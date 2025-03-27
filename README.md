@@ -21,15 +21,25 @@ git branch -M main
 git push -u origin main
 ```
 
-3. Open `.env.development` file and update your Supabase keys. Also change the Vite app URL if necessary.
+3. Initiate a local instance of Supabase
 
-4. Set your package name in `package.json`
+```
+npx supabase start
+```
 
-5. Set your app name in `index.html`
+(If a local instance of Supabase is already running for a different project
+you will need to stop it first. Navigate to the directory associated with
+the other Supabase container and run `npx supabase stop`)
 
-6. Update your logo in `public/`. If your logo is a PNG (not an svg), update the filename in `src/config/AppConfig.ts`.
+4. Open `.env.development` file and update your Supabase keys (output from step 3). Also change the Vite app URL if necessary.
 
-7. Update everything you need in `src/config/AppConfig.ts`.
+5. Set your package name in `package.json`
+
+6. Set your app name in `index.html`
+
+7. Update your logo in `public/`. If your logo is a PNG (not an svg), update the filename in `src/config/AppConfig.ts`.
+
+8. Update everything you need in `src/config/AppConfig.ts`.
 
 ## Stack
 
@@ -48,19 +58,6 @@ git push -u origin main
 - Public files are in public/. Change the logo there. Just replace logo.svg with your logo (png, svg, whatever).
 - Public files are importable using / in vite.
 - Images, pngs, svgs, are importable from assets directly.
-- Set up Supabase locally:
-
-```
-npx supabase init
-npx supabase start # Requires that Docker Desktop be running
-```
-
-- cp .env.example .env
-
-# TODO:
-
-- [ ] Write up readme on cehcking out the repo and setting up the upstream
-- [ ]Add script for updating from template from upstream
 
 # Vite stuff
 
