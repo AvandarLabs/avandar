@@ -60,7 +60,12 @@ export function App({
   const isMobileViewSize = useMediaQuery("(max-width: 768px)");
 
   const logo = (
-    <img src={`/${AppConfig.logoFilename}`} className="logo" alt="Vite logo" />
+    <img
+      src={`/${AppConfig.logoFilename}`}
+      className="logo"
+      alt="Logo"
+      width={40}
+    />
   );
 
   return (
