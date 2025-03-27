@@ -27,7 +27,11 @@ git push -u origin main
 npx supabase start
 ```
 
-4. Open `.env.development` file and update your Supabase keys. Also change the Vite app URL if necessary.
+(If a local instance of Supabase is already running for a different project
+you will need to stop it first. Navigate to the directory associated with
+the other Supabase container and run `npx supabase stop`)
+
+4. Open `.env.development` file and update your Supabase keys (output from step 3). Also change the Vite app URL if necessary.
 
 5. Set your package name in `package.json`
 
@@ -56,17 +60,9 @@ npx supabase start
 - Images, pngs, svgs, are importable from assets directly.
 - Set up Supabase locally:
 
-```
-npx supabase init
-npx supabase start # Requires that Docker Desktop be running
-```
-
-- cp .env.example .env
-
 # TODO:
 
-- [ ] Write up readme on cehcking out the repo and setting up the upstream
-- [ ]Add script for updating from template from upstream
+- [ ] Add script for updating from template from upstream
 
 # Vite stuff
 
