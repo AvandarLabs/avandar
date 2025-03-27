@@ -32,3 +32,5 @@ dist-ssr
 .env.development
 .env.staging
 .env.production
+
+# Ignorable development files 

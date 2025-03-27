@@ -1,12 +1,5 @@
-import {
-  Button,
-  Loader,
-  Stack,
-  TextInput,
-  Title,
-  UnstyledButton,
-} from "@mantine/core";
-import { isEmail, useForm } from "@mantine/form";
+import { Button, Loader, Stack, TextInput, Title } from "@mantine/core";
+import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useMutation } from "@tanstack/react-query";
 import {
