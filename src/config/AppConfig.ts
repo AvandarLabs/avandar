@@ -12,6 +12,6 @@ type AppConfig = {
 };
 
 export const AppConfig = {
-  logoFilename: "logo.svg",
-  appName: "My SaaS App",
+  logoFilename: "logo.png",
+  appName: "Avandar",
 };
