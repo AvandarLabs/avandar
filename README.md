@@ -58,11 +58,6 @@ the other Supabase container and run `npx supabase stop`)
 - Public files are in public/. Change the logo there. Just replace logo.svg with your logo (png, svg, whatever).
 - Public files are importable using / in vite.
 - Images, pngs, svgs, are importable from assets directly.
-- Set up Supabase locally:
-
-# TODO:
-
-- [ ] Add script for updating from template from upstream
 
 # Vite stuff
 
