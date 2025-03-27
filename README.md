@@ -21,15 +21,21 @@ git branch -M main
 git push -u origin main
 ```
 
-3. Open `.env.development` file and update your Supabase keys. Also change the Vite app URL if necessary.
+3. Initiate a local instance of Supabase
 
-4. Set your package name in `package.json`
+```
+npx supabase start
+```
 
-5. Set your app name in `index.html`
+4. Open `.env.development` file and update your Supabase keys. Also change the Vite app URL if necessary.
 
-6. Update your logo in `public/`. If your logo is a PNG (not an svg), update the filename in `src/config/AppConfig.ts`.
+5. Set your package name in `package.json`
 
-7. Update everything you need in `src/config/AppConfig.ts`.
+6. Set your app name in `index.html`
+
+7. Update your logo in `public/`. If your logo is a PNG (not an svg), update the filename in `src/config/AppConfig.ts`.
+
+8. Update everything you need in `src/config/AppConfig.ts`.
 
 ## Stack
 
