@@ -1,9 +1,18 @@
-import { AppShell, Burger, Button, Group, Loader, Stack } from "@mantine/core";
+import {
+  AppShell,
+  Burger,
+  Button,
+  Group,
+  Loader,
+  Stack,
+  Title,
+} from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useMutation } from "@tanstack/react-query";
 import { Link, Outlet, useRouter } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { AppConfig } from "@/config/AppConfig";
 import { AuthService } from "@/services/AuthService";
 
 const HEADER_DEFAULT_HEIGHT = 60;
@@ -50,7 +59,9 @@ export function App({
   const [isNavbarOpened, { toggle: toggleNavbar }] = useDisclosure(false);
   const isMobileViewSize = useMediaQuery("(max-width: 768px)");
 
-  const logo = <img src="/logo.svg" className="logo" alt="Vite logo" />;
+  const logo = (
+    <img src={`/${AppConfig.logoFilename}`} className="logo" alt="Vite logo" />
+  );
 
   return (
     <AppShell
@@ -93,7 +104,7 @@ export function App({
             hiddenFrom="sm"
           />
           {logo}
-          Navbar
+          <Title order={2}>{AppConfig.appName}</Title>
         </Group>
 
         <Stack>

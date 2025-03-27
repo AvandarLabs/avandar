@@ -23,7 +23,13 @@ git push -u origin main
 
 3. Open `.env.development` file and update your Supabase keys. Also change the Vite app URL if necessary.
 
-4. Set your app name in `index.html`
+4. Set your package name in `package.json`
+
+5. Set your app name in `index.html`
+
+6. Update your logo in `public/`. If your logo is a PNG (not an svg), update the filename in `src/config/AppConfig.ts`.
+
+7. Update everything you need in `src/config/AppConfig.ts`.
 
 ## Stack
 
@@ -38,7 +44,6 @@ git push -u origin main
 
 # Notes
 
-- Run `yarn install`
 - TailwindCSS is on v3 because eslint-plugin-tailwindcss does not support v4 yet.
 - Public files are in public/. Change the logo there. Just replace logo.svg with your logo (png, svg, whatever).
 - Public files are importable using / in vite.
