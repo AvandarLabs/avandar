@@ -34,3 +34,4 @@ dist-ssr
 .env.production
 
 # Ignorable development files 
+.eslintcache
