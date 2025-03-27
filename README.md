@@ -5,7 +5,7 @@
 1. Run the following in your terminal
 
 ```
-git clone https://github.com/jps327/saas-app-template.git
+git clone https://github.com/jps327/saas-app-template.git [YOUR_REPO_NAME]
 cd [YOUR_REPO_NAME]
 yarn install
 git remote remove origin
