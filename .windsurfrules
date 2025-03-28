@@ -1,0 +1,78 @@
+# Codebase information
+
+- Bundler: Vite v6
+- Frontend framework: React v19
+- UI library: Mantine v7
+- Router: Tanstack Router v1
+- Querying: Tanstack Query v5
+- Utilities library: Remeda v2
+- Schema validation: Zod
+- Database and Auth: Supabase JS v2
+- Linter: ESLint v9
+- Formatter: Prettier v3
+- CSS Styles: TailwindCSS v3
+
+When writing code or answering questions, use these versions of the libraries. Do not use documentation or APIs from older versions.
+
+# General Code Style & Formatting
+
+- Always declare the type of each variable and function (parameters and return value).
+- Create necessary types.
+- Use JSDoc to document public classes and methods.
+- Use functional and declarative programming patterns; avoid classes.
+- Use named exports instead of default exports.
+- Use higher-order functions (map, filter, reduce) to simplify logic. Avoid `for` and `while` loops.
+- Never use single-line `if`s, always wrap in opening `{` and closing `}` even if there is only one statement.
+- No line, including comments, should exceed 80 characters.
+
+# Naming Conventions
+
+- Use PascalCase for classes.
+- Use camelCase for variables, functions, and methods.
+- Use UPPERCASE for environment variables.
+- Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
+
+# Functions & Logic
+
+- Keep functions short and single-purpose (< 30 lines).
+- Avoid deeply nested blocks by:
+  - Using early returns.
+  - Extracting logic into utility functions.
+- Use default parameter values instead of null/undefined checks.
+- Use `undefined` instead of `null` except when the API expects `null` (examples: JSON in HTTP requests or returning `null` in React to not render)
+- Use RO-RO (Receive Object, Return Object) for passing and returning multiple parameters.
+
+# TypeScript Best Practices
+
+- Avoid using `any`.
+- Use `type` instead of `interface`
+- Use maps or string literal unions instead of enums.
+
+# React Code Style
+
+- For conditional rendering, use ternaries (`condition ? <Component /> : null`) instead of short-circuited evaluation (`condition && <Component />`).
+- For functional components, use the function keyword (`function MyComponent`) instead of arrow functions (`const MyComponent = () =>{}`).
+
+# Data Handling
+
+- Avoid excessive use of primitive types; encapsulate data in composite types.
+- Avoid placing validation inside functions — use classes with internal validation instead.
+- Use Zod for validation
+- Prefer immutability for data:
+  - Use readonly for immutable properties.
+  - Use as const for literals that never change.
+- Use Remeda for functional programming utilities
+  - Always import Remeda as `import * as R from 'remeda';`
+
+# Data Fetching
+
+- Use Tanstack Query for frontend data fetching and mutations
+
+# Styling & UI
+
+- Ensure high accessibility (a11y) standards using ARIA roles and native accessibility props.
+- Use Mantine themes and props to style elements instead of TailwindCSS. Only use TailwindCSS when Mantine's design tokens and props cannot do what we need.
+
+# Terminal
+
+- Use `yarn` instead of `npm`.

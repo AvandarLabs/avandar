@@ -24,7 +24,6 @@ dist-ssr
 *.sw?
 .vim/
 *.swp
-.windsurfrules
 
 # Environment
 .env
