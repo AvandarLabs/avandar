@@ -2,7 +2,12 @@ import { Button, Loader, Stack, TextInput, Title } from "@mantine/core";
 import { isEmail, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useRouter,
+} from "@tanstack/react-router";
 import { AuthService } from "@/services/AuthService";
 
 export const Route = createFileRoute("/register")({
@@ -68,6 +73,7 @@ function RegisterPage() {
             name="email"
             type="email"
             required
+            key={form.key("email")}
             {...form.getInputProps("email")}
           />
           <TextInput
@@ -75,6 +81,7 @@ function RegisterPage() {
             name="password"
             type="password"
             required
+            key={form.key("password")}
             {...form.getInputProps("password")}
           />
           <TextInput
@@ -82,6 +89,7 @@ function RegisterPage() {
             name="confirmPassword"
             type="password"
             required
+            key={form.key("confirmPassword")}
             {...form.getInputProps("confirmPassword")}
           />
 
@@ -91,6 +99,7 @@ function RegisterPage() {
               <Loader />
             : null}
           </Button>
+          <Link to="/signin">Back to sign in</Link>
         </Stack>
       </form>
     </Stack>

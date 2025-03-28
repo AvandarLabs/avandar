@@ -72,21 +72,23 @@ function ProfilePage() {
               }
             </List.Item>
             <List.Item>
-              Password: ********{" "}
-              <Button
-                onClick={() => {
-                  console.log("requesting");
-                  // use route.navigate to go to /udpate-password and include a redirect to the current page
-                  router.navigate({
-                    to: "/update-password",
-                    search: {
-                      redirect: window.location.pathname,
-                    },
-                  });
-                }}
-              >
-                Change password
-              </Button>
+              <Group>
+                <Text>Password: ********</Text>
+                <Button
+                  onClick={() => {
+                    // use route.navigate to go to /update-password and include
+                    // a redirect to the current page
+                    router.navigate({
+                      to: "/update-password",
+                      search: {
+                        redirect: window.location.pathname,
+                      },
+                    });
+                  }}
+                >
+                  Change password
+                </Button>
+              </Group>
             </List.Item>
           </List>
         </Stack>

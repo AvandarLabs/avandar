@@ -16,9 +16,14 @@ export const Route = createFileRoute("/signin")({
   validateSearch: z.object({
     redirect: z.string().optional().catch("/"),
   }),
-  beforeLoad: async () => {
+  beforeLoad: async ({ search }) => {
     const session = await AuthService.getCurrentSession();
     if (session?.user) {
+      if (search.redirect) {
+        // if we're already authenticated and there's a redirect,
+        // let's go to it
+        throw redirect({ to: search.redirect });
+      }
       throw redirect({ to: "/" });
     }
   },
@@ -30,9 +35,7 @@ function SignInPage() {
 
   const { mutate: sendSignInRequest, isPending: isSignInPending } = useMutation(
     {
-      mutationFn: async (values: { email: string; password: string }) => {
-        await AuthService.signIn(values);
-      },
+      mutationFn: AuthService.signIn,
       onSuccess: () => {
         if (searchParams.redirect) {
           router.history.push(searchParams.redirect);
@@ -75,6 +78,7 @@ function SignInPage() {
             label="Email"
             name="email"
             type="email"
+            key={form.key("email")}
             {...form.getInputProps("email")}
           />
           <TextInput
@@ -82,6 +86,7 @@ function SignInPage() {
             label="Password"
             name="password"
             type="password"
+            key={form.key("password")}
             {...form.getInputProps("password")}
           />
           <Button type="submit" disabled={isSignInPending}>
