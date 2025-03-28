@@ -97,6 +97,7 @@ function UpdatePasswordPage() {
           label="Password"
           name="password"
           type="password"
+          key={form.key("password")}
           {...form.getInputProps("password")}
         />
         <TextInput
@@ -104,6 +105,7 @@ function UpdatePasswordPage() {
           label="Confirm Password"
           name="confirmPassword"
           type="password"
+          key={form.key("confirmPassword")}
           {...form.getInputProps("confirmPassword")}
         />
         <Button type="submit" disabled={isPasswordUpdatePending}>

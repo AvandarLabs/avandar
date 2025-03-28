@@ -15,6 +15,10 @@ export const Route = createFileRoute("/forgot-password")({
   },
 });
 
+/**
+ * This is where the user can request a password reset by supplying their email
+ * and a password reset link will be sent to their email.
+ */
 function ForgotPasswordPage() {
   const {
     mutate: sendResetPasswordRequest,
@@ -67,6 +71,7 @@ function ForgotPasswordPage() {
             type="email"
             placeholder="Enter your email address"
             required
+            key={form.key("email")}
             {...form.getInputProps("email")}
           />
           <Button type="submit" disabled={isResetPasswordPending}>
