@@ -11,6 +11,7 @@
 - Linter: ESLint v9
 - Formatter: Prettier v3
 - CSS Styles: TailwindCSS v3
+- Icons: Tabler Icons v3
 
 When writing code or answering questions, use these versions of the libraries. Do not use documentation or APIs from older versions.
 
@@ -72,6 +73,7 @@ When writing code or answering questions, use these versions of the libraries. D
 
 - Ensure high accessibility (a11y) standards using ARIA roles and native accessibility props.
 - Use Mantine themes and props to style elements instead of TailwindCSS. Only use TailwindCSS when Mantine's design tokens and props cannot do what we need.
+- For icons, always use @tabler/icons-react
 
 # Terminal
 
