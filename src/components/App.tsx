@@ -1,7 +1,6 @@
 import {
   AppShell,
   Burger,
-  Button,
   Group,
   Loader,
   Menu,
