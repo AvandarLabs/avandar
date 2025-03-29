@@ -9,7 +9,7 @@ import {
   Title,
   UnstyledButton,
 } from "@mantine/core";
-import { useDisclosure, useMediaQuery } from "@mantine/hooks";
+import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconChevronDown, IconLogout } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
