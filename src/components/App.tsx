@@ -1,6 +1,7 @@
 import {
   AppShell,
   Burger,
+  Button,
   Group,
   Loader,
   Menu,
@@ -15,6 +16,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Link, Outlet, useRouter } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { AppConfig } from "@/config/AppConfig";
+import { useIsMobileSize } from "@/hooks/useIsMobileSize";
 import { AuthService } from "@/services/AuthService";
 
 const HEADER_DEFAULT_HEIGHT = 60;
@@ -60,7 +62,7 @@ export function App({
     });
 
   const [isNavbarOpened, { toggle: toggleNavbar }] = useDisclosure(false);
-  const isMobileViewSize = useMediaQuery("(max-width: 768px)");
+  const isMobileViewSize = useIsMobileSize() ?? false;
 
   const logo = (
     <img
@@ -104,38 +106,45 @@ export function App({
       : null}
 
       <AppShell.Navbar p="md" bg="neutral" c="white">
-        <Group>
-          <Burger
-            opened={isNavbarOpened}
-            onClick={toggleNavbar}
-            size="sm"
-            hiddenFrom="sm"
-          />
-          <Menu shadow="md" width={200}>
-            <Menu.Target>
-              <UnstyledButton>
-                <Group gap="xs">
-                  {logo}
-                  <Title order={2}>{AppConfig.appName}</Title>
-                  <IconChevronDown />
-                </Group>
-              </UnstyledButton>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item
-                leftSection={<IconLogout size={16} />}
-                onClick={() => sendSignOutRequest()}
-              >
-                Sign Out{" "}
-                {isSignOutPending ?
-                  <Loader />
-                : null}
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        </Group>
-
         <Stack>
+          <Group>
+            <Burger
+              color="white"
+              opened={isNavbarOpened}
+              onClick={toggleNavbar}
+              size="sm"
+              hiddenFrom="sm"
+            />
+            <Menu shadow="md" width={200}>
+              <Menu.Target>
+                <Button
+                  color="neutral"
+                  fullWidth
+                  justify="flex-start"
+                  size={isMobileViewSize ? "sm" : "lg"}
+                  pl="xs"
+                >
+                  <Group gap="xs">
+                    {logo}
+                    <Title order={2}>{AppConfig.appName}</Title>
+                    <IconChevronDown />
+                  </Group>
+                </Button>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  leftSection={<IconLogout size={16} />}
+                  onClick={() => sendSignOutRequest()}
+                >
+                  Sign Out{" "}
+                  {isSignOutPending ?
+                    <Loader />
+                  : null}
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+          </Group>
+
           <Link to="/" className="[&.active]:font-bold">
             Home
           </Link>
