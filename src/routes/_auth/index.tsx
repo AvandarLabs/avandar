@@ -36,10 +36,7 @@ function HomePage() {
         </Anchor>
       </Group>
       <Box>
-        <Button
-          onClick={() => setCount((prevCount) => prevCount + 1)}
-          color="primary"
-        >
+        <Button onClick={() => setCount((prevCount) => prevCount + 1)}>
           Count is {count}
         </Button>
       </Box>

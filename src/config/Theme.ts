@@ -33,16 +33,18 @@ export const Theme = createTheme({
     /**
      * Supporting or accent color. Use sparingly to accent UI elements
      * like buttons, links, or headlines.
+     *
+     * Scale from Refactoring UI Palette 2 - Yellow (Vivid)
      */
     secondary: [
-      "#fefbf1",
-      "#fdf3d6",
-      "#fcebbb",
-      "#fbe3a0",
-      "#fadb85",
-      "#f8d36a",
+      "#fffbea",
+      "#fff3c4",
+      "#fce588",
+      "#fadb5f",
       "#f7c948",
+      "#f0b429",
       "#de911d",
+      "#cb6e17",
       "#b44d12",
       "#8d2b0b",
     ] as const,
@@ -103,46 +105,21 @@ export const Theme = createTheme({
       "#00899d",
     ] as const,
 
-    /** Background colors, E.g. app background, cards, panels */
-    background: [
-      "#f6f6f6",
-      "#e7e7e7",
-      "#d1d1d1",
-      "#b0b0b0",
-      "#888888",
-      "#6d6d6d",
-      "#5d5d5d",
-      "#4f4f4f",
-      "#454545",
-      "#373737",
-    ] as const,
-
-    /** Secondary text, hints, descriptions */
-    muted: [
-      "#f6f6f6",
-      "#e7e7e7",
-      "#d1d1d1",
-      "#b0b0b0",
-      "#888888",
-      "#666666",
-      "#5d5d5d",
-      "#4f4f4f",
-      "#454545",
-      "#3d3d3d",
-    ] as const,
-
-    /** Neutral lines, separators */
-    border: [
-      "#f6f6f6",
-      "#e7e7e7",
-      "#d1d1d1",
-      "#b0b0b0",
-      "#909090",
-      "#6d6d6d",
-      "#5d5d5d",
-      "#4f4f4f",
-      "#454545",
-      "#3d3d3d",
+    /**
+     * Neutral colors, E.g. cards, panels.
+     * (Scale from Refactoring UI Palette 2 - Blue Grey)
+     */
+    neutral: [
+      "#f0f4f8",
+      "#d9e2ec",
+      "#bcccdc",
+      "#9fb3c8",
+      "#829ab1",
+      "#627d98",
+      "#486581",
+      "#334e68",
+      "#243b53",
+      "#102a43",
     ] as const,
   },
 });

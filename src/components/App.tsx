@@ -100,7 +100,7 @@ export function App({
         </AppShell.Header>
       : null}
 
-      <AppShell.Navbar p="md" bg="primary">
+      <AppShell.Navbar p="md" bg="neutral" c="white">
         <Group>
           <Burger
             opened={isNavbarOpened}
