@@ -4,8 +4,10 @@ import {
   Button,
   Group,
   Loader,
+  Menu,
   Stack,
   Title,
+  UnstyledButton,
 } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -108,8 +110,19 @@ export function App({
             size="sm"
             hiddenFrom="sm"
           />
-          {logo}
-          <Title order={2}>{AppConfig.appName}</Title>
+          <Menu shadow="md" width={200}>
+            <Menu.Target>
+              <UnstyledButton>
+                <Group gap="xs">
+                  {logo}
+                  <Title order={2}>{AppConfig.appName}</Title>
+                </Group>
+              </UnstyledButton>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Item>Testing</Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
         </Group>
 
         <Stack>
