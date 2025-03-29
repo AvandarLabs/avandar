@@ -114,7 +114,7 @@ export function InputTextField({
           </Button>
         : null}
         {showCancelButton ?
-          <Button variant="outline" onClick={onCancel}>
+          <Button variant="default" onClick={onCancel}>
             {cancelButtonLabel}
           </Button>
         : null}
