@@ -8,13 +8,14 @@ import {
   Title,
   UnstyledButton,
 } from "@mantine/core";
-import { useDisclosure, useMediaQuery } from "@mantine/hooks";
+import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconChevronDown, IconLogout } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { Link, Outlet, useRouter } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { AppConfig } from "@/config/AppConfig";
+import { useIsMobileSize } from "@/hooks/useIsMobileSize";
 import { AuthService } from "@/services/AuthService";
 
 const HEADER_DEFAULT_HEIGHT = 60;
@@ -60,7 +61,7 @@ export function App({
     });
 
   const [isNavbarOpened, { toggle: toggleNavbar }] = useDisclosure(false);
-  const isMobileViewSize = useMediaQuery("(max-width: 768px)");
+  const isMobileViewSize = useIsMobileSize() ?? false;
 
   const logo = (
     <img
