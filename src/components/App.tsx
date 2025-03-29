@@ -1,14 +1,16 @@
 import {
   AppShell,
   Burger,
-  Button,
   Group,
   Loader,
+  Menu,
   Stack,
   Title,
+  UnstyledButton,
 } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
+import { IconChevronDown, IconLogout } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { Link, Outlet, useRouter } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
@@ -40,21 +42,22 @@ export function App({
   navbarWidth = NAVBAR_DEFAULT_WIDTH,
 }: Props): JSX.Element {
   const router = useRouter();
-  const { mutate: doSignOut, isPending: isSignOutPending } = useMutation({
-    mutationFn: async () => {
-      await AuthService.signOut();
-    },
-    onSuccess: () => {
-      router.invalidate();
-    },
-    onError: (error) => {
-      notifications.show({
-        title: "Sign out failed",
-        message: error.message,
-        color: "red",
-      });
-    },
-  });
+  const { mutate: sendSignOutRequest, isPending: isSignOutPending } =
+    useMutation({
+      mutationFn: async () => {
+        await AuthService.signOut();
+      },
+      onSuccess: () => {
+        router.invalidate();
+      },
+      onError: (error) => {
+        notifications.show({
+          title: "Sign out failed",
+          message: error.message,
+          color: "red",
+        });
+      },
+    });
 
   const [isNavbarOpened, { toggle: toggleNavbar }] = useDisclosure(false);
   const isMobileViewSize = useMediaQuery("(max-width: 768px)");
@@ -108,8 +111,28 @@ export function App({
             size="sm"
             hiddenFrom="sm"
           />
-          {logo}
-          <Title order={2}>{AppConfig.appName}</Title>
+          <Menu shadow="md" width={200}>
+            <Menu.Target>
+              <UnstyledButton>
+                <Group gap="xs">
+                  {logo}
+                  <Title order={2}>{AppConfig.appName}</Title>
+                  <IconChevronDown />
+                </Group>
+              </UnstyledButton>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Item
+                leftSection={<IconLogout size={16} />}
+                onClick={() => sendSignOutRequest()}
+              >
+                Sign Out{" "}
+                {isSignOutPending ?
+                  <Loader />
+                : null}
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
         </Group>
 
         <Stack>
@@ -119,12 +142,6 @@ export function App({
           <Link to="/profile" className="[&.active]:font-bold">
             Profile
           </Link>
-          <Button type="button" onClick={() => doSignOut()}>
-            Sign Out{" "}
-            {isSignOutPending ?
-              <Loader />
-            : null}
-          </Button>
         </Stack>
       </AppShell.Navbar>
       <AppShell.Main>
