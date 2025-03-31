@@ -2,7 +2,7 @@ import { MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
-import { Theme } from "@/config/Theme";
+import { cssVariablesResolver, Theme } from "@/config/Theme";
 import { RootRouteContext } from "@/types/RootRouteContext";
 
 const queryClient = new QueryClient();
@@ -17,7 +17,10 @@ export const Route = createRootRouteWithContext<RootRouteContext>()({
 function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider theme={Theme}>
+      <MantineProvider
+        theme={Theme}
+        cssVariablesResolver={cssVariablesResolver}
+      >
         <Notifications />
         <Outlet />
       </MantineProvider>

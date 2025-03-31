@@ -12,11 +12,13 @@ import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconChevronDown, IconLogout } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
-import { Link, Outlet, useRouter } from "@tanstack/react-router";
+import { Outlet, useRouter } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { Link } from "@/components/ui/Link";
 import { AppConfig } from "@/config/AppConfig";
 import { useIsMobileSize } from "@/hooks/useIsMobileSize";
 import { AuthService } from "@/services/AuthService";
+import css from "./AppScaffold.module.css";
 
 const HEADER_DEFAULT_HEIGHT = 60;
 const FOOTER_DEFAULT_HEIGHT = 60;
@@ -33,7 +35,12 @@ type Props = {
   navbarWidth?: number;
 };
 
-export function App({
+const navLinks = [
+  { to: "/", label: "Home" },
+  { to: "/profile", label: "Profile" },
+];
+
+export function AppScaffold({
   header = null,
   footer = null,
   aside = null,
@@ -77,6 +84,9 @@ export function App({
       layout="alt"
       header={{ height: headerHeight }}
       footer={{ height: footerHeight }}
+      classNames={{
+        navbar: css.navbar,
+      }}
       navbar={{
         width: navbarWidth,
         breakpoint: "sm",
@@ -104,8 +114,8 @@ export function App({
         </AppShell.Header>
       : null}
 
-      <AppShell.Navbar p="md">
-        <Group>
+      <AppShell.Navbar>
+        <Group mb="sm" px="md" py="sm">
           <Burger
             opened={isNavbarOpened}
             onClick={toggleNavbar}
@@ -135,15 +145,17 @@ export function App({
             </Menu.Dropdown>
           </Menu>
         </Group>
-
-        <Stack>
-          <Link to="/" className="[&.active]:font-bold">
-            Home
+        {navLinks.map((link) => (
+          <Link
+            key={link.to}
+            to={link.to}
+            className={css.anchor}
+            px="md"
+            py="sm"
+          >
+            {link.label}
           </Link>
-          <Link to="/profile" className="[&.active]:font-bold">
-            Profile
-          </Link>
-        </Stack>
+        ))}
       </AppShell.Navbar>
       <AppShell.Main>
         <Outlet />
