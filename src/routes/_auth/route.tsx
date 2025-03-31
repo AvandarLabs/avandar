@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { App } from "@/components/App";
+import { AppScaffold } from "@/components/AppScaffold/AppScaffold";
 import { AuthService } from "@/services/AuthService";
 
 export const Route = createFileRoute("/_auth")({
@@ -26,5 +26,5 @@ export const Route = createFileRoute("/_auth")({
 });
 
 function RouteComponent() {
-  return <App />;
+  return <AppScaffold />;
 }
