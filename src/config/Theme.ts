@@ -18,6 +18,19 @@ const AVANDAR_BLUE_SHADES = [
   "#143894",
 ] as const;
 
+const NEUTRAL_SHADES = [
+  "#f0f4f8",
+  "#d9e2ec",
+  "#bcccdc",
+  "#9fb3c8",
+  "#829ab1",
+  "#627d98",
+  "#486581",
+  "#334e68",
+  "#243b53",
+  "#102a43",
+] as const;
+
 export const Theme = createTheme({
   scale: 1, // root font size is 1rem = 16px
   fontFamily: "Figtree, sans-serif",
@@ -114,18 +127,7 @@ export const Theme = createTheme({
      * Neutral colors, E.g. cards, panels.
      * (Scale from Refactoring UI Palette 2 - Blue Grey)
      */
-    neutral: [
-      "#f0f4f8",
-      "#d9e2ec",
-      "#bcccdc",
-      "#9fb3c8",
-      "#829ab1",
-      "#627d98",
-      "#486581",
-      "#334e68",
-      "#243b53",
-      "#102a43",
-    ] as const,
+    neutral: NEUTRAL_SHADES,
   },
 
   breakpoints: {
@@ -150,11 +152,11 @@ export const Theme = createTheme({
 
   other: {
     navbar: {
-      backgroundColor: DEFAULT_THEME.colors.dark[8],
+      backgroundColor: NEUTRAL_SHADES[6],
       textColor: DEFAULT_THEME.white,
-      hoverBackgroundColor: DEFAULT_THEME.colors.dark[6],
-      activeBackgroundColor: DEFAULT_THEME.colors.dark[5],
-      activeHoverBackgroundColor: DEFAULT_THEME.colors.dark[4],
+      hoverBackgroundColor: NEUTRAL_SHADES[7],
+      activeBackgroundColor: NEUTRAL_SHADES[7],
+      activeHoverBackgroundColor: NEUTRAL_SHADES[7],
     },
   },
 });

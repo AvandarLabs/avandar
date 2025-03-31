@@ -22,7 +22,7 @@ import css from "./AppScaffold.module.css";
 const HEADER_DEFAULT_HEIGHT = 60;
 const FOOTER_DEFAULT_HEIGHT = 60;
 const ASIDE_DEFAULT_WIDTH = 300;
-const NAVBAR_DEFAULT_WIDTH = 300;
+const NAVBAR_DEFAULT_WIDTH = 250;
 
 type Props = {
   header?: React.ReactNode;
@@ -114,7 +114,7 @@ export function AppScaffold({
       : null}
 
       <AppShell.Navbar>
-        <Group mb="sm" px="md" py="sm">
+        <Group px="md" py="sm">
           <Burger
             opened={isNavbarOpened}
             onClick={toggleNavbar}
