@@ -4,6 +4,7 @@ import {
   Group,
   Loader,
   Menu,
+  Text,
   Title,
   UnstyledButton,
 } from "@mantine/core";
@@ -144,17 +145,20 @@ export function AppScaffold({
             </Menu.Dropdown>
           </Menu>
         </Group>
-        {navLinks.map((link) => (
-          <Link
-            key={link.to}
-            to={link.to}
-            className={css.anchor}
-            px="md"
-            py="sm"
-          >
-            {link.label}
-          </Link>
-        ))}
+        {AppConfig.navbarLinkOrder.map((linkKey) => {
+          const link = AppConfig.links[linkKey];
+          return (
+            <Link
+              key={linkKey}
+              to={link.to}
+              className={css.anchor}
+              px="md"
+              py="sm"
+            >
+              {link.label}
+            </Link>
+          );
+        })}
       </AppShell.Navbar>
       <AppShell.Main>
         <Outlet />
