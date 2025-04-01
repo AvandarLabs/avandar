@@ -30,7 +30,7 @@ When writing code or answering questions, use these versions of the libraries. D
 
 - Use PascalCase for classes.
 - Use camelCase for variables, functions, and methods.
-- Use UPPERCASE for environment variables.
+- Use UPPERCASE for environment variables or hard-coded constants.
 - Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
 
 # Functions & Logic
