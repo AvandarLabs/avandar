@@ -10,10 +10,12 @@ type Props = {
 
 export function DataGrid({ fields, data }: Props): JSX.Element {
   const columnDefs = useMemo(() => {
-    return fields.map((field) => ({
-      field: field,
-      headerName: field,
-    }));
+    return fields.map((field) => {
+      return {
+        field: field,
+        headerName: field,
+      };
+    });
   }, [fields]);
 
   // AgGrid will fill the size of the parent container
