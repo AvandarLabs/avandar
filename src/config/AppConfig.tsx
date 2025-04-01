@@ -37,6 +37,11 @@ type AppConfig = {
    * The order to show the navigable links in the Navbar
    */
   navbarLinkOrder: readonly string[];
+
+  dataImportApp: {
+    maxDatasetNameLength: number;
+    maxDatasetDescriptionLength: number;
+  };
 };
 
 export const AppConfig = {
@@ -69,4 +74,9 @@ export const AppConfig = {
     },
   },
   navbarLinkOrder: ["home", "dataImport", "dataExplorer", "profile"] as const,
+
+  dataImportApp: {
+    maxDatasetNameLength: 100,
+    maxDatasetDescriptionLength: 500,
+  },
 } satisfies AppConfig;

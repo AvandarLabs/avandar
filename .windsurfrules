@@ -22,7 +22,6 @@ When writing code or answering questions, use these versions of the libraries. D
 - Use functional and declarative programming patterns; avoid classes.
 - Use higher-order functions (map, filter, reduce) to simplify logic. Avoid `for` and `while` loops.
 - Use named exports instead of default exports.
-- Do not use implicit returns in arrow functions. Always use curly braces with an explicit `return`, even if would have been a single-line function.
 - Never use single-line `if`s, always wrap in opening `{` and closing `}` even if there is only one statement.
 - No line, including comments, should exceed 80 characters.
 
@@ -64,6 +63,7 @@ When writing code or answering questions, use these versions of the libraries. D
   - Use `as const` for literals that never change.
 - Use Remeda for functional programming utilities
   - Always import Remeda as `import * as R from 'remeda';`
+- When using Mantine's `useForm`, always set a `key={form.key('fieldId')}` prop to each form input component.
 
 # Data Fetching
 

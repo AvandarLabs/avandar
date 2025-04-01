@@ -50,7 +50,7 @@ export default [
         "@typescript-eslint/explicit-module-boundary-types": "error",
         "@typescript-eslint/no-unused-vars": "off",
         "@typescript-eslint/no-shadow": "error",
-        "arrow-body-style": "off",
+        "arrow-body-style": ["error", "always"],
         camelcase: "off",
         "@typescript-eslint/array-type": ["error", { default: "array-simple" }],
         "react/function-component-definition": [
