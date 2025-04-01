@@ -2,6 +2,7 @@ import { Container, List, Stack, Title } from "@mantine/core";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { FileUploadField } from "../ui/FileUploadField";
+import { DataGrid } from "./DataGrid";
 import { useCSV } from "./useCSV";
 
 export function DataImportApp(): JSX.Element {
@@ -25,6 +26,7 @@ export function DataImportApp(): JSX.Element {
               return <List.Item key={field}>{field}</List.Item>;
             })}
           </List>
+          <DataGrid fields={csv.csvMeta.fields ?? []} data={csv.data} />
         </Stack>
       : null}
 

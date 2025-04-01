@@ -1,3 +1,6 @@
+export type CSVRow = Record<string, unknown>;
+export type CSVData = CSVRow[];
+
 export type MIMEType =
   // Text
   | "text/plain"

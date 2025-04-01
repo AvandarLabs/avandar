@@ -1,10 +1,7 @@
 import { notifications } from "@mantine/notifications";
 import Papa from "papaparse";
 import { useState } from "react";
-import { MIMEType } from "@/types/helpers";
-
-type CSVRow = Record<string, unknown>;
-type CSVData = readonly CSVRow[];
+import { CSVData, CSVRow, MIMEType } from "@/types/helpers";
 
 type CSVMetadata = {
   fileMeta: {
@@ -14,7 +11,7 @@ type CSVMetadata = {
   };
   csvMeta: Papa.ParseMeta;
   data: CSVData;
-  errors: readonly Papa.ParseError[];
+  errors: Papa.ParseError[];
 };
 
 export function useCSV(): {
