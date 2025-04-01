@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@mantine/core": "^7.17.2",
+    "@mantine/dropzone": "^7.17.3",
     "@mantine/form": "^7.17.2",
     "@mantine/hooks": "^7.17.2",
     "@mantine/modals": "^7.17.3",
