@@ -22,7 +22,7 @@ import css from "./AppScaffold.module.css";
 const HEADER_DEFAULT_HEIGHT = 60;
 const FOOTER_DEFAULT_HEIGHT = 60;
 const ASIDE_DEFAULT_WIDTH = 300;
-const NAVBAR_DEFAULT_WIDTH = 250;
+const NAVBAR_DEFAULT_WIDTH = 220;
 
 type Props = {
   header?: React.ReactNode;
