@@ -43,7 +43,7 @@ function ProfilePage() {
       <Title order={1}>Profile</Title>
       {user ?
         <Stack>
-          <List>
+          <List listStyleType="none">
             <List.Item>
               {isEditingEmail ?
                 <InputTextField
