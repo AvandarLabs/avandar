@@ -18,6 +18,7 @@ import { Route as ForgotPasswordImport } from "./routes/forgot-password";
 import { Route as AuthRouteImport } from "./routes/_auth/route";
 import { Route as AuthIndexImport } from "./routes/_auth/index";
 import { Route as AuthProfileImport } from "./routes/_auth/profile";
+import { Route as AuthDataImportImport } from "./routes/_auth/data-import";
 
 // Create/Update Routes
 
@@ -62,6 +63,12 @@ const AuthProfileRoute = AuthProfileImport.update({
   getParentRoute: () => AuthRouteRoute,
 } as any);
 
+const AuthDataImportRoute = AuthDataImportImport.update({
+  id: "/data-import",
+  path: "/data-import",
+  getParentRoute: () => AuthRouteRoute,
+} as any);
+
 // Populate the FileRoutesByPath interface
 
 declare module "@tanstack/react-router" {
@@ -101,6 +108,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof UpdatePasswordImport;
       parentRoute: typeof rootRoute;
     };
+    "/_auth/data-import": {
+      id: "/_auth/data-import";
+      path: "/data-import";
+      fullPath: "/data-import";
+      preLoaderRoute: typeof AuthDataImportImport;
+      parentRoute: typeof AuthRouteImport;
+    };
     "/_auth/profile": {
       id: "/_auth/profile";
       path: "/profile";
@@ -121,11 +135,13 @@ declare module "@tanstack/react-router" {
 // Create and export the route tree
 
 interface AuthRouteRouteChildren {
+  AuthDataImportRoute: typeof AuthDataImportRoute;
   AuthProfileRoute: typeof AuthProfileRoute;
   AuthIndexRoute: typeof AuthIndexRoute;
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthDataImportRoute: AuthDataImportRoute,
   AuthProfileRoute: AuthProfileRoute,
   AuthIndexRoute: AuthIndexRoute,
 };
@@ -140,6 +156,7 @@ export interface FileRoutesByFullPath {
   "/register": typeof RegisterRoute;
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
+  "/data-import": typeof AuthDataImportRoute;
   "/profile": typeof AuthProfileRoute;
   "/": typeof AuthIndexRoute;
 }
@@ -149,6 +166,7 @@ export interface FileRoutesByTo {
   "/register": typeof RegisterRoute;
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
+  "/data-import": typeof AuthDataImportRoute;
   "/profile": typeof AuthProfileRoute;
   "/": typeof AuthIndexRoute;
 }
@@ -160,6 +178,7 @@ export interface FileRoutesById {
   "/register": typeof RegisterRoute;
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
+  "/_auth/data-import": typeof AuthDataImportRoute;
   "/_auth/profile": typeof AuthProfileRoute;
   "/_auth/": typeof AuthIndexRoute;
 }
@@ -172,6 +191,7 @@ export interface FileRouteTypes {
     | "/register"
     | "/signin"
     | "/update-password"
+    | "/data-import"
     | "/profile"
     | "/";
   fileRoutesByTo: FileRoutesByTo;
@@ -180,6 +200,7 @@ export interface FileRouteTypes {
     | "/register"
     | "/signin"
     | "/update-password"
+    | "/data-import"
     | "/profile"
     | "/";
   id:
@@ -189,6 +210,7 @@ export interface FileRouteTypes {
     | "/register"
     | "/signin"
     | "/update-password"
+    | "/_auth/data-import"
     | "/_auth/profile"
     | "/_auth/";
   fileRoutesById: FileRoutesById;
@@ -230,6 +252,7 @@ export const routeTree = rootRoute
     "/_auth": {
       "filePath": "_auth/route.tsx",
       "children": [
+        "/_auth/data-import",
         "/_auth/profile",
         "/_auth/"
       ]
@@ -245,6 +268,10 @@ export const routeTree = rootRoute
     },
     "/update-password": {
       "filePath": "update-password.tsx"
+    },
+    "/_auth/data-import": {
+      "filePath": "_auth/data-import.tsx",
+      "parent": "/_auth"
     },
     "/_auth/profile": {
       "filePath": "_auth/profile.tsx",

@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Mantine style overrides */
+.mantine-List-root {
+  /* Tailwind had removed list-style, so we are adding it back */
+  list-style: revert;
+}

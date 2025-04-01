@@ -36,6 +36,7 @@ type Props = {
 
 const navLinks = [
   { to: "/", label: "Home" },
+  { to: "/data-import", label: "Data Import" },
   { to: "/profile", label: "Profile" },
 ];
 
@@ -156,10 +157,12 @@ export function AppScaffold({
           </Link>
         ))}
       </AppShell.Navbar>
-      <AppShell.Main>
+
+      <AppShell.Main pt="md">
         <Outlet />
         <TanStackRouterDevtools />
       </AppShell.Main>
+
       {aside ?
         <AppShell.Aside p="md">{aside}</AppShell.Aside>
       : null}
