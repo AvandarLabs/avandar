@@ -48,17 +48,19 @@ export const Theme = createTheme({
 
 export const cssVariablesResolver: CSSVariablesResolver = (
   theme: MantineTheme,
-) => ({
-  variables: {
-    "--mantine-navbar-background": theme.other.navbar.backgroundColor,
-    "--mantine-navbar-color": theme.other.navbar.textColor,
-    "--mantine-navbar-hover-background":
-      theme.other.navbar.hoverBackgroundColor,
-    "--mantine-navbar-active-background":
-      theme.other.navbar.activeBackgroundColor,
-    "--mantine-navbar-active-hover-background":
-      theme.other.navbar.activeHoverBackgroundColor,
-  },
-  dark: {},
-  light: {},
-});
+) => {
+  return {
+    variables: {
+      "--mantine-navbar-background": theme.other.navbar.backgroundColor,
+      "--mantine-navbar-color": theme.other.navbar.textColor,
+      "--mantine-navbar-hover-background":
+        theme.other.navbar.hoverBackgroundColor,
+      "--mantine-navbar-active-background":
+        theme.other.navbar.activeBackgroundColor,
+      "--mantine-navbar-active-hover-background":
+        theme.other.navbar.activeHoverBackgroundColor,
+    },
+    dark: {},
+    light: {},
+  };
+};
