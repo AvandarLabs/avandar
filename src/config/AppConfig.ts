@@ -1,8 +1,15 @@
+/**
+ * Configuration for a navigable link in the app.
+ * These show up in the navbar.
+ */
 type LinkConfig = {
   to: string;
   label: string;
 };
 
+/**
+ * Configuration for the app.
+ */
 type AppConfig = {
   /**
    * The path and filename to the logo file relative to the `public/` directory.

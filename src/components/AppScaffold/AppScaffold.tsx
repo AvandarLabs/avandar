@@ -4,7 +4,6 @@ import {
   Group,
   Loader,
   Menu,
-  Text,
   Title,
   UnstyledButton,
 } from "@mantine/core";
