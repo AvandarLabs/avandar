@@ -4,18 +4,22 @@ import "@mantine/dropzone/styles.css";
 import "@mantine/notifications/styles.css";
 import "./index.css";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
+import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { StrictMode, useMemo } from "react";
 import { createRoot } from "react-dom/client";
 import { useAuth } from "./hooks/auth/useAuth";
 import { routeTree } from "./routeTree.gen";
 import { RootRouteContext } from "./types/RootRouteContext";
 
-// TODO: add defaultPrelod: intent? add scrollRestoration: true?
+ModuleRegistry.registerModules([AllCommunityModule]);
+
 const router = createRouter({
   routeTree,
   context: {
     user: undefined,
   },
+  defaultPreload: "intent",
+  scrollRestoration: true,
 });
 
 // Register the router instance for type safety
