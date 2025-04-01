@@ -133,7 +133,9 @@ export function AppScaffold({
               <Menu.Dropdown>
                 <Menu.Item
                   leftSection={<IconLogout size={16} />}
-                  onClick={() => sendSignOutRequest()}
+                  onClick={() => {
+                    return sendSignOutRequest();
+                  }}
                 >
                   Sign Out{" "}
                   {isSignOutPending ?

@@ -15,10 +15,11 @@ export const Route = createFileRoute("/_auth/")({
 function useRandomNumber(): UseQueryResult<number> {
   return useQuery({
     queryKey: ["example"],
-    queryFn: () =>
-      Promise.resolve(
+    queryFn: () => {
+      return Promise.resolve(
         Math.round((Math.random() * 100 + Number.EPSILON) * 100) / 100,
-      ),
+      );
+    },
   });
 }
 
@@ -36,7 +37,13 @@ function HomePage() {
         </Anchor>
       </Group>
       <Box>
-        <Button onClick={() => setCount((prevCount) => prevCount + 1)}>
+        <Button
+          onClick={() => {
+            setCount((prevCount) => {
+              return prevCount + 1;
+            });
+          }}
+        >
           Count is {count}
         </Button>
       </Box>

@@ -26,7 +26,9 @@ export function useBoolean(
   }, []);
 
   const toggle = useCallback(() => {
-    setBool((prev) => !prev);
+    setBool((prev) => {
+      return !prev;
+    });
   }, []);
 
   return [bool, setTrue, setFalse, toggle];
