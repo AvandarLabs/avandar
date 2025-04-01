@@ -34,11 +34,6 @@ type Props = {
   navbarWidth?: number;
 };
 
-const navLinks = [
-  { to: "/", label: "Home" },
-  { to: "/profile", label: "Profile" },
-];
-
 export function AppScaffold({
   header = null,
   footer = null,
