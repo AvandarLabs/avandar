@@ -115,7 +115,7 @@ export function AppScaffold({
       : null}
 
       <AppShell.Navbar>
-        <Group px="md" py="sm">
+        <Group px="md" py="sm" justify="center">
           <Burger
             opened={isNavbarOpened}
             onClick={toggleNavbar}
