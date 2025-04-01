@@ -21,7 +21,7 @@ function ProfilePage() {
         notifications.show({
           title: "Email address updated",
           message: "Please check your email for a confirmation link",
-          color: "green",
+          color: "success",
         });
         toggleEditingEmailState();
       },
@@ -29,7 +29,7 @@ function ProfilePage() {
         notifications.show({
           title: "Failed to update email",
           message: "Please try again or reach out to support",
-          color: "red",
+          color: "danger",
         });
       },
     });

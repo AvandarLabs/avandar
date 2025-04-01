@@ -58,7 +58,7 @@ export function AppScaffold({
         notifications.show({
           title: "Sign out failed",
           message: error.message,
-          color: "red",
+          color: "danger",
         });
       },
     });

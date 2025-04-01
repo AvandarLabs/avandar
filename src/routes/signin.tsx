@@ -47,7 +47,7 @@ function SignInPage() {
         notifications.show({
           title: "Sign in failed",
           message: error.message,
-          color: "red",
+          color: "danger",
         });
       },
     },

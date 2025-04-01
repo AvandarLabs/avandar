@@ -50,14 +50,14 @@ function UpdatePasswordPage() {
         notifications.show({
           title: "Password updated successfully",
           message: "You can start using your new password now",
-          color: "green",
+          color: "success",
         });
       },
       onError: (error) => {
         notifications.show({
           title: "Password update failed",
           message: error.message,
-          color: "red",
+          color: "danger",
         });
       },
     });

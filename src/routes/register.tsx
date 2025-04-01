@@ -34,7 +34,7 @@ function RegisterPage() {
         notifications.show({
           title: "Registration failed",
           message: error.message,
-          color: "red",
+          color: "danger",
         });
       },
     });

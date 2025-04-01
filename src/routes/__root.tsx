@@ -23,7 +23,7 @@ function RootComponent() {
         cssVariablesResolver={cssVariablesResolver}
       >
         <ModalsProvider>
-          <Notifications />
+          <Notifications position="top-right" />
           <Outlet />
         </ModalsProvider>
       </MantineProvider>

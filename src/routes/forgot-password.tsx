@@ -31,14 +31,14 @@ function ForgotPasswordPage() {
       notifications.show({
         title: "Sent password reset email",
         message: "Check your email for a password reset link",
-        color: "green",
+        color: "success",
       });
     },
     onError: (error) => {
       notifications.show({
         title: "Password reset failed",
         message: error.message,
-        color: "red",
+        color: "danger",
       });
     },
   });
