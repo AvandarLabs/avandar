@@ -153,7 +153,9 @@ export function AppScaffold({
                 px="md"
                 py="sm"
               >
-                {link.label}
+                <Group>
+                  {link.icon} {link.label}
+                </Group>
               </Link>
             );
           })}
