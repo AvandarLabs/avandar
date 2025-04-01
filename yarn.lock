@@ -553,6 +553,11 @@
   resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-7.17.2.tgz#bfd10e65cb5a83326ecfdd339e56558ea6045c44"
   integrity sha512-tbErVcGZu0E4dSmE6N0k6Tv1y9R3SQmmQgwqorcc+guEgKMdamc36lucZGlJnSGUmGj+WLUgELkEQ0asdfYBDA==
 
+"@mantine/modals@^7.17.3":
+  version "7.17.3"
+  resolved "https://registry.yarnpkg.com/@mantine/modals/-/modals-7.17.3.tgz#8d4aa1996493a0f94b6bbc35520f495a5f047c79"
+  integrity sha512-ZwNDTmfqyVRPUNl+vtBDbgZ9aVeQw6H+KLDSZxEsIYjc8p6u7FgCQ/FaBpsJOf//Oc7gHTLF0al27AqvW8jmOA==
+
 "@mantine/notifications@^7.17.2":
   version "7.17.2"
   resolved "https://registry.yarnpkg.com/@mantine/notifications/-/notifications-7.17.2.tgz#f534a1387d187b605c2840d85c56da03282bdba2"
@@ -561,10 +566,22 @@
     "@mantine/store" "7.17.2"
     react-transition-group "4.4.5"
 
+"@mantine/spotlight@^7.17.3":
+  version "7.17.3"
+  resolved "https://registry.yarnpkg.com/@mantine/spotlight/-/spotlight-7.17.3.tgz#f0abf230b686f318eeac3b2f8ccc287743ac096f"
+  integrity sha512-RBmPjhyxGyel6S63tW5Pl9Xdx1OfBAxjGDyz3N3sdAY/4WaM4PSJTC10mCkxd9G5RKvyDtOBAYFKY9FHeUYY0A==
+  dependencies:
+    "@mantine/store" "7.17.3"
+
 "@mantine/store@7.17.2":
   version "7.17.2"
   resolved "https://registry.yarnpkg.com/@mantine/store/-/store-7.17.2.tgz#c954d23aab2c208a39c129131f2d7d109578753f"
   integrity sha512-UoMUYQK/z58hMueCkpDIXc49gPgrVO/zcpb0k+B7MFU51EIUiFzHLxLFBmWrgCAM6rzJORqN8JjyCd/PB9j4aw==
+
+"@mantine/store@7.17.3":
+  version "7.17.3"
+  resolved "https://registry.yarnpkg.com/@mantine/store/-/store-7.17.3.tgz#6f2b623d28bd8f4b74c8f2e013544c858fc999d9"
+  integrity sha512-wXQXe/Ljv2N6TDRsoVwOHmTGZey7Nt/SS6VeeMujKeNnAybPPXaP1jIbN50MKJoDS4qVPCHJNaHwVKIgMur2aQ==
 
 "@nabla/vite-plugin-eslint@^2.0.5":
   version "2.0.5"

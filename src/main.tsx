@@ -1,4 +1,5 @@
 import "@mantine/core/styles.css";
+import "@mantine/spotlight/styles.css";
 import "@mantine/notifications/styles.css";
 import "./index.css";
 import { createRouter, RouterProvider } from "@tanstack/react-router";

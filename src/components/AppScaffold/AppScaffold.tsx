@@ -9,7 +9,8 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { IconChevronDown, IconLogout } from "@tabler/icons-react";
+import { Spotlight } from "@mantine/spotlight";
+import { IconChevronDown, IconLogout, IconSearch } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { Outlet, useRouter } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
@@ -18,6 +19,7 @@ import { AppConfig } from "@/config/AppConfig";
 import { useIsMobileSize } from "@/hooks/useIsMobileSize";
 import { AuthService } from "@/services/AuthService";
 import css from "./AppScaffold.module.css";
+import { useSpotlightActions } from "./useSpotlightActions";
 
 const HEADER_DEFAULT_HEIGHT = 60;
 const FOOTER_DEFAULT_HEIGHT = 60;
@@ -61,6 +63,7 @@ export function AppScaffold({
       },
     });
 
+  const spotlightActions = useSpotlightActions();
   const [isNavbarOpened, { toggle: toggleNavbar }] = useDisclosure(false);
   const isMobileViewSize = useIsMobileSize() ?? false;
 
@@ -74,98 +77,109 @@ export function AppScaffold({
   );
 
   return (
-    <AppShell
-      layout="alt"
-      header={{ height: headerHeight }}
-      footer={{ height: footerHeight }}
-      classNames={{
-        navbar: css.navbar,
-      }}
-      navbar={{
-        width: navbarWidth,
-        breakpoint: "sm",
-        collapsed: { mobile: !isNavbarOpened },
-      }}
-      aside={{
-        width: asideWidth,
-        breakpoint: "md",
-        collapsed: { desktop: false, mobile: true },
-      }}
-      padding="md"
-    >
-      {header || isMobileViewSize ?
-        <AppShell.Header>
-          <Group h="100%" px="md">
+    <>
+      <AppShell
+        layout="alt"
+        header={{ height: headerHeight }}
+        footer={{ height: footerHeight }}
+        classNames={{
+          navbar: css.navbar,
+        }}
+        navbar={{
+          width: navbarWidth,
+          breakpoint: "sm",
+          collapsed: { mobile: !isNavbarOpened },
+        }}
+        aside={{
+          width: asideWidth,
+          breakpoint: "md",
+          collapsed: { desktop: false, mobile: true },
+        }}
+        padding="md"
+      >
+        {header || isMobileViewSize ?
+          <AppShell.Header>
+            <Group h="100%" px="md">
+              <Burger
+                opened={isNavbarOpened}
+                onClick={toggleNavbar}
+                size="sm"
+                hiddenFrom="sm"
+              />
+              {logo}
+              {header}
+            </Group>
+          </AppShell.Header>
+        : null}
+
+        <AppShell.Navbar>
+          <Group px="md" py="sm" justify="center">
             <Burger
               opened={isNavbarOpened}
               onClick={toggleNavbar}
               size="sm"
               hiddenFrom="sm"
             />
-            {logo}
-            {header}
+            <Menu shadow="md" width={200}>
+              <Menu.Target>
+                <UnstyledButton>
+                  <Group gap="xs">
+                    {logo}
+                    <Title order={2}>{AppConfig.appName}</Title>
+                    <IconChevronDown />
+                  </Group>
+                </UnstyledButton>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  leftSection={<IconLogout size={16} />}
+                  onClick={() => sendSignOutRequest()}
+                >
+                  Sign Out{" "}
+                  {isSignOutPending ?
+                    <Loader />
+                  : null}
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
           </Group>
-        </AppShell.Header>
-      : null}
-
-      <AppShell.Navbar>
-        <Group px="md" py="sm" justify="center">
-          <Burger
-            opened={isNavbarOpened}
-            onClick={toggleNavbar}
-            size="sm"
-            hiddenFrom="sm"
-          />
-          <Menu shadow="md" width={200}>
-            <Menu.Target>
-              <UnstyledButton>
-                <Group gap="xs">
-                  {logo}
-                  <Title order={2}>{AppConfig.appName}</Title>
-                  <IconChevronDown />
-                </Group>
-              </UnstyledButton>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item
-                leftSection={<IconLogout size={16} />}
-                onClick={() => sendSignOutRequest()}
+          {AppConfig.navbarLinkOrder.map((linkKey) => {
+            const link = AppConfig.links[linkKey];
+            return (
+              <Link
+                key={linkKey}
+                to={link.to}
+                className={css.anchor}
+                px="md"
+                py="sm"
               >
-                Sign Out{" "}
-                {isSignOutPending ?
-                  <Loader />
-                : null}
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        </Group>
-        {AppConfig.navbarLinkOrder.map((linkKey) => {
-          const link = AppConfig.links[linkKey];
-          return (
-            <Link
-              key={linkKey}
-              to={link.to}
-              className={css.anchor}
-              px="md"
-              py="sm"
-            >
-              {link.label}
-            </Link>
-          );
-        })}
-      </AppShell.Navbar>
+                {link.label}
+              </Link>
+            );
+          })}
+        </AppShell.Navbar>
 
-      <AppShell.Main pt="md">
-        <Outlet />
-        <TanStackRouterDevtools />
-      </AppShell.Main>
+        <AppShell.Main pt="md">
+          <Outlet />
+          <TanStackRouterDevtools />
+        </AppShell.Main>
 
-      {aside ?
-        <AppShell.Aside p="md">{aside}</AppShell.Aside>
-      : null}
-      {footer ?
-        <AppShell.Footer p="md">{footer}</AppShell.Footer>
-      : null}
-    </AppShell>
+        {aside ?
+          <AppShell.Aside p="md">{aside}</AppShell.Aside>
+        : null}
+        {footer ?
+          <AppShell.Footer p="md">{footer}</AppShell.Footer>
+        : null}
+      </AppShell>
+      <Spotlight
+        highlightQuery
+        actions={spotlightActions}
+        nothingFound="Nothing found..."
+        searchProps={{
+          leftSection: <IconSearch size={20} stroke={1.5} />,
+          placeholder: "Search...",
+        }}
+      />
+    </>
   );
 }

@@ -1,4 +1,5 @@
 import { MantineProvider } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
@@ -21,8 +22,10 @@ function RootComponent() {
         theme={Theme}
         cssVariablesResolver={cssVariablesResolver}
       >
-        <Notifications />
-        <Outlet />
+        <ModalsProvider>
+          <Notifications />
+          <Outlet />
+        </ModalsProvider>
       </MantineProvider>
     </QueryClientProvider>
   );
