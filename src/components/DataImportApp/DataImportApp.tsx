@@ -1,8 +1,8 @@
 import { Container, List, Stack, Title } from "@mantine/core";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
+import { DataGrid } from "../ui/DataGrid";
 import { FileUploadField } from "../ui/FileUploadField";
-import { DataGrid } from "./DataGrid";
 import { useCSV } from "./useCSV";
 
 export function DataImportApp(): JSX.Element {

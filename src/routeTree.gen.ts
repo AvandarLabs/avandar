@@ -19,6 +19,7 @@ import { Route as AuthRouteImport } from "./routes/_auth/route";
 import { Route as AuthIndexImport } from "./routes/_auth/index";
 import { Route as AuthProfileImport } from "./routes/_auth/profile";
 import { Route as AuthDataImportImport } from "./routes/_auth/data-import";
+import { Route as AuthDataExplorerImport } from "./routes/_auth/data-explorer";
 
 // Create/Update Routes
 
@@ -69,6 +70,12 @@ const AuthDataImportRoute = AuthDataImportImport.update({
   getParentRoute: () => AuthRouteRoute,
 } as any);
 
+const AuthDataExplorerRoute = AuthDataExplorerImport.update({
+  id: "/data-explorer",
+  path: "/data-explorer",
+  getParentRoute: () => AuthRouteRoute,
+} as any);
+
 // Populate the FileRoutesByPath interface
 
 declare module "@tanstack/react-router" {
@@ -108,6 +115,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof UpdatePasswordImport;
       parentRoute: typeof rootRoute;
     };
+    "/_auth/data-explorer": {
+      id: "/_auth/data-explorer";
+      path: "/data-explorer";
+      fullPath: "/data-explorer";
+      preLoaderRoute: typeof AuthDataExplorerImport;
+      parentRoute: typeof AuthRouteImport;
+    };
     "/_auth/data-import": {
       id: "/_auth/data-import";
       path: "/data-import";
@@ -135,12 +149,14 @@ declare module "@tanstack/react-router" {
 // Create and export the route tree
 
 interface AuthRouteRouteChildren {
+  AuthDataExplorerRoute: typeof AuthDataExplorerRoute;
   AuthDataImportRoute: typeof AuthDataImportRoute;
   AuthProfileRoute: typeof AuthProfileRoute;
   AuthIndexRoute: typeof AuthIndexRoute;
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthDataExplorerRoute: AuthDataExplorerRoute,
   AuthDataImportRoute: AuthDataImportRoute,
   AuthProfileRoute: AuthProfileRoute,
   AuthIndexRoute: AuthIndexRoute,
@@ -156,6 +172,7 @@ export interface FileRoutesByFullPath {
   "/register": typeof RegisterRoute;
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
+  "/data-explorer": typeof AuthDataExplorerRoute;
   "/data-import": typeof AuthDataImportRoute;
   "/profile": typeof AuthProfileRoute;
   "/": typeof AuthIndexRoute;
@@ -166,6 +183,7 @@ export interface FileRoutesByTo {
   "/register": typeof RegisterRoute;
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
+  "/data-explorer": typeof AuthDataExplorerRoute;
   "/data-import": typeof AuthDataImportRoute;
   "/profile": typeof AuthProfileRoute;
   "/": typeof AuthIndexRoute;
@@ -178,6 +196,7 @@ export interface FileRoutesById {
   "/register": typeof RegisterRoute;
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
+  "/_auth/data-explorer": typeof AuthDataExplorerRoute;
   "/_auth/data-import": typeof AuthDataImportRoute;
   "/_auth/profile": typeof AuthProfileRoute;
   "/_auth/": typeof AuthIndexRoute;
@@ -191,6 +210,7 @@ export interface FileRouteTypes {
     | "/register"
     | "/signin"
     | "/update-password"
+    | "/data-explorer"
     | "/data-import"
     | "/profile"
     | "/";
@@ -200,6 +220,7 @@ export interface FileRouteTypes {
     | "/register"
     | "/signin"
     | "/update-password"
+    | "/data-explorer"
     | "/data-import"
     | "/profile"
     | "/";
@@ -210,6 +231,7 @@ export interface FileRouteTypes {
     | "/register"
     | "/signin"
     | "/update-password"
+    | "/_auth/data-explorer"
     | "/_auth/data-import"
     | "/_auth/profile"
     | "/_auth/";
@@ -252,6 +274,7 @@ export const routeTree = rootRoute
     "/_auth": {
       "filePath": "_auth/route.tsx",
       "children": [
+        "/_auth/data-explorer",
         "/_auth/data-import",
         "/_auth/profile",
         "/_auth/"
@@ -268,6 +291,10 @@ export const routeTree = rootRoute
     },
     "/update-password": {
       "filePath": "update-password.tsx"
+    },
+    "/_auth/data-explorer": {
+      "filePath": "_auth/data-explorer.tsx",
+      "parent": "/_auth"
     },
     "/_auth/data-import": {
       "filePath": "_auth/data-import.tsx",
