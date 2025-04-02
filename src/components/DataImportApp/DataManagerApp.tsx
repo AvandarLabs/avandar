@@ -128,15 +128,17 @@ export function DataManagerApp(): JSX.Element {
           <DataGrid fields={csv.csvMeta.fields ?? []} data={csv.data} />
           <form
             onSubmit={form.onSubmit((values) => {
-              console.log(values);
-              const dataset: LocalDataset.T = {
-                id: uuid(),
+              const creationTime = new Date();
+              const dataset: LocalDataset.CreateT = {
                 name: values.name,
+                mimeType: csv.fileMeta.mimeType,
                 description: values.description,
-                createdAt: new Date(),
-                updatedAt: new Date(),
+                createdAt: creationTime,
+                updatedAt: creationTime,
+                sizeInBytes: csv.fileMeta.sizeInBytes,
                 data: csv.data,
               };
+              console.log("dataset to enter", dataset);
               saveDataset(dataset, {
                 onSuccess: () => {
                   notifications.show({

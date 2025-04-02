@@ -1,7 +1,7 @@
 import { notifications } from "@mantine/notifications";
 import Papa from "papaparse";
 import { useState } from "react";
-import { CSVData, CSVRow, MIMEType } from "@/types/helpers";
+import { CSVData, CSVRow, MIMEType } from "@/types/common";
 
 type CSVMetadata = {
   fileMeta: {

@@ -1,6 +1,6 @@
 import { Button, FileInput, Group } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { MIMEType } from "@/types/helpers";
+import { MIMEType } from "@/types/common";
 
 type Props = {
   /**

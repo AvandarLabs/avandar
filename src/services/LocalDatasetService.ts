@@ -12,7 +12,7 @@ const db = new Dexie("LocalDatasets") as LocalDatasetDatabase;
 
 class LocalDatasetServiceClient {
   constructor() {
-    db.version(DB_VERSION).stores({ datasets: "id" });
+    db.version(DB_VERSION).stores({ datasets: "++id" });
   }
 
   /**
@@ -20,7 +20,7 @@ class LocalDatasetServiceClient {
    * @param dataset - The dataset to add
    * @returns A promise that resolves to the ID of the added dataset
    */
-  addDataset(dataset: LocalDataset.T): Promise<string> {
+  addDataset(dataset: LocalDataset.CreateT): Promise<number> {
     return db.datasets.add(dataset);
   }
 
@@ -30,7 +30,7 @@ class LocalDatasetServiceClient {
    * @returns A promise that resolves to the dataset, or undefined if not found
    * @throws ZodError if dataset schema validation fails
    */
-  async getDataset(id: string): Promise<LocalDataset.T | undefined> {
+  async getDataset(id: number): Promise<LocalDataset.T | undefined> {
     // our dataset schema could have changed by the time we are now loading the
     // dataset back
     const dataset = await db.datasets.get(id);
@@ -52,7 +52,7 @@ class LocalDatasetServiceClient {
    * @param id - The ID of the dataset to delete
    * @returns A promise that resolves when the dataset is deleted
    */
-  deleteDataset(id: string): Promise<void> {
+  deleteDataset(id: number): Promise<void> {
     return db.datasets.delete(id);
   }
 }

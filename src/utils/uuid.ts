@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { UUID } from "@/types/helpers";
+import { UUID } from "@/types/common";
 
 /**
  * Generates a random UUID.

@@ -35,13 +35,13 @@ export function useGetAllLocalDatasets(): [
  * full `useMutation` result object.
  */
 export function useSaveLocalDataset(): [
-  UseMutateFunction<string, Error, LocalDataset.T>,
+  UseMutateFunction<number, Error, LocalDataset.CreateT>,
   boolean,
-  UseMutationResult<string, Error, LocalDataset.T>,
+  UseMutationResult<number, Error, LocalDataset.CreateT>,
 ] {
   const queryClient = useQueryClient();
   const mutationObj = useMutation({
-    mutationFn: async (dataset: LocalDataset.T) => {
+    mutationFn: async (dataset: LocalDataset.CreateT) => {
       return LocalDatasetService.addDataset(dataset);
     },
     onSuccess: () => {
@@ -54,13 +54,13 @@ export function useSaveLocalDataset(): [
 }
 
 export function useDeleteLocalDataset(): [
-  UseMutateFunction<void, Error, string>,
+  UseMutateFunction<void, Error, number>,
   boolean,
-  UseMutationResult<void, Error, string>,
+  UseMutationResult<void, Error, number>,
 ] {
   const queryClient = useQueryClient();
   const mutationObj = useMutation({
-    mutationFn: async (id: string) => {
+    mutationFn: async (id: number) => {
       return LocalDatasetService.deleteDataset(id);
     },
     onSuccess: () => {
