@@ -1,12 +1,13 @@
 import { LinkProps } from "@tanstack/react-router";
 import { z } from "zod";
 import { CSVData, MIMEType } from "@/types/common";
+import { Replace } from "@/types/utils";
 
 /**
  * Local dataset type.
  */
 export type T = {
-  id: number; // auto-incrementing id
+  id: number;
   name: string;
   description: string;
   createdAt: Date;
@@ -16,7 +17,12 @@ export type T = {
   data: CSVData;
 };
 
-export type CreateT = Omit<T, "id">;
+/**
+ * Dataset type for creating a new dataset.
+ *
+ * `id` is undefined because it is autoincremented when inserting.
+ */
+export type CreateT = Replace<T, "id", undefined>;
 
 /**
  * Zod schema for the local dataset type.

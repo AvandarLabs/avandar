@@ -1,4 +1,3 @@
-import { notifications } from "@mantine/notifications";
 import Papa from "papaparse";
 import { useState } from "react";
 import { CSVData, CSVRow, MIMEType } from "@/types/common";
@@ -17,12 +16,12 @@ type CSVMetadata = {
 /**
  * Custom hook for handling CSV file parsing.
  * @param options Optional configuration options.
- * @param options.onNoFileSelected Optional callback function to be called
- * when no file is selected.
+ * @param options.onNoFileProvided Optional callback function to be called
+ * when File is undefined.
  * @returns An object containing the parsed CSV data and a function to parse a
  * file.
  */
-export function useCSV(options?: { onNoFileSelected?: () => void }): {
+export function useCSV(options?: { onNoFileProvided?: () => void }): {
   csv: CSVMetadata | undefined;
   parseFile: (file: File | undefined) => void;
 } {
@@ -30,7 +29,7 @@ export function useCSV(options?: { onNoFileSelected?: () => void }): {
 
   const parseFile = (file: File | undefined) => {
     if (!file) {
-      options?.onNoFileSelected?.();
+      options?.onNoFileProvided?.();
       return;
     }
 

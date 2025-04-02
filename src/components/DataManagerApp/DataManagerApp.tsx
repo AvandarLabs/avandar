@@ -16,7 +16,6 @@ import { IconPhoto, IconTrash, IconUpload, IconX } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import { AppConfig } from "@/config/AppConfig";
 import * as LocalDataset from "@/models/LocalDataset";
-import { uuid } from "@/utils/uuid";
 import { DataGrid } from "../ui/DataGrid";
 import { FileUploadField } from "../ui/FileUploadField";
 import {
@@ -32,11 +31,11 @@ type DatasetForm = {
 };
 
 const { maxDatasetNameLength, maxDatasetDescriptionLength } =
-  AppConfig.dataImportApp;
+  AppConfig.dataManagerApp;
 
 export function DataManagerApp(): JSX.Element {
   const { csv, parseFile } = useCSV({
-    onNoFileSelected: () => {
+    onNoFileProvided: () => {
       notifications.show({
         title: "No file selected",
         message: "Please select a file to import",
@@ -130,6 +129,7 @@ export function DataManagerApp(): JSX.Element {
             onSubmit={form.onSubmit((values) => {
               const creationTime = new Date();
               const dataset: LocalDataset.CreateT = {
+                id: undefined,
                 name: values.name,
                 mimeType: csv.fileMeta.mimeType,
                 description: values.description,
@@ -138,7 +138,6 @@ export function DataManagerApp(): JSX.Element {
                 sizeInBytes: csv.fileMeta.sizeInBytes,
                 data: csv.data,
               };
-              console.log("dataset to enter", dataset);
               saveDataset(dataset, {
                 onSuccess: () => {
                   notifications.show({

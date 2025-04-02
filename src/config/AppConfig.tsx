@@ -44,8 +44,11 @@ type AppConfig = {
    */
   navbarLinkOrder: readonly string[];
 
+  /** Configuration for the data import app */
   dataImportApp: {
+    /** Maximum length of dataset name */
     maxDatasetNameLength: number;
+    /** Maximum length of dataset description */
     maxDatasetDescriptionLength: number;
   };
 };
@@ -81,7 +84,7 @@ export const AppConfig = {
   },
   navbarLinkOrder: ["home", "dataManager", "dataExplorer", "profile"] as const,
 
-  dataImportApp: {
+  dataManagerApp: {
     maxDatasetNameLength: 100,
     maxDatasetDescriptionLength: 500,
   },
