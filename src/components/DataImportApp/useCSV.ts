@@ -14,7 +14,14 @@ type CSVMetadata = {
   errors: Papa.ParseError[];
 };
 
-export function useCSV(): {
+/**
+ * Custom hook for handling CSV file parsing.
+ * @param options Optional configuration options.
+ * @param options.onNoFileSelected Optional callback function to be called
+ * when no file is selected.
+ * @returns An object containing the parsed CSV data and a function to parse a file.
+ */
+export function useCSV(options?: { onNoFileSelected?: () => void }): {
   csv: CSVMetadata | undefined;
   parseFile: (file: File | undefined) => void;
 } {
@@ -22,11 +29,7 @@ export function useCSV(): {
 
   const parseFile = (file: File | undefined) => {
     if (!file) {
-      notifications.show({
-        title: "No file selected",
-        message: "Please select a file to import",
-        color: "danger",
-      });
+      options?.onNoFileSelected?.();
       return;
     }
 
@@ -43,12 +46,6 @@ export function useCSV(): {
             sizeInBytes: file.size,
           },
           csvMeta: meta,
-        });
-
-        notifications.show({
-          title: "CSV processed successfully",
-          message: `${file.name} was processed successfully`,
-          color: "success",
         });
       },
     });

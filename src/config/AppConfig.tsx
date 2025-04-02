@@ -2,7 +2,6 @@ import {
   IconDatabase,
   IconHome,
   IconTable,
-  IconUpload,
   IconUser,
 } from "@tabler/icons-react";
 

@@ -1,3 +1,4 @@
+export type UUID = string & { __brand: "UUID" };
 export type CSVRow = Record<string, unknown>;
 export type CSVData = CSVRow[];
 
