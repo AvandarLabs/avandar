@@ -124,7 +124,7 @@ export const Theme = createTheme({
     ] as const,
 
     /**
-     * Neutral colors, E.g. cards, panels.
+     * Neutral colors for backgrounds. E.g. cards, panels.
      * (Scale from Refactoring UI Palette 2 - Blue Grey)
      */
     neutral: NEUTRAL_SHADES,

@@ -1,4 +1,14 @@
-import "@mantine/core";
+import { DefaultMantineColor, MantineColorsTuple } from "@mantine/core";
+
+type ExtendedCustomColors =
+  | "primary"
+  | "secondary"
+  | "success"
+  | "warning"
+  | "danger"
+  | "info"
+  | "neutral"
+  | DefaultMantineColor;
 
 declare module "@mantine/core" {
   export interface MantineThemeOther {
@@ -18,5 +28,9 @@ declare module "@mantine/core" {
       /** Active navbar link background color on hover */
       activeHoverBackgroundColor: string;
     };
+  }
+
+  export interface MantineThemeColorsOverride {
+    colors: Record<ExtendedCustomColors, MantineColorsTuple>;
   }
 }

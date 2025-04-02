@@ -1,7 +1,8 @@
-import { Container, Text, Title } from "@mantine/core";
+import { Container, Stack, Text, Title } from "@mantine/core";
 import { useEffect } from "react";
 import * as LocalDataset from "@/models/LocalDataset";
 import { DataGrid } from "../ui/DataGrid";
+import { DescriptionList } from "../ui/DescriptionListItem/DescriptionList";
 import { useCSV } from "./useCSV";
 
 type Props = {
@@ -17,17 +18,38 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
 
   return (
     <Container>
-      <Title order={2}>{dataset.name}</Title>
-      <Text>{dataset.description}</Text>
-      <Text>Delimiter: {dataset.delimiter}</Text>
-      <Text>Is first row header: {dataset.firstRowIsHeader}</Text>
-      <Text>File type: {dataset.mimeType}</Text>
-      <Text>Size in bytes: {dataset.sizeInBytes}</Text>
-      <Text>Created at: {dataset.createdAt.toISOString()}</Text>
-      <Text>Last updated: {dataset.updatedAt.toISOString()}</Text>
-      {csv ?
-        <DataGrid fields={csv.meta.fields ?? []} data={csv.data ?? []} />
-      : null}
+      <Stack>
+        <Title order={2}>{dataset.name}</Title>
+        <Text>{dataset.description}</Text>
+
+        <DescriptionList>
+          <DescriptionList.Item
+            label="Delimiter"
+            children={dataset.delimiter}
+          />
+          <DescriptionList.Item
+            label="First row is header"
+            children={dataset.firstRowIsHeader ? "Yes" : "No"}
+          />
+          <DescriptionList.Item label="File type" children={dataset.mimeType} />
+          <DescriptionList.Item
+            label="Size in bytes"
+            children={dataset.sizeInBytes}
+          />
+          <DescriptionList.Item
+            label="Created at"
+            children={dataset.createdAt.toISOString()}
+          />
+          <DescriptionList.Item
+            label="Last updated"
+            children={dataset.updatedAt.toISOString()}
+          />
+        </DescriptionList>
+
+        {csv ?
+          <DataGrid fields={csv.meta.fields ?? []} data={csv.data ?? []} />
+        : null}
+      </Stack>
     </Container>
   );
 }
