@@ -34,7 +34,7 @@ const { maxDatasetNameLength, maxDatasetDescriptionLength } =
   AppConfig.dataManagerApp;
 
 export function DataManagerApp(): JSX.Element {
-  const { csv, parseFile } = useCSV({
+  const { csv, fileMetadata, parseFile } = useCSV({
     onNoFileProvided: () => {
       notifications.show({
         title: "No file selected",
@@ -121,22 +121,28 @@ export function DataManagerApp(): JSX.Element {
         </Stack>
       : null}
 
-      {csv ?
+      {csv && fileMetadata ?
         <Stack>
           <Title order={3}>Data Preview</Title>
-          <DataGrid fields={csv.csvMeta.fields ?? []} data={csv.data} />
+          <DataGrid fields={csv.meta.fields ?? []} data={csv.data} />
           <form
             onSubmit={form.onSubmit((values) => {
               const creationTime = new Date();
+
               const dataset: LocalDataset.CreateT = {
                 id: undefined,
                 name: values.name,
-                mimeType: csv.fileMeta.mimeType,
+                mimeType: fileMetadata.mimeType,
                 description: values.description,
                 createdAt: creationTime,
                 updatedAt: creationTime,
-                sizeInBytes: csv.fileMeta.sizeInBytes,
-                data: csv.data,
+                sizeInBytes: fileMetadata.sizeInBytes,
+                data: LocalDataset.unparse({
+                  datasetType: fileMetadata.mimeType,
+                  data: csv.data,
+                }),
+                delimiter: csv.meta.delimiter,
+                firstRowIsHeader: true,
               };
               saveDataset(dataset, {
                 onSuccess: () => {

@@ -1,16 +1,14 @@
 import Papa from "papaparse";
-import { useState } from "react";
-import { CSVData, CSVRow, MIMEType } from "@/types/common";
+import { useCallback, useState } from "react";
+import { CSVRow, MIMEType } from "@/types/common";
 
-type CSVMetadata = {
-  fileMeta: {
-    name: string;
-    mimeType: MIMEType;
-    sizeInBytes: number;
-  };
-  csvMeta: Papa.ParseMeta;
-  data: CSVData;
-  errors: Papa.ParseError[];
+/**
+ * Metadata about the parsed file itself.
+ */
+type FileMetadata = {
+  name: string;
+  mimeType: MIMEType;
+  sizeInBytes: number;
 };
 
 /**
@@ -21,35 +19,72 @@ type CSVMetadata = {
  * @returns An object containing the parsed CSV data and a function to parse a
  * file.
  */
-export function useCSV(options?: { onNoFileProvided?: () => void }): {
-  csv: CSVMetadata | undefined;
+export function useCSV({
+  delimiter = ",",
+  firstRowIsHeader = true,
+  onNoFileProvided,
+}: {
+  delimiter?: string;
+  firstRowIsHeader?: boolean;
+  onNoFileProvided?: () => void;
+} = {}): {
+  csv: Papa.ParseResult<CSVRow> | undefined;
+  fileMetadata: FileMetadata | undefined;
   parseFile: (file: File | undefined) => void;
+  parseCSVString: (csvString: string) => void;
 } {
-  const [csv, setCSV] = useState<CSVMetadata | undefined>(undefined);
+  const [csv, setCSV] = useState<Papa.ParseResult<CSVRow> | undefined>(
+    undefined,
+  );
+  const [fileMetadata, setFileMetadata] = useState<FileMetadata | undefined>(
+    undefined,
+  );
 
-  const parseFile = (file: File | undefined) => {
-    if (!file) {
-      options?.onNoFileProvided?.();
-      return;
-    }
+  const parseFileOrString = useCallback(
+    (dataToParse: File | string) => {
+      Papa.parse<CSVRow>(dataToParse, {
+        // TODO(pablo): `header` should be toggleable eventually.
+        header: firstRowIsHeader,
+        delimiter: delimiter,
+        complete: (results: Papa.ParseResult<CSVRow>) => {
+          const { meta, data, errors } = results;
+          setCSV({
+            data,
+            meta,
+            errors,
+          });
 
-    Papa.parse<CSVRow>(file, {
-      header: true,
-      complete: (results: Papa.ParseResult<CSVRow>) => {
-        const { meta, data, errors } = results;
-        setCSV({
-          data,
-          errors,
-          fileMeta: {
-            name: file.name,
-            mimeType: file.type as MIMEType,
-            sizeInBytes: file.size,
-          },
-          csvMeta: meta,
-        });
-      },
-    });
-  };
+          if (typeof dataToParse !== "string") {
+            setFileMetadata({
+              name: dataToParse.name,
+              mimeType: dataToParse.type as MIMEType,
+              sizeInBytes: dataToParse.size,
+            });
+          }
+        },
+      });
+    },
+    [delimiter, firstRowIsHeader],
+  );
 
-  return { csv, parseFile };
+  const parseFile = useCallback(
+    (file: File | undefined) => {
+      if (!file) {
+        onNoFileProvided?.();
+        return;
+      }
+
+      parseFileOrString(file);
+    },
+    [parseFileOrString, onNoFileProvided],
+  );
+
+  const parseCSVString = useCallback(
+    (csvString: string) => {
+      parseFileOrString(csvString);
+    },
+    [parseFileOrString],
+  );
+
+  return { csv, fileMetadata, parseFile, parseCSVString };
 }

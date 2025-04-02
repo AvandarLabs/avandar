@@ -1,10 +1,14 @@
 import { LinkProps } from "@tanstack/react-router";
+import Papa from "papaparse";
+import { match } from "ts-pattern";
 import { z } from "zod";
 import { CSVData, MIMEType } from "@/types/common";
 import { Replace } from "@/types/utils";
 
 /**
  * Local dataset type.
+ *
+ * For now, we only support CSVs.
  */
 export type T = {
   id: number;
@@ -14,7 +18,14 @@ export type T = {
   updatedAt: Date;
   sizeInBytes: number;
   mimeType: MIMEType;
-  data: CSVData;
+  delimiter: string;
+  firstRowIsHeader: boolean;
+
+  /**
+   * All data is represented as a single string to take up less space.
+   * This needs to be parsed.
+   */
+  data: string;
 };
 
 /**
@@ -37,12 +48,9 @@ export const Schema = z.object({
   mimeType: z.string().transform((val) => {
     return val as MIMEType; // force type inference
   }),
-
-  // we do not get more specific to not affect performance, because
-  // CSVs can be large
-  data: z.array(z.unknown()).transform((val) => {
-    return val as CSVData; // force type inference
-  }),
+  data: z.string(),
+  delimiter: z.string(),
+  firstRowIsHeader: z.boolean(),
 });
 
 /**
@@ -62,4 +70,28 @@ export function getDatasetLinkProps(id: number): LinkProps {
       datasetId: id.toString(),
     },
   };
+}
+
+/**
+ * Convert a dataset back into a raw string. Only CSVs are supported for now.
+ * @param options
+ * @returns
+ */
+export function unparse(options: {
+  datasetType: MIMEType;
+  data: CSVData;
+}): string {
+  const { datasetType, data } = options;
+  const result = match(datasetType)
+    .with("text/csv", () => {
+      return Papa.unparse(data, {
+        header: true,
+        delimiter: ",",
+        newline: "\n",
+      });
+    })
+    .otherwise(() => {
+      throw new Error("Unsupported dataset type for local storage.");
+    });
+  return result;
 }
