@@ -23,6 +23,7 @@ declare module "@tanstack/react-router" {
   }
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 function MainWrapper() {
   const user = useAuth(router);
   const context: RootRouteContext = useMemo(() => {

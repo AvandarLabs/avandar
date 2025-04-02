@@ -102,9 +102,13 @@ export default [
           },
         ],
         "no-unused-vars": "off",
-        "no-shadow": "off", // we use the @typescript-eslint one instead
+
+        // we use the @typescript-eslint one instead
+        "no-shadow": "off",
         "tailwindcss/no-custom-classname": "off",
-        "tailwindcss/classnames-order": "off", // we use the prettier tailwind plugin for ordering
+
+        // we use the prettier tailwind plugin for ordering
+        "tailwindcss/classnames-order": "off",
       },
       settings: {
         react: {
@@ -133,6 +137,10 @@ export default [
           tabWidth: 2,
           comments: 80,
           ignorePattern: "^import\\s.+\\sfrom\\s.+;$",
+          ignoreUrls: true,
+          ignoreStrings: true,
+          ignoreRegExpLiterals: true,
+          ignoreTemplateLiterals: true,
         },
       ],
     },

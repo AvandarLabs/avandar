@@ -148,10 +148,13 @@ export const AuthService = {
 
   /**
    * Subscribes to auth state changes.
-   * @param callback - A callback function that will be called when the auth state changes.
-   * - callback:event - The event (a string literal enum) that triggered the callback.
-   * - callback:session - The session that triggered the callback.
-   * @returns A subscription object that can be used to unsubscribe from the event.
+   * @param callback - A callback function that will be called when the auth
+   * state changes.
+   * @param callback.event - The event (a string literal enum) that triggered
+   * the callback.
+   * @param callback.session - The session that triggered the callback.
+   * @returns A subscription object that can be used to unsubscribe from the
+   * event.
    */
   onAuthStateChange: (
     callback: (event: AuthChangeEvent, session: Session | null) => void,
