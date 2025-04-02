@@ -32,6 +32,7 @@ Libraries:
 - Use named exports instead of default exports.
 - Never use single-line `if`s, always wrap in opening `{` and closing `}` even if there is only one statement.
 - No line, including comments, should exceed 80 characters.
+- If a docstring fits in 80 characters, then single-line it (`/** my comment */`).
 
 # Naming Conventions
 
