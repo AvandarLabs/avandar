@@ -1,5 +1,11 @@
 # Codebase information
 
+Directories:
+- `src/components`: All React components
+- `src/components/ui`: All UI components
+- `src/routes`: All router pages
+
+Libraries:
 - Bundler: Vite v6
 - Frontend framework: React v19
 - UI library: Mantine v7
@@ -13,7 +19,9 @@
 - CSS Styles: TailwindCSS v3
 - Icons: Tabler Icons v3
 
-When writing code or answering questions, use these versions of the libraries. Do not use documentation or APIs from older versions.
+# Code suggestion rules
+- Use the library versions referenced in this document. Do not use documentation or APIs from older versions.
+- When importing components, if a local component shares a name with a library's component, always import our local component instead. For example, always import `Link` from `@/components/ui` instead of from another library.
 
 # General Code Style & Formatting
 
