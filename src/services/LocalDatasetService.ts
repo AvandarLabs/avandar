@@ -46,6 +46,15 @@ class LocalDatasetServiceClient {
   getAllDatasets(): Promise<LocalDataset.T[]> {
     return db.datasets.toArray();
   }
+
+  /**
+   * Deletes a dataset by its ID.
+   * @param id - The ID of the dataset to delete
+   * @returns A promise that resolves when the dataset is deleted
+   */
+  deleteDataset(id: string): Promise<void> {
+    return db.datasets.delete(id);
+  }
 }
 
 export const LocalDatasetService = new LocalDatasetServiceClient();

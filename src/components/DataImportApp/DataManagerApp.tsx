@@ -3,19 +3,26 @@ import {
   Container,
   Group,
   Stack,
+  Text,
   TextInput,
+  ThemeIcon,
   Title,
 } from "@mantine/core";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
 import { useForm } from "@mantine/form";
+import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
+import { IconPhoto, IconTrash, IconUpload, IconX } from "@tabler/icons-react";
 import { AppConfig } from "@/config/AppConfig";
 import * as LocalDataset from "@/models/LocalDataset";
 import { uuid } from "@/utils/uuid";
 import { DataGrid } from "../ui/DataGrid";
 import { FileUploadField } from "../ui/FileUploadField";
-import { useGetAllDatasets, useSaveDataset } from "./queries";
+import {
+  useDeleteLocalDataset,
+  useGetAllLocalDatasets,
+  useSaveLocalDataset,
+} from "./queries";
 import { useCSV } from "./useCSV";
 
 type DatasetForm = {
@@ -54,8 +61,9 @@ export function DataManagerApp(): JSX.Element {
       },
     },
   });
-  const [saveDataset, isSavePending] = useSaveDataset();
-  const [allDatasets, isLoadingDatasets] = useGetAllDatasets();
+  const [saveDataset, isSavePending] = useSaveLocalDataset();
+  const [allDatasets, isLoadingDatasets] = useGetAllLocalDatasets();
+  const [deleteLocalDataset, isDeletePending] = useDeleteLocalDataset();
 
   return (
     <Container>
@@ -77,7 +85,35 @@ export function DataManagerApp(): JSX.Element {
         <Stack>
           <Title order={3}>Datasets</Title>
           {allDatasets.map((dataset) => {
-            return <Group key={dataset.id}>{dataset.name}</Group>;
+            return (
+              <Group key={dataset.id}>
+                {dataset.name}
+                <ThemeIcon
+                  c="danger"
+                  bg="none"
+                  onClick={() => {
+                    modals.openConfirmModal({
+                      title: "Delete dataset",
+                      children: (
+                        <Text>
+                          Are you sure you want to delete {dataset.name}?
+                        </Text>
+                      ),
+                      labels: { confirm: "Delete", cancel: "Cancel" },
+                      confirmProps: {
+                        color: "danger",
+                        loading: isDeletePending,
+                      },
+                      onConfirm: () => {
+                        deleteLocalDataset(dataset.id);
+                      },
+                    });
+                  }}
+                >
+                  <IconTrash />
+                </ThemeIcon>
+              </Group>
+            );
           })}
         </Stack>
       : null}
