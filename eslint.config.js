@@ -124,4 +124,17 @@ export default [
     },
   ),
   eslintConfigPrettier,
+  {
+    rules: {
+      "max-len": [
+        "error",
+        {
+          code: 80,
+          tabWidth: 2,
+          comments: 80,
+          ignorePattern: "^import\\s.+\\sfrom\\s.+;$",
+        },
+      ],
+    },
+  },
 ];
