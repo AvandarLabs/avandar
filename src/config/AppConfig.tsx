@@ -4,13 +4,14 @@ import {
   IconTable,
   IconUser,
 } from "@tabler/icons-react";
+import { LinkProps } from "@tanstack/react-router";
 
 /**
  * Configuration for a navigable link in the app.
  * These show up in the navbar.
  */
 type LinkConfig = {
-  to: string;
+  to: LinkProps["to"];
   label: string;
   icon: React.ReactNode;
 

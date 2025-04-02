@@ -1,6 +1,10 @@
+import { LinkProps } from "@tanstack/react-router";
 import { z } from "zod";
 import { CSVData } from "@/types/helpers";
 
+/**
+ * Local dataset type.
+ */
 export type T = {
   id: string; // uuid
   name: string;
@@ -10,6 +14,9 @@ export type T = {
   data: CSVData;
 };
 
+/**
+ * Zod schema for the local dataset type.
+ */
 export const Schema = z.object({
   id: z.string().uuid(),
   name: z.string().min(1),
@@ -24,6 +31,21 @@ export const Schema = z.object({
   }),
 });
 
+/**
+ * React Query keys for the local datasets.
+ */
 export const QueryKeys = {
   allDatasets: "localDatasets",
 };
+
+/**
+ * Returns the link props for a dataset to use in a `<Link>` component.
+ */
+export function getDatasetLinkProps(id: string): LinkProps {
+  return {
+    to: `/data-manager/$datasetId`,
+    params: {
+      datasetId: id,
+    },
+  };
+}

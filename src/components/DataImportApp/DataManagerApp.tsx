@@ -13,6 +13,7 @@ import { useForm } from "@mantine/form";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { IconPhoto, IconTrash, IconUpload, IconX } from "@tabler/icons-react";
+import { Link } from "@tanstack/react-router";
 import { AppConfig } from "@/config/AppConfig";
 import * as LocalDataset from "@/models/LocalDataset";
 import { uuid } from "@/utils/uuid";
@@ -87,7 +88,9 @@ export function DataManagerApp(): JSX.Element {
           {allDatasets.map((dataset) => {
             return (
               <Group key={dataset.id}>
-                {dataset.name}
+                <Link {...LocalDataset.getDatasetLinkProps(dataset.id)}>
+                  {dataset.name}
+                </Link>
 
                 <ThemeIcon
                   c="danger"

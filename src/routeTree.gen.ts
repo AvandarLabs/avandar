@@ -18,8 +18,9 @@ import { Route as ForgotPasswordImport } from "./routes/forgot-password";
 import { Route as AuthRouteImport } from "./routes/_auth/route";
 import { Route as AuthIndexImport } from "./routes/_auth/index";
 import { Route as AuthProfileImport } from "./routes/_auth/profile";
-import { Route as AuthDataManagerImport } from "./routes/_auth/data-manager";
 import { Route as AuthDataExplorerImport } from "./routes/_auth/data-explorer";
+import { Route as AuthDataManagerIndexImport } from "./routes/_auth/data-manager/index";
+import { Route as AuthDataManagerDatasetIdImport } from "./routes/_auth/data-manager/$datasetId";
 
 // Create/Update Routes
 
@@ -64,15 +65,21 @@ const AuthProfileRoute = AuthProfileImport.update({
   getParentRoute: () => AuthRouteRoute,
 } as any);
 
-const AuthDataManagerRoute = AuthDataManagerImport.update({
-  id: "/data-manager",
-  path: "/data-manager",
-  getParentRoute: () => AuthRouteRoute,
-} as any);
-
 const AuthDataExplorerRoute = AuthDataExplorerImport.update({
   id: "/data-explorer",
   path: "/data-explorer",
+  getParentRoute: () => AuthRouteRoute,
+} as any);
+
+const AuthDataManagerIndexRoute = AuthDataManagerIndexImport.update({
+  id: "/data-manager/",
+  path: "/data-manager/",
+  getParentRoute: () => AuthRouteRoute,
+} as any);
+
+const AuthDataManagerDatasetIdRoute = AuthDataManagerDatasetIdImport.update({
+  id: "/data-manager/$datasetId",
+  path: "/data-manager/$datasetId",
   getParentRoute: () => AuthRouteRoute,
 } as any);
 
@@ -122,13 +129,6 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthDataExplorerImport;
       parentRoute: typeof AuthRouteImport;
     };
-    "/_auth/data-manager": {
-      id: "/_auth/data-manager";
-      path: "/data-manager";
-      fullPath: "/data-manager";
-      preLoaderRoute: typeof AuthDataManagerImport;
-      parentRoute: typeof AuthRouteImport;
-    };
     "/_auth/profile": {
       id: "/_auth/profile";
       path: "/profile";
@@ -143,6 +143,20 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthIndexImport;
       parentRoute: typeof AuthRouteImport;
     };
+    "/_auth/data-manager/$datasetId": {
+      id: "/_auth/data-manager/$datasetId";
+      path: "/data-manager/$datasetId";
+      fullPath: "/data-manager/$datasetId";
+      preLoaderRoute: typeof AuthDataManagerDatasetIdImport;
+      parentRoute: typeof AuthRouteImport;
+    };
+    "/_auth/data-manager/": {
+      id: "/_auth/data-manager/";
+      path: "/data-manager";
+      fullPath: "/data-manager";
+      preLoaderRoute: typeof AuthDataManagerIndexImport;
+      parentRoute: typeof AuthRouteImport;
+    };
   }
 }
 
@@ -150,16 +164,18 @@ declare module "@tanstack/react-router" {
 
 interface AuthRouteRouteChildren {
   AuthDataExplorerRoute: typeof AuthDataExplorerRoute;
-  AuthDataManagerRoute: typeof AuthDataManagerRoute;
   AuthProfileRoute: typeof AuthProfileRoute;
   AuthIndexRoute: typeof AuthIndexRoute;
+  AuthDataManagerDatasetIdRoute: typeof AuthDataManagerDatasetIdRoute;
+  AuthDataManagerIndexRoute: typeof AuthDataManagerIndexRoute;
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
   AuthDataExplorerRoute: AuthDataExplorerRoute,
-  AuthDataManagerRoute: AuthDataManagerRoute,
   AuthProfileRoute: AuthProfileRoute,
   AuthIndexRoute: AuthIndexRoute,
+  AuthDataManagerDatasetIdRoute: AuthDataManagerDatasetIdRoute,
+  AuthDataManagerIndexRoute: AuthDataManagerIndexRoute,
 };
 
 const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
@@ -173,9 +189,10 @@ export interface FileRoutesByFullPath {
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
   "/data-explorer": typeof AuthDataExplorerRoute;
-  "/data-manager": typeof AuthDataManagerRoute;
   "/profile": typeof AuthProfileRoute;
   "/": typeof AuthIndexRoute;
+  "/data-manager/$datasetId": typeof AuthDataManagerDatasetIdRoute;
+  "/data-manager": typeof AuthDataManagerIndexRoute;
 }
 
 export interface FileRoutesByTo {
@@ -184,9 +201,10 @@ export interface FileRoutesByTo {
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
   "/data-explorer": typeof AuthDataExplorerRoute;
-  "/data-manager": typeof AuthDataManagerRoute;
   "/profile": typeof AuthProfileRoute;
   "/": typeof AuthIndexRoute;
+  "/data-manager/$datasetId": typeof AuthDataManagerDatasetIdRoute;
+  "/data-manager": typeof AuthDataManagerIndexRoute;
 }
 
 export interface FileRoutesById {
@@ -197,9 +215,10 @@ export interface FileRoutesById {
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
   "/_auth/data-explorer": typeof AuthDataExplorerRoute;
-  "/_auth/data-manager": typeof AuthDataManagerRoute;
   "/_auth/profile": typeof AuthProfileRoute;
   "/_auth/": typeof AuthIndexRoute;
+  "/_auth/data-manager/$datasetId": typeof AuthDataManagerDatasetIdRoute;
+  "/_auth/data-manager/": typeof AuthDataManagerIndexRoute;
 }
 
 export interface FileRouteTypes {
@@ -211,9 +230,10 @@ export interface FileRouteTypes {
     | "/signin"
     | "/update-password"
     | "/data-explorer"
-    | "/data-manager"
     | "/profile"
-    | "/";
+    | "/"
+    | "/data-manager/$datasetId"
+    | "/data-manager";
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/forgot-password"
@@ -221,9 +241,10 @@ export interface FileRouteTypes {
     | "/signin"
     | "/update-password"
     | "/data-explorer"
-    | "/data-manager"
     | "/profile"
-    | "/";
+    | "/"
+    | "/data-manager/$datasetId"
+    | "/data-manager";
   id:
     | "__root__"
     | "/_auth"
@@ -232,9 +253,10 @@ export interface FileRouteTypes {
     | "/signin"
     | "/update-password"
     | "/_auth/data-explorer"
-    | "/_auth/data-manager"
     | "/_auth/profile"
-    | "/_auth/";
+    | "/_auth/"
+    | "/_auth/data-manager/$datasetId"
+    | "/_auth/data-manager/";
   fileRoutesById: FileRoutesById;
 }
 
@@ -275,9 +297,10 @@ export const routeTree = rootRoute
       "filePath": "_auth/route.tsx",
       "children": [
         "/_auth/data-explorer",
-        "/_auth/data-manager",
         "/_auth/profile",
-        "/_auth/"
+        "/_auth/",
+        "/_auth/data-manager/$datasetId",
+        "/_auth/data-manager/"
       ]
     },
     "/forgot-password": {
@@ -296,16 +319,20 @@ export const routeTree = rootRoute
       "filePath": "_auth/data-explorer.tsx",
       "parent": "/_auth"
     },
-    "/_auth/data-manager": {
-      "filePath": "_auth/data-manager.tsx",
-      "parent": "/_auth"
-    },
     "/_auth/profile": {
       "filePath": "_auth/profile.tsx",
       "parent": "/_auth"
     },
     "/_auth/": {
       "filePath": "_auth/index.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/data-manager/$datasetId": {
+      "filePath": "_auth/data-manager/$datasetId.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/data-manager/": {
+      "filePath": "_auth/data-manager/index.tsx",
       "parent": "/_auth"
     }
   }
