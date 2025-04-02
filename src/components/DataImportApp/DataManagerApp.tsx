@@ -88,6 +88,7 @@ export function DataManagerApp(): JSX.Element {
             return (
               <Group key={dataset.id}>
                 {dataset.name}
+
                 <ThemeIcon
                   c="danger"
                   bg="none"
