@@ -19,9 +19,7 @@ type LinkConfig = {
   spotlightDescription: string;
 };
 
-/**
- * Configuration for the app.
- */
+/** Configuration for the app. */
 type AppConfig = {
   /**
    * The path and filename to the logo file relative to the `public/` directory.
