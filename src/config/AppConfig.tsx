@@ -29,19 +29,13 @@ type AppConfig = {
    */
   logoFilename: string;
 
-  /**
-   * The name of the app.
-   */
+  /** The name of the app. */
   appName: string;
 
-  /**
-   * Navigable links the app supports
-   */
+  /** Navigable links the app supports */
   links: Record<string, LinkConfig>;
 
-  /**
-   * The order to show the navigable links in the Navbar
-   */
+  /** The order to show the navigable links in the Navbar */
   navbarLinkOrder: readonly string[];
 
   /** Configuration for the data import app */
