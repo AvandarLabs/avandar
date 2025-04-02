@@ -37,9 +37,10 @@ type AppConfig = {
   navbarLinkOrder: readonly string[];
 
   /** Configuration for the data import app */
-  dataImportApp: {
+  dataManagerApp: {
     /** Maximum length of dataset name */
     maxDatasetNameLength: number;
+
     /** Maximum length of dataset description */
     maxDatasetDescriptionLength: number;
   };
