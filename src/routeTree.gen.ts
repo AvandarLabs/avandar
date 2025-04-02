@@ -18,7 +18,7 @@ import { Route as ForgotPasswordImport } from "./routes/forgot-password";
 import { Route as AuthRouteImport } from "./routes/_auth/route";
 import { Route as AuthIndexImport } from "./routes/_auth/index";
 import { Route as AuthProfileImport } from "./routes/_auth/profile";
-import { Route as AuthDataImportImport } from "./routes/_auth/data-import";
+import { Route as AuthDataManagerImport } from "./routes/_auth/data-manager";
 import { Route as AuthDataExplorerImport } from "./routes/_auth/data-explorer";
 
 // Create/Update Routes
@@ -64,9 +64,9 @@ const AuthProfileRoute = AuthProfileImport.update({
   getParentRoute: () => AuthRouteRoute,
 } as any);
 
-const AuthDataImportRoute = AuthDataImportImport.update({
-  id: "/data-import",
-  path: "/data-import",
+const AuthDataManagerRoute = AuthDataManagerImport.update({
+  id: "/data-manager",
+  path: "/data-manager",
   getParentRoute: () => AuthRouteRoute,
 } as any);
 
@@ -122,11 +122,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthDataExplorerImport;
       parentRoute: typeof AuthRouteImport;
     };
-    "/_auth/data-import": {
-      id: "/_auth/data-import";
-      path: "/data-import";
-      fullPath: "/data-import";
-      preLoaderRoute: typeof AuthDataImportImport;
+    "/_auth/data-manager": {
+      id: "/_auth/data-manager";
+      path: "/data-manager";
+      fullPath: "/data-manager";
+      preLoaderRoute: typeof AuthDataManagerImport;
       parentRoute: typeof AuthRouteImport;
     };
     "/_auth/profile": {
@@ -150,14 +150,14 @@ declare module "@tanstack/react-router" {
 
 interface AuthRouteRouteChildren {
   AuthDataExplorerRoute: typeof AuthDataExplorerRoute;
-  AuthDataImportRoute: typeof AuthDataImportRoute;
+  AuthDataManagerRoute: typeof AuthDataManagerRoute;
   AuthProfileRoute: typeof AuthProfileRoute;
   AuthIndexRoute: typeof AuthIndexRoute;
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
   AuthDataExplorerRoute: AuthDataExplorerRoute,
-  AuthDataImportRoute: AuthDataImportRoute,
+  AuthDataManagerRoute: AuthDataManagerRoute,
   AuthProfileRoute: AuthProfileRoute,
   AuthIndexRoute: AuthIndexRoute,
 };
@@ -173,7 +173,7 @@ export interface FileRoutesByFullPath {
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
   "/data-explorer": typeof AuthDataExplorerRoute;
-  "/data-import": typeof AuthDataImportRoute;
+  "/data-manager": typeof AuthDataManagerRoute;
   "/profile": typeof AuthProfileRoute;
   "/": typeof AuthIndexRoute;
 }
@@ -184,7 +184,7 @@ export interface FileRoutesByTo {
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
   "/data-explorer": typeof AuthDataExplorerRoute;
-  "/data-import": typeof AuthDataImportRoute;
+  "/data-manager": typeof AuthDataManagerRoute;
   "/profile": typeof AuthProfileRoute;
   "/": typeof AuthIndexRoute;
 }
@@ -197,7 +197,7 @@ export interface FileRoutesById {
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
   "/_auth/data-explorer": typeof AuthDataExplorerRoute;
-  "/_auth/data-import": typeof AuthDataImportRoute;
+  "/_auth/data-manager": typeof AuthDataManagerRoute;
   "/_auth/profile": typeof AuthProfileRoute;
   "/_auth/": typeof AuthIndexRoute;
 }
@@ -211,7 +211,7 @@ export interface FileRouteTypes {
     | "/signin"
     | "/update-password"
     | "/data-explorer"
-    | "/data-import"
+    | "/data-manager"
     | "/profile"
     | "/";
   fileRoutesByTo: FileRoutesByTo;
@@ -221,7 +221,7 @@ export interface FileRouteTypes {
     | "/signin"
     | "/update-password"
     | "/data-explorer"
-    | "/data-import"
+    | "/data-manager"
     | "/profile"
     | "/";
   id:
@@ -232,7 +232,7 @@ export interface FileRouteTypes {
     | "/signin"
     | "/update-password"
     | "/_auth/data-explorer"
-    | "/_auth/data-import"
+    | "/_auth/data-manager"
     | "/_auth/profile"
     | "/_auth/";
   fileRoutesById: FileRoutesById;
@@ -275,7 +275,7 @@ export const routeTree = rootRoute
       "filePath": "_auth/route.tsx",
       "children": [
         "/_auth/data-explorer",
-        "/_auth/data-import",
+        "/_auth/data-manager",
         "/_auth/profile",
         "/_auth/"
       ]
@@ -296,8 +296,8 @@ export const routeTree = rootRoute
       "filePath": "_auth/data-explorer.tsx",
       "parent": "/_auth"
     },
-    "/_auth/data-import": {
-      "filePath": "_auth/data-import.tsx",
+    "/_auth/data-manager": {
+      "filePath": "_auth/data-manager.tsx",
       "parent": "/_auth"
     },
     "/_auth/profile": {

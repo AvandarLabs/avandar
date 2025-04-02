@@ -18,11 +18,10 @@ const TODOS =
   import.meta.env.DEV ?
     [
       {
-        id: "data-import-todos",
-        label: "Data Import Todos",
-        description: "Show the to-dos for the Data Import app",
+        id: "data-manager-todos",
+        label: "Data Manager Todos",
+        description: "Show the to-dos for the Data Manager app",
         items: [
-          "Rename Data Import to Data Manager",
           "Add ability to persist dataset into dexie",
           "Load data from dexie to DuckDB WASM",
           "Add a basic query tool to query the data",

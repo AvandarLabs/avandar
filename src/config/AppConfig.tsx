@@ -1,4 +1,10 @@
-import { IconHome, IconTable, IconUpload, IconUser } from "@tabler/icons-react";
+import {
+  IconDatabase,
+  IconHome,
+  IconTable,
+  IconUpload,
+  IconUser,
+} from "@tabler/icons-react";
 
 /**
  * Configuration for a navigable link in the app.
@@ -60,10 +66,10 @@ export const AppConfig = {
       icon: <IconUser size={24} stroke={1.5} />,
       spotlightDescription: "Go to profile page",
     },
-    dataImport: {
-      to: "/data-import",
-      label: "Data Import",
-      icon: <IconUpload size={24} stroke={1.5} />,
+    dataManager: {
+      to: "/data-manager",
+      label: "Data Manager",
+      icon: <IconDatabase size={24} stroke={1.5} />,
       spotlightDescription: "Go to the data import app",
     },
     dataExplorer: {
@@ -73,7 +79,7 @@ export const AppConfig = {
       spotlightDescription: "Go to the data explorer app",
     },
   },
-  navbarLinkOrder: ["home", "dataImport", "dataExplorer", "profile"] as const,
+  navbarLinkOrder: ["home", "dataManager", "dataExplorer", "profile"] as const,
 
   dataImportApp: {
     maxDatasetNameLength: 100,

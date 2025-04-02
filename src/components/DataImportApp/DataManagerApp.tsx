@@ -15,7 +15,7 @@ type DatasetForm = {
 const { maxDatasetNameLength, maxDatasetDescriptionLength } =
   AppConfig.dataImportApp;
 
-export function DataImportApp(): JSX.Element {
+export function DataManagerApp(): JSX.Element {
   const { csv, parseFile } = useCSV();
   const form = useForm<DatasetForm>({
     initialValues: {
