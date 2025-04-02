@@ -19,7 +19,8 @@ type CSVMetadata = {
  * @param options Optional configuration options.
  * @param options.onNoFileSelected Optional callback function to be called
  * when no file is selected.
- * @returns An object containing the parsed CSV data and a function to parse a file.
+ * @returns An object containing the parsed CSV data and a function to parse a
+ * file.
  */
 export function useCSV(options?: { onNoFileSelected?: () => void }): {
   csv: CSVMetadata | undefined;
