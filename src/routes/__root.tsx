@@ -3,6 +3,7 @@ import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { cssVariablesResolver, Theme } from "@/config/Theme";
 import { RootRouteContext } from "@/types/RootRouteContext";
 
@@ -25,6 +26,7 @@ function RootComponent() {
         <ModalsProvider>
           <Notifications position="top-right" />
           <Outlet />
+          <TanStackRouterDevtools />
         </ModalsProvider>
       </MantineProvider>
     </QueryClientProvider>

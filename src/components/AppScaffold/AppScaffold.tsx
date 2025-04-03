@@ -13,7 +13,6 @@ import { Spotlight } from "@mantine/spotlight";
 import { IconChevronDown, IconLogout, IconSearch } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { Outlet, useRouter } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { Link } from "@/components/ui/Link";
 import { AppConfig } from "@/config/AppConfig";
 import { useIsMobileSize } from "@/hooks/useIsMobileSize";
@@ -112,7 +111,7 @@ export function AppScaffold({
           </AppShell.Header>
         : null}
 
-        <AppShell.Navbar>
+        <AppShell.Navbar bd="none">
           <Group px="md" py="sm" justify="center">
             <Burger
               opened={isNavbarOpened}
@@ -163,9 +162,8 @@ export function AppScaffold({
           })}
         </AppShell.Navbar>
 
-        <AppShell.Main pt="md">
+        <AppShell.Main pt="xs" pb="0" ml={-8}>
           <Outlet />
-          <TanStackRouterDevtools />
         </AppShell.Main>
 
         {aside ?

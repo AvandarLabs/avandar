@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DataManagerApp } from "@/components/DataManagerApp/DataManagerApp";
 
 export const Route = createFileRoute("/_auth/data-manager/")({
-  component: RouteComponent,
+  component: DataManagerRoot,
 });
 
-function RouteComponent() {
-  return <DataManagerApp />;
+/**
+ * This is the default view when we load the data-manager root.
+ */
+function DataManagerRoot() {
+  return <div>No dataset selected</div>;
 }
