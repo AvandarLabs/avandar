@@ -13,7 +13,7 @@ export function DataManagerApp(): JSX.Element {
           span={3}
           style={(theme) => {
             return {
-              backgroundColor: theme.colors.neutral[0],
+              backgroundColor: "white",
               borderRight: `1px solid ${theme.colors.neutral[3]}`,
               height: "100dvh",
             };
