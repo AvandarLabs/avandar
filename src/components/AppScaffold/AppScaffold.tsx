@@ -108,7 +108,7 @@ export function AppScaffold({
         </AppShell.Header>
       : null}
 
-      <AppShell.Navbar>
+      <AppShell.Navbar bd="none">
         <Group px="md" py="sm" justify="center">
           <Burger
             opened={isNavbarOpened}
