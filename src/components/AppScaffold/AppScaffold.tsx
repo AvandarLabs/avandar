@@ -4,6 +4,7 @@ import {
   Group,
   Loader,
   Menu,
+  Text,
   Title,
   UnstyledButton,
 } from "@mantine/core";
@@ -155,7 +156,10 @@ export function AppScaffold({
                 py="sm"
               >
                 <Group>
-                  {link.icon} {link.label}
+                  {link.icon}{" "}
+                  <Text span fw={500}>
+                    {link.label}
+                  </Text>
                 </Group>
               </Link>
             );
