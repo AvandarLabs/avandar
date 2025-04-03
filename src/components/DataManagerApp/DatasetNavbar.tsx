@@ -24,7 +24,6 @@ export function DatasetNavbar({ datasets, isLoading }: Props): JSX.Element {
       .map((dataset): NavLinkProps => {
         return {
           ...LocalDataset.getDatasetLinkProps(dataset.id),
-          className: "[&:not(.active)]:hover:bg-neutral-100",
           label: dataset.name,
           style: borderStyle,
         };
@@ -32,7 +31,6 @@ export function DatasetNavbar({ datasets, isLoading }: Props): JSX.Element {
       .concat([
         {
           to: AppConfig.links.dataImport.to,
-          className: "[&:not(.active)]:hover:bg-neutral-100",
           label: "Add new dataset",
           style: borderStyle,
         },
@@ -47,7 +45,12 @@ export function DatasetNavbar({ datasets, isLoading }: Props): JSX.Element {
       <Title pl="sm" order={3}>
         Datasets
       </Title>
-      <NavLinkList pt="md" links={datasetLinks} pr="md" />
+      <NavLinkList
+        pt="md"
+        links={datasetLinks}
+        pr="md"
+        inactiveHoverColor="neutral.1"
+      />
     </Box>
   );
 }
