@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { AppConfig } from "@/config/AppConfig";
 import * as LocalDataset from "@/models/LocalDataset";
 import { NavLinkList } from "../ui/NavLinkList";
+import type { NavLinkProps } from "@/components/ui/NavLink";
 
 type Props = {
   datasets: LocalDataset.T[];
@@ -11,9 +12,9 @@ type Props = {
 };
 
 export function DatasetLinkList({ datasets, isLoading }: Props): JSX.Element {
-  const datasetLinks = useMemo(() => {
+  const datasetLinks: readonly NavLinkProps[] = useMemo(() => {
     return datasets
-      .map((dataset) => {
+      .map((dataset): NavLinkProps => {
         return {
           ...LocalDataset.getDatasetLinkProps(dataset.id),
           label: <Text span>{dataset.name}</Text>,
@@ -28,8 +29,11 @@ export function DatasetLinkList({ datasets, isLoading }: Props): JSX.Element {
               <IconPlus size={16} />
             </Group>
           ),
+          style: {
+            backgroundColor: "red",
+          },
         },
-      ]);
+      ] as NavLinkProps[]);
   }, [datasets]);
 
   return (

@@ -1,25 +1,32 @@
-import { NavLink as MantineNavLink } from "@mantine/core";
-import { createLink, LinkComponent } from "@tanstack/react-router";
-import { AnchorHTMLAttributes, forwardRef } from "react";
-import type { NavLinkProps } from "@mantine/core";
+import {
+  NavLink as MantineNavLink,
+  NavLinkProps as MantineNavLinkProps,
+} from "@mantine/core";
+import {
+  createLink,
+  LinkComponent,
+  LinkComponentProps,
+} from "@tanstack/react-router";
+import { forwardRef } from "react";
 
-interface MantineRouterNavLinkProps
-  extends Omit<
-      AnchorHTMLAttributes<HTMLAnchorElement>,
-      "style" | "color" | "onChange"
-    >,
-    NavLinkProps {}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+interface NewMantineNavLinkProps extends Omit<MantineNavLinkProps, "href"> {}
 
-const MantineRouterNavLink = forwardRef<
+const MantineNavLinkComponent = forwardRef<
   HTMLAnchorElement,
-  MantineRouterNavLinkProps
+  NewMantineNavLinkProps
 >((props, ref): JSX.Element => {
   return <MantineNavLink ref={ref} {...props} />;
 });
 
-const MantineRouterNavLinkComponent = createLink(MantineRouterNavLink);
+const MantineRouterNavLink = createLink(MantineNavLinkComponent);
 
+/**
+ * This is a Mantine NavLink that works with our router.
+ */
 // eslint-disable-next-line react/function-component-definition
 export const NavLink: LinkComponent<typeof MantineRouterNavLink> = (props) => {
-  return <MantineRouterNavLinkComponent {...props} />;
+  return <MantineRouterNavLink {...props} />;
 };
+
+export type NavLinkProps = LinkComponentProps<typeof MantineRouterNavLink>;

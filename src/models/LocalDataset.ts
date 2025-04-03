@@ -1,7 +1,7 @@
-import { LinkProps } from "@tanstack/react-router";
 import Papa from "papaparse";
 import { match } from "ts-pattern";
 import { z } from "zod";
+import { LinkProps } from "@/components/ui/Link";
 import { CSVData, MIMEType } from "@/types/common";
 import { Replace } from "@/types/utils";
 
@@ -63,7 +63,10 @@ export const QueryKeys = {
 /**
  * Returns the link props for a dataset to use in a `<Link>` component.
  */
-export function getDatasetLinkProps(id: number): LinkProps {
+export function getDatasetLinkProps(id: number): {
+  to: LinkProps["to"];
+  params: LinkProps["params"];
+} {
   return {
     to: `/data-manager/$datasetId`,
     params: {

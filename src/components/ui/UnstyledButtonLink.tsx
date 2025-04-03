@@ -1,27 +1,37 @@
-import { UnstyledButton as MantineUnstyledButton } from "@mantine/core";
-import { createLink, LinkComponent } from "@tanstack/react-router";
-import { AnchorHTMLAttributes, forwardRef } from "react";
-import type { UnstyledButtonProps } from "@mantine/core";
+import { UnstyledButton, UnstyledButtonProps } from "@mantine/core";
+import {
+  createLink,
+  LinkComponent,
+  LinkComponentProps,
+} from "@tanstack/react-router";
+import { forwardRef } from "react";
 
-interface MantineRouterUnstyledButtonProps
-  extends Omit<
-      AnchorHTMLAttributes<HTMLAnchorElement>,
-      "color" | "onChange" | "style"
-    >,
-    UnstyledButtonProps {}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+interface NewMantineUnstyledButtonProps
+  extends Omit<UnstyledButtonProps, "href"> {}
 
-const MantineRouterNavLink = forwardRef<
+const MantineUnstyledButtonLinkComponent = forwardRef<
   HTMLAnchorElement,
-  MantineRouterUnstyledButtonProps
+  NewMantineUnstyledButtonProps
 >((props, ref): JSX.Element => {
-  return <MantineUnstyledButton component="a" ref={ref} {...props} />;
+  return <UnstyledButton component="a" ref={ref} {...props} />;
 });
 
-const MantineRouterNavLinkComponent = createLink(MantineRouterNavLink);
+const MantineRouterUnstyledButtonLink = createLink(
+  MantineUnstyledButtonLinkComponent,
+);
 
-// eslint-disable-next-line react/function-component-definition
-export const UnstyledButtonLink: LinkComponent<typeof MantineRouterNavLink> = (
-  props,
-) => {
-  return <MantineRouterNavLinkComponent {...props} />;
+/**
+ * This is a Mantine UnstyledButton that is a link and that works with
+ * our router.
+ */
+export const UnstyledButtonLink: LinkComponent<
+  typeof MantineRouterUnstyledButtonLink
+  // eslint-disable-next-line react/function-component-definition
+> = (props) => {
+  return <MantineRouterUnstyledButtonLink {...props} />;
 };
+
+export type UnstyledButtonLinkProps = LinkComponentProps<
+  typeof MantineRouterUnstyledButtonLink
+>;

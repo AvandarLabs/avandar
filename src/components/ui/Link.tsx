@@ -1,20 +1,28 @@
 import { Anchor, AnchorProps } from "@mantine/core";
-import { createLink, LinkComponent } from "@tanstack/react-router";
-import { AnchorHTMLAttributes, forwardRef } from "react";
+import {
+  createLink,
+  LinkComponent,
+  LinkComponentProps,
+} from "@tanstack/react-router";
+import { forwardRef } from "react";
 
-interface MantineRouterLinkProps
-  extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "color" | "style">,
-    AnchorProps {}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+interface NewMantineLinkProps extends Omit<AnchorProps, "href"> {}
 
-const MantineRouterLink = forwardRef<HTMLAnchorElement, MantineRouterLinkProps>(
+const MantineLinkComponent = forwardRef<HTMLAnchorElement, NewMantineLinkProps>(
   (props, ref): JSX.Element => {
     return <Anchor ref={ref} {...props} />;
   },
 );
 
-const MantineRouterLinkComponent = createLink(MantineRouterLink);
+const MantineRouterLink = createLink(MantineLinkComponent);
 
+/**
+ * This is a Mantine Anchor Link that works with our router.
+ */
 // eslint-disable-next-line react/function-component-definition
 export const Link: LinkComponent<typeof MantineRouterLink> = (props) => {
-  return <MantineRouterLinkComponent {...props} />;
+  return <MantineRouterLink {...props} />;
 };
+
+export type LinkProps = LinkComponentProps<typeof MantineRouterLink>;

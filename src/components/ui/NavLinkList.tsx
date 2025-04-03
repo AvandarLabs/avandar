@@ -1,24 +1,28 @@
-import { Box, NavLinkProps } from "@mantine/core";
+import { Box } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
-import { LinkProps, ReactNode } from "@tanstack/react-router";
 import { NavLink } from "@/components/ui/NavLink";
+import type { NavLinkProps } from "@/components/ui/NavLink";
 
 type Props = {
-  links: ReadonlyArray<Pick<LinkProps, "to" | "params"> & { label: ReactNode }>;
+  links: readonly NavLinkProps[];
   color?: NavLinkProps["color"];
+  gap?: NavLinkProps["py"];
 };
 
-export function NavLinkList({ links, color = "primary" }: Props): JSX.Element {
+export function NavLinkList({
+  links,
+  color = "primary",
+  gap = "sm",
+}: Props): JSX.Element {
   const navLinks = links.map((link) => {
     return (
       <NavLink
+        key={link.to}
+        {...link}
         variant="filled"
         color={color}
-        key={link.to}
-        to={link.to}
-        params={link.params}
-        label={link.label}
         rightSection={<IconChevronRight size={16} stroke={0.5} />}
+        py={gap}
       />
     );
   });
