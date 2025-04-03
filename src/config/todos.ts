@@ -10,8 +10,6 @@ export const TODOS =
         label: "Data Manager Todos",
         description: "Show the to-dos for the Data Manager app",
         items: [
-          "Store datset file size",
-          "Add ability to persist dataset into dexie",
           "Load data from dexie to DuckDB WASM",
           "Add a basic query tool to query the data",
           "Display the data in a table in Data Explorer",
