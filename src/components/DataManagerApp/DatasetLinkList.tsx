@@ -16,7 +16,7 @@ export function DatasetLinkList({ datasets, isLoading }: Props): JSX.Element {
       .map((dataset) => {
         return {
           ...LocalDataset.getDatasetLinkProps(dataset.id),
-          label: <Text>{dataset.name}</Text>,
+          label: <Text span>{dataset.name}</Text>,
         };
       })
       .concat([
