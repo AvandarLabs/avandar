@@ -1,8 +1,9 @@
-import { Loader, Stack } from "@mantine/core";
+import { Group, Loader, Stack, Text } from "@mantine/core";
+import { IconPlus } from "@tabler/icons-react";
 import { useMemo } from "react";
+import { AppConfig } from "@/config/AppConfig";
 import * as LocalDataset from "@/models/LocalDataset";
 import { NavLinkList } from "../ui/NavLinkList";
-import { UnstyledButtonLink } from "../ui/UnstyledButtonLink";
 
 type Props = {
   datasets: LocalDataset.T[];
@@ -11,12 +12,24 @@ type Props = {
 
 export function DatasetLinkList({ datasets, isLoading }: Props): JSX.Element {
   const datasetLinks = useMemo(() => {
-    return datasets.map((dataset) => {
-      return {
-        ...LocalDataset.getDatasetLinkProps(dataset.id),
-        label: dataset.name,
-      };
-    });
+    return datasets
+      .map((dataset) => {
+        return {
+          ...LocalDataset.getDatasetLinkProps(dataset.id),
+          label: <Text>{dataset.name}</Text>,
+        };
+      })
+      .concat([
+        {
+          to: AppConfig.links.dataImport.to,
+          label: (
+            <Group gap="xs">
+              <Text span>Add new dataset</Text>
+              <IconPlus size={16} />
+            </Group>
+          ),
+        },
+      ]);
   }, [datasets]);
 
   return (
@@ -26,9 +39,6 @@ export function DatasetLinkList({ datasets, isLoading }: Props): JSX.Element {
       : null}
       <Stack>
         <NavLinkList links={datasetLinks} />
-        <UnstyledButtonLink pl="sm" to="/data-manager/data-import">
-          Add new dataset
-        </UnstyledButtonLink>
       </Stack>
     </>
   );

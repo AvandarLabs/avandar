@@ -1,10 +1,10 @@
 import { Box, NavLinkProps } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
-import { LinkProps } from "@tanstack/react-router";
+import { LinkProps, ReactNode } from "@tanstack/react-router";
 import { NavLink } from "@/components/ui/NavLink";
 
 type Props = {
-  links: ReadonlyArray<Pick<LinkProps, "to" | "params"> & { label: string }>;
+  links: ReadonlyArray<Pick<LinkProps, "to" | "params"> & { label: ReactNode }>;
   color?: NavLinkProps["color"];
 };
 

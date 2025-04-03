@@ -14,7 +14,7 @@ export function DataManagerApp(): JSX.Element {
           style={(theme) => {
             return {
               backgroundColor: "white",
-              borderRight: `1px solid ${theme.colors.neutral[3]}`,
+              borderRight: `1px solid ${theme.colors.neutral[1]}`,
               height: "100dvh",
             };
           }}

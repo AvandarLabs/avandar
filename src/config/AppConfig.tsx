@@ -2,6 +2,7 @@ import {
   IconDatabase,
   IconHome,
   IconTable,
+  IconUpload,
   IconUser,
 } from "@tabler/icons-react";
 import { LinkProps } from "@tanstack/react-router";
@@ -66,6 +67,12 @@ export const AppConfig = {
       to: "/data-manager",
       label: "Data Manager",
       icon: <IconDatabase size={24} stroke={1.5} />,
+      spotlightDescription: "Go to the data import app",
+    },
+    dataImport: {
+      to: "/data-manager/data-import",
+      label: "Data Import",
+      icon: <IconUpload size={24} stroke={1.5} />,
       spotlightDescription: "Go to the data import app",
     },
     dataExplorer: {
