@@ -1,7 +1,7 @@
 import { Button, Container, Stack, Text, Title } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { Router, useRouter } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { AppConfig } from "@/config/AppConfig";
 import * as LocalDataset from "@/models/LocalDataset";
