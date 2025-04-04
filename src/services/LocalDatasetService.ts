@@ -10,7 +10,12 @@ type LocalDatasetDatabase = Dexie & {
 
 const db = new Dexie("LocalDatasets") as LocalDatasetDatabase;
 
-class LocalDatasetServiceClient {
+/**
+ * Service for managing datasets stored locally in the browser.
+ * LocalDatasets are stored in IndexedDB and their full data is
+ * stored as a CSV, serialized as a string.
+ */
+class LocalDatasetServiceImpl {
   constructor() {
     db.version(DB_VERSION).stores({ datasets: "++id" });
   }
@@ -57,4 +62,4 @@ class LocalDatasetServiceClient {
   }
 }
 
-export const LocalDatasetService = new LocalDatasetServiceClient();
+export const LocalDatasetService = new LocalDatasetServiceImpl();

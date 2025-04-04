@@ -2,8 +2,10 @@ import { Box, Flex } from "@mantine/core";
 import { Outlet } from "@tanstack/react-router";
 import { DatasetNavbar } from "./DatasetNavbar";
 import { useGetAllLocalDatasets } from "./queries";
+import { useDuckDB } from "./useDuckDB";
 
 export function DataManagerApp(): JSX.Element {
+  useDuckDB();
   const [allDatasets, isLoadingDatasets] = useGetAllLocalDatasets();
 
   return (
