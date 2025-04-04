@@ -134,7 +134,7 @@ export function AppScaffold({
                 <Menu.Item
                   leftSection={<IconLogout size={16} />}
                   onClick={() => {
-                    return sendSignOutRequest();
+                    sendSignOutRequest();
                   }}
                 >
                   Sign Out{" "}
@@ -156,7 +156,7 @@ export function AppScaffold({
                 py="sm"
               >
                 <Group>
-                  {link.icon}{" "}
+                  {link.icon}
                   <Text span fw={500}>
                     {link.label}
                   </Text>
