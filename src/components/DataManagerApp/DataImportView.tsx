@@ -64,23 +64,14 @@ export function DataImportView(): JSX.Element {
           <DataGrid fields={csv.meta.fields ?? []} data={csv.data} />
           <form
             onSubmit={form.onSubmit((values) => {
-              const creationTime = new Date();
-
-              const dataset: LocalDataset.CreateT = {
-                id: undefined,
+              const dataset: LocalDataset.CreateT = LocalDataset.create({
                 name: values.name,
-                mimeType: fileMetadata.mimeType,
                 description: values.description,
-                createdAt: creationTime,
-                updatedAt: creationTime,
-                sizeInBytes: fileMetadata.sizeInBytes,
-                data: LocalDataset.unparse({
-                  datasetType: fileMetadata.mimeType,
-                  data: csv.data,
-                }),
-                delimiter: csv.meta.delimiter,
-                firstRowIsHeader: true,
-              };
+                fileMetadata,
+                csvMetadata: csv.meta,
+                data: csv.data,
+              });
+
               saveDataset(dataset, {
                 onSuccess: () => {
                   notifications.show({

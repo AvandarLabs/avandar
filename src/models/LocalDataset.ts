@@ -1,9 +1,11 @@
-import Papa from "papaparse";
+import Papa, { ParseMeta } from "papaparse";
 import { match } from "ts-pattern";
 import { z } from "zod";
 import { LinkProps } from "@/components/ui/Link";
+import * as DatasetField from "@/models/DatasetField";
 import { CSVData, MIMEType } from "@/types/common";
-import { Replace } from "@/types/utils";
+import { Replace } from "@/types/utilityTypes";
+import { uuid } from "@/utils/uuid";
 
 /**
  * Local dataset type.
@@ -20,12 +22,22 @@ export type T = {
   mimeType: MIMEType;
   delimiter: string;
   firstRowIsHeader: boolean;
+  fields: readonly DatasetField.T[];
 
   /**
    * All data is represented as a single string to take up less space.
    * This needs to be parsed.
    */
   data: string;
+};
+
+/**
+ * Metadata about the parsed file itself.
+ */
+export type FileMetadata = {
+  name: string;
+  mimeType: MIMEType;
+  sizeInBytes: number;
 };
 
 /**
@@ -51,6 +63,7 @@ export const Schema = z.object({
   data: z.string(),
   delimiter: z.string(),
   firstRowIsHeader: z.boolean(),
+  fields: z.array(DatasetField.Schema),
 });
 
 /**
@@ -59,6 +72,45 @@ export const Schema = z.object({
 export const QueryKeys = {
   allDatasets: "localDatasets",
 };
+
+export function create({
+  name,
+  description,
+  fileMetadata,
+  csvMetadata,
+  data,
+}: {
+  name: string;
+  description: string;
+  fileMetadata: FileMetadata;
+  csvMetadata: ParseMeta;
+  data: CSVData;
+}): CreateT {
+  const creationTime = new Date();
+  return {
+    id: undefined,
+    name,
+    firstRowIsHeader: true,
+    mimeType: fileMetadata.mimeType,
+    description,
+    createdAt: creationTime,
+    updatedAt: creationTime,
+    sizeInBytes: fileMetadata.sizeInBytes,
+    delimiter: csvMetadata.delimiter,
+    data: unparse({ data, datasetType: fileMetadata.mimeType }),
+    fields:
+      csvMetadata.fields?.map((fieldName) => {
+        return {
+          id: uuid(),
+          name: fieldName,
+          // TODO(pablo): force 'string' type for everything even
+          // if not accurate
+          dataType: "string",
+          description: undefined,
+        };
+      }) ?? [],
+  };
+}
 
 /**
  * Returns the link props for a dataset to use in a `<Link>` component.

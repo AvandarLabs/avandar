@@ -1,7 +1,15 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { Alert, Center, Text, Title } from "@mantine/core";
+import { IconAlertCircle } from "@tabler/icons-react";
+import {
+  createFileRoute,
+  ErrorComponentProps,
+  notFound,
+} from "@tanstack/react-router";
+import { useEffect } from "react";
 import { DatasetMetaView } from "@/components/DataManagerApp/DatasetMetaView";
 import * as LocalDataset from "@/models/LocalDataset";
 import { LocalDatasetService } from "@/services/LocalDatasetService";
+import { Logger } from "@/utils/Logger";
 
 export const Route = createFileRoute("/_auth/data-manager/$datasetId")({
   component: RouteComponent,
@@ -12,9 +20,32 @@ export const Route = createFileRoute("/_auth/data-manager/$datasetId")({
     }
     return dataset;
   },
+  errorComponent: DatasetMetaErrorView,
 });
 
 function RouteComponent() {
   const dataset = Route.useLoaderData();
   return <DatasetMetaView dataset={dataset} />;
+}
+
+function DatasetMetaErrorView({ error }: ErrorComponentProps) {
+  useEffect(() => {
+    Logger.error(error);
+  }, [error]);
+
+  return (
+    <Center h="50%">
+      <Alert
+        variant="light"
+        color="danger"
+        title={<Title order={4}>Dataset failed to load</Title>}
+        icon={<IconAlertCircle />}
+      >
+        <Text>
+          The dataset failed to load. Please try again later or reach out to
+          support.
+        </Text>
+      </Alert>
+    </Center>
+  );
 }

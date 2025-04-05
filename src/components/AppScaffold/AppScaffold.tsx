@@ -168,7 +168,7 @@ export function AppScaffold({
           })}
         </AppShell.Navbar>
 
-        <AppShell.Main pt="0" pb="0" ml={-16}>
+        <AppShell.Main py="0" pr="0" ml={-16}>
           <Outlet />
         </AppShell.Main>
 

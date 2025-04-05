@@ -1,15 +1,7 @@
 import Papa from "papaparse";
 import { useCallback, useState } from "react";
+import { FileMetadata } from "@/models/LocalDataset";
 import { CSVRow, MIMEType } from "@/types/common";
-
-/**
- * Metadata about the parsed file itself.
- */
-type FileMetadata = {
-  name: string;
-  mimeType: MIMEType;
-  sizeInBytes: number;
-};
 
 /**
  * Custom hook for handling CSV file parsing.
