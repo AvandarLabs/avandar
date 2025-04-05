@@ -14,6 +14,7 @@ import { Spotlight } from "@mantine/spotlight";
 import { IconChevronDown, IconLogout, IconSearch } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { Outlet, useRouter } from "@tanstack/react-router";
+import clsx from "clsx";
 import { Link } from "@/components/ui/Link";
 import { AppConfig } from "@/config/AppConfig";
 import { useIsMobileSize } from "@/hooks/useIsMobileSize";
@@ -151,7 +152,7 @@ export function AppScaffold({
               <Link
                 key={linkKey}
                 to={link.to}
-                className={css.anchor}
+                className={clsx(css.anchor, "transition-colors")}
                 px="md"
                 py="sm"
               >

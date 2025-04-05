@@ -1,25 +1,20 @@
-import {
-  Box,
-  BoxProps,
-  DEFAULT_THEME,
-  MantineColor,
-  Text,
-} from "@mantine/core";
+import { Box, BoxProps, MantineColor, Text } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
 import clsx from "clsx";
 import * as R from "remeda";
 import { NavLink } from "@/components/ui/NavLink";
-import { Theme } from "@/config/Theme";
 import type { NavLinkProps } from "@/components/ui/NavLink";
-
-const DEFAULT_PRIMARY_SHADE =
-  typeof DEFAULT_THEME.primaryShade === "object" ?
-    DEFAULT_THEME.primaryShade.light
-  : DEFAULT_THEME.primaryShade;
 
 type Props = {
   links: readonly NavLinkProps[];
+
+  /**
+   * Color of active nav links. The hover color will be automatically
+   * computed based on this color.
+   */
   activeColor?: MantineColor;
+
+  /** Color of inactive nav links when hovered */
   inactiveHoverColor?: MantineColor;
   gap?: NavLinkProps["py"];
   showRightChevrons?: boolean;
@@ -36,56 +31,20 @@ function generateLinkKey(linkProps: NavLinkProps): string {
   return keyParts.join("_");
 }
 
-function mantineShadeToTailwindShade(shade: number): number {
-  if (shade === 0) {
-    return 50;
-  }
-  return shade * 100;
-}
-
-function mantineColorToTailwind(color: MantineColor | undefined): string {
-  if (!color) {
-    return "";
-  }
-
-  if (color.startsWith("#")) {
-    return `[${color}]`;
-  }
-
-  const [colorName, colorShade] = color.split(".");
-  if (!colorShade) {
-    const primaryShade =
-      typeof Theme.primaryShade === "object" ?
-        // TODO(pablo): this should handle using the `dark` primary shade if
-        // we're in dark mode
-        Theme.primaryShade.light
-      : DEFAULT_PRIMARY_SHADE;
-    const tailwindShade = mantineShadeToTailwindShade(Number(primaryShade));
-    return `${colorName}-${tailwindShade}`;
-  }
-
-  const tailwindShade = mantineShadeToTailwindShade(Number(colorShade));
-  return `${colorName}-${tailwindShade}`;
-}
-
 export function NavLinkList({
   links,
   activeColor = "primary.5",
   gap = "sm",
   showRightChevrons = false,
-  inactiveHoverColor,
+  inactiveHoverColor = "neutral.0",
   ...boxProps
 }: Props): JSX.Element {
   const navLinks = links.map((link) => {
     const { label, className, ...restOfLinkProps } = link;
     const navLinkClassName = clsx(
+      "transition-colors",
       "[&:not(.active)]:text-neutral-700",
       "[&:not(.active)]:hover:text-black",
-      {
-        "[&:not(.active)]:hover:bg-neutral-50": !inactiveHoverColor,
-        [`[&:not(.active)]:hover:bg-${mantineColorToTailwind(inactiveHoverColor)}`]:
-          !!inactiveHoverColor,
-      },
       className,
     );
 
@@ -96,6 +55,7 @@ export function NavLinkList({
         className={navLinkClassName}
         variant="filled"
         color={activeColor}
+        inactiveHoverColor={inactiveHoverColor}
         rightSection={
           showRightChevrons ? <IconChevronRight size={16} stroke={0.5} /> : null
         }

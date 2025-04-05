@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { AppConfig } from "@/config/AppConfig";
 import * as LocalDataset from "@/models/LocalDataset";
 import { DataGrid } from "../ui/DataGrid";
-import { DescriptionList } from "../ui/DescriptionListItem/DescriptionList";
+import { DescriptionList } from "../ui/DescriptionList/DescriptionList";
 import { useDeleteLocalDataset } from "./queries";
 import { useCSV } from "./useCSV";
 
