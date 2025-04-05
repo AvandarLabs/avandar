@@ -1,4 +1,4 @@
-import { Box, Loader, Title, useMantineTheme } from "@mantine/core";
+import { Box, BoxProps, Loader, Title, useMantineTheme } from "@mantine/core";
 import { useMemo } from "react";
 import { AppConfig } from "@/config/AppConfig";
 import * as LocalDataset from "@/models/LocalDataset";
@@ -8,9 +8,13 @@ import type { NavLinkProps } from "@/components/ui/NavLink";
 type Props = {
   datasets: LocalDataset.T[];
   isLoading: boolean;
-};
+} & BoxProps;
 
-export function DatasetNavbar({ datasets, isLoading }: Props): JSX.Element {
+export function DatasetNavbar({
+  datasets,
+  isLoading,
+  ...boxProps
+}: Props): JSX.Element {
   const theme = useMantineTheme();
   const borderStyle = useMemo(() => {
     return {
@@ -38,7 +42,7 @@ export function DatasetNavbar({ datasets, isLoading }: Props): JSX.Element {
   }, [datasets, borderStyle]);
 
   return (
-    <Box bg="neutral.0" h="100%" pt="lg">
+    <Box bg="neutral.0" pt="lg" {...boxProps}>
       {isLoading ?
         <Loader />
       : null}

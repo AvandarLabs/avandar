@@ -3,6 +3,7 @@ import {
   Burger,
   Group,
   Loader,
+  MantineTheme,
   Menu,
   Text,
   Title,
@@ -113,7 +114,7 @@ export function AppScaffold({
           </AppShell.Header>
         : null}
 
-        <AppShell.Navbar bd="none">
+        <AppShell.Navbar style={$navbarBorder}>
           <Group px="md" py="sm" justify="center">
             <Burger
               opened={isNavbarOpened}
@@ -190,3 +191,9 @@ export function AppScaffold({
     </>
   );
 }
+
+const $navbarBorder = (theme: MantineTheme) => {
+  return {
+    borderRight: `1px solid ${theme.colors.neutral[8]}`,
+  };
+};
