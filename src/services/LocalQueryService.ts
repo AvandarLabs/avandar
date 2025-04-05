@@ -66,7 +66,6 @@ class LocalQueryServiceImpl {
   `);
     conn.close();
     return results.toArray().map((row) => {
-      console.log(row);
       return row.toJSON();
     });
   }
