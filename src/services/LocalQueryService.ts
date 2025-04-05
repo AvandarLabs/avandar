@@ -64,7 +64,7 @@ class LocalQueryServiceImpl {
     const results = await conn.query<{ rowNum: arrow.Int32; val: arrow.Utf8 }>(`
     select * from foo
   `);
-    conn.close();
+    await conn.close();
     return results.toArray().map((row) => {
       return row.toJSON();
     });
