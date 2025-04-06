@@ -1,5 +1,6 @@
 import { Container, List } from "@mantine/core";
 import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
 import {
   SpotlightActionData,
   SpotlightActionGroupData,
@@ -10,6 +11,7 @@ import { useMemo } from "react";
 import * as R from "remeda";
 import { AppConfig } from "@/config/AppConfig";
 import { TODOS } from "@/config/todos";
+import { LocalDatasetService } from "@/services/LocalDatasetService";
 
 export function useSpotlightActions(): Array<
   SpotlightActionData | SpotlightActionGroupData
@@ -31,6 +33,28 @@ export function useSpotlightActions(): Array<
     );
 
     if (import.meta.env.DEV) {
+      const devActions = [
+        {
+          group: "Dev Actions",
+          actions: [
+            {
+              id: "delete-local-datasets-indexed-db",
+              label: "Delete Local Datasets",
+              description: "Delete Local Datasets indexedDB database",
+              onClick: async () => {
+                await LocalDatasetService.deleteDatabase();
+                notifications.show({
+                  title: "Local Datasets deleted",
+                  message:
+                    "Local Datasets indexedDB database deleted. Please refresh the page.",
+                  color: "green",
+                });
+              },
+            },
+          ],
+        },
+      ];
+
       const devTodos = TODOS?.map((devTodo) => {
         return {
           id: devTodo.id,
@@ -55,8 +79,10 @@ export function useSpotlightActions(): Array<
       });
 
       return devTodos ?
-          actions.concat([{ group: "Dev Todos", actions: devTodos }])
-        : actions;
+          actions.concat(devActions, [
+            { group: "Dev Todos", actions: devTodos },
+          ])
+        : actions.concat(devActions);
     }
 
     return actions;

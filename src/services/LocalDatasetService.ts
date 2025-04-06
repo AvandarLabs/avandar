@@ -55,10 +55,18 @@ class LocalDatasetServiceImpl {
   /**
    * Deletes a dataset by its ID.
    * @param id - The ID of the dataset to delete
-   * @returns A promise that resolves when the dataset is deleted
+   * @returns A void promise.
    */
   deleteDataset(id: number): Promise<void> {
     return db.datasets.delete(id);
+  }
+
+  /**
+   * Deletes the entire database.
+   * @returns A void promise.
+   */
+  deleteDatabase(): Promise<void> {
+    return db.delete();
   }
 }
 
