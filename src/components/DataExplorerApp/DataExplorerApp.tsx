@@ -1,37 +1,64 @@
-import { Box, Button, Select, Text } from "@mantine/core";
+import { Box, Button, MultiSelect, Select, Text } from "@mantine/core";
 import { useMemo, useState } from "react";
+import * as R from "remeda";
 import { LocalQueryClient } from "@/clients/LocalQueryClient";
+import * as LocalDataset from "@/models/LocalDataset";
+import { UUID } from "@/types/common";
 import { useLocalDatasets } from "../DataManagerApp/queries";
 
 export function DataExplorerApp(): JSX.Element {
   const [allDatasets, isLoadingDatasets] = useLocalDatasets();
   const [selectedDatasetId, setSelectedDatasetId] = useState<
-    string | undefined
+    number | undefined
   >(undefined);
+  const [selectedFieldIds, setSelectedFieldIds] = useState<readonly UUID[]>([]);
 
-  /*
-  useEffect(() => {
-    const instantiateDB = async () => {
-      await LocalQueryClient.loadCSVData();
-      const data = await LocalQueryClient.queryData();
-      console.log("Queried data", data);
-    };
+  const fieldsMap: Record<UUID, LocalDataset.Field> = useMemo(() => {
+    return R.pipe(
+      allDatasets ?? [],
+      R.flatMap((dataset) => {
+        return dataset.fields;
+      }),
+      R.mapToObj((field) => {
+        return [field.id, field];
+      }),
+    );
+  }, [allDatasets]);
 
-    instantiateDB();
-  }, []);
-  */
+  const datasetOptions = useMemo(() => {
+    return (allDatasets ?? []).map((dataset: LocalDataset.T) => {
+      return { value: String(dataset.id), label: dataset.name };
+    });
+  }, [allDatasets]);
 
-  const datasetIds = useMemo(() => {
-    return allDatasets ?
-        allDatasets.map((d) => {
-          return { value: String(d.id), label: d.name };
-        })
-      : undefined;
+  const fieldGroupOptions = useMemo(() => {
+    return (allDatasets ?? []).map((dataset) => {
+      return {
+        group: dataset.name,
+        items: dataset.fields.map((field) => {
+          return {
+            value: field.id as string,
+            label: field.name,
+          };
+        }),
+      };
+    });
   }, [allDatasets]);
 
   return (
     <Box px="md" py="lg">
-      <Text>Select fields (fields dropdown)</Text>
+      <MultiSelect
+        searchable
+        clearable
+        label="Select fields"
+        placeholder={
+          isLoadingDatasets ? "Loading datasets..." : "Select fields"
+        }
+        data={fieldGroupOptions ?? []}
+        onChange={(fieldIds: string[]) => {
+          setSelectedFieldIds(fieldIds as UUID[]);
+        }}
+      />
 
       <Select
         allowDeselect={false}
@@ -39,13 +66,16 @@ export function DataExplorerApp(): JSX.Element {
         placeholder={
           isLoadingDatasets ? "Loading datasets..." : "Select a dataset"
         }
-        data={datasetIds ?? []}
-        value={selectedDatasetId}
-        onChange={async (datasetId) => {
-          await LocalQueryClient.loadDataset(Number(datasetId));
-          const results = await LocalQueryClient.queryData(Number(datasetId));
-          console.log("results", results);
-          return setSelectedDatasetId(datasetId ?? undefined);
+        data={datasetOptions ?? []}
+        value={String(selectedDatasetId)}
+        onChange={async (datasetId: string | null) => {
+          if (datasetId) {
+            const datasetIdNum = Number(datasetId);
+            setSelectedDatasetId(datasetIdNum);
+            await LocalQueryClient.loadDataset(datasetIdNum);
+          } else {
+            setSelectedDatasetId(undefined);
+          }
         }}
       />
 
@@ -53,7 +83,29 @@ export function DataExplorerApp(): JSX.Element {
       <Text>Group by (fields dropdown)</Text>
       <Text>Order by (fields dropdown)</Text>
       <Text>Limit (number)</Text>
-      <Button>Run</Button>
+      <Button
+        onClick={async () => {
+          const fieldNames = R.pipe(
+            selectedFieldIds,
+            R.map((id) => {
+              return fieldsMap[id]?.name;
+            }),
+            R.filter(R.isTruthy),
+          );
+
+          if (selectedDatasetId) {
+            // TODO(pablo): we need some way to determine if datasets have
+            // loaded otherwise we can't run the query
+            const result = await LocalQueryClient.runQuery({
+              datasetId: selectedDatasetId,
+              fieldNames,
+            });
+            console.log("result", result);
+          }
+        }}
+      >
+        Run
+      </Button>
     </Box>
   );
 }

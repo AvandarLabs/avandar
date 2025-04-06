@@ -23,6 +23,9 @@ function datasetIdToTableName(datasetId: number): string {
   return `dataset_${datasetId}`;
 }
 
+/**
+ * Client for running queries on local datasets.
+ */
 class LocalQueryClientImpl {
   #db?: Promise<duck.AsyncDuckDB>;
 
@@ -69,26 +72,6 @@ class LocalQueryClientImpl {
     }
   }
 
-  /*
-  async #loadCSVData() {
-    // load test data
-    await this.#withConnection(async ({ db, conn }) => {
-      await db.registerFileText(`data.csv`, "rowNum|val\n1|foo\n2|bar\n");
-      await conn.insertCSVFromPath("data.csv", {
-        schema: "main",
-        name: "foo",
-        detect: false,
-        header: true,
-        delimiter: "|",
-        columns: {
-          rowNum: new arrow.Int32(),
-          val: new arrow.Utf8(),
-        },
-      });
-    });
-  }
-  */
-
   async loadDataset(datasetId: number) {
     const { data, fields } = await this.#getDataset(datasetId);
     const tableName = datasetIdToTableName(datasetId);
@@ -118,11 +101,21 @@ class LocalQueryClientImpl {
     });
   }
 
-  async queryData(datasetId: number) {
+  async runQuery({
+    fieldNames,
+    datasetId,
+  }: {
+    fieldNames: string[];
+    datasetId: number;
+  }) {
     const tableName = datasetIdToTableName(datasetId);
+    const escapedFieldNames = fieldNames.map((name) => {
+      return `"${name}"`;
+    });
+
     return this.#withConnection(async ({ conn }) => {
       const results = await conn.query<Record<string, arrow.DataType>>(`
-        select * from ${tableName}
+        select ${escapedFieldNames.join(", ")} from ${tableName}
       `);
       return results.toArray().map((row) => {
         return row.toJSON();
