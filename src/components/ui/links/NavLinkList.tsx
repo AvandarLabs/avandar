@@ -23,9 +23,13 @@ type Props = {
 function generateLinkKey(linkProps: NavLinkProps): string {
   const keyParts: string[] = [linkProps.to as string];
   if (linkProps.params && typeof linkProps.params === "object") {
-    const paramKeyVals = R.entries(linkProps.params).map(([key, val]) => {
-      return `${key}=${String(val)}`;
-    });
+    // Using `any` here but it's safe.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const paramKeyVals = R.entries(linkProps.params as any).map(
+      ([key, val]) => {
+        return `${key}=${String(val)}`;
+      },
+    );
     keyParts.push(...paramKeyVals);
   }
   return keyParts.join("_");

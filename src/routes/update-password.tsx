@@ -4,7 +4,7 @@ import { notifications } from "@mantine/notifications";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { z } from "zod";
-import { AuthService } from "@/services/AuthService";
+import { AuthClient } from "@/clients/AuthClient";
 
 export const Route = createFileRoute("/update-password")({
   component: UpdatePasswordPage,
@@ -12,7 +12,7 @@ export const Route = createFileRoute("/update-password")({
     redirect: z.string().optional().catch("/"),
   }),
   beforeLoad: async () => {
-    const session = await AuthService.getCurrentSession();
+    const session = await AuthClient.getCurrentSession();
     if (!session?.user) {
       throw redirect({ to: "/signin" });
     }
@@ -30,12 +30,12 @@ function UpdatePasswordPage() {
         password: string;
         confirmPassword: string;
       }) => {
-        const { user: updatedUser } = await AuthService.updatePassword(
+        const { user: updatedUser } = await AuthClient.updatePassword(
           values.password,
         );
         if (updatedUser?.email) {
           // After updating password, sign in with the new password
-          await AuthService.signIn({
+          await AuthClient.signIn({
             email: updatedUser.email,
             password: values.password,
           });

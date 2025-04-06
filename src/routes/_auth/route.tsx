@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { AuthClient } from "@/clients/AuthClient";
 import { AppScaffold } from "@/components/AppScaffold/AppScaffold";
-import { AuthService } from "@/services/AuthService";
 
 export const Route = createFileRoute("/_auth")({
   component: RouteComponent,
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_auth")({
    * logged in. If not, we redirect to the /signin page.
    */
   beforeLoad: async ({ location }) => {
-    const session = await AuthService.getCurrentSession();
+    const session = await AuthClient.getCurrentSession();
     if (!session?.user) {
       throw redirect({
         to: "/signin",

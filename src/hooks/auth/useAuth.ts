@@ -1,7 +1,7 @@
 import { User } from "@supabase/supabase-js";
 import { AnyRouter } from "@tanstack/router-core";
 import { useEffect, useState } from "react";
-import { AuthService } from "@/services/AuthService";
+import { AuthClient } from "@/clients/AuthClient";
 
 /**
  * This function should be called from the root component of the app.
@@ -16,14 +16,14 @@ export function useAuth(router: AnyRouter): User | undefined {
 
   useEffect(() => {
     const getSession = async () => {
-      const currentSession = await AuthService.getCurrentSession();
+      const currentSession = await AuthClient.getCurrentSession();
       setUser(currentSession?.user ?? undefined);
       router.invalidate();
     };
 
     getSession();
 
-    const subscription = AuthService.onAuthStateChange(
+    const subscription = AuthClient.onAuthStateChange(
       async (_event, newSession) => {
         setUser(newSession?.user ?? undefined);
         router.invalidate();

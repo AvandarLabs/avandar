@@ -3,12 +3,12 @@ import { isEmail, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { AuthService } from "@/services/AuthService";
+import { AuthClient } from "@/clients/AuthClient";
 
 export const Route = createFileRoute("/forgot-password")({
   component: ForgotPasswordPage,
   beforeLoad: async () => {
-    const session = await AuthService.getCurrentSession();
+    const session = await AuthClient.getCurrentSession();
     if (session?.user) {
       throw redirect({ to: "/" });
     }
@@ -25,7 +25,7 @@ function ForgotPasswordPage() {
     isPending: isResetPasswordPending,
   } = useMutation({
     mutationFn: async (values: { email: string }) => {
-      await AuthService.requestPasswordResetEmail(values.email);
+      await AuthClient.requestPasswordResetEmail(values.email);
     },
     onSuccess: () => {
       notifications.show({

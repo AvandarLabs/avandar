@@ -2,9 +2,9 @@ import { Button, Group, List, Loader, Stack, Text, Title } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { AuthClient } from "@/clients/AuthClient";
 import { InputTextField } from "@/components/ui/InputTextField";
 import { useToggleBoolean } from "@/hooks/useToggleBoolean";
-import { AuthService } from "@/services/AuthService";
 
 export const Route = createFileRoute("/_auth/profile")({
   component: ProfilePage,
@@ -16,7 +16,7 @@ function ProfilePage() {
   const [isEditingEmail, toggleEditingEmailState] = useToggleBoolean(false);
   const { mutate: sendUpdateEmailRequest, isPending: isUpdateEmailPending } =
     useMutation({
-      mutationFn: AuthService.updateEmail,
+      mutationFn: AuthClient.updateEmail,
       onSuccess: () => {
         notifications.show({
           title: "Email address updated",

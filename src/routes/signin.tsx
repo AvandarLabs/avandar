@@ -9,7 +9,7 @@ import {
   useRouter,
 } from "@tanstack/react-router";
 import { z } from "zod";
-import { AuthService } from "@/services/AuthService";
+import { AuthClient } from "@/clients/AuthClient";
 
 export const Route = createFileRoute("/signin")({
   component: SignInPage,
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/signin")({
     redirect: z.string().optional().catch("/"),
   }),
   beforeLoad: async ({ search }) => {
-    const session = await AuthService.getCurrentSession();
+    const session = await AuthClient.getCurrentSession();
     if (session?.user) {
       if (search.redirect) {
         // if we're already authenticated and there's a redirect,
@@ -35,7 +35,7 @@ function SignInPage() {
 
   const { mutate: sendSignInRequest, isPending: isSignInPending } = useMutation(
     {
-      mutationFn: AuthService.signIn,
+      mutationFn: AuthClient.signIn,
       onSuccess: () => {
         if (searchParams.redirect) {
           router.history.push(searchParams.redirect);

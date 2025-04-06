@@ -16,10 +16,10 @@ import { IconChevronDown, IconLogout, IconSearch } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { Outlet, useRouter } from "@tanstack/react-router";
 import clsx from "clsx";
+import { AuthClient } from "@/clients/AuthClient";
 import { Link } from "@/components/ui/links/Link";
 import { AppConfig } from "@/config/AppConfig";
 import { useIsMobileSize } from "@/hooks/useIsMobileSize";
-import { AuthService } from "@/services/AuthService";
 import css from "./AppScaffold.module.css";
 import { useSpotlightActions } from "./useSpotlightActions";
 
@@ -51,7 +51,7 @@ export function AppScaffold({
   const { mutate: sendSignOutRequest, isPending: isSignOutPending } =
     useMutation({
       mutationFn: async () => {
-        await AuthService.signOut();
+        await AuthClient.signOut();
       },
       onSuccess: () => {
         router.invalidate();
