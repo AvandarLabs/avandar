@@ -16,7 +16,7 @@ const MANUAL_BUNDLES: duck.DuckDBBundles = {
   },
 };
 
-class LocalQueryServiceImpl {
+class LocalQueryClientImpl {
   #db?: Promise<duck.AsyncDuckDB>;
 
   async initialize(): Promise<duck.AsyncDuckDB> {
@@ -71,4 +71,4 @@ class LocalQueryServiceImpl {
   }
 }
 
-export const LocalQueryService = new LocalQueryServiceImpl();
+export const LocalQueryClient = new LocalQueryClientImpl();

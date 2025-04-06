@@ -9,9 +9,9 @@ import { IconClipboard } from "@tabler/icons-react";
 import { useRouter } from "@tanstack/react-router";
 import { useMemo } from "react";
 import * as R from "remeda";
+import { LocalDatasetClient } from "@/clients/LocalDatasetClient";
 import { AppConfig } from "@/config/AppConfig";
 import { TODOS } from "@/config/todos";
-import { LocalDatasetService } from "@/services/LocalDatasetService";
 
 export function useSpotlightActions(): Array<
   SpotlightActionData | SpotlightActionGroupData
@@ -42,7 +42,7 @@ export function useSpotlightActions(): Array<
               label: "Delete Local Datasets",
               description: "Delete Local Datasets indexedDB database",
               onClick: async () => {
-                await LocalDatasetService.deleteDatabase();
+                await LocalDatasetClient.deleteDatabase();
                 notifications.show({
                   title: "Local Datasets deleted",
                   message:

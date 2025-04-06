@@ -1,6 +1,6 @@
 import { Box, Button, Select, Text } from "@mantine/core";
 import { useEffect, useMemo, useState } from "react";
-import { LocalQueryService } from "@/services/LocalQueryService";
+import { LocalQueryClient } from "@/clients/LocalQueryClient";
 import { useLocalDatasets } from "../DataManagerApp/queries";
 
 export function DataExplorerApp(): JSX.Element {
@@ -11,8 +11,8 @@ export function DataExplorerApp(): JSX.Element {
 
   useEffect(() => {
     const instantiateDB = async () => {
-      await LocalQueryService.loadCSVData();
-      const data = await LocalQueryService.queryData();
+      await LocalQueryClient.loadCSVData();
+      const data = await LocalQueryClient.queryData();
       console.log("Queried data", data);
     };
 

@@ -4,9 +4,9 @@ import {
   UseMutationResult,
   useQueryClient,
 } from "@tanstack/react-query";
+import { LocalDatasetClient } from "@/clients/LocalDatasetClient";
 import { useQuery, UseQueryResult } from "@/hooks/api/useQuery";
 import * as LocalDataset from "@/models/LocalDataset";
-import { LocalDatasetService } from "@/services/LocalDatasetService";
 
 /**
  * Get all locally stored datasets from the browser.
@@ -21,7 +21,7 @@ export function useLocalDatasets(): [
   const queryResultObj = useQuery({
     queryKey: [LocalDataset.QueryKeys.allDatasets],
     queryFn: async () => {
-      return LocalDatasetService.getAllDatasets();
+      return LocalDatasetClient.getAllDatasets();
     },
   });
   return [queryResultObj.data, queryResultObj.isLoading, queryResultObj];
@@ -41,7 +41,7 @@ export function useSaveLocalDataset(): [
   const queryClient = useQueryClient();
   const mutationObj = useMutation({
     mutationFn: async (dataset: LocalDataset.CreateT) => {
-      return LocalDatasetService.addDataset(dataset);
+      return LocalDatasetClient.addDataset(dataset);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -60,7 +60,7 @@ export function useDeleteLocalDataset(): [
   const queryClient = useQueryClient();
   const mutationObj = useMutation({
     mutationFn: async (id: number) => {
-      return LocalDatasetService.deleteDataset(id);
+      return LocalDatasetClient.deleteDataset(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
