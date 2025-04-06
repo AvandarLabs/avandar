@@ -1,10 +1,10 @@
 import { Box, Flex, MantineTheme } from "@mantine/core";
 import { Outlet } from "@tanstack/react-router";
 import { DatasetNavbar } from "./DatasetNavbar";
-import { useGetAllLocalDatasets } from "./queries";
+import { useLocalDatasets } from "./queries";
 
 export function DataManagerApp(): JSX.Element {
-  const [allDatasets, isLoadingDatasets] = useGetAllLocalDatasets();
+  const [allDatasets, isLoadingDatasets] = useLocalDatasets();
 
   return (
     <Flex>

@@ -14,7 +14,7 @@ import { LocalDatasetService } from "@/services/LocalDatasetService";
  * @returns A tuple of the dataset list, `isPending`, and the full `useQuery`
  * result object.
  */
-export function useGetAllLocalDatasets(): [
+export function useLocalDatasets(): [
   LocalDataset.T[] | undefined,
   boolean,
   UseQueryResult<LocalDataset.T[]>,
