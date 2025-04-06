@@ -1,8 +1,8 @@
 import { Box, BoxProps, Loader, Title, useMantineTheme } from "@mantine/core";
 import { useMemo } from "react";
+import { NavLinkList } from "@/components/ui/links/NavLinkList";
 import { AppConfig } from "@/config/AppConfig";
 import * as LocalDataset from "@/models/LocalDataset";
-import { NavLinkList } from "../ui/NavLinkList";
 import type { NavLinkProps } from "@/components/ui/links/NavLink";
 
 type Props = {
