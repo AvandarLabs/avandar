@@ -1,8 +1,8 @@
 import { Anchor, Box, Button, Group, Stack, Text, Title } from "@mantine/core";
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import reactLogo from "@/assets/react.svg";
+import { useQuery, UseQueryResult } from "@/hooks/api/useQuery";
 
 export const Route = createFileRoute("/_auth/")({
   component: HomePage,

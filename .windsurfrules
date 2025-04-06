@@ -21,7 +21,7 @@ Libraries:
 
 # Code suggestion rules
 - Use the library versions referenced in this document. Do not use documentation or APIs from older versions.
-- When importing components, if a local component shares a name with a library's component, always import our local component instead. For example, always import `Link` from `@/components/ui` instead of from another library.
+- When importing anything that conflicts with a 3rd party library, always import our local version instead. For example, always import `Link` from `@/components/ui` or `useQuery` from '@/components/hooks/api/` instead of from other libraries.
 
 # General Code Style & Formatting
 
