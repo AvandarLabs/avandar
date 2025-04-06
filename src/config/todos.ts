@@ -10,8 +10,6 @@ export const TODOS =
         label: "Data Manager Todos",
         description: "Show the to-dos for the Data Manager app",
         items: [
-          "LocalDataset.T: Store the fields schemas so we can have these available without needing to parse the data every time.",
-          "LocalDataset.T: Make the field schema into its own model. DatasetField.T",
           "Load data from dexie to DuckDB WASM",
           "Add a basic query tool to query the data",
           "Display the data in a table in Data Explorer",
