@@ -8,6 +8,11 @@ import * as R from "remeda";
 import * as LocalDataset from "@/models/LocalDataset";
 import { LocalDatasetClient } from "./LocalDatasetClient";
 
+export type LocalQueryConfig = {
+  datasetId: number;
+  fieldNames: string[];
+};
+
 const MANUAL_BUNDLES: duck.DuckDBBundles = {
   mvp: {
     mainModule: duckDBWasm,
@@ -29,7 +34,7 @@ function datasetIdToTableName(datasetId: number): string {
 class LocalQueryClientImpl {
   #db?: Promise<duck.AsyncDuckDB>;
 
-  async initialize(): Promise<duck.AsyncDuckDB> {
+  async #initialize(): Promise<duck.AsyncDuckDB> {
     // Select a bundle based on browser checks
     const bundle = await duck.selectBundle(MANUAL_BUNDLES);
 
@@ -42,9 +47,9 @@ class LocalQueryClientImpl {
     return duckdb;
   }
 
-  async getDB(): Promise<duck.AsyncDuckDB> {
+  async #getDB(): Promise<duck.AsyncDuckDB> {
     if (!this.#db) {
-      this.#db = this.initialize();
+      this.#db = this.#initialize();
     }
     return this.#db;
   }
@@ -57,13 +62,23 @@ class LocalQueryClientImpl {
     return dataset;
   }
 
+  /**
+   * Runs a database operation with a connection. Wrap any operation
+   * that requires a connection in this method so that the connection
+   * is properly closed after the operation.
+   * @param operationFn The function to run with the connection.
+   * @param operationFn.params - The argument the `operationFn` receives.
+   * @param operationFn.params.db - The database instance.
+   * @param operationFn.params.conn - The connection instance.
+   * @returns The result of the operation.
+   */
   async #withConnection<T>(
     operationFn: (params: {
       db: duck.AsyncDuckDB;
       conn: duck.AsyncDuckDBConnection;
     }) => Promise<T>,
   ): Promise<T> {
-    const db = await this.getDB();
+    const db = await this.#getDB();
     const conn = await db.connect();
     try {
       return await operationFn({ db, conn });
@@ -72,7 +87,7 @@ class LocalQueryClientImpl {
     }
   }
 
-  async loadDataset(datasetId: number) {
+  async loadDataset(datasetId: number): Promise<void> {
     const { data, fields } = await this.#getDataset(datasetId);
     const tableName = datasetIdToTableName(datasetId);
 
@@ -104,10 +119,7 @@ class LocalQueryClientImpl {
   async runQuery({
     fieldNames,
     datasetId,
-  }: {
-    fieldNames: string[];
-    datasetId: number;
-  }) {
+  }: LocalQueryConfig): Promise<Array<Record<string, unknown>>> {
     const tableName = datasetIdToTableName(datasetId);
     const escapedFieldNames = fieldNames.map((name) => {
       return `"${name}"`;

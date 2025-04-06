@@ -5,6 +5,8 @@ import { LocalQueryClient } from "@/clients/LocalQueryClient";
 import * as LocalDataset from "@/models/LocalDataset";
 import { UUID } from "@/types/common";
 import { useLocalDatasets } from "../DataManagerApp/queries";
+import { DataGrid } from "../ui/DataGrid";
+import { useDataQuery } from "./useDataQuery";
 
 export function DataExplorerApp(): JSX.Element {
   const [allDatasets, isLoadingDatasets] = useLocalDatasets();
@@ -45,6 +47,21 @@ export function DataExplorerApp(): JSX.Element {
     });
   }, [allDatasets]);
 
+  const selectedFieldNames = useMemo(() => {
+    return R.pipe(
+      selectedFieldIds,
+      R.map((id) => {
+        return fieldsMap[id]?.name;
+      }),
+      R.filter(R.isTruthy),
+    );
+  }, [fieldsMap, selectedFieldIds]);
+
+  const { data, isLoading } = useDataQuery({
+    datasetId: selectedDatasetId,
+    fieldNames: selectedFieldNames,
+  });
+
   return (
     <Box px="md" py="lg">
       <MultiSelect
@@ -84,21 +101,14 @@ export function DataExplorerApp(): JSX.Element {
       <Text>Order by (fields dropdown)</Text>
       <Text>Limit (number)</Text>
       <Button
+        loading={isLoading}
         onClick={async () => {
-          const fieldNames = R.pipe(
-            selectedFieldIds,
-            R.map((id) => {
-              return fieldsMap[id]?.name;
-            }),
-            R.filter(R.isTruthy),
-          );
-
           if (selectedDatasetId) {
             // TODO(pablo): we need some way to determine if datasets have
             // loaded otherwise we can't run the query
             const result = await LocalQueryClient.runQuery({
               datasetId: selectedDatasetId,
-              fieldNames,
+              fieldNames: selectedFieldNames,
             });
             console.log("result", result);
           }
@@ -106,6 +116,8 @@ export function DataExplorerApp(): JSX.Element {
       >
         Run
       </Button>
+
+      <DataGrid fields={selectedFieldNames} data={data ?? []} />
     </Box>
   );
 }
