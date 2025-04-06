@@ -13,10 +13,10 @@ import { IconChevronDown, IconLogout } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { Outlet, useRouter } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { Link } from "@/components/ui/Link";
+import { AuthClient } from "@/clients/AuthClient";
+import { Link } from "@/components/ui/links/Link";
 import { AppConfig } from "@/config/AppConfig";
 import { useIsMobileSize } from "@/hooks/useIsMobileSize";
-import { AuthService } from "@/services/AuthService";
 import css from "./AppScaffold.module.css";
 
 const HEADER_DEFAULT_HEIGHT = 60;
@@ -47,7 +47,7 @@ export function AppScaffold({
   const { mutate: sendSignOutRequest, isPending: isSignOutPending } =
     useMutation({
       mutationFn: async () => {
-        await AuthService.signOut();
+        await AuthClient.signOut();
       },
       onSuccess: () => {
         router.invalidate();

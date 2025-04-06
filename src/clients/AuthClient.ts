@@ -6,7 +6,7 @@ import {
 } from "@supabase/supabase-js";
 import { SupabaseClient } from "../database";
 
-export const AuthService = {
+export const AuthClient = {
   /**
    * Sends a password reset email to the user.
    * @param email - The user's email address

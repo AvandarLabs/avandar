@@ -8,12 +8,12 @@ import {
   redirect,
   useRouter,
 } from "@tanstack/react-router";
-import { AuthService } from "@/services/AuthService";
+import { AuthClient } from "@/clients/AuthClient";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,
   beforeLoad: async () => {
-    const session = await AuthService.getCurrentSession();
+    const session = await AuthClient.getCurrentSession();
     if (session?.user) {
       throw redirect({ to: "/" });
     }
@@ -25,7 +25,7 @@ function RegisterPage() {
   const { mutate: sendRegistrationRequest, isPending: isRegistrationPending } =
     useMutation({
       mutationFn: async (values: { email: string; password: string }) => {
-        await AuthService.register(values);
+        await AuthClient.register(values);
       },
       onSuccess: () => {
         router.invalidate();
