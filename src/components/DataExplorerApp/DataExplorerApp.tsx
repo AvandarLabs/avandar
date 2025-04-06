@@ -1,5 +1,5 @@
 import { Box, Button, Select, Text } from "@mantine/core";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { LocalQueryClient } from "@/clients/LocalQueryClient";
 import { useLocalDatasets } from "../DataManagerApp/queries";
 
@@ -9,6 +9,7 @@ export function DataExplorerApp(): JSX.Element {
     string | undefined
   >(undefined);
 
+  /*
   useEffect(() => {
     const instantiateDB = async () => {
       await LocalQueryClient.loadCSVData();
@@ -18,6 +19,7 @@ export function DataExplorerApp(): JSX.Element {
 
     instantiateDB();
   }, []);
+  */
 
   const datasetIds = useMemo(() => {
     return allDatasets ?
@@ -27,11 +29,10 @@ export function DataExplorerApp(): JSX.Element {
       : undefined;
   }, [allDatasets]);
 
-  console.log("selectedDatasetId", selectedDatasetId);
   return (
     <Box px="md" py="lg">
       <Text>Select fields (fields dropdown)</Text>
-      <Text>From dataset (dataset dropdown)</Text>
+
       <Select
         allowDeselect={false}
         label="From dataset"
@@ -40,7 +41,10 @@ export function DataExplorerApp(): JSX.Element {
         }
         data={datasetIds ?? []}
         value={selectedDatasetId}
-        onChange={(datasetId) => {
+        onChange={async (datasetId) => {
+          await LocalQueryClient.loadDataset(Number(datasetId));
+          const results = await LocalQueryClient.queryData(Number(datasetId));
+          console.log("results", results);
           return setSelectedDatasetId(datasetId ?? undefined);
         }}
       />

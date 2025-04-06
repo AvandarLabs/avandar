@@ -7,6 +7,8 @@ import { CSVData, MIMEType } from "@/types/common";
 import { Replace } from "@/types/utilityTypes";
 import { uuid } from "@/utils/uuid";
 
+export type Field = DatasetField.T;
+
 /**
  * Local dataset type.
  *
@@ -22,7 +24,7 @@ export type T = {
   mimeType: MIMEType;
   delimiter: string;
   firstRowIsHeader: boolean;
-  fields: readonly DatasetField.T[];
+  fields: readonly Field[];
 
   /**
    * All data is represented as a single string to take up less space.
