@@ -45,7 +45,7 @@ export type FileMetadata = {
  *
  * `id` is undefined because it is autoincremented when inserting.
  */
-export type CreateT = Replace<T, "id", undefined>;
+export type CreateT = Replace<T, { id: undefined }>;
 
 /**
  * Zod schema for the local dataset type.

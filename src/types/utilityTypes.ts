@@ -4,18 +4,15 @@
  *
  * ```
  * type X = { foo: number; bar: string; zed: Date };
- * type Y = Replace<X, "foo", string>;
+ * type Y = Replace<X, { foo: string }>;
  * // Y = { foo: string; bar: string; zed: Date }
  * ```
  *
  * Can also handle multiple key replacement
  * ```
- * type Y = Replace<X, "foo" | "zed", string>;
- * // Y = { foo: string; bar: string; zed: string }
+ * type Z = Replace<X, { foo: string; zed: string }>;
+ * // Z = { foo: string; bar: string; zed: string }
  * ```
  */
-export type Replace<Obj, Key extends keyof Obj, NewType> = {
-  [P in Exclude<keyof Obj, Key>]: Obj[P];
-} & {
-  [P in Key]: NewType;
-};
+export type Replace<Obj, NewTypesObj> = Omit<Obj, keyof NewTypesObj> &
+  NewTypesObj;

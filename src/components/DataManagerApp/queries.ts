@@ -2,10 +2,9 @@ import {
   UseMutateFunction,
   useMutation,
   UseMutationResult,
-  useQuery,
   useQueryClient,
-  UseQueryResult,
 } from "@tanstack/react-query";
+import { useQuery, UseQueryResult } from "@/hooks/api/useQuery";
 import * as LocalDataset from "@/models/LocalDataset";
 import { LocalDatasetService } from "@/services/LocalDatasetService";
 
