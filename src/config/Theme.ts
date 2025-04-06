@@ -144,10 +144,10 @@ export const Theme = createTheme({
     xs: "calc(0.5rem * var(--mantine-scale))", // 8px
     sm: "calc(0.75rem * var(--mantine-scale))", // 12px
     md: "calc(1rem * var(--mantine-scale))", // 16px
-    lg: "calc(1.25rem * var(--mantine-scale))", // 20px
-    xl: "calc(1.625rem * var(--mantine-scale))", // 26px
-    xxl: "calc(2rem * var(--mantine-scale))", // 32px
-    xxxl: "calc(3rem * var(--mantine-scale))", // 48px
+    lg: "calc(1.5rem * var(--mantine-scale))", // 24px
+    xl: "calc(2rem * var(--mantine-scale))", // 32px
+    xxl: "calc(3rem * var(--mantine-scale))", // 48px
+    xxxl: "calc(4rem * var(--mantine-scale))", // 64px
   },
 
   other: {

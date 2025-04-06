@@ -24,7 +24,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   }, [dataset.data, parseCSVString]);
 
   return (
-    <Container>
+    <Container pt="lg">
       <Stack>
         <Title order={2}>{dataset.name}</Title>
         <Text>{dataset.description}</Text>
