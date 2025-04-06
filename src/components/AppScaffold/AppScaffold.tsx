@@ -16,7 +16,7 @@ import { IconChevronDown, IconLogout, IconSearch } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { Outlet, useRouter } from "@tanstack/react-router";
 import clsx from "clsx";
-import { Link } from "@/components/ui/Link";
+import { Link } from "@/components/ui/links/Link";
 import { AppConfig } from "@/config/AppConfig";
 import { useIsMobileSize } from "@/hooks/useIsMobileSize";
 import { AuthService } from "@/services/AuthService";

@@ -2,8 +2,8 @@ import { Box, BoxProps, MantineColor, Text } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
 import clsx from "clsx";
 import * as R from "remeda";
-import { NavLink } from "@/components/ui/NavLink";
-import type { NavLinkProps } from "@/components/ui/NavLink";
+import { NavLink } from "@/components/ui/links/NavLink";
+import type { NavLinkProps } from "@/components/ui/links/NavLink";
 
 type Props = {
   links: readonly NavLinkProps[];

@@ -1,7 +1,7 @@
 import Papa, { ParseMeta } from "papaparse";
 import { match } from "ts-pattern";
 import { z } from "zod";
-import { LinkProps } from "@/components/ui/Link";
+import { LinkProps } from "@/components/ui/links/Link";
 import * as DatasetField from "@/models/DatasetField";
 import { CSVData, MIMEType } from "@/types/common";
 import { Replace } from "@/types/utilityTypes";
