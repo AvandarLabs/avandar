@@ -5,7 +5,6 @@ import { LinkProps } from "@/components/ui/links/Link";
 import * as DatasetField from "@/models/DatasetField";
 import { CSVData, MIMEType } from "@/types/common";
 import { Replace } from "@/types/utilityTypes";
-import { uuid } from "@/utils/uuid";
 
 export type Field = DatasetField.T;
 
@@ -81,12 +80,14 @@ export function create({
   fileMetadata,
   csvMetadata,
   data,
+  fields,
 }: {
   name: string;
   description: string;
   fileMetadata: FileMetadata;
   csvMetadata: ParseMeta;
   data: CSVData;
+  fields: readonly Field[];
 }): CreateT {
   const creationTime = new Date();
   return {
@@ -100,17 +101,7 @@ export function create({
     sizeInBytes: fileMetadata.sizeInBytes,
     delimiter: csvMetadata.delimiter,
     data: unparse({ data, datasetType: fileMetadata.mimeType }),
-    fields:
-      csvMetadata.fields?.map((fieldName) => {
-        return {
-          id: uuid(),
-          name: fieldName,
-          // TODO(pablo): force 'string' type for everything even
-          // if not accurate
-          dataType: "string",
-          description: undefined,
-        };
-      }) ?? [],
+    fields,
   };
 }
 

@@ -8,7 +8,7 @@ import * as LocalDataset from "@/models/LocalDataset";
 import { DataGrid } from "../ui/DataGrid";
 import { FileUploadField } from "../ui/FileUploadField";
 import { useSaveLocalDataset } from "./queries";
-import { useCSV } from "./useCSV";
+import { useCSVParser } from "./useCSVParser";
 
 type DatasetForm = {
   name: string;
@@ -20,7 +20,7 @@ const { maxDatasetNameLength, maxDatasetDescriptionLength } =
 
 export function DataImportView(): JSX.Element {
   const [saveDataset, isSavePending] = useSaveLocalDataset();
-  const { csv, fileMetadata, parseFile } = useCSV({
+  const { csv, fields, fileMetadata, parseFile } = useCSVParser({
     onNoFileProvided: () => {
       notifications.show({
         title: "No file selected",
@@ -70,6 +70,7 @@ export function DataImportView(): JSX.Element {
                 fileMetadata,
                 csvMetadata: csv.meta,
                 data: csv.data,
+                fields,
               });
 
               saveDataset(dataset, {

@@ -1,15 +1,16 @@
 /** @type {import('tailwindcss').Config} */
+import { DEFAULT_THEME } from "@mantine/core";
 import { Theme } from "./src/config/Theme";
 
-function mantineToTailwindColorSpec(mantineColorTuple) {
-  const colorObj = {};
-  colors.forEach((colorKey, i) => {
-    colorObj[colorKey] = mantineColorTuple[i];
-  });
-  return colorObj;
-}
-
-function mantineColorsToTailwindSpec() {
+/**
+ * Convert all our mantine colors to tailwind color objects.
+ * "mantineColor.0" through "mantineColor.9" will map to tailwind
+ * color suffixes 50 through 900.
+ *
+ * For example, "neutral0" will now be "[attribute]-color-50"
+ * (e.g. "bg-color-50")
+ */
+function mantineColorsToTailwindObjects() {
   const tailwindShadeLevels = [
     "50",
     "100",
@@ -23,9 +24,10 @@ function mantineColorsToTailwindSpec() {
     "900",
   ];
   const finalTailwindColors = {};
-  Object.keys(Theme.colors).forEach((colorKey) => {
+  const allColors = { ...DEFAULT_THEME.colors, ...Theme.colors };
+  Object.keys(allColors).forEach((colorKey) => {
     const tailwindColorObj = {};
-    const mantineColorTuple = Theme.colors[colorKey];
+    const mantineColorTuple = allColors[colorKey];
     tailwindShadeLevels.forEach((shadeLevel, i) => {
       tailwindColorObj[shadeLevel] = mantineColorTuple[i];
     });
@@ -38,7 +40,7 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      colors: mantineColorsToTailwindSpec(),
+      colors: mantineColorsToTailwindObjects(),
     },
   },
   plugins: [],

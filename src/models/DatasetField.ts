@@ -1,10 +1,12 @@
 import { z } from "zod";
 import { UUID } from "@/types/common";
 
+export type DataType = "string" | "number" | "date" | "boolean";
+
 export type T = {
   id: UUID;
   name: string;
-  dataType: "string" | "number" | "date" | "boolean";
+  dataType: DataType;
   description?: string;
 };
 
