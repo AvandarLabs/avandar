@@ -4,14 +4,25 @@ import mvpWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?url
 import duckDBWasmEh from "@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url";
 import duckDBWasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
 import * as arrow from "apache-arrow";
+import knex from "knex";
 import * as R from "remeda";
 import * as LocalDataset from "@/models/LocalDataset";
+import { Logger } from "@/utils/Logger";
 import { LocalDatasetClient } from "./LocalDatasetClient";
 
 export type LocalQueryConfig = {
   datasetId: number;
-  fieldNames: string[];
+  selectFieldNames: string[];
+  groupByFieldNames: string[];
 };
+
+const sql = knex({
+  client: "sqlite3",
+  wrapIdentifier: (value: string) => {
+    return `"${value.replace(/"/g, '""')}"`;
+  },
+  useNullAsDefault: true,
+});
 
 const MANUAL_BUNDLES: duck.DuckDBBundles = {
   mvp: {
@@ -117,21 +128,32 @@ class LocalQueryClientImpl {
   }
 
   async runQuery({
-    fieldNames,
+    selectFieldNames: selectFieldNames,
+    groupByFieldNames,
     datasetId,
   }: LocalQueryConfig): Promise<Array<Record<string, unknown>>> {
     const tableName = datasetIdToTableName(datasetId);
-    const escapedFieldNames = fieldNames.map((name) => {
-      return `"${name}"`;
-    });
 
     return this.#withConnection(async ({ conn }) => {
-      const results = await conn.query<Record<string, arrow.DataType>>(`
-        select ${escapedFieldNames.join(", ")} from ${tableName}
-      `);
-      return results.toArray().map((row) => {
-        return row.toJSON();
-      });
+      // build the query
+      let query = sql.select(...selectFieldNames).from(tableName);
+      if (groupByFieldNames.length > 0) {
+        query = query.groupBy(...groupByFieldNames);
+      }
+
+      // run the query
+      try {
+        const results = await conn.query<Record<string, arrow.DataType>>(
+          query.toString(),
+        );
+
+        return results.toArray().map((row) => {
+          return row.toJSON();
+        });
+      } catch (error) {
+        Logger.error(error, { query: query.toString() });
+        throw error;
+      }
     });
   }
 }

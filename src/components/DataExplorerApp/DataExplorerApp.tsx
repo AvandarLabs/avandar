@@ -1,11 +1,11 @@
-import { Box, Button, MultiSelect, Select, Text } from "@mantine/core";
+import { Box, Button, Select, Text } from "@mantine/core";
 import { useMemo, useState } from "react";
 import * as R from "remeda";
 import { LocalQueryClient } from "@/clients/LocalQueryClient";
 import * as LocalDataset from "@/models/LocalDataset";
-import { UUID } from "@/types/common";
 import { useLocalDatasets } from "../DataManagerApp/queries";
 import { DataGrid } from "../ui/DataGrid";
+import { FieldSelect } from "./FieldSelect";
 import { useDataQuery } from "./useDataQuery";
 
 export function DataExplorerApp(): JSX.Element {
@@ -13,19 +13,12 @@ export function DataExplorerApp(): JSX.Element {
   const [selectedDatasetId, setSelectedDatasetId] = useState<
     number | undefined
   >(undefined);
-  const [selectedFieldIds, setSelectedFieldIds] = useState<readonly UUID[]>([]);
-
-  const fieldsMap: Record<UUID, LocalDataset.Field> = useMemo(() => {
-    return R.pipe(
-      allDatasets ?? [],
-      R.flatMap((dataset) => {
-        return dataset.fields;
-      }),
-      R.mapToObj((field) => {
-        return [field.id, field];
-      }),
-    );
-  }, [allDatasets]);
+  const [selectedFields, setSelectedFields] = useState<
+    readonly LocalDataset.Field[]
+  >([]);
+  const [selectedGroupByFields, setSelectedGroupByFields] = useState<
+    readonly LocalDataset.Field[]
+  >([]);
 
   const datasetOptions = useMemo(() => {
     return (allDatasets ?? []).map((dataset: LocalDataset.T) => {
@@ -33,48 +26,25 @@ export function DataExplorerApp(): JSX.Element {
     });
   }, [allDatasets]);
 
-  const fieldGroupOptions = useMemo(() => {
-    return (allDatasets ?? []).map((dataset) => {
-      return {
-        group: dataset.name,
-        items: dataset.fields.map((field) => {
-          return {
-            value: field.id as string,
-            label: field.name,
-          };
-        }),
-      };
-    });
-  }, [allDatasets]);
-
   const selectedFieldNames = useMemo(() => {
-    return R.pipe(
-      selectedFieldIds,
-      R.map((id) => {
-        return fieldsMap[id]?.name;
-      }),
-      R.filter(R.isTruthy),
-    );
-  }, [fieldsMap, selectedFieldIds]);
+    return R.map(selectedFields, R.prop("name"));
+  }, [selectedFields]);
+  const selectedGroupByFieldNames = useMemo(() => {
+    return R.map(selectedGroupByFields, R.prop("name"));
+  }, [selectedGroupByFields]);
 
   const { data, isLoading } = useDataQuery({
     datasetId: selectedDatasetId,
-    fieldNames: selectedFieldNames,
+    selectFieldNames: selectedFieldNames,
+    groupByFieldNames: selectedGroupByFieldNames,
   });
 
   return (
     <Box px="md" py="lg">
-      <MultiSelect
-        searchable
-        clearable
+      <FieldSelect
         label="Select fields"
-        placeholder={
-          isLoadingDatasets ? "Loading datasets..." : "Select fields"
-        }
-        data={fieldGroupOptions ?? []}
-        onChange={(fieldIds: string[]) => {
-          setSelectedFieldIds(fieldIds as UUID[]);
-        }}
+        placeholder="Select fields"
+        onChange={setSelectedFields}
       />
 
       <Select
@@ -97,7 +67,11 @@ export function DataExplorerApp(): JSX.Element {
       />
 
       <Text>Where (react-awesome-query-builder)</Text>
-      <Text>Group by (fields dropdown)</Text>
+      <FieldSelect
+        label="Group by"
+        placeholder="Group by"
+        onChange={setSelectedGroupByFields}
+      />
       <Text>Order by (fields dropdown)</Text>
       <Text>Limit (number)</Text>
       <Button
@@ -108,7 +82,8 @@ export function DataExplorerApp(): JSX.Element {
             // loaded otherwise we can't run the query
             const result = await LocalQueryClient.runQuery({
               datasetId: selectedDatasetId,
-              fieldNames: selectedFieldNames,
+              selectFieldNames: selectedFieldNames,
+              groupByFieldNames: selectedGroupByFieldNames,
             });
             console.log("result", result);
           }

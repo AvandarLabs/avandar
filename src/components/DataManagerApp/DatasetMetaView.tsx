@@ -14,6 +14,12 @@ type Props = {
   dataset: LocalDataset.T;
 };
 
+/**
+ * A view of the metadata for a dataset.
+ *
+ * TODO(pablo): We should show only a preview (first 100 rows) of the data.
+ * Currently, we are still showing all data, which isn't great.
+ */
 export function DatasetMetaView({ dataset }: Props): JSX.Element {
   const router = useRouter();
   const { csv, parseCSVString } = useCSV();
@@ -50,6 +56,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
           </DescriptionList.Item>
         </DescriptionList>
 
+        <Title order={5}>Data preview</Title>
         {csv ?
           <DataGrid fields={csv.meta.fields ?? []} data={csv.data ?? []} />
         : null}
