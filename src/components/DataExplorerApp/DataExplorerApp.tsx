@@ -1,7 +1,7 @@
-import { Box, Loader, Select, Text } from "@mantine/core";
+import { Box, Fieldset, Loader, Select, Text } from "@mantine/core";
 import { useMemo, useState } from "react";
 import * as R from "remeda";
-import { LocalQueryClient } from "@/clients/LocalQueryClient";
+import { AggregationType, LocalQueryClient } from "@/clients/LocalQueryClient";
 import * as LocalDataset from "@/models/LocalDataset";
 import { useLocalDatasets } from "../DataManagerApp/queries";
 import { DataGrid } from "../ui/DataGrid";
@@ -19,6 +19,9 @@ export function DataExplorerApp(): JSX.Element {
   const [selectedGroupByFields, setSelectedGroupByFields] = useState<
     readonly LocalDataset.Field[]
   >([]);
+  const [aggregations, setAggregations] = useState<
+    Record<string, AggregationType>
+  >({});
 
   const datasetOptions = useMemo(() => {
     return (allDatasets ?? []).map((dataset: LocalDataset.T) => {
@@ -34,6 +37,7 @@ export function DataExplorerApp(): JSX.Element {
   }, [selectedGroupByFields]);
 
   const { data, isLoading } = useDataQuery({
+    aggregations,
     datasetId: selectedDatasetId,
     selectFieldNames: selectedFieldNames,
     groupByFieldNames: selectedGroupByFieldNames,
@@ -44,8 +48,59 @@ export function DataExplorerApp(): JSX.Element {
       <FieldSelect
         label="Select fields"
         placeholder="Select fields"
-        onChange={setSelectedFields}
+        onChange={(fields) => {
+          setSelectedFields(fields);
+          setAggregations((prevAggregations) => {
+            const incomingFieldNames = R.map(fields, R.prop("name"));
+            const prevFieldNames = R.keys(prevAggregations);
+            const droppedFieldNames = R.difference(
+              prevFieldNames,
+              incomingFieldNames,
+            );
+
+            const newDefaultAggregations = R.fromKeys(
+              incomingFieldNames,
+              R.constant("none" as const),
+            );
+            return R.omit(
+              { ...newDefaultAggregations, ...prevAggregations },
+              droppedFieldNames,
+            );
+          });
+        }}
       />
+
+      <Fieldset legend="Aggregations">
+        {selectedFields.map((field) => {
+          return (
+            <Select
+              key={field.id}
+              label={field.name}
+              placeholder="Select aggregation"
+              defaultValue="none"
+              data={[
+                { value: "none", label: "None" },
+                { value: "sum", label: "Sum" },
+                { value: "avg", label: "Average" },
+                { value: "count", label: "Count" },
+                { value: "max", label: "Max" },
+                { value: "min", label: "Min" },
+              ]}
+              onChange={(value: string | null) => {
+                if (value === null) {
+                  return;
+                }
+                setAggregations((prevAggregations) => {
+                  return {
+                    ...prevAggregations,
+                    [field.name]: value as AggregationType,
+                  };
+                });
+              }}
+            />
+          );
+        })}
+      </Fieldset>
 
       <Select
         allowDeselect={false}

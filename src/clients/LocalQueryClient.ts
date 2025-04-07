@@ -6,14 +6,22 @@ import duckDBWasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import * as R from "remeda";
+import { match } from "ts-pattern";
 import * as LocalDataset from "@/models/LocalDataset";
 import { Logger } from "@/utils/Logger";
 import { LocalDatasetClient } from "./LocalDatasetClient";
 
+export type AggregationType = "sum" | "avg" | "count" | "max" | "min" | "none";
 export type LocalQueryConfig = {
   datasetId: number;
   selectFieldNames: string[];
   groupByFieldNames: string[];
+
+  /**
+   * Aggregations to apply to the selected fields.
+   * Key is the field name. Value is the type of aggregation.
+   */
+  aggregations: Record<string, AggregationType>;
 };
 
 const sql = knex({
@@ -128,18 +136,54 @@ class LocalQueryClientImpl {
   }
 
   async runQuery({
-    selectFieldNames: selectFieldNames,
+    selectFieldNames,
     groupByFieldNames,
+    aggregations,
     datasetId,
   }: LocalQueryConfig): Promise<Array<Record<string, unknown>>> {
     const tableName = datasetIdToTableName(datasetId);
 
     return this.#withConnection(async ({ conn }) => {
+      const fieldNamesWithoutAggregations = selectFieldNames.filter(
+        (fieldName) => {
+          return aggregations[fieldName] === "none";
+        },
+      );
+
       // build the query
-      let query = sql.select(...selectFieldNames).from(tableName);
+      let query = sql.select(...fieldNamesWithoutAggregations).from(tableName);
       if (groupByFieldNames.length > 0) {
         query = query.groupBy(...groupByFieldNames);
       }
+
+      // apply aggregations
+      query = R.entries(aggregations).reduce(
+        (newQuery, [fieldName, aggType]) => {
+          return match(aggType)
+            .with("sum", () => {
+              return query.sum(fieldName);
+            })
+            .with("avg", () => {
+              return query.avg(fieldName);
+            })
+            .with("count", () => {
+              return query.count(fieldName);
+            })
+            .with("max", () => {
+              return query.max(fieldName);
+            })
+            .with("min", () => {
+              return query.min(fieldName);
+            })
+            .with("none", () => {
+              return newQuery;
+            })
+            .exhaustive(() => {
+              return newQuery;
+            });
+        },
+        query,
+      );
 
       // run the query
       try {
