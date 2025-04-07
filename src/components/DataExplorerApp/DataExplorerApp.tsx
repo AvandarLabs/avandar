@@ -43,6 +43,8 @@ export function DataExplorerApp(): JSX.Element {
     groupByFieldNames: selectedGroupByFieldNames,
   });
 
+  console.log("Returned data", data);
+
   return (
     <Box px="md" py="lg">
       <FieldSelect

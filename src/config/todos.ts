@@ -10,9 +10,10 @@ export const TODOS =
         label: "Data Manager Todos",
         description: "Show the to-dos for the Data Manager app",
         items: [
-          "Load data from dexie to DuckDB WASM",
-          "Add a basic query tool to query the data",
-          "Display the data in a table in Data Explorer",
+          "Field names of the data grid should depend on the returned data (if there are aggregations it changes)",
+          "Make intelligent field data type guesses",
+          "Allow editing the field data type",
+          "Account for field data type in the allowable aggregations",
           "Show a bar graph visualization",
           "Allow saving to a dashboard",
           "Allow basic management of datasets in Data Import",
