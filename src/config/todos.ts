@@ -10,14 +10,37 @@ export const TODOS =
         label: "Data Manager Todos",
         description: "Show the to-dos for the Data Manager app",
         items: [
-          "Field names of the data grid should depend on the returned data (if there are aggregations it changes)",
           "Make intelligent field data type guesses",
           "Allow editing the field data type",
+          "Allow full CRUD of datasets in Data Manager",
+        ],
+      },
+      {
+        id: "data-explorer-todos",
+        label: "Data Explorer Todos",
+        description: "Show the to-dos for the Data Explorer app",
+        items: [
           "Account for field data type in the allowable aggregations",
           "Display empty string as an italicized [empty value]",
           "Show a bar graph visualization",
-          "Allow saving to a dashboard",
-          "Allow basic management of datasets in Data Import",
+        ],
+      },
+      {
+        id: "data-ontology-todos",
+        label: "Data Ontology Todos",
+        description: "Show the to-dos for the Data Ontology app",
+        items: [
+          "Create an ontology page",
+          "Allow users to define their data models",
+        ],
+      },
+      {
+        id: "entity-browser-todos",
+        label: "Entity Browser Todos",
+        description: "Show the to-dos for the Entity Browser app",
+        items: [
+          "Create an entity browser page",
+          "Display entities based off of the defined ontology",
         ],
       },
     ]
