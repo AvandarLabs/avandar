@@ -1,4 +1,4 @@
-import { Box, Button, Select, Text } from "@mantine/core";
+import { Box, Loader, Select, Text } from "@mantine/core";
 import { useMemo, useState } from "react";
 import * as R from "remeda";
 import { LocalQueryClient } from "@/clients/LocalQueryClient";
@@ -74,24 +74,10 @@ export function DataExplorerApp(): JSX.Element {
       />
       <Text>Order by (fields dropdown)</Text>
       <Text>Limit (number)</Text>
-      <Button
-        loading={isLoading}
-        onClick={async () => {
-          if (selectedDatasetId) {
-            // TODO(pablo): we need some way to determine if datasets have
-            // loaded otherwise we can't run the query
-            const result = await LocalQueryClient.runQuery({
-              datasetId: selectedDatasetId,
-              selectFieldNames: selectedFieldNames,
-              groupByFieldNames: selectedGroupByFieldNames,
-            });
-            console.log("result", result);
-          }
-        }}
-      >
-        Run
-      </Button>
 
+      {isLoading ?
+        <Loader />
+      : null}
       <DataGrid fields={selectedFieldNames} data={data ?? []} />
     </Box>
   );
