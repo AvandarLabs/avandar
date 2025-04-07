@@ -14,6 +14,7 @@ export const TODOS =
           "Make intelligent field data type guesses",
           "Allow editing the field data type",
           "Account for field data type in the allowable aggregations",
+          "Display empty string as an italicized [empty value]",
           "Show a bar graph visualization",
           "Allow saving to a dashboard",
           "Allow basic management of datasets in Data Import",
