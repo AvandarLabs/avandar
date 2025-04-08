@@ -44,13 +44,13 @@ function detectFieldDataType(
 
   values.forEach((value) => {
     if (value === "" || value === undefined) {
-      dataTypeCounts.empty++;
+      dataTypeCounts.empty += 1;
     } else if (isParseableNumber(value)) {
-      dataTypeCounts.number++;
+      dataTypeCounts.number += 1;
     } else if (isParseableDate(value)) {
-      dataTypeCounts.date++;
+      dataTypeCounts.date += 1;
     } else {
-      dataTypeCounts.string++;
+      dataTypeCounts.string += 1;
     }
   });
 
