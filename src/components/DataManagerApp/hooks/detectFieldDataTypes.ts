@@ -87,10 +87,18 @@ export function detectFieldDataTypes(
   data: CSVData,
 ): readonly DatasetField.T[] {
   // Convert the CSV to a columnar format
-  const columns = R.fromKeys(fieldNames, R.constant([] as CSVCellValue[]));
+  const columns = fieldNames.reduce(
+    (obj, fieldName) => {
+      obj[fieldName] = [];
+      return obj;
+    },
+    {} as Record<string, CSVCellValue[]>,
+  );
+
+  // fill up the column arrays
   data.forEach((row) => {
-    R.forEachObj(row, (value, fieldName) => {
-      columns[fieldName]?.push(value);
+    Object.keys(row).forEach((fieldName) => {
+      columns[fieldName]?.push(row[fieldName]);
     });
   });
 

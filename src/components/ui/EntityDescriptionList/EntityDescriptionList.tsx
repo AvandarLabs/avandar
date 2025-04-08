@@ -1,4 +1,4 @@
-import { List, Text } from "@mantine/core";
+import { List, Table, Text } from "@mantine/core";
 import { ReactNode, useMemo } from "react";
 import * as R from "remeda";
 import { DescriptionList } from "../DescriptionList/DescriptionList";
@@ -20,7 +20,7 @@ export type EntityRenderOptionsMap<
   [Key in K]?: T[Key] extends UnknownObject ?
     NestedEntityRenderOptions<T[Key], keyof T[Key]>
   : T[Key] extends ReadonlyArray<infer ArrayType extends UnknownObject> ?
-    NestedEntityRenderOptions<ArrayType, keyof ArrayType>
+    NestedEntityArrayRenderOptions<ArrayType, keyof ArrayType>
   : BaseRenderOptions;
 };
 
@@ -36,6 +36,13 @@ export type NestedEntityRenderOptions<
    * precedence over the global entity render options.
    */
   renderOptionsByKey?: EntityRenderOptionsMap<T>;
+};
+
+export type NestedEntityArrayRenderOptions<
+  T extends UnknownObject,
+  K extends keyof T = keyof T,
+> = NestedEntityRenderOptions<T, K> & {
+  renderAsTable?: boolean;
 };
 
 type Props<T extends UnknownObject, K extends keyof T = keyof T> = {
@@ -54,6 +61,22 @@ function isNestedEntityRenderOptions<
     ("renderOptionsByKey" in options ||
       "excludeKeys" in options ||
       "titleKey" in options)
+  );
+}
+
+function isNestedEntityArrayRenderOptions<
+  T extends UnknownObject,
+  K extends keyof T,
+>(
+  options: BaseRenderOptions | NestedEntityRenderOptions<T, K> | undefined,
+): options is NestedEntityArrayRenderOptions<T, K> {
+  return (
+    !!options &&
+    typeof options === "object" &&
+    ("renderOptionsByKey" in options ||
+      "excludeKeys" in options ||
+      "titleKey" in options ||
+      "renderAsTable" in options)
   );
 }
 
@@ -130,6 +153,68 @@ export function EntityDescriptionList<
     } = isNestedEntityRenderOptions(renderOptions) ? renderOptions : {};
 
     if (R.isArray(value)) {
+      const subEntityArray = value as ReadonlyArray<T[K]>;
+      if (subEntityArray.length === 0) {
+        return <Text fs="italic">There are no values</Text>;
+      }
+
+      if (
+        isNestedEntityArrayRenderOptions(renderOptions) &&
+        renderOptions.renderAsTable
+      ) {
+        const firstObj = subEntityArray[0];
+        const headers = Object.keys(R.isPlainObject(firstObj) ? firstObj : {})
+          .filter((headerKey) => {
+            return !subExcludeKeys?.includes(headerKey);
+          })
+          .map((headerKey) => {
+            return (
+              <Table.Th key={headerKey} tt="capitalize">
+                {camelToTitleCase(String(headerKey))}
+              </Table.Th>
+            );
+          });
+
+        const rows = subEntityArray.map((row) => {
+          if (R.isPlainObject(row)) {
+            const subEntity = row as T[K] & UnknownObject;
+            const subEntityId = String(subEntity[titleKey ?? "id"]);
+            return (
+              <Table.Tr key={subEntityId}>
+                {R.keys(row)
+                  .filter((rowField) => {
+                    return !subExcludeKeys?.includes(rowField);
+                  })
+                  .map((rowField) => {
+                    return (
+                      <Table.Td key={String(rowField)}>
+                        {renderValue(rowField as K, row[rowField] as T[K])}
+                      </Table.Td>
+                    );
+                  })}
+              </Table.Tr>
+            );
+          }
+
+          const nonObjectValue = row;
+          return (
+            <Table.Tr key={String(nonObjectValue)}>
+              <Text fs="italic">{renderValue(key, nonObjectValue)}</Text>
+            </Table.Tr>
+          );
+        });
+
+        return (
+          <Table>
+            <Table.Thead>
+              <Table.Tr>{headers}</Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>{rows}</Table.Tbody>
+          </Table>
+        );
+      }
+
+      // render as collapsible description lists
       return (value as Array<T[K]>).map((val, index) => {
         const listItemContents =
           R.isPlainObject(val) ?

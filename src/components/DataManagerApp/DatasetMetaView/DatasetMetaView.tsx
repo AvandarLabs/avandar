@@ -20,7 +20,8 @@ type Props = {
 const EXCLUDED_DATASET_KEYS = ["id", "name", "data", "description"] as const;
 const DATASET_RENDER_OPTIONS: EntityRenderOptionsMap<LocalDataset.T> = {
   fields: {
-    excludeKeys: ["id", "name"],
+    renderAsTable: true,
+    excludeKeys: ["id"],
     titleKey: "name",
   },
 };
