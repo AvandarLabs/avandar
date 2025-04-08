@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { UUID } from "@/types/common";
 
-export type DataType = "string" | "number" | "date" | "boolean";
+export type DataType = "string" | "number" | "date" | "unknown";
 
 export type T = {
   id: UUID;
@@ -18,6 +18,6 @@ export const Schema = z.object({
       return id as UUID;
     }),
   name: z.string().min(1),
-  dataType: z.enum(["string", "number", "date", "boolean"]),
+  dataType: z.enum(["string", "number", "date", "unknown"]),
   description: z.string().optional(),
 });

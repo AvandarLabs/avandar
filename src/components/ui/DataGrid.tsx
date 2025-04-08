@@ -1,11 +1,10 @@
 import { Box } from "@mantine/core";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
-import { CSVData } from "@/types/common";
 
 type Props = {
   fields: readonly string[];
-  data: CSVData;
+  data: Array<Record<string, unknown>>;
 };
 
 export function DataGrid({ fields, data }: Props): JSX.Element {

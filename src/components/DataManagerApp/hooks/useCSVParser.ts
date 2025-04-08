@@ -1,26 +1,9 @@
 import Papa from "papaparse";
 import { useCallback, useState } from "react";
-import * as R from "remeda";
 import * as DatasetField from "@/models/DatasetField";
 import { FileMetadata } from "@/models/LocalDataset";
-import { CSVData, CSVRow, MIMEType } from "@/types/common";
-import { uuid } from "@/utils/uuid";
-
-function detectFieldDataTypes(
-  fieldNames: readonly string[],
-  _data: CSVData,
-): readonly DatasetField.T[] {
-  return R.map(fieldNames, (fieldName) => {
-    return {
-      id: uuid(),
-      name: fieldName,
-      // TODO(pablo): force 'string' type for everything even
-      // if not accurate
-      dataType: "string" as const,
-      description: undefined,
-    };
-  });
-}
+import { CSVRow, MIMEType } from "@/types/common";
+import { detectFieldDataTypes } from "./detectFieldDataTypes";
 
 /**
  * Custom hook for handling CSV file parsing.

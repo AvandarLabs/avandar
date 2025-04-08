@@ -7,8 +7,8 @@ import { AppConfig } from "@/config/AppConfig";
 import * as LocalDataset from "@/models/LocalDataset";
 import { DataGrid } from "../ui/DataGrid";
 import { FileUploadField } from "../ui/FileUploadField";
+import { useCSVParser } from "./hooks/useCSVParser";
 import { useSaveLocalDataset } from "./queries";
-import { useCSVParser } from "./useCSVParser";
 
 type DatasetForm = {
   name: string;

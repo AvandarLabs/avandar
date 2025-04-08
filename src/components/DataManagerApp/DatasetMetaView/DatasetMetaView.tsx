@@ -10,8 +10,8 @@ import {
 import { AppConfig } from "@/config/AppConfig";
 import * as LocalDataset from "@/models/LocalDataset";
 import { DataGrid } from "../../ui/DataGrid";
+import { useCSVParser } from "../hooks/useCSVParser";
 import { useDeleteLocalDataset } from "../queries";
-import { useCSVParser } from "../useCSVParser";
 
 type Props = {
   dataset: LocalDataset.T;
