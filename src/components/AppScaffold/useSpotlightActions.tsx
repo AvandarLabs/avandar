@@ -1,17 +1,16 @@
-import { Container, List } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import {
   SpotlightActionData,
   SpotlightActionGroupData,
 } from "@mantine/spotlight";
-import { IconClipboard } from "@tabler/icons-react";
+import { IconClipboard, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { LocalDatasetClient } from "@/clients/LocalDatasetClient";
 import { AppConfig } from "@/config/AppConfig";
-import { TODOS } from "@/config/todos";
 import { objectEntries } from "@/lib/utils/objects";
+import { SpotlightTodoContainer } from "./SpotlightTodoContainer";
 
 export function useSpotlightActions(): Array<
   SpotlightActionData | SpotlightActionGroupData
@@ -41,6 +40,7 @@ export function useSpotlightActions(): Array<
               id: "delete-local-datasets-indexed-db",
               label: "Delete Local Datasets",
               description: "Delete Local Datasets indexedDB database",
+              leftSection: <IconTrash size={24} stroke={1.5} />,
               onClick: async () => {
                 await LocalDatasetClient.deleteDatabase();
                 notifications.show({
@@ -53,36 +53,21 @@ export function useSpotlightActions(): Array<
             },
           ],
         },
-      ];
-
-      const devTodos = TODOS?.map((devTodo) => {
-        return {
-          id: devTodo.id,
-          label: devTodo.label,
-          description: devTodo.description,
+        {
+          id: "dev-todos",
+          label: "Dev Todos",
+          description: "Show all to-dos for all apps",
           leftSection: <IconClipboard size={24} stroke={1.5} />,
           onClick: () => {
             modals.open({
-              title: devTodo.label,
-              children: (
-                <Container>
-                  <List type="ordered" withPadding>
-                    {devTodo.items.map((todoItem) => {
-                      return <List.Item key={todoItem}>{todoItem}</List.Item>;
-                    })}
-                  </List>
-                </Container>
-              ),
+              title: "Todo list",
+              children: <SpotlightTodoContainer />,
             });
           },
-        };
-      });
+        },
+      ];
 
-      return devTodos ?
-          actions.concat(devActions, [
-            { group: "Dev Todos", actions: devTodos },
-          ])
-        : actions.concat(devActions);
+      return actions.concat(devActions);
     }
 
     return actions;

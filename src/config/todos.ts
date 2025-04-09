@@ -6,19 +6,15 @@ export const TODOS =
   import.meta.env.DEV ?
     [
       {
-        id: "data-manager-todos",
-        label: "Data Manager Todos",
-        description: "Show the to-dos for the Data Manager app",
+        label: "Data Manager",
         items: [
-          "Make intelligent field data type guesses",
           "Allow editing the field data type",
           "Allow full CRUD of datasets in Data Manager",
         ],
       },
+
       {
-        id: "data-explorer-todos",
-        label: "Data Explorer Todos",
-        description: "Show the to-dos for the Data Explorer app",
+        label: "Data Explorer",
         items: [
           "Account for field data type in the allowable aggregations",
           "Display empty string as an italicized [empty value]",
@@ -26,18 +22,14 @@ export const TODOS =
         ],
       },
       {
-        id: "data-ontology-todos",
-        label: "Data Ontology Todos",
-        description: "Show the to-dos for the Data Ontology app",
+        label: "Data Ontology",
         items: [
           "Create an ontology page",
           "Allow users to define their data models",
         ],
       },
       {
-        id: "entity-browser-todos",
-        label: "Entity Browser Todos",
-        description: "Show the to-dos for the Entity Browser app",
+        label: "Entity Browser",
         items: [
           "Create an entity browser page",
           "Display entities based off of the defined ontology",
