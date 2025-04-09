@@ -1,4 +1,6 @@
+import { Center, Text } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
+import { Callout } from "@/lib/ui/Callout";
 
 export const Route = createFileRoute("/_auth/data-manager/")({
   component: DataManagerRoot,
@@ -8,5 +10,13 @@ export const Route = createFileRoute("/_auth/data-manager/")({
  * This is the default view when we load the data-manager root.
  */
 function DataManagerRoot() {
-  return <div>No dataset selected</div>;
+  return (
+    <Center h="50%">
+      <Callout title="No dataset selected" color="info">
+        <Text>
+          Please select a dataset from the left sidebar, or create a new one.
+        </Text>
+      </Callout>
+    </Center>
+  );
 }

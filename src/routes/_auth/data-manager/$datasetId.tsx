@@ -1,4 +1,4 @@
-import { Alert, Center, Text, Title } from "@mantine/core";
+import { Center, Text } from "@mantine/core";
 import { IconAlertCircle } from "@tabler/icons-react";
 import {
   createFileRoute,
@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { LocalDatasetClient } from "@/clients/LocalDatasetClient";
 import { DatasetMetaView } from "@/components/DataManagerApp/DatasetMetaView/DatasetMetaView";
 import { Logger } from "@/lib/Logger";
+import { Callout } from "@/lib/ui/Callout";
 import { type LocalDataset } from "@/models/LocalDataset";
 
 export const Route = createFileRoute("/_auth/data-manager/$datasetId")({
@@ -35,17 +36,17 @@ function DatasetMetaErrorView({ error }: ErrorComponentProps) {
 
   return (
     <Center h="50%">
-      <Alert
+      <Callout
         variant="light"
         color="danger"
-        title={<Title order={4}>Dataset failed to load</Title>}
+        title="Dataset failed to load"
         icon={<IconAlertCircle />}
       >
         <Text>
           The dataset failed to load. Please try again later or reach out to
           support.
         </Text>
-      </Alert>
+      </Callout>
     </Center>
   );
 }
