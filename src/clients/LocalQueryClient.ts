@@ -6,7 +6,7 @@ import duckDBWasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
-import { Logger } from "@/lib/utils/Logger";
+import { Logger } from "@/lib/Logger";
 import {
   getProp,
   makeObjectFromList,
