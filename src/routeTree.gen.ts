@@ -18,6 +18,7 @@ import { Route as ForgotPasswordImport } from "./routes/forgot-password";
 import { Route as AuthRouteImport } from "./routes/_auth/route";
 import { Route as AuthIndexImport } from "./routes/_auth/index";
 import { Route as AuthProfileImport } from "./routes/_auth/profile";
+import { Route as AuthEntityDesignerImport } from "./routes/_auth/entity-designer";
 import { Route as AuthDataExplorerImport } from "./routes/_auth/data-explorer";
 import { Route as AuthDataManagerRouteImport } from "./routes/_auth/data-manager/route";
 import { Route as AuthDataManagerIndexImport } from "./routes/_auth/data-manager/index";
@@ -64,6 +65,12 @@ const AuthIndexRoute = AuthIndexImport.update({
 const AuthProfileRoute = AuthProfileImport.update({
   id: "/profile",
   path: "/profile",
+  getParentRoute: () => AuthRouteRoute,
+} as any);
+
+const AuthEntityDesignerRoute = AuthEntityDesignerImport.update({
+  id: "/entity-designer",
+  path: "/entity-designer",
   getParentRoute: () => AuthRouteRoute,
 } as any);
 
@@ -150,6 +157,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthDataExplorerImport;
       parentRoute: typeof AuthRouteImport;
     };
+    "/_auth/entity-designer": {
+      id: "/_auth/entity-designer";
+      path: "/entity-designer";
+      fullPath: "/entity-designer";
+      preLoaderRoute: typeof AuthEntityDesignerImport;
+      parentRoute: typeof AuthRouteImport;
+    };
     "/_auth/profile": {
       id: "/_auth/profile";
       path: "/profile";
@@ -208,6 +222,7 @@ const AuthDataManagerRouteRouteWithChildren =
 interface AuthRouteRouteChildren {
   AuthDataManagerRouteRoute: typeof AuthDataManagerRouteRouteWithChildren;
   AuthDataExplorerRoute: typeof AuthDataExplorerRoute;
+  AuthEntityDesignerRoute: typeof AuthEntityDesignerRoute;
   AuthProfileRoute: typeof AuthProfileRoute;
   AuthIndexRoute: typeof AuthIndexRoute;
 }
@@ -215,6 +230,7 @@ interface AuthRouteRouteChildren {
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
   AuthDataManagerRouteRoute: AuthDataManagerRouteRouteWithChildren,
   AuthDataExplorerRoute: AuthDataExplorerRoute,
+  AuthEntityDesignerRoute: AuthEntityDesignerRoute,
   AuthProfileRoute: AuthProfileRoute,
   AuthIndexRoute: AuthIndexRoute,
 };
@@ -231,6 +247,7 @@ export interface FileRoutesByFullPath {
   "/update-password": typeof UpdatePasswordRoute;
   "/data-manager": typeof AuthDataManagerRouteRouteWithChildren;
   "/data-explorer": typeof AuthDataExplorerRoute;
+  "/entity-designer": typeof AuthEntityDesignerRoute;
   "/profile": typeof AuthProfileRoute;
   "/": typeof AuthIndexRoute;
   "/data-manager/$datasetId": typeof AuthDataManagerDatasetIdRoute;
@@ -244,6 +261,7 @@ export interface FileRoutesByTo {
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
   "/data-explorer": typeof AuthDataExplorerRoute;
+  "/entity-designer": typeof AuthEntityDesignerRoute;
   "/profile": typeof AuthProfileRoute;
   "/": typeof AuthIndexRoute;
   "/data-manager/$datasetId": typeof AuthDataManagerDatasetIdRoute;
@@ -260,6 +278,7 @@ export interface FileRoutesById {
   "/update-password": typeof UpdatePasswordRoute;
   "/_auth/data-manager": typeof AuthDataManagerRouteRouteWithChildren;
   "/_auth/data-explorer": typeof AuthDataExplorerRoute;
+  "/_auth/entity-designer": typeof AuthEntityDesignerRoute;
   "/_auth/profile": typeof AuthProfileRoute;
   "/_auth/": typeof AuthIndexRoute;
   "/_auth/data-manager/$datasetId": typeof AuthDataManagerDatasetIdRoute;
@@ -277,6 +296,7 @@ export interface FileRouteTypes {
     | "/update-password"
     | "/data-manager"
     | "/data-explorer"
+    | "/entity-designer"
     | "/profile"
     | "/"
     | "/data-manager/$datasetId"
@@ -289,6 +309,7 @@ export interface FileRouteTypes {
     | "/signin"
     | "/update-password"
     | "/data-explorer"
+    | "/entity-designer"
     | "/profile"
     | "/"
     | "/data-manager/$datasetId"
@@ -303,6 +324,7 @@ export interface FileRouteTypes {
     | "/update-password"
     | "/_auth/data-manager"
     | "/_auth/data-explorer"
+    | "/_auth/entity-designer"
     | "/_auth/profile"
     | "/_auth/"
     | "/_auth/data-manager/$datasetId"
@@ -349,6 +371,7 @@ export const routeTree = rootRoute
       "children": [
         "/_auth/data-manager",
         "/_auth/data-explorer",
+        "/_auth/entity-designer",
         "/_auth/profile",
         "/_auth/"
       ]
@@ -376,6 +399,10 @@ export const routeTree = rootRoute
     },
     "/_auth/data-explorer": {
       "filePath": "_auth/data-explorer.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/entity-designer": {
+      "filePath": "_auth/entity-designer.tsx",
       "parent": "/_auth"
     },
     "/_auth/profile": {

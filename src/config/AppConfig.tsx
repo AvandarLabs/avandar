@@ -81,8 +81,20 @@ export const AppConfig = {
       icon: <IconTable size={24} stroke={1.5} />,
       spotlightDescription: "Go to the data explorer app",
     },
+    entityDesigner: {
+      to: "/entity-designer",
+      label: "Entity Designer",
+      icon: <IconTable size={24} stroke={1.5} />,
+      spotlightDescription: "Go to the entity designer app",
+    },
   },
-  navbarLinkOrder: ["home", "dataManager", "dataExplorer", "profile"] as const,
+  navbarLinkOrder: [
+    "home",
+    "dataManager",
+    "dataExplorer",
+    "entityDesigner",
+    "profile",
+  ] as const,
 
   dataManagerApp: {
     maxDatasetNameLength: 100,
