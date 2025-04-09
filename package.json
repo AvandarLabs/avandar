@@ -9,7 +9,9 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "new-main-component": "./scripts/newMainComponent.sh",
     "new-route": "./scripts/newRoute.sh",
+    "new-script": "./scripts/newScript.sh",
     "tsc-watch": "tsc -b --watch",
     "update-boilerplate": "./scripts/mergeUpstreamAppTemplateChanges.sh"
   },
