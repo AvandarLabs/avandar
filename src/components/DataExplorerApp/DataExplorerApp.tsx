@@ -1,6 +1,7 @@
 import { Box, Fieldset, Loader, Select, Text } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { AggregationType, LocalQueryClient } from "@/clients/LocalQueryClient";
+import { useSet } from "@/lib/hooks/useSet";
 import { DataGrid } from "@/lib/ui/DataGrid";
 import { difference } from "@/lib/utils/arrays";
 import {
@@ -10,13 +11,14 @@ import {
   omit,
 } from "@/lib/utils/objects";
 import { DatasetField } from "@/models/DatasetField";
-import { LocalDataset } from "@/models/LocalDataset";
+import { DatasetId, LocalDataset } from "@/models/LocalDataset";
 import { useLocalDatasets } from "../DataManagerApp/queries";
 import { FieldSelect } from "./FieldSelect";
 import { useDataQuery } from "./useDataQuery";
 
 export function DataExplorerApp(): JSX.Element {
   const [allDatasets, isLoadingDatasets] = useLocalDatasets();
+  const [loadedDatasets, setLoadedDatasets] = useSet<DatasetId>();
   const [selectedDatasetId, setSelectedDatasetId] = useState<
     number | undefined
   >(undefined);
@@ -44,6 +46,7 @@ export function DataExplorerApp(): JSX.Element {
   }, [selectedGroupByFields]);
 
   const { data: queryResults, isLoading } = useDataQuery({
+    enabled: !!selectedDatasetId && loadedDatasets.has(selectedDatasetId),
     aggregations,
     datasetId: selectedDatasetId,
     selectFieldNames: selectedFieldNames,
@@ -118,11 +121,15 @@ export function DataExplorerApp(): JSX.Element {
         }
         data={datasetOptions ?? []}
         value={String(selectedDatasetId)}
-        onChange={async (datasetId: string | null) => {
-          if (datasetId) {
-            const datasetIdNum = Number(datasetId);
-            setSelectedDatasetId(datasetIdNum);
-            await LocalQueryClient.loadDataset(datasetIdNum);
+        onChange={async (datasetIdStr: string | null) => {
+          if (datasetIdStr) {
+            const datasetId = Number(datasetIdStr);
+            setSelectedDatasetId(datasetId);
+            if (!loadedDatasets.has(datasetId)) {
+              // if we haven't loaded the dataset yet into memory, load it
+              await LocalQueryClient.loadDataset(datasetId);
+              setLoadedDatasets.add(datasetId);
+            }
           } else {
             setSelectedDatasetId(undefined);
           }

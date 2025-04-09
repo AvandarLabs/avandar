@@ -7,13 +7,15 @@ import { LinkProps } from "@/lib/ui/links/Link";
 import { DatasetFieldSchema } from "@/models/DatasetField";
 import type { DatasetField } from "@/models/DatasetField";
 
+export type DatasetId = number;
+
 /**
  * Local dataset type.
  *
  * For now, we only support CSVs.
  */
 export type LocalDataset = {
-  id: number;
+  id: DatasetId;
   name: string;
   description: string;
   createdAt: Date;

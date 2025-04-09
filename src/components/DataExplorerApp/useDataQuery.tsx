@@ -12,7 +12,10 @@ export function useDataQuery({
   aggregations,
   selectFieldNames,
   groupByFieldNames,
-}: Partial<LocalQueryConfig>): UseQueryResult<LocalQueryResultData> {
+  enabled,
+}: Partial<LocalQueryConfig> & {
+  enabled: boolean;
+}): UseQueryResult<LocalQueryResultData> {
   const sortedFieldNames = sortStrings(selectFieldNames ?? []);
   const sortedGroupByNames = sortStrings(groupByFieldNames ?? []);
   const sortedAggregations = sortStrings(
@@ -22,6 +25,8 @@ export function useDataQuery({
   );
 
   return useQuery({
+    enabled,
+
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       "dataQuery",
