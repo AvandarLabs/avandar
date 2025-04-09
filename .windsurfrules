@@ -4,6 +4,7 @@ Directories:
 - `src/components`: All React components
 - `src/components/ui`: All UI components
 - `src/routes`: All router pages
+- `src/utils`: Our utilities library
 
 Libraries:
 - Bundler: Vite v6
@@ -11,7 +12,6 @@ Libraries:
 - UI library: Mantine v7
 - Router: Tanstack Router v1
 - Querying: Tanstack Query v5
-- Utilities library: Remeda v2
 - Schema validation: Zod
 - Database and Auth: Supabase JS v2
 - Linter: ESLint v9
@@ -19,9 +19,11 @@ Libraries:
 - CSS Styles: TailwindCSS v3
 - Icons: Tabler Icons v3
 
-# Code suggestion rules
+# Library usage
 - Use the library versions referenced in this document. Do not use documentation or APIs from older versions.
-- When importing anything that conflicts with a 3rd party library, always import our local version instead. For example, always import `Link` from `@/components/ui` or `useQuery` from `@/hooks/api/` instead of from other libraries.
+- Import `useQuery` from `@/hooks/api/useQuery`
+- Import `Link` components from `@/components/ui/links/`
+- Import utility functions from `@/utils/`.
 
 # General Code Style & Formatting
 
@@ -70,8 +72,6 @@ Libraries:
 - Prefer immutability for data:
   - Use `readonly` for immutable properties.
   - Use `as const` for literals that never change.
-- Use Remeda for functional programming utilities
-  - Always import Remeda as `import * as R from 'remeda';`
 
 # Data Fetching
 
