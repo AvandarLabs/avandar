@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UUID } from "@/types/common";
+import { UUID } from "@/lib/types/common";
 
 export type DataType = "string" | "number" | "date" | "unknown";
 

@@ -3,11 +3,11 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { EntityDescriptionList } from "@/components/ui/EntityDescriptionList/EntityDescriptionList";
-import { FieldRenderOptionsMap } from "@/components/ui/EntityDescriptionList/types";
 import { AppConfig } from "@/config/AppConfig";
+import { DataGrid } from "@/lib/ui/DataGrid";
+import { EntityDescriptionList } from "@/lib/ui/EntityDescriptionList/EntityDescriptionList";
+import { FieldRenderOptionsMap } from "@/lib/ui/EntityDescriptionList/types";
 import * as LocalDataset from "@/models/LocalDataset";
-import { DataGrid } from "../../ui/DataGrid";
 import { useCSVParser } from "../hooks/useCSVParser";
 import { useDeleteLocalDataset } from "../queries";
 

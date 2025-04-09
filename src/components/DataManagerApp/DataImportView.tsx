@@ -4,9 +4,9 @@ import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { AppConfig } from "@/config/AppConfig";
+import { DataGrid } from "@/lib/ui/DataGrid";
+import { FileUploadField } from "@/lib/ui/FileUploadField";
 import * as LocalDataset from "@/models/LocalDataset";
-import { DataGrid } from "../ui/DataGrid";
-import { FileUploadField } from "../ui/FileUploadField";
 import { useCSVParser } from "./hooks/useCSVParser";
 import { useSaveLocalDataset } from "./queries";
 

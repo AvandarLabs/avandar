@@ -8,8 +8,8 @@ import {
 import { useEffect } from "react";
 import { LocalDatasetClient } from "@/clients/LocalDatasetClient";
 import { DatasetMetaView } from "@/components/DataManagerApp/DatasetMetaView/DatasetMetaView";
+import { Logger } from "@/lib/utils/Logger";
 import * as LocalDataset from "@/models/LocalDataset";
-import { Logger } from "@/utils/Logger";
 
 export const Route = createFileRoute("/_auth/data-manager/$datasetId")({
   component: RouteComponent,

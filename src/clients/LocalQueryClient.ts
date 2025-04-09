@@ -6,9 +6,13 @@ import duckDBWasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
+import { Logger } from "@/lib/utils/Logger";
+import {
+  getProp,
+  makeObjectFromList,
+  objectEntries,
+} from "@/lib/utils/objects";
 import * as LocalDataset from "@/models/LocalDataset";
-import { Logger } from "@/utils/Logger";
-import { getProp, makeObjectFromList, objectEntries } from "@/utils/objects";
 import { LocalDatasetClient } from "./LocalDatasetClient";
 
 export type AggregationType = "sum" | "avg" | "count" | "max" | "min" | "none";

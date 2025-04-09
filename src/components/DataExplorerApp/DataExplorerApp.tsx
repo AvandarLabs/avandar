@@ -1,11 +1,16 @@
 import { Box, Fieldset, Loader, Select, Text } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { AggregationType, LocalQueryClient } from "@/clients/LocalQueryClient";
+import { DataGrid } from "@/lib/ui/DataGrid";
+import { difference } from "@/lib/utils/arrays";
+import {
+  getProp,
+  makeObjectFromKeys,
+  objectKeys,
+  omit,
+} from "@/lib/utils/objects";
 import * as LocalDataset from "@/models/LocalDataset";
-import { difference } from "@/utils/arrays";
-import { getProp, makeObjectFromKeys, objectKeys, omit } from "@/utils/objects";
 import { useLocalDatasets } from "../DataManagerApp/queries";
-import { DataGrid } from "../ui/DataGrid";
 import { FieldSelect } from "./FieldSelect";
 import { useDataQuery } from "./useDataQuery";
 

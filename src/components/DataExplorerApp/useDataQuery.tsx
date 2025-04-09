@@ -1,7 +1,7 @@
 import { LocalQueryClient, LocalQueryConfig } from "@/clients/LocalQueryClient";
-import { useQuery, UseQueryResult } from "@/hooks/api/useQuery";
-import { objectEntries } from "@/utils/objects";
-import { sortStrings } from "@/utils/strings";
+import { useQuery, UseQueryResult } from "@/lib/hooks/query/useQuery";
+import { objectEntries } from "@/lib/utils/objects";
+import { sortStrings } from "@/lib/utils/strings";
 
 export function useDataQuery({
   datasetId,

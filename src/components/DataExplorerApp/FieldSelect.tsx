@@ -1,9 +1,9 @@
 import { MultiSelect } from "@mantine/core";
 import { ReactNode, useMemo } from "react";
+import { UUID } from "@/lib/types/common";
+import { isNotNullOrUndefined } from "@/lib/utils/guards";
+import { makeObjectFromEntries } from "@/lib/utils/objects";
 import * as LocalDataset from "@/models/LocalDataset";
-import { UUID } from "@/types/common";
-import { isNotNullOrUndefined } from "@/utils/guards";
-import { makeObjectFromEntries } from "@/utils/objects";
 import { useLocalDatasets } from "../DataManagerApp/queries";
 
 type Props = {

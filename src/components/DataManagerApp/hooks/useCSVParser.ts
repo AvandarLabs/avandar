@@ -1,8 +1,8 @@
 import Papa from "papaparse";
 import { useCallback, useState } from "react";
+import { CSVRow, MIMEType } from "@/lib/types/common";
 import * as DatasetField from "@/models/DatasetField";
 import { FileMetadata } from "@/models/LocalDataset";
-import { CSVRow, MIMEType } from "@/types/common";
 import { detectFieldDataTypes } from "./detectFieldDataTypes";
 
 /**

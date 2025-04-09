@@ -1,6 +1,6 @@
+import { CSVCellValue, CSVData } from "@/lib/types/common";
+import { uuid } from "@/lib/utils/uuid";
 import * as DatasetField from "@/models/DatasetField";
-import { CSVCellValue, CSVData } from "@/types/common";
-import { uuid } from "@/utils/uuid";
 
 const THRESHOLD = 0.9; // 80% of values should match the type
 

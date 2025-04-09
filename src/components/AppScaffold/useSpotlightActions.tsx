@@ -11,7 +11,7 @@ import { useMemo } from "react";
 import { LocalDatasetClient } from "@/clients/LocalDatasetClient";
 import { AppConfig } from "@/config/AppConfig";
 import { TODOS } from "@/config/todos";
-import { objectEntries } from "@/utils/objects";
+import { objectEntries } from "@/lib/utils/objects";
 
 export function useSpotlightActions(): Array<
   SpotlightActionData | SpotlightActionGroupData

@@ -5,7 +5,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { LocalDatasetClient } from "@/clients/LocalDatasetClient";
-import { useQuery, UseQueryResult } from "@/hooks/api/useQuery";
+import { useQuery, UseQueryResult } from "@/lib/hooks/query/useQuery";
 import * as LocalDataset from "@/models/LocalDataset";
 
 /**
