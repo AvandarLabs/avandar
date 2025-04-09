@@ -1,10 +1,10 @@
 import { CSVCellValue, CSVData } from "@/lib/types/common";
 import { uuid } from "@/lib/utils/uuid";
-import * as DatasetField from "@/models/DatasetField";
+import type { DatasetField, FieldDataType } from "@/models/DatasetField";
 
 const THRESHOLD = 0.9; // 80% of values should match the type
 
-function guessDataTypeFromFieldName(fieldName: string): DatasetField.DataType {
+function guessDataTypeFromFieldName(fieldName: string): FieldDataType {
   const lowercaseName = fieldName.toLowerCase();
   if (lowercaseName.includes("date")) {
     return "date";
@@ -28,7 +28,7 @@ function isParseableDate(value: string): boolean {
 function detectFieldDataType(
   fieldName: string,
   values: readonly CSVCellValue[],
-): DatasetField.DataType {
+): FieldDataType {
   const fallbackType = guessDataTypeFromFieldName(fieldName);
   if (values.length === 0) {
     return fallbackType;
@@ -84,7 +84,7 @@ function detectFieldDataType(
 export function detectFieldDataTypes(
   fieldNames: readonly string[],
   data: CSVData,
-): readonly DatasetField.T[] {
+): readonly DatasetField[] {
   // Convert the CSV to a columnar format
   const columns = fieldNames.reduce(
     (obj, fieldName) => {

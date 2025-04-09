@@ -9,7 +9,8 @@ import {
   objectKeys,
   omit,
 } from "@/lib/utils/objects";
-import * as LocalDataset from "@/models/LocalDataset";
+import { DatasetField } from "@/models/DatasetField";
+import { LocalDataset } from "@/models/LocalDataset";
 import { useLocalDatasets } from "../DataManagerApp/queries";
 import { FieldSelect } from "./FieldSelect";
 import { useDataQuery } from "./useDataQuery";
@@ -19,18 +20,18 @@ export function DataExplorerApp(): JSX.Element {
   const [selectedDatasetId, setSelectedDatasetId] = useState<
     number | undefined
   >(undefined);
-  const [selectedFields, setSelectedFields] = useState<
-    readonly LocalDataset.Field[]
-  >([]);
+  const [selectedFields, setSelectedFields] = useState<readonly DatasetField[]>(
+    [],
+  );
   const [selectedGroupByFields, setSelectedGroupByFields] = useState<
-    readonly LocalDataset.Field[]
+    readonly DatasetField[]
   >([]);
   const [aggregations, setAggregations] = useState<
     Record<string, AggregationType>
   >({});
 
   const datasetOptions = useMemo(() => {
-    return (allDatasets ?? []).map((dataset: LocalDataset.T) => {
+    return (allDatasets ?? []).map((dataset: LocalDataset) => {
       return { value: String(dataset.id), label: dataset.name };
     });
   }, [allDatasets]);

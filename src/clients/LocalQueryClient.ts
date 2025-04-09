@@ -12,7 +12,8 @@ import {
   makeObjectFromList,
   objectEntries,
 } from "@/lib/utils/objects";
-import * as LocalDataset from "@/models/LocalDataset";
+import { type DatasetField } from "@/models/DatasetField";
+import { type LocalDataset } from "@/models/LocalDataset";
 import { LocalDatasetClient } from "./LocalDatasetClient";
 
 export type AggregationType = "sum" | "avg" | "count" | "max" | "min" | "none";
@@ -77,7 +78,7 @@ class LocalQueryClientImpl {
     return this.#db;
   }
 
-  async #getDataset(datasetId: number): Promise<LocalDataset.T> {
+  async #getDataset(datasetId: number): Promise<LocalDataset> {
     const dataset = await LocalDatasetClient.getDataset(datasetId);
     if (!dataset) {
       throw new Error(`Dataset ${datasetId} not found`);
@@ -119,7 +120,7 @@ class LocalQueryClientImpl {
       await db.registerFileText(tableName, data);
 
       // insert the dataset as its own table
-      const arrowColumns = fields.map((fieldSchema: LocalDataset.Field) => {
+      const arrowColumns = fields.map((fieldSchema: DatasetField) => {
         return {
           name: fieldSchema.name,
           // TODO(pablo): this should be coming from the fieldSchema's

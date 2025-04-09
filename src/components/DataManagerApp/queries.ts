@@ -6,7 +6,11 @@ import {
 } from "@tanstack/react-query";
 import { LocalDatasetClient } from "@/clients/LocalDatasetClient";
 import { useQuery, UseQueryResult } from "@/lib/hooks/query/useQuery";
-import * as LocalDataset from "@/models/LocalDataset";
+import {
+  LocalDataset,
+  LocalDatasetCreate,
+  LocalDatasetQueryKeys,
+} from "@/models/LocalDataset";
 
 /**
  * Get all locally stored datasets from the browser.
@@ -14,12 +18,12 @@ import * as LocalDataset from "@/models/LocalDataset";
  * result object.
  */
 export function useLocalDatasets(): [
-  LocalDataset.T[] | undefined,
+  LocalDataset[] | undefined,
   boolean,
-  UseQueryResult<LocalDataset.T[]>,
+  UseQueryResult<LocalDataset[]>,
 ] {
   const queryResultObj = useQuery({
-    queryKey: [LocalDataset.QueryKeys.allDatasets],
+    queryKey: [LocalDatasetQueryKeys.allDatasets],
     queryFn: async () => {
       return LocalDatasetClient.getAllDatasets();
     },
@@ -34,18 +38,18 @@ export function useLocalDatasets(): [
  * full `useMutation` result object.
  */
 export function useSaveLocalDataset(): [
-  UseMutateFunction<number, Error, LocalDataset.CreateT>,
+  UseMutateFunction<number, Error, LocalDatasetCreate>,
   boolean,
-  UseMutationResult<number, Error, LocalDataset.CreateT>,
+  UseMutationResult<number, Error, LocalDatasetCreate>,
 ] {
   const queryClient = useQueryClient();
   const mutationObj = useMutation({
-    mutationFn: async (dataset: LocalDataset.CreateT) => {
+    mutationFn: async (dataset: LocalDatasetCreate) => {
       return LocalDatasetClient.addDataset(dataset);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [LocalDataset.QueryKeys.allDatasets],
+        queryKey: [LocalDatasetQueryKeys.allDatasets],
       });
     },
   });
@@ -64,7 +68,7 @@ export function useDeleteLocalDataset(): [
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [LocalDataset.QueryKeys.allDatasets],
+        queryKey: [LocalDatasetQueryKeys.allDatasets],
       });
     },
   });

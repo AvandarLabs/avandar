@@ -1,16 +1,16 @@
 import { z } from "zod";
 import { UUID } from "@/lib/types/common";
 
-export type DataType = "string" | "number" | "date" | "unknown";
+export type FieldDataType = "string" | "number" | "date" | "unknown";
 
-export type T = {
+export type DatasetField = {
   id: UUID;
   name: string;
-  dataType: DataType;
+  dataType: FieldDataType;
   description?: string;
 };
 
-export const Schema = z.object({
+export const DatasetFieldSchema = z.object({
   id: z
     .string()
     .uuid()

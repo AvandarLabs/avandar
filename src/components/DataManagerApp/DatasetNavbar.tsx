@@ -1,12 +1,12 @@
 import { Box, BoxProps, Loader, Title, useMantineTheme } from "@mantine/core";
 import { useMemo } from "react";
 import { AppConfig } from "@/config/AppConfig";
+import { type NavLinkProps } from "@/lib/ui/links/NavLink";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
-import * as LocalDataset from "@/models/LocalDataset";
-import type { NavLinkProps } from "@/lib/ui/links/NavLink";
+import { getDatasetLinkProps, LocalDataset } from "@/models/LocalDataset";
 
 type Props = {
-  datasets: LocalDataset.T[];
+  datasets: LocalDataset[];
   isLoading: boolean;
 } & BoxProps;
 
@@ -27,7 +27,7 @@ export function DatasetNavbar({
     return datasets
       .map((dataset): NavLinkProps => {
         return {
-          ...LocalDataset.getDatasetLinkProps(dataset.id),
+          ...getDatasetLinkProps(dataset.id),
           label: dataset.name,
           style: borderStyle,
         };

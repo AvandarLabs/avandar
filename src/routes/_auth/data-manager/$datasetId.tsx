@@ -9,11 +9,11 @@ import { useEffect } from "react";
 import { LocalDatasetClient } from "@/clients/LocalDatasetClient";
 import { DatasetMetaView } from "@/components/DataManagerApp/DatasetMetaView/DatasetMetaView";
 import { Logger } from "@/lib/Logger";
-import * as LocalDataset from "@/models/LocalDataset";
+import { type LocalDataset } from "@/models/LocalDataset";
 
 export const Route = createFileRoute("/_auth/data-manager/$datasetId")({
   component: RouteComponent,
-  loader: async ({ params: { datasetId } }): Promise<LocalDataset.T> => {
+  loader: async ({ params: { datasetId } }): Promise<LocalDataset> => {
     const dataset = await LocalDatasetClient.getDataset(Number(datasetId));
     if (!dataset) {
       throw notFound();

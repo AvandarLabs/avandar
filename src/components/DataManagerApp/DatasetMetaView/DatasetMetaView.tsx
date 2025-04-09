@@ -7,16 +7,16 @@ import { AppConfig } from "@/config/AppConfig";
 import { DataGrid } from "@/lib/ui/DataGrid";
 import { EntityDescriptionList } from "@/lib/ui/EntityDescriptionList/EntityDescriptionList";
 import { FieldRenderOptionsMap } from "@/lib/ui/EntityDescriptionList/types";
-import * as LocalDataset from "@/models/LocalDataset";
+import { type LocalDataset } from "@/models/LocalDataset";
 import { useCSVParser } from "../hooks/useCSVParser";
 import { useDeleteLocalDataset } from "../queries";
 
 type Props = {
-  dataset: LocalDataset.T;
+  dataset: LocalDataset;
 };
 
 const EXCLUDED_DATASET_KEYS = ["id", "name", "data", "description"] as const;
-const DATASET_RENDER_OPTIONS: FieldRenderOptionsMap<LocalDataset.T> = {
+const DATASET_RENDER_OPTIONS: FieldRenderOptionsMap<LocalDataset> = {
   fields: {
     renderAsTable: true,
     titleKey: "name",

@@ -4,16 +4,15 @@ import { z } from "zod";
 import { CSVData, MIMEType } from "@/lib/types/common";
 import { Replace } from "@/lib/types/utilityTypes";
 import { LinkProps } from "@/lib/ui/links/Link";
-import * as DatasetField from "@/models/DatasetField";
-
-export type Field = DatasetField.T;
+import { DatasetFieldSchema } from "@/models/DatasetField";
+import type { DatasetField } from "@/models/DatasetField";
 
 /**
  * Local dataset type.
  *
  * For now, we only support CSVs.
  */
-export type T = {
+export type LocalDataset = {
   id: number;
   name: string;
   description: string;
@@ -23,7 +22,7 @@ export type T = {
   mimeType: MIMEType;
   delimiter: string;
   firstRowIsHeader: boolean;
-  fields: readonly Field[];
+  fields: readonly DatasetField[];
 
   /**
    * All data is represented as a single string to take up less space.
@@ -46,12 +45,12 @@ export type FileMetadata = {
  *
  * `id` is undefined because it is autoincremented when inserting.
  */
-export type CreateT = Replace<T, { id: undefined }>;
+export type LocalDatasetCreate = Replace<LocalDataset, { id: undefined }>;
 
 /**
  * Zod schema for the local dataset type.
  */
-export const Schema = z.object({
+export const LocalDatasetSchema = z.object({
   id: z.number(),
   name: z.string().min(1),
   description: z.string(),
@@ -64,17 +63,17 @@ export const Schema = z.object({
   data: z.string(),
   delimiter: z.string(),
   firstRowIsHeader: z.boolean(),
-  fields: z.array(DatasetField.Schema),
+  fields: z.array(DatasetFieldSchema),
 });
 
 /**
  * React Query keys for the local datasets.
  */
-export const QueryKeys = {
+export const LocalDatasetQueryKeys = {
   allDatasets: "localDatasets",
 };
 
-export function create({
+export function makeLocalDataset({
   name,
   description,
   fileMetadata,
@@ -87,8 +86,8 @@ export function create({
   fileMetadata: FileMetadata;
   csvMetadata: ParseMeta;
   data: CSVData;
-  fields: readonly Field[];
-}): CreateT {
+  fields: readonly DatasetField[];
+}): LocalDatasetCreate {
   const creationTime = new Date();
   return {
     id: undefined,
@@ -100,7 +99,7 @@ export function create({
     updatedAt: creationTime,
     sizeInBytes: fileMetadata.sizeInBytes,
     delimiter: csvMetadata.delimiter,
-    data: unparse({ data, datasetType: fileMetadata.mimeType }),
+    data: unparseDataset({ data, datasetType: fileMetadata.mimeType }),
     fields,
   };
 }
@@ -125,7 +124,7 @@ export function getDatasetLinkProps(id: number): {
  * @param options
  * @returns
  */
-export function unparse(options: {
+export function unparseDataset(options: {
   datasetType: MIMEType;
   data: CSVData;
 }): string {

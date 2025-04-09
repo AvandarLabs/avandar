@@ -1,11 +1,15 @@
 import { Dexie } from "dexie";
-import * as LocalDataset from "@/models/LocalDataset";
+import {
+  LocalDataset,
+  LocalDatasetCreate,
+  LocalDatasetSchema,
+} from "@/models/LocalDataset";
 import type { EntityTable } from "dexie";
 
 const DB_VERSION = 1;
 
 type LocalDatasetDatabase = Dexie & {
-  datasets: EntityTable<LocalDataset.T, "id">;
+  datasets: EntityTable<LocalDataset, "id">;
 };
 
 const db = new Dexie("LocalDatasets") as LocalDatasetDatabase;
@@ -25,7 +29,7 @@ class LocalDatasetClientImpl {
    * @param dataset - The dataset to add
    * @returns A promise that resolves to the ID of the added dataset
    */
-  addDataset(dataset: LocalDataset.CreateT): Promise<number> {
+  addDataset(dataset: LocalDatasetCreate): Promise<number> {
     return db.datasets.add(dataset);
   }
 
@@ -35,11 +39,11 @@ class LocalDatasetClientImpl {
    * @returns A promise that resolves to the dataset, or undefined if not found
    * @throws ZodError if dataset schema validation fails
    */
-  async getDataset(id: number): Promise<LocalDataset.T | undefined> {
+  async getDataset(id: number): Promise<LocalDataset | undefined> {
     // our dataset schema could have changed by the time we are now loading the
     // dataset back
     const dataset = await db.datasets.get(id);
-    return dataset ? LocalDataset.Schema.parse(dataset) : undefined;
+    return dataset ? LocalDatasetSchema.parse(dataset) : undefined;
   }
 
   /**
@@ -48,7 +52,7 @@ class LocalDatasetClientImpl {
    * TODO(pablo): needs pagination
    * @returns A promise that resolves to an array of datasets
    */
-  getAllDatasets(): Promise<LocalDataset.T[]> {
+  getAllDatasets(): Promise<LocalDataset[]> {
     return db.datasets.toArray();
   }
 

@@ -6,7 +6,7 @@ import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { AppConfig } from "@/config/AppConfig";
 import { DataGrid } from "@/lib/ui/DataGrid";
 import { FileUploadField } from "@/lib/ui/FileUploadField";
-import * as LocalDataset from "@/models/LocalDataset";
+import { makeLocalDataset } from "@/models/LocalDataset";
 import { useCSVParser } from "./hooks/useCSVParser";
 import { useSaveLocalDataset } from "./queries";
 
@@ -64,7 +64,7 @@ export function DataImportView(): JSX.Element {
           <DataGrid fields={csv.meta.fields ?? []} data={csv.data} />
           <form
             onSubmit={form.onSubmit((values) => {
-              const dataset: LocalDataset.CreateT = LocalDataset.create({
+              const dataset = makeLocalDataset({
                 name: values.name,
                 description: values.description,
                 fileMetadata,
