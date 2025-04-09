@@ -1,6 +1,7 @@
 import { List, Table } from "@mantine/core";
 import { useMemo } from "react";
-import * as R from "remeda";
+import { ObjectStringKey } from "@/types/common";
+import { objectKeys } from "@/utils/objects";
 import { camelToTitleCase } from "@/utils/strings";
 import { CollapsibleItem } from "../CollapsibleItem";
 import { EntityDescriptionList } from "../EntityDescriptionList";
@@ -8,24 +9,21 @@ import { getEntityFieldRenderOptions } from "../helpers";
 import { EntityArrayRenderOptions, EntityObject } from "../types";
 import { UnknownFieldValueItem } from "../UnknownFieldValueItem";
 
-type Props<T extends EntityObject, K extends keyof T = keyof T> = {
+type Props<T extends EntityObject> = {
   values: readonly T[];
-} & EntityArrayRenderOptions<T, K>;
+} & EntityArrayRenderOptions<T>;
 
 /**
  * Renders an array of entities either as a table or as a list of
  * collapsible entity descriptions.
  */
-export function EntityArrayBlock<
-  T extends EntityObject,
-  K extends keyof T = keyof T,
->({
+export function EntityArrayBlock<T extends EntityObject>({
   values,
   renderAsTable,
   titleKey,
   ...renderOptions
-}: Props<T, K>): JSX.Element | null {
-  const excludeKeySet: ReadonlySet<K> = useMemo(() => {
+}: Props<T>): JSX.Element | null {
+  const excludeKeySet: ReadonlySet<ObjectStringKey<T>> = useMemo(() => {
     return new Set(renderOptions.excludeKeys);
   }, [renderOptions.excludeKeys]);
 
@@ -36,33 +34,30 @@ export function EntityArrayBlock<
   // render each entity in the array as a row in a table
   if (renderAsTable) {
     const firstEntity = values[0]!;
-    const headers = R.pipe(
-      R.keys(firstEntity) as K[],
-      R.filter((headerKey) => {
+    const headers = objectKeys(firstEntity)
+      .filter((headerKey) => {
         return !excludeKeySet.has(headerKey);
-      }),
-      R.map((headerKey) => {
+      })
+      .map((headerKey) => {
         return (
-          <Table.Th key={String(headerKey)} tt="capitalize">
-            {camelToTitleCase(String(headerKey))}
+          <Table.Th key={headerKey} tt="capitalize">
+            {camelToTitleCase(headerKey)}
           </Table.Th>
         );
-      }),
-    );
+      });
 
     const rows = values.map((entityRow, idx) => {
       // TODO(pablo): use a stable key
       const entityId = String(entityRow[titleKey ?? "id"] ?? idx);
       return (
         <Table.Tr key={entityId}>
-          {(R.keys(entityRow) as K[]).map((fieldKey: K) => {
+          {objectKeys(entityRow).map((fieldKey) => {
             if (excludeKeySet.has(fieldKey)) {
               return null;
             }
-
             const fieldVal = entityRow[fieldKey];
             return (
-              <Table.Td key={String(fieldKey)}>
+              <Table.Td key={fieldKey}>
                 <UnknownFieldValueItem
                   value={fieldVal}
                   {...getEntityFieldRenderOptions(renderOptions, fieldKey)}

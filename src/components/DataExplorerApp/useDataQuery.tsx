@@ -1,7 +1,7 @@
-import * as R from "remeda";
 import { LocalQueryClient, LocalQueryConfig } from "@/clients/LocalQueryClient";
 import { useQuery, UseQueryResult } from "@/hooks/api/useQuery";
-import { sortStrings, stringComparator } from "@/utils/strings";
+import { objectEntries } from "@/utils/objects";
+import { sortStrings } from "@/utils/strings";
 
 export function useDataQuery({
   datasetId,
@@ -11,12 +11,10 @@ export function useDataQuery({
 }: Partial<LocalQueryConfig>): UseQueryResult<Array<Record<string, unknown>>> {
   const sortedFieldNames = sortStrings(selectFieldNames ?? []);
   const sortedGroupByNames = sortStrings(groupByFieldNames ?? []);
-  const sortedAggregations = R.pipe(
-    R.entries(aggregations ?? {}),
-    R.map(([fieldName, aggType]) => {
+  const sortedAggregations = sortStrings(
+    objectEntries(aggregations ?? {}).map(([fieldName, aggType]) => {
       return `${fieldName}:${aggType}`;
     }),
-    R.sort(stringComparator),
   );
 
   return useQuery({

@@ -5,10 +5,10 @@ import duckDBWasmEh from "@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url";
 import duckDBWasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
 import * as arrow from "apache-arrow";
 import knex from "knex";
-import * as R from "remeda";
 import { match } from "ts-pattern";
 import * as LocalDataset from "@/models/LocalDataset";
 import { Logger } from "@/utils/Logger";
+import { getProp, makeObjectFromList, objectEntries } from "@/utils/objects";
 import { LocalDatasetClient } from "./LocalDatasetClient";
 
 export type AggregationType = "sum" | "avg" | "count" | "max" | "min" | "none";
@@ -130,7 +130,11 @@ class LocalQueryClientImpl {
         detect: false,
         header: true,
         delimiter: ",",
-        columns: R.pullObject(arrowColumns, R.prop("name"), R.prop("dataType")),
+        columns: makeObjectFromList({
+          inputList: arrowColumns,
+          keyFn: getProp("name"),
+          valueFn: getProp("dataType"),
+        }),
       });
     });
   }
@@ -157,7 +161,7 @@ class LocalQueryClientImpl {
       }
 
       // apply aggregations
-      query = R.entries(aggregations).reduce(
+      query = objectEntries(aggregations).reduce(
         (newQuery, [fieldName, aggType]) => {
           return match(aggType)
             .with("sum", () => {

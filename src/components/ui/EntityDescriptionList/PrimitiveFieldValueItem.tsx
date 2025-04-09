@@ -1,5 +1,5 @@
 import { Text } from "@mantine/core";
-import * as R from "remeda";
+import { isDate } from "@/utils/guards";
 import type {
   PrimitiveFieldValue,
   PrimitiveFieldValueRenderOptions,
@@ -39,7 +39,7 @@ export function PrimitiveFieldValueItem<T extends PrimitiveFieldValue>({
     return <Text>{value ? booleanTrue : booleanFalse}</Text>;
   }
 
-  if (R.isDate(value)) {
+  if (isDate(value)) {
     // TODO(pablo): add options to format the date
     return <Text>{value.toISOString()}</Text>;
   }

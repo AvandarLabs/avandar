@@ -8,17 +8,17 @@ import {
 import { IconClipboard } from "@tabler/icons-react";
 import { useRouter } from "@tanstack/react-router";
 import { useMemo } from "react";
-import * as R from "remeda";
 import { LocalDatasetClient } from "@/clients/LocalDatasetClient";
 import { AppConfig } from "@/config/AppConfig";
 import { TODOS } from "@/config/todos";
+import { objectEntries } from "@/utils/objects";
 
 export function useSpotlightActions(): Array<
   SpotlightActionData | SpotlightActionGroupData
 > {
   const router = useRouter();
   const spotlightActions = useMemo(() => {
-    const actions = R.entries(AppConfig.links).map(
+    const actions = objectEntries(AppConfig.links).map(
       ([linkKey, link]): SpotlightActionData | SpotlightActionGroupData => {
         return {
           id: linkKey,

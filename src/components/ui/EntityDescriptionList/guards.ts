@@ -1,4 +1,4 @@
-import * as R from "remeda";
+import { isPlainObject } from "@/utils/guards";
 import { EntityObject, FieldValue, PrimitiveFieldValue } from "./types";
 
 export function isPrimitiveFieldValue(
@@ -21,5 +21,5 @@ export function isFieldValueArray(
 }
 
 export function isEntityObject(value: FieldValue): value is EntityObject {
-  return R.isPlainObject(value);
+  return isPlainObject(value);
 }

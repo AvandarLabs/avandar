@@ -1,4 +1,3 @@
-import * as R from "remeda";
 import * as DatasetField from "@/models/DatasetField";
 import { CSVCellValue, CSVData } from "@/types/common";
 import { uuid } from "@/utils/uuid";
@@ -102,7 +101,7 @@ export function detectFieldDataTypes(
     });
   });
 
-  return R.map(fieldNames, (fieldName) => {
+  return fieldNames.map((fieldName) => {
     const columnValues = columns[fieldName];
 
     return {

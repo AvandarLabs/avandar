@@ -1,8 +1,9 @@
 import { MultiSelect } from "@mantine/core";
 import { ReactNode, useMemo } from "react";
-import * as R from "remeda";
 import * as LocalDataset from "@/models/LocalDataset";
 import { UUID } from "@/types/common";
+import { isNotNullOrUndefined } from "@/utils/guards";
+import { makeObjectFromEntries } from "@/utils/objects";
 import { useLocalDatasets } from "../DataManagerApp/queries";
 
 type Props = {
@@ -18,14 +19,14 @@ export function FieldSelect({
 }: Props): JSX.Element {
   const [allDatasets, isLoadingDatasets] = useLocalDatasets();
   const fieldsMap: Record<UUID, LocalDataset.Field> = useMemo(() => {
-    return R.pipe(
-      allDatasets ?? [],
-      R.flatMap((dataset: LocalDataset.T) => {
-        return dataset.fields;
-      }),
-      R.mapToObj((field: LocalDataset.Field) => {
-        return [field.id, field];
-      }),
+    return makeObjectFromEntries(
+      (allDatasets ?? [])
+        .flatMap((dataset: LocalDataset.T) => {
+          return dataset.fields;
+        })
+        .map((field: LocalDataset.Field) => {
+          return [field.id, field];
+        }),
     );
   }, [allDatasets]);
 
@@ -51,13 +52,11 @@ export function FieldSelect({
       placeholder={isLoadingDatasets ? "Loading datasets..." : placeholder}
       data={fieldGroupOptions ?? []}
       onChange={(fieldIds: string[]) => {
-        const fields = R.pipe(
-          fieldIds,
-          R.map((id) => {
+        const fields = fieldIds
+          .map((id) => {
             return fieldsMap[id as UUID];
-          }),
-          R.filter(R.isTruthy),
-        );
+          })
+          .filter(isNotNullOrUndefined);
 
         onChange(fields);
       }}

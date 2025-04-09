@@ -1,8 +1,9 @@
 import { Box, Fieldset, Loader, Select, Text } from "@mantine/core";
 import { useMemo, useState } from "react";
-import * as R from "remeda";
 import { AggregationType, LocalQueryClient } from "@/clients/LocalQueryClient";
 import * as LocalDataset from "@/models/LocalDataset";
+import { difference } from "@/utils/arrays";
+import { getProp, makeObjectFromKeys, objectKeys, omit } from "@/utils/objects";
 import { useLocalDatasets } from "../DataManagerApp/queries";
 import { DataGrid } from "../ui/DataGrid";
 import { FieldSelect } from "./FieldSelect";
@@ -30,10 +31,10 @@ export function DataExplorerApp(): JSX.Element {
   }, [allDatasets]);
 
   const selectedFieldNames = useMemo(() => {
-    return R.map(selectedFields, R.prop("name"));
+    return selectedFields.map(getProp("name"));
   }, [selectedFields]);
   const selectedGroupByFieldNames = useMemo(() => {
-    return R.map(selectedGroupByFields, R.prop("name"));
+    return selectedGroupByFields.map(getProp("name"));
   }, [selectedGroupByFields]);
 
   const { data, isLoading } = useDataQuery({
@@ -53,21 +54,22 @@ export function DataExplorerApp(): JSX.Element {
         onChange={(fields) => {
           setSelectedFields(fields);
           setAggregations((prevAggregations) => {
-            const incomingFieldNames = R.map(fields, R.prop("name"));
-            const prevFieldNames = R.keys(prevAggregations);
-            const droppedFieldNames = R.difference(
+            const incomingFieldNames = fields.map(getProp("name"));
+            const prevFieldNames = objectKeys(prevAggregations);
+            const droppedFieldNames = difference(
               prevFieldNames,
               incomingFieldNames,
             );
 
-            const newDefaultAggregations = R.fromKeys(
-              incomingFieldNames,
-              R.constant("none" as const),
-            );
-            return R.omit(
-              { ...newDefaultAggregations, ...prevAggregations },
-              droppedFieldNames,
-            );
+            const newDefaultAggregations = makeObjectFromKeys({
+              keys: incomingFieldNames,
+              defaultValue: "none" as const,
+            });
+
+            return omit({
+              inputObj: { ...newDefaultAggregations, ...prevAggregations },
+              keysToDelete: droppedFieldNames,
+            });
           });
         }}
       />

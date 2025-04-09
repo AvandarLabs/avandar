@@ -1,35 +1,34 @@
 import { useMemo } from "react";
-import * as R from "remeda";
+import { ObjectStringKey } from "@/types/common";
+import { objectKeys } from "@/utils/objects";
 import { camelToTitleCase } from "@/utils/strings";
 import { DescriptionList } from "../DescriptionList/DescriptionList";
 import { getEntityFieldRenderOptions } from "./helpers";
 import { EntityObject, EntityRenderOptions } from "./types";
 import { UnknownFieldValueItem } from "./UnknownFieldValueItem";
 
-type Props<T extends EntityObject, K extends keyof T = keyof T> = {
+type Props<T extends EntityObject> = {
   entity: T;
-} & EntityRenderOptions<T, K>;
+} & EntityRenderOptions<T>;
 
-export function EntityDescriptionList<
-  T extends EntityObject,
-  K extends keyof T = keyof T,
->({ entity, excludeKeys = [], ...renderOptions }: Props<T, K>): JSX.Element {
-  const excludeKeySet: ReadonlySet<K> = useMemo(() => {
+export function EntityDescriptionList<T extends EntityObject>({
+  entity,
+  excludeKeys = [],
+  ...renderOptions
+}: Props<T>): JSX.Element {
+  const excludeKeySet: ReadonlySet<ObjectStringKey<T>> = useMemo(() => {
     return new Set(excludeKeys);
   }, [excludeKeys]);
 
   return (
     <DescriptionList>
-      {(R.keys(entity) as K[]).map((key) => {
+      {objectKeys(entity).map((key) => {
         if (excludeKeySet.has(key)) {
           return null;
         }
 
         return (
-          <DescriptionList.Item
-            key={String(key)}
-            label={camelToTitleCase(String(key))}
-          >
+          <DescriptionList.Item key={key} label={camelToTitleCase(String(key))}>
             <UnknownFieldValueItem
               value={entity[key]}
               {...getEntityFieldRenderOptions(renderOptions, key)}

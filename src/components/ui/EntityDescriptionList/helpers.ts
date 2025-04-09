@@ -1,15 +1,13 @@
+import { ObjectStringKey } from "@/types/common";
 import {
   EntityObject,
   EntityRenderOptions,
   PrimitiveFieldValueRenderOptions,
 } from "./types";
 
-export function getEntityFieldRenderOptions<
-  T extends EntityObject,
-  K extends keyof T = keyof T,
->(
-  renderOptions: EntityRenderOptions<T, K>,
-  fieldKey: K,
+export function getEntityFieldRenderOptions<T extends EntityObject>(
+  renderOptions: EntityRenderOptions<T>,
+  fieldKey: ObjectStringKey<T>,
 ): PrimitiveFieldValueRenderOptions {
   const primitiveValueRenderOptions: PrimitiveFieldValueRenderOptions = {
     emptyString: renderOptions.emptyString,
