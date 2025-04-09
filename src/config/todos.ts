@@ -8,6 +8,7 @@ export const TODOS =
       {
         label: "Data Manager",
         items: [
+          "Use UUIDs for dataset ids to ensure global uniqueness",
           "Allow editing the field data type",
           "Allow full CRUD of datasets in Data Manager",
         ],
@@ -23,9 +24,9 @@ export const TODOS =
         ],
       },
       {
-        label: "Data Ontology",
+        label: "Entity Designer",
         items: [
-          "Create an ontology page",
+          "Create an entity designer page (ontology)",
           "Allow users to define their data models",
         ],
       },

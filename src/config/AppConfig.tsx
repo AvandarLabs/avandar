@@ -2,6 +2,7 @@ import {
   IconBlocks,
   IconDatabase,
   IconHome,
+  IconPencilPlus,
   IconTable,
   IconUpload,
   IconUser,
@@ -72,9 +73,9 @@ export const AppConfig = {
     },
     dataImport: {
       to: "/data-manager/data-import",
-      label: "Data Import",
+      label: "Import data",
       icon: <IconUpload size={24} stroke={1.5} />,
-      spotlightDescription: "Go to the data import app",
+      spotlightDescription: "Go to the data import page",
     },
     dataExplorer: {
       to: "/data-explorer",
@@ -87,6 +88,12 @@ export const AppConfig = {
       label: "Entity Designer",
       icon: <IconBlocks size={24} stroke={1.5} />,
       spotlightDescription: "Go to the entity designer app",
+    },
+    entityCreator: {
+      to: "/entity-designer/entity-creator",
+      label: "Create new entity",
+      icon: <IconPencilPlus size={24} stroke={1.5} />,
+      spotlightDescription: "Go to the entity creator page",
     },
   },
   navbarLinkOrder: [

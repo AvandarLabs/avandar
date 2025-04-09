@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "new-main-component": "./scripts/newMainComponent.sh",
+    "new-model": "./scripts/newModel.sh",
     "new-route": "./scripts/newRoute.sh",
     "new-script": "./scripts/newScript.sh",
     "tsc-watch": "tsc -b --watch",

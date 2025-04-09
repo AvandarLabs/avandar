@@ -5,8 +5,9 @@ import { UUID } from "@/lib/types/common";
 
 export type FieldDataType = "string" | "number" | "date" | "unknown";
 
+export type DatasetFieldId = UUID;
 export type DatasetField = {
-  id: UUID;
+  id: DatasetFieldId;
   name: string;
   dataType: FieldDataType;
   description?: string;
