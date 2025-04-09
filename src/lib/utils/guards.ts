@@ -1,4 +1,4 @@
-import { UnknownObject } from "@/types/common";
+import { UnknownObject } from "@/lib/types/common";
 
 /**
  * Inspired from Remeda's `isPlainObject`.

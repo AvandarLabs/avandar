@@ -1,13 +1,16 @@
 import { List, Table } from "@mantine/core";
 import { useMemo } from "react";
-import { ObjectStringKey } from "@/types/utilityTypes";
-import { objectKeys } from "@/utils/objects";
-import { camelToTitleCase } from "@/utils/strings";
-import { CollapsibleItem } from "../CollapsibleItem";
-import { EntityDescriptionList } from "../EntityDescriptionList";
-import { getEntityFieldRenderOptions } from "../helpers";
-import { EntityArrayRenderOptions, EntityObject } from "../types";
-import { UnknownFieldValueItem } from "../UnknownFieldValueItem";
+import { ObjectStringKey } from "@/lib/types/utilityTypes";
+import { CollapsibleItem } from "@/lib/ui/EntityDescriptionList/CollapsibleItem";
+import { EntityDescriptionList } from "@/lib/ui/EntityDescriptionList/EntityDescriptionList";
+import { getEntityFieldRenderOptions } from "@/lib/ui/EntityDescriptionList/helpers";
+import {
+  EntityArrayRenderOptions,
+  EntityObject,
+} from "@/lib/ui/EntityDescriptionList/types";
+import { UnknownFieldValueItem } from "@/lib/ui/EntityDescriptionList/UnknownFieldValueItem";
+import { objectKeys } from "@/lib/utils/objects";
+import { camelToTitleCase } from "@/lib/utils/strings";
 
 type Props<T extends EntityObject> = {
   values: readonly T[];

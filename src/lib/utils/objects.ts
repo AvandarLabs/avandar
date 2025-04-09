@@ -1,6 +1,6 @@
-import { UnknownObject } from "@/types/common";
-import { ObjectStringKey } from "@/types/utilityTypes";
-import { identity } from "@/utils/functions";
+import { UnknownObject } from "@/lib/types/common";
+import { ObjectStringKey } from "@/lib/types/utilityTypes";
+import { identity } from "@/lib/utils/functions";
 
 /**
  * Returns an array of entries from an object.

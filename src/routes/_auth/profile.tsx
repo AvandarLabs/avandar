@@ -3,8 +3,8 @@ import { notifications } from "@mantine/notifications";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { AuthClient } from "@/clients/AuthClient";
-import { InputTextField } from "@/components/ui/InputTextField";
-import { useToggleBoolean } from "@/hooks/useToggleBoolean";
+import { InputTextField } from "@/lib/ui/InputTextField";
+import { useToggleBoolean } from "@/lib/hooks/useToggleBoolean";
 
 export const Route = createFileRoute("/_auth/profile")({
   component: ProfilePage,

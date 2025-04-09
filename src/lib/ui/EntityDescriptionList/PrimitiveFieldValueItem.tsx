@@ -1,5 +1,5 @@
 import { Text } from "@mantine/core";
-import { isDate } from "@/utils/guards";
+import { isDate } from "@/lib/utils/guards";
 import type {
   PrimitiveFieldValue,
   PrimitiveFieldValueRenderOptions,

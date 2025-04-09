@@ -1,4 +1,4 @@
-import { ObjectStringKey } from "@/types/utilityTypes";
+import { ObjectStringKey } from "@/lib/types/utilityTypes";
 
 /** A non-recursive field value */
 export type PrimitiveFieldValue =

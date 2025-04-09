@@ -1,4 +1,4 @@
-import { isPlainObject } from "@/utils/guards";
+import { isPlainObject } from "@/lib/utils/guards";
 import { EntityObject, FieldValue, PrimitiveFieldValue } from "./types";
 
 export function isPrimitiveFieldValue(

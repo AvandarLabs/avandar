@@ -1,7 +1,7 @@
 import { useMemo } from "react";
-import { ObjectStringKey } from "@/types/utilityTypes";
-import { objectKeys } from "@/utils/objects";
-import { camelToTitleCase } from "@/utils/strings";
+import { ObjectStringKey } from "@/lib/types/utilityTypes";
+import { objectKeys } from "@/lib/utils/objects";
+import { camelToTitleCase } from "@/lib/utils/strings";
 import { DescriptionList } from "../DescriptionList/DescriptionList";
 import { getEntityFieldRenderOptions } from "./helpers";
 import { EntityObject, EntityRenderOptions } from "./types";
