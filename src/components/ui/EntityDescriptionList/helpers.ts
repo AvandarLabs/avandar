@@ -1,4 +1,4 @@
-import { ObjectStringKey } from "@/types/common";
+import { ObjectStringKey } from "@/types/utilityTypes";
 import {
   EntityObject,
   EntityRenderOptions,

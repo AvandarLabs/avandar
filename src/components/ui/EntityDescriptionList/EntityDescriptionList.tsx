@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { ObjectStringKey } from "@/types/common";
+import { ObjectStringKey } from "@/types/utilityTypes";
 import { objectKeys } from "@/utils/objects";
 import { camelToTitleCase } from "@/utils/strings";
 import { DescriptionList } from "../DescriptionList/DescriptionList";
