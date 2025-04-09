@@ -80,7 +80,7 @@ Libraries:
 # Data Fetching
 
 - Use Tanstack Query for frontend data fetching and mutations.
-- Use our local `useQuery` function instead of Tanstack's. Our local function is a wrapper around Tanstack's useQuery function.
+- Use our local `useQuery` function (from `src/hooks/api/useQuery`) instead of Tanstack's. Our local function is a wrapper around Tanstack's `useQuery` function.
 
 # Styling & UI
 
