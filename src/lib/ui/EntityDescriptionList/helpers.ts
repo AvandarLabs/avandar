@@ -1,9 +1,9 @@
-import { ObjectStringKey } from "@/types/utilityTypes";
+import { ObjectStringKey } from "@/lib/types/utilityTypes";
 import {
   EntityObject,
   EntityRenderOptions,
   PrimitiveFieldValueRenderOptions,
-} from "./types";
+} from "@/lib/ui/EntityDescriptionList/types";
 
 export function getEntityFieldRenderOptions<T extends EntityObject>(
   renderOptions: EntityRenderOptions<T>,

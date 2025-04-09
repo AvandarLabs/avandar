@@ -8,7 +8,7 @@ import {
   UseQueryResult as TanstackUseQueryResult,
 } from "@tanstack/react-query";
 import { Replace } from "@/lib/types/utilityTypes";
-import { Logger } from "@/utils/Logger";
+import { Logger } from "@/lib/utils/Logger";
 
 export type UseQueryResult<TData> = TanstackUseQueryResult<TData, Error>;
 export type UseQueryOptions<
