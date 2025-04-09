@@ -3,9 +3,10 @@
 Directories:
 
 - `src/components`: All React components
-- `src/components/ui`: All UI components
 - `src/routes`: All router pages
-- `src/utils`: Our utilities library
+- `src/lib`: Our local library of hooks, utilities, and UI components.
+- `src/config`: The application config and theme.
+- `src/clients`: Clients to interact with external services.
 
 Libraries:
 
@@ -14,7 +15,7 @@ Libraries:
 - UI library: Mantine v7
 - Router: Tanstack Router v1
 - Querying: Tanstack Query v5
-- Schema validation: Zod
+- Schema validation: Zod v3
 - Database and Auth: Supabase JS v2
 - Linter: ESLint v9
 - Formatter: Prettier v3
@@ -24,10 +25,12 @@ Libraries:
 # Library usage
 
 - Use the library versions referenced in this document. Do not use documentation or APIs from older versions.
-- Import `useQuery` from `@/hooks/api/useQuery`
-- Import `Link` components from `@/components/ui/links/`
-- Import utility functions from `@/utils/`.
-- When using Mantine's `useForm`, always set a `key={form.key('fieldId')}` prop to each form input component.
+- Use our local library `src/lib` whenever possible instead of external imports.
+- For example:
+  - Import `useQuery` from `@/lib/hooks/query/useQuery`.
+  - Import `Link` components from `@/lib/ui/links/`.
+  - Import utility functions from `@/lib/utils/`.
+- When using Mantine's `useForm`, always set a `key={form.key('fieldId')}` prop to each input component.
 
 # General Code Style & Formatting
 
@@ -80,7 +83,7 @@ Libraries:
 # Data Fetching
 
 - Use Tanstack Query for frontend data fetching and mutations.
-- Use our local `useQuery` function (from `src/hooks/api/useQuery`) instead of Tanstack's. Our local function is a wrapper around Tanstack's `useQuery` function.
+- Use our local `useQuery` function (from `@/lib/hooks/query/useQuery`) instead of Tanstack's. Our local function is a wrapper around Tanstack's `useQuery` function.
 
 # Styling & UI
 
