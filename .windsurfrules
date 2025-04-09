@@ -27,6 +27,7 @@ Libraries:
 - Import `useQuery` from `@/hooks/api/useQuery`
 - Import `Link` components from `@/components/ui/links/`
 - Import utility functions from `@/utils/`.
+- When using Mantine's `useForm`, always set a `key={form.key('fieldId')}` prop to each form input component.
 
 # General Code Style & Formatting
 
@@ -78,7 +79,8 @@ Libraries:
 
 # Data Fetching
 
-- Use Tanstack Query for frontend data fetching and mutations
+- Use Tanstack Query for frontend data fetching and mutations.
+- Use our local `useQuery` function instead of Tanstack's. Our local function is a wrapper around Tanstack's useQuery function.
 
 # Styling & UI
 
