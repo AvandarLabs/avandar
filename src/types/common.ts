@@ -1,4 +1,5 @@
 export type UUID = string & { __brand: "UUID" };
+export type UnknownObject = Record<string, unknown>;
 export type CSVCellValue = string | undefined;
 export type CSVRow = Record<string, CSVCellValue>;
 export type CSVData = CSVRow[];

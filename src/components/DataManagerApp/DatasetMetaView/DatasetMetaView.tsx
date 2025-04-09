@@ -3,10 +3,8 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
-import {
-  EntityDescriptionList,
-  EntityRenderOptionsMap,
-} from "@/components/ui/EntityDescriptionList/EntityDescriptionList";
+import { EntityDescriptionList } from "@/components/ui/EntityDescriptionList/EntityDescriptionList";
+import { FieldRenderOptionsMap } from "@/components/ui/EntityDescriptionList/types";
 import { AppConfig } from "@/config/AppConfig";
 import * as LocalDataset from "@/models/LocalDataset";
 import { DataGrid } from "../../ui/DataGrid";
@@ -18,11 +16,11 @@ type Props = {
 };
 
 const EXCLUDED_DATASET_KEYS = ["id", "name", "data", "description"] as const;
-const DATASET_RENDER_OPTIONS: EntityRenderOptionsMap<LocalDataset.T> = {
+const DATASET_RENDER_OPTIONS: FieldRenderOptionsMap<LocalDataset.T> = {
   fields: {
     renderAsTable: true,
-    excludeKeys: ["id"],
     titleKey: "name",
+    excludeKeys: ["id"],
   },
 };
 
@@ -50,7 +48,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
         <EntityDescriptionList
           entity={dataset}
           excludeKeys={EXCLUDED_DATASET_KEYS}
-          renderOptionsByKey={DATASET_RENDER_OPTIONS}
+          entityFieldOptions={DATASET_RENDER_OPTIONS}
         />
 
         <Title order={5}>Data preview</Title>

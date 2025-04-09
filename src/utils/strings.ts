@@ -7,3 +7,9 @@ export function stringComparator(a: string, b: string): number {
 export function sortStrings(strings: readonly string[]): string[] {
   return R.sort(strings, stringComparator);
 }
+
+export function camelToTitleCase(str: string): string {
+  return str
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/([A-Z])([A-Z][a-z])/g, "$1 $2");
+}
