@@ -18,10 +18,12 @@ import { Route as ForgotPasswordImport } from "./routes/forgot-password";
 import { Route as AuthRouteImport } from "./routes/_auth/route";
 import { Route as AuthIndexImport } from "./routes/_auth/index";
 import { Route as AuthProfileImport } from "./routes/_auth/profile";
-import { Route as AuthEntityDesignerImport } from "./routes/_auth/entity-designer";
 import { Route as AuthDataExplorerImport } from "./routes/_auth/data-explorer";
+import { Route as AuthEntityDesignerRouteImport } from "./routes/_auth/entity-designer/route";
 import { Route as AuthDataManagerRouteImport } from "./routes/_auth/data-manager/route";
+import { Route as AuthEntityDesignerIndexImport } from "./routes/_auth/entity-designer/index";
 import { Route as AuthDataManagerIndexImport } from "./routes/_auth/data-manager/index";
+import { Route as AuthEntityDesignerEntityCreatorImport } from "./routes/_auth/entity-designer/entity-creator";
 import { Route as AuthDataManagerDataImportImport } from "./routes/_auth/data-manager/data-import";
 import { Route as AuthDataManagerDatasetIdImport } from "./routes/_auth/data-manager/$datasetId";
 
@@ -68,15 +70,15 @@ const AuthProfileRoute = AuthProfileImport.update({
   getParentRoute: () => AuthRouteRoute,
 } as any);
 
-const AuthEntityDesignerRoute = AuthEntityDesignerImport.update({
-  id: "/entity-designer",
-  path: "/entity-designer",
-  getParentRoute: () => AuthRouteRoute,
-} as any);
-
 const AuthDataExplorerRoute = AuthDataExplorerImport.update({
   id: "/data-explorer",
   path: "/data-explorer",
+  getParentRoute: () => AuthRouteRoute,
+} as any);
+
+const AuthEntityDesignerRouteRoute = AuthEntityDesignerRouteImport.update({
+  id: "/entity-designer",
+  path: "/entity-designer",
   getParentRoute: () => AuthRouteRoute,
 } as any);
 
@@ -86,11 +88,24 @@ const AuthDataManagerRouteRoute = AuthDataManagerRouteImport.update({
   getParentRoute: () => AuthRouteRoute,
 } as any);
 
+const AuthEntityDesignerIndexRoute = AuthEntityDesignerIndexImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => AuthEntityDesignerRouteRoute,
+} as any);
+
 const AuthDataManagerIndexRoute = AuthDataManagerIndexImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => AuthDataManagerRouteRoute,
 } as any);
+
+const AuthEntityDesignerEntityCreatorRoute =
+  AuthEntityDesignerEntityCreatorImport.update({
+    id: "/entity-creator",
+    path: "/entity-creator",
+    getParentRoute: () => AuthEntityDesignerRouteRoute,
+  } as any);
 
 const AuthDataManagerDataImportRoute = AuthDataManagerDataImportImport.update({
   id: "/data-import",
@@ -150,18 +165,18 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthDataManagerRouteImport;
       parentRoute: typeof AuthRouteImport;
     };
+    "/_auth/entity-designer": {
+      id: "/_auth/entity-designer";
+      path: "/entity-designer";
+      fullPath: "/entity-designer";
+      preLoaderRoute: typeof AuthEntityDesignerRouteImport;
+      parentRoute: typeof AuthRouteImport;
+    };
     "/_auth/data-explorer": {
       id: "/_auth/data-explorer";
       path: "/data-explorer";
       fullPath: "/data-explorer";
       preLoaderRoute: typeof AuthDataExplorerImport;
-      parentRoute: typeof AuthRouteImport;
-    };
-    "/_auth/entity-designer": {
-      id: "/_auth/entity-designer";
-      path: "/entity-designer";
-      fullPath: "/entity-designer";
-      preLoaderRoute: typeof AuthEntityDesignerImport;
       parentRoute: typeof AuthRouteImport;
     };
     "/_auth/profile": {
@@ -192,12 +207,26 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthDataManagerDataImportImport;
       parentRoute: typeof AuthDataManagerRouteImport;
     };
+    "/_auth/entity-designer/entity-creator": {
+      id: "/_auth/entity-designer/entity-creator";
+      path: "/entity-creator";
+      fullPath: "/entity-designer/entity-creator";
+      preLoaderRoute: typeof AuthEntityDesignerEntityCreatorImport;
+      parentRoute: typeof AuthEntityDesignerRouteImport;
+    };
     "/_auth/data-manager/": {
       id: "/_auth/data-manager/";
       path: "/";
       fullPath: "/data-manager/";
       preLoaderRoute: typeof AuthDataManagerIndexImport;
       parentRoute: typeof AuthDataManagerRouteImport;
+    };
+    "/_auth/entity-designer/": {
+      id: "/_auth/entity-designer/";
+      path: "/";
+      fullPath: "/entity-designer/";
+      preLoaderRoute: typeof AuthEntityDesignerIndexImport;
+      parentRoute: typeof AuthEntityDesignerRouteImport;
     };
   }
 }
@@ -219,18 +248,34 @@ const AuthDataManagerRouteRouteChildren: AuthDataManagerRouteRouteChildren = {
 const AuthDataManagerRouteRouteWithChildren =
   AuthDataManagerRouteRoute._addFileChildren(AuthDataManagerRouteRouteChildren);
 
+interface AuthEntityDesignerRouteRouteChildren {
+  AuthEntityDesignerEntityCreatorRoute: typeof AuthEntityDesignerEntityCreatorRoute;
+  AuthEntityDesignerIndexRoute: typeof AuthEntityDesignerIndexRoute;
+}
+
+const AuthEntityDesignerRouteRouteChildren: AuthEntityDesignerRouteRouteChildren =
+  {
+    AuthEntityDesignerEntityCreatorRoute: AuthEntityDesignerEntityCreatorRoute,
+    AuthEntityDesignerIndexRoute: AuthEntityDesignerIndexRoute,
+  };
+
+const AuthEntityDesignerRouteRouteWithChildren =
+  AuthEntityDesignerRouteRoute._addFileChildren(
+    AuthEntityDesignerRouteRouteChildren,
+  );
+
 interface AuthRouteRouteChildren {
   AuthDataManagerRouteRoute: typeof AuthDataManagerRouteRouteWithChildren;
+  AuthEntityDesignerRouteRoute: typeof AuthEntityDesignerRouteRouteWithChildren;
   AuthDataExplorerRoute: typeof AuthDataExplorerRoute;
-  AuthEntityDesignerRoute: typeof AuthEntityDesignerRoute;
   AuthProfileRoute: typeof AuthProfileRoute;
   AuthIndexRoute: typeof AuthIndexRoute;
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
   AuthDataManagerRouteRoute: AuthDataManagerRouteRouteWithChildren,
+  AuthEntityDesignerRouteRoute: AuthEntityDesignerRouteRouteWithChildren,
   AuthDataExplorerRoute: AuthDataExplorerRoute,
-  AuthEntityDesignerRoute: AuthEntityDesignerRoute,
   AuthProfileRoute: AuthProfileRoute,
   AuthIndexRoute: AuthIndexRoute,
 };
@@ -246,13 +291,15 @@ export interface FileRoutesByFullPath {
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
   "/data-manager": typeof AuthDataManagerRouteRouteWithChildren;
+  "/entity-designer": typeof AuthEntityDesignerRouteRouteWithChildren;
   "/data-explorer": typeof AuthDataExplorerRoute;
-  "/entity-designer": typeof AuthEntityDesignerRoute;
   "/profile": typeof AuthProfileRoute;
   "/": typeof AuthIndexRoute;
   "/data-manager/$datasetId": typeof AuthDataManagerDatasetIdRoute;
   "/data-manager/data-import": typeof AuthDataManagerDataImportRoute;
+  "/entity-designer/entity-creator": typeof AuthEntityDesignerEntityCreatorRoute;
   "/data-manager/": typeof AuthDataManagerIndexRoute;
+  "/entity-designer/": typeof AuthEntityDesignerIndexRoute;
 }
 
 export interface FileRoutesByTo {
@@ -261,12 +308,13 @@ export interface FileRoutesByTo {
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
   "/data-explorer": typeof AuthDataExplorerRoute;
-  "/entity-designer": typeof AuthEntityDesignerRoute;
   "/profile": typeof AuthProfileRoute;
   "/": typeof AuthIndexRoute;
   "/data-manager/$datasetId": typeof AuthDataManagerDatasetIdRoute;
   "/data-manager/data-import": typeof AuthDataManagerDataImportRoute;
+  "/entity-designer/entity-creator": typeof AuthEntityDesignerEntityCreatorRoute;
   "/data-manager": typeof AuthDataManagerIndexRoute;
+  "/entity-designer": typeof AuthEntityDesignerIndexRoute;
 }
 
 export interface FileRoutesById {
@@ -277,13 +325,15 @@ export interface FileRoutesById {
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
   "/_auth/data-manager": typeof AuthDataManagerRouteRouteWithChildren;
+  "/_auth/entity-designer": typeof AuthEntityDesignerRouteRouteWithChildren;
   "/_auth/data-explorer": typeof AuthDataExplorerRoute;
-  "/_auth/entity-designer": typeof AuthEntityDesignerRoute;
   "/_auth/profile": typeof AuthProfileRoute;
   "/_auth/": typeof AuthIndexRoute;
   "/_auth/data-manager/$datasetId": typeof AuthDataManagerDatasetIdRoute;
   "/_auth/data-manager/data-import": typeof AuthDataManagerDataImportRoute;
+  "/_auth/entity-designer/entity-creator": typeof AuthEntityDesignerEntityCreatorRoute;
   "/_auth/data-manager/": typeof AuthDataManagerIndexRoute;
+  "/_auth/entity-designer/": typeof AuthEntityDesignerIndexRoute;
 }
 
 export interface FileRouteTypes {
@@ -295,13 +345,15 @@ export interface FileRouteTypes {
     | "/signin"
     | "/update-password"
     | "/data-manager"
-    | "/data-explorer"
     | "/entity-designer"
+    | "/data-explorer"
     | "/profile"
     | "/"
     | "/data-manager/$datasetId"
     | "/data-manager/data-import"
-    | "/data-manager/";
+    | "/entity-designer/entity-creator"
+    | "/data-manager/"
+    | "/entity-designer/";
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/forgot-password"
@@ -309,12 +361,13 @@ export interface FileRouteTypes {
     | "/signin"
     | "/update-password"
     | "/data-explorer"
-    | "/entity-designer"
     | "/profile"
     | "/"
     | "/data-manager/$datasetId"
     | "/data-manager/data-import"
-    | "/data-manager";
+    | "/entity-designer/entity-creator"
+    | "/data-manager"
+    | "/entity-designer";
   id:
     | "__root__"
     | "/_auth"
@@ -323,13 +376,15 @@ export interface FileRouteTypes {
     | "/signin"
     | "/update-password"
     | "/_auth/data-manager"
-    | "/_auth/data-explorer"
     | "/_auth/entity-designer"
+    | "/_auth/data-explorer"
     | "/_auth/profile"
     | "/_auth/"
     | "/_auth/data-manager/$datasetId"
     | "/_auth/data-manager/data-import"
-    | "/_auth/data-manager/";
+    | "/_auth/entity-designer/entity-creator"
+    | "/_auth/data-manager/"
+    | "/_auth/entity-designer/";
   fileRoutesById: FileRoutesById;
 }
 
@@ -370,8 +425,8 @@ export const routeTree = rootRoute
       "filePath": "_auth/route.tsx",
       "children": [
         "/_auth/data-manager",
-        "/_auth/data-explorer",
         "/_auth/entity-designer",
+        "/_auth/data-explorer",
         "/_auth/profile",
         "/_auth/"
       ]
@@ -397,12 +452,16 @@ export const routeTree = rootRoute
         "/_auth/data-manager/"
       ]
     },
+    "/_auth/entity-designer": {
+      "filePath": "_auth/entity-designer/route.tsx",
+      "parent": "/_auth",
+      "children": [
+        "/_auth/entity-designer/entity-creator",
+        "/_auth/entity-designer/"
+      ]
+    },
     "/_auth/data-explorer": {
       "filePath": "_auth/data-explorer.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/entity-designer": {
-      "filePath": "_auth/entity-designer.tsx",
       "parent": "/_auth"
     },
     "/_auth/profile": {
@@ -421,9 +480,17 @@ export const routeTree = rootRoute
       "filePath": "_auth/data-manager/data-import.tsx",
       "parent": "/_auth/data-manager"
     },
+    "/_auth/entity-designer/entity-creator": {
+      "filePath": "_auth/entity-designer/entity-creator.tsx",
+      "parent": "/_auth/entity-designer"
+    },
     "/_auth/data-manager/": {
       "filePath": "_auth/data-manager/index.tsx",
       "parent": "/_auth/data-manager"
+    },
+    "/_auth/entity-designer/": {
+      "filePath": "_auth/entity-designer/index.tsx",
+      "parent": "/_auth/entity-designer"
     }
   }
 }

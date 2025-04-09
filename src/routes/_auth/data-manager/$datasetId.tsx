@@ -1,5 +1,4 @@
-import { Center, Text } from "@mantine/core";
-import { IconAlertCircle } from "@tabler/icons-react";
+import { Center } from "@mantine/core";
 import {
   createFileRoute,
   ErrorComponentProps,
@@ -37,16 +36,9 @@ function DatasetMetaErrorView({ error }: ErrorComponentProps) {
   return (
     <Center h="50%">
       <Callout
-        variant="light"
-        color="danger"
         title="Dataset failed to load"
-        icon={<IconAlertCircle />}
-      >
-        <Text>
-          The dataset failed to load. Please try again later or reach out to
-          support.
-        </Text>
-      </Callout>
+        message="The dataset failed to load. Please try again later or reach out to support."
+      />
     </Center>
   );
 }

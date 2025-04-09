@@ -1,4 +1,4 @@
-import { Center, Text } from "@mantine/core";
+import { Center } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 import { Callout } from "@/lib/ui/Callout";
 
@@ -12,11 +12,11 @@ export const Route = createFileRoute("/_auth/data-manager/")({
 function DataManagerRoot() {
   return (
     <Center h="50%">
-      <Callout title="No dataset selected" color="info">
-        <Text>
-          Please select a dataset from the left sidebar, or create a new one.
-        </Text>
-      </Callout>
+      <Callout
+        title="No dataset selected"
+        color="info"
+        message="Please select a dataset from the left sidebar, or create a new one."
+      />
     </Center>
   );
 }
