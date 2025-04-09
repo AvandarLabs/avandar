@@ -1,5 +1,5 @@
-import { UnknownObject } from "@/types/common";
-import { ObjectStringKey } from "@/types/utilityTypes";
+import { UnknownObject } from "@/lib/types/common";
+import { ObjectStringKey } from "@/lib/types/utilityTypes";
 import { identity } from "@/utils/functions";
 
 /**

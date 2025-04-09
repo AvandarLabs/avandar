@@ -3,7 +3,7 @@ import { Notifications } from "@mantine/notifications";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import { cssVariablesResolver, Theme } from "@/config/Theme";
-import { RootRouteContext } from "@/types/RootRouteContext";
+import { RootRouteContext } from "@/lib/types/RootRouteContext";
 
 const queryClient = new QueryClient();
 

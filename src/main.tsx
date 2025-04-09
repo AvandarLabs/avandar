@@ -4,9 +4,9 @@ import "./index.css";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode, useMemo } from "react";
 import { createRoot } from "react-dom/client";
-import { useAuth } from "./hooks/auth/useAuth";
+import { useAuth } from "./lib/hooks/auth/useAuth";
+import { RootRouteContext } from "./lib/types/RootRouteContext";
 import { routeTree } from "./routeTree.gen";
-import { RootRouteContext } from "./types/RootRouteContext";
 
 // TODO: add defaultPrelod: intent? add scrollRestoration: true?
 const router = createRouter({

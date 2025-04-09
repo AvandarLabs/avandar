@@ -14,9 +14,9 @@ import { useMutation } from "@tanstack/react-query";
 import { Outlet, useRouter } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { AuthClient } from "@/clients/AuthClient";
-import { Link } from "@/components/ui/links/Link";
+import { Link } from "@/lib/ui/links/Link";
 import { AppConfig } from "@/config/AppConfig";
-import { useIsMobileSize } from "@/hooks/useIsMobileSize";
+import { useIsMobileSize } from "@/lib/hooks/useIsMobileSize";
 import css from "./AppScaffold.module.css";
 
 const HEADER_DEFAULT_HEIGHT = 60;
