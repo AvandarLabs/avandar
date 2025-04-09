@@ -11,7 +11,7 @@ export function DataManagerApp(): JSX.Element {
       {allDatasets ?
         <DatasetNavbar
           miw={240}
-          h="100dvh"
+          mih="100dvh"
           isLoading={isLoadingDatasets}
           datasets={allDatasets}
           style={$datasetNavbarBorder}
