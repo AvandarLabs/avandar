@@ -1,8 +1,8 @@
 import { Box, BoxProps, MantineColor, Text } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
 import clsx from "clsx";
-import * as R from "remeda";
 import { NavLink } from "@/components/ui/links/NavLink";
+import { objectEntries } from "@/utils/objects";
 import type { NavLinkProps } from "@/components/ui/links/NavLink";
 
 type Props = {
@@ -25,7 +25,7 @@ function generateLinkKey(linkProps: NavLinkProps): string {
   if (linkProps.params && typeof linkProps.params === "object") {
     // Using `any` here but it's safe.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const paramKeyVals = R.entries(linkProps.params as any).map(
+    const paramKeyVals = objectEntries(linkProps.params as any).map(
       ([key, val]) => {
         return `${key}=${String(val)}`;
       },

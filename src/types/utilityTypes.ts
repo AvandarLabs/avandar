@@ -16,3 +16,9 @@
  */
 export type Replace<Obj, NewTypesObj> = Omit<Obj, keyof NewTypesObj> &
   NewTypesObj;
+
+/**
+ * Extract the keys of an object, but exclude the `symbol` and `number` types
+ * that `keyof` on its own would return.
+ */
+export type ObjectStringKey<T> = Exclude<keyof T, symbol | number>;
