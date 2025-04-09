@@ -1,4 +1,5 @@
 import {
+  IconBlocks,
   IconDatabase,
   IconHome,
   IconTable,
@@ -84,7 +85,7 @@ export const AppConfig = {
     entityDesigner: {
       to: "/entity-designer",
       label: "Entity Designer",
-      icon: <IconTable size={24} stroke={1.5} />,
+      icon: <IconBlocks size={24} stroke={1.5} />,
       spotlightDescription: "Go to the entity designer app",
     },
   },
