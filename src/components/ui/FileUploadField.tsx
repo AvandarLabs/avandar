@@ -48,6 +48,14 @@ type FileUploadForm = {
   file: File | null;
 };
 
+/**
+ * A file upload field wrapped in a form with validation and a button
+ * to submit the file. This is useful for situations where you only
+ * need a single file upload field.
+ *
+ * If you're using multiple file upload fields, use Mantine's `useForm` hook
+ * instead of multiple FileUploadField components.
+ */
 export function FileUploadField({
   clearable = true,
   label,
