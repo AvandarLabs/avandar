@@ -1,8 +1,9 @@
-import { Box, Fieldset, Loader, Select, Text } from "@mantine/core";
+import { Box, Fieldset, Select, Stack, Text } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { AggregationType, LocalQueryClient } from "@/clients/LocalQueryClient";
 import { useSet } from "@/lib/hooks/useSet";
 import { DataGrid } from "@/lib/ui/DataGrid";
+import { LoadingOverlay } from "@/lib/ui/LoadingOverlay";
 import { difference } from "@/lib/utils/arrays";
 import {
   getProp,
@@ -15,6 +16,10 @@ import { DatasetId, LocalDataset } from "@/models/LocalDataset";
 import { useLocalDatasets } from "../DataManagerApp/queries";
 import { FieldSelect } from "./FieldSelect";
 import { useDataQuery } from "./useDataQuery";
+
+const HIDE_WHERE = true;
+const HIDE_ORDER_BY = true;
+const HIDE_LIMIT = true;
 
 export function DataExplorerApp(): JSX.Element {
   const [allDatasets, isLoadingDatasets] = useLocalDatasets();
@@ -45,7 +50,7 @@ export function DataExplorerApp(): JSX.Element {
     return selectedGroupByFields.map(getProp("name"));
   }, [selectedGroupByFields]);
 
-  const { data: queryResults, isLoading } = useDataQuery({
+  const { data: queryResults, isLoading: isLoadingResults } = useDataQuery({
     enabled: !!selectedDatasetId && loadedDatasets.has(selectedDatasetId),
     aggregations,
     datasetId: selectedDatasetId,
@@ -54,7 +59,7 @@ export function DataExplorerApp(): JSX.Element {
   });
 
   return (
-    <Box px="md" py="lg">
+    <Stack px="md" py="lg">
       <FieldSelect
         label="Select fields"
         placeholder="Select fields"
@@ -81,37 +86,39 @@ export function DataExplorerApp(): JSX.Element {
         }}
       />
 
-      <Fieldset legend="Aggregations">
-        {selectedFields.map((field) => {
-          return (
-            <Select
-              key={field.id}
-              label={field.name}
-              placeholder="Select aggregation"
-              defaultValue="none"
-              data={[
-                { value: "none", label: "None" },
-                { value: "sum", label: "Sum" },
-                { value: "avg", label: "Average" },
-                { value: "count", label: "Count" },
-                { value: "max", label: "Max" },
-                { value: "min", label: "Min" },
-              ]}
-              onChange={(value: string | null) => {
-                if (value === null) {
-                  return;
-                }
-                setAggregations((prevAggregations) => {
-                  return {
-                    ...prevAggregations,
-                    [field.name]: value as AggregationType,
-                  };
-                });
-              }}
-            />
-          );
-        })}
-      </Fieldset>
+      {selectedFields.length > 0 ?
+        <Fieldset legend="Aggregations">
+          {selectedFields.map((field) => {
+            return (
+              <Select
+                key={field.id}
+                label={field.name}
+                placeholder="Select aggregation"
+                defaultValue="none"
+                data={[
+                  { value: "none", label: "None" },
+                  { value: "sum", label: "Sum" },
+                  { value: "avg", label: "Average" },
+                  { value: "count", label: "Count" },
+                  { value: "max", label: "Max" },
+                  { value: "min", label: "Min" },
+                ]}
+                onChange={(value: string | null) => {
+                  if (value === null) {
+                    return;
+                  }
+                  setAggregations((prevAggregations) => {
+                    return {
+                      ...prevAggregations,
+                      [field.name]: value as AggregationType,
+                    };
+                  });
+                }}
+              />
+            );
+          })}
+        </Fieldset>
+      : null}
 
       <Select
         allowDeselect={false}
@@ -136,22 +143,22 @@ export function DataExplorerApp(): JSX.Element {
         }}
       />
 
-      <Text>Where (react-awesome-query-builder)</Text>
+      {HIDE_WHERE ? null : <Text>Where (react-awesome-query-builder)</Text>}
       <FieldSelect
         label="Group by"
         placeholder="Group by"
         onChange={setSelectedGroupByFields}
       />
-      <Text>Order by (fields dropdown)</Text>
-      <Text>Limit (number)</Text>
+      {HIDE_ORDER_BY ? null : <Text>Order by (fields dropdown)</Text>}
+      {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
 
-      {isLoading ?
-        <Loader />
-      : null}
-      <DataGrid
-        fields={queryResults?.fields.map(getProp("name")) ?? []}
-        data={queryResults?.data ?? []}
-      />
-    </Box>
+      <Box pos="relative">
+        <LoadingOverlay visible={isLoadingResults} overlayProps={{ blur: 1 }} />
+        <DataGrid
+          fields={queryResults?.fields.map(getProp("name")) ?? []}
+          data={queryResults?.data ?? []}
+        />
+      </Box>
+    </Stack>
   );
 }
