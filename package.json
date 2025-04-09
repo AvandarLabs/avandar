@@ -9,8 +9,9 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "update-boilerplate": "./scripts/mergeUpstreamAppTemplateChanges.sh",
-    "tsc-watch": "tsc -b --watch"
+    "new-route": "./scripts/newRoute.sh",
+    "tsc-watch": "tsc -b --watch",
+    "update-boilerplate": "./scripts/mergeUpstreamAppTemplateChanges.sh"
   },
   "dependencies": {
     "@mantine/core": "^7.17.2",
