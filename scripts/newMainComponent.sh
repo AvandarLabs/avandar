@@ -25,7 +25,7 @@ cat > "$FULL_PATH" << EOL
 import { Text } from "@mantine/core";
 
 export function $1(): JSX.Element {
-  return <Text>Hello</Text>;
+  return <Text>Hello $1</Text>;
 }
 EOL
 
