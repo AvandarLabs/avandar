@@ -1,4 +1,8 @@
-import { LocalQueryClient, LocalQueryConfig } from "@/clients/LocalQueryClient";
+import {
+  LocalQueryClient,
+  LocalQueryConfig,
+  LocalQueryResultData,
+} from "@/clients/LocalQueryClient";
 import { useQuery, UseQueryResult } from "@/lib/hooks/query/useQuery";
 import { objectEntries } from "@/lib/utils/objects";
 import { sortStrings } from "@/lib/utils/strings";
@@ -8,7 +12,7 @@ export function useDataQuery({
   aggregations,
   selectFieldNames,
   groupByFieldNames,
-}: Partial<LocalQueryConfig>): UseQueryResult<Array<Record<string, unknown>>> {
+}: Partial<LocalQueryConfig>): UseQueryResult<LocalQueryResultData> {
   const sortedFieldNames = sortStrings(selectFieldNames ?? []);
   const sortedGroupByNames = sortStrings(groupByFieldNames ?? []);
   const sortedAggregations = sortStrings(
@@ -29,6 +33,7 @@ export function useDataQuery({
       "groupBy",
       ...sortedGroupByNames,
     ],
+
     queryFn: () => {
       if (
         aggregations &&
@@ -42,7 +47,7 @@ export function useDataQuery({
           groupByFieldNames: sortedGroupByNames,
         });
       }
-      return [];
+      return { fields: [], data: [] };
     },
   });
 }

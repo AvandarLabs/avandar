@@ -30,6 +30,11 @@ export type LocalQueryConfig = {
   aggregations: Record<string, AggregationType>;
 };
 
+export type LocalQueryResultData = {
+  fields: Array<arrow.Field<arrow.DataType>>;
+  data: Array<Record<string, unknown>>;
+};
+
 const sql = knex({
   client: "sqlite3",
   wrapIdentifier: (value: string) => {
@@ -148,7 +153,7 @@ class LocalQueryClientImpl {
     groupByFieldNames,
     aggregations,
     datasetId,
-  }: LocalQueryConfig): Promise<Array<Record<string, unknown>>> {
+  }: LocalQueryConfig): Promise<LocalQueryResultData> {
     const tableName = datasetIdToTableName(datasetId);
 
     return this.#withConnection(async ({ conn }) => {
@@ -199,9 +204,11 @@ class LocalQueryClientImpl {
           query.toString(),
         );
 
-        return results.toArray().map((row) => {
+        const jsDataRows = results.toArray().map((row) => {
           return row.toJSON();
         });
+
+        return { fields: results.schema.fields, data: jsDataRows };
       } catch (error) {
         Logger.error(error, { query: query.toString() });
         throw error;

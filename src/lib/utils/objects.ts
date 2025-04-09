@@ -107,7 +107,7 @@ export function makeObjectFromEntries<K extends string | number, V>(
  * @param key The key of the property to get.
  * @returns A function that returns the value of the property.
  */
-export function getProp<T extends UnknownObject, K extends ObjectStringKey<T>>(
+export function getProp<T extends object, K extends ObjectStringKey<T>>(
   key: K,
 ): (obj: T) => T[K] {
   return (obj: T) => {

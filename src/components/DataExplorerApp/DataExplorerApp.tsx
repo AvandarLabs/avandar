@@ -1,7 +1,6 @@
 import { Box, Fieldset, Loader, Select, Text } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { AggregationType, LocalQueryClient } from "@/clients/LocalQueryClient";
-import { Logger } from "@/lib/Logger";
 import { DataGrid } from "@/lib/ui/DataGrid";
 import { difference } from "@/lib/utils/arrays";
 import {
@@ -44,14 +43,12 @@ export function DataExplorerApp(): JSX.Element {
     return selectedGroupByFields.map(getProp("name"));
   }, [selectedGroupByFields]);
 
-  const { data, isLoading } = useDataQuery({
+  const { data: queryResults, isLoading } = useDataQuery({
     aggregations,
     datasetId: selectedDatasetId,
     selectFieldNames: selectedFieldNames,
     groupByFieldNames: selectedGroupByFieldNames,
   });
-
-  Logger.debug("Returned data", data);
 
   return (
     <Box px="md" py="lg">
@@ -144,7 +141,10 @@ export function DataExplorerApp(): JSX.Element {
       {isLoading ?
         <Loader />
       : null}
-      <DataGrid fields={selectedFieldNames} data={data ?? []} />
+      <DataGrid
+        fields={queryResults?.fields.map(getProp("name")) ?? []}
+        data={queryResults?.data ?? []}
+      />
     </Box>
   );
 }
