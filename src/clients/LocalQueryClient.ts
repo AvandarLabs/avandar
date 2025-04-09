@@ -12,9 +12,10 @@ import {
   makeObjectFromList,
   objectEntries,
 } from "@/lib/utils/objects";
-import { type DatasetField } from "@/models/DatasetField";
+import { getArrowDataType } from "@/models/DatasetField";
 import { type LocalDataset } from "@/models/LocalDataset";
 import { LocalDatasetClient } from "./LocalDatasetClient";
+import type { DatasetField } from "@/models/DatasetField";
 
 export type AggregationType = "sum" | "avg" | "count" | "max" | "min" | "none";
 export type LocalQueryConfig = {
@@ -123,9 +124,7 @@ class LocalQueryClientImpl {
       const arrowColumns = fields.map((fieldSchema: DatasetField) => {
         return {
           name: fieldSchema.name,
-          // TODO(pablo): this should be coming from the fieldSchema's
-          // `dataType`
-          dataType: new arrow.Utf8(),
+          dataType: getArrowDataType(fieldSchema.dataType),
         };
       });
 

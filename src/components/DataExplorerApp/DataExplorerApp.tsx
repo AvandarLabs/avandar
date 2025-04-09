@@ -1,6 +1,7 @@
 import { Box, Fieldset, Loader, Select, Text } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { AggregationType, LocalQueryClient } from "@/clients/LocalQueryClient";
+import { Logger } from "@/lib/Logger";
 import { DataGrid } from "@/lib/ui/DataGrid";
 import { difference } from "@/lib/utils/arrays";
 import {
@@ -50,7 +51,7 @@ export function DataExplorerApp(): JSX.Element {
     groupByFieldNames: selectedGroupByFieldNames,
   });
 
-  console.log("Returned data", data);
+  Logger.debug("Returned data", data);
 
   return (
     <Box px="md" py="lg">
