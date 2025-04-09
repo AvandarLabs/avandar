@@ -16,6 +16,7 @@ export const TODOS =
       {
         label: "Data Explorer",
         items: [
+          "Move all state management to a reducer to handle all the bi-directional interactivity between selectors",
           "Account for field data type in the allowable aggregations",
           "Display empty string as an italicized [empty value]",
           "Show a bar graph visualization",
