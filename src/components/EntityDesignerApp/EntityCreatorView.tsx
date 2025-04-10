@@ -1,29 +1,51 @@
 import {
   ActionIcon,
   Button,
+  ComboboxItem,
   Container,
   Fieldset,
   Group,
+  Select,
   Stack,
   Text,
   TextInput,
 } from "@mantine/core";
 import { formRootRule, isNotEmpty, useForm } from "@mantine/form";
 import { IconTrash } from "@tabler/icons-react";
+import { useState } from "react";
 import { Logger } from "@/lib/Logger";
+import { areArrayContentsEqual } from "@/lib/utils/arrays";
 import { getProp } from "@/lib/utils/objects";
+import { makeSelectOptions } from "@/lib/utils/ui/selectHelpers";
 import { uuid } from "@/lib/utils/uuid";
 import { EntityConfig, EntityConfigId } from "@/models/EntityConfig";
-import { EntityFieldConfigId } from "@/models/EntityFieldConfig";
+import {
+  EntityFieldConfig,
+  EntityFieldConfigId,
+  makeEntityFieldConfig,
+} from "@/models/EntityFieldConfig";
 
 type EntityConfigForm = {
   id: EntityConfigId;
   name: string;
   description: string;
-  fields: Array<{ id: EntityFieldConfigId; name: string }>;
+  fields: EntityFieldConfig[];
   titleField?: EntityFieldConfigId;
   idField?: EntityFieldConfigId;
 };
+
+function fieldsToSelectOptions(fields: EntityFieldConfig[]): ComboboxItem[] {
+  return makeSelectOptions({
+    inputList: fields,
+    valueFn: getProp("id"),
+    labelFn: (field) => {
+      return field.name || "[Unnamed field]";
+    },
+  });
+}
+
+const initialFields = [makeEntityFieldConfig({ id: uuid(), name: "" })];
+const initialFieldOptions = fieldsToSelectOptions(initialFields);
 
 export function EntityCreator(): JSX.Element {
   const configForm = useForm<EntityConfigForm>({
@@ -32,7 +54,7 @@ export function EntityCreator(): JSX.Element {
       id: uuid(),
       name: "",
       description: "",
-      fields: [],
+      fields: initialFields,
       titleField: undefined,
       idField: undefined,
     },
@@ -43,9 +65,27 @@ export function EntityCreator(): JSX.Element {
       titleField: isNotEmpty("Title field is required"),
       idField: isNotEmpty("ID field is required"),
     },
-  });
+    onValuesChange: (newValues, prevValues) => {
+      // to generate new field options we only care if the names and ids of the
+      // fields have changed
+      const areFieldsChanged = !areArrayContentsEqual(
+        newValues.fields,
+        prevValues.fields,
+        (field) => {
+          return `id=${field.id}&name=${field.name}`;
+        },
+      );
 
-  const fieldRows = configForm.getValues().fields.map((field, idx) => {
+      if (areFieldsChanged) {
+        setFieldOptions(fieldsToSelectOptions(newValues.fields));
+      }
+    },
+  });
+  const [fieldOptions, setFieldOptions] =
+    useState<ComboboxItem[]>(initialFieldOptions);
+
+  const { fields } = configForm.getValues();
+  const fieldRows = fields.map((field, idx) => {
     return (
       <Group key={field.id}>
         <TextInput
@@ -123,18 +163,21 @@ export function EntityCreator(): JSX.Element {
             </Stack>
           </Fieldset>
 
-          <TextInput
+          <Select
             required
             key={configForm.key("titleField")}
             label="Title field"
-            placeholder="Enter the field name that will be used as the label"
+            placeholder="Enter the field to use as the label"
+            data={fieldOptions}
             {...configForm.getInputProps("titleField")}
           />
-          <TextInput
+
+          <Select
             required
             key={configForm.key("idField")}
             label="ID field"
-            placeholder="Enter the field name that will be used as the ID"
+            placeholder="Enter the field that can uniquely identify this entity"
+            data={fieldOptions}
             {...configForm.getInputProps("idField")}
           />
           <Button type="submit">Create</Button>
