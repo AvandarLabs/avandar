@@ -7,7 +7,7 @@ type Props = {
    * If a message is provided, it will be displayed in a Text component.
    * If children are provided, they will be displaced under the message.
    */
-  message: string;
+  message?: string;
 } & AlertProps;
 
 export function Callout({

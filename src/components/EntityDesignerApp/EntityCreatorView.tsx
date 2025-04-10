@@ -5,9 +5,10 @@ import {
   Fieldset,
   Group,
   Stack,
+  Text,
   TextInput,
 } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { formRootRule, isNotEmpty, useForm } from "@mantine/form";
 import { IconTrash } from "@tabler/icons-react";
 import { Logger } from "@/lib/Logger";
 import { uuid } from "@/lib/utils/uuid";
@@ -17,7 +18,7 @@ type EntityConfigForm = {
   id: EntityConfigId;
   name: string;
   description: string;
-  fields: ReadonlyArray<{ id: string; name: string }>;
+  fields: Array<{ id: string; name: string }>;
   titleField: string;
   idField: string;
 };
@@ -32,6 +33,12 @@ export function EntityCreator(): JSX.Element {
       fields: [],
       titleField: "",
       idField: "",
+    },
+    validate: {
+      // fields cannot be empty
+      fields: {
+        [formRootRule]: isNotEmpty("At least one field is required"),
+      },
     },
   });
 
@@ -81,13 +88,16 @@ export function EntityCreator(): JSX.Element {
 
           <Fieldset legend="Fields">
             <Stack>
-              {fieldRows}
+              {configForm.errors.fields ?
+                <Text c="danger">{configForm.errors.fields}</Text>
+              : <>{fieldRows}</>}
               <Button
                 onClick={() => {
-                  return configForm.insertListItem("fields", {
+                  configForm.insertListItem("fields", {
                     id: uuid(),
                     name: "",
                   });
+                  configForm.clearFieldError("fields");
                 }}
               >
                 Add Field
