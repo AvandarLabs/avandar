@@ -25,10 +25,7 @@ export const TODOS =
       },
       {
         label: "Entity Designer",
-        items: [
-          "Create an entity designer page (ontology)",
-          "Allow users to define their data models",
-        ],
+        items: ["Change Title and ID fields to Selects"],
       },
       {
         label: "Entity Browser",

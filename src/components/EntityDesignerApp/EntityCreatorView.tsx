@@ -11,16 +11,18 @@ import {
 import { formRootRule, isNotEmpty, useForm } from "@mantine/form";
 import { IconTrash } from "@tabler/icons-react";
 import { Logger } from "@/lib/Logger";
+import { getProp } from "@/lib/utils/objects";
 import { uuid } from "@/lib/utils/uuid";
-import { EntityConfigId } from "@/models/EntityConfig";
+import { EntityConfig, EntityConfigId } from "@/models/EntityConfig";
+import { EntityFieldConfigId } from "@/models/EntityFieldConfig";
 
 type EntityConfigForm = {
   id: EntityConfigId;
   name: string;
   description: string;
-  fields: Array<{ id: string; name: string }>;
-  titleField: string;
-  idField: string;
+  fields: Array<{ id: EntityFieldConfigId; name: string }>;
+  titleField?: EntityFieldConfigId;
+  idField?: EntityFieldConfigId;
 };
 
 export function EntityCreator(): JSX.Element {
@@ -31,14 +33,15 @@ export function EntityCreator(): JSX.Element {
       name: "",
       description: "",
       fields: [],
-      titleField: "",
-      idField: "",
+      titleField: undefined,
+      idField: undefined,
     },
     validate: {
-      // fields cannot be empty
       fields: {
         [formRootRule]: isNotEmpty("At least one field is required"),
       },
+      titleField: isNotEmpty("Title field is required"),
+      idField: isNotEmpty("ID field is required"),
     },
   });
 
@@ -68,7 +71,22 @@ export function EntityCreator(): JSX.Element {
     <Container pt="lg">
       <form
         onSubmit={configForm.onSubmit((values) => {
-          Logger.log(values);
+          if (!values.titleField || !values.idField) {
+            // no need to raise any error, this should have been
+            // caught by form validation
+            return;
+          }
+
+          const entityConfig: EntityConfig = {
+            id: values.id,
+            name: values.name,
+            description: values.description,
+            fields: values.fields.map(getProp("id")),
+            titleField: values.titleField,
+            idField: values.idField,
+          };
+
+          Logger.log(entityConfig);
         })}
       >
         <Stack>
@@ -106,12 +124,14 @@ export function EntityCreator(): JSX.Element {
           </Fieldset>
 
           <TextInput
+            required
             key={configForm.key("titleField")}
             label="Title field"
             placeholder="Enter the field name that will be used as the label"
             {...configForm.getInputProps("titleField")}
           />
           <TextInput
+            required
             key={configForm.key("idField")}
             label="ID field"
             placeholder="Enter the field name that will be used as the ID"
