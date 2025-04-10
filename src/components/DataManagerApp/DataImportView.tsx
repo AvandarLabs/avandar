@@ -49,7 +49,7 @@ export function DataImportView(): JSX.Element {
   });
 
   return (
-    <Container>
+    <Container pt="lg">
       <FileUploadField
         label="Upload a CSV"
         description="Select a CSV from your computer to import"

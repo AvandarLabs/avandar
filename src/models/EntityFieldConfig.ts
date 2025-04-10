@@ -18,10 +18,10 @@ export type EntityFieldConfig = {
       baseType: DimensionFieldBaseType;
       isArray: boolean;
       allowManualEdit: boolean;
-      valuePickerRule: "mostFrequent" | "first";
       valueExtractor:
         | {
             extractorType: "adjacentField";
+            valuePickerRule: "mostFrequent" | "first";
             allowManualEdit: boolean;
             dataset: DatasetId;
             field: DatasetFieldId;
@@ -43,3 +43,27 @@ export type EntityFieldConfig = {
       };
     }
 );
+
+/**
+ * Make an EntityFieldConfig. For now, we create something filled with lots
+ * of defaults, but eventually these should all be inputs in the function.
+ * @returns
+ */
+export function makeEntityFieldConfig({
+  id,
+  name,
+}: Pick<EntityFieldConfig, "id" | "name">): EntityFieldConfig {
+  return {
+    id,
+    name,
+    description: undefined,
+    class: "dimension",
+    baseType: "string",
+    isArray: false,
+    allowManualEdit: false,
+    valueExtractor: {
+      extractorType: "manualEntry",
+      allowManualEdit: true,
+    },
+  };
+}
