@@ -37,9 +37,11 @@ the other Supabase container and run `npx supabase stop`)
 
 6. Set your app name in `index.html`
 
-7. Update your logo in `public/`. If your logo is a PNG (not an svg), update the filename in `src/config/AppConfig.ts`. Also update the filename in `index.html`
+7. Update the project id in `supabase/config.toml` and change the port if you don't want it to clash with other local supabase instances.
 
-8. Update everything you need in `src/config/AppConfig.ts`.
+8. Update your logo in `public/`. If your logo is a PNG (not an svg), update the filename in `src/config/AppConfig.ts`. Also update the filename in `index.html`
+
+9. Update everything you need in `src/config/AppConfig.ts`.
 
 ## Stack
 
