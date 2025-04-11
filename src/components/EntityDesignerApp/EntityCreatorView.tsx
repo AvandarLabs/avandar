@@ -10,9 +10,10 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
-import { formRootRule, isNotEmpty, useForm } from "@mantine/form";
+import { formRootRule, isNotEmpty } from "@mantine/form";
 import { IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
+import { useForm } from "@/lib/hooks/ui/useForm";
 import { Logger } from "@/lib/Logger";
 import { areArrayContentsEqual } from "@/lib/utils/arrays";
 import { getProp } from "@/lib/utils/objects";
@@ -48,7 +49,7 @@ const initialFields = [makeEntityFieldConfig({ id: uuid(), name: "" })];
 const initialFieldOptions = fieldsToSelectOptions(initialFields);
 
 export function EntityCreator(): JSX.Element {
-  const configForm = useForm<EntityConfigForm>({
+  const [configForm, setConfigForm] = useForm<EntityConfigForm>({
     mode: "uncontrolled",
     initialValues: {
       id: uuid(),
@@ -117,6 +118,8 @@ export function EntityCreator(): JSX.Element {
             return;
           }
 
+          Logger.log("submitted values", values);
+
           const entityConfig: EntityConfig = {
             id: values.id,
             name: values.name,
@@ -126,7 +129,7 @@ export function EntityCreator(): JSX.Element {
             idField: values.idField,
           };
 
-          Logger.log(entityConfig);
+          Logger.log("final config", entityConfig);
         })}
       >
         <Stack>
@@ -151,10 +154,13 @@ export function EntityCreator(): JSX.Element {
               : <>{fieldRows}</>}
               <Button
                 onClick={() => {
-                  configForm.insertListItem("fields", {
-                    id: uuid(),
-                    name: "",
-                  });
+                  setConfigForm.insertListItem(
+                    "fields",
+                    makeEntityFieldConfig({
+                      id: uuid(),
+                      name: "",
+                    }),
+                  );
                   configForm.clearFieldError("fields");
                 }}
               >

@@ -1,4 +1,8 @@
-export type UUID = string & { __brand: "UUID" };
+import { Brand } from "./utilityTypes";
+
+export type UUID<B extends string = never> =
+  [B] extends [never] ? Brand<string, "UUID"> : Brand<string, `${B}UUID`>;
+
 export type UnknownObject = Record<string | number | symbol, unknown>;
 export type CSVCellValue = string | undefined;
 export type CSVRow = Record<string, CSVCellValue>;

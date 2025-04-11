@@ -5,6 +5,6 @@ import { UUID } from "@/lib/types/common";
  * Generates a random UUID.
  * @returns A random UUID string.
  */
-export function uuid(): UUID {
-  return uuidv4() as UUID;
+export function uuid<T extends string = never>(): UUID<T> {
+  return uuidv4() as UUID<T>;
 }

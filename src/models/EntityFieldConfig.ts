@@ -2,7 +2,7 @@ import { DatasetFieldId } from "./DatasetField";
 import { DatasetId } from "./LocalDataset";
 import type { UUID } from "@/lib/types/common";
 
-export type EntityFieldConfigId = UUID;
+export type EntityFieldConfigId = UUID<"EntityFieldConfig">;
 
 type DimensionFieldBaseType = "string" | "number" | "date";
 

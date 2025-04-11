@@ -22,3 +22,8 @@ export type Replace<Obj, NewTypesObj> = Omit<Obj, keyof NewTypesObj> &
  * that `keyof` on its own would return.
  */
 export type ObjectStringKey<T> = Exclude<keyof T, symbol | number>;
+
+/**
+ * A type that can be used to create a branded string.
+ */
+export type Brand<T, B extends string> = T & { __brand: B };

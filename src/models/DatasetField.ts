@@ -5,7 +5,8 @@ import { UUID } from "@/lib/types/common";
 
 export type FieldDataType = "string" | "number" | "date" | "unknown";
 
-export type DatasetFieldId = UUID;
+export type DatasetFieldId = UUID<"DatasetField">;
+
 export type DatasetField = {
   id: DatasetFieldId;
   name: string;
@@ -18,7 +19,7 @@ export const DatasetFieldSchema = z.object({
     .string()
     .uuid()
     .transform((id) => {
-      return id as UUID;
+      return id as DatasetFieldId;
     }),
   name: z.string().min(1),
   dataType: z.enum(["string", "number", "date", "unknown"]),
