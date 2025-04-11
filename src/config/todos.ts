@@ -6,6 +6,12 @@ export const TODOS =
   import.meta.env.DEV ?
     [
       {
+        label: "Entity Designer",
+        items: [
+          "Set up the Supabase tables for the EntityConfig and EntityFieldConfig",
+        ],
+      },
+      {
         label: "Data Manager",
         items: [
           "Use UUIDs for dataset ids to ensure global uniqueness",
@@ -22,10 +28,6 @@ export const TODOS =
           "Display empty string as an italicized [empty value]",
           "Show a bar graph visualization",
         ],
-      },
-      {
-        label: "Entity Designer",
-        items: ["Change Title and ID fields to Selects"],
       },
       {
         label: "Entity Browser",
