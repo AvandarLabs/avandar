@@ -648,6 +648,48 @@
   resolved "https://registry.yarnpkg.com/@pkgr/core/-/core-0.2.1.tgz#6d083acfddae21fb329c8df8c94bf895ce7d0c15"
   integrity sha512-VzgHzGblFmUeBmmrk55zPyrQIArQN4vujc9shWytaPdB3P7qhi0cpaiKIr7tlCmFv2lYUwnLospIqjL9ZSAhhg==
 
+"@postgrestools/cli-aarch64-apple-darwin@0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@postgrestools/cli-aarch64-apple-darwin/-/cli-aarch64-apple-darwin-0.3.1.tgz#1a77231ade020718afe268e8db1d5dfcc4546423"
+  integrity sha512-w9Gb9nxHznpbNjeY4RQs9C37bN8nXJqmXbPx8dJe1t3Yvvye3L1S35TUgIEoN/uuuVqUWRIFGpL9ELcVl5leOA==
+
+"@postgrestools/cli-aarch64-linux-gnu@0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@postgrestools/cli-aarch64-linux-gnu/-/cli-aarch64-linux-gnu-0.3.1.tgz#9ca6d7555faffcf855f8a424e41adbaaa622a64d"
+  integrity sha512-wmZzjbFQf9FeORS7qfNK6hhNLlWGdgThKpcU4Kd2gHMKXNe04q2esPQfT3+2VXYfOhacKq+TQrSvr4Efx0+pkw==
+
+"@postgrestools/cli-aarch64-windows-msvc@0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@postgrestools/cli-aarch64-windows-msvc/-/cli-aarch64-windows-msvc-0.3.1.tgz#c26d9c45cf51a9df9fbcb3bdbace87ced86507e6"
+  integrity sha512-I0PhM/fuO/uhH7r0yc1ISYqRgMU8FIE8lIk3/j3fYkoTlFlx3gvlrlSRPBp8HwrPVuuDBa4CgqjikmuuwfUcxw==
+
+"@postgrestools/cli-x86_64-apple-darwin@0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@postgrestools/cli-x86_64-apple-darwin/-/cli-x86_64-apple-darwin-0.3.1.tgz#3f1e28fa2361357596bdbb6c524ea38a12532346"
+  integrity sha512-Rm60yJ3wflSLHg1kOVHikJadTJXrNdI5mL6KRvUCNu1P05qwpb7jdfYsdn48qCRjZOQMclxxUuwQ/ht0VNdCGQ==
+
+"@postgrestools/cli-x86_64-linux-gnu@0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@postgrestools/cli-x86_64-linux-gnu/-/cli-x86_64-linux-gnu-0.3.1.tgz#4ddf6d6b81228f2e426656f4d80913496f058da1"
+  integrity sha512-ErR8+JQLgOm9y12fPs6REqu4c12b32dszgzEwxFbfGSzVAglOoySnFOCSNcNltV0ny03z9MyCYp7GiAxVqpIYw==
+
+"@postgrestools/cli-x86_64-windows-msvc@0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@postgrestools/cli-x86_64-windows-msvc/-/cli-x86_64-windows-msvc-0.3.1.tgz#8e418296030957eda3f724d7845b756cf4373945"
+  integrity sha512-SvU78R790z3SvJ4dZNDP9uBvcZWciaOhZjZe8ogXfrm45kqYoa0E02aV2r/reMnODK5ujH7Qe2McgHoxy9sEEw==
+
+"@postgrestools/postgrestools@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@postgrestools/postgrestools/-/postgrestools-0.3.1.tgz#72de65ab09b59149ea6167d1333ca77cc912d721"
+  integrity sha512-0cKhJp6HV1r58/HVt4ka2aQCv77q0C8PZGBHlUx7To4YVRsPkx+JST/eOLGr9A6Kel+ehYwB8BzxZVarcHB+Bw==
+  optionalDependencies:
+    "@postgrestools/cli-aarch64-apple-darwin" "0.3.1"
+    "@postgrestools/cli-aarch64-linux-gnu" "0.3.1"
+    "@postgrestools/cli-aarch64-windows-msvc" "0.3.1"
+    "@postgrestools/cli-x86_64-apple-darwin" "0.3.1"
+    "@postgrestools/cli-x86_64-linux-gnu" "0.3.1"
+    "@postgrestools/cli-x86_64-windows-msvc" "0.3.1"
+
 "@rollup/plugin-inject@^5.0.5":
   version "5.0.5"
   resolved "https://registry.yarnpkg.com/@rollup/plugin-inject/-/plugin-inject-5.0.5.tgz#616f3a73fe075765f91c5bec90176608bed277a3"
@@ -4380,6 +4422,7 @@ stream-http@^3.2.0:
     xtend "^4.0.2"
 
 "string-width-cjs@npm:string-width@^4.2.0", string-width@^4.1.0:
+  name string-width-cjs
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
@@ -4480,6 +4523,7 @@ string_decoder@~1.1.1:
     safe-buffer "~5.1.0"
 
 "strip-ansi-cjs@npm:strip-ansi@^6.0.1", strip-ansi@^6.0.0, strip-ansi@^6.0.1:
+  name strip-ansi-cjs
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==

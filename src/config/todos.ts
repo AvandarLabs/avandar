@@ -15,7 +15,7 @@ export const TODOS =
         label: "Data Manager",
         items: [
           "Use UUIDs for dataset ids to ensure global uniqueness",
-          "Allow editing the field data type",
+          "Allow editing the fChange Title and ID fields to Selectsield data type",
           "Allow full CRUD of datasets in Data Manager",
         ],
       },
