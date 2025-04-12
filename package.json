@@ -11,6 +11,8 @@
     "preview": "vite preview",
     "tsc-watch": "tsc -b --watch",
     "update-boilerplate": "./scripts/mergeUpstreamAppTemplateChanges.sh",
+    "db:apply-migrations": "supabase migration up",
+    "db:new-migration": "supabase db diff -f",
     "dev:new-main-component": "./scripts/newMainComponent.sh",
     "dev:new-model": "./scripts/newModel.sh",
     "dev:new-route": "./scripts/newRoute.sh",

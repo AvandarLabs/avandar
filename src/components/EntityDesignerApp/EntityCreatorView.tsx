@@ -11,10 +11,12 @@ import {
   TextInput,
 } from "@mantine/core";
 import { formRootRule, isNotEmpty } from "@mantine/form";
+import { User } from "@supabase/supabase-js";
 import { IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { Logger } from "@/lib/Logger";
+import { UUID } from "@/lib/types/common";
 import { areArrayContentsEqual } from "@/lib/utils/arrays";
 import { getProp } from "@/lib/utils/objects";
 import { makeSelectOptions } from "@/lib/utils/ui/selectHelpers";
@@ -28,6 +30,7 @@ import {
 
 type EntityConfigForm = {
   id: EntityConfigId;
+  ownerId: UUID<"User">;
   name: string;
   description: string;
   fields: EntityFieldConfig[];
@@ -48,11 +51,16 @@ function fieldsToSelectOptions(fields: EntityFieldConfig[]): ComboboxItem[] {
 const initialFields = [makeEntityFieldConfig({ id: uuid(), name: "" })];
 const initialFieldOptions = fieldsToSelectOptions(initialFields);
 
-export function EntityCreator(): JSX.Element {
+export function EntityCreator({
+  currentUser,
+}: {
+  currentUser: User;
+}): JSX.Element {
   const [configForm, setConfigForm] = useForm<EntityConfigForm>({
     mode: "uncontrolled",
     initialValues: {
       id: uuid(),
+      ownerId: uuid(currentUser.id),
       name: "",
       description: "",
       fields: initialFields,
@@ -122,6 +130,7 @@ export function EntityCreator(): JSX.Element {
 
           const entityConfig: EntityConfig = {
             id: values.id,
+            ownerId: values.ownerId,
             name: values.name,
             description: values.description,
             fields: values.fields.map(getProp("id")),
