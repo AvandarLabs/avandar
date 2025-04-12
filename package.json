@@ -9,12 +9,12 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "new-main-component": "./scripts/newMainComponent.sh",
-    "new-model": "./scripts/newModel.sh",
-    "new-route": "./scripts/newRoute.sh",
-    "new-script": "./scripts/newScript.sh",
     "tsc-watch": "tsc -b --watch",
-    "update-boilerplate": "./scripts/mergeUpstreamAppTemplateChanges.sh"
+    "update-boilerplate": "./scripts/mergeUpstreamAppTemplateChanges.sh",
+    "dev:new-main-component": "./scripts/newMainComponent.sh",
+    "dev:new-model": "./scripts/newModel.sh",
+    "dev:new-route": "./scripts/newRoute.sh",
+    "dev:new-script": "./scripts/newScript.sh"
   },
   "dependencies": {
     "@duckdb/duckdb-wasm": "^1.29.0",
