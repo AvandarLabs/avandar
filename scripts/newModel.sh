@@ -24,9 +24,9 @@ mkdir -p $PROJECT_ROOT/src/models
 cat > $MODEL_FILE << EOL
 import type { UUID } from "@/lib/types/common";
 
-export type ${MODEL_NAME}Id = UUID;
+export type ${MODEL_NAME}Id = UUID<"${MODEL_NAME}">;
 
-export type $MODEL_NAME = {
+export type ${MODEL_NAME} = {
   id: ${MODEL_NAME}Id;
 }
 

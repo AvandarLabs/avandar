@@ -1,3 +1,4 @@
+import { UserId } from "@/models/User";
 import { EntityFieldConfigId } from "./EntityFieldConfig";
 import type { UUID } from "@/lib/types/common";
 
@@ -5,7 +6,7 @@ export type EntityConfigId = UUID<"EntityConfig">;
 
 export type EntityConfig = {
   id: EntityConfigId;
-  ownerId: UUID<"User">;
+  ownerId: UserId;
   name: string;
   description?: string;
   fields: readonly EntityFieldConfigId[];

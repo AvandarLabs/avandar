@@ -16,7 +16,6 @@ import { IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { Logger } from "@/lib/Logger";
-import { UUID } from "@/lib/types/common";
 import { areArrayContentsEqual } from "@/lib/utils/arrays";
 import { getProp } from "@/lib/utils/objects";
 import { makeSelectOptions } from "@/lib/utils/ui/selectHelpers";
@@ -27,10 +26,11 @@ import {
   EntityFieldConfigId,
   makeEntityFieldConfig,
 } from "@/models/EntityFieldConfig";
+import { UserId } from "@/models/User";
 
 type EntityConfigForm = {
   id: EntityConfigId;
-  ownerId: UUID<"User">;
+  ownerId: UserId;
   name: string;
   description: string;
   fields: EntityFieldConfig[];

@@ -13,10 +13,11 @@
     "update-boilerplate": "./scripts/mergeUpstreamAppTemplateChanges.sh",
     "db:apply-migrations": "supabase migration up",
     "db:new-migration": "supabase db diff -f",
-    "dev:new-main-component": "./scripts/newMainComponent.sh",
-    "dev:new-model": "./scripts/newModel.sh",
-    "dev:new-route": "./scripts/newRoute.sh",
-    "dev:new-script": "./scripts/newScript.sh"
+    "db:gen-types": "supabase gen types typescript --local > src/types/database.types.ts",
+    "new:main-component": "./scripts/newMainComponent.sh",
+    "new:model": "./scripts/newModel.sh",
+    "new:route": "./scripts/newRoute.sh",
+    "new:script": "./scripts/newScript.sh"
   },
   "dependencies": {
     "@duckdb/duckdb-wasm": "^1.29.0",
