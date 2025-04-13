@@ -11,9 +11,13 @@
     "preview": "vite preview",
     "tsc-watch": "tsc -b --watch",
     "update-boilerplate": "./scripts/mergeUpstreamAppTemplateChanges.sh",
-    "dev:new-main-component": "./scripts/newMainComponent.sh",
-    "dev:new-route": "./scripts/newRoute.sh",
-    "dev:new-script": "./scripts/newScript.sh"
+    "db:apply-migrations": "supabase migration up",
+    "db:new-migration": "supabase db diff -f",
+    "db:gen-types": "supabase gen types typescript --local > src/types/database.types.ts",
+    "new:main-component": "./scripts/newMainComponent.sh",
+    "new:model": "./scripts/newModel.sh",
+    "new:route": "./scripts/newRoute.sh",
+    "new:script": "./scripts/newScript.sh"
   },
   "dependencies": {
     "@mantine/core": "^7.17.2",
