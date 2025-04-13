@@ -1,3 +1,5 @@
+import { isNotNullOrUndefined } from "./utils/guards";
+
 export const Logger = {
   /**
    * Logs an error to the console.
@@ -53,11 +55,13 @@ export const Logger = {
         });
 
       const caller = stack[0]!;
-      console.log(
-        `%c [LOG] ${caller.fnName} [${caller.location}]\n`,
+      const styles = [
         "background: #d5f5fa; color: #00899d; font-weight: bold; font-size: 12px;",
-        ...args,
-      );
+        args.length > 1 ? "background: #a0140c; color: #ffffff;" : undefined,
+      ].filter(isNotNullOrUndefined);
+      const logHeading = `%c [LOG] ${caller.fnName} [${caller.location}]`;
+      const styledMsg = args.length > 1 ? "%c %s " : "";
+      console.log(`${logHeading}\n${styledMsg}`, ...styles, ...args);
     }
   },
 };

@@ -33,8 +33,8 @@ export function objectKeys<T extends UnknownObject>(
  * @param options The options for creating the object.
  * @param options.inputList The list of items to convert.
  * @param options.keyFn A function that returns the key for each item.
- * @param options.valueFn A function that returns the value for each item.
- * Defaults to the identity function.
+ * @param options.valueFn A function that returns the value for each
+ * item. Defaults to the identity function.
  *
  * @returns An object with keys and values extracted from the list.
  */
