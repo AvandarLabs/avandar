@@ -18,7 +18,7 @@ import { useForm } from "@/lib/hooks/ui/useForm";
 import { Logger } from "@/lib/Logger";
 import { areArrayContentsEqual } from "@/lib/utils/arrays";
 import { getProp } from "@/lib/utils/objects";
-import { makeSelectOptions } from "@/lib/utils/ui/selectHelpers";
+import { makeSelectOptions } from "@/lib/utils/ui/select";
 import { uuid } from "@/lib/utils/uuid";
 import { EntityConfig, EntityConfigId } from "@/models/EntityConfig";
 import {
