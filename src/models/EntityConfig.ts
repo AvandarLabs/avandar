@@ -1,6 +1,7 @@
 import camelCaseKeys from "camelcase-keys";
 import { CamelCasedPropertiesDeep, IsEqual, Merge } from "type-fest";
 import { z } from "zod";
+import { Expect } from "@/lib/types/utilityTypes";
 import { uuidType } from "@/lib/utils/validators";
 import { UserId } from "@/models/User";
 import type { UUID } from "@/lib/types/common";
@@ -19,7 +20,10 @@ export type EntityConfig = Merge<
   }
 >;
 
-export const EntityConfigSchema = z
+/**
+ * Parse a database entity config into an EntityConfig object.
+ */
+export const EntityConfigDatabaseParser = z
   .object({
     id: uuidType<EntityConfigId>(),
     owner_id: uuidType<UserId>(),
@@ -32,11 +36,11 @@ export const EntityConfigSchema = z
     return camelCaseKeys(v, { deep: true });
   });
 
-type Expect<T extends true> = T;
-
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Ignore the fact we never reference `Tests`
 type Tests = [
-  Expect<IsEqual<DatabaseEntityConfig, z.input<typeof EntityConfigSchema>>>,
-  Expect<IsEqual<EntityConfig, z.output<typeof EntityConfigSchema>>>,
+  Expect<
+    IsEqual<z.input<typeof EntityConfigDatabaseParser>, DatabaseEntityConfig>
+  >,
+  Expect<IsEqual<z.output<typeof EntityConfigDatabaseParser>, EntityConfig>>,
 ];
