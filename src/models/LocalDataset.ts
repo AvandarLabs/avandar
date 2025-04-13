@@ -1,8 +1,8 @@
 import Papa, { ParseMeta } from "papaparse";
 import { match } from "ts-pattern";
+import { Merge } from "type-fest";
 import { z } from "zod";
 import { CSVData, MIMEType } from "@/lib/types/common";
-import { Replace } from "@/lib/types/utilityTypes";
 import { LinkProps } from "@/lib/ui/links/Link";
 import { DatasetFieldSchema } from "@/models/DatasetField";
 import type { DatasetField } from "@/models/DatasetField";
@@ -47,7 +47,7 @@ export type FileMetadata = {
  *
  * `id` is undefined because it is autoincremented when inserting.
  */
-export type LocalDatasetCreate = Replace<LocalDataset, { id: undefined }>;
+export type LocalDatasetCreate = Merge<LocalDataset, { id: undefined }>;
 
 /**
  * Zod schema for the local dataset type.

@@ -7,15 +7,15 @@ import {
   UseQueryOptions as TanstackUseQueryOptions,
   UseQueryResult as TanstackUseQueryResult,
 } from "@tanstack/react-query";
+import { Merge } from "type-fest";
 import { Logger } from "@/lib/Logger";
-import { Replace } from "@/lib/types/utilityTypes";
 
 export type UseQueryResult<TData> = TanstackUseQueryResult<TData, Error>;
 export type UseQueryOptions<
   TQueryFnData = unknown,
   TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
-> = Replace<
+> = Merge<
   TanstackUseQueryOptions<TQueryFnData, Error, TData, TQueryKey>,
   {
     queryFn: QueryFunction<TQueryFnData, TQueryKey>;
