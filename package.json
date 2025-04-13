@@ -10,14 +10,14 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "tsc-watch": "tsc -b --watch",
-    "update-boilerplate": "./scripts/mergeUpstreamAppTemplateChanges.sh",
+    "update-boilerplate": "./scripts/lib/mergeUpstreamAppTemplateChanges.sh",
     "db:apply-migrations": "supabase migration up",
     "db:new-migration": "supabase db diff -f",
     "db:gen-types": "supabase gen types typescript --local > src/types/database.types.ts",
-    "new:main-component": "./scripts/newMainComponent.sh",
-    "new:model": "./scripts/newModel.sh",
-    "new:route": "./scripts/newRoute.sh",
-    "new:script": "./scripts/newScript.sh"
+    "new:main-component": "./scripts/lib/newMainComponent.sh",
+    "new:model": "./scripts/lib/newModel.sh",
+    "new:route": "./scripts/lib/newRoute.sh",
+    "new:script": "./scripts/lib/newScript.sh"
   },
   "dependencies": {
     "@duckdb/duckdb-wasm": "^1.29.0",
