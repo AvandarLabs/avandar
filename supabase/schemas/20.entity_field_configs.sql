@@ -1,6 +1,6 @@
 -- Create the entity_field_configs table
 create table public.entity_field_configs (
-    id uuid primary key,
+    id uuid primary key default gen_random_uuid(),
     entity_config_id uuid not null references entity_configs(id)
         on update cascade
         on delete cascade,

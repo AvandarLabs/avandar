@@ -1,7 +1,7 @@
 -- Create the entity_config table
 create table public.entity_configs (
-    id uuid primary key,
-    owner_id uuid not null
+    id uuid primary key default gen_random_uuid(),
+    owner_id uuid not null default auth.uid()
         references auth.users(id)
         on update cascade
         on delete no action,

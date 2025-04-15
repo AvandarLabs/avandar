@@ -1,11 +1,12 @@
 #!/bin/bash
+
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
-PROJECT_ROOT=$SCRIPT_DIR/..
+PROJECT_ROOT=$SCRIPT_DIR/../../
 
 usage() {
   echo "Usage:"
-  echo "  yarn new-route <route-path>         # Create a route in src/routes/"
-  echo "  yarn new-route auth <route-path>    # Create a route in src/routes/_auth/"
+  echo "       yarn new:route <route-path>        # Create a route in src/routes/"
+  echo "       yarn new:route auth <route-path>   # Create a route in src/routes/_auth/"
   exit 1
 }
 

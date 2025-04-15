@@ -12,12 +12,15 @@
     "tsc-watch": "tsc -b --watch",
     "update-boilerplate": "./scripts/lib/mergeUpstreamAppTemplateChanges.sh",
     "db:apply-migrations": "supabase migration up",
-    "db:new-migration": "supabase db diff -f",
+    "db:create-user": "yarn vite-script scripts/lib/createUserScript.ts",
     "db:gen-types": "supabase gen types typescript --local > src/types/database.types.ts",
+    "db:new-migration": "supabase db diff -f",
+    "db:reset": "./scripts/lib/resetDatabase.sh",
     "new:main-component": "./scripts/lib/newMainComponent.sh",
     "new:model": "./scripts/lib/newModel.sh",
     "new:route": "./scripts/lib/newRoute.sh",
-    "new:script": "./scripts/lib/newScript.sh"
+    "new:script": "./scripts/lib/newScript.sh",
+    "vite-script": "vite-node --config ./vite.script.config.ts"
   },
   "dependencies": {
     "@duckdb/duckdb-wasm": "^1.29.0",
@@ -40,6 +43,7 @@
     "papaparse": "^5.5.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "snakecase-keys": "^8.0.1",
     "ts-pattern": "^5.7.0",
     "uuid": "^11.1.0",
     "zod": "^3.24.2"
@@ -80,6 +84,7 @@
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0",
+    "vite-node": "^3.1.1",
     "vite-plugin-node-polyfills": "^0.23.0"
   }
 }

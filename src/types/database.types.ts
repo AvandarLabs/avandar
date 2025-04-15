@@ -46,9 +46,9 @@ export type Database = {
         Insert: {
           created_at?: string
           description?: string | null
-          id: string
+          id?: string
           name: string
-          owner_id: string
+          owner_id?: string
           updated_at?: string
         }
         Update: {
@@ -84,7 +84,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           entity_config_id: string
-          id: string
+          id?: string
           is_array?: boolean | null
           is_id_field?: boolean
           is_title_field?: boolean

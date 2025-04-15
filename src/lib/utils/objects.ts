@@ -1,6 +1,12 @@
+import camelcaseKeys, { CamelCaseKeys } from "camelcase-keys";
+import snakecaseKeys, { SnakeCaseKeys } from "snakecase-keys";
 import { UnknownObject } from "@/lib/types/common";
-import { ObjectStringKey } from "@/lib/types/utilityTypes";
+import {
+  ExcludeUndefinedDeep,
+  ObjectStringKey,
+} from "@/lib/types/utilityTypes";
 import { identity } from "@/lib/utils/functions";
+import { isNotUndefined, isPlainObject } from "./guards";
 
 /**
  * Returns an array of entries from an object.
@@ -135,4 +141,106 @@ export function omit<T extends UnknownObject, K extends keyof T>({
     delete newObj[key];
   });
   return newObj;
+}
+
+/**
+ * Converts an object's keys to camelCase. This is a deep conversion.
+ * @param obj The object to convert.
+ * @returns A new object with camelCase keys.
+ */
+export function camelCaseKeysDeep<T extends UnknownObject>(
+  obj: T,
+): CamelCaseKeys<T, true> {
+  return camelcaseKeys(obj, { deep: true });
+}
+
+/**
+ * Converts an object's keys to camelCase. This is a shallow conversion.
+ * @param obj The object to convert.
+ * @returns A new object with camelCase keys at the first level.
+ */
+export function camelCaseKeysShallow<T extends UnknownObject>(
+  obj: T,
+): CamelCaseKeys<T, false> {
+  return camelcaseKeys(obj, { deep: false });
+}
+
+/**
+ * Converts an object's keys to snake_case. This is a deep conversion.
+ * @param obj The object to convert.
+ * @returns A new object with snake_case keys.
+ */
+export function snakeCaseKeysDeep<T extends UnknownObject>(
+  obj: T,
+): SnakeCaseKeys<T, true> {
+  return snakecaseKeys(obj, { deep: true });
+}
+
+/**
+ * Converts an object's keys to snake_case. This is a shallow conversion.
+ * @param obj The object to convert.
+ * @returns A new object with snake_case keys at the first level.
+ */
+export function snakeCaseKeysShallow<T extends UnknownObject>(
+  obj: T,
+): SnakeCaseKeys<T, false> {
+  return snakecaseKeys(obj, { deep: false });
+}
+
+/**
+ * Drop all keys that have an `undefined` value. This is a deep transformation.
+ * For Maps, the keys (which technically can be of any type) will not get
+ * transformed. We only apply this function on the values.
+ *
+ * @param obj The object to drop all `undefined` values.
+ * @returns A new object with all `undefined` values dropped.
+ */
+export function dropUndefinedDeep<T extends Exclude<unknown, undefined>>(
+  obj: T,
+): ExcludeUndefinedDeep<T> {
+  // Return any values (other than objects) as is
+  if (typeof obj !== "object" || obj === null) {
+    return obj as ExcludeUndefinedDeep<T>;
+  }
+
+  // Now, handle different types of objects in special ways
+  if (Array.isArray(obj)) {
+    // drop undefined items
+    return obj.filter(isNotUndefined).map((item) => {
+      return dropUndefinedDeep(item);
+    }) as ExcludeUndefinedDeep<T>;
+  }
+
+  if (obj instanceof Map) {
+    const newEntries = [...obj.entries()]
+      .filter(([_, value]) => {
+        return isNotUndefined(value);
+      })
+      .map(([key, value]) => {
+        return [key, dropUndefinedDeep(value)];
+      }) as ReadonlyArray<[unknown, unknown]>;
+    return new Map(newEntries) as ExcludeUndefinedDeep<T>;
+  }
+
+  if (obj instanceof Set) {
+    const newValues = [...obj.values()].filter(isNotUndefined).map((value) => {
+      return dropUndefinedDeep(value);
+    }) as readonly unknown[];
+    return new Set(newValues) as ExcludeUndefinedDeep<T>;
+  }
+
+  if (isPlainObject(obj)) {
+    const newObj: UnknownObject = {};
+    Object.keys(obj).forEach((key) => {
+      const val = obj[key];
+      if (obj[key] !== undefined) {
+        newObj[key] = dropUndefinedDeep(val);
+      }
+    });
+    return newObj as ExcludeUndefinedDeep<T>;
+  }
+
+  // any other objects, e.g. class instances, will not be traversed
+  // and we return them as is
+  return obj as ExcludeUndefinedDeep<T>;
 }

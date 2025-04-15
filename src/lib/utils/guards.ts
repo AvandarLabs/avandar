@@ -63,3 +63,19 @@ export function isDate(value: unknown): value is Date {
 export function isNotNullOrUndefined<T>(value: T): value is NonNullable<T> {
   return value !== null && value !== undefined;
 }
+
+/**
+ * Checks if `value` is not `undefined`.
+ *
+ * **Examples**
+ *
+ * ```ts
+ * isNotUndefined(undefined); // false
+ * isNotUndefined("foo"); // true
+ * isNotUndefined(0); // true
+ * isNotUndefined(false); // true
+ * ```
+ */
+export function isNotUndefined<T>(value: T): value is Exclude<T, undefined> {
+  return value !== undefined;
+}
