@@ -29,7 +29,6 @@ Libraries:
 - For example:
   - Import `useQuery` from `@/lib/hooks/query/useQuery`.
   - Import `Link` components from `@/lib/ui/links/`.
-  - Import `SupabaseClient` from `@/lib/clients/SupabaseClient`.
   - Import utility functions from `@/lib/utils/`.
 - When using Mantine's `useForm`, always set a `key={form.key('fieldId')}` prop to each input component.
 
