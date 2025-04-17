@@ -11,7 +11,7 @@ export function EntityDesignerApp(): JSX.Element {
       <EntityNavbar
         miw={240}
         mih="100dvh"
-        entities={entities ?? []}
+        entityConfigs={entities ?? []}
         isLoading={isLoading}
         style={$entityNavbarBorder}
       />

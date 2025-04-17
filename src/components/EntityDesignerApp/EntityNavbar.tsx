@@ -9,12 +9,12 @@ import {
 } from "@/models/EntityConfig/EntityConfig";
 
 type Props = {
-  entities: EntityConfig[];
+  entityConfigs: EntityConfig[];
   isLoading: boolean;
 } & BoxProps;
 
 export function EntityNavbar({
-  entities,
+  entityConfigs,
   isLoading,
   ...boxProps
 }: Props): JSX.Element {
@@ -27,7 +27,7 @@ export function EntityNavbar({
   }, [theme.radius]);
 
   const entityLinks: readonly NavLinkProps[] = useMemo(() => {
-    return entities
+    return entityConfigs
       .map((entity): NavLinkProps => {
         return {
           ...getEntityConfigLinkProps(entity),
@@ -42,7 +42,7 @@ export function EntityNavbar({
           style: borderStyle,
         },
       ] as NavLinkProps[]);
-  }, [entities, borderStyle]);
+  }, [entityConfigs, borderStyle]);
 
   return (
     <Box bg="neutral.0" pt="lg" {...boxProps}>

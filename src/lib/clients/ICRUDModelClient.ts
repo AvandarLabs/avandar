@@ -27,7 +27,7 @@ export interface ICRUDModelClient<
    * @returns A promise resolving to the model instance or undefined
    * if not found
    */
-  get(id: ModelIdFieldType): Promise<M["Read"] | undefined>;
+  getById(id: ModelIdFieldType): Promise<M["Read"] | undefined>;
 
   /**
    * Retrieves all instances of the model.

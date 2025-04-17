@@ -58,5 +58,3 @@ export const EntityConfigClient = withQueryHooks(
     parserRegistry: EntityConfigParsers,
   }),
 );
-
-console.log("new client", EntityConfigClient);

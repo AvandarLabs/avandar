@@ -30,7 +30,7 @@ export class SupabaseCRUDClient<
     this.parsers = config.parserRegistry;
   }
 
-  async get(id: ModelIdFieldType): Promise<M["Read"] | undefined> {
+  async getById(id: ModelIdFieldType): Promise<M["Read"] | undefined> {
     const { data } = await SupabaseDBClient.from(this.tableName)
       .select("*")
       .eq(this.dbTablePrimaryKey, castToAny(id))

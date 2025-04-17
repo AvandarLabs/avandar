@@ -35,9 +35,9 @@ export function getEntityConfigLinkProps(
   entity: EntityConfig,
 ): Pick<LinkProps, "to" | "params"> {
   return {
-    to: `/entity-designer/$entityId`,
+    to: `/entity-designer/$entityConfigId`,
     params: {
-      entityId: entity.id,
+      entityConfigId: entity.id,
     },
   };
 }
