@@ -10,8 +10,6 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
-import { formRootRule, isNotEmpty } from "@mantine/form";
-import { User } from "@supabase/supabase-js";
 import { IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { useForm } from "@/lib/hooks/ui/useForm";
@@ -20,25 +18,26 @@ import { areArrayContentsEqual } from "@/lib/utils/arrays";
 import { getProp } from "@/lib/utils/objects";
 import { makeSelectOptions } from "@/lib/utils/ui/makeSelectOptions";
 import { uuid } from "@/lib/utils/uuid";
-import {
-  EntityConfig,
-  EntityConfigId,
-} from "@/models/EntityConfig/EntityConfig";
+import { EntityConfig } from "@/models/EntityConfig/EntityConfig";
 import {
   EntityFieldConfig,
-  EntityFieldConfigId,
   makeEntityFieldConfig,
 } from "@/models/EntityFieldConfig";
-import { UserId } from "@/models/User";
+
+/*
+
+TODO(pablo):
+1. Implement fields
+2. Re-enable the form root rule for no empty fields array
+3. Validate that there is a title field and an id field in the array
+*/
 
 type EntityConfigForm = {
-  id: EntityConfigId;
-  ownerId: UserId;
   name: string;
   description: string;
+
+  // TODO(pablo): implement this
   fields: EntityFieldConfig[];
-  titleField?: EntityFieldConfigId;
-  idField?: EntityFieldConfigId;
 };
 
 function fieldsToSelectOptions(fields: EntityFieldConfig[]): ComboboxItem[] {
@@ -54,28 +53,19 @@ function fieldsToSelectOptions(fields: EntityFieldConfig[]): ComboboxItem[] {
 const initialFields = [makeEntityFieldConfig({ id: uuid(), name: "" })];
 const initialFieldOptions = fieldsToSelectOptions(initialFields);
 
-export function EntityCreator({
-  currentUser,
-}: {
-  currentUser: User;
-}): JSX.Element {
+export function EntityCreatorView(): JSX.Element {
   const [configForm, setConfigForm] = useForm<EntityConfigForm>({
     mode: "uncontrolled",
     initialValues: {
-      id: uuid(),
-      ownerId: uuid(currentUser.id),
       name: "",
       description: "",
       fields: initialFields,
-      titleField: undefined,
-      idField: undefined,
     },
     validate: {
       fields: {
-        [formRootRule]: isNotEmpty("At least one field is required"),
+        // TODO(pablo): enable this rule again
+        // [formRootRule]: isNotEmpty("At least one field is required"),
       },
-      titleField: isNotEmpty("Title field is required"),
-      idField: isNotEmpty("ID field is required"),
     },
     onValuesChange: (newValues, prevValues) => {
       // to generate new field options we only care if the names and ids of the
@@ -123,12 +113,6 @@ export function EntityCreator({
     <Container pt="lg">
       <form
         onSubmit={configForm.onSubmit((values) => {
-          if (!values.titleField || !values.idField) {
-            // no need to raise any error, this should have been
-            // caught by form validation
-            return;
-          }
-
           Logger.log("submitted values", values);
 
           const entityConfig: EntityConfig<"Insert"> = {
@@ -175,24 +159,6 @@ export function EntityCreator({
               </Button>
             </Stack>
           </Fieldset>
-
-          <Select
-            required
-            key={configForm.key("titleField")}
-            label="Title field"
-            placeholder="Enter the field to use as the label"
-            data={fieldOptions}
-            {...configForm.getInputProps("titleField")}
-          />
-
-          <Select
-            required
-            key={configForm.key("idField")}
-            label="ID field"
-            placeholder="Enter the field that can uniquely identify this entity"
-            data={fieldOptions}
-            {...configForm.getInputProps("idField")}
-          />
           <Button type="submit">Create</Button>
         </Stack>
       </form>
