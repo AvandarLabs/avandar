@@ -30,7 +30,7 @@ export function uuidType<
 }
 
 /**
- * Returns a Zod type that transforms a string into a branded UUID.
+ * Returns a Zod type that changes the type of a string into a branded UUID.
  * The brand is set via a generic parameter and it can either be a branded
  * UUID type or a string literal.
  *
@@ -38,11 +38,11 @@ export function uuidType<
  *
  * ```ts
  * type UserId = UUID<'User'>;
- * uuidType<UserId>(); // outputs Brand<UUID, 'User'>
- * uuidType<'User'>(); // also outputs Brand<UUID, 'User'>
+ * stringToBrandedUUID<UserId>(); // outputs Brand<UUID, 'User'>
+ * stringToBrandedUUID<'User'>(); // also outputs Brand<UUID, 'User'>
  * ```
  *
- * @returns A Zod type that transforms a string into a branded UUID.
+ * @returns A Zod type that changes the type of a string into a branded UUID.
  */
 export function stringToBrandedUUID<
   B extends string,
@@ -56,7 +56,7 @@ export function stringToBrandedUUID<
 }
 
 /**
- * Returns a Zod type that transforms a branded UUID into a string.
+ * Returns a Zod type that changes the type of a branded UUID into a string.
  * The brand is set via a generic parameter and it can either be a branded
  * UUID type or a string literal.
  *
@@ -64,11 +64,11 @@ export function stringToBrandedUUID<
  *
  * ```ts
  * type UserId = UUID<'User'>;
- * uuidType<UserId>(); // accepts input Brand<UUID, 'User'>
- * uuidType<'User'>(); // also accepts input Brand<UUID, 'User'>
+ * brandedUUIDToString<UserId>(); // accepts input Brand<UUID, 'User'>
+ * brandedUUIDToString<'User'>(); // also accepts input Brand<UUID, 'User'>
  * ```
  *
- * @returns A Zod type that transforms a branded UUID into a string.
+ * @returns A Zod type that changes the type of a branded UUID into a string.
  */
 export function brandedUUIDToString<
   B extends string,
@@ -79,4 +79,18 @@ export function brandedUUIDToString<
     z.ZodStringDef,
     UUID<Brand>
   >;
+}
+
+/**
+ * Returns a Zod type that will accept any type but throw an error if
+ * it is used at runtime. This allows this type to pass any TypeScript
+ * compilation checks, but will fail at runtime. It is intended as
+ * a placeholder in Zod schemas for types that still need implementing.
+ *
+ * @returns A Zod `any` type that will throw an error if it is used.
+ */
+export function unimplementedType(): z.ZodTypeAny {
+  return z.any().superRefine(() => {
+    throw new Error("This schema is not implemented yet");
+  });
 }

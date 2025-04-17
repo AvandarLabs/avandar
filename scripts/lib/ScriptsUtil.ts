@@ -1,4 +1,4 @@
-import { SupabaseClient } from "@/clients/SupabaseClient";
+import { supabaseClient } from "@/lib/clients/supabaseClient";
 import { User } from "@/models/User";
 
 export const ScriptsUtil = {
@@ -9,7 +9,7 @@ export const ScriptsUtil = {
    * @returns The created user.
    */
   async createUser(user: { email: string; password: string }): Promise<User> {
-    const { data, error } = await SupabaseClient.auth.signUp({
+    const { data, error } = await supabaseClient.auth.signUp({
       email: user.email,
       password: user.password,
     });

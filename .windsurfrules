@@ -63,7 +63,7 @@ Libraries:
 # TypeScript Best Practices
 
 - Do not use `any`.
-- Use `type` instead of `interface`
+- Use `type` instead of `interface`. **Only** use `interface` when the type represents a traditional `interface` in the idiomatic OOP sense.
 - Use maps or string literal unions instead of enums.
 
 # React Code Style
@@ -92,6 +92,7 @@ Libraries:
 - For icons, use `@tabler/icons-react`
 
 # .sql files and schemas
+
 - Use `snake_case` naming conventions
 - Tables should be plural (e.g. `profiles` preferred over `profile`)
 - Functions should be prefixed with a namespace, either `util__` for utility functions or `table_name__` for functions pertaining to a specific table.

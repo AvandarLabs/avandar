@@ -1,5 +1,4 @@
-import { And, IsEqual } from "type-fest";
-import { z } from "zod";
+import { UnknownObject } from "./common";
 
 /**
  * Extract the keys of an object, but exclude the `symbol` and `number` types
@@ -8,39 +7,20 @@ import { z } from "zod";
 export type ObjectStringKey<T> = Exclude<keyof T, symbol | number>;
 
 /**
+ * Get all the keys of an object that map to a given type.
+ */
+export type KeysThatMapTo<T, Obj extends UnknownObject> = {
+  [K in keyof Obj]: Obj[K] extends T ? K : never;
+}[keyof Obj];
+
+/**
  * A type that can be used to create a branded string.
  */
 export type Brand<T, B extends string> = T & { __brand: B };
 
 /**
- * A type that can be used in type tests to assert a type is true.
- *
- * Example usage:
- *
- * type Tests = [
- *   Expect<IsEqual<A, B>>,
- * ];
+ * Recursively removes all `undefined` types from a type.
  */
-export type Expect<T extends true> = T;
-
-/**
- * A type that can be used in type tests to assert that a Zod schema
- * accurately reflects the expected input and output types.
- *
- * This is a useful way to verify that a Zod schema is correctly
- * transforming between our database tables and our frontend models.
- */
-export type ZodSchemaEqualsTypes<
-  Z extends z.ZodTypeAny,
-  Args extends {
-    input: z.input<Z>;
-    output: z.output<Z>;
-  },
-> = And<
-  IsEqual<z.input<Z>, Args["input"]>,
-  IsEqual<z.output<Z>, Args["output"]>
->;
-
 export type ExcludeUndefinedDeep<T> =
   T extends Array<infer U> ? Array<ExcludeUndefinedDeep<U>>
   : T extends ReadonlyArray<infer U> ? ReadonlyArray<ExcludeUndefinedDeep<U>>
