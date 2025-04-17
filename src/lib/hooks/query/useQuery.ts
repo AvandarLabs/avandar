@@ -23,6 +23,18 @@ export type UseQueryOptions<
 >;
 
 /**
+ * A tuple containing [data, `isLoading` state, the query result object].
+ */
+export type UseQueryResultTuple<
+  TQueryFnData = unknown,
+  TData = TQueryFnData,
+> = [
+  data: TData | undefined,
+  isLoading: boolean,
+  queryResult: TanstackUseQueryResult<TData, Error>,
+];
+
+/**
  * A wrapper around Tanstack's useQuery that provides additional error handling.
  * @param options - The options for the query. These are the same as Tanstack's
  * useQuery options.
@@ -34,9 +46,9 @@ export function useQuery<
   TQueryKey extends QueryKey = QueryKey,
 >(
   options: UseQueryOptions<TQueryFnData, TData, TQueryKey>,
-): UseQueryResult<TData> {
+): UseQueryResultTuple<TQueryFnData, TData> {
   const { queryFn, ...queryOptions } = options;
-  return tanstackUseQuery({
+  const queryResult = tanstackUseQuery({
     ...queryOptions,
     queryFn: async (context: QueryFunctionContext<TQueryKey>) => {
       try {
@@ -64,4 +76,6 @@ export function useQuery<
       }
     },
   });
+
+  return [queryResult.data, queryResult.isLoading, queryResult];
 }

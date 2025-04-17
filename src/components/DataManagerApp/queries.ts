@@ -5,7 +5,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { LocalDatasetClient } from "@/clients/LocalDatasetClient";
-import { useQuery, UseQueryResult } from "@/lib/hooks/query/useQuery";
+import { useQuery, UseQueryResultTuple } from "@/lib/hooks/query/useQuery";
 import {
   LocalDataset,
   LocalDatasetCreate,
@@ -17,18 +17,13 @@ import {
  * @returns A tuple of the dataset list, `isPending`, and the full `useQuery`
  * result object.
  */
-export function useLocalDatasets(): [
-  LocalDataset[] | undefined,
-  boolean,
-  UseQueryResult<LocalDataset[]>,
-] {
-  const queryResultObj = useQuery({
+export function useLocalDatasets(): UseQueryResultTuple<LocalDataset[]> {
+  return useQuery({
     queryKey: [LocalDatasetQueryKeys.allDatasets],
     queryFn: async () => {
       return LocalDatasetClient.getAllDatasets();
     },
   });
-  return [queryResultObj.data, queryResultObj.isLoading, queryResultObj];
 }
 
 /**

@@ -3,7 +3,7 @@ import {
   LocalQueryConfig,
   LocalQueryResultData,
 } from "@/clients/LocalQueryClient";
-import { useQuery, UseQueryResult } from "@/lib/hooks/query/useQuery";
+import { useQuery, UseQueryResultTuple } from "@/lib/hooks/query/useQuery";
 import { objectEntries } from "@/lib/utils/objects";
 import { sortStrings } from "@/lib/utils/strings";
 
@@ -15,7 +15,7 @@ export function useDataQuery({
   enabled,
 }: Partial<LocalQueryConfig> & {
   enabled: boolean;
-}): UseQueryResult<LocalQueryResultData> {
+}): UseQueryResultTuple<LocalQueryResultData> {
   const sortedFieldNames = sortStrings(selectFieldNames ?? []);
   const sortedGroupByNames = sortStrings(groupByFieldNames ?? []);
   const sortedAggregations = sortStrings(

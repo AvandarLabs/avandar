@@ -1,4 +1,4 @@
-import { ModelCRUDParserRegistry } from "../utils/models/crudSchemaParserFactory";
+import { ModelCRUDParserRegistry } from "../utils/models/modelCRUDSchemaParserFactory";
 import { ModelCRUDTypes } from "../utils/models/ModelCRUDTypes";
 
 /**
@@ -14,6 +14,7 @@ export interface ICRUDModelClient<
   ModelIdFieldType extends
     M["Read"][M["modelPrimaryKey"]] = M["Read"][M["modelPrimaryKey"]],
 > {
+  modelName: M["modelName"];
   /**
    * A registry of parsers for converting between model variants and
    * database variants.

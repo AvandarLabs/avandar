@@ -56,7 +56,7 @@ type MakeCRUDSchemaParserRegistry<M extends ModelCRUDTypes> = <
   ModelReadSchema:
     | ModelReadSchemaType
     | ((dbReadSchema: DBReadSchemaType) => ModelReadSchemaType);
-  getCRUDTransformers: (
+  transformers: (
     baseSchemas: ReadSchemasRegistry<M, DBReadSchemaType, ModelReadSchemaType>,
   ) => CRUDTransformerSchemaRegistry<M>;
 }) => ModelCRUDParserRegistry<M, DBReadSchemaType, ModelReadSchemaType>;
@@ -68,7 +68,7 @@ type MakeCRUDSchemaParserRegistry<M extends ModelCRUDTypes> = <
  * given model type.
  * @returns A CRUD transformer registry for the model.
  */
-export function crudSchemaParserFactory<M extends ModelCRUDTypes>(): {
+export function modelCRUDSchemaParserFactory<M extends ModelCRUDTypes>(): {
   makeParserRegistry: MakeCRUDSchemaParserRegistry<M>;
 } {
   const makeParserRegistry: MakeCRUDSchemaParserRegistry<M> = (options) => {
@@ -80,7 +80,7 @@ export function crudSchemaParserFactory<M extends ModelCRUDTypes>(): {
       DBReadSchema: options.DBReadSchema,
       ModelReadSchema: modelReadSchema,
     };
-    const transformerSchemas = options.getCRUDTransformers(baseReadSchemas);
+    const transformerSchemas = options.transformers(baseReadSchemas);
 
     return {
       ...baseReadSchemas,

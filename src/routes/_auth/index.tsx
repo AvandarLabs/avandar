@@ -2,7 +2,7 @@ import { Anchor, Box, Button, Group, Stack, Text, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import reactLogo from "@/assets/react.svg";
-import { useQuery, UseQueryResult } from "@/lib/hooks/query/useQuery";
+import { useQuery, UseQueryResultTuple } from "@/lib/hooks/query/useQuery";
 
 export const Route = createFileRoute("/_auth/")({
   component: HomePage,
@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_auth/")({
  * You can delete this custom hook. It's simple boilerplace to show how
  * to use React Query. This function simply returns a random number.
  */
-function useRandomNumber(): UseQueryResult<number> {
+function useRandomNumber(): UseQueryResultTuple<number> {
   return useQuery({
     queryKey: ["example"],
     queryFn: () => {
@@ -25,7 +25,7 @@ function useRandomNumber(): UseQueryResult<number> {
 
 function HomePage() {
   const [count, setCount] = useState(0);
-  const { data: randomNumber, isLoading } = useRandomNumber();
+  const [randomNumber, isLoading] = useRandomNumber();
 
   return (
     <Stack>

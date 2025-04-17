@@ -1,5 +1,3 @@
-import { UnknownObject } from "./common";
-
 /**
  * Extract the keys of an object, but exclude the `symbol` and `number` types
  * that `keyof` on its own would return.
@@ -9,7 +7,7 @@ export type ObjectStringKey<T> = Exclude<keyof T, symbol | number>;
 /**
  * Get all the keys of an object that map to a given type.
  */
-export type KeysThatMapTo<T, Obj extends UnknownObject> = {
+export type KeysThatMapTo<T, Obj extends object> = {
   [K in keyof Obj]: Obj[K] extends T ? K : never;
 }[keyof Obj];
 
@@ -34,3 +32,9 @@ export type ExcludeUndefinedDeep<T> =
       [K in keyof Required<T>]: ExcludeUndefinedDeep<T[K]>;
     }
   : Exclude<T, undefined>;
+
+/**
+ * Represents any function with inferrable parameters and return types.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyFunction = (...args: any[]) => unknown;

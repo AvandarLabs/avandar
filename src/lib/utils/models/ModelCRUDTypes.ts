@@ -2,6 +2,9 @@ import { Merge } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
 
 export type ModelCRUDTypes = {
+  /** The name of the model */
+  modelName: string;
+
   /** The name of the primary key in the db table */
   dbTablePrimaryKey: string;
 
