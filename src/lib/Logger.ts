@@ -1,5 +1,8 @@
 import { isNotNullOrUndefined } from "./utils/guards";
 
+const LOG_HEADER_FONT_SIZE = "11px";
+const LOG_BODY_FONT_SIZE = "13px";
+
 /**
  * Extracts the function and location from a stack trace.
  * NOTE: this function is tightly coupled to our Logger. It assumes the stack
@@ -72,11 +75,13 @@ export const Logger = {
     const stack = getFunctionsFromLoggerStack(new Error().stack ?? "");
     const caller = stack[0]!;
     const styles = [
-      "background: #f6db6d; color: #102a43; font-weight: bold; font-size: 12px;",
-      args.length > 1 ? "background: #a0140c; color: #ffffff;" : undefined,
-    ].filter(isNotNullOrUndefined);
+      `background: #f6db6d; color: #102a43; font-weight: bold; font-size: ${LOG_HEADER_FONT_SIZE};`,
+      args.length > 1 ?
+        `background: #a0140c; color: #ffffff; font-size: ${LOG_BODY_FONT_SIZE};`
+      : `font-size: ${LOG_BODY_FONT_SIZE};`,
+    ];
     const logHeading = `%c [WARN] ${caller.fnName} [${caller.location}]`;
-    const styledMsg = args.length > 1 ? "%c %s " : "";
+    const styledMsg = "%c %s ";
     console.warn(`${logHeading}\n${styledMsg}`, ...styles, ...args);
   },
 
@@ -89,11 +94,13 @@ export const Logger = {
       const stack = getFunctionsFromLoggerStack(new Error().stack ?? "");
       const caller = stack[0]!;
       const styles = [
-        "background: #d5f5fa; color: #102a43; font-weight: bold; font-size: 12px;",
-        args.length > 1 ? "background: #a0140c; color: #ffffff;" : undefined,
-      ].filter(isNotNullOrUndefined);
+        `background: #d5f5fa; color: #102a43; font-weight: bold; font-size: ${LOG_HEADER_FONT_SIZE};`,
+        args.length > 1 ?
+          `background: #a0140c; color: #ffffff; font-size: ${LOG_BODY_FONT_SIZE};`
+        : `font-size: ${LOG_BODY_FONT_SIZE};`,
+      ];
       const logHeading = `%c [LOG] ${caller.fnName} [${caller.location}]`;
-      const styledMsg = args.length > 1 ? "%c %s " : "";
+      const styledMsg = "%c %s ";
       console.log(`${logHeading}\n${styledMsg}`, ...styles, ...args);
     }
   },
