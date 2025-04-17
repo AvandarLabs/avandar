@@ -6,24 +6,24 @@ export type SeedHelpers = {
   getUserByEmail: (email: string) => User;
 };
 
-export interface ISeedData {
+export type GenericSeedData = {
   [key: string]: unknown;
   users: ReadonlyArray<{ email: string; password: string }>;
-}
+};
 
-type SeedJobFn<Data extends ISeedData> = (context: {
+type SeedJobFn<Data extends GenericSeedData> = (context: {
   data: Data;
   helpers: SeedHelpers;
 }) => Promise<void> | void;
 
-export interface ISeedJob<Data extends ISeedData> {
+export type GenericSeedJob<Data extends GenericSeedData> = {
   name: string;
   jobFn: SeedJobFn<Data>;
-}
+};
 
-export type SeedRunnerConfig<Data extends ISeedData> = {
+export type SeedRunnerConfig<Data extends GenericSeedData> = {
   data: Data;
-  jobs: ReadonlyArray<ISeedJob<Data>>;
+  jobs: ReadonlyArray<GenericSeedJob<Data>>;
 };
 
 /**
@@ -35,10 +35,10 @@ export type SeedRunnerConfig<Data extends ISeedData> = {
  * Both the `SEED_DATA` and `SEED_JOBS` can be configured in
  * `seed/SeedConfig.ts`.
  */
-export class SeedRunner<Data extends ISeedData> {
+export class SeedRunner<Data extends GenericSeedData> {
   #config: SeedRunnerConfig<Data>;
   #userLookup: Map<string, User> = new Map();
-  #jobs: Array<ISeedJob<Data>> = [];
+  #jobs: Array<GenericSeedJob<Data>> = [];
 
   constructor(config: SeedRunnerConfig<Data>) {
     this.#config = config;

@@ -2,7 +2,8 @@ import { CamelCasedPropertiesDeep, Merge, SetRequired } from "type-fest";
 import { z } from "zod";
 import { LinkProps } from "@/lib/ui/links/Link";
 import { crudSchemaParserFactory } from "@/lib/utils/models/crudSchemaParserFactory";
-import { SupabaseCRUDModelVariants } from "@/lib/utils/models/SupabaseCRUDModelVariants";
+import { DefineModelCRUDTypes } from "@/lib/utils/models/ModelCRUDTypes";
+import { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
 import {
   camelCaseKeysDeep,
   camelCaseKeysShallow,
@@ -18,20 +19,22 @@ import type { UUID } from "@/lib/types/common";
 
 export type EntityConfigId = UUID<"EntityConfig">;
 
-export interface EntityConfigCRUDTypes
-  extends SupabaseCRUDModelVariants<"entity_configs"> {
-  dbTablePrimaryKey: "id";
-  modelPrimaryKey: "id";
-  Read: Merge<
-    CamelCasedPropertiesDeep<EntityConfigCRUDTypes["DBRead"]>,
-    {
-      id: EntityConfigId;
-      ownerId: UserId;
-    }
-  >;
-  Insert: SetRequired<Partial<EntityConfigCRUDTypes["Read"]>, "name">;
-  Update: Partial<EntityConfigCRUDTypes["Read"]>;
-}
+export type EntityConfigCRUDTypes = DefineModelCRUDTypes<
+  SupabaseModelCRUDTypes<"entity_configs">,
+  {
+    dbTablePrimaryKey: "id";
+    modelPrimaryKey: "id";
+    Read: Merge<
+      CamelCasedPropertiesDeep<EntityConfigCRUDTypes["DBRead"]>,
+      {
+        id: EntityConfigId;
+        ownerId: UserId;
+      }
+    >;
+    Insert: SetRequired<Partial<EntityConfigCRUDTypes["Read"]>, "name">;
+    Update: Partial<EntityConfigCRUDTypes["Read"]>;
+  }
+>;
 
 export type EntityConfig<K extends keyof EntityConfigCRUDTypes = "Read"> =
   EntityConfigCRUDTypes[K];

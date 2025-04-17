@@ -13,6 +13,16 @@ export const Logger = {
   },
 
   /**
+   * Logs a warning to the console.
+   *
+   * @param message - The message to log.
+   * @param extraData - Optional extra data to log.
+   */
+  warn: (message: string, extraData?: unknown): void => {
+    console.warn(message, extraData);
+  },
+
+  /**
    * Logs a message to the console that is only visible if we are in
    * dev mode. This also prints the function caller and location.
    */

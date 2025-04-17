@@ -63,7 +63,7 @@ Libraries:
 # TypeScript Best Practices
 
 - Do not use `any`.
-- Use `type` instead of `interface`. **Only** use `interface` when the type represents a traditional `interface` in the idiomatic OOP sense.
+- Use `type` instead of `interface`. **Only** use `interface` when it represents a traditional OOP `interface` to be implemented by a class.
 - Use maps or string literal unions instead of enums.
 
 # React Code Style

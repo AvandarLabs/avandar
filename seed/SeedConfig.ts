@@ -1,5 +1,8 @@
 import { EntityConfigSeeder } from "./EntityConfigSeeder";
-import type { ISeedData, ISeedJob } from "../scripts/lib/SeedRunner";
+import type {
+  GenericSeedData,
+  GenericSeedJob,
+} from "../scripts/lib/SeedRunner";
 
 export const TEST_USER_EMAIL = "user@avandarlabs.com";
 
@@ -17,9 +20,9 @@ export const SEED_DATA = {
       description: "This entity represents a US State",
     },
   ],
-} satisfies ISeedData;
+} satisfies GenericSeedData;
 
 export const SEED_JOBS: readonly SeedJob[] = [EntityConfigSeeder] as const;
 
 export type SeedData = typeof SEED_DATA;
-export type SeedJob = ISeedJob<SeedData>;
+export type SeedJob = GenericSeedJob<SeedData>;

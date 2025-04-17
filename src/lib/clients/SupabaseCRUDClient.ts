@@ -1,35 +1,36 @@
 import { ICRUDModelClient } from "@/lib/clients/ICRUDModelClient";
 import { SupabaseDBClient } from "@/lib/clients/SupabaseDBClient";
 import { ModelCRUDParserRegistry } from "@/lib/utils/models/crudSchemaParserFactory";
-import { SupabaseCRUDModelVariants } from "@/lib/utils/models/SupabaseCRUDModelVariants";
+import { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
+import { Logger } from "../Logger";
 import { castToAny } from "../utils/functions";
 import type { DatabaseTableNames } from "@/lib/clients/SupabaseDBClient";
 
 export class SupabaseCRUDClient<
   TableName extends DatabaseTableNames,
-  M extends SupabaseCRUDModelVariants<TableName>,
+  M extends SupabaseModelCRUDTypes<TableName>,
   ModelIdFieldType extends
     M["Read"][M["modelPrimaryKey"]] = M["Read"][M["modelPrimaryKey"]],
 > implements ICRUDModelClient<M, ModelIdFieldType>
 {
-  protected tableName: TableName;
-  protected dbTablePrimaryKey: M["dbTablePrimaryKey"];
-  protected parsers: ModelCRUDParserRegistry<M>;
+  #tableName: TableName;
+  #dbTablePrimaryKey: M["dbTablePrimaryKey"];
+  parsers: ModelCRUDParserRegistry<M>;
 
   constructor(config: {
     tableName: TableName;
     dbTablePrimaryKey: M["dbTablePrimaryKey"];
     parserRegistry: ModelCRUDParserRegistry<M>;
   }) {
-    this.tableName = config.tableName;
-    this.dbTablePrimaryKey = config.dbTablePrimaryKey;
+    this.#tableName = config.tableName;
+    this.#dbTablePrimaryKey = config.dbTablePrimaryKey;
     this.parsers = config.parserRegistry;
   }
 
   async get(id: ModelIdFieldType): Promise<M["Read"] | undefined> {
-    const { data } = await SupabaseDBClient.from(this.tableName)
+    const { data } = await SupabaseDBClient.from(this.#tableName)
       .select("*")
-      .eq(this.dbTablePrimaryKey, castToAny(id))
+      .eq(this.#dbTablePrimaryKey, castToAny(id))
       .maybeSingle<M["DBRead"]>()
       .throwOnError();
 
@@ -41,9 +42,10 @@ export class SupabaseCRUDClient<
     return model;
   }
 
-  // TODO(pablo): implement pagination
   async getAll(): Promise<Array<M["Read"]>> {
-    const { data } = await SupabaseDBClient.from(this.tableName)
+    Logger.warn("TODO(pablo): Pagination must be implemented.");
+
+    const { data } = await SupabaseDBClient.from(this.#tableName)
       .select("*")
       .throwOnError();
     const models = data.map((dbRow) => {
@@ -55,7 +57,7 @@ export class SupabaseCRUDClient<
 
   async insert(data: M["Insert"]): Promise<M["Read"]> {
     const dataToInsert = this.parsers.fromModelToDBInsert.parse(data);
-    const { data: insertedData } = await SupabaseDBClient.from(this.tableName)
+    const { data: insertedData } = await SupabaseDBClient.from(this.#tableName)
       .insert(castToAny(dataToInsert))
       .select()
       .single<M["DBRead"]>()
@@ -67,9 +69,9 @@ export class SupabaseCRUDClient<
 
   async update(id: ModelIdFieldType, data: M["Update"]): Promise<M["Read"]> {
     const dataToUpdate = this.parsers.fromModelToDBUpdate.parse(data);
-    const { data: updatedData } = await SupabaseDBClient.from(this.tableName)
+    const { data: updatedData } = await SupabaseDBClient.from(this.#tableName)
       .update(castToAny(dataToUpdate))
-      .eq(this.dbTablePrimaryKey, castToAny(id))
+      .eq(this.#dbTablePrimaryKey, castToAny(id))
       .select()
       .single<M["DBRead"]>()
       .throwOnError();
@@ -77,9 +79,9 @@ export class SupabaseCRUDClient<
   }
 
   async delete(id: ModelIdFieldType): Promise<void> {
-    await SupabaseDBClient.from(this.tableName)
+    await SupabaseDBClient.from(this.#tableName)
       .delete()
-      .eq(this.dbTablePrimaryKey, castToAny(id))
+      .eq(this.#dbTablePrimaryKey, castToAny(id))
       .throwOnError();
   }
 }
