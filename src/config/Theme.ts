@@ -109,7 +109,7 @@ export const Theme = createTheme({
       "#a0140c",
     ] as const,
 
-    /** Informational or neutral content (tooltips, messages) */
+    /** Informational content (tooltips, messages) */
     info: [
       "#e6fcff",
       "#d5f5fa",
