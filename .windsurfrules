@@ -45,7 +45,7 @@ Libraries:
 
 # Naming Conventions
 
-- Use PascalCase for classes.
+- Use PascalCase for React components, classes, singleton class instances, or objects representing modules, namespaces, or static singletons.
 - Use camelCase for variables, functions, and methods.
 - Use UPPERCASE for environment variables or hard-coded constants.
 - Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
@@ -63,7 +63,7 @@ Libraries:
 # TypeScript Best Practices
 
 - Do not use `any`.
-- Use `type` instead of `interface`. **Only** use `interface` when the type represents a traditional `interface` in the idiomatic OOP sense.
+- Use `type` instead of `interface`. **Only** use `interface` when it represents a traditional OOP `interface` to be implemented by a class.
 - Use maps or string literal unions instead of enums.
 
 # React Code Style
