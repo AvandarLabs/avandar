@@ -8,7 +8,7 @@ import { IconClipboard, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { LocalDatasetClient } from "@/clients/LocalDatasetClient";
-import { AppConfig } from "@/config/AppConfig";
+import { APP_CONFIG } from "@/config/AppConfig";
 import { objectEntries } from "@/lib/utils/objects";
 import { SpotlightTodoContainer } from "./SpotlightTodoContainer";
 
@@ -17,7 +17,7 @@ export function useSpotlightActions(): Array<
 > {
   const router = useRouter();
   const spotlightActions = useMemo(() => {
-    const actions = objectEntries(AppConfig.links).map(
+    const actions = objectEntries(APP_CONFIG.links).map(
       ([linkKey, link]): SpotlightActionData | SpotlightActionGroupData => {
         return {
           id: linkKey,

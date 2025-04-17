@@ -3,7 +3,7 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { AppConfig } from "@/config/AppConfig";
+import { APP_CONFIG } from "@/config/AppConfig";
 import { DataGrid } from "@/lib/ui/DataGrid";
 import { EntityDescriptionList } from "@/lib/ui/EntityDescriptionList/EntityDescriptionList";
 import { FieldRenderOptionsMap } from "@/lib/ui/EntityDescriptionList/types";
@@ -73,7 +73,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                 deleteLocalDataset(dataset.id, {
                   onSuccess: () => {
                     router.navigate({
-                      to: AppConfig.links.dataManager.to,
+                      to: APP_CONFIG.links.dataManager.to,
                     });
 
                     notifications.show({

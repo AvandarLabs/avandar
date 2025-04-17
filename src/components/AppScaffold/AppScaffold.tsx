@@ -17,9 +17,9 @@ import { useMutation } from "@tanstack/react-query";
 import { Outlet, useRouter } from "@tanstack/react-router";
 import clsx from "clsx";
 import { AuthClient } from "@/clients/AuthClient";
-import { Link } from "@/lib/ui/links/Link";
-import { AppConfig } from "@/config/AppConfig";
+import { APP_CONFIG } from "@/config/AppConfig";
 import { useIsMobileSize } from "@/lib/hooks/useIsMobileSize";
+import { Link } from "@/lib/ui/links/Link";
 import css from "./AppScaffold.module.css";
 import { useSpotlightActions } from "./useSpotlightActions";
 
@@ -71,7 +71,7 @@ export function AppScaffold({
 
   const logo = (
     <img
-      src={`/${AppConfig.logoFilename}`}
+      src={`/${APP_CONFIG.logoFilename}`}
       className="logo"
       alt="Logo"
       width={40}
@@ -127,7 +127,7 @@ export function AppScaffold({
                 <UnstyledButton>
                   <Group gap="xs">
                     {logo}
-                    <Title order={2}>{AppConfig.appName}</Title>
+                    <Title order={2}>{APP_CONFIG.appName}</Title>
                     <IconChevronDown />
                   </Group>
                 </UnstyledButton>
@@ -147,8 +147,8 @@ export function AppScaffold({
               </Menu.Dropdown>
             </Menu>
           </Group>
-          {AppConfig.navbarLinkOrder.map((linkKey) => {
-            const link = AppConfig.links[linkKey];
+          {APP_CONFIG.navbarLinkOrder.map((linkKey) => {
+            const link = APP_CONFIG.links[linkKey];
             return (
               <Link
                 key={linkKey}

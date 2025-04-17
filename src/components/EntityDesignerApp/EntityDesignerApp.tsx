@@ -5,7 +5,7 @@ import {
   EntityConfig,
   EntityConfigQueryKeys,
 } from "@/models/EntityConfig/EntityConfig";
-import { entityConfigAPIClient } from "@/models/EntityConfig/entityConfigAPIClient";
+import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityNavbar } from "./EntityNavbar";
 
 function useEntities(): [
@@ -16,7 +16,7 @@ function useEntities(): [
   const queryResultObj = useQuery({
     queryKey: [EntityConfigQueryKeys.allEntityConfigs],
     queryFn: async () => {
-      const entities = await entityConfigAPIClient.getAll();
+      const entities = await EntityConfigClient.getAll();
       return entities;
     },
   });

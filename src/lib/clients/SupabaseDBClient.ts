@@ -6,9 +6,13 @@ export type DatabaseTableNames = keyof Database["public"]["Tables"];
 
 /**
  * A client for interacting with Supabase.
+ *
+ * Naming this `SupabaseDBClient` instead of `SupabaseClient` so it doesn't
+ * get mixed up with `SupabaseClient` from `@supabase/supabase-js` during
+ * automatic imports.
  * @see {@link https://supabase.com/docs/reference/javascript/start|Supabase JS Docs}
  */
-export const supabaseClient = createClient<
+export const SupabaseDBClient = createClient<
   Database,
   "public",
   Database["public"]

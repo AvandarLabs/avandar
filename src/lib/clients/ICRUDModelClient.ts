@@ -1,6 +1,6 @@
 import { CRUDModelVariants } from "../utils/models/CRUDModelVariants";
 
-export interface CRUDModelClient<
+export interface ICRUDModelClient<
   M extends CRUDModelVariants,
   ModelIdFieldType extends
     M["Read"][M["modelPrimaryKey"]] = M["Read"][M["modelPrimaryKey"]],

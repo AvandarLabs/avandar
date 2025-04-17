@@ -1,12 +1,12 @@
-import { SupabaseCRUDClient } from "@/lib/clients/createSupabaseCRUDClient";
+import { SupabaseCRUDClient } from "@/lib/clients/SupabaseCRUDClient";
 import { EntityConfigCRUDTypes, EntityConfigParsers } from "./EntityConfig";
 
-class EntityConfigAPIClient extends SupabaseCRUDClient<
+class EntityConfigClientImpl extends SupabaseCRUDClient<
   "entity_configs",
   EntityConfigCRUDTypes
 > {}
 
-export const entityConfigAPIClient = new EntityConfigAPIClient({
+export const EntityConfigClient = new EntityConfigClientImpl({
   tableName: "entity_configs",
   dbTablePrimaryKey: "id",
   parserRegistry: EntityConfigParsers,

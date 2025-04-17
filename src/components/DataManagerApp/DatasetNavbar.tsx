@@ -1,6 +1,6 @@
 import { Box, BoxProps, Loader, Title, useMantineTheme } from "@mantine/core";
 import { useMemo } from "react";
-import { AppConfig } from "@/config/AppConfig";
+import { APP_CONFIG } from "@/config/AppConfig";
 import { type NavLinkProps } from "@/lib/ui/links/NavLink";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
 import { getDatasetLinkProps, LocalDataset } from "@/models/LocalDataset";
@@ -34,7 +34,7 @@ export function DatasetNavbar({
       })
       .concat([
         {
-          to: AppConfig.links.dataImport.to,
+          to: APP_CONFIG.links.dataImport.to,
           label: "Add new dataset",
           style: borderStyle,
         },

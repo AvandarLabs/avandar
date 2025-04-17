@@ -49,7 +49,7 @@ type AppConfig = {
   };
 };
 
-export const AppConfig = {
+export const APP_CONFIG = {
   logoFilename: "logoWhite.png",
   appName: "Avandar",
   links: {

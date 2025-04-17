@@ -1,16 +1,16 @@
-import { CRUDModelClient } from "@/lib/clients/CRUDModelClient";
-import { supabaseClient } from "@/lib/clients/supabaseClient";
+import { ICRUDModelClient } from "@/lib/clients/ICRUDModelClient";
+import { SupabaseDBClient } from "@/lib/clients/SupabaseDBClient";
 import { ModelCRUDParserRegistry } from "@/lib/utils/models/crudSchemaParserFactory";
 import { SupabaseCRUDModelVariants } from "@/lib/utils/models/SupabaseCRUDModelVariants";
 import { castToAny } from "../utils/functions";
-import type { DatabaseTableNames } from "@/lib/clients/supabaseClient";
+import type { DatabaseTableNames } from "@/lib/clients/SupabaseDBClient";
 
 export class SupabaseCRUDClient<
   TableName extends DatabaseTableNames,
   M extends SupabaseCRUDModelVariants<TableName>,
   ModelIdFieldType extends
     M["Read"][M["modelPrimaryKey"]] = M["Read"][M["modelPrimaryKey"]],
-> implements CRUDModelClient<M, ModelIdFieldType>
+> implements ICRUDModelClient<M, ModelIdFieldType>
 {
   protected tableName: TableName;
   protected dbTablePrimaryKey: M["dbTablePrimaryKey"];
@@ -27,8 +27,7 @@ export class SupabaseCRUDClient<
   }
 
   async get(id: ModelIdFieldType): Promise<M["Read"] | undefined> {
-    const { data } = await supabaseClient
-      .from(this.tableName)
+    const { data } = await SupabaseDBClient.from(this.tableName)
       .select("*")
       .eq(this.dbTablePrimaryKey, castToAny(id))
       .maybeSingle<M["DBRead"]>()
@@ -44,25 +43,19 @@ export class SupabaseCRUDClient<
 
   // TODO(pablo): implement pagination
   async getAll(): Promise<Array<M["Read"]>> {
-    const { data } = await supabaseClient
-      .from(this.tableName)
+    const { data } = await SupabaseDBClient.from(this.tableName)
       .select("*")
       .throwOnError();
-    console.log("the data", data);
     const models = data.map((dbRow) => {
-      console.log("processing this row", dbRow);
       const model = this.parsers.fromDBToModelRead.parse(dbRow);
-      console.log("parsed model", model);
       return model;
     });
-    console.log("the models", models);
     return models;
   }
 
   async insert(data: M["Insert"]): Promise<M["Read"]> {
     const dataToInsert = this.parsers.fromModelToDBInsert.parse(data);
-    const { data: insertedData } = await supabaseClient
-      .from(this.tableName)
+    const { data: insertedData } = await SupabaseDBClient.from(this.tableName)
       .insert(castToAny(dataToInsert))
       .select()
       .single<M["DBRead"]>()
@@ -74,8 +67,7 @@ export class SupabaseCRUDClient<
 
   async update(id: ModelIdFieldType, data: M["Update"]): Promise<M["Read"]> {
     const dataToUpdate = this.parsers.fromModelToDBUpdate.parse(data);
-    const { data: updatedData } = await supabaseClient
-      .from(this.tableName)
+    const { data: updatedData } = await SupabaseDBClient.from(this.tableName)
       .update(castToAny(dataToUpdate))
       .eq(this.dbTablePrimaryKey, castToAny(id))
       .select()
@@ -85,8 +77,7 @@ export class SupabaseCRUDClient<
   }
 
   async delete(id: ModelIdFieldType): Promise<void> {
-    await supabaseClient
-      .from(this.tableName)
+    await SupabaseDBClient.from(this.tableName)
       .delete()
       .eq(this.dbTablePrimaryKey, castToAny(id))
       .throwOnError();

@@ -3,7 +3,7 @@ import { Dropzone, FileWithPath } from "@mantine/dropzone";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
-import { AppConfig } from "@/config/AppConfig";
+import { APP_CONFIG } from "@/config/AppConfig";
 import { DataGrid } from "@/lib/ui/DataGrid";
 import { FileUploadField } from "@/lib/ui/FileUploadField";
 import { makeLocalDataset } from "@/models/LocalDataset";
@@ -16,7 +16,7 @@ type DatasetForm = {
 };
 
 const { maxDatasetNameLength, maxDatasetDescriptionLength } =
-  AppConfig.dataManagerApp;
+  APP_CONFIG.dataManagerApp;
 
 export function DataImportView(): JSX.Element {
   const [saveDataset, isSavePending] = useSaveLocalDataset();
