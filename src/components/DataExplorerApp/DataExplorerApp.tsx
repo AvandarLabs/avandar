@@ -50,7 +50,7 @@ export function DataExplorerApp(): JSX.Element {
     return selectedGroupByFields.map(getProp("name"));
   }, [selectedGroupByFields]);
 
-  const { data: queryResults, isLoading: isLoadingResults } = useDataQuery({
+  const [queryResults, isLoadingResults] = useDataQuery({
     enabled: !!selectedDatasetId && loadedDatasets.has(selectedDatasetId),
     aggregations,
     datasetId: selectedDatasetId,
