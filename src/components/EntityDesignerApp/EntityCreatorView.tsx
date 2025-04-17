@@ -131,14 +131,9 @@ export function EntityCreator({
 
           Logger.log("submitted values", values);
 
-          const entityConfig: EntityConfig = {
-            id: values.id,
-            ownerId: values.ownerId,
+          const entityConfig: EntityConfig<"Insert"> = {
             name: values.name,
             description: values.description,
-            fields: values.fields.map(getProp("id")),
-            titleField: values.titleField,
-            idField: values.idField,
           };
 
           Logger.log("final config", entityConfig);

@@ -109,10 +109,9 @@ export function makeLocalDataset({
 /**
  * Returns the link props for a dataset to use in a `<Link>` component.
  */
-export function getDatasetLinkProps(id: number): {
-  to: LinkProps["to"];
-  params: LinkProps["params"];
-} {
+export function getDatasetLinkProps(
+  id: number,
+): Pick<LinkProps, "to" | "params"> {
   return {
     to: `/data-manager/$datasetId`,
     params: {

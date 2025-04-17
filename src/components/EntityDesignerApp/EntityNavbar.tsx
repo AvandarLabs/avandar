@@ -1,19 +1,17 @@
 import { Box, BoxProps, Loader, Title, useMantineTheme } from "@mantine/core";
 import { useMemo } from "react";
 import { AppConfig } from "@/config/AppConfig";
-import { Logger } from "@/lib/Logger";
 import { type NavLinkProps } from "@/lib/ui/links/NavLink";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
+import {
+  EntityConfig,
+  getEntityConfigLinkProps,
+} from "@/models/EntityConfig/EntityConfig";
 
 type Props = {
-  entities: string[];
+  entities: EntityConfig[];
   isLoading: boolean;
 } & BoxProps;
-
-function getEntityLinkProps(_entity: string): NavLinkProps {
-  Logger.error("Not implemented: getEntityLinkProps");
-  return {} as NavLinkProps;
-}
 
 export function EntityNavbar({
   entities,
@@ -32,8 +30,8 @@ export function EntityNavbar({
     return entities
       .map((entity): NavLinkProps => {
         return {
-          ...getEntityLinkProps(entity),
-          label: entity,
+          ...getEntityConfigLinkProps(entity),
+          label: entity.name,
           style: borderStyle,
         };
       })

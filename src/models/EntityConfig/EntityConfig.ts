@@ -1,5 +1,6 @@
 import { CamelCasedPropertiesDeep, Merge, SetRequired } from "type-fest";
 import { z } from "zod";
+import { LinkProps } from "@/lib/ui/links/Link";
 import { crudSchemaParserFactory } from "@/lib/utils/models/crudSchemaParserFactory";
 import { SupabaseCRUDModelVariants } from "@/lib/utils/models/SupabaseCRUDModelVariants";
 import {
@@ -38,12 +39,12 @@ export type EntityConfig<K extends keyof EntityConfigCRUDTypes = "Read"> =
 export const EntityConfigParsers =
   crudSchemaParserFactory<EntityConfigCRUDTypes>().makeParserRegistry({
     DBReadSchema: z.object({
-      created_at: z.string().datetime(),
+      created_at: z.string().datetime({ offset: true }),
       description: z.string().nullable(),
       id: z.string(),
       name: z.string(),
       owner_id: z.string(),
-      updated_at: z.string().datetime(),
+      updated_at: z.string().datetime({ offset: true }),
     }),
     ModelReadSchema: (dbReadSchema) => {
       return z.object(camelCaseKeysShallow(dbReadSchema.shape)).extend({
@@ -64,3 +65,18 @@ export const EntityConfigParsers =
       };
     },
   });
+
+export const EntityConfigQueryKeys = {
+  allEntityConfigs: ["entity_configs"],
+} as const;
+
+export function getEntityConfigLinkProps(
+  entity: EntityConfig,
+): Pick<LinkProps, "to" | "params"> {
+  return {
+    to: `/entity-designer/$entityId`,
+    params: {
+      entityId: entity.id,
+    },
+  };
+}
