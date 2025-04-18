@@ -265,6 +265,6 @@ CREATE TRIGGER tr_entity_config__set_updated_at BEFORE UPDATE ON public.entity_c
 
 CREATE TRIGGER tr_entity_field_config__set_updated_at BEFORE UPDATE ON public.entity_field_configs FOR EACH ROW EXECUTE FUNCTION util__set_updated_at();
 
-CREATE TRIGGER tr_entity_field_configs__validate_title_id_fields BEFORE INSERT OR UPDATE ON public.entity_field_configs FOR EACH ROW EXECUTE FUNCTION entity_field_configs__validate_title_id_fields();
+CREATE TRIGGER tr_entity_field_configs__validate_title_id_fields AFTER INSERT OR UPDATE ON public.entity_field_configs FOR EACH ROW EXECUTE FUNCTION entity_field_configs__validate_title_id_fields();
 
 

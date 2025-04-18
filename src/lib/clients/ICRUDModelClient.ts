@@ -1,4 +1,4 @@
-import { ModelCRUDParserRegistry } from "../utils/models/modelCRUDSchemaParserFactory";
+import { ModelCRUDParserRegistry } from "../utils/models/ModelCRUDParserRegistry";
 import { ModelCRUDTypes } from "../utils/models/ModelCRUDTypes";
 
 /**

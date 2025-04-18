@@ -1,6 +1,6 @@
 import { ICRUDModelClient } from "@/lib/clients/ICRUDModelClient";
 import { SupabaseDBClient } from "@/lib/clients/SupabaseDBClient";
-import { ModelCRUDParserRegistry } from "@/lib/utils/models/modelCRUDSchemaParserFactory";
+import { ModelCRUDParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
 import { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
 import { Logger } from "../Logger";
 import { castToAny } from "../utils/functions";

@@ -18,22 +18,22 @@ alter table public.entity_configs enable row level security;
 create policy "User can see their own entity_configs"
     on public.entity_configs for select
     to authenticated
-    using ((select auth.uid()) = owner_id);
+    using ((select auth.uid()) = public.entity_configs.owner_id);
 
 create policy "User can insert entity_configs"
     on public.entity_configs for insert
     to authenticated
-    with check ((select auth.uid()) = owner_id);
+    with check ((select auth.uid()) = public.entity_configs.owner_id);
 
 create policy "User can update their own entity_configs"
     on public.entity_configs for update
     to authenticated
-    with check ((select auth.uid()) = owner_id);
+    with check ((select auth.uid()) = public.entity_configs.owner_id);
 
 create policy "User can delete their own entity_configs"
     on public.entity_configs for delete
     to authenticated
-    using ((select auth.uid()) = owner_id);
+    using ((select auth.uid()) = public.entity_configs.owner_id);
 
 -- Create updated_at trigger
 create trigger tr_entity_config__set_updated_at

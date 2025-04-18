@@ -1,4 +1,7 @@
+import { SupabaseClient } from "@supabase/supabase-js";
+import { createSupabaseAdminClient } from "@/lib/clients/SupabaseDBClient";
 import { promiseMap, promiseMapSequential } from "@/lib/utils/promises";
+import { Database } from "@/types/database.types";
 import { ScriptsUtil } from "./ScriptsUtil";
 import type { User } from "@/models/User";
 
@@ -13,6 +16,7 @@ export type GenericSeedData = {
 
 type SeedJobFn<Data extends GenericSeedData> = (context: {
   data: Data;
+  dbClient: SupabaseClient<Database>;
   helpers: SeedHelpers;
 }) => Promise<void> | void;
 
@@ -28,28 +32,35 @@ export type SeedRunnerConfig<Data extends GenericSeedData> = {
 
 /**
  * Utility class for running seed jobs. This class is tightly coupled to
- * Supabase and will use the SupabaseClient from `src/clients` to first
- * create the initial users (defined in `SEED_DATA.users`), and then
- * it will run all jobs defined in `SEED_JOBS`.
+ * Supabase and will create a SupabaseAdminClient to carry out all
+ * database operations.
+ *
+ * First, the runner creates the initial users (defined in `SEED_DATA.users`),
+ * and then it will run all jobs defined in `SEED_JOBS`.
  *
  * Both the `SEED_DATA` and `SEED_JOBS` can be configured in
  * `seed/SeedConfig.ts`.
+ *
+ * This class requires `SUPABASE_SERVICE_ROLE_KEY` env var.
  */
 export class SeedRunner<Data extends GenericSeedData> {
   #config: SeedRunnerConfig<Data>;
   #userLookup: Map<string, User> = new Map();
   #jobs: Array<GenericSeedJob<Data>> = [];
+  #adminClient: SupabaseClient<Database>;
 
   constructor(config: SeedRunnerConfig<Data>) {
     this.#config = config;
     this.#jobs.push(...config.jobs);
+    this.#adminClient = createSupabaseAdminClient(
+      process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+    );
   }
 
   async createUsers(): Promise<void> {
-    const users: User[] = await promiseMap(
-      this.#config.data.users,
-      ScriptsUtil.createUser,
-    );
+    const users: User[] = await promiseMap(this.#config.data.users, (user) => {
+      return ScriptsUtil.createUser(user, this.#adminClient);
+    });
     users.forEach((user) => {
       if (user.email) {
         this.#userLookup.set(user.email, user);
@@ -88,6 +99,7 @@ export class SeedRunner<Data extends GenericSeedData> {
       console.log("Running seed job: ", job.name);
       await job.jobFn({
         data: this.#config.data,
+        dbClient: this.#adminClient,
         helpers: {
           getUserByEmail: (email) => {
             return this.getUserByEmail(email);

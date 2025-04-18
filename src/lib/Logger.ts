@@ -1,5 +1,3 @@
-import { isNotNullOrUndefined } from "./utils/guards";
-
 const LOG_HEADER_FONT_SIZE = "11px";
 const LOG_BODY_FONT_SIZE = "13px";
 

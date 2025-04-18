@@ -60,3 +60,15 @@ the other Supabase container and run `npx supabase stop`)
 - Public files are in public/. Change the logo there. Just replace logo.svg with your logo (png, svg, whatever).
 - Public files are importable using / in vite.
 - Images, pngs, svgs, are importable from assets directly.
+
+# Creating new models
+
+If this is purely a frontend model with no DB persistence, then skip to step 3.
+
+1. Create a SQL DB schema in `supabase/schemas`
+2. Generate the new types with `yarn db:gen-types`
+3. Run `yarn new:model YourModel [your_db_table_name]` to create your new model. If you only need a frontend model, don't include the db table name.
+4. Set up your model types in the newly created `src/models/YourModel.ts`
+5. If this model requires any server operations or backend persistence, set up the Zod schema parsers in `src/models/YourModelParsers.ts`
+6. Configure the API Client with the appropriate arguments in `src/models/YourModelClient.ts`
+7. Add any utility functions to `src/models/yourModelUtils.ts`

@@ -9,7 +9,8 @@ create table public.entity_field_configs (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now(),
 
-    -- Core fields
+    -- Discriminating columns
+    -- (their value depends on the `class` and `base_type`)
     class text not null check (class in ('dimension', 'metric')),
     base_type text not null,
     value_extractor jsonb not null,
@@ -70,8 +71,8 @@ create policy "User can see entity_field_configs"
         exists (
             select 1
             from public.entity_configs
-            where entity_configs.id = public.entity_field_configs.entity_config_id
-            and entity_configs.owner_id = (select auth.uid())
+            where public.entity_configs.id = public.entity_field_configs.entity_config_id
+            and public.entity_configs.owner_id = (select auth.uid())
         )
     );
 
@@ -83,8 +84,8 @@ create policy "User can insert entity_field_configs"
         exists (
             select 1
             from public.entity_configs
-            where entity_configs.id = public.entity_field_configs.entity_config_id
-            and entity_configs.owner_id = (select auth.uid())
+            where public.entity_configs.id = public.entity_field_configs.entity_config_id
+            and public.entity_configs.owner_id = (select auth.uid())
         )
     );
 
@@ -96,8 +97,8 @@ create policy "User can update entity_field_configs"
         exists (
             select 1
             from public.entity_configs
-            where entity_configs.id = public.entity_field_configs.entity_config_id
-            and entity_configs.owner_id = (select auth.uid())
+            where public.entity_configs.id = public.entity_field_configs.entity_config_id
+            and public.entity_configs.owner_id = (select auth.uid())
         )
     );
 
@@ -109,8 +110,8 @@ create policy "User can delete entity_field_configs"
         exists (
             select 1
             from public.entity_configs
-            where entity_configs.id = public.entity_field_configs.entity_config_id
-            and entity_configs.owner_id = (select auth.uid())
+            where public.entity_configs.id = public.entity_field_configs.entity_config_id
+            and public.entity_configs.owner_id = (select auth.uid())
         )
     );
 
@@ -146,5 +147,5 @@ $$ language plpgsql;
 
 -- Trigger to enforce the validation
 create trigger tr_entity_field_configs__validate_title_id_fields
-    before insert or update on public.entity_field_configs
+    after insert or update on public.entity_field_configs
     for each row execute function public.entity_field_configs__validate_title_id_fields();

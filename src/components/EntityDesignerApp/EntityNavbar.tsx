@@ -3,10 +3,8 @@ import { useMemo } from "react";
 import { APP_CONFIG } from "@/config/AppConfig";
 import { type NavLinkProps } from "@/lib/ui/links/NavLink";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
-import {
-  EntityConfig,
-  getEntityConfigLinkProps,
-} from "@/models/EntityConfig/EntityConfig";
+import { EntityConfig } from "@/models/EntityConfig/EntityConfig";
+import { getEntityConfigLinkProps } from "@/models/EntityConfig/entityConfigUtils";
 
 type Props = {
   entityConfigs: EntityConfig[];

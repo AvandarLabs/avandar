@@ -6,9 +6,31 @@ export const TODOS =
   import.meta.env.DEV ?
     [
       {
+        label: "Frontend tooling/infra",
+        items: [
+          "Automated database types => Zod (on yarn new:model MyModel table_name)",
+          "Automated zod schemas for models => typescript types for models, with a filewatcher",
+          "Use individual DBRead, ModelRead, DBInsert, ModelInsert, etc. schemas. 6 total.",
+          `Create parser maker to convert:
+1) fromDbReadToModelRead;
+2) fromModelInsertToDbInsert;
+3) fromModelUpdateToDbUpdate`,
+          `Type tests should ensure that these are consistent:
+1) dbRead output <> modelRead input
+2) modelInsert output <> dbInsert input
+3) modelUpdate output <> dbUpdate input`,
+        ],
+      },
+      {
         label: "Entity Designer",
         items: [
-          "Set up the Supabase tables for the EntityConfig and EntityFieldConfig",
+          "Implement the EntityFieldConfig model and table and related CRUD stuff",
+          "Add function to deep convert nulls to undefined",
+          "Add type utility to deep convert nulls to undefined",
+          "Use these utilities in EntityFieldConfig and EntityConfig",
+          "Implement fields",
+          "Re-enable the form root rule for no empty fields array",
+          "Validate that there is a title field and an id field in the array",
         ],
       },
       {

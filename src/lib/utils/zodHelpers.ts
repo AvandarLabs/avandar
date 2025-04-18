@@ -94,3 +94,19 @@ export function unimplementedType(): z.ZodTypeAny {
     throw new Error("This schema is not implemented yet");
   });
 }
+
+const literalSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
+type Literal = z.infer<typeof literalSchema>;
+type Json = Literal | { [key: string]: Json | undefined } | Json[];
+
+/**
+ * Returns a Zod type that represents a JSON value.
+ *
+ * @returns A Zod type that represents a JSON value.
+ */
+export function jsonType(): z.ZodType<Json> {
+  const jsonSchema: z.ZodType<Json> = z.lazy(() => {
+    return z.union([literalSchema, z.array(jsonSchema), z.record(jsonSchema)]);
+  });
+  return jsonSchema;
+}

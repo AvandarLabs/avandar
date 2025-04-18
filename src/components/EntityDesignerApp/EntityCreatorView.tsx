@@ -5,7 +5,6 @@ import {
   Container,
   Fieldset,
   Group,
-  Select,
   Stack,
   Text,
   TextInput,
@@ -19,18 +18,9 @@ import { getProp } from "@/lib/utils/objects";
 import { makeSelectOptions } from "@/lib/utils/ui/makeSelectOptions";
 import { uuid } from "@/lib/utils/uuid";
 import { EntityConfig } from "@/models/EntityConfig/EntityConfig";
-import {
-  EntityFieldConfig,
-  makeEntityFieldConfig,
-} from "@/models/EntityFieldConfig";
-
-/*
-
-TODO(pablo):
-1. Implement fields
-2. Re-enable the form root rule for no empty fields array
-3. Validate that there is a title field and an id field in the array
-*/
+import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
+import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
+import { makeEntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/entityFieldConfigUtils";
 
 type EntityConfigForm = {
   name: string;
@@ -54,6 +44,9 @@ const initialFields = [makeEntityFieldConfig({ id: uuid(), name: "" })];
 const initialFieldOptions = fieldsToSelectOptions(initialFields);
 
 export function EntityCreatorView(): JSX.Element {
+  const [entityFields] = EntityFieldConfigClient.useGetAll();
+  Logger.log("entity fields", entityFields);
+
   const [configForm, setConfigForm] = useForm<EntityConfigForm>({
     mode: "uncontrolled",
     initialValues: {

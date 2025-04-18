@@ -4,6 +4,7 @@
  *    yarn db:create-user <email> <password>
  */
 import { z } from "zod";
+import { SupabaseDBClient } from "@/lib/clients/SupabaseDBClient";
 import { ScriptsUtil } from "./ScriptsUtil";
 
 function printUsage() {
@@ -15,10 +16,13 @@ const ScriptArguments = z.tuple([z.string().email(), z.string()]);
 async function main(): Promise<void> {
   try {
     const [email, password] = ScriptArguments.parse(process.argv.slice(2));
-    await ScriptsUtil.createUser({
-      email,
-      password,
-    });
+    await ScriptsUtil.createUser(
+      {
+        email,
+        password,
+      },
+      SupabaseDBClient,
+    );
     console.log(`Successfully created user with email ${email}`);
   } catch (error) {
     if (error instanceof z.ZodError) {

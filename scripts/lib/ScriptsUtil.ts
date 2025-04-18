@@ -1,5 +1,6 @@
-import { SupabaseDBClient } from "@/lib/clients/SupabaseDBClient";
-import { User } from "@/models/User";
+import type { User } from "@/models/User";
+import type { Database } from "@/types/database.types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export const ScriptsUtil = {
   /**
@@ -8,8 +9,11 @@ export const ScriptsUtil = {
    * @param user - The user to create.
    * @returns The created user.
    */
-  async createUser(user: { email: string; password: string }): Promise<User> {
-    const { data, error } = await SupabaseDBClient.auth.signUp({
+  async createUser(
+    user: { email: string; password: string },
+    dbClient: SupabaseClient<Database>,
+  ): Promise<User> {
+    const { data, error } = await dbClient.auth.signUp({
       email: user.email,
       password: user.password,
     });
