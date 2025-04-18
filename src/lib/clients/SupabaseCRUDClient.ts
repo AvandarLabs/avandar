@@ -29,7 +29,7 @@ export class SupabaseCRUDClient<
     this.modelName = config.modelName;
     this.dbTablePrimaryKey = config.dbTablePrimaryKey;
     this.parsers = config.parserRegistry;
-    this.logger = Logger.withName(this.modelName);
+    this.logger = Logger.withName(`${this.modelName}Client`);
   }
 
   async getById(id: ModelIdFieldType): Promise<M["Read"] | undefined> {
