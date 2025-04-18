@@ -3,10 +3,13 @@ const LOG_BODY_FONT_SIZE = "13px";
 
 export type ILogger = {
   name: string | undefined;
-  withName: (name: string) => ILogger;
   error: (error: unknown, extraData?: unknown) => void;
   warn: (...args: unknown[]) => void;
   log: (...args: unknown[]) => void;
+  withConditionalLogging: <T>(
+    enabled: boolean | undefined,
+    callback: (conditionalLogger: ILogger) => T,
+  ) => T;
 };
 
 /**
@@ -59,21 +62,35 @@ function getFunctionsFromLoggerStack(
   return stack;
 }
 
-function createLogger(config?: { loggerName: string }): ILogger {
+/**
+ * Creates a new logger instance.
+ *
+ * @param config - Configuration options for the logger.
+ * @param config.loggerName - The name of the logger.
+ * @param config.disable - Whether to disable the logger.
+ * @returns A new logger instance.
+ */
+export function createLogger(config?: {
+  loggerName?: string;
+  disabled?: boolean;
+}): ILogger {
   const loggerName = config?.loggerName;
   const styledMessageStructure = loggerName ? `%c [${loggerName}] %s` : "%c %s";
+  const state = { disabled: config?.disabled ?? false };
 
   return {
     name: loggerName,
 
-    /**
-     * Creates a new logger with the given name.
-     *
-     * @param name - The name of the logger.
-     * @returns A new logger instance.
-     */
-    withName: (name: string) => {
-      return createLogger({ loggerName: name });
+    withConditionalLogging: <T>(
+      enabled: boolean | undefined,
+      callback: (conditionalLogger: ILogger) => T,
+    ): T => {
+      const newLogger = createLogger({
+        ...config,
+        disabled: !enabled,
+      });
+      const results = callback(newLogger);
+      return results;
     },
 
     /**
@@ -84,6 +101,9 @@ function createLogger(config?: { loggerName: string }): ILogger {
      * @param extraData - Optional extra data to log.
      */
     error: (error: unknown, extraData?: unknown): void => {
+      if (state.disabled) {
+        return;
+      }
       console.error(error, extraData);
     },
 
@@ -94,6 +114,10 @@ function createLogger(config?: { loggerName: string }): ILogger {
      * @param extraData - Optional extra data to log.
      */
     warn: (...args: unknown[]): void => {
+      if (state.disabled) {
+        return;
+      }
+
       const stack = getFunctionsFromLoggerStack(new Error().stack ?? "");
       const caller = stack[0]!;
       const styles = [
@@ -116,6 +140,10 @@ function createLogger(config?: { loggerName: string }): ILogger {
      * dev mode. This also prints the function caller and location.
      */
     log: (...args: unknown[]): void => {
+      if (state.disabled) {
+        return;
+      }
+
       if (import.meta.env.DEV) {
         const stack = getFunctionsFromLoggerStack(new Error().stack ?? "");
         const caller = stack[0]!;

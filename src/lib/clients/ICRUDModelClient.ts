@@ -2,7 +2,7 @@ import { ILogger } from "../Logger";
 import { ModelCRUDParserRegistry } from "../utils/models/ModelCRUDParserRegistry";
 import { ModelCRUDTypes } from "../utils/models/ModelCRUDTypes";
 
-type BaseModelClientOptions = {
+export type ModelClientOptions = {
   enableLogger?: boolean;
 };
 
@@ -23,6 +23,14 @@ export interface ICRUDModelClient<
   logger: ILogger;
 
   /**
+   * Validates the passed frontend model data is valid for insertion
+   * into the model.
+   * @param data - The data to validate
+   * @returns A promise that resolves when the data is valid
+   */
+  validateDataForInsert(data: M["Insert"]): boolean;
+
+  /**
    * A registry of parsers for converting between model variants and
    * database variants.
    */
@@ -36,14 +44,14 @@ export interface ICRUDModelClient<
    */
   getById(
     id: ModelIdFieldType,
-    options?: BaseModelClientOptions,
+    options?: ModelClientOptions,
   ): Promise<M["Read"] | undefined>;
 
   /**
    * Retrieves all instances of the model.
    * @returns A promise resolving to an array of model instances
    */
-  getAll(options?: BaseModelClientOptions): Promise<Array<M["Read"]>>;
+  getAll(options?: ModelClientOptions): Promise<Array<M["Read"]>>;
 
   /**
    * Creates a new model instance in the data store.
@@ -61,7 +69,7 @@ export interface ICRUDModelClient<
   update(
     id: ModelIdFieldType,
     data: M["Update"],
-    options?: BaseModelClientOptions,
+    options?: ModelClientOptions,
   ): Promise<M["Read"]>;
 
   /**
@@ -69,5 +77,5 @@ export interface ICRUDModelClient<
    * @param id - The unique identifier of the model to delete
    * @returns A promise that resolves when deletion is complete
    */
-  delete(id: ModelIdFieldType, options?: BaseModelClientOptions): Promise<void>;
+  delete(id: ModelIdFieldType, options?: ModelClientOptions): Promise<void>;
 }

@@ -9,6 +9,7 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
+import { formRootRule, isNotEmpty } from "@mantine/form";
 import { IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { useForm } from "@/lib/hooks/ui/useForm";
@@ -22,12 +23,8 @@ import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/Entit
 import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
 import { makeEntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/entityFieldConfigUtils";
 
-type EntityConfigForm = {
-  name: string;
-  description: string;
-
-  // TODO(pablo): implement this
-  fields: EntityFieldConfig[];
+type EntityConfigForm = EntityConfig<"Insert"> & {
+  fields: Array<EntityFieldConfig<"Insert">>;
 };
 
 function fieldsToSelectOptions(fields: EntityFieldConfig[]): ComboboxItem[] {
@@ -44,8 +41,9 @@ const initialFields = [makeEntityFieldConfig({ id: uuid(), name: "" })];
 const initialFieldOptions = fieldsToSelectOptions(initialFields);
 
 export function EntityCreatorView(): JSX.Element {
-  const [entityFields] = EntityFieldConfigClient.useGetAll();
-  Logger.log("entity fields", entityFields);
+  const [entityFields] = EntityFieldConfigClient.useGetAll({
+    enableLogger: true,
+  });
 
   const [configForm, setConfigForm] = useForm<EntityConfigForm>({
     mode: "uncontrolled",
@@ -56,8 +54,7 @@ export function EntityCreatorView(): JSX.Element {
     },
     validate: {
       fields: {
-        // TODO(pablo): enable this rule again
-        // [formRootRule]: isNotEmpty("At least one field is required"),
+        [formRootRule]: isNotEmpty("At least one field is required"),
       },
     },
     onValuesChange: (newValues, prevValues) => {

@@ -1,9 +1,10 @@
-import { ICRUDModelClient } from "@/lib/clients/ICRUDModelClient";
 import { SupabaseDBClient } from "@/lib/clients/SupabaseDBClient";
 import { ModelCRUDParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
 import { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
-import { ILogger, Logger } from "../Logger";
+import { ILogger } from "../Logger";
 import { castToAny } from "../utils/functions";
+import { CRUDModelClient } from "./CRUDModelClient";
+import { ModelClientOptions } from "./ICRUDModelClient";
 import type { DatabaseTableNames } from "@/lib/clients/SupabaseDBClient";
 
 export class SupabaseCRUDClient<
@@ -11,13 +12,9 @@ export class SupabaseCRUDClient<
   M extends SupabaseModelCRUDTypes<TableName>,
   ModelIdFieldType extends
     M["Read"][M["modelPrimaryKey"]] = M["Read"][M["modelPrimaryKey"]],
-> implements ICRUDModelClient<M>
-{
+> extends CRUDModelClient<M> {
   tableName: TableName;
-  modelName: M["modelName"];
   dbTablePrimaryKey: M["dbTablePrimaryKey"];
-  parsers: ModelCRUDParserRegistry<M>;
-  logger: ILogger;
 
   constructor(config: {
     tableName: TableName;
@@ -25,14 +22,18 @@ export class SupabaseCRUDClient<
     dbTablePrimaryKey: M["dbTablePrimaryKey"];
     parserRegistry: ModelCRUDParserRegistry<M>;
   }) {
+    super({
+      modelName: config.modelName,
+      parserRegistry: config.parserRegistry,
+    });
     this.tableName = config.tableName;
-    this.modelName = config.modelName;
     this.dbTablePrimaryKey = config.dbTablePrimaryKey;
-    this.parsers = config.parserRegistry;
-    this.logger = Logger.withName(`${this.modelName}Client`);
   }
 
-  async getById(id: ModelIdFieldType): Promise<M["Read"] | undefined> {
+  async getById(
+    id: ModelIdFieldType,
+    _options?: ModelClientOptions,
+  ): Promise<M["Read"] | undefined> {
     const { data } = await SupabaseDBClient.from(this.tableName)
       .select("*")
       .eq(this.dbTablePrimaryKey, castToAny(id))
@@ -47,20 +48,28 @@ export class SupabaseCRUDClient<
     return model;
   }
 
-  async getAll(): Promise<Array<M["Read"]>> {
+  async getAll(options?: ModelClientOptions): Promise<Array<M["Read"]>> {
     this.logger.warn("TODO(pablo): Pagination must be implemented.");
 
-    const { data } = await SupabaseDBClient.from(this.tableName)
-      .select("*")
-      .throwOnError();
+    const result = await this.logger.withConditionalLogging(
+      options?.enableLogger,
+      async (logger: ILogger) => {
+        const { data } = await SupabaseDBClient.from(this.tableName)
+          .select("*")
+          .throwOnError();
 
-    this.logger.log("get all data", data);
+        logger.log(`All ${this.modelName}s from db`, data);
 
-    const models = data.map((dbRow) => {
-      const model = this.parsers.fromDBToModelRead.parse(dbRow);
-      return model;
-    });
-    return models;
+        const models = data.map((dbRow) => {
+          const model = this.parsers.fromDBToModelRead.parse(dbRow);
+          return model;
+        });
+
+        return models;
+      },
+    );
+
+    return result;
   }
 
   async insert(data: M["Insert"]): Promise<M["Read"]> {
