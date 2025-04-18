@@ -3,13 +3,13 @@ import { withQueryHooks } from "@/lib/clients/withQueryHooks";
 import { EntityFieldConfigCRUDTypes } from "./EntityFieldConfig";
 import { EntityFieldConfigParsers } from "./EntityFieldConfigParsers";
 
-class EntityConfigClientImpl extends SupabaseCRUDClient<
+class EntityFieldConfigImpl extends SupabaseCRUDClient<
   "entity_field_configs",
   EntityFieldConfigCRUDTypes
 > {}
 
 export const EntityFieldConfigClient = withQueryHooks(
-  new EntityConfigClientImpl({
+  new EntityFieldConfigImpl({
     modelName: "EntityFieldConfig",
     tableName: "entity_field_configs",
     dbTablePrimaryKey: "id",

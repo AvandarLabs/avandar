@@ -1,5 +1,4 @@
-import { uuid } from "@/lib/utils/uuid";
-import { entityConfigSeeder, entityFieldConfigSeeder } from "./seedJobs";
+import { entityConfigSeeder } from "./seedJobs";
 import type {
   GenericSeedData,
   GenericSeedJob,
@@ -16,33 +15,29 @@ export const SEED_DATA = {
   ],
   entityConfigs: [
     {
-      id: uuid(),
       owner: TEST_USER_EMAIL,
       name: "State",
       description: "This entity represents a US State",
-    },
-  ],
-  entityFieldConfigs: [
-    {
-      id: uuid(),
-      name: "Name",
-      description: "This entity represents a US State",
-      isIdField: true,
-      isTitleField: true,
-      baseType: "string",
-      class: "dimension",
-      value_extractor: {
-        extractorType: "manualEntry",
-        allowManualEdit: true,
-      },
+      fields: [
+        {
+          class: "dimension",
+          baseType: "string",
+          isArray: false,
+          name: "Name",
+          description: "This entity represents a US State",
+          isIdField: true,
+          isTitleField: true,
+          value_extractor: {
+            extractorType: "manualEntry",
+            allowManualEdit: true,
+          },
+        },
+      ],
     },
   ],
 } satisfies GenericSeedData;
 
-export const SEED_JOBS: readonly SeedJob[] = [
-  entityConfigSeeder,
-  entityFieldConfigSeeder,
-] as const;
+export const SEED_JOBS: readonly SeedJob[] = [entityConfigSeeder] as const;
 
 export type SeedData = typeof SEED_DATA;
 export type SeedJob = GenericSeedJob<SeedData>;

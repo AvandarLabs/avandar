@@ -51,6 +51,9 @@ export class SupabaseCRUDClient<
     const { data } = await SupabaseDBClient.from(this.tableName)
       .select("*")
       .throwOnError();
+
+    Logger.log("get all data", data);
+
     const models = data.map((dbRow) => {
       const model = this.parsers.fromDBToModelRead.parse(dbRow);
       return model;

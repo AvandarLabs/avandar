@@ -85,7 +85,8 @@ export function withQueryHooks<
           return useQuery({
             queryKey: [client.modelName, queryFnName, ...args],
             queryFn: async () => {
-              return await boundClientFunction(...args);
+              const result = await boundClientFunction(...args);
+              return result;
             },
           });
         };
