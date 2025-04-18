@@ -2,7 +2,7 @@ import { ICRUDModelClient } from "@/lib/clients/ICRUDModelClient";
 import { SupabaseDBClient } from "@/lib/clients/SupabaseDBClient";
 import { ModelCRUDParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
 import { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
-import { Logger } from "../Logger";
+import { ILogger, Logger } from "../Logger";
 import { castToAny } from "../utils/functions";
 import type { DatabaseTableNames } from "@/lib/clients/SupabaseDBClient";
 
@@ -17,6 +17,7 @@ export class SupabaseCRUDClient<
   modelName: M["modelName"];
   dbTablePrimaryKey: M["dbTablePrimaryKey"];
   parsers: ModelCRUDParserRegistry<M>;
+  logger: ILogger;
 
   constructor(config: {
     tableName: TableName;
@@ -28,6 +29,7 @@ export class SupabaseCRUDClient<
     this.modelName = config.modelName;
     this.dbTablePrimaryKey = config.dbTablePrimaryKey;
     this.parsers = config.parserRegistry;
+    this.logger = Logger.withName(this.modelName);
   }
 
   async getById(id: ModelIdFieldType): Promise<M["Read"] | undefined> {
@@ -46,13 +48,13 @@ export class SupabaseCRUDClient<
   }
 
   async getAll(): Promise<Array<M["Read"]>> {
-    Logger.warn("TODO(pablo): Pagination must be implemented.");
+    this.logger.warn("TODO(pablo): Pagination must be implemented.");
 
     const { data } = await SupabaseDBClient.from(this.tableName)
       .select("*")
       .throwOnError();
 
-    Logger.log("get all data", data);
+    this.logger.log("get all data", data);
 
     const models = data.map((dbRow) => {
       const model = this.parsers.fromDBToModelRead.parse(dbRow);

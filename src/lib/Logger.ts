@@ -1,6 +1,14 @@
 const LOG_HEADER_FONT_SIZE = "11px";
 const LOG_BODY_FONT_SIZE = "13px";
 
+export type ILogger = {
+  name: string | undefined;
+  withName: (name: string) => ILogger;
+  error: (error: unknown, extraData?: unknown) => void;
+  warn: (...args: unknown[]) => void;
+  log: (...args: unknown[]) => void;
+};
+
 /**
  * Extracts the function and location from a stack trace.
  * NOTE: this function is tightly coupled to our Logger. It assumes the stack
@@ -51,55 +59,82 @@ function getFunctionsFromLoggerStack(
   return stack;
 }
 
-export const Logger = {
-  /**
-   * Logs an error to the console.
-   *
-   * @param error - The error to log. It can technically be of any type because
-   * javascript lets you `throw` anything, even primitive types.
-   * @param extraData - Optional extra data to log.
-   */
-  error: (error: unknown, extraData?: unknown): void => {
-    console.error(error, extraData);
-  },
+function createLogger(config?: { loggerName: string }): ILogger {
+  const loggerName = config?.loggerName;
+  const styledMessageStructure = loggerName ? `%c [${loggerName}] %s` : "%c %s";
 
-  /**
-   * Logs a warning to the console.
-   *
-   * @param message - The message to log.
-   * @param extraData - Optional extra data to log.
-   */
-  warn: (...args: unknown[]): void => {
-    const stack = getFunctionsFromLoggerStack(new Error().stack ?? "");
-    const caller = stack[0]!;
-    const styles = [
-      `background: #f6db6d; color: #102a43; font-weight: bold; font-size: ${LOG_HEADER_FONT_SIZE};`,
-      args.length > 1 ?
-        `background: #a0140c; color: #ffffff; font-size: ${LOG_BODY_FONT_SIZE};`
-      : `font-size: ${LOG_BODY_FONT_SIZE};`,
-    ];
-    const logHeading = `%c [WARN] ${caller.fnName} [${caller.location}]`;
-    const styledMsg = "%c %s ";
-    console.warn(`${logHeading}\n${styledMsg}`, ...styles, ...args);
-  },
+  return {
+    name: loggerName,
 
-  /**
-   * Logs a message to the console that is only visible if we are in
-   * dev mode. This also prints the function caller and location.
-   */
-  log: (...args: unknown[]): void => {
-    if (import.meta.env.DEV) {
+    /**
+     * Creates a new logger with the given name.
+     *
+     * @param name - The name of the logger.
+     * @returns A new logger instance.
+     */
+    withName: (name: string) => {
+      return createLogger({ loggerName: name });
+    },
+
+    /**
+     * Logs an error to the console.
+     *
+     * @param error - The error to log. It can technically be of any type
+     * because javascript lets you `throw` anything, even primitive types.
+     * @param extraData - Optional extra data to log.
+     */
+    error: (error: unknown, extraData?: unknown): void => {
+      console.error(error, extraData);
+    },
+
+    /**
+     * Logs a warning to the console.
+     *
+     * @param message - The message to log.
+     * @param extraData - Optional extra data to log.
+     */
+    warn: (...args: unknown[]): void => {
       const stack = getFunctionsFromLoggerStack(new Error().stack ?? "");
       const caller = stack[0]!;
       const styles = [
-        `background: #d5f5fa; color: #102a43; font-weight: bold; font-size: ${LOG_HEADER_FONT_SIZE};`,
+        `background: #f6db6d; color: #102a43; font-weight: bold; font-size: ${LOG_HEADER_FONT_SIZE};`,
         args.length > 1 ?
           `background: #a0140c; color: #ffffff; font-size: ${LOG_BODY_FONT_SIZE};`
         : `font-size: ${LOG_BODY_FONT_SIZE};`,
       ];
-      const logHeading = `%c [LOG] ${caller.fnName} [${caller.location}]`;
-      const styledMsg = "%c %s ";
-      console.log(`${logHeading}\n${styledMsg}`, ...styles, ...args);
-    }
-  },
-};
+      const logHeading = `%c [WARN] ${caller.fnName} [${caller.location}]`;
+      console.warn(
+        `${logHeading}\n${styledMessageStructure}`,
+        ...styles,
+        "WARN",
+        ...args,
+      );
+    },
+
+    /**
+     * Logs a message to the console that is only visible if we are in
+     * dev mode. This also prints the function caller and location.
+     */
+    log: (...args: unknown[]): void => {
+      if (import.meta.env.DEV) {
+        const stack = getFunctionsFromLoggerStack(new Error().stack ?? "");
+        const caller = stack[0]!;
+        const styles = [
+          `background: #d5f5fa; color: #102a43; font-weight: bold; font-size: ${LOG_HEADER_FONT_SIZE};`,
+          args.length > 1 ?
+            `background: #a0140c; color: #ffffff; font-size: ${LOG_BODY_FONT_SIZE};`
+          : `font-size: ${LOG_BODY_FONT_SIZE};`,
+        ];
+        const logHeading = `%c [LOG] ${caller.fnName} [${caller.location}]`;
+        console.log(
+          `${logHeading}\n${styledMessageStructure}`,
+          ...styles,
+          ...args,
+        );
+      }
+    },
+  };
+}
+
+/** The base logger, with no name */
+export const Logger: ILogger = createLogger();

@@ -1,5 +1,10 @@
+import { ILogger } from "../Logger";
 import { ModelCRUDParserRegistry } from "../utils/models/ModelCRUDParserRegistry";
 import { ModelCRUDTypes } from "../utils/models/ModelCRUDTypes";
+
+type BaseModelClientOptions = {
+  enableLogger?: boolean;
+};
 
 /**
  * An interface representing a generic client for a CRUD model.
@@ -15,6 +20,8 @@ export interface ICRUDModelClient<
     M["Read"][M["modelPrimaryKey"]] = M["Read"][M["modelPrimaryKey"]],
 > {
   modelName: M["modelName"];
+  logger: ILogger;
+
   /**
    * A registry of parsers for converting between model variants and
    * database variants.
@@ -27,13 +34,16 @@ export interface ICRUDModelClient<
    * @returns A promise resolving to the model instance or undefined
    * if not found
    */
-  getById(id: ModelIdFieldType): Promise<M["Read"] | undefined>;
+  getById(
+    id: ModelIdFieldType,
+    options?: BaseModelClientOptions,
+  ): Promise<M["Read"] | undefined>;
 
   /**
    * Retrieves all instances of the model.
    * @returns A promise resolving to an array of model instances
    */
-  getAll(): Promise<Array<M["Read"]>>;
+  getAll(options?: BaseModelClientOptions): Promise<Array<M["Read"]>>;
 
   /**
    * Creates a new model instance in the data store.
@@ -48,12 +58,16 @@ export interface ICRUDModelClient<
    * @param data - The data to update on the model instance
    * @returns A promise resolving to the updated model instance
    */
-  update(id: ModelIdFieldType, data: M["Update"]): Promise<M["Read"]>;
+  update(
+    id: ModelIdFieldType,
+    data: M["Update"],
+    options?: BaseModelClientOptions,
+  ): Promise<M["Read"]>;
 
   /**
    * Deletes a model instance from the data store.
    * @param id - The unique identifier of the model to delete
    * @returns A promise that resolves when deletion is complete
    */
-  delete(id: ModelIdFieldType): Promise<void>;
+  delete(id: ModelIdFieldType, options?: BaseModelClientOptions): Promise<void>;
 }
