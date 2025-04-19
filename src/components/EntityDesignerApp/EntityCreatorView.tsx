@@ -19,6 +19,7 @@ import { getProp } from "@/lib/utils/objects";
 import { makeSelectOptions } from "@/lib/utils/ui/makeSelectOptions";
 import { uuid } from "@/lib/utils/uuid";
 import { EntityConfig } from "@/models/EntityConfig/EntityConfig";
+import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
 import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
 import { makeEntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/entityFieldConfigUtils";
@@ -41,9 +42,7 @@ const initialFields = [makeEntityFieldConfig({ id: uuid(), name: "" })];
 const initialFieldOptions = fieldsToSelectOptions(initialFields);
 
 export function EntityCreatorView(): JSX.Element {
-  const [entityFields] = EntityFieldConfigClient.useGetAll({
-    enableLogger: true,
-  });
+  const [entityFields] = EntityFieldConfigClient.useGetAll();
 
   const [configForm, setConfigForm] = useForm<EntityConfigForm>({
     mode: "uncontrolled",
@@ -109,6 +108,11 @@ export function EntityCreatorView(): JSX.Element {
             name: values.name,
             description: values.description,
           };
+
+          Logger.log(
+            "Ready for insert",
+            EntityConfigClient.validateDataForInsert(entityConfig),
+          );
 
           Logger.log("final config", entityConfig);
         })}

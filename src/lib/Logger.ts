@@ -75,7 +75,7 @@ export function createLogger(config?: {
   disabled?: boolean;
 }): ILogger {
   const loggerName = config?.loggerName;
-  const styledMessageStructure = loggerName ? `%c [${loggerName}] %s` : "%c %s";
+  const styledMsgTemplate = loggerName ? `%c [${loggerName}] %s` : "%c %s";
   const state = { disabled: config?.disabled ?? false };
 
   return {
@@ -127,12 +127,7 @@ export function createLogger(config?: {
         : `font-size: ${LOG_BODY_FONT_SIZE};`,
       ];
       const logHeading = `%c [WARN] ${caller.fnName} [${caller.location}]`;
-      console.warn(
-        `${logHeading}\n${styledMessageStructure}`,
-        ...styles,
-        "WARN",
-        ...args,
-      );
+      console.warn(`${logHeading}\n${styledMsgTemplate}`, ...styles, ...args);
     },
 
     /**
@@ -154,11 +149,7 @@ export function createLogger(config?: {
           : `font-size: ${LOG_BODY_FONT_SIZE};`,
         ];
         const logHeading = `%c [LOG] ${caller.fnName} [${caller.location}]`;
-        console.log(
-          `${logHeading}\n${styledMessageStructure}`,
-          ...styles,
-          ...args,
-        );
+        console.log(`${logHeading}\n${styledMsgTemplate}`, ...styles, ...args);
       }
     },
   };
