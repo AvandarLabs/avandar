@@ -15,7 +15,7 @@ export type ModelClientOptions = {
  * @template ModelIdFieldType - The type of the model's primary key field
  */
 export interface ICRUDModelClient<
-  M extends ModelCRUDTypes,
+  M extends ModelCRUDTypes = ModelCRUDTypes,
   ModelIdFieldType extends
     M["Read"][M["modelPrimaryKey"]] = M["Read"][M["modelPrimaryKey"]],
 > {

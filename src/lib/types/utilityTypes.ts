@@ -38,3 +38,9 @@ export type ExcludeUndefinedDeep<T> =
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunction = (...args: any[]) => unknown;
+
+/**
+ * Represents any function with a given return type.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyFunctionWithReturn<R> = (...args: any[]) => R;
