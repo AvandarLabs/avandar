@@ -1,10 +1,9 @@
+import { LocalDatasetClient } from "@/clients/LocalDatasetClient";
 import {
   UseMutateFunction,
   useMutation,
   UseMutationResult,
-  useQueryClient,
-} from "@tanstack/react-query";
-import { LocalDatasetClient } from "@/clients/LocalDatasetClient";
+} from "@/lib/hooks/query/useMutation";
 import { useQuery, UseQueryResultTuple } from "@/lib/hooks/query/useQuery";
 import {
   LocalDataset,
@@ -19,7 +18,7 @@ import {
  */
 export function useLocalDatasets(): UseQueryResultTuple<LocalDataset[]> {
   return useQuery({
-    queryKey: [LocalDatasetQueryKeys.allDatasets],
+    queryKey: LocalDatasetQueryKeys.allDatasets,
     queryFn: async () => {
       return LocalDatasetClient.getAllDatasets();
     },
@@ -37,18 +36,12 @@ export function useSaveLocalDataset(): [
   boolean,
   UseMutationResult<number, Error, LocalDatasetCreate>,
 ] {
-  const queryClient = useQueryClient();
-  const mutationObj = useMutation({
+  return useMutation({
+    queryToInvalidate: LocalDatasetQueryKeys.allDatasets,
     mutationFn: async (dataset: LocalDatasetCreate) => {
       return LocalDatasetClient.addDataset(dataset);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [LocalDatasetQueryKeys.allDatasets],
-      });
-    },
   });
-  return [mutationObj.mutate, mutationObj.isPending, mutationObj];
 }
 
 export function useDeleteLocalDataset(): [
@@ -56,16 +49,10 @@ export function useDeleteLocalDataset(): [
   boolean,
   UseMutationResult<void, Error, number>,
 ] {
-  const queryClient = useQueryClient();
-  const mutationObj = useMutation({
+  return useMutation({
+    queryToInvalidate: LocalDatasetQueryKeys.allDatasets,
     mutationFn: async (id: number) => {
       return LocalDatasetClient.deleteDataset(id);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [LocalDatasetQueryKeys.allDatasets],
-      });
-    },
   });
-  return [mutationObj.mutate, mutationObj.isPending, mutationObj];
 }

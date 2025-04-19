@@ -1,10 +1,10 @@
 import { Button, Loader, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
+import { useMutation } from "@/lib/hooks/query/useMutation";
 
 export const Route = createFileRoute("/update-password")({
   component: UpdatePasswordPage,
@@ -24,43 +24,42 @@ function UpdatePasswordPage() {
   const { user } = Route.useRouteContext();
   const searchParams = Route.useSearch();
 
-  const { mutate: sendUpdatedPassword, isPending: isPasswordUpdatePending } =
-    useMutation({
-      mutationFn: async (values: {
-        password: string;
-        confirmPassword: string;
-      }) => {
-        const { user: updatedUser } = await AuthClient.updatePassword(
-          values.password,
-        );
-        if (updatedUser?.email) {
-          // After updating password, sign in with the new password
-          await AuthClient.signIn({
-            email: updatedUser.email,
-            password: values.password,
-          });
-        }
-      },
-      onSuccess: () => {
-        if (searchParams.redirect) {
-          router.history.push(searchParams.redirect);
-        } else {
-          router.navigate({ to: "/" });
-        }
-        notifications.show({
-          title: "Password updated successfully",
-          message: "You can start using your new password now",
-          color: "success",
+  const [sendUpdatedPassword, isPasswordUpdatePending] = useMutation({
+    mutationFn: async (values: {
+      password: string;
+      confirmPassword: string;
+    }) => {
+      const { user: updatedUser } = await AuthClient.updatePassword(
+        values.password,
+      );
+      if (updatedUser?.email) {
+        // After updating password, sign in with the new password
+        await AuthClient.signIn({
+          email: updatedUser.email,
+          password: values.password,
         });
-      },
-      onError: (error) => {
-        notifications.show({
-          title: "Password update failed",
-          message: error.message,
-          color: "danger",
-        });
-      },
-    });
+      }
+    },
+    onSuccess: () => {
+      if (searchParams.redirect) {
+        router.history.push(searchParams.redirect);
+      } else {
+        router.navigate({ to: "/" });
+      }
+      notifications.show({
+        title: "Password updated successfully",
+        message: "You can start using your new password now",
+        color: "success",
+      });
+    },
+    onError: (error) => {
+      notifications.show({
+        title: "Password update failed",
+        message: error.message,
+        color: "danger",
+      });
+    },
+  });
 
   const form = useForm({
     mode: "uncontrolled",

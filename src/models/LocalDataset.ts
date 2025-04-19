@@ -72,7 +72,7 @@ export const LocalDatasetSchema = z.object({
  * React Query keys for the local datasets.
  */
 export const LocalDatasetQueryKeys = {
-  allDatasets: "localDatasets",
+  allDatasets: ["localDatasets"],
 };
 
 export function makeLocalDataset({

@@ -1,9 +1,9 @@
 import { Button, Loader, Stack, TextInput, Title } from "@mantine/core";
 import { isEmail, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { AuthClient } from "@/clients/AuthClient";
+import { useMutation } from "@/lib/hooks/query/useMutation";
 
 export const Route = createFileRoute("/forgot-password")({
   component: ForgotPasswordPage,
@@ -20,10 +20,7 @@ export const Route = createFileRoute("/forgot-password")({
  * and a password reset link will be sent to their email.
  */
 function ForgotPasswordPage() {
-  const {
-    mutate: sendResetPasswordRequest,
-    isPending: isResetPasswordPending,
-  } = useMutation({
+  const [sendResetPasswordRequest, isResetPasswordPending] = useMutation({
     mutationFn: async (values: { email: string }) => {
       await AuthClient.requestPasswordResetEmail(values.email);
     },

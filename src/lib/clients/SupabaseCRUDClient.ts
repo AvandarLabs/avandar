@@ -3,8 +3,8 @@ import { ModelCRUDParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegis
 import { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
 import { ILogger } from "../Logger";
 import { castToAny } from "../utils/functions";
-import { CRUDModelClient } from "./CRUDModelClient";
-import { ModelClientOptions } from "./ICRUDModelClient";
+import { ModelCRUDClient } from "./CRUDModelClient";
+import { ModelCRUDClientOptions } from "./ICRUDModelClient";
 import type { DatabaseTableNames } from "@/lib/clients/SupabaseDBClient";
 
 export class SupabaseCRUDClient<
@@ -12,7 +12,7 @@ export class SupabaseCRUDClient<
   M extends SupabaseModelCRUDTypes<TableName>,
   ModelIdFieldType extends
     M["Read"][M["modelPrimaryKey"]] = M["Read"][M["modelPrimaryKey"]],
-> extends CRUDModelClient<M> {
+> extends ModelCRUDClient<M> {
   tableName: TableName;
   dbTablePrimaryKey: M["dbTablePrimaryKey"];
 
@@ -32,7 +32,7 @@ export class SupabaseCRUDClient<
 
   async getById(
     id: ModelIdFieldType,
-    _options?: ModelClientOptions,
+    _options?: ModelCRUDClientOptions,
   ): Promise<M["Read"] | undefined> {
     const { data } = await SupabaseDBClient.from(this.tableName)
       .select("*")
@@ -48,7 +48,7 @@ export class SupabaseCRUDClient<
     return model;
   }
 
-  async getAll(options?: ModelClientOptions): Promise<Array<M["Read"]>> {
+  async getAll(options?: ModelCRUDClientOptions): Promise<Array<M["Read"]>> {
     this.logger.warn("TODO(pablo): Pagination must be implemented.");
 
     const result = await this.logger.withConditionalLogging(

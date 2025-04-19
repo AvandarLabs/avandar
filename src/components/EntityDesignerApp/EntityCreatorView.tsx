@@ -101,7 +101,7 @@ export function EntityCreatorView(): JSX.Element {
   return (
     <Container pt="lg">
       <form
-        onSubmit={configForm.onSubmit((values) => {
+        onSubmit={configForm.onSubmit(async (values) => {
           Logger.log("submitted values", values);
 
           const entityConfig: EntityConfig<"Insert"> = {
@@ -114,7 +114,9 @@ export function EntityCreatorView(): JSX.Element {
             EntityConfigClient.validateDataForInsert(entityConfig),
           );
 
-          Logger.log("final config", entityConfig);
+          Logger.log("inserting");
+          const result = await EntityConfigClient.insert(entityConfig);
+          Logger.log("done inserting", result);
         })}
       >
         <Stack>

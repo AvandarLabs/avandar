@@ -1,7 +1,6 @@
 import { Button, Loader, Stack, TextInput, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { useMutation } from "@tanstack/react-query";
 import {
   createFileRoute,
   Link,
@@ -10,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
+import { useMutation } from "@/lib/hooks/query/useMutation";
 
 export const Route = createFileRoute("/signin")({
   component: SignInPage,
@@ -33,25 +33,23 @@ function SignInPage() {
   const router = useRouter();
   const searchParams = Route.useSearch();
 
-  const { mutate: sendSignInRequest, isPending: isSignInPending } = useMutation(
-    {
-      mutationFn: AuthClient.signIn,
-      onSuccess: () => {
-        if (searchParams.redirect) {
-          router.history.push(searchParams.redirect);
-        } else {
-          router.invalidate();
-        }
-      },
-      onError: (error) => {
-        notifications.show({
-          title: "Sign in failed",
-          message: error.message,
-          color: "danger",
-        });
-      },
+  const [sendSignInRequest, isSignInPending] = useMutation({
+    mutationFn: AuthClient.signIn,
+    onSuccess: () => {
+      if (searchParams.redirect) {
+        router.history.push(searchParams.redirect);
+      } else {
+        router.invalidate();
+      }
     },
-  );
+    onError: (error) => {
+      notifications.show({
+        title: "Sign in failed",
+        message: error.message,
+        color: "danger",
+      });
+    },
+  });
 
   const form = useForm({
     mode: "uncontrolled",

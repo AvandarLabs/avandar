@@ -1,10 +1,10 @@
 import { Button, Group, List, Loader, Stack, Text, Title } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { AuthClient } from "@/clients/AuthClient";
-import { InputTextField } from "@/lib/ui/InputTextField";
+import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useToggleBoolean } from "@/lib/hooks/useToggleBoolean";
+import { InputTextField } from "@/lib/ui/InputTextField";
 
 export const Route = createFileRoute("/_auth/profile")({
   component: ProfilePage,
@@ -14,25 +14,24 @@ function ProfilePage() {
   const router = useRouter();
   const { user } = Route.useRouteContext();
   const [isEditingEmail, toggleEditingEmailState] = useToggleBoolean(false);
-  const { mutate: sendUpdateEmailRequest, isPending: isUpdateEmailPending } =
-    useMutation({
-      mutationFn: AuthClient.updateEmail,
-      onSuccess: () => {
-        notifications.show({
-          title: "Email address updated",
-          message: "Please check your email for a confirmation link",
-          color: "success",
-        });
-        toggleEditingEmailState();
-      },
-      onError: () => {
-        notifications.show({
-          title: "Failed to update email",
-          message: "Please try again or reach out to support",
-          color: "danger",
-        });
-      },
-    });
+  const [sendUpdateEmailRequest, isUpdateEmailPending] = useMutation({
+    mutationFn: AuthClient.updateEmail,
+    onSuccess: () => {
+      notifications.show({
+        title: "Email address updated",
+        message: "Please check your email for a confirmation link",
+        color: "success",
+      });
+      toggleEditingEmailState();
+    },
+    onError: () => {
+      notifications.show({
+        title: "Failed to update email",
+        message: "Please try again or reach out to support",
+        color: "danger",
+      });
+    },
+  });
 
   if (!user) {
     return <Loader />;

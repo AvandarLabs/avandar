@@ -13,11 +13,11 @@ import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { Spotlight } from "@mantine/spotlight";
 import { IconChevronDown, IconLogout, IconSearch } from "@tabler/icons-react";
-import { useMutation } from "@tanstack/react-query";
 import { Outlet, useRouter } from "@tanstack/react-router";
 import clsx from "clsx";
 import { AuthClient } from "@/clients/AuthClient";
 import { APP_CONFIG } from "@/config/AppConfig";
+import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useIsMobileSize } from "@/lib/hooks/useIsMobileSize";
 import { Link } from "@/lib/ui/links/Link";
 import css from "./AppScaffold.module.css";
@@ -48,22 +48,21 @@ export function AppScaffold({
   navbarWidth = NAVBAR_DEFAULT_WIDTH,
 }: Props): JSX.Element {
   const router = useRouter();
-  const { mutate: sendSignOutRequest, isPending: isSignOutPending } =
-    useMutation({
-      mutationFn: async () => {
-        await AuthClient.signOut();
-      },
-      onSuccess: () => {
-        router.invalidate();
-      },
-      onError: (error) => {
-        notifications.show({
-          title: "Sign out failed",
-          message: error.message,
-          color: "danger",
-        });
-      },
-    });
+  const [sendSignOutRequest, isSignOutPending] = useMutation({
+    mutationFn: async () => {
+      await AuthClient.signOut();
+    },
+    onSuccess: () => {
+      router.invalidate();
+    },
+    onError: (error) => {
+      notifications.show({
+        title: "Sign out failed",
+        message: error.message,
+        color: "danger",
+      });
+    },
+  });
 
   const spotlightActions = useSpotlightActions();
   const [isNavbarOpened, { toggle: toggleNavbar }] = useDisclosure(false);

@@ -1,7 +1,6 @@
 import { Button, Loader, Stack, TextInput, Title } from "@mantine/core";
 import { isEmail, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { useMutation } from "@tanstack/react-query";
 import {
   createFileRoute,
   Link,
@@ -9,6 +8,7 @@ import {
   useRouter,
 } from "@tanstack/react-router";
 import { AuthClient } from "@/clients/AuthClient";
+import { useMutation } from "@/lib/hooks/query/useMutation";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,
@@ -22,22 +22,21 @@ export const Route = createFileRoute("/register")({
 
 function RegisterPage() {
   const router = useRouter();
-  const { mutate: sendRegistrationRequest, isPending: isRegistrationPending } =
-    useMutation({
-      mutationFn: async (values: { email: string; password: string }) => {
-        await AuthClient.register(values);
-      },
-      onSuccess: () => {
-        router.invalidate();
-      },
-      onError: (error) => {
-        notifications.show({
-          title: "Registration failed",
-          message: error.message,
-          color: "danger",
-        });
-      },
-    });
+  const [sendRegistrationRequest, isRegistrationPending] = useMutation({
+    mutationFn: async (values: { email: string; password: string }) => {
+      await AuthClient.register(values);
+    },
+    onSuccess: () => {
+      router.invalidate();
+    },
+    onError: (error) => {
+      notifications.show({
+        title: "Registration failed",
+        message: error.message,
+        color: "danger",
+      });
+    },
+  });
 
   const form = useForm({
     mode: "uncontrolled",

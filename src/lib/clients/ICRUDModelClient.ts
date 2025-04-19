@@ -2,7 +2,7 @@ import { ILogger } from "../Logger";
 import { ModelCRUDParserRegistry } from "../utils/models/ModelCRUDParserRegistry";
 import { ModelCRUDTypes } from "../utils/models/ModelCRUDTypes";
 
-export type ModelClientOptions = {
+export type ModelCRUDClientOptions = {
   enableLogger?: boolean;
 };
 
@@ -14,8 +14,8 @@ export type ModelClientOptions = {
  * @template M - The variants of the model
  * @template ModelIdFieldType - The type of the model's primary key field
  */
-export interface ICRUDModelClient<
-  M extends ModelCRUDTypes = ModelCRUDTypes,
+export interface IModelCRUDClient<
+  M extends ModelCRUDTypes,
   ModelIdFieldType extends
     M["Read"][M["modelPrimaryKey"]] = M["Read"][M["modelPrimaryKey"]],
 > {
@@ -44,14 +44,14 @@ export interface ICRUDModelClient<
    */
   getById(
     id: ModelIdFieldType,
-    options?: ModelClientOptions,
+    options?: ModelCRUDClientOptions,
   ): Promise<M["Read"] | undefined>;
 
   /**
    * Retrieves all instances of the model.
    * @returns A promise resolving to an array of model instances
    */
-  getAll(options?: ModelClientOptions): Promise<Array<M["Read"]>>;
+  getAll(options?: ModelCRUDClientOptions): Promise<Array<M["Read"]>>;
 
   /**
    * Creates a new model instance in the data store.
@@ -69,7 +69,7 @@ export interface ICRUDModelClient<
   update(
     id: ModelIdFieldType,
     data: M["Update"],
-    options?: ModelClientOptions,
+    options?: ModelCRUDClientOptions,
   ): Promise<M["Read"]>;
 
   /**
@@ -77,5 +77,5 @@ export interface ICRUDModelClient<
    * @param id - The unique identifier of the model to delete
    * @returns A promise that resolves when deletion is complete
    */
-  delete(id: ModelIdFieldType, options?: ModelClientOptions): Promise<void>;
+  delete(id: ModelIdFieldType, options?: ModelCRUDClientOptions): Promise<void>;
 }

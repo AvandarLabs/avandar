@@ -1,5 +1,6 @@
 import { notifications } from "@mantine/notifications";
 import {
+  DefaultError,
   QueryFunction,
   QueryFunctionContext,
   QueryKey,
@@ -10,13 +11,13 @@ import {
 import { Merge } from "type-fest";
 import { Logger } from "@/lib/Logger";
 
-export type UseQueryResult<TData> = TanstackUseQueryResult<TData, Error>;
+export type UseQueryResult<TData> = TanstackUseQueryResult<TData, DefaultError>;
 export type UseQueryOptions<
   TQueryFnData = unknown,
   TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
 > = Merge<
-  TanstackUseQueryOptions<TQueryFnData, Error, TData, TQueryKey>,
+  TanstackUseQueryOptions<TQueryFnData, DefaultError, TData, TQueryKey>,
   {
     queryFn: QueryFunction<TQueryFnData, TQueryKey>;
   }
@@ -31,7 +32,7 @@ export type UseQueryResultTuple<
 > = [
   data: TData | undefined,
   isLoading: boolean,
-  queryResult: TanstackUseQueryResult<TData, Error>,
+  queryResult: TanstackUseQueryResult<TData, DefaultError>,
 ];
 
 /**
@@ -55,6 +56,7 @@ export function useQuery<
         const results = await queryFn(context);
         return results;
       } catch (error) {
+        // Catch the error so we can handle and log it better
         const errorMessage =
           error instanceof Error ? error.message : "Unknown error encountered";
         const logData = {
