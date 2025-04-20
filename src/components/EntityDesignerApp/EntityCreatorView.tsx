@@ -44,6 +44,8 @@ export function EntityCreatorView(): JSX.Element {
   const [doCreateEntityConfig, pendingEntityConfigCreate] =
     EntityConfigClient.useInsert();
 
+  Logger.log("This is a test", "omg");
+
   const [configForm, setConfigForm] = useForm<EntityConfigForm>({
     mode: "uncontrolled",
     initialValues: {
@@ -107,8 +109,7 @@ export function EntityCreatorView(): JSX.Element {
             description: values.description,
           };
 
-          const result = await doCreateEntityConfig({ data: entityConfig });
-          Logger.log("post result", result);
+          doCreateEntityConfig({ data: entityConfig, enableLogger: true });
         })}
       >
         <Stack>

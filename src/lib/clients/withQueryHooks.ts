@@ -105,10 +105,10 @@ type WithQueryHooks<
   ) ?
     (
       useMutationOptions?: Omit<
-        UseMutationOptions<Result, DefaultError, Params, unknown>,
+        UseMutationOptions<Result, DefaultError, Params[0], unknown>,
         "mutationFn"
       >,
-    ) => UseMutationResultTuple<Result, DefaultError, Params, unknown>
+    ) => UseMutationResultTuple<Result, DefaultError, Params[0], unknown>
   : never;
 };
 

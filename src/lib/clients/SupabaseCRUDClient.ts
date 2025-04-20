@@ -79,15 +79,30 @@ export class SupabaseCRUDClient<
       data: M["Insert"];
     },
   ): Promise<M["Read"]> {
-    const dataToInsert = this.parsers.fromModelToDBInsert.parse(params.data);
-    const { data: insertedData } = await SupabaseDBClient.from(this.tableName)
-      .insert(castToAny(dataToInsert))
-      .select()
-      .single<M["DBRead"]>()
-      .throwOnError();
+    const result = await this.logger.withConditionalLogging(
+      params?.enableLogger,
+      async (logger: ILogger) => {
+        const dataToInsert = this.parsers.fromModelToDBInsert.parse(
+          params.data,
+        );
+        const { data: insertedData } = await SupabaseDBClient.from(
+          this.tableName,
+        )
+          .insert(castToAny(dataToInsert))
+          .select()
+          .single<M["DBRead"]>()
+          .throwOnError();
 
-    const insertedModel = this.parsers.fromDBToModelRead.parse(insertedData);
-    return insertedModel;
+        logger.log(`Inserted ${this.modelName} into db`, insertedData);
+
+        const insertedModel =
+          this.parsers.fromDBToModelRead.parse(insertedData);
+        return insertedModel;
+      },
+      { functionName: "insert" },
+    );
+
+    return result;
   }
 
   async update(

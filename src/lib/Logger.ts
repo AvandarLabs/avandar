@@ -1,6 +1,9 @@
 const LOG_HEADER_FONT_SIZE = "11px";
 const LOG_BODY_FONT_SIZE = "13px";
 
+const LOG_HEADER_STYLES = `color: #102a43; font-weight: bold; font-size: ${LOG_HEADER_FONT_SIZE};`;
+const LOG_BODY_STYLES = `background: #168d36; color: #ffffff; font-size: ${LOG_BODY_FONT_SIZE};`;
+
 export type ILogger = {
   name: string | undefined;
   error: (error: unknown, extraData?: unknown) => void;
@@ -131,10 +134,8 @@ export function createLogger(config?: {
       const stack = getFunctionsFromLoggerStack(new Error().stack ?? "");
       const caller = stack[0]!;
       const styles = [
-        `background: #f6db6d; color: #102a43; font-weight: bold; font-size: ${LOG_HEADER_FONT_SIZE};`,
-        args.length > 1 ?
-          `background: #a0140c; color: #ffffff; font-size: ${LOG_BODY_FONT_SIZE};`
-        : `font-size: ${LOG_BODY_FONT_SIZE};`,
+        `background: #f6db6d; ${LOG_HEADER_STYLES}`,
+        args.length > 1 ? LOG_BODY_STYLES : `font-size: ${LOG_BODY_FONT_SIZE};`,
       ];
       const logHeading = `%c [WARN] ${caller.fnName} [${caller.location}]`;
       console.warn(`${logHeading}\n${styledMsgTemplate}`, ...styles, ...args);
@@ -153,9 +154,9 @@ export function createLogger(config?: {
         const stack = getFunctionsFromLoggerStack(new Error().stack ?? "");
         const caller = stack[0]!;
         const styles = [
-          `background: #d5f5fa; color: #102a43; font-weight: bold; font-size: ${LOG_HEADER_FONT_SIZE};`,
+          `background: #d5f5fa; ${LOG_HEADER_STYLES}`,
           args.length > 1 ?
-            `background: #a0140c; color: #ffffff; font-size: ${LOG_BODY_FONT_SIZE};`
+            LOG_BODY_STYLES
           : `font-size: ${LOG_BODY_FONT_SIZE};`,
         ];
         const logHeading = `%c [LOG] ${caller.fnName} [${caller.location}]`;
