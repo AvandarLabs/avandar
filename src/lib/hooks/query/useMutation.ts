@@ -3,8 +3,8 @@ import {
   QueryKey,
   UseMutateFunction as TanstackUseMutateFunction,
   useMutation as tanstackUseMutation,
+  UseMutationOptions as TanstackUseMutationOptions,
   UseMutationResult as TanstackUseMutationResult,
-  UseMutationOptions,
   useQueryClient,
 } from "@tanstack/react-query";
 
@@ -21,6 +21,21 @@ export type UseMutateFunction<
   TFnVariables = void,
   TContext = unknown,
 > = TanstackUseMutateFunction<TData, TError, TFnVariables, TContext>;
+
+export type UseMutationOptions<
+  TData = unknown,
+  TError = DefaultError,
+  TFnVariables = void,
+  TContext = unknown,
+> = TanstackUseMutationOptions<TData, TError, TFnVariables, TContext> & {
+  queryToInvalidate?: QueryKey;
+
+  /**
+   * If this is set, it takes precedence over the singular
+   * `queryToInvalidate`
+   */
+  queriesToInvalidate?: readonly QueryKey[];
+};
 
 export type UseMutationResultTuple<
   TData = unknown,
@@ -47,15 +62,7 @@ export function useMutation<
   TFnVariables = void,
   TContext = unknown,
 >(
-  options: UseMutationOptions<TData, TError, TFnVariables, TContext> & {
-    queryToInvalidate?: QueryKey;
-
-    /**
-     * If this is set, it takes precedence over the singular
-     * `queryToInvalidate`
-     */
-    queriesToInvalidate?: readonly QueryKey[];
-  },
+  options: UseMutationOptions<TData, TError, TFnVariables, TContext>,
 ): UseMutationResultTuple<TData, TError, TFnVariables, TContext> {
   const queryClient = useQueryClient();
   const mutationObj = tanstackUseMutation(

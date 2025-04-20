@@ -12,10 +12,14 @@ export function stringComparator(a: string, b: string): number {
 /**
  * Sorts an array of strings in lexicographical order.
  * @param strings The array of strings to sort.
+ * @param comparator The comparator function to use for sorting.
  * @returns The sorted array of strings.
  */
-export function sortStrings(strings: readonly string[]): string[] {
-  return [...strings].sort(stringComparator);
+export function sortStrings(
+  strings: readonly string[],
+  comparator: (a: string, b: string) => number = stringComparator,
+): string[] {
+  return [...strings].sort(comparator);
 }
 
 /**

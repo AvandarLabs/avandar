@@ -1,4 +1,5 @@
 import { UnknownObject } from "@/lib/types/common";
+import { AnyFunction } from "../types/utilityTypes";
 
 /**
  * Inspired from Remeda's `isPlainObject`.
@@ -78,4 +79,12 @@ export function isNotNullOrUndefined<T>(value: T): value is NonNullable<T> {
  */
 export function isNotUndefined<T>(value: T): value is Exclude<T, undefined> {
   return value !== undefined;
+}
+
+export function isUndefined(value: unknown): value is undefined {
+  return value === undefined;
+}
+
+export function isFunction(value: unknown): value is AnyFunction {
+  return typeof value === "function";
 }

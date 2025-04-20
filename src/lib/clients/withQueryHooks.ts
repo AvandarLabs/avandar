@@ -1,4 +1,8 @@
-import { QueryKey } from "@tanstack/react-query";
+import {
+  DefaultError,
+  QueryKey,
+  UseMutationOptions,
+} from "@tanstack/react-query";
 import {
   useMutation,
   UseMutationResultTuple,
@@ -8,19 +12,46 @@ import { capitalize, prefix } from "@/lib/utils/strings";
 import {
   AnyFunction,
   AnyFunctionWithReturn,
+  AnyFunctionWithSignature,
   KeysThatMapTo,
 } from "../types/utilityTypes";
 import { castToAny } from "../utils/functions";
+import { isFunction } from "../utils/guards";
 import { ModelCRUDTypes } from "../utils/models/ModelCRUDTypes";
-import { ModelCRUDClient } from "./CRUDModelClient";
+import { deepExclude } from "../utils/objects";
+import { ModelCRUDClient } from "./ModelCRUDClient";
 
 /**
- * A union of all function names that return a Promise from an object
+ * A union of all function names that have a *single* argument and
+ * return a Promise. These functions are eligible to be wrapped in
+ * `useQuery` or `useMutation` hooks.
  */
-type FnNameReturningPromise<T extends object> = Extract<
-  KeysThatMapTo<AnyFunctionWithReturn<Promise<unknown>>, T>,
+type HookableFnNames<T extends object> = Extract<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  KeysThatMapTo<AnyFunctionWithSignature<[any], Promise<unknown>>, T>,
   string
 >;
+
+/**
+ * Get the first parameter of a function's array of parameters.
+ */
+type ClientFnFirstParameter<
+  CRUDClient extends ModelCRUDClient<ModelCRUDTypes>,
+  FnName extends keyof CRUDClient,
+  Fn extends CRUDClient[FnName] = CRUDClient[FnName],
+> =
+  Fn extends AnyFunction ?
+    undefined extends Parameters<Fn>[0] ?
+      void | Parameters<Fn>[0]
+    : Parameters<Fn>[0]
+  : never;
+
+type ClientFnReturnType<
+  CRUDClient extends ModelCRUDClient<ModelCRUDTypes>,
+  FnName extends keyof CRUDClient,
+> =
+  CRUDClient[FnName] extends AnyFunction ? ReturnType<CRUDClient[FnName]>
+  : never;
 
 /**
  * A default list of query functions to turn into `use` hooks in a CRUD client.
@@ -30,7 +61,7 @@ const DEFAULT_QUERY_FN_NAMES = [
   "getById",
   "getAll",
 ] as const satisfies ReadonlyArray<
-  FnNameReturningPromise<ModelCRUDClient<ModelCRUDTypes>>
+  HookableFnNames<ModelCRUDClient<ModelCRUDTypes>>
 >;
 
 /**
@@ -42,7 +73,7 @@ const DEFAULT_MUTATION_FN_NAMES = [
   "update",
   "delete",
 ] as const satisfies ReadonlyArray<
-  FnNameReturningPromise<ModelCRUDClient<ModelCRUDTypes>>
+  HookableFnNames<ModelCRUDClient<ModelCRUDTypes>>
 >;
 
 /**
@@ -55,39 +86,54 @@ type WithQueryHooks<
   QueryFnName extends keyof CRUDClient,
   MutationFnName extends keyof CRUDClient,
 > = CRUDClient & {
-  [FnName in Extract<
-    QueryFnName | MutationFnName,
+  [QName in Extract<
+    QueryFnName,
     string
-  > as `use${Capitalize<FnName>}`]: CRUDClient[FnName] extends (
-    AnyFunctionWithReturn<Promise<infer Result> | infer Result>
+  > as `use${Capitalize<QName>}`]: CRUDClient[QName] extends (
+    AnyFunctionWithReturn<Promise<infer Result>>
   ) ?
     (
-      ...args: Parameters<CRUDClient[FnName]>
-    ) => FnName extends QueryFnName ? UseQueryResultTuple<Result>
-    : UseMutationResultTuple<Result>
+      params: ClientFnFirstParameter<CRUDClient, QName>,
+    ) => UseQueryResultTuple<Result>
+  : never;
+} & {
+  [MutName in Extract<
+    MutationFnName,
+    string
+  > as `use${Capitalize<MutName>}`]: CRUDClient[MutName] extends (
+    AnyFunctionWithSignature<infer Params, Promise<infer Result>>
+  ) ?
+    (
+      useMutationOptions?: Omit<
+        UseMutationOptions<Result, DefaultError, Params, unknown>,
+        "mutationFn"
+      >,
+    ) => UseMutationResultTuple<Result, DefaultError, Params, unknown>
   : never;
 };
 
-// TODO(pablo): Add mutation hook types to WithQueryHooks
 /**
  * Augments a CRUD Model Client instance with `use` hooks that call
  * `useQuery` and return the appropriate type according to which
  * function names are passed.
  *
  * @param client The client to add query hooks to.
- * @param usableQueryFns The query functions to add hooks for. If
- * this argument is not provided, we add hooks for the function names
- * specified in `DEFAULT_USEABLE_FN_NAMES`.
+ * @param options.queryFns The query functions to add hooks for. If
+ * this argument is not provided, we add `useQuery` hooks for the
+ * function names in `DEFAULT_QUERY_FN_NAMES`.
+ * @param options.mutationFns The mutation functions to add hooks for. If
+ * this argument is not provided, we add `useMutation` hooks for the
+ * function names in `DEFAULT_MUTATION_FN_NAMES`.
  * @returns The client with query hooks added.
  */
 export function withQueryHooks<
   CRUDClient extends ModelCRUDClient<ModelCRUDTypes>,
-  UseQueryFnName extends FnNameReturningPromise<CRUDClient> = never,
-  UseMutationFnName extends FnNameReturningPromise<CRUDClient> = never,
+  UseQueryFnName extends HookableFnNames<CRUDClient> = never,
+  UseMutationFnName extends HookableFnNames<CRUDClient> = never,
 >(
   client: CRUDClient,
   options?: {
-    usableQueryFns?: readonly UseQueryFnName[];
+    queryFns?: readonly UseQueryFnName[];
     mutationFns?: readonly UseMutationFnName[];
   },
 ): WithQueryHooks<
@@ -98,7 +144,7 @@ export function withQueryHooks<
     (typeof DEFAULT_MUTATION_FN_NAMES)[number]
   : UseMutationFnName
 > {
-  const queryFnNames = options?.usableQueryFns ?? DEFAULT_QUERY_FN_NAMES;
+  const queryFnNames = options?.queryFns ?? DEFAULT_QUERY_FN_NAMES;
   const mutationFnNames = options?.mutationFns ?? DEFAULT_MUTATION_FN_NAMES;
 
   // set up all the `useQuery` functions
@@ -111,29 +157,30 @@ export function withQueryHooks<
       if (typeof clientFunction === "function") {
         const boundClientFunction = clientFunction.bind(client);
 
-        const useClientFnQuery = (
-          ...args: CRUDClient[UseQueryFnName] extends AnyFunction ?
-            Parameters<CRUDClient[UseQueryFnName]>
-          : []
+        // we allow only single-argument functions. If multiple arguments are
+        // provided, we will just pass the first one.
+        const useClientQuery = (
+          params: ClientFnFirstParameter<CRUDClient, UseQueryFnName>,
         ) => {
           return useQuery({
             queryFn: async () => {
-              const result = await boundClientFunction(...args);
+              const result = await boundClientFunction(params);
               return result;
             },
             queryKey: makeQueryKey(
               client,
               queryFnName as UseQueryFnName,
-              ...args,
+              params,
             ),
           });
         };
 
         // @ts-expect-error Valid error to raise but it's safe.
-        client[prefix("use", capitalize(queryFnName))] = useClientFnQuery;
+        client[prefix("use", capitalize(queryFnName))] = useClientQuery;
       }
     });
 
+  // set up all the `useMutation` functions
   mutationFnNames
     .filter((mutationFnName) => {
       return typeof client[mutationFnName] === "function";
@@ -143,41 +190,62 @@ export function withQueryHooks<
       if (typeof clientFunction === "function") {
         const boundClientFunction = clientFunction.bind(client);
 
-        const useClientFnMutation = (
-          ...args: CRUDClient[UseMutationFnName] extends AnyFunction ?
-            Parameters<CRUDClient[UseMutationFnName]>
-          : []
+        const useClientMutation = (
+          useMutationOptions?: Omit<
+            UseMutationOptions<
+              ClientFnReturnType<CRUDClient, UseMutationFnName>,
+              DefaultError,
+              ClientFnFirstParameter<CRUDClient, UseMutationFnName>,
+              unknown
+            >,
+            "mutationFn"
+          >,
         ) => {
           return useMutation({
-            mutationFn: async () => {
-              const result = await boundClientFunction(...args);
+            // we allow only single-argument functions. If multiple arguments
+            // are provided, we will just pass the first one.
+            mutationFn: async (
+              params: ClientFnFirstParameter<CRUDClient, UseMutationFnName>,
+            ): Promise<ClientFnReturnType<CRUDClient, UseMutationFnName>> => {
+              const result = await boundClientFunction(params);
               return result;
             },
+
+            // Default to invalidating the `getAll` query for this client
             queryToInvalidate: makeQueryKey(
               client,
-              mutationFnName as UseMutationFnName,
-              ...args,
+              "getAll" as const,
+              undefined as ClientFnFirstParameter<CRUDClient, "getAll">,
             ),
+            ...useMutationOptions,
           });
         };
 
         // @ts-expect-error Valid error to raise but it's safe.
-        client[prefix("use", capitalize(mutationFnName))] = useClientFnMutation;
+        client[prefix("use", capitalize(mutationFnName))] = useClientMutation;
       }
     });
 
   return castToAny(client);
 }
 
+/**
+ * Creates a query key for a given client, function name, and params.
+ * @param client The client to create the query key for.
+ * @param queryFnName The name of the query function.
+ * @param params The parameters for the query function.
+ * @returns The query key.
+ */
 function makeQueryKey<
   CRUDClient extends ModelCRUDClient<ModelCRUDTypes>,
-  FnName extends FnNameReturningPromise<CRUDClient>,
+  FnName extends keyof CRUDClient,
 >(
   client: CRUDClient,
   queryFnName: FnName,
-  ...args: CRUDClient[FnName] extends AnyFunction ?
-    Parameters<CRUDClient[FnName]>
-  : []
+  params: ClientFnFirstParameter<CRUDClient, FnName>,
 ): QueryKey {
-  return [client.modelName, queryFnName, ...args];
+  // exclude any functions from the params, they aren't good to include
+  // in a query key
+  const newParams = deepExclude(params, isFunction);
+  return [client.modelName, queryFnName, newParams];
 }

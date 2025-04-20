@@ -21,7 +21,6 @@ import { uuid } from "@/lib/utils/uuid";
 import { EntityConfig } from "@/models/EntityConfig/EntityConfig";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
-import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
 import { makeEntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/entityFieldConfigUtils";
 
 type EntityConfigForm = EntityConfig<"Insert"> & {
@@ -42,7 +41,8 @@ const initialFields = [makeEntityFieldConfig({ id: uuid(), name: "" })];
 const initialFieldOptions = fieldsToSelectOptions(initialFields);
 
 export function EntityCreatorView(): JSX.Element {
-  const [entityFields] = EntityFieldConfigClient.useGetAll();
+  const [doCreateEntityConfig, pendingEntityConfigCreate] =
+    EntityConfigClient.useInsert();
 
   const [configForm, setConfigForm] = useForm<EntityConfigForm>({
     mode: "uncontrolled",
@@ -102,21 +102,13 @@ export function EntityCreatorView(): JSX.Element {
     <Container pt="lg">
       <form
         onSubmit={configForm.onSubmit(async (values) => {
-          Logger.log("submitted values", values);
-
           const entityConfig: EntityConfig<"Insert"> = {
             name: values.name,
             description: values.description,
           };
 
-          Logger.log(
-            "Ready for insert",
-            EntityConfigClient.validateDataForInsert(entityConfig),
-          );
-
-          Logger.log("inserting");
-          const result = await EntityConfigClient.insert(entityConfig);
-          Logger.log("done inserting", result);
+          const result = await doCreateEntityConfig({ data: entityConfig });
+          Logger.log("post result", result);
         })}
       >
         <Stack>
@@ -155,7 +147,9 @@ export function EntityCreatorView(): JSX.Element {
               </Button>
             </Stack>
           </Fieldset>
-          <Button type="submit">Create</Button>
+          <Button type="submit" loading={pendingEntityConfigCreate}>
+            Create
+          </Button>
         </Stack>
       </form>
     </Container>

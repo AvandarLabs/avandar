@@ -9,6 +9,7 @@ export type ILogger = {
   withConditionalLogging: <T>(
     enabled: boolean | undefined,
     callback: (conditionalLogger: ILogger) => T,
+    options?: { functionName: string },
   ) => T;
 };
 
@@ -84,10 +85,19 @@ export function createLogger(config?: {
     withConditionalLogging: <T>(
       enabled: boolean | undefined,
       callback: (conditionalLogger: ILogger) => T,
+      options?: { functionName: string },
     ): T => {
+      const newLoggerName =
+        options?.functionName ?
+          config?.loggerName ?
+            `${config?.loggerName}:${options?.functionName}`
+          : options?.functionName
+        : config?.loggerName;
+
       const newLogger = createLogger({
         ...config,
         disabled: !enabled,
+        loggerName: newLoggerName,
       });
       const results = callback(newLogger);
       return results;

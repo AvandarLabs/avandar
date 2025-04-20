@@ -1,9 +1,9 @@
 import { createLogger, ILogger } from "../Logger";
 import { ModelCRUDParserRegistry } from "../utils/models/ModelCRUDParserRegistry";
 import { ModelCRUDTypes } from "../utils/models/ModelCRUDTypes";
-import { IModelCRUDClient, ModelCRUDClientOptions } from "./ICRUDModelClient";
+import { IModelCRUDClient, ModelCRUDClientOptions } from "./IModelCRUDClient";
 
-/**
+/*
  * This is the base implementation of an ICRUDModelClient. Any CRUD clients
  * should extend this class.
  */
@@ -45,34 +45,38 @@ export class ModelCRUDClient<
   }
 
   getById(
-    _id: ModelIdFieldType,
-    _options?: ModelCRUDClientOptions,
+    _params: ModelCRUDClientOptions & {
+      id: ModelIdFieldType;
+    },
   ): Promise<M["Read"] | undefined> {
     throw new Error("`getById()` not implemented.");
   }
 
-  getAll(_options?: ModelCRUDClientOptions): Promise<Array<M["Read"]>> {
+  getAll(_params?: ModelCRUDClientOptions): Promise<Array<M["Read"]>> {
     throw new Error("`getAll()` not implemented.");
   }
 
   insert(
-    _data: M["Insert"],
-    _options?: ModelCRUDClientOptions,
+    _params: ModelCRUDClientOptions & {
+      data: M["Insert"];
+    },
   ): Promise<M["Read"]> {
     throw new Error("`insert()` not implemented.");
   }
 
   update(
-    _id: ModelIdFieldType,
-    _data: M["Update"],
-    _options?: ModelCRUDClientOptions,
+    _params: ModelCRUDClientOptions & {
+      id: ModelIdFieldType;
+      data: M["Update"];
+    },
   ): Promise<M["Read"]> {
     throw new Error("`update()` not implemented.");
   }
 
   delete(
-    _id: ModelIdFieldType,
-    _options?: ModelCRUDClientOptions,
+    _params: ModelCRUDClientOptions & {
+      id: ModelIdFieldType;
+    },
   ): Promise<void> {
     throw new Error("`delete()` not implemented.");
   }

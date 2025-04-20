@@ -15,7 +15,9 @@ import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 export const Route = createFileRoute("/_auth/entity-designer/$entityConfigId")({
   component: RouteComponent,
   loader: async ({ params: { entityConfigId } }): Promise<EntityConfig> => {
-    const entityConfig = await EntityConfigClient.getById(uuid(entityConfigId));
+    const entityConfig = await EntityConfigClient.getById({
+      id: uuid(entityConfigId),
+    });
     if (!entityConfig) {
       throw notFound();
     }

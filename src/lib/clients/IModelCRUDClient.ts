@@ -43,22 +43,27 @@ export interface IModelCRUDClient<
    * if not found
    */
   getById(
-    id: ModelIdFieldType,
-    options?: ModelCRUDClientOptions,
+    params: ModelCRUDClientOptions & {
+      id: ModelIdFieldType;
+    },
   ): Promise<M["Read"] | undefined>;
 
   /**
    * Retrieves all instances of the model.
    * @returns A promise resolving to an array of model instances
    */
-  getAll(options?: ModelCRUDClientOptions): Promise<Array<M["Read"]>>;
+  getAll(params: ModelCRUDClientOptions): Promise<Array<M["Read"]>>;
 
   /**
    * Creates a new model instance in the data store.
    * @param data - The data to insert for the new model instance
    * @returns A promise resolving to the created model instance
    */
-  insert(data: M["Insert"]): Promise<M["Read"]>;
+  insert(
+    params: ModelCRUDClientOptions & {
+      data: M["Insert"];
+    },
+  ): Promise<M["Read"]>;
 
   /**
    * Updates an existing model instance with the provided data.
@@ -67,9 +72,10 @@ export interface IModelCRUDClient<
    * @returns A promise resolving to the updated model instance
    */
   update(
-    id: ModelIdFieldType,
-    data: M["Update"],
-    options?: ModelCRUDClientOptions,
+    params: ModelCRUDClientOptions & {
+      id: ModelIdFieldType;
+      data: M["Update"];
+    },
   ): Promise<M["Read"]>;
 
   /**
@@ -77,5 +83,9 @@ export interface IModelCRUDClient<
    * @param id - The unique identifier of the model to delete
    * @returns A promise that resolves when deletion is complete
    */
-  delete(id: ModelIdFieldType, options?: ModelCRUDClientOptions): Promise<void>;
+  delete(
+    params: ModelCRUDClientOptions & {
+      id: ModelIdFieldType;
+    },
+  ): Promise<void>;
 }

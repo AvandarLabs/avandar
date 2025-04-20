@@ -1,12 +1,9 @@
 import camelcaseKeys, { CamelCaseKeys } from "camelcase-keys";
 import snakecaseKeys, { SnakeCaseKeys } from "snakecase-keys";
 import { UnknownObject } from "@/lib/types/common";
-import {
-  ExcludeUndefinedDeep,
-  ObjectStringKey,
-} from "@/lib/types/utilityTypes";
+import { ExcludeDeep, ObjectStringKey } from "@/lib/types/utilityTypes";
 import { identity } from "@/lib/utils/functions";
-import { isNotUndefined, isPlainObject } from "./guards";
+import { isPlainObject, isUndefined } from "./guards";
 
 /**
  * Returns an array of entries from an object.
@@ -204,6 +201,64 @@ export function snakeCaseKeysShallow<T extends UnknownObject>(
   return snakecaseKeys(obj, { deep: false });
 }
 
+export function deepExclude<T, TypeToExclude>(
+  obj: T,
+  exclude: (value: unknown) => value is TypeToExclude,
+): ExcludeDeep<T, TypeToExclude> {
+  // Return any values (other than objects) as is
+  if (typeof obj !== "object" || obj === null) {
+    return obj as ExcludeDeep<T, TypeToExclude>;
+  }
+
+  // Now, handle different types of objects in special ways
+  if (Array.isArray(obj)) {
+    return obj
+      .filter((v) => {
+        return !exclude(v);
+      })
+      .map((item) => {
+        return deepExclude(item, exclude);
+      }) as ExcludeDeep<T, TypeToExclude>;
+  }
+
+  if (obj instanceof Map) {
+    const newEntries = [...obj.entries()]
+      .filter(([_, value]) => {
+        return !exclude(value);
+      })
+      .map(([key, value]) => {
+        return [key, deepExclude(value, exclude)];
+      }) as ReadonlyArray<[unknown, unknown]>;
+    return new Map(newEntries) as ExcludeDeep<T, TypeToExclude>;
+  }
+
+  if (obj instanceof Set) {
+    const newValues = [...obj.values()]
+      .filter((v) => {
+        return !exclude(v);
+      })
+      .map((value) => {
+        return deepExclude(value, exclude);
+      }) as readonly unknown[];
+    return new Set(newValues) as ExcludeDeep<T, TypeToExclude>;
+  }
+
+  if (isPlainObject(obj)) {
+    const newObj: UnknownObject = {};
+    Object.keys(obj).forEach((key) => {
+      const val = obj[key];
+      if (!exclude(val)) {
+        newObj[key] = deepExclude(val, exclude);
+      }
+    });
+    return newObj as ExcludeDeep<T, TypeToExclude>;
+  }
+
+  // any other objects, e.g. class instances, will not be traversed
+  // and we return them as is
+  return obj as ExcludeDeep<T, TypeToExclude>;
+}
+
 /**
  * Drop all keys that have an `undefined` value. This is a deep transformation.
  * For Maps, the keys (which technically can be of any type) will not get
@@ -214,50 +269,6 @@ export function snakeCaseKeysShallow<T extends UnknownObject>(
  */
 export function dropUndefinedDeep<T extends Exclude<unknown, undefined>>(
   obj: T,
-): ExcludeUndefinedDeep<T> {
-  // Return any values (other than objects) as is
-  if (typeof obj !== "object" || obj === null) {
-    return obj as ExcludeUndefinedDeep<T>;
-  }
-
-  // Now, handle different types of objects in special ways
-  if (Array.isArray(obj)) {
-    // drop undefined items
-    return obj.filter(isNotUndefined).map((item) => {
-      return dropUndefinedDeep(item);
-    }) as ExcludeUndefinedDeep<T>;
-  }
-
-  if (obj instanceof Map) {
-    const newEntries = [...obj.entries()]
-      .filter(([_, value]) => {
-        return isNotUndefined(value);
-      })
-      .map(([key, value]) => {
-        return [key, dropUndefinedDeep(value)];
-      }) as ReadonlyArray<[unknown, unknown]>;
-    return new Map(newEntries) as ExcludeUndefinedDeep<T>;
-  }
-
-  if (obj instanceof Set) {
-    const newValues = [...obj.values()].filter(isNotUndefined).map((value) => {
-      return dropUndefinedDeep(value);
-    }) as readonly unknown[];
-    return new Set(newValues) as ExcludeUndefinedDeep<T>;
-  }
-
-  if (isPlainObject(obj)) {
-    const newObj: UnknownObject = {};
-    Object.keys(obj).forEach((key) => {
-      const val = obj[key];
-      if (obj[key] !== undefined) {
-        newObj[key] = dropUndefinedDeep(val);
-      }
-    });
-    return newObj as ExcludeUndefinedDeep<T>;
-  }
-
-  // any other objects, e.g. class instances, will not be traversed
-  // and we return them as is
-  return obj as ExcludeUndefinedDeep<T>;
+): ExcludeDeep<T, undefined> {
+  return deepExclude(obj, isUndefined);
 }

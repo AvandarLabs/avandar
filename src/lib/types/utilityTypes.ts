@@ -17,21 +17,23 @@ export type KeysThatMapTo<T, Obj extends object> = {
 export type Brand<T, B extends string> = T & { __brand: B };
 
 /**
- * Recursively removes all `undefined` types from a type.
+ * Recursively removes all `TypeToExclude` types from a type.
  */
-export type ExcludeUndefinedDeep<T> =
-  T extends Array<infer U> ? Array<ExcludeUndefinedDeep<U>>
-  : T extends ReadonlyArray<infer U> ? ReadonlyArray<ExcludeUndefinedDeep<U>>
-  : T extends Map<infer K, infer V> ? Map<K, ExcludeUndefinedDeep<V>>
+export type ExcludeDeep<T, TypeToExclude> =
+  T extends Array<infer U> ? Array<ExcludeDeep<U, TypeToExclude>>
+  : T extends ReadonlyArray<infer U> ?
+    ReadonlyArray<ExcludeDeep<U, TypeToExclude>>
+  : T extends Map<infer K, infer V> ? Map<K, ExcludeDeep<V, TypeToExclude>>
   : T extends ReadonlyMap<infer K, infer V> ?
-    ReadonlyMap<K, ExcludeUndefinedDeep<V>>
-  : T extends Set<infer U> ? Set<ExcludeUndefinedDeep<U>>
-  : T extends ReadonlySet<infer U> ? ReadonlySet<ExcludeUndefinedDeep<U>>
+    ReadonlyMap<K, ExcludeDeep<V, TypeToExclude>>
+  : T extends Set<infer U> ? Set<ExcludeDeep<U, TypeToExclude>>
+  : T extends ReadonlySet<infer U> ? ReadonlySet<ExcludeDeep<U, TypeToExclude>>
   : T extends object ?
     {
-      [K in keyof Required<T>]: ExcludeUndefinedDeep<T[K]>;
+      [K in keyof T as Exclude<T[K], TypeToExclude> extends never ? never
+      : K]: ExcludeDeep<T[K], TypeToExclude>;
     }
-  : Exclude<T, undefined>;
+  : Exclude<T, TypeToExclude>;
 
 /**
  * Represents any function with inferrable parameters and return types.
@@ -44,3 +46,14 @@ export type AnyFunction = (...args: any[]) => unknown;
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyFunctionWithReturn<R> = (...args: any[]) => R;
+
+/**
+ * Represents any function with a given argument type.
+ */
+export type AnyFunctionWithArguments<Params extends unknown[]> = (
+  ...args: Params
+) => unknown;
+
+export type AnyFunctionWithSignature<Params extends unknown[], Return> = (
+  ...args: Params
+) => Return;
