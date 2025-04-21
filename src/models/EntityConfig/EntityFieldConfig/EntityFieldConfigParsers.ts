@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
-import { ModelCRUDParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
+import { makeParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
 import { camelCaseKeysDeep, snakeCaseKeysDeep } from "@/lib/utils/objects";
 import {
   jsonType,
@@ -138,13 +138,14 @@ const fromModelToDBUpdate = ModelUpdateSchema.transform((values) => {
   return DBUpdateSchema.parse(snakeCasedObject);
 });
 
-export const EntityFieldConfigParsers = {
-  DBReadSchema,
-  ModelReadSchema,
-  fromDBToModelRead,
-  fromModelToDBInsert,
-  fromModelToDBUpdate,
-} satisfies ModelCRUDParserRegistry<EntityFieldConfigCRUDTypes>;
+export const EntityFieldConfigParsers =
+  makeParserRegistry<EntityFieldConfigCRUDTypes>({
+    DBReadSchema,
+    ModelReadSchema,
+    fromDBToModelRead,
+    fromModelToDBInsert,
+    fromModelToDBUpdate,
+  });
 
 /**
  * Do not remove these tests! These check that your Zod parsers are

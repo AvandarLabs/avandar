@@ -47,16 +47,3 @@ export function constant<T>(value: T): () => T {
 export function cast<T>(value: unknown): T {
   return value as T;
 }
-
-/**
- * Casts a value to `any`. Try to never use this. Only use it when there
- * is no appropriate value you can cast to using `cast<T>()` so you
- * need to resort to casting to any.
- *
- * @param value The value to cast.
- * @returns The casted value as `any`.
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function castToAny(value: unknown): any {
-  return value;
-}

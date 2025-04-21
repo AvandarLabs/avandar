@@ -12,3 +12,27 @@ export type ModelCRUDParserRegistry<M extends ModelCRUDTypes> = {
   fromModelToDBInsert: z.ZodType<M["DBInsert"], z.ZodTypeDef, M["Insert"]>;
   fromModelToDBUpdate: z.ZodType<M["DBUpdate"], z.ZodTypeDef, M["Update"]>;
 };
+
+/**
+ * Helper function to create a parser registry. It just returns
+ * the passed object, but it assigns the correct generic type to it
+ * which is helpful for inference in the CRUD Client code.
+ *
+ * The first generic defaults to `never` to force the user to explicitly
+ * set the ModelCRUDTypes type.
+ */
+export function makeParserRegistry<M extends ModelCRUDTypes = never>({
+  DBReadSchema,
+  ModelReadSchema,
+  fromDBToModelRead,
+  fromModelToDBInsert,
+  fromModelToDBUpdate,
+}: ModelCRUDParserRegistry<M>): ModelCRUDParserRegistry<M> {
+  return {
+    DBReadSchema,
+    ModelReadSchema,
+    fromDBToModelRead,
+    fromModelToDBInsert,
+    fromModelToDBUpdate,
+  };
+}

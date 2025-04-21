@@ -13,7 +13,6 @@ import { formRootRule, isNotEmpty } from "@mantine/form";
 import { IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { useForm } from "@/lib/hooks/ui/useForm";
-import { Logger } from "@/lib/Logger";
 import { areArrayContentsEqual } from "@/lib/utils/arrays";
 import { getProp } from "@/lib/utils/objects";
 import { makeSelectOptions } from "@/lib/utils/ui/makeSelectOptions";
@@ -42,7 +41,7 @@ const initialFieldOptions = fieldsToSelectOptions(initialFields);
 
 export function EntityCreatorView(): JSX.Element {
   const [doCreateEntityConfig, pendingEntityConfigCreate] =
-    EntityConfigClient.useInsert();
+    EntityConfigClient.withLogger().useInsert();
 
   const [configForm, setConfigForm] = useForm<EntityConfigForm>({
     mode: "uncontrolled",
@@ -107,7 +106,7 @@ export function EntityCreatorView(): JSX.Element {
             description: values.description,
           };
 
-          doCreateEntityConfig({ data: entityConfig, enableLogger: true });
+          doCreateEntityConfig({ data: entityConfig });
         })}
       >
         <Stack>

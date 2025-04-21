@@ -3,11 +3,16 @@ import {
   QueryKey,
   UseMutationOptions,
 } from "@tanstack/react-query";
+import { Simplify } from "type-fest";
 import {
   useMutation,
   UseMutationResultTuple,
 } from "@/lib/hooks/query/useMutation";
-import { useQuery, UseQueryResultTuple } from "@/lib/hooks/query/useQuery";
+import {
+  useQuery,
+  UseQueryOptions,
+  UseQueryResultTuple,
+} from "@/lib/hooks/query/useQuery";
 import { capitalize, prefix } from "@/lib/utils/strings";
 import {
   AnyFunction,
@@ -15,7 +20,6 @@ import {
   AnyFunctionWithSignature,
   KeysThatMapTo,
 } from "../types/utilityTypes";
-import { castToAny } from "../utils/functions";
 import { isFunction } from "../utils/guards";
 import { ModelCRUDTypes } from "../utils/models/ModelCRUDTypes";
 import { deepExclude } from "../utils/objects";
@@ -26,7 +30,7 @@ import { ModelCRUDClient } from "./ModelCRUDClient";
  * return a Promise. These functions are eligible to be wrapped in
  * `useQuery` or `useMutation` hooks.
  */
-type HookableFnNames<T extends object> = Extract<
+export type HookableFnName<T extends object> = Extract<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   KeysThatMapTo<AnyFunctionWithSignature<[any], Promise<unknown>>, T>,
   string
@@ -61,7 +65,7 @@ const DEFAULT_QUERY_FN_NAMES = [
   "getById",
   "getAll",
 ] as const satisfies ReadonlyArray<
-  HookableFnNames<ModelCRUDClient<ModelCRUDTypes>>
+  HookableFnName<ModelCRUDClient<ModelCRUDTypes>>
 >;
 
 /**
@@ -73,7 +77,7 @@ const DEFAULT_MUTATION_FN_NAMES = [
   "update",
   "delete",
 ] as const satisfies ReadonlyArray<
-  HookableFnNames<ModelCRUDClient<ModelCRUDTypes>>
+  HookableFnName<ModelCRUDClient<ModelCRUDTypes>>
 >;
 
 /**
@@ -81,32 +85,41 @@ const DEFAULT_MUTATION_FN_NAMES = [
  * `useQuery` or `useMutation` and return the appropriate types.
  * We only convert functions that return a Promise to a `use` hook.
  */
-type WithQueryHooks<
+export type WithQueryHooks<
   CRUDClient extends ModelCRUDClient<ModelCRUDTypes>,
-  QueryFnName extends keyof CRUDClient,
-  MutationFnName extends keyof CRUDClient,
+  QueryFnName extends keyof CRUDClient = never,
+  MutationFnName extends keyof CRUDClient = never,
 > = CRUDClient & {
-  [QName in Extract<
-    QueryFnName,
-    string
-  > as `use${Capitalize<QName>}`]: CRUDClient[QName] extends (
+  [QName in [QueryFnName] extends [never] ?
+    (typeof DEFAULT_QUERY_FN_NAMES)[number]
+  : Extract<
+      QueryFnName,
+      string
+    > as `use${Capitalize<QName>}`]: CRUDClient[QName] extends (
     AnyFunctionWithReturn<Promise<infer Result>>
   ) ?
     (
-      params: ClientFnFirstParameter<CRUDClient, QName>,
+      clientFnParams: ClientFnFirstParameter<CRUDClient, QName>,
+      useQueryOptions?: Simplify<
+        Omit<UseQueryOptions<Result>, "queryFn" | "queryKey">
+      >,
     ) => UseQueryResultTuple<Result>
   : never;
 } & {
-  [MutName in Extract<
-    MutationFnName,
-    string
-  > as `use${Capitalize<MutName>}`]: CRUDClient[MutName] extends (
+  [MutName in [MutationFnName] extends [never] ?
+    (typeof DEFAULT_MUTATION_FN_NAMES)[number]
+  : Extract<
+      MutationFnName,
+      string
+    > as `use${Capitalize<MutName>}`]: CRUDClient[MutName] extends (
     AnyFunctionWithSignature<infer Params, Promise<infer Result>>
   ) ?
     (
-      useMutationOptions?: Omit<
-        UseMutationOptions<Result, DefaultError, Params[0], unknown>,
-        "mutationFn"
+      useMutationOptions?: Simplify<
+        Omit<
+          UseMutationOptions<Result, DefaultError, Params[0], unknown>,
+          "mutationFn"
+        >
       >,
     ) => UseMutationResultTuple<Result, DefaultError, Params[0], unknown>
   : never;
@@ -128,22 +141,15 @@ type WithQueryHooks<
  */
 export function withQueryHooks<
   CRUDClient extends ModelCRUDClient<ModelCRUDTypes>,
-  UseQueryFnName extends HookableFnNames<CRUDClient> = never,
-  UseMutationFnName extends HookableFnNames<CRUDClient> = never,
+  UseQueryFnName extends HookableFnName<CRUDClient> = never,
+  UseMutationFnName extends HookableFnName<CRUDClient> = never,
 >(
   client: CRUDClient,
   options?: {
     queryFns?: readonly UseQueryFnName[];
     mutationFns?: readonly UseMutationFnName[];
   },
-): WithQueryHooks<
-  CRUDClient,
-  [UseQueryFnName] extends [never] ? (typeof DEFAULT_QUERY_FN_NAMES)[number]
-  : UseQueryFnName,
-  [UseMutationFnName] extends [never] ?
-    (typeof DEFAULT_MUTATION_FN_NAMES)[number]
-  : UseMutationFnName
-> {
+): WithQueryHooks<CRUDClient, UseQueryFnName, UseMutationFnName> {
   const queryFnNames = options?.queryFns ?? DEFAULT_QUERY_FN_NAMES;
   const mutationFnNames = options?.mutationFns ?? DEFAULT_MUTATION_FN_NAMES;
 
@@ -160,22 +166,24 @@ export function withQueryHooks<
         // we allow only single-argument functions. If multiple arguments are
         // provided, we will just pass the first one.
         const useClientQuery = (
-          params: ClientFnFirstParameter<CRUDClient, UseQueryFnName>,
+          clientFnParams: ClientFnFirstParameter<CRUDClient, UseQueryFnName>,
+          useQueryOptions?: Omit<UseQueryOptions, "queryFn" | "queryKey">,
         ) => {
           return useQuery({
             queryFn: async () => {
-              const result = await boundClientFunction(params);
+              const result = await boundClientFunction(clientFnParams);
               return result;
             },
             queryKey: makeQueryKey(
               client,
               queryFnName as UseQueryFnName,
-              params,
+              clientFnParams,
             ),
+            ...useQueryOptions,
           });
         };
 
-        // @ts-expect-error Valid error to raise but it's safe.
+        // @ts-expect-error This is safe
         client[prefix("use", capitalize(queryFnName))] = useClientQuery;
       }
     });
@@ -221,12 +229,13 @@ export function withQueryHooks<
           });
         };
 
-        // @ts-expect-error Valid error to raise but it's safe.
+        // @ts-expect-error This is safe
         client[prefix("use", capitalize(mutationFnName))] = useClientMutation;
       }
     });
 
-  return castToAny(client);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return client as any;
 }
 
 /**
@@ -247,5 +256,5 @@ function makeQueryKey<
   // exclude any functions from the params, they aren't good to include
   // in a query key
   const newParams = deepExclude(params, isFunction);
-  return [client.modelName, queryFnName, newParams];
+  return [client.getModelName(), queryFnName, newParams];
 }

@@ -5,15 +5,26 @@ const LOG_HEADER_STYLES = `color: #102a43; font-weight: bold; font-size: ${LOG_H
 const LOG_BODY_STYLES = `background: #168d36; color: #ffffff; font-size: ${LOG_BODY_FONT_SIZE};`;
 
 export type ILogger = {
-  name: string | undefined;
   error: (error: unknown, extraData?: unknown) => void;
   warn: (...args: unknown[]) => void;
   log: (...args: unknown[]) => void;
-  withConditionalLogging: <T>(
-    enabled: boolean | undefined,
-    callback: (conditionalLogger: ILogger) => T,
-    options?: { functionName: string },
-  ) => T;
+  isEnabled: () => boolean;
+
+  /**
+   * Sets the logger to enabled or disabled.
+   * This is an immutable function, it returns a new logger instance.
+   * @param enabled - Whether to enable or disable the logger.
+   * @returns The logger instance.
+   */
+  setEnabled: (enabled: boolean) => ILogger;
+
+  /**
+   * Appends a name to the logger.
+   * This is an immutable function, it returns a new logger instance.
+   * @param name - The name to append.
+   * @returns The logger instance.
+   */
+  appendName: (name: string) => ILogger;
 };
 
 /**
@@ -71,39 +82,35 @@ function getFunctionsFromLoggerStack(
  *
  * @param config - Configuration options for the logger.
  * @param config.loggerName - The name of the logger.
- * @param config.disable - Whether to disable the logger.
+ * @param config.enabled - Whether to enable the logger. Defaults to true.
  * @returns A new logger instance.
  */
 export function createLogger(config?: {
   loggerName?: string;
-  disabled?: boolean;
+  enabled?: boolean;
 }): ILogger {
-  const loggerName = config?.loggerName;
+  const { loggerName, enabled = true } = config ?? {};
   const styledMsgTemplate = loggerName ? `%c [${loggerName}] %s` : "%c %s";
-  const state = { disabled: config?.disabled ?? false };
+  const state = { enabled };
 
   return {
-    name: loggerName,
+    isEnabled: (): boolean => {
+      return state.enabled;
+    },
 
-    withConditionalLogging: <T>(
-      enabled: boolean | undefined,
-      callback: (conditionalLogger: ILogger) => T,
-      options?: { functionName: string },
-    ): T => {
-      const newLoggerName =
-        options?.functionName ?
-          config?.loggerName ?
-            `${config?.loggerName}:${options?.functionName}`
-          : options?.functionName
-        : config?.loggerName;
-
-      const newLogger = createLogger({
+    setEnabled: (newEnabledState: boolean): ILogger => {
+      return createLogger({
         ...config,
-        disabled: !enabled,
+        enabled: newEnabledState,
+      });
+    },
+
+    appendName: (name: string): ILogger => {
+      const newLoggerName = loggerName ? `${loggerName}:${name}` : name;
+      return createLogger({
+        ...config,
         loggerName: newLoggerName,
       });
-      const results = callback(newLogger);
-      return results;
     },
 
     /**
@@ -114,7 +121,7 @@ export function createLogger(config?: {
      * @param extraData - Optional extra data to log.
      */
     error: (error: unknown, extraData?: unknown): void => {
-      if (state.disabled) {
+      if (!state.enabled) {
         return;
       }
       console.error(error, extraData);
@@ -127,7 +134,7 @@ export function createLogger(config?: {
      * @param extraData - Optional extra data to log.
      */
     warn: (...args: unknown[]): void => {
-      if (state.disabled) {
+      if (!state.enabled) {
         return;
       }
 
@@ -146,7 +153,7 @@ export function createLogger(config?: {
      * dev mode. This also prints the function caller and location.
      */
     log: (...args: unknown[]): void => {
-      if (state.disabled) {
+      if (!state.enabled) {
         return;
       }
 

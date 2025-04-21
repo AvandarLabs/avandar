@@ -1,18 +1,9 @@
-import { SupabaseCRUDClient } from "@/lib/clients/SupabaseCRUDClient";
-import { withQueryHooks } from "@/lib/clients/withQueryHooks";
-import { EntityFieldConfigCRUDTypes } from "./EntityFieldConfig";
+import { createSupabaseCRUDClient } from "@/lib/clients/SupabaseCRUDClient";
 import { EntityFieldConfigParsers } from "./EntityFieldConfigParsers";
 
-class EntityFieldConfigImpl extends SupabaseCRUDClient<
-  "entity_field_configs",
-  EntityFieldConfigCRUDTypes
-> {}
-
-export const EntityFieldConfigClient = withQueryHooks(
-  new EntityFieldConfigImpl({
-    modelName: "EntityFieldConfig",
-    tableName: "entity_field_configs",
-    dbTablePrimaryKey: "id",
-    parserRegistry: EntityFieldConfigParsers,
-  }),
-);
+export const EntityFieldConfigClient = createSupabaseCRUDClient({
+  modelName: "EntityFieldConfig",
+  tableName: "entity_field_configs",
+  dbTablePrimaryKey: "id",
+  parsers: EntityFieldConfigParsers,
+});
