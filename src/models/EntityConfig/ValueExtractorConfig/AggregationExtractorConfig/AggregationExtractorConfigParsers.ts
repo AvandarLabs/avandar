@@ -21,11 +21,11 @@ const DBReadSchema = z.object({
   updated_at: z.string().datetime({ offset: true }),
 });
 
-const DBInsertSchema = DBReadSchema.partial().required({
-  aggregation_type: true,
-  dataset_field_id: true,
-  dataset_id: true,
-  entity_field_config_id: true,
+const DBInsertSchema = DBReadSchema.required().partial({
+  id: true,
+  created_at: true,
+  updated_at: true,
+  filter: true,
 });
 
 const DBUpdateSchema = DBReadSchema.partial();
@@ -41,11 +41,11 @@ const ModelReadSchema = z.object({
   updatedAt: DBReadSchema.shape.updated_at,
 });
 
-const ModelInsertSchema = ModelReadSchema.partial().required({
-  aggregationType: true,
-  datasetFieldId: true,
-  datasetId: true,
-  entityFieldConfigId: true,
+const ModelInsertSchema = ModelReadSchema.required().partial({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  filter: true,
 });
 
 const ModelUpdateSchema = ModelReadSchema.partial();

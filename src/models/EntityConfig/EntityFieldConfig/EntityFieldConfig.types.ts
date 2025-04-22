@@ -1,4 +1,4 @@
-import { SetRequired, Simplify } from "type-fest";
+import { SetOptional, Simplify } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
 import type { EntityConfigId } from "../EntityConfig.types";
 import type { UUID } from "@/lib/types/common";
@@ -27,17 +27,26 @@ type DimensionRead = {
   valueExtractorType: DimensionExtractorType;
   isTitleField: boolean;
   isIdField: boolean;
-  isArray: boolean;
   allowManualEdit: boolean;
+  isArray: boolean;
 };
 
 type MetricRead = {
   class: "metric";
   baseDataType: MetricFieldBaseDataType;
   valueExtractorType: MetricExtractorType;
-  isTitleField: false;
+
+  /** Metrics can never be title fields */
+  isTitleField: false; // metrics can never be title fields
+
+  /** Metrics can never be id fields */
   isIdField: false;
-  allowManualEdit: false; // metrics should never allow manual edits
+
+  /** Metrics should never allow manual edits */
+  allowManualEdit: false;
+
+  /** Metrics should not allow arrays of values */
+  isArray: false;
 };
 
 type CoreFieldRead = {
@@ -58,17 +67,11 @@ export type EntityFieldConfigCRUDTypes = DefineModelCRUDTypes<
     modelPrimaryKey: "id";
     dbTablePrimaryKey: "id";
     Read: EntityFieldConfigRead;
-    Insert: SetRequired<Partial<CoreFieldRead>, "entityConfigId" | "name"> &
-      (
-        | SetRequired<
-            Partial<DimensionRead>,
-            "baseDataType" | "class" | "valueExtractorType"
-          >
-        | SetRequired<
-            Partial<MetricRead>,
-            "baseDataType" | "class" | "valueExtractorType"
-          >
-      );
+    Insert: SetOptional<
+      Required<CoreFieldRead>,
+      "id" | "createdAt" | "updatedAt" | "description"
+    > &
+      (DimensionRead | MetricRead);
     Update: Partial<CoreFieldRead> &
       (Partial<DimensionRead> | Partial<MetricRead>);
   }

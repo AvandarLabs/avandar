@@ -28,12 +28,15 @@ const DBReadSchema = z.object({
   updated_at: z.string(),
 });
 
-const DBInsertSchema = DBReadSchema.partial().required({
-  base_data_type: true,
-  class: true,
-  entity_config_id: true,
-  value_extractor_type: true,
-  name: true,
+const DBInsertSchema = DBReadSchema.required().partial({
+  allow_manual_edit: true,
+  created_at: true,
+  description: true,
+  id: true,
+  is_array: true,
+  is_id_field: true,
+  is_title_field: true,
+  updated_at: true,
 });
 
 const DBUpdateSchema = DBReadSchema.partial();
@@ -55,6 +58,7 @@ const MetricReadSchema = z.object({
   valueExtractorType: z.literal("aggregation"),
   isTitleField: z.literal(false),
   isIdField: z.literal(false),
+  isArray: z.literal(false),
 });
 
 const ModelReadCoreSchema = z.object({
@@ -72,22 +76,13 @@ const ModelReadSchema = z.intersection(
 );
 
 const ModelInsertSchema = z.intersection(
-  ModelReadCoreSchema.partial().required({
-    entityConfigId: true,
-    name: true,
+  ModelReadCoreSchema.required().partial({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+    description: true,
   }),
-  z.discriminatedUnion("class", [
-    DimensionReadSchema.partial().required({
-      baseDataType: true,
-      class: true,
-      valueExtractorType: true,
-    }),
-    MetricReadSchema.partial().required({
-      baseDataType: true,
-      class: true,
-      valueExtractorType: true,
-    }),
-  ]),
+  z.discriminatedUnion("class", [DimensionReadSchema, MetricReadSchema]),
 );
 
 const ModelUpdateSchema = z.intersection(

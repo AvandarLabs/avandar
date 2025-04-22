@@ -1,3 +1,4 @@
+import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import { entityConfigSeeder } from "./seedJobs";
 import type {
   GenericSeedData,
@@ -20,19 +21,17 @@ export const SEED_DATA = {
       description: "This entity represents a US State",
       fields: [
         {
-          class: "dimension",
-          baseType: "string",
-          isArray: false,
           name: "Name",
+          class: "dimension",
+          baseDataType: "string",
+          valueExtractorType: "manual_entry",
           description: "This entity represents a US State",
+          allowManualEdit: true,
           isIdField: true,
           isTitleField: true,
-          value_extractor: {
-            extractorType: "manualEntry",
-            allowManualEdit: true,
-          },
+          isArray: false,
         },
-      ],
+      ] satisfies Array<Omit<EntityFieldConfig<"Insert">, "entityConfigId">>,
     },
   ],
 } satisfies GenericSeedData;

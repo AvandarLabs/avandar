@@ -1,4 +1,4 @@
-import { SetRequired, Simplify } from "type-fest";
+import { SetOptional, Simplify } from "type-fest";
 import type { EntityFieldConfigId } from "../../EntityFieldConfig/EntityFieldConfig.types";
 import type { JSONType, UUID } from "@/lib/types/common";
 import type { DefineModelCRUDTypes } from "@/lib/utils/models/ModelCRUDTypes";
@@ -44,9 +44,9 @@ export type AggregationExtractorConfigCRUDTypes = DefineModelCRUDTypes<
     modelPrimaryKey: "id";
     dbTablePrimaryKey: "id";
     Read: AggregationExtractorConfigRead;
-    Insert: SetRequired<
-      Partial<AggregationExtractorConfigRead>,
-      "aggregationType" | "datasetFieldId" | "datasetId" | "entityFieldConfigId"
+    Insert: SetOptional<
+      Required<AggregationExtractorConfigRead>,
+      "id" | "createdAt" | "updatedAt" | "filter"
     >;
     Update: Partial<AggregationExtractorConfigRead>;
   }

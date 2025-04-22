@@ -1,4 +1,4 @@
-import { SetRequired, Simplify } from "type-fest";
+import { SetOptional, Simplify } from "type-fest";
 import { DefineModelCRUDTypes } from "@/lib/utils/models/ModelCRUDTypes";
 import { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
 import { UserId } from "@/models/User";
@@ -39,7 +39,10 @@ export type EntityConfigCRUDTypes = DefineModelCRUDTypes<
     dbTablePrimaryKey: "id";
     modelPrimaryKey: "id";
     Read: EntityConfigRead;
-    Insert: SetRequired<Partial<EntityConfigRead>, "name">;
+    Insert: SetOptional<
+      Required<EntityConfigRead>,
+      "id" | "ownerId" | "description" | "createdAt" | "updatedAt"
+    >;
     Update: Partial<EntityConfigRead>;
   }
 >;

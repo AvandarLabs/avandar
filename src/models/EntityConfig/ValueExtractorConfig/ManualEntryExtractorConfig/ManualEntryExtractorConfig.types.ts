@@ -1,4 +1,4 @@
-import { SetRequired, Simplify } from "type-fest";
+import { SetOptional, Simplify } from "type-fest";
 import type { EntityFieldConfigId } from "../../EntityFieldConfig/EntityFieldConfig.types";
 import type { UUID } from "@/lib/types/common";
 import type { DefineModelCRUDTypes } from "@/lib/utils/models/ModelCRUDTypes";
@@ -31,9 +31,9 @@ export type ManualEntryExtractorConfigCRUDTypes = DefineModelCRUDTypes<
     dbTablePrimaryKey: "id";
 
     Read: ManualEntryExtractorConfigRead;
-    Insert: SetRequired<
-      Partial<ManualEntryExtractorConfigRead>,
-      "entityFieldConfigId"
+    Insert: SetOptional<
+      Required<ManualEntryExtractorConfigRead>,
+      "id" | "createdAt" | "updatedAt"
     >;
     Update: Partial<ManualEntryExtractorConfigRead>;
   }
