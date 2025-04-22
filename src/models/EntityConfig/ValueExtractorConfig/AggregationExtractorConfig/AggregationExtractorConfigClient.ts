@@ -1,5 +1,5 @@
 import { createSupabaseCRUDClient } from "@/lib/clients/SupabaseCRUDClient";
-import { AggregationExtractorConfigParsers } from "./AggregationExtractorConfigParsers";
+import { AggregationExtractorConfigParsers } from "./parsers";
 
 /**
  * Client for managing aggregation extractor configurations

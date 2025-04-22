@@ -1,5 +1,5 @@
 import { createSupabaseCRUDClient } from "@/lib/clients/SupabaseCRUDClient";
-import { EntityFieldConfigParsers } from "./EntityFieldConfigParsers";
+import { EntityFieldConfigParsers } from "./parsers";
 
 export const EntityFieldConfigClient = createSupabaseCRUDClient({
   modelName: "EntityFieldConfig",

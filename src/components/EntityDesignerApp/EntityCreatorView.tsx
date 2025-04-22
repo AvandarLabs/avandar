@@ -17,10 +17,10 @@ import { areArrayContentsEqual } from "@/lib/utils/arrays";
 import { getProp } from "@/lib/utils/objects";
 import { makeSelectOptions } from "@/lib/utils/ui/makeSelectOptions";
 import { uuid } from "@/lib/utils/uuid";
-import { EntityConfig } from "@/models/EntityConfig/EntityConfig.types";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
-import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
-import { makeEntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/entityFieldConfigUtils";
+import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/types";
+import { makeDefaultEntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/utils";
+import { EntityConfig } from "@/models/EntityConfig/types";
 
 type EntityConfigForm = EntityConfig<"Insert"> & {
   fields: Array<EntityFieldConfig<"Insert">>;
@@ -36,7 +36,7 @@ function fieldsToSelectOptions(fields: EntityFieldConfig[]): ComboboxItem[] {
   });
 }
 
-const initialFields = [makeEntityFieldConfig({ id: uuid(), name: "" })];
+const initialFields = [makeDefaultEntityFieldConfig({ id: uuid(), name: "" })];
 const initialFieldOptions = fieldsToSelectOptions(initialFields);
 
 export function EntityCreatorView(): JSX.Element {
@@ -133,7 +133,7 @@ export function EntityCreatorView(): JSX.Element {
                 onClick={() => {
                   setConfigForm.insertListItem(
                     "fields",
-                    makeEntityFieldConfig({
+                    makeDefaultEntityFieldConfig({
                       id: uuid(),
                       name: "",
                     }),

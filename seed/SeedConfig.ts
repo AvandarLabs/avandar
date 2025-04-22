@@ -1,4 +1,4 @@
-import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
+import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/types";
 import { entityConfigSeeder } from "./seedJobs";
 import type {
   GenericSeedData,

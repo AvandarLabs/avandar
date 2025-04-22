@@ -9,8 +9,8 @@ import { EntityConfigMetaView } from "@/components/EntityDesignerApp/EntityConfi
 import { Logger } from "@/lib/Logger";
 import { Callout } from "@/lib/ui/Callout";
 import { uuid } from "@/lib/utils/uuid";
-import { EntityConfig } from "@/models/EntityConfig/EntityConfig.types";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
+import { EntityConfig } from "@/models/EntityConfig/types";
 
 export const Route = createFileRoute("/_auth/entity-designer/$entityConfigId")({
   component: RouteComponent,

@@ -1,5 +1,5 @@
 import { createSupabaseCRUDClient } from "@/lib/clients/SupabaseCRUDClient";
-import { ManualEntryExtractorConfigParsers } from "./ManualEntryExtractorConfigParsers";
+import { ManualEntryExtractorConfigParsers } from "./parsers";
 
 /**
  * Client for managing manual entry extractor configurations

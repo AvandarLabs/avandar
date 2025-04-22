@@ -1,5 +1,5 @@
 import { createSupabaseCRUDClient } from "@/lib/clients/SupabaseCRUDClient";
-import { AdjacentFieldExtractorParsers } from "./AdjacentFieldExtractorParsers";
+import { AdjacentFieldExtractorParsers } from "./parsers";
 
 /**
  * Client for managing adjacent field extractor configurations
