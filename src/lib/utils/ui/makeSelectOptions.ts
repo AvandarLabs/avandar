@@ -2,7 +2,8 @@ import { ComboboxItem } from "@mantine/core";
 import { UnknownObject } from "@/lib/types/common";
 
 /**
- * Creates an array of objects with value, label, and isDisabled properties.
+ * Given a list of objects, conver this to a list of objects with
+ * `value`, `label`, and `isDisabled` properties.
  *
  * @param options The options for creating the select options.
  * @param options.inputList The list of items to convert to Select options.

@@ -4,6 +4,7 @@ import {
   ComboboxItem,
   Container,
   Fieldset,
+  getWithProps,
   Group,
   Stack,
   Text,
@@ -16,28 +17,22 @@ import { useForm } from "@/lib/hooks/ui/useForm";
 import { areArrayContentsEqual } from "@/lib/utils/arrays";
 import { getProp } from "@/lib/utils/objects";
 import { makeSelectOptions } from "@/lib/utils/ui/makeSelectOptions";
-import { uuid } from "@/lib/utils/uuid";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/types";
-import { makeDefaultEntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/utils";
+import { makeDefaultEntityFieldDraft } from "@/models/EntityConfig/EntityFieldConfig/utils";
 import { EntityConfig } from "@/models/EntityConfig/types";
 
 type EntityConfigForm = EntityConfig<"Insert"> & {
   fields: Array<EntityFieldConfig<"Insert">>;
 };
 
-function fieldsToSelectOptions(fields: EntityFieldConfig[]): ComboboxItem[] {
-  return makeSelectOptions({
-    inputList: fields,
-    valueFn: getProp("id"),
-    labelFn: (field) => {
-      return field.name || "[Unnamed field]";
-    },
-  });
-}
-
-const initialFields = [makeDefaultEntityFieldConfig({ id: uuid(), name: "" })];
-const initialFieldOptions = fieldsToSelectOptions(initialFields);
+const initialFieldOptions = makeSelectOptions({
+  inputList: [makeDefaultEntityFieldDraft()],
+  valueFn: getProp("id"),
+  labelFn: (field) => {
+    return field.name || "[Unnamed field]";
+  },
+});
 
 export function EntityCreatorView(): JSX.Element {
   const [doCreateEntityConfig, pendingEntityConfigCreate] =
@@ -133,10 +128,7 @@ export function EntityCreatorView(): JSX.Element {
                 onClick={() => {
                   setConfigForm.insertListItem(
                     "fields",
-                    makeDefaultEntityFieldConfig({
-                      id: uuid(),
-                      name: "",
-                    }),
+                    makeDefaultEntityFieldDraft(),
                   );
                   configForm.clearFieldError("fields");
                 }}
