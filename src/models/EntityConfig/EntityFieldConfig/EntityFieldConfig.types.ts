@@ -16,14 +16,14 @@ export type MetricExtractorType = "aggregation";
 
 // Enum types to match database enums
 export type EntityFieldClass = EntityFieldConfigRead["class"];
-export type EntityFieldBaseType = EntityFieldConfigRead["baseType"];
+export type EntityFieldBaseType = EntityFieldConfigRead["baseDataType"];
 export type EntityFieldExtractorType = Simplify<
   EntityFieldConfigRead["extractorType"]
 >;
 
 type DimensionRead = {
   class: "dimension";
-  baseType: DimensionFieldBaseDataType;
+  baseDataType: DimensionFieldBaseDataType;
   extractorType: DimensionExtractorType;
   isTitleField: boolean;
   isIdField: boolean;
@@ -33,7 +33,7 @@ type DimensionRead = {
 
 type MetricRead = {
   class: "metric";
-  baseType: MetricFieldBaseDataType;
+  baseDataType: MetricFieldBaseDataType;
   extractorType: MetricExtractorType;
   isTitleField: false;
   isIdField: false;
@@ -62,11 +62,11 @@ export type EntityFieldConfigCRUDTypes = DefineModelCRUDTypes<
       (
         | SetRequired<
             Partial<DimensionRead>,
-            "baseType" | "class" | "extractorType"
+            "baseDataType" | "class" | "extractorType"
           >
         | SetRequired<
             Partial<MetricRead>,
-            "baseType" | "class" | "extractorType"
+            "baseDataType" | "class" | "extractorType"
           >
       );
     Update: Partial<CoreFieldRead> &

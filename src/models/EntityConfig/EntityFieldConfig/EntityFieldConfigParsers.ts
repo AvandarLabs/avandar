@@ -10,7 +10,7 @@ import {
 
 const DBReadSchema = z.object({
   allow_manual_edit: z.boolean().nullable(),
-  base_type: z.enum(["string", "number", "date"]),
+  base_data_type: z.enum(["string", "number", "date"]),
   class: z.enum(["dimension", "metric"]),
   created_at: z.string(),
   description: z.string().nullable(),
@@ -25,7 +25,7 @@ const DBReadSchema = z.object({
 });
 
 const DBInsertSchema = DBReadSchema.partial().required({
-  base_type: true,
+  base_data_type: true,
   class: true,
   entity_config_id: true,
   extractor_type: true,
@@ -37,7 +37,7 @@ const DBUpdateSchema = DBReadSchema.partial();
 const DimensionReadSchema = z.object({
   allowManualEdit: z.boolean(),
   class: z.literal("dimension"),
-  baseType: z.enum(["string", "number", "date"]),
+  baseDataType: z.enum(["string", "number", "date"]),
   extractorType: z.enum(["adjacent_field", "manual_entry"]),
   isTitleField: z.boolean(),
   isIdField: z.boolean(),
@@ -47,7 +47,7 @@ const DimensionReadSchema = z.object({
 const MetricReadSchema = z.object({
   allowManualEdit: z.literal(false),
   class: z.literal("metric"),
-  baseType: z.literal("number"),
+  baseDataType: z.literal("number"),
   extractorType: z.literal("aggregation"),
   isTitleField: z.literal(false),
   isIdField: z.literal(false),
@@ -74,12 +74,12 @@ const ModelInsertSchema = z.intersection(
   }),
   z.discriminatedUnion("class", [
     DimensionReadSchema.partial().required({
-      baseType: true,
+      baseDataType: true,
       class: true,
       extractorType: true,
     }),
     MetricReadSchema.partial().required({
-      baseType: true,
+      baseDataType: true,
       class: true,
       extractorType: true,
     }),

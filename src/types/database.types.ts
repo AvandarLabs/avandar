@@ -64,7 +64,7 @@ export type Database = {
       entity_field_configs: {
         Row: {
           allow_manual_edit: boolean | null
-          base_type: Database["public"]["Enums"]["entity_field_config__base_type"]
+          base_data_type: Database["public"]["Enums"]["entity_field_config__base_data_type"]
           class: Database["public"]["Enums"]["entity_field_config__class"]
           created_at: string
           description: string | null
@@ -79,7 +79,7 @@ export type Database = {
         }
         Insert: {
           allow_manual_edit?: boolean | null
-          base_type: Database["public"]["Enums"]["entity_field_config__base_type"]
+          base_data_type: Database["public"]["Enums"]["entity_field_config__base_data_type"]
           class: Database["public"]["Enums"]["entity_field_config__class"]
           created_at?: string
           description?: string | null
@@ -94,7 +94,7 @@ export type Database = {
         }
         Update: {
           allow_manual_edit?: boolean | null
-          base_type?: Database["public"]["Enums"]["entity_field_config__base_type"]
+          base_data_type?: Database["public"]["Enums"]["entity_field_config__base_data_type"]
           class?: Database["public"]["Enums"]["entity_field_config__class"]
           created_at?: string
           description?: string | null
@@ -239,7 +239,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      entity_field_config__base_type: "string" | "number" | "date"
+      entity_field_config__base_data_type: "string" | "number" | "date"
       entity_field_config__class: "dimension" | "metric"
       entity_field_config__extractor_type:
         | "adjacent_field"
@@ -365,7 +365,7 @@ export const Constants = {
   },
   public: {
     Enums: {
-      entity_field_config__base_type: ["string", "number", "date"],
+      entity_field_config__base_data_type: ["string", "number", "date"],
       entity_field_config__class: ["dimension", "metric"],
       entity_field_config__extractor_type: [
         "adjacent_field",

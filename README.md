@@ -61,14 +61,36 @@ the other Supabase container and run `npx supabase stop`)
 - Public files are importable using / in vite.
 - Images, pngs, svgs, are importable from assets directly.
 
-# Creating new models
+# Creating new CRUD models
 
-If this is purely a frontend model with no DB persistence, then skip to step 3.
+## 1. DB schema changes
 
 1. Create a SQL DB schema in `supabase/schemas`
-2. Generate the new types with `yarn db:gen-types`
-3. Run `yarn new:model YourModel [your_db_table_name]` to create your new model. If you only need a frontend model, don't include the db table name.
-4. Set up your model types in the newly created `src/models/YourModel.ts`
-5. If this model requires any server operations or backend persistence, set up the Zod schema parsers in `src/models/YourModelParsers.ts`
-6. Configure the API Client with the appropriate arguments in `src/models/YourModelClient.ts`
-7. Add any utility functions to `src/models/yourModelUtils.ts`
+2. Generate a new migration with `yarn db:new-migration your_migration_name`
+3. Review that the generated migration makes sense and does what you need to.
+4. Apply the new migration with `yarn db:apply-migration`
+
+## 2. Set up the TypeScript models
+
+1. Generate the new types with `yarn db:gen-types`
+2. Run `yarn new:model YourModel your_db_table_name` to create your new model with CRUD variants.
+
+This will create a new directory in `src/models/[YourModel]` with the following files:
+
+- `[YourModel].types.ts`: All TypeScript types for this model. Only types should exist here, no actual runtime-executable code.
+- `[YourModel]Parsers.ts`: All Zod schemas for this model. This file also includes Type-level tests to ensure the Zod schemas are consistent with the model types from the `[YourModel].types.ts` file.
+- `[YourModel]Client.ts`: API client for this model.
+
+3. Update your model types in the `[YourModel].types.ts`. Make sure your frontend model's `Read`, `Insert`, and `Update` variants are correctly specified.
+
+- For `Insert`, the convention is to wrap the `Read` variant in `SetRequired<Partial<Read>, requiredFields>`. Meaning, we make the `Read` variant fully optional, and then we specify the required fields.
+- If your `Read` variant has a discriminated union, you will need sub-types for each part of the union, and then reference them in the `Insert` and `Update` variants. See [EntityFieldConfig.types.ts](src/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts) for an example. This is because if you apply `Partial<>` or `SetRequired<>` to the full object, TypeScript loses the discriminated union and treats it as a regular union. Splitting up the union into types and applying `Partial<>` or `SetRequired<>` to each sub-type allows us to maintain the discriminated union.
+
+4. Set up the Zod schema parsers in `[YourModel]Parsers.ts`.
+
+- Ensure the `DBRead`, `DBInsert`, and `DBUpdate` schemas match the model's database table in `src/types/database.types.ts`.
+- Ensure the frontend model's `Read`, `Insert`, and `Update` schemas match the types in `[YourModel].types.ts`.
+- In total, there should be 6 schemas.
+- Ensure there are no TypeScript errors being thrown in the `makeParserRegistry` line or in the type-level tests at the end of the file.
+
+5. Verify there are no TypeScript errors in `[YourModel]Client.ts`.

@@ -1,6 +1,6 @@
 -- Create enums
 create type public.entity_field_config__class as enum ('dimension', 'metric');
-create type public.entity_field_config__base_type as enum ('string', 'number', 'date');
+create type public.entity_field_config__base_data_type as enum ('string', 'number', 'date');
 create type public.entity_field_config__extractor_type as enum ('adjacent_field', 'manual_entry', 'aggregation');
 
 -- Create the entity_field_configs table
@@ -16,7 +16,7 @@ create table public.entity_field_configs (
 
     -- Discriminating columns
     class public.entity_field_config__class not null,
-    base_type public.entity_field_config__base_type not null,
+    base_data_type public.entity_field_config__base_data_type not null,
     extractor_type public.entity_field_config__extractor_type not null,
 
     -- Dimension-related columns
