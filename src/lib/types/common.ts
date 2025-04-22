@@ -7,6 +7,11 @@ export type UnknownObject = Record<PropertyKey, unknown>;
 export type CSVCellValue = string | undefined;
 export type CSVRow = Record<string, CSVCellValue>;
 export type CSVData = CSVRow[];
+export type JSONLiteral = string | number | boolean | null;
+export type JSONType =
+  | JSONLiteral
+  | { [key: string]: JSONType | undefined }
+  | JSONType[];
 
 export type MIMEType =
   // Text

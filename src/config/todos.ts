@@ -24,9 +24,8 @@ export const TODOS =
       {
         label: "Entity Designer",
         items: [
-          "Simplify the useMutation hook",
-          "Make insert, edit, and delete use useMutation instead of useQuery hook",
-          "Implement the EntityFieldConfig model and table and related CRUD stuff",
+          "Add the entity_field_dimension_configs and entity_field_metric_configs tables",
+          "Add the entity_field_value_extractor_configs table",
           "Add function to deep convert nulls to undefined",
           "Add type utility to deep convert nulls to undefined",
           "Use these utilities in EntityFieldConfig and EntityConfig",

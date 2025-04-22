@@ -1,54 +1,70 @@
 import { z } from "zod";
+import { UUID } from "@/lib/types/common";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { makeParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
-import { uuidType } from "@/lib/utils/zodHelpers";
-import { UserId } from "../User";
-import { EntityConfigCRUDTypes, EntityConfigId } from "./EntityConfig.types";
+import { jsonType, uuidType } from "@/lib/utils/zodHelpers";
+import { DatasetFieldId } from "@/models/DatasetField";
+import { EntityFieldConfigId } from "../../EntityFieldConfig/EntityFieldConfig.types";
+import {
+  AggregationExtractorConfigCRUDTypes,
+  AggregationExtractorConfigId,
+} from "./AggregationExtractorConfig.types";
 
 const DBReadSchema = z.object({
-  created_at: z.string().datetime({ offset: true }),
-  description: z.string().nullable(),
   id: z.string(),
-  name: z.string(),
-  owner_id: z.string(),
+  entity_field_config_id: z.string(),
+  aggregation_type: z.enum(["sum", "max", "count"]),
+  dataset_id: z.string(),
+  dataset_field_id: z.string(),
+  filter: jsonType().nullable(),
+  created_at: z.string().datetime({ offset: true }),
   updated_at: z.string().datetime({ offset: true }),
 });
 
 const DBInsertSchema = DBReadSchema.partial().required({
-  name: true,
+  aggregation_type: true,
+  dataset_field_id: true,
+  dataset_id: true,
+  entity_field_config_id: true,
 });
 
 const DBUpdateSchema = DBReadSchema.partial();
 
 const ModelReadSchema = z.object({
+  id: uuidType<AggregationExtractorConfigId>(),
+  entityFieldConfigId: uuidType<EntityFieldConfigId>(),
+  aggregationType: DBReadSchema.shape.aggregation_type,
+  datasetId: uuidType<UUID<"Dataset">>(),
+  datasetFieldId: uuidType<DatasetFieldId>(),
+  filter: DBReadSchema.shape.filter,
   createdAt: DBReadSchema.shape.created_at,
-  description: DBReadSchema.shape.description,
-  id: uuidType<EntityConfigId>(),
-  name: DBReadSchema.shape.name,
-  ownerId: uuidType<UserId>(),
   updatedAt: DBReadSchema.shape.updated_at,
 });
 
 const ModelInsertSchema = ModelReadSchema.partial().required({
-  name: true,
+  aggregationType: true,
+  datasetFieldId: true,
+  datasetId: true,
+  entityFieldConfigId: true,
 });
 
 const ModelUpdateSchema = ModelReadSchema.partial();
 
-export const EntityConfigParsers = makeParserRegistry<EntityConfigCRUDTypes>({
-  DBReadSchema,
-  DBInsertSchema,
-  DBUpdateSchema,
-  ModelReadSchema,
-  ModelInsertSchema,
-  ModelUpdateSchema,
-});
+export const AggregationExtractorConfigParsers =
+  makeParserRegistry<AggregationExtractorConfigCRUDTypes>({
+    DBReadSchema,
+    DBInsertSchema,
+    DBUpdateSchema,
+    ModelReadSchema,
+    ModelInsertSchema,
+    ModelUpdateSchema,
+  });
 
 /**
  * Do not remove these tests! These check that your Zod parsers are
  * consistent with your defined model and DB types.
  */
-type CRUDTypes = EntityConfigCRUDTypes;
+type CRUDTypes = AggregationExtractorConfigCRUDTypes;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

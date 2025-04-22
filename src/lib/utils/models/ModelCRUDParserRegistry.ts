@@ -1,17 +1,36 @@
 import { z } from "zod";
+import { camelCaseKeysDeep, snakeCaseKeysDeep } from "../objects";
 import { ModelCRUDTypes } from "./ModelCRUDTypes";
+
+type BaseCRUDSchemas<M extends ModelCRUDTypes> = {
+  DBReadSchema: z.ZodType<M["DBRead"]>;
+  DBInsertSchema: z.ZodType<M["DBInsert"]>;
+  DBUpdateSchema: z.ZodType<M["DBUpdate"]>;
+  ModelReadSchema: z.ZodType<M["Read"]>;
+  ModelInsertSchema: z.ZodType<M["Insert"]>;
+  ModelUpdateSchema: z.ZodType<M["Update"]>;
+};
+
+type TransformerCRUDSchemas<M extends ModelCRUDTypes> = {
+  fromDBToModelRead: z.ZodType<M["Read"], z.ZodTypeDef, M["DBRead"]>;
+  fromModelInsertToDBInsert: z.ZodType<
+    M["DBInsert"],
+    z.ZodTypeDef,
+    M["Insert"]
+  >;
+  fromModelUpdateToDBUpdate: z.ZodType<
+    M["DBUpdate"],
+    z.ZodTypeDef,
+    M["Update"]
+  >;
+};
 
 /**
  * A registry for the base Read schemas as well as the transformer schemas
  * that convert between database and frontend model schemas.
  */
-export type ModelCRUDParserRegistry<M extends ModelCRUDTypes> = {
-  DBReadSchema: z.ZodType<M["DBRead"]>;
-  ModelReadSchema: z.ZodType<M["Read"]>;
-  fromDBToModelRead: z.ZodType<M["Read"], z.ZodTypeDef, M["DBRead"]>;
-  fromModelToDBInsert: z.ZodType<M["DBInsert"], z.ZodTypeDef, M["Insert"]>;
-  fromModelToDBUpdate: z.ZodType<M["DBUpdate"], z.ZodTypeDef, M["Update"]>;
-};
+export type ModelCRUDParserRegistry<M extends ModelCRUDTypes> =
+  BaseCRUDSchemas<M> & TransformerCRUDSchemas<M>;
 
 /**
  * Helper function to create a parser registry. It just returns
@@ -23,16 +42,37 @@ export type ModelCRUDParserRegistry<M extends ModelCRUDTypes> = {
  */
 export function makeParserRegistry<M extends ModelCRUDTypes = never>({
   DBReadSchema,
+  DBInsertSchema,
+  DBUpdateSchema,
   ModelReadSchema,
-  fromDBToModelRead,
-  fromModelToDBInsert,
-  fromModelToDBUpdate,
-}: ModelCRUDParserRegistry<M>): ModelCRUDParserRegistry<M> {
+  ModelInsertSchema,
+  ModelUpdateSchema,
+  fromDBToModelRead = undefined,
+  fromModelInsertToDBInsert = undefined,
+  fromModelUpdateToDBUpdate = undefined,
+}: BaseCRUDSchemas<M> &
+  Partial<TransformerCRUDSchemas<M>>): ModelCRUDParserRegistry<M> {
   return {
     DBReadSchema,
+    DBInsertSchema,
+    DBUpdateSchema,
     ModelReadSchema,
-    fromDBToModelRead,
-    fromModelToDBInsert,
-    fromModelToDBUpdate,
+    ModelInsertSchema,
+    ModelUpdateSchema,
+    fromDBToModelRead:
+      fromDBToModelRead ??
+      DBReadSchema.transform((dbObj) => {
+        return ModelReadSchema.parse(camelCaseKeysDeep(dbObj));
+      }),
+    fromModelInsertToDBInsert:
+      fromModelInsertToDBInsert ??
+      ModelInsertSchema.transform((modelObj) => {
+        return DBInsertSchema.parse(snakeCaseKeysDeep(modelObj));
+      }),
+    fromModelUpdateToDBUpdate:
+      fromModelUpdateToDBUpdate ??
+      ModelUpdateSchema.transform((modelObj) => {
+        return DBUpdateSchema.parse(snakeCaseKeysDeep(modelObj));
+      }),
   };
 }

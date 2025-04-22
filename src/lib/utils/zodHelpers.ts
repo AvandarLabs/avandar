@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UUID } from "../types/common";
+import { JSONType, UUID } from "../types/common";
 
 /**
  * Returns a Zod type that represents a branded UUID. This expects
@@ -95,18 +95,25 @@ export function unimplementedType(): z.ZodTypeAny {
   });
 }
 
-const literalSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
-type Literal = z.infer<typeof literalSchema>;
-type Json = Literal | { [key: string]: Json | undefined } | Json[];
+const jsonLiteralSchema = z.union([
+  z.string(),
+  z.number(),
+  z.boolean(),
+  z.null(),
+]);
 
 /**
  * Returns a Zod type that represents a JSON value.
  *
  * @returns A Zod type that represents a JSON value.
  */
-export function jsonType(): z.ZodType<Json> {
-  const jsonSchema: z.ZodType<Json> = z.lazy(() => {
-    return z.union([literalSchema, z.array(jsonSchema), z.record(jsonSchema)]);
+export function jsonType(): z.ZodType<JSONType> {
+  const jsonSchema: z.ZodType<JSONType> = z.lazy(() => {
+    return z.union([
+      jsonLiteralSchema,
+      z.array(jsonSchema),
+      z.record(jsonSchema),
+    ]);
   });
   return jsonSchema;
 }

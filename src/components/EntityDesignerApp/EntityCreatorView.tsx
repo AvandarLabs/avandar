@@ -17,9 +17,9 @@ import { areArrayContentsEqual } from "@/lib/utils/arrays";
 import { getProp } from "@/lib/utils/objects";
 import { makeSelectOptions } from "@/lib/utils/ui/makeSelectOptions";
 import { uuid } from "@/lib/utils/uuid";
-import { EntityConfig } from "@/models/EntityConfig/EntityConfig";
+import { EntityConfig } from "@/models/EntityConfig/EntityConfig.types";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
-import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
+import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import { makeEntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/entityFieldConfigUtils";
 
 type EntityConfigForm = EntityConfig<"Insert"> & {

@@ -1,3 +1,8 @@
+-- Create enums
+create type public.entity_field_config__class as enum ('dimension', 'metric');
+create type public.entity_field_config__base_type as enum ('string', 'number', 'date');
+create type public.entity_field_config__extractor_type as enum ('adjacent_field', 'manual_entry', 'aggregation');
+
 -- Create the entity_field_configs table
 create table public.entity_field_configs (
     id uuid primary key default gen_random_uuid(),
@@ -10,10 +15,9 @@ create table public.entity_field_configs (
     updated_at timestamptz not null default now(),
 
     -- Discriminating columns
-    -- (their value depends on the `class` and `base_type`)
-    class text not null check (class in ('dimension', 'metric')),
-    base_type text not null,
-    value_extractor jsonb not null,
+    class public.entity_field_config__class not null,
+    base_type public.entity_field_config__base_type not null,
+    extractor_type public.entity_field_config__extractor_type not null,
 
     -- Dimension-related columns
     is_title_field boolean not null default false,
@@ -28,34 +32,6 @@ create table public.entity_field_configs (
     ),
     constraint id_field_is_dimension check (
         is_id_field and class = 'dimension'
-    ),
-
-    -- Validate value_extractor structure
-    constraint value_extractor_schema_check check (
-        case class
-            when 'dimension' then
-                jsonb_typeof(value_extractor) = 'object'
-                and (
-                    -- adjacentField extractor
-                    value_extractor->>'extractorType' = 'adjacentField'
-                    and value_extractor->>'valuePickerRule' in ('mostFrequent', 'first')
-                    and (value_extractor->>'allowManualEdit')::boolean is not null
-                    and value_extractor->>'dataset' is not null
-                    and value_extractor->>'field' is not null
-                )
-                or (
-                    -- manualEntry extractor
-                    value_extractor->>'extractorType' = 'manualEntry'
-                    and (value_extractor->>'allowManualEdit')::boolean = true
-                )
-            when 'metric' then
-                jsonb_typeof(value_extractor) = 'object'
-                and value_extractor->>'extractorType' = 'aggregation'
-                and value_extractor->>'aggregation' in ('sum', 'max', 'count')
-                and value_extractor->>'dataset' is not null
-                and value_extractor->>'field' is not null
-                and value_extractor->>'filter' is not null
-        end
     )
 );
 
@@ -76,7 +52,7 @@ create policy "User can see entity_field_configs"
         )
     );
 
-create policy "User can insert entity_field_configs"
+create policy "User can INSERT entity_field_configs"
     on public.entity_field_configs for insert
     to authenticated -- postgres role
     -- actual policy
@@ -89,7 +65,7 @@ create policy "User can insert entity_field_configs"
         )
     );
 
-create policy "User can update entity_field_configs"
+create policy "User can UPDATE entity_field_configs"
     on public.entity_field_configs for update
     to authenticated -- postgres role
     -- actual policy
@@ -102,7 +78,7 @@ create policy "User can update entity_field_configs"
         )
     );
 
-create policy "User can delete entity_field_configs"
+create policy "User can DELETE entity_field_configs"
     on public.entity_field_configs for delete
     to authenticated -- postgres role
     -- actual policy
@@ -122,6 +98,8 @@ create trigger tr_entity_field_config__set_updated_at
     execute function public.util__set_updated_at();
 
 -- Function to validate title and id fields
+-- An entity_config should have at least 1 entity_field_config with
+-- `is_title_field` and at least 1 with `is_id_field`
 create or replace function public.entity_field_configs__validate_title_id_fields()
 returns trigger as $$
 begin
@@ -145,7 +123,7 @@ begin
 end;
 $$ language plpgsql;
 
--- Trigger to enforce the validation
+-- Trigger to enforce the title and id field validations
 create trigger tr_entity_field_configs__validate_title_id_fields
     after insert or update on public.entity_field_configs
     for each row execute function public.entity_field_configs__validate_title_id_fields();

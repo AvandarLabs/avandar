@@ -64,48 +64,48 @@ export type Database = {
       entity_field_configs: {
         Row: {
           allow_manual_edit: boolean | null
-          base_type: string
-          class: string
+          base_type: Database["public"]["Enums"]["entity_field_config__base_type"]
+          class: Database["public"]["Enums"]["entity_field_config__class"]
           created_at: string
           description: string | null
           entity_config_id: string
+          extractor_type: Database["public"]["Enums"]["entity_field_config__extractor_type"]
           id: string
           is_array: boolean | null
           is_id_field: boolean
           is_title_field: boolean
           name: string
           updated_at: string
-          value_extractor: Json
         }
         Insert: {
           allow_manual_edit?: boolean | null
-          base_type: string
-          class: string
+          base_type: Database["public"]["Enums"]["entity_field_config__base_type"]
+          class: Database["public"]["Enums"]["entity_field_config__class"]
           created_at?: string
           description?: string | null
           entity_config_id: string
+          extractor_type: Database["public"]["Enums"]["entity_field_config__extractor_type"]
           id?: string
           is_array?: boolean | null
           is_id_field?: boolean
           is_title_field?: boolean
           name: string
           updated_at?: string
-          value_extractor: Json
         }
         Update: {
           allow_manual_edit?: boolean | null
-          base_type?: string
-          class?: string
+          base_type?: Database["public"]["Enums"]["entity_field_config__base_type"]
+          class?: Database["public"]["Enums"]["entity_field_config__class"]
           created_at?: string
           description?: string | null
           entity_config_id?: string
+          extractor_type?: Database["public"]["Enums"]["entity_field_config__extractor_type"]
           id?: string
           is_array?: boolean | null
           is_id_field?: boolean
           is_title_field?: boolean
           name?: string
           updated_at?: string
-          value_extractor?: Json
         }
         Relationships: [
           {
@@ -113,6 +113,120 @@ export type Database = {
             columns: ["entity_config_id"]
             isOneToOne: false
             referencedRelation: "entity_configs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      value_extractor_config__adjacent_field: {
+        Row: {
+          allow_manual_edit: boolean
+          created_at: string
+          dataset_field_id: string
+          dataset_id: string
+          entity_field_config_id: string
+          id: string
+          updated_at: string
+          value_picker_rule_type: Database["public"]["Enums"]["value_extractor_config__value_picker_rule_type"]
+        }
+        Insert: {
+          allow_manual_edit: boolean
+          created_at?: string
+          dataset_field_id: string
+          dataset_id: string
+          entity_field_config_id: string
+          id?: string
+          updated_at?: string
+          value_picker_rule_type: Database["public"]["Enums"]["value_extractor_config__value_picker_rule_type"]
+        }
+        Update: {
+          allow_manual_edit?: boolean
+          created_at?: string
+          dataset_field_id?: string
+          dataset_id?: string
+          entity_field_config_id?: string
+          id?: string
+          updated_at?: string
+          value_picker_rule_type?: Database["public"]["Enums"]["value_extractor_config__value_picker_rule_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "value_extractor_config__adjacent_fi_entity_field_config_id_fkey"
+            columns: ["entity_field_config_id"]
+            isOneToOne: false
+            referencedRelation: "entity_field_configs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      value_extractor_config__aggregation: {
+        Row: {
+          aggregation_type: Database["public"]["Enums"]["value_extractor_config__aggregation_type"]
+          created_at: string
+          dataset_field_id: string
+          dataset_id: string
+          entity_field_config_id: string
+          filter: Json | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          aggregation_type: Database["public"]["Enums"]["value_extractor_config__aggregation_type"]
+          created_at?: string
+          dataset_field_id: string
+          dataset_id: string
+          entity_field_config_id: string
+          filter?: Json | null
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          aggregation_type?: Database["public"]["Enums"]["value_extractor_config__aggregation_type"]
+          created_at?: string
+          dataset_field_id?: string
+          dataset_id?: string
+          entity_field_config_id?: string
+          filter?: Json | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "value_extractor_config__aggregation_entity_field_config_id_fkey"
+            columns: ["entity_field_config_id"]
+            isOneToOne: false
+            referencedRelation: "entity_field_configs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      value_extractor_config__manual_entry: {
+        Row: {
+          allow_manual_edit: boolean
+          created_at: string
+          entity_field_config_id: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          allow_manual_edit: boolean
+          created_at?: string
+          entity_field_config_id: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          allow_manual_edit?: boolean
+          created_at?: string
+          entity_field_config_id?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "value_extractor_config__manual_entr_entity_field_config_id_fkey"
+            columns: ["entity_field_config_id"]
+            isOneToOne: false
+            referencedRelation: "entity_field_configs"
             referencedColumns: ["id"]
           },
         ]
@@ -125,7 +239,14 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      entity_field_config__base_type: "string" | "number" | "date"
+      entity_field_config__class: "dimension" | "metric"
+      entity_field_config__extractor_type:
+        | "adjacent_field"
+        | "manual_entry"
+        | "aggregation"
+      value_extractor_config__aggregation_type: "sum" | "max" | "count"
+      value_extractor_config__value_picker_rule_type: "most_frequent" | "first"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -243,7 +364,20 @@ export const Constants = {
     Enums: {},
   },
   public: {
-    Enums: {},
+    Enums: {
+      entity_field_config__base_type: ["string", "number", "date"],
+      entity_field_config__class: ["dimension", "metric"],
+      entity_field_config__extractor_type: [
+        "adjacent_field",
+        "manual_entry",
+        "aggregation",
+      ],
+      value_extractor_config__aggregation_type: ["sum", "max", "count"],
+      value_extractor_config__value_picker_rule_type: [
+        "most_frequent",
+        "first",
+      ],
+    },
   },
 } as const
 

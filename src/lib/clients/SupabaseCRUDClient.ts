@@ -91,7 +91,9 @@ export function createSupabaseCRUDClient<
       insert: async (params: { data: M["Insert"] }): Promise<M["Read"]> => {
         const logger = baseLogger.appendName("insert");
 
-        const dataToInsert = parsers.fromModelToDBInsert.parse(params.data);
+        const dataToInsert = parsers.fromModelInsertToDBInsert.parse(
+          params.data,
+        );
         const { data: insertedData } = await SupabaseDBClient.from(tableName)
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .insert(dataToInsert as any)
@@ -109,7 +111,9 @@ export function createSupabaseCRUDClient<
         id: ModelIdFieldType;
         data: M["Update"];
       }): Promise<M["Read"]> => {
-        const dataToUpdate = parsers.fromModelToDBUpdate.parse(params.data);
+        const dataToUpdate = parsers.fromModelUpdateToDBUpdate.parse(
+          params.data,
+        );
         const { data: updatedData } = await SupabaseDBClient.from(tableName)
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .update(dataToUpdate as any)

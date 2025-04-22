@@ -1,79 +1,62 @@
 import { z } from "zod";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { makeParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
-import { camelCaseKeysDeep, snakeCaseKeysDeep } from "@/lib/utils/objects";
-import {
-  jsonType,
-  stringToBrandedUUID,
-  uuidType,
-} from "@/lib/utils/zodHelpers";
-import { DatasetFieldId } from "@/models/DatasetField";
-import { EntityConfigId } from "../EntityConfig";
+import { uuidType } from "@/lib/utils/zodHelpers";
+import { EntityConfigId } from "../EntityConfig.types";
 import {
   EntityFieldConfigCRUDTypes,
   EntityFieldConfigId,
-} from "./EntityFieldConfig";
+} from "./EntityFieldConfig.types";
 
 const DBReadSchema = z.object({
   allow_manual_edit: z.boolean().nullable(),
-  base_type: z.string(),
-  class: z.string(),
-  created_at: z.string().datetime({ offset: true }),
+  base_type: z.enum(["string", "number", "date"]),
+  class: z.enum(["dimension", "metric"]),
+  created_at: z.string(),
   description: z.string().nullable(),
   entity_config_id: z.string(),
+  extractor_type: z.enum(["adjacent_field", "manual_entry", "aggregation"]),
   id: z.string(),
   is_array: z.boolean().nullable(),
   is_id_field: z.boolean(),
   is_title_field: z.boolean(),
   name: z.string(),
-  updated_at: z.string().datetime({ offset: true }),
-  value_extractor: jsonType(),
+  updated_at: z.string(),
 });
 
-const DimensionExtractorSchemas = {
-  adjacentField: z.object({
-    extractorType: z.literal("adjacentField"),
-    valuePickerRule: z.enum(["mostFrequent", "first"]),
-    allowManualEdit: z.boolean(),
-    datasetId: z.number(),
-    datasetFieldId: uuidType<DatasetFieldId>(),
-  }),
-  manualEntry: z.object({
-    extractorType: z.literal("manualEntry"),
-    allowManualEdit: z.literal(true),
-  }),
-};
+const DBInsertSchema = DBReadSchema.partial().required({
+  base_type: true,
+  class: true,
+  entity_config_id: true,
+  extractor_type: true,
+  name: true,
+});
+
+const DBUpdateSchema = DBReadSchema.partial();
 
 const DimensionReadSchema = z.object({
+  allowManualEdit: z.boolean(),
   class: z.literal("dimension"),
   baseType: z.enum(["string", "number", "date"]),
-  isArray: z.boolean(),
+  extractorType: z.enum(["adjacent_field", "manual_entry"]),
   isTitleField: z.boolean(),
   isIdField: z.boolean(),
-  valueExtractor: z.discriminatedUnion("extractorType", [
-    DimensionExtractorSchemas.adjacentField,
-    DimensionExtractorSchemas.manualEntry,
-  ]),
+  isArray: z.boolean(),
 });
 
 const MetricReadSchema = z.object({
+  allowManualEdit: z.literal(false),
   class: z.literal("metric"),
   baseType: z.literal("number"),
+  extractorType: z.literal("aggregation"),
   isTitleField: z.literal(false),
   isIdField: z.literal(false),
-  valueExtractor: z.object({
-    extractorType: z.literal("aggregation"),
-    aggregation: z.enum(["sum", "max", "count"]),
-    datasetId: z.number(),
-    datasetFieldId: uuidType<DatasetFieldId>(),
-    filter: z.unknown(),
-  }),
 });
 
 const ModelReadCoreSchema = z.object({
   id: uuidType<EntityFieldConfigId>(),
   entityConfigId: uuidType<EntityConfigId>(),
-  name: DBReadSchema.shape.name.describe("This is a name"),
+  name: DBReadSchema.shape.name,
   description: DBReadSchema.shape.description,
   createdAt: DBReadSchema.shape.created_at,
   updatedAt: DBReadSchema.shape.updated_at,
@@ -93,110 +76,73 @@ const ModelInsertSchema = z.intersection(
     DimensionReadSchema.partial().required({
       baseType: true,
       class: true,
-      valueExtractor: true,
+      extractorType: true,
     }),
     MetricReadSchema.partial().required({
       baseType: true,
       class: true,
-      valueExtractor: true,
+      extractorType: true,
     }),
   ]),
 );
 
-const DBInsertSchema = DBReadSchema.partial({
-  allow_manual_edit: true,
-  created_at: true,
-  description: true,
-  id: true,
-  is_array: true,
-  is_id_field: true,
-  is_title_field: true,
-  updated_at: true,
-});
-
-const DBUpdateSchema = DBReadSchema.partial();
 const ModelUpdateSchema = z.intersection(
   ModelReadCoreSchema.partial(),
   z.union([DimensionReadSchema.partial(), MetricReadSchema.partial()]),
 );
 
-const fromDBToModelRead = DBReadSchema.extend({
-  id: stringToBrandedUUID<EntityFieldConfigId>(),
-  entity_config_id: stringToBrandedUUID<EntityConfigId>(),
-}).transform((values) => {
-  const camelCasedObject = camelCaseKeysDeep(values);
-  return ModelReadSchema.parse(camelCasedObject);
-});
-
-const fromModelToDBInsert = ModelInsertSchema.transform((values) => {
-  const snakeCasedObject = snakeCaseKeysDeep(values);
-  return DBInsertSchema.parse(snakeCasedObject);
-});
-
-const fromModelToDBUpdate = ModelUpdateSchema.transform((values) => {
-  const snakeCasedObject = snakeCaseKeysDeep(values);
-  return DBUpdateSchema.parse(snakeCasedObject);
-});
-
 export const EntityFieldConfigParsers =
   makeParserRegistry<EntityFieldConfigCRUDTypes>({
     DBReadSchema,
+    DBInsertSchema,
+    DBUpdateSchema,
     ModelReadSchema,
-    fromDBToModelRead,
-    fromModelToDBInsert,
-    fromModelToDBUpdate,
+    ModelInsertSchema,
+    ModelUpdateSchema,
   });
 
 /**
  * Do not remove these tests! These check that your Zod parsers are
  * consistent with your defined model and DB types.
  */
+type CRUDTypes = EntityFieldConfigCRUDTypes;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
   Expect<
     ZodSchemaEqualsTypes<
-      typeof EntityFieldConfigParsers.DBReadSchema,
-      {
-        input: EntityFieldConfigCRUDTypes["DBRead"];
-        output: EntityFieldConfigCRUDTypes["DBRead"];
-      }
+      typeof DBReadSchema,
+      { input: CRUDTypes["DBRead"]; output: CRUDTypes["DBRead"] }
     >
   >,
   Expect<
     ZodSchemaEqualsTypes<
-      typeof EntityFieldConfigParsers.ModelReadSchema,
-      {
-        input: EntityFieldConfigCRUDTypes["Read"];
-        output: EntityFieldConfigCRUDTypes["Read"];
-      }
+      typeof DBInsertSchema,
+      { input: CRUDTypes["DBInsert"]; output: CRUDTypes["DBInsert"] }
     >
   >,
   Expect<
     ZodSchemaEqualsTypes<
-      typeof EntityFieldConfigParsers.fromDBToModelRead,
-      {
-        input: EntityFieldConfigCRUDTypes["DBRead"];
-        output: EntityFieldConfigCRUDTypes["Read"];
-      }
+      typeof DBUpdateSchema,
+      { input: CRUDTypes["DBUpdate"]; output: CRUDTypes["DBUpdate"] }
     >
   >,
   Expect<
     ZodSchemaEqualsTypes<
-      typeof EntityFieldConfigParsers.fromModelToDBInsert,
-      {
-        input: EntityFieldConfigCRUDTypes["Insert"];
-        output: EntityFieldConfigCRUDTypes["DBInsert"];
-      }
+      typeof ModelReadSchema,
+      { input: CRUDTypes["Read"]; output: CRUDTypes["Read"] }
     >
   >,
   Expect<
     ZodSchemaEqualsTypes<
-      typeof EntityFieldConfigParsers.fromModelToDBUpdate,
-      {
-        input: EntityFieldConfigCRUDTypes["Update"];
-        output: EntityFieldConfigCRUDTypes["DBUpdate"];
-      }
+      typeof ModelInsertSchema,
+      { input: CRUDTypes["Insert"]; output: CRUDTypes["Insert"] }
+    >
+  >,
+  Expect<
+    ZodSchemaEqualsTypes<
+      typeof ModelUpdateSchema,
+      { input: CRUDTypes["Update"]; output: CRUDTypes["Update"] }
     >
   >,
 ];

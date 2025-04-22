@@ -1,54 +1,72 @@
 import { z } from "zod";
+import { UUID } from "@/lib/types/common";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { makeParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
 import { uuidType } from "@/lib/utils/zodHelpers";
-import { UserId } from "../User";
-import { EntityConfigCRUDTypes, EntityConfigId } from "./EntityConfig.types";
+import { DatasetFieldId } from "@/models/DatasetField";
+import { EntityFieldConfigId } from "../../EntityFieldConfig/EntityFieldConfig.types";
+import {
+  AdjacentFieldExtractorConfigCRUDTypes,
+  AdjacentFieldExtractorConfigId,
+} from "./AdjacentFieldExtractorConfig.types";
 
 const DBReadSchema = z.object({
-  created_at: z.string().datetime({ offset: true }),
-  description: z.string().nullable(),
   id: z.string(),
-  name: z.string(),
-  owner_id: z.string(),
+  entity_field_config_id: z.string(),
+  value_picker_rule_type: z.enum(["most_frequent", "first"]),
+  allow_manual_edit: z.boolean(),
+  dataset_id: z.string(),
+  dataset_field_id: z.string(),
+  created_at: z.string().datetime({ offset: true }),
   updated_at: z.string().datetime({ offset: true }),
 });
 
 const DBInsertSchema = DBReadSchema.partial().required({
-  name: true,
+  allow_manual_edit: true,
+  value_picker_rule_type: true,
+  dataset_field_id: true,
+  dataset_id: true,
+  entity_field_config_id: true,
 });
 
 const DBUpdateSchema = DBReadSchema.partial();
 
 const ModelReadSchema = z.object({
+  id: uuidType<AdjacentFieldExtractorConfigId>(),
+  entityFieldConfigId: uuidType<EntityFieldConfigId>(),
+  valuePickerRuleType: DBReadSchema.shape.value_picker_rule_type,
+  allowManualEdit: DBReadSchema.shape.allow_manual_edit,
+  datasetId: uuidType<UUID<"Dataset">>(),
+  datasetFieldId: uuidType<DatasetFieldId>(),
   createdAt: DBReadSchema.shape.created_at,
-  description: DBReadSchema.shape.description,
-  id: uuidType<EntityConfigId>(),
-  name: DBReadSchema.shape.name,
-  ownerId: uuidType<UserId>(),
   updatedAt: DBReadSchema.shape.updated_at,
 });
 
 const ModelInsertSchema = ModelReadSchema.partial().required({
-  name: true,
+  allowManualEdit: true,
+  valuePickerRuleType: true,
+  datasetFieldId: true,
+  datasetId: true,
+  entityFieldConfigId: true,
 });
 
 const ModelUpdateSchema = ModelReadSchema.partial();
 
-export const EntityConfigParsers = makeParserRegistry<EntityConfigCRUDTypes>({
-  DBReadSchema,
-  DBInsertSchema,
-  DBUpdateSchema,
-  ModelReadSchema,
-  ModelInsertSchema,
-  ModelUpdateSchema,
-});
+export const AdjacentFieldExtractorParsers =
+  makeParserRegistry<AdjacentFieldExtractorConfigCRUDTypes>({
+    DBReadSchema,
+    DBInsertSchema,
+    DBUpdateSchema,
+    ModelReadSchema,
+    ModelInsertSchema,
+    ModelUpdateSchema,
+  });
 
 /**
  * Do not remove these tests! These check that your Zod parsers are
  * consistent with your defined model and DB types.
  */
-type CRUDTypes = EntityConfigCRUDTypes;
+type CRUDTypes = AdjacentFieldExtractorConfigCRUDTypes;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

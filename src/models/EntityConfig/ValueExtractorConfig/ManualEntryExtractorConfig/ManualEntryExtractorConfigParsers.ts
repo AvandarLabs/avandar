@@ -2,53 +2,57 @@ import { z } from "zod";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { makeParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
 import { uuidType } from "@/lib/utils/zodHelpers";
-import { UserId } from "../User";
-import { EntityConfigCRUDTypes, EntityConfigId } from "./EntityConfig.types";
+import { EntityFieldConfigId } from "../../EntityFieldConfig/EntityFieldConfig.types";
+import {
+  ManualEntryExtractorConfigCRUDTypes,
+  ManualEntryExtractorConfigId,
+} from "./ManualEntryExtractorConfig.types";
 
 const DBReadSchema = z.object({
-  created_at: z.string().datetime({ offset: true }),
-  description: z.string().nullable(),
   id: z.string(),
-  name: z.string(),
-  owner_id: z.string(),
+  entity_field_config_id: z.string(),
+  allow_manual_edit: z.boolean(),
+  created_at: z.string().datetime({ offset: true }),
   updated_at: z.string().datetime({ offset: true }),
 });
 
 const DBInsertSchema = DBReadSchema.partial().required({
-  name: true,
+  allow_manual_edit: true,
+  entity_field_config_id: true,
 });
 
 const DBUpdateSchema = DBReadSchema.partial();
 
 const ModelReadSchema = z.object({
+  id: uuidType<ManualEntryExtractorConfigId>(),
+  entityFieldConfigId: uuidType<EntityFieldConfigId>(),
+  allowManualEdit: z.literal(true),
   createdAt: DBReadSchema.shape.created_at,
-  description: DBReadSchema.shape.description,
-  id: uuidType<EntityConfigId>(),
-  name: DBReadSchema.shape.name,
-  ownerId: uuidType<UserId>(),
   updatedAt: DBReadSchema.shape.updated_at,
 });
 
 const ModelInsertSchema = ModelReadSchema.partial().required({
-  name: true,
+  allowManualEdit: true,
+  entityFieldConfigId: true,
 });
 
 const ModelUpdateSchema = ModelReadSchema.partial();
 
-export const EntityConfigParsers = makeParserRegistry<EntityConfigCRUDTypes>({
-  DBReadSchema,
-  DBInsertSchema,
-  DBUpdateSchema,
-  ModelReadSchema,
-  ModelInsertSchema,
-  ModelUpdateSchema,
-});
+export const ManualEntryExtractorConfigParsers =
+  makeParserRegistry<ManualEntryExtractorConfigCRUDTypes>({
+    DBReadSchema,
+    DBInsertSchema,
+    DBUpdateSchema,
+    ModelReadSchema,
+    ModelInsertSchema,
+    ModelUpdateSchema,
+  });
 
 /**
  * Do not remove these tests! These check that your Zod parsers are
  * consistent with your defined model and DB types.
  */
-type CRUDTypes = EntityConfigCRUDTypes;
+type CRUDTypes = ManualEntryExtractorConfigCRUDTypes;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

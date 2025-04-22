@@ -1,5 +1,5 @@
 import { LinkProps } from "@/lib/ui/links/Link";
-import { EntityConfig } from "./EntityConfig";
+import { EntityConfig } from "./EntityConfig.types";
 
 export function getEntityConfigLinkProps(
   entity: EntityConfig,

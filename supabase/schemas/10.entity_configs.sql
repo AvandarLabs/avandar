@@ -15,24 +15,28 @@ create table public.entity_configs (
 alter table public.entity_configs enable row level security;
 
 -- Create policies
-create policy "User can see their own entity_configs"
+create policy "User can SELECT entity_configs"
     on public.entity_configs for select
-    to authenticated
+    to authenticated -- postgres role
+    -- actual policy
     using ((select auth.uid()) = public.entity_configs.owner_id);
 
-create policy "User can insert entity_configs"
+create policy "User can INSERT entity_configs"
     on public.entity_configs for insert
-    to authenticated
+    to authenticated -- postgres role
+    -- actual policy
     with check ((select auth.uid()) = public.entity_configs.owner_id);
 
-create policy "User can update their own entity_configs"
+create policy "User can UPDATE entity_configs"
     on public.entity_configs for update
-    to authenticated
+    to authenticated -- postgres role
+    -- actual policy
     with check ((select auth.uid()) = public.entity_configs.owner_id);
 
-create policy "User can delete their own entity_configs"
+create policy "User can DELETE entity_configs"
     on public.entity_configs for delete
-    to authenticated
+    to authenticated -- postgres role
+    -- actual policy
     using ((select auth.uid()) = public.entity_configs.owner_id);
 
 -- Create updated_at trigger

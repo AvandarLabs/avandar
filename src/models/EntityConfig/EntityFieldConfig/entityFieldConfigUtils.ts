@@ -1,5 +1,5 @@
 import { Logger } from "@/lib/Logger";
-import { EntityFieldConfig } from "./EntityFieldConfig";
+import { EntityFieldConfig } from "./EntityFieldConfig.types";
 
 /**
  * Make an EntityFieldConfig. For now, we create something filled with lots
@@ -24,15 +24,12 @@ export function makeEntityFieldConfig({
     entityConfigId,
     class: "dimension",
     baseType: "string",
+    extractorType: "manual_entry",
     createdAt: dateTimeNow,
     updatedAt: dateTimeNow,
     isArray: false,
     isIdField: false,
     isTitleField: false,
-    valueExtractor: {
-      extractorType: "manualEntry",
-      allowManualEdit: true,
-    },
 
     // TODO(pablo): use a null to undefined converter to avoid using `null`
     // here. We want this to be set to `undefined`
