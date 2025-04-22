@@ -11,7 +11,6 @@ create table public.value_extractor_config__adjacent_field (
         on update cascade
         on delete cascade,
     value_picker_rule_type public.value_extractor_config__value_picker_rule_type not null,
-    allow_manual_edit boolean not null,
     dataset_id uuid not null,
     dataset_field_id uuid not null
 );
@@ -23,8 +22,7 @@ create table public.value_extractor_config__manual_entry (
     updated_at timestamptz not null default now(),
     entity_field_config_id uuid not null references entity_field_configs(id)
         on update cascade
-        on delete cascade,
-    allow_manual_edit boolean not null
+        on delete cascade
 );
 
 -- Create the value_extractor_config__aggregation table

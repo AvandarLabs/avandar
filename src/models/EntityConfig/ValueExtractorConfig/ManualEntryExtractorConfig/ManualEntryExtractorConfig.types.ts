@@ -16,12 +16,6 @@ type ManualEntryExtractorConfigRead = {
   /** ID of the associated entity field config */
   entityFieldConfigId: EntityFieldConfigId;
 
-  /**
-   * Whether to allow manual editing of values
-   * (always true for manual entry)
-   */
-  allowManualEdit: true;
-
   /** Creation timestamp */
   createdAt: string;
 
@@ -39,7 +33,7 @@ export type ManualEntryExtractorConfigCRUDTypes = DefineModelCRUDTypes<
     Read: ManualEntryExtractorConfigRead;
     Insert: SetRequired<
       Partial<ManualEntryExtractorConfigRead>,
-      "allowManualEdit" | "entityFieldConfigId"
+      "entityFieldConfigId"
     >;
     Update: Partial<ManualEntryExtractorConfigRead>;
   }

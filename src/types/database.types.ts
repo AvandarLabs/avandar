@@ -63,49 +63,49 @@ export type Database = {
       }
       entity_field_configs: {
         Row: {
-          allow_manual_edit: boolean | null
+          allow_manual_edit: boolean
           base_data_type: Database["public"]["Enums"]["entity_field_config__base_data_type"]
           class: Database["public"]["Enums"]["entity_field_config__class"]
           created_at: string
           description: string | null
           entity_config_id: string
-          extractor_type: Database["public"]["Enums"]["entity_field_config__extractor_type"]
           id: string
           is_array: boolean | null
           is_id_field: boolean
           is_title_field: boolean
           name: string
           updated_at: string
+          value_extractor_type: Database["public"]["Enums"]["entity_field_config__value_extractor_type"]
         }
         Insert: {
-          allow_manual_edit?: boolean | null
+          allow_manual_edit?: boolean
           base_data_type: Database["public"]["Enums"]["entity_field_config__base_data_type"]
           class: Database["public"]["Enums"]["entity_field_config__class"]
           created_at?: string
           description?: string | null
           entity_config_id: string
-          extractor_type: Database["public"]["Enums"]["entity_field_config__extractor_type"]
           id?: string
           is_array?: boolean | null
           is_id_field?: boolean
           is_title_field?: boolean
           name: string
           updated_at?: string
+          value_extractor_type: Database["public"]["Enums"]["entity_field_config__value_extractor_type"]
         }
         Update: {
-          allow_manual_edit?: boolean | null
+          allow_manual_edit?: boolean
           base_data_type?: Database["public"]["Enums"]["entity_field_config__base_data_type"]
           class?: Database["public"]["Enums"]["entity_field_config__class"]
           created_at?: string
           description?: string | null
           entity_config_id?: string
-          extractor_type?: Database["public"]["Enums"]["entity_field_config__extractor_type"]
           id?: string
           is_array?: boolean | null
           is_id_field?: boolean
           is_title_field?: boolean
           name?: string
           updated_at?: string
+          value_extractor_type?: Database["public"]["Enums"]["entity_field_config__value_extractor_type"]
         }
         Relationships: [
           {
@@ -119,7 +119,6 @@ export type Database = {
       }
       value_extractor_config__adjacent_field: {
         Row: {
-          allow_manual_edit: boolean
           created_at: string
           dataset_field_id: string
           dataset_id: string
@@ -129,7 +128,6 @@ export type Database = {
           value_picker_rule_type: Database["public"]["Enums"]["value_extractor_config__value_picker_rule_type"]
         }
         Insert: {
-          allow_manual_edit: boolean
           created_at?: string
           dataset_field_id: string
           dataset_id: string
@@ -139,7 +137,6 @@ export type Database = {
           value_picker_rule_type: Database["public"]["Enums"]["value_extractor_config__value_picker_rule_type"]
         }
         Update: {
-          allow_manual_edit?: boolean
           created_at?: string
           dataset_field_id?: string
           dataset_id?: string
@@ -201,21 +198,18 @@ export type Database = {
       }
       value_extractor_config__manual_entry: {
         Row: {
-          allow_manual_edit: boolean
           created_at: string
           entity_field_config_id: string
           id: string
           updated_at: string
         }
         Insert: {
-          allow_manual_edit: boolean
           created_at?: string
           entity_field_config_id: string
           id?: string
           updated_at?: string
         }
         Update: {
-          allow_manual_edit?: boolean
           created_at?: string
           entity_field_config_id?: string
           id?: string
@@ -241,7 +235,7 @@ export type Database = {
     Enums: {
       entity_field_config__base_data_type: "string" | "number" | "date"
       entity_field_config__class: "dimension" | "metric"
-      entity_field_config__extractor_type:
+      entity_field_config__value_extractor_type:
         | "adjacent_field"
         | "manual_entry"
         | "aggregation"
@@ -367,7 +361,7 @@ export const Constants = {
     Enums: {
       entity_field_config__base_data_type: ["string", "number", "date"],
       entity_field_config__class: ["dimension", "metric"],
-      entity_field_config__extractor_type: [
+      entity_field_config__value_extractor_type: [
         "adjacent_field",
         "manual_entry",
         "aggregation",

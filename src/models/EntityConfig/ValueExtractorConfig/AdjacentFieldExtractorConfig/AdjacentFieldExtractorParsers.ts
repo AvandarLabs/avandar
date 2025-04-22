@@ -14,7 +14,6 @@ const DBReadSchema = z.object({
   id: z.string(),
   entity_field_config_id: z.string(),
   value_picker_rule_type: z.enum(["most_frequent", "first"]),
-  allow_manual_edit: z.boolean(),
   dataset_id: z.string(),
   dataset_field_id: z.string(),
   created_at: z.string().datetime({ offset: true }),
@@ -22,7 +21,6 @@ const DBReadSchema = z.object({
 });
 
 const DBInsertSchema = DBReadSchema.partial().required({
-  allow_manual_edit: true,
   value_picker_rule_type: true,
   dataset_field_id: true,
   dataset_id: true,
@@ -35,7 +33,6 @@ const ModelReadSchema = z.object({
   id: uuidType<AdjacentFieldExtractorConfigId>(),
   entityFieldConfigId: uuidType<EntityFieldConfigId>(),
   valuePickerRuleType: DBReadSchema.shape.value_picker_rule_type,
-  allowManualEdit: DBReadSchema.shape.allow_manual_edit,
   datasetId: uuidType<UUID<"Dataset">>(),
   datasetFieldId: uuidType<DatasetFieldId>(),
   createdAt: DBReadSchema.shape.created_at,
@@ -43,7 +40,6 @@ const ModelReadSchema = z.object({
 });
 
 const ModelInsertSchema = ModelReadSchema.partial().required({
-  allowManualEdit: true,
   valuePickerRuleType: true,
   datasetFieldId: true,
   datasetId: true,

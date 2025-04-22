@@ -1,7 +1,7 @@
 -- Create enums
 create type public.entity_field_config__class as enum ('dimension', 'metric');
 create type public.entity_field_config__base_data_type as enum ('string', 'number', 'date');
-create type public.entity_field_config__extractor_type as enum ('adjacent_field', 'manual_entry', 'aggregation');
+create type public.entity_field_config__value_extractor_type as enum ('adjacent_field', 'manual_entry', 'aggregation');
 
 -- Create the entity_field_configs table
 create table public.entity_field_configs (
@@ -17,21 +17,26 @@ create table public.entity_field_configs (
     -- Discriminating columns
     class public.entity_field_config__class not null,
     base_data_type public.entity_field_config__base_data_type not null,
-    extractor_type public.entity_field_config__extractor_type not null,
+    value_extractor_type public.entity_field_config__value_extractor_type not null,
 
     -- Dimension-related columns
     is_title_field boolean not null default false,
     is_id_field boolean not null default false,
     is_array boolean,
-    allow_manual_edit boolean,
+    allow_manual_edit boolean not null default false,
 
     -- Constraints
-    -- Ensure title and id fields are only set on "dimension" fields
-    constraint title_field_is_dimension check (
-        is_title_field and class = 'dimension'
+    -- Ensure title and id fields can never be "metric" fields
+    constraint metrics_cant_be_titles check (
+        not (class = 'metric' and is_title_field)
     ),
-    constraint id_field_is_dimension check (
-        is_id_field and class = 'dimension'
+    constraint metrics_cant_be_ids check (
+        not (class = 'metric' and is_id_field)
+    ),
+
+    -- Ensure metrics can never allow manual editing
+    constraint metrics_dont_allow_manual_edit check (
+        not (class = 'metric' and allow_manual_edit)
     )
 );
 

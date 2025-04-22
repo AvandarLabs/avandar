@@ -20,9 +20,6 @@ type AdjacentFieldExtractorConfigRead = {
   /** Rule to pick which value to use when multiple are found */
   valuePickerRuleType: ValuePickerRuleType;
 
-  /** Whether to allow manual editing of the extracted values */
-  allowManualEdit: boolean;
-
   /** ID of the dataset to extract from */
   datasetId: UUID<"Dataset">;
 
@@ -48,7 +45,6 @@ export type AdjacentFieldExtractorConfigCRUDTypes = DefineModelCRUDTypes<
     Read: AdjacentFieldExtractorConfigRead;
     Insert: SetRequired<
       Partial<AdjacentFieldExtractorConfigRead>,
-      | "allowManualEdit"
       | "valuePickerRuleType"
       | "datasetId"
       | "datasetFieldId"

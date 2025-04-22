@@ -9,13 +9,17 @@ import {
 } from "./EntityFieldConfig.types";
 
 const DBReadSchema = z.object({
-  allow_manual_edit: z.boolean().nullable(),
+  allow_manual_edit: z.boolean(),
   base_data_type: z.enum(["string", "number", "date"]),
   class: z.enum(["dimension", "metric"]),
   created_at: z.string(),
   description: z.string().nullable(),
   entity_config_id: z.string(),
-  extractor_type: z.enum(["adjacent_field", "manual_entry", "aggregation"]),
+  value_extractor_type: z.enum([
+    "adjacent_field",
+    "manual_entry",
+    "aggregation",
+  ]),
   id: z.string(),
   is_array: z.boolean().nullable(),
   is_id_field: z.boolean(),
@@ -28,7 +32,7 @@ const DBInsertSchema = DBReadSchema.partial().required({
   base_data_type: true,
   class: true,
   entity_config_id: true,
-  extractor_type: true,
+  value_extractor_type: true,
   name: true,
 });
 
@@ -38,7 +42,7 @@ const DimensionReadSchema = z.object({
   allowManualEdit: z.boolean(),
   class: z.literal("dimension"),
   baseDataType: z.enum(["string", "number", "date"]),
-  extractorType: z.enum(["adjacent_field", "manual_entry"]),
+  valueExtractorType: z.enum(["adjacent_field", "manual_entry"]),
   isTitleField: z.boolean(),
   isIdField: z.boolean(),
   isArray: z.boolean(),
@@ -48,7 +52,7 @@ const MetricReadSchema = z.object({
   allowManualEdit: z.literal(false),
   class: z.literal("metric"),
   baseDataType: z.literal("number"),
-  extractorType: z.literal("aggregation"),
+  valueExtractorType: z.literal("aggregation"),
   isTitleField: z.literal(false),
   isIdField: z.literal(false),
 });
@@ -76,12 +80,12 @@ const ModelInsertSchema = z.intersection(
     DimensionReadSchema.partial().required({
       baseDataType: true,
       class: true,
-      extractorType: true,
+      valueExtractorType: true,
     }),
     MetricReadSchema.partial().required({
       baseDataType: true,
       class: true,
-      extractorType: true,
+      valueExtractorType: true,
     }),
   ]),
 );

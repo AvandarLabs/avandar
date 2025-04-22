@@ -11,13 +11,11 @@ import {
 const DBReadSchema = z.object({
   id: z.string(),
   entity_field_config_id: z.string(),
-  allow_manual_edit: z.boolean(),
   created_at: z.string().datetime({ offset: true }),
   updated_at: z.string().datetime({ offset: true }),
 });
 
 const DBInsertSchema = DBReadSchema.partial().required({
-  allow_manual_edit: true,
   entity_field_config_id: true,
 });
 
@@ -26,13 +24,11 @@ const DBUpdateSchema = DBReadSchema.partial();
 const ModelReadSchema = z.object({
   id: uuidType<ManualEntryExtractorConfigId>(),
   entityFieldConfigId: uuidType<EntityFieldConfigId>(),
-  allowManualEdit: z.literal(true),
   createdAt: DBReadSchema.shape.created_at,
   updatedAt: DBReadSchema.shape.updated_at,
 });
 
 const ModelInsertSchema = ModelReadSchema.partial().required({
-  allowManualEdit: true,
   entityFieldConfigId: true,
 });
 

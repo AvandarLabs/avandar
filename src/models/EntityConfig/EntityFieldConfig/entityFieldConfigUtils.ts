@@ -25,7 +25,7 @@ export function makeEntityFieldConfig({
     entityConfigId,
     class: "dimension",
     baseDataType: "string",
-    extractorType: "manual_entry",
+    valueExtractorType: "manual_entry",
     createdAt: dateTimeNow,
     updatedAt: dateTimeNow,
     isArray: false,

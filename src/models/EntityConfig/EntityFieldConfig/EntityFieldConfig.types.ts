@@ -18,13 +18,13 @@ export type MetricExtractorType = "aggregation";
 export type EntityFieldClass = EntityFieldConfigRead["class"];
 export type EntityFieldBaseType = EntityFieldConfigRead["baseDataType"];
 export type EntityFieldExtractorType = Simplify<
-  EntityFieldConfigRead["extractorType"]
+  EntityFieldConfigRead["valueExtractorType"]
 >;
 
 type DimensionRead = {
   class: "dimension";
   baseDataType: DimensionFieldBaseDataType;
-  extractorType: DimensionExtractorType;
+  valueExtractorType: DimensionExtractorType;
   isTitleField: boolean;
   isIdField: boolean;
   isArray: boolean;
@@ -34,7 +34,7 @@ type DimensionRead = {
 type MetricRead = {
   class: "metric";
   baseDataType: MetricFieldBaseDataType;
-  extractorType: MetricExtractorType;
+  valueExtractorType: MetricExtractorType;
   isTitleField: false;
   isIdField: false;
   allowManualEdit: false; // metrics should never allow manual edits
@@ -62,11 +62,11 @@ export type EntityFieldConfigCRUDTypes = DefineModelCRUDTypes<
       (
         | SetRequired<
             Partial<DimensionRead>,
-            "baseDataType" | "class" | "extractorType"
+            "baseDataType" | "class" | "valueExtractorType"
           >
         | SetRequired<
             Partial<MetricRead>,
-            "baseDataType" | "class" | "extractorType"
+            "baseDataType" | "class" | "valueExtractorType"
           >
       );
     Update: Partial<CoreFieldRead> &
