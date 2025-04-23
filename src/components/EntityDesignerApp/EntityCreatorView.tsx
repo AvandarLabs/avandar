@@ -26,8 +26,9 @@ type EntityConfigForm = EntityConfig<"Insert"> & {
   fields: Array<EntityFieldConfig<"Insert">>;
 };
 
+const initialFields = [makeDefaultEntityFieldDraft()];
 const initialFieldOptions = makeSelectOptions({
-  inputList: [makeDefaultEntityFieldDraft()],
+  inputList: initialFields,
   valueFn: getProp("id"),
   labelFn: (field) => {
     return field.name || "[Unnamed field]";
