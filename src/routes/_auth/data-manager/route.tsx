@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DataManagerApp } from "@/components/DataManagerApp/DataManagerApp";
+import { DataManagerApp } from "@/components/DataManagerApp";
 
 export const Route = createFileRoute("/_auth/data-manager")({
   component: DataManagerApp,

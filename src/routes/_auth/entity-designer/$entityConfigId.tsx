@@ -5,7 +5,7 @@ import {
   notFound,
 } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { EntityConfigMetaView } from "@/components/EntityDesignerApp/EntityConfigMetaView/EntityConfigMetaView";
+import { EntityConfigMetaView } from "@/components/EntityDesignerApp/EntityConfigMetaView";
 import { Logger } from "@/lib/Logger";
 import { Callout } from "@/lib/ui/Callout";
 import { uuid } from "@/lib/utils/uuid";

@@ -1,5 +1,5 @@
 import { Text } from "@mantine/core";
-import { FieldValueArrayBlock } from "./FieldValueArrayBlock/FieldValueArrayBlock";
+import { FieldValueArrayBlock } from "./FieldValueArrayBlock";
 import { isFieldValueArray, isPrimitiveFieldValue } from "./guards";
 import { PrimitiveFieldValueItem } from "./PrimitiveFieldValueItem";
 import {

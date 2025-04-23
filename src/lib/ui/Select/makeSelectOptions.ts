@@ -1,5 +1,5 @@
 import type { UnknownObject } from "@/lib/types/common";
-import type { SelectOption } from "@/lib/ui/Select/Select";
+import type { SelectOption } from "@/lib/ui/Select";
 
 /**
  * Given a list of objects, conver this to a list of objects with

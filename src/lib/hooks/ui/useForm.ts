@@ -6,7 +6,7 @@ import {
 import { useCallback } from "react";
 import { Merge, Paths } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
-import { IdentityFunction } from "@/lib/types/utilityTypes";
+import { IdentityTypeFn } from "@/lib/types/utilityTypes";
 
 type InsertListItemFn<FormValues extends UnknownObject> = <
   P extends keyof FormValues,
@@ -24,7 +24,7 @@ export type FormType<
   FormValues extends UnknownObject,
   TransformValues extends (
     values: FormValues,
-  ) => unknown = IdentityFunction<FormValues>,
+  ) => unknown = IdentityTypeFn<FormValues>,
   FormPaths extends Paths<FormValues> = Paths<FormValues>,
 > = Merge<
   MantineUseFormReturnType<FormValues, TransformValues>,
@@ -53,7 +53,7 @@ export function useForm<
   FormValues extends UnknownObject,
   TransformValues extends (
     values: FormValues,
-  ) => unknown = IdentityFunction<FormValues>,
+  ) => unknown = IdentityTypeFn<FormValues>,
 >(
   formOptions: UseFormInput<FormValues, TransformValues>,
 ): [FormType<FormValues, TransformValues>, FormSetters<FormValues>] {

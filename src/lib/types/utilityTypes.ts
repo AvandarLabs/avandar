@@ -58,4 +58,10 @@ export type AnyFunctionWithSignature<Params extends unknown[], Return> = (
   ...args: Params
 ) => Return;
 
-export type IdentityFunction<T> = (value: T) => T;
+/**
+ * Represents a single-parameter function that returns the same type it was
+ * given.
+ * (Note: this is just at the type-level. It does not mean the function
+ * will return the same _value_. Just that it will return the same _type_.)
+ */
+export type IdentityTypeFn<T> = (value: T) => T;

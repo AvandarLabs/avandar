@@ -24,12 +24,7 @@ export const TODOS =
       {
         label: "Entity Designer",
         items: [
-          "Add the entity_field_dimension_configs and entity_field_metric_configs tables",
-          "Add the entity_field_value_extractor_configs table",
-          "Add function to deep convert nulls to undefined",
-          "Add type utility to deep convert nulls to undefined",
-          "Use these utilities in EntityFieldConfig and EntityConfig",
-          "Implement fields",
+          "Add the value extractor UIs in configuration",
           "Validate that there is a title field and an id field in the array",
         ],
       },

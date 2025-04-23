@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { LocalDatasetClient } from "@/clients/LocalDatasetClient";
-import { DatasetMetaView } from "@/components/DataManagerApp/DatasetMetaView/DatasetMetaView";
+import { DatasetMetaView } from "@/components/DataManagerApp/DatasetMetaView";
 import { Logger } from "@/lib/Logger";
 import { Callout } from "@/lib/ui/Callout";
 import { type LocalDataset } from "@/models/LocalDataset";

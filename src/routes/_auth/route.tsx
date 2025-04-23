@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { AuthClient } from "@/clients/AuthClient";
-import { AppScaffold } from "@/components/AppScaffold/AppScaffold";
+import { AppScaffold } from "@/components/AppScaffold";
 
 export const Route = createFileRoute("/_auth")({
   component: RouteComponent,

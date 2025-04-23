@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { ObjectStringKey } from "@/lib/types/utilityTypes";
 import { objectKeys } from "@/lib/utils/objects";
 import { camelToTitleCase } from "@/lib/utils/strings";
-import { DescriptionList } from "../DescriptionList/DescriptionList";
+import { DescriptionList } from "../DescriptionList";
 import { getEntityFieldRenderOptions } from "./helpers";
 import { EntityObject, EntityRenderOptions } from "./types";
 import { UnknownFieldValueItem } from "./UnknownFieldValueItem";

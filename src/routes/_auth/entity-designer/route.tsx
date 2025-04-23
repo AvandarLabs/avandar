@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { EntityDesignerApp } from "@/components/EntityDesignerApp/EntityDesignerApp";
+import { EntityDesignerApp } from "@/components/EntityDesignerApp";
 
 export const Route = createFileRoute("/_auth/entity-designer")({
   component: EntityDesignerApp,

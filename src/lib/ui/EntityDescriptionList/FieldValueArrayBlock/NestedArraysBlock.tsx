@@ -1,6 +1,6 @@
 import { Fieldset, Stack } from "@mantine/core";
+import { FieldValueArrayBlock } from ".";
 import { FieldValue, FieldValueArrayRenderOptions } from "../types";
-import { FieldValueArrayBlock } from "./FieldValueArrayBlock";
 
 type Props<T extends FieldValue> = {
   /** Array of arrays of field values */
