@@ -57,3 +57,5 @@ export type AnyFunctionWithArguments<Params extends unknown[]> = (
 export type AnyFunctionWithSignature<Params extends unknown[], Return> = (
   ...args: Params
 ) => Return;
+
+export type IdentityFunction<T> = (value: T) => T;

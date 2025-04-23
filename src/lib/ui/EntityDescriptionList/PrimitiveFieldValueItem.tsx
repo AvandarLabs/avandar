@@ -17,10 +17,15 @@ export function PrimitiveFieldValueItem<T extends PrimitiveFieldValue>({
   emptyString = "Empty text",
   booleanTrue = "Yes",
   booleanFalse = "No",
-  nullOrUndefined = "No value",
+  nullString = "No value",
+  undefinedString = "No value",
 }: Props<T>): JSX.Element {
-  if (value === null || value === undefined) {
-    return <Text fs="italic">{nullOrUndefined}</Text>;
+  if (value === null) {
+    return <Text fs="italic">{nullString}</Text>;
+  }
+
+  if (value === undefined) {
+    return <Text fs="italic">{undefinedString}</Text>;
   }
 
   if (value === "") {

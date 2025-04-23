@@ -1,8 +1,8 @@
 import { List, Table } from "@mantine/core";
 import { useMemo } from "react";
 import { ObjectStringKey } from "@/lib/types/utilityTypes";
+import { EntityDescriptionList } from "@/lib/ui/EntityDescriptionList";
 import { CollapsibleItem } from "@/lib/ui/EntityDescriptionList/CollapsibleItem";
-import { EntityDescriptionList } from "@/lib/ui/EntityDescriptionList/EntityDescriptionList";
 import { getEntityFieldRenderOptions } from "@/lib/ui/EntityDescriptionList/helpers";
 import {
   EntityArrayRenderOptions,

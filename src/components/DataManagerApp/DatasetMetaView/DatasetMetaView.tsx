@@ -5,7 +5,7 @@ import { useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { APP_CONFIG } from "@/config/AppConfig";
 import { DataGrid } from "@/lib/ui/DataGrid";
-import { EntityDescriptionList } from "@/lib/ui/EntityDescriptionList/EntityDescriptionList";
+import { EntityDescriptionList } from "@/lib/ui/EntityDescriptionList";
 import { FieldRenderOptionsMap } from "@/lib/ui/EntityDescriptionList/types";
 import { type LocalDataset } from "@/models/LocalDataset";
 import { useCSVParser } from "../hooks/useCSVParser";

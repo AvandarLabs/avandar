@@ -1,7 +1,7 @@
 import { Button, Container, Stack, Text, Title } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { Logger } from "@/lib/Logger";
-import { EntityDescriptionList } from "@/lib/ui/EntityDescriptionList/EntityDescriptionList";
+import { EntityDescriptionList } from "@/lib/ui/EntityDescriptionList";
 import { EntityConfig } from "@/models/EntityConfig/types";
 
 type Props = {

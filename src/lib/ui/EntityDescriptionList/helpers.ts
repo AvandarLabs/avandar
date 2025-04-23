@@ -11,7 +11,8 @@ export function getEntityFieldRenderOptions<T extends EntityObject>(
 ): PrimitiveFieldValueRenderOptions {
   const primitiveValueRenderOptions: PrimitiveFieldValueRenderOptions = {
     emptyString: renderOptions.emptyString,
-    nullOrUndefined: renderOptions.nullOrUndefined,
+    nullString: renderOptions.undefinedString,
+    undefinedString: renderOptions.undefinedString,
     booleanTrue: renderOptions.booleanTrue,
     booleanFalse: renderOptions.booleanFalse,
   };

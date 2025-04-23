@@ -32,7 +32,8 @@ export type EntityObject = {
  */
 export type PrimitiveFieldValueRenderOptions = {
   emptyString?: string;
-  nullOrUndefined?: string;
+  nullString?: string;
+  undefinedString?: string;
   booleanTrue?: string;
   booleanFalse?: string;
 };
