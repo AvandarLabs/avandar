@@ -16,7 +16,7 @@
     "db:gen-types": "supabase gen types typescript --local > src/types/database.types.ts",
     "db:new-migration": "supabase stop && supabase db diff -f",
     "db:reset": "supabase start && ./scripts/lib/resetDatabase.sh",
-    "new:main-component": "./scripts/lib/newMainComponent.sh",
+    "new:component": "./scripts/lib/newComponent.sh",
     "new:model": "./scripts/lib/newModel.sh",
     "new:route": "./scripts/lib/newRoute.sh",
     "new:script": "./scripts/lib/newScript.sh",

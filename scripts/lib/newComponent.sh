@@ -5,11 +5,11 @@ PROJECT_ROOT=$SCRIPT_DIR/../../
 
 usage() {
   echo "Usage:"
-  echo "       yarn new:main-component <ComponentName>"
+  echo "       yarn new:component <ComponentName>"
   echo "Creates a new React component in src/components/<ComponentName>/"
   echo "Example:"
-  echo "       yarn new:main-component MyNewComponent"
-  echo "       Creates src/components/MyNewComponent/MyNewComponent.tsx"
+  echo "       yarn new:component MyNewComponent"
+  echo "       Creates src/components/MyNewComponent/index.tsx"
   exit 1
 }
 
@@ -17,7 +17,8 @@ if [ $# -eq 0 ]; then
   usage
 fi
 
-COMPONENT_PATH="src/components/$1/$1.tsx"
+COMPONENT_DIR="src/components/$1"
+COMPONENT_PATH="$COMPONENT_DIR/index.tsx"
 FULL_PATH="$PROJECT_ROOT/$COMPONENT_PATH"
 
 if [ -f "$FULL_PATH" ]; then
@@ -25,7 +26,7 @@ if [ -f "$FULL_PATH" ]; then
   exit 1
 fi
 
-mkdir -p "$PROJECT_ROOT/src/components/$1"
+mkdir -p "$COMPONENT_DIR"
 
 cat > "$FULL_PATH" << EOL
 import { Text } from "@mantine/core";
