@@ -193,6 +193,6 @@ export function AppScaffold({
 
 const $navbarBorder = (theme: MantineTheme) => {
   return {
-    borderRight: `1px solid ${theme.colors.neutral[8]}`,
+    borderRight: `1px solid ${theme.colors.neutral[7]}`,
   };
 };

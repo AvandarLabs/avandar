@@ -5,6 +5,7 @@ import type { UUID } from "@/lib/types/common";
 import type { DefineModelCRUDTypes } from "@/lib/utils/models/ModelCRUDTypes";
 
 export type EntityFieldConfigId = UUID<"EntityFieldConfig">;
+export type DraftFieldId = UUID<"DraftField">;
 
 // Base data types for each field classe
 export type DimensionFieldBaseDataType = "string" | "number" | "date";
@@ -74,6 +75,18 @@ export type EntityFieldConfigCRUDTypes = DefineModelCRUDTypes<
       (DimensionRead | MetricRead);
     Update: Partial<CoreFieldRead> &
       (Partial<DimensionRead> | Partial<MetricRead>);
+
+    /**
+     * A draft version of the type, to use while the user is still creating
+     * a new EntityFieldConfig in a form.
+     *
+     * There is no `entityConfigId` because the user may not have created
+     * the EntityConfig yet. A `draftId` must be provided in the frontend
+     * so this can be used as a React key.
+     */
+    Draft: {
+      draftId: DraftFieldId;
+    } & Omit<EntityFieldConfigCRUDTypes["Insert"], "id" | "entityConfigId">;
   }
 >;
 

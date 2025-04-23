@@ -4,7 +4,7 @@ import { AggregationType, LocalQueryClient } from "@/clients/LocalQueryClient";
 import { useSet } from "@/lib/hooks/useSet";
 import { DataGrid } from "@/lib/ui/DataGrid";
 import { LoadingOverlay } from "@/lib/ui/LoadingOverlay";
-import { Select } from "@/lib/ui/Select";
+import { Select } from "@/lib/ui/Select/Select";
 import { difference } from "@/lib/utils/arrays";
 import {
   getProp,

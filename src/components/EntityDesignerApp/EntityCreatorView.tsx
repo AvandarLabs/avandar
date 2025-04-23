@@ -1,10 +1,8 @@
 import {
   ActionIcon,
   Button,
-  ComboboxItem,
   Container,
   Fieldset,
-  getWithProps,
   Group,
   Stack,
   Text,
@@ -14,26 +12,36 @@ import { formRootRule, isNotEmpty } from "@mantine/form";
 import { IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { useForm } from "@/lib/hooks/ui/useForm";
+import { makeSelectOptions } from "@/lib/ui/Select/makeSelectOptions";
+import { SelectOption } from "@/lib/ui/Select/Select";
 import { areArrayContentsEqual } from "@/lib/utils/arrays";
 import { getProp } from "@/lib/utils/objects";
-import { makeSelectOptions } from "@/lib/utils/ui/makeSelectOptions";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
-import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/types";
+import {
+  DraftFieldId,
+  EntityFieldConfig,
+} from "@/models/EntityConfig/EntityFieldConfig/types";
 import { makeDefaultEntityFieldDraft } from "@/models/EntityConfig/EntityFieldConfig/utils";
 import { EntityConfig } from "@/models/EntityConfig/types";
 
 type EntityConfigForm = EntityConfig<"Insert"> & {
-  fields: Array<EntityFieldConfig<"Insert">>;
+  fields: Array<EntityFieldConfig<"Draft">>;
 };
 
+function fieldsToSelectOptions(
+  fields: Array<EntityFieldConfig<"Draft">>,
+): Array<SelectOption<DraftFieldId>> {
+  return makeSelectOptions({
+    inputList: fields,
+    valueFn: getProp("draftId"),
+    labelFn: (field) => {
+      return field.name || "[Unnamed field]";
+    },
+  });
+}
+
 const initialFields = [makeDefaultEntityFieldDraft()];
-const initialFieldOptions = makeSelectOptions({
-  inputList: initialFields,
-  valueFn: getProp("id"),
-  labelFn: (field) => {
-    return field.name || "[Unnamed field]";
-  },
-});
+const initialFieldOptions = fieldsToSelectOptions(initialFields);
 
 export function EntityCreatorView(): JSX.Element {
   const [doCreateEntityConfig, pendingEntityConfigCreate] =
@@ -58,7 +66,7 @@ export function EntityCreatorView(): JSX.Element {
         newValues.fields,
         prevValues.fields,
         (field) => {
-          return `id=${field.id}&name=${field.name}`;
+          return `draftId=${field.draftId}&name=${field.name}`;
         },
       );
 
@@ -67,13 +75,13 @@ export function EntityCreatorView(): JSX.Element {
       }
     },
   });
-  const [fieldOptions, setFieldOptions] =
-    useState<ComboboxItem[]>(initialFieldOptions);
+  const [, setFieldOptions] =
+    useState<ReadonlyArray<SelectOption<DraftFieldId>>>(initialFieldOptions);
 
   const { fields } = configForm.getValues();
   const fieldRows = fields.map((field, idx) => {
     return (
-      <Group key={field.id}>
+      <Group key={field.draftId}>
         <TextInput
           key={configForm.key(`fields.${idx}.name`)}
           required

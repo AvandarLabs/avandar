@@ -1,5 +1,5 @@
-import { ComboboxItem } from "@mantine/core";
-import { UnknownObject } from "@/lib/types/common";
+import type { UnknownObject } from "@/lib/types/common";
+import type { SelectOption } from "@/lib/ui/Select/Select";
 
 /**
  * Given a list of objects, conver this to a list of objects with
@@ -21,7 +21,7 @@ export function makeSelectOptions<
   valueFn: (value: T) => Value;
   labelFn?: (value: T) => string;
   isDisabledFn?: (value: T) => boolean;
-}): ComboboxItem[] {
+}): Array<SelectOption<Value>> {
   const { inputList, valueFn, labelFn, isDisabledFn } = options;
 
   const selectOptions = inputList.map((item: T) => {

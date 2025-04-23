@@ -1,11 +1,8 @@
+import { uuid } from "@/lib/utils/uuid";
 import { EntityFieldConfig } from "./types";
 
 /**
- * Make a default EntityFieldConfig draft to use in a creation form.
- *
- * We exclude returning an `entityConfigId` because we probably don't have one
- * yet, if this is part of an EntityConfig form where the entity config id
- * hasn't been created yet.
+ * Make a default EntityFieldConfig Draft to use in a creation form.
  */
 export function makeDefaultEntityFieldDraft(
   options: {
@@ -13,19 +10,21 @@ export function makeDefaultEntityFieldDraft(
     isIdField?: boolean;
     isTitleField?: boolean;
     allowManualEdit?: boolean;
-  } = {
-    name: "",
-    isIdField: false,
-    isTitleField: false,
-    allowManualEdit: true,
-  },
-): Omit<EntityFieldConfig<"Insert">, "entityConfigId"> {
+  } = {},
+): EntityFieldConfig<"Draft"> {
+  const {
+    name = "",
+    isIdField = false,
+    isTitleField = false,
+    allowManualEdit = true,
+  } = options;
   const dateTimeNow = new Date().toISOString();
   return {
     name,
     allowManualEdit,
     isIdField,
     isTitleField,
+    draftId: uuid(),
     class: "dimension",
     baseDataType: "string",
     valueExtractorType: "manual_entry",

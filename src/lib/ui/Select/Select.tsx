@@ -1,19 +1,19 @@
 import { Select as MantineSelect, SelectProps } from "@mantine/core";
 import { Merge } from "type-fest";
 
-export type ComboboxItem<T extends NonNullable<string>> = {
+export type SelectOption<T extends NonNullable<string>> = {
   value: T;
   label: string;
   disabled?: boolean;
 };
 
-export type ComboboxItemGroup<T extends NonNullable<string>> = {
+export type SelectOptionGroup<T extends NonNullable<string>> = {
   group: string;
-  items: ReadonlyArray<T | ComboboxItem<T>>;
+  items: ReadonlyArray<T | SelectOption<T>>;
 };
 
-export type ComboboxData<T extends NonNullable<string>> = ReadonlyArray<
-  T | ComboboxItem<T> | ComboboxItemGroup<T>
+export type SelectData<T extends NonNullable<string>> = ReadonlyArray<
+  T | SelectOption<T> | SelectOptionGroup<T>
 >;
 
 type Props<T extends NonNullable<string>> = Merge<
@@ -35,7 +35,7 @@ type Props<T extends NonNullable<string>> = Merge<
     defaultValue?: T | null;
 
     /** Called when the value changes */
-    onChange?: (value: T | null, option: ComboboxItem<T>) => void;
+    onChange?: (value: T | null, option: SelectOption<T>) => void;
 
     /**
      * Called when option is submitted from dropdown with mouse click or
@@ -47,7 +47,7 @@ type Props<T extends NonNullable<string>> = Merge<
      * Data used to generate options. Values must be unique, otherwise an error
      * will be thrown and the component will not render.
      */
-    data?: ComboboxData<T>;
+    data?: SelectData<T>;
   }
 >;
 
