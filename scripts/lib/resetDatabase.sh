@@ -24,6 +24,10 @@ done
 # (we'll handle seeding ourselves)
 yarn supabase db reset --no-seed
 
+# Whenever we reset, let's regenerate the types in case there were
+# any new migrations that got applied
+yarn db:gen-types
+
 # Run our custom seed script unless --no-seed was specified
 if [ "$SKIP_SEED" = false ]; then
   echo "Seeding database with custom data..."

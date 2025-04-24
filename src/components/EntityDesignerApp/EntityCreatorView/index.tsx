@@ -1,9 +1,9 @@
 import {
   Button,
+  Checkbox,
   Container,
   Select,
   Stack,
-  Text,
   TextInput,
 } from "@mantine/core";
 import { formRootRule, isNotEmpty } from "@mantine/form";
@@ -93,6 +93,8 @@ export function EntityCreatorView(): JSX.Element {
           const entityConfig: EntityConfig<"Insert"> = {
             name: values.name,
             description: values.description,
+            datasetId: values.datasetId,
+            allowManualCreation: values.allowManualCreation,
           };
 
           doCreateEntityConfig({ data: entityConfig });
@@ -118,7 +120,12 @@ export function EntityCreatorView(): JSX.Element {
             label="Dataset"
             {...entityConfigForm.getInputProps("datasetId")}
           />
-          <Text c="danger">Checkbox: allow manual addition of entities</Text>
+
+          <Checkbox
+            key={entityConfigForm.key("allowManualCreation")}
+            label="Allow manual creation of new entities"
+            {...entityConfigForm.getInputProps("allowManualCreation")}
+          />
 
           <FieldCreatorBlock
             entityConfigForm={entityConfigForm}
