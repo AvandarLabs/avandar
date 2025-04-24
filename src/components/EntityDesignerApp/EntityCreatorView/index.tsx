@@ -44,7 +44,7 @@ export function EntityCreatorView(): JSX.Element {
   const [datasets] = useLocalDatasets();
   const datasetOptions = makeSelectOptions({
     list: datasets ?? [],
-    valueFn: pipe(getProp("id"), String),
+    valueFn: getProp("id"),
     labelFn: getProp("name"),
   });
 
