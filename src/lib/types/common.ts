@@ -8,10 +8,14 @@ export type CSVCellValue = string | undefined;
 export type CSVRow = Record<string, CSVCellValue>;
 export type CSVData = CSVRow[];
 export type JSONLiteral = string | number | boolean | null;
-export type JSONType =
+
+/**
+ * Matches any valid JSON value
+ */
+export type JSONValue =
   | JSONLiteral
-  | { [key: string]: JSONType | undefined }
-  | JSONType[];
+  | { [key: string]: JSONValue | undefined }
+  | JSONValue[];
 
 export type MIMEType =
   // Text

@@ -5,7 +5,7 @@
  * @returns A negative number if `a` is less than `b`, 0 if they are equal, or
  * a positive number if `a` is greater than `b`.
  */
-export function stringComparator(a: string, b: string): number {
+export function stringComparator<T extends string>(a: T, b: T): number {
   return a.localeCompare(b);
 }
 
@@ -15,10 +15,10 @@ export function stringComparator(a: string, b: string): number {
  * @param comparator The comparator function to use for sorting.
  * @returns The sorted array of strings.
  */
-export function sortStrings(
-  strings: readonly string[],
-  comparator: (a: string, b: string) => number = stringComparator,
-): string[] {
+export function sortStrings<T extends string>(
+  strings: readonly T[],
+  comparator: (a: T, b: T) => number = stringComparator,
+): T[] {
   return [...strings].sort(comparator);
 }
 

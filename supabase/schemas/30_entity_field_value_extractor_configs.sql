@@ -2,8 +2,8 @@
 create type public.value_extractor_config__value_picker_rule_type as enum ('most_frequent', 'first');
 create type public.value_extractor_config__aggregation_type as enum ('sum', 'max', 'count');
 
--- Create the value_extractor_config__adjacent_field table
-create table public.value_extractor_config__adjacent_field (
+-- Create the value_extractor_config__dataset_column_value table
+create table public.value_extractor_config__dataset_column_value (
     id uuid primary key default gen_random_uuid(),
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now(),
@@ -40,15 +40,15 @@ create table public.value_extractor_config__aggregation (
 );
 
 -- Enable row level security
-alter table public.value_extractor_config__adjacent_field enable row level security;
+alter table public.value_extractor_config__dataset_column_value enable row level security;
 alter table public.value_extractor_config__manual_entry enable row level security;
 alter table public.value_extractor_config__aggregation enable row level security;
 
 -- Create policies
 
 -- `select` policies
-create policy "User can SELECT value_extractor_config__adjacent_field"
-    on public.value_extractor_config__adjacent_field for select
+create policy "User can SELECT value_extractor_config__dataset_column_value"
+    on public.value_extractor_config__dataset_column_value for select
     to authenticated -- postgres role
     -- actual policy
     using (true);
@@ -66,8 +66,8 @@ create policy "User can SELECT value_extractor_config__aggregation"
     using (true);
 
 -- `insert` policies
-create policy "User can INSERT value_extractor_config__adjacent_field"
-    on public.value_extractor_config__adjacent_field for insert
+create policy "User can INSERT value_extractor_config__dataset_column_value"
+    on public.value_extractor_config__dataset_column_value for insert
     to authenticated -- postgres role
     -- actual policy
     with check (true);
@@ -85,8 +85,8 @@ create policy "User can INSERT value_extractor_config__aggregation"
     with check (true);
 
 -- `update` policies
-create policy "User can UPDATE value_extractor_config__adjacent_field"
-    on public.value_extractor_config__adjacent_field for update
+create policy "User can UPDATE value_extractor_config__dataset_column_value"
+    on public.value_extractor_config__dataset_column_value for update
     to authenticated -- postgres role
     -- actual policy
     with check (true);
@@ -104,8 +104,8 @@ create policy "User can UPDATE value_extractor_config__aggregation"
     with check (true);
 
 -- `delete` policies
-create policy "User can DELETE value_extractor_config__adjacent_field"
-    on public.value_extractor_config__adjacent_field for delete
+create policy "User can DELETE value_extractor_config__dataset_column_value"
+    on public.value_extractor_config__dataset_column_value for delete
     to authenticated -- postgres role
     -- actual policy
     using (true);
@@ -123,8 +123,8 @@ create policy "User can DELETE value_extractor_config__aggregation"
     using(true);
 
 -- Create updated_at triggers
-create trigger tr_value_extractor_config__adjacent_field_set_updated_at
-    before update on public.value_extractor_config__adjacent_field
+create trigger tr_value_extractor_config__dataset_column_value_set_updated_at
+    before update on public.value_extractor_config__dataset_column_value
     for each row
     execute function public.util__set_updated_at();
 

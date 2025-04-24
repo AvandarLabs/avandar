@@ -1,4 +1,4 @@
-import { Button, Container, Stack, TextInput } from "@mantine/core";
+import { Button, Container, Stack, Text, TextInput } from "@mantine/core";
 import { formRootRule, isNotEmpty } from "@mantine/form";
 import { useState } from "react";
 import { useForm } from "@/lib/hooks/ui/useForm";
@@ -84,7 +84,7 @@ export function EntityCreatorView(): JSX.Element {
           <TextInput
             key={entityConfigForm.key("name")}
             required
-            label="Entity Name (should be a combo box)"
+            label="Entity Name"
             placeholder="Enter a name for the entity"
             {...entityConfigForm.getInputProps("name")}
           />
@@ -94,6 +94,9 @@ export function EntityCreatorView(): JSX.Element {
             placeholder="Enter a description for the entity"
             {...entityConfigForm.getInputProps("description")}
           />
+
+          <Text c="danger">What dataset does this entity come from?</Text>
+          <Text c="danger">Checkbox: allow manual addition of entities</Text>
 
           <FieldCreatorBlock
             entityConfigForm={entityConfigForm}

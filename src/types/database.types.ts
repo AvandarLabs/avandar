@@ -117,44 +117,6 @@ export type Database = {
           },
         ]
       }
-      value_extractor_config__adjacent_field: {
-        Row: {
-          created_at: string
-          dataset_field_id: string
-          dataset_id: string
-          entity_field_config_id: string
-          id: string
-          updated_at: string
-          value_picker_rule_type: Database["public"]["Enums"]["value_extractor_config__value_picker_rule_type"]
-        }
-        Insert: {
-          created_at?: string
-          dataset_field_id: string
-          dataset_id: string
-          entity_field_config_id: string
-          id?: string
-          updated_at?: string
-          value_picker_rule_type: Database["public"]["Enums"]["value_extractor_config__value_picker_rule_type"]
-        }
-        Update: {
-          created_at?: string
-          dataset_field_id?: string
-          dataset_id?: string
-          entity_field_config_id?: string
-          id?: string
-          updated_at?: string
-          value_picker_rule_type?: Database["public"]["Enums"]["value_extractor_config__value_picker_rule_type"]
-        }
-        Relationships: [
-          {
-            foreignKeyName: "value_extractor_config__adjacent_fi_entity_field_config_id_fkey"
-            columns: ["entity_field_config_id"]
-            isOneToOne: false
-            referencedRelation: "entity_field_configs"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       value_extractor_config__aggregation: {
         Row: {
           aggregation_type: Database["public"]["Enums"]["value_extractor_config__aggregation_type"]
@@ -189,6 +151,44 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "value_extractor_config__aggregation_entity_field_config_id_fkey"
+            columns: ["entity_field_config_id"]
+            isOneToOne: false
+            referencedRelation: "entity_field_configs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      value_extractor_config__dataset_column_value: {
+        Row: {
+          created_at: string
+          dataset_field_id: string
+          dataset_id: string
+          entity_field_config_id: string
+          id: string
+          updated_at: string
+          value_picker_rule_type: Database["public"]["Enums"]["value_extractor_config__value_picker_rule_type"]
+        }
+        Insert: {
+          created_at?: string
+          dataset_field_id: string
+          dataset_id: string
+          entity_field_config_id: string
+          id?: string
+          updated_at?: string
+          value_picker_rule_type: Database["public"]["Enums"]["value_extractor_config__value_picker_rule_type"]
+        }
+        Update: {
+          created_at?: string
+          dataset_field_id?: string
+          dataset_id?: string
+          entity_field_config_id?: string
+          id?: string
+          updated_at?: string
+          value_picker_rule_type?: Database["public"]["Enums"]["value_extractor_config__value_picker_rule_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "value_extractor_config__dataset_col_entity_field_config_id_fkey"
             columns: ["entity_field_config_id"]
             isOneToOne: false
             referencedRelation: "entity_field_configs"
@@ -236,7 +236,7 @@ export type Database = {
       entity_field_config__base_data_type: "string" | "number" | "date"
       entity_field_config__class: "dimension" | "metric"
       entity_field_config__value_extractor_type:
-        | "adjacent_field"
+        | "dataset_column_value"
         | "manual_entry"
         | "aggregation"
       value_extractor_config__aggregation_type: "sum" | "max" | "count"
@@ -362,7 +362,7 @@ export const Constants = {
       entity_field_config__base_data_type: ["string", "number", "date"],
       entity_field_config__class: ["dimension", "metric"],
       entity_field_config__value_extractor_type: [
-        "adjacent_field",
+        "dataset_column_value",
         "manual_entry",
         "aggregation",
       ],

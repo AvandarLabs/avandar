@@ -3,7 +3,14 @@ import snakecaseKeys, { SnakeCaseKeys } from "snakecase-keys";
 import { UnknownObject } from "@/lib/types/common";
 import { ExcludeDeep, ObjectStringKey } from "@/lib/types/utilityTypes";
 import { identity } from "@/lib/utils/functions";
-import { isPlainObject, isUndefined } from "./guards";
+import {
+  isNullOrUndefined,
+  isNumber,
+  isPlainObject,
+  isString,
+  isUndefined,
+} from "./guards";
+import { stringComparator } from "./strings";
 
 /**
  * Returns an array of entries from an object.
@@ -30,11 +37,20 @@ export function objectKeys<T extends UnknownObject>(
 }
 
 /**
+ * Returns an array of values from an object.
+ * @param obj The object to get values from.
+ * @returns An array of values from the object
+ */
+export function objectValues<V>(obj: Record<PropertyKey, V>): V[] {
+  return Object.values(obj);
+}
+
+/**
  * Creates an object from a list of items, given a function to extract the key
  * and a function to extract the value.
  *
  * @param options The options for creating the object.
- * @param options.inputList The list of items to convert.
+ * @param options.list The list of items to convert.
  * @param options.keyFn A function that returns the key for each item.
  * @param options.valueFn A function that returns the value for each
  * item. Defaults to the identity function.
@@ -46,16 +62,16 @@ export function makeObjectFromList<
   K extends string | number = string,
   V = T,
 >({
-  inputList,
+  list,
   keyFn,
   valueFn = identity as (item: T) => V,
 }: {
-  inputList: readonly T[];
+  list: readonly T[];
   keyFn: (item: T) => K;
   valueFn?: (item: T) => V;
 }): Record<K, V> {
   const obj = {} as Record<K, V>;
-  inputList.forEach((item) => {
+  list.forEach((item) => {
     obj[keyFn(item)] = valueFn(item);
   });
   return obj;
@@ -139,20 +155,42 @@ export function propEquals<T extends object, K extends keyof T>(
  * Returns a new object with the specified keys removed.
  *
  * @param options The options for omitting keys.
- * @param options.inputObj The object to remove keys from.
+ * @param options.from The object to remove keys from.
  * @param options.keysToDelete The keys to remove from the object.
  * @returns A new object with the specified keys removed.
  */
 export function omit<T extends UnknownObject, K extends keyof T>({
-  inputObj,
+  from,
   keysToDelete,
 }: {
-  inputObj: T;
+  from: T;
   keysToDelete: readonly K[];
 }): Omit<T, K> {
-  const newObj = { ...inputObj };
+  const newObj = { ...from };
   keysToDelete.forEach((key) => {
     delete newObj[key];
+  });
+  return newObj;
+}
+
+/**
+ * Returns a new object with the specified keys.
+ *
+ * @param options The options for picking keys.
+ * @param options.from The object to pick keys from.
+ * @param options.keysToPick The keys to pick from the object.
+ * @returns A new object with the specified keys.
+ */
+export function pick<T extends UnknownObject, K extends keyof T>({
+  from,
+  keysToPick,
+}: {
+  from: T;
+  keysToPick: readonly K[];
+}): Pick<T, K> {
+  const newObj = {} as Pick<T, K>;
+  keysToPick.forEach((key) => {
+    newObj[key] = from[key];
   });
   return newObj;
 }
@@ -271,4 +309,82 @@ export function dropUndefinedDeep<T extends Exclude<unknown, undefined>>(
   obj: T,
 ): ExcludeDeep<T, undefined> {
   return deepExclude(obj, isUndefined);
+}
+
+function mixedComparator(
+  a: string | number | null | undefined,
+  b: string | number | null | undefined,
+  options?: {
+    nullOrUndefinedSortOrder?: "last" | "first";
+  },
+): number {
+  const { nullOrUndefinedSortOrder = "last" } = options || {};
+
+  // handle nullish values
+  if (isNullOrUndefined(a) && isNullOrUndefined(b)) {
+    return 0;
+  }
+  if (isNullOrUndefined(a)) {
+    return nullOrUndefinedSortOrder === "last" ? 1 : -1;
+  }
+  if (isNullOrUndefined(b)) {
+    return nullOrUndefinedSortOrder === "last" ? -1 : 1;
+  }
+
+  // handle values are strings
+  if (isString(a) && isString(b)) {
+    return stringComparator(a, b);
+  }
+
+  // handle values are numbers
+  if (isNumber(a) && isNumber(b)) {
+    return a - b;
+  }
+
+  // handle values are a mix of strings and numbers
+  if (isString(a) && isNumber(b)) {
+    return stringComparator(a, String(b));
+  }
+  if (isString(b) && isNumber(a)) {
+    return stringComparator(b, String(a));
+  }
+
+  return 0;
+}
+
+/**
+ * Sorts a list of objects using an extractor function to pull a sortable
+ * value from each object.
+ * @param options The options for sorting.
+ * @param options.list The list of objects to sort.
+ * @param options.valueFn A function that returns the value to sort by.
+ * @param options.comparator A comparator function to use for sorting. If no
+ * function is passed, the default `mixedComparator` will be used.
+ * @param options.nullOrUndefinedSortOrder The order to sort null or undefined
+ * values. Defaults to "last". If a `comparator` function is passed, this option
+ * will be ignored.
+ * @returns The sorted list of objects.
+ */
+export function sortBy<
+  T extends object,
+  SortValue extends string | number,
+>(options: {
+  list: readonly T[];
+  valueFn: (obj: T) => SortValue;
+  comparator?: (a: SortValue, b: SortValue) => number;
+  nullOrUndefinedSortOrder?: "last" | "first";
+}): T[] {
+  const {
+    list,
+    valueFn,
+    comparator = (a, b) => {
+      return mixedComparator(a, b, {
+        nullOrUndefinedSortOrder: options.nullOrUndefinedSortOrder,
+      });
+    },
+  } = options;
+
+  return [...list].sort((a, b) => {
+    return comparator(valueFn(a) as SortValue, valueFn(b) as SortValue);
+  });
 }

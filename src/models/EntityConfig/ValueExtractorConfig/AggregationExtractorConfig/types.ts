@@ -1,6 +1,6 @@
 import { SetOptional, Simplify } from "type-fest";
 import type { EntityFieldConfigId } from "../../EntityFieldConfig/types";
-import type { JSONType, UUID } from "@/lib/types/common";
+import type { JSONValue, UUID } from "@/lib/types/common";
 import type { DefineModelCRUDTypes } from "@/lib/utils/models/ModelCRUDTypes";
 import type { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
 import type { DatasetFieldId } from "@/models/DatasetField";
@@ -28,7 +28,7 @@ type AggregationExtractorConfigRead = {
   datasetFieldId: DatasetFieldId;
 
   /** Filter to apply before aggregation */
-  filter: JSONType | null;
+  filter: JSONValue | null;
 
   /** Creation timestamp */
   createdAt: string;

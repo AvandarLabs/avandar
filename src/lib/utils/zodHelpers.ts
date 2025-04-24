@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { JSONType, UUID } from "../types/common";
+import { JSONValue, UUID } from "../types/common";
 
 /**
  * Returns a Zod type that represents a branded UUID. This expects
@@ -107,8 +107,8 @@ const jsonLiteralSchema = z.union([
  *
  * @returns A Zod type that represents a JSON value.
  */
-export function jsonType(): z.ZodType<JSONType> {
-  const jsonSchema: z.ZodType<JSONType> = z.lazy(() => {
+export function jsonType(): z.ZodType<JSONValue> {
+  const jsonSchema: z.ZodType<JSONValue> = z.lazy(() => {
     return z.union([
       jsonLiteralSchema,
       z.array(jsonSchema),

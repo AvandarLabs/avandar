@@ -1,7 +1,7 @@
 -- Create enums
 create type public.entity_field_config__class as enum ('dimension', 'metric');
 create type public.entity_field_config__base_data_type as enum ('string', 'number', 'date');
-create type public.entity_field_config__value_extractor_type as enum ('adjacent_field', 'manual_entry', 'aggregation');
+create type public.entity_field_config__value_extractor_type as enum ('dataset_column_value', 'manual_entry', 'aggregation');
 
 -- Create the entity_field_configs table
 create table public.entity_field_configs (

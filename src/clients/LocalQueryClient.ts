@@ -140,7 +140,7 @@ class LocalQueryClientImpl {
         header: true,
         delimiter: ",",
         columns: makeObjectFromList({
-          inputList: arrowColumns,
+          list: arrowColumns,
           keyFn: getProp("name"),
           valueFn: getProp("dataType"),
         }),

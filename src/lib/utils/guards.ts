@@ -81,10 +81,26 @@ export function isNotUndefined<T>(value: T): value is Exclude<T, undefined> {
   return value !== undefined;
 }
 
+export function isNullOrUndefined(value: unknown): value is null | undefined {
+  return value === undefined || value === null;
+}
+
 export function isUndefined(value: unknown): value is undefined {
   return value === undefined;
 }
 
 export function isFunction(value: unknown): value is AnyFunction {
   return typeof value === "function";
+}
+
+export function isNumber(value: unknown): value is number {
+  return typeof value === "number";
+}
+
+export function isString(value: unknown): value is string {
+  return typeof value === "string";
+}
+
+export function isBoolean(value: unknown): value is boolean {
+  return typeof value === "boolean";
 }

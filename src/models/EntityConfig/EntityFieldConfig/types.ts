@@ -1,5 +1,6 @@
 import { SetOptional, Simplify } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
+import { Enums } from "@/types/database.types";
 import type { EntityConfigId } from "../types";
 import type { UUID } from "@/lib/types/common";
 import type { DefineModelCRUDTypes } from "@/lib/utils/models/ModelCRUDTypes";
@@ -7,20 +8,22 @@ import type { DefineModelCRUDTypes } from "@/lib/utils/models/ModelCRUDTypes";
 export type EntityFieldConfigId = UUID<"EntityFieldConfig">;
 export type DraftFieldId = UUID<"DraftField">;
 
+// Enum types to match database enums
+export type EntityFieldClass = Enums<"entity_field_config__class">;
+export type EntityFieldBaseType = Enums<"entity_field_config__base_data_type">;
+export type EntityFieldValueExtractorType =
+  Enums<"entity_field_config__value_extractor_type">;
+
 // Base data types for each field classe
-export type DimensionFieldBaseDataType = "string" | "number" | "date";
-export type MetricFieldBaseDataType = "number";
+export type DimensionFieldBaseDataType = Extract<
+  EntityFieldBaseType,
+  "string" | "number" | "date"
+>;
+export type MetricFieldBaseDataType = Extract<EntityFieldBaseType, "number">;
 
 // Value extractor types for each field class
-export type DimensionExtractorType = "adjacent_field" | "manual_entry";
+export type DimensionExtractorType = "dataset_column_value" | "manual_entry";
 export type MetricExtractorType = "aggregation";
-
-// Enum types to match database enums
-export type EntityFieldClass = EntityFieldConfigRead["class"];
-export type EntityFieldBaseType = EntityFieldConfigRead["baseDataType"];
-export type EntityFieldExtractorType = Simplify<
-  EntityFieldConfigRead["valueExtractorType"]
->;
 
 type DimensionRead = {
   class: "dimension";

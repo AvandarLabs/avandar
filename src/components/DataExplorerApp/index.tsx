@@ -80,7 +80,7 @@ export function DataExplorerApp(): JSX.Element {
             });
 
             return omit({
-              inputObj: { ...newDefaultAggregations, ...prevAggregations },
+              from: { ...newDefaultAggregations, ...prevAggregations },
               keysToDelete: droppedFieldNames,
             });
           });

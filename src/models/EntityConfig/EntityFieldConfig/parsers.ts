@@ -13,7 +13,7 @@ const DBReadSchema = z.object({
   description: z.string().nullable(),
   entity_config_id: z.string(),
   value_extractor_type: z.enum([
-    "adjacent_field",
+    "dataset_column_value",
     "manual_entry",
     "aggregation",
   ]),
@@ -39,13 +39,13 @@ const DBInsertSchema = DBReadSchema.required().partial({
 const DBUpdateSchema = DBReadSchema.partial();
 
 const DimensionReadSchema = z.object({
-  allowManualEdit: z.boolean(),
+  allowManualEdit: DBReadSchema.shape.allow_manual_edit,
   class: z.literal("dimension"),
-  baseDataType: z.enum(["string", "number", "date"]),
-  valueExtractorType: z.enum(["adjacent_field", "manual_entry"]),
-  isTitleField: z.boolean(),
-  isIdField: z.boolean(),
-  isArray: z.boolean(),
+  baseDataType: DBReadSchema.shape.base_data_type,
+  valueExtractorType: z.enum(["dataset_column_value", "manual_entry"]),
+  isTitleField: DBReadSchema.shape.is_title_field,
+  isIdField: DBReadSchema.shape.is_id_field,
+  isArray: DBReadSchema.shape.is_array.unwrap(),
 });
 
 const MetricReadSchema = z.object({

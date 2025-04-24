@@ -4,13 +4,16 @@ import {
   Checkbox,
   Fieldset,
   Group,
+  Select,
   Stack,
   Text,
   TextInput,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import { FormSetters, FormType } from "@/lib/hooks/ui/useForm";
-import { CollapsibleItem } from "@/lib/ui/EntityDescriptionList/CollapsibleItem";
+import { makeSelectOptions } from "@/lib/ui/Select/makeSelectOptions";
+import { getProp, objectValues, sortBy } from "@/lib/utils/objects";
+import { EntityFieldValueExtractorTypes } from "@/models/EntityConfig/EntityFieldConfig/constants";
 import { makeDefaultEntityFieldDraft } from "@/models/EntityConfig/EntityFieldConfig/utils";
 import { EntityConfigForm } from "./types";
 
@@ -18,6 +21,15 @@ type Props = {
   entityConfigForm: FormType<EntityConfigForm>;
   formSetters: FormSetters<EntityConfigForm>;
 };
+
+const valueExtractorOptions = makeSelectOptions({
+  inputList: sortBy({
+    list: objectValues(EntityFieldValueExtractorTypes),
+    valueFn: getProp("displayName"),
+  }),
+  valueFn: getProp("type"),
+  labelFn: getProp("displayName"),
+});
 
 export function FieldCreatorBlock({
   entityConfigForm,
@@ -65,9 +77,13 @@ export function FieldCreatorBlock({
         >
           <IconTrash size={16} />
         </ActionIcon>
-        <CollapsibleItem label="Value extractor block">
-          woah more items
-        </CollapsibleItem>
+        <Select
+          data={valueExtractorOptions}
+          label="Where should the data for this field come from?"
+          {...entityConfigForm.getInputProps(
+            `fields.${idx}.valueExtractorType`,
+          )}
+        />
       </Group>
     );
   });

@@ -29,7 +29,6 @@ export type ManualEntryExtractorConfigCRUDTypes = DefineModelCRUDTypes<
     modelName: "ManualEntryExtractorConfig";
     modelPrimaryKey: "id";
     dbTablePrimaryKey: "id";
-
     Read: ManualEntryExtractorConfigRead;
     Insert: SetOptional<
       Required<ManualEntryExtractorConfigRead>,
