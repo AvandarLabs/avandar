@@ -8,12 +8,15 @@ import {
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
+import { match } from "ts-pattern";
 import { FormType } from "@/lib/hooks/ui/useForm";
 import { ElementOf } from "@/lib/types/utilityTypes";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
+import { DangerText } from "@/lib/ui/Text/DangerText";
 import { getProp, objectValues, sortBy } from "@/lib/utils/objects";
 import { EntityFieldValueExtractorTypes } from "@/models/EntityConfig/EntityFieldConfig/constants";
 import { EntityConfigForm } from "../types";
+import { DatasetColumnValueExtractorEditor } from "./DatasetColumnValueExtractorEditor";
 
 type Props = {
   entityConfigForm: FormType<EntityConfigForm>;
@@ -95,15 +98,25 @@ export function EntityFieldCreator({
           })}
         />
       </Group>
-
       <Select
         key={entityConfigForm.key(`fields.${idx}.valueExtractorType`)}
         data={valueExtractorOptions}
         label="Where should the data for this field come from?"
         {...entityConfigForm.getInputProps(`fields.${idx}.valueExtractorType`)}
       />
-
-      {valueExtractorType}
+      {match(valueExtractorType)
+        .with("manual_entry", () => {
+          return <div>Manual entry</div>;
+        })
+        .with("dataset_column_value", () => {
+          return <DatasetColumnValueExtractorEditor />;
+        })
+        .with("aggregation", () => {
+          return <div>Aggregation</div>;
+        })
+        .exhaustive(() => {
+          return <DangerText>Unsupported value extractor type</DangerText>;
+        })}
     </Stack>
   );
 }

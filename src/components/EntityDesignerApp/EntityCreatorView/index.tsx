@@ -1,16 +1,7 @@
-import {
-  Button,
-  Checkbox,
-  Container,
-  Select,
-  Stack,
-  TextInput,
-} from "@mantine/core";
+import { Button, Checkbox, Container, Stack, TextInput } from "@mantine/core";
 import { formRootRule, isNotEmpty } from "@mantine/form";
-import { useLocalDatasets } from "@/components/DataManagerApp/queries";
+import { LocalDatasetSelect } from "@/components/common/LocalDatasetSelect";
 import { useForm } from "@/lib/hooks/ui/useForm";
-import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { getProp } from "@/lib/utils/objects";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { makeDefaultEntityFieldDraft } from "@/models/EntityConfig/EntityFieldConfig/utils";
 import { EntityConfig } from "@/models/EntityConfig/types";
@@ -26,13 +17,6 @@ const initialFields = [
 ];
 
 export function EntityCreatorView(): JSX.Element {
-  const [datasets] = useLocalDatasets();
-  const datasetOptions = makeSelectOptions({
-    list: datasets ?? [],
-    valueFn: getProp("id"),
-    labelFn: getProp("name"),
-  });
-
   const [doCreateEntityConfig, pendingEntityConfigCreate] =
     EntityConfigClient.withLogger().useInsert();
 
@@ -83,10 +67,8 @@ export function EntityCreatorView(): JSX.Element {
             {...entityConfigForm.getInputProps("description")}
           />
 
-          <Select
+          <LocalDatasetSelect
             key={entityConfigForm.key("datasetId")}
-            data={datasetOptions}
-            label="Dataset"
             {...entityConfigForm.getInputProps("datasetId")}
           />
 

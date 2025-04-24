@@ -1,4 +1,7 @@
-import { Select as MantineSelect, SelectProps } from "@mantine/core";
+import {
+  Select as MantineSelect,
+  SelectProps as MantineSelectProps,
+} from "@mantine/core";
 import { Merge } from "type-fest";
 
 export type SelectOption<T extends NonNullable<string>> = {
@@ -17,7 +20,7 @@ export type SelectData<T extends NonNullable<string>> = ReadonlyArray<
 >;
 
 type Props<T extends NonNullable<string>> = Merge<
-  SelectProps,
+  MantineSelectProps,
   {
     /**
      * Value of the select. Use this to make the component controlled.
@@ -54,5 +57,7 @@ type Props<T extends NonNullable<string>> = Merge<
 export function Select<T extends NonNullable<string>>(
   props: Props<T>,
 ): JSX.Element {
-  return <MantineSelect {...(props as SelectProps)} />;
+  return <MantineSelect {...(props as MantineSelectProps)} />;
 }
+
+export type { Props as SelectProps };
