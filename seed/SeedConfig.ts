@@ -19,6 +19,8 @@ export const SEED_DATA = {
       owner: TEST_USER_EMAIL,
       name: "State",
       description: "This entity represents a US State",
+      datasetId: null,
+      allowManualCreation: false,
       fields: [
         {
           name: "Name",

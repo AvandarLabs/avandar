@@ -36,7 +36,9 @@ export type Database = {
     Tables: {
       entity_configs: {
         Row: {
+          allow_manual_creation: boolean
           created_at: string
+          dataset_id: string | null
           description: string | null
           id: string
           name: string
@@ -44,7 +46,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          allow_manual_creation: boolean
           created_at?: string
+          dataset_id?: string | null
           description?: string | null
           id?: string
           name: string
@@ -52,7 +56,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          allow_manual_creation?: boolean
           created_at?: string
+          dataset_id?: string | null
           description?: string | null
           id?: string
           name?: string

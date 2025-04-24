@@ -13,7 +13,7 @@ import {
   omit,
 } from "@/lib/utils/objects";
 import { DatasetField } from "@/models/DatasetField";
-import { DatasetId, LocalDataset } from "@/models/LocalDataset";
+import { LocalDataset, LocalDatasetId } from "@/models/LocalDataset";
 import { useLocalDatasets } from "../DataManagerApp/queries";
 import { FieldSelect } from "./FieldSelect";
 import { useDataQuery } from "./useDataQuery";
@@ -24,9 +24,9 @@ const HIDE_LIMIT = true;
 
 export function DataExplorerApp(): JSX.Element {
   const [allDatasets, isLoadingDatasets] = useLocalDatasets();
-  const [loadedDatasets, setLoadedDatasets] = useSet<DatasetId>();
+  const [loadedDatasets, setLoadedDatasets] = useSet<LocalDatasetId>();
   const [selectedDatasetId, setSelectedDatasetId] = useState<
-    number | undefined
+    LocalDatasetId | undefined
   >(undefined);
   const [selectedFields, setSelectedFields] = useState<readonly DatasetField[]>(
     [],
@@ -40,7 +40,7 @@ export function DataExplorerApp(): JSX.Element {
 
   const datasetOptions = useMemo(() => {
     return (allDatasets ?? []).map((dataset: LocalDataset) => {
-      return { value: String(dataset.id), label: dataset.name };
+      return { value: dataset.id, label: dataset.name };
     });
   }, [allDatasets]);
 
@@ -128,10 +128,9 @@ export function DataExplorerApp(): JSX.Element {
           isLoadingDatasets ? "Loading datasets..." : "Select a dataset"
         }
         data={datasetOptions ?? []}
-        value={String(selectedDatasetId)}
-        onChange={async (datasetIdStr: string | null) => {
-          if (datasetIdStr) {
-            const datasetId = Number(datasetIdStr);
+        value={selectedDatasetId}
+        onChange={async (datasetId) => {
+          if (datasetId) {
             setSelectedDatasetId(datasetId);
             if (!loadedDatasets.has(datasetId)) {
               // if we haven't loaded the dataset yet into memory, load it

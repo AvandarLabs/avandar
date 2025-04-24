@@ -4,10 +4,12 @@ import { Merge } from "type-fest";
 import { z } from "zod";
 import { CSVData, MIMEType } from "@/lib/types/common";
 import { LinkProps } from "@/lib/ui/links/Link";
+import { stringToBrandedUUID } from "@/lib/utils/zodHelpers";
 import { DatasetFieldSchema } from "@/models/DatasetField";
+import type { UUID } from "@/lib/types/common";
 import type { DatasetField } from "@/models/DatasetField";
 
-export type DatasetId = number;
+export type LocalDatasetId = UUID<"LocalDataset">;
 
 /**
  * Local dataset type.
@@ -15,7 +17,7 @@ export type DatasetId = number;
  * For now, we only support CSVs.
  */
 export type LocalDataset = {
-  id: DatasetId;
+  id: LocalDatasetId;
   name: string;
   description: string;
   createdAt: Date;
@@ -53,7 +55,7 @@ export type LocalDatasetCreate = Merge<LocalDataset, { id: undefined }>;
  * Zod schema for the local dataset type.
  */
 export const LocalDatasetSchema = z.object({
-  id: z.number(),
+  id: stringToBrandedUUID<LocalDatasetId>(),
   name: z.string().min(1),
   description: z.string(),
   createdAt: z.date(),
@@ -110,7 +112,7 @@ export function makeLocalDataset({
  * Returns the link props for a dataset to use in a `<Link>` component.
  */
 export function getDatasetLinkProps(
-  id: number,
+  id: LocalDatasetId,
 ): Pick<LinkProps, "to" | "params"> {
   return {
     to: `/data-manager/$datasetId`,

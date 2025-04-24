@@ -57,6 +57,8 @@ export function EntityCreatorView(): JSX.Element {
       initialValues: {
         name: "",
         description: "",
+        datasetId: null,
+        allowManualCreation: false,
         fields: initialFields,
       },
       validate: {

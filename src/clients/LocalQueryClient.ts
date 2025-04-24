@@ -13,13 +13,14 @@ import {
   objectEntries,
 } from "@/lib/utils/objects";
 import { getArrowDataType } from "@/models/DatasetField";
-import { type LocalDataset } from "@/models/LocalDataset";
+import { LocalDatasetId } from "@/models/LocalDataset";
 import { LocalDatasetClient } from "./LocalDatasetClient";
 import type { DatasetField } from "@/models/DatasetField";
+import type { LocalDataset } from "@/models/LocalDataset";
 
 export type AggregationType = "sum" | "avg" | "count" | "max" | "min" | "none";
 export type LocalQueryConfig = {
-  datasetId: number;
+  datasetId: LocalDatasetId;
   selectFieldNames: string[];
   groupByFieldNames: string[];
 
@@ -54,7 +55,7 @@ const MANUAL_BUNDLES: duck.DuckDBBundles = {
   },
 };
 
-function datasetIdToTableName(datasetId: number): string {
+function datasetIdToTableName(datasetId: LocalDatasetId): string {
   return `dataset_${datasetId}`;
 }
 
@@ -84,7 +85,7 @@ class LocalQueryClientImpl {
     return this.#db;
   }
 
-  async #getDataset(datasetId: number): Promise<LocalDataset> {
+  async #getDataset(datasetId: LocalDatasetId): Promise<LocalDataset> {
     const dataset = await LocalDatasetClient.getDataset(datasetId);
     if (!dataset) {
       throw new Error(`Dataset ${datasetId} not found`);
@@ -117,7 +118,7 @@ class LocalQueryClientImpl {
     }
   }
 
-  async loadDataset(datasetId: number): Promise<void> {
+  async loadDataset(datasetId: LocalDatasetId): Promise<void> {
     const { data, fields } = await this.#getDataset(datasetId);
     const tableName = datasetIdToTableName(datasetId);
 

@@ -9,12 +9,13 @@ import { LocalDatasetClient } from "@/clients/LocalDatasetClient";
 import { DatasetMetaView } from "@/components/DataManagerApp/DatasetMetaView";
 import { Logger } from "@/lib/Logger";
 import { Callout } from "@/lib/ui/Callout";
+import { uuid } from "@/lib/utils/uuid";
 import { type LocalDataset } from "@/models/LocalDataset";
 
 export const Route = createFileRoute("/_auth/data-manager/$datasetId")({
   component: RouteComponent,
   loader: async ({ params: { datasetId } }): Promise<LocalDataset> => {
-    const dataset = await LocalDatasetClient.getDataset(Number(datasetId));
+    const dataset = await LocalDatasetClient.getDataset(uuid(datasetId));
     if (!dataset) {
       throw notFound();
     }

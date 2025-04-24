@@ -2,6 +2,7 @@ import { SetOptional, Simplify } from "type-fest";
 import { DefineModelCRUDTypes } from "@/lib/utils/models/ModelCRUDTypes";
 import { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
 import { UserId } from "@/models/User";
+import { LocalDatasetId } from "../LocalDataset";
 import type { UUID } from "@/lib/types/common";
 
 export type EntityConfigId = UUID<"EntityConfig">;
@@ -27,6 +28,12 @@ type EntityConfigRead = {
 
   /** Timestamp when this entity config was last updated */
   updatedAt: string;
+
+  /** Dataset ID this entity config is created from */
+  datasetId: LocalDatasetId | null;
+
+  /** Whether users can manually create entities for this config */
+  allowManualCreation: boolean;
 };
 
 /**

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { makeParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
 import { uuidType } from "@/lib/utils/zodHelpers";
+import { LocalDatasetId } from "../LocalDataset";
 import { UserId } from "../User";
 import { EntityConfigCRUDTypes, EntityConfigId } from "./types";
 
@@ -12,6 +13,8 @@ const DBReadSchema = z.object({
   name: z.string(),
   owner_id: z.string(),
   updated_at: z.string().datetime({ offset: true }),
+  dataset_id: z.string().uuid().nullable(),
+  allow_manual_creation: z.boolean(),
 });
 
 const DBInsertSchema = DBReadSchema.required().partial({
@@ -20,6 +23,7 @@ const DBInsertSchema = DBReadSchema.required().partial({
   id: true,
   owner_id: true,
   updated_at: true,
+  dataset_id: true,
 });
 
 const DBUpdateSchema = DBReadSchema.partial();
@@ -31,6 +35,8 @@ const ModelReadSchema = z.object({
   name: DBReadSchema.shape.name,
   ownerId: uuidType<UserId>(),
   updatedAt: DBReadSchema.shape.updated_at,
+  datasetId: uuidType<LocalDatasetId>().nullable(),
+  allowManualCreation: DBReadSchema.shape.allow_manual_creation,
 });
 
 const ModelInsertSchema = ModelReadSchema.required().partial({

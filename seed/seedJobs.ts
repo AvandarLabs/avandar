@@ -13,6 +13,8 @@ export const entityConfigSeeder: SeedJob = {
           owner_id: helpers.getUserByEmail(entityConfig.owner).id,
           name: entityConfig.name,
           description: entityConfig.description,
+          allow_manual_creation: entityConfig.allowManualCreation,
+          dataset_id: entityConfig.datasetId,
         })
         .select()
         .single()

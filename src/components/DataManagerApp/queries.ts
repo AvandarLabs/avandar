@@ -8,6 +8,7 @@ import { useQuery, UseQueryResultTuple } from "@/lib/hooks/query/useQuery";
 import {
   LocalDataset,
   LocalDatasetCreate,
+  LocalDatasetId,
   LocalDatasetQueryKeys,
 } from "@/models/LocalDataset";
 
@@ -32,9 +33,9 @@ export function useLocalDatasets(): UseQueryResultTuple<LocalDataset[]> {
  * full `useMutation` result object.
  */
 export function useSaveLocalDataset(): [
-  UseMutateFunction<number, Error, LocalDatasetCreate>,
+  UseMutateFunction<LocalDatasetId, Error, LocalDatasetCreate>,
   boolean,
-  UseMutationResult<number, Error, LocalDatasetCreate>,
+  UseMutationResult<LocalDatasetId, Error, LocalDatasetCreate>,
 ] {
   return useMutation({
     queryToInvalidate: LocalDatasetQueryKeys.allDatasets,
@@ -45,13 +46,13 @@ export function useSaveLocalDataset(): [
 }
 
 export function useDeleteLocalDataset(): [
-  UseMutateFunction<void, Error, number>,
+  UseMutateFunction<void, Error, LocalDatasetId>,
   boolean,
-  UseMutationResult<void, Error, number>,
+  UseMutationResult<void, Error, LocalDatasetId>,
 ] {
   return useMutation({
     queryToInvalidate: LocalDatasetQueryKeys.allDatasets,
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: LocalDatasetId) => {
       return LocalDatasetClient.deleteDataset(id);
     },
   });
