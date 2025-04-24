@@ -1,4 +1,5 @@
 import { Dexie } from "dexie";
+import { uuid } from "@/lib/utils/uuid";
 import {
   LocalDataset,
   LocalDatasetCreate,
@@ -22,7 +23,14 @@ const db = new Dexie("LocalDatasets") as LocalDatasetDatabase;
  */
 class LocalDatasetClientImpl {
   constructor() {
+    // set up the `datasets` table
     db.version(DB_VERSION).stores({ datasets: "id" });
+    db.datasets.hook("creating", function (_primKey, obj) {
+      // Automatically assign a UUID if not provided
+      if (!obj.id) {
+        obj.id = uuid();
+      }
+    });
   }
 
   /**
