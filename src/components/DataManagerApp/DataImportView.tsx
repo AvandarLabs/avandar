@@ -5,7 +5,7 @@ import { notifications } from "@mantine/notifications";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { APP_CONFIG } from "@/config/AppConfig";
 import { DataGrid } from "@/lib/ui/DataGrid";
-import { FileUploadField } from "@/lib/ui/FileUploadField";
+import { FileUploadField } from "@/lib/ui/singleton-forms/FileUploadField";
 import { makeLocalDataset } from "@/models/LocalDataset";
 import { useCSVParser } from "./hooks/useCSVParser";
 import { useSaveLocalDataset } from "./queries";

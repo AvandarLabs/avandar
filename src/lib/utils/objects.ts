@@ -311,15 +311,26 @@ export function dropUndefinedDeep<T extends Exclude<unknown, undefined>>(
   return deepExclude(obj, isUndefined);
 }
 
+/**
+ * Compares two values of string or number types.
+ * Also handles nulls and undefineds.
+ *
+ * @param a The first value to compare.
+ * @param b The second value to compare.
+ * @param options The options for the comparator.
+ * @param options.nullOrUndefinedSortOrder The order to sort null or undefined
+ * values. Defaults to "last".
+ * @returns A number indicating the order of the values.
+ */
 function mixedComparator(
   a: string | number | null | undefined,
   b: string | number | null | undefined,
-  options?: {
+  {
+    nullOrUndefinedSortOrder = "last",
+  }: {
     nullOrUndefinedSortOrder?: "last" | "first";
   },
 ): number {
-  const { nullOrUndefinedSortOrder = "last" } = options || {};
-
   // handle nullish values
   if (isNullOrUndefined(a) && isNullOrUndefined(b)) {
     return 0;

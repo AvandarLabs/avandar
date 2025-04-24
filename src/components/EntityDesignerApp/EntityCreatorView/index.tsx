@@ -7,38 +7,23 @@ import {
   TextInput,
 } from "@mantine/core";
 import { formRootRule, isNotEmpty } from "@mantine/form";
-import { useState } from "react";
 import { useLocalDatasets } from "@/components/DataManagerApp/queries";
 import { useForm } from "@/lib/hooks/ui/useForm";
-import { SelectOption } from "@/lib/ui/Select";
-import { makeSelectOptions } from "@/lib/ui/Select/makeSelectOptions";
-import { areArrayContentsEqual } from "@/lib/utils/arrays";
+import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { getProp } from "@/lib/utils/objects";
-import { pipe } from "@/lib/utils/pipe";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
-import {
-  DraftFieldId,
-  EntityFieldConfig,
-} from "@/models/EntityConfig/EntityFieldConfig/types";
 import { makeDefaultEntityFieldDraft } from "@/models/EntityConfig/EntityFieldConfig/utils";
 import { EntityConfig } from "@/models/EntityConfig/types";
-import { FieldCreatorBlock } from "./FieldCreatorBlock";
+import { EntityFieldCreatorBlock } from "./EntityFieldCreatorBlock";
 import { EntityConfigForm } from "./types";
 
-function fieldsToSelectOptions(
-  fields: Array<EntityFieldConfig<"Draft">>,
-): Array<SelectOption<DraftFieldId>> {
-  return makeSelectOptions({
-    list: fields,
-    valueFn: getProp("draftId"),
-    labelFn: (field) => {
-      return field.name || "[Unnamed field]";
-    },
-  });
-}
-
-const initialFields = [makeDefaultEntityFieldDraft()];
-const initialFieldOptions = fieldsToSelectOptions(initialFields);
+const initialFields = [
+  makeDefaultEntityFieldDraft({
+    isIdField: true,
+    isTitleField: true,
+    name: "Name",
+  }),
+];
 
 export function EntityCreatorView(): JSX.Element {
   const [datasets] = useLocalDatasets();
@@ -66,25 +51,8 @@ export function EntityCreatorView(): JSX.Element {
           [formRootRule]: isNotEmpty("At least one field is required"),
         },
       },
-      onValuesChange: (newValues, prevValues) => {
-        // to generate new field options we only care if the names and ids
-        // of the fields have changed
-        const areFieldsChanged = !areArrayContentsEqual(
-          newValues.fields,
-          prevValues.fields,
-          (field) => {
-            return `draftId=${field.draftId}&name=${field.name}`;
-          },
-        );
-        if (areFieldsChanged) {
-          setFieldOptions(fieldsToSelectOptions(newValues.fields));
-        }
-      },
     },
   );
-
-  const [, setFieldOptions] =
-    useState<ReadonlyArray<SelectOption<DraftFieldId>>>(initialFieldOptions);
 
   return (
     <Container pt="lg">
@@ -116,6 +84,7 @@ export function EntityCreatorView(): JSX.Element {
           />
 
           <Select
+            key={entityConfigForm.key("datasetId")}
             data={datasetOptions}
             label="Dataset"
             {...entityConfigForm.getInputProps("datasetId")}
@@ -127,7 +96,7 @@ export function EntityCreatorView(): JSX.Element {
             {...entityConfigForm.getInputProps("allowManualCreation")}
           />
 
-          <FieldCreatorBlock
+          <EntityFieldCreatorBlock
             entityConfigForm={entityConfigForm}
             formSetters={entityConfigFormSetters}
           />

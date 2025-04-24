@@ -66,3 +66,8 @@ export type AnyFunctionWithSignature<Params extends unknown[], Return> = (
  * will return the same _value_. Just that it will return the same _type_.)
  */
 export type IdentityTypeFn<T> = (value: T) => T;
+
+/**
+ * Get the element type of an array or tuple.
+ */
+export type ElementOf<T> = T extends ReadonlyArray<infer U> ? U : never;

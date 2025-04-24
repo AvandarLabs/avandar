@@ -4,9 +4,31 @@ import {
   UseFormInput,
 } from "@mantine/form";
 import { useCallback } from "react";
-import { Merge, Paths } from "type-fest";
+import { Merge, Paths, UnknownArray } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
 import { IdentityTypeFn } from "@/lib/types/utilityTypes";
+
+type PathValue<T, P extends Paths<T>> =
+  P extends `${infer K}.${infer Rest}` ?
+    K extends keyof T ?
+      Rest extends Paths<T[K]> ?
+        PathValue<T[K], Rest>
+      : never
+    : K extends `${number}` ?
+      T extends UnknownArray ?
+        Rest extends Paths<T[number]> ?
+          PathValue<T[number], Rest>
+        : never
+      : never
+    : never
+  : // evaluate the final key. Check if this is an array access.
+  P extends `${number}` ?
+    T extends UnknownArray ?
+      T[number]
+    : never
+  : // else, check if this is a valid key in T we can access
+  P extends keyof T ? T[P]
+  : never;
 
 type InsertListItemFn<FormValues extends UnknownObject> = <
   P extends keyof FormValues,
@@ -18,18 +40,27 @@ type InsertListItemFn<FormValues extends UnknownObject> = <
 
 /**
  * An improved version of Mantine's `UseFormReturnType` with
- * better type safety.
+ * significantly better type safety.
  */
 export type FormType<
   FormValues extends UnknownObject,
-  TransformValues extends (
+  TransformedValues extends (
     values: FormValues,
   ) => unknown = IdentityTypeFn<FormValues>,
   FormPaths extends Paths<FormValues> = Paths<FormValues>,
 > = Merge<
-  MantineUseFormReturnType<FormValues, TransformValues>,
+  MantineUseFormReturnType<FormValues, TransformedValues>,
   {
     key: (path: FormPaths) => string;
+    watch: <P extends FormPaths>(
+      path: P,
+      subscriberFn: (payload: {
+        previousValue: PathValue<FormValues, P>;
+        value: PathValue<FormValues, P>;
+        touched: boolean;
+        dirty: boolean;
+      }) => void,
+    ) => void;
   }
 >;
 
@@ -65,5 +96,5 @@ export function useForm<
     [form],
   );
 
-  return [form, { insertListItem }];
+  return [form as FormType<FormValues, TransformValues>, { insertListItem }];
 }

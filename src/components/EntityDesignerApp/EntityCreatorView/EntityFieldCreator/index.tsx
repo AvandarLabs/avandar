@@ -1,25 +1,25 @@
 import {
   ActionIcon,
-  Button,
   Checkbox,
-  Fieldset,
   Group,
   Select,
   Stack,
-  Text,
   TextInput,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-import { FormSetters, FormType } from "@/lib/hooks/ui/useForm";
-import { makeSelectOptions } from "@/lib/ui/Select/makeSelectOptions";
+import { useState } from "react";
+import { FormType } from "@/lib/hooks/ui/useForm";
+import { ElementOf } from "@/lib/types/utilityTypes";
+import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { getProp, objectValues, sortBy } from "@/lib/utils/objects";
 import { EntityFieldValueExtractorTypes } from "@/models/EntityConfig/EntityFieldConfig/constants";
-import { makeDefaultEntityFieldDraft } from "@/models/EntityConfig/EntityFieldConfig/utils";
-import { EntityConfigForm } from "./types";
+import { EntityConfigForm } from "../types";
 
 type Props = {
   entityConfigForm: FormType<EntityConfigForm>;
-  formSetters: FormSetters<EntityConfigForm>;
+  defaultField: ElementOf<EntityConfigForm["fields"]>;
+  idx: number;
+  entityName: string;
 };
 
 const valueExtractorOptions = makeSelectOptions({
@@ -31,33 +31,51 @@ const valueExtractorOptions = makeSelectOptions({
   labelFn: getProp("displayName"),
 });
 
-export function FieldCreatorBlock({
+export function EntityFieldCreator({
   entityConfigForm,
-  formSetters,
+  defaultField,
+  idx,
+  entityName,
 }: Props): JSX.Element {
-  const { name, fields } = entityConfigForm.getValues();
-  const entityName = name || "Entity";
+  const [valueExtractorType, setValueExtractorType] = useState(
+    defaultField.valueExtractorType,
+  );
 
-  const fieldRows = fields.map((field, idx) => {
-    return (
-      <Group key={field.draftId}>
+  entityConfigForm.watch(`fields.${idx}.valueExtractorType`, ({ value }) => {
+    setValueExtractorType(value);
+  });
+
+  return (
+    <Stack>
+      <Group>
         <TextInput
           key={entityConfigForm.key(`fields.${idx}.name`)}
           required
           label="Field Name"
           placeholder="Enter a name for the field"
+          flex={1}
           {...entityConfigForm.getInputProps(`fields.${idx}.name`)}
         />
+        <ActionIcon
+          color="red"
+          onClick={() => {
+            return entityConfigForm.removeListItem("fields", idx);
+          }}
+        >
+          <IconTrash size={16} />
+        </ActionIcon>
+      </Group>
+      <Group>
         <Checkbox
           key={entityConfigForm.key(`fields.${idx}.isIdField`)}
-          label={`This is the the ${entityName}'s ID`}
+          label={`This is the ${entityName}'s ID`}
           {...entityConfigForm.getInputProps(`fields.${idx}.isIdField`, {
             type: "checkbox",
           })}
         />
         <Checkbox
           key={entityConfigForm.key(`fields.${idx}.isTitleField`)}
-          label={`This is the the ${entityName}'s title`}
+          label={`This is the ${entityName}'s title`}
           {...entityConfigForm.getInputProps(`fields.${idx}.isTitleField`, {
             type: "checkbox",
           })}
@@ -69,40 +87,23 @@ export function FieldCreatorBlock({
             type: "checkbox",
           })}
         />
-        <ActionIcon
-          color="red"
-          onClick={() => {
-            return entityConfigForm.removeListItem("fields", idx);
-          }}
-        >
-          <IconTrash size={16} />
-        </ActionIcon>
-        <Select
-          data={valueExtractorOptions}
-          label="Where should the data for this field come from?"
-          {...entityConfigForm.getInputProps(
-            `fields.${idx}.valueExtractorType`,
-          )}
+        <Checkbox
+          key={entityConfigForm.key(`fields.${idx}.isArray`)}
+          label="Allow multiple values"
+          {...entityConfigForm.getInputProps(`fields.${idx}.isArray`, {
+            type: "checkbox",
+          })}
         />
       </Group>
-    );
-  });
 
-  return (
-    <Fieldset legend="Fields">
-      <Stack>
-        {entityConfigForm.errors.fields ?
-          <Text c="danger">{entityConfigForm.errors.fields}</Text>
-        : <>{fieldRows}</>}
-        <Button
-          onClick={() => {
-            formSetters.insertListItem("fields", makeDefaultEntityFieldDraft());
-            entityConfigForm.clearFieldError("fields");
-          }}
-        >
-          Add Field
-        </Button>
-      </Stack>
-    </Fieldset>
+      <Select
+        key={entityConfigForm.key(`fields.${idx}.valueExtractorType`)}
+        data={valueExtractorOptions}
+        label="Where should the data for this field come from?"
+        {...entityConfigForm.getInputProps(`fields.${idx}.valueExtractorType`)}
+      />
+
+      {valueExtractorType}
+    </Stack>
   );
 }
