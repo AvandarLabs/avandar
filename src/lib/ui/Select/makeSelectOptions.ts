@@ -17,14 +17,14 @@ export function makeSelectOptions<
   T extends UnknownObject,
   Value extends string,
 >(options: {
-  inputList: readonly T[];
+  list: readonly T[];
   valueFn: (value: T) => Value;
   labelFn?: (value: T) => string;
   isDisabledFn?: (value: T) => boolean;
 }): Array<SelectOption<Value>> {
-  const { inputList, valueFn, labelFn, isDisabledFn } = options;
+  const { list, valueFn, labelFn, isDisabledFn } = options;
 
-  const selectOptions = inputList.map((item: T) => {
+  const selectOptions = list.map((item: T) => {
     const optionValue = valueFn(item);
     const optionLabel = labelFn ? labelFn(item) : optionValue;
     const isDisabled = isDisabledFn ? isDisabledFn(item) : false;

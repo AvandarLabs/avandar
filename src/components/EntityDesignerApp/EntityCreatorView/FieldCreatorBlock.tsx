@@ -23,7 +23,7 @@ type Props = {
 };
 
 const valueExtractorOptions = makeSelectOptions({
-  inputList: sortBy({
+  list: sortBy({
     list: objectValues(EntityFieldValueExtractorTypes),
     valueFn: getProp("displayName"),
   }),

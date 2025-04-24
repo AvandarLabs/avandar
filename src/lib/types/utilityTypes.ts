@@ -39,7 +39,7 @@ export type ExcludeDeep<T, TypeToExclude> =
  * Represents any function with inferrable parameters and return types.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type AnyFunction = (...args: any[]) => unknown;
+export type AnyFunction = (...args: any[]) => any;
 
 /**
  * Represents any function with a given return type.
@@ -52,7 +52,8 @@ export type AnyFunctionWithReturn<R> = (...args: any[]) => R;
  */
 export type AnyFunctionWithArguments<Params extends unknown[]> = (
   ...args: Params
-) => unknown;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+) => any;
 
 export type AnyFunctionWithSignature<Params extends unknown[], Return> = (
   ...args: Params

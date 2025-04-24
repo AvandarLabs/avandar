@@ -1,11 +1,20 @@
-import { Button, Container, Stack, Text, TextInput } from "@mantine/core";
+import {
+  Button,
+  Container,
+  Select,
+  Stack,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { formRootRule, isNotEmpty } from "@mantine/form";
 import { useState } from "react";
+import { useLocalDatasets } from "@/components/DataManagerApp/queries";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { SelectOption } from "@/lib/ui/Select";
 import { makeSelectOptions } from "@/lib/ui/Select/makeSelectOptions";
 import { areArrayContentsEqual } from "@/lib/utils/arrays";
 import { getProp } from "@/lib/utils/objects";
+import { pipe } from "@/lib/utils/pipe";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import {
   DraftFieldId,
@@ -20,7 +29,7 @@ function fieldsToSelectOptions(
   fields: Array<EntityFieldConfig<"Draft">>,
 ): Array<SelectOption<DraftFieldId>> {
   return makeSelectOptions({
-    inputList: fields,
+    list: fields,
     valueFn: getProp("draftId"),
     labelFn: (field) => {
       return field.name || "[Unnamed field]";
@@ -32,6 +41,13 @@ const initialFields = [makeDefaultEntityFieldDraft()];
 const initialFieldOptions = fieldsToSelectOptions(initialFields);
 
 export function EntityCreatorView(): JSX.Element {
+  const [datasets] = useLocalDatasets();
+  const datasetOptions = makeSelectOptions({
+    list: datasets ?? [],
+    valueFn: pipe(getProp("id"), String),
+    labelFn: getProp("name"),
+  });
+
   const [doCreateEntityConfig, pendingEntityConfigCreate] =
     EntityConfigClient.withLogger().useInsert();
 
@@ -95,7 +111,11 @@ export function EntityCreatorView(): JSX.Element {
             {...entityConfigForm.getInputProps("description")}
           />
 
-          <Text c="danger">What dataset does this entity come from?</Text>
+          <Select
+            data={datasetOptions}
+            label="Dataset"
+            {...entityConfigForm.getInputProps("datasetId")}
+          />
           <Text c="danger">Checkbox: allow manual addition of entities</Text>
 
           <FieldCreatorBlock
