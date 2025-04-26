@@ -12,9 +12,9 @@ import {
   objectKeys,
   omit,
 } from "@/lib/utils/objects";
-import { DatasetField } from "@/models/DatasetField";
-import { LocalDataset, LocalDatasetId } from "@/models/LocalDataset";
-import { useLocalDatasets } from "../DataManagerApp/queries";
+import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
+import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
+import { LocalDataset, LocalDatasetId } from "@/models/LocalDataset/types";
 import { FieldSelect } from "./FieldSelect";
 import { useDataQuery } from "./useDataQuery";
 
@@ -23,16 +23,16 @@ const HIDE_ORDER_BY = true;
 const HIDE_LIMIT = true;
 
 export function DataExplorerApp(): JSX.Element {
-  const [allDatasets, isLoadingDatasets] = useLocalDatasets();
+  const [allDatasets, isLoadingDatasets] = LocalDatasetClient.useGetAll();
   const [loadedDatasets, setLoadedDatasets] = useSet<LocalDatasetId>();
   const [selectedDatasetId, setSelectedDatasetId] = useState<
     LocalDatasetId | undefined
   >(undefined);
-  const [selectedFields, setSelectedFields] = useState<readonly DatasetField[]>(
-    [],
-  );
+  const [selectedFields, setSelectedFields] = useState<
+    readonly LocalDatasetField[]
+  >([]);
   const [selectedGroupByFields, setSelectedGroupByFields] = useState<
-    readonly DatasetField[]
+    readonly LocalDatasetField[]
   >([]);
   const [aggregations, setAggregations] = useState<
     Record<string, AggregationType>

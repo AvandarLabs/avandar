@@ -3,7 +3,7 @@ import { UUID } from "@/lib/types/common";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { makeParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
 import { uuidType } from "@/lib/utils/zodHelpers";
-import { DatasetFieldId } from "@/models/DatasetField";
+import { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
 import { EntityFieldConfigId } from "../../EntityFieldConfig/types";
 import {
   DatasetColumnValueExtractorConfigCRUDTypes,
@@ -33,7 +33,7 @@ const ModelReadSchema = z.object({
   entityFieldConfigId: uuidType<EntityFieldConfigId>(),
   valuePickerRuleType: DBReadSchema.shape.value_picker_rule_type,
   datasetId: uuidType<UUID<"Dataset">>(),
-  datasetFieldId: uuidType<DatasetFieldId>(),
+  datasetFieldId: uuidType<LocalDatasetFieldId>(),
   createdAt: DBReadSchema.shape.created_at,
   updatedAt: DBReadSchema.shape.updated_at,
 });

@@ -3,7 +3,6 @@ import { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDType
 import { Enums } from "@/types/database.types";
 import type { EntityConfigId } from "../types";
 import type { UUID } from "@/lib/types/common";
-import type { DefineModelCRUDTypes } from "@/lib/utils/models/ModelCRUDTypes";
 
 export type EntityFieldConfigId = UUID<"EntityFieldConfig">;
 export type DraftFieldId = UUID<"DraftField">;
@@ -64,12 +63,13 @@ type CoreFieldRead = {
 
 type EntityFieldConfigRead = CoreFieldRead & (DimensionRead | MetricRead);
 
-export type EntityFieldConfigCRUDTypes = DefineModelCRUDTypes<
-  SupabaseModelCRUDTypes<"entity_field_configs">,
+export type EntityFieldConfigCRUDTypes = SupabaseModelCRUDTypes<
   {
+    tableName: "entity_field_configs";
     modelName: "EntityFieldConfig";
-    modelPrimaryKey: "id";
-    dbTablePrimaryKey: "id";
+    modelPrimaryKeyType: EntityFieldConfigId;
+  },
+  {
     Read: EntityFieldConfigRead;
     Insert: SetOptional<
       Required<CoreFieldRead>,
@@ -78,7 +78,12 @@ export type EntityFieldConfigCRUDTypes = DefineModelCRUDTypes<
       (DimensionRead | MetricRead);
     Update: Partial<CoreFieldRead> &
       (Partial<DimensionRead> | Partial<MetricRead>);
-
+  },
+  {
+    dbTablePrimaryKey: "id";
+    modelPrimaryKey: "id";
+  },
+  {
     /**
      * A draft version of the type, to use while the user is still creating
      * a new EntityFieldConfig in a form.

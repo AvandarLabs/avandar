@@ -1,11 +1,8 @@
-import {
-  DefaultError,
-  QueryKey,
-  UseMutationOptions,
-} from "@tanstack/react-query";
-import { Simplify } from "type-fest";
+import { DefaultError, QueryKey } from "@tanstack/react-query";
+import { ConditionalKeys, Simplify } from "type-fest";
 import {
   useMutation,
+  UseMutationOptions,
   UseMutationResultTuple,
 } from "@/lib/hooks/query/useMutation";
 import {
@@ -14,18 +11,19 @@ import {
   UseQueryResultTuple,
 } from "@/lib/hooks/query/useQuery";
 import { capitalize, prefix } from "@/lib/utils/strings";
+import { UnknownObject } from "../types/common";
 import {
   AnyFunction,
   AnyFunctionWithReturn,
   AnyFunctionWithSignature,
-  KeysThatMapTo,
 } from "../types/utilityTypes";
-import { isFunction } from "../utils/guards";
-import { ModelCRUDTypes } from "../utils/models/ModelCRUDTypes";
-import { deepExclude } from "../utils/objects";
-import { ModelCRUDClient } from "./ModelCRUDClient";
+import { isFunction, isPlainObject } from "../utils/guards";
+import { deepExclude, objectKeys } from "../utils/objects";
+import { BaseClient } from "./BaseClient";
 
-type ClientObject = object & { getModelName: () => string };
+function isSingleArgObject(arg: unknown): arg is { arg: unknown } {
+  return isPlainObject(arg) && "arg" in arg && objectKeys(arg).length === 1;
+}
 
 /**
  * A union of all function names that have a *single* argument and
@@ -34,7 +32,7 @@ type ClientObject = object & { getModelName: () => string };
  */
 export type HookableFnName<T extends object> = Extract<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  KeysThatMapTo<AnyFunctionWithSignature<[any], Promise<unknown>>, T>,
+  ConditionalKeys<T, AnyFunctionWithSignature<[any], Promise<unknown>>>,
   string
 >;
 
@@ -42,7 +40,7 @@ export type HookableFnName<T extends object> = Extract<
  * Get the first parameter of a function's array of parameters.
  */
 type ClientFnFirstParameter<
-  Client extends ClientObject,
+  Client extends BaseClient,
   FnName extends keyof Client,
   Fn extends Client[FnName] = Client[FnName],
 > =
@@ -52,33 +50,39 @@ type ClientFnFirstParameter<
     : Parameters<Fn>[0]
   : never;
 
+type RefinedQueryOptions = Omit<UseQueryOptions, "queryFn" | "queryKey">;
+
+/**
+ * Helper type to generate the argument for a client's `useQuery` wrapper
+ * function.
+ */
+type UseClientQueryArg<
+  Client extends BaseClient,
+  FnName extends keyof Client,
+  ClientParam extends ClientFnFirstParameter<
+    Client,
+    FnName
+  > = ClientFnFirstParameter<Client, FnName>,
+> =
+  [Exclude<ClientParam, void>] extends [never] ?
+    { useQueryOptions?: RefinedQueryOptions } | void
+  : ClientParam extends UnknownObject ?
+    ClientParam & { useQueryOptions?: RefinedQueryOptions }
+  : { arg: ClientParam } & { useQueryOptions?: RefinedQueryOptions };
+
+/**
+ * Helper type to generate a function that returns a `QueryKey`
+ * given a client function parameter.
+ */
+type ClientQueryKeyBuilder<
+  Client extends BaseClient,
+  FnName extends keyof Client,
+> = (param: ClientFnFirstParameter<Client, FnName>) => QueryKey;
+
 type ClientFnReturnType<
-  Client extends ClientObject,
+  Client extends BaseClient,
   FnName extends keyof Client,
 > = Client[FnName] extends AnyFunction ? ReturnType<Client[FnName]> : never;
-
-/**
- * A default list of query functions to turn into `use` hooks in a CRUD client.
- * They will wrap `useQuery`.
- */
-const DEFAULT_QUERY_FN_NAMES = [
-  "getById",
-  "getAll",
-] as const satisfies ReadonlyArray<
-  HookableFnName<ModelCRUDClient<ModelCRUDTypes>>
->;
-
-/**
- * A default list of mutation functions to turn into `use` hooks in a CRUD
- * client. They will wrap `useMutation`.
- */
-const DEFAULT_MUTATION_FN_NAMES = [
-  "insert",
-  "update",
-  "delete",
-] as const satisfies ReadonlyArray<
-  HookableFnName<ModelCRUDClient<ModelCRUDTypes>>
->;
 
 /**
  * Augments a CRUD Model Client instance with `use` hooks that call
@@ -86,32 +90,17 @@ const DEFAULT_MUTATION_FN_NAMES = [
  * We only convert functions that return a Promise to a `use` hook.
  */
 export type WithQueryHooks<
-  Client extends ClientObject,
-  QueryFnName extends keyof Client = never,
-  MutationFnName extends keyof Client = never,
+  Client extends BaseClient,
+  QueryFnName extends HookableFnName<Client>,
+  MutationFnName extends HookableFnName<Client>,
 > = Client & {
-  [QName in [QueryFnName] extends [never] ?
-    Extract<keyof Client, (typeof DEFAULT_QUERY_FN_NAMES)[number]>
-  : Extract<
-      QueryFnName,
-      string
-    > as `use${Capitalize<QName>}`]: Client[QName] extends (
+  [QName in QueryFnName as `use${Capitalize<QName>}`]: Client[QName] extends (
     AnyFunctionWithReturn<Promise<infer Result>>
   ) ?
-    (
-      clientFnParams: ClientFnFirstParameter<Client, QName>,
-      useQueryOptions?: Simplify<
-        Omit<UseQueryOptions<Result>, "queryFn" | "queryKey">
-      >,
-    ) => UseQueryResultTuple<Result>
+    (options: UseClientQueryArg<Client, QName>) => UseQueryResultTuple<Result>
   : never;
 } & {
-  [MutName in [MutationFnName] extends [never] ?
-    Extract<keyof Client, (typeof DEFAULT_MUTATION_FN_NAMES)[number]>
-  : Extract<
-      MutationFnName,
-      string
-    > as `use${Capitalize<MutName>}`]: Client[MutName] extends (
+  [MutName in MutationFnName as `use${Capitalize<MutName>}`]: Client[MutName] extends (
     AnyFunctionWithSignature<infer Params, Promise<infer Result>>
   ) ?
     (
@@ -123,40 +112,47 @@ export type WithQueryHooks<
       >,
     ) => UseMutationResultTuple<Result, DefaultError, Params[0], unknown>
   : never;
+} & {
+  QueryKeys: {
+    [QName in QueryFnName]: Client[QName] extends (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      AnyFunctionWithReturn<Promise<any>>
+    ) ?
+      ClientQueryKeyBuilder<Client, QName>
+    : never;
+  };
 };
 
 /**
  * Augments an object with `use` hooks that wrap any specified functions
  * with `useQuery` or `useMutation`.
  *
- * If no query or mutation function names are provided, we attempt to
- * add hooks for `DEFAULT_QUERY_FN_NAMES` and `DEFAULT_MUTATION_FN_NAMES`.
- *
  * @param client The client to add query hooks to.
- * @param options.queryFns The query functions to add hooks for. If
- * this argument is not provided, we add `useQuery` hooks for the
- * function names in `DEFAULT_QUERY_FN_NAMES`.
- * @param options.mutationFns The mutation functions to add hooks for. If
- * this argument is not provided, we add `useMutation` hooks for the
- * function names in `DEFAULT_MUTATION_FN_NAMES`.
+ * @param options.queryFns The query functions to add hooks for.
+ * @param options.mutationFns The mutation functions to add hooks for.
  * @returns The client with query hooks added.
  */
 export function withQueryHooks<
-  Client extends ClientObject,
-  UseQueryFnName extends HookableFnName<Client> = never,
-  UseMutationFnName extends HookableFnName<Client> = never,
+  Client extends BaseClient,
+  UseQueryFnName extends HookableFnName<Client>,
+  UseMutationFnName extends HookableFnName<Client>,
 >(
   client: Client,
-  options?: {
+  {
+    queryFns = [],
+    mutationFns = [],
+  }: {
     queryFns?: readonly UseQueryFnName[];
     mutationFns?: readonly UseMutationFnName[];
-  },
+  } = {},
 ): WithQueryHooks<Client, UseQueryFnName, UseMutationFnName> {
-  const queryFnNames = options?.queryFns ?? DEFAULT_QUERY_FN_NAMES;
-  const mutationFnNames = options?.mutationFns ?? DEFAULT_MUTATION_FN_NAMES;
+  const queryKeyBuilders = {} as Record<
+    UseQueryFnName,
+    ClientQueryKeyBuilder<Client, UseQueryFnName>
+  >;
 
   // set up all the `useQuery` functions
-  queryFnNames
+  queryFns
     .filter((queryFnName) => {
       return (
         queryFnName in client &&
@@ -168,23 +164,35 @@ export function withQueryHooks<
       if (typeof clientFunction === "function") {
         const boundClientFunction = clientFunction.bind(client);
 
-        // we allow only single-argument functions. If multiple arguments are
-        // provided, we will just pass the first one.
-        const useClientQuery = (
-          clientFnParams: ClientFnFirstParameter<Client, UseQueryFnName>,
-          useQueryOptions?: Omit<UseQueryOptions, "queryFn" | "queryKey">,
+        // make the query key builder for this `queryFnName`
+        const queryKeyBuilder = (
+          param: ClientFnFirstParameter<Client, UseQueryFnName>,
         ) => {
+          return makeQueryKey(client, queryFnName, param);
+        };
+        queryKeyBuilders[queryFnName] = queryKeyBuilder;
+
+        // make the wrapped `useQuery` function for this `queryFnName`
+        const useClientQuery = (
+          options: UseClientQueryArg<Client, UseQueryFnName>,
+        ) => {
+          const { useQueryOptions, ...clientFnParamsObj } =
+            isPlainObject(options) ? options : { useQueryOptions: undefined };
+          const clientFnParam = (
+            isSingleArgObject(clientFnParamsObj) ?
+              clientFnParamsObj.arg
+            : clientFnParamsObj) as ClientFnFirstParameter<
+            Client,
+            UseQueryFnName
+          >;
+
           return useQuery({
+            queryKey: queryKeyBuilder(clientFnParam),
             queryFn: async () => {
-              const result = await boundClientFunction(clientFnParams);
+              const result = await boundClientFunction(clientFnParam);
               return result;
             },
-            queryKey: makeQueryKey(
-              client,
-              queryFnName as UseQueryFnName,
-              clientFnParams,
-            ),
-            ...useQueryOptions,
+            ...(isPlainObject(useQueryOptions) ? useQueryOptions : undefined),
           });
         };
 
@@ -194,7 +202,7 @@ export function withQueryHooks<
     });
 
   // set up all the `useMutation` functions
-  mutationFnNames
+  mutationFns
     .filter((mutationFnName) => {
       return (
         mutationFnName in client &&
@@ -206,6 +214,7 @@ export function withQueryHooks<
       if (typeof clientFunction === "function") {
         const boundClientFunction = clientFunction.bind(client);
 
+        // make the wrapped `useMutation` function for this `mutationFnName`
         const useClientMutation = (
           useMutationOptions?: Omit<
             UseMutationOptions<
@@ -218,25 +227,14 @@ export function withQueryHooks<
           >,
         ) => {
           return useMutation({
-            // we allow only single-argument functions. If multiple arguments
-            // are provided, we will just pass the first one.
+            // we only allow single-argument functions. If multiple arguments
+            // are defined in the Client, we will only take the first one.
             mutationFn: async (
               params: ClientFnFirstParameter<Client, UseMutationFnName>,
             ): Promise<ClientFnReturnType<Client, UseMutationFnName>> => {
               const result = await boundClientFunction(params);
               return result;
             },
-
-            // Default to invalidating the `getAll` query for this client
-            // if there is one
-            queryToInvalidate:
-              clientHasGetAllFn(client) ?
-                makeQueryKey(
-                  client,
-                  "getAll" as UseQueryFnName,
-                  undefined as ClientFnFirstParameter<Client, UseQueryFnName>,
-                )
-              : undefined,
             ...useMutationOptions,
           });
         };
@@ -245,6 +243,10 @@ export function withQueryHooks<
         client[prefix("use", capitalize(mutationFnName))] = useClientMutation;
       }
     });
+
+  // assign the query key builders to the client
+  // @ts-expect-error This is safe
+  client.QueryKeys = queryKeyBuilders;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return client as any;
@@ -257,7 +259,7 @@ export function withQueryHooks<
  * @param params The parameters for the query function.
  * @returns The query key.
  */
-function makeQueryKey<Client extends ClientObject, FnName extends keyof Client>(
+function makeQueryKey<Client extends BaseClient, FnName extends keyof Client>(
   client: Client,
   queryFnName: FnName,
   params: ClientFnFirstParameter<Client, FnName>,
@@ -265,9 +267,5 @@ function makeQueryKey<Client extends ClientObject, FnName extends keyof Client>(
   // exclude any functions from the params, they aren't good to include
   // in a query key
   const newParams = deepExclude(params, isFunction);
-  return [client.getModelName(), queryFnName, newParams];
-}
-
-function clientHasGetAllFn(client: ClientObject): boolean {
-  return "getAll" in client && typeof client.getAll === "function";
+  return [client.getClientName(), queryFnName, newParams];
 }

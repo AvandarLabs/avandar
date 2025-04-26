@@ -3,7 +3,7 @@ import { UUID } from "@/lib/types/common";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { makeParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
 import { jsonType, uuidType } from "@/lib/utils/zodHelpers";
-import { DatasetFieldId } from "@/models/DatasetField";
+import { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
 import { EntityFieldConfigId } from "../../EntityFieldConfig/types";
 import {
   AggregationExtractorConfigCRUDTypes,
@@ -16,7 +16,7 @@ const DBReadSchema = z.object({
   aggregation_type: z.enum(["sum", "max", "count"]),
   dataset_id: z.string(),
   dataset_field_id: z.string(),
-  filter: jsonType().nullable(),
+  filter: jsonType.nullable(),
   created_at: z.string().datetime({ offset: true }),
   updated_at: z.string().datetime({ offset: true }),
 });
@@ -35,7 +35,7 @@ const ModelReadSchema = z.object({
   entityFieldConfigId: uuidType<EntityFieldConfigId>(),
   aggregationType: DBReadSchema.shape.aggregation_type,
   datasetId: uuidType<UUID<"Dataset">>(),
-  datasetFieldId: uuidType<DatasetFieldId>(),
+  datasetFieldId: uuidType<LocalDatasetFieldId>(),
   filter: DBReadSchema.shape.filter,
   createdAt: DBReadSchema.shape.created_at,
   updatedAt: DBReadSchema.shape.updated_at,

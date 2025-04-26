@@ -5,7 +5,7 @@ import type { Database } from "@/types/database.types";
 export type DatabaseTableNames = keyof Database["public"]["Tables"];
 
 /**
- * A client for interacting with Supabase.
+ * A global client for interacting with Supabase.
  *
  * Naming this `SupabaseDBClient` instead of `SupabaseClient` so it doesn't
  * get mixed up with `SupabaseClient` from `@supabase/supabase-js` during

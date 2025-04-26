@@ -1,9 +1,8 @@
 import { SetOptional, Simplify } from "type-fest";
 import type { EntityFieldConfigId } from "../../EntityFieldConfig/types";
 import type { UUID } from "@/lib/types/common";
-import type { DefineModelCRUDTypes } from "@/lib/utils/models/ModelCRUDTypes";
 import type { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
-import type { DatasetFieldId } from "@/models/DatasetField";
+import type { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
 
 export type DatasetColumnValueExtractorConfigId =
   UUID<"DatasetColumnValueExtractorConfig">;
@@ -24,7 +23,7 @@ type DatasetColumnValueExtractorConfigRead = {
   datasetId: UUID<"Dataset">;
 
   /** ID of the specific field in the dataset to extract from */
-  datasetFieldId: DatasetFieldId;
+  datasetFieldId: LocalDatasetFieldId;
 
   /** Creation timestamp */
   createdAt: string;
@@ -36,18 +35,23 @@ type DatasetColumnValueExtractorConfigRead = {
 /**
  * CRUD type definitions for the DatasetColumnValueExtractorConfig model.
  */
-export type DatasetColumnValueExtractorConfigCRUDTypes = DefineModelCRUDTypes<
-  SupabaseModelCRUDTypes<"value_extractor_config__dataset_column_value">,
+export type DatasetColumnValueExtractorConfigCRUDTypes = SupabaseModelCRUDTypes<
   {
+    tableName: "value_extractor_config__dataset_column_value";
     modelName: "DatasetColumnValueExtractorConfig";
-    modelPrimaryKey: "id";
-    dbTablePrimaryKey: "id";
+    modelPrimaryKeyType: DatasetColumnValueExtractorConfigId;
+  },
+  {
     Read: DatasetColumnValueExtractorConfigRead;
     Insert: SetOptional<
       Required<DatasetColumnValueExtractorConfigRead>,
       "id" | "createdAt" | "updatedAt"
     >;
     Update: Partial<DatasetColumnValueExtractorConfigRead>;
+  },
+  {
+    modelPrimaryKey: "id";
+    dbTablePrimaryKey: "id";
   }
 >;
 

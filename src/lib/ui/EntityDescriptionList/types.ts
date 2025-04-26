@@ -1,4 +1,4 @@
-import { ObjectStringKey } from "@/lib/types/utilityTypes";
+import { StringPropertyKey } from "@/lib/types/utilityTypes";
 
 /** A non-recursive field value */
 export type PrimitiveFieldValue =
@@ -43,7 +43,7 @@ export type PrimitiveFieldValueRenderOptions = {
  * This will take precedence over any global render options.
  */
 export type FieldRenderOptionsMap<T extends EntityObject> = {
-  [K in ObjectStringKey<T>]?: T[K] extends EntityObject ?
+  [K in StringPropertyKey<T>]?: T[K] extends EntityObject ?
     EntityRenderOptions<T[K]>
   : T[K] extends ReadonlyArray<infer ArrayType extends FieldValue> ?
     FieldValueArrayRenderOptions<ArrayType>
@@ -55,8 +55,8 @@ export type FieldRenderOptionsMap<T extends EntityObject> = {
  */
 export type EntityRenderOptions<T extends EntityObject> =
   PrimitiveFieldValueRenderOptions & {
-    excludeKeys?: ReadonlyArray<ObjectStringKey<T>>;
-    titleKey?: ObjectStringKey<T>;
+    excludeKeys?: ReadonlyArray<StringPropertyKey<T>>;
+    titleKey?: StringPropertyKey<T>;
 
     /**
      * Maps entity fields to its render options. This will take precedence

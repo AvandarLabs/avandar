@@ -1,9 +1,8 @@
 import { SetOptional, Simplify } from "type-fest";
 import type { EntityFieldConfigId } from "../../EntityFieldConfig/types";
 import type { JSONValue, UUID } from "@/lib/types/common";
-import type { DefineModelCRUDTypes } from "@/lib/utils/models/ModelCRUDTypes";
 import type { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
-import type { DatasetFieldId } from "@/models/DatasetField";
+import type { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
 
 export type AggregationExtractorConfigId = UUID<"AggregationExtractorConfig">;
 export type AggregationType = "sum" | "max" | "count";
@@ -25,7 +24,7 @@ type AggregationExtractorConfigRead = {
   datasetId: UUID<"Dataset">;
 
   /** ID of the specific field in the dataset to aggregate */
-  datasetFieldId: DatasetFieldId;
+  datasetFieldId: LocalDatasetFieldId;
 
   /** Filter to apply before aggregation */
   filter: JSONValue | null;
@@ -37,18 +36,23 @@ type AggregationExtractorConfigRead = {
   updatedAt: string;
 };
 
-export type AggregationExtractorConfigCRUDTypes = DefineModelCRUDTypes<
-  SupabaseModelCRUDTypes<"value_extractor_config__aggregation">,
+export type AggregationExtractorConfigCRUDTypes = SupabaseModelCRUDTypes<
   {
+    tableName: "value_extractor_config__aggregation";
     modelName: "AggregationExtractorConfig";
-    modelPrimaryKey: "id";
-    dbTablePrimaryKey: "id";
+    modelPrimaryKeyType: AggregationExtractorConfigId;
+  },
+  {
     Read: AggregationExtractorConfigRead;
     Insert: SetOptional<
       Required<AggregationExtractorConfigRead>,
       "id" | "createdAt" | "updatedAt" | "filter"
     >;
     Update: Partial<AggregationExtractorConfigRead>;
+  },
+  {
+    dbTablePrimaryKey: "id";
+    modelPrimaryKey: "id";
   }
 >;
 

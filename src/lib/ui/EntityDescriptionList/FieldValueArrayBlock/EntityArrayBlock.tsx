@@ -1,6 +1,6 @@
 import { List, Table } from "@mantine/core";
 import { useMemo } from "react";
-import { ObjectStringKey } from "@/lib/types/utilityTypes";
+import { StringPropertyKey } from "@/lib/types/utilityTypes";
 import { EntityDescriptionList } from "@/lib/ui/EntityDescriptionList";
 import { CollapsibleItem } from "@/lib/ui/EntityDescriptionList/CollapsibleItem";
 import { getEntityFieldRenderOptions } from "@/lib/ui/EntityDescriptionList/helpers";
@@ -26,7 +26,7 @@ export function EntityArrayBlock<T extends EntityObject>({
   titleKey,
   ...renderOptions
 }: Props<T>): JSX.Element | null {
-  const excludeKeySet: ReadonlySet<ObjectStringKey<T>> = useMemo(() => {
+  const excludeKeySet: ReadonlySet<StringPropertyKey<T>> = useMemo(() => {
     return new Set(renderOptions.excludeKeys);
   }, [renderOptions.excludeKeys]);
 

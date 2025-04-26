@@ -1,7 +1,7 @@
 import camelcaseKeys, { CamelCaseKeys } from "camelcase-keys";
 import snakecaseKeys, { SnakeCaseKeys } from "snakecase-keys";
 import { UnknownObject } from "@/lib/types/common";
-import { ExcludeDeep, ObjectStringKey } from "@/lib/types/utilityTypes";
+import { ExcludeDeep, StringPropertyKey } from "@/lib/types/utilityTypes";
 import { identity } from "@/lib/utils/functions";
 import {
   isNullOrUndefined,
@@ -19,9 +19,9 @@ import { stringComparator } from "./strings";
  */
 export function objectEntries<T extends UnknownObject>(
   obj: T,
-): Array<[ObjectStringKey<T>, T[ObjectStringKey<T>]]> {
+): Array<[StringPropertyKey<T>, T[StringPropertyKey<T>]]> {
   return Object.entries(obj) as Array<
-    [ObjectStringKey<T>, T[ObjectStringKey<T>]]
+    [StringPropertyKey<T>, T[StringPropertyKey<T>]]
   >;
 }
 
@@ -32,8 +32,8 @@ export function objectEntries<T extends UnknownObject>(
  */
 export function objectKeys<T extends UnknownObject>(
   obj: T,
-): Array<ObjectStringKey<T>> {
-  return Object.keys(obj) as Array<ObjectStringKey<T>>;
+): Array<StringPropertyKey<T>> {
+  return Object.keys(obj) as Array<StringPropertyKey<T>>;
 }
 
 /**

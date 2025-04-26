@@ -6,9 +6,9 @@ import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { APP_CONFIG } from "@/config/AppConfig";
 import { DataGrid } from "@/lib/ui/DataGrid";
 import { FileUploadField } from "@/lib/ui/singleton-forms/FileUploadField";
-import { makeLocalDataset } from "@/models/LocalDataset";
+import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
+import { makeLocalDataset } from "@/models/LocalDataset/utils";
 import { useCSVParser } from "./hooks/useCSVParser";
-import { useSaveLocalDataset } from "./queries";
 
 type DatasetForm = {
   name: string;
@@ -19,7 +19,10 @@ const { maxDatasetNameLength, maxDatasetDescriptionLength } =
   APP_CONFIG.dataManagerApp;
 
 export function DataImportView(): JSX.Element {
-  const [saveDataset, isSavePending] = useSaveLocalDataset();
+  const [saveDataset, isSavePending] = LocalDatasetClient.useInsert({
+    queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
+  });
+
   const { csv, fields, fileMetadata, parseFile } = useCSVParser({
     onNoFileProvided: () => {
       notifications.show({
@@ -73,15 +76,18 @@ export function DataImportView(): JSX.Element {
                 fields,
               });
 
-              saveDataset(dataset, {
-                onSuccess: () => {
-                  notifications.show({
-                    title: "Dataset saved",
-                    message: `${dataset.name} saved successfully`,
-                    color: "green",
-                  });
+              saveDataset(
+                { data: dataset },
+                {
+                  onSuccess: () => {
+                    notifications.show({
+                      title: "Dataset saved",
+                      message: `${dataset.name} saved successfully`,
+                      color: "green",
+                    });
+                  },
                 },
-              });
+              );
             })}
           >
             <Stack>

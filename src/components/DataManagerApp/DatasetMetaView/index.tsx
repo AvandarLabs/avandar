@@ -7,9 +7,9 @@ import { APP_CONFIG } from "@/config/AppConfig";
 import { DataGrid } from "@/lib/ui/DataGrid";
 import { EntityDescriptionList } from "@/lib/ui/EntityDescriptionList";
 import { FieldRenderOptionsMap } from "@/lib/ui/EntityDescriptionList/types";
-import { type LocalDataset } from "@/models/LocalDataset";
+import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
+import { type LocalDataset } from "@/models/LocalDataset/types";
 import { useCSVParser } from "../hooks/useCSVParser";
-import { useDeleteLocalDataset } from "../queries";
 
 type Props = {
   dataset: LocalDataset;
@@ -33,7 +33,9 @@ const DATASET_RENDER_OPTIONS: FieldRenderOptionsMap<LocalDataset> = {
 export function DatasetMetaView({ dataset }: Props): JSX.Element {
   const router = useRouter();
   const { csv, parseCSVString } = useCSVParser();
-  const [deleteLocalDataset, isDeletePending] = useDeleteLocalDataset();
+  const [deleteLocalDataset, isDeletePending] = LocalDatasetClient.useDelete({
+    queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
+  });
 
   useEffect(() => {
     parseCSVString(dataset.data);
@@ -70,19 +72,22 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                 loading: isDeletePending,
               },
               onConfirm: () => {
-                deleteLocalDataset(dataset.id, {
-                  onSuccess: () => {
-                    router.navigate({
-                      to: APP_CONFIG.links.dataManager.to,
-                    });
+                deleteLocalDataset(
+                  { id: dataset.id },
+                  {
+                    onSuccess: () => {
+                      router.navigate({
+                        to: APP_CONFIG.links.dataManager.to,
+                      });
 
-                    notifications.show({
-                      title: "Dataset deleted",
-                      message: `${dataset.name} deleted successfully`,
-                      color: "green",
-                    });
+                      notifications.show({
+                        title: "Dataset deleted",
+                        message: `${dataset.name} deleted successfully`,
+                        color: "green",
+                      });
+                    },
                   },
-                });
+                );
               },
             });
           }}

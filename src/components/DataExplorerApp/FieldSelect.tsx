@@ -3,14 +3,14 @@ import { ReactNode, useMemo } from "react";
 import { UUID } from "@/lib/types/common";
 import { isNotNullOrUndefined } from "@/lib/utils/guards";
 import { makeObjectFromEntries } from "@/lib/utils/objects";
-import { type DatasetField } from "@/models/DatasetField";
-import { LocalDataset } from "@/models/LocalDataset";
-import { useLocalDatasets } from "../DataManagerApp/queries";
+import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
+import { type LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
+import { LocalDataset } from "@/models/LocalDataset/types";
 
 type Props = {
   label: ReactNode;
   placeholder: string;
-  onChange: (fields: readonly DatasetField[]) => void;
+  onChange: (fields: readonly LocalDatasetField[]) => void;
 };
 
 export function FieldSelect({
@@ -18,14 +18,14 @@ export function FieldSelect({
   label,
   placeholder,
 }: Props): JSX.Element {
-  const [allDatasets, isLoadingDatasets] = useLocalDatasets();
-  const fieldsMap: Record<UUID, DatasetField> = useMemo(() => {
+  const [allDatasets, isLoadingDatasets] = LocalDatasetClient.useGetAll();
+  const fieldsMap: Record<UUID, LocalDatasetField> = useMemo(() => {
     return makeObjectFromEntries(
       (allDatasets ?? [])
         .flatMap((dataset: LocalDataset) => {
           return dataset.fields;
         })
-        .map((field: DatasetField) => {
+        .map((field: LocalDatasetField) => {
           return [field.id, field];
         }),
     );
@@ -35,7 +35,7 @@ export function FieldSelect({
     return (allDatasets ?? []).map((dataset: LocalDataset) => {
       return {
         group: dataset.name,
-        items: dataset.fields.map((field: DatasetField) => {
+        items: dataset.fields.map((field: LocalDatasetField) => {
           return {
             value: field.id as string,
             label: field.name,

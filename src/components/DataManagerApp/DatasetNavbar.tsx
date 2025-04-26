@@ -3,7 +3,8 @@ import { useMemo } from "react";
 import { APP_CONFIG } from "@/config/AppConfig";
 import { type NavLinkProps } from "@/lib/ui/links/NavLink";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
-import { getDatasetLinkProps, LocalDataset } from "@/models/LocalDataset";
+import { LocalDataset } from "@/models/LocalDataset/types";
+import { getDatasetLinkProps } from "@/models/LocalDataset/utils";
 
 type Props = {
   datasets: LocalDataset[];

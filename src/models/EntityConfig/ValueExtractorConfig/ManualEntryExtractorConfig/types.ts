@@ -1,7 +1,6 @@
 import { SetOptional, Simplify } from "type-fest";
 import type { EntityFieldConfigId } from "../../EntityFieldConfig/types";
 import type { UUID } from "@/lib/types/common";
-import type { DefineModelCRUDTypes } from "@/lib/utils/models/ModelCRUDTypes";
 import type { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
 
 export type ManualEntryExtractorConfigId = UUID<"ManualEntryExtractorConfig">;
@@ -23,18 +22,23 @@ type ManualEntryExtractorConfigRead = {
   updatedAt: string;
 };
 
-export type ManualEntryExtractorConfigCRUDTypes = DefineModelCRUDTypes<
-  SupabaseModelCRUDTypes<"value_extractor_config__manual_entry">,
+export type ManualEntryExtractorConfigCRUDTypes = SupabaseModelCRUDTypes<
   {
+    tableName: "value_extractor_config__manual_entry";
     modelName: "ManualEntryExtractorConfig";
-    modelPrimaryKey: "id";
-    dbTablePrimaryKey: "id";
+    modelPrimaryKeyType: ManualEntryExtractorConfigId;
+  },
+  {
     Read: ManualEntryExtractorConfigRead;
     Insert: SetOptional<
       Required<ManualEntryExtractorConfigRead>,
       "id" | "createdAt" | "updatedAt"
     >;
     Update: Partial<ManualEntryExtractorConfigRead>;
+  },
+  {
+    modelPrimaryKey: "id";
+    dbTablePrimaryKey: "id";
   }
 >;
 

@@ -1,9 +1,9 @@
 import Papa from "papaparse";
 import { useCallback, useState } from "react";
 import { CSVRow, MIMEType } from "@/lib/types/common";
-import { FileMetadata } from "@/models/LocalDataset";
+import { FileMetadata } from "@/models/LocalDataset/types";
 import { detectFieldDataTypes } from "./detectFieldDataTypes";
-import type { DatasetField } from "@/models/DatasetField";
+import type { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
 
 /**
  * Custom hook for handling CSV file parsing.
@@ -23,7 +23,7 @@ export function useCSVParser({
   onNoFileProvided?: () => void;
 } = {}): {
   csv: Papa.ParseResult<CSVRow> | undefined;
-  fields: readonly DatasetField[];
+  fields: readonly LocalDatasetField[];
   fileMetadata: FileMetadata | undefined;
   parseFile: (file: File | undefined) => void;
   parseCSVString: (csvString: string) => void;
@@ -34,7 +34,7 @@ export function useCSVParser({
   const [fileMetadata, setFileMetadata] = useState<FileMetadata | undefined>(
     undefined,
   );
-  const [fields, setFields] = useState<readonly DatasetField[]>([]);
+  const [fields, setFields] = useState<readonly LocalDatasetField[]>([]);
 
   const parseFileOrString = useCallback(
     (dataToParse: File | string) => {

@@ -1,55 +1,37 @@
 import { z } from "zod";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { makeParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
-import { uuidType } from "@/lib/utils/zodHelpers";
-import { LocalDatasetId } from "../LocalDataset/types";
-import { UserId } from "../User";
-import { EntityConfigCRUDTypes, EntityConfigId } from "./types";
+import { mimeType, uuidType } from "@/lib/utils/zodHelpers";
+import { LocalDatasetFieldSchema } from "./LocalDatasetField/parsers";
+import { LocalDatasetCRUDTypes, LocalDatasetId } from "./types";
 
-const DBReadSchema = z.object({
-  created_at: z.string().datetime({ offset: true }),
-  description: z.string().nullable(),
-  id: z.string(),
-  name: z.string(),
-  owner_id: z.string(),
-  updated_at: z.string().datetime({ offset: true }),
-  dataset_id: z.string().uuid().nullable(),
-  allow_manual_creation: z.boolean(),
+/**
+ * Zod schema for the local dataset type.
+ */
+export const DBReadSchema = z.object({
+  id: uuidType<LocalDatasetId>(),
+  name: z.string().min(1),
+  description: z.string(),
+  createdAt: z.string().datetime({ offset: true }),
+  updatedAt: z.string().datetime({ offset: true }),
+  sizeInBytes: z.number(),
+  mimeType,
+  data: z.string(),
+  delimiter: z.string(),
+  firstRowIsHeader: z.boolean(),
+  fields: z.array(LocalDatasetFieldSchema).readonly(),
 });
-
-const DBInsertSchema = DBReadSchema.required().partial({
-  created_at: true,
-  description: true,
-  id: true,
-  owner_id: true,
-  updated_at: true,
-  dataset_id: true,
-});
-
+const DBInsertSchema = DBReadSchema;
 const DBUpdateSchema = DBReadSchema.partial();
 
-const ModelReadSchema = z.object({
-  createdAt: DBReadSchema.shape.created_at,
-  description: DBReadSchema.shape.description,
-  id: uuidType<EntityConfigId>(),
-  name: DBReadSchema.shape.name,
-  ownerId: uuidType<UserId>(),
-  updatedAt: DBReadSchema.shape.updated_at,
-  datasetId: uuidType<LocalDatasetId>().nullable(),
-  allowManualCreation: DBReadSchema.shape.allow_manual_creation,
+const ModelReadSchema = DBReadSchema.extend({
+  createdAt: z.date(),
+  updatedAt: z.date(),
 });
-
-const ModelInsertSchema = ModelReadSchema.required().partial({
-  createdAt: true,
-  description: true,
-  id: true,
-  ownerId: true,
-  updatedAt: true,
-});
-
+const ModelInsertSchema = ModelReadSchema;
 const ModelUpdateSchema = ModelReadSchema.partial();
 
-export const EntityConfigParsers = makeParserRegistry<EntityConfigCRUDTypes>({
+export const LocalDatasetParsers = makeParserRegistry<LocalDatasetCRUDTypes>({
   DBReadSchema,
   DBInsertSchema,
   DBUpdateSchema,
@@ -62,7 +44,7 @@ export const EntityConfigParsers = makeParserRegistry<EntityConfigCRUDTypes>({
  * Do not remove these tests! These check that your Zod parsers are
  * consistent with your defined model and DB types.
  */
-type CRUDTypes = EntityConfigCRUDTypes;
+type CRUDTypes = LocalDatasetCRUDTypes;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

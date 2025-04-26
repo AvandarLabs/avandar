@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { JSONValue, UUID } from "../types/common";
+import { JSONValue, MIMEType, UUID } from "../types/common";
 
 /**
  * Returns a Zod type that represents a branded UUID. This expects
@@ -95,7 +95,7 @@ export function unimplementedType(): z.ZodTypeAny {
   });
 }
 
-const jsonLiteralSchema = z.union([
+const jsonLiteralType = z.union([
   z.string(),
   z.number(),
   z.boolean(),
@@ -107,13 +107,63 @@ const jsonLiteralSchema = z.union([
  *
  * @returns A Zod type that represents a JSON value.
  */
-export function jsonType(): z.ZodType<JSONValue> {
-  const jsonSchema: z.ZodType<JSONValue> = z.lazy(() => {
-    return z.union([
-      jsonLiteralSchema,
-      z.array(jsonSchema),
-      z.record(jsonSchema),
-    ]);
-  });
-  return jsonSchema;
-}
+export const jsonType: z.ZodType<JSONValue> = z.lazy(() => {
+  return z.union([jsonLiteralType, z.array(jsonType), z.record(jsonType)]);
+});
+
+/**
+ * Zod type for MIMEType.
+ */
+export const mimeType: z.ZodType<MIMEType> = z.union([
+  z.literal("text/plain"),
+  z.literal("text/html"),
+  z.literal("text/css"),
+  z.literal("text/javascript"),
+  z.literal("text/csv"),
+  z.literal("text/xml"),
+  z.literal("text/markdown"),
+  z.literal("application/json"),
+  z.literal("application/xml"),
+  z.literal("application/javascript"),
+  z.literal("application/ecmascript"),
+  z.literal("application/x-www-form-urlencoded"),
+  z.literal("application/pdf"),
+  z.literal("application/zip"),
+  z.literal("application/x-7z-compressed"),
+  z.literal("application/gzip"),
+  z.literal("application/vnd.rar"),
+  z.literal("application/msword"),
+  z.literal("application/vnd.ms-excel"),
+  z.literal("application/vnd.ms-powerpoint"),
+  z.literal(
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ),
+  z.literal(
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  ),
+  z.literal(
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  ),
+  z.literal("application/vnd.oasis.opendocument.text"),
+  z.literal("application/vnd.oasis.opendocument.spreadsheet"),
+  z.literal("application/vnd.oasis.opendocument.presentation"),
+  z.literal("image/jpeg"),
+  z.literal("image/png"),
+  z.literal("image/gif"),
+  z.literal("image/webp"),
+  z.literal("image/svg+xml"),
+  z.literal("image/bmp"),
+  z.literal("image/tiff"),
+  z.literal("audio/mpeg"),
+  z.literal("audio/ogg"),
+  z.literal("audio/wav"),
+  z.literal("audio/webm"),
+  z.literal("video/mp4"),
+  z.literal("video/webm"),
+  z.literal("video/ogg"),
+  z.literal("video/x-msvideo"),
+  z.literal("font/ttf"),
+  z.literal("font/otf"),
+  z.literal("font/woff"),
+  z.literal("font/woff2"),
+]);

@@ -1,59 +1,73 @@
 import { SupabaseDBClient } from "@/lib/clients/SupabaseDBClient";
 import { ModelCRUDParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
 import { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
-import { Tables } from "@/types/database.types";
 import { ILogger } from "../Logger";
-import { ModelCRUDTypes } from "../utils/models/ModelCRUDTypes";
-import { ModelCRUDClient, WithLogger, withLogger } from "./ModelCRUDClient";
+import { BaseClient } from "./BaseClient";
+import {
+  DEFAULT_MUTATION_FN_NAMES,
+  DEFAULT_QUERY_FN_NAMES,
+  DefaultMutationFnName,
+  DefaultQueryFnName,
+  ModelCRUDClient,
+} from "./ModelCRUDClient";
+import { WithLogger, withLogger } from "./withLogger";
 import {
   HookableFnName,
   WithQueryHooks,
   withQueryHooks,
 } from "./withQueryHooks";
-import type { DatabaseTableNames } from "@/lib/clients/SupabaseDBClient";
 
 export type SupabaseCRUDClient<
-  BaseClient extends ModelCRUDClient<ModelCRUDTypes>,
-  UseQueryFnName extends HookableFnName<BaseClient> = never,
-  UseMutationFnName extends HookableFnName<BaseClient> = never,
-> = WithLogger<WithQueryHooks<BaseClient, UseQueryFnName, UseMutationFnName>>;
+  Client extends ModelCRUDClient<SupabaseModelCRUDTypes>,
+> = WithLogger<
+  WithQueryHooks<
+    Client,
+    Extract<HookableFnName<Client>, DefaultQueryFnName>,
+    Extract<HookableFnName<Client>, DefaultMutationFnName>
+  >
+>;
 
-export function createSupabaseCRUDClient<
-  TableName extends DatabaseTableNames,
-  M extends SupabaseModelCRUDTypes<TableName>,
-  ModelIdFieldType extends M["Read"][M["modelPrimaryKey"]],
-  UseQueryFnName extends HookableFnName<ModelCRUDClient<M>> = never,
-  UseMutationFnName extends HookableFnName<ModelCRUDClient<M>> = never,
->(clientConfig: {
-  modelName: string;
-  tableName: TableName;
+/**
+ * Creates a client for a model that maps to a Supabase table.
+ *
+ * It also creates `use` hooks for the `DEFAULT_QUERY_FN_NAMES` and
+ * `DEFAULT_MUTATION_FN_NAMES`.
+ */
+export function createSupabaseCRUDClient<M extends SupabaseModelCRUDTypes>({
+  modelName,
+  tableName,
+  parsers,
+  dbTablePrimaryKey,
+}: {
+  modelName: M["modelName"];
+  tableName: M["tableName"];
 
   /**
    * A registry of parsers for converting between model variants and
    * database variants.
    */
   parsers: ModelCRUDParserRegistry<M>;
-  dbTablePrimaryKey: Extract<keyof Tables<TableName>, string>;
-  queryFns?: readonly UseQueryFnName[];
-  mutationFns?: readonly UseMutationFnName[];
-}): SupabaseCRUDClient<ModelCRUDClient<M>, UseQueryFnName, UseMutationFnName> {
-  const {
-    modelName,
-    tableName,
-    dbTablePrimaryKey,
-    parsers,
-    queryFns,
-    mutationFns,
-  } = clientConfig;
+  dbTablePrimaryKey: M["dbTablePrimaryKey"];
+}): SupabaseCRUDClient<ModelCRUDClient<M>> {
+  const baseClient: BaseClient = {
+    getClientName() {
+      return `${modelName}Client`;
+    },
+  };
 
-  const clientBuilder = (baseLogger: ILogger) => {
-    const baseClient: ModelCRUDClient<M> = {
-      getModelName: () => {
-        return modelName;
-      },
+  return withLogger(baseClient, (baseLogger: ILogger) => {
+    const modelClient: ModelCRUDClient<M> = {
+      ...baseClient,
 
+      /**
+       * Retrieves a model by its ID.
+       * @param params
+       * @param params.id - The ID of the model to retrieve
+       * @returns A promise that resolves to the model, or undefined if not
+       * found.
+       */
       getById: async (params: {
-        id: ModelIdFieldType;
+        id: M["modelPrimaryKeyType"];
       }): Promise<M["Read"] | undefined> => {
         const { data } = await SupabaseDBClient.from(tableName)
           .select("*")
@@ -70,6 +84,12 @@ export function createSupabaseCRUDClient<
         return model;
       },
 
+      /**
+       * Retrieves all models from the database.
+       *
+       * TODO(pablo): implement pagination
+       * @returns A promise that resolves to an array of models
+       */
       getAll: async (): Promise<Array<M["Read"]>> => {
         baseLogger.warn("TODO(pablo): Pagination must be implemented.");
         const logger = baseLogger.appendName("getAll");
@@ -88,6 +108,12 @@ export function createSupabaseCRUDClient<
         return models;
       },
 
+      /**
+       * Inserts a new model into the database.
+       * @param params
+       * @param params.data - The model to insert
+       * @returns The inserted model
+       */
       insert: async (params: { data: M["Insert"] }): Promise<M["Read"]> => {
         const logger = baseLogger.appendName("insert");
 
@@ -107,8 +133,15 @@ export function createSupabaseCRUDClient<
         return insertedModel;
       },
 
+      /**
+       * Updates an existing model in the database.
+       * @param params
+       * @param params.id - The ID of the model to update
+       * @param params.data - The data to update on the model
+       * @returns The updated model
+       */
       update: async (params: {
-        id: ModelIdFieldType;
+        id: M["modelPrimaryKeyType"];
         data: M["Update"];
       }): Promise<M["Read"]> => {
         const dataToUpdate = parsers.fromModelUpdateToDBUpdate.parse(
@@ -125,7 +158,15 @@ export function createSupabaseCRUDClient<
         return parsers.fromDBToModelRead.parse(updatedData);
       },
 
-      delete: async (params: { id: ModelIdFieldType }): Promise<void> => {
+      /**
+       * Deletes an existing model from the database.
+       * @param params
+       * @param params.id - The ID of the model to delete
+       * @returns A void promise.
+       */
+      delete: async (params: {
+        id: M["modelPrimaryKeyType"];
+      }): Promise<void> => {
         await SupabaseDBClient.from(tableName)
           .delete()
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -134,8 +175,9 @@ export function createSupabaseCRUDClient<
       },
     };
 
-    return withQueryHooks(baseClient, { queryFns, mutationFns });
-  };
-
-  return withLogger(modelName, clientBuilder);
+    return withQueryHooks(modelClient, {
+      queryFns: DEFAULT_QUERY_FN_NAMES,
+      mutationFns: DEFAULT_MUTATION_FN_NAMES,
+    });
+  });
 }

@@ -1,15 +1,15 @@
-import { Merge } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
 
 export type ModelCRUDTypes = {
   /** The name of the model */
   modelName: string;
 
-  /** The name of the primary key in the db table */
-  dbTablePrimaryKey: string;
-
-  /** The name of the primary key in the frontend model */
-  modelPrimaryKey: string;
+  /**
+   * The type of the primary key field in a frontend model.
+   * This refers to the actual _type_ of the primary key (e.g. a UUID),
+   * not the key name.
+   */
+  modelPrimaryKeyType: string | number;
 
   /** The type returned when doing a DB `get` (Read) operation */
   DBRead: UnknownObject;
@@ -29,16 +29,3 @@ export type ModelCRUDTypes = {
   /** The frontend model type expected when updating an existing model */
   Update: UnknownObject;
 };
-
-/**
- * Helper type to extend the base model CRUD types while enforcing
- * that the new types are valid subtypes of the extended CRUD type
- * dictionary.
- *
- * We use `Define...` as its naming convention so it will read more naturally
- * because this type should be used whenever defining a new frontend model.
- */
-export type DefineModelCRUDTypes<
-  BaseCRUDTypes extends ModelCRUDTypes,
-  NewTypes extends Partial<BaseCRUDTypes>,
-> = Merge<BaseCRUDTypes, NewTypes>;

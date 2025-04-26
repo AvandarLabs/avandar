@@ -1,4 +1,4 @@
-import { ObjectStringKey } from "@/lib/types/utilityTypes";
+import { StringPropertyKey } from "@/lib/types/utilityTypes";
 import {
   EntityObject,
   EntityRenderOptions,
@@ -7,7 +7,7 @@ import {
 
 export function getEntityFieldRenderOptions<T extends EntityObject>(
   renderOptions: EntityRenderOptions<T>,
-  fieldKey: ObjectStringKey<T>,
+  fieldKey: StringPropertyKey<T>,
 ): PrimitiveFieldValueRenderOptions {
   const primitiveValueRenderOptions: PrimitiveFieldValueRenderOptions = {
     emptyString: renderOptions.emptyString,

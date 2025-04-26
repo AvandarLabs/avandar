@@ -12,11 +12,11 @@ import {
   makeObjectFromList,
   objectEntries,
 } from "@/lib/utils/objects";
-import { getArrowDataType } from "@/models/DatasetField";
-import { LocalDatasetId } from "@/models/LocalDataset";
-import { LocalDatasetClient } from "./LocalDatasetClient";
-import type { DatasetField } from "@/models/DatasetField";
-import type { LocalDataset } from "@/models/LocalDataset";
+import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
+import { getArrowDataType } from "@/models/LocalDataset/LocalDatasetField/utils";
+import { LocalDatasetId } from "@/models/LocalDataset/types";
+import type { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
+import type { LocalDataset } from "@/models/LocalDataset/types";
 
 export type AggregationType = "sum" | "avg" | "count" | "max" | "min" | "none";
 export type LocalQueryConfig = {
@@ -86,7 +86,7 @@ class LocalQueryClientImpl {
   }
 
   async #getDataset(datasetId: LocalDatasetId): Promise<LocalDataset> {
-    const dataset = await LocalDatasetClient.getDataset(datasetId);
+    const dataset = await LocalDatasetClient.getById({ id: datasetId });
     if (!dataset) {
       throw new Error(`Dataset ${datasetId} not found`);
     }
@@ -127,7 +127,7 @@ class LocalQueryClientImpl {
       await db.registerFileText(tableName, data);
 
       // insert the dataset as its own table
-      const arrowColumns = fields.map((fieldSchema: DatasetField) => {
+      const arrowColumns = fields.map((fieldSchema: LocalDatasetField) => {
         return {
           name: fieldSchema.name,
           dataType: getArrowDataType(fieldSchema.dataType),

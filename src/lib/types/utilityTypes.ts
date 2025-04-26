@@ -1,20 +1,26 @@
+import { ConditionalKeys } from "type-fest";
+
 /**
  * Extract the keys of an object, but exclude the `symbol` and `number` types
  * that `keyof` on its own would return.
  */
-export type ObjectStringKey<T> = Exclude<keyof T, symbol | number>;
+export type StringPropertyKey<T> = Exclude<keyof T, symbol | number>;
 
 /**
  * Get all the keys of an object that map to a given type.
+ * @deprecated Just use type-fest's `ConditionalKeys` directly instead.
  */
-export type KeysThatMapTo<T, Obj extends object> = {
-  [K in keyof Obj]: Obj[K] extends T ? K : never;
-}[keyof Obj];
+export type KeysThatMapTo<T, Obj extends object> = ConditionalKeys<Obj, T>;
 
 /**
- * A type that can be used to create a branded string.
+ * A type that can be used to create a branded type.
  */
 export type Brand<T, B extends string> = T & { __brand: B };
+
+/**
+ * A type to remove the brand from a branded type.
+ */
+export type Unbrand<T> = T extends Brand<infer U, string> ? U : T;
 
 /**
  * Recursively removes all `TypeToExclude` types from a type.

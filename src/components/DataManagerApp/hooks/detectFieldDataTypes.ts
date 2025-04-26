@@ -1,6 +1,9 @@
 import { CSVCellValue, CSVData } from "@/lib/types/common";
 import { uuid } from "@/lib/utils/uuid";
-import type { DatasetField, FieldDataType } from "@/models/DatasetField";
+import type {
+  FieldDataType,
+  LocalDatasetField,
+} from "@/models/LocalDataset/LocalDatasetField/types";
 
 const THRESHOLD = 0.9; // 80% of values should match the type
 
@@ -84,7 +87,7 @@ function detectFieldDataType(
 export function detectFieldDataTypes(
   fieldNames: readonly string[],
   data: CSVData,
-): readonly DatasetField[] {
+): readonly LocalDatasetField[] {
   // Convert the CSV to a columnar format
   const columns = fieldNames.reduce(
     (obj, fieldName) => {

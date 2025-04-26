@@ -1,4 +1,7 @@
-import { Merge } from "type-fest";
+import { ConditionalKeys, Merge } from "type-fest";
+import { DatabaseTableNames } from "@/lib/clients/SupabaseDBClient";
+import { UnknownObject } from "@/lib/types/common";
+import { Unbrand } from "@/lib/types/utilityTypes";
 import { ModelCRUDTypes } from "@/lib/utils/models/ModelCRUDTypes";
 import {
   Database,
@@ -7,25 +10,74 @@ import {
   TablesUpdate,
 } from "@/types/database.types";
 
+/**
+ * A wrapper type to create the Supabase CRUD types for a model.
+ */
 export type SupabaseModelCRUDTypes<
-  TableName extends keyof Database["public"]["Tables"],
+  CoreTypes extends {
+    tableName: keyof Database["public"]["Tables"];
+    modelName: string;
+    modelPrimaryKeyType: string | number;
+  } = {
+    tableName: DatabaseTableNames;
+    modelName: string;
+    modelPrimaryKeyType: string | number;
+  },
+  ModelTypes extends {
+    Read: UnknownObject;
+    Insert: UnknownObject;
+    Update: UnknownObject;
+  } = {
+    Read: UnknownObject;
+    Insert: UnknownObject;
+    Update: UnknownObject;
+  },
+  PrimaryKeys extends {
+    dbTablePrimaryKey: Extract<
+      ConditionalKeys<
+        Tables<CoreTypes["tableName"]>,
+        Unbrand<CoreTypes["modelPrimaryKeyType"]>
+      >,
+      string
+    >;
+  } = {
+    dbTablePrimaryKey: Extract<
+      ConditionalKeys<
+        Tables<CoreTypes["tableName"]>,
+        Unbrand<CoreTypes["modelPrimaryKeyType"]>
+      >,
+      string
+    >;
+  },
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  ExtraTypes extends object = {},
 > = Merge<
   ModelCRUDTypes,
   {
     /** The name of the table in Supabase */
-    tableName: TableName;
+    tableName: CoreTypes["tableName"];
 
-    /** The name of the primary key column in the Supabase table */
-    dbTablePrimaryKey: Extract<keyof Tables<TableName>, string>;
+    /** The name of the model */
+    modelName: CoreTypes["modelName"];
 
     /**
-     * The name of the primary key field in a frontend model.
-     * It must be the same type or subtype of the `dbTablePrimaryKey`
+     * The type of the primary key field in a frontend model.
+     * This refers to the actual _type_ of the primary key (e.g. a UUID),
+     * not the key name.
      */
-    modelPrimaryKey: Extract<keyof Tables<TableName>, string>;
+    modelPrimaryKeyType: CoreTypes["modelPrimaryKeyType"];
 
-    DBRead: Tables<TableName>;
-    DBInsert: TablesInsert<TableName>;
-    DBUpdate: TablesUpdate<TableName>;
-  }
+    /**
+     * The name of the primary key column in the Supabase table.
+     * This refers to the actual string literal key name.
+     */
+    dbTablePrimaryKey: PrimaryKeys["dbTablePrimaryKey"];
+
+    DBRead: Tables<CoreTypes["tableName"]>;
+    DBInsert: TablesInsert<CoreTypes["tableName"]>;
+    DBUpdate: TablesUpdate<CoreTypes["tableName"]>;
+    Read: ModelTypes["Read"];
+    Insert: ModelTypes["Insert"];
+    Update: ModelTypes["Update"];
+  } & ExtraTypes
 >;

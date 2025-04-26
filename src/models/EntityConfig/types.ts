@@ -1,8 +1,7 @@
 import { SetOptional, Simplify } from "type-fest";
-import { DefineModelCRUDTypes } from "@/lib/utils/models/ModelCRUDTypes";
 import { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
 import { UserId } from "@/models/User";
-import { LocalDatasetId } from "../LocalDataset";
+import { LocalDatasetId } from "../LocalDataset/types";
 import type { UUID } from "@/lib/types/common";
 
 export type EntityConfigId = UUID<"EntityConfig">;
@@ -39,18 +38,23 @@ type EntityConfigRead = {
 /**
  * CRUD type definitions for the EntityConfig model.
  */
-export type EntityConfigCRUDTypes = DefineModelCRUDTypes<
-  SupabaseModelCRUDTypes<"entity_configs">,
+export type EntityConfigCRUDTypes = SupabaseModelCRUDTypes<
   {
+    tableName: "entity_configs";
     modelName: "EntityConfig";
-    dbTablePrimaryKey: "id";
-    modelPrimaryKey: "id";
+    modelPrimaryKeyType: EntityConfigId;
+  },
+  {
     Read: EntityConfigRead;
     Insert: SetOptional<
       Required<EntityConfigRead>,
       "id" | "ownerId" | "description" | "createdAt" | "updatedAt"
     >;
     Update: Partial<EntityConfigRead>;
+  },
+  {
+    dbTablePrimaryKey: "id";
+    modelPrimaryKey: "id";
   }
 >;
 

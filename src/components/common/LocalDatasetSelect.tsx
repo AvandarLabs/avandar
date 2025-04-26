@@ -2,8 +2,8 @@ import { useUncontrolled } from "@mantine/hooks";
 import { Select, SelectProps } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { getProp } from "@/lib/utils/objects";
-import { LocalDatasetId } from "@/models/LocalDataset";
-import { useLocalDatasets } from "../DataManagerApp/queries";
+import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
+import { LocalDatasetId } from "@/models/LocalDataset/types";
 
 type Props = SelectProps<LocalDatasetId>;
 
@@ -26,7 +26,7 @@ export function LocalDatasetSelect({
     onChange,
   });
 
-  const [datasets] = useLocalDatasets();
+  const [datasets] = LocalDatasetClient.useGetAll();
   const datasetOptions = makeSelectOptions({
     list: datasets ?? [],
     valueFn: getProp("id"),

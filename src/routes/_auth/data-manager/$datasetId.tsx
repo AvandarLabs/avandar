@@ -5,17 +5,17 @@ import {
   notFound,
 } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { LocalDatasetClient } from "@/clients/LocalDatasetClient";
 import { DatasetMetaView } from "@/components/DataManagerApp/DatasetMetaView";
 import { Logger } from "@/lib/Logger";
 import { Callout } from "@/lib/ui/Callout";
 import { uuid } from "@/lib/utils/uuid";
-import { type LocalDataset } from "@/models/LocalDataset";
+import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
+import { type LocalDataset } from "@/models/LocalDataset/types";
 
 export const Route = createFileRoute("/_auth/data-manager/$datasetId")({
   component: RouteComponent,
   loader: async ({ params: { datasetId } }): Promise<LocalDataset> => {
-    const dataset = await LocalDatasetClient.getDataset(uuid(datasetId));
+    const dataset = await LocalDatasetClient.getById({ id: uuid(datasetId) });
     if (!dataset) {
       throw notFound();
     }
