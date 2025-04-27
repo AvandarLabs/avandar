@@ -82,19 +82,6 @@ export type EntityFieldConfigCRUDTypes = SupabaseModelCRUDTypes<
   {
     dbTablePrimaryKey: "id";
     modelPrimaryKey: "id";
-  },
-  {
-    /**
-     * A draft version of the type, to use while the user is still creating
-     * a new EntityFieldConfig in a form.
-     *
-     * There is no `entityConfigId` because the user may not have created
-     * the EntityConfig yet. A `draftId` must be provided in the frontend
-     * so this can be used as a React key.
-     */
-    Draft: {
-      draftId: DraftFieldId;
-    } & Omit<EntityFieldConfigCRUDTypes["Insert"], "id" | "entityConfigId">;
   }
 >;
 

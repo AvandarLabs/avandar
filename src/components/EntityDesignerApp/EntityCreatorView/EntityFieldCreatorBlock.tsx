@@ -1,8 +1,10 @@
 import { Button, Fieldset, Stack, Text } from "@mantine/core";
 import { FormSetters, FormType } from "@/lib/hooks/ui/useForm";
-import { makeDefaultEntityFieldDraft } from "@/models/EntityConfig/EntityFieldConfig/utils";
+import {
+  EntityConfigForm,
+  makeDefaultEntityFieldDraft,
+} from "./entityCreatorTypes";
 import { EntityFieldCreator } from "./EntityFieldCreator";
-import { EntityConfigForm } from "./types";
 
 type Props = {
   entityConfigForm: FormType<EntityConfigForm>;

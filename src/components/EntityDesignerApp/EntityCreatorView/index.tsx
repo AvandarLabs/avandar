@@ -3,10 +3,12 @@ import { formRootRule, isNotEmpty } from "@mantine/form";
 import { LocalDatasetSelect } from "@/components/common/LocalDatasetSelect";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
-import { makeDefaultEntityFieldDraft } from "@/models/EntityConfig/EntityFieldConfig/utils";
 import { EntityConfig } from "@/models/EntityConfig/types";
+import {
+  EntityConfigForm,
+  makeDefaultEntityFieldDraft,
+} from "./entityCreatorTypes";
 import { EntityFieldCreatorBlock } from "./EntityFieldCreatorBlock";
-import { EntityConfigForm } from "./types";
 
 const initialFields = [
   makeDefaultEntityFieldDraft({

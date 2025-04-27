@@ -1,5 +1,5 @@
 import { SetOptional, Simplify } from "type-fest";
-import type { EntityFieldConfigId } from "../../EntityFieldConfig/types";
+import { EntityFieldConfigId } from "../../EntityFieldConfig/types";
 import type { JSONValue, UUID } from "@/lib/types/common";
 import type { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
 import type { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";

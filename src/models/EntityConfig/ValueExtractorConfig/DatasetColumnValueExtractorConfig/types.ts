@@ -1,4 +1,5 @@
 import { SetOptional, Simplify } from "type-fest";
+import { LocalDatasetId } from "@/models/LocalDataset/types";
 import type { EntityFieldConfigId } from "../../EntityFieldConfig/types";
 import type { UUID } from "@/lib/types/common";
 import type { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
@@ -20,7 +21,7 @@ type DatasetColumnValueExtractorConfigRead = {
   valuePickerRuleType: ValuePickerRuleType;
 
   /** ID of the dataset to extract from */
-  datasetId: UUID<"Dataset">;
+  datasetId: LocalDatasetId;
 
   /** ID of the specific field in the dataset to extract from */
   datasetFieldId: LocalDatasetFieldId;

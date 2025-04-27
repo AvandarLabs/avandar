@@ -4,17 +4,16 @@ import { Select, SelectProps } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { getProp } from "@/lib/utils/objects";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
+import { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
 import { LocalDatasetId } from "@/models/LocalDataset/types";
 
-type Props = SelectProps<LocalDatasetId>;
+type Props = {
+  datasetId: LocalDatasetId | undefined;
+} & SelectProps<LocalDatasetFieldId>;
 
-/**
- * A select component for selecting a local dataset.
- *
- * This supports controlled and uncontrolled behavior and can be used
- * with `useForm`.
- */
-export function LocalDatasetSelect({
+export function LocalDatasetFieldSelect({
+  datasetId,
+
   defaultValue,
   value,
   onChange,
@@ -27,22 +26,27 @@ export function LocalDatasetSelect({
     onChange,
   });
 
-  const [datasets] = LocalDatasetClient.useGetAll();
-  const datasetOptions = useMemo(() => {
+  const [dataset, isLoading] = LocalDatasetClient.useGetById({
+    id: datasetId,
+    useQueryOptions: { enabled: !!datasetId },
+  });
+
+  const fieldOptions = useMemo(() => {
     return makeSelectOptions({
-      list: datasets ?? [],
+      list: dataset?.fields ?? [],
       valueFn: getProp("id"),
       labelFn: getProp("name"),
     });
-  }, [datasets]);
+  }, [dataset]);
 
   return (
     <Select
-      data={datasetOptions}
-      label="Dataset"
+      data={fieldOptions}
+      label="Field"
       value={controlledValue}
+      placeholder={isLoading ? "Loading fields..." : ""}
       onChange={(val) => {
-        return innerOnChange(val as LocalDatasetId);
+        return innerOnChange(val as LocalDatasetFieldId);
       }}
       {...selectProps}
     />

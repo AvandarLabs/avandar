@@ -11,12 +11,15 @@ export type ModelCRUDClient<M extends ModelCRUDTypes> = {
   /**
    * Retrieves a single model instance by its ID.
    * @param params - The parameters for the operation
-   * @param params.id - The unique identifier of the model to retrieve
+   * @param params.id - The unique identifier of the model to retrieve.
+   * If the `id` is undefined, the function will return undefined.
+   * This is helpful to support `useQuery` hooks that may not have an id
+   * yet on the first render.
    * @returns A promise resolving to the model instance or undefined
    * if not found
    */
   getById(params: {
-    id: M["modelPrimaryKeyType"];
+    id: M["modelPrimaryKeyType"] | undefined;
   }): Promise<M["Read"] | undefined>;
 
   /**

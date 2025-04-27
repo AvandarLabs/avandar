@@ -15,7 +15,7 @@ import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { DangerText } from "@/lib/ui/Text/DangerText";
 import { getProp, objectValues, sortBy } from "@/lib/utils/objects";
 import { EntityFieldValueExtractorTypes } from "@/models/EntityConfig/EntityFieldConfig/constants";
-import { EntityConfigForm } from "../types";
+import { EntityConfigForm } from "../entityCreatorTypes";
 import { DatasetColumnValueExtractorEditor } from "./DatasetColumnValueExtractorEditor";
 
 type Props = {
@@ -109,7 +109,12 @@ export function EntityFieldCreator({
           return <div>Manual entry</div>;
         })
         .with("dataset_column_value", () => {
-          return <DatasetColumnValueExtractorEditor />;
+          return (
+            <DatasetColumnValueExtractorEditor
+              entityConfigForm={entityConfigForm}
+              fieldIdx={idx}
+            />
+          );
         })
         .with("aggregation", () => {
           return <div>Aggregation</div>;

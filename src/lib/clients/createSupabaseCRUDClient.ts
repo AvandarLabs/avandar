@@ -67,8 +67,12 @@ export function createSupabaseCRUDClient<M extends SupabaseModelCRUDTypes>({
        * found.
        */
       getById: async (params: {
-        id: M["modelPrimaryKeyType"];
+        id: M["modelPrimaryKeyType"] | undefined;
       }): Promise<M["Read"] | undefined> => {
+        if (params.id === undefined) {
+          return undefined;
+        }
+
         const { data } = await SupabaseDBClient.from(tableName)
           .select("*")
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

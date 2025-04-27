@@ -84,16 +84,13 @@ export function createDexieCRUDClient<
     const modelClient: ModelCRUDClient<M> = {
       ...baseClient,
 
-      /**
-       * Retrieve a model by its ID.
-       * @param params
-       * @param params.id - The ID of the model to retrieve
-       * @returns A promise that resolves to the model, or undefined if not
-       * found
-       */
       getById: async (params: {
-        id: M["modelPrimaryKeyType"];
+        id: M["modelPrimaryKeyType"] | undefined;
       }): Promise<M["Read"] | undefined> => {
+        if (params.id === undefined) {
+          return undefined;
+        }
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const data = await dbTable.get(params.id as any);
 
@@ -105,11 +102,7 @@ export function createDexieCRUDClient<
         return model;
       },
 
-      /**
-       * Retrieves all models from the database.
-       * TODO(pablo): implement pagination
-       * @returns A promise that resolves to an array of models
-       */
+      // TODO(pablo): implement pagination
       getAll: async (): Promise<Array<M["Read"]>> => {
         const logger = baseLogger.appendName("getAll");
 
@@ -124,12 +117,6 @@ export function createDexieCRUDClient<
         });
       },
 
-      /**
-       * Inserts a new model into the database.
-       * @param params
-       * @param params.data - The model to insert
-       * @returns The inserted model
-       */
       insert: async (params: { data: M["Insert"] }): Promise<M["Read"]> => {
         const logger = baseLogger.appendName("insert");
 
@@ -152,13 +139,6 @@ export function createDexieCRUDClient<
         return insertedModel;
       },
 
-      /**
-       * Updates an existing model in the database.
-       * @param params
-       * @param params.id - The ID of the model to update
-       * @param params.data - The data to update on the model
-       * @returns The updated model
-       */
       update: async (_params: {
         id: M["modelPrimaryKeyType"];
       }): Promise<M["Read"]> => {
@@ -166,12 +146,6 @@ export function createDexieCRUDClient<
         throw new Error("Need to implement `update` for Dexie clients");
       },
 
-      /**
-       * Deletes an existing model from the database.
-       * @param params
-       * @param params.id - The ID of the model to delete
-       * @returns A void promise.
-       */
       delete: async (params: {
         id: M["modelPrimaryKeyType"];
       }): Promise<void> => {
