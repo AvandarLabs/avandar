@@ -179,8 +179,9 @@ export function withQueryHooks<
           const { useQueryOptions, ...clientFnParamsObj } =
             isPlainObject(options) ? options : { useQueryOptions: undefined };
           const clientFnParam = (
-            isSingleArgObject(clientFnParamsObj) ?
-              clientFnParamsObj.arg
+            isSingleArgObject(clientFnParamsObj) ? clientFnParamsObj.arg
+              // treat an empty object as undefined
+            : objectKeys(clientFnParamsObj).length === 0 ? undefined
             : clientFnParamsObj) as ClientFnFirstParameter<
             Client,
             UseQueryFnName

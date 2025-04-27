@@ -19,10 +19,9 @@ const { maxDatasetNameLength, maxDatasetDescriptionLength } =
   APP_CONFIG.dataManagerApp;
 
 export function DataImportView(): JSX.Element {
-  const [saveDataset, isSavePending] =
-    LocalDatasetClient.withLogger().useInsert({
-      queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
-    });
+  const [saveDataset, isSavePending] = LocalDatasetClient.useInsert({
+    queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
+  });
 
   const { csv, fields, fileMetadata, parseFile } = useCSVParser({
     onNoFileProvided: () => {
