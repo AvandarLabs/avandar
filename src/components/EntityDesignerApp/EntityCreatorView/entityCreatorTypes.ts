@@ -5,9 +5,9 @@ import {
   EntityFieldConfig,
 } from "@/models/EntityConfig/EntityFieldConfig/types";
 import { EntityConfig } from "@/models/EntityConfig/types";
-import { AggregationExtractorConfig } from "@/models/EntityConfig/ValueExtractorConfig/AggregationExtractorConfig/types";
-import { DatasetColumnValueExtractorConfig } from "@/models/EntityConfig/ValueExtractorConfig/DatasetColumnValueExtractorConfig/types";
-import { ManualEntryExtractorConfig } from "@/models/EntityConfig/ValueExtractorConfig/ManualEntryExtractorConfig/types";
+import { AggregationExtractor } from "@/models/EntityConfig/ValueExtractor/AggregationExtractor/types";
+import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/types";
+import { ManualEntryExtractor } from "@/models/EntityConfig/ValueExtractor/ManualEntryExtractor/types";
 
 /**
  * A draft version of the type, to use while the user is still creating
@@ -20,15 +20,15 @@ import { ManualEntryExtractorConfig } from "@/models/EntityConfig/ValueExtractor
 export type EntityFieldConfigDraft = {
   draftId: DraftFieldId;
   aggregationConfig: SetOptional<
-    AggregationExtractorConfig<"Insert">,
+    AggregationExtractor<"Insert">,
     "entityFieldConfigId" | "datasetId" | "datasetFieldId"
   >;
   manualEntryConfig: SetOptional<
-    ManualEntryExtractorConfig<"Insert">,
+    ManualEntryExtractor<"Insert">,
     "entityFieldConfigId"
   >;
   datasetColumnValueConfig: SetOptional<
-    DatasetColumnValueExtractorConfig<"Insert">,
+    DatasetColumnValueExtractor<"Insert">,
     "entityFieldConfigId" | "datasetId" | "datasetFieldId"
   >;
 } & Omit<EntityFieldConfig<"Insert">, "id" | "entityConfigId">;

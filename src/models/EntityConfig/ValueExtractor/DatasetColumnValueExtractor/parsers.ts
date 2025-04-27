@@ -1,13 +1,13 @@
 import { z } from "zod";
-import { UUID } from "@/lib/types/common";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { makeParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
 import { uuidType } from "@/lib/utils/zodHelpers";
 import { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
+import { LocalDatasetId } from "@/models/LocalDataset/types";
 import { EntityFieldConfigId } from "../../EntityFieldConfig/types";
 import {
-  DatasetColumnValueExtractorConfigCRUDTypes,
-  DatasetColumnValueExtractorConfigId,
+  DatasetColumnValueExtractorCRUDTypes,
+  DatasetColumnValueExtractorId,
 } from "./types";
 
 const DBReadSchema = z.object({
@@ -29,10 +29,10 @@ const DBInsertSchema = DBReadSchema.required().partial({
 const DBUpdateSchema = DBReadSchema.partial();
 
 const ModelReadSchema = z.object({
-  id: uuidType<DatasetColumnValueExtractorConfigId>(),
+  id: uuidType<DatasetColumnValueExtractorId>(),
   entityFieldConfigId: uuidType<EntityFieldConfigId>(),
   valuePickerRuleType: DBReadSchema.shape.value_picker_rule_type,
-  datasetId: uuidType<UUID<"Dataset">>(),
+  datasetId: uuidType<LocalDatasetId>(),
   datasetFieldId: uuidType<LocalDatasetFieldId>(),
   createdAt: DBReadSchema.shape.created_at,
   updatedAt: DBReadSchema.shape.updated_at,
@@ -46,9 +46,9 @@ const ModelInsertSchema = ModelReadSchema.required().partial({
 
 const ModelUpdateSchema = ModelReadSchema.partial();
 
-export const DatasetColumnValueExtractorConfigParsers =
-  makeParserRegistry<DatasetColumnValueExtractorConfigCRUDTypes>({
-    modelName: "DatasetColumnValueExtractorConfig",
+export const DatasetColumnValueExtractorParsers =
+  makeParserRegistry<DatasetColumnValueExtractorCRUDTypes>({
+    modelName: "DatasetColumnValueExtractor",
     DBReadSchema,
     DBInsertSchema,
     DBUpdateSchema,
@@ -61,7 +61,7 @@ export const DatasetColumnValueExtractorConfigParsers =
  * Do not remove these tests! These check that your Zod parsers are
  * consistent with your defined model and DB types.
  */
-type CRUDTypes = DatasetColumnValueExtractorConfigCRUDTypes;
+type CRUDTypes = DatasetColumnValueExtractorCRUDTypes;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

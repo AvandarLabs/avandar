@@ -5,14 +5,13 @@ import type { UUID } from "@/lib/types/common";
 import type { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
 import type { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
 
-export type DatasetColumnValueExtractorConfigId =
-  UUID<"DatasetColumnValueExtractorConfig">;
+export type DatasetColumnValueExtractorId = UUID<"DatasetColumnValueExtractor">;
 
 export type ValuePickerRuleType = "most_frequent" | "first";
 
-type DatasetColumnValueExtractorConfigRead = {
+type DatasetColumnValueExtractorRead = {
   /** Unique identifier for this extractor config */
-  id: DatasetColumnValueExtractorConfigId;
+  id: DatasetColumnValueExtractorId;
 
   /** ID of the associated entity field config */
   entityFieldConfigId: EntityFieldConfigId;
@@ -34,21 +33,21 @@ type DatasetColumnValueExtractorConfigRead = {
 };
 
 /**
- * CRUD type definitions for the DatasetColumnValueExtractorConfig model.
+ * CRUD type definitions for the DatasetColumnValueExtractor model.
  */
-export type DatasetColumnValueExtractorConfigCRUDTypes = SupabaseModelCRUDTypes<
+export type DatasetColumnValueExtractorCRUDTypes = SupabaseModelCRUDTypes<
   {
-    tableName: "value_extractor_config__dataset_column_value";
-    modelName: "DatasetColumnValueExtractorConfig";
-    modelPrimaryKeyType: DatasetColumnValueExtractorConfigId;
+    tableName: "value_extractor__dataset_column_value";
+    modelName: "DatasetColumnValueExtractor";
+    modelPrimaryKeyType: DatasetColumnValueExtractorId;
   },
   {
-    Read: DatasetColumnValueExtractorConfigRead;
+    Read: DatasetColumnValueExtractorRead;
     Insert: SetOptional<
-      Required<DatasetColumnValueExtractorConfigRead>,
+      Required<DatasetColumnValueExtractorRead>,
       "id" | "createdAt" | "updatedAt"
     >;
-    Update: Partial<DatasetColumnValueExtractorConfigRead>;
+    Update: Partial<DatasetColumnValueExtractorRead>;
   },
   {
     modelPrimaryKey: "id";
@@ -56,6 +55,6 @@ export type DatasetColumnValueExtractorConfigCRUDTypes = SupabaseModelCRUDTypes<
   }
 >;
 
-export type DatasetColumnValueExtractorConfig<
-  K extends keyof DatasetColumnValueExtractorConfigCRUDTypes = "Read",
-> = Simplify<DatasetColumnValueExtractorConfigCRUDTypes[K]>;
+export type DatasetColumnValueExtractor<
+  K extends keyof DatasetColumnValueExtractorCRUDTypes = "Read",
+> = Simplify<DatasetColumnValueExtractorCRUDTypes[K]>;

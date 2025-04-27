@@ -4,15 +4,15 @@ import type { JSONValue, UUID } from "@/lib/types/common";
 import type { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
 import type { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
 
-export type AggregationExtractorConfigId = UUID<"AggregationExtractorConfig">;
+export type AggregationExtractorId = UUID<"AggregationExtractor">;
 export type AggregationType = "sum" | "max" | "count";
 
 /**
  * CRUD type definition for the aggregation extractor config model
  */
-type AggregationExtractorConfigRead = {
+type AggregationExtractorRead = {
   /** Unique identifier for this extractor config */
-  id: AggregationExtractorConfigId;
+  id: AggregationExtractorId;
 
   /** ID of the associated entity field config */
   entityFieldConfigId: EntityFieldConfigId;
@@ -36,19 +36,19 @@ type AggregationExtractorConfigRead = {
   updatedAt: string;
 };
 
-export type AggregationExtractorConfigCRUDTypes = SupabaseModelCRUDTypes<
+export type AggregationExtractorCRUDTypes = SupabaseModelCRUDTypes<
   {
-    tableName: "value_extractor_config__aggregation";
-    modelName: "AggregationExtractorConfig";
-    modelPrimaryKeyType: AggregationExtractorConfigId;
+    tableName: "value_extractor__aggregation";
+    modelName: "AggregationExtractor";
+    modelPrimaryKeyType: AggregationExtractorId;
   },
   {
-    Read: AggregationExtractorConfigRead;
+    Read: AggregationExtractorRead;
     Insert: SetOptional<
-      Required<AggregationExtractorConfigRead>,
+      Required<AggregationExtractorRead>,
       "id" | "createdAt" | "updatedAt" | "filter"
     >;
-    Update: Partial<AggregationExtractorConfigRead>;
+    Update: Partial<AggregationExtractorRead>;
   },
   {
     dbTablePrimaryKey: "id";
@@ -56,6 +56,6 @@ export type AggregationExtractorConfigCRUDTypes = SupabaseModelCRUDTypes<
   }
 >;
 
-export type AggregationExtractorConfig<
-  K extends keyof AggregationExtractorConfigCRUDTypes = "Read",
-> = Simplify<AggregationExtractorConfigCRUDTypes[K]>;
+export type AggregationExtractor<
+  K extends keyof AggregationExtractorCRUDTypes = "Read",
+> = Simplify<AggregationExtractorCRUDTypes[K]>;

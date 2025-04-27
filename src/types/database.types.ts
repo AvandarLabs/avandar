@@ -123,9 +123,9 @@ export type Database = {
           },
         ]
       }
-      value_extractor_config__aggregation: {
+      value_extractor__aggregation: {
         Row: {
-          aggregation_type: Database["public"]["Enums"]["value_extractor_config__aggregation_type"]
+          aggregation_type: Database["public"]["Enums"]["value_extractor__aggregation_type"]
           created_at: string
           dataset_field_id: string
           dataset_id: string
@@ -135,7 +135,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          aggregation_type: Database["public"]["Enums"]["value_extractor_config__aggregation_type"]
+          aggregation_type: Database["public"]["Enums"]["value_extractor__aggregation_type"]
           created_at?: string
           dataset_field_id: string
           dataset_id: string
@@ -145,7 +145,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          aggregation_type?: Database["public"]["Enums"]["value_extractor_config__aggregation_type"]
+          aggregation_type?: Database["public"]["Enums"]["value_extractor__aggregation_type"]
           created_at?: string
           dataset_field_id?: string
           dataset_id?: string
@@ -156,7 +156,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "value_extractor_config__aggregation_entity_field_config_id_fkey"
+            foreignKeyName: "value_extractor__aggregation_entity_field_config_id_fkey"
             columns: ["entity_field_config_id"]
             isOneToOne: false
             referencedRelation: "entity_field_configs"
@@ -164,7 +164,7 @@ export type Database = {
           },
         ]
       }
-      value_extractor_config__dataset_column_value: {
+      value_extractor__dataset_column_value: {
         Row: {
           created_at: string
           dataset_field_id: string
@@ -172,7 +172,7 @@ export type Database = {
           entity_field_config_id: string
           id: string
           updated_at: string
-          value_picker_rule_type: Database["public"]["Enums"]["value_extractor_config__value_picker_rule_type"]
+          value_picker_rule_type: Database["public"]["Enums"]["value_extractor__value_picker_rule_type"]
         }
         Insert: {
           created_at?: string
@@ -181,7 +181,7 @@ export type Database = {
           entity_field_config_id: string
           id?: string
           updated_at?: string
-          value_picker_rule_type: Database["public"]["Enums"]["value_extractor_config__value_picker_rule_type"]
+          value_picker_rule_type: Database["public"]["Enums"]["value_extractor__value_picker_rule_type"]
         }
         Update: {
           created_at?: string
@@ -190,11 +190,11 @@ export type Database = {
           entity_field_config_id?: string
           id?: string
           updated_at?: string
-          value_picker_rule_type?: Database["public"]["Enums"]["value_extractor_config__value_picker_rule_type"]
+          value_picker_rule_type?: Database["public"]["Enums"]["value_extractor__value_picker_rule_type"]
         }
         Relationships: [
           {
-            foreignKeyName: "value_extractor_config__dataset_col_entity_field_config_id_fkey"
+            foreignKeyName: "value_extractor__dataset_column_val_entity_field_config_id_fkey"
             columns: ["entity_field_config_id"]
             isOneToOne: false
             referencedRelation: "entity_field_configs"
@@ -202,7 +202,7 @@ export type Database = {
           },
         ]
       }
-      value_extractor_config__manual_entry: {
+      value_extractor__manual_entry: {
         Row: {
           created_at: string
           entity_field_config_id: string
@@ -223,7 +223,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "value_extractor_config__manual_entr_entity_field_config_id_fkey"
+            foreignKeyName: "value_extractor__manual_entry_entity_field_config_id_fkey"
             columns: ["entity_field_config_id"]
             isOneToOne: false
             referencedRelation: "entity_field_configs"
@@ -245,8 +245,8 @@ export type Database = {
         | "dataset_column_value"
         | "manual_entry"
         | "aggregation"
-      value_extractor_config__aggregation_type: "sum" | "max" | "count"
-      value_extractor_config__value_picker_rule_type: "most_frequent" | "first"
+      value_extractor__aggregation_type: "sum" | "max" | "count"
+      value_extractor__value_picker_rule_type: "most_frequent" | "first"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -372,11 +372,8 @@ export const Constants = {
         "manual_entry",
         "aggregation",
       ],
-      value_extractor_config__aggregation_type: ["sum", "max", "count"],
-      value_extractor_config__value_picker_rule_type: [
-        "most_frequent",
-        "first",
-      ],
+      value_extractor__aggregation_type: ["sum", "max", "count"],
+      value_extractor__value_picker_rule_type: ["most_frequent", "first"],
     },
   },
 } as const

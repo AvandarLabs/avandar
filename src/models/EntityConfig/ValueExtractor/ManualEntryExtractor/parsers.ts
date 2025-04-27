@@ -3,10 +3,7 @@ import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { makeParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
 import { uuidType } from "@/lib/utils/zodHelpers";
 import { EntityFieldConfigId } from "../../EntityFieldConfig/types";
-import {
-  ManualEntryExtractorConfigCRUDTypes,
-  ManualEntryExtractorConfigId,
-} from "./types";
+import { ManualEntryExtractorCRUDTypes, ManualEntryExtractorId } from "./types";
 
 const DBReadSchema = z.object({
   id: z.string(),
@@ -24,7 +21,7 @@ const DBInsertSchema = DBReadSchema.required().partial({
 const DBUpdateSchema = DBReadSchema.partial();
 
 const ModelReadSchema = z.object({
-  id: uuidType<ManualEntryExtractorConfigId>(),
+  id: uuidType<ManualEntryExtractorId>(),
   entityFieldConfigId: uuidType<EntityFieldConfigId>(),
   createdAt: DBReadSchema.shape.created_at,
   updatedAt: DBReadSchema.shape.updated_at,
@@ -38,9 +35,9 @@ const ModelInsertSchema = ModelReadSchema.required().partial({
 
 const ModelUpdateSchema = ModelReadSchema.partial();
 
-export const ManualEntryExtractorConfigParsers =
-  makeParserRegistry<ManualEntryExtractorConfigCRUDTypes>({
-    modelName: "ManualEntryExtractorConfig",
+export const ManualEntryExtractorParsers =
+  makeParserRegistry<ManualEntryExtractorCRUDTypes>({
+    modelName: "ManualEntryExtractor",
     DBReadSchema,
     DBInsertSchema,
     DBUpdateSchema,
@@ -53,7 +50,7 @@ export const ManualEntryExtractorConfigParsers =
  * Do not remove these tests! These check that your Zod parsers are
  * consistent with your defined model and DB types.
  */
-type CRUDTypes = ManualEntryExtractorConfigCRUDTypes;
+type CRUDTypes = ManualEntryExtractorCRUDTypes;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

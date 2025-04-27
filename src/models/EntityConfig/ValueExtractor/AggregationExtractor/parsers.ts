@@ -5,10 +5,7 @@ import { makeParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
 import { jsonType, uuidType } from "@/lib/utils/zodHelpers";
 import { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
 import { EntityFieldConfigId } from "../../EntityFieldConfig/types";
-import {
-  AggregationExtractorConfigCRUDTypes,
-  AggregationExtractorConfigId,
-} from "./types";
+import { AggregationExtractorCRUDTypes, AggregationExtractorId } from "./types";
 
 const DBReadSchema = z.object({
   id: z.string(),
@@ -31,7 +28,7 @@ const DBInsertSchema = DBReadSchema.required().partial({
 const DBUpdateSchema = DBReadSchema.partial();
 
 const ModelReadSchema = z.object({
-  id: uuidType<AggregationExtractorConfigId>(),
+  id: uuidType<AggregationExtractorId>(),
   entityFieldConfigId: uuidType<EntityFieldConfigId>(),
   aggregationType: DBReadSchema.shape.aggregation_type,
   datasetId: uuidType<UUID<"Dataset">>(),
@@ -50,9 +47,9 @@ const ModelInsertSchema = ModelReadSchema.required().partial({
 
 const ModelUpdateSchema = ModelReadSchema.partial();
 
-export const AggregationExtractorConfigParsers =
-  makeParserRegistry<AggregationExtractorConfigCRUDTypes>({
-    modelName: "AggregationExtractorConfig",
+export const AggregationExtractorParsers =
+  makeParserRegistry<AggregationExtractorCRUDTypes>({
+    modelName: "AggregationExtractor",
     DBReadSchema,
     DBInsertSchema,
     DBUpdateSchema,
@@ -65,7 +62,7 @@ export const AggregationExtractorConfigParsers =
  * Do not remove these tests! These check that your Zod parsers are
  * consistent with your defined model and DB types.
  */
-type CRUDTypes = AggregationExtractorConfigCRUDTypes;
+type CRUDTypes = AggregationExtractorCRUDTypes;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
