@@ -80,7 +80,7 @@ export function createSupabaseCRUDClient<M extends SupabaseModelCRUDTypes>({
           return undefined;
         }
 
-        const model = parsers.fromDBToModelRead.parse(data);
+        const model = parsers.fromDBReadToModelRead(data);
         return model;
       },
 
@@ -101,7 +101,7 @@ export function createSupabaseCRUDClient<M extends SupabaseModelCRUDTypes>({
         logger.log(`All ${modelName}s from db`, data);
 
         const models = data.map((dbRow) => {
-          const model = parsers.fromDBToModelRead.parse(dbRow);
+          const model = parsers.fromDBReadToModelRead(dbRow);
           return model;
         });
 
@@ -117,9 +117,7 @@ export function createSupabaseCRUDClient<M extends SupabaseModelCRUDTypes>({
       insert: async (params: { data: M["Insert"] }): Promise<M["Read"]> => {
         const logger = baseLogger.appendName("insert");
 
-        const dataToInsert = parsers.fromModelInsertToDBInsert.parse(
-          params.data,
-        );
+        const dataToInsert = parsers.fromModelInsertToDBInsert(params.data);
         const { data: insertedData } = await SupabaseDBClient.from(tableName)
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .insert(dataToInsert as any)
@@ -129,7 +127,7 @@ export function createSupabaseCRUDClient<M extends SupabaseModelCRUDTypes>({
 
         logger.log(`Inserted ${modelName} into db`, insertedData);
 
-        const insertedModel = parsers.fromDBToModelRead.parse(insertedData);
+        const insertedModel = parsers.fromDBReadToModelRead(insertedData);
         return insertedModel;
       },
 
@@ -144,9 +142,7 @@ export function createSupabaseCRUDClient<M extends SupabaseModelCRUDTypes>({
         id: M["modelPrimaryKeyType"];
         data: M["Update"];
       }): Promise<M["Read"]> => {
-        const dataToUpdate = parsers.fromModelUpdateToDBUpdate.parse(
-          params.data,
-        );
+        const dataToUpdate = parsers.fromModelUpdateToDBUpdate(params.data);
         const { data: updatedData } = await SupabaseDBClient.from(tableName)
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .update(dataToUpdate as any)
@@ -155,7 +151,7 @@ export function createSupabaseCRUDClient<M extends SupabaseModelCRUDTypes>({
           .select()
           .single<M["DBRead"]>()
           .throwOnError();
-        return parsers.fromDBToModelRead.parse(updatedData);
+        return parsers.fromDBReadToModelRead(updatedData);
       },
 
       /**

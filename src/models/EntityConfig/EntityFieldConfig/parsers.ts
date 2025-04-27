@@ -89,6 +89,7 @@ const ModelUpdateSchema = z.intersection(
 
 export const EntityFieldConfigParsers =
   makeParserRegistry<EntityFieldConfigCRUDTypes>({
+    modelName: "EntityFieldConfig",
     DBReadSchema,
     DBInsertSchema,
     DBUpdateSchema,

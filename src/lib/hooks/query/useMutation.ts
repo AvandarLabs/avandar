@@ -1,3 +1,4 @@
+import { notifications } from "@mantine/notifications";
 import {
   DefaultError,
   QueryKey,
@@ -7,6 +8,7 @@ import {
   UseMutationResult as TanstackUseMutationResult,
   useQueryClient,
 } from "@tanstack/react-query";
+import { Logger } from "@/lib/Logger";
 
 export type UseMutationResult<
   TData = unknown,
@@ -77,6 +79,28 @@ export function useMutation<
         } else if (queryToInvalidate) {
           queryClient.invalidateQueries({ queryKey: queryToInvalidate });
         }
+      },
+      onError: (error, variables, context) => {
+        // TODO(pablo): create an AvandarError class that is able to
+        // reformat the most common types of errors we can catch into
+        // a common unified format. Such as handling ZodErrors.
+        // Catch the error so we can handle and log it better
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error encountered";
+        const logData = {
+          context,
+          variables,
+        };
+
+        if (import.meta.env.DEV) {
+          notifications.show({
+            title: "Error!",
+            message: errorMessage,
+            color: "danger",
+          });
+        }
+
+        Logger.error(error, logData);
       },
     },
     queryClient,

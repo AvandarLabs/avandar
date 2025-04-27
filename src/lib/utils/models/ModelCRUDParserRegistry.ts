@@ -11,26 +11,63 @@ type BaseCRUDSchemas<M extends ModelCRUDTypes> = {
   ModelUpdateSchema: z.ZodType<M["Update"]>;
 };
 
-type TransformerCRUDSchemas<M extends ModelCRUDTypes> = {
-  fromDBToModelRead: z.ZodType<M["Read"], z.ZodTypeDef, M["DBRead"]>;
-  fromModelInsertToDBInsert: z.ZodType<
-    M["DBInsert"],
-    z.ZodTypeDef,
-    M["Insert"]
-  >;
-  fromModelUpdateToDBUpdate: z.ZodType<
-    M["DBUpdate"],
-    z.ZodTypeDef,
-    M["Update"]
-  >;
+type CRUDTransformerFunctions<M extends ModelCRUDTypes> = {
+  /**
+   * Takes input data through the DBReadSchema parser to validate
+   * the data is a valid Read from the database. Then, puts the result through
+   * the the ModelReadSchema parser. The final output is a ModelRead object.
+   *
+   * @param data Any data, but ideally a DBRead object that can parse
+   * successfully.
+   * @returns A ModelRead object if the data parsed successfully, otherwise
+   * throws an error.
+   */
+  fromDBReadToModelRead: (data: unknown) => M["Read"];
+  /**
+   * Takes input data through the ModelInsertSchema parser to validate
+   * the data is a valid Insert from the frontend. Then, puts the result through
+   * the the DBInsertSchema parser. The final output is a DBInsert object.
+   *
+   * @param data Any data, but ideally a ModelInsert object that can parse
+   * successfully.
+   * @returns A DBInsert object if the data parsed successfully, otherwise
+   * throws an error.
+   */
+  fromModelInsertToDBInsert: (data: unknown) => M["DBInsert"];
+  /**
+   * Takes input data through the ModelUpdateSchema parser to validate
+   * the data is a valid Update from the frontend. Then, puts the result through
+   * the the DBUpdateSchema parser. The final output is a DBUpdate object.
+   *
+   * @param data Any data, but ideally a ModelUpdate object that can parse
+   * successfully.
+   * @returns A DBUpdate object if the data parsed successfully, otherwise
+   * throws an error.
+   */
+  fromModelUpdateToDBUpdate: (data: unknown) => M["DBUpdate"];
 };
+
+/**
+ * Appends the model name and schema name to the Zod error message.
+ *
+ * @param modelName The name of the model.
+ * @param schemaName The name of the schema.
+ * @returns A custom error map for the given model and schema.
+ */
+function getErrorMap(modelName: string, schemaName: string): z.ZodErrorMap {
+  return (_issue: z.ZodIssueOptionalMessage, ctx: z.ErrorMapCtx) => {
+    return {
+      message: `[${modelName}:${schemaName}] ${ctx.defaultError}`,
+    };
+  };
+}
 
 /**
  * A registry for the base Read schemas as well as the transformer schemas
  * that convert between database and frontend model schemas.
  */
 export type ModelCRUDParserRegistry<M extends ModelCRUDTypes> =
-  BaseCRUDSchemas<M> & TransformerCRUDSchemas<M>;
+  BaseCRUDSchemas<M> & CRUDTransformerFunctions<M>;
 
 /**
  * Helper function to create a parser registry. It just returns
@@ -40,18 +77,28 @@ export type ModelCRUDParserRegistry<M extends ModelCRUDTypes> =
  * The first generic defaults to `never` to force the user to explicitly
  * set the ModelCRUDTypes type.
  */
-export function makeParserRegistry<M extends ModelCRUDTypes = never>({
-  DBReadSchema,
-  DBInsertSchema,
-  DBUpdateSchema,
-  ModelReadSchema,
-  ModelInsertSchema,
-  ModelUpdateSchema,
-  fromDBToModelRead = undefined,
-  fromModelInsertToDBInsert = undefined,
-  fromModelUpdateToDBUpdate = undefined,
-}: BaseCRUDSchemas<M> &
-  Partial<TransformerCRUDSchemas<M>>): ModelCRUDParserRegistry<M> {
+export function makeParserRegistry<M extends ModelCRUDTypes = never>(
+  {
+    modelName,
+    DBReadSchema,
+    DBInsertSchema,
+    DBUpdateSchema,
+    ModelReadSchema,
+    ModelInsertSchema,
+    ModelUpdateSchema,
+  }: { modelName: M["modelName"] } & BaseCRUDSchemas<M>,
+  options: {
+    /**
+     * Whether to switch between camel and snake_case when parsing from frontend
+     * to db models
+     */
+    switchCasesWhenParsing: boolean;
+  } = {
+    switchCasesWhenParsing: true,
+  },
+): ModelCRUDParserRegistry<M> {
+  const { switchCasesWhenParsing } = options;
+
   return {
     DBReadSchema,
     DBInsertSchema,
@@ -59,20 +106,41 @@ export function makeParserRegistry<M extends ModelCRUDTypes = never>({
     ModelReadSchema,
     ModelInsertSchema,
     ModelUpdateSchema,
-    fromDBToModelRead:
-      fromDBToModelRead ??
-      DBReadSchema.transform((dbObj) => {
-        return ModelReadSchema.parse(camelCaseKeysDeep(dbObj));
-      }),
-    fromModelInsertToDBInsert:
-      fromModelInsertToDBInsert ??
-      ModelInsertSchema.transform((modelObj) => {
-        return DBInsertSchema.parse(snakeCaseKeysDeep(modelObj));
-      }),
-    fromModelUpdateToDBUpdate:
-      fromModelUpdateToDBUpdate ??
-      ModelUpdateSchema.transform((modelObj) => {
-        return DBUpdateSchema.parse(snakeCaseKeysDeep(modelObj));
-      }),
+    fromDBReadToModelRead: (data: unknown) => {
+      return DBReadSchema.transform((dbObj) => {
+        return ModelReadSchema.parse(
+          switchCasesWhenParsing ? camelCaseKeysDeep(dbObj) : dbObj,
+          {
+            errorMap: getErrorMap(modelName, "ModelReadSchema"),
+          },
+        );
+      }).parse(data, {
+        errorMap: getErrorMap(modelName, "DBReadSchema"),
+      });
+    },
+    fromModelInsertToDBInsert: (data: unknown) => {
+      return ModelInsertSchema.transform((modelObj) => {
+        return DBInsertSchema.parse(
+          switchCasesWhenParsing ? snakeCaseKeysDeep(modelObj) : modelObj,
+          {
+            errorMap: getErrorMap(modelName, "DBInsertSchema"),
+          },
+        );
+      }).parse(data, {
+        errorMap: getErrorMap(modelName, "ModelInsertSchema"),
+      });
+    },
+    fromModelUpdateToDBUpdate: (data: unknown) => {
+      return ModelUpdateSchema.transform((modelObj) => {
+        return DBUpdateSchema.parse(
+          switchCasesWhenParsing ? snakeCaseKeysDeep(modelObj) : modelObj,
+          {
+            errorMap: getErrorMap(modelName, "DBUpdateSchema"),
+          },
+        );
+      }).parse(data, {
+        errorMap: getErrorMap(modelName, "ModelUpdateSchema"),
+      });
+    },
   };
 }

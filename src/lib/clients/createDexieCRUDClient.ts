@@ -101,7 +101,7 @@ export function createDexieCRUDClient<
           return undefined;
         }
 
-        const model = parsers.fromDBToModelRead.parse(data);
+        const model = parsers.fromDBReadToModelRead(data);
         return model;
       },
 
@@ -120,7 +120,7 @@ export function createDexieCRUDClient<
 
         const allData = await dbTable.toArray();
         return allData.map((data) => {
-          return parsers.fromDBToModelRead.parse(data);
+          return parsers.fromDBReadToModelRead(data);
         });
       },
 
@@ -132,9 +132,10 @@ export function createDexieCRUDClient<
        */
       insert: async (params: { data: M["Insert"] }): Promise<M["Read"]> => {
         const logger = baseLogger.appendName("insert");
-        const dataToUpdate = parsers.fromModelInsertToDBInsert.parse(
-          params.data,
-        );
+
+        logger.log("Attempting to insert", params.data);
+
+        const dataToUpdate = parsers.fromModelInsertToDBInsert(params.data);
 
         // insert data
         const modelId = await dbTable.add(dataToUpdate);
@@ -147,7 +148,7 @@ export function createDexieCRUDClient<
         logger.log(`Inserted ${modelName} into db`, insertedData);
 
         // convert the inserted data back to a ModelRead
-        const insertedModel = parsers.fromDBToModelRead.parse(insertedData);
+        const insertedModel = parsers.fromDBReadToModelRead(insertedData);
         return insertedModel;
       },
 
@@ -209,6 +210,10 @@ export function createDexieCRUDClient<
     return {
       ...modelClientWithHooks,
       ...extendedClientWithHooks,
+      QueryKeys: {
+        ...modelClientWithHooks.QueryKeys,
+        ...extendedClientWithHooks?.QueryKeys,
+      },
     } as WithQueryHooks<
       ModelCRUDClient<M>,
       Extract<HookableFnName<ModelCRUDClient<M>>, DefaultQueryFnName>,

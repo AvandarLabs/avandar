@@ -12,8 +12,8 @@ export const DBReadSchema = z.object({
   id: uuidType<LocalDatasetId>(),
   name: z.string().min(1),
   description: z.string(),
-  createdAt: z.string().datetime({ offset: true }),
-  updatedAt: z.string().datetime({ offset: true }),
+  createdAt: z.coerce.string(),
+  updatedAt: z.coerce.string(),
   sizeInBytes: z.number(),
   mimeType,
   data: z.string(),
@@ -25,20 +25,26 @@ const DBInsertSchema = DBReadSchema;
 const DBUpdateSchema = DBReadSchema.partial();
 
 const ModelReadSchema = DBReadSchema.extend({
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
 });
 const ModelInsertSchema = ModelReadSchema;
 const ModelUpdateSchema = ModelReadSchema.partial();
 
-export const LocalDatasetParsers = makeParserRegistry<LocalDatasetCRUDTypes>({
-  DBReadSchema,
-  DBInsertSchema,
-  DBUpdateSchema,
-  ModelReadSchema,
-  ModelInsertSchema,
-  ModelUpdateSchema,
-});
+export const LocalDatasetParsers = makeParserRegistry<LocalDatasetCRUDTypes>(
+  {
+    modelName: "LocalDataset",
+    DBReadSchema,
+    DBInsertSchema,
+    DBUpdateSchema,
+    ModelReadSchema,
+    ModelInsertSchema,
+    ModelUpdateSchema,
+  },
+  {
+    switchCasesWhenParsing: false,
+  },
+);
 
 /**
  * Do not remove these tests! These check that your Zod parsers are

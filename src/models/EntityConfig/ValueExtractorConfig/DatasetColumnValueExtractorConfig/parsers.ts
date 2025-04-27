@@ -48,6 +48,7 @@ const ModelUpdateSchema = ModelReadSchema.partial();
 
 export const DatasetColumnValueExtractorConfigParsers =
   makeParserRegistry<DatasetColumnValueExtractorConfigCRUDTypes>({
+    modelName: "DatasetColumnValueExtractorConfig",
     DBReadSchema,
     DBInsertSchema,
     DBUpdateSchema,

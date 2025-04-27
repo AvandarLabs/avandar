@@ -50,6 +50,7 @@ const ModelInsertSchema = ModelReadSchema.required().partial({
 const ModelUpdateSchema = ModelReadSchema.partial();
 
 export const EntityConfigParsers = makeParserRegistry<EntityConfigCRUDTypes>({
+  modelName: "EntityConfig",
   DBReadSchema,
   DBInsertSchema,
   DBUpdateSchema,

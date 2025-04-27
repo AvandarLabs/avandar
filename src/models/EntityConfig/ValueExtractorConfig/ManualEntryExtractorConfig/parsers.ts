@@ -40,6 +40,7 @@ const ModelUpdateSchema = ModelReadSchema.partial();
 
 export const ManualEntryExtractorConfigParsers =
   makeParserRegistry<ManualEntryExtractorConfigCRUDTypes>({
+    modelName: "ManualEntryExtractorConfig",
     DBReadSchema,
     DBInsertSchema,
     DBUpdateSchema,

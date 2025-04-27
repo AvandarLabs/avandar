@@ -52,6 +52,7 @@ const ModelUpdateSchema = ModelReadSchema.partial();
 
 export const AggregationExtractorConfigParsers =
   makeParserRegistry<AggregationExtractorConfigCRUDTypes>({
+    modelName: "AggregationExtractorConfig",
     DBReadSchema,
     DBInsertSchema,
     DBUpdateSchema,
