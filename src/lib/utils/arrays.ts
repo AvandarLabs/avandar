@@ -18,6 +18,10 @@ export function difference<T>(
 /**
  * Check if two arrays contain the equal elements, regardless of order.
  *
+ * Array elements are put in a Set to determine if there is a matching item.
+ * By default, the elements are placed into the Set as-is. To handle how an
+ * element is hashed, you can pass a `hashFn`.
+ *
  * @returns `true` if the arrays contain the same elements, `false` otherwise.
  */
 export function areArrayContentsEqual<A>(
@@ -44,4 +48,28 @@ export function areArrayContentsEqual<A>(
   }
 
   return true;
+}
+
+/**
+ * Maps an array to a tuple of two arrays.
+ * @param items The array to map.
+ * @param callback A function that maps each element of the array to a tuple of
+ * two values.
+ * @returns A tuple of two arrays. An array of all the first values of the
+ * return tuple and an array of all the second values.
+ */
+export function mapToTuple<T, R1, R2>(
+  items: readonly T[],
+  callback: (x: T, idx: number) => readonly [R1, R2],
+): [R1[], R2[]] {
+  const tuples1 = [] as R1[];
+  const tuples2 = [] as R2[];
+
+  items.forEach((item, idx) => {
+    const [r1, r2] = callback(item, idx);
+    tuples1.push(r1);
+    tuples2.push(r2);
+  });
+
+  return [tuples1, tuples2];
 }

@@ -71,6 +71,7 @@ export function EntityCreatorView(): JSX.Element {
 
           <LocalDatasetSelect
             key={entityConfigForm.key("datasetId")}
+            label="Dataset source"
             {...entityConfigForm.getInputProps("datasetId")}
           />
 

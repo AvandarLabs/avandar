@@ -167,7 +167,7 @@ export function createLogger(config?: {
           : `font-size: ${LOG_BODY_FONT_SIZE};`,
         ];
         const logHeading = `%c [LOG] ${caller.fnName} [${caller.location}]`;
-        console.log(`${logHeading}\n${styledMsgTemplate}`, ...styles, ...args);
+        console.log(`${logHeading}\n${styledMsgTemplate} `, ...styles, ...args);
       }
     },
   };

@@ -19,15 +19,15 @@ import { ManualEntryExtractor } from "@/models/EntityConfig/ValueExtractor/Manua
  */
 export type EntityFieldConfigDraft = {
   draftId: DraftFieldId;
-  aggregationConfig: SetOptional<
+  aggregationExtractor: SetOptional<
     AggregationExtractor<"Insert">,
     "entityFieldConfigId" | "datasetId" | "datasetFieldId"
   >;
-  manualEntryConfig: SetOptional<
+  manualEntryExtractor: SetOptional<
     ManualEntryExtractor<"Insert">,
     "entityFieldConfigId"
   >;
-  datasetColumnValueConfig: SetOptional<
+  datasetColumnValueExtractor: SetOptional<
     DatasetColumnValueExtractor<"Insert">,
     "entityFieldConfigId" | "datasetId" | "datasetFieldId"
   >;
@@ -68,7 +68,7 @@ export function makeDefaultEntityFieldDraft({
     description: null,
 
     // set up some default initial values for the value extractor configs
-    aggregationConfig: {
+    aggregationExtractor: {
       aggregationType: "sum",
       datasetId: undefined,
       datasetFieldId: undefined,
@@ -76,11 +76,11 @@ export function makeDefaultEntityFieldDraft({
       createdAt: dateTimeNow,
       updatedAt: dateTimeNow,
     },
-    manualEntryConfig: {
+    manualEntryExtractor: {
       createdAt: dateTimeNow,
       updatedAt: dateTimeNow,
     },
-    datasetColumnValueConfig: {
+    datasetColumnValueExtractor: {
       valuePickerRuleType: "most_frequent",
       datasetId: undefined,
       datasetFieldId: undefined,

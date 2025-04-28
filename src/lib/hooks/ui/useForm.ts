@@ -8,6 +8,10 @@ import { Merge, Paths, UnknownArray } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
 import { IdentityTypeFn } from "@/lib/types/utilityTypes";
 
+/**
+ * Gets the type of a value from an object given a key path in
+ * dot notation.
+ */
 type PathValue<T, P extends Paths<T>> =
   P extends `${infer K}.${infer Rest}` ?
     K extends keyof T ?
@@ -39,6 +43,45 @@ type InsertListItemFn<FormValues extends UnknownObject> = <
 ) => void;
 
 /**
+ * These are the same options from `form.getInputProps`.
+ * @see https://mantine.dev/form/get-input-props
+ */
+type GetInputPropsOptions = {
+  type?: "input" | "checkbox";
+  withError?: boolean;
+  withFocus?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+};
+
+type GetPathTail<Path, PathHead extends string> =
+  Path extends `${PathHead}.${infer Tail}` ? Tail : never;
+
+type GetInputPropsFn = (options?: GetInputPropsOptions) => {
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  onChange: any;
+  value?: any;
+  defaultValue?: any;
+  checked?: any;
+  defaultChecked?: any;
+  error?: any;
+  onFocus?: any;
+  onBlur?: any;
+  /* eslint-enable @typescript-eslint/no-explicit-any */
+};
+
+type GetKeyAndPropsFn<
+  FormValues extends UnknownObject,
+  FormPath extends Paths<FormValues> = Paths<FormValues>,
+> = <BasePath extends string, PathTail extends GetPathTail<FormPath, BasePath>>(
+  basePath: BasePath,
+  keys: readonly PathTail[],
+) => [
+  keys: Record<PathTail, string>,
+  inputProps: Record<PathTail, GetInputPropsFn>,
+];
+
+/**
  * An improved version of Mantine's `UseFormReturnType` with
  * significantly better type safety.
  */
@@ -47,12 +90,12 @@ export type FormType<
   TransformedValues extends (
     values: FormValues,
   ) => unknown = IdentityTypeFn<FormValues>,
-  FormPaths extends Paths<FormValues> = Paths<FormValues>,
+  FormPath extends Paths<FormValues> = Paths<FormValues>,
 > = Merge<
   MantineUseFormReturnType<FormValues, TransformedValues>,
   {
-    key: (path: FormPaths) => string;
-    watch: <P extends FormPaths>(
+    key: (path: FormPath) => string;
+    watch: <P extends FormPath>(
       path: P,
       subscriberFn: (payload: {
         previousValue: PathValue<FormValues, P>;
@@ -61,6 +104,7 @@ export type FormType<
         dirty: boolean;
       }) => void,
     ) => void;
+    keysAndProps: GetKeyAndPropsFn<FormValues, FormPath>;
   }
 >;
 
@@ -85,9 +129,10 @@ export function useForm<
   TransformValues extends (
     values: FormValues,
   ) => unknown = IdentityTypeFn<FormValues>,
+  FormPath extends Paths<FormValues> = Paths<FormValues>,
 >(
   formOptions: UseFormInput<FormValues, TransformValues>,
-): [FormType<FormValues, TransformValues>, FormSetters<FormValues>] {
+): [FormType<FormValues, TransformValues, FormPath>, FormSetters<FormValues>] {
   const form = mantineUseForm<FormValues, TransformValues>(formOptions);
   const insertListItem: InsertListItemFn<FormValues> = useCallback(
     (path, item) => {
@@ -96,5 +141,34 @@ export function useForm<
     [form],
   );
 
-  return [form as FormType<FormValues, TransformValues>, { insertListItem }];
+  const keysAndProps = useCallback(
+    <P extends string, PathTail extends GetPathTail<FormPath, P>>(
+      basePath: P,
+      pathTails: readonly PathTail[],
+    ) => {
+      const keys = {} as Record<PathTail, string>;
+      const inputProps = {} as Record<PathTail, GetInputPropsFn>;
+
+      pathTails.forEach((pathTail) => {
+        const path = `${basePath}.${pathTail}`;
+        keys[pathTail] = form.key(path);
+        inputProps[pathTail] = (options?: GetInputPropsOptions) => {
+          return form.getInputProps(path, options);
+        };
+      });
+
+      return [keys, inputProps];
+    },
+    [form],
+  );
+
+  return [
+    {
+      ...form,
+      keysAndProps,
+    } as FormType<FormValues, TransformValues, FormPath>,
+    {
+      insertListItem,
+    },
+  ];
 }

@@ -106,7 +106,9 @@ export function EntityFieldCreator({
       />
       {match(valueExtractorType)
         .with("manual_entry", () => {
-          return <div>Manual entry</div>;
+          // There are currently no configurable options for a `manual_entry`
+          // extractor, so there is nothing to render.
+          return null;
         })
         .with("dataset_column_value", () => {
           return (
