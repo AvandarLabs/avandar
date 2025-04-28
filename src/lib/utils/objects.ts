@@ -376,18 +376,18 @@ function mixedComparator(
  * will be ignored.
  * @returns The sorted list of objects.
  */
-export function sortBy<
+export function sortObjList<
   T extends object,
   SortValue extends string | number,
 >(options: {
   list: readonly T[];
-  valueFn: (obj: T) => SortValue;
+  sortBy: (obj: T) => SortValue;
   comparator?: (a: SortValue, b: SortValue) => number;
   nullOrUndefinedSortOrder?: "last" | "first";
 }): T[] {
   const {
     list,
-    valueFn,
+    sortBy: valueFn,
     comparator = (a, b) => {
       return mixedComparator(a, b, {
         nullOrUndefinedSortOrder: options.nullOrUndefinedSortOrder,

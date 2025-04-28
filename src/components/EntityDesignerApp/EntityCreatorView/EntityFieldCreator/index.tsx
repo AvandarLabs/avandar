@@ -13,7 +13,7 @@ import { FormType } from "@/lib/hooks/ui/useForm";
 import { ElementOf } from "@/lib/types/utilityTypes";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { DangerText } from "@/lib/ui/Text/DangerText";
-import { getProp, objectValues, sortBy } from "@/lib/utils/objects";
+import { getProp, objectValues, sortObjList } from "@/lib/utils/objects";
 import { EntityFieldValueExtractorTypes } from "@/models/EntityConfig/EntityFieldConfig/constants";
 import { EntityConfigForm } from "../entityCreatorTypes";
 import { DatasetColumnValueExtractorEditor } from "./DatasetColumnValueExtractorEditor";
@@ -26,9 +26,9 @@ type Props = {
 };
 
 const valueExtractorOptions = makeSelectOptions({
-  list: sortBy({
+  list: sortObjList({
     list: objectValues(EntityFieldValueExtractorTypes),
-    valueFn: getProp("displayName"),
+    sortBy: getProp("displayName"),
   }),
   valueFn: getProp("type"),
   labelFn: getProp("displayName"),

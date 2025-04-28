@@ -20,8 +20,7 @@ const initialFields = [
 
 export function EntityCreatorView(): JSX.Element {
   const [doCreateEntityConfig, pendingEntityConfigCreate] =
-    EntityConfigClient.withLogger().useInsert();
-
+    EntityConfigClient.useInsert();
   const [entityConfigForm, entityConfigFormSetters] = useForm<EntityConfigForm>(
     {
       mode: "uncontrolled",
@@ -40,6 +39,14 @@ export function EntityCreatorView(): JSX.Element {
     },
   );
 
+  const [keys, inputProps] = entityConfigForm.keysAndProps([
+    "name",
+    "description",
+    "datasetId",
+    "allowManualCreation",
+    "fields",
+  ]);
+
   return (
     <Container pt="lg">
       <form
@@ -56,29 +63,29 @@ export function EntityCreatorView(): JSX.Element {
       >
         <Stack>
           <TextInput
-            key={entityConfigForm.key("name")}
+            key={keys.name}
             required
             label="Entity Name"
             placeholder="Enter a name for the entity"
-            {...entityConfigForm.getInputProps("name")}
+            {...inputProps.name()}
           />
           <TextInput
-            key={entityConfigForm.key("description")}
+            key={keys.description}
             label="Entity Description"
             placeholder="Enter a description for the entity"
-            {...entityConfigForm.getInputProps("description")}
+            {...inputProps.description()}
           />
 
           <LocalDatasetSelect
-            key={entityConfigForm.key("datasetId")}
+            key={keys.datasetId}
             label="Dataset source"
-            {...entityConfigForm.getInputProps("datasetId")}
+            {...inputProps.datasetId()}
           />
 
           <Checkbox
-            key={entityConfigForm.key("allowManualCreation")}
+            key={keys.allowManualCreation}
             label="Allow manual creation of new entities"
-            {...entityConfigForm.getInputProps("allowManualCreation")}
+            {...inputProps.allowManualCreation()}
           />
 
           <EntityFieldCreatorBlock

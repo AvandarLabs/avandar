@@ -73,12 +73,20 @@ type GetInputPropsFn = (options?: GetInputPropsOptions) => {
 type GetKeyAndPropsFn<
   FormValues extends UnknownObject,
   FormPath extends Paths<FormValues> = Paths<FormValues>,
-> = <BasePath extends string, PathTail extends GetPathTail<FormPath, BasePath>>(
-  basePath: BasePath,
-  keys: readonly PathTail[],
+> = <
+  BasePathOrFullPaths extends string | readonly FormPath[],
+  PathTail extends BasePathOrFullPaths extends string ?
+    GetPathTail<FormPath, BasePathOrFullPaths>
+  : never,
+>(
+  basePathOrFullPaths: BasePathOrFullPaths,
+  pathTails?: readonly PathTail[],
 ) => [
-  keys: Record<PathTail, string>,
-  inputProps: Record<PathTail, GetInputPropsFn>,
+  keys: BasePathOrFullPaths extends string ? Record<PathTail, string>
+  : Record<BasePathOrFullPaths[number], string>,
+  inputProps: BasePathOrFullPaths extends string ?
+    Record<PathTail, GetInputPropsFn>
+  : Record<BasePathOrFullPaths[number], GetInputPropsFn>,
 ];
 
 /**
@@ -142,14 +150,39 @@ export function useForm<
   );
 
   const keysAndProps = useCallback(
-    <P extends string, PathTail extends GetPathTail<FormPath, P>>(
-      basePath: P,
-      pathTails: readonly PathTail[],
+    <
+      FullPath extends FormPath,
+      BasePath extends string,
+      PathTail extends GetPathTail<FormPath, P>,
+    >(
+      basePathOrFullPaths: BasePath | readonly FullPath[],
+      pathTails?: readonly PathTail[],
     ) => {
+      // if an array of full paths was provided, use that
+      if (Array.isArray(basePathOrFullPaths)) {
+        const keys = {} as Record<FullPath, string>;
+        const inputProps = {} as Record<FullPath, GetInputPropsFn>;
+        const fullPaths = basePathOrFullPaths as readonly FullPath[];
+
+        // generate all keys and inputProps functions
+        fullPaths.forEach((path) => {
+          keys[path] = form.key(path);
+          inputProps[path] = (options?: GetInputPropsOptions) => {
+            return form.getInputProps(path, options);
+          };
+        });
+
+        return [keys, inputProps];
+      }
+
+      // this block is the case where a basePath was provided with an array of
+      // path tails
       const keys = {} as Record<PathTail, string>;
       const inputProps = {} as Record<PathTail, GetInputPropsFn>;
+      const basePath = basePathOrFullPaths as BasePath;
 
-      pathTails.forEach((pathTail) => {
+      // generate all keys and inputProps functions
+      (pathTails ?? []).forEach((pathTail) => {
         const path = `${basePath}.${pathTail}`;
         keys[pathTail] = form.key(path);
         inputProps[pathTail] = (options?: GetInputPropsOptions) => {
