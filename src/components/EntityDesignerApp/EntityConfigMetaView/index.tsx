@@ -17,7 +17,7 @@ const EXCLUDED_ENTITY_CONFIG_KEYS = ["id", "ownerId"] as const;
 export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
   const router = useRouter();
   const [sendDelete, isDeletePending] = EntityConfigClient.useDelete({
-    queryToInvalidate: EntityConfigClient.QueryKeys.getAll(),
+    invalidateGetAllQuery: true,
   });
 
   return (

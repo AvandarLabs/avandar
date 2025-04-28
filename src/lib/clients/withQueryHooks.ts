@@ -84,6 +84,10 @@ type ClientFnReturnType<
   FnName extends keyof Client,
 > = Client[FnName] extends AnyFunction ? ReturnType<Client[FnName]> : never;
 
+type ExtraUseClientMutationArgs = {
+  invalidateGetAllQuery?: boolean;
+};
+
 /**
  * Augments a CRUD Model Client instance with `use` hooks that call
  * `useQuery` or `useMutation` and return the appropriate types.
@@ -108,7 +112,8 @@ export type WithQueryHooks<
         Omit<
           UseMutationOptions<Result, DefaultError, Params[0], unknown>,
           "mutationFn"
-        >
+        > &
+          ExtraUseClientMutationArgs
       >,
     ) => UseMutationResultTuple<Result, DefaultError, Params[0], unknown>
   : never;
@@ -225,8 +230,35 @@ export function withQueryHooks<
               unknown
             >,
             "mutationFn"
-          >,
+          > &
+            ExtraUseClientMutationArgs,
         ) => {
+          const {
+            invalidateGetAllQuery,
+            queryToInvalidate,
+            queriesToInvalidate,
+            ...moreOptions
+          } = useMutationOptions ?? {};
+
+          // get the query keys to invalidate
+          const singletonQueryToInvalidate =
+            queryToInvalidate ? [queryToInvalidate] : undefined;
+          // if `queriesToInvalidate` is set, it takes precedence over the
+          // singleton `queryToInvalidate` parameter
+          let newQueriesToInvalidate =
+            queriesToInvalidate ?? singletonQueryToInvalidate ?? undefined;
+
+          // if `invalidateGetAllQuery` is set, add the `getAll` query key
+          if (
+            invalidateGetAllQuery &&
+            "getAll" in queryKeyBuilders &&
+            typeof queryKeyBuilders["getAll"] === "function"
+          ) {
+            newQueriesToInvalidate = (newQueriesToInvalidate ?? []).concat([
+              queryKeyBuilders["getAll"](),
+            ]);
+          }
+
           return useMutation({
             // we only allow single-argument functions. If multiple arguments
             // are defined in the Client, we will only take the first one.
@@ -236,7 +268,8 @@ export function withQueryHooks<
               const result = await boundClientFunction(params);
               return result;
             },
-            ...useMutationOptions,
+            queriesToInvalidate: newQueriesToInvalidate,
+            ...moreOptions,
           });
         };
 
