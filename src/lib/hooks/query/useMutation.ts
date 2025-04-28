@@ -12,22 +12,22 @@ import { Logger } from "@/lib/Logger";
 
 export type UseMutationResult<
   TData = unknown,
-  TError = DefaultError,
   TFnVariables = unknown,
+  TError = DefaultError,
   TContext = unknown,
 > = TanstackUseMutationResult<TData, TError, TFnVariables, TContext>;
 
 export type UseMutateFunction<
   TData = unknown,
-  TError = DefaultError,
   TFnVariables = void,
+  TError = DefaultError,
   TContext = unknown,
 > = TanstackUseMutateFunction<TData, TError, TFnVariables, TContext>;
 
 export type UseMutationOptions<
   TData = unknown,
-  TError = DefaultError,
   TFnVariables = void,
+  TError = DefaultError,
   TContext = unknown,
 > = TanstackUseMutationOptions<TData, TError, TFnVariables, TContext> & {
   queryToInvalidate?: QueryKey;
@@ -41,13 +41,13 @@ export type UseMutationOptions<
 
 export type UseMutationResultTuple<
   TData = unknown,
-  TError = DefaultError,
   TFnVariables = void,
+  TError = DefaultError,
   TContext = unknown,
 > = [
-  doMutationFn: UseMutateFunction<TData, TError, TFnVariables, TContext>,
+  doMutationFn: UseMutateFunction<TData, TFnVariables, TError, TContext>,
   isMutatePending: boolean,
-  useMutateResultObj: UseMutationResult<TData, TError, TFnVariables, TContext>,
+  useMutateResultObj: UseMutationResult<TData, TFnVariables, TError, TContext>,
 ];
 
 /**
@@ -60,17 +60,17 @@ export type UseMutationResultTuple<
  */
 export function useMutation<
   TData = unknown,
-  TError = DefaultError,
   TFnVariables = void,
+  TError = DefaultError,
   TContext = unknown,
 >(
-  options: UseMutationOptions<TData, TError, TFnVariables, TContext>,
-): UseMutationResultTuple<TData, TError, TFnVariables, TContext> {
+  options: UseMutationOptions<TData, TFnVariables, TError, TContext>,
+): UseMutationResultTuple<TData, TFnVariables, TError, TContext> {
   const queryClient = useQueryClient();
   const mutationObj = tanstackUseMutation(
     {
       ...options,
-      onSuccess: () => {
+      onSuccess: (data, variables, context) => {
         const { queriesToInvalidate, queryToInvalidate } = options;
         if (queriesToInvalidate) {
           queriesToInvalidate.forEach((queryKey) => {
@@ -79,6 +79,9 @@ export function useMutation<
         } else if (queryToInvalidate) {
           queryClient.invalidateQueries({ queryKey: queryToInvalidate });
         }
+
+        // Now call the user-defined `onSuccess`
+        options.onSuccess?.(data, variables, context);
       },
       onError: (error, variables, context) => {
         // TODO(pablo): create an AvandarError class that is able to
@@ -101,6 +104,9 @@ export function useMutation<
         }
 
         Logger.error(error, logData);
+
+        // Now call the user-defined `onError`
+        options.onError?.(error, variables, context);
       },
     },
     queryClient,

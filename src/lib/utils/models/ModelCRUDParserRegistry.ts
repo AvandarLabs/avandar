@@ -17,34 +17,32 @@ type CRUDTransformerFunctions<M extends ModelCRUDTypes> = {
    * the data is a valid Read from the database. Then, puts the result through
    * the the ModelReadSchema parser. The final output is a ModelRead object.
    *
-   * @param data Any data, but ideally a DBRead object that can parse
-   * successfully.
+   * @param data A DBRead object to parse into a ModelRead object.
    * @returns A ModelRead object if the data parsed successfully, otherwise
    * throws an error.
    */
-  fromDBReadToModelRead: (data: unknown) => M["Read"];
+  fromDBReadToModelRead: (data: M["DBRead"]) => M["Read"];
+
   /**
    * Takes input data through the ModelInsertSchema parser to validate
    * the data is a valid Insert from the frontend. Then, puts the result through
    * the the DBInsertSchema parser. The final output is a DBInsert object.
    *
-   * @param data Any data, but ideally a ModelInsert object that can parse
-   * successfully.
+   * @param data A ModelInsert object to parse into a DBInsert object.
    * @returns A DBInsert object if the data parsed successfully, otherwise
    * throws an error.
    */
-  fromModelInsertToDBInsert: (data: unknown) => M["DBInsert"];
+  fromModelInsertToDBInsert: (data: M["Insert"]) => M["DBInsert"];
   /**
    * Takes input data through the ModelUpdateSchema parser to validate
    * the data is a valid Update from the frontend. Then, puts the result through
    * the the DBUpdateSchema parser. The final output is a DBUpdate object.
    *
-   * @param data Any data, but ideally a ModelUpdate object that can parse
-   * successfully.
+   * @param data A ModelUpdate object to parse into a DBUpdate object.
    * @returns A DBUpdate object if the data parsed successfully, otherwise
    * throws an error.
    */
-  fromModelUpdateToDBUpdate: (data: unknown) => M["DBUpdate"];
+  fromModelUpdateToDBUpdate: (data: M["Update"]) => M["DBUpdate"];
 };
 
 /**

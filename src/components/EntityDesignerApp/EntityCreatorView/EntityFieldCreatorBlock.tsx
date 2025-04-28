@@ -1,27 +1,27 @@
 import { Button, Fieldset, Stack, Text } from "@mantine/core";
 import { FormSetters, FormType } from "@/lib/hooks/ui/useForm";
 import {
-  EntityConfigForm,
-  makeDefaultEntityFieldDraft,
+  EntityConfigFormValues,
+  getDefaultEntityFieldFormValues,
 } from "./entityCreatorTypes";
 import { EntityFieldCreator } from "./EntityFieldCreator";
 
 type Props = {
-  entityConfigForm: FormType<EntityConfigForm>;
-  formSetters: FormSetters<EntityConfigForm>;
+  entityConfigForm: FormType<EntityConfigFormValues>;
+  formSetters: FormSetters<EntityConfigFormValues>;
 };
 
 export function EntityFieldCreatorBlock({
   entityConfigForm,
   formSetters,
 }: Props): JSX.Element {
-  const { name, fields } = entityConfigForm.getValues();
+  const { id: entityConfigId, name, fields } = entityConfigForm.getValues();
   const entityName = name || "Entity";
 
   const fieldRows = fields.map((field, idx) => {
     return (
       <EntityFieldCreator
-        key={field.draftId}
+        key={field.id}
         defaultField={field}
         entityConfigForm={entityConfigForm}
         idx={idx}
@@ -40,7 +40,8 @@ export function EntityFieldCreatorBlock({
           onClick={() => {
             formSetters.insertListItem(
               "fields",
-              makeDefaultEntityFieldDraft({
+              getDefaultEntityFieldFormValues({
+                entityConfigId,
                 name: "New field",
                 isIdField: false,
                 isTitleField: false,

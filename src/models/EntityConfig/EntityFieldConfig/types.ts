@@ -5,7 +5,6 @@ import type { EntityConfigId } from "../types";
 import type { UUID } from "@/lib/types/common";
 
 export type EntityFieldConfigId = UUID<"EntityFieldConfig">;
-export type DraftFieldId = UUID<"DraftField">;
 
 // Enum types to match database enums
 export type EntityFieldClass = Enums<"entity_field_config__class">;

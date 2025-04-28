@@ -1,6 +1,7 @@
 import Dexie, { EntityTable } from "dexie";
 import { ILogger } from "../Logger";
 import { UnknownObject } from "../types/common";
+import { isNotUndefined } from "../utils/guards";
 import { DexieModelCRUDTypes } from "../utils/models/DexieModelCRUDTypes";
 import { ModelCRUDParserRegistry } from "../utils/models/ModelCRUDParserRegistry";
 import { BaseClient } from "./BaseClient";
@@ -139,6 +140,43 @@ export function createDexieCRUDClient<
         return insertedModel;
       },
 
+      bulkInsert: async (params: {
+        data: ReadonlyArray<M["Insert"]>;
+      }): Promise<Array<M["Read"]>> => {
+        const logger = baseLogger.appendName("bulkInsert");
+
+        logger.log("Attempting to insert with arguments", params.data);
+
+        const dataToInsert = params.data.map((data) => {
+          return parsers.fromModelInsertToDBInsert(data);
+        });
+
+        logger.log("Sending formatted data to Dexie", dataToInsert);
+
+        // insert data
+        const modelIds = await dbTable.bulkAdd(dataToInsert, { allKeys: true });
+        const insertedData = await dbTable.bulkGet(modelIds);
+        if (!insertedData) {
+          throw new Error(
+            "Could not find the models that should have just been inserted.",
+          );
+        }
+
+        logger.log("Received data from Dexie", insertedData);
+
+        // convert the inserted data back to a ModelRead
+        const insertedModels = insertedData
+          .map((data) => {
+            if (data) {
+              return parsers.fromDBReadToModelRead(data);
+            }
+            return undefined;
+          })
+          .filter(isNotUndefined);
+
+        return insertedModels;
+      },
+
       update: async (_params: {
         id: M["modelPrimaryKeyType"];
       }): Promise<M["Read"]> => {
@@ -151,6 +189,16 @@ export function createDexieCRUDClient<
       }): Promise<void> => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await dbTable.delete(params.id as any);
+      },
+
+      bulkDelete: async (params: {
+        ids: ReadonlyArray<M["modelPrimaryKeyType"]>;
+      }): Promise<void> => {
+        const logger = baseLogger.appendName("bulkDelete");
+        logger.log("Attempting to delete", params.ids);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await dbTable.bulkDelete(params.ids as any);
+        logger.log("Finished `bulkDelete`");
       },
     };
 

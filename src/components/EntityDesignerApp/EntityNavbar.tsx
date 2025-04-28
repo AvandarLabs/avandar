@@ -7,7 +7,7 @@ import { EntityConfig } from "@/models/EntityConfig/types";
 import { getEntityConfigLinkProps } from "@/models/EntityConfig/utils";
 
 type Props = {
-  entityConfigs: EntityConfig[];
+  entityConfigs: readonly EntityConfig[];
   isLoading: boolean;
 } & BoxProps;
 

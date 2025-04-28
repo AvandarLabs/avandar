@@ -7,10 +7,10 @@ import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { getProp, objectValues } from "@/lib/utils/objects";
 import { ValuePickerRuleTypes } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/constants";
 import { LocalDatasetId } from "@/models/LocalDataset/types";
-import { EntityConfigForm } from "../entityCreatorTypes";
+import { EntityConfigFormValues } from "../entityCreatorTypes";
 
 type Props = {
-  entityConfigForm: FormType<EntityConfigForm>;
+  entityConfigForm: FormType<EntityConfigFormValues>;
   fieldIdx: number;
 };
 

@@ -48,53 +48,25 @@ create policy "User can see entity_field_configs"
     on public.entity_field_configs for select
     to authenticated -- postgres role
     -- actual policy
-    using (
-        exists (
-            select 1
-            from public.entity_configs
-            where public.entity_configs.id = public.entity_field_configs.entity_config_id
-            and public.entity_configs.owner_id = (select auth.uid())
-        )
-    );
+    using (true);
 
 create policy "User can INSERT entity_field_configs"
     on public.entity_field_configs for insert
     to authenticated -- postgres role
     -- actual policy
-    with check (
-        exists (
-            select 1
-            from public.entity_configs
-            where public.entity_configs.id = public.entity_field_configs.entity_config_id
-            and public.entity_configs.owner_id = (select auth.uid())
-        )
-    );
+    with check (true);
 
 create policy "User can UPDATE entity_field_configs"
     on public.entity_field_configs for update
     to authenticated -- postgres role
     -- actual policy
-    with check (
-        exists (
-            select 1
-            from public.entity_configs
-            where public.entity_configs.id = public.entity_field_configs.entity_config_id
-            and public.entity_configs.owner_id = (select auth.uid())
-        )
-    );
+    with check (true);
 
 create policy "User can DELETE entity_field_configs"
     on public.entity_field_configs for delete
     to authenticated -- postgres role
     -- actual policy
-    using (
-        exists (
-            select 1
-            from public.entity_configs
-            where public.entity_configs.id = public.entity_field_configs.entity_config_id
-            and public.entity_configs.owner_id = (select auth.uid())
-        )
-    );
+    using (true);
 
 -- Create updated_at trigger
 create trigger tr_entity_field_config__set_updated_at

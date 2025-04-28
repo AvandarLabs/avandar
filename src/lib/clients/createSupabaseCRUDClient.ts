@@ -2,6 +2,8 @@ import { SupabaseDBClient } from "@/lib/clients/SupabaseDBClient";
 import { ModelCRUDParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
 import { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
 import { ILogger } from "../Logger";
+import { UnknownObject } from "../types/common";
+import { objectKeys } from "../utils/objects";
 import { BaseClient } from "./BaseClient";
 import {
   DEFAULT_MUTATION_FN_NAMES,
@@ -19,12 +21,18 @@ import {
 
 export type SupabaseCRUDClient<
   Client extends ModelCRUDClient<SupabaseModelCRUDTypes>,
+  ExtendedMutationsClient extends BaseClient,
 > = WithLogger<
   WithQueryHooks<
     Client,
     Extract<HookableFnName<Client>, DefaultQueryFnName>,
     Extract<HookableFnName<Client>, DefaultMutationFnName>
-  >
+  > &
+    WithQueryHooks<
+      ExtendedMutationsClient,
+      never,
+      HookableFnName<ExtendedMutationsClient>
+    >
 >;
 
 /**
@@ -33,11 +41,15 @@ export type SupabaseCRUDClient<
  * It also creates `use` hooks for the `DEFAULT_QUERY_FN_NAMES` and
  * `DEFAULT_MUTATION_FN_NAMES`.
  */
-export function createSupabaseCRUDClient<M extends SupabaseModelCRUDTypes>({
+export function createSupabaseCRUDClient<
+  M extends SupabaseModelCRUDTypes,
+  ExtendedMutationsClient extends UnknownObject,
+>({
   modelName,
   tableName,
   parsers,
   dbTablePrimaryKey,
+  mutations,
 }: {
   modelName: M["modelName"];
   tableName: M["tableName"];
@@ -48,7 +60,16 @@ export function createSupabaseCRUDClient<M extends SupabaseModelCRUDTypes>({
    */
   parsers: ModelCRUDParserRegistry<M>;
   dbTablePrimaryKey: M["dbTablePrimaryKey"];
-}): SupabaseCRUDClient<ModelCRUDClient<M>> {
+
+  /**
+   * Additional mutation functions to add to the client. These functions
+   * will get wrapped in `useMutation` hooks.
+   */
+  mutations?: (config: { logger: ILogger }) => ExtendedMutationsClient;
+}): SupabaseCRUDClient<
+  ModelCRUDClient<M>,
+  ExtendedMutationsClient & BaseClient
+> {
   const baseClient: BaseClient = {
     getClientName() {
       return `${modelName}Client`;
@@ -100,14 +121,17 @@ export function createSupabaseCRUDClient<M extends SupabaseModelCRUDTypes>({
 
         const { data } = await SupabaseDBClient.from(tableName)
           .select("*")
+          .overrideTypes<Array<M["DBRead"]>, { merge: false }>()
           .throwOnError();
 
-        logger.log(`All ${modelName}s from db`, data);
+        logger.log("Received data from Supabase", data);
 
         const models = data.map((dbRow) => {
           const model = parsers.fromDBReadToModelRead(dbRow);
           return model;
         });
+
+        logger.log("Parsed model data", data);
 
         return models;
       },
@@ -121,7 +145,12 @@ export function createSupabaseCRUDClient<M extends SupabaseModelCRUDTypes>({
       insert: async (params: { data: M["Insert"] }): Promise<M["Read"]> => {
         const logger = baseLogger.appendName("insert");
 
+        logger.log("Attempting to insert with arguments", params.data);
+
         const dataToInsert = parsers.fromModelInsertToDBInsert(params.data);
+
+        logger.log("Sending formatted data to Supabase", dataToInsert);
+
         const { data: insertedData } = await SupabaseDBClient.from(tableName)
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .insert(dataToInsert as any)
@@ -129,10 +158,44 @@ export function createSupabaseCRUDClient<M extends SupabaseModelCRUDTypes>({
           .single<M["DBRead"]>()
           .throwOnError();
 
-        logger.log(`Inserted ${modelName} into db`, insertedData);
+        logger.log("Received data from Supabase", insertedData);
 
         const insertedModel = parsers.fromDBReadToModelRead(insertedData);
         return insertedModel;
+      },
+
+      /**
+       * Inserts multiple new models into the database.
+       * @param params
+       * @param params.data - An array of models to insert
+       * @returns An array of the inserted models
+       */
+      bulkInsert: async (params: {
+        data: ReadonlyArray<M["Insert"]>;
+      }): Promise<Array<M["Read"]>> => {
+        const logger = baseLogger.appendName("bulkInsert");
+
+        logger.log("Attempting to insert with arguments", params.data);
+
+        const dataToInsert = params.data.map(parsers.fromModelInsertToDBInsert);
+
+        logger.log("Sending formatted data to Supabase", dataToInsert);
+
+        const { data: insertedData } = await SupabaseDBClient.from(tableName)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .insert(dataToInsert as any)
+          .select()
+          .overrideTypes<Array<M["DBRead"]>, { merge: false }>()
+          .throwOnError();
+
+        logger.log("Received data from Supabase", insertedData);
+
+        const insertedModels = insertedData.map((dbRow) => {
+          const model = parsers.fromDBReadToModelRead(dbRow);
+          return model;
+        });
+
+        return insertedModels;
       },
 
       /**
@@ -146,7 +209,13 @@ export function createSupabaseCRUDClient<M extends SupabaseModelCRUDTypes>({
         id: M["modelPrimaryKeyType"];
         data: M["Update"];
       }): Promise<M["Read"]> => {
+        const logger = baseLogger.appendName("update");
+        logger.log("Attempting to update with arguments", params);
+
         const dataToUpdate = parsers.fromModelUpdateToDBUpdate(params.data);
+
+        logger.log("Sending formatted data to Supabase", dataToUpdate);
+
         const { data: updatedData } = await SupabaseDBClient.from(tableName)
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .update(dataToUpdate as any)
@@ -155,6 +224,9 @@ export function createSupabaseCRUDClient<M extends SupabaseModelCRUDTypes>({
           .select()
           .single<M["DBRead"]>()
           .throwOnError();
+
+        logger.log("Received data from Supabase", updatedData);
+
         return parsers.fromDBReadToModelRead(updatedData);
       },
 
@@ -167,17 +239,77 @@ export function createSupabaseCRUDClient<M extends SupabaseModelCRUDTypes>({
       delete: async (params: {
         id: M["modelPrimaryKeyType"];
       }): Promise<void> => {
+        const logger = baseLogger.appendName("delete");
+        logger.log("Attempting to delete", params.id);
         await SupabaseDBClient.from(tableName)
           .delete()
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .eq(dbTablePrimaryKey, params.id as any)
           .throwOnError();
+        logger.log("Finished `delete`");
+      },
+
+      /**
+       * Deletes multiple existing models from the database.
+       * @param params
+       * @param params.ids - An array of IDs of the models to delete
+       * @returns A void promise.
+       */
+      bulkDelete: async (params: {
+        ids: ReadonlyArray<M["modelPrimaryKeyType"]>;
+      }): Promise<void> => {
+        const logger = baseLogger.appendName("bulkDelete");
+        logger.log("Attempting to delete", params.ids);
+        await SupabaseDBClient.from(tableName)
+          .delete()
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .in(dbTablePrimaryKey, params.ids as any)
+          .throwOnError();
+        logger.log("Finished `bulkDelete`");
       },
     };
 
-    return withQueryHooks(modelClient, {
+    // build the extended mutations client
+    const extendedClient =
+      mutations ?
+        {
+          ...baseClient,
+          ...mutations({
+            logger: baseLogger,
+          }),
+        }
+      : undefined;
+
+    // now attach the hooks to both clients
+    const modelClientWithHooks = withQueryHooks(modelClient, {
       queryFns: DEFAULT_QUERY_FN_NAMES,
       mutationFns: DEFAULT_MUTATION_FN_NAMES,
     });
+
+    const extendedClientWithHooks =
+      extendedClient ?
+        withQueryHooks(extendedClient, {
+          queryFns: [],
+
+          // Technically this will allow some invalid function names to
+          // be passed, but it will not cause any runtime errors or have
+          // any significant memory or performance implications.
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          mutationFns: objectKeys(extendedClient) as any[],
+        })
+      : undefined;
+
+    return {
+      ...modelClientWithHooks,
+      ...extendedClientWithHooks,
+      QueryKeys: {
+        ...modelClientWithHooks.QueryKeys,
+        ...extendedClientWithHooks?.QueryKeys,
+      },
+
+      // Using `any` here only because TypeScript is struggling with the
+      // complexity of the generics and function name extractions.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
   });
 }

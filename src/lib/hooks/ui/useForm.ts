@@ -153,7 +153,7 @@ export function useForm<
     <
       FullPath extends FormPath,
       BasePath extends string,
-      PathTail extends GetPathTail<FormPath, P>,
+      PathTail extends GetPathTail<FormPath, BasePath>,
     >(
       basePathOrFullPaths: BasePath | readonly FullPath[],
       pathTails?: readonly PathTail[],

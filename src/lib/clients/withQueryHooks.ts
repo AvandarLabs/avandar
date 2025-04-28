@@ -110,12 +110,12 @@ export type WithQueryHooks<
     (
       useMutationOptions?: Simplify<
         Omit<
-          UseMutationOptions<Result, DefaultError, Params[0], unknown>,
+          UseMutationOptions<Result, Params[0], DefaultError, unknown>,
           "mutationFn"
         > &
           ExtraUseClientMutationArgs
       >,
-    ) => UseMutationResultTuple<Result, DefaultError, Params[0], unknown>
+    ) => UseMutationResultTuple<Result, Params[0], DefaultError, unknown>
   : never;
 } & {
   QueryKeys: {
@@ -225,8 +225,8 @@ export function withQueryHooks<
           useMutationOptions?: Omit<
             UseMutationOptions<
               ClientFnReturnType<Client, UseMutationFnName>,
-              DefaultError,
               ClientFnFirstParameter<Client, UseMutationFnName>,
+              DefaultError,
               unknown
             >,
             "mutationFn"

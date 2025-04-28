@@ -36,6 +36,16 @@ export type ModelCRUDClient<M extends ModelCRUDTypes> = {
   insert(params: { data: M["Insert"] }): Promise<M["Read"]>;
 
   /**
+   * Inserts multiple new model instances in the data store.
+   * @param params - The parameters for the operation
+   * @param params.data - An array of data objects to insert.
+   * @returns A promise resolving to an array of the created model instances
+   */
+  bulkInsert(params: {
+    data: ReadonlyArray<M["Insert"]>;
+  }): Promise<Array<M["Read"]>>;
+
+  /**
    * Updates an existing model instance with the provided data.
    * @param id - The unique identifier of the model to update
    * @param data - The data to update on the model instance
@@ -52,6 +62,16 @@ export type ModelCRUDClient<M extends ModelCRUDTypes> = {
    * @returns A promise that resolves when deletion is complete
    */
   delete(params: { id: M["modelPrimaryKeyType"] }): Promise<void>;
+
+  /**
+   * Deletes multiple model instances from the data store.
+   * @param params
+   * @param params.ids - An array of IDs of the models to delete
+   * @returns A void promise.
+   */
+  bulkDelete(params: {
+    ids: ReadonlyArray<M["modelPrimaryKeyType"]>;
+  }): Promise<void>;
 } & BaseClient;
 
 /**
@@ -72,8 +92,10 @@ export type DefaultQueryFnName = (typeof DEFAULT_QUERY_FN_NAMES)[number];
  */
 export const DEFAULT_MUTATION_FN_NAMES = [
   "insert",
+  "bulkInsert",
   "update",
   "delete",
+  "bulkDelete",
 ] as const satisfies ReadonlyArray<
   HookableFnName<ModelCRUDClient<ModelCRUDTypes>>
 >;

@@ -15,12 +15,12 @@ import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { DangerText } from "@/lib/ui/Text/DangerText";
 import { getProp, objectValues, sortObjList } from "@/lib/utils/objects";
 import { EntityFieldValueExtractorTypes } from "@/models/EntityConfig/EntityFieldConfig/constants";
-import { EntityConfigForm } from "../entityCreatorTypes";
+import { EntityConfigFormValues } from "../entityCreatorTypes";
 import { DatasetColumnValueExtractorEditor } from "./DatasetColumnValueExtractorEditor";
 
 type Props = {
-  entityConfigForm: FormType<EntityConfigForm>;
-  defaultField: ElementOf<EntityConfigForm["fields"]>;
+  entityConfigForm: FormType<EntityConfigFormValues>;
+  defaultField: ElementOf<EntityConfigFormValues["fields"]>;
   idx: number;
   entityName: string;
 };

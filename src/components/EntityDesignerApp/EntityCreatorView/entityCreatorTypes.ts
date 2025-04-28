@@ -1,67 +1,60 @@
-import { SetOptional } from "type-fest";
+import { SetOptional, SetRequired } from "type-fest";
 import { uuid } from "@/lib/utils/uuid";
 import {
-  DraftFieldId,
   EntityFieldConfig,
+  EntityFieldConfigId,
 } from "@/models/EntityConfig/EntityFieldConfig/types";
-import { EntityConfig } from "@/models/EntityConfig/types";
+import { EntityConfig, EntityConfigId } from "@/models/EntityConfig/types";
 import { AggregationExtractor } from "@/models/EntityConfig/ValueExtractor/AggregationExtractor/types";
 import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/types";
 import { ManualEntryExtractor } from "@/models/EntityConfig/ValueExtractor/ManualEntryExtractor/types";
 
-/**
- * A draft version of the type, to use while the user is still creating
- * a new EntityFieldConfig in a form.
- *
- * There is no `entityConfigId` because the user may not have created
- * the EntityConfig yet. A `draftId` must be provided in the frontend
- * so this can be used as a React key.
- */
-export type EntityFieldConfigDraft = {
-  draftId: DraftFieldId;
+type EntityFieldFormValues = SetRequired<EntityFieldConfig<"Insert">, "id"> & {
   aggregationExtractor: SetOptional<
     AggregationExtractor<"Insert">,
-    "entityFieldConfigId" | "datasetId" | "datasetFieldId"
+    "datasetId" | "datasetFieldId"
   >;
-  manualEntryExtractor: SetOptional<
-    ManualEntryExtractor<"Insert">,
-    "entityFieldConfigId"
-  >;
+  manualEntryExtractor: ManualEntryExtractor<"Insert">;
   datasetColumnValueExtractor: SetOptional<
     DatasetColumnValueExtractor<"Insert">,
-    "entityFieldConfigId" | "datasetId" | "datasetFieldId"
+    "datasetId" | "datasetFieldId"
   >;
-} & Omit<EntityFieldConfig<"Insert">, "id" | "entityConfigId">;
+};
 
-export type EntityConfigForm = EntityConfig<"Insert"> & {
-  fields: EntityFieldConfigDraft[];
+export type EntityConfigFormValues = SetRequired<
+  EntityConfig<"Insert">,
+  "id"
+> & {
+  fields: EntityFieldFormValues[];
 };
 
 /**
- * Make a default EntityFieldConfig Draft to use in a creation form.
+ * Make a default EntityFieldConfig form values to use in a creation form.
  */
-export function makeDefaultEntityFieldDraft({
+export function getDefaultEntityFieldFormValues({
+  entityConfigId,
   name,
   isIdField,
   isTitleField,
 }: {
+  entityConfigId: EntityConfigId;
   name: string;
   isIdField: boolean;
   isTitleField: boolean;
-}): EntityFieldConfigDraft {
-  const dateTimeNow = new Date().toISOString();
+}): EntityFieldFormValues {
+  const entityFieldConfigId: EntityFieldConfigId = uuid();
+
   return {
+    id: entityFieldConfigId,
+    entityConfigId,
     name,
     isIdField,
     isTitleField,
     allowManualEdit: false,
     isArray: false,
-    draftId: uuid(),
     class: "dimension",
     baseDataType: "string",
     valueExtractorType: "manual_entry",
-    createdAt: dateTimeNow,
-    updatedAt: dateTimeNow,
 
     // TODO(pablo): use a null to undefined converter to avoid using `null`
     // here. We want this to be set to `undefined`
@@ -69,23 +62,40 @@ export function makeDefaultEntityFieldDraft({
 
     // set up some default initial values for the value extractor configs
     aggregationExtractor: {
+      entityFieldConfigId,
       aggregationType: "sum",
       datasetId: undefined,
       datasetFieldId: undefined,
       filter: null,
-      createdAt: dateTimeNow,
-      updatedAt: dateTimeNow,
     },
     manualEntryExtractor: {
-      createdAt: dateTimeNow,
-      updatedAt: dateTimeNow,
+      entityFieldConfigId,
     },
     datasetColumnValueExtractor: {
+      entityFieldConfigId,
       valuePickerRuleType: "most_frequent",
       datasetId: undefined,
       datasetFieldId: undefined,
-      createdAt: dateTimeNow,
-      updatedAt: dateTimeNow,
     },
+  };
+}
+
+export function getDefaultEntityConfigFormValues(): EntityConfigFormValues {
+  const entityConfigId: EntityConfigId = uuid();
+
+  return {
+    id: entityConfigId,
+    name: "",
+    description: "",
+    datasetId: null,
+    allowManualCreation: false,
+    fields: [
+      getDefaultEntityFieldFormValues({
+        entityConfigId,
+        isIdField: true,
+        isTitleField: true,
+        name: "Name",
+      }),
+    ],
   };
 }

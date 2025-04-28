@@ -2,42 +2,27 @@ import { Button, Checkbox, Container, Stack, TextInput } from "@mantine/core";
 import { formRootRule, isNotEmpty } from "@mantine/form";
 import { LocalDatasetSelect } from "@/components/common/LocalDatasetSelect";
 import { useForm } from "@/lib/hooks/ui/useForm";
-import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
-import { EntityConfig } from "@/models/EntityConfig/types";
 import {
-  EntityConfigForm,
-  makeDefaultEntityFieldDraft,
+  EntityConfigFormValues,
+  getDefaultEntityConfigFormValues,
 } from "./entityCreatorTypes";
 import { EntityFieldCreatorBlock } from "./EntityFieldCreatorBlock";
-
-const initialFields = [
-  makeDefaultEntityFieldDraft({
-    isIdField: true,
-    isTitleField: true,
-    name: "Name",
-  }),
-];
+import { useSubmitFullEntityConfigForm } from "./useSubmitFullEntityConfigForm";
 
 export function EntityCreatorView(): JSX.Element {
-  const [doCreateEntityConfig, pendingEntityConfigCreate] =
-    EntityConfigClient.useInsert();
-  const [entityConfigForm, entityConfigFormSetters] = useForm<EntityConfigForm>(
-    {
+  const [sendEntityConfigForm, isSendEntityConfigFormPending] =
+    useSubmitFullEntityConfigForm();
+
+  const [entityConfigForm, entityConfigFormSetters] =
+    useForm<EntityConfigFormValues>({
       mode: "uncontrolled",
-      initialValues: {
-        name: "",
-        description: "",
-        datasetId: null,
-        allowManualCreation: false,
-        fields: initialFields,
-      },
+      initialValues: getDefaultEntityConfigFormValues(),
       validate: {
         fields: {
           [formRootRule]: isNotEmpty("At least one field is required"),
         },
       },
-    },
-  );
+    });
 
   const [keys, inputProps] = entityConfigForm.keysAndProps([
     "name",
@@ -50,15 +35,8 @@ export function EntityCreatorView(): JSX.Element {
   return (
     <Container pt="lg">
       <form
-        onSubmit={entityConfigForm.onSubmit(async (values) => {
-          const entityConfig: EntityConfig<"Insert"> = {
-            name: values.name,
-            description: values.description,
-            datasetId: values.datasetId,
-            allowManualCreation: values.allowManualCreation,
-          };
-
-          doCreateEntityConfig({ data: entityConfig });
+        onSubmit={entityConfigForm.onSubmit((values) => {
+          return sendEntityConfigForm(values);
         })}
       >
         <Stack>
@@ -85,7 +63,7 @@ export function EntityCreatorView(): JSX.Element {
           <Checkbox
             key={keys.allowManualCreation}
             label="Allow manual creation of new entities"
-            {...inputProps.allowManualCreation()}
+            {...inputProps.allowManualCreation({ type: "checkbox" })}
           />
 
           <EntityFieldCreatorBlock
@@ -93,7 +71,7 @@ export function EntityCreatorView(): JSX.Element {
             formSetters={entityConfigFormSetters}
           />
 
-          <Button type="submit" loading={pendingEntityConfigCreate}>
+          <Button type="submit" loading={isSendEntityConfigFormPending}>
             Create
           </Button>
         </Stack>
