@@ -1,7 +1,9 @@
 import { Button, Checkbox, Container, Stack, TextInput } from "@mantine/core";
 import { formRootRule, isNotEmpty } from "@mantine/form";
+import { useRouter } from "@tanstack/react-router";
 import { LocalDatasetSelect } from "@/components/common/LocalDatasetSelect";
 import { useForm } from "@/lib/hooks/ui/useForm";
+import { getEntityConfigLinkProps } from "@/models/EntityConfig/utils";
 import {
   EntityConfigFormValues,
   getDefaultEntityConfigFormValues,
@@ -10,6 +12,7 @@ import { EntityFieldCreatorBlock } from "./EntityFieldCreatorBlock";
 import { useSubmitFullEntityConfigForm } from "./useSubmitFullEntityConfigForm";
 
 export function EntityCreatorView(): JSX.Element {
+  const router = useRouter();
   const [sendEntityConfigForm, isSendEntityConfigFormPending] =
     useSubmitFullEntityConfigForm();
 
@@ -36,7 +39,12 @@ export function EntityCreatorView(): JSX.Element {
     <Container pt="lg">
       <form
         onSubmit={entityConfigForm.onSubmit((values) => {
-          return sendEntityConfigForm(values);
+          return sendEntityConfigForm(values, {
+            onSuccess: () => {
+              const entityConfigId = values.id;
+              router.navigate(getEntityConfigLinkProps(entityConfigId));
+            },
+          });
         })}
       >
         <Stack>

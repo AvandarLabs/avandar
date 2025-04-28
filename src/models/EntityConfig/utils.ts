@@ -1,13 +1,13 @@
 import { LinkProps } from "@/lib/ui/links/Link";
-import { EntityConfig } from "./types";
+import { EntityConfig, EntityConfigId } from "./types";
 
 export function getEntityConfigLinkProps(
-  entity: EntityConfig,
+  entity: EntityConfig | EntityConfigId,
 ): Pick<LinkProps, "to" | "params"> {
   return {
     to: "/entity-designer/$entityConfigId",
     params: {
-      entityConfigId: entity.id,
+      entityConfigId: typeof entity === "string" ? entity : entity.id,
     },
   };
 }

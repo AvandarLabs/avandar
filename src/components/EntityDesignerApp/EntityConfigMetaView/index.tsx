@@ -3,7 +3,6 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "@tanstack/react-router";
 import { APP_CONFIG } from "@/config/AppConfig";
-import { Logger } from "@/lib/Logger";
 import { EntityDescriptionList } from "@/lib/ui/EntityDescriptionList";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityConfig } from "@/models/EntityConfig/types";
@@ -47,7 +46,6 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
                 loading: isDeletePending,
               },
               onConfirm: () => {
-                Logger.log("Delete needs implementing");
                 sendDelete(
                   { id: entityConfig.id },
                   {

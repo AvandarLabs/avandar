@@ -2,7 +2,6 @@ import {
   useMutation,
   UseMutationResultTuple,
 } from "@/lib/hooks/query/useMutation";
-import { Logger } from "@/lib/Logger";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
 import { EntityConfigFormValues } from "./entityCreatorTypes";
@@ -14,18 +13,20 @@ export function useSubmitFullEntityConfigForm(): UseMutationResultTuple<
   return useMutation({
     mutationFn: async (entityConfigForm: EntityConfigFormValues) => {
       // create the parent entity
+      await EntityConfigClient.insert({
+        data: entityConfigForm,
+      });
+
+      // create the child entities
       await Promise.all([
-        EntityConfigClient.insert({
-          data: entityConfigForm,
-        }),
         EntityFieldConfigClient.bulkInsert({
           data: entityConfigForm.fields,
         }),
       ]);
     },
-    async onError(_error, entityConfigForm) {
+
+    onError: async (_error, entityConfigForm) => {
       // Roll back all changes
-      Logger.log("ROLLING BACK");
       await Promise.all([
         EntityConfigClient.delete({ id: entityConfigForm.id }),
         EntityFieldConfigClient.bulkDelete({
@@ -35,5 +36,7 @@ export function useSubmitFullEntityConfigForm(): UseMutationResultTuple<
         }),
       ]);
     },
+
+    queryToInvalidate: EntityConfigClient.QueryKeys.getAll(),
   });
 }
