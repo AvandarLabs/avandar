@@ -35,6 +35,13 @@ type EntityConfigRead = {
   allowManualCreation: boolean;
 };
 
+type EntityConfigInsert = SetOptional<
+  Required<EntityConfigRead>,
+  "id" | "ownerId" | "description" | "createdAt" | "updatedAt"
+>;
+
+type EntityConfigUpdate = Partial<EntityConfigRead>;
+
 /**
  * CRUD type definitions for the EntityConfig model.
  */
@@ -46,11 +53,8 @@ export type EntityConfigCRUDTypes = SupabaseModelCRUDTypes<
   },
   {
     Read: EntityConfigRead;
-    Insert: SetOptional<
-      Required<EntityConfigRead>,
-      "id" | "ownerId" | "description" | "createdAt" | "updatedAt"
-    >;
-    Update: Partial<EntityConfigRead>;
+    Insert: EntityConfigInsert;
+    Update: EntityConfigUpdate;
   },
   {
     dbTablePrimaryKey: "id";

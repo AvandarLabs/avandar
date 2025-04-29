@@ -15,7 +15,6 @@ export function EntityDesignerApp(): JSX.Element {
         isLoading={isLoading}
         style={$entityNavbarBorder}
       />
-
       <Box flex={1}>
         <Outlet />
       </Box>

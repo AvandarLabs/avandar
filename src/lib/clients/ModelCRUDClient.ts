@@ -2,6 +2,8 @@ import { ModelCRUDTypes } from "../utils/models/ModelCRUDTypes";
 import { BaseClient } from "./BaseClient";
 import { HookableFnName } from "./withQueryHooks";
 
+export type FilterOperator = "eq";
+
 /**
  * A base generic client for a model with CRUD operations.
  * This interface does not make any assumptions of what the backing data store
@@ -24,9 +26,19 @@ export type ModelCRUDClient<M extends ModelCRUDTypes> = {
 
   /**
    * Retrieves all instances of the model.
+   *
+   * Optionally, `where` filters can be passed to get all the instances that
+   * match the filters.
+   *
+   * The filters must be provided in terms of the DBRead key names and types.
+   *
    * @returns A promise resolving to an array of model instances
    */
-  getAll(): Promise<Array<M["Read"]>>;
+  getAll(params?: {
+    where: {
+      [K in keyof M["DBRead"]]?: Record<FilterOperator, M["DBRead"][K]>;
+    };
+  }): Promise<Array<M["Read"]>>;
 
   /**
    * Creates a new model instance in the data store.

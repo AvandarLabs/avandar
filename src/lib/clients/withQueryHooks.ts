@@ -11,7 +11,6 @@ import {
   UseQueryResultTuple,
 } from "@/lib/hooks/query/useQuery";
 import { capitalize, prefix } from "@/lib/utils/strings";
-import { UnknownObject } from "../types/common";
 import {
   AnyFunction,
   AnyFunctionWithReturn,
@@ -66,7 +65,17 @@ type UseClientQueryArg<
 > =
   [Exclude<ClientParam, void>] extends [never] ?
     { useQueryOptions?: RefinedQueryOptions } | void
-  : ClientParam extends UnknownObject ?
+  : undefined extends ClientParam ?
+    Simplify<
+      NonNullable<ClientParam> extends object ?
+        | (NonNullable<ClientParam> & { useQueryOptions?: RefinedQueryOptions })
+        | void
+      : | ({ arg?: NonNullable<ClientParam> } & {
+            useQueryOptions?: RefinedQueryOptions;
+          })
+        | void
+    >
+  : ClientParam extends object ?
     ClientParam & { useQueryOptions?: RefinedQueryOptions }
   : { arg: ClientParam } & { useQueryOptions?: RefinedQueryOptions };
 

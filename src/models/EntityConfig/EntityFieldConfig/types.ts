@@ -62,6 +62,15 @@ type CoreFieldRead = {
 
 type EntityFieldConfigRead = CoreFieldRead & (DimensionRead | MetricRead);
 
+type EntityFieldConfigInsert = SetOptional<
+  Required<CoreFieldRead>,
+  "id" | "createdAt" | "updatedAt" | "description"
+> &
+  (DimensionRead | MetricRead);
+
+type EntityFieldConfigUpdate = Partial<CoreFieldRead> &
+  (Partial<DimensionRead> | Partial<MetricRead>);
+
 export type EntityFieldConfigCRUDTypes = SupabaseModelCRUDTypes<
   {
     tableName: "entity_field_configs";
@@ -70,13 +79,8 @@ export type EntityFieldConfigCRUDTypes = SupabaseModelCRUDTypes<
   },
   {
     Read: EntityFieldConfigRead;
-    Insert: SetOptional<
-      Required<CoreFieldRead>,
-      "id" | "createdAt" | "updatedAt" | "description"
-    > &
-      (DimensionRead | MetricRead);
-    Update: Partial<CoreFieldRead> &
-      (Partial<DimensionRead> | Partial<MetricRead>);
+    Insert: EntityFieldConfigInsert;
+    Update: EntityFieldConfigUpdate;
   },
   {
     dbTablePrimaryKey: "id";

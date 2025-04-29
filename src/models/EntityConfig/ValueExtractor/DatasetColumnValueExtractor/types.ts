@@ -32,6 +32,14 @@ type DatasetColumnValueExtractorRead = {
   updatedAt: string;
 };
 
+type DatasetColumnValueExtractorInsert = SetOptional<
+  Required<DatasetColumnValueExtractorRead>,
+  "id" | "createdAt" | "updatedAt"
+>;
+
+type DatasetColumnValueExtractorUpdate =
+  Partial<DatasetColumnValueExtractorRead>;
+
 /**
  * CRUD type definitions for the DatasetColumnValueExtractor model.
  */
@@ -43,11 +51,8 @@ export type DatasetColumnValueExtractorCRUDTypes = SupabaseModelCRUDTypes<
   },
   {
     Read: DatasetColumnValueExtractorRead;
-    Insert: SetOptional<
-      Required<DatasetColumnValueExtractorRead>,
-      "id" | "createdAt" | "updatedAt"
-    >;
-    Update: Partial<DatasetColumnValueExtractorRead>;
+    Insert: DatasetColumnValueExtractorInsert;
+    Update: DatasetColumnValueExtractorUpdate;
   },
   {
     modelPrimaryKey: "id";

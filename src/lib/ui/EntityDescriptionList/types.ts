@@ -42,10 +42,12 @@ export type PrimitiveFieldValueRenderOptions = {
  * A mapping of entity keys to its nested render options.
  * This will take precedence over any global render options.
  */
-export type FieldRenderOptionsMap<T extends EntityObject> = {
-  [K in StringPropertyKey<T>]?: T[K] extends EntityObject ?
-    EntityRenderOptions<T[K]>
-  : T[K] extends ReadonlyArray<infer ArrayType extends FieldValue> ?
+export type FieldRenderOptionsMap<T extends NonNullable<EntityObject>> = {
+  [K in StringPropertyKey<T>]?: NonNullable<T[K]> extends EntityObject ?
+    EntityRenderOptions<NonNullable<T[K]>>
+  : NonNullable<T[K]> extends (
+    ReadonlyArray<infer ArrayType extends FieldValue>
+  ) ?
     FieldValueArrayRenderOptions<ArrayType>
   : PrimitiveFieldValueRenderOptions;
 };
@@ -53,7 +55,7 @@ export type FieldRenderOptionsMap<T extends EntityObject> = {
 /**
  * Options for how to render an entity object.
  */
-export type EntityRenderOptions<T extends EntityObject> =
+export type EntityRenderOptions<T extends NonNullable<EntityObject>> =
   PrimitiveFieldValueRenderOptions & {
     excludeKeys?: ReadonlyArray<StringPropertyKey<T>>;
     titleKey?: StringPropertyKey<T>;
@@ -65,7 +67,7 @@ export type EntityRenderOptions<T extends EntityObject> =
     entityFieldOptions?: FieldRenderOptionsMap<T>;
   };
 
-export type EntityArrayRenderOptions<T extends EntityObject> =
+export type EntityArrayRenderOptions<T extends NonNullable<EntityObject>> =
   EntityRenderOptions<T> & {
     renderAsTable?: boolean;
   };

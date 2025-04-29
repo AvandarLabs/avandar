@@ -9,7 +9,7 @@ import { UnknownFieldValueItem } from "./UnknownFieldValueItem";
 
 type Props<T extends EntityObject> = {
   entity: T;
-} & EntityRenderOptions<T>;
+} & EntityRenderOptions<NonNullable<T>>;
 
 export function EntityDescriptionList<T extends EntityObject>({
   entity,

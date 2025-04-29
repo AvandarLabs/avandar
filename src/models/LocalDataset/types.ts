@@ -45,6 +45,8 @@ type LocalDatasetRead = Merge<
   }
 >;
 
+type LocalDatasetUpdate = Partial<LocalDatasetRead>;
+
 export type LocalDatasetCRUDTypes = DexieModelCRUDTypes<
   {
     modelName: "LocalDataset";
@@ -56,7 +58,7 @@ export type LocalDatasetCRUDTypes = DexieModelCRUDTypes<
   },
   {
     Read: LocalDatasetRead;
-    Update: Partial<LocalDatasetRead>;
+    Update: LocalDatasetUpdate;
   },
   {
     primaryKey: "id";

@@ -22,6 +22,13 @@ type ManualEntryExtractorRead = {
   updatedAt: string;
 };
 
+type ManualEntryExtractorInsert = SetOptional<
+  Required<ManualEntryExtractorRead>,
+  "id" | "createdAt" | "updatedAt"
+>;
+
+type ManualEntryExtractorUpdate = Partial<ManualEntryExtractorRead>;
+
 export type ManualEntryExtractorCRUDTypes = SupabaseModelCRUDTypes<
   {
     tableName: "value_extractor__manual_entry";
@@ -30,11 +37,8 @@ export type ManualEntryExtractorCRUDTypes = SupabaseModelCRUDTypes<
   },
   {
     Read: ManualEntryExtractorRead;
-    Insert: SetOptional<
-      Required<ManualEntryExtractorRead>,
-      "id" | "createdAt" | "updatedAt"
-    >;
-    Update: Partial<ManualEntryExtractorRead>;
+    Insert: ManualEntryExtractorInsert;
+    Update: ManualEntryExtractorUpdate;
   },
   {
     modelPrimaryKey: "id";

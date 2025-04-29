@@ -1,15 +1,18 @@
-import Dexie, { EntityTable } from "dexie";
+import Dexie, { EntityTable, IndexableTypePart } from "dexie";
+import { match } from "ts-pattern";
 import { ILogger } from "../Logger";
 import { UnknownObject } from "../types/common";
 import { isNotUndefined } from "../utils/guards";
 import { DexieModelCRUDTypes } from "../utils/models/DexieModelCRUDTypes";
 import { ModelCRUDParserRegistry } from "../utils/models/ModelCRUDParserRegistry";
+import { objectEntries } from "../utils/objects";
 import { BaseClient } from "./BaseClient";
 import {
   DEFAULT_MUTATION_FN_NAMES,
   DEFAULT_QUERY_FN_NAMES,
   DefaultMutationFnName,
   DefaultQueryFnName,
+  FilterOperator,
   ModelCRUDClient,
 } from "./ModelCRUDClient";
 import { WithLogger, withLogger } from "./withLogger";
@@ -104,15 +107,41 @@ export function createDexieCRUDClient<
       },
 
       // TODO(pablo): implement pagination
-      getAll: async (): Promise<Array<M["Read"]>> => {
+      getAll: async (params?: {
+        where: {
+          [K in keyof M["DBRead"]]?: Record<FilterOperator, M["DBRead"][K]>;
+        };
+      }): Promise<Array<M["Read"]>> => {
         const logger = baseLogger.appendName("getAll");
 
-        // always log this untiol we implement pagination
+        // always log this until we implement pagination
         logger
           .setEnabled(true)
           .log("Need to implement pagination for Dexie clients");
 
-        const allData = await dbTable.toArray();
+        let query;
+
+        if (params?.where) {
+          const columns: string[] = [];
+          const eqValues: IndexableTypePart[] = [];
+          objectEntries(params.where).forEach(([column, filter]) => {
+            if (filter) {
+              objectEntries(filter).forEach(([operator, value]) => {
+                // currently we only support `eq` filters
+                match(operator as FilterOperator)
+                  .with("eq", () => {
+                    columns.push(column);
+                    eqValues.push(value as IndexableTypePart);
+                  })
+                  .exhaustive();
+              });
+            }
+          });
+
+          query = dbTable.where(columns).equals(eqValues).toArray();
+        }
+
+        const allData = await (query ?? dbTable.toArray());
         return allData.map((data) => {
           return parsers.fromDBReadToModelRead(data);
         });

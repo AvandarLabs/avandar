@@ -1,15 +1,17 @@
+import { match } from "ts-pattern";
 import { SupabaseDBClient } from "@/lib/clients/SupabaseDBClient";
 import { ModelCRUDParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
 import { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
 import { ILogger } from "../Logger";
 import { UnknownObject } from "../types/common";
-import { objectKeys } from "../utils/objects";
+import { objectEntries, objectKeys } from "../utils/objects";
 import { BaseClient } from "./BaseClient";
 import {
   DEFAULT_MUTATION_FN_NAMES,
   DEFAULT_QUERY_FN_NAMES,
   DefaultMutationFnName,
   DefaultQueryFnName,
+  FilterOperator,
   ModelCRUDClient,
 } from "./ModelCRUDClient";
 import { WithLogger, withLogger } from "./withLogger";
@@ -115,12 +117,34 @@ export function createSupabaseCRUDClient<
        * TODO(pablo): implement pagination
        * @returns A promise that resolves to an array of models
        */
-      getAll: async (): Promise<Array<M["Read"]>> => {
+      getAll: async (params?: {
+        where: {
+          [K in keyof M["DBRead"]]?: Record<FilterOperator, M["DBRead"][K]>;
+        };
+      }): Promise<Array<M["Read"]>> => {
         baseLogger.warn("TODO(pablo): Pagination must be implemented.");
         const logger = baseLogger.appendName("getAll");
 
-        const { data } = await SupabaseDBClient.from(tableName)
-          .select("*")
+        let query = SupabaseDBClient.from(tableName).select("*");
+
+        if (params?.where) {
+          objectEntries(params.where).forEach(([column, filter]) => {
+            if (filter) {
+              objectEntries(filter).forEach(([operator, value]) => {
+                // currently we only support `eq` filters
+                match(operator as FilterOperator)
+                  .with("eq", () => {
+                    // eslint-disable-next-line max-len
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    query = query.eq(column, value as any);
+                  })
+                  .exhaustive();
+              });
+            }
+          });
+        }
+
+        const { data } = await query
           .overrideTypes<Array<M["DBRead"]>, { merge: false }>()
           .throwOnError();
 

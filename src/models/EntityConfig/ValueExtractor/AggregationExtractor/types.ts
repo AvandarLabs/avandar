@@ -36,6 +36,13 @@ type AggregationExtractorRead = {
   updatedAt: string;
 };
 
+type AggregationExtractorInsert = SetOptional<
+  Required<AggregationExtractorRead>,
+  "id" | "createdAt" | "updatedAt" | "filter"
+>;
+
+type AggregationExtractorUpdate = Partial<AggregationExtractorRead>;
+
 export type AggregationExtractorCRUDTypes = SupabaseModelCRUDTypes<
   {
     tableName: "value_extractor__aggregation";
@@ -44,11 +51,8 @@ export type AggregationExtractorCRUDTypes = SupabaseModelCRUDTypes<
   },
   {
     Read: AggregationExtractorRead;
-    Insert: SetOptional<
-      Required<AggregationExtractorRead>,
-      "id" | "createdAt" | "updatedAt" | "filter"
-    >;
-    Update: Partial<AggregationExtractorRead>;
+    Insert: AggregationExtractorInsert;
+    Update: AggregationExtractorUpdate;
   },
   {
     dbTablePrimaryKey: "id";
