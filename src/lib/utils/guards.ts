@@ -1,3 +1,4 @@
+import { SetRequired } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
 import { AnyFunction } from "../types/utilityTypes";
 
@@ -103,4 +104,25 @@ export function isString(value: unknown): value is string {
 
 export function isBoolean(value: unknown): value is boolean {
   return typeof value === "boolean";
+}
+
+/**
+ * Checks if `obj` has all the properties in `properties`.
+ *
+ * This is useful when an object has optional properties but you want to assert
+ * that these values are present.
+ *
+ * @param obj - The object to check.
+ * @param properties - The properties to check.
+ * @returns `true` if `obj` has all the properties in `properties`, `false`
+ * otherwise.
+ */
+export function hasProps<
+  T extends object,
+  Key extends keyof T,
+  Keys extends readonly [Key, ...Key[]],
+>(obj: T, ...properties: Keys): obj is T & SetRequired<T, Keys[number]> {
+  return properties.every((prop) => {
+    return prop in obj;
+  });
 }

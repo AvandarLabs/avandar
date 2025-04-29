@@ -9,7 +9,10 @@ import { AggregationExtractor } from "@/models/EntityConfig/ValueExtractor/Aggre
 import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/types";
 import { ManualEntryExtractor } from "@/models/EntityConfig/ValueExtractor/ManualEntryExtractor/types";
 
-type EntityFieldFormValues = SetRequired<EntityFieldConfig<"Insert">, "id"> & {
+export type EntityFieldFormValues = SetRequired<
+  EntityFieldConfig<"Insert">,
+  "id"
+> & {
   aggregationExtractor: SetOptional<
     AggregationExtractor<"Insert">,
     "datasetId" | "datasetFieldId"
