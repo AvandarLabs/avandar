@@ -119,7 +119,7 @@ export function EntityFieldCreator({
           );
         })
         .with("aggregation", () => {
-          return <div>Aggregation</div>;
+          return <DangerText>Aggregations are not implemented yet.</DangerText>;
         })
         .exhaustive(() => {
           return <DangerText>Unsupported value extractor type</DangerText>;

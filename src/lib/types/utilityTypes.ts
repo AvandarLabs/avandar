@@ -71,7 +71,7 @@ export type AnyFunctionWithSignature<Params extends unknown[], Return> = (
  * (Note: this is just at the type-level. It does not mean the function
  * will return the same _value_. Just that it will return the same _type_.)
  */
-export type IdentityTypeFn<T> = (value: T) => T;
+export type IdentityFnType<T> = (value: T) => T;
 
 /**
  * Get the element type of an array or tuple.

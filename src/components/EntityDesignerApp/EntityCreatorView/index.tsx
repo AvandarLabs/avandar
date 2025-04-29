@@ -3,6 +3,7 @@ import { formRootRule, isNotEmpty } from "@mantine/form";
 import { useRouter } from "@tanstack/react-router";
 import { LocalDatasetSelect } from "@/components/common/LocalDatasetSelect";
 import { useForm } from "@/lib/hooks/ui/useForm";
+import { isNotEqualTo } from "@/lib/hooks/ui/useForm/validators";
 import { getEntityConfigLinkProps } from "@/models/EntityConfig/utils";
 import {
   EntityConfigFormValues,
@@ -23,6 +24,10 @@ export function EntityCreatorView(): JSX.Element {
       validate: {
         fields: {
           [formRootRule]: isNotEmpty("At least one field is required"),
+          valueExtractorType: isNotEqualTo(
+            "aggregation",
+            "Aggregation is not a supported value extractor type yet. Please choose something else.",
+          ),
         },
       },
     });
