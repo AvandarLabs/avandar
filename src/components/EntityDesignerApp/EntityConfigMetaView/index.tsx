@@ -13,7 +13,7 @@ type Props = {
   entityConfig: EntityConfig;
 };
 
-const EXCLUDED_ENTITY_CONFIG_KEYS = ["id", "ownerId"] as const;
+const EXCLUDED_ENTITY_CONFIG_KEYS = ["id", "ownerId", "datasetId"] as const;
 const ENTITY_CONFIG_RENDER_OPTIONS: FieldRenderOptionsMap<
   EntityConfig<"Full">
 > = {
@@ -24,7 +24,7 @@ const ENTITY_CONFIG_RENDER_OPTIONS: FieldRenderOptionsMap<
         excludeKeys: ["id"],
       },
     },
-    excludeKeys: ["data"],
+    excludeKeys: ["id", "data"],
   },
   fields: {
     titleKey: "name",
