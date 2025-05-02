@@ -1,5 +1,5 @@
 import { isPlainObject } from "@/lib/utils/guards";
-import { EntityObject, FieldValue, PrimitiveFieldValue } from "./types";
+import { DescribableObject, FieldValue, PrimitiveFieldValue } from "./types";
 
 export function isPrimitiveFieldValue(
   value: FieldValue,
@@ -20,6 +20,6 @@ export function isFieldValueArray(
   return Array.isArray(value);
 }
 
-export function isEntityObject(value: FieldValue): value is EntityObject {
+export function isEntityObject(value: FieldValue): value is DescribableObject {
   return isPlainObject(value);
 }

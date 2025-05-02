@@ -3,10 +3,12 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "@tanstack/react-router";
 import { APP_CONFIG } from "@/config/AppConfig";
-import { EntityDescriptionList } from "@/lib/ui/EntityDescriptionList";
-import { FieldRenderOptionsMap } from "@/lib/ui/EntityDescriptionList/types";
+import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
+import { FieldRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
+import { hasDefinedProps } from "@/lib/utils/guards";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityConfig } from "@/models/EntityConfig/types";
+import { generateEntities } from "./generateEntities";
 import { useHydratedEntityConfig } from "./useHydratedEntityConfig";
 
 type Props = {
@@ -54,7 +56,10 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
           <Title order={2}>{entityConfig.name}</Title>
           <Button
             onClick={() => {
-              return console.log("sync data");
+              // generate all entities in-browser and in-memory for now
+              if (hasDefinedProps(fullEntityConfig, "dataset", "fields")) {
+                return generateEntities(fullEntityConfig);
+              }
             }}
           >
             Sync data!
@@ -62,7 +67,7 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
         </Group>
         <Text>{entityConfig.description}</Text>
 
-        <EntityDescriptionList
+        <ObjectDescriptionList
           entity={fullEntityConfig}
           excludeKeys={EXCLUDED_ENTITY_CONFIG_KEYS}
           entityFieldOptions={ENTITY_CONFIG_RENDER_OPTIONS}

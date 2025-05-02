@@ -15,7 +15,7 @@ export type PrimitiveFieldValue =
  */
 export type FieldValue =
   | PrimitiveFieldValue
-  | EntityObject
+  | DescribableObject
   | readonly FieldValue[];
 
 /**
@@ -23,7 +23,7 @@ export type FieldValue =
  * keys that map to values. Values can be primitives, nested entities,
  * or arrays of values.
  */
-export type EntityObject = {
+export type DescribableObject = {
   [key: string]: FieldValue;
 };
 
@@ -42,9 +42,9 @@ export type PrimitiveFieldValueRenderOptions = {
  * A mapping of entity keys to its nested render options.
  * This will take precedence over any global render options.
  */
-export type FieldRenderOptionsMap<T extends NonNullable<EntityObject>> = {
-  [K in StringKeyOf<T>]?: NonNullable<T[K]> extends EntityObject ?
-    EntityRenderOptions<NonNullable<T[K]>>
+export type FieldRenderOptionsMap<T extends NonNullable<DescribableObject>> = {
+  [K in StringKeyOf<T>]?: NonNullable<T[K]> extends DescribableObject ?
+    ObjectRenderOptions<NonNullable<T[K]>>
   : NonNullable<T[K]> extends (
     ReadonlyArray<infer ArrayType extends FieldValue>
   ) ?
@@ -55,7 +55,7 @@ export type FieldRenderOptionsMap<T extends NonNullable<EntityObject>> = {
 /**
  * Options for how to render an entity object.
  */
-export type EntityRenderOptions<T extends NonNullable<EntityObject>> =
+export type ObjectRenderOptions<T extends NonNullable<DescribableObject>> =
   PrimitiveFieldValueRenderOptions & {
     excludeKeys?: ReadonlyArray<StringKeyOf<T>>;
     titleKey?: StringKeyOf<T>;
@@ -67,8 +67,8 @@ export type EntityRenderOptions<T extends NonNullable<EntityObject>> =
     entityFieldOptions?: FieldRenderOptionsMap<T>;
   };
 
-export type EntityArrayRenderOptions<T extends NonNullable<EntityObject>> =
-  EntityRenderOptions<T> & {
+export type ObjectArrayRenderOptions<T extends NonNullable<DescribableObject>> =
+  ObjectRenderOptions<T> & {
     renderAsTable?: boolean;
   };
 
@@ -77,5 +77,5 @@ export type EntityArrayRenderOptions<T extends NonNullable<EntityObject>> =
  */
 export type FieldValueArrayRenderOptions<T extends FieldValue> = {
   emptyArray?: string;
-} & (T extends EntityObject ? EntityArrayRenderOptions<T>
+} & (T extends DescribableObject ? ObjectArrayRenderOptions<T>
 : PrimitiveFieldValueRenderOptions);

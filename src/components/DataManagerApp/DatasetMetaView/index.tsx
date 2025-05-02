@@ -5,8 +5,8 @@ import { useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { APP_CONFIG } from "@/config/AppConfig";
 import { DataGrid } from "@/lib/ui/DataGrid";
-import { EntityDescriptionList } from "@/lib/ui/EntityDescriptionList";
-import { FieldRenderOptionsMap } from "@/lib/ui/EntityDescriptionList/types";
+import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
+import { FieldRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { type LocalDataset } from "@/models/LocalDataset/types";
 import { useCSVParser } from "../hooks/useCSVParser";
@@ -47,7 +47,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
         <Title order={2}>{dataset.name}</Title>
         <Text>{dataset.description}</Text>
 
-        <EntityDescriptionList
+        <ObjectDescriptionList
           entity={dataset}
           excludeKeys={EXCLUDED_DATASET_KEYS}
           entityFieldOptions={DATASET_RENDER_OPTIONS}

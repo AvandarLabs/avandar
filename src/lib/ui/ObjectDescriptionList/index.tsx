@@ -3,15 +3,15 @@ import { StringKeyOf } from "type-fest";
 import { objectKeys } from "@/lib/utils/objects/misc";
 import { camelToTitleCase } from "@/lib/utils/strings";
 import { DescriptionList } from "../DescriptionList";
-import { getEntityFieldRenderOptions } from "./helpers";
-import { EntityObject, EntityRenderOptions } from "./types";
+import { getObjectFieldRenderOptions } from "./helpers";
+import { DescribableObject, ObjectRenderOptions } from "./types";
 import { UnknownFieldValueItem } from "./UnknownFieldValueItem";
 
-type Props<T extends EntityObject> = {
+type Props<T extends DescribableObject> = {
   entity: T;
-} & EntityRenderOptions<NonNullable<T>>;
+} & ObjectRenderOptions<NonNullable<T>>;
 
-export function EntityDescriptionList<T extends EntityObject>({
+export function ObjectDescriptionList<T extends DescribableObject>({
   entity,
   excludeKeys = [],
   ...renderOptions
@@ -31,7 +31,7 @@ export function EntityDescriptionList<T extends EntityObject>({
           <DescriptionList.Item key={key} label={camelToTitleCase(String(key))}>
             <UnknownFieldValueItem
               value={entity[key]}
-              {...getEntityFieldRenderOptions(renderOptions, key)}
+              {...getObjectFieldRenderOptions(renderOptions, key)}
             />
           </DescriptionList.Item>
         );

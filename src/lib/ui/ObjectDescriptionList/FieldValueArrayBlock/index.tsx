@@ -2,7 +2,7 @@ import { Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
 import { isFieldValueArray, isPrimitiveFieldValue } from "../guards";
 import {
-  EntityObject,
+  DescribableObject,
   FieldValue,
   FieldValueArrayRenderOptions,
   PrimitiveFieldValue,
@@ -22,7 +22,7 @@ export function FieldValueArrayBlock<T extends FieldValue>({
 }: Props<T>): JSX.Element {
   // Split between entity objects, arrays, and primitive values
   const [entityObjects, valueArrays, primitiveValues] = useMemo(() => {
-    const entities: EntityObject[] = [];
+    const entities: DescribableObject[] = [];
     const arrays: Array<readonly FieldValue[]> = [];
     const primitives: PrimitiveFieldValue[] = [];
     value.forEach((v) => {

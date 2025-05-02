@@ -1,12 +1,12 @@
 import { StringKeyOf } from "type-fest";
 import {
-  EntityObject,
-  EntityRenderOptions,
+  DescribableObject,
+  ObjectRenderOptions,
   PrimitiveFieldValueRenderOptions,
-} from "@/lib/ui/EntityDescriptionList/types";
+} from "./types";
 
-export function getEntityFieldRenderOptions<T extends EntityObject>(
-  renderOptions: EntityRenderOptions<T>,
+export function getObjectFieldRenderOptions<T extends DescribableObject>(
+  renderOptions: ObjectRenderOptions<T>,
   fieldKey: StringKeyOf<T>,
 ): PrimitiveFieldValueRenderOptions {
   const primitiveValueRenderOptions: PrimitiveFieldValueRenderOptions = {

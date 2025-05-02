@@ -1,19 +1,19 @@
-import { EntityDescriptionList } from ".";
+import { ObjectDescriptionList } from ".";
 import { FieldValueArrayBlock } from "./FieldValueArrayBlock";
 import { isFieldValueArray, isPrimitiveFieldValue } from "./guards";
 import { PrimitiveFieldValueItem } from "./PrimitiveFieldValueItem";
 import {
-  EntityObject,
-  EntityRenderOptions,
+  DescribableObject,
   FieldValue,
   FieldValueArrayRenderOptions,
+  ObjectRenderOptions,
   PrimitiveFieldValueRenderOptions,
 } from "./types";
 
 type Props = {
   value: FieldValue;
 } & PrimitiveFieldValueRenderOptions &
-  EntityRenderOptions<EntityObject> &
+  ObjectRenderOptions<DescribableObject> &
   FieldValueArrayRenderOptions<FieldValue>;
 
 export function UnknownFieldValueItem({
@@ -29,5 +29,5 @@ export function UnknownFieldValueItem({
   }
 
   // only possibility now is that the value is an entity object
-  return <EntityDescriptionList entity={value} {...renderOptions} />;
+  return <ObjectDescriptionList entity={value} {...renderOptions} />;
 }
