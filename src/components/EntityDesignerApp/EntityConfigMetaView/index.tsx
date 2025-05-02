@@ -1,4 +1,4 @@
-import { Button, Container, Stack, Text, Title } from "@mantine/core";
+import { Button, Container, Group, Stack, Text, Title } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "@tanstack/react-router";
@@ -50,7 +50,16 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
   return (
     <Container pt="lg">
       <Stack>
-        <Title order={2}>{entityConfig.name}</Title>
+        <Group>
+          <Title order={2}>{entityConfig.name}</Title>
+          <Button
+            onClick={() => {
+              return console.log("sync data");
+            }}
+          >
+            Sync data!
+          </Button>
+        </Group>
         <Text>{entityConfig.description}</Text>
 
         <EntityDescriptionList
