@@ -1,17 +1,18 @@
 import { match } from "ts-pattern";
 import { SupabaseDBClient } from "@/lib/clients/SupabaseDBClient";
-import { ModelCRUDParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
-import { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
 import { ILogger } from "../Logger";
-import { UnknownObject } from "../types/common";
-import { objectEntries, objectKeys } from "../utils/objects";
+import { ModelCRUDParserRegistry } from "../models/makeParserRegistry";
+import { SupabaseModelCRUDTypes } from "../models/SupabaseModelCRUDTypes";
+import { AnyFunctionWithSignature } from "../types/utilityTypes";
+import { FiltersByColumn } from "../utils/filters/filtersByColumn";
+import { FilterOperator } from "../utils/filters/filterTypes";
+import { objectEntries, objectKeys, omit } from "../utils/objects/misc";
 import { BaseClient } from "./BaseClient";
 import {
   DEFAULT_MUTATION_FN_NAMES,
   DEFAULT_QUERY_FN_NAMES,
   DefaultMutationFnName,
   DefaultQueryFnName,
-  FilterOperator,
   ModelCRUDClient,
 } from "./ModelCRUDClient";
 import { WithLogger, withLogger } from "./withLogger";
@@ -23,6 +24,7 @@ import {
 
 export type SupabaseCRUDClient<
   Client extends ModelCRUDClient<SupabaseModelCRUDTypes>,
+  ExtendedQueriesClient extends BaseClient,
   ExtendedMutationsClient extends BaseClient,
 > = WithLogger<
   WithQueryHooks<
@@ -31,10 +33,25 @@ export type SupabaseCRUDClient<
     Extract<HookableFnName<Client>, DefaultMutationFnName>
   > &
     WithQueryHooks<
+      ExtendedQueriesClient,
+      HookableFnName<ExtendedQueriesClient>,
+      never
+    > &
+    WithQueryHooks<
       ExtendedMutationsClient,
       never,
       HookableFnName<ExtendedMutationsClient>
     >
+>;
+
+/**
+ * A client with only functions that have a single parameter and
+ * that return a Promise.
+ */
+type HookableClient = Record<
+  string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  AnyFunctionWithSignature<[any], Promise<unknown>>
 >;
 
 /**
@@ -45,13 +62,15 @@ export type SupabaseCRUDClient<
  */
 export function createSupabaseCRUDClient<
   M extends SupabaseModelCRUDTypes,
-  ExtendedMutationsClient extends UnknownObject,
+  ExtendedQueriesClient extends HookableClient,
+  ExtendedMutationsClient extends HookableClient,
 >({
   modelName,
   tableName,
   parsers,
   dbTablePrimaryKey,
-  mutations,
+  queries: buildQueriesClient,
+  mutations: buildMutationsClient,
 }: {
   modelName: M["modelName"];
   tableName: M["tableName"];
@@ -64,12 +83,27 @@ export function createSupabaseCRUDClient<
   dbTablePrimaryKey: M["dbTablePrimaryKey"];
 
   /**
+   * Additional query functions to add to the client. These functions
+   * will get wrapped in `useQuery` hooks.
+   * @param config
+   * @param config.logger - A logger for the client.
+   * @returns An object of additional mutation functions. Each function must
+   * return a promise.
+   */
+  queries?: (config: { clientLogger: ILogger }) => ExtendedQueriesClient;
+
+  /**
    * Additional mutation functions to add to the client. These functions
    * will get wrapped in `useMutation` hooks.
+   * @param config
+   * @param config.logger - A logger for the client.
+   * @returns An object of additional mutation functions. Each function must
+   * return a promise.
    */
-  mutations?: (config: { logger: ILogger }) => ExtendedMutationsClient;
+  mutations?: (config: { clientLogger: ILogger }) => ExtendedMutationsClient;
 }): SupabaseCRUDClient<
   ModelCRUDClient<M>,
+  ExtendedQueriesClient & BaseClient,
   ExtendedMutationsClient & BaseClient
 > {
   const baseClient: BaseClient = {
@@ -90,9 +124,9 @@ export function createSupabaseCRUDClient<
        * found.
        */
       getById: async (params: {
-        id: M["modelPrimaryKeyType"] | undefined;
+        id: M["modelPrimaryKeyType"] | null | undefined;
       }): Promise<M["Read"] | undefined> => {
-        if (params.id === undefined) {
+        if (params.id === undefined || params.id === null) {
           return undefined;
         }
 
@@ -118,9 +152,7 @@ export function createSupabaseCRUDClient<
        * @returns A promise that resolves to an array of models
        */
       getAll: async (params?: {
-        where: {
-          [K in keyof M["DBRead"]]?: Record<FilterOperator, M["DBRead"][K]>;
-        };
+        where: FiltersByColumn<M["DBRead"]>;
       }): Promise<Array<M["Read"]>> => {
         baseLogger.warn("TODO(pablo): Pagination must be implemented.");
         const logger = baseLogger.appendName("getAll");
@@ -128,7 +160,8 @@ export function createSupabaseCRUDClient<
         let query = SupabaseDBClient.from(tableName).select("*");
 
         if (params?.where) {
-          objectEntries(params.where).forEach(([column, filter]) => {
+          objectKeys(params.where).forEach((column) => {
+            const filter = params.where[column as keyof M["DBRead"]];
             if (filter) {
               objectEntries(filter).forEach(([operator, value]) => {
                 // currently we only support `eq` filters
@@ -136,7 +169,12 @@ export function createSupabaseCRUDClient<
                   .with("eq", () => {
                     // eslint-disable-next-line max-len
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    query = query.eq(column, value as any);
+                    query = query.eq(String(column), value as any);
+                  })
+                  .with("in", () => {
+                    // eslint-disable-next-line max-len
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    query = query.in(String(column), value as any);
                   })
                   .exhaustive();
               });
@@ -293,42 +331,71 @@ export function createSupabaseCRUDClient<
       },
     };
 
-    // build the extended mutations client
-    const extendedClient =
-      mutations ?
+    const mutationsClient =
+      buildMutationsClient ?
         {
           ...baseClient,
-          ...mutations({
-            logger: baseLogger,
+          ...buildMutationsClient({
+            clientLogger: baseLogger,
           }),
         }
       : undefined;
 
-    // now attach the hooks to both clients
+    const queriesClient =
+      buildQueriesClient ?
+        {
+          ...baseClient,
+          ...buildQueriesClient({
+            clientLogger: baseLogger,
+          }),
+        }
+      : undefined;
+
+    // now attach the `use` hooks to our clients
     const modelClientWithHooks = withQueryHooks(modelClient, {
       queryFns: DEFAULT_QUERY_FN_NAMES,
       mutationFns: DEFAULT_MUTATION_FN_NAMES,
     });
 
-    const extendedClientWithHooks =
-      extendedClient ?
-        withQueryHooks(extendedClient, {
-          queryFns: [],
+    const baseClientKeys = objectKeys(baseClient);
+    const queriesClientWithHooks =
+      queriesClient ?
+        withQueryHooks(queriesClient, {
+          queryFns: objectKeys(
+            omit({
+              from: queriesClient,
+              keysToDelete: baseClientKeys,
+            }),
+            // This is safe to cast to `any`
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ) as any,
+          mutationFns: [],
+        })
+      : undefined;
 
-          // Technically this will allow some invalid function names to
-          // be passed, but it will not cause any runtime errors or have
-          // any significant memory or performance implications.
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          mutationFns: objectKeys(extendedClient) as any[],
+    const mutationsClientWithHooks =
+      mutationsClient ?
+        withQueryHooks(mutationsClient, {
+          queryFns: [],
+          mutationFns: objectKeys(
+            omit({
+              from: mutationsClient,
+              keysToDelete: baseClientKeys,
+            }),
+            // This is safe to cast to `any`
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ) as any,
         })
       : undefined;
 
     return {
       ...modelClientWithHooks,
-      ...extendedClientWithHooks,
+      ...queriesClientWithHooks,
+      ...mutationsClientWithHooks,
       QueryKeys: {
         ...modelClientWithHooks.QueryKeys,
-        ...extendedClientWithHooks?.QueryKeys,
+        ...queriesClientWithHooks?.QueryKeys,
+        ...mutationsClientWithHooks?.QueryKeys,
       },
 
       // Using `any` here only because TypeScript is struggling with the

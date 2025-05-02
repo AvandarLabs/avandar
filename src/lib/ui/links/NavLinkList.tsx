@@ -2,7 +2,7 @@ import { Box, BoxProps, MantineColor, Text } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
 import clsx from "clsx";
 import { NavLink } from "@/lib/ui/links/NavLink";
-import { objectEntries } from "@/lib/utils/objects";
+import { objectEntries } from "@/lib/utils/objects/misc";
 import type { NavLinkProps } from "@/lib/ui/links/NavLink";
 
 type Props = {

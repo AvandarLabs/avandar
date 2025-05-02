@@ -1,4 +1,4 @@
-import { snakeCaseKeysDeep } from "@/lib/utils/objects";
+import { snakeCaseKeysDeep } from "@/lib/utils/objects/misc";
 import { promiseMap } from "@/lib/utils/promises";
 import type { SeedJob } from "./SeedConfig";
 

@@ -1,6 +1,10 @@
 import { SetOptional, Simplify } from "type-fest";
-import { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
+import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { Enums } from "@/types/database.types";
+import {
+  DimensionExtractorType,
+  MetricExtractorType,
+} from "../ValueExtractor/types";
 import type { EntityConfigId } from "../types";
 import type { UUID } from "@/lib/types/common";
 
@@ -9,8 +13,6 @@ export type EntityFieldConfigId = UUID<"EntityFieldConfig">;
 // Enum types to match database enums
 export type EntityFieldClass = Enums<"entity_field_config__class">;
 export type EntityFieldBaseType = Enums<"entity_field_config__base_data_type">;
-export type EntityFieldValueExtractorType =
-  Enums<"entity_field_config__value_extractor_type">;
 
 // Base data types for each field classe
 export type DimensionFieldBaseDataType = Extract<
@@ -18,10 +20,6 @@ export type DimensionFieldBaseDataType = Extract<
   "string" | "number" | "date"
 >;
 export type MetricFieldBaseDataType = Extract<EntityFieldBaseType, "number">;
-
-// Value extractor types for each field class
-export type DimensionExtractorType = "dataset_column_value" | "manual_entry";
-export type MetricExtractorType = "aggregation";
 
 type DimensionRead = {
   class: "dimension";

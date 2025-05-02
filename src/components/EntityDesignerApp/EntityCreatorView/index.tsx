@@ -10,12 +10,12 @@ import {
   getDefaultEntityConfigFormValues,
 } from "./entityCreatorTypes";
 import { EntityFieldCreatorBlock } from "./EntityFieldCreatorBlock";
-import { useSubmitFullEntityConfigForm } from "./useSubmitFullEntityConfigForm";
+import { useSubmitEntityCreatorForm } from "./useSubmitEntityCreatorForm";
 
 export function EntityCreatorView(): JSX.Element {
   const router = useRouter();
   const [sendEntityConfigForm, isSendEntityConfigFormPending] =
-    useSubmitFullEntityConfigForm();
+    useSubmitEntityCreatorForm();
 
   const [entityConfigForm, entityConfigFormSetters] =
     useForm<EntityConfigFormValues>({

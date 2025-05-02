@@ -4,7 +4,8 @@ import { LocalDatasetFieldSelect } from "@/components/common/LocalDatasetFieldSe
 import { LocalDatasetSelect } from "@/components/common/LocalDatasetSelect";
 import { FormType } from "@/lib/hooks/ui/useForm";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { getProp, objectValues } from "@/lib/utils/objects";
+import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { objectValues } from "@/lib/utils/objects/misc";
 import { ValuePickerRuleTypes } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/constants";
 import { LocalDatasetId } from "@/models/LocalDataset/types";
 import { EntityConfigFormValues } from "../entityCreatorTypes";

@@ -1,9 +1,11 @@
+import { emptyObjectSymbol } from "./global";
 import { Brand } from "./utilityTypes";
 
 export type UUID<B extends string = never> =
   [B] extends [never] ? Brand<string, "UUID"> : Brand<string, `${B}UUID`>;
 
 export type UnknownObject = Record<PropertyKey, unknown>;
+export type EmptyObject = { [emptyObjectSymbol]?: never };
 export type CSVCellValue = string | undefined;
 export type CSVRow = Record<string, CSVCellValue>;
 export type CSVData = CSVRow[];

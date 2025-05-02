@@ -1,7 +1,7 @@
 import { SetOptional, Simplify } from "type-fest";
+import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import type { EntityFieldConfigId } from "../../EntityFieldConfig/types";
 import type { UUID } from "@/lib/types/common";
-import type { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
 
 export type ManualEntryExtractorId = UUID<"ManualEntryExtractor">;
 

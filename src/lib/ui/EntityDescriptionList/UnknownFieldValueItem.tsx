@@ -1,4 +1,4 @@
-import { Text } from "@mantine/core";
+import { EntityDescriptionList } from ".";
 import { FieldValueArrayBlock } from "./FieldValueArrayBlock";
 import { isFieldValueArray, isPrimitiveFieldValue } from "./guards";
 import { PrimitiveFieldValueItem } from "./PrimitiveFieldValueItem";
@@ -29,5 +29,5 @@ export function UnknownFieldValueItem({
   }
 
   // only possibility now is that the value is an entity object
-  return <Text>Entity object value</Text>;
+  return <EntityDescriptionList entity={value} {...renderOptions} />;
 }

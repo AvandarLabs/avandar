@@ -1,4 +1,4 @@
-import { StringPropertyKey } from "@/lib/types/utilityTypes";
+import { StringKeyOf } from "type-fest";
 
 /** A non-recursive field value */
 export type PrimitiveFieldValue =
@@ -43,7 +43,7 @@ export type PrimitiveFieldValueRenderOptions = {
  * This will take precedence over any global render options.
  */
 export type FieldRenderOptionsMap<T extends NonNullable<EntityObject>> = {
-  [K in StringPropertyKey<T>]?: NonNullable<T[K]> extends EntityObject ?
+  [K in StringKeyOf<T>]?: NonNullable<T[K]> extends EntityObject ?
     EntityRenderOptions<NonNullable<T[K]>>
   : NonNullable<T[K]> extends (
     ReadonlyArray<infer ArrayType extends FieldValue>
@@ -57,8 +57,8 @@ export type FieldRenderOptionsMap<T extends NonNullable<EntityObject>> = {
  */
 export type EntityRenderOptions<T extends NonNullable<EntityObject>> =
   PrimitiveFieldValueRenderOptions & {
-    excludeKeys?: ReadonlyArray<StringPropertyKey<T>>;
-    titleKey?: StringPropertyKey<T>;
+    excludeKeys?: ReadonlyArray<StringKeyOf<T>>;
+    titleKey?: StringKeyOf<T>;
 
     /**
      * Maps entity fields to its render options. This will take precedence

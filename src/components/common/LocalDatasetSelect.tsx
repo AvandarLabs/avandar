@@ -2,7 +2,7 @@ import { useUncontrolled } from "@mantine/hooks";
 import { useMemo } from "react";
 import { Select, SelectProps } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { getProp } from "@/lib/utils/objects";
+import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { LocalDatasetId } from "@/models/LocalDataset/types";
 

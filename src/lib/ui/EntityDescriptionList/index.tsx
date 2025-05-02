@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { StringPropertyKey } from "@/lib/types/utilityTypes";
-import { objectKeys } from "@/lib/utils/objects";
+import { StringKeyOf } from "type-fest";
+import { objectKeys } from "@/lib/utils/objects/misc";
 import { camelToTitleCase } from "@/lib/utils/strings";
 import { DescriptionList } from "../DescriptionList";
 import { getEntityFieldRenderOptions } from "./helpers";
@@ -16,7 +16,7 @@ export function EntityDescriptionList<T extends EntityObject>({
   excludeKeys = [],
   ...renderOptions
 }: Props<T>): JSX.Element {
-  const excludeKeySet: ReadonlySet<StringPropertyKey<T>> = useMemo(() => {
+  const excludeKeySet: ReadonlySet<StringKeyOf<T>> = useMemo(() => {
     return new Set(excludeKeys);
   }, [excludeKeys]);
 

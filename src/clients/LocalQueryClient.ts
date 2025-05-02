@@ -7,11 +7,9 @@ import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
 import { Logger } from "@/lib/Logger";
-import {
-  getProp,
-  makeObjectFromList,
-  objectEntries,
-} from "@/lib/utils/objects";
+import { makeObjectFromList } from "@/lib/utils/objects/builders";
+import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { objectEntries } from "@/lib/utils/objects/misc";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { getArrowDataType } from "@/models/LocalDataset/LocalDatasetField/utils";
 import { LocalDatasetId } from "@/models/LocalDataset/types";

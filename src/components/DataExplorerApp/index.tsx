@@ -6,12 +6,9 @@ import { DataGrid } from "@/lib/ui/DataGrid";
 import { Select } from "@/lib/ui/inputs/Select";
 import { LoadingOverlay } from "@/lib/ui/LoadingOverlay";
 import { difference } from "@/lib/utils/arrays";
-import {
-  getProp,
-  makeObjectFromKeys,
-  objectKeys,
-  omit,
-} from "@/lib/utils/objects";
+import { makeObjectFromKeys } from "@/lib/utils/objects/builders";
+import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { objectKeys, omit } from "@/lib/utils/objects/misc";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
 import { LocalDataset, LocalDatasetId } from "@/models/LocalDataset/types";

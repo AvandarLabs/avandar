@@ -4,6 +4,11 @@ const LOG_BODY_FONT_SIZE = "13px";
 const LOG_HEADER_STYLES = `color: #102a43; font-weight: bold; font-size: ${LOG_HEADER_FONT_SIZE};`;
 const LOG_BODY_STYLES = `background: #168d36; color: #ffffff; font-size: ${LOG_BODY_FONT_SIZE};`;
 
+type LogCaller = {
+  fnName: string;
+  location?: string;
+};
+
 export type ILogger = {
   error: (error: unknown, extraData?: unknown) => void;
   warn: (...args: unknown[]) => void;
@@ -19,12 +24,24 @@ export type ILogger = {
   setEnabled: (enabled: boolean) => ILogger;
 
   /**
-   * Appends a name to the logger.
+   * Appends a name to the logger's name.
    * This is an immutable function, it returns a new logger instance.
    * @param name - The name to append.
    * @returns The logger instance.
    */
   appendName: (name: string) => ILogger;
+
+  /**
+   * Overrides the default computed caller name. This is helpful for
+   * situations with several layers of abstraction where the automatically
+   * computed caller name is not very helpful.
+   *
+   * This is an immutable function, it returns a new logger instance.
+   *
+   * @param callerName - The caller name to set.
+   * @returns The logger instance.
+   */
+  setCallerName: (callerName: string) => ILogger;
 };
 
 /**
@@ -36,13 +53,12 @@ export type ILogger = {
  * @param callStack - The stack trace to extract from.
  * @returns An array of objects containing the function name and location.
  */
-function getFunctionsFromLoggerStack(
-  callStackString: string,
-): Array<{ fnName: string; location: string }> {
-  // Get the stack trace, skip the first lines as it's the Logger itself
+function _getFunctionsFromLoggerStack(callStackString: string): LogCaller[] {
+  // Get the stack trace, skip the first few to skip the layers of indirection
+  // within the Logger itself that led to this function call.
   const stack = callStackString
     .split("\n")
-    .slice(2)
+    .slice(3)
     .map((line) => {
       // Extract just the function/file name from the stack
       const callerString = line.trim().split("at ")[1] ?? "";
@@ -77,6 +93,11 @@ function getFunctionsFromLoggerStack(
   return stack;
 }
 
+function _makeLogHeading(logType: "WARN" | "LOG", caller: LogCaller): string {
+  const baseHeading = `%c [${logType}] ${caller.fnName}`;
+  return caller.location ? `${baseHeading} [${caller.location}]` : baseHeading;
+}
+
 /**
  * Creates a new logger instance.
  *
@@ -87,11 +108,22 @@ function getFunctionsFromLoggerStack(
  */
 export function createLogger(config?: {
   loggerName?: string;
+  callerName?: string;
   enabled?: boolean;
 }): ILogger {
-  const { loggerName, enabled = true } = config ?? {};
+  const { loggerName, callerName, enabled = true } = config ?? {};
   const styledMsgTemplate = loggerName ? `%c [${loggerName}] %s` : "%c %s";
   const state = { enabled };
+
+  const getCaller = (): LogCaller => {
+    if (callerName) {
+      return { fnName: callerName, location: "" };
+    }
+
+    const stack = _getFunctionsFromLoggerStack(new Error().stack ?? "");
+    const caller = stack[0]!;
+    return caller;
+  };
 
   return {
     isEnabled: (): boolean => {
@@ -102,6 +134,13 @@ export function createLogger(config?: {
       return createLogger({
         ...config,
         enabled: newEnabledState,
+      });
+    },
+
+    setCallerName: (newCallerName: string): ILogger => {
+      return createLogger({
+        ...config,
+        callerName: newCallerName,
       });
     },
 
@@ -138,13 +177,12 @@ export function createLogger(config?: {
         return;
       }
 
-      const stack = getFunctionsFromLoggerStack(new Error().stack ?? "");
-      const caller = stack[0]!;
+      const caller = getCaller();
       const styles = [
         `background: #f6db6d; ${LOG_HEADER_STYLES}`,
         args.length > 1 ? LOG_BODY_STYLES : `font-size: ${LOG_BODY_FONT_SIZE};`,
       ];
-      const logHeading = `%c [WARN] ${caller.fnName} [${caller.location}]`;
+      const logHeading = _makeLogHeading("WARN", caller);
       console.warn(`${logHeading}\n${styledMsgTemplate}`, ...styles, ...args);
     },
 
@@ -158,15 +196,14 @@ export function createLogger(config?: {
       }
 
       if (import.meta.env.DEV) {
-        const stack = getFunctionsFromLoggerStack(new Error().stack ?? "");
-        const caller = stack[0]!;
+        const caller = getCaller();
         const styles = [
           `background: #d5f5fa; ${LOG_HEADER_STYLES}`,
           args.length > 1 ?
             LOG_BODY_STYLES
           : `font-size: ${LOG_BODY_FONT_SIZE};`,
         ];
-        const logHeading = `%c [LOG] ${caller.fnName} [${caller.location}]`;
+        const logHeading = _makeLogHeading("LOG", caller);
         console.log(`${logHeading}\n${styledMsgTemplate} `, ...styles, ...args);
       }
     },

@@ -1,7 +1,7 @@
 import { SetOptional, Simplify } from "type-fest";
+import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { EntityFieldConfigId } from "../../EntityFieldConfig/types";
 import type { JSONValue, UUID } from "@/lib/types/common";
-import type { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
 import type { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
 
 export type AggregationExtractorId = UUID<"AggregationExtractor">;

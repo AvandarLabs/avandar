@@ -1,8 +1,7 @@
-import { ModelCRUDTypes } from "../utils/models/ModelCRUDTypes";
+import { ModelCRUDTypes } from "../models/ModelCRUDTypes";
+import { FiltersByColumn } from "../utils/filters/filtersByColumn";
 import { BaseClient } from "./BaseClient";
 import { HookableFnName } from "./withQueryHooks";
-
-export type FilterOperator = "eq";
 
 /**
  * A base generic client for a model with CRUD operations.
@@ -21,7 +20,7 @@ export type ModelCRUDClient<M extends ModelCRUDTypes> = {
    * if not found
    */
   getById(params: {
-    id: M["modelPrimaryKeyType"] | undefined;
+    id: M["modelPrimaryKeyType"] | null | undefined;
   }): Promise<M["Read"] | undefined>;
 
   /**
@@ -35,9 +34,7 @@ export type ModelCRUDClient<M extends ModelCRUDTypes> = {
    * @returns A promise resolving to an array of model instances
    */
   getAll(params?: {
-    where: {
-      [K in keyof M["DBRead"]]?: Record<FilterOperator, M["DBRead"][K]>;
-    };
+    where: FiltersByColumn<M["DBRead"]>;
   }): Promise<Array<M["Read"]>>;
 
   /**
@@ -111,4 +108,5 @@ export const DEFAULT_MUTATION_FN_NAMES = [
 ] as const satisfies ReadonlyArray<
   HookableFnName<ModelCRUDClient<ModelCRUDTypes>>
 >;
+
 export type DefaultMutationFnName = (typeof DEFAULT_MUTATION_FN_NAMES)[number];

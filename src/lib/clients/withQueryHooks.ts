@@ -17,7 +17,7 @@ import {
   AnyFunctionWithSignature,
 } from "../types/utilityTypes";
 import { isFunction, isPlainObject } from "../utils/guards";
-import { deepExclude, objectKeys } from "../utils/objects";
+import { deepExclude, objectKeys } from "../utils/objects/misc";
 import { BaseClient } from "./BaseClient";
 
 function isSingleArgObject(arg: unknown): arg is { arg: unknown } {

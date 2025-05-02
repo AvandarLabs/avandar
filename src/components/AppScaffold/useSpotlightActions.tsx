@@ -8,7 +8,7 @@ import { IconClipboard, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { APP_CONFIG } from "@/config/AppConfig";
-import { objectEntries } from "@/lib/utils/objects";
+import { objectEntries } from "@/lib/utils/objects/misc";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { SpotlightTodoContainer } from "./SpotlightTodoContainer";
 

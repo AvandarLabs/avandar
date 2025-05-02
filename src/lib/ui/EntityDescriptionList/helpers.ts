@@ -1,4 +1,4 @@
-import { StringPropertyKey } from "@/lib/types/utilityTypes";
+import { StringKeyOf } from "type-fest";
 import {
   EntityObject,
   EntityRenderOptions,
@@ -7,7 +7,7 @@ import {
 
 export function getEntityFieldRenderOptions<T extends EntityObject>(
   renderOptions: EntityRenderOptions<T>,
-  fieldKey: StringPropertyKey<T>,
+  fieldKey: StringKeyOf<T>,
 ): PrimitiveFieldValueRenderOptions {
   const primitiveValueRenderOptions: PrimitiveFieldValueRenderOptions = {
     emptyString: renderOptions.emptyString,

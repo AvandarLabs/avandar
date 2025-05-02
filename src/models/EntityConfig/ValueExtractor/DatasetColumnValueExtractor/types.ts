@@ -1,8 +1,8 @@
 import { SetOptional, Simplify } from "type-fest";
+import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { LocalDatasetId } from "@/models/LocalDataset/types";
 import type { EntityFieldConfigId } from "../../EntityFieldConfig/types";
 import type { UUID } from "@/lib/types/common";
-import type { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
 import type { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
 
 export type DatasetColumnValueExtractorId = UUID<"DatasetColumnValueExtractor">;

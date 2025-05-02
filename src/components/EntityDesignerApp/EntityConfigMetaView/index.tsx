@@ -2,18 +2,40 @@ import { Button, Container, Stack, Text, Title } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "@tanstack/react-router";
-import { useMemo } from "react";
 import { APP_CONFIG } from "@/config/AppConfig";
 import { EntityDescriptionList } from "@/lib/ui/EntityDescriptionList";
+import { FieldRenderOptionsMap } from "@/lib/ui/EntityDescriptionList/types";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
-import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
 import { EntityConfig } from "@/models/EntityConfig/types";
+import { useHydratedEntityConfig } from "./useHydratedEntityConfig";
 
 type Props = {
   entityConfig: EntityConfig;
 };
 
 const EXCLUDED_ENTITY_CONFIG_KEYS = ["id", "ownerId"] as const;
+const ENTITY_CONFIG_RENDER_OPTIONS: FieldRenderOptionsMap<
+  EntityConfig<"Full">
+> = {
+  dataset: {
+    entityFieldOptions: {
+      fields: {
+        renderAsTable: true,
+        excludeKeys: ["id"],
+      },
+    },
+    excludeKeys: ["data"],
+  },
+  fields: {
+    titleKey: "name",
+    excludeKeys: ["id", "entityConfigId", "class"],
+    entityFieldOptions: {
+      valueExtractor: {
+        excludeKeys: ["id", "entityFieldConfigId"],
+      },
+    },
+  },
+};
 
 export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
   const router = useRouter();
@@ -21,16 +43,9 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
     invalidateGetAllQuery: true,
   });
 
-  const [entityFields] = EntityFieldConfigClient.withLogger().useGetAll({
-    where: { entity_config_id: { eq: entityConfig.id } },
+  const [fullEntityConfig] = useHydratedEntityConfig({
+    entityConfig,
   });
-
-  const fullEntityConfig = useMemo(() => {
-    return {
-      ...entityConfig,
-      fields: entityFields,
-    };
-  }, [entityConfig, entityFields]);
 
   return (
     <Container pt="lg">
@@ -41,12 +56,7 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
         <EntityDescriptionList
           entity={fullEntityConfig}
           excludeKeys={EXCLUDED_ENTITY_CONFIG_KEYS}
-          entityFieldOptions={{
-            fields: {
-              titleKey: "name",
-              excludeKeys: ["id", "entityConfigId", "class"],
-            },
-          }}
+          entityFieldOptions={ENTITY_CONFIG_RENDER_OPTIONS}
         />
 
         <Button

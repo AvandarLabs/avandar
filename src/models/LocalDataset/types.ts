@@ -1,6 +1,6 @@
 import { Merge, Simplify } from "type-fest";
+import { DexieModelCRUDTypes } from "@/lib/models/DexieModelCRUDTypes";
 import { MIMEType } from "@/lib/types/common";
-import { DexieModelCRUDTypes } from "@/lib/utils/models/DexieModelCRUDTypes";
 import type { UUID } from "@/lib/types/common";
 import type { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
 

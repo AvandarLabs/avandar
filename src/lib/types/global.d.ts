@@ -11,3 +11,5 @@ declare global {
     interface Element extends React.JSX.Element {}
   }
 }
+
+declare const emptyObjectSymbol: unique symbol;

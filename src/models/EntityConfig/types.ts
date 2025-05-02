@@ -1,7 +1,9 @@
-import { SetOptional, Simplify } from "type-fest";
-import { SupabaseModelCRUDTypes } from "@/lib/utils/models/SupabaseModelCRUDTypes";
+import { Paths, SetOptional, SetRequiredDeep, Simplify } from "type-fest";
+import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { UserId } from "@/models/User";
-import { LocalDatasetId } from "../LocalDataset/types";
+import { LocalDataset, LocalDatasetId } from "../LocalDataset/types";
+import { EntityFieldConfig } from "./EntityFieldConfig/types";
+import { EntityFieldValueExtractor } from "./ValueExtractor/types";
 import type { UUID } from "@/lib/types/common";
 
 export type EntityConfigId = UUID<"EntityConfig">;
@@ -42,6 +44,15 @@ type EntityConfigInsert = SetOptional<
 
 type EntityConfigUpdate = Partial<EntityConfigRead>;
 
+type EntityConfigFull = EntityConfig & {
+  dataset?: LocalDataset;
+  fields?: ReadonlyArray<
+    EntityFieldConfig & {
+      valueExtractor?: EntityFieldValueExtractor;
+    }
+  >;
+};
+
 /**
  * CRUD type definitions for the EntityConfig model.
  */
@@ -59,8 +70,14 @@ export type EntityConfigCRUDTypes = SupabaseModelCRUDTypes<
   {
     dbTablePrimaryKey: "id";
     modelPrimaryKey: "id";
+  },
+  {
+    Full: EntityConfigFull;
   }
 >;
 
 export type EntityConfig<K extends keyof EntityConfigCRUDTypes = "Read"> =
-  Simplify<EntityConfigCRUDTypes[K]>;
+  EntityConfigCRUDTypes[K];
+
+export type EntityConfigWith<Keys extends Paths<EntityConfig<"Full">>> =
+  Simplify<SetRequiredDeep<EntityConfig<"Full">, Keys>>;

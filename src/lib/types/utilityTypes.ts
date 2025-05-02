@@ -1,16 +1,20 @@
 import { ConditionalKeys } from "type-fest";
 
 /**
- * Extract the keys of an object, but exclude the `symbol` and `number` types
- * that `keyof` on its own would return.
- */
-export type StringPropertyKey<T> = Exclude<keyof T, symbol | number>;
-
-/**
  * Get all the keys of an object that map to a given type.
  * @deprecated Just use type-fest's `ConditionalKeys` directly instead.
  */
 export type KeysThatMapTo<T, Obj extends object> = ConditionalKeys<Obj, T>;
+
+/**
+ * Get all the entries of an object as an array of tuples that preserve the
+ * mapping between key and value.
+ */
+export type Entries<T> = Array<
+  {
+    [K in keyof T]: [K, T[K]];
+  }[keyof T]
+>;
 
 /**
  * A type that can be used to create a branded type.
@@ -77,3 +81,17 @@ export type IdentityFnType<T> = (value: T) => T;
  * Get the element type of an array or tuple.
  */
 export type ElementOf<T> = T extends ReadonlyArray<infer U> ? U : never;
+
+/**
+ * A utility type to set the types of the properties in `KeysToSet` to be
+ * non-undefined.
+ *
+ * If you want to set properties to be NonNullable then use type-fest's
+ * `SetNonNullable` instead.
+ */
+export type SetDefined<
+  T extends object,
+  KeysToSet extends keyof T = keyof T,
+> = {
+  [K in keyof T]: K extends KeysToSet ? Exclude<T[K], undefined> : T[K];
+};

@@ -1,18 +1,23 @@
 import Dexie, { EntityTable, IndexableTypePart } from "dexie";
 import { match } from "ts-pattern";
 import { ILogger } from "../Logger";
+import { DexieModelCRUDTypes } from "../models/DexieModelCRUDTypes";
+import { ModelCRUDParserRegistry } from "../models/makeParserRegistry";
 import { UnknownObject } from "../types/common";
-import { isNotUndefined } from "../utils/guards";
-import { DexieModelCRUDTypes } from "../utils/models/DexieModelCRUDTypes";
-import { ModelCRUDParserRegistry } from "../utils/models/ModelCRUDParserRegistry";
-import { objectEntries } from "../utils/objects";
+import { mapToArrayTuple } from "../utils/arrays";
+import { applyFiltersToRows } from "../utils/filters/applyFiltersToRows";
+import { bucketFiltersByOperator } from "../utils/filters/bucketFiltersByOperator";
+import { FiltersByColumn } from "../utils/filters/filtersByColumn";
+import { isEmptyFiltersObject } from "../utils/filters/isEmptyFiltersObject";
+import { hasDefinedProps, isNotUndefined } from "../utils/guards";
+import { identity } from "../utils/misc";
+import { objectKeys, omit } from "../utils/objects/misc";
 import { BaseClient } from "./BaseClient";
 import {
   DEFAULT_MUTATION_FN_NAMES,
   DEFAULT_QUERY_FN_NAMES,
   DefaultMutationFnName,
   DefaultQueryFnName,
-  FilterOperator,
   ModelCRUDClient,
 } from "./ModelCRUDClient";
 import { WithLogger, withLogger } from "./withLogger";
@@ -89,9 +94,9 @@ export function createDexieCRUDClient<
       ...baseClient,
 
       getById: async (params: {
-        id: M["modelPrimaryKeyType"] | undefined;
+        id: M["modelPrimaryKeyType"] | undefined | null;
       }): Promise<M["Read"] | undefined> => {
-        if (params.id === undefined) {
+        if (params.id === undefined || params.id === null) {
           return undefined;
         }
 
@@ -108,9 +113,7 @@ export function createDexieCRUDClient<
 
       // TODO(pablo): implement pagination
       getAll: async (params?: {
-        where: {
-          [K in keyof M["DBRead"]]?: Record<FilterOperator, M["DBRead"][K]>;
-        };
+        where: FiltersByColumn<M["DBRead"]>;
       }): Promise<Array<M["Read"]>> => {
         const logger = baseLogger.appendName("getAll");
 
@@ -119,29 +122,67 @@ export function createDexieCRUDClient<
           .setEnabled(true)
           .log("Need to implement pagination for Dexie clients");
 
-        let query;
+        let query: Promise<Array<M["DBRead"]>> | undefined;
+        const filtersByOperator = bucketFiltersByOperator(params?.where);
 
-        if (params?.where) {
-          const columns: string[] = [];
-          const eqValues: IndexableTypePart[] = [];
-          objectEntries(params.where).forEach(([column, filter]) => {
-            if (filter) {
-              objectEntries(filter).forEach(([operator, value]) => {
-                // currently we only support `eq` filters
-                match(operator as FilterOperator)
-                  .with("eq", () => {
-                    columns.push(column);
-                    eqValues.push(value as IndexableTypePart);
-                  })
-                  .exhaustive();
-              });
+        // A limitation of Dexie is that we can only apply one filter
+        // per query, so we choose the first filter with non-empty values and
+        // apply it. The other filters will be applied in-memory.
+        const operatorToApply = objectKeys(filtersByOperator).find(
+          (operator) => {
+            if (hasDefinedProps(filtersByOperator, operator)) {
+              const filterTuples = filtersByOperator[operator];
+              return filterTuples.length > 0;
             }
-          });
+            return false;
+          },
+        );
 
-          query = dbTable.where(columns).equals(eqValues).toArray();
+        if (
+          operatorToApply &&
+          hasDefinedProps(filtersByOperator, operatorToApply)
+        ) {
+          match(operatorToApply)
+            .with("eq", (op) => {
+              const [columns, values] = mapToArrayTuple(
+                filtersByOperator[op],
+                identity,
+              );
+              query = dbTable
+                .where(columns as string[])
+                .equals(values as IndexableTypePart)
+                .toArray();
+            })
+            .with("in", (op) => {
+              const [columns, values] = mapToArrayTuple(
+                filtersByOperator[op],
+                identity,
+              );
+              query = dbTable
+                .where(columns as string[])
+                .anyOf(values as IndexableTypePart[])
+                .toArray();
+            })
+            .exhaustive();
         }
 
-        const allData = await (query ?? dbTable.toArray());
+        let allData = await (query ?? dbTable.toArray());
+
+        // Now apply all the filters that did not get applied before
+        // Only if we actually applied a filter
+        if (operatorToApply) {
+          const newFilters = omit({
+            from: filtersByOperator,
+            keysToDelete: [operatorToApply],
+          });
+
+          // verify that the filters object isn't empty now that we removed
+          // the one operator we applied earlier
+          if (!isEmptyFiltersObject(newFilters)) {
+            allData = applyFiltersToRows(allData, newFilters);
+          }
+        }
+
         return allData.map((data) => {
           return parsers.fromDBReadToModelRead(data);
         });

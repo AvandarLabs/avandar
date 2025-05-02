@@ -58,7 +58,7 @@ export function areArrayContentsEqual<A>(
  * @returns A tuple of two arrays. An array of all the first values of the
  * return tuple and an array of all the second values.
  */
-export function mapToTuple<T, R1, R2>(
+export function mapToArrayTuple<T, R1, R2>(
   items: readonly T[],
   callback: (x: T, idx: number) => readonly [R1, R2],
 ): [R1[], R2[]] {

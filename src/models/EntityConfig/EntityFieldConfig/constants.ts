@@ -1,4 +1,4 @@
-import { EntityFieldValueExtractorType } from "./types";
+import { EntityFieldValueExtractorType } from "../ValueExtractor/types";
 
 export const EntityFieldValueExtractorTypes = {
   manual_entry: {

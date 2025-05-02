@@ -1,6 +1,7 @@
-import { SetRequired } from "type-fest";
+import { EmptyObject, SetRequired } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
-import { AnyFunction } from "../types/utilityTypes";
+import { Logger } from "../Logger";
+import { AnyFunction, SetDefined } from "../types/utilityTypes";
 
 /**
  * Inspired from Remeda's `isPlainObject`.
@@ -112,17 +113,69 @@ export function isBoolean(value: unknown): value is boolean {
  * This is useful when an object has optional properties but you want to assert
  * that these values are present.
  *
+ * NOTE: this only checks for property existence. The property can exist but
+ * the value can still be undefined.
+ *
  * @param obj - The object to check.
  * @param properties - The properties to check.
  * @returns `true` if `obj` has all the properties in `properties`, `false`
  * otherwise.
  */
-export function hasProps<
-  T extends object,
-  Key extends keyof T,
-  Keys extends readonly [Key, ...Key[]],
->(obj: T, ...properties: Keys): obj is T & SetRequired<T, Keys[number]> {
+export function hasProps<T extends object, Key extends keyof T>(
+  obj: T,
+  ...properties: Key[]
+): obj is T & SetRequired<T, Key> {
   return properties.every((prop) => {
     return prop in obj;
   });
+}
+
+/**
+ * Checks if `obj` has all the properties in `properties` and that they are
+ * not undefined.
+ *
+ * NOTE: this still allows `null` values. This literally just checks that it's
+ * not `undefined`.
+ *
+ * @param obj - The object to check.
+ * @param properties - The properties to check.
+ * @returns `true` if `obj` has all the properties in `properties` and that
+ * they are not undefined, `false` otherwise.
+ */
+export function hasDefinedProps<T extends object, Key extends keyof T>(
+  obj: T,
+  ...properties: Key[]
+): obj is SetRequired<T, Key> & SetDefined<T, Key> {
+  return properties.every((prop) => {
+    return prop in obj && obj[prop] !== undefined;
+  });
+}
+
+/**
+ * Asserts that `condition` is truthy.
+ *
+ * @param condition - The condition to assert.
+ * @param msg - The error message to throw if the condition is falsy.
+ */
+export function assert(condition: unknown, msg?: string): asserts condition {
+  if (!condition) {
+    const errMsg = msg ?? "Condition failed";
+    Logger.error(errMsg);
+    throw new Error(errMsg);
+  }
+}
+
+/**
+ * Checks if `v` is an empty object.
+ *
+ * @param v - The value to check. It must be narrowed to an object type already.
+ * @returns `true` if `v` is an empty object, `false` otherwise.
+ */
+export function isEmptyObject(v: UnknownObject): v is EmptyObject {
+  for (const _ in v) {
+    // if there is a single key we will enter this loop and return false
+    return false;
+  }
+
+  return true;
 }

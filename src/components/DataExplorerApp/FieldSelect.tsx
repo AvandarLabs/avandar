@@ -2,7 +2,7 @@ import { MultiSelect } from "@mantine/core";
 import { ReactNode, useMemo } from "react";
 import { UUID } from "@/lib/types/common";
 import { isNotNullOrUndefined } from "@/lib/utils/guards";
-import { makeObjectFromEntries } from "@/lib/utils/objects";
+import { makeObjectFromEntries } from "@/lib/utils/objects/builders";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { type LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
 import { LocalDataset } from "@/models/LocalDataset/types";

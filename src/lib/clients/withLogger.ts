@@ -5,7 +5,7 @@ export type WithLogger<Module extends BaseClient> = Module & {
   /**
    * @returns A new instance of the module with the logger enabled.
    */
-  withLogger: () => Module;
+  withLogger: (callerNameOverride?: string) => Module;
 };
 
 /**
@@ -31,6 +31,7 @@ export function withLogger<Module extends BaseClient>(
 
   const module = moduleBuilder(logger);
   const moduleWithEnabledLogger = moduleBuilder(logger.setEnabled(true));
+  const modulesWithNamedLoggers = new Map<string, Module>();
 
   return {
     ...module,
@@ -38,8 +39,23 @@ export function withLogger<Module extends BaseClient>(
     /**
      * Enables the logger for this module.
      */
-    withLogger: (): Module => {
-      return moduleWithEnabledLogger;
+    withLogger: (callerNameOverride?: string): Module => {
+      if (!callerNameOverride) {
+        return moduleWithEnabledLogger;
+      }
+
+      if (modulesWithNamedLoggers.has(callerNameOverride)) {
+        return modulesWithNamedLoggers.get(callerNameOverride)!;
+      }
+
+      const newModule = moduleBuilder(
+        createLogger({
+          callerName: callerNameOverride,
+          loggerName: baseModule.getClientName(),
+        }).setEnabled(true),
+      );
+      modulesWithNamedLoggers.set(callerNameOverride, newModule);
+      return newModule;
     },
   };
 }

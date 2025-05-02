@@ -1,6 +1,6 @@
 import { z } from "zod";
+import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
-import { makeParserRegistry } from "@/lib/utils/models/ModelCRUDParserRegistry";
 import { mimeType, uuidType } from "@/lib/utils/zodHelpers";
 import { LocalDatasetFieldSchema } from "./LocalDatasetField/parsers";
 import { LocalDatasetCRUDTypes, LocalDatasetId } from "./types";
