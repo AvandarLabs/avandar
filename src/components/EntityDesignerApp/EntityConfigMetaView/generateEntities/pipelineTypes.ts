@@ -28,6 +28,10 @@ export type ValueExtractorInfo<
 > = {
   valueExtractorType: ExtractorType;
   valueExtractorId: EntityFieldValueExtractorRegistry[ExtractorType]["id"];
+  // TODO(pablo): value extractors should also have a reference to the entity
+  // field config, because we need to know `isArray`
+  // TODO(pablo): we don't need a reference to the full entityConfig. We just
+  // need entity field config that has `isIdField` set to true.
   relationships: {
     valueExtractor: EntityFieldValueExtractorRegistry[ExtractorType];
     entityConfig: BuildableEntityConfig;

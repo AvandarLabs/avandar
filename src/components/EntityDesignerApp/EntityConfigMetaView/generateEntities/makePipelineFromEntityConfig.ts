@@ -209,7 +209,7 @@ export function makePipelineFromEntityConfig(
           fieldsToWrite: [
             { name: "id", dataType: "string" },
             { name: "entityId", dataType: "string" },
-            { name: "fieldId", dataType: "string" },
+            { name: "entityFieldConfigId", dataType: "string" },
             { name: "value", dataType: "string" },
             { name: "valueSet", dataType: "string" },
             { name: "datasourceId", dataType: "string" },

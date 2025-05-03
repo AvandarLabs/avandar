@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 import { Logger } from "@/lib/Logger";
-import { CSVRow, UnknownObject, UUID } from "@/lib/types/common";
+import { CSVCellValue, CSVRow, UnknownObject, UUID } from "@/lib/types/common";
 import { isNotNullOrUndefined, isPlainObject } from "@/lib/utils/guards";
 import {
   makeBucketsFromList,
@@ -11,10 +11,7 @@ import { objectKeys } from "@/lib/utils/objects/misc";
 import { promiseReduce } from "@/lib/utils/promises";
 import { unknownToString } from "@/lib/utils/strings";
 import { uuid } from "@/lib/utils/uuid";
-import {
-  EntityFieldConfig,
-  EntityFieldConfigId,
-} from "@/models/EntityConfig/EntityFieldConfig/types";
+import { EntityFieldConfigId } from "@/models/EntityConfig/EntityFieldConfig/types";
 import { EntityConfigId } from "@/models/EntityConfig/types";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
@@ -127,6 +124,11 @@ function _bucketDatasetRowsByExternalId(
       "Could not find a column in the dataset that matches the entity ID field's value extractor configuration",
     );
   }
+
+  // we don't take into account the entityIdField's value picker rule because
+  // for an ID field, we should always treat each ID value uniquely.
+  // TODO(pablo): disable value picker rule for ID fields in the UI. It doesn't
+  // make sense there.
   return makeBucketsFromList({
     list: dataset.data,
     keyFn: getProp(datasetExternalIdColumn.name),
@@ -209,12 +211,12 @@ export function _runCreateFieldStep(
 ): Promise<PipelineContext> {
   Logger.log("Value extractor type", stepConfig.valueExtractorType);
 
-  // here we want to create an array of EntityFieldValues and
-  // store it in the context
+  // our goal is to create this array of entity field values (one field value
+  // per entity) and store it in the context.
+  const entityFieldValues: EntityFieldValue[] = [];
 
   // Get the step's extractor type. This will tell us how we have
   // To generate the field values
-
   match(stepConfig)
     .with({ valueExtractorType: "manual_entry" }, () => {
       Logger.log(
@@ -266,36 +268,113 @@ export function _runCreateFieldStep(
         );
       }
 
-      const externalIds: Set<string> = new Set();
-      const externalIdToEntityDict: Record<string, Entity> = {};
-      entities.forEach((entity) => {
-        externalIds.add(entity.externalId);
-        externalIdToEntityDict[entity.externalId] = entity;
-      });
-      const externalIdToFieldValues: Record<string, EntityFieldValue[]> = {};
+      const externalIdToEntityDict: Record<string, Entity> = makeObjectFromList(
+        { list: entities, keyFn: getProp("externalId") },
+      );
 
-      dataset.data.forEach((row) => {
-        const externalId = row[datasetExternalIdColumn.name];
-        const extractedValue = row[datasetFieldToExtract.name];
-        const matchingEntity = externalIdToEntityDict[externalId];
+      // now we need to go through the dataset and extract the field value
+      // for each external ID
+      match(valuePickerRuleType)
+        .with("first", () => {
+          for (const row of dataset.data) {
+            const seenExternalIds = new Set<string>();
+            const externalId = row[datasetExternalIdColumn.name];
+            if (externalId && !seenExternalIds.has(externalId)) {
+              const matchingEntity = externalIdToEntityDict[externalId];
+              if (matchingEntity) {
+                const extractedValue = row[datasetFieldToExtract.name];
+                const entityFieldValue: EntityFieldValue = {
+                  id: uuid(),
+                  entityId: matchingEntity.id,
+                  value: extractedValue,
+                  valueSet: [extractedValue],
+                  datasourceId: datasetId,
+                  entityFieldConfigId: config.entityFieldConfigId,
+                };
+                seenExternalIds.add(externalId);
+                entityFieldValues.push(entityFieldValue);
 
-        const entityFieldValue: EntityFieldValue = {
-          id: uuid(),
-          entityId: entity.id,
-          value,
-          valueSet: [value],
-          datasourceId: datasetId,
-          entityFieldConfigId: config.entityFieldConfigId,
-        };
-        return entityFieldValue;
-      });
+                // once we've collected one field ID for each entity, we can
+                // stop. No need to see the rest of the dataset.
+                if (seenExternalIds.size === entities.length) {
+                  break;
+                }
+              }
+            }
+          }
+        })
+
+        .with("most_frequent", () => {
+          const externalIdToExtractedValues: Record<string, CSVCellValue[]> =
+            {};
+
+          // this value extractor rule is less efficient because we have to
+          // go through the entire dataset and then pick the most frequent
+          // value that matched to an entity.
+          dataset.data.forEach((row) => {
+            const externalId = row[datasetExternalIdColumn.name];
+            if (externalId) {
+              const matchingEntity = externalIdToEntityDict[externalId];
+              if (matchingEntity) {
+                const extractedValue = row[datasetFieldToExtract.name];
+                const valueSet = externalIdToExtractedValues[externalId] ?? [];
+                valueSet.push(extractedValue);
+                externalIdToExtractedValues[externalId] = valueSet;
+              }
+            }
+          });
+
+          // now that all value sets are created, we can count the most frequent
+          // value for each entity and generate its entity field value
+          objectKeys(externalIdToExtractedValues).forEach((externalId) => {
+            const matchingEntity = externalIdToEntityDict[externalId];
+            if (matchingEntity) {
+              const valueSet = externalIdToExtractedValues[externalId] ?? [];
+              const counts: Map<string | undefined, number> = new Map();
+              let mostFrequentValue: string | undefined;
+
+              valueSet.forEach((value) => {
+                const currentMax = counts.get(mostFrequentValue) ?? 0;
+                const newCount = (counts.get(value) ?? 0) + 1;
+                counts.set(value, newCount);
+
+                if (newCount > currentMax) {
+                  mostFrequentValue = value;
+                }
+              });
+
+              // now create the entity field with our most frequent value
+              const entityFieldValue: EntityFieldValue = {
+                id: uuid(),
+                entityId: matchingEntity.id,
+                value: mostFrequentValue,
+                valueSet: [...counts.keys()],
+                datasourceId: datasetId,
+                entityFieldConfigId: config.entityFieldConfigId,
+              };
+              entityFieldValues.push(entityFieldValue);
+            }
+          });
+        })
+        .exhaustive();
     })
+
     .with({ valueExtractorType: "aggregation" }, () => {
       throw new Error("Aggregation value extractors are not implemented yet");
     })
     .exhaustive();
 
-  return Promise.resolve(context);
+  const currentFieldValues = context.getContextValue("entityFieldValues") ?? [];
+
+  // dangerously mutating the currentFieldValues array because it is more
+  // performant than using immutability here
+  if (Array.isArray(currentFieldValues)) {
+    currentFieldValues.push(...entityFieldValues);
+  }
+
+  return Promise.resolve(
+    context.setContextValue("entityFieldValues", currentFieldValues),
+  );
 }
 
 export async function _runOutputDatasetsStep(
@@ -383,6 +462,7 @@ export function _runCreateEntitiesStep(
   // The data should have already been loaded, so we'll pull it from the context
   const dataset = context.getDataset(entityConfig.datasetId);
 
+  // TODO(pablo): this could just be a set. we do not need to create buckets.
   // now iterate over entire dataset and extract unique id values
   const idsToRows = _bucketDatasetRowsByExternalId(dataset, entityConfig);
 
