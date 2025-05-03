@@ -87,7 +87,7 @@ function detectFieldDataType(
 export function detectFieldDataTypes(
   fieldNames: readonly string[],
   data: CSVData,
-): readonly LocalDatasetField[] {
+): LocalDatasetField[] {
   // Convert the CSV to a columnar format
   const columns = fieldNames.reduce(
     (obj, fieldName) => {

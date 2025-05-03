@@ -3,7 +3,10 @@ import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { UserId } from "@/models/User";
 import { LocalDataset, LocalDatasetId } from "../LocalDataset/types";
 import { EntityFieldConfig } from "./EntityFieldConfig/types";
-import { EntityFieldValueExtractor } from "./ValueExtractor/types";
+import {
+  EntityFieldValueExtractorRegistry,
+  EntityFieldValueExtractorType,
+} from "./ValueExtractor/types";
 import type { UUID } from "@/lib/types/common";
 
 export type EntityConfigId = UUID<"EntityConfig">;
@@ -47,9 +50,13 @@ type EntityConfigUpdate = Partial<EntityConfigRead>;
 type EntityConfigFull = EntityConfig & {
   dataset?: LocalDataset;
   fields?: ReadonlyArray<
-    EntityFieldConfig & {
-      valueExtractor?: EntityFieldValueExtractor;
-    }
+    Omit<EntityFieldConfig, "valueExtractorType"> &
+      {
+        [ExtractorType in EntityFieldValueExtractorType]: {
+          valueExtractorType: ExtractorType;
+          valueExtractor?: EntityFieldValueExtractorRegistry[ExtractorType];
+        };
+      }[EntityFieldValueExtractorType]
   >;
 };
 

@@ -5,6 +5,55 @@ import { FileMetadata } from "@/models/LocalDataset/types";
 import { detectFieldDataTypes } from "./detectFieldDataTypes";
 import type { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
 
+// TODO(pablo): move this to lib/utils
+export function parseFileOrStringToCSV({
+  dataToParse,
+  firstRowIsHeader,
+  delimiter,
+}: {
+  dataToParse: File | string;
+  firstRowIsHeader: boolean;
+  delimiter: string;
+}): Promise<{
+  fileMetadata?: FileMetadata;
+  fields: LocalDatasetField[];
+  csv: Papa.ParseResult<CSVRow>;
+}> {
+  return new Promise((resolve, reject) => {
+    Papa.parse<CSVRow>(dataToParse, {
+      // TODO(pablo): `header` should be toggleable eventually.
+      header: firstRowIsHeader,
+      delimiter,
+      complete: (results: Papa.ParseResult<CSVRow>) => {
+        const { meta, data, errors } = results;
+        const csv = {
+          data,
+          meta,
+          errors,
+        };
+        const fields = detectFieldDataTypes(meta.fields ?? [], data);
+        const fileMetadata =
+          typeof dataToParse !== "string" ?
+            {
+              name: dataToParse.name,
+              mimeType: dataToParse.type as MIMEType,
+              sizeInBytes: dataToParse.size,
+            }
+          : undefined;
+
+        resolve({
+          csv,
+          fields,
+          fileMetadata,
+        });
+      },
+      error: (error: Error) => {
+        reject(error);
+      },
+    });
+  });
+}
+
 /**
  * Custom hook for handling CSV file parsing.
  * @param options Optional configuration options.
@@ -37,30 +86,16 @@ export function useCSVParser({
   const [fields, setFields] = useState<readonly LocalDatasetField[]>([]);
 
   const parseFileOrString = useCallback(
-    (dataToParse: File | string) => {
-      Papa.parse<CSVRow>(dataToParse, {
-        // TODO(pablo): `header` should be toggleable eventually.
-        header: firstRowIsHeader,
-        delimiter: delimiter,
-        complete: (results: Papa.ParseResult<CSVRow>) => {
-          const { meta, data, errors } = results;
-          setCSV({
-            data,
-            meta,
-            errors,
-          });
-
-          if (typeof dataToParse !== "string") {
-            setFileMetadata({
-              name: dataToParse.name,
-              mimeType: dataToParse.type as MIMEType,
-              sizeInBytes: dataToParse.size,
-            });
-          }
-
-          setFields(detectFieldDataTypes(meta.fields ?? [], data));
-        },
+    async (dataToParse: File | string) => {
+      const result = await parseFileOrStringToCSV({
+        dataToParse,
+        firstRowIsHeader,
+        delimiter,
       });
+
+      setCSV(result.csv);
+      setFileMetadata(result.fileMetadata);
+      setFields(result.fields);
     },
     [delimiter, firstRowIsHeader],
   );

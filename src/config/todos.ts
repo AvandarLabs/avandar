@@ -10,15 +10,7 @@ export const TODOS =
         items: [
           "Automated database types => Zod (on yarn new:model MyModel table_name)",
           "Automated zod schemas for models => typescript types for models, with a filewatcher",
-          "Use individual DBRead, ModelRead, DBInsert, ModelInsert, etc. schemas. 6 total.",
-          `Create parser maker to convert:
-1) fromDbReadToModelRead;
-2) fromModelInsertToDbInsert;
-3) fromModelUpdateToDbUpdate`,
-          `Type tests should ensure that these are consistent:
-1) dbRead output <> modelRead input
-2) modelInsert output <> dbInsert input
-3) modelUpdate output <> dbUpdate input`,
+          "Write a pretty print function to print the type of an unknown object",
         ],
       },
       {
@@ -31,8 +23,7 @@ export const TODOS =
       {
         label: "Data Manager",
         items: [
-          "Use UUIDs for dataset ids to ensure global uniqueness",
-          "Allow editing the fChange Title and ID fields to Selectsield data type",
+          "Allow editing the fields data types",
           "Allow full CRUD of datasets in Data Manager",
           "Local datasets should be tracked with user ids",
         ],

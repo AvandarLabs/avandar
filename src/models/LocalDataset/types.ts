@@ -1,7 +1,7 @@
-import { Merge, Simplify } from "type-fest";
+import { Merge, SetFieldType, Simplify } from "type-fest";
 import { DexieModelCRUDTypes } from "@/lib/models/DexieModelCRUDTypes";
 import { MIMEType } from "@/lib/types/common";
-import type { UUID } from "@/lib/types/common";
+import type { CSVData, UUID } from "@/lib/types/common";
 import type { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
 
 export type LocalDatasetId = UUID<"LocalDataset">;
@@ -76,3 +76,9 @@ export type FileMetadata = {
 
 export type LocalDataset<K extends keyof LocalDatasetCRUDTypes = "Read"> =
   Simplify<LocalDatasetCRUDTypes[K]>;
+
+export type ParsedLocalDataset = SetFieldType<
+  LocalDataset<"Read">,
+  "data",
+  CSVData
+>;

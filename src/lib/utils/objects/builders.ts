@@ -48,25 +48,63 @@ export function makeBucketsFromList<
   T,
   K extends string | number = string,
   V = T,
+  CollectNullableKeys extends boolean = never,
+  BucketMapReturnType = [true] extends [CollectNullableKeys] ?
+    Map<K | null | undefined, V[]>
+  : Record<K, V[]>,
 >({
   list,
   keyFn,
   valueFn = identity as (item: T) => V,
+  collectNullableKeys,
 }: {
   list: readonly T[];
-  keyFn: (item: T) => K;
+  keyFn: [true] extends [CollectNullableKeys] ?
+    (item: T) => K | null | undefined
+  : (item: T) => K;
   valueFn?: (item: T) => V;
-}): Record<K, V[]> {
+  allowUndefined?: boolean;
+  collectNullableKeys?: CollectNullableKeys;
+}): BucketMapReturnType {
   const buckets = {} as Record<K, V[]>;
+  const nulls = [] as V[];
+  const undefineds = [] as V[];
+
   list.forEach((item) => {
     const bucketName = keyFn(item);
     const value = valueFn(item);
-    if (!(bucketName in buckets)) {
-      buckets[bucketName] = [];
+
+    if (bucketName === null) {
+      nulls.push(value);
+    } else if (bucketName === undefined) {
+      undefineds.push(value);
+    } else {
+      if (!(bucketName in buckets)) {
+        buckets[bucketName] = [];
+      }
+      buckets[bucketName].push(value);
     }
-    buckets[bucketName].push(value);
   });
-  return buckets;
+
+  if (!collectNullableKeys) {
+    return buckets as BucketMapReturnType;
+  }
+
+  // if we need to report the `null` and `undefined` keys, then we need to
+  // convert the buckets record to a Map
+  const bucketMap = new Map<K | null | undefined, V[]>(
+    Object.entries(buckets) as Array<[K | null | undefined, V[]]>,
+  );
+
+  if (nulls.length > 0) {
+    bucketMap.set(null, nulls);
+  }
+
+  if (undefineds.length > 0) {
+    bucketMap.set(undefined, undefineds);
+  }
+
+  return bucketMap as BucketMapReturnType;
 }
 
 /**

@@ -34,3 +34,29 @@ export async function promiseMapSequential<T, V>(
   }
   return results;
 }
+
+/**
+ * Reduces an array by applying a promise-returning function
+ * to each one sequentially. Each function is awaited before
+ * the next is called. Order is guaranteed.
+ *
+ * The promise-returning function's first argument is the current
+ * item in the array. Second argument is the accumulated result.
+ *
+ * @param array array of items to map over
+ * @param fn function to apply to each item in the array
+ * @param fn.item the current item in the array
+ * @param fn.acc the accumulated result
+ * @returns promise that resolves to the accumulated result
+ */
+export async function promiseReduce<T, V>(
+  array: readonly T[],
+  fn: (item: T, acc: V) => Promise<V> | V,
+  initialValue: V,
+): Promise<V> {
+  let acc = initialValue;
+  for (const item of array) {
+    acc = await fn(item, acc);
+  }
+  return acc;
+}

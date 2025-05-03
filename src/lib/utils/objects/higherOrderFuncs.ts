@@ -27,3 +27,19 @@ export function propEquals<T extends object, K extends keyof T>(
     return obj[key] === value;
   };
 }
+
+/**
+ * Returns a function that checks if an object has a property with the value
+ * `true`.
+ *
+  @param key The key of the property to check.
+ * @returns A function that returns true if the object has the property with
+  the value `true`.
+ */
+export function propIsTrue<T extends object, K extends keyof T>(
+  key: K,
+): (obj: T) => obj is T & { [key in K]: true } {
+  return (obj: T): obj is T & { [key in K]: true } => {
+    return obj[key] === true;
+  };
+}

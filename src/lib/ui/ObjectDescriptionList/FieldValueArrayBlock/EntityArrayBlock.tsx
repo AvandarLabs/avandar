@@ -1,26 +1,23 @@
 import { List, Table } from "@mantine/core";
 import { useMemo } from "react";
 import { StringKeyOf } from "type-fest";
-import { EntityDescriptionList } from "@/lib/ui/EntityDescriptionList";
-import { CollapsibleItem } from "@/lib/ui/EntityDescriptionList/CollapsibleItem";
-import { getEntityFieldRenderOptions } from "@/lib/ui/EntityDescriptionList/helpers";
-import {
-  EntityArrayRenderOptions,
-  EntityObject,
-} from "@/lib/ui/EntityDescriptionList/types";
-import { UnknownFieldValueItem } from "@/lib/ui/EntityDescriptionList/UnknownFieldValueItem";
 import { objectKeys } from "@/lib/utils/objects/misc";
 import { camelToTitleCase } from "@/lib/utils/strings";
+import { ObjectDescriptionList } from "..";
+import { CollapsibleItem } from "../CollapsibleItem";
+import { getObjectFieldRenderOptions } from "../helpers";
+import { DescribableObject, ObjectArrayRenderOptions } from "../types";
+import { UnknownFieldValueItem } from "../UnknownFieldValueItem";
 
-type Props<T extends EntityObject> = {
+type Props<T extends DescribableObject> = {
   values: readonly T[];
-} & EntityArrayRenderOptions<T>;
+} & ObjectArrayRenderOptions<T>;
 
 /**
  * Renders an array of entities either as a table or as a list of
  * collapsible entity descriptions.
  */
-export function EntityArrayBlock<T extends EntityObject>({
+export function EntityArrayBlock<T extends DescribableObject>({
   values,
   renderAsTable,
   titleKey,
@@ -63,7 +60,7 @@ export function EntityArrayBlock<T extends EntityObject>({
               <Table.Td key={fieldKey}>
                 <UnknownFieldValueItem
                   value={fieldVal}
-                  {...getEntityFieldRenderOptions(renderOptions, fieldKey)}
+                  {...getObjectFieldRenderOptions(renderOptions, fieldKey)}
                 />
               </Table.Td>
             );
@@ -92,7 +89,7 @@ export function EntityArrayBlock<T extends EntityObject>({
         key={entityId}
         label={titleKey ? String(val[titleKey]) : String(idx + 1)}
       >
-        <EntityDescriptionList entity={val} {...renderOptions} />
+        <ObjectDescriptionList entity={val} {...renderOptions} />
       </CollapsibleItem>
     );
   });

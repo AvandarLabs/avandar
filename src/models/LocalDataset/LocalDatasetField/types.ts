@@ -9,6 +9,10 @@ export type LocalDatasetFieldId = UUID<"LocalDatasetField">;
  */
 export type LocalDatasetField = {
   id: LocalDatasetFieldId;
+
+  /**
+   * The name of this field as it is stored in a CSV column.
+   */
   name: string;
   dataType: FieldDataType;
   description?: string;

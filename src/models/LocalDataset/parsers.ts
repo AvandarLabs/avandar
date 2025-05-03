@@ -31,6 +31,12 @@ const ModelReadSchema = DBReadSchema.extend({
 const ModelInsertSchema = ModelReadSchema;
 const ModelUpdateSchema = ModelReadSchema.partial();
 
+export const ParsedLocalDatasetSchema = ModelReadSchema.extend({
+  // we do not enforce more type checking here because datasets can be really
+  // big and all this parsing can affect performance.
+  data: z.array(z.any()),
+});
+
 export const LocalDatasetParsers = makeParserRegistry<LocalDatasetCRUDTypes>(
   {
     modelName: "LocalDataset",

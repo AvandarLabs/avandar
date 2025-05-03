@@ -1,5 +1,7 @@
+import { parseFileOrStringToCSV } from "@/components/DataManagerApp/hooks/useCSVParser";
 import { createDexieCRUDClient } from "@/lib/clients/createDexieCRUDClient";
 import { LocalDatasetParsers } from "./parsers";
+import { LocalDatasetId, ParsedLocalDataset } from "./types";
 
 export const LocalDatasetClient = createDexieCRUDClient({
   modelName: "LocalDataset",
@@ -9,6 +11,23 @@ export const LocalDatasetClient = createDexieCRUDClient({
     return {
       deleteDatabase: async (): Promise<void> => {
         await db.delete();
+      },
+      getParsedLocalDataset: async (params: {
+        id: LocalDatasetId;
+      }): Promise<ParsedLocalDataset> => {
+        const dataset = await LocalDatasetClient.getById({ id: params.id });
+        if (!dataset) {
+          throw new Error(`Dataset ${params.id} not found`);
+        }
+        const { csv } = await parseFileOrStringToCSV({
+          dataToParse: dataset.data,
+          firstRowIsHeader: true,
+          delimiter: ",",
+        });
+        return {
+          ...dataset,
+          data: csv.data,
+        };
       },
     };
   },

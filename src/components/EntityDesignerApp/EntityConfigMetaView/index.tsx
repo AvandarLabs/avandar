@@ -58,7 +58,13 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
             onClick={() => {
               // generate all entities in-browser and in-memory for now
               if (hasDefinedProps(fullEntityConfig, "dataset", "fields")) {
-                return generateEntities(fullEntityConfig);
+                const newFields = fullEntityConfig.fields.filter((field) => {
+                  return hasDefinedProps(field, "valueExtractor");
+                });
+                return generateEntities({
+                  ...fullEntityConfig,
+                  fields: newFields,
+                });
               }
             }}
           >
