@@ -1,7 +1,18 @@
 import { parseFileOrStringToCSV } from "@/components/DataManagerApp/hooks/useCSVParser";
 import { createDexieCRUDClient } from "@/lib/clients/createDexieCRUDClient";
 import { LocalDatasetParsers } from "./parsers";
-import { LocalDatasetId, ParsedLocalDataset } from "./types";
+import { LocalDataset, LocalDatasetId, ParsedLocalDataset } from "./types";
+
+async function hydrateDataset(
+  dataset: LocalDataset,
+): Promise<ParsedLocalDataset> {
+  const { csv } = await parseFileOrStringToCSV({
+    dataToParse: dataset.data,
+    firstRowIsHeader: true,
+    delimiter: ",",
+  });
+  return { ...dataset, data: csv.data };
+}
 
 export const LocalDatasetClient = createDexieCRUDClient({
   modelName: "LocalDataset",
@@ -12,6 +23,7 @@ export const LocalDatasetClient = createDexieCRUDClient({
       deleteDatabase: async (): Promise<void> => {
         await db.delete();
       },
+
       getParsedLocalDataset: async (params: {
         id: LocalDatasetId;
       }): Promise<ParsedLocalDataset> => {
@@ -19,15 +31,14 @@ export const LocalDatasetClient = createDexieCRUDClient({
         if (!dataset) {
           throw new Error(`Dataset ${params.id} not found`);
         }
-        const { csv } = await parseFileOrStringToCSV({
-          dataToParse: dataset.data,
-          firstRowIsHeader: true,
-          delimiter: ",",
-        });
-        return {
-          ...dataset,
-          data: csv.data,
-        };
+
+        return hydrateDataset(dataset);
+      },
+
+      hydrateDataset: async (params: {
+        dataset: LocalDataset;
+      }): Promise<ParsedLocalDataset> => {
+        return hydrateDataset(params.dataset);
       },
     };
   },

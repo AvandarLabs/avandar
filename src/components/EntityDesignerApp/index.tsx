@@ -1,14 +1,14 @@
 import { Box, Flex, MantineTheme } from "@mantine/core";
 import { Outlet } from "@tanstack/react-router";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
-import { EntityNavbar } from "./EntityNavbar";
+import { EntityConfigNavbar } from "./EntityConfigNavbar";
 
 export function EntityDesignerApp(): JSX.Element {
   const [entities, isLoading] = EntityConfigClient.useGetAll();
 
   return (
     <Flex>
-      <EntityNavbar
+      <EntityConfigNavbar
         miw={240}
         mih="100dvh"
         entityConfigs={entities ?? []}

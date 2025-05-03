@@ -12,7 +12,12 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { Spotlight } from "@mantine/spotlight";
-import { IconChevronDown, IconLogout, IconSearch } from "@tabler/icons-react";
+import {
+  IconBook,
+  IconChevronDown,
+  IconLogout,
+  IconSearch,
+} from "@tabler/icons-react";
 import { Outlet, useRouter } from "@tanstack/react-router";
 import clsx from "clsx";
 import { AuthClient } from "@/clients/AuthClient";
@@ -20,6 +25,8 @@ import { APP_CONFIG } from "@/config/AppConfig";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useIsMobileSize } from "@/lib/hooks/useIsMobileSize";
 import { Link } from "@/lib/ui/links/Link";
+import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
+import { getEntityManagerLinkProps } from "@/models/EntityConfig/utils";
 import css from "./AppScaffold.module.css";
 import { useSpotlightActions } from "./useSpotlightActions";
 
@@ -67,6 +74,26 @@ export function AppScaffold({
   const spotlightActions = useSpotlightActions();
   const [isNavbarOpened, { toggle: toggleNavbar }] = useDisclosure(false);
   const isMobileViewSize = useIsMobileSize() ?? false;
+  const [entityConfigs] = EntityConfigClient.useGetAll();
+
+  const entityManagerLinks = (entityConfigs ?? []).map((entityConfig) => {
+    return (
+      <Link
+        key={entityConfig.id}
+        className={clsx(css.anchor, "transition-colors")}
+        px="md"
+        py="sm"
+        {...getEntityManagerLinkProps(entityConfig)}
+      >
+        <Group>
+          <IconBook size={24} stroke={1.5} />
+          <Text span fw={500}>
+            {entityConfig.name}
+          </Text>
+        </Group>
+      </Link>
+    );
+  });
 
   const logo = (
     <img
@@ -165,6 +192,7 @@ export function AppScaffold({
               </Link>
             );
           })}
+          {entityManagerLinks}
         </AppShell.Navbar>
 
         <AppShell.Main py="0" pr="0" ml={-16}>

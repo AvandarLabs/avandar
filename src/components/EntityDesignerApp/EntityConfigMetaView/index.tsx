@@ -55,15 +55,24 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
         <Group>
           <Title order={2}>{entityConfig.name}</Title>
           <Button
-            onClick={() => {
+            onClick={async () => {
               // generate all entities in-browser and in-memory for now
               if (hasDefinedProps(fullEntityConfig, "dataset", "fields")) {
                 const newFields = fullEntityConfig.fields.filter((field) => {
                   return hasDefinedProps(field, "valueExtractor");
                 });
-                return generateEntities({
+
+                // TODO(pablo): make this a mutation so you can show a loading
+                // spinner by using `isPending`
+                await generateEntities({
                   ...fullEntityConfig,
                   fields: newFields,
+                });
+
+                notifications.show({
+                  title: "Entities generated",
+                  message: "Entities generated successfully",
+                  color: "green",
                 });
               }
             }}

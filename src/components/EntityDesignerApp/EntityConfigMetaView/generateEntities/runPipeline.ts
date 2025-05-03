@@ -32,16 +32,23 @@ import {
   PipelineStep,
 } from "./pipelineTypes";
 
-type EntityFieldValue = {
+export type EntityFieldValueNativeType =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined;
+
+export type EntityFieldValue = {
   id: UUID<"EntityFieldValue">;
   entityId: UUID<"Entity">;
   entityFieldConfigId: EntityFieldConfigId;
-  value: unknown;
-  valueSet: unknown[];
+  value?: EntityFieldValueNativeType;
+  valueSet: EntityFieldValueNativeType[];
   datasourceId: LocalDatasetId;
 };
 
-type EntityComment = {
+export type EntityComment = {
   id: UUID<"EntityComment">;
   entityId: UUID<"Entity">;
   ownerId: UserId;
@@ -50,21 +57,20 @@ type EntityComment = {
   content: string;
 };
 
-type Entity = {
+export type Entity = {
   id: UUID<"Entity">;
   externalId: string; // this is the id we get from the source dataset
   entityConfigId: EntityConfigId;
   assignedTo: UserId | null;
   createdAt: Date;
   updatedAt: Date;
-
   relationships: {
     entityConfig: BuildableEntityConfig;
     comments: EntityComment[];
   };
 };
 
-type PipelineContext = {
+export type PipelineContext = {
   // getters
   getContextValues: () => UnknownObject;
   getContextValue: (key: string) => unknown;
@@ -401,7 +407,10 @@ export async function _runOutputDatasetsStep(
       if (isPlainObject(row)) {
         const newRow: Record<string, string> = {};
         columnsToWrite.forEach((field) => {
-          newRow[field.name] = unknownToString(row[field.name]);
+          newRow[field.name] = unknownToString(row[field.name], {
+            undefinedString: "",
+            nullString: "",
+          });
         });
 
         return newRow;

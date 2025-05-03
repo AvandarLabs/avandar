@@ -2,7 +2,9 @@ import { makePipelineFromEntityConfig } from "./makePipelineFromEntityConfig";
 import { BuildableEntityConfig } from "./pipelineTypes";
 import { runPipeline } from "./runPipeline";
 
-export function generateEntities(entityConfig: BuildableEntityConfig): void {
+export async function generateEntities(
+  entityConfig: BuildableEntityConfig,
+): Promise<void> {
   const pipeline = makePipelineFromEntityConfig(entityConfig);
-  runPipeline(pipeline);
+  await runPipeline(pipeline);
 }
