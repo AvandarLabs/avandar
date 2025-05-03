@@ -1,0 +1,47 @@
+import { Center } from "@mantine/core";
+import {
+  createFileRoute,
+  ErrorComponentProps,
+  notFound,
+} from "@tanstack/react-router";
+import { useEffect } from "react";
+import { EntityManagerApp } from "@/components/EntityManagerApp";
+import { Logger } from "@/lib/Logger";
+import { Callout } from "@/lib/ui/Callout";
+import { uuid } from "@/lib/utils/uuid";
+import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
+import { EntityConfig } from "@/models/EntityConfig/types";
+
+export const Route = createFileRoute("/_auth/entity-manager/$entityConfigId")({
+  component: RouteComponent,
+  loader: async ({ params: { entityConfigId } }): Promise<EntityConfig> => {
+    const entityConfig = await EntityConfigClient.getById({
+      id: uuid(entityConfigId),
+    });
+    if (!entityConfig) {
+      throw notFound();
+    }
+    return entityConfig;
+  },
+  errorComponent: ErrorView,
+});
+
+function RouteComponent() {
+  const entityConfig = Route.useLoaderData();
+  return <EntityManagerApp entityConfig={entityConfig} />;
+}
+
+function ErrorView({ error }: ErrorComponentProps) {
+  useEffect(() => {
+    Logger.error(error);
+  }, [error]);
+
+  return (
+    <Center h="50%">
+      <Callout
+        title="Entity failed to load"
+        message="The entity failed to load. Please try again later or reach out to support."
+      />
+    </Center>
+  );
+}
