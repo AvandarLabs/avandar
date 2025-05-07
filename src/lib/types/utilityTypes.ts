@@ -1,4 +1,5 @@
 import { ConditionalKeys } from "type-fest";
+import { UnknownObject } from "./common";
 
 /**
  * Get all the keys of an object that map to a given type.
@@ -38,12 +39,31 @@ export type ExcludeDeep<T, TypeToExclude> =
     ReadonlyMap<K, ExcludeDeep<V, TypeToExclude>>
   : T extends Set<infer U> ? Set<ExcludeDeep<U, TypeToExclude>>
   : T extends ReadonlySet<infer U> ? ReadonlySet<ExcludeDeep<U, TypeToExclude>>
-  : T extends object ?
+  : T extends UnknownObject ?
     {
       [K in keyof T as Exclude<T[K], TypeToExclude> extends never ? never
       : K]: ExcludeDeep<T[K], TypeToExclude>;
     }
   : Exclude<T, TypeToExclude>;
+
+export type SwapDeep<T, TypeToSwap, SwapWith> =
+  T extends Array<infer U> ? Array<SwapDeep<U, TypeToSwap, SwapWith>>
+  : T extends ReadonlyArray<infer U> ?
+    ReadonlyArray<SwapDeep<U, TypeToSwap, SwapWith>>
+  : T extends Map<infer K, infer V> ? Map<K, SwapDeep<V, TypeToSwap, SwapWith>>
+  : T extends ReadonlyMap<infer K, infer V> ?
+    ReadonlyMap<K, SwapDeep<V, TypeToSwap, SwapWith>>
+  : T extends Set<infer U> ? Set<SwapDeep<U, TypeToSwap, SwapWith>>
+  : T extends ReadonlySet<infer U> ?
+    ReadonlySet<SwapDeep<U, TypeToSwap, SwapWith>>
+  : T extends UnknownObject ?
+    {
+      [K in keyof T as Exclude<T[K], TypeToSwap> extends never ? never
+      : K]: SwapDeep<T[K], TypeToSwap, SwapWith>;
+    }
+  : // check if this is correct
+  T extends TypeToSwap ? Exclude<T, TypeToSwap> | SwapWith
+  : T;
 
 /**
  * Represents any function with inferrable parameters and return types.

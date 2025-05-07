@@ -1,61 +1,65 @@
 import { z } from "zod";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
-import { UUID } from "@/lib/types/common";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
-import { jsonType, uuidType } from "@/lib/utils/zodHelpers";
-import { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
-import { EntityFieldConfigId } from "../../EntityFieldConfig/types";
-import { AggregationExtractorCRUDTypes, AggregationExtractorId } from "./types";
+import { omit } from "@/lib/utils/objects/misc";
+import {
+  camelCaseKeysDeep,
+  excludeUndefinedDeep,
+  nullsToUndefinedDeep,
+  snakeCaseKeysDeep,
+} from "@/lib/utils/objects/transformations";
+import { uuid } from "@/lib/utils/uuid";
+import { jsonType } from "@/lib/utils/zodHelpers";
+import { AggregationExtractor, AggregationExtractorCRUDTypes } from "./types";
 
 const DBReadSchema = z.object({
-  id: z.string(),
-  entity_field_config_id: z.string(),
+  id: z.string().uuid(),
+  entity_field_config_id: z.string().uuid(),
   aggregation_type: z.enum(["sum", "max", "count"]),
-  dataset_id: z.string(),
-  dataset_field_id: z.string(),
+  dataset_id: z.string().uuid(),
+  dataset_field_id: z.string().uuid(),
   filter: jsonType.nullable(),
   created_at: z.string().datetime({ offset: true }),
   updated_at: z.string().datetime({ offset: true }),
 });
 
-const DBInsertSchema = DBReadSchema.required().partial({
-  id: true,
-  created_at: true,
-  updated_at: true,
-  filter: true,
-});
-
-const DBUpdateSchema = DBReadSchema.partial();
-
-const ModelReadSchema = z.object({
-  id: uuidType<AggregationExtractorId>(),
-  entityFieldConfigId: uuidType<EntityFieldConfigId>(),
-  aggregationType: DBReadSchema.shape.aggregation_type,
-  datasetId: uuidType<UUID<"Dataset">>(),
-  datasetFieldId: uuidType<LocalDatasetFieldId>(),
-  filter: DBReadSchema.shape.filter,
-  createdAt: DBReadSchema.shape.created_at,
-  updatedAt: DBReadSchema.shape.updated_at,
-});
-
-const ModelInsertSchema = ModelReadSchema.required().partial({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-  filter: true,
-});
-
-const ModelUpdateSchema = ModelReadSchema.partial();
-
 export const AggregationExtractorParsers =
-  makeParserRegistry<AggregationExtractorCRUDTypes>({
+  makeParserRegistry<AggregationExtractorCRUDTypes>().build({
     modelName: "AggregationExtractor",
     DBReadSchema,
-    DBInsertSchema,
-    DBUpdateSchema,
-    ModelReadSchema,
-    ModelInsertSchema,
-    ModelUpdateSchema,
+    fromDBReadToModelRead: (
+      dbObj: AggregationExtractor<"DBRead">,
+    ): AggregationExtractor => {
+      const { filter, ...rest } = dbObj;
+      // We remove `filter` before we do these conversions, because it's a
+      // JSON type, which can really mess up with our recursive type utilities
+      const newObj = nullsToUndefinedDeep(camelCaseKeysDeep(rest));
+      return {
+        ...newObj,
+        filter,
+        type: "aggregation" as const,
+        id: uuid(newObj.id),
+        entityFieldConfigId: uuid(newObj.entityFieldConfigId),
+        datasetId: uuid(newObj.datasetId),
+        datasetFieldId: uuid(newObj.datasetFieldId),
+      };
+    },
+
+    fromModelInsertToDBInsert: (
+      modelObj: AggregationExtractor<"Insert">,
+    ): AggregationExtractor<"DBInsert"> => {
+      const { filter, ...rest } = omit(modelObj, "type");
+      const newObj = excludeUndefinedDeep(snakeCaseKeysDeep(rest));
+      return { ...newObj, filter: filter ?? null };
+    },
+
+    fromModelUpdateToDBUpdate: (
+      modelObj: AggregationExtractor<"Update">,
+    ): AggregationExtractor<"DBUpdate"> => {
+      const { filter, ...rest } = omit(modelObj, "type");
+      const newObj = excludeUndefinedDeep(snakeCaseKeysDeep(rest));
+      return { ...newObj, filter: filter ?? null };
+    },
   });
 
 /**
@@ -66,40 +70,11 @@ type CRUDTypes = AggregationExtractorCRUDTypes;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
+  // Check that the DBReadSchema is consistent with the DBRead type.
   Expect<
     ZodSchemaEqualsTypes<
       typeof DBReadSchema,
       { input: CRUDTypes["DBRead"]; output: CRUDTypes["DBRead"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof DBInsertSchema,
-      { input: CRUDTypes["DBInsert"]; output: CRUDTypes["DBInsert"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof DBUpdateSchema,
-      { input: CRUDTypes["DBUpdate"]; output: CRUDTypes["DBUpdate"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof ModelReadSchema,
-      { input: CRUDTypes["Read"]; output: CRUDTypes["Read"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof ModelInsertSchema,
-      { input: CRUDTypes["Insert"]; output: CRUDTypes["Insert"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof ModelUpdateSchema,
-      { input: CRUDTypes["Update"]; output: CRUDTypes["Update"] }
     >
   >,
 ];

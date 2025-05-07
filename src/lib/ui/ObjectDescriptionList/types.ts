@@ -39,10 +39,10 @@ export type PrimitiveFieldValueRenderOptions = {
 };
 
 /**
- * A mapping of entity keys to its nested render options.
+ * A mapping of child keys to its nested render options.
  * This will take precedence over any global render options.
  */
-export type FieldRenderOptionsMap<T extends NonNullable<DescribableObject>> = {
+export type ChildRenderOptionsMap<T extends NonNullable<DescribableObject>> = {
   [K in StringKeyOf<T>]?: NonNullable<T[K]> extends DescribableObject ?
     ObjectRenderOptions<NonNullable<T[K]>>
   : NonNullable<T[K]> extends (
@@ -64,7 +64,7 @@ export type ObjectRenderOptions<T extends NonNullable<DescribableObject>> =
      * Maps entity fields to its render options. This will take precedence
      * over the global entity render options.
      */
-    entityFieldOptions?: FieldRenderOptionsMap<T>;
+    childRenderOptions?: ChildRenderOptionsMap<T>;
   };
 
 export type ObjectArrayRenderOptions<T extends NonNullable<DescribableObject>> =
@@ -73,7 +73,7 @@ export type ObjectArrayRenderOptions<T extends NonNullable<DescribableObject>> =
   };
 
 /**
- * Options for how to render an array of entities.
+ * Options for how to render an array of values.
  */
 export type FieldValueArrayRenderOptions<T extends FieldValue> = {
   emptyArray?: string;

@@ -362,10 +362,7 @@ export function createSupabaseCRUDClient<
       queriesClient ?
         withQueryHooks(queriesClient, {
           queryFns: objectKeys(
-            omit({
-              from: queriesClient,
-              keysToDelete: baseClientKeys,
-            }),
+            omit(queriesClient, ...baseClientKeys),
             // This is safe to cast to `any`
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ) as any,
@@ -378,10 +375,7 @@ export function createSupabaseCRUDClient<
         withQueryHooks(mutationsClient, {
           queryFns: [],
           mutationFns: objectKeys(
-            omit({
-              from: mutationsClient,
-              keysToDelete: baseClientKeys,
-            }),
+            omit(mutationsClient, ...baseClientKeys),
             // This is safe to cast to `any`
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ) as any,

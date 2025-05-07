@@ -2,7 +2,8 @@ import { UUID } from "@/lib/types/common";
 import { EntityFieldConfigId } from "@/models/EntityConfig/EntityFieldConfig/types";
 import { EntityConfigWith } from "@/models/EntityConfig/types";
 import {
-  EntityFieldValueExtractorRegistry,
+  EntityFieldValueExtractor,
+  EntityFieldValueExtractorId,
   EntityFieldValueExtractorType,
 } from "@/models/EntityConfig/ValueExtractor/types";
 import { FieldDataType } from "@/models/LocalDataset/LocalDatasetField/types";
@@ -23,26 +24,20 @@ export type PullDataStepConfig = BaseModel<"DataPullStepConfig"> & {
   datasetType: "local";
 };
 
-export type ValueExtractorInfo<
-  ExtractorType extends EntityFieldValueExtractorType,
-> = {
-  valueExtractorType: ExtractorType;
-  valueExtractorId: EntityFieldValueExtractorRegistry[ExtractorType]["id"];
+export type CreateFieldStepConfig = BaseModel<"CreateFieldStepConfig"> & {
+  entityFieldConfigId: EntityFieldConfigId;
+  valueExtractorType: EntityFieldValueExtractorType;
+  valueExtractorId: EntityFieldValueExtractorId;
+
   // TODO(pablo): value extractors should also have a reference to the entity
   // field config, because we need to know `isArray`
   // TODO(pablo): we don't need a reference to the full entityConfig. We just
   // need entity field config that has `isIdField` set to true.
   relationships: {
-    valueExtractor: EntityFieldValueExtractorRegistry[ExtractorType];
+    valueExtractor: EntityFieldValueExtractor;
     entityConfig: BuildableEntityConfig;
   };
 };
-
-export type CreateFieldStepConfig = BaseModel<"CreateFieldStepConfig"> & {
-  entityFieldConfigId: EntityFieldConfigId;
-} & {
-    [ExType in EntityFieldValueExtractorType]: ValueExtractorInfo<ExType>;
-  }[EntityFieldValueExtractorType];
 
 export type OutputDatasetsStepConfig =
   BaseModel<"DatasetCreationStepConfig"> & {

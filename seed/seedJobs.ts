@@ -1,4 +1,4 @@
-import { snakeCaseKeysDeep } from "@/lib/utils/objects/misc";
+import { snakeCaseKeysDeep } from "@/lib/utils/objects/transformations";
 import { promiseMap } from "@/lib/utils/promises";
 import type { SeedJob } from "./SeedConfig";
 
@@ -22,11 +22,14 @@ export const entityConfigSeeder: SeedJob = {
 
       // now create the field configs for this entity config
       await promiseMap(entityConfig.fields, async (entityFieldConfig) => {
+        const { name, description, options } = entityFieldConfig;
         return dbClient
           .from("entity_field_configs")
           .insert({
             entity_config_id: insertedEntityConfig.id,
-            ...snakeCaseKeysDeep(entityFieldConfig),
+            name,
+            description,
+            ...snakeCaseKeysDeep(options),
           })
           .throwOnError();
       });

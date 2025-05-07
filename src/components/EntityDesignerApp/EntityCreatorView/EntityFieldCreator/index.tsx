@@ -42,24 +42,40 @@ export function EntityFieldCreator({
   idx,
   entityName,
 }: Props): JSX.Element {
+  const [fieldKeys, fieldInputProps] = entityConfigForm.keysAndProps(
+    `fields.${idx}`,
+    ["name"],
+  );
+  const [fieldOptionsKeys, fieldOptionsInputProps] =
+    entityConfigForm.keysAndProps(`fields.${idx}.options`, [
+      "isIdField",
+      "isTitleField",
+      "valueExtractorType",
+      "allowManualEdit",
+      "isArray",
+    ]);
+
   const [valueExtractorType, setValueExtractorType] = useState(
-    defaultField.valueExtractorType,
+    defaultField.options.valueExtractorType,
   );
 
-  entityConfigForm.watch(`fields.${idx}.valueExtractorType`, ({ value }) => {
-    setValueExtractorType(value);
-  });
+  entityConfigForm.watch(
+    `fields.${idx}.options.valueExtractorType`,
+    ({ value }) => {
+      setValueExtractorType(value);
+    },
+  );
 
   return (
     <Stack>
       <Group>
         <TextInput
-          key={entityConfigForm.key(`fields.${idx}.name`)}
+          key={fieldKeys.name}
           required
           label="Field Name"
           placeholder="Enter a name for the field"
           flex={1}
-          {...entityConfigForm.getInputProps(`fields.${idx}.name`)}
+          {...fieldInputProps.name()}
         />
         <ActionIcon
           color="red"
@@ -72,39 +88,33 @@ export function EntityFieldCreator({
       </Group>
       <Group>
         <Checkbox
-          key={entityConfigForm.key(`fields.${idx}.isIdField`)}
+          key={fieldOptionsKeys.isIdField}
           label={`This is the ${entityName}'s ID`}
-          {...entityConfigForm.getInputProps(`fields.${idx}.isIdField`, {
-            type: "checkbox",
-          })}
+          {...fieldOptionsInputProps.isIdField({ type: "checkbox" })}
         />
         <Checkbox
-          key={entityConfigForm.key(`fields.${idx}.isTitleField`)}
+          key={fieldOptionsKeys.isTitleField}
           label={`This is the ${entityName}'s title`}
-          {...entityConfigForm.getInputProps(`fields.${idx}.isTitleField`, {
+          {...fieldOptionsInputProps.isTitleField({
             type: "checkbox",
           })}
         />
         <Checkbox
-          key={entityConfigForm.key(`fields.${idx}.allowManualEdit`)}
+          key={fieldOptionsKeys.allowManualEdit}
           label="Allow manual edit"
-          {...entityConfigForm.getInputProps(`fields.${idx}.allowManualEdit`, {
-            type: "checkbox",
-          })}
+          {...fieldOptionsInputProps.allowManualEdit({ type: "checkbox" })}
         />
         <Checkbox
-          key={entityConfigForm.key(`fields.${idx}.isArray`)}
+          key={fieldOptionsKeys.isArray}
           label="Allow multiple values"
-          {...entityConfigForm.getInputProps(`fields.${idx}.isArray`, {
-            type: "checkbox",
-          })}
+          {...fieldOptionsInputProps.isArray({ type: "checkbox" })}
         />
       </Group>
       <Select
-        key={entityConfigForm.key(`fields.${idx}.valueExtractorType`)}
+        key={fieldOptionsKeys.valueExtractorType}
         data={valueExtractorOptions}
         label="Where should the data for this field come from?"
-        {...entityConfigForm.getInputProps(`fields.${idx}.valueExtractorType`)}
+        {...fieldOptionsInputProps.valueExtractorType()}
       />
       {match(valueExtractorType)
         .with("manual_entry", () => {

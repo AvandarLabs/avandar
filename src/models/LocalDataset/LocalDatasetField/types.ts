@@ -15,5 +15,5 @@ export type LocalDatasetField = {
    */
   name: string;
   dataType: FieldDataType;
-  description?: string;
+  description?: string | undefined;
 };

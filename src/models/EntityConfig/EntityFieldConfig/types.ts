@@ -1,4 +1,4 @@
-import { SetOptional, Simplify } from "type-fest";
+import { Merge, SetOptional, Simplify } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { Enums } from "@/types/database.types";
 import {
@@ -21,7 +21,7 @@ export type DimensionFieldBaseDataType = Extract<
 >;
 export type MetricFieldBaseDataType = Extract<EntityFieldBaseType, "number">;
 
-type DimensionRead = {
+export type DimensionRead = {
   class: "dimension";
   baseDataType: DimensionFieldBaseDataType;
   valueExtractorType: DimensionExtractorType;
@@ -31,7 +31,7 @@ type DimensionRead = {
   isArray: boolean;
 };
 
-type MetricRead = {
+export type MetricRead = {
   class: "metric";
   baseDataType: MetricFieldBaseDataType;
   valueExtractorType: MetricExtractorType;
@@ -49,25 +49,40 @@ type MetricRead = {
   isArray: false;
 };
 
-type CoreFieldRead = {
+type EntityFieldConfigRead = {
   id: EntityFieldConfigId;
   entityConfigId: EntityConfigId;
   name: string;
-  description: string | null;
+  description: string | undefined;
   createdAt: string;
   updatedAt: string;
+  options: DimensionRead | MetricRead;
 };
 
-type EntityFieldConfigRead = CoreFieldRead & (DimensionRead | MetricRead);
+type EntityFieldConfigInsert = Merge<
+  SetOptional<
+    EntityFieldConfigRead,
+    "id" | "createdAt" | "updatedAt" | "description"
+  >,
+  {
+    options:
+      | SetOptional<
+          DimensionRead,
+          "allowManualEdit" | "isArray" | "isTitleField" | "isIdField"
+        >
+      | SetOptional<
+          MetricRead,
+          "allowManualEdit" | "isArray" | "isTitleField" | "isIdField"
+        >;
+  }
+>;
 
-type EntityFieldConfigInsert = SetOptional<
-  Required<CoreFieldRead>,
-  "id" | "createdAt" | "updatedAt" | "description"
-> &
-  (DimensionRead | MetricRead);
-
-type EntityFieldConfigUpdate = Partial<CoreFieldRead> &
-  (Partial<DimensionRead> | Partial<MetricRead>);
+type EntityFieldConfigUpdate = Merge<
+  Partial<EntityFieldConfigRead>,
+  {
+    options: Partial<DimensionRead> | Partial<MetricRead>;
+  }
+>;
 
 export type EntityFieldConfigCRUDTypes = SupabaseModelCRUDTypes<
   {

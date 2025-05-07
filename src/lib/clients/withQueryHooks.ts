@@ -17,7 +17,8 @@ import {
   AnyFunctionWithSignature,
 } from "../types/utilityTypes";
 import { isFunction, isPlainObject } from "../utils/guards";
-import { deepExclude, objectKeys } from "../utils/objects/misc";
+import { objectKeys } from "../utils/objects/misc";
+import { excludeDeep } from "../utils/objects/transformations";
 import { BaseClient } from "./BaseClient";
 
 function isSingleArgObject(arg: unknown): arg is { arg: unknown } {
@@ -309,6 +310,6 @@ function makeQueryKey<Client extends BaseClient, FnName extends keyof Client>(
 ): QueryKey {
   // exclude any functions from the params, they aren't good to include
   // in a query key
-  const newParams = deepExclude(params, isFunction);
+  const newParams = excludeDeep(params, isFunction);
   return [client.getClientName(), queryFnName, newParams];
 }

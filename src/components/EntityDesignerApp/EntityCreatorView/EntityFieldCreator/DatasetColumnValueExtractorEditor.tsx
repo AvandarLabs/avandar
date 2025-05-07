@@ -25,7 +25,7 @@ export function DatasetColumnValueExtractorEditor({
   entityConfigForm,
   fieldIdx,
 }: Props): JSX.Element {
-  const basePath = `fields.${fieldIdx}.datasetColumnValueExtractor` as const;
+  const basePath = `fields.${fieldIdx}.extractors.datasetColumnValue` as const;
   const [keys, inputProps] = entityConfigForm.keysAndProps(basePath, [
     "datasetId",
     "datasetFieldId",

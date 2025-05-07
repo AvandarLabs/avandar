@@ -4,7 +4,7 @@ import { notifications } from "@mantine/notifications";
 import { useRouter } from "@tanstack/react-router";
 import { APP_CONFIG } from "@/config/AppConfig";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
-import { FieldRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
+import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
 import { hasDefinedProps } from "@/lib/utils/guards";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityConfig } from "@/models/EntityConfig/types";
@@ -16,11 +16,11 @@ type Props = {
 };
 
 const EXCLUDED_ENTITY_CONFIG_KEYS = ["id", "ownerId", "datasetId"] as const;
-const ENTITY_CONFIG_RENDER_OPTIONS: FieldRenderOptionsMap<
+const ENTITY_CONFIG_RENDER_OPTIONS: ChildRenderOptionsMap<
   EntityConfig<"Full">
 > = {
   dataset: {
-    entityFieldOptions: {
+    childRenderOptions: {
       fields: {
         renderAsTable: true,
         excludeKeys: ["id"],
@@ -30,8 +30,11 @@ const ENTITY_CONFIG_RENDER_OPTIONS: FieldRenderOptionsMap<
   },
   fields: {
     titleKey: "name",
-    excludeKeys: ["id", "entityConfigId", "class"],
-    entityFieldOptions: {
+    excludeKeys: ["id", "entityConfigId"],
+    childRenderOptions: {
+      options: {
+        excludeKeys: ["class"],
+      },
       valueExtractor: {
         excludeKeys: ["id", "entityFieldConfigId"],
       },
@@ -74,6 +77,12 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
                   message: "Entities generated successfully",
                   color: "green",
                 });
+              } else {
+                notifications.show({
+                  title: "Cannot sync this entity",
+                  message: "No fields or dataset are configured.",
+                  color: "red",
+                });
               }
             }}
           >
@@ -85,7 +94,7 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
         <ObjectDescriptionList
           entity={fullEntityConfig}
           excludeKeys={EXCLUDED_ENTITY_CONFIG_KEYS}
-          entityFieldOptions={ENTITY_CONFIG_RENDER_OPTIONS}
+          childRenderOptions={ENTITY_CONFIG_RENDER_OPTIONS}
         />
 
         <Button

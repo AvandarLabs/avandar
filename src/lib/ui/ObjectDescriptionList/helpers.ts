@@ -19,6 +19,6 @@ export function getObjectFieldRenderOptions<T extends DescribableObject>(
 
   return {
     ...primitiveValueRenderOptions,
-    ...renderOptions.entityFieldOptions?.[fieldKey],
+    ...renderOptions.childRenderOptions?.[fieldKey],
   };
 }

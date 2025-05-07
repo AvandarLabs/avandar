@@ -35,6 +35,18 @@ export function isPlainObject<T>(
 }
 
 /**
+ * Checks if `value` is an array.
+ * This is better than `Array.isArray` because it is more type-safe and
+ * uses `unknown` rather than `any`.
+ *
+ * @param value - The value to check.
+ * @returns `true` if `value` is an array, `false` otherwise.
+ */
+export function isArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
+}
+
+/**
  * Checks if `value` is a `Date` instance.
  *
  * **Examples**
@@ -91,6 +103,10 @@ export function isUndefined(value: unknown): value is undefined {
   return value === undefined;
 }
 
+export function isNull(value: unknown): value is null {
+  return value === null;
+}
+
 export function isFunction(value: unknown): value is AnyFunction {
   return typeof value === "function";
 }
@@ -105,6 +121,19 @@ export function isString(value: unknown): value is string {
 
 export function isBoolean(value: unknown): value is boolean {
   return typeof value === "boolean";
+}
+
+export function isPrimitive(
+  value: unknown,
+): value is string | number | bigint | boolean | symbol | undefined | null {
+  return (
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean" ||
+    typeof value === "symbol" ||
+    typeof value === "undefined" ||
+    value === null
+  );
 }
 
 /**
@@ -178,4 +207,19 @@ export function isEmptyObject(v: UnknownObject): v is EmptyObject {
   }
 
   return true;
+}
+
+/**
+ * Checks if `value` is one of the values in `values`.
+ *
+ * @param value - The value to check.
+ * @param values - The values to check against.
+ * @returns `true` if `value` is one of the values in `values`,
+ * `false` otherwise.
+ */
+export function isOneOf<T extends string | boolean | number>(
+  value: unknown,
+  values: readonly T[],
+): value is T {
+  return values.includes(value as T);
 }

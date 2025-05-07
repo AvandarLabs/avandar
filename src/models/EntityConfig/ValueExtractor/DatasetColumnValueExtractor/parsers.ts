@@ -1,60 +1,60 @@
 import { z } from "zod";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
-import { uuidType } from "@/lib/utils/zodHelpers";
-import { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
-import { LocalDatasetId } from "@/models/LocalDataset/types";
-import { EntityFieldConfigId } from "../../EntityFieldConfig/types";
+import { omitProps } from "@/lib/utils/objects/higherOrderFuncs";
 import {
+  camelCaseKeysDeep,
+  excludeUndefinedDeep,
+  nullsToUndefinedDeep,
+  snakeCaseKeysDeep,
+} from "@/lib/utils/objects/transformations";
+import { pipe } from "@/lib/utils/pipe";
+import { uuid } from "@/lib/utils/uuid";
+import {
+  DatasetColumnValueExtractor,
   DatasetColumnValueExtractorCRUDTypes,
-  DatasetColumnValueExtractorId,
 } from "./types";
 
 const DBReadSchema = z.object({
-  id: z.string(),
-  entity_field_config_id: z.string(),
+  id: z.string().uuid(),
+  entity_field_config_id: z.string().uuid(),
   value_picker_rule_type: z.enum(["most_frequent", "first"]),
-  dataset_id: z.string(),
-  dataset_field_id: z.string(),
+  dataset_id: z.string().uuid(),
+  dataset_field_id: z.string().uuid(),
   created_at: z.string().datetime({ offset: true }),
   updated_at: z.string().datetime({ offset: true }),
 });
 
-const DBInsertSchema = DBReadSchema.required().partial({
-  id: true,
-  created_at: true,
-  updated_at: true,
-});
-
-const DBUpdateSchema = DBReadSchema.partial();
-
-const ModelReadSchema = z.object({
-  id: uuidType<DatasetColumnValueExtractorId>(),
-  entityFieldConfigId: uuidType<EntityFieldConfigId>(),
-  valuePickerRuleType: DBReadSchema.shape.value_picker_rule_type,
-  datasetId: uuidType<LocalDatasetId>(),
-  datasetFieldId: uuidType<LocalDatasetFieldId>(),
-  createdAt: DBReadSchema.shape.created_at,
-  updatedAt: DBReadSchema.shape.updated_at,
-});
-
-const ModelInsertSchema = ModelReadSchema.required().partial({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-const ModelUpdateSchema = ModelReadSchema.partial();
-
 export const DatasetColumnValueExtractorParsers =
-  makeParserRegistry<DatasetColumnValueExtractorCRUDTypes>({
+  makeParserRegistry<DatasetColumnValueExtractorCRUDTypes>().build({
     modelName: "DatasetColumnValueExtractor",
     DBReadSchema,
-    DBInsertSchema,
-    DBUpdateSchema,
-    ModelReadSchema,
-    ModelInsertSchema,
-    ModelUpdateSchema,
+
+    fromDBReadToModelRead: pipe(
+      camelCaseKeysDeep,
+      nullsToUndefinedDeep,
+      (obj): DatasetColumnValueExtractor => {
+        return {
+          ...obj,
+          type: "dataset_column_value" as const,
+          id: uuid(obj.id),
+          entityFieldConfigId: uuid(obj.entityFieldConfigId),
+          datasetId: uuid(obj.datasetId),
+          datasetFieldId: uuid(obj.datasetFieldId),
+        };
+      },
+    ),
+
+    fromModelInsertToDBInsert: pipe(
+      snakeCaseKeysDeep,
+      excludeUndefinedDeep,
+      omitProps("type"),
+    ),
+    fromModelUpdateToDBUpdate: pipe(
+      snakeCaseKeysDeep,
+      excludeUndefinedDeep,
+      omitProps("type"),
+    ),
   });
 
 /**
@@ -65,40 +65,11 @@ type CRUDTypes = DatasetColumnValueExtractorCRUDTypes;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
+  // Check that the DBReadSchema is consistent with the DBRead type.
   Expect<
     ZodSchemaEqualsTypes<
       typeof DBReadSchema,
       { input: CRUDTypes["DBRead"]; output: CRUDTypes["DBRead"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof DBInsertSchema,
-      { input: CRUDTypes["DBInsert"]; output: CRUDTypes["DBInsert"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof DBUpdateSchema,
-      { input: CRUDTypes["DBUpdate"]; output: CRUDTypes["DBUpdate"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof ModelReadSchema,
-      { input: CRUDTypes["Read"]; output: CRUDTypes["Read"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof ModelInsertSchema,
-      { input: CRUDTypes["Insert"]; output: CRUDTypes["Insert"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof ModelUpdateSchema,
-      { input: CRUDTypes["Update"]; output: CRUDTypes["Update"] }
     >
   >,
 ];

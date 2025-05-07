@@ -1,17 +1,11 @@
-import { match } from "ts-pattern";
 import { isNotUndefined } from "@/lib/utils/guards";
 import { uuid } from "@/lib/utils/uuid";
-import {
-  EntityFieldValueExtractorRegistry,
-  EntityFieldValueExtractorType,
-} from "@/models/EntityConfig/ValueExtractor/types";
 import { FieldDataType } from "@/models/LocalDataset/LocalDatasetField/types";
 import {
   BuildableEntityConfig,
   BuildableFieldConfig,
   Pipeline,
   PipelineStep,
-  ValueExtractorInfo,
 } from "./pipelineTypes";
 
 function _makeDataPullStep(entityConfig: BuildableEntityConfig): PipelineStep {
@@ -52,23 +46,11 @@ function _makeCreateFieldStep({
   entityConfig: BuildableEntityConfig;
   entityFieldConfig: BuildableFieldConfig;
 }): PipelineStep | undefined {
-  const makeValueExtractorInfo = <T extends EntityFieldValueExtractorType>(
-    valueExtractorType: T,
-    valueExtractor: EntityFieldValueExtractorRegistry[T],
-  ): ValueExtractorInfo<T> => {
-    return {
-      valueExtractorType,
-      valueExtractorId: valueExtractor.id,
-      relationships: {
-        entityConfig,
-        valueExtractor,
-      },
-    };
-  };
+  const { name, id, valueExtractor } = entityFieldConfig;
 
   return {
     id: uuid(),
-    name: `Create field values for ${entityFieldConfig.name}`,
+    name: `Create field values for ${name}`,
     description: "Create all field values",
     type: "create_field",
     createdAt: new Date(),
@@ -78,27 +60,13 @@ function _makeCreateFieldStep({
         id: uuid(),
         createdAt: new Date(),
         updatedAt: new Date(),
-        entityFieldConfigId: entityFieldConfig.id,
-        ...match(entityFieldConfig)
-          .with(
-            { valueExtractorType: "aggregation" },
-            ({ valueExtractorType, valueExtractor }) => {
-              return makeValueExtractorInfo(valueExtractorType, valueExtractor);
-            },
-          )
-          .with(
-            { valueExtractorType: "dataset_column_value" },
-            ({ valueExtractorType, valueExtractor }) => {
-              return makeValueExtractorInfo(valueExtractorType, valueExtractor);
-            },
-          )
-          .with(
-            { valueExtractorType: "manual_entry" },
-            ({ valueExtractorType, valueExtractor }) => {
-              return makeValueExtractorInfo(valueExtractorType, valueExtractor);
-            },
-          )
-          .exhaustive(),
+        entityFieldConfigId: id,
+        valueExtractorType: valueExtractor.type,
+        valueExtractorId: valueExtractor.id,
+        relationships: {
+          valueExtractor,
+          entityConfig,
+        },
       },
     },
   };

@@ -1,5 +1,6 @@
 import { SetOptional, Simplify } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
+import { LocalDatasetId } from "@/models/LocalDataset/types";
 import { EntityFieldConfigId } from "../../EntityFieldConfig/types";
 import type { JSONValue, UUID } from "@/lib/types/common";
 import type { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
@@ -14,6 +15,9 @@ type AggregationExtractorRead = {
   /** Unique identifier for this extractor config */
   id: AggregationExtractorId;
 
+  /** Type of extractor */
+  type: "aggregation";
+
   /** ID of the associated entity field config */
   entityFieldConfigId: EntityFieldConfigId;
 
@@ -21,13 +25,13 @@ type AggregationExtractorRead = {
   aggregationType: AggregationType;
 
   /** ID of the dataset to extract from */
-  datasetId: UUID<"Dataset">;
+  datasetId: LocalDatasetId;
 
   /** ID of the specific field in the dataset to aggregate */
   datasetFieldId: LocalDatasetFieldId;
 
   /** Filter to apply before aggregation */
-  filter: JSONValue | null;
+  filter: JSONValue | undefined;
 
   /** Creation timestamp */
   createdAt: string;
@@ -37,8 +41,8 @@ type AggregationExtractorRead = {
 };
 
 type AggregationExtractorInsert = SetOptional<
-  Required<AggregationExtractorRead>,
-  "id" | "createdAt" | "updatedAt" | "filter"
+  AggregationExtractorRead,
+  "createdAt" | "filter" | "id" | "updatedAt"
 >;
 
 type AggregationExtractorUpdate = Partial<AggregationExtractorRead>;

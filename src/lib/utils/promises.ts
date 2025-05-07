@@ -17,6 +17,25 @@ export async function promiseMap<T, V>(
 
 /**
  * Maps over an array and applies a promise-returning function
+ * to each one. Each function returns an array of results.
+ * Finally, calls `.flat()` on the result to flatten the
+ * arrays. The promises are awaited in parallel, no order
+ * can be guaranteed.
+ *
+ * @param array array of items to map over
+ * @param fn function to apply to each item in the array
+ * @returns promise that resolves when all the promises in
+ * the mapped array have resolved
+ */
+export async function promiseFlatMap<T, V>(
+  array: readonly T[],
+  fn: (item: T) => Promise<V[]> | V[],
+): Promise<V[]> {
+  return (await promiseMap(array, fn)).flat();
+}
+
+/**
+ * Maps over an array and applies a promise-returning function
  * to each one sequentially. Each function is awaited before
  * the next is called. Order is guaranteed.
  *

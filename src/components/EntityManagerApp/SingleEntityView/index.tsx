@@ -2,7 +2,7 @@ import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { useMemo } from "react";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { makeMapFromList } from "@/lib/utils/maps/builders";
-import { getProp, propIsTrue } from "@/lib/utils/objects/higherOrderFuncs";
+import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { unknownToString } from "@/lib/utils/strings";
 import {
   EntityClient,
@@ -10,7 +10,10 @@ import {
   EntityRead,
 } from "@/models/Entity/EntityClient";
 import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
-import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/types";
+import {
+  EntityFieldConfig,
+  EntityFieldConfigId,
+} from "@/models/EntityConfig/EntityFieldConfig/types";
 import { EntityConfig } from "@/models/EntityConfig/types";
 
 type HydratedEntity = EntityRead & {
@@ -44,11 +47,17 @@ function useHydratedEntity({
   const hydratedEntity = useMemo(() => {
     let configInfo = undefined;
     let fieldValuesInfo = undefined;
-    let fieldConfigsMap = undefined;
+    let fieldConfigsMap:
+      | Map<EntityFieldConfigId, EntityFieldConfig>
+      | undefined = undefined;
 
     if (entityFieldConfigs) {
-      const idField = entityFieldConfigs.find(propIsTrue("isIdField"));
-      const nameField = entityFieldConfigs.find(propIsTrue("isTitleField"));
+      const idField = entityFieldConfigs.find(
+        propEquals("options.isIdField", true),
+      );
+      const nameField = entityFieldConfigs.find(
+        propEquals("options.isTitleField", true),
+      );
       fieldConfigsMap = makeMapFromList({
         list: entityFieldConfigs,
         keyFn: getProp("id"),
@@ -128,7 +137,7 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
             "nameFieldValue",
             "fieldConfigs",
           ]}
-          entityFieldOptions={{
+          childRenderOptions={{
             fieldValues: {
               renderAsTable: true,
               excludeKeys: [

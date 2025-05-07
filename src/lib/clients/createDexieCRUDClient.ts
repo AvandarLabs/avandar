@@ -171,10 +171,7 @@ export function createDexieCRUDClient<
         // Now apply all the filters that did not get applied before
         // Only if we actually applied a filter
         if (operatorToApply) {
-          const newFilters = omit({
-            from: filtersByOperator,
-            keysToDelete: [operatorToApply],
-          });
+          const newFilters = omit(filtersByOperator, operatorToApply);
 
           // verify that the filters object isn't empty now that we removed
           // the one operator we applied earlier

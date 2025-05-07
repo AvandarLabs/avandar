@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
+import { excludeUndefinedDeep } from "@/lib/utils/objects/transformations";
 import { mimeType, uuidType } from "@/lib/utils/zodHelpers";
 import { LocalDatasetFieldSchema } from "./LocalDatasetField/parsers";
-import { LocalDatasetCRUDTypes, LocalDatasetId } from "./types";
+import { LocalDataset, LocalDatasetCRUDTypes, LocalDatasetId } from "./types";
 
 /**
  * Zod schema for the local dataset type.
@@ -16,41 +17,52 @@ export const DBReadSchema = z.object({
   updatedAt: z.coerce.string(),
   sizeInBytes: z.number(),
   mimeType,
-  data: z.string(),
   delimiter: z.string(),
   firstRowIsHeader: z.boolean(),
   fields: z.array(LocalDatasetFieldSchema).readonly(),
+  data: z.string(),
 });
-const DBInsertSchema = DBReadSchema;
-const DBUpdateSchema = DBReadSchema.partial();
 
-const ModelReadSchema = DBReadSchema.extend({
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-});
-const ModelInsertSchema = ModelReadSchema;
-const ModelUpdateSchema = ModelReadSchema.partial();
+export const ParsedLocalDatasetSchema = DBReadSchema.extend({
+  createdAt: z.coerce.string().transform((s) => {
+    return new Date(s);
+  }),
+  updatedAt: z.coerce.string().transform((s) => {
+    return new Date(s);
+  }),
 
-export const ParsedLocalDatasetSchema = ModelReadSchema.extend({
   // we do not enforce more type checking here because datasets can be really
   // big and all this parsing can affect performance.
   data: z.array(z.any()),
 });
 
-export const LocalDatasetParsers = makeParserRegistry<LocalDatasetCRUDTypes>(
-  {
+export const LocalDatasetParsers =
+  makeParserRegistry<LocalDatasetCRUDTypes>().build({
     modelName: "LocalDataset",
     DBReadSchema,
-    DBInsertSchema,
-    DBUpdateSchema,
-    ModelReadSchema,
-    ModelInsertSchema,
-    ModelUpdateSchema,
-  },
-  {
-    switchCasesWhenParsing: false,
-  },
-);
+
+    fromDBReadToModelRead: (dbObj: LocalDataset<"DBRead">): LocalDataset => {
+      return {
+        ...dbObj,
+        createdAt: new Date(dbObj.createdAt),
+        updatedAt: new Date(dbObj.updatedAt),
+      };
+    },
+    fromModelInsertToDBInsert: (modelObj): LocalDataset<"DBInsert"> => {
+      return {
+        ...modelObj,
+        createdAt: modelObj.createdAt.toISOString(),
+        updatedAt: modelObj.updatedAt.toISOString(),
+      };
+    },
+    fromModelUpdateToDBUpdate: (modelObj): LocalDataset<"DBUpdate"> => {
+      return excludeUndefinedDeep({
+        ...modelObj,
+        createdAt: modelObj.createdAt?.toISOString(),
+        updatedAt: modelObj.updatedAt?.toISOString(),
+      });
+    },
+  });
 
 /**
  * Do not remove these tests! These check that your Zod parsers are
@@ -60,40 +72,11 @@ type CRUDTypes = LocalDatasetCRUDTypes;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
+  // Check that the DBReadSchema is consistent with the DBRead type.
   Expect<
     ZodSchemaEqualsTypes<
       typeof DBReadSchema,
       { input: CRUDTypes["DBRead"]; output: CRUDTypes["DBRead"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof DBInsertSchema,
-      { input: CRUDTypes["DBInsert"]; output: CRUDTypes["DBInsert"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof DBUpdateSchema,
-      { input: CRUDTypes["DBUpdate"]; output: CRUDTypes["DBUpdate"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof ModelReadSchema,
-      { input: CRUDTypes["Read"]; output: CRUDTypes["Read"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof ModelInsertSchema,
-      { input: CRUDTypes["Insert"]; output: CRUDTypes["Insert"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof ModelUpdateSchema,
-      { input: CRUDTypes["Update"]; output: CRUDTypes["Update"] }
     >
   >,
 ];

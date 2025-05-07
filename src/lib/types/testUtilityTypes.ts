@@ -2,7 +2,7 @@
  * This file contains utility types to test typescript types.
  */
 
-import { And, IsEqual } from "type-fest";
+import { And, IsEqual, Simplify } from "type-fest";
 import { z } from "zod";
 
 /**
@@ -37,6 +37,6 @@ export type ZodSchemaEqualsTypes<
     output: z.output<Z>;
   },
 > = And<
-  IsEqual<z.input<Z>, Args["input"]>,
-  IsEqual<z.output<Z>, Args["output"]>
+  IsEqual<Simplify<z.input<Z>>, Simplify<Args["input"]>>,
+  IsEqual<Simplify<z.output<Z>>, Simplify<Args["output"]>>
 >;

@@ -3,10 +3,7 @@ import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { UserId } from "@/models/User";
 import { LocalDataset, LocalDatasetId } from "../LocalDataset/types";
 import { EntityFieldConfig } from "./EntityFieldConfig/types";
-import {
-  EntityFieldValueExtractorRegistry,
-  EntityFieldValueExtractorType,
-} from "./ValueExtractor/types";
+import { EntityFieldValueExtractor } from "./ValueExtractor/types";
 import type { UUID } from "@/lib/types/common";
 
 export type EntityConfigId = UUID<"EntityConfig">;
@@ -25,7 +22,7 @@ type EntityConfigRead = {
   name: string;
 
   /** Optional description of what this entity represents */
-  description: string | null;
+  description: string | undefined;
 
   /** Timestamp when this entity config was created */
   createdAt: string;
@@ -34,29 +31,25 @@ type EntityConfigRead = {
   updatedAt: string;
 
   /** Dataset ID this entity config is created from */
-  datasetId: LocalDatasetId | null;
+  datasetId: LocalDatasetId | undefined;
 
   /** Whether users can manually create entities for this config */
   allowManualCreation: boolean;
 };
 
 type EntityConfigInsert = SetOptional<
-  Required<EntityConfigRead>,
-  "id" | "ownerId" | "description" | "createdAt" | "updatedAt"
+  EntityConfigRead,
+  "id" | "ownerId" | "description" | "createdAt" | "updatedAt" | "datasetId"
 >;
 
-type EntityConfigUpdate = Partial<EntityConfigRead>;
+type EntityConfigUpdate = Partial<EntityConfigInsert>;
 
 type EntityConfigFull = EntityConfig & {
   dataset?: LocalDataset;
   fields?: ReadonlyArray<
-    Omit<EntityFieldConfig, "valueExtractorType"> &
-      {
-        [ExtractorType in EntityFieldValueExtractorType]: {
-          valueExtractorType: ExtractorType;
-          valueExtractor?: EntityFieldValueExtractorRegistry[ExtractorType];
-        };
-      }[EntityFieldValueExtractorType]
+    EntityFieldConfig & {
+      valueExtractor?: EntityFieldValueExtractor;
+    }
   >;
 };
 

@@ -1,106 +1,70 @@
 import { z } from "zod";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
-import { uuidType } from "@/lib/utils/zodHelpers";
-import { LocalDatasetId } from "../LocalDataset/types";
-import { UserId } from "../User";
-import { EntityConfigCRUDTypes, EntityConfigId } from "./types";
+import { excludeNullsExceptFromProps } from "@/lib/utils/objects/higherOrderFuncs";
+import {
+  camelCaseKeysDeep,
+  nullsToUndefinedDeep,
+  snakeCaseKeysDeep,
+  undefinedsToNullsDeep,
+} from "@/lib/utils/objects/transformations";
+import { pipe } from "@/lib/utils/pipe";
+import { uuid } from "@/lib/utils/uuid";
+import { EntityConfig, EntityConfigCRUDTypes } from "./types";
 
 const DBReadSchema = z.object({
   created_at: z.string().datetime({ offset: true }),
   description: z.string().nullable(),
-  id: z.string(),
+  id: z.string().uuid(),
   name: z.string(),
-  owner_id: z.string(),
+  owner_id: z.string().uuid(),
   updated_at: z.string().datetime({ offset: true }),
   dataset_id: z.string().uuid().nullable(),
   allow_manual_creation: z.boolean(),
 });
 
-const DBInsertSchema = DBReadSchema.required().partial({
-  created_at: true,
-  description: true,
-  id: true,
-  owner_id: true,
-  updated_at: true,
-  dataset_id: true,
-});
+export const EntityConfigParsers =
+  makeParserRegistry<EntityConfigCRUDTypes>().build({
+    modelName: "EntityConfig",
+    DBReadSchema,
+    fromDBReadToModelRead: pipe(
+      camelCaseKeysDeep,
+      nullsToUndefinedDeep,
+      (obj): EntityConfig => {
+        return {
+          ...obj,
+          id: uuid(obj.id),
+          ownerId: uuid(obj.ownerId),
+          datasetId: obj.datasetId ? uuid(obj.datasetId) : undefined,
+        };
+      },
+    ),
 
-const DBUpdateSchema = DBReadSchema.partial();
+    fromModelInsertToDBInsert: pipe(
+      snakeCaseKeysDeep,
+      undefinedsToNullsDeep,
+      excludeNullsExceptFromProps("dataset_id", "description"),
+    ),
 
-const ModelReadSchema = z.object({
-  createdAt: DBReadSchema.shape.created_at,
-  description: DBReadSchema.shape.description,
-  id: uuidType<EntityConfigId>(),
-  name: DBReadSchema.shape.name,
-  ownerId: uuidType<UserId>(),
-  updatedAt: DBReadSchema.shape.updated_at,
-  datasetId: uuidType<LocalDatasetId>().nullable(),
-  allowManualCreation: DBReadSchema.shape.allow_manual_creation,
-});
-
-const ModelInsertSchema = ModelReadSchema.required().partial({
-  createdAt: true,
-  description: true,
-  id: true,
-  ownerId: true,
-  updatedAt: true,
-});
-
-const ModelUpdateSchema = ModelReadSchema.partial();
-
-export const EntityConfigParsers = makeParserRegistry<EntityConfigCRUDTypes>({
-  modelName: "EntityConfig",
-  DBReadSchema,
-  DBInsertSchema,
-  DBUpdateSchema,
-  ModelReadSchema,
-  ModelInsertSchema,
-  ModelUpdateSchema,
-});
+    fromModelUpdateToDBUpdate: pipe(
+      snakeCaseKeysDeep,
+      undefinedsToNullsDeep,
+      excludeNullsExceptFromProps("dataset_id", "description"),
+    ),
+  });
 
 /**
- * Do not remove these tests! These check that your Zod parsers are
- * consistent with your defined model and DB types.
+ * Do not remove these tests!
  */
 type CRUDTypes = EntityConfigCRUDTypes;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
+  // Check that the DBReadSchema is consistent with the DBRead type.
   Expect<
     ZodSchemaEqualsTypes<
       typeof DBReadSchema,
       { input: CRUDTypes["DBRead"]; output: CRUDTypes["DBRead"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof DBInsertSchema,
-      { input: CRUDTypes["DBInsert"]; output: CRUDTypes["DBInsert"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof DBUpdateSchema,
-      { input: CRUDTypes["DBUpdate"]; output: CRUDTypes["DBUpdate"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof ModelReadSchema,
-      { input: CRUDTypes["Read"]; output: CRUDTypes["Read"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof ModelInsertSchema,
-      { input: CRUDTypes["Insert"]; output: CRUDTypes["Insert"] }
-    >
-  >,
-  Expect<
-    ZodSchemaEqualsTypes<
-      typeof ModelUpdateSchema,
-      { input: CRUDTypes["Update"]; output: CRUDTypes["Update"] }
     >
   >,
 ];

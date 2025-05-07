@@ -12,6 +12,9 @@ type ManualEntryExtractorRead = {
   /** Unique identifier for this extractor config */
   id: ManualEntryExtractorId;
 
+  /** Type of extractor */
+  type: "manual_entry";
+
   /** ID of the associated entity field config */
   entityFieldConfigId: EntityFieldConfigId;
 
@@ -23,7 +26,7 @@ type ManualEntryExtractorRead = {
 };
 
 type ManualEntryExtractorInsert = SetOptional<
-  Required<ManualEntryExtractorRead>,
+  ManualEntryExtractorRead,
   "id" | "createdAt" | "updatedAt"
 >;
 

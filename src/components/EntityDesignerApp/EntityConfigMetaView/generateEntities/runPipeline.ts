@@ -1,12 +1,13 @@
 import { match } from "ts-pattern";
 import { Logger } from "@/lib/Logger";
+import { getErrorMap } from "@/lib/models/makeParserRegistry";
 import { CSVCellValue, CSVRow, UnknownObject, UUID } from "@/lib/types/common";
 import { isNotNullOrUndefined, isPlainObject } from "@/lib/utils/guards";
 import {
   makeBucketsFromList,
   makeObjectFromList,
 } from "@/lib/utils/objects/builders";
-import { getProp, propIsTrue } from "@/lib/utils/objects/higherOrderFuncs";
+import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys } from "@/lib/utils/objects/misc";
 import { promiseReduce } from "@/lib/utils/promises";
 import { unknownToString } from "@/lib/utils/strings";
@@ -88,7 +89,7 @@ export type PipelineContext = {
 function _getEntityIdField(
   entityConfig: BuildableEntityConfig,
 ): BuildableFieldConfig | undefined {
-  const field = entityConfig.fields.find(propIsTrue("isIdField"));
+  const field = entityConfig.fields.find(propEquals("options.isIdField", true));
   return field;
 }
 
@@ -102,7 +103,9 @@ function _getDatasetExternalIdColumn(
     );
   }
 
-  if (entityIdField.valueExtractorType !== "dataset_column_value") {
+  const { valueExtractor } = entityIdField;
+
+  if (valueExtractor.type !== "dataset_column_value") {
     throw new Error(
       "Cannot extract a primary key if the ID field is not configured as a dataset column value extractor",
     );
@@ -110,7 +113,7 @@ function _getDatasetExternalIdColumn(
 
   // get the dataset field which corresponds to our entity config's ID field
   const datasetIdField = dataset.fields.find((field) => {
-    return field.id === entityIdField.valueExtractor.datasetFieldId;
+    return field.id === valueExtractor.datasetFieldId;
   });
   return datasetIdField;
 }
@@ -184,7 +187,9 @@ function createPipelineContext(
     },
     getDataset: (id: LocalDatasetId): ParsedLocalDataset => {
       const maybeDataset = getContextValue(`datasetId:${id}`);
-      return ParsedLocalDatasetSchema.parse(maybeDataset);
+      return ParsedLocalDatasetSchema.parse(maybeDataset, {
+        errorMap: getErrorMap("ParsedLocalDataset", "ParsedLocalDatasetSchema"),
+      });
     },
     getErrors: () => {
       return state.errors;
@@ -221,22 +226,20 @@ export function _runCreateFieldStep(
   // per entity) and store it in the context.
   const entityFieldValues: EntityFieldValue[] = [];
 
+  const { valueExtractor, entityConfig } = stepConfig.relationships;
+
   // Get the step's extractor type. This will tell us how we have
   // To generate the field values
-  match(stepConfig)
-    .with({ valueExtractorType: "manual_entry" }, () => {
+  match(valueExtractor)
+    .with({ type: "manual_entry" }, () => {
       Logger.log(
         "Skipping value extraction for field configured as 'manual_entry'",
       );
       // manual entries do not have any values to generate with a pipeline
       return Promise.resolve(context);
     })
-    .with({ valueExtractorType: "dataset_column_value" }, (config) => {
-      const {
-        relationships: { valueExtractor, entityConfig },
-      } = config;
-
-      const { datasetId, datasetFieldId, valuePickerRuleType } = valueExtractor;
+    .with({ type: "dataset_column_value" }, (extractor) => {
+      const { datasetId, datasetFieldId, valuePickerRuleType } = extractor;
 
       // data should be loaded already, so lets fetch it
       const dataset = context.getDataset(datasetId);
@@ -295,7 +298,7 @@ export function _runCreateFieldStep(
                   value: extractedValue,
                   valueSet: [extractedValue],
                   datasourceId: datasetId,
-                  entityFieldConfigId: config.entityFieldConfigId,
+                  entityFieldConfigId: stepConfig.entityFieldConfigId,
                 };
                 seenExternalIds.add(externalId);
                 entityFieldValues.push(entityFieldValue);
@@ -356,7 +359,7 @@ export function _runCreateFieldStep(
                 value: mostFrequentValue,
                 valueSet: [...counts.keys()],
                 datasourceId: datasetId,
-                entityFieldConfigId: config.entityFieldConfigId,
+                entityFieldConfigId: stepConfig.entityFieldConfigId,
               };
               entityFieldValues.push(entityFieldValue);
             }
@@ -365,7 +368,7 @@ export function _runCreateFieldStep(
         .exhaustive();
     })
 
-    .with({ valueExtractorType: "aggregation" }, () => {
+    .with({ type: "aggregation" }, () => {
       throw new Error("Aggregation value extractors are not implemented yet");
     })
     .exhaustive();

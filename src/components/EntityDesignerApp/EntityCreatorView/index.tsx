@@ -4,6 +4,7 @@ import { useRouter } from "@tanstack/react-router";
 import { LocalDatasetSelect } from "@/components/common/LocalDatasetSelect";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { isNotEqualTo } from "@/lib/hooks/ui/useForm/validators";
+import { propDoesntEqual } from "@/lib/utils/objects/higherOrderFuncs";
 import { getEntityConfigLinkProps } from "@/models/EntityConfig/utils";
 import {
   EntityConfigFormValues,
@@ -22,12 +23,24 @@ export function EntityCreatorView(): JSX.Element {
       mode: "uncontrolled",
       initialValues: getDefaultEntityConfigFormValues(),
       validate: {
+        datasetId: (datasetId, formValues) => {
+          const fieldsThatNeedDataset = formValues.fields.filter(
+            propDoesntEqual("options.valueExtractorType", "manual_entry"),
+          );
+          if (!datasetId && fieldsThatNeedDataset.length > 0) {
+            return "Dataset cannot be left empty if a field requires one.";
+          }
+          return null;
+        },
+
         fields: {
           [formRootRule]: isNotEmpty("At least one field is required"),
-          valueExtractorType: isNotEqualTo(
-            "aggregation",
-            "Aggregation is not a supported value extractor type yet. Please choose something else.",
-          ),
+          options: {
+            valueExtractorType: isNotEqualTo(
+              "aggregation",
+              "Aggregation is not a supported value extractor type yet. Please choose something else.",
+            ),
+          },
         },
       },
     });

@@ -9,7 +9,6 @@ type Props = {
 };
 
 export function EntityManagerApp({ entityConfig }: Props): JSX.Element {
-  console.log("entity config", entityConfig);
   const [entities, isLoading] = EntityClient.useGetAll({
     entityConfigId: entityConfig.id,
   });

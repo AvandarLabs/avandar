@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { APP_CONFIG } from "@/config/AppConfig";
 import { DataGrid } from "@/lib/ui/DataGrid";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
-import { FieldRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
+import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { type LocalDataset } from "@/models/LocalDataset/types";
 import { useCSVParser } from "../hooks/useCSVParser";
@@ -16,7 +16,7 @@ type Props = {
 };
 
 const EXCLUDED_DATASET_KEYS = ["id", "name", "data", "description"] as const;
-const DATASET_RENDER_OPTIONS: FieldRenderOptionsMap<LocalDataset> = {
+const DATASET_RENDER_OPTIONS: ChildRenderOptionsMap<LocalDataset> = {
   fields: {
     renderAsTable: true,
     titleKey: "name",
@@ -50,7 +50,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
         <ObjectDescriptionList
           entity={dataset}
           excludeKeys={EXCLUDED_DATASET_KEYS}
-          entityFieldOptions={DATASET_RENDER_OPTIONS}
+          childRenderOptions={DATASET_RENDER_OPTIONS}
         />
 
         <Title order={5}>Data preview</Title>

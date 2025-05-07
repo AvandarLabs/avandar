@@ -3,15 +3,11 @@ import {
   useMutation,
   UseMutationResultTuple,
 } from "@/lib/hooks/query/useMutation";
-import { hasProps } from "@/lib/utils/guards";
+import { hasProps, isNotUndefined } from "@/lib/utils/guards";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
-import { AggregationExtractorClient } from "@/models/EntityConfig/ValueExtractor/AggregationExtractor/AggregationExtractorClient";
-import { AggregationExtractor } from "@/models/EntityConfig/ValueExtractor/AggregationExtractor/types";
-import { DatasetColumnValueExtractorClient } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractorClient";
-import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/types";
-import { ManualEntryExtractorClient } from "@/models/EntityConfig/ValueExtractor/ManualEntryExtractor/ManualEntryExtractorClient";
-import { ManualEntryExtractor } from "@/models/EntityConfig/ValueExtractor/ManualEntryExtractor/types";
+import { EntityFieldValueExtractor } from "@/models/EntityConfig/ValueExtractor/types";
+import { ValueExtractorClient } from "@/models/EntityConfig/ValueExtractor/ValueExtractorClient";
 import { EntityConfigFormValues } from "./entityCreatorTypes";
 
 export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
@@ -20,62 +16,58 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
 > {
   return useMutation({
     mutationFn: async (entityConfigForm: EntityConfigFormValues) => {
-      // create the parent entity
-      await EntityConfigClient.insert({
+      // Insert the parent entity
+      await EntityConfigClient.withLogger("submit form").insert({
         data: entityConfigForm,
       });
 
-      // create the child field entities
-      await Promise.all([
-        EntityFieldConfigClient.bulkInsert({
-          data: entityConfigForm.fields,
-        }),
-      ]);
-
-      const aggregationExtractors: Array<AggregationExtractor<"Insert">> = [];
-      const manualEntryExtractors: Array<ManualEntryExtractor<"Insert">> = [];
-      const datasetColumnValueExtractors: Array<
-        DatasetColumnValueExtractor<"Insert">
-      > = [];
-
-      entityConfigForm.fields.forEach((field) => {
-        match(field.valueExtractorType)
-          .with("manual_entry", () => {
-            manualEntryExtractors.push(field.manualEntryExtractor);
-          })
-          .with("dataset_column_value", () => {
-            const { datasetColumnValueExtractor } = field;
-            if (
-              hasProps(
-                datasetColumnValueExtractor,
-                "datasetId",
-                "datasetFieldId",
-              )
-            ) {
-              datasetColumnValueExtractors.push(datasetColumnValueExtractor);
-            }
-          })
-          .with("aggregation", () => {
-            const { aggregationExtractor } = field;
-            if (hasProps(aggregationExtractor, "datasetId", "datasetFieldId")) {
-              aggregationExtractors.push(aggregationExtractor);
-            }
-          })
-          .exhaustive();
+      // Insert the child field entities
+      await EntityFieldConfigClient.bulkInsert({
+        data: entityConfigForm.fields,
       });
 
-      // now send requests to save the extractors
-      await Promise.all([
-        AggregationExtractorClient.bulkInsert({
-          data: aggregationExtractors,
-        }),
-        ManualEntryExtractorClient.bulkInsert({
-          data: manualEntryExtractors,
-        }),
-        DatasetColumnValueExtractorClient.bulkInsert({
-          data: datasetColumnValueExtractors,
-        }),
-      ]);
+      // Insert the value extractors
+      // First, get all value extractors from the fields. Filter out any
+      // that don't have the necessary required properties
+      const extractorsToCreate: Array<EntityFieldValueExtractor<"Insert">> =
+        entityConfigForm.fields
+          .map((field) => {
+            const { options, extractors } = field;
+            return match(options.valueExtractorType)
+              .with("manual_entry", () => {
+                return extractors.manualEntry;
+              })
+              .with("dataset_column_value", () => {
+                const datasetColumnValueExtractor =
+                  extractors.datasetColumnValue;
+                if (
+                  hasProps(
+                    datasetColumnValueExtractor,
+                    "datasetId",
+                    "datasetFieldId",
+                  )
+                ) {
+                  return datasetColumnValueExtractor;
+                }
+                return undefined;
+              })
+              .with("aggregation", () => {
+                const aggregationExtractor = extractors.aggregation;
+                if (
+                  hasProps(aggregationExtractor, "datasetId", "datasetFieldId")
+                ) {
+                  return aggregationExtractor;
+                }
+                return undefined;
+              })
+              .exhaustive();
+          })
+          .filter(isNotUndefined);
+
+      // Send the bulk insert requrest
+      await ValueExtractorClient.bulkInsert({
+        data: extractorsToCreate,
+      });
     },
 
     onError: async (_error, entityConfigForm) => {

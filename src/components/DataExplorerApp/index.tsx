@@ -76,10 +76,10 @@ export function DataExplorerApp(): JSX.Element {
               defaultValue: "none" as const,
             });
 
-            return omit({
-              from: { ...newDefaultAggregations, ...prevAggregations },
-              keysToDelete: droppedFieldNames,
-            });
+            return omit(
+              { ...newDefaultAggregations, ...prevAggregations },
+              ...droppedFieldNames,
+            );
           });
         }}
       />

@@ -13,6 +13,9 @@ type DatasetColumnValueExtractorRead = {
   /** Unique identifier for this extractor config */
   id: DatasetColumnValueExtractorId;
 
+  /** Type of extractor */
+  type: "dataset_column_value";
+
   /** ID of the associated entity field config */
   entityFieldConfigId: EntityFieldConfigId;
 
@@ -33,7 +36,7 @@ type DatasetColumnValueExtractorRead = {
 };
 
 type DatasetColumnValueExtractorInsert = SetOptional<
-  Required<DatasetColumnValueExtractorRead>,
+  DatasetColumnValueExtractorRead,
   "id" | "createdAt" | "updatedAt"
 >;
 

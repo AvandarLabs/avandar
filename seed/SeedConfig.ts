@@ -24,14 +24,16 @@ export const SEED_DATA = {
       fields: [
         {
           name: "Name",
-          class: "dimension",
-          baseDataType: "string",
-          valueExtractorType: "manual_entry",
           description: "This entity represents a US State",
-          allowManualEdit: true,
-          isIdField: true,
-          isTitleField: true,
-          isArray: false,
+          options: {
+            class: "dimension",
+            baseDataType: "string",
+            valueExtractorType: "manual_entry",
+            allowManualEdit: true,
+            isIdField: true,
+            isTitleField: true,
+            isArray: false,
+          },
         },
       ] satisfies Array<Omit<EntityFieldConfig<"Insert">, "entityConfigId">>,
     },
