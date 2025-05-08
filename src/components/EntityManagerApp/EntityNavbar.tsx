@@ -35,7 +35,7 @@ export function EntityNavbar({
           ...getEntityLinkProps({ entityConfig, entity }),
           // TODO(pablo): this label should come from the field
           // that is configured as the title field
-          label: entity.externalId,
+          label: entity.name,
           style: borderStyle,
         };
       })
