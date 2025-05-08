@@ -119,7 +119,7 @@ export function useForm<
 
   const insertListItem: InsertListItemFn<FormValues> = useCallback(
     (path, item) => {
-      form.insertListItem(path, item);
+      form.insertListItem(String(path), item);
     },
     [form],
   );

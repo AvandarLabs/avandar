@@ -16,6 +16,7 @@ import { LocalDatasetClient } from "../LocalDataset/LocalDatasetClient";
 export const EntityReadSchema = z.object({
   id: uuidType<"Entity">(),
   externalId: z.string(),
+  name: z.string(),
   entityConfigId: uuidType<"EntityConfig">(),
   assignedTo: z.union([
     z.literal("").transform(() => {

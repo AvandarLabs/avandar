@@ -86,9 +86,9 @@ export function useKeysAndPropsCallback<
 
         // generate all keys and inputProps functions
         fullPaths.forEach((path) => {
-          keys[path] = form.key(path);
+          keys[path] = form.key(String(path));
           inputProps[path] = (options?: GetInputPropsOptions) => {
-            return form.getInputProps(path, options);
+            return form.getInputProps(String(path), options);
           };
         });
 

@@ -2,7 +2,11 @@ import { match } from "ts-pattern";
 import { Logger } from "@/lib/Logger";
 import { getErrorMap } from "@/lib/models/makeParserRegistry";
 import { CSVCellValue, CSVRow, UnknownObject, UUID } from "@/lib/types/common";
-import { isNotNullOrUndefined, isPlainObject } from "@/lib/utils/guards";
+import {
+  hasProps,
+  isNotNullOrUndefined,
+  isPlainObject,
+} from "@/lib/utils/guards";
 import {
   makeBucketsFromList,
   makeObjectFromList,
@@ -32,6 +36,7 @@ import {
   Pipeline,
   PipelineStep,
 } from "./pipelineTypes";
+import { ValueExtractorUtil } from "./ValueExtractorUtil";
 
 export type EntityFieldValueNativeType =
   | string
@@ -60,6 +65,7 @@ export type EntityComment = {
 
 export type Entity = {
   id: UUID<"Entity">;
+  name: string; // the external name of this entity (from the source dataset)
   externalId: string; // this is the id we get from the source dataset
   entityConfigId: EntityConfigId;
   assignedTo: UserId | null;
@@ -93,17 +99,26 @@ function _getEntityIdField(
   return field;
 }
 
-function _getDatasetExternalIdColumn(
+function _getEntityNameField(
+  entityConfig: BuildableEntityConfig,
+): BuildableFieldConfig | undefined {
+  const field = entityConfig.fields.find(
+    propEquals("options.isTitleField", true),
+  );
+  return field;
+}
+
+function _getDatasetColumnFromFieldConfig(
   dataset: ParsedLocalDataset,
-  entityIdField: BuildableFieldConfig | undefined,
+  entityFieldConfig: BuildableFieldConfig | undefined,
 ): LocalDatasetField | undefined {
-  if (!entityIdField) {
+  if (!entityFieldConfig) {
     throw new Error(
       "Cannot identify primary key in a dataset if no entity field is configured as the ID field",
     );
   }
 
-  const { valueExtractor } = entityIdField;
+  const { valueExtractor } = entityFieldConfig;
 
   if (valueExtractor.type !== "dataset_column_value") {
     throw new Error(
@@ -124,7 +139,7 @@ function _bucketDatasetRowsByExternalId(
 ): Map<string | null | undefined, CSVRow[]> {
   // Get the entity's id field
   const entityIdField = _getEntityIdField(entityConfig);
-  const datasetExternalIdColumn = _getDatasetExternalIdColumn(
+  const datasetExternalIdColumn = _getDatasetColumnFromFieldConfig(
     dataset,
     entityIdField,
   );
@@ -266,7 +281,7 @@ export function _runCreateFieldStep(
       // look at for the external ID. We need this so we can match the
       // extracted value back to the correct entity.
       const entityIdField = _getEntityIdField(entityConfig);
-      const datasetExternalIdColumn = _getDatasetExternalIdColumn(
+      const datasetExternalIdColumn = _getDatasetColumnFromFieldConfig(
         dataset,
         entityIdField,
       );
@@ -500,11 +515,50 @@ export function _runCreateEntitiesStep(
     errors.push("No valid ids found in the id field");
   }
 
-  const entityIds = [...idsToRows.keys()].filter(isNotNullOrUndefined);
+  const nameFieldConfig = _getEntityNameField(entityConfig);
+  if (!nameFieldConfig) {
+    errors.push("No name field configured for this entity");
+  }
+  const nameFieldColumn = _getDatasetColumnFromFieldConfig(
+    dataset,
+    nameFieldConfig,
+  );
 
+  if (!nameFieldColumn) {
+    errors.push("Name field column not found for entity name field config");
+  }
+
+  const entityIds = [...idsToRows.keys()].filter(isNotNullOrUndefined);
   const entities = entityIds.map((id): Entity => {
+    const rows = idsToRows.get(id) ?? [];
+
+    const entityNames = rows
+      .map((row) => {
+        if (nameFieldColumn) {
+          if (hasProps(row, nameFieldColumn.name)) {
+            return row[nameFieldColumn.name];
+          }
+        }
+        return id;
+      })
+      .filter(isNotNullOrUndefined);
+
+    let chosenEntityName: string | undefined = id; // fallback value
+    if (nameFieldConfig?.valueExtractor.type === "dataset_column_value") {
+      const { valuePickerRuleType } = nameFieldConfig.valueExtractor;
+      chosenEntityName = match(valuePickerRuleType)
+        .with("most_frequent", () => {
+          return ValueExtractorUtil.getMostFrequentValue(entityNames);
+        })
+        .with("first", () => {
+          return ValueExtractorUtil.getFirstValue(entityNames);
+        })
+        .exhaustive();
+    }
+
     return {
       id: uuid(), // our internal id
+      name: chosenEntityName ?? String(id),
       externalId: String(id),
       entityConfigId: entityConfig.id,
       assignedTo: null,
