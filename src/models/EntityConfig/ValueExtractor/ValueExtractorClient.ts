@@ -16,8 +16,7 @@ export const ValueExtractorClient = {
     data: Array<EntityFieldValueExtractor<"Insert">>;
   }): Promise<void> => {
     // bucket the extractors by type
-    const extractorsByType = makeBucketsFromList({
-      list: params.data,
+    const extractorsByType = makeBucketsFromList(params.data, {
       keyFn: getProp("type"),
     }) as {
       [K in EntityFieldValueExtractorType]: Array<

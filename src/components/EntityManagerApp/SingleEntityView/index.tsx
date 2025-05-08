@@ -58,8 +58,7 @@ function useHydratedEntity({
       const nameField = entityFieldConfigs.find(
         propEquals("options.isTitleField", true),
       );
-      fieldConfigsMap = makeMapFromList({
-        list: entityFieldConfigs,
+      fieldConfigsMap = makeMapFromList(entityFieldConfigs, {
         keyFn: getProp("id"),
       });
 
@@ -71,8 +70,7 @@ function useHydratedEntity({
     }
 
     if (entityFieldValues) {
-      const fieldValuesMap = makeMapFromList({
-        list: entityFieldValues,
+      const fieldValuesMap = makeMapFromList(entityFieldValues, {
         keyFn: getProp("entityFieldConfigId"),
         valueFn: (fieldValue) => {
           return {

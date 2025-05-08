@@ -51,7 +51,9 @@ export function areArrayContentsEqual<A>(
 }
 
 /**
- * Maps an array to a tuple of two arrays.
+ * Maps an array to a tuple of two arrays. The map function returns a tuple
+ * of [R1, R2] and the final return is two arrays of [R1[], R2[]].
+ *
  * @param items The array to map.
  * @param callback A function that maps each element of the array to a tuple of
  * two values.

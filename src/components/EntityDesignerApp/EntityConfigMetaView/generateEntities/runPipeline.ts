@@ -138,8 +138,7 @@ function _bucketDatasetRowsByExternalId(
   // for an ID field, we should always treat each ID value uniquely.
   // TODO(pablo): disable value picker rule for ID fields in the UI. It doesn't
   // make sense there.
-  return makeBucketsFromList({
-    list: dataset.data,
+  return makeBucketsFromList(dataset.data, {
     keyFn: getProp(datasetExternalIdColumn.name),
     collectNullableKeys: true,
   });
@@ -278,7 +277,8 @@ export function _runCreateFieldStep(
       }
 
       const externalIdToEntityDict: Record<string, Entity> = makeObjectFromList(
-        { list: entities, keyFn: getProp("externalId") },
+        entities,
+        { keyFn: getProp("externalId") },
       );
 
       // now we need to go through the dataset and extract the field value

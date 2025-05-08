@@ -34,8 +34,7 @@ export const EntityFieldConfigClient = createSupabaseCRUDClient({
 
         // Bucket each field by value extractor type, so we only query for
         // the extractor types that we need
-        const fieldsByValueExtractorType = makeBucketsFromList({
-          list: fields,
+        const fieldsByValueExtractorType = makeBucketsFromList(fields, {
           keyFn: getPropAt("options.valueExtractorType"),
         });
         const fieldIds = fields.map(getProp("id"));

@@ -71,10 +71,10 @@ export function DataExplorerApp(): JSX.Element {
               incomingFieldNames,
             );
 
-            const newDefaultAggregations = makeObjectFromKeys({
-              keys: incomingFieldNames,
-              defaultValue: "none" as const,
-            });
+            const newDefaultAggregations = makeObjectFromKeys(
+              incomingFieldNames,
+              { defaultValue: "none" as const },
+            );
 
             return omit(
               { ...newDefaultAggregations, ...prevAggregations },
