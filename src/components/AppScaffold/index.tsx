@@ -17,6 +17,7 @@ import {
   IconChevronDown,
   IconLogout,
   IconSearch,
+  IconUser,
 } from "@tabler/icons-react";
 import { Outlet, useRouter } from "@tanstack/react-router";
 import clsx from "clsx";
@@ -160,15 +161,26 @@ export function AppScaffold({
               </Menu.Target>
               <Menu.Dropdown>
                 <Menu.Item
+                  leftSection={<IconUser size={16} />}
+                  onClick={() => {
+                    router.navigate({ to: APP_CONFIG.links.profile.to });
+                  }}
+                >
+                  <Text span>Profile</Text>
+                </Menu.Item>
+
+                <Menu.Item
                   leftSection={<IconLogout size={16} />}
                   onClick={() => {
                     sendSignOutRequest();
                   }}
                 >
-                  Sign Out{" "}
-                  {isSignOutPending ?
-                    <Loader />
-                  : null}
+                  <Group>
+                    <Text span>Sign Out</Text>
+                    {isSignOutPending ?
+                      <Loader />
+                    : null}
+                  </Group>
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>

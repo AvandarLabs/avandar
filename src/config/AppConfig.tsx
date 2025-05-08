@@ -85,7 +85,7 @@ export const APP_CONFIG = {
     },
     entityDesigner: {
       to: "/entity-designer",
-      label: "Entity Designer",
+      label: "Profile Designer",
       icon: <IconBlocks size={24} stroke={1.5} />,
       spotlightDescription: "Go to the entity designer app",
     },
@@ -101,7 +101,6 @@ export const APP_CONFIG = {
     "dataManager",
     "dataExplorer",
     "entityDesigner",
-    "profile",
   ] as const,
 
   dataManagerApp: {
