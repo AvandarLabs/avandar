@@ -17,7 +17,7 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
   return useMutation({
     mutationFn: async (entityConfigForm: EntityConfigFormValues) => {
       // Insert the parent entity
-      await EntityConfigClient.withLogger("submit form").insert({
+      await EntityConfigClient.insert({
         data: entityConfigForm,
       });
 

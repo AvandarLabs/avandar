@@ -30,7 +30,7 @@ import type { FiltersByColumn } from "./filtersByColumn";
  * - If a column appears multiple times in the same operator, we will
  * only apply the last filter.
  *
- * TODO(pablo): when the FiltersByColumn type allows for multiple target
+ * TODO(jpbls): when the FiltersByColumn type allows for multiple target
  * values, we can update this to allow a column to appear multiple times
  * in the same operator.
  */

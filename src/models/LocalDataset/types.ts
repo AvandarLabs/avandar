@@ -47,23 +47,19 @@ type LocalDatasetRead = Merge<
 
 type LocalDatasetUpdate = Partial<LocalDatasetRead>;
 
-export type LocalDatasetCRUDTypes = DexieModelCRUDTypes<
-  {
-    modelName: "LocalDataset";
-    primaryKeyType: LocalDatasetId;
-  },
-  {
+export type LocalDatasetCRUDTypes = DexieModelCRUDTypes<{
+  modelName: "LocalDataset";
+  primaryKey: "id";
+  primaryKeyType: LocalDatasetId;
+  dbTypes: {
     DBRead: DBRead;
     DBUpdate: Partial<DBRead>;
-  },
-  {
+  };
+  modelTypes: {
     Read: LocalDatasetRead;
     Update: LocalDatasetUpdate;
-  },
-  {
-    primaryKey: "id";
-  }
->;
+  };
+}>;
 
 /**
  * Metadata about the parsed file itself.

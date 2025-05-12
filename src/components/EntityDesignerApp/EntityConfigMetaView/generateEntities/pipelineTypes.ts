@@ -29,9 +29,9 @@ export type CreateFieldStepConfig = BaseModel<"CreateFieldStepConfig"> & {
   valueExtractorType: EntityFieldValueExtractorType;
   valueExtractorId: EntityFieldValueExtractorId;
 
-  // TODO(pablo): value extractors should also have a reference to the entity
+  // TODO(jpbls): value extractors should also have a reference to the entity
   // field config, because we need to know `isArray`
-  // TODO(pablo): we don't need a reference to the full entityConfig. We just
+  // TODO(jpbls): we don't need a reference to the full entityConfig. We just
   // need entity field config that has `isIdField` set to true.
   relationships: {
     valueExtractor: EntityFieldValueExtractor;
@@ -59,7 +59,7 @@ export type PipelineStepConfig = {
 
 export type PipelineStepType = keyof PipelineStepConfig;
 
-// TODO(pablo): add ability to roll back a pipeline or a pipeline step
+// TODO(jpbls): add ability to roll back a pipeline or a pipeline step
 export type PipelineStep = {
   id: UUID<"PipelineStep">;
   name: string;

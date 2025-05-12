@@ -1,5 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { createSupabaseAdminClient } from "@/lib/clients/SupabaseDBClient";
+import { createSupabaseAdminClient } from "@/lib/clients/supabase/SupabaseDBClient";
 import { promiseMap, promiseMapSequential } from "@/lib/utils/promises";
 import { Database } from "@/types/database.types";
 import { ScriptsUtil } from "./ScriptsUtil";

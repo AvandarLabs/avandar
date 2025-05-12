@@ -1,7 +1,6 @@
 import { Box, BoxProps, Loader, Title, useMantineTheme } from "@mantine/core";
 import { useMemo } from "react";
 import { APP_CONFIG } from "@/config/AppConfig";
-import { type NavLinkProps } from "@/lib/ui/links/NavLink";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
 import { EntityConfig } from "@/models/EntityConfig/types";
 import { getEntityConfigLinkProps } from "@/models/EntityConfig/utils";
@@ -24,22 +23,24 @@ export function EntityConfigNavbar({
     };
   }, [theme.radius]);
 
-  const entityLinks: readonly NavLinkProps[] = useMemo(() => {
-    return entityConfigs
-      .map((entity): NavLinkProps => {
+  const entityLinks = useMemo(() => {
+    const entityConfigLinks = [
+      ...entityConfigs.map((entity) => {
         return {
           ...getEntityConfigLinkProps(entity),
           label: entity.name,
           style: borderStyle,
+          linkKey: entity.id,
         };
-      })
-      .concat([
-        {
-          to: APP_CONFIG.links.entityCreator.to,
-          label: "Create new entity",
-          style: borderStyle,
-        },
-      ] as NavLinkProps[]);
+      }),
+      {
+        to: APP_CONFIG.links.entityCreator.to,
+        label: "Create new entity",
+        style: borderStyle,
+        linkKey: "create-new",
+      },
+    ];
+    return entityConfigLinks;
   }, [entityConfigs, borderStyle]);
 
   return (

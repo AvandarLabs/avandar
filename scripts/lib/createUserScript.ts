@@ -4,7 +4,7 @@
  *    yarn db:create-user <email> <password>
  */
 import { z } from "zod";
-import { SupabaseDBClient } from "@/lib/clients/SupabaseDBClient";
+import { SupabaseDBClient } from "@/lib/clients/supabase/SupabaseDBClient";
 import { ScriptsUtil } from "./ScriptsUtil";
 
 function printUsage() {

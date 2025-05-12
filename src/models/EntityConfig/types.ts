@@ -61,15 +61,14 @@ export type EntityConfigCRUDTypes = SupabaseModelCRUDTypes<
     tableName: "entity_configs";
     modelName: "EntityConfig";
     modelPrimaryKeyType: EntityConfigId;
-  },
-  {
-    Read: EntityConfigRead;
-    Insert: EntityConfigInsert;
-    Update: EntityConfigUpdate;
+    modelTypes: {
+      Read: EntityConfigRead;
+      Insert: EntityConfigInsert;
+      Update: EntityConfigUpdate;
+    };
   },
   {
     dbTablePrimaryKey: "id";
-    modelPrimaryKey: "id";
   },
   {
     Full: EntityConfigFull;

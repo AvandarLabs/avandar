@@ -84,7 +84,7 @@ export function useMutation<
         options.onSuccess?.(data, variables, context);
       },
       onError: (error, variables, context) => {
-        // TODO(pablo): create an AvandarError class that is able to
+        // TODO(jpbls): create an AvandarError class that is able to
         // reformat the most common types of errors we can catch into
         // a common unified format. Such as handling ZodErrors.
         // Catch the error so we can handle and log it better

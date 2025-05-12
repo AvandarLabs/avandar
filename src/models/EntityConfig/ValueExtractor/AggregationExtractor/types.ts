@@ -52,15 +52,14 @@ export type AggregationExtractorCRUDTypes = SupabaseModelCRUDTypes<
     tableName: "value_extractor__aggregation";
     modelName: "AggregationExtractor";
     modelPrimaryKeyType: AggregationExtractorId;
-  },
-  {
-    Read: AggregationExtractorRead;
-    Insert: AggregationExtractorInsert;
-    Update: AggregationExtractorUpdate;
+    modelTypes: {
+      Read: AggregationExtractorRead;
+      Insert: AggregationExtractorInsert;
+      Update: AggregationExtractorUpdate;
+    };
   },
   {
     dbTablePrimaryKey: "id";
-    modelPrimaryKey: "id";
   }
 >;
 

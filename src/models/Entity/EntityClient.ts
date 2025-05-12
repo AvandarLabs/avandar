@@ -1,32 +1,20 @@
-// TODO(pablo): this is all very hacky right now
+// TODO(jpbls): this is all very hacky right now
 import { z } from "zod";
+import { EntityFieldValue } from "@/components/EntityDesignerApp/EntityConfigMetaView/generateEntities/runPipeline";
 import {
-  Entity,
-  EntityFieldValue,
-} from "@/components/EntityDesignerApp/EntityConfigMetaView/generateEntities/runPipeline";
-import { BaseClient } from "@/lib/clients/BaseClient";
-import { withQueryHooks } from "@/lib/clients/withQueryHooks";
-import { UUID } from "@/lib/types/common";
+  createModelCRUDClient,
+  ModelCRUDClient,
+} from "@/lib/clients/ModelCRUDClient";
+import { ILogger } from "@/lib/Logger";
 import { applyFiltersToRows } from "@/lib/utils/filters/applyFiltersToRows";
+import { FiltersByColumn } from "@/lib/utils/filters/filtersByColumn";
 import { propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { uuidType } from "@/lib/utils/zodHelpers";
 import { EntityConfigId } from "../EntityConfig/types";
 import { LocalDatasetClient } from "../LocalDataset/LocalDatasetClient";
-
-export const EntityReadSchema = z.object({
-  id: uuidType<"Entity">(),
-  externalId: z.string(),
-  name: z.string(),
-  entityConfigId: uuidType<"EntityConfig">(),
-  assignedTo: z.union([
-    z.literal("").transform(() => {
-      return null;
-    }),
-    uuidType<"User">(),
-  ]),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-});
+import { ParsedLocalDataset } from "../LocalDataset/types";
+import { EntityParsers } from "./parsers";
+import { Entity, EntityCRUDTypes, EntityId } from "./types";
 
 const EntityFieldValueNativeType = z.union([
   z.string(),
@@ -47,113 +35,223 @@ export const EntityFieldValueReadSchema = z.object({
   datasourceId: uuidType<"LocalDataset">(),
 });
 
-export type EntityId = UUID<"Entity">;
-export type EntityRead = Omit<Entity, "relationships">;
 export type EntityFieldValueRead = EntityFieldValue;
 
-const baseClient: BaseClient = {
-  getClientName() {
-    return "EntityClient";
-  },
+type EntityDatasets = {
+  entityDataset: ParsedLocalDataset;
+  fieldValuesDataset: ParsedLocalDataset;
 };
 
-// we need to clean this up when we have proper models set up
-export const EntityClient = withQueryHooks(
-  {
-    ...baseClient,
-    getAllFields: async (params: {
-      entityId: EntityId;
-    }): Promise<EntityFieldValueRead[]> => {
-      const entity = await EntityClient.getById({
-        id: params.entityId,
-      });
+type AdditionalEntityQueries = {
+  getAllFields: (params: {
+    entityId: EntityId;
+  }) => Promise<EntityFieldValueRead[]>;
+};
 
-      if (entity) {
-        const { entityConfigId } = entity;
+type EntityClient = ModelCRUDClient<
+  EntityCRUDTypes,
+  AdditionalEntityQueries,
+  never
+>;
 
-        const datasets = await LocalDatasetClient.getAll();
-        const filteredDatasets = applyFiltersToRows(datasets, {
-          name: { eq: `entity_field_values__${entityConfigId}` },
-        });
+function createEntityClient(entityConfigId: EntityConfigId): EntityClient {
+  const state: Partial<EntityDatasets> = {
+    entityDataset: undefined,
+    fieldValuesDataset: undefined,
+  };
 
-        if (filteredDatasets.length === 0) {
-          return [];
-        }
+  async function _getEntityDataset(): Promise<ParsedLocalDataset> {
+    if (state.entityDataset) {
+      return state.entityDataset;
+    }
 
-        // there should only be one, if not, choose the first one
-        const entityValuesDataset = filteredDatasets[0];
-        if (entityValuesDataset) {
-          const parsedDataset = await LocalDatasetClient.hydrateDataset({
-            dataset: entityValuesDataset,
-          });
+    const allDatasets = await LocalDatasetClient.getAll();
+    const entityDatasets = allDatasets.filter((dataset) => {
+      return dataset.name.startsWith(`entity__${entityConfigId}`);
+    });
 
-          // now we need to filter the rows to only include our entity id
-          const filteredRows = applyFiltersToRows(parsedDataset.data, {
-            entityId: { eq: entity.id },
-          });
+    if (entityDatasets.length === 0) {
+      throw new Error(`Datasets for entity ${entityConfigId} not found`);
+    }
 
-          const entityFieldValues = filteredRows.map((row) => {
-            return EntityFieldValueReadSchema.parse(row);
-          });
-          return entityFieldValues;
-        }
-      }
-      return [];
+    if (entityDatasets.length > 1) {
+      throw new Error(`Multiple datasets found for entity ${entityConfigId}`);
+    }
+
+    // now hydrate the dataset
+    const entityDataset = await LocalDatasetClient.hydrateDataset({
+      dataset: entityDatasets[0]!,
+    });
+
+    state.entityDataset = entityDataset;
+    return entityDataset;
+  }
+
+  async function _getFieldValuesDataset(): Promise<ParsedLocalDataset> {
+    if (state.fieldValuesDataset) {
+      return state.fieldValuesDataset;
+    }
+
+    const allDatasets = await LocalDatasetClient.getAll();
+    const fieldValueDatasets = allDatasets.filter((dataset) => {
+      return dataset.name.startsWith(`entity_field_values__${entityConfigId}`);
+    });
+
+    if (fieldValueDatasets.length === 0) {
+      throw new Error(
+        `Field value datasets for entity ${entityConfigId} not found`,
+      );
+    }
+
+    if (fieldValueDatasets.length > 1) {
+      throw new Error(
+        `Multiple field value datasets found for entity ${entityConfigId}`,
+      );
+    }
+    // now hydrate the dataset
+    const fieldValuesDataset = await LocalDatasetClient.hydrateDataset({
+      dataset: fieldValueDatasets[0]!,
+    });
+
+    state.fieldValuesDataset = fieldValuesDataset;
+    return fieldValuesDataset;
+  }
+
+  async function getById(params: {
+    id: EntityId | null | undefined;
+    logger: ILogger;
+  }) {
+    // TODO(jpbls): use DuckDB WASM here to speed this up
+    if (!params.id) {
+      return undefined;
+    }
+
+    const entityDataset = await _getEntityDataset();
+    const entity = entityDataset.data.find(propEquals("id", params.id));
+    return EntityParsers.DBReadSchema.parse(entity);
+  }
+
+  // copy the LocalDatasetClient
+  return createModelCRUDClient({
+    modelName: "Entity",
+    parsers: EntityParsers,
+
+    // `Get` queries
+    getById,
+    getCount: async (params: {
+      where?: FiltersByColumn<Entity<"DBRead">>;
+      logger: ILogger;
+    }) => {
+      // TODO(jpbls): use DuckDB WASM here to speed this up
+      const { where } = params;
+      const entityDataset = await _getEntityDataset();
+      const filteredRows =
+        where ?
+          applyFiltersToRows(
+            entityDataset.data as unknown as Array<Entity<"DBRead">>,
+            where,
+          )
+        : entityDataset.data;
+      return filteredRows.length;
     },
 
-    getById: async (params: {
+    getPage: async (params: {
+      where?: FiltersByColumn<Entity<"DBRead">>;
+      pageSize: number;
+      pageNum: number;
+      logger: ILogger;
+    }) => {
+      // TODO(jpbls): use DuckDB WASM here to speed this up
+      const { where, pageSize, pageNum } = params;
+      const entityDataset = await _getEntityDataset();
+      const filteredRows =
+        where ?
+          applyFiltersToRows(
+            entityDataset.data as unknown as Array<Entity<"DBRead">>,
+            where,
+          )
+        : entityDataset.data;
+
+      const dbRows = filteredRows
+        .slice(pageNum * pageSize, (pageNum + 1) * pageSize)
+        .map((row) => {
+          return EntityParsers.DBReadSchema.parse(row);
+        });
+      return dbRows;
+    },
+
+    // Mutations
+    insert: (_params: { data: Entity<"DBInsert">; logger: ILogger }) => {
+      throw new Error("Not implemented");
+    },
+
+    bulkInsert: (_params: {
+      data: ReadonlyArray<Entity<"DBInsert">>;
+      logger: ILogger;
+    }) => {
+      throw new Error("Not implemented");
+    },
+
+    update: (_params: {
       id: EntityId;
-    }): Promise<EntityRead | undefined> => {
-      // this is super hacky and not a good way of doing it.
-      // we are just loading the dataset and doing an O(n) search for the entity
-      // there is no querying going on here.
-      // We should be using SQLite WASM for this part. Load the entity datasets
-      // to SQLIte and query them that way
-      const allEntities = await EntityClient.getAll();
-      return allEntities.find(propEquals("id", params.id));
+      data: Entity<"DBUpdate">;
+      logger: ILogger;
+    }) => {
+      throw new Error("Not implemented");
     },
 
-    getAll: async (params?: {
-      entityConfigId: EntityConfigId;
-    }): Promise<EntityRead[]> => {
-      // TODO(pablo): to filter by `name` you need to have it indexed
-      // first. So we need to add an option to the Dexie client
-      // to allow the user to specify what other fields to index by.
-      // For now, we will do a hacky thing and just filter through the
-      // datasets in memory.
-      const datasets = await LocalDatasetClient.getAll();
-
-      const filteredDatasets =
-        params?.entityConfigId ?
-          applyFiltersToRows(datasets, {
-            name: { eq: `entity__${params.entityConfigId}` },
-          })
-        : datasets.filter((dataset) => {
-            return dataset.name.startsWith("entity__");
-          });
-
-      if (filteredDatasets.length === 0) {
-        return [];
-      }
-
-      // there should only be one, if not, choose the first one
-      const entityDataset = filteredDatasets[0];
-      if (entityDataset) {
-        const parsedDataset = await LocalDatasetClient.hydrateDataset({
-          dataset: entityDataset,
-        });
-
-        const entities = parsedDataset.data.map((row) => {
-          return EntityReadSchema.parse(row);
-        });
-
-        return entities;
-      }
-      return [];
+    delete: (_params: { id: EntityId; logger: ILogger }) => {
+      throw new Error("Not implemented");
     },
+
+    bulkDelete: (_params: { ids: readonly EntityId[]; logger: ILogger }) => {
+      throw new Error("Not implemented");
+    },
+
+    additionalQueries: ({ clientLogger }) => {
+      return {
+        getAllFields: async (params: {
+          entityId: EntityId;
+        }): Promise<EntityFieldValueRead[]> => {
+          const { entityId } = params;
+          const logger = clientLogger.appendName("getAllFields");
+          const entity = await getById({ id: entityId, logger });
+
+          if (entity) {
+            const fieldValuesDataset = await _getFieldValuesDataset();
+
+            // pick only the field values that belong to the requested entity
+            const filteredRows = applyFiltersToRows(fieldValuesDataset.data, {
+              entityId: { eq: entity.id },
+            });
+
+            const entityFieldValues = filteredRows.map((row) => {
+              return EntityFieldValueReadSchema.parse(row);
+            });
+
+            logger.log(
+              `Parsed entity fields (count: ${entityFieldValues.length})`,
+            );
+            return entityFieldValues;
+          }
+          return [];
+        },
+      };
+    },
+  });
+}
+
+const entityClientMap = new Map<EntityConfigId, EntityClient>();
+
+export const EntityClient = {
+  ofType: (entityConfigId: EntityConfigId): EntityClient => {
+    const cachedClient = entityClientMap.get(entityConfigId);
+    if (cachedClient) {
+      return cachedClient;
+    }
+
+    const newClient = createEntityClient(entityConfigId);
+    entityClientMap.set(entityConfigId, newClient);
+    return newClient;
   },
-  {
-    queryFns: ["getAll", "getById", "getAllFields"],
-    mutationFns: [],
-  },
-);
+};

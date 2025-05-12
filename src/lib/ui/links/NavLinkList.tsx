@@ -1,12 +1,17 @@
 import { Box, BoxProps, MantineColor, Text } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
 import clsx from "clsx";
+import { ReactNode } from "react";
 import { NavLink } from "@/lib/ui/links/NavLink";
 import { objectEntries } from "@/lib/utils/objects/misc";
 import type { NavLinkProps } from "@/lib/ui/links/NavLink";
 
 type Props = {
-  links: readonly NavLinkProps[];
+  links: ReadonlyArray<
+    | (NavLinkProps & { linkKey: string })
+    | { loadingText: ReactNode; style: NavLinkProps["style"] }
+    | undefined
+  >;
 
   /**
    * Color of active nav links. The hover color will be automatically
@@ -44,6 +49,18 @@ export function NavLinkList({
   ...boxProps
 }: Props): JSX.Element {
   const navLinks = links.map((link) => {
+    if (!link) {
+      return null;
+    }
+
+    if ("loadingText" in link) {
+      return (
+        <Text key="loading-text" style={link.style}>
+          {link.loadingText}
+        </Text>
+      );
+    }
+
     const { label, className, ...restOfLinkProps } = link;
     const navLinkClassName = clsx(
       "transition-colors",
@@ -54,7 +71,7 @@ export function NavLinkList({
 
     return (
       <NavLink
-        key={generateLinkKey(link)}
+        key={link.linkKey ?? generateLinkKey(link)}
         {...restOfLinkProps}
         className={navLinkClassName}
         variant="filled"

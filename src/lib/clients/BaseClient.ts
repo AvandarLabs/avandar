@@ -8,3 +8,11 @@ export type BaseClient = {
    */
   getClientName(): string;
 };
+
+export function createBaseClient(clientPrefix: string): BaseClient {
+  return {
+    getClientName(): string {
+      return `${clientPrefix}Client`;
+    },
+  };
+}

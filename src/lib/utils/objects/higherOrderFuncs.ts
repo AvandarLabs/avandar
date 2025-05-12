@@ -28,7 +28,7 @@ export function getProp<T extends object, K extends keyof T>(
  * @param path The path of the property to get.
  * @returns A function that returns the value at the given key path.
  */
-export function getPropAt<
+export function xgetProp<
   T extends UnknownObject | UnknownArray,
   P extends Paths<T>,
 >(path: P): (obj: T) => PathValue<T, P> {
@@ -45,7 +45,24 @@ export function getPropAt<
  * @returns A function that returns true if the object has the property with
  * the specified value.
  */
-export function propEquals<T extends UnknownObject, P extends Paths<T>>(
+export function propEquals<T extends UnknownObject, K extends keyof T>(
+  key: K,
+  value: T[K],
+): (obj: T) => boolean {
+  return (obj: T) => {
+    return obj[key] === value;
+  };
+}
+
+/**
+ * Returns a function that checks if an object has a property with a specific
+ * value.
+ * @param path The path of the property to check.
+ * @param value The value to check.
+ * @returns A function that returns true if the object has the property with
+ * the specified value.
+ */
+export function xpropEquals<T extends UnknownObject, P extends Paths<T>>(
   path: P,
   value: PathValue<T, P>,
 ): (obj: T) => boolean {
@@ -63,7 +80,25 @@ export function propEquals<T extends UnknownObject, P extends Paths<T>>(
  * @returns A function that returns true if the object has the property with
  * the specified value.
  */
-export function propDoesntEqual<T extends UnknownObject, P extends Paths<T>>(
+export function propDoesntEqual<T extends UnknownObject, K extends keyof T>(
+  key: K,
+  value: T[K],
+): (obj: T) => boolean {
+  return (obj: T) => {
+    return obj[key] !== value;
+  };
+}
+
+/**
+ * Returns a function that checks if an object has a property that **doesn't**
+ * have a specific value.
+ *
+ * @param path The path of the property to check.
+ * @param value The value to check.
+ * @returns A function that returns true if the object has the property with
+ * the specified value.
+ */
+export function xpropDoesntEqual<T extends UnknownObject, P extends Paths<T>>(
   path: P,
   value: PathValue<T, P>,
 ): (obj: T) => boolean {

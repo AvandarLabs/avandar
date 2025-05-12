@@ -1,19 +1,54 @@
+import { ILogger } from "../Logger";
+import { ModelCRUDParserRegistry } from "../models/makeParserRegistry";
 import { ModelCRUDTypes } from "../models/ModelCRUDTypes";
+import { AnyFunctionWithSignature } from "../types/utilityTypes";
 import { FiltersByColumn } from "../utils/filters/filtersByColumn";
-import { BaseClient } from "./BaseClient";
-import { HookableFnName } from "./withQueryHooks";
+import { objectKeys, omit } from "../utils/objects/misc";
+import { BaseClient, createBaseClient } from "./BaseClient";
+import { WithLogger, withLogger } from "./withLogger";
+import {
+  HookableFnName,
+  WithQueryHooks,
+  withQueryHooks,
+} from "./withQueryHooks";
+
+export type ModelCRUDPage<ModelRead> = {
+  /** The rows in the pagef */
+  rows: ModelRead[];
+
+  /**
+   * The total number of rows in the data store (for the query that
+   * generated this page)
+   */
+  totalRows: number;
+
+  /**
+   * The total number of pages in the data store (for the query that
+   * generated this page)
+   */
+  totalPages: number;
+
+  /** The next page number, or undefined if there is no next page */
+  nextPage: number | undefined;
+
+  /** The previous page number, or undefined if there is no previous page */
+  prevPage: number | undefined;
+};
 
 /**
  * A base generic client for a model with CRUD operations.
  * This interface does not make any assumptions of what the backing data store
  * of the model is.
+ *
+ * All of these functions will have auto-generated `useQuery` and `useMutation`
+ * hooks.
  */
-export type ModelCRUDClient<M extends ModelCRUDTypes> = {
+export type BaseModelCRUDClient<M extends ModelCRUDTypes> = {
   /**
    * Retrieves a single model instance by its ID.
    * @param params - The parameters for the operation
    * @param params.id - The unique identifier of the model to retrieve.
-   * If the `id` is undefined, the function will return undefined.
+   * If the `id` is nullish, the function will return undefined.
    * This is helpful to support `useQuery` hooks that may not have an id
    * yet on the first render.
    * @returns A promise resolving to the model instance or undefined
@@ -24,17 +59,47 @@ export type ModelCRUDClient<M extends ModelCRUDTypes> = {
   }): Promise<M["Read"] | undefined>;
 
   /**
-   * Retrieves all instances of the model.
+   * Retrieves the total number of instances of a model.
    *
-   * Optionally, `where` filters can be passed to get all the instances that
-   * match the filters.
+   * A `null` result on a successful query means there was no error
+   * but the count could not be computed for some reason.
    *
-   * The filters must be provided in terms of the DBRead key names and types.
+   * @param params Optional params for the query
+   * @param params.where Filters to apply.
+   * @returns A promise resolving to the total number of instances
+   */
+  getCount(params: {
+    where?: FiltersByColumn<M["DBRead"]>;
+  }): Promise<number | null>;
+
+  /**
+   * Retrieves one page of instances of a model.
+   *
+   * @param params Optional params for the query
+   * @param params.where Filters to apply. Get all instances that pass the
+   * filters.
+   * @param params.pageSize The number of instances to return per page.
+   * @param params.pageNum The page number to return.
+   *
+   * @returns A promise resolving to a page of model instances
+   */
+  getPage(params: {
+    where?: FiltersByColumn<M["DBRead"]>;
+    pageSize: number;
+    pageNum: number;
+  }): Promise<ModelCRUDPage<M["Read"]>>;
+
+  /**
+   * Retrieves all instances of a model.
+   *
+   * @param params Optional params for the query
+   * @param params.where Filters to apply. Get all instances that pass the
+   * filters.
    *
    * @returns A promise resolving to an array of model instances
    */
   getAll(params?: {
-    where: FiltersByColumn<M["DBRead"]>;
+    where?: FiltersByColumn<M["DBRead"]>;
   }): Promise<Array<M["Read"]>>;
 
   /**
@@ -84,14 +149,450 @@ export type ModelCRUDClient<M extends ModelCRUDTypes> = {
 } & BaseClient;
 
 /**
+ * A client with only functions that have a single parameter and
+ * that return a Promise.
+ */
+export type HookableClient = Record<
+  string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  AnyFunctionWithSignature<[any], Promise<unknown>>
+>;
+
+export type ModelCRUDClient<
+  M extends ModelCRUDTypes,
+  ExtendedQueriesClient extends HookableClient = never,
+  ExtendedMutationsClient extends HookableClient = never,
+  MainClient extends
+    BaseModelCRUDClient<ModelCRUDTypes> = BaseModelCRUDClient<M>,
+> = WithLogger<
+  WithQueryHooks<
+    MainClient,
+    Extract<HookableFnName<MainClient>, DefaultQueryFnName>,
+    Extract<HookableFnName<MainClient>, DefaultMutationFnName>
+  > &
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    ([ExtendedQueriesClient] extends [never] ? {}
+    : WithQueryHooks<
+        ExtendedQueriesClient & BaseClient,
+        HookableFnName<ExtendedQueriesClient & BaseClient>,
+        never
+      >) &
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    ([ExtendedMutationsClient] extends [never] ? {}
+    : WithQueryHooks<
+        ExtendedMutationsClient & BaseClient,
+        never,
+        HookableFnName<ExtendedMutationsClient & BaseClient>
+      >)
+>;
+
+type CreateModelCRUDClientOptions<
+  M extends ModelCRUDTypes,
+  ExtendedQueriesClient extends HookableClient,
+  ExtendedMutationsClient extends HookableClient,
+> = {
+  modelName: M["modelName"];
+
+  /** The default batch size to use in `getAll`. Defaults to 500. */
+  defaultGetAllBatchSize?: number;
+  parsers: ModelCRUDParserRegistry<M>;
+
+  /**
+   * Additional queries to merge into the main client. These will also have
+   * auto-generated `useQuery` hooks.
+   */
+  additionalQueries?: (config: {
+    clientLogger: ILogger;
+  }) => ExtendedQueriesClient;
+
+  /**
+   * Additional mutations to merge into the main client. These will also have
+   * auto-generated `useMutation` hooks.
+   */
+  additionalMutations?: (config: {
+    clientLogger: ILogger;
+  }) => ExtendedMutationsClient;
+
+  // `Get` queries
+  getById: (params: {
+    id: M["modelPrimaryKeyType"] | null | undefined;
+    logger: ILogger;
+  }) => Promise<M["DBRead"] | undefined>;
+  getCount: (params: {
+    where?: FiltersByColumn<M["DBRead"]>;
+    logger: ILogger;
+  }) => Promise<number | null>;
+  getPage: (params: {
+    where?: FiltersByColumn<M["DBRead"]>;
+    pageSize: number;
+    pageNum: number;
+    logger: ILogger;
+  }) => Promise<Array<M["DBRead"]>>;
+
+  // Mutations
+  insert: (params: {
+    data: M["DBInsert"];
+    logger: ILogger;
+  }) => Promise<M["DBRead"]>;
+  bulkInsert: (params: {
+    data: ReadonlyArray<M["DBInsert"]>;
+    logger: ILogger;
+  }) => Promise<Array<M["DBRead"]>>;
+  update: (params: {
+    id: M["modelPrimaryKeyType"];
+    data: M["DBUpdate"];
+    logger: ILogger;
+  }) => Promise<M["DBRead"]>;
+  delete: (params: {
+    id: M["modelPrimaryKeyType"];
+    logger: ILogger;
+  }) => Promise<void>;
+  bulkDelete: (params: {
+    ids: ReadonlyArray<M["modelPrimaryKeyType"]>;
+    logger: ILogger;
+  }) => Promise<void>;
+};
+
+export function createModelCRUDClient<
+  M extends ModelCRUDTypes,
+  ExtendedQueriesClient extends HookableClient = never,
+  ExtendedMutationsClient extends HookableClient = never,
+>({
+  modelName,
+  defaultGetAllBatchSize = 500,
+  parsers,
+  additionalQueries,
+  additionalMutations,
+  ...crudFns
+}: CreateModelCRUDClientOptions<
+  M,
+  ExtendedQueriesClient,
+  ExtendedMutationsClient
+>): ModelCRUDClient<M, ExtendedQueriesClient, ExtendedMutationsClient> {
+  const baseClient = createBaseClient(modelName);
+
+  const _getPage = async (params: {
+    where: FiltersByColumn<M["DBRead"]> | undefined;
+    pageSize: number;
+    pageNum: number;
+    logger: ILogger;
+    totalRows: number | undefined;
+  }): Promise<ModelCRUDPage<M["Read"]>> => {
+    const { pageNum, pageSize, logger } = params;
+
+    logger.log("Calling `getPage` with params", omit(params, "logger"));
+    const pageRows = await crudFns.getPage(params);
+
+    logger.log(
+      `Received ${modelName} DBRead page[${pageNum}] from database. Row count: ${pageRows.length}`,
+    );
+
+    // Now let's figure out our page metadata to return
+    let totalRows = params.totalRows;
+    if (totalRows === undefined) {
+      if (pageNum === 0 && pageRows.length < pageSize) {
+        // if we're on the first page and the number of rows we received
+        // is less than the requested `pageSize`, then we can be 100% sure
+        // that we have all the rows. So there's no need to send a separate
+        // `getCount` query
+        totalRows = pageRows.length;
+      } else {
+        totalRows =
+          (await crudFns.getCount({
+            where: params.where,
+            logger,
+          })) ?? 0;
+      }
+    }
+
+    // special case for when there's 0 rows, we still say there is 1 page
+    const totalPages = totalRows === 0 ? 1 : Math.ceil(totalRows / pageSize);
+    const nextPage = pageNum + 1 === totalPages ? undefined : pageNum + 1;
+    const prevPage = pageNum === 0 ? undefined : pageNum - 1;
+
+    // Finally, parse the db rows into models
+    const pageModels = pageRows.map((row) => {
+      return parsers.fromDBReadToModelRead(row);
+    });
+    logger.log(
+      `Parsed page [${pageNum}] of ${modelName}Read (count: ${pageRows.length})`,
+    );
+
+    return {
+      rows: pageModels,
+      nextPage,
+      prevPage,
+      totalRows,
+      totalPages,
+    };
+  };
+
+  return withLogger(baseClient, (baseLogger: ILogger) => {
+    const modelClient = {
+      ...baseClient,
+      getById: async (params: {
+        id: M["modelPrimaryKeyType"] | null | undefined;
+      }): Promise<M["Read"] | undefined> => {
+        const logger = baseLogger.appendName("getById");
+
+        logger.log("Calling `getById` with params", params);
+        const dbRow = await crudFns.getById({
+          id: params.id,
+          logger,
+        });
+
+        logger.log(`Received ${modelName} DBRead`, dbRow);
+        if (!dbRow) {
+          return undefined;
+        }
+        const model = parsers.fromDBReadToModelRead(dbRow);
+
+        logger.log(`Parsed ${modelName}Read`, model);
+        return model;
+      },
+
+      getCount: async (
+        params: {
+          where?: FiltersByColumn<M["DBRead"]>;
+        } = {},
+      ): Promise<number | null> => {
+        const logger = baseLogger.appendName("getCount");
+
+        logger.log("Calling `getCount` with params", params);
+        const count = await crudFns.getCount({
+          where: params.where,
+          logger,
+        });
+
+        logger.log(`${modelName} count`, count);
+        return count;
+      },
+
+      getPage: async (params: {
+        where?: FiltersByColumn<M["DBRead"]>;
+        pageSize: number;
+        pageNum: number;
+      }): Promise<ModelCRUDPage<M["Read"]>> => {
+        const logger = baseLogger.appendName("getPage");
+        const { where, pageNum = 0, pageSize } = params;
+        const page = await _getPage({
+          pageNum,
+          pageSize,
+          where,
+          logger,
+          totalRows: undefined,
+        });
+        return page;
+      },
+
+      getAll: async (
+        params: {
+          where?: FiltersByColumn<M["DBRead"]>;
+          batchSize?: number;
+        } = {},
+      ): Promise<Array<M["Read"]>> => {
+        const logger = baseLogger.appendName("getAll");
+
+        logger.log("Calling `getAll` with params", params);
+        const { where, batchSize = defaultGetAllBatchSize } = params;
+        const firstPage = await _getPage({
+          where,
+          pageSize: batchSize,
+          pageNum: 0,
+          logger,
+          totalRows: undefined,
+        });
+
+        // Now iterate through the pages until we get the last one. We keep
+        // accumulating all rows into `allRows.
+        let nextPage = firstPage.nextPage;
+        const allRows = firstPage.rows;
+        while (nextPage !== undefined) {
+          const newPage = await _getPage({
+            where,
+            pageSize: batchSize,
+            pageNum: nextPage,
+            totalRows: firstPage.totalRows,
+            logger,
+          });
+          allRows.push(...newPage.rows);
+          nextPage = newPage.nextPage;
+        }
+
+        logger.log(`Received all ${modelName}Read (count: ${allRows.length})`);
+        return allRows;
+      },
+
+      insert: async (params: { data: M["Insert"] }): Promise<M["Read"]> => {
+        const logger = baseLogger.appendName("insert");
+
+        logger.log("Calling `insert` with params", params);
+        const dbDataToInsert = parsers.fromModelInsertToDBInsert(params.data);
+
+        logger.log(`Sending ${modelName} DBInsert to database`, dbDataToInsert);
+        const insertedData = await crudFns.insert({
+          data: dbDataToInsert,
+          logger,
+        });
+
+        logger.log(`Received ${modelName} DBRead`, insertedData);
+        const insertedModel = parsers.fromDBReadToModelRead(insertedData);
+
+        logger.log(`Parsed ${modelName}Read`, insertedModel);
+        return insertedModel;
+      },
+
+      bulkInsert: async (params: {
+        data: ReadonlyArray<M["Insert"]>;
+      }): Promise<Array<M["Read"]>> => {
+        const logger = baseLogger.appendName("bulkInsert");
+
+        logger.log("Calling `bulkInsert` with params", params);
+        const dbDataToInsert = params.data.map(
+          parsers.fromModelInsertToDBInsert,
+        );
+
+        logger.log(
+          `Sending ${modelName} DBInsert list to database`,
+          dbDataToInsert,
+        );
+        const insertedData = await crudFns.bulkInsert({
+          data: dbDataToInsert,
+          logger,
+        });
+
+        logger.log(`Received ${modelName} DBRead list`, insertedData);
+        const insertedModels = insertedData.map(parsers.fromDBReadToModelRead);
+
+        logger.log(
+          `Parsed ${modelName}Read list (count: ${insertedModels.length})`,
+        );
+        return insertedModels;
+      },
+
+      update: async (params: {
+        id: M["modelPrimaryKeyType"];
+        data: M["Update"];
+      }): Promise<M["Read"]> => {
+        const logger = baseLogger.appendName("update");
+        logger.log("Calling `update` with params", params);
+        const dbDataToUpdate = parsers.fromModelUpdateToDBUpdate(params.data);
+
+        logger.log(`Sending ${modelName} DBUpdate to database`, dbDataToUpdate);
+        const updatedData = await crudFns.update({
+          id: params.id,
+          data: dbDataToUpdate,
+          logger,
+        });
+
+        logger.log(`Received ${modelName} DBRead`, updatedData);
+        const updatedModel = parsers.fromDBReadToModelRead(updatedData);
+
+        logger.log(`Parsed ${modelName}Read`, updatedModel);
+        return updatedModel;
+      },
+
+      delete: async (params: {
+        id: M["modelPrimaryKeyType"];
+      }): Promise<void> => {
+        const logger = baseLogger.appendName("delete");
+        logger.log("Calling `delete` with params", params);
+        await crudFns.delete({
+          id: params.id,
+          logger,
+        });
+        logger.log("Finished `delete`");
+      },
+
+      bulkDelete: async (params: {
+        ids: ReadonlyArray<M["modelPrimaryKeyType"]>;
+      }): Promise<void> => {
+        const logger = baseLogger.appendName("bulkDelete");
+        logger.log("Calling `bulkDelete` with params", params);
+        await crudFns.bulkDelete({
+          ids: params.ids,
+          logger,
+        });
+        logger.log("Finished `bulkDelete`");
+      },
+    };
+
+    const queriesClient =
+      additionalQueries ?
+        {
+          ...baseClient,
+          ...additionalQueries({ clientLogger: baseLogger }),
+        }
+      : undefined;
+
+    const mutationsClient =
+      additionalMutations ?
+        {
+          ...baseClient,
+          ...additionalMutations({ clientLogger: baseLogger }),
+        }
+      : undefined;
+
+    // Now attach the `use` hooks to our clients
+    const modelClientWithHooks = withQueryHooks(modelClient, {
+      queryFns: DEFAULT_QUERY_FN_NAMES,
+      mutationFns: DEFAULT_MUTATION_FN_NAMES,
+    });
+
+    const baseClientKeys = objectKeys(baseClient);
+    const queriesClientWithHooks =
+      queriesClient ?
+        withQueryHooks(queriesClient, {
+          queryFns: objectKeys(
+            omit(queriesClient, ...baseClientKeys),
+            // This is safe to cast to `any`
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ) as any,
+          mutationFns: [],
+        })
+      : undefined;
+
+    const mutationsClientWithHooks =
+      mutationsClient ?
+        withQueryHooks(mutationsClient, {
+          queryFns: [],
+          mutationFns: objectKeys(
+            omit(mutationsClient, ...baseClientKeys),
+            // This is safe to cast to `any`
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ) as any,
+        })
+      : undefined;
+
+    return {
+      ...baseClient,
+      ...modelClient,
+      ...queriesClient,
+      ...mutationsClient,
+      QueryKeys: {
+        ...modelClientWithHooks.QueryKeys,
+        ...queriesClientWithHooks?.QueryKeys,
+        ...mutationsClientWithHooks?.QueryKeys,
+      },
+
+      // Using `any` here only because TypeScript is struggling with the
+      // complexity of the generics and function name extractions.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
+  });
+}
+
+/**
  * A default list of query functions to turn into `use` hooks in a CRUD client.
  * They will wrap `useQuery`.
  */
 export const DEFAULT_QUERY_FN_NAMES = [
   "getById",
+  "getPage",
   "getAll",
+  "getCount",
 ] as const satisfies ReadonlyArray<
-  HookableFnName<ModelCRUDClient<ModelCRUDTypes>>
+  HookableFnName<BaseModelCRUDClient<ModelCRUDTypes>>
 >;
 export type DefaultQueryFnName = (typeof DEFAULT_QUERY_FN_NAMES)[number];
 
@@ -106,7 +607,7 @@ export const DEFAULT_MUTATION_FN_NAMES = [
   "delete",
   "bulkDelete",
 ] as const satisfies ReadonlyArray<
-  HookableFnName<ModelCRUDClient<ModelCRUDTypes>>
+  HookableFnName<BaseModelCRUDClient<ModelCRUDTypes>>
 >;
 
 export type DefaultMutationFnName = (typeof DEFAULT_MUTATION_FN_NAMES)[number];

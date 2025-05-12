@@ -2,6 +2,32 @@ import { Merge } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
 import { ModelCRUDTypes } from "./ModelCRUDTypes";
 
+type DefaultModelTypes = {
+  modelName: string;
+
+  /**
+   * The name of the string literal primary key of *both* the db and
+   * frontend model. They should both have the same key.
+   */
+  primaryKey: string;
+
+  /**
+   * The primary key type of *both* the db and frontend model.
+   * They should both have the same primary key type.
+   */
+  primaryKeyType: string;
+
+  dbTypes: {
+    DBRead: UnknownObject;
+    DBUpdate: UnknownObject;
+  };
+
+  modelTypes: {
+    Read: UnknownObject;
+    Update: UnknownObject;
+  };
+};
+
 /**
  * A wrapper type to create the Dexie CRUD types for a model.
  *
@@ -18,70 +44,29 @@ import { ModelCRUDTypes } from "./ModelCRUDTypes";
  * behavior to fill in any default values.
  */
 export type DexieModelCRUDTypes<
-  CoreTypes extends {
-    modelName: string;
-
-    /**
-     * The primary key type of *both* the db and frontend model.
-     * They should both have the same primary key type.
-     */
-    primaryKeyType: string;
-  } = {
-    modelName: string;
-    primaryKeyType: string;
-  },
-  DBTypes extends {
-    DBRead: UnknownObject;
-    DBUpdate: UnknownObject;
-  } = {
-    DBRead: UnknownObject;
-    DBUpdate: UnknownObject;
-  },
-  ModelTypes extends {
-    Read: UnknownObject;
-    Update: UnknownObject;
-  } = {
-    Read: UnknownObject;
-    Update: UnknownObject;
-  },
-  PrimaryKeys extends {
-    /**
-     * The name of the string literal primary key of *both* the db and
-     * frontend model. They should both have the same key.
-     */
-    primaryKey: string;
-  } = {
-    primaryKey: string;
-  },
+  ModelTypes extends DefaultModelTypes = DefaultModelTypes,
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   ExtraTypes extends object = {},
 > = Merge<
   ModelCRUDTypes,
   {
     /** The model name. Also used as the Dexie table name. */
-    modelName: CoreTypes["modelName"];
+    modelName: ModelTypes["modelName"];
 
     /** The type of the primary key field in a frontend model */
-    modelPrimaryKeyType: CoreTypes["primaryKeyType"];
+    modelPrimaryKeyType: ModelTypes["primaryKeyType"];
 
     /**
      * The name of the primary key field in a frontend model.
      * This will also be the primary key of the Dexie table.
      */
-    modelPrimaryKey: PrimaryKeys["primaryKey"];
+    modelPrimaryKey: ModelTypes["primaryKey"];
 
-    DBRead: DBTypes["DBRead"];
-    DBUpdate: DBTypes["DBUpdate"];
-    Read: ModelTypes["Read"];
-    Update: ModelTypes["Update"];
+    DBRead: ModelTypes["dbTypes"]["DBRead"];
+    Read: ModelTypes["modelTypes"]["Read"];
 
-    /**
-     * With Dexie (IndexedDB), the Insert type should be equal to the Read
-     * type. Since the database is managed entirely in the frontend,
-     * we should be in charge of supplying all necessary values at
-     * insertion time.
-     */
-    DBInsert: DBTypes["DBRead"];
+    DBUpdate: ModelTypes["dbTypes"]["DBUpdate"];
+    Update: ModelTypes["modelTypes"]["Update"];
 
     /**
      * With Dexie (IndexedDB), the Insert type should be equal to the Read
@@ -89,6 +74,14 @@ export type DexieModelCRUDTypes<
      * we should be in charge of supplying all necessary values at
      * insertion time.
      */
-    Insert: ModelTypes["Read"];
+    DBInsert: ModelTypes["dbTypes"]["DBRead"];
+
+    /**
+     * With Dexie (IndexedDB), the Insert type should be equal to the Read
+     * type. Since the database is managed entirely in the frontend,
+     * we should be in charge of supplying all necessary values at
+     * insertion time.
+     */
+    Insert: ModelTypes["modelTypes"]["Read"];
   } & ExtraTypes
 >;

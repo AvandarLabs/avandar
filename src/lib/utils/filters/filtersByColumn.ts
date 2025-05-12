@@ -21,7 +21,7 @@ import type { ArrayValueOperator, SingleValueOperator } from "./filterTypes";
  * - Any ArrayValueOperators can only have a single target array.
  * - All filters are automatically ANDed together.
  *
- * TODO(pablo): allow each operator to have multiple target values.
+ * TODO(jpbls): allow each operator to have multiple target values.
  *
  * Importantly, `undefined` is a valid filter value. If a filter operator is set
  * to `undefined` then the operator will still get applied.

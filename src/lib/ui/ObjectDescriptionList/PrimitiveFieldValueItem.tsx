@@ -45,7 +45,7 @@ export function PrimitiveFieldValueItem<T extends PrimitiveFieldValue>({
   }
 
   if (isDate(value)) {
-    // TODO(pablo): add options to format the date
+    // TODO(jpbls): add options to format the date
     return <Text>{value.toISOString()}</Text>;
   }
 

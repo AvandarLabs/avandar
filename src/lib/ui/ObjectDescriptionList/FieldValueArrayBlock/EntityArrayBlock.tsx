@@ -47,7 +47,7 @@ export function EntityArrayBlock<T extends DescribableObject>({
       });
 
     const rows = values.map((entityRow, idx) => {
-      // TODO(pablo): use a stable key
+      // TODO(jpbls): use a stable key
       const entityId = String(entityRow[titleKey ?? "id"] ?? idx);
       return (
         <Table.Tr key={entityId}>
@@ -82,7 +82,7 @@ export function EntityArrayBlock<T extends DescribableObject>({
   // render the entities as a list, where each entity is a collapsible
   // entity description list.
   const listItems = values.map((val, idx) => {
-    // TODO(pablo): use a stable key
+    // TODO(jpbls): use a stable key
     const entityId = String(val[titleKey ?? "id"] ?? idx);
     return (
       <CollapsibleItem

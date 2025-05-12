@@ -150,13 +150,33 @@ export function isPrimitive(
  * @returns `true` if `obj` has all the properties in `properties`, `false`
  * otherwise.
  */
-export function hasProps<T extends object, Key extends keyof T>(
-  obj: T,
+export function hasProps<T extends UnknownObject, Key extends keyof T>(
+  obj: T | null | undefined,
   ...properties: Key[]
 ): obj is T & SetRequired<T, Key> {
+  if (obj === null || obj === undefined) {
+    return false;
+  }
   return properties.every((prop) => {
     return prop in obj;
   });
+}
+
+/**
+ * Checks if `obj` has the property `prop`.
+ * This is the same as the function `hasProps` but only allows one key. This
+ * function exists purely for readability purposes because it was annoying
+ * to read a plural `hasProps` when only 1 prop was passed.
+ *
+ * @param obj The object to check.
+ * @param prop The property to check.
+ * @returns `true` if `obj` has the property `prop`, `false` otherwise.
+ */
+export function hasProp<T extends UnknownObject, Key extends keyof T>(
+  obj: T | null | undefined,
+  prop: Key,
+): obj is T & SetRequired<T, Key> {
+  return hasProps(obj, prop);
 }
 
 /**

@@ -37,14 +37,13 @@ export type ManualEntryExtractorCRUDTypes = SupabaseModelCRUDTypes<
     tableName: "value_extractor__manual_entry";
     modelName: "ManualEntryExtractor";
     modelPrimaryKeyType: ManualEntryExtractorId;
+    modelTypes: {
+      Read: ManualEntryExtractorRead;
+      Insert: ManualEntryExtractorInsert;
+      Update: ManualEntryExtractorUpdate;
+    };
   },
   {
-    Read: ManualEntryExtractorRead;
-    Insert: ManualEntryExtractorInsert;
-    Update: ManualEntryExtractorUpdate;
-  },
-  {
-    modelPrimaryKey: "id";
     dbTablePrimaryKey: "id";
   }
 >;

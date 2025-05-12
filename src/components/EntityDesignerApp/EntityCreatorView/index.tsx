@@ -4,7 +4,7 @@ import { useRouter } from "@tanstack/react-router";
 import { LocalDatasetSelect } from "@/components/common/LocalDatasetSelect";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { isNotEqualTo } from "@/lib/hooks/ui/useForm/validators";
-import { propDoesntEqual } from "@/lib/utils/objects/higherOrderFuncs";
+import { xpropDoesntEqual } from "@/lib/utils/objects/higherOrderFuncs";
 import { getEntityConfigLinkProps } from "@/models/EntityConfig/utils";
 import {
   EntityConfigFormValues,
@@ -25,7 +25,7 @@ export function EntityCreatorView(): JSX.Element {
       validate: {
         datasetId: (datasetId, formValues) => {
           const fieldsThatNeedDataset = formValues.fields.filter(
-            propDoesntEqual("options.valueExtractorType", "manual_entry"),
+            xpropDoesntEqual("options.valueExtractorType", "manual_entry"),
           );
           if (!datasetId && fieldsThatNeedDataset.length > 0) {
             return "Dataset cannot be left empty if a field requires one.";

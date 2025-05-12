@@ -51,14 +51,13 @@ export type DatasetColumnValueExtractorCRUDTypes = SupabaseModelCRUDTypes<
     tableName: "value_extractor__dataset_column_value";
     modelName: "DatasetColumnValueExtractor";
     modelPrimaryKeyType: DatasetColumnValueExtractorId;
+    modelTypes: {
+      Read: DatasetColumnValueExtractorRead;
+      Insert: DatasetColumnValueExtractorInsert;
+      Update: DatasetColumnValueExtractorUpdate;
+    };
   },
   {
-    Read: DatasetColumnValueExtractorRead;
-    Insert: DatasetColumnValueExtractorInsert;
-    Update: DatasetColumnValueExtractorUpdate;
-  },
-  {
-    modelPrimaryKey: "id";
     dbTablePrimaryKey: "id";
   }
 >;

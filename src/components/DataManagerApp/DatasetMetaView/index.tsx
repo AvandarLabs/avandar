@@ -27,7 +27,7 @@ const DATASET_RENDER_OPTIONS: ChildRenderOptionsMap<LocalDataset> = {
 /**
  * A view of the metadata for a dataset.
  *
- * TODO(pablo): We should show only a preview (first 100 rows) of the data.
+ * TODO(jpbls): We should show only a preview (first 100 rows) of the data.
  * Currently, we are still showing all data, which isn't great.
  */
 export function DatasetMetaView({ dataset }: Props): JSX.Element {

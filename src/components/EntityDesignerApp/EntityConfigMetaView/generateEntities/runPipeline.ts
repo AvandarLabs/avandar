@@ -3,7 +3,7 @@ import { Logger } from "@/lib/Logger";
 import { getErrorMap } from "@/lib/models/makeParserRegistry";
 import { CSVCellValue, CSVRow, UnknownObject, UUID } from "@/lib/types/common";
 import {
-  hasProps,
+  hasProp,
   isNotNullOrUndefined,
   isPlainObject,
 } from "@/lib/utils/guards";
@@ -11,13 +11,13 @@ import {
   makeBucketsFromList,
   makeObjectFromList,
 } from "@/lib/utils/objects/builders";
-import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
+import { getProp, xpropEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys } from "@/lib/utils/objects/misc";
 import { promiseReduce } from "@/lib/utils/promises";
 import { unknownToString } from "@/lib/utils/strings";
 import { uuid } from "@/lib/utils/uuid";
+import { Entity, EntityId } from "@/models/Entity/types";
 import { EntityFieldConfigId } from "@/models/EntityConfig/EntityFieldConfig/types";
-import { EntityConfigId } from "@/models/EntityConfig/types";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
 import { ParsedLocalDatasetSchema } from "@/models/LocalDataset/parsers";
@@ -47,7 +47,7 @@ export type EntityFieldValueNativeType =
 
 export type EntityFieldValue = {
   id: UUID<"EntityFieldValue">;
-  entityId: UUID<"Entity">;
+  entityId: EntityId;
   entityFieldConfigId: EntityFieldConfigId;
   value?: EntityFieldValueNativeType;
   valueSet: EntityFieldValueNativeType[];
@@ -56,25 +56,11 @@ export type EntityFieldValue = {
 
 export type EntityComment = {
   id: UUID<"EntityComment">;
-  entityId: UUID<"Entity">;
+  entityId: EntityId;
   ownerId: UserId;
   createdAt: Date;
   updatedAt: Date;
   content: string;
-};
-
-export type Entity = {
-  id: UUID<"Entity">;
-  name: string; // the external name of this entity (from the source dataset)
-  externalId: string; // this is the id we get from the source dataset
-  entityConfigId: EntityConfigId;
-  assignedTo: UserId | null;
-  createdAt: Date;
-  updatedAt: Date;
-  relationships: {
-    entityConfig: BuildableEntityConfig;
-    comments: EntityComment[];
-  };
 };
 
 export type PipelineContext = {
@@ -95,7 +81,9 @@ export type PipelineContext = {
 function _getEntityIdField(
   entityConfig: BuildableEntityConfig,
 ): BuildableFieldConfig | undefined {
-  const field = entityConfig.fields.find(propEquals("options.isIdField", true));
+  const field = entityConfig.fields.find(
+    xpropEquals("options.isIdField", true),
+  );
   return field;
 }
 
@@ -103,7 +91,7 @@ function _getEntityNameField(
   entityConfig: BuildableEntityConfig,
 ): BuildableFieldConfig | undefined {
   const field = entityConfig.fields.find(
-    propEquals("options.isTitleField", true),
+    xpropEquals("options.isTitleField", true),
   );
   return field;
 }
@@ -151,7 +139,7 @@ function _bucketDatasetRowsByExternalId(
 
   // we don't take into account the entityIdField's value picker rule because
   // for an ID field, we should always treat each ID value uniquely.
-  // TODO(pablo): disable value picker rule for ID fields in the UI. It doesn't
+  // TODO(jpbls): disable value picker rule for ID fields in the UI. It doesn't
   // make sense there.
   return makeBucketsFromList(dataset.data, {
     keyFn: getProp(datasetExternalIdColumn.name),
@@ -165,7 +153,7 @@ type PipelineRunError = {
 };
 
 type PipelineContextState = {
-  // TODO(pablo): break up `contextValues` into several other dictionaries.
+  // TODO(jpbls): break up `contextValues` into several other dictionaries.
   // And also have a catch-all `extraMetadata` or something like that.
   contextValues: UnknownObject;
   errors: PipelineRunError[];
@@ -271,8 +259,8 @@ export function _runCreateFieldStep(
       }
 
       // at this point our entities should have gotten stored already
-      // TODO(pablo): we are coercing a type here. it's not safe. fix this.
-      // TODO(pablo): do not hard code this key
+      // TODO(jpbls): we are coercing a type here. it's not safe. fix this.
+      // TODO(jpbls): do not hard code this key
       const entities = context.getContextValue(
         "entities",
       ) as unknown as Entity[];
@@ -489,7 +477,7 @@ export function _runCreateEntitiesStep(
   // The data should have already been loaded, so we'll pull it from the context
   const dataset = context.getDataset(entityConfig.datasetId);
 
-  // TODO(pablo): this could just be a set. we do not need to create buckets.
+  // TODO(jpbls): this could just be a set. we do not need to create buckets.
   // now iterate over entire dataset and extract unique id values
   const idsToRows = _bucketDatasetRowsByExternalId(dataset, entityConfig);
 
@@ -535,7 +523,7 @@ export function _runCreateEntitiesStep(
     const entityNames = rows
       .map((row) => {
         if (nameFieldColumn) {
-          if (hasProps(row, nameFieldColumn.name)) {
+          if (hasProp(row, nameFieldColumn.name)) {
             return row[nameFieldColumn.name];
           }
         }
@@ -561,18 +549,14 @@ export function _runCreateEntitiesStep(
       name: chosenEntityName ?? String(id),
       externalId: String(id),
       entityConfigId: entityConfig.id,
-      assignedTo: null,
+      assignedTo: undefined,
       createdAt: new Date(),
       updatedAt: new Date(),
-      relationships: {
-        comments: [],
-        entityConfig: entityConfig,
-      },
     };
   });
 
   return Promise.resolve(
-    // TODO(pablo): eventually store this in some Collections
+    // TODO(jpbls): eventually store this in some Collections
     // dictionary or some way to infer the type back. Perhaps
     // specifically an EntitiesCollection dictionary in the context.
     context.setContextValue("entities", entities).addErrors(errors),

@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
-import { createSupabaseCRUDClient } from "@/lib/clients/createSupabaseCRUDClient";
+import { createSupabaseCRUDClient } from "@/lib/clients/supabase/SupabaseCRUDClient";
 import { makeBucketsFromList } from "@/lib/utils/objects/builders";
-import { getProp, getPropAt } from "@/lib/utils/objects/higherOrderFuncs";
+import { getProp, xgetProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys } from "@/lib/utils/objects/misc";
 import { promiseFlatMap } from "@/lib/utils/promises";
 import { AggregationExtractorClient } from "../ValueExtractor/AggregationExtractor/AggregationExtractorClient";
@@ -26,16 +26,15 @@ export const EntityFieldConfigClient = createSupabaseCRUDClient({
       }: {
         fields: readonly EntityFieldConfig[] | undefined;
       }): Promise<EntityFieldValueExtractor[]> => {
+        const logger = clientLogger.appendName("getAllValueExtractors");
         if (!fields) {
           return [];
         }
 
-        const logger = clientLogger.appendName("getAllValueExtractors");
-
         // Bucket each field by value extractor type, so we only query for
         // the extractor types that we need
         const fieldsByValueExtractorType = makeBucketsFromList(fields, {
-          keyFn: getPropAt("options.valueExtractorType"),
+          keyFn: xgetProp("options.valueExtractorType"),
         });
         const fieldIds = fields.map(getProp("id"));
 
@@ -54,10 +53,10 @@ export const EntityFieldConfigClient = createSupabaseCRUDClient({
         // Now make one query per extractor type
         const valueExtractors = await promiseFlatMap(
           objectKeys(fieldsByValueExtractorType),
-          (
+          async (
             valueExtractorType: EntityFieldValueExtractorType,
           ): Promise<EntityFieldValueExtractor[]> => {
-            return match(valueExtractorType)
+            const extractors = await match(valueExtractorType)
               .with("aggregation", () => {
                 return AggregationExtractorClient.getAll(whereInFieldIds);
               })
@@ -70,6 +69,7 @@ export const EntityFieldConfigClient = createSupabaseCRUDClient({
                 );
               })
               .exhaustive();
+            return extractors;
           },
         );
 

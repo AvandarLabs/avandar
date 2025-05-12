@@ -65,6 +65,9 @@ export type SwapDeep<T, TypeToSwap, SwapWith> =
   T extends TypeToSwap ? Exclude<T, TypeToSwap> | SwapWith
   : T;
 
+export type UndefinedToNullDeep<T> = SwapDeep<T, undefined, null>;
+export type NullToUndefinedDeep<T> = SwapDeep<T, null, undefined>;
+
 /**
  * Represents any function with inferrable parameters and return types.
  */

@@ -36,6 +36,7 @@
     "@tabler/icons-react": "^3.31.0",
     "@tanstack/react-query": "^5.69.0",
     "@tanstack/react-router": "^1.114.27",
+    "@tanstack/react-virtual": "^3.13.8",
     "ag-grid-react": "^33.2.1",
     "apache-arrow": "^19.0.1",
     "camelcase-keys": "^9.1.3",

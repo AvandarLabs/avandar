@@ -40,8 +40,9 @@ Libraries:
 - Use higher-order functions (map, filter, reduce) to simplify logic. Avoid `for` and `while` loops.
 - Use named exports instead of default exports.
 - Never use single-line `if`s, always wrap in opening `{` and closing `}` even if there is only one statement.
-- No line, including comments, should exceed 80 characters.
+- Never exceed 80 characters per line, including comments.
 - If a docstring fits in 80 characters, then single-line it (`/** my comment */`).
+- Leave an empty line before any comments or docstrings.
 
 # Naming Conventions
 

@@ -56,7 +56,7 @@ export function useQuery<
         const results = await queryFn(context);
         return results;
       } catch (error) {
-        // TODO(pablo): create an AvandarError class that is able to
+        // TODO(jpbls): create an AvandarError class that is able to
         // reformat the most common types of errors we can catch into
         // a common unified format. Such as handling ZodErrors.
 

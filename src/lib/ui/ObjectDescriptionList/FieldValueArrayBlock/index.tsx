@@ -41,7 +41,7 @@ export function FieldValueArrayBlock<T extends FieldValue>({
     return <Text fs="italic">{emptyArray}</Text>;
   }
 
-  // TODO(pablo): we should be passing sub options here
+  // TODO(jpbls): we should be passing sub options here
   return (
     <Stack>
       <PrimitiveFieldValueArrayBlock

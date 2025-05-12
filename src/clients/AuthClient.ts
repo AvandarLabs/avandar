@@ -4,7 +4,7 @@ import {
   Subscription,
   User,
 } from "@supabase/supabase-js";
-import { SupabaseDBClient } from "../lib/clients/SupabaseDBClient";
+import { SupabaseDBClient } from "../lib/clients/supabase/SupabaseDBClient";
 
 export const AuthClient = {
   /**

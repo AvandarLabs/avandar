@@ -80,7 +80,7 @@ export const NavLink: LinkComponent<typeof MantineRouterNavLink> = (props) => {
 
       const primaryShade =
         typeof Theme.primaryShade === "object" ?
-          // TODO(pablo): this should handle using the `dark` primary shade if
+          // TODO(jpbls): this should handle using the `dark` primary shade if
           // we're in dark mode
           Theme.primaryShade.light
         : undefined;

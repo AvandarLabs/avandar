@@ -2,13 +2,13 @@ import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { useMemo } from "react";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { makeMapFromList } from "@/lib/utils/maps/builders";
-import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
+import { getProp, xpropEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { unknownToString } from "@/lib/utils/strings";
 import {
   EntityClient,
   EntityFieldValueRead,
-  EntityRead,
 } from "@/models/Entity/EntityClient";
+import { Entity } from "@/models/Entity/types";
 import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
 import {
   EntityFieldConfig,
@@ -16,7 +16,7 @@ import {
 } from "@/models/EntityConfig/EntityFieldConfig/types";
 import { EntityConfig } from "@/models/EntityConfig/types";
 
-type HydratedEntity = EntityRead & {
+type HydratedEntity = Entity & {
   idField?: EntityFieldConfig;
   nameField?: EntityFieldConfig;
   fieldConfigs?: EntityFieldConfig[];
@@ -33,16 +33,17 @@ function useHydratedEntity({
   entity,
 }: {
   entityConfig: EntityConfig;
-  entity: EntityRead;
+  entity: Entity;
 }): [HydratedEntity, boolean] {
   const [entityFieldConfigs, isLoadingEntityFieldConfigs] =
     EntityFieldConfigClient.useGetAll({
       where: { entity_config_id: { eq: entityConfig.id } },
     });
-  const [entityFieldValues, isLoadingEntityFieldValues] =
-    EntityClient.useGetAllFields({
-      entityId: entity.id,
-    });
+  const [entityFieldValues, isLoadingEntityFieldValues] = EntityClient.ofType(
+    entityConfig.id,
+  ).useGetAllFields({
+    entityId: entity.id,
+  });
 
   const hydratedEntity = useMemo(() => {
     let configInfo = undefined;
@@ -53,10 +54,10 @@ function useHydratedEntity({
 
     if (entityFieldConfigs) {
       const idField = entityFieldConfigs.find(
-        propEquals("options.isIdField", true),
+        xpropEquals("options.isIdField", true),
       );
       const nameField = entityFieldConfigs.find(
-        propEquals("options.isTitleField", true),
+        xpropEquals("options.isTitleField", true),
       );
       fieldConfigsMap = makeMapFromList(entityFieldConfigs, {
         keyFn: getProp("id"),
@@ -104,7 +105,7 @@ function useHydratedEntity({
 
 type Props = {
   entityConfig: EntityConfig;
-  entity: EntityRead;
+  entity: Entity;
 };
 
 export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
