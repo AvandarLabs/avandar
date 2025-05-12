@@ -1,4 +1,4 @@
-import { Box, BoxProps, Loader, Title, useMantineTheme } from "@mantine/core";
+import { Box, BoxProps, Loader, useMantineTheme } from "@mantine/core";
 import { useMemo } from "react";
 import { APP_CONFIG } from "@/config/AppConfig";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
@@ -44,13 +44,10 @@ export function EntityConfigNavbar({
   }, [entityConfigs, borderStyle]);
 
   return (
-    <Box bg="neutral.0" pt="lg" {...boxProps}>
+    <Box bg="neutral.0" pt="0" {...boxProps}>
       {isLoading ?
         <Loader />
       : null}
-      <Title pl="sm" order={3}>
-        Entities
-      </Title>
       <NavLinkList
         pt="md"
         links={entityLinks}
