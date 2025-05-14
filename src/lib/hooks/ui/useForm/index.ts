@@ -4,24 +4,11 @@ import {
   useForm as mantineUseForm,
   UseFormInput as MantineUseFormInput,
 } from "@mantine/form";
-import { useCallback } from "react";
 import { Merge, Paths } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
 import { IdentityFnType } from "@/lib/types/utilityTypes";
-import { FormType } from "./useFormTypes";
+import { FormType } from "./types";
 import { useKeysAndPropsCallback } from "./useKeysAndPropsCallback";
-
-type InsertListItemFn<FormValues extends UnknownObject> = <
-  P extends keyof FormValues,
-  ItemType extends FormValues[P] extends ReadonlyArray<infer V> ? V : never,
->(
-  path: P,
-  item: ItemType,
-) => void;
-
-export type FormSetters<FormValues extends UnknownObject> = {
-  insertListItem: InsertListItemFn<FormValues>;
-};
 
 // Improved type safety for `path` argument in a Rule function
 type RuleFn<Value, FullFormValues, FormPath extends Paths<FullFormValues>> = (
@@ -112,29 +99,17 @@ export function useForm<
   FormPath extends Paths<FormValues> = Paths<FormValues>,
 >(
   formOptions: UseFormInput<FormValues, TransformValues, FormPath>,
-): [FormType<FormValues, TransformValues, FormPath>, FormSetters<FormValues>] {
+): FormType<FormValues, TransformValues, FormPath> {
   const form = mantineUseForm<FormValues, TransformValues>(
     formOptions as MantineUseFormInput<FormValues, TransformValues>,
   );
 
-  const insertListItem: InsertListItemFn<FormValues> = useCallback(
-    (path, item) => {
-      form.insertListItem(String(path), item);
-    },
-    [form],
-  );
-
   const keysAndProps = useKeysAndPropsCallback(form);
 
-  return [
-    {
-      ...form,
-      keysAndProps,
-    } as FormType<FormValues, TransformValues, FormPath>,
-    {
-      insertListItem,
-    },
-  ];
+  return {
+    ...form,
+    keysAndProps,
+  } as FormType<FormValues, TransformValues, FormPath>;
 }
 
 export type { FormType };

@@ -1,7 +1,7 @@
 import { Box, Fieldset, Stack, Text } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { AggregationType, LocalQueryClient } from "@/clients/LocalQueryClient";
-import { useSet } from "@/lib/hooks/useSet";
+import { useMutableSet } from "@/lib/hooks/useMutableSet";
 import { DataGrid } from "@/lib/ui/DataGrid";
 import { Select } from "@/lib/ui/inputs/Select";
 import { LoadingOverlay } from "@/lib/ui/LoadingOverlay";
@@ -21,7 +21,7 @@ const HIDE_LIMIT = true;
 
 export function DataExplorerApp(): JSX.Element {
   const [allDatasets, isLoadingDatasets] = LocalDatasetClient.useGetAll();
-  const [loadedDatasets, setLoadedDatasets] = useSet<LocalDatasetId>();
+  const [loadedDatasets, setLoadedDatasets] = useMutableSet<LocalDatasetId>();
   const [selectedDatasetId, setSelectedDatasetId] = useState<
     LocalDatasetId | undefined
   >(undefined);

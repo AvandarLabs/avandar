@@ -139,7 +139,7 @@ function _bucketDatasetRowsByExternalId(
 
   // we don't take into account the entityIdField's value picker rule because
   // for an ID field, we should always treat each ID value uniquely.
-  // TODO(jpbls): disable value picker rule for ID fields in the UI. It doesn't
+  // TODO(jpsyx): disable value picker rule for ID fields in the UI. It doesn't
   // make sense there.
   return makeBucketsFromList(dataset.data, {
     keyFn: getProp(datasetExternalIdColumn.name),
@@ -153,7 +153,7 @@ type PipelineRunError = {
 };
 
 type PipelineContextState = {
-  // TODO(jpbls): break up `contextValues` into several other dictionaries.
+  // TODO(jpsyx): break up `contextValues` into several other dictionaries.
   // And also have a catch-all `extraMetadata` or something like that.
   contextValues: UnknownObject;
   errors: PipelineRunError[];
@@ -259,8 +259,8 @@ export function _runCreateFieldStep(
       }
 
       // at this point our entities should have gotten stored already
-      // TODO(jpbls): we are coercing a type here. it's not safe. fix this.
-      // TODO(jpbls): do not hard code this key
+      // TODO(jpsyx): we are coercing a type here. it's not safe. fix this.
+      // TODO(jpsyx): do not hard code this key
       const entities = context.getContextValue(
         "entities",
       ) as unknown as Entity[];
@@ -477,7 +477,7 @@ export function _runCreateEntitiesStep(
   // The data should have already been loaded, so we'll pull it from the context
   const dataset = context.getDataset(entityConfig.datasetId);
 
-  // TODO(jpbls): this could just be a set. we do not need to create buckets.
+  // TODO(jpsyx): this could just be a set. we do not need to create buckets.
   // now iterate over entire dataset and extract unique id values
   const idsToRows = _bucketDatasetRowsByExternalId(dataset, entityConfig);
 
@@ -556,7 +556,7 @@ export function _runCreateEntitiesStep(
   });
 
   return Promise.resolve(
-    // TODO(jpbls): eventually store this in some Collections
+    // TODO(jpsyx): eventually store this in some Collections
     // dictionary or some way to infer the type back. Perhaps
     // specifically an EntitiesCollection dictionary in the context.
     context.setContextValue("entities", entities).addErrors(errors),

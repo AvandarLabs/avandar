@@ -1,4 +1,8 @@
-import { DefaultMantineColor, MantineColorsTuple } from "@mantine/core";
+import {
+  DefaultMantineColor,
+  DefaultMantineSize,
+  MantineColorsTuple,
+} from "@mantine/core";
 
 type CustomAppColors =
   | "primary"
@@ -10,6 +14,13 @@ type CustomAppColors =
   | "neutral";
 
 type ExtendedAppColors = CustomAppColors | DefaultMantineColor;
+
+type ExtendedCustomSpacing =
+  | "xxxs"
+  | "xxs"
+  | DefaultMantineSize
+  | "xxl"
+  | "xxxl";
 
 declare module "@mantine/core" {
   export interface MantineThemeOther {
@@ -29,6 +40,10 @@ declare module "@mantine/core" {
       /** Active navbar link background color on hover */
       activeHoverBackgroundColor: string;
     };
+  }
+
+  export interface MantineThemeSizesOverride {
+    spacing: Record<ExtendedCustomSpacing, string>;
   }
 
   export interface MantineThemeColorsOverride {

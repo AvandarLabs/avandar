@@ -56,8 +56,8 @@ export function mixedComparator(
 /**
  * Sorts a list of objects using an extractor function to pull a sortable
  * value from each object.
+ * @param list The list of objects to sort.
  * @param options The options for sorting.
- * @param options.list The list of objects to sort.
  * @param options.valueFn A function that returns the value to sort by.
  * @param options.comparator A comparator function to use for sorting. If no
  * function is passed, the default `mixedComparator` will be used.
@@ -69,14 +69,15 @@ export function mixedComparator(
 export function sortObjList<
   T extends object,
   SortValue extends string | number,
->(options: {
-  list: readonly T[];
-  sortBy: (obj: T) => SortValue;
-  comparator?: (a: SortValue, b: SortValue) => number;
-  nullOrUndefinedSortOrder?: "last" | "first";
-}): T[] {
+>(
+  list: readonly T[],
+  options: {
+    sortBy: (obj: T) => SortValue;
+    comparator?: (a: SortValue, b: SortValue) => number;
+    nullOrUndefinedSortOrder?: "last" | "first";
+  },
+): T[] {
   const {
-    list,
     sortBy: valueFn,
     comparator = (a, b) => {
       return mixedComparator(a, b, {

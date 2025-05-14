@@ -5,7 +5,7 @@ import { FileMetadata } from "@/models/LocalDataset/types";
 import { detectFieldDataTypes } from "./detectFieldDataTypes";
 import type { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
 
-// TODO(jpbls): move this to lib/utils
+// TODO(jpsyx): move this to lib/utils
 export function parseFileOrStringToCSV({
   dataToParse,
   firstRowIsHeader,
@@ -21,7 +21,7 @@ export function parseFileOrStringToCSV({
 }> {
   return new Promise((resolve, reject) => {
     Papa.parse<CSVRow>(dataToParse, {
-      // TODO(jpbls): `header` should be toggleable eventually.
+      // TODO(jpsyx): `header` should be toggleable eventually.
       header: firstRowIsHeader,
       delimiter,
       complete: (results: Papa.ParseResult<CSVRow>) => {

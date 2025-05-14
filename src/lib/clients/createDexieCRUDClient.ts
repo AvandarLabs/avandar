@@ -31,7 +31,7 @@ export type DexieCRUDClient<
 /**
  * Creates a client for a model that maps to a Dexie table.
  *
- * TODO(jpbls): implement versioning for the database. It's possible that
+ * TODO(jpsyx): implement versioning for the database. It's possible that
  * the db schema may have changed by the time the user is now loading their
  * previously saved data, so we need to be able to migrate their data to a
  * newer schema version.
@@ -180,7 +180,7 @@ export function createDexieCRUDClient<
       data: M["DBUpdate"];
       logger: ILogger;
     }) => {
-      // TODO(jpbls): implement `update` with dexie
+      // TODO(jpsyx): implement `update` with dexie
       throw new Error("Need to implement `update` for Dexie clients");
     },
 

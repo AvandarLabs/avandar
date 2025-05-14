@@ -22,6 +22,7 @@ type DBRead = {
    * We do not have to structure this as a relational database with foreign
    * keys.
    */
+  // TODO(jpsyx): rename to `columns`
   fields: readonly LocalDatasetField[];
 
   /**

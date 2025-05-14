@@ -75,3 +75,35 @@ export function mapToArrayTuple<T, R1, R2>(
 
   return [tuples1, tuples2];
 }
+
+/**
+ * Removes an item from an array by index.
+ *
+ * @param array The array to remove the item from.
+ * @param idx The index of the item to remove.
+ * @returns A new array with the item removed.
+ */
+export function removeItem<T>(array: readonly T[], idx: number): T[] {
+  const copy = [...array];
+  if (idx === -1) {
+    return copy;
+  }
+
+  copy.splice(idx, 1);
+  return copy;
+}
+
+/**
+ * Removes the first item from an array where the `predicate` returns true.
+ *
+ * @param array The array to remove the item from.
+ * @param predicate The predicate to use to find the item to remove.
+ * @returns A new array with the item removed.
+ */
+export function removeItemWhere<T>(
+  array: readonly T[],
+  predicate: (value: T) => boolean,
+): T[] {
+  const idx = array.findIndex(predicate);
+  return removeItem(array, idx);
+}

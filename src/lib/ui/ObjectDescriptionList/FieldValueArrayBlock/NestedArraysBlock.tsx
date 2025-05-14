@@ -15,7 +15,7 @@ export function NestedArraysBlock<T extends FieldValue>({
     return null;
   }
 
-  // TODO(jpbls): use a stable key
+  // TODO(jpsyx): use a stable key
   return (
     <Stack>
       {values.map((valueArray, idx) => {

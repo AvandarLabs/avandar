@@ -1,5 +1,6 @@
-import { useUncontrolled } from "@mantine/hooks";
-import { useMemo } from "react";
+import { usePrevious, useUncontrolled } from "@mantine/hooks";
+import { useCallback, useEffect, useMemo } from "react";
+import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
 import { Select, SelectProps } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
@@ -10,6 +11,8 @@ type Props = SelectProps<LocalDatasetId>;
 
 /**
  * A select component for selecting a local dataset.
+ * This queries for the list of LocalDatasets on its own, it does not
+ * need to be passed a list of datasets.
  *
  * This supports controlled and uncontrolled behavior and can be used
  * with `useForm`.
@@ -20,7 +23,7 @@ export function LocalDatasetSelect({
   onChange,
   ...selectProps
 }: Props): JSX.Element {
-  const [controlledValue, innerOnChange] = useUncontrolled({
+  const [controlledValue, onChangeValue] = useUncontrolled({
     value,
     defaultValue,
     finalValue: null,
@@ -28,9 +31,19 @@ export function LocalDatasetSelect({
   });
 
   const [datasets] = LocalDatasetClient.useGetAll();
+
+  useOnBecomesDefined(
+    datasets,
+    useCallback(
+      (dsets) => {
+        onChangeValue(dsets[0]?.id ?? null);
+      },
+      [onChangeValue],
+    ),
+  );
+
   const datasetOptions = useMemo(() => {
-    return makeSelectOptions({
-      list: datasets ?? [],
+    return makeSelectOptions(datasets ?? [], {
       valueFn: getProp("id"),
       labelFn: getProp("name"),
     });
@@ -41,9 +54,7 @@ export function LocalDatasetSelect({
       data={datasetOptions}
       label="Dataset"
       value={controlledValue}
-      onChange={(val) => {
-        return innerOnChange(val as LocalDatasetId);
-      }}
+      onChange={onChangeValue}
       {...selectProps}
     />
   );

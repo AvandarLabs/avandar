@@ -35,7 +35,7 @@ export function EntityConfigNavbar({
       }),
       {
         to: APP_CONFIG.links.entityCreator.to,
-        label: "Create new entity",
+        label: "Create new profile type",
         style: borderStyle,
         linkKey: "create-new",
       },

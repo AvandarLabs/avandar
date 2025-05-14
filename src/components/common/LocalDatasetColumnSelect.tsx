@@ -1,5 +1,6 @@
 import { useUncontrolled } from "@mantine/hooks";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
 import { Select, SelectProps } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
@@ -9,16 +10,18 @@ import { LocalDatasetId } from "@/models/LocalDataset/types";
 
 type Props = {
   datasetId: LocalDatasetId | undefined;
+  excludeColumns?: LocalDatasetFieldId[];
 } & SelectProps<LocalDatasetFieldId>;
 
-export function LocalDatasetFieldSelect({
+export function LocalDatasetColumnSelect({
   datasetId,
   defaultValue,
   value,
   onChange,
+  excludeColumns,
   ...selectProps
 }: Props): JSX.Element {
-  const [controlledValue, innerOnChange] = useUncontrolled({
+  const [controlledValue, onChangeValue] = useUncontrolled({
     value,
     defaultValue,
     finalValue: null,
@@ -30,13 +33,27 @@ export function LocalDatasetFieldSelect({
     useQueryOptions: { enabled: !!datasetId },
   });
 
+  useOnBecomesDefined(
+    dataset,
+    useCallback(
+      (dset) => {
+        onChangeValue(dset.fields[0]?.id ?? null);
+      },
+      [onChangeValue],
+    ),
+  );
+
   const fieldOptions = useMemo(() => {
-    return makeSelectOptions({
-      list: dataset?.fields ?? [],
-      valueFn: getProp("id"),
-      labelFn: getProp("name"),
-    });
-  }, [dataset]);
+    return makeSelectOptions(
+      dataset?.fields?.filter((f) => {
+        return !excludeColumns?.includes(f.id);
+      }) ?? [],
+      {
+        valueFn: getProp("id"),
+        labelFn: getProp("name"),
+      },
+    );
+  }, [dataset, excludeColumns]);
 
   return (
     <Select
@@ -44,9 +61,7 @@ export function LocalDatasetFieldSelect({
       label="Field"
       value={controlledValue}
       placeholder={isLoading ? "Loading fields..." : ""}
-      onChange={(val) => {
-        return innerOnChange(val as LocalDatasetFieldId);
-      }}
+      onChange={onChangeValue}
       {...selectProps}
     />
   );

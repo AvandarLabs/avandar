@@ -1,7 +1,7 @@
 import { Button, Checkbox, Container, Stack, TextInput } from "@mantine/core";
 import { formRootRule, isNotEmpty } from "@mantine/form";
 import { useRouter } from "@tanstack/react-router";
-import { LocalDatasetSelect } from "@/components/common/LocalDatasetSelect";
+import { useState } from "react";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { isNotEqualTo } from "@/lib/hooks/ui/useForm/validators";
 import { xpropDoesntEqual } from "@/lib/utils/objects/higherOrderFuncs";
@@ -18,32 +18,31 @@ export function EntityCreatorView(): JSX.Element {
   const [sendEntityConfigForm, isSendEntityConfigFormPending] =
     useSubmitEntityCreatorForm();
 
-  const [entityConfigForm, entityConfigFormSetters] =
-    useForm<EntityConfigFormValues>({
-      mode: "uncontrolled",
-      initialValues: getDefaultEntityConfigFormValues(),
-      validate: {
-        datasetId: (datasetId, formValues) => {
-          const fieldsThatNeedDataset = formValues.fields.filter(
-            xpropDoesntEqual("options.valueExtractorType", "manual_entry"),
-          );
-          if (!datasetId && fieldsThatNeedDataset.length > 0) {
-            return "Dataset cannot be left empty if a field requires one.";
-          }
-          return null;
-        },
+  const entityConfigForm = useForm<EntityConfigFormValues>({
+    mode: "uncontrolled",
+    initialValues: getDefaultEntityConfigFormValues(),
+    validate: {
+      datasetId: (datasetId, formValues) => {
+        const fieldsThatNeedDataset = formValues.fields.filter(
+          xpropDoesntEqual("options.valueExtractorType", "manual_entry"),
+        );
+        if (!datasetId && fieldsThatNeedDataset.length > 0) {
+          return "Dataset cannot be left empty if a field requires one.";
+        }
+        return null;
+      },
 
-        fields: {
-          [formRootRule]: isNotEmpty("At least one field is required"),
-          options: {
-            valueExtractorType: isNotEqualTo(
-              "aggregation",
-              "Aggregation is not a supported value extractor type yet. Please choose something else.",
-            ),
-          },
+      fields: {
+        [formRootRule]: isNotEmpty("At least one field is required"),
+        options: {
+          valueExtractorType: isNotEqualTo(
+            "aggregation",
+            "Aggregation is not a supported value extractor type yet. Please choose something else.",
+          ),
         },
       },
-    });
+    },
+  });
 
   const [keys, inputProps] = entityConfigForm.keysAndProps([
     "name",
@@ -52,6 +51,13 @@ export function EntityCreatorView(): JSX.Element {
     "allowManualCreation",
     "fields",
   ]);
+
+  const [entityConfigName, setEntityConfigName] = useState("");
+
+  entityConfigForm.watch("name", ({ value }) => {
+    // TODO(jpsyx): add a debounce
+    setEntityConfigName(value);
+  });
 
   return (
     <Container pt="lg">
@@ -69,32 +75,27 @@ export function EntityCreatorView(): JSX.Element {
           <TextInput
             key={keys.name}
             required
-            label="Entity Name"
-            placeholder="Enter a name for the entity"
+            label="Profile Name"
+            placeholder="Enter a name for this profile type"
             {...inputProps.name()}
           />
           <TextInput
             key={keys.description}
-            label="Entity Description"
-            placeholder="Enter a description for the entity"
+            label="Profile Description"
+            placeholder="Enter a description for this profile type"
             {...inputProps.description()}
-          />
-
-          <LocalDatasetSelect
-            key={keys.datasetId}
-            label="Dataset source"
-            {...inputProps.datasetId()}
           />
 
           <Checkbox
             key={keys.allowManualCreation}
-            label="Allow manual creation of new entities"
+            label={`Can new new ${entityConfigName || "profile"}s be created manually?`}
             {...inputProps.allowManualCreation({ type: "checkbox" })}
           />
 
           <EntityFieldCreatorBlock
+            entityConfigId={entityConfigForm.getValues().id}
             entityConfigForm={entityConfigForm}
-            formSetters={entityConfigFormSetters}
+            entityConfigName={entityConfigName || "Profile"}
           />
 
           <Button type="submit" loading={isSendEntityConfigFormPending}>

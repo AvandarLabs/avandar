@@ -27,14 +27,15 @@ type Props = {
   entityName: string;
 };
 
-const valueExtractorOptions = makeSelectOptions({
-  list: sortObjList({
-    list: objectValues(EntityFieldValueExtractorTypes),
+const valueExtractorOptions = makeSelectOptions(
+  sortObjList(objectValues(EntityFieldValueExtractorTypes), {
     sortBy: getProp("displayName"),
   }),
-  valueFn: getProp("type"),
-  labelFn: getProp("displayName"),
-});
+  {
+    valueFn: getProp("type"),
+    labelFn: getProp("displayName"),
+  },
+);
 
 export function EntityFieldCreator({
   entityConfigForm,

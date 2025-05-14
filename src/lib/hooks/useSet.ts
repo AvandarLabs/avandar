@@ -1,14 +1,12 @@
-import { useSet as useMutableSet } from "@mantine/hooks";
+import { useMemo, useState } from "react";
 
 /**
  * Hook to manage a set of values.
  *
- * NOTE: this uses mantine's `useSet` under the hood which
- * uses a *mutable* set. The set will maintain the same reference
- * after each update. Mantine uses a `forceUpdate` hook to correctly
- * trigger a re-render but beware of any situations where you truly
- * depend on an immutable set that produces a new reference with
- * each mutation.
+ * This has the same signature as `useMutableSet` except the set
+ * is guaranteed to be immutable. Therefore, insertions and deletions
+ * are O(n) instead of O(1), but you are guaranteed a new reference on
+ * each operation.
  *
  * Usage:
  * ```ts
@@ -26,18 +24,30 @@ import { useSet as useMutableSet } from "@mantine/hooks";
 export function useSet<T>(values?: T[]): [
   Set<T>,
   {
-    add: (value: T) => Set<T>;
-    delete: (value: T) => boolean;
+    add: (value: T) => void;
+    delete: (value: T) => void;
     clear: () => void;
   },
 ] {
-  const set = useMutableSet<T>(values);
+  const [set, setSet] = useState(() => {
+    return new Set(values);
+  });
   return [
     set,
     {
-      add: set.add,
-      delete: set.delete,
-      clear: set.clear,
+      add: (value: T) => {
+        const newSet = new Set(set);
+        newSet.add(value);
+        setSet(newSet);
+      },
+      delete: (value: T) => {
+        const newSet = new Set(set);
+        newSet.delete(value);
+        setSet(newSet);
+      },
+      clear: () => {
+        setSet(new Set<T>());
+      },
     },
   ];
 }

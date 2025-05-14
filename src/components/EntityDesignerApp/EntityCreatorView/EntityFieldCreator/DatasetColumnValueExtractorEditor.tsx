@@ -1,6 +1,6 @@
 import { Group, Select } from "@mantine/core";
 import { useState } from "react";
-import { LocalDatasetFieldSelect } from "@/components/common/LocalDatasetFieldSelect";
+import { LocalDatasetColumnSelect } from "@/components/common/LocalDatasetColumnSelect";
 import { LocalDatasetSelect } from "@/components/common/LocalDatasetSelect";
 import { FormType } from "@/lib/hooks/ui/useForm";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
@@ -15,11 +15,13 @@ type Props = {
   fieldIdx: number;
 };
 
-const valuePickerOptions = makeSelectOptions({
-  list: objectValues(ValuePickerRuleTypes),
-  valueFn: getProp("type"),
-  labelFn: getProp("displayName"),
-});
+const valuePickerOptions = makeSelectOptions(
+  objectValues(ValuePickerRuleTypes),
+  {
+    valueFn: getProp("type"),
+    labelFn: getProp("displayName"),
+  },
+);
 
 export function DatasetColumnValueExtractorEditor({
   entityConfigForm,
@@ -48,7 +50,7 @@ export function DatasetColumnValueExtractorEditor({
         allowDeselect={false}
         {...inputProps.datasetId()}
       />
-      <LocalDatasetFieldSelect
+      <LocalDatasetColumnSelect
         key={keys.datasetFieldId}
         label="Field"
         datasetId={datasetId}

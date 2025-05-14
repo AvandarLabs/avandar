@@ -115,13 +115,6 @@ export function getDefaultEntityConfigFormValues(): EntityConfigFormValues {
     description: "",
     datasetId: undefined,
     allowManualCreation: false,
-    fields: [
-      getDefaultEntityFieldFormValues({
-        entityConfigId,
-        isIdField: true,
-        isTitleField: true,
-        name: "Name",
-      }),
-    ],
+    fields: [],
   };
 }

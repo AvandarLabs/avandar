@@ -17,7 +17,7 @@ export function PrimitiveFieldValueArrayBlock<T extends PrimitiveFieldValue>({
     return null;
   }
 
-  // TODO(jpbls): use a stable key
+  // TODO(jpsyx): use a stable key
   return (
     <Stack>
       {values.map((v, idx) => {

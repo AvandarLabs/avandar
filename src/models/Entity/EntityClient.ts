@@ -1,4 +1,4 @@
-// TODO(jpbls): this is all very hacky right now
+// TODO(jpsyx): this is all very hacky right now
 import { z } from "zod";
 import { EntityFieldValue } from "@/components/EntityDesignerApp/EntityConfigMetaView/generateEntities/runPipeline";
 import {
@@ -121,7 +121,7 @@ function createEntityClient(entityConfigId: EntityConfigId): EntityClient {
     id: EntityId | null | undefined;
     logger: ILogger;
   }) {
-    // TODO(jpbls): use DuckDB WASM here to speed this up
+    // TODO(jpsyx): use DuckDB WASM here to speed this up
     if (!params.id) {
       return undefined;
     }
@@ -142,7 +142,7 @@ function createEntityClient(entityConfigId: EntityConfigId): EntityClient {
       where?: FiltersByColumn<Entity<"DBRead">>;
       logger: ILogger;
     }) => {
-      // TODO(jpbls): use DuckDB WASM here to speed this up
+      // TODO(jpsyx): use DuckDB WASM here to speed this up
       const { where } = params;
       const entityDataset = await _getEntityDataset();
       const filteredRows =
@@ -161,7 +161,7 @@ function createEntityClient(entityConfigId: EntityConfigId): EntityClient {
       pageNum: number;
       logger: ILogger;
     }) => {
-      // TODO(jpbls): use DuckDB WASM here to speed this up
+      // TODO(jpsyx): use DuckDB WASM here to speed this up
       const { where, pageSize, pageNum } = params;
       const entityDataset = await _getEntityDataset();
       const filteredRows =

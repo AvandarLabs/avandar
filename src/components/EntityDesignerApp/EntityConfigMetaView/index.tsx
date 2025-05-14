@@ -65,7 +65,7 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
                   return hasDefinedProps(field, "valueExtractor");
                 });
 
-                // TODO(jpbls): make this a mutation so you can show a loading
+                // TODO(jpsyx): make this a mutation so you can show a loading
                 // spinner by using `isPending`
                 await generateEntities({
                   ...fullEntityConfig,

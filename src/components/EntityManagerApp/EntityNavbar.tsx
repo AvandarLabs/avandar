@@ -20,7 +20,7 @@ type Props = {
   entityConfig: EntityConfig;
 } & BoxProps;
 
-// TODO(jpbls): generalize these navbars
+// TODO(jpsyx): generalize these navbars
 export function EntityNavbar({
   entityConfig,
   ...boxProps

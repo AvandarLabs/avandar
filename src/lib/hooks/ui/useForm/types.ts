@@ -5,6 +5,21 @@ import { IdentityFnType } from "@/lib/types/utilityTypes";
 import { PathValue } from "@/lib/utils/objects/getValueAt";
 import { GetKeyAndPropsFn } from "./useKeysAndPropsCallback";
 
+type InsertListItemFn<FormValues extends UnknownObject> = <
+  P extends keyof FormValues,
+  ItemType extends FormValues[P] extends ReadonlyArray<infer V> ? V : never,
+>(
+  path: P,
+  item: ItemType,
+) => void;
+
+type RemoveListItemFn<FormValues extends UnknownObject> = <
+  P extends keyof FormValues,
+>(
+  path: P,
+  index: number,
+) => void;
+
 /**
  * An improved version of Mantine's `UseFormReturnType` with
  * significantly better type safety.
@@ -16,7 +31,12 @@ export type FormType<
   ) => unknown = IdentityFnType<FormValues>,
   FormPath extends Paths<FormValues> = Paths<FormValues>,
 > = Merge<
-  MantineUseFormReturnType<FormValues, TransformedValues>,
+  Omit<
+    MantineUseFormReturnType<FormValues, TransformedValues>,
+    // remove `values` so that we don't mistakenly use it. We should always
+    // use `getValues` instead.
+    "values"
+  >,
   {
     // Improve type-safety for `key`
     key: (path: FormPath) => string;
@@ -31,6 +51,12 @@ export type FormType<
         dirty: boolean;
       }) => void,
     ) => void;
+
+    // Improve type-safety for `insertListItem`
+    insertListItem: InsertListItemFn<FormValues>;
+
+    // Improve type-safety for `removeListItem`
+    removeListItem: RemoveListItemFn<FormValues>;
 
     // Our own helper function to get `keys` and `props` bound to a base path
     keysAndProps: GetKeyAndPropsFn<FormValues, FormPath>;

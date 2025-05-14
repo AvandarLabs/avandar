@@ -112,7 +112,7 @@ export function unknownToString(
   }
 
   if (isDate(value)) {
-    // TODO(jpbls): add options to format the date
+    // TODO(jpsyx): add options to format the date
     return value.toISOString();
   }
 

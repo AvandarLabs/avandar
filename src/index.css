@@ -2,8 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Mantine style overrides */
+/*
+ * Mantine style overrides.
+ * Most of this section is adding back some styles that Tailwind CSS
+ * had removed or changed.
+ */
 .mantine-List-root {
-  /* Tailwind had removed list-style, so we are adding it back */
   list-style: revert;
+}
+
+button {
+  &:disabled,
+  &[data-disabled] {
+    cursor: not-allowed;
+  }
 }

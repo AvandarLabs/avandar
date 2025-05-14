@@ -25,6 +25,10 @@ export function getProp<T extends object, K extends keyof T>(
 /**
  * Returns a getter function that returns the value of a property at a given
  * key path in dot notation.
+ *
+ * The `x` prefix is our convention to denote a function that accepts a deep
+ * key path rather than a shallow key.
+ *
  * @param path The path of the property to get.
  * @returns A function that returns the value at the given key path.
  */
@@ -57,6 +61,10 @@ export function propEquals<T extends UnknownObject, K extends keyof T>(
 /**
  * Returns a function that checks if an object has a property with a specific
  * value.
+ *
+ * The `x` prefix is our convention to denote a function that accepts a deep
+ * key path rather than a shallow key.
+ *
  * @param path The path of the property to check.
  * @param value The value to check.
  * @returns A function that returns true if the object has the property with
@@ -92,6 +100,9 @@ export function propDoesntEqual<T extends UnknownObject, K extends keyof T>(
 /**
  * Returns a function that checks if an object has a property that **doesn't**
  * have a specific value.
+ *
+ * The `x` prefix is our convention to denote a function that accepts a deep
+ * key path rather than a shallow key.
  *
  * @param path The path of the property to check.
  * @param value The value to check.
