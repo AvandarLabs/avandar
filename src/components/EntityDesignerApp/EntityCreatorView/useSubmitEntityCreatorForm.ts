@@ -8,29 +8,32 @@ import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
 import { EntityFieldValueExtractor } from "@/models/EntityConfig/ValueExtractor/types";
 import { ValueExtractorClient } from "@/models/EntityConfig/ValueExtractor/ValueExtractorClient";
-import { EntityConfigFormValues } from "./entityCreatorTypes";
+import { EntityConfigFormSubmitValues } from "./entityConfigFormTypes";
 
 export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
   void,
-  EntityConfigFormValues
+  EntityConfigFormSubmitValues
 > {
   return useMutation({
-    mutationFn: async (entityConfigForm: EntityConfigFormValues) => {
+    mutationFn: async (
+      entityConfigFormValues: EntityConfigFormSubmitValues,
+    ) => {
       // Insert the parent entity
       await EntityConfigClient.insert({
-        data: entityConfigForm,
+        data: entityConfigFormValues,
       });
+      const { fields } = entityConfigFormValues;
 
       // Insert the child field entities
       await EntityFieldConfigClient.bulkInsert({
-        data: entityConfigForm.fields,
+        data: fields,
       });
 
       // Insert the value extractors
       // First, get all value extractors from the fields. Filter out any
       // that don't have the necessary required properties
       const extractorsToCreate: Array<EntityFieldValueExtractor<"Insert">> =
-        entityConfigForm.fields
+        fields
           .map((field) => {
             const { options, extractors } = field;
             return match(options.valueExtractorType)
@@ -70,12 +73,14 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
       });
     },
 
-    onError: async (_error, entityConfigForm) => {
+    onError: async (_error, entityConfigFormValues) => {
+      const { fields } = entityConfigFormValues;
+
       // Roll back all changes
       await Promise.all([
-        EntityConfigClient.delete({ id: entityConfigForm.id }),
+        EntityConfigClient.delete({ id: entityConfigFormValues.id }),
         EntityFieldConfigClient.bulkDelete({
-          ids: entityConfigForm.fields.map((f) => {
+          ids: fields.map((f) => {
             return f.id;
           }),
         }),

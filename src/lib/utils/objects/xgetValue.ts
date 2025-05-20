@@ -32,11 +32,15 @@ export type PathValue<T, P extends Paths<T>> =
 
 /**
  * Gets the value of a property at a given key path in dot notation.
+ *
+ * We use the `x` prefix as a convention to denote a function that accepts
+ * a deep key path.
+ *
  * @param obj The object to get the value from.
  * @param path The key path in dot notation.
  * @returns The value of the property.
  */
-export function getValueAt<
+export function xgetValue<
   T extends UnknownObject | UnknownArray,
   P extends Paths<T>,
 >(obj: T, path: P): PathValue<T, P> {
@@ -52,6 +56,7 @@ export function _getValueAt(
 ): unknown {
   const [key, ...pathTail] = paths;
 
+  // Error handling:
   // Get the value at this key. Make sure this key exists in the object
   // or array first.
   let value: unknown;
@@ -84,8 +89,8 @@ export function _getValueAt(
     return value;
   }
 
-  // Fromt his point on, we know there is still a `pathTail` to traverse.
-  // If we ar at a primitive value, then that's bad.
+  // From this point on, we know there is still a `pathTail` to traverse.
+  // If we are at a primitive value, then that's bad.
   if (isPrimitive(value)) {
     const remainingPath = pathTail.join(".");
     throw new Error(

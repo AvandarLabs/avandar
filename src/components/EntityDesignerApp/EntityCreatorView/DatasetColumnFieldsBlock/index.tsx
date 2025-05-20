@@ -1,10 +1,8 @@
 import {
   ActionIcon,
   Box,
-  Button,
   Fieldset,
   Group,
-  Paper,
   ScrollArea,
   Stack,
   Text,
@@ -26,22 +24,20 @@ import { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/typ
 import { LocalDatasetId } from "@/models/LocalDataset/types";
 import {
   EntityConfigFormValues,
-  getDefaultEntityFieldFormValues,
-} from "./entityCreatorTypes";
-import { EntityFieldCreator } from "./EntityFieldCreator";
+  makeDefaultDatasetColumnField,
+} from "../entityConfigFormTypes";
+import { DatasetColumnExtractorCreator } from "./DatasetColumnExtractorCreator";
 
 type Props = {
   entityConfigForm: FormType<EntityConfigFormValues>;
   entityConfigId: EntityConfigId;
-  entityConfigName: string;
 };
 
-export function EntityFieldCreatorBlock({
+export function DatasetColumnFieldsBlock({
   entityConfigForm,
   entityConfigId,
-  entityConfigName,
 }: Props): JSX.Element {
-  const { fields } = entityConfigForm.getValues();
+  const { datasetColumnFields } = entityConfigForm.getValues();
   const [selectedDatasetId, setSelectedDatasetId] =
     useState<LocalDatasetId | null>(null);
 
@@ -53,6 +49,12 @@ export function EntityFieldCreatorBlock({
     id: selectedDatasetId,
     useQueryOptions: { enabled: !!selectedDatasetId },
   });
+
+  const selectedDatasetColumn = useMemo(() => {
+    return selectedDatasetColumnId ?
+        selectedDataset?.fields.find(propEquals("id", selectedDatasetColumnId))
+      : undefined;
+  }, [selectedDataset, selectedDatasetColumnId]);
 
   const [selectedFieldId, setSelectedFieldId] = useState<
     EntityFieldConfigId | undefined
@@ -67,74 +69,67 @@ export function EntityFieldCreatorBlock({
     return [...fieldToColumnMap.values()];
   }, [fieldToColumnMap]);
 
-  const fieldRows = fields.map((field, idx) => {
-    return (
-      <EntityFieldCreator
-        key={field.id}
-        defaultField={field}
-        entityConfigForm={entityConfigForm}
-        idx={idx}
-        entityName={entityConfigName}
-      />
-    );
-  });
-
   const fieldItems = useMemo(() => {
-    return makeSegmentedControlItems(fields, {
+    return makeSegmentedControlItems(datasetColumnFields, {
       valueFn: getProp("id"),
       labelFn: getProp("name"),
     });
-  }, [fields]);
+  }, [datasetColumnFields]);
 
   const addDatasetColumnAsField = useCallback(() => {
-    if (selectedDataset && selectedDatasetColumnId) {
-      const datasetColumn = selectedDataset.fields.find(
-        propEquals("id", selectedDatasetColumnId),
-      );
-
-      const newField = getDefaultEntityFieldFormValues({
+    if (selectedDataset && selectedDatasetColumn) {
+      const newField = makeDefaultDatasetColumnField({
         entityConfigId,
-        name: datasetColumn?.name ?? "New field",
-        isIdField: false,
-        isTitleField: false,
+        name: selectedDatasetColumn.name,
+        dataset: selectedDataset,
+        datasetColumn: selectedDatasetColumn,
       });
 
-      updateFieldToColumnMap.set(newField.id, selectedDatasetColumnId);
-      if (fields.length === 0) {
+      // link this field to the dataset column it's based on
+      updateFieldToColumnMap.set(newField.id, selectedDatasetColumn.id);
+      if (datasetColumnFields.length === 0) {
         // if this is the first field we're adding to the `fields` array,
         // then automatically select it
         setSelectedFieldId(newField.id);
       }
-      entityConfigForm.insertListItem("fields", newField);
+
+      // add this field to the form data
+      entityConfigForm.insertListItem("datasetColumnFields", newField);
     }
   }, [
-    fields,
+    datasetColumnFields,
     entityConfigForm,
     entityConfigId,
     selectedDataset,
-    selectedDatasetColumnId,
+    selectedDatasetColumn,
+    updateFieldToColumnMap,
   ]);
 
   const removeField = useCallback(() => {
     if (selectedFieldId) {
       const newFields = removeItemWhere(
-        fields,
+        datasetColumnFields,
         propEquals("id", selectedFieldId),
       );
-      entityConfigForm.setFieldValue("fields", newFields);
+      entityConfigForm.setFieldValue("datasetColumnFields", newFields);
       updateFieldToColumnMap.delete(selectedFieldId);
 
       // reset the selected field to be the first field in the list
       setSelectedFieldId(newFields[0]?.id);
     }
-  }, [entityConfigForm, fields, selectedFieldId]);
+  }, [
+    entityConfigForm,
+    datasetColumnFields,
+    selectedFieldId,
+    updateFieldToColumnMap,
+  ]);
 
   return (
-    <Box>
+    <Fieldset legend="Fields that come from datasets">
       <Group pb="sm">
         <LocalDatasetSelect onChange={setSelectedDatasetId} />
       </Group>
-      <Group>
+      <Group align="flex-start">
         <Stack gap="xs">
           <Text size="xs" c="dark" tt="uppercase" lts="0.1em">
             Dataset columns
@@ -147,7 +142,7 @@ export function EntityFieldCreatorBlock({
             />
           </ScrollArea>
         </Stack>
-        <Stack gap="xxxs">
+        <Stack gap="xxxs" pt="lg">
           <ActionIcon
             variant="subtle"
             color="neutral"
@@ -163,7 +158,7 @@ export function EntityFieldCreatorBlock({
             color="neutral"
             aria-label="Remove field"
             className={`data-[disabled]:bg-transparent`}
-            disabled={fields.length === 0}
+            disabled={datasetColumnFields.length === 0}
             onClick={removeField}
           >
             <IconArrowLeft size={24} />
@@ -173,8 +168,8 @@ export function EntityFieldCreatorBlock({
           <Text size="xs" c="dark" tt="uppercase" lts="0.1em">
             Profile fields
           </Text>
-          {fields.length === 0 ?
-            <Text>No dataset columns have been added as fields yet</Text>
+          {datasetColumnFields.length === 0 ?
+            <Text>No columns have been added yet</Text>
           : <ScrollArea h={300}>
               <SegmentedControl
                 orientation="vertical"
@@ -185,32 +180,21 @@ export function EntityFieldCreatorBlock({
             </ScrollArea>
           }
         </Stack>
-        <Box>Field Editor</Box>
+        {selectedFieldId ?
+          <Box pt="sm">
+            <DatasetColumnExtractorCreator
+              entityConfigForm={entityConfigForm}
+              fieldIdx={datasetColumnFields.findIndex(
+                propEquals("id", selectedFieldId),
+              )}
+              fieldName={
+                datasetColumnFields.find(propEquals("id", selectedFieldId))!
+                  .name
+              }
+            />
+          </Box>
+        : null}
       </Group>
-
-      <Fieldset legend="Fields">
-        <Stack>
-          {entityConfigForm.errors.fields ?
-            <Text c="danger">{entityConfigForm.errors.fields}</Text>
-          : <>{fieldRows}</>}
-          <Button
-            onClick={() => {
-              entityConfigForm.insertListItem(
-                "fields",
-                getDefaultEntityFieldFormValues({
-                  entityConfigId,
-                  name: "New field",
-                  isIdField: false,
-                  isTitleField: false,
-                }),
-              );
-              entityConfigForm.clearFieldError("fields");
-            }}
-          >
-            Add Field
-          </Button>
-        </Stack>
-      </Fieldset>
-    </Box>
+    </Fieldset>
   );
 }

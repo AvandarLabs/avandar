@@ -45,7 +45,7 @@ export type GetKeyAndPropsFn<
   FormValues extends UnknownObject,
   FormPath extends Paths<FormValues> = Paths<FormValues>,
 > = <
-  BasePathOrFullPaths extends string | readonly FormPath[],
+  BasePathOrFullPaths extends readonly FormPath[] | (string & FormPath),
   PathTail extends BasePathOrFullPaths extends string ?
     GetPathTail<FormPath, BasePathOrFullPaths>
   : never = never,

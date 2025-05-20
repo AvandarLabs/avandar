@@ -1,8 +1,7 @@
 import { UseFormReturnType as MantineUseFormReturnType } from "@mantine/form";
 import { Merge, Paths } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
-import { IdentityFnType } from "@/lib/types/utilityTypes";
-import { PathValue } from "@/lib/utils/objects/getValueAt";
+import { PathValue } from "@/lib/utils/objects/xgetValue";
 import { GetKeyAndPropsFn } from "./useKeysAndPropsCallback";
 
 type InsertListItemFn<FormValues extends UnknownObject> = <
@@ -26,13 +25,14 @@ type RemoveListItemFn<FormValues extends UnknownObject> = <
  */
 export type FormType<
   FormValues extends UnknownObject,
-  TransformedValues extends (
-    values: FormValues,
-  ) => unknown = IdentityFnType<FormValues>,
+  TransformedValues = FormValues,
   FormPath extends Paths<FormValues> = Paths<FormValues>,
 > = Merge<
   Omit<
-    MantineUseFormReturnType<FormValues, TransformedValues>,
+    MantineUseFormReturnType<
+      FormValues,
+      (values: FormValues) => TransformedValues
+    >,
     // remove `values` so that we don't mistakenly use it. We should always
     // use `getValues` instead.
     "values"

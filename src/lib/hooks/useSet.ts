@@ -32,22 +32,28 @@ export function useSet<T>(values?: T[]): [
   const [set, setSet] = useState(() => {
     return new Set(values);
   });
-  return [
-    set,
-    {
+
+  const setters = useMemo(() => {
+    return {
       add: (value: T) => {
-        const newSet = new Set(set);
-        newSet.add(value);
-        setSet(newSet);
+        setSet((prevSet) => {
+          const newSet = new Set(prevSet);
+          newSet.add(value);
+          return newSet;
+        });
       },
       delete: (value: T) => {
-        const newSet = new Set(set);
-        newSet.delete(value);
-        setSet(newSet);
+        setSet((prevSet) => {
+          const newSet = new Set(prevSet);
+          newSet.delete(value);
+          return newSet;
+        });
       },
       clear: () => {
         setSet(new Set<T>());
       },
-    },
-  ];
+    };
+  }, []);
+
+  return [set, setters];
 }

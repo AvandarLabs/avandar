@@ -1,4 +1,5 @@
 import { useMap as mantineUseMap } from "@mantine/hooks";
+import { useMemo } from "react";
 
 /**
  * Hook to manage a set of values.
@@ -34,12 +35,14 @@ export function useMutableMap<K, V>(
   },
 ] {
   const map = mantineUseMap(values as Array<[K, V]>);
-  return [
-    map,
-    {
+
+  const setters = useMemo(() => {
+    return {
       set: map.set,
       delete: map.delete,
       clear: map.clear,
-    },
-  ];
+    };
+  }, [map]);
+
+  return [map, setters];
 }

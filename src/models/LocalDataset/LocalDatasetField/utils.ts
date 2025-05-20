@@ -1,5 +1,6 @@
 import * as arrow from "apache-arrow";
 import { match } from "ts-pattern";
+import { EntityFieldBaseType } from "@/models/EntityConfig/EntityFieldConfig/types";
 import { FieldDataType } from "./types";
 
 /*
@@ -21,6 +22,31 @@ export function getArrowDataType(dataType: FieldDataType): arrow.DataType {
     .with("unknown", () => {
       // treat unknowns as strings
       return new arrow.Utf8();
+    })
+    .exhaustive();
+}
+
+/**
+ * Converts a dataset field data type to its equivalent EntityFieldBaseType.
+ * @param dataType The field data type.
+ * @returns The EntityFieldBaseType.
+ */
+export function getEntityFieldBaseDataType(
+  dataType: FieldDataType,
+): EntityFieldBaseType {
+  return match(dataType)
+    .with("string", () => {
+      return "string" as const;
+    })
+    .with("number", () => {
+      return "number" as const;
+    })
+    .with("date", () => {
+      return "date" as const;
+    })
+    .with("unknown", () => {
+      // treat unknowns as strings
+      return "string" as const;
     })
     .exhaustive();
 }

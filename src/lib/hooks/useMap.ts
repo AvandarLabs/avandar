@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useMutableMap } from "./useMutableMap";
+import { useMemo, useState } from "react";
 
 /**
  * Hook to manage a map of values.
@@ -36,22 +35,27 @@ export function useMap<K, V>(
     return new Map(values);
   });
 
-  return [
-    map,
-    {
+  const setters = useMemo(() => {
+    return {
       set: (key: K, value: V) => {
-        const newMap = new Map(map);
-        newMap.set(key, value);
-        setMap(newMap);
+        setMap((prevMap) => {
+          const newMap = new Map(prevMap);
+          newMap.set(key, value);
+          return newMap;
+        });
       },
       delete: (key: K) => {
-        const newMap = new Map(map);
-        newMap.delete(key);
-        setMap(newMap);
+        setMap((prevMap) => {
+          const newMap = new Map(prevMap);
+          newMap.delete(key);
+          return newMap;
+        });
       },
       clear: () => {
         setMap(new Map<K, V>());
       },
-    },
-  ];
+    };
+  }, []);
+
+  return [map, setters];
 }

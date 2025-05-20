@@ -1,4 +1,5 @@
 import { useSet as mantineUseSet } from "@mantine/hooks";
+import { useMemo } from "react";
 
 /**
  * Hook to manage a set of values.
@@ -32,12 +33,13 @@ export function useMutableSet<T>(values?: T[]): [
   },
 ] {
   const set = mantineUseSet<T>(values);
-  return [
-    set,
-    {
+  const setters = useMemo(() => {
+    return {
       add: set.add,
       delete: set.delete,
       clear: set.clear,
-    },
-  ];
+    };
+  }, [set]);
+
+  return [set, setters];
 }

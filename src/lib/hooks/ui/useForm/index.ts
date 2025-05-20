@@ -6,7 +6,6 @@ import {
 } from "@mantine/form";
 import { Merge, Paths } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
-import { IdentityFnType } from "@/lib/types/utilityTypes";
 import { FormType } from "./types";
 import { useKeysAndPropsCallback } from "./useKeysAndPropsCallback";
 
@@ -66,14 +65,12 @@ export type FormRulesRecord<
  */
 type UseFormInput<
   FormValues extends UnknownObject,
-  TransformValues extends (
-    values: FormValues,
-  ) => unknown = IdentityFnType<FormValues>,
+  TransformValues = FormValues,
   FormPath extends Paths<FormValues> = Paths<FormValues>,
 > = Merge<
-  MantineUseFormInput<FormValues, TransformValues>,
+  MantineUseFormInput<FormValues, (values: FormValues) => TransformValues>,
   {
-    validate:
+    validate?:
       | FormRulesRecord<FormValues, FormValues, FormPath>
       | ((values: FormValues) => FormErrors);
   }
@@ -93,15 +90,19 @@ type UseFormInput<
  */
 export function useForm<
   FormValues extends UnknownObject,
-  TransformValues extends (
-    values: FormValues,
-  ) => unknown = IdentityFnType<FormValues>,
+  TransformValues = FormValues,
   FormPath extends Paths<FormValues> = Paths<FormValues>,
 >(
   formOptions: UseFormInput<FormValues, TransformValues, FormPath>,
 ): FormType<FormValues, TransformValues, FormPath> {
-  const form = mantineUseForm<FormValues, TransformValues>(
-    formOptions as MantineUseFormInput<FormValues, TransformValues>,
+  const form = mantineUseForm<
+    FormValues,
+    (values: FormValues) => TransformValues
+  >(
+    formOptions as MantineUseFormInput<
+      FormValues,
+      (values: FormValues) => TransformValues
+    >,
   );
 
   const keysAndProps = useKeysAndPropsCallback(form);

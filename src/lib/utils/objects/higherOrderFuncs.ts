@@ -1,6 +1,5 @@
 import { Paths, UnknownArray } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
-import { getValueAt, PathValue } from "./getValueAt";
 import { omit, pick } from "./misc";
 import {
   ExcludeNullsExceptFrom,
@@ -8,6 +7,7 @@ import {
   ExcludeNullsFrom,
   excludeNullsFrom,
 } from "./transformations";
+import { PathValue, xgetValue } from "./xgetValue";
 
 /**
  * Returns a getter function that returns the value of a property of an object.
@@ -37,7 +37,7 @@ export function xgetProp<
   P extends Paths<T>,
 >(path: P): (obj: T) => PathValue<T, P> {
   return (obj: T) => {
-    return getValueAt(obj, path);
+    return xgetValue(obj, path);
   };
 }
 
@@ -75,7 +75,7 @@ export function xpropEquals<T extends UnknownObject, P extends Paths<T>>(
   value: PathValue<T, P>,
 ): (obj: T) => boolean {
   return (obj: T) => {
-    return getValueAt(obj, path) === value;
+    return xgetValue(obj, path) === value;
   };
 }
 
@@ -114,7 +114,7 @@ export function xpropDoesntEqual<T extends UnknownObject, P extends Paths<T>>(
   value: PathValue<T, P>,
 ): (obj: T) => boolean {
   return (obj: T) => {
-    return getValueAt(obj, path) !== value;
+    return xgetValue(obj, path) !== value;
   };
 }
 

@@ -1,16 +1,14 @@
-import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import {
   SpotlightActionData,
   SpotlightActionGroupData,
 } from "@mantine/spotlight";
-import { IconClipboard, IconTrash } from "@tabler/icons-react";
+import { IconTrash } from "@tabler/icons-react";
 import { useRouter } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { APP_CONFIG } from "@/config/AppConfig";
 import { objectEntries } from "@/lib/utils/objects/misc";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
-import { SpotlightTodoContainer } from "./SpotlightTodoContainer";
 
 export function useSpotlightActions(): Array<
   SpotlightActionData | SpotlightActionGroupData
@@ -52,18 +50,6 @@ export function useSpotlightActions(): Array<
               },
             },
           ],
-        },
-        {
-          id: "dev-todos",
-          label: "Dev Todos",
-          description: "Show all to-dos for all apps",
-          leftSection: <IconClipboard size={24} stroke={1.5} />,
-          onClick: () => {
-            modals.open({
-              title: "Todo list",
-              children: <SpotlightTodoContainer />,
-            });
-          },
         },
       ];
 
