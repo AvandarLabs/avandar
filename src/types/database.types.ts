@@ -38,7 +38,6 @@ export type Database = {
         Row: {
           allow_manual_creation: boolean
           created_at: string
-          dataset_id: string | null
           description: string | null
           id: string
           name: string
@@ -48,7 +47,6 @@ export type Database = {
         Insert: {
           allow_manual_creation: boolean
           created_at?: string
-          dataset_id?: string | null
           description?: string | null
           id?: string
           name: string
@@ -58,7 +56,6 @@ export type Database = {
         Update: {
           allow_manual_creation?: boolean
           created_at?: string
-          dataset_id?: string | null
           description?: string | null
           id?: string
           name?: string

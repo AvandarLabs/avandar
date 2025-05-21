@@ -96,6 +96,18 @@ function _getEntityNameField(
   return field;
 }
 
+function _getDatasetForField(
+  field: BuildableFieldConfig | undefined,
+  context: PipelineContext,
+): ParsedLocalDataset {
+  if (field?.valueExtractor.type !== "dataset_column_value") {
+    throw new Error(
+      "Cannot extract a primary key if the ID field is not configured with a dataset column value extractor",
+    );
+  }
+  return context.getDataset(field.valueExtractor.datasetId);
+}
+
 function _getDatasetColumnFromFieldConfig(
   dataset: ParsedLocalDataset,
   entityFieldConfig: BuildableFieldConfig | undefined,
@@ -122,11 +134,12 @@ function _getDatasetColumnFromFieldConfig(
 }
 
 function _bucketDatasetRowsByExternalId(
-  dataset: ParsedLocalDataset,
   entityConfig: BuildableEntityConfig,
+  context: PipelineContext,
 ): Map<string | null | undefined, CSVRow[]> {
   // Get the entity's id field
   const entityIdField = _getEntityIdField(entityConfig);
+  const dataset = _getDatasetForField(entityIdField, context);
   const datasetExternalIdColumn = _getDatasetColumnFromFieldConfig(
     dataset,
     entityIdField,
@@ -467,19 +480,19 @@ export function _runCreateEntitiesStep(
   context: PipelineContext,
 ): Promise<PipelineContext> {
   const { entityConfig } = stepConfig;
-  if (!entityConfig.datasetId) {
+  if (!entityConfig.datasets) {
     throw new Error(
-      "Cannot create entities if no source dataset is configured for this  entity",
+      "Cannot create entities if no source datasets are configured for this entity",
     );
   }
 
   // Now that we know the id field, let's pull the data and get all unique ids
   // The data should have already been loaded, so we'll pull it from the context
-  const dataset = context.getDataset(entityConfig.datasetId);
+  // const dataset = context.getDataset(entityConfig.datasetId);
 
   // TODO(jpsyx): this could just be a set. we do not need to create buckets.
   // now iterate over entire dataset and extract unique id values
-  const idsToRows = _bucketDatasetRowsByExternalId(dataset, entityConfig);
+  const idsToRows = _bucketDatasetRowsByExternalId(entityConfig, context);
 
   const errors: string[] = [];
 
@@ -508,7 +521,7 @@ export function _runCreateEntitiesStep(
     errors.push("No name field configured for this entity");
   }
   const nameFieldColumn = _getDatasetColumnFromFieldConfig(
-    dataset,
+    _getDatasetForField(nameFieldConfig, context),
     nameFieldConfig,
   );
 

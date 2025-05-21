@@ -15,19 +15,10 @@ type Props = {
   entityConfig: EntityConfig;
 };
 
-const EXCLUDED_ENTITY_CONFIG_KEYS = ["id", "ownerId", "datasetId"] as const;
+const EXCLUDED_ENTITY_CONFIG_KEYS = ["id", "ownerId", "datasets"] as const;
 const ENTITY_CONFIG_RENDER_OPTIONS: ChildRenderOptionsMap<
   EntityConfig<"Full">
 > = {
-  dataset: {
-    childRenderOptions: {
-      fields: {
-        renderAsTable: true,
-        excludeKeys: ["id"],
-      },
-    },
-    excludeKeys: ["id", "data"],
-  },
   fields: {
     titleKey: "name",
     excludeKeys: ["id", "entityConfigId"],
@@ -60,7 +51,7 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
           <Button
             onClick={async () => {
               // generate all entities in-browser and in-memory for now
-              if (hasDefinedProps(fullEntityConfig, "dataset", "fields")) {
+              if (hasDefinedProps(fullEntityConfig, "datasets", "fields")) {
                 const newFields = fullEntityConfig.fields.filter((field) => {
                   return hasDefinedProps(field, "valueExtractor");
                 });

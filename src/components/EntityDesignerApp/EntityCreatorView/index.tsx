@@ -64,7 +64,6 @@ export function EntityCreatorView(): JSX.Element {
   const [keys, inputProps] = entityConfigForm.keysAndProps([
     "name",
     "description",
-    "datasetId",
     "allowManualCreation",
     "titleFieldId",
     "idFieldId",
@@ -156,7 +155,6 @@ export function EntityCreatorView(): JSX.Element {
               if (!displayManualEntryFields) {
                 entityConfigForm.setFieldValue("manualEntryFields", []);
               }
-
               if (
                 displayManualEntryFields &&
                 entityConfigForm.getValues().manualEntryFields.length === 0

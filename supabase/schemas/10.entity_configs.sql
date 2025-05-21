@@ -15,9 +15,6 @@ create table public.entity_configs (
     -- Optional description of the entity config
     description text,
 
-    -- ID of the dataset this entity is created from.
-    dataset_id uuid,
-
     -- Timestamp when the entity config was created.
     created_at timestamptz not null default now(),
 
@@ -37,8 +34,6 @@ comment on column public.entity_configs.name is
     'Name of the entity configuration.';
 comment on column public.entity_configs.description is
     'Optional description of the entity configuration.';
-comment on column public.entity_configs.dataset_id is
-    'ID of the dataset this entity is created from.';
 comment on column public.entity_configs.created_at is
     'Timestamp when the entity configuration was created.';
 comment on column public.entity_configs.updated_at is

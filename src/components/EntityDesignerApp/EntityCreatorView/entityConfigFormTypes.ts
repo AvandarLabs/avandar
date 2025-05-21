@@ -67,7 +67,6 @@ export function getDefaultEntityConfigFormValues(): EntityConfigFormValues {
     id: entityConfigId,
     name: "",
     description: "",
-    datasetId: undefined,
     allowManualCreation: false,
     datasetColumnFields: [],
     manualEntryFields: [],

@@ -1,7 +1,7 @@
 import { Paths, SetOptional, SetRequiredDeep, Simplify } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { UserId } from "@/models/User";
-import { LocalDataset, LocalDatasetId } from "../LocalDataset/types";
+import { LocalDataset } from "../LocalDataset/types";
 import { EntityFieldConfig } from "./EntityFieldConfig/types";
 import { EntityFieldValueExtractor } from "./ValueExtractor/types";
 import type { UUID } from "@/lib/types/common";
@@ -30,22 +30,19 @@ type EntityConfigRead = {
   /** Timestamp when this entity config was last updated */
   updatedAt: string;
 
-  /** Dataset ID this entity config is created from */
-  datasetId: LocalDatasetId | undefined;
-
   /** Whether users can manually create entities for this config */
   allowManualCreation: boolean;
 };
 
 type EntityConfigInsert = SetOptional<
   EntityConfigRead,
-  "id" | "ownerId" | "description" | "createdAt" | "updatedAt" | "datasetId"
+  "id" | "ownerId" | "description" | "createdAt" | "updatedAt"
 >;
 
 type EntityConfigUpdate = Partial<EntityConfigInsert>;
 
 type EntityConfigFull = EntityConfig & {
-  dataset?: LocalDataset;
+  datasets?: LocalDataset[];
   fields?: ReadonlyArray<
     EntityFieldConfig & {
       valueExtractor?: EntityFieldValueExtractor;

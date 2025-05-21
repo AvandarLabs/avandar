@@ -68,7 +68,7 @@ the other Supabase container and run `npx supabase stop`)
 1. Create a SQL DB schema in `supabase/schemas`
 2. Generate a new migration with `yarn db:new-migration your_migration_name`
 3. Review that the generated migration makes sense and does what you need to.
-4. Apply the new migration with `yarn db:apply-migration`
+4. Apply the new migration with `yarn db:apply-migrations`
 
 ## 2. Set up the TypeScript models
 

@@ -94,7 +94,7 @@ export type Pipeline = {
 };
 
 export type BuildableEntityConfig = EntityConfigWith<
-  "dataset" | "fields" | `fields.${number}.valueExtractor`
+  "datasets" | "fields" | `fields.${number}.valueExtractor`
 >;
 
 export type BuildableFieldConfig = BuildableEntityConfig["fields"][number];

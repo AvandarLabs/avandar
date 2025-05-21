@@ -19,7 +19,6 @@ const DBReadSchema = z.object({
   name: z.string(),
   owner_id: z.string().uuid(),
   updated_at: z.string().datetime({ offset: true }),
-  dataset_id: z.string().uuid().nullable(),
   allow_manual_creation: z.boolean(),
 });
 
@@ -35,7 +34,6 @@ export const EntityConfigParsers =
           ...obj,
           id: uuid(obj.id),
           ownerId: uuid(obj.ownerId),
-          datasetId: obj.datasetId ? uuid(obj.datasetId) : undefined,
         };
       },
     ),
@@ -43,13 +41,13 @@ export const EntityConfigParsers =
     fromModelInsertToDBInsert: pipe(
       snakeCaseKeysDeep,
       undefinedsToNullsDeep,
-      excludeNullsExceptFromProps("dataset_id", "description"),
+      excludeNullsExceptFromProps("description"),
     ),
 
     fromModelUpdateToDBUpdate: pipe(
       snakeCaseKeysDeep,
       undefinedsToNullsDeep,
-      excludeNullsExceptFromProps("dataset_id", "description"),
+      excludeNullsExceptFromProps("description"),
     ),
   });
 
