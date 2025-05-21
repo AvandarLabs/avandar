@@ -32,7 +32,7 @@ type ManualEntryExtractorInsert = SetOptional<
 
 type ManualEntryExtractorUpdate = Partial<ManualEntryExtractorRead>;
 
-export type ManualEntryExtractorCRUDTypes = SupabaseModelCRUDTypes<
+export type ManualEntryExtractorModel = SupabaseModelCRUDTypes<
   {
     tableName: "value_extractor__manual_entry";
     modelName: "ManualEntryExtractor";
@@ -52,5 +52,5 @@ export type ManualEntryExtractorCRUDTypes = SupabaseModelCRUDTypes<
  * Helper type for a specific variant of the ManualEntryExtractor model
  */
 export type ManualEntryExtractor<
-  K extends keyof ManualEntryExtractorCRUDTypes = "Read",
-> = Simplify<ManualEntryExtractorCRUDTypes[K]>;
+  K extends keyof ManualEntryExtractorModel = "Read",
+> = Simplify<ManualEntryExtractorModel[K]>;

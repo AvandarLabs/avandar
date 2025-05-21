@@ -3,7 +3,7 @@ import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { uuidType } from "@/lib/utils/zodHelpers";
 import { EntityConfigId } from "../EntityConfig/types";
 import { UserId } from "../User";
-import { EntityCRUDTypes, EntityId } from "./types";
+import { EntityId, EntityModel } from "./types";
 
 const DBReadSchema = z.object({
   id: uuidType<EntityId>(),
@@ -15,7 +15,7 @@ const DBReadSchema = z.object({
   updatedAt: z.coerce.date(),
 });
 
-export const EntityParsers = makeParserRegistry<EntityCRUDTypes>().build({
+export const EntityParsers = makeParserRegistry<EntityModel>().build({
   modelName: "Entity",
   DBReadSchema,
   fromDBReadToModelRead: (dbObj) => {

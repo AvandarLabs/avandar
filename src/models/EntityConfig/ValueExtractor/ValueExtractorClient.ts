@@ -8,7 +8,7 @@ import { ManualEntryExtractorClient } from "./ManualEntryExtractor/ManualEntryEx
 import {
   EntityFieldValueExtractor,
   EntityFieldValueExtractorRegistry,
-  EntityFieldValueExtractorType,
+  ValueExtractorType,
 } from "./types";
 
 export const ValueExtractorClient = {
@@ -19,7 +19,7 @@ export const ValueExtractorClient = {
     const extractorsByType = makeBucketsFromList(params.data, {
       keyFn: getProp("type"),
     }) as {
-      [K in EntityFieldValueExtractorType]: Array<
+      [K in ValueExtractorType]: Array<
         EntityFieldValueExtractorRegistry<"Insert">[K]
       >;
     };

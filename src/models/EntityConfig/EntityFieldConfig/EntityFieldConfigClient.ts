@@ -9,7 +9,7 @@ import { DatasetColumnValueExtractorClient } from "../ValueExtractor/DatasetColu
 import { ManualEntryExtractorClient } from "../ValueExtractor/ManualEntryExtractor/ManualEntryExtractorClient";
 import {
   EntityFieldValueExtractor,
-  EntityFieldValueExtractorType,
+  ValueExtractorType,
 } from "../ValueExtractor/types";
 import { EntityFieldConfigParsers } from "./parsers";
 import { EntityFieldConfig } from "./types";
@@ -54,7 +54,7 @@ export const EntityFieldConfigClient = createSupabaseCRUDClient({
         const valueExtractors = await promiseFlatMap(
           objectKeys(fieldsByValueExtractorType),
           async (
-            valueExtractorType: EntityFieldValueExtractorType,
+            valueExtractorType: ValueExtractorType,
           ): Promise<EntityFieldValueExtractor[]> => {
             const extractors = await match(valueExtractorType)
               .with("aggregation", () => {

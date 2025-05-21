@@ -1,31 +1,50 @@
 import { Enums } from "@/types/database.types";
-import { AggregationExtractorCRUDTypes } from "./AggregationExtractor/types";
-import { DatasetColumnValueExtractorCRUDTypes } from "./DatasetColumnValueExtractor/types";
-import { ManualEntryExtractorCRUDTypes } from "./ManualEntryExtractor/types";
+import { AggregationExtractorModel } from "./AggregationExtractor/types";
+import { DatasetColumnValueExtractorModel } from "./DatasetColumnValueExtractor/types";
+import { ManualEntryExtractorModel } from "./ManualEntryExtractor/types";
 
-export type EntityFieldValueExtractorType =
+export type ValueExtractorType =
   Enums<"entity_field_config__value_extractor_type">;
 
 // Value extractor types for each field class
 export type DimensionExtractorType = "dataset_column_value" | "manual_entry";
 export type MetricExtractorType = "aggregation";
 
-export type EntityFieldValueExtractorCRUDTypesRegistry = {
-  aggregation: AggregationExtractorCRUDTypes;
-  manual_entry: ManualEntryExtractorCRUDTypes;
-  dataset_column_value: DatasetColumnValueExtractorCRUDTypes;
+/**
+ * Value extractor registry that maps extractor types to their CRUD model
+ * definitions.
+ */
+export type EntityFieldValueExtractorModelRegistry = {
+  aggregation: AggregationExtractorModel;
+  manual_entry: ManualEntryExtractorModel;
+  dataset_column_value: DatasetColumnValueExtractorModel;
 };
 
+/**
+ * Value extractor registry to access a value extractor model with a CRUD
+ * method passed as a generic.
+ */
 export type EntityFieldValueExtractorRegistry<
   T extends "Read" | "Insert" | "Update" = "Read",
 > = {
-  // eslint-disable-next-line max-len
-  [K in EntityFieldValueExtractorType]: EntityFieldValueExtractorCRUDTypesRegistry[K][T];
+  [K in ValueExtractorType]: EntityFieldValueExtractorModelRegistry[K][T];
 };
 
+/**
+ * Get a value extractor model with a CRUD method and ValueExtractorType
+ * passed as generics. This is a helpful type to also get the union of all
+ * value extractor models given a CRUD method.
+ *
+ * For example:
+ * ```
+ * // Union of all value extractor "Read" models
+ * EntityFieldValueExtractor<"Read">
+ * ```
+ */
 export type EntityFieldValueExtractor<
   T extends "Read" | "Insert" | "Update" = "Read",
-> = EntityFieldValueExtractorRegistry<T>[EntityFieldValueExtractorType];
+  ExtractorType extends ValueExtractorType = ValueExtractorType,
+> = EntityFieldValueExtractorRegistry<T>[ExtractorType];
 
 export type EntityFieldValueExtractorId =
-  EntityFieldValueExtractorRegistry<"Read">[EntityFieldValueExtractorType]["id"];
+  EntityFieldValueExtractorRegistry<"Read">[ValueExtractorType]["id"];

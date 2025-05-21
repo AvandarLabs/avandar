@@ -53,7 +53,7 @@ type EntityConfigFull = EntityConfig & {
 /**
  * CRUD type definitions for the EntityConfig model.
  */
-export type EntityConfigCRUDTypes = SupabaseModelCRUDTypes<
+export type EntityConfigModel = SupabaseModelCRUDTypes<
   {
     tableName: "entity_configs";
     modelName: "EntityConfig";
@@ -72,8 +72,8 @@ export type EntityConfigCRUDTypes = SupabaseModelCRUDTypes<
   }
 >;
 
-export type EntityConfig<K extends keyof EntityConfigCRUDTypes = "Read"> =
-  EntityConfigCRUDTypes[K];
+export type EntityConfig<K extends keyof EntityConfigModel = "Read"> =
+  EntityConfigModel[K];
 
 export type EntityConfigWith<Keys extends Paths<EntityConfig<"Full">>> =
   Simplify<SetRequiredDeep<EntityConfig<"Full">, Keys>>;

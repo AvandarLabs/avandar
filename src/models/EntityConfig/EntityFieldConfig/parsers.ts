@@ -16,8 +16,8 @@ import { EntityConfigId } from "../types";
 import {
   DimensionRead,
   EntityFieldConfig,
-  EntityFieldConfigCRUDTypes,
   EntityFieldConfigId,
+  EntityFieldConfigModel,
   MetricRead,
 } from "./types";
 
@@ -107,7 +107,7 @@ function fromDBReadToModelRead(
 }
 
 export const EntityFieldConfigParsers =
-  makeParserRegistry<EntityFieldConfigCRUDTypes>().build({
+  makeParserRegistry<EntityFieldConfigModel>().build({
     modelName: "EntityFieldConfig",
     DBReadSchema,
     fromDBReadToModelRead,
@@ -145,7 +145,7 @@ export const EntityFieldConfigParsers =
  * Do not remove these tests! These check that your Zod parsers are
  * consistent with your defined model and DB types.
  */
-type CRUDTypes = EntityFieldConfigCRUDTypes;
+type CRUDTypes = EntityFieldConfigModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

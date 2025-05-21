@@ -14,7 +14,7 @@ import { EntityConfigId } from "../EntityConfig/types";
 import { LocalDatasetClient } from "../LocalDataset/LocalDatasetClient";
 import { ParsedLocalDataset } from "../LocalDataset/types";
 import { EntityParsers } from "./parsers";
-import { Entity, EntityCRUDTypes, EntityId } from "./types";
+import { Entity, EntityId, EntityModel } from "./types";
 
 const EntityFieldValueNativeType = z.union([
   z.string(),
@@ -49,7 +49,7 @@ type AdditionalEntityQueries = {
 };
 
 type EntityClient = ModelCRUDClient<
-  EntityCRUDTypes,
+  EntityModel,
   AdditionalEntityQueries,
   never
 >;

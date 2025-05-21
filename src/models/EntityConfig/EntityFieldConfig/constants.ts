@@ -1,4 +1,4 @@
-import { EntityFieldValueExtractorType } from "../ValueExtractor/types";
+import { ValueExtractorType } from "../ValueExtractor/types";
 
 export const EntityFieldValueExtractorTypes = {
   manual_entry: {
@@ -14,7 +14,7 @@ export const EntityFieldValueExtractorTypes = {
     displayName: "Aggregation",
   },
 } as const satisfies {
-  [T in EntityFieldValueExtractorType]: {
+  [T in ValueExtractorType]: {
     type: T;
     displayName: string;
   };

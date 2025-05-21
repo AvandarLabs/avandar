@@ -20,7 +20,7 @@ type DBRead = {
 
 type EntityRead = SetFieldType<DBRead, "assignedTo", UserId | undefined>;
 
-export type EntityCRUDTypes = DexieModelCRUDTypes<
+export type EntityModel = DexieModelCRUDTypes<
   {
     modelName: "Entity";
     primaryKey: "id";
@@ -42,5 +42,4 @@ export type EntityCRUDTypes = DexieModelCRUDTypes<
   }
 >;
 
-export type Entity<K extends keyof EntityCRUDTypes = "Read"> =
-  EntityCRUDTypes[K];
+export type Entity<K extends keyof EntityModel = "Read"> = EntityModel[K];

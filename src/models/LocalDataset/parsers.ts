@@ -4,7 +4,7 @@ import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { excludeUndefinedDeep } from "@/lib/utils/objects/transformations";
 import { mimeType, uuidType } from "@/lib/utils/zodHelpers";
 import { LocalDatasetFieldSchema } from "./LocalDatasetField/parsers";
-import { LocalDataset, LocalDatasetCRUDTypes, LocalDatasetId } from "./types";
+import { LocalDataset, LocalDatasetId, LocalDatasetModel } from "./types";
 
 /**
  * Zod schema for the local dataset type.
@@ -37,7 +37,7 @@ export const ParsedLocalDatasetSchema = DBReadSchema.extend({
 });
 
 export const LocalDatasetParsers =
-  makeParserRegistry<LocalDatasetCRUDTypes>().build({
+  makeParserRegistry<LocalDatasetModel>().build({
     modelName: "LocalDataset",
     DBReadSchema,
 
@@ -68,7 +68,7 @@ export const LocalDatasetParsers =
  * Do not remove these tests! These check that your Zod parsers are
  * consistent with your defined model and DB types.
  */
-type CRUDTypes = LocalDatasetCRUDTypes;
+type CRUDTypes = LocalDatasetModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

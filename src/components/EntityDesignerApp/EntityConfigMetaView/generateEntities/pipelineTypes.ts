@@ -4,7 +4,7 @@ import { EntityConfigWith } from "@/models/EntityConfig/types";
 import {
   EntityFieldValueExtractor,
   EntityFieldValueExtractorId,
-  EntityFieldValueExtractorType,
+  ValueExtractorType,
 } from "@/models/EntityConfig/ValueExtractor/types";
 import { FieldDataType } from "@/models/LocalDataset/LocalDatasetField/types";
 import { LocalDatasetId } from "@/models/LocalDataset/types";
@@ -26,7 +26,7 @@ export type PullDataStepConfig = BaseModel<"DataPullStepConfig"> & {
 
 export type CreateFieldStepConfig = BaseModel<"CreateFieldStepConfig"> & {
   entityFieldConfigId: EntityFieldConfigId;
-  valueExtractorType: EntityFieldValueExtractorType;
+  valueExtractorType: ValueExtractorType;
   valueExtractorId: EntityFieldValueExtractorId;
 
   // TODO(jpsyx): value extractors should also have a reference to the entity

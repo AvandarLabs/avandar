@@ -46,7 +46,7 @@ type DatasetColumnValueExtractorUpdate =
 /**
  * CRUD type definitions for the DatasetColumnValueExtractor model.
  */
-export type DatasetColumnValueExtractorCRUDTypes = SupabaseModelCRUDTypes<
+export type DatasetColumnValueExtractorModel = SupabaseModelCRUDTypes<
   {
     tableName: "value_extractor__dataset_column_value";
     modelName: "DatasetColumnValueExtractor";
@@ -63,5 +63,5 @@ export type DatasetColumnValueExtractorCRUDTypes = SupabaseModelCRUDTypes<
 >;
 
 export type DatasetColumnValueExtractor<
-  K extends keyof DatasetColumnValueExtractorCRUDTypes = "Read",
-> = Simplify<DatasetColumnValueExtractorCRUDTypes[K]>;
+  K extends keyof DatasetColumnValueExtractorModel = "Read",
+> = Simplify<DatasetColumnValueExtractorModel[K]>;

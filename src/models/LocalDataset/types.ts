@@ -48,7 +48,7 @@ type LocalDatasetRead = Merge<
 
 type LocalDatasetUpdate = Partial<LocalDatasetRead>;
 
-export type LocalDatasetCRUDTypes = DexieModelCRUDTypes<{
+export type LocalDatasetModel = DexieModelCRUDTypes<{
   modelName: "LocalDataset";
   primaryKey: "id";
   primaryKeyType: LocalDatasetId;
@@ -71,8 +71,9 @@ export type FileMetadata = {
   sizeInBytes: number;
 };
 
-export type LocalDataset<K extends keyof LocalDatasetCRUDTypes = "Read"> =
-  Simplify<LocalDatasetCRUDTypes[K]>;
+export type LocalDataset<K extends keyof LocalDatasetModel = "Read"> = Simplify<
+  LocalDatasetModel[K]
+>;
 
 export type ParsedLocalDataset = SetFieldType<
   LocalDataset<"Read">,

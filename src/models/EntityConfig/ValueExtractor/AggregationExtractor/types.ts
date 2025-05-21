@@ -47,7 +47,7 @@ type AggregationExtractorInsert = SetOptional<
 
 type AggregationExtractorUpdate = Partial<AggregationExtractorRead>;
 
-export type AggregationExtractorCRUDTypes = SupabaseModelCRUDTypes<
+export type AggregationExtractorModel = SupabaseModelCRUDTypes<
   {
     tableName: "value_extractor__aggregation";
     modelName: "AggregationExtractor";
@@ -64,5 +64,5 @@ export type AggregationExtractorCRUDTypes = SupabaseModelCRUDTypes<
 >;
 
 export type AggregationExtractor<
-  K extends keyof AggregationExtractorCRUDTypes = "Read",
-> = Simplify<AggregationExtractorCRUDTypes[K]>;
+  K extends keyof AggregationExtractorModel = "Read",
+> = Simplify<AggregationExtractorModel[K]>;

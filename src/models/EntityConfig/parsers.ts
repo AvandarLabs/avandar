@@ -10,7 +10,7 @@ import {
 } from "@/lib/utils/objects/transformations";
 import { pipe } from "@/lib/utils/pipe";
 import { uuid } from "@/lib/utils/uuid";
-import { EntityConfig, EntityConfigCRUDTypes } from "./types";
+import { EntityConfig, EntityConfigModel } from "./types";
 
 const DBReadSchema = z.object({
   created_at: z.string().datetime({ offset: true }),
@@ -23,7 +23,7 @@ const DBReadSchema = z.object({
 });
 
 export const EntityConfigParsers =
-  makeParserRegistry<EntityConfigCRUDTypes>().build({
+  makeParserRegistry<EntityConfigModel>().build({
     modelName: "EntityConfig",
     DBReadSchema,
     fromDBReadToModelRead: pipe(
@@ -54,7 +54,7 @@ export const EntityConfigParsers =
 /**
  * Do not remove these tests!
  */
-type CRUDTypes = EntityConfigCRUDTypes;
+type CRUDTypes = EntityConfigModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

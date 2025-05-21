@@ -84,7 +84,7 @@ type EntityFieldConfigUpdate = Merge<
   }
 >;
 
-export type EntityFieldConfigCRUDTypes = SupabaseModelCRUDTypes<
+export type EntityFieldConfigModel = SupabaseModelCRUDTypes<
   {
     tableName: "entity_field_configs";
     modelName: "EntityFieldConfig";
@@ -100,6 +100,5 @@ export type EntityFieldConfigCRUDTypes = SupabaseModelCRUDTypes<
   }
 >;
 
-export type EntityFieldConfig<
-  K extends keyof EntityFieldConfigCRUDTypes = "Read",
-> = Simplify<EntityFieldConfigCRUDTypes[K]>;
+export type EntityFieldConfig<K extends keyof EntityFieldConfigModel = "Read"> =
+  Simplify<EntityFieldConfigModel[K]>;

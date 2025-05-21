@@ -10,7 +10,7 @@ import {
 } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
 import { jsonType } from "@/lib/utils/zodHelpers";
-import { AggregationExtractor, AggregationExtractorCRUDTypes } from "./types";
+import { AggregationExtractor, AggregationExtractorModel } from "./types";
 
 const DBReadSchema = z.object({
   id: z.string().uuid(),
@@ -24,7 +24,7 @@ const DBReadSchema = z.object({
 });
 
 export const AggregationExtractorParsers =
-  makeParserRegistry<AggregationExtractorCRUDTypes>().build({
+  makeParserRegistry<AggregationExtractorModel>().build({
     modelName: "AggregationExtractor",
     DBReadSchema,
     fromDBReadToModelRead: (
@@ -66,7 +66,7 @@ export const AggregationExtractorParsers =
  * Do not remove these tests! These check that your Zod parsers are
  * consistent with your defined model and DB types.
  */
-type CRUDTypes = AggregationExtractorCRUDTypes;
+type CRUDTypes = AggregationExtractorModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

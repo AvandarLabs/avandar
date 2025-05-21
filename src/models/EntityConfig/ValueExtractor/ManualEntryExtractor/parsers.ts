@@ -10,7 +10,7 @@ import {
 } from "@/lib/utils/objects/transformations";
 import { pipe } from "@/lib/utils/pipe";
 import { uuid } from "@/lib/utils/uuid";
-import { ManualEntryExtractor, ManualEntryExtractorCRUDTypes } from "./types";
+import { ManualEntryExtractor, ManualEntryExtractorModel } from "./types";
 
 const DBReadSchema = z.object({
   id: z.string().uuid(),
@@ -20,7 +20,7 @@ const DBReadSchema = z.object({
 });
 
 export const ManualEntryExtractorParsers =
-  makeParserRegistry<ManualEntryExtractorCRUDTypes>().build({
+  makeParserRegistry<ManualEntryExtractorModel>().build({
     modelName: "ManualEntryExtractor",
     DBReadSchema,
 
@@ -53,7 +53,7 @@ export const ManualEntryExtractorParsers =
  * Do not remove these tests! These check that your Zod parsers are
  * consistent with your defined model and DB types.
  */
-type CRUDTypes = ManualEntryExtractorCRUDTypes;
+type CRUDTypes = ManualEntryExtractorModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

@@ -12,7 +12,7 @@ import { pipe } from "@/lib/utils/pipe";
 import { uuid } from "@/lib/utils/uuid";
 import {
   DatasetColumnValueExtractor,
-  DatasetColumnValueExtractorCRUDTypes,
+  DatasetColumnValueExtractorModel,
 } from "./types";
 
 const DBReadSchema = z.object({
@@ -26,7 +26,7 @@ const DBReadSchema = z.object({
 });
 
 export const DatasetColumnValueExtractorParsers =
-  makeParserRegistry<DatasetColumnValueExtractorCRUDTypes>().build({
+  makeParserRegistry<DatasetColumnValueExtractorModel>().build({
     modelName: "DatasetColumnValueExtractor",
     DBReadSchema,
 
@@ -61,7 +61,7 @@ export const DatasetColumnValueExtractorParsers =
  * Do not remove these tests! These check that your Zod parsers are
  * consistent with your defined model and DB types.
  */
-type CRUDTypes = DatasetColumnValueExtractorCRUDTypes;
+type CRUDTypes = DatasetColumnValueExtractorModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
