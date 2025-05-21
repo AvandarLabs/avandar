@@ -1,9 +1,10 @@
 import { SetFieldType } from "type-fest";
-import { BuildableEntityConfig } from "@/components/EntityDesignerApp/EntityConfigMetaView/generateEntities/pipelineTypes";
 import { EntityComment } from "@/components/EntityDesignerApp/EntityConfigMetaView/generateEntities/runPipeline";
 import { UUID } from "@/lib/types/common";
-import { EntityConfigId } from "../EntityConfig/types";
+import { EntityFieldConfig } from "../EntityConfig/EntityFieldConfig/types";
+import { EntityConfig, EntityConfigId } from "../EntityConfig/types";
 import { UserId } from "../User";
+import { EntityFieldValueRead } from "./EntityClient";
 import type { DexieModelCRUDTypes } from "@/lib/models/DexieModelCRUDTypes";
 
 export type EntityId = UUID<"Entity">;
@@ -36,10 +37,16 @@ export type EntityModel = DexieModelCRUDTypes<
   },
   {
     relationships: {
-      entityConfig: BuildableEntityConfig;
+      entityConfig: EntityConfig;
+      fieldConfigs: EntityFieldConfig[];
+      fieldValues: Array<
+        EntityFieldValueRead & { fieldConfig: EntityFieldConfig }
+      >;
       comments: EntityComment[];
     };
   }
 >;
 
 export type Entity<K extends keyof EntityModel = "Read"> = EntityModel[K];
+export type EntityWith<R extends keyof EntityModel["relationships"]> =
+  EntityModel["Read"] & { [Rel in R]: EntityModel["relationships"][Rel] };

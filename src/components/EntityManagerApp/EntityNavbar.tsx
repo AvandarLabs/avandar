@@ -39,7 +39,7 @@ export function EntityNavbar({
     useInfiniteQuery({
       queryKey: entityClient.QueryKeys.getAll(),
       queryFn: (ctx) => {
-        return entityClient.withLogger().getPage({
+        return entityClient.getPage({
           pageSize: 20,
           pageNum: ctx.pageParam,
         });

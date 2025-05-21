@@ -15,6 +15,7 @@ import {
   EntityFieldConfigId,
 } from "@/models/EntityConfig/EntityFieldConfig/types";
 import { EntityConfig } from "@/models/EntityConfig/types";
+import { ActivityBlock } from "./ActivityBlock";
 
 type HydratedEntity = Entity & {
   idField?: EntityFieldConfig;
@@ -35,6 +36,7 @@ function useHydratedEntity({
   entityConfig: EntityConfig;
   entity: Entity;
 }): [HydratedEntity, boolean] {
+  // TODO(jpsyx): move this to a generalized implementation of useHydration
   const [entityFieldConfigs, isLoadingEntityFieldConfigs] =
     EntityFieldConfigClient.useGetAll({
       where: { entity_config_id: { eq: entityConfig.id } },
@@ -45,6 +47,7 @@ function useHydratedEntity({
     entityId: entity.id,
   });
 
+  // TODO(jpsyx): move this to a module that can also use cacheing.
   const hydratedEntity = useMemo(() => {
     let configInfo = undefined;
     let fieldValuesInfo = undefined;
@@ -114,8 +117,6 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
     entity,
   });
 
-  console.log("hydratedEntity", hydratedEntity);
-
   return (
     <Container pt="lg">
       <Stack>
@@ -127,7 +128,6 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
           </Title>
         </Group>
         <Text>{entityConfig.description}</Text>
-
         <ObjectDescriptionList
           entity={hydratedEntity}
           excludeKeys={[
@@ -148,6 +148,7 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
             },
           }}
         />
+        <ActivityBlock />
       </Stack>
     </Container>
   );
