@@ -164,9 +164,13 @@ export function hasProps<T extends UnknownObject, Key extends keyof T>(
 
 /**
  * Checks if `obj` has the property `prop`.
+ *
  * This is the same as the function `hasProps` but only allows one key. This
  * function exists purely for readability purposes because it was annoying
  * to read a plural `hasProps` when only 1 prop was passed.
+ *
+ * NOTE: this only checks for property existence. The property can exist but
+ * the value can still be undefined.
  *
  * @param obj The object to check.
  * @param prop The property to check.
@@ -183,6 +187,10 @@ export function hasProp<T extends UnknownObject, Key extends keyof T>(
  * Checks if `obj` has all the properties in `properties` and that they are
  * not undefined.
  *
+ * NOTE: this guard only works properly for strictly defined objects and keys
+ * as literals. For objects with indexers or keys as broad strings, you should
+ * do a manual check instead of using this guard.
+ *
  * NOTE: this still allows `null` values. This literally just checks that it's
  * not `undefined`.
  *
@@ -198,6 +206,33 @@ export function hasDefinedProps<T extends object, Key extends keyof T>(
   return properties.every((prop) => {
     return prop in obj && obj[prop] !== undefined;
   });
+}
+
+/**
+ * Checks if `obj` has all the properties in `properties` and that they are
+ * not undefined.
+ *
+ * This is the same as the function `hasDefinedProps` but only allows one key.
+ * This function exists purely for readability purposes because it was annoying
+ * to read a plural `hasDefinedProps` when only 1 prop was passed.
+ *
+ * NOTE: this guard only works properly for strictly defined objects and keys
+ * as literals. For objects with indexers or keys as broad strings, you should
+ * do a manual check instead of using this guard.
+ *
+ * NOTE: this still allows `null` values. This literally just checks that it's
+ * not `undefined`.
+ *
+ * @param obj - The object to check.
+ * @param prop - The property to check.
+ * @returns `true` if `obj` has the property `prop` and that it is not
+ * undefined, `false` otherwise.
+ */
+export function hasDefinedProp<T extends object, Key extends keyof T>(
+  obj: T,
+  prop: Key,
+): obj is SetRequired<T, Key> & SetDefined<T, Key> {
+  return hasDefinedProps(obj, prop);
 }
 
 /**

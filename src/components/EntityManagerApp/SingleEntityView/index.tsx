@@ -129,7 +129,7 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
         </Group>
         <Text>{entityConfig.description}</Text>
         <ObjectDescriptionList
-          entity={hydratedEntity}
+          data={hydratedEntity}
           excludeKeys={[
             "idField",
             "nameField",

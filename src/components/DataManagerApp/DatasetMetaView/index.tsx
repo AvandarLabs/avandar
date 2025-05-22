@@ -1,15 +1,14 @@
-import { Button, Container, Stack, Text, Title } from "@mantine/core";
+import { Button, Container, Loader, Stack, Text, Title } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "@tanstack/react-router";
-import { useEffect } from "react";
 import { APP_CONFIG } from "@/config/AppConfig";
 import { DataGrid } from "@/lib/ui/DataGrid";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
+import { getSummary } from "@/models/LocalDataset/getSummary";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { type LocalDataset } from "@/models/LocalDataset/types";
-import { useCSVParser } from "../hooks/useCSVParser";
 
 type Props = {
   dataset: LocalDataset;
@@ -32,14 +31,13 @@ const DATASET_RENDER_OPTIONS: ChildRenderOptionsMap<LocalDataset> = {
  */
 export function DatasetMetaView({ dataset }: Props): JSX.Element {
   const router = useRouter();
-  const { csv, parseCSVString } = useCSVParser();
   const [deleteLocalDataset, isDeletePending] = LocalDatasetClient.useDelete({
     queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
   });
-
-  useEffect(() => {
-    parseCSVString(dataset.data);
-  }, [dataset.data, parseCSVString]);
+  const [parsedDataset, isLoadingParsedDataset] =
+    LocalDatasetClient.useGetParsedLocalDataset({
+      id: dataset.id,
+    });
 
   return (
     <Container pt="lg">
@@ -48,14 +46,38 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
         <Text>{dataset.description}</Text>
 
         <ObjectDescriptionList
-          entity={dataset}
+          data={dataset}
           excludeKeys={EXCLUDED_DATASET_KEYS}
           childRenderOptions={DATASET_RENDER_OPTIONS}
         />
 
+        <Title order={5}>Summary</Title>
+        {isLoadingParsedDataset ?
+          <Loader />
+        : <Text>
+            {
+              <ObjectDescriptionList
+                data={getSummary(parsedDataset)}
+                childRenderOptions={{
+                  columnSummaries: {
+                    titleKey: "name",
+                  },
+                }}
+              />
+            }
+          </Text>
+        }
+
         <Title order={5}>Data preview</Title>
-        {csv ?
-          <DataGrid fields={csv.meta.fields ?? []} data={csv.data ?? []} />
+        {parsedDataset ?
+          <DataGrid
+            fields={
+              parsedDataset.fields.map((field) => {
+                return field.name;
+              }) ?? []
+            }
+            data={parsedDataset.data ?? []}
+          />
         : null}
 
         <Button

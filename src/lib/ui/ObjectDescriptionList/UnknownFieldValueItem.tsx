@@ -29,5 +29,5 @@ export function UnknownFieldValueItem({
   }
 
   // only possibility now is that the value is an entity object
-  return <ObjectDescriptionList entity={value} {...renderOptions} />;
+  return <ObjectDescriptionList data={value} {...renderOptions} />;
 }

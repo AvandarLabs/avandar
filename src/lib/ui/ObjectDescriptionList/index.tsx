@@ -8,11 +8,11 @@ import { DescribableObject, ObjectRenderOptions } from "./types";
 import { UnknownFieldValueItem } from "./UnknownFieldValueItem";
 
 type Props<T extends DescribableObject> = {
-  entity: T;
+  data: T;
 } & ObjectRenderOptions<NonNullable<T>>;
 
 export function ObjectDescriptionList<T extends DescribableObject>({
-  entity,
+  data,
   excludeKeys = [],
   ...renderOptions
 }: Props<T>): JSX.Element {
@@ -22,7 +22,7 @@ export function ObjectDescriptionList<T extends DescribableObject>({
 
   return (
     <DescriptionList>
-      {objectKeys(entity).map((key) => {
+      {objectKeys(data).map((key) => {
         if (excludeKeySet.has(key)) {
           return null;
         }
@@ -30,7 +30,7 @@ export function ObjectDescriptionList<T extends DescribableObject>({
         return (
           <DescriptionList.Item key={key} label={camelToTitleCase(String(key))}>
             <UnknownFieldValueItem
-              value={entity[key]}
+              value={data[key]}
               {...getObjectFieldRenderOptions(renderOptions, key)}
             />
           </DescriptionList.Item>

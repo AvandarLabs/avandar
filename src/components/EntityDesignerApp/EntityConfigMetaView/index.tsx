@@ -83,7 +83,7 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
         <Text>{entityConfig.description}</Text>
 
         <ObjectDescriptionList
-          entity={fullEntityConfig}
+          data={fullEntityConfig}
           excludeKeys={EXCLUDED_ENTITY_CONFIG_KEYS}
           childRenderOptions={ENTITY_CONFIG_RENDER_OPTIONS}
         />

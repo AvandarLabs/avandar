@@ -89,7 +89,7 @@ export function EntityArrayBlock<T extends DescribableObject>({
         key={entityId}
         label={titleKey ? String(val[titleKey]) : String(idx + 1)}
       >
-        <ObjectDescriptionList entity={val} {...renderOptions} />
+        <ObjectDescriptionList data={val} {...renderOptions} />
       </CollapsibleItem>
     );
   });
