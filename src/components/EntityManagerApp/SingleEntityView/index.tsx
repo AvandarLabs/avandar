@@ -130,6 +130,7 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
         <Text>{entityConfig.description}</Text>
         <ObjectDescriptionList
           data={hydratedEntity}
+          dateFormat="MMMM D, YYYY"
           excludeKeys={[
             "id",
             "externalId",

@@ -1,7 +1,7 @@
 import { StringKeyOf } from "type-fest";
 
-/** A non-recursive field value */
-export type PrimitiveFieldValue =
+/** A non-recursive value */
+export type PrimitiveValue =
   | string
   | number
   | boolean
@@ -10,13 +10,13 @@ export type PrimitiveFieldValue =
   | undefined;
 
 /**
- * All possible values an entity can hold. This includes primitive values,
- * nested objects, and arrays of field values.
+ * All possible values a DescribableObject can hold. This includes primitive
+ * values, nested objects, and arrays of field values.
  */
-export type FieldValue =
-  | PrimitiveFieldValue
+export type DescribableValue =
+  | PrimitiveValue
   | DescribableObject
-  | readonly FieldValue[];
+  | readonly DescribableValue[];
 
 /**
  * The base definition of an entity object. This is a record of string
@@ -24,18 +24,22 @@ export type FieldValue =
  * or arrays of values.
  */
 export type DescribableObject = {
-  [key: string]: FieldValue;
+  [key: string]: DescribableValue;
 };
 
 /**
- * Render options that can be applied to any FieldValue.
+ * Render options for primitive values. These can also be passed to any
+ * recursive DescribableValues to apply to its children.
  */
-export type PrimitiveFieldValueRenderOptions = {
+export type PrimitiveValueRenderOptions = {
   emptyString?: string;
   nullString?: string;
   undefinedString?: string;
   booleanTrue?: string;
   booleanFalse?: string;
+
+  /** If no `dateFormat` is provided we will use `date.toLocaleDateString()` */
+  dateFormat?: string;
 };
 
 /**
@@ -46,17 +50,17 @@ export type ChildRenderOptionsMap<T extends NonNullable<DescribableObject>> = {
   [K in StringKeyOf<T>]?: NonNullable<T[K]> extends DescribableObject ?
     ObjectRenderOptions<NonNullable<T[K]>>
   : NonNullable<T[K]> extends (
-    ReadonlyArray<infer ArrayType extends FieldValue>
+    ReadonlyArray<infer ArrayType extends DescribableValue>
   ) ?
-    FieldValueArrayRenderOptions<ArrayType>
-  : PrimitiveFieldValueRenderOptions;
+    DescribableValueArrayRenderOptions<ArrayType>
+  : PrimitiveValueRenderOptions;
 };
 
 /**
  * Options for how to render an entity object.
  */
 export type ObjectRenderOptions<T extends NonNullable<DescribableObject>> =
-  PrimitiveFieldValueRenderOptions & {
+  PrimitiveValueRenderOptions & {
     excludeKeys?: ReadonlyArray<StringKeyOf<T>>;
     titleKey?: StringKeyOf<T>;
 
@@ -75,7 +79,7 @@ export type ObjectArrayRenderOptions<T extends NonNullable<DescribableObject>> =
 /**
  * Options for how to render an array of values.
  */
-export type FieldValueArrayRenderOptions<T extends FieldValue> = {
+export type DescribableValueArrayRenderOptions<T extends DescribableValue> = {
   emptyArray?: string;
 } & (T extends DescribableObject ? ObjectArrayRenderOptions<T>
-: PrimitiveFieldValueRenderOptions);
+: PrimitiveValueRenderOptions);

@@ -1,15 +1,12 @@
 import { Stack } from "@mantine/core";
-import { PrimitiveFieldValueItem } from "../PrimitiveFieldValueItem";
-import {
-  PrimitiveFieldValue,
-  PrimitiveFieldValueRenderOptions,
-} from "../types";
+import { PrimitiveValueItem } from "../PrimitiveValueItem";
+import { PrimitiveValue, PrimitiveValueRenderOptions } from "../types";
 
-type Props<T extends PrimitiveFieldValue> = {
+type Props<T extends PrimitiveValue> = {
   values: readonly T[];
-} & PrimitiveFieldValueRenderOptions;
+} & PrimitiveValueRenderOptions;
 
-export function PrimitiveFieldValueArrayBlock<T extends PrimitiveFieldValue>({
+export function PrimitiveFieldValueArrayBlock<T extends PrimitiveValue>({
   values,
   ...renderOptions
 }: Props<T>): JSX.Element | null {
@@ -21,9 +18,7 @@ export function PrimitiveFieldValueArrayBlock<T extends PrimitiveFieldValue>({
   return (
     <Stack>
       {values.map((v, idx) => {
-        return (
-          <PrimitiveFieldValueItem key={idx} value={v} {...renderOptions} />
-        );
+        return <PrimitiveValueItem key={idx} value={v} {...renderOptions} />;
       })}
     </Stack>
   );

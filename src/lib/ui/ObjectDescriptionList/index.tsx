@@ -5,7 +5,7 @@ import { camelToTitleCase } from "@/lib/utils/strings";
 import { DescriptionList } from "../DescriptionList";
 import { getObjectFieldRenderOptions } from "./helpers";
 import { DescribableObject, ObjectRenderOptions } from "./types";
-import { UnknownFieldValueItem } from "./UnknownFieldValueItem";
+import { UnknownValueItem } from "./UnknownValueItem";
 
 type Props<T extends DescribableObject> = {
   data: T;
@@ -29,7 +29,7 @@ export function ObjectDescriptionList<T extends DescribableObject>({
 
         return (
           <DescriptionList.Item key={key} label={camelToTitleCase(String(key))}>
-            <UnknownFieldValueItem
+            <UnknownValueItem
               value={data[key]}
               {...getObjectFieldRenderOptions(renderOptions, key)}
             />

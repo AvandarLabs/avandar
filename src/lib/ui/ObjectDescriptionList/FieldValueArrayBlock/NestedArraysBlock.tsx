@@ -1,13 +1,13 @@
 import { Fieldset, Stack } from "@mantine/core";
 import { FieldValueArrayBlock } from ".";
-import { FieldValue, FieldValueArrayRenderOptions } from "../types";
+import { DescribableValue, DescribableValueArrayRenderOptions } from "../types";
 
-type Props<T extends FieldValue> = {
+type Props<T extends DescribableValue> = {
   /** Array of arrays of field values */
   values: ReadonlyArray<readonly T[]>;
-} & FieldValueArrayRenderOptions<T>;
+} & DescribableValueArrayRenderOptions<T>;
 
-export function NestedArraysBlock<T extends FieldValue>({
+export function NestedArraysBlock<T extends DescribableValue>({
   values,
   ...renderOptions
 }: Props<T>): JSX.Element | null {

@@ -3,19 +3,19 @@ import { useMemo } from "react";
 import { isFieldValueArray, isPrimitiveFieldValue } from "../guards";
 import {
   DescribableObject,
-  FieldValue,
-  FieldValueArrayRenderOptions,
-  PrimitiveFieldValue,
+  DescribableValue,
+  DescribableValueArrayRenderOptions,
+  PrimitiveValue,
 } from "../types";
 import { EntityArrayBlock } from "./EntityArrayBlock";
 import { NestedArraysBlock } from "./NestedArraysBlock";
 import { PrimitiveFieldValueArrayBlock } from "./PrimitiveFieldValueArrayBlock";
 
-type Props<T extends FieldValue> = {
-  value: readonly FieldValue[];
-} & FieldValueArrayRenderOptions<T>;
+type Props<T extends DescribableValue> = {
+  value: readonly DescribableValue[];
+} & DescribableValueArrayRenderOptions<T>;
 
-export function FieldValueArrayBlock<T extends FieldValue>({
+export function FieldValueArrayBlock<T extends DescribableValue>({
   value,
   emptyArray = "There are no values",
   ...moreRenderOptions
@@ -23,8 +23,8 @@ export function FieldValueArrayBlock<T extends FieldValue>({
   // Split between entity objects, arrays, and primitive values
   const [entityObjects, valueArrays, primitiveValues] = useMemo(() => {
     const entities: DescribableObject[] = [];
-    const arrays: Array<readonly FieldValue[]> = [];
-    const primitives: PrimitiveFieldValue[] = [];
+    const arrays: Array<readonly DescribableValue[]> = [];
+    const primitives: PrimitiveValue[] = [];
     value.forEach((v) => {
       if (isPrimitiveFieldValue(v)) {
         primitives.push(v);

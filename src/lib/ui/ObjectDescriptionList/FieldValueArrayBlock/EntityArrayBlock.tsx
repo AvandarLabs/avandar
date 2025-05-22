@@ -7,7 +7,7 @@ import { ObjectDescriptionList } from "..";
 import { CollapsibleItem } from "../CollapsibleItem";
 import { getObjectFieldRenderOptions } from "../helpers";
 import { DescribableObject, ObjectArrayRenderOptions } from "../types";
-import { UnknownFieldValueItem } from "../UnknownFieldValueItem";
+import { UnknownValueItem } from "../UnknownValueItem";
 
 type Props<T extends DescribableObject> = {
   values: readonly T[];
@@ -58,7 +58,7 @@ export function EntityArrayBlock<T extends DescribableObject>({
             const fieldVal = entityRow[fieldKey];
             return (
               <Table.Td key={fieldKey}>
-                <UnknownFieldValueItem
+                <UnknownValueItem
                   value={fieldVal}
                   {...getObjectFieldRenderOptions(renderOptions, fieldKey)}
                 />
