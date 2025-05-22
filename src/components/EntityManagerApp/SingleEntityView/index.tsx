@@ -131,6 +131,9 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
         <ObjectDescriptionList
           data={hydratedEntity}
           excludeKeys={[
+            "id",
+            "externalId",
+            "entityConfigId",
             "idField",
             "nameField",
             "nameFieldValue",
@@ -144,6 +147,7 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
                 "valueSet",
                 "entityId",
                 "entityFieldConfigId",
+                "datasourceId",
               ],
             },
           }}
