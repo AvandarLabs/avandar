@@ -8,6 +8,7 @@ import { getDistinctValuesCount } from "./getDistinctValuesCount";
 import { getEmptyValuesCount } from "./getEmptyValuesCount";
 import { getMaxValue } from "./getMaxValue";
 import { getMinValue } from "./getMinValue";
+import { getMostCommonValue } from "./getMostCommonValue";
 import { getStandardDeviation } from "./getStandardDeviation";
 
 type UnknownFieldSummary = {
@@ -39,8 +40,8 @@ type FieldSummary = {
   emptyValuesCount: number;
   percentMissingValues: number;
   mostCommonValue: {
-    count: string;
-    value: string;
+    count: number;
+    value: string[];
   };
 } & (
   | StringFieldSummary
@@ -124,10 +125,7 @@ export function getSummary(dataset: ParsedLocalDataset): DatasetSummary {
                 distinctValuesCount: getDistinctValuesCount(values),
                 emptyValuesCount: emptyValCount,
                 percentMissingValues: emptyValCount / valueCount,
-                mostCommonValue: {
-                  count: "",
-                  value: "",
-                },
+                mostCommonValue: getMostCommonValue(values),
                 ..._getTypeSpecificSummary(values, column.dataType),
               };
             }
