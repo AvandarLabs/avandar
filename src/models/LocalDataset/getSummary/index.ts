@@ -11,10 +11,6 @@ import { getMinValue } from "./getMinValue";
 import { getMostCommonValue } from "./getMostCommonValue";
 import { getStandardDeviation } from "./getStandardDeviation";
 
-type UnknownFieldSummary = {
-  type: "unknown";
-};
-
 type StringFieldSummary = {
   type: "string";
 };
@@ -43,12 +39,7 @@ type FieldSummary = {
     count: number;
     value: string[];
   };
-} & (
-  | StringFieldSummary
-  | UnknownFieldSummary
-  | NumericFieldSummary
-  | DateFieldSummary
-);
+} & (StringFieldSummary | NumericFieldSummary | DateFieldSummary);
 
 type DatasetSummary = {
   rows: number;
@@ -60,11 +51,7 @@ type DatasetSummary = {
 function _getTypeSpecificSummary(
   values: unknown[],
   dataType: FieldDataType,
-):
-  | StringFieldSummary
-  | UnknownFieldSummary
-  | NumericFieldSummary
-  | DateFieldSummary {
+): StringFieldSummary | NumericFieldSummary | DateFieldSummary {
   return match(dataType)
     .with("string", (type) => {
       return {
@@ -86,11 +73,6 @@ function _getTypeSpecificSummary(
         mostRecentDate: "2020-01-01",
         oldestDate: "2019-01-01",
         datasetDuration: "1 year",
-      };
-    })
-    .with("unknown", (type) => {
-      return {
-        type,
       };
     })
     .exhaustive();

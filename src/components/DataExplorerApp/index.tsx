@@ -1,17 +1,22 @@
 import { Box, Fieldset, Stack, Text } from "@mantine/core";
 import { useMemo, useState } from "react";
-import { AggregationType, LocalQueryClient } from "@/clients/LocalQueryClient";
+import {
+  LocalDatasetQueryClient,
+  QueryAggregationType,
+} from "@/clients/LocalDatasetQueryClient";
+import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useMutableSet } from "@/lib/hooks/useMutableSet";
 import { DataGrid } from "@/lib/ui/DataGrid";
-import { Select } from "@/lib/ui/inputs/Select";
 import { LoadingOverlay } from "@/lib/ui/LoadingOverlay";
 import { difference } from "@/lib/utils/arrays";
 import { makeObjectFromKeys } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys, omit } from "@/lib/utils/objects/misc";
-import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
+import { setValue } from "@/lib/utils/objects/setValue";
 import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
-import { LocalDataset, LocalDatasetId } from "@/models/LocalDataset/types";
+import { LocalDatasetId } from "@/models/LocalDataset/types";
+import { LocalDatasetSelect } from "../common/LocalDatasetSelect";
+import { AggregationSelect } from "./AggregationSelect";
 import { FieldSelect } from "./FieldSelect";
 import { useDataQuery } from "./useDataQuery";
 
@@ -20,8 +25,26 @@ const HIDE_ORDER_BY = true;
 const HIDE_LIMIT = true;
 
 export function DataExplorerApp(): JSX.Element {
-  const [allDatasets, isLoadingDatasets] = LocalDatasetClient.useGetAll();
+  const [loadDataset] = useMutation({
+    mutationFn: async (datasetId: LocalDatasetId) => {
+      await LocalDatasetQueryClient.loadDataset(datasetId);
+      return datasetId;
+    },
+    onSuccess: (datasetId: LocalDatasetId) => {
+      setLoadedDatasets.add(datasetId);
+      setLoadingDatasets.delete(datasetId);
+    },
+    onError: (error) => {
+      throw error;
+    },
+  });
+
+  // datasets that are in the process of being loaded into the db
+  const [loadingDatasets, setLoadingDatasets] = useMutableSet<LocalDatasetId>();
+
+  // datasets that have been loaded into db
   const [loadedDatasets, setLoadedDatasets] = useMutableSet<LocalDatasetId>();
+
   const [selectedDatasetId, setSelectedDatasetId] = useState<
     LocalDatasetId | undefined
   >(undefined);
@@ -32,18 +55,13 @@ export function DataExplorerApp(): JSX.Element {
     readonly LocalDatasetField[]
   >([]);
   const [aggregations, setAggregations] = useState<
-    Record<string, AggregationType>
+    Record<string, QueryAggregationType>
   >({});
-
-  const datasetOptions = useMemo(() => {
-    return (allDatasets ?? []).map((dataset: LocalDataset) => {
-      return { value: dataset.id, label: dataset.name };
-    });
-  }, [allDatasets]);
 
   const selectedFieldNames = useMemo(() => {
     return selectedFields.map(getProp("name"));
   }, [selectedFields]);
+
   const selectedGroupByFieldNames = useMemo(() => {
     return selectedGroupByFields.map(getProp("name"));
   }, [selectedGroupByFields]);
@@ -58,9 +76,29 @@ export function DataExplorerApp(): JSX.Element {
 
   return (
     <Stack px="md" py="lg">
+      <LocalDatasetSelect
+        onChange={async (datasetId) => {
+          if (datasetId) {
+            setSelectedDatasetId(datasetId);
+            if (
+              !loadedDatasets.has(datasetId) &&
+              !loadingDatasets.has(datasetId)
+            ) {
+              // if we haven't loaded the dataset yet into memory and it
+              // isn't actively being loaded, then load it
+              setLoadingDatasets.add(datasetId);
+              loadDataset(datasetId);
+            }
+          } else {
+            setSelectedDatasetId(undefined);
+          }
+        }}
+      />
+
       <FieldSelect
         label="Select fields"
         placeholder="Select fields"
+        datasetId={selectedDatasetId}
         onChange={(fields) => {
           setSelectedFields(fields);
           setAggregations((prevAggregations) => {
@@ -88,28 +126,12 @@ export function DataExplorerApp(): JSX.Element {
         <Fieldset legend="Aggregations">
           {selectedFields.map((field) => {
             return (
-              <Select
+              <AggregationSelect
                 key={field.id}
-                label={field.name}
-                placeholder="Select aggregation"
-                defaultValue="none"
-                data={[
-                  { value: "none", label: "None" },
-                  { value: "sum", label: "Sum" },
-                  { value: "avg", label: "Average" },
-                  { value: "count", label: "Count" },
-                  { value: "max", label: "Max" },
-                  { value: "min", label: "Min" },
-                ]}
-                onChange={(value: string | null) => {
-                  if (value === null) {
-                    return;
-                  }
+                column={field}
+                onChange={(aggregation) => {
                   setAggregations((prevAggregations) => {
-                    return {
-                      ...prevAggregations,
-                      [field.name]: value as AggregationType,
-                    };
+                    return setValue(prevAggregations, field.name, aggregation);
                   });
                 }}
               />
@@ -117,28 +139,6 @@ export function DataExplorerApp(): JSX.Element {
           })}
         </Fieldset>
       : null}
-
-      <Select
-        allowDeselect={false}
-        label="From dataset"
-        placeholder={
-          isLoadingDatasets ? "Loading datasets..." : "Select a dataset"
-        }
-        data={datasetOptions ?? []}
-        value={selectedDatasetId}
-        onChange={async (datasetId) => {
-          if (datasetId) {
-            setSelectedDatasetId(datasetId);
-            if (!loadedDatasets.has(datasetId)) {
-              // if we haven't loaded the dataset yet into memory, load it
-              await LocalQueryClient.loadDataset(datasetId);
-              setLoadedDatasets.add(datasetId);
-            }
-          } else {
-            setSelectedDatasetId(undefined);
-          }
-        }}
-      />
 
       {HIDE_WHERE ? null : <Text>Where (react-awesome-query-builder)</Text>}
       <FieldSelect

@@ -31,25 +31,26 @@ export type PathValue<T, P extends Paths<T>> =
   : never;
 
 /**
- * Gets the value of a property at a given key path in dot notation.
- *
- * We use the `x` prefix as a convention to denote a function that accepts
- * a deep key path.
+ * Gets the value of a property at a given key path.
+ * This can get values deeply by using a dot-notation path.
  *
  * @param obj The object to get the value from.
  * @param path The key path in dot notation.
  * @returns The value of the property.
  */
-export function xgetValue<
+export function getValue<
   T extends UnknownObject | UnknownArray,
-  P extends Paths<T>,
->(obj: T, path: P): PathValue<T, P> {
+  K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
+  V extends K extends keyof T ? T[K]
+  : K extends Paths<T> ? PathValue<T, K>
+  : never,
+>(obj: T, path: K): V {
   const fullPathAsString = String(path);
   const pathParts = fullPathAsString.split(".");
-  return _getValueAt(obj, pathParts, fullPathAsString) as PathValue<T, P>;
+  return _getValue(obj, pathParts, fullPathAsString) as V;
 }
 
-export function _getValueAt(
+export function _getValue(
   obj: UnknownObject | UnknownArray,
   paths: readonly string[],
   fullPath: string,
@@ -100,5 +101,5 @@ export function _getValueAt(
 
   // At this point, `value` is either an object or an array
   // and we still have a `pathTail` so we keep traversing
-  return _getValueAt(value as UnknownObject | UnknownArray, pathTail, fullPath);
+  return _getValue(value as UnknownObject | UnknownArray, pathTail, fullPath);
 }

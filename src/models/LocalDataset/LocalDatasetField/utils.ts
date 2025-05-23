@@ -1,5 +1,6 @@
 import * as arrow from "apache-arrow";
 import { match } from "ts-pattern";
+import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
 import { EntityFieldBaseType } from "@/models/EntityConfig/EntityFieldConfig/types";
 import { FieldDataType } from "./types";
 
@@ -18,10 +19,6 @@ export function getArrowDataType(dataType: FieldDataType): arrow.DataType {
     })
     .with("date", () => {
       return new arrow.TimestampMillisecond();
-    })
-    .with("unknown", () => {
-      // treat unknowns as strings
-      return new arrow.Utf8();
     })
     .exhaustive();
 }
@@ -44,9 +41,21 @@ export function getEntityFieldBaseDataType(
     .with("date", () => {
       return "date" as const;
     })
-    .with("unknown", () => {
-      // treat unknowns as strings
-      return "string" as const;
+    .exhaustive();
+}
+
+export function getValidQueryAggregationsByType(
+  dataType: FieldDataType,
+): readonly QueryAggregationType[] {
+  return match(dataType)
+    .with("string", () => {
+      return ["count"] as const;
+    })
+    .with("number", () => {
+      return ["sum", "avg", "count", "max", "min"] as const;
+    })
+    .with("date", () => {
+      return ["count"] as const;
     })
     .exhaustive();
 }

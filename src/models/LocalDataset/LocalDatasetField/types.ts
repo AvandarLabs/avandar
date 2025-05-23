@@ -1,6 +1,6 @@
 import { UUID } from "@/lib/types/common";
 
-export type FieldDataType = "string" | "number" | "date" | "unknown";
+export type FieldDataType = "string" | "number" | "date";
 export type LocalDatasetFieldId = UUID<"LocalDatasetField">;
 
 /**

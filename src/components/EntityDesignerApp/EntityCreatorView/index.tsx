@@ -13,7 +13,7 @@ import { useForm } from "@/lib/hooks/ui/useForm";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
-import { xsetValue } from "@/lib/utils/objects/xsetValue";
+import { setValue } from "@/lib/utils/objects/setValue";
 import { getEntityConfigLinkProps } from "@/models/EntityConfig/utils";
 import { DatasetColumnFieldsBlock } from "./DatasetColumnFieldsBlock";
 import {
@@ -42,13 +42,13 @@ export function EntityCreatorView(): JSX.Element {
         // set the id field
         .map((field) => {
           return field.id === values.idFieldId ?
-              xsetValue(field, "options.isIdField", true)
+              setValue(field, "options.isIdField", true)
             : field;
         })
         // set the title field
         .map((field) => {
           return field.id === values.titleFieldId ?
-              xsetValue(field, "options.isTitleField", true)
+              setValue(field, "options.isTitleField", true)
             : field;
         });
 

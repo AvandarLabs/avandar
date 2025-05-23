@@ -10,13 +10,21 @@ import { Logger } from "@/lib/Logger";
 import { makeObjectFromList } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries } from "@/lib/utils/objects/misc";
+import { promiseMap } from "@/lib/utils/promises";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { getArrowDataType } from "@/models/LocalDataset/LocalDatasetField/utils";
 import { LocalDatasetId } from "@/models/LocalDataset/types";
 import type { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
 import type { LocalDataset } from "@/models/LocalDataset/types";
 
-export type AggregationType = "sum" | "avg" | "count" | "max" | "min" | "none";
+export type QueryAggregationType =
+  | "sum"
+  | "avg"
+  | "count"
+  | "max"
+  | "min"
+  | "none";
+
 export type LocalQueryConfig = {
   datasetId: LocalDatasetId;
   selectFieldNames: string[];
@@ -26,7 +34,7 @@ export type LocalQueryConfig = {
    * Aggregations to apply to the selected fields.
    * Key is the field name. Value is the type of aggregation.
    */
-  aggregations: Record<string, AggregationType>;
+  aggregations: Record<string, QueryAggregationType>;
 };
 
 export type LocalQueryResultData = {
@@ -60,7 +68,7 @@ function datasetIdToTableName(datasetId: LocalDatasetId): string {
 /**
  * Client for running queries on local datasets.
  */
-class LocalQueryClientImpl {
+class LocalDatasetQueryClientImpl {
   #db?: Promise<duck.AsyncDuckDB>;
 
   async #initialize(): Promise<duck.AsyncDuckDB> {
@@ -116,11 +124,50 @@ class LocalQueryClientImpl {
     }
   }
 
+  async getTableNames(): Promise<string[]> {
+    return await this.#withConnection(async ({ db, conn }) => {
+      // get all table names
+      const result = await conn.query(`
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'main' AND table_type = 'BASE TABLE'
+      `);
+      const tableNames: string[] = result.toArray().map((row) => {
+        return row.table_name;
+      });
+      return tableNames;
+    });
+  }
+
+  async dropAllTables(): Promise<void> {
+    return await this.#withConnection(async ({ db, conn }) => {
+      const tableNames = await this.getTableNames();
+      await promiseMap(tableNames, async (tableName) => {
+        await conn.query(`DROP TABLE IF EXISTS "${tableName}"`);
+        await db.dropFile(tableName);
+      });
+    });
+  }
+
+  /**
+   * Loads a dataset into the database. If the dataset already exists in the db
+   * then we will skip loading it again.
+   *
+   * @param datasetId The ID of the dataset to load.
+   * @returns A promise that resolves when the dataset is loaded.
+   */
   async loadDataset(datasetId: LocalDatasetId): Promise<void> {
     const { data, fields } = await this.#getDataset(datasetId);
     const tableName = datasetIdToTableName(datasetId);
 
-    return await this.#withConnection(async ({ db, conn }) => {
+    // first verify the table name doesn't already exist
+    const existingTableNames = await this.getTableNames();
+    if (existingTableNames.includes(tableName)) {
+      // table name already exists, so we can skip loading the dataset again
+      return;
+    }
+
+    await this.#withConnection(async ({ db, conn }) => {
       // register the dataset in the database as a file
       await db.registerFileText(tableName, data);
 
@@ -135,6 +182,12 @@ class LocalQueryClientImpl {
       await conn.insertCSVFromPath(tableName, {
         name: tableName,
         schema: "main",
+
+        // TODO(jpsyx): dont hardcode this, somehow infer it
+        dateFormat: "%B %d, %Y",
+
+        // TODO(jpsyx): dont hardcode this, somehow infer it
+        timestampFormat: "%B %d, %Y",
         detect: false,
         header: true,
         delimiter: ",",
@@ -215,4 +268,4 @@ class LocalQueryClientImpl {
   }
 }
 
-export const LocalQueryClient = new LocalQueryClientImpl();
+export const LocalDatasetQueryClient = new LocalDatasetQueryClientImpl();

@@ -8,6 +8,7 @@ import {
   UseMutationResult as TanstackUseMutationResult,
   useQueryClient,
 } from "@tanstack/react-query";
+import { Simplify } from "type-fest";
 import { Logger } from "@/lib/Logger";
 
 export type UseMutationResult<
@@ -64,7 +65,7 @@ export function useMutation<
   TError = DefaultError,
   TContext = unknown,
 >(
-  options: UseMutationOptions<TData, TFnVariables, TError, TContext>,
+  options: Simplify<UseMutationOptions<TData, TFnVariables, TError, TContext>>,
 ): UseMutationResultTuple<TData, TFnVariables, TError, TContext> {
   const queryClient = useQueryClient();
   const mutationObj = tanstackUseMutation(

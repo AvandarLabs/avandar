@@ -5,8 +5,6 @@ import type {
   LocalDatasetField,
 } from "@/models/LocalDataset/LocalDatasetField/types";
 
-const THRESHOLD = 0.9; // 80% of values should match the type
-
 function guessDataTypeFromFieldName(fieldName: string): FieldDataType {
   const lowercaseName = fieldName.toLowerCase();
   if (lowercaseName.includes("date")) {
@@ -17,10 +15,16 @@ function guessDataTypeFromFieldName(fieldName: string): FieldDataType {
     return "string";
   }
 
-  return "unknown";
+  return "string";
 }
 
 function isParseableNumber(value: string): boolean {
+  if (value.startsWith("+")) {
+    // if the string starts with a + it is more likely a
+    // phone number than a number.
+    return false;
+  }
+
   return !isNaN(Number(value));
 }
 
@@ -63,14 +67,13 @@ function detectFieldDataType(
   }
 
   const totalNonEmptyValues = totalValues - dataTypeCounts.empty;
-  const threshold = totalNonEmptyValues * THRESHOLD;
-  if (dataTypeCounts.number > threshold) {
+  if (dataTypeCounts.number === totalNonEmptyValues) {
     return "number";
   }
-  if (dataTypeCounts.string > threshold) {
+  if (dataTypeCounts.string === totalNonEmptyValues) {
     return "string";
   }
-  if (dataTypeCounts.date > threshold) {
+  if (dataTypeCounts.date === totalNonEmptyValues) {
     return "date";
   }
 

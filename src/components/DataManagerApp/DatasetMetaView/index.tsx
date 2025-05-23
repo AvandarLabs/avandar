@@ -54,18 +54,14 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
         <Title order={5}>Summary</Title>
         {isLoadingParsedDataset ?
           <Loader />
-        : <Text>
-            {
-              <ObjectDescriptionList
-                data={getSummary(parsedDataset)}
-                childRenderOptions={{
-                  columnSummaries: {
-                    titleKey: "name",
-                  },
-                }}
-              />
-            }
-          </Text>
+        : <ObjectDescriptionList
+            data={getSummary(parsedDataset)}
+            childRenderOptions={{
+              columnSummaries: {
+                titleKey: "name",
+              },
+            }}
+          />
         }
 
         <Title order={5}>Data preview</Title>

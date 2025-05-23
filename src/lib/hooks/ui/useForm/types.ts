@@ -1,7 +1,7 @@
 import { UseFormReturnType as MantineUseFormReturnType } from "@mantine/form";
 import { Merge, Paths } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
-import { PathValue } from "@/lib/utils/objects/xgetValue";
+import { PathValue } from "@/lib/utils/objects/getValue";
 import { GetKeyAndPropsFn } from "./useKeysAndPropsCallback";
 
 type InsertListItemFn<FormValues extends UnknownObject> = <

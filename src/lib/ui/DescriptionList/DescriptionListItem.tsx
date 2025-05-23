@@ -11,7 +11,7 @@ export function DescriptionListItem({ label, children }: Props): JSX.Element {
   return (
     <Grid className={css.root} px="xs" py="sm">
       <Grid.Col span={3} p={0}>
-        <Text component="dt" span size="sm" fw="bold" tt="uppercase" c="dimmed">
+        <Text component="dt" size="sm" fw="bold" tt="uppercase" c="dimmed">
           {label}
         </Text>
       </Grid.Col>

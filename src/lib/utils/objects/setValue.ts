@@ -2,29 +2,29 @@ import { Paths, UnknownArray } from "type-fest";
 import { Logger } from "@/lib/Logger";
 import { UnknownObject } from "@/lib/types/common";
 import { isArray, isPrimitive } from "../guards";
-import { PathValue } from "./xgetValue";
+import { PathValue } from "./getValue";
 
 /**
- * Sets the value of a property at a given key path in dot notation.
- *
- * We use the `x` prefix as a convention to denote a function that accepts
- * a deep key path.
+ * Sets the value of a property at a given key path.
+ * This can set values deeply by using a dot-notation path.
  *
  * @param obj The object to set the value on.
  * @param path The key path in dot notation.
  * @param value The value to set.
  */
-export function xsetValue<
+export function setValue<
   T extends UnknownObject | UnknownArray,
-  P extends Paths<T>,
->(obj: T, path: P, value: PathValue<T, P>): T {
+  K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
+  V extends K extends keyof T ? T[K]
+  : K extends Paths<T> ? PathValue<T, K>
+  : never,
+>(obj: T, path: K, value: V): T {
   const fullPathAsString = String(path);
   const pathParts = fullPathAsString.split(".");
-
-  return _setValueAt(obj, pathParts, value, fullPathAsString) as T;
+  return _setValue(obj, pathParts, value, fullPathAsString) as T;
 }
 
-export function _setValueAt(
+export function _setValue(
   obj: UnknownObject | UnknownArray,
   paths: readonly string[],
   value: unknown,
@@ -70,7 +70,7 @@ export function _setValueAt(
   if (isArray(obj)) {
     const idx = Number(key);
     const newArray = [...obj];
-    newArray[idx] = _setValueAt(
+    newArray[idx] = _setValue(
       nextObj as UnknownObject | UnknownArray,
       pathTail,
       value,
@@ -81,7 +81,7 @@ export function _setValueAt(
 
   return {
     ...obj,
-    [key]: _setValueAt(
+    [key]: _setValue(
       nextObj as UnknownObject | UnknownArray,
       pathTail,
       value,

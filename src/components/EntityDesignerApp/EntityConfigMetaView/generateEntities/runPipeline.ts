@@ -11,7 +11,7 @@ import {
   makeBucketsFromList,
   makeObjectFromList,
 } from "@/lib/utils/objects/builders";
-import { getProp, xpropEquals } from "@/lib/utils/objects/higherOrderFuncs";
+import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys } from "@/lib/utils/objects/misc";
 import { promiseReduce } from "@/lib/utils/promises";
 import { unknownToString } from "@/lib/utils/strings";
@@ -81,9 +81,7 @@ export type PipelineContext = {
 function _getEntityIdField(
   entityConfig: BuildableEntityConfig,
 ): BuildableFieldConfig | undefined {
-  const field = entityConfig.fields.find(
-    xpropEquals("options.isIdField", true),
-  );
+  const field = entityConfig.fields.find(propEquals("options.isIdField", true));
   return field;
 }
 
@@ -91,7 +89,7 @@ function _getEntityNameField(
   entityConfig: BuildableEntityConfig,
 ): BuildableFieldConfig | undefined {
   const field = entityConfig.fields.find(
-    xpropEquals("options.isTitleField", true),
+    propEquals("options.isTitleField", true),
   );
   return field;
 }

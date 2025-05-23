@@ -2,7 +2,7 @@ import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { useMemo } from "react";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { makeMapFromList } from "@/lib/utils/maps/builders";
-import { getProp, xpropEquals } from "@/lib/utils/objects/higherOrderFuncs";
+import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { unknownToString } from "@/lib/utils/strings";
 import {
   EntityClient,
@@ -57,10 +57,10 @@ function useHydratedEntity({
 
     if (entityFieldConfigs) {
       const idField = entityFieldConfigs.find(
-        xpropEquals("options.isIdField", true),
+        propEquals("options.isIdField", true),
       );
       const nameField = entityFieldConfigs.find(
-        xpropEquals("options.isTitleField", true),
+        propEquals("options.isTitleField", true),
       );
       fieldConfigsMap = makeMapFromList(entityFieldConfigs, {
         keyFn: getProp("id"),
