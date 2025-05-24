@@ -39,7 +39,7 @@ export type PathValue<T, P extends Paths<T>> =
  * @returns The value of the property.
  */
 export function getValue<
-  T extends UnknownObject | UnknownArray,
+  T extends object,
   K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
   V extends K extends keyof T ? T[K]
   : K extends Paths<T> ? PathValue<T, K>
@@ -51,7 +51,7 @@ export function getValue<
 }
 
 export function _getValue(
-  obj: UnknownObject | UnknownArray,
+  obj: object,
   paths: readonly string[],
   fullPath: string,
 ): unknown {
@@ -82,7 +82,7 @@ export function _getValue(
         `Key '${key}' not found in object. Full path: '${fullPath}'`,
       );
     }
-    value = obj[key];
+    value = obj[key as keyof typeof obj];
   }
 
   // We ran out of path, so this is the value to return

@@ -1,4 +1,4 @@
-import { Paths, UnknownArray } from "type-fest";
+import { Paths } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
 import { getValue, PathValue } from "./getValue";
 import { omit, pick } from "./misc";
@@ -17,14 +17,17 @@ import {
  * @returns A function that returns the value at the given key path.
  */
 export function getProp<
-  T extends UnknownObject | UnknownArray,
-  P extends Paths<T>,
->(path: P): (obj: T) => PathValue<T, P> {
+  T extends object,
+  K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
+  V extends K extends keyof T ? T[K]
+  : K extends Paths<T> ? PathValue<T, K>
+  : never,
+>(path: K): (obj: T) => V {
   return (obj: T) => {
     if (String(path).includes(".")) {
       return getValue(obj, path);
     }
-    return obj[path as keyof T] as PathValue<T, P>;
+    return obj[path as keyof T] as V;
   };
 }
 
@@ -37,10 +40,13 @@ export function getProp<
  * @returns A function that returns true if the object has the property with
  * the specified value.
  */
-export function propEquals<T extends UnknownObject, P extends Paths<T>>(
-  path: P,
-  value: PathValue<T, P>,
-): (obj: T) => boolean {
+export function propEquals<
+  T extends object,
+  K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
+  V extends K extends keyof T ? T[K]
+  : K extends Paths<T> ? PathValue<T, K>
+  : never,
+>(path: K, value: V): (obj: T) => boolean {
   return (obj: T) => {
     if (String(path).includes(".")) {
       return getValue(obj, path) === value;
@@ -58,10 +64,13 @@ export function propEquals<T extends UnknownObject, P extends Paths<T>>(
  * @returns A function that returns true if the object has the property with
  * the specified value.
  */
-export function propDoesntEqual<T extends UnknownObject, P extends Paths<T>>(
-  path: P,
-  value: PathValue<T, P>,
-): (obj: T) => boolean {
+export function propDoesntEqual<
+  T extends object,
+  K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
+  V extends K extends keyof T ? T[K]
+  : K extends Paths<T> ? PathValue<T, K>
+  : never,
+>(path: K, value: V): (obj: T) => boolean {
   return (obj: T) => {
     if (String(path).includes(".")) {
       return getValue(obj, path) !== value;

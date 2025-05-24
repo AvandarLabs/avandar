@@ -125,7 +125,7 @@ class LocalDatasetQueryClientImpl {
   }
 
   async getTableNames(): Promise<string[]> {
-    return await this.#withConnection(async ({ db, conn }) => {
+    return await this.#withConnection(async ({ conn }) => {
       // get all table names
       const result = await conn.query(`
         SELECT table_name
