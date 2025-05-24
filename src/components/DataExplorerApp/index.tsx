@@ -72,17 +72,15 @@ export function DataExplorerApp(): JSX.Element {
 
   const [isValidQuery, errorMessage] = useMemo(() => {
     // 1. There must be at least one field selected
-    const hasFields = selectedFieldNames.length > 0;
-    if (!hasFields) {
+    if (selectedFieldNames.length === 0) {
       return [
         false,
         "At least one column must be selected for the query to run",
       ];
     }
 
-    // 2. Either there are no aggregated or GROUP BY columns, or ALL columns
-    // must be either in the GROUP BY or have an aggregation.
-    const groupByColumnNames = new Set(selectedGroupByFieldNames);
+    // 2. If there is at least 1 GROUP BY or at least 1 aggregated column, then
+    // ALL columns must be either in the GROUP BY or have an aggregation.
     const [nonAggregatedColumnNames, aggregatedColumnNames] = partition(
       selectedFieldNames,
       (columnName) => {
@@ -90,25 +88,32 @@ export function DataExplorerApp(): JSX.Element {
       },
     );
 
-    let areAggregationsAndGroupBysValid;
-    let errMsg = undefined;
-    if (aggregatedColumnNames.length === 0 && groupByColumnNames.size === 0) {
-      // if there are no aggregations and no group-by's, that's fine
-      areAggregationsAndGroupBysValid = true;
-    } else {
-      // if there is at least 1 group-by or at least 1 aggregated column, then
-      // ALL columns must be either in the GROUP BY or have an aggregation.
+    if (
+      aggregatedColumnNames.length !== 0 ||
+      selectedGroupByFieldNames.length !== 0
+    ) {
+      const groupByColumnNames = new Set(selectedGroupByFieldNames);
       const columnsWithoutGroupOrAggregation = nonAggregatedColumnNames.filter(
         isNotInSet(groupByColumnNames),
       );
-      errMsg = `If one column is in the Group By or has an aggregation, then all columns must be in the Group By or have an aggregation. Columns ${wordJoin(
-        columnsWithoutGroupOrAggregation.map(wrapString('"')),
-      )} need to be added to the Group By or have an aggregation.`;
-      areAggregationsAndGroupBysValid =
-        columnsWithoutGroupOrAggregation.length === 0;
+      if (columnsWithoutGroupOrAggregation.length > 0) {
+        // generate the error message
+        const columnsListStr = wordJoin(
+          columnsWithoutGroupOrAggregation.map(wrapString('"')),
+        );
+        const pluralizedColumnsString =
+          columnsWithoutGroupOrAggregation.length === 1 ?
+            `Column ${columnsListStr} needs`
+          : `Columns ${columnsListStr} need`;
+        const errMsg = `If one column is in the Group By or has an aggregation,
+        then all columns must be in the Group By or have an aggregation.
+        ${pluralizedColumnsString} to be added to the Group By or have an aggregation.`;
+
+        return [false, errMsg];
+      }
     }
 
-    return [hasFields && areAggregationsAndGroupBysValid, errMsg];
+    return [true, undefined];
   }, [selectedFieldNames, selectedGroupByFieldNames, aggregations]);
 
   const [queryResults, isLoadingResults] = useDataQuery({
