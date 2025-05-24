@@ -1,5 +1,5 @@
 import { isNullOrUndefined, isNumber, isString } from "../guards";
-import { stringComparator } from "../strings";
+import { stringComparator } from "../strings/sort";
 
 /**
  * Compares two values of string or number types.

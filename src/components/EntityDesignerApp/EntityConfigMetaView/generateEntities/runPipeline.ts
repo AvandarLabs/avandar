@@ -14,7 +14,7 @@ import {
 import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys } from "@/lib/utils/objects/misc";
 import { promiseReduce } from "@/lib/utils/promises";
-import { unknownToString } from "@/lib/utils/strings";
+import { unknownToString } from "@/lib/utils/strings/transformations";
 import { uuid } from "@/lib/utils/uuid";
 import { Entity, EntityId } from "@/models/Entity/types";
 import { EntityFieldConfigId } from "@/models/EntityConfig/EntityFieldConfig/types";

@@ -1,68 +1,12 @@
-import { isDate, isEmptyObject, isPlainObject } from "./guards";
-import { objectEntries } from "./objects/misc";
-
-/**
- * Compares two strings lexicographically.
- * @param a The first string to compare.
- * @param b The second string to compare.
- * @returns A negative number if `a` is less than `b`, 0 if they are equal, or
- * a positive number if `a` is greater than `b`.
- */
-export function stringComparator<T extends string>(a: T, b: T): number {
-  return a.localeCompare(b);
-}
-
-/**
- * Sorts an array of strings in lexicographical order.
- * @param strings The array of strings to sort.
- * @param comparator The comparator function to use for sorting.
- * @returns The sorted array of strings.
- */
-export function sortStrings<T extends string>(
-  strings: readonly T[],
-  comparator: (a: T, b: T) => number = stringComparator,
-): T[] {
-  return [...strings].sort(comparator);
-}
-
-/**
- * Converts camelCase to title case.
- * @param str The string to convert.
- * @returns The converted string.
- */
-export function camelToTitleCase(str: string): string {
-  return str
-    .replace(/([a-z])([A-Z])/g, "$1 $2")
-    .replace(/([A-Z])([A-Z][a-z])/g, "$1 $2");
-}
-
-/**
- * Capitalizes the first letter of a string.
- * @param str The string to capitalize.
- * @returns The capitalized string.
- */
-export function capitalize<T extends string>(str: T): Capitalize<T> {
-  return (str.charAt(0).toUpperCase() + str.slice(1)) as Capitalize<T>;
-}
-
-/**
- * Prefixes a string with a given prefix.
- * @param prefixStr The prefix to add.
- * @param str The string to prefix.
- * @returns The prefixed string.
- */
-export function prefix<Prefix extends string, T extends string>(
-  prefixStr: Prefix,
-  str: T,
-): `${Prefix}${T}` {
-  return `${prefixStr}${str}`;
-}
+import { isDate, isEmptyObject, isPlainObject } from "../guards";
+import { objectEntries } from "../objects/misc";
 
 /**
  * Converts an unknown value to a string.
  * @param value The value to convert.
  * @returns The string representation of the value.
  */
+
 export function unknownToString(
   value: unknown,
   {
@@ -157,4 +101,73 @@ export function unknownToString(
   }
 
   return String(value);
+}
+
+/**
+ * Converts camelCase to title case.
+ * @param str The string to convert.
+ * @returns The converted string.
+ */
+export function camelToTitleCase(str: string): string {
+  return str
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/([A-Z])([A-Z][a-z])/g, "$1 $2");
+}
+
+/**
+ * Capitalizes the first letter of a string.
+ * @param str The string to capitalize.
+ * @returns The capitalized string.
+ */
+export function capitalize<T extends string>(str: T): Capitalize<T> {
+  return (str.charAt(0).toUpperCase() + str.slice(1)) as Capitalize<T>;
+}
+
+/**
+ * Prefixes a string with a given prefix.
+ * @param prefixStr The prefix to add.
+ * @param str The string to prefix.
+ * @returns The prefixed string.
+ */
+export function prefix<Prefix extends string, T extends string>(
+  prefixStr: Prefix,
+  str: T,
+): `${Prefix}${T}` {
+  return `${prefixStr}${str}`;
+}
+
+/**
+ * Joins an array of strings into a single string, with a separator and a
+ * finalizing connector.
+ * @param words The array of strings to join.
+ * @param options
+ * @param options.separator The separator to use between words. Defaults to a
+ * comma.
+ * @param options.endConnector The connector to use before the last word.
+ * Defaults to "and".
+ * @returns The joined string.
+ */
+export function wordJoin(
+  words: readonly string[],
+  {
+    separator = ",",
+    endConnector = "and",
+  }: {
+    separator?: string;
+    endConnector?: string;
+  } = {},
+): string {
+  if (words.length === 0) {
+    return "";
+  }
+
+  if (words.length === 1) {
+    return words[0]!;
+  }
+
+  if (words.length === 2) {
+    return `${words[0]} ${endConnector} ${words[1]}`;
+  }
+
+  return `${words.slice(0, -1).join(`${separator} `)} ${endConnector} ${words[words.length - 1]}`;
 }

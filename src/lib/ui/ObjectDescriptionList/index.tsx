@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { StringKeyOf } from "type-fest";
 import { objectKeys } from "@/lib/utils/objects/misc";
-import { camelToTitleCase } from "@/lib/utils/strings";
+import { camelToTitleCase } from "@/lib/utils/strings/transformations";
 import { DescriptionList } from "../DescriptionList";
 import { getObjectFieldRenderOptions } from "./helpers";
 import { DescribableObject, ObjectRenderOptions } from "./types";

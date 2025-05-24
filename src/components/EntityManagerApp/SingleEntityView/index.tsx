@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { makeMapFromList } from "@/lib/utils/maps/builders";
 import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
-import { unknownToString } from "@/lib/utils/strings";
+import { unknownToString } from "@/lib/utils/strings/transformations";
 import {
   EntityClient,
   EntityFieldValueRead,

@@ -10,7 +10,6 @@ import {
   UseQueryOptions,
   UseQueryResultTuple,
 } from "@/lib/hooks/query/useQuery";
-import { capitalize, prefix } from "@/lib/utils/strings";
 import {
   AnyFunction,
   AnyFunctionWithReturn,
@@ -19,6 +18,7 @@ import {
 import { isFunction, isPlainObject } from "../utils/guards";
 import { objectKeys } from "../utils/objects/misc";
 import { excludeDeep } from "../utils/objects/transformations";
+import { capitalize, prefix } from "../utils/strings/transformations";
 import { BaseClient } from "./BaseClient";
 
 function isSingleArgObject(arg: unknown): arg is { arg: unknown } {

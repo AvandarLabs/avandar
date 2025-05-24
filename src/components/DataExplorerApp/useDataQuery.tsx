@@ -5,7 +5,7 @@ import {
 } from "@/clients/LocalDatasetQueryClient";
 import { useQuery, UseQueryResultTuple } from "@/lib/hooks/query/useQuery";
 import { objectEntries } from "@/lib/utils/objects/misc";
-import { sortStrings } from "@/lib/utils/strings";
+import { sortStrings } from "@/lib/utils/strings/sort";
 
 export function useDataQuery({
   datasetId,

@@ -1,4 +1,4 @@
-import { Box, Fieldset, Stack, Text } from "@mantine/core";
+import { Box, Fieldset, Loader, Stack, Text } from "@mantine/core";
 import { useMemo, useState } from "react";
 import {
   LocalDatasetQueryClient,
@@ -7,12 +7,15 @@ import {
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useMutableSet } from "@/lib/hooks/useMutableSet";
 import { DataGrid } from "@/lib/ui/DataGrid";
-import { LoadingOverlay } from "@/lib/ui/LoadingOverlay";
+import { DangerText } from "@/lib/ui/Text/DangerText";
 import { difference } from "@/lib/utils/arrays";
 import { makeObjectFromKeys } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys, omit } from "@/lib/utils/objects/misc";
 import { setValue } from "@/lib/utils/objects/setValue";
+import { isNotInSet } from "@/lib/utils/sets/higherOrderFuncs";
+import { wrapString } from "@/lib/utils/strings/higherOrderFuncs";
+import { wordJoin } from "@/lib/utils/strings/transformations";
 import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
 import { LocalDatasetId } from "@/models/LocalDataset/types";
 import { LocalDatasetSelect } from "../common/LocalDatasetSelect";
@@ -55,6 +58,7 @@ export function DataExplorerApp(): JSX.Element {
     readonly LocalDatasetField[]
   >([]);
   const [aggregations, setAggregations] = useState<
+    // field name -> query aggregation type
     Record<string, QueryAggregationType>
   >({});
 
@@ -66,8 +70,51 @@ export function DataExplorerApp(): JSX.Element {
     return selectedGroupByFields.map(getProp("name"));
   }, [selectedGroupByFields]);
 
+  const [isValidQuery, errorMessage] = useMemo(() => {
+    // 1. There must be at least one field selected
+    const hasFields = selectedFieldNames.length > 0;
+    if (!hasFields) {
+      return [
+        false,
+        "At least one column must be selected for the query to run",
+      ];
+    }
+
+    // 2. all non-aggregated columns must be in the GROUP BY
+    const groupByColumnNames = new Set(selectedGroupByFieldNames);
+    const nonAggregatedColumnNames = selectedFieldNames.filter((columnName) => {
+      return aggregations[columnName] === "none";
+    });
+    const aggregatedColumnNames = selectedFieldNames.filter((columnName) => {
+      return aggregations[columnName] !== "none";
+    });
+
+    let areAggregationsAndGroupBysValid;
+    let errMsg = undefined;
+    if (aggregatedColumnNames.length === 0 && groupByColumnNames.size === 0) {
+      // if there are no aggregations and no group-by's, that's fine
+      areAggregationsAndGroupBysValid = true;
+    } else {
+      // if there is at least 1 group-by or at least 1 aggregated column, then
+      // ALL columns must be either in the GROUP BY or have an aggregation.
+      const columnsWithoutGroupOrAggregation = nonAggregatedColumnNames.filter(
+        isNotInSet(groupByColumnNames),
+      );
+      errMsg = `If one column is in the Group By or has an aggregation, then all columns must be in the Group By or have an aggregation. Columns ${wordJoin(
+        columnsWithoutGroupOrAggregation.map(wrapString('"')),
+      )} need to be added to the Group By or have an aggregation.`;
+      areAggregationsAndGroupBysValid =
+        columnsWithoutGroupOrAggregation.length === 0;
+    }
+
+    return [hasFields && areAggregationsAndGroupBysValid, errMsg];
+  }, [selectedFieldNames, selectedGroupByFieldNames, aggregations]);
+
   const [queryResults, isLoadingResults] = useDataQuery({
-    enabled: !!selectedDatasetId && loadedDatasets.has(selectedDatasetId),
+    enabled:
+      !!selectedDatasetId &&
+      loadedDatasets.has(selectedDatasetId) &&
+      isValidQuery,
     aggregations,
     datasetId: selectedDatasetId,
     selectFieldNames: selectedFieldNames,
@@ -101,6 +148,10 @@ export function DataExplorerApp(): JSX.Element {
         datasetId={selectedDatasetId}
         onChange={(fields) => {
           setSelectedFields(fields);
+
+          // Remove the aggregations for any fields that are no longer selected,
+          // and add a default "none" aggregation for any new fields that just
+          // got added
           setAggregations((prevAggregations) => {
             const incomingFieldNames = fields.map(getProp("name"));
             const prevFieldNames = objectKeys(prevAggregations);
@@ -150,7 +201,12 @@ export function DataExplorerApp(): JSX.Element {
       {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
 
       <Box pos="relative">
-        <LoadingOverlay visible={isLoadingResults} overlayProps={{ blur: 1 }} />
+        {errorMessage ?
+          <DangerText>{errorMessage}</DangerText>
+        : null}
+        {isLoadingResults ?
+          <Loader />
+        : null}
         <DataGrid
           fields={queryResults?.fields.map(getProp("name")) ?? []}
           data={queryResults?.data ?? []}
