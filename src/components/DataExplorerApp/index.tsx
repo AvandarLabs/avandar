@@ -8,7 +8,7 @@ import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useMutableSet } from "@/lib/hooks/useMutableSet";
 import { DataGrid } from "@/lib/ui/DataGrid";
 import { DangerText } from "@/lib/ui/Text/DangerText";
-import { difference } from "@/lib/utils/arrays";
+import { difference, partition } from "@/lib/utils/arrays";
 import { makeObjectFromKeys } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys, omit } from "@/lib/utils/objects/misc";
@@ -80,14 +80,15 @@ export function DataExplorerApp(): JSX.Element {
       ];
     }
 
-    // 2. all non-aggregated columns must be in the GROUP BY
+    // 2. Either there are no aggregated or GROUP BY columns, or ALL columns
+    // must be either in the GROUP BY or have an aggregation.
     const groupByColumnNames = new Set(selectedGroupByFieldNames);
-    const nonAggregatedColumnNames = selectedFieldNames.filter((columnName) => {
-      return aggregations[columnName] === "none";
-    });
-    const aggregatedColumnNames = selectedFieldNames.filter((columnName) => {
-      return aggregations[columnName] !== "none";
-    });
+    const [nonAggregatedColumnNames, aggregatedColumnNames] = partition(
+      selectedFieldNames,
+      (columnName) => {
+        return aggregations[columnName] === "none";
+      },
+    );
 
     let areAggregationsAndGroupBysValid;
     let errMsg = undefined;
