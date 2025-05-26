@@ -27,8 +27,8 @@ export type QueryAggregationType =
 
 export type LocalQueryConfig = {
   datasetId: LocalDatasetId;
-  selectFieldNames: string[];
-  groupByFieldNames: string[];
+  selectFields: readonly LocalDatasetField[];
+  groupByFields: readonly LocalDatasetField[];
 
   /**
    * Aggregations to apply to the selected fields.
@@ -200,11 +200,14 @@ class LocalDatasetQueryClientImpl {
   }
 
   async runQuery({
-    selectFieldNames,
-    groupByFieldNames,
+    selectFields,
+    groupByFields,
     aggregations,
     datasetId,
   }: LocalQueryConfig): Promise<LocalQueryResultData> {
+    const selectFieldNames = selectFields.map(getProp("name"));
+    const groupByFieldNames = groupByFields.map(getProp("name"));
+
     const tableName = datasetIdToTableName(datasetId);
 
     return this.#withConnection(async ({ conn }) => {
