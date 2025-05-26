@@ -1,4 +1,4 @@
-import { Box, Loader, Stack } from "@mantine/core";
+import { Box, Flex, Loader, MantineTheme } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
 import { DataGrid } from "@/lib/ui/DataGrid";
@@ -11,6 +11,8 @@ import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types
 import { LocalDatasetId } from "@/models/LocalDataset/types";
 import { QueryForm } from "./QueryForm";
 import { useDataQuery } from "./useDataQuery";
+
+const QUERY_FORM_WIDTH = 300;
 
 export function DataExplorerApp(): JSX.Element {
   const [aggregations, setAggregations] = useState<
@@ -90,18 +92,28 @@ export function DataExplorerApp(): JSX.Element {
   });
 
   return (
-    <Stack px="md" py="lg">
-      <QueryForm
-        aggregations={aggregations}
-        selectedDatasetId={selectedDatasetId}
-        selectedFields={selectedFields}
-        onAggregationsChange={setAggregations}
-        onFromDatasetChange={setSelectedDatasetId}
-        onSelectFieldsChange={setSelectedFields}
-        onGroupByChange={setSelectedGroupByFields}
-        errorMessage={errorMessage}
-      />
-      <Box pos="relative">
+    <Flex>
+      <Box
+        bg="neutral.0"
+        miw={QUERY_FORM_WIDTH}
+        w={QUERY_FORM_WIDTH}
+        mih="100dvh"
+        px="md"
+        py="md"
+        style={$queryFormBorder}
+      >
+        <QueryForm
+          aggregations={aggregations}
+          selectedDatasetId={selectedDatasetId}
+          selectedFields={selectedFields}
+          onAggregationsChange={setAggregations}
+          onFromDatasetChange={setSelectedDatasetId}
+          onSelectFieldsChange={setSelectedFields}
+          onGroupByChange={setSelectedGroupByFields}
+          errorMessage={errorMessage}
+        />
+      </Box>
+      <Box pos="relative" flex={1} px="sm" py="md">
         {isLoadingResults ?
           <Loader />
         : null}
@@ -110,6 +122,12 @@ export function DataExplorerApp(): JSX.Element {
           data={queryResults?.data ?? []}
         />
       </Box>
-    </Stack>
+    </Flex>
   );
 }
+
+const $queryFormBorder = (theme: MantineTheme) => {
+  return {
+    borderRight: `1px solid ${theme.colors.neutral[2]}`,
+  };
+};
