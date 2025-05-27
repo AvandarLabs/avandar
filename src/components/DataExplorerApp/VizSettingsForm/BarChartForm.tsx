@@ -64,7 +64,7 @@ export function BarChartForm({
         placeholder={
           fieldOptions.length === 0 ? "No fields have been queried"
           : numericFieldOptions.length === 0 ?
-            "There are no numeric fields"
+            "There are no queried numeric fields"
           : "Select a field"
         }
         onChange={(field) => {
