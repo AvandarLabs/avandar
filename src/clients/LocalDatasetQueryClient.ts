@@ -7,6 +7,7 @@ import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
 import { Logger } from "@/lib/Logger";
+import { UnknownDataFrame } from "@/lib/types/common";
 import { makeObjectFromList } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries } from "@/lib/utils/objects/misc";
@@ -37,10 +38,43 @@ export type LocalQueryConfig = {
   aggregations: Record<string, QueryAggregationType>;
 };
 
-export type LocalQueryResultData = {
-  fields: Array<arrow.Field<arrow.DataType>>;
-  data: Array<Record<string, unknown>>;
+export type QueryResultField = {
+  name: string;
+  dataType: "string" | "number" | "date";
 };
+
+export type LocalQueryResultData = {
+  fields: QueryResultField[];
+  data: UnknownDataFrame;
+};
+
+function arrowFieldToQueryResultField(
+  field: arrow.Field<arrow.DataType>,
+): QueryResultField {
+  return {
+    name: field.name,
+    dataType: match(field.type.typeId)
+      .with(arrow.Type.Date, arrow.Type.TimestampMillisecond, () => {
+        return "date" as const;
+      })
+      .with(
+        arrow.Type.Float,
+        arrow.Type.Float16,
+        arrow.Type.Float32,
+        arrow.Type.Float64,
+        arrow.Type.Int,
+        arrow.Type.Int16,
+        arrow.Type.Int32,
+        arrow.Type.Int64,
+        () => {
+          return "number" as const;
+        },
+      )
+      .otherwise(() => {
+        return "string" as const;
+      }),
+  };
+}
 
 const sql = knex({
   client: "sqlite3",
@@ -262,7 +296,10 @@ class LocalDatasetQueryClientImpl {
           return row.toJSON();
         });
 
-        return { fields: results.schema.fields, data: jsDataRows };
+        return {
+          fields: results.schema.fields.map(arrowFieldToQueryResultField),
+          data: jsDataRows,
+        };
       } catch (error) {
         Logger.error(error, { query: query.toString() });
         throw error;

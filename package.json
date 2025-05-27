@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@duckdb/duckdb-wasm": "^1.29.0",
+    "@mantine/charts": "^8.0.2",
     "@mantine/core": "^8.0.0",
     "@mantine/dropzone": "^8.0.0",
     "@mantine/form": "^8.0.0",
@@ -57,6 +58,7 @@
     "papaparse": "^5.5.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "recharts": "2",
     "snakecase-keys": "^8.0.1",
     "ts-pattern": "^5.7.0",
     "uuid": "^11.1.0",

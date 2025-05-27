@@ -3,7 +3,7 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "@tanstack/react-router";
 import { APP_CONFIG } from "@/config/AppConfig";
-import { DataGrid } from "@/lib/ui/DataGrid";
+import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
 import { getSummary } from "@/models/LocalDataset/getSummary";
@@ -67,7 +67,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
         <Title order={5}>Data preview</Title>
         {parsedDataset ?
           <DataGrid
-            fields={
+            columnNames={
               parsedDataset.fields.map((field) => {
                 return field.name;
               }) ?? []

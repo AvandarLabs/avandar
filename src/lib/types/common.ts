@@ -11,6 +11,9 @@ export type CSVRow = Record<string, CSVCellValue>;
 export type CSVData = CSVRow[];
 export type JSONLiteral = string | number | boolean | null;
 
+/** A dataframe with unknown data in row format. */
+export type UnknownDataFrame = Array<Record<string, unknown>>;
+
 /**
  * Matches any valid JSON value
  */

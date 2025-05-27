@@ -19,6 +19,8 @@ type Props = {
   onChange: (fields: readonly LocalDatasetField[]) => void;
 };
 
+// TODO(jpsyx) we already have LocalDatasetColumnSelect. We shouldnt have both
+// components. Refactor and keep only one.
 export function FieldSelect({
   onChange,
   label,

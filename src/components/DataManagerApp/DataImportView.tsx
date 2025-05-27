@@ -4,7 +4,7 @@ import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { APP_CONFIG } from "@/config/AppConfig";
-import { DataGrid } from "@/lib/ui/DataGrid";
+import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { FileUploadField } from "@/lib/ui/singleton-forms/FileUploadField";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { makeLocalDataset } from "@/models/LocalDataset/utils";
@@ -64,7 +64,7 @@ export function DataImportView(): JSX.Element {
       {csv && fileMetadata ?
         <Stack>
           <Title order={3}>Data Preview</Title>
-          <DataGrid fields={csv.meta.fields ?? []} data={csv.data} />
+          <DataGrid columnNames={csv.meta.fields ?? []} data={csv.data} />
           <form
             onSubmit={form.onSubmit((values) => {
               const dataset = makeLocalDataset({

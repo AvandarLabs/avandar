@@ -1,7 +1,6 @@
 import { Box, Flex, Loader, MantineTheme } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
-import { DataGrid } from "@/lib/ui/DataGrid";
 import { partition } from "@/lib/utils/arrays";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { isNotInSet } from "@/lib/utils/sets/higherOrderFuncs";
@@ -11,6 +10,12 @@ import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types
 import { LocalDatasetId } from "@/models/LocalDataset/types";
 import { QueryForm } from "./QueryForm";
 import { useDataQuery } from "./useDataQuery";
+import { VisualizationContainer } from "./VisualizationContainer";
+import { VizSettingsForm } from "./VizSettingsForm";
+import {
+  makeDefaultVizConfig,
+  VizConfig,
+} from "./VizSettingsForm/makeDefaultVizConfig";
 
 const QUERY_FORM_WIDTH = 300;
 
@@ -28,11 +33,13 @@ export function DataExplorerApp(): JSX.Element {
   const [selectedGroupByFields, setSelectedGroupByFields] = useState<
     readonly LocalDatasetField[]
   >([]);
+  const [vizConfig, setVizConfig] = useState<VizConfig>(() => {
+    return makeDefaultVizConfig("table");
+  });
 
   const selectedFieldNames = useMemo(() => {
     return selectedFields.map(getProp("name"));
   }, [selectedFields]);
-
   const selectedGroupByFieldNames = useMemo(() => {
     return selectedGroupByFields.map(getProp("name"));
   }, [selectedGroupByFields]);
@@ -91,6 +98,13 @@ export function DataExplorerApp(): JSX.Element {
     groupByFields: selectedGroupByFields,
   });
 
+  const { fields, data } = useMemo(() => {
+    return {
+      fields: queryResults?.fields ?? [],
+      data: queryResults?.data ?? [],
+    };
+  }, [queryResults]);
+
   return (
     <Flex>
       <Box
@@ -112,14 +126,20 @@ export function DataExplorerApp(): JSX.Element {
           onGroupByChange={setSelectedGroupByFields}
           errorMessage={errorMessage}
         />
+        <VizSettingsForm
+          fields={fields}
+          vizConfig={vizConfig}
+          onVizConfigChange={setVizConfig}
+        />
       </Box>
       <Box pos="relative" flex={1} px="sm" py="md">
         {isLoadingResults ?
           <Loader />
         : null}
-        <DataGrid
-          fields={queryResults?.fields.map(getProp("name")) ?? []}
-          data={queryResults?.data ?? []}
+        <VisualizationContainer
+          vizConfig={vizConfig}
+          fields={fields}
+          data={data}
         />
       </Box>
     </Flex>
