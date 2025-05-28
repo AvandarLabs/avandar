@@ -1,11 +1,23 @@
-import { Button, Container, Loader, Stack, Text, Title } from "@mantine/core";
+import {
+  Button,
+  Container,
+  FloatingIndicator,
+  Loader,
+  MantineTheme,
+  Stack,
+  Tabs,
+  Text,
+  Title,
+} from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { APP_CONFIG } from "@/config/AppConfig";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
+import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { getSummary } from "@/models/LocalDataset/getSummary";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { type LocalDataset } from "@/models/LocalDataset/types";
@@ -23,6 +35,8 @@ const DATASET_RENDER_OPTIONS: ChildRenderOptionsMap<LocalDataset> = {
   },
 };
 
+type DatasetTabId = "dataset-metadata" | "dataset-summary";
+
 /**
  * A view of the metadata for a dataset.
  *
@@ -39,80 +53,158 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
       id: dataset.id,
     });
 
+  // TODO(jpsyx): eventually the dataset should be streamed, rather than
+  // storing it all in memory. Right now this doesnt save any memory if we
+  // load it all and then just take a slice.
+  const previewData = useMemo(() => {
+    return (parsedDataset?.data ?? []).slice(0, 200);
+  }, [parsedDataset]);
+
+  const datasetColumnNames = useMemo(() => {
+    return parsedDataset?.fields.map(getProp("name")) ?? [];
+  }, [parsedDataset]);
+
+  const [currentTab, setCurrentTab] =
+    useState<DatasetTabId>("dataset-metadata");
+
+  // track the tab list refs so we can animate the tab indicator
+  const [tabListRef, setTabListRef] = useState<HTMLDivElement | null>(null);
+  const [tabItemRefs, setTabItemRefs] = useState<
+    Record<DatasetTabId, HTMLButtonElement | null>
+  >({
+    "dataset-metadata": null,
+    "dataset-summary": null,
+  });
+  const tabItemRefCallback = (tabItemId: DatasetTabId) => {
+    return (node: HTMLButtonElement | null) => {
+      tabItemRefs[tabItemId] = node; // intentional mutation
+      setTabItemRefs(tabItemRefs);
+    };
+  };
+
   return (
     <Container pt="lg">
       <Stack>
         <Title order={2}>{dataset.name}</Title>
-        <Text>{dataset.description}</Text>
-
-        <ObjectDescriptionList
-          data={dataset}
-          excludeKeys={EXCLUDED_DATASET_KEYS}
-          childRenderOptions={DATASET_RENDER_OPTIONS}
-        />
-
-        <Title order={5}>Summary</Title>
-        {isLoadingParsedDataset ?
-          <Loader />
-        : <ObjectDescriptionList
-            data={getSummary(parsedDataset)}
-            childRenderOptions={{
-              columnSummaries: {
-                titleKey: "name",
-              },
-            }}
-          />
-        }
-
-        <Title order={5}>Data preview</Title>
-        {parsedDataset ?
-          <DataGrid
-            columnNames={
-              parsedDataset.fields.map((field) => {
-                return field.name;
-              }) ?? []
-            }
-            data={parsedDataset.data ?? []}
-          />
-        : null}
-
-        <Button
-          color="danger"
-          onClick={() => {
-            modals.openConfirmModal({
-              title: "Delete dataset",
-              children: (
-                <Text>Are you sure you want to delete {dataset.name}?</Text>
-              ),
-              labels: { confirm: "Delete", cancel: "Cancel" },
-              confirmProps: {
-                color: "danger",
-                loading: isDeletePending,
-              },
-              onConfirm: () => {
-                deleteLocalDataset(
-                  { id: dataset.id },
-                  {
-                    onSuccess: () => {
-                      router.navigate({
-                        to: APP_CONFIG.links.dataManager.to,
-                      });
-
-                      notifications.show({
-                        title: "Dataset deleted",
-                        message: `${dataset.name} deleted successfully`,
-                        color: "green",
-                      });
-                    },
-                  },
-                );
-              },
-            });
+        <Tabs
+          variant="none"
+          value={currentTab}
+          onChange={(val) => {
+            return setCurrentTab(val as DatasetTabId);
           }}
         >
-          Delete Dataset
-        </Button>
+          <Tabs.List
+            mb="xs"
+            ref={setTabListRef}
+            pos="relative"
+            style={styles.tabList}
+          >
+            <Tabs.Tab
+              value="dataset-metadata"
+              ref={tabItemRefCallback("dataset-metadata")}
+            >
+              Metadata
+            </Tabs.Tab>
+            <Tabs.Tab
+              value="dataset-summary"
+              ref={tabItemRefCallback("dataset-summary")}
+            >
+              Data Summary
+            </Tabs.Tab>
+
+            <FloatingIndicator
+              target={tabItemRefs[currentTab]}
+              parent={tabListRef}
+              style={styles.tabIndicator}
+            />
+          </Tabs.List>
+
+          <Tabs.Panel value="dataset-metadata">
+            <Stack>
+              <Text>{dataset.description}</Text>
+
+              <ObjectDescriptionList
+                data={dataset}
+                excludeKeys={EXCLUDED_DATASET_KEYS}
+                childRenderOptions={DATASET_RENDER_OPTIONS}
+              />
+
+              <Title order={5}>Data preview</Title>
+              {parsedDataset ?
+                <DataGrid columnNames={datasetColumnNames} data={previewData} />
+              : null}
+            </Stack>
+          </Tabs.Panel>
+
+          <Tabs.Panel value="dataset-summary">
+            <Stack>
+              {isLoadingParsedDataset ?
+                <Loader />
+              : <ObjectDescriptionList
+                  data={getSummary(parsedDataset)}
+                  childRenderOptions={{
+                    columnSummaries: {
+                      titleKey: "name",
+                    },
+                  }}
+                />
+              }
+            </Stack>
+          </Tabs.Panel>
+
+          <Button
+            color="danger"
+            onClick={() => {
+              modals.openConfirmModal({
+                title: "Delete dataset",
+                children: (
+                  <Text>Are you sure you want to delete {dataset.name}?</Text>
+                ),
+                labels: { confirm: "Delete", cancel: "Cancel" },
+                confirmProps: {
+                  color: "danger",
+                  loading: isDeletePending,
+                },
+                onConfirm: () => {
+                  deleteLocalDataset(
+                    { id: dataset.id },
+                    {
+                      onSuccess: () => {
+                        router.navigate({
+                          to: APP_CONFIG.links.dataManager.to,
+                        });
+
+                        notifications.show({
+                          title: "Dataset deleted",
+                          message: `${dataset.name} deleted successfully`,
+                          color: "green",
+                        });
+                      },
+                    },
+                  );
+                },
+              });
+            }}
+          >
+            Delete Dataset
+          </Button>
+        </Tabs>
       </Stack>
     </Container>
   );
 }
+
+const styles = {
+  tabList: (theme: MantineTheme) => {
+    return {
+      borderBottom: `2px solid ${theme.colors.neutral[1]}`,
+    };
+  },
+  tabIndicator: (theme: MantineTheme) => {
+    return {
+      position: "absolute",
+      top: "2px",
+      borderBottom: `2px solid ${theme.colors.primary[6]}`,
+    };
+  },
+};
