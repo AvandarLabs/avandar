@@ -16,6 +16,7 @@ import {
 } from "@/models/EntityConfig/EntityFieldConfig/types";
 import { EntityConfig } from "@/models/EntityConfig/types";
 import { ActivityBlock } from "./ActivityBlock";
+import { StatusPill } from "./StatusPill";
 
 type HydratedEntity = Entity & {
   idField?: EntityFieldConfig;
@@ -126,6 +127,7 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
               <Loader />
             : unknownToString(hydratedEntity.nameFieldValue?.value)}
           </Title>
+          <StatusPill />
         </Group>
         <Text>{entityConfig.description}</Text>
         <ObjectDescriptionList
