@@ -145,13 +145,15 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
           childRenderOptions={{
             fieldValues: {
               renderAsTable: true,
-              excludeKeys: [
-                "id",
-                "valueSet",
-                "entityId",
-                "entityFieldConfigId",
-                "datasourceId",
-              ],
+              itemRenderOptions: {
+                excludeKeys: [
+                  "id",
+                  "valueSet",
+                  "entityId",
+                  "entityFieldConfigId",
+                  "datasourceId",
+                ],
+              },
             },
           }}
         />

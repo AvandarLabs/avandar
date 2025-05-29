@@ -26,12 +26,20 @@ type Props = {
   dataset: LocalDataset;
 };
 
-const EXCLUDED_DATASET_KEYS = ["id", "name", "data", "description"] as const;
-const DATASET_RENDER_OPTIONS: ChildRenderOptionsMap<LocalDataset> = {
+const EXCLUDED_DATASET_METADATA_KEYS = [
+  "id",
+  "name",
+  "data",
+  "description",
+] as const;
+const DATASET_METADATA_RENDER_OPTIONS: ChildRenderOptionsMap<LocalDataset> = {
   fields: {
     renderAsTable: true,
     titleKey: "name",
-    excludeKeys: ["id"],
+    maxHeight: 400,
+    itemRenderOptions: {
+      excludeKeys: ["id"],
+    },
   },
 };
 
@@ -103,13 +111,13 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
               value="dataset-metadata"
               ref={tabItemRefCallback("dataset-metadata")}
             >
-              Metadata
+              <Text span>Metadata</Text>
             </Tabs.Tab>
             <Tabs.Tab
               value="dataset-summary"
               ref={tabItemRefCallback("dataset-summary")}
             >
-              Data Summary
+              <Text span>Data Summary</Text>
             </Tabs.Tab>
 
             <FloatingIndicator
@@ -125,8 +133,8 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
 
               <ObjectDescriptionList
                 data={dataset}
-                excludeKeys={EXCLUDED_DATASET_KEYS}
-                childRenderOptions={DATASET_RENDER_OPTIONS}
+                excludeKeys={EXCLUDED_DATASET_METADATA_KEYS}
+                childRenderOptions={DATASET_METADATA_RENDER_OPTIONS}
               />
 
               <Title order={5}>Data preview</Title>
@@ -145,6 +153,18 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                   childRenderOptions={{
                     columnSummaries: {
                       titleKey: "name",
+                      itemRenderOptions: {
+                        maxHeight: 400,
+                        childRenderOptions: {
+                          mostCommonValue: {
+                            childRenderOptions: {
+                              value: {
+                                maxItemsCount: 4,
+                              },
+                            },
+                          },
+                        },
+                      },
                     },
                   }}
                 />

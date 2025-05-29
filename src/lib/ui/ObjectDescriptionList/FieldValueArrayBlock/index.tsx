@@ -1,23 +1,28 @@
-import { Stack, Text } from "@mantine/core";
+import { ScrollArea, Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
+import { pick } from "@/lib/utils/objects/misc";
 import { isFieldValueArray, isPrimitiveFieldValue } from "../guards";
 import {
   DescribableObject,
   DescribableValue,
   DescribableValueArrayRenderOptions,
+  PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
   PrimitiveValue,
+  PrimitiveValueRenderOptions,
 } from "../types";
-import { EntityArrayBlock } from "./EntityArrayBlock";
 import { NestedArraysBlock } from "./NestedArraysBlock";
+import { ObjectArrayBlock } from "./ObjectArrayBlock";
 import { PrimitiveFieldValueArrayBlock } from "./PrimitiveFieldValueArrayBlock";
 
 type Props<T extends DescribableValue> = {
-  value: readonly DescribableValue[];
+  data: readonly DescribableValue[];
 } & DescribableValueArrayRenderOptions<T>;
 
 export function FieldValueArrayBlock<T extends DescribableValue>({
-  value,
+  data,
   emptyArray = "There are no values",
+  maxHeight,
+  maxItemsCount,
   ...moreRenderOptions
 }: Props<T>): JSX.Element {
   // Split between entity objects, arrays, and primitive values
@@ -25,7 +30,7 @@ export function FieldValueArrayBlock<T extends DescribableValue>({
     const entities: DescribableObject[] = [];
     const arrays: Array<readonly DescribableValue[]> = [];
     const primitives: PrimitiveValue[] = [];
-    value.forEach((v) => {
+    data.forEach((v) => {
       if (isPrimitiveFieldValue(v)) {
         primitives.push(v);
       } else if (isFieldValueArray(v)) {
@@ -35,23 +40,52 @@ export function FieldValueArrayBlock<T extends DescribableValue>({
       }
     });
     return [entities, arrays, primitives];
-  }, [value]);
+  }, [data]);
 
-  if (value.length === 0) {
+  if (data.length === 0) {
     return <Text fs="italic">{emptyArray}</Text>;
   }
 
-  // TODO(jpsyx): we should be passing sub options here
-  return (
+  // compute the render options for each block
+  const parentPrimitiveRenderOptions: PrimitiveValueRenderOptions = pick(
+    moreRenderOptions as PrimitiveValueRenderOptions,
+    ...PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
+  );
+
+  const objectArrayOrNestedArrayRenderOptions = {
+    ...parentPrimitiveRenderOptions,
+    ...moreRenderOptions,
+  };
+  const contentBlock = (
     <Stack>
       <PrimitiveFieldValueArrayBlock
         values={primitiveValues}
-        {...moreRenderOptions}
+        maxItemsCount={maxItemsCount}
+        {...parentPrimitiveRenderOptions}
       />
-
-      <EntityArrayBlock values={entityObjects} {...moreRenderOptions} />
-
-      <NestedArraysBlock values={valueArrays} {...moreRenderOptions} />
+      <ObjectArrayBlock
+        values={entityObjects}
+        maxItemsCount={maxItemsCount}
+        {...objectArrayOrNestedArrayRenderOptions}
+      />
+      <NestedArraysBlock
+        values={valueArrays}
+        maxItemsCount={maxItemsCount}
+        {...objectArrayOrNestedArrayRenderOptions}
+      />
     </Stack>
   );
+
+  if (maxHeight === undefined) {
+    return contentBlock;
+  }
+
+  return (
+    <ScrollArea.Autosize mah={maxHeight} type="auto">
+      {contentBlock}
+    </ScrollArea.Autosize>
+  );
 }
+
+export type DescribableValueArrayBlockProps<T extends DescribableValue> =
+  Props<T>;

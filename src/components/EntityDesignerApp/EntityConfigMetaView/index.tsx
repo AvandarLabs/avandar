@@ -21,13 +21,15 @@ const ENTITY_CONFIG_RENDER_OPTIONS: ChildRenderOptionsMap<
 > = {
   fields: {
     titleKey: "name",
-    excludeKeys: ["id", "entityConfigId"],
-    childRenderOptions: {
-      options: {
-        excludeKeys: ["class"],
-      },
-      valueExtractor: {
-        excludeKeys: ["id", "entityFieldConfigId"],
+    itemRenderOptions: {
+      excludeKeys: ["id", "entityConfigId"],
+      childRenderOptions: {
+        options: {
+          excludeKeys: ["class"],
+        },
+        valueExtractor: {
+          excludeKeys: ["id", "entityFieldConfigId"],
+        },
       },
     },
   },
