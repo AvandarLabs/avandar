@@ -101,11 +101,11 @@ export function makeParserRegistry<M extends ModelCRUDTypes = never>(): {
 
           // Only pass the keys defined in the database. Some databases
           // can reject inputs with extra keys
-          const strippedDBObj = pick(dbObj, ...dbKeys);
+          const strippedDBObj = pick(dbObj, dbKeys);
 
           // the pick operation may have added some `undefined` values
           // back in, so we need to drop them
-          return excludeUndefinedDeep(strippedDBObj);
+          return excludeUndefinedDeep(strippedDBObj) as M["DBInsert"];
         },
 
         fromModelUpdateToDBUpdate: (modelObj: M["Update"]): M["DBUpdate"] => {
@@ -113,11 +113,11 @@ export function makeParserRegistry<M extends ModelCRUDTypes = never>(): {
 
           // Only pass the keys defined in the database. Some databases
           // can reject inputs with extra keys
-          const strippedDBObj = pick(dbObj, ...dbKeys);
+          const strippedDBObj = pick(dbObj, dbKeys);
 
           // the pick operation may have added some `undefined` values
           // back in, so we need to drop them
-          return excludeUndefinedDeep(strippedDBObj);
+          return excludeUndefinedDeep(strippedDBObj) as M["DBUpdate"];
         },
       };
     },

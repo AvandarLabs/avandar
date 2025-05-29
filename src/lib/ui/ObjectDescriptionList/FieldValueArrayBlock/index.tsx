@@ -49,7 +49,7 @@ export function FieldValueArrayBlock<T extends DescribableValue>({
   // compute the render options for each block
   const parentPrimitiveRenderOptions: PrimitiveValueRenderOptions = pick(
     moreRenderOptions as PrimitiveValueRenderOptions,
-    ...PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
+    PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
   );
 
   const objectArrayOrNestedArrayRenderOptions = {

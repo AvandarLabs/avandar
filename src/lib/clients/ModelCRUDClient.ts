@@ -544,7 +544,7 @@ export function createModelCRUDClient<
       queriesClient ?
         withQueryHooks(queriesClient, {
           queryFns: objectKeys(
-            omit(queriesClient, ...baseClientKeys),
+            omit(queriesClient, baseClientKeys),
             // This is safe to cast to `any`
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ) as any,
@@ -557,7 +557,7 @@ export function createModelCRUDClient<
         withQueryHooks(mutationsClient, {
           queryFns: [],
           mutationFns: objectKeys(
-            omit(mutationsClient, ...baseClientKeys),
+            omit(mutationsClient, baseClientKeys),
             // This is safe to cast to `any`
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ) as any,

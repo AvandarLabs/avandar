@@ -6,6 +6,7 @@ import { camelToTitleCase } from "@/lib/utils/strings/transformations";
 import { DescriptionList } from "../DescriptionList";
 import { DescribableValueArrayBlockProps } from "./FieldValueArrayBlock";
 import {
+  AnyDescribableValueRenderOptions,
   DescribableObject,
   DescribableValue,
   ObjectRenderOptions,
@@ -41,9 +42,9 @@ export function ObjectDescriptionListBlock<T extends DescribableObject>({
         // compute the child render options to pass down
         const parentPrimitiveValueRenderOptions = pick(
           renderOptions,
-          ...PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
+          PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
         );
-        const childRenderOptions = {
+        const childRenderOptions: AnyDescribableValueRenderOptions = {
           ...parentPrimitiveValueRenderOptions,
           ...(renderOptions?.childRenderOptions?.[key] ?? {}),
         };

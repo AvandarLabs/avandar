@@ -61,9 +61,9 @@ export function QueryForm({
           onChange={(fields) => {
             onSelectFieldsChange(fields);
 
-            // Remove the aggregations for any fields that are no longer selected,
-            // and add a default "none" aggregation for any new fields that just
-            // got added
+            // Remove the aggregations for any fields that are no longer
+            // selected, and add a default "none" aggregation for any
+            // new fields that just got added
             const prevAggregations = aggregations;
             const incomingFieldNames = fields.map(getProp("name"));
             const prevFieldNames = objectKeys(prevAggregations);
@@ -80,7 +80,7 @@ export function QueryForm({
             onAggregationsChange(
               omit(
                 { ...newDefaultAggregations, ...prevAggregations },
-                ...droppedFieldNames,
+                droppedFieldNames,
               ),
             );
           }}

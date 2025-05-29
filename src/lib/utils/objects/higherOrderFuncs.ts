@@ -85,10 +85,10 @@ export function propDoesntEqual<
  * @returns A function that removes the specified keys from an object.
  */
 export function omitProps<T extends UnknownObject, K extends keyof T>(
-  ...keys: readonly K[]
+  keys: Extract<K, string> | readonly K[],
 ): (obj: T) => Omit<T, K> {
   return (obj: T) => {
-    return omit(obj, ...keys);
+    return omit(obj, keys);
   };
 }
 
@@ -98,10 +98,10 @@ export function omitProps<T extends UnknownObject, K extends keyof T>(
  * @returns A function that picks the specified keys from an object.
  */
 export function pickProps<T extends UnknownObject, K extends keyof T>(
-  ...keys: readonly K[]
+  keys: Extract<K, string> | readonly K[],
 ): (obj: T) => Pick<T, K> {
   return (obj: T) => {
-    return pick(obj, ...keys);
+    return pick(obj, keys);
   };
 }
 

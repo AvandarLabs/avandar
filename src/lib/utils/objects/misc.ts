@@ -42,12 +42,17 @@ export function objectValues<T extends UnknownObject>(
  */
 export function omit<T extends UnknownObject, K extends keyof T>(
   fromObj: T,
-  ...keysToRemove: readonly K[]
+  keysToRemove: Extract<K, string> | readonly K[],
 ): Omit<T, K> {
   const newObj = { ...fromObj };
-  keysToRemove.forEach((key) => {
-    delete newObj[key];
-  });
+  if (typeof keysToRemove === "string") {
+    delete newObj[keysToRemove];
+    return newObj;
+  } else {
+    keysToRemove.forEach((key) => {
+      delete newObj[key];
+    });
+  }
   return newObj;
 }
 
@@ -60,11 +65,15 @@ export function omit<T extends UnknownObject, K extends keyof T>(
  */
 export function pick<T extends UnknownObject, K extends keyof T>(
   fromObj: T,
-  ...keysToPick: readonly K[]
+  keysToPick: Extract<K, string> | readonly K[],
 ): Pick<T, K> {
   const newObj = {} as Pick<T, K>;
-  keysToPick.forEach((key) => {
-    newObj[key] = fromObj[key];
-  });
+  if (typeof keysToPick === "string") {
+    newObj[keysToPick] = fromObj[keysToPick];
+  } else {
+    keysToPick.forEach((key) => {
+      newObj[key] = fromObj[key];
+    });
+  }
   return newObj;
 }
