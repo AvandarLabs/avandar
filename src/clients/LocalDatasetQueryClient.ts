@@ -216,12 +216,6 @@ class LocalDatasetQueryClientImpl {
       await conn.insertCSVFromPath(tableName, {
         name: tableName,
         schema: "main",
-
-        // TODO(jpsyx): dont hardcode this, somehow infer it
-        dateFormat: "%B %d, %Y",
-
-        // TODO(jpsyx): dont hardcode this, somehow infer it
-        timestampFormat: "%B %d, %Y",
         detect: false,
         header: true,
         delimiter: ",",

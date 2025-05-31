@@ -143,6 +143,26 @@ export function makePipelineFromEntityConfig(
             { name: "datasourceId", dataType: "string" },
           ],
         }),
+
+        // create the queryable entities dataset, with one row per entity
+        _makeOutputDatasetStep({
+          name: `Save queryable entities dataset for entity ${entityConfig.name}`,
+          datasetName: `entity_queryable__${entityConfig.id}`,
+          description: `All the queryable entities for ${entityConfig.name}`,
+          contextValueKey: "queryableEntities",
+          fieldsToWrite: [
+            ...entityConfig.fields.map((field) => {
+              return {
+                name: field.name,
+                dataType: field.options.baseDataType,
+              };
+            }),
+            { name: "assignedTo", dataType: "string" },
+            { name: "status", dataType: "string" },
+            { name: "createdAt", dataType: "date" },
+            { name: "updatedAt", dataType: "date" },
+          ],
+        }),
       ],
     },
   };

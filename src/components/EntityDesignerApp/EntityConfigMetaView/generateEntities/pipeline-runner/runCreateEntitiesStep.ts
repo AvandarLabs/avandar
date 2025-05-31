@@ -14,7 +14,11 @@ import {
   BuildableFieldConfig,
   CreateEntitiesStepConfig,
 } from "../pipelineTypes";
-import { EntityFieldValue, PipelineContext } from "./runPipeline";
+import {
+  EntityFieldValue,
+  EntityFieldValueNativeType,
+  PipelineContext,
+} from "./runPipeline";
 
 function _getEntityIdField(
   entityConfig: BuildableEntityConfig,
@@ -194,7 +198,8 @@ export function runCreateEntitiesStep(
   }
 
   const entities: Entity[] = [];
-  const entityFieldValues: EntityFieldValue[] = [];
+  const allEntityFieldValues: EntityFieldValue[] = [];
+  const queryableEntities: Array<Entity & Record<string, unknown>> = [];
 
   // each external id we found is 1 valid entity. So now we iterate through each
   // one, collect the fields, and create the necessary entity and field value
@@ -205,6 +210,7 @@ export function runCreateEntitiesStep(
     }
 
     const entityId = uuid<"Entity">();
+    const fieldNameToValueDict: Record<string, EntityFieldValueNativeType> = {};
 
     let entityName: string = String(externalId); // falback value
 
@@ -249,7 +255,8 @@ export function runCreateEntitiesStep(
         .exhaustive();
 
       if (entityFieldValue) {
-        entityFieldValues.push(entityFieldValue);
+        allEntityFieldValues.push(entityFieldValue);
+        fieldNameToValueDict[fieldConfig.name] = entityFieldValue.value;
         if (
           fieldConfig.options.isTitleField &&
           isNotNullOrUndefined(entityFieldValue.value)
@@ -259,6 +266,7 @@ export function runCreateEntitiesStep(
       }
     });
 
+    // construct the entity object
     const entity = {
       id: entityId, // the internal id
       name: entityName,
@@ -272,8 +280,14 @@ export function runCreateEntitiesStep(
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-
     entities.push(entity);
+
+    // finally, construct the queryable entity object
+    const queryableEntity = {
+      ...entity,
+      ...fieldNameToValueDict,
+    };
+    queryableEntities.push(queryableEntity);
   });
 
   return Promise.resolve(
@@ -282,7 +296,8 @@ export function runCreateEntitiesStep(
     // specifically an EntitiesCollection dictionary in the context.
     context
       .setContextValue("entities", entities)
-      .setContextValue("entityFieldValues", entityFieldValues)
+      .setContextValue("entityFieldValues", allEntityFieldValues)
+      .setContextValue("queryableEntities", queryableEntities)
       .addErrors(errors),
   );
 }

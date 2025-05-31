@@ -1,6 +1,7 @@
 import Papa from "papaparse";
 import { useCallback, useState } from "react";
 import { CSVRow, MIMEType } from "@/lib/types/common";
+import { propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { FileMetadata } from "@/models/LocalDataset/types";
 import { detectFieldDataTypes } from "./detectFieldDataTypes";
 import type { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
@@ -32,6 +33,23 @@ export function parseFileOrStringToCSV({
           errors,
         };
         const fields = detectFieldDataTypes(meta.fields ?? [], data);
+
+        // check if there are any fields we've determined are dates
+        const dateFields = fields.filter(propEquals("dataType", "date"));
+        if (dateFields.length > 0) {
+          // mutate the CSV data - standardize the dates into ISO format
+          csv.data.forEach((row) => {
+            dateFields.forEach((field) => {
+              const dateString = row[field.name];
+              if (dateString) {
+                row[field.name] = new Date(
+                  Date.parse(dateString),
+                ).toISOString();
+              }
+            });
+          });
+        }
+
         const fileMetadata =
           typeof dataToParse !== "string" ?
             {
