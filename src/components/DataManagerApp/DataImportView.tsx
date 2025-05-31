@@ -69,6 +69,7 @@ export function DataImportView(): JSX.Element {
             onSubmit={form.onSubmit((values) => {
               const dataset = makeLocalDataset({
                 name: values.name,
+                datasetType: "upload",
                 description: values.description,
                 fileMetadata,
                 csvMetadata: csv.meta,

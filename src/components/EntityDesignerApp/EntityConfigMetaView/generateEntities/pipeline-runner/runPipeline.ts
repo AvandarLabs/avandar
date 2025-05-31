@@ -181,6 +181,7 @@ export async function _runOutputDatasetsStep(
 
   const parsedLocalDataset: ParsedLocalDataset = {
     id: uuid(),
+    datasetType: stepConfig.datasetType,
     createdAt: new Date(),
     updatedAt: new Date(),
     name: datasetName,

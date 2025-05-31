@@ -9,6 +9,7 @@ export type LocalDatasetId = UUID<"LocalDataset">;
 type DBRead = {
   id: LocalDatasetId;
   name: string;
+  datasetType: "upload" | "entity_queryable" | "entity_internal";
   description: string;
   createdAt: string;
   updatedAt: string;

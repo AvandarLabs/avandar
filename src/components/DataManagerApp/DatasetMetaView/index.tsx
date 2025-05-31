@@ -29,9 +29,11 @@ type Props = {
 const EXCLUDED_DATASET_METADATA_KEYS = [
   "id",
   "name",
+  "datasetType",
   "data",
   "description",
 ] as const;
+
 const DATASET_METADATA_RENDER_OPTIONS: ChildRenderOptionsMap<LocalDataset> = {
   fields: {
     renderAsTable: true,

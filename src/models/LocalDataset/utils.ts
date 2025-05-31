@@ -8,6 +8,7 @@ import { FileMetadata, LocalDataset, LocalDatasetId } from "./types";
 
 export function makeLocalDataset({
   name,
+  datasetType,
   description,
   fileMetadata,
   csvMetadata,
@@ -15,6 +16,7 @@ export function makeLocalDataset({
   fields,
 }: {
   name: string;
+  datasetType: LocalDataset["datasetType"];
   description: string;
   fileMetadata: FileMetadata;
   csvMetadata: ParseMeta;
@@ -25,6 +27,7 @@ export function makeLocalDataset({
   return {
     id: uuid(),
     name,
+    datasetType,
     firstRowIsHeader: true,
     mimeType: fileMetadata.mimeType,
     description,

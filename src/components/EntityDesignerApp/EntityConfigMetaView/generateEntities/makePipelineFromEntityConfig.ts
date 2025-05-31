@@ -1,7 +1,7 @@
 import { isNotUndefined } from "@/lib/utils/guards";
 import { uuid } from "@/lib/utils/uuid";
 import { FieldDataType } from "@/models/LocalDataset/LocalDatasetField/types";
-import { LocalDatasetId } from "@/models/LocalDataset/types";
+import { LocalDataset, LocalDatasetId } from "@/models/LocalDataset/types";
 import { BuildableEntityConfig, Pipeline, PipelineStep } from "./pipelineTypes";
 
 function _makeDataPullStep(datasetId: LocalDatasetId): PipelineStep {
@@ -29,12 +29,14 @@ function _makeDataPullStep(datasetId: LocalDatasetId): PipelineStep {
 function _makeOutputDatasetStep({
   name,
   datasetName,
+  datasetType,
   description,
   contextValueKey,
   fieldsToWrite,
 }: {
   name: string;
   datasetName: string;
+  datasetType: LocalDataset["datasetType"];
   description?: string;
   contextValueKey: string;
   fieldsToWrite: Array<{ name: string; dataType: FieldDataType }>;
@@ -52,6 +54,7 @@ function _makeOutputDatasetStep({
         createdAt: new Date(),
         updatedAt: new Date(),
         datasetName,
+        datasetType,
         contextValueKey,
         columnsToWrite: fieldsToWrite,
       },
@@ -110,6 +113,7 @@ export function makePipelineFromEntityConfig(
 
         // create the entities dataset, with one row per entity
         _makeOutputDatasetStep({
+          datasetType: "entity_internal",
           name: `Save entity dataset for entity ${entityConfig.name}`,
           datasetName: `entity__${entityConfig.id}`,
           description: `All the entities for ${entityConfig.name}`,
@@ -130,6 +134,7 @@ export function makePipelineFromEntityConfig(
         // field value per entity. So there will be O(N*M) rows, where
         // N is the number of entities and M is the number of fields per entity.
         _makeOutputDatasetStep({
+          datasetType: "entity_internal",
           name: `Save entity field values dataset for entity ${entityConfig.name}`,
           datasetName: `entity_field_values__${entityConfig.id}`,
           description: `All the field values for ${entityConfig.name}`,
@@ -146,6 +151,7 @@ export function makePipelineFromEntityConfig(
 
         // create the queryable entities dataset, with one row per entity
         _makeOutputDatasetStep({
+          datasetType: "entity_queryable",
           name: `Save queryable entities dataset for entity ${entityConfig.name}`,
           datasetName: `entity_queryable__${entityConfig.id}`,
           description: `All the queryable entities for ${entityConfig.name}`,

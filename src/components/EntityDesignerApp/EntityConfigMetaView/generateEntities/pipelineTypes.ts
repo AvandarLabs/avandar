@@ -1,7 +1,7 @@
 import { UUID } from "@/lib/types/common";
 import { EntityConfigWith } from "@/models/EntityConfig/types";
 import { FieldDataType } from "@/models/LocalDataset/LocalDatasetField/types";
-import { LocalDatasetId } from "@/models/LocalDataset/types";
+import { LocalDataset, LocalDatasetId } from "@/models/LocalDataset/types";
 
 type BaseModel<T extends string> = {
   id: UUID<T>;
@@ -21,6 +21,7 @@ export type PullDataStepConfig = BaseModel<"DataPullStepConfig"> & {
 export type OutputDatasetsStepConfig =
   BaseModel<"DatasetCreationStepConfig"> & {
     datasetName: string;
+    datasetType: LocalDataset["datasetType"];
 
     // The pipeline context from where we should get the data
     // This should be an array of objects.

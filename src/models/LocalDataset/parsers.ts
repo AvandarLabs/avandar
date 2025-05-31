@@ -12,6 +12,7 @@ import { LocalDataset, LocalDatasetId, LocalDatasetModel } from "./types";
 export const DBReadSchema = z.object({
   id: uuidType<LocalDatasetId>(),
   name: z.string().min(1),
+  datasetType: z.enum(["upload", "entity_queryable", "entity_internal"]),
   description: z.string(),
   createdAt: z.coerce.string(),
   updatedAt: z.coerce.string(),
