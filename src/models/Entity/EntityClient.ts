@@ -1,6 +1,6 @@
 // TODO(jpsyx): this is all very hacky right now
 import { z } from "zod";
-import { EntityFieldValue } from "@/components/EntityDesignerApp/EntityConfigMetaView/generateEntities/runPipeline";
+import { EntityFieldValue } from "@/components/EntityDesignerApp/EntityConfigMetaView/generateEntities/pipeline-runner/runPipeline";
 import {
   createModelCRUDClient,
   ModelCRUDClient,

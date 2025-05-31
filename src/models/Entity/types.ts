@@ -1,5 +1,5 @@
 import { SetFieldType } from "type-fest";
-import { EntityComment } from "@/components/EntityDesignerApp/EntityConfigMetaView/generateEntities/runPipeline";
+import { EntityComment } from "@/components/EntityDesignerApp/EntityConfigMetaView/generateEntities/pipeline-runner/runPipeline";
 import { UUID } from "@/lib/types/common";
 import { EntityFieldConfig } from "../EntityConfig/EntityFieldConfig/types";
 import { EntityConfig, EntityConfigId } from "../EntityConfig/types";
@@ -14,6 +14,7 @@ type DBRead = {
   name: string; // the external name of this entity (from the source dataset)
   externalId: string; // this is the id we get from the source dataset
   entityConfigId: EntityConfigId;
+  status: string;
   assignedTo: UserId | "";
   createdAt: Date;
   updatedAt: Date;

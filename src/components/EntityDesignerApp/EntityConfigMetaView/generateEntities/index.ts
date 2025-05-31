@@ -1,6 +1,6 @@
 import { makePipelineFromEntityConfig } from "./makePipelineFromEntityConfig";
+import { runPipeline } from "./pipeline-runner/runPipeline";
 import { BuildableEntityConfig } from "./pipelineTypes";
-import { runPipeline } from "./runPipeline";
 
 export async function generateEntities(
   entityConfig: BuildableEntityConfig,

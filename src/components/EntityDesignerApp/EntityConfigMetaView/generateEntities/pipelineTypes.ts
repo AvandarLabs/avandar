@@ -1,11 +1,5 @@
 import { UUID } from "@/lib/types/common";
-import { EntityFieldConfigId } from "@/models/EntityConfig/EntityFieldConfig/types";
 import { EntityConfigWith } from "@/models/EntityConfig/types";
-import {
-  EntityFieldValueExtractor,
-  EntityFieldValueExtractorId,
-  ValueExtractorType,
-} from "@/models/EntityConfig/ValueExtractor/types";
 import { FieldDataType } from "@/models/LocalDataset/LocalDatasetField/types";
 import { LocalDatasetId } from "@/models/LocalDataset/types";
 
@@ -24,21 +18,6 @@ export type PullDataStepConfig = BaseModel<"DataPullStepConfig"> & {
   datasetType: "local";
 };
 
-export type CreateFieldStepConfig = BaseModel<"CreateFieldStepConfig"> & {
-  entityFieldConfigId: EntityFieldConfigId;
-  valueExtractorType: ValueExtractorType;
-  valueExtractorId: EntityFieldValueExtractorId;
-
-  // TODO(jpsyx): value extractors should also have a reference to the entity
-  // field config, because we need to know `isArray`
-  // TODO(jpsyx): we don't need a reference to the full entityConfig. We just
-  // need entity field config that has `isIdField` set to true.
-  relationships: {
-    valueExtractor: EntityFieldValueExtractor;
-    entityConfig: BuildableEntityConfig;
-  };
-};
-
 export type OutputDatasetsStepConfig =
   BaseModel<"DatasetCreationStepConfig"> & {
     datasetName: string;
@@ -53,7 +32,6 @@ export type OutputDatasetsStepConfig =
 export type PipelineStepConfig = {
   pull_data: PullDataStepConfig;
   create_entities: CreateEntitiesStepConfig;
-  create_field: CreateFieldStepConfig;
   output_datasets: OutputDatasetsStepConfig;
 };
 

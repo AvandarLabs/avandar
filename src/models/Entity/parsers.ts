@@ -9,6 +9,7 @@ const DBReadSchema = z.object({
   id: uuidType<EntityId>(),
   name: z.string(),
   externalId: z.string(),
+  status: z.string(),
   entityConfigId: uuidType<EntityConfigId>(),
   assignedTo: z.union([uuidType<UserId>(), z.literal("")]),
   createdAt: z.coerce.date(),

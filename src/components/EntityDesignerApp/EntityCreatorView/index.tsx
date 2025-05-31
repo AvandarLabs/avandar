@@ -52,8 +52,6 @@ export function EntityCreatorView(): JSX.Element {
             : field;
         });
 
-      console.log("transformed fields", allFields);
-
       return {
         ...values,
         fields: allFields,
