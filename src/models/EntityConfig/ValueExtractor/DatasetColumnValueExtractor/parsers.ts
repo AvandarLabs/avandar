@@ -10,6 +10,7 @@ import {
 } from "@/lib/utils/objects/transformations";
 import { pipe } from "@/lib/utils/pipe";
 import { uuid } from "@/lib/utils/uuid";
+import { asLocalDatasetId } from "@/models/LocalDataset/utils";
 import {
   DatasetColumnValueExtractor,
   DatasetColumnValueExtractorModel,
@@ -19,7 +20,7 @@ const DBReadSchema = z.object({
   id: z.string().uuid(),
   entity_field_config_id: z.string().uuid(),
   value_picker_rule_type: z.enum(["most_frequent", "first"]),
-  dataset_id: z.string().uuid(),
+  dataset_id: z.string(),
   dataset_field_id: z.string().uuid(),
   created_at: z.string().datetime({ offset: true }),
   updated_at: z.string().datetime({ offset: true }),
@@ -39,7 +40,7 @@ export const DatasetColumnValueExtractorParsers =
           type: "dataset_column_value" as const,
           id: uuid(obj.id),
           entityFieldConfigId: uuid(obj.entityFieldConfigId),
-          datasetId: uuid(obj.datasetId),
+          datasetId: asLocalDatasetId(obj.datasetId),
           datasetFieldId: uuid(obj.datasetFieldId),
         };
       },

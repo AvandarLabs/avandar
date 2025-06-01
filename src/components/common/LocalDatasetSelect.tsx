@@ -1,11 +1,14 @@
 import { useUncontrolled } from "@mantine/hooks";
 import { useCallback, useMemo } from "react";
+import { match } from "ts-pattern";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
-import { Select, SelectProps } from "@/lib/ui/inputs/Select";
+import { Select, SelectOptionGroup, SelectProps } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
+import { makeBucketMapFromList } from "@/lib/utils/maps/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { LocalDatasetId } from "@/models/LocalDataset/types";
+import { isDatasetViewableType } from "@/models/LocalDataset/utils";
 
 type Props = SelectProps<LocalDatasetId>;
 
@@ -31,6 +34,9 @@ export function LocalDatasetSelect({
   });
 
   const [datasets] = LocalDatasetClient.useGetAll();
+  const viewableDatasets = useMemo(() => {
+    return datasets?.filter(isDatasetViewableType) ?? [];
+  }, [datasets]);
 
   useOnBecomesDefined(
     datasets,
@@ -43,11 +49,46 @@ export function LocalDatasetSelect({
   );
 
   const datasetOptions = useMemo(() => {
-    return makeSelectOptions(datasets ?? [], {
-      valueFn: getProp("id"),
-      labelFn: getProp("name"),
+    const datasetBucketsByType = makeBucketMapFromList(viewableDatasets ?? [], {
+      keyFn: getProp("datasetType"),
     });
-  }, [datasets]);
+
+    if (datasetBucketsByType.size === 1) {
+      return makeSelectOptions(viewableDatasets ?? [], {
+        valueFn: getProp("id"),
+        labelFn: getProp("name"),
+      });
+    }
+
+    // if we have more than 1 bucket that means we need to group things
+    const groups: Array<SelectOptionGroup<LocalDatasetId>> = [];
+    datasetBucketsByType.forEach((bucketValues, bucketKey) => {
+      const bucketName = match(bucketKey)
+        .with("upload", () => {
+          return "Datasets";
+        })
+        .with("entities_queryable", () => {
+          return "Profiles";
+        })
+        .with("entities", "entity_field_values", () => {
+          return "Entity Field Values";
+        })
+        .exhaustive(() => {
+          return undefined;
+        });
+      if (bucketName) {
+        groups.push({
+          group: bucketName,
+          items: makeSelectOptions(bucketValues, {
+            valueFn: getProp("id"),
+            labelFn: getProp("name"),
+          }),
+        });
+      }
+    });
+
+    return groups;
+  }, [viewableDatasets]);
 
   return (
     <Select

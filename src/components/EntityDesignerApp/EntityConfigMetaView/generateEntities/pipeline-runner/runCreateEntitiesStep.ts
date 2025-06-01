@@ -2,7 +2,7 @@ import { match } from "ts-pattern";
 import { Logger } from "@/lib/Logger";
 import { CSVCellValue, CSVRow } from "@/lib/types/common";
 import { assert, isNotNullOrUndefined } from "@/lib/utils/guards";
-import { makeBucketsFromList } from "@/lib/utils/objects/builders";
+import { makeBucketMapFromList } from "@/lib/utils/maps/builders";
 import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { uuid } from "@/lib/utils/uuid";
 import { Entity, EntityId } from "@/models/Entity/types";
@@ -176,12 +176,9 @@ export function runCreateEntitiesStep(
     entityIdField,
   );
 
-  const externalIdsToSourceDatasetRows = makeBucketsFromList(
+  const externalIdsToSourceDatasetRows = makeBucketMapFromList(
     externalIdSourceDataset.data,
-    {
-      keyFn: getProp(datasetExternalIdColumn.name),
-      collectNullableKeys: true,
-    },
+    { keyFn: getProp(datasetExternalIdColumn.name) },
   );
 
   // now report on any errors and remove them from our bucket

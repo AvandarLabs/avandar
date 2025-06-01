@@ -2,9 +2,15 @@ import { LinkProps } from "@tanstack/react-router";
 import Papa, { ParseMeta } from "papaparse";
 import { match } from "ts-pattern";
 import { CSVData, MIMEType } from "@/lib/types/common";
+import { assert } from "@/lib/utils/guards";
 import { uuid } from "@/lib/utils/uuid";
 import { LocalDatasetField } from "./LocalDatasetField/types";
 import { FileMetadata, LocalDataset, LocalDatasetId } from "./types";
+
+export function asLocalDatasetId(id: string): LocalDatasetId {
+  assert(typeof id === "string", "Expected a string as a LocalDatasetId");
+  return id as LocalDatasetId;
+}
 
 export function makeLocalDataset({
   name,
@@ -25,7 +31,7 @@ export function makeLocalDataset({
 }): LocalDataset<"Insert"> {
   const creationTime = new Date();
   return {
-    id: uuid(),
+    id: asLocalDatasetId(uuid()),
     name,
     datasetType,
     firstRowIsHeader: true,
@@ -76,4 +82,22 @@ export function unparseDataset(options: {
       throw new Error("Unsupported dataset type for local storage.");
     });
   return result;
+}
+
+/**
+ * Returns true if the dataset is viewable in the Data Manager navbar.
+ * @param dataset
+ * @returns boolean
+ */
+export function isDatasetViewableType(dataset: LocalDataset): boolean {
+  return match(dataset.datasetType)
+    .with("upload", "entities_queryable", () => {
+      return true;
+    })
+    .with("entities", "entity_field_values", () => {
+      return false;
+    })
+    .exhaustive(() => {
+      return false;
+    });
 }

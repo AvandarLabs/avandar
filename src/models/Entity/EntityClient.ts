@@ -9,10 +9,10 @@ import { ILogger } from "@/lib/Logger";
 import { applyFiltersToRows } from "@/lib/utils/filters/applyFiltersToRows";
 import { FiltersByColumn } from "@/lib/utils/filters/filtersByColumn";
 import { propEquals } from "@/lib/utils/objects/higherOrderFuncs";
-import { uuidType } from "@/lib/utils/zodHelpers";
+import { brandedStringType, uuidType } from "@/lib/utils/zodHelpers";
 import { EntityConfigId } from "../EntityConfig/types";
 import { LocalDatasetClient } from "../LocalDataset/LocalDatasetClient";
-import { ParsedLocalDataset } from "../LocalDataset/types";
+import { LocalDatasetId, ParsedLocalDataset } from "../LocalDataset/types";
 import { EntityParsers } from "./parsers";
 import { Entity, EntityId, EntityModel } from "./types";
 
@@ -32,7 +32,7 @@ export const EntityFieldValueReadSchema = z.object({
   valueSet: z.string().transform((value) => {
     return value.split(";");
   }),
-  datasourceId: uuidType<"LocalDataset">(),
+  datasourceId: brandedStringType<LocalDatasetId>(),
 });
 
 export type EntityFieldValueRead = EntityFieldValue;
@@ -67,7 +67,10 @@ function createEntityClient(entityConfigId: EntityConfigId): EntityClient {
 
     const allDatasets = await LocalDatasetClient.getAll();
     const entityDatasets = allDatasets.filter((dataset) => {
-      return dataset.name.startsWith(`entity__${entityConfigId}`);
+      return (
+        dataset.datasetType === "entities" &&
+        dataset.id.includes(entityConfigId)
+      );
     });
 
     if (entityDatasets.length === 0) {
@@ -94,7 +97,10 @@ function createEntityClient(entityConfigId: EntityConfigId): EntityClient {
 
     const allDatasets = await LocalDatasetClient.getAll();
     const fieldValueDatasets = allDatasets.filter((dataset) => {
-      return dataset.name.startsWith(`entity_field_values__${entityConfigId}`);
+      return (
+        dataset.datasetType === "entity_field_values" &&
+        dataset.id.includes(entityConfigId)
+      );
     });
 
     if (fieldValueDatasets.length === 0) {

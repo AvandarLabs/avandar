@@ -1,15 +1,20 @@
 import { Merge, SetFieldType, Simplify } from "type-fest";
 import { DexieModelCRUDTypes } from "@/lib/models/DexieModelCRUDTypes";
 import { MIMEType } from "@/lib/types/common";
-import type { CSVData, UUID } from "@/lib/types/common";
+import { Brand } from "@/lib/types/utilityTypes";
+import type { CSVData } from "@/lib/types/common";
 import type { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
 
-export type LocalDatasetId = UUID<"LocalDataset">;
+export type LocalDatasetId = Brand<string, "LocalDatasetId">;
 
 type DBRead = {
   id: LocalDatasetId;
   name: string;
-  datasetType: "upload" | "entity_queryable" | "entity_internal";
+  datasetType:
+    | "upload"
+    | "entities_queryable"
+    | "entities"
+    | "entity_field_values";
   description: string;
   createdAt: string;
   updatedAt: string;

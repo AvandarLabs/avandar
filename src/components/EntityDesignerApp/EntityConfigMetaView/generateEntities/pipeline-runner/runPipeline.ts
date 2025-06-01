@@ -14,7 +14,7 @@ import {
   LocalDatasetId,
   ParsedLocalDataset,
 } from "@/models/LocalDataset/types";
-import { unparseDataset } from "@/models/LocalDataset/utils";
+import { asLocalDatasetId, unparseDataset } from "@/models/LocalDataset/utils";
 import { UserId } from "@/models/User";
 import {
   OutputDatasetsStepConfig,
@@ -180,7 +180,7 @@ export async function _runOutputDatasetsStep(
   const sizeInBytes = new TextEncoder().encode(dataAsString).length;
 
   const parsedLocalDataset: ParsedLocalDataset = {
-    id: uuid(),
+    id: asLocalDatasetId(stepConfig.datasetId),
     datasetType: stepConfig.datasetType,
     createdAt: new Date(),
     updatedAt: new Date(),

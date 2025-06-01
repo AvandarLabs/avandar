@@ -117,6 +117,7 @@ export function QueryForm({
           label="Group by"
           placeholder="Group by"
           onChange={onGroupByChange}
+          datasetId={selectedDatasetId}
         />
         {HIDE_ORDER_BY ? null : <Text>Order by (fields dropdown)</Text>}
         {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}

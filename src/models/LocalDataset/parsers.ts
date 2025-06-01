@@ -2,7 +2,7 @@ import { z } from "zod";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { excludeUndefinedDeep } from "@/lib/utils/objects/transformations";
-import { mimeType, uuidType } from "@/lib/utils/zodHelpers";
+import { brandedStringType, mimeType } from "@/lib/utils/zodHelpers";
 import { LocalDatasetFieldSchema } from "./LocalDatasetField/parsers";
 import { LocalDataset, LocalDatasetId, LocalDatasetModel } from "./types";
 
@@ -10,9 +10,14 @@ import { LocalDataset, LocalDatasetId, LocalDatasetModel } from "./types";
  * Zod schema for the local dataset type.
  */
 export const DBReadSchema = z.object({
-  id: uuidType<LocalDatasetId>(),
+  id: brandedStringType<LocalDatasetId>(),
   name: z.string().min(1),
-  datasetType: z.enum(["upload", "entity_queryable", "entity_internal"]),
+  datasetType: z.enum([
+    "upload",
+    "entities_queryable",
+    "entities",
+    "entity_field_values",
+  ]),
   description: z.string(),
   createdAt: z.coerce.string(),
   updatedAt: z.coerce.string(),

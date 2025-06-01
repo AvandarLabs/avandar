@@ -20,6 +20,7 @@ export type PullDataStepConfig = BaseModel<"DataPullStepConfig"> & {
 
 export type OutputDatasetsStepConfig =
   BaseModel<"DatasetCreationStepConfig"> & {
+    datasetId: string;
     datasetName: string;
     datasetType: LocalDataset["datasetType"];
 

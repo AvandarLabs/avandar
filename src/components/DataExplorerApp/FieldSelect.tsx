@@ -6,6 +6,7 @@ import { makeObjectFromEntries } from "@/lib/utils/objects/builders";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { type LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
 import { LocalDataset, LocalDatasetId } from "@/models/LocalDataset/types";
+import { isDatasetViewableType } from "@/models/LocalDataset/utils";
 
 type Props = {
   label: ReactNode;
@@ -35,9 +36,13 @@ export function FieldSelect({
     : undefined,
   );
 
+  const viewableDatasets = useMemo(() => {
+    return allDatasets?.filter(isDatasetViewableType) ?? [];
+  }, [allDatasets]);
+
   const fieldsMap: Record<UUID, LocalDatasetField> = useMemo(() => {
     return makeObjectFromEntries(
-      (allDatasets ?? [])
+      (viewableDatasets ?? [])
         .flatMap((dataset: LocalDataset) => {
           return dataset.fields;
         })
@@ -45,23 +50,25 @@ export function FieldSelect({
           return [field.id, field];
         }),
     );
-  }, [allDatasets]);
+  }, [viewableDatasets]);
 
   const fieldGroupOptions = useMemo(() => {
-    const fieldGroups = (allDatasets ?? []).map((dataset: LocalDataset) => {
-      return {
-        group: dataset.name,
-        items: dataset.fields.map((field: LocalDatasetField) => {
-          return {
-            value: field.id as string,
-            label: field.name,
-          };
-        }),
-      };
-    });
+    const fieldGroups = (viewableDatasets ?? []).map(
+      (dataset: LocalDataset) => {
+        return {
+          group: dataset.name,
+          items: dataset.fields.map((field: LocalDatasetField) => {
+            return {
+              value: field.id as string,
+              label: field.name,
+            };
+          }),
+        };
+      },
+    );
 
     return fieldGroups;
-  }, [allDatasets]);
+  }, [viewableDatasets]);
 
   return (
     <MultiSelect

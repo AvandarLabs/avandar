@@ -1,19 +1,25 @@
 import { Box, Flex, MantineTheme } from "@mantine/core";
 import { Outlet } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
+import { isDatasetViewableType } from "@/models/LocalDataset/utils";
 import { DatasetNavbar } from "./DatasetNavbar";
 
 export function DataManagerApp(): JSX.Element {
   const [allDatasets, isLoadingDatasets] = LocalDatasetClient.useGetAll();
 
+  const viewableDatasets = useMemo(() => {
+    return allDatasets?.filter(isDatasetViewableType) ?? [];
+  }, [allDatasets]);
+
   return (
     <Flex>
-      {allDatasets ?
+      {viewableDatasets ?
         <DatasetNavbar
           miw={240}
           mih="100dvh"
           isLoading={isLoadingDatasets}
-          datasets={allDatasets}
+          datasets={viewableDatasets}
           style={$datasetNavbarBorder}
         />
       : null}

@@ -34,82 +34,33 @@ export function makeObjectFromList<
 }
 
 /**
- * Creates an object of buckets from a list. The `keyFn` is used to extract
- * the bucket name. The `valueFn` is used to extract what value to place in
- * the bucket. Buckets hold arrays of values. Whenever there is a key collision,
- * the value gets appended to that bucket's array.
+ * Creates a record of buckets from a list. The `keyFn` extracts the bucket
+ * name. The `valueFn` extracts the value to place in the bucket. Buckets hold
+ * arrays of values. When keys collide, the value gets appended to the bucket's
+ * array.
  *
  * @param list The list of items to convert to buckets.
  * @param config
  * @param config.keyFn A function that returns the key for each item.
  * @param config.valueFn A function that returns the value for each item.
- * @param config.collectNullableKeys Whether to collect null and undefined
- * keys. If true, the return type will be a Map in order to allow `null`
- * and `undefined` keys.
- * @returns A record or map of buckets, where the keys are the bucket names
- * and the values are arrays of values that were placed in each bucket.
+ * @returns A record of keys to arrays of values.
  */
-export function makeBucketsFromList<
-  T,
-  K extends string | number = string,
-  V = T,
-  CollectNullableKeys extends boolean = never,
-  BucketMapReturnType = [true] extends [CollectNullableKeys] ?
-    Map<K | null | undefined, V[]>
-  : Record<K, V[]>,
->(
+export function makeBucketRecordFromList<T, K extends string, V = T>(
   list: readonly T[],
   {
     keyFn,
     valueFn = identity as (item: T) => V,
-    collectNullableKeys,
-  }: {
-    keyFn: [true] extends [CollectNullableKeys] ?
-      (item: T) => K | null | undefined
-    : (item: T) => K;
-    valueFn?: (item: T) => V;
-    collectNullableKeys?: CollectNullableKeys;
-  },
-): BucketMapReturnType {
+  }: { keyFn: (item: T) => K; valueFn?: (item: T) => V },
+): Record<K, V[]> {
   const buckets = {} as Record<K, V[]>;
-  const nulls = [] as V[];
-  const undefineds = [] as V[];
-
   list.forEach((item) => {
     const bucketName = keyFn(item);
-    const value = valueFn(item);
-
-    if (bucketName === null) {
-      nulls.push(value);
-    } else if (bucketName === undefined) {
-      undefineds.push(value);
-    } else {
-      if (!(bucketName in buckets)) {
-        buckets[bucketName] = [];
-      }
-      buckets[bucketName].push(value);
-    }
+    const value: V = valueFn(item);
+    const bucket: V[] = buckets[bucketName] ?? [];
+    bucket.push(value);
+    buckets[bucketName] = bucket;
   });
-
-  if (!collectNullableKeys) {
-    return buckets as BucketMapReturnType;
-  }
-
-  // if we need to report the `null` and `undefined` keys, then we need to
-  // convert the buckets record to a Map
-  const bucketMap = new Map<K | null | undefined, V[]>(
-    Object.entries(buckets) as Array<[K | null | undefined, V[]]>,
-  );
-
-  if (nulls.length > 0) {
-    bucketMap.set(null, nulls);
-  }
-
-  if (undefineds.length > 0) {
-    bucketMap.set(undefined, undefineds);
-  }
-
-  return bucketMap as BucketMapReturnType;
+  return buckets;
 }
 
 /**
