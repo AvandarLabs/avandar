@@ -1,7 +1,11 @@
 import { ScrollArea, Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
 import { pick } from "@/lib/utils/objects/misc";
-import { isFieldValueArray, isPrimitiveFieldValue } from "../guards";
+import {
+  isFieldValueArray,
+  isPrimitiveFieldValue,
+  isStringOrNumber,
+} from "../guards";
 import {
   DescribableObject,
   DescribableValue,
@@ -20,7 +24,7 @@ type Props<T extends DescribableValue> = {
 
 export function FieldValueArrayBlock<T extends DescribableValue>({
   data,
-  emptyArray = "There are no values",
+  renderEmptyArray = "There are no values",
   maxHeight,
   maxItemsCount,
   ...moreRenderOptions
@@ -43,7 +47,14 @@ export function FieldValueArrayBlock<T extends DescribableValue>({
   }, [data]);
 
   if (data.length === 0) {
-    return <Text fs="italic">{emptyArray}</Text>;
+    if (isStringOrNumber(renderEmptyArray)) {
+      return (
+        <Text span fs="italic">
+          {renderEmptyArray}
+        </Text>
+      );
+    }
+    return <>{renderEmptyArray}</>;
   }
 
   // compute the render options for each block

@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { StringKeyOf, UnionToTuple } from "type-fest";
 
 /** A non-recursive value */
@@ -36,11 +37,20 @@ type DescribableObjectOf<T extends DescribableValue> = {
  * recursive DescribableValues to apply to its children.
  */
 export type PrimitiveValueRenderOptions = {
-  emptyString?: string;
-  nullString?: string;
-  undefinedString?: string;
-  booleanTrue?: string;
-  booleanFalse?: string;
+  /** The string to display for empty strings */
+  renderEmptyString?: NonNullable<ReactNode>;
+
+  /** The string to display for null values */
+  renderNullString?: NonNullable<ReactNode>;
+
+  /** The string to display for undefined values */
+  renderUndefinedString?: NonNullable<ReactNode>;
+
+  /** The string to display for boolean true values */
+  renderBooleanTrue?: NonNullable<ReactNode>;
+
+  /** The string to display for boolean false values */
+  renderBooleanFalse?: NonNullable<ReactNode>;
 
   /** If no `dateFormat` is provided we will use `date.toLocaleDateString()` */
   dateFormat?: string;
@@ -49,11 +59,11 @@ export type PrimitiveValueRenderOptions = {
 export const PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS: UnionToTuple<
   keyof PrimitiveValueRenderOptions
 > = [
-  "emptyString",
-  "nullString",
-  "undefinedString",
-  "booleanTrue",
-  "booleanFalse",
+  "renderEmptyString",
+  "renderNullString",
+  "renderUndefinedString",
+  "renderBooleanTrue",
+  "renderBooleanFalse",
   "dateFormat",
 ] as const;
 
@@ -105,9 +115,29 @@ export type ObjectRenderOptions<T extends NonNullable<DescribableObject>> =
     : PrimitiveValueRenderOptions;
   };
 
+/**
+ * Extended options for arrays of objects.
+ */
 export type ObjectArrayRenderOptions<T extends NonNullable<DescribableObject>> =
   PrimitiveValueRenderOptions & {
+    /**
+     * By default object arrays render as a list of collapsible items.
+     * If `renderAsTable` is true then we will render as a table instead.
+     */
     renderAsTable?: boolean;
+
+    /**
+     * If true, we default each item to start expanded rather than collapsed.
+     * This is only applicable if we are not rendering as a table.
+     *
+     * Default is `true`.
+     */
+    defaultExpanded?: boolean;
+
+    /**
+     * The title to use for each list item. This is only applicable if we are
+     * not rendering as a table.
+     */
     titleKey?: StringKeyOf<T>;
 
     /**
@@ -116,6 +146,9 @@ export type ObjectArrayRenderOptions<T extends NonNullable<DescribableObject>> =
     itemRenderOptions?: ObjectRenderOptions<T>;
   };
 
+/**
+ * Extended options for nested arrays
+ */
 export type NestedArrayRenderOptions<T extends DescribableValue> =
   PrimitiveValueRenderOptions & {
     /** Options for each nested array within this array */
@@ -126,7 +159,7 @@ export type NestedArrayRenderOptions<T extends DescribableValue> =
  * Options for how to render an array of values.
  */
 export type DescribableValueArrayRenderOptions<T extends DescribableValue> = {
-  emptyArray?: string;
+  renderEmptyArray?: NonNullable<ReactNode>;
 
   /**
    * Maximum height of the description list. Beyond this height we will

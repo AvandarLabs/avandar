@@ -21,6 +21,7 @@ const ENTITY_CONFIG_RENDER_OPTIONS: ChildRenderOptionsMap<
 > = {
   fields: {
     titleKey: "name",
+    defaultExpanded: false,
     itemRenderOptions: {
       excludeKeys: ["id", "entityConfigId"],
       childRenderOptions: {

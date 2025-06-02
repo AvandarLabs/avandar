@@ -26,6 +26,7 @@ export function ObjectArrayBlock<T extends DescribableObject>({
   titleKey,
   itemRenderOptions,
   maxItemsCount,
+  defaultExpanded = true,
   ...primitiveValueRenderOptions
 }: Props<T>): JSX.Element | null {
   const excludeKeySet: ReadonlySet<StringKeyOf<T>> = useMemo(() => {
@@ -115,6 +116,7 @@ export function ObjectArrayBlock<T extends DescribableObject>({
       <CollapsibleItem
         key={entityId}
         label={titleKey ? String(val[titleKey]) : String(idx + 1)}
+        defaultOpen={defaultExpanded}
       >
         {/* We intentionally pass the `parentRenderOptions` because the
           child-specific render options will be computed inside the object

@@ -25,3 +25,7 @@ export function isDescribableObject(
 ): value is DescribableObject {
   return isPlainObject(value);
 }
+
+export function isStringOrNumber(value: unknown): value is string | number {
+  return typeof value === "string" || typeof value === "number";
+}

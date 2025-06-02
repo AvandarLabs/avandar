@@ -1,6 +1,7 @@
 import { Text } from "@mantine/core";
 import dayjs from "dayjs";
 import { isDate } from "@/lib/utils/guards";
+import { isStringOrNumber } from "./guards";
 import type { PrimitiveValue, PrimitiveValueRenderOptions } from "./types";
 
 type Props<T extends PrimitiveValue> = {
@@ -12,41 +13,69 @@ type Props<T extends PrimitiveValue> = {
  */
 export function PrimitiveValueItem<T extends PrimitiveValue>({
   value,
-  emptyString = "Empty text",
-  booleanTrue = "Yes",
-  booleanFalse = "No",
-  nullString = "No value",
-  undefinedString = "No value",
+  renderEmptyString = "Empty text",
+  renderBooleanTrue = "Yes",
+  renderBooleanFalse = "No",
+  renderNullString = "No value",
+  renderUndefinedString = "No value",
   dateFormat,
 }: Props<T>): JSX.Element {
   if (value === null) {
-    return <Text fs="italic">{nullString}</Text>;
+    if (isStringOrNumber(renderNullString)) {
+      return (
+        <Text span fs="italic">
+          {renderNullString}
+        </Text>
+      );
+    } else {
+      return <>{renderNullString}</>;
+    }
   }
 
   if (value === undefined) {
-    return <Text fs="italic">{undefinedString}</Text>;
+    if (isStringOrNumber(renderUndefinedString)) {
+      return (
+        <Text span fs="italic">
+          {renderUndefinedString}
+        </Text>
+      );
+    } else {
+      return <>{renderUndefinedString}</>;
+    }
   }
 
   if (value === "") {
-    return <Text fs="italic">{emptyString}</Text>;
+    if (isStringOrNumber(renderEmptyString)) {
+      return (
+        <Text span fs="italic">
+          {renderEmptyString}
+        </Text>
+      );
+    } else {
+      return <>{renderEmptyString}</>;
+    }
   }
 
   if (typeof value === "string") {
-    return <Text>{value}</Text>;
+    return <Text span>{value}</Text>;
   }
 
   if (typeof value === "number") {
-    return <Text>{Intl.NumberFormat().format(value)}</Text>;
+    return <Text span>{Intl.NumberFormat().format(value)}</Text>;
   }
 
   if (typeof value === "boolean") {
-    return <Text>{value ? booleanTrue : booleanFalse}</Text>;
+    if (isStringOrNumber(renderBooleanTrue)) {
+      return <Text span>{value ? renderBooleanTrue : renderBooleanFalse}</Text>;
+    } else {
+      return <>{value ? renderBooleanTrue : renderBooleanFalse}</>;
+    }
   }
 
   if (isDate(value)) {
     // TODO(jpsyx): add options to format the date
     return (
-      <Text>
+      <Text span>
         {dateFormat ?
           dayjs(value).format(dateFormat)
         : value.toLocaleDateString()}
