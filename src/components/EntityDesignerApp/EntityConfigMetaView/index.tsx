@@ -107,6 +107,9 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
                 loading: isDeletePending,
               },
               onConfirm: () => {
+                // TODO(jpsyx): if we delete an entity config, we should delete
+                // any entities (and their entities datasets) that are
+                // associated to it
                 sendDelete(
                   { id: entityConfig.id },
                   {

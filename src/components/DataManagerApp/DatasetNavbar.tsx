@@ -8,7 +8,9 @@ import {
 } from "@mantine/core";
 import { useMemo } from "react";
 import { APP_CONFIG } from "@/config/AppConfig";
+import { Logger } from "@/lib/Logger";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
+import { isNotNullOrUndefined } from "@/lib/utils/guards";
 import { makeBucketMapFromList } from "@/lib/utils/maps/builders";
 import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
@@ -48,9 +50,15 @@ export function DatasetNavbar({
     };
   }, [theme.radius]);
 
+  const hasEntityDatasets = datasets.some(
+    propEquals("datasetType", "entities_queryable"),
+  );
+
+  Logger.log("hasEntityDatasets", { hasEntityDatasets, datasets });
+
   const [entityConfigs, isLoadingEntityConfigs] = EntityConfigClient.useGetAll({
     useQueryOptions: {
-      enabled: datasets.some(propEquals("datasetType", "entities_queryable")),
+      enabled: hasEntityDatasets,
     },
   });
 
@@ -74,26 +82,28 @@ export function DatasetNavbar({
         },
       ],
 
-      entityConfigs === undefined ?
+      entityConfigs === undefined || entityConfigs.length === 0 ?
         []
-      : entityDatasets.map((dataset) => {
-          // make sure the dataset is the queryable entity type
-          if (dataset.datasetType === "entities_queryable") {
-            const entityConfigId = dataset.id.split("__")[1];
-            if (entityConfigId) {
-              const entityConfig = entityConfigs.find((config) => {
-                return config.id === entityConfigId;
-              });
-              return entityConfig ?
-                  makeDatasetLink(dataset, {
-                    style: borderStyle,
-                    label: entityConfig.name,
-                  })
-                : undefined;
+      : entityDatasets
+          .map((dataset) => {
+            // make sure the dataset is the queryable entity type
+            if (dataset.datasetType === "entities_queryable") {
+              const entityConfigId = dataset.id.split("__")[1];
+              if (entityConfigId) {
+                const entityConfig = entityConfigs.find((config) => {
+                  return config.id === entityConfigId;
+                });
+                return entityConfig ?
+                    makeDatasetLink(dataset, {
+                      style: borderStyle,
+                      label: entityConfig.name,
+                    })
+                  : undefined;
+              }
             }
-          }
-          return undefined;
-        }),
+            return undefined;
+          })
+          .filter(isNotNullOrUndefined),
     ];
   }, [datasets, borderStyle, entityConfigs]);
 

@@ -26,7 +26,9 @@ function RootComponent() {
         <ModalsProvider>
           <Notifications position="top-right" />
           <Outlet />
-          <TanStackRouterDevtools />
+          {import.meta.env.VITE_HIDE_DEV_TOOLS === "true" ? null : (
+            <TanStackRouterDevtools />
+          )}
         </ModalsProvider>
       </MantineProvider>
     </QueryClientProvider>
