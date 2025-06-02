@@ -2,7 +2,9 @@ import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { useMemo } from "react";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { makeMapFromList } from "@/lib/utils/maps/builders";
+import { makeObjectFromList } from "@/lib/utils/objects/builders";
 import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
+import { omit } from "@/lib/utils/objects/misc";
 import { unknownToString } from "@/lib/utils/strings/transformations";
 import {
   EntityClient,
@@ -118,6 +120,21 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
     entity,
   });
 
+  const [entityMetadata, fieldValues] = useMemo(() => {
+    // convert the field values array into a record
+    const fieldValuesRecord =
+      hydratedEntity.fieldValues ?
+        makeObjectFromList(hydratedEntity.fieldValues, {
+          keyFn: (fieldValue) => {
+            return fieldValue.fieldName ?? "Loading...";
+          },
+          valueFn: getProp("value"),
+        })
+      : undefined;
+
+    return [omit(hydratedEntity, "fieldValues"), fieldValuesRecord];
+  }, [hydratedEntity]);
+
   return (
     <Container pt="lg">
       <Stack>
@@ -131,7 +148,7 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
         </Group>
         <Text>{entityConfig.description}</Text>
         <ObjectDescriptionList
-          data={hydratedEntity}
+          data={entityMetadata}
           dateFormat="MMMM D, YYYY"
           excludeKeys={[
             "id",
@@ -142,21 +159,14 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
             "nameFieldValue",
             "fieldConfigs",
           ]}
-          childRenderOptions={{
-            fieldValues: {
-              renderAsTable: true,
-              itemRenderOptions: {
-                excludeKeys: [
-                  "id",
-                  "valueSet",
-                  "entityId",
-                  "entityFieldConfigId",
-                  "datasourceId",
-                ],
-              },
-            },
-          }}
         />
+
+        <Title order={4}>Data</Title>
+        {fieldValues === undefined ?
+          <Loader />
+        : <ObjectDescriptionList data={fieldValues} dateFormat="MMMM D, YYYY" />
+        }
+
         <ActivityBlock />
       </Stack>
     </Container>

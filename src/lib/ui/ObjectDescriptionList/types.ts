@@ -27,6 +27,10 @@ export type DescribableObject = {
   [key: string]: DescribableValue;
 };
 
+type DescribableObjectOf<T extends DescribableValue> = {
+  [key: string]: T;
+};
+
 /**
  * Render options for primitive values. These can also be passed to any
  * recursive DescribableValues to apply to its children.
@@ -85,13 +89,37 @@ export type ObjectRenderOptions<T extends NonNullable<DescribableObject>> =
      * over the global entity render options.
      */
     childRenderOptions?: ChildRenderOptionsMap<T>;
+
+    /**
+     * Render options to apply to each item in the object. This is useful for
+     * objects as records where you can't use `childRenderOptions` because you
+     * may not know the literal keys, and you want to apply the same options
+     * to all items.
+     */
+    itemRenderOptions?: T extends (
+      DescribableObjectOf<infer Item extends DescribableObject>
+    ) ?
+      ObjectRenderOptions<Item>
+    : T extends ReadonlyArray<infer Item extends DescribableValue> ?
+      DescribableValueArrayRenderOptions<Item>
+    : PrimitiveValueRenderOptions;
   };
 
 export type ObjectArrayRenderOptions<T extends NonNullable<DescribableObject>> =
   PrimitiveValueRenderOptions & {
     renderAsTable?: boolean;
     titleKey?: StringKeyOf<T>;
+
+    /**
+     * Render options for each object in the array.
+     */
     itemRenderOptions?: ObjectRenderOptions<T>;
+  };
+
+export type NestedArrayRenderOptions<T extends DescribableValue> =
+  PrimitiveValueRenderOptions & {
+    /** Options for each nested array within this array */
+    itemRenderOptions?: DescribableValueArrayRenderOptions<T>;
   };
 
 /**
@@ -111,12 +139,7 @@ export type DescribableValueArrayRenderOptions<T extends DescribableValue> = {
    */
   maxItemsCount?: number;
 } & (T extends DescribableObject ? ObjectArrayRenderOptions<T>
-: T extends readonly DescribableValue[] ?
-  // nested array render options
-  PrimitiveValueRenderOptions & {
-    // options for the child array
-    itemRenderOptions?: DescribableValueArrayRenderOptions<T>;
-  }
+: T extends readonly DescribableValue[] ? NestedArrayRenderOptions<T>
 : PrimitiveValueRenderOptions);
 
 export type AnyDescribableValueRenderOptions =

@@ -46,6 +46,11 @@ export function ObjectDescriptionListBlock<T extends DescribableObject>({
         );
         const childRenderOptions: AnyDescribableValueRenderOptions = {
           ...parentPrimitiveValueRenderOptions,
+
+          // apply the item render options
+          ...(renderOptions?.itemRenderOptions ?? {}),
+
+          // apply the child render options, which take highest priority
           ...(renderOptions?.childRenderOptions?.[key] ?? {}),
         };
 
@@ -74,7 +79,7 @@ export function ObjectDescriptionListBlock<T extends DescribableObject>({
 }
 
 type DescribableObjectProps<T extends DescribableObject> = Props<T>;
-type DescribableValueArrayProps<T extends readonly DescribableValue[]> =
+type DescribableValueArrayProps<T extends DescribableValue> =
   DescribableValueArrayBlockProps<T>;
 
 /**
@@ -92,7 +97,8 @@ export function ObjectDescriptionList<
   data,
   ...renderOptions
 }: T extends DescribableObject ? DescribableObjectProps<T>
-: T extends readonly DescribableValue[] ? DescribableValueArrayProps<T>
+: T extends ReadonlyArray<infer U extends DescribableValue> ?
+  DescribableValueArrayProps<U>
 : never): JSX.Element {
   // pass the data to `UnknownValueItem` to decide how to render things
   return <ValueItemContainer type="unknown" value={data} {...renderOptions} />;
