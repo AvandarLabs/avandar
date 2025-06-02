@@ -18,9 +18,9 @@ import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
-import { getSummary } from "@/models/LocalDataset/getSummary";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { type LocalDataset } from "@/models/LocalDataset/types";
+import { DataSummaryView } from "./DataSummaryView";
 
 type Props = {
   dataset: LocalDataset;
@@ -147,31 +147,9 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
           </Tabs.Panel>
 
           <Tabs.Panel value="dataset-summary">
-            <Stack>
-              {isLoadingParsedDataset ?
-                <Loader />
-              : <ObjectDescriptionList
-                  data={getSummary(parsedDataset)}
-                  childRenderOptions={{
-                    columnSummaries: {
-                      titleKey: "name",
-                      itemRenderOptions: {
-                        maxHeight: 400,
-                        childRenderOptions: {
-                          mostCommonValue: {
-                            childRenderOptions: {
-                              value: {
-                                maxItemsCount: 4,
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  }}
-                />
-              }
-            </Stack>
+            {isLoadingParsedDataset ?
+              <Loader />
+            : <DataSummaryView parsedDataset={parsedDataset} />}
           </Tabs.Panel>
 
           <Button
