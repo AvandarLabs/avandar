@@ -1,47 +1,57 @@
-# SaaS App Scaffold
+# Avandar
 
-## Set up
+## Local development
 
-1. Run the following in your terminal
+### Prerequisites
 
-```
-git clone https://github.com/jps327/saas-app-template.git [YOUR_REPO_NAME]
-cd [YOUR_REPO_NAME]
-yarn install
-git remote remove origin
+1. Node.js
+2. Yarn
+3. Docker Desktop
+4. Supabase CLI
+
+### Set up
+
+1. Clone this repo
+2. Set the SaaS App Template (also developed by Avandar) as the upstream repo
+
+```bash
 git remote add upstream https://github.com/jps327/saas-app-template.git
-cp .env.example .env.development
-```
-
-2. Create a repo in GitHub and point this directory to your newly created repo
-
-```
-git remote add origin [REPO_GIT_URL].git
-git branch -M main
-git push -u origin main
 ```
 
 3. Initiate a local instance of Supabase
 
-```
+```bash
 npx supabase start
 ```
 
-(If a local instance of Supabase is already running for a different project
-you will need to stop it first. Navigate to the directory associated with
-the other Supabase container and run `npx supabase stop`)
+You should be able to access your local Supabase Studio at a URL provided
+in the output (most likely `http://localhost:54323`)
 
-4. Open `.env.development` file and update your Supabase keys (output from step 3). Also change the Vite app URL if necessary.
+4. Set up your environment variables
 
-5. Set your package name in `package.json`
+```bash
+cp .env.example .env.development
+```
 
-6. Set your app name in `index.html`
+And then fill in the necessary environment variables. For the Supabase
+variables, you should be able to get that info from the output of having
+started Supabase locally in the prior steps.
 
-7. Update the project id in `supabase/config.toml` and change the port if you don't want it to clash with other local supabase instances.
+5. Set up your local database
 
-8. Update your logo in `public/`. If your logo is a PNG (not an svg), update the filename in `src/config/AppConfig.ts`. Also update the filename in `index.html`
+```bash
+yarn db:reset
+```
 
-9. Update everything you need in `src/config/AppConfig.ts`.
+This will reset your Supabase database, apply all local migrations from
+the `supabase/migrations` directory, and then add the seed data from
+`seed/SeedConfig.ts`
+
+6. Start the development server
+
+```bash
+yarn dev
+```
 
 ## Stack
 
@@ -49,28 +59,21 @@ the other Supabase container and run `npx supabase stop`)
 - Vite
 - TypeScript
 - Mantine
-- TailwindCSS
+- TailwindCSS (this is on v3 because `eslint-plugin-tailwindcss` does not support v4 yet)
 - React Query
 - React Router
 - Supabase
 
-# Notes
+## Creating new CRUD models
 
-- TailwindCSS is on v3 because eslint-plugin-tailwindcss does not support v4 yet.
-- Public files are in public/. Change the logo there. Just replace logo.svg with your logo (png, svg, whatever).
-- Public files are importable using / in vite.
-- Images, pngs, svgs, are importable from assets directly.
-
-# Creating new CRUD models
-
-## 1. DB schema changes
+### 1. DB schema changes
 
 1. Create a SQL DB schema in `supabase/schemas`
 2. Generate a new migration with `yarn db:new-migration your_migration_name`
 3. Review that the generated migration makes sense and does what you need to.
 4. Apply the new migration with `yarn db:apply-migrations`
 
-## 2. Set up the TypeScript models
+### 2. Set up the TypeScript models
 
 1. Generate the new types with `yarn db:gen-types`
 2. Run `yarn new:model YourModel your_db_table_name` to create your new model with CRUD variants.

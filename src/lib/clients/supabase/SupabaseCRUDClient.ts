@@ -1,4 +1,5 @@
 import { PostgrestFilterBuilder } from "@supabase/postgrest-js";
+import { SupabaseClient } from "@supabase/supabase-js";
 import { match } from "ts-pattern";
 import {
   DatabaseTableNames,
@@ -29,7 +30,11 @@ export type SupabaseCRUDClient<
   M,
   ExtendedQueriesClient & BaseClient,
   ExtendedMutationsClient & BaseClient
->;
+> & {
+  setDBClient: (
+    dbClient: SupabaseClient<Database>,
+  ) => SupabaseCRUDClient<M, ExtendedQueriesClient, ExtendedMutationsClient>;
+};
 
 type SupabaseFilterableQuery = PostgrestFilterBuilder<
   Database["public"],
@@ -46,14 +51,7 @@ export function createSupabaseCRUDClient<
   M extends SupabaseModelCRUDTypes,
   ExtendedQueriesClient extends HookableClient,
   ExtendedMutationsClient extends HookableClient,
->({
-  modelName,
-  tableName,
-  parsers,
-  dbTablePrimaryKey,
-  queries,
-  mutations,
-}: {
+>(options: {
   modelName: M["modelName"];
   tableName: M["tableName"];
 
@@ -83,7 +81,24 @@ export function createSupabaseCRUDClient<
    * return a promise.
    */
   mutations?: (config: { clientLogger: ILogger }) => ExtendedMutationsClient;
+
+  /**
+   * The database client to use for interacting with Supabase.
+   * Defaults to our global `SupabaseDBClient`.
+   * We override this when we want to test or seed data with an admin client.
+   */
+  dbClient?: SupabaseClient<Database>;
 }): SupabaseCRUDClient<M, ExtendedQueriesClient, ExtendedMutationsClient> {
+  const {
+    modelName,
+    tableName,
+    parsers,
+    dbTablePrimaryKey,
+    queries,
+    mutations,
+    dbClient = SupabaseDBClient,
+  } = options;
+
   function _applyFiltersToSupabaseQuery<Query extends SupabaseFilterableQuery>(
     query: Query,
     filters: FiltersByColumn<M["DBRead"]>,
@@ -122,7 +137,8 @@ export function createSupabaseCRUDClient<
       if (params.id === undefined || params.id === null) {
         return undefined;
       }
-      const { data } = await SupabaseDBClient.from(tableName)
+      const { data } = await dbClient
+        .from(tableName)
         .select("*")
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .eq(dbTablePrimaryKey, params.id as any)
@@ -136,7 +152,7 @@ export function createSupabaseCRUDClient<
       logger: ILogger;
     }): Promise<number | null> => {
       const { where } = params;
-      let query = SupabaseDBClient.from(tableName).select("*", {
+      let query = dbClient.from(tableName).select("*", {
         count: "exact",
         head: true,
       }) as SupabaseFilterableQuery;
@@ -156,9 +172,9 @@ export function createSupabaseCRUDClient<
       logger: ILogger;
     }) => {
       const { where, pageSize, pageNum, logger } = params;
-      let query = SupabaseDBClient.from(tableName).select(
-        "*",
-      ) as SupabaseFilterableQuery;
+      let query = dbClient
+        .from(tableName)
+        .select("*") as SupabaseFilterableQuery;
 
       if (where) {
         query = _applyFiltersToSupabaseQuery(query, where);
@@ -181,7 +197,8 @@ export function createSupabaseCRUDClient<
     },
 
     insert: async (params: { data: M["DBInsert"]; logger: ILogger }) => {
-      const { data: insertedData } = await SupabaseDBClient.from(tableName)
+      const { data: insertedData } = await dbClient
+        .from(tableName)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .insert(params.data as any)
         .select()
@@ -194,7 +211,8 @@ export function createSupabaseCRUDClient<
       data: ReadonlyArray<M["DBInsert"]>;
       logger: ILogger;
     }) => {
-      const { data: insertedRows } = await SupabaseDBClient.from(tableName)
+      const { data: insertedRows } = await dbClient
+        .from(tableName)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .insert(params.data as any)
         .select()
@@ -208,7 +226,8 @@ export function createSupabaseCRUDClient<
       data: M["DBUpdate"];
       logger: ILogger;
     }) => {
-      const { data: updatedData } = await SupabaseDBClient.from(tableName)
+      const { data: updatedData } = await dbClient
+        .from(tableName)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .update(params.data as any)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -223,7 +242,8 @@ export function createSupabaseCRUDClient<
       id: M["modelPrimaryKeyType"];
       logger: ILogger;
     }) => {
-      await SupabaseDBClient.from(tableName)
+      await dbClient
+        .from(tableName)
         .delete()
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .eq(dbTablePrimaryKey, params.id as any)
@@ -234,7 +254,8 @@ export function createSupabaseCRUDClient<
       ids: ReadonlyArray<M["modelPrimaryKeyType"]>;
       logger: ILogger;
     }) => {
-      await SupabaseDBClient.from(tableName)
+      await dbClient
+        .from(tableName)
         .delete()
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .in(dbTablePrimaryKey, params.ids as any)
@@ -242,5 +263,19 @@ export function createSupabaseCRUDClient<
     },
   });
 
-  return modelClient;
+  return {
+    setDBClient: (
+      newDBClient: SupabaseClient<Database>,
+    ): SupabaseCRUDClient<
+      M,
+      ExtendedQueriesClient,
+      ExtendedMutationsClient
+    > => {
+      return createSupabaseCRUDClient({
+        ...options,
+        dbClient: newDBClient,
+      });
+    },
+    ...modelClient,
+  };
 }

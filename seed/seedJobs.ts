@@ -1,5 +1,6 @@
-import { snakeCaseKeysDeep } from "@/lib/utils/objects/transformations";
 import { promiseMap } from "@/lib/utils/promises";
+import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
+import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
 import type { SeedJob } from "./SeedConfig";
 
 export const entityConfigSeeder: SeedJob = {
@@ -7,31 +8,28 @@ export const entityConfigSeeder: SeedJob = {
   jobFn: async ({ data, dbClient, helpers }): Promise<void> => {
     // create the entity configs
     await promiseMap(data.entityConfigs, async (entityConfig) => {
-      const { data: insertedEntityConfig } = await dbClient
-        .from("entity_configs")
-        .insert({
-          owner_id: helpers.getUserByEmail(entityConfig.owner).id,
+      const insertedEntityConfig = await EntityConfigClient.setDBClient(
+        dbClient,
+      ).insert({
+        data: {
+          ownerId: helpers.getUserByEmail(entityConfig.owner).id,
           name: entityConfig.name,
           description: entityConfig.description,
-          allow_manual_creation: entityConfig.allowManualCreation,
-          dataset_id: entityConfig.datasetId,
-        })
-        .select()
-        .single()
-        .throwOnError();
+          allowManualCreation: entityConfig.allowManualCreation,
+        },
+      });
 
       // now create the field configs for this entity config
       await promiseMap(entityConfig.fields, async (entityFieldConfig) => {
         const { name, description, options } = entityFieldConfig;
-        return dbClient
-          .from("entity_field_configs")
-          .insert({
-            entity_config_id: insertedEntityConfig.id,
+        return await EntityFieldConfigClient.setDBClient(dbClient).insert({
+          data: {
+            entityConfigId: insertedEntityConfig.id,
             name,
             description,
-            ...snakeCaseKeysDeep(options),
-          })
-          .throwOnError();
+            options,
+          },
+        });
       });
     });
   },
