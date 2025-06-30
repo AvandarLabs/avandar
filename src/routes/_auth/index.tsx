@@ -1,57 +1,73 @@
-import { Anchor, Box, Button, Group, Stack, Text, Title } from "@mantine/core";
+import { Container, Paper, Stack, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import reactLogo from "@/assets/react.svg";
-import { useQuery, UseQueryResultTuple } from "@/lib/hooks/query/useQuery";
+import { BasicForm } from "@/lib/ui/BasicForm";
+import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
+import { slugify } from "@/lib/utils/strings/transformations";
 
 export const Route = createFileRoute("/_auth/")({
   component: HomePage,
 });
 
-/**
- * You can delete this custom hook. It's simple boilerplace to show how
- * to use React Query. This function simply returns a random number.
- */
-function useRandomNumber(): UseQueryResultTuple<number> {
-  return useQuery({
-    queryKey: ["example"],
-    queryFn: () => {
-      return Promise.resolve(
-        Math.round((Math.random() * 100 + Number.EPSILON) * 100) / 100,
-      );
+const FORM_FIELDS = {
+  workspaceName: {
+    type: "text" as const,
+    initialValue: "",
+    required: true,
+  },
+  workspaceIdentifier: {
+    type: "text" as const,
+    description:
+      "This is the unique ID of your organization used in URLs. It cannot be changed once created.",
+    initialValue: "",
+    required: true,
+    syncWhileUntouched: {
+      syncFrom: "workspaceName",
+      transform: slugify,
     },
-  });
-}
+  },
+  fullName: {
+    type: "text" as const,
+    initialValue: "",
+    required: true,
+  },
+  displayName: {
+    type: "text" as const,
+    description:
+      "This could be your name, a nickname, or however you want your team to refer to you.",
+    initialValue: "",
+    required: true,
+    syncWhileUntouched: {
+      syncFrom: "fullName",
+    },
+  },
+};
+
+const FIELD_ORDER = [
+  "workspaceName",
+  "workspaceIdentifier",
+  "fullName",
+  "displayName",
+] as const;
 
 function HomePage() {
-  const [count, setCount] = useState(0);
-  const [randomNumber, isLoading] = useRandomNumber();
-
   return (
-    <Stack>
-      <Title order={1}>This is an H1 Title</Title>
-      <Group>
-        <Text>This is a test image asset:</Text>
-        <Anchor href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </Anchor>
-      </Group>
-      <Box>
-        <Button
-          onClick={() => {
-            setCount((prevCount) => {
-              return prevCount + 1;
-            });
-          }}
-        >
-          Count is {count}
-        </Button>
-      </Box>
-      <Text>This is a test paragraph.</Text>
-      <Text>
-        Loading random number from a query:{" "}
-        {isLoading ? "Loading..." : randomNumber}
-      </Text>
-    </Stack>
+    <Container my="xxxl">
+      <Stack>
+        <Title ta="center" order={1}>
+          Welcome to your first workspace
+        </Title>
+
+        <Paper withBorder shadow="md" p="lg" mt="lg" radius="md" bg="white">
+          <BasicForm
+            fields={FORM_FIELDS}
+            fieldOrder={FIELD_ORDER}
+            onSubmit={(values) => {
+              console.log(values);
+              notifyDevAlert(values);
+            }}
+          />
+        </Paper>
+      </Stack>
+    </Container>
   );
 }

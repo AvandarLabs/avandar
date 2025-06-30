@@ -1,5 +1,7 @@
-import { Paths } from "type-fest";
+import { Paths, SetRequired } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
+import { SetDefined } from "@/lib/types/utilityTypes";
+import { hasDefinedProp } from "../guards";
 import { getValue, PathValue } from "./getValue";
 import { omit, pick } from "./misc";
 import {
@@ -76,6 +78,21 @@ export function propDoesntEqual<
       return getValue(obj, path) !== value;
     }
     return obj[path as keyof T] !== value;
+  };
+}
+
+/**
+ * Returns a function that checks if an object has a property that is defined.
+ *
+ * @param path The path of the property to check.
+ * @returns A function that returns true if the object has the property with
+ * the specified value.
+ */
+export function propIsDefined<T extends object, K extends keyof T>(
+  path: K,
+): (obj: T) => obj is SetRequired<T, K> & SetDefined<T, K> {
+  return (obj: T) => {
+    return hasDefinedProp(obj, path);
   };
 }
 

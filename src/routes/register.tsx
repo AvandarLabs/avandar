@@ -51,7 +51,6 @@ function RegisterPage() {
           : undefined;
       },
     },
-    touchTrigger: "focus",
   });
 
   const onFormSubmit = form.onSubmit(async (values) => {
