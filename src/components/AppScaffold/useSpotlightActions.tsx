@@ -4,33 +4,15 @@ import {
   SpotlightActionGroupData,
 } from "@mantine/spotlight";
 import { IconTrash } from "@tabler/icons-react";
-import { useRouter } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { LocalDatasetQueryClient } from "@/clients/LocalDatasetQueryClient";
-import { APP_CONFIG } from "@/config/AppConfig";
 import { Logger } from "@/lib/Logger";
-import { objectEntries } from "@/lib/utils/objects/misc";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 
 export function useSpotlightActions(): Array<
   SpotlightActionData | SpotlightActionGroupData
 > {
-  const router = useRouter();
   const spotlightActions = useMemo(() => {
-    const actions = objectEntries(APP_CONFIG.links).map(
-      ([linkKey, link]): SpotlightActionData | SpotlightActionGroupData => {
-        return {
-          id: linkKey,
-          label: link.label,
-          description: link.spotlightDescription,
-          onClick: () => {
-            router.navigate({ to: link.to });
-          },
-          leftSection: link.icon,
-        };
-      },
-    );
-
     if (import.meta.env.DEV) {
       const devActions = [
         {
@@ -87,10 +69,11 @@ export function useSpotlightActions(): Array<
         },
       ];
 
-      return actions.concat(devActions);
+      return devActions;
     }
 
-    return actions;
-  }, [router]);
+    return [];
+  }, []);
+
   return spotlightActions;
 }

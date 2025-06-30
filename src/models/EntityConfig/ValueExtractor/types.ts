@@ -4,7 +4,7 @@ import { DatasetColumnValueExtractorModel } from "./DatasetColumnValueExtractor/
 import { ManualEntryExtractorModel } from "./ManualEntryExtractor/types";
 
 export type ValueExtractorType =
-  Enums<"entity_field_config__value_extractor_type">;
+  Enums<"entity_field_configs__value_extractor_type">;
 
 // Value extractor types for each field class
 export type DimensionExtractorType = "dataset_column_value" | "manual_entry";

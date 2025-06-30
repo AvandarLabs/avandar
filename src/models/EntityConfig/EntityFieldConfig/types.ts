@@ -12,8 +12,8 @@ import type { UUID } from "@/lib/types/common";
 export type EntityFieldConfigId = UUID<"EntityFieldConfig">;
 
 // Enum types to match database enums
-export type EntityFieldClass = Enums<"entity_field_config__class">;
-export type EntityFieldBaseType = Enums<"entity_field_config__base_data_type">;
+export type EntityFieldClass = Enums<"entity_field_configs__class">;
+export type EntityFieldBaseType = Enums<"entity_field_configs__base_data_type">;
 
 // Base data types for each field classe
 export type DimensionFieldBaseDataType = Extract<
