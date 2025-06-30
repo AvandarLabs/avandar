@@ -2,7 +2,7 @@ import { z } from "zod";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { uuidType } from "@/lib/utils/zodHelpers";
 import { EntityConfigId } from "../EntityConfig/types";
-import { UserId } from "../User";
+import { UserId } from "../User/types";
 import { EntityId, EntityModel } from "./types";
 
 const DBReadSchema = z.object({

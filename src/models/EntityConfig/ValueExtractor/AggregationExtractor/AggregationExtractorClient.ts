@@ -6,7 +6,7 @@ import { AggregationExtractorParsers } from "./parsers";
  */
 export const AggregationExtractorClient = createSupabaseCRUDClient({
   modelName: "AggregationExtractor",
-  tableName: "value_extractor__aggregation",
+  tableName: "value_extractors__aggregation",
   dbTablePrimaryKey: "id",
   parsers: AggregationExtractorParsers,
 });

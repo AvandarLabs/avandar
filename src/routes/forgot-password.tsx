@@ -1,8 +1,10 @@
-import { Button, Loader, Stack, TextInput, Title } from "@mantine/core";
+import { Button, Group, Stack, TextInput } from "@mantine/core";
 import { isEmail, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { AuthClient } from "@/clients/AuthClient";
+import { AuthLayout } from "@/components/common/AuthLayout";
+import { BackToLoginLink } from "@/components/common/AuthLayout/BackToLoginLink";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 
 export const Route = createFileRoute("/forgot-password")({
@@ -58,8 +60,10 @@ function ForgotPasswordPage() {
   });
 
   return (
-    <Stack>
-      <Title order={2}>Reset your password</Title>
+    <AuthLayout
+      title="Forgot your password?"
+      subtitle="Enter your email to get a reset link"
+    >
       <form onSubmit={onFormSubmit}>
         <Stack>
           <TextInput
@@ -71,15 +75,20 @@ function ForgotPasswordPage() {
             key={form.key("email")}
             {...form.getInputProps("email")}
           />
-          <Button type="submit" disabled={isResetPasswordPending}>
-            Reset my password
-            {isResetPasswordPending ?
-              <Loader />
-            : null}
-          </Button>
-          <Link to="/signin">Back to sign in</Link>
+
+          <Group justify="space-between" gap="xl" mt="md">
+            <BackToLoginLink />
+            <Button
+              className="flex-1"
+              loading={isResetPasswordPending}
+              type="submit"
+              disabled={isResetPasswordPending}
+            >
+              Reset password
+            </Button>
+          </Group>
         </Stack>
       </form>
-    </Stack>
+    </AuthLayout>
   );
 }

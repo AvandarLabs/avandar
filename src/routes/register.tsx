@@ -1,14 +1,12 @@
-import { Button, Loader, Stack, TextInput, Title } from "@mantine/core";
-import { isEmail, useForm } from "@mantine/form";
+import { Button, Group, PasswordInput, Stack, TextInput } from "@mantine/core";
+import { isEmail } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import {
-  createFileRoute,
-  Link,
-  redirect,
-  useRouter,
-} from "@tanstack/react-router";
+import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { AuthClient } from "@/clients/AuthClient";
+import { AuthLayout } from "@/components/common/AuthLayout";
+import { BackToLoginLink } from "@/components/common/AuthLayout/BackToLoginLink";
 import { useMutation } from "@/lib/hooks/query/useMutation";
+import { useForm } from "@/lib/hooks/ui/useForm";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,
@@ -53,6 +51,7 @@ function RegisterPage() {
           : undefined;
       },
     },
+    touchTrigger: "focus",
   });
 
   const onFormSubmit = form.onSubmit(async (values) => {
@@ -63,8 +62,10 @@ function RegisterPage() {
   });
 
   return (
-    <Stack>
-      <Title order={2}>Create a new account</Title>
+    <AuthLayout
+      title="Create a new account"
+      subtitle="Start your journey with us"
+    >
       <form onSubmit={onFormSubmit}>
         <Stack>
           <TextInput
@@ -72,10 +73,11 @@ function RegisterPage() {
             name="email"
             type="email"
             required
+            autoComplete="email"
             key={form.key("email")}
             {...form.getInputProps("email")}
           />
-          <TextInput
+          <PasswordInput
             label="Password"
             name="password"
             type="password"
@@ -83,7 +85,7 @@ function RegisterPage() {
             key={form.key("password")}
             {...form.getInputProps("password")}
           />
-          <TextInput
+          <PasswordInput
             label="Confirm Password"
             name="confirmPassword"
             type="password"
@@ -92,15 +94,19 @@ function RegisterPage() {
             {...form.getInputProps("confirmPassword")}
           />
 
-          <Button type="submit" disabled={isRegistrationPending}>
-            Register
-            {isRegistrationPending ?
-              <Loader />
-            : null}
-          </Button>
-          <Link to="/signin">Back to sign in</Link>
+          <Group justify="space-between" gap="xl" mt="md">
+            <BackToLoginLink />
+            <Button
+              className="flex-1"
+              loading={isRegistrationPending}
+              type="submit"
+              disabled={isRegistrationPending}
+            >
+              Register
+            </Button>
+          </Group>
         </Stack>
       </form>
-    </Stack>
+    </AuthLayout>
   );
 }

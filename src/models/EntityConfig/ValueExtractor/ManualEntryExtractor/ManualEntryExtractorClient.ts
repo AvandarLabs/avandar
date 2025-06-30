@@ -6,7 +6,7 @@ import { ManualEntryExtractorParsers } from "./parsers";
  */
 export const ManualEntryExtractorClient = createSupabaseCRUDClient({
   modelName: "ManualEntryExtractor",
-  tableName: "value_extractor__manual_entry",
+  tableName: "value_extractors__manual_entry",
   dbTablePrimaryKey: "id",
   parsers: ManualEntryExtractorParsers,
 });

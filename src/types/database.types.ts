@@ -43,6 +43,7 @@ export type Database = {
           name: string
           owner_id: string
           updated_at: string
+          workspace_id: string
         }
         Insert: {
           allow_manual_creation: boolean
@@ -52,6 +53,7 @@ export type Database = {
           name: string
           owner_id?: string
           updated_at?: string
+          workspace_id: string
         }
         Update: {
           allow_manual_creation?: boolean
@@ -61,14 +63,23 @@ export type Database = {
           name?: string
           owner_id?: string
           updated_at?: string
+          workspace_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "entity_configs_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       entity_field_configs: {
         Row: {
           allow_manual_edit: boolean
-          base_data_type: Database["public"]["Enums"]["entity_field_config__base_data_type"]
-          class: Database["public"]["Enums"]["entity_field_config__class"]
+          base_data_type: Database["public"]["Enums"]["entity_field_configs__base_data_type"]
+          class: Database["public"]["Enums"]["entity_field_configs__class"]
           created_at: string
           description: string | null
           entity_config_id: string
@@ -78,12 +89,13 @@ export type Database = {
           is_title_field: boolean
           name: string
           updated_at: string
-          value_extractor_type: Database["public"]["Enums"]["entity_field_config__value_extractor_type"]
+          value_extractor_type: Database["public"]["Enums"]["entity_field_configs__value_extractor_type"]
+          workspace_id: string
         }
         Insert: {
           allow_manual_edit?: boolean
-          base_data_type: Database["public"]["Enums"]["entity_field_config__base_data_type"]
-          class: Database["public"]["Enums"]["entity_field_config__class"]
+          base_data_type: Database["public"]["Enums"]["entity_field_configs__base_data_type"]
+          class: Database["public"]["Enums"]["entity_field_configs__class"]
           created_at?: string
           description?: string | null
           entity_config_id: string
@@ -93,12 +105,13 @@ export type Database = {
           is_title_field?: boolean
           name: string
           updated_at?: string
-          value_extractor_type: Database["public"]["Enums"]["entity_field_config__value_extractor_type"]
+          value_extractor_type: Database["public"]["Enums"]["entity_field_configs__value_extractor_type"]
+          workspace_id: string
         }
         Update: {
           allow_manual_edit?: boolean
-          base_data_type?: Database["public"]["Enums"]["entity_field_config__base_data_type"]
-          class?: Database["public"]["Enums"]["entity_field_config__class"]
+          base_data_type?: Database["public"]["Enums"]["entity_field_configs__base_data_type"]
+          class?: Database["public"]["Enums"]["entity_field_configs__class"]
           created_at?: string
           description?: string | null
           entity_config_id?: string
@@ -108,7 +121,8 @@ export type Database = {
           is_title_field?: boolean
           name?: string
           updated_at?: string
-          value_extractor_type?: Database["public"]["Enums"]["entity_field_config__value_extractor_type"]
+          value_extractor_type?: Database["public"]["Enums"]["entity_field_configs__value_extractor_type"]
+          workspace_id?: string
         }
         Relationships: [
           {
@@ -118,11 +132,111 @@ export type Database = {
             referencedRelation: "entity_configs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "entity_field_configs_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
         ]
       }
-      value_extractor__aggregation: {
+      user_profiles: {
         Row: {
-          aggregation_type: Database["public"]["Enums"]["value_extractor__aggregation_type"]
+          created_at: string
+          display_name: string
+          full_name: string
+          id: string
+          membership_id: string
+          updated_at: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          full_name: string
+          id?: string
+          membership_id: string
+          updated_at?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          full_name?: string
+          id?: string
+          membership_id?: string
+          updated_at?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_profiles_membership_id_fkey"
+            columns: ["membership_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_memberships"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_profiles_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          membership_id: string
+          role: string
+          updated_at: string | null
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          membership_id: string
+          role: string
+          updated_at?: string | null
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          membership_id?: string
+          role?: string
+          updated_at?: string | null
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_membership_id_fkey"
+            columns: ["membership_id"]
+            isOneToOne: false
+            referencedRelation: "workspace_memberships"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_roles_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      value_extractors__aggregation: {
+        Row: {
+          aggregation_type: Database["public"]["Enums"]["value_extractors__aggregation_type"]
           created_at: string
           dataset_field_id: string
           dataset_id: string
@@ -130,9 +244,10 @@ export type Database = {
           filter: Json | null
           id: string
           updated_at: string
+          workspace_id: string
         }
         Insert: {
-          aggregation_type: Database["public"]["Enums"]["value_extractor__aggregation_type"]
+          aggregation_type: Database["public"]["Enums"]["value_extractors__aggregation_type"]
           created_at?: string
           dataset_field_id: string
           dataset_id: string
@@ -140,9 +255,10 @@ export type Database = {
           filter?: Json | null
           id?: string
           updated_at?: string
+          workspace_id: string
         }
         Update: {
-          aggregation_type?: Database["public"]["Enums"]["value_extractor__aggregation_type"]
+          aggregation_type?: Database["public"]["Enums"]["value_extractors__aggregation_type"]
           created_at?: string
           dataset_field_id?: string
           dataset_id?: string
@@ -150,18 +266,26 @@ export type Database = {
           filter?: Json | null
           id?: string
           updated_at?: string
+          workspace_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "value_extractor__aggregation_entity_field_config_id_fkey"
+            foreignKeyName: "value_extractors__aggregation_entity_field_config_id_fkey"
             columns: ["entity_field_config_id"]
             isOneToOne: false
             referencedRelation: "entity_field_configs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "value_extractors__aggregation_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
         ]
       }
-      value_extractor__dataset_column_value: {
+      value_extractors__dataset_column_value: {
         Row: {
           created_at: string
           dataset_field_id: string
@@ -169,7 +293,8 @@ export type Database = {
           entity_field_config_id: string
           id: string
           updated_at: string
-          value_picker_rule_type: Database["public"]["Enums"]["value_extractor__value_picker_rule_type"]
+          value_picker_rule_type: Database["public"]["Enums"]["value_extractors__value_picker_rule_type"]
+          workspace_id: string
         }
         Insert: {
           created_at?: string
@@ -178,7 +303,8 @@ export type Database = {
           entity_field_config_id: string
           id?: string
           updated_at?: string
-          value_picker_rule_type: Database["public"]["Enums"]["value_extractor__value_picker_rule_type"]
+          value_picker_rule_type: Database["public"]["Enums"]["value_extractors__value_picker_rule_type"]
+          workspace_id: string
         }
         Update: {
           created_at?: string
@@ -187,63 +313,152 @@ export type Database = {
           entity_field_config_id?: string
           id?: string
           updated_at?: string
-          value_picker_rule_type?: Database["public"]["Enums"]["value_extractor__value_picker_rule_type"]
+          value_picker_rule_type?: Database["public"]["Enums"]["value_extractors__value_picker_rule_type"]
+          workspace_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "value_extractor__dataset_column_val_entity_field_config_id_fkey"
+            foreignKeyName: "value_extractors__dataset_column_va_entity_field_config_id_fkey"
             columns: ["entity_field_config_id"]
             isOneToOne: false
             referencedRelation: "entity_field_configs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "value_extractors__dataset_column_value_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
         ]
       }
-      value_extractor__manual_entry: {
+      value_extractors__manual_entry: {
         Row: {
           created_at: string
           entity_field_config_id: string
           id: string
           updated_at: string
+          workspace_id: string
         }
         Insert: {
           created_at?: string
           entity_field_config_id: string
           id?: string
           updated_at?: string
+          workspace_id: string
         }
         Update: {
           created_at?: string
           entity_field_config_id?: string
           id?: string
           updated_at?: string
+          workspace_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "value_extractor__manual_entry_entity_field_config_id_fkey"
+            foreignKeyName: "value_extractors__manual_entry_entity_field_config_id_fkey"
             columns: ["entity_field_config_id"]
             isOneToOne: false
             referencedRelation: "entity_field_configs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "value_extractors__manual_entry_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
         ]
+      }
+      workspace_memberships: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_memberships_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspaces: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_id: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          owner_id?: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      util__auth_user_is_workspace_admin: {
+        Args: { workspace_id: string }
+        Returns: boolean
+      }
+      util__auth_user_is_workspace_member: {
+        Args: { workspace_id: string }
+        Returns: boolean
+      }
+      util__auth_user_is_workspace_owner: {
+        Args: { workspace_id: string }
+        Returns: boolean
+      }
+      util__user_is_workspace_member: {
+        Args: { user_id: string; workspace_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      entity_field_config__base_data_type: "string" | "number" | "date"
-      entity_field_config__class: "dimension" | "metric"
-      entity_field_config__value_extractor_type:
+      entity_field_configs__base_data_type: "string" | "number" | "date"
+      entity_field_configs__class: "dimension" | "metric"
+      entity_field_configs__value_extractor_type:
         | "dataset_column_value"
         | "manual_entry"
         | "aggregation"
-      value_extractor__aggregation_type: "sum" | "max" | "count"
-      value_extractor__value_picker_rule_type: "most_frequent" | "first"
+      value_extractors__aggregation_type: "sum" | "max" | "count"
+      value_extractors__value_picker_rule_type: "most_frequent" | "first"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -362,15 +577,15 @@ export const Constants = {
   },
   public: {
     Enums: {
-      entity_field_config__base_data_type: ["string", "number", "date"],
-      entity_field_config__class: ["dimension", "metric"],
-      entity_field_config__value_extractor_type: [
+      entity_field_configs__base_data_type: ["string", "number", "date"],
+      entity_field_configs__class: ["dimension", "metric"],
+      entity_field_configs__value_extractor_type: [
         "dataset_column_value",
         "manual_entry",
         "aggregation",
       ],
-      value_extractor__aggregation_type: ["sum", "max", "count"],
-      value_extractor__value_picker_rule_type: ["most_frequent", "first"],
+      value_extractors__aggregation_type: ["sum", "max", "count"],
+      value_extractors__value_picker_rule_type: ["most_frequent", "first"],
     },
   },
 } as const

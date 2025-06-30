@@ -166,6 +166,7 @@ export const cssVariablesResolver: CSSVariablesResolver = (
 ) => {
   return {
     variables: {
+      // new custom colors
       "--mantine-navbar-background": theme.other.navbar.backgroundColor,
       "--mantine-navbar-color": theme.other.navbar.textColor,
       "--mantine-navbar-hover-background":
@@ -175,7 +176,13 @@ export const cssVariablesResolver: CSSVariablesResolver = (
       "--mantine-navbar-active-hover-background":
         theme.other.navbar.activeHoverBackgroundColor,
     },
-    dark: {},
-    light: {},
+    dark: {
+      "--mantine-color-body": theme.colors.neutral[0],
+      "--mantine-color-text": theme.colors.neutral[9],
+    },
+    light: {
+      "--mantine-color-body": theme.colors.neutral[0],
+      "--mantine-color-text": theme.colors.neutral[9],
+    },
   };
 };

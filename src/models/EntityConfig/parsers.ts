@@ -18,6 +18,7 @@ const DBReadSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
   owner_id: z.string().uuid(),
+  workspace_id: z.string().uuid(),
   updated_at: z.string().datetime({ offset: true }),
   allow_manual_creation: z.boolean(),
 });
@@ -34,6 +35,7 @@ export const EntityConfigParsers =
           ...obj,
           id: uuid(obj.id),
           ownerId: uuid(obj.ownerId),
+          workspaceId: uuid(obj.workspaceId),
         };
       },
     ),

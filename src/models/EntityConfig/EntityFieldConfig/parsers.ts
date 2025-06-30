@@ -12,6 +12,7 @@ import {
 } from "@/lib/utils/objects/transformations";
 import { pipe } from "@/lib/utils/pipe";
 import { uuid } from "@/lib/utils/uuid";
+import { WorkspaceId } from "@/models/Workspace/types";
 import { EntityConfigId } from "../types";
 import {
   DimensionRead,
@@ -34,6 +35,7 @@ const DBReadSchema = z.object({
     "aggregation",
   ]),
   id: z.string().uuid(),
+  workspace_id: z.string().uuid(),
   is_array: z.boolean().nullable(),
   is_id_field: z.boolean(),
   is_title_field: z.boolean(),
@@ -48,6 +50,7 @@ function fromDBReadToModelRead(
   const coreField = {
     id: uuid<EntityFieldConfigId>(newObj.id),
     entityConfigId: uuid<EntityConfigId>(newObj.entityConfigId),
+    workspaceId: uuid<WorkspaceId>(newObj.workspaceId),
     description: newObj.description,
     name: newObj.name,
     createdAt: newObj.createdAt,

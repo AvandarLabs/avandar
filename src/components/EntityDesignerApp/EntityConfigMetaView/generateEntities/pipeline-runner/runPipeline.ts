@@ -15,7 +15,7 @@ import {
   ParsedLocalDataset,
 } from "@/models/LocalDataset/types";
 import { asLocalDatasetId, unparseDataset } from "@/models/LocalDataset/utils";
-import { UserId } from "@/models/User";
+import { UserId } from "@/models/User/types";
 import {
   OutputDatasetsStepConfig,
   Pipeline,

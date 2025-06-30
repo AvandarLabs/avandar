@@ -17,6 +17,7 @@ const DBReadSchema = z.object({
   entity_field_config_id: z.string().uuid(),
   created_at: z.string().datetime({ offset: true }),
   updated_at: z.string().datetime({ offset: true }),
+  workspace_id: z.string().uuid(),
 });
 
 export const ManualEntryExtractorParsers =
@@ -33,6 +34,7 @@ export const ManualEntryExtractorParsers =
           type: "manual_entry" as const,
           id: uuid(obj.id),
           entityFieldConfigId: uuid(obj.entityFieldConfigId),
+          workspaceId: uuid(obj.workspaceId),
         };
       },
     ),

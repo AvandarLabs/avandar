@@ -3,7 +3,7 @@ import { EntityComment } from "@/components/EntityDesignerApp/EntityConfigMetaVi
 import { UUID } from "@/lib/types/common";
 import { EntityFieldConfig } from "../EntityConfig/EntityFieldConfig/types";
 import { EntityConfig, EntityConfigId } from "../EntityConfig/types";
-import { UserId } from "../User";
+import { UserId } from "../User/types";
 import { EntityFieldValueRead } from "./EntityClient";
 import type { DexieModelCRUDTypes } from "@/lib/models/DexieModelCRUDTypes";
 

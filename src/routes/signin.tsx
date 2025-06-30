@@ -1,15 +1,12 @@
-import { Button, Loader, Stack, TextInput, Title } from "@mantine/core";
+import { Button, Loader, PasswordInput, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import {
-  createFileRoute,
-  Link,
-  redirect,
-  useRouter,
-} from "@tanstack/react-router";
+import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
+import { AuthLayout } from "@/components/common/AuthLayout";
 import { useMutation } from "@/lib/hooks/query/useMutation";
+import { Link } from "@/lib/ui/links/Link";
 
 export const Route = createFileRoute("/signin")({
   component: SignInPage,
@@ -67,8 +64,15 @@ function SignInPage() {
   });
 
   return (
-    <Stack>
-      <Title order={2}>Please sign in</Title>
+    <AuthLayout
+      title="Welcome back!"
+      subtitle={
+        <>
+          <span>Don&apos;t have an account yet?</span>
+          <Link to="/register">Create account</Link>
+        </>
+      }
+    >
       <form onSubmit={onFormSubmit}>
         <Stack>
           <TextInput
@@ -79,7 +83,7 @@ function SignInPage() {
             key={form.key("email")}
             {...form.getInputProps("email")}
           />
-          <TextInput
+          <PasswordInput
             required
             label="Password"
             name="password"
@@ -93,10 +97,9 @@ function SignInPage() {
               <Loader />
             : null}
           </Button>
-          <Link to="/register">Don&apos;t have an account?</Link>
           <Link to="/forgot-password">Forgot your password?</Link>
         </Stack>
       </form>
-    </Stack>
+    </AuthLayout>
   );
 }

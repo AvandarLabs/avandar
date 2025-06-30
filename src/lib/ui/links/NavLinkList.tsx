@@ -40,6 +40,10 @@ function generateLinkKey(linkProps: NavLinkProps): string {
   return keyParts.join("_");
 }
 
+/**
+ * This is a vertical list of NavLink components, whose props are
+ * specified in the `links` prop, that works with our router.
+ */
 export function NavLinkList({
   links,
   activeColor = "primary.5",

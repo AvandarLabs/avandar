@@ -1,7 +1,8 @@
 import { Paths, SetOptional, SetRequiredDeep, Simplify } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
-import { UserId } from "@/models/User";
+import { UserId } from "@/models/User/types";
 import { LocalDataset } from "../LocalDataset/types";
+import { WorkspaceId } from "../Workspace/types";
 import { EntityFieldConfig } from "./EntityFieldConfig/types";
 import { EntityFieldValueExtractor } from "./ValueExtractor/types";
 import type { UUID } from "@/lib/types/common";
@@ -14,6 +15,9 @@ export type EntityConfigId = UUID<"EntityConfig">;
 type EntityConfigRead = {
   /** Unique identifier for this entity config */
   id: EntityConfigId;
+
+  /** Workspace ID this entity config belongs to */
+  workspaceId: WorkspaceId;
 
   /** User ID of the owner of this entity config */
   ownerId: UserId;

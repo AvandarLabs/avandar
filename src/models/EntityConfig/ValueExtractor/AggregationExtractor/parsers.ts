@@ -16,6 +16,7 @@ import { AggregationExtractor, AggregationExtractorModel } from "./types";
 const DBReadSchema = z.object({
   id: z.string().uuid(),
   entity_field_config_id: z.string().uuid(),
+  workspace_id: z.string().uuid(),
   aggregation_type: z.enum(["sum", "max", "count"]),
   dataset_id: z.string(),
   dataset_field_id: z.string().uuid(),
@@ -41,6 +42,7 @@ export const AggregationExtractorParsers =
         type: "aggregation" as const,
         id: uuid(newObj.id),
         entityFieldConfigId: uuid(newObj.entityFieldConfigId),
+        workspaceId: uuid(newObj.workspaceId),
         datasetId: asLocalDatasetId(newObj.datasetId),
         datasetFieldId: uuid(newObj.datasetFieldId),
       };

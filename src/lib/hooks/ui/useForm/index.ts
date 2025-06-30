@@ -110,6 +110,7 @@ export function useForm<
   return {
     ...form,
     keysAndProps,
+    useFieldWatch: form.watch,
   } as FormType<FormValues, TransformValues, FormPath>;
 }
 

@@ -1,6 +1,7 @@
 import { SetOptional, Simplify } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { LocalDatasetId } from "@/models/LocalDataset/types";
+import { WorkspaceId } from "@/models/Workspace/types";
 import type { EntityFieldConfigId } from "../../EntityFieldConfig/types";
 import type { UUID } from "@/lib/types/common";
 import type { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
@@ -12,6 +13,9 @@ export type ValuePickerRuleType = "most_frequent" | "first";
 type DatasetColumnValueExtractorRead = {
   /** Unique identifier for this extractor config */
   id: DatasetColumnValueExtractorId;
+
+  /** ID of the associated workspace */
+  workspaceId: WorkspaceId;
 
   /** Type of extractor */
   type: "dataset_column_value";
@@ -48,7 +52,7 @@ type DatasetColumnValueExtractorUpdate =
  */
 export type DatasetColumnValueExtractorModel = SupabaseModelCRUDTypes<
   {
-    tableName: "value_extractor__dataset_column_value";
+    tableName: "value_extractors__dataset_column_value";
     modelName: "DatasetColumnValueExtractor";
     modelPrimaryKeyType: DatasetColumnValueExtractorId;
     modelTypes: {

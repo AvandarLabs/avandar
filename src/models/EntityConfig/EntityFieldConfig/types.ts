@@ -1,5 +1,6 @@
 import { Merge, SetOptional, Simplify } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
+import { WorkspaceId } from "@/models/Workspace/types";
 import { Enums } from "@/types/database.types";
 import {
   DimensionExtractorType,
@@ -52,6 +53,7 @@ export type MetricRead = {
 type EntityFieldConfigRead = {
   id: EntityFieldConfigId;
   entityConfigId: EntityConfigId;
+  workspaceId: WorkspaceId;
   name: string;
   description: string | undefined;
   createdAt: string;

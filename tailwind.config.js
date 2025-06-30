@@ -7,7 +7,7 @@ import { Theme } from "./src/config/Theme";
  * "mantineColor.0" through "mantineColor.9" will map to tailwind
  * color suffixes 50 through 900.
  *
- * For example, "neutral0" will now be "[attribute]-color-50"
+ * For example, "neutral.0" will now be "[attribute]-color-50"
  * (e.g. "bg-color-50")
  */
 function mantineColorsToTailwindObjects() {

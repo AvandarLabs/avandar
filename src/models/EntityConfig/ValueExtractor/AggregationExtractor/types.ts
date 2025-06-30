@@ -1,6 +1,7 @@
 import { SetOptional, Simplify } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { LocalDatasetId } from "@/models/LocalDataset/types";
+import { WorkspaceId } from "@/models/Workspace/types";
 import { EntityFieldConfigId } from "../../EntityFieldConfig/types";
 import type { JSONValue, UUID } from "@/lib/types/common";
 import type { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
@@ -17,6 +18,9 @@ type AggregationExtractorRead = {
 
   /** Type of extractor */
   type: "aggregation";
+
+  /** ID of the associated workspace */
+  workspaceId: WorkspaceId;
 
   /** ID of the associated entity field config */
   entityFieldConfigId: EntityFieldConfigId;
@@ -49,7 +53,7 @@ type AggregationExtractorUpdate = Partial<AggregationExtractorRead>;
 
 export type AggregationExtractorModel = SupabaseModelCRUDTypes<
   {
-    tableName: "value_extractor__aggregation";
+    tableName: "value_extractors__aggregation";
     modelName: "AggregationExtractor";
     modelPrimaryKeyType: AggregationExtractorId;
     modelTypes: {

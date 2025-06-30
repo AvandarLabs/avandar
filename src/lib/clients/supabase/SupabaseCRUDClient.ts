@@ -67,20 +67,30 @@ export function createSupabaseCRUDClient<
    * will get wrapped in `useQuery` hooks.
    * @param config
    * @param config.clientLogger - A logger for the client.
-   * @returns An object of additional mutation functions. Each function must
+   * @param config.dbClient - The database client to use for interacting with
+   *   Supabase.
+   * @returns An object of additional query functions. Each function must
    * return a promise.
    */
-  queries?: (config: { clientLogger: ILogger }) => ExtendedQueriesClient;
+  queries?: (config: {
+    clientLogger: ILogger;
+    dbClient: SupabaseClient<Database>;
+  }) => ExtendedQueriesClient;
 
   /**
    * Additional mutation functions to add to the client. These functions
    * will get wrapped in `useMutation` hooks.
    * @param config
    * @param config.clientLogger - A logger for the client.
+   * @param config.dbClient - The database client to use for interacting with
+   *   Supabase.
    * @returns An object of additional mutation functions. Each function must
    * return a promise.
    */
-  mutations?: (config: { clientLogger: ILogger }) => ExtendedMutationsClient;
+  mutations?: (config: {
+    clientLogger: ILogger;
+    dbClient: SupabaseClient<Database>;
+  }) => ExtendedMutationsClient;
 
   /**
    * The database client to use for interacting with Supabase.
@@ -128,8 +138,14 @@ export function createSupabaseCRUDClient<
   const modelClient = createModelCRUDClient({
     modelName,
     parsers,
-    additionalQueries: queries,
-    additionalMutations: mutations,
+    additionalQueries: (config) => {
+      return (queries?.({ ...config, dbClient }) ??
+        {}) as ExtendedQueriesClient;
+    },
+    additionalMutations: (config) => {
+      return (mutations?.({ ...config, dbClient }) ??
+        {}) as ExtendedMutationsClient;
+    },
     getById: async (params: {
       id: M["modelPrimaryKeyType"] | null | undefined;
       logger: ILogger;

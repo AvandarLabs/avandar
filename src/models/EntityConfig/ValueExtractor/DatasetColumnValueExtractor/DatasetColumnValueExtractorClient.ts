@@ -6,7 +6,7 @@ import { DatasetColumnValueExtractorParsers } from "./parsers";
  */
 export const DatasetColumnValueExtractorClient = createSupabaseCRUDClient({
   modelName: "DatasetColumnValueExtractor",
-  tableName: "value_extractor__dataset_column_value",
+  tableName: "value_extractors__dataset_column_value",
   dbTablePrimaryKey: "id",
   parsers: DatasetColumnValueExtractorParsers,
 });

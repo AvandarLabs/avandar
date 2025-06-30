@@ -3,7 +3,7 @@ import { createSupabaseAdminClient } from "@/lib/clients/supabase/SupabaseDBClie
 import { promiseMap, promiseMapSequential } from "@/lib/utils/promises";
 import { Database } from "@/types/database.types";
 import { ScriptsUtil } from "./ScriptsUtil";
-import type { User } from "@/models/User";
+import type { User } from "@/models/User/types";
 
 export type SeedHelpers = {
   getUserByEmail: (email: string) => User;
@@ -47,19 +47,26 @@ export class SeedRunner<Data extends GenericSeedData> {
   #config: SeedRunnerConfig<Data>;
   #userLookup: Map<string, User> = new Map();
   #jobs: Array<GenericSeedJob<Data>> = [];
-  #adminClient: SupabaseClient<Database>;
 
   constructor(config: SeedRunnerConfig<Data>) {
     this.#config = config;
     this.#jobs.push(...config.jobs);
-    this.#adminClient = createSupabaseAdminClient(
+  }
+
+  /**
+   * Returns a new SupabaseAdminClient instance.
+   * We intentionally do not reuse the admin client to avoid
+   * any potential issues with auth state in between seed jobs.
+   */
+  #getAdminClient(): SupabaseClient<Database> {
+    return createSupabaseAdminClient(
       process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
     );
   }
 
   async createUsers(): Promise<void> {
     const users: User[] = await promiseMap(this.#config.data.users, (user) => {
-      return ScriptsUtil.createUser(user, this.#adminClient);
+      return ScriptsUtil.createUser(user, this.#getAdminClient());
     });
     users.forEach((user) => {
       if (user.email) {
@@ -99,7 +106,7 @@ export class SeedRunner<Data extends GenericSeedData> {
       console.log("Running seed job: ", job.name);
       await job.jobFn({
         data: this.#config.data,
-        dbClient: this.#adminClient,
+        dbClient: this.#getAdminClient(),
         helpers: {
           getUserByEmail: (email) => {
             return this.getUserByEmail(email);

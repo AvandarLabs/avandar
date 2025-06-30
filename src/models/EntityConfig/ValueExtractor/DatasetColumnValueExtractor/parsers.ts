@@ -18,6 +18,7 @@ import {
 
 const DBReadSchema = z.object({
   id: z.string().uuid(),
+  workspace_id: z.string().uuid(),
   entity_field_config_id: z.string().uuid(),
   value_picker_rule_type: z.enum(["most_frequent", "first"]),
   dataset_id: z.string(),
@@ -39,6 +40,7 @@ export const DatasetColumnValueExtractorParsers =
           ...obj,
           type: "dataset_column_value" as const,
           id: uuid(obj.id),
+          workspaceId: uuid(obj.workspaceId),
           entityFieldConfigId: uuid(obj.entityFieldConfigId),
           datasetId: asLocalDatasetId(obj.datasetId),
           datasetFieldId: uuid(obj.datasetFieldId),

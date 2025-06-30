@@ -1,5 +1,6 @@
 import { SetOptional, Simplify } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
+import { WorkspaceId } from "@/models/Workspace/types";
 import type { EntityFieldConfigId } from "../../EntityFieldConfig/types";
 import type { UUID } from "@/lib/types/common";
 
@@ -11,6 +12,9 @@ export type ManualEntryExtractorId = UUID<"ManualEntryExtractor">;
 type ManualEntryExtractorRead = {
   /** Unique identifier for this extractor config */
   id: ManualEntryExtractorId;
+
+  /** ID of the associated workspace */
+  workspaceId: WorkspaceId;
 
   /** Type of extractor */
   type: "manual_entry";
@@ -34,7 +38,7 @@ type ManualEntryExtractorUpdate = Partial<ManualEntryExtractorRead>;
 
 export type ManualEntryExtractorModel = SupabaseModelCRUDTypes<
   {
-    tableName: "value_extractor__manual_entry";
+    tableName: "value_extractors__manual_entry";
     modelName: "ManualEntryExtractor";
     modelPrimaryKeyType: ManualEntryExtractorId;
     modelTypes: {

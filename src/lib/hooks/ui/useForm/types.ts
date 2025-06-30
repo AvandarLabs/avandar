@@ -41,8 +41,27 @@ export type FormType<
     // Improve type-safety for `key`
     key: (path: FormPath) => string;
 
-    // Improve type-safety for `watch`
+    /**
+     * Improved type-safety for Mantine's `form.watch`
+     * @deprecated Use `useFieldWatch` instead
+     */
     watch: <P extends FormPath>(
+      path: P,
+      subscriberFn: (payload: {
+        previousValue: PathValue<FormValues, P>;
+        value: PathValue<FormValues, P>;
+        touched: boolean;
+        dirty: boolean;
+      }) => void,
+    ) => void;
+
+    /**
+     * Improved type-safety for Mantine's `form.watch`
+     *
+     * This is an alias for Mantine's `form.watch`. The new name makes it
+     * clearer that this function is a React hook.
+     */
+    useFieldWatch: <P extends FormPath>(
       path: P,
       subscriberFn: (payload: {
         previousValue: PathValue<FormValues, P>;
