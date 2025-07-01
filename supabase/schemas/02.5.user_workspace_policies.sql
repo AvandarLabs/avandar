@@ -3,10 +3,13 @@
 -- workspace tables.
 
 -- Policies: workspaces
-create policy "User can SELECT workspaces they belong to"
+create policy "User can SELECT workspaces they own or belong to"
   on public.workspaces for select
   to authenticated
-  using (public.util__auth_user_is_workspace_member(id));
+  using (
+    auth.uid() = owner_id or
+    public.util__auth_user_is_workspace_member(id)
+  );
 
 create policy "User can INSERT workspaces that they own"
   on public.workspaces for insert
@@ -14,7 +17,8 @@ create policy "User can INSERT workspaces that they own"
   -- Anyone can create workspaces, but will still need to separately create:
   -- 1. the workspace_memberships row to link the user to the workspace
   -- 2. the user_details row for this user in this workspace
-  with check (auth.uid() = public.workspaces.owner_id);
+  -- 3. the user_roles row for this user in this workspace
+  with check (auth.uid() = owner_id);
 
 create policy "User can UPDATE workspaces they admin"
   on public.workspaces for update

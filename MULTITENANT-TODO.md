@@ -7,116 +7,55 @@ This document outlines the step-by-step changes required to implement multi-tena
 - Users can have different email addresses per workspace
 - RLS policies must account for tenant ID, not just auth user ID
 
-## 1. Database Schema Changes
-
-### 1.1 Create Workspaces Table
-
-- [x] Create a new `workspaces` table with the following columns:
-  - `id` (UUID, primary key)
-  - `name` (text, not null)
-  - `created_at` (timestamp with timezone)
-  - `updated_at` (timestamp with timezone)
-  - `slug` (text, unique, not null)
-
-### 1.2 Create Workspace Memberships
-
-- [x] Create a new `workspace_memberships` table with:
-  - `id` (UUID, primary key)
-  - `workspace_id` (UUID, foreign key to workspaces.id)
-  - `user_id` (UUID, foreign key to auth.users.id)
-  - `role` (text, e.g., 'admin', 'member')
-  - `created_at` (timestamp with timezone)
-  - `updated_at` (timestamp with timezone)
-  - Add a unique constraint on (`workspace_id`, `user_id`)
-
-### 1.3 Update Existing Tables
-
-- [x] Add `workspace_id` column to the following tables:
-
-  - `entity_configs`
-  - `entity_field_configs`
-  - `entities`
-  - `entity_fields`
-  - All other application-specific tables that store user data
-
-- [x] Update foreign keys and indices as needed
-
-## 2. Authentication System Changes
-
-### 2.1 Supabase Auth Configuration
-
-- [x] Review default Supabase auth settings to ensure compatibility with the multi-tenant model
-- [x] Ensure auth settings allow for multiple active sessions (for users switching between workspaces with different emails)
+## 2.1 Supabase Auth Configuration
 
 ### 2.2 Sign-Up Flow Changes
 
-- [ ] Modify `src/routes/auth/signup/page.tsx` to associate new users with a workspace
-- [ ] Update `src/clients/AuthClient.ts` to handle workspace context during sign-up
+- [ ] When a user creates an account, they should be taken to the "Welcome to your first workspace" page
+- [ ] The side bar should hide any workspace links while the workspace is being created
+- [ ] When a user creates a workspace, they should be taken to that workspace page
 
 ### 2.3 Sign-In Flow Changes
 
-- [ ] Modify `src/routes/auth/signin/page.tsx` to handle workspace context during sign-in
-- [ ] Update `src/clients/AuthClient.ts` to support workspace-specific authentication
-- [ ] Add ability to maintain multiple authenticated sessions (different email accounts) simultaneously
+- [ ] When a user logs in, they should be taken to the first workspace page of their workspace list
+- [ ] "Welcome to your first workspace" page should be impossible for them to reach.
+- [ ] When user clicks "Create new workspace" this should open a modal now instead.
+- [ ] Going to the root URL (previously "Welcome to your first workspace") should now redirect user to the first workspace of their workspace list.
+- [ ] Future: Add ability to maintain multiple authenticated sessions (different email accounts) simultaneously
+- [ ] Future: allow switching between workspaces from different authenticated sessions
 
-### 2.4 Session Management
+### 2.4 Joining a workspace
 
-- [ ] Update `src/lib/hooks/auth/useSession.ts` to handle multiple active sessions
-- [ ] Create a new `useWorkspace` hook in `src/lib/hooks/auth/useWorkspace.ts` for workspace-specific operations
-- [ ] Add workspace switching capability in the app header/sidebar
-- [ ] Implement local storage to track active workspace sessions
-- [ ] Create a workspace selector UI component
+- [ ] Users should be able to accept an invitation
+- [ ] When a user accepts an invitation, they should be prompted to authenticate or register.
+- [ ] When a user registers, it accepts the invitation and goes to that workspace. No "Welcome to your first workspace" page.
+- [ ] When a user authenticates, it goes straight to that new workspace.
 
-## 3. Row Level Security (RLS) Policy Updates
+## 3. Workspace functionality
 
-### 3.1 Create Helper Functions
+### 3.1 UI
 
-- [ ] Create a Postgres function `util__get_user_workspaces(user_id UUID)` that returns all workspace IDs a user belongs to
-- [ ] Create a Postgres function `util__is_workspace_member(user_id UUID, workspace_id UUID)` that checks if a user is a member of a specific workspace
+- [ ] Workspace name should be visible somewhere
+- [ ] Sidebar should now let you switch workspaces
 
-### 3.2 Update RLS Policies
+### 3.2 Object creation
 
-- [ ] Update all existing RLS policies to check workspace membership, replacing patterns like:
+- [ ] All local datasets should be linked to a workspace
+- [ ] Only show local datasets that relate to this workspace
+- [ ] All entity profile configs should be linked to a workspace
+- [ ] All entity instances and field values should be linked to a workspace
+- [ ] Entities should only be viewable according to our workspace
+- [ ] Entity profile configs should only be viewable according to our workspace
 
-  - From: `auth.uid() = owner_id`
-  - To: `auth.uid() = owner_id AND workspace_id = any(util__get_user_workspaces(auth.uid()))`
+### 3.3 Backend clients
 
-- [ ] Create new RLS policies for the new tables:
-  - `workspaces` table
-  - `workspace_memberships` table
+- [ ] WorkspaceClient should allow inviting members
+- [ ] Inviting a member should send them an email
+- [ ] Add support for seed data:
+  - 2 workspaces
+  - 3 users: 1 admin per workspace, and 1 user in one of the workspaces.
 
-## 4. API and Client Changes
-
-### 4.1 Supabase Client Updates
-
-- [ ] Update `src/lib/clients/supabase/SupabaseDBClient.ts` to include workspace context in requests
-- [ ] Modify `src/lib/clients/supabase/SupabaseCRUDClient.ts` to automatically include workspace_id in queries
-
-### 4.2 Model Client Updates
-
-- [ ] Update all model clients to include workspace_id in their database operations:
-  - `src/models/EntityConfig/EntityConfigClient.ts`
-  - `src/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient.ts`
-  - All other model clients
-
-### 4.3 Create Workspace Management Clients
-
-- [ ] Create a new `WorkspaceClient` in `src/models/Workspace/WorkspaceClient.ts`
-- [ ] Create a new `WorkspaceMembershipClient` in `src/models/Workspace/WorkspaceMembershipClient.ts`
-- [ ] Create a new `UserEmailClient` in `src/models/User/UserEmailClient.ts`
-
-## 5. Frontend Context and Routing
-
-### 5.1 Multi-Session Management
-
-- [ ] Create a session manager to handle multiple authenticated sessions in the browser
-- [ ] Implement a way to store and retrieve authentication tokens for different email accounts
-- [ ] Add a session selector UI to allow users to switch between authenticated accounts
-
-### 5.2 Auth Context Updates
-
-- [ ] Update `src/context/AuthContext.tsx` to handle multiple authenticated sessions
-- [ ] Implement a way to store and retrieve authentication tokens for different email accounts
+### 5. Future work
 
 ### 5.3 Workspace Management Components
 

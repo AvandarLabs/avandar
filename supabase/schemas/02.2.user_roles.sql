@@ -30,7 +30,6 @@ create table public.user_roles (
   -- Timestamp for last update
   updated_at timestamp with time zone default timezone('utc'::text, now())
 );
-
 comment on table public.user_roles is
   'Stores roles for a user in a workspace.';
 
@@ -59,20 +58,21 @@ alter table public.user_roles enable row level security;
 -- Function: prevent changes to user_id, workspace_id, and membership_id
 create or replace function user_roles__prevent_id_changes()
 returns trigger as $$
-begin
-  if new.user_id <> old.user_id or
-     new.workspace_id <> old.workspace_id or
-     new.membership_id <> old.membership_id then
-    raise exception 'user_id, workspace_id, and membership_id cannot be changed';
-  end if;
-  return new;
-end;
-$$ language plpgsql;
+  begin
+    if new.user_id <> old.user_id or
+      new.workspace_id <> old.workspace_id or
+      new.membership_id <> old.membership_id then
+      raise exception 'user_id, workspace_id, and membership_id cannot be changed';
+    end if;
+    return new;
+  end;
+$$
+language plpgsql;
 
 -- Trigger: prevent `user_id`, `workspace_id`, and `membership_id` changes on update
 create trigger tr_user_roles__prevent_id_changes
-before update on public.user_roles
-for each row execute function user_roles__prevent_id_changes();
+  before update on public.user_roles
+  for each row execute function user_roles__prevent_id_changes();
 
 -- Trigger: update `updated_at` on row modification
 create trigger tr_user_roles__set_updated_at

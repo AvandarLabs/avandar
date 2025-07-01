@@ -1,4 +1,4 @@
-import { Box, Button, Stack, TextInput } from "@mantine/core";
+import { Box, Button, Stack, Text, TextInput } from "@mantine/core";
 import { FormValidateInput, isEmail, useForm } from "@mantine/form";
 import { HTMLInputAutoCompleteAttribute, ReactNode, useMemo } from "react";
 import { match } from "ts-pattern";
@@ -34,15 +34,6 @@ type FormFieldSchema = {
 
 type FieldsToValuesObject<Fields extends Record<string, FormFieldSchema>> = {
   [fieldKey in StringKeyOf<Fields>]: Fields[fieldKey]["initialValue"];
-};
-
-type Props<
-  Fields extends Record<string, FormFieldSchema>,
-  FormValues extends FieldsToValuesObject<Fields>,
-> = {
-  fields: Fields;
-  fieldOrder: ReadonlyArray<keyof Fields>;
-  onSubmit: (values: FormValues) => void;
 };
 
 function getDefaultFieldSchema(
@@ -83,10 +74,29 @@ function getDefaultSemanticValidationFn(
   }
 }
 
+type Props<
+  Fields extends Record<string, FormFieldSchema>,
+  FormValues extends FieldsToValuesObject<Fields>,
+> = {
+  introText?: ReactNode;
+  fields: Fields;
+  formElements: ReadonlyArray<StringKeyOf<Fields> | ReactNode>;
+  outroText?: ReactNode;
+  onSubmit: (values: FormValues) => void;
+  submitIsLoading?: boolean;
+};
+
 export function BasicForm<
   Fields extends Record<string, FormFieldSchema>,
   FormValues extends FieldsToValuesObject<Fields>,
->({ fields, onSubmit }: Props<Fields, FormValues>): JSX.Element {
+>({
+  fields,
+  formElements: formElements,
+  onSubmit,
+  introText,
+  outroText,
+  submitIsLoading,
+}: Props<Fields, FormValues>): JSX.Element {
   const formInitializer = useMemo(() => {
     const initValues = {} as Record<string, string>;
     const validations = {} as Record<string, ValidationFn>;
@@ -149,27 +159,49 @@ export function BasicForm<
 
   const form = useForm<FormValues>(formInitializer);
 
-  const fieldInputs = objectKeys(fields).map((fieldKey) => {
-    const field = fields[fieldKey]!;
-    const { syncWhileUntouched, ...moreInputProps } = getDefaultFieldSchema(
-      fieldKey,
-      field,
-    );
-    return (
-      <TextInput
-        key={form.key(fieldKey)}
-        {...form.getInputProps(fieldKey)}
-        {...moreInputProps}
-      />
-    );
+  const innerFormElements = formElements.map((formElement) => {
+    if (typeof formElement === "string") {
+      if (formElement in fields) {
+        const fieldKey = formElement;
+        const field = fields[fieldKey]!;
+        const { syncWhileUntouched, ...moreInputProps } = getDefaultFieldSchema(
+          fieldKey,
+          field,
+        );
+        return (
+          <TextInput
+            key={form.key(fieldKey)}
+            {...form.getInputProps(fieldKey)}
+            {...moreInputProps}
+          />
+        );
+      }
+    }
+
+    return formElement;
   });
+
+  function renderText(text: ReactNode) {
+    if (typeof text === "string") {
+      return <Text>{text}</Text>;
+    }
+    return text;
+  }
 
   return (
     <form onSubmit={form.onSubmit(onSubmit)}>
       <Stack gap="md">
-        {fieldInputs}
-        <Box>
-          <Button type="submit">Submit</Button>
+        {renderText(introText)}
+        {innerFormElements}
+        {renderText(outroText)}
+        <Box mt="sm">
+          <Button
+            loading={submitIsLoading}
+            disabled={submitIsLoading}
+            type="submit"
+          >
+            Submit
+          </Button>
         </Box>
       </Stack>
     </form>

@@ -21,7 +21,6 @@ create table public.workspaces (
   -- Timestamp of the last update to the workspace.
   updated_at timestamptz not null default now()
 );
-
 comment on table public.workspaces is
   'Stores information about workspaces.';
 

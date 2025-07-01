@@ -103,7 +103,8 @@ begin
 
   return new;
 end;
-$$ language plpgsql;
+$$
+language plpgsql;
 
 -- Trigger: enforce title and id field validations on insert or update
 create trigger tr_entity_field_configs__validate_title_id_fields

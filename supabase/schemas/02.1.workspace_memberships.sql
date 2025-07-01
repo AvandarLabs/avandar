@@ -22,7 +22,6 @@ create table public.workspace_memberships (
   -- prevents a user from getting added multiple times to the same workspace.
   constraint workspace_memberships_workspace_user_unique unique (workspace_id, user_id)
 );
-
 comment on table public.workspace_memberships is
   'Stores memberships between a user and a workspace.';
 
@@ -41,9 +40,9 @@ alter table public.workspace_memberships enable row level security;
 
 -- Trigger: update `updated_at` on row modification
 create trigger tr_workspace_memberships__set_updated_at
-    before update on public.workspace_memberships
-    for each row
-    execute function public.util__set_updated_at();
+  before update on public.workspace_memberships
+  for each row
+  execute function public.util__set_updated_at();
 
 -- Indexes to improve performance
 create index idx_workspace_memberships__user_id_workspace_id on public.workspace_memberships (user_id, workspace_id);

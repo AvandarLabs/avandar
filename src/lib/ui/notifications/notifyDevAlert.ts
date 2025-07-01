@@ -8,11 +8,15 @@ import { unknownToString } from "@/lib/utils/strings/transformations";
  * development. It's useful to check that certain callbacks, such as
  * button clicks, are working.
  */
-export function notifyDevAlert(message?: unknown): void {
+export function notifyDevAlert(...messages: unknown[]): void {
   if (import.meta.env.DEV) {
     notifications.show({
       title: "Alert",
-      message: unknownToString(message),
+      message: messages
+        .map((message) => {
+          return unknownToString(message);
+        })
+        .join(" "),
       color: "red",
     });
   }

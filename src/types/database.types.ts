@@ -433,6 +433,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      rpc_workspaces__add_user: {
+        Args: {
+          p_workspace_id: string
+          p_user_id: string
+          p_full_name: string
+          p_display_name: string
+          p_user_role: string
+        }
+        Returns: string
+      }
+      rpc_workspaces__create_with_owner: {
+        Args: {
+          p_workspace_name: string
+          p_workspace_slug: string
+          p_full_name: string
+          p_display_name: string
+        }
+        Returns: string
+      }
       util__auth_user_is_workspace_admin: {
         Args: { workspace_id: string }
         Returns: boolean
