@@ -1,20 +1,21 @@
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
+import { useCurrentWorkspace } from "@/lib/hooks/workspaces/useCurrentWorkspace";
 import { AppShell } from "@/lib/ui/AppShell";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { useSpotlightActions } from "./useSpotlightActions";
 
 export function WorkspaceAppLayout(): JSX.Element {
   const [entityConfigs] = EntityConfigClient.useGetAll();
-  // TODO(jpsyx): get a real workspace slug
-  const workspaceSlug = "avandar-labs";
+  const currentWorkspace = useCurrentWorkspace();
+  const workspaceSlug = currentWorkspace.slug;
 
-  const spotlightActions = useSpotlightActions("avandar-labs");
+  const spotlightActions = useSpotlightActions(workspaceSlug);
   const entityManagerLinks: NavbarLink[] = useMemo(() => {
     return (entityConfigs ?? []).map((entityConfig) => {
       const navLink = NavbarLinks.entityManager({
-        workspaceSlug,
+        workspaceSlug: workspaceSlug,
         entityConfigId: entityConfig.id,
         entityConfigName: entityConfig.name,
       });
