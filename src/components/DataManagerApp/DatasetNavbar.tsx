@@ -7,7 +7,7 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { useMemo } from "react";
-import { APP_CONFIG } from "@/config/AppConfig";
+import { AppConfig } from "@/config/AppConfig";
 import { Logger } from "@/lib/Logger";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
 import { isNotNullOrUndefined } from "@/lib/utils/guards";
@@ -75,7 +75,7 @@ export function DatasetNavbar({
           return makeDatasetLink(dataset, { style: borderStyle });
         }),
         {
-          to: APP_CONFIG.links.dataImport.to,
+          to: AppConfig.links.dataImport.to,
           label: "Add new dataset",
           style: borderStyle,
           linkKey: "create-new",

@@ -1,13 +1,42 @@
+import { AuthClient } from "@/clients/AuthClient";
 import { createSupabaseCRUDClient } from "@/lib/clients/supabase/SupabaseCRUDClient";
+import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { UserId } from "../User/types";
 import { WorkspaceParsers } from "./parsers";
-import { WorkspaceId, WorkspaceRole } from "./types";
+import { Workspace, WorkspaceId, WorkspaceRole } from "./types";
 
 export const WorkspaceClient = createSupabaseCRUDClient({
   modelName: "Workspace",
   tableName: "workspaces",
   dbTablePrimaryKey: "id",
   parsers: WorkspaceParsers,
+  queries: ({ clientLogger, dbClient, parsers }) => {
+    return {
+      getWorkspacesOfCurrentUser: async (): Promise<Workspace[]> => {
+        const logger = clientLogger.appendName("getWorkspacesOfCurrentUser");
+        logger.log("Getting workspaces of current user");
+        const session = await AuthClient.getCurrentSession();
+
+        if (!session?.user) {
+          logger.error("Could not get workspaces of an unauthenticated user.");
+          return [];
+        }
+
+        const { data: memberships } = await dbClient
+          .from("workspace_memberships")
+          .select(`workspace:workspaces (*)`)
+          .eq("user_id", session.user.id)
+          .throwOnError();
+        const workspaces = memberships.map(getProp("workspace"));
+
+        logger.log("Found workspaces for current user", workspaces);
+        return workspaces.map((workspace) => {
+          return parsers.fromDBReadToModelRead(workspace);
+        });
+      },
+    };
+  },
+
   mutations: ({ clientLogger, dbClient }) => {
     return {
       createWorkspaceWithOwner: async (params: {

@@ -278,3 +278,9 @@ export function isOneOf<T extends string | boolean | number>(
 ): value is T {
   return values.includes(value as T);
 }
+
+export function isNonEmptyArray<T>(
+  value: readonly T[],
+): value is readonly [T, ...T[]] {
+  return isArray(value) && value.length > 0;
+}

@@ -2,14 +2,16 @@ import { Center } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 import { Callout } from "@/lib/ui/Callout";
 
-export const Route = createFileRoute("/_auth/entity-manager/")({
-  component: EntityManagerRootWithNoConfigSelected,
+export const Route = createFileRoute(
+  "/_auth/$workspaceSlug/entity-manager/$entityConfigId/",
+)({
+  component: EntityManagerWithNoEntitySelected,
 });
 
 /**
  * This is the default view when we load the entity-manager root.
  */
-function EntityManagerRootWithNoConfigSelected() {
+function EntityManagerWithNoEntitySelected() {
   return (
     <Center h="50%">
       <Callout

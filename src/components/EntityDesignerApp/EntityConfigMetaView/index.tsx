@@ -2,7 +2,7 @@ import { Button, Container, Group, Stack, Text, Title } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "@tanstack/react-router";
-import { APP_CONFIG } from "@/config/AppConfig";
+import { AppConfig } from "@/config/AppConfig";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
 import { hasDefinedProps } from "@/lib/utils/guards";
@@ -115,7 +115,7 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
                   {
                     onSuccess: () => {
                       router.navigate({
-                        to: APP_CONFIG.links.entityDesigner.to,
+                        to: AppConfig.links.entityDesigner.to,
                       });
 
                       notifications.show({

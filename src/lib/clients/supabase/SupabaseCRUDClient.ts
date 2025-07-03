@@ -1,6 +1,7 @@
 import { PostgrestFilterBuilder } from "@supabase/postgrest-js";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { match } from "ts-pattern";
+import { EmptyObject } from "type-fest";
 import {
   DatabaseTableNames,
   SupabaseDBClient,
@@ -12,7 +13,6 @@ import { SupabaseModelCRUDTypes } from "../../models/SupabaseModelCRUDTypes";
 import { FiltersByColumn } from "../../utils/filters/filtersByColumn";
 import { FilterOperator } from "../../utils/filters/filterTypes";
 import { objectEntries, objectKeys } from "../../utils/objects/misc";
-import { BaseClient } from "../BaseClient";
 import {
   createModelCRUDClient,
   HookableClient,
@@ -26,11 +26,7 @@ export type SupabaseCRUDClient<
   M extends SupabaseModelCRUDTypes,
   ExtendedQueriesClient extends HookableClient,
   ExtendedMutationsClient extends HookableClient,
-> = ModelCRUDClient<
-  M,
-  ExtendedQueriesClient & BaseClient,
-  ExtendedMutationsClient & BaseClient
-> & {
+> = ModelCRUDClient<M, ExtendedQueriesClient, ExtendedMutationsClient> & {
   setDBClient: (
     dbClient: SupabaseClient<Database>,
   ) => SupabaseCRUDClient<M, ExtendedQueriesClient, ExtendedMutationsClient>;
@@ -49,8 +45,8 @@ type SupabaseFilterableQuery = PostgrestFilterBuilder<
  */
 export function createSupabaseCRUDClient<
   M extends SupabaseModelCRUDTypes,
-  ExtendedQueriesClient extends HookableClient,
-  ExtendedMutationsClient extends HookableClient,
+  ExtendedQueriesClient extends HookableClient = EmptyObject,
+  ExtendedMutationsClient extends HookableClient = EmptyObject,
 >(options: {
   modelName: M["modelName"];
   tableName: M["tableName"];
@@ -75,6 +71,7 @@ export function createSupabaseCRUDClient<
   queries?: (config: {
     clientLogger: ILogger;
     dbClient: SupabaseClient<Database>;
+    parsers: ModelCRUDParserRegistry<M>;
   }) => ExtendedQueriesClient;
 
   /**
@@ -90,6 +87,7 @@ export function createSupabaseCRUDClient<
   mutations?: (config: {
     clientLogger: ILogger;
     dbClient: SupabaseClient<Database>;
+    parsers: ModelCRUDParserRegistry<M>;
   }) => ExtendedMutationsClient;
 
   /**
@@ -139,11 +137,11 @@ export function createSupabaseCRUDClient<
     modelName,
     parsers,
     additionalQueries: (config) => {
-      return (queries?.({ ...config, dbClient }) ??
+      return (queries?.({ ...config, dbClient, parsers }) ??
         {}) as ExtendedQueriesClient;
     },
     additionalMutations: (config) => {
-      return (mutations?.({ ...config, dbClient }) ??
+      return (mutations?.({ ...config, dbClient, parsers }) ??
         {}) as ExtendedMutationsClient;
     },
     getById: async (params: {

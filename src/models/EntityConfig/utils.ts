@@ -1,26 +1,22 @@
-import { LinkProps } from "@/lib/ui/links/Link";
+import { AppLink } from "@/config/AppLinks";
 import { EntityConfig, EntityConfigId } from "./types";
 
-export function getEntityConfigLinkProps(
-  entityConfig: EntityConfig | EntityConfigId,
-): Pick<LinkProps, "to" | "params"> {
+export function getEntityConfigLinkProps({
+  workspaceSlug,
+  entityConfig,
+}: {
+  workspaceSlug: string;
+  entityConfig: EntityConfig | EntityConfigId;
+}): AppLink {
+  const entityConfigId =
+    typeof entityConfig === "string" ? entityConfig : entityConfig.id;
   return {
-    to: "/entity-designer/$entityConfigId",
+    key: `entity-config-${entityConfigId}`,
+    to: "/$workspaceSlug/entity-designer/$entityConfigId",
     params: {
-      entityConfigId:
-        typeof entityConfig === "string" ? entityConfig : entityConfig.id,
+      workspaceSlug,
+      entityConfigId,
     },
-  };
-}
-
-export function getEntityManagerLinkProps(
-  entityConfig: EntityConfig | EntityConfigId,
-): Pick<LinkProps, "to" | "params"> {
-  return {
-    to: "/entity-manager/$entityConfigId",
-    params: {
-      entityConfigId:
-        typeof entityConfig === "string" ? entityConfig : entityConfig.id,
-    },
+    label: "Entity Config",
   };
 }

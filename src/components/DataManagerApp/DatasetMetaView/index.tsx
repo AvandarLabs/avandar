@@ -13,7 +13,7 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { APP_CONFIG } from "@/config/AppConfig";
+import { AppConfig } from "@/config/AppConfig";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
@@ -171,7 +171,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                     {
                       onSuccess: () => {
                         router.navigate({
-                          to: APP_CONFIG.links.dataManager.to,
+                          to: AppConfig.links.dataManager.to,
                         });
 
                         notifications.show({

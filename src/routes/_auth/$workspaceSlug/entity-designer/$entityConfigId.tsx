@@ -5,14 +5,14 @@ import {
   notFound,
 } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { EntityManagerApp } from "@/components/EntityManagerApp";
+import { EntityConfigMetaView } from "@/components/EntityDesignerApp/EntityConfigMetaView";
 import { Logger } from "@/lib/Logger";
 import { Callout } from "@/lib/ui/Callout";
 import { uuid } from "@/lib/utils/uuid";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityConfig } from "@/models/EntityConfig/types";
 
-export const Route = createFileRoute("/_auth/entity-manager/$entityConfigId")({
+export const Route = createFileRoute("/_auth/$workspaceSlug/entity-designer/$entityConfigId")({
   component: RouteComponent,
   loader: async ({ params: { entityConfigId } }): Promise<EntityConfig> => {
     const entityConfig = await EntityConfigClient.getById({
@@ -23,15 +23,15 @@ export const Route = createFileRoute("/_auth/entity-manager/$entityConfigId")({
     }
     return entityConfig;
   },
-  errorComponent: ErrorView,
+  errorComponent: EntityMetaErrorView,
 });
 
 function RouteComponent() {
   const entityConfig = Route.useLoaderData();
-  return <EntityManagerApp entityConfig={entityConfig} />;
+  return <EntityConfigMetaView entityConfig={entityConfig} />;
 }
 
-function ErrorView({ error }: ErrorComponentProps) {
+function EntityMetaErrorView({ error }: ErrorComponentProps) {
   useEffect(() => {
     Logger.error(error);
   }, [error]);

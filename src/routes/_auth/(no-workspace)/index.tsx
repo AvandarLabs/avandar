@@ -1,12 +1,42 @@
 import { Container, Divider, Paper, Stack, Title } from "@mantine/core";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { BasicForm } from "@/lib/ui/BasicForm";
 import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
+import { isNonEmptyArray } from "@/lib/utils/guards";
 import { slugify } from "@/lib/utils/strings/transformations";
+import { getWorkspaceLinkProps } from "@/models/Workspace/utils";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
-export const Route = createFileRoute("/_auth/")({
-  component: HomePage,
+/**
+ * This is the `/` root page. We already checked if the user is logged in
+ * in the `route.tsx` file. In this file, we are attempting to actually
+ * render the `CreateFirstWorkspacePage` which should only render if the
+ * user has no workspaces.
+ */
+export const Route = createFileRoute("/_auth/(no-workspace)/")({
+  component: CreateFirstWorkspacePage,
+
+  /**
+   * Before loading the `/` root page, we check if the user has any workspaces.
+   * If they do, then we redirect to that workspace.
+   * Otherwise, we can continue rendering this page.
+   */
+  beforeLoad: async ({ context }) => {
+    const { queryClient } = context;
+
+    const userWorkspaces = await queryClient.ensureQueryData({
+      queryKey: WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
+      queryFn: () => {
+        return WorkspaceClient.getWorkspacesOfCurrentUser();
+      },
+    });
+
+    if (isNonEmptyArray(userWorkspaces)) {
+      // TODO(jpsyx): redirect to the most recent workspace
+      // For now we're just choosing the first one we find for this user
+      throw redirect(getWorkspaceLinkProps(userWorkspaces[0]));
+    }
+  },
 });
 
 const FORM_FIELDS = {
@@ -46,13 +76,18 @@ const FORM_ELEMENTS = [
   <Title order={4}>About your workspace</Title>,
   "workspaceName",
   "workspaceIdentifier",
-  <Divider mt="sm" mb="xs" />,
+  <Divider mt="xs" />,
   <Title order={4}>About you</Title>,
   "fullName",
   "displayName",
 ] as const;
 
-function HomePage() {
+/**
+ * Page where a user can create their first workspace.
+ * If the user already has a workspace, this page is never accessible.
+ * We will always redirect them to their workspace page.
+ */
+function CreateFirstWorkspacePage() {
   const [createWorkspace, isWorkspaceCreating] =
     WorkspaceClient.useCreateWorkspaceWithOwner({
       onSuccess: (data) => {

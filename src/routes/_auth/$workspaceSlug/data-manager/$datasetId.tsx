@@ -12,7 +12,7 @@ import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { asLocalDatasetId } from "@/models/LocalDataset/utils";
 import type { LocalDataset } from "@/models/LocalDataset/types";
 
-export const Route = createFileRoute("/_auth/data-manager/$datasetId")({
+export const Route = createFileRoute("/_auth/$workspaceSlug/data-manager/$datasetId")({
   component: RouteComponent,
   loader: async ({ params: { datasetId } }): Promise<LocalDataset> => {
     const dataset = await LocalDatasetClient.getById({

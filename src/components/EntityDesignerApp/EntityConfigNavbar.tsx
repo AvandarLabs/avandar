@@ -1,6 +1,6 @@
 import { Box, BoxProps, Loader, useMantineTheme } from "@mantine/core";
 import { useMemo } from "react";
-import { APP_CONFIG } from "@/config/AppConfig";
+import { AppConfig } from "@/config/AppConfig";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
 import { EntityConfig } from "@/models/EntityConfig/types";
 import { getEntityConfigLinkProps } from "@/models/EntityConfig/utils";
@@ -34,7 +34,7 @@ export function EntityConfigNavbar({
         };
       }),
       {
-        to: APP_CONFIG.links.entityCreator.to,
+        to: AppConfig.links.entityCreator.to,
         label: "Create new profile type",
         style: borderStyle,
         linkKey: "create-new",

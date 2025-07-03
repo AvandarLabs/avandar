@@ -2,7 +2,7 @@ import { Center } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 import { Callout } from "@/lib/ui/Callout";
 
-export const Route = createFileRoute("/_auth/data-manager/")({
+export const Route = createFileRoute("/_auth/$workspaceSlug/data-manager/")({
   component: DataManagerRoot,
 });
 

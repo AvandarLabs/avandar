@@ -1,16 +1,14 @@
 import { ILogger } from "../Logger";
 import { ModelCRUDParserRegistry } from "../models/makeParserRegistry";
 import { ModelCRUDTypes } from "../models/ModelCRUDTypes";
+import { EmptyObject } from "../types/common";
 import { AnyFunctionWithSignature } from "../types/utilityTypes";
 import { FiltersByColumn } from "../utils/filters/filtersByColumn";
 import { objectKeys, omit } from "../utils/objects/misc";
 import { BaseClient, createBaseClient } from "./BaseClient";
 import { WithLogger, withLogger } from "./withLogger";
-import {
-  HookableFnName,
-  WithQueryHooks,
-  withQueryHooks,
-} from "./withQueryHooks";
+import { HookableFnName, WithQueryHooks } from "./withQueryHooks/types";
+import { withQueryHooks } from "./withQueryHooks/withQueryHooks";
 
 export type ModelCRUDPage<ModelRead> = {
   /** The rows in the pagef */
@@ -159,31 +157,27 @@ export type HookableClient = Record<
 >;
 
 export type ModelCRUDClient<
+  // These args should be passed explicitly
   M extends ModelCRUDTypes,
-  ExtendedQueriesClient extends HookableClient = never,
-  ExtendedMutationsClient extends HookableClient = never,
-  MainClient extends
-    BaseModelCRUDClient<ModelCRUDTypes> = BaseModelCRUDClient<M>,
+  ExtendedQueriesClient extends HookableClient = EmptyObject,
+  ExtendedMutationsClient extends HookableClient = EmptyObject,
+  FullClient extends BaseModelCRUDClient<ModelCRUDTypes> &
+    ExtendedQueriesClient &
+    ExtendedMutationsClient = BaseModelCRUDClient<M> &
+    ExtendedQueriesClient &
+    ExtendedMutationsClient,
 > = WithLogger<
   WithQueryHooks<
-    MainClient,
-    Extract<HookableFnName<MainClient>, DefaultQueryFnName>,
-    Extract<HookableFnName<MainClient>, DefaultMutationFnName>
-  > &
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    ([ExtendedQueriesClient] extends [never] ? {}
-    : WithQueryHooks<
-        ExtendedQueriesClient & BaseClient,
-        HookableFnName<ExtendedQueriesClient & BaseClient>,
-        never
-      >) &
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    ([ExtendedMutationsClient] extends [never] ? {}
-    : WithQueryHooks<
-        ExtendedMutationsClient & BaseClient,
-        never,
-        HookableFnName<ExtendedMutationsClient & BaseClient>
-      >)
+    FullClient,
+    Exclude<
+      HookableFnName<FullClient>,
+      DefaultMutationFnName | HookableFnName<ExtendedMutationsClient>
+    >,
+    Exclude<
+      HookableFnName<FullClient>,
+      DefaultQueryFnName | HookableFnName<ExtendedQueriesClient>
+    >
+  >
 >;
 
 type CreateModelCRUDClientOptions<
@@ -255,8 +249,8 @@ type CreateModelCRUDClientOptions<
 
 export function createModelCRUDClient<
   M extends ModelCRUDTypes,
-  ExtendedQueriesClient extends HookableClient = never,
-  ExtendedMutationsClient extends HookableClient = never,
+  ExtendedQueriesClient extends HookableClient = Record<string, never>,
+  ExtendedMutationsClient extends HookableClient = Record<string, never>,
 >({
   modelName,
   defaultGetAllBatchSize = 500,
@@ -328,6 +322,11 @@ export function createModelCRUDClient<
   };
 
   return withLogger(baseClient, (baseLogger: ILogger) => {
+    const additionalQueriesRecord =
+      additionalQueries?.({ clientLogger: baseLogger }) ?? {};
+    const additionalMutationsRecord =
+      additionalMutations?.({ clientLogger: baseLogger }) ?? {};
+
     const modelClient = {
       ...baseClient,
       getById: async (params: {
@@ -515,65 +514,23 @@ export function createModelCRUDClient<
         });
         logger.log("Finished `bulkDelete`");
       },
+
+      ...additionalQueriesRecord,
+      ...additionalMutationsRecord,
     };
 
-    const queriesClient =
-      additionalQueries ?
-        {
-          ...baseClient,
-          ...additionalQueries({ clientLogger: baseLogger }),
-        }
-      : undefined;
-
-    const mutationsClient =
-      additionalMutations ?
-        {
-          ...baseClient,
-          ...additionalMutations({ clientLogger: baseLogger }),
-        }
-      : undefined;
+    const additionalQueryNames = objectKeys(additionalQueriesRecord);
+    const additionalMutationNames = objectKeys(additionalMutationsRecord);
 
     // Now attach the `use` hooks to our clients
     const modelClientWithHooks = withQueryHooks(modelClient, {
-      queryFns: DEFAULT_QUERY_FN_NAMES,
-      mutationFns: DEFAULT_MUTATION_FN_NAMES,
+      queryFns: [...DEFAULT_QUERY_FN_NAMES, ...additionalQueryNames],
+      mutationFns: [...DEFAULT_MUTATION_FN_NAMES, ...additionalMutationNames],
     });
-
-    const baseClientKeys = objectKeys(baseClient);
-    const queriesClientWithHooks =
-      queriesClient ?
-        withQueryHooks(queriesClient, {
-          queryFns: objectKeys(
-            omit(queriesClient, baseClientKeys),
-            // This is safe to cast to `any`
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ) as any,
-          mutationFns: [],
-        })
-      : undefined;
-
-    const mutationsClientWithHooks =
-      mutationsClient ?
-        withQueryHooks(mutationsClient, {
-          queryFns: [],
-          mutationFns: objectKeys(
-            omit(mutationsClient, baseClientKeys),
-            // This is safe to cast to `any`
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ) as any,
-        })
-      : undefined;
 
     return {
       ...baseClient,
-      ...modelClient,
-      ...queriesClient,
-      ...mutationsClient,
-      QueryKeys: {
-        ...modelClientWithHooks.QueryKeys,
-        ...queriesClientWithHooks?.QueryKeys,
-        ...mutationsClientWithHooks?.QueryKeys,
-      },
+      ...modelClientWithHooks,
 
       // Using `any` here only because TypeScript is struggling with the
       // complexity of the generics and function name extractions.

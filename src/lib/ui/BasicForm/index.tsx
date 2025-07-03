@@ -176,6 +176,8 @@ export function BasicForm<
           />
         );
       }
+
+      return <Text>{formElement}</Text>;
     }
 
     return formElement;

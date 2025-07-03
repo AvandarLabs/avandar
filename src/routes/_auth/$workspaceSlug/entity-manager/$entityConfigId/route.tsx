@@ -5,40 +5,32 @@ import {
   notFound,
 } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { SingleEntityView } from "@/components/EntityManagerApp/SingleEntityView";
+import { EntityManagerApp } from "@/components/EntityManagerApp";
 import { Logger } from "@/lib/Logger";
 import { Callout } from "@/lib/ui/Callout";
 import { uuid } from "@/lib/utils/uuid";
-import { EntityClient } from "@/models/Entity/EntityClient";
-import { Entity } from "@/models/Entity/types";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityConfig } from "@/models/EntityConfig/types";
 
 export const Route = createFileRoute(
-  "/_auth/entity-manager/$entityConfigId/$entityId",
+  "/_auth/$workspaceSlug/entity-manager/$entityConfigId",
 )({
   component: RouteComponent,
-  loader: async ({
-    params: { entityId, entityConfigId },
-  }): Promise<{ entityConfig: EntityConfig; entity: Entity }> => {
-    const [entityConfig, entity] = await Promise.all([
-      EntityConfigClient.getById({ id: uuid(entityConfigId) }),
-      EntityClient.ofType(uuid(entityConfigId)).getById({ id: uuid(entityId) }),
-    ]);
-    if (!entityConfig || !entity) {
+  loader: async ({ params: { entityConfigId } }): Promise<EntityConfig> => {
+    const entityConfig = await EntityConfigClient.getById({
+      id: uuid(entityConfigId),
+    });
+    if (!entityConfig) {
       throw notFound();
     }
-    return {
-      entityConfig,
-      entity,
-    };
+    return entityConfig;
   },
   errorComponent: ErrorView,
 });
 
 function RouteComponent() {
-  const { entityConfig, entity } = Route.useLoaderData();
-  return <SingleEntityView entityConfig={entityConfig} entity={entity} />;
+  const entityConfig = Route.useLoaderData();
+  return <EntityManagerApp entityConfig={entityConfig} />;
 }
 
 function ErrorView({ error }: ErrorComponentProps) {

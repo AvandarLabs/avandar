@@ -16,22 +16,25 @@ import { Route as SigninImport } from "./routes/signin";
 import { Route as RegisterImport } from "./routes/register";
 import { Route as ForgotPasswordImport } from "./routes/forgot-password";
 import { Route as AuthRouteImport } from "./routes/_auth/route";
-import { Route as AuthIndexImport } from "./routes/_auth/index";
-import { Route as AuthProfileImport } from "./routes/_auth/profile";
-import { Route as AuthDataExplorerImport } from "./routes/_auth/data-explorer";
-import { Route as AuthEntityManagerRouteImport } from "./routes/_auth/entity-manager/route";
-import { Route as AuthEntityDesignerRouteImport } from "./routes/_auth/entity-designer/route";
-import { Route as AuthDataManagerRouteImport } from "./routes/_auth/data-manager/route";
-import { Route as AuthEntityManagerIndexImport } from "./routes/_auth/entity-manager/index";
-import { Route as AuthEntityDesignerIndexImport } from "./routes/_auth/entity-designer/index";
-import { Route as AuthDataManagerIndexImport } from "./routes/_auth/data-manager/index";
-import { Route as AuthEntityDesignerEntityCreatorImport } from "./routes/_auth/entity-designer/entity-creator";
-import { Route as AuthEntityDesignerEntityConfigIdImport } from "./routes/_auth/entity-designer/$entityConfigId";
-import { Route as AuthDataManagerDataImportImport } from "./routes/_auth/data-manager/data-import";
-import { Route as AuthDataManagerDatasetIdImport } from "./routes/_auth/data-manager/$datasetId";
-import { Route as AuthEntityManagerEntityConfigIdRouteImport } from "./routes/_auth/entity-manager/$entityConfigId/route";
-import { Route as AuthEntityManagerEntityConfigIdIndexImport } from "./routes/_auth/entity-manager/$entityConfigId/index";
-import { Route as AuthEntityManagerEntityConfigIdEntityIdImport } from "./routes/_auth/entity-manager/$entityConfigId/$entityId";
+import { Route as AuthnoWorkspaceRouteImport } from "./routes/_auth/(no-workspace)/route";
+import { Route as AuthWorkspaceSlugRouteImport } from "./routes/_auth/$workspaceSlug/route";
+import { Route as AuthnoWorkspaceIndexImport } from "./routes/_auth/(no-workspace)/index";
+import { Route as AuthWorkspaceSlugIndexImport } from "./routes/_auth/$workspaceSlug/index";
+import { Route as AuthnoWorkspaceInvalidWorkspaceImport } from "./routes/_auth/(no-workspace)/invalid-workspace";
+import { Route as AuthWorkspaceSlugProfileImport } from "./routes/_auth/$workspaceSlug/profile";
+import { Route as AuthWorkspaceSlugDataExplorerImport } from "./routes/_auth/$workspaceSlug/data-explorer";
+import { Route as AuthWorkspaceSlugEntityDesignerRouteImport } from "./routes/_auth/$workspaceSlug/entity-designer/route";
+import { Route as AuthWorkspaceSlugDataManagerRouteImport } from "./routes/_auth/$workspaceSlug/data-manager/route";
+import { Route as AuthWorkspaceSlugEntityManagerIndexImport } from "./routes/_auth/$workspaceSlug/entity-manager/index";
+import { Route as AuthWorkspaceSlugEntityDesignerIndexImport } from "./routes/_auth/$workspaceSlug/entity-designer/index";
+import { Route as AuthWorkspaceSlugDataManagerIndexImport } from "./routes/_auth/$workspaceSlug/data-manager/index";
+import { Route as AuthWorkspaceSlugEntityDesignerEntityCreatorImport } from "./routes/_auth/$workspaceSlug/entity-designer/entity-creator";
+import { Route as AuthWorkspaceSlugEntityDesignerEntityConfigIdImport } from "./routes/_auth/$workspaceSlug/entity-designer/$entityConfigId";
+import { Route as AuthWorkspaceSlugDataManagerDataImportImport } from "./routes/_auth/$workspaceSlug/data-manager/data-import";
+import { Route as AuthWorkspaceSlugDataManagerDatasetIdImport } from "./routes/_auth/$workspaceSlug/data-manager/$datasetId";
+import { Route as AuthWorkspaceSlugEntityManagerEntityConfigIdRouteImport } from "./routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route";
+import { Route as AuthWorkspaceSlugEntityManagerEntityConfigIdIndexImport } from "./routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index";
+import { Route as AuthWorkspaceSlugEntityManagerEntityConfigIdEntityIdImport } from "./routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId";
 
 // Create/Update Routes
 
@@ -64,105 +67,133 @@ const AuthRouteRoute = AuthRouteImport.update({
   getParentRoute: () => rootRoute,
 } as any);
 
-const AuthIndexRoute = AuthIndexImport.update({
-  id: "/",
-  path: "/",
+const AuthnoWorkspaceRouteRoute = AuthnoWorkspaceRouteImport.update({
+  id: "/(no-workspace)",
   getParentRoute: () => AuthRouteRoute,
 } as any);
 
-const AuthProfileRoute = AuthProfileImport.update({
+const AuthWorkspaceSlugRouteRoute = AuthWorkspaceSlugRouteImport.update({
+  id: "/$workspaceSlug",
+  path: "/$workspaceSlug",
+  getParentRoute: () => AuthRouteRoute,
+} as any);
+
+const AuthnoWorkspaceIndexRoute = AuthnoWorkspaceIndexImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => AuthnoWorkspaceRouteRoute,
+} as any);
+
+const AuthWorkspaceSlugIndexRoute = AuthWorkspaceSlugIndexImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => AuthWorkspaceSlugRouteRoute,
+} as any);
+
+const AuthnoWorkspaceInvalidWorkspaceRoute =
+  AuthnoWorkspaceInvalidWorkspaceImport.update({
+    id: "/invalid-workspace",
+    path: "/invalid-workspace",
+    getParentRoute: () => AuthnoWorkspaceRouteRoute,
+  } as any);
+
+const AuthWorkspaceSlugProfileRoute = AuthWorkspaceSlugProfileImport.update({
   id: "/profile",
   path: "/profile",
-  getParentRoute: () => AuthRouteRoute,
+  getParentRoute: () => AuthWorkspaceSlugRouteRoute,
 } as any);
 
-const AuthDataExplorerRoute = AuthDataExplorerImport.update({
-  id: "/data-explorer",
-  path: "/data-explorer",
-  getParentRoute: () => AuthRouteRoute,
-} as any);
-
-const AuthEntityManagerRouteRoute = AuthEntityManagerRouteImport.update({
-  id: "/entity-manager",
-  path: "/entity-manager",
-  getParentRoute: () => AuthRouteRoute,
-} as any);
-
-const AuthEntityDesignerRouteRoute = AuthEntityDesignerRouteImport.update({
-  id: "/entity-designer",
-  path: "/entity-designer",
-  getParentRoute: () => AuthRouteRoute,
-} as any);
-
-const AuthDataManagerRouteRoute = AuthDataManagerRouteImport.update({
-  id: "/data-manager",
-  path: "/data-manager",
-  getParentRoute: () => AuthRouteRoute,
-} as any);
-
-const AuthEntityManagerIndexRoute = AuthEntityManagerIndexImport.update({
-  id: "/",
-  path: "/",
-  getParentRoute: () => AuthEntityManagerRouteRoute,
-} as any);
-
-const AuthEntityDesignerIndexRoute = AuthEntityDesignerIndexImport.update({
-  id: "/",
-  path: "/",
-  getParentRoute: () => AuthEntityDesignerRouteRoute,
-} as any);
-
-const AuthDataManagerIndexRoute = AuthDataManagerIndexImport.update({
-  id: "/",
-  path: "/",
-  getParentRoute: () => AuthDataManagerRouteRoute,
-} as any);
-
-const AuthEntityDesignerEntityCreatorRoute =
-  AuthEntityDesignerEntityCreatorImport.update({
-    id: "/entity-creator",
-    path: "/entity-creator",
-    getParentRoute: () => AuthEntityDesignerRouteRoute,
+const AuthWorkspaceSlugDataExplorerRoute =
+  AuthWorkspaceSlugDataExplorerImport.update({
+    id: "/data-explorer",
+    path: "/data-explorer",
+    getParentRoute: () => AuthWorkspaceSlugRouteRoute,
   } as any);
 
-const AuthEntityDesignerEntityConfigIdRoute =
-  AuthEntityDesignerEntityConfigIdImport.update({
-    id: "/$entityConfigId",
-    path: "/$entityConfigId",
-    getParentRoute: () => AuthEntityDesignerRouteRoute,
+const AuthWorkspaceSlugEntityDesignerRouteRoute =
+  AuthWorkspaceSlugEntityDesignerRouteImport.update({
+    id: "/entity-designer",
+    path: "/entity-designer",
+    getParentRoute: () => AuthWorkspaceSlugRouteRoute,
   } as any);
 
-const AuthDataManagerDataImportRoute = AuthDataManagerDataImportImport.update({
-  id: "/data-import",
-  path: "/data-import",
-  getParentRoute: () => AuthDataManagerRouteRoute,
-} as any);
-
-const AuthDataManagerDatasetIdRoute = AuthDataManagerDatasetIdImport.update({
-  id: "/$datasetId",
-  path: "/$datasetId",
-  getParentRoute: () => AuthDataManagerRouteRoute,
-} as any);
-
-const AuthEntityManagerEntityConfigIdRouteRoute =
-  AuthEntityManagerEntityConfigIdRouteImport.update({
-    id: "/$entityConfigId",
-    path: "/$entityConfigId",
-    getParentRoute: () => AuthEntityManagerRouteRoute,
+const AuthWorkspaceSlugDataManagerRouteRoute =
+  AuthWorkspaceSlugDataManagerRouteImport.update({
+    id: "/data-manager",
+    path: "/data-manager",
+    getParentRoute: () => AuthWorkspaceSlugRouteRoute,
   } as any);
 
-const AuthEntityManagerEntityConfigIdIndexRoute =
-  AuthEntityManagerEntityConfigIdIndexImport.update({
+const AuthWorkspaceSlugEntityManagerIndexRoute =
+  AuthWorkspaceSlugEntityManagerIndexImport.update({
+    id: "/entity-manager/",
+    path: "/entity-manager/",
+    getParentRoute: () => AuthWorkspaceSlugRouteRoute,
+  } as any);
+
+const AuthWorkspaceSlugEntityDesignerIndexRoute =
+  AuthWorkspaceSlugEntityDesignerIndexImport.update({
     id: "/",
     path: "/",
-    getParentRoute: () => AuthEntityManagerEntityConfigIdRouteRoute,
+    getParentRoute: () => AuthWorkspaceSlugEntityDesignerRouteRoute,
   } as any);
 
-const AuthEntityManagerEntityConfigIdEntityIdRoute =
-  AuthEntityManagerEntityConfigIdEntityIdImport.update({
+const AuthWorkspaceSlugDataManagerIndexRoute =
+  AuthWorkspaceSlugDataManagerIndexImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => AuthWorkspaceSlugDataManagerRouteRoute,
+  } as any);
+
+const AuthWorkspaceSlugEntityDesignerEntityCreatorRoute =
+  AuthWorkspaceSlugEntityDesignerEntityCreatorImport.update({
+    id: "/entity-creator",
+    path: "/entity-creator",
+    getParentRoute: () => AuthWorkspaceSlugEntityDesignerRouteRoute,
+  } as any);
+
+const AuthWorkspaceSlugEntityDesignerEntityConfigIdRoute =
+  AuthWorkspaceSlugEntityDesignerEntityConfigIdImport.update({
+    id: "/$entityConfigId",
+    path: "/$entityConfigId",
+    getParentRoute: () => AuthWorkspaceSlugEntityDesignerRouteRoute,
+  } as any);
+
+const AuthWorkspaceSlugDataManagerDataImportRoute =
+  AuthWorkspaceSlugDataManagerDataImportImport.update({
+    id: "/data-import",
+    path: "/data-import",
+    getParentRoute: () => AuthWorkspaceSlugDataManagerRouteRoute,
+  } as any);
+
+const AuthWorkspaceSlugDataManagerDatasetIdRoute =
+  AuthWorkspaceSlugDataManagerDatasetIdImport.update({
+    id: "/$datasetId",
+    path: "/$datasetId",
+    getParentRoute: () => AuthWorkspaceSlugDataManagerRouteRoute,
+  } as any);
+
+const AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRoute =
+  AuthWorkspaceSlugEntityManagerEntityConfigIdRouteImport.update({
+    id: "/entity-manager/$entityConfigId",
+    path: "/entity-manager/$entityConfigId",
+    getParentRoute: () => AuthWorkspaceSlugRouteRoute,
+  } as any);
+
+const AuthWorkspaceSlugEntityManagerEntityConfigIdIndexRoute =
+  AuthWorkspaceSlugEntityManagerEntityConfigIdIndexImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () =>
+      AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRoute,
+  } as any);
+
+const AuthWorkspaceSlugEntityManagerEntityConfigIdEntityIdRoute =
+  AuthWorkspaceSlugEntityManagerEntityConfigIdEntityIdImport.update({
     id: "/$entityId",
     path: "/$entityId",
-    getParentRoute: () => AuthEntityManagerEntityConfigIdRouteRoute,
+    getParentRoute: () =>
+      AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRoute,
   } as any);
 
 // Populate the FileRoutesByPath interface
@@ -204,208 +235,255 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof UpdatePasswordImport;
       parentRoute: typeof rootRoute;
     };
-    "/_auth/data-manager": {
-      id: "/_auth/data-manager";
-      path: "/data-manager";
-      fullPath: "/data-manager";
-      preLoaderRoute: typeof AuthDataManagerRouteImport;
+    "/_auth/$workspaceSlug": {
+      id: "/_auth/$workspaceSlug";
+      path: "/$workspaceSlug";
+      fullPath: "/$workspaceSlug";
+      preLoaderRoute: typeof AuthWorkspaceSlugRouteImport;
       parentRoute: typeof AuthRouteImport;
     };
-    "/_auth/entity-designer": {
-      id: "/_auth/entity-designer";
-      path: "/entity-designer";
-      fullPath: "/entity-designer";
-      preLoaderRoute: typeof AuthEntityDesignerRouteImport;
-      parentRoute: typeof AuthRouteImport;
-    };
-    "/_auth/entity-manager": {
-      id: "/_auth/entity-manager";
-      path: "/entity-manager";
-      fullPath: "/entity-manager";
-      preLoaderRoute: typeof AuthEntityManagerRouteImport;
-      parentRoute: typeof AuthRouteImport;
-    };
-    "/_auth/data-explorer": {
-      id: "/_auth/data-explorer";
-      path: "/data-explorer";
-      fullPath: "/data-explorer";
-      preLoaderRoute: typeof AuthDataExplorerImport;
-      parentRoute: typeof AuthRouteImport;
-    };
-    "/_auth/profile": {
-      id: "/_auth/profile";
-      path: "/profile";
-      fullPath: "/profile";
-      preLoaderRoute: typeof AuthProfileImport;
-      parentRoute: typeof AuthRouteImport;
-    };
-    "/_auth/": {
-      id: "/_auth/";
+    "/_auth/(no-workspace)": {
+      id: "/_auth/(no-workspace)";
       path: "/";
       fullPath: "/";
-      preLoaderRoute: typeof AuthIndexImport;
+      preLoaderRoute: typeof AuthnoWorkspaceRouteImport;
       parentRoute: typeof AuthRouteImport;
     };
-    "/_auth/entity-manager/$entityConfigId": {
-      id: "/_auth/entity-manager/$entityConfigId";
-      path: "/$entityConfigId";
-      fullPath: "/entity-manager/$entityConfigId";
-      preLoaderRoute: typeof AuthEntityManagerEntityConfigIdRouteImport;
-      parentRoute: typeof AuthEntityManagerRouteImport;
+    "/_auth/$workspaceSlug/data-manager": {
+      id: "/_auth/$workspaceSlug/data-manager";
+      path: "/data-manager";
+      fullPath: "/$workspaceSlug/data-manager";
+      preLoaderRoute: typeof AuthWorkspaceSlugDataManagerRouteImport;
+      parentRoute: typeof AuthWorkspaceSlugRouteImport;
     };
-    "/_auth/data-manager/$datasetId": {
-      id: "/_auth/data-manager/$datasetId";
+    "/_auth/$workspaceSlug/entity-designer": {
+      id: "/_auth/$workspaceSlug/entity-designer";
+      path: "/entity-designer";
+      fullPath: "/$workspaceSlug/entity-designer";
+      preLoaderRoute: typeof AuthWorkspaceSlugEntityDesignerRouteImport;
+      parentRoute: typeof AuthWorkspaceSlugRouteImport;
+    };
+    "/_auth/$workspaceSlug/data-explorer": {
+      id: "/_auth/$workspaceSlug/data-explorer";
+      path: "/data-explorer";
+      fullPath: "/$workspaceSlug/data-explorer";
+      preLoaderRoute: typeof AuthWorkspaceSlugDataExplorerImport;
+      parentRoute: typeof AuthWorkspaceSlugRouteImport;
+    };
+    "/_auth/$workspaceSlug/profile": {
+      id: "/_auth/$workspaceSlug/profile";
+      path: "/profile";
+      fullPath: "/$workspaceSlug/profile";
+      preLoaderRoute: typeof AuthWorkspaceSlugProfileImport;
+      parentRoute: typeof AuthWorkspaceSlugRouteImport;
+    };
+    "/_auth/(no-workspace)/invalid-workspace": {
+      id: "/_auth/(no-workspace)/invalid-workspace";
+      path: "/invalid-workspace";
+      fullPath: "/invalid-workspace";
+      preLoaderRoute: typeof AuthnoWorkspaceInvalidWorkspaceImport;
+      parentRoute: typeof AuthnoWorkspaceRouteImport;
+    };
+    "/_auth/$workspaceSlug/": {
+      id: "/_auth/$workspaceSlug/";
+      path: "/";
+      fullPath: "/$workspaceSlug/";
+      preLoaderRoute: typeof AuthWorkspaceSlugIndexImport;
+      parentRoute: typeof AuthWorkspaceSlugRouteImport;
+    };
+    "/_auth/(no-workspace)/": {
+      id: "/_auth/(no-workspace)/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof AuthnoWorkspaceIndexImport;
+      parentRoute: typeof AuthnoWorkspaceRouteImport;
+    };
+    "/_auth/$workspaceSlug/entity-manager/$entityConfigId": {
+      id: "/_auth/$workspaceSlug/entity-manager/$entityConfigId";
+      path: "/entity-manager/$entityConfigId";
+      fullPath: "/$workspaceSlug/entity-manager/$entityConfigId";
+      preLoaderRoute: typeof AuthWorkspaceSlugEntityManagerEntityConfigIdRouteImport;
+      parentRoute: typeof AuthWorkspaceSlugRouteImport;
+    };
+    "/_auth/$workspaceSlug/data-manager/$datasetId": {
+      id: "/_auth/$workspaceSlug/data-manager/$datasetId";
       path: "/$datasetId";
-      fullPath: "/data-manager/$datasetId";
-      preLoaderRoute: typeof AuthDataManagerDatasetIdImport;
-      parentRoute: typeof AuthDataManagerRouteImport;
+      fullPath: "/$workspaceSlug/data-manager/$datasetId";
+      preLoaderRoute: typeof AuthWorkspaceSlugDataManagerDatasetIdImport;
+      parentRoute: typeof AuthWorkspaceSlugDataManagerRouteImport;
     };
-    "/_auth/data-manager/data-import": {
-      id: "/_auth/data-manager/data-import";
+    "/_auth/$workspaceSlug/data-manager/data-import": {
+      id: "/_auth/$workspaceSlug/data-manager/data-import";
       path: "/data-import";
-      fullPath: "/data-manager/data-import";
-      preLoaderRoute: typeof AuthDataManagerDataImportImport;
-      parentRoute: typeof AuthDataManagerRouteImport;
+      fullPath: "/$workspaceSlug/data-manager/data-import";
+      preLoaderRoute: typeof AuthWorkspaceSlugDataManagerDataImportImport;
+      parentRoute: typeof AuthWorkspaceSlugDataManagerRouteImport;
     };
-    "/_auth/entity-designer/$entityConfigId": {
-      id: "/_auth/entity-designer/$entityConfigId";
+    "/_auth/$workspaceSlug/entity-designer/$entityConfigId": {
+      id: "/_auth/$workspaceSlug/entity-designer/$entityConfigId";
       path: "/$entityConfigId";
-      fullPath: "/entity-designer/$entityConfigId";
-      preLoaderRoute: typeof AuthEntityDesignerEntityConfigIdImport;
-      parentRoute: typeof AuthEntityDesignerRouteImport;
+      fullPath: "/$workspaceSlug/entity-designer/$entityConfigId";
+      preLoaderRoute: typeof AuthWorkspaceSlugEntityDesignerEntityConfigIdImport;
+      parentRoute: typeof AuthWorkspaceSlugEntityDesignerRouteImport;
     };
-    "/_auth/entity-designer/entity-creator": {
-      id: "/_auth/entity-designer/entity-creator";
+    "/_auth/$workspaceSlug/entity-designer/entity-creator": {
+      id: "/_auth/$workspaceSlug/entity-designer/entity-creator";
       path: "/entity-creator";
-      fullPath: "/entity-designer/entity-creator";
-      preLoaderRoute: typeof AuthEntityDesignerEntityCreatorImport;
-      parentRoute: typeof AuthEntityDesignerRouteImport;
+      fullPath: "/$workspaceSlug/entity-designer/entity-creator";
+      preLoaderRoute: typeof AuthWorkspaceSlugEntityDesignerEntityCreatorImport;
+      parentRoute: typeof AuthWorkspaceSlugEntityDesignerRouteImport;
     };
-    "/_auth/data-manager/": {
-      id: "/_auth/data-manager/";
+    "/_auth/$workspaceSlug/data-manager/": {
+      id: "/_auth/$workspaceSlug/data-manager/";
       path: "/";
-      fullPath: "/data-manager/";
-      preLoaderRoute: typeof AuthDataManagerIndexImport;
-      parentRoute: typeof AuthDataManagerRouteImport;
+      fullPath: "/$workspaceSlug/data-manager/";
+      preLoaderRoute: typeof AuthWorkspaceSlugDataManagerIndexImport;
+      parentRoute: typeof AuthWorkspaceSlugDataManagerRouteImport;
     };
-    "/_auth/entity-designer/": {
-      id: "/_auth/entity-designer/";
+    "/_auth/$workspaceSlug/entity-designer/": {
+      id: "/_auth/$workspaceSlug/entity-designer/";
       path: "/";
-      fullPath: "/entity-designer/";
-      preLoaderRoute: typeof AuthEntityDesignerIndexImport;
-      parentRoute: typeof AuthEntityDesignerRouteImport;
+      fullPath: "/$workspaceSlug/entity-designer/";
+      preLoaderRoute: typeof AuthWorkspaceSlugEntityDesignerIndexImport;
+      parentRoute: typeof AuthWorkspaceSlugEntityDesignerRouteImport;
     };
-    "/_auth/entity-manager/": {
-      id: "/_auth/entity-manager/";
-      path: "/";
-      fullPath: "/entity-manager/";
-      preLoaderRoute: typeof AuthEntityManagerIndexImport;
-      parentRoute: typeof AuthEntityManagerRouteImport;
+    "/_auth/$workspaceSlug/entity-manager/": {
+      id: "/_auth/$workspaceSlug/entity-manager/";
+      path: "/entity-manager";
+      fullPath: "/$workspaceSlug/entity-manager";
+      preLoaderRoute: typeof AuthWorkspaceSlugEntityManagerIndexImport;
+      parentRoute: typeof AuthWorkspaceSlugRouteImport;
     };
-    "/_auth/entity-manager/$entityConfigId/$entityId": {
-      id: "/_auth/entity-manager/$entityConfigId/$entityId";
+    "/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId": {
+      id: "/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId";
       path: "/$entityId";
-      fullPath: "/entity-manager/$entityConfigId/$entityId";
-      preLoaderRoute: typeof AuthEntityManagerEntityConfigIdEntityIdImport;
-      parentRoute: typeof AuthEntityManagerEntityConfigIdRouteImport;
+      fullPath: "/$workspaceSlug/entity-manager/$entityConfigId/$entityId";
+      preLoaderRoute: typeof AuthWorkspaceSlugEntityManagerEntityConfigIdEntityIdImport;
+      parentRoute: typeof AuthWorkspaceSlugEntityManagerEntityConfigIdRouteImport;
     };
-    "/_auth/entity-manager/$entityConfigId/": {
-      id: "/_auth/entity-manager/$entityConfigId/";
+    "/_auth/$workspaceSlug/entity-manager/$entityConfigId/": {
+      id: "/_auth/$workspaceSlug/entity-manager/$entityConfigId/";
       path: "/";
-      fullPath: "/entity-manager/$entityConfigId/";
-      preLoaderRoute: typeof AuthEntityManagerEntityConfigIdIndexImport;
-      parentRoute: typeof AuthEntityManagerEntityConfigIdRouteImport;
+      fullPath: "/$workspaceSlug/entity-manager/$entityConfigId/";
+      preLoaderRoute: typeof AuthWorkspaceSlugEntityManagerEntityConfigIdIndexImport;
+      parentRoute: typeof AuthWorkspaceSlugEntityManagerEntityConfigIdRouteImport;
     };
   }
 }
 
 // Create and export the route tree
 
-interface AuthDataManagerRouteRouteChildren {
-  AuthDataManagerDatasetIdRoute: typeof AuthDataManagerDatasetIdRoute;
-  AuthDataManagerDataImportRoute: typeof AuthDataManagerDataImportRoute;
-  AuthDataManagerIndexRoute: typeof AuthDataManagerIndexRoute;
+interface AuthWorkspaceSlugDataManagerRouteRouteChildren {
+  AuthWorkspaceSlugDataManagerDatasetIdRoute: typeof AuthWorkspaceSlugDataManagerDatasetIdRoute;
+  AuthWorkspaceSlugDataManagerDataImportRoute: typeof AuthWorkspaceSlugDataManagerDataImportRoute;
+  AuthWorkspaceSlugDataManagerIndexRoute: typeof AuthWorkspaceSlugDataManagerIndexRoute;
 }
 
-const AuthDataManagerRouteRouteChildren: AuthDataManagerRouteRouteChildren = {
-  AuthDataManagerDatasetIdRoute: AuthDataManagerDatasetIdRoute,
-  AuthDataManagerDataImportRoute: AuthDataManagerDataImportRoute,
-  AuthDataManagerIndexRoute: AuthDataManagerIndexRoute,
+const AuthWorkspaceSlugDataManagerRouteRouteChildren: AuthWorkspaceSlugDataManagerRouteRouteChildren =
+  {
+    AuthWorkspaceSlugDataManagerDatasetIdRoute:
+      AuthWorkspaceSlugDataManagerDatasetIdRoute,
+    AuthWorkspaceSlugDataManagerDataImportRoute:
+      AuthWorkspaceSlugDataManagerDataImportRoute,
+    AuthWorkspaceSlugDataManagerIndexRoute:
+      AuthWorkspaceSlugDataManagerIndexRoute,
+  };
+
+const AuthWorkspaceSlugDataManagerRouteRouteWithChildren =
+  AuthWorkspaceSlugDataManagerRouteRoute._addFileChildren(
+    AuthWorkspaceSlugDataManagerRouteRouteChildren,
+  );
+
+interface AuthWorkspaceSlugEntityDesignerRouteRouteChildren {
+  AuthWorkspaceSlugEntityDesignerEntityConfigIdRoute: typeof AuthWorkspaceSlugEntityDesignerEntityConfigIdRoute;
+  AuthWorkspaceSlugEntityDesignerEntityCreatorRoute: typeof AuthWorkspaceSlugEntityDesignerEntityCreatorRoute;
+  AuthWorkspaceSlugEntityDesignerIndexRoute: typeof AuthWorkspaceSlugEntityDesignerIndexRoute;
+}
+
+const AuthWorkspaceSlugEntityDesignerRouteRouteChildren: AuthWorkspaceSlugEntityDesignerRouteRouteChildren =
+  {
+    AuthWorkspaceSlugEntityDesignerEntityConfigIdRoute:
+      AuthWorkspaceSlugEntityDesignerEntityConfigIdRoute,
+    AuthWorkspaceSlugEntityDesignerEntityCreatorRoute:
+      AuthWorkspaceSlugEntityDesignerEntityCreatorRoute,
+    AuthWorkspaceSlugEntityDesignerIndexRoute:
+      AuthWorkspaceSlugEntityDesignerIndexRoute,
+  };
+
+const AuthWorkspaceSlugEntityDesignerRouteRouteWithChildren =
+  AuthWorkspaceSlugEntityDesignerRouteRoute._addFileChildren(
+    AuthWorkspaceSlugEntityDesignerRouteRouteChildren,
+  );
+
+interface AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRouteChildren {
+  AuthWorkspaceSlugEntityManagerEntityConfigIdEntityIdRoute: typeof AuthWorkspaceSlugEntityManagerEntityConfigIdEntityIdRoute;
+  AuthWorkspaceSlugEntityManagerEntityConfigIdIndexRoute: typeof AuthWorkspaceSlugEntityManagerEntityConfigIdIndexRoute;
+}
+
+const AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRouteChildren: AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRouteChildren =
+  {
+    AuthWorkspaceSlugEntityManagerEntityConfigIdEntityIdRoute:
+      AuthWorkspaceSlugEntityManagerEntityConfigIdEntityIdRoute,
+    AuthWorkspaceSlugEntityManagerEntityConfigIdIndexRoute:
+      AuthWorkspaceSlugEntityManagerEntityConfigIdIndexRoute,
+  };
+
+const AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRouteWithChildren =
+  AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRoute._addFileChildren(
+    AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRouteChildren,
+  );
+
+interface AuthWorkspaceSlugRouteRouteChildren {
+  AuthWorkspaceSlugDataManagerRouteRoute: typeof AuthWorkspaceSlugDataManagerRouteRouteWithChildren;
+  AuthWorkspaceSlugEntityDesignerRouteRoute: typeof AuthWorkspaceSlugEntityDesignerRouteRouteWithChildren;
+  AuthWorkspaceSlugDataExplorerRoute: typeof AuthWorkspaceSlugDataExplorerRoute;
+  AuthWorkspaceSlugProfileRoute: typeof AuthWorkspaceSlugProfileRoute;
+  AuthWorkspaceSlugIndexRoute: typeof AuthWorkspaceSlugIndexRoute;
+  AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRoute: typeof AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRouteWithChildren;
+  AuthWorkspaceSlugEntityManagerIndexRoute: typeof AuthWorkspaceSlugEntityManagerIndexRoute;
+}
+
+const AuthWorkspaceSlugRouteRouteChildren: AuthWorkspaceSlugRouteRouteChildren =
+  {
+    AuthWorkspaceSlugDataManagerRouteRoute:
+      AuthWorkspaceSlugDataManagerRouteRouteWithChildren,
+    AuthWorkspaceSlugEntityDesignerRouteRoute:
+      AuthWorkspaceSlugEntityDesignerRouteRouteWithChildren,
+    AuthWorkspaceSlugDataExplorerRoute: AuthWorkspaceSlugDataExplorerRoute,
+    AuthWorkspaceSlugProfileRoute: AuthWorkspaceSlugProfileRoute,
+    AuthWorkspaceSlugIndexRoute: AuthWorkspaceSlugIndexRoute,
+    AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRoute:
+      AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRouteWithChildren,
+    AuthWorkspaceSlugEntityManagerIndexRoute:
+      AuthWorkspaceSlugEntityManagerIndexRoute,
+  };
+
+const AuthWorkspaceSlugRouteRouteWithChildren =
+  AuthWorkspaceSlugRouteRoute._addFileChildren(
+    AuthWorkspaceSlugRouteRouteChildren,
+  );
+
+interface AuthnoWorkspaceRouteRouteChildren {
+  AuthnoWorkspaceInvalidWorkspaceRoute: typeof AuthnoWorkspaceInvalidWorkspaceRoute;
+  AuthnoWorkspaceIndexRoute: typeof AuthnoWorkspaceIndexRoute;
+}
+
+const AuthnoWorkspaceRouteRouteChildren: AuthnoWorkspaceRouteRouteChildren = {
+  AuthnoWorkspaceInvalidWorkspaceRoute: AuthnoWorkspaceInvalidWorkspaceRoute,
+  AuthnoWorkspaceIndexRoute: AuthnoWorkspaceIndexRoute,
 };
 
-const AuthDataManagerRouteRouteWithChildren =
-  AuthDataManagerRouteRoute._addFileChildren(AuthDataManagerRouteRouteChildren);
-
-interface AuthEntityDesignerRouteRouteChildren {
-  AuthEntityDesignerEntityConfigIdRoute: typeof AuthEntityDesignerEntityConfigIdRoute;
-  AuthEntityDesignerEntityCreatorRoute: typeof AuthEntityDesignerEntityCreatorRoute;
-  AuthEntityDesignerIndexRoute: typeof AuthEntityDesignerIndexRoute;
-}
-
-const AuthEntityDesignerRouteRouteChildren: AuthEntityDesignerRouteRouteChildren =
-  {
-    AuthEntityDesignerEntityConfigIdRoute:
-      AuthEntityDesignerEntityConfigIdRoute,
-    AuthEntityDesignerEntityCreatorRoute: AuthEntityDesignerEntityCreatorRoute,
-    AuthEntityDesignerIndexRoute: AuthEntityDesignerIndexRoute,
-  };
-
-const AuthEntityDesignerRouteRouteWithChildren =
-  AuthEntityDesignerRouteRoute._addFileChildren(
-    AuthEntityDesignerRouteRouteChildren,
-  );
-
-interface AuthEntityManagerEntityConfigIdRouteRouteChildren {
-  AuthEntityManagerEntityConfigIdEntityIdRoute: typeof AuthEntityManagerEntityConfigIdEntityIdRoute;
-  AuthEntityManagerEntityConfigIdIndexRoute: typeof AuthEntityManagerEntityConfigIdIndexRoute;
-}
-
-const AuthEntityManagerEntityConfigIdRouteRouteChildren: AuthEntityManagerEntityConfigIdRouteRouteChildren =
-  {
-    AuthEntityManagerEntityConfigIdEntityIdRoute:
-      AuthEntityManagerEntityConfigIdEntityIdRoute,
-    AuthEntityManagerEntityConfigIdIndexRoute:
-      AuthEntityManagerEntityConfigIdIndexRoute,
-  };
-
-const AuthEntityManagerEntityConfigIdRouteRouteWithChildren =
-  AuthEntityManagerEntityConfigIdRouteRoute._addFileChildren(
-    AuthEntityManagerEntityConfigIdRouteRouteChildren,
-  );
-
-interface AuthEntityManagerRouteRouteChildren {
-  AuthEntityManagerEntityConfigIdRouteRoute: typeof AuthEntityManagerEntityConfigIdRouteRouteWithChildren;
-  AuthEntityManagerIndexRoute: typeof AuthEntityManagerIndexRoute;
-}
-
-const AuthEntityManagerRouteRouteChildren: AuthEntityManagerRouteRouteChildren =
-  {
-    AuthEntityManagerEntityConfigIdRouteRoute:
-      AuthEntityManagerEntityConfigIdRouteRouteWithChildren,
-    AuthEntityManagerIndexRoute: AuthEntityManagerIndexRoute,
-  };
-
-const AuthEntityManagerRouteRouteWithChildren =
-  AuthEntityManagerRouteRoute._addFileChildren(
-    AuthEntityManagerRouteRouteChildren,
-  );
+const AuthnoWorkspaceRouteRouteWithChildren =
+  AuthnoWorkspaceRouteRoute._addFileChildren(AuthnoWorkspaceRouteRouteChildren);
 
 interface AuthRouteRouteChildren {
-  AuthDataManagerRouteRoute: typeof AuthDataManagerRouteRouteWithChildren;
-  AuthEntityDesignerRouteRoute: typeof AuthEntityDesignerRouteRouteWithChildren;
-  AuthEntityManagerRouteRoute: typeof AuthEntityManagerRouteRouteWithChildren;
-  AuthDataExplorerRoute: typeof AuthDataExplorerRoute;
-  AuthProfileRoute: typeof AuthProfileRoute;
-  AuthIndexRoute: typeof AuthIndexRoute;
+  AuthWorkspaceSlugRouteRoute: typeof AuthWorkspaceSlugRouteRouteWithChildren;
+  AuthnoWorkspaceRouteRoute: typeof AuthnoWorkspaceRouteRouteWithChildren;
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
-  AuthDataManagerRouteRoute: AuthDataManagerRouteRouteWithChildren,
-  AuthEntityDesignerRouteRoute: AuthEntityDesignerRouteRouteWithChildren,
-  AuthEntityManagerRouteRoute: AuthEntityManagerRouteRouteWithChildren,
-  AuthDataExplorerRoute: AuthDataExplorerRoute,
-  AuthProfileRoute: AuthProfileRoute,
-  AuthIndexRoute: AuthIndexRoute,
+  AuthWorkspaceSlugRouteRoute: AuthWorkspaceSlugRouteRouteWithChildren,
+  AuthnoWorkspaceRouteRoute: AuthnoWorkspaceRouteRouteWithChildren,
 };
 
 const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
@@ -418,22 +496,24 @@ export interface FileRoutesByFullPath {
   "/register": typeof RegisterRoute;
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
-  "/data-manager": typeof AuthDataManagerRouteRouteWithChildren;
-  "/entity-designer": typeof AuthEntityDesignerRouteRouteWithChildren;
-  "/entity-manager": typeof AuthEntityManagerRouteRouteWithChildren;
-  "/data-explorer": typeof AuthDataExplorerRoute;
-  "/profile": typeof AuthProfileRoute;
-  "/": typeof AuthIndexRoute;
-  "/entity-manager/$entityConfigId": typeof AuthEntityManagerEntityConfigIdRouteRouteWithChildren;
-  "/data-manager/$datasetId": typeof AuthDataManagerDatasetIdRoute;
-  "/data-manager/data-import": typeof AuthDataManagerDataImportRoute;
-  "/entity-designer/$entityConfigId": typeof AuthEntityDesignerEntityConfigIdRoute;
-  "/entity-designer/entity-creator": typeof AuthEntityDesignerEntityCreatorRoute;
-  "/data-manager/": typeof AuthDataManagerIndexRoute;
-  "/entity-designer/": typeof AuthEntityDesignerIndexRoute;
-  "/entity-manager/": typeof AuthEntityManagerIndexRoute;
-  "/entity-manager/$entityConfigId/$entityId": typeof AuthEntityManagerEntityConfigIdEntityIdRoute;
-  "/entity-manager/$entityConfigId/": typeof AuthEntityManagerEntityConfigIdIndexRoute;
+  "/$workspaceSlug": typeof AuthWorkspaceSlugRouteRouteWithChildren;
+  "/": typeof AuthnoWorkspaceIndexRoute;
+  "/$workspaceSlug/data-manager": typeof AuthWorkspaceSlugDataManagerRouteRouteWithChildren;
+  "/$workspaceSlug/entity-designer": typeof AuthWorkspaceSlugEntityDesignerRouteRouteWithChildren;
+  "/$workspaceSlug/data-explorer": typeof AuthWorkspaceSlugDataExplorerRoute;
+  "/$workspaceSlug/profile": typeof AuthWorkspaceSlugProfileRoute;
+  "/invalid-workspace": typeof AuthnoWorkspaceInvalidWorkspaceRoute;
+  "/$workspaceSlug/": typeof AuthWorkspaceSlugIndexRoute;
+  "/$workspaceSlug/entity-manager/$entityConfigId": typeof AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRouteWithChildren;
+  "/$workspaceSlug/data-manager/$datasetId": typeof AuthWorkspaceSlugDataManagerDatasetIdRoute;
+  "/$workspaceSlug/data-manager/data-import": typeof AuthWorkspaceSlugDataManagerDataImportRoute;
+  "/$workspaceSlug/entity-designer/$entityConfigId": typeof AuthWorkspaceSlugEntityDesignerEntityConfigIdRoute;
+  "/$workspaceSlug/entity-designer/entity-creator": typeof AuthWorkspaceSlugEntityDesignerEntityCreatorRoute;
+  "/$workspaceSlug/data-manager/": typeof AuthWorkspaceSlugDataManagerIndexRoute;
+  "/$workspaceSlug/entity-designer/": typeof AuthWorkspaceSlugEntityDesignerIndexRoute;
+  "/$workspaceSlug/entity-manager": typeof AuthWorkspaceSlugEntityManagerIndexRoute;
+  "/$workspaceSlug/entity-manager/$entityConfigId/$entityId": typeof AuthWorkspaceSlugEntityManagerEntityConfigIdEntityIdRoute;
+  "/$workspaceSlug/entity-manager/$entityConfigId/": typeof AuthWorkspaceSlugEntityManagerEntityConfigIdIndexRoute;
 }
 
 export interface FileRoutesByTo {
@@ -441,18 +521,20 @@ export interface FileRoutesByTo {
   "/register": typeof RegisterRoute;
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
-  "/data-explorer": typeof AuthDataExplorerRoute;
-  "/profile": typeof AuthProfileRoute;
-  "/": typeof AuthIndexRoute;
-  "/data-manager/$datasetId": typeof AuthDataManagerDatasetIdRoute;
-  "/data-manager/data-import": typeof AuthDataManagerDataImportRoute;
-  "/entity-designer/$entityConfigId": typeof AuthEntityDesignerEntityConfigIdRoute;
-  "/entity-designer/entity-creator": typeof AuthEntityDesignerEntityCreatorRoute;
-  "/data-manager": typeof AuthDataManagerIndexRoute;
-  "/entity-designer": typeof AuthEntityDesignerIndexRoute;
-  "/entity-manager": typeof AuthEntityManagerIndexRoute;
-  "/entity-manager/$entityConfigId/$entityId": typeof AuthEntityManagerEntityConfigIdEntityIdRoute;
-  "/entity-manager/$entityConfigId": typeof AuthEntityManagerEntityConfigIdIndexRoute;
+  "/$workspaceSlug/data-explorer": typeof AuthWorkspaceSlugDataExplorerRoute;
+  "/$workspaceSlug/profile": typeof AuthWorkspaceSlugProfileRoute;
+  "/invalid-workspace": typeof AuthnoWorkspaceInvalidWorkspaceRoute;
+  "/$workspaceSlug": typeof AuthWorkspaceSlugIndexRoute;
+  "/": typeof AuthnoWorkspaceIndexRoute;
+  "/$workspaceSlug/data-manager/$datasetId": typeof AuthWorkspaceSlugDataManagerDatasetIdRoute;
+  "/$workspaceSlug/data-manager/data-import": typeof AuthWorkspaceSlugDataManagerDataImportRoute;
+  "/$workspaceSlug/entity-designer/$entityConfigId": typeof AuthWorkspaceSlugEntityDesignerEntityConfigIdRoute;
+  "/$workspaceSlug/entity-designer/entity-creator": typeof AuthWorkspaceSlugEntityDesignerEntityCreatorRoute;
+  "/$workspaceSlug/data-manager": typeof AuthWorkspaceSlugDataManagerIndexRoute;
+  "/$workspaceSlug/entity-designer": typeof AuthWorkspaceSlugEntityDesignerIndexRoute;
+  "/$workspaceSlug/entity-manager": typeof AuthWorkspaceSlugEntityManagerIndexRoute;
+  "/$workspaceSlug/entity-manager/$entityConfigId/$entityId": typeof AuthWorkspaceSlugEntityManagerEntityConfigIdEntityIdRoute;
+  "/$workspaceSlug/entity-manager/$entityConfigId": typeof AuthWorkspaceSlugEntityManagerEntityConfigIdIndexRoute;
 }
 
 export interface FileRoutesById {
@@ -462,22 +544,25 @@ export interface FileRoutesById {
   "/register": typeof RegisterRoute;
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
-  "/_auth/data-manager": typeof AuthDataManagerRouteRouteWithChildren;
-  "/_auth/entity-designer": typeof AuthEntityDesignerRouteRouteWithChildren;
-  "/_auth/entity-manager": typeof AuthEntityManagerRouteRouteWithChildren;
-  "/_auth/data-explorer": typeof AuthDataExplorerRoute;
-  "/_auth/profile": typeof AuthProfileRoute;
-  "/_auth/": typeof AuthIndexRoute;
-  "/_auth/entity-manager/$entityConfigId": typeof AuthEntityManagerEntityConfigIdRouteRouteWithChildren;
-  "/_auth/data-manager/$datasetId": typeof AuthDataManagerDatasetIdRoute;
-  "/_auth/data-manager/data-import": typeof AuthDataManagerDataImportRoute;
-  "/_auth/entity-designer/$entityConfigId": typeof AuthEntityDesignerEntityConfigIdRoute;
-  "/_auth/entity-designer/entity-creator": typeof AuthEntityDesignerEntityCreatorRoute;
-  "/_auth/data-manager/": typeof AuthDataManagerIndexRoute;
-  "/_auth/entity-designer/": typeof AuthEntityDesignerIndexRoute;
-  "/_auth/entity-manager/": typeof AuthEntityManagerIndexRoute;
-  "/_auth/entity-manager/$entityConfigId/$entityId": typeof AuthEntityManagerEntityConfigIdEntityIdRoute;
-  "/_auth/entity-manager/$entityConfigId/": typeof AuthEntityManagerEntityConfigIdIndexRoute;
+  "/_auth/$workspaceSlug": typeof AuthWorkspaceSlugRouteRouteWithChildren;
+  "/_auth/(no-workspace)": typeof AuthnoWorkspaceRouteRouteWithChildren;
+  "/_auth/$workspaceSlug/data-manager": typeof AuthWorkspaceSlugDataManagerRouteRouteWithChildren;
+  "/_auth/$workspaceSlug/entity-designer": typeof AuthWorkspaceSlugEntityDesignerRouteRouteWithChildren;
+  "/_auth/$workspaceSlug/data-explorer": typeof AuthWorkspaceSlugDataExplorerRoute;
+  "/_auth/$workspaceSlug/profile": typeof AuthWorkspaceSlugProfileRoute;
+  "/_auth/(no-workspace)/invalid-workspace": typeof AuthnoWorkspaceInvalidWorkspaceRoute;
+  "/_auth/$workspaceSlug/": typeof AuthWorkspaceSlugIndexRoute;
+  "/_auth/(no-workspace)/": typeof AuthnoWorkspaceIndexRoute;
+  "/_auth/$workspaceSlug/entity-manager/$entityConfigId": typeof AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRouteWithChildren;
+  "/_auth/$workspaceSlug/data-manager/$datasetId": typeof AuthWorkspaceSlugDataManagerDatasetIdRoute;
+  "/_auth/$workspaceSlug/data-manager/data-import": typeof AuthWorkspaceSlugDataManagerDataImportRoute;
+  "/_auth/$workspaceSlug/entity-designer/$entityConfigId": typeof AuthWorkspaceSlugEntityDesignerEntityConfigIdRoute;
+  "/_auth/$workspaceSlug/entity-designer/entity-creator": typeof AuthWorkspaceSlugEntityDesignerEntityCreatorRoute;
+  "/_auth/$workspaceSlug/data-manager/": typeof AuthWorkspaceSlugDataManagerIndexRoute;
+  "/_auth/$workspaceSlug/entity-designer/": typeof AuthWorkspaceSlugEntityDesignerIndexRoute;
+  "/_auth/$workspaceSlug/entity-manager/": typeof AuthWorkspaceSlugEntityManagerIndexRoute;
+  "/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId": typeof AuthWorkspaceSlugEntityManagerEntityConfigIdEntityIdRoute;
+  "/_auth/$workspaceSlug/entity-manager/$entityConfigId/": typeof AuthWorkspaceSlugEntityManagerEntityConfigIdIndexRoute;
 }
 
 export interface FileRouteTypes {
@@ -488,40 +573,44 @@ export interface FileRouteTypes {
     | "/register"
     | "/signin"
     | "/update-password"
-    | "/data-manager"
-    | "/entity-designer"
-    | "/entity-manager"
-    | "/data-explorer"
-    | "/profile"
+    | "/$workspaceSlug"
     | "/"
-    | "/entity-manager/$entityConfigId"
-    | "/data-manager/$datasetId"
-    | "/data-manager/data-import"
-    | "/entity-designer/$entityConfigId"
-    | "/entity-designer/entity-creator"
-    | "/data-manager/"
-    | "/entity-designer/"
-    | "/entity-manager/"
-    | "/entity-manager/$entityConfigId/$entityId"
-    | "/entity-manager/$entityConfigId/";
+    | "/$workspaceSlug/data-manager"
+    | "/$workspaceSlug/entity-designer"
+    | "/$workspaceSlug/data-explorer"
+    | "/$workspaceSlug/profile"
+    | "/invalid-workspace"
+    | "/$workspaceSlug/"
+    | "/$workspaceSlug/entity-manager/$entityConfigId"
+    | "/$workspaceSlug/data-manager/$datasetId"
+    | "/$workspaceSlug/data-manager/data-import"
+    | "/$workspaceSlug/entity-designer/$entityConfigId"
+    | "/$workspaceSlug/entity-designer/entity-creator"
+    | "/$workspaceSlug/data-manager/"
+    | "/$workspaceSlug/entity-designer/"
+    | "/$workspaceSlug/entity-manager"
+    | "/$workspaceSlug/entity-manager/$entityConfigId/$entityId"
+    | "/$workspaceSlug/entity-manager/$entityConfigId/";
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/forgot-password"
     | "/register"
     | "/signin"
     | "/update-password"
-    | "/data-explorer"
-    | "/profile"
+    | "/$workspaceSlug/data-explorer"
+    | "/$workspaceSlug/profile"
+    | "/invalid-workspace"
+    | "/$workspaceSlug"
     | "/"
-    | "/data-manager/$datasetId"
-    | "/data-manager/data-import"
-    | "/entity-designer/$entityConfigId"
-    | "/entity-designer/entity-creator"
-    | "/data-manager"
-    | "/entity-designer"
-    | "/entity-manager"
-    | "/entity-manager/$entityConfigId/$entityId"
-    | "/entity-manager/$entityConfigId";
+    | "/$workspaceSlug/data-manager/$datasetId"
+    | "/$workspaceSlug/data-manager/data-import"
+    | "/$workspaceSlug/entity-designer/$entityConfigId"
+    | "/$workspaceSlug/entity-designer/entity-creator"
+    | "/$workspaceSlug/data-manager"
+    | "/$workspaceSlug/entity-designer"
+    | "/$workspaceSlug/entity-manager"
+    | "/$workspaceSlug/entity-manager/$entityConfigId/$entityId"
+    | "/$workspaceSlug/entity-manager/$entityConfigId";
   id:
     | "__root__"
     | "/_auth"
@@ -529,22 +618,25 @@ export interface FileRouteTypes {
     | "/register"
     | "/signin"
     | "/update-password"
-    | "/_auth/data-manager"
-    | "/_auth/entity-designer"
-    | "/_auth/entity-manager"
-    | "/_auth/data-explorer"
-    | "/_auth/profile"
-    | "/_auth/"
-    | "/_auth/entity-manager/$entityConfigId"
-    | "/_auth/data-manager/$datasetId"
-    | "/_auth/data-manager/data-import"
-    | "/_auth/entity-designer/$entityConfigId"
-    | "/_auth/entity-designer/entity-creator"
-    | "/_auth/data-manager/"
-    | "/_auth/entity-designer/"
-    | "/_auth/entity-manager/"
-    | "/_auth/entity-manager/$entityConfigId/$entityId"
-    | "/_auth/entity-manager/$entityConfigId/";
+    | "/_auth/$workspaceSlug"
+    | "/_auth/(no-workspace)"
+    | "/_auth/$workspaceSlug/data-manager"
+    | "/_auth/$workspaceSlug/entity-designer"
+    | "/_auth/$workspaceSlug/data-explorer"
+    | "/_auth/$workspaceSlug/profile"
+    | "/_auth/(no-workspace)/invalid-workspace"
+    | "/_auth/$workspaceSlug/"
+    | "/_auth/(no-workspace)/"
+    | "/_auth/$workspaceSlug/entity-manager/$entityConfigId"
+    | "/_auth/$workspaceSlug/data-manager/$datasetId"
+    | "/_auth/$workspaceSlug/data-manager/data-import"
+    | "/_auth/$workspaceSlug/entity-designer/$entityConfigId"
+    | "/_auth/$workspaceSlug/entity-designer/entity-creator"
+    | "/_auth/$workspaceSlug/data-manager/"
+    | "/_auth/$workspaceSlug/entity-designer/"
+    | "/_auth/$workspaceSlug/entity-manager/"
+    | "/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId"
+    | "/_auth/$workspaceSlug/entity-manager/$entityConfigId/";
   fileRoutesById: FileRoutesById;
 }
 
@@ -584,12 +676,8 @@ export const routeTree = rootRoute
     "/_auth": {
       "filePath": "_auth/route.tsx",
       "children": [
-        "/_auth/data-manager",
-        "/_auth/entity-designer",
-        "/_auth/entity-manager",
-        "/_auth/data-explorer",
-        "/_auth/profile",
-        "/_auth/"
+        "/_auth/$workspaceSlug",
+        "/_auth/(no-workspace)"
       ]
     },
     "/forgot-password": {
@@ -604,87 +692,108 @@ export const routeTree = rootRoute
     "/update-password": {
       "filePath": "update-password.tsx"
     },
-    "/_auth/data-manager": {
-      "filePath": "_auth/data-manager/route.tsx",
+    "/_auth/$workspaceSlug": {
+      "filePath": "_auth/$workspaceSlug/route.tsx",
       "parent": "/_auth",
       "children": [
-        "/_auth/data-manager/$datasetId",
-        "/_auth/data-manager/data-import",
-        "/_auth/data-manager/"
+        "/_auth/$workspaceSlug/data-manager",
+        "/_auth/$workspaceSlug/entity-designer",
+        "/_auth/$workspaceSlug/data-explorer",
+        "/_auth/$workspaceSlug/profile",
+        "/_auth/$workspaceSlug/",
+        "/_auth/$workspaceSlug/entity-manager/$entityConfigId",
+        "/_auth/$workspaceSlug/entity-manager/"
       ]
     },
-    "/_auth/entity-designer": {
-      "filePath": "_auth/entity-designer/route.tsx",
+    "/_auth/(no-workspace)": {
+      "filePath": "_auth/(no-workspace)/route.tsx",
       "parent": "/_auth",
       "children": [
-        "/_auth/entity-designer/$entityConfigId",
-        "/_auth/entity-designer/entity-creator",
-        "/_auth/entity-designer/"
+        "/_auth/(no-workspace)/invalid-workspace",
+        "/_auth/(no-workspace)/"
       ]
     },
-    "/_auth/entity-manager": {
-      "filePath": "_auth/entity-manager/route.tsx",
-      "parent": "/_auth",
+    "/_auth/$workspaceSlug/data-manager": {
+      "filePath": "_auth/$workspaceSlug/data-manager/route.tsx",
+      "parent": "/_auth/$workspaceSlug",
       "children": [
-        "/_auth/entity-manager/$entityConfigId",
-        "/_auth/entity-manager/"
+        "/_auth/$workspaceSlug/data-manager/$datasetId",
+        "/_auth/$workspaceSlug/data-manager/data-import",
+        "/_auth/$workspaceSlug/data-manager/"
       ]
     },
-    "/_auth/data-explorer": {
-      "filePath": "_auth/data-explorer.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/profile": {
-      "filePath": "_auth/profile.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/": {
-      "filePath": "_auth/index.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/entity-manager/$entityConfigId": {
-      "filePath": "_auth/entity-manager/$entityConfigId/route.tsx",
-      "parent": "/_auth/entity-manager",
+    "/_auth/$workspaceSlug/entity-designer": {
+      "filePath": "_auth/$workspaceSlug/entity-designer/route.tsx",
+      "parent": "/_auth/$workspaceSlug",
       "children": [
-        "/_auth/entity-manager/$entityConfigId/$entityId",
-        "/_auth/entity-manager/$entityConfigId/"
+        "/_auth/$workspaceSlug/entity-designer/$entityConfigId",
+        "/_auth/$workspaceSlug/entity-designer/entity-creator",
+        "/_auth/$workspaceSlug/entity-designer/"
       ]
     },
-    "/_auth/data-manager/$datasetId": {
-      "filePath": "_auth/data-manager/$datasetId.tsx",
-      "parent": "/_auth/data-manager"
+    "/_auth/$workspaceSlug/data-explorer": {
+      "filePath": "_auth/$workspaceSlug/data-explorer.tsx",
+      "parent": "/_auth/$workspaceSlug"
     },
-    "/_auth/data-manager/data-import": {
-      "filePath": "_auth/data-manager/data-import.tsx",
-      "parent": "/_auth/data-manager"
+    "/_auth/$workspaceSlug/profile": {
+      "filePath": "_auth/$workspaceSlug/profile.tsx",
+      "parent": "/_auth/$workspaceSlug"
     },
-    "/_auth/entity-designer/$entityConfigId": {
-      "filePath": "_auth/entity-designer/$entityConfigId.tsx",
-      "parent": "/_auth/entity-designer"
+    "/_auth/(no-workspace)/invalid-workspace": {
+      "filePath": "_auth/(no-workspace)/invalid-workspace.tsx",
+      "parent": "/_auth/(no-workspace)"
     },
-    "/_auth/entity-designer/entity-creator": {
-      "filePath": "_auth/entity-designer/entity-creator.tsx",
-      "parent": "/_auth/entity-designer"
+    "/_auth/$workspaceSlug/": {
+      "filePath": "_auth/$workspaceSlug/index.tsx",
+      "parent": "/_auth/$workspaceSlug"
     },
-    "/_auth/data-manager/": {
-      "filePath": "_auth/data-manager/index.tsx",
-      "parent": "/_auth/data-manager"
+    "/_auth/(no-workspace)/": {
+      "filePath": "_auth/(no-workspace)/index.tsx",
+      "parent": "/_auth/(no-workspace)"
     },
-    "/_auth/entity-designer/": {
-      "filePath": "_auth/entity-designer/index.tsx",
-      "parent": "/_auth/entity-designer"
+    "/_auth/$workspaceSlug/entity-manager/$entityConfigId": {
+      "filePath": "_auth/$workspaceSlug/entity-manager/$entityConfigId/route.tsx",
+      "parent": "/_auth/$workspaceSlug",
+      "children": [
+        "/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId",
+        "/_auth/$workspaceSlug/entity-manager/$entityConfigId/"
+      ]
     },
-    "/_auth/entity-manager/": {
-      "filePath": "_auth/entity-manager/index.tsx",
-      "parent": "/_auth/entity-manager"
+    "/_auth/$workspaceSlug/data-manager/$datasetId": {
+      "filePath": "_auth/$workspaceSlug/data-manager/$datasetId.tsx",
+      "parent": "/_auth/$workspaceSlug/data-manager"
     },
-    "/_auth/entity-manager/$entityConfigId/$entityId": {
-      "filePath": "_auth/entity-manager/$entityConfigId/$entityId.tsx",
-      "parent": "/_auth/entity-manager/$entityConfigId"
+    "/_auth/$workspaceSlug/data-manager/data-import": {
+      "filePath": "_auth/$workspaceSlug/data-manager/data-import.tsx",
+      "parent": "/_auth/$workspaceSlug/data-manager"
     },
-    "/_auth/entity-manager/$entityConfigId/": {
-      "filePath": "_auth/entity-manager/$entityConfigId/index.tsx",
-      "parent": "/_auth/entity-manager/$entityConfigId"
+    "/_auth/$workspaceSlug/entity-designer/$entityConfigId": {
+      "filePath": "_auth/$workspaceSlug/entity-designer/$entityConfigId.tsx",
+      "parent": "/_auth/$workspaceSlug/entity-designer"
+    },
+    "/_auth/$workspaceSlug/entity-designer/entity-creator": {
+      "filePath": "_auth/$workspaceSlug/entity-designer/entity-creator.tsx",
+      "parent": "/_auth/$workspaceSlug/entity-designer"
+    },
+    "/_auth/$workspaceSlug/data-manager/": {
+      "filePath": "_auth/$workspaceSlug/data-manager/index.tsx",
+      "parent": "/_auth/$workspaceSlug/data-manager"
+    },
+    "/_auth/$workspaceSlug/entity-designer/": {
+      "filePath": "_auth/$workspaceSlug/entity-designer/index.tsx",
+      "parent": "/_auth/$workspaceSlug/entity-designer"
+    },
+    "/_auth/$workspaceSlug/entity-manager/": {
+      "filePath": "_auth/$workspaceSlug/entity-manager/index.tsx",
+      "parent": "/_auth/$workspaceSlug"
+    },
+    "/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId": {
+      "filePath": "_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId.tsx",
+      "parent": "/_auth/$workspaceSlug/entity-manager/$entityConfigId"
+    },
+    "/_auth/$workspaceSlug/entity-manager/$entityConfigId/": {
+      "filePath": "_auth/$workspaceSlug/entity-manager/$entityConfigId/index.tsx",
+      "parent": "/_auth/$workspaceSlug/entity-manager/$entityConfigId"
     }
   }
 }

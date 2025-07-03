@@ -1,19 +1,19 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { AuthClient } from "@/clients/AuthClient";
-import { AppScaffold } from "@/components/AppScaffold";
+import { AppLinks } from "@/config/AppLinks";
 
 export const Route = createFileRoute("/_auth")({
-  component: RouteComponent,
+  component: MainAppRootLayout,
 
   /**
    * Before loading any page hidden behind auth, we check if the user is
-   * logged in. If not, we redirect to the /signin page.
+   * logged in. If not, redirect to the `/signin` page.
    */
   beforeLoad: async ({ location }) => {
     const session = await AuthClient.getCurrentSession();
     if (!session?.user) {
       throw redirect({
-        to: "/signin",
+        to: AppLinks.signin.to,
         search: {
           // Use the current location to power a redirect after login
           // (Do not use `router.state.resolvedLocation` as it can potentially
@@ -25,6 +25,6 @@ export const Route = createFileRoute("/_auth")({
   },
 });
 
-function RouteComponent() {
-  return <AppScaffold />;
+function MainAppRootLayout() {
+  return <Outlet />;
 }

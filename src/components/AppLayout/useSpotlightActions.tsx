@@ -4,17 +4,51 @@ import {
   SpotlightActionGroupData,
 } from "@mantine/spotlight";
 import { IconTrash } from "@tabler/icons-react";
+import { useRouter } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { LocalDatasetQueryClient } from "@/clients/LocalDatasetQueryClient";
+import { SpotlightLinks } from "@/config/SpotlightLinks";
 import { Logger } from "@/lib/Logger";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 
-export function useSpotlightActions(): Array<
-  SpotlightActionData | SpotlightActionGroupData
-> {
-  const spotlightActions = useMemo(() => {
+export function useSpotlightActions(
+  workspaceSlug: string,
+): Array<SpotlightActionData | SpotlightActionGroupData> {
+  const router = useRouter();
+
+  const navigationActions = useMemo(() => {
+    const spotlightLinks = [
+      SpotlightLinks.home,
+      SpotlightLinks.profile(workspaceSlug),
+      SpotlightLinks.dataManager(workspaceSlug),
+      SpotlightLinks.dataImport(workspaceSlug),
+      SpotlightLinks.dataExplorer(workspaceSlug),
+      SpotlightLinks.entityDesigner(workspaceSlug),
+      SpotlightLinks.entityCreator(workspaceSlug),
+    ];
+
+    return spotlightLinks.map(
+      ({
+        link,
+        spotlightDescription,
+        icon,
+      }): SpotlightActionData | SpotlightActionGroupData => {
+        return {
+          id: link.key,
+          label: link.label,
+          description: spotlightDescription,
+          leftSection: icon,
+          onClick: () => {
+            router.navigate({ to: link.to, params: { workspaceSlug } });
+          },
+        };
+      },
+    );
+  }, [router, workspaceSlug]);
+
+  const devActions = useMemo(() => {
     if (import.meta.env.DEV) {
-      const devActions = [
+      return [
         {
           group: "Dev Actions",
           actions: [
@@ -68,12 +102,11 @@ export function useSpotlightActions(): Array<
           ],
         },
       ];
-
-      return devActions;
     }
-
     return [];
   }, []);
 
-  return spotlightActions;
+  return useMemo(() => {
+    return [...navigationActions, ...devActions];
+  }, [navigationActions, devActions]);
 }
