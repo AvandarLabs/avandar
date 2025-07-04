@@ -7,14 +7,15 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
-import { useRouter } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { AppLinks } from "@/config/AppLinks";
 import { useForm } from "@/lib/hooks/ui/useForm";
+import { useCurrentWorkspaceSlug } from "@/lib/hooks/workspaces/useCurrentWorkspaceSlug";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { setValue } from "@/lib/utils/objects/setValue";
-import { getEntityConfigLinkProps } from "@/models/EntityConfig/utils";
 import { DatasetColumnFieldsBlock } from "./DatasetColumnFieldsBlock";
 import {
   EntityConfigFormSubmitValues,
@@ -26,7 +27,8 @@ import { ManualEntryFieldsBlock } from "./ManualEntryFieldsBlock";
 import { useSubmitEntityCreatorForm } from "./useSubmitEntityCreatorForm";
 
 export function EntityCreatorView(): JSX.Element {
-  const router = useRouter();
+  const navigate = useNavigate();
+  const workspaceSlug = useCurrentWorkspaceSlug();
   const [sendEntityConfigForm, isSendEntityConfigFormPending] =
     useSubmitEntityCreatorForm();
 
@@ -41,17 +43,22 @@ export function EntityCreatorView(): JSX.Element {
         .concat(values.manualEntryFields)
         // set the id field
         .map((field) => {
-          return field.id === values.idFieldId ?
+          return (
+              field.id === values.idFieldId &&
+                field.options.class === "dimension"
+            ) ?
               setValue(field, "options.isIdField", true)
             : field;
         })
         // set the title field
         .map((field) => {
-          return field.id === values.titleFieldId ?
+          return (
+              field.id === values.titleFieldId &&
+                field.options.class === "dimension"
+            ) ?
               setValue(field, "options.isTitleField", true)
             : field;
         });
-
       return {
         ...values,
         fields: allFields,
@@ -99,7 +106,13 @@ export function EntityCreatorView(): JSX.Element {
         onSubmit={entityConfigForm.onSubmit((values) => {
           return sendEntityConfigForm(values, {
             onSuccess: () => {
-              router.navigate(getEntityConfigLinkProps(entityConfigId));
+              navigate(
+                AppLinks.entityDesignerConfigView({
+                  workspaceSlug,
+                  entityConfigId,
+                  entityConfigName,
+                }),
+              );
             },
           });
         })}

@@ -36,10 +36,10 @@ export const SpotlightLinks = {
       icon: <IconUser size={24} stroke={1.5} />,
     };
   },
-  dataManager: (workspaceSlug: string) => {
+  dataManagerHome: (workspaceSlug: string) => {
     return {
-      link: AppLinks.dataManager(workspaceSlug),
-      icon: NavbarLinks.dataManager(workspaceSlug).icon,
+      link: AppLinks.dataManagerHome(workspaceSlug),
+      icon: NavbarLinks.dataManagerHome(workspaceSlug).icon,
       spotlightDescription: "Go to the data import app",
     };
   },
@@ -57,16 +57,16 @@ export const SpotlightLinks = {
       spotlightDescription: "Go to the data explorer app",
     };
   },
-  entityDesigner: (workspaceSlug: string) => {
+  entityDesignerHome: (workspaceSlug: string) => {
     return {
-      link: AppLinks.entityDesigner(workspaceSlug),
-      icon: NavbarLinks.entityDesigner(workspaceSlug).icon,
+      link: AppLinks.entityDesignerHome(workspaceSlug),
+      icon: NavbarLinks.entityDesignerHome(workspaceSlug).icon,
       spotlightDescription: "Go to the entity designer app",
     };
   },
-  entityCreator: (workspaceSlug: string) => {
+  entityDesignerCreatorView: (workspaceSlug: string) => {
     return {
-      link: AppLinks.entityCreator(workspaceSlug),
+      link: AppLinks.entityDesignerCreatorView(workspaceSlug),
       icon: <IconPencilPlus size={24} stroke={1.5} />,
       spotlightDescription: "Go to the entity creator page",
     };

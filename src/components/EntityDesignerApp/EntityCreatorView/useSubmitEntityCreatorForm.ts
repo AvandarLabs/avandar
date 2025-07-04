@@ -3,7 +3,9 @@ import {
   useMutation,
   UseMutationResultTuple,
 } from "@/lib/hooks/query/useMutation";
+import { useCurrentWorkspace } from "@/lib/hooks/workspaces/useCurrentWorkspace";
 import { hasProps, isNotUndefined } from "@/lib/utils/guards";
+import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
 import { EntityFieldValueExtractor } from "@/models/EntityConfig/ValueExtractor/types";
@@ -14,19 +16,26 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
   void,
   EntityConfigFormSubmitValues
 > {
+  const workspaceId = useCurrentWorkspace().id;
+
   return useMutation({
     mutationFn: async (
       entityConfigFormValues: EntityConfigFormSubmitValues,
     ) => {
       // Insert the parent entity
       await EntityConfigClient.insert({
-        data: entityConfigFormValues,
+        data: {
+          workspaceId,
+          ...entityConfigFormValues,
+        },
       });
       const { fields } = entityConfigFormValues;
 
       // Insert the child field entities
       await EntityFieldConfigClient.bulkInsert({
-        data: fields,
+        data: fields.map((field) => {
+          return { workspaceId, ...field };
+        }),
       });
 
       // Insert the value extractors
@@ -38,7 +47,10 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
             const { options, extractors } = field;
             return match(options.valueExtractorType)
               .with("manual_entry", () => {
-                return extractors.manualEntry;
+                return {
+                  ...extractors.manualEntry,
+                  workspaceId,
+                };
               })
               .with("dataset_column_value", () => {
                 const datasetColumnValueExtractor =
@@ -50,7 +62,10 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
                     "datasetFieldId",
                   )
                 ) {
-                  return datasetColumnValueExtractor;
+                  return {
+                    ...datasetColumnValueExtractor,
+                    workspaceId,
+                  };
                 }
                 return undefined;
               })
@@ -59,7 +74,10 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
                 if (
                   hasProps(aggregationExtractor, "datasetId", "datasetFieldId")
                 ) {
-                  return aggregationExtractor;
+                  return {
+                    ...aggregationExtractor,
+                    workspaceId,
+                  };
                 }
                 return undefined;
               })
@@ -80,9 +98,7 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
       await Promise.all([
         EntityConfigClient.delete({ id: entityConfigFormValues.id }),
         EntityFieldConfigClient.bulkDelete({
-          ids: fields.map((f) => {
-            return f.id;
-          }),
+          ids: fields.map(getProp("id")),
         }),
       ]);
     },

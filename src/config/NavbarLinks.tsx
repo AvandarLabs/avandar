@@ -25,9 +25,9 @@ export const NavbarLinks = {
     link: AppLinks.home,
     icon: <IconHome size={24} stroke={1.5} />,
   },
-  dataManager: (workspaceSlug: string) => {
+  dataManagerHome: (workspaceSlug: string) => {
     return {
-      link: AppLinks.dataManager(workspaceSlug),
+      link: AppLinks.dataManagerHome(workspaceSlug),
       icon: <IconDatabase size={24} stroke={1.5} />,
     };
   },
@@ -37,13 +37,13 @@ export const NavbarLinks = {
       icon: <IconTable size={24} stroke={1.5} />,
     };
   },
-  entityDesigner: (workspaceSlug: string) => {
+  entityDesignerHome: (workspaceSlug: string) => {
     return {
-      link: AppLinks.entityDesigner(workspaceSlug),
+      link: AppLinks.entityDesignerHome(workspaceSlug),
       icon: <IconBlocks size={24} stroke={1.5} />,
     };
   },
-  entityManager: ({
+  entityManagerHome: ({
     workspaceSlug,
     entityConfigId,
     entityConfigName,
@@ -53,7 +53,7 @@ export const NavbarLinks = {
     entityConfigName: string;
   }) => {
     return {
-      link: AppLinks.entityManager({
+      link: AppLinks.entityManagerHome({
         workspaceSlug,
         entityConfigId,
         entityConfigName,

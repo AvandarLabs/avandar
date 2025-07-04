@@ -16,18 +16,18 @@ import { getEntityFieldBaseDataType } from "@/models/LocalDataset/LocalDatasetFi
 import { LocalDataset } from "@/models/LocalDataset/types";
 
 export type EntityFieldFormValues = SetRequired<
-  EntityFieldConfig<"Insert">,
+  SetOptional<EntityFieldConfig<"Insert">, "workspaceId">,
   "id"
 > & {
   extractors: {
     aggregation: SetOptional<
       AggregationExtractor<"Insert">,
-      "datasetId" | "datasetFieldId"
+      "datasetId" | "datasetFieldId" | "workspaceId"
     >;
-    manualEntry: ManualEntryExtractor<"Insert">;
+    manualEntry: SetOptional<ManualEntryExtractor<"Insert">, "workspaceId">;
     datasetColumnValue: SetOptional<
       DatasetColumnValueExtractor<"Insert">,
-      "datasetId" | "datasetFieldId"
+      "datasetId" | "datasetFieldId" | "workspaceId"
     >;
   };
 };
@@ -46,9 +46,9 @@ type _Test_EntityFieldFormValues = Expect<
   : false
 >;
 
-export type EntityConfigFormValues = SetRequired<
-  EntityConfig<"Insert">,
-  "id"
+export type EntityConfigFormValues = SetOptional<
+  SetRequired<EntityConfig<"Insert">, "id">,
+  "workspaceId"
 > & {
   titleFieldId?: EntityFieldConfigId;
   idFieldId?: EntityFieldConfigId;

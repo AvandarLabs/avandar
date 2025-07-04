@@ -14,6 +14,10 @@ import { PathValue } from "./getValue";
  */
 export function setValue<
   T extends UnknownObject | UnknownArray,
+  // We need to use this ternary expression on `K` because Paths<> returns
+  // `never` on a record. E.g. Paths<string, string> = never.
+  // So if `Paths<>` can't compute a set of paths, we can fall back
+  // to using `keyof T` which works fine for records.
   K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
   V extends K extends keyof T ? T[K]
   : K extends Paths<T> ? PathValue<T, K>

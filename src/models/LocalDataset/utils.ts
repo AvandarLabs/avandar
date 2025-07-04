@@ -1,4 +1,3 @@
-import { LinkProps } from "@tanstack/react-router";
 import Papa, { ParseMeta } from "papaparse";
 import { match } from "ts-pattern";
 import { CSVData, MIMEType } from "@/lib/types/common";
@@ -43,20 +42,6 @@ export function makeLocalDataset({
     delimiter: csvMetadata.delimiter,
     data: unparseDataset({ data, datasetType: fileMetadata.mimeType }),
     fields,
-  };
-}
-
-/**
- * Returns the link props for a dataset to use in a `<Link>` component.
- */
-export function getDatasetLinkProps(
-  id: LocalDatasetId,
-): Pick<LinkProps, "to" | "params"> {
-  return {
-    to: `/data-manager/$datasetId`,
-    params: {
-      datasetId: id.toString(),
-    },
   };
 }
 

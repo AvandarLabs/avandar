@@ -23,6 +23,7 @@ type AppLinksRecord = Record<
 >;
 
 export const AppLinks = {
+  // Root-level links
   home: { key: "home", to: "/", label: "Home" },
   signin: { key: "signin", to: "/signin", label: "Sign in" },
   invalidWorkspace: {
@@ -31,6 +32,7 @@ export const AppLinks = {
     label: "Invalid workspace",
   },
 
+  // Profile links
   profile: (workspaceSlug: string) => {
     return {
       key: "profile",
@@ -39,12 +41,33 @@ export const AppLinks = {
       label: "Profile",
     };
   },
-  dataManager: (workspaceSlug: string) => {
+
+  // Data Manager links
+  dataManagerHome: (workspaceSlug: string) => {
     return {
       key: "data-manager",
       to: "/$workspaceSlug/data-manager",
       params: { workspaceSlug },
       label: "Data Manager",
+    };
+  },
+  dataManagerDatasetView: ({
+    workspaceSlug,
+    datasetId,
+    datasetName,
+  }: {
+    workspaceSlug: string;
+    datasetId: string;
+    datasetName: string;
+  }) => {
+    return {
+      key: "data-manager-dataset-view",
+      to: "/$workspaceSlug/data-manager/$datasetId",
+      params: {
+        workspaceSlug,
+        datasetId,
+      },
+      label: datasetName,
     };
   },
   dataImport: (workspaceSlug: string) => {
@@ -57,6 +80,8 @@ export const AppLinks = {
       label: "Import data",
     };
   },
+
+  // Data Explorer links
   dataExplorer: (workspaceSlug: string) => {
     return {
       key: "data-explorer",
@@ -65,7 +90,9 @@ export const AppLinks = {
       label: "Data Explorer",
     };
   },
-  entityDesigner: (workspaceSlug: string) => {
+
+  // Entity Designer links
+  entityDesignerHome: (workspaceSlug: string) => {
     return {
       key: "entity-designer",
       to: "/$workspaceSlug/entity-designer",
@@ -73,7 +100,26 @@ export const AppLinks = {
       label: "Profile Designer",
     };
   },
-  entityCreator: (workspaceSlug: string) => {
+  entityDesignerConfigView: ({
+    workspaceSlug,
+    entityConfigId,
+    entityConfigName,
+  }: {
+    workspaceSlug: string;
+    entityConfigId: string;
+    entityConfigName: string;
+  }) => {
+    return {
+      key: `entity-config-${entityConfigId}`,
+      to: "/$workspaceSlug/entity-designer/$entityConfigId",
+      params: {
+        workspaceSlug,
+        entityConfigId,
+      },
+      label: entityConfigName,
+    };
+  },
+  entityDesignerCreatorView: (workspaceSlug: string) => {
     return {
       key: "entity-creator",
       to: "/$workspaceSlug/entity-designer/entity-creator",
@@ -81,7 +127,9 @@ export const AppLinks = {
       label: "Create new entity",
     };
   },
-  entityManager: ({
+
+  // Entity Manager links
+  entityManagerHome: ({
     workspaceSlug,
     entityConfigId,
     entityConfigName,
@@ -98,6 +146,28 @@ export const AppLinks = {
         entityConfigId,
       },
       label: entityConfigName,
+    };
+  },
+  entityManagerEntityView: ({
+    workspaceSlug,
+    entityConfigId,
+    entityId,
+    entityName,
+  }: {
+    workspaceSlug: string;
+    entityConfigId: string;
+    entityId: string;
+    entityName: string;
+  }) => {
+    return {
+      key: `entity-manager-${entityConfigId}-${entityId}`,
+      to: "/$workspaceSlug/entity-manager/$entityConfigId/$entityId",
+      params: {
+        workspaceSlug,
+        entityConfigId,
+        entityId,
+      },
+      label: entityName,
     };
   },
 } as const satisfies AppLinksRecord;

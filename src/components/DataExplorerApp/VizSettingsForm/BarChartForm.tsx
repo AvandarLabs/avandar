@@ -3,7 +3,6 @@ import { QueryResultField } from "@/clients/LocalDatasetQueryClient";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
-import { setValue } from "@/lib/utils/objects/setValue";
 
 export type BarChartSettings = {
   xAxisKey: string | undefined;
@@ -51,7 +50,7 @@ export function BarChartForm({
           : "Select a field"
         }
         onChange={(field) => {
-          onSettingsChange(setValue(settings, "xAxisKey", field ?? undefined));
+          onSettingsChange({ ...settings, xAxisKey: field ?? undefined });
         }}
       />
 
@@ -68,7 +67,7 @@ export function BarChartForm({
           : "Select a field"
         }
         onChange={(field) => {
-          onSettingsChange(setValue(settings, "yAxisKey", field ?? undefined));
+          onSettingsChange({ ...settings, yAxisKey: field ?? undefined });
         }}
       />
     </>

@@ -1,20 +1,18 @@
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
-import { useCurrentWorkspace } from "@/lib/hooks/workspaces/useCurrentWorkspace";
+import { useCurrentWorkspaceSlug } from "@/lib/hooks/workspaces/useCurrentWorkspaceSlug";
 import { AppShell } from "@/lib/ui/AppShell";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { useSpotlightActions } from "./useSpotlightActions";
 
 export function WorkspaceAppLayout(): JSX.Element {
   const [entityConfigs] = EntityConfigClient.useGetAll();
-  const currentWorkspace = useCurrentWorkspace();
-  const workspaceSlug = currentWorkspace.slug;
-
+  const workspaceSlug = useCurrentWorkspaceSlug();
   const spotlightActions = useSpotlightActions(workspaceSlug);
   const entityManagerLinks: NavbarLink[] = useMemo(() => {
     return (entityConfigs ?? []).map((entityConfig) => {
-      const navLink = NavbarLinks.entityManager({
+      const navLink = NavbarLinks.entityManagerHome({
         workspaceSlug: workspaceSlug,
         entityConfigId: entityConfig.id,
         entityConfigName: entityConfig.name,
@@ -28,9 +26,9 @@ export function WorkspaceAppLayout(): JSX.Element {
 
   const navbarLinks = [
     NavbarLinks.home,
-    NavbarLinks.dataManager(workspaceSlug),
+    NavbarLinks.dataManagerHome(workspaceSlug),
     NavbarLinks.dataExplorer(workspaceSlug),
-    NavbarLinks.entityDesigner(workspaceSlug),
+    NavbarLinks.entityDesignerHome(workspaceSlug),
     ...entityManagerLinks,
   ];
 

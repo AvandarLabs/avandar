@@ -11,9 +11,10 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { useRouter } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { AppConfig } from "@/config/AppConfig";
+import { AppLinks } from "@/config/AppLinks";
+import { useCurrentWorkspaceSlug } from "@/lib/hooks/workspaces/useCurrentWorkspaceSlug";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
@@ -54,7 +55,8 @@ type DatasetTabId = "dataset-metadata" | "dataset-summary";
  * Currently, we are still showing all data, which isn't great.
  */
 export function DatasetMetaView({ dataset }: Props): JSX.Element {
-  const router = useRouter();
+  const navigate = useNavigate();
+  const workspaceSlug = useCurrentWorkspaceSlug();
   const [deleteLocalDataset, isDeletePending] = LocalDatasetClient.useDelete({
     queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
   });
@@ -170,10 +172,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                     { id: dataset.id },
                     {
                       onSuccess: () => {
-                        router.navigate({
-                          to: AppConfig.links.dataManager.to,
-                        });
-
+                        navigate(AppLinks.dataManagerHome(workspaceSlug));
                         notifications.show({
                           title: "Dataset deleted",
                           message: `${dataset.name} deleted successfully`,

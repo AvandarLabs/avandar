@@ -1,9 +1,10 @@
-import { Paths, SetRequired } from "type-fest";
+import { Paths, SetRequired, UnknownArray } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
 import { SetDefined } from "@/lib/types/utilityTypes";
 import { hasDefinedProp } from "../guards";
 import { getValue, PathValue } from "./getValue";
 import { omit, pick } from "./misc";
+import { setValue } from "./setValue";
 import {
   ExcludeNullsExceptFrom,
   excludeNullsExceptFrom,
@@ -160,5 +161,28 @@ export function excludeNullsExceptFromProps<
 >(...keysToKeepNull: readonly K[]): (obj: T) => ExcludeNullsExceptFrom<T, K> {
   return (obj: T) => {
     return excludeNullsExceptFrom(obj, ...keysToKeepNull);
+  };
+}
+
+/**
+ * Returns a function that sets the value of a property at a given key path.
+ * This can set values deeply by using a dot-notation path.
+ *
+ * @param path The key path in dot notation.
+ * @param value The value to set.
+ */
+export function setPropValue<
+  T extends UnknownObject | UnknownArray,
+  // We need to use this ternary expression on `K` because Paths<> returns
+  // `never` on a record. E.g. Paths<string, string> = never.
+  // So if `Paths<>` can't compute a set of paths, we can fall back
+  // to using `keyof T` which works fine for records.
+  K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
+  V extends K extends keyof T ? T[K]
+  : K extends Paths<T> ? PathValue<T, K>
+  : never,
+>(path: K, value: V): (obj: T) => T {
+  return (obj: T) => {
+    return setValue(obj, path, value);
   };
 }

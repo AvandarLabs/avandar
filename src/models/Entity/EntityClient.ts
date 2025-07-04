@@ -48,11 +48,7 @@ type AdditionalEntityQueries = {
   }) => Promise<EntityFieldValueRead[]>;
 };
 
-type EntityClient = ModelCRUDClient<
-  EntityModel,
-  AdditionalEntityQueries,
-  never
->;
+type EntityClient = ModelCRUDClient<EntityModel, AdditionalEntityQueries>;
 
 function createEntityClient(entityConfigId: EntityConfigId): EntityClient {
   const state: Partial<EntityDatasets> = {
@@ -244,7 +240,7 @@ function createEntityClient(entityConfigId: EntityConfigId): EntityClient {
         },
       };
     },
-  });
+  }) as ModelCRUDClient<EntityModel, AdditionalEntityQueries>;
 }
 
 const entityClientMap = new Map<EntityConfigId, EntityClient>();

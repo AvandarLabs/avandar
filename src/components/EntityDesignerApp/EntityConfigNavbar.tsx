@@ -1,9 +1,9 @@
 import { Box, BoxProps, Loader, useMantineTheme } from "@mantine/core";
 import { useMemo } from "react";
-import { AppConfig } from "@/config/AppConfig";
+import { AppLinks } from "@/config/AppLinks";
+import { useCurrentWorkspaceSlug } from "@/lib/hooks/workspaces/useCurrentWorkspaceSlug";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
 import { EntityConfig } from "@/models/EntityConfig/types";
-import { getEntityConfigLinkProps } from "@/models/EntityConfig/utils";
 
 type Props = {
   entityConfigs: readonly EntityConfig[];
@@ -15,6 +15,7 @@ export function EntityConfigNavbar({
   isLoading,
   ...boxProps
 }: Props): JSX.Element {
+  const workspaceSlug = useCurrentWorkspaceSlug();
   const theme = useMantineTheme();
   const borderStyle = useMemo(() => {
     return {
@@ -27,21 +28,24 @@ export function EntityConfigNavbar({
     const entityConfigLinks = [
       ...entityConfigs.map((entity) => {
         return {
-          ...getEntityConfigLinkProps(entity),
-          label: entity.name,
+          ...AppLinks.entityDesignerConfigView({
+            workspaceSlug,
+            entityConfigId: entity.id,
+            entityConfigName: entity.name,
+          }),
           style: borderStyle,
           linkKey: entity.id,
         };
       }),
       {
-        to: AppConfig.links.entityCreator.to,
+        to: AppLinks.entityDesignerCreatorView(workspaceSlug).to,
         label: "Create new profile type",
         style: borderStyle,
         linkKey: "create-new",
       },
     ];
     return entityConfigLinks;
-  }, [entityConfigs, borderStyle]);
+  }, [entityConfigs, borderStyle, workspaceSlug]);
 
   return (
     <Box bg="neutral.0" pt="0" {...boxProps}>

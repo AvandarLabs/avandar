@@ -1,8 +1,9 @@
 import { Button, Container, Group, Stack, Text, Title } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { useRouter } from "@tanstack/react-router";
-import { AppConfig } from "@/config/AppConfig";
+import { useNavigate } from "@tanstack/react-router";
+import { AppLinks } from "@/config/AppLinks";
+import { useCurrentWorkspaceSlug } from "@/lib/hooks/workspaces/useCurrentWorkspaceSlug";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
 import { hasDefinedProps } from "@/lib/utils/guards";
@@ -37,7 +38,8 @@ const ENTITY_CONFIG_RENDER_OPTIONS: ChildRenderOptionsMap<
 };
 
 export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
-  const router = useRouter();
+  const navigate = useNavigate();
+  const workspaceSlug = useCurrentWorkspaceSlug();
   const [sendDelete, isDeletePending] = EntityConfigClient.useDelete({
     invalidateGetAllQuery: true,
   });
@@ -114,9 +116,7 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
                   { id: entityConfig.id },
                   {
                     onSuccess: () => {
-                      router.navigate({
-                        to: AppConfig.links.entityDesigner.to,
-                      });
+                      navigate(AppLinks.entityDesignerHome(workspaceSlug));
 
                       notifications.show({
                         title: "Entity deleted",

@@ -249,8 +249,8 @@ type CreateModelCRUDClientOptions<
 
 export function createModelCRUDClient<
   M extends ModelCRUDTypes,
-  ExtendedQueriesClient extends HookableClient = Record<string, never>,
-  ExtendedMutationsClient extends HookableClient = Record<string, never>,
+  ExtendedQueriesClient extends HookableClient = EmptyObject,
+  ExtendedMutationsClient extends HookableClient = EmptyObject,
 >({
   modelName,
   defaultGetAllBatchSize = 500,

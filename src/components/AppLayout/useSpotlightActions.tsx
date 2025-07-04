@@ -20,11 +20,11 @@ export function useSpotlightActions(
     const spotlightLinks = [
       SpotlightLinks.home,
       SpotlightLinks.profile(workspaceSlug),
-      SpotlightLinks.dataManager(workspaceSlug),
+      SpotlightLinks.dataManagerHome(workspaceSlug),
       SpotlightLinks.dataImport(workspaceSlug),
       SpotlightLinks.dataExplorer(workspaceSlug),
-      SpotlightLinks.entityDesigner(workspaceSlug),
-      SpotlightLinks.entityCreator(workspaceSlug),
+      SpotlightLinks.entityDesignerHome(workspaceSlug),
+      SpotlightLinks.entityDesignerCreatorView(workspaceSlug),
     ];
 
     return spotlightLinks.map(

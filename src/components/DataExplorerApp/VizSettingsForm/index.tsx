@@ -3,7 +3,6 @@ import { QueryResultField } from "@/clients/LocalDatasetQueryClient";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
-import { setValue } from "@/lib/utils/objects/setValue";
 import { BarChartForm } from "./BarChartForm";
 import { makeDefaultVizConfig, VizConfig } from "./makeDefaultVizConfig";
 
@@ -64,7 +63,7 @@ export function VizSettingsForm({
               fields={fields}
               settings={config.settings}
               onSettingsChange={(settings) => {
-                onVizConfigChange(setValue(config, "settings", settings));
+                onVizConfigChange({ ...config, settings });
               }}
             />
           );

@@ -5,7 +5,6 @@ import { ModelCRUDParserRegistry } from "../models/makeParserRegistry";
 import { applyFiltersToRows } from "../utils/filters/applyFiltersToRows";
 import { FiltersByColumn } from "../utils/filters/filtersByColumn";
 import { isNotUndefined } from "../utils/guards";
-import { BaseClient } from "./BaseClient";
 import {
   createModelCRUDClient,
   HookableClient,
@@ -22,11 +21,7 @@ export type DexieCRUDClient<
   M extends DexieModelCRUDTypes,
   ExtendedQueriesClient extends HookableClient,
   ExtendedMutationsClient extends HookableClient,
-> = ModelCRUDClient<
-  M,
-  ExtendedQueriesClient & BaseClient,
-  ExtendedMutationsClient & BaseClient
->;
+> = ModelCRUDClient<M, ExtendedQueriesClient, ExtendedMutationsClient>;
 
 /**
  * Creates a client for a model that maps to a Dexie table.

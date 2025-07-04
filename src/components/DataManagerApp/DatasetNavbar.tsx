@@ -7,34 +7,37 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { useMemo } from "react";
-import { AppConfig } from "@/config/AppConfig";
-import { Logger } from "@/lib/Logger";
+import { AppLinks } from "@/config/AppLinks";
+import { useCurrentWorkspaceSlug } from "@/lib/hooks/workspaces/useCurrentWorkspaceSlug";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
 import { isNotNullOrUndefined } from "@/lib/utils/guards";
 import { makeBucketMapFromList } from "@/lib/utils/maps/builders";
 import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { LocalDataset } from "@/models/LocalDataset/types";
-import { getDatasetLinkProps } from "@/models/LocalDataset/utils";
 
 type Props = {
   datasets: LocalDataset[];
   isLoading: boolean;
 } & BoxProps;
 
-function makeDatasetLink(
-  dataset: LocalDataset,
-  options: {
-    style: NavLinkProps["style"];
-    label?: string;
-  },
-): NavLinkProps & { linkKey: string } {
-  return {
-    ...getDatasetLinkProps(dataset.id),
-    label: options.label ?? dataset.name,
-    style: options.style,
+function makeDatasetLink(options: {
+  workspaceSlug: string;
+  dataset: LocalDataset;
+  style?: NavLinkProps["style"];
+  label?: string;
+}): NavLinkProps & { linkKey: string } {
+  const { workspaceSlug, dataset, style, label } = options;
+  const link = {
+    ...AppLinks.dataManagerDatasetView({
+      workspaceSlug,
+      datasetId: dataset.id,
+      datasetName: dataset.name,
+    }),
+    style,
     linkKey: dataset.id,
   };
+  return label ? { ...link, label } : link;
 }
 
 export function DatasetNavbar({
@@ -42,6 +45,7 @@ export function DatasetNavbar({
   isLoading,
   ...boxProps
 }: Props): JSX.Element {
+  const workspaceSlug = useCurrentWorkspaceSlug();
   const theme = useMantineTheme();
   const borderStyle = useMemo(() => {
     return {
@@ -53,8 +57,6 @@ export function DatasetNavbar({
   const hasEntityDatasets = datasets.some(
     propEquals("datasetType", "entities_queryable"),
   );
-
-  Logger.log("hasEntityDatasets", { hasEntityDatasets, datasets });
 
   const [entityConfigs, isLoadingEntityConfigs] = EntityConfigClient.useGetAll({
     useQueryOptions: {
@@ -72,10 +74,14 @@ export function DatasetNavbar({
     return [
       [
         ...uploadedDatasets.map((dataset) => {
-          return makeDatasetLink(dataset, { style: borderStyle });
+          return makeDatasetLink({
+            workspaceSlug,
+            dataset,
+            style: borderStyle,
+          });
         }),
         {
-          to: AppConfig.links.dataImport.to,
+          to: AppLinks.dataImport(workspaceSlug).to,
           label: "Add new dataset",
           style: borderStyle,
           linkKey: "create-new",
@@ -94,7 +100,9 @@ export function DatasetNavbar({
                   return config.id === entityConfigId;
                 });
                 return entityConfig ?
-                    makeDatasetLink(dataset, {
+                    makeDatasetLink({
+                      workspaceSlug,
+                      dataset,
                       style: borderStyle,
                       label: entityConfig.name,
                     })
@@ -105,7 +113,7 @@ export function DatasetNavbar({
           })
           .filter(isNotNullOrUndefined),
     ];
-  }, [datasets, borderStyle, entityConfigs]);
+  }, [datasets, borderStyle, entityConfigs, workspaceSlug]);
 
   return (
     <Box bg="neutral.0" pt="lg" {...boxProps}>
