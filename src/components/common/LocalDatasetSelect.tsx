@@ -2,8 +2,10 @@ import { useUncontrolled } from "@mantine/hooks";
 import { useCallback, useMemo } from "react";
 import { match } from "ts-pattern";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
+import { useCurrentWorkspace } from "@/lib/hooks/workspaces/useCurrentWorkspace";
 import { Select, SelectOptionGroup, SelectProps } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
+import { where } from "@/lib/utils/filters/filterBuilders";
 import { makeBucketMapFromList } from "@/lib/utils/maps/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
@@ -26,6 +28,7 @@ export function LocalDatasetSelect({
   onChange,
   ...selectProps
 }: Props): JSX.Element {
+  const workspace = useCurrentWorkspace();
   const [controlledValue, onChangeValue] = useUncontrolled({
     value,
     defaultValue,
@@ -33,7 +36,9 @@ export function LocalDatasetSelect({
     onChange,
   });
 
-  const [datasets] = LocalDatasetClient.useGetAll();
+  const [datasets] = LocalDatasetClient.useGetAll(
+    where("workspaceId", "eq", workspace.id),
+  );
   const viewableDatasets = useMemo(() => {
     return datasets?.filter(isDatasetViewableType) ?? [];
   }, [datasets]);

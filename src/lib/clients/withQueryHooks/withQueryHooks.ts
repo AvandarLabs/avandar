@@ -2,7 +2,7 @@ import { DefaultError, QueryClient, QueryKey } from "@tanstack/react-query";
 import { useMutation, UseMutationOptions } from "@/lib/hooks/query/useMutation";
 import { useQuery } from "@/lib/hooks/query/useQuery";
 import { AnyFunction } from "../../types/utilityTypes";
-import { isFunction, isPlainObject } from "../../utils/guards";
+import { isEmptyObject, isFunction, isPlainObject } from "../../utils/guards";
 import { objectKeys } from "../../utils/objects/misc";
 import { excludeDeep } from "../../utils/objects/transformations";
 import { capitalize, prefix } from "../../utils/strings/transformations";
@@ -292,6 +292,12 @@ function makeQueryKey<Client extends BaseClient, FnName extends keyof Client>(
   queryFnName: FnName,
   params: ClientFnFirstParameter<Client, FnName>,
 ): QueryKey {
+  if (
+    params === undefined ||
+    (typeof params === "object" && isEmptyObject(params))
+  ) {
+    return [client.getClientName(), queryFnName];
+  }
   // exclude any functions from the params, they aren't good to include
   // in a query key
   const newParams = excludeDeep(params, isFunction);
