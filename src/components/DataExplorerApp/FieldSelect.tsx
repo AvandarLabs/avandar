@@ -1,6 +1,7 @@
 import { MultiSelect } from "@mantine/core";
 import { ReactNode, useMemo } from "react";
 import { UUID } from "@/lib/types/common";
+import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNotNullOrUndefined } from "@/lib/utils/guards";
 import { makeObjectFromEntries } from "@/lib/utils/objects/builders";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
@@ -29,11 +30,7 @@ export function FieldSelect({
   datasetId,
 }: Props): JSX.Element {
   const [allDatasets, isLoadingDatasets] = LocalDatasetClient.useGetAll(
-    datasetId ?
-      {
-        where: { id: { eq: datasetId } },
-      }
-    : undefined,
+    datasetId ? where("id", "eq", datasetId) : undefined,
   );
 
   const viewableDatasets = useMemo(() => {

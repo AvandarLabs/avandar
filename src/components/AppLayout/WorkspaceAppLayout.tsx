@@ -1,14 +1,17 @@
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
-import { useCurrentWorkspaceSlug } from "@/lib/hooks/workspaces/useCurrentWorkspaceSlug";
+import { useCurrentWorkspace } from "@/lib/hooks/workspaces/useCurrentWorkspace";
 import { AppShell } from "@/lib/ui/AppShell";
+import { where } from "@/lib/utils/filters/filterBuilders";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { useSpotlightActions } from "./useSpotlightActions";
 
 export function WorkspaceAppLayout(): JSX.Element {
-  const [entityConfigs] = EntityConfigClient.useGetAll();
-  const workspaceSlug = useCurrentWorkspaceSlug();
+  const { slug: workspaceSlug, id: workspaceId } = useCurrentWorkspace();
+  const [entityConfigs] = EntityConfigClient.useGetAll(
+    where("workspace_id", "eq", workspaceId),
+  );
   const spotlightActions = useSpotlightActions(workspaceSlug);
   const entityManagerLinks: NavbarLink[] = useMemo(() => {
     return (entityConfigs ?? []).map((entityConfig) => {

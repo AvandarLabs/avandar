@@ -10,7 +10,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useEffect, useMemo, useRef } from "react";
 import { AppLinks } from "@/config/AppLinks";
-import { useCurrentWorkspaceSlug } from "@/lib/hooks/workspaces/useCurrentWorkspaceSlug";
+import { useCurrentWorkspace } from "@/lib/hooks/workspaces/useCurrentWorkspace";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
 import { constant } from "@/lib/utils/higherOrderFuncs";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
@@ -26,7 +26,7 @@ export function EntityNavbar({
   entityConfig,
   ...boxProps
 }: Props): JSX.Element {
-  const workspaceSlug = useCurrentWorkspaceSlug();
+  const workspace = useCurrentWorkspace();
   const theme = useMantineTheme();
   const borderStyle = useMemo(() => {
     return {
@@ -118,7 +118,7 @@ export function EntityNavbar({
 
       return {
         ...AppLinks.entityManagerEntityView({
-          workspaceSlug,
+          workspaceSlug: workspace.slug,
           entityConfigId: entityConfig.id,
           entityId: entity.id,
           entityName: entity.name,
@@ -133,7 +133,7 @@ export function EntityNavbar({
     allEntities,
     borderStyle,
     hasNextPage,
-    workspaceSlug,
+    workspace.slug,
   ]);
 
   return (

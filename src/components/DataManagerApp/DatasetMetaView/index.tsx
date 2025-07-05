@@ -14,7 +14,7 @@ import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppLinks } from "@/config/AppLinks";
-import { useCurrentWorkspaceSlug } from "@/lib/hooks/workspaces/useCurrentWorkspaceSlug";
+import { useCurrentWorkspace } from "@/lib/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
@@ -56,7 +56,7 @@ type DatasetTabId = "dataset-metadata" | "dataset-summary";
  */
 export function DatasetMetaView({ dataset }: Props): JSX.Element {
   const navigate = useNavigate();
-  const workspaceSlug = useCurrentWorkspaceSlug();
+  const workspace = useCurrentWorkspace();
   const [deleteLocalDataset, isDeletePending] = LocalDatasetClient.useDelete({
     queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
   });
@@ -172,7 +172,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                     { id: dataset.id },
                     {
                       onSuccess: () => {
-                        navigate(AppLinks.dataManagerHome(workspaceSlug));
+                        navigate(AppLinks.dataManagerHome(workspace.slug));
                         notifications.show({
                           title: "Dataset deleted",
                           message: `${dataset.name} deleted successfully`,

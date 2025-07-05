@@ -11,7 +11,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useForm } from "@/lib/hooks/ui/useForm";
-import { useCurrentWorkspaceSlug } from "@/lib/hooks/workspaces/useCurrentWorkspaceSlug";
+import { useCurrentWorkspace } from "@/lib/hooks/workspaces/useCurrentWorkspace";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
@@ -28,7 +28,7 @@ import { useSubmitEntityCreatorForm } from "./useSubmitEntityCreatorForm";
 
 export function EntityCreatorView(): JSX.Element {
   const navigate = useNavigate();
-  const workspaceSlug = useCurrentWorkspaceSlug();
+  const workspace = useCurrentWorkspace();
   const [sendEntityConfigForm, isSendEntityConfigFormPending] =
     useSubmitEntityCreatorForm();
 
@@ -108,7 +108,7 @@ export function EntityCreatorView(): JSX.Element {
             onSuccess: () => {
               navigate(
                 AppLinks.entityDesignerConfigView({
-                  workspaceSlug,
+                  workspaceSlug: workspace.slug,
                   entityConfigId,
                   entityConfigName,
                 }),

@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { where } from "@/lib/utils/filters/filterBuilders";
 import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
 import { EntityConfig } from "@/models/EntityConfig/types";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
@@ -24,9 +25,9 @@ export function useHydratedEntityConfig({
     isLoadingValueExtractors: boolean;
   },
 ] {
-  const [entityFields, isLoadingFields] = EntityFieldConfigClient.useGetAll({
-    where: { entity_config_id: { eq: entityConfig.id } },
-  });
+  const [entityFields, isLoadingFields] = EntityFieldConfigClient.useGetAll(
+    where("entity_config_id", "eq", entityConfig.id),
+  );
 
   const [valueExtractors, isLoadingValueExtractors] =
     EntityFieldConfigClient.useGetAllValueExtractors({
@@ -47,7 +48,7 @@ export function useHydratedEntityConfig({
   }, [valueExtractors]);
 
   const [localDatasets, isLoadingDatasets] = LocalDatasetClient.useGetAll({
-    where: { id: { in: datasetsToLoad } },
+    ...where("id", "in", datasetsToLoad),
     useQueryOptions: {
       enabled: datasetsToLoad.length > 0,
     },

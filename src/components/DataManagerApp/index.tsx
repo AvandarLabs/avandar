@@ -1,12 +1,17 @@
 import { Box, Flex, MantineTheme } from "@mantine/core";
 import { Outlet } from "@tanstack/react-router";
 import { useMemo } from "react";
+import { useCurrentWorkspace } from "@/lib/hooks/workspaces/useCurrentWorkspace";
+import { where } from "@/lib/utils/filters/filterBuilders";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { isDatasetViewableType } from "@/models/LocalDataset/utils";
 import { DatasetNavbar } from "./DatasetNavbar";
 
 export function DataManagerApp(): JSX.Element {
-  const [allDatasets, isLoadingDatasets] = LocalDatasetClient.useGetAll();
+  const workspace = useCurrentWorkspace();
+  const [allDatasets, isLoadingDatasets] = LocalDatasetClient.useGetAll(
+    where("workspaceId", "eq", workspace.id),
+  );
 
   const viewableDatasets = useMemo(() => {
     return allDatasets?.filter(isDatasetViewableType) ?? [];

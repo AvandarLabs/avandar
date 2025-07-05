@@ -8,8 +8,9 @@ import {
 } from "@mantine/core";
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
-import { useCurrentWorkspaceSlug } from "@/lib/hooks/workspaces/useCurrentWorkspaceSlug";
+import { useCurrentWorkspace } from "@/lib/hooks/workspaces/useCurrentWorkspace";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
+import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNotNullOrUndefined } from "@/lib/utils/guards";
 import { makeBucketMapFromList } from "@/lib/utils/maps/builders";
 import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
@@ -45,7 +46,7 @@ export function DatasetNavbar({
   isLoading,
   ...boxProps
 }: Props): JSX.Element {
-  const workspaceSlug = useCurrentWorkspaceSlug();
+  const { slug: workspaceSlug, id: workspaceId } = useCurrentWorkspace();
   const theme = useMantineTheme();
   const borderStyle = useMemo(() => {
     return {
@@ -59,6 +60,7 @@ export function DatasetNavbar({
   );
 
   const [entityConfigs, isLoadingEntityConfigs] = EntityConfigClient.useGetAll({
+    ...where("workspace_id", "eq", workspaceId),
     useQueryOptions: {
       enabled: hasEntityDatasets,
     },

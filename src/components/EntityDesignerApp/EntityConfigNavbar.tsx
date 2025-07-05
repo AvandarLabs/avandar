@@ -1,7 +1,7 @@
 import { Box, BoxProps, Loader, useMantineTheme } from "@mantine/core";
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
-import { useCurrentWorkspaceSlug } from "@/lib/hooks/workspaces/useCurrentWorkspaceSlug";
+import { useCurrentWorkspace } from "@/lib/hooks/workspaces/useCurrentWorkspace";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
 import { EntityConfig } from "@/models/EntityConfig/types";
 
@@ -15,7 +15,7 @@ export function EntityConfigNavbar({
   isLoading,
   ...boxProps
 }: Props): JSX.Element {
-  const workspaceSlug = useCurrentWorkspaceSlug();
+  const workspace = useCurrentWorkspace();
   const theme = useMantineTheme();
   const borderStyle = useMemo(() => {
     return {
@@ -29,7 +29,7 @@ export function EntityConfigNavbar({
       ...entityConfigs.map((entity) => {
         return {
           ...AppLinks.entityDesignerConfigView({
-            workspaceSlug,
+            workspaceSlug: workspace.slug,
             entityConfigId: entity.id,
             entityConfigName: entity.name,
           }),
@@ -38,14 +38,14 @@ export function EntityConfigNavbar({
         };
       }),
       {
-        to: AppLinks.entityDesignerCreatorView(workspaceSlug).to,
+        to: AppLinks.entityDesignerCreatorView(workspace.slug).to,
         label: "Create new profile type",
         style: borderStyle,
         linkKey: "create-new",
       },
     ];
     return entityConfigLinks;
-  }, [entityConfigs, borderStyle, workspaceSlug]);
+  }, [entityConfigs, borderStyle, workspace.slug]);
 
   return (
     <Box bg="neutral.1" pt="0" {...boxProps}>

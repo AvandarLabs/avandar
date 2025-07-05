@@ -4,7 +4,7 @@ import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { AppConfig } from "@/config/AppConfig";
-import { useCurrentWorkspaceId } from "@/lib/hooks/workspaces/useCurrentWorkspaceId";
+import { useCurrentWorkspace } from "@/lib/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { FileUploadField } from "@/lib/ui/singleton-forms/FileUploadField";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
@@ -20,7 +20,7 @@ const { maxDatasetNameLength, maxDatasetDescriptionLength } =
   AppConfig.dataManagerApp;
 
 export function DataImportView(): JSX.Element {
-  const workspaceId = useCurrentWorkspaceId();
+  const workspace = useCurrentWorkspace();
   const [saveDataset, isSavePending] = LocalDatasetClient.useInsert({
     queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
   });
@@ -70,7 +70,7 @@ export function DataImportView(): JSX.Element {
           <form
             onSubmit={form.onSubmit((values) => {
               const dataset = makeLocalDataset({
-                workspaceId,
+                workspaceId: workspace.id,
                 name: values.name,
                 datasetType: "upload",
                 description: values.description,
