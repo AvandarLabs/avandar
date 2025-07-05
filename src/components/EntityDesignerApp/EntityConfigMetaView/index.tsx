@@ -16,7 +16,12 @@ type Props = {
   entityConfig: EntityConfig;
 };
 
-const EXCLUDED_ENTITY_CONFIG_KEYS = ["id", "ownerId", "datasets"] as const;
+const EXCLUDED_ENTITY_CONFIG_KEYS = [
+  "id",
+  "ownerId",
+  "workspaceId",
+  "datasets",
+] as const;
 const ENTITY_CONFIG_RENDER_OPTIONS: ChildRenderOptionsMap<
   EntityConfig<"Full">
 > = {

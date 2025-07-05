@@ -13,6 +13,7 @@ import { brandedStringType, uuidType } from "@/lib/utils/zodHelpers";
 import { EntityConfigId } from "../EntityConfig/types";
 import { LocalDatasetClient } from "../LocalDataset/LocalDatasetClient";
 import { LocalDatasetId, ParsedLocalDataset } from "../LocalDataset/types";
+import { WorkspaceId } from "../Workspace/types";
 import { EntityParsers } from "./parsers";
 import { Entity, EntityId, EntityModel } from "./types";
 
@@ -26,6 +27,7 @@ const EntityFieldValueNativeType = z.union([
 
 export const EntityFieldValueReadSchema = z.object({
   id: uuidType<"EntityFieldValue">(),
+  workspaceId: uuidType<WorkspaceId>(),
   entityId: uuidType<"Entity">(),
   entityFieldConfigId: uuidType<"EntityFieldConfig">(),
   value: EntityFieldValueNativeType,

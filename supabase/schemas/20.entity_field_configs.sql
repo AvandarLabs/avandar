@@ -107,8 +107,15 @@ $$
 language plpgsql;
 
 -- Trigger: enforce title and id field validations on insert or update
+-- NOTE: this trigger is intentionally set for *after* insert or update.
+-- This is because when an Entity Config is inserted, the fields do not exist
+-- yet, so if we triggered this "before" insert, then the fields count will
+-- be 0, so it will raise an error. But, because we insert fields via a bulk
+-- insert, then *after* the insert we know the fields are fair game to query
+-- now. On the flip side, the disadvantage is that if there's an error now,
+-- we need to manually rollback the changes. 
 create trigger tr_entity_field_configs__validate_title_id_fields
-  before insert or update on public.entity_field_configs
+  after insert or update on public.entity_field_configs
   for each row execute function public.entity_field_configs__validate_title_id_fields();
 
 -- Indexes to improve performance

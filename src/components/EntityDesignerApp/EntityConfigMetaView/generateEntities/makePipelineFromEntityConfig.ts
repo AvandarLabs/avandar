@@ -103,6 +103,7 @@ export function makePipelineFromEntityConfig(
 
   return {
     id: uuid(),
+    workspaceId: entityConfig.workspaceId,
     name: `Pipeline for ${entityConfig.name}`,
     createdAt: new Date(),
     updatedAt: new Date(),

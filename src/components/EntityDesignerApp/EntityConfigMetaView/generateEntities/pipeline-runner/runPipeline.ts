@@ -3,6 +3,7 @@ import { Logger } from "@/lib/Logger";
 import { getErrorMap } from "@/lib/models/makeParserRegistry";
 import { UnknownObject, UUID } from "@/lib/types/common";
 import { isNotNullOrUndefined, isPlainObject } from "@/lib/utils/guards";
+import { constant } from "@/lib/utils/higherOrderFuncs";
 import { promiseReduce } from "@/lib/utils/promises";
 import { unknownToString } from "@/lib/utils/strings/transformations";
 import { uuid } from "@/lib/utils/uuid";
@@ -16,6 +17,7 @@ import {
 } from "@/models/LocalDataset/types";
 import { asLocalDatasetId, unparseDataset } from "@/models/LocalDataset/utils";
 import { UserId } from "@/models/User/types";
+import { WorkspaceId } from "@/models/Workspace/types";
 import {
   OutputDatasetsStepConfig,
   Pipeline,
@@ -33,6 +35,7 @@ export type EntityFieldValueNativeType =
 
 export type EntityFieldValue = {
   id: UUID<"EntityFieldValue">;
+  workspaceId: WorkspaceId;
   entityId: EntityId;
   entityFieldConfigId: EntityFieldConfigId;
   value?: EntityFieldValueNativeType;
@@ -56,6 +59,7 @@ export type PipelineContext = {
   getDataset: (id: LocalDatasetId) => ParsedLocalDataset;
   getErrors: () => PipelineRunError[];
   getCurrentStep: () => PipelineStep | undefined;
+  getWorkspaceId: () => WorkspaceId;
 
   // setters
   setContextValue: (key: string, value: unknown) => PipelineContext;
@@ -72,61 +76,62 @@ type PipelineRunError = {
 type PipelineContextState = {
   // TODO(jpsyx): break up `contextValues` into several other dictionaries.
   // And also have a catch-all `extraMetadata` or something like that.
-  contextValues: UnknownObject;
-  errors: PipelineRunError[];
-  currentStep: PipelineStep | undefined;
+  contextValues?: UnknownObject;
+  errors?: PipelineRunError[];
+  currentStep?: PipelineStep | undefined;
+  workspaceId: WorkspaceId;
 };
 
-function createPipelineContext(
-  state: PipelineContextState = {
-    contextValues: {},
-    errors: [],
-    currentStep: undefined,
-  },
-): PipelineContext {
+function createPipelineContext(state: PipelineContextState): PipelineContext {
+  const {
+    contextValues = {},
+    errors = [],
+    currentStep = undefined,
+    workspaceId,
+  } = state;
   const setContextValue = (key: string, value: unknown) => {
-    const newContextValues = { ...state.contextValues, [key]: value };
-    return createPipelineContext({ ...state, contextValues: newContextValues });
+    const newContextValues = { ...contextValues, [key]: value };
+    return createPipelineContext({
+      contextValues: newContextValues,
+      errors,
+      currentStep,
+      workspaceId,
+    });
   };
 
   const getContextValue = (key: string) => {
-    return state.contextValues[key];
+    return contextValues[key];
   };
 
-  const getCurrentStep = () => {
-    return state.currentStep;
-  };
+  const getCurrentStep = constant(currentStep);
 
   return {
     // Getters
     getContextValue,
     getCurrentStep,
-    getContextValues: () => {
-      return state.contextValues;
-    },
+    getContextValues: constant(contextValues),
     getDataset: (id: LocalDatasetId): ParsedLocalDataset => {
       const maybeDataset = getContextValue(`datasetId:${id}`);
       return ParsedLocalDatasetSchema.parse(maybeDataset, {
         errorMap: getErrorMap("ParsedLocalDataset", "ParsedLocalDatasetSchema"),
       });
     },
-    getErrors: () => {
-      return state.errors;
-    },
+    getErrors: constant(errors),
+    getWorkspaceId: constant(workspaceId),
 
     // Setters - these should all be immutable
     setContextValue,
     storeDataset: (dataset: ParsedLocalDataset): PipelineContext => {
       return setContextValue(`datasetId:${dataset.id}`, dataset);
     },
-    addErrors: (errors: string[]): PipelineContext => {
-      const pipelineErrors = errors.map((error) => {
+    addErrors: (errorsToAdd: string[]): PipelineContext => {
+      const pipelineErrorsToAdd = errorsToAdd.map((error) => {
         return {
           stepName: getCurrentStep()?.name ?? "none",
           message: error,
         };
       });
-      const newErrors = [...state.errors, ...pipelineErrors];
+      const newErrors = [...errors, ...pipelineErrorsToAdd];
       return createPipelineContext({ ...state, errors: newErrors });
     },
     setCurrentStep: (step: PipelineStep): PipelineContext => {
@@ -181,6 +186,7 @@ export async function _runOutputDatasetsStep(
 
   const parsedLocalDataset: ParsedLocalDataset = {
     id: asLocalDatasetId(stepConfig.datasetId),
+    workspaceId: context.getWorkspaceId(),
     datasetType: stepConfig.datasetType,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -246,7 +252,7 @@ export async function runPipeline(
     (step, context) => {
       return runPipelineStep(step, context.setCurrentStep(step));
     },
-    createPipelineContext(),
+    createPipelineContext({ workspaceId: pipeline.workspaceId }),
   );
   return results;
 }

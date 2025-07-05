@@ -3,6 +3,7 @@ import { match } from "ts-pattern";
 import { CSVData, MIMEType } from "@/lib/types/common";
 import { assert } from "@/lib/utils/guards";
 import { uuid } from "@/lib/utils/uuid";
+import { WorkspaceId } from "../Workspace/types";
 import { LocalDatasetField } from "./LocalDatasetField/types";
 import { FileMetadata, LocalDataset, LocalDatasetId } from "./types";
 
@@ -13,6 +14,7 @@ export function asLocalDatasetId(id: string): LocalDatasetId {
 
 export function makeLocalDataset({
   name,
+  workspaceId,
   datasetType,
   description,
   fileMetadata,
@@ -21,6 +23,7 @@ export function makeLocalDataset({
   fields,
 }: {
   name: string;
+  workspaceId: WorkspaceId;
   datasetType: LocalDataset["datasetType"];
   description: string;
   fileMetadata: FileMetadata;
@@ -31,6 +34,7 @@ export function makeLocalDataset({
   const creationTime = new Date();
   return {
     id: asLocalDatasetId(uuid()),
+    workspaceId,
     name,
     datasetType,
     firstRowIsHeader: true,

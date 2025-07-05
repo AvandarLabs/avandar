@@ -48,7 +48,7 @@ export function EntityConfigNavbar({
   }, [entityConfigs, borderStyle, workspaceSlug]);
 
   return (
-    <Box bg="neutral.0" pt="0" {...boxProps}>
+    <Box bg="neutral.1" pt="0" {...boxProps}>
       {isLoading ?
         <Loader />
       : null}

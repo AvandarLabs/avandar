@@ -119,6 +119,7 @@ function _extractEntityFieldValueFromDatasetRows(params: {
       const extractedValue = firstRow[datasetColumnToExtract.name];
       return {
         id: uuid<"EntityFieldValue">(),
+        workspaceId: context.getWorkspaceId(),
         entityId,
         value: extractedValue,
         valueSet: [extractedValue],
@@ -143,6 +144,7 @@ function _extractEntityFieldValueFromDatasetRows(params: {
 
       return {
         id: uuid<"EntityFieldValue">(),
+        workspaceId: context.getWorkspaceId(),
         entityId,
         value: mostFrequentValue,
         valueSet: [...counts.keys()],
@@ -266,6 +268,7 @@ export function runCreateEntitiesStep(
     // construct the entity object
     const entity = {
       id: entityId, // the internal id
+      workspaceId: context.getWorkspaceId(),
       name: entityName,
       externalId: String(externalId),
       entityConfigId: entityConfig.id,

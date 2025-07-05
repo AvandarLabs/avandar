@@ -2,6 +2,7 @@ import { UUID } from "@/lib/types/common";
 import { EntityConfigWith } from "@/models/EntityConfig/types";
 import { FieldDataType } from "@/models/LocalDataset/LocalDatasetField/types";
 import { LocalDataset, LocalDatasetId } from "@/models/LocalDataset/types";
+import { WorkspaceId } from "@/models/Workspace/types";
 
 type BaseModel<T extends string> = {
   id: UUID<T>;
@@ -65,6 +66,7 @@ export type PipelineStep = {
 //  id, entity_id, field_id, value, all_values, datasource_id
 export type Pipeline = {
   id: UUID<"Pipeline">;
+  workspaceId: WorkspaceId;
   createdAt: Date;
   updatedAt: Date;
   name: string;

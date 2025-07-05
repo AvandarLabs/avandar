@@ -24,10 +24,7 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
     ) => {
       // Insert the parent entity
       await EntityConfigClient.insert({
-        data: {
-          workspaceId,
-          ...entityConfigFormValues,
-        },
+        data: { workspaceId, ...entityConfigFormValues },
       });
       const { fields } = entityConfigFormValues;
 
@@ -47,10 +44,7 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
             const { options, extractors } = field;
             return match(options.valueExtractorType)
               .with("manual_entry", () => {
-                return {
-                  ...extractors.manualEntry,
-                  workspaceId,
-                };
+                return { ...extractors.manualEntry, workspaceId };
               })
               .with("dataset_column_value", () => {
                 const datasetColumnValueExtractor =
@@ -62,10 +56,7 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
                     "datasetFieldId",
                   )
                 ) {
-                  return {
-                    ...datasetColumnValueExtractor,
-                    workspaceId,
-                  };
+                  return { ...datasetColumnValueExtractor, workspaceId };
                 }
                 return undefined;
               })
@@ -74,10 +65,7 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
                 if (
                   hasProps(aggregationExtractor, "datasetId", "datasetFieldId")
                 ) {
-                  return {
-                    ...aggregationExtractor,
-                    workspaceId,
-                  };
+                  return { ...aggregationExtractor, workspaceId };
                 }
                 return undefined;
               })

@@ -127,10 +127,17 @@ export function EntityNavbar({
         style,
       };
     });
-  }, [virtualRows, entityConfig, allEntities, borderStyle, hasNextPage]);
+  }, [
+    virtualRows,
+    entityConfig,
+    allEntities,
+    borderStyle,
+    hasNextPage,
+    workspaceSlug,
+  ]);
 
   return (
-    <Flex bg="neutral.0" pt="lg" direction="column" {...boxProps}>
+    <Flex bg="neutral.1" pt="lg" direction="column" {...boxProps}>
       <Title pl="sm" order={3} pb="sm">
         {entityConfig.name} Manager
       </Title>

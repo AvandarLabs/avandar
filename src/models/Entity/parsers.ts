@@ -3,10 +3,12 @@ import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { uuidType } from "@/lib/utils/zodHelpers";
 import { EntityConfigId } from "../EntityConfig/types";
 import { UserId } from "../User/types";
+import { WorkspaceId } from "../Workspace/types";
 import { EntityId, EntityModel } from "./types";
 
 const DBReadSchema = z.object({
   id: uuidType<EntityId>(),
+  workspaceId: uuidType<WorkspaceId>(),
   name: z.string(),
   externalId: z.string(),
   status: z.string(),

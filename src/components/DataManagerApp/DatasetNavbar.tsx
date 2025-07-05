@@ -116,7 +116,7 @@ export function DatasetNavbar({
   }, [datasets, borderStyle, entityConfigs, workspaceSlug]);
 
   return (
-    <Box bg="neutral.0" pt="lg" {...boxProps}>
+    <Box bg="neutral.1" pt="lg" {...boxProps}>
       {isLoading ?
         <Loader />
       : null}

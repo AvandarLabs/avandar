@@ -3,6 +3,7 @@ import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { excludeUndefinedDeep } from "@/lib/utils/objects/transformations";
 import { brandedStringType, mimeType } from "@/lib/utils/zodHelpers";
+import { WorkspaceId } from "../Workspace/types";
 import { LocalDatasetFieldSchema } from "./LocalDatasetField/parsers";
 import { LocalDataset, LocalDatasetId, LocalDatasetModel } from "./types";
 
@@ -11,6 +12,7 @@ import { LocalDataset, LocalDatasetId, LocalDatasetModel } from "./types";
  */
 export const DBReadSchema = z.object({
   id: brandedStringType<LocalDatasetId>(),
+  workspaceId: brandedStringType<WorkspaceId>(),
   name: z.string().min(1),
   datasetType: z.enum([
     "upload",

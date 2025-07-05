@@ -4,6 +4,7 @@ import { UUID } from "@/lib/types/common";
 import { EntityFieldConfig } from "../EntityConfig/EntityFieldConfig/types";
 import { EntityConfig, EntityConfigId } from "../EntityConfig/types";
 import { UserId } from "../User/types";
+import { WorkspaceId } from "../Workspace/types";
 import { EntityFieldValueRead } from "./EntityClient";
 import type { DexieModelCRUDTypes } from "@/lib/models/DexieModelCRUDTypes";
 
@@ -11,6 +12,7 @@ export type EntityId = UUID<"Entity">;
 
 type DBRead = {
   id: EntityId;
+  workspaceId: WorkspaceId;
   name: string; // the external name of this entity (from the source dataset)
   externalId: string; // this is the id we get from the source dataset
   entityConfigId: EntityConfigId;

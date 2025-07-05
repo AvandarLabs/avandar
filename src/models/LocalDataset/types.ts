@@ -2,6 +2,7 @@ import { Merge, SetFieldType, Simplify } from "type-fest";
 import { DexieModelCRUDTypes } from "@/lib/models/DexieModelCRUDTypes";
 import { MIMEType } from "@/lib/types/common";
 import { Brand } from "@/lib/types/utilityTypes";
+import { WorkspaceId } from "../Workspace/types";
 import type { CSVData } from "@/lib/types/common";
 import type { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
 
@@ -9,6 +10,7 @@ export type LocalDatasetId = Brand<string, "LocalDatasetId">;
 
 type DBRead = {
   id: LocalDatasetId;
+  workspaceId: WorkspaceId;
   name: string;
   datasetType:
     | "upload"
