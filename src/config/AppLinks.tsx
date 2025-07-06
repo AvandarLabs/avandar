@@ -31,6 +31,11 @@ export const AppLinks = {
     to: "/invalid-workspace",
     label: "Invalid workspace",
   },
+  updatePassword: {
+    key: "update-password",
+    to: "/update-password",
+    label: "Update password",
+  },
 
   // Profile links
   profile: (workspaceSlug: string) => {

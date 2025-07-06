@@ -9,7 +9,7 @@ type Props = {
 
 export function AuthLayout({ title, subtitle, children }: Props): JSX.Element {
   return (
-    <Container size={420} my="xxl">
+    <Container size={420} py="xxl">
       <Stack>
         <Title ta="center" order={1}>
           {title}

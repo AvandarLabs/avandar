@@ -1,7 +1,18 @@
-import { Button, Group, List, Loader, Stack, Text, Title } from "@mantine/core";
+import {
+  Button,
+  Container,
+  Group,
+  List,
+  Loader,
+  Paper,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AuthClient } from "@/clients/AuthClient";
+import { AppLinks } from "@/config/AppLinks";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useToggleBoolean } from "@/lib/hooks/useToggleBoolean";
 import { InputTextField } from "@/lib/ui/singleton-forms/InputTextField";
@@ -11,7 +22,7 @@ export const Route = createFileRoute("/_auth/$workspaceSlug/profile")({
 });
 
 function ProfilePage() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { user } = Route.useRouteContext();
   const [isEditingEmail, toggleEditingEmailState] = useToggleBoolean(false);
   const [sendUpdateEmailRequest, isUpdateEmailPending] = useMutation({
@@ -38,60 +49,65 @@ function ProfilePage() {
   }
 
   return (
-    <Stack>
-      <Title order={1}>Profile</Title>
-      {user ?
-        <Stack>
-          <List listStyleType="none">
-            <List.Item>
-              {isEditingEmail ?
-                <InputTextField
-                  required
-                  hideLabel
-                  isSubmitting={isUpdateEmailPending}
-                  showCancelButton
-                  type="email"
-                  label="Email"
-                  defaultValue={user.email ?? ""}
-                  submitButtonLabel="Edit"
-                  minLength={3}
-                  placeholder="Email"
-                  onCancel={toggleEditingEmailState}
-                  onSubmit={async (email) => {
-                    if (isUpdateEmailPending) {
-                      return;
-                    }
-                    sendUpdateEmailRequest(email);
-                  }}
-                />
-              : <Group>
-                  <Text>Email: {user.email}</Text>
-                  <Button onClick={toggleEditingEmailState}>Edit</Button>
-                </Group>
-              }
-            </List.Item>
-            <List.Item>
-              <Group>
-                <Text>Password: ********</Text>
-                <Button
-                  onClick={() => {
-                    // use route.navigate to go to /update-password and include
-                    // a redirect to the current page
-                    router.navigate({
-                      to: "/update-password",
-                      search: {
-                        redirect: window.location.pathname,
-                      },
-                    });
-                  }}
-                >
-                  Change password
-                </Button>
-              </Group>
-            </List.Item>
-          </List>
-        </Stack>
-      : <Loader />}
-    </Stack>
+    <Container pt="xxxl">
+      <Stack>
+        <Title ta="center" order={1}>
+          Profile
+        </Title>
+
+        <Paper withBorder shadow="md" p="lg" mt="lg" radius="md" bg="white">
+          {user ?
+            <Stack>
+              <List listStyleType="none" spacing="sm">
+                <List.Item>
+                  {isEditingEmail ?
+                    <InputTextField
+                      required
+                      hideLabel
+                      isSubmitting={isUpdateEmailPending}
+                      showCancelButton
+                      type="email"
+                      label="Email"
+                      defaultValue={user.email ?? ""}
+                      submitButtonLabel="Edit"
+                      minLength={3}
+                      placeholder="Email"
+                      onCancel={toggleEditingEmailState}
+                      onSubmit={async (email) => {
+                        if (isUpdateEmailPending) {
+                          return;
+                        }
+                        sendUpdateEmailRequest(email);
+                      }}
+                    />
+                  : <Group>
+                      <Text>Email: {user.email}</Text>
+                      <Button onClick={toggleEditingEmailState}>Edit</Button>
+                    </Group>
+                  }
+                </List.Item>
+                <List.Item>
+                  <Group>
+                    <Text>Password: ********</Text>
+                    <Button
+                      onClick={() => {
+                        navigate({
+                          to: AppLinks.updatePassword.to,
+                          search: {
+                            redirect: window.location.pathname,
+                          },
+                        });
+                      }}
+                    >
+                      Change password
+                    </Button>
+                  </Group>
+                </List.Item>
+              </List>
+            </Stack>
+          : <Loader />}
+        </Paper>
+      </Stack>
+    </Container>
   );
 }
