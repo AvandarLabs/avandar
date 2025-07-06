@@ -8,10 +8,6 @@ export const Route = createFileRoute("/_auth/$workspaceSlug/")({
 
 function WorkspaceHomePage() {
   const { user } = Route.useRouteContext();
-
-  // get the workspace slug from params
-  const workspaceSlug = Route.useParams().workspaceSlug;
-
   const [userProfile, isLoadingUserProfile] = useCurrentUserProfile();
 
   if (!user) {
@@ -22,12 +18,15 @@ function WorkspaceHomePage() {
     <Container ta="left" my="xxxl">
       <Stack>
         <Title order={1}>
-          Welcome back{" "}
+          Welcome back
           {isLoadingUserProfile ?
-            <Loader ml="xs" />
-          : userProfile.displayName}
+            <Loader ml="sm" />
+          : `, ${userProfile.displayName}`}
         </Title>
-        <Text>Welcome to your workspace: {workspaceSlug}.</Text>
+        <Text>
+          This is where eventually you will see the newest updates for your
+          workspace.
+        </Text>
       </Stack>
     </Container>
   );
