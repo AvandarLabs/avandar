@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
-import { useCurrentWorkspace } from "@/lib/hooks/workspaces/useCurrentWorkspace";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AppShell } from "@/lib/ui/AppShell";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";

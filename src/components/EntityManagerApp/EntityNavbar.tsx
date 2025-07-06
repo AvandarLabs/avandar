@@ -10,7 +10,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useEffect, useMemo, useRef } from "react";
 import { AppLinks } from "@/config/AppLinks";
-import { useCurrentWorkspace } from "@/lib/hooks/workspaces/useCurrentWorkspace";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
 import { constant } from "@/lib/utils/higherOrderFuncs";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";

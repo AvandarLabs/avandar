@@ -1,8 +1,8 @@
 import { notifications } from "@mantine/notifications";
 
-const DEFAULT_TITLE = "Error";
+const DEFAULT_TITLE = "Success";
 
-export function notifyError(
+export function notifySuccess(
   titleOrOptions:
     | string
     | {
@@ -19,6 +19,6 @@ export function notifyError(
   notifications.show({
     title,
     message,
-    color: "red",
+    color: "green",
   });
 }

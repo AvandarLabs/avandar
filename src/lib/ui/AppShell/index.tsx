@@ -29,7 +29,7 @@ import { AppConfig } from "@/config/AppConfig";
 import { AppLink } from "@/config/AppLinks";
 import { NavbarLink } from "@/config/NavbarLinks";
 import { useMutation } from "@/lib/hooks/query/useMutation";
-import { useIsMobileSize } from "@/lib/hooks/useIsMobileSize";
+import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
 import { Link } from "@/lib/ui/links/Link";
 import css from "./AppShell.module.css";
 

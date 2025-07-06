@@ -14,7 +14,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AuthClient } from "@/clients/AuthClient";
 import { AppLinks } from "@/config/AppLinks";
 import { useMutation } from "@/lib/hooks/query/useMutation";
-import { useToggleBoolean } from "@/lib/hooks/useToggleBoolean";
+import { useToggleBoolean } from "@/lib/hooks/state/useToggleBoolean";
 import { InputTextField } from "@/lib/ui/singleton-forms/InputTextField";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug/profile")({

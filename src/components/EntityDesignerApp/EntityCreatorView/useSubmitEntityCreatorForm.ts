@@ -1,9 +1,9 @@
 import { match } from "ts-pattern";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import {
   useMutation,
   UseMutationResultTuple,
 } from "@/lib/hooks/query/useMutation";
-import { useCurrentWorkspace } from "@/lib/hooks/workspaces/useCurrentWorkspace";
 import { hasProps, isNotUndefined } from "@/lib/utils/guards";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";

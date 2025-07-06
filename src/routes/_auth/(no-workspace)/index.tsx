@@ -1,10 +1,10 @@
 import { Container, Divider, Paper, Stack, Title } from "@mantine/core";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { AppLinks } from "@/config/AppLinks";
 import { BasicForm } from "@/lib/ui/BasicForm";
-import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
+import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
 import { isNonEmptyArray } from "@/lib/utils/guards";
 import { slugify } from "@/lib/utils/strings/transformations";
-import { getWorkspaceLinkProps } from "@/models/Workspace/utils";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
 /**
@@ -23,18 +23,14 @@ export const Route = createFileRoute("/_auth/(no-workspace)/")({
    */
   beforeLoad: async ({ context }) => {
     const { queryClient } = context;
-
-    const userWorkspaces = await queryClient.ensureQueryData({
-      queryKey: WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
-      queryFn: () => {
-        return WorkspaceClient.getWorkspacesOfCurrentUser();
-      },
-    });
+    const userWorkspaces = await WorkspaceClient.withCache(queryClient)
+      .withEnsureQueryData()
+      .getWorkspacesOfCurrentUser();
 
     if (isNonEmptyArray(userWorkspaces)) {
       // TODO(jpsyx): redirect to the most recent workspace
       // For now we're just choosing the first one we find for this user
-      throw redirect(getWorkspaceLinkProps(userWorkspaces[0]));
+      throw redirect(AppLinks.workspaceHome(userWorkspaces[0].slug));
     }
   },
 });
@@ -88,10 +84,15 @@ const FORM_ELEMENTS = [
  * We will always redirect them to their workspace page.
  */
 function CreateFirstWorkspacePage() {
+  const navigate = useNavigate();
   const [createWorkspace, isWorkspaceCreating] =
     WorkspaceClient.useCreateWorkspaceWithOwner({
-      onSuccess: (data) => {
-        notifyDevAlert("Workspace created successfully", data);
+      queryToInvalidate: [WorkspaceClient.getClientName()],
+      onSuccess: (newWorkspace) => {
+        notifySuccess("Workspace created successfully!");
+
+        // navigate to the new workspace
+        navigate(AppLinks.workspaceHome(newWorkspace.slug));
       },
     });
 
@@ -108,8 +109,6 @@ function CreateFirstWorkspacePage() {
             formElements={FORM_ELEMENTS}
             submitIsLoading={isWorkspaceCreating}
             onSubmit={(values) => {
-              console.log(values);
-              notifyDevAlert(values);
               createWorkspace({
                 workspaceName: values.workspaceName,
                 workspaceSlug: values.workspaceIdentifier,

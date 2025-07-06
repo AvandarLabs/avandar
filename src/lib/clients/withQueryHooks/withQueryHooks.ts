@@ -221,60 +221,73 @@ export function withQueryHooks<
       }
 
       const cachedClientsByFnNameLookup = new Map<
-        string,
+        keyof QueryClient,
         ClientWithCache<
           WithQueryHooks<Client, UseQueryFnName, UseMutationFnName>
         >
       >();
 
+      const getWrappedQueryFns = (queryClientFnName: keyof QueryClient) => {
+        if (cachedClientsByFnNameLookup.has(queryClientFnName)) {
+          return cachedClientsByFnNameLookup.get(queryClientFnName)!;
+        }
+
+        const wrappedQueries = {} as QueryFnsRecord<Client, UseQueryFnName>;
+
+        callableQueryFnNames.forEach((queryFnName: UseQueryFnName) => {
+          const clientFunction = client[queryFnName as UseQueryFnName];
+          if (typeof clientFunction === "function") {
+            const boundClientFunction = clientFunction.bind(client);
+            const wrappedQuery = async (
+              params: ClientFnFirstParameter<Client, UseQueryFnName>,
+            ) => {
+              const queryClientFn =
+                queryClient[queryClientFnName as keyof QueryClient];
+              if (typeof queryClientFn !== "function") {
+                throw new Error(
+                  `QueryClient does not have a function named ${queryClientFnName}`,
+                );
+              }
+              const boundQueryClientFn = queryClientFn.bind(queryClient);
+              // This is not completely safe, but we will suppress the
+              // typescript error. We are assuming that we will only ever
+              // call QueryClient functions that expect a `queryKey` and
+              // a `queryFn`. If we attempt a QueryClient function with a
+              // different signature then this will not work.
+              // @ts-expect-error This is not completely safe, but oh well
+              const data = await boundQueryClientFn({
+                queryKey: queryKeyBuilders[queryFnName](params),
+                queryFn: boundClientFunction,
+              });
+              return data;
+            };
+
+            // @ts-expect-error This is safe
+            wrappedQueries[queryFnName] = wrappedQuery;
+          }
+        });
+
+        const withQueryClientFn = { ...clientWithCache, ...wrappedQueries };
+        cachedClientsByFnNameLookup.set(queryClientFnName, withQueryClientFn);
+        return withQueryClientFn;
+      };
+
       const clientWithCache: ClientWithCache<
         WithQueryHooks<Client, UseQueryFnName, UseMutationFnName>
       > = {
         ...returnClient,
-
-        // wrap all query functions in `queryClient.ensureQueryData`
         withEnsureQueryData: (): ClientWithCache<
           WithQueryHooks<Client, UseQueryFnName, UseMutationFnName>
         > => {
-          if (cachedClientsByFnNameLookup.has("withEnsureQueryData")) {
-            return cachedClientsByFnNameLookup.get("withEnsureQueryData")!;
-          }
-          const wrappedQueries = {} as QueryFnsRecord<Client, UseQueryFnName>;
-
-          callableQueryFnNames.forEach((queryFnName: UseQueryFnName) => {
-            const clientFunction = client[queryFnName as UseQueryFnName];
-            if (typeof clientFunction === "function") {
-              const boundClientFunction = clientFunction.bind(client);
-              const wrappedQuery = async (
-                params: ClientFnFirstParameter<Client, UseQueryFnName>,
-              ) => {
-                const data = await queryClient.ensureQueryData<
-                  ClientFnReturnType<Client, UseQueryFnName>
-                >({
-                  queryKey: queryKeyBuilders[queryFnName](params),
-                  queryFn: boundClientFunction,
-                });
-                return data;
-              };
-
-              // @ts-expect-error This is safe
-              wrappedQueries[queryFnName] = wrappedQuery;
-            }
-          });
-
-          const withEnsureQueryDataClient = {
-            ...clientWithCache,
-            ...wrappedQueries,
-          };
-          cachedClientsByFnNameLookup.set(
-            "withEnsureQueryData",
-            withEnsureQueryDataClient,
-          );
-          return withEnsureQueryDataClient;
+          return getWrappedQueryFns("ensureQueryData");
+        },
+        withFetchQuery: (): ClientWithCache<
+          WithQueryHooks<Client, UseQueryFnName, UseMutationFnName>
+        > => {
+          return getWrappedQueryFns("fetchQuery");
         },
       };
 
-      cachedClientsLookup.set(queryClient, clientWithCache);
       return clientWithCache;
     },
   };

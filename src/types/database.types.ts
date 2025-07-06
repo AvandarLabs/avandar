@@ -450,7 +450,14 @@ export type Database = {
           p_full_name: string
           p_display_name: string
         }
-        Returns: string
+        Returns: {
+          created_at: string
+          id: string
+          name: string
+          owner_id: string
+          slug: string
+          updated_at: string
+        }
       }
       util__auth_user_is_workspace_admin: {
         Args: { workspace_id: string }

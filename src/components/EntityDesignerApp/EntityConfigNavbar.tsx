@@ -1,7 +1,7 @@
 import { Box, BoxProps, Loader, useMantineTheme } from "@mantine/core";
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
-import { useCurrentWorkspace } from "@/lib/hooks/workspaces/useCurrentWorkspace";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
 import { EntityConfig } from "@/models/EntityConfig/types";
 

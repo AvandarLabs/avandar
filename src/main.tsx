@@ -10,7 +10,7 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { StrictMode, useMemo } from "react";
 import { createRoot } from "react-dom/client";
-import { useCurrentUser } from "./lib/hooks/auth/useCurrentUser";
+import { useAuth } from "./lib/hooks/auth/useAuth";
 import { RootRouteContext } from "./lib/types/RootRouteContext";
 import { routeTree } from "./routeTree.gen";
 
@@ -37,7 +37,7 @@ declare module "@tanstack/react-router" {
 
 // eslint-disable-next-line react-refresh/only-export-components
 function MainWrapper() {
-  const user = useCurrentUser(router);
+  const { user } = useAuth(router);
   const context: RootRouteContext = useMemo(() => {
     return { user, queryClient };
   }, [user]);

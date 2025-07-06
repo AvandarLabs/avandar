@@ -1,7 +1,6 @@
 import { Container, Loader, Stack, Text, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
-import { useCurrentWorkspace } from "@/lib/hooks/workspaces/useCurrentWorkspace";
-import { Logger } from "@/lib/Logger";
+import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug/")({
   component: WorkspaceHomePage,
@@ -9,12 +8,11 @@ export const Route = createFileRoute("/_auth/$workspaceSlug/")({
 
 function WorkspaceHomePage() {
   const { user } = Route.useRouteContext();
-  const workspace = useCurrentWorkspace();
-
-  Logger.log("loaded workspace", workspace);
 
   // get the workspace slug from params
   const workspaceSlug = Route.useParams().workspaceSlug;
+
+  const [userProfile, isLoadingUserProfile] = useCurrentUserProfile();
 
   if (!user) {
     return <Loader />;
@@ -23,7 +21,12 @@ function WorkspaceHomePage() {
   return (
     <Container ta="left" my="xxxl">
       <Stack>
-        <Title order={1}>Welcome back {user.email}</Title>
+        <Title order={1}>
+          Welcome back{" "}
+          {isLoadingUserProfile ?
+            <Loader ml="xs" />
+          : userProfile.displayName}
+        </Title>
         <Text>Welcome to your workspace: {workspaceSlug}.</Text>
       </Stack>
     </Container>

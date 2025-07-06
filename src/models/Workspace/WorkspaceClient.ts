@@ -14,9 +14,9 @@ export const WorkspaceClient = createSupabaseCRUDClient({
     return {
       getWorkspacesOfCurrentUser: async (): Promise<Workspace[]> => {
         const logger = clientLogger.appendName("getWorkspacesOfCurrentUser");
-        logger.log("Getting workspaces of current user");
-        const session = await AuthClient.getCurrentSession();
+        logger.log("Calling getWorkspacesOfCurrentUser");
 
+        const session = await AuthClient.getCurrentSession();
         if (!session?.user) {
           logger.error("Could not get workspaces of an unauthenticated user.");
           return [];
@@ -29,7 +29,8 @@ export const WorkspaceClient = createSupabaseCRUDClient({
           .throwOnError();
         const workspaces = memberships.map(getProp("workspace"));
 
-        logger.log("Found workspaces for current user", workspaces);
+        logger.log("Found user workspaces", workspaces);
+
         return workspaces.map((workspace) => {
           return parsers.fromDBReadToModelRead(workspace);
         });
@@ -37,21 +38,20 @@ export const WorkspaceClient = createSupabaseCRUDClient({
     };
   },
 
-  mutations: ({ clientLogger, dbClient }) => {
+  mutations: ({ clientLogger, dbClient, parsers }) => {
     return {
       createWorkspaceWithOwner: async (params: {
         workspaceName: string;
         workspaceSlug: string;
         ownerName: string;
         ownerDisplayName: string;
-      }): Promise<WorkspaceId> => {
+      }): Promise<Workspace> => {
         const logger = clientLogger.appendName("createWorkspaceWithOwner");
         logger.log("Creating workspace with owner", params);
 
         const { workspaceName, workspaceSlug, ownerName, ownerDisplayName } =
           params;
-
-        const { data: workspaceId } = await dbClient
+        const { data: workspace } = await dbClient
           .rpc("rpc_workspaces__create_with_owner", {
             p_workspace_name: workspaceName,
             p_workspace_slug: workspaceSlug,
@@ -60,7 +60,9 @@ export const WorkspaceClient = createSupabaseCRUDClient({
           })
           .throwOnError();
 
-        return workspaceId as WorkspaceId;
+        logger.log("Successfully created workspace", workspace);
+
+        return parsers.fromDBReadToModelRead(workspace);
       },
 
       addMember: async (params: {
@@ -69,7 +71,9 @@ export const WorkspaceClient = createSupabaseCRUDClient({
         role: WorkspaceRole;
       }) => {
         const logger = clientLogger.appendName("addMember");
+
         logger.log("Adding member to workspace", params);
+
         const { workspaceId, userId, role } = params;
         // TODO(jpsyx): also need to add user_profiles and user_roles row
         await dbClient

@@ -10,3 +10,12 @@ export type User = Merge<
     id: UserId;
   }
 >;
+
+export type UserProfile = {
+  id: UserId;
+  email: string;
+  fullName: string;
+  displayName: string;
+  createdAt: Date;
+  updatedAt: Date;
+};

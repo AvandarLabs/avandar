@@ -37,6 +37,16 @@ export const AppLinks = {
     label: "Update password",
   },
 
+  // Workspace root link
+  workspaceHome: (workspaceSlug: string) => {
+    return {
+      key: "workspace-home",
+      to: "/$workspaceSlug",
+      params: { workspaceSlug },
+      label: "Workspace Home",
+    };
+  },
+
   // Profile links
   profile: (workspaceSlug: string) => {
     return {

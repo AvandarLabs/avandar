@@ -1,7 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { AppLayout } from "@/components/AppLayout";
 import { AppLinks } from "@/config/AppLinks";
-import { where } from "@/lib/utils/filters/filterBuilders";
 import { propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { Workspace } from "@/models/Workspace/types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
@@ -11,14 +10,9 @@ export const Route = createFileRoute("/_auth/$workspaceSlug")({
   loader: async ({ params, context }): Promise<Workspace> => {
     const { queryClient } = context;
     const { workspaceSlug } = params;
-
-    // use `ensureQueryData` so that we can load workspace immediately
-    // if it's in the cache, even if the data is stale.
-    // `useQuery` (which is called by our React components) will then
-    // handle refetching if the data is indeed stale
     const workspaces = await WorkspaceClient.withCache(queryClient)
-      .withEnsureQueryData()
-      .getAll(where("slug", "eq", workspaceSlug));
+      .withFetchQuery()
+      .getWorkspacesOfCurrentUser();
     const workspaceToLoad = workspaces.find(propEquals("slug", workspaceSlug));
     if (!workspaceToLoad) {
       throw redirect({ to: AppLinks.invalidWorkspace.to });

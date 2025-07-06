@@ -11,7 +11,7 @@ import { AuthClient } from "@/clients/AuthClient";
  *
  * @returns The current user or undefined if the user is not authenticated
  */
-export function useCurrentUser(router: AnyRouter): User | undefined {
+export function useAuth(router: AnyRouter): { user: User | undefined } {
   const [user, setUser] = useState<User | undefined>(undefined);
 
   useEffect(() => {
@@ -35,5 +35,5 @@ export function useCurrentUser(router: AnyRouter): User | undefined {
     };
   }, [router]);
 
-  return user;
+  return { user };
 }

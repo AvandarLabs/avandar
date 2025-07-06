@@ -2,7 +2,7 @@ import { Box, Collapse, Group, Text, UnstyledButton } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
 import { clsx } from "clsx";
 import { ReactNode } from "react";
-import { useToggleBoolean } from "@/lib/hooks/useToggleBoolean";
+import { useToggleBoolean } from "@/lib/hooks/state/useToggleBoolean";
 
 type Props = {
   children: ReactNode;

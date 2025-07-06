@@ -1,8 +1,8 @@
 import { useUncontrolled } from "@mantine/hooks";
 import { useCallback, useMemo } from "react";
 import { match } from "ts-pattern";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
-import { useCurrentWorkspace } from "@/lib/hooks/workspaces/useCurrentWorkspace";
 import { Select, SelectOptionGroup, SelectProps } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { where } from "@/lib/utils/filters/filterBuilders";

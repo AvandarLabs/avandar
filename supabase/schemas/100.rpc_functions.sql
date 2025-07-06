@@ -68,26 +68,26 @@ create or replace function public.rpc_workspaces__create_with_owner(
   p_full_name text,
   p_display_name text
 )
-returns uuid as $$
+returns public.workspaces as $$
   declare
     v_owner_id uuid := auth.uid();
-    v_workspace_id uuid;
+    v_workspace public.workspaces;
   begin
     -- Create the workspace
     insert into public.workspaces (owner_id, name, slug)
       values (v_owner_id, p_workspace_name, p_workspace_slug)
-      returning id into v_workspace_id;
+      returning * into v_workspace;
 
     -- Call the rpc function to create the workspace membership and user profile
     perform public.rpc_workspaces__add_user(
-      v_workspace_id,
+      v_workspace.id,
       v_owner_id,
       p_full_name,
       p_display_name,
       'admin'
     );
 
-    return v_workspace_id;
+    return v_workspace;
   end;
 $$
 language plpgsql
@@ -99,4 +99,4 @@ comment on function public.rpc_workspaces__create_with_owner(
   p_display_name text
 ) is
   'Creates a new workspace and assigns the current user as the owner. '
-  'Returns the workspace ID.';
+  'Returns the created workspace.';

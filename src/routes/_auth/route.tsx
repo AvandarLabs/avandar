@@ -10,6 +10,9 @@ export const Route = createFileRoute("/_auth")({
    * logged in. If not, redirect to the `/signin` page.
    */
   beforeLoad: async ({ location }) => {
+    // The `user` in the root context in main.tsx is not set yet
+    // in the initial load, so we need to call AuthClient directly
+    // to check if the user is authenticated.
     const session = await AuthClient.getCurrentSession();
     if (!session?.user) {
       throw redirect({

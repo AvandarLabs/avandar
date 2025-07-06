@@ -18,6 +18,7 @@ import {
   HookableClient,
   ModelCRUDClient,
 } from "../ModelCRUDClient";
+import { withSupabaseClient } from "../withSupabaseClient";
 
 /** The maximum page size configured in Supabase */
 const MAXIMUM_PAGE_SIZE = 1000;
@@ -277,19 +278,14 @@ export function createSupabaseCRUDClient<
     },
   });
 
-  return {
-    setDBClient: (
-      newDBClient: SupabaseClient<Database>,
-    ): SupabaseCRUDClient<
+  return withSupabaseClient(
+    modelClient as SupabaseCRUDClient<
       M,
       ExtendedQueriesClient,
       ExtendedMutationsClient
-    > => {
-      return createSupabaseCRUDClient({
-        ...options,
-        dbClient: newDBClient,
-      });
+    >,
+    (newDBClient: SupabaseClient<Database>) => {
+      return createSupabaseCRUDClient({ ...options, dbClient: newDBClient });
     },
-    ...modelClient,
-  };
+  );
 }

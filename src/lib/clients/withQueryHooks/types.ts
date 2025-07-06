@@ -209,6 +209,20 @@ export type ClientWithCache<
   /**
    * Return a new client with all query functions wrapped in
    * `queryClient.ensureQueryData()`.
+   *
+   * `ensureQueryData` will always return data if it exists
+   * in the cache, even if the data is stale. Data will only
+   * be refetched if the query does not exist in the cache.
    */
   withEnsureQueryData: () => ClientWithCache<ClientWithQueries>;
+
+  /**
+   * Return a new client with all query functions wrapped in
+   * `queryClient.fetchQuery()`.
+   *
+   * `fetchQuery` will return data from the cache **only**
+   * if the query has not been invalidated and the data is not
+   * stale. Otherwise it will refetch.
+   */
+  withFetchQuery: () => ClientWithCache<ClientWithQueries>;
 };
