@@ -8,9 +8,9 @@ create table public.value_extractors__dataset_column_value (
 
   -- Workspace this value extractor config belongs to
   workspace_id uuid not null
-      references public.workspaces(id)
-      on update cascade
-      on delete cascade,
+    references public.workspaces(id)
+    on update cascade
+    on delete cascade,
 
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
@@ -29,9 +29,9 @@ create table public.value_extractors__manual_entry (
 
   -- Workspace this value extractor config belongs to
   workspace_id uuid not null
-      references public.workspaces(id)
-      on update cascade
-      on delete cascade,
+    references public.workspaces(id)
+    on update cascade
+    on delete cascade,
 
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
@@ -47,9 +47,9 @@ create table public.value_extractors__aggregation (
 
   -- Workspace this value extractor config belongs to
   workspace_id uuid not null
-      references public.workspaces(id)
-      on update cascade
-      on delete cascade,
+    references public.workspaces(id)
+    on update cascade
+    on delete cascade,
 
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
@@ -73,65 +73,65 @@ alter table public.value_extractors__aggregation enable row level security;
 create policy "User can SELECT value_extractors__dataset_column_value"
   on public.value_extractors__dataset_column_value for select
   to authenticated
-  using (true);
+  using (public.util__auth_user_is_workspace_member(workspace_id));
 
 create policy "User can SELECT value_extractors__manual_entry"
   on public.value_extractors__manual_entry for select
   to authenticated
-  using (true);
+  using (public.util__auth_user_is_workspace_member(workspace_id));
 
 create policy "User can SELECT value_extractors__aggregation"
   on public.value_extractors__aggregation for select
   to authenticated
-  using (true);
+  using (public.util__auth_user_is_workspace_member(workspace_id));
 
 -- `insert` policies
 create policy "User can INSERT value_extractors__dataset_column_value"
   on public.value_extractors__dataset_column_value for insert
   to authenticated
-  with check (true);
+  with check (public.util__auth_user_is_workspace_member(workspace_id));
 
 create policy "User can INSERT value_extractors__manual_entry"
   on public.value_extractors__manual_entry for insert
   to authenticated
-  with check (true);
+  with check (public.util__auth_user_is_workspace_member(workspace_id));
 
 create policy "User can INSERT value_extractors__aggregation"
   on public.value_extractors__aggregation for insert
   to authenticated
-  with check (true);
+  with check (public.util__auth_user_is_workspace_member(workspace_id));
 
 -- `update` policies
 create policy "User can UPDATE value_extractors__dataset_column_value"
   on public.value_extractors__dataset_column_value for update
   to authenticated
-  with check (true);
+  with check (public.util__auth_user_is_workspace_member(workspace_id));
 
 create policy "User can UPDATE value_extractors__manual_entry"
   on public.value_extractors__manual_entry for update
   to authenticated
-  with check (true);
+  with check (public.util__auth_user_is_workspace_member(workspace_id));
 
 create policy "User can UPDATE value_extractors__aggregation"
   on public.value_extractors__aggregation for update
   to authenticated
-  with check (true);
+  with check (public.util__auth_user_is_workspace_member(workspace_id));
 
 -- `delete` policies
 create policy "User can DELETE value_extractors__dataset_column_value"
   on public.value_extractors__dataset_column_value for delete
   to authenticated
-  using (true);
+  using (public.util__auth_user_is_workspace_member(workspace_id));
 
 create policy "User can DELETE value_extractors__manual_entry"
   on public.value_extractors__manual_entry for delete
   to authenticated
-  using (true);
+  using (public.util__auth_user_is_workspace_member(workspace_id));
 
 create policy "User can DELETE value_extractors__aggregation"
   on public.value_extractors__aggregation for delete
   to authenticated
-  using(true);
+  using (public.util__auth_user_is_workspace_member(workspace_id));
 
 -- Create updated_at triggers
 create trigger tr_value_extractors__dataset_column_value_set_updated_at

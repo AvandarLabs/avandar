@@ -7,15 +7,16 @@
  * is no package.json script to call it. It should typically run as
  * part of `resetDatabaseScript.sh` through the `yarn db:reset` command.
  */
-import { SEED_DATA, SEED_JOBS } from "../../seed/SeedConfig";
+import { SeedData } from "../../seed/SeedData";
+import { SeedJobs } from "../../seed/SeedJobs";
 import { SeedRunner } from "./SeedRunner";
 
 async function main(): Promise<void> {
   console.log("Initializing the database seed runner");
 
   const runner = new SeedRunner({
-    data: SEED_DATA,
-    jobs: SEED_JOBS,
+    data: SeedData,
+    jobs: SeedJobs,
   });
 
   console.log("Seeding database...");

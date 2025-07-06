@@ -27,13 +27,15 @@ export function WorkspaceAppLayout(): JSX.Element {
     });
   }, [workspace.slug, entityConfigs]);
 
-  const navbarLinks = [
-    NavbarLinks.home,
-    NavbarLinks.dataManagerHome(workspace.slug),
-    NavbarLinks.dataExplorer(workspace.slug),
-    NavbarLinks.entityDesignerHome(workspace.slug),
-    ...entityManagerLinks,
-  ];
+  const navbarLinks = useMemo(() => {
+    return [
+      NavbarLinks.home,
+      NavbarLinks.dataManagerHome(workspace.slug),
+      NavbarLinks.dataExplorer(workspace.slug),
+      NavbarLinks.entityDesignerHome(workspace.slug),
+      ...entityManagerLinks,
+    ];
+  }, [workspace.slug, entityManagerLinks]);
 
   const profileLink = useMemo(() => {
     return AppLinks.profile(workspace.slug);

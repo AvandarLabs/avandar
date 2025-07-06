@@ -10,9 +10,9 @@ create table public.entity_field_configs (
 
   -- Workspace this entity field config belongs to
   workspace_id uuid not null
-      references public.workspaces(id)
-      on update cascade
-      on delete cascade,
+    references public.workspaces(id)
+    on update cascade
+    on delete cascade,
 
   entity_config_id uuid not null
     references entity_configs(id)
@@ -53,25 +53,25 @@ create table public.entity_field_configs (
 alter table public.entity_field_configs enable row level security;
 
 -- Policies: entity_field_configs
-create policy "User/not all can see entity_field_configs"
+create policy "User can SELECT entity_field_configs"
   on public.entity_field_configs for select
   to authenticated
-  using (true);
+  using (public.util__auth_user_is_workspace_member(workspace_id));
 
 create policy "User can INSERT entity_field_configs"
   on public.entity_field_configs for insert
   to authenticated
-  with check (true);
+  with check (public.util__auth_user_is_workspace_member(workspace_id));
 
 create policy "User can UPDATE entity_field_configs"
   on public.entity_field_configs for update
   to authenticated 
-  with check (true);
+  with check (public.util__auth_user_is_workspace_member(workspace_id));
 
 create policy "User can DELETE entity_field_configs"
   on public.entity_field_configs for delete
   to authenticated
-  using (true);
+  using (public.util__auth_user_is_workspace_member(workspace_id));
 
 -- Trigger: update `updated_at` on row modification
 create trigger tr_entity_field_config__set_updated_at

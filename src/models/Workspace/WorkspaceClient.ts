@@ -51,6 +51,9 @@ export const WorkspaceClient = createSupabaseCRUDClient({
 
         const { workspaceName, workspaceSlug, ownerName, ownerDisplayName } =
           params;
+
+        // creating a workspace involves many database operations, so we use a
+        // stored procedure to handle it
         const { data: workspace } = await dbClient
           .rpc("rpc_workspaces__create_with_owner", {
             p_workspace_name: workspaceName,
@@ -69,21 +72,26 @@ export const WorkspaceClient = createSupabaseCRUDClient({
         workspaceId: WorkspaceId;
         userId: UserId;
         role: WorkspaceRole;
-      }) => {
+      }): Promise<void> => {
         const logger = clientLogger.appendName("addMember");
 
         logger.log("Adding member to workspace", params);
 
         const { workspaceId, userId, role } = params;
-        // TODO(jpsyx): also need to add user_profiles and user_roles row
+
+        // adding a member to a workspace involves many database operations,
+        // so we use a stored procedure to handle it
         await dbClient
-          .from("workspace_memberships")
-          .insert({
-            workspace_id: workspaceId,
-            user_id: userId,
-            role,
+          .rpc("rpc_workspaces__add_user", {
+            p_workspace_id: workspaceId,
+            p_user_id: userId,
+            p_full_name: "",
+            p_display_name: "",
+            p_user_role: role,
           })
           .throwOnError();
+
+        logger.log("Successfully added member to workspace");
       },
     };
   },

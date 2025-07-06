@@ -1,4 +1,5 @@
 -- Function: add a user to an existing workspace
+-- Returns the workspace membership ID
 create or replace function public.rpc_workspaces__add_user(
   p_workspace_id uuid,
   p_user_id uuid,
@@ -58,7 +59,7 @@ comment on function public.rpc_workspaces__add_user(
   p_user_role text
 ) is
   'Adds a user to an existing workspace with the given role. '
-  'Returns the workspace ID. '
+  'Returns the workspace membership ID. '
   'The requesting user must be an admin of the workspace.';
 
 -- Function: create a new workspace and assign the current user as the owner. Returns the workspace ID.

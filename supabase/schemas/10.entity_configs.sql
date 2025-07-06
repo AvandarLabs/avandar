@@ -11,9 +11,9 @@ create table public.entity_configs (
   
   -- Workspace this entity config belongs to
   workspace_id uuid not null
-      references public.workspaces(id)
-      on update cascade
-      on delete cascade,
+    references public.workspaces(id)
+    on update cascade
+    on delete cascade,
 
   -- Name of the entity config
   name text not null,
@@ -56,22 +56,22 @@ alter table public.entity_configs enable row level security;
 create policy "User can SELECT entity_configs"
   on public.entity_configs for select
   to authenticated
-  using (auth.uid() = public.entity_configs.owner_id);
+  using (public.util__auth_user_is_workspace_member(workspace_id));
 
 create policy "User can INSERT entity_configs"
   on public.entity_configs for insert
   to authenticated
-  with check (auth.uid() = public.entity_configs.owner_id);
+  with check (public.util__auth_user_is_workspace_member(workspace_id));
 
 create policy "User can UPDATE entity_configs"
   on public.entity_configs for update
   to authenticated
-  with check (auth.uid() = public.entity_configs.owner_id);
+  with check (public.util__auth_user_is_workspace_member(workspace_id));
 
 create policy "User can DELETE entity_configs"
   on public.entity_configs for delete
   to authenticated
-  using (auth.uid() = public.entity_configs.owner_id);
+  using (public.util__auth_user_is_workspace_member(workspace_id));
 
 -- Trigger: update `updated_at` on row modification
 create trigger tr_entity_config__set_updated_at
