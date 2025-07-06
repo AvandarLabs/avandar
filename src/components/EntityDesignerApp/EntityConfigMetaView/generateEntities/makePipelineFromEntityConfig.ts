@@ -126,6 +126,7 @@ export function makePipelineFromEntityConfig(
           fieldsToWrite: [
             { name: "id", dataType: "string" },
             { name: "externalId", dataType: "string" },
+            { name: "workspaceId", dataType: "string" },
             { name: "name", dataType: "string" },
             { name: "entityConfigId", dataType: "string" },
             { name: "assignedTo", dataType: "string" },

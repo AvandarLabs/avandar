@@ -35,7 +35,6 @@ export type EntityFieldValueNativeType =
 
 export type EntityFieldValue = {
   id: UUID<"EntityFieldValue">;
-  workspaceId: WorkspaceId;
   entityId: EntityId;
   entityFieldConfigId: EntityFieldConfigId;
   value?: EntityFieldValueNativeType;

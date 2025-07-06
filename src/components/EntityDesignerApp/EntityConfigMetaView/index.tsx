@@ -45,7 +45,7 @@ const ENTITY_CONFIG_RENDER_OPTIONS: ChildRenderOptionsMap<
 export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
-  const [sendDelete, isDeletePending] = EntityConfigClient.useDelete({
+  const [sendDelete, isDeletePending] = EntityConfigClient.useFullDelete({
     invalidateGetAllQuery: true,
   });
 
