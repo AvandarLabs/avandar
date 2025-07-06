@@ -39,6 +39,7 @@ const ASIDE_DEFAULT_WIDTH = 300;
 const NAVBAR_DEFAULT_WIDTH = 220;
 
 type Props = {
+  title?: string;
   headerHeight?: number;
   footerHeight?: number;
   asideWidth?: number;
@@ -64,6 +65,7 @@ export function AppShell({
   footerHeight = FOOTER_DEFAULT_HEIGHT,
   asideWidth = ASIDE_DEFAULT_WIDTH,
   navbarWidth = NAVBAR_DEFAULT_WIDTH,
+  title,
   profileLink,
   spotlightActions,
   navbarLinks,
@@ -94,7 +96,7 @@ export function AppShell({
       src={`/${AppConfig.logoFilename}`}
       className="logo"
       alt="Logo"
-      width={40}
+      width={28}
     />
   );
 
@@ -129,12 +131,15 @@ export function AppShell({
                 hiddenFrom="sm"
               />
               {logo}
+              <Title order={2} size="md" textWrap="nowrap">
+                {title ?? AppConfig.appName}
+              </Title>
             </Group>
           </MantineAppShell.Header>
         : null}
 
         <MantineAppShell.Navbar style={$navbarBorder}>
-          <Group px="md" py="sm" justify="center">
+          <Group px="md" py="sm" wrap="nowrap">
             <Burger
               opened={isNavbarOpened}
               onClick={toggleNavbar}
@@ -144,10 +149,12 @@ export function AppShell({
             <Menu shadow="md" width={200}>
               <Menu.Target>
                 <UnstyledButton>
-                  <Group gap="xs">
+                  <Group wrap="nowrap" gap="xs">
                     {logo}
-                    <Title order={2}>{AppConfig.appName}</Title>
-                    <IconChevronDown />
+                    <Title order={2} size="md" textWrap="nowrap">
+                      {title ?? AppConfig.appName}
+                    </Title>
+                    <IconChevronDown size={18} />
                   </Group>
                 </UnstyledButton>
               </Menu.Target>

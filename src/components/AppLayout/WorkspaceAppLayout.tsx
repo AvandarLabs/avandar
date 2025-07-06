@@ -8,15 +8,15 @@ import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { useSpotlightActions } from "./useSpotlightActions";
 
 export function WorkspaceAppLayout(): JSX.Element {
-  const { slug: workspaceSlug, id: workspaceId } = useCurrentWorkspace();
+  const workspace = useCurrentWorkspace();
   const [entityConfigs] = EntityConfigClient.useGetAll(
-    where("workspace_id", "eq", workspaceId),
+    where("workspace_id", "eq", workspace.id),
   );
-  const spotlightActions = useSpotlightActions(workspaceSlug);
+  const spotlightActions = useSpotlightActions(workspace.slug);
   const entityManagerLinks: NavbarLink[] = useMemo(() => {
     return (entityConfigs ?? []).map((entityConfig) => {
       const navLink = NavbarLinks.entityManagerHome({
-        workspaceSlug: workspaceSlug,
+        workspaceSlug: workspace.slug,
         entityConfigId: entityConfig.id,
         entityConfigName: entityConfig.name,
       });
@@ -25,22 +25,23 @@ export function WorkspaceAppLayout(): JSX.Element {
         icon: navLink.icon,
       };
     });
-  }, [workspaceSlug, entityConfigs]);
+  }, [workspace.slug, entityConfigs]);
 
   const navbarLinks = [
     NavbarLinks.home,
-    NavbarLinks.dataManagerHome(workspaceSlug),
-    NavbarLinks.dataExplorer(workspaceSlug),
-    NavbarLinks.entityDesignerHome(workspaceSlug),
+    NavbarLinks.dataManagerHome(workspace.slug),
+    NavbarLinks.dataExplorer(workspace.slug),
+    NavbarLinks.entityDesignerHome(workspace.slug),
     ...entityManagerLinks,
   ];
 
   const profileLink = useMemo(() => {
-    return AppLinks.profile(workspaceSlug);
-  }, [workspaceSlug]);
+    return AppLinks.profile(workspace.slug);
+  }, [workspace.slug]);
 
   return (
     <AppShell
+      title={workspace.name}
       profileLink={profileLink}
       navbarLinks={navbarLinks}
       spotlightActions={spotlightActions}

@@ -17,10 +17,10 @@ This document outlines the step-by-step changes required to implement multi-tena
 
 ### 2.3 Sign-In Flow Changes
 
-- [ ] When a user logs in, they should be taken to the first workspace page of their workspace list
-- [ ] "Welcome to your first workspace" page should be impossible for them to reach.
+- [x] When a user logs in, they should be taken to the first workspace page of their workspace list
+- [x] "Welcome to your first workspace" page should be impossible for them to reach.
 - [ ] When user clicks "Create new workspace" this should open a modal now instead.
-- [ ] Going to the root URL (previously "Welcome to your first workspace") should now redirect user to the first workspace of their workspace list.
+- [x] Going to the root URL (previously "Welcome to your first workspace") should now redirect user to the first workspace of their workspace list.
 - [ ] Future: Add ability to maintain multiple authenticated sessions (different email accounts) simultaneously
 - [ ] Future: allow switching between workspaces from different authenticated sessions
 
@@ -40,10 +40,10 @@ This document outlines the step-by-step changes required to implement multi-tena
 
 ### 3.2 Object creation
 
-- [ ] All local datasets should be linked to a workspace
+- [x] All local datasets should be linked to a workspace
 - [ ] Only show local datasets that relate to this workspace
-- [ ] All entity profile configs should be linked to a workspace
-- [ ] All entity instances and field values should be linked to a workspace
+- [x] All entity profile configs should be linked to a workspace
+- [x] All entity instances and field values should be linked to a workspace
 - [ ] Entities should only be viewable according to our workspace
 - [ ] Entity profile configs should only be viewable according to our workspace
 
@@ -106,15 +106,7 @@ This document outlines the step-by-step changes required to implement multi-tena
 - [ ] Create `useWorkspacePermissions` hook in `src/lib/hooks/auth/useWorkspacePermissions.ts`
 - [ ] Implement UI permission checks using this hook
 
-## 8. Data Migration
-
-### 8.1 Migration Scripts
-
-- [ ] Create a migration script to move existing data to the multi-tenant schema
-- [ ] Create a default workspace for existing users
-- [ ] Associate all existing data with the default workspace
-
-### 8.2 Seed Script Updates
+### 8. Seed Script Updates
 
 - [ ] Update `seed/seedJobs.ts` to include workspace context
 - [ ] Update `seed/SeedConfig.ts` to support seeding multiple workspaces
@@ -142,23 +134,3 @@ This document outlines the step-by-step changes required to implement multi-tena
 
 - [ ] Create user guides for workspace management
 - [ ] Document how to switch between workspaces
-
-## 11. Deployment Considerations
-
-### 11.1 Database Migrations
-
-- [ ] Plan a safe migration strategy for the production database
-
-### 11.2 Feature Flags
-
-- [ ] Consider implementing feature flags in `src/config/featureFlags.ts` for gradual rollout
-
-## 12. Performance Considerations
-
-### 12.1 Indexing
-
-- [ ] Add appropriate indexes on `workspace_id` columns for performance
-
-### 12.2 Caching
-
-- [ ] Update caching strategies in `src/lib/hooks/query/useQuery.ts` to include workspace context in cache keys
