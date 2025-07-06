@@ -31,7 +31,9 @@ type ClientFnReturnType<
 
 /**
  * Augments an object with `use` hooks that wrap any specified functions
- * with `useQuery` or `useMutation`.
+ * with `useQuery` or `useMutation`. This hook is intended to augment clients
+ * whose functions return promises, such as those that interact with an API,
+ * such as a database or a REST API.
  *
  * @param client The client to add query hooks to.
  * @param options.queryFns The query functions to add hooks for.
