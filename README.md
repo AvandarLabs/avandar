@@ -13,10 +13,10 @@
 
 1. Clone this repo
 
-2. Initiate a local instance of Supabase
+2. Initiate a local instance of Supabase (you need to have installed Supabase CLI for this)
 
 ```bash
-npx supabase start
+supabase start
 ```
 
 You should be able to access your local Supabase Studio at a URL provided
