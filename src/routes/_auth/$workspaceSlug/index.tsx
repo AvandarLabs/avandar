@@ -15,7 +15,7 @@ function WorkspaceHomePage() {
   }
 
   return (
-    <Container ta="left" my="xxxl">
+    <Container ta="left" py="xxxl">
       <Stack>
         <Title order={1}>
           Welcome back
