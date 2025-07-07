@@ -10,7 +10,7 @@
 # project root directory)
 
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
-PROJECT_ROOT=$SCRIPT_DIR/../../
+PROJECT_ROOT=$SCRIPT_DIR/../
 
 # Parse command line arguments
 SKIP_SEED=false

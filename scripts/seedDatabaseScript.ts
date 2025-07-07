@@ -7,8 +7,8 @@
  * is no package.json script to call it. It should typically run as
  * part of `resetDatabaseScript.sh` through the `yarn db:reset` command.
  */
-import { SeedData } from "../../seed/SeedData";
-import { SeedJobs } from "../../seed/SeedJobs";
+import { SeedData } from "../seed/SeedData";
+import { SeedJobs } from "../seed/SeedJobs";
 import { SeedRunner } from "./SeedRunner";
 
 async function main(): Promise<void> {

@@ -35,5 +35,13 @@
     "experimentalDecorators": true,
     "resolveJsonModule": true
   },
-  "include": ["src", "scripts/lib", "seed"]
+  "include": [
+    "src",
+    "scripts/lib",
+    "seed",
+    "scripts/SeedRunner.ts",
+    "scripts/seedDatabaseScript.ts",
+    "scripts/ScriptsUtil.ts",
+    "scripts/createUserScript.ts"
+  ]
 }

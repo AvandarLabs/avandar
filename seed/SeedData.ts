@@ -1,5 +1,5 @@
 import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/types";
-import type { GenericSeedData } from "../scripts/lib/SeedRunner";
+import type { GenericSeedData } from "../scripts/SeedRunner";
 
 export const TEST_USER_EMAIL = "user@avandarlabs.com";
 export const TEST_WORKSPACE_SLUG = "avandar-labs";

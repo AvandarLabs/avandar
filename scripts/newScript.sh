@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
-PROJECT_ROOT=$SCRIPT_DIR/../../
+PROJECT_ROOT=$SCRIPT_DIR/../
 
 usage() {
   echo "Usage:"
@@ -26,7 +26,7 @@ cat > $NEW_FILE << EOL
 #!/bin/bash
 
 SCRIPT_DIR="\$(dirname "\$(realpath "\$0")")"
-PROJECT_ROOT=\$SCRIPT_DIR/../../
+PROJECT_ROOT=\$SCRIPT_DIR/../
 
 usage() {
   echo "Usage:"

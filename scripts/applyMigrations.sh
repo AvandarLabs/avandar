@@ -15,7 +15,7 @@
 
 # Set the project root directory
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
-PROJECT_ROOT=$SCRIPT_DIR/../../
+PROJECT_ROOT=$SCRIPT_DIR/../
 cd $PROJECT_ROOT
 
 # Default value for generating types
