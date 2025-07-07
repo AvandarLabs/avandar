@@ -12,13 +12,8 @@
 ### Set up
 
 1. Clone this repo
-2. Set the SaaS App Template (also developed by Avandar) as the upstream repo
 
-```bash
-git remote add upstream https://github.com/jps327/saas-app-template.git
-```
-
-3. Initiate a local instance of Supabase
+2. Initiate a local instance of Supabase
 
 ```bash
 npx supabase start
@@ -27,7 +22,7 @@ npx supabase start
 You should be able to access your local Supabase Studio at a URL provided
 in the output (most likely `http://localhost:54323`)
 
-4. Set up your environment variables
+3. Set up your environment variables
 
 ```bash
 cp .env.example .env.development
@@ -37,7 +32,7 @@ And then fill in the necessary environment variables. For the Supabase
 variables, you should be able to get that info from the output of having
 started Supabase locally in the prior steps.
 
-5. Set up your local database
+4. Set up your local database
 
 ```bash
 yarn db:reset
@@ -47,7 +42,7 @@ This will reset your Supabase database, apply all local migrations from
 the `supabase/migrations` directory, and then add the seed data from
 `seed/SeedConfig.ts`
 
-6. Start the development server
+5. Start the development server
 
 ```bash
 yarn dev

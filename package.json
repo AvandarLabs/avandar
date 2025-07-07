@@ -10,7 +10,6 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "tsc-watch": "tsc -b --watch",
-    "update-boilerplate": "./scripts/lib/mergeUpstreamAppTemplateChanges.sh",
     "db:apply-migrations": "./scripts/lib/applyMigrations.sh",
     "db:create-user": "yarn vite-script scripts/lib/createUserScript.ts",
     "db:gen-types": "supabase gen types typescript --local > src/types/database.types.ts",
