@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { assert, describe, expect, it } from "vitest";
 import {
   hasDefinedProp,
   hasDefinedProps,
@@ -7,11 +7,14 @@ import {
   isArray,
   isBoolean,
   isDate,
+  isEmptyObject,
   isFunction,
+  isNonEmptyArray,
   isNotUndefined,
   isNull,
   isNullOrUndefined,
   isNumber,
+  isOneOf,
   isPlainObject,
   isPrimitive,
   isString,
@@ -282,5 +285,67 @@ describe("hasDefinedProp", () => {
 
     expect(hasDefinedProp(user, "name")).toBe(false);
     expect(hasDefinedProp(user, "email")).toBe(false);
+  });
+});
+
+describe("assert", () => {
+  it("should throw error if the condition is falsey", () => {
+    expect(() => assert(undefined)).toThrowError();
+    expect(() => assert(false)).toThrowError();
+    expect(() => assert("")).toThrowError();
+    expect(() => assert(null)).toThrowError();
+    expect(() => assert(0)).toThrowError();
+  });
+
+  it("should not throw error if the condition is truthy", () => {
+    expect(() => assert({})).not.toThrowError();
+    expect(() => assert(true)).not.toThrowError();
+    expect(() => assert("abc")).not.toThrowError();
+    expect(() => assert(42)).not.toThrowError();
+  });
+
+  it("throws with custom message", () => {
+    expect(() => assert(false, "Custom error")).toThrow("Custom error");
+  });
+});
+
+describe("isEmptyObject", () => {
+  it("returns true for an empty object", () => {
+    expect(isEmptyObject({})).toBe(true);
+  });
+
+  it("returns false for an object with keys", () => {
+    expect(isEmptyObject({ a: 1 })).toBe(false);
+    expect(isEmptyObject({ b: undefined })).toBe(false);
+  });
+});
+
+describe("isOneOf", () => {
+  it("returns true if value is in the array", () => {
+    expect(isOneOf("a", ["a", "b", "c"])).toBe(true);
+    expect(isOneOf(2, [1, 2, 3])).toBe(true);
+    expect(isOneOf(true, [true, false])).toBe(true);
+  });
+
+  it("returns false if value is not in the array", () => {
+    expect(isOneOf("z", ["a", "b", "c"])).toBe(false);
+    expect(isOneOf(4, [1, 2, 3])).toBe(false);
+    expect(isOneOf(false, [true])).toBe(false);
+  });
+
+  it("returns false if value is of a different type", () => {
+    expect(isOneOf("1", [1, 2, 3])).toBe(false);
+    expect(isOneOf(1, ["1", "2", "3"])).toBe(false);
+  });
+});
+
+describe("isNonEmptyArray", () => {
+  it("returns true for non-empty arrays", () => {
+    expect(isNonEmptyArray([1])).toBe(true);
+    expect(isNonEmptyArray(["a", "b"])).toBe(true);
+  });
+
+  it("returns false for empty arrays", () => {
+    expect(isNonEmptyArray([])).toBe(false);
   });
 });
