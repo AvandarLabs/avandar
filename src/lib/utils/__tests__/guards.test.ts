@@ -135,11 +135,11 @@ describe("isNumber", () => {
   it("returns true for numbers", () => {
     expect(isNumber(0)).toBe(true);
     expect(isNumber(3.14)).toBe(true);
+    expect(isNumber(NaN)).toBe(true);
   });
 
   it("returns false for non-numbers", () => {
     expect(isNumber("123")).toBe(false);
-    expect(isNumber(NaN)).toBe(true); // Still a number
     expect(isNumber(undefined)).toBe(false);
   });
 });
@@ -199,6 +199,14 @@ describe("hasProps", () => {
     expect(hasPropsCheck).toBe(true);
   });
 
+  it("returns true if property is assigned but value is undefined", () => {
+    const obj: { name?: string } = { name: undefined };
+
+    const hasPropsCheck = hasProps(obj, "name");
+
+    expect(hasPropsCheck).toBe(true);
+  });
+
   it("returns false if object is missing required props", () => {
     const obj: { name: string; email?: string } = { name: "John Doe" }; // the optional modifier (?) for 'email' satisfies TypeScript
 
@@ -209,26 +217,25 @@ describe("hasProps", () => {
 });
 
 describe("hasProp", () => {
-  // this typecast satisfies TypeScript for the purpose of this test
-  type User = {
-    id?: number;
-    name?: string;
-    email?: string;
-  };
-
   it("returns true if object has required prop", () => {
-    const obj: User = { id: 123 };
-    expect(hasProp(obj, "id")).toBe(true);
+    const obj = { name: "John Doe", email: "johndoe@gmail.com" };
+    expect(hasProp(obj, "name")).toBe(true);
+    expect(hasProp(obj, "email")).toBe(true);
+  });
+
+  it("returns true if property is assigned but value is undefined", () => {
+    const obj = { name: undefined };
+    expect(hasProp(obj, "name")).toBe(true);
   });
 
   it("returns false if object is missing the required prop", () => {
-    const obj: User = { name: "Alice" };
+    const obj: { name: string; email?: string } = { name: "John Doe" };
     expect(hasProp(obj, "email")).toBe(false);
   });
 
   it("returns false if value is null or undefined", () => {
-    expect(hasProp(null, "id")).toBe(false);
-    expect(hasProp(undefined, "id")).toBe(false);
+    expect(hasProp(null, "name")).toBe(false);
+    expect(hasProp(undefined, "name")).toBe(false);
   });
 });
 
