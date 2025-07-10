@@ -41,11 +41,11 @@ describe("difference", () => {
   });
 });
 
-it("returns true for arrays with same contents in same order", () => {
-  expect(areArrayContentsEqual([1, 2, 3], [1, 2, 3])).toBe(true);
-});
-
 describe("areArrayContentsEqual", () => {
+  it("returns true for arrays with same contents in same order", () => {
+    expect(areArrayContentsEqual([1, 2, 3], [1, 2, 3])).toBe(true);
+  });
+
   it("returns true for arrays with same contents in different order", () => {
     expect(areArrayContentsEqual([1, 2, 3], [3, 2, 1])).toBe(true);
   });
@@ -59,7 +59,9 @@ describe("areArrayContentsEqual", () => {
       areArrayContentsEqual(
         [{ id: 1 }, { id: 2 }],
         [{ id: 2 }, { id: 1 }],
-        (x) => x.id,
+        (x) => {
+          return x.id;
+        },
       ),
     ).toBe(true);
 
@@ -67,7 +69,9 @@ describe("areArrayContentsEqual", () => {
       areArrayContentsEqual(
         [{ id: 1 }, { id: 2, foo: "bar" }],
         [{ id: 2 }, { id: 1, foo: "other value" }],
-        (x) => x.id,
+        (x) => {
+          return x.id;
+        },
       ),
     ).toBe(true);
   });
@@ -77,7 +81,9 @@ describe("areArrayContentsEqual", () => {
       areArrayContentsEqual(
         [{ id: 1 }, { id: 2 }],
         [{ id: 3 }, { id: 1 }],
-        (x) => x.id,
+        (x) => {
+          return x.id;
+        },
       ),
     ).toBe(false);
   });
@@ -90,14 +96,18 @@ describe("areArrayContentsEqual", () => {
 describe("mapToArrayTuple", () => {
   it("returns a tuple of 2 arrays", () => {
     const items = ["a", "b", "c"];
-    const result = mapToArrayTuple(items, (str) => [str, str]);
+    const result = mapToArrayTuple(items, (str) => {
+      return [str, str];
+    });
 
     expect(Array.isArray(result)).toBe(true);
     expect(result.length).toBe(2);
   });
 
   it("returns a tuple of 2 empty arrays", () => {
-    const result = mapToArrayTuple([], () => ["foo", "bar"]);
+    const result = mapToArrayTuple([], () => {
+      return ["foo", "bar"];
+    });
 
     expect(result).toEqual([[], []]);
   });
@@ -105,10 +115,9 @@ describe("mapToArrayTuple", () => {
   it("correctly maps input strings to lengths and repeated strings", () => {
     const input = ["a", "bb", "ccc"];
 
-    const [lengths, repeats] = mapToArrayTuple(input, (str) => [
-      str.length,
-      str + str,
-    ]);
+    const [lengths, repeats] = mapToArrayTuple(input, (str) => {
+      return [str.length, str + str];
+    });
 
     expect(lengths).toEqual([1, 2, 3]);
     expect(repeats).toEqual(["aa", "bbbb", "cccccc"]);
@@ -117,10 +126,9 @@ describe("mapToArrayTuple", () => {
   it("correctly maps input numbers to squared and tests if even", () => {
     const input = [1, 2, 3];
 
-    const [squared, isEven] = mapToArrayTuple(input, (num) => [
-      num * num,
-      num % 2 === 0,
-    ]);
+    const [squared, isEven] = mapToArrayTuple(input, (num) => {
+      return [num * num, num % 2 === 0];
+    });
 
     expect(squared).toEqual([1, 4, 9]);
     expect(isEven).toEqual([false, true, false]);
@@ -169,7 +177,9 @@ describe("removeItemWhere", () => {
   it("removes item from array when id matches predicate", () => {
     const input = [{ id: 1 }, { id: 2 }, { id: 3 }];
 
-    const updated = removeItemWhere(input, (i) => i.id === 2);
+    const updated = removeItemWhere(input, (i) => {
+      return i.id === 2;
+    });
 
     expect(updated).toEqual([{ id: 1 }, { id: 3 }]);
   });
@@ -177,7 +187,9 @@ describe("removeItemWhere", () => {
   it("returns original array if no item matches predicate", () => {
     const input = [{ id: 1 }, { id: 2 }];
 
-    const updated = removeItemWhere(input, (i) => i.id === 99);
+    const updated = removeItemWhere(input, (i) => {
+      return i.id === 99;
+    });
 
     expect(updated).toEqual(input);
   });
@@ -187,7 +199,9 @@ describe("partition", () => {
   it("splits an array of numbers into even and odd groups", () => {
     const input = [1, 2, 3, 4, 5];
 
-    const updated = partition(input, (num) => num % 2 === 0);
+    const updated = partition(input, (num) => {
+      return num % 2 === 0;
+    });
 
     expect(updated).toEqual([
       [2, 4],
@@ -196,7 +210,9 @@ describe("partition", () => {
   });
 
   it("returns two empty arrays when input is an empty array", () => {
-    const result = partition([], () => true);
+    const result = partition([], () => {
+      return true;
+    });
     expect(result).toEqual([[], []]);
     expect(Array.isArray(result)).toBe(true);
     expect(result.length).toBe(2);
