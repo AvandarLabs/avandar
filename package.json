@@ -1,6 +1,6 @@
 {
   "name": "avandar",
-  "license": "AGPL-3.0-or-later",
+  "license": "CPAL-1.0",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,16 +10,16 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "tsc-watch": "tsc -b --watch",
-    "db:apply-migrations": "./scripts/lib/applyMigrations.sh",
-    "db:create-user": "yarn vite-script scripts/lib/createUserScript.ts",
+    "db:apply-migrations": "./scripts/applyMigrations.sh",
+    "db:create-user": "yarn vite-script scripts/createUserScript.ts",
     "db:gen-types": "supabase gen types typescript --local > src/types/database.types.ts",
     "db:new-migration": "supabase stop && supabase db diff -f",
-    "db:reset": "supabase start && ./scripts/lib/resetDatabase.sh",
-    "db:seed": "supabase start && yarn vite-script scripts/lib/seedDatabaseScript.ts",
-    "new:component": "./scripts/lib/newComponent.sh",
-    "new:model": "./scripts/lib/newModel.sh",
-    "new:route": "./scripts/lib/newRoute.sh",
-    "new:script": "./scripts/lib/newScript.sh",
+    "db:reset": "supabase start && ./scripts/resetDatabase.sh",
+    "db:seed": "supabase start && yarn vite-script scripts/seedDatabaseScript.ts",
+    "new:component": "./scripts/newComponent.sh",
+    "new:model": "./scripts/newModel.sh",
+    "new:route": "./scripts/newRoute.sh",
+    "new:script": "./scripts/newScript.sh",
     "vite-script": "vite-node --config ./vite.script.config.ts"
   },
   "dependencies": {
@@ -73,6 +73,8 @@
     "@tanstack/eslint-plugin-router": "^1.114.12",
     "@tanstack/react-router-devtools": "^1.114.27",
     "@tanstack/router-plugin": "^1.114.27",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
     "@types/papaparse": "^5.3.15",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
@@ -89,6 +91,7 @@
     "eslint-plugin-tailwindcss": "^3.18.0",
     "eslint-plugin-unused-imports": "^4.1.4",
     "globals": "^15.15.0",
+    "jsdom": "^26.1.0",
     "postcss": "^8.5.3",
     "postcss-preset-mantine": "^1.17.0",
     "postcss-simple-vars": "^7.0.1",
@@ -101,6 +104,7 @@
     "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0",
     "vite-node": "^3.1.1",
-    "vite-plugin-node-polyfills": "^0.23.0"
+    "vite-plugin-node-polyfills": "^0.23.0",
+    "vitest": "^3.2.4"
   }
 }
