@@ -18,6 +18,11 @@ describe("difference", () => {
     expect(difference([], [])).toEqual([]);
   });
 
+  it("removes duplicates from the first array", () => {
+    const result = difference([1, 2, 2, 2, 3], [2]);
+    expect(result).toEqual([1, 3]);
+  });
+
   it("returns empty array when first array is empty", () => {
     expect(difference([], [1, 2, 3])).toEqual([]);
   });
@@ -36,12 +41,16 @@ describe("difference", () => {
   });
 });
 
+it("returns true for arrays with same contents in same order", () => {
+  expect(areArrayContentsEqual([1, 2, 3], [1, 2, 3])).toBe(true);
+});
+
 describe("areArrayContentsEqual", () => {
   it("returns true for arrays with same contents in different order", () => {
     expect(areArrayContentsEqual([1, 2, 3], [3, 2, 1])).toBe(true);
   });
 
-  it("return false for arrays that do not have the same content", () => {
+  it("returns false for arrays that do not have the same content", () => {
     expect(areArrayContentsEqual([1, 2, 3], [1, 2])).toBe(false);
   });
 
@@ -132,7 +141,27 @@ describe("removeItem", () => {
 
     const updated = removeItem(input, -1);
 
-    expect(updated).toEqual(input);
+    expect(updated).toBe(input);
+  });
+
+  it("returns the original array when index is out of bounds", () => {
+    const input = ["apple", "banana", "cherry"];
+    const updated = removeItem(input, 99);
+    expect(updated).toBe(input);
+  });
+
+  it("returns the original empty array when trying to remove index 0", () => {
+    const input: string[] = [];
+    const updated = removeItem(input, 0);
+    expect(updated).toBe(input);
+  });
+
+  it("does not mutate the original array", () => {
+    const input = ["apple", "banana", "cherry"];
+
+    const updated = removeItem(input, 1);
+
+    expect(input).not.toEqual(updated);
   });
 });
 
@@ -164,5 +193,12 @@ describe("partition", () => {
       [2, 4],
       [1, 3, 5],
     ]);
+  });
+
+  it("returns two empty arrays when input is an empty array", () => {
+    const result = partition([], () => true);
+    expect(result).toEqual([[], []]);
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBe(2);
   });
 });
