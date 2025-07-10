@@ -214,7 +214,5 @@ describe("partition", () => {
       return true;
     });
     expect(result).toEqual([[], []]);
-    expect(Array.isArray(result)).toBe(true);
-    expect(result.length).toBe(2);
   });
 });
