@@ -2,6 +2,9 @@
  * Returns the difference between two arrays. The equivalent of doing
  * `firstArray` minus `secondArray`.
  *
+ * This also handles duplicates: duplicates from the first array will be
+ * removed as long as there is a single matching value in the second array.
+ *
  * @returns A new array containing the elements that are in the first list
  * but not in the second list.
  */
@@ -79,14 +82,16 @@ export function mapToArrayTuple<T, R1, R2>(
 /**
  * Removes an item from an array by index.
  *
+ * This function performs an immutable operation.
+ *
  * @param array The array to remove the item from.
  * @param idx The index of the item to remove.
  * @returns A new array with the item removed.
  */
 export function removeItem<T>(array: readonly T[], idx: number): T[] {
   const copy = [...array];
-  if (idx === -1) {
-    return copy;
+  if (idx < 0 || idx >= array.length) {
+    return array as T[];
   }
 
   copy.splice(idx, 1);
@@ -95,6 +100,8 @@ export function removeItem<T>(array: readonly T[], idx: number): T[] {
 
 /**
  * Removes the first item from an array where the `predicate` returns true.
+ *
+ * This function performs an immutable operation.
  *
  * @param array The array to remove the item from.
  * @param predicate The predicate to use to find the item to remove.
