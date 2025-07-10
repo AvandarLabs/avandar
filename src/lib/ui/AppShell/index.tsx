@@ -22,12 +22,7 @@ import {
   IconSearch,
   IconUser,
 } from "@tabler/icons-react";
-import {
-  Outlet,
-  ReactNode,
-  useLocation,
-  useRouter,
-} from "@tanstack/react-router";
+import { Outlet, ReactNode, useRouter } from "@tanstack/react-router";
 import clsx from "clsx";
 import { AuthClient } from "@/clients/AuthClient";
 import { AppConfig } from "@/config/AppConfig";
@@ -77,7 +72,7 @@ export function AppShell({
   mainContent = <Outlet />,
 }: Props): JSX.Element {
   const router = useRouter();
-  const location = useLocation();
+
   const [sendSignOutRequest, isSignOutPending] = useMutation({
     mutationFn: async () => {
       await AuthClient.signOut();
@@ -106,9 +101,6 @@ export function AppShell({
     />
   );
 
-  const isActive =
-    location.pathname.startsWith("/profile") || location.pathname === "/logout";
-  console.log(isActive);
   return (
     <>
       <MantineAppShell
@@ -135,7 +127,7 @@ export function AppShell({
             <Group
               h="100%"
               px="md"
-              className={clsx(css.anchor, isActive && "transition-colors")}
+              className={clsx(css.anchor, "transition-colors")}
             >
               <Burger
                 opened={isNavbarOpened}
