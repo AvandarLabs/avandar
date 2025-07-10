@@ -9,7 +9,7 @@ import {
 } from "../arrays";
 
 describe("difference", () => {
-  it("returns items in first array no in second", () => {
+  it("returns items in first array, excluding those from second array", () => {
     const result = difference([1, 2, 3], [2, 3]);
     expect(result).toEqual([1]);
   });
@@ -29,6 +29,11 @@ describe("difference", () => {
   it("returns full first array when no overlap", () => {
     expect(difference([1, 2], [3, 4])).toEqual([1, 2]);
   });
+
+  it("returns elements from the first array not present in the second", () => {
+    const result = difference([1, 2, 3], [2, 3, 4]);
+    expect(result).toEqual([1]);
+  });
 });
 
 describe("areArrayContentsEqual", () => {
@@ -40,11 +45,19 @@ describe("areArrayContentsEqual", () => {
     expect(areArrayContentsEqual([1, 2, 3], [1, 2])).toBe(false);
   });
 
-  it("returns 2 array of obejcts with same contents in different order as true", () => {
+  it("returns 2 array of objects with same hashed values as true", () => {
     expect(
       areArrayContentsEqual(
         [{ id: 1 }, { id: 2 }],
         [{ id: 2 }, { id: 1 }],
+        (x) => x.id,
+      ),
+    ).toBe(true);
+
+    expect(
+      areArrayContentsEqual(
+        [{ id: 1 }, { id: 2, foo: "bar" }],
+        [{ id: 2 }, { id: 1, foo: "other value" }],
         (x) => x.id,
       ),
     ).toBe(true);
@@ -59,9 +72,27 @@ describe("areArrayContentsEqual", () => {
       ),
     ).toBe(false);
   });
+
+  it("returns true when both arrays are empty", () => {
+    expect(areArrayContentsEqual([], [])).toBe(true);
+  });
 });
 
 describe("mapToArrayTuple", () => {
+  it("returns a tuple of 2 arrays", () => {
+    const items = ["a", "b", "c"];
+    const result = mapToArrayTuple(items, (str) => [str, str]);
+
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBe(2);
+  });
+
+  it("returns a tuple of 2 empty arrays", () => {
+    const result = mapToArrayTuple([], () => ["foo", "bar"]);
+
+    expect(result).toEqual([[], []]);
+  });
+
   it("correctly maps input strings to lengths and repeated strings", () => {
     const input = ["a", "bb", "ccc"];
 
