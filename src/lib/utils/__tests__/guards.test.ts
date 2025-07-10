@@ -60,8 +60,8 @@ describe("isDate", () => {
   });
 
   it("returns false if value is not a Date object", () => {
-    expect(isDate(Date.now())).toBe(false); // timestamp
-    expect(isDate("2023-01-01")).toBe(false); // ISO string
+    expect(isDate(Date.now())).toBe(false);
+    expect(isDate("2023-01-01")).toBe(false);
     expect(isDate({})).toBe(false);
     expect(isDate(null)).toBe(false);
     expect(isDate(undefined)).toBe(false);
@@ -208,7 +208,8 @@ describe("hasProps", () => {
   });
 
   it("returns false if object is missing required props", () => {
-    const obj: { name: string; email?: string } = { name: "John Doe" }; // the optional modifier (?) for 'email' satisfies TypeScript
+    // the optional modifier (?) for 'email' satisfies TypeScript
+    const obj: { name: string; email?: string } = { name: "John Doe" };
 
     const hasPropsCheck = hasProps(obj, "name", "email");
 
@@ -278,7 +279,7 @@ describe("hasDefinedProp", () => {
   it("returns true if the property exists and is not undefined", () => {
     const user: Partial<User> = {
       name: "Alice",
-      email: null, // null is fine
+      email: null,
     };
 
     expect(hasDefinedProp(user, "name")).toBe(true);
@@ -297,22 +298,25 @@ describe("hasDefinedProp", () => {
 
 describe("assert", () => {
   it("should throw error if the condition is falsey", () => {
-    expect(() => assert(undefined)).toThrowError();
-    expect(() => assert(false)).toThrowError();
-    expect(() => assert("")).toThrowError();
-    expect(() => assert(null)).toThrowError();
-    expect(() => assert(0)).toThrowError();
+    [undefined, false, "", null, 0].map((value) => {
+      expect(() => {
+        assert(value);
+      }).toThrowError();
+    });
   });
 
   it("should not throw error if the condition is truthy", () => {
-    expect(() => assert({})).not.toThrowError();
-    expect(() => assert(true)).not.toThrowError();
-    expect(() => assert("abc")).not.toThrowError();
-    expect(() => assert(42)).not.toThrowError();
+    [{}, true, "abc", 42].map((value) => {
+      expect(() => {
+        assert(value);
+      }).not.toThrowError();
+    });
   });
 
   it("throws with custom message", () => {
-    expect(() => assert(false, "Custom error")).toThrow("Custom error");
+    expect(() => {
+      assert(false, "Custom error");
+    }).toThrow("Custom error");
   });
 });
 
