@@ -72,6 +72,7 @@ export function AppShell({
   mainContent = <Outlet />,
 }: Props): JSX.Element {
   const router = useRouter();
+
   const [sendSignOutRequest, isSignOutPending] = useMutation({
     mutationFn: async () => {
       await AuthClient.signOut();
@@ -123,7 +124,11 @@ export function AppShell({
       >
         {isMobileViewSize ?
           <MantineAppShell.Header>
-            <Group h="100%" px="md">
+            <Group
+              h="100%"
+              px="md"
+              className={clsx(css.anchor, "transition-colors")}
+            >
               <Burger
                 opened={isNavbarOpened}
                 onClick={toggleNavbar}
@@ -139,7 +144,12 @@ export function AppShell({
         : null}
 
         <MantineAppShell.Navbar style={$navbarBorder}>
-          <Group px="md" py="sm" wrap="nowrap">
+          <Group
+            className={clsx(css.anchor, "transition-colors")}
+            px="md"
+            py="sm"
+            wrap="nowrap"
+          >
             <Burger
               opened={isNavbarOpened}
               onClick={toggleNavbar}
