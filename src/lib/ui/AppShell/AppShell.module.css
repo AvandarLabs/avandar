@@ -10,11 +10,12 @@
     background-color: var(--mantine-navbar-hover-background);
     text-decoration: none;
   }
+}
 
-  &[data-status="active"] {
-    background-color: var(--mantine-navbar-active-background);
-    &:hover {
-      background-color: var(--mantine-navbar-active-hover-background);
-    }
+.active {
+  background-color: var(--mantine-navbar-active-background);
+
+  &:hover {
+    background-color: var(--mantine-navbar-active-hover-background);
   }
 }

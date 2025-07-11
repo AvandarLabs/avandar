@@ -22,7 +22,12 @@ import {
   IconSearch,
   IconUser,
 } from "@tabler/icons-react";
-import { Outlet, ReactNode, useRouter } from "@tanstack/react-router";
+import {
+  Outlet,
+  ReactNode,
+  useMatchRoute,
+  useRouter,
+} from "@tanstack/react-router";
 import clsx from "clsx";
 import { AuthClient } from "@/clients/AuthClient";
 import { AppConfig } from "@/config/AppConfig";
@@ -72,7 +77,7 @@ export function AppShell({
   mainContent = <Outlet />,
 }: Props): JSX.Element {
   const router = useRouter();
-
+  const matchRoute = useMatchRoute();
   const [sendSignOutRequest, isSignOutPending] = useMutation({
     mutationFn: async () => {
       await AuthClient.signOut();
@@ -100,6 +105,9 @@ export function AppShell({
       width={28}
     />
   );
+
+  const { location } = useRouter().state;
+  console.log("Current route:", location.pathname);
 
   return (
     <>
@@ -197,12 +205,27 @@ export function AppShell({
           </Group>
 
           {navbarLinks.map(({ link, icon }: NavbarLink) => {
+            const currentPath = router.state.location.pathname;
+            const resolvedPath = router.buildLocation({
+              to: link.to,
+              params: link.params,
+            }).pathname;
+
+            const isActive = currentPath === resolvedPath;
+
+            console.log("NAVBAR", {
+              label: link.label,
+              currentPath,
+              resolvedPath,
+              isActive,
+            });
+
             return (
               <Link
                 key={link.key}
                 to={link.to}
                 params={link.params}
-                className={clsx(css.anchor, "transition-colors")}
+                className={clsx(css.anchor, isActive && css.active)}
                 px="md"
                 py="sm"
               >
