@@ -14,18 +14,22 @@ export const EntityConfigClient = createSupabaseCRUDClient({
       fullDelete: async (params: { id: EntityConfigId }): Promise<void> => {
         const logger = clientLogger.appendName("fullDelete");
         logger.log("Deleting entity config and associated local datasets");
+        const entityConfigId = params.id;
 
         // Delete the entity config
-        await EntityConfigClient.delete({ id: params.id });
+        await EntityConfigClient.delete({ id: entityConfigId });
 
         // Delete the associated local datasets
         const datasets = await LocalDatasetClient.getAll();
         const datasetsToDelete = datasets.filter((dataset) => {
-          return (
+          if (
             dataset.datasetType === "entities" ||
             dataset.datasetType === "entities_queryable" ||
             dataset.datasetType === "entity_field_values"
-          );
+          ) {
+            return dataset.id.includes(entityConfigId);
+          }
+          return false;
         });
 
         await LocalDatasetClient.bulkDelete({
