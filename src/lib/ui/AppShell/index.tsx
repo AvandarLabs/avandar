@@ -106,9 +106,6 @@ export function AppShell({
     />
   );
 
-  const { location } = useRouter().state;
-  console.log("Current route:", location.pathname);
-
   return (
     <>
       <MantineAppShell
