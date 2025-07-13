@@ -41,19 +41,17 @@ This document outlines the step-by-step changes required to implement multi-tena
 ### 3.2 Object creation
 
 - [x] All local datasets should be linked to a workspace
-- [ ] Only show local datasets that relate to this workspace
+- [x] Only show local datasets that relate to this workspace
 - [x] All entity profile configs should be linked to a workspace
 - [x] All entity instances and field values should be linked to a workspace
-- [ ] Entities should only be viewable according to our workspace
-- [ ] Entity profile configs should only be viewable according to our workspace
+- [x] Entities should only be viewable according to our workspace
+- [x] Entity profile configs should only be viewable according to our workspace
 
 ### 3.3 Backend clients
 
 - [ ] WorkspaceClient should allow inviting members
 - [ ] Inviting a member should send them an email
-- [ ] Add support for seed data:
-  - 2 workspaces
-  - 3 users: 1 admin per workspace, and 1 user in one of the workspaces.
+- [x] Add support for seed data:
 
 ### 5. Future work
 
@@ -73,11 +71,6 @@ This document outlines the step-by-step changes required to implement multi-tena
   - `src/routes/workspaces/[workspace_id]/members/page.tsx` - Workspace members management
   - `src/routes/workspaces/[workspace_id]/settings/page.tsx` - Workspace settings
 
-### 5.3 Create Workspace Context
-
-- [ ] Create a workspace context in `src/context/WorkspaceContext.tsx`
-- [ ] Add workspace switching functionality to the context
-
 ## 6. User Interface Changes
 
 ### 6.1 Layout Updates
@@ -85,31 +78,10 @@ This document outlines the step-by-step changes required to implement multi-tena
 - [ ] Update `src/components/Layout/AppShell.tsx` to include workspace selection in the sidebar/header
 - [ ] Add workspace indicator in `src/components/Layout/Header.tsx`
 
-### 6.2 User Profile Updates
-
-- [ ] Update `src/routes/settings/profile/page.tsx` to show all emails across workspaces
-- [ ] Add email management UI in `src/components/User/EmailManagement.tsx`
-
-### 6.3 Onboarding Flow Updates
-
-- [ ] Update `src/routes/onboarding/page.tsx` to include workspace creation
-
-## 7. Authorization and Permissions
-
-### 7.1 Role-Based Access Control
-
-- [ ] Create a permission system in `src/lib/auth/permissions.ts` for workspace roles
-- [ ] Implement role checks in relevant components and routes
-
-### 7.2 Frontend Authorization Hooks
-
-- [ ] Create `useWorkspacePermissions` hook in `src/lib/hooks/auth/useWorkspacePermissions.ts`
-- [ ] Implement UI permission checks using this hook
-
 ### 8. Seed Script Updates
 
-- [ ] Update `seed/seedJobs.ts` to include workspace context
-- [ ] Update `seed/SeedConfig.ts` to support seeding multiple workspaces
+- [x] Update `seed/seedJobs.ts` to include workspace context
+- [x] Update `seed/SeedConfig.ts` to support seeding multiple workspaces
 
 ## 9. Testing
 
