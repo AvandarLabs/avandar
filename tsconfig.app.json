@@ -42,6 +42,8 @@
     "scripts/SeedRunner.ts",
     "scripts/seedDatabaseScript.ts",
     "scripts/ScriptsUtil.ts",
-    "scripts/createUserScript.ts"
+    "scripts/createUserScript.ts",
+    "vitest.setup.ts",
+    "vitest.d.ts"
   ]
 }
