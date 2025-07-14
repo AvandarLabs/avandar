@@ -34,3 +34,6 @@ dist-ssr
 
 # Ignorable development files 
 .eslintcache
+
+# Supabase
+supabase/.temp
