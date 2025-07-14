@@ -9,7 +9,7 @@
     "test": "vitest",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsc -b --noEmit",
     "preview": "vite preview",
     "tsc-watch": "tsc -b --watch",
     "db:apply-migrations": "./scripts/applyMigrations.sh",
