@@ -22,6 +22,7 @@ export function PaperWrapper({
   shadow = "md",
   bg = "white",
   withBorder = true,
+  ...rest
 }: PaperWrapperProps): JSX.Element {
   return (
     <Paper
@@ -31,6 +32,7 @@ export function PaperWrapper({
       shadow={shadow}
       bg={bg}
       withBorder={withBorder}
+      {...rest}
     >
       {children}
     </Paper>

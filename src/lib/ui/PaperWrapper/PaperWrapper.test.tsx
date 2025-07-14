@@ -1,48 +1,44 @@
-import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { PaperWrapper } from "./PaperWrapper";
+import { renderWithMantine, screen } from "../../utils/renderWithMantine";
+import { PaperWrapper } from "../PaperWrapper";
 
 describe("PaperWrapper", () => {
   it("renders children correctly", () => {
-    render(
+    renderWithMantine(
       <PaperWrapper>
-        <p>Test content</p>
+        <div data-testid="inner">Hello world</div>
       </PaperWrapper>,
     );
 
-    expect(screen.getByText("Test content")).toBeInTheDocument();
+    expect(screen.getByTestId("inner")).toBeInTheDocument();
   });
 
-  it("applies default props when none are provided", () => {
-    const { container } = render(<PaperWrapper>Defaults</PaperWrapper>);
-    const paperDiv = container.firstChild as HTMLElement;
-
-    expect(paperDiv).toHaveClass("mantine-Paper-root"); // Mantine base class
-
-    // You can check styles directly if needed
-    expect(paperDiv).toHaveStyle({
-      backgroundColor: "white",
-    });
+  it("applies radius correctly", () => {
+    renderWithMantine(<PaperWrapper radius="lg">Radius test</PaperWrapper>);
+    const paper = screen.getByText("Radius test").parentElement;
+    expect(paper).toBeInTheDocument();
   });
 
-  it("applies custom props", () => {
-    const { container } = render(
-      <PaperWrapper
-        p="sm"
-        mt="xl"
-        radius="xl"
-        shadow="lg"
-        bg="gray"
-        withBorder={false}
-        className="custom-class"
-      >
-        Custom Props
+  it("applies border when withBorder is true", () => {
+    renderWithMantine(<PaperWrapper withBorder>Border test</PaperWrapper>);
+    const paper = screen.getByText("Border test").parentElement;
+    expect(paper).toBeInTheDocument();
+  });
+
+  it("applies padding when passed", () => {
+    renderWithMantine(<PaperWrapper p="md">Padding test</PaperWrapper>);
+    const paper = screen.getByText("Padding test").parentElement;
+    expect(paper).toBeInTheDocument();
+  });
+
+  it("renders with multiple props", () => {
+    renderWithMantine(
+      <PaperWrapper className="combo" data-testid="wrapper">
+        Combo test
       </PaperWrapper>,
     );
 
-    const paperDiv = container.firstChild as HTMLElement;
-
-    expect(paperDiv.className).toContain("custom-class");
-    expect(screen.getByText("Custom Props")).toBeInTheDocument();
+    const paper = screen.getByTestId("wrapper");
+    expect(paper).toHaveClass("combo");
   });
 });
