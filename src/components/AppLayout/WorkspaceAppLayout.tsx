@@ -27,16 +27,19 @@ export function WorkspaceAppLayout(): JSX.Element {
     });
   }, [workspace.slug, entityConfigs]);
 
-  const navbarLinks = useMemo(() => {
+  const mainNavBarLinks = useMemo(() => {
     return [
       NavbarLinks.home,
       NavbarLinks.dataManagerHome(workspace.slug),
       NavbarLinks.dataExplorer(workspace.slug),
       NavbarLinks.entityDesignerHome(workspace.slug),
-      NavbarLinks.workspaceSettings(workspace.slug),
       ...entityManagerLinks,
     ];
   }, [workspace.slug, entityManagerLinks]);
+
+  const utilityNavBarLinks = useMemo(() => {
+    return [NavbarLinks.workspaceSettings(workspace.slug)];
+  }, [workspace.slug]);
 
   const profileLink = useMemo(() => {
     return AppLinks.profile(workspace.slug);
@@ -46,7 +49,8 @@ export function WorkspaceAppLayout(): JSX.Element {
     <AppShell
       title={workspace.name}
       profileLink={profileLink}
-      navbarLinks={navbarLinks}
+      navbarLinks={mainNavBarLinks}
+      utilityLinks={utilityNavBarLinks}
       spotlightActions={spotlightActions}
     />
   );

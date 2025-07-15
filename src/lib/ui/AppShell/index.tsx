@@ -5,6 +5,7 @@ import {
   AppShell as MantineAppShell,
   MantineTheme,
   Menu,
+  Stack,
   Text,
   Title,
   UnstyledButton,
@@ -47,6 +48,7 @@ type Props = {
   spotlightActions?: Array<SpotlightActionData | SpotlightActionGroupData>;
   profileLink?: AppLink;
   navbarLinks: readonly NavbarLink[];
+  utilityLinks?: readonly NavbarLink[];
 
   /**
    * The main content of the app shell.
@@ -69,6 +71,7 @@ export function AppShell({
   profileLink,
   spotlightActions,
   navbarLinks,
+  utilityLinks,
   mainContent = <Outlet />,
 }: Props): JSX.Element {
   const router = useRouter();
@@ -195,26 +198,49 @@ export function AppShell({
               </Menu.Dropdown>
             </Menu>
           </Group>
+          <Stack justify="space-between" h="100%">
+            <Stack gap="xs">
+              {navbarLinks.map(({ link, icon }) => (
+                <Link
+                  key={link.key}
+                  to={link.to}
+                  params={link.params}
+                  className={clsx(css.anchor, "transition-colors")}
+                  px="md"
+                  py="sm"
+                >
+                  <Group>
+                    {icon}
+                    <Text span fw={500}>
+                      {link.label}
+                    </Text>
+                  </Group>
+                </Link>
+              ))}
+            </Stack>
 
-          {navbarLinks.map(({ link, icon }: NavbarLink) => {
-            return (
-              <Link
-                key={link.key}
-                to={link.to}
-                params={link.params}
-                className={clsx(css.anchor, "transition-colors")}
-                px="md"
-                py="sm"
-              >
-                <Group>
-                  {icon}
-                  <Text span fw={500}>
-                    {link.label}
-                  </Text>
-                </Group>
-              </Link>
-            );
-          })}
+            {utilityLinks && (
+              <Stack gap="xs" pb="md">
+                {utilityLinks.map(({ link, icon }) => (
+                  <Link
+                    key={link.key}
+                    to={link.to}
+                    params={link.params}
+                    className={clsx(css.anchor, "transition-colors")}
+                    px="md"
+                    py="sm"
+                  >
+                    <Group>
+                      {icon}
+                      <Text span fw={500}>
+                        {link.label}
+                      </Text>
+                    </Group>
+                  </Link>
+                ))}
+              </Stack>
+            )}
+          </Stack>
         </MantineAppShell.Navbar>
 
         <MantineAppShell.Main py="0" pr="0" ml={-16}>

@@ -2,6 +2,7 @@ import {
   IconBlocks,
   IconDatabase,
   IconHome,
+  IconSettings,
   IconTable,
 } from "@tabler/icons-react";
 import { ReactNode } from "react";
@@ -63,6 +64,6 @@ export const NavbarLinks = {
   },
   workspaceSettings: (workspaceSlug: string) => ({
     link: AppLinks.workspaceSettings(workspaceSlug),
-    icon: <IconBlocks size={24} stroke={1.5} />,
+    icon: <IconSettings size={24} stroke={1.5} />,
   }),
 } as const satisfies NavbarLinksRecord;
