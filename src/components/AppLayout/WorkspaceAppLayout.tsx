@@ -33,6 +33,7 @@ export function WorkspaceAppLayout(): JSX.Element {
       NavbarLinks.dataManagerHome(workspace.slug),
       NavbarLinks.dataExplorer(workspace.slug),
       NavbarLinks.entityDesignerHome(workspace.slug),
+      NavbarLinks.workspaceSettings(workspace.slug),
       ...entityManagerLinks,
     ];
   }, [workspace.slug, entityManagerLinks]);

@@ -185,6 +185,13 @@ export const AppLinks = {
       label: entityName,
     };
   },
+  // Settings links
+  workspaceSettings: (workspaceSlug: string) => ({
+    key: "workspace-settings",
+    to: "/$workspaceSlug/settings",
+    params: { workspaceSlug },
+    label: "Settings",
+  }),
 } as const satisfies AppLinksRecord;
 
 export type AppLinkKey = keyof typeof AppLinks;

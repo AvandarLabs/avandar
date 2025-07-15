@@ -61,4 +61,8 @@ export const NavbarLinks = {
       icon: <IconBlocks size={24} stroke={1.5} />,
     };
   },
+  workspaceSettings: (workspaceSlug: string) => ({
+    link: AppLinks.workspaceSettings(workspaceSlug),
+    icon: <IconBlocks size={24} stroke={1.5} />,
+  }),
 } as const satisfies NavbarLinksRecord;
