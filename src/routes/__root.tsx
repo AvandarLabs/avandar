@@ -1,10 +1,7 @@
-import { MantineProvider } from "@mantine/core";
-import { ModalsProvider } from "@mantine/modals";
-import { Notifications } from "@mantine/notifications";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { cssVariablesResolver, Theme } from "@/config/Theme";
+import { AvandarUIProvider } from "@/components/common/AvandarUIProvider";
 import { RootRouteContext } from "@/lib/types/RootRouteContext";
 
 /**
@@ -16,17 +13,14 @@ export const Route = createRootRouteWithContext<RootRouteContext>()({
 
 function RootComponent() {
   return (
-    <MantineProvider theme={Theme} cssVariablesResolver={cssVariablesResolver}>
-      <ModalsProvider>
-        <Notifications position="top-right" />
-        <Outlet />
-        {import.meta.env.VITE_HIDE_DEV_TOOLS === "true" ? null : (
-          <>
-            <TanStackRouterDevtools />
-            <ReactQueryDevtools initialIsOpen={false} />
-          </>
-        )}
-      </ModalsProvider>
-    </MantineProvider>
+    <AvandarUIProvider>
+      <Outlet />
+      {import.meta.env.VITE_HIDE_DEV_TOOLS === "true" ? null : (
+        <>
+          <TanStackRouterDevtools />
+          <ReactQueryDevtools initialIsOpen={false} />
+        </>
+      )}
+    </AvandarUIProvider>
   );
 }

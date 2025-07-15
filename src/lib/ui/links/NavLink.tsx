@@ -3,7 +3,6 @@ import {
   MantineColor,
   NavLink as MantineNavLink,
   NavLinkProps as MantineNavLinkProps,
-  noop,
   useMantineTheme,
 } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
@@ -14,6 +13,7 @@ import {
 } from "@tanstack/react-router";
 import { forwardRef, useEffect, useMemo, useState } from "react";
 import { Theme } from "@/config/Theme";
+import { noop } from "@/lib/utils/misc";
 
 const DEFAULT_PRIMARY_SHADE =
   typeof DEFAULT_THEME.primaryShade === "object" ?
