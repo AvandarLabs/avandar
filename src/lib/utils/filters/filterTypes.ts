@@ -14,7 +14,10 @@ export type ArrayValueOperator = "in";
 /** All supported filter operators */
 export type FilterOperator = SingleValueOperator | ArrayValueOperator;
 
-export const FILTER_TYPES: UnionToTuple<FilterOperator> = ["eq", "in"] as const;
+export const FILTER_TYPES = [
+  "eq",
+  "in",
+] as const satisfies UnionToTuple<FilterOperator>;
 export const FILTER_TYPES_SET: Set<FilterOperator> = new Set(FILTER_TYPES);
 
 export const isSingleValueOperator = (

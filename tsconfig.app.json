@@ -37,8 +37,9 @@
   },
   "include": [
     "src",
-    "scripts/lib",
+    "tests",
     "seed",
+    "scripts/lib",
     "scripts/SeedRunner.ts",
     "scripts/seedDatabaseScript.ts",
     "scripts/ScriptsUtil.ts",

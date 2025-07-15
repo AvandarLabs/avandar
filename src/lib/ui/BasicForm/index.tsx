@@ -168,11 +168,12 @@ export function BasicForm<
           fieldKey,
           field,
         );
+        const { initialValue, ...restOfInputProps } = moreInputProps;
         return (
           <TextInput
             key={form.key(fieldKey)}
             {...form.getInputProps(fieldKey)}
-            {...moreInputProps}
+            {...restOfInputProps}
           />
         );
       }
