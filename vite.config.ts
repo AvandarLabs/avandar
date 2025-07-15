@@ -17,6 +17,8 @@ export default defineConfig({
     }),
     react(),
     eslintPlugin(),
+
+    // node polyfills are necessary to run `knex` in browser
     nodePolyfills(),
   ],
   resolve: {
