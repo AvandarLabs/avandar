@@ -29,7 +29,7 @@ export function WorkspaceAppLayout(): JSX.Element {
 
   const mainNavBarLinks = useMemo(() => {
     return [
-      NavbarLinks.home,
+      NavbarLinks.workspaceHome(workspace.slug),
       NavbarLinks.dataManagerHome(workspace.slug),
       NavbarLinks.dataExplorer(workspace.slug),
       NavbarLinks.entityDesignerHome(workspace.slug),

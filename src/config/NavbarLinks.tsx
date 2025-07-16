@@ -26,6 +26,12 @@ export const NavbarLinks = {
     link: AppLinks.home,
     icon: <IconHome size={24} stroke={1.5} />,
   },
+  workspaceHome: (workspaceSlug: string) => {
+    return {
+      link: AppLinks.workspaceHome(workspaceSlug),
+      icon: <IconHome size={24} stroke={1.5} />,
+    };
+  },
   dataManagerHome: (workspaceSlug: string) => {
     return {
       link: AppLinks.dataManagerHome(workspaceSlug),

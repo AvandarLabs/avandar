@@ -22,9 +22,10 @@ returns boolean as $$
   begin
     return exists (
       select 1 from public.workspace_memberships
+        join public.user_roles on workspace_memberships.id = user_roles.membership_id
       where workspace_memberships.workspace_id = $1
         and workspace_memberships.user_id = auth.uid()
-        and workspace_memberships.role = 'admin'
+        and user_roles.role = 'admin'
     );
   end;
 $$
