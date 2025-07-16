@@ -17,6 +17,12 @@ type TAppConfig = {
     /** Maximum length of dataset description */
     maxDatasetDescriptionLength: number;
   };
+
+  /** The email address to use for support inquiries */
+  supportEmail: string;
+
+  /** The email address to use for general inquiries */
+  infoEmail: string;
 };
 
 export const AppConfig = {
@@ -26,4 +32,6 @@ export const AppConfig = {
     maxDatasetNameLength: 100,
     maxDatasetDescriptionLength: 500,
   },
+  supportEmail: "support@avandarlabs.com",
+  infoEmail: "info@avandarlabs.com",
 } satisfies TAppConfig;

@@ -1,8 +1,8 @@
 import eslintPlugin from "@nabla/vite-plugin-eslint";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
+import { defineConfig } from "vitest/config";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -17,6 +17,8 @@ export default defineConfig({
     }),
     react(),
     eslintPlugin(),
+
+    // node polyfills are necessary to run `knex` in browser
     nodePolyfills(),
   ],
   resolve: {
@@ -25,4 +27,9 @@ export default defineConfig({
     },
   },
   publicDir: "public",
+  test: {
+    globals: true,
+    environment: "jsdom",
+    setupFiles: "./tests/vitest.setup.ts",
+  },
 });

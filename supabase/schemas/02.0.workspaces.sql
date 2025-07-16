@@ -7,6 +7,9 @@ create table public.workspaces (
   owner_id uuid not null default auth.uid()
     references auth.users(id)
     on update cascade
+    -- Raise error if owner is deleted while still connected to a workspace.
+    -- This will force us to have to first transfer ownership of the workspace
+    -- to another user before deleting the previous owner.
     on delete no action,
 
   -- Name of the workspace
