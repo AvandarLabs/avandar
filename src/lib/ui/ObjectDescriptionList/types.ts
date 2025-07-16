@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
-import { StringKeyOf, UnionToTuple } from "type-fest";
+import { UnionToTuple } from "type-fest";
+import { StringKeyOf } from "@/lib/types/utilityTypes";
 
 /** A non-recursive value */
 export type PrimitiveValue =

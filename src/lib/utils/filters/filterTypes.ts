@@ -1,23 +1,25 @@
 import { match } from "ts-pattern";
-import { UnionToTuple } from "type-fest";
+
+const SINGLE_VALUE_OPERATORS = ["eq"] as const;
+const ARRAY_VALUE_OPERATORS = ["in"] as const;
 
 /**
  * These are filter operators that are evaluated against a single value.
  */
-export type SingleValueOperator = "eq";
+export type SingleValueOperator = (typeof SINGLE_VALUE_OPERATORS)[number];
 
 /**
  * These are filter operators that are evaluated against an array of values.
  */
-export type ArrayValueOperator = "in";
+export type ArrayValueOperator = (typeof ARRAY_VALUE_OPERATORS)[number];
 
 /** All supported filter operators */
 export type FilterOperator = SingleValueOperator | ArrayValueOperator;
 
 export const FILTER_TYPES = [
-  "eq",
-  "in",
-] as const satisfies UnionToTuple<FilterOperator>;
+  ...SINGLE_VALUE_OPERATORS,
+  ...ARRAY_VALUE_OPERATORS,
+] as const;
 export const FILTER_TYPES_SET: Set<FilterOperator> = new Set(FILTER_TYPES);
 
 export const isSingleValueOperator = (

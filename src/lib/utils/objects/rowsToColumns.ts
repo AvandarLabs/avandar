@@ -1,5 +1,5 @@
-import { StringKeyOf } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
+import { StringKeyOf } from "@/lib/types/utilityTypes";
 import { hasDefinedProp } from "../guards";
 import { objectKeys } from "./misc";
 

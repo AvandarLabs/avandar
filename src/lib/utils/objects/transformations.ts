@@ -326,3 +326,21 @@ export function excludeUndefinedShallow<T extends UnknownObject>(
   });
   return newObj as ExcludeUndefinedShallow<T>;
 }
+
+/**
+ * Maps the values of an object shallowly.
+ *
+ * @param obj The object to map values from.
+ * @param fn The function to apply to each value.
+ * @returns The object with all values mapped.
+ */
+export function mapObjectValues<T extends UnknownObject, V>(
+  obj: T,
+  fn: (value: T[keyof T], key: keyof T) => V,
+): { [K in keyof T]: V } {
+  const newObj = {} as { [K in keyof T]: V };
+  objectKeys(obj).forEach((key) => {
+    newObj[key] = fn(obj[key], key);
+  });
+  return newObj;
+}

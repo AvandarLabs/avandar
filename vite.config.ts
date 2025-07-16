@@ -1,3 +1,4 @@
+/* eslint-disable import-x/no-unresolved */
 import eslintPlugin from "@nabla/vite-plugin-eslint";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";

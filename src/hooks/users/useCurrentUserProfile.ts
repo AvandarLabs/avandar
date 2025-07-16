@@ -23,5 +23,7 @@ export function useCurrentUserProfile():
   const [userProfile, isLoadingUserProfile] = UserClient.useGetProfile({
     workspaceId: workspace.id,
   });
-  return isLoadingUserProfile ? [undefined, true] : [userProfile, false];
+  return isLoadingUserProfile || !userProfile ?
+      [undefined, true]
+    : [userProfile, false];
 }

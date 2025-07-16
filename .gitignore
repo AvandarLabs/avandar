@@ -37,3 +37,4 @@ dist-ssr
 
 # Supabase
 supabase/.temp
+supabase/.branches
