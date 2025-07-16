@@ -1,5 +1,6 @@
 import { CamelCaseKeys } from "camelcase-keys";
 import { SetOptional, SetRequired } from "type-fest";
+import { FormType } from "@/lib/hooks/ui/useForm";
 import { Expect } from "@/lib/types/testUtilityTypes";
 import { uuid } from "@/lib/utils/uuid";
 import {
@@ -13,7 +14,7 @@ import { ManualEntryExtractor } from "@/models/EntityConfig/ValueExtractor/Manua
 import { EntityFieldValueExtractorRegistry } from "@/models/EntityConfig/ValueExtractor/types";
 import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
 import { getEntityFieldBaseDataType } from "@/models/LocalDataset/LocalDatasetField/utils";
-import { LocalDataset } from "@/models/LocalDataset/types";
+import { LocalDataset, LocalDatasetId } from "@/models/LocalDataset/types";
 
 export type EntityFieldFormValues = SetRequired<
   SetOptional<EntityFieldConfig<"Insert">, "workspaceId">,
@@ -50,8 +51,17 @@ export type EntityConfigFormValues = SetOptional<
   SetRequired<EntityConfig<"Insert">, "id">,
   "workspaceId"
 > & {
-  titleFieldId?: EntityFieldConfigId;
-  idFieldId?: EntityFieldConfigId;
+  /**
+   * The id of the field that should be used as the title field
+   */
+  titleFieldId: EntityFieldConfigId | undefined;
+
+  /**
+   * If any fields are configured as datasetColumnValue extractors,
+   * this record will map the dataset IDs we need to extract from
+   * to the field ID that represents the entity's ID.
+   */
+  idFieldsByDatasetId: Record<LocalDatasetId, EntityFieldConfigId>;
   datasetColumnFields: EntityFieldFormValues[];
   manualEntryFields: EntityFieldFormValues[];
 };
@@ -60,13 +70,20 @@ export type EntityConfigFormSubmitValues = EntityConfigFormValues & {
   fields: EntityFieldFormValues[];
 };
 
+export type EntityConfigFormType = FormType<
+  EntityConfigFormValues,
+  EntityConfigFormSubmitValues
+>;
+
 export function getDefaultEntityConfigFormValues(): EntityConfigFormValues {
   const entityConfigId: EntityConfigId = uuid();
 
   return {
     id: entityConfigId,
+    titleFieldId: undefined,
     name: "",
     description: "",
+    idFieldsByDatasetId: {},
     allowManualCreation: false,
     datasetColumnFields: [],
     manualEntryFields: [],

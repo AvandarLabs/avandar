@@ -4,6 +4,7 @@ import { objectKeys } from "../objects/misc";
 import {
   ArrayValueOperator,
   FILTER_TYPES_SET,
+  FilterOperator,
   SingleValueOperator,
 } from "./filterTypes";
 import type { FiltersByColumn } from "./filtersByColumn";
@@ -60,6 +61,6 @@ export function isFiltersByOperatorObject<T extends UnknownObject>(
 
   // every key must be a filter operator
   return objectKeys(filters).every((key) => {
-    return FILTER_TYPES_SET.has(key);
+    return FILTER_TYPES_SET.has(key as FilterOperator);
   });
 }

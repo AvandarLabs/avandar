@@ -81,8 +81,9 @@ create trigger tr_entity_field_config__set_updated_at
 
 -- Function to validate title and id fields
 -- An entity_config should have at least 1 entity_field_config with
--- `is_title_field` and at least 1 with `is_id_field`
-create or replace function public.entity_field_configs__validate_title_id_fields()
+-- `is_title_field` and, for fields that extract from datasets, each
+-- dataset should have exactly 1 with `is_id_field`
+create or replace function public.entity_field_configs__validate_title_and_id_fields()
 returns trigger as $$
 begin
   -- Count title fields for this entity_config
@@ -93,12 +94,17 @@ begin
     raise exception 'There must be exactly one title field per entity config';
   end if;
 
-  -- Count id fields for this entity_config
-  if (
-    select count(*) from public.entity_field_configs
-    where entity_config_id = new.entity_config_id and is_id_field
-  ) != 1 then
-    raise exception 'There must be exactly one id field per entity config';
+  -- For fields that extract from datasets, ensure each source dataset
+  -- is associated with exactly one ID field.
+  if exists (
+    select 1 from public.entity_field_configs field_config
+      join public.value_extractors__dataset_column_value dataset_col_extractor
+        on field_config.id = dataset_col_extractor.entity_field_config_id
+    where field_config.entity_config_id = new.entity_config_id
+    group by dataset_col_extractor.dataset_id
+      having count(case when field_config.is_id_field then 1 end) != 1
+  ) then
+    raise exception 'Each dataset must have exactly one ID field.';
   end if;
 
   return new;
@@ -116,7 +122,7 @@ language plpgsql;
 -- we need to manually rollback the changes. 
 create trigger tr_entity_field_configs__validate_title_id_fields
   after insert or update on public.entity_field_configs
-  for each row execute function public.entity_field_configs__validate_title_id_fields();
+  for each row execute function public.entity_field_configs__validate_title_and_id_fields();
 
 -- Indexes to improve performance
 create index idx_entity_field_configs__entity_config_id_workspace_id on public.entity_field_configs(entity_config_id, workspace_id);

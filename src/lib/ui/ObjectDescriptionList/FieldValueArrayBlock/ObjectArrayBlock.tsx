@@ -1,6 +1,6 @@
 import { List, Table, Text } from "@mantine/core";
 import { useMemo } from "react";
-import { StringKeyOf } from "type-fest";
+import { StringKeyOf } from "@/lib/types/utilityTypes";
 import { objectKeys } from "@/lib/utils/objects/misc";
 import { camelToTitleCase } from "@/lib/utils/strings/transformations";
 import { CollapsibleItem } from "../CollapsibleItem";

@@ -38,9 +38,6 @@ export type FormType<
     "values"
   >,
   {
-    // Improve type-safety for `key`
-    key: (path: FormPath) => string;
-
     /**
      * Improved type-safety for Mantine's `form.watch`
      * @deprecated Use `useFieldWatch` instead
