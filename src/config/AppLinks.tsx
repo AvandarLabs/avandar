@@ -186,12 +186,14 @@ export const AppLinks = {
     };
   },
   // Settings link
-  workspaceSettings: (workspaceSlug: string) => ({
-    key: "workspace-settings",
-    to: "/$workspaceSlug/settings",
-    params: { workspaceSlug },
-    label: "Settings",
-  }),
+  workspaceSettings: (workspaceSlug: string) => {
+    return {
+      key: "workspace-settings",
+      to: "/$workspaceSlug/settings",
+      params: { workspaceSlug },
+      label: "Settings",
+    };
+  },
 } as const satisfies AppLinksRecord;
 
 export type AppLinkKey = keyof typeof AppLinks;

@@ -12,7 +12,7 @@ import { useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
-export function SettingsPage() {
+export function SettingsPage(): JSX.Element {
   const workspace = useCurrentWorkspace();
   const [workspaceName, setWorkspaceName] = useState(workspace.name);
 
@@ -54,7 +54,9 @@ export function SettingsPage() {
         <TextInput
           label="Workspace Name"
           value={workspaceName}
-          onChange={(event) => setWorkspaceName(event.currentTarget.value)}
+          onChange={(event) => {
+            setWorkspaceName(event.currentTarget.value);
+          }}
         />
 
         <Group justify="flex-end" mt="md">

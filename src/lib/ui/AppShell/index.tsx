@@ -200,28 +200,8 @@ export function AppShell({
           </Group>
           <Stack justify="space-between" h="100%">
             <Stack gap="xs">
-              {navbarLinks.map(({ link, icon }) => (
-                <Link
-                  key={link.key}
-                  to={link.to}
-                  params={link.params}
-                  className={clsx(css.anchor, "transition-colors")}
-                  px="md"
-                  py="sm"
-                >
-                  <Group>
-                    {icon}
-                    <Text span fw={500}>
-                      {link.label}
-                    </Text>
-                  </Group>
-                </Link>
-              ))}
-            </Stack>
-
-            {utilityLinks && (
-              <Stack gap="xs" pb="md">
-                {utilityLinks.map(({ link, icon }) => (
+              {navbarLinks.map(({ link, icon }) => {
+                return (
                   <Link
                     key={link.key}
                     to={link.to}
@@ -237,7 +217,31 @@ export function AppShell({
                       </Text>
                     </Group>
                   </Link>
-                ))}
+                );
+              })}
+            </Stack>
+
+            {utilityLinks && (
+              <Stack gap="xs" pb="md">
+                {utilityLinks.map(({ link, icon }) => {
+                  return (
+                    <Link
+                      key={link.key}
+                      to={link.to}
+                      params={link.params}
+                      className={clsx(css.anchor, "transition-colors")}
+                      px="md"
+                      py="sm"
+                    >
+                      <Group>
+                        {icon}
+                        <Text span fw={500}>
+                          {link.label}
+                        </Text>
+                      </Group>
+                    </Link>
+                  );
+                })}
               </Stack>
             )}
           </Stack>
