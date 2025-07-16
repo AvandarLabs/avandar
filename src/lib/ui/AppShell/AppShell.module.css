@@ -4,13 +4,7 @@
 }
 
 .anchor {
-  display: block;
-  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
   color: var(--mantine-navbar-color);
-  border-radius: var(--mantine-radius-sm);
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
 
   &:hover {
     background-color: var(--mantine-navbar-hover-background);
@@ -19,8 +13,6 @@
 
   &[data-status="active"] {
     background-color: var(--mantine-navbar-active-background);
-    font-weight: 600;
-
     &:hover {
       background-color: var(--mantine-navbar-active-hover-background);
     }

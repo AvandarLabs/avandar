@@ -202,6 +202,8 @@ export function AppShell({
                 key={link.key}
                 to={link.to}
                 params={link.params}
+                px="md"
+                py="sm"
                 className={clsx(css.anchor, "transition-colors")}
                 activeOptions={
                   link.to === "/$workspaceSlug" ? { exact: true } : undefined
