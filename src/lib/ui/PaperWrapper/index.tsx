@@ -1,21 +1,11 @@
-import { Paper } from "@mantine/core";
-import { ReactNode } from "react";
+import { Paper as MantinePaper, PaperProps } from "@mantine/core";
 
-type MantineSize = "xs" | "sm" | "md" | "lg" | "xl";
-type MantineShadow = "xs" | "sm" | "md" | "lg" | "xl" | "none";
 
-type PaperWrapperProps = {
-  children: ReactNode;
-  p?: MantineSize | number;
-  mt?: MantineSize | number;
-  radius?: MantineSize | number;
-  shadow?: MantineShadow;
-  bg?: string;
-  withBorder?: boolean;
-  className?: string;
+
+
+
 };
-export function PaperWrapper({
-  children,
+export function Paper({
   p = "lg",
   mt = "lg",
   radius = "md",
@@ -23,9 +13,9 @@ export function PaperWrapper({
   bg = "white",
   withBorder = true,
   ...rest
-}: PaperWrapperProps): JSX.Element {
+}: PaperProps): JSX.Element {
   return (
-    <Paper
+    <MantinePaper
       p={p}
       mt={mt}
       radius={radius}
@@ -35,6 +25,6 @@ export function PaperWrapper({
       {...rest}
     >
       {children}
-    </Paper>
+    </MantinePaper>
   );
 }

@@ -1,47 +1,41 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@/test-utils";
-import { PaperWrapper } from "../PaperWrapper";
+import { Paper } from "../Paper";
 
 describe("PaperWrapper", () => {
   it("renders children correctly", () => {
     render(
-      <PaperWrapper>
+      <Paper>
         <div data-testid="inner">Hello world</div>
-      </PaperWrapper>,
+      </Paper>,
     );
 
     expect(screen.getByTestId("inner")).toBeInTheDocument();
   });
 
-  it("uses default props when none are provided", () => {
-    render(<PaperWrapper>Default test</PaperWrapper>);
-    const paper = screen.getByText("Default test").parentElement;
-    expect(paper).toBeInTheDocument();
-  });
-
   it("applies radius correctly", () => {
-    render(<PaperWrapper radius="lg">Radius test</PaperWrapper>);
+    render(<Paper radius="lg">Radius test</Paper>);
     const paper = screen.getByText("Radius test").parentElement;
     expect(paper).toBeInTheDocument();
   });
 
   it("applies border when withBorder is true", () => {
-    render(<PaperWrapper withBorder>Border test</PaperWrapper>);
-    const paper = screen.getByText("Border test").parentElement;
-    expect(paper).toBeInTheDocument();
+    render(<Paper withBorder>Border test</Paper>);
+    const paper = screen.getByText("Border test");
+    expect(paper).toHaveStyle({ "--paper-radius": "var(--mantine-radius-md)" });
   });
 
   it("applies padding when passed", () => {
-    render(<PaperWrapper p="md">Padding test</PaperWrapper>);
-    const paper = screen.getByText("Padding test").parentElement;
-    expect(paper).toBeInTheDocument();
+    render(<Paper p="md">Padding test</Paper>);
+    const paper = screen.getByText("Padding test");
+    expect(paper).toHaveAttribute("data-with-border", "true");
   });
 
   it("applies background and shadow correctly", () => {
     render(
-      <PaperWrapper bg="gray" shadow="xl">
+      <Paper bg="gray" shadow="xl">
         Styled content
-      </PaperWrapper>,
+      </Paper>,
     );
     const paper = screen.getByText("Styled content").parentElement;
     expect(paper).toBeInTheDocument();
@@ -49,18 +43,16 @@ describe("PaperWrapper", () => {
 
   it("renders with multiple props and custom class", () => {
     render(
-      <PaperWrapper className="combo" data-testid="wrapper">
+      <Paper className="combo" data-testid="wrapper">
         Combo test
-      </PaperWrapper>,
+      </Paper>,
     );
     const paper = screen.getByTestId("wrapper");
     expect(paper).toHaveClass("combo");
   });
 
   it("passes additional props through to the Paper component", () => {
-    render(
-      <PaperWrapper data-testid="passthrough">Passthrough test</PaperWrapper>,
-    );
+    render(<Paper data-testid="passthrough">Passthrough test</Paper>);
     expect(screen.getByTestId("passthrough")).toBeInTheDocument();
   });
 });
