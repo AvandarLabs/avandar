@@ -185,7 +185,7 @@ export const AppLinks = {
       label: entityName,
     };
   },
-  // Settings links
+  // Settings link
   workspaceSettings: (workspaceSlug: string) => ({
     key: "workspace-settings",
     to: "/$workspaceSlug/settings",
