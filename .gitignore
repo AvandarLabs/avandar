@@ -36,4 +36,3 @@ dist-ssr
 .eslintcache
 
 # Supabase
-supabase/.temp
