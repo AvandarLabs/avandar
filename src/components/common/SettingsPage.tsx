@@ -14,7 +14,7 @@ import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
 export function SettingsPage() {
   const workspace = useCurrentWorkspace();
-  const [name, setName] = useState(workspace.name);
+  const [workspaceName, setWorkspaceName] = useState(workspace.name);
 
   const [saveWorkspace, isWorkspaceSaving] = WorkspaceClient.useUpdate({
     onSuccess: () => {
@@ -37,8 +37,7 @@ export function SettingsPage() {
     saveWorkspace({
       id: workspace.id,
       data: {
-        ...workspace,
-        name,
+        name: workspaceName,
       },
     });
   };
@@ -54,15 +53,15 @@ export function SettingsPage() {
 
         <TextInput
           label="Workspace Name"
-          value={name}
-          onChange={(event) => setName(event.currentTarget.value)}
+          value={workspaceName}
+          onChange={(event) => setWorkspaceName(event.currentTarget.value)}
         />
 
         <Group justify="flex-end" mt="md">
           <Button
             onClick={handleSave}
             loading={isWorkspaceSaving}
-            disabled={name === workspace.name}
+            disabled={workspaceName === workspace.name}
           >
             Save
           </Button>
