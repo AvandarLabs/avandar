@@ -7,9 +7,10 @@ import { AppConfig } from "@/config/AppConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { FileUploadField } from "@/lib/ui/singleton-forms/FileUploadField";
+import { noop } from "@/lib/utils/misc";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { makeLocalDataset } from "@/models/LocalDataset/utils";
-import { useCSVParser } from "./hooks/useCSVParser";
+import { useCSVParser } from "../hooks/useCSVParser";
 
 type DatasetForm = {
   name: string;
@@ -55,6 +56,12 @@ export function DataImportView(): JSX.Element {
 
   return (
     <Container pt="lg">
+      <Button variant="outline" onClick={noop} size="xl">
+        Upload a CSV
+      </Button>
+      <Button variant="outline" onClick={noop} size="xl">
+        Connect to Google Sheets
+      </Button>
       <FileUploadField
         label="Upload a CSV"
         description="Select a CSV from your computer to import"
@@ -62,7 +69,6 @@ export function DataImportView(): JSX.Element {
         accept="text/csv"
         onSubmit={parseFile}
       />
-
       {csv && fileMetadata ?
         <Stack>
           <Title order={3}>Data Preview</Title>
@@ -115,7 +121,6 @@ export function DataImportView(): JSX.Element {
           </form>
         </Stack>
       : null}
-
       <Dropzone.FullScreen
         onDrop={(files: FileWithPath[]) => {
           const uploadedFile = files[0];
