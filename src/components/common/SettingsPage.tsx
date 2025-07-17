@@ -1,5 +1,4 @@
-import { Container, Stack, Text, Title } from "@mantine/core";
-import { useState } from "react";
+import { Container, Stack, Title } from "@mantine/core";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { BasicForm } from "@/lib/ui/BasicForm";
 import { notifyError } from "@/lib/ui/notifications/notifyError";
@@ -8,7 +7,6 @@ import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
 export function SettingsPage(): JSX.Element {
   const workspace = useCurrentWorkspace();
-  const [workspaceName, setWorkspaceName] = useState(workspace.name);
 
   const [saveWorkspace, isWorkspaceSaving] = WorkspaceClient.useUpdate({
     onSuccess: () => {
@@ -25,25 +23,13 @@ export function SettingsPage(): JSX.Element {
     },
   });
 
-  const onSubmit = () => {
-    saveWorkspace({
-      id: workspace.id,
-      data: {
-        name: workspaceName,
-      },
-    });
-  };
-
   return (
     <Container size="sm">
       <Stack>
         <Title order={2}>Workspace Settings</Title>
 
-        <Text c="dimmed" size="sm">
-          Update your workspace name. Editing the slug will come later.
-        </Text>
-
         <BasicForm
+          introText="Update your workspace name. Editing the slug will come later."
           fields={{
             workspaceName: {
               type: "text",
@@ -52,9 +38,17 @@ export function SettingsPage(): JSX.Element {
             },
           }}
           formElements={["workspaceName"]}
-          disableSubmitWhileUnchanged={workspaceName === workspace.name}
+          disableSubmitWhileUnchanged
           buttonAlignment="right"
-          onSubmit={onSubmit}
+          submitIsLoading={isWorkspaceSaving}
+          onSubmit={(values) => {
+            saveWorkspace({
+              id: workspace.id,
+              data: {
+                name: values.workspaceName,
+              },
+            });
+          }}
         />
       </Stack>
     </Container>
