@@ -57,6 +57,8 @@ type Props = {
  * Columns are grouped by dataset and, by default, this also renders
  * a table of contents to also make it easy to scroll from one
  * dataset's list to another.
+ *
+ * Only one column can be selected at a time.
  */
 export function LocalDatasetColumnPickerList({
   datasetIds,
