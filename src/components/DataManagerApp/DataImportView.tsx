@@ -6,7 +6,7 @@ import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { AppConfig } from "@/config/AppConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
-import { PaperWrapper } from "@/lib/ui/PaperWrapper";
+import { PaperWrapper } from "@/lib/ui/Paper";
 import { FileUploadField } from "@/lib/ui/singleton-forms/FileUploadField";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { makeLocalDataset } from "@/models/LocalDataset/utils";

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@/test-utils";
-import { Paper } from "../Paper";
+import { Paper } from "./index";
 
 describe("PaperWrapper", () => {
   it("renders children correctly", () => {
@@ -15,20 +15,22 @@ describe("PaperWrapper", () => {
 
   it("applies radius correctly", () => {
     render(<Paper radius="lg">Radius test</Paper>);
-    const paper = screen.getByText("Radius test").parentElement;
-    expect(paper).toBeInTheDocument();
+    const paper = screen.getByText("Radius test");
+    expect(paper).toHaveStyle({
+      "--paper-radius": "var(--mantine-radius-lg)",
+    });
   });
 
   it("applies border when withBorder is true", () => {
     render(<Paper withBorder>Border test</Paper>);
     const paper = screen.getByText("Border test");
-    expect(paper).toHaveStyle({ "--paper-radius": "var(--mantine-radius-md)" });
+    expect(paper).toHaveAttribute("data-with-border", "true");
   });
 
   it("applies padding when passed", () => {
     render(<Paper p="md">Padding test</Paper>);
     const paper = screen.getByText("Padding test");
-    expect(paper).toHaveAttribute("data-with-border", "true");
+    expect(paper).toHaveStyle({ padding: "var(--mantine-spacing-md)" });
   });
 
   it("applies background and shadow correctly", () => {
@@ -37,8 +39,8 @@ describe("PaperWrapper", () => {
         Styled content
       </Paper>,
     );
-    const paper = screen.getByText("Styled content").parentElement;
-    expect(paper).toBeInTheDocument();
+    const paper = screen.getByText("Styled content");
+    expect(paper).toHaveStyle({ "--paper-shadow": "var(--mantine-shadow-xl)" });
   });
 
   it("renders with multiple props and custom class", () => {
