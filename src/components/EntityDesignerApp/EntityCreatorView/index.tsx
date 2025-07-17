@@ -13,7 +13,6 @@ import { useMemo, useState } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useForm } from "@/lib/hooks/ui/useForm";
-import { Logger } from "@/lib/Logger";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
@@ -50,7 +49,6 @@ export function EntityCreatorView(): JSX.Element {
       values: EntityConfigFormValues,
     ): EntityConfigFormSubmitValues => {
       const idFields = new Set(objectValues(values?.idFieldsByDatasetId ?? {}));
-      Logger.log("id fields", idFields);
 
       const allFields = values.datasetColumnFields
         .concat(values.manualEntryFields)

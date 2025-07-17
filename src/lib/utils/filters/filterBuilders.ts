@@ -21,12 +21,12 @@ export function where<T extends UnknownObject, K extends keyof T>(
 export function where<T extends UnknownObject, K extends keyof T>(
   column: K,
   operator: ArrayValueOperator,
-  value: Array<T[K] | undefined>,
+  value: ReadonlyArray<T[K] | undefined>,
 ): { where: FiltersByColumn<T> };
 export function where<T extends UnknownObject, K extends keyof T>(
   column: K,
   operator: FilterOperator,
-  value: T[K] | Array<T[K] | undefined>,
+  value: T[K] | ReadonlyArray<T[K] | undefined>,
 ): { where: FiltersByColumn<T> } {
   return {
     where: {
