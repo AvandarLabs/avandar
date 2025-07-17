@@ -83,7 +83,7 @@ type Props<
   formElements: ReadonlyArray<StringKeyOf<Fields> | ReactNode>;
   outroText?: ReactNode;
   disableSubmitWhileUnchanged?: boolean;
-  buttonAlignment: "right" | "left";
+  buttonAlignment?: "right" | "left";
   onSubmit: (values: FormValues) => void;
   submitIsLoading?: boolean;
 };
