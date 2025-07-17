@@ -1,4 +1,4 @@
-import { Box, Button, Stack, Text, TextInput } from "@mantine/core";
+import { Box, Button, Flex, Stack, Text, TextInput } from "@mantine/core";
 import { FormValidateInput, isEmail, useForm } from "@mantine/form";
 import { HTMLInputAutoCompleteAttribute, ReactNode, useMemo } from "react";
 import { match } from "ts-pattern";
@@ -82,6 +82,8 @@ type Props<
   fields: Fields;
   formElements: ReadonlyArray<StringKeyOf<Fields> | ReactNode>;
   outroText?: ReactNode;
+  disableSubmitWhileUnchanged?: boolean;
+  buttonAlignment: "right" | "left";
   onSubmit: (values: FormValues) => void;
   submitIsLoading?: boolean;
 };
@@ -95,6 +97,8 @@ export function BasicForm<
   onSubmit,
   introText,
   outroText,
+  disableSubmitWhileUnchanged,
+  buttonAlignment,
   submitIsLoading,
 }: Props<Fields, FormValues>): JSX.Element {
   const formInitializer = useMemo(() => {
@@ -198,13 +202,20 @@ export function BasicForm<
         {innerFormElements}
         {renderText(outroText)}
         <Box mt="sm">
-          <Button
-            loading={submitIsLoading}
-            disabled={submitIsLoading}
-            type="submit"
+          <Flex
+            justify={buttonAlignment === "left" ? "flex-start" : "flex-end"}
           >
-            Submit
-          </Button>
+            <Button
+              loading={submitIsLoading}
+              disabled={
+                submitIsLoading ||
+                (disableSubmitWhileUnchanged && !form.isDirty())
+              }
+              type="submit"
+            >
+              Submit
+            </Button>
+          </Flex>
         </Box>
       </Stack>
     </form>

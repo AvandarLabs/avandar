@@ -1,15 +1,9 @@
-import {
-  Button,
-  Container,
-  Group,
-  Stack,
-  Text,
-  TextInput,
-  Title,
-} from "@mantine/core";
-import { notifications } from "@mantine/notifications";
+import { Container, Stack, Text, Title } from "@mantine/core";
 import { useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { BasicForm } from "@/lib/ui/BasicForm";
+import { notifyError } from "@/lib/ui/notifications/notifyError";
+import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
 export function SettingsPage(): JSX.Element {
@@ -18,22 +12,20 @@ export function SettingsPage(): JSX.Element {
 
   const [saveWorkspace, isWorkspaceSaving] = WorkspaceClient.useUpdate({
     onSuccess: () => {
-      notifications.show({
+      notifySuccess({
         title: "Workspace name updated",
         message: "The workspace name was saved successfully.",
-        color: "green",
       });
     },
     onError: (error) => {
-      notifications.show({
+      notifyError({
         title: "Failed to update workspace name",
         message: error.message,
-        color: "red",
       });
     },
   });
 
-  const handleSave = () => {
+  const onSubmit = () => {
     saveWorkspace({
       id: workspace.id,
       data: {
@@ -51,23 +43,19 @@ export function SettingsPage(): JSX.Element {
           Update your workspace name. Editing the slug will come later.
         </Text>
 
-        <TextInput
-          label="Workspace Name"
-          value={workspaceName}
-          onChange={(event) => {
-            setWorkspaceName(event.currentTarget.value);
+        <BasicForm
+          fields={{
+            workspaceName: {
+              type: "text",
+              initialValue: workspace.name,
+              label: "Workspace Name",
+            },
           }}
+          formElements={["workspaceName"]}
+          disableSubmitWhileUnchanged={workspaceName === workspace.name}
+          buttonAlignment="right"
+          onSubmit={onSubmit}
         />
-
-        <Group justify="flex-end" mt="md">
-          <Button
-            onClick={handleSave}
-            loading={isWorkspaceSaving}
-            disabled={workspaceName === workspace.name}
-          >
-            Save
-          </Button>
-        </Group>
       </Stack>
     </Container>
   );
