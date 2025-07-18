@@ -12,9 +12,12 @@ import { AggregationExtractor } from "@/models/EntityConfig/ValueExtractor/Aggre
 import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/types";
 import { ManualEntryExtractor } from "@/models/EntityConfig/ValueExtractor/ManualEntryExtractor/types";
 import { EntityFieldValueExtractorRegistry } from "@/models/EntityConfig/ValueExtractor/types";
-import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
+import {
+  LocalDatasetField,
+  LocalDatasetFieldId,
+} from "@/models/LocalDataset/LocalDatasetField/types";
 import { getEntityFieldBaseDataType } from "@/models/LocalDataset/LocalDatasetField/utils";
-import { LocalDataset, LocalDatasetId } from "@/models/LocalDataset/types";
+import { LocalDataset } from "@/models/LocalDataset/types";
 
 export type EntityFieldFormValues = SetRequired<
   SetOptional<EntityFieldConfig<"Insert">, "workspaceId">,
@@ -58,10 +61,13 @@ export type EntityConfigFormValues = SetOptional<
 
   /**
    * If any fields are configured as datasetColumnValue extractors,
-   * this record will map the dataset IDs we need to extract from
-   * to the field ID that represents the entity's ID.
+   * this array holds the ids of the datasets we will extract from,
+   * coupled with the id of the column to use as the primary key.
    */
-  idFieldsByDatasetId: Record<LocalDatasetId, EntityFieldConfigId>;
+  sourceDatasets: Array<{
+    dataset: LocalDataset;
+    primaryKeyColumnId?: LocalDatasetFieldId;
+  }>;
   datasetColumnFields: EntityFieldFormValues[];
   manualEntryFields: EntityFieldFormValues[];
 };
@@ -83,7 +89,7 @@ export function getDefaultEntityConfigFormValues(): EntityConfigFormValues {
     titleFieldId: undefined,
     name: "",
     description: "",
-    idFieldsByDatasetId: {},
+    sourceDatasets: [],
     allowManualCreation: false,
     datasetColumnFields: [],
     manualEntryFields: [],

@@ -7,7 +7,7 @@ import {
   Stack,
   Title,
 } from "@mantine/core";
-import { useUncontrolled } from "@mantine/hooks";
+import { usePrevious, useUncontrolled } from "@mantine/hooks";
 import {
   Fragment,
   useCallback,
@@ -25,7 +25,7 @@ import {
 import { makeSegmentedControlItems } from "@/lib/ui/inputs/SegmentedControl/makeSegmentedControlItems";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNonEmptyArray } from "@/lib/utils/guards";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries } from "@/lib/utils/objects/misc";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
@@ -112,6 +112,8 @@ export function LocalDatasetColumnPickerList({
     );
   }, [datasets, excludeColumns]);
 
+  const prevColumnItems = usePrevious(datasetColumnItems);
+
   // select the first column when the datasets array are defined
   useOnBecomesDefined(
     datasets,
@@ -128,13 +130,38 @@ export function LocalDatasetColumnPickerList({
 
   useEffect(() => {
     // if the columns to exclude now includes the currently selected value,
-    // then let's change the selected value to the first column of the dataset
-    if (excludeColumns?.includes(controlledValue)) {
-      if (datasetColumnItems[0]?.items[0]) {
-        onChangeValue(datasetColumnItems[0].items[0].value);
+    // then let's change the selected value to next value in the list
+    if (excludeColumns?.includes(controlledValue) && prevColumnItems) {
+      const allColumns = prevColumnItems.flatMap(getProp("items"));
+      const remainingColumns = allColumns.filter((col) => {
+        // remember to still include the `controlledValue` because we
+        // still need to find its index in the flattened array
+        return (
+          !excludeColumns?.includes(col.value) || col.value === controlledValue
+        );
+      });
+
+      const currColumnIdx = remainingColumns.findIndex(
+        propEquals("value", controlledValue),
+      );
+
+      const nextIdx =
+        currColumnIdx + 1 >= remainingColumns.length ?
+          currColumnIdx - 1
+        : currColumnIdx + 1;
+
+      const nextColumn = remainingColumns[nextIdx];
+      if (nextColumn) {
+        onChangeValue(nextColumn.value);
       }
     }
-  }, [excludeColumns, datasetColumnItems, onChangeValue, controlledValue]);
+  }, [
+    excludeColumns,
+    datasetColumnItems,
+    onChangeValue,
+    controlledValue,
+    prevColumnItems,
+  ]);
 
   return (
     <Group align="flex-start" style={{ position: "relative" }}>
@@ -200,7 +227,6 @@ export function LocalDatasetColumnPickerList({
               closestDistanceToTop = distanceFromTop;
             }
           }
-          console.log(closestDatasetToTop);
           setActiveDatasetHeading(closestDatasetToTop);
         }}
       >

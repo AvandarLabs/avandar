@@ -69,6 +69,7 @@ export function DatasetColumnFieldsBlock({
     return localDatasets?.filter((dataset) => {
       return (
         dataset.datasetType !== "entity_field_values" &&
+        dataset.datasetType !== "entities_queryable" &&
         dataset.datasetType !== "entities"
       );
     });
@@ -139,6 +140,18 @@ export function DatasetColumnFieldsBlock({
 
         // add this field to the form data
         entityConfigForm.insertListItem("datasetColumnFields", newField);
+
+        // if the selected dataset isn't already in our sourceDatasets array,
+        // add it
+        const { sourceDatasets } = entityConfigForm.getValues();
+        if (
+          !sourceDatasets.some(propEquals("dataset.id", selectedDataset.id))
+        ) {
+          entityConfigForm.insertListItem("sourceDatasets", {
+            dataset: selectedDataset,
+            primaryKeyColumnId: undefined,
+          });
+        }
       }
     }
   }, [
@@ -188,7 +201,6 @@ export function DatasetColumnFieldsBlock({
             <LocalDatasetColumnPickerList
               datasetIds={localDatasetsToUse?.map(getProp("id")) ?? []}
               onChange={(value) => {
-                console.log("value", value);
                 setSelectedDatasetColumnId(value);
               }}
               excludeColumns={addedColumns}
