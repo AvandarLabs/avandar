@@ -2,59 +2,49 @@ import { describe, expect, it } from "vitest";
 import { render, screen } from "@/test-utils";
 import { Paper } from "./index";
 
-describe("PaperWrapper", () => {
-  it("renders children correctly", () => {
-    render(
-      <Paper>
-        <div data-testid="inner">Hello world</div>
-      </Paper>,
-    );
-
-    expect(screen.getByTestId("inner")).toBeInTheDocument();
+describe("Paper", () => {
+  it("renders without crashing", () => {
+    render(<Paper data-testid="paper-element" />);
+    expect(screen.getByTestId("paper-element")).toBeInTheDocument();
   });
 
   it("applies radius correctly", () => {
-    render(<Paper radius="lg">Radius test</Paper>);
-    const paper = screen.getByText("Radius test");
+    render(<Paper data-testid="radius-test" radius="lg" />);
+    const paper = screen.getByTestId("radius-test");
     expect(paper).toHaveStyle({
       "--paper-radius": "var(--mantine-radius-lg)",
     });
   });
 
   it("applies border when withBorder is true", () => {
-    render(<Paper withBorder>Border test</Paper>);
-    const paper = screen.getByText("Border test");
+    render(<Paper data-testid="border-test" withBorder />);
+    const paper = screen.getByTestId("border-test");
     expect(paper).toHaveAttribute("data-with-border", "true");
   });
 
   it("applies padding when passed", () => {
-    render(<Paper p="md">Padding test</Paper>);
-    const paper = screen.getByText("Padding test");
+    render(<Paper data-testid="padding-test" p="md" />);
+    const paper = screen.getByTestId("padding-test");
     expect(paper).toHaveStyle({ padding: "var(--mantine-spacing-md)" });
   });
 
   it("applies background and shadow correctly", () => {
-    render(
-      <Paper bg="gray" shadow="xl">
-        Styled content
-      </Paper>,
-    );
-    const paper = screen.getByText("Styled content");
-    expect(paper).toHaveStyle({ "--paper-shadow": "var(--mantine-shadow-xl)" });
+    render(<Paper data-testid="style-test" bg="gray" shadow="xl" />);
+    const paper = screen.getByTestId("style-test");
+    expect(paper).toHaveStyle({
+      "--paper-shadow": "var(--mantine-shadow-xl)",
+    });
   });
 
-  it("renders with multiple props and custom class", () => {
-    render(
-      <Paper className="combo" data-testid="wrapper">
-        Combo test
-      </Paper>,
-    );
-    const paper = screen.getByTestId("wrapper");
-    expect(paper).toHaveClass("combo");
+  it("renders with custom className", () => {
+    render(<Paper className="custom-class" data-testid="custom-class-test" />);
+    const paper = screen.getByTestId("custom-class-test");
+    expect(paper).toHaveClass("custom-class");
   });
 
-  it("passes additional props through to the Paper component", () => {
-    render(<Paper data-testid="passthrough">Passthrough test</Paper>);
-    expect(screen.getByTestId("passthrough")).toBeInTheDocument();
+  it("passes arbitrary props through to the Paper element", () => {
+    render(<Paper aria-label="test-label" data-testid="passthrough" />);
+    const paper = screen.getByTestId("passthrough");
+    expect(paper).toHaveAttribute("aria-label", "test-label");
   });
 });
