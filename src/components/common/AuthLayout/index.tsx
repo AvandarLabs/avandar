@@ -1,5 +1,6 @@
-import { Container, Paper, Stack, Text, Title } from "@mantine/core";
+import { Container, Stack, Text, Title } from "@mantine/core";
 import { ReactNode } from "react";
+import { Paper } from "@/lib/ui/Paper";
 
 type Props = {
   title: string;
@@ -21,9 +22,7 @@ export function AuthLayout({ title, subtitle, children }: Props): JSX.Element {
           </Text>
         : null}
 
-        <Paper withBorder shadow="md" p="lg" mt="lg" radius="md" bg="white">
-          {children}
-        </Paper>
+        <Paper>{children}</Paper>
       </Stack>
     </Container>
   );

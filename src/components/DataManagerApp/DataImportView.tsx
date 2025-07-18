@@ -6,6 +6,7 @@ import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { AppConfig } from "@/config/AppConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
+import { Paper } from "@/lib/ui/Paper";
 import { FileUploadField } from "@/lib/ui/singleton-forms/FileUploadField";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { makeLocalDataset } from "@/models/LocalDataset/utils";
@@ -55,93 +56,95 @@ export function DataImportView(): JSX.Element {
 
   return (
     <Container pt="lg">
-      <FileUploadField
-        label="Upload a CSV"
-        description="Select a CSV from your computer to import"
-        placeholder="Select file"
-        accept="text/csv"
-        onSubmit={parseFile}
-      />
+      <Paper>
+        <FileUploadField
+          label="Upload a CSV"
+          description="Select a CSV from your computer to import"
+          placeholder="Select file"
+          accept="text/csv"
+          onSubmit={parseFile}
+        />
 
-      {csv && fileMetadata ?
-        <Stack>
-          <Title order={3}>Data Preview</Title>
-          <DataGrid columnNames={csv.meta.fields ?? []} data={csv.data} />
-          <form
-            onSubmit={form.onSubmit((values) => {
-              const dataset = makeLocalDataset({
-                workspaceId: workspace.id,
-                name: values.name,
-                datasetType: "upload",
-                description: values.description,
-                fileMetadata,
-                csvMetadata: csv.meta,
-                data: csv.data,
-                fields,
-              });
+        {csv && fileMetadata ?
+          <Stack>
+            <Title order={3}>Data Preview</Title>
+            <DataGrid columnNames={csv.meta.fields ?? []} data={csv.data} />
+            <form
+              onSubmit={form.onSubmit((values) => {
+                const dataset = makeLocalDataset({
+                  workspaceId: workspace.id,
+                  name: values.name,
+                  datasetType: "upload",
+                  description: values.description,
+                  fileMetadata,
+                  csvMetadata: csv.meta,
+                  data: csv.data,
+                  fields,
+                });
 
-              saveDataset(
-                { data: dataset },
-                {
-                  onSuccess: () => {
-                    notifications.show({
-                      title: "Dataset saved",
-                      message: `${dataset.name} saved successfully`,
-                      color: "green",
-                    });
+                saveDataset(
+                  { data: dataset },
+                  {
+                    onSuccess: () => {
+                      notifications.show({
+                        title: "Dataset saved",
+                        message: `${dataset.name} saved successfully`,
+                        color: "green",
+                      });
+                    },
                   },
-                },
-              );
-            })}
-          >
-            <Stack>
-              <TextInput
-                key={form.key("name")}
-                label="Dataset Name"
-                placeholder="Enter a name for this dataset"
-                required
-                {...form.getInputProps("name")}
-              />
-              <TextInput
-                key={form.key("description")}
-                label="Description"
-                placeholder="Enter a description for this dataset"
-                {...form.getInputProps("description")}
-              />
-              <Button loading={isSavePending} type="submit">
-                Save Dataset
-              </Button>
-            </Stack>
-          </form>
-        </Stack>
-      : null}
+                );
+              })}
+            >
+              <Stack>
+                <TextInput
+                  key={form.key("name")}
+                  label="Dataset Name"
+                  placeholder="Enter a name for this dataset"
+                  required
+                  {...form.getInputProps("name")}
+                />
+                <TextInput
+                  key={form.key("description")}
+                  label="Description"
+                  placeholder="Enter a description for this dataset"
+                  {...form.getInputProps("description")}
+                />
+                <Button loading={isSavePending} type="submit">
+                  Save Dataset
+                </Button>
+              </Stack>
+            </form>
+          </Stack>
+        : null}
 
-      <Dropzone.FullScreen
-        onDrop={(files: FileWithPath[]) => {
-          const uploadedFile = files[0];
-          if (uploadedFile) {
-            parseFile(uploadedFile);
-          }
-        }}
-      >
-        <Dropzone.Accept>
-          <IconUpload
-            size={52}
-            color="var(--mantine-color-blue-6)"
-            stroke={1.5}
-          />
-        </Dropzone.Accept>
-        <Dropzone.Reject>
-          <IconX size={52} color="var(--mantine-color-red-6)" stroke={1.5} />
-        </Dropzone.Reject>
-        <Dropzone.Idle>
-          <IconPhoto
-            size={52}
-            color="var(--mantine-color-dimmed)"
-            stroke={1.5}
-          />
-        </Dropzone.Idle>
-      </Dropzone.FullScreen>
+        <Dropzone.FullScreen
+          onDrop={(files: FileWithPath[]) => {
+            const uploadedFile = files[0];
+            if (uploadedFile) {
+              parseFile(uploadedFile);
+            }
+          }}
+        >
+          <Dropzone.Accept>
+            <IconUpload
+              size={52}
+              color="var(--mantine-color-blue-6)"
+              stroke={1.5}
+            />
+          </Dropzone.Accept>
+          <Dropzone.Reject>
+            <IconX size={52} color="var(--mantine-color-red-6)" stroke={1.5} />
+          </Dropzone.Reject>
+          <Dropzone.Idle>
+            <IconPhoto
+              size={52}
+              color="var(--mantine-color-dimmed)"
+              stroke={1.5}
+            />
+          </Dropzone.Idle>
+        </Dropzone.FullScreen>
+      </Paper>
     </Container>
   );
 }
