@@ -5,13 +5,13 @@ import {
   NavLinkProps as MantineNavLinkProps,
   useMantineTheme,
 } from "@mantine/core";
-import { useHover } from "@mantine/hooks";
+import { useHover, useMergedRef } from "@mantine/hooks";
 import {
   createLink,
   LinkComponent,
   LinkComponentProps,
 } from "@tanstack/react-router";
-import { forwardRef, useEffect, useMemo, useState } from "react";
+import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { Theme } from "@/config/Theme";
 import { noop } from "@/lib/utils/misc";
 
@@ -40,7 +40,9 @@ const MantineRouterNavLink = createLink(MantineNavLinkComponent);
 // eslint-disable-next-line react/function-component-definition
 export const NavLink: LinkComponent<typeof MantineRouterNavLink> = (props) => {
   const [isClicked, setIsClicked] = useState(false);
-  const { hovered, ref } = useHover();
+  const { hovered, ref: hoverRef } = useHover();
+  const linkRef = useRef<HTMLAnchorElement>(null);
+  const mergedRef = useMergedRef(linkRef, hoverRef);
   const theme = useMantineTheme();
   const { onClick, style, inactiveHoverColor, ...rest } = props;
 
@@ -62,7 +64,7 @@ export const NavLink: LinkComponent<typeof MantineRouterNavLink> = (props) => {
 
   // We need to check both `data-status` and `isClicked` because `data-status`
   // might not update immediately
-  const isActive = isClicked || ref.current?.dataset?.status === "active";
+  const isActive = isClicked || linkRef.current?.dataset?.status === "active";
 
   // Mantine NavLinks do not provide a way to override the hover color of an
   // inactive link, so we have to do it ourselves using `useHover`,
@@ -91,7 +93,7 @@ export const NavLink: LinkComponent<typeof MantineRouterNavLink> = (props) => {
 
   return (
     <MantineRouterNavLink
-      ref={ref}
+      ref={mergedRef}
       onClick={(e) => {
         setIsClicked(true);
         onClick?.(e);

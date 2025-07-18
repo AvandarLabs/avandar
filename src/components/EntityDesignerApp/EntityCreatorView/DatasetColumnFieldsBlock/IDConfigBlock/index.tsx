@@ -1,9 +1,8 @@
-import { Group, Loader, Select, Stack, Text } from "@mantine/core";
+import { Loader, Select, Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNotUndefined } from "@/lib/utils/guards";
-import { identity } from "@/lib/utils/misc";
 import { makeObjectFromList } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
@@ -21,7 +20,7 @@ export function IDConfigBlock({
   const { datasetColumnFields } = entityConfigForm.getValues();
   const { fields } = entityConfigForm.getTransformedValues();
 
-  const datasetsToPullFrom = useMemo(() => {
+  const datasetIdsToPullFrom = useMemo(() => {
     return [
       ...new Set(
         datasetColumnFields
@@ -31,55 +30,61 @@ export function IDConfigBlock({
     ];
   }, [datasetColumnFields]);
 
+  const [localDatasets, loadingLocalDatasets] = LocalDatasetClient.useGetAll({
+    ...where("id", "in", datasetIdsToPullFrom),
+    useQueryOptions: { enabled: datasetIdsToPullFrom.length > 0 },
+  });
+
   // these are the fields that are eligible to be used as the entity ID or title
-  const possibleIdFieldsByDatasetId = useMemo(() => {
-    return makeObjectFromList(datasetsToPullFrom, {
-      keyFn: identity,
-      valueFn: (datasetId) => {
-        // get all fields that extract from this dataset
-        return makeSelectOptions(
-          datasetColumnFields.filter((field) => {
-            return field.extractors.datasetColumnValue.datasetId === datasetId;
-          }),
-          { valueFn: getProp("id"), labelFn: getProp("name") },
-        );
+  const fieldOptionsByDatasetId = useMemo(() => {
+    return makeObjectFromList(localDatasets ?? [], {
+      keyFn: getProp("id"),
+      valueFn: (dataset) => {
+        return makeSelectOptions(dataset.fields, {
+          valueFn: getProp("id"),
+          labelFn: getProp("name"),
+        });
       },
     });
-  }, [datasetsToPullFrom, datasetColumnFields]);
+  }, [localDatasets]);
 
-  const [localDatasets, loadingLocalDatasets] = LocalDatasetClient.useGetAll({
-    ...where("id", "in", datasetsToPullFrom),
-    useQueryOptions: { enabled: datasetsToPullFrom.length > 0 },
-  });
+  const { sourceDatasets } = entityConfigForm.getValues();
 
   return (
     <Stack>
       {loadingLocalDatasets ?
         <Loader />
-      : localDatasets?.map((dataset) => {
-          const possibleIdFields = possibleIdFieldsByDatasetId[dataset.id];
-          if (!possibleIdFields) {
+      : sourceDatasets.map(({ dataset }, idx) => {
+          const fieldOptions = fieldOptionsByDatasetId[dataset.id];
+          if (!fieldOptions) {
             return null;
           }
 
           return (
-            <Group>
-              <Text key={dataset.id}>{dataset.name}</Text>
-              <Select
-                required
-                key={entityConfigForm.key(`idFieldsByDatasetId.${dataset.id}`)}
-                data={possibleIdFields}
-                placeholder={
-                  fields.length === 0 ?
-                    "No fields have been configured yet"
-                  : "Select a field"
-                }
-                label={`What field should be used as a ${entityConfigName}'s ID?`}
-                {...entityConfigForm.getInputProps(
-                  `idFieldsByDatasetId.${dataset.id}`,
-                )}
-              />
-            </Group>
+            <Select
+              required
+              key={entityConfigForm.key(
+                `sourceDatasets.${idx}.primaryKeyColumnId`,
+              )}
+              data={fieldOptions}
+              placeholder={
+                fields.length === 0 ?
+                  "No fields have been configured yet"
+                : "Select a field"
+              }
+              label={
+                <Text span>
+                  For dataset{" "}
+                  <Text span fw="bold">
+                    {dataset.name}
+                  </Text>
+                  , what field should be used as a {entityConfigName}'s ID?
+                </Text>
+              }
+              {...entityConfigForm.getInputProps(
+                `sourceDatasets.${idx}.primaryKeyColumnId`,
+              )}
+            />
           );
         })
       }

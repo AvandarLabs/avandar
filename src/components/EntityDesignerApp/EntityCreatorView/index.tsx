@@ -13,11 +13,10 @@ import { useMemo, useState } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useForm } from "@/lib/hooks/ui/useForm";
-import { Logger } from "@/lib/Logger";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
-import { objectValues } from "@/lib/utils/objects/misc";
+import { isNotUndefined } from "@/lib/utils/guards";
+import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { setValue } from "@/lib/utils/objects/setValue";
 import { DatasetColumnFieldsBlock } from "./DatasetColumnFieldsBlock";
 import {
@@ -25,6 +24,7 @@ import {
   EntityConfigFormType,
   EntityConfigFormValues,
   getDefaultEntityConfigFormValues,
+  makeDefaultDatasetColumnField,
   makeDefaultManualEntryField,
 } from "./entityConfigFormTypes";
 import { ManualEntryFieldsBlock } from "./ManualEntryFieldsBlock";
@@ -42,6 +42,9 @@ export function EntityCreatorView(): JSX.Element {
 
     validate: {
       titleFieldId: isNotEmpty("Title field is required"),
+      sourceDatasets: {
+        primaryKeyColumnId: isNotEmpty("ID field is required"),
+      },
     },
 
     // our transformed values combine all the datasetColumnFields
@@ -49,17 +52,55 @@ export function EntityCreatorView(): JSX.Element {
     transformValues: (
       values: EntityConfigFormValues,
     ): EntityConfigFormSubmitValues => {
-      const idFields = new Set(objectValues(values?.idFieldsByDatasetId ?? {}));
-      Logger.log("id fields", idFields);
+      // collect all the primary key fields
+      const primaryKeyFields = values.sourceDatasets
+        .map(({ dataset, primaryKeyColumnId }) => {
+          if (!primaryKeyColumnId) {
+            return undefined;
+          }
 
-      const allFields = values.datasetColumnFields
-        .concat(values.manualEntryFields)
-        // set the id fields
-        .map((field) => {
-          return idFields.has(field.id) && field.options.class === "dimension" ?
-              setValue(field, "options.isIdField", true)
-            : field;
+          // first, let's see if this primary key column was already
+          // added as a datasetColumnField
+          const primaryField = values.datasetColumnFields.find(
+            propEquals(
+              "extractors.datasetColumnValue.datasetFieldId",
+              primaryKeyColumnId,
+            ),
+          );
+
+          if (primaryField) {
+            // if the primary key field was already added, set `isIdField`
+            return setValue(primaryField, "options.isIdField", true);
+          }
+
+          // otherwise, create a datasetColumnField for this primary key
+          // column, and set `isIdField`
+          const datasetColumn = dataset.fields.find(
+            propEquals("id", primaryKeyColumnId),
+          );
+          if (datasetColumn) {
+            return setValue(
+              makeDefaultDatasetColumnField({
+                entityConfigId,
+                name: datasetColumn.name,
+                dataset,
+                datasetColumn,
+              }),
+              "options.isIdField",
+              true,
+            );
+          }
+          return undefined;
         })
+        .filter(isNotUndefined);
+
+      const nonPrimaryKeyFields = values.datasetColumnFields.filter(
+        propEquals("options.isIdField", false),
+      );
+
+      const allFields = nonPrimaryKeyFields
+        .concat(primaryKeyFields)
+        .concat(values.manualEntryFields)
         // set the title field
         .map((field) => {
           return (
