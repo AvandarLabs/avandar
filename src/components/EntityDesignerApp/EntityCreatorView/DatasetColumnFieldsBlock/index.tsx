@@ -222,7 +222,7 @@ export function DatasetColumnFieldsBlock({
             </Text>
             <Divider />
             {addedFields.length === 0 ?
-              <Text>No columns have been added yet</Text>
+              <Text>No columns have been added yet.</Text>
             : <ScrollArea h={300}>
                 <SegmentedControl
                   orientation="vertical"
@@ -263,10 +263,12 @@ export function DatasetColumnFieldsBlock({
             the same {entityConfigName}.
           </Text>
         </Callout.Info>
-        <IDConfigBlock
-          entityConfigForm={entityConfigForm}
-          entityConfigName={entityConfigName}
-        />
+        {addedFields.length > 0 ?
+          <IDConfigBlock
+            entityConfigForm={entityConfigForm}
+            entityConfigName={entityConfigName}
+          />
+        : <Text>No columns have been added yet.</Text>}
       </Stack>
     </Fieldset>
   );
