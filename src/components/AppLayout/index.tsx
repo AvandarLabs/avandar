@@ -11,7 +11,7 @@ export function AppLayout({ mode }: Props): JSX.Element {
   return match(mode)
     .with("no-workspace", () => {
       const navbarLinks = [NavbarLinks.home];
-      return <AppShell navbarLinks={navbarLinks} />;
+      return <AppShell navbarLinks={navbarLinks} utilityLinks={[]} />;
     })
     .with("workspace", () => {
       return <WorkspaceAppLayout />;
