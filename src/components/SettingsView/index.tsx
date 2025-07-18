@@ -5,7 +5,7 @@ import { notifyError } from "@/lib/ui/notifications/notifyError";
 import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
-export function SettingsPage(): JSX.Element {
+export function SettingsView(): JSX.Element {
   const workspace = useCurrentWorkspace();
 
   const [saveWorkspace, isWorkspaceSaving] = WorkspaceClient.useUpdate({

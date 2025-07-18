@@ -48,7 +48,7 @@ type Props = {
   spotlightActions?: Array<SpotlightActionData | SpotlightActionGroupData>;
   profileLink?: AppLink;
   navbarLinks: readonly NavbarLink[];
-  utilityLinks?: readonly NavbarLink[];
+  utilityLinks: readonly NavbarLink[];
 
   /**
    * The main content of the app shell.
@@ -221,29 +221,27 @@ export function AppShell({
               })}
             </Stack>
 
-            {utilityLinks && (
-              <Stack gap="xs" pb="md">
-                {utilityLinks.map(({ link, icon }) => {
-                  return (
-                    <Link
-                      key={link.key}
-                      to={link.to}
-                      params={link.params}
-                      className={clsx(css.anchor, "transition-colors")}
-                      px="md"
-                      py="sm"
-                    >
-                      <Group>
-                        {icon}
-                        <Text span fw={500}>
-                          {link.label}
-                        </Text>
-                      </Group>
-                    </Link>
-                  );
-                })}
-              </Stack>
-            )}
+            <Stack gap="xs" pb="md">
+              {utilityLinks.map(({ link, icon }) => {
+                return (
+                  <Link
+                    key={link.key}
+                    to={link.to}
+                    params={link.params}
+                    className={clsx(css.anchor, "transition-colors")}
+                    px="md"
+                    py="sm"
+                  >
+                    <Group>
+                      {icon}
+                      <Text span fw={500}>
+                        {link.label}
+                      </Text>
+                    </Group>
+                  </Link>
+                );
+              })}
+            </Stack>
           </Stack>
         </MantineAppShell.Navbar>
 
