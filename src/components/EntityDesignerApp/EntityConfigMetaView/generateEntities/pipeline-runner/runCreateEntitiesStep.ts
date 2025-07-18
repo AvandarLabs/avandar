@@ -1,14 +1,22 @@
 import { match } from "ts-pattern";
 import { Logger } from "@/lib/Logger";
-import { CSVCellValue, CSVRow } from "@/lib/types/common";
+import { CSVRow } from "@/lib/types/common";
 import { assert, isNotNullOrUndefined } from "@/lib/utils/guards";
-import { makeBucketMapFromList } from "@/lib/utils/maps/builders";
+import {
+  makeBucketMapFromList,
+  mergeBucketMaps,
+} from "@/lib/utils/maps/builders";
 import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
+import { objectValues } from "@/lib/utils/objects/misc";
+import { mapObjectValues } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
 import { Entity, EntityId } from "@/models/Entity/types";
 import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/types";
 import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
-import { ParsedLocalDataset } from "@/models/LocalDataset/types";
+import {
+  LocalDatasetId,
+  ParsedLocalDataset,
+} from "@/models/LocalDataset/types";
 import {
   BuildableEntityConfig,
   BuildableFieldConfig,
@@ -20,28 +28,36 @@ import {
   PipelineContext,
 } from "./runPipeline";
 
-function _getEntityIdField(
+/**
+ * Given an entity config, get the IDs of all datasets that will be
+ * used as data sources for this entity and map them to the EntityFieldConfig
+ * that will be used as the entity's unique identifier for that dataset.
+ */
+function _getDatasetIdsToEntityIdFields(
   entityConfig: BuildableEntityConfig,
-): BuildableFieldConfig {
-  const field = entityConfig.fields.find(propEquals("options.isIdField", true));
-  if (!field) {
-    throw new Error("Entity must have an ID field configured");
-  }
-  return field;
+): Record<LocalDatasetId, BuildableFieldConfig> {
+  const datasetIdsToEntityIdFields: Record<
+    LocalDatasetId,
+    BuildableFieldConfig
+  > = {};
+
+  entityConfig.fields.forEach((field) => {
+    if (
+      field.valueExtractor.type === "dataset_column_value" &&
+      field.options.isIdField
+    ) {
+      datasetIdsToEntityIdFields[field.valueExtractor.datasetId] = field;
+    }
+  });
+
+  return datasetIdsToEntityIdFields;
 }
 
-function _getSourceDatasetFromField(
-  field: BuildableFieldConfig,
-  context: PipelineContext,
-): ParsedLocalDataset {
-  if (field.valueExtractor.type !== "dataset_column_value") {
-    throw new Error(
-      "Cannot extract a primary key if the ID field is not configured with a dataset column value extractor",
-    );
-  }
-  return context.getDataset(field.valueExtractor.datasetId);
-}
-
+/**
+ * Given a dataset and an entity field config, get the dataset column that will
+ * populate this field's value. If the field is not configured with
+ * a `dataset_column_value` extractor then throw an error.
+ */
 function _getDatasetColumnFromFieldConfig(
   dataset: ParsedLocalDataset,
   entityFieldConfig: BuildableFieldConfig,
@@ -68,8 +84,6 @@ function _getDatasetColumnFromFieldConfig(
 
 function _extractEntityFieldValueFromDatasetRows(params: {
   entityId: EntityId;
-  entityExternalId: CSVCellValue;
-  sourceDatasetExternalIdColumn: LocalDatasetField;
   valueExtractor: DatasetColumnValueExtractor;
   context: PipelineContext;
 
@@ -77,42 +91,41 @@ function _extractEntityFieldValueFromDatasetRows(params: {
    * A subset of rows from the source dataset that match the external
    * id of the entity we are extracting the field value for.
    */
-  sourceDatasetRows: CSVRow[];
+  sourceDatasetRows: Array<{
+    datasetId: LocalDatasetId;
+    rowData: CSVRow;
+  }>;
 }): EntityFieldValue | undefined {
-  const {
-    entityId,
-    entityExternalId,
-    valueExtractor,
-    sourceDatasetExternalIdColumn,
-    sourceDatasetRows,
-    context,
-  } = params;
+  const { entityId, valueExtractor, sourceDatasetRows, context } = params;
   const { datasetId, datasetFieldId, valuePickerRuleType } = valueExtractor;
   const sourceDataset = context.getDataset(datasetId);
-  const datasetColumnToExtract = sourceDataset.fields.find((column) => {
-    return column.id === datasetFieldId;
-  });
+  const datasetColumnToExtract = sourceDataset.fields.find(
+    propEquals("id", datasetFieldId),
+  );
 
   assert(
     datasetColumnToExtract !== undefined,
-    "Could not find a column in the dataset that matches the entity field's value extractor configuration",
+    `Attempting to extract a dataset column value from a column that does not
+exist in the dataset "${sourceDataset.name}". Could not find Dataset Column ID
+"${datasetFieldId}"`,
   );
 
-  assert(
-    sourceDatasetRows.every((sourceRow) => {
-      return sourceRow[sourceDatasetExternalIdColumn.name] === entityExternalId;
-    }),
-    "All external IDs in the `sourceDatasetRows` match the entity external ID",
-  );
+  // only look at the rows whose `datasetId` matches the value extractor
+  // we are applying
+  const eligibleSourceRows = sourceDatasetRows
+    .filter((row) => {
+      return row.datasetId === datasetId;
+    })
+    .map(getProp("rowData"));
 
-  // now we need to go through the `sourceDatasetRows` (which are rows
+  // now we need to go through the `eligibleSourceRows` (which are rows
   // that match the entity we want to associate with this field), and
   // extract the requested field value from each row.
   // Then we have to decide which value to use based on the value picker
   // rule type.
   return match(valuePickerRuleType)
     .with("first", () => {
-      const firstRow = sourceDatasetRows[0];
+      const firstRow = eligibleSourceRows[0];
       if (!firstRow) {
         return undefined;
       }
@@ -127,7 +140,7 @@ function _extractEntityFieldValueFromDatasetRows(params: {
       };
     })
     .with("most_frequent", () => {
-      const valueSet = sourceDatasetRows.map((row) => {
+      const valueSet = eligibleSourceRows.map((row) => {
         return row[datasetColumnToExtract.name];
       });
       const counts: Map<string | undefined, number> = new Map();
@@ -166,42 +179,75 @@ export function runCreateEntitiesStep(
     );
   }
 
-  const entityIdField = _getEntityIdField(entityConfig);
-  const externalIdSourceDataset = _getSourceDatasetFromField(
-    entityIdField,
-    context,
-  );
-  const datasetExternalIdColumn = _getDatasetColumnFromFieldConfig(
-    externalIdSourceDataset,
-    entityIdField,
+  const sourceDatasetIdsToEntityIdFields =
+    _getDatasetIdsToEntityIdFields(entityConfig);
+
+  // now we want to build the External ID Row Group Lookup, which is a map of an
+  // entity's external ID to the lsit of rows from **all** the source datasets
+  // that match this external ID.
+  const sourceDatasetIdsToExternalIdRowGroupLookup = mapObjectValues(
+    sourceDatasetIdsToEntityIdFields,
+    (entityIdField, datasetId) => {
+      const sourceDataset = context.getDataset(datasetId);
+      const datasetExternalIdColumn = _getDatasetColumnFromFieldConfig(
+        sourceDataset,
+        entityIdField,
+      );
+
+      // we know the column to use as the external ID, so we can bucket
+      // all rows by that column's value
+      const externalIdsToSourceDatasetRows = makeBucketMapFromList(
+        sourceDataset.data,
+        {
+          keyFn: getProp(datasetExternalIdColumn.name),
+          valueFn: (row) => {
+            return {
+              datasetId,
+              rowData: row,
+              externalIdColumn: datasetExternalIdColumn,
+            };
+          },
+        },
+      );
+
+      // check for any errors
+      if (externalIdsToSourceDatasetRows.has(undefined)) {
+        errors.push(
+          `Found undefined values in the id field (${datasetExternalIdColumn.name}) in dataset "${sourceDataset.name}"`,
+        );
+        externalIdsToSourceDatasetRows.delete(undefined);
+      }
+      if (externalIdsToSourceDatasetRows.has("")) {
+        errors.push(
+          `Found empty string values in the id field (${datasetExternalIdColumn.name}) in dataset "${sourceDataset.name}"`,
+        );
+        externalIdsToSourceDatasetRows.delete("");
+      }
+      if (externalIdsToSourceDatasetRows.size === 0) {
+        errors.push(
+          `No valid ids found in the id field (${datasetExternalIdColumn.name}) in dataset "${sourceDataset.name}"`,
+        );
+      }
+
+      return externalIdsToSourceDatasetRows;
+    },
   );
 
-  const externalIdsToSourceDatasetRows = makeBucketMapFromList(
-    externalIdSourceDataset.data,
-    { keyFn: getProp(datasetExternalIdColumn.name) },
+  // in the function above we created an externalIdRowGroupLookup for
+  // each source dataset. Now we merge them all into one big lookup.
+  const externalIdRowGroupLookup = mergeBucketMaps(
+    ...objectValues(sourceDatasetIdsToExternalIdRowGroupLookup),
   );
-
-  // now report on any errors and remove them from our bucket
-  if (externalIdsToSourceDatasetRows.has(undefined)) {
-    errors.push("Found `undefined` values in the id field");
-    externalIdsToSourceDatasetRows.delete(undefined);
-  }
-  if (externalIdsToSourceDatasetRows.has("")) {
-    errors.push("Found empty string values in the id field");
-    externalIdsToSourceDatasetRows.delete("");
-  }
-  if (externalIdsToSourceDatasetRows.size === 0) {
-    errors.push("No valid ids found in the id field");
-  }
 
   const entities: Entity[] = [];
   const allEntityFieldValues: EntityFieldValue[] = [];
   const queryableEntities: Array<Entity & Record<string, unknown>> = [];
 
   // each external id we found is 1 valid entity. So now we iterate through each
-  // one, collect the fields, and create the necessary entity and field value
-  // datasets
-  externalIdsToSourceDatasetRows.forEach((sourceDatasetRows, externalId) => {
+  // one, collect the configured fields values, apply the necessary value picker
+  // rules (if we have multiple values for a single field), and finally create
+  // the output entity and field value datasets.
+  externalIdRowGroupLookup.forEach((sourceDatasetRows, externalId) => {
     if (!externalId) {
       return;
     }
@@ -227,18 +273,7 @@ export function runCreateEntitiesStep(
           const extractedEntityFieldValue =
             _extractEntityFieldValueFromDatasetRows({
               entityId,
-              entityExternalId: String(externalId),
               sourceDatasetRows,
-
-              // TODO(jpsyx): this is incorrect and should change soon. Each
-              // field can point to a different dataset, so we need to figure
-              // out the external id column for *that* dataset. For now,
-              // we're just assuming its always the same dataset, and therefore
-              // the same external id column. This is safe for now because we
-              // only allow entities to configure a single source dataset.
-              // We will have to change this when we allow fields to pull
-              // from different source datasets.
-              sourceDatasetExternalIdColumn: datasetExternalIdColumn,
               valueExtractor: extractor,
               context,
             });

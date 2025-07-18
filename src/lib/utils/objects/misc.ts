@@ -1,6 +1,5 @@
-import { StringKeyOf } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
-import { Entries } from "@/lib/types/utilityTypes";
+import { Entries, StringKeyOf } from "@/lib/types/utilityTypes";
 
 /**
  * Returns an array of entries from an object.

@@ -1,6 +1,6 @@
 import { ScrollArea } from "@mantine/core";
 import { useMemo } from "react";
-import { StringKeyOf } from "type-fest";
+import { StringKeyOf } from "@/lib/types/utilityTypes";
 import { objectKeys, pick } from "@/lib/utils/objects/misc";
 import { camelToTitleCase } from "@/lib/utils/strings/transformations";
 import { DescriptionList } from "../DescriptionList";

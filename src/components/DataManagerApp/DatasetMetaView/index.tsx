@@ -149,7 +149,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
           </Tabs.Panel>
 
           <Tabs.Panel value="dataset-summary">
-            {isLoadingParsedDataset ?
+            {isLoadingParsedDataset || !parsedDataset ?
               <Loader />
             : <DataSummaryView parsedDataset={parsedDataset} />}
           </Tabs.Panel>

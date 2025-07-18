@@ -2,7 +2,11 @@ import { UseFormReturnType as MantineUseFormReturnType } from "@mantine/form";
 import { Merge, Paths } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
 import { PathValue } from "@/lib/utils/objects/getValue";
-import { GetKeyAndPropsFn } from "./useKeysAndPropsCallback";
+import {
+  GetInputPropsOptions,
+  GetInputPropsReturnType,
+  GetKeyAndPropsFn,
+} from "./useKeysAndPropsCallback";
 
 type InsertListItemFn<FormValues extends UnknownObject> = <
   P extends keyof FormValues,
@@ -40,6 +44,12 @@ export type FormType<
   {
     // Improve type-safety for `key`
     key: (path: FormPath) => string;
+
+    // Improve type-safety for `getInputProps`
+    getInputProps: (
+      path: FormPath,
+      options?: GetInputPropsOptions,
+    ) => GetInputPropsReturnType;
 
     /**
      * Improved type-safety for Mantine's `form.watch`

@@ -26,17 +26,14 @@ export type UseQueryOptions<
 /**
  * A tuple containing [data, `isLoading` state, the query result object].
  */
-export type UseQueryResultTuple<TQueryFnData = unknown, TData = TQueryFnData> =
-  | [
-      data: undefined,
-      isLoading: true,
-      queryResult: TanstackUseQueryResult<TData, DefaultError>,
-    ]
-  | [
-      data: TData,
-      isLoading: false,
-      queryResult: TanstackUseQueryResult<TData, DefaultError>,
-    ];
+export type UseQueryResultTuple<
+  TQueryFnData = unknown,
+  TData = TQueryFnData,
+> = [
+  data: undefined | TData,
+  isLoading: boolean,
+  queryResult: TanstackUseQueryResult<TData, DefaultError>,
+];
 
 /**
  * A wrapper around Tanstack's useQuery that provides additional error handling.

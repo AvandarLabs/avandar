@@ -29,7 +29,11 @@ type DatasetColumnValueExtractorRead = {
   /** ID of the dataset to extract from */
   datasetId: LocalDatasetId;
 
-  /** ID of the specific field in the dataset to extract from */
+  /**
+   * ID of the specific field in the dataset to extract from
+   *
+   * TODO(jpsyx): this should be renamed to `datasetColumnId`
+   */
   datasetFieldId: LocalDatasetFieldId;
 
   /** Creation timestamp */

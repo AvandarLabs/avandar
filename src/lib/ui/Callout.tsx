@@ -20,7 +20,7 @@ export function Callout({
   ...moreAlertProps
 }: Props): JSX.Element {
   const contents = (
-    <Stack>
+    <Stack gap="xxs">
       {message ?
         <Text>{message}</Text>
       : null}
@@ -39,3 +39,11 @@ export function Callout({
     />
   );
 }
+
+Callout.Info = (props: Omit<Props, "color">): JSX.Element => {
+  return <Callout color="info" {...props} />;
+};
+
+Callout.Error = (props: Omit<Props, "color">): JSX.Element => {
+  return <Callout color="danger" {...props} />;
+};

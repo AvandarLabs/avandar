@@ -2,7 +2,7 @@ import { Box, Button, Flex, Stack, Text, TextInput } from "@mantine/core";
 import { FormValidateInput, isEmail, useForm } from "@mantine/form";
 import { HTMLInputAutoCompleteAttribute, ReactNode, useMemo } from "react";
 import { match } from "ts-pattern";
-import { StringKeyOf } from "type-fest";
+import { StringKeyOf } from "@/lib/types/utilityTypes";
 import { constant } from "@/lib/utils/higherOrderFuncs";
 import { propIsDefined } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys, objectValues } from "@/lib/utils/objects/misc";

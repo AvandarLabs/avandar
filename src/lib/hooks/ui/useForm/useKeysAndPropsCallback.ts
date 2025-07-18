@@ -11,7 +11,7 @@ type GetPathTail<Path, PathHead extends string> =
  * These are the same options from `form.getInputProps`.
  * @see https://mantine.dev/form/get-input-props
  */
-type GetInputPropsOptions = {
+export type GetInputPropsOptions = {
   type?: "input" | "checkbox";
   withError?: boolean;
   withFocus?: boolean;
@@ -19,16 +19,7 @@ type GetInputPropsOptions = {
   [key: string]: any;
 };
 
-/**
- * This has the same return type as `form.getInputProps`.
- *
- * This function doesn't include the `path` argument because it
- * is being used in the `GetKeyAndPropsFn` where the path will
- * already be bound to this function call.
- *
- * @see https://mantine.dev/form/get-input-props
- */
-type GetInputPropsFn = (options?: GetInputPropsOptions) => {
+export type GetInputPropsReturnType = {
   /* eslint-disable @typescript-eslint/no-explicit-any */
   onChange: any;
   value?: any;
@@ -40,6 +31,19 @@ type GetInputPropsFn = (options?: GetInputPropsOptions) => {
   onBlur?: any;
   /* eslint-enable @typescript-eslint/no-explicit-any */
 };
+
+/**
+ * This has the same return type as `form.getInputProps`.
+ *
+ * This function doesn't include the `path` argument because it
+ * is being used in the `GetKeyAndPropsFn` where the path will
+ * already be bound to this function call.
+ *
+ * @see https://mantine.dev/form/get-input-props
+ */
+type GetInputPropsFn = (
+  options?: GetInputPropsOptions,
+) => GetInputPropsReturnType;
 
 export type GetKeyAndPropsFn<
   FormValues extends UnknownObject,

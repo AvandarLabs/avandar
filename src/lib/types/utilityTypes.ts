@@ -1,11 +1,23 @@
-import { ConditionalKeys } from "type-fest";
-import { UnknownObject } from "./common";
+import type { UnknownObject } from "./common";
+import type {
+  StringKeyOf as BroadStringKeyOf,
+  ConditionalKeys,
+} from "type-fest";
 
 /**
  * Get all the keys of an object that map to a given type.
  * @deprecated Just use type-fest's `ConditionalKeys` directly instead.
  */
 export type KeysThatMapTo<T, Obj extends object> = ConditionalKeys<Obj, T>;
+
+/**
+ * A stricter version of type-fest's `StringKeyOf` that will return
+ * branded strings as strings rather than the branded string wrapped
+ * in a string template. So, it returns MyId instead of \`${MyId}\`.
+ */
+export type StringKeyOf<T> =
+  BroadStringKeyOf<T> extends `${infer S extends string}` ? S
+  : BroadStringKeyOf<T>;
 
 /**
  * Get all the entries of an object as an array of tuples that preserve the

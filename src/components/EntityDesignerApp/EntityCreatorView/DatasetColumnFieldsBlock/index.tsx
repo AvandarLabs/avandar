@@ -1,114 +1,172 @@
 import {
   ActionIcon,
   Box,
+  Divider,
   Fieldset,
   Group,
   ScrollArea,
   Stack,
   Text,
 } from "@mantine/core";
-import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
+import {
+  IconArrowLeft,
+  IconArrowRight,
+  IconCircleNumber1Filled,
+  IconCircleNumber2Filled,
+} from "@tabler/icons-react";
 import { useCallback, useMemo, useState } from "react";
 import { LocalDatasetColumnPickerList } from "@/components/common/LocalDatasetColumnPickerList";
-import { LocalDatasetSelect } from "@/components/common/LocalDatasetSelect";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useMap } from "@/lib/hooks/state/useMap";
-import { FormType } from "@/lib/hooks/ui/useForm";
+import { Callout } from "@/lib/ui/Callout";
 import { SegmentedControl } from "@/lib/ui/inputs/SegmentedControl";
 import { makeSegmentedControlItems } from "@/lib/ui/inputs/SegmentedControl/makeSegmentedControlItems";
 import { removeItemWhere } from "@/lib/utils/arrays";
+import { where } from "@/lib/utils/filters/filterBuilders";
+import { identity } from "@/lib/utils/misc";
+import { makeObjectFromList } from "@/lib/utils/objects/builders";
 import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { EntityFieldConfigId } from "@/models/EntityConfig/EntityFieldConfig/types";
 import { EntityConfigId } from "@/models/EntityConfig/types";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
-import { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
-import { LocalDatasetId } from "@/models/LocalDataset/types";
 import {
-  EntityConfigFormValues,
+  LocalDatasetField,
+  LocalDatasetFieldId,
+} from "@/models/LocalDataset/LocalDatasetField/types";
+import { LocalDataset } from "@/models/LocalDataset/types";
+import {
+  EntityConfigFormType,
   makeDefaultDatasetColumnField,
 } from "../entityConfigFormTypes";
 import { DatasetColumnExtractorCreator } from "./DatasetColumnExtractorCreator";
+import { IDConfigBlock } from "./IDConfigBlock";
 
 type Props = {
-  entityConfigForm: FormType<EntityConfigFormValues>;
+  entityConfigForm: EntityConfigFormType;
   entityConfigId: EntityConfigId;
+  entityConfigName: string;
 };
 
 export function DatasetColumnFieldsBlock({
   entityConfigForm,
   entityConfigId,
+  entityConfigName,
 }: Props): JSX.Element {
-  const { datasetColumnFields } = entityConfigForm.getValues();
-  const [selectedDatasetId, setSelectedDatasetId] =
-    useState<LocalDatasetId | null>(null);
-
+  const workspace = useCurrentWorkspace();
   const [selectedDatasetColumnId, setSelectedDatasetColumnId] = useState<
     LocalDatasetFieldId | undefined
   >();
-
-  const [selectedDataset] = LocalDatasetClient.useGetById({
-    id: selectedDatasetId,
-    useQueryOptions: { enabled: !!selectedDatasetId },
-  });
-
-  const selectedDatasetColumn = useMemo(() => {
-    return selectedDatasetColumnId ?
-        selectedDataset?.fields.find(propEquals("id", selectedDatasetColumnId))
-      : undefined;
-  }, [selectedDataset, selectedDatasetColumnId]);
-
   const [selectedFieldId, setSelectedFieldId] = useState<
     EntityFieldConfigId | undefined
   >();
 
+  // load all local datasets and all available columns
+  const [localDatasets] = LocalDatasetClient.useGetAll(
+    where("workspaceId", "eq", workspace.id),
+  );
+
+  const localDatasetsToUse = useMemo(() => {
+    return localDatasets?.filter((dataset) => {
+      return (
+        dataset.datasetType !== "entity_field_values" &&
+        dataset.datasetType !== "entities_queryable" &&
+        dataset.datasetType !== "entities"
+      );
+    });
+  }, [localDatasets]);
+
+  const datasetColumnLookup: Record<
+    LocalDatasetFieldId,
+    { dataset: LocalDataset; field: LocalDatasetField }
+  > = useMemo(() => {
+    if (!localDatasetsToUse) {
+      return {};
+    }
+    return makeObjectFromList(
+      localDatasetsToUse.flatMap((dataset) => {
+        return dataset.fields.map((field) => {
+          return { dataset, field };
+        });
+      }),
+      {
+        keyFn: getProp("field.id"),
+        valueFn: identity,
+      },
+    );
+  }, [localDatasetsToUse]);
+
+  // Keep track of the fields we've added and the dataset columns they map to
   const [fieldToColumnMap, updateFieldToColumnMap] = useMap<
     EntityFieldConfigId,
     LocalDatasetFieldId
   >();
 
+  // these are the fields that we've already added
   const addedColumns = useMemo(() => {
     return [...fieldToColumnMap.values()];
   }, [fieldToColumnMap]);
+  const { datasetColumnFields: addedFields } = entityConfigForm.getValues();
 
   const fieldItems = useMemo(() => {
-    return makeSegmentedControlItems(datasetColumnFields, {
+    return makeSegmentedControlItems(addedFields, {
       valueFn: getProp("id"),
       labelFn: getProp("name"),
     });
-  }, [datasetColumnFields]);
+  }, [addedFields]);
 
   const addDatasetColumnAsField = useCallback(() => {
-    if (selectedDataset && selectedDatasetColumn) {
-      const newField = makeDefaultDatasetColumnField({
-        entityConfigId,
-        name: selectedDatasetColumn.name,
-        dataset: selectedDataset,
-        datasetColumn: selectedDatasetColumn,
-      });
+    if (
+      selectedDatasetColumnId &&
+      datasetColumnLookup[selectedDatasetColumnId]
+    ) {
+      const { field: selectedDatasetColumn, dataset: selectedDataset } =
+        datasetColumnLookup[selectedDatasetColumnId];
 
-      // link this field to the dataset column it's based on
-      updateFieldToColumnMap.set(newField.id, selectedDatasetColumn.id);
-      if (datasetColumnFields.length === 0) {
-        // if this is the first field we're adding to the `fields` array,
-        // then automatically select it
-        setSelectedFieldId(newField.id);
+      if (selectedDatasetColumn && selectedDataset) {
+        const newField = makeDefaultDatasetColumnField({
+          entityConfigId,
+          name: selectedDatasetColumn.name,
+          dataset: selectedDataset,
+          datasetColumn: selectedDatasetColumn,
+        });
+
+        // link this field to the dataset column it's based on
+        updateFieldToColumnMap.set(newField.id, selectedDatasetColumn.id);
+        if (addedFields.length === 0) {
+          // if this is the first field we're adding to the `fields` array,
+          // then automatically select it
+          setSelectedFieldId(newField.id);
+        }
+
+        // add this field to the form data
+        entityConfigForm.insertListItem("datasetColumnFields", newField);
+
+        // if the selected dataset isn't already in our sourceDatasets array,
+        // add it
+        const { sourceDatasets } = entityConfigForm.getValues();
+        if (
+          !sourceDatasets.some(propEquals("dataset.id", selectedDataset.id))
+        ) {
+          entityConfigForm.insertListItem("sourceDatasets", {
+            dataset: selectedDataset,
+            primaryKeyColumnId: undefined,
+          });
+        }
       }
-
-      // add this field to the form data
-      entityConfigForm.insertListItem("datasetColumnFields", newField);
     }
   }, [
-    datasetColumnFields,
+    addedFields,
     entityConfigForm,
     entityConfigId,
-    selectedDataset,
-    selectedDatasetColumn,
+    datasetColumnLookup,
+    selectedDatasetColumnId,
     updateFieldToColumnMap,
   ]);
 
   const removeField = useCallback(() => {
     if (selectedFieldId) {
       const newFields = removeItemWhere(
-        datasetColumnFields,
+        addedFields,
         propEquals("id", selectedFieldId),
       );
       entityConfigForm.setFieldValue("datasetColumnFields", newFields);
@@ -117,84 +175,113 @@ export function DatasetColumnFieldsBlock({
       // reset the selected field to be the first field in the list
       setSelectedFieldId(newFields[0]?.id);
     }
-  }, [
-    entityConfigForm,
-    datasetColumnFields,
-    selectedFieldId,
-    updateFieldToColumnMap,
-  ]);
+  }, [entityConfigForm, addedFields, selectedFieldId, updateFieldToColumnMap]);
 
   return (
     <Fieldset legend="Fields that come from datasets">
-      <Group pb="sm">
-        <LocalDatasetSelect onChange={setSelectedDatasetId} />
-      </Group>
-      <Group align="flex-start">
-        <Stack gap="xs">
-          <Text size="xs" c="dark" tt="uppercase" lts="0.1em">
-            Dataset columns
+      <Stack>
+        <Callout.Info
+          title="Select the columns you want in this profile"
+          icon={<IconCircleNumber1Filled />}
+        >
+          <Text>
+            A profile can consist of columns that come from different datasets.
           </Text>
-          <ScrollArea h={300} pr="xs">
+          <Text>
+            This is where you select which columns from which datasets should be
+            added into this profile.
+          </Text>
+        </Callout.Info>
+        <Group align="flex-start">
+          <Stack gap="xs">
+            <Text size="xs" c="dark" tt="uppercase" lts="0.1em">
+              Dataset columns
+            </Text>
+            <Divider />
             <LocalDatasetColumnPickerList
-              datasetId={selectedDatasetId ?? undefined}
-              onChange={setSelectedDatasetColumnId}
+              datasetIds={localDatasetsToUse?.map(getProp("id")) ?? []}
+              onChange={(value) => {
+                setSelectedDatasetColumnId(value);
+              }}
               excludeColumns={addedColumns}
             />
-          </ScrollArea>
-        </Stack>
-        <Stack gap="xxxs" pt="lg">
-          <ActionIcon
-            variant="subtle"
-            color="neutral"
-            aria-label="Add column as a field"
-            className={`data-[disabled]:bg-transparent`}
-            disabled={!selectedDatasetColumnId}
-            onClick={addDatasetColumnAsField}
-          >
-            <IconArrowRight size={24} />
-          </ActionIcon>
-          <ActionIcon
-            variant="subtle"
-            color="neutral"
-            aria-label="Remove field"
-            className={`data-[disabled]:bg-transparent`}
-            disabled={datasetColumnFields.length === 0}
-            onClick={removeField}
-          >
-            <IconArrowLeft size={24} />
-          </ActionIcon>
-        </Stack>
-        <Stack gap="xs">
-          <Text size="xs" c="dark" tt="uppercase" lts="0.1em">
-            Profile fields
-          </Text>
-          {datasetColumnFields.length === 0 ?
-            <Text>No columns have been added yet</Text>
-          : <ScrollArea h={300}>
-              <SegmentedControl
-                orientation="vertical"
-                data={fieldItems}
-                value={selectedFieldId}
-                onChange={setSelectedFieldId}
+          </Stack>
+          <Stack gap="xxxs" pt="lg">
+            <ActionIcon
+              variant="subtle"
+              color="neutral"
+              aria-label="Add column as a field"
+              className={`data-[disabled]:bg-transparent`}
+              disabled={!selectedDatasetColumnId}
+              onClick={addDatasetColumnAsField}
+            >
+              <IconArrowRight size={24} />
+            </ActionIcon>
+            <ActionIcon
+              variant="subtle"
+              color="neutral"
+              aria-label="Remove field"
+              className={`data-[disabled]:bg-transparent`}
+              disabled={addedFields.length === 0}
+              onClick={removeField}
+            >
+              <IconArrowLeft size={24} />
+            </ActionIcon>
+          </Stack>
+          <Stack gap="xs">
+            <Text size="xs" c="dark" tt="uppercase" lts="0.1em">
+              Profile fields
+            </Text>
+            <Divider />
+            {addedFields.length === 0 ?
+              <Text>No columns have been added yet.</Text>
+            : <ScrollArea h={300}>
+                <SegmentedControl
+                  orientation="vertical"
+                  data={fieldItems}
+                  value={selectedFieldId}
+                  onChange={setSelectedFieldId}
+                />
+              </ScrollArea>
+            }
+          </Stack>
+          {selectedFieldId ?
+            <Box pt="sm">
+              <DatasetColumnExtractorCreator
+                entityConfigForm={entityConfigForm}
+                fieldIdx={addedFields.findIndex(
+                  propEquals("id", selectedFieldId),
+                )}
+                fieldName={
+                  addedFields.find(propEquals("id", selectedFieldId))!.name
+                }
               />
-            </ScrollArea>
-          }
-        </Stack>
-        {selectedFieldId ?
-          <Box pt="sm">
-            <DatasetColumnExtractorCreator
-              entityConfigForm={entityConfigForm}
-              fieldIdx={datasetColumnFields.findIndex(
-                propEquals("id", selectedFieldId),
-              )}
-              fieldName={
-                datasetColumnFields.find(propEquals("id", selectedFieldId))!
-                  .name
-              }
-            />
-          </Box>
-        : null}
-      </Group>
+            </Box>
+          : null}
+        </Group>
+
+        <Divider my="xs" />
+
+        <Callout.Info
+          title={`Configure how to identify a ${entityConfigName} across datasets`}
+          icon={<IconCircleNumber2Filled />}
+        >
+          <Text>
+            For each dataset you've added, please specify which column should be
+            used to uniquely identify a {entityConfigName}.
+          </Text>
+          <Text>
+            This is how we can detect which rows in different datasets represent
+            the same {entityConfigName}.
+          </Text>
+        </Callout.Info>
+        {addedFields.length > 0 ?
+          <IDConfigBlock
+            entityConfigForm={entityConfigForm}
+            entityConfigName={entityConfigName}
+          />
+        : <Text>No columns have been added yet.</Text>}
+      </Stack>
     </Fieldset>
   );
 }

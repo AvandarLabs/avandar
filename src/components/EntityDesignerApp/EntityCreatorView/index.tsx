@@ -7,6 +7,7 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
+import { isNotEmpty } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppLinks } from "@/config/AppLinks";
@@ -14,13 +15,16 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { isNotUndefined } from "@/lib/utils/guards";
+import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { setValue } from "@/lib/utils/objects/setValue";
 import { DatasetColumnFieldsBlock } from "./DatasetColumnFieldsBlock";
 import {
   EntityConfigFormSubmitValues,
+  EntityConfigFormType,
   EntityConfigFormValues,
   getDefaultEntityConfigFormValues,
+  makeDefaultDatasetColumnField,
   makeDefaultManualEntryField,
 } from "./entityConfigFormTypes";
 import { ManualEntryFieldsBlock } from "./ManualEntryFieldsBlock";
@@ -32,24 +36,71 @@ export function EntityCreatorView(): JSX.Element {
   const [sendEntityConfigForm, isSendEntityConfigFormPending] =
     useSubmitEntityCreatorForm();
 
-  const entityConfigForm = useForm<
-    EntityConfigFormValues,
-    EntityConfigFormSubmitValues
-  >({
+  const entityConfigForm: EntityConfigFormType = useForm({
     mode: "uncontrolled",
     initialValues: getDefaultEntityConfigFormValues(),
-    transformValues: (values: EntityConfigFormValues) => {
-      const allFields = values.datasetColumnFields
-        .concat(values.manualEntryFields)
-        // set the id field
-        .map((field) => {
-          return (
-              field.id === values.idFieldId &&
-                field.options.class === "dimension"
-            ) ?
-              setValue(field, "options.isIdField", true)
-            : field;
+
+    validate: {
+      titleFieldId: isNotEmpty("Title field is required"),
+      sourceDatasets: {
+        primaryKeyColumnId: isNotEmpty("ID field is required"),
+      },
+    },
+
+    // our transformed values combine all the datasetColumnFields
+    // and manualEntryFields into a single `fields` array
+    transformValues: (
+      values: EntityConfigFormValues,
+    ): EntityConfigFormSubmitValues => {
+      // collect all the primary key fields
+      const primaryKeyFields = values.sourceDatasets
+        .map(({ dataset, primaryKeyColumnId }) => {
+          if (!primaryKeyColumnId) {
+            return undefined;
+          }
+
+          // first, let's see if this primary key column was already
+          // added as a datasetColumnField
+          const primaryField = values.datasetColumnFields.find(
+            propEquals(
+              "extractors.datasetColumnValue.datasetFieldId",
+              primaryKeyColumnId,
+            ),
+          );
+
+          if (primaryField) {
+            // if the primary key field was already added, set `isIdField`
+            return setValue(primaryField, "options.isIdField", true);
+          }
+
+          // otherwise, create a datasetColumnField for this primary key
+          // column, and set `isIdField`
+          const datasetColumn = dataset.fields.find(
+            propEquals("id", primaryKeyColumnId),
+          );
+          if (datasetColumn) {
+            return setValue(
+              makeDefaultDatasetColumnField({
+                entityConfigId,
+                name: datasetColumn.name,
+                dataset,
+                datasetColumn,
+              }),
+              "options.isIdField",
+              true,
+            );
+          }
+          return undefined;
         })
+        .filter(isNotUndefined);
+
+      const nonPrimaryKeyFields = values.datasetColumnFields.filter(
+        propEquals("options.isIdField", false),
+      );
+
+      const allFields = nonPrimaryKeyFields
+        .concat(primaryKeyFields)
+        .concat(values.manualEntryFields)
         // set the title field
         .map((field) => {
           return (
@@ -71,17 +122,15 @@ export function EntityCreatorView(): JSX.Element {
     "description",
     "allowManualCreation",
     "titleFieldId",
-    "idFieldId",
   ]);
 
-  entityConfigForm.watch("name", ({ value }) => {
+  entityConfigForm.useFieldWatch("name", ({ value }) => {
     // TODO(jpsyx): add a debounce
     setEntityConfigName(value);
   });
 
   const [allowDatasetFields, setAllowDatasetFields] = useState(false);
   const [allowManualEntryFields, setAllowManualEntryFields] = useState(false);
-
   const [entityConfigName, setEntityConfigName] = useState("");
   const singularEntityConfigName = entityConfigName.toLowerCase() || "profile";
   const pluralEntityConfigName = `${entityConfigName.toLowerCase() || "profile"}s`;
@@ -91,9 +140,10 @@ export function EntityCreatorView(): JSX.Element {
     datasetColumnFields,
     manualEntryFields,
   } = entityConfigForm.getValues();
+  const { fields } = entityConfigForm.getTransformedValues();
 
   // these are the fields that are eligible to be used as the entity ID or title
-  const possibleTitleOrIdFields = useMemo(() => {
+  const possibleTitleFields = useMemo(() => {
     return makeSelectOptions(datasetColumnFields.concat(manualEntryFields), {
       valueFn: getProp("id"),
       labelFn: getProp("name"),
@@ -101,9 +151,10 @@ export function EntityCreatorView(): JSX.Element {
   }, [datasetColumnFields, manualEntryFields]);
 
   return (
-    <Container pt="lg">
+    <Container pt="lg" pb="xxl">
       <form
         onSubmit={entityConfigForm.onSubmit((values) => {
+          console.log("submitting form", values);
           return sendEntityConfigForm(values, {
             onSuccess: () => {
               navigate(
@@ -151,6 +202,7 @@ export function EntityCreatorView(): JSX.Element {
             <DatasetColumnFieldsBlock
               entityConfigId={entityConfigId}
               entityConfigForm={entityConfigForm}
+              entityConfigName={singularEntityConfigName}
             />
           : null}
           <Switch
@@ -188,17 +240,14 @@ export function EntityCreatorView(): JSX.Element {
           : null}
 
           <Select
-            key={keys.idFieldId}
-            required
-            data={possibleTitleOrIdFields}
-            label={`What field should be used as a ${singularEntityConfigName}'s ID?`}
-            {...inputProps.idFieldId()}
-          />
-
-          <Select
             key={keys.titleFieldId}
             required
-            data={possibleTitleOrIdFields}
+            data={possibleTitleFields}
+            placeholder={
+              fields.length === 0 ?
+                "No fields have been configured yet"
+              : "Select a field"
+            }
             label={`What field should be used as a ${singularEntityConfigName}'s name?`}
             {...inputProps.titleFieldId()}
           />
