@@ -1,4 +1,9 @@
 import { Paper as MantinePaper, PaperProps } from "@mantine/core";
+import { ReactNode } from "react";
+
+type Props = {
+  children?: ReactNode;
+} & PaperProps;
 
 export function Paper({
   p = "lg",
@@ -8,7 +13,7 @@ export function Paper({
   bg = "white",
   withBorder = true,
   ...rest
-}: PaperProps): JSX.Element {
+}: Props): JSX.Element {
   return (
     <MantinePaper
       p={p}
