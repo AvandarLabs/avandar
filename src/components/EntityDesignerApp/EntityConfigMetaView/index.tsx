@@ -6,7 +6,7 @@ import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
-import { PaperWrapper } from "@/lib/ui/Paper";
+import { Paper } from "@/lib/ui/Paper";
 import { hasDefinedProps } from "@/lib/utils/guards";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityConfig } from "@/models/EntityConfig/types";
@@ -56,7 +56,7 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
 
   return (
     <Container pt="lg">
-      <PaperWrapper>
+      <Paper>
         <Stack>
           <Group>
             <Title order={2}>{entityConfig.name}</Title>
@@ -140,7 +140,7 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
             Delete Entity
           </Button>
         </Stack>
-      </PaperWrapper>
+      </Paper>
     </Container>
   );
 }
