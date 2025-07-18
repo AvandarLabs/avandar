@@ -31,6 +31,7 @@ dist-ssr
 .env.development
 .env.staging
 .env.production
+*client_secret*
 
 # Ignorable development files 
 .eslintcache
