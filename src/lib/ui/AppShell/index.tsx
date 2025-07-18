@@ -48,7 +48,7 @@ type Props = {
   spotlightActions?: Array<SpotlightActionData | SpotlightActionGroupData>;
   profileLink?: AppLink;
   navbarLinks: readonly NavbarLink[];
-  utilityLinks: readonly NavbarLink[];
+  utilityLinks?: readonly NavbarLink[];
 
   /**
    * The main content of the app shell.
@@ -71,7 +71,7 @@ export function AppShell({
   profileLink,
   spotlightActions,
   navbarLinks,
-  utilityLinks,
+  utilityLinks = [],
   mainContent = <Outlet />,
 }: Props): JSX.Element {
   const router = useRouter();

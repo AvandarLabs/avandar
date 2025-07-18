@@ -27,7 +27,6 @@ export function SettingsView(): JSX.Element {
     <Container size="sm">
       <Stack>
         <Title order={2}>Workspace Settings</Title>
-
         <BasicForm
           introText="Update your workspace name. Editing the slug will come later."
           fields={{
