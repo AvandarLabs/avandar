@@ -199,7 +199,7 @@ export function AppShell({
             </Menu>
           </Group>
           <Stack justify="space-between" h="100%">
-            <Stack gap="xs">
+            <Stack gap={0}>
               {navbarLinks.map(({ link, icon }) => {
                 return (
                   <Link
@@ -226,7 +226,7 @@ export function AppShell({
               })}
             </Stack>
 
-            <Stack gap="xs" pb="md">
+            <Stack gap={0} pb="md">
               {utilityLinks.map(({ link, icon }) => {
                 return (
                   <Link
