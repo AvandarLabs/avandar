@@ -70,7 +70,7 @@ export function LocalDatasetColumnPickerList({
 }: Props): JSX.Element {
   // we use `useUncontrolled` so this SegmentedControl (which is technically a
   // `radio` input) can be used with `useForm`
-  const [controlledValue, onChangeValue] = useUncontrolled({
+  const [controlledValue, setSelectedValue] = useUncontrolled({
     value,
     defaultValue,
     onChange,
@@ -121,10 +121,10 @@ export function LocalDatasetColumnPickerList({
       (dsets) => {
         if (dsets[0]?.fields[0]) {
           setActiveDatasetHeading(dsets[0].id);
-          onChangeValue(dsets[0].fields[0].id);
+          setSelectedValue(dsets[0].fields[0].id);
         }
       },
-      [onChangeValue],
+      [setSelectedValue],
     ),
   );
 
@@ -152,13 +152,13 @@ export function LocalDatasetColumnPickerList({
 
       const nextColumn = remainingColumns[nextIdx];
       if (nextColumn) {
-        onChangeValue(nextColumn.value);
+        setSelectedValue(nextColumn.value);
       }
     }
   }, [
     excludeColumns,
     datasetColumnItems,
-    onChangeValue,
+    setSelectedValue,
     controlledValue,
     prevColumnItems,
   ]);
@@ -194,6 +194,18 @@ export function LocalDatasetColumnPickerList({
                   });
                 }
                 setActiveDatasetHeading(dataset.id);
+
+                // now select the first item in that dataset group
+                // first, find the selected dataset
+                const datasetItemGroup = datasetColumnItems.find(
+                  propEquals("dataset.id", dataset.id),
+                );
+                if (
+                  datasetItemGroup &&
+                  isNonEmptyArray(datasetItemGroup.items)
+                ) {
+                  setSelectedValue(datasetItemGroup.items[0].value);
+                }
               }}
             >
               {dataset.name}
@@ -253,7 +265,7 @@ export function LocalDatasetColumnPickerList({
                     data={items}
                     bg="neutral.0"
                     value={controlledValue}
-                    onChange={onChangeValue}
+                    onChange={setSelectedValue}
                     fullWidth
                     {...segmentedControlProps}
                   />
