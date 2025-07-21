@@ -55,21 +55,25 @@ type Props = {
   introText?: string;
 };
 
-export function WorkspaceForm({ isLoading, onSubmit, introText }: Props) {
+export function WorkspaceForm({
+  isLoading,
+  onSubmit,
+  introText,
+}: Props): JSX.Element {
   return (
     <Paper withBorder shadow="md" p="lg" mt="lg" radius="md" bg="white">
       <BasicForm
         fields={FORM_FIELDS}
         formElements={FORM_ELEMENTS}
         submitIsLoading={isLoading}
-        onSubmit={(values) =>
-          onSubmit({
+        onSubmit={(values) => {
+          return onSubmit({
             workspaceName: values.workspaceName,
             workspaceIdentifier: values.workspaceIdentifier,
             fullName: values.fullName,
             displayName: values.displayName,
-          })
-        }
+          });
+        }}
         introText={introText}
       />
     </Paper>

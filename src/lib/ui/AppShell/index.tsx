@@ -5,7 +5,6 @@ import {
   AppShell as MantineAppShell,
   MantineTheme,
   Menu,
-  Modal,
   Stack,
   Text,
   Title,
@@ -39,6 +38,7 @@ import { NavbarLink } from "@/config/NavbarLinks";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
 import { Link } from "@/lib/ui/links/Link";
+import { Modal } from "@/lib/ui/Modal";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 import { WorkspaceForm } from "../forms/WorkspaceForm";
 import { notifySuccess } from "../notifications/notifySuccess";
@@ -196,9 +196,9 @@ export function AppShell({
                   </Group>
                 </UnstyledButton>
               </Menu.Target>
-              <Menu.Dropdown>
+              <Menu.Dropdown style={{ width: "max-content", minWidth: 200 }}>
                 {profileLink ?
-                  <Stack>
+                  <>
                     <Menu.Item
                       leftSection={<IconUser size={16} />}
                       onClick={() => {
@@ -211,9 +211,9 @@ export function AppShell({
                       leftSection={<IconPlus size={16} />}
                       onClick={open}
                     >
-                      <Text span>Create New Workspace</Text>
+                      <Text span>Create Workspace</Text>
                     </Menu.Item>
-                  </Stack>
+                  </>
                 : null}
 
                 <Menu.Item
@@ -283,7 +283,7 @@ export function AppShell({
           {mainContent}
         </MantineAppShell.Main>
       </MantineAppShell>
-      <Modal opened={opened} onClose={close} title="Create New Workspace">
+      <Modal opened={opened} onClose={close}>
         <WorkspaceForm
           isLoading={isWorkspaceCreating}
           onSubmit={({
