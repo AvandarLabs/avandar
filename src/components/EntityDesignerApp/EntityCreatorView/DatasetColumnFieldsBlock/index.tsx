@@ -263,16 +263,16 @@ export function DatasetColumnFieldsBlock({
         <Divider my="xs" />
 
         <Callout.Info
-          title={`Configure how to identify a ${entityConfigName} across datasets`}
+          title="Configure how to join datasets"
           icon={<IconCircleNumber2Filled />}
         >
           <Text>
-            For each dataset you've added, please specify which column should be
-            used to uniquely identify a {entityConfigName}.
+            For each dataset you've added, please specify which columns should
+            be used to uniquely identify a {entityConfigName}.
           </Text>
           <Text>
-            This is how we can detect which rows in different datasets represent
-            the same {entityConfigName}.
+            We will use those columns to merge datasets into a single{" "}
+            {entityConfigName}.
           </Text>
         </Callout.Info>
         {addedFields.length > 0 ?

@@ -18,6 +18,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
+import { Paper } from "@/lib/ui/Paper";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { type LocalDataset } from "@/models/LocalDataset/types";
@@ -98,96 +99,101 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
     <Container pt="lg">
       <Stack>
         <Title order={2}>{dataset.name}</Title>
-        <Tabs
-          variant="none"
-          value={currentTab}
-          onChange={(val) => {
-            return setCurrentTab(val as DatasetTabId);
-          }}
-        >
-          <Tabs.List
-            mb="xs"
-            ref={setTabListRef}
-            pos="relative"
-            style={styles.tabList}
-          >
-            <Tabs.Tab
-              value="dataset-metadata"
-              ref={tabItemRefCallback("dataset-metadata")}
-            >
-              <Text span>Metadata</Text>
-            </Tabs.Tab>
-            <Tabs.Tab
-              value="dataset-summary"
-              ref={tabItemRefCallback("dataset-summary")}
-            >
-              <Text span>Data Summary</Text>
-            </Tabs.Tab>
-
-            <FloatingIndicator
-              target={tabItemRefs[currentTab]}
-              parent={tabListRef}
-              style={styles.tabIndicator}
-            />
-          </Tabs.List>
-
-          <Tabs.Panel value="dataset-metadata">
-            <Stack>
-              <Text>{dataset.description}</Text>
-
-              <ObjectDescriptionList
-                data={dataset}
-                excludeKeys={EXCLUDED_DATASET_METADATA_KEYS}
-                childRenderOptions={DATASET_METADATA_RENDER_OPTIONS}
-              />
-
-              <Title order={5}>Data preview</Title>
-              {parsedDataset ?
-                <DataGrid columnNames={datasetColumnNames} data={previewData} />
-              : null}
-            </Stack>
-          </Tabs.Panel>
-
-          <Tabs.Panel value="dataset-summary">
-            {isLoadingParsedDataset || !parsedDataset ?
-              <Loader />
-            : <DataSummaryView parsedDataset={parsedDataset} />}
-          </Tabs.Panel>
-
-          <Button
-            color="danger"
-            onClick={() => {
-              modals.openConfirmModal({
-                title: "Delete dataset",
-                children: (
-                  <Text>Are you sure you want to delete {dataset.name}?</Text>
-                ),
-                labels: { confirm: "Delete", cancel: "Cancel" },
-                confirmProps: {
-                  color: "danger",
-                  loading: isDeletePending,
-                },
-                onConfirm: () => {
-                  deleteLocalDataset(
-                    { id: dataset.id },
-                    {
-                      onSuccess: () => {
-                        navigate(AppLinks.dataManagerHome(workspace.slug));
-                        notifications.show({
-                          title: "Dataset deleted",
-                          message: `${dataset.name} deleted successfully`,
-                          color: "green",
-                        });
-                      },
-                    },
-                  );
-                },
-              });
+        <Paper>
+          <Tabs
+            variant="none"
+            value={currentTab}
+            onChange={(val) => {
+              return setCurrentTab(val as DatasetTabId);
             }}
           >
-            Delete Dataset
-          </Button>
-        </Tabs>
+            <Tabs.List
+              mb="xs"
+              ref={setTabListRef}
+              pos="relative"
+              style={styles.tabList}
+            >
+              <Tabs.Tab
+                value="dataset-metadata"
+                ref={tabItemRefCallback("dataset-metadata")}
+              >
+                <Text span>Metadata</Text>
+              </Tabs.Tab>
+              <Tabs.Tab
+                value="dataset-summary"
+                ref={tabItemRefCallback("dataset-summary")}
+              >
+                <Text span>Data Summary</Text>
+              </Tabs.Tab>
+
+              <FloatingIndicator
+                target={tabItemRefs[currentTab]}
+                parent={tabListRef}
+                style={styles.tabIndicator}
+              />
+            </Tabs.List>
+
+            <Tabs.Panel value="dataset-metadata">
+              <Stack>
+                <Text>{dataset.description}</Text>
+
+                <ObjectDescriptionList
+                  data={dataset}
+                  excludeKeys={EXCLUDED_DATASET_METADATA_KEYS}
+                  childRenderOptions={DATASET_METADATA_RENDER_OPTIONS}
+                />
+
+                <Title order={5}>Data preview</Title>
+                {parsedDataset ?
+                  <DataGrid
+                    columnNames={datasetColumnNames}
+                    data={previewData}
+                  />
+                : null}
+              </Stack>
+            </Tabs.Panel>
+
+            <Tabs.Panel value="dataset-summary">
+              {isLoadingParsedDataset || !parsedDataset ?
+                <Loader />
+              : <DataSummaryView parsedDataset={parsedDataset} />}
+            </Tabs.Panel>
+
+            <Button
+              color="danger"
+              onClick={() => {
+                modals.openConfirmModal({
+                  title: "Delete dataset",
+                  children: (
+                    <Text>Are you sure you want to delete {dataset.name}?</Text>
+                  ),
+                  labels: { confirm: "Delete", cancel: "Cancel" },
+                  confirmProps: {
+                    color: "danger",
+                    loading: isDeletePending,
+                  },
+                  onConfirm: () => {
+                    deleteLocalDataset(
+                      { id: dataset.id },
+                      {
+                        onSuccess: () => {
+                          navigate(AppLinks.dataManagerHome(workspace.slug));
+                          notifications.show({
+                            title: "Dataset deleted",
+                            message: `${dataset.name} deleted successfully`,
+                            color: "green",
+                          });
+                        },
+                      },
+                    );
+                  },
+                });
+              }}
+            >
+              Delete Dataset
+            </Button>
+          </Tabs>
+        </Paper>
       </Stack>
     </Container>
   );

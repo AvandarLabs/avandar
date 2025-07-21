@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Checkbox,
   Container,
@@ -15,6 +16,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
+import { Paper } from "@/lib/ui/Paper";
 import { isNotUndefined } from "@/lib/utils/guards";
 import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { setValue } from "@/lib/utils/objects/setValue";
@@ -151,112 +153,116 @@ export function EntityCreatorView(): JSX.Element {
   }, [datasetColumnFields, manualEntryFields]);
 
   return (
-    <Container pt="lg" pb="xxl">
-      <form
-        onSubmit={entityConfigForm.onSubmit((values) => {
-          console.log("submitting form", values);
-          return sendEntityConfigForm(values, {
-            onSuccess: () => {
-              navigate(
-                AppLinks.entityDesignerConfigView({
-                  workspaceSlug: workspace.slug,
-                  entityConfigId,
-                  entityConfigName,
-                }),
-              );
-            },
-          });
-        })}
-      >
-        <Stack>
-          <TextInput
-            key={keys.name}
-            required
-            label="Profile Name"
-            placeholder="Enter a name for this profile type"
-            {...inputProps.name()}
-          />
-          <TextInput
-            key={keys.description}
-            label="Profile Description"
-            placeholder="Enter a description for this profile type"
-            {...inputProps.description()}
-          />
-          <Checkbox
-            key={keys.allowManualCreation}
-            label={`Allow new ${pluralEntityConfigName} to be created manually`}
-            {...inputProps.allowManualCreation({ type: "checkbox" })}
-          />
-          <Text>
-            Tell us about where the {singularEntityConfigName} data should come
-            from...
-          </Text>
-          <Switch
-            label={`Some data should come from existing datasets`}
-            checked={allowDatasetFields}
-            onChange={(e) => {
-              setAllowDatasetFields(e.currentTarget.checked);
-            }}
-          />
-          {allowDatasetFields ?
-            <DatasetColumnFieldsBlock
-              entityConfigId={entityConfigId}
-              entityConfigForm={entityConfigForm}
-              entityConfigName={singularEntityConfigName}
-            />
-          : null}
-          <Switch
-            label="Some data should be manually entered"
-            checked={allowManualEntryFields}
-            onChange={(e) => {
-              const displayManualEntryFields = e.currentTarget.checked;
-              setAllowManualEntryFields(displayManualEntryFields);
-
-              // clear the list when we turn off the switch
-              // TODO(jpsyx): we should store a backup of the list for when
-              // we turn it back on.
-              if (!displayManualEntryFields) {
-                entityConfigForm.setFieldValue("manualEntryFields", []);
-              }
-              if (
-                displayManualEntryFields &&
-                entityConfigForm.getValues().manualEntryFields.length === 0
-              ) {
-                entityConfigForm.insertListItem(
-                  "manualEntryFields",
-                  makeDefaultManualEntryField({
+    <Container pt="lg" pb="xxl" fluid style={{ width: "75%" }}>
+      <Paper>
+        <form
+          onSubmit={entityConfigForm.onSubmit((values) => {
+            console.log("submitting form", values);
+            return sendEntityConfigForm(values, {
+              onSuccess: () => {
+                navigate(
+                  AppLinks.entityDesignerConfigView({
+                    workspaceSlug: workspace.slug,
                     entityConfigId,
-                    name: "New field",
+                    entityConfigName,
                   }),
                 );
-              }
-            }}
-          />
-          {allowManualEntryFields ?
-            <ManualEntryFieldsBlock
-              entityConfigId={entityConfigId}
-              entityConfigForm={entityConfigForm}
+              },
+            });
+          })}
+        >
+          <Stack>
+            <TextInput
+              key={keys.name}
+              required
+              label="Profile Name"
+              placeholder="Enter a name for this profile type"
+              {...inputProps.name()}
             />
-          : null}
+            <TextInput
+              key={keys.description}
+              label="Profile Description"
+              placeholder="Enter a description for this profile type"
+              {...inputProps.description()}
+            />
+            <Checkbox
+              key={keys.allowManualCreation}
+              label={`Allow new ${pluralEntityConfigName} to be created manually`}
+              {...inputProps.allowManualCreation({ type: "checkbox" })}
+            />
+            <Text>
+              Tell us about where the {singularEntityConfigName} data should
+              come from...
+            </Text>
+            <Switch
+              label={`Some data should come from existing datasets`}
+              checked={allowDatasetFields}
+              onChange={(e) => {
+                setAllowDatasetFields(e.currentTarget.checked);
+              }}
+            />
+            {allowDatasetFields ?
+              <DatasetColumnFieldsBlock
+                entityConfigId={entityConfigId}
+                entityConfigForm={entityConfigForm}
+                entityConfigName={singularEntityConfigName}
+              />
+            : null}
+            <Switch
+              label="Some data should be manually entered"
+              checked={allowManualEntryFields}
+              onChange={(e) => {
+                const displayManualEntryFields = e.currentTarget.checked;
+                setAllowManualEntryFields(displayManualEntryFields);
 
-          <Select
-            key={keys.titleFieldId}
-            required
-            data={possibleTitleFields}
-            placeholder={
-              fields.length === 0 ?
-                "No fields have been configured yet"
-              : "Select a field"
-            }
-            label={`What field should be used as a ${singularEntityConfigName}'s name?`}
-            {...inputProps.titleFieldId()}
-          />
+                // clear the list when we turn off the switch
+                // TODO(jpsyx): we should store a backup of the list for when
+                // we turn it back on.
+                if (!displayManualEntryFields) {
+                  entityConfigForm.setFieldValue("manualEntryFields", []);
+                }
+                if (
+                  displayManualEntryFields &&
+                  entityConfigForm.getValues().manualEntryFields.length === 0
+                ) {
+                  entityConfigForm.insertListItem(
+                    "manualEntryFields",
+                    makeDefaultManualEntryField({
+                      entityConfigId,
+                      name: "New field",
+                    }),
+                  );
+                }
+              }}
+            />
+            {allowManualEntryFields ?
+              <ManualEntryFieldsBlock
+                entityConfigId={entityConfigId}
+                entityConfigForm={entityConfigForm}
+              />
+            : null}
 
-          <Button type="submit" loading={isSendEntityConfigFormPending}>
-            Create
-          </Button>
-        </Stack>
-      </form>
+            <Select
+              key={keys.titleFieldId}
+              required
+              data={possibleTitleFields}
+              placeholder={
+                fields.length === 0 ?
+                  "No fields have been configured yet"
+                : "Select a field"
+              }
+              label={`What field should be used as a ${singularEntityConfigName}'s name?`}
+              {...inputProps.titleFieldId()}
+            />
+
+            <Box>
+              <Button type="submit" loading={isSendEntityConfigFormPending}>
+                Create
+              </Button>
+            </Box>
+          </Stack>
+        </form>
+      </Paper>
     </Container>
   );
 }
