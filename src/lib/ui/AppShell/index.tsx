@@ -5,6 +5,7 @@ import {
   AppShell as MantineAppShell,
   MantineTheme,
   Menu,
+  Modal,
   Stack,
   Text,
   Title,
@@ -20,18 +21,27 @@ import {
 import {
   IconChevronDown,
   IconLogout,
+  IconPlus,
   IconSearch,
   IconUser,
 } from "@tabler/icons-react";
-import { Outlet, ReactNode, useRouter } from "@tanstack/react-router";
+import {
+  Outlet,
+  ReactNode,
+  useNavigate,
+  useRouter,
+} from "@tanstack/react-router";
 import clsx from "clsx";
 import { AuthClient } from "@/clients/AuthClient";
 import { AppConfig } from "@/config/AppConfig";
-import { AppLink } from "@/config/AppLinks";
+import { AppLink, AppLinks } from "@/config/AppLinks";
 import { NavbarLink } from "@/config/NavbarLinks";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
 import { Link } from "@/lib/ui/links/Link";
+import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
+import { WorkspaceForm } from "../forms/WorkspaceForm";
+import { notifySuccess } from "../notifications/notifySuccess";
 import css from "./AppShell.module.css";
 
 const HEADER_DEFAULT_HEIGHT = 60;
@@ -75,6 +85,20 @@ export function AppShell({
   mainContent = <Outlet />,
 }: Props): JSX.Element {
   const router = useRouter();
+  const [opened, { open, close }] = useDisclosure(false);
+
+  const navigate = useNavigate();
+  const [createWorkspace, isWorkspaceCreating] =
+    WorkspaceClient.useCreateWorkspaceWithOwner({
+      queryToInvalidate: [WorkspaceClient.getClientName()],
+      onSuccess: (newWorkspace) => {
+        notifySuccess("Workspace created successfully!");
+        close();
+
+        // navigate to the new workspace
+        navigate(AppLinks.workspaceHome(newWorkspace.slug));
+      },
+    });
 
   const [sendSignOutRequest, isSignOutPending] = useMutation({
     mutationFn: async () => {
@@ -82,6 +106,7 @@ export function AppShell({
     },
     onSuccess: () => {
       router.invalidate();
+      close();
     },
     onError: (error) => {
       notifications.show({
@@ -173,15 +198,24 @@ export function AppShell({
               </Menu.Target>
               <Menu.Dropdown>
                 {profileLink ?
-                  <Menu.Item
-                    leftSection={<IconUser size={16} />}
-                    onClick={() => {
-                      router.navigate({ to: profileLink.to });
-                    }}
-                  >
-                    <Text span>Profile</Text>
-                  </Menu.Item>
+                  <Stack>
+                    <Menu.Item
+                      leftSection={<IconUser size={16} />}
+                      onClick={() => {
+                        router.navigate({ to: profileLink.to });
+                      }}
+                    >
+                      <Text span>Profile</Text>
+                    </Menu.Item>
+                    <Menu.Item
+                      leftSection={<IconPlus size={16} />}
+                      onClick={open}
+                    >
+                      <Text span>Create New Workspace</Text>
+                    </Menu.Item>
+                  </Stack>
                 : null}
+
                 <Menu.Item
                   leftSection={<IconLogout size={16} />}
                   onClick={() => {
@@ -249,6 +283,26 @@ export function AppShell({
           {mainContent}
         </MantineAppShell.Main>
       </MantineAppShell>
+      <Modal opened={opened} onClose={close} title="Create New Workspace">
+        <WorkspaceForm
+          isLoading={isWorkspaceCreating}
+          onSubmit={({
+            workspaceName,
+            workspaceIdentifier,
+            fullName,
+            displayName,
+          }) => {
+            createWorkspace({
+              workspaceName,
+              workspaceSlug: workspaceIdentifier,
+              ownerName: fullName,
+              ownerDisplayName: displayName,
+            });
+          }}
+          introText="Create a new workspace. You can always edit it later."
+        />
+      </Modal>
+
       <Spotlight
         highlightQuery
         actions={spotlightActions ?? []}
