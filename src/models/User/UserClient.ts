@@ -17,7 +17,7 @@ import { camelCaseKeysShallow } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
 import { Database } from "@/types/database.types";
 import { WorkspaceId } from "../Workspace/types";
-import { UserId, UserProfile } from "./types";
+import { UserId, UserProfile, WorkspaceUser } from "./types";
 
 type TUserClient = WithSupabaseClient<
   WithLogger<
@@ -29,8 +29,13 @@ type TUserClient = WithSupabaseClient<
         }: {
           workspaceId: WorkspaceId;
         }) => Promise<UserProfile>;
+        getUsersForWorkspace: ({
+          workspaceId,
+        }: {
+          workspaceId: WorkspaceId;
+        }) => Promise<WorkspaceUser[]>; // <- add this line
       },
-      "getProfile",
+      "getProfile" | "getUsersForWorkspace", // <- include it here too
       never
     >
   >
@@ -110,9 +115,52 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
           logger.log("User profile retrieved", { userProfile });
           return userProfile;
         },
+        getUsersForWorkspace: async ({
+          workspaceId,
+        }: {
+          workspaceId: WorkspaceId;
+        }): Promise<WorkspaceUser[]> => {
+          const logger = baseLogger.appendName("getUsersForWorkspace");
+          logger.log("Fetching all users for workspace", { workspaceId });
+
+          // Step 1: Get all user profiles in the workspace
+          const { data: profiles } = await dbClient
+            .from("user_profiles")
+            .select("*")
+            .eq("workspace_id", workspaceId)
+            .throwOnError();
+
+          // Step 2: Get all user roles in the workspace
+          const userIds = profiles.map((p) => p.user_id);
+          const { data: roles } = await dbClient
+            .from("user_roles")
+            .select("user_id, role")
+            .in("user_id", userIds)
+            .eq("workspace_id", workspaceId)
+            .throwOnError();
+
+          // Step 3: Create lookup map of user_id -> role
+          const roleMap = new Map(roles.map((r) => [r.user_id, r.role]));
+
+          // Step 4: Merge role into user profile, convert to model
+          const transformed = profiles.map((row) => {
+            const model = camelCaseKeysShallow(row);
+            return {
+              ...model,
+              id: uuid<UserId>(model.id),
+              workspaceId: uuid<WorkspaceId>(model.workspaceId),
+              createdAt: new Date(model.createdAt),
+              updatedAt: new Date(model.updatedAt),
+              role: roleMap.get(row.user_id) ?? "member",
+            };
+          });
+
+          logger.log("Users retrieved", { users: transformed });
+          return transformed;
+        },
       },
       {
-        queryFns: ["getProfile"],
+        queryFns: ["getProfile", "getUsersForWorkspace"],
         mutationFns: [],
       },
     );
