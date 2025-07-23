@@ -1,22 +1,32 @@
-import { Box, Button, Card, Flex, Group, Table, Text } from "@mantine/core";
+import {
+  Box,
+  Button,
+  Card,
+  Flex,
+  Group,
+  LoadingOverlay,
+  Table,
+  Text,
+} from "@mantine/core";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useWorkspaceRole } from "@/hooks/workspaces/useWorkspaceRole";
-
-const userTable = [
-  { name: "Jane Doe", role: "Admin" },
-  { name: "Jim Dae", role: "Admin" },
-  { name: "Alice Waters", role: "Member" },
-];
+import { UserClient } from "@/models/User/UserClient";
 
 export function WorkspaceUserForm(): JSX.Element {
   const workspaceRole = useWorkspaceRole();
+  const workspace = useCurrentWorkspace();
+
+  const [users, isLoading] = UserClient.useGetUsersForWorkspace({
+    workspaceId: workspace.id,
+  });
 
   const isAdmin = workspaceRole === "admin";
 
-  const users: any = userTable.map((user) => {
+  const userTest = users?.map((user) => {
     return (
-      <Table.Tr key={user.name}>
-        <Table.Td>{user.name}</Table.Td>
+      <Table.Tr key={user.fullName}>
+        <Table.Td>{user.fullName}</Table.Td>
         <Table.Td>{user.role}</Table.Td>
         {isAdmin && (
           <Table.Td>
@@ -32,9 +42,10 @@ export function WorkspaceUserForm(): JSX.Element {
 
   return (
     <Box w="100%" px="lg">
+      <LoadingOverlay visible={isLoading} zIndex={1000} />
       <Card withBorder mt="md" p="lg" w="100%" maw="1000px">
         <Flex justify="space-between" align="center" mb="md">
-          <Text>Workspace Users</Text>
+          <Text>Workspace UserTest</Text>
           <Button>Add User</Button>
         </Flex>
         <Table>
@@ -47,7 +58,7 @@ export function WorkspaceUserForm(): JSX.Element {
               <Table.Th w="200x">Action</Table.Th>
             </Table.Tr>
           </Table.Thead>
-          <Table.Tbody>{users}</Table.Tbody>
+          <Table.Tbody>{userTest}</Table.Tbody>
         </Table>
       </Card>
     </Box>
