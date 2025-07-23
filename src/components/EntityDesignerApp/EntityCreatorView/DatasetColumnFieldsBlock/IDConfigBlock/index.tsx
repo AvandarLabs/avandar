@@ -18,7 +18,6 @@ export function IDConfigBlock({
   entityConfigName,
 }: Props): JSX.Element {
   const { datasetColumnFields } = entityConfigForm.getValues();
-  const { fields } = entityConfigForm.getTransformedValues();
 
   const datasetIdsToPullFrom = useMemo(() => {
     return [
