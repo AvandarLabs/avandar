@@ -101,11 +101,13 @@ export function makeDefaultDatasetColumnField({
   name,
   dataset,
   datasetColumn,
+  isIdField = false,
 }: {
   entityConfigId: EntityConfigId;
   name: string;
   dataset: LocalDataset;
   datasetColumn: LocalDatasetField;
+  isIdField?: boolean;
 }): EntityFieldFormValues {
   const entityFieldConfigId: EntityFieldConfigId = uuid();
   return {
@@ -117,7 +119,7 @@ export function makeDefaultDatasetColumnField({
       class: "dimension",
       baseDataType: getEntityFieldBaseDataType(datasetColumn.dataType),
       valueExtractorType: "dataset_column_value",
-      isIdField: false,
+      isIdField,
       isTitleField: false,
       allowManualEdit: false,
       isArray: false,

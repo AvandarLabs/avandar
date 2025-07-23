@@ -165,6 +165,9 @@ export function DatasetColumnFieldsBlock({
 
   const removeField = useCallback(() => {
     if (selectedFieldId) {
+      const selectedField = addedFields.find(propEquals("id", selectedFieldId));
+      const sourceDatasetId =
+        selectedField?.extractors.datasetColumnValue.datasetId;
       const newFields = removeItemWhere(
         addedFields,
         propEquals("id", selectedFieldId),
@@ -174,6 +177,21 @@ export function DatasetColumnFieldsBlock({
 
       // reset the selected field to be the first field in the list
       setSelectedFieldId(newFields[0]?.id);
+
+      // if we removed a field, we might need to remove it from our
+      // `sourceDatasets` array.
+      // First, check if there's another field that relies on this same dataset
+      const isSourceDatasetStillUsed = newFields.some(
+        propEquals("extractors.datasetColumnValue.datasetId", sourceDatasetId),
+      );
+      if (!isSourceDatasetStillUsed && sourceDatasetId) {
+        // no remaining fields are using this dataset, so we can safely remove
+        // it from our `sourceDatasets` list
+        const sourceDatasetIdx = entityConfigForm
+          .getValues()
+          .sourceDatasets.findIndex(propEquals("dataset.id", sourceDatasetId));
+        entityConfigForm.removeListItem("sourceDatasets", sourceDatasetIdx);
+      }
     }
   }, [entityConfigForm, addedFields, selectedFieldId, updateFieldToColumnMap]);
 

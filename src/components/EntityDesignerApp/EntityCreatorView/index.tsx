@@ -55,6 +55,9 @@ export function EntityCreatorView(): JSX.Element {
       values: EntityConfigFormValues,
     ): EntityConfigFormSubmitValues => {
       // collect all the primary key fields
+      const primaryKeyColumnIds = new Set(
+        values.sourceDatasets.map(getProp("primaryKeyColumnId")),
+      );
       const primaryKeyFields = values.sourceDatasets
         .map(({ dataset, primaryKeyColumnId }) => {
           if (!primaryKeyColumnId) {
@@ -62,7 +65,7 @@ export function EntityCreatorView(): JSX.Element {
           }
 
           // first, let's see if this primary key column was already
-          // added as a datasetColumnField
+          // added as a datasetColumnField.
           const primaryField = values.datasetColumnFields.find(
             propEquals(
               "extractors.datasetColumnValue.datasetFieldId",
@@ -71,7 +74,8 @@ export function EntityCreatorView(): JSX.Element {
           );
 
           if (primaryField) {
-            // if the primary key field was already added, set `isIdField`
+            // if the primary key field was already added, we want to just
+            // use that same field and set `isIdField` to true
             return setValue(primaryField, "options.isIdField", true);
           }
 
@@ -81,24 +85,26 @@ export function EntityCreatorView(): JSX.Element {
             propEquals("id", primaryKeyColumnId),
           );
           if (datasetColumn) {
-            return setValue(
-              makeDefaultDatasetColumnField({
-                entityConfigId,
-                name: datasetColumn.name,
-                dataset,
-                datasetColumn,
-              }),
-              "options.isIdField",
-              true,
-            );
+            return makeDefaultDatasetColumnField({
+              entityConfigId,
+              name: datasetColumn.name,
+              dataset,
+              datasetColumn,
+              isIdField: true,
+            });
           }
           return undefined;
         })
         .filter(isNotUndefined);
 
-      const nonPrimaryKeyFields = values.datasetColumnFields.filter(
-        propEquals("options.isIdField", false),
-      );
+      const nonPrimaryKeyFields = values.datasetColumnFields.filter((field) => {
+        if (field.options.valueExtractorType === "dataset_column_value") {
+          return !primaryKeyColumnIds.has(
+            field.extractors.datasetColumnValue.datasetFieldId,
+          );
+        }
+        return false;
+      });
 
       const allFields = nonPrimaryKeyFields
         .concat(primaryKeyFields)
