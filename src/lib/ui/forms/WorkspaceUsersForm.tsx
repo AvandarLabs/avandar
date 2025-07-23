@@ -11,19 +11,32 @@ import {
 import { IconPencil, IconTrash } from "@tabler/icons-react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useWorkspaceRole } from "@/hooks/workspaces/useWorkspaceRole";
-import { UserClient } from "@/models/User/UserClient";
+import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
+import { notifySuccess } from "../notifications/notifySuccess";
 
 export function WorkspaceUserForm(): JSX.Element {
   const workspaceRole = useWorkspaceRole();
   const workspace = useCurrentWorkspace();
 
-  const [users, isLoading] = UserClient.useGetUsersForWorkspace({
+  const [users, isLoading] = WorkspaceClient.useGetUsersForWorkspace({
     workspaceId: workspace.id,
+  });
+
+  const [addMember, isAddingMember] = WorkspaceClient.useAddMember({
+    onSuccess: () =>
+      notifySuccess({
+        title: "User added to workspace!",
+        message: "The user was successfully added to the workspace!",
+      }),
+    queriesToInvalidate: [
+      [WorkspaceClient.getClientName()],
+      ["getUsersForWorkspace"],
+    ],
   });
 
   const isAdmin = workspaceRole === "admin";
 
-  const userTest = users?.map((user) => {
+  const workspaceUsers = users?.map((user) => {
     return (
       <Table.Tr key={user.fullName}>
         <Table.Td>{user.fullName}</Table.Td>
@@ -42,11 +55,11 @@ export function WorkspaceUserForm(): JSX.Element {
 
   return (
     <Box w="100%" px="lg">
-      <LoadingOverlay visible={isLoading} zIndex={1000} />
+      <LoadingOverlay visible={isLoading || isAddingMember} zIndex={1000} />
       <Card withBorder mt="md" p="lg" w="100%" maw="1000px">
         <Flex justify="space-between" align="center" mb="md">
-          <Text>Workspace UserTest</Text>
-          <Button>Add User</Button>
+          <Text>Workspace Users</Text>
+          <Button loading={isAddingMember}>Add User</Button>
         </Flex>
         <Table>
           <Table.Thead>
@@ -58,7 +71,7 @@ export function WorkspaceUserForm(): JSX.Element {
               <Table.Th w="200x">Action</Table.Th>
             </Table.Tr>
           </Table.Thead>
-          <Table.Tbody>{userTest}</Table.Tbody>
+          <Table.Tbody>{workspaceUsers}</Table.Tbody>
         </Table>
       </Card>
     </Box>

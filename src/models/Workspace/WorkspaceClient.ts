@@ -1,7 +1,10 @@
 import { AuthClient } from "@/clients/AuthClient";
 import { createSupabaseCRUDClient } from "@/lib/clients/supabase/SupabaseCRUDClient";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { camelCaseKeysShallow } from "@/lib/utils/objects/transformations";
+import { uuid } from "@/lib/utils/uuid";
 import { UserId } from "../User/types";
+import { WorkspaceUser } from "../Workspace/types";
 import { WorkspaceParsers } from "./parsers";
 import { Workspace, WorkspaceId, WorkspaceRole } from "./types";
 
@@ -34,6 +37,45 @@ export const WorkspaceClient = createSupabaseCRUDClient({
         return workspaces.map((workspace) => {
           return parsers.fromDBReadToModelRead(workspace);
         });
+      },
+      getUsersForWorkspace: async ({
+        workspaceId,
+      }: {
+        workspaceId: WorkspaceId;
+      }): Promise<WorkspaceUser[]> => {
+        const logger = clientLogger.appendName("getUsersForWorkspace");
+        logger.log("Fetching all users for workspace", { workspaceId });
+
+        const { data: profiles } = await dbClient
+          .from("user_profiles")
+          .select("*")
+          .eq("workspace_id", workspaceId)
+          .throwOnError();
+
+        const userIds = profiles.map((p) => p.user_id);
+        const { data: roles } = await dbClient
+          .from("user_roles")
+          .select("user_id, role")
+          .in("user_id", userIds)
+          .eq("workspace_id", workspaceId)
+          .throwOnError();
+
+        const roleMap = new Map(roles.map((r) => [r.user_id, r.role]));
+
+        const transformed = profiles.map((row) => {
+          const model = camelCaseKeysShallow(row);
+          return {
+            ...model,
+            id: uuid<UserId>(model.id),
+            workspaceId: uuid<WorkspaceId>(model.workspaceId),
+            createdAt: new Date(model.createdAt),
+            updatedAt: new Date(model.updatedAt),
+            role: roleMap.get(row.user_id) ?? "member",
+          };
+        });
+
+        logger.log("Users retrieved", { users: transformed });
+        return transformed;
       },
     };
   },
