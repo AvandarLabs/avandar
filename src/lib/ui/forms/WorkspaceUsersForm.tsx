@@ -11,23 +11,46 @@ import {
 import { IconPencil, IconTrash } from "@tabler/icons-react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useWorkspaceRole } from "@/hooks/workspaces/useWorkspaceRole";
+import { uuid } from "@/lib/utils/uuid";
+import { UserId } from "@/models/User/types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
+import { notifyError } from "../notifications/notifyError";
 import { notifySuccess } from "../notifications/notifySuccess";
 
 export function WorkspaceUserForm(): JSX.Element {
   const workspaceRole = useWorkspaceRole();
   const workspace = useCurrentWorkspace();
 
-  const [users, isLoading] = WorkspaceClient.useGetUsersForWorkspace({
-    workspaceId: workspace.id,
-  });
+  const [workspaceUsers, workspaceUsersLoading] =
+    WorkspaceClient.useGetUsersForWorkspace({
+      workspaceId: workspace.id,
+    });
+
+  const [availableUsers, availableUsersLoading] =
+    WorkspaceClient.useGetUsersAvailableForWorkspace({
+      workspaceId: workspace.id,
+    });
 
   const [addMember, isAddingMember] = WorkspaceClient.useAddMember({
-    onSuccess: () =>
+    onSuccess: () => {
       notifySuccess({
         title: "User added to workspace!",
         message: "The user was successfully added to the workspace!",
-      }),
+      });
+    },
+    onError: (error) => {
+      if (String(error).includes("duplicate key")) {
+        notifyError({
+          title: "User already added",
+          message: "This user is already a member of the workspace.",
+        });
+      } else {
+        notifyError({
+          title: "Failed to add user",
+          message: error.message,
+        });
+      }
+    },
     queriesToInvalidate: [
       [WorkspaceClient.getClientName()],
       ["getUsersForWorkspace"],
@@ -36,7 +59,7 @@ export function WorkspaceUserForm(): JSX.Element {
 
   const isAdmin = workspaceRole === "admin";
 
-  const workspaceUsers = users?.map((user) => {
+  const allWorkspaceUsers = workspaceUsers?.map((user) => {
     return (
       <Table.Tr key={user.fullName}>
         <Table.Td>{user.fullName}</Table.Td>
@@ -55,11 +78,27 @@ export function WorkspaceUserForm(): JSX.Element {
 
   return (
     <Box w="100%" px="lg">
-      <LoadingOverlay visible={isLoading || isAddingMember} zIndex={1000} />
+      <LoadingOverlay
+        visible={
+          workspaceUsersLoading || availableUsersLoading || isAddingMember
+        }
+        zIndex={1000}
+      />
       <Card withBorder mt="md" p="lg" w="100%" maw="1000px">
         <Flex justify="space-between" align="center" mb="md">
           <Text>Workspace Users</Text>
-          <Button loading={isAddingMember}>Add User</Button>
+          <Button
+            onClick={() =>
+              addMember({
+                workspaceId: workspace.id,
+                userId: uuid<UserId>("313d9c5a-8d08-492e-abc9-e459827a2604"),
+                role: "member",
+              })
+            }
+            loading={isAddingMember}
+          >
+            Add User
+          </Button>
         </Flex>
         <Table>
           <Table.Thead>
@@ -71,7 +110,7 @@ export function WorkspaceUserForm(): JSX.Element {
               <Table.Th w="200x">Action</Table.Th>
             </Table.Tr>
           </Table.Thead>
-          <Table.Tbody>{workspaceUsers}</Table.Tbody>
+          <Table.Tbody>{allWorkspaceUsers}</Table.Tbody>
         </Table>
       </Card>
     </Box>
