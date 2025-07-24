@@ -36,11 +36,12 @@ import { AppConfig } from "@/config/AppConfig";
 import { AppLink, AppLinks } from "@/config/AppLinks";
 import { NavbarLink } from "@/config/NavbarLinks";
 import { useMutation } from "@/lib/hooks/query/useMutation";
+import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
 import { Link } from "@/lib/ui/links/Link";
 import { Modal } from "@/lib/ui/Modal";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
-import { WorkspaceForm } from "../forms/WorkspaceForm";
+import { WorkspaceForm } from "../../../components/common/forms/WorkspaceForm";
 import { notifySuccess } from "../notifications/notifySuccess";
 import css from "./AppShell.module.css";
 
@@ -85,7 +86,7 @@ export function AppShell({
   mainContent = <Outlet />,
 }: Props): JSX.Element {
   const router = useRouter();
-  const [opened, { open, close }] = useDisclosure(false);
+  const [opened, open, close] = useBoolean(false);
 
   const navigate = useNavigate();
   const [createWorkspace, isWorkspaceCreating] =

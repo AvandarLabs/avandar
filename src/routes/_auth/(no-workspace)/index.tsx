@@ -1,7 +1,7 @@
 import { Container, Paper, Stack, Title } from "@mantine/core";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { WorkspaceForm } from "@/components/common/forms/WorkspaceForm";
 import { AppLinks } from "@/config/AppLinks";
-import { WorkspaceForm } from "@/lib/ui/forms/WorkspaceForm";
 import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
 import { isNonEmptyArray } from "@/lib/utils/guards";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";

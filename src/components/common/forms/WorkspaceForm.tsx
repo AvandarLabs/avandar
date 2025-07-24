@@ -1,4 +1,4 @@
-import { Divider, Paper, Title } from "@mantine/core";
+import { Divider, Title } from "@mantine/core";
 import { BasicForm } from "@/lib/ui/BasicForm";
 import { slugify } from "@/lib/utils/strings/transformations";
 
@@ -61,21 +61,19 @@ export function WorkspaceForm({
   introText,
 }: Props): JSX.Element {
   return (
-    <Paper withBorder shadow="md" p="lg" mt="lg" radius="md" bg="white">
-      <BasicForm
-        fields={FORM_FIELDS}
-        formElements={FORM_ELEMENTS}
-        submitIsLoading={isLoading}
-        onSubmit={(values) => {
-          return onSubmit({
-            workspaceName: values.workspaceName,
-            workspaceIdentifier: values.workspaceIdentifier,
-            fullName: values.fullName,
-            displayName: values.displayName,
-          });
-        }}
-        introText={introText}
-      />
-    </Paper>
+    <BasicForm
+      fields={FORM_FIELDS}
+      formElements={FORM_ELEMENTS}
+      submitIsLoading={isLoading}
+      onSubmit={(values) => {
+        return onSubmit({
+          workspaceName: values.workspaceName,
+          workspaceIdentifier: values.workspaceIdentifier,
+          fullName: values.fullName,
+          displayName: values.displayName,
+        });
+      }}
+      introText={introText}
+    />
   );
 }
