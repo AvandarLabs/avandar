@@ -2,6 +2,7 @@ import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/types
 import type { GenericSeedData } from "../scripts/SeedRunner";
 
 export const TEST_USER_EMAIL = "user@avandarlabs.com";
+export const TEST_USER_PASSWORD = "avandar";
 export const TEST_WORKSPACE_SLUG = "avandar-labs";
 
 const SEED_USERS = {
@@ -20,15 +21,15 @@ export const SeedData = {
   users: [
     {
       email: SEED_USERS.primaryTestUser,
-      password: "avandar",
+      password: TEST_USER_PASSWORD,
     },
     {
       email: SEED_USERS.user2,
-      password: "avandar",
+      password: TEST_USER_PASSWORD,
     },
     {
       email: SEED_USERS.williamFarr,
-      password: "avandar",
+      password: TEST_USER_PASSWORD,
     },
   ],
   workspaces: [

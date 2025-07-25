@@ -17,7 +17,7 @@ import {
   createModelCRUDClient,
   HookableClient,
   ModelCRUDClient,
-} from "../ModelCRUDClient";
+} from "../createModelCRUDClient";
 import { withSupabaseClient } from "../withSupabaseClient";
 
 /** The maximum page size configured in Supabase */

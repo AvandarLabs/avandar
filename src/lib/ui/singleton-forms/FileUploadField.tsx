@@ -1,4 +1,4 @@
-import { Button, FileInput, Group } from "@mantine/core";
+import { Button, FileInput, FileInputProps, Group } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { MIMEType } from "@/lib/types/common";
 
@@ -7,21 +7,6 @@ type Props = {
    * Whether the file input should be clearable
    */
   clearable?: boolean;
-
-  /**
-   * Label to display above the file input
-   */
-  label?: string;
-
-  /**
-   * Description to display below the file input
-   */
-  description?: string;
-
-  /**
-   * Placeholder text to display when no file is selected
-   */
-  placeholder?: string;
 
   /**
    * MIME type to accept. Example: "text/csv"
@@ -42,7 +27,13 @@ type Props = {
    * Label for the submit button
    */
   submitButtonLabel?: string;
-};
+
+  /**
+   * Whether the form that wraps this file input should have
+   * `width: 100%` applied to it
+   */
+  fullWidth?: boolean;
+} & Omit<FileInputProps, "clearable" | "accept" | "onSubmit">;
 
 type FileUploadForm = {
   file: File | null;
@@ -58,13 +49,12 @@ type FileUploadForm = {
  */
 export function FileUploadField({
   clearable = true,
-  label,
-  description,
-  placeholder,
   accept,
   onSubmit,
   isSubmitting = false,
   submitButtonLabel = "Upload",
+  fullWidth,
+  ...fileInputProps
 }: Props): JSX.Element {
   const form = useForm<FileUploadForm>({
     initialValues: {
@@ -77,18 +67,21 @@ export function FileUploadField({
       onSubmit={form.onSubmit((values) => {
         onSubmit(values.file ?? undefined);
       })}
+      style={{ width: fullWidth ? "100%" : undefined }}
     >
       <FileInput
         key={form.key("file")}
         {...form.getInputProps("file")}
         clearable={clearable}
-        label={label}
-        description={description}
-        placeholder={placeholder}
         accept={accept}
+        {...fileInputProps}
       />
       <Group justify="flex-end" mt="md">
-        <Button type="submit" loading={isSubmitting}>
+        <Button
+          type="submit"
+          loading={isSubmitting}
+          disabled={form.getValues().file === null}
+        >
           {submitButtonLabel}
         </Button>
       </Group>

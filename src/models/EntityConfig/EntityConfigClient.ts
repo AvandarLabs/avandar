@@ -1,4 +1,4 @@
-import { createSupabaseCRUDClient } from "@/lib/clients/supabase/SupabaseCRUDClient";
+import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { LocalDatasetClient } from "../LocalDataset/LocalDatasetClient";
 import { EntityConfigParsers } from "./parsers";

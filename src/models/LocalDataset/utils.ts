@@ -1,6 +1,6 @@
 import Papa, { ParseMeta } from "papaparse";
 import { match } from "ts-pattern";
-import { CSVData, MIMEType } from "@/lib/types/common";
+import { MIMEType, RawCellValue, RawDataset } from "@/lib/types/common";
 import { assert } from "@/lib/utils/guards";
 import { uuid } from "@/lib/utils/uuid";
 import { WorkspaceId } from "../Workspace/types";
@@ -28,7 +28,7 @@ export function makeLocalDataset({
   description: string;
   fileMetadata: FileMetadata;
   csvMetadata: ParseMeta;
-  data: CSVData;
+  data: RawDataset;
   fields: readonly LocalDatasetField[];
 }): LocalDataset<"Insert"> {
   const creationTime = new Date();
@@ -44,7 +44,10 @@ export function makeLocalDataset({
     updatedAt: creationTime,
     sizeInBytes: fileMetadata.sizeInBytes,
     delimiter: csvMetadata.delimiter,
-    data: unparseDataset({ data, datasetType: fileMetadata.mimeType }),
+    data: unparseDataset({
+      data,
+      datasetType: MIMEType.TEXT_CSV,
+    }),
     fields,
   };
 }
@@ -54,19 +57,38 @@ export function makeLocalDataset({
  * @param options
  * @returns
  */
-export function unparseDataset(options: {
-  datasetType: MIMEType;
-  data: CSVData;
-}): string {
-  const { datasetType, data } = options;
-  const result = match(datasetType)
-    .with("text/csv", () => {
+export function unparseDataset(
+  options:
+    | {
+        datasetType: MIMEType.TEXT_CSV;
+        data: RawDataset;
+      }
+    | {
+        datasetType: MIMEType.APPLICATION_GOOGLE_SPREADSHEET;
+        data: RawCellValue[][];
+      }
+    | {
+        datasetType: Exclude<
+          MIMEType,
+          MIMEType.TEXT_CSV | MIMEType.APPLICATION_GOOGLE_SPREADSHEET
+        >;
+        data: unknown;
+      },
+): string {
+  const result = match(options)
+    .with({ datasetType: MIMEType.TEXT_CSV }, ({ data }) => {
       return Papa.unparse(data, {
         header: true,
         delimiter: ",",
         newline: "\n",
       });
     })
+    .with(
+      { datasetType: MIMEType.APPLICATION_GOOGLE_SPREADSHEET },
+      ({ data }) => {
+        return Papa.unparse(data, { delimiter: ",", newline: "\n" });
+      },
+    )
     .otherwise(() => {
       throw new Error("Unsupported dataset type for local storage.");
     });

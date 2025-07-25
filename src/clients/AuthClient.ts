@@ -3,6 +3,7 @@ import {
   Session,
   Subscription,
   User,
+  WeakPassword,
 } from "@supabase/supabase-js";
 import { SupabaseDBClient } from "../lib/clients/supabase/SupabaseDBClient";
 
@@ -92,16 +93,20 @@ export const AuthClient = {
   signIn: async (signInParams: {
     email: string;
     password: string;
-  }): Promise<void> => {
+  }): Promise<{
+    user: User;
+    session: Session;
+    weakPassword?: WeakPassword;
+  }> => {
     const { email, password } = signInParams;
-    const { error } = await SupabaseDBClient.auth.signInWithPassword({
+    const { data, error } = await SupabaseDBClient.auth.signInWithPassword({
       email,
       password,
     });
-
     if (error) {
       throw error;
     }
+    return data;
   },
 
   /**

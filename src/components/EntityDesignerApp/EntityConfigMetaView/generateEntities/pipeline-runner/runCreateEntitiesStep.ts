@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 import { Logger } from "@/lib/Logger";
-import { CSVRow } from "@/lib/types/common";
+import { RawDataRecordRow } from "@/lib/types/common";
 import { assert, isNotNullOrUndefined } from "@/lib/utils/guards";
 import {
   makeBucketMapFromList,
@@ -93,7 +93,7 @@ function _extractEntityFieldValueFromDatasetRows(params: {
    */
   sourceDatasetRows: Array<{
     datasetId: LocalDatasetId;
-    rowData: CSVRow;
+    rowData: RawDataRecordRow;
   }>;
 }): EntityFieldValue | undefined {
   const { entityId, valueExtractor, sourceDatasetRows, context } = params;
@@ -211,12 +211,6 @@ export function runCreateEntitiesStep(
       );
 
       // check for any errors
-      if (externalIdsToSourceDatasetRows.has(undefined)) {
-        errors.push(
-          `Found undefined values in the id field (${datasetExternalIdColumn.name}) in dataset "${sourceDataset.name}"`,
-        );
-        externalIdsToSourceDatasetRows.delete(undefined);
-      }
       if (externalIdsToSourceDatasetRows.has("")) {
         errors.push(
           `Found empty string values in the id field (${datasetExternalIdColumn.name}) in dataset "${sourceDataset.name}"`,

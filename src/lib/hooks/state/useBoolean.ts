@@ -9,12 +9,17 @@ import { useCallback, useState } from "react";
  * state.
  *
  * @param initialState - The initial state of the boolean
- * @returns An array containing the current state and handlers to set it to
+ * @returns A tuple containing the current state and handlers to set it to
  * true, false, or toggle
  */
 export function useBoolean(
   initialState: boolean,
-): [boolean, () => void, () => void, () => void] {
+): [
+  state: boolean,
+  setTrue: () => void,
+  setFalse: () => void,
+  toggle: () => void,
+] {
   const [bool, setBool] = useState<boolean>(initialState);
 
   const setTrue = useCallback(() => {

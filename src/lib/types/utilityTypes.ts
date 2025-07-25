@@ -2,6 +2,7 @@ import type { UnknownObject } from "./common";
 import type {
   StringKeyOf as BroadStringKeyOf,
   ConditionalKeys,
+  UnknownRecord,
 } from "type-fest";
 
 /**
@@ -129,4 +130,12 @@ export type SetDefined<
   KeysToSet extends keyof T = keyof T,
 > = {
   [K in keyof T]: K extends KeysToSet ? Exclude<T[K], undefined> : T[K];
+};
+
+export type ReplaceTypes<
+  OriginalObject extends UnknownRecord,
+  NewTypes extends UnknownRecord,
+> = {
+  [K in keyof OriginalObject]: K extends keyof NewTypes ? NewTypes[K]
+  : OriginalObject[K];
 };

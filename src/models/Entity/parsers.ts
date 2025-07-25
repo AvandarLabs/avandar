@@ -14,8 +14,8 @@ const DBReadSchema = z.object({
   status: z.string(),
   entityConfigId: uuidType<EntityConfigId>(),
   assignedTo: z.union([uuidType<UserId>(), z.literal("")]),
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
+  createdAt: z.iso.datetime({ offset: true }),
+  updatedAt: z.iso.datetime({ offset: true }),
 });
 
 export const EntityParsers = makeParserRegistry<EntityModel>().build({
@@ -25,18 +25,24 @@ export const EntityParsers = makeParserRegistry<EntityModel>().build({
     return {
       ...dbObj,
       assignedTo: dbObj.assignedTo === "" ? undefined : dbObj.assignedTo,
+      createdAt: new Date(dbObj.createdAt),
+      updatedAt: new Date(dbObj.updatedAt),
     };
   },
   fromModelInsertToDBInsert: (modelObj) => {
     return {
       ...modelObj,
       assignedTo: modelObj.assignedTo ?? "",
+      createdAt: modelObj.createdAt.toISOString(),
+      updatedAt: modelObj.updatedAt.toISOString(),
     };
   },
   fromModelUpdateToDBUpdate: (modelObj) => {
     return {
       ...modelObj,
       assignedTo: modelObj.assignedTo ?? "",
+      createdAt: modelObj.createdAt?.toISOString(),
+      updatedAt: modelObj.updatedAt?.toISOString(),
     };
   },
 });

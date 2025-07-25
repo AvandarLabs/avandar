@@ -9,8 +9,10 @@
 # This script is meant to be run with `yarn db:reset` (from the
 # project root directory)
 
-SCRIPT_DIR="$(dirname "$(realpath "$0")")"
-PROJECT_ROOT=$SCRIPT_DIR/../
+PROJECT_ROOT=$(yarn --silent util:get-project-root)
+cd "$PROJECT_ROOT" || exit
+
+SCRIPT_DIR="${PROJECT_ROOT}/scripts"
 
 # Parse command line arguments
 SKIP_SEED=false
