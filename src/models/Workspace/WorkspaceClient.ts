@@ -1,5 +1,5 @@
 import { AuthClient } from "@/clients/AuthClient";
-import { createSupabaseCRUDClient } from "@/lib/clients/supabase/SupabaseCRUDClient";
+import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { UserId } from "../User/types";
 import { WorkspaceParsers } from "./parsers";

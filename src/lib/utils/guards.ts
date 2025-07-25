@@ -289,7 +289,7 @@ export function isOneOf<T extends string | boolean | number>(
  * @returns `true` if `value` is a non-empty array, `false` otherwise.
  */
 export function isNonEmptyArray<T>(
-  value: readonly T[],
+  value: readonly T[] | null | undefined,
 ): value is readonly [T, ...T[]] {
   return isArray(value) && value.length > 0;
 }

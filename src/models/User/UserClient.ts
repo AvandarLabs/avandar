@@ -13,11 +13,12 @@ import {
   withSupabaseClient,
 } from "@/lib/clients/withSupabaseClient";
 import { ILogger } from "@/lib/Logger";
+import { omit } from "@/lib/utils/objects/misc";
 import { camelCaseKeysShallow } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
-import { Database } from "@/types/database.types";
+import { Database, Tables } from "@/types/database.types";
 import { WorkspaceId } from "../Workspace/types";
-import { UserId, UserProfile } from "./types";
+import { MembershipId, UserId, UserProfile, UserProfileId } from "./types";
 
 type TUserClient = WithSupabaseClient<
   WithLogger<
@@ -40,21 +41,28 @@ type TUserClientOptions = {
   dbClient?: SupabaseClient<Database>;
 };
 
-const UserProfileDBReadToModelReadSchema = z
+const UserProfileDBReadToModelReadSchema: z.ZodType<
+  UserProfile,
+  Tables<"user_profiles">
+> = z
   .object({
-    id: z.string().uuid(),
-    workspace_id: z.string().uuid(),
+    id: z.uuid(),
+    membership_id: z.uuid(),
+    user_id: z.uuid(),
+    workspace_id: z.uuid(),
     email: z.string(),
     full_name: z.string(),
     display_name: z.string(),
-    created_at: z.string().datetime({ offset: true }),
-    updated_at: z.string().datetime({ offset: true }),
+    created_at: z.iso.datetime({ offset: true }),
+    updated_at: z.iso.datetime({ offset: true }),
   })
-  .transform((obj) => {
-    const model = camelCaseKeysShallow(obj);
+  .transform((obj): UserProfile => {
+    const model = omit(camelCaseKeysShallow(obj), ["id"]);
     return {
       ...model,
-      id: uuid<UserId>(model.id),
+      profileId: uuid<UserProfileId>(obj.id),
+      membershipId: uuid<MembershipId>(model.membershipId),
+      userId: uuid<UserId>(model.userId),
       workspaceId: uuid<WorkspaceId>(model.workspaceId),
       createdAt: new Date(model.createdAt),
       updatedAt: new Date(model.updatedAt),

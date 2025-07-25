@@ -21,7 +21,9 @@ function WorkspaceHomePage() {
           Welcome back
           {isLoadingUserProfile ?
             <Loader ml="sm" />
-          : `, ${userProfile.displayName}`}
+          : userProfile ?
+            `, ${userProfile.displayName}`
+          : null}
         </Title>
         <Text>
           This is where eventually you will see the newest updates for your

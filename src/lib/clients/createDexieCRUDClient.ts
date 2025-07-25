@@ -9,7 +9,7 @@ import {
   createModelCRUDClient,
   HookableClient,
   ModelCRUDClient,
-} from "./ModelCRUDClient";
+} from "./createModelCRUDClient";
 
 const DB_VERSION = 1;
 

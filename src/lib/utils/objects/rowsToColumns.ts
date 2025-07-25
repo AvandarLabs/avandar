@@ -3,6 +3,14 @@ import { StringKeyOf } from "@/lib/types/utilityTypes";
 import { hasDefinedProp } from "../guards";
 import { objectKeys } from "./misc";
 
+/**
+ * Transforms an array of objects (rows) into an object where each key
+ * is a column name and the value is an array of values for that column.
+ *
+ * @param rows - The array of objects to transform.
+ * @returns An object where each key is a column name and the value is
+ * an array of values for that column.
+ */
 export function rowsToColumns<T extends UnknownObject>(
   rows: readonly T[],
 ): {

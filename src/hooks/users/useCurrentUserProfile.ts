@@ -1,4 +1,5 @@
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { UseQueryResult } from "@/lib/hooks/query/useQuery";
 import { UserProfile } from "@/models/User/types";
 import { UserClient } from "@/models/User/UserClient";
 
@@ -13,17 +14,18 @@ import { UserClient } from "@/models/User/UserClient";
  * the authenticated DB user, but this will not give you any profile
  * data because a profile requires a workspace.
  *
- * @returns A tuple containing the user profile and a boolean
- * indicating if the data is loading.
+ * @returns A tuple containing the user profile, a boolean indicating
+ * if the data is loading, and the full `useQuery` response object.
  */
-export function useCurrentUserProfile():
-  | [userProfile: UserProfile, isLoading: false]
-  | [userProfile: undefined, isLoading: true] {
+export function useCurrentUserProfile(): [
+  userProfile: UserProfile | undefined,
+  isLoading: boolean,
+  response: UseQueryResult<UserProfile>,
+] {
   const workspace = useCurrentWorkspace();
-  const [userProfile, isLoadingUserProfile] = UserClient.useGetProfile({
-    workspaceId: workspace.id,
-  });
-  return isLoadingUserProfile || !userProfile ?
-      [undefined, true]
-    : [userProfile, false];
+  const [userProfile, isLoadingUserProfile, response] =
+    UserClient.useGetProfile({
+      workspaceId: workspace.id,
+    });
+  return [userProfile, isLoadingUserProfile, response];
 }

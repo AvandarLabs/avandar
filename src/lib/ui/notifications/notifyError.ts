@@ -9,16 +9,19 @@ export function notifyError(
         title?: string;
         message?: string;
       },
+  message?: string,
 ): void {
   const title =
     typeof titleOrOptions === "string" ? titleOrOptions : (
       (titleOrOptions.title ?? DEFAULT_TITLE)
     );
-  const message =
-    typeof titleOrOptions === "string" ? undefined : titleOrOptions.message;
+  const messageToUse =
+    typeof titleOrOptions === "string" ? message : (
+      (message ?? titleOrOptions.message)
+    );
   notifications.show({
     title,
-    message,
+    message: messageToUse,
     color: "red",
   });
 }

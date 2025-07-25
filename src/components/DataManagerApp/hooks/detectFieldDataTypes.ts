@@ -1,4 +1,4 @@
-import { CSVCellValue, CSVData } from "@/lib/types/common";
+import { RawCellValue, RawDataset } from "@/lib/types/common";
 import { uuid } from "@/lib/utils/uuid";
 import type {
   FieldDataType,
@@ -34,7 +34,7 @@ function isParseableDate(value: string): boolean {
 
 function detectFieldDataType(
   fieldName: string,
-  values: readonly CSVCellValue[],
+  values: readonly RawCellValue[],
 ): FieldDataType {
   const fallbackType = guessDataTypeFromFieldName(fieldName);
   if (values.length === 0) {
@@ -89,7 +89,7 @@ function detectFieldDataType(
  */
 export function detectFieldDataTypes(
   fieldNames: readonly string[],
-  data: CSVData,
+  data: RawDataset,
 ): LocalDatasetField[] {
   // Convert the CSV to a columnar format
   const columns = fieldNames.reduce(
@@ -97,13 +97,13 @@ export function detectFieldDataTypes(
       obj[fieldName] = [];
       return obj;
     },
-    {} as Record<string, CSVCellValue[]>,
+    {} as Record<string, RawCellValue[]>,
   );
 
   // fill up the column arrays
   data.forEach((row) => {
     Object.keys(row).forEach((fieldName) => {
-      columns[fieldName]?.push(row[fieldName]);
+      columns[fieldName]?.push(row[fieldName]!);
     });
   });
 

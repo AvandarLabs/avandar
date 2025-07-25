@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "google-auth-library": "npm:google-auth-library@10",
+    "googleapis": "npm:googleapis@153",
+    "zod": "npm:zod@4"
+  }
+}

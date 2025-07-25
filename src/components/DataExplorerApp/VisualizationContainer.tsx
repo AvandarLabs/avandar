@@ -6,7 +6,6 @@ import { UnknownDataFrame } from "@/lib/types/common";
 import { BarChart } from "@/lib/ui/data-viz/BarChart";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { DangerText } from "@/lib/ui/Text/DangerText";
-import { constant } from "@/lib/utils/higherOrderFuncs";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { VizConfig } from "./VizSettingsForm/makeDefaultVizConfig";
 
@@ -18,27 +17,17 @@ type Props = {
 
 const BarChartSettingsSchema = z.object({
   xAxisKey: z.string({
-    errorMap: (issue: z.ZodIssueOptionalMessage, ctx: z.ErrorMapCtx) => {
-      const errorMessage = match(issue.code)
-        .with(z.ZodIssueCode.invalid_type, () => {
-          return ctx.data === undefined ?
-              "X axis must be specified"
-            : "X axis must be a string";
-        })
-        .otherwise(constant(ctx.defaultError));
-      return { message: errorMessage };
+    error: (issue) => {
+      return issue.input === undefined ?
+          "X axis must be specified"
+        : "X axis must be a string";
     },
   }),
   yAxisKey: z.string({
-    errorMap: (issue: z.ZodIssueOptionalMessage, ctx: z.ErrorMapCtx) => {
-      const errorMessage = match(issue.code)
-        .with(z.ZodIssueCode.invalid_type, () => {
-          return ctx.data === undefined ?
-              "Y axis must be specified"
-            : "Y axis must be a string";
-        })
-        .otherwise(constant(ctx.defaultError));
-      return { message: errorMessage };
+    error: (issue) => {
+      return issue.input === undefined ?
+          "Y axis must be specified"
+        : "Y axis must be a string";
     },
   }),
 });
@@ -63,13 +52,11 @@ export function VisualizationContainer({
         error,
       } = BarChartSettingsSchema.safeParse(config.settings);
 
-      console.log(data);
-
       if (success) {
         return <BarChart data={data} height={700} {...settings} />;
       }
-      const errorMessages = error.errors.map(getProp("message"));
-      return <DangerText>{errorMessages.join(", ")}</DangerText>;
+      const errorMessages = z.prettifyError(error);
+      return <DangerText>{errorMessages}</DangerText>;
     })
     .exhaustive();
 }

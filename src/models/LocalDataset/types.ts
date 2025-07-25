@@ -3,7 +3,7 @@ import { DexieModelCRUDTypes } from "@/lib/models/DexieModelCRUDTypes";
 import { MIMEType } from "@/lib/types/common";
 import { Brand } from "@/lib/types/utilityTypes";
 import { WorkspaceId } from "../Workspace/types";
-import type { CSVData } from "@/lib/types/common";
+import type { RawDataset } from "@/lib/types/common";
 import type { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
 
 export type LocalDatasetId = Brand<string, "LocalDatasetId">;
@@ -86,5 +86,5 @@ export type LocalDataset<K extends keyof LocalDatasetModel = "Read"> = Simplify<
 export type ParsedLocalDataset = SetFieldType<
   LocalDataset<"Read">,
   "data",
-  CSVData
+  RawDataset
 >;

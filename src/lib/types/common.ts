@@ -6,9 +6,43 @@ export type UUID<B extends string = never> =
 
 export type UnknownObject = Record<PropertyKey, unknown>;
 export type EmptyObject = { [emptyObjectSymbol]?: never };
-export type CSVCellValue = string | undefined;
-export type CSVRow = Record<string, CSVCellValue>;
-export type CSVData = CSVRow[];
+
+/**
+ * Raw Cell Values are *always* strings. This represents the type of
+ * data you'd find in a plaintext file where only strings are allowed.
+ * This is the type of value you'd find in a CSV.
+ *
+ * Empty values are represented as empty strings, not null or undefined.
+ */
+export type RawCellValue = string;
+
+/**
+ * A row of raw data represented as a record of strings (representing
+ * the fields) to RawCellValue.
+ */
+export type RawDataRecordRow = Record<string, RawCellValue>;
+
+/**
+ * A row of data represented as an array of RawCellValue.
+ */
+export type RawDataArrayRow = RawCellValue[];
+
+/**
+ * A raw dataset represented as an array of RawDataRecordRows.
+ * This is the most convenient and common way of representing raw
+ * data, such as a parsed CSV.
+ */
+export type RawDataset = RawDataRecordRow[];
+
+/**
+ * Raw data represented as an array of arrays of CSVCellValues.
+ * This is a more memory-efficient representation of data, rather
+ * than using records, but it is less convenient to work with.
+ *
+ * The Google Sheets API, for example, returns data in this format.
+ */
+export type RawArrayDataset = RawDataArrayRow[];
+
 export type JSONLiteral = string | number | boolean | null;
 
 /** A dataframe with unknown data in row format. */
@@ -19,67 +53,93 @@ export type UnknownDataFrame = Array<Record<string, unknown>>;
  */
 export type JSONValue =
   | JSONLiteral
-  | { [key: string]: JSONValue | undefined }
+  | { [key: string]: JSONValue }
   | JSONValue[];
 
-export type MIMEType =
+/**
+ * Enum of supported MIME types.
+ */
+export enum MIMEType {
   // Text
-  | "text/plain"
-  | "text/html"
-  | "text/css"
-  | "text/javascript"
-  | "text/csv"
-  | "text/xml"
-  | "text/markdown"
+  TEXT_PLAIN = "text/plain",
+  TEXT_HTML = "text/html",
+  TEXT_CSS = "text/css",
+  TEXT_JAVASCRIPT = "text/javascript",
+  TEXT_CSV = "text/csv",
+  TEXT_XML = "text/xml",
+  TEXT_MARKDOWN = "text/markdown",
 
   // Application
-  | "application/json"
-  | "application/xml"
-  | "application/javascript"
-  | "application/ecmascript"
-  | "application/x-www-form-urlencoded"
-  | "application/pdf"
-  | "application/zip"
-  | "application/x-7z-compressed"
-  | "application/gzip"
-  | "application/vnd.rar"
+  APPLICATION_JSON = "application/json",
+  APPLICATION_XML = "application/xml",
+  APPLICATION_JAVASCRIPT = "application/javascript",
+  APPLICATION_ECMASCRIPT = "application/ecmascript",
+  APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded",
+  APPLICATION_PDF = "application/pdf",
+  APPLICATION_ZIP = "application/zip",
+  APPLICATION_X_7Z_COMPRESSED = "application/x-7z-compressed",
+  APPLICATION_GZIP = "application/gzip",
+  APPLICATION_VND_RAR = "application/vnd.rar",
 
   // MS Office
-  | "application/msword"
-  | "application/vnd.ms-excel"
-  | "application/vnd.ms-powerpoint"
-  | "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-  | "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-  | "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+  APPLICATION_MS_WORD = "application/msword",
+  APPLICATION_MS_EXCEL = "application/vnd.ms-excel",
+  APPLICATION_MS_POWERPOINT = "application/vnd.ms-powerpoint",
+  APPLICATION_OPENXML_WORD = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  APPLICATION_OPENXML_EXCEL = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  APPLICATION_OPENXML_POWERPOINT = "application/vnd.openxmlformats-officedocument.presentationml.presentation",
 
   // Open Office / LibreOffice
-  | "application/vnd.oasis.opendocument.text"
-  | "application/vnd.oasis.opendocument.spreadsheet"
-  | "application/vnd.oasis.opendocument.presentation"
+  APPLICATION_OASIS_ODT = "application/vnd.oasis.opendocument.text",
+  APPLICATION_OASIS_ODS = "application/vnd.oasis.opendocument.spreadsheet",
+  APPLICATION_OASIS_ODP = "application/vnd.oasis.opendocument.presentation",
+
+  // Google Sheets
+  APPLICATION_GOOGLE_AUDIO = "application/vnd.google-apps.audio",
+  APPLICATION_GOOGLE_DOCUMENT = "application/vnd.google-apps.document",
+  APPLICATION_GOOGLE_DRIVE_SDK = "application/vnd.google-apps.drive-sdk",
+  APPLICATION_GOOGLE_DRAWING = "application/vnd.google-apps.drawing",
+  APPLICATION_GOOGLE_FILE = "application/vnd.google-apps.file",
+  APPLICATION_GOOGLE_FOLDER = "application/vnd.google-apps.folder",
+  APPLICATION_GOOGLE_FORM = "application/vnd.google-apps.form",
+  APPLICATION_GOOGLE_FUSIONTABLE = "application/vnd.google-apps.fusiontable",
+  APPLICATION_GOOGLE_JAM = "application/vnd.google-apps.jam",
+  APPLICATION_GOOGLE_MAIL_LAYOUT = "application/vnd.google-apps.mail-layout",
+  APPLICATION_GOOGLE_MAP = "application/vnd.google-apps.map",
+  APPLICATION_GOOGLE_PHOTO = "application/vnd.google-apps.photo",
+  APPLICATION_GOOGLE_PRESENTATION = "application/vnd.google-apps.presentation",
+  APPLICATION_GOOGLE_SCRIPT = "application/vnd.google-apps.script",
+  APPLICATION_GOOGLE_SHORTCUT = "application/vnd.google-apps.shortcut",
+  APPLICATION_GOOGLE_SITE = "application/vnd.google-apps.site",
+  APPLICATION_GOOGLE_SPREADSHEET = "application/vnd.google-apps.spreadsheet",
+  APPLICATION_GOOGLE_UNKNOWN = "application/vnd.google-apps.unknown",
+  APPLICATION_GOOGLE_VID = "application/vnd.google-apps.vid",
+  APPLICATION_GOOGLE_VIDEO = "application/vnd.google-apps.video",
 
   // Images
-  | "image/jpeg"
-  | "image/png"
-  | "image/gif"
-  | "image/webp"
-  | "image/svg+xml"
-  | "image/bmp"
-  | "image/tiff"
+  IMAGE_JPEG = "image/jpeg",
+  IMAGE_PNG = "image/png",
+  IMAGE_GIF = "image/gif",
+  IMAGE_WEBP = "image/webp",
+  IMAGE_SVG_XML = "image/svg+xml",
+  IMAGE_BMP = "image/bmp",
+  IMAGE_TIFF = "image/tiff",
 
   // Audio
-  | "audio/mpeg"
-  | "audio/ogg"
-  | "audio/wav"
-  | "audio/webm"
+  AUDIO_MPEG = "audio/mpeg",
+  AUDIO_OGG = "audio/ogg",
+  AUDIO_WAV = "audio/wav",
+  AUDIO_WEBM = "audio/webm",
 
   // Video
-  | "video/mp4"
-  | "video/webm"
-  | "video/ogg"
-  | "video/x-msvideo"
+  VIDEO_MP4 = "video/mp4",
+  VIDEO_WEBM = "video/webm",
+  VIDEO_OGG = "video/ogg",
+  VIDEO_X_MSVIDEO = "video/x-msvideo",
 
   // Fonts
-  | "font/ttf"
-  | "font/otf"
-  | "font/woff"
-  | "font/woff2";
+  FONT_TTF = "font/ttf",
+  FONT_OTF = "font/otf",
+  FONT_WOFF = "font/woff",
+  FONT_WOFF2 = "font/woff2",
+}

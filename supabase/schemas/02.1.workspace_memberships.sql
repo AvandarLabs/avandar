@@ -20,7 +20,7 @@ create table public.workspace_memberships (
 
   -- Constraint: Each user can be a member of a workspace only once. This
   -- prevents a user from getting added multiple times to the same workspace.
-  constraint workspace_memberships_workspace_user_unique unique (workspace_id, user_id)
+  constraint workspace_memberships__workspace_user_unique unique (workspace_id, user_id)
 );
 comment on table public.workspace_memberships is
   'Stores memberships between a user and a workspace.';

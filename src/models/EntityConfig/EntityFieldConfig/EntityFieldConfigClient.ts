@@ -1,5 +1,5 @@
 import { match } from "ts-pattern";
-import { createSupabaseCRUDClient } from "@/lib/clients/supabase/SupabaseCRUDClient";
+import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
 import { makeBucketRecordFromList } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys } from "@/lib/utils/objects/misc";

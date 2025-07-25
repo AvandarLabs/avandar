@@ -25,12 +25,16 @@ in the output (most likely `http://localhost:54323`)
 3. Set up your environment variables
 
 ```bash
-cp .env.example .env.development
+yarn env:reset
 ```
 
-And then fill in the necessary environment variables. For the Supabase
-variables, you should be able to get that info from the output of having
-started Supabase locally in the prior steps.
+This will create `.env.development` and `.env.development.edge` files which
+you will need to fill out.
+
+Next, fill in the necessary environment variables. For the Supabase
+variables, you should use the values you get from the output of running
+`supabase start` locally. If your local Supabase is already running, run
+`supabase status` to see your Supabase environment variables again.
 
 4. Set up your local database
 
