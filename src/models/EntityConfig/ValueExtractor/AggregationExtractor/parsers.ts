@@ -9,20 +9,20 @@ import {
   snakeCaseKeysDeep,
 } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
-import { jsonType } from "@/lib/utils/zodHelpers";
+import { supabaseJSONSchema } from "@/lib/utils/zodHelpers";
 import { asLocalDatasetId } from "@/models/LocalDataset/utils";
 import { AggregationExtractor, AggregationExtractorModel } from "./types";
 
 const DBReadSchema = z.object({
-  id: z.string().uuid(),
-  entity_field_config_id: z.string().uuid(),
-  workspace_id: z.string().uuid(),
+  id: z.uuid(),
+  entity_field_config_id: z.uuid(),
+  workspace_id: z.uuid(),
   aggregation_type: z.enum(["sum", "max", "count"]),
   dataset_id: z.string(),
-  dataset_field_id: z.string().uuid(),
-  filter: jsonType.nullable(),
-  created_at: z.string().datetime({ offset: true }),
-  updated_at: z.string().datetime({ offset: true }),
+  dataset_field_id: z.uuid(),
+  filter: supabaseJSONSchema.nullable(),
+  created_at: z.iso.datetime({ offset: true }),
+  updated_at: z.iso.datetime({ offset: true }),
 });
 
 export const AggregationExtractorParsers =
@@ -38,7 +38,7 @@ export const AggregationExtractorParsers =
       const newObj = nullsToUndefinedDeep(camelCaseKeysDeep(rest));
       return {
         ...newObj,
-        filter,
+        filter: filter ? excludeUndefinedDeep(filter) : undefined,
         type: "aggregation" as const,
         id: uuid(newObj.id),
         entityFieldConfigId: uuid(newObj.entityFieldConfigId),

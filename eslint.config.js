@@ -145,4 +145,11 @@ export default [
       ],
     },
   },
+  {
+    files: ["supabase/functions/**/*.ts"],
+    rules: {
+      "import-x/no-unresolved": "off",
+      "import-x/extensions": "off",
+    },
+  },
 ];

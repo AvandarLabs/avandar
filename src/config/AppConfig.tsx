@@ -1,4 +1,6 @@
 /** Configuration for the app. */
+// TODO(jpsyx): move most of these to environment variables so that
+// changes do not require rebuilding production.
 type TAppConfig = {
   /**
    * The path and filename to the logo file relative to the `public/` directory.
@@ -16,6 +18,9 @@ type TAppConfig = {
 
     /** Maximum length of dataset description */
     maxDatasetDescriptionLength: number;
+
+    /** Maximum number of rows to preview */
+    maxPreviewRows: number;
   };
 
   /** The email address to use for support inquiries */
@@ -31,6 +36,7 @@ export const AppConfig = {
   dataManagerApp: {
     maxDatasetNameLength: 100,
     maxDatasetDescriptionLength: 500,
+    maxPreviewRows: 200,
   },
   supportEmail: "support@avandarlabs.com",
   infoEmail: "info@avandarlabs.com",

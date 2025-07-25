@@ -1,6 +1,6 @@
-import { SetFieldType } from "type-fest";
 import { EntityComment } from "@/components/EntityDesignerApp/EntityConfigMetaView/generateEntities/pipeline-runner/runPipeline";
 import { UUID } from "@/lib/types/common";
+import { ReplaceTypes } from "@/lib/types/utilityTypes";
 import { EntityFieldConfig } from "../EntityConfig/EntityFieldConfig/types";
 import { EntityConfig, EntityConfigId } from "../EntityConfig/types";
 import { UserId } from "../User/types";
@@ -18,11 +18,18 @@ type DBRead = {
   entityConfigId: EntityConfigId;
   status: string;
   assignedTo: UserId | "";
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 };
 
-type EntityRead = SetFieldType<DBRead, "assignedTo", UserId | undefined>;
+type EntityRead = ReplaceTypes<
+  DBRead,
+  {
+    assignedTo: UserId | undefined;
+    createdAt: Date;
+    updatedAt: Date;
+  }
+>;
 
 export type EntityModel = DexieModelCRUDTypes<
   {

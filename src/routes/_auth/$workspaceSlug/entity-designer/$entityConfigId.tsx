@@ -12,7 +12,9 @@ import { uuid } from "@/lib/utils/uuid";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityConfig } from "@/models/EntityConfig/types";
 
-export const Route = createFileRoute("/_auth/$workspaceSlug/entity-designer/$entityConfigId")({
+export const Route = createFileRoute(
+  "/_auth/$workspaceSlug/entity-designer/$entityConfigId",
+)({
   component: RouteComponent,
   loader: async ({ params: { entityConfigId } }): Promise<EntityConfig> => {
     const entityConfig = await EntityConfigClient.getById({

@@ -1,4 +1,4 @@
-import { createSupabaseCRUDClient } from "@/lib/clients/supabase/SupabaseCRUDClient";
+import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
 import { DatasetColumnValueExtractorParsers } from "./parsers";
 
 /**

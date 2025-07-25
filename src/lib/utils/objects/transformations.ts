@@ -305,7 +305,7 @@ export function undefinedsToNullsDeep<T extends UnknownObject>(
   });
 }
 
-type ExcludeUndefinedShallow<T extends UnknownObject> = {
+export type ExcludeUndefinedShallow<T extends UnknownObject> = {
   [K in keyof T]: undefined extends T[K] ? Exclude<T[K], undefined> : T[K];
 };
 

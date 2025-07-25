@@ -3,13 +3,9 @@ import { objectKeys, pick } from "../utils/objects/misc";
 import { excludeUndefinedDeep } from "../utils/objects/transformations";
 import { ModelCRUDTypes } from "./ModelCRUDTypes";
 
-type GenericDBReadSchema<M extends ModelCRUDTypes> = z.ZodObject<
-  z.ZodRawShape,
-  "strip",
-  z.ZodTypeAny,
-  M["DBRead"],
-  M["DBRead"]
->;
+type GenericDBReadSchema<M extends ModelCRUDTypes> = z.ZodObject<{
+  [K in keyof M["DBRead"]]: z.ZodType<M["DBRead"][K], M["DBRead"][K]>;
+}>;
 
 type CRUDTransformerFunctions<M extends ModelCRUDTypes> = {
   /**
@@ -59,9 +55,12 @@ export function getErrorMap(
   modelName: string,
   schemaName: string,
 ): z.ZodErrorMap {
-  return (_issue: z.ZodIssueOptionalMessage, ctx: z.ErrorMapCtx) => {
+  return (issue) => {
     return {
-      message: `[${modelName}:${schemaName}] ${ctx.defaultError}`,
+      message:
+        issue.message ?
+          `[${modelName}:${schemaName}] (${issue.code}) ${issue.message}`
+        : `[${modelName}:${schemaName}] (${issue.code})Error parsing schema.`,
     };
   };
 }
@@ -91,7 +90,7 @@ export function makeParserRegistry<M extends ModelCRUDTypes = never>(): {
             // run the DBReadSchema parser to be extra sure we are receiving
             // a valid DBRead model
             config.DBReadSchema.parse(data, {
-              errorMap: getErrorMap(config.modelName, "DBReadSchema"),
+              error: getErrorMap(config.modelName, "DBReadSchema"),
             }),
           );
         },

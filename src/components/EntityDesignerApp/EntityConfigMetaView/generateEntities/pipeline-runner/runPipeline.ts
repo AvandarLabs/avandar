@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 import { Logger } from "@/lib/Logger";
 import { getErrorMap } from "@/lib/models/makeParserRegistry";
-import { UnknownObject, UUID } from "@/lib/types/common";
+import { MIMEType, UnknownObject, UUID } from "@/lib/types/common";
 import { isNotNullOrUndefined, isPlainObject } from "@/lib/utils/guards";
 import { constant } from "@/lib/utils/higherOrderFuncs";
 import { promiseReduce } from "@/lib/utils/promises";
@@ -112,7 +112,7 @@ function createPipelineContext(state: PipelineContextState): PipelineContext {
     getDataset: (id: LocalDatasetId): ParsedLocalDataset => {
       const maybeDataset = getContextValue(`datasetId:${id}`);
       return ParsedLocalDatasetSchema.parse(maybeDataset, {
-        errorMap: getErrorMap("ParsedLocalDataset", "ParsedLocalDatasetSchema"),
+        error: getErrorMap("ParsedLocalDataset", "ParsedLocalDatasetSchema"),
       });
     },
     getErrors: constant(errors),
@@ -177,7 +177,7 @@ export async function _runOutputDatasetsStep(
     .filter(isNotNullOrUndefined);
 
   const dataAsString = unparseDataset({
-    datasetType: "text/csv",
+    datasetType: MIMEType.TEXT_CSV,
     data: rowsToWrite,
   });
 
@@ -192,7 +192,7 @@ export async function _runOutputDatasetsStep(
     name: datasetName,
     description: "",
     sizeInBytes,
-    mimeType: "text/csv",
+    mimeType: MIMEType.TEXT_CSV,
     delimiter: ",",
     firstRowIsHeader: true,
     fields: columnsToWrite.map((field) => {

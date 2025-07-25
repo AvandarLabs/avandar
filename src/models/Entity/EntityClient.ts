@@ -4,7 +4,7 @@ import { EntityFieldValue } from "@/components/EntityDesignerApp/EntityConfigMet
 import {
   createModelCRUDClient,
   ModelCRUDClient,
-} from "@/lib/clients/ModelCRUDClient";
+} from "@/lib/clients/createModelCRUDClient";
 import { ILogger } from "@/lib/Logger";
 import { applyFiltersToRows } from "@/lib/utils/filters/applyFiltersToRows";
 import { FiltersByColumn } from "@/lib/utils/filters/filtersByColumn";
