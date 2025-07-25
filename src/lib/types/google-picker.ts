@@ -478,7 +478,8 @@ export enum GPickerAudience {
 }
 
 /**
- * DocsViewMode is an export enumerated type for displaying data within a DocsView.
+ * DocsViewMode is an export enumerated type for displaying data within a
+ * DocsView.
  * Use these values in calls to DocsView.setMode.
  * If using a scope other than https://www.googleapis.com/auth/drive
  * or https://www.googleapis.com/auth/drive.readonly, it is recommended
@@ -575,8 +576,8 @@ export enum GPickerResponse {
 }
 
 /**
- * ServiceId is an export enumerated type used to describe the service the item was
- * selected from.
+ * ServiceId is an export enumerated type used to describe the service the
+ * item was selected from.
  *
  * API documentation here:
  * https://developers.google.com/workspace/drive/picker/reference/picker.serviceid
