@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { SupabaseDBClient } from "@/lib/clients/supabase/SupabaseDBClient";
 import { useAuth } from "@/lib/hooks/auth/useAuth";
+import { WorkspaceRole } from "@/models/Workspace/types";
 import { routeTree } from "@/routeTree.gen";
 
 const queryClient = new QueryClient();
@@ -18,7 +19,7 @@ const router = createRouter({
   scrollRestoration: true,
 });
 
-export function useWorkspaceRole(): JSX.Element {
+export function useWorkspaceRole(): WorkspaceRole {
   const { user } = useAuth(router);
   const workspace = useCurrentWorkspace();
 
@@ -35,7 +36,7 @@ export function useWorkspaceRole(): JSX.Element {
         .single();
 
       if (data?.role) {
-        setRole(data.role);
+        return setRole(data.role);
       } else {
         console.error("Failed to get role:", error);
       }
@@ -44,5 +45,5 @@ export function useWorkspaceRole(): JSX.Element {
     fetchRole();
   }, [user?.id, workspace?.id]);
 
-  return role;
+  return (role ?? "member") as WorkspaceRole;
 }

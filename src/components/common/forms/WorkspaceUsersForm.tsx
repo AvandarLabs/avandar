@@ -67,7 +67,7 @@ export function WorkspaceUserForm(): JSX.Element {
       <Table.Tr key={user.fullName}>
         <Table.Td>{user.fullName}</Table.Td>
         <Table.Td>{user.role}</Table.Td>
-        {isAdmin && (
+        {isAdmin ?
           <Table.Td>
             <Flex align="flex-end" gap="xs">
               <IconPencil size={18} />
@@ -81,7 +81,7 @@ export function WorkspaceUserForm(): JSX.Element {
               />
             </Flex>
           </Table.Td>
-        )}
+        : null}
       </Table.Tr>
     );
   });
