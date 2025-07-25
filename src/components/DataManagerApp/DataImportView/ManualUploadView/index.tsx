@@ -1,26 +1,17 @@
-import { Button, Stack } from "@mantine/core";
+import { Box, BoxProps, Stack } from "@mantine/core";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
-import {
-  IconArrowLeft,
-  IconPhoto,
-  IconUpload,
-  IconX,
-} from "@tabler/icons-react";
+import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { MIMEType } from "@/lib/types/common";
 import { notifyError } from "@/lib/ui/notifications/notifyError";
-import { Paper } from "@/lib/ui/Paper";
 import { FileUploadField } from "@/lib/ui/singleton-forms/FileUploadField";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { makeLocalDataset } from "@/models/LocalDataset/utils";
 import { useCSVParser } from "../../hooks/useCSVParser";
 import { DatasetUploadForm } from "../DatasetUploadForm";
 
-type Props = {
-  onBackClick: () => void;
-};
-
-export function ManualUploadView({ onBackClick }: Props): JSX.Element {
+type Props = BoxProps;
+export function ManualUploadView({ ...props }: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
   const { csv, fields, fileMetadata, parseFile } = useCSVParser({
     onNoFileProvided: () => {
@@ -66,17 +57,8 @@ export function ManualUploadView({ onBackClick }: Props): JSX.Element {
   };
 
   return (
-    <Paper>
+    <Box {...props}>
       <Stack align="flex-start">
-        <Button
-          variant="subtle"
-          size="compact-sm"
-          color="neutral"
-          leftSection={<IconArrowLeft size={16} />}
-          onClick={onBackClick}
-        >
-          Back
-        </Button>
         <FileUploadField
           label="Upload a CSV"
           description="Select a CSV from your computer to import"
@@ -122,6 +104,6 @@ export function ManualUploadView({ onBackClick }: Props): JSX.Element {
           </Dropzone.Idle>
         </Dropzone.FullScreen>
       </Stack>
-    </Paper>
+    </Box>
   );
 }

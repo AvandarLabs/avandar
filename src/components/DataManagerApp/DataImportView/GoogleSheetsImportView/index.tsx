@@ -1,5 +1,4 @@
-import { Button, Loader, Stack, Text } from "@mantine/core";
-import { IconArrowLeft } from "@tabler/icons-react";
+import { Box, BoxProps, Button, Loader, Stack, Text } from "@mantine/core";
 import { useState } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
@@ -10,7 +9,6 @@ import { MIMEType } from "@/lib/types/common";
 import { GPickerDocumentObject } from "@/lib/types/google-picker";
 import { notifyError } from "@/lib/ui/notifications/notifyError";
 import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
-import { Paper } from "@/lib/ui/Paper";
 import { DangerText } from "@/lib/ui/Text/DangerText";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
@@ -20,13 +18,11 @@ import { APIReturnType } from "@/types/http-api.types";
 import { useCSVParser } from "../../hooks/useCSVParser";
 import { DatasetUploadForm } from "../DatasetUploadForm";
 
-type Props = {
-  onBackClick: () => void;
-};
-
 type SpreadsheetPreview = APIReturnType<"google-sheets/:id/preview">;
 
-export function GoogleSheetsImportView({ onBackClick }: Props): JSX.Element {
+type Props = BoxProps;
+
+export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
   const [selectedDocument, setSelectedDocument] = useState<
     GPickerDocumentObject | undefined
   >();
@@ -78,20 +74,11 @@ export function GoogleSheetsImportView({ onBackClick }: Props): JSX.Element {
   });
 
   return (
-    <Paper>
+    <Box {...props}>
       <Stack align="flex-start">
         <DangerText>
           Google Sheets connection is still under development.
         </DangerText>
-        <Button
-          variant="subtle"
-          size="compact-sm"
-          color="neutral"
-          leftSection={<IconArrowLeft size={16} />}
-          onClick={onBackClick}
-        >
-          Back
-        </Button>
         {isLoadingGoogleAuthState ?
           <Loader />
         : isGoogleAuthenticated ?
@@ -169,6 +156,6 @@ export function GoogleSheetsImportView({ onBackClick }: Props): JSX.Element {
           />
         : null}
       </Stack>
-    </Paper>
+    </Box>
   );
 }

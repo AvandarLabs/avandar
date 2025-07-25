@@ -2,7 +2,7 @@ import { Fieldset, Stack, Text } from "@mantine/core";
 import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
 import { DangerText } from "@/lib/ui/Text/DangerText";
 import { difference } from "@/lib/utils/arrays";
-import { makeObjectFromKeys } from "@/lib/utils/objects/builders";
+import { makeObjectFromList } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys, omit } from "@/lib/utils/objects/misc";
 import { setValue } from "@/lib/utils/objects/setValue";
@@ -72,7 +72,7 @@ export function QueryForm({
               incomingFieldNames,
             );
 
-            const newDefaultAggregations = makeObjectFromKeys(
+            const newDefaultAggregations = makeObjectFromList(
               incomingFieldNames,
               { defaultValue: "none" as const },
             );

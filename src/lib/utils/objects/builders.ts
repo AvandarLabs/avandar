@@ -1,4 +1,11 @@
+import { constant } from "../higherOrderFuncs";
 import { identity } from "../misc";
+
+function toString<T extends string>(item: T): T;
+function toString<T extends Exclude<unknown, string>>(item: T): string;
+function toString<T>(item: T): string | T {
+  return String(item);
+}
 
 /**
  * Creates an object from a list of items, given a function to extract the key
@@ -6,9 +13,13 @@ import { identity } from "../misc";
  *
  * @param list The list of items to convert.
  * @param options The options for creating the object.
- * @param options.keyFn A function that returns the key for each item.
+ * @param options.keyFn A function that returns the key for each item. Defaults
+ * to the `toString` function. If the item is a string, it will be unchanged.
  * @param options.valueFn A function that returns the value for each
  * item. Defaults to the identity function.
+ * @param options.defaultValue A default value to use for each item if no
+ * valueFn is provided. If a `valueFn` is provided, it takes precedence over
+ * the `defaultValue`.
  *
  * @returns An object with keys and values extracted from the list.
  */
@@ -18,14 +29,22 @@ export function makeObjectFromList<
   V = T,
 >(
   list: readonly T[],
-  {
-    keyFn,
-    valueFn = identity as (item: T) => V,
-  }: {
-    keyFn: (item: T) => K;
-    valueFn?: (item: T) => V;
-  },
+  options:
+    | {
+        keyFn?: (item: T) => K;
+        valueFn?: (item: T) => V;
+      }
+    | {
+        keyFn?: (item: T) => K;
+        defaultValue: V;
+      } = {},
 ): Record<K, V> {
+  const keyFn = (options.keyFn ?? toString) as (item: T) => K;
+  const valueFn =
+    "valueFn" in options && options.valueFn ? options.valueFn
+    : "defaultValue" in options ? constant(options.defaultValue)
+    : (identity as (item: T) => V);
+
   const obj = {} as Record<K, V>;
   list.forEach((item) => {
     obj[keyFn(item)] = valueFn(item);
@@ -61,40 +80,6 @@ export function makeBucketRecordFromList<T, K extends string, V = T>(
     buckets[bucketName] = bucket;
   });
   return buckets;
-}
-
-/**
- * Creates an object from a list of keys, given a function to generate the
- * value. The keys will be the same as the given list of keys. The values
- * will come from the `valueFn` or the `defaultValue`.
- *
- * @param keys The list of keys to convert.
- * @param options The options for creating the object.
- * @param options.valueFn A function that returns the value for each key.
- * @param options.defaultValue The value to give each key. This is only
- * used if `valueFn` is not provided.
- *
- * @returns An object with keys and values produced from the given options.
- */
-export function makeObjectFromKeys<K extends string | number, V = unknown>(
-  keys: readonly K[],
-  options:
-    | {
-        valueFn: (key: K) => V;
-      }
-    | {
-        defaultValue: V;
-      },
-): Record<K, V> {
-  const obj = {} as Record<K, V>;
-  keys.forEach((key) => {
-    if ("valueFn" in options) {
-      obj[key] = options.valueFn(key);
-    } else {
-      obj[key] = options.defaultValue;
-    }
-  });
-  return obj;
 }
 
 /**
