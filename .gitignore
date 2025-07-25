@@ -27,10 +27,10 @@ dist-ssr
 
 # Environment
 .env
-.env.local
-.env.development
-.env.staging
-.env.production
+.env.local*
+.env.development*
+.env.staging*
+.env.production*
 *client_secret*
 
 # Ignorable development files 
