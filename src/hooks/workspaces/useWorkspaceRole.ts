@@ -18,7 +18,7 @@ const router = createRouter({
   scrollRestoration: true,
 });
 
-export function useWorkspaceRole() {
+export function useWorkspaceRole(): JSX.Element {
   const { user } = useAuth(router);
   const workspace = useCurrentWorkspace();
 

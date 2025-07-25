@@ -4,9 +4,8 @@ import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { camelCaseKeysShallow } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
 import { UserId } from "../User/types";
-import { WorkspaceUser } from "../Workspace/types";
 import { WorkspaceParsers } from "./parsers";
-import { Workspace, WorkspaceId, WorkspaceRole } from "./types";
+import { Workspace, WorkspaceId, WorkspaceRole, WorkspaceUser } from "./types";
 
 export const WorkspaceClient = createSupabaseCRUDClient({
   modelName: "Workspace",
@@ -52,7 +51,9 @@ export const WorkspaceClient = createSupabaseCRUDClient({
           .eq("workspace_id", workspaceId)
           .throwOnError();
 
-        const userIds = profiles.map((p) => p.user_id);
+        const userIds = profiles.map((p) => {
+          return p.user_id;
+        });
         const { data: roles } = await dbClient
           .from("user_roles")
           .select("user_id, role")
@@ -60,7 +61,11 @@ export const WorkspaceClient = createSupabaseCRUDClient({
           .eq("workspace_id", workspaceId)
           .throwOnError();
 
-        const roleMap = new Map(roles.map((r) => [r.user_id, r.role]));
+        const roleMap = new Map(
+          roles.map((r) => {
+            return [r.user_id, r.role];
+          }),
+        );
 
         const transformed = profiles.map((row) => {
           const model = camelCaseKeysShallow(row);
@@ -134,6 +139,24 @@ export const WorkspaceClient = createSupabaseCRUDClient({
           .throwOnError();
 
         logger.log("Successfully added member to workspace");
+      },
+      removeMember: async (params: {
+        workspaceId: WorkspaceId;
+        userId: UserId;
+      }): Promise<void> => {
+        const logger = clientLogger.appendName("removeMember");
+
+        logger.log("Removing member from workspace", params);
+
+        const { workspaceId, userId } = params;
+
+        await dbClient
+          .from("workspace_memberships")
+          .delete()
+          .match({ workspace_id: workspaceId, user_id: userId })
+          .throwOnError();
+
+        logger.log("Successfully removed member from workspace");
       },
     };
   },

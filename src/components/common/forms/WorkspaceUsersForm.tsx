@@ -3,7 +3,6 @@ import {
   Button,
   Card,
   Flex,
-  Group,
   LoadingOverlay,
   Select,
   Stack,
@@ -16,15 +15,21 @@ import { useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useWorkspaceRole } from "@/hooks/workspaces/useWorkspaceRole";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
+import { ConfirmModal } from "@/lib/ui/ConfirmationModal";
 import { Modal } from "@/lib/ui/Modal";
+import { notifyError } from "@/lib/ui/notifications/notifyError";
 import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
+import { UserId } from "@/models/User/types";
 import { WorkspaceRole } from "@/models/Workspace/types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
 export function WorkspaceUserForm(): JSX.Element {
   const [opened, open, close] = useBoolean(false);
-  const [emails, setEmails] = useState("");
-  const [role, setRole] = useState<WorkspaceRole | "">("");
+  const [confirmDeleteOpen, openConfirmDelete, closeConfirmDelete] =
+    useBoolean(false);
+  const [userToDelete, setUserToDelete] = useState<UserId | null>(null);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<WorkspaceRole>("member");
 
   const workspaceRole = useWorkspaceRole();
   const workspace = useCurrentWorkspace();
@@ -34,35 +39,59 @@ export function WorkspaceUserForm(): JSX.Element {
       workspaceId: workspace.id,
     });
 
-  // temporary until API is built for this functionality
+  const [removeMember, isRemovingMember] = WorkspaceClient.useRemoveMember({
+    onSuccess: () => {
+      return notifySuccess({ title: "User removed" });
+    },
+    onError: (error) => {
+      return notifyError({ title: "Remove failed", message: error.message });
+    },
+    queriesToInvalidate: [
+      [WorkspaceClient.getClientName()],
+      ["getUsersForWorkspace"],
+    ],
+  });
+
   const handleFakeInvite = () => {
     notifySuccess({
       title: "Invite sent!",
-      message: `Invite sent to ${emails} as ${role}`,
+      message: `Invite sent to ${inviteEmail} as ${inviteRole}`,
     });
     close();
   };
 
   const isAdmin = workspaceRole === "admin";
 
-  const allWorkspaceUsers = workspaceUsers?.map((user) => (
-    <Table.Tr key={user.fullName}>
-      <Table.Td>{user.fullName}</Table.Td>
-      <Table.Td>{user.role}</Table.Td>
-      {isAdmin && (
-        <Table.Td>
-          <Group gap="xs" justify="flex-end">
-            <IconPencil size={16} />
-            <IconTrash size={16} />
-          </Group>
-        </Table.Td>
-      )}
-    </Table.Tr>
-  ));
+  const allWorkspaceUsers = workspaceUsers?.map((user) => {
+    return (
+      <Table.Tr key={user.fullName}>
+        <Table.Td>{user.fullName}</Table.Td>
+        <Table.Td>{user.role}</Table.Td>
+        {isAdmin && (
+          <Table.Td>
+            <Flex align="flex-end" gap="xs">
+              <IconPencil size={18} />
+              <IconTrash
+                style={{ cursor: "pointer" }}
+                size={18}
+                onClick={() => {
+                  setUserToDelete(user.id);
+                  openConfirmDelete();
+                }}
+              />
+            </Flex>
+          </Table.Td>
+        )}
+      </Table.Tr>
+    );
+  });
 
   return (
     <Box w="100%" px="lg">
-      <LoadingOverlay visible={workspaceUsersLoading} zIndex={1000} />
+      <LoadingOverlay
+        visible={workspaceUsersLoading || isRemovingMember}
+        zIndex={1000}
+      />
       <Card withBorder mt="md" p="lg" w="100%" maw="1000px">
         <Flex justify="space-between" align="center" mb="md">
           <Text>Workspace Users</Text>
@@ -85,29 +114,52 @@ export function WorkspaceUserForm(): JSX.Element {
       <Modal opened={opened} onClose={close} title="Add User to Workspace">
         <Stack>
           <Text size="sm" c="dimmed">
-            Type or paste in emails below, separated by commas. Your workspace
-            will be billed by members.
+            Type or paste in email below. Your workspace will be billed by
+            members.
           </Text>
           <TextInput
-            label="Email addresses"
-            placeholder="Search names or emails"
-            value={emails}
-            onChange={(e) => setEmails(e.currentTarget.value)}
+            label="Email address"
+            placeholder="Enter email"
+            value={inviteEmail}
+            onChange={(e) => {
+              return setInviteEmail(e.currentTarget.value);
+            }}
           />
           <Select
             label="Role"
-            value={role}
-            onChange={(val) => setRole(val as "member" | "admin")}
+            value={inviteRole}
+            onChange={(val) => {
+              return setInviteRole(val as WorkspaceRole);
+            }}
             data={[
               { value: "member", label: "Member" },
               { value: "admin", label: "Admin" },
             ]}
           />
-          <Button onClick={handleFakeInvite} disabled={isDisabled}>
+          <Button
+            onClick={handleFakeInvite}
+            disabled={!inviteEmail || !inviteRole}
+          >
             Send invite
           </Button>
         </Stack>
       </Modal>
+      <ConfirmModal
+        opened={confirmDeleteOpen}
+        onClose={closeConfirmDelete}
+        onConfirm={() => {
+          if (userToDelete) {
+            return removeMember({
+              workspaceId: workspace.id,
+              userId: userToDelete,
+            });
+          }
+        }}
+        loading={isRemovingMember}
+        title="Remove User"
+        message="Are you sure you want to remove this user from the workspace?"
+        confirmText="Remove"
+      />
     </Box>
   );
 }
