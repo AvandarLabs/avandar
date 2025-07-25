@@ -1,10 +1,9 @@
-import { Container, Divider, Paper, Stack, Title } from "@mantine/core";
+import { Container, Paper, Stack, Title } from "@mantine/core";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { WorkspaceForm } from "@/components/common/forms/WorkspaceForm";
 import { AppLinks } from "@/config/AppLinks";
-import { BasicForm } from "@/lib/ui/BasicForm";
 import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
 import { isNonEmptyArray } from "@/lib/utils/guards";
-import { slugify } from "@/lib/utils/strings/transformations";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
 /**
@@ -35,49 +34,6 @@ export const Route = createFileRoute("/_auth/(no-workspace)/")({
   },
 });
 
-const FORM_FIELDS = {
-  workspaceName: {
-    type: "text" as const,
-    initialValue: "",
-    required: true,
-  },
-  workspaceIdentifier: {
-    type: "text" as const,
-    description: "This is the unique ID of your organization used in URLs.",
-    initialValue: "",
-    required: true,
-    syncWhileUntouched: {
-      syncFrom: "workspaceName",
-      transform: slugify,
-    },
-  },
-  fullName: {
-    type: "text" as const,
-    initialValue: "",
-    required: true,
-  },
-  displayName: {
-    type: "text" as const,
-    description:
-      "This could be your name, a nickname, or however you want your team to refer to you.",
-    initialValue: "",
-    required: true,
-    syncWhileUntouched: {
-      syncFrom: "fullName",
-    },
-  },
-};
-
-const FORM_ELEMENTS = [
-  <Title order={4}>About your workspace</Title>,
-  "workspaceName",
-  "workspaceIdentifier",
-  <Divider mt="xs" />,
-  <Title order={4}>About you</Title>,
-  "fullName",
-  "displayName",
-] as const;
-
 /**
  * Page where a user can create their first workspace.
  * If the user already has a workspace, this page is never accessible.
@@ -104,19 +60,22 @@ function CreateFirstWorkspacePage() {
         </Title>
 
         <Paper withBorder shadow="md" p="lg" mt="lg" radius="md" bg="white">
-          <BasicForm
-            fields={FORM_FIELDS}
-            formElements={FORM_ELEMENTS}
-            submitIsLoading={isWorkspaceCreating}
-            onSubmit={(values) => {
+          <WorkspaceForm
+            isLoading={isWorkspaceCreating}
+            onSubmit={({
+              workspaceName,
+              workspaceIdentifier,
+              fullName,
+              displayName,
+            }) => {
               createWorkspace({
-                workspaceName: values.workspaceName,
-                workspaceSlug: values.workspaceIdentifier,
-                ownerName: values.fullName,
-                ownerDisplayName: values.displayName,
+                workspaceName,
+                workspaceSlug: workspaceIdentifier,
+                ownerName: fullName,
+                ownerDisplayName: displayName,
               });
             }}
-            introText="It's time to create your first workspace. Don't think for too long you can always change these later!"
+            introText="It's time to create your first workspace. Don't think for too long—you can always change these later!"
           />
         </Paper>
       </Stack>
