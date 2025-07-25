@@ -4,7 +4,7 @@ import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { camelCaseKeysShallow } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
 import { UserId } from "../User/types";
-import { AddableUser, WorkspaceUser } from "../Workspace/types";
+import { WorkspaceUser } from "../Workspace/types";
 import { WorkspaceParsers } from "./parsers";
 import { Workspace, WorkspaceId, WorkspaceRole } from "./types";
 
@@ -75,40 +75,6 @@ export const WorkspaceClient = createSupabaseCRUDClient({
         });
 
         logger.log("Users retrieved", { users: transformed });
-        return transformed;
-      },
-      getUsersAvailableForWorkspace: async ({
-        workspaceId,
-      }: {
-        workspaceId: WorkspaceId;
-      }): Promise<AddableUser[]> => {
-        const logger = clientLogger.appendName("getUsersNotInWorkspace");
-        logger.log("Fetching users not in workspace", { workspaceId });
-
-        const { data: memberships } = await dbClient
-          .from("workspace_memberships")
-          .select("user_id")
-          .eq("workspace_id", workspaceId)
-          .throwOnError();
-
-        const memberUserIds = memberships.map((m) => m.user_id);
-
-        const { data: profiles } = await dbClient
-          .from("user_profiles")
-          .select("*")
-          .not("user_id", "in", `(${memberUserIds.join(",") || "''"})`)
-          .throwOnError();
-
-        const transformed = profiles.map((row) => {
-          const model = camelCaseKeysShallow(row);
-          return {
-            id: uuid<UserId>(model.id),
-            fullName: model.fullName,
-            displayName: model.displayName,
-          };
-        });
-
-        logger.log("Users not in workspace", { users: transformed });
         return transformed;
       },
     };

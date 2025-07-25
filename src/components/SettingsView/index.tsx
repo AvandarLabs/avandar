@@ -1,7 +1,7 @@
 import { Container, Stack, Title } from "@mantine/core";
+import { WorkspaceUserForm } from "@/components/common/forms/WorkspaceUsersForm";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { BasicForm } from "@/lib/ui/BasicForm";
-import { WorkspaceUserForm } from "@/lib/ui/forms/WorkspaceUsersForm";
 import { notifyError } from "@/lib/ui/notifications/notifyError";
 import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
