@@ -18,7 +18,6 @@ export function IDConfigBlock({
   entityConfigName,
 }: Props): JSX.Element {
   const { datasetColumnFields } = entityConfigForm.getValues();
-  const { fields } = entityConfigForm.getTransformedValues();
 
   const datasetIdsToPullFrom = useMemo(() => {
     return [
@@ -54,39 +53,57 @@ export function IDConfigBlock({
     <Stack>
       {loadingLocalDatasets ?
         <Loader />
-      : sourceDatasets.map(({ dataset }, idx) => {
-          const fieldOptions = fieldOptionsByDatasetId[dataset.id];
-          if (!fieldOptions) {
-            return null;
-          }
+      : <>
+          {sourceDatasets.length > 1 ?
+            <Text>
+              We should join data into the same {entityConfigName} when...
+            </Text>
+          : null}
+          {sourceDatasets.map(({ dataset }, idx) => {
+            const fieldOptions = fieldOptionsByDatasetId[dataset.id];
+            if (!fieldOptions) {
+              return null;
+            }
 
-          return (
-            <Select
-              required
-              key={entityConfigForm.key(
-                `sourceDatasets.${idx}.primaryKeyColumnId`,
-              )}
-              data={fieldOptions}
-              placeholder={
-                fields.length === 0 ?
-                  "No fields have been configured yet"
-                : "Select a field"
-              }
-              label={
-                <Text span>
-                  For dataset{" "}
-                  <Text span fw="bold">
-                    {dataset.name}
-                  </Text>
-                  , what field should be used as a {entityConfigName}'s ID?
-                </Text>
-              }
-              {...entityConfigForm.getInputProps(
-                `sourceDatasets.${idx}.primaryKeyColumnId`,
-              )}
-            />
-          );
-        })
+            return (
+              <Select
+                required
+                key={entityConfigForm.key(
+                  `sourceDatasets.${idx}.primaryKeyColumnId`,
+                )}
+                data={fieldOptions}
+                placeholder="Select a field"
+                label={
+                  sourceDatasets.length === 1 ?
+                    <Text span>
+                      For dataset{" "}
+                      <Text span fw="bold">
+                        {dataset.name}
+                      </Text>{" "}
+                      this column should be used as a {entityConfigName}'s ID
+                    </Text>
+                  : idx === 0 ?
+                    <Text span>
+                      The values of{" "}
+                      <Text span fw="bold">
+                        {dataset.name}
+                      </Text>
+                    </Text>
+                  : <Text span>
+                      {idx > 1 ? "and " : ""}are equal to the values of{" "}
+                      <Text span fw="bold">
+                        {dataset.name}
+                      </Text>
+                    </Text>
+
+                }
+                {...entityConfigForm.getInputProps(
+                  `sourceDatasets.${idx}.primaryKeyColumnId`,
+                )}
+              />
+            );
+          })}
+        </>
       }
     </Stack>
   );

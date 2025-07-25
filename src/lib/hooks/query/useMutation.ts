@@ -1,4 +1,3 @@
-import { notifications } from "@mantine/notifications";
 import {
   DefaultError,
   QueryKey,
@@ -10,6 +9,7 @@ import {
 } from "@tanstack/react-query";
 import { Simplify } from "type-fest";
 import { Logger } from "@/lib/Logger";
+import { notifyError } from "@/lib/ui/notifications/notifyError";
 
 export type UseMutationResult<
   TData = unknown,
@@ -97,10 +97,11 @@ export function useMutation<
         };
 
         if (import.meta.env.DEV) {
-          notifications.show({
-            title: "Error!",
-            message: errorMessage,
-            color: "danger",
+          notifyError({ title: "Error!", message: errorMessage });
+        } else {
+          notifyError({
+            title: "An unexpected error occurred",
+            message: "Please contact support for assistance.",
           });
         }
 
