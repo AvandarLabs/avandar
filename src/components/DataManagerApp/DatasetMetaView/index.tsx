@@ -34,6 +34,7 @@ const EXCLUDED_DATASET_METADATA_KEYS = [
   "datasetType",
   "data",
   "description",
+  "workspaceId",
 ] as const;
 
 const DATASET_METADATA_RENDER_OPTIONS: ChildRenderOptionsMap<LocalDataset> = {
