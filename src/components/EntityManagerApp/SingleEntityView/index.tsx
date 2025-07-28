@@ -158,6 +158,7 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
             "nameField",
             "nameFieldValue",
             "fieldConfigs",
+            "workspaceId",
           ]}
         />
 
