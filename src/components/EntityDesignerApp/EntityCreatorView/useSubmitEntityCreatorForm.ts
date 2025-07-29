@@ -49,6 +49,7 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
               .with("dataset_column_value", () => {
                 const datasetColumnValueExtractor =
                   extractors.datasetColumnValue;
+                const isArray = options.isArray ?? true;
                 if (
                   hasProps(
                     datasetColumnValueExtractor,
@@ -56,7 +57,16 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
                     "datasetFieldId",
                   )
                 ) {
-                  return { ...datasetColumnValueExtractor, workspaceId };
+                  return {
+                    ...datasetColumnValueExtractor,
+                    workspaceId,
+                    ...(isArray ?
+                      {}
+                    : {
+                        valuePickerRuleType:
+                          datasetColumnValueExtractor.valuePickerRuleType,
+                      }),
+                  };
                 }
                 return undefined;
               })
