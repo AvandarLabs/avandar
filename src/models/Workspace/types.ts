@@ -58,3 +58,20 @@ export type WorkspaceModel = SupabaseModelCRUDTypes<
 
 export type Workspace<K extends keyof WorkspaceModel = "Read"> =
   WorkspaceModel[K];
+
+export type WorkspaceUser = {
+  id: UserId;
+  fullName: string;
+  displayName: string;
+  workspaceId: WorkspaceId;
+  createdAt: Date;
+  updatedAt: Date;
+  role: string;
+};
+
+export type AddableUser = {
+  id: UserId;
+  fullName: string;
+  displayName: string;
+  email?: string;
+};
