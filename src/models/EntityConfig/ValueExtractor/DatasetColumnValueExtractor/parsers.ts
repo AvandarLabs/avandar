@@ -44,11 +44,18 @@ export const DatasetColumnValueExtractorParsers =
           entityFieldConfigId: uuid(obj.entityFieldConfigId),
           datasetId: asLocalDatasetId(obj.datasetId),
           datasetFieldId: uuid(obj.datasetFieldId),
+          valuePickerRuleType: obj.valuePickerRuleType ?? "most_frequent",
         };
       },
     ),
 
     fromModelInsertToDBInsert: pipe(
+      (input) => {
+        return {
+          ...input,
+          valuePickerRuleType: input.valuePickerRuleType ?? "most_frequent", // 👈 ensure it's always defined
+        };
+      },
       snakeCaseKeysDeep,
       excludeUndefinedDeep,
       omitProps("type"),

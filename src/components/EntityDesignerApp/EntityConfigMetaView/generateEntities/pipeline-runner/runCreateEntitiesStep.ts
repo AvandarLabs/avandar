@@ -163,7 +163,10 @@ exist in the dataset "${sourceDataset.name}". Could not find Dataset Column ID
         entityFieldConfigId: valueExtractor.entityFieldConfigId,
       };
     })
-    .exhaustive();
+    .otherwise(() => {
+      // handle fallback logic or throw
+      throw new Error("Unsupported ruleType");
+    });
 }
 
 export function runCreateEntitiesStep(

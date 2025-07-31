@@ -27,13 +27,20 @@ export function DatasetColumnExtractorCreator({
 }: Props): JSX.Element {
   const [fieldOptionsKeys, fieldOptionsInputProps] =
     entityConfigForm.keysAndProps(`datasetColumnFields.${fieldIdx}.options`, [
-      "allowManualEdit",
       "isArray",
+      "allowManualEdit",
     ]);
+
   const [extractorKeys, extractorInputProps] = entityConfigForm.keysAndProps(
     `datasetColumnFields.${fieldIdx}.extractors.datasetColumnValue`,
     ["valuePickerRuleType"],
   );
+
+  // Check whether "only allow one" is enabled
+  const isArray =
+    entityConfigForm.getValues().datasetColumnFields[fieldIdx]?.options
+      ?.isArray ?? true;
+  const onlyAllowOneValue = !isArray;
 
   return (
     <Fieldset legend={fieldName}>
@@ -45,16 +52,42 @@ export function DatasetColumnExtractorCreator({
         />
         <Checkbox
           key={fieldOptionsKeys.isArray}
-          label="Allow multiple values"
-          {...fieldOptionsInputProps.isArray({ type: "checkbox" })}
+          label="Only allow one value"
+          checked={onlyAllowOneValue}
+          onChange={(e) => {
+            const checked = e.currentTarget.checked;
+            // Invert logic: checked means isArray = false
+            entityConfigForm.setFieldValue(
+              `datasetColumnFields.${fieldIdx}.options.isArray`,
+              !checked,
+            );
+
+            // Set default valuePickerRuleType if enabling
+            if (checked) {
+              entityConfigForm.setFieldValue(
+                `datasetColumnFields.${fieldIdx}.extractors.datasetColumnValue.valuePickerRuleType`,
+                "most_frequent",
+              );
+            } else {
+              // Clear valuePickerRuleType if not relevant
+              entityConfigForm.setFieldValue(
+                `datasetColumnFields.${fieldIdx}.extractors.datasetColumnValue.valuePickerRuleType`,
+                undefined,
+              );
+            }
+          }}
         />
       </Group>
-      <Select
-        key={extractorKeys.valuePickerRuleType}
-        data={valuePickerOptions}
-        label="Value picker rule"
-        {...extractorInputProps.valuePickerRuleType()}
-      />
+
+      {onlyAllowOneValue && (
+        <Select
+          key={extractorKeys.valuePickerRuleType}
+          data={valuePickerOptions}
+          label="Value picker rule"
+          placeholder="Select rule (e.g. most frequent)"
+          {...extractorInputProps.valuePickerRuleType()}
+        />
+      )}
     </Fieldset>
   );
 }

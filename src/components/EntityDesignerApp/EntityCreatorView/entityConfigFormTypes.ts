@@ -122,7 +122,7 @@ export function makeDefaultDatasetColumnField({
       isIdField,
       isTitleField: false,
       allowManualEdit: false,
-      isArray: false,
+      isArray: true,
     },
 
     // set up some default initial values for the value extractor configs

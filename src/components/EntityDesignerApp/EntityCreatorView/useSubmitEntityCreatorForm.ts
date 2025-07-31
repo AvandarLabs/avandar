@@ -49,6 +49,7 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
               .with("dataset_column_value", () => {
                 const datasetColumnValueExtractor =
                   extractors.datasetColumnValue;
+
                 if (
                   hasProps(
                     datasetColumnValueExtractor,
@@ -56,8 +57,15 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
                     "datasetFieldId",
                   )
                 ) {
-                  return { ...datasetColumnValueExtractor, workspaceId };
+                  return {
+                    ...datasetColumnValueExtractor,
+                    workspaceId,
+                    valuePickerRuleType:
+                      datasetColumnValueExtractor.valuePickerRuleType ??
+                      "most_frequent",
+                  };
                 }
+
                 return undefined;
               })
               .with("aggregation", () => {
