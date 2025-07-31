@@ -6,6 +6,7 @@ import { MIMEType } from "@/lib/types/common";
 import { notifyError } from "@/lib/ui/notifications/notifyError";
 import { FileUploadField } from "@/lib/ui/singleton-forms/FileUploadField";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
+import { LocalDataset } from "@/models/LocalDataset/types";
 import { makeLocalDataset } from "@/models/LocalDataset/utils";
 import { useCSVParser } from "../../hooks/useCSVParser";
 import { DatasetUploadForm } from "../DatasetUploadForm";
@@ -26,12 +27,15 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
     queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
   });
 
-  const saveLocalDataset = async (values: DatasetUploadForm) => {
+  const saveLocalDataset = async (
+    values: DatasetUploadForm,
+  ): Promise<LocalDataset> => {
     if (!csv || !fileMetadata) {
-      return notifyError({
+      notifyError({
         title: "No file selected",
         message: "Please select a file to import",
       });
+      throw new Error("No file selected");
     }
     const dataset = makeLocalDataset({
       workspaceId: workspace.id,
@@ -43,7 +47,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
       data: csv.data,
       fields,
     });
-    const savePromise = new Promise<void>((resolve) => {
+    await new Promise<void>((resolve) => {
       _saveLocalDataset(
         { data: dataset },
         {
@@ -53,7 +57,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
         },
       );
     });
-    await savePromise;
+    return dataset;
   };
 
   return (
