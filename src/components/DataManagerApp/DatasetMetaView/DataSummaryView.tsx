@@ -12,7 +12,7 @@ export function DataSummaryView({ parsedDataset }: Props): JSX.Element {
   const summary = useMemo(() => {
     return getSummary(parsedDataset);
   }, [parsedDataset]);
-
+  console.log(summary);
   return (
     <Stack>
       <ObjectDescriptionList data={summary} excludeKeys={["columnSummaries"]} />

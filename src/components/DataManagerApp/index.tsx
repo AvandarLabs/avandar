@@ -16,7 +16,7 @@ export function DataManagerApp(): JSX.Element {
   const viewableDatasets = useMemo(() => {
     return allDatasets?.filter(isDatasetViewableType) ?? [];
   }, [allDatasets]);
-
+  console.log(allDatasets);
   return (
     <Flex>
       {viewableDatasets ?
