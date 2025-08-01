@@ -5,6 +5,7 @@ type Props = {
   defaultValue: string;
   required?: boolean;
   minLength?: number;
+  inputWidth?: number | string;
   validateOnChange?: boolean;
   validateOnBlur?: boolean;
   placeholder?: string;
@@ -56,6 +57,7 @@ export function InputTextField({
   defaultValue,
   required = false,
   minLength,
+  inputWidth,
   validateOnChange = false,
   validateOnBlur = false,
   label,
@@ -97,13 +99,14 @@ export function InputTextField({
         onSubmit?.(value);
       })}
     >
-      <Group gap="xs">
+      <Group gap="xs" align="end" wrap="wrap">
         <TextInput
           key={form.key("value")}
           {...form.getInputProps("value")}
           required={required}
           label={hideLabel ? undefined : label}
           placeholder={placeholder}
+          style={{ width: inputWidth }}
         />
         {showSubmitButton ?
           <Button type="submit" disabled={isSubmitting}>
