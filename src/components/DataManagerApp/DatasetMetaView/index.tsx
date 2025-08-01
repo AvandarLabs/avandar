@@ -171,7 +171,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
             <Tabs.Panel value="dataset-edit">
               {isLoadingParsedDataset ?
                 <Loader />
-              : <EditDatasetView />}
+              : <EditDatasetView dataset={dataset} />}
             </Tabs.Panel>
 
             <Button
