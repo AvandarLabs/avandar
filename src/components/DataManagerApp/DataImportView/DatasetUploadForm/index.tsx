@@ -30,7 +30,7 @@ type Props = {
   rows: RawDataRecordRow[];
   defaultName: string;
   fields: readonly LocalDatasetField[];
-  additionalDatasetSaveCallback?: (
+  additionalDatasetSaveCallback: (
     values: DatasetUploadForm,
   ) => Promise<LocalDataset>;
   disableSubmit?: boolean;
@@ -53,10 +53,6 @@ export function DatasetUploadForm({
     unknown
   >({
     mutationFn: async (values: DatasetUploadForm) => {
-      if (!additionalDatasetSaveCallback) {
-        throw new Error("No dataset save callback provided");
-      }
-
       const savedDataset = await additionalDatasetSaveCallback(values);
 
       return savedDataset;

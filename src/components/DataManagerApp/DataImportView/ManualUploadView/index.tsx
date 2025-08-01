@@ -1,6 +1,7 @@
 import { Box, BoxProps, Stack } from "@mantine/core";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
+import { invariant } from "@tanstack/react-router";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { MIMEType } from "@/lib/types/common";
 import { notifyError } from "@/lib/ui/notifications/notifyError";
@@ -30,13 +31,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
   const saveLocalDataset = async (
     values: DatasetUploadForm,
   ): Promise<LocalDataset> => {
-    if (!csv || !fileMetadata) {
-      notifyError({
-        title: "No file selected",
-        message: "Please select a file to import",
-      });
-      throw new Error("No file selected");
-    }
+    invariant(csv && fileMetadata, "CSV or metadata missing");
     const dataset = makeLocalDataset({
       workspaceId: workspace.id,
       name: values.name,
