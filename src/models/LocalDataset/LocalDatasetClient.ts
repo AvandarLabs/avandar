@@ -40,7 +40,7 @@ export const LocalDatasetClient = createDexieCRUDClient({
         try {
           await (dbTable as EntityTable<LocalDataset, "id">).update(id, {
             ...updates,
-            updatedAt: new Date().toISOString(), // ✅ Convert to ISO string
+            updatedAt: new Date().toISOString(),
           });
           logger.log("Dataset updated:", id);
         } catch (error) {
