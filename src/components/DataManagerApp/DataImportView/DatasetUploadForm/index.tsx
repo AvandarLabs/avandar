@@ -1,6 +1,6 @@
 import { Button, Stack, TextInput, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useNavigate } from "@tanstack/react-router";
+import { invariant, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
@@ -30,7 +30,7 @@ type Props = {
   rows: RawDataRecordRow[];
   defaultName: string;
   fields: readonly LocalDatasetField[];
-  additionalDatasetSaveCallback: (
+  additionalDatasetSaveCallback?: (
     values: DatasetUploadForm,
   ) => Promise<LocalDataset>;
   disableSubmit?: boolean;
@@ -53,6 +53,11 @@ export function DatasetUploadForm({
     unknown
   >({
     mutationFn: async (values: DatasetUploadForm) => {
+      invariant(
+        additionalDatasetSaveCallback,
+        "No dataset save callback provided",
+      );
+
       const savedDataset = await additionalDatasetSaveCallback(values);
 
       return savedDataset;
