@@ -1,4 +1,4 @@
-import { Fieldset, Stack, Text } from "@mantine/core";
+import { Fieldset, Select, Stack, Text } from "@mantine/core";
 import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
 import { DangerText } from "@/lib/ui/Text/DangerText";
 import { difference } from "@/lib/utils/arrays";
@@ -13,7 +13,6 @@ import { AggregationSelect } from "./AggregationSelect";
 import { FieldSelect } from "./FieldSelect";
 
 const HIDE_WHERE = true;
-const HIDE_ORDER_BY = true;
 const HIDE_LIMIT = true;
 
 type Props = {
@@ -21,12 +20,15 @@ type Props = {
   aggregations: Record<string, QueryAggregationType>;
   selectedDatasetId: LocalDatasetId | undefined;
   selectedFields: readonly LocalDatasetField[];
+  orderByDirection: "asc" | "desc";
   onAggregationsChange: (
     newAggregations: Record<string, QueryAggregationType>,
   ) => void;
   onFromDatasetChange: (datasetId: LocalDatasetId | undefined) => void;
   onSelectFieldsChange: (fields: readonly LocalDatasetField[]) => void;
   onGroupByChange: (fields: readonly LocalDatasetField[]) => void;
+  onOrderByFieldChange: (fields: readonly LocalDatasetField[]) => void;
+  onOrderByDirectionChange: (value: "asc" | "desc") => void;
 };
 
 /**
@@ -44,6 +46,9 @@ export function QueryForm({
   onFromDatasetChange,
   onSelectFieldsChange,
   onGroupByChange,
+  orderByDirection,
+  onOrderByFieldChange,
+  onOrderByDirectionChange,
 }: Props): JSX.Element {
   return (
     <form>
@@ -119,7 +124,32 @@ export function QueryForm({
           onChange={onGroupByChange}
           datasetId={selectedDatasetId}
         />
-        {HIDE_ORDER_BY ? null : <Text>Order by (fields dropdown)</Text>}
+        <FieldSelect
+          label="Field"
+          placeholder="Select field"
+          onChange={(fields) => {
+            const firstField = fields[0];
+            if (firstField) {
+              onOrderByFieldChange([firstField]);
+            }
+          }}
+          datasetId={selectedDatasetId}
+        />
+        <Select
+          label="Order by"
+          placeholder="Select order"
+          data={[
+            { value: "asc", label: "Ascending" },
+            { value: "desc", label: "Descending" },
+          ]}
+          value={orderByDirection}
+          onChange={(value) => {
+            if (value === "asc" || value === "desc") {
+              onOrderByDirectionChange(value);
+            }
+          }}
+        />
+
         {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
         {errorMessage ?
           <DangerText>{errorMessage}</DangerText>

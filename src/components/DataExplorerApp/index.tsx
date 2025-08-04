@@ -33,6 +33,12 @@ export function DataExplorerApp(): JSX.Element {
   const [selectedGroupByFields, setSelectedGroupByFields] = useState<
     readonly LocalDatasetField[]
   >([]);
+  const [orderByField, setOrderByField] = useState<
+    readonly LocalDatasetField[]
+  >([]);
+  const [orderByDirection, setOrderByDirection] = useState<"asc" | "desc">(
+    "asc",
+  );
   const [vizConfig, setVizConfig] = useState<VizConfig>(() => {
     return makeDefaultVizConfig("table");
   });
@@ -124,6 +130,9 @@ export function DataExplorerApp(): JSX.Element {
           onFromDatasetChange={setSelectedDatasetId}
           onSelectFieldsChange={setSelectedFields}
           onGroupByChange={setSelectedGroupByFields}
+          orderByDirection={orderByDirection}
+          onOrderByFieldChange={setOrderByField}
+          onOrderByDirectionChange={setOrderByDirection}
           errorMessage={errorMessage}
         />
         <VizSettingsForm
