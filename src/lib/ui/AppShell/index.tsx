@@ -22,6 +22,7 @@ import {
   IconLogout,
   IconPlus,
   IconSearch,
+  IconSwitch2,
   IconUser,
 } from "@tabler/icons-react";
 import {
@@ -119,6 +120,8 @@ export function AppShell({
   });
 
   const [isNavbarOpened, { toggle: toggleNavbar }] = useDisclosure(false);
+  const [isWorkpaceSelecterOpened, { toggle: toggleWorkspaceSelector }] =
+    useDisclosure(false);
   const isMobileViewSize = useIsMobileSize() ?? false;
 
   const logo = (
@@ -213,6 +216,36 @@ export function AppShell({
                       onClick={open}
                     >
                       <Text span>Create Workspace</Text>
+                    </Menu.Item>
+                    <Menu.Item
+                      leftSection={<IconSwitch2 size={14} />}
+                      component="div"
+                    >
+                      <Menu
+                        offset={0}
+                        position="right-start"
+                        withArrow={false}
+                        trigger="hover"
+                        openDelay={100}
+                        closeDelay={200}
+                      >
+                        <Menu.Target>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              width: "100%",
+                            }}
+                          >
+                            Switch Workspace
+                          </div>
+                        </Menu.Target>
+                        <Menu.Dropdown>
+                          <Menu.Item>Workspace 1</Menu.Item>
+                          <Menu.Item>Workspace 2</Menu.Item>
+                          <Menu.Item>Workspace 3</Menu.Item>
+                        </Menu.Dropdown>
+                      </Menu>
                     </Menu.Item>
                   </>
                 : null}
