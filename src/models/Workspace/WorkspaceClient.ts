@@ -37,6 +37,9 @@ export const WorkspaceClient = createSupabaseCRUDClient({
           return parsers.fromDBReadToModelRead(workspace);
         });
       },
+
+      // TODO: Update user_roles to reference
+      // user_profiles instead of auth.users. See issue #123.
       getUsersForWorkspace: async ({
         workspaceId,
       }: {
