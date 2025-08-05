@@ -24,7 +24,7 @@ type DatasetColumnValueExtractorRead = {
   entityFieldConfigId: EntityFieldConfigId;
 
   /** Rule to pick which value to use when multiple are found */
-  valuePickerRuleType?: ValuePickerRuleType;
+  valuePickerRuleType: ValuePickerRuleType;
 
   /** ID of the dataset to extract from */
   datasetId: LocalDatasetId;

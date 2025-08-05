@@ -162,10 +162,6 @@ exist in the dataset "${sourceDataset.name}". Could not find Dataset Column ID
         datasourceId: datasetId,
         entityFieldConfigId: valueExtractor.entityFieldConfigId,
       };
-    })
-    .otherwise(() => {
-      // handle fallback logic or throw
-      throw new Error("Unsupported ruleType");
     });
 }
 

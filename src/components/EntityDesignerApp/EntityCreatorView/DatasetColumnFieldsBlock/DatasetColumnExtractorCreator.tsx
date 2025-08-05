@@ -61,20 +61,6 @@ export function DatasetColumnExtractorCreator({
               `datasetColumnFields.${fieldIdx}.options.isArray`,
               !checked,
             );
-
-            // Set default valuePickerRuleType if enabling
-            if (checked) {
-              entityConfigForm.setFieldValue(
-                `datasetColumnFields.${fieldIdx}.extractors.datasetColumnValue.valuePickerRuleType`,
-                "most_frequent",
-              );
-            } else {
-              // Clear valuePickerRuleType if not relevant
-              entityConfigForm.setFieldValue(
-                `datasetColumnFields.${fieldIdx}.extractors.datasetColumnValue.valuePickerRuleType`,
-                undefined,
-              );
-            }
           }}
         />
       </Group>

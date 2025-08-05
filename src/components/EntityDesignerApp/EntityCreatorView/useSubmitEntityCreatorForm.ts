@@ -57,13 +57,7 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
                     "datasetFieldId",
                   )
                 ) {
-                  return {
-                    ...datasetColumnValueExtractor,
-                    workspaceId,
-                    valuePickerRuleType:
-                      datasetColumnValueExtractor.valuePickerRuleType ??
-                      "most_frequent",
-                  };
+                  return { ...datasetColumnValueExtractor, workspaceId };
                 }
 
                 return undefined;
