@@ -1,4 +1,3 @@
-import { EntityTable } from "dexie";
 import { parseFileOrStringToCSV } from "@/components/DataManagerApp/hooks/useCSVParser";
 import { createDexieCRUDClient } from "@/lib/clients/createDexieCRUDClient";
 import { LocalDatasetParsers } from "./parsers";
@@ -28,24 +27,6 @@ export const LocalDatasetClient = createDexieCRUDClient({
         } catch (err) {
           logger.error("Failed to delete database", err);
           throw err;
-        }
-      },
-      updateDataset: async ({
-        id,
-        updates,
-      }: {
-        id: LocalDatasetId;
-        updates: Partial<LocalDataset>;
-      }): Promise<void> => {
-        try {
-          await (dbTable as EntityTable<LocalDataset, "id">).update(id, {
-            ...updates,
-            updatedAt: new Date().toISOString(),
-          });
-          logger.log("Dataset updated:", id);
-        } catch (error) {
-          logger.error("Failed to update dataset", error);
-          throw error;
         }
       },
     };

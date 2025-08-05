@@ -23,7 +23,7 @@ import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { type LocalDataset } from "@/models/LocalDataset/types";
 import { DataSummaryView } from "./DataSummaryView";
-import EditDatasetView from "./EditDatasetView";
+import { EditDatasetView } from "./EditDatasetView";
 
 type Props = {
   dataset: LocalDataset;

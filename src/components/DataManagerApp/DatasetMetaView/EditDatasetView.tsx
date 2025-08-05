@@ -9,17 +9,14 @@ type Props = {
   dataset: LocalDataset;
 };
 
-function EditDatasetView({ dataset }: Props): JSX.Element {
-  const [updateDataset, isUpdating] = LocalDatasetClient.useUpdateDataset({
+export function EditDatasetView({ dataset }: Props): JSX.Element {
+  const [updateDataset, isUpdatePending] = LocalDatasetClient.useUpdate({
     queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
     onSuccess: () => {
-      notifySuccess("Dataset updated!");
+      notifySuccess("Dataset updated successfully!");
     },
     onError: (err) => {
-      notifyError({
-        title: "Update failed",
-        message: err instanceof Error ? err.message : "Something went wrong",
-      });
+      notifyError("There was an error on update: " + err.message);
     },
   });
 
@@ -33,16 +30,14 @@ function EditDatasetView({ dataset }: Props): JSX.Element {
         required
         showSubmitButton
         submitButtonLabel="Save"
-        isSubmitting={isUpdating}
-        onSubmit={(newName) =>
-          {return updateDataset({
+        isSubmitting={isUpdatePending}
+        onSubmit={(newName) => {
+          return updateDataset({
             id: dataset.id,
-            updates: { name: newName },
-          })}
-        }
+            data: { name: newName },
+          });
+        }}
       />
     </Box>
   );
 }
-
-export default EditDatasetView;
