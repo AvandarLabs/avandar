@@ -23,11 +23,6 @@ export type DexieCRUDClient<
   ExtendedMutationsClient extends HookableClient,
 > = ModelCRUDClient<M, ExtendedQueriesClient, ExtendedMutationsClient>;
 
-type UpdateInput<M extends DexieModelCRUDTypes> = {
-  id: M["modelPrimaryKeyType"];
-  data: M["DBUpdate"];
-};
-
 /**
  * Creates a client for a model that maps to a Dexie table.
  *

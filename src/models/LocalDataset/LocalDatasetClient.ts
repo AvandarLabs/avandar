@@ -18,7 +18,7 @@ export const LocalDatasetClient = createDexieCRUDClient({
   modelName: "LocalDataset",
   primaryKey: "id",
   parsers: LocalDatasetParsers,
-  mutations: ({ logger, db, dbTable }) => {
+  mutations: ({ logger, db }) => {
     return {
       deleteDatabase: async (): Promise<void> => {
         try {
