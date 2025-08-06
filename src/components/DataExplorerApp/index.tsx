@@ -34,8 +34,9 @@ export function DataExplorerApp(): JSX.Element {
     readonly LocalDatasetField[]
   >([]);
   const [orderByField, setOrderByField] = useState<
-    readonly LocalDatasetField[]
-  >([]);
+    LocalDatasetField | undefined
+  >(undefined);
+
   const [orderByDirection, setOrderByDirection] = useState<"asc" | "desc">(
     "asc",
   );
@@ -102,6 +103,8 @@ export function DataExplorerApp(): JSX.Element {
     datasetId: selectedDatasetId,
     selectFields: selectedFields,
     groupByFields: selectedGroupByFields,
+    orderByField,
+    orderByDirection,
   });
 
   const { fields, data } = useMemo(() => {
@@ -126,12 +129,13 @@ export function DataExplorerApp(): JSX.Element {
           aggregations={aggregations}
           selectedDatasetId={selectedDatasetId}
           selectedFields={selectedFields}
+          orderByField={orderByField}
           onAggregationsChange={setAggregations}
           onFromDatasetChange={setSelectedDatasetId}
           onSelectFieldsChange={setSelectedFields}
           onGroupByChange={setSelectedGroupByFields}
-          orderByDirection={orderByDirection}
           onOrderByFieldChange={setOrderByField}
+          orderByDirection={orderByDirection}
           onOrderByDirectionChange={setOrderByDirection}
           errorMessage={errorMessage}
         />
