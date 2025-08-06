@@ -162,7 +162,8 @@ exist in the dataset "${sourceDataset.name}". Could not find Dataset Column ID
         datasourceId: datasetId,
         entityFieldConfigId: valueExtractor.entityFieldConfigId,
       };
-    });
+    })
+    .exhaustive();
 }
 
 export function runCreateEntitiesStep(
