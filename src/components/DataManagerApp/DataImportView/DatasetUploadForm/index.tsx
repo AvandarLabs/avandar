@@ -1,7 +1,10 @@
 import { Button, Stack, TextInput, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { invariant, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { AppConfig } from "@/config/AppConfig";
+import { AppLinks } from "@/config/AppLinks";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { RawDataRecordRow } from "@/lib/types/common";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
@@ -9,6 +12,7 @@ import { notifyError } from "@/lib/ui/notifications/notifyError";
 import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
+import { LocalDataset } from "@/models/LocalDataset/types";
 
 export type DatasetUploadForm = {
   name: string;
@@ -28,7 +32,7 @@ type Props = {
   fields: readonly LocalDatasetField[];
   additionalDatasetSaveCallback?: (
     values: DatasetUploadForm,
-  ) => void | Promise<void>;
+  ) => Promise<LocalDataset>;
   disableSubmit?: boolean;
 };
 
@@ -39,16 +43,46 @@ export function DatasetUploadForm({
   additionalDatasetSaveCallback,
   disableSubmit,
 }: Props): JSX.Element {
+  const navigate = useNavigate();
+  const workspace = useCurrentWorkspace();
+
   // TODO(jpsyx): add this back once we have a DatasetClient
-  const [saveDataset, isSavePending] = useMutation({
+  const [saveDataset, isSavePending] = useMutation<
+    LocalDataset,
+    DatasetUploadForm,
+    unknown
+  >({
     mutationFn: async (values: DatasetUploadForm) => {
-      await additionalDatasetSaveCallback?.(values);
+      invariant(
+        additionalDatasetSaveCallback,
+        "No dataset save callback provided",
+      );
+
+      const savedDataset = await additionalDatasetSaveCallback(values);
+
+      return savedDataset;
     },
-    onSuccess: () => {
+    onSuccess: async (savedDataset) => {
+      if (!savedDataset?.id) {
+        notifyError({
+          title: "Routing failed",
+          message: "No dataset ID returned.",
+        });
+        return;
+      }
+
       notifySuccess({
         title: "Dataset saved",
-        message: "Dataset saved successfully",
+        message: `Dataset "${savedDataset.name}" saved successfully`,
       });
+
+      navigate(
+        AppLinks.dataManagerDatasetView({
+          workspaceSlug: workspace.slug,
+          datasetId: savedDataset.id,
+          datasetName: savedDataset.name,
+        }),
+      );
     },
     onError: () => {
       notifyError({

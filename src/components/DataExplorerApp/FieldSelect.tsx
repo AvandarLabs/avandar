@@ -21,8 +21,17 @@ type Props = {
   onChange: (fields: readonly LocalDatasetField[]) => void;
 };
 
+// Human readable names for fields
+const FIELD_NAME_OVERRIDES: Record<string, string> = {
+  assignedTo: "Assigned to",
+  status: "Status",
+  createdAt: "Created at",
+  updatedAt: "Updated at",
+};
+
 // TODO(jpsyx) we already have LocalDatasetColumnSelect. We shouldnt have both
 // components. Refactor and keep only one.
+
 export function FieldSelect({
   onChange,
   label,
@@ -57,7 +66,7 @@ export function FieldSelect({
           items: dataset.fields.map((field: LocalDatasetField) => {
             return {
               value: field.id as string,
-              label: field.name,
+              label: FIELD_NAME_OVERRIDES[field.name] ?? field.name,
             };
           }),
         };
