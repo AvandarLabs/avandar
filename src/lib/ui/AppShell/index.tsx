@@ -187,14 +187,14 @@ export function AppShell({
             />
             <Menu shadow="md" width={200}>
               <Menu.Target>
-                <UnstyledButton>
-                  <Group wrap="nowrap" gap="xs">
+                <UnstyledButton className="w-full text-left">
+                  <div className="flex w-full items-center justify-between gap-2">
                     {logo}
-                    <Title order={2} size="md" textWrap="wrap">
+                    <span className="flex-1 break-words text-base font-medium leading-tight">
                       {title ?? AppConfig.appName}
-                    </Title>
-                    <IconChevronDown size={18} />
-                  </Group>
+                    </span>
+                    <IconChevronDown size={18} className="min-h-4 min-w-4" />
+                  </div>
                 </UnstyledButton>
               </Menu.Target>
               <Menu.Dropdown style={{ width: "max-content", minWidth: 200 }}>
