@@ -36,6 +36,7 @@ import { AuthClient } from "@/clients/AuthClient";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLink, AppLinks } from "@/config/AppLinks";
 import { NavbarLink } from "@/config/NavbarLinks";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
@@ -102,6 +103,12 @@ export function AppShell({
       },
     });
 
+  const [userWorkspaces] = WorkspaceClient.useGetWorkspacesOfCurrentUser({
+    useQueryOptions: { staleTime: Infinity },
+  });
+
+  const currentWorkspace = useCurrentWorkspace();
+
   const [sendSignOutRequest, isSignOutPending] = useMutation({
     mutationFn: async () => {
       await AuthClient.signOut();
@@ -120,8 +127,7 @@ export function AppShell({
   });
 
   const [isNavbarOpened, { toggle: toggleNavbar }] = useDisclosure(false);
-  const [isWorkpaceSelecterOpened, { toggle: toggleWorkspaceSelector }] =
-    useDisclosure(false);
+
   const isMobileViewSize = useIsMobileSize() ?? false;
 
   const logo = (
@@ -230,20 +236,27 @@ export function AppShell({
                         closeDelay={200}
                       >
                         <Menu.Target>
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              width: "100%",
-                            }}
-                          >
-                            Switch Workspace
-                          </div>
+                          <Text span> Switch Workspace</Text>
                         </Menu.Target>
                         <Menu.Dropdown>
-                          <Menu.Item>Workspace 1</Menu.Item>
-                          <Menu.Item>Workspace 2</Menu.Item>
-                          <Menu.Item>Workspace 3</Menu.Item>
+                          {userWorkspaces?.map((ws) => {
+                            const isCurrent = ws.slug === currentWorkspace.slug;
+                            return (
+                              <Menu.Item
+                                key={ws.id}
+                                onClick={() => {
+                                  navigate(AppLinks.workspaceHome(ws.slug));
+                                }}
+                                disabled={isCurrent}
+                                className={clsx(
+                                  isCurrent &&
+                                    "bg-neutral-100 font-medium text-neutral-900",
+                                )}
+                              >
+                                {ws.name}
+                              </Menu.Item>
+                            );
+                          })}
                         </Menu.Dropdown>
                       </Menu>
                     </Menu.Item>
