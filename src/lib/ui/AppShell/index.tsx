@@ -190,7 +190,7 @@ export function AppShell({
                 <UnstyledButton>
                   <Group wrap="nowrap" gap="xs">
                     {logo}
-                    <Title order={2} size="md" textWrap="nowrap">
+                    <Title order={2} size="md" textWrap="wrap">
                       {title ?? AppConfig.appName}
                     </Title>
                     <IconChevronDown size={18} />
