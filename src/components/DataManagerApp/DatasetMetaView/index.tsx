@@ -11,6 +11,7 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
+import { IconPencil } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppLinks } from "@/config/AppLinks";
@@ -132,7 +133,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                 value="dataset-edit"
                 ref={tabItemRefCallback("dataset-edit")}
               >
-                <Text span>Edit Dataset</Text>
+                <IconPencil size={20} />
               </Tabs.Tab>
 
               <FloatingIndicator
