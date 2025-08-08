@@ -10,12 +10,12 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
+import { modals } from "@mantine/modals";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useWorkspaceRole } from "@/hooks/workspaces/useWorkspaceRole";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
-import { ConfirmModal } from "@/lib/ui/ConfirmationModal";
 import { Modal } from "@/lib/ui/Modal";
 import { notifyError } from "@/lib/ui/notifications/notifyError";
 import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
@@ -24,9 +24,8 @@ import { WorkspaceRole } from "@/models/Workspace/types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
 export function WorkspaceUserForm(): JSX.Element {
-  const [opened, open, close] = useBoolean(false);
-  const [confirmDeleteOpen, openConfirmDelete, closeConfirmDelete] =
-    useBoolean(false);
+  const [isOpened, open, close] = useBoolean(false);
+
   const [userToDelete, setUserToDelete] = useState<UserId | null>(null);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<WorkspaceRole>("member");
@@ -47,8 +46,9 @@ export function WorkspaceUserForm(): JSX.Element {
       return notifyError({ title: "Remove failed", message: error.message });
     },
     queriesToInvalidate: [
-      [WorkspaceClient.getClientName()],
-      ["getUsersForWorkspace"],
+      WorkspaceClient.QueryKeys.getUsersForWorkspace({
+        workspaceId: workspace.id,
+      }),
     ],
   });
 
@@ -75,8 +75,19 @@ export function WorkspaceUserForm(): JSX.Element {
                 style={{ cursor: "pointer" }}
                 size={18}
                 onClick={() => {
-                  setUserToDelete(user.id);
-                  openConfirmDelete();
+                  modals.openConfirmModal({
+                    title: "Remove User",
+                    children:
+                      "Are you sure you want to remove this user from the workspace?",
+                    labels: { confirm: "Remove", cancel: "Cancel" },
+                    confirmProps: { color: "red" },
+                    onConfirm: () => {
+                      removeMember({
+                        workspaceId: workspace.id,
+                        userId: user.id,
+                      });
+                    },
+                  });
                 }}
               />
             </Flex>
@@ -111,7 +122,7 @@ export function WorkspaceUserForm(): JSX.Element {
         </Table>
       </Card>
 
-      <Modal opened={opened} onClose={close} title="Add User to Workspace">
+      <Modal opened={isOpened} onClose={close} title="Add User to Workspace">
         <Stack>
           <Text size="sm" c="dimmed">
             Type or paste in email below. Your workspace will be billed by
@@ -144,22 +155,6 @@ export function WorkspaceUserForm(): JSX.Element {
           </Button>
         </Stack>
       </Modal>
-      <ConfirmModal
-        opened={confirmDeleteOpen}
-        onClose={closeConfirmDelete}
-        onConfirm={() => {
-          if (userToDelete) {
-            return removeMember({
-              workspaceId: workspace.id,
-              userId: userToDelete,
-            });
-          }
-        }}
-        loading={isRemovingMember}
-        title="Remove User"
-        message="Are you sure you want to remove this user from the workspace?"
-        confirmText="Remove"
-      />
     </Box>
   );
 }

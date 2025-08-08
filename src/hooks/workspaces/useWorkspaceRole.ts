@@ -1,49 +1,31 @@
-import { QueryClient } from "@tanstack/react-query";
-import { createRouter } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { SupabaseDBClient } from "@/lib/clients/supabase/SupabaseDBClient";
-import { useAuth } from "@/lib/hooks/auth/useAuth";
 import { WorkspaceRole } from "@/models/Workspace/types";
-import { routeTree } from "@/routeTree.gen";
-
-const queryClient = new QueryClient();
-
-const router = createRouter({
-  routeTree,
-  context: {
-    user: undefined,
-    queryClient,
-  },
-  defaultPreload: "intent",
-  scrollRestoration: true,
-});
+import { useCurrentUser } from "../users/useCurrentUser";
 
 export function useWorkspaceRole(): WorkspaceRole {
-  const { user } = useAuth(router);
+  const user = useCurrentUser();
   const workspace = useCurrentWorkspace();
 
-  const [role, setRole] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!user?.id || !workspace?.id) return;
-
-    const fetchRole = async () => {
+  const { data: role } = useQuery({
+    queryKey: ["UserRoles", workspace?.id, user?.id],
+    enabled: !!workspace?.id && !!user?.id,
+    staleTime: Infinity,
+    queryFn: async () => {
       const { data, error } = await SupabaseDBClient.from("user_roles")
         .select("role")
-        .eq("user_id", user.id)
-        .eq("workspace_id", workspace.id)
+        .eq("user_id", user!.id)
+        .eq("workspace_id", workspace!.id)
         .single();
 
-      if (data?.role) {
-        return setRole(data.role);
-      } else {
-        console.error("Failed to get role:", error);
+      if (error) {
+        throw new Error(error.message);
       }
-    };
 
-    fetchRole();
-  }, [user?.id, workspace?.id]);
+      return data?.role ?? "member";
+    },
+  });
 
   return (role ?? "member") as WorkspaceRole;
 }

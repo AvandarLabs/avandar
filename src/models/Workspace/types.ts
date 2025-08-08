@@ -68,10 +68,3 @@ export type WorkspaceUser = {
   updatedAt: Date;
   role: string;
 };
-
-export type AddableUser = {
-  id: UserId;
-  fullName: string;
-  displayName: string;
-  email?: string;
-};
