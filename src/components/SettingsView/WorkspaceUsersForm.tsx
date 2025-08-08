@@ -19,14 +19,12 @@ import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { Modal } from "@/lib/ui/Modal";
 import { notifyError } from "@/lib/ui/notifications/notifyError";
 import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
-import { UserId } from "@/models/User/types";
 import { WorkspaceRole } from "@/models/Workspace/types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
 export function WorkspaceUserForm(): JSX.Element {
   const [isOpened, open, close] = useBoolean(false);
 
-  const [userToDelete, setUserToDelete] = useState<UserId | null>(null);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<WorkspaceRole>("member");
 
