@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import { UnionToTuple } from "type-fest";
 import { StringKeyOf } from "@/lib/types/utilityTypes";
 
 /** A non-recursive value */
@@ -39,25 +38,25 @@ type DescribableObjectOf<T extends DescribableValue> = {
  */
 export type PrimitiveValueRenderOptions = {
   /** The string to display for empty strings */
-  renderEmptyString?: NonNullable<ReactNode>;
+  renderEmptyString?: string | NonNullable<ReactNode>;
 
   /** The string to display for null values */
-  renderNullString?: NonNullable<ReactNode>;
+  renderNullString?: string | NonNullable<ReactNode>;
 
   /** The string to display for undefined values */
-  renderUndefinedString?: NonNullable<ReactNode>;
+  renderUndefinedString?: string | NonNullable<ReactNode>;
 
   /** The string to display for boolean true values */
-  renderBooleanTrue?: NonNullable<ReactNode>;
+  renderBooleanTrue?: string | NonNullable<ReactNode>;
 
   /** The string to display for boolean false values */
-  renderBooleanFalse?: NonNullable<ReactNode>;
+  renderBooleanFalse?: string | NonNullable<ReactNode>;
 
   /** If no `dateFormat` is provided we will use `date.toLocaleDateString()` */
   dateFormat?: string;
 };
 
-export const PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS: UnionToTuple<
+export const PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS: ReadonlyArray<
   keyof PrimitiveValueRenderOptions
 > = [
   "renderEmptyString",
