@@ -176,20 +176,14 @@ export function createDexieCRUDClient<
       logger: ILogger;
     }): Promise<M["DBRead"]> => {
       const { id, data, logger } = params;
-
       const typedId = id as IDType<M["DBRead"], M["modelPrimaryKey"]>;
       const updateData = data as UpdateSpec<M["DBRead"]>;
-
-      logger.log("Updating record", id);
-
+      
       await dbTable.update(typedId, updateData);
-
       const updated = await dbTable.get(typedId);
-
       if (!updated) {
         throw new Error(`Could not retrieve updated record with id ${id}`);
       }
-
       return updated;
     },
 
