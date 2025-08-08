@@ -62,9 +62,6 @@ export function VisualizationContainer({
     );
   }, [fields, data]);
 
-  console.debug("fields", fields);
-  console.debug("dateColumns", Array.from(dateColumns));
-
   return match(vizConfig)
     .with({ type: "table" }, () => {
       return (
