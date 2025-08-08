@@ -1,5 +1,5 @@
 import { Text } from "@mantine/core";
-import dayjs from "dayjs";
+import { formatDateish } from "@/lib/utils/formatters/formatDateish";
 import { isDate } from "@/lib/utils/guards";
 import { isStringOrNumber } from "./guards";
 import type { PrimitiveValue, PrimitiveValueRenderOptions } from "./types";
@@ -73,14 +73,7 @@ export function PrimitiveValueItem<T extends PrimitiveValue>({
   }
 
   if (isDate(value)) {
-    // TODO(jpsyx): add options to format the date
-    return (
-      <Text span>
-        {dateFormat ?
-          dayjs(value).format(dateFormat)
-        : value.toLocaleDateString()}
-      </Text>
-    );
+    return <Text span>{formatDateish(value, dateFormat ?? "YYYY-MM-DD")}</Text>;
   }
 
   // fallback, just cast to string
