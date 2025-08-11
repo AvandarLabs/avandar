@@ -1,7 +1,7 @@
-import { useRouteContext } from "@tanstack/react-router";
-import { RootRouteContext } from "@/lib/types/RootRouteContext";
+import { User } from "@supabase/supabase-js";
+import { Route as AuthRoute } from "@/routes/_auth/route";
 
-export function useCurrentUser(): RootRouteContext["user"] {
-  const { user } = useRouteContext({ from: "__root__" });
+export function useCurrentUser(): User | undefined {
+  const { user } = AuthRoute.useRouteContext();
   return user;
 }
