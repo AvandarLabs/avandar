@@ -1,5 +1,5 @@
 import { Text } from "@mantine/core";
-import { formatDateish } from "@/lib/utils/formatters/formatDateish";
+import { formatDate } from "@/lib/utils/formatters/formatDate";
 import { isDate } from "@/lib/utils/guards";
 import { isStringOrNumber } from "./guards";
 import type { PrimitiveValue, PrimitiveValueRenderOptions } from "./types";
@@ -73,7 +73,7 @@ export function PrimitiveValueItem<T extends PrimitiveValue>({
   }
 
   if (isDate(value)) {
-    return <Text span>{formatDateish(value, dateFormat ?? "YYYY-MM-DD")}</Text>;
+    return <Text span>{formatDate(value, dateFormat ?? "YYYY-MM-DD")}</Text>;
   }
 
   // fallback, just cast to string

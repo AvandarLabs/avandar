@@ -6,10 +6,7 @@ import { UnknownDataFrame } from "@/lib/types/common";
 import { BarChart } from "@/lib/ui/data-viz/BarChart";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { DangerText } from "@/lib/ui/Text/DangerText";
-import {
-  isEpochMs,
-  isIsoDateString,
-} from "@/lib/utils/formatters/formatDateish";
+import { isEpochMs, isIsoDateString } from "@/lib/utils/formatters/formatDate";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { VizConfig } from "./VizSettingsForm/makeDefaultVizConfig";
 
@@ -69,6 +66,9 @@ export function VisualizationContainer({
           columnNames={fieldNames}
           data={data}
           dateColumns={dateColumns}
+          dateFormat="YYYY-MM-DD HH:mm:ss z"
+          // Timezone can be wired in later
+          // timezone="America/New_York"
         />
       );
     })

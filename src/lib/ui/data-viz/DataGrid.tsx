@@ -3,7 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
 import { Writable } from "type-fest";
 import { UnknownDataFrame } from "@/lib/types/common";
-import { formatDateish } from "@/lib/utils/formatters/formatDateish";
+import { formatDate } from "@/lib/utils/formatters/formatDate";
 
 type Props = {
   columnNames: readonly string[];
@@ -16,6 +16,8 @@ type Props = {
   data: UnknownDataFrame;
   height?: number;
   dateColumns?: ReadonlySet<string>;
+  dateFormat?: string;
+  timezone?: string;
 };
 
 export function DataGrid({
@@ -23,6 +25,8 @@ export function DataGrid({
   data,
   dateColumns,
   height = 500,
+  dateFormat = "YYYY-MM-DD HH:mm:ss z",
+  timezone,
 }: Props): JSX.Element {
   const columnDefs = useMemo(() => {
     return columnNames.map((field) => {
@@ -32,12 +36,12 @@ export function DataGrid({
         valueFormatter:
           dateColumns?.has(field) ?
             (p: { value: unknown }) => {
-              return formatDateish(p.value);
+              return formatDate(p.value, dateFormat, timezone);
             }
           : undefined,
       };
     });
-  }, [columnNames, dateColumns]);
+  }, [columnNames, dateColumns, dateFormat, timezone]);
 
   // AgGrid will fill the size of the parent container
   return (
