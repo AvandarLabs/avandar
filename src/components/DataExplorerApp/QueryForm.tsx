@@ -15,6 +15,8 @@ import { FieldSelect } from "./FieldSelect";
 const HIDE_WHERE = true;
 const HIDE_LIMIT = true;
 
+type Direction = "asc" | "desc";
+
 type Props = {
   errorMessage: string | undefined;
   aggregations: Record<string, QueryAggregationType>;
@@ -42,9 +44,9 @@ export function QueryForm({
   onFromDatasetChange,
   onSelectFieldsChange,
   onGroupByChange,
+  orderByDirection,
   onOrderByFieldChange,
   onOrderByDirectionChange,
-  orderByDirection,
 }: Props): JSX.Element {
   return (
     <form>
@@ -130,7 +132,7 @@ export function QueryForm({
             const selected = selectedFields.find((f) => {
               return f.name === fieldName;
             });
-            onOrderByFieldChange(selected); // not [selected]
+            onOrderByFieldChange(selected);
           }}
         />
 
@@ -142,10 +144,9 @@ export function QueryForm({
             { value: "desc", label: "Descending" },
           ]}
           value={orderByDirection}
+          clearable={false}
           onChange={(value) => {
-            if (value === "asc" || value === "desc") {
-              onOrderByDirectionChange(value);
-            }
+            return onOrderByDirectionChange(value as Direction);
           }}
         />
 
