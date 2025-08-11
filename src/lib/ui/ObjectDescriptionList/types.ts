@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import { UnionToTuple } from "type-fest";
 import { StringKeyOf } from "@/lib/types/utilityTypes";
 
 /** A non-recursive value */
@@ -57,7 +56,7 @@ export type PrimitiveValueRenderOptions = {
   dateFormat?: string;
 };
 
-export const PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS: UnionToTuple<
+export const PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS: ReadonlyArray<
   keyof PrimitiveValueRenderOptions
 > = [
   "renderEmptyString",

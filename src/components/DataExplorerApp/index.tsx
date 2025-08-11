@@ -33,6 +33,13 @@ export function DataExplorerApp(): JSX.Element {
   const [selectedGroupByFields, setSelectedGroupByFields] = useState<
     readonly LocalDatasetField[]
   >([]);
+  const [orderByField, setOrderByField] = useState<
+    LocalDatasetField | undefined
+  >(undefined);
+
+  const [orderByDirection, setOrderByDirection] = useState<"asc" | "desc">(
+    "asc",
+  );
   const [vizConfig, setVizConfig] = useState<VizConfig>(() => {
     return makeDefaultVizConfig("table");
   });
@@ -96,6 +103,8 @@ export function DataExplorerApp(): JSX.Element {
     datasetId: selectedDatasetId,
     selectFields: selectedFields,
     groupByFields: selectedGroupByFields,
+    orderByField,
+    orderByDirection,
   });
 
   const { fields, data } = useMemo(() => {
@@ -120,10 +129,14 @@ export function DataExplorerApp(): JSX.Element {
           aggregations={aggregations}
           selectedDatasetId={selectedDatasetId}
           selectedFields={selectedFields}
+          orderByField={orderByField}
           onAggregationsChange={setAggregations}
           onFromDatasetChange={setSelectedDatasetId}
           onSelectFieldsChange={setSelectedFields}
           onGroupByChange={setSelectedGroupByFields}
+          onOrderByFieldChange={setOrderByField}
+          orderByDirection={orderByDirection}
+          onOrderByDirectionChange={setOrderByDirection}
           errorMessage={errorMessage}
         />
         <VizSettingsForm

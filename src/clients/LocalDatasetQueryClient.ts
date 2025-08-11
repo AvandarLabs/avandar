@@ -30,6 +30,8 @@ export type LocalQueryConfig = {
   datasetId: LocalDatasetId;
   selectFields: readonly LocalDatasetField[];
   groupByFields: readonly LocalDatasetField[];
+  orderByField?: LocalDatasetField | undefined;
+  orderByDirection?: "asc" | "desc";
 
   /**
    * Aggregations to apply to the selected fields.
@@ -232,6 +234,8 @@ class LocalDatasetQueryClientImpl {
     groupByFields,
     aggregations,
     datasetId,
+    orderByField,
+    orderByDirection,
   }: LocalQueryConfig): Promise<LocalQueryResultData> {
     const selectFieldNames = selectFields.map(getProp("name"));
     const groupByFieldNames = groupByFields.map(getProp("name"));
@@ -249,6 +253,10 @@ class LocalDatasetQueryClientImpl {
       let query = sql.select(...fieldNamesWithoutAggregations).from(tableName);
       if (groupByFieldNames.length > 0) {
         query = query.groupBy(...groupByFieldNames);
+      }
+
+      if (orderByField && orderByDirection) {
+        query = query.orderBy(orderByField.name, orderByDirection);
       }
 
       // apply aggregations
