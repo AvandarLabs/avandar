@@ -1,4 +1,5 @@
 import { Container, Stack, Title } from "@mantine/core";
+import { WorkspaceUserForm } from "@/components/SettingsView/WorkspaceUsersForm";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { BasicForm } from "@/lib/ui/BasicForm";
 import { notifyError } from "@/lib/ui/notifications/notifyError";
@@ -49,6 +50,7 @@ export function SettingsView(): JSX.Element {
             });
           }}
         />
+        <WorkspaceUserForm />
       </Stack>
     </Container>
   );

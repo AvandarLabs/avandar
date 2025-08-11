@@ -22,6 +22,7 @@ import {
   IconLogout,
   IconPlus,
   IconSearch,
+  IconSwitch2,
   IconUser,
 } from "@tabler/icons-react";
 import {
@@ -35,6 +36,7 @@ import { AuthClient } from "@/clients/AuthClient";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLink, AppLinks } from "@/config/AppLinks";
 import { NavbarLink } from "@/config/NavbarLinks";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
@@ -101,6 +103,12 @@ export function AppShell({
       },
     });
 
+  const [userWorkspaces] = WorkspaceClient.useGetWorkspacesOfCurrentUser({
+    useQueryOptions: { staleTime: Infinity },
+  });
+
+  const currentWorkspace = useCurrentWorkspace();
+
   const [sendSignOutRequest, isSignOutPending] = useMutation({
     mutationFn: async () => {
       await AuthClient.signOut();
@@ -119,6 +127,7 @@ export function AppShell({
   });
 
   const [isNavbarOpened, { toggle: toggleNavbar }] = useDisclosure(false);
+
   const isMobileViewSize = useIsMobileSize() ?? false;
 
   const logo = (
@@ -187,14 +196,14 @@ export function AppShell({
             />
             <Menu shadow="md" width={200}>
               <Menu.Target>
-                <UnstyledButton>
-                  <Group wrap="nowrap" gap="xs">
+                <UnstyledButton className="w-full text-left">
+                  <div className="flex w-full items-center justify-between gap-2">
                     {logo}
-                    <Title order={2} size="md" textWrap="nowrap">
+                    <span className="flex-1 break-words text-base font-medium leading-tight">
                       {title ?? AppConfig.appName}
-                    </Title>
-                    <IconChevronDown size={18} />
-                  </Group>
+                    </span>
+                    <IconChevronDown size={18} className="min-h-4 min-w-4" />
+                  </div>
                 </UnstyledButton>
               </Menu.Target>
               <Menu.Dropdown style={{ width: "max-content", minWidth: 200 }}>
@@ -214,6 +223,33 @@ export function AppShell({
                     >
                       <Text span>Create Workspace</Text>
                     </Menu.Item>
+                    {userWorkspaces && userWorkspaces?.length > 1 ?
+                      <Menu.Sub>
+                        <Menu.Sub.Target>
+                          <Menu.Sub.Item
+                            leftSection={<IconSwitch2 size={14} />}
+                          >
+                            <Text>Switch Workspace</Text>
+                          </Menu.Sub.Item>
+                        </Menu.Sub.Target>
+
+                        <Menu.Sub.Dropdown>
+                          {userWorkspaces?.map((ws) => {
+                            return (
+                              <Menu.Item
+                                key={ws.id}
+                                onClick={() => {
+                                  navigate(AppLinks.workspaceHome(ws.slug));
+                                }}
+                                disabled={ws.slug === currentWorkspace.slug}
+                              >
+                                {ws.name}
+                              </Menu.Item>
+                            );
+                          })}
+                        </Menu.Sub.Dropdown>
+                      </Menu.Sub>
+                    : null}
                   </>
                 : null}
 

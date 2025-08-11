@@ -1,9 +1,11 @@
 import { AuthClient } from "@/clients/AuthClient";
 import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { camelCaseKeysShallow } from "@/lib/utils/objects/transformations";
+import { uuid } from "@/lib/utils/uuid";
 import { UserId } from "../User/types";
 import { WorkspaceParsers } from "./parsers";
-import { Workspace, WorkspaceId, WorkspaceRole } from "./types";
+import { Workspace, WorkspaceId, WorkspaceRole, WorkspaceUser } from "./types";
 
 export const WorkspaceClient = createSupabaseCRUDClient({
   modelName: "Workspace",
@@ -34,6 +36,54 @@ export const WorkspaceClient = createSupabaseCRUDClient({
         return workspaces.map((workspace) => {
           return parsers.fromDBReadToModelRead(workspace);
         });
+      },
+
+      // TODO: Update user_roles to reference
+      // user_profiles instead of auth.users. See issue #123.
+      getUsersForWorkspace: async ({
+        workspaceId,
+      }: {
+        workspaceId: WorkspaceId;
+      }): Promise<WorkspaceUser[]> => {
+        const logger = clientLogger.appendName("getUsersForWorkspace");
+        logger.log("Fetching all users for workspace", { workspaceId });
+
+        const { data: profiles } = await dbClient
+          .from("user_profiles")
+          .select("*")
+          .eq("workspace_id", workspaceId)
+          .throwOnError();
+
+        const userIds = profiles.map((p) => {
+          return p.user_id;
+        });
+        const { data: roles } = await dbClient
+          .from("user_roles")
+          .select("user_id, role")
+          .in("user_id", userIds)
+          .eq("workspace_id", workspaceId)
+          .throwOnError();
+
+        const roleMap = new Map(
+          roles.map((r) => {
+            return [r.user_id, r.role];
+          }),
+        );
+
+        const transformed = profiles.map((row) => {
+          const model = camelCaseKeysShallow(row);
+          return {
+            ...model,
+            id: uuid<UserId>(model.id),
+            workspaceId: uuid<WorkspaceId>(model.workspaceId),
+            createdAt: new Date(model.createdAt),
+            updatedAt: new Date(model.updatedAt),
+            role: roleMap.get(row.user_id) ?? "member",
+          };
+        });
+
+        logger.log("Users retrieved", { users: transformed });
+        return transformed;
       },
     };
   },
@@ -92,6 +142,24 @@ export const WorkspaceClient = createSupabaseCRUDClient({
           .throwOnError();
 
         logger.log("Successfully added member to workspace");
+      },
+      removeMember: async (params: {
+        workspaceId: WorkspaceId;
+        userId: UserId;
+      }): Promise<void> => {
+        const logger = clientLogger.appendName("removeMember");
+
+        logger.log("Removing member from workspace", params);
+
+        const { workspaceId, userId } = params;
+
+        await dbClient
+          .from("workspace_memberships")
+          .delete()
+          .match({ workspace_id: workspaceId, user_id: userId })
+          .throwOnError();
+
+        logger.log("Successfully removed member from workspace");
       },
     };
   },
