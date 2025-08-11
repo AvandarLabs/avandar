@@ -15,6 +15,11 @@ import { FieldSelect } from "./FieldSelect";
 const HIDE_WHERE = true;
 const HIDE_LIMIT = true;
 
+const orderOptions = [
+  { value: "asc", label: "Ascending" },
+  { value: "desc", label: "Descending" },
+] as const;
+
 type Direction = "asc" | "desc";
 
 type Props = {
@@ -23,7 +28,7 @@ type Props = {
   selectedDatasetId: LocalDatasetId | undefined;
   selectedFields: readonly LocalDatasetField[];
   orderByField: LocalDatasetField | undefined;
-  orderByDirection: "asc" | "desc";
+  orderByDirection: Direction;
   onAggregationsChange: (
     newAggregations: Record<string, QueryAggregationType>,
   ) => void;
@@ -139,14 +144,11 @@ export function QueryForm({
         <Select
           label="Order by"
           placeholder="Select order"
-          data={[
-            { value: "asc", label: "Ascending" },
-            { value: "desc", label: "Descending" },
-          ]}
+          data={orderOptions}
           value={orderByDirection}
           clearable={false}
           onChange={(value) => {
-            return onOrderByDirectionChange(value as Direction);
+            onOrderByDirectionChange(value as Direction);
           }}
         />
 
