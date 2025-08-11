@@ -6,6 +6,7 @@ import { UnknownDataFrame } from "@/lib/types/common";
 import { BarChart } from "@/lib/ui/data-viz/BarChart";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { DangerText } from "@/lib/ui/Text/DangerText";
+import { isEpochMs, isIsoDateString } from "@/lib/utils/formatters/formatDate";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { VizConfig } from "./VizSettingsForm/makeDefaultVizConfig";
 
@@ -41,9 +42,33 @@ export function VisualizationContainer({
     return fields.map(getProp("name"));
   }, [fields]);
 
+  const dateColumns = useMemo(() => {
+    return new Set(
+      fields
+        .filter((f) => {
+          const sampleVal = data[0]?.[f.name];
+          return (
+            f.dataType === "date" ||
+            isIsoDateString(sampleVal) ||
+            isEpochMs(sampleVal)
+          );
+        })
+        .map((f) => {
+          return f.name;
+        }),
+    );
+  }, [fields, data]);
+
   return match(vizConfig)
     .with({ type: "table" }, () => {
-      return <DataGrid columnNames={fieldNames} data={data} />;
+      return (
+        <DataGrid
+          columnNames={fieldNames}
+          data={data}
+          dateColumns={dateColumns}
+          dateFormat="YYYY-MM-DD HH:mm:ss z"
+        />
+      );
     })
     .with({ type: "bar" }, (config) => {
       const {
