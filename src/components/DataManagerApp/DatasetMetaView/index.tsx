@@ -23,6 +23,7 @@ import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { type LocalDataset } from "@/models/LocalDataset/types";
 import { DataSummaryView } from "./DataSummaryView";
+import { EditDatasetView } from "./EditDatasetView";
 
 type Props = {
   dataset: LocalDataset;
@@ -34,6 +35,7 @@ const EXCLUDED_DATASET_METADATA_KEYS = [
   "datasetType",
   "data",
   "description",
+  "workspaceId",
 ] as const;
 
 const DATASET_METADATA_RENDER_OPTIONS: ChildRenderOptionsMap<LocalDataset> = {
@@ -47,7 +49,7 @@ const DATASET_METADATA_RENDER_OPTIONS: ChildRenderOptionsMap<LocalDataset> = {
   },
 };
 
-type DatasetTabId = "dataset-metadata" | "dataset-summary";
+type DatasetTabId = "dataset-metadata" | "dataset-summary" | "dataset-edit";
 
 /**
  * A view of the metadata for a dataset.
@@ -87,6 +89,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   >({
     "dataset-metadata": null,
     "dataset-summary": null,
+    "dataset-edit": null,
   });
   const tabItemRefCallback = (tabItemId: DatasetTabId) => {
     return (node: HTMLButtonElement | null) => {
@@ -125,6 +128,12 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
               >
                 <Text span>Data Summary</Text>
               </Tabs.Tab>
+              <Tabs.Tab
+                value="dataset-edit"
+                ref={tabItemRefCallback("dataset-edit")}
+              >
+                <Text span>Edit Dataset</Text>
+              </Tabs.Tab>
 
               <FloatingIndicator
                 target={tabItemRefs[currentTab]}
@@ -157,6 +166,12 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
               {isLoadingParsedDataset || !parsedDataset ?
                 <Loader />
               : <DataSummaryView parsedDataset={parsedDataset} />}
+            </Tabs.Panel>
+
+            <Tabs.Panel value="dataset-edit">
+              {isLoadingParsedDataset ?
+                <Loader />
+              : <EditDatasetView dataset={dataset} />}
             </Tabs.Panel>
 
             <Button
