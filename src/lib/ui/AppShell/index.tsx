@@ -223,43 +223,35 @@ export function AppShell({
                     >
                       <Text span>Create Workspace</Text>
                     </Menu.Item>
-                    <Menu.Item
-                      leftSection={<IconSwitch2 size={14} />}
-                      component="div"
-                    >
-                      <Menu
-                        offset={0}
-                        position="right-start"
-                        withArrow={false}
-                        trigger="hover"
-                        openDelay={100}
-                        closeDelay={200}
-                      >
-                        <Menu.Target>
-                          <Text span> Switch Workspace</Text>
-                        </Menu.Target>
-                        <Menu.Dropdown>
+                    {userWorkspaces && userWorkspaces?.length > 1 && (
+                      <Menu.Sub>
+                        <Menu.Sub.Target>
+                          <Menu.Sub.Item
+                            leftSection={<IconSwitch2 size={14} />}
+                          >
+                            <Text>Switch Workspace</Text>
+                          </Menu.Sub.Item>
+                        </Menu.Sub.Target>
+
+                        <Menu.Sub.Dropdown>
                           {userWorkspaces?.map((ws) => {
-                            const isCurrent = ws.slug === currentWorkspace.slug;
                             return (
                               <Menu.Item
                                 key={ws.id}
                                 onClick={() => {
-                                  navigate(AppLinks.workspaceHome(ws.slug));
+                                  return navigate(
+                                    AppLinks.workspaceHome(ws.slug),
+                                  );
                                 }}
-                                disabled={isCurrent}
-                                className={clsx(
-                                  isCurrent &&
-                                    "bg-neutral-100 font-medium text-neutral-900",
-                                )}
+                                disabled={ws.slug === currentWorkspace.slug}
                               >
                                 {ws.name}
                               </Menu.Item>
                             );
                           })}
-                        </Menu.Dropdown>
-                      </Menu>
-                    </Menu.Item>
+                        </Menu.Sub.Dropdown>
+                      </Menu.Sub>
+                    )}
                   </>
                 : null}
 
