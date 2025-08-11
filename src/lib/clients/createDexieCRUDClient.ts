@@ -1,4 +1,4 @@
-import Dexie, { EntityTable, IDType } from "dexie";
+import Dexie, { EntityTable, IDType, UpdateSpec } from "dexie";
 import { ILogger } from "../Logger";
 import { DexieModelCRUDTypes } from "../models/DexieModelCRUDTypes";
 import { ModelCRUDParserRegistry } from "../models/makeParserRegistry";
@@ -170,13 +170,21 @@ export function createDexieCRUDClient<
       return insertedData.filter(isNotUndefined);
     },
 
-    update: async (_params: {
+    update: async (params: {
       id: M["modelPrimaryKeyType"];
       data: M["DBUpdate"];
       logger: ILogger;
-    }) => {
-      // TODO(jpsyx): implement `update` with dexie
-      throw new Error("Need to implement `update` for Dexie clients");
+    }): Promise<M["DBRead"]> => {
+      const { id, data } = params;
+      const typedId = id as IDType<M["DBRead"], M["modelPrimaryKey"]>;
+      const updateData = data as UpdateSpec<M["DBRead"]>;
+
+      await dbTable.update(typedId, updateData);
+      const updated = await dbTable.get(typedId);
+      if (!updated) {
+        throw new Error(`Could not retrieve updated record with id ${id}`);
+      }
+      return updated;
     },
 
     delete: async (params: {

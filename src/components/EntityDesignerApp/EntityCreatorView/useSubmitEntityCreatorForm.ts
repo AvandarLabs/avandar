@@ -49,6 +49,7 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
               .with("dataset_column_value", () => {
                 const datasetColumnValueExtractor =
                   extractors.datasetColumnValue;
+
                 if (
                   hasProps(
                     datasetColumnValueExtractor,
@@ -58,6 +59,7 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
                 ) {
                   return { ...datasetColumnValueExtractor, workspaceId };
                 }
+
                 return undefined;
               })
               .with("aggregation", () => {
