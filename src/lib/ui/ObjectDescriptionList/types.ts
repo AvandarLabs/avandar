@@ -39,19 +39,19 @@ type DescribableObjectOf<T extends DescribableValue> = {
  */
 export type PrimitiveValueRenderOptions = {
   /** The string to display for empty strings */
-  renderEmptyString?: NonNullable<ReactNode>;
+  renderEmptyString?: readonly ReactNode[];
 
   /** The string to display for null values */
-  renderNullString?: NonNullable<ReactNode>;
+  renderNullString?: readonly ReactNode[];
 
   /** The string to display for undefined values */
-  renderUndefinedString?: NonNullable<ReactNode>;
+  renderUndefinedString?: readonly ReactNode[];
 
   /** The string to display for boolean true values */
-  renderBooleanTrue?: NonNullable<ReactNode>;
+  renderBooleanTrue?: readonly ReactNode[];
 
   /** The string to display for boolean false values */
-  renderBooleanFalse?: NonNullable<ReactNode>;
+  renderBooleanFalse?: readonly ReactNode[];
 
   /** If no `dateFormat` is provided we will use `date.toLocaleDateString()` */
   dateFormat?: string;
