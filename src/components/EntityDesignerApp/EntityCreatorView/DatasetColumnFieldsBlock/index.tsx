@@ -279,7 +279,7 @@ export function DatasetColumnFieldsBlock({
         </Group>
 
         <Divider my="xs" />
-        {localDatasetsToUse && localDatasetsToUse.length > 1 && (
+        {localDatasetsToUse && localDatasetsToUse.length > 1 ?
           <Callout.Info
             title="Configure how to join datasets"
             icon={<IconCircleNumber2Filled />}
@@ -293,7 +293,7 @@ export function DatasetColumnFieldsBlock({
               {entityConfigName}.
             </Text>
           </Callout.Info>
-        )}
+        : null}
         {addedFields.length > 0 ?
           <IDConfigBlock
             entityConfigForm={entityConfigForm}
