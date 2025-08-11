@@ -67,8 +67,6 @@ export function VisualizationContainer({
           data={data}
           dateColumns={dateColumns}
           dateFormat="YYYY-MM-DD HH:mm:ss z"
-          // Timezone can be wired in later
-          // timezone="America/New_York"
         />
       );
     })

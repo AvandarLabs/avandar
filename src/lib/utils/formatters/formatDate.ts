@@ -17,23 +17,24 @@ export function isEpochMs(v: unknown): v is number {
 
 /** Return YYYY-MM-DD for ISO strings or epoch ms; else String(v). */
 export function formatDate(
-  v: unknown,
-  fmt = "YYYY-MM-DD HH:mm:ss z",
+  value: unknown,
+  format = "YYYY-MM-DD HH:mm:ss",
   zone?: string,
 ): string {
-  if (v == null) return "";
-
-  let d;
-  if (typeof v === "number") {
-    d = dayjs(v);
-  } else if (typeof v === "string") {
-    d = dayjs(v);
-  } else {
-    return String(v);
+  if (value == null) {
+    return "";
   }
 
-  if (!d.isValid()) return String(v);
+  if (typeof value !== "number" && typeof value !== "string") {
+    return String(value);
+  }
 
-  const t = zone ? d.tz(zone) : d;
-  return t.format(fmt);
+  const date = dayjs(value);
+
+  if (!date.isValid()) {
+    return String(value);
+  }
+
+  const dateWithTimezone = zone ? date.tz(zone) : date;
+  return dateWithTimezone.format(format);
 }

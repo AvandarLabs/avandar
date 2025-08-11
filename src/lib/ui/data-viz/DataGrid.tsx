@@ -25,7 +25,7 @@ export function DataGrid({
   data,
   dateColumns,
   height = 500,
-  dateFormat = "YYYY-MM-DD HH:mm:ss z",
+  dateFormat = "YYYY-MM-DD HH:mm:ss",
   timezone,
 }: Props): JSX.Element {
   const columnDefs = useMemo(() => {
