@@ -223,7 +223,7 @@ export function AppShell({
                     >
                       <Text span>Create Workspace</Text>
                     </Menu.Item>
-                    {userWorkspaces && userWorkspaces?.length > 1 && (
+                    {userWorkspaces && userWorkspaces?.length > 1 ?
                       <Menu.Sub>
                         <Menu.Sub.Target>
                           <Menu.Sub.Item
@@ -239,9 +239,7 @@ export function AppShell({
                               <Menu.Item
                                 key={ws.id}
                                 onClick={() => {
-                                  return navigate(
-                                    AppLinks.workspaceHome(ws.slug),
-                                  );
+                                  navigate(AppLinks.workspaceHome(ws.slug));
                                 }}
                                 disabled={ws.slug === currentWorkspace.slug}
                               >
@@ -251,7 +249,7 @@ export function AppShell({
                           })}
                         </Menu.Sub.Dropdown>
                       </Menu.Sub>
-                    )}
+                    : null}
                   </>
                 : null}
 
