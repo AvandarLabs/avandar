@@ -1,5 +1,6 @@
-import { Loader, Select, Stack, Text } from "@mantine/core";
+import { Box, Group, Loader, Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
+import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNotUndefined } from "@/lib/utils/guards";
@@ -17,7 +18,7 @@ export function IDConfigBlock({
   entityConfigForm,
   entityConfigName,
 }: Props): JSX.Element {
-  const { datasetColumnFields } = entityConfigForm.getValues();
+  const { datasetColumnFields, sourceDatasets } = entityConfigForm.getValues();
 
   const datasetIdsToPullFrom = useMemo(() => {
     return [
@@ -34,7 +35,6 @@ export function IDConfigBlock({
     useQueryOptions: { enabled: datasetIdsToPullFrom.length > 0 },
   });
 
-  // these are the fields that are eligible to be used as the entity ID or title
   const fieldOptionsByDatasetId = useMemo(() => {
     return makeObjectFromList(localDatasets ?? [], {
       keyFn: getProp("id"),
@@ -47,64 +47,92 @@ export function IDConfigBlock({
     });
   }, [localDatasets]);
 
-  const { sourceDatasets } = entityConfigForm.getValues();
+  if (loadingLocalDatasets) return <Loader />;
+
+  // single dataset: keep the clear instructional sentence + one select
+  if (sourceDatasets.length <= 1) {
+    const sourcedDataset = sourceDatasets[0]?.dataset;
+    const fieldOptions =
+      sourcedDataset ? (fieldOptionsByDatasetId[sourcedDataset.id] ?? []) : [];
+    return (
+      <Stack>
+        <Text>
+          For dataset{" "}
+          <Text span fw="bold">
+            {sourcedDataset?.name}
+          </Text>
+          , choose the field to use as the {entityConfigName} ID
+        </Text>
+        <Select
+          required
+          data={fieldOptions}
+          placeholder="Select a field"
+          size="lg"
+          radius="md"
+          {...entityConfigForm.getInputProps(
+            `sourceDatasets.0.primaryKeyColumnId`,
+          )}
+        />
+      </Stack>
+    );
+  }
+
+  // two or more datasets: show simplified “A = B” row for the first two
+  const left = sourceDatasets[0]!.dataset;
+  const right = sourceDatasets[1]!.dataset;
+
+  const leftOptions = fieldOptionsByDatasetId[left.id] ?? [];
+  const rightOptions = fieldOptionsByDatasetId[right.id] ?? [];
 
   return (
-    <Stack>
-      {loadingLocalDatasets ?
-        <Loader />
-      : <>
-          {sourceDatasets.length > 1 ?
-            <Text>
-              We should join data into the same {entityConfigName} when...
-            </Text>
-          : null}
-          {sourceDatasets.map(({ dataset }, idx) => {
-            const fieldOptions = fieldOptionsByDatasetId[dataset.id];
-            if (!fieldOptions) {
-              return null;
-            }
+    <Stack gap="sm">
+      <Text size="sm">
+        We should join data into the same {entityConfigName} when…
+      </Text>
 
-            return (
-              <Select
-                required
-                key={entityConfigForm.key(
-                  `sourceDatasets.${idx}.primaryKeyColumnId`,
-                )}
-                data={fieldOptions}
-                placeholder="Select a field"
-                label={
-                  sourceDatasets.length === 1 ?
-                    <Text span>
-                      For dataset{" "}
-                      <Text span fw="bold">
-                        {dataset.name}
-                      </Text>{" "}
-                      this column should be used as a {entityConfigName}'s ID
-                    </Text>
-                  : idx === 0 ?
-                    <Text span>
-                      The values of{" "}
-                      <Text span fw="bold">
-                        {dataset.name}
-                      </Text>
-                    </Text>
-                  : <Text span>
-                      {idx > 1 ? "and " : ""}are equal to the values of{" "}
-                      <Text span fw="bold">
-                        {dataset.name}
-                      </Text>
-                    </Text>
+      <Group justify="center" gap="xl" wrap="nowrap">
+        <Box ta="center" style={{ minWidth: 240 }}>
+          <Text size="sm" c="dimmed" mb={6}>
+            {left.name}
+          </Text>
+          <Select
+            required
+            data={leftOptions}
+            placeholder="Select field"
+            size="lg"
+            radius="md"
+            styles={{
+              input: { height: 56, textAlign: "center", fontWeight: 600 },
+            }}
+            {...entityConfigForm.getInputProps(
+              `sourceDatasets.0.primaryKeyColumnId`,
+            )}
+          />
+        </Box>
 
-                }
-                {...entityConfigForm.getInputProps(
-                  `sourceDatasets.${idx}.primaryKeyColumnId`,
-                )}
-              />
-            );
-          })}
-        </>
-      }
+        <Text fw={700} size="lg" aria-hidden>
+          =
+        </Text>
+
+        <Box ta="center" style={{ minWidth: 240 }}>
+          <Text size="sm" c="dimmed" mb={6}>
+            {right.name}
+          </Text>
+          <Select
+            required
+            data={rightOptions}
+            placeholder="Select field"
+            size="lg"
+            radius="md"
+            styles={{
+              input: { height: 56, textAlign: "center", fontWeight: 600 },
+            }}
+            {...entityConfigForm.getInputProps(
+              `sourceDatasets.1.primaryKeyColumnId`,
+            )}
+          />
+        </Box>
+      </Group>
     </Stack>
   );
 }
