@@ -27,6 +27,12 @@ type Props = {
   onGroupByChange: (fields: readonly LocalDatasetField[]) => void;
 };
 
+/**
+ * This is a presentational component that just receives QueryForm props and
+ * renders the UI. It does not handle any business logic, such as checking
+ * if the query is valid or running the query. The parent component should
+ * handle that logic.
+ */
 export function QueryForm({
   errorMessage,
   aggregations,
