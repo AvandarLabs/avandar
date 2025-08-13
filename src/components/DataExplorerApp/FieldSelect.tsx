@@ -1,4 +1,3 @@
-// FieldSelect.tsx
 import { MultiSelect } from "@mantine/core";
 import { ReactNode, useMemo, useState } from "react";
 import { UUID } from "@/lib/types/common";

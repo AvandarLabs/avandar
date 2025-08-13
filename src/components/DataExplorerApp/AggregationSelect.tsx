@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
 import { Select, SelectOption } from "@/lib/ui/inputs/Select";
 import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
@@ -21,28 +21,36 @@ const AGGREGATION_OPTIONS: Array<SelectOption<QueryAggregationType>> = [
 
 export function AggregationSelect({
   column,
-  value = "none",
+  value,
   onChange,
 }: Props): JSX.Element {
-  const validAggregations = useMemo(() => {
+  const valid = useMemo(() => {
     return new Set(getValidQueryAggregationsByType(column.dataType));
   }, [column.dataType]);
 
-  const aggregationOptions = AGGREGATION_OPTIONS.filter((option) => {
-    return validAggregations.has(option.value) || option.value === "none";
+  const data = AGGREGATION_OPTIONS.filter((opt) => {
+    return valid.has(opt.value) || opt.value === "none";
   });
+
+  // Uncontrolled fallback
+  const [internal, setInternal] = useState<QueryAggregationType>("none");
+
+  const current = value ?? internal;
+
+  const handleChange = (next: QueryAggregationType | null) => {
+    if (!next) return;
+    if (value === undefined) setInternal(next);
+    onChange(next);
+  };
 
   return (
     <Select
       key={column.id}
       label={column.name}
       placeholder="Select aggregation"
-      data={aggregationOptions}
-      value={value}
-      onChange={(selected: QueryAggregationType | null) => {
-        if (selected === null) return;
-        onChange(selected);
-      }}
+      data={data}
+      value={current}
+      onChange={handleChange}
     />
   );
 }

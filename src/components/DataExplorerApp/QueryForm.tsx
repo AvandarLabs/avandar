@@ -5,7 +5,6 @@ import { difference } from "@/lib/utils/arrays";
 import { makeObjectFromList } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys, omit } from "@/lib/utils/objects/misc";
-import { setValue } from "@/lib/utils/objects/setValue";
 import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
 import { LocalDatasetId } from "@/models/LocalDataset/types";
 import { LocalDatasetSelect } from "../common/LocalDatasetSelect";
@@ -91,10 +90,11 @@ export function QueryForm({
                   key={field.id}
                   column={field}
                   value={aggregations[field.name] ?? "none"}
-                  onChange={(aggregationType) => {
-                    onAggregationsChange(
-                      setValue(aggregations, field.name, aggregationType),
-                    );
+                  onChange={(agg) => {
+                    return onAggregationsChange({
+                      ...aggregations,
+                      [field.name]: agg,
+                    });
                   }}
                 />
               );
