@@ -1,5 +1,6 @@
+// FieldSelect.tsx
 import { MultiSelect } from "@mantine/core";
-import { ReactNode, useMemo } from "react";
+import { ReactNode, useMemo, useState } from "react";
 import { UUID } from "@/lib/types/common";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNotNullOrUndefined } from "@/lib/utils/guards";
@@ -12,16 +13,12 @@ import { isDatasetViewableType } from "@/models/LocalDataset/utils";
 type Props = {
   label: ReactNode;
   placeholder: string;
-
-  /**
-   * If we have a selected dataset, then we will only show fields from
-   * that dataset.
-   */
   datasetId?: LocalDatasetId;
-  onChange: (fields: readonly LocalDatasetField[]) => void;
+  value?: readonly LocalDatasetField[];
+  defaultValue?: readonly LocalDatasetField[];
+  onChange?: (fields: readonly LocalDatasetField[]) => void;
 };
 
-// Human readable names for fields
 const FIELD_NAME_OVERRIDES: Record<string, string> = {
   assignedTo: "Assigned to",
   status: "Status",
@@ -29,14 +26,13 @@ const FIELD_NAME_OVERRIDES: Record<string, string> = {
   updatedAt: "Updated at",
 };
 
-// TODO(jpsyx) we already have LocalDatasetColumnSelect. We shouldnt have both
-// components. Refactor and keep only one.
-
 export function FieldSelect({
-  onChange,
   label,
   placeholder,
   datasetId,
+  value,
+  defaultValue = [],
+  onChange,
 }: Props): JSX.Element {
   const [allDatasets, isLoadingDatasets] = LocalDatasetClient.useGetAll(
     datasetId ? where("id", "eq", datasetId) : undefined,
@@ -46,35 +42,54 @@ export function FieldSelect({
     return allDatasets?.filter(isDatasetViewableType) ?? [];
   }, [allDatasets]);
 
-  const fieldsMap: Record<UUID, LocalDatasetField> = useMemo(() => {
+  const fieldsMap = useMemo<Record<UUID, LocalDatasetField>>(() => {
     return makeObjectFromEntries(
-      (viewableDatasets ?? [])
-        .flatMap((dataset: LocalDataset) => {
-          return dataset.fields;
+      viewableDatasets
+        .flatMap((ds: LocalDataset) => {
+          return ds.fields;
         })
-        .map((field: LocalDatasetField) => {
-          return [field.id, field];
+        .map((f: LocalDatasetField) => {
+          return [f.id, f];
         }),
     );
   }, [viewableDatasets]);
 
-  const fieldGroupOptions = useMemo(() => {
-    const fieldGroups = (viewableDatasets ?? []).map(
-      (dataset: LocalDataset) => {
-        return {
-          group: dataset.name,
-          items: dataset.fields.map((field: LocalDatasetField) => {
-            return {
-              value: field.id as string,
-              label: FIELD_NAME_OVERRIDES[field.name] ?? field.name,
-            };
-          }),
-        };
-      },
-    );
-
-    return fieldGroups;
+  const data = useMemo(() => {
+    return viewableDatasets.map((ds) => {
+      return {
+        group: ds.name,
+        items: ds.fields.map((f) => {
+          return {
+            value: f.id as string,
+            label: FIELD_NAME_OVERRIDES[f.name] ?? f.name,
+          };
+        }),
+      };
+    });
   }, [viewableDatasets]);
+
+  // Uncontrolled state
+  const [internal, setInternal] =
+    useState<readonly LocalDatasetField[]>(defaultValue);
+
+  const current = value ?? internal;
+
+  const selectedIds = useMemo(() => {
+    return current.map((f) => {
+      return f.id as string;
+    });
+  }, [current]);
+
+  const handleChange = (ids: string[]) => {
+    const next = ids
+      .map((id) => {
+        return fieldsMap[id as UUID];
+      })
+      .filter(isNotNullOrUndefined);
+
+    if (value === undefined) setInternal(next);
+    onChange?.(next);
+  };
 
   return (
     <MultiSelect
@@ -82,16 +97,10 @@ export function FieldSelect({
       clearable
       label={label}
       placeholder={isLoadingDatasets ? "Loading datasets..." : placeholder}
-      data={fieldGroupOptions ?? []}
-      onChange={(fieldIds: string[]) => {
-        const fields = fieldIds
-          .map((id) => {
-            return fieldsMap[id as UUID];
-          })
-          .filter(isNotNullOrUndefined);
-
-        onChange(fields);
-      }}
+      data={data}
+      value={selectedIds}
+      onChange={handleChange}
+      nothingFoundMessage="No fields"
     />
   );
 }

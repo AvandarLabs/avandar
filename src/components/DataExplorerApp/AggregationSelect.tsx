@@ -6,6 +6,7 @@ import { getValidQueryAggregationsByType } from "@/models/LocalDataset/LocalData
 
 type Props = {
   column: LocalDatasetField;
+  value?: QueryAggregationType;
   onChange: (aggregation: QueryAggregationType) => void;
 };
 
@@ -18,7 +19,11 @@ const AGGREGATION_OPTIONS: Array<SelectOption<QueryAggregationType>> = [
   { value: "min", label: "Min" },
 ];
 
-export function AggregationSelect({ column, onChange }: Props): JSX.Element {
+export function AggregationSelect({
+  column,
+  value = "none",
+  onChange,
+}: Props): JSX.Element {
   const validAggregations = useMemo(() => {
     return new Set(getValidQueryAggregationsByType(column.dataType));
   }, [column.dataType]);
@@ -32,13 +37,11 @@ export function AggregationSelect({ column, onChange }: Props): JSX.Element {
       key={column.id}
       label={column.name}
       placeholder="Select aggregation"
-      defaultValue="none"
       data={aggregationOptions}
-      onChange={(value: QueryAggregationType | null) => {
-        if (value === null) {
-          return;
-        }
-        onChange(value);
+      value={value}
+      onChange={(selected: QueryAggregationType | null) => {
+        if (selected === null) return;
+        onChange(selected);
       }}
     />
   );
