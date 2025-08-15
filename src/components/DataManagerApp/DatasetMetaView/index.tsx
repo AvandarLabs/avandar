@@ -1,9 +1,12 @@
 import {
+  ActionIcon,
   Button,
   Container,
   FloatingIndicator,
+  Group,
   Loader,
   MantineTheme,
+  Paper,
   Stack,
   Tabs,
   Text,
@@ -11,6 +14,7 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
+import { IconPencil, IconX } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppLinks } from "@/config/AppLinks";
@@ -18,7 +22,6 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
-import { Paper } from "@/lib/ui/Paper";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { type LocalDataset } from "@/models/LocalDataset/types";
@@ -68,6 +71,8 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
       id: dataset.id,
     });
 
+  const [isEditingDataset, setIsEditingDataset] = useState<boolean>(false);
+
   // TODO(jpsyx): eventually the dataset should be streamed, rather than
   // storing it all in memory. Right now this doesnt save any memory if we
   // load it all and then just take a slice.
@@ -101,7 +106,40 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   return (
     <Container pt="lg">
       <Stack>
-        <Title order={2}>{dataset.name}</Title>
+        <Group justify="space-between" align="center">
+          <Group gap="xs" align="center">
+            {
+              isEditingDataset ?
+                <Group>
+                  <EditDatasetView dataset={dataset} />
+                  <ActionIcon
+                    variant="subtle"
+                    aria-label="Exit edit"
+                    onClick={() => {
+                      return setIsEditingDataset(false);
+                    }}
+                  >
+                    <IconX size={20} />
+                  </ActionIcon>
+                </Group>
+                // optional “exit edit” action
+              : <Group>
+                  <Title order={2}>{dataset.name}</Title>
+                  <ActionIcon
+                    variant="subtle"
+                    aria-label="Edit dataset"
+                    onClick={() => {
+                      return setIsEditingDataset(true);
+                    }}
+                  >
+                    <IconPencil size={20} />
+                  </ActionIcon>
+                </Group>
+
+            }
+          </Group>
+        </Group>
+
         <Paper>
           <Tabs
             variant="none"
@@ -127,12 +165,6 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                 ref={tabItemRefCallback("dataset-summary")}
               >
                 <Text span>Data Summary</Text>
-              </Tabs.Tab>
-              <Tabs.Tab
-                value="dataset-edit"
-                ref={tabItemRefCallback("dataset-edit")}
-              >
-                <Text span>Edit Dataset</Text>
               </Tabs.Tab>
 
               <FloatingIndicator
@@ -166,12 +198,6 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
               {isLoadingParsedDataset || !parsedDataset ?
                 <Loader />
               : <DataSummaryView parsedDataset={parsedDataset} />}
-            </Tabs.Panel>
-
-            <Tabs.Panel value="dataset-edit">
-              {isLoadingParsedDataset ?
-                <Loader />
-              : <EditDatasetView dataset={dataset} />}
             </Tabs.Panel>
 
             <Button

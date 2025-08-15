@@ -1,4 +1,3 @@
-import { Box } from "@mantine/core";
 import { notifyError } from "@/lib/ui/notifications/notifyError";
 import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
 import { InputTextField } from "@/lib/ui/singleton-forms/InputTextField";
@@ -21,23 +20,21 @@ export function EditDatasetView({ dataset }: Props): JSX.Element {
   });
 
   return (
-    <Box mt="md" mb="xl">
-      <InputTextField
-        defaultValue={dataset.name}
-        label="Dataset Name"
-        minLength={2}
-        inputWidth={300}
-        required
-        showSubmitButton
-        submitButtonLabel="Save"
-        isSubmitting={isUpdatePending}
-        onSubmit={(newName) => {
-          return updateDataset({
-            id: dataset.id,
-            data: { name: newName },
-          });
-        }}
-      />
-    </Box>
+    <InputTextField
+      defaultValue={dataset.name}
+      required
+      hideLabel
+      minLength={2}
+      inputWidth={300}
+      showSubmitButton
+      submitButtonLabel="Save"
+      isSubmitting={isUpdatePending}
+      onSubmit={(newName) => {
+        return updateDataset({
+          id: dataset.id,
+          data: { name: newName },
+        });
+      }}
+    />
   );
 }
