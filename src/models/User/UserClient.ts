@@ -29,7 +29,7 @@ type TUserClient = WithSupabaseClient<
           workspaceId,
         }: {
           workspaceId: WorkspaceId;
-        }) => Promise<UserProfile>;
+        }) => Promise<UserProfile | null>;
       },
       "getProfile",
       never
@@ -89,30 +89,32 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
           workspaceId,
         }: {
           workspaceId: WorkspaceId;
-        }): Promise<UserProfile> => {
+        }): Promise<UserProfile | null> => {
           const logger = baseLogger.appendName("getProfile");
-          logger.log("Calling `getProfile` with params", {
-            workspaceId,
-          });
+          logger.log("Calling `getProfile`", { workspaceId });
 
           const session = await AuthClient.getCurrentSession();
-          if (!session?.user) {
-            throw new Error("User not found.");
-          }
+          if (!session?.user) throw new Error("User not found.");
 
-          const { data } = await dbClient
+          const { data, error } = await dbClient
             .from("user_profiles")
             .select("*")
             .eq("user_id", session.user.id)
             .eq("workspace_id", workspaceId)
-            .single()
-            .throwOnError();
+            .limit(1)
+            .maybeSingle();
+
+          if (error) throw error;
+
+          // No profile yet for this user+workspace
+          if (!data) {
+            logger.log("No user_profile found; returning null");
+            return null;
+          }
 
           const userProfile = UserProfileDBReadToModelReadSchema.parse({
             ...data,
-
-            // user email has to come from the auth session
-            email: session.user.email,
+            email: session.user.email, // email always from auth
           });
 
           logger.log("User profile retrieved", { userProfile });

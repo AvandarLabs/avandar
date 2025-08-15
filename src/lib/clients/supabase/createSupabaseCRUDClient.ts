@@ -157,6 +157,7 @@ export function createSupabaseCRUDClient<
         .select("*")
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .eq(dbTablePrimaryKey, params.id as any)
+        .limit(1)
         .maybeSingle<M["DBRead"]>()
         .throwOnError();
       return data ?? undefined;
@@ -203,7 +204,7 @@ export function createSupabaseCRUDClient<
 
       // Now apply the page range
       const startIndex = pageNum * pageSize;
-      const endIndex = (pageNum + 1) * pageSize;
+      const endIndex = (pageNum + 1) * pageSize - 1;
       const { data: dbRows } = await query
         .range(startIndex, endIndex)
         .overrideTypes<Array<M["DBRead"]>, { merge: false }>()
@@ -240,17 +241,33 @@ export function createSupabaseCRUDClient<
       id: M["modelPrimaryKeyType"];
       data: M["DBUpdate"];
       logger: ILogger;
-    }) => {
-      const { data: updatedData } = await dbClient
+    }): Promise<M["DBRead"]> => {
+      const { id, data: upd } = params;
+
+      await dbClient
         .from(tableName)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .update(params.data as any)
+        .update(upd as any)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .eq(dbTablePrimaryKey, params.id as any)
-        .select()
-        .single<M["DBRead"]>()
+        .eq(dbTablePrimaryKey, id as any)
         .throwOnError();
-      return updatedData;
+
+      const { data } = await dbClient
+        .from(tableName)
+        .select("*")
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .eq(dbTablePrimaryKey, id as any)
+        .limit(1)
+        .maybeSingle<M["DBRead"]>()
+        .throwOnError();
+
+      if (!data) {
+        throw new Error(
+          `${modelName}: updated row not visible (RLS or not found). id=${String(id)}`,
+        );
+      }
+
+      return data;
     },
 
     delete: async (params: {

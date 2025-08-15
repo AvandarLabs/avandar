@@ -109,6 +109,18 @@ export function AppShell({
 
   const currentWorkspace = useCurrentWorkspace();
 
+  const [liveWorkspace] = WorkspaceClient.useGetById({
+    id: currentWorkspace.id,
+    useQueryOptions: {
+      enabled: !!currentWorkspace.id,
+      staleTime: 0,
+      refetchOnWindowFocus: false,
+    },
+  });
+
+  const displayTitle =
+    liveWorkspace?.name ?? currentWorkspace.name ?? title ?? AppConfig.appName;
+
   const [sendSignOutRequest, isSignOutPending] = useMutation({
     mutationFn: async () => {
       await AuthClient.signOut();
@@ -175,7 +187,7 @@ export function AppShell({
               />
               {logo}
               <Title order={2} size="md" textWrap="nowrap">
-                {title ?? AppConfig.appName}
+                {displayTitle}
               </Title>
             </Group>
           </MantineAppShell.Header>
@@ -200,7 +212,7 @@ export function AppShell({
                   <div className="flex w-full items-center justify-between gap-2">
                     {logo}
                     <span className="flex-1 break-words text-base font-medium leading-tight">
-                      {title ?? AppConfig.appName}
+                      {displayTitle}
                     </span>
                     <IconChevronDown size={18} className="min-h-4 min-w-4" />
                   </div>

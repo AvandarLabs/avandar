@@ -1,4 +1,5 @@
 import { Container, Stack, Title } from "@mantine/core";
+import { useQueryClient } from "@tanstack/react-query";
 import { WorkspaceUserForm } from "@/components/SettingsView/WorkspaceUsersForm";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { BasicForm } from "@/lib/ui/BasicForm";
@@ -7,10 +8,29 @@ import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
 export function SettingsView(): JSX.Element {
-  const workspace = useCurrentWorkspace();
+  const currentWorkspace = useCurrentWorkspace();
+  const queryClient = useQueryClient();
 
   const [saveWorkspace, isWorkspaceSaving] = WorkspaceClient.useUpdate({
-    onSuccess: () => {
+    onSuccess: (updated) => {
+      queryClient.setQueryData(
+        [WorkspaceClient.getClientName(), "getById", updated.id],
+        updated,
+      );
+
+      queryClient.setQueryData(
+        [WorkspaceClient.getClientName(), "getWorkspacesOfCurrentUser"],
+        (prev: unknown) => {
+          return Array.isArray(prev) ?
+              prev.map((workspace) => {
+                return workspace.id === updated.id ?
+                    { ...workspace, name: updated.name }
+                  : workspace;
+              })
+            : prev;
+        },
+      );
+
       notifySuccess({
         title: "Workspace name updated",
         message: "The workspace name was saved successfully.",
@@ -33,7 +53,7 @@ export function SettingsView(): JSX.Element {
           fields={{
             workspaceName: {
               type: "text",
-              initialValue: workspace.name,
+              initialValue: currentWorkspace.name,
               label: "Workspace Name",
             },
           }}
@@ -43,10 +63,8 @@ export function SettingsView(): JSX.Element {
           submitIsLoading={isWorkspaceSaving}
           onSubmit={(values) => {
             saveWorkspace({
-              id: workspace.id,
-              data: {
-                name: values.workspaceName,
-              },
+              id: currentWorkspace.id,
+              data: { name: values.workspaceName },
             });
           }}
         />
