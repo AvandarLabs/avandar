@@ -1,47 +1,40 @@
 import { Box, Flex, Loader, MantineTheme } from "@mantine/core";
-import { useMemo, useState } from "react";
-import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
+import { useMemo } from "react";
 import { partition } from "@/lib/utils/arrays";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { isNotInSet } from "@/lib/utils/sets/higherOrderFuncs";
 import { wrapString } from "@/lib/utils/strings/higherOrderFuncs";
 import { wordJoin } from "@/lib/utils/strings/transformations";
-import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
-import { LocalDatasetId } from "@/models/LocalDataset/types";
 import { QueryForm } from "./QueryForm";
 import { useDataQuery } from "./useDataQuery";
+import { useExplorerDraft } from "./useExplorerDraft";
 import { VisualizationContainer } from "./VisualizationContainer";
 import { VizSettingsForm } from "./VizSettingsForm";
-import {
-  makeDefaultVizConfig,
-  VizConfig,
-} from "./VizSettingsForm/makeDefaultVizConfig";
 
 const QUERY_FORM_WIDTH = 300;
 
 export function DataExplorerApp(): JSX.Element {
-  const [aggregations, setAggregations] = useState<
-    // field name -> query aggregation type
-    Record<string, QueryAggregationType>
-  >({});
-  const [selectedDatasetId, setSelectedDatasetId] = useState<
-    LocalDatasetId | undefined
-  >(undefined);
-  const [selectedFields, setSelectedFields] = useState<
-    readonly LocalDatasetField[]
-  >([]);
-  const [selectedGroupByFields, setSelectedGroupByFields] = useState<
-    readonly LocalDatasetField[]
-  >([]);
-  const [vizConfig, setVizConfig] = useState<VizConfig>(() => {
-    return makeDefaultVizConfig("table");
-  });
+  const {
+    aggregations,
+    setAggregations,
+    selectedDatasetId,
+    setSelectedDatasetId,
+    selectedFields,
+    setSelectedFields,
+    selectedGroupByFields,
+    setSelectedGroupByFields,
+    vizConfig,
+    setVizConfig,
+  } = useExplorerDraft();
 
   const selectedFieldNames = useMemo(() => {
-    return selectedFields.map(getProp("name"));
+    return selectedFields.map((f) => {
+      return f.name;
+    });
   }, [selectedFields]);
   const selectedGroupByFieldNames = useMemo(() => {
-    return selectedGroupByFields.map(getProp("name"));
+    return selectedGroupByFields.map((f) => {
+      return f.name;
+    });
   }, [selectedGroupByFields]);
 
   const [isValidQuery, errorMessage] = useMemo(() => {
@@ -120,6 +113,7 @@ export function DataExplorerApp(): JSX.Element {
           aggregations={aggregations}
           selectedDatasetId={selectedDatasetId}
           selectedFields={selectedFields}
+          selectedGroupByFields={selectedGroupByFields}
           onAggregationsChange={setAggregations}
           onFromDatasetChange={setSelectedDatasetId}
           onSelectFieldsChange={setSelectedFields}
