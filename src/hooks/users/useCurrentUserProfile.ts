@@ -20,12 +20,15 @@ import { UserClient } from "@/models/User/UserClient";
 export function useCurrentUserProfile(): [
   userProfile: UserProfile | undefined,
   isLoading: boolean,
-  response: UseQueryResult<UserProfile>,
+  response: UseQueryResult<UserProfile | null>,
 ] {
   const workspace = useCurrentWorkspace();
-  const [userProfile, isLoadingUserProfile, response] =
-    UserClient.useGetProfile({
-      workspaceId: workspace.id,
-    });
-  return [userProfile, isLoadingUserProfile, response];
+
+  const [rawProfile, isLoading, response] = UserClient.useGetProfile({
+    workspaceId: workspace.id,
+  });
+
+  const userProfile = rawProfile ?? undefined;
+
+  return [userProfile, isLoading, response];
 }
