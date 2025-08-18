@@ -55,6 +55,8 @@ export function WorkspaceUserForm(): JSX.Element {
       title: "Invite sent!",
       message: `Invite sent to ${inviteEmail} as ${inviteRole}`,
     });
+    setInviteEmail("");
+    setInviteRole("member");
     close();
   };
 
