@@ -44,6 +44,8 @@ const LineChartSettingsSchema = z.object({
   yAxisKey: yAxisKeySchema,
 });
 
+const LineChartSettingsSchema = BarChartSettingsSchema;
+
 export function VisualizationContainer({
   vizConfig,
   fields,
