@@ -139,3 +139,7 @@ export type ReplaceTypes<
   [K in keyof OriginalObject]: K extends keyof NewTypes ? NewTypes[K]
   : OriginalObject[K];
 };
+
+export type Registry<StringLiteralUnion extends string> = {
+  [key in StringLiteralUnion]: true;
+};
