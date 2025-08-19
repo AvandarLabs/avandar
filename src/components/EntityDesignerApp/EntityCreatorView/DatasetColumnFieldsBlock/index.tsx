@@ -94,7 +94,7 @@ export function DatasetColumnFieldsBlock({
       },
     );
   }, [localDatasetsToUse]);
-  console.log(localDatasetsToUse);
+
   // Keep track of the fields we've added and the dataset columns they map to
   const [fieldToColumnMap, updateFieldToColumnMap] = useMap<
     EntityFieldConfigId,
