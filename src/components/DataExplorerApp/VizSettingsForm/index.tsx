@@ -92,6 +92,21 @@ export function VizSettingsForm({
     labelFn: getProp("displayName"),
   });
 
+  // helper to seed next config with cached XY
+  function seedXY<T extends VizConfig>(next: T): T {
+    const xy = vizConfig.cachedXY;
+    if (!xy) return next;
+    // only charts have settings to merge into; table just carries the cache
+    if (next.type === "bar" || next.type === "line") {
+      return {
+        ...next,
+        cachedXY: xy,
+        settings: { ...next.settings, ...xy },
+      } as T;
+    }
+    return { ...next, cachedXY: xy } as T;
+  }
+
   return (
     <form>
       <Select
@@ -99,13 +114,10 @@ export function VizSettingsForm({
         data={vizTypeOptions}
         label="Visualization Type"
         value={vizConfig.type}
-        onChange={(selectedVizType) => {
-          if (selectedVizType) {
-            const updated = hydrateXY({
-              prevVizConfig: vizConfig,
-              newVizConfig: makeDefaultVizConfig(selectedVizType as VizType),
-            });
-            onVizConfigChange(updated);
+        onChange={(value) => {
+          if (value) {
+            const next = makeDefaultVizConfig(value as VizType);
+            return onVizConfigChange(seedXY(next));
           }
         }}
       />
@@ -119,8 +131,15 @@ export function VizSettingsForm({
             <BarChartForm
               fields={fields}
               settings={config.settings}
-              onSettingsChange={(nextSettings) => {
-                onVizConfigChange({ ...config, settings: nextSettings });
+              onSettingsChange={(settings) => {
+                onVizConfigChange({
+                  ...config,
+                  settings,
+                  cachedXY: {
+                    xAxisKey: settings.xAxisKey,
+                    yAxisKey: settings.yAxisKey,
+                  },
+                });
               }}
             />
           );
@@ -130,8 +149,15 @@ export function VizSettingsForm({
             <LineChartForm
               fields={fields}
               settings={config.settings}
-              onSettingsChange={(nextSettings) => {
-                onVizConfigChange({ ...config, settings: nextSettings });
+              onSettingsChange={(settings) => {
+                onVizConfigChange({
+                  ...config,
+                  settings,
+                  cachedXY: {
+                    xAxisKey: settings.xAxisKey,
+                    yAxisKey: settings.yAxisKey,
+                  },
+                });
               }}
             />
           );
