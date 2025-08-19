@@ -4,30 +4,24 @@ import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { BarChartForm } from "./BarChartForm";
-import { makeDefaultVizConfig, VizConfig } from "./makeDefaultVizConfig";
+import { LineChartForm } from "./LineChartForm";
+import {
+  makeDefaultVizConfig,
+  VizConfig,
+  VizType,
+} from "./makeDefaultVizConfig";
 
-export type VizType = "table" | "bar";
-type VizTypeMetadata = {
-  type: VizType;
-  displayName: string;
-};
-
-const VIZ_TYPES: VizTypeMetadata[] = [
-  {
-    type: "table",
-    displayName: "Table",
-  },
-  {
-    type: "bar",
-    displayName: "Bar Chart",
-  },
-];
-
-type Props = {
+export type Props = {
   fields: readonly QueryResultField[];
   vizConfig: VizConfig;
   onVizConfigChange: (config: VizConfig) => void;
 };
+
+const VIZ_TYPES: Array<{ type: VizType; displayName: string }> = [
+  { type: "table", displayName: "Table" },
+  { type: "bar", displayName: "Bar Chart" },
+  { type: "line", displayName: "Line Chart" },
+];
 
 export function VizSettingsForm({
   vizConfig,
@@ -47,9 +41,7 @@ export function VizSettingsForm({
         label="Visualization Type"
         value={vizConfig.type}
         onChange={(value) => {
-          if (value) {
-            return onVizConfigChange(makeDefaultVizConfig(value));
-          }
+          if (value) onVizConfigChange(makeDefaultVizConfig(value as VizType));
         }}
       />
 
@@ -63,7 +55,18 @@ export function VizSettingsForm({
               fields={fields}
               settings={config.settings}
               onSettingsChange={(settings) => {
-                onVizConfigChange({ ...config, settings });
+                return onVizConfigChange({ ...config, settings });
+              }}
+            />
+          );
+        })
+        .with({ type: "line" }, (config) => {
+          return (
+            <LineChartForm
+              fields={fields}
+              settings={config.settings}
+              onSettingsChange={(settings) => {
+                return onVizConfigChange({ ...config, settings });
               }}
             />
           );
