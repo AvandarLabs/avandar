@@ -4,7 +4,7 @@ import { UUID } from "@/lib/types/common";
 import { EntityConfigId } from "@/models/EntityConfig/types";
 import { WorkspaceId } from "@/models/Workspace/types";
 
-export type EntityId = UUID<"EntityNew">;
+export type EntityId = UUID<"Entity">;
 
 type EntityRead = {
   assignedTo: string | undefined;

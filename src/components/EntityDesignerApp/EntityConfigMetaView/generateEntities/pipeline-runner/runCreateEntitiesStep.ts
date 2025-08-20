@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
+import { EntityClient } from "@/clients/entities/EntityClient";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient";
-import { EntityNewClient } from "@/clients/entities/EntityNewClient";
 import { Logger } from "@/lib/Logger";
 import { RawDataRow } from "@/lib/types/common";
 import { assert, isNotNullOrUndefined } from "@/lib/utils/guards";
@@ -259,7 +259,7 @@ export async function runCreateEntitiesStep(
       return;
     }
 
-    const entityId = uuid<"EntityNew">();
+    const entityId = uuid<EntityId>();
     const fieldNameToValueDict: Record<string, EntityFieldValueNativeType> = {};
 
     let entityName: string = String(externalId); // falback value
@@ -326,7 +326,7 @@ export async function runCreateEntitiesStep(
 
   // TODO(jpsyx): for now, we're just going to write everything to
   // Supabase here rather than having a separate write or output step.
-  await EntityNewClient.bulkInsert({ data: entities });
+  await EntityClient.bulkInsert({ data: entities });
   await EntityFieldValueClient.bulkInsert({ data: allEntityFieldValues });
 
   // TODO(jpsyx): we should be storing entities back in Supabase

@@ -9,7 +9,7 @@ import {
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useEffect, useMemo, useRef } from "react";
-import { EntityNewClient } from "@/clients/entities/EntityNewClient";
+import { EntityClient } from "@/clients/entities/EntityClient";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
@@ -38,11 +38,11 @@ export function EntityNavbar({
 
   const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useInfiniteQuery({
-      queryKey: EntityNewClient.QueryKeys.getAll(
+      queryKey: EntityClient.QueryKeys.getAll(
         where("entity_config_id", "eq", entityConfig.id),
       ),
       queryFn: (ctx) => {
-        return EntityNewClient.getPage({
+        return EntityClient.getPage({
           pageSize: 20,
           pageNum: ctx.pageParam,
           ...where("entity_config_id", "eq", entityConfig.id),
