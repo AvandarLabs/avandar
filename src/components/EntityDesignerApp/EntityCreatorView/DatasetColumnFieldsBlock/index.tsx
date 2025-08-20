@@ -263,20 +263,21 @@ export function DatasetColumnFieldsBlock({
         </Group>
 
         <Divider my="xs" />
-
-        <Callout.Info
-          title="Configure how to join datasets"
-          icon={<IconCircleNumber2Filled />}
-        >
-          <Text>
-            For each dataset you've added, please specify which columns should
-            be used to uniquely identify a {entityConfigName}.
-          </Text>
-          <Text>
-            We will use those columns to merge datasets into a single{" "}
-            {entityConfigName}.
-          </Text>
-        </Callout.Info>
+        {localDatasetsToUse && localDatasetsToUse.length > 1 ?
+          <Callout.Info
+            title="Configure how to join datasets"
+            icon={<IconCircleNumber2Filled />}
+          >
+            <Text>
+              For each dataset you've added, please specify which columns should
+              be used to uniquely identify a {entityConfigName}.
+            </Text>
+            <Text>
+              We will use those columns to merge datasets into a single{" "}
+              {entityConfigName}.
+            </Text>
+          </Callout.Info>
+        : null}
         {addedFields.length > 0 ?
           <IDConfigBlock
             entityConfigForm={entityConfigForm}
