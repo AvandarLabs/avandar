@@ -1,10 +1,9 @@
 import { isNotUndefined } from "@/lib/utils/guards";
 import { uuid } from "@/lib/utils/uuid";
-import { FieldDataType } from "@/models/LocalDataset/LocalDatasetField/types";
-import { LocalDataset, LocalDatasetId } from "@/models/LocalDataset/types";
+import { DatasetId } from "@/models/datasets/Dataset";
 import { BuildableEntityConfig, Pipeline, PipelineStep } from "./pipelineTypes";
 
-function _makeDataPullStep(datasetId: LocalDatasetId): PipelineStep {
+function _makeDataPullStep(datasetId: DatasetId): PipelineStep {
   return {
     id: uuid(),
     createdAt: new Date(),
@@ -20,17 +19,18 @@ function _makeDataPullStep(datasetId: LocalDatasetId): PipelineStep {
         datasetId,
 
         // for now we only support pulling from local datasets
-        datasetType: "local",
+        sourceType: "local",
       },
     },
   };
 }
 
+/*
 function _makeOutputDatasetStep({
   name,
   datasetId,
   datasetName,
-  datasetType,
+  sourceType,
   description,
   contextValueKey,
   fieldsToWrite,
@@ -38,10 +38,10 @@ function _makeOutputDatasetStep({
   name: string;
   datasetId: string;
   datasetName: string;
-  datasetType: LocalDataset["datasetType"];
+  sourceType: Dataset["sourceType"];
   description?: string;
   contextValueKey: string;
-  fieldsToWrite: Array<{ name: string; dataType: FieldDataType }>;
+  fieldsToWrite: Array<{ name: string; dataType: DatasetColumnDataType }>;
 }): PipelineStep {
   return {
     id: uuid(),
@@ -57,13 +57,14 @@ function _makeOutputDatasetStep({
         createdAt: new Date(),
         updatedAt: new Date(),
         datasetName,
-        datasetType,
+        sourceType,
         contextValueKey,
         columnsToWrite: fieldsToWrite,
       },
     },
   };
 }
+*/
 
 function _makeCreateEntitiesStep(
   entityConfig: BuildableEntityConfig,
@@ -86,10 +87,18 @@ function _makeCreateEntitiesStep(
   };
 }
 
+// TODO(jpsyx): eventually this should be entirely unnecessary because
+// should use a QETL on-demand approach rather than precomputing all values
+// with a monolithic pipeline that generates all entities and values.
+// Values should only be generated on-demand.
+// TODO(jpsyx): We should only use monolithic pipeline approach for small
+// data scales. Which means we need to have some way to identify when the
+// data scales AND data sources are optimal for a monolithic pipeline.
+// We need some way to choose between monolithic pipeline vs. QETL on-demand.
 export function makePipelineFromEntityConfig(
   entityConfig: BuildableEntityConfig,
 ): Pipeline {
-  const datasetsToLoad = new Set<LocalDatasetId>(
+  const datasetsToLoad = new Set<DatasetId>(
     entityConfig.fields
       .map((field) => {
         return field.valueExtractor.type === "dataset_column_value" ?
@@ -115,22 +124,23 @@ export function makePipelineFromEntityConfig(
         // Create all the entities
         _makeCreateEntitiesStep(entityConfig),
 
+        /*
         // create the entities dataset, with one row per entity
         _makeOutputDatasetStep({
-          datasetType: "entities",
+          sourceType: "entities",
           name: `Save entity dataset for entity ${entityConfig.name}`,
           datasetId: `entities__${entityConfig.id}`,
           datasetName: `${entityConfig.name} (Internal)`,
           description: `All the entities for ${entityConfig.name}`,
           contextValueKey: "entities",
           fieldsToWrite: [
-            { name: "id", dataType: "string" },
-            { name: "externalId", dataType: "string" },
-            { name: "workspaceId", dataType: "string" },
-            { name: "name", dataType: "string" },
-            { name: "entityConfigId", dataType: "string" },
-            { name: "assignedTo", dataType: "string" },
-            { name: "status", dataType: "string" },
+            { name: "id", dataType: "text" },
+            { name: "externalId", dataType: "text" },
+            { name: "workspaceId", dataType: "text" },
+            { name: "name", dataType: "text" },
+            { name: "entityConfigId", dataType: "text" },
+            { name: "assignedTo", dataType: "text" },
+            { name: "status", dataType: "text" },
             { name: "createdAt", dataType: "date" },
             { name: "updatedAt", dataType: "date" },
           ],
@@ -140,26 +150,28 @@ export function makePipelineFromEntityConfig(
         // field value per entity. So there will be O(N*M) rows, where
         // N is the number of entities and M is the number of fields per entity.
         _makeOutputDatasetStep({
-          datasetType: "entity_field_values",
-          name: `Save entity field values dataset for entity ${entityConfig.name}`,
+          sourceType: "entity_field_values",
+          name: `Save entity field values dataset for entity
+          ${entityConfig.name}`,
           datasetId: `entity_field_values__${entityConfig.id}`,
           datasetName: `${entityConfig.name} (Field values)`,
           description: `All the field values for ${entityConfig.name}`,
           contextValueKey: "entityFieldValues",
           fieldsToWrite: [
-            { name: "id", dataType: "string" },
-            { name: "entityId", dataType: "string" },
-            { name: "entityFieldConfigId", dataType: "string" },
-            { name: "value", dataType: "string" },
-            { name: "valueSet", dataType: "string" },
-            { name: "datasourceId", dataType: "string" },
+            { name: "id", dataType: "text" },
+            { name: "entityId", dataType: "text" },
+            { name: "entityFieldConfigId", dataType: "text" },
+            { name: "value", dataType: "text" },
+            { name: "valueSet", dataType: "text" },
+            { name: "datasourceId", dataType: "text" },
           ],
         }),
 
         // create the queryable entities dataset, with one row per entity
         _makeOutputDatasetStep({
-          datasetType: "entities_queryable",
-          name: `Save queryable entities dataset for entity ${entityConfig.name}`,
+          sourceType: "entities_queryable",
+          name: `Save queryable entities dataset for entity
+          ${entityConfig.name}`,
           datasetId: `entities_queryable__${entityConfig.id}`,
           datasetName: entityConfig.name,
           description: `All the queryable entities for ${entityConfig.name}`,
@@ -168,15 +180,19 @@ export function makePipelineFromEntityConfig(
             ...entityConfig.fields.map((field) => {
               return {
                 name: field.name,
-                dataType: field.options.baseDataType,
+                dataType:
+                  field.options.baseDataType === "string" ?
+                    ("text" as const)
+                  : field.options.baseDataType,
               };
             }),
-            { name: "assignedTo", dataType: "string" },
-            { name: "status", dataType: "string" },
+            { name: "assignedTo", dataType: "text" },
+            { name: "status", dataType: "text" },
             { name: "createdAt", dataType: "date" },
             { name: "updatedAt", dataType: "date" },
           ],
         }),
+        */
       ],
     },
   };

@@ -5,7 +5,8 @@
   "tabWidth": 2,
   "plugins": [
     "@ianvs/prettier-plugin-sort-imports",
-    "prettier-plugin-tailwindcss"
+    "prettier-plugin-tailwindcss",
+    "prettier-plugin-sql"
   ],
   "importOrder": [
     "<BUILTIN_MODULES>",
@@ -19,6 +20,19 @@
       "files": ["*.jsonc"],
       "options": {
         "trailingComma": "none"
+      }
+    },
+    {
+      "files": ["*.sql"],
+      "options": {
+        "language": "postgresql",
+        "keywordCase": "lower",
+        "dataTypeCase": "lower",
+        "functionCase": "lower",
+        "identifierCase": "lower",
+        "indentStyle": "standard",
+        "logicalOperatorNewline": "after",
+        "expressionWidth": 8
       }
     }
   ]

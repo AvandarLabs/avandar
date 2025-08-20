@@ -1,6 +1,8 @@
 import { match } from "ts-pattern";
+import { EntityClient } from "@/clients/entities/EntityClient";
+import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient";
 import { Logger } from "@/lib/Logger";
-import { RawDataRecordRow } from "@/lib/types/common";
+import { RawDataRow } from "@/lib/types/common";
 import { assert, isNotNullOrUndefined } from "@/lib/utils/guards";
 import {
   makeBucketMapFromList,
@@ -10,23 +12,21 @@ import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectValues } from "@/lib/utils/objects/misc";
 import { mapObjectValues } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
-import { Entity, EntityId } from "@/models/Entity/types";
-import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/types";
-import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
+import { DatasetId, DatasetWithColumns } from "@/models/datasets/Dataset";
+import { DatasetColumn } from "@/models/datasets/DatasetColumn";
+import { Entity, EntityId } from "@/models/entities/Entity";
 import {
-  LocalDatasetId,
-  ParsedLocalDataset,
-} from "@/models/LocalDataset/types";
+  EntityFieldValue,
+  EntityFieldValueId,
+} from "@/models/entities/EntityFieldValue";
+import { EntityConfigId } from "@/models/EntityConfig/types";
+import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/types";
 import {
   BuildableEntityConfig,
   BuildableFieldConfig,
   CreateEntitiesStepConfig,
 } from "../pipelineTypes";
-import {
-  EntityFieldValue,
-  EntityFieldValueNativeType,
-  PipelineContext,
-} from "./runPipeline";
+import { EntityFieldValueNativeType, PipelineContext } from "./runPipeline";
 
 /**
  * Given an entity config, get the IDs of all datasets that will be
@@ -35,11 +35,9 @@ import {
  */
 function _getDatasetIdsToEntityIdFields(
   entityConfig: BuildableEntityConfig,
-): Record<LocalDatasetId, BuildableFieldConfig> {
-  const datasetIdsToEntityIdFields: Record<
-    LocalDatasetId,
-    BuildableFieldConfig
-  > = {};
+): Record<DatasetId, BuildableFieldConfig> {
+  const datasetIdsToEntityIdFields: Record<DatasetId, BuildableFieldConfig> =
+    {};
 
   entityConfig.fields.forEach((field) => {
     if (
@@ -59,9 +57,9 @@ function _getDatasetIdsToEntityIdFields(
  * a `dataset_column_value` extractor then throw an error.
  */
 function _getDatasetColumnFromFieldConfig(
-  dataset: ParsedLocalDataset,
+  dataset: DatasetWithColumns,
   entityFieldConfig: BuildableFieldConfig,
-): LocalDatasetField {
+): DatasetColumn {
   const { valueExtractor } = entityFieldConfig;
 
   assert(
@@ -70,7 +68,7 @@ function _getDatasetColumnFromFieldConfig(
   );
 
   // get the dataset column corresponding to this entity field's value extractor
-  const datasetColumn = dataset.fields.find((column) => {
+  const datasetColumn = dataset.columns.find((column) => {
     return column.id === valueExtractor.datasetFieldId;
   });
 
@@ -84,6 +82,7 @@ function _getDatasetColumnFromFieldConfig(
 
 function _extractEntityFieldValueFromDatasetRows(params: {
   entityId: EntityId;
+  entityConfigId: EntityConfigId;
   valueExtractor: DatasetColumnValueExtractor;
   context: PipelineContext;
 
@@ -92,14 +91,20 @@ function _extractEntityFieldValueFromDatasetRows(params: {
    * id of the entity we are extracting the field value for.
    */
   sourceDatasetRows: Array<{
-    datasetId: LocalDatasetId;
-    rowData: RawDataRecordRow;
+    datasetId: DatasetId;
+    rowData: RawDataRow;
   }>;
 }): EntityFieldValue | undefined {
-  const { entityId, valueExtractor, sourceDatasetRows, context } = params;
+  const {
+    entityId,
+    entityConfigId,
+    valueExtractor,
+    sourceDatasetRows,
+    context,
+  } = params;
   const { datasetId, datasetFieldId, valuePickerRuleType } = valueExtractor;
   const sourceDataset = context.getDataset(datasetId);
-  const datasetColumnToExtract = sourceDataset.fields.find(
+  const datasetColumnToExtract = sourceDataset.columns.find(
     propEquals("id", datasetFieldId),
   );
 
@@ -124,22 +129,26 @@ exist in the dataset "${sourceDataset.name}". Could not find Dataset Column ID
   // Then we have to decide which value to use based on the value picker
   // rule type.
   return match(valuePickerRuleType)
-    .with("first", () => {
+    .with("first", (): EntityFieldValue | undefined => {
       const firstRow = eligibleSourceRows[0];
       if (!firstRow) {
         return undefined;
       }
       const extractedValue = firstRow[datasetColumnToExtract.name];
       return {
-        id: uuid<"EntityFieldValue">(),
+        id: uuid() as EntityFieldValueId,
         entityId,
+        entityConfigId,
         value: extractedValue,
-        valueSet: [extractedValue],
-        datasourceId: datasetId,
+        valueSet: extractedValue ? [extractedValue] : [],
+        datasetId: datasetId,
         entityFieldConfigId: valueExtractor.entityFieldConfigId,
+        workspaceId: context.getWorkspaceId(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
     })
-    .with("most_frequent", () => {
+    .with("most_frequent", (): EntityFieldValue | undefined => {
       const valueSet = eligibleSourceRows.map((row) => {
         return row[datasetColumnToExtract.name];
       });
@@ -155,18 +164,22 @@ exist in the dataset "${sourceDataset.name}". Could not find Dataset Column ID
       });
 
       return {
-        id: uuid<"EntityFieldValue">(),
+        id: uuid() as EntityFieldValueId,
         entityId,
+        entityConfigId,
         value: mostFrequentValue,
-        valueSet: [...counts.keys()],
-        datasourceId: datasetId,
+        valueSet: [...counts.keys()].filter(isNotNullOrUndefined),
+        datasetId: datasetId,
         entityFieldConfigId: valueExtractor.entityFieldConfigId,
+        workspaceId: context.getWorkspaceId(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
     })
     .exhaustive();
 }
 
-export function runCreateEntitiesStep(
+export async function runCreateEntitiesStep(
   stepConfig: CreateEntitiesStepConfig,
   context: PipelineContext,
 ): Promise<PipelineContext> {
@@ -235,7 +248,7 @@ export function runCreateEntitiesStep(
 
   const entities: Entity[] = [];
   const allEntityFieldValues: EntityFieldValue[] = [];
-  const queryableEntities: Array<Entity & Record<string, unknown>> = [];
+  // const queryableEntities: Array<Entity & Record<string, unknown>> = [];
 
   // each external id we found is 1 valid entity. So now we iterate through each
   // one, collect the configured fields values, apply the necessary value picker
@@ -246,14 +259,14 @@ export function runCreateEntitiesStep(
       return;
     }
 
-    const entityId = uuid<"Entity">();
+    const entityId = uuid<EntityId>();
     const fieldNameToValueDict: Record<string, EntityFieldValueNativeType> = {};
 
     let entityName: string = String(externalId); // falback value
 
     // now collect all the fields for this entity
     entityConfig.fields.forEach((fieldConfig) => {
-      const { valueExtractor } = fieldConfig;
+      const { valueExtractor, entityConfigId } = fieldConfig;
 
       const entityFieldValue = match(valueExtractor)
         .with({ type: "manual_entry" }, () => {
@@ -267,6 +280,7 @@ export function runCreateEntitiesStep(
           const extractedEntityFieldValue =
             _extractEntityFieldValueFromDatasetRows({
               entityId,
+              entityConfigId,
               sourceDatasetRows,
               valueExtractor: extractor,
               context,
@@ -293,7 +307,7 @@ export function runCreateEntitiesStep(
     });
 
     // construct the entity object
-    const entity = {
+    const entity: Entity = {
       id: entityId, // the internal id
       workspaceId: context.getWorkspaceId(),
       name: entityName,
@@ -304,27 +318,17 @@ export function runCreateEntitiesStep(
       // configured list and not hardcoded to "active"
       status: "active",
       assignedTo: undefined,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
     entities.push(entity);
-
-    // finally, construct the queryable entity object
-    const queryableEntity = {
-      ...entity,
-      ...fieldNameToValueDict,
-    };
-    queryableEntities.push(queryableEntity);
   });
 
-  return Promise.resolve(
-    // TODO(jpsyx): eventually store this in some Collections
-    // dictionary or some way to infer the type back. Perhaps
-    // specifically an EntitiesCollection dictionary in the context.
-    context
-      .setContextValue("entities", entities)
-      .setContextValue("entityFieldValues", allEntityFieldValues)
-      .setContextValue("queryableEntities", queryableEntities)
-      .addErrors(errors),
-  );
+  // TODO(jpsyx): for now, we're just going to write everything to
+  // Supabase here rather than having a separate write or output step.
+  await EntityClient.bulkInsert({ data: entities });
+  await EntityFieldValueClient.bulkInsert({ data: allEntityFieldValues });
+
+  // TODO(jpsyx): we should be storing entities back in Supabase
+  return Promise.resolve(context.addErrors(errors));
 }

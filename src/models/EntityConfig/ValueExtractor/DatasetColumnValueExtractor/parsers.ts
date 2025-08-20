@@ -10,7 +10,7 @@ import {
 } from "@/lib/utils/objects/transformations";
 import { pipe } from "@/lib/utils/pipe";
 import { uuid } from "@/lib/utils/uuid";
-import { asLocalDatasetId } from "@/models/LocalDataset/utils";
+import { DatasetId } from "@/models/datasets/Dataset";
 import {
   DatasetColumnValueExtractor,
   DatasetColumnValueExtractorModel,
@@ -42,7 +42,7 @@ export const DatasetColumnValueExtractorParsers =
           id: uuid(obj.id),
           workspaceId: uuid(obj.workspaceId),
           entityFieldConfigId: uuid(obj.entityFieldConfigId),
-          datasetId: asLocalDatasetId(obj.datasetId),
+          datasetId: obj.datasetId as DatasetId,
           datasetFieldId: uuid(obj.datasetFieldId),
           valuePickerRuleType: obj.valuePickerRuleType ?? "most_frequent",
         };

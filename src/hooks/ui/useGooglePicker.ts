@@ -98,7 +98,7 @@ export function useGooglePicker({
     googlePickerAPI: pickerAPI,
     isLoadingAPI,
     isLoadingGoogleAuthState,
-    isGoogleAuthenticated: !!tokens,
+    isGoogleAuthenticated: !!tokens && tokens.length > 0,
     selectedGoogleAccount: selectedAccount,
   };
 }
