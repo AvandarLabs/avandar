@@ -47,7 +47,9 @@ export function IDConfigBlock({
     });
   }, [localDatasets]);
 
-  if (loadingLocalDatasets) return <Loader />;
+  if (loadingLocalDatasets) {
+    return <Loader />;
+  }
 
   // single dataset: keep the clear instructional sentence + one select
   if (sourceDatasets.length <= 1) {
