@@ -14,7 +14,6 @@ import { Logger } from "@/lib/Logger";
 import { MIMEType } from "@/lib/types/common";
 import { GPickerDocumentObject } from "@/lib/types/google-picker";
 import { notifyError } from "@/lib/ui/notifications/notifyError";
-import { DangerText } from "@/lib/ui/Text/DangerText";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
 import { csvCellValueSchema } from "@/lib/utils/zodHelpers";
@@ -123,9 +122,6 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
   return (
     <Box {...props}>
       <Stack align="flex-start">
-        <DangerText>
-          Google Sheets connection is still under development.
-        </DangerText>
         {isLoadingGoogleAuthState ?
           <Loader />
         : isGoogleAuthenticated ?
