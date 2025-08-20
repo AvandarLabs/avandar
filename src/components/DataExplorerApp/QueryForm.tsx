@@ -1,4 +1,4 @@
-import { Fieldset, Select, Stack, Text } from "@mantine/core";
+import { Box, Fieldset, Select, Stack, Text } from "@mantine/core";
 import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
 import { DangerText } from "@/lib/ui/Text/DangerText";
 import { difference } from "@/lib/utils/arrays";
@@ -57,12 +57,14 @@ export function QueryForm({
     <form>
       <Stack>
         <LocalDatasetSelect
+          value={selectedDatasetId ?? null}
           onChange={(datasetId) => {
             onFromDatasetChange(datasetId ?? undefined);
           }}
         />
 
         <FieldSelect
+          key={`fields-${selectedDatasetId ?? "none"}`}
           label="Select fields"
           placeholder="Select fields"
           datasetId={selectedDatasetId}
@@ -117,6 +119,7 @@ export function QueryForm({
 
         {HIDE_WHERE ? null : <Text>Where (react-awesome-query-builder)</Text>}
         <FieldSelect
+          key={`groupby-${selectedDatasetId ?? "none"}`}
           label="Group by"
           placeholder="Group by"
           onChange={onGroupByChange}
@@ -140,22 +143,23 @@ export function QueryForm({
             onOrderByFieldChange(selected);
           }}
         />
+        <Box mb="md">
+          <Select
+            label="Order by"
+            placeholder="Select order"
+            data={orderOptions}
+            value={orderByDirection}
+            clearable={false}
+            onChange={(value) => {
+              onOrderByDirectionChange(value as Direction);
+            }}
+          />
 
-        <Select
-          label="Order by"
-          placeholder="Select order"
-          data={orderOptions}
-          value={orderByDirection}
-          clearable={false}
-          onChange={(value) => {
-            onOrderByDirectionChange(value as Direction);
-          }}
-        />
-
-        {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
-        {errorMessage ?
-          <DangerText>{errorMessage}</DangerText>
-        : null}
+          {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
+          {errorMessage ?
+            <DangerText>{errorMessage}</DangerText>
+          : null}
+        </Box>
       </Stack>
     </form>
   );

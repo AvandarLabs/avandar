@@ -1,5 +1,5 @@
 import { Box, Flex, Loader, MantineTheme } from "@mantine/core";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
 import { partition } from "@/lib/utils/arrays";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
@@ -113,6 +113,15 @@ export function DataExplorerApp(): JSX.Element {
       data: queryResults?.data ?? [],
     };
   }, [queryResults]);
+
+  useEffect(() => {
+    setSelectedFields([]);
+    setSelectedGroupByFields([]);
+    setAggregations({});
+    setOrderByField(undefined);
+    setOrderByDirection("asc");
+    setVizConfig(makeDefaultVizConfig("table"));
+  }, [selectedDatasetId]);
 
   return (
     <Flex>
