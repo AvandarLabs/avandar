@@ -1,4 +1,4 @@
-import { Fieldset, Stack, Text } from "@mantine/core";
+import { Fieldset, Select, Stack, Text } from "@mantine/core";
 import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
 import { DangerText } from "@/lib/ui/Text/DangerText";
 import { difference } from "@/lib/utils/arrays";
@@ -13,37 +13,45 @@ import { AggregationSelect } from "./AggregationSelect";
 import { FieldSelect } from "./FieldSelect";
 
 const HIDE_WHERE = true;
-const HIDE_ORDER_BY = true;
 const HIDE_LIMIT = true;
+
+const orderOptions = [
+  { value: "asc", label: "Ascending" },
+  { value: "desc", label: "Descending" },
+] as const;
+
+type Direction = "asc" | "desc";
 
 type Props = {
   errorMessage: string | undefined;
   aggregations: Record<string, QueryAggregationType>;
   selectedDatasetId: LocalDatasetId | undefined;
   selectedFields: readonly LocalDatasetField[];
+  orderByField: LocalDatasetField | undefined;
+  orderByDirection: Direction;
   onAggregationsChange: (
     newAggregations: Record<string, QueryAggregationType>,
   ) => void;
   onFromDatasetChange: (datasetId: LocalDatasetId | undefined) => void;
   onSelectFieldsChange: (fields: readonly LocalDatasetField[]) => void;
   onGroupByChange: (fields: readonly LocalDatasetField[]) => void;
+  onOrderByFieldChange: (field: LocalDatasetField | undefined) => void;
+  onOrderByDirectionChange: (value: "asc" | "desc") => void;
 };
 
-/**
- * This is a presentational component that just receives QueryForm props and
- * renders the UI. It does not handle any business logic, such as checking
- * if the query is valid or running the query. The parent component should
- * handle that logic.
- */
 export function QueryForm({
   errorMessage,
   aggregations,
   selectedFields,
   selectedDatasetId,
+  orderByField,
   onAggregationsChange,
   onFromDatasetChange,
   onSelectFieldsChange,
   onGroupByChange,
+  orderByDirection,
+  onOrderByFieldChange,
+  onOrderByDirectionChange,
 }: Props): JSX.Element {
   return (
     <form>
@@ -61,9 +69,6 @@ export function QueryForm({
           onChange={(fields) => {
             onSelectFieldsChange(fields);
 
-            // Remove the aggregations for any fields that are no longer
-            // selected, and add a default "none" aggregation for any
-            // new fields that just got added
             const prevAggregations = aggregations;
             const incomingFieldNames = fields.map(getProp("name"));
             const prevFieldNames = objectKeys(prevAggregations);
@@ -89,9 +94,7 @@ export function QueryForm({
         {selectedFields.length > 0 ?
           <Fieldset
             legend="Aggregations"
-            style={{
-              backgroundColor: "rgba(255, 255, 255, 0.4)",
-            }}
+            style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
           >
             {selectedFields.map((field) => {
               return (
@@ -119,7 +122,36 @@ export function QueryForm({
           onChange={onGroupByChange}
           datasetId={selectedDatasetId}
         />
-        {HIDE_ORDER_BY ? null : <Text>Order by (fields dropdown)</Text>}
+
+        <Select
+          label="Select field"
+          placeholder="Select field"
+          data={selectedFields.map((f) => {
+            return {
+              value: f.name,
+              label: f.name,
+            };
+          })}
+          value={orderByField?.name}
+          onChange={(fieldName) => {
+            const selected = selectedFields.find((f) => {
+              return f.name === fieldName;
+            });
+            onOrderByFieldChange(selected);
+          }}
+        />
+
+        <Select
+          label="Order by"
+          placeholder="Select order"
+          data={orderOptions}
+          value={orderByDirection}
+          clearable={false}
+          onChange={(value) => {
+            onOrderByDirectionChange(value as Direction);
+          }}
+        />
+
         {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
         {errorMessage ?
           <DangerText>{errorMessage}</DangerText>
