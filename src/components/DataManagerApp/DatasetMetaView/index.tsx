@@ -17,32 +17,34 @@ import { notifications } from "@mantine/notifications";
 import { IconPencil, IconX } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { DatasetClient } from "@/clients/datsets/DatasetClient";
+import { DatasetColumnClient } from "@/clients/datsets/DatasetColumnClient";
+import { DatasetRawDataClient } from "@/clients/datsets/DatasetRawDataClient";
+import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
+import { where } from "@/lib/utils/filters/filterBuilders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
-import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
-import { type LocalDataset } from "@/models/LocalDataset/types";
+import { Dataset, DatasetWithColumns } from "@/models/datasets/Dataset";
 import { DataSummaryView } from "./DataSummaryView";
 import { EditDatasetView } from "./EditDatasetView";
 
 type Props = {
-  dataset: LocalDataset;
+  dataset: Dataset;
 };
 
 const EXCLUDED_DATASET_METADATA_KEYS = [
   "id",
   "name",
-  "datasetType",
-  "data",
   "description",
   "workspaceId",
-] as const;
+] satisfies ReadonlyArray<keyof DatasetWithColumns>;
 
-const DATASET_METADATA_RENDER_OPTIONS: ChildRenderOptionsMap<LocalDataset> = {
-  fields: {
+const DATASET_METADATA_RENDER_OPTIONS = {
+  columns: {
     renderAsTable: true,
     titleKey: "name",
     maxHeight: 400,
@@ -50,26 +52,33 @@ const DATASET_METADATA_RENDER_OPTIONS: ChildRenderOptionsMap<LocalDataset> = {
       excludeKeys: ["id"],
     },
   },
-};
+} satisfies ChildRenderOptionsMap<DatasetWithColumns>;
 
-type DatasetTabId = "dataset-metadata" | "dataset-summary" | "dataset-edit";
+type DatasetTabId = "dataset-metadata" | "dataset-summary";
 
 /**
  * A view of the metadata for a dataset.
- *
- * TODO(jpsyx): We should show only a preview (first 100 rows) of the data.
- * Currently, we are still showing all data, which isn't great.
  */
 export function DatasetMetaView({ dataset }: Props): JSX.Element {
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
-  const [deleteLocalDataset, isDeletePending] = LocalDatasetClient.useDelete({
-    queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
+  const [deleteDataset, isDeletePending] = DatasetClient.useFullDelete({
+    queryToInvalidate: DatasetClient.QueryKeys.getAll(),
   });
-  const [parsedDataset, isLoadingParsedDataset] =
-    LocalDatasetClient.useGetParsedLocalDataset({
-      id: dataset.id,
+
+  const [datasetRawData, isLoadingRawData] =
+    DatasetRawDataClient.useGetParsedRawData({
+      datasetId: dataset.id,
     });
+  const [datasetColumns, isLoadingDatasetColumns] =
+    DatasetColumnClient.useGetAll(where("dataset_id", "eq", dataset.id));
+
+  const datasetWithColumns = useMemo(() => {
+    return {
+      ...dataset,
+      columns: datasetColumns,
+    };
+  }, [dataset, datasetColumns]);
 
   const [isEditingDataset, setIsEditingDataset] = useState<boolean>(false);
 
@@ -77,12 +86,10 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   // storing it all in memory. Right now this doesnt save any memory if we
   // load it all and then just take a slice.
   const previewData = useMemo(() => {
-    return (parsedDataset?.data ?? []).slice(0, 200);
-  }, [parsedDataset]);
-
-  const datasetColumnNames = useMemo(() => {
-    return parsedDataset?.fields.map(getProp("name")) ?? [];
-  }, [parsedDataset]);
+    return (
+      datasetRawData?.slice(0, AppConfig.dataManagerApp.maxPreviewRows) ?? []
+    );
+  }, [datasetRawData]);
 
   const [currentTab, setCurrentTab] =
     useState<DatasetTabId>("dataset-metadata");
@@ -94,7 +101,6 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   >({
     "dataset-metadata": null,
     "dataset-summary": null,
-    "dataset-edit": null,
   });
   const tabItemRefCallback = (tabItemId: DatasetTabId) => {
     return (node: HTMLButtonElement | null) => {
@@ -102,6 +108,9 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
       setTabItemRefs(tabItemRefs);
     };
   };
+
+  const isLoadingFullDataset = isLoadingRawData || isLoadingDatasetColumns;
+  const datasetColumnNames = datasetColumns?.map(getProp("name")) ?? [];
 
   return (
     <Container pt="lg">
@@ -179,13 +188,13 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                 <Text>{dataset.description}</Text>
 
                 <ObjectDescriptionList
-                  data={dataset}
+                  data={datasetWithColumns}
                   excludeKeys={EXCLUDED_DATASET_METADATA_KEYS}
                   childRenderOptions={DATASET_METADATA_RENDER_OPTIONS}
                 />
 
                 <Title order={5}>Data preview</Title>
-                {parsedDataset ?
+                {datasetRawData && previewData ?
                   <DataGrid
                     columnNames={datasetColumnNames}
                     data={previewData}
@@ -195,9 +204,13 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
             </Tabs.Panel>
 
             <Tabs.Panel value="dataset-summary">
-              {isLoadingParsedDataset || !parsedDataset ?
+              {isLoadingFullDataset || !datasetRawData || !datasetColumns ?
                 <Loader />
-              : <DataSummaryView parsedDataset={parsedDataset} />}
+              : <DataSummaryView
+                  rawDatasetRows={datasetRawData}
+                  columns={datasetColumns}
+                />
+              }
             </Tabs.Panel>
 
             <Button
@@ -214,7 +227,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                     loading: isDeletePending,
                   },
                   onConfirm: () => {
-                    deleteLocalDataset(
+                    deleteDataset(
                       { id: dataset.id },
                       {
                         onSuccess: () => {

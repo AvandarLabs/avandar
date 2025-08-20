@@ -3,3 +3,4 @@ dist
 build
 src/routeTree.gen.ts
 LICENSE
+src/types/database.types.ts

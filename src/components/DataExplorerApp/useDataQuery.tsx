@@ -14,7 +14,7 @@ export function useDataQuery({
   enabled,
   selectFields = [],
   groupByFields = [],
-  orderByField,
+  orderByColumn: orderByField,
   orderByDirection,
 }: Partial<LocalQueryConfig> & {
   enabled: boolean;
@@ -59,7 +59,7 @@ export function useDataQuery({
           aggregations,
           selectFields,
           groupByFields,
-          orderByField,
+          orderByColumn: orderByField,
           orderByDirection,
         });
       }

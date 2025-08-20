@@ -8,8 +8,9 @@ import "./index.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
-import { StrictMode, useMemo } from "react";
+import { StrictMode, useEffect, useMemo } from "react";
 import { createRoot } from "react-dom/client";
+import { AvaDexie } from "./dexie/AvaDexie";
 import { useAuth } from "./lib/hooks/auth/useAuth";
 import { RootRouteContext } from "./lib/types/RootRouteContext";
 import { routeTree } from "./routeTree.gen";
@@ -40,6 +41,10 @@ function MainWrapper() {
   const { user } = useAuth(router);
   const context: RootRouteContext = useMemo(() => {
     return { user, queryClient };
+  }, [user]);
+
+  useEffect(() => {
+    AvaDexie.syncDBVersion(user);
   }, [user]);
 
   return (

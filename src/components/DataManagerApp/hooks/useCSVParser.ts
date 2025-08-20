@@ -1,10 +1,17 @@
 import Papa from "papaparse";
 import { useCallback, useState } from "react";
-import { MIMEType, RawDataRecordRow } from "@/lib/types/common";
+import { MIMEType, RawDataRow } from "@/lib/types/common";
 import { propEquals } from "@/lib/utils/objects/higherOrderFuncs";
-import { FileMetadata } from "@/models/LocalDataset/types";
-import { detectFieldDataTypes } from "./detectFieldDataTypes";
-import type { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
+import {
+  detectColumnDataTypes,
+  DetectedDatasetColumn,
+} from "./detectColumnDataTypes";
+
+type FileMetadata = {
+  name: string;
+  mimeType: MIMEType;
+  sizeInBytes: number;
+};
 
 // TODO(jpsyx): move this to lib/utils
 export function parseFileOrStringToCSV({
@@ -17,22 +24,22 @@ export function parseFileOrStringToCSV({
   delimiter: string;
 }): Promise<{
   fileMetadata?: FileMetadata;
-  fields: LocalDatasetField[];
-  csv: Papa.ParseResult<RawDataRecordRow>;
+  columns: DetectedDatasetColumn[];
+  csv: Papa.ParseResult<RawDataRow>;
 }> {
   return new Promise((resolve, reject) => {
-    Papa.parse<RawDataRecordRow>(dataToParse, {
+    Papa.parse<RawDataRow>(dataToParse, {
       // TODO(jpsyx): `header` should be toggleable eventually.
       header: firstRowIsHeader,
       delimiter,
-      complete: (results: Papa.ParseResult<RawDataRecordRow>) => {
+      complete: (results: Papa.ParseResult<RawDataRow>) => {
         const { meta, data, errors } = results;
         const csv = {
           data,
           meta,
           errors,
         };
-        const fields = detectFieldDataTypes(meta.fields ?? [], data);
+        const fields = detectColumnDataTypes(meta.fields ?? [], data);
 
         // check if there are any fields we've determined are dates
         const dateFields = fields.filter(propEquals("dataType", "date"));
@@ -61,7 +68,7 @@ export function parseFileOrStringToCSV({
 
         resolve({
           csv,
-          fields,
+          columns: fields,
           fileMetadata,
         });
       },
@@ -89,19 +96,19 @@ export function useCSVParser({
   firstRowIsHeader?: boolean;
   onNoFileProvided?: () => void;
 } = {}): {
-  csv: Papa.ParseResult<RawDataRecordRow> | undefined;
-  fields: readonly LocalDatasetField[];
+  csv: Papa.ParseResult<RawDataRow> | undefined;
+  columns: readonly DetectedDatasetColumn[];
   fileMetadata: FileMetadata | undefined;
   parseFile: (file: File | undefined) => void;
   parseCSVString: (csvString: string) => void;
 } {
-  const [csv, setCSV] = useState<
-    Papa.ParseResult<RawDataRecordRow> | undefined
-  >(undefined);
+  const [csv, setCSV] = useState<Papa.ParseResult<RawDataRow> | undefined>(
+    undefined,
+  );
   const [fileMetadata, setFileMetadata] = useState<FileMetadata | undefined>(
     undefined,
   );
-  const [fields, setFields] = useState<readonly LocalDatasetField[]>([]);
+  const [columns, setColumns] = useState<readonly DetectedDatasetColumn[]>([]);
 
   const parseFileOrString = useCallback(
     async (dataToParse: File | string) => {
@@ -113,7 +120,7 @@ export function useCSVParser({
 
       setCSV(result.csv);
       setFileMetadata(result.fileMetadata);
-      setFields(result.fields);
+      setColumns(result.columns);
     },
     [delimiter, firstRowIsHeader],
   );
@@ -137,5 +144,5 @@ export function useCSVParser({
     [parseFileOrString],
   );
 
-  return { csv, fields, fileMetadata, parseFile, parseCSVString };
+  return { csv, columns: columns, fileMetadata, parseFile, parseCSVString };
 }

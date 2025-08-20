@@ -3,20 +3,22 @@ import ehWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url";
 import mvpWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?url";
 import duckDBWasmEh from "@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url";
 import duckDBWasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
+import { invariant } from "@tanstack/react-router";
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
 import { Logger } from "@/lib/Logger";
-import { UnknownDataFrame } from "@/lib/types/common";
+import { MIMEType, UnknownDataFrame } from "@/lib/types/common";
 import { makeObjectFromList } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries } from "@/lib/utils/objects/misc";
 import { promiseMap } from "@/lib/utils/promises";
-import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
-import { getArrowDataType } from "@/models/LocalDataset/LocalDatasetField/utils";
-import { LocalDatasetId } from "@/models/LocalDataset/types";
-import type { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
-import type { LocalDataset } from "@/models/LocalDataset/types";
+import { DatasetId, DatasetWithColumns } from "@/models/datasets/Dataset";
+import { DatasetColumn } from "@/models/datasets/DatasetColumn";
+import { getArrowDataType } from "@/models/datasets/DatasetColumn/utils";
+import { unparseDataset } from "@/models/LocalDataset/utils";
+import { DatasetClient } from "./datsets/DatasetClient";
+import { DatasetRawDataClient } from "./datsets/DatasetRawDataClient";
 
 export type QueryAggregationType =
   | "sum"
@@ -27,10 +29,10 @@ export type QueryAggregationType =
   | "none";
 
 export type LocalQueryConfig = {
-  datasetId: LocalDatasetId;
-  selectFields: readonly LocalDatasetField[];
-  groupByFields: readonly LocalDatasetField[];
-  orderByField?: LocalDatasetField | undefined;
+  datasetId: DatasetId;
+  selectFields: readonly DatasetColumn[];
+  groupByFields: readonly DatasetColumn[];
+  orderByColumn?: DatasetColumn | undefined;
   orderByDirection?: "asc" | "desc";
 
   /**
@@ -97,7 +99,7 @@ const MANUAL_BUNDLES: duck.DuckDBBundles = {
   },
 };
 
-function datasetIdToTableName(datasetId: LocalDatasetId): string {
+function datasetIdToTableName(datasetId: DatasetId): string {
   return `dataset_${datasetId}`;
 }
 
@@ -127,8 +129,8 @@ class LocalDatasetQueryClientImpl {
     return this.#db;
   }
 
-  async #getDataset(datasetId: LocalDatasetId): Promise<LocalDataset> {
-    const dataset = await LocalDatasetClient.getById({ id: datasetId });
+  async #getDataset(datasetId: DatasetId): Promise<DatasetWithColumns> {
+    const dataset = await DatasetClient.getWithColumns({ id: datasetId });
     if (!dataset) {
       throw new Error(`Dataset ${datasetId} not found`);
     }
@@ -192,8 +194,13 @@ class LocalDatasetQueryClientImpl {
    * @param datasetId The ID of the dataset to load.
    * @returns A promise that resolves when the dataset is loaded.
    */
-  async loadDataset(datasetId: LocalDatasetId): Promise<void> {
-    const { data, fields } = await this.#getDataset(datasetId);
+  async loadDataset(datasetId: DatasetId): Promise<void> {
+    const { columns } = await this.#getDataset(datasetId);
+    const parsedRawData = await DatasetRawDataClient.getParsedRawData({
+      datasetId,
+    });
+    invariant(parsedRawData, "Raw data could not be found.");
+
     const tableName = datasetIdToTableName(datasetId);
 
     // first verify the table name doesn't already exist
@@ -204,21 +211,42 @@ class LocalDatasetQueryClientImpl {
     }
 
     await this.#withConnection(async ({ db, conn }) => {
+      // make sure all date columns are in ISO format so that they can be
+      // parsed by duckdb
+      const dateColumns = columns.filter((column) => {
+        return column.dataType === "date";
+      });
+
+      // mutable operations for performance reasons here
+      parsedRawData.forEach((row) => {
+        dateColumns.forEach((column) => {
+          const dateString = row[column.name];
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          row[column.name] =
+            dateString ? new Date(dateString).toISOString() : undefined;
+        });
+      });
+
       // register the dataset in the database as a file
-      await db.registerFileText(tableName, data);
+      const rawStringData = unparseDataset({
+        datasetType: MIMEType.TEXT_CSV,
+        data: parsedRawData,
+      });
+      await db.registerFileText(tableName, rawStringData);
 
       // insert the dataset as its own table
-      const arrowColumns = fields.map((fieldSchema: LocalDatasetField) => {
+      const arrowColumns = columns.map((column) => {
         return {
-          name: fieldSchema.name,
-          dataType: getArrowDataType(fieldSchema.dataType),
+          name: column.name,
+          dataType: getArrowDataType(column.dataType),
         };
       });
 
       await conn.insertCSVFromPath(tableName, {
         name: tableName,
         schema: "main",
-        detect: false,
+        detect: true,
         header: true,
         delimiter: ",",
         columns: makeObjectFromList(arrowColumns, {
@@ -234,7 +262,7 @@ class LocalDatasetQueryClientImpl {
     groupByFields,
     aggregations,
     datasetId,
-    orderByField,
+    orderByColumn,
     orderByDirection,
   }: LocalQueryConfig): Promise<LocalQueryResultData> {
     const selectFieldNames = selectFields.map(getProp("name"));
@@ -255,8 +283,8 @@ class LocalDatasetQueryClientImpl {
         query = query.groupBy(...groupByFieldNames);
       }
 
-      if (orderByField && orderByDirection) {
-        query = query.orderBy(orderByField.name, orderByDirection);
+      if (orderByColumn && orderByDirection) {
+        query = query.orderBy(orderByColumn.name, orderByDirection);
       }
 
       // apply aggregations

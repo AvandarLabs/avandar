@@ -14,12 +14,12 @@ import { UserId } from "../User/types";
 import { Workspace, WorkspaceId, WorkspaceModel } from "./types";
 
 const DBReadSchema = z.object({
-  created_at: z.string().datetime({ offset: true }),
-  id: z.string().uuid(),
-  owner_id: z.string().uuid(),
+  created_at: z.iso.datetime({ offset: true }),
+  id: z.uuid(),
+  owner_id: z.uuid(),
   name: z.string(),
   slug: z.string(),
-  updated_at: z.string().datetime({ offset: true }),
+  updated_at: z.iso.datetime({ offset: true }),
 });
 
 export const WorkspaceParsers = makeParserRegistry<WorkspaceModel>().build({

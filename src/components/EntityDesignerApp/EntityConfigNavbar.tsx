@@ -34,14 +34,13 @@ export function EntityConfigNavbar({
             entityConfigName: entity.name,
           }),
           style: borderStyle,
-          linkKey: entity.id,
         };
       }),
       {
         to: AppLinks.entityDesignerCreatorView(workspace.slug).to,
         label: "Create new profile type",
         style: borderStyle,
-        linkKey: "create-new",
+        key: "create-new",
       },
     ];
     return entityConfigLinks;

@@ -7,7 +7,9 @@ import {
 } from "./filterTypes";
 
 /**
- * Helper function to create a filter for a specific column.
+ * Helper function to create a `where` filter for a specific column.
+ * This returns a single-key object, with a `where` key, which contains
+ * the filter object.
  *
  * @param column The column to filter by.
  * @param operator The operator to use for the filter.

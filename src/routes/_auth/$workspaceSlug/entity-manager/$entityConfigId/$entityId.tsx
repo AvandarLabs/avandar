@@ -5,12 +5,12 @@ import {
   notFound,
 } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { EntityNewClient } from "@/clients/entities/EntityNewClient";
 import { SingleEntityView } from "@/components/EntityManagerApp/SingleEntityView";
 import { Logger } from "@/lib/Logger";
 import { Callout } from "@/lib/ui/Callout";
 import { uuid } from "@/lib/utils/uuid";
-import { EntityClient } from "@/models/Entity/EntityClient";
-import { Entity } from "@/models/Entity/types";
+import { Entity } from "@/models/entities/Entity";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityConfig } from "@/models/EntityConfig/types";
 
@@ -23,7 +23,7 @@ export const Route = createFileRoute(
   }): Promise<{ entityConfig: EntityConfig; entity: Entity }> => {
     const [entityConfig, entity] = await Promise.all([
       EntityConfigClient.getById({ id: uuid(entityConfigId) }),
-      EntityClient.ofType(uuid(entityConfigId)).getById({ id: uuid(entityId) }),
+      EntityNewClient.getById({ id: uuid(entityId) }),
     ]);
     if (!entityConfig || !entity) {
       throw notFound();
