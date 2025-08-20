@@ -179,6 +179,8 @@ export function DatasetColumnFieldsBlock({
     }
   }, [entityConfigForm, addedFields, selectedFieldId, updateFieldToColumnMap]);
 
+  const { sourceDatasets } = entityConfigForm.getValues();
+
   return (
     <Fieldset legend="Fields that come from datasets">
       <Stack>
@@ -263,7 +265,7 @@ export function DatasetColumnFieldsBlock({
         </Group>
 
         <Divider my="xs" />
-        {localDatasetsToUse && localDatasetsToUse.length > 1 ?
+        {sourceDatasets.length > 1 ?
           <Callout.Info
             title="Configure how to join datasets"
             icon={<IconCircleNumber2Filled />}
