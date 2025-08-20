@@ -139,3 +139,35 @@ export type ReplaceTypes<
   [K in keyof OriginalObject]: K extends keyof NewTypes ? NewTypes[K]
   : OriginalObject[K];
 };
+
+/**
+ * Converts a union of string literals into a record mapping each key
+ * to `true`. This is a useful hack for when we are starting from a union
+ * of string literals at the type level and need to enforce that an array
+ * tuple has EVERY possible value from the string literal union.
+ *
+ * The `UnionToTuple` type from type-fest is not stable and not a reliable
+ * solution. So, instead we can create the array by using a registry.
+ *
+ * Example:
+ * ```ts
+ * type Letter = "a" | "b" | "c";
+ *
+ * const LETTERS = objectKeys({
+ *   a: true,
+ *   b: true,
+ *   c: true,
+ * } satisfies Registry<Letter>);
+ * ```
+ *
+ * `Letters` is of type `("a" | "b" | "c")[]`. But if we exclude any of
+ * the keys from the object (e.g. if "c" is removed from the object) then
+ * you'd get a type error.
+ *
+ * This way we can be notified if a union is ever changed at the type-level,
+ * we will be forced to also update this registry. That way the array remains
+ * consistent with the type.
+ */
+export type Registry<StringLiteralUnion extends string> = {
+  [K in StringLiteralUnion]: true;
+};

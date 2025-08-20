@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
 import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
 import { Select, SelectOption } from "@/lib/ui/inputs/Select";
-import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
-import { getValidQueryAggregationsByType } from "@/models/LocalDataset/LocalDatasetField/utils";
+import { DatasetColumn } from "@/models/datasets/DatasetColumn";
+import { getValidQueryAggregationsByType } from "@/models/datasets/DatasetColumn/utils";
 
 type Props = {
-  column: LocalDatasetField;
+  column: DatasetColumn;
   value?: QueryAggregationType;
   onChange: (aggregation: QueryAggregationType) => void;
 };

@@ -1,41 +1,52 @@
 import { Box, Flex, Loader, MantineTheme } from "@mantine/core";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { partition } from "@/lib/utils/arrays";
 import { isNotInSet } from "@/lib/utils/sets/higherOrderFuncs";
 import { wrapString } from "@/lib/utils/strings/higherOrderFuncs";
 import { wordJoin } from "@/lib/utils/strings/transformations";
+import { DatasetId } from "@/models/datasets/Dataset";
+import { DatasetColumn } from "@/models/datasets/DatasetColumn";
 import { QueryForm } from "./QueryForm";
 import { useDataQuery } from "./useDataQuery";
-import { useExplorerDraft } from "./useExplorerDraft";
 import { VisualizationContainer } from "./VisualizationContainer";
 import { VizSettingsForm } from "./VizSettingsForm";
+import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
+import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { VizConfig, makeDefaultVizConfig } from "./VizSettingsForm/makeDefaultVizConfig";
 
 const QUERY_FORM_WIDTH = 300;
 
 export function DataExplorerApp(): JSX.Element {
-  const {
-    aggregations,
-    setAggregations,
-    selectedDatasetId,
-    setSelectedDatasetId,
-    selectedFields,
-    setSelectedFields,
-    selectedGroupByFields,
-    setSelectedGroupByFields,
-    vizConfig,
-    setVizConfig,
-  } = useExplorerDraft();
+  const [aggregations, setAggregations] = useState<
+    // field name -> query aggregation type
+    Record<string, QueryAggregationType>
+  >({});
+  const [selectedDatasetId, setSelectedDatasetId] = useState<
+    DatasetId | undefined
+  >(undefined);
+  const [selectColumns, setSelectedFields] = useState<readonly DatasetColumn[]>(
+    [],
+  );
+  const [selectGroupByColumns, setSelectedGroupByFields] = useState<
+    readonly DatasetColumn[]
+  >([]);
+  const [orderByColumn, setOrderByColumn] = useState<DatasetColumn | undefined>(
+    undefined,
+  );
+
+  const [orderByDirection, setOrderByDirection] = useState<"asc" | "desc">(
+    "asc",
+  );
+  const [vizConfig, setVizConfig] = useState<VizConfig>(() => {
+    return makeDefaultVizConfig("table");
+  });
 
   const selectedFieldNames = useMemo(() => {
-    return selectedFields.map((f) => {
-      return f.name;
-    });
-  }, [selectedFields]);
+    return selectColumns.map(getProp("name"));
+  }, [selectColumns]);
   const selectedGroupByFieldNames = useMemo(() => {
-    return selectedGroupByFields.map((f) => {
-      return f.name;
-    });
-  }, [selectedGroupByFields]);
+    return selectGroupByColumns.map(getProp("name"));
+  }, [selectGroupByColumns]);
 
   const [isValidQuery, errorMessage] = useMemo(() => {
     // 1. There must be at least one field selected
@@ -87,8 +98,10 @@ export function DataExplorerApp(): JSX.Element {
     enabled: !!selectedDatasetId && isValidQuery,
     aggregations,
     datasetId: selectedDatasetId,
-    selectFields: selectedFields,
-    groupByFields: selectedGroupByFields,
+    selectFields: selectColumns,
+    groupByFields: selectGroupByColumns,
+    orderByColumn,
+    orderByDirection,
   });
 
   const { fields, data } = useMemo(() => {
@@ -112,12 +125,15 @@ export function DataExplorerApp(): JSX.Element {
         <QueryForm
           aggregations={aggregations}
           selectedDatasetId={selectedDatasetId}
-          selectedFields={selectedFields}
-          selectedGroupByFields={selectedGroupByFields}
+          selectedColumns={selectColumns}
+          orderByColumn={orderByColumn}
           onAggregationsChange={setAggregations}
           onFromDatasetChange={setSelectedDatasetId}
-          onSelectFieldsChange={setSelectedFields}
+          onSelectColumnsChange={setSelectedFields}
           onGroupByChange={setSelectedGroupByFields}
+          onOrderByColumnChange={setOrderByColumn}
+          orderByDirection={orderByDirection}
+          onOrderByDirectionChange={setOrderByDirection}
           errorMessage={errorMessage}
         />
         <VizSettingsForm

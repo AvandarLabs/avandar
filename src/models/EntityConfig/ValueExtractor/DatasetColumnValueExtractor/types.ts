@@ -1,10 +1,10 @@
 import { SetOptional, Simplify } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
-import { LocalDatasetId } from "@/models/LocalDataset/types";
+import { DatasetId } from "@/models/datasets/Dataset";
+import { DatasetColumnId } from "@/models/datasets/DatasetColumn";
 import { WorkspaceId } from "@/models/Workspace/types";
 import type { EntityFieldConfigId } from "../../EntityFieldConfig/types";
 import type { UUID } from "@/lib/types/common";
-import type { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
 
 export type DatasetColumnValueExtractorId = UUID<"DatasetColumnValueExtractor">;
 
@@ -27,14 +27,14 @@ type DatasetColumnValueExtractorRead = {
   valuePickerRuleType: ValuePickerRuleType;
 
   /** ID of the dataset to extract from */
-  datasetId: LocalDatasetId;
+  datasetId: DatasetId;
 
   /**
    * ID of the specific field in the dataset to extract from
    *
    * TODO(jpsyx): this should be renamed to `datasetColumnId`
    */
-  datasetFieldId: LocalDatasetFieldId;
+  datasetFieldId: DatasetColumnId;
 
   /** Creation timestamp */
   createdAt: string;

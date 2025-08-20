@@ -1,9 +1,9 @@
 import { useMemo } from "react";
+import { DatasetClient } from "@/clients/datsets/DatasetClient";
 import { where } from "@/lib/utils/filters/filterBuilders";
+import { DatasetId } from "@/models/datasets/Dataset";
 import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
 import { EntityConfig } from "@/models/EntityConfig/types";
-import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
-import { LocalDatasetId } from "@/models/LocalDataset/types";
 
 /**
  * Given an entity config, finish hydrating it.
@@ -38,7 +38,7 @@ export function useHydratedEntityConfig({
     });
 
   const datasetsToLoad = useMemo(() => {
-    const datasetIds = new Set<LocalDatasetId>();
+    const datasetIds = new Set<DatasetId>();
     valueExtractors?.forEach((extractor) => {
       if (extractor.type === "dataset_column_value") {
         datasetIds.add(extractor.datasetId);
@@ -47,7 +47,7 @@ export function useHydratedEntityConfig({
     return [...datasetIds];
   }, [valueExtractors]);
 
-  const [localDatasets, isLoadingDatasets] = LocalDatasetClient.useGetAll({
+  const [datasets, isLoadingDatasets] = DatasetClient.useGetAll({
     ...where("id", "in", datasetsToLoad),
     useQueryOptions: {
       enabled: datasetsToLoad.length > 0,
@@ -57,7 +57,7 @@ export function useHydratedEntityConfig({
   const hydratedEntityConfig: EntityConfig<"Full"> = useMemo(() => {
     return {
       ...entityConfig,
-      datasets: localDatasets,
+      datasets,
       fields: entityFields?.map((field) => {
         const { valueExtractorType } = field.options;
         const valueExtractor = valueExtractors?.find((extractor) => {
@@ -71,7 +71,7 @@ export function useHydratedEntityConfig({
         };
       }),
     };
-  }, [entityConfig, localDatasets, entityFields, valueExtractors]);
+  }, [entityConfig, datasets, entityFields, valueExtractors]);
 
   return [
     hydratedEntityConfig,
