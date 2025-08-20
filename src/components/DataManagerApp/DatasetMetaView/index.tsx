@@ -6,7 +6,6 @@ import {
   Group,
   Loader,
   MantineTheme,
-  Paper,
   Stack,
   Tabs,
   Text,
@@ -26,6 +25,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
+import { Paper } from "@/lib/ui/Paper";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { Dataset, DatasetWithColumns } from "@/models/datasets/Dataset";
