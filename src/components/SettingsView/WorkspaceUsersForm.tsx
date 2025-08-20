@@ -52,6 +52,8 @@ export function WorkspaceUserForm(): JSX.Element {
   });
 
   const handleFakeInvite = () => {
+    setInviteEmail("");
+    setInviteRole("member");
     notifyNotImplemented();
     close();
   };
