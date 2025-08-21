@@ -3,37 +3,46 @@ import { useCallback, useMemo } from "react";
 import { makeDefaultVizConfig } from "./VizSettingsForm/makeDefaultVizConfig";
 import type { VizConfig } from "./VizSettingsForm/makeDefaultVizConfig";
 import type { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
-import type { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
-import type { LocalDatasetId } from "@/models/LocalDataset/types";
+import type { DatasetId } from "@/models/datasets/Dataset";
+import type { DatasetColumn } from "@/models/datasets/DatasetColumn";
 
 export type UseExplorerDraftReturn = {
   aggregations: Record<string, QueryAggregationType>;
-  selectedDatasetId?: LocalDatasetId;
-  selectedFields: readonly LocalDatasetField[];
-  selectedGroupByFields: readonly LocalDatasetField[];
+  selectedDatasetId?: DatasetId;
+  selectedColumns: readonly DatasetColumn[];
+  selectGroupByColumns: readonly DatasetColumn[];
+  orderByColumn?: DatasetColumn;
+  orderByDirection: "asc" | "desc";
   vizConfig: VizConfig;
 
   setAggregations: (agg: Record<string, QueryAggregationType>) => void;
-  setSelectedDatasetId: (id: LocalDatasetId | undefined) => void;
-  setSelectedFields: (fields: readonly LocalDatasetField[]) => void;
-  setSelectedGroupByFields: (fields: readonly LocalDatasetField[]) => void;
+  setSelectedDatasetId: (id: DatasetId | undefined) => void;
+  setSelectedColumns: (cols: readonly DatasetColumn[]) => void;
+  setSelectGroupByColumns: (cols: readonly DatasetColumn[]) => void;
+  setOrderByColumn: (col: DatasetColumn | undefined) => void;
+  setOrderByDirection: (dir: "asc" | "desc") => void;
   setVizConfig: (vc: VizConfig) => void;
+
   reset: () => void;
 };
 
 type ExplorerDraft = {
   aggregations: Record<string, QueryAggregationType>;
-  selectedDatasetId?: LocalDatasetId;
-  selectedFields: readonly LocalDatasetField[];
-  selectedGroupByFields: readonly LocalDatasetField[];
+  selectedDatasetId?: DatasetId;
+  selectedColumns: readonly DatasetColumn[];
+  selectGroupByColumns: readonly DatasetColumn[];
+  orderByColumn?: DatasetColumn;
+  orderByDirection: "asc" | "desc";
   vizConfig: VizConfig;
 };
 
 const DEFAULTS: ExplorerDraft = {
   aggregations: {},
   selectedDatasetId: undefined,
-  selectedFields: [],
-  selectedGroupByFields: [],
+  selectedColumns: [],
+  selectGroupByColumns: [],
+  orderByColumn: undefined,
+  orderByDirection: "asc",
   vizConfig: makeDefaultVizConfig("table"),
 };
 
@@ -42,7 +51,7 @@ const DRAFT_KEY = ["data-explorer", "draft"] as const;
 export function useExplorerDraft(): UseExplorerDraftReturn {
   const qc = useQueryClient();
 
-  // SUBSCRIBE to changes
+  // subscribe to the draft
   const { data: draft = DEFAULTS } = useQuery({
     queryKey: DRAFT_KEY,
     queryFn: async () => {
@@ -56,10 +65,7 @@ export function useExplorerDraft(): UseExplorerDraftReturn {
   const patch = useCallback(
     (update: Partial<ExplorerDraft>) => {
       qc.setQueryData<ExplorerDraft>(DRAFT_KEY, (prev = DEFAULTS) => {
-        return {
-          ...prev,
-          ...update,
-        };
+        return { ...prev, ...update };
       });
     },
     [qc],
@@ -71,50 +77,81 @@ export function useExplorerDraft(): UseExplorerDraftReturn {
     },
     [patch],
   );
+
   const setSelectedDatasetId = useCallback(
-    (id: ExplorerDraft["selectedDatasetId"]) => {
+    (id: DatasetId | undefined) => {
       return patch({ selectedDatasetId: id });
     },
     [patch],
   );
-  const setSelectedFields = useCallback(
-    (fields: ExplorerDraft["selectedFields"]) => {
-      return patch({ selectedFields: fields });
+
+  const setSelectedColumns = useCallback(
+    (cols: readonly DatasetColumn[]) => {
+      return patch({ selectedColumns: cols });
     },
     [patch],
   );
-  const setSelectedGroupByFields = useCallback(
-    (fields: ExplorerDraft["selectedGroupByFields"]) => {
-      return patch({ selectedGroupByFields: fields });
+
+  const setSelectGroupByColumns = useCallback(
+    (cols: readonly DatasetColumn[]) => {
+      return patch({ selectGroupByColumns: cols });
     },
     [patch],
   );
+
+  const setOrderByColumn = useCallback(
+    (col: DatasetColumn | undefined) => {
+      return patch({ orderByColumn: col });
+    },
+    [patch],
+  );
+
+  const setOrderByDirection = useCallback(
+    (dir: "asc" | "desc") => {
+      return patch({ orderByDirection: dir });
+    },
+    [patch],
+  );
+
   const setVizConfig = useCallback(
-    (vc: ExplorerDraft["vizConfig"]) => {
+    (vc: VizConfig) => {
       return patch({ vizConfig: vc });
     },
     [patch],
   );
+
   const reset = useCallback(() => {
     return qc.setQueryData<ExplorerDraft>(DRAFT_KEY, DEFAULTS);
   }, [qc]);
 
   return useMemo(() => {
     return {
-      ...draft,
+      aggregations: draft.aggregations,
+      selectedDatasetId: draft.selectedDatasetId,
+      selectedColumns: draft.selectedColumns,
+      selectGroupByColumns: draft.selectGroupByColumns,
+      orderByColumn: draft.orderByColumn,
+      orderByDirection: draft.orderByDirection,
+      vizConfig: draft.vizConfig,
+
       setAggregations,
       setSelectedDatasetId,
-      setSelectedFields,
-      setSelectedGroupByFields,
+      setSelectedColumns,
+      setSelectGroupByColumns,
+      setOrderByColumn,
+      setOrderByDirection,
       setVizConfig,
+
       reset,
     };
   }, [
     draft,
     setAggregations,
     setSelectedDatasetId,
-    setSelectedFields,
-    setSelectedGroupByFields,
+    setSelectedColumns,
+    setSelectGroupByColumns,
+    setOrderByColumn,
+    setOrderByDirection,
     setVizConfig,
     reset,
   ]);

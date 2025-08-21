@@ -1,6 +1,6 @@
 import { invariant } from "@tanstack/react-router";
-import { DatasetClient } from "@/clients/datsets/DatasetClient";
-import { DatasetRawDataClient } from "@/clients/datsets/DatasetRawDataClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { PullDataStepConfig } from "../pipelineTypes";
 import { PipelineContext } from "./runPipeline";
 

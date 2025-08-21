@@ -1,104 +1,89 @@
 import { Box, Flex, Loader, MantineTheme } from "@mantine/core";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { partition } from "@/lib/utils/arrays";
+import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { isNotInSet } from "@/lib/utils/sets/higherOrderFuncs";
 import { wrapString } from "@/lib/utils/strings/higherOrderFuncs";
 import { wordJoin } from "@/lib/utils/strings/transformations";
-import { DatasetId } from "@/models/datasets/Dataset";
-import { DatasetColumn } from "@/models/datasets/DatasetColumn";
 import { QueryForm } from "./QueryForm";
 import { useDataQuery } from "./useDataQuery";
+import { useExplorerDraft } from "./useExplorerDraft";
 import { VisualizationContainer } from "./VisualizationContainer";
 import { VizSettingsForm } from "./VizSettingsForm";
-import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
-import { VizConfig, makeDefaultVizConfig } from "./VizSettingsForm/makeDefaultVizConfig";
 
 const QUERY_FORM_WIDTH = 300;
 
 export function DataExplorerApp(): JSX.Element {
-  const [aggregations, setAggregations] = useState<
-    // field name -> query aggregation type
-    Record<string, QueryAggregationType>
-  >({});
-  const [selectedDatasetId, setSelectedDatasetId] = useState<
-    DatasetId | undefined
-  >(undefined);
-  const [selectColumns, setSelectedFields] = useState<readonly DatasetColumn[]>(
-    [],
-  );
-  const [selectGroupByColumns, setSelectedGroupByFields] = useState<
-    readonly DatasetColumn[]
-  >([]);
-  const [orderByColumn, setOrderByColumn] = useState<DatasetColumn | undefined>(
-    undefined,
-  );
+  const {
+    // persisted explorer state (from your hook)
+    aggregations,
+    setAggregations,
+    selectedDatasetId,
+    setSelectedDatasetId,
 
-  const [orderByDirection, setOrderByDirection] = useState<"asc" | "desc">(
-    "asc",
-  );
-  const [vizConfig, setVizConfig] = useState<VizConfig>(() => {
-    return makeDefaultVizConfig("table");
-  });
+    // develop API names, exposed by the hook
+    selectedColumns,
+    setSelectedColumns,
+    selectGroupByColumns,
+    setSelectGroupByColumns,
+
+    orderByColumn,
+    setOrderByColumn,
+    orderByDirection,
+    setOrderByDirection,
+
+    vizConfig,
+    setVizConfig,
+  } = useExplorerDraft();
 
   const selectedFieldNames = useMemo(() => {
-    return selectColumns.map(getProp("name"));
-  }, [selectColumns]);
+    return selectedColumns.map(getProp("name"));
+  }, [selectedColumns]);
+
   const selectedGroupByFieldNames = useMemo(() => {
     return selectGroupByColumns.map(getProp("name"));
   }, [selectGroupByColumns]);
 
   const [isValidQuery, errorMessage] = useMemo(() => {
-    // 1. There must be at least one field selected
     if (selectedFieldNames.length === 0) {
       return [
         false,
         "At least one column must be selected for the query to run",
-      ];
+      ] as const;
     }
 
-    // 2. If there is at least 1 GROUP BY or at least 1 aggregated column, then
-    // ALL columns must be either in the GROUP BY or have an aggregation.
-    const [nonAggregatedColumnNames, aggregatedColumnNames] = partition(
-      selectedFieldNames,
-      (columnName) => {
-        return aggregations[columnName] === "none";
-      },
-    );
+    const [nonAgg, agg] = partition(selectedFieldNames, (name) => {
+      return aggregations[name] === "none";
+    });
 
-    if (
-      aggregatedColumnNames.length !== 0 ||
-      selectedGroupByFieldNames.length !== 0
-    ) {
-      const groupByColumnNames = new Set(selectedGroupByFieldNames);
-      const columnsWithoutGroupOrAggregation = nonAggregatedColumnNames.filter(
-        isNotInSet(groupByColumnNames),
-      );
-      if (columnsWithoutGroupOrAggregation.length > 0) {
-        // generate the error message
-        const columnsListStr = wordJoin(
-          columnsWithoutGroupOrAggregation.map(wrapString('"')),
-        );
-        const pluralizedColumnsString =
-          columnsWithoutGroupOrAggregation.length === 1 ?
-            `Column ${columnsListStr} needs`
-          : `Columns ${columnsListStr} need`;
-        const errMsg = `If one column is in the Group By or has an aggregation,
-        then all columns must be in the Group By or have an aggregation.
-        ${pluralizedColumnsString} to be added to the Group By or have an aggregation.`;
+    if (agg.length !== 0 || selectedGroupByFieldNames.length !== 0) {
+      const groupBySet = new Set(selectedGroupByFieldNames);
+      const missing = nonAgg.filter(isNotInSet(groupBySet));
 
-        return [false, errMsg];
+      if (missing.length > 0) {
+        const list = wordJoin(missing.map(wrapString('"')));
+        const needs =
+          missing.length === 1 ?
+            `Column ${list} needs`
+          : `Columns ${list} need`;
+
+        const msg =
+          `If one column is in the Group By or has an aggregation, ` +
+          `then all columns must be in the Group By or have an aggregation. ` +
+          `${needs} to be added to the Group By or have an aggregation.`;
+
+        return [false, msg] as const;
       }
     }
 
-    return [true, undefined];
+    return [true, undefined] as const;
   }, [selectedFieldNames, selectedGroupByFieldNames, aggregations]);
 
   const [queryResults, isLoadingResults] = useDataQuery({
     enabled: !!selectedDatasetId && isValidQuery,
     aggregations,
     datasetId: selectedDatasetId,
-    selectFields: selectColumns,
+    selectFields: selectedColumns,
     groupByFields: selectGroupByColumns,
     orderByColumn,
     orderByDirection,
@@ -125,27 +110,31 @@ export function DataExplorerApp(): JSX.Element {
         <QueryForm
           aggregations={aggregations}
           selectedDatasetId={selectedDatasetId}
-          selectedColumns={selectColumns}
+          selectedColumns={selectedColumns}
+          selectGroupByColumns={selectGroupByColumns}
           orderByColumn={orderByColumn}
+          orderByDirection={orderByDirection}
           onAggregationsChange={setAggregations}
           onFromDatasetChange={setSelectedDatasetId}
-          onSelectColumnsChange={setSelectedFields}
-          onGroupByChange={setSelectedGroupByFields}
+          onSelectColumnsChange={setSelectedColumns}
+          onGroupByChange={setSelectGroupByColumns}
           onOrderByColumnChange={setOrderByColumn}
-          orderByDirection={orderByDirection}
           onOrderByDirectionChange={setOrderByDirection}
           errorMessage={errorMessage}
         />
+
         <VizSettingsForm
           fields={fields}
           vizConfig={vizConfig}
           onVizConfigChange={setVizConfig}
         />
       </Box>
+
       <Box pos="relative" flex={1} px="sm" py="md">
         {isLoadingResults ?
           <Loader />
         : null}
+
         <VisualizationContainer
           vizConfig={vizConfig}
           fields={fields}

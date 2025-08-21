@@ -5,7 +5,7 @@ import {
   notFound,
 } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { DatasetClient } from "@/clients/datsets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetMetaView } from "@/components/DataManagerApp/DatasetMetaView";
 import { Logger } from "@/lib/Logger";
 import { Callout } from "@/lib/ui/Callout";
