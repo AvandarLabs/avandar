@@ -1,6 +1,6 @@
 import { Loader, Select, Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
-import { DatasetClient } from "@/clients/datsets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNotUndefined } from "@/lib/utils/guards";

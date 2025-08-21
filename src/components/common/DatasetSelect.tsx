@@ -1,7 +1,7 @@
 import { useUncontrolled } from "@mantine/hooks";
 import { useCallback, useMemo } from "react";
 import { match } from "ts-pattern";
-import { DatasetClient } from "@/clients/datsets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
 import { Select, SelectOptionGroup, SelectProps } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";

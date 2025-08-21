@@ -9,8 +9,8 @@ import {
 } from "@mantine/core";
 import { usePrevious, useUncontrolled } from "@mantine/hooks";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import { DatasetClient } from "@/clients/datsets/DatasetClient";
-import { DatasetColumnClient } from "@/clients/datsets/DatasetColumnClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
 import {
   SegmentedControl,
