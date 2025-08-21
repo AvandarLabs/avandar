@@ -13,7 +13,7 @@ import { useQuery } from "@/lib/hooks/query/useQuery";
 import { Logger } from "@/lib/Logger";
 import { MIMEType } from "@/lib/types/common";
 import { GPickerDocumentObject } from "@/lib/types/google-picker";
-import { notifyError } from "@/lib/ui/notifications/notifyError";
+import { notifyError } from "@/lib/ui/notifications/notify";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
 import { csvCellValueSchema } from "@/lib/utils/zodHelpers";

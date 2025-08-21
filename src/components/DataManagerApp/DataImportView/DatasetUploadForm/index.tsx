@@ -1,4 +1,4 @@
-import { Button, Stack, TextInput, Title } from "@mantine/core";
+import { Button, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
@@ -6,10 +6,11 @@ import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useMutation } from "@/lib/hooks/query/useMutation";
-import { RawDataRow } from "@/lib/types/common";
+import { UnknownObject } from "@/lib/types/common";
+import { Callout } from "@/lib/ui/Callout";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
-import { notifyError } from "@/lib/ui/notifications/notifyError";
-import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
+import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
+import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { Dataset } from "@/models/datasets/Dataset";
 import { DetectedDatasetColumn } from "../../hooks/detectColumnDataTypes";
@@ -27,7 +28,7 @@ type Props = {
    * Regardless of how many rows are passed in, only the first
    * `AppConfig.dataManagerApp.maxPreviewRows` will be displayed.
    */
-  rows: RawDataRow[];
+  rows: UnknownObject[];
   defaultName: string;
   columns: readonly DetectedDatasetColumn[];
   doDatasetSave: (values: DatasetUploadForm) => Promise<Dataset>;
@@ -99,37 +100,50 @@ export function DatasetUploadForm({
 
   const columnNames = columns.map(getProp("name"));
   return (
-    <Stack w="100%">
-      <Title order={3}>Data Preview</Title>
-      <DataGrid columnNames={columnNames} data={previewRows} />
-      <form
-        onSubmit={form.onSubmit((values) => {
-          saveDataset(values);
-        })}
-      >
-        <Stack>
-          <TextInput
-            key={form.key("name")}
-            label="Dataset Name"
-            placeholder="Enter a name for this dataset"
-            required
-            {...form.getInputProps("name")}
-          />
-          <TextInput
-            key={form.key("description")}
-            label="Description"
-            placeholder="Enter a description for this dataset"
-            {...form.getInputProps("description")}
-          />
-          <Button
-            loading={isSavePending}
-            type="submit"
-            disabled={disableSubmit}
-          >
-            Save Dataset
-          </Button>
-        </Stack>
-      </form>
-    </Stack>
+    <form
+      onSubmit={form.onSubmit((values) => {
+        saveDataset(values);
+      })}
+    >
+      <Stack>
+        <TextInput
+          key={form.key("name")}
+          label="Dataset Name"
+          placeholder="Enter a name for this dataset"
+          required
+          {...form.getInputProps("name")}
+        />
+        <TextInput
+          key={form.key("description")}
+          label="Description"
+          placeholder="Enter a description for this dataset"
+          {...form.getInputProps("description")}
+        />
+        <Callout
+          title="Data Preview"
+          color="info"
+          message={` These are the first ${rows.length} rows of your dataset.
+            Check to see if the data is correct. If they are not, change the
+            import options above and click Upload again.`}
+        />
+        <DataGrid columnNames={columnNames} data={previewRows} />
+        <Callout
+          title="Column info"
+          color="info"
+          message={`${columns.length} columns were detected. Review the column
+            info below to make sure they are correct. If they are not, change
+            the import options above and click Upload again.`}
+        />
+        <ObjectDescriptionList
+          data={columns}
+          renderAsTable
+          itemRenderOptions={{ excludeKeys: ["columnIdx"] }}
+        />
+
+        <Button loading={isSavePending} type="submit" disabled={disableSubmit}>
+          Save Dataset
+        </Button>
+      </Stack>
+    </form>
   );
 }

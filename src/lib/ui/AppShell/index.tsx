@@ -24,13 +24,9 @@ import {
   IconSearch,
   IconSwitch2,
   IconUser,
-} from "@tabler/icons-react";
-import {
-  Outlet,
   ReactNode,
-  useNavigate,
-  useRouter,
-} from "@tanstack/react-router";
+} from "@tabler/icons-react";
+import { Outlet, useNavigate, useRouter } from "@tanstack/react-router";
 import clsx from "clsx";
 import { AuthClient } from "@/clients/AuthClient";
 import { AppConfig } from "@/config/AppConfig";
@@ -44,7 +40,7 @@ import { Modal } from "@/lib/ui/Modal";
 import { Workspace } from "@/models/Workspace/types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 import { WorkspaceForm } from "../../../components/common/forms/WorkspaceForm";
-import { notifySuccess } from "../notifications/notifySuccess";
+import { notifySuccess } from "../notifications/notify";
 import css from "./AppShell.module.css";
 
 const HEADER_DEFAULT_HEIGHT = 60;

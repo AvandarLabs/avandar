@@ -60,6 +60,9 @@ async function sendHTTPRequest<Route extends keyof API>(
   throw error ? error : new Error("No data returned");
 }
 
+/**
+ * HTTP client for making requests to our Supabase edge functions API.
+ */
 export const APIClient = {
   get: async <Route extends keyof API>(
     route: Route,

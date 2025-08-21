@@ -17,9 +17,8 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useWorkspaceRole } from "@/hooks/workspaces/useWorkspaceRole";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { Modal } from "@/lib/ui/Modal";
-import { notifyError } from "@/lib/ui/notifications/notifyError";
+import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 import { notifyNotImplemented } from "@/lib/ui/notifications/notifyNotImplemented";
-import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
 import { WorkspaceRole } from "@/models/Workspace/types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
