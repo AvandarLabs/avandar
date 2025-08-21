@@ -5,6 +5,7 @@ import { QueryResultField } from "@/clients/LocalDatasetQueryClient";
 import { UnknownDataFrame } from "@/lib/types/common";
 import { BarChart } from "@/lib/ui/data-viz/BarChart";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
+import { LineChart } from "@/lib/ui/data-viz/LineChart";
 import { DangerText } from "@/lib/ui/Text/DangerText";
 import { isEpochMs, isIsoDateString } from "@/lib/utils/formatters/formatDate";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
@@ -32,6 +33,8 @@ const BarChartSettingsSchema = z.object({
     },
   }),
 });
+
+const LineChartSettingsSchema = BarChartSettingsSchema;
 
 export function VisualizationContainer({
   vizConfig,
@@ -82,6 +85,18 @@ export function VisualizationContainer({
       }
       const errorMessages = z.prettifyError(error);
       return <DangerText>{errorMessages}</DangerText>;
+    })
+    .with({ type: "line" }, (config) => {
+      const {
+        success,
+        data: settings,
+        error,
+      } = LineChartSettingsSchema.safeParse(config.settings);
+
+      if (success) {
+        return <LineChart data={data} height={700} {...settings} />;
+      }
+      return <DangerText>{z.prettifyError(error)}</DangerText>;
     })
     .exhaustive();
 }
