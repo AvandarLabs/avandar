@@ -47,20 +47,23 @@ function getDefaultFieldSchema(
       camelToTitleCase(fieldKey, { capitalizeFirstLetter: true }),
   };
 
-  return match(providedSchema)
-    .with({ semanticType: "email" }, () => {
-      return {
-        name: "email",
-        autoComplete: "email",
-        ...processedSchema,
-      };
-    })
-    .with({ semanticType: "text" }, () => {
-      return processedSchema;
-    })
-    .exhaustive(() => {
-      return processedSchema;
-    });
+  if (processedSchema.semanticType) {
+    return match(processedSchema.semanticType)
+      .with("email", () => {
+        return {
+          name: "email",
+          autoComplete: "email",
+          ...processedSchema,
+        };
+      })
+      .with("text", () => {
+        return processedSchema;
+      })
+      .exhaustive(() => {
+        return processedSchema;
+      });
+  }
+  return processedSchema;
 }
 
 function getDefaultSemanticValidationFn(

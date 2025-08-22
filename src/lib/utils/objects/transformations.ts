@@ -400,8 +400,14 @@ export function mapObjectValues<T extends UnknownObject, V>(
   fn: (value: T[keyof T], key: keyof T) => V,
 ): { [K in keyof T]: V } {
   const newObj = {} as { [K in keyof T]: V };
-  objectKeys(obj).forEach((key) => {
-    newObj[key] = fn(obj[key], key);
-  });
+
+  // intentionally using a for loop here since this is a low-level
+  // function that we really need to be performant if it is used
+  // in huge arrays
+  for (const key in obj) {
+    if (Object.hasOwn(obj, key)) {
+      newObj[key] = fn(obj[key], key);
+    }
+  }
   return newObj;
 }

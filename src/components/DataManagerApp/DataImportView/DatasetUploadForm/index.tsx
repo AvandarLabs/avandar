@@ -1,7 +1,8 @@
-import { Button, Stack, TextInput } from "@mantine/core";
+import { Button, Group, NumberInput, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/types";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -23,6 +24,8 @@ export type DatasetUploadForm = {
 const { maxDatasetNameLength, maxDatasetDescriptionLength } =
   AppConfig.dataManagerApp;
 
+const TOO_MANY_ERRORS_THRESHOLD = 1000;
+
 type Props = {
   /**
    * Regardless of how many rows are passed in, only the first
@@ -33,6 +36,11 @@ type Props = {
   columns: readonly DetectedDatasetColumn[];
   doDatasetSave: (values: DatasetUploadForm) => Promise<Dataset>;
   disableSubmit?: boolean;
+  loadCSVResult: DuckDBLoadCSVResult;
+
+  /** When the user requests to parse the data again. */
+  onRequestDataParse: (numRowsToSkip: number) => void;
+  isProcessing?: boolean;
 };
 
 export function DatasetUploadForm({
@@ -41,9 +49,13 @@ export function DatasetUploadForm({
   defaultName,
   doDatasetSave,
   disableSubmit,
+  loadCSVResult,
+  onRequestDataParse,
+  isProcessing = false,
 }: Props): JSX.Element {
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
+  const [numRowsToSkip, setNumRowsToSkip] = useState(0);
   const [saveDataset, isSavePending] = useMutation({
     mutationFn: doDatasetSave,
     onSuccess: async (savedDataset) => {
@@ -99,6 +111,53 @@ export function DatasetUploadForm({
   });
 
   const columnNames = columns.map(getProp("name"));
+
+  const renderProcessState = () => {
+    const { numRows: numSuccessRows, numRejectedRows } = loadCSVResult;
+
+    if (numSuccessRows === 0) {
+      return (
+        <Callout
+          title="Data processing failed"
+          color="error"
+          message="No rows were read successfully"
+        />
+      );
+    } else if (numRejectedRows === 0) {
+      return (
+        <Callout
+          title="Data processed successfully"
+          color="success"
+          message={`Parsed ${numSuccessRows} rows successfully`}
+        />
+      );
+    } else if (
+      numSuccessRows > numRejectedRows * 2 &&
+      numRejectedRows < TOO_MANY_ERRORS_THRESHOLD
+    ) {
+      // if the number of success rows is greater than double the number
+      // of errors, then we can say that it was mostly a success
+      return (
+        <Callout
+          title="Data processed successfully with some errors"
+          color="warning"
+          message={`Parsed ${numSuccessRows} rows successfully, but ${numRejectedRows} rows were rejected`}
+        />
+      );
+    }
+    return (
+      <Callout
+        title="Data processed successfully with a large number of errors"
+        color="warning"
+        message={`Parsed ${numSuccessRows} rows successfully, but ${
+          numRejectedRows > 1000 ?
+            " over 1000 rows were rejected"
+          : ` ${numRejectedRows} rows were rejected`
+        }`}
+      />
+    );
+  };
+
   return (
     <form
       onSubmit={form.onSubmit((values) => {
@@ -119,13 +178,36 @@ export function DatasetUploadForm({
           placeholder="Enter a description for this dataset"
           {...form.getInputProps("description")}
         />
+
+        {renderProcessState()}
+
         <Callout
           title="Data Preview"
           color="info"
-          message={` These are the first ${rows.length} rows of your dataset.
-            Check to see if the data is correct. If they are not, change the
-            import options above and click Upload again.`}
-        />
+          message={`These are the first ${rows.length} rows of your dataset.
+            Check to see if the data is correct. If they are not, it's possible
+            your dataset does not start on the first row. You can try adjusting
+            the number of rows to skip here.`}
+        >
+          <Group align="flex-end">
+            <NumberInput
+              label="Number of rows to skip"
+              defaultValue={loadCSVResult.csvSniff.SkipRows}
+              onChange={(value) => {
+                return setNumRowsToSkip(Number(value));
+              }}
+            />
+            <Button
+              onClick={() => {
+                return onRequestDataParse(numRowsToSkip);
+              }}
+              loading={isProcessing}
+              disabled={isProcessing}
+            >
+              Process data again
+            </Button>
+          </Group>
+        </Callout>
         <DataGrid columnNames={columnNames} data={previewRows} />
         <Callout
           title="Column info"

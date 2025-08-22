@@ -1,4 +1,4 @@
-import { UnknownObject } from "@/lib/types/common";
+import { UnknownObject, UUID } from "@/lib/types/common";
 
 export type QueryResultColumn = {
   name: string;
@@ -136,6 +136,8 @@ export type DuckDBColumnSchema = {
 };
 
 export type DuckDBLoadCSVResult = {
+  /** Unique identifier for this load operation */
+  id: UUID;
   /** The name of the CSV file */
   csvName: string;
   /** The number of rows that successfully parsed */
@@ -146,4 +148,42 @@ export type DuckDBLoadCSVResult = {
   numRejectedRows: number;
   /** The errors that occurred while loading the CSV file */
   errors: LoadCSVErrors;
+  /**
+   * The sniffed CSV file information. This is the result of DuckDB's
+   * auto-detection. It may not be completely accurate.
+   */
+  csvSniff: DuckDBCSVSniffResult;
+};
+
+export type DuckDBCSVSniffResult = {
+  /** Example: `,` */
+  Delimiter: string;
+  /** Quote character. E.g. `"` */
+  Quote: string;
+  /** Escape character. E.g. `\` */
+  Escape: string;
+  /** Newline delimiter. E.g. `\r\n` */
+  NewLineDelimiter: string;
+  /** Comment character. E.g. `#` */
+  Comment: string;
+  /** Number of rows to skip at the start of the file */
+  SkipRows: number;
+  /** Whether the CSV has a header */
+  HasHeader: boolean;
+  /** The columns of the CSV file */
+  Columns: Array<{ name: string; type: DuckDBDataType }>;
+  /** The date format of the CSV file. E.g. `%d/%m/%Y` */
+  DateFormat: string | null;
+  /** The timestamp format of the CSV file. E.g. `%Y-%m-%dT%H:%M:%S.%f` */
+  TimestampFormat: string | null;
+  /**
+   * Any extra arguments manually set by the user, returned as a string.
+   * E.g. `"ignore_errors=true"`
+   */
+  UserArguments: string;
+  /**
+   * Prompt ready to be used to read the CSV.
+   * E.g. `"FROM read_csv('my_file.csv', auto_detect=false, delim=',', ...)"`
+   */
+  Prompt: string;
 };

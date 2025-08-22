@@ -7,10 +7,13 @@ import * as arrow from "apache-arrow";
 import { ILogger, Logger } from "@/lib/Logger";
 import { UnknownObject } from "@/lib/types/common";
 import { isNonEmptyArray } from "@/lib/utils/guards";
+import { mapObjectValues } from "@/lib/utils/objects/transformations";
 import { snakeify } from "@/lib/utils/strings/transformations";
+import { uuid } from "@/lib/utils/uuid";
 import { arrowFieldToQueryResultField } from "./arrowFieldToQueryResultField";
 import {
   DuckDBColumnSchema,
+  DuckDBCSVSniffResult,
   DuckDBLoadCSVResult,
   DuckDBRejectedRow,
   DuckDBScan,
@@ -50,7 +53,16 @@ function arrowTableToJS<RowObject extends UnknownObject>(
   arrowTable: arrow.Table<Record<string, arrow.DataType>>,
 ): QueryResultData<RowObject> {
   const jsDataRows = arrowTable.toArray().map((row) => {
-    return row.toJSON();
+    const jsRow = row.toJSON();
+    return mapObjectValues(jsRow, (v) => {
+      if (v instanceof arrow.Vector) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return v.toArray().map((x: any) => {
+          return x.toJSON();
+        });
+      }
+      return v;
+    });
   });
   return {
     fields: arrowTable.schema.fields.map(arrowFieldToQueryResultField),
@@ -72,6 +84,7 @@ class DuckDBClientImpl {
 
   #logger: ILogger = Logger.appendName("DuckDBClient");
 
+  /** Map csv names to their duckdb table names. */
   #csvTableNameLookup: Record<string, string> = {};
 
   async #initialize(): Promise<duck.AsyncDuckDB> {
@@ -164,6 +177,32 @@ class DuckDBClientImpl {
   }
 
   /**
+   * Sniffs a CSV file to infer the CSV column schema and parsing options.
+   *
+   * This function requires that the CSV file has already been registered
+   * with DuckDB.
+   *
+   * @param csvName The name of the CSV file.
+   * @returns The sniffed CSV file information.
+   */
+  sniffCSV(
+    csvName: string,
+    options: { numRowsToSkip: number },
+  ): Promise<DuckDBCSVSniffResult> {
+    return this.#withConnection(async () => {
+      const { numRowsToSkip } = options;
+      const result = await this.runQuery<DuckDBCSVSniffResult>(
+        `SELECT * FROM sniff_csv(
+          '$table$', 
+          ignore_errors=true, 
+          skip=${numRowsToSkip})`,
+        { csvName },
+      );
+      return result.data[0]!;
+    });
+  }
+
+  /**
    * Loads a CSV file into DuckDB.
    * @param tableName The name of the table to create.
    * @param file The file to load.
@@ -172,75 +211,96 @@ class DuckDBClientImpl {
   async loadCSV(options: {
     csvName: string;
     file: File;
+    numRowsToSkip: number;
   }): Promise<DuckDBLoadCSVResult> {
-    const { csvName, file } = options;
+    const { csvName, file, numRowsToSkip } = options;
     return await this.#withConnection(async ({ db, conn }) => {
       const isCSVAlreadyLoaded = await this.hasLoadedCSV(csvName);
 
-      // if the csv hasn't been loaded before, let's read it into duckdb
-      if (!isCSVAlreadyLoaded) {
+      if (isCSVAlreadyLoaded) {
+        // delete the existing table
+        await this.runQuery('DROP TABLE IF EXISTS "$table$"', { csvName });
+
+        // clear the existing rejected rows and rejected scans
+        // from any previous load attempt
+        await this.runQuery(
+          `DELETE FROM csv_reject_errors
+          USING csv_reject_scans
+          WHERE
+            csv_reject_errors.file_id = csv_reject_scans.file_id AND
+            csv_reject_scans.file_path = '$table$'`,
+          { csvName },
+        );
+
+        await this.runQuery(
+          `DELETE FROM csv_reject_scans
+          WHERE csv_reject_scans.file_path = '$table$'`,
+          { csvName },
+        );
+      } else {
+        // if the CSV has never been loaded yet, register the file first
         const tableName = snakeify(csvName);
 
         // store the table name for future lookup
         this.#csvTableNameLookup[csvName] = tableName;
-
-        // first we need to register the file
         await db.registerFileHandle(
           tableName,
           file,
           duck.DuckDBDataProtocol.BROWSER_FILEREADER,
           true,
         );
+      }
 
-        // insert the CSV file as a table
-        await conn.query(`
-          CREATE TABLE "${tableName}" AS
-            SELECT * FROM read_csv(
-              '${tableName}',
-              header=true,
-              encoding='utf-8',
+      // now we are ready to start loading the actual CSV data
+      // first, we need to sniff the CSV to infer the schema and parsing options
+      const sniffResult = await this.sniffCSV(csvName, { numRowsToSkip });
+
+      // insert the CSV file as a table
+      await this.runQuery(
+        `CREATE TABLE "$table$" AS
+            SELECT * ${sniffResult.Prompt.replace(
+              "ignore_errors=true",
+              `encoding='utf-8',
               store_rejects=true,
               rejects_scan='reject_scans',
               rejects_table='reject_errors',
-              rejects_limit=${REJECTED_ROW_STORAGE_LIMIT}
-            );
-        `);
+              rejects_limit=${REJECTED_ROW_STORAGE_LIMIT}`,
+            )}`,
+        { csvName },
+      );
 
-        // append the temporary error tables into permanent tables, so we can
-        // keep references to rows that failed to parse
-        await this.runQuery(`
-          CREATE TABLE IF NOT EXISTS csv_reject_scans AS
+      // append the temporary error tables into permanent tables, so we can
+      // keep references to rows that failed to parse
+      await conn.query(
+        `CREATE TABLE IF NOT EXISTS csv_reject_scans AS
             SELECT * FROM reject_scans
             WHERE 0; -- creates the table with the correct schema, but no rows
 
           INSERT INTO csv_reject_scans
-            SELECT * FROM reject_scans;
-        `);
-        await this.runQuery(`
-          CREATE TABLE IF NOT EXISTS csv_reject_errors AS
+            SELECT * FROM reject_scans;`,
+      );
+      await conn.query(
+        `CREATE TABLE IF NOT EXISTS csv_reject_errors AS
             SELECT * FROM reject_errors
             WHERE 0; -- creates the table with the correct schema, but no rows
 
           INSERT INTO csv_reject_errors
-            SELECT * FROM reject_errors;
-        `);
-        this.#logger.log("Successfully loaded CSV into DuckDB!");
-      } else {
-        this.#logger.log(
-          "CSV has already been loaded, so we are not loading it again.",
-        );
-      }
+            SELECT * FROM reject_errors;`,
+      );
+      this.#logger.log("Successfully loaded CSV into DuckDB!");
 
       // now let's collect all information we need to return
       const columns = await this.getCSVSchema(csvName);
       const csvRowCount = await this.getCSVParsedRowCount(csvName);
       const csvErrors = await this.getCSVLoadErrors(csvName);
       return {
+        id: uuid(),
         csvName,
         numRows: csvRowCount,
         columns,
         errors: csvErrors,
         numRejectedRows: csvErrors.rejectedRows.length,
+        csvSniff: sniffResult,
       };
     });
   }
@@ -252,7 +312,7 @@ class DuckDBClientImpl {
    */
   async getCSVParsedRowCount(csvName: string): Promise<number> {
     const result = await this.runQuery<{ count: bigint }>(
-      `SELECT count(*) as count FROM $table$`,
+      `SELECT count(*) as count FROM "$table$"`,
       { csvName },
     );
     return Number(result.data[0]?.count ?? 0);
@@ -266,7 +326,7 @@ class DuckDBClientImpl {
    */
   async getCSVSchema(csvName: string): Promise<DuckDBColumnSchema[]> {
     const { data } = await this.runQuery<DuckDBColumnSchema>(
-      `DESCRIBE $table$`,
+      `DESCRIBE "$table$"`,
       {
         csvName,
       },
@@ -320,10 +380,7 @@ class DuckDBClientImpl {
         if (options?.csvName) {
           // replace $table$ with the actual table name
           const tableName = this.getCSVTableName(options.csvName);
-          queryStringToUse = queryString.replace(
-            /\$table\$/g,
-            `"${tableName}"`,
-          );
+          queryStringToUse = queryString.replace(/\$table\$/g, tableName);
         }
 
         // run the query

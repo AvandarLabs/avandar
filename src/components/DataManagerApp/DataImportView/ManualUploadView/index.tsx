@@ -12,6 +12,7 @@ import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useMutation } from "@/lib/hooks/query/useMutation";
+import { Logger } from "@/lib/Logger";
 import { MIMEType, UnknownObject } from "@/lib/types/common";
 import {
   notifyError,
@@ -28,26 +29,35 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
   const queryClient = useQueryClient();
   const workspace = useCurrentWorkspace();
   const [userProfile] = useCurrentUserProfile();
-
   const [selectedFile, setSelectedFile] = useState<File | undefined>();
   const [loadCSVResult, setLoadCSVResult] = useState<DuckDBLoadCSVResult>();
   const [previewRows, setPreviewRows] = useState<UnknownObject[]>();
+  const [isReprocessing, setIsReprocessing] = useState(false);
   const [loadCSV, isLoadingCSV] = useMutation({
-    mutationFn: async (file: File) => {
+    mutationFn: async ({
+      file,
+      numRowsToSkip,
+    }: {
+      file: File;
+      numRowsToSkip: number;
+    }) => {
       const csvName = file.name;
 
       // load the file into DuckDB
       const loadResult = await DuckDBClient.loadCSV({
         file,
         csvName,
+        numRowsToSkip,
       });
+
       // now query the file for the rows to preview
       const previewData = await DuckDBClient.runQuery(
-        `SELECT * FROM $table$ LIMIT ${AppConfig.dataManagerApp.maxPreviewRows}`,
+        `SELECT * FROM "$table$" LIMIT ${AppConfig.dataManagerApp.maxPreviewRows}`,
         { csvName },
       );
       setLoadCSVResult(loadResult);
       setPreviewRows(previewData.data);
+      Logger.log("new results", loadResult);
       return loadResult;
     },
     onSuccess: (loadResult: DuckDBLoadCSVResult) => {
@@ -71,13 +81,13 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
             : ` ${numRejectedRows} rows were rejected`
           }`,
         });
-        console.log("result", loadResult);
       }
     },
   });
 
   const saveLocalCSVToBackend = async (values: DatasetUploadForm) => {
     // this function can't be called without available file metadata
+    invariant(loadCSVResult, "No CSV has been loaded");
     invariant(selectedFile, "No file is available");
     invariant(columns, "No columns were detected");
     invariant(userProfile, "No user profile is available");
@@ -86,9 +96,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
       workspaceId: workspace.id,
       datasetName: values.name,
       datasetDescription: values.description,
-
-      // TODO(jpsyx): get this inferred info from DuckDB
-      delimiter: ",",
+      delimiter: loadCSVResult.csvSniff.Delimiter,
       sizeInBytes: selectedFile.size,
       columns: columns.map(snakeCaseKeysShallow),
     });
@@ -135,7 +143,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
   const onFileSubmit = (file: File | undefined) => {
     if (file) {
       setSelectedFile(file);
-      loadCSV(file);
+      loadCSV({ file, numRowsToSkip: 0 });
     } else {
       notifyError({
         title: "No file selected",
@@ -153,16 +161,30 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
           placeholder="Select file"
           accept={MIMEType.TEXT_CSV}
           fullWidth
-          isSubmitting={isLoadingCSV}
+          isSubmitting={isLoadingCSV && !isReprocessing}
           onSubmit={onFileSubmit}
         />
 
-        {columns && previewRows && selectedFile ?
+        {columns && previewRows && selectedFile && loadCSVResult ?
           <DatasetUploadForm
+            key={loadCSVResult.id}
             defaultName={selectedFile.name}
             rows={previewRows}
             columns={columns}
             doDatasetSave={saveLocalCSVToBackend}
+            loadCSVResult={loadCSVResult}
+            onRequestDataParse={(numRowsToSkip: number) => {
+              setIsReprocessing(true);
+              loadCSV(
+                { file: selectedFile, numRowsToSkip },
+                {
+                  onSuccess: () => {
+                    setIsReprocessing(false);
+                  },
+                },
+              );
+            }}
+            isProcessing={isReprocessing}
           />
         : null}
 
