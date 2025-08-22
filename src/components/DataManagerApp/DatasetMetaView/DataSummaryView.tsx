@@ -1,22 +1,18 @@
 import { Loader, Stack, Title } from "@mantine/core";
 import { DatasetRawDataClient } from "@/clients/datsets/DatasetRawDataClient";
-import { Logger } from "@/lib/Logger";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { DatasetId } from "@/models/datasets/Dataset";
-import { DatasetColumn } from "@/models/datasets/DatasetColumn";
 
 type Props = {
   datasetId: DatasetId;
-  columns: DatasetColumn[];
 };
 
-export function DataSummaryView({ datasetId, columns }: Props): JSX.Element {
+export function DataSummaryView({ datasetId }: Props): JSX.Element {
   const [summary, isLoadingSummary] =
     DatasetRawDataClient.withLogger().useGetSummary({
       datasetId,
     });
 
-  Logger.log("got summary", summary);
   /*
   const summary = useMemo(() => {
     return getSummary({

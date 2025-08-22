@@ -211,11 +211,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
             <Tabs.Panel value="dataset-summary">
               {isLoadingFullDataset || !datasetRawData || !datasetColumns ?
                 <Loader />
-              : <DataSummaryView
-                  datasetId={dataset.id}
-                  columns={datasetColumns}
-                />
-              }
+              : <DataSummaryView datasetId={dataset.id} />}
             </Tabs.Panel>
 
             <Button
