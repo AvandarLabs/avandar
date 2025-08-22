@@ -15,7 +15,10 @@ import {
 } from "@/models/datasets/DatasetRawData/getSummary";
 import { DuckDBClient } from "../DuckDBClient";
 import { DuckDBDataType } from "../DuckDBClient/DuckDBDataType";
-import { QueryResultData } from "../DuckDBClient/types";
+import {
+  DuckDBLoadParquetResult,
+  QueryResultData,
+} from "../DuckDBClient/types";
 
 function scalar<V, T extends { [key: string]: V }>(
   query: QueryResultData<T>,
@@ -90,7 +93,7 @@ export const DatasetRawDataClient = createDexieCRUDClient({
 
             const distinctValuesCount = Number(
               scalar(
-                await DuckDBClient.runQuery<{
+                await DuckDBClient.runRawQuery<{
                   count: bigint;
                 }>(
                   `SELECT COUNT(DISTINCT "${colName}") as count FROM "$table$"`,
@@ -103,7 +106,7 @@ export const DatasetRawDataClient = createDexieCRUDClient({
 
             const emptyValuesCount = Number(
               scalar(
-                await DuckDBClient.runQuery<{
+                await DuckDBClient.runRawQuery<{
                   count: bigint;
                 }>(
                   `SELECT COUNT("${colName}") as count FROM "$table$"
@@ -115,7 +118,7 @@ export const DatasetRawDataClient = createDexieCRUDClient({
             );
 
             // Find the maximum count for the most common value(s)
-            const maxCountResult = await DuckDBClient.runQuery<{
+            const maxCountResult = await DuckDBClient.runRawQuery<{
               max_count: bigint;
             }>(
               `SELECT MAX(cnt) as max_count FROM (
@@ -131,7 +134,7 @@ export const DatasetRawDataClient = createDexieCRUDClient({
             const maxCount = maxCountResult.data[0]?.max_count ?? 0n;
 
             // Get all values with the maximum count
-            const mostCommonValuesQuery = await DuckDBClient.runQuery<{
+            const mostCommonValuesQuery = await DuckDBClient.runRawQuery<{
               value: unknown;
               count: bigint;
             }>(
@@ -162,7 +165,7 @@ export const DatasetRawDataClient = createDexieCRUDClient({
                   avg = NaN,
                   stdDev = NaN,
                 } = singleton(
-                  await DuckDBClient.runQuery<{
+                  await DuckDBClient.runRawQuery<{
                     max: number;
                     min: number;
                     avg: number;
@@ -244,7 +247,7 @@ export const DatasetRawDataClient = createDexieCRUDClient({
           blob: dataset.data,
         });
         logger.log("Dataset found", dataset);
-        const result = await DuckDBClient.runQuery(
+        const result = await DuckDBClient.runRawQuery(
           `SELECT * FROM "$table$" LIMIT ${params.numRows}`,
           { csvName: dataset.datasetId },
         );
@@ -282,5 +285,30 @@ export const DatasetRawDataClient = createDexieCRUDClient({
       },
     };
     */
+  },
+  mutations: ({ logger: clientLogger }) => {
+    return {
+      loadDataset: async (params: {
+        datasetId: DatasetId;
+      }): Promise<DuckDBLoadParquetResult> => {
+        const logger = clientLogger.appendName("loadDataset");
+        logger.log("Loading dataset", params);
+        const dataset = await DatasetRawDataClient.getOne(
+          where("datasetId", "eq", params.datasetId),
+        );
+        if (!dataset) {
+          throw new Error(`Dataset ${params.datasetId} not found`);
+        }
+        const loadResult = await DuckDBClient.loadParquet({
+          name: dataset.datasetId,
+          blob: dataset.data,
+          // to save time, do not overwrite the existing table if
+          // its already there.
+          overwrite: false,
+        });
+        logger.log("Dataset loaded", loadResult);
+        return loadResult;
+      },
+    };
   },
 });

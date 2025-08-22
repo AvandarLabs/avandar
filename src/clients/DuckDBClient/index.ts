@@ -4,9 +4,13 @@ import mvpWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?url
 import duckDBWasmEh from "@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url";
 import duckDBWasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
 import * as arrow from "apache-arrow";
+import knex from "knex";
+import { match } from "ts-pattern";
 import { ILogger, Logger } from "@/lib/Logger";
 import { MIMEType } from "@/lib/types/common";
 import { isNonEmptyArray } from "@/lib/utils/guards";
+import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { objectEntries } from "@/lib/utils/objects/misc";
 import { mapObjectValues } from "@/lib/utils/objects/transformations";
 import { snakeify } from "@/lib/utils/strings/transformations";
 import { uuid } from "@/lib/utils/uuid";
@@ -20,6 +24,7 @@ import {
   DuckDBScan,
   LoadCSVErrors,
   QueryResultData,
+  StructuredQueryConfig,
 } from "./types";
 
 const MANUAL_BUNDLES: duckdb.DuckDBBundles = {
@@ -32,6 +37,14 @@ const MANUAL_BUNDLES: duckdb.DuckDBBundles = {
     mainWorker: ehWorker,
   },
 };
+
+const sql = knex({
+  client: "sqlite3",
+  wrapIdentifier: (value: string) => {
+    return `"${value.replace(/"/g, '""')}"`;
+  },
+  useNullAsDefault: true,
+});
 
 /**
  * The maximum number of rejected rows to store in DuckDB per file.
@@ -50,7 +63,9 @@ const MANUAL_BUNDLES: duckdb.DuckDBBundles = {
  */
 const REJECTED_ROW_STORAGE_LIMIT = 1001;
 
-function arrowTableToJS<RowObject extends Record<string, unknown>>(
+type UnknownRow = Record<string, unknown>;
+
+function arrowTableToJS<RowObject extends UnknownRow>(
   arrowTable: arrow.Table<Record<string, arrow.DataType>>,
 ): QueryResultData<RowObject> {
   const jsDataRows = arrowTable.toArray().map((row) => {
@@ -239,7 +254,7 @@ class DuckDBClientImpl {
   ): Promise<DuckDBCSVSniffResult> {
     const { delimiter, numRowsToSkip } = options;
     const hasUserProvidedOptions = !!numRowsToSkip || !!delimiter;
-    const result = await this.runQuery<DuckDBCSVSniffResult>(
+    const result = await this.runRawQuery<DuckDBCSVSniffResult>(
       `SELECT * FROM sniff_csv(
           '$table$', 
           strict_mode=${hasUserProvidedOptions ? "true" : "false"},
@@ -262,11 +277,11 @@ class DuckDBClientImpl {
     const db = await this.#getDB();
 
     // delete the table associated to this file
-    await this.runQuery('DROP TABLE IF EXISTS "$table$"', { csvName });
+    await this.runRawQuery('DROP TABLE IF EXISTS "$table$"', { csvName });
 
     // clear the existing rejected rows and rejected scans
     // from any previous load attempts
-    await this.runQuery(
+    await this.runRawQuery(
       `DELETE FROM csv_reject_errors
           USING csv_reject_scans
           WHERE
@@ -274,7 +289,7 @@ class DuckDBClientImpl {
             csv_reject_scans.file_path = '$table$'`,
       { csvName },
     );
-    await this.runQuery(
+    await this.runRawQuery(
       `DELETE FROM csv_reject_scans
           WHERE csv_reject_scans.file_path = '$table$'`,
       { csvName },
@@ -326,7 +341,7 @@ class DuckDBClientImpl {
       });
 
       // insert the CSV file as a table
-      await this.runQuery(
+      await this.runRawQuery(
         `CREATE TABLE "$table$" AS
             SELECT * ${sniffResult.Prompt.replace(
               "ignore_errors=true",
@@ -393,7 +408,7 @@ class DuckDBClientImpl {
 
       // reingest the parquet data into a table if it doesn't
       // already exist
-      await this.runQuery(
+      await this.runRawQuery(
         `CREATE TABLE IF NOT EXISTS "$table$" AS
             SELECT * FROM read_parquet('$table$')`,
         { csvName: name },
@@ -418,7 +433,7 @@ class DuckDBClientImpl {
    * @returns The number of successfully-parsed rows.
    */
   async getCSVParsedRowCount(csvName: string): Promise<number> {
-    const result = await this.runQuery<{ count: bigint }>(
+    const result = await this.runRawQuery<{ count: bigint }>(
       `SELECT count(*) as count FROM "$table$"`,
       { csvName },
     );
@@ -432,7 +447,7 @@ class DuckDBClientImpl {
    * DuckDBColumnSchema objects.
    */
   async getCSVSchema(csvName: string): Promise<DuckDBColumnSchema[]> {
-    const { data } = await this.runQuery<DuckDBColumnSchema>(
+    const { data } = await this.runRawQuery<DuckDBColumnSchema>(
       `DESCRIBE "$table$"`,
       {
         csvName,
@@ -444,14 +459,14 @@ class DuckDBClientImpl {
   async getCSVLoadErrors(csvName: string): Promise<LoadCSVErrors> {
     const tableName = this.getCSVTableName(csvName);
     try {
-      const rejectedScansResult = await this.runQuery<DuckDBScan>(
+      const rejectedScansResult = await this.runRawQuery<DuckDBScan>(
         `SELECT * FROM csv_reject_scans WHERE file_path='${tableName}'`,
       );
       const { data: rejectedScans } = rejectedScansResult;
       if (isNonEmptyArray(rejectedScans)) {
         // if there are scans, then let's see if there are any rejected rows
         const fileId = rejectedScans[0].file_id;
-        const rejectedRows = await this.runQuery<DuckDBRejectedRow>(
+        const rejectedRows = await this.runRawQuery<DuckDBRejectedRow>(
           `SELECT * FROM csv_reject_errors WHERE file_id='${fileId}'`,
         );
         return { rejectedScans, rejectedRows: rejectedRows.data };
@@ -473,7 +488,7 @@ class DuckDBClientImpl {
     const parquetFileName = `${this.getCSVTableName(csvName)}.parquet`;
 
     // create the parquet file in the DuckDB internal file system
-    await this.runQuery(
+    await this.runRawQuery(
       `COPY '$table$' TO '${parquetFileName}' (FORMAT parquet)`,
       { csvName },
     );
@@ -492,9 +507,7 @@ class DuckDBClientImpl {
    * @param queryString The query to run.
    * @returns The results of the query.
    */
-  async runQuery<
-    RowObject extends Record<string, unknown> = Record<string, unknown>,
-  >(
+  async runRawQuery<RowObject extends UnknownRow = UnknownRow>(
     queryString: string,
     options?: {
       csvName?: string;
@@ -515,6 +528,91 @@ class DuckDBClientImpl {
         return arrowTableToJS<RowObject>(arrowTable);
       } catch (error) {
         this.#logger.error(error, { queryString });
+        throw error;
+      }
+    });
+  }
+
+  async runStructuredQuery({
+    selectFields,
+    groupByFields,
+    aggregations,
+    datasetId,
+    orderByColumn,
+    orderByDirection,
+  }: StructuredQueryConfig): Promise<QueryResultData<UnknownRow>> {
+    const selectFieldNames = selectFields.map(getProp("name"));
+    const groupByFieldNames = groupByFields.map(getProp("name"));
+    const tableName = this.getCSVTableName(datasetId);
+
+    return this.#withConnection(async ({ conn }) => {
+      const fieldNamesWithoutAggregations = selectFieldNames.filter(
+        (fieldName) => {
+          return aggregations[fieldName] === "none";
+        },
+      );
+
+      // build the query
+      let query = sql.select(...fieldNamesWithoutAggregations).from(tableName);
+      if (groupByFieldNames.length > 0) {
+        query = query.groupBy(...groupByFieldNames);
+      }
+
+      if (orderByColumn && orderByDirection) {
+        query = query.orderBy(orderByColumn.name, orderByDirection);
+      }
+
+      // apply aggregations
+      query = objectEntries(aggregations).reduce(
+        (newQuery, [fieldName, aggType]) => {
+          return match(aggType)
+            .with("sum", () => {
+              return query.sum(fieldName);
+            })
+            .with("avg", () => {
+              return query.avg(fieldName);
+            })
+            .with("count", () => {
+              return query.count(fieldName);
+            })
+            .with("max", () => {
+              return query.max(fieldName);
+            })
+            .with("min", () => {
+              return query.min(fieldName);
+            })
+            .with("none", () => {
+              return newQuery;
+            })
+            .exhaustive(() => {
+              return newQuery;
+            });
+        },
+        query,
+      );
+
+      // run the query
+      try {
+        const queryString = query.toString();
+        const results =
+          await conn.query<Record<string, arrow.DataType>>(queryString);
+
+        const jsDataRows = results.toArray().map((row) => {
+          return row.toJSON();
+        });
+
+        this.#logger.log("Ran query", {
+          queryString,
+          numResults: jsDataRows.length,
+        });
+
+        return {
+          fields: results.schema.fields.map(arrowFieldToQueryResultField),
+          data: jsDataRows,
+          numRows: jsDataRows.length,
+        };
+      } catch (error) {
+        Logger.error(error, { query: query.toString() });
         throw error;
       }
     });

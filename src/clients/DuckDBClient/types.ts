@@ -1,4 +1,6 @@
 import { UnknownObject, UUID } from "@/lib/types/common";
+import { DatasetId } from "@/models/datasets/Dataset";
+import { DatasetColumn } from "@/models/datasets/DatasetColumn";
 import { DuckDBDataTypeT } from "./DuckDBDataType";
 
 export type QueryResultColumn = {
@@ -152,7 +154,7 @@ export type DuckDBCSVSniffResult = {
   /** Whether the CSV has a header */
   HasHeader: boolean;
   /** The columns of the CSV file */
-  Columns: Array<{ name: string; type: DuckDBDataType }>;
+  Columns: Array<{ name: string; type: DuckDBDataTypeT }>;
   /** The date format of the CSV file. E.g. `%d/%m/%Y` */
   DateFormat: string | null;
   /** The timestamp format of the CSV file. E.g. `%Y-%m-%dT%H:%M:%S.%f` */
@@ -167,4 +169,26 @@ export type DuckDBCSVSniffResult = {
    * E.g. `"FROM read_csv('my_file.csv', auto_detect=false, delim=',', ...)"`
    */
   Prompt: string;
+};
+
+export type QueryAggregationType =
+  | "sum"
+  | "avg"
+  | "count"
+  | "max"
+  | "min"
+  | "none";
+
+export type StructuredQueryConfig = {
+  datasetId: DatasetId;
+  selectFields: readonly DatasetColumn[];
+  groupByFields: readonly DatasetColumn[];
+  orderByColumn?: DatasetColumn | undefined;
+  orderByDirection?: "asc" | "desc";
+
+  /**
+   * Aggregations to apply to the selected fields.
+   * Key is the field name. Value is the type of aggregation.
+   */
+  aggregations: Record<string, QueryAggregationType>;
 };

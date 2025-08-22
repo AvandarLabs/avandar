@@ -1,6 +1,7 @@
-import { Box, Flex, Loader, MantineTheme } from "@mantine/core";
+import { Box, Flex, MantineTheme } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
+import { LoadingOverlay } from "@/lib/ui/LoadingOverlay";
 import { partition } from "@/lib/utils/arrays";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { isNotInSet } from "@/lib/utils/sets/higherOrderFuncs";
@@ -146,9 +147,7 @@ export function DataExplorerApp(): JSX.Element {
         />
       </Box>
       <Box pos="relative" flex={1} px="sm" py="md">
-        {isLoadingResults ?
-          <Loader />
-        : null}
+        <LoadingOverlay visible={isLoadingResults} zIndex={1000} />
         <VisualizationContainer
           vizConfig={vizConfig}
           fields={fields}

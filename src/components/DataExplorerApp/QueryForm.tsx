@@ -124,7 +124,7 @@ export function QueryForm({
         />
 
         <Select
-          label="Select field"
+          label="Order by"
           placeholder="Select field"
           data={selectedColumns.map((f) => {
             return {
@@ -142,8 +142,8 @@ export function QueryForm({
         />
 
         <Select
-          label="Order by"
-          placeholder="Select order"
+          label="Order direction"
+          placeholder="Select order direction"
           data={orderOptions}
           value={orderByDirection}
           clearable={false}

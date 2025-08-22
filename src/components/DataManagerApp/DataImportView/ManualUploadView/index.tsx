@@ -54,7 +54,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
       });
 
       // now query the file for the rows to preview
-      const previewData = await DuckDBClient.runQuery(
+      const previewData = await DuckDBClient.runRawQuery(
         `SELECT * FROM "$table$" LIMIT ${AppConfig.dataManagerApp.maxPreviewRows}`,
         { csvName },
       );

@@ -42,6 +42,7 @@ export function VisualizationContainer({
     return fields.map(getProp("name"));
   }, [fields]);
 
+  // TODO(jpsyx): this should get supplied as a prop
   const dateColumns = useMemo(() => {
     return new Set(
       fields
@@ -67,6 +68,7 @@ export function VisualizationContainer({
           data={data}
           dateColumns={dateColumns}
           dateFormat="YYYY-MM-DD HH:mm:ss z"
+          height="100%"
         />
       );
     })
