@@ -1,4 +1,4 @@
-import * as duck from "@duckdb/duckdb-wasm";
+import * as duckdb from "@duckdb/duckdb-wasm";
 import ehWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url";
 import mvpWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?url";
 import duckDBWasmEh from "@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url";
@@ -22,7 +22,7 @@ import {
   QueryResultData,
 } from "./types";
 
-const MANUAL_BUNDLES: duck.DuckDBBundles = {
+const MANUAL_BUNDLES: duckdb.DuckDBBundles = {
   mvp: {
     mainModule: duckDBWasm,
     mainWorker: mvpWorker,
@@ -73,8 +73,8 @@ function arrowTableToJS<RowObject extends Record<string, unknown>>(
 }
 
 class DuckDBClientImpl {
-  #db?: Promise<duck.AsyncDuckDB>;
-  #conn?: duck.AsyncDuckDBConnection;
+  #db?: Promise<duckdb.AsyncDuckDB>;
+  #conn?: duckdb.AsyncDuckDBConnection;
 
   /**
    * Number of unresolved operations. This is used to keep track of how many
@@ -88,20 +88,33 @@ class DuckDBClientImpl {
   /** Map csv names to their duckdb table names. */
   #csvTableNameLookup: Record<string, string> = {};
 
-  async #initialize(): Promise<duck.AsyncDuckDB> {
+  async #initialize(): Promise<duckdb.AsyncDuckDB> {
     // Select a bundle based on browser checks
-    const bundle = await duck.selectBundle(MANUAL_BUNDLES);
+    const bundle = await duckdb.selectBundle(MANUAL_BUNDLES);
 
     // Instantiate the asynchronous version of DuckDB-wasm
     const worker = new Worker(bundle.mainWorker!);
-    const logger = new duck.ConsoleLogger();
-    const duckdb = new duck.AsyncDuckDB(logger, worker);
+    const logger = new duckdb.ConsoleLogger();
+    const db = new duckdb.AsyncDuckDB(logger, worker);
 
-    await duckdb.instantiate(bundle.mainModule, bundle.pthreadWorker);
-    return duckdb;
+    await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+
+    // drop the whole database for now and then we can restart it
+    const rootOPFS = await navigator.storage.getDirectory();
+    const fileHandle = await rootOPFS.getFileHandle("avandar.duckdb");
+    await fileHandle.remove();
+
+    // TODO(jpsyx): if we are in a browser that does not support OPFS
+    // we will need to persist to indexedDB. we should handle this.
+    await db.open({
+      path: `opfs://avandar.duckdb`,
+      accessMode: duckdb.DuckDBAccessMode.AUTOMATIC,
+    });
+
+    return db;
   }
 
-  async #getDB(): Promise<duck.AsyncDuckDB> {
+  async #getDB(): Promise<duckdb.AsyncDuckDB> {
     if (!this.#db) {
       this.#db = this.#initialize();
     }
@@ -120,8 +133,8 @@ class DuckDBClientImpl {
    */
   async #withConnection<T>(
     operationFn: (params: {
-      db: duck.AsyncDuckDB;
-      conn: duck.AsyncDuckDBConnection;
+      db: duckdb.AsyncDuckDB;
+      conn: duckdb.AsyncDuckDBConnection;
     }) => Promise<T>,
   ): Promise<T> {
     const db = await this.#getDB();
@@ -175,7 +188,7 @@ class DuckDBClientImpl {
     await db.registerFileHandle(
       tableName,
       file,
-      duck.DuckDBDataProtocol.BROWSER_FILEREADER,
+      duckdb.DuckDBDataProtocol.BROWSER_FILEREADER,
       true,
     );
   }
@@ -224,14 +237,18 @@ class DuckDBClientImpl {
    */
   async sniffCSV(
     csvName: string,
-    options: { numRowsToSkip: number },
+    options: { numRowsToSkip?: number; delimiter?: string },
   ): Promise<DuckDBCSVSniffResult> {
-    const { numRowsToSkip } = options;
+    const { delimiter, numRowsToSkip } = options;
+    const hasUserProvidedOptions = !!numRowsToSkip || !!delimiter;
     const result = await this.runQuery<DuckDBCSVSniffResult>(
       `SELECT * FROM sniff_csv(
           '$table$', 
-          ignore_errors=true, 
-          skip=${numRowsToSkip})`,
+          strict_mode=${hasUserProvidedOptions ? "true" : "false"},
+          ignore_errors=true
+          ${numRowsToSkip ? `, skip=${numRowsToSkip}` : ""}
+          ${delimiter ? `, delim='${delimiter}'` : ""}
+      )`,
       { csvName },
     );
     return result.data[0]!;
@@ -291,9 +308,10 @@ class DuckDBClientImpl {
   async loadCSV(options: {
     csvName: string;
     file: File;
-    numRowsToSkip: number;
+    numRowsToSkip?: number;
+    delimiter?: string;
   }): Promise<DuckDBLoadCSVResult> {
-    const { csvName, file, numRowsToSkip } = options;
+    const { csvName, file, numRowsToSkip, delimiter } = options;
     return await this.#withConnection(async ({ conn }) => {
       const isCSVAlreadyLoaded = await this.hasLoadedCSV(csvName);
       if (isCSVAlreadyLoaded) {
@@ -304,7 +322,10 @@ class DuckDBClientImpl {
 
       // now we are ready to start loading the actual CSV data
       // first, we need to sniff the CSV to infer the schema and parsing options
-      const sniffResult = await this.sniffCSV(csvName, { numRowsToSkip });
+      const sniffResult = await this.sniffCSV(csvName, {
+        numRowsToSkip,
+        delimiter,
+      });
 
       // insert the CSV file as a table
       await this.runQuery(

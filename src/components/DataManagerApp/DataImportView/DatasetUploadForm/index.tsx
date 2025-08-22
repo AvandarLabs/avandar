@@ -46,7 +46,10 @@ type Props = {
   loadCSVResult: DuckDBLoadCSVResult;
 
   /** When the user requests to parse the data again. */
-  onRequestDataParse: (numRowsToSkip: number) => void;
+  onRequestDataParse: (parseConfig: {
+    numRowsToSkip: number;
+    delimiter: string;
+  }) => void;
   isProcessing?: boolean;
 };
 
@@ -62,7 +65,10 @@ export function DatasetUploadForm({
 }: Props): JSX.Element {
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
-  const [numRowsToSkip, setNumRowsToSkip] = useState(0);
+  const [numRowsToSkip, setNumRowsToSkip] = useState(
+    loadCSVResult.csvSniff.SkipRows,
+  );
+  const [delimiter, setDelimiter] = useState(loadCSVResult.csvSniff.Delimiter);
   const [saveDataset, isSavePending] = useMutation({
     mutationFn: doDatasetSave,
     onSuccess: async (savedDataset) => {
@@ -121,6 +127,8 @@ export function DatasetUploadForm({
 
   const renderProcessState = () => {
     const { numRows: numSuccessRows, numRejectedRows } = loadCSVResult;
+    const formattedSuccessNum = numSuccessRows.toLocaleString();
+    const formattedRejectedNum = numRejectedRows.toLocaleString();
 
     if (numSuccessRows === 0) {
       return (
@@ -135,7 +143,7 @@ export function DatasetUploadForm({
         <Callout
           title="Data processed successfully"
           color="success"
-          message={`Parsed ${numSuccessRows} rows successfully`}
+          message={`Parsed ${formattedSuccessNum} rows successfully`}
         />
       );
     } else if (
@@ -148,7 +156,7 @@ export function DatasetUploadForm({
         <Callout
           title="Data processed successfully with some errors"
           color="warning"
-          message={`Parsed ${numSuccessRows} rows successfully, but ${numRejectedRows} rows were rejected`}
+          message={`Parsed ${formattedSuccessNum} rows successfully, but ${formattedRejectedNum} rows were rejected`}
         />
       );
     }
@@ -156,10 +164,10 @@ export function DatasetUploadForm({
       <Callout
         title="Data processed successfully with a large number of errors"
         color="warning"
-        message={`Parsed ${numSuccessRows} rows successfully, but ${
+        message={`Parsed ${formattedSuccessNum} rows successfully, but ${
           numRejectedRows > 1000 ?
             " over 1000 rows were rejected"
-          : ` ${numRejectedRows} rows were rejected`
+          : ` ${formattedRejectedNum} rows were rejected`
         }`}
       />
     );
@@ -193,20 +201,30 @@ export function DatasetUploadForm({
           color="info"
           message={`These are the first ${rows.length} rows of your dataset.
             Check to see if the data is correct. If they are not, it's possible
-            your dataset does not start on the first row. You can try adjusting
-            the number of rows to skip here.`}
+            your dataset does not start on the first row or the CSV uses a different.
+            delimiter. Try adjusting those settings here.`}
         >
           <Group align="flex-end">
             <NumberInput
               label="Number of rows to skip"
-              defaultValue={loadCSVResult.csvSniff.SkipRows}
+              value={numRowsToSkip}
               onChange={(value) => {
                 return setNumRowsToSkip(Number(value));
               }}
             />
+            <TextInput
+              label="Delimiter"
+              value={delimiter}
+              onChange={(e) => {
+                return setDelimiter(e.target.value);
+              }}
+            />
             <Button
               onClick={() => {
-                return onRequestDataParse(numRowsToSkip);
+                return onRequestDataParse({
+                  numRowsToSkip,
+                  delimiter,
+                });
               }}
               loading={isProcessing}
               disabled={isProcessing}

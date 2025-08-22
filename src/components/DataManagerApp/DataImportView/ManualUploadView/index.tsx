@@ -37,9 +37,11 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
     mutationFn: async ({
       file,
       numRowsToSkip,
+      delimiter,
     }: {
       file: File;
-      numRowsToSkip: number;
+      numRowsToSkip?: number;
+      delimiter?: string;
     }) => {
       const csvName = file.name;
 
@@ -48,6 +50,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
         file,
         csvName,
         numRowsToSkip,
+        delimiter,
       });
 
       // now query the file for the rows to preview
@@ -140,7 +143,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
   const onFileSubmit = (file: File | undefined) => {
     if (file) {
       setSelectedFile(file);
-      loadCSV({ file, numRowsToSkip: 0 });
+      loadCSV({ file });
     } else {
       notifyError({
         title: "No file selected",
@@ -170,10 +173,17 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
             columns={columns}
             doDatasetSave={saveLocalCSVToBackend}
             loadCSVResult={loadCSVResult}
-            onRequestDataParse={(numRowsToSkip: number) => {
+            onRequestDataParse={(parseConfig: {
+              numRowsToSkip: number;
+              delimiter: string;
+            }) => {
               setIsReprocessing(true);
               loadCSV(
-                { file: selectedFile, numRowsToSkip },
+                {
+                  file: selectedFile,
+                  numRowsToSkip: parseConfig.numRowsToSkip,
+                  delimiter: parseConfig.delimiter,
+                },
                 {
                   onSuccess: () => {
                     setIsReprocessing(false);
