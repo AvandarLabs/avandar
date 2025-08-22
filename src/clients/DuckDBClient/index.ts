@@ -101,8 +101,7 @@ class DuckDBClientImpl {
 
     // drop the whole database for now and then we can restart it
     const rootOPFS = await navigator.storage.getDirectory();
-    const fileHandle = await rootOPFS.getFileHandle("avandar.duckdb");
-    await fileHandle.remove();
+    await rootOPFS.removeEntry("avandar.duckdb", { recursive: false });
 
     // TODO(jpsyx): if we are in a browser that does not support OPFS
     // we will need to persist to indexedDB. we should handle this.
@@ -110,7 +109,6 @@ class DuckDBClientImpl {
       path: `opfs://avandar.duckdb`,
       accessMode: duckdb.DuckDBAccessMode.AUTOMATIC,
     });
-
     return db;
   }
 
