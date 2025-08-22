@@ -30,6 +30,15 @@ create table public.user_roles (
   -- Timestamp for last update
   updated_at timestamp with time zone default timezone('utc'::text, now())
 );
+
+-- One entry per role per membership
+create unique index if not exists user_roles_membership_role_unique
+  on public.user_roles (membership_id, role);
+
+-- Handy lookup
+create index if not exists idx_user_roles_membership_id
+  on public.user_roles (membership_id);
+  
 comment on table public.user_roles is
   'Stores roles for a user in a workspace.';
 

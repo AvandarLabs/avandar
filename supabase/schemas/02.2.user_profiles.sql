@@ -74,6 +74,11 @@ returns trigger as $$
 $$
 language plpgsql;
 
+-- One profile per membership
+alter table public.user_profiles
+  add constraint if not exists user_profiles_membership_id_unique
+  unique (membership_id);
+
 -- Trigger: prevent `user_id`, `workspace_id`, and `membership_id` changes on update
 create trigger tr_user_profiles__prevent_id_changes
   before update on public.user_profiles
