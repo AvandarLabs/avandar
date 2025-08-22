@@ -17,7 +17,7 @@ left join public.user_profiles p on p.membership_id = wm.id
 left join auth.users u on u.id = wm.user_id
 where p.id is null;
 
--- Backfill roles (default 'member'); NOTE: no user_id column here
+-- Backfill roles (default 'member'); NOTE: NO user_id column here
 insert into public.user_roles (
   id, workspace_id, membership_id, role, created_at, updated_at
 )
