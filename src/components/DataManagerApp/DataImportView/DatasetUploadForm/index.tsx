@@ -1,4 +1,11 @@
-import { Button, Group, NumberInput, Stack, TextInput } from "@mantine/core";
+import {
+  Button,
+  Group,
+  NumberInput,
+  ScrollArea,
+  Stack,
+  TextInput,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
@@ -216,11 +223,13 @@ export function DatasetUploadForm({
             info below to make sure they are correct. If they are not, change
             the import options above and click Upload again.`}
         />
-        <ObjectDescriptionList
-          data={columns}
-          renderAsTable
-          itemRenderOptions={{ excludeKeys: ["columnIdx"] }}
-        />
+        <ScrollArea h={500} type="auto">
+          <ObjectDescriptionList
+            data={columns}
+            renderAsTable
+            itemRenderOptions={{ excludeKeys: ["columnIdx"] }}
+          />
+        </ScrollArea>
 
         <Button loading={isSavePending} type="submit" disabled={disableSubmit}>
           Save Dataset
