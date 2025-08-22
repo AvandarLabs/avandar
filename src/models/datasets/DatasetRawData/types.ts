@@ -30,8 +30,8 @@ type DatasetRawDataDBRead = {
   /** Unique identifier of the workspace the raw data object belongs to. */
   workspaceId: WorkspaceId;
 
-  /** The raw data, represented as a single CSV string. */
-  data: string;
+  /** The raw data, stored as a binary Blob */
+  data: Blob;
 };
 
 type DatasetRawDataRead = Merge<

@@ -1,4 +1,5 @@
 import { UnknownObject, UUID } from "@/lib/types/common";
+import { DuckDBDataTypeT } from "./DuckDBDataType";
 
 export type QueryResultColumn = {
   name: string;
@@ -83,37 +84,6 @@ export type LoadCSVErrors = {
   rejectedRows: DuckDBRejectedRow[];
 };
 
-export type DuckDBDataType =
-  | "BOOLEAN"
-  | "TINYINT"
-  | "SMALLINT"
-  | "INTEGER"
-  | "BIGINT"
-  | "UBIGINT"
-  | "UTINYINT"
-  | "USMALLINT"
-  | "UINTEGER"
-  | "FLOAT"
-  | "DOUBLE"
-  | "DECIMAL"
-  | "DATE"
-  | "TIME"
-  | "TIMESTAMP"
-  | "TIMESTAMP_TZ"
-  | "INTERVAL"
-  | "VARCHAR"
-  | "BLOB"
-  | "UUID"
-  | "HUGEINT"
-  | "BIT"
-  | "ENUM"
-  | "MAP"
-  | "STRUCT"
-  | "LIST"
-  | "UNION"
-  | "JSON"
-  | "GEOMETRY";
-
 /**
  * Schema for a column as returned by DuckDB's DESCRIBE statement.
  */
@@ -121,7 +91,7 @@ export type DuckDBColumnSchema = {
   /** The name of the column */
   column_name: string;
   /** The data type of the column (e.g. VARCHAR, INTEGER, etc.) */
-  column_type: DuckDBDataType;
+  column_type: DuckDBDataTypeT;
   /** The default value for the column, if any */
   default: unknown;
   /** Any extra information about the column (usually null) */
@@ -133,6 +103,17 @@ export type DuckDBColumnSchema = {
   key: string | null;
   /** Indicates if the column can contain NULL values ("YES" or "NO") */
   null: "YES" | "NO";
+};
+
+export type DuckDBLoadParquetResult = {
+  /** Unique identifier for this load operation */
+  id: UUID;
+  /** The name of the parquet file */
+  name: string;
+  /** The number of rows that successfully parsed */
+  numRows: number;
+  /** The inferred schema of the CSV file */
+  columns: DuckDBColumnSchema[];
 };
 
 export type DuckDBLoadCSVResult = {

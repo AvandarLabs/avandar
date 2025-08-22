@@ -41,6 +41,8 @@ const EXCLUDED_DATASET_METADATA_KEYS = [
   "name",
   "description",
   "workspaceId",
+  "ownerId",
+  "ownerProfileId",
 ] satisfies ReadonlyArray<keyof DatasetWithColumns>;
 
 const DATASET_METADATA_RENDER_OPTIONS = {
@@ -49,7 +51,7 @@ const DATASET_METADATA_RENDER_OPTIONS = {
     titleKey: "name",
     maxHeight: 400,
     itemRenderOptions: {
-      excludeKeys: ["id"],
+      excludeKeys: ["id", "datasetId", "workspaceId", "columnIdx"],
     },
   },
 } satisfies ChildRenderOptionsMap<DatasetWithColumns>;
@@ -67,8 +69,9 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   });
 
   const [datasetRawData, isLoadingRawData] =
-    DatasetRawDataClient.useGetParsedRawData({
+    DatasetRawDataClient.withLogger().useGetPreviewData({
       datasetId: dataset.id,
+      numRows: AppConfig.dataManagerApp.maxPreviewRows,
     });
   const [datasetColumns, isLoadingDatasetColumns] =
     DatasetColumnClient.useGetAll(where("dataset_id", "eq", dataset.id));
@@ -194,7 +197,9 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                 />
 
                 <Title order={5}>Data preview</Title>
-                {datasetRawData && previewData ?
+                {isLoadingRawData ?
+                  <Loader />
+                : datasetRawData && previewData ?
                   <DataGrid
                     columnNames={datasetColumnNames}
                     data={previewData}
@@ -207,7 +212,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
               {isLoadingFullDataset || !datasetRawData || !datasetColumns ?
                 <Loader />
               : <DataSummaryView
-                  rawDatasetRows={datasetRawData}
+                  datasetId={dataset.id}
                   columns={datasetColumns}
                 />
               }
@@ -215,6 +220,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
 
             <Button
               color="danger"
+              mt="lg"
               onClick={() => {
                 modals.openConfirmModal({
                   title: "Delete dataset",

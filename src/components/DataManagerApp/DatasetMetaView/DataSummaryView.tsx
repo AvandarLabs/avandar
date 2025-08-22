@@ -1,51 +1,66 @@
-import { Stack, Title } from "@mantine/core";
-import { useMemo } from "react";
-import { RawDataRow } from "@/lib/types/common";
+import { Loader, Stack, Title } from "@mantine/core";
+import { DatasetRawDataClient } from "@/clients/datsets/DatasetRawDataClient";
+import { Logger } from "@/lib/Logger";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
+import { DatasetId } from "@/models/datasets/Dataset";
 import { DatasetColumn } from "@/models/datasets/DatasetColumn";
-import { getSummary } from "@/models/datasets/DatasetRawData/getSummary";
 
 type Props = {
-  rawDatasetRows: RawDataRow[];
+  datasetId: DatasetId;
   columns: DatasetColumn[];
 };
 
-export function DataSummaryView({
-  rawDatasetRows,
-  columns,
-}: Props): JSX.Element {
+export function DataSummaryView({ datasetId, columns }: Props): JSX.Element {
+  const [summary, isLoadingSummary] =
+    DatasetRawDataClient.withLogger().useGetSummary({
+      datasetId,
+    });
+
+  Logger.log("got summary", summary);
+  /*
   const summary = useMemo(() => {
     return getSummary({
       dataRows: rawDatasetRows,
       columns,
     });
   }, [rawDatasetRows, columns]);
+  */
 
   return (
     <Stack>
-      <ObjectDescriptionList data={summary} excludeKeys={["columnSummaries"]} />
-
-      {summary.columnSummaries ?
-        <Stack>
-          <Title order={4}>Column Summaries</Title>
+      {isLoadingSummary ?
+        <Loader />
+      : null}
+      {summary ?
+        <>
           <ObjectDescriptionList
-            data={summary.columnSummaries}
-            titleKey="name"
-            itemRenderOptions={{
-              maxHeight: 400,
-              excludeKeys: ["name"],
-              childRenderOptions: {
-                mostCommonValue: {
+            data={summary}
+            excludeKeys={["columnSummaries"]}
+          />
+
+          {summary.columnSummaries ?
+            <Stack>
+              <Title order={4}>Column Summaries</Title>
+              <ObjectDescriptionList
+                data={summary.columnSummaries}
+                titleKey="name"
+                itemRenderOptions={{
+                  maxHeight: 400,
+                  excludeKeys: ["name"],
                   childRenderOptions: {
-                    value: {
-                      maxItemsCount: 4,
+                    mostCommonValue: {
+                      childRenderOptions: {
+                        value: {
+                          maxItemsCount: 4,
+                        },
+                      },
                     },
                   },
-                },
-              },
-            }}
-          />
-        </Stack>
+                }}
+              />
+            </Stack>
+          : null}
+        </>
       : null}
     </Stack>
   );

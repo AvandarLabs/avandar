@@ -5,14 +5,14 @@ import { useQueryClient } from "@tanstack/react-query";
 import { invariant } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datsets/DatasetClient";
+import { DatasetRawDataClient } from "@/clients/datsets/DatasetRawDataClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
-import { duckDataTypeToDatasetDataType } from "@/clients/DuckDBClient/duckDataTypeToDatasetDataType";
+import { DuckDBDataType } from "@/clients/DuckDBClient/DuckDBDataType";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/types";
 import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useMutation } from "@/lib/hooks/query/useMutation";
-import { Logger } from "@/lib/Logger";
 import { MIMEType, UnknownObject } from "@/lib/types/common";
 import {
   notifyError,
@@ -57,7 +57,6 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
       );
       setLoadCSVResult(loadResult);
       setPreviewRows(previewData.data);
-      Logger.log("new results", loadResult);
       return loadResult;
     },
     onSuccess: (loadResult: DuckDBLoadCSVResult) => {
@@ -104,15 +103,15 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
       queryKey: DatasetClient.QueryKeys.getAll(),
     });
 
-    // TODO(jpsyx): we dont need to save to Dexie?
-    // TODO(jpsyx): perhaps save duckdb to Dexie instead now?
-    /*
-    // and also save the raw data locally to Dexie
-    const rawDataString = unparseDataset({
-      datasetType: MIMEType.TEXT_CSV,
-      data: csv.data,
+    // now that we've persisted the dataset metadata to the backend, let's
+    // rename it locally to use the dataset id, which is stable
+    DuckDBClient.renameCSV({
+      oldName: selectedFile.name,
+      newName: dataset.id,
     });
 
+    // Now let's save the raw data locally to Dexie
+    const parquetBlob = await DuckDBClient.exportCSVAsParquet(dataset.id);
     await DatasetRawDataClient.insert({
       data: {
         createdAt: new Date(),
@@ -122,11 +121,9 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
         ownerId: workspace.ownerId,
         ownerProfileId: userProfile.profileId,
         workspaceId: workspace.id,
-        data: rawDataString,
+        data: parquetBlob,
       },
     });
-    */
-
     return dataset;
   };
 
@@ -134,7 +131,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
     return loadCSVResult?.columns.map((duckColumn, idx) => {
       return {
         name: duckColumn.column_name,
-        dataType: duckDataTypeToDatasetDataType(duckColumn.column_type),
+        dataType: DuckDBDataType.toDatasetDataType(duckColumn.column_type),
         columnIdx: idx,
       };
     });

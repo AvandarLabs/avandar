@@ -1,4 +1,4 @@
-import { iso, object, string, enum as zodEnum } from "zod";
+import { iso, object, enum as zodEnum, instanceof as zodInstanceOf } from "zod";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import {
@@ -19,7 +19,7 @@ const DBReadSchema = object({
   ownerProfileId: uuidType<UserProfileId>(),
   workspaceId: uuidType<WorkspaceId>(),
   sourceType: zodEnum(DatasetSourceTypes),
-  data: string(),
+  data: zodInstanceOf(Blob),
 });
 
 export const DatasetRawDataParsers =

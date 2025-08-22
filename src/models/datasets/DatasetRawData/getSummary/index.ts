@@ -34,7 +34,7 @@ type DateFieldSummary = {
   datasetDuration: string;
 };
 
-type FieldSummary = {
+export type ColumnSummary = {
   name: string;
   distinctValuesCount: number;
   emptyValuesCount: number;
@@ -45,11 +45,10 @@ type FieldSummary = {
   };
 } & (TextFieldSummary | NumericFieldSummary | DateFieldSummary);
 
-type DatasetSummary = {
+export type DatasetSummary = {
   rows: number;
   columns: number;
-  emptyRows: number;
-  columnSummaries?: readonly FieldSummary[];
+  columnSummaries?: readonly ColumnSummary[];
 };
 
 function _getTypeSpecificSummary(
@@ -95,7 +94,6 @@ export function getSummary({
   return {
     rows: dataRows.length,
     columns: columns.length,
-    emptyRows: 0,
     columnSummaries:
       dataRows.length === 0 ?
         undefined
