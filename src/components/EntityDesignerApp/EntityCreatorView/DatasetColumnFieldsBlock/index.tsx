@@ -15,7 +15,7 @@ import {
   IconCircleNumber2Filled,
 } from "@tabler/icons-react";
 import { useCallback, useMemo, useState } from "react";
-import { DatasetClient } from "@/clients/datsets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnPickerList } from "@/components/common/DatasetColumnPickerList";
 import { useMap } from "@/lib/hooks/state/useMap";
 import { Callout } from "@/lib/ui/Callout";

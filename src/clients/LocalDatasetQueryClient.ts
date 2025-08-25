@@ -17,8 +17,8 @@ import { DatasetId, DatasetWithColumns } from "@/models/datasets/Dataset";
 import { DatasetColumn } from "@/models/datasets/DatasetColumn";
 import { getArrowDataType } from "@/models/datasets/DatasetColumn/utils";
 import { unparseDataset } from "@/models/LocalDataset/utils";
-import { DatasetClient } from "./datsets/DatasetClient";
-import { DatasetRawDataClient } from "./datsets/DatasetRawDataClient";
+import { DatasetClient } from "./datasets/DatasetClient";
+import { DatasetRawDataClient } from "./datasets/DatasetRawDataClient";
 
 export type QueryAggregationType =
   | "sum"
