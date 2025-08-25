@@ -67,18 +67,31 @@ using (
 );
 
 -- INSERT
-create policy "Owner can INSERT themselves as workspace members; Admin can INSERT others"
+drop policy if exists "Insert memberships: self, owner, admin" on public.workspace_memberships;
+
+create policy "Insert memberships: self, owner, admin"
 on public.workspace_memberships
-for insert
-to authenticated
+for insert to authenticated
 with check (
-  (
-    user_id = auth.uid()
-    and workspace_id = any ( array( select public.util__get_auth_user_owned_workspaces() ) )
+  -- self
+  user_id = auth.uid()
+  -- owner of the workspace
+  or exists (
+    select 1
+    from public.workspaces w
+    where w.id = workspace_memberships.workspace_id
+      and w.owner_id = auth.uid()
   )
-  or
-  workspace_id = any ( array( select public.util__get_auth_user_workspaces_by_role('admin') ) )
+  -- admin of the workspace
+  or workspace_id = any (
+    array(select public.util__get_auth_user_workspaces_by_role('admin'))
+  )
 );
+
+-- (optional but recommended to be explicit)
+grant insert on public.workspace_memberships to authenticated;
+
+
 
 -- DELETE
 create policy "User can DELETE their own memberships; Admin can DELETE in their workspaces"
