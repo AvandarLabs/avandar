@@ -1,4 +1,4 @@
-drop policy "User can SELECT their own tokens__google" on "public"."tokens__google";
+drop policy if exists "User can SELECT their own tokens__google" on "public"."tokens__google";
 
 create policy "User can DELETE their own google tokens"
 on "public"."tokens__google"

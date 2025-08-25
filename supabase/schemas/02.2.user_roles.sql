@@ -28,6 +28,33 @@ create table public.user_roles (
   )
 );
 
+-- One entry per role per membership
+create unique index if not exists user_roles_membership_role_unique
+  on public.user_roles (membership_id, role);
+
+-- Handy lookup
+create index if not exists idx_user_roles_membership_id
+  on public.user_roles (membership_id);
+  
+comment on table public.user_roles is
+  'Stores roles for a user in a workspace.';
+
+-- Column documentation
+comment on column public.user_roles.id is
+  'Unique identifier for the user role.';
+comment on column public.user_roles.workspace_id is
+  'Workspace this membership belongs to. References workspaces(id).';
+comment on column public.user_roles.user_id is
+  'User who is a member of the workspace. References auth.users(id).';
+comment on column public.user_roles.membership_id is
+  'Membership this role belongs to. References workspace_memberships(id).';
+comment on column public.user_roles.role is
+  'Role of the user in the workspace (admin, member, etc.).';
+comment on column public.user_roles.created_at is
+  'Timestamp when the membership was created.';
+comment on column public.user_roles.updated_at is
+  'Timestamp of last update.';
+
 -- Indexes to improve performance
 create index idx_user_roles__workspace_id on public.user_roles (
   workspace_id

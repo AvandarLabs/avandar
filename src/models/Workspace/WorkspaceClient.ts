@@ -38,8 +38,6 @@ export const WorkspaceClient = createSupabaseCRUDClient({
         });
       },
 
-      // TODO: Update user_roles to reference
-      // user_profiles instead of auth.users. See issue #123.
       getUsersForWorkspace: async ({
         workspaceId,
       }: {
@@ -50,39 +48,45 @@ export const WorkspaceClient = createSupabaseCRUDClient({
 
         const { data: profiles } = await dbClient
           .from("user_profiles")
-          .select("*")
+          .select(
+            "id, user_id, membership_id, workspace_id, full_name, display_name, created_at, updated_at",
+          )
           .eq("workspace_id", workspaceId)
           .throwOnError();
 
-        const userIds = profiles.map((p) => {
-          return p.user_id;
+        const membershipIds = profiles.map((p) => {
+          return p.membership_id;
         });
+        if (membershipIds.length === 0) {
+          logger.log("No profiles in workspace; returning empty.");
+          return [];
+        }
+
         const { data: roles } = await dbClient
           .from("user_roles")
-          .select("user_id, role")
-          .in("user_id", userIds)
-          .eq("workspace_id", workspaceId)
+          .select("membership_id, role")
+          .in("membership_id", membershipIds)
           .throwOnError();
 
-        const roleMap = new Map(
-          roles.map((r) => {
-            return [r.user_id, r.role];
-          }),
-        );
+        const roleMap = new Map<string, string>();
+        for (const r of roles) {
+          if (!roleMap.has(r.membership_id))
+            roleMap.set(r.membership_id, r.role);
+        }
 
         const transformed = profiles.map((row) => {
           const model = camelCaseKeysShallow(row);
           return {
             ...model,
-            id: uuid<UserId>(model.id),
+            id: uuid<UserId>(row.user_id),
             workspaceId: uuid<WorkspaceId>(model.workspaceId),
             createdAt: new Date(model.createdAt),
             updatedAt: new Date(model.updatedAt),
-            role: roleMap.get(row.user_id) ?? "member",
-          };
+            role: roleMap.get(row.membership_id) ?? "member",
+          } as WorkspaceUser;
         });
 
-        logger.log("Users retrieved", { users: transformed });
+        logger.log("Users retrieved", { count: transformed.length });
         return transformed;
       },
     };

@@ -50,7 +50,34 @@ update on public.user_profiles for each row
 execute function public.util__set_updated_at ();
 
 -- Indexes to improve performance
-create index idx_user_profiles__user_id_workspace_id on public.user_profiles (
-  user_id,
-  workspace_id
-);
+create index idx_user_profiles__user_id_workspace_id on public.user_profiles(user_id, workspace_id);
+
+-- Function: prevent changes to user_id, workspace_id, and membership_id
+create or replace function user_profiles__prevent_id_changes()
+returns trigger as $$
+  begin
+    if new.user_id <> old.user_id or
+      new.workspace_id <> old.workspace_id or
+      new.membership_id <> old.membership_id then
+      raise exception 'user_id, workspace_id, and membership_id cannot be changed';
+    end if;
+    return new;
+  end;
+$$
+language plpgsql;
+
+-- One profile per membership
+alter table public.user_profiles
+  add constraint if not exists user_profiles_membership_id_unique
+  unique (membership_id);
+
+-- Trigger: prevent `user_id`, `workspace_id`, and `membership_id` changes on update
+create trigger tr_user_profiles__prevent_id_changes
+  before update on public.user_profiles
+  for each row execute function user_profiles__prevent_id_changes();
+
+-- Trigger: update `updated_at` on row modification
+create trigger tr_user_profiles__set_updated_at
+  before update on public.user_profiles
+  for each row
+  execute function public.util__set_updated_at();

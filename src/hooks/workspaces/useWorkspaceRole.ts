@@ -1,8 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { SupabaseDBClient } from "@/lib/clients/supabase/SupabaseDBClient";
 import { WorkspaceRole } from "@/models/Workspace/types";
 import { useCurrentUser } from "../users/useCurrentUser";
+import { useCurrentWorkspace } from "./useCurrentWorkspace";
+
+type UserRoleWithMembership = {
+  role: WorkspaceRole;
+  workspace_memberships: { id: string; workspace_id: string; user_id: string };
+};
 
 export function useWorkspaceRole(): WorkspaceRole {
   const user = useCurrentUser();
@@ -14,16 +19,14 @@ export function useWorkspaceRole(): WorkspaceRole {
     staleTime: Infinity,
     queryFn: async () => {
       const { data, error } = await SupabaseDBClient.from("user_roles")
-        .select("role")
-        .eq("user_id", user!.id)
-        .eq("workspace_id", workspace!.id)
-        .single();
+        .select("role, workspace_memberships!inner(id, workspace_id, user_id)")
+        .eq("workspace_memberships.workspace_id", workspace!.id)
+        .eq("workspace_memberships.user_id", user!.id)
+        .limit(1)
+        .maybeSingle<UserRoleWithMembership>();
 
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      return data?.role ?? "member";
+      if (error) throw error;
+      return (data?.role ?? "member") as WorkspaceRole;
     },
   });
 
