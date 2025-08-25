@@ -41,9 +41,9 @@ declare
   v_dataset public.datasets;
   v_column public.dataset_column_input;
 begin
-  -- Check the requesting user is an admin of the workspace.
+  -- Ensure the workspace is one that the user admins
   if (
-    p_workspace_id != any(public.util__get_auth_user_workspaces_by_role('admin'))
+    p_workspace_id != all(public.util__get_auth_user_workspaces_by_role('admin'))
   ) then
     raise exception 'The requesting user is not an admin of this workspace';
   end if;

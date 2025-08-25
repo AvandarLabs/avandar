@@ -25,13 +25,9 @@ import {
   IconSwitch2,
   IconUser,
 } from "@tabler/icons-react";
-import {
-  Outlet,
-  ReactNode,
-  useNavigate,
-  useRouter,
-} from "@tanstack/react-router";
+import { Outlet, useNavigate, useRouter } from "@tanstack/react-router";
 import clsx from "clsx";
+import { ReactNode } from "react";
 import { AuthClient } from "@/clients/AuthClient";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLink, AppLinks } from "@/config/AppLinks";
