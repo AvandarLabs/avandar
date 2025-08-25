@@ -50,7 +50,6 @@ update on public.user_profiles for each row
 execute function public.util__set_updated_at ();
 
 -- Indexes to improve performance
-<<<<<<< HEAD
 create index idx_user_profiles__user_id_workspace_id on public.user_profiles(user_id, workspace_id);
 
 -- Function: prevent changes to user_id, workspace_id, and membership_id
@@ -82,9 +81,3 @@ create trigger tr_user_profiles__set_updated_at
   before update on public.user_profiles
   for each row
   execute function public.util__set_updated_at();
-=======
-create index idx_user_profiles__user_id_workspace_id on public.user_profiles (
-  user_id,
-  workspace_id
-);
->>>>>>> develop

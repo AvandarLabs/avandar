@@ -51,48 +51,48 @@ begin
 end;
 $$;
 
-comment on function public.rpc_workspaces__add_user(
+comment on function create or replace function public.rpc_workspaces__add_user(
   p_workspace_id uuid,
   p_user_id uuid,
   p_full_name text,
   p_display_name text,
   p_user_role text
-) is
-  'Adds a user to an existing workspace: creates membership, profile, and role (via user_profile_id). '
-  'Returns the workspace_memberships.id. Caller must be an owner or admin of the workspace.';
-
-
--- Function: create a new workspace and assign the current user as the owner
--- Returns the created workspace row
-create or replace function public.rpc_workspaces__create_with_owner(
-  p_workspace_name text,
-  p_workspace_slug text,
-  p_full_name text,
-  p_display_name text
 )
-returns public.workspaces
+returns uuid
 language plpgsql
 security invoker
 as $$
 declare
-  v_owner_id uuid := auth.uid();
-  v_workspace public.workspaces;
+  v_membership_id uuid;
+  v_profile_id uuid;
 begin
-  -- Create the workspace owned by the current user
-  insert into public.workspaces (owner_id, name, slug)
-  values (v_owner_id, p_workspace_name, p_workspace_slug)
-  returning * into v_workspace;
+  -- Correct admin/owner check (positive membership checks, not "!= ANY")
+  if
+    not (p_workspace_id = any(public.util__get_auth_user_owned_workspaces()))
+    and not (p_workspace_id = any(public.util__get_auth_user_workspaces_by_role('admin')))
+  then
+    raise exception 'The requesting user is not an admin of this workspace';
+  end if;
 
-  -- Add the owner as an admin member (creates membership, profile, role)
-  perform public.rpc_workspaces__add_user(
-    v_workspace.id,
-    v_owner_id,
-    p_full_name,
-    p_display_name,
-    'admin'
-  );
+  -- Create membership
+  insert into public.workspace_memberships (workspace_id, user_id)
+  values (p_workspace_id, p_user_id)
+  returning id into v_membership_id;
 
-  return v_workspace;
+  -- Create profile
+  insert into public.user_profiles (
+    workspace_id, user_id, membership_id, full_name, display_name
+  )
+  values (
+    p_workspace_id, p_user_id, v_membership_id, p_full_name, p_display_name
+  )
+  returning id into v_profile_id;
+
+  -- Create role (no user_id column on user_roles)
+  insert into public.user_roles (workspace_id, membership_id, user_profile_id, role)
+  values (p_workspace_id, v_membership_id, v_profile_id, p_user_role);
+
+  return v_membership_id;
 end;
 $$;
 

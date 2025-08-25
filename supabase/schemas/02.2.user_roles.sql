@@ -27,7 +27,6 @@ create table public.user_roles (
     now()
   )
 );
-<<<<<<< HEAD
 
 -- One entry per role per membership
 create unique index if not exists user_roles_membership_role_unique
@@ -55,8 +54,6 @@ comment on column public.user_roles.created_at is
   'Timestamp when the membership was created.';
 comment on column public.user_roles.updated_at is
   'Timestamp of last update.';
-=======
->>>>>>> develop
 
 -- Indexes to improve performance
 create index idx_user_roles__workspace_id on public.user_roles (
