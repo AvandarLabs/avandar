@@ -5,7 +5,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { invariant } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datsets/DatasetClient";
-import { DatasetRawDataClient } from "@/clients/datsets/DatasetRawDataClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { DuckDBDataType } from "@/clients/DuckDBClient/DuckDBDataType";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/types";
@@ -19,10 +18,12 @@ import {
   notifySuccess,
   notifyWarning,
 } from "@/lib/ui/notifications/notify";
-import { notifyNotImplemented } from "@/lib/ui/notifications/notifyNotImplemented";
 import { FileUploadField } from "@/lib/ui/singleton-forms/FileUploadField";
 import { snakeCaseKeysShallow } from "@/lib/utils/objects/transformations";
-import { DatasetUploadForm } from "../DatasetUploadForm";
+import {
+  DatasetUploadForm,
+  DatasetUploadFormValues,
+} from "../DatasetUploadForm";
 
 type Props = BoxProps;
 export function ManualUploadView({ ...props }: Props): JSX.Element {
@@ -30,9 +31,10 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
   const [userProfile] = useCurrentUserProfile();
   const [selectedFile, setSelectedFile] = useState<File | undefined>();
+  const [isReprocessing, setIsReprocessing] = useState(false);
+
   const [loadCSVResult, setLoadCSVResult] = useState<DuckDBLoadCSVResult>();
   const [previewRows, setPreviewRows] = useState<UnknownObject[]>();
-  const [isReprocessing, setIsReprocessing] = useState(false);
   const [loadCSV, isLoadingCSV] = useMutation({
     mutationFn: async ({
       file,
@@ -55,8 +57,8 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
 
       // now query the file for the rows to preview
       const previewData = await DuckDBClient.runRawQuery(
-        `SELECT * FROM "$table$" LIMIT ${AppConfig.dataManagerApp.maxPreviewRows}`,
-        { csvName },
+        `SELECT * FROM "$tableName$" LIMIT ${AppConfig.dataManagerApp.maxPreviewRows}`,
+        { datasetName: csvName },
       );
       setLoadCSVResult(loadResult);
       setPreviewRows(previewData.data);
@@ -87,7 +89,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
     },
   });
 
-  const saveLocalCSVToBackend = async (values: DatasetUploadForm) => {
+  const saveLocalCSVToBackend = async (values: DatasetUploadFormValues) => {
     // this function can't be called without available file metadata
     invariant(loadCSVResult, "No CSV has been loaded");
     invariant(selectedFile, "No file is available");
@@ -108,24 +110,9 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
 
     // now that we've persisted the dataset metadata to the backend, let's
     // rename it locally to use the dataset id, which is stable
-    DuckDBClient.renameCSV({
+    await DuckDBClient.renameDataset({
       oldName: selectedFile.name,
       newName: dataset.id,
-    });
-
-    // Now let's save the raw data locally to Dexie
-    const parquetBlob = await DuckDBClient.exportCSVAsParquet(dataset.id);
-    await DatasetRawDataClient.insert({
-      data: {
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        datasetId: dataset.id,
-        sourceType: "local_csv",
-        ownerId: workspace.ownerId,
-        ownerProfileId: userProfile.profileId,
-        workspaceId: workspace.id,
-        data: parquetBlob,
-      },
     });
     return dataset;
   };
@@ -197,14 +184,11 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
 
         <Dropzone.FullScreen
           onDrop={(files: FileWithPath[]) => {
-            console.log(files);
-            notifyNotImplemented();
-            /*
             const uploadedFile = files[0];
             if (uploadedFile) {
-              parseFile(uploadedFile);
+              setSelectedFile(uploadedFile);
+              loadCSV({ file: uploadedFile });
             }
-            */
           }}
         >
           <Dropzone.Accept>

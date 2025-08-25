@@ -23,7 +23,7 @@ import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { Dataset } from "@/models/datasets/Dataset";
 import { DetectedDatasetColumn } from "../../hooks/detectColumnDataTypes";
 
-export type DatasetUploadForm = {
+export type DatasetUploadFormValues = {
   name: string;
   description: string;
 };
@@ -41,7 +41,7 @@ type Props = {
   rows: UnknownObject[];
   defaultName: string;
   columns: readonly DetectedDatasetColumn[];
-  doDatasetSave: (values: DatasetUploadForm) => Promise<Dataset>;
+  doDatasetSave: (values: DatasetUploadFormValues) => Promise<Dataset>;
   disableSubmit?: boolean;
   loadCSVResult: DuckDBLoadCSVResult;
 
@@ -105,7 +105,7 @@ export function DatasetUploadForm({
     return rows.slice(0, AppConfig.dataManagerApp.maxPreviewRows);
   }, [rows]);
 
-  const form = useForm<DatasetUploadForm>({
+  const form = useForm<DatasetUploadFormValues>({
     initialValues: {
       name: defaultName,
       description: "",

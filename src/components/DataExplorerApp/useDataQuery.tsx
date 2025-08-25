@@ -1,4 +1,3 @@
-import { DatasetRawDataClient } from "@/clients/datsets/DatasetRawDataClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import {
   LocalQueryConfig,
@@ -51,9 +50,6 @@ export function useDataQuery({
 
     queryFn: async () => {
       if (aggregations && datasetId !== undefined && selectFields.length > 0) {
-        // load the necessary dataset into the db
-        await DatasetRawDataClient.loadDataset({ datasetId });
-
         // now run the query
         return DuckDBClient.runStructuredQuery({
           datasetId,

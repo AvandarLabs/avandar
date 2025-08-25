@@ -13,8 +13,8 @@ import {
 } from "@/models/datasets/Dataset";
 import { WorkspaceId } from "@/models/Workspace/types";
 import { CompositeTypes } from "@/types/database.types";
+import { DuckDBClient } from "../DuckDBClient";
 import { DatasetColumnClient } from "./DatasetColumnClient";
-import { DatasetRawDataClient } from "./DatasetRawDataClient";
 
 type DatasetColumnInput = SetOptional<
   ExcludeNullsIn<CompositeTypes<"dataset_column_input">>,
@@ -180,7 +180,7 @@ export const DatasetClient = createSupabaseCRUDClient({
         await DatasetClient.delete({ id: params.id });
 
         // now also delete the raw data locally
-        await DatasetRawDataClient.delete({ id: params.id });
+        await DuckDBClient.dropDataset(params.id);
       },
     };
   },

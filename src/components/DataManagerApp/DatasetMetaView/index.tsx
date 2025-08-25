@@ -68,7 +68,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
   });
 
-  const [datasetRawData, isLoadingRawData] =
+  const [previewData, isLoadingPreviewData] =
     DatasetRawDataClient.withLogger().useGetPreviewData({
       datasetId: dataset.id,
       numRows: AppConfig.dataManagerApp.maxPreviewRows,
@@ -77,22 +77,10 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
     DatasetColumnClient.useGetAll(where("dataset_id", "eq", dataset.id));
 
   const datasetWithColumns = useMemo(() => {
-    return {
-      ...dataset,
-      columns: datasetColumns,
-    };
+    return { ...dataset, columns: datasetColumns };
   }, [dataset, datasetColumns]);
 
   const [isEditingDataset, setIsEditingDataset] = useState<boolean>(false);
-
-  // TODO(jpsyx): eventually the dataset should be streamed, rather than
-  // storing it all in memory. Right now this doesnt save any memory if we
-  // load it all and then just take a slice.
-  const previewData = useMemo(() => {
-    return (
-      datasetRawData?.slice(0, AppConfig.dataManagerApp.maxPreviewRows) ?? []
-    );
-  }, [datasetRawData]);
 
   const [currentTab, setCurrentTab] =
     useState<DatasetTabId>("dataset-metadata");
@@ -112,7 +100,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
     };
   };
 
-  const isLoadingFullDataset = isLoadingRawData || isLoadingDatasetColumns;
+  const isLoadingFullDataset = isLoadingPreviewData || isLoadingDatasetColumns;
   const datasetColumnNames = datasetColumns?.map(getProp("name")) ?? [];
 
   return (
@@ -197,9 +185,9 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                 />
 
                 <Title order={5}>Data preview</Title>
-                {isLoadingRawData ?
+                {isLoadingPreviewData ?
                   <Loader />
-                : datasetRawData && previewData ?
+                : previewData && previewData ?
                   <DataGrid
                     columnNames={datasetColumnNames}
                     data={previewData}
@@ -209,7 +197,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
             </Tabs.Panel>
 
             <Tabs.Panel value="dataset-summary">
-              {isLoadingFullDataset || !datasetRawData || !datasetColumns ?
+              {isLoadingFullDataset || !previewData || !datasetColumns ?
                 <Loader />
               : <DataSummaryView datasetId={dataset.id} />}
             </Tabs.Panel>

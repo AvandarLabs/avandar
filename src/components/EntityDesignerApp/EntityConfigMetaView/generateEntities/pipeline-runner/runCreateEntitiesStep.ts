@@ -1,7 +1,5 @@
 import { match } from "ts-pattern";
 import { EntityClient } from "@/clients/entities/EntityClient";
-import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient";
-import { Logger } from "@/lib/Logger";
 import { RawDataRow } from "@/lib/types/common";
 import { assert, isNotNullOrUndefined } from "@/lib/utils/guards";
 import {
@@ -26,7 +24,7 @@ import {
   BuildableFieldConfig,
   CreateEntitiesStepConfig,
 } from "../pipelineTypes";
-import { EntityFieldValueNativeType, PipelineContext } from "./runPipeline";
+import { PipelineContext } from "./runPipeline";
 
 /**
  * Given an entity config, get the IDs of all datasets that will be
@@ -242,29 +240,31 @@ export async function runCreateEntitiesStep(
 
   // in the function above we created an externalIdRowGroupLookup for
   // each source dataset. Now we merge them all into one big lookup.
+
+  const entities: Entity[] = [];
   const externalIdRowGroupLookup = mergeBucketMaps(
     ...objectValues(sourceDatasetIdsToExternalIdRowGroupLookup),
   );
-
-  const entities: Entity[] = [];
-  const allEntityFieldValues: EntityFieldValue[] = [];
+  // const allEntityFieldValues: EntityFieldValue[] = [];
   // const queryableEntities: Array<Entity & Record<string, unknown>> = [];
 
   // each external id we found is 1 valid entity. So now we iterate through each
   // one, collect the configured fields values, apply the necessary value picker
   // rules (if we have multiple values for a single field), and finally create
   // the output entity and field value datasets.
-  externalIdRowGroupLookup.forEach((sourceDatasetRows, externalId) => {
+  externalIdRowGroupLookup.forEach((_sourceDatasetRows, externalId) => {
     if (!externalId) {
       return;
     }
 
     const entityId = uuid<EntityId>();
-    const fieldNameToValueDict: Record<string, EntityFieldValueNativeType> = {};
-
-    let entityName: string = String(externalId); // falback value
+    // const fieldNameToValueDict: Record<string, EntityFieldValueNativeType> =
+    // {};
 
     // now collect all the fields for this entity
+    const entityName: string = String(externalId); // falback value
+
+    /*
     entityConfig.fields.forEach((fieldConfig) => {
       const { valueExtractor, entityConfigId } = fieldConfig;
 
@@ -305,6 +305,7 @@ export async function runCreateEntitiesStep(
         }
       }
     });
+    */
 
     // construct the entity object
     const entity: Entity = {
@@ -327,7 +328,6 @@ export async function runCreateEntitiesStep(
   // TODO(jpsyx): for now, we're just going to write everything to
   // Supabase here rather than having a separate write or output step.
   await EntityClient.bulkInsert({ data: entities });
-  await EntityFieldValueClient.bulkInsert({ data: allEntityFieldValues });
 
   // TODO(jpsyx): we should be storing entities back in Supabase
   return Promise.resolve(context.addErrors(errors));

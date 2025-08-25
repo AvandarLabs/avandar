@@ -84,6 +84,7 @@ function createPipelineContext(state: PipelineContextState): PipelineContext {
         datasets: { ...datasets, [dataset.id]: dataset },
       });
     },
+
     addErrors: (errorsToAdd: string[]): PipelineContext => {
       const pipelineErrorsToAdd = errorsToAdd.map((error) => {
         return {

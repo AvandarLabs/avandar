@@ -3,6 +3,7 @@ import ehWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url";
 import mvpWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?url";
 import duckDBWasmEh from "@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url";
 import duckDBWasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
+import { invariant } from "@tanstack/react-router";
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
@@ -11,7 +12,10 @@ import { MIMEType } from "@/lib/types/common";
 import { isNonEmptyArray } from "@/lib/utils/guards";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries } from "@/lib/utils/objects/misc";
-import { mapObjectValues } from "@/lib/utils/objects/transformations";
+import {
+  camelCaseKeysShallow,
+  mapObjectValues,
+} from "@/lib/utils/objects/transformations";
 import { snakeify } from "@/lib/utils/strings/transformations";
 import { uuid } from "@/lib/utils/uuid";
 import { arrowFieldToQueryResultField } from "./arrowFieldToQueryResultField";
@@ -100,9 +104,6 @@ class DuckDBClientImpl {
 
   #logger: ILogger = Logger.appendName("DuckDBClient");
 
-  /** Map csv names to their duckdb table names. */
-  #csvTableNameLookup: Record<string, string> = {};
-
   async #initialize(): Promise<duckdb.AsyncDuckDB> {
     // Select a bundle based on browser checks
     const bundle = await duckdb.selectBundle(MANUAL_BUNDLES);
@@ -112,18 +113,23 @@ class DuckDBClientImpl {
     const logger = new duckdb.ConsoleLogger();
     const db = new duckdb.AsyncDuckDB(logger, worker);
 
+    this.#db = Promise.resolve(db);
     await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
-
-    // drop the whole database for now and then we can restart it
-    const rootOPFS = await navigator.storage.getDirectory();
-    await rootOPFS.removeEntry("avandar.duckdb", { recursive: false });
 
     // TODO(jpsyx): if we are in a browser that does not support OPFS
     // we will need to persist to indexedDB. we should handle this.
     await db.open({
       path: `opfs://avandar.duckdb`,
-      accessMode: duckdb.DuckDBAccessMode.AUTOMATIC,
+      accessMode: duckdb.DuckDBAccessMode.READ_WRITE,
     });
+
+    // create a table that tracks dataset names mapped to their table names
+    await this.runRawQuery(
+      `CREATE TABLE IF NOT EXISTS datasets (
+        dataset_name VARCHAR UNIQUE,
+        table_name VARCHAR UNIQUE
+      )`,
+    );
     return db;
   }
 
@@ -151,7 +157,7 @@ class DuckDBClientImpl {
     }) => Promise<T>,
   ): Promise<T> {
     const db = await this.#getDB();
-    if (!this.#conn) {
+    if (this.#conn === undefined) {
       // if there's no active connection, create a new one
       this.#conn = await db.connect();
     }
@@ -172,7 +178,7 @@ class DuckDBClientImpl {
   async getTableNames(): Promise<string[]> {
     return await this.#withConnection(async ({ conn }) => {
       // get all table names
-      const result = await conn.query(`
+      const result = await conn.query<{ table_name: arrow.DataType }>(`
         SELECT table_name
         FROM information_schema.tables
         WHERE table_schema = 'main' AND table_type = 'BASE TABLE'
@@ -184,29 +190,72 @@ class DuckDBClientImpl {
     });
   }
 
-  async hasLoadedCSV(csvName: string): Promise<boolean> {
-    const tableName = snakeify(csvName);
-    const tableNames = await this.getTableNames();
-    return tableNames.includes(tableName);
+  async hasTable(tableName: string): Promise<boolean> {
+    const dbTableNames = await this.getTableNames();
+    return dbTableNames.includes(tableName);
   }
 
-  async #registerCSVFile(options: { name: string; file: File }): Promise<void> {
-    const { name, file } = options;
-    const tableName = snakeify(options.name);
-
-    // store the table name for future lookup
-    this.#csvTableNameLookup[name] = tableName;
-
-    const db = await this.#getDB();
-    await db.registerFileHandle(
-      tableName,
-      file,
-      duckdb.DuckDBDataProtocol.BROWSER_FILEREADER,
-      true,
+  /**
+   * Checks if a dataset file has been loaded into DuckDB. This requires that
+   * both the dataset name be in the `datasets` table and the table name be in
+   * the list of table names.
+   * @param datasetName The name of the CSV file.
+   * @returns A promise that resolves to a boolean indicating whether the CSV
+   * file has been loaded.
+   */
+  async hasLoadedDataset(datasetName: string): Promise<boolean> {
+    const datasetResults = await this.runRawQuery<{
+      dataset_name: string;
+      table_name: string;
+    }>(
+      `SELECT dataset_name, table_name FROM datasets
+        WHERE dataset_name = '${datasetName}'`,
     );
+    if (datasetResults.numRows === 0) {
+      return false;
+    }
+    invariant(datasetResults.numRows === 1, "Expected exactly one dataset");
+    const tableName = datasetResults.data[0]!.table_name;
+    return await this.hasTable(tableName);
   }
 
-  async #registerParquetFile(options: {
+  async #addDatasetMapping(datasetName: string): Promise<void> {
+    const tableName = snakeify(datasetName);
+    await this.#withConnection(async ({ conn }) => {
+      await conn.query(
+        `INSERT INTO datasets (dataset_name, table_name)
+          VALUES ('${datasetName}', '${tableName}')
+          ON CONFLICT DO NOTHING`,
+      );
+    });
+  }
+
+  async #registerDatasetFromCSV(
+    options: { name: string; file: File } | { name: string; fileText: string },
+  ): Promise<void> {
+    const { name } = options;
+    await this.#withConnection(async ({ db }) => {
+      await this.#addDatasetMapping(name);
+      const tableName = await this.#getDatasetTableName(name);
+
+      // we offer two ways a CSV can be registered: either with the file
+      // handle or with the raw text
+      if ("file" in options) {
+        const { file } = options;
+        await db.registerFileHandle(
+          tableName,
+          file,
+          duckdb.DuckDBDataProtocol.BROWSER_FILEREADER,
+          true,
+        );
+      } else {
+        const { fileText } = options;
+        await db.registerFileText(tableName, fileText);
+      }
+    });
+  }
+
+  async #registerDatasetFromParquet(options: {
     name: string;
     blob: Blob;
   }): Promise<void> {
@@ -214,29 +263,32 @@ class DuckDBClientImpl {
     if (blob.type !== MIMEType.APPLICATION_PARQUET) {
       throw new Error("Blob is not a parquet file");
     }
-
-    const tableName = snakeify(options.name);
-
-    // store the table name for future lookup
-    this.#csvTableNameLookup[name] = tableName;
+    await this.#addDatasetMapping(name);
+    const db = await this.#getDB();
+    const tableName = await this.#getDatasetTableName(name);
 
     // convert the blob to a Uint8Array
     const parquetBuffer = new Uint8Array(await blob.arrayBuffer());
-    const db = await this.#getDB();
     await db.registerFileBuffer(tableName, parquetBuffer);
   }
 
   /**
-   * Gets the table name for a CSV file.
-   * @param csvName The name of the CSV file.
+   * Gets the table name for a dataset.
+   * @param datasetName The name of the dataset.
    * @returns The table name.
    */
-  getCSVTableName(csvName: string): string {
-    const tableName = this.#csvTableNameLookup[csvName];
-    if (!tableName) {
-      throw new Error(`No table name found for CSV name: ${csvName}`);
+  async #getDatasetTableName(datasetName: string): Promise<string> {
+    const tableName = await this.runRawQuery<{ table_name: string }>(
+      `SELECT table_name FROM datasets WHERE dataset_name = '${datasetName}'`,
+    );
+    Logger.log("all datasets", await this.getLocalDatasetList());
+    if (tableName.numRows === 0) {
+      throw new Error(
+        `No table name found for dataset with name '${datasetName}'`,
+      );
     }
-    return tableName;
+    invariant(tableName.numRows === 1, "Expected exactly one table name");
+    return tableName.data[0]!.table_name;
   }
 
   /**
@@ -256,13 +308,13 @@ class DuckDBClientImpl {
     const hasUserProvidedOptions = !!numRowsToSkip || !!delimiter;
     const result = await this.runRawQuery<DuckDBCSVSniffResult>(
       `SELECT * FROM sniff_csv(
-          '$table$', 
+          '$tableName$', 
           strict_mode=${hasUserProvidedOptions ? "true" : "false"},
           ignore_errors=true
           ${numRowsToSkip ? `, skip=${numRowsToSkip}` : ""}
           ${delimiter ? `, delim='${delimiter}'` : ""}
       )`,
-      { csvName },
+      { datasetName: csvName },
     );
     return result.data[0]!;
   }
@@ -271,45 +323,87 @@ class DuckDBClientImpl {
    * Drops a file from DuckDB's internal file system. Also drops all
    * tables and information about rejected scans and rejected rows
    * that are associated with the file.
-   * @param csvName The name of the CSV file to drop.
+   * @param datasetName The name of the CSV file to drop.
    */
-  async #dropCSVFile(csvName: string): Promise<void> {
+  async dropDataset(datasetName: string): Promise<void> {
     const db = await this.#getDB();
+    const tableName = await this.#getDatasetTableName(datasetName);
 
     // delete the table associated to this file
-    await this.runRawQuery('DROP TABLE IF EXISTS "$table$"', { csvName });
+    await this.runRawQuery('DROP TABLE IF EXISTS "$tableName$"', {
+      datasetName,
+    });
 
-    // clear the existing rejected rows and rejected scans
-    // from any previous load attempts
-    await this.runRawQuery(
-      `DELETE FROM csv_reject_errors
+    const dbTableNames = await this.getTableNames();
+    if (dbTableNames.includes("csv_reject_errors")) {
+      // clear rejected rows from previous load attempts
+      await this.runRawQuery(
+        `DELETE FROM csv_reject_errors
           USING csv_reject_scans
           WHERE
             csv_reject_errors.file_id = csv_reject_scans.file_id AND
-            csv_reject_scans.file_path = '$table$'`,
-      { csvName },
-    );
+            csv_reject_scans.file_path = '$tableName$';`,
+        { datasetName },
+      );
+    }
+
+    if (dbTableNames.includes("csv_reject_scans")) {
+      // clear rejected scans from previous load attempts
+      await this.runRawQuery(
+        `DELETE FROM csv_reject_scans
+            WHERE csv_reject_scans.file_path = '$tableName$';`,
+        { datasetName },
+      );
+    }
+
+    // finally, delete the dataset-to-tableName mapping for this dataset
     await this.runRawQuery(
-      `DELETE FROM csv_reject_scans
-          WHERE csv_reject_scans.file_path = '$table$'`,
-      { csvName },
+      `DELETE FROM datasets WHERE dataset_name = '$datasetName$';`,
+      { datasetName },
     );
 
     // finally, drop the file from DuckDB's internal file system
-    await db.dropFile(csvName);
-    delete this.#csvTableNameLookup[csvName];
+    await db.dropFile(tableName);
+    await this.syncDB();
+  }
+
+  async getLocalDatasetList(): Promise<
+    Array<{ datasetName: string; tableName: string }>
+  > {
+    const datasets = await this.runRawQuery<{
+      dataset_name: string;
+      table_name: string;
+    }>(`SELECT dataset_name, table_name FROM datasets`);
+    return datasets.data.map(camelCaseKeysShallow);
   }
 
   /**
-   * Renames a CSV file. This does not change the internal DuckDB table name,
-   * it only changes the CSV name we will use to reference it. The internal
-   * DuckDB table name should not matter to the user, because this class
-   * interface only ever exposes the CSV name to the user.
+   * Syncs the DuckDB database with the browser's OPFS file system.
    */
-  renameCSV(options: { oldName: string; newName: string }): void {
-    this.#csvTableNameLookup[options.newName] =
-      this.#csvTableNameLookup[options.oldName]!;
-    delete this.#csvTableNameLookup[options.oldName];
+  async syncDB(): Promise<void> {
+    await this.#withConnection(async ({ conn }) => {
+      await conn.query("CHECKPOINT");
+    });
+  }
+
+  /**
+   * Renames a dataset. This does not change the internal DuckDB table name,
+   * it only changes the mapping so that this new dataset name can point to the
+   * table name. The internal DuckDB table name should not matter to the user,
+   * because the user only ever uses the dataset name to interact with this
+   * interface.
+   */
+  async renameDataset(options: {
+    oldName: string;
+    newName: string;
+  }): Promise<void> {
+    await this.#withConnection(async ({ conn }) => {
+      await conn.query(
+        `UPDATE datasets SET dataset_name = '${options.newName}'
+          WHERE dataset_name = '${options.oldName}';`,
+      );
+      await this.syncDB();
+    });
   }
 
   /**
@@ -318,20 +412,28 @@ class DuckDBClientImpl {
    * @param file The file to load.
    * @returns A promise that resolves when the file is loaded.
    */
-  async loadCSV(options: {
-    csvName: string;
-    file: File;
-    numRowsToSkip?: number;
-    delimiter?: string;
-  }): Promise<DuckDBLoadCSVResult> {
-    const { csvName, file, numRowsToSkip, delimiter } = options;
+  async loadCSV(
+    options: {
+      csvName: string;
+      numRowsToSkip?: number;
+      delimiter?: string;
+    } & ({ file: File } | { fileText: string }),
+  ): Promise<DuckDBLoadCSVResult> {
+    const { csvName, numRowsToSkip, delimiter } = options;
+
     return await this.#withConnection(async ({ conn }) => {
-      const isCSVAlreadyLoaded = await this.hasLoadedCSV(csvName);
-      if (isCSVAlreadyLoaded) {
-        await this.#dropCSVFile(csvName);
+      const isDatasetAlreadyLoaded = await this.hasLoadedDataset(csvName);
+      if (isDatasetAlreadyLoaded) {
+        // if the dataset already exists, we drop it and then recreate it.
+        // For now, CSV loading will ALWAYS overwrite the existing data
+        await this.dropDataset(csvName);
       }
 
-      await this.#registerCSVFile({ name: csvName, file });
+      await this.#registerDatasetFromCSV(
+        "file" in options ?
+          { name: csvName, file: options.file }
+        : { name: csvName, fileText: options.fileText },
+      );
 
       // now we are ready to start loading the actual CSV data
       // first, we need to sniff the CSV to infer the schema and parsing options
@@ -342,7 +444,7 @@ class DuckDBClientImpl {
 
       // insert the CSV file as a table
       await this.runRawQuery(
-        `CREATE TABLE "$table$" AS
+        `CREATE TABLE "$tableName$" AS
             SELECT * ${sniffResult.Prompt.replace(
               "ignore_errors=true",
               `encoding='utf-8',
@@ -351,7 +453,7 @@ class DuckDBClientImpl {
               rejects_table='reject_errors',
               rejects_limit=${REJECTED_ROW_STORAGE_LIMIT}`,
             )}`,
-        { csvName },
+        { datasetName: csvName },
       );
 
       // append the temporary error tables into permanent tables, so we can
@@ -378,6 +480,9 @@ class DuckDBClientImpl {
       const columns = await this.getCSVSchema(csvName);
       const csvRowCount = await this.getCSVParsedRowCount(csvName);
       const csvErrors = await this.getCSVLoadErrors(csvName);
+
+      await this.syncDB();
+
       return {
         id: uuid(),
         csvName,
@@ -393,31 +498,36 @@ class DuckDBClientImpl {
   async loadParquet(options: {
     name: string;
     blob: Blob;
+    /**
+     * Overwrite the existing dataset if it exists. Otherwise, we skip
+     * parsing the dataset, and just return the existing metadata.
+     */
     overwrite?: boolean;
   }): Promise<DuckDBLoadParquetResult> {
     const { name, blob, overwrite } = options;
-    return await this.#withConnection(async () => {
-      const isCSVAlreadyLoaded = await this.hasLoadedCSV(name);
-      if (isCSVAlreadyLoaded && overwrite) {
-        await this.#dropCSVFile(name);
+    return await this.#withConnection(async ({ db }) => {
+      const isDatasetAlreadyLoaded = await this.hasLoadedDataset(name);
+      if (isDatasetAlreadyLoaded && overwrite) {
+        await this.dropDataset(name);
       }
 
-      if (!isCSVAlreadyLoaded || overwrite) {
-        await this.#registerParquetFile({ name, blob });
+      if (!isDatasetAlreadyLoaded || overwrite) {
+        await this.#registerDatasetFromParquet({ name, blob });
       }
 
       // reingest the parquet data into a table if it doesn't
       // already exist
       await this.runRawQuery(
-        `CREATE TABLE IF NOT EXISTS "$table$" AS
-            SELECT * FROM read_parquet('$table$')`,
-        { csvName: name },
+        `CREATE TABLE IF NOT EXISTS "$tableName$" AS
+            SELECT * FROM read_parquet('$tableName$')`,
+        { datasetName: name },
       );
 
       // now let's collect all information we need to return
       const columns = await this.getCSVSchema(name);
       const csvRowCount = await this.getCSVParsedRowCount(name);
 
+      await this.syncDB();
       return {
         name,
         columns,
@@ -434,8 +544,8 @@ class DuckDBClientImpl {
    */
   async getCSVParsedRowCount(csvName: string): Promise<number> {
     const result = await this.runRawQuery<{ count: bigint }>(
-      `SELECT count(*) as count FROM "$table$"`,
-      { csvName },
+      `SELECT count(*) as count FROM "$tableName$"`,
+      { datasetName: csvName },
     );
     return Number(result.data[0]?.count ?? 0);
   }
@@ -448,21 +558,20 @@ class DuckDBClientImpl {
    */
   async getCSVSchema(csvName: string): Promise<DuckDBColumnSchema[]> {
     const { data } = await this.runRawQuery<DuckDBColumnSchema>(
-      `DESCRIBE "$table$"`,
-      {
-        csvName,
-      },
+      `DESCRIBE "$tableName$"`,
+      { datasetName: csvName },
     );
     return data;
   }
 
   async getCSVLoadErrors(csvName: string): Promise<LoadCSVErrors> {
-    const tableName = this.getCSVTableName(csvName);
     try {
       const rejectedScansResult = await this.runRawQuery<DuckDBScan>(
-        `SELECT * FROM csv_reject_scans WHERE file_path='${tableName}'`,
+        `SELECT * FROM csv_reject_scans WHERE file_path='$tableName$'`,
+        { datasetName: csvName },
       );
       const { data: rejectedScans } = rejectedScansResult;
+
       if (isNonEmptyArray(rejectedScans)) {
         // if there are scans, then let's see if there are any rejected rows
         const fileId = rejectedScans[0].file_id;
@@ -478,19 +587,19 @@ class DuckDBClientImpl {
         rejectedRows: [],
       };
     } catch (error) {
-      this.#logger.error(error, { tableName });
+      this.#logger.error(error, { csvName });
       throw error;
     }
   }
 
   async exportCSVAsParquet(csvName: string): Promise<Blob> {
     const db = await this.#getDB();
-    const parquetFileName = `${this.getCSVTableName(csvName)}.parquet`;
+    const parquetFileName = `${this.#getDatasetTableName(csvName)}.parquet`;
 
     // create the parquet file in the DuckDB internal file system
     await this.runRawQuery(
-      `COPY '$table$' TO '${parquetFileName}' (FORMAT parquet)`,
-      { csvName },
+      `COPY '$tableName$' TO '${parquetFileName}' (FORMAT parquet)`,
+      { datasetName: csvName },
     );
     const parquetBuffer = await db.copyFileToBuffer(parquetFileName);
     const parquetBlob = new Blob([parquetBuffer], {
@@ -510,16 +619,20 @@ class DuckDBClientImpl {
   async runRawQuery<RowObject extends UnknownRow = UnknownRow>(
     queryString: string,
     options?: {
-      csvName?: string;
+      datasetName?: string;
     },
   ): Promise<QueryResultData<RowObject>> {
     return await this.#withConnection(async ({ conn }) => {
       try {
         let queryStringToUse = queryString;
-        if (options?.csvName) {
-          // replace $table$ with the actual table name
-          const tableName = this.getCSVTableName(options.csvName);
-          queryStringToUse = queryString.replace(/\$table\$/g, tableName);
+        if (options?.datasetName) {
+          // replace $tableName$ with the actual table name
+          const tableName = await this.#getDatasetTableName(
+            options.datasetName,
+          );
+          queryStringToUse = queryString
+            .replace(/\$tableName\$/g, tableName)
+            .replace(/\$datasetName\$/g, options.datasetName);
         }
 
         // run the query
@@ -543,7 +656,7 @@ class DuckDBClientImpl {
   }: StructuredQueryConfig): Promise<QueryResultData<UnknownRow>> {
     const selectFieldNames = selectFields.map(getProp("name"));
     const groupByFieldNames = groupByFields.map(getProp("name"));
-    const tableName = this.getCSVTableName(datasetId);
+    const tableName = await this.#getDatasetTableName(datasetId);
 
     return this.#withConnection(async ({ conn }) => {
       const fieldNamesWithoutAggregations = selectFieldNames.filter(

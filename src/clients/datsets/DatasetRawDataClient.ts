@@ -4,7 +4,6 @@ import { AvaDexie } from "@/dexie/AvaDexie";
 import { createDexieCRUDClient } from "@/lib/clients/dexie/createDexieCRUDClient";
 import { UnknownDataFrame, UnknownObject } from "@/lib/types/common";
 import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
-import { where } from "@/lib/utils/filters/filterBuilders";
 import { objectKeys } from "@/lib/utils/objects/misc";
 import { promiseMap } from "@/lib/utils/promises";
 import { DatasetId } from "@/models/datasets/Dataset";
@@ -15,10 +14,7 @@ import {
 } from "@/models/datasets/DatasetRawData/getSummary";
 import { DuckDBClient } from "../DuckDBClient";
 import { DuckDBDataType } from "../DuckDBClient/DuckDBDataType";
-import {
-  DuckDBLoadParquetResult,
-  QueryResultData,
-} from "../DuckDBClient/types";
+import { QueryResultData } from "../DuckDBClient/types";
 
 function scalar<V, T extends { [key: string]: V }>(
   query: QueryResultData<T>,
@@ -54,6 +50,9 @@ function singleton<T extends UnknownObject>(
   return query.data[0]!;
 }
 
+// TODO(jpsyx): we need to create a DuckDBCrudClient. We aren't using
+// IndexedDB at all for this actually. Also this should get renamed to
+// DatasetLocalCopyClient with a DatasetLocalCopy model.
 export const DatasetRawDataClient = createDexieCRUDClient({
   db: AvaDexie.DB,
   modelName: "DatasetRawData",
@@ -64,27 +63,27 @@ export const DatasetRawDataClient = createDexieCRUDClient({
         datasetId: DatasetId;
       }): Promise<DatasetSummary> => {
         const logger = clientLogger.appendName("getSummary");
+        const { datasetId } = params;
         logger.log("Getting summary for dataset", params);
 
-        const dataset = await DatasetRawDataClient.getOne(
-          where("datasetId", "eq", params.datasetId),
-        );
-        if (!dataset) {
-          throw new Error(`Dataset ${params.datasetId} not found`);
-        }
-        const loadResult = await DuckDBClient.loadParquet({
-          name: dataset.datasetId,
-          blob: dataset.data,
-        });
-        logger.log("Dataset loaded", loadResult);
-
-        const columns = loadResult.columns.map((duckColumn, idx) => {
+        const duckdbColumns = await DuckDBClient.getCSVSchema(datasetId);
+        const columns = duckdbColumns.map((duckColumn, idx) => {
           return {
             name: duckColumn.column_name,
             dataType: DuckDBDataType.toDatasetDataType(duckColumn.column_type),
             columnIdx: idx,
           };
         });
+
+        const numRows = Number(
+          scalar(
+            await DuckDBClient.runRawQuery<{
+              count: bigint;
+            }>(`SELECT COUNT(*) as count FROM "$tableName$"`, {
+              datasetName: datasetId,
+            }),
+          ),
+        );
 
         const columnSummaries = await promiseMap(
           columns,
@@ -96,10 +95,8 @@ export const DatasetRawDataClient = createDexieCRUDClient({
                 await DuckDBClient.runRawQuery<{
                   count: bigint;
                 }>(
-                  `SELECT COUNT(DISTINCT "${colName}") as count FROM "$table$"`,
-                  {
-                    csvName: dataset.datasetId,
-                  },
+                  `SELECT COUNT(DISTINCT "${colName}") as count FROM "$tableName$"`,
+                  { datasetName: datasetId },
                 ),
               ),
             );
@@ -109,10 +106,10 @@ export const DatasetRawDataClient = createDexieCRUDClient({
                 await DuckDBClient.runRawQuery<{
                   count: bigint;
                 }>(
-                  `SELECT COUNT("${colName}") as count FROM "$table$"
+                  `SELECT COUNT("${colName}") as count FROM "$tableName$"
                 WHERE "${colName}" IS NULL
                 ${dataType === "text" ? `OR "${colName}" = ''` : ""}`,
-                  { csvName: dataset.datasetId },
+                  { datasetName: datasetId },
                 ),
               ),
             );
@@ -123,13 +120,13 @@ export const DatasetRawDataClient = createDexieCRUDClient({
             }>(
               `SELECT MAX(cnt) as max_count FROM (
                   SELECT COUNT(*) as cnt
-                  FROM "$table$"
+                  FROM "$tableName$"
                   WHERE
                     "${colName}" IS NOT NULL
                     ${dataType === "text" ? `AND "${colName}" <> ''` : ""}
                   GROUP BY "${colName}"
                 )`,
-              { csvName: dataset.datasetId },
+              { datasetName: datasetId },
             );
             const maxCount = maxCountResult.data[0]?.max_count ?? 0n;
 
@@ -139,7 +136,7 @@ export const DatasetRawDataClient = createDexieCRUDClient({
               count: bigint;
             }>(
               `SELECT "${colName}" AS value, COUNT(*) AS count
-               FROM "$table$"
+               FROM "$tableName$"
                WHERE
                  "${colName}" IS NOT NULL
                  ${dataType === "text" ? `AND "${colName}" <> ''` : ""}
@@ -147,7 +144,7 @@ export const DatasetRawDataClient = createDexieCRUDClient({
                HAVING COUNT(*) = ${maxCount}
                ORDER BY value
                LIMIT 10`, // only get the top 10 to save memory
-              { csvName: dataset.datasetId },
+              { datasetName: datasetId },
             );
             const mostCommonValue = mostCommonValuesQuery.data;
 
@@ -176,8 +173,8 @@ export const DatasetRawDataClient = createDexieCRUDClient({
                         MIN("${colName}") as min,
                         AVG("${colName}") as avg,
                         STDDEV_SAMP("${colName}") as stdDev
-                      FROM "$table$"`,
-                    { csvName: dataset.datasetId },
+                      FROM "$tableName$"`,
+                    { datasetName: datasetId },
                   ),
                 ) ?? {};
                 return {
@@ -223,8 +220,8 @@ export const DatasetRawDataClient = createDexieCRUDClient({
         );
 
         return {
-          rows: loadResult.numRows,
-          columns: loadResult.columns.length,
+          rows: numRows,
+          columns: columns.length,
           columnSummaries,
         };
       },
@@ -235,79 +232,12 @@ export const DatasetRawDataClient = createDexieCRUDClient({
       }): Promise<UnknownDataFrame> => {
         const logger = clientLogger.appendName("getPreviewData");
         logger.log("Getting preview data for dataset", params);
-        const dataset = await DatasetRawDataClient.getOne(
-          where("datasetId", "eq", params.datasetId),
-        );
-        if (!dataset) {
-          throw new Error(`Dataset ${params.datasetId} not found`);
-        }
-
-        await DuckDBClient.loadParquet({
-          name: dataset.datasetId,
-          blob: dataset.data,
-        });
-        logger.log("Dataset found", dataset);
+        const { datasetId, numRows } = params;
         const result = await DuckDBClient.runRawQuery(
-          `SELECT * FROM "$table$" LIMIT ${params.numRows}`,
-          { csvName: dataset.datasetId },
+          `SELECT * FROM "$tableName$" LIMIT ${numRows}`,
+          { datasetName: datasetId },
         );
         return result.data;
-      },
-    };
-
-    /**
-     * Retrieves the raw data for a dataset, parsed from a string into an
-     * array of RawDataRow objects.
-     *
-     * @param params - The parameters for the operation
-     * @param params.datasetId - The ID of the dataset whose raw data will be
-     * retrieved.
-     *
-     * @returns The raw data for the dataset as an array of row objects
-     */
-    /*
-      getParsedRawData: async (params: {
-        datasetId: DatasetId;
-      }): Promise<RawDataRow[]> => {
-        const dataset = await DatasetRawDataClient.getOne(
-          where("datasetId", "eq", params.datasetId),
-        );
-        if (!dataset) {
-          throw new Error(`Dataset ${params.datasetId} not found`);
-        }
-
-        const { csv } = await parseFileOrStringToCSV({
-          dataToParse: dataset.data,
-          firstRowIsHeader: true,
-          delimiter: ",",
-        });
-        return csv.data;
-      },
-    };
-    */
-  },
-  mutations: ({ logger: clientLogger }) => {
-    return {
-      loadDataset: async (params: {
-        datasetId: DatasetId;
-      }): Promise<DuckDBLoadParquetResult> => {
-        const logger = clientLogger.appendName("loadDataset");
-        logger.log("Loading dataset", params);
-        const dataset = await DatasetRawDataClient.getOne(
-          where("datasetId", "eq", params.datasetId),
-        );
-        if (!dataset) {
-          throw new Error(`Dataset ${params.datasetId} not found`);
-        }
-        const loadResult = await DuckDBClient.loadParquet({
-          name: dataset.datasetId,
-          blob: dataset.data,
-          // to save time, do not overwrite the existing table if
-          // its already there.
-          overwrite: false,
-        });
-        logger.log("Dataset loaded", loadResult);
-        return loadResult;
       },
     };
   },
