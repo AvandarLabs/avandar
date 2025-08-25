@@ -118,7 +118,6 @@ export const WorkspaceClient = createSupabaseCRUDClient({
           .throwOnError();
 
         logger.log("Successfully created workspace", workspace);
-
         return parsers.fromDBReadToModelRead(workspace);
       },
 

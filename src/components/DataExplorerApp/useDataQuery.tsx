@@ -14,6 +14,8 @@ export function useDataQuery({
   enabled,
   selectFields = [],
   groupByFields = [],
+  orderByColumn: orderByField,
+  orderByDirection,
 }: Partial<LocalQueryConfig> & {
   enabled: boolean;
 }): UseQueryResultTuple<LocalQueryResultData> {
@@ -41,6 +43,9 @@ export function useDataQuery({
       ...sortedAggregations,
       "groupBy",
       ...sortedGroupByNames,
+      "orderBy",
+      orderByField?.name,
+      orderByDirection,
     ],
 
     queryFn: async () => {
@@ -54,6 +59,8 @@ export function useDataQuery({
           aggregations,
           selectFields,
           groupByFields,
+          orderByColumn: orderByField,
+          orderByDirection,
         });
       }
       return { fields: [], data: [] };

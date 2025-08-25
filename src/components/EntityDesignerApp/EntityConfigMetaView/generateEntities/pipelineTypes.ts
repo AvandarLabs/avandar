@@ -1,7 +1,6 @@
 import { UUID } from "@/lib/types/common";
+import { DatasetId } from "@/models/datasets/Dataset";
 import { EntityConfigWith } from "@/models/EntityConfig/types";
-import { FieldDataType } from "@/models/LocalDataset/LocalDatasetField/types";
-import { LocalDataset, LocalDatasetId } from "@/models/LocalDataset/types";
 import { WorkspaceId } from "@/models/Workspace/types";
 
 type BaseModel<T extends string> = {
@@ -15,27 +14,13 @@ export type CreateEntitiesStepConfig = BaseModel<"CreateEntitiesStepConfig"> & {
 };
 
 export type PullDataStepConfig = BaseModel<"DataPullStepConfig"> & {
-  datasetId: LocalDatasetId;
-  datasetType: "local";
+  datasetId: DatasetId;
+  sourceType: "local";
 };
-
-export type OutputDatasetsStepConfig =
-  BaseModel<"DatasetCreationStepConfig"> & {
-    datasetId: string;
-    datasetName: string;
-    datasetType: LocalDataset["datasetType"];
-
-    // The pipeline context from where we should get the data
-    // This should be an array of objects.
-    contextValueKey: string;
-
-    columnsToWrite: Array<{ name: string; dataType: FieldDataType }>;
-  };
 
 export type PipelineStepConfig = {
   pull_data: PullDataStepConfig;
   create_entities: CreateEntitiesStepConfig;
-  output_datasets: OutputDatasetsStepConfig;
 };
 
 export type PipelineStepType = keyof PipelineStepConfig;

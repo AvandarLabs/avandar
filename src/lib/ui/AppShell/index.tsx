@@ -36,12 +36,12 @@ import { AuthClient } from "@/clients/AuthClient";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLink, AppLinks } from "@/config/AppLinks";
 import { NavbarLink } from "@/config/NavbarLinks";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
 import { Link } from "@/lib/ui/links/Link";
 import { Modal } from "@/lib/ui/Modal";
+import { Workspace } from "@/models/Workspace/types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 import { WorkspaceForm } from "../../../components/common/forms/WorkspaceForm";
 import { notifySuccess } from "../notifications/notifySuccess";
@@ -68,6 +68,7 @@ type Props = {
    * Defaults to `<Outlet />` so it can be used in a router.
    */
   mainContent?: ReactNode;
+  currentWorkspace?: Workspace;
 };
 
 /**
@@ -84,6 +85,7 @@ export function AppShell({
   profileLink,
   spotlightActions,
   navbarLinks,
+  currentWorkspace,
   utilityLinks = [],
   mainContent = <Outlet />,
 }: Props): JSX.Element {
@@ -107,19 +109,17 @@ export function AppShell({
     useQueryOptions: { staleTime: Infinity },
   });
 
-  const currentWorkspace = useCurrentWorkspace();
-
   const [liveWorkspace] = WorkspaceClient.useGetById({
-    id: currentWorkspace.id,
+    id: currentWorkspace?.id,
     useQueryOptions: {
-      enabled: !!currentWorkspace.id,
+      enabled: !!currentWorkspace?.id,
       staleTime: 0,
       refetchOnWindowFocus: false,
     },
   });
 
   const displayTitle =
-    liveWorkspace?.name ?? currentWorkspace.name ?? title ?? AppConfig.appName;
+    liveWorkspace?.name ?? currentWorkspace?.name ?? title ?? AppConfig.appName;
 
   const [sendSignOutRequest, isSignOutPending] = useMutation({
     mutationFn: async () => {
@@ -253,7 +253,10 @@ export function AppShell({
                                 onClick={() => {
                                   navigate(AppLinks.workspaceHome(ws.slug));
                                 }}
-                                disabled={ws.slug === currentWorkspace.slug}
+                                disabled={
+                                  currentWorkspace &&
+                                  ws.slug === currentWorkspace.slug
+                                }
                               >
                                 {ws.name}
                               </Menu.Item>

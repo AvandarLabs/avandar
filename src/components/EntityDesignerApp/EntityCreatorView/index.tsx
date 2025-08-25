@@ -81,7 +81,7 @@ export function EntityCreatorView(): JSX.Element {
 
           // otherwise, create a datasetColumnField for this primary key
           // column, and set `isIdField`
-          const datasetColumn = dataset.fields.find(
+          const datasetColumn = dataset.columns.find(
             propEquals("id", primaryKeyColumnId),
           );
           if (datasetColumn) {

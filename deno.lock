@@ -81,6 +81,7 @@
         "npm:postcss-preset-mantine@^1.17.0",
         "npm:postcss-simple-vars@^7.0.1",
         "npm:postcss@^8.5.3",
+        "npm:prettier-plugin-sql@~0.19.2",
         "npm:prettier-plugin-tailwindcss@~0.6.11",
         "npm:prettier@^3.5.3",
         "npm:react-dom@19",

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
-import { excludeNullsExceptFromProps } from "@/lib/utils/objects/higherOrderFuncs";
+import { excludeNullsExceptInProps } from "@/lib/utils/objects/higherOrderFuncs";
 import {
   camelCaseKeysDeep,
   nullsToUndefinedDeep,
@@ -43,13 +43,13 @@ export const EntityConfigParsers =
     fromModelInsertToDBInsert: pipe(
       snakeCaseKeysDeep,
       undefinedsToNullsDeep,
-      excludeNullsExceptFromProps("description"),
+      excludeNullsExceptInProps("description"),
     ),
 
     fromModelUpdateToDBUpdate: pipe(
       snakeCaseKeysDeep,
       undefinedsToNullsDeep,
-      excludeNullsExceptFromProps("description"),
+      excludeNullsExceptInProps("description"),
     ),
   });
 

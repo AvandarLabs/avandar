@@ -18,6 +18,7 @@ import { useWorkspaceRole } from "@/hooks/workspaces/useWorkspaceRole";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { Modal } from "@/lib/ui/Modal";
 import { notifyError } from "@/lib/ui/notifications/notifyError";
+import { notifyNotImplemented } from "@/lib/ui/notifications/notifyNotImplemented";
 import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
 import { WorkspaceRole } from "@/models/Workspace/types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
@@ -51,10 +52,9 @@ export function WorkspaceUserForm(): JSX.Element {
   });
 
   const handleFakeInvite = () => {
-    notifySuccess({
-      title: "Invite sent!",
-      message: `Invite sent to ${inviteEmail} as ${inviteRole}`,
-    });
+    setInviteEmail("");
+    setInviteRole("member");
+    notifyNotImplemented();
     close();
   };
 

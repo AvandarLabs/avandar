@@ -1,16 +1,16 @@
 import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { useMemo } from "react";
+import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
+import { Paper } from "@/lib/ui/Paper";
+import { where } from "@/lib/utils/filters/filterBuilders";
 import { makeMapFromList } from "@/lib/utils/maps/builders";
 import { makeObjectFromList } from "@/lib/utils/objects/builders";
 import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { omit } from "@/lib/utils/objects/misc";
 import { unknownToString } from "@/lib/utils/strings/transformations";
-import {
-  EntityClient,
-  EntityFieldValueRead,
-} from "@/models/Entity/EntityClient";
-import { Entity } from "@/models/Entity/types";
+import { Entity } from "@/models/entities/Entity";
+import { EntityFieldValue } from "@/models/entities/EntityFieldValue";
 import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
 import {
   EntityFieldConfig,
@@ -25,11 +25,11 @@ type HydratedEntity = Entity & {
   nameField?: EntityFieldConfig;
   fieldConfigs?: EntityFieldConfig[];
   fieldValues?: Array<
-    EntityFieldValueRead & {
+    EntityFieldValue & {
       fieldName?: string;
     }
   >;
-  nameFieldValue?: EntityFieldValueRead;
+  nameFieldValue?: EntityFieldValue;
 };
 
 function useHydratedEntity({
@@ -44,11 +44,8 @@ function useHydratedEntity({
     EntityFieldConfigClient.useGetAll({
       where: { entity_config_id: { eq: entityConfig.id } },
     });
-  const [entityFieldValues, isLoadingEntityFieldValues] = EntityClient.ofType(
-    entityConfig.id,
-  ).useGetAllFields({
-    entityId: entity.id,
-  });
+  const [entityFieldValues, isLoadingEntityFieldValues] =
+    EntityFieldValueClient.useGetAll(where("entity_id", "eq", entity.id));
 
   // TODO(jpsyx): move this to a module that can also use cacheing.
   const hydratedEntity = useMemo(() => {
@@ -136,39 +133,46 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
   }, [hydratedEntity]);
 
   return (
-    <Container pt="lg">
+    <Container pt="xxl">
       <Stack>
         <Group>
           <Title order={2}>
             {isLoadingHydratedEntity ?
               <Loader />
-            : unknownToString(hydratedEntity.nameFieldValue?.value)}
+            : unknownToString(hydratedEntity.name)}
           </Title>
           <StatusPill />
         </Group>
-        <Text>{entityConfig.description}</Text>
-        <ObjectDescriptionList
-          data={entityMetadata}
-          dateFormat="MMMM D, YYYY"
-          excludeKeys={[
-            "id",
-            "externalId",
-            "entityConfigId",
-            "idField",
-            "nameField",
-            "nameFieldValue",
-            "fieldConfigs",
-            "workspaceId",
-          ]}
-        />
+        <Paper>
+          <Stack>
+            <Text>{entityConfig.description}</Text>
+            <ObjectDescriptionList
+              data={entityMetadata}
+              dateFormat="MMMM D, YYYY"
+              excludeKeys={[
+                "id",
+                "externalId",
+                "entityConfigId",
+                "idField",
+                "nameField",
+                "nameFieldValue",
+                "fieldConfigs",
+                "workspaceId",
+              ]}
+            />
 
-        <Title order={4}>Data</Title>
-        {fieldValues === undefined ?
-          <Loader />
-        : <ObjectDescriptionList data={fieldValues} dateFormat="MMMM D, YYYY" />
-        }
+            <Title order={4}>Data</Title>
+            {fieldValues === undefined ?
+              <Loader />
+            : <ObjectDescriptionList
+                data={fieldValues}
+                dateFormat="MMMM D, YYYY"
+              />
+            }
 
-        <ActivityBlock />
+            <ActivityBlock />
+          </Stack>
+        </Paper>
       </Stack>
     </Container>
   );
