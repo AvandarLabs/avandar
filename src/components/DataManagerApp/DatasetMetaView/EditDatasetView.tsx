@@ -1,4 +1,4 @@
-import { DatasetClient } from "@/clients/datsets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 import { InputTextField } from "@/lib/ui/singleton-forms/InputTextField";
 import { Dataset } from "@/models/datasets/Dataset";

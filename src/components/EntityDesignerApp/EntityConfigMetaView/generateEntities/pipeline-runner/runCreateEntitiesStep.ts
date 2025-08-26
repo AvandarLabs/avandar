@@ -1,24 +1,16 @@
-import { match } from "ts-pattern";
 import { EntityClient } from "@/clients/entities/EntityClient";
-import { RawDataRow } from "@/lib/types/common";
-import { assert, isNotNullOrUndefined } from "@/lib/utils/guards";
+import { assert } from "@/lib/utils/guards";
 import {
   makeBucketMapFromList,
   mergeBucketMaps,
 } from "@/lib/utils/maps/builders";
-import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
+import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectValues } from "@/lib/utils/objects/misc";
 import { mapObjectValues } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
 import { DatasetId, DatasetWithColumns } from "@/models/datasets/Dataset";
 import { DatasetColumn } from "@/models/datasets/DatasetColumn";
 import { Entity, EntityId } from "@/models/entities/Entity";
-import {
-  EntityFieldValue,
-  EntityFieldValueId,
-} from "@/models/entities/EntityFieldValue";
-import { EntityConfigId } from "@/models/EntityConfig/types";
-import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/types";
 import {
   BuildableEntityConfig,
   BuildableFieldConfig,
@@ -78,16 +70,19 @@ function _getDatasetColumnFromFieldConfig(
   return datasetColumn;
 }
 
+/*
 function _extractEntityFieldValueFromDatasetRows(params: {
   entityId: EntityId;
   entityConfigId: EntityConfigId;
   valueExtractor: DatasetColumnValueExtractor;
   context: PipelineContext;
+  */
 
-  /**
-   * A subset of rows from the source dataset that match the external
-   * id of the entity we are extracting the field value for.
-   */
+/**
+ * A subset of rows from the source dataset that match the external
+ * id of the entity we are extracting the field value for.
+ */
+/*
   sourceDatasetRows: Array<{
     datasetId: DatasetId;
     rowData: RawDataRow;
@@ -176,6 +171,7 @@ exist in the dataset "${sourceDataset.name}". Could not find Dataset Column ID
     })
     .exhaustive();
 }
+*/
 
 export async function runCreateEntitiesStep(
   stepConfig: CreateEntitiesStepConfig,

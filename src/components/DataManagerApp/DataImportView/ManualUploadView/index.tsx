@@ -4,7 +4,7 @@ import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { invariant } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { DatasetClient } from "@/clients/datsets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { DuckDBDataType } from "@/clients/DuckDBClient/DuckDBDataType";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/types";

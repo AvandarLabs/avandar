@@ -4,7 +4,7 @@ import { invariant } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
-import { DatasetClient } from "@/clients/datsets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { DuckDBDataType } from "@/clients/DuckDBClient/DuckDBDataType";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/types";
@@ -47,7 +47,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
 
   const [isReprocessing, setIsReprocessing] = useState(false);
   const [loadCSVResult, setLoadCSVResult] = useState<DuckDBLoadCSVResult>();
-  const [loadCSV, isLoadingCSV] = useMutation({
+  const [loadCSV, _isLoadingCSV] = useMutation({
     mutationFn: async ({
       csvName,
       fileText,
@@ -105,7 +105,9 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
       // and onSuccess, we should resolve().
       loadCSV({
         csvName: selectedDocumentId,
-        fileText: csvString,
+        // TODO(jpsyx): make this work
+        // fileText: csvString,
+        fileText: "",
       });
 
       return googleSpreadsheet;
@@ -125,7 +127,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
     });
   }, [spreadsheet]);
 
-  const [previewRows, isLoadingPreview] = useQuery({
+  const [previewRows, _isLoadingPreview] = useQuery({
     queryKey: ["google-sheets", selectedDocumentId, "previewData", csvString],
     queryFn: async (): Promise<UnknownObject[]> => {
       invariant(selectedDocumentId, "A spreadsheet name must be provided");

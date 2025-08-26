@@ -63,6 +63,7 @@ function getDefaultFieldSchema(
         return processedSchema;
       });
   }
+
   return processedSchema;
 }
 

@@ -1,6 +1,6 @@
 import { MultiSelect } from "@mantine/core";
 import { ReactNode, useMemo } from "react";
-import { DatasetClient } from "@/clients/datsets/DatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNotNullOrUndefined } from "@/lib/utils/guards";
 import { makeObjectFromList } from "@/lib/utils/objects/builders";

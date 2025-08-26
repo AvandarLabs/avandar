@@ -1,5 +1,5 @@
 import { Loader, Stack, Title } from "@mantine/core";
-import { DatasetRawDataClient } from "@/clients/datsets/DatasetRawDataClient";
+import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { DatasetId } from "@/models/datasets/Dataset";
 

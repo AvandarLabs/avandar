@@ -227,6 +227,8 @@ class DuckDBClientImpl {
           VALUES ('${datasetName}', '${tableName}')
           ON CONFLICT DO NOTHING`,
       );
+      await this.syncDB();
+      Logger.log("new dataset list", await this.getLocalDatasetList());
     });
   }
 
@@ -505,7 +507,7 @@ class DuckDBClientImpl {
     overwrite?: boolean;
   }): Promise<DuckDBLoadParquetResult> {
     const { name, blob, overwrite } = options;
-    return await this.#withConnection(async ({ db }) => {
+    return await this.#withConnection(async () => {
       const isDatasetAlreadyLoaded = await this.hasLoadedDataset(name);
       if (isDatasetAlreadyLoaded && overwrite) {
         await this.dropDataset(name);

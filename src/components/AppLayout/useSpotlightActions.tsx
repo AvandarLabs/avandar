@@ -65,6 +65,12 @@ export function useSpotlightActions(
                     "All local Avandar data has been deleted. Please refresh the page.",
                   color: "green",
                 });
+
+                // delete the local OPFS database
+                const root = await navigator.storage.getDirectory();
+                await root.removeEntry("avandar.duckdb", {
+                  recursive: false,
+                });
               },
             },
 
