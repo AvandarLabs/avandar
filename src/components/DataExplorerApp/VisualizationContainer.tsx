@@ -17,24 +17,32 @@ type Props = {
   data: UnknownDataFrame;
 };
 
-const BarChartSettingsSchema = z.object({
-  xAxisKey: z.string({
-    error: (issue) => {
-      return issue.input === undefined ?
-          "X axis must be specified"
-        : "X axis must be a string";
-    },
-  }),
-  yAxisKey: z.string({
-    error: (issue) => {
-      return issue.input === undefined ?
-          "Y axis must be specified"
-        : "Y axis must be a string";
-    },
-  }),
+// Reusable XY schema “blocks”
+const xAxisKeySchema = z.string({
+  error: (issue) => {
+    return issue.input === undefined ?
+        "X axis must be specified"
+      : "X axis must be a string";
+  },
+});
+const yAxisKeySchema = z.string({
+  error: (issue) => {
+    return issue.input === undefined ?
+        "Y axis must be specified"
+      : "Y axis must be a string";
+  },
 });
 
-const LineChartSettingsSchema = BarChartSettingsSchema;
+// Chart-specific schemas (can diverge later)
+const BarChartSettingsSchema = z.object({
+  xAxisKey: xAxisKeySchema,
+  yAxisKey: yAxisKeySchema,
+});
+
+const LineChartSettingsSchema = z.object({
+  xAxisKey: xAxisKeySchema,
+  yAxisKey: yAxisKeySchema,
+});
 
 export function VisualizationContainer({
   vizConfig,
