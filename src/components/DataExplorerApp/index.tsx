@@ -118,7 +118,7 @@ export function DataExplorerApp(): JSX.Element {
     setSelectedFields([]);
     setSelectedGroupByFields([]);
     setAggregations({});
-    setOrderByField(undefined);
+    setOrderByColumn(undefined);
     setOrderByDirection("asc");
     setVizConfig(makeDefaultVizConfig("table"));
   }, [selectedDatasetId]);
