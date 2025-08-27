@@ -10,7 +10,7 @@ import {
 } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
 import { supabaseJSONSchema } from "@/lib/utils/zodHelpers";
-import { asLocalDatasetId } from "@/models/LocalDataset/utils";
+import { DatasetId } from "@/models/datasets/Dataset";
 import { AggregationExtractor, AggregationExtractorModel } from "./types";
 
 const DBReadSchema = z.object({
@@ -43,7 +43,7 @@ export const AggregationExtractorParsers =
         id: uuid(newObj.id),
         entityFieldConfigId: uuid(newObj.entityFieldConfigId),
         workspaceId: uuid(newObj.workspaceId),
-        datasetId: asLocalDatasetId(newObj.datasetId),
+        datasetId: newObj.datasetId as DatasetId,
         datasetFieldId: uuid(newObj.datasetFieldId),
       };
     },

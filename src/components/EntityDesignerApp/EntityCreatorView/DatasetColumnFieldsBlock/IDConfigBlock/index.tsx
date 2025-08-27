@@ -1,11 +1,11 @@
 import { Loader, Select, Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNotUndefined } from "@/lib/utils/guards";
 import { makeObjectFromList } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
-import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 import { EntityConfigFormType } from "../../entityConfigFormTypes";
 
 type Props = {
@@ -29,29 +29,30 @@ export function IDConfigBlock({
     ];
   }, [datasetColumnFields]);
 
-  const [localDatasets, loadingLocalDatasets] = LocalDatasetClient.useGetAll({
-    ...where("id", "in", datasetIdsToPullFrom),
-    useQueryOptions: { enabled: datasetIdsToPullFrom.length > 0 },
-  });
+  const [datasets, isLoadingDatasets] =
+    DatasetClient.useGetAllDatasetsWithColumns({
+      ...where("id", "in", datasetIdsToPullFrom),
+      useQueryOptions: { enabled: datasetIdsToPullFrom.length > 0 },
+    });
 
   // these are the fields that are eligible to be used as the entity ID or title
   const fieldOptionsByDatasetId = useMemo(() => {
-    return makeObjectFromList(localDatasets ?? [], {
+    return makeObjectFromList(datasets ?? [], {
       keyFn: getProp("id"),
       valueFn: (dataset) => {
-        return makeSelectOptions(dataset.fields, {
+        return makeSelectOptions(dataset.columns, {
           valueFn: getProp("id"),
           labelFn: getProp("name"),
         });
       },
     });
-  }, [localDatasets]);
+  }, [datasets]);
 
   const { sourceDatasets } = entityConfigForm.getValues();
 
   return (
     <Stack>
-      {loadingLocalDatasets ?
+      {isLoadingDatasets ?
         <Loader />
       : <>
           {sourceDatasets.length > 1 ?

@@ -1,18 +1,18 @@
 import { Button, Stack, TextInput, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { invariant, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useMutation } from "@/lib/hooks/query/useMutation";
-import { RawDataRecordRow } from "@/lib/types/common";
+import { RawDataRow } from "@/lib/types/common";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { notifyError } from "@/lib/ui/notifications/notifyError";
 import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
-import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
-import { LocalDataset } from "@/models/LocalDataset/types";
+import { Dataset } from "@/models/datasets/Dataset";
+import { DetectedDatasetColumn } from "../../hooks/detectColumnDataTypes";
 
 export type DatasetUploadForm = {
   name: string;
@@ -27,41 +27,24 @@ type Props = {
    * Regardless of how many rows are passed in, only the first
    * `AppConfig.dataManagerApp.maxPreviewRows` will be displayed.
    */
-  rows: RawDataRecordRow[];
+  rows: RawDataRow[];
   defaultName: string;
-  fields: readonly LocalDatasetField[];
-  additionalDatasetSaveCallback?: (
-    values: DatasetUploadForm,
-  ) => Promise<LocalDataset>;
+  columns: readonly DetectedDatasetColumn[];
+  doDatasetSave: (values: DatasetUploadForm) => Promise<Dataset>;
   disableSubmit?: boolean;
 };
 
 export function DatasetUploadForm({
   rows,
-  fields,
+  columns,
   defaultName,
-  additionalDatasetSaveCallback,
+  doDatasetSave,
   disableSubmit,
 }: Props): JSX.Element {
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
-
-  // TODO(jpsyx): add this back once we have a DatasetClient
-  const [saveDataset, isSavePending] = useMutation<
-    LocalDataset,
-    DatasetUploadForm,
-    unknown
-  >({
-    mutationFn: async (values: DatasetUploadForm) => {
-      invariant(
-        additionalDatasetSaveCallback,
-        "No dataset save callback provided",
-      );
-
-      const savedDataset = await additionalDatasetSaveCallback(values);
-
-      return savedDataset;
-    },
+  const [saveDataset, isSavePending] = useMutation({
+    mutationFn: doDatasetSave,
     onSuccess: async (savedDataset) => {
       if (!savedDataset?.id) {
         notifyError({
@@ -114,7 +97,7 @@ export function DatasetUploadForm({
     },
   });
 
-  const columnNames = fields.map(getProp("name"));
+  const columnNames = columns.map(getProp("name"));
   return (
     <Stack w="100%">
       <Title order={3}>Data Preview</Title>

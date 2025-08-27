@@ -1,17 +1,25 @@
 import { Stack, Title } from "@mantine/core";
 import { useMemo } from "react";
+import { RawDataRow } from "@/lib/types/common";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
-import { getSummary } from "@/models/LocalDataset/getSummary";
-import { ParsedLocalDataset } from "@/models/LocalDataset/types";
+import { DatasetColumn } from "@/models/datasets/DatasetColumn";
+import { getSummary } from "@/models/datasets/DatasetRawData/getSummary";
 
 type Props = {
-  parsedDataset: ParsedLocalDataset;
+  rawDatasetRows: RawDataRow[];
+  columns: DatasetColumn[];
 };
 
-export function DataSummaryView({ parsedDataset }: Props): JSX.Element {
+export function DataSummaryView({
+  rawDatasetRows,
+  columns,
+}: Props): JSX.Element {
   const summary = useMemo(() => {
-    return getSummary(parsedDataset);
-  }, [parsedDataset]);
+    return getSummary({
+      dataRows: rawDatasetRows,
+      columns,
+    });
+  }, [rawDatasetRows, columns]);
 
   return (
     <Stack>

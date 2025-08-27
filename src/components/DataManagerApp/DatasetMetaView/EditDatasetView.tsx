@@ -1,16 +1,16 @@
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { notifyError } from "@/lib/ui/notifications/notifyError";
 import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
 import { InputTextField } from "@/lib/ui/singleton-forms/InputTextField";
-import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
-import { LocalDataset } from "@/models/LocalDataset/types";
+import { Dataset } from "@/models/datasets/Dataset";
 
 type Props = {
-  dataset: LocalDataset;
+  dataset: Dataset;
 };
 
 export function EditDatasetView({ dataset }: Props): JSX.Element {
-  const [updateDataset, isUpdatePending] = LocalDatasetClient.useUpdate({
-    queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
+  const [updateDataset, isUpdatePending] = DatasetClient.useUpdate({
+    queryToInvalidate: DatasetClient.QueryKeys.getAll(),
     onSuccess: () => {
       notifySuccess("Dataset updated successfully!");
     },
