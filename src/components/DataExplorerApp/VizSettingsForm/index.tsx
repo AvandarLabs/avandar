@@ -19,68 +19,19 @@ const VIZ_TYPES: VizTypeMetadata[] = [
   { type: "line", displayName: "Line Chart" },
 ];
 
+type VizTypeMetadata = { type: VizType; displayName: string };
+
+const VIZ_TYPES: VizTypeMetadata[] = [
+  { type: "table", displayName: "Table" },
+  { type: "bar", displayName: "Bar Chart" },
+  { type: "line", displayName: "Line Chart" },
+];
+
 export type Props = {
   fields: readonly QueryResultField[];
   vizConfig: VizConfig;
   onVizConfigChange: (config: VizConfig) => void;
 };
-
-function getXYFromVizConfig(
-  vizConfig: VizConfig,
-): { xAxisKey?: string; yAxisKey?: string } | undefined {
-  return match(vizConfig)
-    .with({ type: "bar" }, (config) => {
-      return {
-        xAxisKey: config.settings.xAxisKey,
-        yAxisKey: config.settings.yAxisKey,
-      };
-    })
-    .with({ type: "line" }, (config) => {
-      return {
-        xAxisKey: config.settings.xAxisKey,
-        yAxisKey: config.settings.yAxisKey,
-      };
-    })
-    .with({ type: "table" }, () => {
-      return undefined;
-    })
-    .exhaustive();
-}
-
-function hydrateXY(options: {
-  prevVizConfig: VizConfig;
-  newVizConfig: VizConfig;
-}): VizConfig {
-  const { prevVizConfig, newVizConfig } = options;
-  const prevXY = getXYFromVizConfig(prevVizConfig);
-  if (!prevXY) {
-    return newVizConfig;
-  }
-
-  return match(newVizConfig)
-    .with({ type: "bar" }, (config) => {
-      return {
-        ...config,
-        settings: {
-          xAxisKey: config.settings.xAxisKey ?? prevXY.xAxisKey,
-          yAxisKey: config.settings.yAxisKey ?? prevXY.yAxisKey,
-        },
-      };
-    })
-    .with({ type: "line" }, (config) => {
-      return {
-        ...config,
-        settings: {
-          xAxisKey: config.settings.xAxisKey ?? prevXY.xAxisKey,
-          yAxisKey: config.settings.yAxisKey ?? prevXY.yAxisKey,
-        },
-      };
-    })
-    .with({ type: "table" }, (config) => {
-      return config;
-    })
-    .exhaustive();
-}
 
 export function VizSettingsForm({
   vizConfig,
@@ -92,19 +43,67 @@ export function VizSettingsForm({
     labelFn: getProp("displayName"),
   });
 
-  // helper to seed next config with cached XY
-  function seedXY<T extends VizConfig>(next: T): T {
-    const xy = vizConfig.cachedXY;
-    if (!xy) return next;
-    // only charts have settings to merge into; table just carries the cache
-    if (next.type === "bar" || next.type === "line") {
-      return {
-        ...next,
-        cachedXY: xy,
-        settings: { ...next.settings, ...xy },
-      } as T;
+  // helper to read XY from the current config (prefer settings;
+  // fallback to cachedXY)
+  function getCurrentXY(
+    cfg: VizConfig,
+  ): { xAxisKey?: string; yAxisKey?: string } | undefined {
+    const fromSettings = match(cfg)
+      .with({ type: "bar" }, (config) => {
+        return {
+          xAxisKey: config.settings.xAxisKey,
+          yAxisKey: config.settings.yAxisKey,
+        };
+      })
+      .with({ type: "line" }, (config) => {
+        return {
+          xAxisKey: config.settings.xAxisKey,
+          yAxisKey: config.settings.yAxisKey,
+        };
+      })
+      .with({ type: "table" }, () => {
+        return undefined;
+      })
+      .exhaustive();
+
+    if (fromSettings?.xAxisKey || fromSettings?.yAxisKey) return fromSettings;
+
+    // if cachedXY only exists on XY charts in your types, this guard is correct
+    return "cachedXY" in cfg ? cfg.cachedXY : undefined;
+  }
+
+  // helper to seed the *new* config with the cached XY (when applicable)
+  function seedXY(newVizConfig: VizConfig): VizConfig {
+    const xy = "cachedXY" in vizConfig ? vizConfig.cachedXY : undefined;
+    if (!xy) {
+      return newVizConfig;
     }
-    return { ...next, cachedXY: xy } as T;
+
+    return match(newVizConfig)
+      .with({ type: "bar" }, (cfg) => {
+        return {
+          ...cfg,
+          cachedXY: xy,
+          settings: {
+            xAxisKey: cfg.settings.xAxisKey ?? xy.xAxisKey,
+            yAxisKey: cfg.settings.yAxisKey ?? xy.yAxisKey,
+          },
+        };
+      })
+      .with({ type: "line" }, (cfg) => {
+        return {
+          ...cfg,
+          cachedXY: xy,
+          settings: {
+            xAxisKey: cfg.settings.xAxisKey ?? xy.xAxisKey,
+            yAxisKey: cfg.settings.yAxisKey ?? xy.yAxisKey,
+          },
+        };
+      })
+      .with({ type: "table" }, (cfg) => {
+        return cfg;
+      })
+      .exhaustive();
   }
 
   return (

@@ -5,7 +5,15 @@ import type { UnknownDataFrame } from "@/lib/types/common";
 >>>>>>> e11f28c (refactored chart types)
 
 export type XYSettings = {
+  /**
+   * The data object key used to bucket the X-axis (categories or time).
+   * Must correspond to a string or date-like field in the dataset.
+   */
   xAxisKey: string;
+  /**
+   * The data object key used for Y-axis numeric values.
+   * Must map to a number for each row in the dataframe.
+   */
   yAxisKey: string;
 };
 
@@ -24,13 +32,12 @@ export type XYChartProps = {
 =======
 export type XYChartProps = {
   /**
-   * The `data` structure is a conventional dataframe (an array of objects), but
-   * semantically the interpretation is different. Each object represents a
-   * collection of bars for one bucket.
+   * The `data` structure is a conventional dataframe (an array of objects).
+   * Each object represents a single row (or bucket).
    *
-   * One key in the object should be the `dataKey` which is used to bucket
-   * the data. The remaining keys are the names of the series.
-   * The value of each series should be a number.
+   * One key in the object should be the `dataKey`, which is used to bucket
+   * the data. The remaining keys are treated as series names, and their values
+   * must be numeric.
    */
   data: UnknownDataFrame;
   height?: number;
