@@ -1,15 +1,19 @@
 import { Box, BoxProps, Button, Loader, Stack, Text } from "@mantine/core";
+import { useQueryClient } from "@tanstack/react-query";
+import { invariant } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { useGooglePicker } from "@/hooks/ui/useGooglePicker";
-import { useMutation } from "@/lib/hooks/query/useMutation";
+import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useQuery } from "@/lib/hooks/query/useQuery";
 import { Logger } from "@/lib/Logger";
 import { MIMEType } from "@/lib/types/common";
 import { GPickerDocumentObject } from "@/lib/types/google-picker";
 import { notifyError } from "@/lib/ui/notifications/notifyError";
-import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
-import { DangerText } from "@/lib/ui/Text/DangerText";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
 import { csvCellValueSchema } from "@/lib/utils/zodHelpers";
@@ -18,15 +22,19 @@ import { APIReturnType } from "@/types/http-api.types";
 import { useCSVParser } from "../../hooks/useCSVParser";
 import { DatasetUploadForm } from "../DatasetUploadForm";
 
-type SpreadsheetPreview = APIReturnType<"google-sheets/:id/preview">;
+type GoogleSpreadsheetData = APIReturnType<"google-sheets/:id">;
 
 type Props = BoxProps;
 
 export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
+  const workspace = useCurrentWorkspace();
+  const [userProfile] = useCurrentUserProfile();
+  const queryClient = useQueryClient();
   const [selectedDocument, setSelectedDocument] = useState<
     GPickerDocumentObject | undefined
   >();
-  const { parseCSVString, csv, fields } = useCSVParser({
+  const [rawDataString, setRawDataString] = useState<string | undefined>();
+  const { parseCSVString, csv, columns } = useCSVParser({
     onNoFileProvided: () => {
       notifyError({
         title: "No rows were found in this sheet",
@@ -35,33 +43,28 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
       });
     },
   });
-  const [spreadsheet, setSpreadsheet] = useState<
-    SpreadsheetPreview | undefined
-  >();
-  const [getSpreadsheet, isLoadingSpreadsheet] = useMutation({
-    mutationFn: async () => {
-      if (!selectedDocument) {
-        throw new Error("No spreadsheet was selected");
-      }
-      const preview = await APIClient.post("google-sheets/:id/preview", {
-        urlParams: {
-          id: selectedDocument.id,
-        },
+
+  const selectedDocumentId = selectedDocument?.id;
+
+  const [spreadsheet, isLoadingSpreadsheet] = useQuery({
+    queryKey: ["google-sheets", selectedDocumentId],
+    queryFn: async (): Promise<GoogleSpreadsheetData> => {
+      invariant(selectedDocumentId, "A spreadsheet must be selected");
+      const googleSpreadsheet = await APIClient.get("google-sheets/:id", {
+        urlParams: { id: selectedDocumentId },
       });
-      return preview;
-    },
-    onSuccess: (data: SpreadsheetPreview) => {
-      setSpreadsheet(data);
-      notifySuccess({
-        title: "Spreadsheet preview",
-        message: data?.sheetName,
-      });
+      // TODO(jpsyx): store the spreadsheet in the local dexie
       const csvString = unparseDataset({
         datasetType: MIMEType.APPLICATION_GOOGLE_SPREADSHEET,
-        data: z.array(z.array(csvCellValueSchema)).parse(data.rows),
+        data: z
+          .array(z.array(csvCellValueSchema))
+          .parse(googleSpreadsheet.rows),
       });
+      setRawDataString(csvString);
       parseCSVString(csvString);
+      return googleSpreadsheet;
     },
+    enabled: !!selectedDocumentId,
   });
 
   const {
@@ -73,12 +76,52 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
     onGoogleSheetPicked: setSelectedDocument,
   });
 
+  const saveGoogleSheetToBackend = async (values: DatasetUploadForm) => {
+    invariant(selectedGoogleAccount, "No Google account has been selected");
+    invariant(selectedDocument, "No Google Sheet has been selected");
+    const dataset = await DatasetClient.insertGoogleSheetsDataset({
+      workspaceId: workspace.id,
+      datasetName: values.name,
+      datasetDescription: values.description,
+      googleAccountId: selectedGoogleAccount.google_account_id,
+      googleDocumentId: selectedDocument.id,
+      columns: columns.map((field, idx) => {
+        return {
+          name: field.name,
+          data_type: field.dataType,
+          column_idx: idx,
+        };
+      }),
+      // TODO(jpsyx): eventually this should be configurable
+      rowsToSkip: 0,
+    });
+    queryClient.invalidateQueries({
+      queryKey: DatasetClient.QueryKeys.getAll(),
+    });
+
+    // and also save the raw data locally to Dexie
+    // TODO(jpsyx): implement this
+    invariant(rawDataString, "No raw data was found");
+    invariant(userProfile, "No user profile is available");
+    await DatasetRawDataClient.insert({
+      data: {
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        datasetId: dataset.id,
+        sourceType: "google_sheets",
+        ownerId: workspace.ownerId,
+        ownerProfileId: userProfile.profileId,
+        workspaceId: workspace.id,
+        data: rawDataString,
+      },
+    });
+
+    return dataset;
+  };
+
   return (
     <Box {...props}>
       <Stack align="flex-start">
-        <DangerText>
-          Google Sheets connection is still under development.
-        </DangerText>
         {isLoadingGoogleAuthState ?
           <Loader />
         : isGoogleAuthenticated ?
@@ -103,14 +146,9 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
             {selectedDocument ?
               <>
                 <Text>Selected document: {selectedDocument.name}</Text>
-                <Button
-                  loading={isLoadingSpreadsheet}
-                  onClick={() => {
-                    getSpreadsheet();
-                  }}
-                >
-                  Upload
-                </Button>
+                {isLoadingSpreadsheet ?
+                  <Loader />
+                : null}
               </>
             : null}
           </>
@@ -149,10 +187,10 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
 
         {spreadsheet && csv ?
           <DatasetUploadForm
-            disableSubmit
             defaultName={spreadsheet.spreadsheetName}
             rows={csv.data}
-            fields={fields}
+            columns={columns}
+            doDatasetSave={saveGoogleSheetToBackend}
           />
         : null}
       </Stack>

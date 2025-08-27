@@ -8,8 +8,8 @@ import { useRouter } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { LocalDatasetQueryClient } from "@/clients/LocalDatasetQueryClient";
 import { SpotlightLinks } from "@/config/SpotlightLinks";
+import { AvaDexie } from "@/dexie/AvaDexie";
 import { Logger } from "@/lib/Logger";
-import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
 
 export function useSpotlightActions(
   workspaceSlug: string,
@@ -53,16 +53,16 @@ export function useSpotlightActions(
           group: "Dev Actions",
           actions: [
             {
-              id: "delete-local-datasets-indexed-db",
-              label: "Delete Local Datasets",
-              description: "Delete Local Datasets indexedDB database",
+              id: "delete-local-indexed-db",
+              label: "Delete local data",
+              description: "Delete all local Avandar data from the browser",
               leftSection: <IconTrash size={24} stroke={1.5} />,
               onClick: async () => {
-                await LocalDatasetClient.deleteDatabase();
+                await AvaDexie.deleteDatabase();
                 notifications.show({
-                  title: "Local Datasets deleted",
+                  title: "Local data deleted",
                   message:
-                    "Local Datasets indexedDB database deleted. Please refresh the page.",
+                    "All local Avandar data has been deleted. Please refresh the page.",
                   color: "green",
                 });
               },

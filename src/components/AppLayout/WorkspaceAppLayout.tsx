@@ -48,6 +48,7 @@ export function WorkspaceAppLayout(): JSX.Element {
   return (
     <AppShell
       title={workspace.name}
+      currentWorkspace={workspace}
       profileLink={profileLink}
       navbarLinks={mainNavBarLinks}
       utilityLinks={utilityNavBarLinks}

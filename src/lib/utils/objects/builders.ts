@@ -14,7 +14,7 @@ function toString<T>(item: T): string | T {
  * @param list The list of items to convert.
  * @param options The options for creating the object.
  * @param options.keyFn A function that returns the key for each item. Defaults
- * to the `toString` function. If the item is a string, it will be unchanged.
+ * to the `toString` function.
  * @param options.valueFn A function that returns the value for each
  * item. Defaults to the identity function.
  * @param options.defaultValue A default value to use for each item if no

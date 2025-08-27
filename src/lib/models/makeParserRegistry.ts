@@ -51,10 +51,13 @@ type ParserRegistryBuilderFn<M extends ModelCRUDTypes> = (
  * @param schemaName The name of the schema.
  * @returns A custom error map for the given model and schema.
  */
-export function getErrorMap(
-  modelName: string,
-  schemaName: string,
-): z.ZodErrorMap {
+export function getErrorMap({
+  modelName,
+  schemaName,
+}: {
+  modelName: string;
+  schemaName: string;
+}): z.ZodErrorMap {
   return (issue) => {
     return {
       message:
@@ -90,7 +93,10 @@ export function makeParserRegistry<M extends ModelCRUDTypes = never>(): {
             // run the DBReadSchema parser to be extra sure we are receiving
             // a valid DBRead model
             config.DBReadSchema.parse(data, {
-              error: getErrorMap(config.modelName, "DBReadSchema"),
+              error: getErrorMap({
+                modelName: config.modelName,
+                schemaName: "DBReadSchema",
+              }),
             }),
           );
         },

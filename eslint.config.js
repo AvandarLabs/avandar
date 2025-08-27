@@ -152,4 +152,7 @@ export default [
       "import-x/extensions": "off",
     },
   },
+  {
+    ignores: ["src/types/database.types.ts"],
+  },
 ];

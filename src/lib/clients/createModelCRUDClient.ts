@@ -11,7 +11,7 @@ import { HookableFnName, WithQueryHooks } from "./withQueryHooks/types";
 import { withQueryHooks } from "./withQueryHooks/withQueryHooks";
 
 export type ModelCRUDPage<ModelRead> = {
-  /** The rows in the pagef */
+  /** The rows in the page */
   rows: ModelRead[];
 
   /**
@@ -42,6 +42,9 @@ export type ModelCRUDPage<ModelRead> = {
  * hooks.
  */
 export type BaseModelCRUDClient<M extends ModelCRUDTypes> = {
+  /** The parsers for the model */
+  parsers: ModelCRUDParserRegistry<M>;
+
   /**
    * Retrieves a single model instance by its ID.
    * @param params - The parameters for the operation
@@ -99,6 +102,21 @@ export type BaseModelCRUDClient<M extends ModelCRUDTypes> = {
   getAll(params?: {
     where?: FiltersByColumn<M["DBRead"]>;
   }): Promise<Array<M["Read"]>>;
+
+  /**
+   * Retrieves a single instance of a model.
+   *
+   * @param params Optional params for the query
+   * @param params.where Filters to apply. If multiple instances pass the
+   * filter, the first instance is returned.
+   *
+   * @returns A promise resolving to the model instance or undefined
+   * if not found. If multiple instances pass the `where` filter, only
+   * the first instance is returned.
+   */
+  getOne(params: {
+    where?: FiltersByColumn<M["DBRead"]>;
+  }): Promise<M["Read"] | undefined>;
 
   /**
    * Creates a new model instance in the data store.
@@ -422,6 +440,27 @@ export function createModelCRUDClient<
         return allRows;
       },
 
+      getOne: async (
+        params: {
+          where?: FiltersByColumn<M["DBRead"]>;
+        } = {},
+      ): Promise<M["Read"] | undefined> => {
+        const logger = baseLogger.appendName("getOne");
+
+        logger.log("Calling `getOne` with params", params);
+        const page = await _getPage({
+          where: params.where,
+          pageSize: 1,
+          pageNum: 0,
+          logger,
+          totalRows: 1,
+        });
+
+        const model = page.rows[0];
+        logger.log(`Received ${modelName} Read`, model);
+        return model;
+      },
+
       insert: async (params: { data: M["Insert"] }): Promise<M["Read"]> => {
         const logger = baseLogger.appendName("insert");
 
@@ -531,6 +570,7 @@ export function createModelCRUDClient<
     return {
       ...baseClient,
       ...modelClientWithHooks,
+      parsers,
 
       // Using `any` here only because TypeScript is struggling with the
       // complexity of the generics and function name extractions.
@@ -547,6 +587,7 @@ export const DEFAULT_QUERY_FN_NAMES = [
   "getById",
   "getPage",
   "getAll",
+  "getOne",
   "getCount",
 ] as const satisfies ReadonlyArray<
   HookableFnName<BaseModelCRUDClient<ModelCRUDTypes>>

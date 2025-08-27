@@ -47,13 +47,13 @@ export function makeBucketMapFromList<T, K, V = T>(
     valueFn = identity as (item: T) => V,
   }: {
     keyFn: (item: T) => K;
-    valueFn?: (item: T) => V;
+    valueFn?: (item: T, key: K) => V;
   },
 ): Map<K, V[]> {
   const buckets = new Map<K, V[]>();
   list.forEach((item) => {
     const bucketName = keyFn(item);
-    const value: V = valueFn(item);
+    const value: V = valueFn(item, bucketName);
     const bucket: V[] = buckets.get(bucketName) ?? [];
     bucket.push(value);
     buckets.set(bucketName, bucket);

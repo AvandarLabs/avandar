@@ -1,14 +1,13 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { URL } from "node:url";
 import { z } from "zod";
 import { AvaHTTPError } from "../_shared/AvaHTTPError.ts";
 import { GoogleAuthClient } from "../_shared/getGoogleAuthClient.ts";
 import { BAD_REQUEST } from "../_shared/httpCodes.ts";
-import { GET, MiniServer } from "../_shared/MiniServer/MiniServer.ts";
+import { GET, MiniServer } from "../_shared/MiniServer/mod.ts";
 import { redirect } from "../_shared/MiniServer/redirect.ts";
 import { SupabaseAdmin } from "../_shared/supabase.ts";
 import { API } from "./api.types.ts";
-import type { MiniServerRoutesDef } from "../_shared/MiniServer/MiniServer.ts";
+import type { MiniServerRoutesDef } from "../_shared/MiniServer/mod.ts";
 import type { TokenPayload } from "google-auth-library";
 
 const GoogleTokensSchema = z.object({
@@ -39,11 +38,14 @@ const Routes: MiniServerRoutesDef<API> = {
      */
     "/": GET()
       .disableJWTVerification()
-      .action(async ({ request }) => {
-        const queryString = new URL(request.url).searchParams;
-        const googleCode = String(queryString.get("code"));
+      .querySchema({
+        state: z.string(),
+        code: z.string(),
+      })
+      .action(async ({ queryParams }) => {
+        const googleCode = queryParams.code;
         const { redirectURL, userId } = AuthStateSchema.parse(
-          JSON.parse(String(queryString.get("state"))),
+          JSON.parse(queryParams.state),
         );
 
         // Let's exchange the `code` for a token
@@ -88,7 +90,10 @@ const Routes: MiniServerRoutesDef<API> = {
               refresh_token: parsedTokens.refresh_token,
               scope: parsedTokens.scope,
             },
-            { onConflict: "user_id,google_account_id" },
+            {
+              onConflict: "user_id,google_account_id",
+              ignoreDuplicates: false,
+            },
           )
           .throwOnError();
 

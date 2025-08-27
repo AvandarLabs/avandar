@@ -1,12 +1,6 @@
 import { z } from "zod";
 import { Json } from "@/types/database.types";
-import {
-  MIMEType,
-  RawCellValue,
-  RawDataRecordRow,
-  RawDataset,
-  UUID,
-} from "../types/common";
+import { MIMEType, RawCellValue, RawDataRow, UUID } from "../types/common";
 import { Brand } from "../types/utilityTypes";
 
 /**
@@ -73,8 +67,10 @@ export const supabaseJSONSchema: z.ZodType<Json, Json> = z.lazy(() => {
 export const csvCellValueSchema: z.ZodType<RawCellValue, RawCellValue> =
   z.string();
 
-export const csvRowSchema: z.ZodType<RawDataRecordRow, RawDataRecordRow> =
-  z.record(z.string(), csvCellValueSchema);
+export const csvRowSchema: z.ZodType<RawDataRow, RawDataRow> = z.record(
+  z.string(),
+  csvCellValueSchema,
+);
 
-export const csvDataSchema: z.ZodType<RawDataset, RawDataset> =
+export const csvDataSchema: z.ZodType<RawDataRow[], RawDataRow[]> =
   z.array(csvRowSchema);

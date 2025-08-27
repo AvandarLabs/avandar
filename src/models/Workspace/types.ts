@@ -7,9 +7,7 @@ export type WorkspaceId = UUID<"Workspace">;
 
 export type WorkspaceRole = "admin" | "member";
 
-/**
- * Defines a Workspace.
- */
+/** Defines a Workspace. */
 type WorkspaceRead = {
   /** Unique identifier for this workspace */
   id: WorkspaceId;
@@ -30,13 +28,6 @@ type WorkspaceRead = {
   updatedAt: string;
 };
 
-type WorkspaceInsert = SetOptional<
-  WorkspaceRead,
-  "id" | "createdAt" | "updatedAt"
->;
-
-type WorkspaceUpdate = Partial<WorkspaceInsert>;
-
 /**
  * CRUD type definitions for the Workspace model.
  */
@@ -47,8 +38,8 @@ export type WorkspaceModel = SupabaseModelCRUDTypes<
     modelPrimaryKeyType: WorkspaceId;
     modelTypes: {
       Read: WorkspaceRead;
-      Insert: WorkspaceInsert;
-      Update: WorkspaceUpdate;
+      Insert: SetOptional<WorkspaceRead, "id" | "createdAt" | "updatedAt">;
+      Update: Partial<WorkspaceRead>;
     };
   },
   {
