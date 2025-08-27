@@ -74,7 +74,7 @@ export function VizSettingsForm({
 
   // helper to seed the *new* config with the cached XY (when applicable)
   function seedXY(newVizConfig: VizConfig): VizConfig {
-    const xy = getCurrentXY(vizConfig);
+    const xy = "cachedXY" in vizConfig ? vizConfig.cachedXY : undefined;
     if (!xy) {
       return newVizConfig;
     }
