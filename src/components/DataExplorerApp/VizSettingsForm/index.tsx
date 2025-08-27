@@ -19,6 +19,14 @@ const VIZ_TYPES: VizTypeMetadata[] = [
   { type: "line", displayName: "Line Chart" },
 ];
 
+type VizTypeMetadata = { type: VizType; displayName: string };
+
+const VIZ_TYPES: VizTypeMetadata[] = [
+  { type: "table", displayName: "Table" },
+  { type: "bar", displayName: "Bar Chart" },
+  { type: "line", displayName: "Line Chart" },
+];
+
 export type Props = {
   fields: readonly QueryResultField[];
   vizConfig: VizConfig;
@@ -66,7 +74,7 @@ export function VizSettingsForm({
 
   // helper to seed the *new* config with the cached XY (when applicable)
   function seedXY(newVizConfig: VizConfig): VizConfig {
-    const xy = getCurrentXY(vizConfig);
+    const xy = "cachedXY" in vizConfig ? vizConfig.cachedXY : undefined;
     if (!xy) {
       return newVizConfig;
     }
