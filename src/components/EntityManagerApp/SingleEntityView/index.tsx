@@ -1,7 +1,11 @@
 import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { useMemo } from "react";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient";
+import { DescriptionList } from "@/lib/ui/DescriptionList";
+import { SourceBadge } from "@/lib/ui/Icons/SourceBadge";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
+import { ValueItemContainer } from "@/lib/ui/ObjectDescriptionList/ValueItemContainer";
 import { Paper } from "@/lib/ui/Paper";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { makeMapFromList } from "@/lib/utils/maps/builders";
@@ -9,6 +13,7 @@ import { makeObjectFromList } from "@/lib/utils/objects/builders";
 import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { omit } from "@/lib/utils/objects/misc";
 import { unknownToString } from "@/lib/utils/strings/transformations";
+import { DatasetSourceType } from "@/models/datasets/Dataset";
 import { Entity } from "@/models/entities/Entity";
 import { EntityFieldValue } from "@/models/entities/EntityFieldValue";
 import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
@@ -27,6 +32,8 @@ type HydratedEntity = Entity & {
   fieldValues?: Array<
     EntityFieldValue & {
       fieldName?: string;
+      sourceType?: DatasetSourceType;
+      sourceName?: string;
     }
   >;
   nameFieldValue?: EntityFieldValue;
@@ -46,6 +53,28 @@ function useHydratedEntity({
     });
   const [entityFieldValues, isLoadingEntityFieldValues] =
     EntityFieldValueClient.useGetAll(where("entity_id", "eq", entity.id));
+
+  const datasetIds = useMemo(() => {
+    return Array.from(
+      new Set(
+        (entityFieldValues ?? [])
+          .map((value) => {
+            return value.datasetId;
+          })
+          .filter((isDataset) => {
+            return Boolean(isDataset);
+          }),
+      ),
+    );
+  }, [entityFieldValues]);
+
+  const [datasets] = DatasetClient.useGetAll(where("id", "in", datasetIds));
+
+  const datasetsMap = useMemo(() => {
+    return datasets ?
+        makeMapFromList(datasets, { keyFn: getProp("id") })
+      : undefined;
+  }, [datasets]);
 
   // TODO(jpsyx): move this to a module that can also use cacheing.
   const hydratedEntity = useMemo(() => {
@@ -77,13 +106,20 @@ function useHydratedEntity({
       const fieldValuesMap = makeMapFromList(entityFieldValues, {
         keyFn: getProp("entityFieldConfigId"),
         valueFn: (fieldValue) => {
+          const config = fieldConfigsMap?.get(fieldValue.entityFieldConfigId);
+          const dataset =
+            fieldValue.datasetId ?
+              datasetsMap?.get(fieldValue.datasetId)
+            : undefined;
           return {
             ...fieldValue,
-            fieldName: fieldConfigsMap?.get(fieldValue.entityFieldConfigId)
-              ?.name,
+            fieldName: config?.name,
+            sourceType: dataset?.sourceType ?? dataset?.sourceType,
+            sourceName: dataset?.name,
           };
         },
       });
+
       const nameFieldId = configInfo?.nameField?.id;
 
       fieldValuesInfo = {
@@ -98,7 +134,7 @@ function useHydratedEntity({
       ...configInfo,
       ...fieldValuesInfo,
     };
-  }, [entity, entityFieldConfigs, entityFieldValues]);
+  }, [entity, entityFieldConfigs, entityFieldValues, datasetsMap]);
 
   return [
     hydratedEntity,
@@ -111,6 +147,12 @@ type Props = {
   entity: Entity;
 };
 
+type FieldValueUI = {
+  value: EntityFieldValue["value"];
+  sourceType?: DatasetSourceType;
+  sourceName?: string;
+};
+
 export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
   const [hydratedEntity, isLoadingHydratedEntity] = useHydratedEntity({
     entityConfig,
@@ -119,13 +161,19 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
 
   const [entityMetadata, fieldValues] = useMemo(() => {
     // convert the field values array into a record
-    const fieldValuesRecord =
+    const fieldValuesRecord: Record<string, FieldValueUI> | undefined =
       hydratedEntity.fieldValues ?
         makeObjectFromList(hydratedEntity.fieldValues, {
           keyFn: (fieldValue) => {
             return fieldValue.fieldName ?? "Loading...";
           },
-          valueFn: getProp("value"),
+          valueFn: (fieldValue) => {
+            return {
+              value: fieldValue.value,
+              sourceType: fieldValue.sourceType,
+              sourceName: fieldValue.sourceName,
+            };
+          },
         })
       : undefined;
 
@@ -164,10 +212,32 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
             <Title order={4}>Data</Title>
             {fieldValues === undefined ?
               <Loader />
-            : <ObjectDescriptionList
-                data={fieldValues}
-                dateFormat="MMMM D, YYYY"
-              />
+            : <DescriptionList>
+                {Object.entries(fieldValues).map(
+                  ([label, { value, sourceType, sourceName }]) => {
+                    return (
+                      <DescriptionList.Item
+                        key={label}
+                        label={
+                          <Group gap="xs" wrap="nowrap" align="center">
+                            <SourceBadge
+                              sourceType={sourceType}
+                              sourceName={sourceName}
+                            />
+                            <Text fw={500}>{label}</Text>
+                          </Group>
+                        }
+                      >
+                        <ValueItemContainer
+                          type="unknown"
+                          value={value}
+                          dateFormat="MMMM D, YYYY"
+                        />
+                      </DescriptionList.Item>
+                    );
+                  },
+                )}
+              </DescriptionList>
             }
 
             <ActivityBlock />

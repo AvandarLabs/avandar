@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 import css from "./DescriptionListItem.module.css";
 
 type Props = {
-  label: string;
+  label: React.ReactNode;
   children: ReactNode;
 };
 
