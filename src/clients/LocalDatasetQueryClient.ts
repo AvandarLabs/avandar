@@ -265,51 +265,109 @@ class LocalDatasetQueryClientImpl {
     orderByColumn,
     orderByDirection,
   }: LocalQueryConfig): Promise<LocalQueryResultData> {
+    const tableName = datasetIdToTableName(datasetId);
+
+    // --- normalize & resolve actual column names from DuckDB schema ---
+    const { columns } = await this.#getDataset(datasetId);
+    const norm = (s: string) => {
+      return s.trim().toLowerCase();
+    };
+    const actualByNorm = new Map(
+      columns.map((c) => {
+        return [norm(c.name), c.name];
+      }),
+    );
+    const resolveActual = (uiName: string): string => {
+      return actualByNorm.get(norm(uiName)) ?? uiName;
+    };
+    const selectAs = (uiName: string) => {
+      const actual = resolveActual(uiName);
+      return sql.raw(`"${actual}" AS "${uiName}"`);
+    };
+
     const selectFieldNames = selectFields.map(getProp("name"));
     const groupByFieldNames = groupByFields.map(getProp("name"));
 
-    const tableName = datasetIdToTableName(datasetId);
-
     return this.#withConnection(async ({ conn }) => {
-      const fieldNamesWithoutAggregations = selectFieldNames.filter(
-        (fieldName) => {
-          return aggregations[fieldName] === "none";
-        },
+      // treat missing agg as "none"
+      const aggOf = (name: string): QueryAggregationType => {
+        return (aggregations?.[name] ?? "none") as QueryAggregationType;
+      };
+
+      const fieldsWithoutAggregations = selectFieldNames.filter((fieldName) => {
+        return aggOf(fieldName) === "none";
+      });
+
+      const hasAnyAgg = Object.values(aggregations).some((t) => {
+        return t !== "none";
+      });
+
+      // if any aggregation present: group by provided + non-agg fields
+      const effectiveGroupBy =
+        hasAnyAgg ?
+          Array.from(
+            new Set([...groupByFieldNames, ...fieldsWithoutAggregations]),
+          )
+        : groupByFieldNames;
+
+      // build base SELECT (never emit SELECT *)
+      const baseColumnsToSelect = Array.from(
+        new Set([...fieldsWithoutAggregations, ...effectiveGroupBy]),
       );
 
-      // build the query
-      let query = sql.select(...fieldNamesWithoutAggregations).from(tableName);
-      if (groupByFieldNames.length > 0) {
-        query = query.groupBy(...groupByFieldNames);
+      let query = sql.from(tableName);
+      if (baseColumnsToSelect.length === 0) {
+        query = query.select(sql.raw("1 AS __noop__"));
+      } else {
+        query = query.select(...baseColumnsToSelect.map(selectAs));
+      }
+
+      if (effectiveGroupBy.length > 0) {
+        query = query.groupBy(
+          ...effectiveGroupBy.map((n) => {
+            return resolveActual(n);
+          }),
+        );
       }
 
       if (orderByColumn && orderByDirection) {
-        query = query.orderBy(orderByColumn.name, orderByDirection);
+        query = query.orderBy(
+          resolveActual(orderByColumn.name),
+          orderByDirection,
+        );
       }
 
-      // apply aggregations
+      // apply aggregations (alias back to the UI field name)
       query = objectEntries(aggregations).reduce(
         (newQuery, [fieldName, aggType]) => {
+          const target = resolveActual(fieldName);
           return match(aggType)
             .with("sum", () => {
-              return query.sum(fieldName);
+              return newQuery.select(
+                sql.raw(`SUM("${target}") AS "${fieldName}"`),
+              );
             })
             .with("avg", () => {
-              return query.avg(fieldName);
+              return newQuery.select(
+                sql.raw(`AVG("${target}") AS "${fieldName}"`),
+              );
             })
             .with("count", () => {
-              return query.count(fieldName);
+              return newQuery.select(
+                sql.raw(`COUNT("${target}") AS "${fieldName}"`),
+              );
             })
             .with("max", () => {
-              return query.max(fieldName);
+              return newQuery.select(
+                sql.raw(`MAX("${target}") AS "${fieldName}"`),
+              );
             })
             .with("min", () => {
-              return query.min(fieldName);
+              return newQuery.select(
+                sql.raw(`MIN("${target}") AS "${fieldName}"`),
+              );
             })
-            .with("none", () => {
-              return newQuery;
-            })
-            .exhaustive(() => {
+            .otherwise(() => {
               return newQuery;
             });
         },
@@ -323,13 +381,24 @@ class LocalDatasetQueryClientImpl {
         );
 
         const jsDataRows = results.toArray().map((row) => {
-          return row.toJSON();
+          const o = row.toJSON() as Record<string, unknown>;
+          // strip dummy if present
+          // also coerce bigint → number for UI friendliness
+          const out: Record<string, unknown> = {};
+          for (const [k, v] of Object.entries(o)) {
+            if (k === "__noop__") continue;
+            out[k] = typeof v === "bigint" ? Number(v) : v;
+          }
+          return out;
         });
 
-        return {
-          fields: results.schema.fields.map(arrowFieldToQueryResultField),
-          data: jsDataRows,
-        };
+        const fields = results.schema.fields
+          .filter((f) => {
+            return f.name !== "__noop__";
+          })
+          .map(arrowFieldToQueryResultField);
+
+        return { fields, data: jsDataRows };
       } catch (error) {
         Logger.error(error, { query: query.toString() });
         throw error;
