@@ -7,11 +7,9 @@ import { invariant } from "@tanstack/react-router";
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
-import { Logger } from "@/lib/Logger";
 import { MIMEType, UnknownDataFrame } from "@/lib/types/common";
 import { makeObjectFromList } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
-import { objectEntries } from "@/lib/utils/objects/misc";
 import { promiseMap } from "@/lib/utils/promises";
 import { DatasetId, DatasetWithColumns } from "@/models/datasets/Dataset";
 import { DatasetColumn } from "@/models/datasets/DatasetColumn";
@@ -102,6 +100,12 @@ const MANUAL_BUNDLES: duck.DuckDBBundles = {
 function datasetIdToTableName(datasetId: DatasetId): string {
   return `dataset_${datasetId}`;
 }
+
+// Track in-flight dataset loads so we don't double-load and race.
+const __LOADS = new Map<string, Promise<void>>();
+
+// Monotonic sequence for runQuery responses (helps ignore late results).
+const __RUNQUERY_SEQ = 0;
 
 /**
  * Client for running queries on local datasets.
@@ -195,66 +199,74 @@ class LocalDatasetQueryClientImpl {
    * @returns A promise that resolves when the dataset is loaded.
    */
   async loadDataset(datasetId: DatasetId): Promise<void> {
-    const { columns } = await this.#getDataset(datasetId);
-    const parsedRawData = await DatasetRawDataClient.getParsedRawData({
-      datasetId,
-    });
-    invariant(parsedRawData, "Raw data could not be found.");
-
-    const tableName = datasetIdToTableName(datasetId);
-
-    // first verify the table name doesn't already exist
-    const existingTableNames = await this.getTableNames();
-    if (existingTableNames.includes(tableName)) {
-      // table name already exists, so we can skip loading the dataset again
+    // If a load for this dataset is already running, await it.
+    const existing = __LOADS.get(datasetId);
+    if (existing) {
+      await existing;
       return;
     }
 
-    await this.#withConnection(async ({ db, conn }) => {
-      // make sure all date columns are in ISO format so that they can be
-      // parsed by duckdb
-      const dateColumns = columns.filter((column) => {
-        return column.dataType === "date";
+    const loadPromise = (async () => {
+      const { columns } = await this.#getDataset(datasetId);
+      const parsedRawData = await DatasetRawDataClient.getParsedRawData({
+        datasetId,
       });
+      invariant(parsedRawData, "Raw data could not be found.");
 
-      // mutable operations for performance reasons here
-      parsedRawData.forEach((row) => {
-        dateColumns.forEach((column) => {
-          const dateString = row[column.name];
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          row[column.name] =
-            dateString ? new Date(dateString).toISOString() : undefined;
+      const tableName = datasetIdToTableName(datasetId);
+
+      // Fast skip if the table is already present
+      const existingTableNames = await this.getTableNames();
+      if (existingTableNames.includes(tableName)) return;
+
+      await this.#withConnection(async ({ db, conn }) => {
+        // Normalize date columns to ISO
+        const dateColumns = columns.filter((c) => {
+          return c.dataType === "date";
+        });
+        parsedRawData.forEach((row) => {
+          dateColumns.forEach((col) => {
+            const dateString = row[col.name] as unknown as string | undefined;
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            row[col.name] =
+              dateString ? new Date(dateString).toISOString() : undefined;
+          });
+        });
+
+        // Register + create table
+        const rawStringData = unparseDataset({
+          datasetType: MIMEType.TEXT_CSV,
+          data: parsedRawData,
+        });
+        await db.registerFileText(tableName, rawStringData);
+
+        const arrowColumns = columns.map((c) => {
+          return {
+            name: c.name,
+            dataType: getArrowDataType(c.dataType),
+          };
+        });
+        await conn.insertCSVFromPath(tableName, {
+          name: tableName,
+          schema: "main",
+          detect: true,
+          header: true,
+          delimiter: ",",
+          columns: makeObjectFromList(arrowColumns, {
+            keyFn: getProp("name"),
+            valueFn: getProp("dataType"),
+          }),
         });
       });
+    })();
 
-      // register the dataset in the database as a file
-      const rawStringData = unparseDataset({
-        datasetType: MIMEType.TEXT_CSV,
-        data: parsedRawData,
-      });
-      await db.registerFileText(tableName, rawStringData);
-
-      // insert the dataset as its own table
-      const arrowColumns = columns.map((column) => {
-        return {
-          name: column.name,
-          dataType: getArrowDataType(column.dataType),
-        };
-      });
-
-      await conn.insertCSVFromPath(tableName, {
-        name: tableName,
-        schema: "main",
-        detect: true,
-        header: true,
-        delimiter: ",",
-        columns: makeObjectFromList(arrowColumns, {
-          keyFn: getProp("name"),
-          valueFn: getProp("dataType"),
-        }),
-      });
-    });
+    __LOADS.set(datasetId, loadPromise);
+    try {
+      await loadPromise;
+    } finally {
+      __LOADS.delete(datasetId);
+    }
   }
 
   async runQuery({
@@ -267,142 +279,232 @@ class LocalDatasetQueryClientImpl {
   }: LocalQueryConfig): Promise<LocalQueryResultData> {
     const tableName = datasetIdToTableName(datasetId);
 
-    // --- normalize & resolve actual column names from DuckDB schema ---
-    const { columns } = await this.#getDataset(datasetId);
-    const norm = (s: string) => {
-      return s.trim().toLowerCase();
-    };
-    const actualByNorm = new Map(
-      columns.map((c) => {
-        return [norm(c.name), c.name];
-      }),
-    );
-    const resolveActual = (uiName: string): string => {
-      return actualByNorm.get(norm(uiName)) ?? uiName;
-    };
-    const selectAs = (uiName: string) => {
-      const actual = resolveActual(uiName);
-      return sql.raw(`"${actual}" AS "${uiName}"`);
-    };
-
-    const selectFieldNames = selectFields.map(getProp("name"));
-    const groupByFieldNames = groupByFields.map(getProp("name"));
+    const uiSelectNames = selectFields.map((c) => {
+      return c.name;
+    });
+    const uiGroupByNames = groupByFields.map((c) => {
+      return c.name;
+    });
 
     return this.#withConnection(async ({ conn }) => {
-      // treat missing agg as "none"
-      const aggOf = (name: string): QueryAggregationType => {
-        return (aggregations?.[name] ?? "none") as QueryAggregationType;
-      };
-
-      const fieldsWithoutAggregations = selectFieldNames.filter((fieldName) => {
-        return aggOf(fieldName) === "none";
-      });
-
-      const hasAnyAgg = Object.values(aggregations).some((t) => {
-        return t !== "none";
-      });
-
-      // if any aggregation present: group by provided + non-agg fields
-      const effectiveGroupBy =
-        hasAnyAgg ?
-          Array.from(
-            new Set([...groupByFieldNames, ...fieldsWithoutAggregations]),
-          )
-        : groupByFieldNames;
-
-      // build base SELECT (never emit SELECT *)
-      const baseColumnsToSelect = Array.from(
-        new Set([...fieldsWithoutAggregations, ...effectiveGroupBy]),
+      // 1) discover actual identifiers
+      type PragmaRow = { name: string; type?: string };
+      const pragma = await conn.query<PragmaRow>(
+        `PRAGMA table_info("${tableName.replace(/"/g, '""')}")`,
+      );
+      const actualNames = (pragma.toArray() as unknown as PragmaRow[]).map(
+        (r) => {
+          return String(r.name);
+        },
       );
 
-      let query = sql.from(tableName);
-      if (baseColumnsToSelect.length === 0) {
-        query = query.select(sql.raw("1 AS __noop__"));
-      } else {
-        query = query.select(...baseColumnsToSelect.map(selectAs));
-      }
+      // 2) name normalization + resolver
+      const normalizeLoose = (s: string) => {
+        return String(s)
+          .replace(/\u00A0/g, " ")
+          .replace(/\s+/g, " ")
+          .trim()
+          .toLowerCase();
+      };
 
-      if (effectiveGroupBy.length > 0) {
-        query = query.groupBy(
-          ...effectiveGroupBy.map((n) => {
-            return resolveActual(n);
-          }),
+      const aliasCanonical = (s: string) => {
+        return String(s)
+          .replace(/\u00A0/g, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+      };
+
+      const actualByNorm = new Map<string, string>();
+      for (const a of actualNames) actualByNorm.set(normalizeLoose(a), a);
+
+      const resolveActual = (uiName: string): string => {
+        const found = actualByNorm.get(normalizeLoose(uiName));
+        if (found) return found;
+        if (actualNames.includes(uiName)) return uiName;
+        throw new Error(
+          `Unable to resolve column "${uiName}". Known: ${actualNames.slice(0, 8).join(", ")} ...`,
         );
+      };
+
+      // 3) aggregations
+      const aggsByNorm = new Map<string, QueryAggregationType>(
+        Object.entries(aggregations ?? {}).map(([k, v]) => {
+          return [normalizeLoose(k), v ?? "none"];
+        }),
+      );
+      const aggOf = (uiName: string): QueryAggregationType => {
+        return aggsByNorm.get(normalizeLoose(uiName)) ?? "none";
+      };
+
+      const uiAggPairs = uiSelectNames.map((n) => {
+        return [n, aggOf(n)] as const;
+      });
+      const aggregatedUI = uiAggPairs
+        .filter(([, a]) => {
+          return a !== "none";
+        })
+        .map(([n]) => {
+          return n;
+        });
+      const nonAggregatedUI = uiAggPairs
+        .filter(([, a]) => {
+          return a === "none";
+        })
+        .map(([n]) => {
+          return n;
+        });
+
+      const hasAnyAgg = aggregatedUI.length > 0;
+      const hasExplicitGroupBy = uiGroupByNames.length > 0;
+
+      // 4) helpers
+      const q = (ident: string) => {
+        return `"${ident.replace(/"/g, '""')}"`;
+      };
+      const isMoneyishUI = (uiName: string) => {
+        const n = normalizeLoose(uiName).replace(/[^a-z]/g, "");
+        return (
+          n.includes("cost") ||
+          n.includes("price") ||
+          n.includes("amount") ||
+          n.includes("total") ||
+          n.includes("oop") ||
+          n.includes("charge") ||
+          n.includes("median") ||
+          n.includes("est")
+        );
+      };
+      const moneyLikeToDoubleSql = (qa: string) => {
+        return `
+(
+  CASE
+    WHEN ${qa} IS NULL THEN NULL
+    ELSE
+      (CASE WHEN ${qa} LIKE '%(%)%' THEN -1 ELSE 1 END)
+      * TRY_CAST(NULLIF(regexp_replace(TRIM(${qa}), '[^0-9.+-]', ''), '') AS DOUBLE)
+  END
+)`;
+      };
+
+      // 5) build SQL
+      let query = sql.from(tableName);
+
+      if (!hasAnyAgg && !hasExplicitGroupBy) {
+        // Plain detail mode: just project the selected columns
+        for (const uiName of uiSelectNames) {
+          const qa = q(resolveActual(uiName));
+          const expr = isMoneyishUI(uiName) ? moneyLikeToDoubleSql(qa) : qa;
+          const alias = aliasCanonical(uiName);
+          query = query.select(sql.raw(`${expr} AS ${q(alias)}`));
+        }
+      } else if (hasExplicitGroupBy) {
+        // Classic GROUP BY: group by explicit + any non-agg selected
+        const groupByTargetsUI = Array.from(
+          new Set([...uiGroupByNames, ...nonAggregatedUI]),
+        );
+
+        for (const uiName of groupByTargetsUI) {
+          const qa = q(resolveActual(uiName));
+          const expr = isMoneyishUI(uiName) ? moneyLikeToDoubleSql(qa) : qa;
+          const alias = aliasCanonical(uiName);
+          query = query.select(sql.raw(`${expr} AS ${q(alias)}`));
+        }
+
+        for (const uiName of aggregatedUI) {
+          const qa = q(resolveActual(uiName));
+          const t = aggOf(uiName);
+          const alias = aliasCanonical(uiName);
+          const needsNumeric =
+            t === "sum" || t === "avg" || t === "min" || t === "max";
+          const expr =
+            needsNumeric && isMoneyishUI(uiName) ?
+              moneyLikeToDoubleSql(qa)
+            : qa;
+
+          const clause =
+            t === "count" ? `COUNT(${qa}) AS ${q(alias)}`
+            : t === "sum" ? `SUM(${expr})   AS ${q(alias)}`
+            : t === "avg" ? `AVG(${expr})   AS ${q(alias)}`
+            : t === "max" ? `MAX(${expr})   AS ${q(alias)}`
+            : t === "min" ? `MIN(${expr})   AS ${q(alias)}`
+            : null;
+
+          if (clause) query = query.select(sql.raw(clause));
+        }
+
+        if (groupByTargetsUI.length > 0) {
+          query = query.groupByRaw(
+            groupByTargetsUI
+              .map((ui) => {
+                return q(resolveActual(ui));
+              })
+              .join(", "),
+          );
+        }
+      } else {
+        // ✅ Single-row summary mode (at least one agg, no explicit group by):
+        // return ONLY the aggregated columns as a single row.
+        for (const uiName of aggregatedUI) {
+          const qa = q(resolveActual(uiName));
+          const t = aggOf(uiName);
+          const alias = aliasCanonical(uiName);
+          const needsNumeric =
+            t === "sum" || t === "avg" || t === "min" || t === "max";
+          const expr =
+            needsNumeric && isMoneyishUI(uiName) ?
+              moneyLikeToDoubleSql(qa)
+            : qa;
+
+          const clause =
+            t === "count" ? `COUNT(${qa}) AS ${q(alias)}`
+            : t === "sum" ? `ROUND(SUM(${expr}), 2) AS ${q(alias)}`
+            : t === "avg" ? `ROUND(AVG(${expr}), 2) AS ${q(alias)}`
+            : t === "max" ? `ROUND(MAX(${expr}), 2) AS ${q(alias)}`
+            : t === "min" ? `ROUND(MIN(${expr}), 2) AS ${q(alias)}`
+            : null;
+
+          if (clause) query = query.select(sql.raw(clause));
+        }
       }
 
       if (orderByColumn && orderByDirection) {
-        query = query.orderBy(
-          resolveActual(orderByColumn.name),
-          orderByDirection,
+        query = query.orderByRaw(
+          `${q(resolveActual(orderByColumn.name))} ${orderByDirection}`,
         );
       }
 
-      // apply aggregations (alias back to the UI field name)
-      query = objectEntries(aggregations).reduce(
-        (newQuery, [fieldName, aggType]) => {
-          const target = resolveActual(fieldName);
-          return match(aggType)
-            .with("sum", () => {
-              return newQuery.select(
-                sql.raw(`SUM("${target}") AS "${fieldName}"`),
-              );
-            })
-            .with("avg", () => {
-              return newQuery.select(
-                sql.raw(`AVG("${target}") AS "${fieldName}"`),
-              );
-            })
-            .with("count", () => {
-              return newQuery.select(
-                sql.raw(`COUNT("${target}") AS "${fieldName}"`),
-              );
-            })
-            .with("max", () => {
-              return newQuery.select(
-                sql.raw(`MAX("${target}") AS "${fieldName}"`),
-              );
-            })
-            .with("min", () => {
-              return newQuery.select(
-                sql.raw(`MIN("${target}") AS "${fieldName}"`),
-              );
-            })
-            .otherwise(() => {
-              return newQuery;
-            });
-        },
-        query,
+      // 6) Execute + shape
+      const results = await conn.query<Record<string, arrow.DataType>>(
+        query.toString(),
       );
 
-      // run the query
-      try {
-        const results = await conn.query<Record<string, arrow.DataType>>(
-          query.toString(),
-        );
-
-        const jsDataRows = results.toArray().map((row) => {
-          const o = row.toJSON() as Record<string, unknown>;
-          // strip dummy if present
-          // also coerce bigint → number for UI friendliness
-          const out: Record<string, unknown> = {};
-          for (const [k, v] of Object.entries(o)) {
-            if (k === "__noop__") continue;
-            out[k] = typeof v === "bigint" ? Number(v) : v;
-          }
-          return out;
+      const schemaNames = results.schema.fields
+        .map((f) => {
+          return f.name;
+        })
+        .filter((n) => {
+          return n !== "__noop__";
         });
 
-        const fields = results.schema.fields
-          .filter((f) => {
-            return f.name !== "__noop__";
-          })
-          .map(arrowFieldToQueryResultField);
+      const arr = results.toArray();
 
-        return { fields, data: jsDataRows };
-      } catch (error) {
-        Logger.error(error, { query: query.toString() });
-        throw error;
-      }
+      const jsDataRows = arr.map((row) => {
+        const o = row.toJSON() as Record<string, unknown>;
+        const out: Record<string, unknown> = {};
+        for (const name of schemaNames) {
+          const v = o[name];
+          out[name] = typeof v === "bigint" ? Number(v) : v;
+        }
+        return out;
+      });
+
+      const fields = results.schema.fields
+        .filter((f) => {
+          return f.name !== "__noop__";
+        })
+        .map(arrowFieldToQueryResultField);
+
+      return { fields, data: jsDataRows };
     });
   }
 }

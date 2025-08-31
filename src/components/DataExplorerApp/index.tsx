@@ -1,11 +1,7 @@
 import { Box, Flex, Loader, MantineTheme } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
-import { partition } from "@/lib/utils/arrays";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
-import { isNotInSet } from "@/lib/utils/sets/higherOrderFuncs";
-import { wrapString } from "@/lib/utils/strings/higherOrderFuncs";
-import { wordJoin } from "@/lib/utils/strings/transformations";
 import { DatasetId } from "@/models/datasets/Dataset";
 import { DatasetColumn } from "@/models/datasets/DatasetColumn";
 import { QueryForm } from "./QueryForm";
@@ -47,55 +43,22 @@ export function DataExplorerApp(): JSX.Element {
   const selectedFieldNames = useMemo(() => {
     return selectColumns.map(getProp("name"));
   }, [selectColumns]);
-  const selectedGroupByFieldNames = useMemo(() => {
-    return selectGroupByColumns.map(getProp("name"));
-  }, [selectGroupByColumns]);
+  // const selectedGroupByFieldNames = useMemo(() => {
+  //   return selectGroupByColumns.map(getProp("name"));
+  // }, [selectGroupByColumns]);
 
   const [isValidQuery, errorMessage] = useMemo(() => {
-    // 1. There must be at least one field selected
     if (selectedFieldNames.length === 0) {
       return [
         false,
         "At least one column must be selected for the query to run",
-      ];
+      ] as const;
     }
-
-    // 2. If there is at least 1 GROUP BY or at least 1 aggregated column, then
-    // ALL columns must be either in the GROUP BY or have an aggregation.
-    const [nonAggregatedColumnNames, aggregatedColumnNames] = partition(
-      selectedFieldNames,
-      (columnName) => {
-        return aggregations[columnName] === "none";
-      },
-    );
-
-    if (
-      aggregatedColumnNames.length !== 0 ||
-      selectedGroupByFieldNames.length !== 0
-    ) {
-      const groupByColumnNames = new Set(selectedGroupByFieldNames);
-      const columnsWithoutGroupOrAggregation = nonAggregatedColumnNames.filter(
-        isNotInSet(groupByColumnNames),
-      );
-      if (columnsWithoutGroupOrAggregation.length > 0) {
-        // generate the error message
-        const columnsListStr = wordJoin(
-          columnsWithoutGroupOrAggregation.map(wrapString('"')),
-        );
-        const pluralizedColumnsString =
-          columnsWithoutGroupOrAggregation.length === 1 ?
-            `Column ${columnsListStr} needs`
-          : `Columns ${columnsListStr} need`;
-        const errMsg = `If one column is in the Group By or has an aggregation,
-        then all columns must be in the Group By or have an aggregation.
-        ${pluralizedColumnsString} to be added to the Group By or have an aggregation.`;
-
-        return [false, errMsg];
-      }
-    }
-
-    return [true, undefined];
-  }, [selectedFieldNames, selectedGroupByFieldNames, aggregations]);
+    // We no longer enforce “every selected col must be grouped or aggregated”.
+    // The backend auto–groups non-aggregated
+    // selected fields when any agg exists.
+    return [true, undefined] as const;
+  }, [selectedFieldNames]);
 
   const [queryResults, isLoadingResults] = useDataQuery({
     enabled: !!selectedDatasetId && isValidQuery,
