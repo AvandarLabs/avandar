@@ -166,6 +166,44 @@ class LocalDatasetQueryClientImpl {
     }
   }
 
+  async #getActualColumnNames(
+    conn: duck.AsyncDuckDBConnection,
+    tableName: string,
+  ): Promise<string[]> {
+    const pragma = await conn.query(
+      `PRAGMA table_info("${tableName.replace(/"/g, '""')}")`,
+    );
+    return pragma.toArray().map((r) => {
+      return r.name;
+    });
+  }
+
+  #makeResolver(actualNames: string[]): (name: string) => string {
+    const normalize = (s: string) => {
+      return s
+        .replace(/\u00A0/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toLowerCase();
+    };
+
+    const map = new Map(
+      actualNames.map((n) => {
+        return [normalize(n), n];
+      }),
+    );
+
+    return (uiName: string) => {
+      const n = normalize(uiName);
+      const resolved = map.get(n);
+      if (resolved) return resolved;
+      if (actualNames.includes(uiName)) return uiName;
+      throw new Error(
+        `Unable to resolve column "${uiName}". Known: ${actualNames.join(", ")}`,
+      );
+    };
+  }
+
   async getTableNames(): Promise<string[]> {
     return await this.#withConnection(async ({ conn }) => {
       // get all table names
@@ -269,6 +307,52 @@ class LocalDatasetQueryClientImpl {
     }
   }
 
+  #buildAggregationClause({
+    uiName,
+    aggType,
+    resolveActual,
+    isMoneyishUI,
+    moneyLikeToDoubleSql,
+    aliasCanonical,
+    q,
+  }: {
+    uiName: string;
+    aggType: QueryAggregationType;
+    resolveActual: (name: string) => string;
+    isMoneyishUI: (name: string) => boolean;
+    moneyLikeToDoubleSql: (qExpr: string) => string;
+    aliasCanonical: (name: string) => string;
+    q: (name: string) => string;
+  }): string | null {
+    const actual = resolveActual(uiName);
+    const alias = aliasCanonical(uiName);
+    const needsNumeric = ["sum", "avg", "min", "max"].includes(aggType);
+    const expr =
+      needsNumeric && isMoneyishUI(uiName) ?
+        moneyLikeToDoubleSql(q(actual))
+      : q(actual);
+
+    return match(aggType)
+      .with("count", () => {
+        return `COUNT(${q(actual)}) AS ${q(alias)}`;
+      })
+      .with("sum", () => {
+        return `ROUND(SUM(${expr}), 2) AS ${q(alias)}`;
+      })
+      .with("avg", () => {
+        return `ROUND(AVG(${expr}), 2) AS ${q(alias)}`;
+      })
+      .with("max", () => {
+        return `ROUND(MAX(${expr}), 2) AS ${q(alias)}`;
+      })
+      .with("min", () => {
+        return `ROUND(MIN(${expr}), 2) AS ${q(alias)}`;
+      })
+      .otherwise(() => {
+        return null;
+      });
+  }
+
   async runQuery({
     selectFields,
     groupByFields,
@@ -278,7 +362,6 @@ class LocalDatasetQueryClientImpl {
     orderByDirection,
   }: LocalQueryConfig): Promise<LocalQueryResultData> {
     const tableName = datasetIdToTableName(datasetId);
-
     const uiSelectNames = selectFields.map((c) => {
       return c.name;
     });
@@ -287,55 +370,48 @@ class LocalDatasetQueryClientImpl {
     });
 
     return this.#withConnection(async ({ conn }) => {
-      // 1) discover actual identifiers
-      type PragmaRow = { name: string; type?: string };
-      const pragma = await conn.query<PragmaRow>(
-        `PRAGMA table_info("${tableName.replace(/"/g, '""')}")`,
-      );
-      const actualNames = (pragma.toArray() as unknown as PragmaRow[]).map(
-        (r) => {
-          return String(r.name);
-        },
-      );
-
-      // 2) name normalization + resolver
-      const normalizeLoose = (s: string) => {
-        return String(s)
+      const actualNames = await this.#getActualColumnNames(conn, tableName);
+      const resolveActual = this.#makeResolver(actualNames);
+      const normalize = (s: string) => {
+        return s
           .replace(/\u00A0/g, " ")
           .replace(/\s+/g, " ")
           .trim()
           .toLowerCase();
       };
-
       const aliasCanonical = (s: string) => {
-        return String(s)
+        return s
           .replace(/\u00A0/g, " ")
           .replace(/\s+/g, " ")
           .trim();
       };
 
-      const actualByNorm = new Map<string, string>();
-      for (const a of actualNames) actualByNorm.set(normalizeLoose(a), a);
-
-      const resolveActual = (uiName: string): string => {
-        const found = actualByNorm.get(normalizeLoose(uiName));
-        if (found) return found;
-        if (actualNames.includes(uiName)) return uiName;
-        throw new Error(
-          `Unable to resolve column "${uiName}". Known: ${actualNames.slice(0, 8).join(", ")} ...`,
-        );
-      };
-
-      // 3) aggregations
-      const aggsByNorm = new Map<string, QueryAggregationType>(
-        Object.entries(aggregations ?? {}).map(([k, v]) => {
-          return [normalizeLoose(k), v ?? "none"];
-        }),
-      );
       const aggOf = (uiName: string): QueryAggregationType => {
-        return aggsByNorm.get(normalizeLoose(uiName)) ?? "none";
+        return aggregations?.[uiName] ?? "none";
       };
 
+      const q = (ident: string) => {
+        return `"${ident.replace(/"/g, '""')}"`;
+      };
+
+      const isMoneyishUI = (uiName: string) => {
+        const n = normalize(uiName).replace(/[^a-z]/g, "");
+        return /(cost|price|amount|total|oop|charge|median|est)/.test(n);
+      };
+
+      const moneyLikeToDoubleSql = (qa: string) => {
+        return `
+(
+  CASE
+    WHEN ${qa} IS NULL THEN NULL
+    ELSE
+      (CASE WHEN ${qa} LIKE '%(%)%' THEN -1 ELSE 1 END)
+      * TRY_CAST(NULLIF(regexp_replace(TRIM(${qa}), '[^0-9.+-]', ''), '') AS DOUBLE)
+  END
+)`;
+      };
+
+      // ─── Determine Column Modes ────────────────────────────────
       const uiAggPairs = uiSelectNames.map((n) => {
         return [n, aggOf(n)] as const;
       });
@@ -353,83 +429,46 @@ class LocalDatasetQueryClientImpl {
         .map(([n]) => {
           return n;
         });
-
       const hasAnyAgg = aggregatedUI.length > 0;
       const hasExplicitGroupBy = uiGroupByNames.length > 0;
 
-      // 4) helpers
-      const q = (ident: string) => {
-        return `"${ident.replace(/"/g, '""')}"`;
-      };
-      const isMoneyishUI = (uiName: string) => {
-        const n = normalizeLoose(uiName).replace(/[^a-z]/g, "");
-        return (
-          n.includes("cost") ||
-          n.includes("price") ||
-          n.includes("amount") ||
-          n.includes("total") ||
-          n.includes("oop") ||
-          n.includes("charge") ||
-          n.includes("median") ||
-          n.includes("est")
-        );
-      };
-      const moneyLikeToDoubleSql = (qa: string) => {
-        return `
-(
-  CASE
-    WHEN ${qa} IS NULL THEN NULL
-    ELSE
-      (CASE WHEN ${qa} LIKE '%(%)%' THEN -1 ELSE 1 END)
-      * TRY_CAST(NULLIF(regexp_replace(TRIM(${qa}), '[^0-9.+-]', ''), '') AS DOUBLE)
-  END
-)`;
-      };
-
-      // 5) build SQL
+      // ─── Begin Query Construction ──────────────────────────────
       let query = sql.from(tableName);
 
       if (!hasAnyAgg && !hasExplicitGroupBy) {
-        // Plain detail mode: just project the selected columns
+        // ➤ DETAIL MODE (no agg, no group by)
         for (const uiName of uiSelectNames) {
-          const qa = q(resolveActual(uiName));
-          const expr = isMoneyishUI(uiName) ? moneyLikeToDoubleSql(qa) : qa;
+          const actual = resolveActual(uiName);
+          const expr =
+            isMoneyishUI(uiName) ? moneyLikeToDoubleSql(q(actual)) : q(actual);
           const alias = aliasCanonical(uiName);
           query = query.select(sql.raw(`${expr} AS ${q(alias)}`));
         }
       } else if (hasExplicitGroupBy) {
-        // Classic GROUP BY: group by explicit + any non-agg selected
+        // ➤ GROUP BY MODE
         const groupByTargetsUI = Array.from(
           new Set([...uiGroupByNames, ...nonAggregatedUI]),
         );
 
         for (const uiName of groupByTargetsUI) {
-          const qa = q(resolveActual(uiName));
-          const expr = isMoneyishUI(uiName) ? moneyLikeToDoubleSql(qa) : qa;
+          const actual = resolveActual(uiName);
+          const expr =
+            isMoneyishUI(uiName) ? moneyLikeToDoubleSql(q(actual)) : q(actual);
           const alias = aliasCanonical(uiName);
           query = query.select(sql.raw(`${expr} AS ${q(alias)}`));
         }
 
         for (const uiName of aggregatedUI) {
-          const qa = q(resolveActual(uiName));
-          const t = aggOf(uiName);
-          const alias = aliasCanonical(uiName);
-          const needsNumeric =
-            t === "sum" || t === "avg" || t === "min" || t === "max";
-          const expr =
-            needsNumeric && isMoneyishUI(uiName) ?
-              moneyLikeToDoubleSql(qa)
-            : qa;
-
-          const clause =
-            t === "count" ? `COUNT(${qa}) AS ${q(alias)}`
-            : t === "sum" ? `SUM(${expr})   AS ${q(alias)}`
-            : t === "avg" ? `AVG(${expr})   AS ${q(alias)}`
-            : t === "max" ? `MAX(${expr})   AS ${q(alias)}`
-            : t === "min" ? `MIN(${expr})   AS ${q(alias)}`
-            : null;
-
-          if (clause) query = query.select(sql.raw(clause));
+          const aggClause = this.#buildAggregationClause({
+            uiName,
+            aggType: aggOf(uiName),
+            resolveActual,
+            isMoneyishUI,
+            moneyLikeToDoubleSql,
+            aliasCanonical,
+            q,
+          });
+          if (aggClause) query = query.select(sql.raw(aggClause));
         }
 
         if (groupByTargetsUI.length > 0) {
@@ -442,28 +481,18 @@ class LocalDatasetQueryClientImpl {
           );
         }
       } else {
-        // ✅ Single-row summary mode (at least one agg, no explicit group by):
-        // return ONLY the aggregated columns as a single row.
+        // ➤ SINGLE-ROW SUMMARY MODE
         for (const uiName of aggregatedUI) {
-          const qa = q(resolveActual(uiName));
-          const t = aggOf(uiName);
-          const alias = aliasCanonical(uiName);
-          const needsNumeric =
-            t === "sum" || t === "avg" || t === "min" || t === "max";
-          const expr =
-            needsNumeric && isMoneyishUI(uiName) ?
-              moneyLikeToDoubleSql(qa)
-            : qa;
-
-          const clause =
-            t === "count" ? `COUNT(${qa}) AS ${q(alias)}`
-            : t === "sum" ? `ROUND(SUM(${expr}), 2) AS ${q(alias)}`
-            : t === "avg" ? `ROUND(AVG(${expr}), 2) AS ${q(alias)}`
-            : t === "max" ? `ROUND(MAX(${expr}), 2) AS ${q(alias)}`
-            : t === "min" ? `ROUND(MIN(${expr}), 2) AS ${q(alias)}`
-            : null;
-
-          if (clause) query = query.select(sql.raw(clause));
+          const aggClause = this.#buildAggregationClause({
+            uiName,
+            aggType: aggOf(uiName),
+            resolveActual,
+            isMoneyishUI,
+            moneyLikeToDoubleSql,
+            aliasCanonical,
+            q,
+          });
+          if (aggClause) query = query.select(sql.raw(aggClause));
         }
       }
 
@@ -473,7 +502,7 @@ class LocalDatasetQueryClientImpl {
         );
       }
 
-      // 6) Execute + shape
+      // ─── Execute Query ─────────────────────────────────────────
       const results = await conn.query<Record<string, arrow.DataType>>(
         query.toString(),
       );
@@ -486,9 +515,7 @@ class LocalDatasetQueryClientImpl {
           return n !== "__noop__";
         });
 
-      const arr = results.toArray();
-
-      const jsDataRows = arr.map((row) => {
+      const jsDataRows = results.toArray().map((row) => {
         const o = row.toJSON() as Record<string, unknown>;
         const out: Record<string, unknown> = {};
         for (const name of schemaNames) {

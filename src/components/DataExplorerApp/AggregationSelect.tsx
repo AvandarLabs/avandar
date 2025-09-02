@@ -4,7 +4,7 @@ import { DatasetColumn } from "@/models/datasets/DatasetColumn";
 
 type Props = {
   column: DatasetColumn;
-  value: QueryAggregationType; // <-- add
+  value?: QueryAggregationType;
   onChange: (aggregation: QueryAggregationType) => void;
 };
 
