@@ -1,17 +1,12 @@
-// src/lib/ui/Icons/sourceBadge.tsx
 import { Tooltip } from "@mantine/core";
 import {
   IconBrandGoogle,
   IconFileTypeCsv,
-  IconProps,
   IconTable,
 } from "@tabler/icons-react";
 import { match } from "ts-pattern";
 import { DatasetSourceType } from "@/models/datasets/Dataset";
 
-type TablerIconComponent = React.ComponentType<IconProps>;
-
-// Accept e.g. "local_csv" | "google_sheets" | "airtable"
 export function SourceBadge({
   sourceType,
   sourceName,
@@ -26,25 +21,33 @@ export function SourceBadge({
   const { Icon, tooltip } = match(sourceType)
     .with("local_csv", () => {
       return {
-        Icon: IconFileTypeCsv as TablerIconComponent,
+        Icon: (props: React.ComponentProps<typeof IconFileTypeCsv>) => {
+          return <IconFileTypeCsv {...props} color="#666" />;
+        },
         tooltip: "From CSV",
       };
     })
     .with("google_sheets", () => {
       return {
-        Icon: IconBrandGoogle as TablerIconComponent,
+        Icon: (props: React.ComponentProps<typeof IconBrandGoogle>) => {
+          return <IconBrandGoogle {...props} color="#34a853" />;
+        },
         tooltip: "From Google Sheets",
       };
     })
     // .with("airtable", () => {
     //   return {
-    //     Icon: IconBrandAirtable as TablerIconComponent,
+    //     Icon: (props: React.ComponentProps<typeof IconBrandAirtable>) => {
+    //       return <IconBrandAirtable {...props} color="#fcb400" />;
+    //     },
     //     tooltip: "From Airtable",
     //   };
     // })
     .otherwise(() => {
       return {
-        Icon: IconTable as TablerIconComponent,
+        Icon: (props: React.ComponentProps<typeof IconTable>) => {
+          return <IconTable {...props} color="#999" />;
+        },
         tooltip: "From dataset",
       };
     });
