@@ -28,6 +28,7 @@ export function parseFileOrStringToCSV({
   csv: Papa.ParseResult<RawDataRow>;
 }> {
   return new Promise((resolve, reject) => {
+    console.log("📦 dataToParse is a", typeof dataToParse, dataToParse);
     Papa.parse<RawDataRow>(dataToParse, {
       // TODO(jpsyx): `header` should be toggleable eventually.
       header: firstRowIsHeader,
@@ -39,7 +40,44 @@ export function parseFileOrStringToCSV({
           meta,
           errors,
         };
-        const fields = detectColumnDataTypes(meta.fields ?? [], data);
+
+        console.log("🔍 meta.fields raw:", meta.fields);
+        console.log("🔍 typeof meta.fields:", typeof meta.fields);
+        console.log(
+          "🔍 meta.fields instanceof Array:",
+          meta.fields instanceof Array,
+        );
+        console.log("🔍 meta.fields[0]:", meta.fields?.[0]);
+
+        if (firstRowIsHeader && Array.isArray(meta.fields)) {
+          const cleanedFields = meta.fields
+            .filter((f): f is string => {
+              return typeof f === "string" && f.trim() !== "" && !/^_/.test(f);
+            })
+            .map((f) => {
+              return f.trim();
+            });
+
+          console.log("✅ Cleaned CSV Headers:", cleanedFields);
+
+          csv.data = csv.data.map((row) => {
+            const newRow: Record<string, unknown> = {};
+            for (const field of cleanedFields) {
+              newRow[field] = row[field];
+            }
+            return newRow as RawDataRow;
+          });
+        }
+
+        if (!meta.fields || meta.fields.length === 0) {
+          console.error(
+            "CSV parse failed — no headers detected:",
+            data.slice(0, 2),
+          );
+          reject(new Error("CSV parsing failed — headers not detected."));
+          return;
+        }
+        const fields = detectColumnDataTypes(meta.fields, data);
 
         // check if there are any fields we've determined are dates
         const dateFields = fields.filter(propEquals("dataType", "date"));
@@ -65,6 +103,9 @@ export function parseFileOrStringToCSV({
               sizeInBytes: dataToParse.size,
             }
           : undefined;
+
+        console.log("👀 CSV Meta Fields:", meta.fields);
+        console.log("👀 First row of data:", data[0]);
 
         resolve({
           csv,

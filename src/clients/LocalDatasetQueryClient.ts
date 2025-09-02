@@ -278,7 +278,12 @@ class LocalDatasetQueryClientImpl {
           data: parsedRawData,
         });
         await db.registerFileText(tableName, rawStringData);
-
+        if (rawStringData?.[0]) {
+          console.log("🧠 CSV Headers:", Object.keys(rawStringData[0]));
+        } else {
+          console.warn("⚠️ rawStringData[0] is undefined");
+        }
+        console.log(rawStringData);
         const arrowColumns = columns.map((c) => {
           return {
             name: c.name,
