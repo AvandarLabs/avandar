@@ -21,7 +21,6 @@ import {
 } from "react";
 import { Theme } from "@/config/Theme";
 import { noop } from "@/lib/utils/misc";
-import { notifyDevAlert } from "../notifications/notifyDevAlert";
 
 const DEFAULT_PRIMARY_SHADE =
   typeof DEFAULT_THEME.primaryShade === "object" ?
@@ -108,7 +107,6 @@ export const NavLink: LinkComponent<typeof MantineRouterNavLink> = (props) => {
     <MantineRouterNavLink
       ref={mergedRef}
       onClick={(e) => {
-        notifyDevAlert("clicked");
         setIsClicked(true);
         onClick?.(e);
       }}

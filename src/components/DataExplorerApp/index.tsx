@@ -5,11 +5,13 @@ import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { isNotInSet } from "@/lib/utils/sets/higherOrderFuncs";
 import { wrapString } from "@/lib/utils/strings/higherOrderFuncs";
 import { wordJoin } from "@/lib/utils/strings/transformations";
+import { DatasetId } from "@/models/datasets/Dataset";
 import { QueryForm } from "./QueryForm";
 import { useDataQuery } from "./useDataQuery";
 import { useExplorerDraft } from "./useExplorerDraft";
 import { VisualizationContainer } from "./VisualizationContainer";
 import { VizSettingsForm } from "./VizSettingsForm";
+import { makeDefaultVizConfig } from "./VizSettingsForm/makeDefaultVizConfig";
 
 const QUERY_FORM_WIDTH = 300;
 
@@ -24,8 +26,8 @@ export function DataExplorerApp(): JSX.Element {
     // develop API names, exposed by the hook
     selectedColumns,
     setSelectedColumns,
-    selectGroupByColumns,
-    setSelectGroupByColumns,
+    selectedGroupByColumns,
+    setSelectedGroupByColumns,
 
     orderByColumn,
     setOrderByColumn,
@@ -41,8 +43,8 @@ export function DataExplorerApp(): JSX.Element {
   }, [selectedColumns]);
 
   const selectedGroupByFieldNames = useMemo(() => {
-    return selectGroupByColumns.map(getProp("name"));
-  }, [selectGroupByColumns]);
+    return selectedGroupByColumns.map(getProp("name"));
+  }, [selectedGroupByColumns]);
 
   const [isValidQuery, errorMessage] = useMemo(() => {
     if (selectedFieldNames.length === 0) {
@@ -84,7 +86,7 @@ export function DataExplorerApp(): JSX.Element {
     aggregations,
     datasetId: selectedDatasetId,
     selectFields: selectedColumns,
-    groupByFields: selectGroupByColumns,
+    groupByFields: selectedGroupByColumns,
     orderByColumn,
     orderByDirection,
   });
@@ -95,6 +97,22 @@ export function DataExplorerApp(): JSX.Element {
       data: queryResults?.data ?? [],
     };
   }, [queryResults]);
+
+  const resetQueryForm = () => {
+    setSelectedColumns([]);
+    setSelectedGroupByColumns([]);
+    setAggregations({});
+    setOrderByColumn(undefined);
+    setOrderByDirection("asc");
+    setVizConfig(makeDefaultVizConfig("table"));
+  };
+
+  const onSelectedDatasetChange = (datasetId: DatasetId | undefined) => {
+    if (datasetId !== selectedDatasetId) {
+      resetQueryForm();
+    }
+    setSelectedDatasetId(datasetId);
+  };
 
   return (
     <Flex>
@@ -111,13 +129,13 @@ export function DataExplorerApp(): JSX.Element {
           aggregations={aggregations}
           selectedDatasetId={selectedDatasetId}
           selectedColumns={selectedColumns}
-          selectGroupByColumns={selectGroupByColumns}
+          selectedGroupByColumns={selectedGroupByColumns}
           orderByColumn={orderByColumn}
           orderByDirection={orderByDirection}
           onAggregationsChange={setAggregations}
-          onFromDatasetChange={setSelectedDatasetId}
+          onFromDatasetChange={onSelectedDatasetChange}
           onSelectColumnsChange={setSelectedColumns}
-          onGroupByChange={setSelectGroupByColumns}
+          onGroupByChange={setSelectedGroupByColumns}
           onOrderByColumnChange={setOrderByColumn}
           onOrderByDirectionChange={setOrderByDirection}
           errorMessage={errorMessage}

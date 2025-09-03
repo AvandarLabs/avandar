@@ -1,4 +1,4 @@
-import { Fieldset, Select, Stack, Text } from "@mantine/core";
+import { Box, Fieldset, Select, Stack, Text } from "@mantine/core";
 import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
 import { DangerText } from "@/lib/ui/Text/DangerText";
 import { difference } from "@/lib/utils/arrays";
@@ -28,8 +28,8 @@ type Props = {
 
   // develop names
   selectedColumns: readonly DatasetColumn[];
-  selectGroupByColumns: readonly DatasetColumn[];
-  orderByColumn?: DatasetColumn;
+  selectedGroupByColumns: readonly DatasetColumn[];
+  orderByColumn: DatasetColumn | undefined;
   orderByDirection: Direction;
 
   onAggregationsChange: (next: Record<string, QueryAggregationType>) => void;
@@ -44,9 +44,9 @@ type Props = {
 export function QueryForm({
   errorMessage,
   aggregations,
-  selectedDatasetId,
   selectedColumns,
-  selectGroupByColumns,
+  selectedGroupByColumns,
+  selectedDatasetId,
   orderByColumn,
   orderByDirection,
   onAggregationsChange,
@@ -119,10 +119,8 @@ export function QueryForm({
           label="Group by"
           placeholder="Group by"
           datasetId={selectedDatasetId}
-          value={selectGroupByColumns}
-          onChange={(cols) => {
-            onGroupByChange(cols);
-          }}
+          value={selectedGroupByColumns}
+          onChange={onGroupByChange}
         />
 
         <Select
@@ -140,6 +138,18 @@ export function QueryForm({
           }}
           clearable
         />
+        <Box mb="md">
+          <Select
+            label="Order by"
+            placeholder="Select order"
+            data={orderOptions}
+            value={orderByDirection}
+            clearable={false}
+            onChange={(value) => {
+              onOrderByDirectionChange(value as Direction);
+            }}
+          />
+        </Box>
 
         <Select
           label="Order by"

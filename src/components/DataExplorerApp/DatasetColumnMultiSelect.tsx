@@ -1,8 +1,10 @@
 import { MultiSelect } from "@mantine/core";
-import { ReactNode, useMemo, useState } from "react";
+import { useUncontrolled } from "@mantine/hooks";
+import { ReactNode, useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNotNullOrUndefined } from "@/lib/utils/guards";
+import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { DatasetId, DatasetWithColumns } from "@/models/datasets/Dataset";
 import {
   DatasetColumn,
@@ -40,9 +42,16 @@ export function DatasetColumnMultiSelect({
   placeholder,
   datasetId,
   value,
-  defaultValue = [],
+  defaultValue,
   onChange,
 }: Props): JSX.Element {
+  const [controlledValue, setControlledValue] = useUncontrolled({
+    value,
+    defaultValue,
+    onChange,
+    finalValue: [],
+  });
+
   const [allDatasets, isLoadingDatasets] =
     DatasetClient.useGetAllDatasetsWithColumns(
       datasetId ? where("id", "eq", datasetId) : undefined,
@@ -78,16 +87,7 @@ export function DatasetColumnMultiSelect({
     };
   }, [allDatasets]);
 
-  // Uncontrolled fallback (Mantine-style)
-  const [internal, setInternal] =
-    useState<readonly DatasetColumn[]>(defaultValue);
-  const current = value ?? internal;
-
-  const selectedIds = useMemo(() => {
-    return current.map((c) => {
-      return c.id as string;
-    });
-  }, [current]);
+  const selectedColumnIds = controlledValue.map(getProp("id"));
 
   return (
     <MultiSelect
@@ -97,20 +97,14 @@ export function DatasetColumnMultiSelect({
       label={label}
       placeholder={isLoadingDatasets ? "Loading datasets..." : placeholder}
       data={fieldGroupOptions ?? []}
-      value={selectedIds}
-      onChange={(ids: string[]) => {
-        const next = ids
+      value={selectedColumnIds}
+      onChange={(columnIds: string[]) => {
+        const columns = columnIds
           .map((id) => {
             return columnLookup.get(id as DatasetColumnId);
           })
           .filter(isNotNullOrUndefined);
-
-        if (value === undefined) {
-          setInternal(next);
-        }
-        if (onChange) {
-          onChange(next);
-        }
+        setControlledValue(columns);
       }}
       nothingFoundMessage="No fields"
     />

@@ -10,7 +10,7 @@ export type UseExplorerDraftReturn = {
   aggregations: Record<string, QueryAggregationType>;
   selectedDatasetId?: DatasetId;
   selectedColumns: readonly DatasetColumn[];
-  selectGroupByColumns: readonly DatasetColumn[];
+  selectedGroupByColumns: readonly DatasetColumn[];
   orderByColumn?: DatasetColumn;
   orderByDirection: "asc" | "desc";
   vizConfig: VizConfig;
@@ -18,7 +18,7 @@ export type UseExplorerDraftReturn = {
   setAggregations: (agg: Record<string, QueryAggregationType>) => void;
   setSelectedDatasetId: (id: DatasetId | undefined) => void;
   setSelectedColumns: (cols: readonly DatasetColumn[]) => void;
-  setSelectGroupByColumns: (cols: readonly DatasetColumn[]) => void;
+  setSelectedGroupByColumns: (cols: readonly DatasetColumn[]) => void;
   setOrderByColumn: (col: DatasetColumn | undefined) => void;
   setOrderByDirection: (dir: "asc" | "desc") => void;
   setVizConfig: (vc: VizConfig) => void;
@@ -30,7 +30,7 @@ type ExplorerDraft = {
   aggregations: Record<string, QueryAggregationType>;
   selectedDatasetId?: DatasetId;
   selectedColumns: readonly DatasetColumn[];
-  selectGroupByColumns: readonly DatasetColumn[];
+  selectedGroupByColumns: readonly DatasetColumn[];
   orderByColumn?: DatasetColumn;
   orderByDirection: "asc" | "desc";
   vizConfig: VizConfig;
@@ -40,7 +40,7 @@ const DEFAULTS: ExplorerDraft = {
   aggregations: {},
   selectedDatasetId: undefined,
   selectedColumns: [],
-  selectGroupByColumns: [],
+  selectedGroupByColumns: [],
   orderByColumn: undefined,
   orderByDirection: "asc",
   vizConfig: makeDefaultVizConfig("table"),
@@ -92,9 +92,9 @@ export function useExplorerDraft(): UseExplorerDraftReturn {
     [patch],
   );
 
-  const setSelectGroupByColumns = useCallback(
+  const setSelectedGroupByColumns = useCallback(
     (cols: readonly DatasetColumn[]) => {
-      return patch({ selectGroupByColumns: cols });
+      return patch({ selectedGroupByColumns: cols });
     },
     [patch],
   );
@@ -129,7 +129,7 @@ export function useExplorerDraft(): UseExplorerDraftReturn {
       aggregations: draft.aggregations,
       selectedDatasetId: draft.selectedDatasetId,
       selectedColumns: draft.selectedColumns,
-      selectGroupByColumns: draft.selectGroupByColumns,
+      selectedGroupByColumns: draft.selectedGroupByColumns,
       orderByColumn: draft.orderByColumn,
       orderByDirection: draft.orderByDirection,
       vizConfig: draft.vizConfig,
@@ -137,7 +137,7 @@ export function useExplorerDraft(): UseExplorerDraftReturn {
       setAggregations,
       setSelectedDatasetId,
       setSelectedColumns,
-      setSelectGroupByColumns,
+      setSelectedGroupByColumns,
       setOrderByColumn,
       setOrderByDirection,
       setVizConfig,
@@ -149,7 +149,7 @@ export function useExplorerDraft(): UseExplorerDraftReturn {
     setAggregations,
     setSelectedDatasetId,
     setSelectedColumns,
-    setSelectGroupByColumns,
+    setSelectedGroupByColumns,
     setOrderByColumn,
     setOrderByDirection,
     setVizConfig,
