@@ -20,8 +20,6 @@ type Props = {
    * that dataset.
    */
   datasetId?: DatasetId;
-
-  // controllable, with uncontrolled fallback
   value?: readonly DatasetColumn[];
   defaultValue?: readonly DatasetColumn[];
   onChange?: (fields: readonly DatasetColumn[]) => void;
