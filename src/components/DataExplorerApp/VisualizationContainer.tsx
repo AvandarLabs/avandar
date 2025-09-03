@@ -67,6 +67,17 @@ export function VisualizationContainer({
           data={data}
           dateColumns={dateColumns}
           dateFormat="YYYY-MM-DD HH:mm:ss z"
+          formatters={{
+            Price: (val) => {
+              const num =
+                typeof val === "number" ? val : (
+                  parseFloat(`${val}`.replace(/[^0-9.-]/g, ""))
+                );
+              return isNaN(num) ?
+                  String(val)
+                : `$${num.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+            },
+          }}
         />
       );
     })

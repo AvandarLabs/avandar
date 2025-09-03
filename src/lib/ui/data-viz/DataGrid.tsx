@@ -18,6 +18,7 @@ type Props = {
   dateColumns?: ReadonlySet<string>;
   dateFormat?: string;
   timezone?: string;
+  formatters?: Record<string, (value: unknown) => string>;
 };
 
 export function DataGrid({
@@ -27,21 +28,32 @@ export function DataGrid({
   height = 500,
   dateFormat = "YYYY-MM-DD HH:mm:ss",
   timezone,
+  formatters,
 }: Props): JSX.Element {
   const columnDefs = useMemo(() => {
     return columnNames.map((field) => {
       return {
         field: field,
         headerName: field,
-        valueFormatter:
-          dateColumns?.has(field) ?
-            (p: { value: unknown }) => {
-              return formatDate(p.value, dateFormat, timezone);
-            }
-          : undefined,
+        valueFormatter: (p: { value: unknown }) => {
+          const val = p.value;
+
+          // 1. Format date if applicable
+          if (dateColumns?.has(field)) {
+            return formatDate(val, dateFormat, timezone);
+          }
+
+          // 2. Use custom formatter (e.g., for price fields)
+          if (formatters?.[field]) {
+            return formatters[field](val);
+          }
+
+          // 3. Fallback to raw value
+          return String(val ?? "");
+        },
       };
     });
-  }, [columnNames, dateColumns, dateFormat, timezone]);
+  }, [columnNames, dateColumns, dateFormat, timezone, formatters]);
 
   // AgGrid will fill the size of the parent container
   return (

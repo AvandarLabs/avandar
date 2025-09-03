@@ -15,13 +15,15 @@ function guessDataTypeFromColumnName(fieldName: string): DatasetColumnDataType {
 }
 
 function isParseableNumber(value: string): boolean {
-  if (value.startsWith("+")) {
-    // if the string starts with a + it is more likely a
-    // phone number than a number.
-    return false;
-  }
+  if (typeof value !== "string") return false;
 
-  return !isNaN(Number(value));
+  // Don't parse phone numbers
+  if (value.startsWith("+")) return false;
+
+  // Remove currency symbols and commas
+  const cleaned = value.replace(/[$€£,]/g, "").trim();
+
+  return !isNaN(Number(cleaned));
 }
 
 function isParseableDate(value: string): boolean {
@@ -43,6 +45,10 @@ function detectColumnDataType(
   if (values.length === 0) {
     return fallbackType;
   }
+
+  const lowerName = columnName.toLowerCase();
+  const isLikelyPriceColumn =
+    /\b(price|cost|amount|total|charge|msrp|list[_ ]?price)\b/.test(lowerName);
 
   const dataTypeCounts = {
     number: 0,
@@ -71,6 +77,13 @@ function detectColumnDataType(
 
   const totalNonEmptyValues = totalValues - dataTypeCounts.empty;
   if (dataTypeCounts.number === totalNonEmptyValues) {
+    return "number";
+  }
+  if (
+    isLikelyPriceColumn &&
+    dataTypeCounts.number > 0 &&
+    dataTypeCounts.string === 0
+  ) {
     return "number";
   }
   if (dataTypeCounts.string === totalNonEmptyValues) {

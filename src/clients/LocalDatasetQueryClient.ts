@@ -181,10 +181,10 @@ class LocalDatasetQueryClientImpl {
   #makeResolver(actualNames: string[]): (name: string) => string {
     const normalize = (s: string) => {
       return s
-        .replace(/\u00A0/g, " ")
-        .replace(/\s+/g, " ")
+        .replace(/\u00A0/g, " ") // convert non-breaking space
+        .replace(/\s+/g, " ") // collapse multiple spaces
         .trim()
-        .toLowerCase();
+        .toLowerCase(); // make matching case-insensitive
     };
 
     const map = new Map(
@@ -197,7 +197,17 @@ class LocalDatasetQueryClientImpl {
       const n = normalize(uiName);
       const resolved = map.get(n);
       if (resolved) return resolved;
+
+      // Fallback (optional)
       if (actualNames.includes(uiName)) return uiName;
+
+      // 🔥 Add this logging so you SEE what’s failing
+      console.warn(`❗ Could not resolve column "${uiName}"`, {
+        normalizedAttempt: n,
+        knownNormalizedFields: Array.from(map.keys()),
+        knownRawFields: actualNames,
+      });
+
       throw new Error(
         `Unable to resolve column "${uiName}". Known: ${actualNames.join(", ")}`,
       );
@@ -249,6 +259,8 @@ class LocalDatasetQueryClientImpl {
       const parsedRawData = await DatasetRawDataClient.getParsedRawData({
         datasetId,
       });
+      console.log("[DEBUG] Parsed CSV keys:", Object.keys(parsedRawData[0]));
+
       invariant(parsedRawData, "Raw data could not be found.");
 
       const tableName = datasetIdToTableName(datasetId);
@@ -278,29 +290,53 @@ class LocalDatasetQueryClientImpl {
           data: parsedRawData,
         });
         await db.registerFileText(tableName, rawStringData);
-        if (rawStringData?.[0]) {
-          console.log("🧠 CSV Headers:", Object.keys(rawStringData[0]));
-        } else {
-          console.warn("⚠️ rawStringData[0] is undefined");
-        }
-        console.log(rawStringData);
+
         const arrowColumns = columns.map((c) => {
           return {
-            name: c.name,
+            name: c.name
+              .replace(/\u00A0/g, " ")
+              .replace(/\s+/g, " ")
+              .trim(),
             dataType: getArrowDataType(c.dataType),
           };
         });
-        await conn.insertCSVFromPath(tableName, {
+        console.log(
+          "[DEBUG] Creating DuckDB table with columns:",
+          arrowColumns,
+        );
+
+        console.log("CSV Insert Options:", {
           name: tableName,
           schema: "main",
-          detect: true,
+          detect: false,
           header: true,
           delimiter: ",",
+          quote: '"',
+          escape: '"',
+          ignore_errors: true,
+          null_padding: true,
           columns: makeObjectFromList(arrowColumns, {
             keyFn: getProp("name"),
             valueFn: getProp("dataType"),
           }),
         });
+
+        await conn.insertCSVFromPath(tableName, {
+          name: tableName,
+          schema: "main",
+          detect: false,
+          header: true,
+          delimiter: ",",
+          quote: '"', // ✅ wrap quoted strings like "$5,261.00"
+          escape: '"', // ✅ escape embedded quotes
+          ignore_errors: true, // ✅ skip bad lines (fallback)
+          null_padding: true, // ✅ pad missing values
+          columns: makeObjectFromList(arrowColumns, {
+            keyFn: getProp("name"),
+            valueFn: getProp("dataType"),
+          }),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any);
       });
     })();
 
@@ -410,8 +446,14 @@ class LocalDatasetQueryClientImpl {
   CASE
     WHEN ${qa} IS NULL THEN NULL
     ELSE
-      (CASE WHEN ${qa} LIKE '%(%)%' THEN -1 ELSE 1 END)
-      * TRY_CAST(NULLIF(regexp_replace(TRIM(${qa}), '[^0-9.+-]', ''), '') AS DOUBLE)
+      (CASE WHEN CAST(${qa} AS VARCHAR) LIKE '%(%)%' THEN -1 ELSE 1 END)
+      * TRY_CAST(
+          NULLIF(
+            regexp_replace(TRIM(CAST(${qa} AS VARCHAR)), '[^0-9.+-]', ''),
+            ''
+          )
+          AS DOUBLE
+        )
   END
 )`;
       };
@@ -444,6 +486,10 @@ class LocalDatasetQueryClientImpl {
         // ➤ DETAIL MODE (no agg, no group by)
         for (const uiName of uiSelectNames) {
           const actual = resolveActual(uiName);
+          console.log("🧠 Actual DuckDB field names:", actualNames);
+          console.log("📋 Select fields:", uiSelectNames);
+          console.log("📋 GroupBy fields:", uiGroupByNames);
+          console.log("📋 Aggregations:", Object.keys(aggregations ?? {}));
           const expr =
             isMoneyishUI(uiName) ? moneyLikeToDoubleSql(q(actual)) : q(actual);
           const alias = aliasCanonical(uiName);
