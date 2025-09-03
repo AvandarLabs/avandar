@@ -41,8 +41,8 @@ function EntityMetaErrorView({ error }: ErrorComponentProps) {
   return (
     <Center h="50%">
       <Callout
-        title="Entity failed to load"
-        message="The entity failed to load. Please try again later or reach out to support."
+        title="Profile failed to load"
+        message="The profile manager page failed to load. Please try again later or reach out to support."
       />
     </Center>
   );

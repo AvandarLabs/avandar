@@ -6,8 +6,8 @@ import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { isNotInSet } from "@/lib/utils/sets/higherOrderFuncs";
 import { wrapString } from "@/lib/utils/strings/higherOrderFuncs";
 import { wordJoin } from "@/lib/utils/strings/transformations";
-import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
-import { LocalDatasetId } from "@/models/LocalDataset/types";
+import { DatasetId } from "@/models/datasets/Dataset";
+import { DatasetColumn } from "@/models/datasets/DatasetColumn";
 import { QueryForm } from "./QueryForm";
 import { useDataQuery } from "./useDataQuery";
 import { VisualizationContainer } from "./VisualizationContainer";
@@ -25,24 +25,31 @@ export function DataExplorerApp(): JSX.Element {
     Record<string, QueryAggregationType>
   >({});
   const [selectedDatasetId, setSelectedDatasetId] = useState<
-    LocalDatasetId | undefined
+    DatasetId | undefined
   >(undefined);
-  const [selectedFields, setSelectedFields] = useState<
-    readonly LocalDatasetField[]
+  const [selectColumns, setSelectedFields] = useState<readonly DatasetColumn[]>(
+    [],
+  );
+  const [selectGroupByColumns, setSelectedGroupByFields] = useState<
+    readonly DatasetColumn[]
   >([]);
-  const [selectedGroupByFields, setSelectedGroupByFields] = useState<
-    readonly LocalDatasetField[]
-  >([]);
+  const [orderByColumn, setOrderByColumn] = useState<DatasetColumn | undefined>(
+    undefined,
+  );
+
+  const [orderByDirection, setOrderByDirection] = useState<"asc" | "desc">(
+    "asc",
+  );
   const [vizConfig, setVizConfig] = useState<VizConfig>(() => {
     return makeDefaultVizConfig("table");
   });
 
   const selectedFieldNames = useMemo(() => {
-    return selectedFields.map(getProp("name"));
-  }, [selectedFields]);
+    return selectColumns.map(getProp("name"));
+  }, [selectColumns]);
   const selectedGroupByFieldNames = useMemo(() => {
-    return selectedGroupByFields.map(getProp("name"));
-  }, [selectedGroupByFields]);
+    return selectGroupByColumns.map(getProp("name"));
+  }, [selectGroupByColumns]);
 
   const [isValidQuery, errorMessage] = useMemo(() => {
     // 1. There must be at least one field selected
@@ -94,8 +101,10 @@ export function DataExplorerApp(): JSX.Element {
     enabled: !!selectedDatasetId && isValidQuery,
     aggregations,
     datasetId: selectedDatasetId,
-    selectFields: selectedFields,
-    groupByFields: selectedGroupByFields,
+    selectFields: selectColumns,
+    groupByFields: selectGroupByColumns,
+    orderByColumn,
+    orderByDirection,
   });
 
   const { fields, data } = useMemo(() => {
@@ -104,6 +113,22 @@ export function DataExplorerApp(): JSX.Element {
       data: queryResults?.data ?? [],
     };
   }, [queryResults]);
+
+  const resetQueryForm = () => {
+    setSelectedFields([]);
+    setSelectedGroupByFields([]);
+    setAggregations({});
+    setOrderByColumn(undefined);
+    setOrderByDirection("asc");
+    setVizConfig(makeDefaultVizConfig("table"));
+  };
+
+  const onSelectedDatasetChange = (datasetId: DatasetId | undefined) => {
+    if (datasetId !== selectedDatasetId) {
+      resetQueryForm();
+    }
+    setSelectedDatasetId(datasetId);
+  };
 
   return (
     <Flex>
@@ -119,11 +144,16 @@ export function DataExplorerApp(): JSX.Element {
         <QueryForm
           aggregations={aggregations}
           selectedDatasetId={selectedDatasetId}
-          selectedFields={selectedFields}
+          selectedColumns={selectColumns}
+          selectedGroupByColumns={selectGroupByColumns}
+          orderByColumn={orderByColumn}
           onAggregationsChange={setAggregations}
-          onFromDatasetChange={setSelectedDatasetId}
-          onSelectFieldsChange={setSelectedFields}
+          onFromDatasetChange={onSelectedDatasetChange}
+          onSelectColumnsChange={setSelectedFields}
           onGroupByChange={setSelectedGroupByFields}
+          onOrderByColumnChange={setOrderByColumn}
+          orderByDirection={orderByDirection}
+          onOrderByDirectionChange={setOrderByDirection}
           errorMessage={errorMessage}
         />
         <VizSettingsForm

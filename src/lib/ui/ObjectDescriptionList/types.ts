@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import { UnionToTuple } from "type-fest";
-import { StringKeyOf } from "@/lib/types/utilityTypes";
+import { Registry, StringKeyOf } from "@/lib/types/utilityTypes";
+import { objectKeys } from "@/lib/utils/objects/misc";
 
 /** A non-recursive value */
 export type PrimitiveValue =
@@ -57,16 +57,14 @@ export type PrimitiveValueRenderOptions = {
   dateFormat?: string;
 };
 
-export const PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS: UnionToTuple<
-  keyof PrimitiveValueRenderOptions
-> = [
-  "renderEmptyString",
-  "renderNullString",
-  "renderUndefinedString",
-  "renderBooleanTrue",
-  "renderBooleanFalse",
-  "dateFormat",
-] as const;
+export const PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS = objectKeys({
+  renderEmptyString: true,
+  renderNullString: true,
+  renderUndefinedString: true,
+  renderBooleanTrue: true,
+  renderBooleanFalse: true,
+  dateFormat: true,
+} satisfies Registry<keyof PrimitiveValueRenderOptions>);
 
 /**
  * A mapping of child keys to its nested render options.

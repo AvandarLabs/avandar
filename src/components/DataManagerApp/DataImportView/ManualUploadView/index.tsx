@@ -1,21 +1,30 @@
 import { Box, BoxProps, Stack } from "@mantine/core";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { invariant } from "@tanstack/react-router";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
+import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { MIMEType } from "@/lib/types/common";
 import { notifyError } from "@/lib/ui/notifications/notifyError";
 import { FileUploadField } from "@/lib/ui/singleton-forms/FileUploadField";
-import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
-import { LocalDataset } from "@/models/LocalDataset/types";
-import { makeLocalDataset } from "@/models/LocalDataset/utils";
+import { unparseDataset } from "@/models/LocalDataset/utils";
 import { useCSVParser } from "../../hooks/useCSVParser";
 import { DatasetUploadForm } from "../DatasetUploadForm";
 
 type Props = BoxProps;
 export function ManualUploadView({ ...props }: Props): JSX.Element {
+  const queryClient = useQueryClient();
   const workspace = useCurrentWorkspace();
-  const { csv, fields, fileMetadata, parseFile } = useCSVParser({
+  const [userProfile] = useCurrentUserProfile();
+  const {
+    csv,
+    columns: fields,
+    fileMetadata,
+    parseFile,
+  } = useCSVParser({
     onNoFileProvided: () => {
       notifyError({
         title: "No file selected",
@@ -24,34 +33,49 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
     },
   });
 
-  const [_saveLocalDataset] = LocalDatasetClient.useInsert({
-    queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
-  });
+  const saveLocalCSVToBackend = async (values: DatasetUploadForm) => {
+    // this function can't be called without available file metadata
+    invariant(fileMetadata, "No file metadata is available");
+    invariant(csv, "No parsed CSV data is available");
+    invariant(userProfile, "No user profile is available");
 
-  const saveLocalDataset = async (
-    values: DatasetUploadForm,
-  ): Promise<LocalDataset> => {
-    invariant(csv && fileMetadata, "CSV or metadata missing");
-    const dataset = makeLocalDataset({
+    const dataset = await DatasetClient.insertLocalCSVDataset({
       workspaceId: workspace.id,
-      name: values.name,
-      datasetType: "upload",
-      description: values.description,
-      fileMetadata,
-      csvMetadata: csv.meta,
+      datasetName: values.name,
+      datasetDescription: values.description,
+      delimiter: ",",
+      sizeInBytes: fileMetadata.sizeInBytes,
+      columns: fields.map((field, idx) => {
+        return {
+          name: field.name,
+          data_type: field.dataType,
+          column_idx: idx,
+        };
+      }),
+    });
+    queryClient.invalidateQueries({
+      queryKey: DatasetClient.QueryKeys.getAll(),
+    });
+
+    // and also save the raw data locally to Dexie
+    const rawDataString = unparseDataset({
+      datasetType: MIMEType.TEXT_CSV,
       data: csv.data,
-      fields,
     });
-    await new Promise<void>((resolve) => {
-      _saveLocalDataset(
-        { data: dataset },
-        {
-          onSuccess: () => {
-            resolve();
-          },
-        },
-      );
+
+    await DatasetRawDataClient.insert({
+      data: {
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        datasetId: dataset.id,
+        sourceType: "local_csv",
+        ownerId: workspace.ownerId,
+        ownerProfileId: userProfile.profileId,
+        workspaceId: workspace.id,
+        data: rawDataString,
+      },
     });
+
     return dataset;
   };
 
@@ -71,8 +95,8 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
           <DatasetUploadForm
             defaultName={fileMetadata.name}
             rows={csv.data.slice(0, 500)}
-            fields={fields}
-            additionalDatasetSaveCallback={saveLocalDataset}
+            columns={fields}
+            doDatasetSave={saveLocalCSVToBackend}
           />
         : null}
 

@@ -173,31 +173,21 @@ export interface GPickerResourceId {
 export interface GPickerBuilder {
   new (): GPickerBuilder;
 
-  /**
-   * Add a view to the navigation pane.
-   */
+  /** Add a view to the navigation pane. */
   addView(
     viewOrViewId: GPickerDocsView | GPickerDocsUploadView | GPickerViewId,
   ): GPickerBuilder;
 
-  /**
-   * Add a ViewGroup to the top-level navigation pane.
-   */
+  /** Add a ViewGroup to the top-level navigation pane. */
   addViewGroup(viewGroup: GPickerViewGroup): GPickerBuilder;
 
-  /**
-   * Construct the Picker object.
-   */
+  /** Construct the Picker object. */
   build(): GPicker;
 
-  /**
-   * Disable a picker feature.
-   */
+  /** Disable a picker feature. */
   disableFeature(feature: GPickerFeature): GPickerBuilder;
 
-  /**
-   * Enable a picker feature.
-   */
+  /** Enable a picker feature. */
   enableFeature(feature: GPickerFeature): GPickerBuilder;
 
   /**

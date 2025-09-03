@@ -1,7 +1,7 @@
 import { Paths, SetOptional, SetRequiredDeep, Simplify } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { UserId } from "@/models/User/types";
-import { LocalDataset } from "../LocalDataset/types";
+import { Dataset } from "../datasets/Dataset";
 import { WorkspaceId } from "../Workspace/types";
 import { EntityFieldConfig } from "./EntityFieldConfig/types";
 import { EntityFieldValueExtractor } from "./ValueExtractor/types";
@@ -46,7 +46,7 @@ type EntityConfigInsert = SetOptional<
 type EntityConfigUpdate = Partial<EntityConfigInsert>;
 
 type EntityConfigFull = EntityConfig & {
-  datasets?: LocalDataset[];
+  datasets?: Dataset[];
   fields?: ReadonlyArray<
     EntityFieldConfig & {
       valueExtractor?: EntityFieldValueExtractor;

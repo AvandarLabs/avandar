@@ -17,31 +17,24 @@ export type EmptyObject = { [emptyObjectSymbol]?: never };
 export type RawCellValue = string;
 
 /**
- * A row of raw data represented as a record of strings (representing
- * the fields) to RawCellValue.
+ * The standard representation of a row of raw data. It is a
+ * record of strings (representing the fields) to RawCellValue.
+ *
+ * This is the most convenient and common way of representing raw
+ * data, such as a parsed CSV row. However, it is not very memory
+ * efficient, because each row contains the field names as keys.
  */
-export type RawDataRecordRow = Record<string, RawCellValue>;
+export type RawDataRow = Record<string, RawCellValue>;
 
 /**
  * A row of data represented as an array of RawCellValue.
+ * This is a less convenient but more memory-efficient representation of data,
+ * rather than using records. It does not contain information about the
+ * field names, it only contains the cell values.
+ *
+ * The Google Sheets API, for example, returns data rows in this format.
  */
 export type RawDataArrayRow = RawCellValue[];
-
-/**
- * A raw dataset represented as an array of RawDataRecordRows.
- * This is the most convenient and common way of representing raw
- * data, such as a parsed CSV.
- */
-export type RawDataset = RawDataRecordRow[];
-
-/**
- * Raw data represented as an array of arrays of CSVCellValues.
- * This is a more memory-efficient representation of data, rather
- * than using records, but it is less convenient to work with.
- *
- * The Google Sheets API, for example, returns data in this format.
- */
-export type RawArrayDataset = RawDataArrayRow[];
 
 export type JSONLiteral = string | number | boolean | null;
 
