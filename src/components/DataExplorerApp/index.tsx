@@ -1,5 +1,5 @@
 import { Box, Flex, Loader, MantineTheme } from "@mantine/core";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
 import { partition } from "@/lib/utils/arrays";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
@@ -114,14 +114,21 @@ export function DataExplorerApp(): JSX.Element {
     };
   }, [queryResults]);
 
-  useEffect(() => {
+  const resetQueryForm = () => {
     setSelectedFields([]);
     setSelectedGroupByFields([]);
     setAggregations({});
     setOrderByColumn(undefined);
     setOrderByDirection("asc");
     setVizConfig(makeDefaultVizConfig("table"));
-  }, [selectedDatasetId]);
+  };
+
+  const onSelectedDatasetChange = (datasetId: DatasetId | undefined) => {
+    if (datasetId !== selectedDatasetId) {
+      resetQueryForm();
+    }
+    setSelectedDatasetId(datasetId);
+  };
 
   return (
     <Flex>
@@ -138,9 +145,10 @@ export function DataExplorerApp(): JSX.Element {
           aggregations={aggregations}
           selectedDatasetId={selectedDatasetId}
           selectedColumns={selectColumns}
+          selectedGroupByColumns={selectGroupByColumns}
           orderByColumn={orderByColumn}
           onAggregationsChange={setAggregations}
-          onFromDatasetChange={setSelectedDatasetId}
+          onFromDatasetChange={onSelectedDatasetChange}
           onSelectColumnsChange={setSelectedFields}
           onGroupByChange={setSelectedGroupByFields}
           onOrderByColumnChange={setOrderByColumn}

@@ -27,6 +27,7 @@ type Props = {
   aggregations: Record<string, QueryAggregationType>;
   selectedDatasetId: DatasetId | undefined;
   selectedColumns: readonly DatasetColumn[];
+  selectedGroupByColumns: readonly DatasetColumn[];
   orderByColumn: DatasetColumn | undefined;
   orderByDirection: Direction;
   onAggregationsChange: (
@@ -43,6 +44,7 @@ export function QueryForm({
   errorMessage,
   aggregations,
   selectedColumns,
+  selectedGroupByColumns,
   selectedDatasetId,
   orderByColumn,
   onAggregationsChange,
@@ -64,10 +66,10 @@ export function QueryForm({
         />
 
         <DatasetColumnMultiSelect
-          key={`fields-${selectedDatasetId ?? "none"}`}
           label="Select fields"
           placeholder="Select fields"
           datasetId={selectedDatasetId}
+          value={selectedColumns}
           onChange={(columns) => {
             onSelectColumnsChange(columns);
 
@@ -119,11 +121,11 @@ export function QueryForm({
 
         {HIDE_WHERE ? null : <Text>Where (react-awesome-query-builder)</Text>}
         <DatasetColumnMultiSelect
-          key={`groupby-${selectedDatasetId ?? "none"}`}
           label="Group by"
           placeholder="Group by"
           onChange={onGroupByChange}
           datasetId={selectedDatasetId}
+          value={selectedGroupByColumns}
         />
 
         <Select
