@@ -47,7 +47,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
 
   const [isReprocessing, setIsReprocessing] = useState(false);
   const [loadCSVResult, setLoadCSVResult] = useState<DuckDBLoadCSVResult>();
-  const [loadCSV, _isLoadingCSV] = useMutation({
+  const [loadCSV, _isLoadingCSV, loadCSVMutation] = useMutation({
     mutationFn: async ({
       csvName,
       fileText,
@@ -100,16 +100,16 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
       const googleSpreadsheet = await APIClient.get("google-sheets/:id", {
         urlParams: { id: selectedDocumentId },
       });
-
-      // TODO(jpsyx): you are here. trigger loadCSV here as a promise.
-      // and onSuccess, we should resolve().
-      loadCSV({
-        csvName: selectedDocumentId,
-        // TODO(jpsyx): make this work
-        // fileText: csvString,
-        fileText: "",
+      const csvString = unparseDataset({
+        datasetType: MIMEType.APPLICATION_GOOGLE_SPREADSHEET,
+        data: z
+          .array(z.array(csvCellValueSchema))
+          .parse(googleSpreadsheet.rows),
       });
-
+      await loadCSVMutation.mutateAsync({
+        csvName: selectedDocumentId,
+        fileText: csvString,
+      });
       return googleSpreadsheet;
     },
     enabled: !!selectedDocumentId,

@@ -9,7 +9,8 @@ import knex from "knex";
 import { match } from "ts-pattern";
 import { ILogger, Logger } from "@/lib/Logger";
 import { MIMEType } from "@/lib/types/common";
-import { isNonEmptyArray } from "@/lib/utils/guards";
+import { removeOPFSFile } from "@/lib/utils/browser/removeOPFSFile";
+import { isNonEmptyArray, isString } from "@/lib/utils/guards";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries } from "@/lib/utils/objects/misc";
 import {
@@ -30,6 +31,8 @@ import {
   QueryResultData,
   StructuredQueryConfig,
 } from "./types";
+
+const DUCKDB_DB_PATH = "opfs://avandar.duckdb";
 
 const MANUAL_BUNDLES: duckdb.DuckDBBundles = {
   mvp: {
@@ -118,10 +121,29 @@ class DuckDBClientImpl {
 
     // TODO(jpsyx): if we are in a browser that does not support OPFS
     // we will need to persist to indexedDB. we should handle this.
-    await db.open({
-      path: `opfs://avandar.duckdb`,
-      accessMode: duckdb.DuckDBAccessMode.READ_WRITE,
-    });
+    try {
+      await db.open({
+        path: DUCKDB_DB_PATH,
+        accessMode: duckdb.DuckDBAccessMode.READ_WRITE,
+      });
+    } catch (err) {
+      if (
+        err instanceof Error &&
+        "exception_type" in err &&
+        "exception_message" in err &&
+        isString(err.exception_type) &&
+        isString(err.exception_message) &&
+        err.exception_type === "IO" &&
+        err.exception_message.includes("not a valid DuckDB database")
+      ) {
+        // re-create the database
+        await removeOPFSFile(DUCKDB_DB_PATH);
+        await db.open({
+          path: DUCKDB_DB_PATH,
+          accessMode: duckdb.DuckDBAccessMode.READ_WRITE,
+        });
+      }
+    }
 
     // create a table that tracks dataset names mapped to their table names
     await this.runRawQuery(

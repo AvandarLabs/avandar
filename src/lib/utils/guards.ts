@@ -107,14 +107,32 @@ export function isNull(value: unknown): value is null {
   return value === null;
 }
 
+/**
+ * Checks if `value` is a function.
+ *
+ * @param value - The value to check.
+ * @returns `true` if `value` is a function, `false` otherwise.
+ */
 export function isFunction(value: unknown): value is AnyFunction {
   return typeof value === "function";
 }
 
+/**
+ * Checks if `value` is a number.
+ *
+ * @param value - The value to check.
+ * @returns `true` if `value` is a number, `false` otherwise.
+ */
 export function isNumber(value: unknown): value is number {
   return typeof value === "number";
 }
 
+/**
+ * Checks if `value` is a string.
+ *
+ * @param value - The value to check.
+ * @returns `true` if `value` is a string, `false` otherwise.
+ */
 export function isString(value: unknown): value is string {
   return typeof value === "string";
 }

@@ -10,6 +10,7 @@ import { LocalDatasetQueryClient } from "@/clients/LocalDatasetQueryClient";
 import { SpotlightLinks } from "@/config/SpotlightLinks";
 import { AvaDexie } from "@/dexie/AvaDexie";
 import { Logger } from "@/lib/Logger";
+import { removeOPFSFile } from "@/lib/utils/browser/removeOPFSFile";
 
 export function useSpotlightActions(
   workspaceSlug: string,
@@ -67,10 +68,7 @@ export function useSpotlightActions(
                 });
 
                 // delete the local OPFS database
-                const root = await navigator.storage.getDirectory();
-                await root.removeEntry("avandar.duckdb", {
-                  recursive: false,
-                });
+                await removeOPFSFile("avandar.duckdb");
               },
             },
 

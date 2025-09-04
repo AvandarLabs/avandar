@@ -50,9 +50,6 @@ function singleton<T extends UnknownObject>(
   return query.data[0]!;
 }
 
-// TODO(jpsyx): we need to create a DuckDBCrudClient. We aren't using
-// IndexedDB at all for this actually. Also this should get renamed to
-// DatasetLocalCopyClient with a DatasetLocalCopy model.
 export const DatasetRawDataClient = createDexieCRUDClient({
   db: AvaDexie.DB,
   modelName: "DatasetRawData",

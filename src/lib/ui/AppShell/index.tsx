@@ -24,10 +24,10 @@ import {
   IconSearch,
   IconSwitch2,
   IconUser,
-  ReactNode,
 } from "@tabler/icons-react";
 import { Outlet, useNavigate, useRouter } from "@tanstack/react-router";
 import clsx from "clsx";
+import { ReactNode } from "react";
 import { AuthClient } from "@/clients/AuthClient";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLink, AppLinks } from "@/config/AppLinks";

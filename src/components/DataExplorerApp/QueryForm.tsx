@@ -27,6 +27,7 @@ type Props = {
   aggregations: Record<string, QueryAggregationType>;
   selectedDatasetId: DatasetId | undefined;
   selectedColumns: readonly DatasetColumn[];
+  selectedGroupByColumns: readonly DatasetColumn[];
   orderByColumn: DatasetColumn | undefined;
   orderByDirection: Direction;
   onAggregationsChange: (
@@ -43,6 +44,7 @@ export function QueryForm({
   errorMessage,
   aggregations,
   selectedColumns,
+  selectedGroupByColumns,
   selectedDatasetId,
   orderByColumn,
   onAggregationsChange,
@@ -57,6 +59,7 @@ export function QueryForm({
     <form>
       <Stack>
         <DatasetSelect
+          value={selectedDatasetId ?? null}
           onChange={(datasetId) => {
             onFromDatasetChange(datasetId ?? undefined);
           }}
@@ -66,6 +69,7 @@ export function QueryForm({
           label="Select fields"
           placeholder="Select fields"
           datasetId={selectedDatasetId}
+          value={selectedColumns}
           onChange={(columns) => {
             onSelectColumnsChange(columns);
 
@@ -121,6 +125,7 @@ export function QueryForm({
           placeholder="Group by"
           onChange={onGroupByChange}
           datasetId={selectedDatasetId}
+          value={selectedGroupByColumns}
         />
 
         <Select
@@ -140,7 +145,6 @@ export function QueryForm({
             onOrderByColumnChange(selected);
           }}
         />
-
         <Select
           label="Order direction"
           placeholder="Select order direction"
