@@ -5,38 +5,31 @@ import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { isNotInSet } from "@/lib/utils/sets/higherOrderFuncs";
 import { wrapString } from "@/lib/utils/strings/higherOrderFuncs";
 import { wordJoin } from "@/lib/utils/strings/transformations";
-import { DatasetId } from "@/models/datasets/Dataset";
 import { QueryForm } from "./QueryForm";
+import { useDataExplorerContext } from "./useDataExplorerContext";
 import { useDataQuery } from "./useDataQuery";
-import { useExplorerDraft } from "./useExplorerDraft";
 import { VisualizationContainer } from "./VisualizationContainer";
 import { VizSettingsForm } from "./VizSettingsForm";
-import { makeDefaultVizConfig } from "./VizSettingsForm/makeDefaultVizConfig";
 
 const QUERY_FORM_WIDTH = 300;
 
 export function DataExplorerApp(): JSX.Element {
   const {
-    // persisted explorer state (from your hook)
     aggregations,
     setAggregations,
     selectedDatasetId,
-    setSelectedDatasetId,
-
-    // develop API names, exposed by the hook
+    onSelectDatasetChange,
     selectedColumns,
     setSelectedColumns,
     selectedGroupByColumns,
     setSelectedGroupByColumns,
-
     orderByColumn,
     setOrderByColumn,
     orderByDirection,
     setOrderByDirection,
-
     vizConfig,
     setVizConfig,
-  } = useExplorerDraft();
+  } = useDataExplorerContext();
 
   const selectedFieldNames = useMemo(() => {
     return selectedColumns.map(getProp("name"));
@@ -98,22 +91,6 @@ export function DataExplorerApp(): JSX.Element {
     };
   }, [queryResults]);
 
-  const resetQueryForm = () => {
-    setSelectedColumns([]);
-    setSelectedGroupByColumns([]);
-    setAggregations({});
-    setOrderByColumn(undefined);
-    setOrderByDirection("asc");
-    setVizConfig(makeDefaultVizConfig("table"));
-  };
-
-  const onSelectedDatasetChange = (datasetId: DatasetId | undefined) => {
-    if (datasetId !== selectedDatasetId) {
-      resetQueryForm();
-    }
-    setSelectedDatasetId(datasetId);
-  };
-
   return (
     <Flex>
       <Box
@@ -133,7 +110,7 @@ export function DataExplorerApp(): JSX.Element {
           orderByColumn={orderByColumn}
           orderByDirection={orderByDirection}
           onAggregationsChange={setAggregations}
-          onFromDatasetChange={onSelectedDatasetChange}
+          onSelectDatasetChange={onSelectDatasetChange}
           onSelectColumnsChange={setSelectedColumns}
           onGroupByChange={setSelectedGroupByColumns}
           onOrderByColumnChange={setOrderByColumn}

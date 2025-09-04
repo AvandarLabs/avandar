@@ -5,9 +5,14 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AppShell } from "@/lib/ui/AppShell";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
+import { DataExplorerProvider } from "../DataExplorerApp/DataExplorerContext";
 import { useSpotlightActions } from "./useSpotlightActions";
 
-export function WorkspaceAppLayout(): JSX.Element {
+export function WorkspaceAppLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}): JSX.Element {
   const workspace = useCurrentWorkspace();
   const [entityConfigs] = EntityConfigClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
@@ -46,13 +51,17 @@ export function WorkspaceAppLayout(): JSX.Element {
   }, [workspace.slug]);
 
   return (
-    <AppShell
-      title={workspace.name}
-      currentWorkspace={workspace}
-      profileLink={profileLink}
-      navbarLinks={mainNavBarLinks}
-      utilityLinks={utilityNavBarLinks}
-      spotlightActions={spotlightActions}
-    />
+    <DataExplorerProvider>
+      <AppShell
+        title={workspace.name}
+        currentWorkspace={workspace}
+        profileLink={profileLink}
+        navbarLinks={mainNavBarLinks}
+        utilityLinks={utilityNavBarLinks}
+        spotlightActions={spotlightActions}
+      >
+        {children}
+      </AppShell>
+    </DataExplorerProvider>
   );
 }

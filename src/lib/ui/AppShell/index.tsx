@@ -49,6 +49,7 @@ const ASIDE_DEFAULT_WIDTH = 300;
 const NAVBAR_DEFAULT_WIDTH = 220;
 
 type Props = {
+  children?: React.ReactNode;
   title?: string;
   headerHeight?: number;
   footerHeight?: number;
@@ -77,13 +78,14 @@ export function AppShell({
   footerHeight = FOOTER_DEFAULT_HEIGHT,
   asideWidth = ASIDE_DEFAULT_WIDTH,
   navbarWidth = NAVBAR_DEFAULT_WIDTH,
+  children,
   title,
   profileLink,
   spotlightActions,
   navbarLinks,
   currentWorkspace,
   utilityLinks = [],
-  mainContent = <Outlet />,
+  mainContent = children ?? <Outlet />,
 }: Props): JSX.Element {
   const router = useRouter();
   const [opened, open, close] = useBoolean(false);

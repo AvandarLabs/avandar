@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useUncontrolled } from "@mantine/hooks";
+import { useEffect, useMemo } from "react";
 import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
 import { Select, SelectOption } from "@/lib/ui/inputs/Select";
 import { DatasetColumn } from "@/models/datasets/DatasetColumn";
@@ -7,7 +8,8 @@ import { getValidQueryAggregationsByType } from "@/models/datasets/DatasetColumn
 type Props = {
   column: DatasetColumn;
   value?: QueryAggregationType;
-  onChange: (aggregation: QueryAggregationType) => void;
+  defaultValue?: QueryAggregationType;
+  onChange?: (aggregation: QueryAggregationType) => void;
 };
 
 const AGGREGATION_OPTIONS: Array<SelectOption<QueryAggregationType>> = [
@@ -22,35 +24,48 @@ const AGGREGATION_OPTIONS: Array<SelectOption<QueryAggregationType>> = [
 export function AggregationSelect({
   column,
   value,
+  defaultValue = "none",
   onChange,
 }: Props): JSX.Element {
-  const valid = useMemo(() => {
+  const validSet = useMemo(() => {
     return new Set(getValidQueryAggregationsByType(column.dataType));
   }, [column.dataType]);
 
   const data = AGGREGATION_OPTIONS.filter((opt) => {
-    return valid.has(opt.value) || opt.value === "none";
+    return validSet.has(opt.value) || opt.value === "none";
   });
 
-  // Uncontrolled fallback
-  const [internal, setInternal] = useState<QueryAggregationType>("none");
+  // Controlled if `value` is provided,
+  // otherwise uncontrolled with internal state.
+  const [current, setCurrent] = useUncontrolled<QueryAggregationType>({
+    value,
+    defaultValue,
+    finalValue: "none",
+    onChange,
+  });
 
-  const current = value ?? internal;
-
-  const handleChange = (next: QueryAggregationType | null) => {
-    if (!next) return;
-    if (value === undefined) setInternal(next);
-    onChange(next);
-  };
+  // If the column type changes and the current aggregation becomes invalid,
+  // coerce it to "none" (and notify parent if controlled).
+  useEffect(() => {
+    if (current !== "none" && !validSet.has(current)) {
+      setCurrent("none");
+    }
+  }, [current, column.dataType, validSet, setCurrent]);
 
   return (
     <Select
+      // key for hard reset
       key={column.id}
       label={column.name}
       placeholder="Select aggregation"
       data={data}
       value={current}
-      onChange={handleChange}
+      onChange={(next) => {
+        if (!next) {
+          return;
+        }
+        setCurrent(next);
+      }}
     />
   );
 }

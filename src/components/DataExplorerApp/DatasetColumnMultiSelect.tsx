@@ -1,6 +1,6 @@
 import { MultiSelect } from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
-import { ReactNode, useMemo } from "react";
+import { ReactNode, useEffect, useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNotNullOrUndefined } from "@/lib/utils/guards";
@@ -20,6 +20,8 @@ type Props = {
    * that dataset.
    */
   datasetId?: DatasetId;
+
+  // controllable, with uncontrolled fallback
   value?: readonly DatasetColumn[];
   defaultValue?: readonly DatasetColumn[];
   onChange?: (fields: readonly DatasetColumn[]) => void;
@@ -33,7 +35,7 @@ const FIELD_NAME_OVERRIDES: Record<string, string> = {
   updatedAt: "Updated at",
 };
 
-// TODO(jpsyx) we already have DatasetColumnSelect. We shouldnt have both
+// TODO(jpsyx) we already have DatasetColumnSelect. We shouldn't have both
 // components. Refactor and keep only one.
 export function DatasetColumnMultiSelect({
   label,
@@ -43,13 +45,6 @@ export function DatasetColumnMultiSelect({
   defaultValue,
   onChange,
 }: Props): JSX.Element {
-  const [controlledValue, setControlledValue] = useUncontrolled({
-    value,
-    defaultValue,
-    onChange,
-    finalValue: [],
-  });
-
   const [allDatasets, isLoadingDatasets] =
     DatasetClient.useGetAllDatasetsWithColumns(
       datasetId ? where("id", "eq", datasetId) : undefined,
@@ -71,9 +66,10 @@ export function DatasetColumnMultiSelect({
       };
     });
 
-    const cols = datasets.flatMap((dataset) => {
-      return dataset.columns;
+    const cols = datasets.flatMap((ds) => {
+      return ds.columns;
     });
+
     const lookup = new Map<DatasetColumnId, DatasetColumn>();
     for (const col of cols) {
       lookup.set(col.id as DatasetColumnId, col);
@@ -85,11 +81,32 @@ export function DatasetColumnMultiSelect({
     };
   }, [allDatasets]);
 
-  const selectedColumnIds = controlledValue.map(getProp("id"));
+  // Controlled if `value` is
+  // provided, otherwise uncontrolled with internal state.
+  const [current, setCurrent] = useUncontrolled<readonly DatasetColumn[]>({
+    value,
+    defaultValue,
+    onChange,
+    finalValue: [],
+  });
+
+  // If the available columns change
+  // (e.g., switching dataset), drop any selections no longer present.
+  useEffect(() => {
+    const pruned = current.filter((c) => {
+      return columnLookup.has(c.id as DatasetColumnId);
+    });
+    if (pruned.length !== current.length) {
+      setCurrent(pruned);
+    }
+  }, [columnLookup, current, setCurrent]);
+
+  const selectedColumnIds = useMemo(() => {
+    return current.map(getProp("id")) as string[];
+  }, [current]);
 
   return (
     <MultiSelect
-      key={datasetId}
       searchable
       clearable
       label={label}
@@ -102,7 +119,7 @@ export function DatasetColumnMultiSelect({
             return columnLookup.get(id as DatasetColumnId);
           })
           .filter(isNotNullOrUndefined);
-        setControlledValue(columns);
+        setCurrent(columns);
       }}
       nothingFoundMessage="No fields"
     />

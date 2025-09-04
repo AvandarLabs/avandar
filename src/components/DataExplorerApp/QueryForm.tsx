@@ -1,5 +1,7 @@
-import { Box, Fieldset, Select, Stack, Text } from "@mantine/core";
+import { Box, Fieldset, Stack, Text } from "@mantine/core";
+import { useMemo } from "react";
 import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
+import { Select } from "@/lib/ui/inputs/Select";
 import { DangerText } from "@/lib/ui/Text/DangerText";
 import { difference } from "@/lib/utils/arrays";
 import { makeObjectFromList } from "@/lib/utils/objects/builders";
@@ -14,26 +16,25 @@ import type { DatasetColumn } from "@/models/datasets/DatasetColumn";
 const HIDE_WHERE = true;
 const HIDE_LIMIT = true;
 
-const orderOptions = [
+type Direction = "asc" | "desc";
+
+const orderOptions: Array<{ value: Direction; label: string }> = [
   { value: "asc", label: "Ascending" },
   { value: "desc", label: "Descending" },
 ] as const;
-
-type Direction = "asc" | "desc";
 
 type Props = {
   errorMessage?: string;
   aggregations: Record<string, QueryAggregationType>;
   selectedDatasetId: DatasetId | undefined;
 
-  // develop names
   selectedColumns: readonly DatasetColumn[];
   selectedGroupByColumns: readonly DatasetColumn[];
   orderByColumn: DatasetColumn | undefined;
   orderByDirection: Direction;
 
   onAggregationsChange: (next: Record<string, QueryAggregationType>) => void;
-  onFromDatasetChange: (datasetId: DatasetId | undefined) => void;
+  onSelectDatasetChange: (datasetId: DatasetId | undefined) => void;
 
   onSelectColumnsChange: (columns: readonly DatasetColumn[]) => void;
   onGroupByChange: (columns: readonly DatasetColumn[]) => void;
@@ -50,19 +51,28 @@ export function QueryForm({
   orderByColumn,
   orderByDirection,
   onAggregationsChange,
-  onFromDatasetChange,
+  onSelectDatasetChange,
   onSelectColumnsChange,
   onGroupByChange,
   onOrderByColumnChange,
   onOrderByDirectionChange,
 }: Props): JSX.Element {
+  const fieldOptionsById = useMemo(() => {
+    return selectedColumns.map((c) => {
+      return { value: c.id as string, label: c.name };
+    });
+  }, [selectedColumns]);
+
+  const orderByColumnId =
+    orderByColumn?.id ? (orderByColumn.id as string) : null;
+
   return (
     <form>
       <Stack>
         <DatasetSelect
           value={selectedDatasetId ?? null}
           onChange={(datasetId) => {
-            onFromDatasetChange(datasetId ?? undefined);
+            onSelectDatasetChange(datasetId ?? undefined);
           }}
         />
 
@@ -74,7 +84,6 @@ export function QueryForm({
           onChange={(columns) => {
             onSelectColumnsChange(columns);
 
-            // keep aggregations in sync with current columns
             const incoming = columns.map(getProp("name"));
             const prevAgg = aggregations;
             const prevNames = objectKeys(prevAgg);
@@ -120,60 +129,49 @@ export function QueryForm({
           placeholder="Group by"
           datasetId={selectedDatasetId}
           value={selectedGroupByColumns}
-          onChange={onGroupByChange}
+          onChange={(cols) => {
+            onGroupByChange(cols);
+          }}
         />
 
-        <Select
+        <Select<string>
           label="Select field"
           placeholder="Select field"
-          data={selectedColumns.map((f) => {
-            return { value: f.name, label: f.name };
-          })}
-          value={orderByColumn?.name ?? null}
-          onChange={(fieldName) => {
-            const selected = selectedColumns.find((f) => {
-              return f.name === fieldName;
+          data={fieldOptionsById}
+          value={orderByColumnId}
+          clearable
+          onChange={(id) => {
+            if (id === null) {
+              onOrderByColumnChange(undefined);
+              return;
+            }
+            const selected = selectedColumns.find((field) => {
+              return (field.id as string) === id;
             });
             onOrderByColumnChange(selected);
           }}
-          clearable
         />
+
         <Box mb="md">
-          <Select
+          <Select<Direction>
             label="Order by"
             placeholder="Select order"
             data={orderOptions}
             value={orderByDirection}
             clearable={false}
             onChange={(value) => {
-              onOrderByDirectionChange(value as Direction);
+              if (value === null) {
+                return;
+              }
+              onOrderByDirectionChange(value);
             }}
           />
+
+          {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
+          {errorMessage ?
+            <DangerText>{errorMessage}</DangerText>
+          : null}
         </Box>
-
-        <Select
-          label="Order by"
-          placeholder="Select order"
-          data={
-            orderOptions as unknown as Array<{
-              value: string;
-              label: string;
-            }>
-          }
-          value={orderByDirection}
-          clearable={false}
-          onChange={(value) => {
-            if (value) {
-              onOrderByDirectionChange(value as Direction);
-            }
-          }}
-        />
-
-        {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
-
-        {errorMessage ?
-          <DangerText>{errorMessage}</DangerText>
-        : null}
       </Stack>
     </form>
   );
