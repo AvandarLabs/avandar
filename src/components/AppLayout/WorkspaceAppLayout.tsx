@@ -9,16 +9,19 @@ import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { DataExplorerProvider } from "../DataExplorerApp/DataExplorerContext";
 import { useSpotlightActions } from "./useSpotlightActions";
 
+type Props = {
+  children?: React.ReactNode;
+};
+
 export function WorkspaceAppLayout({
   children = <Outlet />,
-}: {
-  children: React.ReactNode;
-}): JSX.Element {
+}: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
   const [entityConfigs] = EntityConfigClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
   const spotlightActions = useSpotlightActions(workspace.slug);
+
   const entityManagerLinks: NavbarLink[] = useMemo(() => {
     return (entityConfigs ?? []).map((entityConfig) => {
       const navLink = NavbarLinks.entityManagerHome({
@@ -26,10 +29,7 @@ export function WorkspaceAppLayout({
         entityConfigId: entityConfig.id,
         entityConfigName: entityConfig.name,
       });
-      return {
-        link: navLink.link,
-        icon: navLink.icon,
-      };
+      return { link: navLink.link, icon: navLink.icon };
     });
   }, [workspace.slug, entityConfigs]);
 

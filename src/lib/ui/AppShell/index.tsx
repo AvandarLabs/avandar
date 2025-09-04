@@ -27,7 +27,6 @@ import {
 } from "@tabler/icons-react";
 import { Outlet, useNavigate, useRouter } from "@tanstack/react-router";
 import clsx from "clsx";
-import { ReactNode } from "react";
 import { AuthClient } from "@/clients/AuthClient";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLink, AppLinks } from "@/config/AppLinks";
@@ -64,7 +63,6 @@ type Props = {
    * The main content of the app shell.
    * Defaults to `<Outlet />` so it can be used in a router.
    */
-  mainContent?: ReactNode;
   currentWorkspace?: Workspace;
 };
 
@@ -85,7 +83,6 @@ export function AppShell({
   navbarLinks,
   currentWorkspace,
   utilityLinks = [],
-  mainContent = children ?? <Outlet />,
 }: Props): JSX.Element {
   const router = useRouter();
   const [opened, open, close] = useBoolean(false);
@@ -323,7 +320,7 @@ export function AppShell({
         </MantineAppShell.Navbar>
 
         <MantineAppShell.Main py="0" pr="0" ml={-16}>
-          {mainContent}
+          {children ?? <Outlet />}
         </MantineAppShell.Main>
       </MantineAppShell>
       <Modal opened={opened} onClose={close}>
