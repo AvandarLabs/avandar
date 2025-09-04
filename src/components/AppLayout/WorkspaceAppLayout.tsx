@@ -1,3 +1,4 @@
+import { Outlet } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
@@ -9,7 +10,7 @@ import { DataExplorerProvider } from "../DataExplorerApp/DataExplorerContext";
 import { useSpotlightActions } from "./useSpotlightActions";
 
 export function WorkspaceAppLayout({
-  children,
+  children = <Outlet />,
 }: {
   children: React.ReactNode;
 }): JSX.Element {
