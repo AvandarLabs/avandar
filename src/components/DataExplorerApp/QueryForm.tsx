@@ -144,6 +144,7 @@ export function QueryForm({
             });
             onOrderByColumnChange(selected);
           }}
+          clearable
         />
         <Box mb="md">
           <Select
