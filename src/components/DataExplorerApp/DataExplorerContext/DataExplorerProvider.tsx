@@ -50,7 +50,7 @@ export function DataExplorerProvider({
     setVizConfig(makeDefaultVizConfig("table"));
   }, []);
 
-  const selectDataset = useCallback(
+  const onSelectDatasetChange = useCallback(
     (newValue: DatasetId | undefined) => {
       if (newValue !== selectedDatasetId) {
         reset();
@@ -76,7 +76,7 @@ export function DataExplorerProvider({
       setOrderByColumn,
       setOrderByDirection,
       setVizConfig,
-      selectDataset,
+      onSelectDatasetChange,
       reset,
     };
   }, [
@@ -87,7 +87,7 @@ export function DataExplorerProvider({
     orderByColumn,
     orderByDirection,
     vizConfig,
-    selectDataset,
+    onSelectDatasetChange,
     reset,
   ]);
 

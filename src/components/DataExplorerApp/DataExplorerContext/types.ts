@@ -20,6 +20,5 @@ export type DataExplorerContextType = {
   setOrderByDirection: (newValue: "asc" | "desc") => void;
   setVizConfig: (newValue: VizConfig) => void;
   onSelectDatasetChange: (newValue: DatasetId | undefined) => void;
-  selectDataset: (newValue: DatasetId | undefined) => void;
   reset: () => void;
 };
