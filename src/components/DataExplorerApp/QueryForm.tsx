@@ -1,4 +1,4 @@
-import { Fieldset, Select, Stack, Text } from "@mantine/core";
+import { Box, Fieldset, Select, Stack, Text } from "@mantine/core";
 import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
 import { DangerText } from "@/lib/ui/Text/DangerText";
 import { difference } from "@/lib/utils/arrays";
@@ -27,6 +27,7 @@ type Props = {
   aggregations: Record<string, QueryAggregationType>;
   selectedDatasetId: DatasetId | undefined;
   selectedColumns: readonly DatasetColumn[];
+  selectedGroupByColumns: readonly DatasetColumn[];
   orderByColumn: DatasetColumn | undefined;
   orderByDirection: Direction;
   onAggregationsChange: (
@@ -43,6 +44,7 @@ export function QueryForm({
   errorMessage,
   aggregations,
   selectedColumns,
+  selectedGroupByColumns,
   selectedDatasetId,
   orderByColumn,
   onAggregationsChange,
@@ -57,6 +59,7 @@ export function QueryForm({
     <form>
       <Stack>
         <DatasetSelect
+          value={selectedDatasetId ?? null}
           onChange={(datasetId) => {
             onFromDatasetChange(datasetId ?? undefined);
           }}
@@ -66,6 +69,7 @@ export function QueryForm({
           label="Select fields"
           placeholder="Select fields"
           datasetId={selectedDatasetId}
+          value={selectedColumns}
           onChange={(columns) => {
             onSelectColumnsChange(columns);
 
@@ -121,6 +125,7 @@ export function QueryForm({
           placeholder="Group by"
           onChange={onGroupByChange}
           datasetId={selectedDatasetId}
+          value={selectedGroupByColumns}
         />
 
         <Select
@@ -139,23 +144,25 @@ export function QueryForm({
             });
             onOrderByColumnChange(selected);
           }}
+          clearable
         />
+        <Box mb="md">
+          <Select
+            label="Order by"
+            placeholder="Select order"
+            data={orderOptions}
+            value={orderByDirection}
+            clearable={false}
+            onChange={(value) => {
+              onOrderByDirectionChange(value as Direction);
+            }}
+          />
 
-        <Select
-          label="Order by"
-          placeholder="Select order"
-          data={orderOptions}
-          value={orderByDirection}
-          clearable={false}
-          onChange={(value) => {
-            onOrderByDirectionChange(value as Direction);
-          }}
-        />
-
-        {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
-        {errorMessage ?
-          <DangerText>{errorMessage}</DangerText>
-        : null}
+          {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
+          {errorMessage ?
+            <DangerText>{errorMessage}</DangerText>
+          : null}
+        </Box>
       </Stack>
     </form>
   );

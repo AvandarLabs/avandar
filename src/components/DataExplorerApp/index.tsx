@@ -114,6 +114,22 @@ export function DataExplorerApp(): JSX.Element {
     };
   }, [queryResults]);
 
+  const resetQueryForm = () => {
+    setSelectedFields([]);
+    setSelectedGroupByFields([]);
+    setAggregations({});
+    setOrderByColumn(undefined);
+    setOrderByDirection("asc");
+    setVizConfig(makeDefaultVizConfig("table"));
+  };
+
+  const onSelectedDatasetChange = (datasetId: DatasetId | undefined) => {
+    if (datasetId !== selectedDatasetId) {
+      resetQueryForm();
+    }
+    setSelectedDatasetId(datasetId);
+  };
+
   return (
     <Flex>
       <Box
@@ -129,9 +145,10 @@ export function DataExplorerApp(): JSX.Element {
           aggregations={aggregations}
           selectedDatasetId={selectedDatasetId}
           selectedColumns={selectColumns}
+          selectedGroupByColumns={selectGroupByColumns}
           orderByColumn={orderByColumn}
           onAggregationsChange={setAggregations}
-          onFromDatasetChange={setSelectedDatasetId}
+          onFromDatasetChange={onSelectedDatasetChange}
           onSelectColumnsChange={setSelectedFields}
           onGroupByChange={setSelectedGroupByFields}
           onOrderByColumnChange={setOrderByColumn}
