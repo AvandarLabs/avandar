@@ -1,3 +1,5 @@
+import { UnknownDataFrame } from "@/lib/types/common";
+
 export type XYSettings = {
   xAxisKey: string;
   yAxisKey: string;
@@ -9,6 +11,8 @@ export type XYChartProps = {
    * The `data` structure is a conventional dataframe (an array of objects).
    * Each object's keys can be referenced by `xAxisKey` and `yAxisKey`.
    */
-  data: Array<Record<string, unknown>>;
-  settings: XYSettings;
+  data: UnknownDataFrame;
+  xAxisKey: string;
+  yAxisKey: string;
+  height: number;
 };
