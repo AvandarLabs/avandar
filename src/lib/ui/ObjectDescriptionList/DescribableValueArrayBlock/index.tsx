@@ -2,7 +2,7 @@ import { ScrollArea, Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
 import { pick } from "@/lib/utils/objects/misc";
 import {
-  isFieldValueArray,
+  isDescribableValueArray,
   isPrimitiveFieldValue,
   isStringOrNumber,
 } from "../guards";
@@ -22,9 +22,14 @@ type Props<T extends DescribableValue> = {
   data: readonly DescribableValue[];
 } & DescribableValueArrayRenderOptions<T>;
 
-export function FieldValueArrayBlock<T extends DescribableValue>({
+/**
+ * Renders an array of potentially mixed describable values, so it
+ * splits it between primitive values, object values, and array values.
+ */
+export function DescribableValueArrayBlock<T extends DescribableValue>({
   data,
   renderEmptyArray = "There are no values",
+  renderArray,
   maxHeight,
   maxItemsCount,
   ...moreRenderOptions
@@ -37,7 +42,7 @@ export function FieldValueArrayBlock<T extends DescribableValue>({
     data.forEach((v) => {
       if (isPrimitiveFieldValue(v)) {
         primitives.push(v);
-      } else if (isFieldValueArray(v)) {
+      } else if (isDescribableValueArray(v)) {
         arrays.push(v);
       } else {
         entities.push(v);
@@ -58,8 +63,8 @@ export function FieldValueArrayBlock<T extends DescribableValue>({
   }
 
   // compute the render options for each block
-  const parentPrimitiveRenderOptions: PrimitiveValueRenderOptions = pick(
-    moreRenderOptions as PrimitiveValueRenderOptions,
+  const parentPrimitiveRenderOptions = pick(
+    moreRenderOptions as PrimitiveValueRenderOptions<PrimitiveValue>,
     PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
   );
 
@@ -67,28 +72,30 @@ export function FieldValueArrayBlock<T extends DescribableValue>({
     ...parentPrimitiveRenderOptions,
     ...moreRenderOptions,
   };
-  const contentBlock = (
-    <Stack>
-      <PrimitiveFieldValueArrayBlock
-        values={primitiveValues}
-        maxItemsCount={maxItemsCount}
-        {...parentPrimitiveRenderOptions}
-      />
-      <ObjectArrayBlock
-        values={entityObjects}
-        maxItemsCount={maxItemsCount}
-        {...objectArrayOrNestedArrayRenderOptions}
-      />
-      <NestedArraysBlock
-        values={valueArrays}
-        maxItemsCount={maxItemsCount}
-        {...objectArrayOrNestedArrayRenderOptions}
-      />
-    </Stack>
-  );
+
+  const contentBlock =
+    renderArray ?
+      renderArray(data as readonly T[])
+    : <Stack>
+        <PrimitiveFieldValueArrayBlock
+          values={primitiveValues}
+          maxItemsCount={maxItemsCount}
+          {...parentPrimitiveRenderOptions}
+        />
+        <ObjectArrayBlock
+          values={entityObjects}
+          maxItemsCount={maxItemsCount}
+          {...objectArrayOrNestedArrayRenderOptions}
+        />
+        <NestedArraysBlock
+          values={valueArrays}
+          maxItemsCount={maxItemsCount}
+          {...objectArrayOrNestedArrayRenderOptions}
+        />
+      </Stack>;
 
   if (maxHeight === undefined) {
-    return contentBlock;
+    return <>{contentBlock}</>;
   }
 
   return (

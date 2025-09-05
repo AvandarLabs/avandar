@@ -14,7 +14,7 @@ export function isPrimitiveFieldValue(
   );
 }
 
-export function isFieldValueArray(
+export function isDescribableValueArray(
   value: DescribableValue,
 ): value is readonly DescribableValue[] {
   return isArray(value);

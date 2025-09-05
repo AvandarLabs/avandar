@@ -6,13 +6,14 @@ import type { PrimitiveValue, PrimitiveValueRenderOptions } from "./types";
 
 type Props<T extends PrimitiveValue> = {
   value: T;
-} & PrimitiveValueRenderOptions;
+} & PrimitiveValueRenderOptions<T>;
 
 /**
  * Render a primitive value. Primitive values are not recursive.
  */
 export function PrimitiveValueItem<T extends PrimitiveValue>({
   value,
+  renderValue = undefined,
   renderEmptyString = "Empty text",
   renderBooleanTrue = "Yes",
   renderBooleanFalse = "No",
@@ -20,6 +21,10 @@ export function PrimitiveValueItem<T extends PrimitiveValue>({
   renderUndefinedString = "No value",
   dateFormat,
 }: Props<T>): JSX.Element {
+  if (renderValue !== undefined) {
+    return <>{renderValue(value)}</>;
+  }
+
   if (value === null) {
     if (isStringOrNumber(renderNullString)) {
       return (

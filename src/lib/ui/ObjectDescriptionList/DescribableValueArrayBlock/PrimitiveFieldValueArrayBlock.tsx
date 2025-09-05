@@ -6,7 +6,7 @@ import { PrimitiveValue, PrimitiveValueRenderOptions } from "../types";
 type Props<T extends PrimitiveValue> = {
   values: readonly T[];
   maxItemsCount?: number;
-} & PrimitiveValueRenderOptions;
+} & PrimitiveValueRenderOptions<T>;
 
 export function PrimitiveFieldValueArrayBlock<T extends PrimitiveValue>({
   values,

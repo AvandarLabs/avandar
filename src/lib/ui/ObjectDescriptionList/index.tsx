@@ -4,7 +4,7 @@ import { StringKeyOf } from "@/lib/types/utilityTypes";
 import { objectKeys, pick } from "@/lib/utils/objects/misc";
 import { camelToTitleCase } from "@/lib/utils/strings/transformations";
 import { DescriptionList } from "../DescriptionList";
-import { DescribableValueArrayBlockProps } from "./FieldValueArrayBlock";
+import { DescribableValueArrayBlockProps } from "./DescribableValueArrayBlock";
 import {
   AnyDescribableValueRenderOptions,
   DescribableObject,
@@ -26,49 +26,54 @@ export function ObjectDescriptionListBlock<T extends DescribableObject>({
   data,
   excludeKeys = [],
   maxHeight,
+  renderObject,
   ...renderOptions
 }: Props<T>): JSX.Element {
   const excludeKeySet: ReadonlySet<StringKeyOf<T>> = useMemo(() => {
     return new Set(excludeKeys);
   }, [excludeKeys]);
 
-  const contentBlock = (
-    <DescriptionList>
-      {objectKeys(data).map((key) => {
-        if (excludeKeySet.has(key)) {
-          return null;
-        }
+  const contentBlock =
+    renderObject ?
+      renderObject(data)
+    : <DescriptionList>
+        {objectKeys(data).map((key) => {
+          if (excludeKeySet.has(key)) {
+            return null;
+          }
 
-        // compute the child render options to pass down
-        const parentPrimitiveValueRenderOptions = pick(
-          renderOptions,
-          PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
-        );
-        const childRenderOptions: AnyDescribableValueRenderOptions = {
-          ...parentPrimitiveValueRenderOptions,
+          // compute the child render options to pass down
+          const parentPrimitiveValueRenderOptions = pick(
+            renderOptions,
+            PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
+          );
+          const childRenderOptions = {
+            ...parentPrimitiveValueRenderOptions,
 
-          // apply the item render options
-          ...(renderOptions?.itemRenderOptions ?? {}),
+            // apply the item render options
+            ...(renderOptions?.itemRenderOptions ?? {}),
 
-          // apply the child render options, which take highest priority
-          ...(renderOptions?.childRenderOptions?.[key] ?? {}),
-        };
+            // apply the child render options, which take highest priority
+            ...(renderOptions?.childRenderOptions?.[key] ?? {}),
+          } as AnyDescribableValueRenderOptions;
 
-        return (
-          <DescriptionList.Item key={key} label={camelToTitleCase(String(key))}>
-            <ValueItemContainer
-              type="unknown"
-              value={data[key]}
-              {...childRenderOptions}
-            />
-          </DescriptionList.Item>
-        );
-      })}
-    </DescriptionList>
-  );
+          return (
+            <DescriptionList.Item
+              key={key}
+              label={camelToTitleCase(String(key))}
+            >
+              <ValueItemContainer
+                type="unknown"
+                value={data[key]}
+                {...childRenderOptions}
+              />
+            </DescriptionList.Item>
+          );
+        })}
+      </DescriptionList>;
 
   if (maxHeight === undefined) {
-    return contentBlock;
+    return <>{contentBlock}</>;
   }
 
   return (
@@ -101,5 +106,11 @@ export function ObjectDescriptionList<
   DescribableValueArrayProps<U>
 : never): JSX.Element {
   // pass the data to `UnknownValueItem` to decide how to render things
-  return <ValueItemContainer type="unknown" value={data} {...renderOptions} />;
+  return (
+    <ValueItemContainer
+      type="unknown"
+      value={data}
+      {...(renderOptions as AnyDescribableValueRenderOptions)}
+    />
+  );
 }

@@ -37,7 +37,9 @@ type DescribableObjectOf<T extends DescribableValue> = {
  * Render options for primitive values. These can also be passed to any
  * recursive DescribableValues to apply to its children.
  */
-export type PrimitiveValueRenderOptions = {
+export type PrimitiveValueRenderOptions<T extends PrimitiveValue> = {
+  renderValue?: (value: T) => ReactNode;
+
   /** The string to display for empty strings */
   renderEmptyString?: NonNullable<ReactNode>;
 
@@ -58,13 +60,14 @@ export type PrimitiveValueRenderOptions = {
 };
 
 export const PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS = objectKeys({
+  renderValue: true,
   renderEmptyString: true,
   renderNullString: true,
   renderUndefinedString: true,
   renderBooleanTrue: true,
   renderBooleanFalse: true,
   dateFormat: true,
-} satisfies Registry<keyof PrimitiveValueRenderOptions>);
+} satisfies Registry<keyof PrimitiveValueRenderOptions<PrimitiveValue>>);
 
 /**
  * A mapping of child keys to its nested render options.
@@ -77,14 +80,16 @@ export type ChildRenderOptionsMap<T extends NonNullable<DescribableObject>> = {
     ReadonlyArray<infer ArrayType extends DescribableValue>
   ) ?
     DescribableValueArrayRenderOptions<ArrayType>
-  : PrimitiveValueRenderOptions;
+  : T[K] extends PrimitiveValue ? PrimitiveValueRenderOptions<T[K]>
+  : PrimitiveValueRenderOptions<PrimitiveValue>;
 };
 
 /**
  * Options for how to render an entity object.
  */
 export type ObjectRenderOptions<T extends NonNullable<DescribableObject>> =
-  PrimitiveValueRenderOptions & {
+  PrimitiveValueRenderOptions<PrimitiveValue> & {
+    renderObject?: (obj: T) => ReactNode;
     excludeKeys?: ReadonlyArray<StringKeyOf<T>>;
 
     /**
@@ -105,20 +110,21 @@ export type ObjectRenderOptions<T extends NonNullable<DescribableObject>> =
      * may not know the literal keys, and you want to apply the same options
      * to all items.
      */
-    itemRenderOptions?: T extends (
-      DescribableObjectOf<infer Item extends DescribableObject>
+    itemRenderOptions?: [T] extends (
+      [[DescribableObjectOf<infer Item extends DescribableObject>]]
     ) ?
       ObjectRenderOptions<Item>
-    : T extends ReadonlyArray<infer Item extends DescribableValue> ?
+    : [T] extends [ReadonlyArray<infer Item extends DescribableValue>] ?
       DescribableValueArrayRenderOptions<Item>
-    : PrimitiveValueRenderOptions;
+    : [T] extends [PrimitiveValue] ? PrimitiveValueRenderOptions<T>
+    : PrimitiveValueRenderOptions<PrimitiveValue>;
   };
 
 /**
  * Extended options for arrays of objects.
  */
 export type ObjectArrayRenderOptions<T extends NonNullable<DescribableObject>> =
-  PrimitiveValueRenderOptions & {
+  PrimitiveValueRenderOptions<PrimitiveValue> & {
     /**
      * By default object arrays render as a list of collapsible items.
      * If `renderAsTable` is true then we will render as a table instead.
@@ -149,7 +155,7 @@ export type ObjectArrayRenderOptions<T extends NonNullable<DescribableObject>> =
  * Extended options for nested arrays
  */
 export type NestedArrayRenderOptions<T extends DescribableValue> =
-  PrimitiveValueRenderOptions & {
+  PrimitiveValueRenderOptions<PrimitiveValue> & {
     /** Options for each nested array within this array */
     itemRenderOptions?: DescribableValueArrayRenderOptions<T>;
   };
@@ -158,6 +164,8 @@ export type NestedArrayRenderOptions<T extends DescribableValue> =
  * Options for how to render an array of values.
  */
 export type DescribableValueArrayRenderOptions<T extends DescribableValue> = {
+  renderArray?: (array: readonly T[]) => ReactNode;
+
   renderEmptyArray?: NonNullable<ReactNode>;
 
   /**
@@ -170,11 +178,12 @@ export type DescribableValueArrayRenderOptions<T extends DescribableValue> = {
    * Maximum number of items to show.
    */
   maxItemsCount?: number;
-} & (T extends DescribableObject ? ObjectArrayRenderOptions<T>
-: T extends readonly DescribableValue[] ? NestedArrayRenderOptions<T>
-: PrimitiveValueRenderOptions);
+} & ([T] extends [DescribableObject] ? ObjectArrayRenderOptions<T>
+: [T] extends [readonly DescribableValue[]] ? NestedArrayRenderOptions<T>
+: [T] extends [PrimitiveValue] ? PrimitiveValueRenderOptions<T>
+: PrimitiveValueRenderOptions<PrimitiveValue>);
 
 export type AnyDescribableValueRenderOptions =
-  | PrimitiveValueRenderOptions
+  | PrimitiveValueRenderOptions<PrimitiveValue>
   | ObjectRenderOptions<DescribableObject>
   | DescribableValueArrayRenderOptions<DescribableValue>;

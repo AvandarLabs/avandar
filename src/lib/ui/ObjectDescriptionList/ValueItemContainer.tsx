@@ -1,10 +1,10 @@
 import { match } from "ts-pattern";
 import { constant } from "@/lib/utils/higherOrderFuncs";
 import { ObjectDescriptionListBlock } from ".";
-import { FieldValueArrayBlock } from "./FieldValueArrayBlock";
+import { DescribableValueArrayBlock } from "./DescribableValueArrayBlock";
 import {
   isDescribableObject,
-  isFieldValueArray,
+  isDescribableValueArray,
   isPrimitiveFieldValue,
 } from "./guards";
 import { PrimitiveValueItem } from "./PrimitiveValueItem";
@@ -22,7 +22,7 @@ type Props =
   | ({
       type: "primitive";
       value: PrimitiveValue;
-    } & PrimitiveValueRenderOptions)
+    } & PrimitiveValueRenderOptions<PrimitiveValue>)
   | ({
       type: "object";
       value: DescribableObject;
@@ -47,7 +47,14 @@ export function ValueItemContainer(props: Props): JSX.Element | null {
       },
     )
     .with({ type: "array" }, ({ type, value, ...arrayRenderOptions }) => {
-      return <FieldValueArrayBlock data={value} {...arrayRenderOptions} />;
+      return (
+        <DescribableValueArrayBlock
+          data={value}
+          {...(arrayRenderOptions as DescribableValueArrayRenderOptions<
+            DescribableValue[]
+          >)}
+        />
+      );
     })
     .with({ type: "object" }, ({ type, value, ...objectRenderOptions }) => {
       return (
@@ -58,15 +65,32 @@ export function ValueItemContainer(props: Props): JSX.Element | null {
       // if no explicit type was passed, we rely on narrowing the type from
       // the `value` itself
       if (isPrimitiveFieldValue(value)) {
-        return <PrimitiveValueItem value={value} {...renderOptions} />;
+        return (
+          <PrimitiveValueItem
+            value={value}
+            {...(renderOptions as PrimitiveValueRenderOptions<PrimitiveValue>)}
+          />
+        );
       }
 
-      if (isFieldValueArray(value)) {
-        return <FieldValueArrayBlock data={value} {...renderOptions} />;
+      if (isDescribableValueArray(value)) {
+        return (
+          <DescribableValueArrayBlock
+            data={value}
+            {...(renderOptions as DescribableValueArrayRenderOptions<
+              DescribableValue[]
+            >)}
+          />
+        );
       }
 
       if (isDescribableObject(value)) {
-        return <ObjectDescriptionListBlock data={value} {...renderOptions} />;
+        return (
+          <ObjectDescriptionListBlock
+            data={value}
+            {...(renderOptions as ObjectRenderOptions<DescribableObject>)}
+          />
+        );
       }
 
       return null;

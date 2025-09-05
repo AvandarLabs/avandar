@@ -1,13 +1,13 @@
 import { Fieldset, Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
-import { DescribableValue, DescribableValueArrayRenderOptions } from "../types";
+import { DescribableValue, NestedArrayRenderOptions } from "../types";
 import { ValueItemContainer } from "../ValueItemContainer";
 
 type Props<T extends DescribableValue> = {
   /** Array of arrays of field values */
   values: ReadonlyArray<readonly T[]>;
   maxItemsCount?: number;
-} & DescribableValueArrayRenderOptions<T>;
+} & NestedArrayRenderOptions<T>;
 
 export function NestedArraysBlock<T extends DescribableValue>({
   values,

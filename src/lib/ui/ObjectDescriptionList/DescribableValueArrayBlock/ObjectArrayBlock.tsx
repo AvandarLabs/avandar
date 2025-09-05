@@ -8,6 +8,7 @@ import {
   AnyDescribableValueRenderOptions,
   DescribableObject,
   ObjectArrayRenderOptions,
+  ObjectRenderOptions,
 } from "../types";
 import { ValueItemContainer } from "../ValueItemContainer";
 
@@ -77,10 +78,10 @@ export function ObjectArrayBlock<T extends DescribableObject>({
             const fieldVal = entityRow[fieldKey];
 
             // compute the child render options to pass down
-            const childRenderOptions: AnyDescribableValueRenderOptions = {
+            const childRenderOptions = {
               ...parentRenderOptions,
               ...(itemRenderOptions?.childRenderOptions?.[fieldKey] ?? {}),
-            };
+            } as AnyDescribableValueRenderOptions;
 
             return (
               <Table.Td key={fieldKey}>
@@ -124,7 +125,7 @@ export function ObjectArrayBlock<T extends DescribableObject>({
         <ValueItemContainer
           type="object"
           value={val}
-          {...parentRenderOptions}
+          {...(parentRenderOptions as ObjectRenderOptions<DescribableObject>)}
         />
       </CollapsibleItem>
     );
