@@ -18,7 +18,7 @@ const HIDE_LIMIT = true;
 
 type Direction = "asc" | "desc";
 
-const orderOptions: Array<{ value: Direction; label: string }> = [
+const orderDirectionOptions: Array<{ value: Direction; label: string }> = [
   { value: "asc", label: "Ascending" },
   { value: "desc", label: "Descending" },
 ] as const;
@@ -140,20 +140,18 @@ export function QueryForm({
         />
 
         <Select
-          label="Select field"
-          placeholder="Select field"
+          label="Order field"
           data={fieldOptionsById}
           value={orderByColumnId}
-          clearable
-          onChange={(id) => {
-            if (id === null) {
+          onChange={(newFieldId) => {
+            if (newFieldId === null) {
               onOrderByColumnChange(undefined);
-            } else {
-              const selected = selectedColumns.find((field) => {
-                return field.id === id;
-              });
-              onOrderByColumnChange(selected);
+              return;
             }
+            const newOrderByColumn = selectedColumns.find((field) => {
+              return field.id === newFieldId;
+            });
+            onOrderByColumnChange(newOrderByColumn);
           }}
         />
 
@@ -161,7 +159,7 @@ export function QueryForm({
           <Select
             label="Order by"
             placeholder="Select order"
-            data={orderOptions}
+            data={orderDirectionOptions}
             value={orderByDirection}
             clearable={false}
             onChange={(value) => {

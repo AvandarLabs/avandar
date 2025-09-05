@@ -37,20 +37,22 @@ export function AggregationSelect({
 
   // Controlled if `value` is provided,
   // otherwise uncontrolled with internal state.
-  const [current, setCurrent] = useUncontrolled<QueryAggregationType>({
-    value,
-    defaultValue,
-    finalValue: "none",
-    onChange,
-  });
+  const [currentColumns, setCurrentColumns] =
+    useUncontrolled<QueryAggregationType>({
+      value,
+      defaultValue,
+      finalValue: "none",
+      onChange,
+    });
 
-  // If the column type changes and the current aggregation becomes invalid,
+  // If the column type changes and the s
+  // electedValue aggregation becomes invalid,
   // coerce it to "none" (and notify parent if controlled).
   useEffect(() => {
-    if (current !== "none" && !validSet.has(current)) {
-      setCurrent("none");
+    if (currentColumns !== "none" && !validSet.has(currentColumns)) {
+      setCurrentColumns("none");
     }
-  }, [current, column.dataType, validSet, setCurrent]);
+  }, [currentColumns, column.dataType, validSet, setCurrentColumns]);
 
   return (
     <Select
@@ -59,12 +61,11 @@ export function AggregationSelect({
       label={column.name}
       placeholder="Select aggregation"
       data={data}
-      value={current}
-      onChange={(next) => {
-        if (!next) {
-          return;
+      value={currentColumns}
+      onChange={(newValue) => {
+        if (newValue) {
+          setCurrentColumns(newValue);
         }
-        setCurrent(next);
       }}
     />
   );

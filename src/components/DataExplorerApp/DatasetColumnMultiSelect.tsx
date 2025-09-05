@@ -81,7 +81,9 @@ export function DatasetColumnMultiSelect({
 
   // Controlled if `value` is
   // provided, otherwise uncontrolled with internal state.
-  const [current, setCurrent] = useUncontrolled<readonly DatasetColumn[]>({
+  const [currentColumns, setCurrentColumns] = useUncontrolled<
+    readonly DatasetColumn[]
+  >({
     value,
     defaultValue,
     onChange,
@@ -91,17 +93,18 @@ export function DatasetColumnMultiSelect({
   // If the available columns change
   // (e.g., switching dataset), drop any selections no longer present.
   useEffect(() => {
-    const pruned = current.filter((c) => {
-      return columnLookup.has(c.id as DatasetColumnId);
+    const pruned = currentColumns.filter((c) => {
+      const columnId = c.id as DatasetColumnId;
+      return columnId in columnLookup;
     });
-    if (pruned.length !== current.length) {
-      setCurrent(pruned);
+    if (pruned.length !== currentColumns.length) {
+      setCurrentColumns(pruned);
     }
-  }, [columnLookup, current, setCurrent]);
+  }, [columnLookup, currentColumns, setCurrentColumns]);
 
   const selectedColumnIds = useMemo(() => {
-    return current.map(getProp("id")) as string[];
-  }, [current]);
+    return currentColumns.map(getProp("id")) as string[];
+  }, [currentColumns]);
 
   return (
     <MultiSelect
@@ -111,13 +114,14 @@ export function DatasetColumnMultiSelect({
       placeholder={isLoadingDatasets ? "Loading datasets..." : placeholder}
       data={fieldGroupOptions ?? []}
       value={selectedColumnIds}
-      onChange={(columnIds: string[]) => {
-        const columns = columnIds
-          .map((id) => {
-            return columnLookup.get(id as DatasetColumnId);
+      onChange={(newColumnIds) => {
+        const newSelectedColumns = newColumnIds
+          .map((columnId) => {
+            return columnLookup[columnId as DatasetColumnId];
           })
           .filter(isNotNullOrUndefined);
-        setCurrent(columns);
+
+        setCurrentColumns(newSelectedColumns);
       }}
       nothingFoundMessage="No fields"
     />
