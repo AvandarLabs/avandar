@@ -1,8 +1,6 @@
 import { useContext } from "react";
-import {
-  DataExplorerContext,
-  DataExplorerContextType,
-} from "./DataExplorerContext";
+import { DataExplorerContext } from "./context";
+import type { DataExplorerContextType } from "./types";
 
 export function useDataExplorerContext(): DataExplorerContextType {
   const ctx = useContext(DataExplorerContext);

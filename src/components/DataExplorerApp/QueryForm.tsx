@@ -84,16 +84,21 @@ export function QueryForm({
           onChange={(columns) => {
             onSelectColumnsChange(columns);
 
-            const incoming = columns.map(getProp("name"));
-            const prevAgg = aggregations;
-            const prevNames = objectKeys(prevAgg);
-            const dropped = difference(prevNames, incoming);
+            const incomingFieldNames = columns.map(getProp("name"));
+            const prevAggregations = aggregations;
+            const prevFieldNames = objectKeys(prevAggregations);
+            const droppedFieldNames = difference(
+              prevFieldNames,
+              incomingFieldNames,
+            );
 
-            const defaults = makeObjectFromList(incoming, {
+            const defaults = makeObjectFromList(incomingFieldNames, {
               defaultValue: "none" as const,
             });
 
-            onAggregationsChange(omit({ ...defaults, ...prevAgg }, dropped));
+            onAggregationsChange(
+              omit({ ...defaults, ...prevAggregations }, droppedFieldNames),
+            );
           }}
         />
 
@@ -134,7 +139,7 @@ export function QueryForm({
           }}
         />
 
-        <Select<string>
+        <Select
           label="Select field"
           placeholder="Select field"
           data={fieldOptionsById}
@@ -143,27 +148,26 @@ export function QueryForm({
           onChange={(id) => {
             if (id === null) {
               onOrderByColumnChange(undefined);
-              return;
+            } else {
+              const selected = selectedColumns.find((field) => {
+                return field.id === id;
+              });
+              onOrderByColumnChange(selected);
             }
-            const selected = selectedColumns.find((field) => {
-              return (field.id as string) === id;
-            });
-            onOrderByColumnChange(selected);
           }}
         />
 
         <Box mb="md">
-          <Select<Direction>
+          <Select
             label="Order by"
             placeholder="Select order"
             data={orderOptions}
             value={orderByDirection}
             clearable={false}
             onChange={(value) => {
-              if (value === null) {
-                return;
+              if (value !== null) {
+                onOrderByDirectionChange(value);
               }
-              onOrderByDirectionChange(value);
             }}
           />
 

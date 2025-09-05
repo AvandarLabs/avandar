@@ -27,6 +27,7 @@ import {
 } from "@tabler/icons-react";
 import { Outlet, useNavigate, useRouter } from "@tanstack/react-router";
 import clsx from "clsx";
+import { ReactNode } from "react";
 import { AuthClient } from "@/clients/AuthClient";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLink, AppLinks } from "@/config/AppLinks";
@@ -48,7 +49,11 @@ const ASIDE_DEFAULT_WIDTH = 300;
 const NAVBAR_DEFAULT_WIDTH = 220;
 
 type Props = {
-  children?: React.ReactNode;
+  /**
+   * The main content of the app shell.
+   * Defaults to `<Outlet />` so it can be used in a router.
+   */
+  children?: ReactNode;
   title?: string;
   headerHeight?: number;
   footerHeight?: number;
@@ -76,7 +81,7 @@ export function AppShell({
   footerHeight = FOOTER_DEFAULT_HEIGHT,
   asideWidth = ASIDE_DEFAULT_WIDTH,
   navbarWidth = NAVBAR_DEFAULT_WIDTH,
-  children,
+  children = <Outlet />,
   title,
   profileLink,
   spotlightActions,
@@ -320,7 +325,7 @@ export function AppShell({
         </MantineAppShell.Navbar>
 
         <MantineAppShell.Main py="0" pr="0" ml={-16}>
-          {children ?? <Outlet />}
+          {children}
         </MantineAppShell.Main>
       </MantineAppShell>
       <Modal opened={opened} onClose={close}>

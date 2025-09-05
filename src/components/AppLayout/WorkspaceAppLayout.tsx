@@ -1,5 +1,5 @@
 import { Outlet } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -10,7 +10,11 @@ import { DataExplorerProvider } from "../DataExplorerApp/DataExplorerContext";
 import { useSpotlightActions } from "./useSpotlightActions";
 
 type Props = {
-  children?: React.ReactNode;
+  /**
+   * The main content of the app shell.
+   * Defaults to `<Outlet />` so it can be used in a router.
+   */
+  children?: ReactNode;
 };
 
 export function WorkspaceAppLayout({

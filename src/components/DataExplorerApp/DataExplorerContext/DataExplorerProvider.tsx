@@ -1,58 +1,26 @@
-import React, { createContext, useCallback, useMemo, useState } from "react";
-import { makeDefaultVizConfig } from "./VizSettingsForm/makeDefaultVizConfig";
-import type { VizConfig } from "./VizSettingsForm/makeDefaultVizConfig";
+import React, { useCallback, useMemo, useState } from "react";
+import { makeDefaultVizConfig } from "../VizSettingsForm/makeDefaultVizConfig";
+import { DataExplorerContext } from "./context";
+import type { VizConfig } from "../VizSettingsForm/makeDefaultVizConfig";
+import type { DataExplorerContextType } from "./types";
 import type { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
 import type { DatasetId } from "@/models/datasets/Dataset";
 import type { DatasetColumn } from "@/models/datasets/DatasetColumn";
 
-export type DataExplorerContextType = {
-  aggregations: Record<string, QueryAggregationType>;
-  selectedDatasetId?: DatasetId;
-  selectedColumns: readonly DatasetColumn[];
-  selectedGroupByColumns: readonly DatasetColumn[];
-  orderByColumn?: DatasetColumn;
-  orderByDirection: "asc" | "desc";
-  vizConfig: VizConfig;
-  setAggregations: (agg: Record<string, QueryAggregationType>) => void;
-  setSelectedDatasetId: (id: DatasetId | undefined) => void;
-  setSelectedColumns: (cols: readonly DatasetColumn[]) => void;
-  setSelectedGroupByColumns: (cols: readonly DatasetColumn[]) => void;
-  setOrderByColumn: (col: DatasetColumn | undefined) => void;
-  setOrderByDirection: (dir: "asc" | "desc") => void;
-  setVizConfig: (vc: VizConfig) => void;
-  onSelectDatasetChange: (id: DatasetId | undefined) => void;
-  reset: () => void;
-};
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const DataExplorerContext =
-  createContext<DataExplorerContextType | null>(null);
-
-const DEFAULTS: Omit<
-  DataExplorerContextType,
-  | "setAggregations"
-  | "setSelectedDatasetId"
-  | "setSelectedColumns"
-  | "setSelectedGroupByColumns"
-  | "setOrderByColumn"
-  | "setOrderByDirection"
-  | "setVizConfig"
-  | "onSelectDatasetChange"
-  | "reset"
-> = {
-  aggregations: {},
-  selectedDatasetId: undefined,
-  selectedColumns: [],
-  selectedGroupByColumns: [],
-  orderByColumn: undefined,
-  orderByDirection: "asc",
-  vizConfig: makeDefaultVizConfig("table"),
+const DEFAULTS = {
+  aggregations: {} as Record<string, QueryAggregationType>,
+  selectedDatasetId: undefined as DatasetId | undefined,
+  selectedColumns: [] as readonly DatasetColumn[],
+  selectedGroupByColumns: [] as readonly DatasetColumn[],
+  orderByColumn: undefined as DatasetColumn | undefined,
+  orderByDirection: "asc" as const,
+  vizConfig: makeDefaultVizConfig("table") as VizConfig,
 };
 
 export function DataExplorerProvider({
   children,
 }: {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }): JSX.Element {
   const [aggregations, setAggregations] = useState(DEFAULTS.aggregations);
   const [selectedDatasetId, setSelectedDatasetId] = useState<
@@ -82,17 +50,17 @@ export function DataExplorerProvider({
     setVizConfig(makeDefaultVizConfig("table"));
   }, []);
 
-  const onSelectDatasetChange = useCallback(
-    (id: DatasetId | undefined) => {
-      if (id !== selectedDatasetId) {
+  const selectDataset = useCallback(
+    (newValue: DatasetId | undefined) => {
+      if (newValue !== selectedDatasetId) {
         reset();
       }
-      setSelectedDatasetId(id);
+      setSelectedDatasetId(newValue);
     },
     [selectedDatasetId, reset],
   );
 
-  const value = useMemo(() => {
+  const value = useMemo((): DataExplorerContextType => {
     return {
       aggregations,
       selectedDatasetId,
@@ -108,9 +76,9 @@ export function DataExplorerProvider({
       setOrderByColumn,
       setOrderByDirection,
       setVizConfig,
-      onSelectDatasetChange,
+      selectDataset,
       reset,
-    } satisfies DataExplorerContextType;
+    };
   }, [
     aggregations,
     selectedDatasetId,
@@ -119,7 +87,7 @@ export function DataExplorerProvider({
     orderByColumn,
     orderByDirection,
     vizConfig,
-    onSelectDatasetChange,
+    selectDataset,
     reset,
   ]);
 

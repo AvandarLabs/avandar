@@ -4,6 +4,7 @@ import { ReactNode, useEffect, useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNotNullOrUndefined } from "@/lib/utils/guards";
+import { makeObjectFromList } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { DatasetId, DatasetWithColumns } from "@/models/datasets/Dataset";
 import {
@@ -70,10 +71,7 @@ export function DatasetColumnMultiSelect({
       return ds.columns;
     });
 
-    const lookup = new Map<DatasetColumnId, DatasetColumn>();
-    for (const col of cols) {
-      lookup.set(col.id as DatasetColumnId, col);
-    }
+    const lookup = makeObjectFromList(cols, { keyFn: getProp("id") });
 
     return {
       fieldGroupOptions: grouped,
