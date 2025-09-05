@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { UnknownDataFrame } from "@/lib/types/common";
 =======
 import type { UnknownDataFrame } from "@/lib/types/common";
@@ -7,6 +8,10 @@ import type { UnknownDataFrame } from "@/lib/types/common";
 
 =======
 >>>>>>> b526f1e (accepted all PR suggestions)
+=======
+import { UnknownDataFrame } from "@/lib/types/common";
+
+>>>>>>> 212b3a4 (fixed more type issues)
 export type XYSettings = {
   xAxisKey: string;
   yAxisKey: string;
@@ -24,6 +29,7 @@ export type XYChartProps = {
   xAxisKey: string;
   yAxisKey: string;
   height: number;
+<<<<<<< HEAD
 };
 =======
 =======
@@ -44,5 +50,7 @@ export type ChartType = "bar" | "line";
 =======
   data: Array<Record<string, unknown>>;
   settings: XYSettings;
+=======
+>>>>>>> 212b3a4 (fixed more type issues)
 };
 >>>>>>> b526f1e (accepted all PR suggestions)
