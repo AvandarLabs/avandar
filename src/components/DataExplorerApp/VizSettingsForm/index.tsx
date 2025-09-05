@@ -19,14 +19,6 @@ const VIZ_TYPES: VizTypeMetadata[] = [
   { type: "line", displayName: "Line Chart" },
 ];
 
-type VizTypeMetadata = { type: VizType; displayName: string };
-
-const VIZ_TYPES: VizTypeMetadata[] = [
-  { type: "table", displayName: "Table" },
-  { type: "bar", displayName: "Bar Chart" },
-  { type: "line", displayName: "Line Chart" },
-];
-
 export type Props = {
   fields: readonly QueryResultField[];
   vizConfig: VizConfig;
