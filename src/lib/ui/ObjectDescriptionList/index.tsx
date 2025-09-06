@@ -5,7 +5,6 @@ import { objectKeys, pick } from "@/lib/utils/objects/misc";
 import { camelToTitleCase } from "@/lib/utils/strings/transformations";
 import { DescriptionList } from "../DescriptionList";
 import { DescribableValueArrayBlockProps } from "./DescribableValueArrayBlock";
-import { isPrimitiveDescribableValue } from "./guards";
 import {
   AnyDescribableValueRenderOptions,
   DescribableObject,
@@ -48,12 +47,12 @@ export function ObjectDescriptionListBlock<
     PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
   );
 
-  const dataToRender = getValue ? getValue(data, rootData) : data;
-  if (isPrimitiveDescribableValue(dataToRender)) {
+  if (getValue !== undefined) {
+    const objAsPrimitiveValue = getValue(data, rootData);
     return (
       <ValueItemContainer
         type="primitive"
-        value={dataToRender}
+        value={objAsPrimitiveValue}
         rootData={rootData}
         {...parentPrimitiveValueRenderOptions}
       />
