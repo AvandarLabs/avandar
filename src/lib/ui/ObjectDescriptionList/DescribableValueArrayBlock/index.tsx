@@ -10,6 +10,7 @@ import {
   DescribableObject,
   DescribableValue,
   DescribableValueArrayRenderOptions,
+  GenericRootData,
   PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
   PrimitiveValue,
   PrimitiveValueRenderOptions,
@@ -18,38 +19,45 @@ import { NestedArraysBlock } from "./NestedArraysBlock";
 import { ObjectArrayBlock } from "./ObjectArrayBlock";
 import { PrimitiveFieldValueArrayBlock } from "./PrimitiveFieldValueArrayBlock";
 
-type Props<T extends DescribableValue> = {
+type Props<T extends DescribableValue, RootData extends GenericRootData> = {
   data: readonly DescribableValue[];
-} & DescribableValueArrayRenderOptions<T>;
+  rootData: RootData;
+} & DescribableValueArrayRenderOptions<T, RootData>;
+export type { Props as DescribableValueArrayBlockProps };
 
 /**
  * Renders an array of potentially mixed describable values, so it
  * splits it between primitive values, object values, and array values.
  */
-export function DescribableValueArrayBlock<T extends DescribableValue>({
+export function DescribableValueArrayBlock<
+  T extends DescribableValue,
+  RootData extends GenericRootData,
+>({
   data,
+  rootData,
   renderEmptyArray = "There are no values",
   renderArray,
   maxHeight,
   maxItemsCount,
   ...moreRenderOptions
-}: Props<T>): JSX.Element {
-  // Split between entity objects, arrays, and primitive values
-  const [entityObjects, valueArrays, primitiveValues] = useMemo(() => {
-    const entities: DescribableObject[] = [];
-    const arrays: Array<readonly DescribableValue[]> = [];
-    const primitives: PrimitiveValue[] = [];
-    data.forEach((v) => {
-      if (isPrimitiveFieldValue(v)) {
-        primitives.push(v);
-      } else if (isDescribableValueArray(v)) {
-        arrays.push(v);
-      } else {
-        entities.push(v);
-      }
-    });
-    return [entities, arrays, primitives];
-  }, [data]);
+}: Props<T, RootData>): JSX.Element {
+  // Split between objects, arrays, and primitive values
+  const [describableObjects, describableValueArrays, primitiveValues] =
+    useMemo(() => {
+      const objs: DescribableObject[] = [];
+      const arrays: Array<readonly DescribableValue[]> = [];
+      const primitives: PrimitiveValue[] = [];
+      data.forEach((v) => {
+        if (isPrimitiveFieldValue(v)) {
+          primitives.push(v);
+        } else if (isDescribableValueArray(v)) {
+          arrays.push(v);
+        } else {
+          objs.push(v);
+        }
+      });
+      return [objs, arrays, primitives];
+    }, [data]);
 
   if (data.length === 0) {
     if (isStringOrNumber(renderEmptyArray)) {
@@ -64,7 +72,7 @@ export function DescribableValueArrayBlock<T extends DescribableValue>({
 
   // compute the render options for each block
   const parentPrimitiveRenderOptions = pick(
-    moreRenderOptions as PrimitiveValueRenderOptions<PrimitiveValue>,
+    moreRenderOptions as PrimitiveValueRenderOptions<PrimitiveValue, RootData>,
     PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
   );
 
@@ -73,26 +81,32 @@ export function DescribableValueArrayBlock<T extends DescribableValue>({
     ...moreRenderOptions,
   };
 
+  const customRenderedArrayContent =
+    renderArray ? renderArray(data as readonly T[], rootData) : undefined;
+
   const contentBlock =
-    renderArray ?
-      renderArray(data as readonly T[])
-    : <Stack>
+    customRenderedArrayContent === undefined ?
+      <Stack>
         <PrimitiveFieldValueArrayBlock
           values={primitiveValues}
           maxItemsCount={maxItemsCount}
+          rootData={rootData}
           {...parentPrimitiveRenderOptions}
         />
         <ObjectArrayBlock
-          values={entityObjects}
+          values={describableObjects}
           maxItemsCount={maxItemsCount}
+          rootData={rootData}
           {...objectArrayOrNestedArrayRenderOptions}
         />
         <NestedArraysBlock
-          values={valueArrays}
+          values={describableValueArrays}
           maxItemsCount={maxItemsCount}
+          rootData={rootData}
           {...objectArrayOrNestedArrayRenderOptions}
         />
-      </Stack>;
+      </Stack>
+    : customRenderedArrayContent;
 
   if (maxHeight === undefined) {
     return <>{contentBlock}</>;
@@ -104,6 +118,3 @@ export function DescribableValueArrayBlock<T extends DescribableValue>({
     </ScrollArea.Autosize>
   );
 }
-
-export type DescribableValueArrayBlockProps<T extends DescribableValue> =
-  Props<T>;

@@ -2,17 +2,26 @@ import { Text } from "@mantine/core";
 import { formatDate } from "@/lib/utils/formatters/formatDate";
 import { isDate } from "@/lib/utils/guards";
 import { isStringOrNumber } from "./guards";
-import type { PrimitiveValue, PrimitiveValueRenderOptions } from "./types";
+import type {
+  GenericRootData,
+  PrimitiveValue,
+  PrimitiveValueRenderOptions,
+} from "./types";
 
-type Props<T extends PrimitiveValue> = {
+type Props<T extends PrimitiveValue, RootData extends GenericRootData> = {
   value: T;
-} & PrimitiveValueRenderOptions<T>;
+  rootData: RootData;
+} & PrimitiveValueRenderOptions<T, RootData>;
 
 /**
  * Render a primitive value. Primitive values are not recursive.
  */
-export function PrimitiveValueItem<T extends PrimitiveValue>({
+export function PrimitiveValueItem<
+  T extends PrimitiveValue,
+  RootData extends GenericRootData,
+>({
   value,
+  rootData,
   renderValue = undefined,
   renderEmptyString = "Empty text",
   renderBooleanTrue = "Yes",
@@ -20,9 +29,14 @@ export function PrimitiveValueItem<T extends PrimitiveValue>({
   renderNullString = "No value",
   renderUndefinedString = "No value",
   dateFormat,
-}: Props<T>): JSX.Element {
+}: Props<T, RootData>): JSX.Element {
   if (renderValue !== undefined) {
-    return <>{renderValue(value)}</>;
+    const customRenderedValue = renderValue(value, rootData);
+    if (customRenderedValue !== undefined) {
+      // only use the returned value if it's not `undefined`, which we use
+      // to signal a no-op
+      return <>{renderValue(value, rootData)}</>;
+    }
   }
 
   if (value === null) {

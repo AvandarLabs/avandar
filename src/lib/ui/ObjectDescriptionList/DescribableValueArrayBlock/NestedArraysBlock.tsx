@@ -1,19 +1,30 @@
 import { Fieldset, Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
-import { DescribableValue, NestedArrayRenderOptions } from "../types";
+import {
+  DescribableValue,
+  DescribableValueArrayRenderOptions,
+  GenericRootData,
+  NestedArrayRenderOptions,
+} from "../types";
 import { ValueItemContainer } from "../ValueItemContainer";
 
-type Props<T extends DescribableValue> = {
+type Props<T extends DescribableValue, RootData extends GenericRootData> = {
   /** Array of arrays of field values */
   values: ReadonlyArray<readonly T[]>;
   maxItemsCount?: number;
-} & NestedArrayRenderOptions<T>;
+  rootData: RootData;
+} & NestedArrayRenderOptions<T, RootData>;
 
-export function NestedArraysBlock<T extends DescribableValue>({
+export function NestedArraysBlock<
+  T extends DescribableValue,
+  RootData extends GenericRootData,
+>({
   values,
+  rootData,
   maxItemsCount,
-  ...renderOptions
-}: Props<T>): JSX.Element | null {
+  itemRenderOptions,
+  ...primitiveRenderValueOptions
+}: Props<T, RootData>): JSX.Element | null {
   const valuesToRender = useMemo(() => {
     return maxItemsCount === undefined ? values : (
         values.slice(0, maxItemsCount)
@@ -29,6 +40,11 @@ export function NestedArraysBlock<T extends DescribableValue>({
       <Text>... and {values.length - valuesToRender.length} more</Text>
     : null;
 
+  const arrayItemRenderOptions = {
+    ...primitiveRenderValueOptions,
+    ...itemRenderOptions,
+  } as DescribableValueArrayRenderOptions<T, RootData>;
+
   // TODO(jpsyx): use a stable key
   return (
     <Stack>
@@ -38,7 +54,11 @@ export function NestedArraysBlock<T extends DescribableValue>({
             <ValueItemContainer
               type="array"
               value={valueArray}
-              {...renderOptions}
+              rootData={rootData}
+              {...(arrayItemRenderOptions as DescribableValueArrayRenderOptions<
+                DescribableValue,
+                RootData
+              >)}
             />
           </Fieldset>
         );
