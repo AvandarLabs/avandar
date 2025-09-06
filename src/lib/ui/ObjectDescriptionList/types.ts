@@ -46,7 +46,7 @@ type DescribableObjectOf<T extends DescribableValue> = {
  */
 export type PrimitiveValueRenderOptions<
   T extends PrimitiveValue,
-  RootData extends GenericRootData,
+  RootData extends GenericRootData | undefined,
 > = {
   /**
    * A custom render function for the value. If provided, this will take
@@ -113,6 +113,17 @@ export type ObjectRenderOptions<
   T extends NonNullable<DescribableObject>,
   RootData extends GenericRootData,
 > = PrimitiveValueRenderOptions<PrimitiveValue, RootData> & {
+  /**
+   * This function is used to transform the entire object to a different
+   * value. The
+   * If provided, this will take precedence over any other render options.
+   *
+   * @param obj The object to render
+   * @param rootData The root data of the object description list
+   * @returns The value to render
+   */
+  getValue?: (obj: T, rootData: RootData) => ReactNode;
+
   /**
    * A custom render function for the object. If provided, this will take
    * precedence over any other render options.

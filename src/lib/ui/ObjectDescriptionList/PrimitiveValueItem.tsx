@@ -8,9 +8,21 @@ import type {
   PrimitiveValueRenderOptions,
 } from "./types";
 
-type Props<T extends PrimitiveValue, RootData extends GenericRootData> = {
+type Props<
+  T extends PrimitiveValue,
+  RootData extends GenericRootData | undefined,
+> = {
   value: T;
-  rootData: RootData;
+
+  /**
+   * Data that gets passed into the `renderValue` function, if provided.
+   * This prop gets auto-filled when this component is used recursively
+   * within `ObjectDescriptionList`.
+   *
+   * If `PrimitiveValueItem` is being used directly, this prop does not
+   * need to be passed in.
+   */
+  rootData?: RootData;
 } & PrimitiveValueRenderOptions<T, RootData>;
 
 /**
@@ -18,10 +30,10 @@ type Props<T extends PrimitiveValue, RootData extends GenericRootData> = {
  */
 export function PrimitiveValueItem<
   T extends PrimitiveValue,
-  RootData extends GenericRootData,
+  RootData extends GenericRootData | undefined,
 >({
   value,
-  rootData,
+  rootData = undefined,
   renderValue = undefined,
   renderEmptyString = "Empty text",
   renderBooleanTrue = "Yes",
@@ -31,11 +43,11 @@ export function PrimitiveValueItem<
   dateFormat,
 }: Props<T, RootData>): JSX.Element {
   if (renderValue !== undefined) {
-    const customRenderedValue = renderValue(value, rootData);
+    const customRenderedValue = renderValue(value, rootData as RootData);
     if (customRenderedValue !== undefined) {
       // only use the returned value if it's not `undefined`, which we use
       // to signal a no-op
-      return <>{renderValue(value, rootData)}</>;
+      return <>{customRenderedValue}</>;
     }
   }
 
