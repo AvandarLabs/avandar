@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { ConditionalKeys } from "type-fest";
 import { Registry, StringKeyOf } from "@/lib/types/utilityTypes";
 import { objectKeys } from "@/lib/utils/objects/misc";
 
@@ -114,9 +115,13 @@ export type ObjectRenderOptions<
   RootData extends GenericRootData,
 > = PrimitiveValueRenderOptions<PrimitiveValue, RootData> & {
   /**
-   * This function is used to transform the entire object to a renderable
-   * primitive value. The value returned by this function will be rendered
-   * using the primitive value render options.
+   * This function or key is used to transform the entire object to a
+   * renderable primitive value. The value returned by this function will be
+   * rendered using the primitive value render options.
+   *
+   * `getRenderableValue` can either be a function or the object key
+   * that will be used to extract the renderable value for this object.
+   * The value must be a PrimitiveValue.
    *
    * If passed, the object will no longer be traversed to render any
    * child items. The returned primitive value is considered the final
@@ -126,7 +131,9 @@ export type ObjectRenderOptions<
    * @param rootData The root data of the object description list
    * @returns The value to render
    */
-  getValue?: (obj: T, rootData: RootData) => PrimitiveValue;
+  getRenderableValue?:
+    | ConditionalKeys<T, PrimitiveValue>
+    | ((obj: T, rootData: RootData) => PrimitiveValue);
 
   /**
    * A custom render function for the object. If provided, this will take

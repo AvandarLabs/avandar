@@ -12,6 +12,7 @@ import {
   GenericRootData,
   ObjectRenderOptions,
   PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
+  PrimitiveValue,
 } from "./types";
 import { ValueItemContainer } from "./ValueItemContainer";
 
@@ -32,7 +33,7 @@ export function ObjectDescriptionListBlock<
   rootData,
   excludeKeys = [],
   maxHeight,
-  getValue,
+  getRenderableValue,
   renderObject,
   renderObjectKeyValue,
   renderObjectKeyLabel,
@@ -47,8 +48,11 @@ export function ObjectDescriptionListBlock<
     PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
   );
 
-  if (getValue !== undefined) {
-    const objAsPrimitiveValue = getValue(data, rootData);
+  if (getRenderableValue !== undefined) {
+    const objAsPrimitiveValue =
+      typeof getRenderableValue === "function" ?
+        getRenderableValue(data, rootData)
+      : (data[getRenderableValue] as PrimitiveValue);
     return (
       <ValueItemContainer
         type="primitive"
