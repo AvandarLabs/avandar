@@ -17,10 +17,14 @@ type Props<
   /**
    * Data that gets passed into the `renderValue` function, if provided.
    * This prop gets auto-filled when this component is used recursively
-   * within `ObjectDescriptionList`.
+   * within an `ObjectDescriptionList` hierarchy.
    *
-   * If `PrimitiveValueItem` is being used directly, this prop does not
-   * need to be passed in.
+   * If `PrimitiveValueItem` is being used directly, outsiede of an
+   * `ObjectDescriptionList` hierarchy, this prop does not need to be
+   * passed in.
+   *
+   * TODO(jpsyx): this is a good indication that we should add `rootData`
+   * into a Context held by the `ObjectDescriptionList` component.
    */
   rootData?: RootData;
 } & PrimitiveValueRenderOptions<T, RootData>;

@@ -114,15 +114,19 @@ export type ObjectRenderOptions<
   RootData extends GenericRootData,
 > = PrimitiveValueRenderOptions<PrimitiveValue, RootData> & {
   /**
-   * This function is used to transform the entire object to a different
-   * value. The
-   * If provided, this will take precedence over any other render options.
+   * This function is used to transform the entire object to a renderable
+   * primitive value. The value returned by this function will be rendered
+   * using the primitive value render options.
+   *
+   * If passed, the object will no longer be traversed to render any
+   * child items. The returned primitive value is considered the final
+   * value to render for this object.
    *
    * @param obj The object to render
    * @param rootData The root data of the object description list
    * @returns The value to render
    */
-  getValue?: (obj: T, rootData: RootData) => ReactNode;
+  getValue?: (obj: T, rootData: RootData) => PrimitiveValue;
 
   /**
    * A custom render function for the object. If provided, this will take

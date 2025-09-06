@@ -5,7 +5,7 @@ import { DescribableValueArrayBlock } from "./DescribableValueArrayBlock";
 import {
   isDescribableObject,
   isDescribableValueArray,
-  isPrimitiveFieldValue,
+  isPrimitiveDescribableValue,
 } from "./guards";
 import { PrimitiveValueItem } from "./PrimitiveValueItem";
 import {
@@ -90,7 +90,7 @@ export function ValueItemContainer<RootData extends GenericRootData>(
       ({ type, value, rootData, ...renderOptions }) => {
         // if no explicit type was passed, we rely on narrowing the type from
         // the `value` itself
-        if (isPrimitiveFieldValue(value)) {
+        if (isPrimitiveDescribableValue(value)) {
           return (
             <PrimitiveValueItem
               value={value}

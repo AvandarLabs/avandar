@@ -5,6 +5,7 @@ import { objectKeys, pick } from "@/lib/utils/objects/misc";
 import { camelToTitleCase } from "@/lib/utils/strings/transformations";
 import { DescriptionList } from "../DescriptionList";
 import { DescribableValueArrayBlockProps } from "./DescribableValueArrayBlock";
+import { isPrimitiveDescribableValue } from "./guards";
 import {
   AnyDescribableValueRenderOptions,
   DescribableObject,
@@ -32,6 +33,7 @@ export function ObjectDescriptionListBlock<
   rootData,
   excludeKeys = [],
   maxHeight,
+  getValue,
   renderObject,
   renderObjectKeyValue,
   renderObjectKeyLabel,
@@ -40,6 +42,23 @@ export function ObjectDescriptionListBlock<
   const excludeKeySet: ReadonlySet<StringKeyOf<T>> = useMemo(() => {
     return new Set(excludeKeys);
   }, [excludeKeys]);
+
+  const parentPrimitiveValueRenderOptions = pick(
+    renderOptions,
+    PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
+  );
+
+  const dataToRender = getValue ? getValue(data, rootData) : data;
+  if (isPrimitiveDescribableValue(dataToRender)) {
+    return (
+      <ValueItemContainer
+        type="primitive"
+        value={dataToRender}
+        rootData={rootData}
+        {...parentPrimitiveValueRenderOptions}
+      />
+    );
+  }
 
   const customRenderedObject =
     renderObject ? renderObject(data, rootData) : undefined;
@@ -66,10 +85,6 @@ export function ObjectDescriptionListBlock<
             : undefined;
 
           // compute the child's render options to pass down
-          const parentPrimitiveValueRenderOptions = pick(
-            renderOptions,
-            PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
-          );
           const childRenderOptions = {
             ...parentPrimitiveValueRenderOptions,
 

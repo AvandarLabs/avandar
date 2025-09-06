@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { pick } from "@/lib/utils/objects/misc";
 import {
   isDescribableValueArray,
-  isPrimitiveFieldValue,
+  isPrimitiveDescribableValue,
   isStringOrNumber,
 } from "../guards";
 import {
@@ -48,7 +48,7 @@ export function DescribableValueArrayBlock<
       const arrays: Array<readonly DescribableValue[]> = [];
       const primitives: PrimitiveValue[] = [];
       data.forEach((v) => {
-        if (isPrimitiveFieldValue(v)) {
+        if (isPrimitiveDescribableValue(v)) {
           primitives.push(v);
         } else if (isDescribableValueArray(v)) {
           arrays.push(v);
