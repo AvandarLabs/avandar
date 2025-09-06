@@ -206,7 +206,7 @@ export type ObjectRenderOptions<
    * to all items.
    */
   itemRenderOptions?: [T] extends (
-    [[DescribableObjectOf<infer Item extends DescribableObject>]]
+    [DescribableObjectOf<infer Item extends DescribableObject>]
   ) ?
     ObjectRenderOptions<Item, RootData>
   : [T] extends [ReadonlyArray<infer Item extends DescribableValue>] ?
