@@ -1,5 +1,5 @@
 import { useUncontrolled } from "@mantine/hooks";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
 import { Select, SelectOption } from "@/lib/ui/inputs/Select";
 import { DatasetColumn } from "@/models/datasets/DatasetColumn";
@@ -27,17 +27,19 @@ export function AggregationSelect({
   defaultValue = "none",
   onChange,
 }: Props): JSX.Element {
-  const validSet = useMemo(() => {
+  const validAggregations = useMemo(() => {
     return new Set(getValidQueryAggregationsByType(column.dataType));
   }, [column.dataType]);
 
-  const data = AGGREGATION_OPTIONS.filter((opt) => {
-    return validSet.has(opt.value) || opt.value === "none";
-  });
+  const aggregationOptions = useMemo(() => {
+    return AGGREGATION_OPTIONS.filter((opt) => {
+      return validAggregations.has(opt.value) || opt.value === "none";
+    });
+  }, [validAggregations]);
 
   // Controlled if `value` is provided,
   // otherwise uncontrolled with internal state.
-  const [currentColumns, setCurrentColumns] =
+  const [currentAggregations, setCurrentAggregations] =
     useUncontrolled<QueryAggregationType>({
       value,
       defaultValue,
@@ -45,14 +47,13 @@ export function AggregationSelect({
       onChange,
     });
 
-  // If the column type changes and the s
-  // electedValue aggregation becomes invalid,
-  // coerce it to "none" (and notify parent if controlled).
-  useEffect(() => {
-    if (currentColumns !== "none" && !validSet.has(currentColumns)) {
-      setCurrentColumns("none");
-    }
-  }, [currentColumns, column.dataType, validSet, setCurrentColumns]);
+  const aggregationToUse =
+    (
+      currentAggregations !== "none" &&
+      !validAggregations.has(currentAggregations)
+    ) ?
+      "none"
+    : currentAggregations;
 
   return (
     <Select
@@ -60,11 +61,11 @@ export function AggregationSelect({
       key={column.id}
       label={column.name}
       placeholder="Select aggregation"
-      data={data}
-      value={currentColumns}
+      data={aggregationOptions}
+      value={aggregationToUse}
       onChange={(newValue) => {
         if (newValue) {
-          setCurrentColumns(newValue);
+          setCurrentAggregations(newValue);
         }
       }}
     />
