@@ -137,6 +137,26 @@ export function QueryForm({
             onGroupByChange(cols);
           }}
         />
+        <Box mb="md" mt="md">
+          <Select
+            label="Select field"
+            placeholder="Select field"
+            data={selectedColumns.map((f) => {
+              return {
+                value: f.name,
+                label: f.name,
+              };
+            })}
+            value={orderByColumn?.name}
+            onChange={(fieldName) => {
+              const selected = selectedColumns.find((f) => {
+                return f.name === fieldName;
+              });
+              onOrderByColumnChange(selected);
+            }}
+            clearable
+          />
+
 
         <Select
           label="Order field"
