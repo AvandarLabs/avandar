@@ -2,10 +2,8 @@ import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient";
-import { DescriptionList } from "@/lib/ui/DescriptionList";
-import { SourceBadge } from "@/lib/ui/Icons/SourceBadge";
+import { SourceBadge } from "@/components/common/SourceBadge";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
-import { ValueItemContainer } from "@/lib/ui/ObjectDescriptionList/ValueItemContainer";
 import { Paper } from "@/lib/ui/Paper";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNotNullOrUndefined } from "@/lib/utils/guards";
@@ -144,7 +142,7 @@ type Props = {
   entity: Entity;
 };
 
-type FieldValueUI = {
+type FieldValueMetadata = {
   value: EntityFieldValue["value"];
   sourceType?: DatasetSourceType;
   sourceName?: string;
@@ -158,7 +156,7 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
 
   const [entityMetadata, fieldValues] = useMemo(() => {
     // convert the field values array into a record
-    const fieldValuesRecord: Record<string, FieldValueUI> | undefined =
+    const fieldValuesRecord: Record<string, FieldValueMetadata> | undefined =
       hydratedEntity.fieldValues ?
         makeObjectFromList(hydratedEntity.fieldValues, {
           keyFn: (fieldValue) => {
@@ -209,32 +207,25 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
             <Title order={4}>Data</Title>
             {fieldValues === undefined ?
               <Loader />
-            : <DescriptionList>
-                {Object.entries(fieldValues).map(
-                  ([label, { value, sourceType, sourceName }]) => {
-                    return (
-                      <DescriptionList.Item
-                        key={label}
-                        label={
-                          <Group gap="xs" wrap="nowrap" align="center">
-                            <SourceBadge
-                              sourceType={sourceType}
-                              sourceName={sourceName}
-                            />
-                            <Text fw={500}>{label}</Text>
-                          </Group>
-                        }
-                      >
-                        <ValueItemContainer
-                          type="unknown"
-                          value={value}
-                          dateFormat="MMMM D, YYYY"
-                        />
-                      </DescriptionList.Item>
-                    );
-                  },
-                )}
-              </DescriptionList>
+            : <ObjectDescriptionList
+                data={fieldValues}
+                dateFormat="MMMM D, YYYY"
+                renderObjectKeyLabel={(key, obj) => {
+                  const { sourceType, sourceName } = obj[key]!;
+                  return (
+                    <Group gap="xs" wrap="nowrap" align="center">
+                      <SourceBadge
+                        sourceType={sourceType}
+                        sourceName={sourceName}
+                      />
+                      <Text fw={500}>{key}</Text>
+                    </Group>
+                  );
+                }}
+                itemRenderOptions={{
+                  getRenderableValue: "value",
+                }}
+              />
             }
 
             <ActivityBlock />

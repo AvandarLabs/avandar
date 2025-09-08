@@ -35,14 +35,6 @@ export function SourceBadge({
         tooltip: "From Google Sheets",
       };
     })
-    // .with("airtable", () => {
-    //   return {
-    //     Icon: (props: React.ComponentProps<typeof IconBrandAirtable>) => {
-    //       return <IconBrandAirtable {...props} color="#fcb400" />;
-    //     },
-    //     tooltip: "From Airtable",
-    //   };
-    // })
     .otherwise(() => {
       return {
         Icon: (props: React.ComponentProps<typeof IconTable>) => {
