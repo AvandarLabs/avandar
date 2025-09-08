@@ -6,7 +6,7 @@ import { useState } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
-import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
+import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
 import { Paper } from "@/lib/ui/Paper";
 import { hasDefinedProps } from "@/lib/utils/guards";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
@@ -24,7 +24,7 @@ const EXCLUDED_ENTITY_CONFIG_KEYS = [
   "datasets",
   "workspaceId",
 ] as const;
-const ENTITY_CONFIG_RENDER_OPTIONS: ChildRenderOptionsMap<
+const ENTITY_CONFIG_RENDER_OPTIONS: ObjectKeyRenderOptionsMap<
   EntityConfig<"Full">
 > = {
   fields: {
@@ -32,7 +32,7 @@ const ENTITY_CONFIG_RENDER_OPTIONS: ChildRenderOptionsMap<
     defaultExpanded: false,
     itemRenderOptions: {
       excludeKeys: ["id", "entityConfigId"],
-      childRenderOptions: {
+      keyRenderOptions: {
         options: {
           excludeKeys: ["class"],
         },
@@ -102,7 +102,7 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
           <ObjectDescriptionList
             data={fullEntityConfig}
             excludeKeys={EXCLUDED_ENTITY_CONFIG_KEYS}
-            childRenderOptions={ENTITY_CONFIG_RENDER_OPTIONS}
+            keyRenderOptions={ENTITY_CONFIG_RENDER_OPTIONS}
           />
 
           <Button

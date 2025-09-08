@@ -24,7 +24,7 @@ import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
-import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
+import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
 import { Paper } from "@/lib/ui/Paper";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
@@ -52,7 +52,7 @@ const DATASET_METADATA_RENDER_OPTIONS = {
       excludeKeys: ["id"],
     },
   },
-} satisfies ChildRenderOptionsMap<DatasetWithColumns>;
+} satisfies ObjectKeyRenderOptionsMap<DatasetWithColumns>;
 
 type DatasetTabId = "dataset-metadata" | "dataset-summary";
 
@@ -190,7 +190,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                 <ObjectDescriptionList
                   data={datasetWithColumns}
                   excludeKeys={EXCLUDED_DATASET_METADATA_KEYS}
-                  childRenderOptions={DATASET_METADATA_RENDER_OPTIONS}
+                  keyRenderOptions={DATASET_METADATA_RENDER_OPTIONS}
                 />
 
                 <Title order={5}>Data preview</Title>

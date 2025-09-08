@@ -1,7 +1,7 @@
 import { isArray, isPlainObject } from "@/lib/utils/guards";
 import { DescribableObject, DescribableValue, PrimitiveValue } from "./types";
 
-export function isPrimitiveFieldValue(
+export function isPrimitiveDescribableValue(
   value: DescribableValue,
 ): value is PrimitiveValue {
   return (
@@ -14,7 +14,7 @@ export function isPrimitiveFieldValue(
   );
 }
 
-export function isFieldValueArray(
+export function isDescribableValueArray(
   value: DescribableValue,
 ): value is readonly DescribableValue[] {
   return isArray(value);

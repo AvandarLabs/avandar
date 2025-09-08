@@ -1,18 +1,27 @@
 import { Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
 import { PrimitiveValueItem } from "../PrimitiveValueItem";
-import { PrimitiveValue, PrimitiveValueRenderOptions } from "../types";
+import {
+  GenericRootData,
+  PrimitiveValue,
+  PrimitiveValueRenderOptions,
+} from "../types";
 
-type Props<T extends PrimitiveValue> = {
+type Props<T extends PrimitiveValue, RootData extends GenericRootData> = {
   values: readonly T[];
   maxItemsCount?: number;
-} & PrimitiveValueRenderOptions;
+  rootData: RootData;
+} & PrimitiveValueRenderOptions<T, RootData>;
 
-export function PrimitiveFieldValueArrayBlock<T extends PrimitiveValue>({
+export function PrimitiveFieldValueArrayBlock<
+  T extends PrimitiveValue,
+  RootData extends GenericRootData,
+>({
   values,
   maxItemsCount,
+  rootData,
   ...renderOptions
-}: Props<T>): JSX.Element | null {
+}: Props<T, RootData>): JSX.Element | null {
   const valuesToRender = useMemo(() => {
     return maxItemsCount === undefined ? values : (
         values.slice(0, maxItemsCount)
@@ -32,7 +41,14 @@ export function PrimitiveFieldValueArrayBlock<T extends PrimitiveValue>({
   return (
     <Stack>
       {valuesToRender.map((v, idx) => {
-        return <PrimitiveValueItem key={idx} value={v} {...renderOptions} />;
+        return (
+          <PrimitiveValueItem
+            key={idx}
+            value={v}
+            rootData={rootData}
+            {...renderOptions}
+          />
+        );
       })}
       {moreText}
     </Stack>
