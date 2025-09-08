@@ -8,6 +8,7 @@ import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ValueItemContainer } from "@/lib/ui/ObjectDescriptionList/ValueItemContainer";
 import { Paper } from "@/lib/ui/Paper";
 import { where } from "@/lib/utils/filters/filterBuilders";
+import { isNotNullOrUndefined } from "@/lib/utils/guards";
 import { makeMapFromList } from "@/lib/utils/maps/builders";
 import { makeObjectFromList } from "@/lib/utils/objects/builders";
 import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
@@ -55,17 +56,13 @@ function useHydratedEntity({
     EntityFieldValueClient.useGetAll(where("entity_id", "eq", entity.id));
 
   const datasetIds = useMemo(() => {
-    return Array.from(
-      new Set(
+    return [
+      ...new Set(
         (entityFieldValues ?? [])
-          .map((value) => {
-            return value.datasetId;
-          })
-          .filter((isDataset) => {
-            return Boolean(isDataset);
-          }),
+          .map(getProp("datasetId"))
+          .filter(isNotNullOrUndefined),
       ),
-    );
+    ];
   }, [entityFieldValues]);
 
   const [datasets] = DatasetClient.useGetAll(where("id", "in", datasetIds));
