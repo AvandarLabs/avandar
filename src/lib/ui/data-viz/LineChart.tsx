@@ -1,8 +1,8 @@
-import { BarChart as MantineBarChart } from "@mantine/charts";
+import { LineChart as MantineLineChart } from "@mantine/charts";
 import { useMemo } from "react";
 import { XYChartProps } from "./ChartTypes";
 
-export function BarChart({
+export function LineChart({
   data,
   xAxisKey,
   yAxisKey,
@@ -13,7 +13,7 @@ export function BarChart({
   }, [yAxisKey]);
 
   return (
-    <MantineBarChart
+    <MantineLineChart
       h={height}
       data={data}
       dataKey={xAxisKey}
