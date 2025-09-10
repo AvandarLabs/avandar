@@ -1,8 +1,12 @@
+// VizSettingsForm/BarChartForm.tsx
 import { useMemo } from "react";
 import { QueryResultField } from "@/clients/LocalDatasetQueryClient";
+import { UnknownDataFrame } from "@/lib/types/common";
+import { CHART_REQUIREMENTS } from "@/lib/ui/data-viz/requirements/chartRequirements";
+import { useXYFieldGuards } from "@/lib/ui/data-viz/requirements/useXYFieldGuards";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
+import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 
 export type BarChartSettings = {
   xAxisKey: string | undefined;
@@ -11,63 +15,81 @@ export type BarChartSettings = {
 
 type Props = {
   fields: readonly QueryResultField[];
+  data: UnknownDataFrame; // ← added in Step 3 already
   settings: BarChartSettings;
   onSettingsChange: (settings: BarChartSettings) => void;
 };
 
 export function BarChartForm({
   fields,
+  data,
   settings,
   onSettingsChange,
 }: Props): JSX.Element {
-  const fieldOptions = useMemo(() => {
-    return makeSelectOptions(fields, {
-      valueFn: getProp("name"),
-      labelFn: getProp("name"),
-    });
-  }, [fields]);
+  const {
+    allowedXAxisNames,
+    allowedYAxisNames,
+    isXAxisDisabled,
+    isYAxisDisabled,
+    xAxisPlaceholder,
+    yAxisPlaceholder,
+  } = useXYFieldGuards({
+    fields,
+    data,
+    requirements: CHART_REQUIREMENTS.bar,
+  });
 
-  const numericFieldOptions = useMemo(() => {
-    return makeSelectOptions(fields.filter(propEquals("dataType", "number")), {
-      valueFn: getProp("name"),
-      labelFn: getProp("name"),
-    });
-  }, [fields]);
+  const xAxisOptions = useMemo(() => {
+    return makeSelectOptions(
+      fields.filter((f) => {
+        return allowedXAxisNames.includes(f.name);
+      }),
+      { valueFn: getProp("name"), labelFn: getProp("name") },
+    );
+  }, [fields, allowedXAxisNames]);
 
-  const { xAxisKey, yAxisKey } = settings;
+  const yAxisOptions = useMemo(() => {
+    return makeSelectOptions(
+      fields.filter((f) => {
+        return allowedYAxisNames.includes(f.name);
+      }),
+      { valueFn: getProp("name"), labelFn: getProp("name") },
+    );
+  }, [fields, allowedYAxisNames]);
 
   return (
     <>
       <Select
+        key={`x-${allowedXAxisNames.join("|")}`}
         allowDeselect
-        data={fieldOptions}
+        data={xAxisOptions}
         label="X Axis"
-        value={xAxisKey}
-        disabled={fieldOptions.length === 0}
-        placeholder={
-          fieldOptions.length === 0 ?
-            "No fields have been queried"
-          : "Select a field"
-        }
-        onChange={(field) => {
-          onSettingsChange({ ...settings, xAxisKey: field ?? undefined });
+        value={settings.xAxisKey ?? null}
+        disabled={isXAxisDisabled}
+        placeholder={xAxisPlaceholder}
+        onChange={(selectedName) => {
+          const updatedSettings: BarChartSettings = {
+            ...settings,
+            xAxisKey: selectedName ?? undefined,
+          };
+          onSettingsChange(updatedSettings);
         }}
       />
 
       <Select
+        key={`y-${allowedYAxisNames.join("|")}`}
         allowDeselect
-        data={numericFieldOptions}
+        data={yAxisOptions}
         label="Y Axis"
-        value={yAxisKey}
-        disabled={fieldOptions.length === 0 || numericFieldOptions.length === 0}
-        placeholder={
-          fieldOptions.length === 0 ? "No fields have been queried"
-          : numericFieldOptions.length === 0 ?
-            "There are no queried numeric fields"
-          : "Select a field"
-        }
-        onChange={(field) => {
-          onSettingsChange({ ...settings, yAxisKey: field ?? undefined });
+        value={settings.yAxisKey}
+        disabled={isYAxisDisabled}
+        placeholder={yAxisPlaceholder ?? null}
+        onChange={(selectedName) => {
+          const updatedSettings: BarChartSettings = {
+            ...settings,
+            yAxisKey: selectedName ?? undefined,
+          };
+          onSettingsChange(updatedSettings);
         }}
       />
     </>
