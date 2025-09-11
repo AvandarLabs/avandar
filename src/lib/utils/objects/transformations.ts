@@ -5,6 +5,7 @@ import { UnknownObject } from "@/lib/types/common";
 import { ExcludeDeep, ReplaceTypes, SwapDeep } from "@/lib/types/utilityTypes";
 import { isNull, isPlainObject, isUndefined } from "../guards";
 import { constant } from "../higherOrderFuncs";
+import { isInSet } from "../sets/higherOrderFuncs";
 import { objectKeys } from "./misc";
 
 /**
@@ -404,4 +405,31 @@ export function mapObjectValues<T extends UnknownObject, V>(
     newObj[key] = fn(obj[key], key);
   });
   return newObj;
+}
+
+/**
+ * Create a new object with keys arranged in `desiredOrder`.
+ * Optionally exclude some keys and/or append the remaining keys afterward.
+ *
+ * - Shallow: does not touch nested objects.
+ * - Non-mutating: returns a new object.
+ */
+// Unify on one key string type:
+
+type KeyStringOf<T> = `${Extract<keyof T, string | number>}`;
+
+export function reorderObjectKeys<T extends Record<PropertyKey, unknown>>(
+  obj: T,
+  desiredOrder: ReadonlyArray<KeyStringOf<T>>,
+): T {
+  const result: Record<PropertyKey, unknown> = {};
+  const inDesired = isInSet(new Set<KeyStringOf<T>>(desiredOrder));
+
+  for (const k of desiredOrder) {
+    if ((k as keyof T) in obj) result[k] = obj[k as keyof T];
+  }
+  for (const k of objectKeys(obj) as Array<KeyStringOf<T>>) {
+    if (!inDesired(k)) result[k] = obj[k as keyof T];
+  }
+  return result as T;
 }
