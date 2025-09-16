@@ -1,5 +1,4 @@
 import { UnknownObject, UUID } from "@/lib/types/common";
-import { DatasetId } from "@/models/datasets/Dataset";
 import { DatasetColumn } from "@/models/datasets/DatasetColumn";
 import { DuckDBDataTypeT } from "./DuckDBDataType";
 
@@ -136,6 +135,9 @@ export type DuckDBLoadCSVResult = {
    * auto-detection. It may not be completely accurate.
    */
   csvSniff: DuckDBCSVSniffResult;
+
+  /** The name of the DUckDB table holding the loaded CSV data */
+  tableName: string;
 };
 
 export type DuckDBCSVSniffResult = {
@@ -169,6 +171,15 @@ export type DuckDBCSVSniffResult = {
    * E.g. `"FROM read_csv('my_file.csv', auto_detect=false, delim=',', ...)"`
    */
   Prompt: string;
+
+  /**
+   * The table name holding the loaded CSV data.
+   * NOTE: given that a CSV sniff operation can be run separately from
+   * actually loading the data, the `table_name` may not actually exist yet.
+   * In that case, this `table_name` represents the table name that would be
+   * used if the data were loaded.
+   */
+  table_name: string;
 };
 
 export type QueryAggregationType =
@@ -180,7 +191,7 @@ export type QueryAggregationType =
   | "none";
 
 export type StructuredQueryConfig = {
-  datasetId: DatasetId;
+  tableName: string;
   selectFields: readonly DatasetColumn[];
   groupByFields: readonly DatasetColumn[];
   orderByColumn?: DatasetColumn | undefined;

@@ -1,69 +1,90 @@
 import { invariant } from "@tanstack/react-router";
 import { match } from "ts-pattern";
-import { AvaDexie } from "@/dexie/AvaDexie";
-import { createDexieCRUDClient } from "@/lib/clients/dexie/createDexieCRUDClient";
-import { UnknownDataFrame, UnknownObject } from "@/lib/types/common";
+import { BaseClient, createBaseClient } from "@/lib/clients/BaseClient";
+import { withLogger } from "@/lib/clients/withLogger";
+import { withQueryHooks } from "@/lib/clients/withQueryHooks/withQueryHooks";
+import { ILogger } from "@/lib/Logger";
+import { UnknownDataFrame } from "@/lib/types/common";
 import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
-import { objectKeys } from "@/lib/utils/objects/misc";
+import { objectKeys, omit } from "@/lib/utils/objects/misc";
 import { promiseMap } from "@/lib/utils/promises";
 import { DatasetId } from "@/models/datasets/Dataset";
-import { DatasetRawDataParsers } from "@/models/datasets/DatasetRawData";
 import {
   ColumnSummary,
   DatasetSummary,
 } from "@/models/datasets/DatasetRawData/getSummary";
 import { DuckDBClient } from "../DuckDBClient";
 import { DuckDBDataType } from "../DuckDBClient/DuckDBDataType";
-import { QueryResultData } from "../DuckDBClient/types";
+import { scalar, singleton } from "../DuckDBClient/queryResultHelpers";
+import { LocalDatasetEntryClient } from "./LocalDatasetEntryClient";
 
-function scalar<V, T extends { [key: string]: V }>(
-  query: QueryResultData<T>,
-): V {
-  invariant(query.data.length !== 0, "No data found");
-  invariant(
-    query.data.length === 1,
-    "Multiple rows found. A scalar requires a single row.",
-  );
-  const firstRow = query.data[0]!;
-  const keys = objectKeys(firstRow);
-  invariant(
-    keys.length !== 0,
-    "Received an empty row. A scalar requires a value.",
-  );
-  invariant(
-    keys.length === 1,
-    "Multiple columns found. A scalar requires a single column.",
-  );
-  return firstRow[keys[0]!]!;
-}
+export type IDatasetRawDataClient = BaseClient & {
+  getSummary(params: { datasetId: DatasetId }): Promise<DatasetSummary>;
 
-function singleton<T extends UnknownObject>(
-  query: QueryResultData<T>,
-): T | undefined {
-  if (query.data.length === 0) {
-    return undefined;
-  }
-  invariant(
-    query.data.length === 1,
-    "Multiple rows found. A singleton requires a single row.",
-  );
-  return query.data[0]!;
-}
+  /**
+   * Gets a preview of the dataset's locally loaded raw data.
+   * If the dataset has not been loaded locally already (i.e. if it does not
+   * have an entry in LocalDatasetEntryClient that maps to a local DuckDB
+   * table), then this will throw an error.
+   */
+  getPreviewData(params: {
+    datasetId: DatasetId;
+    numRows: number;
+  }): Promise<UnknownDataFrame>;
+};
 
-export const DatasetRawDataClient = createDexieCRUDClient({
-  db: AvaDexie.DB,
-  modelName: "DatasetRawData",
-  parsers: DatasetRawDataParsers,
-  queries: ({ logger: clientLogger }) => {
-    return {
-      getSummary: async (params: {
+/**
+ * Creates a client to query a dataset's raw data.
+ *
+ * This client is not a CRUD client, so it does not support CRUD functions.
+ */
+function createDatasetRawDataClient(): IDatasetRawDataClient {
+  const baseClient = createBaseClient("DatasetRawData");
+  return withLogger(baseClient, (baseLogger: ILogger) => {
+    const client = {
+      ...baseClient,
+      async getPreviewData(params: { datasetId: DatasetId; numRows: number }) {
+        const logger = baseLogger.appendName("getPreviewData");
+        logger.log("Getting preview data for dataset", params);
+        const { datasetId, numRows } = params;
+
+        // we have to get the local table name for the given dataset
+        const datasetEntry = await LocalDatasetEntryClient.getById({
+          id: datasetId,
+        });
+
+        if (datasetEntry) {
+          const tableName = datasetEntry?.localTableName;
+          const { data } = await DuckDBClient.runRawQuery(
+            `SELECT * FROM "${tableName}" LIMIT ${numRows}`,
+            { tableName },
+          );
+          return data;
+        }
+
+        throw new Error(
+          `Could not find a local entry for dataset ${datasetId}`,
+        );
+      },
+
+      async getSummary(params: {
         datasetId: DatasetId;
-      }): Promise<DatasetSummary> => {
-        const logger = clientLogger.appendName("getSummary");
-        const { datasetId } = params;
-        logger.log("Getting summary for dataset", params);
+      }): Promise<DatasetSummary> {
+        const logger = baseLogger.appendName("getSummary");
+        logger.log("Calling `getSummary`", params);
 
-        const duckdbColumns = await DuckDBClient.getCSVSchema(datasetId);
+        const loadedDatasetEntry = await LocalDatasetEntryClient.getById({
+          id: params.datasetId,
+        });
+
+        invariant(
+          loadedDatasetEntry,
+          `Could not find a locally loaded entry for dataset ${params.datasetId}`,
+        );
+
+        const { localTableName } = loadedDatasetEntry;
+
+        const duckdbColumns = await DuckDBClient.getTableSchema(localTableName);
         const columns = duckdbColumns.map((duckColumn, idx) => {
           return {
             name: duckColumn.column_name,
@@ -77,7 +98,7 @@ export const DatasetRawDataClient = createDexieCRUDClient({
             await DuckDBClient.runRawQuery<{
               count: bigint;
             }>(`SELECT COUNT(*) as count FROM "$tableName$"`, {
-              datasetName: datasetId,
+              tableName: localTableName,
             }),
           ),
         );
@@ -85,15 +106,15 @@ export const DatasetRawDataClient = createDexieCRUDClient({
         const columnSummaries = await promiseMap(
           columns,
           async (column): Promise<ColumnSummary> => {
-            const { name: colName, dataType } = column;
+            const { name: columnName, dataType } = column;
 
             const distinctValuesCount = Number(
               scalar(
                 await DuckDBClient.runRawQuery<{
                   count: bigint;
                 }>(
-                  `SELECT COUNT(DISTINCT "${colName}") as count FROM "$tableName$"`,
-                  { datasetName: datasetId },
+                  `SELECT COUNT(DISTINCT "$columnName$") as count FROM "$tableName$"`,
+                  { columnName: columnName, tableName: localTableName },
                 ),
               ),
             );
@@ -103,10 +124,12 @@ export const DatasetRawDataClient = createDexieCRUDClient({
                 await DuckDBClient.runRawQuery<{
                   count: bigint;
                 }>(
-                  `SELECT COUNT("${colName}") as count FROM "$tableName$"
-                WHERE "${colName}" IS NULL
-                ${dataType === "text" ? `OR "${colName}" = ''` : ""}`,
-                  { datasetName: datasetId },
+                  `SELECT COUNT("$columnName$") as count
+                    FROM "$tableName$"
+                    WHERE "$columnName$" IS NULL
+                    ${dataType === "text" ? `OR "$columnName$" = ''` : ""}
+                  `,
+                  { columnName, tableName: localTableName },
                 ),
               ),
             );
@@ -116,14 +139,14 @@ export const DatasetRawDataClient = createDexieCRUDClient({
               max_count: bigint;
             }>(
               `SELECT MAX(cnt) as max_count FROM (
-                  SELECT COUNT(*) as cnt
-                  FROM "$tableName$"
-                  WHERE
-                    "${colName}" IS NOT NULL
-                    ${dataType === "text" ? `AND "${colName}" <> ''` : ""}
-                  GROUP BY "${colName}"
-                )`,
-              { datasetName: datasetId },
+                SELECT COUNT(*) as cnt
+                FROM "$tableName$"
+                WHERE
+                  "$columnName$" IS NOT NULL
+                  ${dataType === "text" ? `AND "$columnName$" <> ''` : ""}
+                GROUP BY "${columnName}"
+              )`,
+              { columnName, tableName: localTableName },
             );
             const maxCount = maxCountResult.data[0]?.max_count ?? 0n;
 
@@ -132,16 +155,20 @@ export const DatasetRawDataClient = createDexieCRUDClient({
               value: unknown;
               count: bigint;
             }>(
-              `SELECT "${colName}" AS value, COUNT(*) AS count
+              `SELECT "$columnName$" AS value, COUNT(*) AS count
                FROM "$tableName$"
                WHERE
-                 "${colName}" IS NOT NULL
-                 ${dataType === "text" ? `AND "${colName}" <> ''` : ""}
-               GROUP BY "${colName}"
-               HAVING COUNT(*) = ${maxCount}
+                 "$columnName$" IS NOT NULL
+                 ${dataType === "text" ? `AND "$columnName$" <> ''` : ""}
+               GROUP BY "$columnName$"
+               HAVING COUNT(*) = $maxCount$
                ORDER BY value
                LIMIT 10`, // only get the top 10 to save memory
-              { datasetName: datasetId },
+              {
+                columnName,
+                tableName: localTableName,
+                maxCount,
+              },
             );
             const mostCommonValue = mostCommonValuesQuery.data;
 
@@ -166,12 +193,12 @@ export const DatasetRawDataClient = createDexieCRUDClient({
                     stdDev: number;
                   }>(
                     `SELECT
-                        MAX("${colName}") as max,
-                        MIN("${colName}") as min,
-                        AVG("${colName}") as avg,
-                        STDDEV_SAMP("${colName}") as stdDev
+                        MAX("$columnName$") as max,
+                        MIN("$columnName$") as min,
+                        AVG("$columnName$") as avg,
+                        STDDEV_SAMP("$columnName$") as stdDev
                       FROM "$tableName$"`,
-                    { datasetName: datasetId },
+                    { columnName, tableName: localTableName },
                   ),
                 ) ?? {};
                 return {
@@ -195,7 +222,7 @@ export const DatasetRawDataClient = createDexieCRUDClient({
               .exhaustive();
 
             return {
-              name: colName,
+              name: columnName,
               distinctValuesCount,
               emptyValuesCount,
               percentMissingValues: emptyValuesCount / distinctValuesCount,
@@ -222,20 +249,15 @@ export const DatasetRawDataClient = createDexieCRUDClient({
           columnSummaries,
         };
       },
-
-      getPreviewData: async (params: {
-        datasetId: DatasetId;
-        numRows: number;
-      }): Promise<UnknownDataFrame> => {
-        const logger = clientLogger.appendName("getPreviewData");
-        logger.log("Getting preview data for dataset", params);
-        const { datasetId, numRows } = params;
-        const result = await DuckDBClient.runRawQuery(
-          `SELECT * FROM "$tableName$" LIMIT ${numRows}`,
-          { datasetName: datasetId },
-        );
-        return result.data;
-      },
     };
-  },
-});
+
+    return withQueryHooks(client, {
+      // only turn the augmented client functions into hooks, not
+      // the base client functions
+      queryFns: objectKeys(omit(client, objectKeys(baseClient))),
+      mutationFns: [],
+    });
+  });
+}
+
+export const DatasetRawDataClient = createDatasetRawDataClient();

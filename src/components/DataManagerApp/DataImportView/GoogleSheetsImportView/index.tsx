@@ -61,7 +61,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
     }) => {
       const loadResult = await DuckDBClient.loadCSV({
         fileText,
-        csvName,
+        tableName: csvName,
         numRowsToSkip,
         delimiter,
       });
@@ -134,7 +134,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
       invariant(csvString, "A CSV string must be provided");
       const previewData = await DuckDBClient.runRawQuery(
         `SELECT * FROM "$tableName$" LIMIT ${AppConfig.dataManagerApp.maxPreviewRows}`,
-        { datasetName: selectedDocumentId },
+        { tableName: selectedDocumentId },
       );
 
       return previewData.data;

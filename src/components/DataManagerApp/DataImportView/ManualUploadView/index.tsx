@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { invariant } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { LocalDatasetEntryClient } from "@/clients/datasets/LocalDatasetEntryClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { DuckDBDataType } from "@/clients/DuckDBClient/DuckDBDataType";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/types";
@@ -12,6 +13,7 @@ import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useMutation } from "@/lib/hooks/query/useMutation";
+import { Logger } from "@/lib/Logger";
 import { MIMEType, UnknownObject } from "@/lib/types/common";
 import {
   notifyError,
@@ -20,6 +22,8 @@ import {
 } from "@/lib/ui/notifications/notify";
 import { FileUploadField } from "@/lib/ui/singleton-forms/FileUploadField";
 import { snakeCaseKeysShallow } from "@/lib/utils/objects/transformations";
+import { snakeify } from "@/lib/utils/strings/transformations";
+import { uuid } from "@/lib/utils/uuid";
 import {
   DatasetUploadForm,
   DatasetUploadFormValues,
@@ -35,6 +39,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
 
   const [loadCSVResult, setLoadCSVResult] = useState<DuckDBLoadCSVResult>();
   const [previewRows, setPreviewRows] = useState<UnknownObject[]>();
+
   const [loadCSV, isLoadingCSV] = useMutation({
     mutationFn: async ({
       file,
@@ -45,12 +50,12 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
       numRowsToSkip?: number;
       delimiter?: string;
     }) => {
-      const csvName = file.name;
-
-      // load the file into DuckDB
+      // generate a unique table name for this CSV
+      const csvTableName = snakeify(uuid());
+      Logger.log("csv table name", csvTableName);
       const loadResult = await DuckDBClient.loadCSV({
         file,
-        csvName,
+        tableName: csvTableName,
         numRowsToSkip,
         delimiter,
       });
@@ -58,7 +63,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
       // now query the file for the rows to preview
       const previewData = await DuckDBClient.runRawQuery(
         `SELECT * FROM "$tableName$" LIMIT ${AppConfig.dataManagerApp.maxPreviewRows}`,
-        { datasetName: csvName },
+        { tableName: csvTableName },
       );
       setLoadCSVResult(loadResult);
       setPreviewRows(previewData.data);
@@ -108,11 +113,14 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
       queryKey: DatasetClient.QueryKeys.getAll(),
     });
 
-    // now that we've persisted the dataset metadata to the backend, let's
-    // rename it locally to use the dataset id, which is stable
-    await DuckDBClient.renameDataset({
-      oldName: selectedFile.name,
-      newName: dataset.id,
+    // now that we've persisted the dataset to the backend, let's add an entry
+    // to IndexedDB to map the datasetId to the table name, so we can always
+    // remember where a dataset's locally loaded raw data is stored.
+    await LocalDatasetEntryClient.insert({
+      data: {
+        datasetId: dataset.id,
+        localTableName: loadCSVResult.tableName,
+      },
     });
     return dataset;
   };
@@ -160,11 +168,15 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
             columns={columns}
             doDatasetSave={saveLocalCSVToBackend}
             loadCSVResult={loadCSVResult}
-            onRequestDataParse={(parseConfig: {
+            onRequestDataParse={async (parseConfig: {
               numRowsToSkip: number;
               delimiter: string;
             }) => {
               setIsReprocessing(true);
+
+              // drop the previous dataset since we are going to parse a
+              // new file now
+              await DuckDBClient.dropDataset(loadCSVResult.tableName);
               loadCSV(
                 {
                   file: selectedFile,
