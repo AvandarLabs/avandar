@@ -137,7 +137,10 @@ export function QueryForm({
             onGroupByChange(cols);
           }}
         />
-        <Box mb="md" mt="md">
+        <Fieldset
+          legend="Order by"
+          style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
+        >
           <Select
             label="Select field"
             placeholder="Select field"
@@ -188,12 +191,11 @@ export function QueryForm({
               }
             }}
           />
-
-          {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
-          {errorMessage ?
-            <DangerText>{errorMessage}</DangerText>
-          : null}
-        </Box>
+        </Fieldset>
+        {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
+        {errorMessage ?
+          <DangerText>{errorMessage}</DangerText>
+        : null}
       </Stack>
     </form>
   );
