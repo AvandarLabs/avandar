@@ -164,7 +164,7 @@ export function DataExplorerApp(): JSX.Element {
         />
       </Box>
       <Box pos="relative" flex={1} px="sm" py="md">
-        <LoadingOverlay visible={isLoadingResults} zIndex={1000} />
+        <LoadingOverlay visible={isLoadingResults} zIndex={99} />
         <VisualizationContainer
           vizConfig={vizConfig}
           fields={fields}

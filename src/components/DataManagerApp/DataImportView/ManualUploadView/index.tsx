@@ -97,6 +97,8 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
     numRowsToSkip?: number;
     delimiter?: string;
   }>();
+
+  // query to load the data locally to DuckDB
   const [loadResults, isLoadingCSV, loadQueryObj] = useQuery({
     queryKey: ["load-csv", parseOptions],
     queryFn: async (): Promise<
@@ -230,8 +232,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
               numRowsToSkip: number;
               delimiter: string;
             }) => {
-              // drop the previous dataset since we are going to parse a
-              // new file now
+              // drop the dataset so we can re-parse it from scratch
               await DuckDBClient.dropDataset(loadResults.metadata.tableName);
               setParseOptions((prevParseOptions) => {
                 if (prevParseOptions) {

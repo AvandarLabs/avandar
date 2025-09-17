@@ -124,7 +124,8 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
     staleTime: Infinity,
   });
 
-  const [loadResults, _isLoadingCSV] = useQuery({
+  // query to load the data locally to DuckDB
+  const [loadResults, _, loadQueryObj] = useQuery({
     queryKey: ["load-csv-text", parseOptions],
     queryFn: async (): Promise<
       | { metadata: DuckDBLoadCSVResult; previewRows: UnknownObject[] }
@@ -305,26 +306,28 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
               return dataset;
             }}
             loadCSVResult={loadResults.metadata}
-            onRequestDataParse={(parseConfig: {
+            onRequestDataParse={async (parseConfig: {
               numRowsToSkip: number;
               delimiter: string;
             }) => {
-              setIsReprocessing(true);
-              loadCSV(
-                {
-                  fileText: csvString,
-                  csvName: spreadsheet.spreadsheetName,
-                  numRowsToSkip: parseConfig.numRowsToSkip,
-                  delimiter: parseConfig.delimiter,
-                },
-                {
-                  onSuccess: () => {
-                    setIsReprocessing(false);
-                  },
-                },
-              );
+              // drop the dataset so we can re-parse it from scratch
+              await DuckDBClient.dropDataset(loadResults.metadata.tableName);
+
+              setParseOptions((prevParseOptions) => {
+                if (prevParseOptions) {
+                  return {
+                    ...prevParseOptions,
+                    numRowsToSkip: parseConfig.numRowsToSkip,
+                    delimiter: parseConfig.delimiter,
+
+                    // generate a new local table name for this new parsing
+                    localTableName: uuid(),
+                  };
+                }
+                return prevParseOptions;
+              });
             }}
-            isProcessing={isReprocessing}
+            isProcessing={loadQueryObj.isFetching}
           />
         : null}
       </Stack>
