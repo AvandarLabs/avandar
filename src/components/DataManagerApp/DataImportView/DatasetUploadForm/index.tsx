@@ -40,8 +40,11 @@ type Props = {
    */
   rows: UnknownObject[];
   defaultName: string;
+  // TODO(jpsyx): this should be a DatasetColumn<"Insert"> type
   columns: readonly DetectedDatasetColumn[];
-  doDatasetSave: (values: DatasetUploadFormValues) => Promise<Dataset>;
+  doDatasetSave: (
+    datasetFormValues: DatasetUploadFormValues,
+  ) => Promise<Dataset>;
   disableSubmit?: boolean;
   loadCSVResult: DuckDBLoadCSVResult;
 
@@ -72,14 +75,6 @@ export function DatasetUploadForm({
   const [saveDataset, isSavePending] = useMutation({
     mutationFn: doDatasetSave,
     onSuccess: async (savedDataset) => {
-      if (!savedDataset?.id) {
-        notifyError({
-          title: "Routing failed",
-          message: "No dataset ID returned.",
-        });
-        return;
-      }
-
       notifySuccess({
         title: "Dataset saved",
         message: `Dataset "${savedDataset.name}" saved successfully`,

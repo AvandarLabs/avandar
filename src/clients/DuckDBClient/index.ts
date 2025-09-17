@@ -384,7 +384,6 @@ class DuckDBClientImpl {
       }
 
       const isDataAlreadyLoaded = await this.hasTable(tableName);
-      this.#logger.log("is it already loaded?", isDataAlreadyLoaded);
       if (!isDataAlreadyLoaded) {
         await this.#registerDatasetFromCSV(
           "file" in options ?

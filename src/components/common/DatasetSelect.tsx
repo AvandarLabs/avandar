@@ -60,7 +60,7 @@ export function DatasetSelect({
     const groups: Array<SelectOptionGroup<DatasetId>> = [];
     datasetBucketsByType.forEach((bucketValues, bucketKey) => {
       const bucketName = match(bucketKey)
-        .with("local_csv", () => {
+        .with("csv_file", () => {
           return "CSVs";
         })
         .with("google_sheets", () => {

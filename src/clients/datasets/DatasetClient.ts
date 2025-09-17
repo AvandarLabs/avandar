@@ -95,32 +95,60 @@ export const DatasetClient = createSupabaseCRUDClient({
        * @param params - The parameters for the dataset to be inserted.
        * @returns The inserted dataset.
        */
-      insertLocalCSVDataset: async (params: {
+      insertCSVFileDataset: async (params: {
         workspaceId: WorkspaceId;
         datasetName: string;
         datasetDescription: string;
-        delimiter: string;
-        sizeInBytes: number;
         columns: DatasetColumnInput[];
+        sizeInBytes: number;
+        parseOptions: {
+          rowsToSkip: number;
+          quoteChar: string;
+          escapeChar: string;
+          delimiter: string;
+          newlineDelimiter: string;
+          commentChar: string;
+          hasHeader: boolean;
+          dateFormat: string | null;
+          timestampFormat: string | null;
+        };
       }): Promise<Dataset> => {
         const logger = clientLogger.appendName("addNewDataset");
         logger.log("Creating dataset", params);
 
-        const columns = params.columns.map((col) => {
-          return {
-            ...col,
-            // convert undefined to nulls
-            description: col.description ?? null,
-          };
-        });
+        const {
+          columns,
+          sizeInBytes,
+          workspaceId,
+          datasetName,
+          datasetDescription,
+          parseOptions,
+        } = params;
         const { data: dataset } = await dbClient
-          .rpc("rpc_datasets__add_local_csv_dataset", {
-            p_workspace_id: params.workspaceId,
-            p_dataset_name: params.datasetName,
-            p_dataset_description: params.datasetDescription,
-            p_columns: columns,
-            p_delimiter: params.delimiter,
-            p_size_in_bytes: params.sizeInBytes,
+          .rpc("rpc_datasets__add_csv_file_dataset", {
+            p_workspace_id: workspaceId,
+            p_dataset_name: datasetName,
+            p_dataset_description: datasetDescription,
+            p_columns: columns.map((col) => {
+              return { ...col, description: col.description ?? null };
+            }),
+            p_size_in_bytes: sizeInBytes,
+            p_rows_to_skip: parseOptions.rowsToSkip,
+            p_quote_char: parseOptions.quoteChar,
+            p_escape_char: parseOptions.escapeChar,
+            p_delimiter: parseOptions.delimiter,
+            p_newline_delimiter: parseOptions.newlineDelimiter,
+            p_comment_char: {
+              value:
+                parseOptions.commentChar === "\u0000" ?
+                  null
+                : parseOptions.commentChar,
+            },
+            p_has_header: parseOptions.hasHeader,
+            p_date_format: {
+              date_format: parseOptions.dateFormat,
+              timestamp_format: parseOptions.timestampFormat,
+            },
           })
           .throwOnError();
 
