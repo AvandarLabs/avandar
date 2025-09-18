@@ -1,7 +1,7 @@
 import { ConditionalKeys, Paths, SetRequired, UnknownArray } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
 import { SetDefined } from "@/lib/types/utilityTypes";
-import { hasDefinedProp } from "../guards";
+import { hasNonUndefinedProps } from "../guards";
 import { getValue, PathValue } from "./getValue";
 import { omit, pick } from "./misc";
 import { setValue } from "./setValue";
@@ -92,10 +92,10 @@ export function propDoesntEqual<
  * the specified value.
  */
 export function propIsDefined<T extends object, K extends keyof T>(
-  path: K,
+  key: K,
 ): (obj: T) => obj is SetRequired<T, K> & SetDefined<T, K> {
   return (obj: T) => {
-    return hasDefinedProp(obj, path);
+    return hasNonUndefinedProps(obj, [key]);
   };
 }
 
@@ -137,10 +137,10 @@ export function pickProps<T extends UnknownObject, K extends keyof T>(
  * @returns A new object with nulls excluded from the specified keys.
  */
 export function excludeNullsInProps<T extends UnknownObject, K extends keyof T>(
-  ...keysToTest: readonly K[]
+  keysToTest: Extract<K, string> | readonly K[],
 ): (obj: T) => ExcludeNullsIn<T, K> {
   return (obj: T) => {
-    return excludeNullsIn(obj, ...keysToTest);
+    return excludeNullsIn(obj, keysToTest);
   };
 }
 
@@ -159,9 +159,11 @@ export function excludeNullsInProps<T extends UnknownObject, K extends keyof T>(
 export function excludeNullsExceptInProps<
   T extends UnknownObject,
   K extends keyof T,
->(...keysToKeepNull: readonly K[]): (obj: T) => ExcludeNullsExceptIn<T, K> {
+>(
+  keysToKeepNull: Extract<K, string> | readonly K[],
+): (obj: T) => ExcludeNullsExceptIn<T, K> {
   return (obj: T) => {
-    return excludeNullsExceptIn(obj, ...keysToKeepNull);
+    return excludeNullsExceptIn(obj, keysToKeepNull);
   };
 }
 
@@ -172,7 +174,7 @@ export function excludeNullsExceptInProps<
  * @returns A function that coerces the specified keys into dates.
  */
 export function coerceDatesInProps<T extends UnknownObject, K extends keyof T>(
-  ...keys: readonly K[]
+  keys: readonly K[],
 ): (obj: T) => {
   [Key in keyof T]: Key extends K ?
     undefined extends T[Key] ?
@@ -181,7 +183,7 @@ export function coerceDatesInProps<T extends UnknownObject, K extends keyof T>(
   : T[Key];
 } {
   return (obj: T) => {
-    return coerceDatesIn(obj, ...keys);
+    return coerceDatesIn(obj, keys);
   };
 }
 
@@ -195,7 +197,7 @@ export function convertDatesToISOInProps<
   T extends UnknownObject,
   K extends ConditionalKeys<T, Date | undefined>,
 >(
-  ...keys: readonly K[]
+  keys: readonly K[],
 ): (obj: T) => {
   [Key in keyof T]: Key extends K ?
     undefined extends T[Key] ?
@@ -204,7 +206,7 @@ export function convertDatesToISOInProps<
   : T[Key];
 } {
   return (obj: T) => {
-    return convertDatesToISOIn(obj, ...keys);
+    return convertDatesToISOIn(obj, keys);
   };
 }
 

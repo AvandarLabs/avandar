@@ -1,5 +1,5 @@
 import { EntityClient } from "@/clients/entities/EntityClient";
-import { assert } from "@/lib/utils/guards";
+import { assert } from "@/lib/utils/asserts";
 import {
   makeBucketMapFromList,
   mergeBucketMaps,

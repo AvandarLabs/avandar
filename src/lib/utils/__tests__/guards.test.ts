@@ -1,9 +1,7 @@
 import { assert, describe, expect, it } from "vitest";
 import {
-  hasDefinedProp,
-  hasDefinedProps,
-  hasProp,
-  hasProps,
+  hasNonUndefinedProps,
+  hasPropKeys,
   isArray,
   isBoolean,
   isDate,
@@ -12,7 +10,7 @@ import {
   isNonEmptyArray,
   isNotUndefined,
   isNull,
-  isNullOrUndefined,
+  isNullish,
   isNumber,
   isOneOf,
   isPlainObject,
@@ -83,14 +81,14 @@ describe("isNotUndefined", () => {
 
 describe("isNullOrUndefined", () => {
   it("returns true for null or undefined", () => {
-    expect(isNullOrUndefined(null)).toBe(true);
-    expect(isNullOrUndefined(undefined)).toBe(true);
+    expect(isNullish(null)).toBe(true);
+    expect(isNullish(undefined)).toBe(true);
   });
 
   it("returns false for other values", () => {
-    expect(isNullOrUndefined(0)).toBe(false);
-    expect(isNullOrUndefined("")).toBe(false);
-    expect(isNullOrUndefined(false)).toBe(false);
+    expect(isNullish(0)).toBe(false);
+    expect(isNullish("")).toBe(false);
+    expect(isNullish(false)).toBe(false);
   });
 });
 
@@ -187,60 +185,31 @@ describe("isPrimitive", () => {
   });
 });
 
-describe("hasProps", () => {
+describe("hasPropKeys", () => {
   it("returns true if object has required props", () => {
     const obj: { name: string; email: string } = {
       name: "John Doe",
       email: "johndoe@gmail.com",
     };
-
-    const hasPropsCheck = hasProps(obj, "name", "email");
-
-    expect(hasPropsCheck).toBe(true);
+    const hasPropKeysCheck = hasPropKeys(obj, ["name", "email"]);
+    expect(hasPropKeysCheck).toBe(true);
   });
 
   it("returns true if property is assigned but value is undefined", () => {
     const obj: { name?: string } = { name: undefined };
-
-    const hasPropsCheck = hasProps(obj, "name");
-
-    expect(hasPropsCheck).toBe(true);
+    const hasPropKeysCheck = hasPropKeys(obj, ["name"]);
+    expect(hasPropKeysCheck).toBe(true);
   });
 
   it("returns false if object is missing required props", () => {
     // the optional modifier (?) for 'email' satisfies TypeScript
     const obj: { name: string; email?: string } = { name: "John Doe" };
-
-    const hasPropsCheck = hasProps(obj, "name", "email");
-
-    expect(hasPropsCheck).toBe(false);
+    const hasPropKeysCheck = hasPropKeys(obj, ["name", "email"]);
+    expect(hasPropKeysCheck).toBe(false);
   });
 });
 
-describe("hasProp", () => {
-  it("returns true if object has required prop", () => {
-    const obj = { name: "John Doe", email: "johndoe@gmail.com" };
-    expect(hasProp(obj, "name")).toBe(true);
-    expect(hasProp(obj, "email")).toBe(true);
-  });
-
-  it("returns true if property is assigned but value is undefined", () => {
-    const obj = { name: undefined };
-    expect(hasProp(obj, "name")).toBe(true);
-  });
-
-  it("returns false if object is missing the required prop", () => {
-    const obj: { name: string; email?: string } = { name: "John Doe" };
-    expect(hasProp(obj, "email")).toBe(false);
-  });
-
-  it("returns false if value is null or undefined", () => {
-    expect(hasProp(null, "name")).toBe(false);
-    expect(hasProp(undefined, "name")).toBe(false);
-  });
-});
-
-describe("hasDefinedProps", () => {
+describe("hasNonUndefinedProps", () => {
   // this typecast satisfies TypeScript for the purpose of this test
   type User = {
     id?: number;
@@ -250,49 +219,22 @@ describe("hasDefinedProps", () => {
 
   it("returns true when all props exist and are not undefined", () => {
     const user: User = { id: 1, name: "Alice", email: "alice@example.com" };
-    expect(hasDefinedProps(user, "id", "name", "email")).toBe(true);
+    expect(hasNonUndefinedProps(user, ["id", "name", "email"])).toBe(true);
   });
 
   it("returns false if any prop is undefined", () => {
     const user: User = { id: 1, name: "Alice", email: undefined };
-    expect(hasDefinedProps(user, "id", "name", "email")).toBe(false);
+    expect(hasNonUndefinedProps(user, ["id", "name", "email"])).toBe(false);
   });
 
   it("returns true if props exist and are null", () => {
     const user: User = { id: 1, name: "Alice", email: null };
-    expect(hasDefinedProps(user, "id", "name", "email")).toBe(true);
+    expect(hasNonUndefinedProps(user, ["id", "name", "email"])).toBe(true);
   });
 
   it("returns false if a prop is missing", () => {
     const user: Partial<User> = { id: 1 };
-    expect(hasDefinedProps(user as User, "id", "name")).toBe(false);
-  });
-});
-
-describe("hasDefinedProp", () => {
-  type User = {
-    id?: number;
-    name?: string;
-    email?: string | null;
-  };
-
-  it("returns true if the property exists and is not undefined", () => {
-    const user: Partial<User> = {
-      name: "Alice",
-      email: null,
-    };
-
-    expect(hasDefinedProp(user, "name")).toBe(true);
-    expect(hasDefinedProp(user, "email")).toBe(true);
-  });
-
-  it("returns false if the property is missing or undefined", () => {
-    const user: Partial<User> = {
-      id: 1,
-    };
-
-    expect(hasDefinedProp(user, "name")).toBe(false);
-    expect(hasDefinedProp(user, "email")).toBe(false);
+    expect(hasNonUndefinedProps(user, ["id", "name"])).toBe(false);
   });
 });
 

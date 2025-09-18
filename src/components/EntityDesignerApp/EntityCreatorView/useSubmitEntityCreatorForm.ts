@@ -4,7 +4,7 @@ import {
   useMutation,
   UseMutationResultTuple,
 } from "@/lib/hooks/query/useMutation";
-import { hasProps, isNotUndefined } from "@/lib/utils/guards";
+import { hasPropKeys, isNotUndefined } from "@/lib/utils/guards";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
@@ -51,7 +51,7 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
                   extractors.datasetColumnValue;
 
                 if (
-                  hasProps(
+                  hasPropKeys(
                     datasetColumnValueExtractor,
                     "datasetId",
                     "datasetFieldId",
@@ -65,7 +65,11 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
               .with("aggregation", () => {
                 const aggregationExtractor = extractors.aggregation;
                 if (
-                  hasProps(aggregationExtractor, "datasetId", "datasetFieldId")
+                  hasPropKeys(
+                    aggregationExtractor,
+                    "datasetId",
+                    "datasetFieldId",
+                  )
                 ) {
                   return { ...aggregationExtractor, workspaceId };
                 }

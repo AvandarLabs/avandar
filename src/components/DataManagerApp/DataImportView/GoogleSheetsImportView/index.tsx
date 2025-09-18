@@ -89,8 +89,6 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
   >();
 
   const selectedDocumentId = selectedDocument?.id;
-
-  const [isReprocessing, setIsReprocessing] = useState(false);
   const [parseOptions, setParseOptions] = useState<{
     fileText: string;
     localTableName: string;

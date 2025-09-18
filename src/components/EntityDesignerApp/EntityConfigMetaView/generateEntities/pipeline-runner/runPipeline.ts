@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 import { Logger } from "@/lib/Logger";
 import { RawDataRow, UUID } from "@/lib/types/common";
-import { assert } from "@/lib/utils/guards";
+import { assert } from "@/lib/utils/asserts";
 import { constant } from "@/lib/utils/higherOrderFuncs";
 import { promiseReduce } from "@/lib/utils/promises";
 import { DatasetId, DatasetWithColumns } from "@/models/datasets/Dataset";

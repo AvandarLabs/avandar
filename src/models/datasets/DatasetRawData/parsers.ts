@@ -25,15 +25,15 @@ export const DatasetRawDataParsers =
   makeParserRegistry<DatasetRawDataModel>().build({
     modelName: "DatasetRawData",
     DBReadSchema,
-    fromDBReadToModelRead: coerceDatesInProps("createdAt", "updatedAt"),
-    fromModelInsertToDBInsert: convertDatesToISOInProps(
+    fromDBReadToModelRead: coerceDatesInProps(["createdAt", "updatedAt"]),
+    fromModelInsertToDBInsert: convertDatesToISOInProps([
       "createdAt",
       "updatedAt",
-    ),
-    fromModelUpdateToDBUpdate: convertDatesToISOInProps(
+    ]),
+    fromModelUpdateToDBUpdate: convertDatesToISOInProps([
       "createdAt",
       "updatedAt",
-    ),
+    ]),
   });
 
 /**

@@ -41,16 +41,16 @@ export type CSVFileDatasetRead = {
   newlineDelimiter: string;
 
   /** Comment character used in the CSV file */
-  commentChar: string;
+  commentChar: string | undefined;
 
   /** Whether the CSV has a header */
   hasHeader: boolean;
 
   /** Date format of the CSV file */
-  dateFormat: string;
+  dateFormat: string | undefined;
 
   /** Timestamp format of the CSV file */
-  timestampFormat: string;
+  timestampFormat: string | undefined;
 };
 
 /**

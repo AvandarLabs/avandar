@@ -3,6 +3,7 @@ import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import {
   camelCaseKeysDeep,
+  nullsToUndefinedDeep,
   snakeCaseKeysDeep,
 } from "@/lib/utils/objects/transformations";
 import { pipe } from "@/lib/utils/pipe";
@@ -22,24 +23,28 @@ const DBReadSchema = object({
   escape_char: string(),
   delimiter: string(),
   newline_delimiter: string(),
-  comment_char: string(),
+  comment_char: string().nullable(),
   has_header: boolean(),
-  date_format: string(),
-  timestamp_format: string(),
+  date_format: string().nullable(),
+  timestamp_format: string().nullable(),
 });
 
 export const LocalCSVDatasetParsers =
   makeParserRegistry<CSVFileDatasetModel>().build({
     modelName: "CSVFileDataset",
     DBReadSchema,
-    fromDBReadToModelRead: pipe(camelCaseKeysDeep, (obj) => {
-      return {
-        ...obj,
-        id: obj.id as CSVFileDatasetId,
-        datasetId: obj.datasetId as DatasetId,
-        workspaceId: obj.workspaceId as WorkspaceId,
-      };
-    }),
+    fromDBReadToModelRead: pipe(
+      camelCaseKeysDeep,
+      nullsToUndefinedDeep,
+      (obj) => {
+        return {
+          ...obj,
+          id: obj.id as CSVFileDatasetId,
+          datasetId: obj.datasetId as DatasetId,
+          workspaceId: obj.workspaceId as WorkspaceId,
+        };
+      },
+    ),
     fromModelInsertToDBInsert: snakeCaseKeysDeep,
     fromModelUpdateToDBUpdate: snakeCaseKeysDeep,
   });

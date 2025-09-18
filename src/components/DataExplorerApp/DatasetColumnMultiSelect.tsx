@@ -3,7 +3,7 @@ import { useUncontrolled } from "@mantine/hooks";
 import { ReactNode, useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { where } from "@/lib/utils/filters/filterBuilders";
-import { isNotNullOrUndefined } from "@/lib/utils/guards";
+import { isNonNullish } from "@/lib/utils/guards";
 import { makeObjectFromList } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { DatasetId, DatasetWithColumns } from "@/models/datasets/Dataset";
@@ -97,7 +97,7 @@ export function DatasetColumnMultiSelect({
           .map((id) => {
             return columnsLookup[id as DatasetColumnId];
           })
-          .filter(isNotNullOrUndefined);
+          .filter(isNonNullish);
         setControlledValue(columns);
       }}
     />

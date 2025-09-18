@@ -8,7 +8,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
 import { Paper } from "@/lib/ui/Paper";
-import { hasDefinedProps } from "@/lib/utils/guards";
+import { hasNonUndefinedProps } from "@/lib/utils/guards";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityConfig } from "@/models/EntityConfig/types";
 import { generateEntities } from "./generateEntities";
@@ -66,9 +66,11 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
               loading={isGeneratingEntities}
               onClick={async () => {
                 // generate all entities in-browser and in-memory for now
-                if (hasDefinedProps(fullEntityConfig, "datasets", "fields")) {
+                if (
+                  hasNonUndefinedProps(fullEntityConfig, ["datasets", "fields"])
+                ) {
                   const newFields = fullEntityConfig.fields.filter((field) => {
-                    return hasDefinedProps(field, "valueExtractor");
+                    return hasNonUndefinedProps(field, "valueExtractor");
                   });
 
                   // TODO(jpsyx): make this a mutation so you can show a loading

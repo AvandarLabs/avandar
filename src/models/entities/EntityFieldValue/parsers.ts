@@ -56,7 +56,7 @@ export const EntityFieldValueParsers =
     fromModelInsertToDBInsert: pipe(
       snakeCaseKeysDeep,
       undefinedsToNullsDeep,
-      excludeNullsExceptInProps("dataset_id", "value"),
+      excludeNullsExceptInProps(["dataset_id", "value"]),
       (obj) => {
         return {
           ...obj,
@@ -67,7 +67,7 @@ export const EntityFieldValueParsers =
     fromModelUpdateToDBUpdate: pipe(
       snakeCaseKeysDeep,
       undefinedsToNullsDeep,
-      excludeNullsExceptInProps("dataset_id", "value"),
+      excludeNullsExceptInProps(["dataset_id", "value"]),
       (obj) => {
         return { ...obj, value_set: obj.value_set?.join(";") };
       },

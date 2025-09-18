@@ -1,14 +1,16 @@
+import { LocalDatasetEntryClient } from "@/clients/datasets/LocalDatasetEntryClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import {
   LocalQueryConfig,
   LocalQueryResultData,
 } from "@/clients/LocalDatasetQueryClient";
 import { useQuery, UseQueryResultTuple } from "@/lib/hooks/query/useQuery";
+import { assertIsDefined } from "@/lib/utils/asserts";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries } from "@/lib/utils/objects/misc";
 import { sortStrings } from "@/lib/utils/strings/sort";
 
-export function useDataQuery({
+export async function useDataQuery({
   datasetId,
   aggregations,
   enabled,
@@ -18,7 +20,7 @@ export function useDataQuery({
   orderByDirection,
 }: Partial<LocalQueryConfig> & {
   enabled: boolean;
-}): UseQueryResultTuple<LocalQueryResultData> {
+}): Promise<UseQueryResultTuple<LocalQueryResultData>> {
   const selectFieldNames = selectFields.map(getProp("name"));
   const groupByFieldNames = groupByFields.map(getProp("name"));
 
@@ -50,14 +52,20 @@ export function useDataQuery({
 
     queryFn: async () => {
       if (aggregations && datasetId !== undefined && selectFields.length > 0) {
+        const datasetEntry = await LocalDatasetEntryClient.getById({
+          id: datasetId,
+        });
+
+        assertIsDefined(datasetEntry, "Could not find a dataset entry");
+
         // now run the query
         return DuckDBClient.runStructuredQuery({
-          datasetId,
           aggregations,
           selectFields,
           groupByFields,
-          orderByColumn: orderByField,
           orderByDirection,
+          orderByColumn: orderByField,
+          tableName: datasetEntry.localTableName,
         });
       }
       return { fields: [], data: [] };

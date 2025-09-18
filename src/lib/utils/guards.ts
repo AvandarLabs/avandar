@@ -1,6 +1,5 @@
 import { EmptyObject, SetRequired } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
-import { Logger } from "../Logger";
 import { AnyFunction, SetDefined } from "../types/utilityTypes";
 
 /**
@@ -68,14 +67,14 @@ export function isDate(value: unknown): value is Date {
  * **Examples**
  *
  * ```ts
- * isNotNullOrUndefined(null); // false
- * isNotNullOrUndefined(undefined); // false
- * isNotNullOrUndefined("foo"); // true
- * isNotNullOrUndefined(0); // true
- * isNotNullOrUndefined(false); // true
+ * isDefined(null); // false
+ * isDefined(undefined); // false
+ * isDefined("foo"); // true
+ * isDefined(0); // true
+ * isDefined(false); // true
  * ```
  */
-export function isNotNullOrUndefined<T>(value: T): value is NonNullable<T> {
+export function isNonNullish<T>(value: T): value is NonNullable<T> {
   return value !== null && value !== undefined;
 }
 
@@ -95,7 +94,7 @@ export function isNotUndefined<T>(value: T): value is Exclude<T, undefined> {
   return value !== undefined;
 }
 
-export function isNullOrUndefined(value: unknown): value is null | undefined {
+export function isNullish(value: unknown): value is null | undefined {
   return value === undefined || value === null;
 }
 
@@ -105,6 +104,10 @@ export function isUndefined(value: unknown): value is undefined {
 
 export function isNull(value: unknown): value is null {
   return value === null;
+}
+
+export function isNotNull(value: unknown): value is Exclude<unknown, null> {
+  return value !== null;
 }
 
 /**
@@ -168,9 +171,9 @@ export function isPrimitive(
  * @returns `true` if `obj` has all the properties in `properties`, `false`
  * otherwise.
  */
-export function hasProps<T extends UnknownObject, Key extends keyof T>(
+export function hasPropKeys<T extends UnknownObject, Key extends keyof T>(
   obj: T | null | undefined,
-  ...properties: Key[]
+  properties: Key[],
 ): obj is T & SetRequired<T, Key> {
   if (obj === null || obj === undefined) {
     return false;
@@ -178,27 +181,6 @@ export function hasProps<T extends UnknownObject, Key extends keyof T>(
   return properties.every((prop) => {
     return prop in obj;
   });
-}
-
-/**
- * Checks if `obj` has the property `prop`.
- *
- * This is the same as the function `hasProps` but only allows one key. This
- * function exists purely for readability purposes because it was annoying
- * to read a plural `hasProps` when only 1 prop was passed.
- *
- * NOTE: this only checks for property existence. The property can exist but
- * the value can still be undefined.
- *
- * @param obj The object to check.
- * @param prop The property to check.
- * @returns `true` if `obj` has the property `prop`, `false` otherwise.
- */
-export function hasProp<T extends UnknownObject, Key extends keyof T>(
-  obj: T | null | undefined,
-  prop: Key,
-): obj is T & SetRequired<T, Key> {
-  return hasProps(obj, prop);
 }
 
 /**
@@ -217,54 +199,14 @@ export function hasProp<T extends UnknownObject, Key extends keyof T>(
  * @returns `true` if `obj` has all the properties in `properties` and that
  * they are not undefined, `false` otherwise.
  */
-export function hasDefinedProps<T extends object, Key extends keyof T>(
+export function hasNonUndefinedProps<T extends object, Key extends keyof T>(
   obj: T,
-  ...properties: Key[]
+  properties: Extract<Key, string> | readonly Key[],
 ): obj is SetRequired<T, Key> & SetDefined<T, Key> {
-  return properties.every((prop) => {
+  const props = typeof properties === "string" ? [properties] : properties;
+  return props.every((prop) => {
     return prop in obj && obj[prop] !== undefined;
   });
-}
-
-/**
- * Checks if `obj` has all the properties in `properties` and that they are
- * not undefined.
- *
- * This is the same as the function `hasDefinedProps` but only allows one key.
- * This function exists purely for readability purposes because it was annoying
- * to read a plural `hasDefinedProps` when only 1 prop was passed.
- *
- * NOTE: this guard only works properly for strictly defined objects and keys
- * as literals. For objects with indexers or keys as broad strings, you should
- * do a manual check instead of using this guard.
- *
- * NOTE: this still allows `null` values. This literally just checks that it's
- * not `undefined`.
- *
- * @param obj - The object to check.
- * @param prop - The property to check.
- * @returns `true` if `obj` has the property `prop` and that it is not
- * undefined, `false` otherwise.
- */
-export function hasDefinedProp<T extends object, Key extends keyof T>(
-  obj: T,
-  prop: Key,
-): obj is SetRequired<T, Key> & SetDefined<T, Key> {
-  return hasDefinedProps(obj, prop);
-}
-
-/**
- * Asserts that `condition` is truthy.
- *
- * @param condition - The condition to assert.
- * @param msg - The error message to throw if the condition is falsy.
- */
-export function assert(condition: unknown, msg?: string): asserts condition {
-  if (!condition) {
-    const errMsg = msg ?? "Condition failed";
-    Logger.error(errMsg);
-    throw new Error(errMsg);
-  }
 }
 
 /**
