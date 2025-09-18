@@ -63,8 +63,7 @@ export function QueryForm({
     });
   }, [selectedColumns]);
 
-  const orderByColumnId =
-    orderByColumn?.id ? (orderByColumn.id as string) : null;
+  const orderByColumnId = orderByColumn?.id ?? null;
 
   return (
     <form>
@@ -115,7 +114,7 @@ export function QueryForm({
                   key={col.id}
                   column={col}
                   value={aggregations[col.name] ?? "none"}
-                  onChange={(agg) => {
+                  onChange={(agg: QueryAggregationType) => {
                     onAggregationsChange({
                       ...aggregations,
                       [col.name]: agg,

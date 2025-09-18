@@ -79,8 +79,8 @@ export function DatasetColumnMultiSelect({
     };
   }, [allDatasets]);
 
-  // Controlled if `value` is
-  // provided, otherwise uncontrolled with internal state.
+  // Controlled if `value` is provided, otherwise uncontrolled with
+  // internal state.
   const [currentColumns, setCurrentColumns] = useUncontrolled<
     readonly DatasetColumn[]
   >({

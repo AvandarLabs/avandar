@@ -2,19 +2,21 @@ import React, { useCallback, useMemo, useState } from "react";
 import { makeDefaultVizConfig } from "../VizSettingsForm/makeDefaultVizConfig";
 import { DataExplorerContext } from "./context";
 import type { VizConfig } from "../VizSettingsForm/makeDefaultVizConfig";
-import type { DataExplorerContextType } from "./types";
-import type { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
+import type {
+  DataExplorerContextType,
+  DataExplorerContextTypeValues,
+} from "./types";
 import type { DatasetId } from "@/models/datasets/Dataset";
 import type { DatasetColumn } from "@/models/datasets/DatasetColumn";
 
-const DEFAULTS = {
-  aggregations: {} as Record<string, QueryAggregationType>,
-  selectedDatasetId: undefined as DatasetId | undefined,
-  selectedColumns: [] as readonly DatasetColumn[],
-  selectedGroupByColumns: [] as readonly DatasetColumn[],
-  orderByColumn: undefined as DatasetColumn | undefined,
-  orderByDirection: "asc" as const,
-  vizConfig: makeDefaultVizConfig("table") as VizConfig,
+const DEFAULTS: DataExplorerContextTypeValues = {
+  aggregations: {},
+  selectedDatasetId: undefined,
+  selectedColumns: [],
+  selectedGroupByColumns: [],
+  orderByColumn: undefined,
+  orderByDirection: "asc",
+  vizConfig: makeDefaultVizConfig("table"),
 };
 
 export function DataExplorerProvider({

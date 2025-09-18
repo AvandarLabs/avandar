@@ -3,7 +3,7 @@ import type { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
 import type { DatasetId } from "@/models/datasets/Dataset";
 import type { DatasetColumn } from "@/models/datasets/DatasetColumn";
 
-export type DataExplorerContextType = {
+export type DataExplorerContextTypeValues = {
   aggregations: Record<string, QueryAggregationType>;
   selectedDatasetId?: DatasetId;
   selectedColumns: readonly DatasetColumn[];
@@ -11,7 +11,9 @@ export type DataExplorerContextType = {
   orderByColumn?: DatasetColumn;
   orderByDirection: "asc" | "desc";
   vizConfig: VizConfig;
+};
 
+export type DataExplorerContextType = DataExplorerContextTypeValues & {
   setAggregations: (newValue: Record<string, QueryAggregationType>) => void;
   setSelectedDatasetId: (newValue: DatasetId | undefined) => void;
   setSelectedColumns: (newValue: readonly DatasetColumn[]) => void;
