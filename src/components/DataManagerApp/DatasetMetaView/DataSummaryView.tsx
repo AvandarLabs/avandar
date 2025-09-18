@@ -1,4 +1,4 @@
-import { Loader, Stack, Title } from "@mantine/core";
+import { Loader, Stack } from "@mantine/core";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { DatasetId } from "@/models/datasets/Dataset";
@@ -18,35 +18,25 @@ export function DataSummaryView({ datasetId }: Props): JSX.Element {
       {isLoadingSummary ?
         <Loader />
       : null}
-      {summary ?
+      {summary?.columnSummaries ?
         <>
           <ObjectDescriptionList
-            data={summary}
-            excludeKeys={["columnSummaries"]}
-          />
-
-          {summary.columnSummaries ?
-            <Stack>
-              <Title order={4}>Column Summaries</Title>
-              <ObjectDescriptionList
-                data={summary.columnSummaries}
-                titleKey="name"
-                itemRenderOptions={{
-                  maxHeight: 400,
-                  excludeKeys: ["name"],
-                  childRenderOptions: {
-                    mostCommonValue: {
-                      childRenderOptions: {
-                        value: {
-                          maxItemsCount: 4,
-                        },
-                      },
+            data={summary.columnSummaries}
+            titleKey="name"
+            itemRenderOptions={{
+              maxHeight: 400,
+              excludeKeys: ["name"],
+              keyRenderOptions: {
+                mostCommonValue: {
+                  keyRenderOptions: {
+                    value: {
+                      maxItemsCount: 4,
                     },
                   },
-                }}
-              />
-            </Stack>
-          : null}
+                },
+              },
+            }}
+          />
         </>
       : null}
     </Stack>

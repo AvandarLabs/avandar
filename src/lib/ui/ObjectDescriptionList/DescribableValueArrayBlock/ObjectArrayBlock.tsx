@@ -7,28 +7,35 @@ import { CollapsibleItem } from "../CollapsibleItem";
 import {
   AnyDescribableValueRenderOptions,
   DescribableObject,
+  GenericRootData,
   ObjectArrayRenderOptions,
+  ObjectRenderOptions,
 } from "../types";
 import { ValueItemContainer } from "../ValueItemContainer";
 
-type Props<T extends DescribableObject> = {
+type Props<T extends DescribableObject, RootData extends GenericRootData> = {
   values: readonly T[];
   maxItemsCount?: number;
-} & ObjectArrayRenderOptions<T>;
+  rootData: RootData;
+} & ObjectArrayRenderOptions<T, RootData>;
 
 /**
  * Renders an array of entities either as a table or as a list of
  * collapsible entity descriptions.
  */
-export function ObjectArrayBlock<T extends DescribableObject>({
+export function ObjectArrayBlock<
+  T extends DescribableObject,
+  RootData extends GenericRootData,
+>({
   values,
+  rootData,
   renderAsTable,
   titleKey,
   itemRenderOptions,
   maxItemsCount,
   defaultExpanded = true,
   ...primitiveValueRenderOptions
-}: Props<T>): JSX.Element | null {
+}: Props<T, RootData>): JSX.Element | null {
   const excludeKeySet: ReadonlySet<StringKeyOf<T>> = useMemo(() => {
     return new Set(itemRenderOptions?.excludeKeys);
   }, [itemRenderOptions?.excludeKeys]);
@@ -76,17 +83,18 @@ export function ObjectArrayBlock<T extends DescribableObject>({
             }
             const fieldVal = entityRow[fieldKey];
 
-            // compute the child render options to pass down
-            const childRenderOptions: AnyDescribableValueRenderOptions = {
+            // compute the child's render options to pass down
+            const childRenderOptions = {
               ...parentRenderOptions,
-              ...(itemRenderOptions?.childRenderOptions?.[fieldKey] ?? {}),
-            };
+              ...(itemRenderOptions?.keyRenderOptions?.[fieldKey] ?? {}),
+            } as AnyDescribableValueRenderOptions;
 
             return (
               <Table.Td key={fieldKey}>
                 <ValueItemContainer
                   type="unknown"
                   value={fieldVal}
+                  rootData={rootData}
                   {...childRenderOptions}
                 />
               </Table.Td>
@@ -124,7 +132,11 @@ export function ObjectArrayBlock<T extends DescribableObject>({
         <ValueItemContainer
           type="object"
           value={val}
-          {...parentRenderOptions}
+          rootData={rootData}
+          {...(parentRenderOptions as ObjectRenderOptions<
+            DescribableObject,
+            RootData
+          >)}
         />
       </CollapsibleItem>
     );
