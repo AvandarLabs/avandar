@@ -34,7 +34,7 @@ type DateFieldSummary = {
   datasetDuration: string;
 };
 
-type FieldSummary = {
+export type FieldSummary = {
   name: string;
   distinctValuesCount: number;
   emptyValuesCount: number;

@@ -34,9 +34,9 @@ export function DataSummaryView({
             itemRenderOptions={{
               maxHeight: 400,
               excludeKeys: ["name"],
-              childRenderOptions: {
+              keyRenderOptions: {
                 mostCommonValue: {
-                  childRenderOptions: {
+                  keyRenderOptions: {
                     value: {
                       maxItemsCount: 4,
                     },
