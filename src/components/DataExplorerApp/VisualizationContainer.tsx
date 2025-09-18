@@ -5,6 +5,7 @@ import { QueryResultField } from "@/clients/LocalDatasetQueryClient";
 import { UnknownDataFrame } from "@/lib/types/common";
 import { BarChart } from "@/lib/ui/data-viz/BarChart";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
+import { LineChart } from "@/lib/ui/data-viz/LineChart";
 import { DangerText } from "@/lib/ui/Text/DangerText";
 import { isEpochMs, isIsoDateString } from "@/lib/utils/formatters/formatDate";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
@@ -16,21 +17,31 @@ type Props = {
   data: UnknownDataFrame;
 };
 
+// Reusable XY schema “blocks”
+const xAxisKeySchema = z.string({
+  error: (issue) => {
+    return issue.input === undefined ?
+        "X axis must be specified"
+      : "X axis must be a string";
+  },
+});
+const yAxisKeySchema = z.string({
+  error: (issue) => {
+    return issue.input === undefined ?
+        "Y axis must be specified"
+      : "Y axis must be a string";
+  },
+});
+
+// Chart-specific schemas (can diverge later)
 const BarChartSettingsSchema = z.object({
-  xAxisKey: z.string({
-    error: (issue) => {
-      return issue.input === undefined ?
-          "X axis must be specified"
-        : "X axis must be a string";
-    },
-  }),
-  yAxisKey: z.string({
-    error: (issue) => {
-      return issue.input === undefined ?
-          "Y axis must be specified"
-        : "Y axis must be a string";
-    },
-  }),
+  xAxisKey: xAxisKeySchema,
+  yAxisKey: yAxisKeySchema,
+});
+
+const LineChartSettingsSchema = z.object({
+  xAxisKey: xAxisKeySchema,
+  yAxisKey: yAxisKeySchema,
 });
 
 export function VisualizationContainer({
@@ -82,6 +93,18 @@ export function VisualizationContainer({
       }
       const errorMessages = z.prettifyError(error);
       return <DangerText>{errorMessages}</DangerText>;
+    })
+    .with({ type: "line" }, (config) => {
+      const {
+        success,
+        data: settings,
+        error,
+      } = LineChartSettingsSchema.safeParse(config.settings);
+
+      if (success) {
+        return <LineChart data={data} height={700} {...settings} />;
+      }
+      return <DangerText>{z.prettifyError(error)}</DangerText>;
     })
     .exhaustive();
 }
