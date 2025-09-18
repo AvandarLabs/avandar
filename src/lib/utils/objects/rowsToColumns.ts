@@ -1,6 +1,6 @@
 import { UnknownObject } from "@/lib/types/common";
 import { StringKeyOf } from "@/lib/types/utilityTypes";
-import { hasNonUndefinedProp } from "../guards";
+import { hasNonUndefinedProps } from "../guards";
 import { objectKeys } from "./misc";
 
 /**
@@ -22,7 +22,7 @@ export function rowsToColumns<T extends UnknownObject>(
   rows.forEach((row) => {
     objectKeys(row).forEach((key) => {
       const value = row[key];
-      if (hasNonUndefinedProp(columnValues, key)) {
+      if (hasNonUndefinedProps(columnValues, key)) {
         columnValues[key].push(value);
       } else {
         columnValues[key] = [value];

@@ -158,7 +158,7 @@ export function DataExplorerApp(): JSX.Element {
           errorMessage={errorMessage}
         />
         <VizSettingsForm
-          fields={fields}
+          columns={fields}
           vizConfig={vizConfig}
           onVizConfigChange={setVizConfig}
         />
@@ -167,7 +167,7 @@ export function DataExplorerApp(): JSX.Element {
         <LoadingOverlay visible={isLoadingResults} zIndex={99} />
         <VisualizationContainer
           vizConfig={vizConfig}
-          fields={fields}
+          columns={fields}
           data={data}
         />
       </Box>

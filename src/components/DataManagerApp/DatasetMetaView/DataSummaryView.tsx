@@ -13,15 +13,6 @@ export function DataSummaryView({ datasetId }: Props): JSX.Element {
       datasetId,
     });
 
-  /*
-  const summary = useMemo(() => {
-    return getSummary({
-      dataRows: rawDatasetRows,
-      columns,
-    });
-  }, [rawDatasetRows, columns]);
-  */
-
   return (
     <Stack>
       {isLoadingSummary ?

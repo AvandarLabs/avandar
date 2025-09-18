@@ -190,7 +190,7 @@ export type QueryAggregationType =
   | "min"
   | "none";
 
-export type StructuredQueryConfig = {
+export type StructuredDuckDBQueryConfig = {
   tableName: string;
   selectFields: readonly DatasetColumn[];
   groupByFields: readonly DatasetColumn[];

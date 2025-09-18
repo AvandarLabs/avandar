@@ -1,12 +1,15 @@
 import { invariant } from "@tanstack/react-router";
 import { match } from "ts-pattern";
 import { BaseClient, createBaseClient } from "@/lib/clients/BaseClient";
-import { withLogger } from "@/lib/clients/withLogger";
-import { withQueryHooks } from "@/lib/clients/withQueryHooks/withQueryHooks";
+import { WithLogger, withLogger } from "@/lib/clients/withLogger";
+import {
+  WithQueryHooks,
+  withQueryHooks,
+} from "@/lib/clients/withQueryHooks/withQueryHooks";
 import { ILogger } from "@/lib/Logger";
 import { UnknownDataFrame } from "@/lib/types/common";
 import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
-import { objectKeys, omit } from "@/lib/utils/objects/misc";
+import { objectKeys } from "@/lib/utils/objects/misc";
 import { promiseMap } from "@/lib/utils/promises";
 import { DatasetId } from "@/models/datasets/Dataset";
 import {
@@ -18,7 +21,7 @@ import { DuckDBDataType } from "../DuckDBClient/DuckDBDataType";
 import { scalar, singleton } from "../DuckDBClient/queryResultHelpers";
 import { LocalDatasetEntryClient } from "./LocalDatasetEntryClient";
 
-export type IDatasetRawDataClient = BaseClient & {
+type DatasetRawDataClientQueries = {
   getSummary(params: { datasetId: DatasetId }): Promise<DatasetSummary>;
 
   /**
@@ -33,16 +36,23 @@ export type IDatasetRawDataClient = BaseClient & {
   }): Promise<UnknownDataFrame>;
 };
 
+export type IDatasetRawDataClient = BaseClient & DatasetRawDataClientQueries;
+
 /**
  * Creates a client to query a dataset's raw data.
  *
  * This client is not a CRUD client, so it does not support CRUD functions.
  */
-function createDatasetRawDataClient(): IDatasetRawDataClient {
+function createDatasetRawDataClient(): WithLogger<
+  WithQueryHooks<
+    IDatasetRawDataClient,
+    keyof DatasetRawDataClientQueries,
+    never
+  >
+> {
   const baseClient = createBaseClient("DatasetRawData");
   return withLogger(baseClient, (baseLogger: ILogger) => {
-    const client = {
-      ...baseClient,
+    const queries = {
       async getPreviewData(params: { datasetId: DatasetId; numRows: number }) {
         const logger = baseLogger.appendName("getPreviewData");
         logger.log("Getting preview data for dataset", params);
@@ -251,12 +261,18 @@ function createDatasetRawDataClient(): IDatasetRawDataClient {
       },
     };
 
-    return withQueryHooks(client, {
-      // only turn the augmented client functions into hooks, not
-      // the base client functions
-      queryFns: objectKeys(omit(client, objectKeys(baseClient))),
-      mutationFns: [],
-    });
+    return withQueryHooks(
+      {
+        ...baseClient,
+        ...queries,
+      },
+      {
+        // only turn the augmented client functions into hooks, not
+        // the base client functions
+        queryFns: objectKeys(queries),
+        mutationFns: [],
+      },
+    );
   });
 }
 

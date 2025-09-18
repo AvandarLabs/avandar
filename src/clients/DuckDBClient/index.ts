@@ -24,7 +24,7 @@ import {
   DuckDBScan,
   LoadCSVErrors,
   QueryResultData,
-  StructuredQueryConfig,
+  StructuredDuckDBQueryConfig,
 } from "./types";
 
 const DUCKDB_DB_PATH = "opfs://avandar.duckdb";
@@ -65,7 +65,11 @@ const sql = knex({
  */
 const REJECTED_ROW_STORAGE_LIMIT = 1001;
 
-type UnknownRow = Record<string, unknown>;
+/**
+ * An object representing a row with unknown column types.
+ * This is very similar to `UnknownObject` except that keys can only be strings.
+ */
+export type UnknownRow = Record<string, unknown>;
 
 const META_TABLE_NAMES = {
   CSV_REJECT_SCANS: "csv_reject_scans",
@@ -674,7 +678,7 @@ class DuckDBClientImpl {
     aggregations,
     orderByColumn,
     orderByDirection,
-  }: StructuredQueryConfig): Promise<QueryResultData<UnknownRow>> {
+  }: StructuredDuckDBQueryConfig): Promise<QueryResultData<UnknownRow>> {
     const selectFieldNames = selectFields.map(getProp("name"));
     const groupByFieldNames = groupByFields.map(getProp("name"));
 

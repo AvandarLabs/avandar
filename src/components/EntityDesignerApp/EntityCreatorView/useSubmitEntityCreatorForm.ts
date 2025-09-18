@@ -51,11 +51,10 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
                   extractors.datasetColumnValue;
 
                 if (
-                  hasPropKeys(
-                    datasetColumnValueExtractor,
+                  hasPropKeys(datasetColumnValueExtractor, [
                     "datasetId",
                     "datasetFieldId",
-                  )
+                  ])
                 ) {
                   return { ...datasetColumnValueExtractor, workspaceId };
                 }
@@ -65,11 +64,10 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
               .with("aggregation", () => {
                 const aggregationExtractor = extractors.aggregation;
                 if (
-                  hasPropKeys(
-                    aggregationExtractor,
+                  hasPropKeys(aggregationExtractor, [
                     "datasetId",
                     "datasetFieldId",
-                  )
+                  ])
                 ) {
                   return { ...aggregationExtractor, workspaceId };
                 }

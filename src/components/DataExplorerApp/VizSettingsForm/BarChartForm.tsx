@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { QueryResultField } from "@/clients/LocalDatasetQueryClient";
+import { QueryResultColumn } from "@/clients/DuckDBClient/types";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
@@ -10,7 +10,7 @@ export type BarChartSettings = {
 };
 
 type Props = {
-  fields: readonly QueryResultField[];
+  fields: readonly QueryResultColumn[];
   settings: BarChartSettings;
   onSettingsChange: (settings: BarChartSettings) => void;
 };

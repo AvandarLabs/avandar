@@ -30,7 +30,7 @@ export type LocalQueryConfig = {
   aggregations: Record<string, QueryAggregationType>;
 };
 
-export type QueryResultField = {
+type QueryResultField = {
   name: string;
   dataType: "string" | "number" | "date";
 };

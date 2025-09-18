@@ -1,16 +1,22 @@
 import { LocalDatasetEntryClient } from "@/clients/datasets/LocalDatasetEntryClient";
-import { DuckDBClient } from "@/clients/DuckDBClient";
+import { DuckDBClient, UnknownRow } from "@/clients/DuckDBClient";
 import {
-  LocalQueryConfig,
-  LocalQueryResultData,
-} from "@/clients/LocalDatasetQueryClient";
+  QueryResultData,
+  StructuredDuckDBQueryConfig,
+} from "@/clients/DuckDBClient/types";
 import { useQuery, UseQueryResultTuple } from "@/lib/hooks/query/useQuery";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries } from "@/lib/utils/objects/misc";
 import { sortStrings } from "@/lib/utils/strings/sort";
+import { DatasetId } from "@/models/datasets/Dataset";
 
-export async function useDataQuery({
+type UseDataQueryOptions = {
+  datasetId?: DatasetId;
+  enabled: boolean;
+} & Partial<Omit<StructuredDuckDBQueryConfig, "tableName">>;
+
+export function useDataQuery({
   datasetId,
   aggregations,
   enabled,
@@ -18,9 +24,7 @@ export async function useDataQuery({
   groupByFields = [],
   orderByColumn: orderByField,
   orderByDirection,
-}: Partial<LocalQueryConfig> & {
-  enabled: boolean;
-}): Promise<UseQueryResultTuple<LocalQueryResultData>> {
+}: UseDataQueryOptions): UseQueryResultTuple<QueryResultData<UnknownRow>> {
   const selectFieldNames = selectFields.map(getProp("name"));
   const groupByFieldNames = groupByFields.map(getProp("name"));
 
@@ -59,7 +63,7 @@ export async function useDataQuery({
         assertIsDefined(datasetEntry, "Could not find a dataset entry");
 
         // now run the query
-        return DuckDBClient.runStructuredQuery({
+        return await DuckDBClient.runStructuredQuery({
           aggregations,
           selectFields,
           groupByFields,
@@ -68,7 +72,7 @@ export async function useDataQuery({
           tableName: datasetEntry.localTableName,
         });
       }
-      return { fields: [], data: [] };
+      return { fields: [], data: [], numRows: 0 };
     },
   });
 }
