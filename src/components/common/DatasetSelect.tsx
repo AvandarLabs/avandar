@@ -23,6 +23,7 @@ export function DatasetSelect({
   defaultValue,
   value,
   onChange,
+  onHasDatasets,
   ...selectProps
 }: Props): JSX.Element {
   const [controlledValue, onChangeValue] = useUncontrolled({
@@ -32,7 +33,9 @@ export function DatasetSelect({
     onChange,
   });
 
-  const [datasets] = DatasetClient.useGetAll();
+  const [datasets = []] = DatasetClient.useGetAll();
+
+  onHasDatasets?.(datasets.length > 0);
 
   useOnBecomesDefined(
     datasets,
@@ -90,6 +93,7 @@ export function DatasetSelect({
       value={controlledValue}
       onChange={onChangeValue}
       {...selectProps}
+      disabled={!datasetOptions.length}
     />
   );
 }

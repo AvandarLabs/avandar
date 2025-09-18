@@ -1,15 +1,11 @@
 import { Box, Fieldset, Stack, Text } from "@mantine/core";
-import { useMemo } from "react";
-import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
+import { useMemo, useState } from "react";
 import { Select } from "@/lib/ui/inputs/Select";
 import { DangerText } from "@/lib/ui/Text/DangerText";
-import { difference } from "@/lib/utils/arrays";
-import { makeObjectFromList } from "@/lib/utils/objects/builders";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
-import { objectKeys, omit } from "@/lib/utils/objects/misc";
 import { DatasetSelect } from "../common/DatasetSelect";
 import { AggregationSelect } from "./AggregationSelect";
 import { DatasetColumnMultiSelect } from "./DatasetColumnMultiSelect";
+import type { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
 import type { DatasetId } from "@/models/datasets/Dataset";
 import type { DatasetColumn } from "@/models/datasets/DatasetColumn";
 
@@ -21,10 +17,11 @@ type Direction = "asc" | "desc";
 const orderDirectionOptions: Array<{ value: Direction; label: string }> = [
   { value: "asc", label: "Ascending" },
   { value: "desc", label: "Descending" },
-] as const;
+];
 
 type Props = {
   errorMessage?: string;
+
   aggregations: Record<string, QueryAggregationType>;
   selectedDatasetId: DatasetId | undefined;
 
@@ -57,9 +54,10 @@ export function QueryForm({
   onOrderByColumnChange,
   onOrderByDirectionChange,
 }: Props): JSX.Element {
-  const fieldOptionsById = useMemo(() => {
-    return selectedColumns.map((c) => {
-      return { value: c.id as string, label: c.name };
+  const [hasDatasets, setHasDatasets] = useState<boolean | null>(null);
+  const orderFieldOptions = useMemo(() => {
+    return selectedColumns.map((column) => {
+      return { value: column.id as string, label: column.name };
     });
   }, [selectedColumns]);
 
@@ -70,10 +68,14 @@ export function QueryForm({
     <form>
       <Stack>
         <DatasetSelect
+          placeholder={
+            hasDatasets ? "Select a profile" : "You must create a profile"
+          }
           value={selectedDatasetId ?? null}
           onChange={(datasetId) => {
-            onSelectDatasetChange(datasetId ?? undefined);
+            return onSelectDatasetChange(datasetId ?? undefined);
           }}
+          onHasDatasets={setHasDatasets}
         />
 
         <DatasetColumnMultiSelect
@@ -81,33 +83,15 @@ export function QueryForm({
           placeholder="Select fields"
           datasetId={selectedDatasetId}
           value={selectedColumns}
-          onChange={(columns) => {
-            onSelectColumnsChange(columns);
-
-            const incomingFieldNames = columns.map(getProp("name"));
-            const prevAggregations = aggregations;
-            const prevFieldNames = objectKeys(prevAggregations);
-            const droppedFieldNames = difference(
-              prevFieldNames,
-              incomingFieldNames,
-            );
-
-            const defaults = makeObjectFromList(incomingFieldNames, {
-              defaultValue: "none" as const,
-            });
-
-            onAggregationsChange(
-              omit({ ...defaults, ...prevAggregations }, droppedFieldNames),
-            );
+          onChange={(cols) => {
+            return onSelectColumnsChange(cols ?? []);
           }}
         />
 
         {selectedColumns.length > 0 ?
           <Fieldset
             legend="Aggregations"
-            style={{
-              backgroundColor: "rgba(255, 255, 255, 0.4)",
-            }}
+            style={{ backgroundColor: "rgba(255,255,255,0.4)" }}
           >
             {selectedColumns.map((col) => {
               return (
@@ -135,25 +119,26 @@ export function QueryForm({
           datasetId={selectedDatasetId}
           value={selectedGroupByColumns}
           onChange={(cols) => {
-            onGroupByChange(cols);
+            return onGroupByChange(cols ?? []);
           }}
         />
 
         <Select
           label="Order field"
-          data={fieldOptionsById}
+          placeholder="Select field"
+          data={orderFieldOptions}
           value={orderByColumnId}
+          clearable
           onChange={(newFieldId) => {
             if (newFieldId === null) {
               onOrderByColumnChange(undefined);
               return;
             }
-            const newOrderByColumn = selectedColumns.find((field) => {
-              return field.id === newFieldId;
+            const newOrderByColumns = selectedColumns.find((field) => {
+              return (field.id as string) === newFieldId;
             });
-            onOrderByColumnChange(newOrderByColumn);
+            onOrderByColumnChange(newOrderByColumns);
           }}
-          clearable
         />
 
         <Box mb="md">
@@ -164,9 +149,7 @@ export function QueryForm({
             value={orderByDirection}
             clearable={false}
             onChange={(value) => {
-              if (value !== null) {
-                onOrderByDirectionChange(value);
-              }
+              if (value !== null) onOrderByDirectionChange(value as Direction);
             }}
           />
 

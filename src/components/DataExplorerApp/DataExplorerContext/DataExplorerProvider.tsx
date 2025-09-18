@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
+import { isInSet } from "@/lib/utils/sets/higherOrderFuncs";
 import { makeDefaultVizConfig } from "../VizSettingsForm/makeDefaultVizConfig";
 import { DataExplorerContext } from "./context";
 import type { VizConfig } from "../VizSettingsForm/makeDefaultVizConfig";
@@ -26,7 +27,7 @@ export function DataExplorerProvider({
   const [selectedDatasetId, setSelectedDatasetId] = useState<
     DatasetId | undefined
   >(DEFAULTS.selectedDatasetId);
-  const [selectedColumns, setSelectedColumns] = useState<
+  const [selectedColumns, rawSetSelectedColumns] = useState<
     readonly DatasetColumn[]
   >(DEFAULTS.selectedColumns);
   const [selectedGroupByColumns, setSelectedGroupByColumns] = useState<
@@ -43,7 +44,7 @@ export function DataExplorerProvider({
   const reset = useCallback(() => {
     setAggregations(DEFAULTS.aggregations);
     setSelectedDatasetId(DEFAULTS.selectedDatasetId);
-    setSelectedColumns(DEFAULTS.selectedColumns);
+    rawSetSelectedColumns(DEFAULTS.selectedColumns);
     setSelectedGroupByColumns(DEFAULTS.selectedGroupByColumns);
     setOrderByColumn(DEFAULTS.orderByColumn);
     setOrderByDirection(DEFAULTS.orderByDirection);
@@ -60,7 +61,49 @@ export function DataExplorerProvider({
     [selectedDatasetId, reset],
   );
 
-  const value = useMemo((): DataExplorerContextType => {
+  const applySelectedColumns = useCallback(
+    (updatedColumns: readonly DatasetColumn[]) => {
+      const updatedNames = new Set(
+        updatedColumns.map((column) => {
+          return column.name;
+        }),
+      );
+
+      rawSetSelectedColumns(updatedColumns);
+
+      if (updatedColumns.length === 0) {
+        setAggregations({});
+        setSelectedGroupByColumns([]);
+        setOrderByColumn(undefined);
+        setOrderByDirection("asc");
+        setVizConfig(makeDefaultVizConfig("table"));
+        return;
+      }
+
+      setSelectedGroupByColumns((groupByColumns) => {
+        return groupByColumns.filter((col) => {
+          return isInSet(updatedNames)(col.name);
+        });
+      });
+
+      setAggregations((currentAggs) => {
+        const nextAggs: Record<string, QueryAggregationType> = {};
+        updatedColumns.forEach((col) => {
+          nextAggs[col.name] = currentAggs[col.name] ?? "none";
+        });
+        return nextAggs;
+      });
+
+      setOrderByColumn((currentOrderBy) => {
+        return currentOrderBy && updatedNames.has(currentOrderBy.name) ?
+            currentOrderBy
+          : undefined;
+      });
+    },
+    [],
+  );
+
+  const value = useMemo<DataExplorerContextType>(() => {
     return {
       aggregations,
       selectedDatasetId,
@@ -69,13 +112,15 @@ export function DataExplorerProvider({
       orderByColumn,
       orderByDirection,
       vizConfig,
+
       setAggregations,
       setSelectedDatasetId,
-      setSelectedColumns,
+      setSelectedColumns: applySelectedColumns,
       setSelectedGroupByColumns,
       setOrderByColumn,
       setOrderByDirection,
       setVizConfig,
+
       onSelectDatasetChange,
       reset,
     };
@@ -88,6 +133,7 @@ export function DataExplorerProvider({
     orderByDirection,
     vizConfig,
     onSelectDatasetChange,
+    applySelectedColumns,
     reset,
   ]);
 

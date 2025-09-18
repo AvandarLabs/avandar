@@ -51,6 +51,7 @@ type Props<T extends NonNullable<string>> = Omit<
    * will be thrown and the component will not render.
    */
   data?: SelectData<T>;
+  onHasDatasets?: (value: boolean) => void;
 };
 
 export function Select<T extends NonNullable<string>>(
