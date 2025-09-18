@@ -1,6 +1,6 @@
 import { Box, Flex, MantineTheme } from "@mantine/core";
 import { useMemo, useState } from "react";
-import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
+import { QueryAggregationType } from "@/clients/DuckDBClient/types";
 import { LoadingOverlay } from "@/lib/ui/LoadingOverlay";
 import { partition } from "@/lib/utils/arrays";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
+import { QueryAggregationType } from "@/clients/DuckDBClient/types";
 import { Select, SelectOption } from "@/lib/ui/inputs/Select";
 import { DatasetColumn } from "@/models/datasets/DatasetColumn";
 import { getValidQueryAggregationsByType } from "@/models/datasets/DatasetColumn/utils";

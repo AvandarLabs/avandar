@@ -7,6 +7,7 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { LocalDatasetEntryClient } from "@/clients/datasets/LocalDatasetEntryClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { DuckDBDataType } from "@/clients/DuckDBClient/DuckDBDataType";
+import { getRandomTableName } from "@/clients/DuckDBClient/getRandomTableName";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/types";
 import { AppConfig } from "@/config/AppConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -19,8 +20,6 @@ import {
 } from "@/lib/ui/notifications/notify";
 import { FileUploadField } from "@/lib/ui/singleton-forms/FileUploadField";
 import { snakeCaseKeysShallow } from "@/lib/utils/objects/transformations";
-import { snakeify } from "@/lib/utils/strings/transformations";
-import { uuid } from "@/lib/utils/uuid";
 import { Dataset } from "@/models/datasets/Dataset";
 import { WorkspaceId } from "@/models/Workspace/types";
 import { DetectedDatasetColumn } from "../../hooks/detectColumnDataTypes";
@@ -181,7 +180,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
     if (file) {
       setParseOptions({
         file,
-        localTableName: snakeify(uuid()),
+        localTableName: getRandomTableName(),
       });
     } else {
       notifyError({
@@ -242,7 +241,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
                     delimiter: parseConfig.delimiter,
 
                     // generate a new local table name for this new parsing
-                    localTableName: uuid(),
+                    localTableName: getRandomTableName(),
                   };
                 }
                 return prevParseOptions;
@@ -256,7 +255,10 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
           onDrop={(files: FileWithPath[]) => {
             const uploadedFile = files[0];
             if (uploadedFile) {
-              setParseOptions({ file: uploadedFile, localTableName: uuid() });
+              setParseOptions({
+                file: uploadedFile,
+                localTableName: getRandomTableName(),
+              });
             }
           }}
         >

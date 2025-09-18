@@ -8,6 +8,7 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { LocalDatasetEntryClient } from "@/clients/datasets/LocalDatasetEntryClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { DuckDBDataType } from "@/clients/DuckDBClient/DuckDBDataType";
+import { getRandomTableName } from "@/clients/DuckDBClient/getRandomTableName";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/types";
 import { AppConfig } from "@/config/AppConfig";
 import { useGooglePicker } from "@/hooks/ui/useGooglePicker";
@@ -25,7 +26,6 @@ import {
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
 import { snakeCaseKeysShallow } from "@/lib/utils/objects/transformations";
-import { uuid } from "@/lib/utils/uuid";
 import { csvCellValueSchema } from "@/lib/utils/zodHelpers";
 import { Dataset } from "@/models/datasets/Dataset";
 import { unparseDataset } from "@/models/LocalDataset/utils";
@@ -113,7 +113,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
       setParseOptions({
         fileText: csvString,
         spreadsheetName: googleSpreadsheet.spreadsheetName,
-        localTableName: uuid(),
+        localTableName: getRandomTableName(),
       });
       return googleSpreadsheet;
     },
@@ -319,7 +319,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
                     delimiter: parseConfig.delimiter,
 
                     // generate a new local table name for this new parsing
-                    localTableName: uuid(),
+                    localTableName: getRandomTableName(),
                   };
                 }
                 return prevParseOptions;
