@@ -152,6 +152,7 @@ export function QueryForm({
             });
             onOrderByColumnChange(newOrderByColumn);
           }}
+          clearable
         />
 
         <Box mb="md">
