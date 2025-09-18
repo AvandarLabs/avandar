@@ -10,7 +10,6 @@ import { DuckDBClient } from "@/clients/DuckDBClient";
 import { SpotlightLinks } from "@/config/SpotlightLinks";
 import { AvaDexie } from "@/dexie/AvaDexie";
 import { Logger } from "@/lib/Logger";
-import { removeOPFSFile } from "@/lib/utils/browser/removeOPFSFile";
 
 export function useSpotlightActions(
   workspaceSlug: string,
@@ -64,7 +63,7 @@ export function useSpotlightActions(
                 await AvaDexie.deleteDatabase();
 
                 // delete the local OPFS database (DuckDB)
-                await removeOPFSFile("avandar.duckdb");
+                await DuckDBClient.deleteDatabase();
 
                 notifications.show({
                   title: "Local data deleted",

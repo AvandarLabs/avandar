@@ -154,14 +154,6 @@ class DuckDBClientImpl {
         });
       }
     }
-
-    // create a table that tracks dataset names mapped to their table names
-    await this.runRawQuery(
-      `CREATE TABLE IF NOT EXISTS datasets (
-        dataset_name VARCHAR UNIQUE,
-        table_name VARCHAR UNIQUE
-      )`,
-    );
     return db;
   }
 
@@ -200,8 +192,8 @@ class DuckDBClientImpl {
     } finally {
       this.#unresolvedOperations -= 1;
       if (this.#unresolvedOperations === 0) {
-        // clear the connection
-        await this.#conn.close();
+        // close the connection
+        await this.#conn?.close();
         this.#conn = undefined;
       }
     }
@@ -337,13 +329,13 @@ class DuckDBClientImpl {
     await db.dropFile(tableName);
 
     // persist the db to the browser file-system
-    await this.persistDB();
+    await this.#persistDB();
   }
 
   /**
    * Syncs the DuckDB database with the browser's OPFS file system.
    */
-  async persistDB(): Promise<void> {
+  async #persistDB(): Promise<void> {
     await this.#withConnection(async ({ conn }) => {
       await conn.query("CHECKPOINT");
     });
@@ -473,7 +465,7 @@ class DuckDBClientImpl {
       const csvErrors = await this.#getCSVLoadErrors(tableName);
       const csvSniffResult = await this.#getCSVSniffResult(tableName);
 
-      await this.persistDB();
+      await this.#persistDB();
 
       return {
         id: uuid(),
@@ -528,7 +520,8 @@ class DuckDBClientImpl {
       const columns = await this.getTableSchema(tableName);
       const csvRowCount = await this.getTableRowCount(tableName);
 
-      await this.persistDB();
+      await this.#persistDB();
+
       return {
         name: tableName,
         columns,
@@ -753,6 +746,26 @@ class DuckDBClientImpl {
         throw error;
       }
     });
+  }
+
+  async deleteDatabase(): Promise<void> {
+    const tableNames = await this.getTableNames();
+    const dropStatements = tableNames.map((name) => {
+      return `DROP TABLE IF EXISTS "${name}";`;
+    });
+    const dropStatement = `BEGIN; ${dropStatements.join(" ")} COMMIT;`;
+    await this.runRawQuery(dropStatement);
+
+    // persist the cleared DB one last time
+    await this.#persistDB();
+
+    // now close the connection, detach the DB,
+    // terminate the worker, delete the file
+    const db = await this.#getDB();
+    await this.#conn?.close();
+    db.detach();
+    await db.terminate();
+    await removeOPFSFile("avandar.duckdb");
   }
 }
 

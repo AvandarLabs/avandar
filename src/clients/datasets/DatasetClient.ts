@@ -15,6 +15,7 @@ import { WorkspaceId } from "@/models/Workspace/types";
 import { CompositeTypes } from "@/types/database.types";
 import { DuckDBClient } from "../DuckDBClient";
 import { DatasetColumnClient } from "./DatasetColumnClient";
+import { LocalDatasetEntryClient } from "./LocalDatasetEntryClient";
 
 type DatasetColumnInput = SetOptional<
   ExcludeNullsIn<CompositeTypes<"dataset_column_input">>,
@@ -205,10 +206,21 @@ export const DatasetClient = createSupabaseCRUDClient({
       fullDelete: async (params: { id: DatasetId }): Promise<void> => {
         const logger = clientLogger.appendName("fullDelete");
         logger.log("Deleting dataset", params);
-        await DatasetClient.delete({ id: params.id });
 
-        // now also delete the raw data locally
-        await DuckDBClient.dropDataset(params.id);
+        const { id } = params;
+        await DatasetClient.delete({ id });
+
+        // now delete things locally from IndexedDB
+        const localDatasetEntry = await LocalDatasetEntryClient.getById({
+          id,
+        });
+        if (localDatasetEntry) {
+          const { datasetId, localTableName } = localDatasetEntry;
+          await LocalDatasetEntryClient.delete({ id: datasetId });
+
+          // finally, delete the raw data locally from DuckDB
+          await DuckDBClient.dropDataset(localTableName);
+        }
       },
     };
   },
