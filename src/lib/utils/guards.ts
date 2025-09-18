@@ -67,11 +67,11 @@ export function isDate(value: unknown): value is Date {
  * **Examples**
  *
  * ```ts
- * isDefined(null); // false
- * isDefined(undefined); // false
- * isDefined("foo"); // true
- * isDefined(0); // true
- * isDefined(false); // true
+ * isNonNullish(null); // false
+ * isNonNullish(undefined); // false
+ * isNonNullish("foo"); // true
+ * isNonNullish(0); // true
+ * isNonNullish(false); // true
  * ```
  */
 export function isNonNullish<T>(value: T): value is NonNullable<T> {
