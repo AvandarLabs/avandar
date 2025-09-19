@@ -40,7 +40,15 @@ export function DataExplorerApp(): JSX.Element {
   }, [selectedGroupByColumns]);
 
   const [isValidQuery, errorMessage] = useMemo(() => {
-    // If there is at least 1 GROUP BY or at least 1 aggregated column, then
+    // 1. There must be at least one field selected
+    if (selectedFieldNames.length === 0) {
+      return [
+        false,
+        "At least one column must be selected for the query to run",
+      ] as const;
+    }
+
+    // 2. If there is at least 1 GROUP BY or at least 1 aggregated column, then
     // ALL columns must be either in the GROUP BY or have an aggregation.
     const [nonAggregatedColNames, aggregatedColNames] = partition(
       selectedFieldNames,

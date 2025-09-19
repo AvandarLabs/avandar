@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
+import { notifyError } from "@/lib/ui/notifications/notifyError";
 import { makeDefaultVizConfig } from "../VizSettingsForm/makeDefaultVizConfig";
 import { DataExplorerContext } from "./context";
 import type { VizConfig } from "../VizSettingsForm/makeDefaultVizConfig";
@@ -56,11 +57,21 @@ export function DataExplorerProvider({
   const onSelectDatasetChange = useCallback(
     (newValue: DatasetId | undefined) => {
       if (newValue !== selectedDatasetId) {
+        const hasData = selectedColumns.length > 0;
+
+        if (hasData) {
+          notifyError({
+            title: "Create Data Profile",
+            message: "Create a Data Profile to visualize merged data.",
+          });
+        }
+
         reset();
       }
+
       setSelectedDatasetId(newValue);
     },
-    [selectedDatasetId, reset],
+    [selectedDatasetId, selectedColumns, reset],
   );
 
   const value = useMemo((): DataExplorerContextType => {
