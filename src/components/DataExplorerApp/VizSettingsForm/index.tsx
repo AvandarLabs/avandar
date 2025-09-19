@@ -22,7 +22,6 @@ const VIZ_TYPES: VizTypeMetadata[] = [
 ];
 
 export type Props = {
-export type Props = {
   fields: readonly QueryResultField[];
   vizConfig: VizConfig;
   onVizConfigChange: (config: VizConfig) => void;
@@ -117,13 +116,6 @@ export function VizSettingsForm({
         data={vizTypeOptions}
         label="Visualization Type"
         value={vizConfig.type}
-        onChange={(selectedVizType) => {
-          if (selectedVizType) {
-            const updated = hydrateXY({
-              prevVizConfig: vizConfig,
-              newVizConfig: makeDefaultVizConfig(selectedVizType as VizType),
-            });
-            onVizConfigChange(updated);
         onChange={(selectedVizType) => {
           if (selectedVizType) {
             const updated = hydrateXY({
