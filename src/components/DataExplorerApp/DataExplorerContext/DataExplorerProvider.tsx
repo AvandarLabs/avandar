@@ -52,7 +52,6 @@ export function DataExplorerProvider({
     setOrderByDirection(DEFAULTS.orderByDirection);
     setVizConfig(makeDefaultVizConfig("table"));
   }, []);
-  console.log("👉 orderByDirection:", orderByDirection);
 
   const onSelectDatasetChange = useCallback(
     (newValue: DatasetId | undefined) => {

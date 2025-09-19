@@ -1,7 +1,6 @@
 import { Box, Fieldset, Stack, Text } from "@mantine/core";
-import { useMemo } from "react";
 import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
-import { Select } from "@/lib/ui/inputs/Select";
+import { Select, SelectData } from "@/lib/ui/inputs/Select";
 import { DangerText } from "@/lib/ui/Text/DangerText";
 import { difference } from "@/lib/utils/arrays";
 import { makeObjectFromList } from "@/lib/utils/objects/builders";
@@ -17,11 +16,10 @@ import type { DatasetColumn } from "@/models/datasets/DatasetColumn";
 const HIDE_WHERE = true;
 const HIDE_LIMIT = true;
 
-const orderDirectionOptions: Array<{ value: OrderByDirection; label: string }> =
-  [
-    { value: "asc", label: "Ascending" },
-    { value: "desc", label: "Descending" },
-  ] as const;
+const orderDirectionOptions = [
+  { value: "asc", label: "Ascending" },
+  { value: "desc", label: "Descending" },
+] as const satisfies SelectData<string>;
 
 type Props = {
   errorMessage?: string;
@@ -57,21 +55,12 @@ export function QueryForm({
   onOrderByColumnChange,
   onOrderByDirectionChange,
 }: Props): JSX.Element {
-  const fieldOptionsById = useMemo(() => {
-    return selectedColumns.map((c) => {
-      return { value: c.id as string, label: c.name };
-    });
-  }, [selectedColumns]);
-
-  const orderByColumnId = orderByColumn?.id ?? null;
-
   const builderTouched =
     selectedColumns.length > 0 ||
     (selectedGroupByColumns?.length ?? 0) > 0 ||
     orderByDirection != null;
 
   const showEmptyFieldsError = selectedColumns.length === 0 && builderTouched;
-  console.log("ORDER BY:", { orderByColumn, orderByDirection });
 
   return (
     <form>
@@ -149,25 +138,19 @@ export function QueryForm({
         <Select
           label="Order field"
           placeholder="Select field"
-          data={fieldOptionsById}
-          value={
-            (
-              fieldOptionsById.some((opt) => {
-                return opt.value === orderByColumn?.id;
-              })
-            ) ?
-              orderByColumn?.id
-            : null
-          }
-          onChange={(newFieldId) => {
-            if (!newFieldId) {
-              onOrderByColumnChange(undefined);
-              return;
-            }
-            const col = selectedColumns.find((f) => {
-              return f.id === newFieldId;
+          data={selectedColumns.map((field) => {
+            return {
+              value: field.name,
+              label: field.name,
+            };
+          })}
+          value={orderByColumn?.name}
+          onChange={(fieldName) => {
+            console.log("fieldName: ", fieldName);
+            const selected = selectedColumns.find((field) => {
+              return field.name === fieldName;
             });
-            onOrderByColumnChange(col);
+            onOrderByColumnChange(selected);
           }}
           clearable
         />
@@ -176,17 +159,10 @@ export function QueryForm({
             label="Order by"
             placeholder="Select order"
             data={orderDirectionOptions}
-            value={
-              (
-                orderDirectionOptions.some((opt) => {
-                  return opt.value === orderByDirection;
-                })
-              ) ?
-                orderByDirection
-              : null
-            }
-            onChange={(val) => {
-              onOrderByDirectionChange((val as OrderByDirection) ?? null);
+            value={orderByDirection}
+            onChange={(value) => {
+              console.log("value", value);
+              onOrderByDirectionChange((value as OrderByDirection) ?? null);
             }}
             clearable={false}
           />
