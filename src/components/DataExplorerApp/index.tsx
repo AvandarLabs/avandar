@@ -136,6 +136,7 @@ export function DataExplorerApp(): JSX.Element {
           fields={fields}
           vizConfig={vizConfig}
           onVizConfigChange={setVizConfig}
+          data={data}
         />
       </Box>
 
