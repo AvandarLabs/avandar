@@ -124,7 +124,7 @@ export function DataExplorerApp(): JSX.Element {
           orderByColumn={orderByColumn}
           orderByDirection={orderByDirection}
           onAggregationsChange={setAggregations}
-          onSelectDatasetChange={onSelectDatasetChange}
+          onFromDatasetChange={onSelectDatasetChange}
           onSelectColumnsChange={setSelectedColumns}
           onGroupByChange={setSelectedGroupByColumns}
           onOrderByColumnChange={setOrderByColumn}
