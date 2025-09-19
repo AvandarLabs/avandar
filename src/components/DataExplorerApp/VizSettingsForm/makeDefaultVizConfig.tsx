@@ -21,11 +21,6 @@ export type LineVizConfig = {
 
 export type VizConfig = TableVizConfig | BarVizConfig | LineVizConfig;
 
-export type LineVizConfig = {
-  type: "line";
-  settings: LineChartSettings;
-};
-
 export function makeDefaultVizConfig(vizType: VizType): VizConfig {
   return match(vizType)
     .with("table", (type): TableVizConfig => {
