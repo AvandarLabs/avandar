@@ -1,6 +1,6 @@
 import { MultiSelect } from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
-import { ReactNode, useMemo } from "react";
+import { ReactNode, useEffect, useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNotNullOrUndefined } from "@/lib/utils/guards";
@@ -21,9 +21,11 @@ type Props = {
    * that dataset.
    */
   datasetId?: DatasetId;
-  onChange: (fields: readonly DatasetColumn[]) => void;
+
+  // controllable, with uncontrolled fallback
   value?: readonly DatasetColumn[];
   defaultValue?: readonly DatasetColumn[];
+  onChange?: (fields: readonly DatasetColumn[]) => void;
 };
 
 // Human readable names for fields
@@ -34,55 +36,75 @@ const FIELD_NAME_OVERRIDES: Record<string, string> = {
   updatedAt: "Updated at",
 };
 
-// TODO(jpsyx) we already have DatasetColumnSelect. We shouldnt have both
+// TODO(jpsyx) we already have DatasetColumnSelect. We shouldn't have both
 // components. Refactor and keep only one.
 export function DatasetColumnMultiSelect({
-  onChange,
   label,
   placeholder,
   datasetId,
   value,
   defaultValue,
+  onChange,
 }: Props): JSX.Element {
-  const [controlledValue, setControlledValue] = useUncontrolled({
-    value,
-    defaultValue,
-    onChange,
-  });
-
   const [allDatasets, isLoadingDatasets] =
     DatasetClient.useGetAllDatasetsWithColumns(
       datasetId ? where("id", "eq", datasetId) : undefined,
     );
 
-  const columnsLookup: Record<DatasetColumnId, DatasetColumn> = useMemo(() => {
-    if (!allDatasets) {
-      return {};
-    }
-    return makeObjectFromList(allDatasets.flatMap(getProp("columns")), {
-      keyFn: getProp("id"),
+  const { fieldGroupOptions, columnLookup } = useMemo(() => {
+    const datasets: DatasetWithColumns[] = allDatasets ?? [];
+
+    // Grouped options for Mantine MultiSelect
+    const grouped = datasets.map((ds) => {
+      return {
+        group: ds.name,
+        items: ds.columns.map((col) => {
+          return {
+            value: col.id as string, // MultiSelect expects string ids
+            label: FIELD_NAME_OVERRIDES[col.name] ?? col.name,
+          };
+        }),
+      };
     });
+
+    const cols = datasets.flatMap((ds) => {
+      return ds.columns;
+    });
+
+    const lookup = makeObjectFromList(cols, { keyFn: getProp("id") });
+
+    return {
+      fieldGroupOptions: grouped,
+      columnLookup: lookup,
+    };
   }, [allDatasets]);
 
-  const fieldGroupOptions = useMemo(() => {
-    const fieldGroups = (allDatasets ?? []).map(
-      (dataset: DatasetWithColumns) => {
-        return {
-          group: dataset.name,
-          items: dataset.columns.map((column: DatasetColumn) => {
-            return {
-              value: column.id as string,
-              label: FIELD_NAME_OVERRIDES[column.name] ?? column.name,
-            };
-          }),
-        };
-      },
-    );
+  // Controlled if `value` is provided, otherwise uncontrolled with
+  // internal state.
+  const [currentColumns, setCurrentColumns] = useUncontrolled<
+    readonly DatasetColumn[]
+  >({
+    value,
+    defaultValue,
+    onChange,
+    finalValue: [],
+  });
 
-    return fieldGroups;
-  }, [allDatasets]);
+  // If the available columns change
+  // (e.g., switching dataset), drop any selections no longer present.
+  useEffect(() => {
+    const pruned = currentColumns.filter((c) => {
+      const columnId = c.id as DatasetColumnId;
+      return columnId in columnLookup;
+    });
+    if (pruned.length !== currentColumns.length) {
+      setCurrentColumns(pruned);
+    }
+  }, [columnLookup, currentColumns, setCurrentColumns]);
 
-  const selectedColumnIds = controlledValue.map(getProp("id"));
+  const selectedColumnIds = useMemo(() => {
+    return currentColumns.map(getProp("id")) as string[];
+  }, [currentColumns]);
 
   return (
     <MultiSelect
@@ -92,14 +114,16 @@ export function DatasetColumnMultiSelect({
       placeholder={isLoadingDatasets ? "Loading datasets..." : placeholder}
       data={fieldGroupOptions ?? []}
       value={selectedColumnIds}
-      onChange={(columnIds: string[]) => {
-        const columns = columnIds
-          .map((id) => {
-            return columnsLookup[id as DatasetColumnId];
+      onChange={(newColumnIds) => {
+        const newSelectedColumns = newColumnIds
+          .map((columnId) => {
+            return columnLookup[columnId as DatasetColumnId];
           })
           .filter(isNotNullOrUndefined);
-        setControlledValue(columns);
+
+        setCurrentColumns(newSelectedColumns);
       }}
+      nothingFoundMessage="No fields"
     />
   );
 }

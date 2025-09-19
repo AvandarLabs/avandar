@@ -14,6 +14,15 @@ export type BarVizConfig = {
   type: "bar";
   settings: BarChartSettings;
 };
+export type TableVizConfig = {
+  type: "table";
+  settings: undefined;
+};
+
+export type BarVizConfig = {
+  type: "bar";
+  settings: BarChartSettings;
+};
 
 export type LineVizConfig = {
   type: "line";
