@@ -5,6 +5,7 @@ import type { VizConfig } from "../VizSettingsForm/makeDefaultVizConfig";
 import type {
   DataExplorerContextType,
   DataExplorerContextTypeValues,
+  OrderByDirection,
 } from "./types";
 import type { DatasetId } from "@/models/datasets/Dataset";
 import type { DatasetColumn } from "@/models/datasets/DatasetColumn";
@@ -15,7 +16,7 @@ const DEFAULTS: DataExplorerContextTypeValues = {
   selectedColumns: [],
   selectedGroupByColumns: [],
   orderByColumn: undefined,
-  orderByDirection: "asc",
+  orderByDirection: null,
   vizConfig: makeDefaultVizConfig("table"),
 };
 
@@ -37,7 +38,7 @@ export function DataExplorerProvider({
   const [orderByColumn, setOrderByColumn] = useState<DatasetColumn | undefined>(
     DEFAULTS.orderByColumn,
   );
-  const [orderByDirection, setOrderByDirection] = useState<"asc" | "desc">(
+  const [orderByDirection, setOrderByDirection] = useState<OrderByDirection>(
     DEFAULTS.orderByDirection,
   );
   const [vizConfig, setVizConfig] = useState<VizConfig>(DEFAULTS.vizConfig);
@@ -51,6 +52,7 @@ export function DataExplorerProvider({
     setOrderByDirection(DEFAULTS.orderByDirection);
     setVizConfig(makeDefaultVizConfig("table"));
   }, []);
+  console.log("👉 orderByDirection:", orderByDirection);
 
   const onSelectDatasetChange = useCallback(
     (newValue: DatasetId | undefined) => {

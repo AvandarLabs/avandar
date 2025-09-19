@@ -9,6 +9,7 @@ import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys, omit } from "@/lib/utils/objects/misc";
 import { DatasetSelect } from "../common/DatasetSelect";
 import { AggregationSelect } from "./AggregationSelect";
+import { OrderByDirection } from "./DataExplorerContext/types";
 import { DatasetColumnMultiSelect } from "./DatasetColumnMultiSelect";
 import type { DatasetId } from "@/models/datasets/Dataset";
 import type { DatasetColumn } from "@/models/datasets/DatasetColumn";
@@ -16,12 +17,11 @@ import type { DatasetColumn } from "@/models/datasets/DatasetColumn";
 const HIDE_WHERE = true;
 const HIDE_LIMIT = true;
 
-type Direction = "asc" | "desc";
-
-const orderDirectionOptions: Array<{ value: Direction; label: string }> = [
-  { value: "asc", label: "Ascending" },
-  { value: "desc", label: "Descending" },
-] as const;
+const orderDirectionOptions: Array<{ value: OrderByDirection; label: string }> =
+  [
+    { value: "asc", label: "Ascending" },
+    { value: "desc", label: "Descending" },
+  ] as const;
 
 type Props = {
   errorMessage?: string;
@@ -31,7 +31,7 @@ type Props = {
   selectedColumns: readonly DatasetColumn[];
   selectedGroupByColumns: readonly DatasetColumn[];
   orderByColumn: DatasetColumn | undefined;
-  orderByDirection: Direction;
+  orderByDirection: OrderByDirection;
 
   onAggregationsChange: (next: Record<string, QueryAggregationType>) => void;
   onSelectDatasetChange: (datasetId: DatasetId | undefined) => void;
@@ -39,7 +39,7 @@ type Props = {
   onSelectColumnsChange: (columns: readonly DatasetColumn[]) => void;
   onGroupByChange: (columns: readonly DatasetColumn[]) => void;
   onOrderByColumnChange: (column: DatasetColumn | undefined) => void;
-  onOrderByDirectionChange: (dir: Direction) => void;
+  onOrderByDirectionChange: (dir: OrderByDirection) => void;
 };
 
 export function QueryForm({
@@ -64,6 +64,14 @@ export function QueryForm({
   }, [selectedColumns]);
 
   const orderByColumnId = orderByColumn?.id ?? null;
+
+  const builderTouched =
+    selectedColumns.length > 0 ||
+    (selectedGroupByColumns?.length ?? 0) > 0 ||
+    orderByDirection != null;
+
+  const showEmptyFieldsError = selectedColumns.length === 0 && builderTouched;
+  console.log("ORDER BY:", { orderByColumn, orderByDirection });
 
   return (
     <form>
@@ -140,34 +148,55 @@ export function QueryForm({
 
         <Select
           label="Order field"
+          placeholder="Select field"
           data={fieldOptionsById}
-          value={orderByColumnId}
+          value={
+            (
+              fieldOptionsById.some((opt) => {
+                return opt.value === orderByColumn?.id;
+              })
+            ) ?
+              orderByColumn?.id
+            : null
+          }
           onChange={(newFieldId) => {
-            if (newFieldId === null) {
+            if (!newFieldId) {
               onOrderByColumnChange(undefined);
               return;
             }
-            const newOrderByColumn = selectedColumns.find((field) => {
-              return field.id === newFieldId;
+            const col = selectedColumns.find((f) => {
+              return f.id === newFieldId;
             });
-            onOrderByColumnChange(newOrderByColumn);
+            onOrderByColumnChange(col);
           }}
           clearable
         />
-
         <Box mb="md">
           <Select
             label="Order by"
             placeholder="Select order"
             data={orderDirectionOptions}
-            value={orderByDirection}
-            clearable={false}
-            onChange={(value) => {
-              if (value !== null) {
-                onOrderByDirectionChange(value);
-              }
+            value={
+              (
+                orderDirectionOptions.some((opt) => {
+                  return opt.value === orderByDirection;
+                })
+              ) ?
+                orderByDirection
+              : null
+            }
+            onChange={(val) => {
+              onOrderByDirectionChange((val as OrderByDirection) ?? null);
             }}
+            clearable={false}
           />
+
+          {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
+          {showEmptyFieldsError ?
+            <DangerText>
+              At least one column must be selected to build a query.
+            </DangerText>
+          : null}
 
           {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
           {errorMessage ?
