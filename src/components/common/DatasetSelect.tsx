@@ -2,6 +2,7 @@ import { useUncontrolled } from "@mantine/hooks";
 import { useCallback, useMemo } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
 import { Select, SelectOptionGroup, SelectProps } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
@@ -25,6 +26,7 @@ export function DatasetSelect({
   onChange,
   ...selectProps
 }: Props): JSX.Element {
+  const workspace = useCurrentWorkspace();
   const [controlledValue, onChangeValue] = useUncontrolled({
     value,
     defaultValue,
@@ -33,9 +35,11 @@ export function DatasetSelect({
   });
 
   const [datasets] = DatasetClient.useGetAll();
-
+  const filteredDatasets = datasets?.filter((dataset) => {
+    return dataset.workspaceId === workspace.id;
+  });
   useOnBecomesDefined(
-    datasets,
+    filteredDatasets,
     useCallback(
       (dsets) => {
         onChangeValue(dsets[0]?.id ?? null);
@@ -45,12 +49,12 @@ export function DatasetSelect({
   );
 
   const datasetOptions = useMemo(() => {
-    const datasetBucketsByType = makeBucketMapFromList(datasets ?? [], {
+    const datasetBucketsByType = makeBucketMapFromList(filteredDatasets ?? [], {
       keyFn: getProp("sourceType"),
     });
 
     if (datasetBucketsByType.size === 1) {
-      return makeSelectOptions(datasets ?? [], {
+      return makeSelectOptions(filteredDatasets ?? [], {
         valueFn: getProp("id"),
         labelFn: getProp("name"),
       });
@@ -81,7 +85,7 @@ export function DatasetSelect({
     });
 
     return groups;
-  }, [datasets]);
+  }, [filteredDatasets]);
 
   return (
     <Select
