@@ -25,8 +25,8 @@ export function assertIsDefined<T>(
   msg?: string,
 ): asserts value is T {
   if (value === undefined) {
-    const errMsg = msg ?? "Expected value to be defined";
-    Logger.error(errMsg, { value });
+    const errMsg = msg ?? "Expected value to be defined. Received undefined.";
+    Logger.error(errMsg);
     throw new Error(errMsg);
   }
 }

@@ -46,6 +46,19 @@ export type BaseModelCRUDClient<M extends ModelCRUDTypes> = {
   parsers: ModelCRUDParserRegistry<M>;
 
   /**
+   * The CRUD functions for the model, in case we need to work directly
+   * with the CRUD-level functions and types.
+   */
+  crudFunctions: Omit<
+    CreateModelCRUDClientOptions<M, EmptyObject, EmptyObject>,
+    | "modelName"
+    | "parsers"
+    | "additionalQueries"
+    | "additionalMutations"
+    | "defaultGetAllBatchSize"
+  >;
+
+  /**
    * Retrieves a single model instance by its ID.
    * @param params - The parameters for the operation
    * @param params.id - The unique identifier of the model to retrieve.
@@ -347,6 +360,7 @@ export function createModelCRUDClient<
 
     const modelClient = {
       ...baseClient,
+      crudFunctions: crudFns,
       getById: async (params: {
         id: M["modelPrimaryKeyType"] | null | undefined;
       }): Promise<M["Read"] | undefined> => {

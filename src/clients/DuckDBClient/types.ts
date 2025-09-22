@@ -10,8 +10,38 @@ export type QueryResultColumn = {
 export type QueryResultData<T extends UnknownObject = UnknownObject> = {
   fields: QueryResultColumn[];
   data: T[];
+
+  /** The number of rows in the `data` array */
   numRows: number;
 };
+
+export type QueryResultDataPage<T extends UnknownObject = UnknownObject> =
+  QueryResultData<T> & {
+    /**
+     * The total number of rows in the data store (for the query that
+     * generated this page)
+     */
+    totalRows: number;
+
+    /**
+     * The total number of pages in the data store (for the query that
+     * generated this page)
+     */
+    totalPages: number;
+
+    /**
+     * The next page number, or undefined if there is no next page
+     */
+    nextPage: number | undefined;
+
+    /** The current page number */
+    pageNum: number;
+
+    /**
+     * The previous page number, or undefined if there is no previous page
+     */
+    prevPage: number | undefined;
+  };
 
 /**
  * The CSV Reject Scans Table returns the following information:
@@ -192,14 +222,22 @@ export type QueryAggregationType =
 
 export type StructuredDuckDBQueryConfig = {
   tableName: string;
-  selectFields: readonly DatasetColumn[];
-  groupByFields: readonly DatasetColumn[];
+  selectFields?: readonly DatasetColumn[] | "*";
+  groupByFields?: readonly DatasetColumn[];
   orderByColumn?: DatasetColumn | undefined;
   orderByDirection?: "asc" | "desc";
 
   /**
    * Aggregations to apply to the selected fields.
-   * Key is the field name. Value is the type of aggregation.
+   * Key is the field name (not field id). Value is the aggregation type.
    */
-  aggregations: Record<string, QueryAggregationType>;
+  aggregations?: Record<string, QueryAggregationType>;
+  offset?: number;
+  limit?: number;
+
+  /**
+   * If true, timestamps will be cast to ISO strings before returning.
+   * Otherwise, they will be returned as numbers.
+   */
+  castTimestampsToISO?: boolean;
 };

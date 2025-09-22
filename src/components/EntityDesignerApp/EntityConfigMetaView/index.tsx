@@ -8,10 +8,10 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
 import { Paper } from "@/lib/ui/Paper";
-import { hasNonUndefinedProps } from "@/lib/utils/guards";
+import { hasDefinedProps } from "@/lib/utils/guards";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityConfig } from "@/models/EntityConfig/types";
-import { generateEntities } from "./generateEntities";
+import { NEW_generateEntities } from "./generateEntities";
 import { useHydratedEntityConfig } from "./useHydratedEntityConfig";
 
 type Props = {
@@ -66,17 +66,15 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
               loading={isGeneratingEntities}
               onClick={async () => {
                 // generate all entities in-browser and in-memory for now
-                if (
-                  hasNonUndefinedProps(fullEntityConfig, ["datasets", "fields"])
-                ) {
+                if (hasDefinedProps(fullEntityConfig, ["datasets", "fields"])) {
                   const newFields = fullEntityConfig.fields.filter((field) => {
-                    return hasNonUndefinedProps(field, "valueExtractor");
+                    return hasDefinedProps(field, "valueExtractor");
                   });
 
                   // TODO(jpsyx): make this a mutation so you can show a loading
                   // spinner by using `isPending`
                   setIsGeneratingEntities(true);
-                  await generateEntities({
+                  await NEW_generateEntities({
                     ...fullEntityConfig,
                     fields: newFields,
                   });

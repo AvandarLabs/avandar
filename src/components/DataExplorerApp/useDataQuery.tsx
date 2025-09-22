@@ -1,3 +1,4 @@
+import { SetFieldType } from "type-fest";
 import { LocalDatasetEntryClient } from "@/clients/datasets/LocalDatasetEntryClient";
 import { DuckDBClient, UnknownRow } from "@/clients/DuckDBClient";
 import {
@@ -14,7 +15,16 @@ import { DatasetId } from "@/models/datasets/Dataset";
 type UseDataQueryOptions = {
   datasetId?: DatasetId;
   enabled: boolean;
-} & Partial<Omit<StructuredDuckDBQueryConfig, "tableName">>;
+} & Partial<
+  Omit<
+    SetFieldType<
+      StructuredDuckDBQueryConfig,
+      "selectFields",
+      Exclude<StructuredDuckDBQueryConfig["selectFields"], "*">
+    >,
+    "tableName"
+  >
+>;
 
 export function useDataQuery({
   datasetId,

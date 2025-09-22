@@ -1,4 +1,4 @@
-import { isNotUndefined } from "@/lib/utils/guards";
+import { isDefined } from "@/lib/utils/guards";
 import { uuid } from "@/lib/utils/uuid";
 import { DatasetId } from "@/models/datasets/Dataset";
 import { BuildableEntityConfig, Pipeline, PipelineStep } from "./pipelineTypes";
@@ -105,7 +105,7 @@ export function makePipelineFromEntityConfig(
             field.valueExtractor.datasetId
           : undefined;
       })
-      .filter(isNotUndefined),
+      .filter(isDefined),
   );
 
   const dataPullSteps = [...datasetsToLoad].map(_makeDataPullStep);

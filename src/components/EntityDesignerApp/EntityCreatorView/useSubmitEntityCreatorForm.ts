@@ -4,7 +4,7 @@ import {
   useMutation,
   UseMutationResultTuple,
 } from "@/lib/hooks/query/useMutation";
-import { hasPropKeys, isNotUndefined } from "@/lib/utils/guards";
+import { hasPropKeys, isDefined } from "@/lib/utils/guards";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
@@ -75,7 +75,7 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
               })
               .exhaustive();
           })
-          .filter(isNotUndefined);
+          .filter(isDefined);
 
       // Send the bulk insert requrest
       await ValueExtractorClient.bulkInsert({

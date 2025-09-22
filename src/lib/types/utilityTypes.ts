@@ -1,15 +1,5 @@
 import type { UnknownObject } from "./common";
-import type {
-  StringKeyOf as BroadStringKeyOf,
-  ConditionalKeys,
-  UnknownRecord,
-} from "type-fest";
-
-/**
- * Get all the keys of an object that map to a given type.
- * @deprecated Just use type-fest's `ConditionalKeys` directly instead.
- */
-export type KeysThatMapTo<T, Obj extends object> = ConditionalKeys<Obj, T>;
+import type { StringKeyOf as BroadStringKeyOf, UnknownRecord } from "type-fest";
 
 /**
  * A stricter version of type-fest's `StringKeyOf` that will return

@@ -5,7 +5,7 @@ import { DexieModelCRUDTypes } from "@/lib/models/DexieModelCRUDTypes";
 import { ModelCRUDParserRegistry } from "@/lib/models/makeParserRegistry";
 import { applyFiltersToRows } from "@/lib/utils/filters/applyFiltersToRows";
 import { FiltersByColumn } from "@/lib/utils/filters/filtersByColumn";
-import { isNotUndefined } from "@/lib/utils/guards";
+import { isDefined } from "@/lib/utils/guards";
 import {
   createModelCRUDClient,
   HookableClient,
@@ -174,7 +174,7 @@ export function createDexieCRUDClient<
           "Could not find the models that should have just been inserted.",
         );
       }
-      return insertedData.filter(isNotUndefined);
+      return insertedData.filter(isDefined);
     },
 
     update: async (params: {

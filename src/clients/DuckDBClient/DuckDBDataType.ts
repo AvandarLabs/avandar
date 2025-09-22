@@ -18,6 +18,7 @@ export type DuckDBDataTypeT =
   | "TIME"
   | "TIMESTAMP"
   | "TIMESTAMP_TZ"
+  | "TIMESTAMP WITH TIME ZONE"
   | "INTERVAL"
   | "VARCHAR"
   | "BLOB"
@@ -33,6 +34,16 @@ export type DuckDBDataTypeT =
   | "GEOMETRY";
 
 export const DuckDBDataType = {
+  isDateOrTimestamp: (duckDBDataType: DuckDBDataTypeT): boolean => {
+    return [
+      "DATE",
+      "TIME",
+      "TIMESTAMP",
+      "TIMESTAMP_TZ",
+      "TIMESTAMP WITH TIME ZONE",
+    ].includes(duckDBDataType);
+  },
+
   /**
    * Converts a DuckDB data type to a DatasetColumn data type.
    */
@@ -58,9 +69,16 @@ export const DuckDBDataType = {
             return "number" as const;
           },
         )
-        .with("DATE", "TIME", "TIMESTAMP", "TIMESTAMP_TZ", () => {
-          return "date" as const;
-        })
+        .with(
+          "DATE",
+          "TIME",
+          "TIMESTAMP",
+          "TIMESTAMP_TZ",
+          "TIMESTAMP WITH TIME ZONE",
+          () => {
+            return "date" as const;
+          },
+        )
         .with("VARCHAR", "UUID", () => {
           return "text" as const;
         })

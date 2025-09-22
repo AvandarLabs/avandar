@@ -15,6 +15,7 @@ import { objectEntries, objectKeys } from "@/lib/utils/objects/misc";
 import { mapObjectValues } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
 import { arrowFieldToQueryResultField } from "./arrowFieldToQueryResultField";
+import { DuckDBDataType } from "./DuckDBDataType";
 import {
   DuckDBColumnSchema,
   DuckDBCSVSniffResult,
@@ -24,6 +25,7 @@ import {
   DuckDBScan,
   LoadCSVErrors,
   QueryResultData,
+  QueryResultDataPage,
   StructuredDuckDBQueryConfig,
 } from "./types";
 
@@ -664,26 +666,181 @@ class DuckDBClientImpl {
     });
   }
 
-  async runStructuredQuery({
+  async #getPageHelper<T extends UnknownRow>(
+    queryParams: Omit<
+      StructuredDuckDBQueryConfig & {
+        pageSize: number;
+        pageNum: number;
+        totalRows: number | undefined;
+      },
+      "limit" | "offset"
+    >,
+  ): Promise<QueryResultDataPage<T>> {
+    const { tableName, pageSize, pageNum, totalRows } = queryParams;
+    const pageData = await this.runStructuredQuery<T>({
+      ...queryParams,
+      limit: pageSize,
+      offset: pageSize * pageNum,
+    });
+
+    // Now let's get the page metadata to add to the return result
+    let totalRowsInSource = totalRows;
+    if (totalRowsInSource === undefined) {
+      if (pageNum === 0 && pageData.data.length < pageSize) {
+        // if we're on the first page and the number of rows we received
+        // is less than the requested `pageSize`, then we can be 100% sure
+        // that we have all the rows. So there's no need to send a separate
+        // `getTableRowCount` query
+        totalRowsInSource = pageData.numRows;
+      } else {
+        // TODO(jpsyx): this should reuse the query params, in case a filter
+        // got sent
+        totalRowsInSource = await this.getTableRowCount(tableName);
+      }
+    }
+
+    // special case for when there's 0 rows, we still say there is 1 page
+    const totalPages =
+      totalRowsInSource === 0 ? 1 : Math.ceil(totalRowsInSource / pageSize);
+    const nextPage = pageNum + 1 === totalPages ? undefined : pageNum + 1;
+    const prevPage = pageNum === 0 ? undefined : pageNum - 1;
+
+    return {
+      ...pageData,
+      totalRows: totalRowsInSource,
+      totalPages,
+      nextPage,
+      prevPage,
+      pageNum,
+    };
+  }
+
+  async getPage<T extends UnknownRow>({
+    selectFields = "*",
+    groupByFields = [],
+    pageSize = 500,
+    pageNum = 0,
+    ...restOfStructuredQuery
+  }: Omit<
+    StructuredDuckDBQueryConfig & { pageSize: number; pageNum: number },
+    "limit" | "offset"
+  >): Promise<QueryResultDataPage<T>> {
+    const page = await this.#getPageHelper<T>({
+      selectFields,
+      groupByFields,
+      pageSize,
+      pageNum,
+      // pass `undefined` to mean we don't know the total number of rows
+      // yet. We don't want to calculate this eagerly because there are cases
+      // where we won't need to send a separate `count` query.
+      totalRows: undefined,
+      ...restOfStructuredQuery,
+    });
+    return page;
+  }
+
+  async forEachQueryPage<T extends UnknownRow>(
+    {
+      selectFields = "*",
+      groupByFields = [],
+      aggregations = {},
+      pageSize = 500,
+      ...restOfStructuredQuery
+    }: Omit<StructuredDuckDBQueryConfig, "limit" | "offset"> & {
+      pageSize?: number;
+    },
+    callback: (page: QueryResultDataPage<T>) => void | Promise<void>,
+  ): Promise<{ numPages: number; numRows: number }> {
+    const firstPage = await this.#getPageHelper<T>({
+      selectFields,
+      groupByFields,
+      aggregations,
+      pageSize,
+      pageNum: 0,
+      // pass `undefined` to mean we don't know the total number of rows
+      // yet. We don't want to calculate this eagerly because there are cases
+      // where we won't need to send a separate `count` query.
+      totalRows: undefined,
+      ...restOfStructuredQuery,
+    });
+    await callback(firstPage);
+
+    let numPages = 1;
+    let numRows = firstPage.numRows;
+
+    // Now iterate through pages until we get the last one
+    let nextPageNum = firstPage.nextPage;
+    while (nextPageNum !== undefined) {
+      const newPage = await this.#getPageHelper<T>({
+        selectFields,
+        groupByFields,
+        aggregations,
+        pageSize,
+        pageNum: nextPageNum,
+        totalRows: firstPage.totalRows,
+        ...restOfStructuredQuery,
+      });
+      await callback(newPage);
+      nextPageNum = newPage.nextPage;
+
+      numPages += 1;
+      numRows += newPage.numRows;
+    }
+
+    return {
+      numPages,
+      numRows,
+    };
+  }
+
+  async runStructuredQuery<T extends UnknownRow>({
     tableName,
-    selectFields,
-    groupByFields,
-    aggregations,
+    selectFields = "*",
+    groupByFields = [],
+    aggregations = {},
     orderByColumn,
     orderByDirection,
-  }: StructuredDuckDBQueryConfig): Promise<QueryResultData<UnknownRow>> {
-    const selectFieldNames = selectFields.map(getProp("name"));
+    castTimestampsToISO,
+    limit,
+    offset,
+  }: StructuredDuckDBQueryConfig): Promise<QueryResultData<T>> {
+    const tableColumns = await this.getTableSchema(tableName);
+    const timestampColumnNames = tableColumns
+      .filter((col) => {
+        return DuckDBDataType.isDateOrTimestamp(col.column_type);
+      })
+      .map(getProp("column_name"));
+
+    const selectColumnNames =
+      selectFields === "*" ?
+        tableColumns.map(getProp("column_name"))
+      : selectFields.map(getProp("name"));
     const groupByFieldNames = groupByFields.map(getProp("name"));
 
     return this.#withConnection(async ({ conn }) => {
-      const fieldNamesWithoutAggregations = selectFieldNames.filter(
+      const fieldNamesWithoutAggregations = selectColumnNames.filter(
         (fieldName) => {
-          return aggregations[fieldName] === "none";
+          return (
+            aggregations[fieldName] === undefined ||
+            aggregations[fieldName] === "none"
+          );
         },
       );
 
-      // build the query
-      let query = sql.select(...fieldNamesWithoutAggregations).from(tableName);
+      // if requested, cast any timestamp columns that will go in the SELECT
+      // clause to ISO strings
+      const adjustedFieldNames =
+        castTimestampsToISO ?
+          fieldNamesWithoutAggregations.map((colName) => {
+            return timestampColumnNames.includes(colName) ?
+                sql.raw(
+                  `strftime("${colName}"::TIMESTAMP, '%Y-%m-%dT%H:%M:%S.%fZ') as "${colName}"`,
+                )
+              : colName;
+          })
+        : fieldNamesWithoutAggregations;
+
+      let query = sql.select(...adjustedFieldNames).from(tableName);
       if (groupByFieldNames.length > 0) {
         query = query.groupBy(...groupByFieldNames);
       }
@@ -720,6 +877,14 @@ class DuckDBClientImpl {
         },
         query,
       );
+
+      // apply limits and offsets
+      if (limit) {
+        query = query.limit(limit);
+      }
+      if (offset) {
+        query = query.offset(offset);
+      }
 
       // run the query
       try {

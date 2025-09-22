@@ -1,10 +1,10 @@
 import { invariant } from "@tanstack/react-router";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { PullDataStepConfig } from "../pipelineTypes";
+import { DataPullStepConfig } from "../pipelineTypes";
 import { PipelineContext } from "./runPipeline";
 
 export async function runDataPullStep(
-  stepConfig: PullDataStepConfig,
+  stepConfig: DataPullStepConfig,
   context: PipelineContext,
 ): Promise<PipelineContext> {
   if (stepConfig.sourceType !== "local") {

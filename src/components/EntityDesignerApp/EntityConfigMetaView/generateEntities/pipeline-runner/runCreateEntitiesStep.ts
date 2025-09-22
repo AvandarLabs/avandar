@@ -173,6 +173,19 @@ exist in the dataset "${sourceDataset.name}". Could not find Dataset Column ID
 }
 */
 
+export async function NEW_runCreateEntitiesStep(): Promise<PipelineContext> {
+  // all datasets should be loaded by now
+  // query each dataset for the external id column
+  //   optimization: we only had to load the columns necessary to computer
+  //   external ids
+  // this should be a QETL pipeline.
+  // query: identify what needs to be loaded.
+  // extract: query the data
+  // transform:
+  // load:
+  throw new Error("Not implemented");
+}
+
 export async function runCreateEntitiesStep(
   stepConfig: CreateEntitiesStepConfig,
   context: PipelineContext,
@@ -190,7 +203,7 @@ export async function runCreateEntitiesStep(
     _getDatasetIdsToEntityIdFields(entityConfig);
 
   // now we want to build the External ID Row Group Lookup, which is a map of an
-  // entity's external ID to the lsit of rows from **all** the source datasets
+  // entity's external ID to the list of rows from **all** the source datasets
   // that match this external ID.
   const sourceDatasetIdsToExternalIdRowGroupLookup = mapObjectValues(
     sourceDatasetIdsToEntityIdFields,
@@ -236,7 +249,6 @@ export async function runCreateEntitiesStep(
 
   // in the function above we created an externalIdRowGroupLookup for
   // each source dataset. Now we merge them all into one big lookup.
-
   const entities: Entity[] = [];
   const externalIdRowGroupLookup = mergeBucketMaps(
     ...objectValues(sourceDatasetIdsToExternalIdRowGroupLookup),

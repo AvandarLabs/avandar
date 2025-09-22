@@ -4,7 +4,7 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { where } from "@/lib/utils/filters/filterBuilders";
-import { isNotUndefined } from "@/lib/utils/guards";
+import { isDefined } from "@/lib/utils/guards";
 import { makeObjectFromList } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { EntityConfigFormType } from "../../entityConfigFormTypes";
@@ -25,7 +25,7 @@ export function IDConfigBlock({
       ...new Set(
         datasetColumnFields
           .map(getProp("extractors.datasetColumnValue.datasetId"))
-          .filter(isNotUndefined),
+          .filter(isDefined),
       ),
     ];
   }, [datasetColumnFields]);

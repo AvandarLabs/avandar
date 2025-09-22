@@ -1,7 +1,7 @@
 import { invariant } from "@tanstack/react-router";
 import { match } from "ts-pattern";
 import { RawDataRow } from "@/lib/types/common";
-import { isNotUndefined } from "@/lib/utils/guards";
+import { isDefined } from "@/lib/utils/guards";
 import { rowsToColumns } from "@/lib/utils/objects/rowsToColumns";
 import {
   DatasetColumn,
@@ -123,6 +123,6 @@ export function getSummary({
             }
             return undefined;
           })
-          .filter(isNotUndefined),
+          .filter(isDefined),
   };
 }

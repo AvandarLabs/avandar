@@ -113,7 +113,7 @@ export function runPipelineStep(
     .with({ type: "create_entities" }, ({ relationships: { stepConfig } }) => {
       return runCreateEntitiesStep(stepConfig, context);
     })
-    .exhaustive(() => {
+    .otherwise(() => {
       Logger.error("Unknown pipeline step type", pipelineStep);
       throw new Error(
         `Pipeline failed to run. Unknown pipeline step type: '${pipelineStep.type}'`,

@@ -1,3 +1,4 @@
+import { ConditionalKeys } from "type-fest";
 import { constant } from "../higherOrderFuncs";
 import { identity } from "../misc";
 
@@ -13,41 +14,56 @@ function toString<T>(item: T): string | T {
  *
  * @param list The list of items to convert.
  * @param options The options for creating the object.
+ * @param options.key The object key from which we will extract the output key.
+ * This takes precedence over `keyFn`.
  * @param options.keyFn A function that returns the key for each item. Defaults
  * to the `toString` function.
+ * @param options.valueKey The object key from which we will extract the output
+ * value. This takes precedence over `valueFn`. If neither `valueKey`
+ * nor `valueFn` is provided, then we default to using the identity function.
  * @param options.valueFn A function that returns the value for each
- * item. Defaults to the identity function.
+ * item. If neither `valueKey` nor `valueFn` is provided, then we default to
+ * using the identity function.
  * @param options.defaultValue A default value to use for each item if no
- * valueFn is provided. If a `valueFn` is provided, it takes precedence over
- * the `defaultValue`.
+ * valueFn is provided. If either `valueKey` or `valueFn` are provided, they
+ * will take precedence over the `defaultValue`.
  *
  * @returns An object with keys and values extracted from the list.
  */
 export function makeObjectFromList<
   T,
-  K extends string | number = string,
-  V = T,
+  InK extends ConditionalKeys<T, PropertyKey> | undefined,
+  OutK extends undefined extends InK ? PropertyKey
+  : Extract<T[Extract<InK, PropertyKey>], PropertyKey>,
+  ValueKey extends ConditionalKeys<T, PropertyKey> | undefined,
+  OutV extends undefined extends ValueKey ? unknown
+  : T[Extract<ValueKey, PropertyKey>] = undefined extends ValueKey ? T
+  : T[Extract<ValueKey, PropertyKey>],
 >(
   list: readonly T[],
   options:
     | {
-        keyFn?: (item: T) => K;
-        valueFn?: (item: T) => V;
+        keyFn?: (item: T) => OutK;
+        key?: InK;
+        valueFn?: (item: T) => OutV;
+        valueKey?: ValueKey;
       }
     | {
-        keyFn?: (item: T) => K;
-        defaultValue: V;
+        keyFn?: (item: T) => OutK;
+        key?: InK;
+        defaultValue: OutV;
       } = {},
-): Record<K, V> {
-  const keyFn = (options.keyFn ?? toString) as (item: T) => K;
+): Record<OutK, OutV> {
+  const keyFn = (options.keyFn ?? toString) as (item: T) => OutK;
   const valueFn =
     "valueFn" in options && options.valueFn ? options.valueFn
     : "defaultValue" in options ? constant(options.defaultValue)
-    : (identity as (item: T) => V);
+    : (identity as (item: T) => OutV);
 
-  const obj = {} as Record<K, V>;
+  const obj = {} as Record<OutK, OutV>;
   list.forEach((item) => {
-    obj[keyFn(item)] = valueFn(item);
+    const key = (options.key ? item[options.key] : keyFn(item)) as OutK;
+    obj[key] = valueFn(item);
   });
   return obj;
 }

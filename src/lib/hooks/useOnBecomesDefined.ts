@@ -1,6 +1,6 @@
 import { usePrevious } from "@mantine/hooks";
 import { useEffect } from "react";
-import { isNotUndefined } from "../utils/guards";
+import { isDefined } from "../utils/guards";
 
 /**
  * Calls `callback` when `value` changes from `undefined` to any value.
@@ -14,7 +14,7 @@ export function useOnBecomesDefined<T>(
   const prevValue = usePrevious(value);
 
   useEffect(() => {
-    if (prevValue === undefined && isNotUndefined(value)) {
+    if (prevValue === undefined && isDefined(value)) {
       callback(value);
     }
   }, [prevValue, value, callback]);

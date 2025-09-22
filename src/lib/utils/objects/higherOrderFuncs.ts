@@ -1,7 +1,7 @@
 import { ConditionalKeys, Paths, SetRequired, UnknownArray } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
 import { SetDefined } from "@/lib/types/utilityTypes";
-import { hasNonUndefinedProps } from "../guards";
+import { hasDefinedProps } from "../guards";
 import { getValue, PathValue } from "./getValue";
 import { omit, pick } from "./misc";
 import { setValue } from "./setValue";
@@ -95,7 +95,7 @@ export function propIsDefined<T extends object, K extends keyof T>(
   key: K,
 ): (obj: T) => obj is SetRequired<T, K> & SetDefined<T, K> {
   return (obj: T) => {
-    return hasNonUndefinedProps(obj, [key]);
+    return hasDefinedProps(obj, [key]);
   };
 }
 

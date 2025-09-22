@@ -17,7 +17,7 @@ import { useForm } from "@/lib/hooks/ui/useForm";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { Paper } from "@/lib/ui/Paper";
-import { isNotUndefined } from "@/lib/utils/guards";
+import { isDefined } from "@/lib/utils/guards";
 import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
 import { setValue } from "@/lib/utils/objects/setValue";
 import { DatasetColumnFieldsBlock } from "./DatasetColumnFieldsBlock";
@@ -95,7 +95,7 @@ export function EntityCreatorView(): JSX.Element {
           }
           return undefined;
         })
-        .filter(isNotUndefined);
+        .filter(isDefined);
 
       const nonPrimaryKeyFields = values.datasetColumnFields.filter((field) => {
         if (field.options.valueExtractorType === "dataset_column_value") {

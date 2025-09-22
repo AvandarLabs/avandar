@@ -81,16 +81,18 @@ export function isNonNullish<T>(value: T): value is NonNullable<T> {
 /**
  * Checks if `value` is not `undefined`.
  *
+ * NOTE: the value can still be `null`. This counts as a defined value.
+ *
  * **Examples**
  *
  * ```ts
- * isNotUndefined(undefined); // false
- * isNotUndefined("foo"); // true
- * isNotUndefined(0); // true
- * isNotUndefined(false); // true
+ * isDefined(undefined); // false
+ * isDefined("foo"); // true
+ * isDefined(0); // true
+ * isDefined(false); // true
  * ```
  */
-export function isNotUndefined<T>(value: T): value is Exclude<T, undefined> {
+export function isDefined<T>(value: T): value is Exclude<T, undefined> {
   return value !== undefined;
 }
 
@@ -199,7 +201,7 @@ export function hasPropKeys<T extends UnknownObject, Key extends keyof T>(
  * @returns `true` if `obj` has all the properties in `properties` and that
  * they are not undefined, `false` otherwise.
  */
-export function hasNonUndefinedProps<T extends object, Key extends keyof T>(
+export function hasDefinedProps<T extends object, Key extends keyof T>(
   obj: T,
   properties: Extract<Key, string> | readonly Key[],
 ): obj is SetRequired<T, Key> & SetDefined<T, Key> {
