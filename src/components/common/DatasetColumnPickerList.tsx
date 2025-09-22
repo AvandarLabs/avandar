@@ -11,6 +11,7 @@ import { usePrevious, useUncontrolled } from "@mantine/hooks";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
 import {
   SegmentedControl,
@@ -64,6 +65,8 @@ export function DatasetColumnPickerList({
   excludeColumns,
   segmentedControlProps,
 }: Props): JSX.Element {
+  const workspace = useCurrentWorkspace();
+
   // we use `useUncontrolled` so this SegmentedControl (which is technically a
   // `radio` input) can be used with `useForm`
   const [controlledValue, setSelectedValue] = useUncontrolled({
@@ -83,26 +86,31 @@ export function DatasetColumnPickerList({
     ...where("id", "in", datasetIds),
     useQueryOptions: { enabled: isNonEmptyArray(datasetIds) },
   });
+
+  const filteredDatasets = datasets?.filter((dataset) => {
+    return dataset.workspaceId === workspace.id;
+  });
+
   const [datasetColumns] = DatasetColumnClient.useGetAll({
-    ...where("dataset_id", "in", datasets?.map(getProp("id")) ?? []),
-    useQueryOptions: { enabled: !!datasets },
+    ...where("dataset_id", "in", filteredDatasets?.map(getProp("id")) ?? []),
+    useQueryOptions: { enabled: !!filteredDatasets },
   });
 
   const datasetsWithColumns: readonly DatasetWithColumns[] = useMemo(() => {
-    if (!datasets || !datasetColumns) {
+    if (!filteredDatasets || !datasetColumns) {
       return [];
     }
     const datasetColumnBuckets = makeBucketRecordFromList(datasetColumns, {
       keyFn: getProp("datasetId"),
     });
 
-    return datasets.map((dataset) => {
+    return filteredDatasets.map((filteredDataset) => {
       return {
-        ...dataset,
-        columns: datasetColumnBuckets[dataset.id]!,
+        ...filteredDataset,
+        columns: datasetColumnBuckets[filteredDataset.id]!,
       };
     });
-  }, [datasets, datasetColumns]);
+  }, [filteredDatasets, datasetColumns]);
 
   const datasetColumnItems: Array<{
     dataset: Dataset;
@@ -175,7 +183,7 @@ export function DatasetColumnPickerList({
     <Group align="flex-start" style={{ position: "relative" }}>
       {/* Set up the dataset buttons to act as a table of contents */}
       <Stack gap={0}>
-        {datasets?.map((dataset) => {
+        {filteredDatasets?.map((dataset) => {
           const isActive = activeDatasetHeading === dataset.id;
           return (
             <Button
