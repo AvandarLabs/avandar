@@ -204,16 +204,24 @@ export async function NEW_generateEntities(
     },
   );
 
+  // TODO(jpsyx): NOTE: this will do an upsert on all rows. There is definitely
+  // optimization that can be done to only upsert new rows or rows that have
+  // a new name. There is no need to upsert rows that already exist and have
+  // not changed.
   const jobSummary = await DuckDBClient.forEachQueryPage<Entity<"DBRead">>(
     { tableName: entityConfig.id, castTimestampsToISO: true },
     async (page) => {
-      // TODO(jpsyx): handle upserts. use external_id as the unique key.
       await EntityClient.crudFunctions.bulkInsert({
         data: page.data,
+        upsert: true,
+        onConflict: {
+          columnNames: ["external_id", "entity_config_id"],
+          ignoreDuplicates: false,
+        },
         logger: Logger,
       });
     },
   );
 
-  Logger.log(`Finished inserting all pages`, jobSummary);
+  Logger.log(`Finished upserting all pages`, jobSummary);
 }
