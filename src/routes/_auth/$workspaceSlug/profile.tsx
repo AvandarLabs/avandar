@@ -83,7 +83,7 @@ function ProfilePage() {
                   : <Group>
                       <Text>Email: {user.email}</Text>
                       <Button onClick={toggleEditingEmailState}>
-                        Change Email
+                        Change email
                       </Button>
                     </Group>
                   }
