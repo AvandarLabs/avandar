@@ -1,7 +1,7 @@
 import { StructuredDuckDBQueryConfig } from "@/clients/DuckDBClient/types";
 import { UUID } from "@/lib/types/common";
 import { DatasetId } from "@/models/datasets/Dataset";
-import { EntityConfigWith } from "@/models/EntityConfig/types";
+import { EntityConfigWith } from "@/models/EntityConfig/EntityConfig.types";
 import { WorkspaceId } from "@/models/Workspace/types";
 
 // TODO(jpsyx): move this into some common type for all your models

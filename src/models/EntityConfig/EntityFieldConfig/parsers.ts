@@ -13,7 +13,7 @@ import {
 import { pipe } from "@/lib/utils/pipe";
 import { uuid } from "@/lib/utils/uuid";
 import { WorkspaceId } from "@/models/Workspace/types";
-import { EntityConfigId } from "../types";
+import { EntityConfigId } from "../EntityConfig.types";
 import {
   DimensionRead,
   EntityFieldConfig,

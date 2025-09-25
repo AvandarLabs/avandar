@@ -1,7 +1,7 @@
 import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { NEW_EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient";
+import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient";
 import { SourceBadge } from "@/components/common/SourceBadge";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { Paper } from "@/lib/ui/Paper";
@@ -15,12 +15,12 @@ import { unknownToString } from "@/lib/utils/strings/transformations";
 import { DatasetSourceType } from "@/models/datasets/Dataset";
 import { Entity } from "@/models/entities/Entity";
 import { EntityFieldValue } from "@/models/entities/EntityFieldValue";
+import { EntityConfig } from "@/models/EntityConfig/EntityConfig.types";
 import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
 import {
   EntityFieldConfig,
   EntityFieldConfigId,
 } from "@/models/EntityConfig/EntityFieldConfig/types";
-import { EntityConfig } from "@/models/EntityConfig/types";
 import { ActivityBlock } from "./ActivityBlock";
 import { StatusPill } from "./StatusPill";
 
@@ -54,7 +54,7 @@ function useHydratedEntity({
       where: { entity_config_id: { eq: entityConfig.id } },
     });
   const [entityFieldValues, isLoadingEntityFieldValues] =
-    NEW_EntityFieldValueClient.withLogger().useGetEntityFieldValues({
+    EntityFieldValueClient.withLogger().useGetEntityFieldValues({
       entityId: entity.id,
       entityFieldConfigs: entityFieldConfigs ?? [],
     });

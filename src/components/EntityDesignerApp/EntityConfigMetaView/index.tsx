@@ -9,9 +9,9 @@ import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
 import { Paper } from "@/lib/ui/Paper";
 import { hasDefinedProps } from "@/lib/utils/guards";
+import { EntityConfig } from "@/models/EntityConfig/EntityConfig.types";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
-import { EntityConfig } from "@/models/EntityConfig/types";
-import { NEW_generateEntities } from "./generateEntities";
+import { generateEntities } from "./generateEntities";
 import { useHydratedEntityConfig } from "./useHydratedEntityConfig";
 
 type Props = {
@@ -74,7 +74,7 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
                   // TODO(jpsyx): make this a mutation so you can show a loading
                   // spinner by using `isPending`
                   setIsGeneratingEntities(true);
-                  await NEW_generateEntities({
+                  await generateEntities({
                     ...fullEntityConfig,
                     fields: newFields,
                   });

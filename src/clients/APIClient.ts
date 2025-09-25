@@ -1,6 +1,6 @@
 import { SupabaseDBClient } from "@/lib/clients/supabase/SupabaseDBClient";
 import { Logger } from "@/lib/Logger";
-import { buildQueryString } from "@/lib/utils/buildQueryString";
+import { buildHTTPQueryString } from "@/lib/utils/buildHTTPQueryString";
 import type { API } from "@/types/http-api.types";
 
 type HTTPRequestOptions = {
@@ -43,7 +43,8 @@ async function sendHTTPRequest<Route extends keyof API>(
     throw new Error(errMsg);
   }
 
-  const queryString = queryParams ? buildQueryString(queryParams) : undefined;
+  const queryString =
+    queryParams ? buildHTTPQueryString(queryParams) : undefined;
   const { data, error } = await SupabaseDBClient.functions.invoke<
     API[Route]["returnType"]
   >(

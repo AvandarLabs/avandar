@@ -14,71 +14,16 @@ import {
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { promiseMap } from "@/lib/utils/promises";
 import { Entity } from "@/models/entities/Entity";
-import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/types";
-import { EntityFieldValueExtractor } from "@/models/EntityConfig/ValueExtractor/types";
-import { makePipelineFromEntityConfig } from "./makePipelineFromEntityConfig";
-import { runPipeline } from "./pipeline-runner/runPipeline";
+import { EntityConfigModule } from "@/models/EntityConfig";
 import { BuildableEntityConfig } from "./pipelineTypes";
-
-export async function generateEntities(
-  entityConfig: BuildableEntityConfig,
-): Promise<void> {
-  const pipeline = makePipelineFromEntityConfig(entityConfig);
-  await runPipeline(pipeline);
-}
-
-type EntityFieldConfigWithValueExtractor = EntityFieldConfig & {
-  valueExtractor: EntityFieldValueExtractor;
-};
-
-type EntityModule = {
-  getTitleField(): EntityFieldConfigWithValueExtractor;
-  getIdFields(): EntityFieldConfigWithValueExtractor[];
-};
-
-function createEntityModule(entityConfig: BuildableEntityConfig): EntityModule {
-  return {
-    getTitleField(): EntityFieldConfigWithValueExtractor {
-      const titleField = entityConfig.fields.find((field) => {
-        return field.options.isTitleField;
-      })!;
-      assertIsDefined(
-        titleField,
-        `Entity ${entityConfig.name} does not have a title field`,
-      );
-      return titleField;
-    },
-    getIdFields(): EntityFieldConfigWithValueExtractor[] {
-      return entityConfig.fields.filter((field) => {
-        return field.options.isIdField;
-      });
-    },
-  };
-}
-
-function entityModuleFactory() {
-  const moduleCache = new WeakMap<BuildableEntityConfig, EntityModule>();
-  return {
-    bind: (entityConfig: BuildableEntityConfig) => {
-      if (moduleCache.has(entityConfig)) {
-        return moduleCache.get(entityConfig)!;
-      }
-      const module = createEntityModule(entityConfig);
-      moduleCache.set(entityConfig, module);
-      return module;
-    },
-  };
-}
-
-const EntityConfig = entityModuleFactory();
 
 /**
  * Run a basic QETL pipeline to generate entities.
  */
-export async function NEW_generateEntities(
+export async function generateEntities(
   entityConfig: BuildableEntityConfig,
 ): Promise<void> {
-  const entConfig = EntityConfig.bind(entityConfig);
+  const entConfig = EntityConfigModule.bind(entityConfig);
 
   // 1. Figure out what source datasets we need to query.
   const primaryKeyFields = entConfig.getIdFields();

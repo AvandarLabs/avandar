@@ -1,6 +1,5 @@
 import { match } from "ts-pattern";
 import { BaseClient, createBaseClient } from "@/lib/clients/BaseClient";
-import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
 import { withLogger, WithLogger } from "@/lib/clients/withLogger";
 import { WithQueryHooks } from "@/lib/clients/withQueryHooks/types";
 import { withQueryHooks } from "@/lib/clients/withQueryHooks/withQueryHooks";
@@ -21,7 +20,6 @@ import { isInSet } from "@/lib/utils/sets/higherOrderFuncs";
 import { wrapString } from "@/lib/utils/strings/higherOrderFuncs";
 import { uuid } from "@/lib/utils/uuid";
 import { EntityId } from "@/models/entities/Entity";
-import { EntityFieldValueParsers } from "@/models/entities/EntityFieldValue/parsers";
 import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
 import {
   EntityFieldConfig,
@@ -34,13 +32,6 @@ import { LocalDatasetEntryClient } from "../datasets/LocalDatasetEntryClient";
 import { singleton } from "../DuckDBClient/queryResultHelpers";
 import { EntityClient } from "./EntityClient";
 import type { EntityFieldValue } from "@/models/entities/EntityFieldValue";
-
-export const EntityFieldValueClient = createSupabaseCRUDClient({
-  modelName: "EntityFieldValue",
-  tableName: "entity_field_values",
-  dbTablePrimaryKey: "id",
-  parsers: EntityFieldValueParsers,
-});
 
 type EntityFieldValueClientQueries = {
   getEntityFieldValues(params: {
@@ -306,4 +297,4 @@ function createEntityFieldValueClient(): WithLogger<
   });
 }
 
-export const NEW_EntityFieldValueClient = createEntityFieldValueClient();
+export const EntityFieldValueClient = createEntityFieldValueClient();
