@@ -96,6 +96,23 @@ export type AnyFunctionWithSignature<Params extends unknown[], Return> = (
 ) => Return;
 
 /**
+ * Gets the first parameter of a function.
+ */
+export type FirstParameter<Func extends AnyFunction> =
+  Func extends AnyFunctionWithArguments<infer Args> ? Args[0] : never;
+
+/**
+ * Gets the tail parameters of a function (i.e. everything after the first
+ * parameter)
+ */
+export type TailParameters<Func extends AnyFunction> =
+  Func extends AnyFunctionWithArguments<infer Args> ?
+    Args extends [unknown, ...infer Tail] ?
+      Tail
+    : never
+  : never;
+
+/**
  * Represents a single-parameter function that returns the same type it was
  * given.
  * (Note: this is just at the type-level. It does not mean the function

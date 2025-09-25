@@ -34,10 +34,10 @@ import { EntityClient } from "./EntityClient";
 import type { EntityFieldValue } from "@/models/entities/EntityFieldValue";
 
 type EntityFieldValueClientQueries = {
-  getEntityFieldValues(params: {
+  getEntityFieldValues: (params: {
     entityId: EntityId;
     entityFieldConfigs: readonly EntityFieldConfig[];
-  }): Promise<EntityFieldValue[]>;
+  }) => Promise<EntityFieldValue[]>;
 };
 
 export type IEntityFieldValueClient = BaseClient &
@@ -53,10 +53,10 @@ function createEntityFieldValueClient(): WithLogger<
   const baseClient = createBaseClient("DatasetRawData");
   return withLogger(baseClient, (baseLogger: ILogger) => {
     const queries = {
-      async getEntityFieldValues(params: {
+      getEntityFieldValues: async (params: {
         entityId: EntityId;
         entityFieldConfigs: readonly EntityFieldConfig[];
-      }): Promise<EntityFieldValue[]> {
+      }): Promise<EntityFieldValue[]> => {
         const logger = baseLogger.appendName("getEntityFieldValues");
         logger.log("Getting entity field values", params);
 

@@ -72,9 +72,9 @@ type DatasetRawDataClientQueries = {
    * executed.
    * @returns An array of rows
    */
-  runLocalRawQuery<T extends UnknownRow = UnknownRow>(
+  runLocalRawQuery: <T extends UnknownRow = UnknownRow>(
     params: DatasetLocalRawQueryOptions,
-  ): Promise<QueryResultData<T>>;
+  ) => Promise<QueryResultData<T>>;
 
   /**
    * Runs a structured query against the user's locally loaded raw data.
@@ -94,11 +94,11 @@ type DatasetRawDataClientQueries = {
    * replaced by a `datasetId` field.
    * @returns An array of rows
    */
-  runLocalStructuredQuery<T extends UnknownRow = UnknownRow>(
+  runLocalStructuredQuery: <T extends UnknownRow = UnknownRow>(
     params: DatasetLocalStructuredQueryOptions,
-  ): Promise<QueryResultData<T>>;
+  ) => Promise<QueryResultData<T>>;
 
-  getSummary(params: { datasetId: DatasetId }): Promise<DatasetSummary>;
+  getSummary: (params: { datasetId: DatasetId }) => Promise<DatasetSummary>;
 
   /**
    * Gets a preview of the dataset's locally loaded raw data.
@@ -106,10 +106,10 @@ type DatasetRawDataClientQueries = {
    * have an entry in LocalDatasetEntryClient that maps to a local DuckDB
    * table), then this will throw an error.
    */
-  getPreviewData(params: {
+  getPreviewData: (params: {
     datasetId: DatasetId;
     numRows: number;
-  }): Promise<UnknownDataFrame>;
+  }) => Promise<UnknownDataFrame>;
 };
 
 export type IDatasetRawDataClient = BaseClient & DatasetRawDataClientQueries;
@@ -172,9 +172,9 @@ function createDatasetRawDataClient(): WithLogger<
 
   return withLogger(baseClient, (baseLogger: ILogger) => {
     const queries: DatasetRawDataClientQueries = {
-      async runLocalRawQuery<T extends UnknownRow = UnknownRow>(
+      runLocalRawQuery: async <T extends UnknownRow = UnknownRow>(
         params: DatasetLocalRawQueryOptions,
-      ) {
+      ) => {
         const logger = baseLogger.appendName("runLocalRawQuery");
         logger.log("Running raw query", params);
         const { query, dependencies, queryArgs = {} } = params;
@@ -186,9 +186,9 @@ function createDatasetRawDataClient(): WithLogger<
         return DuckDBClient.runRawQuery<T>(query, queryArgs);
       },
 
-      async runLocalStructuredQuery<T extends UnknownRow = UnknownRow>(
+      runLocalStructuredQuery: async <T extends UnknownRow = UnknownRow>(
         params: DatasetLocalStructuredQueryOptions,
-      ): Promise<QueryResultData<T>> {
+      ): Promise<QueryResultData<T>> => {
         const logger = baseLogger.appendName("runLocalStructuredQuery");
         logger.log("Running structured query", params);
         const {
@@ -211,7 +211,10 @@ function createDatasetRawDataClient(): WithLogger<
         });
       },
 
-      async getPreviewData(params: { datasetId: DatasetId; numRows: number }) {
+      getPreviewData: async (params: {
+        datasetId: DatasetId;
+        numRows: number;
+      }) => {
         const logger = baseLogger.appendName("getPreviewData");
         logger.log("Getting preview data for dataset", params);
         const { datasetId, numRows } = params;
@@ -235,9 +238,9 @@ function createDatasetRawDataClient(): WithLogger<
         );
       },
 
-      async getSummary(params: {
+      getSummary: async (params: {
         datasetId: DatasetId;
-      }): Promise<DatasetSummary> {
+      }): Promise<DatasetSummary> => {
         const logger = baseLogger.appendName("getSummary");
         logger.log("Calling `getSummary`", params);
 
