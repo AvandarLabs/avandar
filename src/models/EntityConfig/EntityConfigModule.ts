@@ -1,5 +1,8 @@
 import { Simplify } from "type-fest";
-import { AnyFunctionWithArguments } from "@/lib/types/utilityTypes";
+import {
+  AnyFunction,
+  AnyFunctionWithArguments,
+} from "@/lib/types/utilityTypes";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { objectKeys } from "@/lib/utils/objects/misc";
 import { BuildableEntityConfig, EntityConfig } from "./EntityConfig.types";
@@ -77,18 +80,13 @@ function createEntityConfigModule(): WithBind<IEntityConfigModule> {
         if (typeof moduleMember === "function") {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           boundModule[moduleKey] = (...args: readonly unknown[]): any => {
-            return Function.prototype.call(
-              moduleMember,
-              {},
-              entityConfig,
-              ...args,
-            );
+            return (moduleMember as AnyFunction)(entityConfig, ...args);
           };
         }
       }
 
       boundModuleCache.set(entityConfig, boundModule);
-      return boundModule as BindWithEntityConfig<IEntityConfigModule>;
+      return boundModule;
     },
   };
 }
