@@ -1,4 +1,5 @@
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { LocalDatasetEntryClient } from "@/clients/datasets/LocalDatasetEntryClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { EntityClient } from "@/clients/entities/EntityClient";
@@ -79,10 +80,7 @@ export async function NEW_generateEntities(
 ): Promise<void> {
   const entConfig = EntityConfig.bind(entityConfig);
 
-  // 1. Query analysis: what datasets do we need to query?
-  // - Find all ID and name fields.
-  // - Of these, filter by datasetColumnValue extractors
-  // - Get the dataset IDs they need to have loaded
+  // 1. Figure out what source datasets we need to query.
   const primaryKeyFields = entConfig.getIdFields();
   const titleField = entConfig.getTitleField();
   const allFields = [...primaryKeyFields, titleField];
@@ -143,7 +141,7 @@ export async function NEW_generateEntities(
     },
   );
 
-  // 2. Extract all external IDs
+  // 2. Get the dataset columns to use for external IDs and the entity title
   const primaryKeyExtractors = datasetColumnValueExtractors.filter(
     (extractor) => {
       return extractor.entityFieldConfigId !== titleField.id;
@@ -158,35 +156,35 @@ export async function NEW_generateEntities(
   );
   const titleColumn = extractorColumnsLookup[titleExtractor.id]!;
 
-  await DuckDBClient.runRawQuery(
-    `
-    DROP TABLE IF EXISTS "$entityConfigId$";
+  await DatasetRawDataClient.runLocalRawQuery({
+    query: `
+      DROP TABLE IF EXISTS "$entityConfigId$";
 
-    CREATE TABLE "$entityConfigId$" AS (
-      -- Find all external IDs
-      WITH external_ids AS (
+      CREATE TABLE "$entityConfigId$" AS (
+        -- Find all external IDs
+        WITH external_ids AS (
+          SELECT
+            DISTINCT external_id
+          FROM ($externalIdSelectors$)
+          WHERE external_id IS NOT NULL
+        )
+
+        -- Get all names and join the tables together
         SELECT
-          DISTINCT external_id
-        FROM ($externalIdSelectors$)
-        WHERE external_id IS NOT NULL
-      )
-
-      -- Get all names and join the tables together
-      SELECT
-        gen_random_uuid() AS id,
-        NOW() as created_at,
-        NOW() as updated_at,
-        '$workspaceId$' AS workspace_id,
-        '$entityConfigId$' AS entity_config_id,
-        NULL::UUID AS assigned_to,
-        'active' AS status,
-        external_id,
-        t."$titleColumnName$" AS name
-      FROM external_ids e
-        LEFT JOIN "$titleTableName$" t ON e.external_id = t."$titleTableNamePrimaryKey$"
-    );
+          gen_random_uuid() AS id,
+          NOW() as created_at,
+          NOW() as updated_at,
+          '$workspaceId$' AS workspace_id,
+          '$entityConfigId$' AS entity_config_id,
+          NULL::UUID AS assigned_to,
+          'active' AS status,
+          external_id,
+          t."$titleColumnName$" AS name
+        FROM external_ids e
+          LEFT JOIN "$titleTableName$" t ON e.external_id = t."$titleTableNamePrimaryKey$"
+      );
     `,
-    {
+    queryArgs: {
       workspaceId: entityConfig.workspaceId,
       entityConfigId: entityConfig.id,
       externalIdSelectors: primaryKeyExtractors
@@ -202,7 +200,8 @@ export async function NEW_generateEntities(
           primaryKeyExtractorsByDatasetId[titleColumn.column.datasetId]!.id
         ]!.column.name,
     },
-  );
+    dependencies: sourceDatasetIds,
+  });
 
   // TODO(jpsyx): NOTE: this will do an upsert on all rows. There is definitely
   // optimization that can be done to only upsert new rows or rows that have

@@ -161,3 +161,10 @@ export type ReplaceTypes<
 export type Registry<StringLiteralUnion extends string> = {
   [K in StringLiteralUnion]: true;
 };
+
+/**
+ * Converts a record into a record of arrays of the same type.
+ */
+export type RegistryOfArrays<T extends UnknownObject> = {
+  [K in keyof T]: Array<T[K]>;
+};

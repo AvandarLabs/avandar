@@ -8,10 +8,9 @@ type Props = {
 };
 
 export function DataSummaryView({ datasetId }: Props): JSX.Element {
-  const [summary, isLoadingSummary] =
-    DatasetRawDataClient.withLogger().useGetSummary({
-      datasetId,
-    });
+  const [summary, isLoadingSummary] = DatasetRawDataClient.useGetSummary({
+    datasetId,
+  });
 
   return (
     <Stack>

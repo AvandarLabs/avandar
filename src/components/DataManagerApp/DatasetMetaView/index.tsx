@@ -69,7 +69,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   });
 
   const [previewData, isLoadingPreviewData] =
-    DatasetRawDataClient.withLogger().useGetPreviewData({
+    DatasetRawDataClient.useGetPreviewData({
       datasetId: dataset.id,
       numRows: AppConfig.dataManagerApp.maxPreviewRows,
     });

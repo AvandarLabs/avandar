@@ -11,8 +11,7 @@ export type DimensionExtractorType = "dataset_column_value" | "manual_entry";
 export type MetricExtractorType = "aggregation";
 
 /**
- * Value extractor registry that maps extractor types to their CRUD model
- * definitions.
+ * Registry that maps extractor types to their CRUD model definitions.
  */
 export type EntityFieldValueExtractorModelRegistry = {
   aggregation: AggregationExtractorModel;

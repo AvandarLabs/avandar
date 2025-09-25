@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { QueryAggregationType } from "@/clients/DuckDBClient/types";
 import { Select } from "@/lib/ui/inputs/Select";
 import { DangerText } from "@/lib/ui/Text/DangerText";
-import { difference } from "@/lib/utils/arrays";
+import { difference } from "@/lib/utils/arrays/misc";
 import { makeObjectFromList } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys, omit } from "@/lib/utils/objects/misc";

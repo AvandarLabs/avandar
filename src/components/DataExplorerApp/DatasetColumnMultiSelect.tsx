@@ -71,7 +71,7 @@ export function DatasetColumnMultiSelect({
       return ds.columns;
     });
 
-    const lookup = makeObjectFromList(cols, { keyFn: getProp("id") });
+    const lookup = makeObjectFromList(cols, { key: "id" });
 
     return {
       fieldGroupOptions: grouped,

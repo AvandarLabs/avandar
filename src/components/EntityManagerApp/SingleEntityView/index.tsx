@@ -1,7 +1,7 @@
 import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient";
+import { NEW_EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient";
 import { SourceBadge } from "@/components/common/SourceBadge";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { Paper } from "@/lib/ui/Paper";
@@ -9,7 +9,7 @@ import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNonNullish } from "@/lib/utils/guards";
 import { makeMapFromList } from "@/lib/utils/maps/builders";
 import { makeObjectFromList } from "@/lib/utils/objects/builders";
-import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
+import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
 import { omit } from "@/lib/utils/objects/misc";
 import { unknownToString } from "@/lib/utils/strings/transformations";
 import { DatasetSourceType } from "@/models/datasets/Dataset";
@@ -38,6 +38,9 @@ type HydratedEntity = Entity & {
   nameFieldValue?: EntityFieldValue;
 };
 
+/**
+ * Hydrates an entity with all its field configs and values.
+ */
 function useHydratedEntity({
   entityConfig,
   entity,
@@ -51,7 +54,10 @@ function useHydratedEntity({
       where: { entity_config_id: { eq: entityConfig.id } },
     });
   const [entityFieldValues, isLoadingEntityFieldValues] =
-    EntityFieldValueClient.useGetAll(where("entity_id", "eq", entity.id));
+    NEW_EntityFieldValueClient.withLogger().useGetEntityFieldValues({
+      entityId: entity.id,
+      entityFieldConfigs: entityFieldConfigs ?? [],
+    });
 
   const datasetIds = useMemo(() => {
     return [
@@ -81,10 +87,10 @@ function useHydratedEntity({
 
     if (entityFieldConfigs) {
       const idField = entityFieldConfigs.find(
-        propEquals("options.isIdField", true),
+        propIs("options.isIdField", true),
       );
       const nameField = entityFieldConfigs.find(
-        propEquals("options.isTitleField", true),
+        propIs("options.isTitleField", true),
       );
       fieldConfigsMap = makeMapFromList(entityFieldConfigs, {
         keyFn: getProp("id"),

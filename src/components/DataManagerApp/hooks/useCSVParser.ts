@@ -1,7 +1,7 @@
 import Papa from "papaparse";
 import { useCallback, useState } from "react";
 import { MIMEType, RawDataRow } from "@/lib/types/common";
-import { propEquals } from "@/lib/utils/objects/higherOrderFuncs";
+import { propIs } from "@/lib/utils/objects/higherOrderFuncs";
 import {
   detectColumnDataTypes,
   DetectedDatasetColumn,
@@ -42,7 +42,7 @@ export function parseFileOrStringToCSV({
         const fields = detectColumnDataTypes(meta.fields ?? [], data);
 
         // check if there are any fields we've determined are dates
-        const dateFields = fields.filter(propEquals("dataType", "date"));
+        const dateFields = fields.filter(propIs("dataType", "date"));
         if (dateFields.length > 0) {
           // mutate the CSV data - standardize the dates into ISO format
           csv.data.forEach((row) => {

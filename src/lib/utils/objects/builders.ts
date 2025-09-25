@@ -17,16 +17,15 @@ function toString<T>(item: T): string | T {
  * @param options.key The object key from which we will extract the output key.
  * This takes precedence over `keyFn`.
  * @param options.keyFn A function that returns the key for each item. Defaults
- * to the `toString` function.
+ * to the `toString` function. If `key` is provided, then `keyFn` is ignored.
  * @param options.valueKey The object key from which we will extract the output
- * value. This takes precedence over `valueFn`. If neither `valueKey`
- * nor `valueFn` is provided, then we default to using the identity function.
+ * value. This takes precedence over `valueFn`.
  * @param options.valueFn A function that returns the value for each
- * item. If neither `valueKey` nor `valueFn` is provided, then we default to
- * using the identity function.
- * @param options.defaultValue A default value to use for each item if no
- * valueFn is provided. If either `valueKey` or `valueFn` are provided, they
- * will take precedence over the `defaultValue`.
+ * item. If `valueKey` is provided then `valueFn` is ignored. If neither
+ * `valueKey` nor `valueFn` is provided, then we default to using the identity
+ * function.
+ * @param options.defaultValue A default value to use for each item if neither
+ * `valueKey` nor `valueFn` is provided.
  *
  * @returns An object with keys and values extracted from the list.
  */
@@ -63,7 +62,13 @@ export function makeObjectFromList<
   const obj = {} as Record<OutK, OutV>;
   list.forEach((item) => {
     const key = (options.key ? item[options.key] : keyFn(item)) as OutK;
-    obj[key] = valueFn(item);
+    const value = (
+      "valueKey" in options && options.valueKey ?
+        item[options.valueKey]
+      : valueFn(item)) as OutV;
+    if (key !== undefined && key !== null) {
+      obj[key] = value;
+    }
   });
   return obj;
 }
@@ -107,4 +112,29 @@ export function makeObjectFromEntries<K extends string | number, V>(
   entries: ReadonlyArray<[K, V]>,
 ): Record<K, V> {
   return Object.fromEntries(entries) as Record<K, V>;
+}
+
+/**
+ * Creates a lookup from a list of objects, indexed by an object's id field.
+ * The id field is assumed to be "id" unless otherwise specified.
+ *
+ * @param list The list of objects to convert.
+ * @param options
+ * @param options.key The key to use as the id field. Defaults to "id".
+ * @returns A record of objects indexed by their id field.
+ */
+export function makeIdLookupRecord<
+  T extends object,
+  IdKey extends ConditionalKeys<T, PropertyKey> = "id" extends (
+    ConditionalKeys<T, PropertyKey>
+  ) ?
+    "id"
+  : never,
+  OutKey extends T[IdKey] extends PropertyKey ? T[IdKey]
+  : never = T[IdKey] extends PropertyKey ? T[IdKey] : never,
+>(
+  list: readonly T[],
+  { key = "id" as IdKey }: { key?: IdKey } = {},
+): Record<OutKey, T> {
+  return makeObjectFromList(list, { key }) as Record<OutKey, T>;
 }

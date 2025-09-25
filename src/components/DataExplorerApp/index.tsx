@@ -1,6 +1,6 @@
 import { Box, Flex, LoadingOverlay, MantineTheme } from "@mantine/core";
 import { useMemo } from "react";
-import { partition } from "@/lib/utils/arrays";
+import { partition } from "@/lib/utils/arrays/misc";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { isNotInSet } from "@/lib/utils/sets/higherOrderFuncs";
 import { wrapString } from "@/lib/utils/strings/higherOrderFuncs";

@@ -45,7 +45,7 @@ export function getProp<
  * @returns A function that returns true if the object has the property with
  * the specified value.
  */
-export function propEquals<
+export function propIs<
   T extends object,
   K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
   V extends K extends keyof T ? T[K]
@@ -69,7 +69,7 @@ export function propEquals<
  * @returns A function that returns true if the object has the property with
  * the specified value.
  */
-export function propDoesntEqual<
+export function propIsNot<
   T extends object,
   K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
   V extends K extends keyof T ? T[K]
