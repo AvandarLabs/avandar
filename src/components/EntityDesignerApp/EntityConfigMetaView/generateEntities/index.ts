@@ -14,8 +14,10 @@ import {
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { promiseMap } from "@/lib/utils/promises";
 import { Entity } from "@/models/entities/Entity";
-import { EntityConfigModule } from "@/models/EntityConfig";
-import { BuildableEntityConfig } from "./pipelineTypes";
+import {
+  BuildableEntityConfig,
+  EntityConfigModule,
+} from "@/models/EntityConfig";
 
 /**
  * Run a basic QETL pipeline to generate entities.

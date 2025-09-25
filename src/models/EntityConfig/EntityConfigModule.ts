@@ -1,9 +1,8 @@
 import { Simplify } from "type-fest";
-import { BuildableEntityConfig } from "@/components/EntityDesignerApp/EntityConfigMetaView/generateEntities/pipelineTypes";
 import { AnyFunctionWithArguments } from "@/lib/types/utilityTypes";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { objectKeys } from "@/lib/utils/objects/misc";
-import { EntityConfig } from "./EntityConfig.types";
+import { BuildableEntityConfig, EntityConfig } from "./EntityConfig.types";
 import { EntityFieldConfig } from "./EntityFieldConfig/types";
 import { EntityFieldValueExtractor } from "./ValueExtractor/types";
 
