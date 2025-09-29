@@ -95,7 +95,7 @@ function arrowTableToJS<RowObject extends UnknownRow>(
     });
   });
   return {
-    fields: arrowTable.schema.fields.map(arrowFieldToQueryResultField),
+    columns: arrowTable.schema.fields.map(arrowFieldToQueryResultField),
     data: jsDataRows,
     numRows: jsDataRows.length,
   };
@@ -716,8 +716,8 @@ class DuckDBClientImpl {
   }
 
   async getPage<T extends UnknownRow>({
-    selectFields = "*",
-    groupByFields = [],
+    selectColumnNames: selectColumns = "*",
+    groupByColumnNames: groupByColumns = [],
     pageSize = 500,
     pageNum = 0,
     ...restOfStructuredQuery
@@ -726,8 +726,8 @@ class DuckDBClientImpl {
     "limit" | "offset"
   >): Promise<QueryResultDataPage<T>> {
     const page = await this.#getPageHelper<T>({
-      selectFields,
-      groupByFields,
+      selectColumnNames: selectColumns,
+      groupByColumnNames: groupByColumns,
       pageSize,
       pageNum,
       // pass `undefined` to mean we don't know the total number of rows
@@ -741,8 +741,8 @@ class DuckDBClientImpl {
 
   async forEachQueryPage<T extends UnknownRow>(
     {
-      selectFields = "*",
-      groupByFields = [],
+      selectColumnNames = "*",
+      groupByColumnNames = [],
       aggregations = {},
       pageSize = 500,
       ...restOfStructuredQuery
@@ -752,8 +752,8 @@ class DuckDBClientImpl {
     callback: (page: QueryResultDataPage<T>) => void | Promise<void>,
   ): Promise<{ numPages: number; numRows: number }> {
     const firstPage = await this.#getPageHelper<T>({
-      selectFields,
-      groupByFields,
+      selectColumnNames,
+      groupByColumnNames,
       aggregations,
       pageSize,
       pageNum: 0,
@@ -772,8 +772,8 @@ class DuckDBClientImpl {
     let nextPageNum = firstPage.nextPage;
     while (nextPageNum !== undefined) {
       const newPage = await this.#getPageHelper<T>({
-        selectFields,
-        groupByFields,
+        selectColumnNames,
+        groupByColumnNames,
         aggregations,
         pageSize,
         pageNum: nextPageNum,
@@ -782,23 +782,19 @@ class DuckDBClientImpl {
       });
       await callback(newPage);
       nextPageNum = newPage.nextPage;
-
       numPages += 1;
       numRows += newPage.numRows;
     }
 
-    return {
-      numPages,
-      numRows,
-    };
+    return { numPages, numRows };
   }
 
   async runStructuredQuery<T extends UnknownRow>({
     tableName,
-    selectFields = "*",
-    groupByFields = [],
+    selectColumnNames = "*",
+    groupByColumnNames = [],
     aggregations = {},
-    orderByColumn,
+    orderByColumnName,
     orderByDirection,
     castTimestampsToISO,
     limit,
@@ -811,42 +807,39 @@ class DuckDBClientImpl {
       })
       .map(getProp("column_name"));
 
-    const selectColumnNames =
-      selectFields === "*" ?
+    const columnNames =
+      selectColumnNames === "*" ?
         tableColumns.map(getProp("column_name"))
-      : selectFields.map(getProp("name"));
-    const groupByFieldNames = groupByFields.map(getProp("name"));
+      : selectColumnNames;
 
     return this.#withConnection(async ({ conn }) => {
-      const fieldNamesWithoutAggregations = selectColumnNames.filter(
-        (fieldName) => {
-          return (
-            aggregations[fieldName] === undefined ||
-            aggregations[fieldName] === "none"
-          );
-        },
-      );
+      const columnNamesWithoutAggregations = columnNames.filter((colName) => {
+        return (
+          aggregations[colName] === undefined ||
+          aggregations[colName] === "none"
+        );
+      });
 
       // if requested, cast any timestamp columns that will go in the SELECT
       // clause to ISO strings
       const adjustedFieldNames =
         castTimestampsToISO ?
-          fieldNamesWithoutAggregations.map((colName) => {
+          columnNamesWithoutAggregations.map((colName) => {
             return timestampColumnNames.includes(colName) ?
                 sql.raw(
                   `strftime("${colName}"::TIMESTAMP, '%Y-%m-%dT%H:%M:%S.%fZ') as "${colName}"`,
                 )
               : colName;
           })
-        : fieldNamesWithoutAggregations;
+        : columnNamesWithoutAggregations;
 
       let query = sql.select(...adjustedFieldNames).from(tableName);
-      if (groupByFieldNames.length > 0) {
-        query = query.groupBy(...groupByFieldNames);
+      if (groupByColumnNames.length > 0) {
+        query = query.groupBy(...groupByColumnNames);
       }
 
-      if (orderByColumn && orderByDirection) {
-        query = query.orderBy(orderByColumn.name, orderByDirection);
+      if (orderByColumnName && orderByDirection) {
+        query = query.orderBy(orderByColumnName, orderByDirection);
       }
 
       // apply aggregations
@@ -902,7 +895,7 @@ class DuckDBClientImpl {
         });
 
         return {
-          fields: results.schema.fields.map(arrowFieldToQueryResultField),
+          columns: results.schema.fields.map(arrowFieldToQueryResultField),
           data: jsDataRows,
           numRows: jsDataRows.length,
         };

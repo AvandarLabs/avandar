@@ -1,5 +1,4 @@
 import { UnknownObject, UUID } from "@/lib/types/common";
-import { DatasetColumn } from "@/models/datasets/DatasetColumn";
 import { DuckDBDataTypeT } from "./DuckDBDataType";
 
 export type QueryResultColumn = {
@@ -8,7 +7,7 @@ export type QueryResultColumn = {
 };
 
 export type QueryResultData<T extends UnknownObject = UnknownObject> = {
-  fields: QueryResultColumn[];
+  columns: QueryResultColumn[];
   data: T[];
 
   /** The number of rows in the `data` array */
@@ -222,14 +221,15 @@ export type QueryAggregationType =
 
 export type StructuredDuckDBQueryConfig = {
   tableName: string;
-  selectFields?: readonly DatasetColumn[] | "*";
-  groupByFields?: readonly DatasetColumn[];
-  orderByColumn?: DatasetColumn | undefined;
+  selectColumnNames?: readonly string[] | "*";
+  groupByColumnNames?: readonly string[];
+  orderByColumnName?: string | undefined;
   orderByDirection?: "asc" | "desc";
 
   /**
    * Aggregations to apply to the selected fields.
-   * Key is the field name (not field id). Value is the aggregation type.
+   *
+   * **NOTE**: Key is the column name.
    */
   aggregations?: Record<string, QueryAggregationType>;
   offset?: number;

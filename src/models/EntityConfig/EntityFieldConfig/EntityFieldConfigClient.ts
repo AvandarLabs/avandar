@@ -2,7 +2,7 @@ import { match } from "ts-pattern";
 import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates";
 import { where } from "@/lib/utils/filters/filterBuilders";
-import { makeBucketRecordFromList } from "@/lib/utils/objects/builders";
+import { makeBucketRecord } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys } from "@/lib/utils/objects/misc";
 import { promiseFlatMap } from "@/lib/utils/promises";
@@ -42,7 +42,7 @@ export const EntityFieldConfigClient = createSupabaseCRUDClient({
 
         // Bucket each field by value extractor type, so we only query for
         // the extractor types that we need
-        const fieldsByValueExtractorType = makeBucketRecordFromList(fields, {
+        const fieldsByValueExtractorType = makeBucketRecord(fields, {
           keyFn: getProp("options.valueExtractorType"),
         });
 

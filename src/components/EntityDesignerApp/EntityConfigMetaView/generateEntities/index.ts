@@ -8,8 +8,8 @@ import { assertIsDefined } from "@/lib/utils/asserts";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isDefined } from "@/lib/utils/guards";
 import {
+  makeObject,
   makeObjectFromEntries,
-  makeObjectFromList,
 } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { promiseMap } from "@/lib/utils/promises";
@@ -62,31 +62,28 @@ export async function generateEntities(
       datasetColumnValueExtractors.map(getProp("datasetFieldId")),
     ),
   );
-  const columnsById = makeObjectFromList(sourceDatasetColumns, { key: "id" });
+  const columnsById = makeObject(sourceDatasetColumns, { key: "id" });
 
   // map each extractor to its column and table name
-  const extractorColumnsLookup = makeObjectFromList(
-    datasetColumnValueExtractors,
-    {
-      key: "id",
-      valueFn: (extractor) => {
-        const localTableName = localTableNameLookup[extractor.datasetId];
-        const column = columnsById[extractor.datasetFieldId];
-        assertIsDefined(
-          localTableName,
-          `Could not find local table name for dataset "${extractor.datasetId}"`,
-        );
-        assertIsDefined(
-          column,
-          `Could not find column "${extractor.datasetFieldId}"`,
-        );
-        return {
-          column,
-          tableName: localTableName,
-        };
-      },
+  const extractorColumnsLookup = makeObject(datasetColumnValueExtractors, {
+    key: "id",
+    valueFn: (extractor) => {
+      const localTableName = localTableNameLookup[extractor.datasetId];
+      const column = columnsById[extractor.datasetFieldId];
+      assertIsDefined(
+        localTableName,
+        `Could not find local table name for dataset "${extractor.datasetId}"`,
+      );
+      assertIsDefined(
+        column,
+        `Could not find column "${extractor.datasetFieldId}"`,
+      );
+      return {
+        column,
+        tableName: localTableName,
+      };
     },
-  );
+  });
 
   // 2. Get the dataset columns to use for external IDs and the entity title
   const primaryKeyExtractors = datasetColumnValueExtractors.filter(
@@ -97,13 +94,13 @@ export async function generateEntities(
   const titleExtractor = datasetColumnValueExtractors.find((extractor) => {
     return extractor.entityFieldConfigId === titleField.id;
   })!;
-  const primaryKeyExtractorsByDatasetId = makeObjectFromList(
-    primaryKeyExtractors,
-    { key: "datasetId" },
-  );
+  const primaryKeyExtractorsByDatasetId = makeObject(primaryKeyExtractors, {
+    key: "datasetId",
+  });
   const titleColumn = extractorColumnsLookup[titleExtractor.id]!;
 
   await DatasetRawDataClient.runLocalRawQuery({
+    dependencies: sourceDatasetIds,
     query: `
       DROP TABLE IF EXISTS "$entityConfigId$";
 
@@ -147,9 +144,9 @@ export async function generateEntities(
           primaryKeyExtractorsByDatasetId[titleColumn.column.datasetId]!.id
         ]!.column.name,
     },
-    dependencies: sourceDatasetIds,
   });
 
+  // 3. Now upload all data to Supabase
   // TODO(jpsyx): NOTE: this will do an upsert on all rows. There is definitely
   // optimization that can be done to only upsert new rows or rows that have
   // a new name. There is no need to upsert rows that already exist and have

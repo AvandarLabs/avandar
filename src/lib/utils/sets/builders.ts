@@ -23,15 +23,6 @@ export function makeSet<
   if (hashFn === undefined && key === undefined) {
     return new Set(list as unknown as HashV[]);
   }
-
   const outputSet = new Set<HashV>();
-  for (const item of list) {
-    const hashedItem =
-      key !== undefined ? (item[key] as HashV)
-      : hashFn !== undefined ? hashFn(item)
-      : (item as unknown as HashV);
-    outputSet.add(hashedItem);
-  }
-
   return outputSet;
 }

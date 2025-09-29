@@ -2,7 +2,7 @@ import { SetOptional } from "type-fest";
 import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { FiltersByColumn } from "@/lib/utils/filters/filtersByColumn";
-import { makeBucketRecordFromList } from "@/lib/utils/objects/builders";
+import { makeBucketRecord } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { ExcludeNullsIn } from "@/lib/utils/objects/transformations";
 import {
@@ -68,10 +68,9 @@ export const DatasetClient = createSupabaseCRUDClient({
         const allDatasetColumns = await DatasetColumnClient.getAll(
           where("dataset_id", "in", datasets.map(getProp("id"))),
         );
-        const bucketedDatasetColumns = makeBucketRecordFromList(
-          allDatasetColumns,
-          { keyFn: getProp("datasetId") },
-        );
+        const bucketedDatasetColumns = makeBucketRecord(allDatasetColumns, {
+          key: "datasetId",
+        });
         const datasetsWithColumns = datasets.map((dataset: Dataset) => {
           return {
             ...dataset,

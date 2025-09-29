@@ -5,7 +5,7 @@ import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isDefined } from "@/lib/utils/guards";
-import { makeObjectFromList } from "@/lib/utils/objects/builders";
+import { makeObject } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { EntityConfigFormType } from "../../entityConfigFormTypes";
 
@@ -37,7 +37,7 @@ export function IDConfigBlock({
     });
 
   const fieldOptionsByDatasetId = useMemo(() => {
-    return makeObjectFromList(datasets ?? [], {
+    return makeObject(datasets ?? [], {
       keyFn: getProp("id"),
       valueFn: (dataset) => {
         return makeSelectOptions(dataset.columns, {

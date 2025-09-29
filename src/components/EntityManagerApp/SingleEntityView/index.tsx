@@ -1,14 +1,14 @@
 import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient";
+import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { SourceBadge } from "@/components/common/SourceBadge";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { Paper } from "@/lib/ui/Paper";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNonNullish } from "@/lib/utils/guards";
-import { makeMapFromList } from "@/lib/utils/maps/builders";
-import { makeObjectFromList } from "@/lib/utils/objects/builders";
+import { makeMap } from "@/lib/utils/maps/builders";
+import { makeObject } from "@/lib/utils/objects/builders";
 import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
 import { omit } from "@/lib/utils/objects/misc";
 import { unknownToString } from "@/lib/utils/strings/transformations";
@@ -72,9 +72,7 @@ function useHydratedEntity({
   const [datasets] = DatasetClient.useGetAll(where("id", "in", datasetIds));
 
   const datasetsMap = useMemo(() => {
-    return datasets ?
-        makeMapFromList(datasets, { keyFn: getProp("id") })
-      : undefined;
+    return datasets ? makeMap(datasets, { keyFn: getProp("id") }) : undefined;
   }, [datasets]);
 
   // TODO(jpsyx): move this to a module that can also use cacheing.
@@ -92,7 +90,7 @@ function useHydratedEntity({
       const nameField = entityFieldConfigs.find(
         propIs("options.isTitleField", true),
       );
-      fieldConfigsMap = makeMapFromList(entityFieldConfigs, {
+      fieldConfigsMap = makeMap(entityFieldConfigs, {
         keyFn: getProp("id"),
       });
 
@@ -104,7 +102,7 @@ function useHydratedEntity({
     }
 
     if (entityFieldValues) {
-      const fieldValuesMap = makeMapFromList(entityFieldValues, {
+      const fieldValuesMap = makeMap(entityFieldValues, {
         keyFn: getProp("entityFieldConfigId"),
         valueFn: (fieldValue) => {
           const config = fieldConfigsMap?.get(fieldValue.entityFieldConfigId);
@@ -164,7 +162,7 @@ export function SingleEntityView({ entityConfig, entity }: Props): JSX.Element {
     // convert the field values array into a record
     const fieldValuesRecord: Record<string, FieldValueMetadata> | undefined =
       hydratedEntity.fieldValues ?
-        makeObjectFromList(hydratedEntity.fieldValues, {
+        makeObject(hydratedEntity.fieldValues, {
           keyFn: (fieldValue) => {
             return fieldValue.fieldName ?? "Loading...";
           },

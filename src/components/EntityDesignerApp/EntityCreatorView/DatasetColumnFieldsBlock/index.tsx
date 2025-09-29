@@ -23,7 +23,7 @@ import { SegmentedControl } from "@/lib/ui/inputs/SegmentedControl";
 import { makeSegmentedControlItems } from "@/lib/ui/inputs/SegmentedControl/makeSegmentedControlItems";
 import { removeItemWhere } from "@/lib/utils/arrays/misc";
 import { identity } from "@/lib/utils/misc";
-import { makeObjectFromList } from "@/lib/utils/objects/builders";
+import { makeObject } from "@/lib/utils/objects/builders";
 import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
 import { DatasetWithColumns } from "@/models/datasets/Dataset";
 import {
@@ -66,7 +66,7 @@ export function DatasetColumnFieldsBlock({
     if (!allDatasets) {
       return {};
     }
-    return makeObjectFromList(
+    return makeObject(
       allDatasets.flatMap((dataset) => {
         return dataset.columns.map((column) => {
           return { dataset, column };

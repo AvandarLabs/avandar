@@ -9,7 +9,7 @@ import { assertIsDefined } from "@/lib/utils/asserts";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isDefined } from "@/lib/utils/guards";
 import {
-  makeBucketRecordFromList,
+  makeBucketRecord,
   makeIdLookupRecord,
 } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
@@ -20,20 +20,27 @@ import { isInSet } from "@/lib/utils/sets/higherOrderFuncs";
 import { wrapString } from "@/lib/utils/strings/higherOrderFuncs";
 import { uuid } from "@/lib/utils/uuid";
 import { EntityId } from "@/models/entities/Entity";
+import { EntityConfigId } from "@/models/EntityConfig";
 import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
 import {
   EntityFieldConfig,
   EntityFieldConfigId,
 } from "@/models/EntityConfig/EntityFieldConfig/types";
 import { EntityFieldValueExtractorRegistry } from "@/models/EntityConfig/ValueExtractor/types";
-import { DatasetColumnClient } from "../datasets/DatasetColumnClient";
-import { DatasetRawDataClient } from "../datasets/DatasetRawDataClient";
-import { LocalDatasetEntryClient } from "../datasets/LocalDatasetEntryClient";
-import { singleton } from "../DuckDBClient/queryResultHelpers";
-import { EntityClient } from "./EntityClient";
+import { DatasetColumnClient } from "../../datasets/DatasetColumnClient";
+import { DatasetRawDataClient } from "../../datasets/DatasetRawDataClient";
+import { LocalDatasetEntryClient } from "../../datasets/LocalDatasetEntryClient";
+import { singleton } from "../../DuckDBClient/queryResultHelpers";
+import { EntityClient } from "../EntityClient";
+import { getEntityFieldValues } from "./getEntityFieldValues/getEntityFieldValues";
 import type { EntityFieldValue } from "@/models/entities/EntityFieldValue";
 
 type EntityFieldValueClientQueries = {
+  getAllEntityFieldValues: (params: {
+    entityConfigId: EntityConfigId;
+    entityFieldConfigs: readonly EntityFieldConfig[];
+  }) => Promise<Array<Record<EntityFieldConfigId, unknown>>>;
+
   getEntityFieldValues: (params: {
     entityId: EntityId;
     entityFieldConfigs: readonly EntityFieldConfig[];
@@ -53,6 +60,20 @@ function createEntityFieldValueClient(): WithLogger<
   const baseClient = createBaseClient("DatasetRawData");
   return withLogger(baseClient, (baseLogger: ILogger) => {
     const queries = {
+      getAllEntityFieldValues: async (params: {
+        entityConfigId: EntityConfigId;
+        entityFieldConfigs: readonly EntityFieldConfig[];
+      }): Promise<Array<Record<EntityFieldConfigId, unknown>>> => {
+        const logger = baseLogger.appendName("getAllEntityFieldValues");
+        logger.log("Getting all entity field values from query", params);
+        const allFieldValues = await getEntityFieldValues({
+          entityConfigId: params.entityConfigId,
+          entityFieldConfigs: params.entityFieldConfigs,
+        });
+        logger.log("Got all entity field values", allFieldValues);
+        return allFieldValues;
+      },
+
       getEntityFieldValues: async (params: {
         entityId: EntityId;
         entityFieldConfigs: readonly EntityFieldConfig[];
@@ -93,10 +114,9 @@ function createEntityFieldValueClient(): WithLogger<
           });
 
         // bucket the extractors by type
-        const valueExtractorsByType = makeBucketRecordFromList(
-          valueExtractors,
-          { keyFn: getProp("type") },
-        ) as RegistryOfArrays<EntityFieldValueExtractorRegistry>;
+        const valueExtractorsByType = makeBucketRecord(valueExtractors, {
+          keyFn: getProp("type"),
+        }) as RegistryOfArrays<EntityFieldValueExtractorRegistry>;
 
         // bucket the extractors by field id
         const valueExtractorsByFieldId = makeIdLookupRecord(valueExtractors, {
@@ -149,10 +169,9 @@ function createEntityFieldValueClient(): WithLogger<
                 // duplicate datasets, so let's bucket them by dataset.
                 // Each of these buckets should include a primary key
                 // extractor already.
-                const extractorsByDatasetId = makeBucketRecordFromList(
-                  extractors,
-                  { keyFn: getProp("datasetId") },
-                );
+                const extractorsByDatasetId = makeBucketRecord(extractors, {
+                  keyFn: getProp("datasetId"),
+                });
 
                 // run a query for each dataset
                 const datasetColumnFieldValues = await promiseMap(

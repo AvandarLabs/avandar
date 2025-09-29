@@ -46,11 +46,11 @@ export function getEntityFieldBaseDataType(
     .exhaustive();
 }
 
-export function getValidQueryAggregationsByType(
-  dataType: DatasetColumnDataType,
+export function getValidQueryAggregationsByDataType(
+  dataType: DatasetColumnDataType | EntityFieldBaseType,
 ): readonly QueryAggregationType[] {
   return match(dataType)
-    .with("text", () => {
+    .with("text", "string", () => {
       return ["count"] as const;
     })
     .with("number", () => {

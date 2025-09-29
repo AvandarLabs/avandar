@@ -20,7 +20,7 @@ import {
 import { makeSegmentedControlItems } from "@/lib/ui/inputs/SegmentedControl/makeSegmentedControlItems";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNonEmptyArray } from "@/lib/utils/guards";
-import { makeBucketRecordFromList } from "@/lib/utils/objects/builders";
+import { makeBucketRecord } from "@/lib/utils/objects/builders";
 import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries } from "@/lib/utils/objects/misc";
 import {
@@ -92,7 +92,7 @@ export function DatasetColumnPickerList({
     if (!datasets || !datasetColumns) {
       return [];
     }
-    const datasetColumnBuckets = makeBucketRecordFromList(datasetColumns, {
+    const datasetColumnBuckets = makeBucketRecord(datasetColumns, {
       keyFn: getProp("datasetId"),
     });
 
