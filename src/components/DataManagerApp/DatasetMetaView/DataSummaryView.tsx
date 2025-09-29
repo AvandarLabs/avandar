@@ -22,6 +22,7 @@ export function DataSummaryView({ datasetId }: Props): JSX.Element {
           <ObjectDescriptionList
             data={summary.columnSummaries}
             titleKey="name"
+            defaultExpanded={true}
             itemRenderOptions={{
               maxHeight: 400,
               excludeKeys: ["name"],
