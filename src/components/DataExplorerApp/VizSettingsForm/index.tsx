@@ -1,5 +1,7 @@
 import { match } from "ts-pattern";
 import { QueryResultField } from "@/clients/LocalDatasetQueryClient";
+import { UnknownDataFrame } from "@/lib/types/common";
+import { sanitizeXYSettings } from "@/lib/ui/data-viz/requirements/sanitizeXYSettings";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
@@ -19,9 +21,16 @@ const VIZ_TYPES: VizTypeMetadata[] = [
   { type: "line", displayName: "Line Chart" },
 ];
 
+const isVizType = (value: unknown): value is VizType => {
+  return VIZ_TYPES.some((meta) => {
+    return meta.type === value;
+  });
+};
+
 export type Props = {
   fields: readonly QueryResultField[];
   vizConfig: VizConfig;
+  data: UnknownDataFrame;
   onVizConfigChange: (config: VizConfig) => void;
 };
 
@@ -85,6 +94,7 @@ function hydrateXY(options: {
 export function VizSettingsForm({
   vizConfig,
   fields,
+  data,
   onVizConfigChange,
 }: Props): JSX.Element {
   const vizTypeOptions = makeSelectOptions(VIZ_TYPES, {
@@ -92,21 +102,30 @@ export function VizSettingsForm({
     labelFn: getProp("displayName"),
   });
 
+  const sanitizedVizConfig = sanitizeXYSettings(vizConfig, fields, data);
+
   return (
     <form>
       <Select
         allowDeselect={false}
         data={vizTypeOptions}
         label="Visualization Type"
-        value={vizConfig.type}
+        value={sanitizedVizConfig.type}
         onChange={(selectedVizType) => {
-          if (selectedVizType) {
-            const updated = hydrateXY({
-              prevVizConfig: vizConfig,
-              newVizConfig: makeDefaultVizConfig(selectedVizType as VizType),
-            });
-            onVizConfigChange(updated);
-          }
+          if (!isVizType(selectedVizType)) return;
+
+          const hydratedConfig = hydrateXY({
+            prevVizConfig: sanitizedVizConfig,
+            newVizConfig: makeDefaultVizConfig(selectedVizType),
+          });
+
+          const sanitizedUpdatedConfig = sanitizeXYSettings(
+            hydratedConfig,
+            fields,
+            data,
+          );
+
+          onVizConfigChange(sanitizedUpdatedConfig);
         }}
       />
 
@@ -118,6 +137,7 @@ export function VizSettingsForm({
           return (
             <BarChartForm
               fields={fields}
+              data={data}
               settings={config.settings}
               onSettingsChange={(nextSettings) => {
                 onVizConfigChange({ ...config, settings: nextSettings });
@@ -129,6 +149,7 @@ export function VizSettingsForm({
           return (
             <LineChartForm
               fields={fields}
+              data={data}
               settings={config.settings}
               onSettingsChange={(nextSettings) => {
                 onVizConfigChange({ ...config, settings: nextSettings });
