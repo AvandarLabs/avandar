@@ -14,7 +14,6 @@ import { useMemo, useState } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useForm } from "@/lib/hooks/ui/useForm";
-import { Logger } from "@/lib/Logger";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { Paper } from "@/lib/ui/Paper";
@@ -153,16 +152,11 @@ export function EntityCreatorView(): JSX.Element {
 
   // these are the fields that are eligible to be used as the entity ID or title
   const possibleTitleFields = useMemo(() => {
-    Logger.log("recreating");
     return makeSelectOptions(datasetColumnFields.concat(manualEntryFields), {
       valueFn: getProp("id"),
       labelFn: getProp("name"),
     });
   }, [datasetColumnFields, manualEntryFields]);
-
-  Logger.log("possibleTitleFields", possibleTitleFields);
-  Logger.log(keys.titleFieldId);
-  Logger.log("inputProps.titleFieldId", inputProps.titleFieldId());
 
   return (
     <Container pt="lg" pb="xxl" fluid style={{ width: "75%" }}>
