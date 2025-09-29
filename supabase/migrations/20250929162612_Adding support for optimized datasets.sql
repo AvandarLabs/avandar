@@ -317,6 +317,19 @@ create table "public"."datasets__csv_file" (
 
 alter table "public"."datasets__csv_file" enable row level security;
 
+-- temporarily set the source_type column to be "text" so we can
+-- change existing values without error
+alter table "public"."datasets"
+alter column source_type type text using source_type::text;
+
+-- update any old "local_csv" values to now be "csv_file"
+update "public"."datasets"
+set
+  source_type = 'csv_file'
+where
+  source_type = 'local_csv';
+
+-- finally, change the column type to the new enum
 alter table "public"."datasets"
 alter column source_type type "public"."datasets__source_type" using source_type::text::"public"."datasets__source_type";
 
