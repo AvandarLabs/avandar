@@ -7,6 +7,7 @@ import { invariant } from "@tanstack/react-router";
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
+import { OrderByDirection } from "@/components/DataExplorerApp/DataExplorerContext/types";
 import { Logger } from "@/lib/Logger";
 import { MIMEType, UnknownDataFrame } from "@/lib/types/common";
 import { makeObjectFromList } from "@/lib/utils/objects/builders";
@@ -33,7 +34,7 @@ export type LocalQueryConfig = {
   selectFields: readonly DatasetColumn[];
   groupByFields: readonly DatasetColumn[];
   orderByColumn?: DatasetColumn | undefined;
-  orderByDirection?: "asc" | "desc";
+  orderByDirection?: OrderByDirection;
 
   /**
    * Aggregations to apply to the selected fields.

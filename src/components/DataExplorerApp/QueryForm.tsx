@@ -1,7 +1,6 @@
 import { Box, Fieldset, Stack, Text } from "@mantine/core";
-import { useMemo } from "react";
 import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
-import { Select } from "@/lib/ui/inputs/Select";
+import { Select, SelectData } from "@/lib/ui/inputs/Select";
 import { DangerText } from "@/lib/ui/Text/DangerText";
 import { difference } from "@/lib/utils/arrays";
 import { makeObjectFromList } from "@/lib/utils/objects/builders";
@@ -9,6 +8,7 @@ import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys, omit } from "@/lib/utils/objects/misc";
 import { DatasetSelect } from "../common/DatasetSelect";
 import { AggregationSelect } from "./AggregationSelect";
+import { OrderByDirection } from "./DataExplorerContext/types";
 import { DatasetColumnMultiSelect } from "./DatasetColumnMultiSelect";
 import type { DatasetId } from "@/models/datasets/Dataset";
 import type { DatasetColumn } from "@/models/datasets/DatasetColumn";
@@ -16,12 +16,10 @@ import type { DatasetColumn } from "@/models/datasets/DatasetColumn";
 const HIDE_WHERE = true;
 const HIDE_LIMIT = true;
 
-type Direction = "asc" | "desc";
-
-const orderDirectionOptions: Array<{ value: Direction; label: string }> = [
+const orderDirectionOptions = [
   { value: "asc", label: "Ascending" },
   { value: "desc", label: "Descending" },
-] as const;
+] as const satisfies SelectData<string>;
 
 type Props = {
   errorMessage?: string;
@@ -31,7 +29,7 @@ type Props = {
   selectedColumns: readonly DatasetColumn[];
   selectedGroupByColumns: readonly DatasetColumn[];
   orderByColumn: DatasetColumn | undefined;
-  orderByDirection: Direction;
+  orderByDirection: OrderByDirection;
 
   onAggregationsChange: (next: Record<string, QueryAggregationType>) => void;
   onSelectDatasetChange: (datasetId: DatasetId | undefined) => void;
@@ -39,7 +37,7 @@ type Props = {
   onSelectColumnsChange: (columns: readonly DatasetColumn[]) => void;
   onGroupByChange: (columns: readonly DatasetColumn[]) => void;
   onOrderByColumnChange: (column: DatasetColumn | undefined) => void;
-  onOrderByDirectionChange: (dir: Direction) => void;
+  onOrderByDirectionChange: (dir: OrderByDirection) => void;
 };
 
 export function QueryForm({
@@ -57,13 +55,12 @@ export function QueryForm({
   onOrderByColumnChange,
   onOrderByDirectionChange,
 }: Props): JSX.Element {
-  const fieldOptionsById = useMemo(() => {
-    return selectedColumns.map((c) => {
-      return { value: c.id as string, label: c.name };
-    });
-  }, [selectedColumns]);
+  const builderTouched =
+    selectedColumns.length > 0 ||
+    (selectedGroupByColumns?.length ?? 0) > 0 ||
+    orderByDirection != null;
 
-  const orderByColumnId = orderByColumn?.id ?? null;
+  const showEmptyFieldsError = selectedColumns.length === 0 && builderTouched;
 
   return (
     <form>
@@ -140,34 +137,42 @@ export function QueryForm({
 
         <Select
           label="Order field"
-          data={fieldOptionsById}
-          value={orderByColumnId}
-          onChange={(newFieldId) => {
-            if (newFieldId === null) {
-              onOrderByColumnChange(undefined);
-              return;
-            }
-            const newOrderByColumn = selectedColumns.find((field) => {
-              return field.id === newFieldId;
+          placeholder="Select field"
+          data={selectedColumns.map((field) => {
+            return {
+              value: field.name,
+              label: field.name,
+            };
+          })}
+          value={orderByColumn?.name}
+          onChange={(fieldName) => {
+            console.log("fieldName: ", fieldName);
+            const selected = selectedColumns.find((field) => {
+              return field.name === fieldName;
             });
-            onOrderByColumnChange(newOrderByColumn);
+            onOrderByColumnChange(selected);
           }}
           clearable
         />
-
         <Box mb="md">
           <Select
             label="Order by"
             placeholder="Select order"
             data={orderDirectionOptions}
             value={orderByDirection}
-            clearable={false}
             onChange={(value) => {
-              if (value !== null) {
-                onOrderByDirectionChange(value);
-              }
+              console.log("value", value);
+              onOrderByDirectionChange((value as OrderByDirection) ?? null);
             }}
+            clearable={false}
           />
+
+          {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
+          {showEmptyFieldsError ?
+            <DangerText>
+              At least one column must be selected to build a query.
+            </DangerText>
+          : null}
 
           {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
           {errorMessage ?
