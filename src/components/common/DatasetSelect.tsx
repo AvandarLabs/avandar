@@ -38,9 +38,12 @@ export function DatasetSelect({
     datasets,
     useCallback(
       (dsets) => {
-        onChangeValue(dsets[0]?.id ?? null);
+        // only default to the first dataset if nothing is currently selected
+        if (!controlledValue) {
+          onChangeValue(dsets[0]?.id ?? null);
+        }
       },
-      [onChangeValue],
+      [controlledValue, onChangeValue],
     ),
   );
 

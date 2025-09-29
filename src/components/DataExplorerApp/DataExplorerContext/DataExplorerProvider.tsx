@@ -1,13 +1,11 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { makeDefaultVizConfig } from "../VizSettingsForm/makeDefaultVizConfig";
 import { DataExplorerContext } from "./context";
-import type { VizConfig } from "../VizSettingsForm/makeDefaultVizConfig";
 import type {
   DataExplorerContextType,
   DataExplorerContextTypeValues,
 } from "./types";
 import type { DatasetId } from "@/models/datasets/Dataset";
-import type { DatasetColumn } from "@/models/datasets/DatasetColumn";
 
 const DEFAULTS: DataExplorerContextTypeValues = {
   aggregations: {},
@@ -24,71 +22,97 @@ export function DataExplorerProvider({
 }: {
   children?: React.ReactNode;
 }): JSX.Element {
-  const [aggregations, setAggregations] = useState(DEFAULTS.aggregations);
+  const [formStates, setFormStates] = useState<
+    Record<string, DataExplorerContextTypeValues>
+  >({});
+
   const [selectedDatasetId, setSelectedDatasetId] = useState<
     DatasetId | undefined
-  >(DEFAULTS.selectedDatasetId);
-  const [selectedColumns, setSelectedColumns] = useState<
-    readonly DatasetColumn[]
-  >(DEFAULTS.selectedColumns);
-  const [selectedGroupByColumns, setSelectedGroupByColumns] = useState<
-    readonly DatasetColumn[]
-  >(DEFAULTS.selectedGroupByColumns);
-  const [orderByColumn, setOrderByColumn] = useState<DatasetColumn | undefined>(
-    DEFAULTS.orderByColumn,
-  );
-  const [orderByDirection, setOrderByDirection] = useState<"asc" | "desc">(
-    DEFAULTS.orderByDirection,
-  );
-  const [vizConfig, setVizConfig] = useState<VizConfig>(DEFAULTS.vizConfig);
+  >(undefined);
 
-  const reset = useCallback(() => {
-    setAggregations(DEFAULTS.aggregations);
-    setSelectedDatasetId(DEFAULTS.selectedDatasetId);
-    setSelectedColumns(DEFAULTS.selectedColumns);
-    setSelectedGroupByColumns(DEFAULTS.selectedGroupByColumns);
-    setOrderByColumn(DEFAULTS.orderByColumn);
-    setOrderByDirection(DEFAULTS.orderByDirection);
-    setVizConfig(makeDefaultVizConfig("table"));
-  }, []);
+  // Always return a fully-populated state
+  const currentFormState: DataExplorerContextTypeValues = useMemo(() => {
+    if (selectedDatasetId && formStates[selectedDatasetId]) {
+      return formStates[selectedDatasetId];
+    }
+    return {
+      ...DEFAULTS,
+      selectedDatasetId,
+    };
+  }, [selectedDatasetId, formStates]);
+
+  // helper to update dataset-specific state
+  const updateFormState = useCallback(
+    (partial: Partial<DataExplorerContextTypeValues>) => {
+      if (!selectedDatasetId) return;
+      setFormStates((prevSelectedDatasetId) => {
+        const prevState = prevSelectedDatasetId[selectedDatasetId] ?? {
+          ...DEFAULTS,
+          selectedDatasetId,
+        };
+        return {
+          ...prevSelectedDatasetId,
+          [selectedDatasetId]: {
+            ...prevState,
+            ...partial,
+          },
+        };
+      });
+    },
+    [selectedDatasetId],
+  );
 
   const onSelectDatasetChange = useCallback(
     (newValue: DatasetId | undefined) => {
-      if (newValue !== selectedDatasetId) {
-        reset();
-      }
+      if (newValue === selectedDatasetId) return;
       setSelectedDatasetId(newValue);
     },
-    [selectedDatasetId, reset],
+    [selectedDatasetId],
   );
+
+  const reset = useCallback(() => {
+    if (!selectedDatasetId) return;
+    setFormStates((previousSelectedDatasetId) => {
+      return {
+        ...previousSelectedDatasetId,
+        [selectedDatasetId]: {
+          ...DEFAULTS,
+          selectedDatasetId,
+        },
+      };
+    });
+  }, [selectedDatasetId]);
 
   const value = useMemo((): DataExplorerContextType => {
     return {
-      aggregations,
+      ...currentFormState,
       selectedDatasetId,
-      selectedColumns,
-      selectedGroupByColumns,
-      orderByColumn,
-      orderByDirection,
-      vizConfig,
-      setAggregations,
+      setAggregations: (newAggregations) => {
+        return updateFormState({ aggregations: newAggregations });
+      },
+      setSelectedColumns: (newColumns) => {
+        return updateFormState({ selectedColumns: newColumns });
+      },
+      setSelectedGroupByColumns: (newGroupBycolumns) => {
+        return updateFormState({ selectedGroupByColumns: newGroupBycolumns });
+      },
+      setOrderByColumn: (newOrderByColumn) => {
+        return updateFormState({ orderByColumn: newOrderByColumn });
+      },
+      setOrderByDirection: (newOrderByColumn) => {
+        return updateFormState({ orderByDirection: newOrderByColumn });
+      },
+      setVizConfig: (newVizConfig) => {
+        return updateFormState({ vizConfig: newVizConfig });
+      },
       setSelectedDatasetId,
-      setSelectedColumns,
-      setSelectedGroupByColumns,
-      setOrderByColumn,
-      setOrderByDirection,
-      setVizConfig,
       onSelectDatasetChange,
       reset,
     };
   }, [
-    aggregations,
+    currentFormState,
     selectedDatasetId,
-    selectedColumns,
-    selectedGroupByColumns,
-    orderByColumn,
-    orderByDirection,
-    vizConfig,
+    updateFormState,
     onSelectDatasetChange,
     reset,
   ]);
