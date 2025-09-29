@@ -1,5 +1,6 @@
 import { Button, FileInput, FileInputProps, Group } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { useRef } from "react";
 import { MIMEType } from "@/lib/types/common";
 
 type Props = {
@@ -62,6 +63,9 @@ export function FileUploadField({
     },
   });
 
+  // allow user to press enter to upload form
+  const submitRef = useRef<HTMLButtonElement>(null);
+
   return (
     <form
       onSubmit={form.onSubmit((values) => {
@@ -74,10 +78,17 @@ export function FileUploadField({
         {...form.getInputProps("file")}
         clearable={clearable}
         accept={accept}
+        onChange={(file) => {
+          form.setFieldValue("file", file);
+          setTimeout(() => {
+            submitRef.current?.focus();
+          }, 0);
+        }}
         {...fileInputProps}
       />
       <Group justify="flex-end" mt="md">
         <Button
+          ref={submitRef}
           type="submit"
           loading={isSubmitting}
           disabled={form.getValues().file === null}
