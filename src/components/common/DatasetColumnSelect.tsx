@@ -2,6 +2,7 @@ import { useUncontrolled } from "@mantine/hooks";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
+import { Logger } from "@/lib/Logger";
 import { Select, SelectProps } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
@@ -48,6 +49,8 @@ export function DatasetColumnSelect({
       },
     );
   }, [dataset, excludeColumns]);
+
+  Logger.log("fieldOptions", fieldOptions);
 
   return (
     <Select

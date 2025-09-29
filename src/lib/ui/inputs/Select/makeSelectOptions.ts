@@ -55,7 +55,7 @@ export function makeSelectOptions<
     return {
       value: optionValue,
       label: optionLabel,
-      isDisabled,
+      disabled: isDisabled,
     };
   });
   return selectOptions;

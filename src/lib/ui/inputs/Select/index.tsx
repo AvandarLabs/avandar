@@ -2,6 +2,7 @@ import {
   Select as MantineSelect,
   SelectProps as MantineSelectProps,
 } from "@mantine/core";
+import { Logger } from "@/lib/Logger";
 
 export type SelectOption<T extends NonNullable<string>> = {
   value: T;
@@ -56,6 +57,7 @@ type Props<T extends NonNullable<string>> = Omit<
 export function Select<T extends NonNullable<string>>(
   props: Props<T>,
 ): JSX.Element {
+  Logger.log("rendering somehow");
   return <MantineSelect {...(props as MantineSelectProps)} />;
 }
 
