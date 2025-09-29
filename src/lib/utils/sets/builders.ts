@@ -24,5 +24,12 @@ export function makeSet<
     return new Set(list as unknown as HashV[]);
   }
   const outputSet = new Set<HashV>();
+  for (const item of list) {
+    const hashValue =
+      key ? (item[key] as HashV)
+      : hashFn ? hashFn(item)
+      : (item as unknown as HashV);
+    outputSet.add(hashValue);
+  }
   return outputSet;
 }

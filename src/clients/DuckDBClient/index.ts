@@ -655,6 +655,8 @@ class DuckDBClientImpl {
           );
         }, queryString);
 
+        Logger.log("final query to use", queryStringToUse);
+
         // run the query
         const arrowTable =
           await conn.query<Record<string, arrow.DataType>>(queryStringToUse);
