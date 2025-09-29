@@ -2,13 +2,16 @@ import { Button, Container, Group, Stack, Text, Title } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { StringKeyOf } from "type-fest";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
 import { Paper } from "@/lib/ui/Paper";
 import { hasDefinedProps } from "@/lib/utils/guards";
+import { reorderObjectKeys } from "@/lib/utils/objects/transformations";
+import { Dataset } from "@/models/datasets/Dataset";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityConfig } from "@/models/EntityConfig/types";
 import { generateEntities } from "./generateEntities";
@@ -18,12 +21,30 @@ type Props = {
   entityConfig: EntityConfig;
 };
 
+type FullEntity = EntityConfig<"Full">;
+
+type FullEntityView = FullEntity & {
+  dateOfLastSync?: string | Date;
+  fields: EntityConfig[];
+  datasets: Dataset[];
+};
+
 const EXCLUDED_ENTITY_CONFIG_KEYS = [
   "id",
   "ownerId",
   "datasets",
   "workspaceId",
 ] as const;
+
+const ORDER_OF_RENDERED_KEYS = [
+  "name",
+  "description",
+  "createdAt",
+  "updatedAt",
+  "allowManualCreation",
+  "fields",
+] as const satisfies ReadonlyArray<StringKeyOf<FullEntityView>>;
+
 const ENTITY_CONFIG_RENDER_OPTIONS: ObjectKeyRenderOptionsMap<
   EntityConfig<"Full">
 > = {
@@ -55,6 +76,13 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
   const [fullEntityConfig] = useHydratedEntityConfig({
     entityConfig,
   });
+
+  const orderedFullEntityConfig = useMemo<FullEntity>(() => {
+    return reorderObjectKeys<FullEntity>(
+      fullEntityConfig,
+      ORDER_OF_RENDERED_KEYS,
+    );
+  }, [fullEntityConfig]);
 
   return (
     <Container pt="lg">
@@ -100,7 +128,7 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
           <Text>{entityConfig.description}</Text>
 
           <ObjectDescriptionList
-            data={fullEntityConfig}
+            data={orderedFullEntityConfig}
             excludeKeys={EXCLUDED_ENTITY_CONFIG_KEYS}
             keyRenderOptions={ENTITY_CONFIG_RENDER_OPTIONS}
           />
