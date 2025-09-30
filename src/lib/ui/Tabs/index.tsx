@@ -6,7 +6,7 @@ import {
   Text,
 } from "@mantine/core";
 import { ReactNode, useState } from "react";
-import { makeObjectFromList } from "@/lib/utils/objects/builders";
+import { makeObject } from "@/lib/utils/objects/builders";
 
 type Props<TabId extends string> = {
   /**
@@ -41,7 +41,7 @@ export function Tabs<TabId extends string>({
   const [tabItemRefs, setTabItemRefs] = useState<
     Record<TabId, HTMLButtonElement | null>
   >(() => {
-    return makeObjectFromList(tabIds, { defaultValue: null });
+    return makeObject(tabIds, { defaultValue: null });
   });
   const tabItemRefCallback = (tabItemId: TabId) => {
     return (node: HTMLButtonElement | null) => {

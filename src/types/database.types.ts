@@ -139,6 +139,75 @@ export type Database = {
           },
         ]
       }
+      datasets__csv_file: {
+        Row: {
+          comment_char: string | null
+          created_at: string
+          dataset_id: string
+          date_format: string | null
+          delimiter: string
+          escape_char: string
+          has_header: boolean
+          id: string
+          newline_delimiter: string
+          quote_char: string
+          rows_to_skip: number
+          size_in_bytes: number
+          timestamp_format: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          comment_char?: string | null
+          created_at?: string
+          dataset_id: string
+          date_format?: string | null
+          delimiter: string
+          escape_char?: string
+          has_header?: boolean
+          id?: string
+          newline_delimiter?: string
+          quote_char?: string
+          rows_to_skip?: number
+          size_in_bytes: number
+          timestamp_format?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          comment_char?: string | null
+          created_at?: string
+          dataset_id?: string
+          date_format?: string | null
+          delimiter?: string
+          escape_char?: string
+          has_header?: boolean
+          id?: string
+          newline_delimiter?: string
+          quote_char?: string
+          rows_to_skip?: number
+          size_in_bytes?: number
+          timestamp_format?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "datasets__csv_file_dataset_id_fkey"
+            columns: ["dataset_id"]
+            isOneToOne: true
+            referencedRelation: "datasets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "datasets__csv_file_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       datasets__google_sheets: {
         Row: {
           created_at: string
@@ -187,51 +256,6 @@ export type Database = {
           },
           {
             foreignKeyName: "datasets__google_sheets_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      datasets__local_csv: {
-        Row: {
-          created_at: string
-          dataset_id: string
-          delimiter: string
-          id: string
-          size_in_bytes: number
-          updated_at: string
-          workspace_id: string
-        }
-        Insert: {
-          created_at?: string
-          dataset_id: string
-          delimiter: string
-          id?: string
-          size_in_bytes: number
-          updated_at?: string
-          workspace_id: string
-        }
-        Update: {
-          created_at?: string
-          dataset_id?: string
-          delimiter?: string
-          id?: string
-          size_in_bytes?: number
-          updated_at?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "datasets__local_csv_dataset_id_fkey"
-            columns: ["dataset_id"]
-            isOneToOne: true
-            referencedRelation: "datasets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "datasets__local_csv_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -420,81 +444,6 @@ export type Database = {
           },
           {
             foreignKeyName: "entity_field_configs_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      entity_field_values: {
-        Row: {
-          created_at: string
-          dataset_id: string | null
-          entity_config_id: string
-          entity_field_config_id: string
-          entity_id: string
-          id: string
-          updated_at: string
-          value: string | null
-          value_set: string
-          workspace_id: string
-        }
-        Insert: {
-          created_at?: string
-          dataset_id?: string | null
-          entity_config_id: string
-          entity_field_config_id: string
-          entity_id: string
-          id?: string
-          updated_at?: string
-          value?: string | null
-          value_set: string
-          workspace_id: string
-        }
-        Update: {
-          created_at?: string
-          dataset_id?: string | null
-          entity_config_id?: string
-          entity_field_config_id?: string
-          entity_id?: string
-          id?: string
-          updated_at?: string
-          value?: string | null
-          value_set?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "entity_field_values_dataset_id_fkey"
-            columns: ["dataset_id"]
-            isOneToOne: false
-            referencedRelation: "datasets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "entity_field_values_entity_config_id_fkey"
-            columns: ["entity_config_id"]
-            isOneToOne: false
-            referencedRelation: "entity_configs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "entity_field_values_entity_field_config_id_fkey"
-            columns: ["entity_field_config_id"]
-            isOneToOne: false
-            referencedRelation: "entity_field_configs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "entity_field_values_entity_id_fkey"
-            columns: ["entity_id"]
-            isOneToOne: false
-            referencedRelation: "entities"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "entity_field_values_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -833,6 +782,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      rpc_datasets__add_csv_file_dataset: {
+        Args: {
+          p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
+          p_comment_char: Database["public"]["CompositeTypes"]["util__nullable_text"]
+          p_dataset_description: string
+          p_dataset_name: string
+          p_date_format: Database["public"]["CompositeTypes"]["datasets__csv_file__date_format"]
+          p_delimiter: string
+          p_escape_char: string
+          p_has_header: boolean
+          p_newline_delimiter: string
+          p_quote_char: string
+          p_rows_to_skip: number
+          p_size_in_bytes: number
+          p_workspace_id: string
+        }
+        Returns: {
+          created_at: string
+          date_of_last_sync: string | null
+          description: string | null
+          id: string
+          name: string
+          owner_id: string
+          owner_profile_id: string
+          source_type: Database["public"]["Enums"]["datasets__source_type"]
+          updated_at: string
+          workspace_id: string
+        }
+      }
       rpc_datasets__add_dataset: {
         Args: {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
@@ -862,28 +840,6 @@ export type Database = {
           p_google_account_id: string
           p_google_document_id: string
           p_rows_to_skip?: number
-          p_workspace_id: string
-        }
-        Returns: {
-          created_at: string
-          date_of_last_sync: string | null
-          description: string | null
-          id: string
-          name: string
-          owner_id: string
-          owner_profile_id: string
-          source_type: Database["public"]["Enums"]["datasets__source_type"]
-          updated_at: string
-          workspace_id: string
-        }
-      }
-      rpc_datasets__add_local_csv_dataset: {
-        Args: {
-          p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
-          p_dataset_description: string
-          p_dataset_name: string
-          p_delimiter: string
-          p_size_in_bytes: number
           p_workspace_id: string
         }
         Returns: {
@@ -944,7 +900,7 @@ export type Database = {
     }
     Enums: {
       datasets__column_data_type: "text" | "number" | "date"
-      datasets__source_type: "local_csv" | "google_sheets"
+      datasets__source_type: "csv_file" | "google_sheets"
       entity_field_configs__base_data_type: "string" | "number" | "date"
       entity_field_configs__class: "dimension" | "metric"
       entity_field_configs__value_extractor_type:
@@ -962,6 +918,13 @@ export type Database = {
           | Database["public"]["Enums"]["datasets__column_data_type"]
           | null
         column_idx: number | null
+      }
+      datasets__csv_file__date_format: {
+        date_format: string | null
+        timestamp_format: string | null
+      }
+      util__nullable_text: {
+        value: string | null
       }
     }
   }
@@ -1091,7 +1054,7 @@ export const Constants = {
   public: {
     Enums: {
       datasets__column_data_type: ["text", "number", "date"],
-      datasets__source_type: ["local_csv", "google_sheets"],
+      datasets__source_type: ["csv_file", "google_sheets"],
       entity_field_configs__base_data_type: ["string", "number", "date"],
       entity_field_configs__class: ["dimension", "metric"],
       entity_field_configs__value_extractor_type: [

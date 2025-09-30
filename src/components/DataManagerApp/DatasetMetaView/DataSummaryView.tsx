@@ -1,36 +1,28 @@
-import { Stack, Title } from "@mantine/core";
-import { useMemo } from "react";
-import { RawDataRow } from "@/lib/types/common";
+import { Loader, Stack } from "@mantine/core";
+import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
-import { DatasetColumn } from "@/models/datasets/DatasetColumn";
-import { getSummary } from "@/models/datasets/DatasetRawData/getSummary";
+import { DatasetId } from "@/models/datasets/Dataset";
 
 type Props = {
-  rawDatasetRows: RawDataRow[];
-  columns: DatasetColumn[];
+  datasetId: DatasetId;
 };
 
-export function DataSummaryView({
-  rawDatasetRows,
-  columns,
-}: Props): JSX.Element {
-  const summary = useMemo(() => {
-    return getSummary({
-      dataRows: rawDatasetRows,
-      columns,
-    });
-  }, [rawDatasetRows, columns]);
+export function DataSummaryView({ datasetId }: Props): JSX.Element {
+  const [summary, isLoadingSummary] = DatasetRawDataClient.useGetSummary({
+    datasetId,
+  });
 
   return (
     <Stack>
-      <ObjectDescriptionList data={summary} excludeKeys={["columnSummaries"]} />
-
-      {summary.columnSummaries ?
-        <Stack>
-          <Title order={4}>Column Summaries</Title>
+      {isLoadingSummary ?
+        <Loader />
+      : null}
+      {summary?.columnSummaries ?
+        <>
           <ObjectDescriptionList
             data={summary.columnSummaries}
             titleKey="name"
+            defaultExpanded={true}
             itemRenderOptions={{
               maxHeight: 400,
               excludeKeys: ["name"],
@@ -45,7 +37,7 @@ export function DataSummaryView({
               },
             }}
           />
-        </Stack>
+        </>
       : null}
     </Stack>
   );

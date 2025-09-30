@@ -40,7 +40,7 @@ import { Modal } from "@/lib/ui/Modal";
 import { Workspace } from "@/models/Workspace/types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 import { WorkspaceForm } from "../../../components/common/forms/WorkspaceForm";
-import { notifySuccess } from "../notifications/notifySuccess";
+import { notifySuccess } from "../notifications/notify";
 import css from "./AppShell.module.css";
 
 const HEADER_DEFAULT_HEIGHT = 60;

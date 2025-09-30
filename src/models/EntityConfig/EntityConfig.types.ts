@@ -81,3 +81,9 @@ export type EntityConfig<K extends keyof EntityConfigModel = "Read"> =
 
 export type EntityConfigWith<Keys extends Paths<EntityConfig<"Full">>> =
   Simplify<SetRequiredDeep<EntityConfig<"Full">, Keys>>;
+
+export type BuildableEntityConfig = EntityConfigWith<
+  "datasets" | "fields" | `fields.${number}.valueExtractor`
+>;
+
+export type BuildableFieldConfig = BuildableEntityConfig["fields"][number];

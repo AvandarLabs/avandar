@@ -147,6 +147,22 @@ export function slugify(str: string): string {
 }
 
 /**
+ * Snakeifies a string.
+ * @param str The string to snakeify.
+ * @returns The snakeified string.
+ */
+export function snakeify(str: string): string {
+  return str
+    .toLowerCase()
+    .replace(/ /g, "_")
+    .replace(/-/g, "_") // also convert dashes to underscores
+    .replace(/[^\w_]/g, "")
+    .replace(/_+/g, "_")
+    .replace(/^_+/, "")
+    .replace(/_+$/, "");
+}
+
+/**
  * Prefixes a string with a given prefix.
  * @param prefixStr The prefix to add.
  * @param str The string to prefix.

@@ -45,12 +45,12 @@ export const DatasetParsers = makeParserRegistry<DatasetModel>().build({
   fromModelInsertToDBInsert: pipe(
     snakeCaseKeysDeep,
     undefinedsToNullsDeep,
-    excludeNullsExceptInProps("date_of_last_sync", "description"),
+    excludeNullsExceptInProps(["date_of_last_sync", "description"]),
   ),
   fromModelUpdateToDBUpdate: pipe(
     snakeCaseKeysDeep,
     undefinedsToNullsDeep,
-    excludeNullsExceptInProps("date_of_last_sync", "description"),
+    excludeNullsExceptInProps(["date_of_last_sync", "description"]),
   ),
 });
 

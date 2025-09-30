@@ -4,6 +4,10 @@ import { UserId, UserProfileId } from "../../User/types";
 import { WorkspaceId } from "../../Workspace/types";
 import { DatasetId, DatasetSourceType } from "../Dataset/types";
 
+// TODO(jpsyx): this model no longer tracks raw data. It is just a list of
+// metadata of which datasets have been loaded locally into DuckDB.
+// potential name: DatasetLocalMetadata? DatasetDuckDBMetadata?
+// should we just store this in DuckDB?? why use a separate database?
 type DatasetRawDataDBRead = {
   /** Timestamp of when this raw data object was created. */
   createdAt: string;
@@ -29,9 +33,6 @@ type DatasetRawDataDBRead = {
 
   /** Unique identifier of the workspace the raw data object belongs to. */
   workspaceId: WorkspaceId;
-
-  /** The raw data, represented as a single CSV string. */
-  data: string;
 };
 
 type DatasetRawDataRead = Merge<

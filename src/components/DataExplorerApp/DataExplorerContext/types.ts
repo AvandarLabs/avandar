@@ -1,26 +1,27 @@
+import { QueryAggregationType } from "@/clients/DuckDBClient/types";
+import { QueryableDataSource } from "../QueryableDataSourceSelect";
+import type { QueryableColumn } from "../QueryableColumnMultiSelect";
 import type { VizConfig } from "../VizSettingsForm/makeDefaultVizConfig";
-import type { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
-import type { DatasetId } from "@/models/datasets/Dataset";
-import type { DatasetColumn } from "@/models/datasets/DatasetColumn";
 
 export type DataExplorerContextTypeValues = {
   aggregations: Record<string, QueryAggregationType>;
-  selectedDatasetId?: DatasetId;
-  selectedColumns: readonly DatasetColumn[];
-  selectedGroupByColumns: readonly DatasetColumn[];
-  orderByColumn?: DatasetColumn;
+  selectedFromDataSource?: QueryableDataSource;
+  selectedColumns: readonly QueryableColumn[];
+  selectedGroupByColumns: readonly QueryableColumn[];
+  orderByColumn?: QueryableColumn;
   orderByDirection: "asc" | "desc";
   vizConfig: VizConfig;
 };
 
 export type DataExplorerContextType = DataExplorerContextTypeValues & {
   setAggregations: (newValue: Record<string, QueryAggregationType>) => void;
-  setSelectedDatasetId: (newValue: DatasetId | undefined) => void;
-  setSelectedColumns: (newValue: readonly DatasetColumn[]) => void;
-  setSelectedGroupByColumns: (newValue: readonly DatasetColumn[]) => void;
-  setOrderByColumn: (newValue: DatasetColumn | undefined) => void;
+  setSelectedFromDataSource: (
+    newValue: QueryableDataSource | undefined,
+  ) => void;
+  setSelectedColumns: (newValue: readonly QueryableColumn[]) => void;
+  setSelectedGroupByColumns: (newValue: readonly QueryableColumn[]) => void;
+  setOrderByColumn: (newValue: QueryableColumn | undefined) => void;
   setOrderByDirection: (newValue: "asc" | "desc") => void;
   setVizConfig: (newValue: VizConfig) => void;
-  onSelectDatasetChange: (newValue: DatasetId | undefined) => void;
   reset: () => void;
 };

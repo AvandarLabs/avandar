@@ -10,7 +10,7 @@ import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
-import { makeBucketMapFromList } from "@/lib/utils/maps/builders";
+import { makeBucketMap } from "@/lib/utils/maps/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import {
   Dataset,
@@ -57,7 +57,7 @@ export function DatasetNavbar({
   }, [theme.radius]);
 
   const [uploadedDatasetLinks] = useMemo(() => {
-    const datasetsByType = makeBucketMapFromList(datasets, {
+    const datasetsByType = makeBucketMap(datasets, {
       keyFn: getProp("sourceType"),
     });
 

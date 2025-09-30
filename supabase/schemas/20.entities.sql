@@ -17,7 +17,12 @@ create table public.entities (
   -- User id of the owner. We cannot delete users that are still assigned to entities.
   assigned_to uuid references auth.users (id) on update cascade on delete no action,
   -- Status of the entity
-  status text not null
+  status text not null,
+  -- Unique constraint to ensure one external_id per entity_config
+  constraint entities__entity_config_external_id_unique unique (
+    entity_config_id,
+    external_id
+  )
 );
 
 -- Enable row level security
