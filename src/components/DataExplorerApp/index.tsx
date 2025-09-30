@@ -17,8 +17,8 @@ export function DataExplorerApp(): JSX.Element {
   const {
     aggregations,
     setAggregations,
-    selectedDataSource,
-    onSelectedDataSourceChange,
+    selectedFromDataSource,
+    setSelectedFromDataSource,
     selectedColumns,
     setSelectedColumns,
     selectedGroupByColumns,
@@ -81,9 +81,9 @@ export function DataExplorerApp(): JSX.Element {
   }, [selectedColumnNames, selectedGroupByColNames, aggregations]);
 
   const [queryResults, isLoadingResults] = useDataQuery({
-    enabled: !!selectedDataSource && isValidQuery,
+    enabled: !!selectedFromDataSource && isValidQuery,
     aggregations,
-    dataSource: selectedDataSource,
+    dataSource: selectedFromDataSource,
     selectColumns: selectedColumns,
     groupByColumns: selectedGroupByColumns,
     orderByColumn,
@@ -110,13 +110,13 @@ export function DataExplorerApp(): JSX.Element {
       >
         <QueryForm
           aggregations={aggregations}
-          selectedDataSource={selectedDataSource}
+          selectedFromDataSource={selectedFromDataSource}
           selectedColumns={selectedColumns}
           selectedGroupByColumns={selectedGroupByColumns}
           orderByColumn={orderByColumn}
           orderByDirection={orderByDirection}
           onAggregationsChange={setAggregations}
-          onSelectDataSourceChange={onSelectedDataSourceChange}
+          onFromDataSourceChange={setSelectedFromDataSource}
           onSelectColumnsChange={setSelectedColumns}
           onGroupByChange={setSelectedGroupByColumns}
           onOrderByColumnChange={setOrderByColumn}
