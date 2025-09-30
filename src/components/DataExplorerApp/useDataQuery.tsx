@@ -12,6 +12,7 @@ import { makeObjectFromEntries } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries } from "@/lib/utils/objects/misc";
 import { sortStrings } from "@/lib/utils/strings/sort";
+import { OrderByDirection } from "./DataExplorerContext/types";
 import { QueryableColumn } from "./QueryableColumnMultiSelect";
 import { QueryableDataSource } from "./QueryableDataSourceSelect";
 
@@ -21,7 +22,7 @@ type UseDataQueryOptions = {
   selectColumns: readonly QueryableColumn[];
   groupByColumns: readonly QueryableColumn[];
   orderByColumn: QueryableColumn | undefined;
-  orderByDirection: "asc" | "desc";
+  orderByDirection: OrderByDirection | undefined;
 
   /**
    * Aggregations to apply to the selected columns

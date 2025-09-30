@@ -3,13 +3,15 @@ import { QueryableDataSource } from "../QueryableDataSourceSelect";
 import type { QueryableColumn } from "../QueryableColumnMultiSelect";
 import type { VizConfig } from "../VizSettingsForm/makeDefaultVizConfig";
 
+export type OrderByDirection = "asc" | "desc";
+
 export type DataExplorerContextTypeValues = {
   aggregations: Record<string, QueryAggregationType>;
-  selectedFromDataSource?: QueryableDataSource;
+  selectedFromDataSource: QueryableDataSource | undefined;
   selectedColumns: readonly QueryableColumn[];
   selectedGroupByColumns: readonly QueryableColumn[];
-  orderByColumn?: QueryableColumn;
-  orderByDirection: "asc" | "desc";
+  orderByColumn: QueryableColumn | undefined;
+  orderByDirection: OrderByDirection | undefined;
   vizConfig: VizConfig;
 };
 
@@ -21,7 +23,7 @@ export type DataExplorerContextType = DataExplorerContextTypeValues & {
   setSelectedColumns: (newValue: readonly QueryableColumn[]) => void;
   setSelectedGroupByColumns: (newValue: readonly QueryableColumn[]) => void;
   setOrderByColumn: (newValue: QueryableColumn | undefined) => void;
-  setOrderByDirection: (newValue: "asc" | "desc") => void;
+  setOrderByDirection: (newValue: OrderByDirection | undefined) => void;
   setVizConfig: (newValue: VizConfig) => void;
   reset: () => void;
 };

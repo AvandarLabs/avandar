@@ -1,7 +1,7 @@
 import { Fieldset, Stack, Text } from "@mantine/core";
 import { match } from "ts-pattern";
 import { QueryAggregationType } from "@/clients/DuckDBClient/types";
-import { Select } from "@/lib/ui/inputs/Select";
+import { Select, SelectData } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { DangerText } from "@/lib/ui/Text/DangerText";
 import { difference } from "@/lib/utils/arrays/misc";
@@ -9,6 +9,7 @@ import { makeObject } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys, omit } from "@/lib/utils/objects/misc";
 import { AggregationSelect } from "./AggregationSelect";
+import { OrderByDirection } from "./DataExplorerContext/types";
 import {
   QueryableColumn,
   QueryableColumnMultiSelect,
@@ -22,12 +23,10 @@ import {
 const HIDE_WHERE = true;
 const HIDE_LIMIT = true;
 
-const orderOptions = [
+const orderDirectionOptions = [
   { value: "asc", label: "Ascending" },
   { value: "desc", label: "Descending" },
-] as const;
-
-type Direction = "asc" | "desc";
+] as const satisfies SelectData<string>;
 
 type Props = {
   errorMessage: string | undefined;
@@ -36,7 +35,7 @@ type Props = {
   selectedColumns: readonly QueryableColumn[];
   selectedGroupByColumns: readonly QueryableColumn[];
   orderByColumn: QueryableColumn | undefined;
-  orderByDirection: Direction;
+  orderByDirection: OrderByDirection | undefined;
   onAggregationsChange: (next: Record<string, QueryAggregationType>) => void;
   onFromDataSourceChange: (
     dataSourceId: QueryableDataSource | undefined,
@@ -44,7 +43,7 @@ type Props = {
   onSelectColumnsChange: (columns: readonly QueryableColumn[]) => void;
   onGroupByChange: (columns: readonly QueryableColumn[]) => void;
   onOrderByColumnChange: (column: QueryableColumn | undefined) => void;
-  onOrderByDirectionChange: (dir: Direction) => void;
+  onOrderByDirectionChange: (dir: OrderByDirection) => void;
 };
 
 function makeDataSourceIdWithType(
@@ -79,7 +78,12 @@ export function QueryForm({
     valueFn: getProp("value.id"),
     labelFn: getProp("value.name"),
   });
+  const builderTouched =
+    selectedColumns.length > 0 ||
+    (selectedGroupByColumns?.length ?? 0) > 0 ||
+    orderByDirection != null;
 
+  const showEmptyFieldsError = selectedColumns.length === 0 && builderTouched;
   const orderByColumnId = orderByColumn?.value.id ?? null;
 
   return (
@@ -161,18 +165,14 @@ export function QueryForm({
         />
 
         <Fieldset
-          legend="Order by"
+          legend="Sort by"
           style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
         >
           <Select
-            label="Select column"
+            label="Column"
             data={fieldOptionsById}
             value={orderByColumnId}
             onChange={(newColId) => {
-              if (newColId === null) {
-                onOrderByColumnChange(undefined);
-                return;
-              }
               const newOrderByColumn = selectedColumns.find((col) => {
                 return col.value.id === newColId;
               });
@@ -181,16 +181,23 @@ export function QueryForm({
             clearable
           />
           <Select
-            label="Order by"
+            label="Direction"
             placeholder="Select order"
-            data={orderOptions}
+            data={orderDirectionOptions}
             value={orderByDirection}
-            clearable={false}
             onChange={(value) => {
-              onOrderByDirectionChange(value as Direction);
+              onOrderByDirectionChange((value as OrderByDirection) ?? null);
             }}
+            clearable={false}
           />
         </Fieldset>
+
+        {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
+        {showEmptyFieldsError ?
+          <DangerText>
+            At least one column must be selected to build a query.
+          </DangerText>
+        : null}
 
         {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
         {errorMessage ?
