@@ -7,6 +7,7 @@ import type { VizConfig } from "../VizSettingsForm/makeDefaultVizConfig";
 import type {
   DataExplorerContextType,
   DataExplorerContextTypeValues,
+  OrderByDirection,
 } from "./types";
 
 const DEFAULTS: DataExplorerContextTypeValues = {
@@ -15,7 +16,7 @@ const DEFAULTS: DataExplorerContextTypeValues = {
   selectedColumns: [],
   selectedGroupByColumns: [],
   orderByColumn: undefined,
-  orderByDirection: "asc",
+  orderByDirection: undefined,
   vizConfig: makeDefaultVizConfig("table"),
 };
 
@@ -37,9 +38,9 @@ export function DataExplorerProvider({
   const [orderByColumn, setOrderByColumn] = useState<
     QueryableColumn | undefined
   >(DEFAULTS.orderByColumn);
-  const [orderByDirection, setOrderByDirection] = useState<"asc" | "desc">(
-    DEFAULTS.orderByDirection,
-  );
+  const [orderByDirection, setOrderByDirection] = useState<
+    OrderByDirection | undefined
+  >(DEFAULTS.orderByDirection);
   const [vizConfig, setVizConfig] = useState<VizConfig>(DEFAULTS.vizConfig);
 
   const reset = useCallback(() => {
