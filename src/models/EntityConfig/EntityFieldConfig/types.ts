@@ -6,7 +6,7 @@ import {
   DimensionExtractorType,
   MetricExtractorType,
 } from "../ValueExtractor/types";
-import type { EntityConfigId } from "../types";
+import type { EntityConfigId } from "../EntityConfig.types";
 import type { UUID } from "@/lib/types/common";
 
 export type EntityFieldConfigId = UUID<"EntityFieldConfig">;

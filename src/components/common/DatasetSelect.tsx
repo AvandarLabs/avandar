@@ -5,7 +5,7 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
 import { Select, SelectOptionGroup, SelectProps } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { makeBucketMapFromList } from "@/lib/utils/maps/builders";
+import { makeBucketMap } from "@/lib/utils/maps/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { DatasetId } from "@/models/datasets/Dataset";
 
@@ -45,8 +45,8 @@ export function DatasetSelect({
   );
 
   const datasetOptions = useMemo(() => {
-    const datasetBucketsByType = makeBucketMapFromList(datasets ?? [], {
-      keyFn: getProp("sourceType"),
+    const datasetBucketsByType = makeBucketMap(datasets ?? [], {
+      key: "sourceType",
     });
 
     if (datasetBucketsByType.size === 1) {
@@ -60,7 +60,7 @@ export function DatasetSelect({
     const groups: Array<SelectOptionGroup<DatasetId>> = [];
     datasetBucketsByType.forEach((bucketValues, bucketKey) => {
       const bucketName = match(bucketKey)
-        .with("local_csv", () => {
+        .with("csv_file", () => {
           return "CSVs";
         })
         .with("google_sheets", () => {

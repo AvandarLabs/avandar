@@ -14,7 +14,7 @@ type Props = {
    * column.
    */
   data: UnknownDataFrame;
-  height?: number;
+  height?: number | string;
   dateColumns?: ReadonlySet<string>;
   dateFormat?: string;
   timezone?: string;
@@ -33,6 +33,7 @@ export function DataGrid({
       return {
         field: field,
         headerName: field,
+        filter: true,
         valueFormatter:
           dateColumns?.has(field) ?
             (p: { value: unknown }) => {
@@ -49,6 +50,8 @@ export function DataGrid({
       <AgGridReact
         columnDefs={columnDefs}
         rowData={data as Writable<UnknownDataFrame>}
+        pagination={true}
+        paginationPageSize={50}
       />
     </Box>
   );
