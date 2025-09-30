@@ -10,6 +10,7 @@ import {
   VizConfig,
   VizType,
 } from "./makeDefaultVizConfig";
+import { ScatterChartForm } from "./ScatterChartForm";
 
 type VizTypeMetadata = { type: VizType; displayName: string };
 
@@ -17,6 +18,7 @@ const VIZ_TYPES: VizTypeMetadata[] = [
   { type: "table", displayName: "Table" },
   { type: "bar", displayName: "Bar Chart" },
   { type: "line", displayName: "Line Chart" },
+  { type: "scatter", displayName: "Scatter Plot" },
 ];
 
 type Props = {
@@ -39,6 +41,12 @@ function getXYFromVizConfig(
       return {
         xAxisKey: config.settings.xAxisKey,
         yAxisKey: config.settings.yAxisKey,
+      };
+    })
+    .with({ type: "scatter" }, (c) => {
+      return {
+        xAxisKey: c.settings.xAxisKey,
+        yAxisKey: c.settings.yAxisKey,
       };
     })
     .with({ type: "table" }, () => {
@@ -73,6 +81,15 @@ function hydrateXY(options: {
         settings: {
           xAxisKey: config.settings.xAxisKey ?? prevXY.xAxisKey,
           yAxisKey: config.settings.yAxisKey ?? prevXY.yAxisKey,
+        },
+      };
+    })
+    .with({ type: "scatter" }, (c) => {
+      return {
+        ...c,
+        settings: {
+          xAxisKey: c.settings.xAxisKey ?? prevXY.xAxisKey,
+          yAxisKey: c.settings.yAxisKey ?? prevXY.yAxisKey,
         },
       };
     })
@@ -132,6 +149,17 @@ export function VizSettingsForm({
               settings={config.settings}
               onSettingsChange={(nextSettings) => {
                 onVizConfigChange({ ...config, settings: nextSettings });
+              }}
+            />
+          );
+        })
+        .with({ type: "scatter" }, (config) => {
+          return (
+            <ScatterChartForm
+              fields={columns}
+              settings={config.settings}
+              onSettingsChange={(next) => {
+                return onVizConfigChange({ ...config, settings: next });
               }}
             />
           );

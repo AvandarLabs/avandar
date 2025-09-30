@@ -6,6 +6,7 @@ import { UnknownDataFrame } from "@/lib/types/common";
 import { BarChart } from "@/lib/ui/data-viz/BarChart";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { LineChart } from "@/lib/ui/data-viz/LineChart";
+import { ScatterChart } from "@/lib/ui/data-viz/ScatterChart";
 import { DangerText } from "@/lib/ui/Text/DangerText";
 import { isEpochMs, isIsoDateString } from "@/lib/utils/formatters/formatDate";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
@@ -40,6 +41,11 @@ const BarChartSettingsSchema = z.object({
 });
 
 const LineChartSettingsSchema = z.object({
+  xAxisKey: xAxisKeySchema,
+  yAxisKey: yAxisKeySchema,
+});
+
+const ScatterChartSettingsSchema = z.object({
   xAxisKey: xAxisKeySchema,
   yAxisKey: yAxisKeySchema,
 });
@@ -105,6 +111,18 @@ export function VisualizationContainer({
 
       if (success) {
         return <LineChart data={data} height={700} {...settings} />;
+      }
+      return <DangerText>{z.prettifyError(error)}</DangerText>;
+    })
+    .with({ type: "scatter" }, (config) => {
+      const {
+        success,
+        data: settings,
+        error,
+      } = ScatterChartSettingsSchema.safeParse(config.settings);
+
+      if (success) {
+        return <ScatterChart data={data} height={700} {...settings} />;
       }
       return <DangerText>{z.prettifyError(error)}</DangerText>;
     })

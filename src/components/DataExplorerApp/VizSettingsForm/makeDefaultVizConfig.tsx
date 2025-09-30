@@ -1,8 +1,9 @@
 import { match } from "ts-pattern";
 import { BarChartSettings } from "./BarChartForm";
 import { LineChartSettings } from "./LineChartForm";
+import { ScatterChartSettings } from "./ScatterChartForm";
 
-export type VizType = "table" | "bar" | "line";
+export type VizType = "table" | "bar" | "line" | "scatter";
 
 export type TableVizConfig = {
   type: "table";
@@ -19,7 +20,16 @@ export type LineVizConfig = {
   settings: LineChartSettings;
 };
 
-export type VizConfig = TableVizConfig | BarVizConfig | LineVizConfig;
+export type ScatterVizConfig = {
+  type: "scatter";
+  settings: ScatterChartSettings;
+};
+
+export type VizConfig =
+  | TableVizConfig
+  | BarVizConfig
+  | LineVizConfig
+  | ScatterVizConfig;
 
 export function makeDefaultVizConfig(vizType: VizType): VizConfig {
   return match(vizType)
@@ -30,6 +40,9 @@ export function makeDefaultVizConfig(vizType: VizType): VizConfig {
       return { type, settings: { xAxisKey: undefined, yAxisKey: undefined } };
     })
     .with("line", (type): LineVizConfig => {
+      return { type, settings: { xAxisKey: undefined, yAxisKey: undefined } };
+    })
+    .with("scatter", (type): ScatterVizConfig => {
       return { type, settings: { xAxisKey: undefined, yAxisKey: undefined } };
     })
     .exhaustive();
