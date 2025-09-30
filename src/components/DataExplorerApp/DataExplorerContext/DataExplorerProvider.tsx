@@ -11,7 +11,7 @@ import type {
 
 const DEFAULTS: DataExplorerContextTypeValues = {
   aggregations: {},
-  selectedDataSource: undefined,
+  selectedFromDataSource: undefined,
   selectedColumns: [],
   selectedGroupByColumns: [],
   orderByColumn: undefined,
@@ -25,9 +25,9 @@ export function DataExplorerProvider({
   children?: React.ReactNode;
 }): JSX.Element {
   const [aggregations, setAggregations] = useState(DEFAULTS.aggregations);
-  const [selectedDataSource, setSelectedDataSource] = useState<
+  const [selectedFromDataSource, setSelectedFromDataSource] = useState<
     QueryableDataSource | undefined
-  >(DEFAULTS.selectedDataSource);
+  >(DEFAULTS.selectedFromDataSource);
   const [selectedColumns, setSelectedColumns] = useState<
     readonly QueryableColumn[]
   >(DEFAULTS.selectedColumns);
@@ -44,7 +44,7 @@ export function DataExplorerProvider({
 
   const reset = useCallback(() => {
     setAggregations(DEFAULTS.aggregations);
-    setSelectedDataSource(DEFAULTS.selectedDataSource);
+    setSelectedFromDataSource(DEFAULTS.selectedFromDataSource);
     setSelectedColumns(DEFAULTS.selectedColumns);
     setSelectedGroupByColumns(DEFAULTS.selectedGroupByColumns);
     setOrderByColumn(DEFAULTS.orderByColumn);
@@ -52,45 +52,44 @@ export function DataExplorerProvider({
     setVizConfig(makeDefaultVizConfig("table"));
   }, []);
 
-  const onSelectedDataSourceChange = useCallback(
-    (newValue: QueryableDataSource | undefined) => {
-      if (newValue !== selectedDataSource) {
+  const _setSelectedFromDataSource = useCallback(
+    (newFrom: QueryableDataSource | undefined) => {
+      if (newFrom !== selectedFromDataSource) {
         reset();
       }
-      setSelectedDataSource(newValue);
+      setSelectedFromDataSource(newFrom);
     },
-    [selectedDataSource, reset],
+    [selectedFromDataSource, reset],
   );
 
   const value = useMemo((): DataExplorerContextType => {
     return {
       aggregations,
-      selectedDataSource: selectedDataSource,
       selectedColumns,
+      selectedFromDataSource,
       selectedGroupByColumns,
       orderByColumn,
       orderByDirection,
       vizConfig,
       setAggregations,
-      setSelectedDataSource: setSelectedDataSource,
       setSelectedColumns,
+      setSelectedFromDataSource: _setSelectedFromDataSource,
       setSelectedGroupByColumns,
       setOrderByColumn,
       setOrderByDirection,
       setVizConfig,
-      onSelectedDataSourceChange,
       reset,
     };
   }, [
     aggregations,
-    selectedDataSource,
     selectedColumns,
+    selectedFromDataSource,
     selectedGroupByColumns,
     orderByColumn,
     orderByDirection,
     vizConfig,
-    onSelectedDataSourceChange,
     reset,
+    _setSelectedFromDataSource,
   ]);
 
   return (

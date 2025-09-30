@@ -1,4 +1,4 @@
-import { Box, Fieldset, Stack, Text } from "@mantine/core";
+import { Fieldset, Stack, Text } from "@mantine/core";
 import { match } from "ts-pattern";
 import { QueryAggregationType } from "@/clients/DuckDBClient/types";
 import { Select } from "@/lib/ui/inputs/Select";
@@ -22,23 +22,23 @@ import {
 const HIDE_WHERE = true;
 const HIDE_LIMIT = true;
 
-type Direction = "asc" | "desc";
-
-const orderDirectionOptions: Array<{ value: Direction; label: string }> = [
+const orderOptions = [
   { value: "asc", label: "Ascending" },
   { value: "desc", label: "Descending" },
 ] as const;
 
+type Direction = "asc" | "desc";
+
 type Props = {
-  errorMessage?: string;
+  errorMessage: string | undefined;
   aggregations: Record<string, QueryAggregationType>;
-  selectedDataSource: QueryableDataSource | undefined;
+  selectedFromDataSource: QueryableDataSource | undefined;
   selectedColumns: readonly QueryableColumn[];
   selectedGroupByColumns: readonly QueryableColumn[];
   orderByColumn: QueryableColumn | undefined;
   orderByDirection: Direction;
   onAggregationsChange: (next: Record<string, QueryAggregationType>) => void;
-  onSelectDataSourceChange: (
+  onFromDataSourceChange: (
     dataSourceId: QueryableDataSource | undefined,
   ) => void;
   onSelectColumnsChange: (columns: readonly QueryableColumn[]) => void;
@@ -47,7 +47,7 @@ type Props = {
   onOrderByDirectionChange: (dir: Direction) => void;
 };
 
-function getDataSourceIdWithType(
+function makeDataSourceIdWithType(
   dataSource: QueryableDataSource,
 ): QueryableDataSourceIdWithType {
   return match(dataSource)
@@ -65,13 +65,13 @@ export function QueryForm({
   aggregations,
   selectedColumns,
   selectedGroupByColumns,
-  selectedDataSource,
+  selectedFromDataSource,
   orderByColumn,
-  orderByDirection,
   onAggregationsChange,
-  onSelectDataSourceChange,
+  onFromDataSourceChange,
   onSelectColumnsChange,
   onGroupByChange,
+  orderByDirection,
   onOrderByColumnChange,
   onOrderByDirectionChange,
 }: Props): JSX.Element {
@@ -86,9 +86,9 @@ export function QueryForm({
     <form>
       <Stack>
         <QueryableDataSourceSelect
-          value={selectedDataSource ?? null}
+          value={selectedFromDataSource ?? null}
           onChange={(dataSource) => {
-            onSelectDataSourceChange(dataSource ?? undefined);
+            onFromDataSourceChange(dataSource ?? undefined);
           }}
         />
 
@@ -96,8 +96,8 @@ export function QueryForm({
           label="Select columns"
           placeholder="Select columns"
           dataSourceId={
-            selectedDataSource ?
-              getDataSourceIdWithType(selectedDataSource)
+            selectedFromDataSource ?
+              makeDataSourceIdWithType(selectedFromDataSource)
             : undefined
           }
           value={selectedColumns}
@@ -110,13 +110,15 @@ export function QueryForm({
               prevFieldNames,
               incomingFieldNames,
             );
-
-            const defaults = makeObject(incomingFieldNames, {
+            const newDefaultAggregations = makeObject(incomingFieldNames, {
               defaultValue: "none" as const,
             });
 
             onAggregationsChange(
-              omit({ ...defaults, ...prevAggregations }, droppedFieldNames),
+              omit(
+                { ...newDefaultAggregations, ...prevAggregations },
+                droppedFieldNames,
+              ),
             );
           }}
         />
@@ -124,9 +126,7 @@ export function QueryForm({
         {selectedColumns.length > 0 ?
           <Fieldset
             legend="Aggregations"
-            style={{
-              backgroundColor: "rgba(255, 255, 255, 0.4)",
-            }}
+            style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
           >
             {selectedColumns.map((col) => {
               return (
@@ -152,46 +152,45 @@ export function QueryForm({
           label="Group by"
           placeholder="Group by"
           dataSourceId={
-            selectedDataSource ?
-              getDataSourceIdWithType(selectedDataSource)
+            selectedFromDataSource ?
+              makeDataSourceIdWithType(selectedFromDataSource)
             : undefined
           }
           value={selectedGroupByColumns}
-          onChange={(cols) => {
-            onGroupByChange(cols);
-          }}
+          onChange={onGroupByChange}
         />
 
-        <Select
-          label="Order field"
-          data={fieldOptionsById}
-          value={orderByColumnId}
-          onChange={(newColId) => {
-            if (newColId === null) {
-              onOrderByColumnChange(undefined);
-              return;
-            }
-            const newOrderByColumn = selectedColumns.find((col) => {
-              return col.value.id === newColId;
-            });
-            onOrderByColumnChange(newOrderByColumn);
-          }}
-          clearable
-        />
-        <Box mb="md">
+        <Fieldset
+          legend="Order by"
+          style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
+        >
+          <Select
+            label="Select column"
+            data={fieldOptionsById}
+            value={orderByColumnId}
+            onChange={(newColId) => {
+              if (newColId === null) {
+                onOrderByColumnChange(undefined);
+                return;
+              }
+              const newOrderByColumn = selectedColumns.find((col) => {
+                return col.value.id === newColId;
+              });
+              onOrderByColumnChange(newOrderByColumn);
+            }}
+            clearable
+          />
           <Select
             label="Order by"
             placeholder="Select order"
-            data={orderDirectionOptions}
+            data={orderOptions}
             value={orderByDirection}
             clearable={false}
             onChange={(value) => {
-              if (value !== null) {
-                onOrderByDirectionChange(value);
-              }
+              onOrderByDirectionChange(value as Direction);
             }}
           />
-        </Box>
+        </Fieldset>
 
         {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
         {errorMessage ?
