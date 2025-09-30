@@ -11,7 +11,7 @@ import type {
 
 const DEFAULTS: DataExplorerContextTypeValues = {
   aggregations: {},
-  selectedDataSource: undefined,
+  selectedFromDataSource: undefined,
   selectedColumns: [],
   selectedGroupByColumns: [],
   orderByColumn: undefined,
@@ -27,7 +27,7 @@ export function DataExplorerProvider({
   const [aggregations, setAggregations] = useState(DEFAULTS.aggregations);
   const [selectedFromDataSource, setSelectedFromDataSource] = useState<
     QueryableDataSource | undefined
-  >(DEFAULTS.selectedDataSource);
+  >(DEFAULTS.selectedFromDataSource);
   const [selectedColumns, setSelectedColumns] = useState<
     readonly QueryableColumn[]
   >(DEFAULTS.selectedColumns);
@@ -44,7 +44,7 @@ export function DataExplorerProvider({
 
   const reset = useCallback(() => {
     setAggregations(DEFAULTS.aggregations);
-    setSelectedFromDataSource(DEFAULTS.selectedDataSource);
+    setSelectedFromDataSource(DEFAULTS.selectedFromDataSource);
     setSelectedColumns(DEFAULTS.selectedColumns);
     setSelectedGroupByColumns(DEFAULTS.selectedGroupByColumns);
     setOrderByColumn(DEFAULTS.orderByColumn);
@@ -65,14 +65,15 @@ export function DataExplorerProvider({
   const value = useMemo((): DataExplorerContextType => {
     return {
       aggregations,
-      setSelectedFromDataSource: _setSelectedFromDataSource,
       selectedColumns,
+      selectedFromDataSource,
       selectedGroupByColumns,
       orderByColumn,
       orderByDirection,
       vizConfig,
       setAggregations,
       setSelectedColumns,
+      setSelectedFromDataSource: _setSelectedFromDataSource,
       setSelectedGroupByColumns,
       setOrderByColumn,
       setOrderByDirection,
@@ -82,6 +83,7 @@ export function DataExplorerProvider({
   }, [
     aggregations,
     selectedColumns,
+    selectedFromDataSource,
     selectedGroupByColumns,
     orderByColumn,
     orderByDirection,

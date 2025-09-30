@@ -32,7 +32,7 @@ type Direction = "asc" | "desc";
 type Props = {
   errorMessage: string | undefined;
   aggregations: Record<string, QueryAggregationType>;
-  selectedDataSource: QueryableDataSource | undefined;
+  selectedFromDataSource: QueryableDataSource | undefined;
   selectedColumns: readonly QueryableColumn[];
   selectedGroupByColumns: readonly QueryableColumn[];
   orderByColumn: QueryableColumn | undefined;
@@ -65,7 +65,7 @@ export function QueryForm({
   aggregations,
   selectedColumns,
   selectedGroupByColumns,
-  selectedDataSource,
+  selectedFromDataSource,
   orderByColumn,
   onAggregationsChange,
   onFromDataSourceChange,
@@ -86,7 +86,7 @@ export function QueryForm({
     <form>
       <Stack>
         <QueryableDataSourceSelect
-          value={selectedDataSource ?? null}
+          value={selectedFromDataSource ?? null}
           onChange={(dataSource) => {
             onFromDataSourceChange(dataSource ?? undefined);
           }}
@@ -96,8 +96,8 @@ export function QueryForm({
           label="Select columns"
           placeholder="Select columns"
           dataSourceId={
-            selectedDataSource ?
-              makeDataSourceIdWithType(selectedDataSource)
+            selectedFromDataSource ?
+              makeDataSourceIdWithType(selectedFromDataSource)
             : undefined
           }
           value={selectedColumns}
@@ -152,8 +152,8 @@ export function QueryForm({
           label="Group by"
           placeholder="Group by"
           dataSourceId={
-            selectedDataSource ?
-              makeDataSourceIdWithType(selectedDataSource)
+            selectedFromDataSource ?
+              makeDataSourceIdWithType(selectedFromDataSource)
             : undefined
           }
           value={selectedGroupByColumns}

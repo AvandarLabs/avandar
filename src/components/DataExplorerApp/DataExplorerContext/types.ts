@@ -5,7 +5,7 @@ import type { VizConfig } from "../VizSettingsForm/makeDefaultVizConfig";
 
 export type DataExplorerContextTypeValues = {
   aggregations: Record<string, QueryAggregationType>;
-  selectedDataSource?: QueryableDataSource;
+  selectedFromDataSource?: QueryableDataSource;
   selectedColumns: readonly QueryableColumn[];
   selectedGroupByColumns: readonly QueryableColumn[];
   orderByColumn?: QueryableColumn;
