@@ -1,4 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
+import { QueryableColumn } from "../QueryableColumnMultiSelect";
+import { QueryableDataSource } from "../QueryableDataSourceSelect";
 import { makeDefaultVizConfig } from "../VizSettingsForm/makeDefaultVizConfig";
 import { DataExplorerContext } from "./context";
 import type { VizConfig } from "../VizSettingsForm/makeDefaultVizConfig";
@@ -7,16 +9,14 @@ import type {
   DataExplorerContextTypeValues,
   OrderByDirection,
 } from "./types";
-import type { DatasetId } from "@/models/datasets/Dataset";
-import type { DatasetColumn } from "@/models/datasets/DatasetColumn";
 
 const DEFAULTS: DataExplorerContextTypeValues = {
   aggregations: {},
-  selectedDatasetId: undefined,
+  selectedDataSource: undefined,
   selectedColumns: [],
   selectedGroupByColumns: [],
   orderByColumn: undefined,
-  orderByDirection: null,
+  orderByDirection: undefined,
   vizConfig: makeDefaultVizConfig("table"),
 };
 
@@ -26,26 +26,26 @@ export function DataExplorerProvider({
   children?: React.ReactNode;
 }): JSX.Element {
   const [aggregations, setAggregations] = useState(DEFAULTS.aggregations);
-  const [selectedDatasetId, setSelectedDatasetId] = useState<
-    DatasetId | undefined
-  >(DEFAULTS.selectedDatasetId);
+  const [selectedDataSource, setSelectedDataSource] = useState<
+    QueryableDataSource | undefined
+  >(DEFAULTS.selectedDataSource);
   const [selectedColumns, setSelectedColumns] = useState<
-    readonly DatasetColumn[]
+    readonly QueryableColumn[]
   >(DEFAULTS.selectedColumns);
   const [selectedGroupByColumns, setSelectedGroupByColumns] = useState<
-    readonly DatasetColumn[]
+    readonly QueryableColumn[]
   >(DEFAULTS.selectedGroupByColumns);
-  const [orderByColumn, setOrderByColumn] = useState<DatasetColumn | undefined>(
-    DEFAULTS.orderByColumn,
-  );
-  const [orderByDirection, setOrderByDirection] = useState<OrderByDirection>(
-    DEFAULTS.orderByDirection,
-  );
+  const [orderByColumn, setOrderByColumn] = useState<
+    QueryableColumn | undefined
+  >(DEFAULTS.orderByColumn);
+  const [orderByDirection, setOrderByDirection] = useState<
+    OrderByDirection | undefined
+  >(DEFAULTS.orderByDirection);
   const [vizConfig, setVizConfig] = useState<VizConfig>(DEFAULTS.vizConfig);
 
   const reset = useCallback(() => {
     setAggregations(DEFAULTS.aggregations);
-    setSelectedDatasetId(DEFAULTS.selectedDatasetId);
+    setSelectedDataSource(DEFAULTS.selectedDataSource);
     setSelectedColumns(DEFAULTS.selectedColumns);
     setSelectedGroupByColumns(DEFAULTS.selectedGroupByColumns);
     setOrderByColumn(DEFAULTS.orderByColumn);
@@ -53,44 +53,44 @@ export function DataExplorerProvider({
     setVizConfig(makeDefaultVizConfig("table"));
   }, []);
 
-  const onSelectDatasetChange = useCallback(
-    (newValue: DatasetId | undefined) => {
-      if (newValue !== selectedDatasetId) {
+  const onSelectedDataSourceChange = useCallback(
+    (newValue: QueryableDataSource | undefined) => {
+      if (newValue !== selectedDataSource) {
         reset();
       }
-      setSelectedDatasetId(newValue);
+      setSelectedDataSource(newValue);
     },
-    [selectedDatasetId, reset],
+    [selectedDataSource, reset],
   );
 
   const value = useMemo((): DataExplorerContextType => {
     return {
       aggregations,
-      selectedDatasetId,
+      selectedDataSource: selectedDataSource,
       selectedColumns,
       selectedGroupByColumns,
       orderByColumn,
       orderByDirection,
       vizConfig,
       setAggregations,
-      setSelectedDatasetId,
+      setSelectedDataSource: setSelectedDataSource,
       setSelectedColumns,
       setSelectedGroupByColumns,
       setOrderByColumn,
       setOrderByDirection,
       setVizConfig,
-      onSelectDatasetChange,
+      onSelectedDataSourceChange,
       reset,
     };
   }, [
     aggregations,
-    selectedDatasetId,
+    selectedDataSource,
     selectedColumns,
     selectedGroupByColumns,
     orderByColumn,
     orderByDirection,
     vizConfig,
-    onSelectDatasetChange,
+    onSelectedDataSourceChange,
     reset,
   ]);
 

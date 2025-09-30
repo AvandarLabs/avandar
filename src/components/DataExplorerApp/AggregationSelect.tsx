@@ -1,12 +1,12 @@
 import { useUncontrolled } from "@mantine/hooks";
 import { useMemo } from "react";
-import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
+import { QueryAggregationType } from "@/clients/DuckDBClient/types";
 import { Select, SelectOption } from "@/lib/ui/inputs/Select";
-import { DatasetColumn } from "@/models/datasets/DatasetColumn";
-import { getValidQueryAggregationsByType } from "@/models/datasets/DatasetColumn/utils";
+import { getValidQueryAggregationsByDataType } from "@/models/datasets/DatasetColumn/utils";
+import { QueryableColumn } from "./QueryableColumnMultiSelect";
 
 type Props = {
-  column: DatasetColumn;
+  column: QueryableColumn;
   value?: QueryAggregationType;
   defaultValue?: QueryAggregationType;
   onChange?: (aggregation: QueryAggregationType) => void;
@@ -27,19 +27,19 @@ export function AggregationSelect({
   defaultValue = "none",
   onChange,
 }: Props): JSX.Element {
-  const validAggregations = useMemo(() => {
-    return new Set(getValidQueryAggregationsByType(column.dataType));
-  }, [column.dataType]);
+  const validAggregations = getValidQueryAggregationsByDataType(
+    column.type === "DatasetColumn" ?
+      column.value.dataType
+    : column.value.options.baseDataType,
+  );
 
   const aggregationOptions = useMemo(() => {
     return AGGREGATION_OPTIONS.filter((opt) => {
-      return validAggregations.has(opt.value) || opt.value === "none";
+      return validAggregations.includes(opt.value) || opt.value === "none";
     });
   }, [validAggregations]);
 
-  // Controlled if `value` is provided,
-  // otherwise uncontrolled with internal state.
-  const [currentAggregations, setCurrentAggregations] =
+  const [currentAggregation, setCurrentAggregation] =
     useUncontrolled<QueryAggregationType>({
       value,
       defaultValue,
@@ -47,25 +47,23 @@ export function AggregationSelect({
       onChange,
     });
 
+  const isValidAggregation = validAggregations.includes(currentAggregation);
   const aggregationToUse =
-    (
-      currentAggregations !== "none" &&
-      !validAggregations.has(currentAggregations)
-    ) ?
+    currentAggregation !== "none" && !isValidAggregation ?
       "none"
-    : currentAggregations;
+    : currentAggregation;
 
   return (
     <Select
       // key for hard reset
-      key={column.id}
-      label={column.name}
+      key={column.value.id}
+      label={column.value.name}
       placeholder="Select aggregation"
       data={aggregationOptions}
       value={aggregationToUse}
       onChange={(newValue) => {
         if (newValue) {
-          setCurrentAggregations(newValue);
+          setCurrentAggregation(newValue);
         }
       }}
     />

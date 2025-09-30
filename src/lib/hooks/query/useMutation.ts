@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-query";
 import { Simplify } from "type-fest";
 import { Logger } from "@/lib/Logger";
-import { notifyError } from "@/lib/ui/notifications/notifyError";
+import { notifyError } from "@/lib/ui/notifications/notify";
 
 export type UseMutationResult<
   TData = unknown,

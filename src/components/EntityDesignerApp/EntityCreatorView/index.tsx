@@ -17,8 +17,8 @@ import { useForm } from "@/lib/hooks/ui/useForm";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { Paper } from "@/lib/ui/Paper";
-import { isNotUndefined } from "@/lib/utils/guards";
-import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
+import { isDefined } from "@/lib/utils/guards";
+import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
 import { setValue } from "@/lib/utils/objects/setValue";
 import { DatasetColumnFieldsBlock } from "./DatasetColumnFieldsBlock";
 import {
@@ -67,7 +67,7 @@ export function EntityCreatorView(): JSX.Element {
           // first, let's see if this primary key column was already
           // added as a datasetColumnField.
           const primaryField = values.datasetColumnFields.find(
-            propEquals(
+            propIs(
               "extractors.datasetColumnValue.datasetFieldId",
               primaryKeyColumnId,
             ),
@@ -82,7 +82,7 @@ export function EntityCreatorView(): JSX.Element {
           // otherwise, create a datasetColumnField for this primary key
           // column, and set `isIdField`
           const datasetColumn = dataset.columns.find(
-            propEquals("id", primaryKeyColumnId),
+            propIs("id", primaryKeyColumnId),
           );
           if (datasetColumn) {
             return makeDefaultDatasetColumnField({
@@ -95,7 +95,7 @@ export function EntityCreatorView(): JSX.Element {
           }
           return undefined;
         })
-        .filter(isNotUndefined);
+        .filter(isDefined);
 
       const nonPrimaryKeyFields = values.datasetColumnFields.filter((field) => {
         if (field.options.valueExtractorType === "dataset_column_value") {

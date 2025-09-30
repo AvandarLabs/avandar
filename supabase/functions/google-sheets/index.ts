@@ -12,6 +12,8 @@ import { API } from "./api.types.ts";
 
 const Routes: MiniServerRoutesDef<API> = {
   "google-sheets": {
+    // TODO(jpsyx): update this to use DuckDB WASM so we can send the data as
+    // a parquet binary blob instead.
     "/:id": GET("/:id").action(async ({ urlParams, supabaseClient, user }) => {
       // TODO(jpsyx): this should support receiving an optional
       // `google_account_id` so we only get and refresh the appropriate token

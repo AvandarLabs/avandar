@@ -8,7 +8,7 @@ import { unknownToString } from "./strings/transformations";
  * @param params - The record of key-value pairs to build the query string from.
  * @returns The query string.
  */
-export function buildQueryString(params: Record<string, unknown>): string {
+export function buildHTTPQueryString(params: Record<string, unknown>): string {
   return Object.entries(params)
     .map(([key, value]) => {
       return `${key}=${encodeURIComponent(unknownToString(value))}`;

@@ -1,4 +1,4 @@
-import { iso, object, string, enum as zodEnum } from "zod";
+import { iso, object, enum as zodEnum } from "zod";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import {
@@ -19,22 +19,21 @@ const DBReadSchema = object({
   ownerProfileId: uuidType<UserProfileId>(),
   workspaceId: uuidType<WorkspaceId>(),
   sourceType: zodEnum(DatasetSourceTypes),
-  data: string(),
 });
 
 export const DatasetRawDataParsers =
   makeParserRegistry<DatasetRawDataModel>().build({
     modelName: "DatasetRawData",
     DBReadSchema,
-    fromDBReadToModelRead: coerceDatesInProps("createdAt", "updatedAt"),
-    fromModelInsertToDBInsert: convertDatesToISOInProps(
+    fromDBReadToModelRead: coerceDatesInProps(["createdAt", "updatedAt"]),
+    fromModelInsertToDBInsert: convertDatesToISOInProps([
       "createdAt",
       "updatedAt",
-    ),
-    fromModelUpdateToDBUpdate: convertDatesToISOInProps(
+    ]),
+    fromModelUpdateToDBUpdate: convertDatesToISOInProps([
       "createdAt",
       "updatedAt",
-    ),
+    ]),
   });
 
 /**
