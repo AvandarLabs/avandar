@@ -1,5 +1,5 @@
 import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
-import { EntityParsers } from "@/models/entities/Entity/parsers";
+import { EntityParsers } from "@/models/entities/Entity/EntityParsers";
 
 export const EntityClient = createSupabaseCRUDClient({
   modelName: "Entity",

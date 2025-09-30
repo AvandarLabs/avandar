@@ -24,7 +24,7 @@ import {
 } from "@/config/FeatureFlagConfig";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useForm } from "@/lib/hooks/ui/useForm";
-import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
+import { notifySuccess } from "@/lib/ui/notifications/notify";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,

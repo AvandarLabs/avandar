@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import { FormType } from "@/lib/hooks/ui/useForm";
-import { EntityConfigId } from "@/models/EntityConfig/types";
+import { EntityConfigId } from "@/models/EntityConfig/EntityConfig.types";
 import {
   EntityConfigFormValues,
   makeDefaultManualEntryField,

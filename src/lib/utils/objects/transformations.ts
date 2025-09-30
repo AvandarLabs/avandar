@@ -218,12 +218,12 @@ export type ExcludeNullsIn<
  */
 export function excludeNullsIn<T extends UnknownObject, K extends keyof T>(
   obj: T,
-  ...keysToTest: readonly K[]
+  keysToTest: Extract<K, string> | readonly K[],
 ): ExcludeNullsIn<T, K> {
   const newObj = { ...obj };
   const keys =
-    keysToTest === undefined || keysToTest.length === 0 ?
-      objectKeys(obj)
+    typeof keysToTest === "string" ? [keysToTest]
+    : keysToTest.length === 0 ? objectKeys(obj)
     : keysToTest;
   keys.forEach((key) => {
     if (isNull(obj[key])) {
@@ -261,12 +261,16 @@ export type ExcludeNullsExceptIn<
 export function excludeNullsExceptIn<
   T extends UnknownObject,
   K extends keyof T,
->(obj: T, ...keysToKeepNull: readonly K[]): ExcludeNullsExceptIn<T, K> {
-  if (keysToKeepNull === undefined || keysToKeepNull.length === 0) {
+>(
+  obj: T,
+  keysToKeepNull: Extract<K, string> | readonly K[],
+): ExcludeNullsExceptIn<T, K> {
+  const keys =
+    typeof keysToKeepNull === "string" ? [keysToKeepNull] : keysToKeepNull;
+  if (keys.length === 0) {
     return obj as ExcludeNullsExceptIn<T, K>;
   }
-
-  const keysToSkip: Set<string> = new Set(keysToKeepNull.map(String));
+  const keysToSkip: Set<string> = new Set(keys.map(String));
   const newObj = {} as UnknownObject;
   objectKeys(obj).forEach((key) => {
     if (keysToSkip.has(key) || !isNull(obj[key])) {
@@ -285,7 +289,7 @@ export function excludeNullsExceptIn<
  */
 export function coerceDatesIn<T extends UnknownObject, K extends keyof T>(
   obj: T,
-  ...keys: readonly K[]
+  keys: readonly K[],
 ): {
   [Key in keyof T]: Key extends K ?
     undefined extends T[Key] ?
@@ -317,7 +321,7 @@ export function convertDatesToISOIn<
   K extends ConditionalKeys<T, Date | undefined>,
 >(
   obj: T,
-  ...keys: readonly K[]
+  keys: readonly K[],
 ): {
   [Key in keyof T]: Key extends K ?
     undefined extends T[Key] ?
@@ -400,8 +404,14 @@ export function mapObjectValues<T extends UnknownObject, V>(
   fn: (value: T[keyof T], key: keyof T) => V,
 ): { [K in keyof T]: V } {
   const newObj = {} as { [K in keyof T]: V };
-  objectKeys(obj).forEach((key) => {
-    newObj[key] = fn(obj[key], key);
-  });
+
+  // intentionally using a for loop here since this is a low-level
+  // function that we really need to be performant if it is used
+  // in huge arrays
+  for (const key in obj) {
+    if (Object.hasOwn(obj, key)) {
+      newObj[key] = fn(obj[key], key);
+    }
+  }
   return newObj;
 }

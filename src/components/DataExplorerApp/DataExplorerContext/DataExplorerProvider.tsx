@@ -1,21 +1,22 @@
 import React, { useCallback, useMemo, useState } from "react";
+import { QueryableColumn } from "../QueryableColumnMultiSelect";
+import { QueryableDataSource } from "../QueryableDataSourceSelect";
 import { makeDefaultVizConfig } from "../VizSettingsForm/makeDefaultVizConfig";
 import { DataExplorerContext } from "./context";
 import type { VizConfig } from "../VizSettingsForm/makeDefaultVizConfig";
 import type {
   DataExplorerContextType,
   DataExplorerContextTypeValues,
+  OrderByDirection,
 } from "./types";
-import type { DatasetId } from "@/models/datasets/Dataset";
-import type { DatasetColumn } from "@/models/datasets/DatasetColumn";
 
 const DEFAULTS: DataExplorerContextTypeValues = {
   aggregations: {},
-  selectedDatasetId: undefined,
+  selectedFromDataSource: undefined,
   selectedColumns: [],
   selectedGroupByColumns: [],
   orderByColumn: undefined,
-  orderByDirection: "asc",
+  orderByDirection: undefined,
   vizConfig: makeDefaultVizConfig("table"),
 };
 
@@ -25,26 +26,26 @@ export function DataExplorerProvider({
   children?: React.ReactNode;
 }): JSX.Element {
   const [aggregations, setAggregations] = useState(DEFAULTS.aggregations);
-  const [selectedDatasetId, setSelectedDatasetId] = useState<
-    DatasetId | undefined
-  >(DEFAULTS.selectedDatasetId);
+  const [selectedFromDataSource, setSelectedFromDataSource] = useState<
+    QueryableDataSource | undefined
+  >(DEFAULTS.selectedFromDataSource);
   const [selectedColumns, setSelectedColumns] = useState<
-    readonly DatasetColumn[]
+    readonly QueryableColumn[]
   >(DEFAULTS.selectedColumns);
   const [selectedGroupByColumns, setSelectedGroupByColumns] = useState<
-    readonly DatasetColumn[]
+    readonly QueryableColumn[]
   >(DEFAULTS.selectedGroupByColumns);
-  const [orderByColumn, setOrderByColumn] = useState<DatasetColumn | undefined>(
-    DEFAULTS.orderByColumn,
-  );
-  const [orderByDirection, setOrderByDirection] = useState<"asc" | "desc">(
-    DEFAULTS.orderByDirection,
-  );
+  const [orderByColumn, setOrderByColumn] = useState<
+    QueryableColumn | undefined
+  >(DEFAULTS.orderByColumn);
+  const [orderByDirection, setOrderByDirection] = useState<
+    OrderByDirection | undefined
+  >(DEFAULTS.orderByDirection);
   const [vizConfig, setVizConfig] = useState<VizConfig>(DEFAULTS.vizConfig);
 
   const reset = useCallback(() => {
     setAggregations(DEFAULTS.aggregations);
-    setSelectedDatasetId(DEFAULTS.selectedDatasetId);
+    setSelectedFromDataSource(DEFAULTS.selectedFromDataSource);
     setSelectedColumns(DEFAULTS.selectedColumns);
     setSelectedGroupByColumns(DEFAULTS.selectedGroupByColumns);
     setOrderByColumn(DEFAULTS.orderByColumn);
@@ -52,45 +53,44 @@ export function DataExplorerProvider({
     setVizConfig(makeDefaultVizConfig("table"));
   }, []);
 
-  const onSelectDatasetChange = useCallback(
-    (newValue: DatasetId | undefined) => {
-      if (newValue !== selectedDatasetId) {
+  const _setSelectedFromDataSource = useCallback(
+    (newFrom: QueryableDataSource | undefined) => {
+      if (newFrom !== selectedFromDataSource) {
         reset();
       }
-      setSelectedDatasetId(newValue);
+      setSelectedFromDataSource(newFrom);
     },
-    [selectedDatasetId, reset],
+    [selectedFromDataSource, reset],
   );
 
   const value = useMemo((): DataExplorerContextType => {
     return {
       aggregations,
-      selectedDatasetId,
       selectedColumns,
+      selectedFromDataSource,
       selectedGroupByColumns,
       orderByColumn,
       orderByDirection,
       vizConfig,
       setAggregations,
-      setSelectedDatasetId,
       setSelectedColumns,
+      setSelectedFromDataSource: _setSelectedFromDataSource,
       setSelectedGroupByColumns,
       setOrderByColumn,
       setOrderByDirection,
       setVizConfig,
-      onSelectDatasetChange,
       reset,
     };
   }, [
     aggregations,
-    selectedDatasetId,
     selectedColumns,
+    selectedFromDataSource,
     selectedGroupByColumns,
     orderByColumn,
     orderByDirection,
     vizConfig,
-    onSelectDatasetChange,
     reset,
+    _setSelectedFromDataSource,
   ]);
 
   return (

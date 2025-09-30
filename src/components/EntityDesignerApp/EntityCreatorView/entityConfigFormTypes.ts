@@ -10,10 +10,13 @@ import {
 } from "@/models/datasets/DatasetColumn";
 import { getEntityFieldBaseDataType } from "@/models/datasets/DatasetColumn/utils";
 import {
+  EntityConfig,
+  EntityConfigId,
+} from "@/models/EntityConfig/EntityConfig.types";
+import {
   EntityFieldConfig,
   EntityFieldConfigId,
 } from "@/models/EntityConfig/EntityFieldConfig/types";
-import { EntityConfig, EntityConfigId } from "@/models/EntityConfig/types";
 import { AggregationExtractor } from "@/models/EntityConfig/ValueExtractor/AggregationExtractor/types";
 import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/types";
 import { ManualEntryExtractor } from "@/models/EntityConfig/ValueExtractor/ManualEntryExtractor/types";
