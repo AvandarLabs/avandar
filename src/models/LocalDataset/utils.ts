@@ -1,6 +1,7 @@
 import Papa from "papaparse";
 import { match } from "ts-pattern";
 import { MIMEType, RawCellValue, RawDataRow } from "@/lib/types/common";
+import { isNonEmptyArray } from "@/lib/utils/guards";
 
 /**
  * Convert a dataset back into a raw string. Only CSVs are supported for now.
@@ -36,7 +37,22 @@ export function unparseDataset(
     .with(
       { datasetType: MIMEType.APPLICATION_GOOGLE_SPREADSHEET },
       ({ data }) => {
-        return Papa.unparse(data, { delimiter: ",", newline: "\n" });
+        if (isNonEmptyArray(data)) {
+          const numColumns = data[0].length;
+
+          // now we pad all rows to make sure any columns with missing values
+          // are padded with empty strings
+          const paddedData = data.map((row) => {
+            if (row.length < numColumns) {
+              row.push(...Array(numColumns - row.length).fill(""));
+              return row;
+            }
+            return row;
+          });
+
+          return Papa.unparse(paddedData, { delimiter: ",", newline: "\n" });
+        }
+        return "";
       },
     )
     .otherwise(() => {

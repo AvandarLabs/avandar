@@ -1,6 +1,6 @@
-import { Box, Flex, Loader, MantineTheme } from "@mantine/core";
+import { Box, Flex, LoadingOverlay, MantineTheme } from "@mantine/core";
 import { useMemo } from "react";
-import { partition } from "@/lib/utils/arrays";
+import { partition } from "@/lib/utils/arrays/misc";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { isNotInSet } from "@/lib/utils/sets/higherOrderFuncs";
 import { wrapString } from "@/lib/utils/strings/higherOrderFuncs";
@@ -17,8 +17,8 @@ export function DataExplorerApp(): JSX.Element {
   const {
     aggregations,
     setAggregations,
-    selectedDatasetId,
-    onSelectDatasetChange,
+    selectedDataSource,
+    setSelectedFromDataSource,
     selectedColumns,
     setSelectedColumns,
     selectedGroupByColumns,
@@ -31,17 +31,17 @@ export function DataExplorerApp(): JSX.Element {
     setVizConfig,
   } = useDataExplorerContext();
 
-  const selectedFieldNames = useMemo(() => {
-    return selectedColumns.map(getProp("name"));
+  const selectedColumnNames = useMemo(() => {
+    return selectedColumns.map(getProp("value.name"));
   }, [selectedColumns]);
 
   const selectedGroupByColNames = useMemo(() => {
-    return selectedGroupByColumns.map(getProp("name"));
+    return selectedGroupByColumns.map(getProp("value.name"));
   }, [selectedGroupByColumns]);
 
   const [isValidQuery, errorMessage] = useMemo(() => {
-    // 1. There must be at least one field selected
-    if (selectedFieldNames.length === 0) {
+    // 1. There must be at least one column selected
+    if (selectedColumnNames.length === 0) {
       return [
         false,
         "At least one column must be selected for the query to run",
@@ -51,7 +51,7 @@ export function DataExplorerApp(): JSX.Element {
     // 2. If there is at least 1 GROUP BY or at least 1 aggregated column, then
     // ALL columns must be either in the GROUP BY or have an aggregation.
     const [nonAggregatedColNames, aggregatedColNames] = partition(
-      selectedFieldNames,
+      selectedColumnNames,
       (name) => {
         return aggregations[name] === "none";
       },
@@ -86,21 +86,21 @@ export function DataExplorerApp(): JSX.Element {
     }
 
     return [true, undefined] as const;
-  }, [selectedFieldNames, selectedGroupByColNames, aggregations]);
+  }, [selectedColumnNames, selectedGroupByColNames, aggregations]);
 
   const [queryResults, isLoadingResults] = useDataQuery({
-    enabled: !!selectedDatasetId && isValidQuery,
+    enabled: !!selectedDataSource && isValidQuery,
     aggregations,
-    datasetId: selectedDatasetId,
-    selectFields: selectedColumns,
-    groupByFields: selectedGroupByColumns,
+    dataSource: selectedDataSource,
+    selectColumns: selectedColumns,
+    groupByColumns: selectedGroupByColumns,
     orderByColumn,
     orderByDirection,
   });
 
   const { fields, data } = useMemo(() => {
     return {
-      fields: queryResults?.fields ?? [],
+      fields: queryResults?.columns ?? [],
       data: queryResults?.data ?? [],
     };
   }, [queryResults]);
@@ -118,13 +118,13 @@ export function DataExplorerApp(): JSX.Element {
       >
         <QueryForm
           aggregations={aggregations}
-          selectedDatasetId={selectedDatasetId}
+          selectedDataSource={selectedDataSource}
           selectedColumns={selectedColumns}
           selectedGroupByColumns={selectedGroupByColumns}
           orderByColumn={orderByColumn}
           orderByDirection={orderByDirection}
           onAggregationsChange={setAggregations}
-          onFromDatasetChange={onSelectDatasetChange}
+          onFromDataSourceChange={setSelectedFromDataSource}
           onSelectColumnsChange={setSelectedColumns}
           onGroupByChange={setSelectedGroupByColumns}
           onOrderByColumnChange={setOrderByColumn}
@@ -133,20 +133,17 @@ export function DataExplorerApp(): JSX.Element {
         />
 
         <VizSettingsForm
-          fields={fields}
+          columns={fields}
           vizConfig={vizConfig}
           onVizConfigChange={setVizConfig}
         />
       </Box>
 
       <Box pos="relative" flex={1} px="sm" py="md">
-        {isLoadingResults ?
-          <Loader />
-        : null}
-
+        <LoadingOverlay visible={isLoadingResults} zIndex={99} />
         <VisualizationContainer
           vizConfig={vizConfig}
-          fields={fields}
+          columns={fields}
           data={data}
         />
       </Box>

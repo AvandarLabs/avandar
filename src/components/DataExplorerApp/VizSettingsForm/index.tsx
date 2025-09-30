@@ -1,5 +1,5 @@
 import { match } from "ts-pattern";
-import { QueryResultField } from "@/clients/LocalDatasetQueryClient";
+import { QueryResultColumn } from "@/clients/DuckDBClient/types";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
@@ -19,8 +19,8 @@ const VIZ_TYPES: VizTypeMetadata[] = [
   { type: "line", displayName: "Line Chart" },
 ];
 
-export type Props = {
-  fields: readonly QueryResultField[];
+type Props = {
+  columns: readonly QueryResultColumn[];
   vizConfig: VizConfig;
   onVizConfigChange: (config: VizConfig) => void;
 };
@@ -84,7 +84,7 @@ function hydrateXY(options: {
 
 export function VizSettingsForm({
   vizConfig,
-  fields,
+  columns,
   onVizConfigChange,
 }: Props): JSX.Element {
   const vizTypeOptions = makeSelectOptions(VIZ_TYPES, {
@@ -117,7 +117,7 @@ export function VizSettingsForm({
         .with({ type: "bar" }, (config) => {
           return (
             <BarChartForm
-              fields={fields}
+              fields={columns}
               settings={config.settings}
               onSettingsChange={(nextSettings) => {
                 onVizConfigChange({ ...config, settings: nextSettings });
@@ -128,7 +128,7 @@ export function VizSettingsForm({
         .with({ type: "line" }, (config) => {
           return (
             <LineChartForm
-              fields={fields}
+              fields={columns}
               settings={config.settings}
               onSettingsChange={(nextSettings) => {
                 onVizConfigChange({ ...config, settings: nextSettings });

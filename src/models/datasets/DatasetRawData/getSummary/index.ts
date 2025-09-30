@@ -1,7 +1,7 @@
 import { invariant } from "@tanstack/react-router";
 import { match } from "ts-pattern";
 import { RawDataRow } from "@/lib/types/common";
-import { isNotUndefined } from "@/lib/utils/guards";
+import { isDefined } from "@/lib/utils/guards";
 import { rowsToColumns } from "@/lib/utils/objects/rowsToColumns";
 import {
   DatasetColumn,
@@ -34,7 +34,7 @@ type DateFieldSummary = {
   datasetDuration: string;
 };
 
-export type FieldSummary = {
+export type ColumnSummary = {
   name: string;
   distinctValuesCount: number;
   emptyValuesCount: number;
@@ -45,11 +45,10 @@ export type FieldSummary = {
   };
 } & (TextFieldSummary | NumericFieldSummary | DateFieldSummary);
 
-type DatasetSummary = {
+export type DatasetSummary = {
   rows: number;
   columns: number;
-  emptyRows: number;
-  columnSummaries?: readonly FieldSummary[];
+  columnSummaries?: readonly ColumnSummary[];
 };
 
 function _getTypeSpecificSummary(
@@ -95,7 +94,6 @@ export function getSummary({
   return {
     rows: dataRows.length,
     columns: columns.length,
-    emptyRows: 0,
     columnSummaries:
       dataRows.length === 0 ?
         undefined
@@ -125,6 +123,6 @@ export function getSummary({
             }
             return undefined;
           })
-          .filter(isNotUndefined),
+          .filter(isDefined),
   };
 }

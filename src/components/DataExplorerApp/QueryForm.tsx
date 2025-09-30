@@ -1,16 +1,23 @@
-import { Fieldset, Select, Stack, Text } from "@mantine/core";
-import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
+import { Fieldset, Stack, Text } from "@mantine/core";
+import { match } from "ts-pattern";
+import { QueryAggregationType } from "@/clients/DuckDBClient/types";
+import { Select } from "@/lib/ui/inputs/Select";
+import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { DangerText } from "@/lib/ui/Text/DangerText";
-import { difference } from "@/lib/utils/arrays";
-import { makeObjectFromList } from "@/lib/utils/objects/builders";
+import { difference } from "@/lib/utils/arrays/misc";
+import { makeObject } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys, omit } from "@/lib/utils/objects/misc";
-import { setValue } from "@/lib/utils/objects/setValue";
-import { DatasetId } from "@/models/datasets/Dataset";
-import { DatasetColumn } from "@/models/datasets/DatasetColumn";
-import { DatasetSelect } from "../common/DatasetSelect";
 import { AggregationSelect } from "./AggregationSelect";
-import { DatasetColumnMultiSelect } from "./DatasetColumnMultiSelect";
+import {
+  QueryableColumn,
+  QueryableColumnMultiSelect,
+} from "./QueryableColumnMultiSelect";
+import {
+  QueryableDataSource,
+  QueryableDataSourceIdWithType,
+  QueryableDataSourceSelect,
+} from "./QueryableDataSourceSelect";
 
 const HIDE_WHERE = true;
 const HIDE_LIMIT = true;
@@ -25,66 +32,87 @@ type Direction = "asc" | "desc";
 type Props = {
   errorMessage: string | undefined;
   aggregations: Record<string, QueryAggregationType>;
-  selectedDatasetId: DatasetId | undefined;
-  selectedColumns: readonly DatasetColumn[];
-  selectedGroupByColumns: readonly DatasetColumn[];
-  orderByColumn: DatasetColumn | undefined;
+  selectedDataSource: QueryableDataSource | undefined;
+  selectedColumns: readonly QueryableColumn[];
+  selectedGroupByColumns: readonly QueryableColumn[];
+  orderByColumn: QueryableColumn | undefined;
   orderByDirection: Direction;
-  onAggregationsChange: (
-    newAggregations: Record<string, QueryAggregationType>,
+  onAggregationsChange: (next: Record<string, QueryAggregationType>) => void;
+  onFromDataSourceChange: (
+    dataSourceId: QueryableDataSource | undefined,
   ) => void;
-  onFromDatasetChange: (datasetId: DatasetId | undefined) => void;
-  onSelectColumnsChange: (columns: readonly DatasetColumn[]) => void;
-  onGroupByChange: (columns: readonly DatasetColumn[]) => void;
-  onOrderByColumnChange: (field: DatasetColumn | undefined) => void;
-  onOrderByDirectionChange: (value: "asc" | "desc") => void;
+  onSelectColumnsChange: (columns: readonly QueryableColumn[]) => void;
+  onGroupByChange: (columns: readonly QueryableColumn[]) => void;
+  onOrderByColumnChange: (column: QueryableColumn | undefined) => void;
+  onOrderByDirectionChange: (dir: Direction) => void;
 };
+
+function makeDataSourceIdWithType(
+  dataSource: QueryableDataSource,
+): QueryableDataSourceIdWithType {
+  return match(dataSource)
+    .with({ type: "Dataset" }, (d) => {
+      return { type: d.type, id: d.value.id };
+    })
+    .with({ type: "EntityConfig" }, (ec) => {
+      return { type: ec.type, id: ec.value.id };
+    })
+    .exhaustive();
+}
 
 export function QueryForm({
   errorMessage,
   aggregations,
   selectedColumns,
   selectedGroupByColumns,
-  selectedDatasetId,
+  selectedDataSource,
   orderByColumn,
   onAggregationsChange,
-  onFromDatasetChange,
+  onFromDataSourceChange,
   onSelectColumnsChange,
   onGroupByChange,
   orderByDirection,
   onOrderByColumnChange,
   onOrderByDirectionChange,
 }: Props): JSX.Element {
+  const fieldOptionsById = makeSelectOptions(selectedColumns, {
+    valueFn: getProp("value.id"),
+    labelFn: getProp("value.name"),
+  });
+
+  const orderByColumnId = orderByColumn?.value.id ?? null;
+
   return (
     <form>
       <Stack>
-        <DatasetSelect
-          value={selectedDatasetId ?? null}
-          onChange={(datasetId) => {
-            onFromDatasetChange(datasetId ?? undefined);
+        <QueryableDataSourceSelect
+          value={selectedDataSource ?? null}
+          onChange={(dataSource) => {
+            onFromDataSourceChange(dataSource ?? undefined);
           }}
         />
 
-        <DatasetColumnMultiSelect
-          label="Select fields"
-          placeholder="Select fields"
-          datasetId={selectedDatasetId}
+        <QueryableColumnMultiSelect
+          label="Select columns"
+          placeholder="Select columns"
+          dataSourceId={
+            selectedDataSource ?
+              makeDataSourceIdWithType(selectedDataSource)
+            : undefined
+          }
           value={selectedColumns}
-          onChange={(columns) => {
+          onChange={(columns: readonly QueryableColumn[]) => {
             onSelectColumnsChange(columns);
-
+            const incomingFieldNames = columns.map(getProp("value.name"));
             const prevAggregations = aggregations;
-            const incomingFieldNames = columns.map(getProp("name"));
             const prevFieldNames = objectKeys(prevAggregations);
             const droppedFieldNames = difference(
               prevFieldNames,
               incomingFieldNames,
             );
-
-            const newDefaultAggregations = makeObjectFromList(
-              incomingFieldNames,
-              { defaultValue: "none" as const },
-            );
+            const newDefaultAggregations = makeObject(incomingFieldNames, {
+              defaultValue: "none" as const,
+            });
 
             onAggregationsChange(
               omit(
@@ -100,18 +128,17 @@ export function QueryForm({
             legend="Aggregations"
             style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
           >
-            {selectedColumns.map((field) => {
+            {selectedColumns.map((col) => {
               return (
                 <AggregationSelect
-                  key={field.id}
-                  column={field}
-                  onChange={(aggregationType) => {
-                    const newAggregations = setValue(
-                      aggregations,
-                      field.name,
-                      aggregationType,
-                    );
-                    onAggregationsChange(newAggregations);
+                  key={col.value.id}
+                  column={col}
+                  value={aggregations[col.value.name] ?? "none"}
+                  onChange={(agg: QueryAggregationType) => {
+                    onAggregationsChange({
+                      ...aggregations,
+                      [col.value.name]: agg,
+                    });
                   }}
                 />
               );
@@ -120,36 +147,39 @@ export function QueryForm({
         : null}
 
         {HIDE_WHERE ? null : <Text>Where (react-awesome-query-builder)</Text>}
-        <DatasetColumnMultiSelect
+
+        <QueryableColumnMultiSelect
           label="Group by"
           placeholder="Group by"
-          onChange={onGroupByChange}
-          datasetId={selectedDatasetId}
+          dataSourceId={
+            selectedDataSource ?
+              makeDataSourceIdWithType(selectedDataSource)
+            : undefined
+          }
           value={selectedGroupByColumns}
+          onChange={onGroupByChange}
         />
+
         <Fieldset
           legend="Order by"
           style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
         >
           <Select
-            label="Select field"
-            placeholder="Select field"
-            data={selectedColumns.map((f) => {
-              return {
-                value: f.name,
-                label: f.name,
-              };
-            })}
-            value={orderByColumn?.name}
-            onChange={(fieldName) => {
-              const selected = selectedColumns.find((f) => {
-                return f.name === fieldName;
+            label="Select column"
+            data={fieldOptionsById}
+            value={orderByColumnId}
+            onChange={(newColId) => {
+              if (newColId === null) {
+                onOrderByColumnChange(undefined);
+                return;
+              }
+              const newOrderByColumn = selectedColumns.find((col) => {
+                return col.value.id === newColId;
               });
-              onOrderByColumnChange(selected);
+              onOrderByColumnChange(newOrderByColumn);
             }}
             clearable
           />
-
           <Select
             label="Order by"
             placeholder="Select order"
@@ -161,6 +191,7 @@ export function QueryForm({
             }}
           />
         </Fieldset>
+
         {HIDE_LIMIT ? null : <Text>Limit (number)</Text>}
         {errorMessage ?
           <DangerText>{errorMessage}</DangerText>

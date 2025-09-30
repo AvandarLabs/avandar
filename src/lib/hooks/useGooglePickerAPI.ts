@@ -3,7 +3,7 @@ import { useQuery, UseQueryResult } from "@/lib/hooks/query/useQuery";
 import { APIReturnType } from "@/types/http-api.types";
 import { Logger } from "../Logger";
 import { GooglePickerAPI } from "../types/google-picker";
-import { notifyError } from "../ui/notifications/notifyError";
+import { notifyError } from "../ui/notifications/notify";
 import { useBoolean } from "./state/useBoolean";
 
 const GOOGLE_API_JS_URL = "https://apis.google.com/js/api.js";

@@ -10,7 +10,7 @@ import {
 } from "@/lib/utils/objects/transformations";
 import { pipe } from "@/lib/utils/pipe";
 import { uuid } from "@/lib/utils/uuid";
-import { EntityConfig, EntityConfigModel } from "./types";
+import { EntityConfig, EntityConfigModel } from "./EntityConfig.types";
 
 const DBReadSchema = z.object({
   created_at: z.string().datetime({ offset: true }),

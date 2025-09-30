@@ -2,7 +2,7 @@ import { Container, Stack, Text, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { z } from "zod";
-import { notifyError } from "@/lib/ui/notifications/notifyError";
+import { notifyError } from "@/lib/ui/notifications/notify";
 
 const searchSchema = z.object({
   redirectReason: z.string().optional(),
