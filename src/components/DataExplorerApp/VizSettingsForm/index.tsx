@@ -156,7 +156,7 @@ export function VizSettingsForm({
         .with({ type: "scatter" }, (config) => {
           return (
             <ScatterChartForm
-              fields={fields}
+              fields={columns}
               settings={config.settings}
               onSettingsChange={(next) => {
                 return onVizConfigChange({ ...config, settings: next });

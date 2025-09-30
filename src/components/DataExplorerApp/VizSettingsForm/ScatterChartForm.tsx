@@ -1,8 +1,8 @@
 import { useMemo } from "react";
-import { QueryResultField } from "@/clients/LocalDatasetQueryClient";
+import { QueryResultColumn } from "@/clients/DuckDBClient/types";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
+import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
 
 export type ScatterChartSettings = {
   xAxisKey: string | undefined;
@@ -10,7 +10,7 @@ export type ScatterChartSettings = {
 };
 
 type Props = {
-  fields: readonly QueryResultField[];
+  fields: readonly QueryResultColumn[];
   settings: ScatterChartSettings;
   onSettingsChange: (settings: ScatterChartSettings) => void;
 };
@@ -21,7 +21,7 @@ export function ScatterChartForm({
   onSettingsChange,
 }: Props): JSX.Element {
   const numericFields = useMemo(() => {
-    return fields.filter(propEquals("dataType", "number"));
+    return fields.filter(propIs("dataType", "number"));
   }, [fields]);
 
   const numericOptions = useMemo(() => {
