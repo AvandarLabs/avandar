@@ -13,7 +13,7 @@ import {
 import { pipe } from "@/lib/utils/pipe";
 import { uuid } from "@/lib/utils/uuid";
 import { WorkspaceId } from "@/models/Workspace/types";
-import { EntityConfigId } from "../types";
+import { EntityConfigId } from "../EntityConfig.types";
 import {
   DimensionRead,
   EntityFieldConfig,
@@ -120,6 +120,7 @@ export const EntityFieldConfigParsers =
       undefinedsToNullsDeep,
       (obj): EntityFieldConfig<"DBInsert"> => {
         const { options, ...field } = excludeNullsExceptIn(obj, "description");
+
         // put the options back in the flattened db object
         const newOptions = excludeNullsExceptIn(options, "is_array");
         return { ...field, ...newOptions };
@@ -130,7 +131,9 @@ export const EntityFieldConfigParsers =
       snakeCaseKeysDeep,
       undefinedsToNullsDeep,
       (obj): EntityFieldConfig<"DBUpdate"> => {
-        const { options, ...field } = excludeNullsExceptIn(obj, "description");
+        const { options, ...field } = excludeNullsExceptIn(obj, [
+          "description",
+        ]);
         // put the options back in the flattened db object
         const newOptions = excludeNullsExceptIn(options, "is_array");
         return { ...field, ...newOptions };

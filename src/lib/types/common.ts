@@ -73,6 +73,7 @@ export enum MIMEType {
   APPLICATION_X_7Z_COMPRESSED = "application/x-7z-compressed",
   APPLICATION_GZIP = "application/gzip",
   APPLICATION_VND_RAR = "application/vnd.rar",
+  APPLICATION_PARQUET = "application/vnd.apache.parquet",
 
   // MS Office
   APPLICATION_MS_WORD = "application/msword",

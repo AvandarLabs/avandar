@@ -1,15 +1,5 @@
 import type { UnknownObject } from "./common";
-import type {
-  StringKeyOf as BroadStringKeyOf,
-  ConditionalKeys,
-  UnknownRecord,
-} from "type-fest";
-
-/**
- * Get all the keys of an object that map to a given type.
- * @deprecated Just use type-fest's `ConditionalKeys` directly instead.
- */
-export type KeysThatMapTo<T, Obj extends object> = ConditionalKeys<Obj, T>;
+import type { StringKeyOf as BroadStringKeyOf, UnknownRecord } from "type-fest";
 
 /**
  * A stricter version of type-fest's `StringKeyOf` that will return
@@ -106,6 +96,23 @@ export type AnyFunctionWithSignature<Params extends unknown[], Return> = (
 ) => Return;
 
 /**
+ * Gets the first parameter of a function.
+ */
+export type FirstParameter<Func extends AnyFunction> =
+  Func extends AnyFunctionWithArguments<infer Args> ? Args[0] : never;
+
+/**
+ * Gets the tail parameters of a function (i.e. everything after the first
+ * parameter)
+ */
+export type TailParameters<Func extends AnyFunction> =
+  Func extends AnyFunctionWithArguments<infer Args> ?
+    Args extends [unknown, ...infer Tail] ?
+      Tail
+    : never
+  : never;
+
+/**
  * Represents a single-parameter function that returns the same type it was
  * given.
  * (Note: this is just at the type-level. It does not mean the function
@@ -170,4 +177,11 @@ export type ReplaceTypes<
  */
 export type Registry<StringLiteralUnion extends string> = {
   [K in StringLiteralUnion]: true;
+};
+
+/**
+ * Converts a record into a record of arrays of the same type.
+ */
+export type RegistryOfArrays<T extends UnknownObject> = {
+  [K in keyof T]: Array<T[K]>;
 };

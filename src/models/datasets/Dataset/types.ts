@@ -13,7 +13,7 @@ export type DatasetId = UUID<"Dataset">;
 export type DatasetSourceType = Enums<"datasets__source_type">;
 
 const DatasetRegistryType = {
-  local_csv: true,
+  csv_file: true,
   google_sheets: true,
 } satisfies Registry<DatasetSourceType>;
 

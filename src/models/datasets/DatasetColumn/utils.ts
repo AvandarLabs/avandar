@@ -1,6 +1,6 @@
 import * as arrow from "apache-arrow";
 import { match } from "ts-pattern";
-import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
+import { QueryAggregationType } from "@/clients/DuckDBClient/types";
 import { EntityFieldBaseType } from "@/models/EntityConfig/EntityFieldConfig/types";
 import { DatasetColumnDataType } from "./types";
 
@@ -46,11 +46,11 @@ export function getEntityFieldBaseDataType(
     .exhaustive();
 }
 
-export function getValidQueryAggregationsByType(
-  dataType: DatasetColumnDataType,
+export function getValidQueryAggregationsByDataType(
+  dataType: DatasetColumnDataType | EntityFieldBaseType,
 ): readonly QueryAggregationType[] {
   return match(dataType)
-    .with("text", () => {
+    .with("text", "string", () => {
       return ["count"] as const;
     })
     .with("number", () => {

@@ -1,5 +1,6 @@
 import { Button, FileInput, FileInputProps, Group } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { useState } from "react";
+import { useForm } from "@/lib/hooks/ui/useForm";
 import { MIMEType } from "@/lib/types/common";
 
 type Props = {
@@ -61,11 +62,17 @@ export function FileUploadField({
       file: null,
     },
   });
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  form.useFieldWatch("file", () => {
+    // when the file changes, reset the submitted state
+    setIsSubmitted(false);
+  });
 
   return (
     <form
       onSubmit={form.onSubmit((values) => {
         onSubmit(values.file ?? undefined);
+        setIsSubmitted(true);
       })}
       style={{ width: fullWidth ? "100%" : undefined }}
     >
@@ -80,7 +87,7 @@ export function FileUploadField({
         <Button
           type="submit"
           loading={isSubmitting}
-          disabled={form.getValues().file === null}
+          disabled={form.getValues().file === null || isSubmitted}
         >
           {submitButtonLabel}
         </Button>
