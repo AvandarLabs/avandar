@@ -1,8 +1,8 @@
 import { useMemo } from "react";
-import { QueryResultField } from "@/clients/LocalDatasetQueryClient";
+import { QueryResultColumn } from "@/clients/DuckDBClient/types";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
+import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
 
 export type LineChartSettings = {
   xAxisKey: string | undefined;
@@ -10,7 +10,7 @@ export type LineChartSettings = {
 };
 
 type Props = {
-  fields: readonly QueryResultField[];
+  fields: readonly QueryResultColumn[];
   settings: LineChartSettings;
   onSettingsChange: (settings: LineChartSettings) => void;
 };
@@ -28,7 +28,7 @@ export function LineChartForm({
   }, [fields]);
 
   const numericFieldOptions = useMemo(() => {
-    return makeSelectOptions(fields.filter(propEquals("dataType", "number")), {
+    return makeSelectOptions(fields.filter(propIs("dataType", "number")), {
       valueFn: getProp("name"),
       labelFn: getProp("name"),
     });

@@ -6,7 +6,7 @@ import {
 import { IconTrash } from "@tabler/icons-react";
 import { useRouter } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { LocalDatasetQueryClient } from "@/clients/LocalDatasetQueryClient";
+import { DuckDBClient } from "@/clients/DuckDBClient";
 import { SpotlightLinks } from "@/config/SpotlightLinks";
 import { AvaDexie } from "@/dexie/AvaDexie";
 import { Logger } from "@/lib/Logger";
@@ -53,31 +53,22 @@ export function useSpotlightActions(
           group: "Dev Actions",
           actions: [
             {
-              id: "delete-local-indexed-db",
+              id: "delete-local-data",
               label: "Delete local data",
-              description: "Delete all local Avandar data from the browser",
+              description:
+                "Delete all local Avandar data from the browser (IndexedDB and DuckDB)",
               leftSection: <IconTrash size={24} stroke={1.5} />,
               onClick: async () => {
+                // delete indexed db
                 await AvaDexie.deleteDatabase();
+
+                // delete the local OPFS database (DuckDB)
+                await DuckDBClient.deleteDatabase();
+
                 notifications.show({
                   title: "Local data deleted",
                   message:
                     "All local Avandar data has been deleted. Please refresh the page.",
-                  color: "green",
-                });
-              },
-            },
-
-            {
-              id: "drop-duckdb-tables",
-              label: "Drop DuckDB tables",
-              description: "Drop all DuckDB tables",
-              leftSection: <IconTrash size={24} stroke={1.5} />,
-              onClick: async () => {
-                await LocalDatasetQueryClient.dropAllTables();
-                notifications.show({
-                  title: "DuckDB Datasets deleted",
-                  message: "DuckDB Datasets deleted. Please refresh the page.",
                   color: "green",
                 });
               },
@@ -89,8 +80,7 @@ export function useSpotlightActions(
               description: "List all DuckDB tables",
               leftSection: <IconTrash size={24} stroke={1.5} />,
               onClick: async () => {
-                const tableNames =
-                  await LocalDatasetQueryClient.getTableNames();
+                const tableNames = await DuckDBClient.getTableNames();
                 Logger.log("Table names", tableNames.join("; "));
                 notifications.show({
                   title: "Check the console",

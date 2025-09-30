@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { z } from "zod";
-import { QueryResultField } from "@/clients/LocalDatasetQueryClient";
+import { QueryResultColumn } from "@/clients/DuckDBClient/types";
 import { UnknownDataFrame } from "@/lib/types/common";
 import { BarChart } from "@/lib/ui/data-viz/BarChart";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
@@ -13,7 +13,7 @@ import { VizConfig } from "./VizSettingsForm/makeDefaultVizConfig";
 
 type Props = {
   vizConfig: VizConfig;
-  fields: readonly QueryResultField[];
+  columns: readonly QueryResultColumn[];
   data: UnknownDataFrame;
 };
 
@@ -46,16 +46,17 @@ const LineChartSettingsSchema = z.object({
 
 export function VisualizationContainer({
   vizConfig,
-  fields,
+  columns,
   data,
 }: Props): JSX.Element {
   const fieldNames = useMemo(() => {
-    return fields.map(getProp("name"));
-  }, [fields]);
+    return columns.map(getProp("name"));
+  }, [columns]);
 
+  // TODO(jpsyx): this should get supplied as a prop
   const dateColumns = useMemo(() => {
     return new Set(
-      fields
+      columns
         .filter((f) => {
           const sampleVal = data[0]?.[f.name];
           return (
@@ -68,7 +69,7 @@ export function VisualizationContainer({
           return f.name;
         }),
     );
-  }, [fields, data]);
+  }, [columns, data]);
 
   return match(vizConfig)
     .with({ type: "table" }, () => {
@@ -78,6 +79,7 @@ export function VisualizationContainer({
           data={data}
           dateColumns={dateColumns}
           dateFormat="YYYY-MM-DD HH:mm:ss z"
+          height="100%"
         />
       );
     })

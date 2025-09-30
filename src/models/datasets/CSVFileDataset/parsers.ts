@@ -1,40 +1,50 @@
-import { iso, number, object, string, uuid } from "zod";
+import { boolean, iso, number, object, string, uuid } from "zod";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import {
   camelCaseKeysDeep,
+  nullsToUndefinedDeep,
   snakeCaseKeysDeep,
 } from "@/lib/utils/objects/transformations";
 import { pipe } from "@/lib/utils/pipe";
 import { WorkspaceId } from "@/models/Workspace/types";
 import { DatasetId } from "../Dataset/types";
-import {
-  LocalCSVDatasetId,
-  LocalCSVDatasetModel,
-} from "../LocalCSVDataset/types";
+import { CSVFileDatasetId, CSVFileDatasetModel } from "./types";
 
 const DBReadSchema = object({
   created_at: iso.datetime({ offset: true }),
   dataset_id: uuid(),
-  delimiter: string(),
   id: uuid(),
-  size_in_bytes: number(),
   updated_at: iso.datetime({ offset: true }),
   workspace_id: uuid(),
+  size_in_bytes: number(),
+  rows_to_skip: number(),
+  quote_char: string(),
+  escape_char: string(),
+  delimiter: string(),
+  newline_delimiter: string(),
+  comment_char: string().nullable(),
+  has_header: boolean(),
+  date_format: string().nullable(),
+  timestamp_format: string().nullable(),
 });
 
 export const LocalCSVDatasetParsers =
-  makeParserRegistry<LocalCSVDatasetModel>().build({
-    modelName: "LocalCSVDataset",
+  makeParserRegistry<CSVFileDatasetModel>().build({
+    modelName: "CSVFileDataset",
     DBReadSchema,
-    fromDBReadToModelRead: pipe(camelCaseKeysDeep, (obj) => {
-      return {
-        ...obj,
-        id: obj.id as LocalCSVDatasetId,
-        datasetId: obj.datasetId as DatasetId,
-        workspaceId: obj.workspaceId as WorkspaceId,
-      };
-    }),
+    fromDBReadToModelRead: pipe(
+      camelCaseKeysDeep,
+      nullsToUndefinedDeep,
+      (obj) => {
+        return {
+          ...obj,
+          id: obj.id as CSVFileDatasetId,
+          datasetId: obj.datasetId as DatasetId,
+          workspaceId: obj.workspaceId as WorkspaceId,
+        };
+      },
+    ),
     fromModelInsertToDBInsert: snakeCaseKeysDeep,
     fromModelUpdateToDBUpdate: snakeCaseKeysDeep,
   });
@@ -42,7 +52,7 @@ export const LocalCSVDatasetParsers =
 /**
  * Do not remove these tests!
  */
-type CRUDTypes = LocalCSVDatasetModel;
+type CRUDTypes = CSVFileDatasetModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

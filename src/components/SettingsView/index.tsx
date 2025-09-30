@@ -2,8 +2,7 @@ import { Container, Stack, Title } from "@mantine/core";
 import { WorkspaceUserForm } from "@/components/SettingsView/WorkspaceUsersForm";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { BasicForm } from "@/lib/ui/BasicForm";
-import { notifyError } from "@/lib/ui/notifications/notifyError";
-import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
+import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
 export function SettingsView(): JSX.Element {

@@ -6,6 +6,7 @@ import {
   DatabaseTableNames,
   SupabaseDBClient,
 } from "@/lib/clients/supabase/SupabaseDBClient";
+import { assertIsDefined } from "@/lib/utils/asserts";
 import { Database } from "@/types/database.types";
 import { ILogger } from "../../Logger";
 import { ModelCRUDParserRegistry } from "../../models/makeParserRegistry";
@@ -17,6 +18,7 @@ import {
   createModelCRUDClient,
   HookableClient,
   ModelCRUDClient,
+  UpsertOptions,
 } from "../createModelCRUDClient";
 import { withSupabaseClient } from "../withSupabaseClient";
 
@@ -145,136 +147,181 @@ export function createSupabaseCRUDClient<
       return (mutations?.({ ...config, dbClient, parsers }) ??
         {}) as ExtendedMutationsClient;
     },
-    getById: async (params: {
-      id: M["modelPrimaryKeyType"] | null | undefined;
-      logger: ILogger;
-    }): Promise<M["DBRead"] | undefined> => {
-      if (params.id === undefined || params.id === null) {
-        return undefined;
-      }
-      const { data } = await dbClient
-        .from(tableName)
-        .select("*")
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .eq(dbTablePrimaryKey, params.id as any)
-        .maybeSingle<M["DBRead"]>()
-        .throwOnError();
-      return data ?? undefined;
-    },
 
-    getCount: async (params: {
-      where?: FiltersByColumn<M["DBRead"]>;
-      logger: ILogger;
-    }): Promise<number | null> => {
-      const { where } = params;
-      let query = dbClient.from(tableName).select("*", {
-        count: "exact",
-        head: true,
-      }) as SupabaseFilterableQuery;
+    crudFunctions: {
+      getById: async (params: {
+        id: M["modelPrimaryKeyType"] | null | undefined;
+        logger: ILogger;
+      }): Promise<M["DBRead"] | undefined> => {
+        if (params.id === undefined || params.id === null) {
+          return undefined;
+        }
+        const { data } = await dbClient
+          .from(tableName)
+          .select("*")
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .eq(dbTablePrimaryKey, params.id as any)
+          .maybeSingle<M["DBRead"]>()
+          .throwOnError();
+        return data ?? undefined;
+      },
 
-      if (where) {
-        query = _applyFiltersToSupabaseQuery(query, where);
-      }
+      getCount: async (params: {
+        where?: FiltersByColumn<M["DBRead"]>;
+        logger: ILogger;
+      }): Promise<number | null> => {
+        const { where } = params;
+        let query = dbClient.from(tableName).select("*", {
+          count: "exact",
+          head: true,
+        }) as SupabaseFilterableQuery;
 
-      const { count } = await query.throwOnError();
-      return count ?? null;
-    },
+        if (where) {
+          query = _applyFiltersToSupabaseQuery(query, where);
+        }
 
-    getPage: async (params: {
-      where?: FiltersByColumn<M["DBRead"]>;
-      pageSize: number;
-      pageNum: number;
-      logger: ILogger;
-    }) => {
-      const { where, pageSize, pageNum, logger } = params;
-      let query = dbClient
-        .from(tableName)
-        .select("*") as SupabaseFilterableQuery;
+        const { count } = await query.throwOnError();
+        return count ?? null;
+      },
 
-      if (where) {
-        query = _applyFiltersToSupabaseQuery(query, where);
-      }
+      getPage: async (params: {
+        where?: FiltersByColumn<M["DBRead"]>;
+        pageSize: number;
+        pageNum: number;
+        logger: ILogger;
+      }) => {
+        const { where, pageSize, pageNum, logger } = params;
+        let query = dbClient
+          .from(tableName)
+          .select("*") as SupabaseFilterableQuery;
 
-      if (pageSize > MAXIMUM_PAGE_SIZE) {
-        logger.warn(
-          `Page size is greater than ${MAXIMUM_PAGE_SIZE}. Supabase will only return ${MAXIMUM_PAGE_SIZE} rows.`,
-        );
-      }
+        if (where) {
+          query = _applyFiltersToSupabaseQuery(query, where);
+        }
 
-      // Now apply the page range
-      const startIndex = pageNum * pageSize;
-      const endIndex = (pageNum + 1) * pageSize;
-      const { data: dbRows } = await query
-        .range(startIndex, endIndex)
-        .overrideTypes<Array<M["DBRead"]>, { merge: false }>()
-        .throwOnError();
-      return dbRows;
-    },
+        if (pageSize > MAXIMUM_PAGE_SIZE) {
+          logger.warn(
+            `Page size is greater than ${MAXIMUM_PAGE_SIZE}. Supabase will only return ${MAXIMUM_PAGE_SIZE} rows.`,
+          );
+        }
 
-    insert: async (params: { data: M["DBInsert"]; logger: ILogger }) => {
-      const { data: insertedData } = await dbClient
-        .from(tableName)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .insert(params.data as any)
-        .select()
-        .single<M["DBRead"]>()
-        .throwOnError();
-      return insertedData;
-    },
+        // Now apply the page range
+        const startIndex = pageNum * pageSize;
+        const endIndex = (pageNum + 1) * pageSize;
+        const { data: dbRows } = await query
+          .range(startIndex, endIndex)
+          .overrideTypes<Array<M["DBRead"]>, { merge: false }>()
+          .throwOnError();
+        return dbRows;
+      },
 
-    bulkInsert: async (params: {
-      data: ReadonlyArray<M["DBInsert"]>;
-      logger: ILogger;
-    }) => {
-      const { data: insertedRows } = await dbClient
-        .from(tableName)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .insert(params.data as any)
-        .select()
-        .overrideTypes<Array<M["DBRead"]>, { merge: false }>()
-        .throwOnError();
-      return insertedRows;
-    },
+      insert: async (
+        params: UpsertOptions & { data: M["DBInsert"]; logger: ILogger },
+      ) => {
+        if (params.upsert) {
+          assertIsDefined(
+            params.onConflict,
+            "`onConflict` must be defined when upserting",
+          );
+          const { columnNames, ignoreDuplicates } = params.onConflict;
+          const { data: upsertedData } = await dbClient
+            .from(tableName)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .upsert(params.data as any, {
+              onConflict: columnNames.join(","),
+              ignoreDuplicates,
+            })
+            .select()
+            .single<M["DBRead"]>()
+            .throwOnError();
+          return upsertedData;
+        }
 
-    update: async (params: {
-      id: M["modelPrimaryKeyType"];
-      data: M["DBUpdate"];
-      logger: ILogger;
-    }) => {
-      const { data: updatedData } = await dbClient
-        .from(tableName)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .update(params.data as any)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .eq(dbTablePrimaryKey, params.id as any)
-        .select()
-        .single<M["DBRead"]>()
-        .throwOnError();
-      return updatedData;
-    },
+        const { data: insertedData } = await dbClient
+          .from(tableName)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .insert(params.data as any)
+          .select()
+          .single<M["DBRead"]>()
+          .throwOnError();
+        return insertedData;
+      },
 
-    delete: async (params: {
-      id: M["modelPrimaryKeyType"];
-      logger: ILogger;
-    }) => {
-      await dbClient
-        .from(tableName)
-        .delete()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .eq(dbTablePrimaryKey, params.id as any)
-        .throwOnError();
-    },
+      bulkInsert: async (
+        params: UpsertOptions & {
+          data: ReadonlyArray<M["DBInsert"]>;
+          logger: ILogger;
+        },
+      ) => {
+        if (params.upsert) {
+          assertIsDefined(
+            params.onConflict,
+            "`onConflict` must be defined when upserting",
+          );
+          const { columnNames, ignoreDuplicates } = params.onConflict;
+          const { data: upsertedRows } = await dbClient
+            .from(tableName)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .upsert(params.data as any, {
+              onConflict: columnNames.join(","),
+              ignoreDuplicates,
+            })
+            .select()
+            .overrideTypes<Array<M["DBRead"]>, { merge: false }>()
+            .throwOnError();
+          return upsertedRows;
+        }
 
-    bulkDelete: async (params: {
-      ids: ReadonlyArray<M["modelPrimaryKeyType"]>;
-      logger: ILogger;
-    }) => {
-      await dbClient
-        .from(tableName)
-        .delete()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .in(dbTablePrimaryKey, params.ids as any)
-        .throwOnError();
+        const { data: insertedRows } = await dbClient
+          .from(tableName)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .insert(params.data as any)
+          .select()
+          .overrideTypes<Array<M["DBRead"]>, { merge: false }>()
+          .throwOnError();
+        return insertedRows;
+      },
+
+      update: async (params: {
+        id: M["modelPrimaryKeyType"];
+        data: M["DBUpdate"];
+        logger: ILogger;
+      }) => {
+        const { data: updatedData } = await dbClient
+          .from(tableName)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .update(params.data as any)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .eq(dbTablePrimaryKey, params.id as any)
+          .select()
+          .single<M["DBRead"]>()
+          .throwOnError();
+        return updatedData;
+      },
+
+      delete: async (params: {
+        id: M["modelPrimaryKeyType"];
+        logger: ILogger;
+      }) => {
+        await dbClient
+          .from(tableName)
+          .delete()
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .eq(dbTablePrimaryKey, params.id as any)
+          .throwOnError();
+      },
+
+      bulkDelete: async (params: {
+        ids: ReadonlyArray<M["modelPrimaryKeyType"]>;
+        logger: ILogger;
+      }) => {
+        await dbClient
+          .from(tableName)
+          .delete()
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .in(dbTablePrimaryKey, params.ids as any)
+          .throwOnError();
+      },
     },
   });
 

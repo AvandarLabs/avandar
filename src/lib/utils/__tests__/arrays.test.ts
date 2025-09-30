@@ -6,7 +6,7 @@ import {
   partition,
   removeItem,
   removeItemWhere,
-} from "../arrays";
+} from "../arrays/misc";
 
 describe("difference", () => {
   it("returns items in first array, excluding those from second array", () => {
