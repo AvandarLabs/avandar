@@ -67,11 +67,11 @@ export function QueryForm({
   selectedGroupByColumns,
   selectedFromDataSource,
   orderByColumn,
+  orderByDirection,
   onAggregationsChange,
   onFromDataSourceChange,
   onSelectColumnsChange,
   onGroupByChange,
-  orderByDirection,
   onOrderByColumnChange,
   onOrderByDirectionChange,
 }: Props): JSX.Element {
