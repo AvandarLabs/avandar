@@ -2,9 +2,11 @@ import { useUncontrolled } from "@mantine/hooks";
 import { useCallback, useMemo } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
 import { Select, SelectOptionGroup, SelectProps } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
+import { where } from "@/lib/utils/filters/filterBuilders";
 import { makeBucketMap } from "@/lib/utils/maps/builders";
 import { Dataset, DatasetId } from "@/models/datasets/Dataset";
 import { EntityConfig, EntityConfigId } from "@/models/EntityConfig";
@@ -63,8 +65,13 @@ export function QueryableDataSourceSelect({
       onChange,
     });
 
-  const [datasets] = DatasetClient.useGetAll();
-  const [entityConfigs] = EntityConfigClient.useGetAll();
+  const workspace = useCurrentWorkspace();
+  const [datasets] = DatasetClient.useGetAll(
+    where("workspace_id", "eq", workspace.id),
+  );
+  const [entityConfigs] = EntityConfigClient.useGetAll(
+    where("workspace_id", "eq", workspace.id),
+  );
   const dataSources: QueryableDataSource[] = useMemo(() => {
     return [
       ...(datasets ?? []).map((d) => {

@@ -90,30 +90,26 @@ export function DatasetColumnPickerList({
     useQueryOptions: { enabled: isNonEmptyArray(datasetIds) },
   });
 
-  const filteredDatasets = datasets?.filter((dataset) => {
-    return dataset.workspaceId === workspace.id;
-  });
-
   const [datasetColumns] = DatasetColumnClient.useGetAll({
-    ...where("dataset_id", "in", filteredDatasets?.map(getProp("id")) ?? []),
-    useQueryOptions: { enabled: !!filteredDatasets },
+    ...where("dataset_id", "in", datasets?.map(getProp("id")) ?? []),
+    useQueryOptions: { enabled: !!datasets },
   });
 
   const datasetsWithColumns: readonly DatasetWithColumns[] = useMemo(() => {
-    if (!filteredDatasets || !datasetColumns) {
+    if (!datasets || !datasetColumns) {
       return [];
     }
     const datasetColumnBuckets = makeBucketRecord(datasetColumns, {
       keyFn: getProp("datasetId"),
     });
 
-    return filteredDatasets.map((filteredDataset) => {
+    return datasets.map((dataset) => {
       return {
-        ...filteredDataset,
-        columns: datasetColumnBuckets[filteredDataset.id]!,
+        ...dataset,
+        columns: datasetColumnBuckets[dataset.id]!,
       };
     });
-  }, [filteredDatasets, datasetColumns]);
+  }, [datasets, datasetColumns]);
 
   const datasetColumnItems: Array<{
     dataset: Dataset;
@@ -186,7 +182,7 @@ export function DatasetColumnPickerList({
     <Group align="flex-start" style={{ position: "relative" }}>
       {/* Set up the dataset buttons to act as a table of contents */}
       <Stack gap={0}>
-        {filteredDatasets?.map((dataset) => {
+        {datasets?.map((dataset) => {
           const isActive = activeDatasetHeading === dataset.id;
           return (
             <Button
