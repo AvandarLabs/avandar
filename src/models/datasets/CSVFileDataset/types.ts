@@ -29,10 +29,10 @@ export type CSVFileDatasetRead = {
   rowsToSkip: number;
 
   /** Quote character used in the CSV file */
-  quoteChar: string;
+  quoteChar: string | undefined;
 
   /** Escape character used in the CSV file */
-  escapeChar: string;
+  escapeChar: string | undefined;
 
   /** Delimiter used in the CSV file. */
   delimiter: string;

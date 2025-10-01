@@ -146,11 +146,11 @@ export type Database = {
           dataset_id: string
           date_format: string | null
           delimiter: string
-          escape_char: string
+          escape_char: string | null
           has_header: boolean
           id: string
           newline_delimiter: string
-          quote_char: string
+          quote_char: string | null
           rows_to_skip: number
           size_in_bytes: number
           timestamp_format: string | null
@@ -163,11 +163,11 @@ export type Database = {
           dataset_id: string
           date_format?: string | null
           delimiter: string
-          escape_char?: string
+          escape_char?: string | null
           has_header?: boolean
           id?: string
           newline_delimiter?: string
-          quote_char?: string
+          quote_char?: string | null
           rows_to_skip?: number
           size_in_bytes: number
           timestamp_format?: string | null
@@ -180,11 +180,11 @@ export type Database = {
           dataset_id?: string
           date_format?: string | null
           delimiter?: string
-          escape_char?: string
+          escape_char?: string | null
           has_header?: boolean
           id?: string
           newline_delimiter?: string
-          quote_char?: string
+          quote_char?: string | null
           rows_to_skip?: number
           size_in_bytes?: number
           timestamp_format?: string | null
@@ -790,10 +790,10 @@ export type Database = {
           p_dataset_name: string
           p_date_format: Database["public"]["CompositeTypes"]["datasets__csv_file__date_format"]
           p_delimiter: string
-          p_escape_char: string
+          p_escape_char: Database["public"]["CompositeTypes"]["util__nullable_text"]
           p_has_header: boolean
           p_newline_delimiter: string
-          p_quote_char: string
+          p_quote_char: Database["public"]["CompositeTypes"]["util__nullable_text"]
           p_rows_to_skip: number
           p_size_in_bytes: number
           p_workspace_id: string

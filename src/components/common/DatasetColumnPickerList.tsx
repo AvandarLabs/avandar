@@ -83,7 +83,10 @@ export function DatasetColumnPickerList({
 
   // fetch all datasets and then get the columns
   const [datasets] = DatasetClient.useGetAll({
-    ...where("id", "in", datasetIds),
+    where: {
+      id: { in: datasetIds },
+      workspace_id: { eq: workspace.id },
+    },
     useQueryOptions: { enabled: isNonEmptyArray(datasetIds) },
   });
 

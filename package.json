@@ -16,6 +16,7 @@
     "db:create-user": "yarn vite-script scripts/createUserScript.ts",
     "db:gen-types": "supabase gen types typescript --local > src/types/database.types.ts",
     "db:new-migration": "supabase stop && supabase db diff -f",
+    "db:down-migration": "./scripts/downMigration.sh",
     "db:reset": "supabase start && ./scripts/resetDatabase.sh",
     "db:seed": "supabase start && yarn vite-script ./scripts/seedDatabaseScript.ts",
     "env:reset": "cp .env.example .env.development && cp .env.example.edge .env.development.edge",

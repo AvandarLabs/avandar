@@ -46,7 +46,7 @@ type ColumnTargetValuePairs<T extends UnknownObject> = Array<
 
 type ColumnTargetValueArrayPairs<T extends UnknownObject> = Array<
   {
-    [K in keyof T]: [column: K, targetValues: Array<T[K] | undefined>];
+    [K in keyof T]: [column: K, targetValues: ReadonlyArray<T[K] | undefined>];
   }[keyof T]
 >;
 
