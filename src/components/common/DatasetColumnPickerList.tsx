@@ -89,6 +89,7 @@ export function DatasetColumnPickerList({
     },
     useQueryOptions: { enabled: isNonEmptyArray(datasetIds) },
   });
+
   const [datasetColumns] = DatasetColumnClient.useGetAll({
     ...where("dataset_id", "in", datasets?.map(getProp("id")) ?? []),
     useQueryOptions: { enabled: !!datasets },
