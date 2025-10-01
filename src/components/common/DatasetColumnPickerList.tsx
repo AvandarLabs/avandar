@@ -11,6 +11,7 @@ import { usePrevious, useUncontrolled } from "@mantine/hooks";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
 import {
   SegmentedControl,
@@ -64,6 +65,8 @@ export function DatasetColumnPickerList({
   excludeColumns,
   segmentedControlProps,
 }: Props): JSX.Element {
+  const workspace = useCurrentWorkspace();
+
   // we use `useUncontrolled` so this SegmentedControl (which is technically a
   // `radio` input) can be used with `useForm`
   const [controlledValue, setSelectedValue] = useUncontrolled({
@@ -80,7 +83,10 @@ export function DatasetColumnPickerList({
 
   // fetch all datasets and then get the columns
   const [datasets] = DatasetClient.useGetAll({
-    ...where("id", "in", datasetIds),
+    where: {
+      id: { in: datasetIds },
+      workspace_id: { eq: workspace.id },
+    },
     useQueryOptions: { enabled: isNonEmptyArray(datasetIds) },
   });
   const [datasetColumns] = DatasetColumnClient.useGetAll({
