@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { AppLayout } from "@/components/AppLayout";
 import { AppLinks } from "@/config/AppLinks";
-import { propEquals } from "@/lib/utils/objects/higherOrderFuncs";
+import { propIs } from "@/lib/utils/objects/higherOrderFuncs";
 import { Workspace } from "@/models/Workspace/types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_auth/$workspaceSlug")({
     const workspaces = await WorkspaceClient.withCache(queryClient)
       .withFetchQuery()
       .getWorkspacesOfCurrentUser();
-    const workspaceToLoad = workspaces.find(propEquals("slug", workspaceSlug));
+    const workspaceToLoad = workspaces.find(propIs("slug", workspaceSlug));
     if (!workspaceToLoad) {
       throw redirect({ to: AppLinks.invalidWorkspace.to });
     }

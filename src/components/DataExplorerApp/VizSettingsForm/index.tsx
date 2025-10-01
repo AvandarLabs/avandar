@@ -1,5 +1,5 @@
 import { match } from "ts-pattern";
-import { QueryResultField } from "@/clients/LocalDatasetQueryClient";
+import { QueryResultColumn } from "@/clients/DuckDBClient/types";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
@@ -10,6 +10,7 @@ import {
   VizConfig,
   VizType,
 } from "./makeDefaultVizConfig";
+import { ScatterChartForm } from "./ScatterChartForm";
 
 type VizTypeMetadata = { type: VizType; displayName: string };
 
@@ -17,10 +18,11 @@ const VIZ_TYPES: VizTypeMetadata[] = [
   { type: "table", displayName: "Table" },
   { type: "bar", displayName: "Bar Chart" },
   { type: "line", displayName: "Line Chart" },
+  { type: "scatter", displayName: "Scatter Plot" },
 ];
 
-export type Props = {
-  fields: readonly QueryResultField[];
+type Props = {
+  columns: readonly QueryResultColumn[];
   vizConfig: VizConfig;
   onVizConfigChange: (config: VizConfig) => void;
 };
@@ -39,6 +41,12 @@ function getXYFromVizConfig(
       return {
         xAxisKey: config.settings.xAxisKey,
         yAxisKey: config.settings.yAxisKey,
+      };
+    })
+    .with({ type: "scatter" }, (c) => {
+      return {
+        xAxisKey: c.settings.xAxisKey,
+        yAxisKey: c.settings.yAxisKey,
       };
     })
     .with({ type: "table" }, () => {
@@ -76,6 +84,15 @@ function hydrateXY(options: {
         },
       };
     })
+    .with({ type: "scatter" }, (c) => {
+      return {
+        ...c,
+        settings: {
+          xAxisKey: c.settings.xAxisKey ?? prevXY.xAxisKey,
+          yAxisKey: c.settings.yAxisKey ?? prevXY.yAxisKey,
+        },
+      };
+    })
     .with({ type: "table" }, (config) => {
       return config;
     })
@@ -84,7 +101,7 @@ function hydrateXY(options: {
 
 export function VizSettingsForm({
   vizConfig,
-  fields,
+  columns,
   onVizConfigChange,
 }: Props): JSX.Element {
   const vizTypeOptions = makeSelectOptions(VIZ_TYPES, {
@@ -117,7 +134,7 @@ export function VizSettingsForm({
         .with({ type: "bar" }, (config) => {
           return (
             <BarChartForm
-              fields={fields}
+              fields={columns}
               settings={config.settings}
               onSettingsChange={(nextSettings) => {
                 onVizConfigChange({ ...config, settings: nextSettings });
@@ -128,10 +145,21 @@ export function VizSettingsForm({
         .with({ type: "line" }, (config) => {
           return (
             <LineChartForm
-              fields={fields}
+              fields={columns}
               settings={config.settings}
               onSettingsChange={(nextSettings) => {
                 onVizConfigChange({ ...config, settings: nextSettings });
+              }}
+            />
+          );
+        })
+        .with({ type: "scatter" }, (config) => {
+          return (
+            <ScatterChartForm
+              fields={columns}
+              settings={config.settings}
+              onSettingsChange={(next) => {
+                return onVizConfigChange({ ...config, settings: next });
               }}
             />
           );

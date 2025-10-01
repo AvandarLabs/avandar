@@ -57,7 +57,7 @@ export type FiltersByColumn<T extends UnknownObject> = {
 export type FilterOperatorRecord<TargetValue> = Partial<
   Record<SingleValueOperator, TargetValue | undefined>
 > &
-  Partial<Record<ArrayValueOperator, Array<TargetValue | undefined>>>;
+  Partial<Record<ArrayValueOperator, ReadonlyArray<TargetValue | undefined>>>;
 
 export function isFiltersByColumnObject<T extends UnknownObject>(
   filters: FiltersByColumn<T> | FiltersByOperator<T>,

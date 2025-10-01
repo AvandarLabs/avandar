@@ -19,7 +19,7 @@ export function SourceBadge({
   if (!sourceType) return null;
 
   const { Icon, tooltip } = match(sourceType)
-    .with("local_csv", () => {
+    .with("csv_file", () => {
       return {
         Icon: (props: React.ComponentProps<typeof IconFileTypeCsv>) => {
           return <IconFileTypeCsv {...props} color="#666" />;

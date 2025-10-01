@@ -1,15 +1,13 @@
-import { SetOptional } from "type-fest";
-import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { UUID } from "@/lib/types/common";
 import { DatasetId } from "@/models/datasets/Dataset";
+import { EntityConfigId } from "@/models/EntityConfig/EntityConfig.types";
 import { EntityFieldConfigId } from "@/models/EntityConfig/EntityFieldConfig/types";
-import { EntityConfigId } from "@/models/EntityConfig/types";
 import { WorkspaceId } from "@/models/Workspace/types";
-import { EntityId } from "../Entity/types";
+import { EntityId } from "../Entity/Entity.types";
 
 export type EntityFieldValueId = UUID<"EntityFieldValue">;
 
-type EntityFieldValueRead = {
+export type EntityFieldValue = {
   createdAt: string;
   datasetId: DatasetId | undefined;
   entityFieldConfigId: EntityFieldConfigId;
@@ -21,28 +19,3 @@ type EntityFieldValueRead = {
   valueSet: string[];
   workspaceId: WorkspaceId;
 };
-
-/**
- * CRUD type definitions for the Workspace model.
- */
-export type EntityFieldValueModel = SupabaseModelCRUDTypes<
-  {
-    tableName: "entity_field_values";
-    modelName: "EntityFieldValue";
-    modelPrimaryKeyType: EntityFieldValueId;
-    modelTypes: {
-      Read: EntityFieldValueRead;
-      Insert: SetOptional<
-        EntityFieldValueRead,
-        "createdAt" | "datasetId" | "id"
-      >;
-      Update: Partial<EntityFieldValueRead>;
-    };
-  },
-  {
-    dbTablePrimaryKey: "id";
-  }
->;
-
-export type EntityFieldValue<K extends keyof EntityFieldValueModel = "Read"> =
-  EntityFieldValueModel[K];

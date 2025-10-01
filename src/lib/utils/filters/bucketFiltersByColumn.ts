@@ -1,4 +1,5 @@
 import { UnknownObject } from "@/lib/types/common";
+import { isArray } from "../guards";
 import { objectKeys } from "../objects/misc";
 import { FilterOperatorRecord, FiltersByColumn } from "./filtersByColumn";
 import { FiltersByOperator } from "./filtersByOperator";
@@ -38,9 +39,9 @@ export function bucketFiltersByColumn<T extends UnknownObject>(
         // values for the same operator, we will just overwrite the previous
         // value. That means only the last filter for this column on this
         // operator will be applied.
-        if (isSingleValueOperator(operator) && !Array.isArray(value)) {
+        if (isSingleValueOperator(operator) && !isArray(value)) {
           filtersByColumn[column][operator] = value;
-        } else if (isArrayValueOperator(operator) && Array.isArray(value)) {
+        } else if (isArrayValueOperator(operator) && isArray(value)) {
           filtersByColumn[column][operator] = value;
         }
       });

@@ -16,7 +16,7 @@ import { NavLinkList } from "@/lib/ui/links/NavLinkList";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { constant } from "@/lib/utils/higherOrderFuncs";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
-import { EntityConfig } from "@/models/EntityConfig/types";
+import { EntityConfig } from "@/models/EntityConfig/EntityConfig.types";
 
 type Props = {
   entityConfig: EntityConfig;

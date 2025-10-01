@@ -6,8 +6,8 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
 import { Select, SelectOptionGroup, SelectProps } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { makeBucketMapFromList } from "@/lib/utils/maps/builders";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { where } from "@/lib/utils/filters/filterBuilders";
+import { makeBucketMap } from "@/lib/utils/maps/builders";
 import { DatasetId } from "@/models/datasets/Dataset";
 
 type Props = SelectProps<DatasetId>;
@@ -34,12 +34,12 @@ export function DatasetSelect({
     onChange,
   });
 
-  const [datasets] = DatasetClient.useGetAll();
-  const filteredDatasets = datasets?.filter((dataset) => {
-    return dataset.workspaceId === workspace.id;
-  });
+  const [datasets] = DatasetClient.useGetAll(
+    where("workspace_id", "eq", workspace.id),
+  );
+
   useOnBecomesDefined(
-    filteredDatasets,
+    datasets,
     useCallback(
       (dsets) => {
         onChangeValue(dsets[0]?.id ?? null);
@@ -49,14 +49,14 @@ export function DatasetSelect({
   );
 
   const datasetOptions = useMemo(() => {
-    const datasetBucketsByType = makeBucketMapFromList(filteredDatasets ?? [], {
-      keyFn: getProp("sourceType"),
+    const datasetBucketsByType = makeBucketMap(datasets ?? [], {
+      key: "sourceType",
     });
 
     if (datasetBucketsByType.size === 1) {
-      return makeSelectOptions(filteredDatasets ?? [], {
-        valueFn: getProp("id"),
-        labelFn: getProp("name"),
+      return makeSelectOptions(datasets ?? [], {
+        valueKey: "id",
+        labelKey: "name",
       });
     }
 
@@ -64,7 +64,7 @@ export function DatasetSelect({
     const groups: Array<SelectOptionGroup<DatasetId>> = [];
     datasetBucketsByType.forEach((bucketValues, bucketKey) => {
       const bucketName = match(bucketKey)
-        .with("local_csv", () => {
+        .with("csv_file", () => {
           return "CSVs";
         })
         .with("google_sheets", () => {
@@ -77,15 +77,15 @@ export function DatasetSelect({
         groups.push({
           group: bucketName,
           items: makeSelectOptions(bucketValues, {
-            valueFn: getProp("id"),
-            labelFn: getProp("name"),
+            valueKey: "id",
+            labelKey: "name",
           }),
         });
       }
     });
 
     return groups;
-  }, [filteredDatasets]);
+  }, [datasets]);
 
   return (
     <Select

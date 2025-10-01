@@ -11,6 +11,7 @@ import { usePrevious, useUncontrolled } from "@mantine/hooks";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
 import {
   SegmentedControl,
@@ -20,8 +21,8 @@ import {
 import { makeSegmentedControlItems } from "@/lib/ui/inputs/SegmentedControl/makeSegmentedControlItems";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNonEmptyArray } from "@/lib/utils/guards";
-import { makeBucketRecordFromList } from "@/lib/utils/objects/builders";
-import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
+import { makeBucketRecord } from "@/lib/utils/objects/builders";
+import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries } from "@/lib/utils/objects/misc";
 import {
   Dataset,
@@ -64,6 +65,8 @@ export function DatasetColumnPickerList({
   excludeColumns,
   segmentedControlProps,
 }: Props): JSX.Element {
+  const workspace = useCurrentWorkspace();
+
   // we use `useUncontrolled` so this SegmentedControl (which is technically a
   // `radio` input) can be used with `useForm`
   const [controlledValue, setSelectedValue] = useUncontrolled({
@@ -80,7 +83,10 @@ export function DatasetColumnPickerList({
 
   // fetch all datasets and then get the columns
   const [datasets] = DatasetClient.useGetAll({
-    ...where("id", "in", datasetIds),
+    where: {
+      id: { in: datasetIds },
+      workspace_id: { eq: workspace.id },
+    },
     useQueryOptions: { enabled: isNonEmptyArray(datasetIds) },
   });
   const [datasetColumns] = DatasetColumnClient.useGetAll({
@@ -92,7 +98,7 @@ export function DatasetColumnPickerList({
     if (!datasets || !datasetColumns) {
       return [];
     }
-    const datasetColumnBuckets = makeBucketRecordFromList(datasetColumns, {
+    const datasetColumnBuckets = makeBucketRecord(datasetColumns, {
       keyFn: getProp("datasetId"),
     });
 
@@ -150,7 +156,7 @@ export function DatasetColumnPickerList({
       });
 
       const currColumnIdx = remainingColumns.findIndex(
-        propEquals("value", controlledValue),
+        propIs("value", controlledValue),
       );
 
       const nextIdx =
@@ -206,7 +212,7 @@ export function DatasetColumnPickerList({
                 // now select the first item in that dataset group
                 // first, find the selected dataset
                 const datasetItemGroup = datasetColumnItems.find(
-                  propEquals("dataset.id", dataset.id),
+                  propIs("dataset.id", dataset.id),
                 );
                 if (
                   datasetItemGroup &&

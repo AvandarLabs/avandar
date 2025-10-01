@@ -1,4 +1,5 @@
 import { UnknownObject } from "@/lib/types/common";
+import { isArray } from "../guards";
 import { objectKeys } from "../objects/misc";
 import { FilterOperatorRecord, FiltersByColumn } from "./filtersByColumn";
 import { FiltersByOperator } from "./filtersByOperator";
@@ -28,7 +29,7 @@ export function bucketFiltersByOperator<T extends UnknownObject>(
       filtersByColumn[column];
     if (operatorRecord) {
       objectKeys(operatorRecord).forEach((operator) => {
-        const value = operatorRecord[operator];
+        const value = operatorRecord[operator]!;
         if (
           !(operator in filtersByOperator) ||
           filtersByOperator[operator] === undefined
@@ -36,9 +37,9 @@ export function bucketFiltersByOperator<T extends UnknownObject>(
           filtersByOperator[operator] = [];
         }
 
-        if (isSingleValueOperator(operator) && !Array.isArray(value)) {
+        if (isSingleValueOperator(operator) && !isArray(value)) {
           filtersByOperator[operator].push([column, value]);
-        } else if (isArrayValueOperator(operator) && Array.isArray(value)) {
+        } else if (isArrayValueOperator(operator) && isArray(value)) {
           filtersByOperator[operator].push([column, value]);
         }
       });

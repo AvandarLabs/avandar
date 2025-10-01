@@ -2,7 +2,7 @@ import { SetOptional } from "type-fest";
 import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { FiltersByColumn } from "@/lib/utils/filters/filtersByColumn";
-import { makeBucketRecordFromList } from "@/lib/utils/objects/builders";
+import { makeBucketRecord } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { ExcludeNullsIn } from "@/lib/utils/objects/transformations";
 import {
@@ -13,13 +13,18 @@ import {
 } from "@/models/datasets/Dataset";
 import { WorkspaceId } from "@/models/Workspace/types";
 import { CompositeTypes } from "@/types/database.types";
+import { DuckDBClient } from "../DuckDBClient";
 import { DatasetColumnClient } from "./DatasetColumnClient";
-import { DatasetRawDataClient } from "./DatasetRawDataClient";
+import { LocalDatasetEntryClient } from "./LocalDatasetEntryClient";
 
 type DatasetColumnInput = SetOptional<
   ExcludeNullsIn<CompositeTypes<"dataset_column_input">>,
   "description"
 >;
+
+function _escapeNullChar(str: string): string | null {
+  return str === "\u0000" ? null : str;
+}
 
 export const DatasetClient = createSupabaseCRUDClient({
   modelName: "Dataset",
@@ -67,10 +72,9 @@ export const DatasetClient = createSupabaseCRUDClient({
         const allDatasetColumns = await DatasetColumnClient.getAll(
           where("dataset_id", "in", datasets.map(getProp("id"))),
         );
-        const bucketedDatasetColumns = makeBucketRecordFromList(
-          allDatasetColumns,
-          { keyFn: getProp("datasetId") },
-        );
+        const bucketedDatasetColumns = makeBucketRecord(allDatasetColumns, {
+          key: "datasetId",
+        });
         const datasetsWithColumns = datasets.map((dataset: Dataset) => {
           return {
             ...dataset,
@@ -95,32 +99,61 @@ export const DatasetClient = createSupabaseCRUDClient({
        * @param params - The parameters for the dataset to be inserted.
        * @returns The inserted dataset.
        */
-      insertLocalCSVDataset: async (params: {
+      insertCSVFileDataset: async (params: {
         workspaceId: WorkspaceId;
         datasetName: string;
         datasetDescription: string;
-        delimiter: string;
-        sizeInBytes: number;
         columns: DatasetColumnInput[];
+        sizeInBytes: number;
+        parseOptions: {
+          rowsToSkip: number;
+          quoteChar: string;
+          escapeChar: string;
+          delimiter: string;
+          newlineDelimiter: string;
+          commentChar: string;
+          hasHeader: boolean;
+          dateFormat: string | null;
+          timestampFormat: string | null;
+        };
       }): Promise<Dataset> => {
         const logger = clientLogger.appendName("addNewDataset");
         logger.log("Creating dataset", params);
 
-        const columns = params.columns.map((col) => {
-          return {
-            ...col,
-            // convert undefined to nulls
-            description: col.description ?? null,
-          };
-        });
+        const {
+          columns,
+          sizeInBytes,
+          workspaceId,
+          datasetName,
+          datasetDescription,
+          parseOptions,
+        } = params;
         const { data: dataset } = await dbClient
-          .rpc("rpc_datasets__add_local_csv_dataset", {
-            p_workspace_id: params.workspaceId,
-            p_dataset_name: params.datasetName,
-            p_dataset_description: params.datasetDescription,
-            p_columns: columns,
-            p_delimiter: params.delimiter,
-            p_size_in_bytes: params.sizeInBytes,
+          .rpc("rpc_datasets__add_csv_file_dataset", {
+            p_workspace_id: workspaceId,
+            p_dataset_name: datasetName,
+            p_dataset_description: datasetDescription,
+            p_columns: columns.map((col) => {
+              return { ...col, description: col.description ?? null };
+            }),
+            p_size_in_bytes: sizeInBytes,
+            p_rows_to_skip: parseOptions.rowsToSkip,
+            p_quote_char: {
+              value: _escapeNullChar(parseOptions.quoteChar),
+            },
+            p_escape_char: {
+              value: _escapeNullChar(parseOptions.escapeChar),
+            },
+            p_delimiter: parseOptions.delimiter,
+            p_newline_delimiter: parseOptions.newlineDelimiter,
+            p_comment_char: {
+              value: _escapeNullChar(parseOptions.commentChar),
+            },
+            p_has_header: parseOptions.hasHeader,
+            p_date_format: {
+              date_format: parseOptions.dateFormat,
+              timestamp_format: parseOptions.timestampFormat,
+            },
           })
           .throwOnError();
 
@@ -177,10 +210,21 @@ export const DatasetClient = createSupabaseCRUDClient({
       fullDelete: async (params: { id: DatasetId }): Promise<void> => {
         const logger = clientLogger.appendName("fullDelete");
         logger.log("Deleting dataset", params);
-        await DatasetClient.delete({ id: params.id });
 
-        // now also delete the raw data locally
-        await DatasetRawDataClient.delete({ id: params.id });
+        const { id } = params;
+        await DatasetClient.delete({ id });
+
+        // now delete things locally from IndexedDB
+        const localDatasetEntry = await LocalDatasetEntryClient.getById({
+          id,
+        });
+        if (localDatasetEntry) {
+          const { datasetId, localTableName } = localDatasetEntry;
+          await LocalDatasetEntryClient.delete({ id: datasetId });
+
+          // finally, delete the raw data locally from DuckDB
+          await DuckDBClient.dropDataset(localTableName);
+        }
       },
     };
   },

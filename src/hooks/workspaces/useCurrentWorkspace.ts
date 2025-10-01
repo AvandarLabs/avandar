@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { AppLinks } from "@/config/AppLinks";
 import { Logger } from "@/lib/Logger";
-import { propEquals } from "@/lib/utils/objects/higherOrderFuncs";
+import { propIs } from "@/lib/utils/objects/higherOrderFuncs";
 import { Workspace } from "@/models/Workspace/types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 import { WorkspaceRootRouteAPI } from "@/routes/_auth/$workspaceSlug/route";
@@ -28,9 +28,7 @@ export function useCurrentWorkspace(): Workspace {
   // after a fetch, the query cache is the source of truth if
   // we find a workspace with the necessary slug
   const workspaceFromCache =
-    isSuccess ?
-      userWorkspaces?.find(propEquals("slug", workspaceSlug))
-    : undefined;
+    isSuccess ? userWorkspaces?.find(propIs("slug", workspaceSlug)) : undefined;
 
   if (workspaceFromCache) {
     return workspaceFromCache;
