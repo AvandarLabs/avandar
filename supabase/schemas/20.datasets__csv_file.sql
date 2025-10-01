@@ -14,9 +14,9 @@ create table public.datasets__csv_file (
   -- Number of rows to skip at the start of the file
   rows_to_skip integer not null default 0,
   -- Quote character used in the CSV file
-  quote_char text not null default '"',
+  quote_char text,
   -- Escape character used in the CSV file
-  escape_char text not null default '"',
+  escape_char text,
   -- Delimiter used in the CSV file
   delimiter text not null,
   -- Newline delimiter used in the CSV file

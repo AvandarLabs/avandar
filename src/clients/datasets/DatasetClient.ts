@@ -22,6 +22,10 @@ type DatasetColumnInput = SetOptional<
   "description"
 >;
 
+function _escapeNullChar(str: string): string | null {
+  return str === "\u0000" ? null : str;
+}
+
 export const DatasetClient = createSupabaseCRUDClient({
   modelName: "Dataset",
   tableName: "datasets",
@@ -134,15 +138,16 @@ export const DatasetClient = createSupabaseCRUDClient({
             }),
             p_size_in_bytes: sizeInBytes,
             p_rows_to_skip: parseOptions.rowsToSkip,
-            p_quote_char: parseOptions.quoteChar,
-            p_escape_char: parseOptions.escapeChar,
+            p_quote_char: {
+              value: _escapeNullChar(parseOptions.quoteChar),
+            },
+            p_escape_char: {
+              value: _escapeNullChar(parseOptions.escapeChar),
+            },
             p_delimiter: parseOptions.delimiter,
             p_newline_delimiter: parseOptions.newlineDelimiter,
             p_comment_char: {
-              value:
-                parseOptions.commentChar === "\u0000" ?
-                  null
-                : parseOptions.commentChar,
+              value: _escapeNullChar(parseOptions.commentChar),
             },
             p_has_header: parseOptions.hasHeader,
             p_date_format: {
