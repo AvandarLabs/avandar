@@ -69,7 +69,7 @@ function ProfilePage() {
                       type="email"
                       label="Email"
                       defaultValue={user.email ?? ""}
-                      submitButtonLabel="Edit"
+                      submitButtonLabel="Change"
                       minLength={3}
                       placeholder="Email"
                       onCancel={toggleEditingEmailState}
@@ -82,7 +82,9 @@ function ProfilePage() {
                     />
                   : <Group>
                       <Text>Email: {user.email}</Text>
-                      <Button onClick={toggleEditingEmailState}>Edit</Button>
+                      <Button onClick={toggleEditingEmailState}>
+                        Change email
+                      </Button>
                     </Group>
                   }
                 </List.Item>
