@@ -12,6 +12,7 @@ import { isNotEmpty } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppLinks } from "@/config/AppLinks";
+import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { Select } from "@/lib/ui/inputs/Select";
@@ -31,6 +32,8 @@ import {
 } from "./entityConfigFormTypes";
 import { ManualEntryFieldsBlock } from "./ManualEntryFieldsBlock";
 import { useSubmitEntityCreatorForm } from "./useSubmitEntityCreatorForm";
+
+const IS_MANUAL_DATA_DISABLED = isFlagEnabled(FeatureFlag.DisableManualData);
 
 export function EntityCreatorView(): JSX.Element {
   const navigate = useNavigate();
@@ -191,11 +194,13 @@ export function EntityCreatorView(): JSX.Element {
               placeholder="Enter a description for this profile type"
               {...inputProps.description()}
             />
-            <Checkbox
-              key={keys.allowManualCreation}
-              label={`Allow new ${pluralEntityConfigName} to be created manually`}
-              {...inputProps.allowManualCreation({ type: "checkbox" })}
-            />
+            {IS_MANUAL_DATA_DISABLED ? null : (
+              <Checkbox
+                key={keys.allowManualCreation}
+                label={`Allow new ${pluralEntityConfigName} to be created manually`}
+                {...inputProps.allowManualCreation({ type: "checkbox" })}
+              />
+            )}
             <Text>
               Tell us about where the {singularEntityConfigName} data should
               come from...
@@ -214,33 +219,35 @@ export function EntityCreatorView(): JSX.Element {
                 entityConfigName={singularEntityConfigName}
               />
             : null}
-            <Switch
-              label="Some data should be manually entered"
-              checked={allowManualEntryFields}
-              onChange={(e) => {
-                const displayManualEntryFields = e.currentTarget.checked;
-                setAllowManualEntryFields(displayManualEntryFields);
+            {IS_MANUAL_DATA_DISABLED ? null : (
+              <Switch
+                label="Some data should be manually entered"
+                checked={allowManualEntryFields}
+                onChange={(e) => {
+                  const displayManualEntryFields = e.currentTarget.checked;
+                  setAllowManualEntryFields(displayManualEntryFields);
 
-                // clear the list when we turn off the switch
-                // TODO(jpsyx): we should store a backup of the list for when
-                // we turn it back on.
-                if (!displayManualEntryFields) {
-                  entityConfigForm.setFieldValue("manualEntryFields", []);
-                }
-                if (
-                  displayManualEntryFields &&
-                  entityConfigForm.getValues().manualEntryFields.length === 0
-                ) {
-                  entityConfigForm.insertListItem(
-                    "manualEntryFields",
-                    makeDefaultManualEntryField({
-                      entityConfigId,
-                      name: "New field",
-                    }),
-                  );
-                }
-              }}
-            />
+                  // clear the list when we turn off the switch
+                  // TODO(jpsyx): we should store a backup of the list for when
+                  // we turn it back on.
+                  if (!displayManualEntryFields) {
+                    entityConfigForm.setFieldValue("manualEntryFields", []);
+                  }
+                  if (
+                    displayManualEntryFields &&
+                    entityConfigForm.getValues().manualEntryFields.length === 0
+                  ) {
+                    entityConfigForm.insertListItem(
+                      "manualEntryFields",
+                      makeDefaultManualEntryField({
+                        entityConfigId,
+                        name: "New field",
+                      }),
+                    );
+                  }
+                }}
+              />
+            )}
             {allowManualEntryFields ?
               <ManualEntryFieldsBlock
                 entityConfigId={entityConfigId}

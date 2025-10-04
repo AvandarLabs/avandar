@@ -17,12 +17,19 @@ export enum FeatureFlag {
    * to sign up.
    */
   DisableSelfRegistration = "disable-self-registration",
+
+  /**
+   * Disable manual entity fields. Users are not allowed to manually change
+   * the values of entity fields.
+   */
+  DisableManualData = "disable-manual-data",
 }
 
 export const FeatureFlagConfig = {
   [FeatureFlag.DisableSelfRegistration]: {
     waitlistURL: "https://avandarlabs.com",
   },
+  [FeatureFlag.DisableManualData]: undefined,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as const satisfies Record<FeatureFlag, any>;
 
@@ -32,6 +39,5 @@ export function isFlagEnabled(featureFlag: FeatureFlag): boolean {
     const flags = envFlagsStr.split(";");
     return flags.includes(featureFlag);
   }
-
   return false;
 }
