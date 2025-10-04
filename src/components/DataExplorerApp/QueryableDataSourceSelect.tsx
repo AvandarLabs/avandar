@@ -160,6 +160,7 @@ export function QueryableDataSourceSelect({
     <Select
       data={dataSourceOptions}
       label="Data source"
+      placeholder="Select a data source"
       value={currentDataSource?.value.id ?? null}
       onChange={onDataSourceChange}
       {...selectProps}
