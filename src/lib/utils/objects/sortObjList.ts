@@ -1,4 +1,4 @@
-import { isNullOrUndefined, isNumber, isString } from "../guards";
+import { isNullish, isNumber, isString } from "../guards";
 import { stringComparator } from "../strings/sort";
 
 /**
@@ -22,13 +22,13 @@ export function mixedComparator(
   },
 ): number {
   // handle nullish values
-  if (isNullOrUndefined(a) && isNullOrUndefined(b)) {
+  if (isNullish(a) && isNullish(b)) {
     return 0;
   }
-  if (isNullOrUndefined(a)) {
+  if (isNullish(a)) {
     return nullOrUndefinedSortOrder === "last" ? 1 : -1;
   }
-  if (isNullOrUndefined(b)) {
+  if (isNullish(b)) {
     return nullOrUndefinedSortOrder === "last" ? -1 : 1;
   }
 

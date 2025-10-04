@@ -25,26 +25,22 @@ import {
   IconSwitch2,
   IconUser,
 } from "@tabler/icons-react";
-import {
-  Outlet,
-  ReactNode,
-  useNavigate,
-  useRouter,
-} from "@tanstack/react-router";
+import { Outlet, useNavigate, useRouter } from "@tanstack/react-router";
 import clsx from "clsx";
+import { ReactNode } from "react";
 import { AuthClient } from "@/clients/AuthClient";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLink, AppLinks } from "@/config/AppLinks";
 import { NavbarLink } from "@/config/NavbarLinks";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
 import { Link } from "@/lib/ui/links/Link";
 import { Modal } from "@/lib/ui/Modal";
+import { Workspace } from "@/models/Workspace/types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 import { WorkspaceForm } from "../../../components/common/forms/WorkspaceForm";
-import { notifySuccess } from "../notifications/notifySuccess";
+import { notifySuccess } from "../notifications/notify";
 import css from "./AppShell.module.css";
 
 const HEADER_DEFAULT_HEIGHT = 60;
@@ -53,6 +49,11 @@ const ASIDE_DEFAULT_WIDTH = 300;
 const NAVBAR_DEFAULT_WIDTH = 220;
 
 type Props = {
+  /**
+   * The main content of the app shell.
+   * Defaults to `<Outlet />` so it can be used in a router.
+   */
+  children?: ReactNode;
   title?: string;
   headerHeight?: number;
   footerHeight?: number;
@@ -67,7 +68,7 @@ type Props = {
    * The main content of the app shell.
    * Defaults to `<Outlet />` so it can be used in a router.
    */
-  mainContent?: ReactNode;
+  currentWorkspace?: Workspace;
 };
 
 /**
@@ -80,12 +81,13 @@ export function AppShell({
   footerHeight = FOOTER_DEFAULT_HEIGHT,
   asideWidth = ASIDE_DEFAULT_WIDTH,
   navbarWidth = NAVBAR_DEFAULT_WIDTH,
+  children = <Outlet />,
   title,
   profileLink,
   spotlightActions,
   navbarLinks,
+  currentWorkspace,
   utilityLinks = [],
-  mainContent = <Outlet />,
 }: Props): JSX.Element {
   const router = useRouter();
   const [opened, open, close] = useBoolean(false);
@@ -106,8 +108,6 @@ export function AppShell({
   const [userWorkspaces] = WorkspaceClient.useGetWorkspacesOfCurrentUser({
     useQueryOptions: { staleTime: Infinity },
   });
-
-  const currentWorkspace = useCurrentWorkspace();
 
   const [sendSignOutRequest, isSignOutPending] = useMutation({
     mutationFn: async () => {
@@ -241,7 +241,10 @@ export function AppShell({
                                 onClick={() => {
                                   navigate(AppLinks.workspaceHome(ws.slug));
                                 }}
-                                disabled={ws.slug === currentWorkspace.slug}
+                                disabled={
+                                  currentWorkspace &&
+                                  ws.slug === currentWorkspace.slug
+                                }
                               >
                                 {ws.name}
                               </Menu.Item>
@@ -322,7 +325,7 @@ export function AppShell({
         </MantineAppShell.Navbar>
 
         <MantineAppShell.Main py="0" pr="0" ml={-16}>
-          {mainContent}
+          {children}
         </MantineAppShell.Main>
       </MantineAppShell>
       <Modal opened={opened} onClose={close}>

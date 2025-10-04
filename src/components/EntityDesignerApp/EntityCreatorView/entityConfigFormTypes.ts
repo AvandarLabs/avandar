@@ -3,21 +3,24 @@ import { SetOptional, SetRequired } from "type-fest";
 import { FormType } from "@/lib/hooks/ui/useForm";
 import { Expect } from "@/lib/types/testUtilityTypes";
 import { uuid } from "@/lib/utils/uuid";
+import { Dataset, DatasetWithColumns } from "@/models/datasets/Dataset";
+import {
+  DatasetColumn,
+  DatasetColumnId,
+} from "@/models/datasets/DatasetColumn";
+import { getEntityFieldBaseDataType } from "@/models/datasets/DatasetColumn/utils";
+import {
+  EntityConfig,
+  EntityConfigId,
+} from "@/models/EntityConfig/EntityConfig.types";
 import {
   EntityFieldConfig,
   EntityFieldConfigId,
 } from "@/models/EntityConfig/EntityFieldConfig/types";
-import { EntityConfig, EntityConfigId } from "@/models/EntityConfig/types";
 import { AggregationExtractor } from "@/models/EntityConfig/ValueExtractor/AggregationExtractor/types";
 import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/types";
 import { ManualEntryExtractor } from "@/models/EntityConfig/ValueExtractor/ManualEntryExtractor/types";
 import { EntityFieldValueExtractorRegistry } from "@/models/EntityConfig/ValueExtractor/types";
-import {
-  LocalDatasetField,
-  LocalDatasetFieldId,
-} from "@/models/LocalDataset/LocalDatasetField/types";
-import { getEntityFieldBaseDataType } from "@/models/LocalDataset/LocalDatasetField/utils";
-import { LocalDataset } from "@/models/LocalDataset/types";
 
 export type EntityFieldFormValues = SetRequired<
   SetOptional<EntityFieldConfig<"Insert">, "workspaceId">,
@@ -54,9 +57,7 @@ export type EntityConfigFormValues = SetOptional<
   SetRequired<EntityConfig<"Insert">, "id">,
   "workspaceId"
 > & {
-  /**
-   * The id of the field that should be used as the title field
-   */
+  /** The id of the field that should be used as the title field */
   titleFieldId: EntityFieldConfigId | undefined;
 
   /**
@@ -65,8 +66,8 @@ export type EntityConfigFormValues = SetOptional<
    * coupled with the id of the column to use as the primary key.
    */
   sourceDatasets: Array<{
-    dataset: LocalDataset;
-    primaryKeyColumnId?: LocalDatasetFieldId;
+    dataset: DatasetWithColumns;
+    primaryKeyColumnId?: DatasetColumnId;
   }>;
   datasetColumnFields: EntityFieldFormValues[];
   manualEntryFields: EntityFieldFormValues[];
@@ -105,8 +106,8 @@ export function makeDefaultDatasetColumnField({
 }: {
   entityConfigId: EntityConfigId;
   name: string;
-  dataset: LocalDataset;
-  datasetColumn: LocalDatasetField;
+  dataset: Dataset;
+  datasetColumn: DatasetColumn;
   isIdField?: boolean;
 }): EntityFieldFormValues {
   const entityFieldConfigId: EntityFieldConfigId = uuid();

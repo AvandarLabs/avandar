@@ -2,9 +2,9 @@ import { APITypeDef } from "../_shared/MiniServer/api.types.ts";
 
 export type API = APITypeDef<{
   "google-sheets": {
-    "/:id/preview": {
+    "/:id": {
       returnType: {
-        rows: unknown[];
+        rows: unknown[][];
         sheetName: string;
         spreadsheetName: string;
         availableSheets: Array<{

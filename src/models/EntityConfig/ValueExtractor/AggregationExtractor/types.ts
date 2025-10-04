@@ -1,10 +1,10 @@
 import { SetOptional, Simplify } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
-import { LocalDatasetId } from "@/models/LocalDataset/types";
+import { DatasetId } from "@/models/datasets/Dataset";
+import { DatasetColumnId } from "@/models/datasets/DatasetColumn";
 import { WorkspaceId } from "@/models/Workspace/types";
 import { EntityFieldConfigId } from "../../EntityFieldConfig/types";
 import type { JSONValue, UUID } from "@/lib/types/common";
-import type { LocalDatasetFieldId } from "@/models/LocalDataset/LocalDatasetField/types";
 
 export type AggregationExtractorId = UUID<"AggregationExtractor">;
 export type AggregationType = "sum" | "max" | "count";
@@ -29,10 +29,10 @@ type AggregationExtractorRead = {
   aggregationType: AggregationType;
 
   /** ID of the dataset to extract from */
-  datasetId: LocalDatasetId;
+  datasetId: DatasetId;
 
   /** ID of the specific field in the dataset to aggregate */
-  datasetFieldId: LocalDatasetFieldId;
+  datasetFieldId: DatasetColumnId;
 
   /** Filter to apply before aggregation */
   filter: JSONValue | undefined;

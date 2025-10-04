@@ -1,20 +1,29 @@
-import { Button, Stack, TextInput, Title } from "@mantine/core";
+import {
+  Button,
+  Group,
+  NumberInput,
+  ScrollArea,
+  Stack,
+  TextInput,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { invariant, useNavigate } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/types";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useMutation } from "@/lib/hooks/query/useMutation";
-import { RawDataRecordRow } from "@/lib/types/common";
+import { UnknownObject } from "@/lib/types/common";
+import { Callout } from "@/lib/ui/Callout";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
-import { notifyError } from "@/lib/ui/notifications/notifyError";
-import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
+import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
+import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
-import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
-import { LocalDataset } from "@/models/LocalDataset/types";
+import { Dataset } from "@/models/datasets/Dataset";
+import { DetectedDatasetColumn } from "../../hooks/detectColumnDataTypes";
 
-export type DatasetUploadForm = {
+export type DatasetUploadFormValues = {
   name: string;
   description: string;
 };
@@ -22,55 +31,50 @@ export type DatasetUploadForm = {
 const { maxDatasetNameLength, maxDatasetDescriptionLength } =
   AppConfig.dataManagerApp;
 
+const TOO_MANY_ERRORS_THRESHOLD = 1000;
+
 type Props = {
   /**
    * Regardless of how many rows are passed in, only the first
    * `AppConfig.dataManagerApp.maxPreviewRows` will be displayed.
    */
-  rows: RawDataRecordRow[];
+  rows: UnknownObject[];
   defaultName: string;
-  fields: readonly LocalDatasetField[];
-  additionalDatasetSaveCallback?: (
-    values: DatasetUploadForm,
-  ) => Promise<LocalDataset>;
+  // TODO(jpsyx): this should be a DatasetColumn<"Insert"> type
+  columns: readonly DetectedDatasetColumn[];
+  doDatasetSave: (
+    datasetFormValues: DatasetUploadFormValues,
+  ) => Promise<Dataset>;
   disableSubmit?: boolean;
+  loadCSVResult: DuckDBLoadCSVResult;
+
+  /** When the user requests to parse the data again. */
+  onRequestDataParse: (parseConfig: {
+    numRowsToSkip: number;
+    delimiter: string;
+  }) => void;
+  isProcessing?: boolean;
 };
 
 export function DatasetUploadForm({
   rows,
-  fields,
+  columns,
   defaultName,
-  additionalDatasetSaveCallback,
+  doDatasetSave,
   disableSubmit,
+  loadCSVResult,
+  onRequestDataParse,
+  isProcessing = false,
 }: Props): JSX.Element {
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
-
-  // TODO(jpsyx): add this back once we have a DatasetClient
-  const [saveDataset, isSavePending] = useMutation<
-    LocalDataset,
-    DatasetUploadForm,
-    unknown
-  >({
-    mutationFn: async (values: DatasetUploadForm) => {
-      invariant(
-        additionalDatasetSaveCallback,
-        "No dataset save callback provided",
-      );
-
-      const savedDataset = await additionalDatasetSaveCallback(values);
-
-      return savedDataset;
-    },
+  const [numRowsToSkip, setNumRowsToSkip] = useState(
+    loadCSVResult.csvSniff.SkipRows,
+  );
+  const [delimiter, setDelimiter] = useState(loadCSVResult.csvSniff.Delimiter);
+  const [saveDataset, isSavePending] = useMutation({
+    mutationFn: doDatasetSave,
     onSuccess: async (savedDataset) => {
-      if (!savedDataset?.id) {
-        notifyError({
-          title: "Routing failed",
-          message: "No dataset ID returned.",
-        });
-        return;
-      }
-
       notifySuccess({
         title: "Dataset saved",
         message: `Dataset "${savedDataset.name}" saved successfully`,
@@ -96,7 +100,7 @@ export function DatasetUploadForm({
     return rows.slice(0, AppConfig.dataManagerApp.maxPreviewRows);
   }, [rows]);
 
-  const form = useForm<DatasetUploadForm>({
+  const form = useForm<DatasetUploadFormValues>({
     initialValues: {
       name: defaultName,
       description: "",
@@ -114,39 +118,136 @@ export function DatasetUploadForm({
     },
   });
 
-  const columnNames = fields.map(getProp("name"));
+  const columnNames = columns.map(getProp("name"));
+
+  const renderProcessState = () => {
+    const { numRows: numSuccessRows, numRejectedRows } = loadCSVResult;
+    const formattedSuccessNum = numSuccessRows.toLocaleString();
+    const formattedRejectedNum = numRejectedRows.toLocaleString();
+
+    if (numSuccessRows === 0) {
+      return (
+        <Callout
+          title="Data processing failed"
+          color="error"
+          message="No rows were read successfully"
+        />
+      );
+    } else if (numRejectedRows === 0) {
+      return (
+        <Callout
+          title="Data processed successfully"
+          color="success"
+          message={`Parsed ${formattedSuccessNum} rows successfully`}
+        />
+      );
+    } else if (
+      numSuccessRows > numRejectedRows * 2 &&
+      numRejectedRows < TOO_MANY_ERRORS_THRESHOLD
+    ) {
+      // if the number of success rows is greater than double the number
+      // of errors, then we can say that it was mostly a success
+      return (
+        <Callout
+          title="Data processed successfully with some errors"
+          color="warning"
+          message={`Parsed ${formattedSuccessNum} rows successfully, but ${formattedRejectedNum} rows were rejected`}
+        />
+      );
+    }
+    return (
+      <Callout
+        title="Data processed successfully with a large number of errors"
+        color="warning"
+        message={`Parsed ${formattedSuccessNum} rows successfully, but ${
+          numRejectedRows > 1000 ?
+            " over 1000 rows were rejected"
+          : ` ${formattedRejectedNum} rows were rejected`
+        }`}
+      />
+    );
+  };
+
   return (
-    <Stack w="100%">
-      <Title order={3}>Data Preview</Title>
-      <DataGrid columnNames={columnNames} data={previewRows} />
-      <form
-        onSubmit={form.onSubmit((values) => {
-          saveDataset(values);
-        })}
-      >
-        <Stack>
-          <TextInput
-            key={form.key("name")}
-            label="Dataset Name"
-            placeholder="Enter a name for this dataset"
-            required
-            {...form.getInputProps("name")}
+    <form
+      onSubmit={form.onSubmit((values) => {
+        saveDataset(values);
+      })}
+    >
+      <Stack>
+        <TextInput
+          key={form.key("name")}
+          label="Dataset Name"
+          placeholder="Enter a name for this dataset"
+          required
+          {...form.getInputProps("name")}
+        />
+        <TextInput
+          key={form.key("description")}
+          label="Description"
+          placeholder="Enter a description for this dataset"
+          {...form.getInputProps("description")}
+        />
+
+        {renderProcessState()}
+
+        <Callout
+          title="Data Preview"
+          color="info"
+          message={`These are the first ${rows.length} rows of your dataset.
+            Check to see if the data is correct. If they are not, it's possible
+            your dataset does not start on the first row or the CSV uses a different.
+            delimiter. Try adjusting those settings here.`}
+        >
+          <Group align="flex-end">
+            <NumberInput
+              label="Number of rows to skip"
+              value={numRowsToSkip}
+              onChange={(value) => {
+                return setNumRowsToSkip(Number(value));
+              }}
+            />
+            <TextInput
+              label="Delimiter"
+              value={delimiter}
+              onChange={(e) => {
+                return setDelimiter(e.target.value);
+              }}
+            />
+            <Button
+              onClick={() => {
+                return onRequestDataParse({
+                  numRowsToSkip,
+                  delimiter,
+                });
+              }}
+              loading={isProcessing}
+              disabled={isProcessing}
+            >
+              Process data again
+            </Button>
+          </Group>
+        </Callout>
+        <DataGrid columnNames={columnNames} data={previewRows} />
+        <Callout
+          title="Column info"
+          color="info"
+          message={`${columns.length} columns were detected. Review the column
+            info below to make sure they are correct. If they are not, change
+            the import options above and click Upload again.`}
+        />
+        <ScrollArea h={500} type="auto">
+          <ObjectDescriptionList
+            data={columns}
+            renderAsTable
+            itemRenderOptions={{ excludeKeys: ["columnIdx"] }}
           />
-          <TextInput
-            key={form.key("description")}
-            label="Description"
-            placeholder="Enter a description for this dataset"
-            {...form.getInputProps("description")}
-          />
-          <Button
-            loading={isSavePending}
-            type="submit"
-            disabled={disableSubmit}
-          >
-            Save Dataset
-          </Button>
-        </Stack>
-      </form>
-    </Stack>
+        </ScrollArea>
+
+        <Button loading={isSavePending} type="submit" disabled={disableSubmit}>
+          Save Dataset
+        </Button>
+      </Stack>
+    </form>
   );
 }

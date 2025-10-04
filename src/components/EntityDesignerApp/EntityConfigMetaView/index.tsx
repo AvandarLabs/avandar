@@ -2,14 +2,15 @@ import { Button, Container, Group, Stack, Text, Title } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
-import { ChildRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
+import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
 import { Paper } from "@/lib/ui/Paper";
 import { hasDefinedProps } from "@/lib/utils/guards";
+import { EntityConfig } from "@/models/EntityConfig/EntityConfig.types";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
-import { EntityConfig } from "@/models/EntityConfig/types";
 import { generateEntities } from "./generateEntities";
 import { useHydratedEntityConfig } from "./useHydratedEntityConfig";
 
@@ -23,7 +24,7 @@ const EXCLUDED_ENTITY_CONFIG_KEYS = [
   "datasets",
   "workspaceId",
 ] as const;
-const ENTITY_CONFIG_RENDER_OPTIONS: ChildRenderOptionsMap<
+const ENTITY_CONFIG_RENDER_OPTIONS: ObjectKeyRenderOptionsMap<
   EntityConfig<"Full">
 > = {
   fields: {
@@ -31,7 +32,7 @@ const ENTITY_CONFIG_RENDER_OPTIONS: ChildRenderOptionsMap<
     defaultExpanded: false,
     itemRenderOptions: {
       excludeKeys: ["id", "entityConfigId"],
-      childRenderOptions: {
+      keyRenderOptions: {
         options: {
           excludeKeys: ["class"],
         },
@@ -46,9 +47,10 @@ const ENTITY_CONFIG_RENDER_OPTIONS: ChildRenderOptionsMap<
 export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
-  const [sendDelete, isDeletePending] = EntityConfigClient.useFullDelete({
-    invalidateGetAllQuery: true,
+  const [sendDelete, isDeletePending] = EntityConfigClient.useDelete({
+    queriesToInvalidate: [EntityConfigClient.QueryKeys.getAll()],
   });
+  const [isGeneratingEntities, setIsGeneratingEntities] = useState(false);
 
   const [fullEntityConfig] = useHydratedEntityConfig({
     entityConfig,
@@ -61,19 +63,22 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
           <Group>
             <Title order={2}>{entityConfig.name}</Title>
             <Button
+              loading={isGeneratingEntities}
               onClick={async () => {
                 // generate all entities in-browser and in-memory for now
-                if (hasDefinedProps(fullEntityConfig, "datasets", "fields")) {
+                if (hasDefinedProps(fullEntityConfig, ["datasets", "fields"])) {
                   const newFields = fullEntityConfig.fields.filter((field) => {
                     return hasDefinedProps(field, "valueExtractor");
                   });
 
                   // TODO(jpsyx): make this a mutation so you can show a loading
                   // spinner by using `isPending`
+                  setIsGeneratingEntities(true);
                   await generateEntities({
                     ...fullEntityConfig,
                     fields: newFields,
                   });
+                  setIsGeneratingEntities(false);
 
                   notifications.show({
                     title: "Entities generated",
@@ -97,7 +102,7 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
           <ObjectDescriptionList
             data={fullEntityConfig}
             excludeKeys={EXCLUDED_ENTITY_CONFIG_KEYS}
-            childRenderOptions={ENTITY_CONFIG_RENDER_OPTIONS}
+            keyRenderOptions={ENTITY_CONFIG_RENDER_OPTIONS}
           />
 
           <Button

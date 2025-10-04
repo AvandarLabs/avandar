@@ -1,18 +1,31 @@
-import { useMemo } from "react";
+import { Outlet } from "@tanstack/react-router";
+import { ReactNode, useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AppShell } from "@/lib/ui/AppShell";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
+import { DataExplorerProvider } from "../DataExplorerApp/DataExplorerContext";
 import { useSpotlightActions } from "./useSpotlightActions";
 
-export function WorkspaceAppLayout(): JSX.Element {
+type Props = {
+  /**
+   * The main content of the app shell.
+   * Defaults to `<Outlet />` so it can be used in a router.
+   */
+  children?: ReactNode;
+};
+
+export function WorkspaceAppLayout({
+  children = <Outlet />,
+}: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
   const [entityConfigs] = EntityConfigClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
   const spotlightActions = useSpotlightActions(workspace.slug);
+
   const entityManagerLinks: NavbarLink[] = useMemo(() => {
     return (entityConfigs ?? []).map((entityConfig) => {
       const navLink = NavbarLinks.entityManagerHome({
@@ -20,10 +33,7 @@ export function WorkspaceAppLayout(): JSX.Element {
         entityConfigId: entityConfig.id,
         entityConfigName: entityConfig.name,
       });
-      return {
-        link: navLink.link,
-        icon: navLink.icon,
-      };
+      return { link: navLink.link, icon: navLink.icon };
     });
   }, [workspace.slug, entityConfigs]);
 
@@ -46,12 +56,17 @@ export function WorkspaceAppLayout(): JSX.Element {
   }, [workspace.slug]);
 
   return (
-    <AppShell
-      title={workspace.name}
-      profileLink={profileLink}
-      navbarLinks={mainNavBarLinks}
-      utilityLinks={utilityNavBarLinks}
-      spotlightActions={spotlightActions}
-    />
+    <DataExplorerProvider>
+      <AppShell
+        title={workspace.name}
+        currentWorkspace={workspace}
+        profileLink={profileLink}
+        navbarLinks={mainNavBarLinks}
+        utilityLinks={utilityNavBarLinks}
+        spotlightActions={spotlightActions}
+      >
+        {children}
+      </AppShell>
+    </DataExplorerProvider>
   );
 }

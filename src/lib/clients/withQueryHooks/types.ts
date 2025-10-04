@@ -172,23 +172,32 @@ export type WithQueryHooks<
      * that create new clients where all non-hook queries are wrapped in
      * the specified queryClient function.
      *
-     * Example:
+     * This is helpful so you can use your clients in a route's loader
+     * and also in the React components, but have them use the same cache.
+     *
+     * **NOTE**: this function is only wrapping the query functions, not the
+     * mutation functions.
+     *
+     * Examples:
      * ```ts
      *   await MyClient
-     *     .withQueryClient(queryClient)
+     *     .withCache(queryClient)
      *     .withEnsureQueryData()
      *     .getAll();
      * ```
      *
-     * The above will call `.getAll()` but will be wrapped in
-     * `queryClient.ensureQueryData` so it will use react-query's caching
-     * logic.
+     * The above will call `.getAll()`, but will wrap it in
+     * `queryClient.ensureQueryData` so it can use react-query's caching logic.
      *
-     * This is helpful so you can use your clients in a route's loader
-     * and also in the React components, but have them use the same cache.
+     * ```ts
+     *   await MyClient
+     *     .withCache(queryClient)
+     *     .withFetchQuery()
+     *     .getAll();
+     * ```
      *
-     * NOTE: this function is only wrapping the query functions, not the
-     * mutation functions.
+     * The above will call `.getAll()` but will wrap it in
+     * `queryClient.fetchQuery` so it can use react-query's caching logic.
      *
      * @param queryClient The query client to use.
      * @returns A new client with query functions wrapped in
@@ -213,6 +222,9 @@ export type ClientWithCache<
    * `ensureQueryData` will always return data if it exists
    * in the cache, even if the data is stale. Data will only
    * be refetched if the query does not exist in the cache.
+   *
+   * For a deeper explanation of how `ensureQueryData` works, see the
+   * [Tanstack Query documentation](https://tanstack.com/query/v4/docs/reference/QueryClient#queryclientensurequerydata)
    */
   withEnsureQueryData: () => ClientWithCache<ClientWithQueries>;
 
@@ -223,6 +235,9 @@ export type ClientWithCache<
    * `fetchQuery` will return data from the cache **only**
    * if the query has not been invalidated and the data is not
    * stale. Otherwise it will refetch.
+   *
+   * For a deeper explanation of how `fetchQuery` works, see the
+   * [Tanstack Query documentation](https://tanstack.com/query/v4/docs/reference/QueryClient#queryclientfetchquery)
    */
   withFetchQuery: () => ClientWithCache<ClientWithQueries>;
 };

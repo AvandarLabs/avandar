@@ -10,8 +10,33 @@ import { WithLogger, withLogger } from "./withLogger";
 import { HookableFnName, WithQueryHooks } from "./withQueryHooks/types";
 import { withQueryHooks } from "./withQueryHooks/withQueryHooks";
 
+export type UpsertOptions = {
+  /** Whether to upsert the model if it already exists */
+  upsert?: boolean;
+
+  /**
+   * The options to use for conflict resolution in an upsert.
+   * This is only used if `upsert` is true.
+   */
+  onConflict?: {
+    /**
+     * The column names to check that determine if a row is a duplicate.
+     * In Supabase and Postgres, these columns are required to have
+     * UNIQUE constraints.
+     */
+    columnNames: string[];
+
+    /**
+     * What to do if a conflict is found on `conflictNames`. If
+     * true, the duplicate row is ignored. If false, duplicate rows
+     * are merged with existing rows (an Update operation).
+     */
+    ignoreDuplicates: boolean;
+  };
+};
+
 export type ModelCRUDPage<ModelRead> = {
-  /** The rows in the pagef */
+  /** The rows in the page */
   rows: ModelRead[];
 
   /**
@@ -42,6 +67,19 @@ export type ModelCRUDPage<ModelRead> = {
  * hooks.
  */
 export type BaseModelCRUDClient<M extends ModelCRUDTypes> = {
+  /** The parsers for the model */
+  parsers: ModelCRUDParserRegistry<M>;
+
+  /**
+   * The CRUD functions for the model, in case we need to work directly
+   * with the CRUD-level functions and types.
+   */
+  crudFunctions: CreateModelCRUDClientOptions<
+    M,
+    EmptyObject,
+    EmptyObject
+  >["crudFunctions"];
+
   /**
    * Retrieves a single model instance by its ID.
    * @param params - The parameters for the operation
@@ -101,21 +139,65 @@ export type BaseModelCRUDClient<M extends ModelCRUDTypes> = {
   }): Promise<Array<M["Read"]>>;
 
   /**
+   * Retrieves a single instance of a model.
+   *
+   * @param params Optional params for the query
+   * @param params.where Filters to apply. If multiple instances pass the
+   * filter, the first instance is returned.
+   *
+   * @returns A promise resolving to the model instance or undefined
+   * if not found. If multiple instances pass the `where` filter, only
+   * the first instance is returned.
+   */
+  getOne(params: {
+    where?: FiltersByColumn<M["DBRead"]>;
+  }): Promise<M["Read"] | undefined>;
+
+  /**
    * Creates a new model instance in the data store.
-   * @param data - The data to insert for the new model instance
+   * @param params - The parameters for the operation
+   * @param params.data - The data to insert for the new model instance
+   * @param params.upsert - Whether to upsert the model if it already exists
+   * @param params.onConflict - The options to use for conflict resolution
+   * in an upsert. This is only used if `upsert` is true.
+   * @param params.onConflict.columnNames - The column names to check that
+   * determine if a row is a duplicate. In Supabase and Postgres, these
+   * columns are required to have UNIQUE constraints.
+   * @param params.onConflict.ignoreDuplicates - What to do if a conflict is
+   * found on `conflictNames`. If true, the duplicate row is ignored. If
+   * false, duplicate rows are merged with existing rows (an Update operation).
+   *
    * @returns A promise resolving to the created model instance
    */
-  insert(params: { data: M["Insert"] }): Promise<M["Read"]>;
+  insert(params: {
+    data: M["Insert"];
+    upsert?: boolean;
+    onConflict?: {
+      columnNames: string[];
+      ignoreDuplicates: boolean;
+    };
+  }): Promise<M["Read"]>;
 
   /**
    * Inserts multiple new model instances in the data store.
    * @param params - The parameters for the operation
    * @param params.data - An array of data objects to insert.
+   * @param params.upsert - Whether to upsert the model if it already exists
+   * @param params.onConflict - The options to use for conflict resolution
+   * in an upsert. This is only used if `upsert` is true.
+   * @param params.onConflict.columnNames - The column names to check that
+   * determine if a row is a duplicate. In Supabase and Postgres, these
+   * columns are required to have UNIQUE constraints.
+   * @param params.onConflict.ignoreDuplicates - What to do if a conflict is
+   * found on `conflictNames`. If true, the duplicate row is ignored. If
+   * false, duplicate rows are merged with existing rows (an Update operation).
    * @returns A promise resolving to an array of the created model instances
    */
-  bulkInsert(params: {
-    data: ReadonlyArray<M["Insert"]>;
-  }): Promise<Array<M["Read"]>>;
+  bulkInsert(
+    params: UpsertOptions & {
+      data: ReadonlyArray<M["Insert"]>;
+    },
+  ): Promise<Array<M["Read"]>>;
 
   /**
    * Updates an existing model instance with the provided data.
@@ -207,44 +289,53 @@ type CreateModelCRUDClientOptions<
     clientLogger: ILogger;
   }) => ExtendedMutationsClient;
 
-  // `Get` queries
-  getById: (params: {
-    id: M["modelPrimaryKeyType"] | null | undefined;
-    logger: ILogger;
-  }) => Promise<M["DBRead"] | undefined>;
-  getCount: (params: {
-    where?: FiltersByColumn<M["DBRead"]>;
-    logger: ILogger;
-  }) => Promise<number | null>;
-  getPage: (params: {
-    where?: FiltersByColumn<M["DBRead"]>;
-    pageSize: number;
-    pageNum: number;
-    logger: ILogger;
-  }) => Promise<Array<M["DBRead"]>>;
+  crudFunctions: {
+    // `Get` queries
+    getById: (params: {
+      id: M["modelPrimaryKeyType"] | null | undefined;
+      logger: ILogger;
+    }) => Promise<M["DBRead"] | undefined>;
+    getCount: (params: {
+      where?: FiltersByColumn<M["DBRead"]>;
+      logger: ILogger;
+    }) => Promise<number | null>;
+    getPage: (params: {
+      where?: FiltersByColumn<M["DBRead"]>;
+      pageSize: number;
+      pageNum: number;
+      logger: ILogger;
+    }) => Promise<Array<M["DBRead"]>>;
 
-  // Mutations
-  insert: (params: {
-    data: M["DBInsert"];
-    logger: ILogger;
-  }) => Promise<M["DBRead"]>;
-  bulkInsert: (params: {
-    data: ReadonlyArray<M["DBInsert"]>;
-    logger: ILogger;
-  }) => Promise<Array<M["DBRead"]>>;
-  update: (params: {
-    id: M["modelPrimaryKeyType"];
-    data: M["DBUpdate"];
-    logger: ILogger;
-  }) => Promise<M["DBRead"]>;
-  delete: (params: {
-    id: M["modelPrimaryKeyType"];
-    logger: ILogger;
-  }) => Promise<void>;
-  bulkDelete: (params: {
-    ids: ReadonlyArray<M["modelPrimaryKeyType"]>;
-    logger: ILogger;
-  }) => Promise<void>;
+    // Mutations
+    insert: (params: {
+      data: M["DBInsert"];
+      upsert?: boolean;
+      onConflict?: {
+        columnNames: string[];
+        ignoreDuplicates: boolean;
+      };
+      logger: ILogger;
+    }) => Promise<M["DBRead"]>;
+    bulkInsert: (
+      params: UpsertOptions & {
+        data: ReadonlyArray<M["DBInsert"]>;
+        logger: ILogger;
+      },
+    ) => Promise<Array<M["DBRead"]>>;
+    update: (params: {
+      id: M["modelPrimaryKeyType"];
+      data: M["DBUpdate"];
+      logger: ILogger;
+    }) => Promise<M["DBRead"]>;
+    delete: (params: {
+      id: M["modelPrimaryKeyType"];
+      logger: ILogger;
+    }) => Promise<void>;
+    bulkDelete: (params: {
+      ids: ReadonlyArray<M["modelPrimaryKeyType"]>;
+      logger: ILogger;
+    }) => Promise<void>;
+  };
 };
 
 export function createModelCRUDClient<
@@ -257,7 +348,7 @@ export function createModelCRUDClient<
   parsers,
   additionalQueries,
   additionalMutations,
-  ...crudFns
+  crudFunctions,
 }: CreateModelCRUDClientOptions<
   M,
   ExtendedQueriesClient,
@@ -275,7 +366,7 @@ export function createModelCRUDClient<
     const { pageNum, pageSize, logger } = params;
 
     logger.log("Calling `getPage` with params", omit(params, "logger"));
-    const pageRows = await crudFns.getPage(params);
+    const pageRows = await crudFunctions.getPage(params);
 
     logger.log(
       `Received ${modelName} DBRead page[${pageNum}] from database. Row count: ${pageRows.length}`,
@@ -292,7 +383,7 @@ export function createModelCRUDClient<
         totalRows = pageRows.length;
       } else {
         totalRows =
-          (await crudFns.getCount({
+          (await crudFunctions.getCount({
             where: params.where,
             logger,
           })) ?? 0;
@@ -329,13 +420,14 @@ export function createModelCRUDClient<
 
     const modelClient = {
       ...baseClient,
+      crudFunctions,
       getById: async (params: {
         id: M["modelPrimaryKeyType"] | null | undefined;
       }): Promise<M["Read"] | undefined> => {
         const logger = baseLogger.appendName("getById");
 
         logger.log("Calling `getById` with params", params);
-        const dbRow = await crudFns.getById({
+        const dbRow = await crudFunctions.getById({
           id: params.id,
           logger,
         });
@@ -358,7 +450,7 @@ export function createModelCRUDClient<
         const logger = baseLogger.appendName("getCount");
 
         logger.log("Calling `getCount` with params", params);
-        const count = await crudFns.getCount({
+        const count = await crudFunctions.getCount({
           where: params.where,
           logger,
         });
@@ -422,16 +514,43 @@ export function createModelCRUDClient<
         return allRows;
       },
 
-      insert: async (params: { data: M["Insert"] }): Promise<M["Read"]> => {
+      getOne: async (
+        params: {
+          where?: FiltersByColumn<M["DBRead"]>;
+        } = {},
+      ): Promise<M["Read"] | undefined> => {
+        const logger = baseLogger.appendName("getOne");
+
+        logger.log("Calling `getOne` with params", params);
+        const page = await _getPage({
+          where: params.where,
+          pageSize: 1,
+          pageNum: 0,
+          logger,
+          totalRows: 1,
+        });
+
+        const model = page.rows[0];
+        logger.log(`Received ${modelName} Read`, model);
+        return model;
+      },
+
+      insert: async (
+        params: UpsertOptions & {
+          data: M["Insert"];
+        },
+      ): Promise<M["Read"]> => {
         const logger = baseLogger.appendName("insert");
 
         logger.log("Calling `insert` with params", params);
-        const dbDataToInsert = parsers.fromModelInsertToDBInsert(params.data);
+        const { data, ...upsertOptions } = params;
+        const dbDataToInsert = parsers.fromModelInsertToDBInsert(data);
 
         logger.log(`Sending ${modelName} DBInsert to database`, dbDataToInsert);
-        const insertedData = await crudFns.insert({
+        const insertedData = await crudFunctions.insert({
           data: dbDataToInsert,
           logger,
+          ...upsertOptions,
         });
 
         logger.log(`Received ${modelName} DBRead`, insertedData);
@@ -441,9 +560,11 @@ export function createModelCRUDClient<
         return insertedModel;
       },
 
-      bulkInsert: async (params: {
-        data: ReadonlyArray<M["Insert"]>;
-      }): Promise<Array<M["Read"]>> => {
+      bulkInsert: async (
+        params: UpsertOptions & {
+          data: ReadonlyArray<M["Insert"]>;
+        },
+      ): Promise<Array<M["Read"]>> => {
         const logger = baseLogger.appendName("bulkInsert");
 
         logger.log("Calling `bulkInsert` with params", params);
@@ -455,7 +576,7 @@ export function createModelCRUDClient<
           `Sending ${modelName} DBInsert list to database`,
           dbDataToInsert,
         );
-        const insertedData = await crudFns.bulkInsert({
+        const insertedData = await crudFunctions.bulkInsert({
           data: dbDataToInsert,
           logger,
         });
@@ -478,7 +599,7 @@ export function createModelCRUDClient<
         const dbDataToUpdate = parsers.fromModelUpdateToDBUpdate(params.data);
 
         logger.log(`Sending ${modelName} DBUpdate to database`, dbDataToUpdate);
-        const updatedData = await crudFns.update({
+        const updatedData = await crudFunctions.update({
           id: params.id,
           data: dbDataToUpdate,
           logger,
@@ -496,7 +617,7 @@ export function createModelCRUDClient<
       }): Promise<void> => {
         const logger = baseLogger.appendName("delete");
         logger.log("Calling `delete` with params", params);
-        await crudFns.delete({
+        await crudFunctions.delete({
           id: params.id,
           logger,
         });
@@ -508,7 +629,7 @@ export function createModelCRUDClient<
       }): Promise<void> => {
         const logger = baseLogger.appendName("bulkDelete");
         logger.log("Calling `bulkDelete` with params", params);
-        await crudFns.bulkDelete({
+        await crudFunctions.bulkDelete({
           ids: params.ids,
           logger,
         });
@@ -531,6 +652,7 @@ export function createModelCRUDClient<
     return {
       ...baseClient,
       ...modelClientWithHooks,
+      parsers,
 
       // Using `any` here only because TypeScript is struggling with the
       // complexity of the generics and function name extractions.
@@ -547,6 +669,7 @@ export const DEFAULT_QUERY_FN_NAMES = [
   "getById",
   "getPage",
   "getAll",
+  "getOne",
   "getCount",
 ] as const satisfies ReadonlyArray<
   HookableFnName<BaseModelCRUDClient<ModelCRUDTypes>>

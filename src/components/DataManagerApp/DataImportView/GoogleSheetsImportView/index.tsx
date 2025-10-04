@@ -1,67 +1,162 @@
 import { Box, BoxProps, Button, Loader, Stack, Text } from "@mantine/core";
-import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { invariant } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { LocalDatasetEntryClient } from "@/clients/datasets/LocalDatasetEntryClient";
+import { DuckDBClient } from "@/clients/DuckDBClient";
+import { DuckDBDataType } from "@/clients/DuckDBClient/DuckDBDataType";
+import { getRandomTableName } from "@/clients/DuckDBClient/getRandomTableName";
+import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/types";
+import { AppConfig } from "@/config/AppConfig";
 import { useGooglePicker } from "@/hooks/ui/useGooglePicker";
-import { useMutation } from "@/lib/hooks/query/useMutation";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useQuery } from "@/lib/hooks/query/useQuery";
+import { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import { Logger } from "@/lib/Logger";
-import { MIMEType } from "@/lib/types/common";
+import { MIMEType, UnknownObject } from "@/lib/types/common";
 import { GPickerDocumentObject } from "@/lib/types/google-picker";
-import { notifyError } from "@/lib/ui/notifications/notifyError";
-import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
-import { DangerText } from "@/lib/ui/Text/DangerText";
+import {
+  notifyError,
+  notifySuccess,
+  notifyWarning,
+} from "@/lib/ui/notifications/notify";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
+import { snakeCaseKeysShallow } from "@/lib/utils/objects/transformations";
 import { csvCellValueSchema } from "@/lib/utils/zodHelpers";
+import { Dataset } from "@/models/datasets/Dataset";
 import { unparseDataset } from "@/models/LocalDataset/utils";
+import { WorkspaceId } from "@/models/Workspace/types";
 import { APIReturnType } from "@/types/http-api.types";
-import { useCSVParser } from "../../hooks/useCSVParser";
-import { DatasetUploadForm } from "../DatasetUploadForm";
+import { DetectedDatasetColumn } from "../../hooks/detectColumnDataTypes";
+import {
+  DatasetUploadForm,
+  DatasetUploadFormValues,
+} from "../DatasetUploadForm";
 
-type SpreadsheetPreview = APIReturnType<"google-sheets/:id/preview">;
+type GoogleSpreadsheetData = APIReturnType<"google-sheets/:id">;
 
 type Props = BoxProps;
 
+async function saveGoogleSheetToBackend(params: {
+  name: string;
+  description: string;
+  googleAccount: GoogleToken;
+  googleDocument: GPickerDocumentObject;
+  columns: DetectedDatasetColumn[];
+  workspaceId: WorkspaceId;
+  loadCSVResult: DuckDBLoadCSVResult;
+}): Promise<Dataset> {
+  const {
+    name,
+    description,
+    googleAccount,
+    googleDocument,
+    columns,
+    workspaceId,
+    loadCSVResult,
+  } = params;
+  const dataset = await DatasetClient.insertGoogleSheetsDataset({
+    workspaceId: workspaceId,
+    datasetName: name,
+    datasetDescription: description,
+    googleAccountId: googleAccount.google_account_id,
+    googleDocumentId: googleDocument.id,
+    columns: columns.map(snakeCaseKeysShallow),
+    rowsToSkip: loadCSVResult.csvSniff.SkipRows ?? 0,
+  });
+
+  // now that we've persisted the dataset to the backend, let's add an entry
+  // to IndexedDB to map the datasetId to the table name, so we can always
+  // remember where a dataset's locally loaded raw data is stored.
+  await LocalDatasetEntryClient.insert({
+    data: {
+      datasetId: dataset.id,
+      localTableName: loadCSVResult.tableName,
+    },
+  });
+  return dataset;
+}
+
 export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
+  const queryClient = useQueryClient();
+  const workspace = useCurrentWorkspace();
   const [selectedDocument, setSelectedDocument] = useState<
     GPickerDocumentObject | undefined
   >();
-  const { parseCSVString, csv, fields } = useCSVParser({
-    onNoFileProvided: () => {
-      notifyError({
-        title: "No rows were found in this sheet",
-        message:
-          "Please double check that the sheet is not empty. Otherwise, contact support for help.",
-      });
-    },
-  });
-  const [spreadsheet, setSpreadsheet] = useState<
-    SpreadsheetPreview | undefined
-  >();
-  const [getSpreadsheet, isLoadingSpreadsheet] = useMutation({
-    mutationFn: async () => {
-      if (!selectedDocument) {
-        throw new Error("No spreadsheet was selected");
-      }
-      const preview = await APIClient.post("google-sheets/:id/preview", {
-        urlParams: {
-          id: selectedDocument.id,
-        },
-      });
-      return preview;
-    },
-    onSuccess: (data: SpreadsheetPreview) => {
-      setSpreadsheet(data);
-      notifySuccess({
-        title: "Spreadsheet preview",
-        message: data?.sheetName,
+
+  const selectedDocumentId = selectedDocument?.id;
+  const [parseOptions, setParseOptions] = useState<{
+    fileText: string;
+    localTableName: string;
+    spreadsheetName: string;
+    numRowsToSkip?: number;
+    delimiter?: string;
+  }>();
+
+  const [spreadsheet, isLoadingSpreadsheet] = useQuery({
+    queryKey: ["google-sheets", selectedDocumentId],
+    queryFn: async (): Promise<GoogleSpreadsheetData> => {
+      invariant(selectedDocumentId, "A spreadsheet must be selected");
+      const googleSpreadsheet = await APIClient.get("google-sheets/:id", {
+        urlParams: { id: selectedDocumentId },
       });
       const csvString = unparseDataset({
         datasetType: MIMEType.APPLICATION_GOOGLE_SPREADSHEET,
-        data: z.array(z.array(csvCellValueSchema)).parse(data.rows),
+        data: z
+          .array(z.array(csvCellValueSchema))
+          .parse(googleSpreadsheet.rows),
       });
-      parseCSVString(csvString);
+      setParseOptions({
+        fileText: csvString,
+        spreadsheetName: googleSpreadsheet.spreadsheetName,
+        localTableName: getRandomTableName(),
+      });
+      return googleSpreadsheet;
     },
+    enabled: !!selectedDocumentId,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
+  });
+
+  // query to load the data locally to DuckDB
+  const [loadResults, _, loadQueryObj] = useQuery({
+    queryKey: ["load-csv-text", parseOptions],
+    queryFn: async (): Promise<
+      | { metadata: DuckDBLoadCSVResult; previewRows: UnknownObject[] }
+      | undefined
+    > => {
+      if (!parseOptions) {
+        return undefined;
+      }
+      const { fileText, localTableName, numRowsToSkip, delimiter } =
+        parseOptions;
+      const loadResult = await DuckDBClient.loadCSV({
+        fileText,
+        numRowsToSkip,
+        delimiter,
+        tableName: localTableName,
+      });
+      const previewData = await DuckDBClient.runRawQuery(
+        `SELECT * FROM "$tableName$" LIMIT $maxPreviewRows$`,
+        {
+          tableName: localTableName,
+          maxPreviewRows: AppConfig.dataManagerApp.maxPreviewRows,
+        },
+      );
+      return { metadata: loadResult, previewRows: previewData.data };
+    },
+    enabled: !!parseOptions,
+    // this ensures that we dont immediately set `loadResults` to undefined when
+    // the `parseOptions` change.
+    placeholderData: (prevValue) => {
+      return prevValue;
+    },
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
   });
 
   const {
@@ -73,12 +168,48 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
     onGoogleSheetPicked: setSelectedDocument,
   });
 
+  // check if dataset has loaded and if so, show a notification
+  useEffect(() => {
+    if (loadResults) {
+      const {
+        metadata: { numRows: numSuccessRows, numRejectedRows },
+      } = loadResults;
+      if (numRejectedRows === 0) {
+        notifySuccess({
+          title: "File loaded successfully",
+          message: `Parsed ${numSuccessRows} rows`,
+        });
+      } else if (numSuccessRows === 0) {
+        notifyError({
+          title: "File failed to load",
+          message: "No rows were read successfully",
+        });
+      } else {
+        notifyWarning({
+          title: "File was partially loaded",
+          message: `Parsed ${numSuccessRows} rows successfully, but ${
+            numRejectedRows > 1000 ?
+              " over 1000 rows were rejected"
+            : ` ${numRejectedRows} rows were rejected`
+          }`,
+        });
+      }
+    }
+  }, [loadResults]);
+
+  const detectedColumns = useMemo(() => {
+    return loadResults?.metadata?.columns.map((duckColumn, idx) => {
+      return {
+        name: duckColumn.column_name,
+        dataType: DuckDBDataType.toDatasetDataType(duckColumn.column_type),
+        columnIdx: idx,
+      };
+    });
+  }, [loadResults?.metadata?.columns]);
+
   return (
     <Box {...props}>
       <Stack align="flex-start">
-        <DangerText>
-          Google Sheets connection is still under development.
-        </DangerText>
         {isLoadingGoogleAuthState ?
           <Loader />
         : isGoogleAuthenticated ?
@@ -103,14 +234,9 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
             {selectedDocument ?
               <>
                 <Text>Selected document: {selectedDocument.name}</Text>
-                <Button
-                  loading={isLoadingSpreadsheet}
-                  onClick={() => {
-                    getSpreadsheet();
-                  }}
-                >
-                  Upload
-                </Button>
+                {isLoadingSpreadsheet ?
+                  <Loader />
+                : null}
               </>
             : null}
           </>
@@ -147,12 +273,59 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
           </Button>
         }
 
-        {spreadsheet && csv ?
+        {(
+          detectedColumns &&
+          parseOptions &&
+          spreadsheet &&
+          loadResults &&
+          selectedGoogleAccount &&
+          selectedDocument
+        ) ?
           <DatasetUploadForm
-            disableSubmit
-            defaultName={spreadsheet.spreadsheetName}
-            rows={csv.data}
-            fields={fields}
+            key={loadResults.metadata.id}
+            defaultName={parseOptions.spreadsheetName}
+            rows={loadResults.previewRows}
+            columns={detectedColumns}
+            doDatasetSave={async (
+              datasetFormValues: DatasetUploadFormValues,
+            ) => {
+              const dataset = await saveGoogleSheetToBackend({
+                workspaceId: workspace.id,
+                name: datasetFormValues.name,
+                description: datasetFormValues.description,
+                googleAccount: selectedGoogleAccount,
+                googleDocument: selectedDocument,
+                columns: detectedColumns,
+                loadCSVResult: loadResults.metadata,
+              });
+              queryClient.invalidateQueries({
+                queryKey: DatasetClient.QueryKeys.getAll(),
+              });
+              return dataset;
+            }}
+            loadCSVResult={loadResults.metadata}
+            onRequestDataParse={async (parseConfig: {
+              numRowsToSkip: number;
+              delimiter: string;
+            }) => {
+              // drop the dataset so we can re-parse it from scratch
+              await DuckDBClient.dropDataset(loadResults.metadata.tableName);
+
+              setParseOptions((prevParseOptions) => {
+                if (prevParseOptions) {
+                  return {
+                    ...prevParseOptions,
+                    numRowsToSkip: parseConfig.numRowsToSkip,
+                    delimiter: parseConfig.delimiter,
+
+                    // generate a new local table name for this new parsing
+                    localTableName: getRandomTableName(),
+                  };
+                }
+                return prevParseOptions;
+              });
+            }}
+            isProcessing={loadQueryObj.isFetching}
           />
         : null}
       </Stack>

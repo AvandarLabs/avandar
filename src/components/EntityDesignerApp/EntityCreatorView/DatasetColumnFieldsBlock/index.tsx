@@ -15,25 +15,23 @@ import {
   IconCircleNumber2Filled,
 } from "@tabler/icons-react";
 import { useCallback, useMemo, useState } from "react";
-import { LocalDatasetColumnPickerList } from "@/components/common/LocalDatasetColumnPickerList";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetColumnPickerList } from "@/components/common/DatasetColumnPickerList";
 import { useMap } from "@/lib/hooks/state/useMap";
 import { Callout } from "@/lib/ui/Callout";
 import { SegmentedControl } from "@/lib/ui/inputs/SegmentedControl";
 import { makeSegmentedControlItems } from "@/lib/ui/inputs/SegmentedControl/makeSegmentedControlItems";
-import { removeItemWhere } from "@/lib/utils/arrays";
-import { where } from "@/lib/utils/filters/filterBuilders";
+import { removeItemWhere } from "@/lib/utils/arrays/misc";
 import { identity } from "@/lib/utils/misc";
-import { makeObjectFromList } from "@/lib/utils/objects/builders";
-import { getProp, propEquals } from "@/lib/utils/objects/higherOrderFuncs";
-import { EntityFieldConfigId } from "@/models/EntityConfig/EntityFieldConfig/types";
-import { EntityConfigId } from "@/models/EntityConfig/types";
-import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
+import { makeObject } from "@/lib/utils/objects/builders";
+import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
+import { DatasetWithColumns } from "@/models/datasets/Dataset";
 import {
-  LocalDatasetField,
-  LocalDatasetFieldId,
-} from "@/models/LocalDataset/LocalDatasetField/types";
-import { LocalDataset } from "@/models/LocalDataset/types";
+  DatasetColumn,
+  DatasetColumnId,
+} from "@/models/datasets/DatasetColumn";
+import { EntityConfigId } from "@/models/EntityConfig/EntityConfig.types";
+import { EntityFieldConfigId } from "@/models/EntityConfig/EntityFieldConfig/types";
 import {
   EntityConfigFormType,
   makeDefaultDatasetColumnField,
@@ -52,53 +50,39 @@ export function DatasetColumnFieldsBlock({
   entityConfigId,
   entityConfigName,
 }: Props): JSX.Element {
-  const workspace = useCurrentWorkspace();
   const [selectedDatasetColumnId, setSelectedDatasetColumnId] = useState<
-    LocalDatasetFieldId | undefined
+    DatasetColumnId | undefined
   >();
   const [selectedFieldId, setSelectedFieldId] = useState<
     EntityFieldConfigId | undefined
   >();
 
-  // load all local datasets and all available columns
-  const [localDatasets] = LocalDatasetClient.useGetAll(
-    where("workspaceId", "eq", workspace.id),
-  );
-
-  const localDatasetsToUse = useMemo(() => {
-    return localDatasets?.filter((dataset) => {
-      return (
-        dataset.datasetType !== "entity_field_values" &&
-        dataset.datasetType !== "entities_queryable" &&
-        dataset.datasetType !== "entities"
-      );
-    });
-  }, [localDatasets]);
-
+  // load all datasets and all available columns
+  const [allDatasets] = DatasetClient.useGetAllDatasetsWithColumns();
   const datasetColumnLookup: Record<
-    LocalDatasetFieldId,
-    { dataset: LocalDataset; field: LocalDatasetField }
+    DatasetColumnId,
+    { dataset: DatasetWithColumns; column: DatasetColumn }
   > = useMemo(() => {
-    if (!localDatasetsToUse) {
+    if (!allDatasets) {
       return {};
     }
-    return makeObjectFromList(
-      localDatasetsToUse.flatMap((dataset) => {
-        return dataset.fields.map((field) => {
-          return { dataset, field };
+    return makeObject(
+      allDatasets.flatMap((dataset) => {
+        return dataset.columns.map((column) => {
+          return { dataset, column };
         });
       }),
       {
-        keyFn: getProp("field.id"),
+        keyFn: getProp("column.id"),
         valueFn: identity,
       },
     );
-  }, [localDatasetsToUse]);
+  }, [allDatasets]);
 
   // Keep track of the fields we've added and the dataset columns they map to
   const [fieldToColumnMap, updateFieldToColumnMap] = useMap<
     EntityFieldConfigId,
-    LocalDatasetFieldId
+    DatasetColumnId
   >();
 
   // these are the fields that we've already added
@@ -119,7 +103,7 @@ export function DatasetColumnFieldsBlock({
       selectedDatasetColumnId &&
       datasetColumnLookup[selectedDatasetColumnId]
     ) {
-      const { field: selectedDatasetColumn, dataset: selectedDataset } =
+      const { column: selectedDatasetColumn, dataset: selectedDataset } =
         datasetColumnLookup[selectedDatasetColumnId];
 
       if (selectedDatasetColumn && selectedDataset) {
@@ -144,9 +128,7 @@ export function DatasetColumnFieldsBlock({
         // if the selected dataset isn't already in our sourceDatasets array,
         // add it
         const { sourceDatasets } = entityConfigForm.getValues();
-        if (
-          !sourceDatasets.some(propEquals("dataset.id", selectedDataset.id))
-        ) {
+        if (!sourceDatasets.some(propIs("dataset.id", selectedDataset.id))) {
           entityConfigForm.insertListItem("sourceDatasets", {
             dataset: selectedDataset,
             primaryKeyColumnId: undefined,
@@ -165,12 +147,12 @@ export function DatasetColumnFieldsBlock({
 
   const removeField = useCallback(() => {
     if (selectedFieldId) {
-      const selectedField = addedFields.find(propEquals("id", selectedFieldId));
+      const selectedField = addedFields.find(propIs("id", selectedFieldId));
       const sourceDatasetId =
         selectedField?.extractors.datasetColumnValue.datasetId;
       const newFields = removeItemWhere(
         addedFields,
-        propEquals("id", selectedFieldId),
+        propIs("id", selectedFieldId),
       );
       entityConfigForm.setFieldValue("datasetColumnFields", newFields);
       updateFieldToColumnMap.delete(selectedFieldId);
@@ -182,18 +164,20 @@ export function DatasetColumnFieldsBlock({
       // `sourceDatasets` array.
       // First, check if there's another field that relies on this same dataset
       const isSourceDatasetStillUsed = newFields.some(
-        propEquals("extractors.datasetColumnValue.datasetId", sourceDatasetId),
+        propIs("extractors.datasetColumnValue.datasetId", sourceDatasetId),
       );
       if (!isSourceDatasetStillUsed && sourceDatasetId) {
         // no remaining fields are using this dataset, so we can safely remove
         // it from our `sourceDatasets` list
         const sourceDatasetIdx = entityConfigForm
           .getValues()
-          .sourceDatasets.findIndex(propEquals("dataset.id", sourceDatasetId));
+          .sourceDatasets.findIndex(propIs("dataset.id", sourceDatasetId));
         entityConfigForm.removeListItem("sourceDatasets", sourceDatasetIdx);
       }
     }
   }, [entityConfigForm, addedFields, selectedFieldId, updateFieldToColumnMap]);
+
+  const { sourceDatasets } = entityConfigForm.getValues();
 
   return (
     <Fieldset legend="Fields that come from datasets">
@@ -216,8 +200,8 @@ export function DatasetColumnFieldsBlock({
               Dataset columns
             </Text>
             <Divider />
-            <LocalDatasetColumnPickerList
-              datasetIds={localDatasetsToUse?.map(getProp("id")) ?? []}
+            <DatasetColumnPickerList
+              datasetIds={allDatasets?.map(getProp("id")) ?? []}
               onChange={(value) => {
                 setSelectedDatasetColumnId(value);
               }}
@@ -267,11 +251,9 @@ export function DatasetColumnFieldsBlock({
             <Box pt="sm">
               <DatasetColumnExtractorCreator
                 entityConfigForm={entityConfigForm}
-                fieldIdx={addedFields.findIndex(
-                  propEquals("id", selectedFieldId),
-                )}
+                fieldIdx={addedFields.findIndex(propIs("id", selectedFieldId))}
                 fieldName={
-                  addedFields.find(propEquals("id", selectedFieldId))!.name
+                  addedFields.find(propIs("id", selectedFieldId))!.name
                 }
               />
             </Box>
@@ -279,20 +261,21 @@ export function DatasetColumnFieldsBlock({
         </Group>
 
         <Divider my="xs" />
-
-        <Callout.Info
-          title="Configure how to join datasets"
-          icon={<IconCircleNumber2Filled />}
-        >
-          <Text>
-            For each dataset you've added, please specify which columns should
-            be used to uniquely identify a {entityConfigName}.
-          </Text>
-          <Text>
-            We will use those columns to merge datasets into a single{" "}
-            {entityConfigName}.
-          </Text>
-        </Callout.Info>
+        {sourceDatasets.length > 1 ?
+          <Callout.Info
+            title="Configure how to join datasets"
+            icon={<IconCircleNumber2Filled />}
+          >
+            <Text>
+              For each dataset you've added, please specify which columns should
+              be used to uniquely identify a {entityConfigName}.
+            </Text>
+            <Text>
+              We will use those columns to merge datasets into a single{" "}
+              {entityConfigName}.
+            </Text>
+          </Callout.Info>
+        : null}
         {addedFields.length > 0 ?
           <IDConfigBlock
             entityConfigForm={entityConfigForm}

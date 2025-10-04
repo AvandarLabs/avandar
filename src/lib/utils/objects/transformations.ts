@@ -1,7 +1,8 @@
 import camelcaseKeys, { CamelCaseKeys } from "camelcase-keys";
 import snakecaseKeys, { SnakeCaseKeys } from "snakecase-keys";
+import { ConditionalKeys } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
-import { ExcludeDeep, SwapDeep } from "@/lib/types/utilityTypes";
+import { ExcludeDeep, ReplaceTypes, SwapDeep } from "@/lib/types/utilityTypes";
 import { isNull, isPlainObject, isUndefined } from "../guards";
 import { constant } from "../higherOrderFuncs";
 import { objectKeys } from "./misc";
@@ -197,10 +198,10 @@ export function excludeNullsDeep<T extends Exclude<unknown, null>>(
   return excludeDeep(obj, isNull);
 }
 
-export type ExcludeNullsFrom<T extends UnknownObject, K extends keyof T> = Omit<
-  T,
-  K
-> & {
+export type ExcludeNullsIn<
+  T extends UnknownObject,
+  K extends keyof T = keyof T,
+> = Omit<T, K> & {
   [Key in K]: Exclude<T[Key], null>;
 };
 
@@ -215,14 +216,14 @@ export type ExcludeNullsFrom<T extends UnknownObject, K extends keyof T> = Omit<
  * @param keysToTest The keys to test for null values.
  * @returns A new object with nulls excluded from the specified keys.
  */
-export function excludeNullsFrom<T extends UnknownObject, K extends keyof T>(
+export function excludeNullsIn<T extends UnknownObject, K extends keyof T>(
   obj: T,
-  ...keysToTest: readonly K[]
-): ExcludeNullsFrom<T, K> {
+  keysToTest: Extract<K, string> | readonly K[],
+): ExcludeNullsIn<T, K> {
   const newObj = { ...obj };
   const keys =
-    keysToTest === undefined || keysToTest.length === 0 ?
-      objectKeys(obj)
+    typeof keysToTest === "string" ? [keysToTest]
+    : keysToTest.length === 0 ? objectKeys(obj)
     : keysToTest;
   keys.forEach((key) => {
     if (isNull(obj[key])) {
@@ -235,7 +236,7 @@ export function excludeNullsFrom<T extends UnknownObject, K extends keyof T>(
   };
 }
 
-export type ExcludeNullsExceptFrom<
+export type ExcludeNullsExceptIn<
   T extends UnknownObject,
   K extends keyof T,
   KeysToExcludeNulls extends keyof T = Exclude<keyof T, K>,
@@ -257,22 +258,86 @@ export type ExcludeNullsExceptFrom<
  * @returns A new object with nulls excluded from all keys except
  * the specified keys.
  */
-export function excludeNullsExceptFrom<
+export function excludeNullsExceptIn<
   T extends UnknownObject,
   K extends keyof T,
->(obj: T, ...keysToKeepNull: readonly K[]): ExcludeNullsExceptFrom<T, K> {
-  if (keysToKeepNull === undefined || keysToKeepNull.length === 0) {
-    return obj as ExcludeNullsExceptFrom<T, K>;
+>(
+  obj: T,
+  keysToKeepNull: Extract<K, string> | readonly K[],
+): ExcludeNullsExceptIn<T, K> {
+  const keys =
+    typeof keysToKeepNull === "string" ? [keysToKeepNull] : keysToKeepNull;
+  if (keys.length === 0) {
+    return obj as ExcludeNullsExceptIn<T, K>;
   }
-
-  const keysToSkip: Set<string> = new Set(keysToKeepNull.map(String));
+  const keysToSkip: Set<string> = new Set(keys.map(String));
   const newObj = {} as UnknownObject;
   objectKeys(obj).forEach((key) => {
     if (keysToSkip.has(key) || !isNull(obj[key])) {
       newObj[key] = obj[key];
     }
   });
-  return newObj as ExcludeNullsExceptFrom<T, K>;
+  return newObj as ExcludeNullsExceptIn<T, K>;
+}
+
+/**
+ * Coerces the specified keys into dates.
+ *
+ * @param obj The object to coerce dates from.
+ * @param keys The keys to coerce into dates.
+ * @returns The object with the specified keys coerced into dates.
+ */
+export function coerceDatesIn<T extends UnknownObject, K extends keyof T>(
+  obj: T,
+  keys: readonly K[],
+): {
+  [Key in keyof T]: Key extends K ?
+    undefined extends T[Key] ?
+      Date | undefined
+    : Date
+  : T[Key];
+} {
+  const newObj = { ...obj };
+  keys.forEach((key) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    newObj[key] =
+      obj[key] === undefined ?
+        undefined
+      : new Date(obj[key] as unknown as string | number);
+  });
+  return newObj as ReplaceTypes<T, { [Key in K]: Date }>;
+}
+
+/**
+ * Converts the specified keys into ISO strings.
+ *
+ * @param obj The object to convert dates from.
+ * @param keys The keys to convert into ISO strings.
+ * @returns The object with the specified keys converted into ISO strings.
+ */
+export function convertDatesToISOIn<
+  T extends UnknownObject,
+  K extends ConditionalKeys<T, Date | undefined>,
+>(
+  obj: T,
+  keys: readonly K[],
+): {
+  [Key in keyof T]: Key extends K ?
+    undefined extends T[Key] ?
+      string | undefined
+    : string
+  : T[Key];
+} {
+  const newObj = { ...obj };
+  keys.forEach((key) => {
+    if (obj[key] instanceof Date) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      newObj[key] = obj[key].toISOString();
+    }
+  });
+  return newObj as ReplaceTypes<T, { [Key in K]: string }>;
 }
 
 /**
@@ -339,8 +404,14 @@ export function mapObjectValues<T extends UnknownObject, V>(
   fn: (value: T[keyof T], key: keyof T) => V,
 ): { [K in keyof T]: V } {
   const newObj = {} as { [K in keyof T]: V };
-  objectKeys(obj).forEach((key) => {
-    newObj[key] = fn(obj[key], key);
-  });
+
+  // intentionally using a for loop here since this is a low-level
+  // function that we really need to be performant if it is used
+  // in huge arrays
+  for (const key in obj) {
+    if (Object.hasOwn(obj, key)) {
+      newObj[key] = fn(obj[key], key);
+    }
+  }
   return newObj;
 }

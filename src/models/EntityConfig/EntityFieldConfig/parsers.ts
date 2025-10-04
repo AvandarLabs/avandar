@@ -5,7 +5,7 @@ import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { isOneOf } from "@/lib/utils/guards";
 import {
   camelCaseKeysDeep,
-  excludeNullsExceptFrom,
+  excludeNullsExceptIn,
   nullsToUndefinedDeep,
   snakeCaseKeysDeep,
   undefinedsToNullsDeep,
@@ -13,7 +13,7 @@ import {
 import { pipe } from "@/lib/utils/pipe";
 import { uuid } from "@/lib/utils/uuid";
 import { WorkspaceId } from "@/models/Workspace/types";
-import { EntityConfigId } from "../types";
+import { EntityConfigId } from "../EntityConfig.types";
 import {
   DimensionRead,
   EntityFieldConfig,
@@ -119,12 +119,10 @@ export const EntityFieldConfigParsers =
       snakeCaseKeysDeep,
       undefinedsToNullsDeep,
       (obj): EntityFieldConfig<"DBInsert"> => {
-        const { options, ...field } = excludeNullsExceptFrom(
-          obj,
-          "description",
-        );
+        const { options, ...field } = excludeNullsExceptIn(obj, "description");
+
         // put the options back in the flattened db object
-        const newOptions = excludeNullsExceptFrom(options, "is_array");
+        const newOptions = excludeNullsExceptIn(options, "is_array");
         return { ...field, ...newOptions };
       },
     ),
@@ -133,12 +131,11 @@ export const EntityFieldConfigParsers =
       snakeCaseKeysDeep,
       undefinedsToNullsDeep,
       (obj): EntityFieldConfig<"DBUpdate"> => {
-        const { options, ...field } = excludeNullsExceptFrom(
-          obj,
+        const { options, ...field } = excludeNullsExceptIn(obj, [
           "description",
-        );
+        ]);
         // put the options back in the flattened db object
-        const newOptions = excludeNullsExceptFrom(options, "is_array");
+        const newOptions = excludeNullsExceptIn(options, "is_array");
         return { ...field, ...newOptions };
       },
     ),

@@ -1,34 +1,34 @@
-import { Stack, Title } from "@mantine/core";
-import { useMemo } from "react";
+import { Loader, Stack } from "@mantine/core";
+import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
-import { getSummary } from "@/models/LocalDataset/getSummary";
-import { ParsedLocalDataset } from "@/models/LocalDataset/types";
+import { DatasetId } from "@/models/datasets/Dataset";
 
 type Props = {
-  parsedDataset: ParsedLocalDataset;
+  datasetId: DatasetId;
 };
 
-export function DataSummaryView({ parsedDataset }: Props): JSX.Element {
-  const summary = useMemo(() => {
-    return getSummary(parsedDataset);
-  }, [parsedDataset]);
+export function DataSummaryView({ datasetId }: Props): JSX.Element {
+  const [summary, isLoadingSummary] = DatasetRawDataClient.useGetSummary({
+    datasetId,
+  });
 
   return (
     <Stack>
-      <ObjectDescriptionList data={summary} excludeKeys={["columnSummaries"]} />
-
-      {summary.columnSummaries ?
-        <Stack>
-          <Title order={4}>Column Summaries</Title>
+      {isLoadingSummary ?
+        <Loader />
+      : null}
+      {summary?.columnSummaries ?
+        <>
           <ObjectDescriptionList
             data={summary.columnSummaries}
             titleKey="name"
+            defaultExpanded={true}
             itemRenderOptions={{
               maxHeight: 400,
               excludeKeys: ["name"],
-              childRenderOptions: {
+              keyRenderOptions: {
                 mostCommonValue: {
-                  childRenderOptions: {
+                  keyRenderOptions: {
                     value: {
                       maxItemsCount: 4,
                     },
@@ -37,7 +37,7 @@ export function DataSummaryView({ parsedDataset }: Props): JSX.Element {
               },
             }}
           />
-        </Stack>
+        </>
       : null}
     </Stack>
   );

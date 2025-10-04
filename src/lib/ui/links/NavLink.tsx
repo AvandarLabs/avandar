@@ -11,7 +11,14 @@ import {
   LinkComponent,
   LinkComponentProps,
 } from "@tanstack/react-router";
-import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import {
+  AnchorHTMLAttributes,
+  forwardRef,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Theme } from "@/config/Theme";
 import { noop } from "@/lib/utils/misc";
 
@@ -20,7 +27,12 @@ const DEFAULT_PRIMARY_SHADE =
     DEFAULT_THEME.primaryShade.light
   : DEFAULT_THEME.primaryShade;
 
-interface NewMantineNavLinkProps extends Omit<MantineNavLinkProps, "href"> {
+interface NewMantineNavLinkProps
+  extends Omit<
+    MantineNavLinkProps &
+      Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "onChange" | "style">,
+    "href"
+  > {
   /** Color of inactive nav links when hovered */
   inactiveHoverColor?: MantineColor;
 }

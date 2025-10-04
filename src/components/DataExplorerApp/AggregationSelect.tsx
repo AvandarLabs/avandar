@@ -1,12 +1,15 @@
+import { useUncontrolled } from "@mantine/hooks";
 import { useMemo } from "react";
-import { QueryAggregationType } from "@/clients/LocalDatasetQueryClient";
+import { QueryAggregationType } from "@/clients/DuckDBClient/types";
 import { Select, SelectOption } from "@/lib/ui/inputs/Select";
-import { LocalDatasetField } from "@/models/LocalDataset/LocalDatasetField/types";
-import { getValidQueryAggregationsByType } from "@/models/LocalDataset/LocalDatasetField/utils";
+import { getValidQueryAggregationsByDataType } from "@/models/datasets/DatasetColumn/utils";
+import { QueryableColumn } from "./QueryableColumnMultiSelect";
 
 type Props = {
-  column: LocalDatasetField;
-  onChange: (aggregation: QueryAggregationType) => void;
+  column: QueryableColumn;
+  value?: QueryAggregationType;
+  defaultValue?: QueryAggregationType;
+  onChange?: (aggregation: QueryAggregationType) => void;
 };
 
 const AGGREGATION_OPTIONS: Array<SelectOption<QueryAggregationType>> = [
@@ -18,27 +21,50 @@ const AGGREGATION_OPTIONS: Array<SelectOption<QueryAggregationType>> = [
   { value: "min", label: "Min" },
 ];
 
-export function AggregationSelect({ column, onChange }: Props): JSX.Element {
-  const validAggregations = useMemo(() => {
-    return new Set(getValidQueryAggregationsByType(column.dataType));
-  }, [column.dataType]);
+export function AggregationSelect({
+  column,
+  value,
+  defaultValue = "none",
+  onChange,
+}: Props): JSX.Element {
+  const validAggregations = getValidQueryAggregationsByDataType(
+    column.type === "DatasetColumn" ?
+      column.value.dataType
+    : column.value.options.baseDataType,
+  );
 
-  const aggregationOptions = AGGREGATION_OPTIONS.filter((option) => {
-    return validAggregations.has(option.value) || option.value === "none";
-  });
+  const aggregationOptions = useMemo(() => {
+    return AGGREGATION_OPTIONS.filter((opt) => {
+      return validAggregations.includes(opt.value) || opt.value === "none";
+    });
+  }, [validAggregations]);
+
+  const [currentAggregation, setCurrentAggregation] =
+    useUncontrolled<QueryAggregationType>({
+      value,
+      defaultValue,
+      finalValue: "none",
+      onChange,
+    });
+
+  const isValidAggregation = validAggregations.includes(currentAggregation);
+  const aggregationToUse =
+    currentAggregation !== "none" && !isValidAggregation ?
+      "none"
+    : currentAggregation;
 
   return (
     <Select
-      key={column.id}
-      label={column.name}
+      // key for hard reset
+      key={column.value.id}
+      label={column.value.name}
       placeholder="Select aggregation"
-      defaultValue="none"
       data={aggregationOptions}
-      onChange={(value: QueryAggregationType | null) => {
-        if (value === null) {
-          return;
+      value={aggregationToUse}
+      onChange={(newValue) => {
+        if (newValue) {
+          setCurrentAggregation(newValue);
         }
-        onChange(value);
       }}
     />
   );

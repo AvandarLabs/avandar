@@ -1,10 +1,12 @@
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { z } from "zod";
-import { QueryResultField } from "@/clients/LocalDatasetQueryClient";
+import { QueryResultColumn } from "@/clients/DuckDBClient/types";
 import { UnknownDataFrame } from "@/lib/types/common";
 import { BarChart } from "@/lib/ui/data-viz/BarChart";
 import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
+import { LineChart } from "@/lib/ui/data-viz/LineChart";
+import { ScatterChart } from "@/lib/ui/data-viz/ScatterChart";
 import { DangerText } from "@/lib/ui/Text/DangerText";
 import { isEpochMs, isIsoDateString } from "@/lib/utils/formatters/formatDate";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
@@ -12,39 +14,55 @@ import { VizConfig } from "./VizSettingsForm/makeDefaultVizConfig";
 
 type Props = {
   vizConfig: VizConfig;
-  fields: readonly QueryResultField[];
+  columns: readonly QueryResultColumn[];
   data: UnknownDataFrame;
 };
 
+// Reusable XY schema “blocks”
+const xAxisKeySchema = z.string({
+  error: (issue) => {
+    return issue.input === undefined ?
+        "X axis must be specified"
+      : "X axis must be a string";
+  },
+});
+const yAxisKeySchema = z.string({
+  error: (issue) => {
+    return issue.input === undefined ?
+        "Y axis must be specified"
+      : "Y axis must be a string";
+  },
+});
+
+// Chart-specific schemas (can diverge later)
 const BarChartSettingsSchema = z.object({
-  xAxisKey: z.string({
-    error: (issue) => {
-      return issue.input === undefined ?
-          "X axis must be specified"
-        : "X axis must be a string";
-    },
-  }),
-  yAxisKey: z.string({
-    error: (issue) => {
-      return issue.input === undefined ?
-          "Y axis must be specified"
-        : "Y axis must be a string";
-    },
-  }),
+  xAxisKey: xAxisKeySchema,
+  yAxisKey: yAxisKeySchema,
+});
+
+const LineChartSettingsSchema = z.object({
+  xAxisKey: xAxisKeySchema,
+  yAxisKey: yAxisKeySchema,
+});
+
+const ScatterChartSettingsSchema = z.object({
+  xAxisKey: xAxisKeySchema,
+  yAxisKey: yAxisKeySchema,
 });
 
 export function VisualizationContainer({
   vizConfig,
-  fields,
+  columns,
   data,
 }: Props): JSX.Element {
   const fieldNames = useMemo(() => {
-    return fields.map(getProp("name"));
-  }, [fields]);
+    return columns.map(getProp("name"));
+  }, [columns]);
 
+  // TODO(jpsyx): this should get supplied as a prop
   const dateColumns = useMemo(() => {
     return new Set(
-      fields
+      columns
         .filter((f) => {
           const sampleVal = data[0]?.[f.name];
           return (
@@ -57,7 +75,7 @@ export function VisualizationContainer({
           return f.name;
         }),
     );
-  }, [fields, data]);
+  }, [columns, data]);
 
   return match(vizConfig)
     .with({ type: "table" }, () => {
@@ -67,6 +85,7 @@ export function VisualizationContainer({
           data={data}
           dateColumns={dateColumns}
           dateFormat="YYYY-MM-DD HH:mm:ss z"
+          height="100%"
         />
       );
     })
@@ -82,6 +101,30 @@ export function VisualizationContainer({
       }
       const errorMessages = z.prettifyError(error);
       return <DangerText>{errorMessages}</DangerText>;
+    })
+    .with({ type: "line" }, (config) => {
+      const {
+        success,
+        data: settings,
+        error,
+      } = LineChartSettingsSchema.safeParse(config.settings);
+
+      if (success) {
+        return <LineChart data={data} height={700} {...settings} />;
+      }
+      return <DangerText>{z.prettifyError(error)}</DangerText>;
+    })
+    .with({ type: "scatter" }, (config) => {
+      const {
+        success,
+        data: settings,
+        error,
+      } = ScatterChartSettingsSchema.safeParse(config.settings);
+
+      if (success) {
+        return <ScatterChart data={data} height={700} {...settings} />;
+      }
+      return <DangerText>{z.prettifyError(error)}</DangerText>;
     })
     .exhaustive();
 }

@@ -1,15 +1,5 @@
 import type { UnknownObject } from "./common";
-import type {
-  StringKeyOf as BroadStringKeyOf,
-  ConditionalKeys,
-  UnknownRecord,
-} from "type-fest";
-
-/**
- * Get all the keys of an object that map to a given type.
- * @deprecated Just use type-fest's `ConditionalKeys` directly instead.
- */
-export type KeysThatMapTo<T, Obj extends object> = ConditionalKeys<Obj, T>;
+import type { StringKeyOf as BroadStringKeyOf, UnknownRecord } from "type-fest";
 
 /**
  * A stricter version of type-fest's `StringKeyOf` that will return
@@ -106,6 +96,23 @@ export type AnyFunctionWithSignature<Params extends unknown[], Return> = (
 ) => Return;
 
 /**
+ * Gets the first parameter of a function.
+ */
+export type FirstParameter<Func extends AnyFunction> =
+  Func extends AnyFunctionWithArguments<infer Args> ? Args[0] : never;
+
+/**
+ * Gets the tail parameters of a function (i.e. everything after the first
+ * parameter)
+ */
+export type TailParameters<Func extends AnyFunction> =
+  Func extends AnyFunctionWithArguments<infer Args> ?
+    Args extends [unknown, ...infer Tail] ?
+      Tail
+    : never
+  : never;
+
+/**
  * Represents a single-parameter function that returns the same type it was
  * given.
  * (Note: this is just at the type-level. It does not mean the function
@@ -140,6 +147,41 @@ export type ReplaceTypes<
   : OriginalObject[K];
 };
 
+/**
+ * Converts a union of string literals into a record mapping each key
+ * to `true`. This is a useful hack for when we are starting from a union
+ * of string literals at the type level and need to enforce that an array
+ * tuple has EVERY possible value from the string literal union.
+ *
+ * The `UnionToTuple` type from type-fest is not stable and not a reliable
+ * solution. So, instead we can create the array by using a registry.
+ *
+ * Example:
+ * ```ts
+ * type Letter = "a" | "b" | "c";
+ *
+ * const LETTERS = objectKeys({
+ *   a: true,
+ *   b: true,
+ *   c: true,
+ * } satisfies Registry<Letter>);
+ * ```
+ *
+ * `Letters` is of type `("a" | "b" | "c")[]`. But if we exclude any of
+ * the keys from the object (e.g. if "c" is removed from the object) then
+ * you'd get a type error.
+ *
+ * This way we can be notified if a union is ever changed at the type-level,
+ * we will be forced to also update this registry. That way the array remains
+ * consistent with the type.
+ */
 export type Registry<StringLiteralUnion extends string> = {
-  [key in StringLiteralUnion]: true;
+  [K in StringLiteralUnion]: true;
+};
+
+/**
+ * Converts a record into a record of arrays of the same type.
+ */
+export type RegistryOfArrays<T extends UnknownObject> = {
+  [K in keyof T]: Array<T[K]>;
 };

@@ -1,11 +1,11 @@
 import { match } from "ts-pattern";
 import { constant } from "@/lib/utils/higherOrderFuncs";
 import { ObjectDescriptionListBlock } from ".";
-import { FieldValueArrayBlock } from "./FieldValueArrayBlock";
+import { DescribableValueArrayBlock } from "./DescribableValueArrayBlock";
 import {
   isDescribableObject,
-  isFieldValueArray,
-  isPrimitiveFieldValue,
+  isDescribableValueArray,
+  isPrimitiveDescribableValue,
 } from "./guards";
 import { PrimitiveValueItem } from "./PrimitiveValueItem";
 import {
@@ -13,63 +13,115 @@ import {
   DescribableObject,
   DescribableValue,
   DescribableValueArrayRenderOptions,
+  GenericRootData,
   ObjectRenderOptions,
   PrimitiveValue,
   PrimitiveValueRenderOptions,
 } from "./types";
 
-type Props =
+type Props<RootData extends GenericRootData> = {
+  /**
+   * The root data of the object description list. This is used to pass
+   * to any custom `render` functions, like `renderValue`, `renderObject`,
+   * `renderObjectKey`, or `renderArray`.
+   */
+  rootData: RootData;
+} & (
   | ({
       type: "primitive";
       value: PrimitiveValue;
-    } & PrimitiveValueRenderOptions)
+    } & PrimitiveValueRenderOptions<PrimitiveValue, RootData>)
   | ({
       type: "object";
       value: DescribableObject;
-    } & ObjectRenderOptions<DescribableObject>)
+    } & ObjectRenderOptions<DescribableObject, RootData>)
   | ({
       type: "array";
       value: readonly DescribableValue[];
-    } & DescribableValueArrayRenderOptions<DescribableValue>)
+    } & DescribableValueArrayRenderOptions<DescribableValue, RootData>)
   | ({
       type: "unknown";
       value: DescribableValue;
-    } & AnyDescribableValueRenderOptions);
+    } & AnyDescribableValueRenderOptions)
+);
 
-export function ValueItemContainer(props: Props): JSX.Element | null {
+export function ValueItemContainer<RootData extends GenericRootData>(
+  props: Props<RootData>,
+): JSX.Element | null {
   return match(props)
     .with(
       { type: "primitive" },
-      ({ type, value, ...primitiveValueRenderOptions }) => {
+      ({ type, value, rootData, ...primitiveValueRenderOptions }) => {
         return (
-          <PrimitiveValueItem value={value} {...primitiveValueRenderOptions} />
+          <PrimitiveValueItem
+            value={value}
+            rootData={rootData}
+            {...primitiveValueRenderOptions}
+          />
         );
       },
     )
-    .with({ type: "array" }, ({ type, value, ...arrayRenderOptions }) => {
-      return <FieldValueArrayBlock data={value} {...arrayRenderOptions} />;
-    })
-    .with({ type: "object" }, ({ type, value, ...objectRenderOptions }) => {
-      return (
-        <ObjectDescriptionListBlock data={value} {...objectRenderOptions} />
-      );
-    })
-    .with({ type: "unknown" }, ({ type, value, ...renderOptions }) => {
-      // if no explicit type was passed, we rely on narrowing the type from
-      // the `value` itself
-      if (isPrimitiveFieldValue(value)) {
-        return <PrimitiveValueItem value={value} {...renderOptions} />;
-      }
+    .with(
+      { type: "array" },
+      ({ type, value, rootData, ...arrayRenderOptions }) => {
+        return (
+          <DescribableValueArrayBlock
+            data={value}
+            rootData={rootData}
+            {...arrayRenderOptions}
+          />
+        );
+      },
+    )
+    .with(
+      { type: "object" },
+      ({ type, value, rootData, ...objectRenderOptions }) => {
+        return (
+          <ObjectDescriptionListBlock
+            data={value}
+            rootData={rootData}
+            {...objectRenderOptions}
+          />
+        );
+      },
+    )
+    .with(
+      { type: "unknown" },
+      ({ type, value, rootData, ...renderOptions }) => {
+        // if no explicit type was passed, we rely on narrowing the type from
+        // the `value` itself
+        if (isPrimitiveDescribableValue(value)) {
+          return (
+            <PrimitiveValueItem
+              value={value}
+              rootData={rootData}
+              {...renderOptions}
+            />
+          );
+        }
 
-      if (isFieldValueArray(value)) {
-        return <FieldValueArrayBlock data={value} {...renderOptions} />;
-      }
+        if (isDescribableValueArray(value)) {
+          return (
+            <DescribableValueArrayBlock
+              data={value}
+              rootData={rootData}
+              {...renderOptions}
+            />
+          );
+        }
 
-      if (isDescribableObject(value)) {
-        return <ObjectDescriptionListBlock data={value} {...renderOptions} />;
-      }
+        if (isDescribableObject(value)) {
+          return (
+            <ObjectDescriptionListBlock
+              data={value}
+              rootData={rootData}
+              {...renderOptions}
+            />
+          );
+        }
 
-      return null;
-    })
+        return null;
+      },
+    )
     .exhaustive(constant(null));
 }

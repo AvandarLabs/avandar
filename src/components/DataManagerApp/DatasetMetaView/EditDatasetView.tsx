@@ -1,17 +1,15 @@
-import { Box } from "@mantine/core";
-import { notifyError } from "@/lib/ui/notifications/notifyError";
-import { notifySuccess } from "@/lib/ui/notifications/notifySuccess";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 import { InputTextField } from "@/lib/ui/singleton-forms/InputTextField";
-import { LocalDatasetClient } from "@/models/LocalDataset/LocalDatasetClient";
-import { LocalDataset } from "@/models/LocalDataset/types";
+import { Dataset } from "@/models/datasets/Dataset";
 
 type Props = {
-  dataset: LocalDataset;
+  dataset: Dataset;
 };
 
 export function EditDatasetView({ dataset }: Props): JSX.Element {
-  const [updateDataset, isUpdatePending] = LocalDatasetClient.useUpdate({
-    queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
+  const [updateDataset, isUpdatePending] = DatasetClient.useUpdate({
+    queryToInvalidate: DatasetClient.QueryKeys.getAll(),
     onSuccess: () => {
       notifySuccess("Dataset updated successfully!");
     },
@@ -21,23 +19,21 @@ export function EditDatasetView({ dataset }: Props): JSX.Element {
   });
 
   return (
-    <Box mt="md" mb="xl">
-      <InputTextField
-        defaultValue={dataset.name}
-        label="Dataset Name"
-        minLength={2}
-        inputWidth={300}
-        required
-        showSubmitButton
-        submitButtonLabel="Save"
-        isSubmitting={isUpdatePending}
-        onSubmit={(newName) => {
-          return updateDataset({
-            id: dataset.id,
-            data: { name: newName },
-          });
-        }}
-      />
-    </Box>
+    <InputTextField
+      defaultValue={dataset.name}
+      required
+      hideLabel
+      minLength={2}
+      inputWidth={300}
+      showSubmitButton
+      submitButtonLabel="Save"
+      isSubmitting={isUpdatePending}
+      onSubmit={(newName) => {
+        return updateDataset({
+          id: dataset.id,
+          data: { name: newName },
+        });
+      }}
+    />
   );
 }

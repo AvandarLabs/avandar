@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
-import { EntityConfig } from "@/models/EntityConfig/types";
+import { EntityConfig } from "@/models/EntityConfig/EntityConfig.types";
 
 type Props = {
   entityConfigs: readonly EntityConfig[];
@@ -34,14 +34,13 @@ export function EntityConfigNavbar({
             entityConfigName: entity.name,
           }),
           style: borderStyle,
-          linkKey: entity.id,
         };
       }),
       {
         to: AppLinks.entityDesignerCreatorView(workspace.slug).to,
         label: "Create new profile type",
         style: borderStyle,
-        linkKey: "create-new",
+        key: "create-new",
       },
     ];
     return entityConfigLinks;

@@ -1,0 +1,99 @@
+import { useUncontrolled } from "@mantine/hooks";
+import { useCallback, useMemo } from "react";
+import { match } from "ts-pattern";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
+import { Select, SelectOptionGroup, SelectProps } from "@/lib/ui/inputs/Select";
+import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
+import { where } from "@/lib/utils/filters/filterBuilders";
+import { makeBucketMap } from "@/lib/utils/maps/builders";
+import { DatasetId } from "@/models/datasets/Dataset";
+
+type Props = SelectProps<DatasetId>;
+
+/**
+ * A select component for selecting a dataset.
+ * This queries for the list of Datasets on its own, it does not
+ * need to be passed a list of datasets.
+ *
+ * This supports controlled and uncontrolled behavior and can be used
+ * with `useForm`.
+ */
+export function DatasetSelect({
+  defaultValue,
+  value,
+  onChange,
+  ...selectProps
+}: Props): JSX.Element {
+  const workspace = useCurrentWorkspace();
+  const [controlledValue, onChangeValue] = useUncontrolled({
+    value,
+    defaultValue,
+    finalValue: null,
+    onChange,
+  });
+
+  const [datasets] = DatasetClient.useGetAll(
+    where("workspace_id", "eq", workspace.id),
+  );
+
+  useOnBecomesDefined(
+    datasets,
+    useCallback(
+      (dsets) => {
+        onChangeValue(dsets[0]?.id ?? null);
+      },
+      [onChangeValue],
+    ),
+  );
+
+  const datasetOptions = useMemo(() => {
+    const datasetBucketsByType = makeBucketMap(datasets ?? [], {
+      key: "sourceType",
+    });
+
+    if (datasetBucketsByType.size === 1) {
+      return makeSelectOptions(datasets ?? [], {
+        valueKey: "id",
+        labelKey: "name",
+      });
+    }
+
+    // if we have more than 1 bucket that means we need to group things
+    const groups: Array<SelectOptionGroup<DatasetId>> = [];
+    datasetBucketsByType.forEach((bucketValues, bucketKey) => {
+      const bucketName = match(bucketKey)
+        .with("csv_file", () => {
+          return "CSVs";
+        })
+        .with("google_sheets", () => {
+          return "Google Sheets";
+        })
+        .exhaustive(() => {
+          return undefined;
+        });
+      if (bucketName) {
+        groups.push({
+          group: bucketName,
+          items: makeSelectOptions(bucketValues, {
+            valueKey: "id",
+            labelKey: "name",
+          }),
+        });
+      }
+    });
+
+    return groups;
+  }, [datasets]);
+
+  return (
+    <Select
+      data={datasetOptions}
+      label="Dataset"
+      value={controlledValue}
+      onChange={onChangeValue}
+      {...selectProps}
+    />
+  );
+}

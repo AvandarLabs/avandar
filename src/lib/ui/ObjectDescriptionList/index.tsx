@@ -4,71 +4,124 @@ import { StringKeyOf } from "@/lib/types/utilityTypes";
 import { objectKeys, pick } from "@/lib/utils/objects/misc";
 import { camelToTitleCase } from "@/lib/utils/strings/transformations";
 import { DescriptionList } from "../DescriptionList";
-import { DescribableValueArrayBlockProps } from "./FieldValueArrayBlock";
+import { DescribableValueArrayBlockProps } from "./DescribableValueArrayBlock";
 import {
   AnyDescribableValueRenderOptions,
   DescribableObject,
   DescribableValue,
+  GenericRootData,
   ObjectRenderOptions,
   PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
+  PrimitiveValue,
 } from "./types";
 import { ValueItemContainer } from "./ValueItemContainer";
 
-type Props<T extends DescribableObject> = {
+type Props<T extends DescribableObject, RootData extends GenericRootData> = {
   data: T;
-} & ObjectRenderOptions<NonNullable<T>>;
+  rootData: RootData;
+} & ObjectRenderOptions<NonNullable<T>, RootData>;
 
 /**
  * This is the internal ObjectDescriptionList component which only accepts
  * objects as the data.
  */
-export function ObjectDescriptionListBlock<T extends DescribableObject>({
+export function ObjectDescriptionListBlock<
+  T extends DescribableObject,
+  RootData extends GenericRootData,
+>({
   data,
+  rootData,
   excludeKeys = [],
   maxHeight,
+  getRenderableValue,
+  renderObject,
+  renderObjectKeyValue,
+  renderObjectKeyLabel,
   ...renderOptions
-}: Props<T>): JSX.Element {
+}: Props<T, RootData>): JSX.Element {
   const excludeKeySet: ReadonlySet<StringKeyOf<T>> = useMemo(() => {
     return new Set(excludeKeys);
   }, [excludeKeys]);
 
-  const contentBlock = (
-    <DescriptionList>
-      {objectKeys(data).map((key) => {
-        if (excludeKeySet.has(key)) {
-          return null;
-        }
-
-        // compute the child render options to pass down
-        const parentPrimitiveValueRenderOptions = pick(
-          renderOptions,
-          PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
-        );
-        const childRenderOptions: AnyDescribableValueRenderOptions = {
-          ...parentPrimitiveValueRenderOptions,
-
-          // apply the item render options
-          ...(renderOptions?.itemRenderOptions ?? {}),
-
-          // apply the child render options, which take highest priority
-          ...(renderOptions?.childRenderOptions?.[key] ?? {}),
-        };
-
-        return (
-          <DescriptionList.Item key={key} label={camelToTitleCase(String(key))}>
-            <ValueItemContainer
-              type="unknown"
-              value={data[key]}
-              {...childRenderOptions}
-            />
-          </DescriptionList.Item>
-        );
-      })}
-    </DescriptionList>
+  const parentPrimitiveValueRenderOptions = pick(
+    renderOptions,
+    PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
   );
 
+  if (getRenderableValue !== undefined) {
+    const objAsPrimitiveValue =
+      typeof getRenderableValue === "function" ?
+        getRenderableValue(data, rootData)
+      : (data[getRenderableValue] as PrimitiveValue);
+    return (
+      <ValueItemContainer
+        type="primitive"
+        value={objAsPrimitiveValue}
+        rootData={rootData}
+        {...parentPrimitiveValueRenderOptions}
+      />
+    );
+  }
+
+  const customRenderedObject =
+    renderObject ? renderObject(data, rootData) : undefined;
+
+  const contentBlock =
+    customRenderedObject !== undefined ?
+      // only use the customRenderedObject if it's not `undefined`, otherwise
+      // we fall back to using the default DescriptionList logic
+      <>{customRenderedObject}</>
+    : <DescriptionList>
+        {objectKeys(data).map((key) => {
+          if (excludeKeySet.has(key)) {
+            return null;
+          }
+
+          const customRenderedKeyContent =
+            renderObjectKeyValue ?
+              renderObjectKeyValue(key, data, rootData)
+            : undefined;
+
+          const customRenderedKeyLabel =
+            renderObjectKeyLabel ?
+              renderObjectKeyLabel(key, data, rootData)
+            : undefined;
+
+          // compute the child's render options to pass down
+          const childRenderOptions = {
+            ...parentPrimitiveValueRenderOptions,
+
+            // apply the item render options
+            ...(renderOptions?.itemRenderOptions ?? {}),
+
+            // apply the child render options, which take highest priority
+            ...(renderOptions?.keyRenderOptions?.[key] ?? {}),
+          } as AnyDescribableValueRenderOptions;
+
+          return (
+            <DescriptionList.Item
+              key={key}
+              label={
+                customRenderedKeyLabel === undefined ?
+                  camelToTitleCase(String(key))
+                : customRenderedKeyLabel
+              }
+            >
+              {customRenderedKeyContent === undefined ?
+                <ValueItemContainer
+                  type="unknown"
+                  value={data[key]}
+                  rootData={rootData}
+                  {...childRenderOptions}
+                />
+              : customRenderedKeyContent}
+            </DescriptionList.Item>
+          );
+        })}
+      </DescriptionList>;
+
   if (maxHeight === undefined) {
-    return contentBlock;
+    return <>{contentBlock}</>;
   }
 
   return (
@@ -78,9 +131,14 @@ export function ObjectDescriptionListBlock<T extends DescribableObject>({
   );
 }
 
-type DescribableObjectProps<T extends DescribableObject> = Props<T>;
-type DescribableValueArrayProps<T extends DescribableValue> =
-  DescribableValueArrayBlockProps<T>;
+type DescribableObjectProps<
+  T extends DescribableObject,
+  RootData extends GenericRootData,
+> = Omit<Props<T, RootData>, "rootData">;
+type DescribableValueArrayProps<
+  T extends DescribableValue,
+  RootData extends GenericRootData,
+> = Omit<DescribableValueArrayBlockProps<T, RootData>, "rootData">;
 
 /**
  * This is the root component for an `ObjectDescriptionList`. It allows
@@ -91,15 +149,20 @@ type DescribableValueArrayProps<T extends DescribableValue> =
  * users don't have to decide between using an Object-specific or Array-specific
  * component.
  */
-export function ObjectDescriptionList<
-  T extends DescribableObject | readonly DescribableValue[],
->({
+export function ObjectDescriptionList<T extends GenericRootData>({
   data,
   ...renderOptions
-}: T extends DescribableObject ? DescribableObjectProps<T>
+}: T extends DescribableObject ? DescribableObjectProps<T, T>
 : T extends ReadonlyArray<infer U extends DescribableValue> ?
-  DescribableValueArrayProps<U>
+  DescribableValueArrayProps<U, T>
 : never): JSX.Element {
   // pass the data to `UnknownValueItem` to decide how to render things
-  return <ValueItemContainer type="unknown" value={data} {...renderOptions} />;
+  return (
+    <ValueItemContainer
+      type="unknown"
+      value={data}
+      rootData={data}
+      {...(renderOptions as Omit<AnyDescribableValueRenderOptions, "rootData">)}
+    />
+  );
 }
