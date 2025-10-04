@@ -23,7 +23,7 @@ import { notifyNotImplemented } from "@/lib/ui/notifications/notifyNotImplemente
 import { WorkspaceRole } from "@/models/Workspace/types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
-const IS_USER_INVITES_ENABLED = isFlagEnabled(FeatureFlag.DisableUserInvites);
+const IS_USER_INVITES_DISABLED = isFlagEnabled(FeatureFlag.DisableUserInvites);
 
 export function WorkspaceUserForm(): JSX.Element {
   const [isOpened, open, close] = useBoolean(false);
@@ -103,7 +103,7 @@ export function WorkspaceUserForm(): JSX.Element {
         visible={workspaceUsersLoading || isRemovingMember}
         zIndex={1000}
       />
-      {IS_USER_INVITES_ENABLED ?
+      {IS_USER_INVITES_DISABLED ? null : (
         <Card withBorder mt="md" p="lg" w="100%" maw="1000px">
           <Flex justify="space-between" align="center" mb="md">
             <Text>Workspace Users</Text>
@@ -122,7 +122,7 @@ export function WorkspaceUserForm(): JSX.Element {
             <Table.Tbody>{allWorkspaceUsers}</Table.Tbody>
           </Table>
         </Card>
-      : null}
+      )}
       <Modal opened={isOpened} onClose={close} title="Add User to Workspace">
         <Stack>
           <Text size="sm" c="dimmed">
