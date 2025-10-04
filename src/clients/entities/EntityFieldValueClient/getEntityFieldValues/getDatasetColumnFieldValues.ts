@@ -30,6 +30,16 @@ type FieldWithDatasetExtractor = {
   extractor: DatasetColumnValueExtractor;
 };
 
+/**
+ * Generate the nested SQL 'SELECT' statement to extract values using
+ * a dataset column extractor's `ruleType`.
+ *
+ * The output SQL of this function will only work if it is included as a
+ * subquery of a larger query that has a table called `external_ids` with
+ * a column called `external_id`. The names of these identifiers can be
+ * changed in `externalIdsTable` and `externalIdsColumn`, but it is still
+ * a requirement that the outer query be a table of external IDs.
+ */
 export function getSQLSelectOfExtractor({
   selectColumnName,
   primaryKeyColumnName,
