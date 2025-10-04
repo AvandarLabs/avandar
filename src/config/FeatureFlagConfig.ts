@@ -20,9 +20,15 @@ export enum FeatureFlag {
 
   /**
    * Disable manual entity fields. Users are not allowed to manually change
-   * the values of entity fields.
+   * the values of entity fields. This will be removed once the feature is
+   * ready.
    */
   DisableManualData = "disable-manual-data",
+
+  /**
+   * Disable inviting users to a workspace until the feature is ready.
+   */
+  DisableUserInvites = "disable-user-invites",
 }
 
 export const FeatureFlagConfig = {
@@ -30,6 +36,7 @@ export const FeatureFlagConfig = {
     waitlistURL: "https://avandarlabs.com",
   },
   [FeatureFlag.DisableManualData]: undefined,
+  [FeatureFlag.DisableUserInvites]: undefined,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as const satisfies Record<FeatureFlag, any>;
 
