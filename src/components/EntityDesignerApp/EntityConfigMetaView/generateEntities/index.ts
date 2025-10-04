@@ -3,6 +3,7 @@ import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { LocalDatasetEntryClient } from "@/clients/datasets/LocalDatasetEntryClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { EntityClient } from "@/clients/entities/EntityClient";
+import { getSQLSelectOfExtractor } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getDatasetColumnFieldValues";
 import { Logger } from "@/lib/Logger";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { where } from "@/lib/utils/filters/filterBuilders";
@@ -11,7 +12,7 @@ import {
   makeObject,
   makeObjectFromEntries,
 } from "@/lib/utils/objects/builders";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
 import { promiseMap } from "@/lib/utils/promises";
 import { Entity } from "@/models/entities/Entity";
 import {
@@ -88,7 +89,7 @@ export async function generateEntities(
   // 2. Get the dataset columns to use for external IDs and the entity title
   const primaryKeyExtractors = datasetColumnValueExtractors.filter(
     (extractor) => {
-      return extractor.entityFieldConfigId !== titleField.id;
+      return primaryKeyFields.some(propIs("id", extractor.entityFieldConfigId));
     },
   );
   const titleExtractor = datasetColumnValueExtractors.find((extractor) => {
@@ -98,6 +99,10 @@ export async function generateEntities(
     key: "datasetId",
   });
   const titleColumn = extractorColumnsLookup[titleExtractor.id]!;
+  const titleDatasetPrimaryKeyColumn =
+    extractorColumnsLookup[
+      primaryKeyExtractorsByDatasetId[titleColumn.column.datasetId]!.id
+    ]!.column;
 
   await DatasetRawDataClient.runLocalRawQuery({
     dependencies: sourceDatasetIds,
@@ -123,9 +128,8 @@ export async function generateEntities(
           NULL::UUID AS assigned_to,
           'active' AS status,
           external_id,
-          t."$titleColumnName$" AS name
-        FROM external_ids e
-          LEFT JOIN "$titleTableName$" t ON e.external_id = t."$titleTableNamePrimaryKey$"
+          $titleSelector$
+        FROM external_ids
       );
     `,
     queryArgs: {
@@ -137,12 +141,15 @@ export async function generateEntities(
           return `SELECT "${column.name}" AS external_id FROM "${tableName}"`;
         })
         .join(" UNION ALL "),
-      titleTableName: titleColumn.tableName,
-      titleColumnName: titleColumn.column.name,
-      titleTableNamePrimaryKey:
-        extractorColumnsLookup[
-          primaryKeyExtractorsByDatasetId[titleColumn.column.datasetId]!.id
-        ]!.column.name,
+      titleSelector: getSQLSelectOfExtractor({
+        selectColumnName: titleColumn.column.name,
+        primaryKeyColumnName: titleDatasetPrimaryKeyColumn.name,
+        tableName: titleColumn.tableName,
+        ruleType: titleExtractor.valuePickerRuleType,
+        outputColumnName: "name",
+        externalIdsTable: "external_ids",
+        externalIdsColumn: "external_id",
+      }),
     },
   });
 
@@ -154,6 +161,7 @@ export async function generateEntities(
   const jobSummary = await DuckDBClient.forEachQueryPage<Entity<"DBRead">>(
     { tableName: entityConfig.id, castTimestampsToISO: true },
     async (page) => {
+      Logger.log("page", page);
       await EntityClient.crudFunctions.bulkInsert({
         data: page.data,
         upsert: true,

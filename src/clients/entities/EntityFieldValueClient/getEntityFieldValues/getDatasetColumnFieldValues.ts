@@ -30,6 +30,47 @@ type FieldWithDatasetExtractor = {
   extractor: DatasetColumnValueExtractor;
 };
 
+export function getSQLSelectOfExtractor({
+  selectColumnName,
+  primaryKeyColumnName,
+  tableName,
+  ruleType,
+  outputColumnName,
+  externalIdsTable = "external_ids",
+  externalIdsColumn = "external_id",
+}: {
+  selectColumnName: string;
+  primaryKeyColumnName: string;
+  tableName: string;
+  ruleType: DatasetColumnValueExtractor["valuePickerRuleType"];
+  outputColumnName: string;
+  externalIdsTable?: string;
+  externalIdsColumn?: string;
+}): string {
+  return match(ruleType)
+    .with("first", () => {
+      return `
+        -- Get the first value
+        (SELECT "${selectColumnName}"
+        FROM "${tableName}" dataset
+        WHERE "${externalIdsTable}"."${externalIdsColumn}" = dataset."${primaryKeyColumnName}"
+        LIMIT 1) as "${outputColumnName}"
+      `;
+    })
+    .with("most_frequent", () => {
+      return `
+        -- Get the most frequent value
+        (SELECT "${selectColumnName}"
+        FROM "${tableName}" dataset
+        WHERE "${externalIdsTable}"."${externalIdsColumn}" = dataset."${primaryKeyColumnName}"
+        GROUP BY "${selectColumnName}"
+        ORDER BY COUNT(*) DESC, "${selectColumnName}"
+        LIMIT 1) as "${outputColumnName}"
+      `;
+    })
+    .exhaustive();
+}
+
 async function _extractFieldValuesFromDataset({
   datasetId,
   primaryKeyField,
@@ -80,28 +121,16 @@ async function _extractFieldValuesFromDataset({
           const fieldId = field.fieldConfig.id;
           const colName = field.datasetColumn.name;
           // TODO(jpsyx): replace this with a real extractor sql
-          return match(field.extractor)
-            .with({ valuePickerRuleType: "first" }, () => {
-              return `
-                -- Get the first value
-                (SELECT "${colName}"
-                FROM "${datasetTableName}" dataset
-                WHERE external_ids.external_id = dataset."${primaryKeyColumnName}"
-                LIMIT 1) as "${fieldId}"
-              `;
-            })
-            .with({ valuePickerRuleType: "most_frequent" }, () => {
-              return `
-                -- Get the most frequent value
-                (SELECT "${colName}"
-                FROM "${datasetTableName}" dataset
-                WHERE external_ids.external_id = dataset."${primaryKeyColumnName}"
-                GROUP BY "${colName}"
-                ORDER BY COUNT(*) DESC, "${colName}"
-                LIMIT 1) as "${fieldId}"
-              `;
-            })
-            .exhaustive();
+          const sqlStatement = getSQLSelectOfExtractor({
+            selectColumnName: colName,
+            primaryKeyColumnName,
+            tableName: datasetTableName,
+            ruleType: field.extractor.valuePickerRuleType,
+            outputColumnName: fieldId,
+            externalIdsTable: "external_ids",
+            externalIdsColumn: "external_id",
+          });
+          return sqlStatement;
         })
         .join(", "),
     },
