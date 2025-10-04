@@ -13,6 +13,7 @@ import {
 import { modals } from "@mantine/modals";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
+import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useWorkspaceRole } from "@/hooks/workspaces/useWorkspaceRole";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
@@ -21,6 +22,8 @@ import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 import { notifyNotImplemented } from "@/lib/ui/notifications/notifyNotImplemented";
 import { WorkspaceRole } from "@/models/Workspace/types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
+
+const IS_USER_INVITES_ENABLED = isFlagEnabled(FeatureFlag.DisableUserInvites);
 
 export function WorkspaceUserForm(): JSX.Element {
   const [isOpened, open, close] = useBoolean(false);
@@ -100,25 +103,26 @@ export function WorkspaceUserForm(): JSX.Element {
         visible={workspaceUsersLoading || isRemovingMember}
         zIndex={1000}
       />
-      <Card withBorder mt="md" p="lg" w="100%" maw="1000px">
-        <Flex justify="space-between" align="center" mb="md">
-          <Text>Workspace Users</Text>
-          <Button onClick={open}>Invite User</Button>
-        </Flex>
-        <Table>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th w="300px">
-                <Box pr="lg">Name</Box>
-              </Table.Th>
-              <Table.Th w="600px">Role</Table.Th>
-              <Table.Th w="200px">Action</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>{allWorkspaceUsers}</Table.Tbody>
-        </Table>
-      </Card>
-
+      {IS_USER_INVITES_ENABLED ?
+        <Card withBorder mt="md" p="lg" w="100%" maw="1000px">
+          <Flex justify="space-between" align="center" mb="md">
+            <Text>Workspace Users</Text>
+            <Button onClick={open}>Invite User</Button>
+          </Flex>
+          <Table>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th w="300px">
+                  <Box pr="lg">Name</Box>
+                </Table.Th>
+                <Table.Th w="600px">Role</Table.Th>
+                <Table.Th w="200px">Action</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>{allWorkspaceUsers}</Table.Tbody>
+          </Table>
+        </Card>
+      : null}
       <Modal opened={isOpened} onClose={close} title="Add User to Workspace">
         <Stack>
           <Text size="sm" c="dimmed">
