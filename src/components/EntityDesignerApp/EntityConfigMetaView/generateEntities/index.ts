@@ -161,7 +161,6 @@ export async function generateEntities(
   const jobSummary = await DuckDBClient.forEachQueryPage<Entity<"DBRead">>(
     { tableName: entityConfig.id, castTimestampsToISO: true },
     async (page) => {
-      Logger.log("page", page);
       await EntityClient.crudFunctions.bulkInsert({
         data: page.data,
         upsert: true,
