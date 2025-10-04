@@ -43,7 +43,7 @@ export const FeatureFlagConfig = {
 export function isFlagEnabled(featureFlag: FeatureFlag): boolean {
   const envFlagsStr = import.meta.env.VITE_FEATURE_FLAGS;
   if (envFlagsStr && typeof envFlagsStr === "string") {
-    const flags = envFlagsStr.split(";");
+    const flags = envFlagsStr.split(",");
     return flags.includes(featureFlag);
   }
   return false;
