@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { Key, ReactNode } from "react";
 import { NavLink } from "@/lib/ui/links/NavLink";
 import { objectEntries } from "@/lib/utils/objects/misc";
+import { TruncatedText } from "../Text/TruncatedText";
 import type { NavLinkProps } from "@/lib/ui/links/NavLink";
 
 type Props = {
@@ -86,9 +87,11 @@ export function NavLinkList({
         }
         py={gap}
         label={
-          <Text span fw={500}>
-            {label}
-          </Text>
+          typeof label === "string" ?
+            <TruncatedText withFullTextTooltip fw={500}>
+              {label}
+            </TruncatedText>
+          : label
         }
       />
     );
