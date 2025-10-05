@@ -4,6 +4,7 @@ import { match } from "ts-pattern";
 import { EmptyObject } from "type-fest";
 import {
   DatabaseTableNames,
+  GetSupabaseClientOptions,
   SupabaseDBClient,
 } from "@/lib/clients/supabase/SupabaseDBClient";
 import { assertIsDefined } from "@/lib/utils/asserts";
@@ -36,6 +37,7 @@ export type SupabaseCRUDClient<
 };
 
 type SupabaseFilterableQuery = PostgrestFilterBuilder<
+  GetSupabaseClientOptions<Database>,
   Database["public"],
   Database["public"]["Tables"][DatabaseTableNames]["Row"],
   unknown[],

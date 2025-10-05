@@ -1,4 +1,3 @@
-import { invariant } from "@tanstack/react-router";
 import { match } from "ts-pattern";
 import { BaseClient, createBaseClient } from "@/lib/clients/BaseClient";
 import { WithLogger, withLogger } from "@/lib/clients/withLogger";
@@ -9,6 +8,7 @@ import {
 import { ILogger } from "@/lib/Logger";
 import { UnknownDataFrame } from "@/lib/types/common";
 import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
+import { assertIsDefined } from "@/lib/utils/asserts";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys } from "@/lib/utils/objects/misc";
@@ -248,7 +248,7 @@ function createDatasetRawDataClient(): WithLogger<
           id: params.datasetId,
         });
 
-        invariant(
+        assertIsDefined(
           loadedDatasetEntry,
           `Could not find a locally loaded entry for dataset ${params.datasetId}`,
         );

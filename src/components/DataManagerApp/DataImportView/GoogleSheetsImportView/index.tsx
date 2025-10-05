@@ -1,6 +1,5 @@
 import { Box, BoxProps, Button, Loader, Stack, Text } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
-import { invariant } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
@@ -23,6 +22,7 @@ import {
   notifySuccess,
   notifyWarning,
 } from "@/lib/ui/notifications/notify";
+import { assertIsDefined } from "@/lib/utils/asserts";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
 import { snakeCaseKeysShallow } from "@/lib/utils/objects/transformations";
@@ -100,7 +100,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
   const [spreadsheet, isLoadingSpreadsheet] = useQuery({
     queryKey: ["google-sheets", selectedDocumentId],
     queryFn: async (): Promise<GoogleSpreadsheetData> => {
-      invariant(selectedDocumentId, "A spreadsheet must be selected");
+      assertIsDefined(selectedDocumentId, "A spreadsheet must be selected");
       const googleSpreadsheet = await APIClient.get("google-sheets/:id", {
         urlParams: { id: selectedDocumentId },
       });

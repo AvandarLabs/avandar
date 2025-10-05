@@ -71,7 +71,7 @@ export function useMutation<
   const mutationObj = tanstackUseMutation(
     {
       ...options,
-      onSuccess: (data, variables, context) => {
+      onSuccess: (data, variables, onMutateResult, context) => {
         const { queriesToInvalidate, queryToInvalidate } = options;
         if (queriesToInvalidate) {
           queriesToInvalidate.forEach((queryKey) => {
@@ -82,9 +82,9 @@ export function useMutation<
         }
 
         // Now call the user-defined `onSuccess`
-        options.onSuccess?.(data, variables, context);
+        options.onSuccess?.(data, variables, onMutateResult, context);
       },
-      onError: (error, variables, context) => {
+      onError: (error, variables, onMutateResult, context) => {
         // TODO(jpsyx): create an AvandarError class that is able to
         // reformat the most common types of errors we can catch into
         // a common unified format. Such as handling ZodErrors.
@@ -93,6 +93,7 @@ export function useMutation<
           error instanceof Error ? error.message : "Unknown error encountered";
         const logData = {
           context,
+          onMutateResult,
           variables,
         };
 
@@ -108,7 +109,7 @@ export function useMutation<
         Logger.error(error, logData);
 
         // Now call the user-defined `onError`
-        options.onError?.(error, variables, context);
+        options.onError?.(error, variables, onMutateResult, context);
       },
     },
     queryClient,

@@ -1,5 +1,8 @@
-import { invariant } from "@tanstack/react-router";
 import { UnknownObject } from "@/lib/types/common";
+import {
+  assertIsNonEmptyArray,
+  assertIsSingletonArray,
+} from "@/lib/utils/asserts";
 import { objectKeys } from "@/lib/utils/objects/misc";
 import { QueryResultData } from "./types";
 
@@ -14,19 +17,19 @@ import { QueryResultData } from "./types";
 export function scalar<V, T extends { [key: string]: V }>(
   query: QueryResultData<T>,
 ): V {
-  invariant(query.data.length !== 0, "No data found");
-  invariant(
-    query.data.length === 1,
+  assertIsNonEmptyArray(query.data, "No data found");
+  assertIsSingletonArray(
+    query.data,
     "Multiple rows found. A scalar requires a single row.",
   );
   const firstRow = query.data[0]!;
   const keys = objectKeys(firstRow);
-  invariant(
-    keys.length !== 0,
+  assertIsNonEmptyArray(
+    keys,
     "Received an empty row. A scalar requires a value.",
   );
-  invariant(
-    keys.length === 1,
+  assertIsSingletonArray(
+    keys,
     "Multiple columns found. A scalar requires a single column.",
   );
   return firstRow[keys[0]!]!;
@@ -46,8 +49,8 @@ export function singleton<T extends UnknownObject>(
   if (query.data.length === 0) {
     return undefined;
   }
-  invariant(
-    query.data.length === 1,
+  assertIsSingletonArray(
+    query.data,
     "Multiple rows found. A singleton requires a single row.",
   );
   return query.data[0]!;

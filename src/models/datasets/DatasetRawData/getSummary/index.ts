@@ -1,6 +1,6 @@
-import { invariant } from "@tanstack/react-router";
 import { match } from "ts-pattern";
 import { RawDataRow } from "@/lib/types/common";
+import { assertIsDefined } from "@/lib/utils/asserts";
 import { isDefined } from "@/lib/utils/guards";
 import { rowsToColumns } from "@/lib/utils/objects/rowsToColumns";
 import {
@@ -104,7 +104,7 @@ export function getSummary({
               columnValues[column.name] !== undefined
             ) {
               const values = columnValues[column.name];
-              invariant(
+              assertIsDefined(
                 values,
                 `No values were found for column ${column.name}`,
               );
