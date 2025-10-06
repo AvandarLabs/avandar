@@ -73,7 +73,7 @@ export function InputTextField({
   cancelButtonLabel = "Cancel",
 }: Props): JSX.Element {
   const form = useForm<SingleInputForm>({
-    mode: "uncontrolled",
+    mode: "controlled",
     initialValues: {
       value: defaultValue,
     },
@@ -82,6 +82,9 @@ export function InputTextField({
     validateInputOnChange: validateOnChange,
     validate: {
       value: (value) => {
+        if (value.trim().length === 0) {
+          return "This field cannot be empty";
+        }
         if (minLength && value.length < minLength) {
           return `${hideLabel ? "This field" : label} must be at least ${minLength} characters long`;
         }
@@ -92,7 +95,6 @@ export function InputTextField({
       },
     },
   });
-
   return (
     <form
       onSubmit={form.onSubmit(({ value }) => {
@@ -109,7 +111,14 @@ export function InputTextField({
           style={{ width: inputWidth }}
         />
         {showSubmitButton ?
-          <Button type="submit" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            disabled={
+              isSubmitting ||
+              !form.isValid() ||
+              form.values.value.trim() === defaultValue.trim()
+            }
+          >
             {submitButtonLabel}
             {isSubmitting ?
               <Loader />
