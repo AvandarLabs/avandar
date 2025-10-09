@@ -1,4 +1,4 @@
-import { Button, FileInput, FileInputProps, Group } from "@mantine/core";
+import { Box, Button, FileInput, FileInputProps, Group } from "@mantine/core";
 import { useState } from "react";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { MIMEType } from "@/lib/types/common";
@@ -48,7 +48,7 @@ type FileUploadForm = {
  * If you're using multiple file upload fields, use Mantine's `useForm` hook
  * instead of multiple FileUploadField components.
  */
-export function FileUploadField({
+export function FileUploadForm({
   clearable = true,
   accept,
   onSubmit,
@@ -76,21 +76,24 @@ export function FileUploadField({
       })}
       style={{ width: fullWidth ? "100%" : undefined }}
     >
-      <FileInput
-        key={form.key("file")}
-        {...form.getInputProps("file")}
-        clearable={clearable}
-        accept={accept}
-        {...fileInputProps}
-      />
-      <Group justify="flex-end" mt="md">
-        <Button
-          type="submit"
-          loading={isSubmitting}
-          disabled={form.getValues().file === null || isSubmitted}
-        >
-          {submitButtonLabel}
-        </Button>
+      <Group mt="md">
+        <FileInput
+          style={{ flex: 1 }}
+          key={form.key("file")}
+          {...form.getInputProps("file")}
+          clearable={clearable}
+          accept={accept}
+          {...fileInputProps}
+        />
+        <Box style={{ alignSelf: "flex-end" }}>
+          <Button
+            type="submit"
+            loading={isSubmitting}
+            disabled={form.getValues().file === null || isSubmitted}
+          >
+            {submitButtonLabel}
+          </Button>
+        </Box>
       </Group>
     </form>
   );

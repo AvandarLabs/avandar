@@ -10,6 +10,12 @@ type Props = {
 export function DataSummaryView({ datasetId }: Props): JSX.Element {
   const [summary, isLoadingSummary] = DatasetRawDataClient.useGetSummary({
     datasetId,
+    useQueryOptions: {
+      staleTime: Infinity,
+      refetchOnMount: false,
+      retry: false,
+      refetchOnWindowFocus: false,
+    },
   });
 
   return (

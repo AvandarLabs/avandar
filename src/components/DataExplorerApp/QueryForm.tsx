@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 import { QueryAggregationType } from "@/clients/DuckDBClient/types";
 import { Select, SelectData } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { DangerText } from "@/lib/ui/Text/DangerText";
+import { DangerText } from "@/lib/ui/text/DangerText";
 import { difference } from "@/lib/utils/arrays/misc";
 import { makeObject } from "@/lib/utils/objects/builders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";

@@ -192,6 +192,13 @@ export type ObjectRenderOptions<
     rootData: RootData,
   ) => ReactNode;
 
+  /**
+   * Keys to include when rendering the object. If not provided, all keys
+   * will be included (except for those in `excludeKeys`).
+   */
+  includeKeys?: ReadonlyArray<StringKeyOf<T>>;
+
+  /** Keys to exclude when rendering the object */
   excludeKeys?: ReadonlyArray<StringKeyOf<T>>;
 
   /**
@@ -222,38 +229,79 @@ export type ObjectRenderOptions<
   : PrimitiveValueRenderOptions<PrimitiveValue, RootData>;
 };
 
+type BaseObjectArrayRenderOptions<
+  T extends NonNullable<DescribableObject>,
+  RootData extends GenericRootData,
+> = PrimitiveValueRenderOptions<PrimitiveValue, RootData> & {
+  /**
+   * The key to use as the React key in order to render the array of
+   * items in a stable way. If an `idKey` is not provided we will
+   * automatically test if the object has an "id" key, otherwise
+   * we will fall back to the array index.
+   */
+  idKey?: Extract<keyof T, string | number>;
+};
+
 /**
  * Extended options for arrays of objects.
  */
 export type ObjectArrayRenderOptions<
   T extends NonNullable<DescribableObject>,
   RootData extends GenericRootData,
-> = PrimitiveValueRenderOptions<PrimitiveValue, RootData> & {
-  /**
-   * By default object arrays render as a list of collapsible items.
-   * If `renderAsTable` is true then we will render as a table instead.
-   */
-  renderAsTable?: boolean;
+> =
+  | (BaseObjectArrayRenderOptions<T, RootData> & {
+      /**
+       * By default object arrays render as a list of collapsible items.
+       * If `renderAsTable` is true then we will render as a table instead.
+       */
+      renderAsTable: true;
 
-  /**
-   * If true, we default each item to start expanded rather than collapsed.
-   * This is only applicable if we are not rendering as a table.
-   *
-   * Default is `true`.
-   */
-  defaultExpanded?: boolean;
+      /**
+       * A custom render function that receives an object key, so that you can
+       * have complete freedom on how a table column's header is rendered.
+       *
+       * Return `undefined` to fall back to the default render function, which
+       * just converts the key to Title Case.
+       */
+      renderTableHeader?: (key: keyof T, rootData: RootData) => ReactNode;
 
-  /**
-   * The title to use for each list item. This is only applicable if we are
-   * not rendering as a table.
-   */
-  titleKey?: StringKeyOf<T>;
+      /**
+       * Render options for each object in the array.
+       */
+      itemRenderOptions?: Omit<
+        ObjectRenderOptions<T, RootData>,
+        "renderObjectKeyLabel"
+      >;
+      defaultExpanded?: undefined;
+      titleKey?: undefined;
+    })
+  | (BaseObjectArrayRenderOptions<T, RootData> & {
+      /**
+       * By default object arrays render as a list of collapsible items.
+       * If `renderAsTable` is true then we will render as a table instead.
+       */
+      renderAsTable?: false;
 
-  /**
-   * Render options for each object in the array.
-   */
-  itemRenderOptions?: ObjectRenderOptions<T, RootData>;
-};
+      /**
+       * If true (and we are not rendering as a table), we default each
+       * list item to start expanded rather than collapsed.
+       *
+       * Default is `true`.
+       */
+      defaultExpanded?: boolean;
+
+      /**
+       * The title to use for each list item. This is only applicable if
+       * `renderAsTable` is false.
+       */
+      titleKey?: StringKeyOf<T>;
+
+      /**
+       * Render options for each object in the array.
+       */
+      itemRenderOptions?: ObjectRenderOptions<T, RootData>;
+      renderTableHeader?: undefined;
+    });
 
 /**
  * Extended options for nested arrays
@@ -267,9 +315,9 @@ export type NestedArrayRenderOptions<
 };
 
 /**
- * Options for how to render an array of values.
+ * Common render options for all describable value arrays.
  */
-export type DescribableValueArrayRenderOptions<
+export type BaseDescribableValueArrayRenderOptions<
   T extends DescribableValue,
   RootData extends GenericRootData,
 > = {
@@ -299,11 +347,26 @@ export type DescribableValueArrayRenderOptions<
    * Maximum number of items to show.
    */
   maxItemsCount?: number;
-} & ([T] extends [DescribableObject] ? ObjectArrayRenderOptions<T, RootData>
-: [T] extends [readonly DescribableValue[]] ?
-  NestedArrayRenderOptions<T, RootData>
-: [T] extends [PrimitiveValue] ? PrimitiveValueRenderOptions<T, RootData>
-: PrimitiveValueRenderOptions<PrimitiveValue, RootData>);
+};
+
+/**
+ * Options for how to render an array of values.
+ */
+export type DescribableValueArrayRenderOptions<
+  T extends DescribableValue,
+  RootData extends GenericRootData,
+> =
+  [T] extends [DescribableObject] ?
+    BaseDescribableValueArrayRenderOptions<T, RootData> &
+      ObjectArrayRenderOptions<T, RootData>
+  : [T] extends [readonly DescribableValue[]] ?
+    BaseDescribableValueArrayRenderOptions<T, RootData> &
+      NestedArrayRenderOptions<T, RootData>
+  : [T] extends [PrimitiveValue] ?
+    BaseDescribableValueArrayRenderOptions<T, RootData> &
+      PrimitiveValueRenderOptions<T, RootData>
+  : BaseDescribableValueArrayRenderOptions<T, RootData> &
+      PrimitiveValueRenderOptions<PrimitiveValue, RootData>;
 
 export type AnyDescribableValueRenderOptions =
   | PrimitiveValueRenderOptions<PrimitiveValue, GenericRootData>

@@ -11,6 +11,7 @@ import {
   DescribableValue,
   DescribableValueArrayRenderOptions,
   GenericRootData,
+  ObjectArrayRenderOptions,
   PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
   PrimitiveValue,
   PrimitiveValueRenderOptions,
@@ -97,7 +98,11 @@ export function DescribableValueArrayBlock<
           values={describableObjects}
           maxItemsCount={maxItemsCount}
           rootData={rootData}
-          {...objectArrayOrNestedArrayRenderOptions}
+          // eslint-disable-next-line max-len
+          {...(objectArrayOrNestedArrayRenderOptions as unknown as ObjectArrayRenderOptions<
+            DescribableObject,
+            RootData
+          >)}
         />
         <NestedArraysBlock
           values={describableValueArrays}

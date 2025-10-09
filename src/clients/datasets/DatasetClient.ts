@@ -221,7 +221,6 @@ export const DatasetClient = createSupabaseCRUDClient({
         if (localDatasetEntry) {
           const { datasetId, localTableName } = localDatasetEntry;
           await LocalDatasetEntryClient.delete({ id: datasetId });
-
           // finally, delete the raw data locally from DuckDB
           await DuckDBClient.dropDataset(localTableName);
         }

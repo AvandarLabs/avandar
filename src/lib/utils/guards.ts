@@ -3,6 +3,24 @@ import { UnknownObject } from "@/lib/types/common";
 import { AnyFunction, SetDefined } from "../types/utilityTypes";
 
 /**
+ * Returns a predicate that is true if any of the predicates are true.
+ *
+ * @param predicates - The predicates to check.
+ * @returns A predicate that is true if any of the predicates are true.
+ * @param predicates
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function or<T, Predicates extends Array<(value: any) => value is any>>(
+  value: T,
+  ...predicates: Predicates
+): value is Predicates[number] extends (value: any) => value is infer R ? T & R
+: never {
+  return predicates.some((predicate) => {
+    return predicate(value);
+  });
+}
+
+/**
  * Inspired from Remeda's `isPlainObject`.
  * Checks if `value` is a plain object, i.e. an object with string
  * keys and values. This will not consider other entities JavaScript
@@ -254,4 +272,16 @@ export function isNonEmptyArray<T>(
   value: readonly T[] | null | undefined,
 ): value is readonly [T, ...T[]] {
   return isArray(value) && value.length > 0;
+}
+
+/**
+ * Checks if `value` is an empty array.
+ *
+ * @param value - The value to check.
+ * @returns
+ */
+export function isEmptyArray<T>(
+  value: readonly T[] | null | undefined,
+): value is readonly T[] & readonly [] {
+  return isArray(value) && value.length === 0;
 }
