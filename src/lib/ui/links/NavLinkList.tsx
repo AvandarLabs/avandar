@@ -3,8 +3,8 @@ import { IconChevronRight } from "@tabler/icons-react";
 import clsx from "clsx";
 import { Key, ReactNode } from "react";
 import { NavLink } from "@/lib/ui/links/NavLink";
+import { TruncatedText } from "@/lib/ui/text/TruncatedText";
 import { objectEntries } from "@/lib/utils/objects/misc";
-import { TruncatedText } from "../text/TruncatedText";
 import type { NavLinkProps } from "@/lib/ui/links/NavLink";
 
 type Props = {
