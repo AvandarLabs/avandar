@@ -46,6 +46,7 @@ export function DangerousActionButton({
         cancel: modalProps.cancelLabel,
       },
       confirmProps: { color: "danger", loading },
+      closeOnConfirm: false,
       onConfirm: async () => {
         await modalProps.onConfirm();
         modals.close(modalId);

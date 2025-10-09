@@ -17,7 +17,7 @@ import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 import { Paper } from "@/lib/ui/Paper";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { where } from "@/lib/utils/filters/filterBuilders";
-import { Dataset } from "@/models/datasets/Dataset";
+import { Dataset, DatasetId } from "@/models/datasets/Dataset";
 
 type Props = {
   dataset: Dataset;
@@ -36,6 +36,19 @@ type Props = {
 export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
   const [deleteDataset, isDeletingDataset] = DatasetClient.useFullDelete({
     queryToRefetch: DatasetClient.QueryKeys.getAll(),
+  });
+  const [deleteLocalDatasetEntry] = useMutation({
+    queryToRefetch: ["missing-datasets"],
+    mutationFn: async (datasetId: DatasetId) => {
+      const localDatasetEntry = await LocalDatasetEntryClient.getById({
+        id: datasetId,
+      });
+      assertIsDefined(localDatasetEntry, "Local dataset entry not found");
+      await LocalDatasetEntryClient.delete({
+        id: localDatasetEntry.datasetId,
+      });
+      await DuckDBClient.dropDataset(localDatasetEntry.localTableName);
+    },
   });
 
   const [resyncDataset, isResyncing] = useMutation({
@@ -131,15 +144,10 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
           // nothing left to do. We can close the modal.
           modals.close(confirmationModalId);
         },
+        closeOnCancel: false,
         onCancel: async () => {
-          const localDatasetEntry = await LocalDatasetEntryClient.getById({
-            id: dataset.id,
-          });
-          assertIsDefined(localDatasetEntry, "Local dataset entry not found");
-          await LocalDatasetEntryClient.delete({
-            id: localDatasetEntry.datasetId,
-          });
-          await DuckDBClient.dropDataset(localDatasetEntry.localTableName);
+          await deleteLocalDatasetEntry.async(dataset.id);
+          modals.close(confirmationModalId);
         },
       });
     },

@@ -4,7 +4,6 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { ResyncDatasetsBlock } from "@/components/DataManagerApp/ResyncDatasetsBlock";
 import { useQuery } from "@/lib/hooks/query/useQuery";
-import { Logger } from "@/lib/Logger";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { isEmptyArray, isNullish, or } from "@/lib/utils/guards";
 import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
@@ -62,10 +61,10 @@ export function useCheckLocallyLoadedDatasets(): void {
     // Do nothing if there are no missing datasets
     if (or(missingDatasets, isNullish, isEmptyArray)) {
       modals.closeAll();
+      setModalId(undefined);
       return;
     }
     if (modalId) {
-      Logger.log("updating?");
       modals.updateModal({
         modalId: modalId,
         children: <ResyncDatasetsBlock datasets={missingDatasets} />,
