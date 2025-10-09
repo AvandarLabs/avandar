@@ -11,7 +11,7 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
-        "npm:@duckdb/duckdb-wasm@1.29.1-dev132.0",
+        "npm:@duckdb/duckdb-wasm@1.31.0",
         "npm:@eslint/js@^9.21.0",
         "npm:@ianvs/prettier-plugin-sort-imports@^4.4.1",
         "npm:@mantine/charts@^8.3.2",
@@ -52,6 +52,7 @@
         "npm:@types/papaparse@^5.3.15",
         "npm:@types/react-dom@^19.0.4",
         "npm:@types/react@^19.0.10",
+        "npm:@types/wicg-file-system-access@^2023.10.7",
         "npm:@vitejs/plugin-react@^4.3.4",
         "npm:ag-grid-react@^33.2.1",
         "npm:apache-arrow@17",
@@ -93,7 +94,7 @@
         "npm:ts-pattern@^5.7.0",
         "npm:type-fest@^4.39.1",
         "npm:typescript-eslint@^8.24.1",
-        "npm:typescript@~5.8.3",
+        "npm:typescript@~5.9.3",
         "npm:uuid@^11.1.0",
         "npm:vite-node@^3.2.4",
         "npm:vite-plugin-node-polyfills@0.24",

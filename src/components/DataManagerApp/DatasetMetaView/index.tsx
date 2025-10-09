@@ -22,10 +22,10 @@ import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
 import { Paper } from "@/lib/ui/Paper";
+import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { Dataset, DatasetWithColumns } from "@/models/datasets/Dataset";
@@ -48,7 +48,6 @@ const EXCLUDED_DATASET_METADATA_KEYS = [
 const DATASET_METADATA_RENDER_OPTIONS = {
   columns: {
     renderAsTable: true,
-    titleKey: "name",
     maxHeight: 400,
     itemRenderOptions: {
       excludeKeys: ["id", "datasetId", "workspaceId", "columnIdx"],

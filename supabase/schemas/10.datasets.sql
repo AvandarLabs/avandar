@@ -18,9 +18,10 @@ create table public.datasets (
   owner_profile_id uuid not null references public.user_profiles (id) on update cascade on delete no action,
   -- Workspace this dataset belongs to
   workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,
-  -- The date of the last sync of the dataset. This is nullable
-  -- because, for online datasets, we may have created the
-  -- dataset, but never loaded all of its data yet.
+  -- The date the last time this dataset's raw data was sync'd with its source.
+  -- This is nullable because, for online datasets (e.g. a Google Sheet), we
+  -- may have created the dataset object, but still not loaded its data, in
+  -- which case the dataset has never been sync'd yet.
   date_of_last_sync timestamptz,
   -- Name of the dataset
   name text not null,

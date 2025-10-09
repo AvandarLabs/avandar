@@ -1,5 +1,8 @@
 import { RawCellValue, RawDataRow } from "@/lib/types/common";
-import { DatasetColumnDataType } from "@/models/datasets/DatasetColumn";
+import {
+  DatasetColumn,
+  DatasetColumnDataType,
+} from "@/models/datasets/DatasetColumn";
 
 function guessDataTypeFromColumnName(fieldName: string): DatasetColumnDataType {
   const lowercaseName = fieldName.toLowerCase();
@@ -84,11 +87,13 @@ function detectColumnDataType(
   return fallbackType;
 }
 
-export type DetectedDatasetColumn = {
-  name: string;
-  dataType: DatasetColumnDataType;
-  columnIdx: number;
-};
+/**
+ * This is a subset of a DatasetColumn type with only
+ */
+export type DetectedDatasetColumn = Pick<
+  DatasetColumn,
+  "name" | "dataType" | "columnIdx"
+>;
 
 /**
  * Detects the data type of an array of columns and their values.

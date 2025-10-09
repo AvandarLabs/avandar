@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 import { DatasetColumnDataType } from "@/models/datasets/DatasetColumn";
 
-export type DuckDBDataTypeT =
+export type DuckDBDataType =
   | "BOOLEAN"
   | "TINYINT"
   | "SMALLINT"
@@ -33,8 +33,17 @@ export type DuckDBDataTypeT =
   | "JSON"
   | "GEOMETRY";
 
-export const DuckDBDataType = {
-  isDateOrTimestamp: (duckDBDataType: DuckDBDataTypeT): boolean => {
+/**
+ * This is a subset of DuckDBDataType. These are the possible data that
+ * DuckDB outputs when sniffing a CSV file.
+ */
+export type DuckDBSniffableDataType = Extract<
+  DuckDBDataType,
+  "BOOLEAN" | "BIGINT" | "DOUBLE" | "TIME" | "DATE" | "TIMESTAMP" | "VARCHAR"
+>;
+
+export const DuckDBDataTypeUtils = {
+  isDateOrTimestamp: (duckDBDataType: DuckDBDataType): boolean => {
     return [
       "DATE",
       "TIME",
@@ -47,8 +56,8 @@ export const DuckDBDataType = {
   /**
    * Converts a DuckDB data type to a DatasetColumn data type.
    */
-  toDatasetDataType: (
-    duckDBDataType: DuckDBDataTypeT,
+  toDatasetColumnDataType: (
+    duckDBDataType: DuckDBDataType,
   ): DatasetColumnDataType => {
     return (
       match(duckDBDataType)
@@ -103,5 +112,23 @@ export const DuckDBDataType = {
         )
         .exhaustive()
     );
+  },
+
+  // TODO(jpsyx): add support for other data types with more
+  // specificity. E.g. date vs. timestamp.
+  fromDatasetColumnType: (
+    datasetColumnType: DatasetColumnDataType,
+  ): DuckDBSniffableDataType => {
+    return match(datasetColumnType)
+      .with("text", () => {
+        return "VARCHAR" as const;
+      })
+      .with("number", () => {
+        return "DOUBLE" as const;
+      })
+      .with("date", () => {
+        return "TIMESTAMP" as const;
+      })
+      .exhaustive();
   },
 };

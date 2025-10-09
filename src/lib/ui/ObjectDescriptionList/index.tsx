@@ -1,6 +1,4 @@
 import { ScrollArea } from "@mantine/core";
-import { useMemo } from "react";
-import { StringKeyOf } from "@/lib/types/utilityTypes";
 import { objectKeys, pick } from "@/lib/utils/objects/misc";
 import { camelToTitleCase } from "@/lib/utils/strings/transformations";
 import { DescriptionList } from "../DescriptionList";
@@ -32,6 +30,7 @@ export function ObjectDescriptionListBlock<
   data,
   rootData,
   excludeKeys = [],
+  includeKeys = [],
   maxHeight,
   getRenderableValue,
   renderObject,
@@ -39,9 +38,8 @@ export function ObjectDescriptionListBlock<
   renderObjectKeyLabel,
   ...renderOptions
 }: Props<T, RootData>): JSX.Element {
-  const excludeKeySet: ReadonlySet<StringKeyOf<T>> = useMemo(() => {
-    return new Set(excludeKeys);
-  }, [excludeKeys]);
+  const excludeKeySet = new Set(excludeKeys);
+  const includeKeySet = new Set(includeKeys);
 
   const parentPrimitiveValueRenderOptions = pick(
     renderOptions,
@@ -73,7 +71,10 @@ export function ObjectDescriptionListBlock<
       <>{customRenderedObject}</>
     : <DescriptionList>
         {objectKeys(data).map((key) => {
-          if (excludeKeySet.has(key)) {
+          if (
+            excludeKeySet.has(key) ||
+            (includeKeySet.size > 0 && !includeKeySet.has(key))
+          ) {
             return null;
           }
 

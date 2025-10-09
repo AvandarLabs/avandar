@@ -53,7 +53,7 @@ type SingleInputForm = {
  * If you're using multiple fields, use Mantine's `useForm` hook instead of
  * multiple XField components.
  */
-export function InputTextField({
+export function InputTextForm({
   defaultValue,
   required = false,
   minLength,

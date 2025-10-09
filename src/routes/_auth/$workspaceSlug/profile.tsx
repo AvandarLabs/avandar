@@ -15,7 +15,7 @@ import { AuthClient } from "@/clients/AuthClient";
 import { AppLinks } from "@/config/AppLinks";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useToggleBoolean } from "@/lib/hooks/state/useToggleBoolean";
-import { InputTextField } from "@/lib/ui/singleton-forms/InputTextField";
+import { InputTextForm } from "@/lib/ui/singleton-forms/InputTextForm";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug/profile")({
   component: ProfilePage,
@@ -61,7 +61,7 @@ function ProfilePage() {
               <List listStyleType="none" spacing="sm">
                 <List.Item>
                   {isEditingEmail ?
-                    <InputTextField
+                    <InputTextForm
                       required
                       hideLabel
                       isSubmitting={isUpdateEmailPending}

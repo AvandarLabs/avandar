@@ -35,7 +35,7 @@
     "apache-arrow": "This needs to be the same version of apache-arrow used by duckdb-wasm."
   },
   "dependencies": {
-    "@duckdb/duckdb-wasm": "1.29.1-dev132.0",
+    "@duckdb/duckdb-wasm": "1.31.0",
     "@mantine/charts": "^8.3.2",
     "@mantine/core": "^8.3.2",
     "@mantine/dropzone": "^8.3.2",
@@ -93,6 +93,7 @@
     "@types/papaparse": "^5.3.15",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "@types/wicg-file-system-access": "^2023.10.7",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.21",
     "commander": "^14.0.0",
@@ -121,7 +122,7 @@
     "supabase": "^2.19.7",
     "tailwindcss": "^3.4.14",
     "type-fest": "^4.39.1",
-    "typescript": "~5.8.3",
+    "typescript": "~5.9.3",
     "typescript-eslint": "^8.24.1",
     "vite": "^7.0.4",
     "vite-node": "^3.2.4",

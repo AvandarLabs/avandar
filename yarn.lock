@@ -310,10 +310,10 @@
   resolved "https://registry.yarnpkg.com/@csstools/css-tokenizer/-/css-tokenizer-3.0.4.tgz#333fedabc3fd1a8e5d0100013731cf19e6a8c5d3"
   integrity sha512-Vd/9EVDiu6PPJt9yAh6roZP6El1xHrdvIVGjyBsHR0RYwNHgL7FJPyIIW4fANJNG6FtyZfvlRPpFI4ZM/lubvw==
 
-"@duckdb/duckdb-wasm@1.29.1-dev132.0":
-  version "1.29.1-dev132.0"
-  resolved "https://registry.yarnpkg.com/@duckdb/duckdb-wasm/-/duckdb-wasm-1.29.1-dev132.0.tgz#a2b5c0ab2f1241d095a8244a5303cc109d1f29d8"
-  integrity sha512-OUkJuH9564GQ/OgggdgJ/Yxmlk5PYnWiJe0rrNkEs0Sfsi00nK6WZgJmWGGAtCK6le2KJxFWZ4Z2MjUKGBzLuQ==
+"@duckdb/duckdb-wasm@1.31.0":
+  version "1.31.0"
+  resolved "https://registry.yarnpkg.com/@duckdb/duckdb-wasm/-/duckdb-wasm-1.31.0.tgz#bf48e84ed561048edf8c205741d1b00838f123f6"
+  integrity sha512-HcR5XFmNpi7ua0IFohO2dFDNh0LkZgnkfkiD5BDlP8SAmhhcHe+zfOPD1izpmuBxLel25LHO608NY/3RolwztQ==
   dependencies:
     apache-arrow "^17.0.0"
 
@@ -1682,6 +1682,11 @@
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/@types/use-sync-external-store/-/use-sync-external-store-0.0.6.tgz#60be8d21baab8c305132eb9cb912ed497852aadc"
   integrity sha512-zFDAD+tlpf2r4asuHEj0XH6pY6i0g5NeAHPn+15wk3BV6JA69eERFXC1gyGThDkVa1zCyKr5jox1+2LbV/AMLg==
+
+"@types/wicg-file-system-access@^2023.10.7":
+  version "2023.10.7"
+  resolved "https://registry.yarnpkg.com/@types/wicg-file-system-access/-/wicg-file-system-access-2023.10.7.tgz#fab9868dfe0743003be6cb8c37ae480c9ce8537b"
+  integrity sha512-g49ijasEJvCd7ifmAY2D0wdEtt1xRjBbA33PJTiv8mKBr7DoMsPeISoJ8oQOTopSRi+FBWPpPW5ouDj2QPKtGA==
 
 "@types/ws@^8.18.1":
   version "8.18.1"
@@ -6624,10 +6629,10 @@ typescript-eslint@^8.24.1:
     "@typescript-eslint/typescript-estree" "8.45.0"
     "@typescript-eslint/utils" "8.45.0"
 
-typescript@~5.8.3:
-  version "5.8.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.8.3.tgz#92f8a3e5e3cf497356f4178c34cd65a7f5e8440e"
-  integrity sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ==
+typescript@~5.9.3:
+  version "5.9.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.9.3.tgz#5b4f59e15310ab17a216f5d6cf53ee476ede670f"
+  integrity sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==
 
 typical@^4.0.0:
   version "4.0.0"

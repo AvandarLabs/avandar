@@ -5,21 +5,21 @@ import {
   WithQueryHooks,
   withQueryHooks,
 } from "@/lib/clients/withQueryHooks/withQueryHooks";
-import { ILogger } from "@/lib/Logger";
+import { ILogger, Logger } from "@/lib/Logger";
 import { UnknownDataFrame } from "@/lib/types/common";
 import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys } from "@/lib/utils/objects/misc";
-import { promiseMap } from "@/lib/utils/promises";
+import { promiseMap, promiseReduce } from "@/lib/utils/promises";
 import { DatasetId } from "@/models/datasets/Dataset";
 import {
   ColumnSummary,
   DatasetSummary,
 } from "@/models/datasets/DatasetRawData/getSummary";
 import { DuckDBClient, UnknownRow } from "../DuckDBClient";
-import { DuckDBDataType } from "../DuckDBClient/DuckDBDataType";
+import { DuckDBDataTypeUtils } from "../DuckDBClient/DuckDBDataType";
 import { scalar, singleton } from "../DuckDBClient/queryResultHelpers";
 import {
   QueryResultData,
@@ -55,6 +55,16 @@ type DatasetLocalStructuredQueryOptions = {
 };
 
 type DatasetRawDataClientQueries = {
+  /**
+   * Checks if a dataset is loaded locally.
+   *
+   * @param params The {@link DatasetId} to check.
+   * @returns `true` if the dataset is loaded locally, `false` otherwise.
+   */
+  isDatasetLoadedLocally: (params: {
+    datasetId: DatasetId;
+  }) => Promise<boolean>;
+
   /**
    * Runs a raw DuckDB query against the user's locally loaded raw data.
    * If the datasets specified in `dependencies` have not been loaded locally
@@ -172,6 +182,17 @@ function createDatasetRawDataClient(): WithLogger<
 
   return withLogger(baseClient, (baseLogger: ILogger) => {
     const queries: DatasetRawDataClientQueries = {
+      isDatasetLoadedLocally: async (params: { datasetId: DatasetId }) => {
+        const { datasetId } = params;
+        const datasetEntry = await LocalDatasetEntryClient.getById({
+          id: datasetId,
+        });
+        if (!datasetEntry) {
+          return false;
+        }
+        return await DuckDBClient.hasTable(datasetEntry.localTableName);
+      },
+
       runLocalRawQuery: async <T extends UnknownRow = UnknownRow>(
         params: DatasetLocalRawQueryOptions,
       ) => {
@@ -242,6 +263,7 @@ function createDatasetRawDataClient(): WithLogger<
         datasetId: DatasetId;
       }): Promise<DatasetSummary> => {
         const logger = baseLogger.appendName("getSummary");
+        Logger.log("Calling `getSummary`", params);
         logger.log("Calling `getSummary`", params);
 
         const loadedDatasetEntry = await LocalDatasetEntryClient.getById({
@@ -256,14 +278,20 @@ function createDatasetRawDataClient(): WithLogger<
         const { localTableName } = loadedDatasetEntry;
 
         const duckdbColumns = await DuckDBClient.getTableSchema(localTableName);
+
+        Logger.log("duckdb columns", duckdbColumns);
+
         const columns = duckdbColumns.map((duckColumn, idx) => {
           return {
             name: duckColumn.column_name,
-            dataType: DuckDBDataType.toDatasetDataType(duckColumn.column_type),
+            dataType: DuckDBDataTypeUtils.toDatasetColumnDataType(
+              duckColumn.column_type,
+            ),
             columnIdx: idx,
           };
         });
 
+        Logger.log("get num rows");
         const numRows = Number(
           scalar(
             await DuckDBClient.runRawQuery<{
@@ -274,11 +302,13 @@ function createDatasetRawDataClient(): WithLogger<
           ),
         );
 
-        const columnSummaries = await promiseMap(
+        Logger.log("get column summaries");
+        const columnSummaries: ColumnSummary[] = await promiseReduce(
           columns,
-          async (column): Promise<ColumnSummary> => {
+          async (summaries, column): Promise<ColumnSummary[]> => {
             const { name: columnName, dataType } = column;
 
+            Logger.log("get distinct values");
             const distinctValuesCount = Number(
               scalar(
                 await DuckDBClient.runRawQuery<{
@@ -290,6 +320,7 @@ function createDatasetRawDataClient(): WithLogger<
               ),
             );
 
+            Logger.log("get empty values");
             const emptyValuesCount = Number(
               scalar(
                 await DuckDBClient.runRawQuery<{
@@ -392,7 +423,7 @@ function createDatasetRawDataClient(): WithLogger<
               })
               .exhaustive();
 
-            return {
+            const summary: ColumnSummary = {
               name: columnName,
               distinctValuesCount,
               emptyValuesCount,
@@ -411,7 +442,11 @@ function createDatasetRawDataClient(): WithLogger<
                   },
               ...typeSpecificSummary,
             };
+
+            summaries.push(summary);
+            return summaries;
           },
+          [],
         );
 
         return {

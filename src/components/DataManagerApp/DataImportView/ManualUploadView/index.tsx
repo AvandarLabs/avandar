@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { LocalDatasetEntryClient } from "@/clients/datasets/LocalDatasetEntryClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
-import { DuckDBDataType } from "@/clients/DuckDBClient/DuckDBDataType";
+import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { getRandomTableName } from "@/clients/DuckDBClient/getRandomTableName";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/types";
 import { AppConfig } from "@/config/AppConfig";
@@ -18,7 +18,7 @@ import {
   notifySuccess,
   notifyWarning,
 } from "@/lib/ui/notifications/notify";
-import { FileUploadField } from "@/lib/ui/singleton-forms/FileUploadField";
+import { FileUploadForm } from "@/lib/ui/singleton-forms/FileUploadForm";
 import { snakeCaseKeysShallow } from "@/lib/utils/objects/transformations";
 import { Dataset } from "@/models/datasets/Dataset";
 import { WorkspaceId } from "@/models/Workspace/types";
@@ -98,6 +98,10 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
   }>();
 
   // query to load the data locally to DuckDB
+  // TODO(jpsyx): try again to set this to `useMutation` instead of `useQuery`
+  // the code is hard to follow with `useQuery` and i dont think we need to
+  // have it that way anymore. We used to need to but we worked around it i
+  // think.
   const [loadResults, isLoadingCSV, loadQueryObj] = useQuery({
     queryKey: ["load-csv", parseOptions],
     queryFn: async (): Promise<
@@ -117,6 +121,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
         delimiter,
         tableName: localTableName,
       });
+
       // now query the file for the rows to preview
       const previewData = await DuckDBClient.runRawQuery(
         `SELECT * FROM "$tableName$" LIMIT $maxPreviewRows$`,
@@ -130,11 +135,10 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
     enabled: !!parseOptions,
     // this ensures that we dont immediately set `loadResults` to undefined when
     // the `parseOptions` change.
-    placeholderData: (prevValue) => {
-      return prevValue;
-    },
+    usePreviousDataAsPlaceholder: true,
     refetchOnWindowFocus: false,
     staleTime: Infinity,
+    retry: false,
   });
 
   // check if dataset has loaded and if so, show a notification
@@ -170,7 +174,9 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
     return loadResults?.metadata.columns.map((duckColumn, idx) => {
       return {
         name: duckColumn.column_name,
-        dataType: DuckDBDataType.toDatasetDataType(duckColumn.column_type),
+        dataType: DuckDBDataTypeUtils.toDatasetColumnDataType(
+          duckColumn.column_type,
+        ),
         columnIdx: idx,
       };
     });
@@ -193,7 +199,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
   return (
     <Box {...props}>
       <Stack align="flex-start">
-        <FileUploadField
+        <FileUploadForm
           label="Upload a CSV"
           description="Select a CSV from your computer to import"
           placeholder="Select file"

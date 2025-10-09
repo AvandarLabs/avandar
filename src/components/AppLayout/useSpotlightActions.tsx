@@ -1,4 +1,3 @@
-import { notifications } from "@mantine/notifications";
 import {
   SpotlightActionData,
   SpotlightActionGroupData,
@@ -10,6 +9,7 @@ import { DuckDBClient } from "@/clients/DuckDBClient";
 import { SpotlightLinks } from "@/config/SpotlightLinks";
 import { AvaDexie } from "@/dexie/AvaDexie";
 import { Logger } from "@/lib/Logger";
+import { notifySuccess } from "@/lib/ui/notifications/notify";
 
 export function useSpotlightActions(
   workspaceSlug: string,
@@ -65,11 +65,10 @@ export function useSpotlightActions(
                 // delete the local OPFS database (DuckDB)
                 await DuckDBClient.deleteDatabase();
 
-                notifications.show({
+                notifySuccess({
                   title: "Local data deleted",
                   message:
                     "All local Avandar data has been deleted. Please refresh the page.",
-                  color: "green",
                 });
               },
             },
@@ -82,10 +81,28 @@ export function useSpotlightActions(
               onClick: async () => {
                 const tableNames = await DuckDBClient.getTableNames();
                 Logger.log("Table names", tableNames.join("; "));
-                notifications.show({
+                notifySuccess({
                   title: "Check the console",
                   message: "DuckDB tables have been printed to the console.",
-                  color: "green",
+                });
+              },
+            },
+
+            {
+              id: "list-opfs-files",
+              label: "List OPFS files",
+              description: "List all OPFS files",
+              leftSection: <IconTrash size={24} stroke={1.5} />,
+              onClick: async () => {
+                const root = await navigator.storage.getDirectory();
+                const fileNames: string[] = [];
+                for await (const entry of root.values()) {
+                  fileNames.push(entry.name);
+                }
+                Logger.log("OPFS files", fileNames.join("; "));
+                notifySuccess({
+                  title: "Check the console",
+                  message: "DuckDB tables have been printed to the console.",
                 });
               },
             },

@@ -1,5 +1,5 @@
 import { UnknownObject, UUID } from "@/lib/types/common";
-import { DuckDBDataTypeT } from "./DuckDBDataType";
+import { DuckDBDataType } from "./DuckDBDataType";
 
 export type QueryResultColumn = {
   name: string;
@@ -102,7 +102,7 @@ export type DuckDBRejectedRow = {
   /** If the error happens in a specific column, the name of the column */
   column_name: string;
   /** The type of the error that happened */
-  error_type: number;
+  error_type: string;
   /** The original CSV line */
   csv_line: string;
   /** The error message produced by DuckDB */
@@ -121,7 +121,7 @@ export type DuckDBColumnSchema = {
   /** The name of the column */
   column_name: string;
   /** The data type of the column (e.g. VARCHAR, INTEGER, etc.) */
-  column_type: DuckDBDataTypeT;
+  column_type: DuckDBDataType;
   /** The default value for the column, if any */
   default: unknown;
   /** Any extra information about the column (usually null) */
@@ -185,7 +185,7 @@ export type DuckDBCSVSniffResult = {
   /** Whether the CSV has a header */
   HasHeader: boolean;
   /** The columns of the CSV file */
-  Columns: Array<{ name: string; type: DuckDBDataTypeT }>;
+  Columns: Array<{ name: string; type: DuckDBDataType }>;
   /** The date format of the CSV file. E.g. `%d/%m/%Y` */
   DateFormat: string | null;
   /** The timestamp format of the CSV file. E.g. `%Y-%m-%dT%H:%M:%S.%f` */

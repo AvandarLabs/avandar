@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { Key, ReactNode } from "react";
 import { NavLink } from "@/lib/ui/links/NavLink";
 import { objectEntries } from "@/lib/utils/objects/misc";
-import { TruncatedText } from "../Text/TruncatedText";
+import { TruncatedText } from "../text/TruncatedText";
 import type { NavLinkProps } from "@/lib/ui/links/NavLink";
 
 type Props = {

@@ -6,7 +6,7 @@ import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { LocalDatasetEntryClient } from "@/clients/datasets/LocalDatasetEntryClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
-import { DuckDBDataType } from "@/clients/DuckDBClient/DuckDBDataType";
+import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { getRandomTableName } from "@/clients/DuckDBClient/getRandomTableName";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/types";
 import { AppConfig } from "@/config/AppConfig";
@@ -152,9 +152,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
     enabled: !!parseOptions,
     // this ensures that we dont immediately set `loadResults` to undefined when
     // the `parseOptions` change.
-    placeholderData: (prevValue) => {
-      return prevValue;
-    },
+    usePreviousDataAsPlaceholder: true,
     refetchOnWindowFocus: false,
     staleTime: Infinity,
   });
@@ -201,7 +199,9 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
     return loadResults?.metadata?.columns.map((duckColumn, idx) => {
       return {
         name: duckColumn.column_name,
-        dataType: DuckDBDataType.toDatasetDataType(duckColumn.column_type),
+        dataType: DuckDBDataTypeUtils.toDatasetColumnDataType(
+          duckColumn.column_type,
+        ),
         columnIdx: idx,
       };
     });
