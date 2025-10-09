@@ -58,8 +58,6 @@ export function useCheckLocallyLoadedDatasets(): void {
     },
   });
 
-  Logger.log("new missing datasets", missingDatasets);
-
   useEffect(() => {
     // Do nothing if there are no missing datasets
     if (or(missingDatasets, isNullish, isEmptyArray)) {

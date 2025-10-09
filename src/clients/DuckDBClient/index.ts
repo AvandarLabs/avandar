@@ -118,7 +118,6 @@ class DuckDBClientImpl {
   #logger: ILogger = Logger.appendName("DuckDBClient");
 
   async #initialize(): Promise<duckdb.AsyncDuckDB> {
-    Logger.log("calling initialize");
     // Select a bundle based on browser checks
     const bundle = await duckdb.selectBundle(MANUAL_BUNDLES);
 

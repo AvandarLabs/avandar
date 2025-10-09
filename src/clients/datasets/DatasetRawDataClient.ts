@@ -5,7 +5,7 @@ import {
   WithQueryHooks,
   withQueryHooks,
 } from "@/lib/clients/withQueryHooks/withQueryHooks";
-import { ILogger, Logger } from "@/lib/Logger";
+import { ILogger } from "@/lib/Logger";
 import { UnknownDataFrame } from "@/lib/types/common";
 import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
 import { assertIsDefined } from "@/lib/utils/asserts";
@@ -263,7 +263,6 @@ function createDatasetRawDataClient(): WithLogger<
         datasetId: DatasetId;
       }): Promise<DatasetSummary> => {
         const logger = baseLogger.appendName("getSummary");
-        Logger.log("Calling `getSummary`", params);
         logger.log("Calling `getSummary`", params);
 
         const loadedDatasetEntry = await LocalDatasetEntryClient.getById({
@@ -279,8 +278,6 @@ function createDatasetRawDataClient(): WithLogger<
 
         const duckdbColumns = await DuckDBClient.getTableSchema(localTableName);
 
-        Logger.log("duckdb columns", duckdbColumns);
-
         const columns = duckdbColumns.map((duckColumn, idx) => {
           return {
             name: duckColumn.column_name,
@@ -291,7 +288,6 @@ function createDatasetRawDataClient(): WithLogger<
           };
         });
 
-        Logger.log("get num rows");
         const numRows = Number(
           scalar(
             await DuckDBClient.runRawQuery<{
@@ -302,13 +298,11 @@ function createDatasetRawDataClient(): WithLogger<
           ),
         );
 
-        Logger.log("get column summaries");
         const columnSummaries: ColumnSummary[] = await promiseReduce(
           columns,
           async (summaries, column): Promise<ColumnSummary[]> => {
             const { name: columnName, dataType } = column;
 
-            Logger.log("get distinct values");
             const distinctValuesCount = Number(
               scalar(
                 await DuckDBClient.runRawQuery<{
@@ -320,7 +314,6 @@ function createDatasetRawDataClient(): WithLogger<
               ),
             );
 
-            Logger.log("get empty values");
             const emptyValuesCount = Number(
               scalar(
                 await DuckDBClient.runRawQuery<{
