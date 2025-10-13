@@ -5,7 +5,7 @@ import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
-import { LocalDatasetEntryClient } from "@/clients/datasets/LocalDatasetEntryClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock";
@@ -24,7 +24,7 @@ type Props = {
 };
 
 /**
- * A paper component for displaying a single dataset that needs to be re-synced
+ * A card component for displaying a single dataset that needs to be re-synced
  * because its local data is missing.
  *
  * When a file is selected for upload, we will process the file using the
@@ -37,17 +37,16 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
   const [deleteDataset, isDeletingDataset] = DatasetClient.useFullDelete({
     queryToRefetch: DatasetClient.QueryKeys.getAll(),
   });
-  const [deleteLocalDatasetEntry] = useMutation({
+  const [deleteDatasetLocally] = useMutation({
     queryToRefetch: ["missing-datasets"],
     mutationFn: async (datasetId: DatasetId) => {
-      const localDatasetEntry = await LocalDatasetEntryClient.getById({
+      const localDataset = await LocalDatasetClient.getById({
         id: datasetId,
       });
-      assertIsDefined(localDatasetEntry, "Local dataset entry not found");
-      await LocalDatasetEntryClient.delete({
-        id: localDatasetEntry.datasetId,
-      });
-      await DuckDBClient.dropDataset(localDatasetEntry.localTableName);
+      if (localDataset) {
+        await LocalDatasetClient.delete({ id: localDataset.datasetId });
+      }
+      await DuckDBClient.dropTableAndFile(datasetId);
     },
   });
 
@@ -58,12 +57,10 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
         CSVFileDatasetClient.getOne(where("dataset_id", "eq", dataset.id)),
         DatasetColumnClient.getAll(where("dataset_id", "eq", dataset.id)),
       ]);
-
       assertIsDefined(
         csvParseOptions,
         `CSV parse options could not be found for dataset (ID: ${dataset.id})`,
       );
-
       const duckdbColumns = datasetColumns.map((column) => {
         return [
           column.name,
@@ -71,32 +68,24 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
         ] as const;
       });
 
-      // If there are no errors then it means the file was loaded successfully
-      const loadResult = await DuckDBClient.loadCSV({
-        file,
-        tableName: dataset.id,
-        numRowsToSkip: csvParseOptions.rowsToSkip,
-        delimiter: csvParseOptions.delimiter,
-        columns: duckdbColumns,
-        quoteChar: csvParseOptions.quoteChar,
-        escapeChar: csvParseOptions.escapeChar,
-        newlineDelimiter: csvParseOptions.newlineDelimiter,
-        commentChar: csvParseOptions.commentChar,
-        hasHeader: csvParseOptions.hasHeader,
-        dateFormat: csvParseOptions.dateFormat,
-        timestampFormat: csvParseOptions.timestampFormat,
-      });
-
-      // now that we loaded the data, we can add an entry to IndexedDB to track
-      // the local data
-      await LocalDatasetEntryClient.insert({
-        data: {
-          datasetId: dataset.id,
-          localTableName: loadResult.tableName,
+      // add the data back to local storage
+      const loadResult = await LocalDatasetClient.storeLocalCSV({
+        datasetId: dataset.id,
+        csvParseOptions: {
+          file,
+          numRowsToSkip: csvParseOptions.rowsToSkip,
+          delimiter: csvParseOptions.delimiter,
+          columns: duckdbColumns,
+          quoteChar: csvParseOptions.quoteChar,
+          escapeChar: csvParseOptions.escapeChar,
+          newlineDelimiter: csvParseOptions.newlineDelimiter,
+          commentChar: csvParseOptions.commentChar,
+          hasHeader: csvParseOptions.hasHeader,
+          dateFormat: csvParseOptions.dateFormat,
+          timestampFormat: csvParseOptions.timestampFormat,
         },
       });
 
-      // TODO(jpsyx): we want to show preview rows in a new modal
       return { metadata: loadResult };
     },
 
@@ -146,7 +135,7 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
         },
         closeOnCancel: false,
         onCancel: async () => {
-          await deleteLocalDatasetEntry.async(dataset.id);
+          await deleteDatasetLocally.async(dataset.id);
           modals.close(confirmationModalId);
         },
       });

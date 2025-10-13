@@ -9,7 +9,7 @@ import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNonNullish } from "@/lib/utils/guards";
 import { makeMap } from "@/lib/utils/maps/builders";
 import { makeObject } from "@/lib/utils/objects/builders";
-import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
+import { getProp, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { omit } from "@/lib/utils/objects/misc";
 import { unknownToString } from "@/lib/utils/strings/transformations";
 import { DatasetSourceType } from "@/models/datasets/Dataset";
@@ -85,10 +85,10 @@ function useHydratedEntity({
 
     if (entityFieldConfigs) {
       const idField = entityFieldConfigs.find(
-        propIs("options.isIdField", true),
+        propEq("options.isIdField", true),
       );
       const nameField = entityFieldConfigs.find(
-        propIs("options.isTitleField", true),
+        propEq("options.isTitleField", true),
       );
       fieldConfigsMap = makeMap(entityFieldConfigs, {
         keyFn: getProp("id"),

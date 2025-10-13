@@ -4,10 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { LocalDatasetEntryClient } from "@/clients/datasets/LocalDatasetEntryClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
-import { getRandomTableName } from "@/clients/DuckDBClient/getRandomTableName";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/types";
 import { AppConfig } from "@/config/AppConfig";
 import { useGooglePicker } from "@/hooks/ui/useGooglePicker";
@@ -26,8 +25,9 @@ import { assertIsDefined } from "@/lib/utils/asserts";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
 import { snakeCaseKeysShallow } from "@/lib/utils/objects/transformations";
+import { uuid } from "@/lib/utils/uuid";
 import { csvCellValueSchema } from "@/lib/utils/zodHelpers";
-import { Dataset } from "@/models/datasets/Dataset";
+import { Dataset, DatasetId } from "@/models/datasets/Dataset";
 import { unparseDataset } from "@/models/LocalDataset/utils";
 import { WorkspaceId } from "@/models/Workspace/types";
 import { APIReturnType } from "@/types/http-api.types";
@@ -43,6 +43,7 @@ type Props = BoxProps;
 
 async function saveGoogleSheetToBackend(params: {
   name: string;
+  datasetId: DatasetId;
   description: string;
   googleAccount: GoogleToken;
   googleDocument: GPickerDocumentObject;
@@ -58,8 +59,10 @@ async function saveGoogleSheetToBackend(params: {
     columns,
     workspaceId,
     loadCSVResult,
+    datasetId,
   } = params;
   const dataset = await DatasetClient.insertGoogleSheetsDataset({
+    datasetId,
     workspaceId: workspaceId,
     datasetName: name,
     datasetDescription: description,
@@ -67,16 +70,6 @@ async function saveGoogleSheetToBackend(params: {
     googleDocumentId: googleDocument.id,
     columns: columns.map(snakeCaseKeysShallow),
     rowsToSkip: loadCSVResult.csvSniff.SkipRows ?? 0,
-  });
-
-  // now that we've persisted the dataset to the backend, let's add an entry
-  // to IndexedDB to map the datasetId to the table name, so we can always
-  // remember where a dataset's locally loaded raw data is stored.
-  await LocalDatasetEntryClient.insert({
-    data: {
-      datasetId: dataset.id,
-      localTableName: loadCSVResult.tableName,
-    },
   });
   return dataset;
 }
@@ -91,7 +84,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
   const selectedDocumentId = selectedDocument?.id;
   const [parseOptions, setParseOptions] = useState<{
     fileText: string;
-    localTableName: string;
+    datasetId: DatasetId;
     spreadsheetName: string;
     numRowsToSkip?: number;
     delimiter?: string;
@@ -113,7 +106,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
       setParseOptions({
         fileText: csvString,
         spreadsheetName: googleSpreadsheet.spreadsheetName,
-        localTableName: getRandomTableName(),
+        datasetId: uuid(),
       });
       return googleSpreadsheet;
     },
@@ -126,28 +119,35 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
   const [loadResults, _, loadQueryObj] = useQuery({
     queryKey: ["load-csv-text", parseOptions],
     queryFn: async (): Promise<
-      | { metadata: DuckDBLoadCSVResult; previewRows: UnknownObject[] }
+      | {
+          datasetId: DatasetId;
+          metadata: DuckDBLoadCSVResult;
+          previewRows: UnknownObject[];
+        }
       | undefined
     > => {
       if (!parseOptions) {
         return undefined;
       }
-      const { fileText, localTableName, numRowsToSkip, delimiter } =
-        parseOptions;
-      const loadResult = await DuckDBClient.loadCSV({
-        fileText,
-        numRowsToSkip,
-        delimiter,
-        tableName: localTableName,
+      const { fileText, datasetId, numRowsToSkip, delimiter } = parseOptions;
+      const loadResult = await LocalDatasetClient.storeLocalCSV({
+        datasetId,
+        csvParseOptions: {
+          fileText,
+          numRowsToSkip,
+          delimiter,
+        },
       });
       const previewData = await DuckDBClient.runRawQuery(
         `SELECT * FROM "$tableName$" LIMIT $maxPreviewRows$`,
         {
-          tableName: localTableName,
-          maxPreviewRows: AppConfig.dataManagerApp.maxPreviewRows,
+          params: {
+            tableName: datasetId,
+            maxPreviewRows: AppConfig.dataManagerApp.maxPreviewRows,
+          },
         },
       );
-      return { metadata: loadResult, previewRows: previewData.data };
+      return { datasetId, metadata: loadResult, previewRows: previewData.data };
     },
     enabled: !!parseOptions,
     // this ensures that we dont immediately set `loadResults` to undefined when
@@ -290,6 +290,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
               datasetFormValues: DatasetUploadFormValues,
             ) => {
               const dataset = await saveGoogleSheetToBackend({
+                datasetId: loadResults.datasetId,
                 workspaceId: workspace.id,
                 name: datasetFormValues.name,
                 description: datasetFormValues.description,
@@ -309,7 +310,9 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
               delimiter: string;
             }) => {
               // drop the dataset so we can re-parse it from scratch
-              await DuckDBClient.dropDataset(loadResults.metadata.tableName);
+              await LocalDatasetClient.dropLocalDataset({
+                datasetId: loadResults.datasetId,
+              });
 
               setParseOptions((prevParseOptions) => {
                 if (prevParseOptions) {
@@ -319,7 +322,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
                     delimiter: parseConfig.delimiter,
 
                     // generate a new local table name for this new parsing
-                    localTableName: getRandomTableName(),
+                    datasetId: uuid(),
                   };
                 }
                 return prevParseOptions;

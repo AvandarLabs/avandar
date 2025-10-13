@@ -4,7 +4,7 @@ import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { identity } from "@/lib/utils/misc";
 import { uuidType } from "@/lib/utils/zodHelpers";
 import { DatasetId } from "../Dataset";
-import { LocalDatasetEntryModel } from "./types";
+import { LegacyLocalDatasetEntryModel } from "./types";
 
 const DBReadSchema = object({
   datasetId: uuidType<DatasetId>(),
@@ -12,7 +12,7 @@ const DBReadSchema = object({
 });
 
 export const LocalDatasetEntryParsers =
-  makeParserRegistry<LocalDatasetEntryModel>().build({
+  makeParserRegistry<LegacyLocalDatasetEntryModel>().build({
     modelName: "LocalDatasetEntry",
     DBReadSchema,
     fromDBReadToModelRead: identity,
@@ -23,7 +23,7 @@ export const LocalDatasetEntryParsers =
 /**
  * Do not remove these tests!
  */
-type CRUDTypes = LocalDatasetEntryModel;
+type CRUDTypes = LegacyLocalDatasetEntryModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

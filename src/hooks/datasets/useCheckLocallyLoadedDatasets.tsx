@@ -6,24 +6,18 @@ import { ResyncDatasetsBlock } from "@/components/DataManagerApp/ResyncDatasetsB
 import { useQuery } from "@/lib/hooks/query/useQuery";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { isEmptyArray, isNullish, or } from "@/lib/utils/guards";
-import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
+import { getProp, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { promiseMap } from "@/lib/utils/promises";
 import { useCurrentWorkspace } from "../workspaces/useCurrentWorkspace";
 
 /**
  * Checks that all datasets that require locally-loaded data (e.g. datasets of
- * type `"csv_file"`) have a locally-loaded table in DuckDB.
+ * type `"csv_file"`) are available in local storage (IndexedDB).
  *
  * For all missing datasets that require local data, we will display an
  * error modal notifying the user that the data could not be found.
  *
- * In this modal, the user has the following options:
- *
- * a) Re-upload the dataset. But if they upload a dataset whose metadata
- *    (e.g. column names) is different from the stored dataset, then we
- *    do not allow this. Their only choice now is to delete the dataset.
- * b) Delete the dataset.
- *
+ * In this modal, the user can either re-upload the dataset or delete it.
  */
 export function useCheckLocallyLoadedDatasets(): void {
   const workspace = useCurrentWorkspace();
@@ -45,14 +39,14 @@ export function useCheckLocallyLoadedDatasets(): void {
 
       // get the locally loaded datasets
       const datasetStatuses = await promiseMap(datasets, async (dataset) => {
-        const isLoaded = await DatasetRawDataClient.isDatasetLoadedLocally({
+        const isLoaded = await DatasetRawDataClient.isLocalDatasetAvailable({
           datasetId: dataset.id,
         });
         return { dataset, isLoaded };
       });
 
       return datasetStatuses
-        .filter(propIs("isLoaded", false))
+        .filter(propEq("isLoaded", false))
         .map(getProp("dataset"));
     },
   });

@@ -19,7 +19,7 @@ import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { Paper } from "@/lib/ui/Paper";
 import { isDefined } from "@/lib/utils/guards";
-import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
+import { getProp, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { setValue } from "@/lib/utils/objects/setValue";
 import { DatasetColumnFieldsBlock } from "./DatasetColumnFieldsBlock";
 import {
@@ -70,7 +70,7 @@ export function EntityCreatorView(): JSX.Element {
           // first, let's see if this primary key column was already
           // added as a datasetColumnField.
           const primaryField = values.datasetColumnFields.find(
-            propIs(
+            propEq(
               "extractors.datasetColumnValue.datasetFieldId",
               primaryKeyColumnId,
             ),
@@ -85,7 +85,7 @@ export function EntityCreatorView(): JSX.Element {
           // otherwise, create a datasetColumnField for this primary key
           // column, and set `isIdField`
           const datasetColumn = dataset.columns.find(
-            propIs("id", primaryKeyColumnId),
+            propEq("id", primaryKeyColumnId),
           );
           if (datasetColumn) {
             return makeDefaultDatasetColumnField({
