@@ -2,6 +2,7 @@ import { Outlet } from "@tanstack/react-router";
 import { ReactNode, useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
+import { useEnsureLocalStoragePersistence } from "@/hooks/browser/useEnsureLocalStoragePersistence";
 import { useCheckLocallyLoadedDatasets } from "@/hooks/datasets/useCheckLocallyLoadedDatasets";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AppShell } from "@/lib/ui/AppShell";
@@ -18,12 +19,19 @@ type Props = {
   children?: ReactNode;
 };
 
-export function WorkspaceAppLayout({
-  children = <Outlet />,
-}: Props): JSX.Element {
+// Hooks that need to run at the root level of the workspace
+function useWorkspaceChecks() {
+  useEnsureLocalStoragePersistence();
+
   // At the root level of the app we should check if this workspace
   // is missing any datasets that *should* be locally loaded
   useCheckLocallyLoadedDatasets();
+}
+
+export function WorkspaceAppLayout({
+  children = <Outlet />,
+}: Props): JSX.Element {
+  useWorkspaceChecks();
 
   const workspace = useCurrentWorkspace();
   const [entityConfigs] = EntityConfigClient.useGetAll(
