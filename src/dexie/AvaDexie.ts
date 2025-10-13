@@ -7,6 +7,9 @@ import { CurrentDexieDBVersion } from "./CurrentDexieDBVersion";
 export const AvaDexie = {
   DB: CurrentDexieDBVersion,
 
+  /**
+   * Deletes the Avandar IndexedDB from the browser.
+   */
   deleteDatabase: async (): Promise<void> => {
     try {
       await CurrentDexieDBVersion.delete();
@@ -18,14 +21,14 @@ export const AvaDexie = {
   },
 
   /**
-   * Syncs the database version with the current version.
+   * Syncs the Dexie database version in the backend with the current version.
    * 1. If the user deleted the `meta` table, this will create it again.
    * 2. If the user deleted the version number from the `meta` table, or if it
    *    is out of sync, this will create it again.
    * 3. If the user deleted the db_id, this will create it again.
    * 4. Sync the dexie db metadata to the backend. We can use this to get an
-   *    idea of which users still have stale DBs and when it's safe to delete
-   *    a dexie upgrade function.
+   *    idea of which users still have stale DBs and when it's safe to delete an
+   *    older Dexie version from our codebase so we no longer have to bundle it.
    */
   syncDBVersion: async (user: User | undefined): Promise<void> => {
     if (CurrentDexieDBVersion.verno && CurrentDexieDBVersion.verno > 0) {

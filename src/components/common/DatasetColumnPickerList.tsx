@@ -22,7 +22,7 @@ import { makeSegmentedControlItems } from "@/lib/ui/inputs/SegmentedControl/make
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNonEmptyArray } from "@/lib/utils/guards";
 import { makeBucketRecord } from "@/lib/utils/objects/builders";
-import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
+import { getProp, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries } from "@/lib/utils/objects/misc";
 import {
   Dataset,
@@ -157,7 +157,7 @@ export function DatasetColumnPickerList({
       });
 
       const currColumnIdx = remainingColumns.findIndex(
-        propIs("value", controlledValue),
+        propEq("value", controlledValue),
       );
 
       const nextIdx =
@@ -213,7 +213,7 @@ export function DatasetColumnPickerList({
                 // now select the first item in that dataset group
                 // first, find the selected dataset
                 const datasetItemGroup = datasetColumnItems.find(
-                  propIs("dataset.id", dataset.id),
+                  propEq("dataset.id", dataset.id),
                 );
                 if (
                   datasetItemGroup &&

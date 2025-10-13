@@ -7,10 +7,9 @@ import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
 import { ILogger, Logger } from "@/lib/Logger";
+import { MIMEType } from "@/lib/types/common";
 import { assertIsDefined } from "@/lib/utils/asserts";
-import { removeOPFSFile } from "@/lib/utils/browser/removeOPFSFile";
-import { isNonEmptyArray, isString } from "@/lib/utils/guards";
-import { wait } from "@/lib/utils/misc";
+import { isNonEmptyArray } from "@/lib/utils/guards";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries, objectKeys } from "@/lib/utils/objects/misc";
 import { mapObjectValues } from "@/lib/utils/objects/transformations";
@@ -22,14 +21,13 @@ import {
   DuckDBColumnSchema,
   DuckDBCSVSniffResult,
   DuckDBLoadCSVResult,
+  DuckDBLoadParquetResult,
   DuckDBRejectedRow,
   DuckDBScan,
   QueryResultData,
   QueryResultDataPage,
   StructuredDuckDBQueryConfig,
 } from "./types";
-
-const DUCKDB_DB_PATH = "opfs://avandar.duckdb";
 
 const MANUAL_BUNDLES: duckdb.DuckDBBundles = {
   mvp: {
@@ -50,12 +48,23 @@ const sql = knex({
   useNullAsDefault: true,
 });
 
-async function ensurePersistence(): Promise<void> {
-  const alreadyPersisting = await navigator.storage.persisted();
-  if (!alreadyPersisting) {
-    await navigator.storage.persist();
-  }
-}
+type BaseDuckDBLoadCSVOptions = {
+  tableName: string;
+  numRowsToSkip?: number;
+  delimiter?: string;
+  quoteChar?: string;
+  escapeChar?: string;
+  newlineDelimiter?: string;
+  commentChar?: string;
+  hasHeader?: boolean;
+  dateFormat?: string;
+  timestampFormat?: string;
+  columns?: Array<readonly [columnName: string, columnType: DuckDBDataType]>;
+};
+
+export type DucKDBLoadCSVOptions =
+  | (BaseDuckDBLoadCSVOptions & { file: File })
+  | (BaseDuckDBLoadCSVOptions & { fileText: string });
 
 /**
  * The maximum number of rejected rows to store in DuckDB per file.
@@ -125,47 +134,7 @@ class DuckDBClientImpl {
     const worker = new Worker(bundle.mainWorker!);
     const logger = new duckdb.ConsoleLogger();
     const db = new duckdb.AsyncDuckDB(logger, worker);
-
     await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
-
-    // TODO(jpsyx): if we are in a browser that does not support OPFS
-    // we will need to persist to indexedDB. we should handle this.
-    try {
-      await db.open({
-        path: DUCKDB_DB_PATH,
-        accessMode: duckdb.DuckDBAccessMode.READ_WRITE,
-        opfs: {
-          fileHandling: "manual",
-        },
-      });
-    } catch (err) {
-      Logger.error("Failed to open duckdb", DUCKDB_DB_PATH);
-      if (
-        err instanceof Error &&
-        "exception_type" in err &&
-        "exception_message" in err &&
-        isString(err.exception_type) &&
-        isString(err.exception_message) &&
-        err.exception_type === "IO" &&
-        err.exception_message.includes("not a valid DuckDB database")
-      ) {
-        Logger.log("Attemping to remove and then re-create the database");
-        // re-create the database
-        await removeOPFSFile(DUCKDB_DB_PATH);
-        await db.open({
-          path: DUCKDB_DB_PATH,
-          accessMode: duckdb.DuckDBAccessMode.READ_WRITE,
-          opfs: {
-            fileHandling: "manual",
-          },
-        });
-      } else {
-        await db.terminate();
-        throw err; // we do not return a half-initialized DB
-      }
-    }
-
-    await ensurePersistence();
     return db;
   }
 
@@ -203,26 +172,58 @@ class DuckDBClientImpl {
     return tableNames;
   }
 
+  /**
+   * Gets the number of rows in a table.
+   * @param tableName
+   * @returns The number of rows.
+   */
+  async getTableRowCount(tableName: string): Promise<number> {
+    const result = await this.runRawQuery<{ count: bigint }>(
+      `SELECT count(*) as count FROM "$tableName$"`,
+      { params: { tableName } },
+    );
+    return Number(result.data[0]?.count ?? 0);
+  }
+
+  /**
+   * Gets the schema of a table
+   * @param tableName The name of the table.
+   * @returns The schema of the table as an array of
+   * DuckDBColumnSchema objects.
+   */
+  async getTableSchema(tableName: string): Promise<DuckDBColumnSchema[]> {
+    const { data } = await this.runRawQuery<DuckDBColumnSchema>(
+      `DESCRIBE "$tableName$"`,
+      { params: { tableName } },
+    );
+    return data;
+  }
+
   async hasTable(tableName: string): Promise<boolean> {
     const dbTableNames = await this.getTableNames();
     return dbTableNames.includes(tableName);
   }
 
   /**
-   * Registers a dataset from a CSV file.
-   * @param tableName The name of the table to register the dataset under.
-   * This must be a valid DuckDB table name. Calling `snakeify` on the string
-   * before passing it to this function would be sufficient to ensure
-   * the string is a valid table name.
+   * Registers a CSV file in DuckDB's internal file system.
    * @param options The options for registering the dataset.
+   * @param options.tableName The name of the table to register the dataset
+   * under. This must be a valid DuckDB table name. Calling `snakeify` on the
+   * string before passing it to this function would be sufficient to ensure
+   * the string is a valid table name.
+   * @param options.file The file to register. This takes precedence over
+   * passing `fileText`.
+   * @param options.fileText The raw CSV text string to register. If a `file`
+   * is provided, this option will be ignored.
    */
-  async #registerDatasetFromCSV(
+  async #registerCSVFile(
     options:
       | { tableName: string; file: File }
       | { tableName: string; fileText: string },
   ): Promise<void> {
     const { tableName } = options;
     const db = await this.#getDB();
+
     // we offer two ways a CSV can be registered: either with the file
     // handle or with the raw text
     if ("file" in options) {
@@ -240,15 +241,15 @@ class DuckDBClientImpl {
   }
 
   /**
-   * Registers a dataset from a Parquet file.
-   * @param tableName The name of the table to register the dataset under.
-   * This must be a valid DuckDB table name. Calling `snakeify` on the string
-   * before passing it to this function would be sufficient to ensure
-   * the string is a valid table name.
+   * Registers a Parquet file in DuckDB's internal file system.
    * @param options The options for registering the dataset.
+   * @param options.tableName The name of the table to register the dataset
+   * under. This must be a valid DuckDB table name. Calling `snakeify` on the
+   * string before passing it to this function would be sufficient to ensure
+   * the string is a valid table name.
+   * @param options.blob The parquet file as a binary blob to register.
    */
-  /*
-  async #registerDatasetFromParquet(options: {
+  async #registerParquetFile(options: {
     tableName: string;
     blob: Blob;
   }): Promise<void> {
@@ -257,74 +258,59 @@ class DuckDBClientImpl {
       throw new Error("Blob is not a parquet file");
     }
     const db = await this.#getDB();
-
+    const fileContents = await blob.arrayBuffer();
+    const parquetBuffer = new Uint8Array(fileContents);
     await db.registerFileBuffer(tableName, parquetBuffer);
   }
-  */
 
   /**
-   * Drops a file from DuckDB's internal file system. Also drops any extra
-   * metadata we collected about this file or its raw data.
-   * @param tableName The name of the dataset file to drop from DuckDB.
+   * Drops a file from DuckDB's internal file system and any tables related
+   * to it. If the `tableName` does not exist, this will do nothing. It does
+   * not throw an error.
+   *
+   * @param tableName The table name to drop. This will also be used as the file
+   * name to drop.
    */
-  async dropDataset(tableName: string): Promise<void> {
+  async dropTableAndFile(tableName: string): Promise<void> {
     const db = await this.#getDB();
 
     // delete the table associated to this file
     await this.runRawQuery('DROP TABLE IF EXISTS "$tableName$"', {
-      tableName,
+      params: { tableName },
     });
 
     // finally, drop the file from DuckDB's internal file system
     await db.dropFile(tableName);
   }
 
-  async #persistDB(conn: duckdb.AsyncDuckDBConnection): Promise<void> {
-    await conn.query("CHECKPOINT");
-  }
-
-  /**
-   * Syncs the DuckDB database with the browser's OPFS file system
-   * and then closes the connection.
-   */
-  async #persistAndCloseConnection(
-    conn: duckdb.AsyncDuckDBConnection,
-  ): Promise<void> {
-    await this.#persistDB(conn);
-    await this.#closeConnection(conn);
-  }
-
   /**
    * Loads a CSV file into DuckDB.
    * @param options The options for loading the CSV file.
-   * @param options.tableName The name of the table that the CSV was registered
-   * under in DuckDB.
+   * @param options.tableName The name of the table to hold the raw data. This
+   * also the file name that will be used in DuckDB's internal file system.
    * @param options.numRowsToSkip The number of rows to skip at the beginning
    * of the csv text. Defaults to `0`
    * @param options.delimiter The delimiter to use for the CSV file.
+   * @param options.quoteChar The quote character to use for the CSV file.
+   * @param options.escapeChar The escape character to use for the CSV file.
+   * @param options.newlineDelimiter The newline delimiter to use for the CSV
+   * file.
+   * @param options.commentChar The comment character to use for the CSV file.
+   * @param options.hasHeader Whether the CSV file has a header.
+   * @param options.dateFormat The date format to use for the CSV file.
+   * @param options.timestampFormat The timestamp format to use for the CSV
+   * file.
    * @param options.columns The columns to use for the CSV file, if we know
    * the schema of the CSV file ahead of time and want to make sure these
    * columns get used. The record keys are the column names, the values are
    * the DuckDBDataType of the column.
+   * @param options.file The file to load. This takes precedence over
+   * passing `fileText`.
+   * @param options.fileText The raw CSV text string to load. If a `file`
+   * is provided, this option will be ignored.
    * @returns A promise that resolves when the file is loaded.
    */
-  async loadCSV(
-    options: {
-      tableName: string;
-      numRowsToSkip?: number;
-      delimiter?: string;
-      quoteChar?: string;
-      escapeChar?: string;
-      newlineDelimiter?: string;
-      commentChar?: string;
-      hasHeader?: boolean;
-      dateFormat?: string;
-      timestampFormat?: string;
-      columns?: Array<
-        readonly [columnName: string, columnType: DuckDBDataType]
-      >;
-    } & ({ file: File } | { fileText: string }),
-  ): Promise<DuckDBLoadCSVResult> {
+  async loadCSV(options: DucKDBLoadCSVOptions): Promise<DuckDBLoadCSVResult> {
     const {
       tableName,
       numRowsToSkip = 0,
@@ -340,69 +326,69 @@ class DuckDBClientImpl {
     } = options;
     const conn = await this.#connect();
     let loadResults: DuckDBLoadCSVResult;
-
     try {
-      // if the dataset already exists, we drop it and then recreate it.
+      // If the dataset already exists, we drop it and then recreate it.
       // Loading a CSV will ALWAYS overwrite existing data.
-      await this.dropDataset(tableName);
-
-      await this.#registerDatasetFromCSV(
+      await this.dropTableAndFile(tableName);
+      await this.#registerCSVFile(
         "file" in options ?
           { tableName, file: options.file }
         : { tableName, fileText: options.fileText },
       );
 
       const cleanCommentChar = commentChar === "(empty)" ? null : commentChar;
-
       const csvSniffResult = singleton(
         await this.runRawQuery<DuckDBCSVSniffResult>(
           `SELECT
-          '$tableName$' AS table_name,
-          t.* FROM sniff_csv(
-            '$tableName$', 
-            strict_mode=false,
-            ignore_errors=true
-            ${numRowsToSkip ? `, skip=${numRowsToSkip}` : ""}
-            ${delimiter ? `, delim='${delimiter}'` : ""}
-            ${quoteChar ? `, quote='${quoteChar}'` : ""}
-            ${escapeChar ? `, escape='${escapeChar}'` : ""}
-            ${newlineDelimiter ? `, new_line='${newlineDelimiter}'` : ""}
-            ${cleanCommentChar ? `, comment='${cleanCommentChar}'` : ""}
-            ${hasHeader ? `, header=${hasHeader}` : ""}
-            ${dateFormat ? `, dateformat='${dateFormat}'` : ""}
-            ${timestampFormat ? `, timestampformat='${timestampFormat}'` : ""}
-            ${
-              columns ?
-                `, columns={${columns
-                  .map(([name, type]) => {
-                    return `'${name}': '${type}'`;
-                  })
-                  .join(",")}}`
-              : ""
-            }
-          ) t
-        `,
-          { tableName },
-          { conn },
+            '$tableName$' AS table_name,
+            t.* FROM sniff_csv(
+              '$tableName$', 
+              strict_mode=false,
+              ignore_errors=true
+              ${numRowsToSkip ? `, skip=${numRowsToSkip}` : ""}
+              ${delimiter ? `, delim='${delimiter}'` : ""}
+              ${quoteChar ? `, quote='${quoteChar}'` : ""}
+              ${escapeChar ? `, escape='${escapeChar}'` : ""}
+              ${newlineDelimiter ? `, new_line='${newlineDelimiter}'` : ""}
+              ${cleanCommentChar ? `, comment='${cleanCommentChar}'` : ""}
+              ${hasHeader ? `, header=${hasHeader}` : ""}
+              ${dateFormat ? `, dateformat='${dateFormat}'` : ""}
+              ${timestampFormat ? `, timestampformat='${timestampFormat}'` : ""}
+              ${
+                columns ?
+                  `, columns={${columns
+                    .map(([name, type]) => {
+                      return `'${name}': '${type}'`;
+                    })
+                    .join(",")}}`
+                : ""
+              }
+            ) t
+          `,
+          { conn, params: { tableName } },
         ),
       );
       assertIsDefined(csvSniffResult, "CSV Sniff result is undefined");
 
+      Logger.log("got csv sniff result", csvSniffResult);
+
       // insert the CSV file as a table
       await this.runRawQuery(
-        'CREATE TABLE "$tableName$" AS SELECT * $sniffCSVPrompt$',
+        `CREATE TABLE "$tableName$" AS SELECT * $sniffCSVPrompt$`,
         {
-          tableName: tableName,
-          sniffCSVPrompt: csvSniffResult.Prompt.replace(
-            "ignore_errors=true",
-            `encoding='utf-8',
+          conn,
+          params: {
+            tableName,
+            sniffCSVPrompt: csvSniffResult.Prompt.replace(
+              "ignore_errors=true",
+              `encoding='utf-8',
               store_rejects=true,
               rejects_scan='reject_scans',
               rejects_table='reject_errors',
               rejects_limit=${REJECTED_ROW_STORAGE_LIMIT}`,
-          ),
+            ),
+          },
         },
-        { conn },
       );
 
       // get the parsing errors
@@ -410,8 +396,7 @@ class DuckDBClientImpl {
       let rejectedRows: DuckDBRejectedRow[] = [];
       const rejectedScansResult = await this.runRawQuery<DuckDBScan>(
         `SELECT * FROM reject_scans WHERE file_path='$tableName$'`,
-        { tableName },
-        { conn },
+        { conn, params: { tableName } },
       );
       rejectedScans = rejectedScansResult.data;
 
@@ -420,8 +405,7 @@ class DuckDBClientImpl {
         const fileId = rejectedScans[0].file_id;
         const rejectedRowsResult = await this.runRawQuery<DuckDBRejectedRow>(
           `SELECT * FROM reject_errors WHERE file_id='$fileId$'`,
-          { fileId },
-          { conn },
+          { conn, params: { fileId } },
         );
         rejectedRows = rejectedRowsResult.data;
       }
@@ -447,7 +431,7 @@ class DuckDBClientImpl {
         csvSniff: csvSniffResult,
       };
     } finally {
-      await this.#persistAndCloseConnection(conn);
+      await this.#closeConnection(conn);
     }
 
     return loadResults;
@@ -456,11 +440,11 @@ class DuckDBClientImpl {
   /**
    * Loads a parquet file into DuckDB.
    * @param options The options for loading the parquet file.
-   * @param options.tableName The name of the table to create.
+   * @param options.tableName The name of the table to hold the raw data. This
+   * also the file name that will be used in DuckDB's internal file system.
    * @param options.blob The parquet file to load.
    * @returns A promise that resolves when the file is loaded.
    */
-  /*
   async loadParquet(options: {
     tableName: string;
     blob: Blob;
@@ -471,85 +455,63 @@ class DuckDBClientImpl {
 
     try {
       // Drop the dataset and recreate it. We are overwriting the data.
-      await this.dropDataset(tableName);
+      await this.dropTableAndFile(tableName);
+      await this.#registerParquetFile({ tableName, blob });
 
-      const isDataAlreadyLoaded = await this.hasTable(tableName);
-      if (!isDataAlreadyLoaded) {
-        await this.#registerDatasetFromParquet({ tableName, blob });
-
-        // reingest the parquet data into a table if it doesn't
-        // already exist
-        await this.runRawQuery(
-          `CREATE TABLE IF NOT EXISTS "$tableName$" AS
+      // re-ingest the parquet data into a table
+      await this.runRawQuery(
+        `CREATE TABLE IF NOT EXISTS "$tableName$" AS
             SELECT * FROM read_parquet('$tableName$')`,
-          { tableName },
-        );
-      }
+        { conn, params: { tableName } },
+      );
 
       // now let's collect all information we need to return
       const columns = await this.getTableSchema(tableName);
-      const csvRowCount = await this.getTableRowCount(tableName);
-
+      const rowCount = await this.getTableRowCount(tableName);
       loadResults = {
         name: tableName,
         columns,
         id: uuid(),
-        numRows: csvRowCount,
+        numRows: rowCount,
       };
     } finally {
-      await this.#persistAndCloseConnection(conn);
+      await this.#closeConnection(conn);
     }
     return loadResults;
   }
-  */
 
-  /**
-   * Gets the number of rows in a table.
-   * @param tableName
-   * @returns The number of rows.
-   */
-  async getTableRowCount(tableName: string): Promise<number> {
-    const result = await this.runRawQuery<{ count: bigint }>(
-      `SELECT count(*) as count FROM "$tableName$"`,
-      { tableName },
-    );
-    return Number(result.data[0]?.count ?? 0);
-  }
-
-  /**
-   * Gets the schema of a table
-   * @param tableName The name of the table.
-   * @returns The schema of the table as an array of
-   * DuckDBColumnSchema objects.
-   */
-  async getTableSchema(tableName: string): Promise<DuckDBColumnSchema[]> {
-    const { data } = await this.runRawQuery<DuckDBColumnSchema>(
-      `DESCRIBE "$tableName$"`,
-      { tableName },
-    );
-    return data;
-  }
-
-  /*
   async exportTableAsParquet(tableName: string): Promise<Blob> {
-    const db = await this.#getDB();
-    const parquetFileName = `${tableName}.parquet`;
+    try {
+      const db = await this.#getDB();
+      const tempParquetFileName = `${tableName}.temp`;
 
-    // create the parquet file in the DuckDB internal file system
-    await this.runRawQuery(
-      `COPY '$tableName$' TO '$parquetFileName$' (FORMAT parquet)`,
-      { tableName, parquetFileName },
-    );
-    const parquetBuffer = await db.copyFileToBuffer(parquetFileName);
-    const parquetBlob = new Blob([parquetBuffer], {
-      type: MIMEType.APPLICATION_PARQUET,
-    });
+      // create the parquet file in the DuckDB internal file system
+      await this.runRawQuery(
+        `COPY '$tableName$' TO '$parquetFileName$' (FORMAT 'parquet')`,
+        { params: { tableName, parquetFileName: tempParquetFileName } },
+      );
+      const parquetBuffer: Uint8Array<ArrayBuffer> = (await db.copyFileToBuffer(
+        tempParquetFileName,
+        // enforce ArrayBuffer type so TypeScript doesn't think it's a
+        // SharedArrayBuffer
+      )) as Uint8Array<ArrayBuffer>;
+      const parquetBlob = new Blob([parquetBuffer], {
+        type: MIMEType.APPLICATION_PARQUET,
+      });
 
-    // now drop the parquet file now that we've successfully exported it
-    await db.dropFile(parquetFileName);
-    return parquetBlob;
+      // now drop the parquet file now that we've successfully exported it
+      await db.dropFile(tempParquetFileName);
+      return parquetBlob;
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      this.#logger.error(error, {
+        msg: "Failed to export table as parquet",
+        errMsg: errorMessage,
+      });
+      throw new Error(`Parquet export failed: ${errorMessage}`);
+    }
   }
-  */
 
   /**
    * Runs a query against the database.
@@ -573,8 +535,8 @@ class DuckDBClientImpl {
    * to ensure they are treated as case-sensitive identifiers.)
    *
    * @param queryString The query to run.
-   * @param params The parameters to replace in the query string.
    * @param options Additional options for the query
+   * @param options.params The parameters to replace in the query string.
    * @param options.conn The connection to use for the query. If not
    * provided, a new connection will be created. This is useful when previous
    * operations have created temporary data (e.g. transient tables) that will
@@ -584,11 +546,12 @@ class DuckDBClientImpl {
    */
   async runRawQuery<RowObject extends UnknownRow = UnknownRow>(
     queryString: string,
-    params: Record<string, string | number | bigint> = {},
     options: {
+      params?: Record<string, string | number | bigint>;
       conn?: duckdb.AsyncDuckDBConnection;
     } = {},
   ): Promise<QueryResultData<RowObject>> {
+    const { params = {} } = options;
     const conn = options.conn ?? (await this.#connect());
     let queryResults: QueryResultData<RowObject>;
     try {
@@ -600,7 +563,6 @@ class DuckDBClientImpl {
           String(params[paramName]!),
         );
       }, queryString);
-
       this.#logger.log("Executing query", { query: queryStringToUse });
       // run the query
       const arrowTable =
@@ -610,16 +572,11 @@ class DuckDBClientImpl {
       this.#logger.error(error, { queryString });
       throw error;
     } finally {
-      // the query may have written data, so we need to also make sure we
-      // persist any changes
-      if (options.conn) {
-        // if the connection was provided, we only persist changes. It should
-        // be up to the caller to close the connection
-        await this.#persistDB(options.conn);
-      } else {
-        // if we created the connection in this function then we persist AND
-        // close the connection
-        await this.#persistAndCloseConnection(conn);
+      // If we created the connection in this function, then we can close it.
+      // Otherwise, if a connection was passed to us, we should do nothing. It
+      // should be up to the caller to close the connection.
+      if (conn !== options.conn) {
+        await this.#closeConnection(conn);
       }
     }
 
@@ -867,38 +824,6 @@ class DuckDBClientImpl {
     }
 
     return queryResults;
-  }
-
-  async deleteDatabase(): Promise<void> {
-    const db = await this.#getDB();
-    const tableNames = await this.getTableNames();
-    const dropStatements = tableNames.map((name) => {
-      return `DROP TABLE IF EXISTS "${name}";`;
-    });
-    const conn = await this.#connect();
-    await this.runRawQuery(
-      `BEGIN; $dropStatements$ COMMIT;`,
-      { dropStatements: dropStatements.join(" ") },
-      { conn },
-    );
-
-    // persist the cleared DB one last time
-    await this.#persistAndCloseConnection(conn);
-
-    // now close all connections in case we left any dangling
-    this.#openConnections.forEach((c) => {
-      c.close();
-    });
-
-    // now close the connection, detach the DB,
-    // terminate the worker, delete the file
-    db.detach();
-    await db.terminate();
-
-    // small delay to let OPFS release underlying locks
-    await wait(100);
-    await removeOPFSFile("avandar.duckdb.wal");
-    await removeOPFSFile("avandar.duckdb");
   }
 }
 

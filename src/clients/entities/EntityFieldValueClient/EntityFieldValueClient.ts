@@ -29,7 +29,6 @@ import {
 import { EntityFieldValueExtractorRegistry } from "@/models/EntityConfig/ValueExtractor/types";
 import { DatasetColumnClient } from "../../datasets/DatasetColumnClient";
 import { DatasetRawDataClient } from "../../datasets/DatasetRawDataClient";
-import { LocalDatasetEntryClient } from "../../datasets/LocalDatasetEntryClient";
 import { singleton } from "../../DuckDBClient/queryResultHelpers";
 import { EntityClient } from "../EntityClient";
 import { getEntityFieldValues } from "./getEntityFieldValues/getEntityFieldValues";
@@ -184,12 +183,6 @@ function createEntityFieldValueClient(): WithLogger<
                       primaryKeyExtractorsByDatasetId[datasetId]!;
                     const pkeyColumn =
                       datasetColumnsById[pkeyExtractor.datasetFieldId]!;
-                    const localDatasetEntry =
-                      await LocalDatasetEntryClient.getById({ id: datasetId });
-                    assertIsDefined(
-                      localDatasetEntry,
-                      "Dataset not found locally",
-                    );
                     const columnNames = columns.map(getProp("name"));
                     const requestedExtractors = datasetExtractors.filter(
                       isInSet(requestedFieldIds, {
@@ -219,7 +212,7 @@ function createEntityFieldValueClient(): WithLogger<
                           columnNames: columnNames
                             .map(wrapString('"'))
                             .join(", "),
-                          datasetTableName: localDatasetEntry.localTableName,
+                          datasetTableName: datasetId,
                           primaryKeyColumnName: pkeyColumn.name,
                           externalId: entity.externalId,
                           columnNameValueSelectors: requestedExtractors

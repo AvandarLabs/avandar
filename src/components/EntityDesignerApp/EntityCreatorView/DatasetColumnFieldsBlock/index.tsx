@@ -24,7 +24,7 @@ import { makeSegmentedControlItems } from "@/lib/ui/inputs/SegmentedControl/make
 import { removeItemWhere } from "@/lib/utils/arrays/misc";
 import { identity } from "@/lib/utils/misc";
 import { makeObject } from "@/lib/utils/objects/builders";
-import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
+import { getProp, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { DatasetWithColumns } from "@/models/datasets/Dataset";
 import {
   DatasetColumn,
@@ -128,7 +128,7 @@ export function DatasetColumnFieldsBlock({
         // if the selected dataset isn't already in our sourceDatasets array,
         // add it
         const { sourceDatasets } = entityConfigForm.getValues();
-        if (!sourceDatasets.some(propIs("dataset.id", selectedDataset.id))) {
+        if (!sourceDatasets.some(propEq("dataset.id", selectedDataset.id))) {
           entityConfigForm.insertListItem("sourceDatasets", {
             dataset: selectedDataset,
             primaryKeyColumnId: undefined,
@@ -147,12 +147,12 @@ export function DatasetColumnFieldsBlock({
 
   const removeField = useCallback(() => {
     if (selectedFieldId) {
-      const selectedField = addedFields.find(propIs("id", selectedFieldId));
+      const selectedField = addedFields.find(propEq("id", selectedFieldId));
       const sourceDatasetId =
         selectedField?.extractors.datasetColumnValue.datasetId;
       const newFields = removeItemWhere(
         addedFields,
-        propIs("id", selectedFieldId),
+        propEq("id", selectedFieldId),
       );
       entityConfigForm.setFieldValue("datasetColumnFields", newFields);
       updateFieldToColumnMap.delete(selectedFieldId);
@@ -164,14 +164,14 @@ export function DatasetColumnFieldsBlock({
       // `sourceDatasets` array.
       // First, check if there's another field that relies on this same dataset
       const isSourceDatasetStillUsed = newFields.some(
-        propIs("extractors.datasetColumnValue.datasetId", sourceDatasetId),
+        propEq("extractors.datasetColumnValue.datasetId", sourceDatasetId),
       );
       if (!isSourceDatasetStillUsed && sourceDatasetId) {
         // no remaining fields are using this dataset, so we can safely remove
         // it from our `sourceDatasets` list
         const sourceDatasetIdx = entityConfigForm
           .getValues()
-          .sourceDatasets.findIndex(propIs("dataset.id", sourceDatasetId));
+          .sourceDatasets.findIndex(propEq("dataset.id", sourceDatasetId));
         entityConfigForm.removeListItem("sourceDatasets", sourceDatasetIdx);
       }
     }
@@ -251,9 +251,9 @@ export function DatasetColumnFieldsBlock({
             <Box pt="sm">
               <DatasetColumnExtractorCreator
                 entityConfigForm={entityConfigForm}
-                fieldIdx={addedFields.findIndex(propIs("id", selectedFieldId))}
+                fieldIdx={addedFields.findIndex(propEq("id", selectedFieldId))}
                 fieldName={
-                  addedFields.find(propIs("id", selectedFieldId))!.name
+                  addedFields.find(propEq("id", selectedFieldId))!.name
                 }
               />
             </Box>

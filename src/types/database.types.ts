@@ -787,6 +787,7 @@ export type Database = {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
           p_comment_char: Database["public"]["CompositeTypes"]["util__nullable_text"]
           p_dataset_description: string
+          p_dataset_id: string
           p_dataset_name: string
           p_date_format: Database["public"]["CompositeTypes"]["datasets__csv_file__date_format"]
           p_delimiter: string
@@ -815,6 +816,7 @@ export type Database = {
         Args: {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
           p_dataset_description: string
+          p_dataset_id: string
           p_dataset_name: string
           p_dataset_source_type: Database["public"]["Enums"]["datasets__source_type"]
           p_workspace_id: string
@@ -836,6 +838,7 @@ export type Database = {
         Args: {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
           p_dataset_description: string
+          p_dataset_id: string
           p_dataset_name: string
           p_google_account_id: string
           p_google_document_id: string

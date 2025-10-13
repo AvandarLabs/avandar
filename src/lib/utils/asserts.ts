@@ -25,7 +25,7 @@ export function assert(
 export function assertIsDefined<T>(
   value: T | undefined,
   msg: string = "Expected value to be defined. Received undefined.",
-): asserts value is T {
+): asserts value is Exclude<T, undefined> {
   if (value === undefined) {
     Logger.error(msg);
     throw new Error(msg);
@@ -40,7 +40,7 @@ export function assertIsDefined<T>(
 export function assertIsNonNullish<T>(
   value: T | null | undefined,
   msg: string = "Expected value to be defined",
-): asserts value is T {
+): asserts value is Exclude<T, null | undefined> {
   if (value === null || value === undefined) {
     Logger.error(msg, { value });
     throw new Error(msg);

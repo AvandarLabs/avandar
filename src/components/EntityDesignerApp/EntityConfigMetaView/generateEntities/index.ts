@@ -1,6 +1,5 @@
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
-import { LocalDatasetEntryClient } from "@/clients/datasets/LocalDatasetEntryClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { getSQLSelectOfExtractor } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getDatasetColumnFieldValues";
@@ -8,12 +7,8 @@ import { Logger } from "@/lib/Logger";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isDefined } from "@/lib/utils/guards";
-import {
-  makeObject,
-  makeObjectFromEntries,
-} from "@/lib/utils/objects/builders";
-import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
-import { promiseMap } from "@/lib/utils/promises";
+import { makeObject } from "@/lib/utils/objects/builders";
+import { getProp, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { Entity } from "@/models/entities/Entity";
 import {
   BuildableEntityConfig,
@@ -47,14 +42,6 @@ export async function generateEntities(
     ...new Set(datasetColumnValueExtractors.map(getProp("datasetId"))),
   ].filter(isDefined);
 
-  // get all source datasets we need to pull data from
-  const localTableNameLookup = makeObjectFromEntries(
-    await promiseMap(sourceDatasetIds, async (datasetId) => {
-      const entry = await LocalDatasetEntryClient.getById({ id: datasetId });
-      return [datasetId, entry?.localTableName] as const;
-    }),
-  );
-
   // get all columns that we need to extract values from
   const sourceDatasetColumns = await DatasetColumnClient.getAll(
     where(
@@ -69,27 +56,19 @@ export async function generateEntities(
   const extractorColumnsLookup = makeObject(datasetColumnValueExtractors, {
     key: "id",
     valueFn: (extractor) => {
-      const localTableName = localTableNameLookup[extractor.datasetId];
       const column = columnsById[extractor.datasetFieldId];
-      assertIsDefined(
-        localTableName,
-        `Could not find local table name for dataset "${extractor.datasetId}"`,
-      );
       assertIsDefined(
         column,
         `Could not find column "${extractor.datasetFieldId}"`,
       );
-      return {
-        column,
-        tableName: localTableName,
-      };
+      return column;
     },
   });
 
   // 2. Get the dataset columns to use for external IDs and the entity title
   const primaryKeyExtractors = datasetColumnValueExtractors.filter(
     (extractor) => {
-      return primaryKeyFields.some(propIs("id", extractor.entityFieldConfigId));
+      return primaryKeyFields.some(propEq("id", extractor.entityFieldConfigId));
     },
   );
   const titleExtractor = datasetColumnValueExtractors.find((extractor) => {
@@ -101,8 +80,8 @@ export async function generateEntities(
   const titleColumn = extractorColumnsLookup[titleExtractor.id]!;
   const titleDatasetPrimaryKeyColumn =
     extractorColumnsLookup[
-      primaryKeyExtractorsByDatasetId[titleColumn.column.datasetId]!.id
-    ]!.column;
+      primaryKeyExtractorsByDatasetId[titleColumn.datasetId]!.id
+    ]!;
 
   await DatasetRawDataClient.runLocalRawQuery({
     dependencies: sourceDatasetIds,
@@ -137,14 +116,14 @@ export async function generateEntities(
       entityConfigId: entityConfig.id,
       externalIdSelectors: primaryKeyExtractors
         .map((extractor) => {
-          const { column, tableName } = extractorColumnsLookup[extractor.id]!;
-          return `SELECT "${column.name}" AS external_id FROM "${tableName}"`;
+          const column = extractorColumnsLookup[extractor.id]!;
+          return `SELECT "${column.name}" AS external_id FROM "${column.datasetId}"`;
         })
         .join(" UNION ALL "),
       titleSelector: getSQLSelectOfExtractor({
-        selectColumnName: titleColumn.column.name,
+        selectColumnName: titleColumn.name,
         primaryKeyColumnName: titleDatasetPrimaryKeyColumn.name,
-        tableName: titleColumn.tableName,
+        datasetId: titleColumn.datasetId,
         ruleType: titleExtractor.valuePickerRuleType,
         outputColumnName: "name",
         externalIdsTable: "external_ids",

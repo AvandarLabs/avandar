@@ -15,7 +15,7 @@ import { WorkspaceId } from "@/models/Workspace/types";
 import { CompositeTypes } from "@/types/database.types";
 import { DuckDBClient } from "../DuckDBClient";
 import { DatasetColumnClient } from "./DatasetColumnClient";
-import { LocalDatasetEntryClient } from "./LocalDatasetEntryClient";
+import { LocalDatasetClient } from "./LocalDatasetClient";
 
 type DatasetColumnInput = SetOptional<
   ExcludeNullsIn<CompositeTypes<"dataset_column_input">>,
@@ -100,6 +100,7 @@ export const DatasetClient = createSupabaseCRUDClient({
        * @returns The inserted dataset.
        */
       insertCSVFileDataset: async (params: {
+        datasetId: DatasetId;
         workspaceId: WorkspaceId;
         datasetName: string;
         datasetDescription: string;
@@ -130,6 +131,7 @@ export const DatasetClient = createSupabaseCRUDClient({
         } = params;
         const { data: dataset } = await dbClient
           .rpc("rpc_datasets__add_csv_file_dataset", {
+            p_dataset_id: params.datasetId,
             p_workspace_id: workspaceId,
             p_dataset_name: datasetName,
             p_dataset_description: datasetDescription,
@@ -169,6 +171,7 @@ export const DatasetClient = createSupabaseCRUDClient({
        */
       insertGoogleSheetsDataset: async (params: {
         workspaceId: WorkspaceId;
+        datasetId: DatasetId;
         datasetName: string;
         datasetDescription: string;
         columns: DatasetColumnInput[];
@@ -187,6 +190,7 @@ export const DatasetClient = createSupabaseCRUDClient({
         });
         const { data: dataset } = await dbClient
           .rpc("rpc_datasets__add_google_sheets_dataset", {
+            p_dataset_id: params.datasetId,
             p_workspace_id: params.workspaceId,
             p_dataset_name: params.datasetName,
             p_dataset_description: params.datasetDescription,
@@ -215,14 +219,14 @@ export const DatasetClient = createSupabaseCRUDClient({
         await DatasetClient.delete({ id });
 
         // now delete things locally from IndexedDB
-        const localDatasetEntry = await LocalDatasetEntryClient.getById({
+        const localDataset = await LocalDatasetClient.getById({
           id,
         });
-        if (localDatasetEntry) {
-          const { datasetId, localTableName } = localDatasetEntry;
-          await LocalDatasetEntryClient.delete({ id: datasetId });
+        if (localDataset) {
+          const { datasetId } = localDataset;
+          await LocalDatasetClient.delete({ id: datasetId });
           // finally, delete the raw data locally from DuckDB
-          await DuckDBClient.dropDataset(localTableName);
+          await DuckDBClient.dropTableAndFile(datasetId);
         }
       },
     };

@@ -8,7 +8,7 @@ import { DatasetId } from "../Dataset";
  * This model maps the datasetId (which came from the Dataset in Supabase) to
  * the local table name in DuckDB which stores the raw queryable data.
  */
-type LocalDatasetEntryDBRead = {
+type LegacyLocalDatasetEntryDBRead = {
   /** The dataset id from the backend */
   datasetId: DatasetId;
 
@@ -16,19 +16,20 @@ type LocalDatasetEntryDBRead = {
   localTableName: string;
 };
 
-export type LocalDatasetEntryModel = DexieModelCRUDTypes<{
+export type LegacyLocalDatasetEntryModel = DexieModelCRUDTypes<{
   modelName: "LocalDatasetEntry";
   primaryKey: "datasetId";
   primaryKeyType: DatasetId;
   dbTypes: {
-    DBRead: LocalDatasetEntryDBRead;
-    DBUpdate: Partial<LocalDatasetEntryDBRead>;
+    DBRead: LegacyLocalDatasetEntryDBRead;
+    DBUpdate: Partial<LegacyLocalDatasetEntryDBRead>;
   };
   modelTypes: {
-    Read: LocalDatasetEntryDBRead;
-    Update: Partial<LocalDatasetEntryDBRead>;
+    Read: LegacyLocalDatasetEntryDBRead;
+    Update: Partial<LegacyLocalDatasetEntryDBRead>;
   };
 }>;
 
-export type LocalDatasetEntry<K extends keyof LocalDatasetEntryModel = "Read"> =
-  LocalDatasetEntryModel[K];
+export type LegacyLocalDatasetEntry<
+  K extends keyof LegacyLocalDatasetEntryModel = "Read",
+> = LegacyLocalDatasetEntryModel[K];
