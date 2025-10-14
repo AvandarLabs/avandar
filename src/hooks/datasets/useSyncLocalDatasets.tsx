@@ -70,17 +70,15 @@ function useGarbageDatasetCollection(): void {
  * TODO(jpsyx): once CSVs can be cloud-persisted, add re-downloading them
  */
 export function useSyncLocalDatasets(): void {
+  useGarbageDatasetCollection();
   const workspace = useCurrentWorkspace();
   const [modalId, setModalId] = useState<string | undefined>(undefined);
-
   const [datasets] = DatasetClient.useGetAll({
     where: {
       workspace_id: { eq: workspace.id },
       source_type: { eq: "csv_file" },
     },
   });
-
-  useGarbageDatasetCollection();
 
   // TODO(jpsyx): this should be a DatasetClient query
   const [missingDatasets] = useQuery({
