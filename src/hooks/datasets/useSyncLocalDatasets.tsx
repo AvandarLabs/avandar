@@ -11,8 +11,6 @@ import { assertIsDefined } from "@/lib/utils/asserts";
 import { isEmptyArray, isNullish, or } from "@/lib/utils/guards";
 import { getProp, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { promiseMap } from "@/lib/utils/promises";
-import { Dataset } from "@/models/datasets/Dataset";
-import { LocalDataset } from "@/models/datasets/LocalDataset";
 import { UserId } from "@/models/User/types";
 import { useCurrentUser } from "../users/useCurrentUser";
 import { useCurrentWorkspace } from "../workspaces/useCurrentWorkspace";
@@ -23,20 +21,32 @@ import { useCurrentWorkspace } from "../workspaces/useCurrentWorkspace";
  * This runs only once: when the Supabase datasets and the local datasets are
  * first loaded.
  */
-function useGarbageDatasetCollection(options: {
-  backendDatasets: readonly Dataset[] | undefined;
-  localDatasets: readonly LocalDataset[] | undefined;
-}): void {
-  const { backendDatasets, localDatasets } = options;
+function useGarbageDatasetCollection(): void {
+  const workspace = useCurrentWorkspace();
+  const user = useCurrentUser();
+
+  const [allWorkspaceDatasets] = DatasetClient.useGetAll({
+    where: { workspace_id: { eq: workspace.id } },
+  });
+
+  const [localDatasets] = LocalDatasetClient.useGetAll({
+    where: {
+      userId: { eq: user!.id as UserId },
+      workspaceId: { eq: workspace.id },
+    },
+    useQueryOptions: {
+      enabled: !!user,
+    },
+  });
   const [isGarbageCollectionDone, setIsGarbageCollectionDone] = useState(false);
 
   useEffect(() => {
-    if (isGarbageCollectionDone || !backendDatasets || !localDatasets) {
+    if (isGarbageCollectionDone || !allWorkspaceDatasets || !localDatasets) {
       return;
     }
     const extraDatasetIds = difference(
       localDatasets.map(getProp("datasetId")),
-      backendDatasets.map(getProp("id")),
+      allWorkspaceDatasets.map(getProp("id")),
     );
     if (extraDatasetIds.length > 0) {
       Logger.log("deleting extra datasets", extraDatasetIds);
@@ -44,7 +54,7 @@ function useGarbageDatasetCollection(options: {
         setIsGarbageCollectionDone(true);
       });
     }
-  }, [backendDatasets, localDatasets, isGarbageCollectionDone]);
+  }, [allWorkspaceDatasets, localDatasets, isGarbageCollectionDone]);
 }
 
 /**
@@ -60,7 +70,6 @@ function useGarbageDatasetCollection(options: {
  * TODO(jpsyx): once CSVs can be cloud-persisted, add re-downloading them
  */
 export function useSyncLocalDatasets(): void {
-  const user = useCurrentUser();
   const workspace = useCurrentWorkspace();
   const [modalId, setModalId] = useState<string | undefined>(undefined);
 
@@ -71,20 +80,7 @@ export function useSyncLocalDatasets(): void {
     },
   });
 
-  const [localDatasets] = LocalDatasetClient.useGetAll({
-    where: {
-      userId: { eq: user!.id as UserId },
-      workspaceId: { eq: workspace.id },
-    },
-    useQueryOptions: {
-      enabled: !!user,
-    },
-  });
-
-  useGarbageDatasetCollection({
-    backendDatasets: datasets,
-    localDatasets: localDatasets,
-  });
+  useGarbageDatasetCollection();
 
   // TODO(jpsyx): this should be a DatasetClient query
   const [missingDatasets] = useQuery({
