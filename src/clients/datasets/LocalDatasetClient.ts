@@ -3,6 +3,8 @@ import { AvaDexie } from "@/dexie/AvaDexie";
 import { createDexieCRUDClient } from "@/lib/clients/dexie/createDexieCRUDClient";
 import { DatasetId } from "@/models/datasets/Dataset";
 import { LocalDatasetParsers } from "@/models/datasets/LocalDataset";
+import { UserId } from "@/models/User/types";
+import { WorkspaceId } from "@/models/Workspace/types";
 import { DuckDBClient, DucKDBLoadCSVOptions } from "../DuckDBClient";
 import { DuckDBLoadCSVResult } from "../DuckDBClient/types";
 
@@ -17,11 +19,13 @@ export const LocalDatasetClient = createDexieCRUDClient({
        */
       storeLocalCSV: async (params: {
         datasetId: DatasetId;
+        workspaceId: WorkspaceId;
+        userId: UserId;
         csvParseOptions: DistributedOmit<DucKDBLoadCSVOptions, "tableName">;
       }): Promise<DuckDBLoadCSVResult> => {
         const logger = config.logger.appendName("insertCSV");
         logger.log("Storing CSV locally", params);
-        const { datasetId, csvParseOptions } = params;
+        const { datasetId, csvParseOptions, workspaceId, userId } = params;
         const loadResult = await DuckDBClient.loadCSV({
           tableName: datasetId,
           ...csvParseOptions,
@@ -33,7 +37,12 @@ export const LocalDatasetClient = createDexieCRUDClient({
         // now that the data is in DuckDB memory, lets add an entry to IndexedDB
         // to track it in persisted local storage.
         await LocalDatasetClient.insert({
-          data: { datasetId: datasetId, parquetData: parquetData },
+          data: {
+            datasetId: datasetId,
+            parquetData: parquetData,
+            workspaceId: workspaceId,
+            userId: userId,
+          },
         });
         return loadResult;
       },

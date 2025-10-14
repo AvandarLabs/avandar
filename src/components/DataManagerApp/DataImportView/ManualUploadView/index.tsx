@@ -9,6 +9,7 @@ import { DuckDBClient } from "@/clients/DuckDBClient";
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/types";
 import { AppConfig } from "@/config/AppConfig";
+import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useQuery } from "@/lib/hooks/query/useQuery";
 import { MIMEType, UnknownObject } from "@/lib/types/common";
@@ -21,6 +22,7 @@ import { FileUploadForm } from "@/lib/ui/singleton-forms/FileUploadForm";
 import { snakeCaseKeysShallow } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
 import { Dataset, DatasetId } from "@/models/datasets/Dataset";
+import { UserId } from "@/models/User/types";
 import { WorkspaceId } from "@/models/Workspace/types";
 import { DetectedDatasetColumn } from "../../hooks/detectColumnDataTypes";
 import {
@@ -81,6 +83,7 @@ type Props = BoxProps;
 
 export function ManualUploadView({ ...props }: Props): JSX.Element {
   const queryClient = useQueryClient();
+  const user = useCurrentUser();
   const workspace = useCurrentWorkspace();
 
   const [parseOptions, setParseOptions] = useState<{
@@ -96,7 +99,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
   // have it that way anymore. We used to need to but we worked around it i
   // think.
   const [loadResults, isLoadingCSV, loadQueryObj] = useQuery({
-    queryKey: ["load-csv", parseOptions],
+    queryKey: ["load-csv", user!.id, workspace.id, parseOptions],
     queryFn: async (): Promise<
       | {
           datasetId: DatasetId;
@@ -111,6 +114,8 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
       const { file, datasetId, numRowsToSkip, delimiter } = parseOptions;
       const loadResult = await LocalDatasetClient.storeLocalCSV({
         datasetId,
+        workspaceId: workspace.id,
+        userId: user!.id as UserId,
         csvParseOptions: {
           file,
           numRowsToSkip,

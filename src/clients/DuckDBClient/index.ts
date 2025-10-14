@@ -337,6 +337,8 @@ class DuckDBClientImpl {
       );
 
       const cleanCommentChar = commentChar === "(empty)" ? null : commentChar;
+      const cleanEscapeChar = escapeChar === "(empty)" ? null : escapeChar;
+      const cleanQuoteChar = quoteChar === "(empty)" ? null : quoteChar;
       const csvSniffResult = singleton(
         await this.runRawQuery<DuckDBCSVSniffResult>(
           `SELECT
@@ -347,8 +349,8 @@ class DuckDBClientImpl {
               ignore_errors=true
               ${numRowsToSkip ? `, skip=${numRowsToSkip}` : ""}
               ${delimiter ? `, delim='${delimiter}'` : ""}
-              ${quoteChar ? `, quote='${quoteChar}'` : ""}
-              ${escapeChar ? `, escape='${escapeChar}'` : ""}
+              ${cleanQuoteChar ? `, quote='${cleanQuoteChar}'` : ""}
+              ${cleanEscapeChar ? `, escape='${cleanEscapeChar}'` : ""}
               ${newlineDelimiter ? `, new_line='${newlineDelimiter}'` : ""}
               ${cleanCommentChar ? `, comment='${cleanCommentChar}'` : ""}
               ${hasHeader ? `, header=${hasHeader}` : ""}
@@ -369,8 +371,6 @@ class DuckDBClientImpl {
         ),
       );
       assertIsDefined(csvSniffResult, "CSV Sniff result is undefined");
-
-      Logger.log("got csv sniff result", csvSniffResult);
 
       // insert the CSV file as a table
       await this.runRawQuery(

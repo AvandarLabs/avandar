@@ -3,7 +3,7 @@ import { ReactNode, useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
 import { useEnsureLocalStoragePersistence } from "@/hooks/browser/useEnsureLocalStoragePersistence";
-import { useCheckLocallyLoadedDatasets } from "@/hooks/datasets/useCheckLocallyLoadedDatasets";
+import { useSyncLocalDatasets } from "@/hooks/datasets/useSyncLocalDatasets";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AppShell } from "@/lib/ui/AppShell";
 import { where } from "@/lib/utils/filters/filterBuilders";
@@ -25,7 +25,7 @@ function useWorkspaceChecks() {
 
   // At the root level of the app we should check if this workspace
   // is missing any datasets that *should* be locally loaded
-  useCheckLocallyLoadedDatasets();
+  useSyncLocalDatasets();
 }
 
 export function WorkspaceAppLayout({

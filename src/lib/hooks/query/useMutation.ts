@@ -105,7 +105,6 @@ export function useMutation<
 
         if (queriesToRefetch) {
           queriesToRefetch.forEach((queryKey) => {
-            Logger.log("refetching query", queryKey);
             queryClient.refetchQueries({ queryKey });
           });
         } else if (queryToRefetch) {

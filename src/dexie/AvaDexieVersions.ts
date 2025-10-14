@@ -49,7 +49,12 @@ const DBDefinitions = [
   AvaDexieVersionManager.defineVersion<2>({
     db,
     version: 2,
-    models: { LocalDataset: { primaryKey: "datasetId" } },
+    models: {
+      LocalDataset: {
+        primaryKey: "datasetId",
+        columnsToIndex: ["userId", "workspaceId"],
+      },
+    },
 
     // Going for a full reset of all data. This should not be common,
     // but it's safe right now since we have not launched the platform yet.

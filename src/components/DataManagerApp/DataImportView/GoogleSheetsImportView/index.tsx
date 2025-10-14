@@ -10,6 +10,7 @@ import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/types";
 import { AppConfig } from "@/config/AppConfig";
 import { useGooglePicker } from "@/hooks/ui/useGooglePicker";
+import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useQuery } from "@/lib/hooks/query/useQuery";
 import { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
@@ -29,6 +30,7 @@ import { uuid } from "@/lib/utils/uuid";
 import { csvCellValueSchema } from "@/lib/utils/zodHelpers";
 import { Dataset, DatasetId } from "@/models/datasets/Dataset";
 import { unparseDataset } from "@/models/LocalDataset/utils";
+import { UserId } from "@/models/User/types";
 import { WorkspaceId } from "@/models/Workspace/types";
 import { APIReturnType } from "@/types/http-api.types";
 import { DetectedDatasetColumn } from "../../hooks/detectColumnDataTypes";
@@ -76,6 +78,7 @@ async function saveGoogleSheetToBackend(params: {
 
 export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
   const queryClient = useQueryClient();
+  const user = useCurrentUser();
   const workspace = useCurrentWorkspace();
   const [selectedDocument, setSelectedDocument] = useState<
     GPickerDocumentObject | undefined
@@ -117,7 +120,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
 
   // query to load the data locally to DuckDB
   const [loadResults, _, loadQueryObj] = useQuery({
-    queryKey: ["load-csv-text", parseOptions],
+    queryKey: ["load-csv-text", user!.id, workspace.id, parseOptions],
     queryFn: async (): Promise<
       | {
           datasetId: DatasetId;
@@ -132,6 +135,8 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
       const { fileText, datasetId, numRowsToSkip, delimiter } = parseOptions;
       const loadResult = await LocalDatasetClient.storeLocalCSV({
         datasetId,
+        workspaceId: workspace.id,
+        userId: user!.id as UserId,
         csvParseOptions: {
           fileText,
           numRowsToSkip,

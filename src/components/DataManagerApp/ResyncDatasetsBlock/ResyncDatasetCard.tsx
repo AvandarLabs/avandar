@@ -9,6 +9,7 @@ import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock";
+import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { Logger } from "@/lib/Logger";
 import { MIMEType } from "@/lib/types/common";
@@ -18,6 +19,7 @@ import { Paper } from "@/lib/ui/Paper";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { Dataset, DatasetId } from "@/models/datasets/Dataset";
+import { UserId } from "@/models/User/types";
 
 type Props = {
   dataset: Dataset;
@@ -34,6 +36,7 @@ type Props = {
  * - If the parsing fails, then we will display an error to the user.
  */
 export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
+  const user = useCurrentUser();
   const [deleteDataset, isDeletingDataset] = DatasetClient.useFullDelete({
     queryToRefetch: DatasetClient.QueryKeys.getAll(),
   });
@@ -71,6 +74,8 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
       // add the data back to local storage
       const loadResult = await LocalDatasetClient.storeLocalCSV({
         datasetId: dataset.id,
+        workspaceId: dataset.workspaceId,
+        userId: user!.id as UserId,
         csvParseOptions: {
           file,
           numRowsToSkip: csvParseOptions.rowsToSkip,

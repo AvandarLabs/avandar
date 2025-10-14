@@ -1,4 +1,6 @@
 import { DexieModelCRUDTypes } from "@/lib/models/DexieModelCRUDTypes";
+import { UserId } from "@/models/User/types";
+import { WorkspaceId } from "@/models/Workspace/types";
 import { DatasetId } from "../Dataset";
 
 /**
@@ -8,6 +10,12 @@ import { DatasetId } from "../Dataset";
 type LocalDatasetDBRead = {
   /** The dataset id from the backend */
   datasetId: DatasetId;
+
+  /** The workspace id the dataset belongs to */
+  workspaceId: WorkspaceId;
+
+  /** The user that has loaded this dataset locally */
+  userId: UserId;
 
   /** The raw data of the dataset as a Parquet data blob */
   parquetData: Blob;

@@ -58,6 +58,12 @@ type DBSchemaConfig<DBSchema extends DBSchemaType = DBSchemaType> =
       models: {
         [M in DBSchema["models"][number] as M["modelName"]]: {
           primaryKey: M["modelPrimaryKey"];
+          /**
+           * Additional columns to index. The primary key column does not have
+           * to be specified here. If it is, it'll just get ignored. Primary
+           * keys are indexed automatically.
+           */
+          columnsToIndex?: Array<keyof M["DBRead"]>;
         };
       };
 
@@ -153,11 +159,19 @@ function createDexieDBVersionManager<
     const dexieTableDefs = { meta: "&key" };
 
     objectKeys(models).forEach((modelName) => {
+      const { primaryKey, columnsToIndex = [] } = models[modelName]!;
+      const columnsWithoutPrimaryKey = columnsToIndex.filter((columnName) => {
+        return columnName !== primaryKey;
+      });
+
       // The & prefix is used by Dexie to know that this primary key should
       // be unique
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore This is safe
-      dexieTableDefs[modelName] = `&${models[modelName].primaryKey}`;
+      dexieTableDefs[modelName] = [
+        `&${primaryKey}`,
+        ...columnsWithoutPrimaryKey,
+      ].join(",");
     });
 
     db.version(version)

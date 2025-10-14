@@ -3,11 +3,15 @@ import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { identity } from "@/lib/utils/misc";
 import { uuidType } from "@/lib/utils/zodHelpers";
+import { UserId } from "@/models/User/types";
+import { WorkspaceId } from "@/models/Workspace/types";
 import { DatasetId } from "../Dataset";
 import { LocalDatasetModel } from "./LocalDataset.types";
 
 const DBReadSchema = object({
   datasetId: uuidType<DatasetId>(),
+  workspaceId: uuidType<WorkspaceId>(),
+  userId: uuidType<UserId>(),
   parquetData: zodInstanceOf(Blob),
 });
 
