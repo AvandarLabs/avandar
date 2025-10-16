@@ -1,21 +1,26 @@
 import { SetOptional } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { UUID } from "@/lib/types/common";
-import { Registry } from "@/lib/types/utilityTypes";
-import { objectKeys } from "@/lib/utils/objects/misc";
 import { WorkspaceId } from "@/models/Workspace/types";
 import { Enums } from "@/types/database.types";
 import { DatasetId } from "../Dataset/types";
+import { registryKeys } from "@/lib/utils/objects/misc";
 
 export type DatasetColumnId = UUID<"DatasetColumn">;
 
 export type DatasetColumnDataType = Enums<"datasets__column_data_type">;
 
-export const DatasetColumnDataTypes = objectKeys({
-  text: true,
-  number: true,
-  date: true,
-} satisfies Registry<DatasetColumnDataType>);
+export const DatasetColumnDataTypes = registryKeys<DatasetColumnDataType>(
+  {
+    varchar: true,
+    bigint: true,
+    double: true,
+    time: true,
+    date: true,
+    timestamp: true,
+    boolean: true,
+  },
+);
 
 export type DatasetColumnRead = {
   /** Timestamp of when the dataset column was created. */

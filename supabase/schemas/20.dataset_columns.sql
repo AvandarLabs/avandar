@@ -1,7 +1,11 @@
 create type public.datasets__column_data_type as enum(
-  'text',
-  'number',
-  'date'
+  'boolean',
+  'bigint',
+  'double',
+  'time',
+  'date',
+  'timestamp',
+  'varchar'
 );
 
 create table public.dataset_columns (
@@ -17,7 +21,13 @@ create table public.dataset_columns (
   updated_at timestamptz not null default now(),
   -- Name of the column
   name text not null,
-  -- Data type of the column
+  -- Original data type the column was parsed with. This is useful if we ever
+  -- need to re-parse a dataset. This value should never be changed after a
+  -- dataset is parsed.
+  original_data_type public.datasets__column_data_type not null,
+  -- Queryable data type of the column. This may differ from original_data_type, because
+  -- sometimes a column may be transformed to a new data type in DuckDB so it
+  -- can be queried more easily. This value can be changed manually by the user.
   data_type public.datasets__column_data_type not null,
   -- Description of the column. This is nullable.
   description text,

@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { ConditionalKeys } from "type-fest";
-import { Registry, StringKeyOf } from "@/lib/types/utilityTypes";
-import { objectKeys } from "@/lib/utils/objects/misc";
+import { StringKeyOf } from "@/lib/types/utilityTypes";
+import { registryKeys } from "@/lib/utils/objects/misc";
 
 /**
  * The root data of an `ObjectDescriptionList` must be a collection.
@@ -77,17 +77,19 @@ export type PrimitiveValueRenderOptions<
   dateFormat?: string;
 };
 
-export const PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS = objectKeys({
-  renderValue: true,
-  renderEmptyString: true,
-  renderNullString: true,
-  renderUndefinedString: true,
-  renderBooleanTrue: true,
-  renderBooleanFalse: true,
-  dateFormat: true,
-} satisfies Registry<
+export const PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS = registryKeys<
   keyof PrimitiveValueRenderOptions<PrimitiveValue, GenericRootData>
->);
+>(
+  {
+    renderValue: true,
+    renderEmptyString: true,
+    renderNullString: true,
+    renderUndefinedString: true,
+    renderBooleanTrue: true,
+    renderBooleanFalse: true,
+    dateFormat: true,
+  },
+);
 
 /**
  * A mapping of object keys to their render options.
@@ -97,14 +99,13 @@ export type ObjectKeyRenderOptionsMap<
   T extends NonNullable<DescribableObject>,
   RootData extends GenericRootData = T,
 > = {
-  [K in StringKeyOf<T>]?: NonNullable<T[K]> extends DescribableObject ?
-    ObjectRenderOptions<NonNullable<T[K]>, RootData>
-  : NonNullable<T[K]> extends (
-    ReadonlyArray<infer ArrayType extends DescribableValue>
-  ) ?
-    DescribableValueArrayRenderOptions<ArrayType, RootData>
-  : T[K] extends PrimitiveValue ? PrimitiveValueRenderOptions<T[K], RootData>
-  : PrimitiveValueRenderOptions<PrimitiveValue, RootData>;
+  [K in StringKeyOf<T>]?: NonNullable<T[K]> extends DescribableObject
+    ? ObjectRenderOptions<NonNullable<T[K]>, RootData>
+    : NonNullable<T[K]> extends (
+      ReadonlyArray<infer ArrayType extends DescribableValue>
+    ) ? DescribableValueArrayRenderOptions<ArrayType, RootData>
+    : T[K] extends PrimitiveValue ? PrimitiveValueRenderOptions<T[K], RootData>
+    : PrimitiveValueRenderOptions<PrimitiveValue, RootData>;
 };
 
 /**
@@ -221,12 +222,11 @@ export type ObjectRenderOptions<
    */
   itemRenderOptions?: [T] extends (
     [DescribableObjectOf<infer Item extends DescribableObject>]
-  ) ?
-    ObjectRenderOptions<Item, RootData>
-  : [T] extends [ReadonlyArray<infer Item extends DescribableValue>] ?
-    DescribableValueArrayRenderOptions<Item, RootData>
-  : [T] extends [PrimitiveValue] ? PrimitiveValueRenderOptions<T, RootData>
-  : PrimitiveValueRenderOptions<PrimitiveValue, RootData>;
+  ) ? ObjectRenderOptions<Item, RootData>
+    : [T] extends [ReadonlyArray<infer Item extends DescribableValue>]
+      ? DescribableValueArrayRenderOptions<Item, RootData>
+    : [T] extends [PrimitiveValue] ? PrimitiveValueRenderOptions<T, RootData>
+    : PrimitiveValueRenderOptions<PrimitiveValue, RootData>;
 };
 
 type BaseObjectArrayRenderOptions<
@@ -250,58 +250,58 @@ export type ObjectArrayRenderOptions<
   RootData extends GenericRootData,
 > =
   | (BaseObjectArrayRenderOptions<T, RootData> & {
-      /**
-       * By default object arrays render as a list of collapsible items.
-       * If `renderAsTable` is true then we will render as a table instead.
-       */
-      renderAsTable: true;
+    /**
+     * By default object arrays render as a list of collapsible items.
+     * If `renderAsTable` is true then we will render as a table instead.
+     */
+    renderAsTable: true;
 
-      /**
-       * A custom render function that receives an object key, so that you can
-       * have complete freedom on how a table column's header is rendered.
-       *
-       * Return `undefined` to fall back to the default render function, which
-       * just converts the key to Title Case.
-       */
-      renderTableHeader?: (key: keyof T, rootData: RootData) => ReactNode;
+    /**
+     * A custom render function that receives an object key, so that you can
+     * have complete freedom on how a table column's header is rendered.
+     *
+     * Return `undefined` to fall back to the default render function, which
+     * just converts the key to Title Case.
+     */
+    renderTableHeader?: (key: keyof T, rootData: RootData) => ReactNode;
 
-      /**
-       * Render options for each object in the array.
-       */
-      itemRenderOptions?: Omit<
-        ObjectRenderOptions<T, RootData>,
-        "renderObjectKeyLabel"
-      >;
-      defaultExpanded?: undefined;
-      titleKey?: undefined;
-    })
+    /**
+     * Render options for each object in the array.
+     */
+    itemRenderOptions?: Omit<
+      ObjectRenderOptions<T, RootData>,
+      "renderObjectKeyLabel"
+    >;
+    defaultExpanded?: undefined;
+    titleKey?: undefined;
+  })
   | (BaseObjectArrayRenderOptions<T, RootData> & {
-      /**
-       * By default object arrays render as a list of collapsible items.
-       * If `renderAsTable` is true then we will render as a table instead.
-       */
-      renderAsTable?: false;
+    /**
+     * By default object arrays render as a list of collapsible items.
+     * If `renderAsTable` is true then we will render as a table instead.
+     */
+    renderAsTable?: false;
 
-      /**
-       * If true (and we are not rendering as a table), we default each
-       * list item to start expanded rather than collapsed.
-       *
-       * Default is `true`.
-       */
-      defaultExpanded?: boolean;
+    /**
+     * If true (and we are not rendering as a table), we default each
+     * list item to start expanded rather than collapsed.
+     *
+     * Default is `true`.
+     */
+    defaultExpanded?: boolean;
 
-      /**
-       * The title to use for each list item. This is only applicable if
-       * `renderAsTable` is false.
-       */
-      titleKey?: StringKeyOf<T>;
+    /**
+     * The title to use for each list item. This is only applicable if
+     * `renderAsTable` is false.
+     */
+    titleKey?: StringKeyOf<T>;
 
-      /**
-       * Render options for each object in the array.
-       */
-      itemRenderOptions?: ObjectRenderOptions<T, RootData>;
-      renderTableHeader?: undefined;
-    });
+    /**
+     * Render options for each object in the array.
+     */
+    itemRenderOptions?: ObjectRenderOptions<T, RootData>;
+    renderTableHeader?: undefined;
+  });
 
 /**
  * Extended options for nested arrays
@@ -355,18 +355,18 @@ export type BaseDescribableValueArrayRenderOptions<
 export type DescribableValueArrayRenderOptions<
   T extends DescribableValue,
   RootData extends GenericRootData,
-> =
-  [T] extends [DescribableObject] ?
-    BaseDescribableValueArrayRenderOptions<T, RootData> &
-      ObjectArrayRenderOptions<T, RootData>
+> = [T] extends [DescribableObject] ?
+    & BaseDescribableValueArrayRenderOptions<T, RootData>
+    & ObjectArrayRenderOptions<T, RootData>
   : [T] extends [readonly DescribableValue[]] ?
-    BaseDescribableValueArrayRenderOptions<T, RootData> &
-      NestedArrayRenderOptions<T, RootData>
+      & BaseDescribableValueArrayRenderOptions<T, RootData>
+      & NestedArrayRenderOptions<T, RootData>
   : [T] extends [PrimitiveValue] ?
-    BaseDescribableValueArrayRenderOptions<T, RootData> &
-      PrimitiveValueRenderOptions<T, RootData>
-  : BaseDescribableValueArrayRenderOptions<T, RootData> &
-      PrimitiveValueRenderOptions<PrimitiveValue, RootData>;
+      & BaseDescribableValueArrayRenderOptions<T, RootData>
+      & PrimitiveValueRenderOptions<T, RootData>
+  :
+    & BaseDescribableValueArrayRenderOptions<T, RootData>
+    & PrimitiveValueRenderOptions<PrimitiveValue, RootData>;
 
 export type AnyDescribableValueRenderOptions =
   | PrimitiveValueRenderOptions<PrimitiveValue, GenericRootData>

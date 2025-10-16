@@ -1,5 +1,5 @@
 import { UnknownObject } from "@/lib/types/common";
-import { Entries, StringKeyOf } from "@/lib/types/utilityTypes";
+import { Entries, Registry, StringKeyOf } from "@/lib/types/utilityTypes";
 
 /**
  * Returns an array of entries from an object.
@@ -75,4 +75,14 @@ export function pick<T extends UnknownObject, K extends keyof T>(
     });
   }
   return newObj;
+}
+
+/**
+ * Helper function to get the keys of a registry. This is useful to generate
+ * type-safe arrays of a string literal union
+ * @param registry The registry to get the keys from.
+ * @returns The keys from the registry.
+ */
+export function registryKeys<T extends string>(registry: Registry<T>): T[] {
+  return objectKeys(registry) as unknown as T[];
 }

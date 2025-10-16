@@ -43,6 +43,7 @@ export type Database = {
           description: string | null
           id: string
           name: string
+          original_data_type: Database["public"]["Enums"]["datasets__column_data_type"]
           updated_at: string
           workspace_id: string
         }
@@ -54,6 +55,7 @@ export type Database = {
           description?: string | null
           id?: string
           name: string
+          original_data_type: Database["public"]["Enums"]["datasets__column_data_type"]
           updated_at?: string
           workspace_id: string
         }
@@ -65,6 +67,7 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+          original_data_type?: Database["public"]["Enums"]["datasets__column_data_type"]
           updated_at?: string
           workspace_id?: string
         }
@@ -902,7 +905,14 @@ export type Database = {
       }
     }
     Enums: {
-      datasets__column_data_type: "text" | "number" | "date"
+      datasets__column_data_type:
+        | "boolean"
+        | "bigint"
+        | "double"
+        | "time"
+        | "date"
+        | "timestamp"
+        | "varchar"
       datasets__source_type: "csv_file" | "google_sheets"
       entity_field_configs__base_data_type: "string" | "number" | "date"
       entity_field_configs__class: "dimension" | "metric"
@@ -917,6 +927,9 @@ export type Database = {
       dataset_column_input: {
         name: string | null
         description: string | null
+        original_data_type:
+          | Database["public"]["Enums"]["datasets__column_data_type"]
+          | null
         data_type:
           | Database["public"]["Enums"]["datasets__column_data_type"]
           | null
@@ -1056,7 +1069,15 @@ export const Constants = {
   },
   public: {
     Enums: {
-      datasets__column_data_type: ["text", "number", "date"],
+      datasets__column_data_type: [
+        "boolean",
+        "bigint",
+        "double",
+        "time",
+        "date",
+        "timestamp",
+        "varchar",
+      ],
       datasets__source_type: ["csv_file", "google_sheets"],
       entity_field_configs__base_data_type: ["string", "number", "date"],
       entity_field_configs__class: ["dimension", "metric"],

@@ -2,7 +2,7 @@ import * as arrow from "apache-arrow";
 import { match } from "ts-pattern";
 import { QueryAggregationType } from "@/clients/DuckDBClient/types";
 import { EntityFieldBaseType } from "@/models/EntityConfig/EntityFieldConfig/types";
-import { DatasetColumnDataType } from "./types";
+import { DatasetColumnDataType } from "./DatasetColumn.types";
 
 /*
  * Converts a dataset field data type to its equivalent Arrow data type.

@@ -1,4 +1,4 @@
-import { iso, number, object, string, uuid, enum as zodEnum } from "zod";
+import { enum as zodEnum, iso, number, object, string, uuid } from "zod";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { excludeNullsExceptInProps } from "@/lib/utils/objects/higherOrderFuncs";
@@ -16,7 +16,7 @@ import {
   DatasetColumnDataTypes,
   DatasetColumnId,
   DatasetColumnModel,
-} from "./types";
+} from "./DatasetColumn.types";
 
 const DBReadSchema = object({
   created_at: iso.datetime({ offset: true }),
@@ -30,8 +30,8 @@ const DBReadSchema = object({
   column_idx: number(),
 });
 
-export const DatasetColumnParsers =
-  makeParserRegistry<DatasetColumnModel>().build({
+export const DatasetColumnParsers = makeParserRegistry<DatasetColumnModel>()
+  .build({
     modelName: "DatasetColumn",
     DBReadSchema,
     fromDBReadToModelRead: pipe(
