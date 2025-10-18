@@ -16,11 +16,11 @@ import { promiseFlatMap } from "@/lib/utils/promises";
 import { DatasetId } from "@/models/datasets/Dataset";
 import { DatasetColumn } from "@/models/datasets/DatasetColumn";
 import { EntityConfigId } from "@/models/EntityConfig";
-import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
+import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import {
   EntityFieldConfig,
   EntityFieldConfigId,
-} from "@/models/EntityConfig/EntityFieldConfig/types";
+} from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import { DatasetColumnValueExtractorClient } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractorClient";
 import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/types";
 
@@ -194,8 +194,9 @@ export async function getDatasetColumnFieldValues({
   entityConfigId: EntityConfigId;
   fieldsWithExtractors: readonly FieldWithDatasetExtractor[];
 }): Promise<Array<Record<EntityFieldConfigId, unknown>>> {
-  const primaryKeyFieldsWithExtractors =
-    await _getPrimaryKeyFieldExtractors(entityConfigId);
+  const primaryKeyFieldsWithExtractors = await _getPrimaryKeyFieldExtractors(
+    entityConfigId,
+  );
 
   // Get all metadata of the columns we need to extract
   const allColumnIds = removeDuplicates([

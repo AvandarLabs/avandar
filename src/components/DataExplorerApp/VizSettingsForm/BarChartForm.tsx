@@ -2,7 +2,8 @@ import { useMemo } from "react";
 import { QueryResultColumn } from "@/clients/DuckDBClient/types";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { getProp, propEq } from "@/lib/utils/objects/higherOrderFuncs";
+import { propPasses } from "@/lib/utils/objects/higherOrderFuncs";
+import { AvaDataTypeUtils } from "@/models/datasets/AvaDataType";
 
 export type BarChartSettings = {
   xAxisKey: string | undefined;
@@ -22,16 +23,19 @@ export function BarChartForm({
 }: Props): JSX.Element {
   const fieldOptions = useMemo(() => {
     return makeSelectOptions(fields, {
-      valueFn: getProp("name"),
-      labelFn: getProp("name"),
+      valueKey: "name",
+      labelKey: "name",
     });
   }, [fields]);
 
   const numericFieldOptions = useMemo(() => {
-    return makeSelectOptions(fields.filter(propEq("dataType", "number")), {
-      valueFn: getProp("name"),
-      labelFn: getProp("name"),
-    });
+    return makeSelectOptions(
+      fields.filter(propPasses("dataType", AvaDataTypeUtils.isNumeric)),
+      {
+        valueKey: "name",
+        labelKey: "name",
+      },
+    );
   }, [fields]);
 
   const { xAxisKey, yAxisKey } = settings;

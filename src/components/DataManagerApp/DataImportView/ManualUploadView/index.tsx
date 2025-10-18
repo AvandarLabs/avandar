@@ -22,9 +22,9 @@ import { FileUploadForm } from "@/lib/ui/singleton-forms/FileUploadForm";
 import { snakeCaseKeysShallow } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
 import { Dataset, DatasetId } from "@/models/datasets/Dataset";
+import { DetectedDatasetColumn } from "@/models/datasets/DatasetColumn";
 import { UserId } from "@/models/User/types";
 import { WorkspaceId } from "@/models/Workspace/types";
-import { DetectedDatasetColumn } from "../../hooks/detectColumnDataTypes";
 import {
   DatasetUploadForm,
   DatasetUploadFormValues,
@@ -178,9 +178,9 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
     return loadResults?.metadata.columns.map((duckColumn, idx) => {
       return {
         name: duckColumn.column_name,
-        dataType: DuckDBDataTypeUtils.toDatasetColumnDataType(
-          duckColumn.column_type,
-        ),
+        originalDataType: duckColumn.column_type,
+        detectedDataType: duckColumn.column_type,
+        dataType: DuckDBDataTypeUtils.toAvaDataType(duckColumn.column_type),
         columnIdx: idx,
       };
     });

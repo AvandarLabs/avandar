@@ -7,7 +7,6 @@ import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
-import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useMutation } from "@/lib/hooks/query/useMutation";
@@ -65,10 +64,7 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
         `CSV parse options could not be found for dataset (ID: ${dataset.id})`,
       );
       const duckdbColumns = datasetColumns.map((column) => {
-        return [
-          column.name,
-          DuckDBDataTypeUtils.fromDatasetColumnType(column.dataType),
-        ] as const;
+        return [column.name, column.detectedDataType] as const;
       });
 
       // add the data back to local storage

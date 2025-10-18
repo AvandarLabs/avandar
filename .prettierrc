@@ -32,7 +32,8 @@
         "identifierCase": "lower",
         "indentStyle": "standard",
         "logicalOperatorNewline": "after",
-        "expressionWidth": 8
+        "expressionWidth": 8,
+        "linesBetweenQueries": 1
       }
     }
   ]

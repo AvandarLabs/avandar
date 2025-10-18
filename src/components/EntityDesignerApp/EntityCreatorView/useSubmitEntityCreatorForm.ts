@@ -7,7 +7,7 @@ import {
 import { hasPropKeys, isDefined } from "@/lib/utils/guards";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
-import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
+import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { EntityFieldValueExtractor } from "@/models/EntityConfig/ValueExtractor/types";
 import { ValueExtractorClient } from "@/models/EntityConfig/ValueExtractor/ValueExtractorClient";
 import { EntityConfigFormSubmitValues } from "./entityConfigFormTypes";

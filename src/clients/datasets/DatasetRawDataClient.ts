@@ -14,10 +14,6 @@ import { getProp, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys } from "@/lib/utils/objects/misc";
 import { promiseMap, promiseReduce } from "@/lib/utils/promises";
 import { DatasetId } from "@/models/datasets/Dataset";
-import {
-  ColumnSummary,
-  DatasetSummary,
-} from "@/models/datasets/DatasetRawData/getSummary";
 import { DuckDBClient, UnknownRow } from "../DuckDBClient";
 import { DuckDBDataTypeUtils } from "../DuckDBClient/DuckDBDataType";
 import { scalar, singleton } from "../DuckDBClient/queryResultHelpers";
@@ -26,6 +22,42 @@ import {
   StructuredDuckDBQueryConfig,
 } from "../DuckDBClient/types";
 import { LocalDatasetClient } from "./LocalDatasetClient";
+
+type TextFieldSummary = {
+  type: "text";
+};
+
+type NumericFieldSummary = {
+  type: "number";
+  maxValue: number;
+  minValue: number;
+  averageValue: number;
+  stdDev: number;
+};
+
+type DateFieldSummary = {
+  type: "date";
+  mostRecentDate: string;
+  oldestDate: string;
+  datasetDuration: string;
+};
+
+export type ColumnSummary = {
+  name: string;
+  distinctValuesCount: number;
+  emptyValuesCount: number;
+  percentMissingValues: number;
+  mostCommonValue: {
+    count: number;
+    value: string[];
+  };
+} & (TextFieldSummary | NumericFieldSummary | DateFieldSummary);
+
+type DatasetSummary = {
+  rows: number;
+  columns: number;
+  columnSummaries?: readonly ColumnSummary[];
+};
 
 type DatasetLocalRawQueryOptions = {
   /**
@@ -159,7 +191,9 @@ function createDatasetRawDataClient(): WithLogger<
     );
     if (missingLocalDatasets.length > 0) {
       throw new Error(
-        `The following datasets were not found locally: ${missingLocalDatasets.join(", ")}`,
+        `The following datasets were not found locally: ${
+          missingLocalDatasets.join(", ")
+        }`,
       );
     }
     const datasetLoadStatuses = await promiseMap(
@@ -258,7 +292,7 @@ function createDatasetRawDataClient(): WithLogger<
         const columns = duckdbColumns.map((duckColumn, idx) => {
           return {
             name: duckColumn.column_name,
-            dataType: DuckDBDataTypeUtils.toDatasetColumnDataType(
+            dataType: DuckDBDataTypeUtils.toAvaDataType(
               duckColumn.column_type,
             ),
             columnIdx: idx,
@@ -303,7 +337,7 @@ function createDatasetRawDataClient(): WithLogger<
                   `SELECT COUNT("$columnName$") as count
                     FROM "$tableName$"
                     WHERE "$columnName$" IS NULL
-                    ${dataType === "text" ? `OR "$columnName$" = ''` : ""}
+                    ${dataType === "varchar" ? `OR "$columnName$" = ''` : ""}
                   `,
                   { params: { columnName, tableName: datasetId } },
                 ),
@@ -319,7 +353,7 @@ function createDatasetRawDataClient(): WithLogger<
                 FROM "$tableName$"
                 WHERE
                   "$columnName$" IS NOT NULL
-                  ${dataType === "text" ? `AND "$columnName$" <> ''` : ""}
+                  ${dataType === "varchar" ? `AND "$columnName$" <> ''` : ""}
                 GROUP BY "${columnName}"
               )`,
               { params: { columnName, tableName: datasetId } },
@@ -335,7 +369,7 @@ function createDatasetRawDataClient(): WithLogger<
                FROM "$tableName$"
                WHERE
                  "$columnName$" IS NOT NULL
-                 ${dataType === "text" ? `AND "$columnName$" <> ''` : ""}
+                 ${dataType === "varchar" ? `AND "$columnName$" <> ''` : ""}
                GROUP BY "$columnName$"
                HAVING COUNT(*) = $maxCount$
                ORDER BY value
@@ -351,12 +385,12 @@ function createDatasetRawDataClient(): WithLogger<
             const mostCommonValue = mostCommonValuesQuery.data;
 
             const typeSpecificSummary = await match(dataType)
-              .with("text", () => {
+              .with("varchar", () => {
                 return {
                   type: "text" as const,
                 };
               })
-              .with("number", async () => {
+              .with("bigint", "double", async () => {
                 // TODO(jpsyx): implement this
                 const {
                   max = NaN,
@@ -387,7 +421,7 @@ function createDatasetRawDataClient(): WithLogger<
                   stdDev: stdDev,
                 };
               })
-              .with("date", () => {
+              .with("date", "time", "timestamp", () => {
                 notifyDevAlert("Date field summary not implemented");
                 // TODO(jpsyx): implement this
                 return {
@@ -397,25 +431,31 @@ function createDatasetRawDataClient(): WithLogger<
                   datasetDuration: "",
                 };
               })
-              .exhaustive();
+              .with("boolean", () => {
+                notifyDevAlert("Boolean field summary not implemented");
+                throw new Error(`Unsupported data type: ${dataType}`);
+              })
+              .exhaustive(() => {
+                notifyDevAlert(`Unsupported data type: ${dataType}`);
+                throw new Error(`Unsupported data type: ${dataType}`);
+              });
 
             const summary: ColumnSummary = {
               name: columnName,
               distinctValuesCount,
               emptyValuesCount,
               percentMissingValues: emptyValuesCount / distinctValuesCount,
-              mostCommonValue:
-                !mostCommonValue || mostCommonValue.length === 0 ?
-                  {
-                    count: 0,
-                    value: [],
-                  }
+              mostCommonValue: !mostCommonValue || mostCommonValue.length === 0
+                ? {
+                  count: 0,
+                  value: [],
+                }
                 : {
-                    count: Number(maxCount),
-                    value: mostCommonValue.map((row) => {
-                      return String(row.value);
-                    }),
-                  },
+                  count: Number(maxCount),
+                  value: mostCommonValue.map((row) => {
+                    return String(row.value);
+                  }),
+                },
               ...typeSpecificSummary,
             };
 

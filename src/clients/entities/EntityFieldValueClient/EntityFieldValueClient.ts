@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 import { BaseClient, createBaseClient } from "@/lib/clients/BaseClient";
-import { withLogger, WithLogger } from "@/lib/clients/withLogger";
+import { WithLogger, withLogger } from "@/lib/clients/withLogger";
 import { WithQueryHooks } from "@/lib/clients/withQueryHooks/types";
 import { withQueryHooks } from "@/lib/clients/withQueryHooks/withQueryHooks";
 import { ILogger } from "@/lib/Logger";
@@ -21,11 +21,11 @@ import { wrapString } from "@/lib/utils/strings/higherOrderFuncs";
 import { uuid } from "@/lib/utils/uuid";
 import { EntityId } from "@/models/entities/Entity";
 import { EntityConfigId } from "@/models/EntityConfig";
-import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
+import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import {
   EntityFieldConfig,
   EntityFieldConfigId,
-} from "@/models/EntityConfig/EntityFieldConfig/types";
+} from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import { EntityFieldValueExtractorRegistry } from "@/models/EntityConfig/ValueExtractor/types";
 import { DatasetColumnClient } from "../../datasets/DatasetColumnClient";
 import { DatasetRawDataClient } from "../../datasets/DatasetRawDataClient";
@@ -46,8 +46,9 @@ type EntityFieldValueClientQueries = {
   }) => Promise<EntityFieldValue[]>;
 };
 
-export type IEntityFieldValueClient = BaseClient &
-  EntityFieldValueClientQueries;
+export type IEntityFieldValueClient =
+  & BaseClient
+  & EntityFieldValueClientQueries;
 
 function createEntityFieldValueClient(): WithLogger<
   WithQueryHooks<
@@ -107,8 +108,8 @@ function createEntityFieldValueClient(): WithLogger<
         // get all value extractors, including the primary key extractors (which
         // may not have been explicitly requested, but we cannot join datasets
         // without them)
-        const valueExtractors =
-          await EntityFieldConfigClient.getAllValueExtractors({
+        const valueExtractors = await EntityFieldConfigClient
+          .getAllValueExtractors({
             fields: entityFieldConfigs.concat(primaryKeyFields),
           });
 
@@ -142,8 +143,8 @@ function createEntityFieldValueClient(): WithLogger<
                 const primaryKeyExtractors = primaryKeyFields
                   .map((field) => {
                     const extractor = valueExtractorsByFieldId[field.id];
-                    return extractor?.type === "dataset_column_value" ?
-                        extractor
+                    return extractor?.type === "dataset_column_value"
+                      ? extractor
                       : undefined;
                   })
                   .filter(isDefined);

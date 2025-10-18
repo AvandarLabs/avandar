@@ -1,5 +1,7 @@
 import { match } from "ts-pattern";
-import { DatasetColumnDataType } from "@/models/datasets/DatasetColumn";
+import { constant } from "@/lib/utils/higherOrderFuncs";
+import { AvaDataType } from "@/models/datasets/AvaDataType";
+import { registryKeys } from "@/lib/utils/objects/misc";
 
 export type DuckDBDataType =
   | "BOOLEAN"
@@ -42,6 +44,41 @@ export type DuckDBSniffableDataType = Extract<
   "BOOLEAN" | "BIGINT" | "DOUBLE" | "TIME" | "DATE" | "TIMESTAMP" | "VARCHAR"
 >;
 
+export const DuckDBDataTypes = registryKeys<DuckDBDataType>(
+  {
+    BOOLEAN: true,
+    TINYINT: true,
+    SMALLINT: true,
+    INTEGER: true,
+    BIGINT: true,
+    UBIGINT: true,
+    UTINYINT: true,
+    USMALLINT: true,
+    UINTEGER: true,
+    FLOAT: true,
+    DOUBLE: true,
+    DECIMAL: true,
+    DATE: true,
+    TIME: true,
+    TIMESTAMP: true,
+    TIMESTAMP_TZ: true,
+    "TIMESTAMP WITH TIME ZONE": true,
+    INTERVAL: true,
+    VARCHAR: true,
+    BLOB: true,
+    UUID: true,
+    HUGEINT: true,
+    BIT: true,
+    ENUM: true,
+    MAP: true,
+    STRUCT: true,
+    LIST: true,
+    UNION: true,
+    JSON: true,
+    GEOMETRY: true,
+  },
+);
+
 export const DuckDBDataTypeUtils = {
   isDateOrTimestamp: (duckDBDataType: DuckDBDataType): boolean => {
     return [
@@ -54,11 +91,13 @@ export const DuckDBDataTypeUtils = {
   },
 
   /**
-   * Converts a DuckDB data type to a DatasetColumn data type.
+   * Converts a DuckDB data type to an Avandar data type.
    */
-  toDatasetColumnDataType: (
+  // TODO(jpsyx): move this to AvaDataTypeUtils and rename to
+  // `fromDuckDBDataType`
+  toAvaDataType: (
     duckDBDataType: DuckDBDataType,
-  ): DatasetColumnDataType => {
+  ): AvaDataType => {
     return (
       match(duckDBDataType)
         .with(
@@ -70,30 +109,27 @@ export const DuckDBDataTypeUtils = {
           "UTINYINT",
           "USMALLINT",
           "UINTEGER",
+          "HUGEINT",
+          constant("bigint" as const),
+        )
+        .with(
           "FLOAT",
           "DOUBLE",
           "DECIMAL",
-          "HUGEINT",
-          () => {
-            return "number" as const;
-          },
+          constant("double" as const),
         )
+        .with("TIME", constant("time" as const))
+        .with("DATE", constant("date" as const))
         .with(
-          "DATE",
-          "TIME",
           "TIMESTAMP",
           "TIMESTAMP_TZ",
           "TIMESTAMP WITH TIME ZONE",
-          () => {
-            return "date" as const;
-          },
+          constant("timestamp" as const),
         )
-        .with("VARCHAR", "UUID", () => {
-          return "text" as const;
-        })
+        .with("VARCHAR", "UUID", constant("varchar" as const))
+        .with("BOOLEAN", constant("boolean" as const))
         // data types that we cannot support yet
         .with(
-          "BOOLEAN",
           "INTERVAL",
           "BLOB",
           "BIT",
@@ -107,28 +143,26 @@ export const DuckDBDataTypeUtils = {
           () => {
             // TODO(jpsyx): we will just call these "text" for now
             // until we need to handle these differently.
-            return "text" as const;
+            return "varchar" as const;
           },
         )
         .exhaustive()
     );
   },
 
-  // TODO(jpsyx): add support for other data types with more
-  // specificity. E.g. date vs. timestamp.
+  // TODO(jpsyx): move this to AvaDataTypeUtils and rename to
+  // `toDuckDBDataType`
   fromDatasetColumnType: (
-    datasetColumnType: DatasetColumnDataType,
+    datasetColumnType: AvaDataType,
   ): DuckDBSniffableDataType => {
     return match(datasetColumnType)
-      .with("text", () => {
-        return "VARCHAR" as const;
-      })
-      .with("number", () => {
-        return "DOUBLE" as const;
-      })
-      .with("date", () => {
-        return "TIMESTAMP" as const;
-      })
+      .with("varchar", constant("VARCHAR" as const))
+      .with("bigint", constant("BIGINT" as const))
+      .with("double", constant("DOUBLE" as const))
+      .with("time", constant("TIME" as const))
+      .with("date", constant("DATE" as const))
+      .with("timestamp", constant("TIMESTAMP" as const))
+      .with("boolean", constant("BOOLEAN" as const))
       .exhaustive();
   },
 };

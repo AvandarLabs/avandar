@@ -2,7 +2,7 @@ import { useUncontrolled } from "@mantine/hooks";
 import { useMemo } from "react";
 import { QueryAggregationType } from "@/clients/DuckDBClient/types";
 import { Select, SelectOption } from "@/lib/ui/inputs/Select";
-import { getValidQueryAggregationsByDataType } from "@/models/datasets/DatasetColumn/utils";
+import { AvaDataTypeUtils } from "@/models/datasets/AvaDataType/AvaDataTypeUtils";
 import { QueryableColumn } from "./QueryableColumnMultiSelect";
 
 type Props = {
@@ -27,7 +27,7 @@ export function AggregationSelect({
   defaultValue = "none",
   onChange,
 }: Props): JSX.Element {
-  const validAggregations = getValidQueryAggregationsByDataType(
+  const validAggregations = AvaDataTypeUtils.getValidQueryAggregations(
     column.type === "DatasetColumn" ?
       column.value.dataType
     : column.value.options.baseDataType,

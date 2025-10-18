@@ -29,11 +29,11 @@ import { snakeCaseKeysShallow } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
 import { csvCellValueSchema } from "@/lib/utils/zodHelpers";
 import { Dataset, DatasetId } from "@/models/datasets/Dataset";
+import { DetectedDatasetColumn } from "@/models/datasets/DatasetColumn";
 import { unparseDataset } from "@/models/LocalDataset/utils";
 import { UserId } from "@/models/User/types";
 import { WorkspaceId } from "@/models/Workspace/types";
 import { APIReturnType } from "@/types/http-api.types";
-import { DetectedDatasetColumn } from "../../hooks/detectColumnDataTypes";
 import {
   DatasetUploadForm,
   DatasetUploadFormValues,
@@ -41,7 +41,7 @@ import {
 
 type GoogleSpreadsheetData = APIReturnType<"google-sheets/:id">;
 
-type Props = BoxProps;
+type Props = BoxProps | undefined;
 
 async function saveGoogleSheetToBackend(params: {
   name: string;
@@ -115,7 +115,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
     },
     enabled: !!selectedDocumentId,
     refetchOnWindowFocus: false,
-    staleTime: Infinity,
+    staleTime: undefined,
   });
 
   // query to load the data locally to DuckDB
@@ -204,9 +204,9 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
     return loadResults?.metadata?.columns.map((duckColumn, idx) => {
       return {
         name: duckColumn.column_name,
-        dataType: DuckDBDataTypeUtils.toDatasetColumnDataType(
-          duckColumn.column_type,
-        ),
+        originalDataType: duckColumn.column_type,
+        detectedDataType: duckColumn.column_type,
+        dataType: DuckDBDataTypeUtils.toAvaDataType(duckColumn.column_type),
         columnIdx: idx,
       };
     });

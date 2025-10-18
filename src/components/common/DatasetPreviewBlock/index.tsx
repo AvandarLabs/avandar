@@ -1,10 +1,12 @@
 import { ScrollArea, Stack, StackProps } from "@mantine/core";
-import { DetectedDatasetColumn } from "@/components/DataManagerApp/hooks/detectColumnDataTypes";
 import { Callout } from "@/lib/ui/Callout";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
-import { DatasetColumnRead } from "@/models/datasets/DatasetColumn";
+import {
+  DatasetColumnRead,
+  DetectedDatasetColumn,
+} from "@/models/datasets/DatasetColumn";
 
 type Props = {
   /** The preview rows to display in the data grid */

@@ -3,12 +3,6 @@ create type public.entity_field_configs__class as enum(
   'metric'
 );
 
-create type public.entity_field_configs__base_data_type as enum(
-  'string',
-  'number',
-  'date'
-);
-
 create type public.entity_field_configs__value_extractor_type as enum(
   'dataset_column_value',
   'manual_entry',
@@ -27,7 +21,7 @@ create table public.entity_field_configs (
   updated_at timestamptz not null default now(),
   -- Discriminating columns
   class public.entity_field_configs__class not null,
-  base_data_type public.entity_field_configs__base_data_type not null,
+  base_data_type public.datasets__ava_data_type not null,
   value_extractor_type public.entity_field_configs__value_extractor_type not null,
   -- Dimension-related columns
   is_title_field boolean not null default false,

@@ -1,7 +1,7 @@
 import { SetOptional } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { UUID } from "@/lib/types/common";
-import { objectKeys } from "@/lib/utils/objects/misc";
+import { registryKeys } from "@/lib/utils/objects/misc";
 import { Enums } from "@/types/database.types";
 import { UserId, UserProfileId } from "../../User/types";
 import { WorkspaceId } from "../../Workspace/types";
@@ -17,7 +17,7 @@ const DatasetRegistryType = {
   google_sheets: true,
 } satisfies Registry<DatasetSourceType>;
 
-export const DatasetSourceTypes = objectKeys(DatasetRegistryType);
+export const DatasetSourceTypes = registryKeys(DatasetRegistryType);
 
 type DatasetRead = {
   /** Timestamp of when the dataset was created. */

@@ -1,44 +1,88 @@
-create type public.dataset_column_input as (
-  -- The name of the column
-  name text,
-  -- The description of the column
-  description text,
-  -- The original data type of the column
-  original_data_type text,
-  -- The detected data type of the column, as inferred by DuckDB when parsing
-  -- the dataset for the first time.
-  detected_data_type public.datasets__duckdb_data_type,
-  -- The queryable data type of the column
-  data_type public.datasets__ava_data_type,
-  -- The index of the column, so we can display columns in order in the UI
-  column_idx integer
+-- Drop rpc functions that depend on dataset_column_input type
+drop function "public"."rpc_datasets__add_dataset";
+
+drop function "public"."rpc_datasets__add_google_sheets_dataset";
+
+drop function "public"."rpc_datasets__add_csv_file_dataset";
+
+drop type "public"."dataset_column_input";
+
+-- drop all datasets just to make this easier on ourselves
+truncate table "public"."datasets" cascade;
+
+-- drop all the entity field configs to make this easier on ourselves
+truncate table "public"."entity_field_configs" cascade;
+
+alter type "public"."datasets__column_data_type"
+rename to "datasets__column_data_type__old_version_to_be_dropped";
+
+create type "public"."datasets__ava_data_type" as enum(
+  'boolean',
+  'bigint',
+  'double',
+  'time',
+  'date',
+  'timestamp',
+  'varchar'
 );
 
-create type public.datasets__csv_file__date_format as (
-  date_format text,
-  timestamp_format text
+create type "public"."datasets__duckdb_data_type" as enum(
+  'BOOLEAN',
+  'TINYINT',
+  'SMALLINT',
+  'INTEGER',
+  'BIGINT',
+  'UBIGINT',
+  'UTINYINT',
+  'USMALLINT',
+  'UINTEGER',
+  'FLOAT',
+  'DOUBLE',
+  'DECIMAL',
+  'DATE',
+  'TIME',
+  'TIMESTAMP',
+  'TIMESTAMP_TZ',
+  'TIMESTAMP WITH TIME ZONE',
+  'INTERVAL',
+  'VARCHAR',
+  'BLOB',
+  'UUID',
+  'HUGEINT',
+  'BIT',
+  'ENUM',
+  'MAP',
+  'STRUCT',
+  'LIST',
+  'UNION',
+  'JSON',
+  'GEOMETRY'
 );
 
-/**
- * Add a dataset to a given workspace.
- * This function should never be called directly and instead we should
- * always call one of the more specific functions such as
- * `rpc_datasets__add_google_sheets_dataset` or
- * `rpc_datasets__add_csv_file_dataset`.
- *
- * The requesting user must be an admin of the workspace.
- *
- * @param p_dataset_id: The id of the dataset to add
- * @param p_workspace_id: The workspace id to add the dataset to
- * @param p_dataset_name: The name of the dataset
- * @param p_dataset_description: The description of the dataset
- * @param p_dataset_source_type: The source type of the dataset
- * @param p_columns: The columns of the dataset
- *
- * @returns: The created dataset
- *
- * TODO(jpsyx): add this function to a private schema
- */
+alter table "public"."dataset_columns"
+alter column data_type type "public"."datasets__ava_data_type" using data_type::text::"public"."datasets__ava_data_type";
+
+drop type "public"."datasets__column_data_type__old_version_to_be_dropped";
+
+alter table "public"."dataset_columns"
+add column "original_data_type" text not null;
+
+alter table "public"."dataset_columns"
+add column "detected_data_type" "public"."datasets__duckdb_data_type" not null;
+
+alter table "public"."entity_field_configs"
+alter column "base_data_type" type "public"."datasets__ava_data_type" using base_data_type::text::"public"."datasets__ava_data_type";
+
+create type "public"."dataset_column_input" as (
+  "name" text,
+  "description" text,
+  "original_data_type" text,
+  "detected_data_type" "public"."datasets__duckdb_data_type",
+  "data_type" "public"."datasets__ava_data_type",
+  "column_idx" integer
+);
+
+-- Add the RPC functions back
 create or replace function public.rpc_datasets__add_dataset (
   p_dataset_id uuid,
   p_workspace_id uuid,
@@ -121,24 +165,6 @@ begin
 end;
 $$ language plpgsql security invoker;
 
-/**
- * Add a Google Sheet dataset to a workspace.
- * Calls rpc_datasets__add_dataset and inserts metadata into
- * datasets__google_sheets.
- *
- * @param p_dataset_id: The id of the dataset to add
- * @param p_workspace_id: The workspace id to add the dataset to
- * @param p_dataset_name: The name of the dataset
- * @param p_dataset_description: The description of the dataset
- * @param p_columns: The columns of the dataset
- * @param p_google_account_id: The google account id
- * @param p_google_document_id: The google document id (i.e. the ID within
- * Google's system. This is the ID you see in the URL when viewing a google
- * sheet)
- * @param p_rows_to_skip: The number of rows to skip
- *
- * @returns: The created dataset
- */
 create or replace function public.rpc_datasets__add_google_sheets_dataset (
   p_dataset_id uuid,
   p_workspace_id uuid,
@@ -179,29 +205,6 @@ begin
 end;
 $$ language plpgsql security invoker;
 
-/**
- * Add a Local CSV dataset to a workspace.
- * Calls rpc_datasets__add_dataset and inserts metadata into
- * datasets__csv_file.
- *
- * @param p_dataset_id: The id of the dataset to add
- * @param p_workspace_id: The workspace id to add the dataset to
- * @param p_dataset_name: The name of the dataset
- * @param p_dataset_description: The description of the dataset
- * @param p_columns: The columns of the dataset
- * @param p_size_in_bytes: The size of the CSV file in bytes
- * @param p_rows_to_skip: The number of rows to skip
- * @param p_quote_char: The quote character of the CSV file
- * @param p_escape_char: The escape character of the CSV file
- * @param p_delimiter: The delimiter of the CSV file
- * @param p_newline_delimiter: The newline delimiter of the CSV file
- * @param p_comment_char: The comment character of the CSV file
- * @param p_has_header: Whether the CSV file has a header
- * @param p_date_format: the `date_format` and `timestamp_format` of the
- * CSV file.
- *
- * @returns: The created dataset
- */
 create or replace function public.rpc_datasets__add_csv_file_dataset (
   p_dataset_id uuid,
   p_workspace_id uuid,

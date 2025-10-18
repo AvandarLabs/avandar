@@ -118,10 +118,7 @@ export function useDataQuery({
               (field) => {
                 return {
                   name: field.name,
-                  dataType:
-                    field.options.baseDataType === "string" ?
-                      "text"
-                    : field.options.baseDataType,
+                  dataType: field.options.baseDataType,
                 };
               },
             );
