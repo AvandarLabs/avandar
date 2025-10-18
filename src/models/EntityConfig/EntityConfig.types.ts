@@ -3,7 +3,7 @@ import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { UserId } from "@/models/User/types";
 import { Dataset } from "../datasets/Dataset";
 import { WorkspaceId } from "../Workspace/types";
-import { EntityFieldConfig } from "./EntityFieldConfig/types";
+import { EntityFieldConfig } from "./EntityFieldConfig/EntityFieldConfig.types";
 import { EntityFieldValueExtractor } from "./ValueExtractor/types";
 import type { UUID } from "@/lib/types/common";
 

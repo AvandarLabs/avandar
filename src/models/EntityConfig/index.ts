@@ -1,3 +1,3 @@
 export type * from "./EntityConfig.types";
-export * from "./EntityConfigModule";
+export * from "./EntityConfigUtils";
 export * from "./EntityConfigParsers";

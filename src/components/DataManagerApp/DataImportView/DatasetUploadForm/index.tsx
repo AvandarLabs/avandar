@@ -12,7 +12,7 @@ import { UnknownObject } from "@/lib/types/common";
 import { Callout } from "@/lib/ui/Callout";
 import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 import { Dataset } from "@/models/datasets/Dataset";
-import { DetectedDatasetColumn } from "../../hooks/detectColumnDataTypes";
+import { DetectedDatasetColumn } from "@/models/datasets/DatasetColumn";
 
 export type DatasetUploadFormValues = {
   name: string;

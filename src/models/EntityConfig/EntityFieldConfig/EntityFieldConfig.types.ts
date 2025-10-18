@@ -8,19 +8,19 @@ import {
 } from "../ValueExtractor/types";
 import type { EntityConfigId } from "../EntityConfig.types";
 import type { UUID } from "@/lib/types/common";
+import type { AvaDataType } from "@/models/datasets/AvaDataType";
 
 export type EntityFieldConfigId = UUID<"EntityFieldConfig">;
 
 // Enum types to match database enums
 export type EntityFieldClass = Enums<"entity_field_configs__class">;
-export type EntityFieldBaseType = Enums<"entity_field_configs__base_data_type">;
 
 // Base data types for each field classe
 export type DimensionFieldBaseDataType = Extract<
-  EntityFieldBaseType,
-  "string" | "number" | "date"
+  AvaDataType,
+  "varchar" | "bigint" | "double" | "time" | "date" | "timestamp" | "boolean"
 >;
-export type MetricFieldBaseDataType = Extract<EntityFieldBaseType, "number">;
+export type MetricFieldBaseDataType = Extract<AvaDataType, "bigint" | "double">;
 
 export type DimensionRead = {
   class: "dimension";
@@ -69,13 +69,13 @@ type EntityFieldConfigInsert = Merge<
   {
     options:
       | SetOptional<
-          DimensionRead,
-          "allowManualEdit" | "isArray" | "isTitleField" | "isIdField"
-        >
+        DimensionRead,
+        "allowManualEdit" | "isArray" | "isTitleField" | "isIdField"
+      >
       | SetOptional<
-          MetricRead,
-          "allowManualEdit" | "isArray" | "isTitleField" | "isIdField"
-        >;
+        MetricRead,
+        "allowManualEdit" | "isArray" | "isTitleField" | "isIdField"
+      >;
   }
 >;
 

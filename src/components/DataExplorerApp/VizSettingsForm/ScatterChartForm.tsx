@@ -2,7 +2,8 @@ import { useMemo } from "react";
 import { QueryResultColumn } from "@/clients/DuckDBClient/types";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { getProp, propEq } from "@/lib/utils/objects/higherOrderFuncs";
+import { propPasses } from "@/lib/utils/objects/higherOrderFuncs";
+import { AvaDataTypeUtils } from "@/models/datasets/AvaDataType";
 
 export type ScatterChartSettings = {
   xAxisKey: string | undefined;
@@ -21,13 +22,13 @@ export function ScatterChartForm({
   onSettingsChange,
 }: Props): JSX.Element {
   const numericFields = useMemo(() => {
-    return fields.filter(propEq("dataType", "number"));
+    return fields.filter(propPasses("dataType", AvaDataTypeUtils.isNumeric));
   }, [fields]);
 
   const numericOptions = useMemo(() => {
     return makeSelectOptions(numericFields, {
-      valueFn: getProp("name"),
-      labelFn: getProp("name"),
+      valueKey: "name",
+      labelKey: "name",
     });
   }, [numericFields]);
 

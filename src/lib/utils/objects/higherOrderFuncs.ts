@@ -1,4 +1,10 @@
-import { ConditionalKeys, Paths, SetRequired, UnknownArray } from "type-fest";
+import {
+  ConditionalKeys,
+  Paths,
+  SetFieldType,
+  SetRequired,
+  UnknownArray,
+} from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
 import { SetDefined } from "@/lib/types/utilityTypes";
 import { hasDefinedProps } from "../guards";
@@ -25,8 +31,8 @@ export function getProp<
   T extends object,
   K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
   V extends K extends keyof T ? T[K]
-  : K extends Paths<T> ? PathValue<T, K>
-  : never,
+    : K extends Paths<T> ? PathValue<T, K>
+    : never,
 >(path: K): (obj: T) => V {
   return (obj: T) => {
     if (String(path).includes(".")) {
@@ -37,20 +43,20 @@ export function getProp<
 }
 
 /**
- * Returns a function that checks if an object has a property with a specific
- * value.
+ * Returns a function that checks if an object's property at `path` equals
+ * `value`.
  *
  * @param path The path of the property to check.
  * @param value The value to check.
- * @returns A function that returns true if the object has the property with
- * the specified value.
+ * @returns A function that returns true if the value at `path` is equal to
+ * `value`
  */
 export function propEq<
   T extends object,
   K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
   V extends K extends keyof T ? T[K]
-  : K extends Paths<T> ? PathValue<T, K>
-  : never,
+    : K extends Paths<T> ? PathValue<T, K>
+    : never,
 >(path: K, value: V): (obj: T) => boolean {
   return (obj: T) => {
     if (String(path).includes(".")) {
@@ -61,20 +67,20 @@ export function propEq<
 }
 
 /**
- * Returns a function that checks if an object has a property that **doesn't**
- * have a specific value.
+ * Returns a function that checks if an object's property at `path` **doesn't**
+ * equal `value`.
  *
  * @param path The path of the property to check.
  * @param value The value to check.
- * @returns A function that returns true if the object has the property with
- * the specified value.
+ * @returns A function that returns true if the property at `path` is **not**
+ * equal to `value`
  */
 export function propNotEq<
   T extends object,
   K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
   V extends K extends keyof T ? T[K]
-  : K extends Paths<T> ? PathValue<T, K>
-  : never,
+    : K extends Paths<T> ? PathValue<T, K>
+    : never,
 >(path: K, value: V): (obj: T) => boolean {
   return (obj: T) => {
     if (String(path).includes(".")) {
@@ -85,17 +91,42 @@ export function propNotEq<
 }
 
 /**
- * Returns a function that checks if an object has a property that is defined.
+ * Returns a function that checks if an object's property at `key` is defined
+ * (i.e. is not `undefined`).
  *
- * @param path The path of the property to check.
- * @returns A function that returns true if the object has the property with
- * the specified value.
+ * @param key The key of the property to check.
+ * @returns A function that returns true if the property at `key` is defined.
  */
 export function propIsDefined<T extends object, K extends keyof T>(
   key: K,
 ): (obj: T) => obj is SetRequired<T, K> & SetDefined<T, K> {
   return (obj: T) => {
     return hasDefinedProps(obj, [key]);
+  };
+}
+
+/**
+ * Returns a function that checks if an object's property at `key` passes a
+ * `predicate`.
+ *
+ * This function retains type safety if the predicate that is passed is a type
+ * guard.
+ *
+ * @param key The key of the property to check.
+ * @param predicate The predicate to check the property against.
+ * @returns A function that returns true if the property at `key` passes the
+ * `predicate`
+ */
+export function propPasses<T extends object, K extends keyof T, R extends T[K]>(
+  key: K,
+  predicate: (value: T[K]) => value is R,
+): (obj: T) => obj is T & SetFieldType<T, K, R>;
+export function propPasses<T extends object, K extends keyof T>(
+  key: K,
+  predicate: (value: T[K]) => boolean,
+): (obj: T) => boolean {
+  return (obj: T) => {
+    return predicate(obj[key]);
   };
 }
 
@@ -176,11 +207,9 @@ export function excludeNullsExceptInProps<
 export function coerceDatesInProps<T extends UnknownObject, K extends keyof T>(
   keys: readonly K[],
 ): (obj: T) => {
-  [Key in keyof T]: Key extends K ?
-    undefined extends T[Key] ?
-      Date | undefined
+  [Key in keyof T]: Key extends K ? undefined extends T[Key] ? Date | undefined
     : Date
-  : T[Key];
+    : T[Key];
 } {
   return (obj: T) => {
     return coerceDatesIn(obj, keys);
@@ -199,11 +228,10 @@ export function convertDatesToISOInProps<
 >(
   keys: readonly K[],
 ): (obj: T) => {
-  [Key in keyof T]: Key extends K ?
-    undefined extends T[Key] ?
-      string | undefined
+  [Key in keyof T]: Key extends K
+    ? undefined extends T[Key] ? string | undefined
     : string
-  : T[Key];
+    : T[Key];
 } {
   return (obj: T) => {
     return convertDatesToISOIn(obj, keys);
@@ -233,8 +261,8 @@ export function setPropValue<
   // to using `keyof T` which works fine for records.
   K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
   V extends K extends keyof T ? T[K]
-  : K extends Paths<T> ? PathValue<T, K>
-  : never,
+    : K extends Paths<T> ? PathValue<T, K>
+    : never,
 >(path: K, value: V): (obj: T) => T {
   return (obj: T) => {
     return setValue(obj, path, value);

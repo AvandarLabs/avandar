@@ -3,7 +3,7 @@ import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { DatasetId } from "@/models/datasets/Dataset";
 import { DatasetColumnId } from "@/models/datasets/DatasetColumn";
 import { WorkspaceId } from "@/models/Workspace/types";
-import type { EntityFieldConfigId } from "../../EntityFieldConfig/types";
+import type { EntityFieldConfigId } from "../../EntityFieldConfig/EntityFieldConfig.types";
 import type { UUID } from "@/lib/types/common";
 
 export type DatasetColumnValueExtractorId = UUID<"DatasetColumnValueExtractor">;
@@ -48,8 +48,9 @@ type DatasetColumnValueExtractorInsert = SetOptional<
   "id" | "createdAt" | "updatedAt"
 >;
 
-type DatasetColumnValueExtractorUpdate =
-  Partial<DatasetColumnValueExtractorRead>;
+type DatasetColumnValueExtractorUpdate = Partial<
+  DatasetColumnValueExtractorRead
+>;
 
 /**
  * CRUD type definitions for the DatasetColumnValueExtractor model.

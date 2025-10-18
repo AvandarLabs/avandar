@@ -6,14 +6,14 @@ import {
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { objectKeys } from "@/lib/utils/objects/misc";
 import { BuildableEntityConfig, EntityConfig } from "./EntityConfig.types";
-import { EntityFieldConfig } from "./EntityFieldConfig/types";
+import { EntityFieldConfig } from "./EntityFieldConfig/EntityFieldConfig.types";
 import { EntityFieldValueExtractor } from "./ValueExtractor/types";
 
 type EntityFieldConfigWithValueExtractor = EntityFieldConfig & {
   valueExtractor: EntityFieldValueExtractor;
 };
 
-type IEntityConfigModule = {
+type IEntityConfigUtils = {
   getTitleField(
     entityConfig: BuildableEntityConfig,
   ): EntityFieldConfigWithValueExtractor;
@@ -22,25 +22,27 @@ type IEntityConfigModule = {
   ): EntityFieldConfigWithValueExtractor[];
 };
 
-type WithBind<M extends IEntityConfigModule> = M & {
-  bind: (entityConfig: BuildableEntityConfig) => BindWithEntityConfig<M>;
+type WithBind<U extends IEntityConfigUtils> = U & {
+  bind: (entityConfig: BuildableEntityConfig) => BindWithEntityConfig<U>;
 };
 
-type BindWithEntityConfig<M extends IEntityConfigModule> = Simplify<{
-  [K in keyof M]: M[K] extends AnyFunctionWithArguments<infer Args> ?
-    Args extends [EntityConfig, ...infer Rest] ?
-      (...args: Rest) => ReturnType<M[K]>
-    : never
-  : never;
-}>;
+type BindWithEntityConfig<U extends IEntityConfigUtils> = Simplify<
+  {
+    [K in keyof U]: U[K] extends AnyFunctionWithArguments<infer Args>
+      ? Args extends [EntityConfig, ...infer Rest]
+        ? (...args: Rest) => ReturnType<U[K]>
+      : never
+      : never;
+  }
+>;
 
 const boundModuleCache = new WeakMap<
   BuildableEntityConfig,
-  BindWithEntityConfig<IEntityConfigModule>
+  BindWithEntityConfig<IEntityConfigUtils>
 >();
 
-function createEntityConfigModule(): WithBind<IEntityConfigModule> {
-  const module: IEntityConfigModule = {
+function createEntityConfigModule(): WithBind<IEntityConfigUtils> {
+  const module: IEntityConfigUtils = {
     getTitleField: (
       entityConfig: BuildableEntityConfig,
     ): EntityFieldConfigWithValueExtractor => {
@@ -67,14 +69,14 @@ function createEntityConfigModule(): WithBind<IEntityConfigModule> {
     ...module,
     bind: (
       entityConfig: BuildableEntityConfig,
-    ): BindWithEntityConfig<IEntityConfigModule> => {
+    ): BindWithEntityConfig<IEntityConfigUtils> => {
       if (boundModuleCache.has(entityConfig)) {
         return boundModuleCache.get(entityConfig)!;
       }
 
       const moduleKeys = objectKeys(module);
 
-      const boundModule = {} as BindWithEntityConfig<IEntityConfigModule>;
+      const boundModule = {} as BindWithEntityConfig<IEntityConfigUtils>;
       for (const moduleKey of moduleKeys) {
         const moduleMember = module[moduleKey];
         if (typeof moduleMember === "function") {

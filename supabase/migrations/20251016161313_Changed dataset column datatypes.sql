@@ -10,10 +10,13 @@ drop type "public"."dataset_column_input";
 -- drop all datasets just to make this easier on ourselves
 truncate table "public"."datasets" cascade;
 
+-- drop all the entity field configs to make this easier on ourselves
+truncate table "public"."entity_field_configs" cascade;
+
 alter type "public"."datasets__column_data_type"
 rename to "datasets__column_data_type__old_version_to_be_dropped";
 
-create type "public"."datasets__column_data_type" as enum(
+create type "public"."datasets__ava_data_type" as enum(
   'boolean',
   'bigint',
   'double',
@@ -23,19 +26,59 @@ create type "public"."datasets__column_data_type" as enum(
   'varchar'
 );
 
+create type "public"."datasets__duckdb_data_type" as enum(
+  'BOOLEAN',
+  'TINYINT',
+  'SMALLINT',
+  'INTEGER',
+  'BIGINT',
+  'UBIGINT',
+  'UTINYINT',
+  'USMALLINT',
+  'UINTEGER',
+  'FLOAT',
+  'DOUBLE',
+  'DECIMAL',
+  'DATE',
+  'TIME',
+  'TIMESTAMP',
+  'TIMESTAMP_TZ',
+  'TIMESTAMP WITH TIME ZONE',
+  'INTERVAL',
+  'VARCHAR',
+  'BLOB',
+  'UUID',
+  'HUGEINT',
+  'BIT',
+  'ENUM',
+  'MAP',
+  'STRUCT',
+  'LIST',
+  'UNION',
+  'JSON',
+  'GEOMETRY'
+);
+
 alter table "public"."dataset_columns"
-alter column data_type type "public"."datasets__column_data_type" using data_type::text::"public"."datasets__column_data_type";
+alter column data_type type "public"."datasets__ava_data_type" using data_type::text::"public"."datasets__ava_data_type";
 
 drop type "public"."datasets__column_data_type__old_version_to_be_dropped";
 
 alter table "public"."dataset_columns"
-add column "original_data_type" datasets__column_data_type not null;
+add column "original_data_type" text not null;
+
+alter table "public"."dataset_columns"
+add column "detected_data_type" "public"."datasets__duckdb_data_type" not null;
+
+alter table "public"."entity_field_configs"
+alter column "base_data_type" type "public"."datasets__ava_data_type" using base_data_type::text::"public"."datasets__ava_data_type";
 
 create type "public"."dataset_column_input" as (
   "name" text,
   "description" text,
-  "original_data_type" datasets__column_data_type,
-  "data_type" datasets__column_data_type,
+  "original_data_type" text,
+  "detected_data_type" "public"."datasets__duckdb_data_type",
+  "data_type" "public"."datasets__ava_data_type",
   "column_idx" integer
 );
 
@@ -102,6 +145,8 @@ begin
       dataset_id,
       workspace_id,
       name,
+      original_data_type,
+      detected_data_type,
       data_type,
       description,
       column_idx
@@ -109,6 +154,8 @@ begin
       v_dataset.id,
       p_workspace_id,
       v_column.name,
+      v_column.original_data_type,
+      v_column.detected_data_type,
       v_column.data_type,
       v_column.description,
       v_column.column_idx

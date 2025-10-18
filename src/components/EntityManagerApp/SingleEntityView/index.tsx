@@ -1,6 +1,7 @@
 import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { SourceBadge } from "@/components/common/SourceBadge";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
@@ -16,11 +17,10 @@ import { DatasetSourceType } from "@/models/datasets/Dataset";
 import { Entity } from "@/models/entities/Entity";
 import { EntityFieldValue } from "@/models/entities/EntityFieldValue";
 import { EntityConfig } from "@/models/EntityConfig/EntityConfig.types";
-import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
 import {
   EntityFieldConfig,
   EntityFieldConfigId,
-} from "@/models/EntityConfig/EntityFieldConfig/types";
+} from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import { ActivityBlock } from "./ActivityBlock";
 import { StatusPill } from "./StatusPill";
 

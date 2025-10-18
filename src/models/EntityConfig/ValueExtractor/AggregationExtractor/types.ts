@@ -3,7 +3,7 @@ import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { DatasetId } from "@/models/datasets/Dataset";
 import { DatasetColumnId } from "@/models/datasets/DatasetColumn";
 import { WorkspaceId } from "@/models/Workspace/types";
-import { EntityFieldConfigId } from "../../EntityFieldConfig/types";
+import { EntityFieldConfigId } from "../../EntityFieldConfig/EntityFieldConfig.types";
 import type { JSONValue, UUID } from "@/lib/types/common";
 
 export type AggregationExtractorId = UUID<"AggregationExtractor">;

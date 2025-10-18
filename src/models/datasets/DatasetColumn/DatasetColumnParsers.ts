@@ -13,14 +13,17 @@ import { WorkspaceId } from "@/models/Workspace/types";
 import { DatasetId } from "../Dataset/types";
 import {
   DatasetColumn,
-  DatasetColumnDataTypes,
   DatasetColumnId,
   DatasetColumnModel,
 } from "./DatasetColumn.types";
+import { AvaDataTypes } from "../AvaDataType";
+import { DuckDBDataTypes } from "@/clients/DuckDBClient/DuckDBDataType";
 
 const DBReadSchema = object({
   created_at: iso.datetime({ offset: true }),
-  data_type: zodEnum(DatasetColumnDataTypes),
+  original_data_type: string(),
+  detected_data_type: zodEnum(DuckDBDataTypes),
+  data_type: zodEnum(AvaDataTypes),
   dataset_id: uuid(),
   description: string().nullable(),
   id: uuid(),

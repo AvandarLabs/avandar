@@ -31,7 +31,7 @@ import {
   DatasetColumnId,
 } from "@/models/datasets/DatasetColumn";
 import { EntityConfigId } from "@/models/EntityConfig/EntityConfig.types";
-import { EntityFieldConfigId } from "@/models/EntityConfig/EntityFieldConfig/types";
+import { EntityFieldConfigId } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import {
   EntityConfigFormType,
   makeDefaultDatasetColumnField,

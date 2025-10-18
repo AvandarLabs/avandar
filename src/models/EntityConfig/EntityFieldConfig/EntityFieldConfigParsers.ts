@@ -1,5 +1,5 @@
 import { match } from "ts-pattern";
-import { z } from "zod";
+import z, { boolean, enum as zodEnum, object, string, uuid } from "zod";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { isOneOf } from "@/lib/utils/guards";
@@ -11,7 +11,6 @@ import {
   undefinedsToNullsDeep,
 } from "@/lib/utils/objects/transformations";
 import { pipe } from "@/lib/utils/pipe";
-import { uuid } from "@/lib/utils/uuid";
 import { WorkspaceId } from "@/models/Workspace/types";
 import { EntityConfigId } from "../EntityConfig.types";
 import {
@@ -20,27 +19,28 @@ import {
   EntityFieldConfigId,
   EntityFieldConfigModel,
   MetricRead,
-} from "./types";
+} from "./EntityFieldConfig.types";
+import { AvaDataTypes, AvaDataTypeUtils } from "@/models/datasets/AvaDataType";
 
-const DBReadSchema = z.object({
-  allow_manual_edit: z.boolean(),
-  base_data_type: z.enum(["string", "number", "date"]),
-  class: z.enum(["dimension", "metric"]),
-  created_at: z.string(),
-  description: z.string().nullable(),
-  entity_config_id: z.string().uuid(),
+const DBReadSchema = object({
+  allow_manual_edit: boolean(),
+  base_data_type: zodEnum(AvaDataTypes),
+  class: zodEnum(["dimension", "metric"]),
+  created_at: string(),
+  description: string().nullable(),
+  entity_config_id: uuid(),
   value_extractor_type: z.enum([
     "dataset_column_value",
     "manual_entry",
     "aggregation",
   ]),
-  id: z.string().uuid(),
-  workspace_id: z.string().uuid(),
-  is_array: z.boolean().nullable(),
-  is_id_field: z.boolean(),
-  is_title_field: z.boolean(),
-  name: z.string(),
-  updated_at: z.string(),
+  id: uuid(),
+  workspace_id: uuid(),
+  is_array: boolean().nullable(),
+  is_id_field: boolean(),
+  is_title_field: boolean(),
+  name: string(),
+  updated_at: string(),
 });
 
 function fromDBReadToModelRead(
@@ -48,9 +48,9 @@ function fromDBReadToModelRead(
 ): EntityFieldConfig<"Read"> {
   const newObj = nullsToUndefinedDeep(camelCaseKeysDeep(dbObj));
   const coreField = {
-    id: uuid<EntityFieldConfigId>(newObj.id),
-    entityConfigId: uuid<EntityConfigId>(newObj.entityConfigId),
-    workspaceId: uuid<WorkspaceId>(newObj.workspaceId),
+    id: newObj.id as EntityFieldConfigId,
+    entityConfigId: newObj.entityConfigId as EntityConfigId,
+    workspaceId: newObj.workspaceId as WorkspaceId,
     description: newObj.description,
     name: newObj.name,
     createdAt: newObj.createdAt,
@@ -87,7 +87,7 @@ function fromDBReadToModelRead(
     })
     .with({ class: "metric" }, (metricField) => {
       if (
-        metricField.baseDataType === "number" &&
+        AvaDataTypeUtils.isNumeric(metricField.baseDataType) &&
         metricField.valueExtractorType === "aggregation"
       ) {
         return {
@@ -109,37 +109,38 @@ function fromDBReadToModelRead(
   return { ...coreField, options };
 }
 
-export const EntityFieldConfigParsers =
-  makeParserRegistry<EntityFieldConfigModel>().build({
-    modelName: "EntityFieldConfig",
-    DBReadSchema,
-    fromDBReadToModelRead,
+export const EntityFieldConfigParsers = makeParserRegistry<
+  EntityFieldConfigModel
+>().build({
+  modelName: "EntityFieldConfig",
+  DBReadSchema,
+  fromDBReadToModelRead,
 
-    fromModelInsertToDBInsert: pipe(
-      snakeCaseKeysDeep,
-      undefinedsToNullsDeep,
-      (obj): EntityFieldConfig<"DBInsert"> => {
-        const { options, ...field } = excludeNullsExceptIn(obj, "description");
+  fromModelInsertToDBInsert: pipe(
+    snakeCaseKeysDeep,
+    undefinedsToNullsDeep,
+    (obj): EntityFieldConfig<"DBInsert"> => {
+      const { options, ...field } = excludeNullsExceptIn(obj, "description");
 
-        // put the options back in the flattened db object
-        const newOptions = excludeNullsExceptIn(options, "is_array");
-        return { ...field, ...newOptions };
-      },
-    ),
+      // put the options back in the flattened db object
+      const newOptions = excludeNullsExceptIn(options, "is_array");
+      return { ...field, ...newOptions };
+    },
+  ),
 
-    fromModelUpdateToDBUpdate: pipe(
-      snakeCaseKeysDeep,
-      undefinedsToNullsDeep,
-      (obj): EntityFieldConfig<"DBUpdate"> => {
-        const { options, ...field } = excludeNullsExceptIn(obj, [
-          "description",
-        ]);
-        // put the options back in the flattened db object
-        const newOptions = excludeNullsExceptIn(options, "is_array");
-        return { ...field, ...newOptions };
-      },
-    ),
-  });
+  fromModelUpdateToDBUpdate: pipe(
+    snakeCaseKeysDeep,
+    undefinedsToNullsDeep,
+    (obj): EntityFieldConfig<"DBUpdate"> => {
+      const { options, ...field } = excludeNullsExceptIn(obj, [
+        "description",
+      ]);
+      // put the options back in the flattened db object
+      const newOptions = excludeNullsExceptIn(options, "is_array");
+      return { ...field, ...newOptions };
+    },
+  ),
+});
 
 /**
  * Do not remove these tests! These check that your Zod parsers are

@@ -1,9 +1,10 @@
 import { UnknownObject, UUID } from "@/lib/types/common";
 import { DuckDBDataType } from "./DuckDBDataType";
+import { AvaDataType } from "@/models/datasets/AvaDataType";
 
 export type QueryResultColumn = {
   name: string;
-  dataType: "text" | "number" | "date";
+  dataType: AvaDataType;
 };
 
 export type QueryResultData<T extends UnknownObject = UnknownObject> = {
@@ -15,7 +16,8 @@ export type QueryResultData<T extends UnknownObject = UnknownObject> = {
 };
 
 export type QueryResultDataPage<T extends UnknownObject = UnknownObject> =
-  QueryResultData<T> & {
+  & QueryResultData<T>
+  & {
     /**
      * The total number of rows in the data store (for the query that
      * generated this page)

@@ -4,9 +4,12 @@ create type public.dataset_column_input as (
   -- The description of the column
   description text,
   -- The original data type of the column
-  original_data_type public.datasets__column_data_type,
+  original_data_type text,
+  -- The detected data type of the column, as inferred by DuckDB when parsing
+  -- the dataset for the first time.
+  detected_data_type public.datasets__duckdb_data_type,
   -- The queryable data type of the column
-  data_type public.datasets__column_data_type,
+  data_type public.datasets__ava_data_type,
   -- The index of the column, so we can display columns in order in the UI
   column_idx integer
 );
@@ -98,6 +101,8 @@ begin
       dataset_id,
       workspace_id,
       name,
+      original_data_type,
+      detected_data_type,
       data_type,
       description,
       column_idx
@@ -105,6 +110,8 @@ begin
       v_dataset.id,
       p_workspace_id,
       v_column.name,
+      v_column.original_data_type,
+      v_column.detected_data_type,
       v_column.data_type,
       v_column.description,
       v_column.column_idx

@@ -1,4 +1,4 @@
-import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/types";
+import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import type { GenericSeedData } from "../scripts/SeedRunner";
 
 export const TEST_USER_EMAIL = "user@avandarlabs.com";
@@ -77,7 +77,7 @@ export const SeedData = {
           description: "This entity represents a US State",
           options: {
             class: "dimension",
-            baseDataType: "string",
+            baseDataType: "varchar",
             valueExtractorType: "manual_entry",
             allowManualEdit: true,
             isIdField: true,

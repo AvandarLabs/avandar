@@ -9,11 +9,11 @@ import {
 import { objectKeys } from "@/lib/utils/objects/misc";
 import { promiseFlatMap } from "@/lib/utils/promises";
 import { EntityConfigId } from "@/models/EntityConfig";
-import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
+import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import {
   EntityFieldConfig,
   EntityFieldConfigId,
-} from "@/models/EntityConfig/EntityFieldConfig/types";
+} from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import { EntityFieldValueExtractorRegistry } from "@/models/EntityConfig/ValueExtractor/types";
 import { getDatasetColumnFieldValues } from "./getDatasetColumnFieldValues";
 
