@@ -126,7 +126,7 @@ export function VisualizationContainer({
         : "The bar chart cannot be displayed.";
       return (
         <Callout.Error
-          title="Error"
+          title="Cannot display bar chart"
           message={summaryMessage}
           w="fit-content"
           mt="-20rem"
