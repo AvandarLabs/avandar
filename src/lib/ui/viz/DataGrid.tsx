@@ -46,7 +46,7 @@ export function DataGrid({
 
   // AgGrid will fill the size of the parent container
   return (
-    <Box style={{ height }}>
+    <Box style={{ height, width: "100%" }}>
       <AgGridReact
         columnDefs={columnDefs}
         rowData={data as Writable<UnknownDataFrame>}
