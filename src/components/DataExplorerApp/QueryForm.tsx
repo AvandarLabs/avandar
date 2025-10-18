@@ -98,7 +98,7 @@ export function QueryForm({
 
         <QueryableColumnMultiSelect
           label="Select columns"
-          placeholder="Select columns"
+          placeholder="Select columns to query"
           dataSourceId={
             selectedFromDataSource ?
               makeDataSourceIdWithType(selectedFromDataSource)
@@ -154,7 +154,7 @@ export function QueryForm({
 
         <QueryableColumnMultiSelect
           label="Group by"
-          placeholder="Group by"
+          placeholder="Select columns to group results by"
           dataSourceId={
             selectedFromDataSource ?
               makeDataSourceIdWithType(selectedFromDataSource)
@@ -172,6 +172,7 @@ export function QueryForm({
             label="Column"
             data={fieldOptionsById}
             value={orderByColumnId}
+            placeholder="Select column to sort by"
             onChange={(newColId) => {
               const newOrderByColumn = selectedColumns.find((col) => {
                 return col.value.id === newColId;
@@ -182,7 +183,7 @@ export function QueryForm({
           />
           <Select
             label="Direction"
-            placeholder="Select order"
+            placeholder="Select sort order"
             data={orderDirectionOptions}
             value={orderByDirection}
             onChange={(value) => {
