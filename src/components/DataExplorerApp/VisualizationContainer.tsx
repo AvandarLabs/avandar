@@ -27,14 +27,14 @@ type Props = {
 const XAxisKeySchema = string({
   error: (issue) => {
     return issue.input === undefined ?
-        "You must choose an X axis"
+        "You haven't chosen an X axis"
       : "Invalid X axis selected";
   },
 });
 const YAxisKeySchema = string({
   error: (issue) => {
     return issue.input === undefined ?
-        "You must choose a Y axis"
+        "You haven't chosen a Y axis"
       : "Invalid Y axis selected";
   },
 });
