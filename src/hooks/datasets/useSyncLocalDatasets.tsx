@@ -5,7 +5,6 @@ import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { ResyncDatasetsBlock } from "@/components/DataManagerApp/ResyncDatasetsBlock";
 import { useQuery } from "@/lib/hooks/query/useQuery";
-import { Logger } from "@/lib/Logger";
 import { difference } from "@/lib/utils/arrays/misc";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { isEmptyArray, isNullish, or } from "@/lib/utils/guards";
@@ -49,7 +48,6 @@ function useGarbageDatasetCollection(): void {
       allWorkspaceDatasets.map(getProp("id")),
     );
     if (extraDatasetIds.length > 0) {
-      Logger.log("deleting extra datasets", extraDatasetIds);
       LocalDatasetClient.bulkDelete({ ids: extraDatasetIds }).then(() => {
         setIsGarbageCollectionDone(true);
       });
