@@ -23,6 +23,7 @@ export function EditDatasetView({ dataset }: Props): JSX.Element {
       defaultValue={dataset.name}
       required
       hideLabel
+      validateOnChange
       minLength={2}
       inputWidth={300}
       showSubmitButton

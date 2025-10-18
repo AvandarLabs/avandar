@@ -82,6 +82,11 @@ export function InputTextForm({
     validateInputOnChange: validateOnChange,
     validate: {
       value: (value) => {
+        if (value.trim().length === 0) {
+          // prevent a value that is only empty spaces
+          return "This field cannot be empty";
+        }
+
         if (minLength && value.length < minLength) {
           return `${hideLabel ? "This field" : label} must be at least ${minLength} characters long`;
         }
@@ -99,7 +104,7 @@ export function InputTextForm({
         onSubmit?.(value);
       })}
     >
-      <Group gap="xs" align="end" wrap="wrap">
+      <Group gap="xs" align="start" wrap="wrap">
         <TextInput
           key={form.key("value")}
           {...form.getInputProps("value")}
@@ -109,7 +114,10 @@ export function InputTextForm({
           style={{ width: inputWidth }}
         />
         {showSubmitButton ?
-          <Button type="submit" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            disabled={isSubmitting || (validateOnChange && !form.isValid())}
+          >
             {submitButtonLabel}
             {isSubmitting ?
               <Loader />
