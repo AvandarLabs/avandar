@@ -1,5 +1,5 @@
 import { Box, Button, FileInput, FileInputProps, Group } from "@mantine/core";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { MIMEType } from "@/lib/types/common";
 
@@ -66,7 +66,14 @@ export function FileUploadForm({
   form.useFieldWatch("file", () => {
     // when the file changes, reset the submitted state
     setIsSubmitted(false);
+    // we request an animation frame because the button cannot receive focus
+    // while it is disabled, so we need to wait for the browser to first
+    // remove the button's disabled state before we can call `focus()`
+    requestAnimationFrame(() => {
+      submitBtnRef.current?.focus();
+    });
   });
+  const submitBtnRef = useRef<HTMLButtonElement | null>(null);
 
   return (
     <form
@@ -87,6 +94,7 @@ export function FileUploadForm({
         />
         <Box style={{ alignSelf: "flex-end" }}>
           <Button
+            ref={submitBtnRef}
             type="submit"
             loading={isSubmitting}
             disabled={form.getValues().file === null || isSubmitted}
