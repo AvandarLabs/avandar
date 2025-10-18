@@ -22,6 +22,12 @@ export const AvaDataTypeUtils = {
   isNumeric: (avaDataType: AvaDataType): avaDataType is "bigint" | "double" => {
     return avaDataType === "bigint" || avaDataType === "double";
   },
+  isTemporal: (
+    avaDataType: AvaDataType,
+  ): avaDataType is "date" | "time" | "timestamp" => {
+    return avaDataType === "date" || avaDataType === "time" ||
+      avaDataType === "timestamp";
+  },
   getValidQueryAggregations: (
     avaDataType: AvaDataType,
   ): readonly QueryAggregationType[] => {

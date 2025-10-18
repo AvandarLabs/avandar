@@ -1,8 +1,11 @@
+import { Flex, List, Text } from "@mantine/core";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
-import { z } from "zod";
+import { flattenError, object, prettifyError, string } from "zod";
 import { QueryResultColumn } from "@/clients/DuckDBClient/types";
+import { Logger } from "@/lib/Logger";
 import { UnknownDataFrame } from "@/lib/types/common";
+import { Callout } from "@/lib/ui/Callout";
 import { DangerText } from "@/lib/ui/text/DangerText";
 import { BarChart } from "@/lib/ui/viz/BarChart";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
@@ -10,6 +13,8 @@ import { LineChart } from "@/lib/ui/viz/LineChart";
 import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
 import { isEpochMs, isIsoDateString } from "@/lib/utils/formatters/formatDate";
 import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { objectValues } from "@/lib/utils/objects/misc";
+import { AvaDataTypeUtils } from "@/models/datasets/AvaDataType";
 import { VizConfig } from "./VizSettingsForm/makeDefaultVizConfig";
 
 type Props = {
@@ -19,35 +24,35 @@ type Props = {
 };
 
 // Reusable XY schema “blocks”
-const xAxisKeySchema = z.string({
+const XAxisKeySchema = string({
   error: (issue) => {
     return issue.input === undefined ?
-        "X axis must be specified"
-      : "X axis must be a string";
+        "You must choose an X axis"
+      : "Invalid X axis selected";
   },
 });
-const yAxisKeySchema = z.string({
+const YAxisKeySchema = string({
   error: (issue) => {
     return issue.input === undefined ?
-        "Y axis must be specified"
-      : "Y axis must be a string";
+        "You must choose a Y axis"
+      : "Invalid Y axis selected";
   },
 });
 
 // Chart-specific schemas (can diverge later)
-const BarChartSettingsSchema = z.object({
-  xAxisKey: xAxisKeySchema,
-  yAxisKey: yAxisKeySchema,
+const BarChartSettingsSchema = object({
+  xAxisKey: XAxisKeySchema,
+  yAxisKey: YAxisKeySchema,
 });
 
-const LineChartSettingsSchema = z.object({
-  xAxisKey: xAxisKeySchema,
-  yAxisKey: yAxisKeySchema,
+const LineChartSettingsSchema = object({
+  xAxisKey: XAxisKeySchema,
+  yAxisKey: YAxisKeySchema,
 });
 
-const ScatterChartSettingsSchema = z.object({
-  xAxisKey: xAxisKeySchema,
-  yAxisKey: yAxisKeySchema,
+const ScatterPlotSettingsSchema = object({
+  xAxisKey: XAxisKeySchema,
+  yAxisKey: YAxisKeySchema,
 });
 
 export function VisualizationContainer({
@@ -66,18 +71,16 @@ export function VisualizationContainer({
         .filter((f) => {
           const sampleVal = data[0]?.[f.name];
           return (
-            f.dataType === "date" ||
+            AvaDataTypeUtils.isTemporal(f.dataType) ||
             isIsoDateString(sampleVal) ||
             isEpochMs(sampleVal)
           );
         })
-        .map((f) => {
-          return f.name;
-        }),
+        .map(getProp("name")),
     );
   }, [columns, data]);
 
-  return match(vizConfig)
+  const viz = match(vizConfig)
     .with({ type: "table" }, () => {
       return (
         <DataGrid
@@ -95,12 +98,42 @@ export function VisualizationContainer({
         data: settings,
         error,
       } = BarChartSettingsSchema.safeParse(config.settings);
-
       if (success) {
         return <BarChart data={data} height={700} {...settings} />;
       }
-      const errorMessages = z.prettifyError(error);
-      return <DangerText>{errorMessages}</DangerText>;
+
+      // generate the error message
+      const errors = flattenError(error).fieldErrors;
+      Logger.log("errors", errors);
+      const errorMessages = objectValues(errors).flat();
+      const errorBlock = (
+        <List size="xl">
+          {errorMessages.map((errMsg) => {
+            return (
+              <List.Item key={errMsg}>
+                <Text display="flex" size="xl">
+                  {errMsg}
+                </Text>
+              </List.Item>
+            );
+          })}
+        </List>
+      );
+
+      const summaryMessage =
+        errors.xAxisKey || errors.yAxisKey ?
+          "The bar chart cannot be displayed because there are missing axes."
+        : "The bar chart cannot be displayed.";
+      return (
+        <Callout.Error
+          title="Error"
+          message={summaryMessage}
+          w="fit-content"
+          mt="-20rem"
+        >
+          {errorBlock}
+        </Callout.Error>
+      );
     })
     .with({ type: "line" }, (config) => {
       const {
@@ -112,19 +145,25 @@ export function VisualizationContainer({
       if (success) {
         return <LineChart data={data} height={700} {...settings} />;
       }
-      return <DangerText>{z.prettifyError(error)}</DangerText>;
+      return <DangerText>{prettifyError(error)}</DangerText>;
     })
     .with({ type: "scatter" }, (config) => {
       const {
         success,
         data: settings,
         error,
-      } = ScatterChartSettingsSchema.safeParse(config.settings);
+      } = ScatterPlotSettingsSchema.safeParse(config.settings);
 
       if (success) {
         return <ScatterChart data={data} height={700} {...settings} />;
       }
-      return <DangerText>{z.prettifyError(error)}</DangerText>;
+      return <DangerText>{prettifyError(error)}</DangerText>;
     })
     .exhaustive();
+
+  return (
+    <Flex h="100%" w="100%" justify="center" align="center">
+      {viz}
+    </Flex>
+  );
 }
