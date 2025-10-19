@@ -22,7 +22,7 @@
  */
 import Dexie from "dexie";
 import { DexieDBVersionManager } from "@/lib/clients/dexie/DexieDBVersionManager";
-import { SupabaseDBClient } from "@/lib/clients/supabase/SupabaseDBClient";
+import { AvaSupabase } from "../supabase/AvaSupabase";
 import { clearOPFS } from "@/lib/utils/browser/clearOPFS";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { LegacyLocalDatasetEntryModel } from "@/models/datasets/Legacy_LocalDatasetEntry";
@@ -68,11 +68,11 @@ const DBDefinitions = [
       // When a user upgardes the database in a different browser, this will run
       // again). But this is safe right now because we have not launched the
       // platform yet.
-      const { data: datasets } = await SupabaseDBClient.from("datasets")
+      const { data: datasets } = await AvaSupabase.DB.from("datasets")
         .select("*")
         .throwOnError();
       const datasetIds = datasets.map(prop("id"));
-      await SupabaseDBClient.from("datasets").delete().in("id", datasetIds);
+      await AvaSupabase.DB.from("datasets").delete().in("id", datasetIds);
     },
   }),
 ] as const;

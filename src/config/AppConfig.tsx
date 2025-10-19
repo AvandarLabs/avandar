@@ -1,7 +1,7 @@
 /** Configuration for the app. */
 // TODO(jpsyx): move most of these to environment variables so that
 // changes do not require rebuilding production.
-type TAppConfig = {
+type AppConfigType = {
   /**
    * The path and filename to the logo file relative to the `public/` directory.
    * The logo must be in the `public` directory.
@@ -40,4 +40,4 @@ export const AppConfig = {
   },
   supportEmail: "support@avandarlabs.com",
   infoEmail: "info@avandarlabs.com",
-} satisfies TAppConfig;
+} satisfies AppConfigType;

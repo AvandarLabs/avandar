@@ -10,7 +10,7 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { StrictMode, useEffect, useMemo } from "react";
 import { createRoot } from "react-dom/client";
-import { AvaDexie } from "./dexie/AvaDexie";
+import { AvaDexie } from "./db/dexie/AvaDexie";
 import { useAuth } from "./lib/hooks/auth/useAuth";
 import { RootRouteContext } from "./lib/types/RootRouteContext";
 import { routeTree } from "./routeTree.gen";

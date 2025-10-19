@@ -1,18 +1,25 @@
 import { User } from "@supabase/supabase-js";
-import { SupabaseDBClient } from "@/lib/clients/supabase/SupabaseDBClient";
 import { Logger } from "@/lib/Logger";
 import { uuid } from "@/lib/utils/uuid";
-import { CurrentDexieDBVersion } from "./CurrentDexieDBVersion";
+import { AvaSupabase } from "../supabase/AvaSupabase";
+import {
+  AvaDexieVersionManager,
+  CURRENT_AVA_DEXIE_VERSION,
+} from "./dexieVersions";
+
+const currentDexieDBVersion = AvaDexieVersionManager.getVersion(
+  CURRENT_AVA_DEXIE_VERSION,
+);
 
 export const AvaDexie = {
-  DB: CurrentDexieDBVersion,
+  DB: currentDexieDBVersion,
 
   /**
    * Deletes the Avandar IndexedDB from the browser.
    */
   deleteDatabase: async (): Promise<void> => {
     try {
-      await CurrentDexieDBVersion.delete();
+      await currentDexieDBVersion.delete();
       Logger.log("Database deleted successfully");
     } catch (err) {
       Logger.error("Failed to delete database", err);
@@ -31,10 +38,10 @@ export const AvaDexie = {
    *    older Dexie version from our codebase so we no longer have to bundle it.
    */
   syncDBVersion: async (user: User | undefined): Promise<void> => {
-    if (CurrentDexieDBVersion.verno && CurrentDexieDBVersion.verno > 0) {
+    if (currentDexieDBVersion.verno && currentDexieDBVersion.verno > 0) {
       // first, make sure the `meta` table exists and the user didn't just
       // fully delete it
-      const metaTableExists = CurrentDexieDBVersion.tables.some((table) => {
+      const metaTableExists = currentDexieDBVersion.tables.some((table) => {
         return table.name === "meta";
       });
 
@@ -44,7 +51,7 @@ export const AvaDexie = {
         Logger.error(
           "Meta table does not exist. Resetting the frontend database and refreshing.",
         );
-        await CurrentDexieDBVersion.delete();
+        await currentDexieDBVersion.delete();
         window.location.reload();
       }
 
@@ -53,31 +60,31 @@ export const AvaDexie = {
       if (metaTableExists) {
         //
         const currentMetaVersion = Number(
-          (await CurrentDexieDBVersion.meta.get("version"))?.value ?? 0,
+          (await currentDexieDBVersion.meta.get("version"))?.value ?? 0,
         );
-        if (currentMetaVersion !== CurrentDexieDBVersion.verno) {
-          await CurrentDexieDBVersion.meta.put({
+        if (currentMetaVersion !== currentDexieDBVersion.verno) {
+          await currentDexieDBVersion.meta.put({
             key: "version",
-            value: String(CurrentDexieDBVersion.verno),
+            value: String(currentDexieDBVersion.verno),
           });
         }
 
-        const dbId = (await CurrentDexieDBVersion.meta.get("db_id"))?.value;
+        const dbId = (await currentDexieDBVersion.meta.get("db_id"))?.value;
         if (!dbId) {
-          await CurrentDexieDBVersion.meta.put({ key: "db_id", value: uuid() });
+          await currentDexieDBVersion.meta.put({ key: "db_id", value: uuid() });
         }
       }
     }
 
-    const dbId = (await CurrentDexieDBVersion.meta.get("db_id"))?.value;
+    const dbId = (await currentDexieDBVersion.meta.get("db_id"))?.value;
     if (user && dbId) {
       // Sync the dexie db metadata to the backend
-      await SupabaseDBClient.from("dexie_dbs")
+      await AvaSupabase.DB.from("dexie_dbs")
         .upsert(
           {
             user_id: user.id,
             db_id: dbId,
-            version: CurrentDexieDBVersion.verno,
+            version: currentDexieDBVersion.verno,
             user_agent: navigator.userAgent,
             last_seen_at: new Date().toISOString(),
           },
@@ -91,4 +98,4 @@ export const AvaDexie = {
   },
 };
 
-export type AvaDexieDB = typeof CurrentDexieDBVersion;
+export type AvaDexieDB = typeof currentDexieDBVersion;

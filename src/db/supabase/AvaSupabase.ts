@@ -5,17 +5,22 @@ import type { Database } from "@/types/database.types";
 export type DatabaseTableNames = keyof Database["public"]["Tables"];
 
 /**
- * A global client for interacting with Supabase.
- *
  * Naming this `SupabaseDBClient` instead of `SupabaseClient` so it doesn't
  * get mixed up with `SupabaseClient` from `@supabase/supabase-js` during
  * automatic imports.
- * @see {@link https://supabase.com/docs/reference/javascript/start|Supabase JS Docs}
  */
-export const SupabaseDBClient: SupabaseClient<Database> = createClient(
+const supabaseDBClient: SupabaseClient<Database> = createClient(
   import.meta.env.VITE_SUPABASE_API_URL ?? "",
   import.meta.env.VITE_SUPABASE_ANON_KEY ?? "",
 );
+
+export const AvaSupabase = {
+  /**
+   * A global client for interacting with Supabase.
+   * @see {@link https://supabase.com/docs/reference/javascript/start|Supabase JS Docs}
+   */
+  DB: supabaseDBClient,
+};
 
 export type GetSupabaseClientOptions<DB> =
   // Get the client options from the internal Supabase object, if it is set

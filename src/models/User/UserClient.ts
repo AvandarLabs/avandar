@@ -1,8 +1,7 @@
-import { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
 import { createBaseClient } from "@/lib/clients/BaseClient";
-import { SupabaseDBClient } from "@/lib/clients/supabase/SupabaseDBClient";
+import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { WithLogger, withLogger } from "@/lib/clients/withLogger";
 import {
   WithQueryHooks,
@@ -19,6 +18,7 @@ import { uuid } from "@/lib/utils/uuid";
 import { Database, Tables } from "@/types/database.types";
 import { WorkspaceId } from "../Workspace/types";
 import { MembershipId, UserId, UserProfile, UserProfileId } from "./types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 type TUserClient = WithSupabaseClient<
   WithLogger<
@@ -70,7 +70,7 @@ const UserProfileDBReadToModelReadSchema: z.ZodType<
   });
 
 function createUserClient(options?: TUserClientOptions): TUserClient {
-  const { dbClient = SupabaseDBClient } = options ?? {};
+  const { dbClient = AvaSupabase.DB } = options ?? {};
   const baseClient = createBaseClient("User");
 
   const client = withLogger(baseClient, (baseLogger: ILogger) => {

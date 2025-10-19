@@ -1,12 +1,11 @@
 import { PostgrestFilterBuilder } from "@supabase/postgrest-js";
-import { SupabaseClient } from "@supabase/supabase-js";
 import { match } from "ts-pattern";
 import { EmptyObject } from "type-fest";
 import {
+  AvaSupabase,
   DatabaseTableNames,
   GetSupabaseClientOptions,
-  SupabaseDBClient,
-} from "@/lib/clients/supabase/SupabaseDBClient";
+} from "@/db/supabase/AvaSupabase";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { Database } from "@/types/database.types";
 import { ILogger } from "../../Logger";
@@ -22,6 +21,7 @@ import {
   UpsertOptions,
 } from "../createModelCRUDClient";
 import { withSupabaseClient } from "../withSupabaseClient";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 /** The maximum page size configured in Supabase */
 const MAXIMUM_PAGE_SIZE = 1000;
@@ -97,7 +97,7 @@ export function createSupabaseCRUDClient<
 
   /**
    * The database client to use for interacting with Supabase.
-   * Defaults to our global `SupabaseDBClient`.
+   * Defaults to our global `AvaSupabase`.
    * We override this when we want to test or seed data with an admin client.
    */
   dbClient?: SupabaseClient<Database>;
@@ -109,7 +109,7 @@ export function createSupabaseCRUDClient<
     dbTablePrimaryKey,
     queries,
     mutations,
-    dbClient = SupabaseDBClient,
+    dbClient = AvaSupabase.DB,
   } = options;
 
   function _applyFiltersToSupabaseQuery<Query extends SupabaseFilterableQuery>(

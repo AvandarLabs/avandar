@@ -1,5 +1,5 @@
 import { DistributedOmit } from "type-fest";
-import { AvaDexie } from "@/dexie/AvaDexie";
+import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { createDexieCRUDClient } from "@/lib/clients/dexie/createDexieCRUDClient";
 import { DatasetId } from "@/models/datasets/Dataset";
 import { LocalDatasetParsers } from "@/models/datasets/LocalDataset";
