@@ -1,12 +1,14 @@
 import { useUncontrolled } from "@mantine/hooks";
 import { useMemo } from "react";
-import { QueryAggregationType } from "@/clients/DuckDBClient/types";
 import { Select, SelectOption } from "@/lib/ui/inputs/Select";
+import { propIsInArray } from "@/lib/utils/objects/higherOrderFuncs";
+import { AvaDataType } from "@/models/datasets/AvaDataType";
 import { AvaDataTypeUtils } from "@/models/datasets/AvaDataType/AvaDataTypeUtils";
-import { QueryableColumn } from "./QueryableColumnMultiSelect";
+import { QueryAggregationType } from "@/models/queries/QueryAggregationType";
 
 type Props = {
-  column: QueryableColumn;
+  dataType: AvaDataType;
+  label: string;
   value?: QueryAggregationType;
   defaultValue?: QueryAggregationType;
   onChange?: (aggregation: QueryAggregationType) => void;
@@ -14,6 +16,7 @@ type Props = {
 
 const AGGREGATION_OPTIONS: Array<SelectOption<QueryAggregationType>> = [
   { value: "none", label: "None" },
+  { value: "group_by", label: "Group by" },
   { value: "sum", label: "Sum" },
   { value: "avg", label: "Average" },
   { value: "count", label: "Count" },
@@ -22,21 +25,20 @@ const AGGREGATION_OPTIONS: Array<SelectOption<QueryAggregationType>> = [
 ];
 
 export function AggregationSelect({
-  column,
+  dataType,
+  label,
   value,
   defaultValue = "none",
   onChange,
 }: Props): JSX.Element {
-  const validAggregations = AvaDataTypeUtils.getValidQueryAggregations(
-    column.type === "DatasetColumn" ?
-      column.value.dataType
-    : column.value.options.baseDataType,
-  );
+  const validAggregations =
+    AvaDataTypeUtils.getValidQueryAggregations(dataType);
 
+  // only show valid aggregations as Select options
   const aggregationOptions = useMemo(() => {
-    return AGGREGATION_OPTIONS.filter((opt) => {
-      return validAggregations.includes(opt.value) || opt.value === "none";
-    });
+    return AGGREGATION_OPTIONS.filter(
+      propIsInArray("value", validAggregations),
+    );
   }, [validAggregations]);
 
   const [currentAggregation, setCurrentAggregation] =
@@ -47,20 +49,12 @@ export function AggregationSelect({
       onChange,
     });
 
-  const isValidAggregation = validAggregations.includes(currentAggregation);
-  const aggregationToUse =
-    currentAggregation !== "none" && !isValidAggregation ?
-      "none"
-    : currentAggregation;
-
   return (
     <Select
-      // key for hard reset
-      key={column.value.id}
-      label={column.value.name}
+      label={label}
       placeholder="Select aggregation"
       data={aggregationOptions}
-      value={aggregationToUse}
+      value={currentAggregation}
       onChange={(newValue) => {
         if (newValue) {
           setCurrentAggregation(newValue);

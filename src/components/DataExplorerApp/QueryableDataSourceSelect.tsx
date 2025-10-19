@@ -27,11 +27,11 @@ export type QueryableDataSourceId = QueryableDataSourceIdWithType["id"];
 export type QueryableDataSource =
   | {
       type: "Dataset";
-      value: Dataset;
+      object: Dataset;
     }
   | {
       type: "EntityConfig";
-      value: EntityConfig;
+      object: EntityConfig;
     };
 
 type Props = {
@@ -75,10 +75,10 @@ export function QueryableDataSourceSelect({
   const dataSources: QueryableDataSource[] = useMemo(() => {
     return [
       ...(datasets ?? []).map((d) => {
-        return { type: "Dataset" as const, value: d };
+        return { type: "Dataset" as const, object: d };
       }),
       ...(entityConfigs ?? []).map((ec) => {
-        return { type: "EntityConfig" as const, value: ec };
+        return { type: "EntityConfig" as const, object: ec };
       }),
     ];
   }, [datasets, entityConfigs]);
@@ -151,7 +151,7 @@ export function QueryableDataSourceSelect({
   ) => {
     const newDataSource =
       dataSources.find((ds) => {
-        return ds.value.id === newDataSourceId;
+        return ds.object.id === newDataSourceId;
       }) ?? null;
     setCurrentDataSource(newDataSource);
   };
@@ -161,7 +161,7 @@ export function QueryableDataSourceSelect({
       data={dataSourceOptions}
       label="Data source"
       placeholder="Select a data source"
-      value={currentDataSource?.value.id ?? null}
+      value={currentDataSource?.object.id ?? null}
       onChange={onDataSourceChange}
       {...selectProps}
     />

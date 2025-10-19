@@ -8,7 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { isArray } from "@/lib/utils/guards";
+import { isArray } from "@/lib/utils/guards/guards";
 
 type Props = {
   children: string;

@@ -1,5 +1,5 @@
 import { UnknownObject } from "@/lib/types/common";
-import { isEmptyObject } from "../guards";
+import { isEmptyObject } from "../guards/guards";
 import { objectKeys } from "../objects/misc";
 import {
   ArrayValueOperator,
@@ -36,8 +36,8 @@ import type { FiltersByColumn } from "./filtersByColumn";
  * in the same operator.
  */
 export type FiltersByOperator<T extends UnknownObject> = Partial<
-  Record<SingleValueOperator, ColumnTargetValuePairs<T>> &
-    Record<ArrayValueOperator, ColumnTargetValueArrayPairs<T>>
+  & Record<SingleValueOperator, ColumnTargetValuePairs<T>>
+  & Record<ArrayValueOperator, ColumnTargetValueArrayPairs<T>>
 >;
 
 type ColumnTargetValuePairs<T extends UnknownObject> = Array<

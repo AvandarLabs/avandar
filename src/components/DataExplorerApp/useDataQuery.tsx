@@ -1,99 +1,109 @@
 import { match } from "ts-pattern";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { UnknownRow } from "@/clients/DuckDBClient";
-import {
-  QueryAggregationType,
-  QueryResultColumn,
-  QueryResultData,
-} from "@/clients/DuckDBClient/types";
+import { DuckDBQueryAggregationType } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { useQuery, UseQueryResultTuple } from "@/lib/hooks/query/useQuery";
+import { valNotEq } from "@/lib/utils/guards/higherOrderFuncs";
+import { makeIdLookupMap } from "@/lib/utils/maps/builders";
 import { makeObjectFromEntries } from "@/lib/utils/objects/builders";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
-import { objectEntries } from "@/lib/utils/objects/misc";
-import { sortStrings } from "@/lib/utils/strings/sort";
-import { OrderByDirection } from "./DataExplorerContext/types";
-import { QueryableColumn } from "./QueryableColumnMultiSelect";
-import { QueryableDataSource } from "./QueryableDataSourceSelect";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
+import { objectEntries, objectValues } from "@/lib/utils/objects/misc";
+import { sortObjList } from "@/lib/utils/objects/sortObjList";
+import {
+  QueryResultColumn,
+  QueryResultData,
+} from "@/models/queries/QueryResultData/QueryResultData.types";
+import { PartialStructuredQuery } from "@/models/queries/StructuredQuery";
 
 type UseDataQueryOptions = {
-  dataSource?: QueryableDataSource;
-  enabled: boolean;
-  selectColumns: readonly QueryableColumn[];
-  groupByColumns: readonly QueryableColumn[];
-  orderByColumn: QueryableColumn | undefined;
-  orderByDirection: OrderByDirection | undefined;
-
-  /**
-   * Aggregations to apply to the selected columns
-   * **NOTE**: The key is the column name (not the column id).
-   */
-  aggregations: Record<string, QueryAggregationType>;
-  offset?: number;
-  limit?: number;
+  query: PartialStructuredQuery;
 };
 
 export function useDataQuery({
-  dataSource,
-  enabled,
-  selectColumns = [],
-  groupByColumns = [],
-  orderByColumn,
-  orderByDirection,
-  aggregations,
-  offset,
-  limit,
+  query,
 }: UseDataQueryOptions): UseQueryResultTuple<QueryResultData<UnknownRow>> {
-  const dataSourceId = dataSource?.value.id;
-  const selectColumnNames = selectColumns.map(getProp("value.name"));
-  const groupByColumnNames = groupByColumns.map(getProp("value.name"));
-
-  const sortedColumnNames = sortStrings(selectColumnNames);
-  const sortedGroupByNames = sortStrings(groupByColumnNames);
-  const sortedAggregations = sortStrings(
-    objectEntries(aggregations ?? {}).map(([fieldName, aggType]) => {
-      return `${fieldName}:${aggType}`;
-    }),
-  );
-  const orderByColumnName = orderByColumn?.value.name;
+  const {
+    dataSource,
+    queryColumns,
+    aggregations,
+    orderByColumn,
+    orderByDirection,
+  } = query;
+  const sortedQueryColumns = sortObjList(queryColumns, {
+    sortBy: prop("column.id"),
+  });
 
   return useQuery({
-    enabled: enabled && !!dataSourceId,
-
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    enabled: !!dataSource,
     queryKey: [
-      "dataQuery",
-      dataSourceId,
+      "dataSource",
+      dataSource,
       "select",
-      ...sortedColumnNames,
+      sortedQueryColumns,
       "aggregations",
-      ...sortedAggregations,
-      "groupBy",
-      ...sortedGroupByNames,
+      aggregations,
       "orderBy",
-      orderByColumnName,
+      orderByColumn,
       orderByDirection,
-      "offset",
-      offset,
-      "limit",
-      limit,
     ],
 
     queryFn: async () => {
-      if (
-        dataSource !== undefined &&
-        dataSourceId &&
-        aggregations &&
-        selectColumns.length > 0
-      ) {
+      if (dataSource && sortedQueryColumns.length > 0) {
         const queryResults = await match(dataSource)
-          .with({ type: "Dataset" }, async ({ value: dataset }) => {
+          .with({ type: "Dataset" }, async ({ object: dataset }) => {
             // Querying datasets is simple. We can just query the dataset
             // directly.
+            const columnLookup = makeIdLookupMap(sortedQueryColumns, {
+              key: "column.id",
+            });
+
+            // First, we need to convert the structured query into a
+            // DuckDB structured query.
+            const duckDBAggregations = {} as Record<
+              string, // duckdb uses column names for aggregations
+              DuckDBQueryAggregationType
+            >;
+            const groupByColumnNames = [] as string[];
+
+            const atLeastOneColumnHasAggregation = objectValues(
+              aggregations,
+            ).some(valNotEq("none"));
+
+            objectEntries(aggregations).forEach(([columnId, aggregation]) => {
+              const column = columnLookup.get(columnId);
+              if (column?.type === "DatasetColumn") {
+                // "group_by" and "none" are not valid DucKDB aggregations, so
+                // we exclude them here.
+                if (aggregation !== "group_by" && aggregation !== "none") {
+                  duckDBAggregations[column.column.name] = aggregation;
+                } else {
+                  // But if the aggregation is "group_by" or there is at least
+                  // one other column with an aggregation, then we add this
+                  // column to the groupBy list to make sure our SQL query
+                  // remains valid.
+                  if (
+                    atLeastOneColumnHasAggregation ||
+                    aggregation === "group_by"
+                  ) {
+                    groupByColumnNames.push(column.column.name);
+                  }
+                }
+              }
+            });
+
+            const selectColumnNames = sortedQueryColumns.map(
+              prop("column.name"),
+            );
+            const orderByColumnName =
+              orderByColumn ?
+                columnLookup.get(orderByColumn)?.column.name
+              : undefined;
+
             return await DatasetRawDataClient.runLocalStructuredQuery({
               query: {
                 datasetId: dataset.id,
-                aggregations,
+                aggregations: duckDBAggregations,
                 selectColumnNames,
                 groupByColumnNames,
                 orderByDirection,
@@ -101,14 +111,18 @@ export function useDataQuery({
               },
             });
           })
-          .with({ type: "EntityConfig" }, async ({ value: entityConfig }) => {
-            // TODO(jpsyx): optimize this to use a table-materialization
-            // approach
-            const fields = selectColumns
+          .with({ type: "EntityConfig" }, async ({ object: entityConfig }) => {
+            // TODO(jpsyx): optimize this by using a progressive
+            // table-materialization approach
+            const fields = sortedQueryColumns
               .filter((col) => {
                 return col.type === "EntityFieldConfig";
               })
-              .map(getProp("value"));
+              .map(prop("column"));
+
+            // TODO(jpsyx): we still need to apply group bys, aggregations,
+            // and sorting. Right now its just returning all values for the
+            // requested fields.
             const rows = await EntityFieldValueClient.getAllEntityFieldValues({
               entityConfigId: entityConfig.id,
               entityFieldConfigs: fields,

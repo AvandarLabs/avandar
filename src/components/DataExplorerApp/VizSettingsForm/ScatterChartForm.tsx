@@ -1,9 +1,9 @@
 import { useMemo } from "react";
-import { QueryResultColumn } from "@/clients/DuckDBClient/types";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { propPasses } from "@/lib/utils/objects/higherOrderFuncs";
 import { AvaDataTypeUtils } from "@/models/datasets/AvaDataType";
+import { QueryResultColumn } from "@/models/queries/QueryResultData/QueryResultData.types";
 
 export type ScatterChartSettings = {
   xAxisKey: string | undefined;

@@ -10,17 +10,15 @@ import { UnknownDataFrame } from "@/lib/types/common";
 import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
 import { difference, partition } from "@/lib/utils/arrays/misc";
 import { where } from "@/lib/utils/filters/filterBuilders";
-import { getProp, propEq } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys } from "@/lib/utils/objects/misc";
 import { promiseMap, promiseReduce } from "@/lib/utils/promises";
 import { DatasetId } from "@/models/datasets/Dataset";
 import { DuckDBClient, UnknownRow } from "../DuckDBClient";
 import { DuckDBDataTypeUtils } from "../DuckDBClient/DuckDBDataType";
 import { scalar, singleton } from "../DuckDBClient/queryResultHelpers";
-import {
-  QueryResultData,
-  StructuredDuckDBQueryConfig,
-} from "../DuckDBClient/types";
+import { DuckDBStructuredQuery } from "../DuckDBClient/DuckDBClient.types";
+import { QueryResultData } from "@/models/queries/QueryResultData/QueryResultData.types";
 import { LocalDatasetClient } from "./LocalDatasetClient";
 
 type TextFieldSummary = {
@@ -81,7 +79,7 @@ type DatasetLocalStructuredQueryOptions = {
   /**
    * The structured DuckDB query to run locally.
    */
-  query: Omit<StructuredDuckDBQueryConfig, "tableName"> & {
+  query: Omit<DuckDBStructuredQuery, "tableName"> & {
     datasetId: DatasetId;
   };
 };
@@ -130,9 +128,9 @@ type DatasetRawDataClientQueries = {
    *   Until we can support "where", we will need to continue
    *   using runLocalRawQuery
    *
-   * @param params The {@link StructuredDuckDBQueryConfig} object to run
+   * @param params The {@link DuckDBStructuredQuery} object to run
    * @param params.query The query to run, structured as a
-   * {@link StructuredDuckDBQueryConfig} object, except with the `tableName`
+   * {@link DuckDBStructuredQuery} object, except with the `tableName`
    * replaced by a `datasetId` field.
    * @returns An array of rows
    */
@@ -187,7 +185,7 @@ function createDatasetRawDataClient(): WithLogger<
 
     const missingLocalDatasets = difference(
       datasetIds,
-      localDatasets.map(getProp("datasetId")),
+      localDatasets.map(prop("datasetId")),
     );
     if (missingLocalDatasets.length > 0) {
       throw new Error(
@@ -216,13 +214,13 @@ function createDatasetRawDataClient(): WithLogger<
     if (skippedDatasets.length > 0) {
       Logger.log(
         "The following datasets were already in memory",
-        skippedDatasets.map(getProp("datasetId")),
+        skippedDatasets.map(prop("datasetId")),
       );
     }
     if (newlyLoadedDatasets.length > 0) {
       Logger.log(
         "The following datasets were loaded to memory",
-        newlyLoadedDatasets.map(getProp("datasetId")),
+        newlyLoadedDatasets.map(prop("datasetId")),
       );
     }
   };

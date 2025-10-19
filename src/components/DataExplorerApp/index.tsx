@@ -1,11 +1,5 @@
 import { Box, Flex, LoadingOverlay, MantineTheme } from "@mantine/core";
-import { useMemo } from "react";
-import { partition } from "@/lib/utils/arrays/misc";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
-import { isNotInSet } from "@/lib/utils/sets/higherOrderFuncs";
-import { wrapString } from "@/lib/utils/strings/higherOrderFuncs";
-import { wordJoin } from "@/lib/utils/strings/transformations";
-import { useDataExplorerContext } from "./DataExplorerContext/";
+import { DataExplorerStore } from "./DataExplorerStore";
 import { QueryForm } from "./QueryForm";
 import { useDataQuery } from "./useDataQuery";
 import { VisualizationContainer } from "./VisualizationContainer";
@@ -14,88 +8,12 @@ import { VizSettingsForm } from "./VizSettingsForm";
 const QUERY_FORM_WIDTH = 300;
 
 export function DataExplorerApp(): JSX.Element {
-  const {
-    aggregations,
-    setAggregations,
-    selectedFromDataSource,
-    setSelectedFromDataSource,
-    selectedColumns,
-    setSelectedColumns,
-    selectedGroupByColumns,
-    setSelectedGroupByColumns,
-    orderByColumn,
-    setOrderByColumn,
-    orderByDirection,
-    setOrderByDirection,
-    vizConfig,
-    setVizConfig,
-  } = useDataExplorerContext();
-
-  const selectedColumnNames = useMemo(() => {
-    return selectedColumns.map(getProp("value.name"));
-  }, [selectedColumns]);
-
-  const selectedGroupByColNames = useMemo(() => {
-    return selectedGroupByColumns.map(getProp("value.name"));
-  }, [selectedGroupByColumns]);
-
-  const [isValidQuery, errorMessage] = useMemo(() => {
-    // If there is at least 1 GROUP BY or at least 1 aggregated column, then
-    // ALL columns must be either in the GROUP BY or have an aggregation.
-    const [nonAggregatedColNames, aggregatedColNames] = partition(
-      selectedColumnNames,
-      (name) => {
-        return aggregations[name] === "none";
-      },
-    );
-
-    if (
-      aggregatedColNames.length !== 0 ||
-      selectedGroupByColNames.length !== 0
-    ) {
-      const groupByColNames = new Set(selectedGroupByColNames);
-      const colsWithoutGroupByOrAggregation = nonAggregatedColNames.filter(
-        isNotInSet(groupByColNames),
-      );
-
-      if (colsWithoutGroupByOrAggregation.length > 0) {
-        // generate the error message
-        const colNamesListStr = wordJoin(
-          colsWithoutGroupByOrAggregation.map(wrapString('"')),
-        );
-        const needs =
-          colsWithoutGroupByOrAggregation.length === 1 ?
-            `Column ${colNamesListStr} needs`
-          : `Columns ${colNamesListStr} need`;
-
-        const errMsg =
-          `If one column is in the Group By or has an aggregation, ` +
-          `then all columns must be in the Group By or have an aggregation. ` +
-          `${needs} to be added to the Group By or have an aggregation.`;
-
-        return [false, errMsg] as const;
-      }
-    }
-
-    return [true, undefined] as const;
-  }, [selectedColumnNames, selectedGroupByColNames, aggregations]);
-
+  const [state] = DataExplorerStore.use();
   const [queryResults, isLoadingResults] = useDataQuery({
-    enabled: !!selectedFromDataSource && isValidQuery,
-    aggregations,
-    dataSource: selectedFromDataSource,
-    selectColumns: selectedColumns,
-    groupByColumns: selectedGroupByColumns,
-    orderByColumn,
-    orderByDirection,
+    query: state.query,
   });
-
-  const { fields, data } = useMemo(() => {
-    return {
-      fields: queryResults?.columns ?? [],
-      data: queryResults?.data ?? [],
-    };
-  }, [queryResults]);
+  const queryResultColumns = queryResults?.columns ?? [];
+  const queryResultData = queryResults?.data ?? [];
 
   return (
     <Flex>
@@ -108,35 +26,15 @@ export function DataExplorerApp(): JSX.Element {
         py="md"
         style={$queryFormBorder}
       >
-        <QueryForm
-          aggregations={aggregations}
-          selectedFromDataSource={selectedFromDataSource}
-          selectedColumns={selectedColumns}
-          selectedGroupByColumns={selectedGroupByColumns}
-          orderByColumn={orderByColumn}
-          orderByDirection={orderByDirection}
-          onAggregationsChange={setAggregations}
-          onFromDataSourceChange={setSelectedFromDataSource}
-          onSelectColumnsChange={setSelectedColumns}
-          onGroupByChange={setSelectedGroupByColumns}
-          onOrderByColumnChange={setOrderByColumn}
-          onOrderByDirectionChange={setOrderByDirection}
-          errorMessage={errorMessage}
-        />
-
-        <VizSettingsForm
-          columns={fields}
-          vizConfig={vizConfig}
-          onVizConfigChange={setVizConfig}
-        />
+        <QueryForm />
+        <VizSettingsForm columns={queryResultColumns} />
       </Box>
 
       <Box pos="relative" flex={1} px="sm" py="md">
         <LoadingOverlay visible={isLoadingResults} zIndex={99} />
         <VisualizationContainer
-          vizConfig={vizConfig}
-          columns={fields}
-          data={data}
+          columns={queryResultColumns}
+          data={queryResultData}
         />
       </Box>
     </Flex>

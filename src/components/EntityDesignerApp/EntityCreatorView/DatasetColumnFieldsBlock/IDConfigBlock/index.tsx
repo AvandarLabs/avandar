@@ -4,9 +4,9 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { where } from "@/lib/utils/filters/filterBuilders";
-import { isDefined } from "@/lib/utils/guards";
+import { isDefined } from "@/lib/utils/guards/guards";
 import { makeObject } from "@/lib/utils/objects/builders";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { EntityConfigFormType } from "../../entityConfigFormTypes";
 
 type Props = {
@@ -24,7 +24,7 @@ export function IDConfigBlock({
     return [
       ...new Set(
         datasetColumnFields
-          .map(getProp("extractors.datasetColumnValue.datasetId"))
+          .map(prop("extractors.datasetColumnValue.datasetId"))
           .filter(isDefined),
       ),
     ];
@@ -38,11 +38,11 @@ export function IDConfigBlock({
 
   const fieldOptionsByDatasetId = useMemo(() => {
     return makeObject(datasets ?? [], {
-      keyFn: getProp("id"),
+      keyFn: prop("id"),
       valueFn: (dataset) => {
         return makeSelectOptions(dataset.columns, {
-          valueFn: getProp("id"),
-          labelFn: getProp("name"),
+          valueFn: prop("id"),
+          labelFn: prop("name"),
         });
       },
     });

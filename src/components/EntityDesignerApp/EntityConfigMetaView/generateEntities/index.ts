@@ -6,9 +6,9 @@ import { getSQLSelectOfExtractor } from "@/clients/entities/EntityFieldValueClie
 import { Logger } from "@/lib/Logger";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { where } from "@/lib/utils/filters/filterBuilders";
-import { isDefined } from "@/lib/utils/guards";
+import { isDefined } from "@/lib/utils/guards/guards";
 import { makeObject } from "@/lib/utils/objects/builders";
-import { getProp, propEq } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { Entity } from "@/models/entities/Entity";
 import {
   BuildableEntityConfig,
@@ -30,8 +30,8 @@ export async function generateEntities(
 
   const datasetColumnValueExtractors = allFields
     .map((field) => {
-      return field.valueExtractor.type === "dataset_column_value" ?
-          field.valueExtractor
+      return field.valueExtractor.type === "dataset_column_value"
+        ? field.valueExtractor
         : undefined;
     })
     .filter(isDefined);
@@ -39,7 +39,7 @@ export async function generateEntities(
   // get all source datasets and their local DuckDB table names
   const sourceDatasetIds = [
     // remove duplicates
-    ...new Set(datasetColumnValueExtractors.map(getProp("datasetId"))),
+    ...new Set(datasetColumnValueExtractors.map(prop("datasetId"))),
   ].filter(isDefined);
 
   // get all columns that we need to extract values from
@@ -47,7 +47,7 @@ export async function generateEntities(
     where(
       "id",
       "in",
-      datasetColumnValueExtractors.map(getProp("datasetFieldId")),
+      datasetColumnValueExtractors.map(prop("datasetFieldId")),
     ),
   );
   const columnsById = makeObject(sourceDatasetColumns, { key: "id" });
@@ -78,10 +78,9 @@ export async function generateEntities(
     key: "datasetId",
   });
   const titleColumn = extractorColumnsLookup[titleExtractor.id]!;
-  const titleDatasetPrimaryKeyColumn =
-    extractorColumnsLookup[
-      primaryKeyExtractorsByDatasetId[titleColumn.datasetId]!.id
-    ]!;
+  const titleDatasetPrimaryKeyColumn = extractorColumnsLookup[
+    primaryKeyExtractorsByDatasetId[titleColumn.datasetId]!.id
+  ]!;
 
   await DatasetRawDataClient.runLocalRawQuery({
     dependencies: sourceDatasetIds,

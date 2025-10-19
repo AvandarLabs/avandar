@@ -4,7 +4,7 @@ import {
   assertIsSingletonArray,
 } from "@/lib/utils/asserts";
 import { objectKeys } from "@/lib/utils/objects/misc";
-import { QueryResultData } from "./types";
+import { QueryResultData } from "@/models/queries/QueryResultData/QueryResultData.types";
 
 /**
  * Returns the singular scalar value from a single-column row.

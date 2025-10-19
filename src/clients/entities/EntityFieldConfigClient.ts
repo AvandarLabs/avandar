@@ -3,7 +3,7 @@ import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseC
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { makeBucketRecord } from "@/lib/utils/objects/builders";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys } from "@/lib/utils/objects/misc";
 import { promiseFlatMap } from "@/lib/utils/promises";
 import { AggregationExtractorClient } from "../../models/EntityConfig/ValueExtractor/AggregationExtractor/AggregationExtractorClient";
@@ -36,14 +36,14 @@ export const EntityFieldConfigClient = createSupabaseCRUDClient({
           return [];
         }
         const fields = removeDuplicates(inputFields, {
-          hashFn: getProp("id"),
+          hashFn: prop("id"),
         });
-        const fieldIds = fields.map(getProp("id"));
+        const fieldIds = fields.map(prop("id"));
 
         // Bucket each field by value extractor type, so we only query for
         // the extractor types that we need
         const fieldsByValueExtractorType = makeBucketRecord(fields, {
-          keyFn: getProp("options.valueExtractorType"),
+          keyFn: prop("options.valueExtractorType"),
         });
 
         logger.log("Fetching value extractors for fields", {

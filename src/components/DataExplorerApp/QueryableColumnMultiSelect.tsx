@@ -5,32 +5,17 @@ import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { where } from "@/lib/utils/filters/filterBuilders";
-import { isNonNullish } from "@/lib/utils/guards";
+import { isNonNullish } from "@/lib/utils/guards/guards";
 import { makeIdLookupMap } from "@/lib/utils/maps/builders";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
-import {
-  DatasetColumn,
-  DatasetColumnId,
-} from "@/models/datasets/DatasetColumn";
-import {
-  EntityFieldConfig,
-  EntityFieldConfigId,
-} from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
+import { DatasetColumn } from "@/models/datasets/DatasetColumn";
+import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import { QueryableDataSourceIdWithType } from "./QueryableDataSourceSelect";
 
-export type QueryableColumnIdWithType =
-  | {
-      type: "DatasetColumn";
-      id: DatasetColumnId;
-    }
-  | {
-      type: "EntityFieldConfig";
-      id: EntityFieldConfigId;
-    };
-export type QueryableColumnId = DatasetColumnId | EntityFieldConfigId;
 export type QueryableColumn =
-  | { type: "DatasetColumn"; value: DatasetColumn }
-  | { type: "EntityFieldConfig"; value: EntityFieldConfig };
+  | { type: "DatasetColumn"; column: DatasetColumn }
+  | { type: "EntityFieldConfig"; column: EntityFieldConfig };
+export type QueryableColumnId = QueryableColumn["column"]["id"];
 
 type Props = {
   label: ReactNode;
@@ -100,24 +85,24 @@ export function QueryableColumnMultiSelect({
       ...(datasetColumns ?? []).map((col) => {
         return {
           type: "DatasetColumn" as const,
-          value: col,
+          column: col,
         };
       }),
       ...(entityFieldConfigs ?? []).map((col) => {
         return {
           type: "EntityFieldConfig" as const,
-          value: col,
+          column: col,
         };
       }),
     ];
 
     return {
       selectableOptions: makeSelectOptions(combinedColumns, {
-        valueFn: getProp("value.id"),
-        labelFn: getProp("value.name"),
+        valueFn: prop("column.id"),
+        labelFn: prop("column.name"),
       }),
       queryableColumnLookup: makeIdLookupMap(combinedColumns, {
-        key: "value.id",
+        key: "column.id",
       }),
     };
   }, [datasetColumns, entityFieldConfigs]);
@@ -126,7 +111,7 @@ export function QueryableColumnMultiSelect({
   // we should drop any selections that are no longer valid.
   useEffect(() => {
     const prunedSelectedColumns = currentSelectedColumns.filter((col) => {
-      return queryableColumnLookup.has(col.value.id);
+      return queryableColumnLookup.has(col.column.id);
     });
     if (prunedSelectedColumns.length !== currentSelectedColumns.length) {
       setCurrentSelectedColumns(prunedSelectedColumns);
@@ -138,7 +123,7 @@ export function QueryableColumnMultiSelect({
   ]);
 
   const selectedColumnIds = useMemo(() => {
-    return currentSelectedColumns.map(getProp("value.id"));
+    return currentSelectedColumns.map(prop("column.id"));
   }, [currentSelectedColumns]);
 
   return (

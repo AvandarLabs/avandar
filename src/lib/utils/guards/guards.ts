@@ -1,6 +1,6 @@
 import { EmptyObject, SetRequired } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
-import { AnyFunction, SetDefined } from "../types/utilityTypes";
+import { AnyFunction, SetDefined } from "../../types/utilityTypes";
 
 /**
  * Returns a predicate that is true if any of the predicates are true.
@@ -15,7 +15,7 @@ export function or<T, Predicates extends Array<(value: any) => value is any>>(
   ...predicates: Predicates
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): value is Predicates[number] extends (value: any) => value is infer R ? T & R
-: never {
+  : never {
   return predicates.some((predicate) => {
     return predicate(value);
   });

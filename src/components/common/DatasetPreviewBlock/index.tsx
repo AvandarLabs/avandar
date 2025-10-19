@@ -2,7 +2,7 @@ import { ScrollArea, Stack, StackProps } from "@mantine/core";
 import { Callout } from "@/lib/ui/Callout";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import {
   DatasetColumnRead,
   DetectedDatasetColumn,
@@ -43,7 +43,7 @@ export function DatasetPreviewBlock({
     dataColumnsCalloutMessage ??
     `${columns.length} columns were detected. Review the column info below to make sure they are correct.`;
 
-  const columnNames = columns.map(getProp("name"));
+  const columnNames = columns.map(prop("name"));
 
   return (
     <Stack gap="md" {...stackProps}>

@@ -17,7 +17,7 @@ import {
   isPrimitive,
   isString,
   isUndefined,
-} from "../guards";
+} from "../guards/guards";
 
 describe("isPlainObject", () => {
   it("returns true for plain objects", () => {

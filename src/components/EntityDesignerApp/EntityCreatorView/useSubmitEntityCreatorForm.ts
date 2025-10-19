@@ -4,8 +4,8 @@ import {
   useMutation,
   UseMutationResultTuple,
 } from "@/lib/hooks/query/useMutation";
-import { hasPropKeys, isDefined } from "@/lib/utils/guards";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { hasPropKeys, isDefined } from "@/lib/utils/guards/guards";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { EntityFieldValueExtractor } from "@/models/EntityConfig/ValueExtractor/types";
@@ -90,7 +90,7 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
       await Promise.all([
         EntityConfigClient.delete({ id: entityConfigFormValues.id }),
         EntityFieldConfigClient.bulkDelete({
-          ids: fields.map(getProp("id")),
+          ids: fields.map(prop("id")),
         }),
       ]);
     },

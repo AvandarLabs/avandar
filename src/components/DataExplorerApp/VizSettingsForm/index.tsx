@@ -1,8 +1,9 @@
 import { match } from "ts-pattern";
-import { QueryResultColumn } from "@/clients/DuckDBClient/types";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
+import { QueryResultColumn } from "@/models/queries/QueryResultData/QueryResultData.types";
+import { DataExplorerStore } from "../DataExplorerStore";
 import { BarChartForm } from "./BarChartForm";
 import { LineChartForm } from "./LineChartForm";
 import {
@@ -23,8 +24,6 @@ const VIZ_TYPES: VizTypeMetadata[] = [
 
 type Props = {
   columns: readonly QueryResultColumn[];
-  vizConfig: VizConfig;
-  onVizConfigChange: (config: VizConfig) => void;
 };
 
 function getXYFromVizConfig(
@@ -99,14 +98,12 @@ function hydrateXY(options: {
     .exhaustive();
 }
 
-export function VizSettingsForm({
-  vizConfig,
-  columns,
-  onVizConfigChange,
-}: Props): JSX.Element {
+export function VizSettingsForm({ columns }: Props): JSX.Element {
+  const [{ vizConfig }, dispatch] = DataExplorerStore.use();
+
   const vizTypeOptions = makeSelectOptions(VIZ_TYPES, {
-    valueFn: getProp("type"),
-    labelFn: getProp("displayName"),
+    valueFn: prop("type"),
+    labelFn: prop("displayName"),
   });
 
   return (
@@ -122,7 +119,7 @@ export function VizSettingsForm({
               prevVizConfig: vizConfig,
               newVizConfig: makeDefaultVizConfig(selectedVizType as VizType),
             });
-            onVizConfigChange(updated);
+            dispatch.setVizConfig({ vizConfig: updated });
           }
         }}
       />
@@ -136,8 +133,10 @@ export function VizSettingsForm({
             <BarChartForm
               fields={columns}
               settings={config.settings}
-              onSettingsChange={(nextSettings) => {
-                onVizConfigChange({ ...config, settings: nextSettings });
+              onSettingsChange={(newSettings) => {
+                dispatch.setVizConfig({
+                  vizConfig: { ...config, settings: newSettings },
+                });
               }}
             />
           );
@@ -147,8 +146,10 @@ export function VizSettingsForm({
             <LineChartForm
               fields={columns}
               settings={config.settings}
-              onSettingsChange={(nextSettings) => {
-                onVizConfigChange({ ...config, settings: nextSettings });
+              onSettingsChange={(newSettings) => {
+                dispatch.setVizConfig({
+                  vizConfig: { ...config, settings: newSettings },
+                });
               }}
             />
           );
@@ -158,8 +159,10 @@ export function VizSettingsForm({
             <ScatterChartForm
               fields={columns}
               settings={config.settings}
-              onSettingsChange={(next) => {
-                return onVizConfigChange({ ...config, settings: next });
+              onSettingsChange={(newSettings) => {
+                dispatch.setVizConfig({
+                  vizConfig: { ...config, settings: newSettings },
+                });
               }}
             />
           );

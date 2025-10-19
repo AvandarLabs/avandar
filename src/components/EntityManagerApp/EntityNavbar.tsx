@@ -15,7 +15,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { constant } from "@/lib/utils/higherOrderFuncs";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { EntityConfig } from "@/models/EntityConfig/EntityConfig.types";
 
 type Props = {
@@ -55,7 +55,7 @@ export function EntityNavbar({
     });
 
   const allEntities = useMemo(() => {
-    return data ? data.pages.flatMap(getProp("rows")) : [];
+    return data ? data.pages.flatMap(prop("rows")) : [];
   }, [data]);
 
   const parentRef = useRef<HTMLDivElement | null>(null);

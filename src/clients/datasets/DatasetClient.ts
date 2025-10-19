@@ -3,7 +3,7 @@ import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseC
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { FiltersByColumn } from "@/lib/utils/filters/filtersByColumn";
 import { makeBucketRecord } from "@/lib/utils/objects/builders";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { ExcludeNullsIn } from "@/lib/utils/objects/transformations";
 import {
   Dataset,
@@ -70,7 +70,7 @@ export const DatasetClient = createSupabaseCRUDClient({
         logger.log("Getting all datasets with columns using params", params);
         const datasets = await DatasetClient.getAll(params);
         const allDatasetColumns = await DatasetColumnClient.getAll(
-          where("dataset_id", "in", datasets.map(getProp("id"))),
+          where("dataset_id", "in", datasets.map(prop("id"))),
         );
         const bucketedDatasetColumns = makeBucketRecord(allDatasetColumns, {
           key: "datasetId",

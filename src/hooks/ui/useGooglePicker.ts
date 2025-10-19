@@ -11,7 +11,7 @@ import {
   GPickerDocumentObject,
   GPickerResponseObject,
 } from "@/lib/types/google-picker";
-import { isNonEmptyArray } from "@/lib/utils/guards";
+import { isNonEmptyArray } from "@/lib/utils/guards/guards";
 import { noop } from "@/lib/utils/misc";
 import { useCurrentUserProfile } from "../users/useCurrentUserProfile";
 

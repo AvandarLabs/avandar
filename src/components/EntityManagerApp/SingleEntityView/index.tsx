@@ -7,10 +7,10 @@ import { SourceBadge } from "@/components/common/SourceBadge";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { Paper } from "@/lib/ui/Paper";
 import { where } from "@/lib/utils/filters/filterBuilders";
-import { isNonNullish } from "@/lib/utils/guards";
+import { isNonNullish } from "@/lib/utils/guards/guards";
 import { makeMap } from "@/lib/utils/maps/builders";
 import { makeObject } from "@/lib/utils/objects/builders";
-import { getProp, propEq } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { omit } from "@/lib/utils/objects/misc";
 import { unknownToString } from "@/lib/utils/strings/transformations";
 import { DatasetSourceType } from "@/models/datasets/Dataset";
@@ -62,9 +62,7 @@ function useHydratedEntity({
   const datasetIds = useMemo(() => {
     return [
       ...new Set(
-        (entityFieldValues ?? [])
-          .map(getProp("datasetId"))
-          .filter(isNonNullish),
+        (entityFieldValues ?? []).map(prop("datasetId")).filter(isNonNullish),
       ),
     ];
   }, [entityFieldValues]);
@@ -72,7 +70,7 @@ function useHydratedEntity({
   const [datasets] = DatasetClient.useGetAll(where("id", "in", datasetIds));
 
   const datasetsMap = useMemo(() => {
-    return datasets ? makeMap(datasets, { keyFn: getProp("id") }) : undefined;
+    return datasets ? makeMap(datasets, { keyFn: prop("id") }) : undefined;
   }, [datasets]);
 
   // TODO(jpsyx): move this to a module that can also use cacheing.
@@ -91,7 +89,7 @@ function useHydratedEntity({
         propEq("options.isTitleField", true),
       );
       fieldConfigsMap = makeMap(entityFieldConfigs, {
-        keyFn: getProp("id"),
+        keyFn: prop("id"),
       });
 
       configInfo = {
@@ -103,7 +101,7 @@ function useHydratedEntity({
 
     if (entityFieldValues) {
       const fieldValuesMap = makeMap(entityFieldValues, {
-        keyFn: getProp("entityFieldConfigId"),
+        keyFn: prop("entityFieldConfigId"),
         valueFn: (fieldValue) => {
           const config = fieldConfigsMap?.get(fieldValue.entityFieldConfigId);
           const dataset =

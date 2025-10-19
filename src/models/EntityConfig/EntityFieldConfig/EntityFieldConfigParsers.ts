@@ -2,7 +2,7 @@ import { match } from "ts-pattern";
 import z, { boolean, enum as zodEnum, object, string, uuid } from "zod";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
-import { isOneOf } from "@/lib/utils/guards";
+import { isOneOf } from "@/lib/utils/guards/guards";
 import {
   camelCaseKeysDeep,
   excludeNullsExceptIn,
