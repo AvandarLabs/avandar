@@ -8,7 +8,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AppShell } from "@/lib/ui/AppShell";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
-import { DataExplorerProvider } from "../DataExplorerApp/DataExplorerContext";
+import { DataExplorerStore } from "../DataExplorerApp/DataExplorerStore";
 import { useSpotlightActions } from "./useSpotlightActions";
 
 type Props = {
@@ -69,7 +69,7 @@ export function WorkspaceAppLayout({
   }, [workspace.slug]);
 
   return (
-    <DataExplorerProvider>
+    <DataExplorerStore.Provider>
       <AppShell
         title={workspace.name}
         currentWorkspace={workspace}
@@ -80,6 +80,6 @@ export function WorkspaceAppLayout({
       >
         {children}
       </AppShell>
-    </DataExplorerProvider>
+    </DataExplorerStore.Provider>
   );
 }

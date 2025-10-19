@@ -24,7 +24,7 @@ import { makeSegmentedControlItems } from "@/lib/ui/inputs/SegmentedControl/make
 import { removeItemWhere } from "@/lib/utils/arrays/misc";
 import { identity } from "@/lib/utils/misc";
 import { makeObject } from "@/lib/utils/objects/builders";
-import { getProp, propEq } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { DatasetWithColumns } from "@/models/datasets/Dataset";
 import {
   DatasetColumn,
@@ -73,7 +73,7 @@ export function DatasetColumnFieldsBlock({
         });
       }),
       {
-        keyFn: getProp("column.id"),
+        keyFn: prop("column.id"),
         valueFn: identity,
       },
     );
@@ -93,8 +93,8 @@ export function DatasetColumnFieldsBlock({
 
   const fieldItems = useMemo(() => {
     return makeSegmentedControlItems(addedFields, {
-      valueFn: getProp("id"),
-      labelFn: getProp("name"),
+      valueFn: prop("id"),
+      labelFn: prop("name"),
     });
   }, [addedFields]);
 
@@ -201,7 +201,7 @@ export function DatasetColumnFieldsBlock({
             </Text>
             <Divider />
             <DatasetColumnPickerList
-              datasetIds={allDatasets?.map(getProp("id")) ?? []}
+              datasetIds={allDatasets?.map(prop("id")) ?? []}
               onChange={(value) => {
                 setSelectedDatasetColumnId(value);
               }}

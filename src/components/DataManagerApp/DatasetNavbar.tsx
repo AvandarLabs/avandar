@@ -11,7 +11,7 @@ import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
 import { makeBucketMap } from "@/lib/utils/maps/builders";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import {
   Dataset,
   DatasetId,
@@ -58,7 +58,7 @@ export function DatasetNavbar({
 
   const [uploadedDatasetLinks] = useMemo(() => {
     const datasetsByType = makeBucketMap(datasets, {
-      keyFn: getProp("sourceType"),
+      keyFn: prop("sourceType"),
     });
 
     const datasetLinks = DatasetSourceTypes.flatMap((sourceType) => {

@@ -24,7 +24,7 @@ import Dexie from "dexie";
 import { DexieDBVersionManager } from "@/lib/clients/dexie/DexieDBVersionManager";
 import { SupabaseDBClient } from "@/lib/clients/supabase/SupabaseDBClient";
 import { clearOPFS } from "@/lib/utils/browser/clearOPFS";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { LegacyLocalDatasetEntryModel } from "@/models/datasets/Legacy_LocalDatasetEntry";
 import { LocalDatasetModel } from "@/models/datasets/LocalDataset";
 
@@ -71,7 +71,7 @@ const DBDefinitions = [
       const { data: datasets } = await SupabaseDBClient.from("datasets")
         .select("*")
         .throwOnError();
-      const datasetIds = datasets.map(getProp("id"));
+      const datasetIds = datasets.map(prop("id"));
       await SupabaseDBClient.from("datasets").delete().in("id", datasetIds);
     },
   }),

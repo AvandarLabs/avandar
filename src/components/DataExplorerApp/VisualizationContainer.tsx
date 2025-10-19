@@ -2,7 +2,6 @@ import { Flex, List, Text } from "@mantine/core";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { flattenError, object, prettifyError, string } from "zod";
-import { QueryResultColumn } from "@/clients/DuckDBClient/types";
 import { Logger } from "@/lib/Logger";
 import { UnknownDataFrame } from "@/lib/types/common";
 import { Callout } from "@/lib/ui/Callout";
@@ -12,13 +11,13 @@ import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { LineChart } from "@/lib/ui/viz/LineChart";
 import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
 import { isEpochMs, isIsoDateString } from "@/lib/utils/formatters/formatDate";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectValues } from "@/lib/utils/objects/misc";
 import { AvaDataTypeUtils } from "@/models/datasets/AvaDataType";
-import { VizConfig } from "./VizSettingsForm/makeDefaultVizConfig";
+import { QueryResultColumn } from "@/models/queries/QueryResultData/QueryResultData.types";
+import { DataExplorerStore } from "./DataExplorerStore";
 
 type Props = {
-  vizConfig: VizConfig;
   columns: readonly QueryResultColumn[];
   data: UnknownDataFrame;
 };
@@ -55,15 +54,8 @@ const ScatterPlotSettingsSchema = object({
   yAxisKey: YAxisKeySchema,
 });
 
-export function VisualizationContainer({
-  vizConfig,
-  columns,
-  data,
-}: Props): JSX.Element {
-  const fieldNames = useMemo(() => {
-    return columns.map(getProp("name"));
-  }, [columns]);
-
+export function VisualizationContainer({ columns, data }: Props): JSX.Element {
+  const [{ vizConfig }] = DataExplorerStore.use();
   // TODO(jpsyx): this should get supplied as a prop
   const dateColumns = useMemo(() => {
     return new Set(
@@ -76,15 +68,16 @@ export function VisualizationContainer({
             isEpochMs(sampleVal)
           );
         })
-        .map(getProp("name")),
+        .map(prop("name")),
     );
   }, [columns, data]);
+  const columnNames = columns.map(prop("name"));
 
   const viz = match(vizConfig)
     .with({ type: "table" }, () => {
       return (
         <DataGrid
-          columnNames={fieldNames}
+          columnNames={columnNames}
           data={data}
           dateColumns={dateColumns}
           dateFormat="YYYY-MM-DD HH:mm:ss z"

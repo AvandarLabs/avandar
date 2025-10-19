@@ -27,7 +27,7 @@ import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types"
 import { Paper } from "@/lib/ui/Paper";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { where } from "@/lib/utils/filters/filterBuilders";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { Dataset, DatasetWithColumns } from "@/models/datasets/Dataset";
 import { DataSummaryView } from "./DataSummaryView";
 import { EditDatasetView } from "./EditDatasetView";
@@ -100,7 +100,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   };
 
   const isLoadingFullDataset = isLoadingPreviewData || isLoadingDatasetColumns;
-  const datasetColumnNames = datasetColumns?.map(getProp("name")) ?? [];
+  const datasetColumnNames = datasetColumns?.map(prop("name")) ?? [];
 
   return (
     <Container pt="lg">

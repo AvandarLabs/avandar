@@ -1,4 +1,4 @@
-import { isArray, isPlainObject } from "@/lib/utils/guards";
+import { isArray, isPlainObject } from "@/lib/utils/guards/guards";
 import { DescribableObject, DescribableValue, PrimitiveValue } from "./types";
 
 export function isPrimitiveDescribableValue(

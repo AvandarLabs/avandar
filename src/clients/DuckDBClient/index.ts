@@ -9,8 +9,8 @@ import { match } from "ts-pattern";
 import { ILogger, Logger } from "@/lib/Logger";
 import { MIMEType } from "@/lib/types/common";
 import { assertIsDefined } from "@/lib/utils/asserts";
-import { isNonEmptyArray } from "@/lib/utils/guards";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { isNonEmptyArray } from "@/lib/utils/guards/guards";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries, objectKeys } from "@/lib/utils/objects/misc";
 import { mapObjectValues } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
@@ -24,10 +24,12 @@ import {
   DuckDBLoadParquetResult,
   DuckDBRejectedRow,
   DuckDBScan,
+  DuckDBStructuredQuery,
+} from "./DuckDBClient.types";
+import {
   QueryResultData,
   QueryResultDataPage,
-  StructuredDuckDBQueryConfig,
-} from "./types";
+} from "@/models/queries/QueryResultData/QueryResultData.types";
 
 const MANUAL_BUNDLES: duckdb.DuckDBBundles = {
   mvp: {
@@ -122,7 +124,7 @@ class DuckDBClientImpl {
   /**
    * Tracking open connections. This is useful for debugging if we ever need to
    * know if we forgot to close any connections.
-   * */
+   */
   #openConnections: Set<duckdb.AsyncDuckDBConnection> = new Set();
   #logger: ILogger = Logger.appendName("DuckDBClient");
 
@@ -331,9 +333,9 @@ class DuckDBClientImpl {
       // Loading a CSV will ALWAYS overwrite existing data.
       await this.dropTableAndFile(tableName);
       await this.#registerCSVFile(
-        "file" in options ?
-          { tableName, file: options.file }
-        : { tableName, fileText: options.fileText },
+        "file" in options
+          ? { tableName, file: options.file }
+          : { tableName, fileText: options.fileText },
       );
 
       const cleanCommentChar = commentChar === "(empty)" ? null : commentChar;
@@ -357,14 +359,16 @@ class DuckDBClientImpl {
               ${dateFormat ? `, dateformat='${dateFormat}'` : ""}
               ${timestampFormat ? `, timestampformat='${timestampFormat}'` : ""}
               ${
-                columns ?
-                  `, columns={${columns
-                    .map(([name, type]) => {
-                      return `'${name}': '${type}'`;
-                    })
-                    .join(",")}}`
-                : ""
-              }
+            columns
+              ? `, columns={${
+                columns
+                  .map(([name, type]) => {
+                    return `'${name}': '${type}'`;
+                  })
+                  .join(",")
+              }}`
+              : ""
+          }
             ) t
           `,
           { conn, params: { tableName } },
@@ -503,8 +507,9 @@ class DuckDBClientImpl {
       await db.dropFile(tempParquetFileName);
       return parquetBlob;
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = error instanceof Error
+        ? error.message
+        : "Unknown error";
       this.#logger.error(error, {
         msg: "Failed to export table as parquet",
         errMsg: errorMessage,
@@ -565,8 +570,9 @@ class DuckDBClientImpl {
       }, queryString);
       this.#logger.log("Executing query", { query: queryStringToUse });
       // run the query
-      const arrowTable =
-        await conn.query<Record<string, arrow.DataType>>(queryStringToUse);
+      const arrowTable = await conn.query<Record<string, arrow.DataType>>(
+        queryStringToUse,
+      );
       queryResults = arrowTableToJS<RowObject>(arrowTable);
     } catch (error) {
       this.#logger.error(error, { queryString });
@@ -585,7 +591,7 @@ class DuckDBClientImpl {
 
   async #getPageHelper<T extends UnknownRow>(
     queryParams: Omit<
-      StructuredDuckDBQueryConfig & {
+      DuckDBStructuredQuery & {
         pageSize: number;
         pageNum: number;
         totalRows: number | undefined;
@@ -617,8 +623,9 @@ class DuckDBClientImpl {
     }
 
     // special case for when there's 0 rows, we still say there is 1 page
-    const totalPages =
-      totalRowsInSource === 0 ? 1 : Math.ceil(totalRowsInSource / pageSize);
+    const totalPages = totalRowsInSource === 0
+      ? 1
+      : Math.ceil(totalRowsInSource / pageSize);
     const nextPage = pageNum + 1 === totalPages ? undefined : pageNum + 1;
     const prevPage = pageNum === 0 ? undefined : pageNum - 1;
 
@@ -639,7 +646,7 @@ class DuckDBClientImpl {
     pageNum = 0,
     ...restOfStructuredQuery
   }: Omit<
-    StructuredDuckDBQueryConfig & { pageSize: number; pageNum: number },
+    DuckDBStructuredQuery & { pageSize: number; pageNum: number },
     "limit" | "offset"
   >): Promise<QueryResultDataPage<T>> {
     const page = await this.#getPageHelper<T>({
@@ -663,7 +670,7 @@ class DuckDBClientImpl {
       aggregations = {},
       pageSize = 500,
       ...restOfStructuredQuery
-    }: Omit<StructuredDuckDBQueryConfig, "limit" | "offset"> & {
+    }: Omit<DuckDBStructuredQuery, "limit" | "offset"> & {
       pageSize?: number;
     },
     callback: (page: QueryResultDataPage<T>) => void | Promise<void>,
@@ -716,7 +723,7 @@ class DuckDBClientImpl {
     castTimestampsToISO,
     limit,
     offset,
-  }: StructuredDuckDBQueryConfig): Promise<QueryResultData<T>> {
+  }: DuckDBStructuredQuery): Promise<QueryResultData<T>> {
     const conn = await this.#connect();
     let queryResults: QueryResultData<T>;
     const tableColumns = await this.getTableSchema(tableName);
@@ -724,30 +731,28 @@ class DuckDBClientImpl {
       .filter((col) => {
         return DuckDBDataTypeUtils.isDateOrTimestamp(col.column_type);
       })
-      .map(getProp("column_name"));
+      .map(prop("column_name"));
 
-    const columnNames =
-      selectColumnNames === "*" ?
-        tableColumns.map(getProp("column_name"))
+    const columnNames = selectColumnNames === "*"
+      ? tableColumns.map(prop("column_name"))
       : selectColumnNames;
 
     const columnNamesWithoutAggregations = columnNames.filter((colName) => {
       return (
-        aggregations[colName] === undefined || aggregations[colName] === "none"
+        aggregations[colName] === undefined
       );
     });
 
     // if requested, cast any timestamp columns that will go in the SELECT
     // clause to ISO strings
-    const adjustedFieldNames =
-      castTimestampsToISO ?
-        columnNamesWithoutAggregations.map((colName) => {
-          return timestampColumnNames.includes(colName) ?
-              sql.raw(
-                `strftime("${colName}"::TIMESTAMP, '%Y-%m-%dT%H:%M:%S.%fZ') as "${colName}"`,
-              )
-            : `"${colName}"`;
-        })
+    const adjustedFieldNames = castTimestampsToISO
+      ? columnNamesWithoutAggregations.map((colName) => {
+        return timestampColumnNames.includes(colName)
+          ? sql.raw(
+            `strftime("${colName}"::TIMESTAMP, '%Y-%m-%dT%H:%M:%S.%fZ') as "${colName}"`,
+          )
+          : `"${colName}"`;
+      })
       : columnNamesWithoutAggregations;
 
     let query = sql.select(...adjustedFieldNames).from(tableName);
@@ -778,9 +783,6 @@ class DuckDBClientImpl {
           .with("min", () => {
             return query.min(fieldName);
           })
-          .with("none", () => {
-            return newQuery;
-          })
           .exhaustive(() => {
             return newQuery;
           });
@@ -799,8 +801,9 @@ class DuckDBClientImpl {
     // run the query
     try {
       const queryString = query.toString();
-      const results =
-        await conn.query<Record<string, arrow.DataType>>(queryString);
+      const results = await conn.query<Record<string, arrow.DataType>>(
+        queryString,
+      );
 
       const jsDataRows = results.toArray().map((row) => {
         return row.toJSON();

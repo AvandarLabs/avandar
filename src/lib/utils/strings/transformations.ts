@@ -1,4 +1,4 @@
-import { isDate, isEmptyObject, isPlainObject } from "../guards";
+import { isDate, isEmptyObject, isPlainObject } from "../guards/guards";
 import { objectEntries } from "../objects/misc";
 
 /**
@@ -208,5 +208,7 @@ export function wordJoin(
     return `${words[0]} ${endConnector} ${words[1]}`;
   }
 
-  return `${words.slice(0, -1).join(`${separator} `)} ${endConnector} ${words[words.length - 1]}`;
+  return `${words.slice(0, -1).join(`${separator} `)} ${endConnector} ${
+    words[words.length - 1]
+  }`;
 }

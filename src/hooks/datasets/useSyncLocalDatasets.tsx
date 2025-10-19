@@ -7,8 +7,8 @@ import { ResyncDatasetsBlock } from "@/components/DataManagerApp/ResyncDatasetsB
 import { useQuery } from "@/lib/hooks/query/useQuery";
 import { difference } from "@/lib/utils/arrays/misc";
 import { assertIsDefined } from "@/lib/utils/asserts";
-import { isEmptyArray, isNullish, or } from "@/lib/utils/guards";
-import { getProp, propEq } from "@/lib/utils/objects/higherOrderFuncs";
+import { isEmptyArray, isNullish, or } from "@/lib/utils/guards/guards";
+import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { promiseMap } from "@/lib/utils/promises";
 import { UserId } from "@/models/User/types";
 import { useCurrentUser } from "../users/useCurrentUser";
@@ -44,8 +44,8 @@ function useGarbageDatasetCollection(): void {
       return;
     }
     const extraDatasetIds = difference(
-      localDatasets.map(getProp("datasetId")),
-      allWorkspaceDatasets.map(getProp("id")),
+      localDatasets.map(prop("datasetId")),
+      allWorkspaceDatasets.map(prop("id")),
     );
     if (extraDatasetIds.length > 0) {
       LocalDatasetClient.bulkDelete({ ids: extraDatasetIds }).then(() => {
@@ -96,7 +96,7 @@ export function useSyncLocalDatasets(): void {
 
       return datasetStatuses
         .filter(propEq("isLoaded", false))
-        .map(getProp("dataset"));
+        .map(prop("dataset"));
     },
   });
 

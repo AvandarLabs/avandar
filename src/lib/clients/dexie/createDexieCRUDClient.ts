@@ -6,7 +6,7 @@ import { ModelCRUDParserRegistry } from "@/lib/models/makeParserRegistry";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { applyFiltersToRows } from "@/lib/utils/filters/applyFiltersToRows";
 import { FiltersByColumn } from "@/lib/utils/filters/filtersByColumn";
-import { isDefined } from "@/lib/utils/guards";
+import { isDefined } from "@/lib/utils/guards/guards";
 import {
   createModelCRUDClient,
   HookableClient,
@@ -97,18 +97,16 @@ export function createDexieCRUDClient<
   const modelClient = createModelCRUDClient({
     modelName,
     parsers,
-    additionalQueries:
-      queries ?
-        ({ clientLogger }) => {
-          return queries({ logger: clientLogger, db, dbTable });
-        }
+    additionalQueries: queries
+      ? ({ clientLogger }) => {
+        return queries({ logger: clientLogger, db, dbTable });
+      }
       : undefined,
 
-    additionalMutations:
-      mutations ?
-        ({ clientLogger }) => {
-          return mutations({ logger: clientLogger, db, dbTable });
-        }
+    additionalMutations: mutations
+      ? ({ clientLogger }) => {
+        return mutations({ logger: clientLogger, db, dbTable });
+      }
       : undefined,
 
     crudFunctions: {

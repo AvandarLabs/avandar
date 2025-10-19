@@ -1,48 +1,5 @@
-import { UnknownObject, UUID } from "@/lib/types/common";
+import { UUID } from "@/lib/types/common";
 import { DuckDBDataType } from "./DuckDBDataType";
-import { AvaDataType } from "@/models/datasets/AvaDataType";
-
-export type QueryResultColumn = {
-  name: string;
-  dataType: AvaDataType;
-};
-
-export type QueryResultData<T extends UnknownObject = UnknownObject> = {
-  columns: QueryResultColumn[];
-  data: T[];
-
-  /** The number of rows in the `data` array */
-  numRows: number;
-};
-
-export type QueryResultDataPage<T extends UnknownObject = UnknownObject> =
-  & QueryResultData<T>
-  & {
-    /**
-     * The total number of rows in the data store (for the query that
-     * generated this page)
-     */
-    totalRows: number;
-
-    /**
-     * The total number of pages in the data store (for the query that
-     * generated this page)
-     */
-    totalPages: number;
-
-    /**
-     * The next page number, or undefined if there is no next page
-     */
-    nextPage: number | undefined;
-
-    /** The current page number */
-    pageNum: number;
-
-    /**
-     * The previous page number, or undefined if there is no previous page
-     */
-    prevPage: number | undefined;
-  };
 
 /**
  * The CSV Reject Scans Table returns the following information:
@@ -213,15 +170,14 @@ export type DuckDBCSVSniffResult = {
   table_name: string;
 };
 
-export type QueryAggregationType =
+export type DuckDBQueryAggregationType =
   | "sum"
   | "avg"
   | "count"
   | "max"
-  | "min"
-  | "none";
+  | "min";
 
-export type StructuredDuckDBQueryConfig = {
+export type DuckDBStructuredQuery = {
   tableName: string;
   selectColumnNames?: readonly string[] | "*";
   groupByColumnNames?: readonly string[];
@@ -233,7 +189,7 @@ export type StructuredDuckDBQueryConfig = {
    *
    * **NOTE**: Key is the column name.
    */
-  aggregations?: Record<string, QueryAggregationType>;
+  aggregations?: Record<string, DuckDBQueryAggregationType>;
   offset?: number;
   limit?: number;
 

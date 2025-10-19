@@ -4,13 +4,13 @@ import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { where } from "@/lib/utils/filters/filterBuilders";
-import { isDefined } from "@/lib/utils/guards";
+import { isDefined } from "@/lib/utils/guards/guards";
 import { makeIdLookupMap } from "@/lib/utils/maps/builders";
 import {
   makeBucketRecord,
   makeIdLookupRecord,
 } from "@/lib/utils/objects/builders";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries } from "@/lib/utils/objects/misc";
 import { promiseFlatMap } from "@/lib/utils/promises";
 import { DatasetId } from "@/models/datasets/Dataset";
@@ -161,7 +161,7 @@ async function _getPrimaryKeyFieldExtractors(
 
   // now get all the extractors for these fields
   const primaryKeyExtractors = await DatasetColumnValueExtractorClient.getAll(
-    where("entity_field_config_id", "in", primaryKeyFields.map(getProp("id"))),
+    where("entity_field_config_id", "in", primaryKeyFields.map(prop("id"))),
   );
 
   // now group them together
@@ -200,8 +200,8 @@ export async function getDatasetColumnFieldValues({
 
   // Get all metadata of the columns we need to extract
   const allColumnIds = removeDuplicates([
-    ...primaryKeyFieldsWithExtractors.map(getProp("extractor.datasetFieldId")),
-    ...fieldsWithExtractors.map(getProp("extractor.datasetFieldId")),
+    ...primaryKeyFieldsWithExtractors.map(prop("extractor.datasetFieldId")),
+    ...fieldsWithExtractors.map(prop("extractor.datasetFieldId")),
   ]);
   const datasetColumnsById = makeIdLookupRecord(
     await DatasetColumnClient.getAll(where("id", "in", allColumnIds)),
@@ -231,7 +231,7 @@ export async function getDatasetColumnFieldValues({
   // Each extractor corresponds to 1 dataset, but there can be
   // duplicate datasets, so let's bucket them by dataset.
   const requestedFieldsByDatasetId = makeBucketRecord(requestedFields, {
-    keyFn: getProp("extractor.datasetId"),
+    keyFn: prop("extractor.datasetId"),
   });
 
   // run a query for each dataset

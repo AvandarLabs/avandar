@@ -1,7 +1,7 @@
 import Papa from "papaparse";
 import { match } from "ts-pattern";
 import { MIMEType, RawCellValue, RawDataRow } from "@/lib/types/common";
-import { isNonEmptyArray } from "@/lib/utils/guards";
+import { isNonEmptyArray } from "@/lib/utils/guards/guards";
 
 /**
  * Convert a dataset back into a raw string. Only CSVs are supported for now.
@@ -11,20 +11,20 @@ import { isNonEmptyArray } from "@/lib/utils/guards";
 export function unparseDataset(
   options:
     | {
-        datasetType: MIMEType.TEXT_CSV;
-        data: RawDataRow[];
-      }
+      datasetType: MIMEType.TEXT_CSV;
+      data: RawDataRow[];
+    }
     | {
-        datasetType: MIMEType.APPLICATION_GOOGLE_SPREADSHEET;
-        data: RawCellValue[][];
-      }
+      datasetType: MIMEType.APPLICATION_GOOGLE_SPREADSHEET;
+      data: RawCellValue[][];
+    }
     | {
-        datasetType: Exclude<
-          MIMEType,
-          MIMEType.TEXT_CSV | MIMEType.APPLICATION_GOOGLE_SPREADSHEET
-        >;
-        data: unknown;
-      },
+      datasetType: Exclude<
+        MIMEType,
+        MIMEType.TEXT_CSV | MIMEType.APPLICATION_GOOGLE_SPREADSHEET
+      >;
+      data: unknown;
+    },
 ): string {
   const result = match(options)
     .with({ datasetType: MIMEType.TEXT_CSV }, ({ data }) => {

@@ -8,7 +8,6 @@ import { objectKeys } from "@/lib/utils/objects/misc";
 /**
  * A record of Dexie tables representing CRUD models.
  * Each key is a model name and the values are Dexie tables type definitions.
- *
  */
 type DexieModelTableRecord<M extends DexieModelCRUDTypes> = UnionToIntersection<
   // we use a distributive conditional here to create a union of records, so we
@@ -16,11 +15,10 @@ type DexieModelTableRecord<M extends DexieModelCRUDTypes> = UnionToIntersection<
   // name is associated to its correct model type, rather than being a union
   // of all model types.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  M extends any ?
-    {
+  M extends any ? {
       [K in M["modelName"]]: EntityTable<M["DBRead"], M["modelPrimaryKey"]>;
     }
-  : never
+    : never
 >;
 
 /**
@@ -31,8 +29,10 @@ type DexieMetaTable = EntityTable<{ key: string; value: string }, "key">;
 /**
  * A type representing a Dexie database with a specific union of models.
  */
-export type DexieDBType<M extends DexieModelCRUDTypes> = Dexie &
-  DexieModelTableRecord<M> & {
+export type DexieDBType<M extends DexieModelCRUDTypes> =
+  & Dexie
+  & DexieModelTableRecord<M>
+  & {
     meta: DexieMetaTable;
   };
 
@@ -46,8 +46,7 @@ type DBSchemaConfig<DBSchema extends DBSchemaType = DBSchemaType> =
   // it will get distributed. This will keep the union discriminated rather than
   // merged into one single object with each key unioned.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  DBSchema extends any ?
-    {
+  DBSchema extends any ? {
       /** The base unconfigured Dexie DB */
       db: Dexie;
 
@@ -74,7 +73,7 @@ type DBSchemaConfig<DBSchema extends DBSchemaType = DBSchemaType> =
        */
       upgrader?: (tx: Transaction) => Promise<void> | void;
     }
-  : never;
+    : never;
 
 type GenericDexieDBSchema = {
   version: number;
@@ -85,10 +84,12 @@ type GenericDexieDBSchema = {
 
 type GenericDexieDBSchemaRegistry = Record<`v${number}`, GenericDexieDBSchema>;
 
-type SchemasOfRegistry<Registry> = Registry[Extract<
-  keyof Registry,
-  `v${number}`
->];
+type SchemasOfRegistry<Registry> = Registry[
+  Extract<
+    keyof Registry,
+    `v${number}`
+  >
+];
 
 type DexieDBVersionManager<
   DBSchemaRegistry extends GenericDexieDBSchemaRegistry,
@@ -117,11 +118,10 @@ type DexieDBVersionManager<
   defineVersion: <
     VersionNum extends keyof DBSchemaRegistry extends (
       `v${infer V extends number}`
-    ) ?
-      V
-    : never,
-    DBSchema extends
-      DBSchemaRegistry[`v${VersionNum}`] = DBSchemaRegistry[`v${VersionNum}`],
+    ) ? V
+      : never,
+    DBSchema extends DBSchemaRegistry[`v${VersionNum}`] =
+      DBSchemaRegistry[`v${VersionNum}`],
   >(
     config: DBSchemaConfig<DBSchema>,
   ) => DBSchemaConfig<DBSchema>;

@@ -1,6 +1,6 @@
 import { Text } from "@mantine/core";
 import { formatDate } from "@/lib/utils/formatters/formatDate";
-import { isDate } from "@/lib/utils/guards";
+import { isDate } from "@/lib/utils/guards/guards";
 import { isStringOrNumber } from "./guards";
 import type {
   GenericRootData,

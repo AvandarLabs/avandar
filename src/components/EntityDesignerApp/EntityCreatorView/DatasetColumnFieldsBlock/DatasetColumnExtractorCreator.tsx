@@ -1,7 +1,7 @@
 import { Checkbox, Fieldset, Group, Select } from "@mantine/core";
 import { FormType } from "@/lib/hooks/ui/useForm";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectValues } from "@/lib/utils/objects/misc";
 import { ValuePickerRuleTypes } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/constants";
 import { EntityConfigFormValues } from "../entityConfigFormTypes";
@@ -15,8 +15,8 @@ type Props = {
 const valuePickerOptions = makeSelectOptions(
   objectValues(ValuePickerRuleTypes),
   {
-    valueFn: getProp("type"),
-    labelFn: getProp("displayName"),
+    valueFn: prop("type"),
+    labelFn: prop("displayName"),
   },
 );
 

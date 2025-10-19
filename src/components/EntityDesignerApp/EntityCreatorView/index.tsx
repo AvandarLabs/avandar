@@ -18,8 +18,8 @@ import { useForm } from "@/lib/hooks/ui/useForm";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { Paper } from "@/lib/ui/Paper";
-import { isDefined } from "@/lib/utils/guards";
-import { getProp, propEq } from "@/lib/utils/objects/higherOrderFuncs";
+import { isDefined } from "@/lib/utils/guards/guards";
+import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { setValue } from "@/lib/utils/objects/setValue";
 import { DatasetColumnFieldsBlock } from "./DatasetColumnFieldsBlock";
 import {
@@ -59,7 +59,7 @@ export function EntityCreatorView(): JSX.Element {
     ): EntityConfigFormSubmitValues => {
       // collect all the primary key fields
       const primaryKeyColumnIds = new Set(
-        values.sourceDatasets.map(getProp("primaryKeyColumnId")),
+        values.sourceDatasets.map(prop("primaryKeyColumnId")),
       );
       const primaryKeyFields = values.sourceDatasets
         .map(({ dataset, primaryKeyColumnId }) => {
@@ -156,8 +156,8 @@ export function EntityCreatorView(): JSX.Element {
   // these are the fields that are eligible to be used as the entity ID or title
   const possibleTitleFields = useMemo(() => {
     return makeSelectOptions(datasetColumnFields.concat(manualEntryFields), {
-      valueFn: getProp("id"),
-      labelFn: getProp("name"),
+      valueFn: prop("id"),
+      labelFn: prop("name"),
     });
   }, [datasetColumnFields, manualEntryFields]);
 

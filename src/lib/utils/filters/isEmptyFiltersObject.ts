@@ -1,5 +1,5 @@
 import { UnknownObject } from "../../types/common";
-import { isEmptyObject } from "../guards";
+import { isEmptyObject } from "../guards/guards";
 import { objectValues } from "../objects/misc";
 import { FiltersByColumn, isFiltersByColumnObject } from "./filtersByColumn";
 import {

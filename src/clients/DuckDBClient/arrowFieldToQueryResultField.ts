@@ -1,6 +1,6 @@
 import * as arrow from "apache-arrow";
 import { match } from "ts-pattern";
-import { QueryResultColumn } from "./types";
+import { QueryResultColumn } from "@/models/queries/QueryResultData/QueryResultData.types";
 import { constant } from "@/lib/utils/higherOrderFuncs";
 
 export function arrowFieldToQueryResultField(

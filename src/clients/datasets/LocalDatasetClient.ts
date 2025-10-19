@@ -6,7 +6,7 @@ import { LocalDatasetParsers } from "@/models/datasets/LocalDataset";
 import { UserId } from "@/models/User/types";
 import { WorkspaceId } from "@/models/Workspace/types";
 import { DuckDBClient, DucKDBLoadCSVOptions } from "../DuckDBClient";
-import { DuckDBLoadCSVResult } from "../DuckDBClient/types";
+import { DuckDBLoadCSVResult } from "../DuckDBClient/DuckDBClient.types";
 
 export const LocalDatasetClient = createDexieCRUDClient({
   db: AvaDexie.DB,

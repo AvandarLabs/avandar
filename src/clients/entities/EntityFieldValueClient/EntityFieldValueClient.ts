@@ -7,12 +7,12 @@ import { ILogger } from "@/lib/Logger";
 import { RegistryOfArrays } from "@/lib/types/utilityTypes";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { where } from "@/lib/utils/filters/filterBuilders";
-import { isDefined } from "@/lib/utils/guards";
+import { isDefined } from "@/lib/utils/guards/guards";
 import {
   makeBucketRecord,
   makeIdLookupRecord,
 } from "@/lib/utils/objects/builders";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries, objectKeys } from "@/lib/utils/objects/misc";
 import { promiseFlatMap, promiseMap } from "@/lib/utils/promises";
 import { makeSet } from "@/lib/utils/sets/builders";
@@ -115,7 +115,7 @@ function createEntityFieldValueClient(): WithLogger<
 
         // bucket the extractors by type
         const valueExtractorsByType = makeBucketRecord(valueExtractors, {
-          keyFn: getProp("type"),
+          keyFn: prop("type"),
         }) as RegistryOfArrays<EntityFieldValueExtractorRegistry>;
 
         // bucket the extractors by field id
@@ -159,7 +159,7 @@ function createEntityFieldValueClient(): WithLogger<
                     where(
                       "id",
                       "in",
-                      extractors.map(getProp("datasetFieldId")),
+                      extractors.map(prop("datasetFieldId")),
                     ),
                   ),
                   { key: "id" },
@@ -170,7 +170,7 @@ function createEntityFieldValueClient(): WithLogger<
                 // Each of these buckets should include a primary key
                 // extractor already.
                 const extractorsByDatasetId = makeBucketRecord(extractors, {
-                  keyFn: getProp("datasetId"),
+                  keyFn: prop("datasetId"),
                 });
 
                 // run a query for each dataset
@@ -184,7 +184,7 @@ function createEntityFieldValueClient(): WithLogger<
                       primaryKeyExtractorsByDatasetId[datasetId]!;
                     const pkeyColumn =
                       datasetColumnsById[pkeyExtractor.datasetFieldId]!;
-                    const columnNames = columns.map(getProp("name"));
+                    const columnNames = columns.map(prop("name"));
                     const requestedExtractors = datasetExtractors.filter(
                       isInSet(requestedFieldIds, {
                         key: "entityFieldConfigId",

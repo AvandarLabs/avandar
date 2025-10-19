@@ -1,7 +1,7 @@
-import { QueryAggregationType } from "@/clients/DuckDBClient/types";
 import { match } from "ts-pattern";
 import { AvaDataType } from "./AvaDataType.types";
 import { registryKeys } from "@/lib/utils/objects/misc";
+import { QueryAggregationType } from "@/models/queries/QueryAggregationType";
 
 /**
  * Data types that can be handled in Avandar.
@@ -31,9 +31,9 @@ export const AvaDataTypeUtils = {
   getValidQueryAggregations: (
     avaDataType: AvaDataType,
   ): readonly QueryAggregationType[] => {
-    return match(avaDataType)
+    const typeSpecificAggregations = match(avaDataType)
       .with("varchar", () => {
-        return ["count"] as const;
+        return ["none", "count"] as const;
       })
       .with("boolean", () => {
         return ["count"] as const;
@@ -45,5 +45,6 @@ export const AvaDataTypeUtils = {
         return ["count"] as const;
       })
       .exhaustive();
+    return ["none", "group_by", ...typeSpecificAggregations];
   },
 };
