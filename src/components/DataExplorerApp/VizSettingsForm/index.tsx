@@ -44,9 +44,7 @@ export function VizSettingsForm({ columns }: Props): JSX.Element {
               fields={columns}
               config={config}
               onConfigChange={(newConfig) => {
-                dispatch.setVizConfig({
-                  vizConfig: { ...config, ...newConfig },
-                });
+                dispatch.setVizConfig({ ...config, ...newConfig });
               }}
             />
           );
@@ -57,9 +55,7 @@ export function VizSettingsForm({ columns }: Props): JSX.Element {
               fields={columns}
               config={config}
               onConfigChange={(newConfig) => {
-                dispatch.setVizConfig({
-                  vizConfig: { ...config, ...newConfig },
-                });
+                dispatch.setVizConfig({ ...config, ...newConfig });
               }}
             />
           );
@@ -70,9 +66,7 @@ export function VizSettingsForm({ columns }: Props): JSX.Element {
               fields={columns}
               config={config}
               onConfigChange={(newConfig) => {
-                dispatch.setVizConfig({
-                  vizConfig: { ...config, ...newConfig },
-                });
+                dispatch.setVizConfig({ ...config, ...newConfig });
               }}
             />
           );

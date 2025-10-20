@@ -59,7 +59,7 @@ export function QueryForm(): JSX.Element {
         <QueryableDataSourceSelect
           value={dataSource ?? null}
           onChange={(newDataSource) => {
-            dispatch.setDataSource({ dataSource: newDataSource ?? undefined });
+            dispatch.setDataSource(newDataSource ?? undefined);
           }}
         />
 
@@ -71,7 +71,7 @@ export function QueryForm(): JSX.Element {
           }
           value={queryColumns}
           onChange={(newColumns: readonly QueryableColumn[]) => {
-            dispatch.setColumns({ columns: newColumns });
+            dispatch.setColumns(newColumns);
             const newColumnIds = newColumns.map(prop("column.id"));
             const newAggregations = makeObject(newColumnIds, {
               valueFn: (colId) => {
@@ -79,7 +79,7 @@ export function QueryForm(): JSX.Element {
                 return aggregations[colId] ?? "none";
               },
             });
-            dispatch.setAggregations({ aggregations: newAggregations });
+            dispatch.setAggregations(newAggregations);
           }}
         />
 
@@ -124,9 +124,7 @@ export function QueryForm(): JSX.Element {
             value={orderByColumn}
             placeholder="Select column to sort by"
             onChange={(newColId) => {
-              dispatch.setOrderByColumn({
-                columnId: newColId ?? undefined,
-              });
+              dispatch.setOrderByColumn(newColId ?? undefined);
             }}
           />
           <Select
@@ -136,9 +134,7 @@ export function QueryForm(): JSX.Element {
             data={orderDirectionOptions}
             value={orderByDirection}
             onChange={(value) => {
-              dispatch.setOrderByDirection({
-                direction: value ?? undefined,
-              });
+              dispatch.setOrderByDirection(value ?? undefined);
             }}
           />
         </Fieldset>

@@ -40,27 +40,25 @@ export const DataExplorerStore = createStore({
     /** Set the data source for the query. */
     setDataSource: (
       state: DataExplorerState,
-      payload: { dataSource: QueryableDataSource | undefined },
+      dataSource: QueryableDataSource | undefined,
     ) => {
-      return setValue(state, "query.dataSource", payload.dataSource);
+      return setValue(state, "query.dataSource", dataSource);
     },
 
     /** Set the columns for the query. */
     setColumns: (
       state: DataExplorerState,
-      payload: { columns: readonly QueryableColumn[] },
+      columns: readonly QueryableColumn[],
     ) => {
-      return setValue(state, "query.queryColumns", payload.columns);
+      return setValue(state, "query.queryColumns", columns);
     },
 
     /** Set the aggregations for the query. */
     setAggregations: (
       state: DataExplorerState,
-      payload: {
-        aggregations: Record<QueryableColumnId, QueryAggregationType>;
-      },
+      aggregations: Record<QueryableColumnId, QueryAggregationType>,
     ) => {
-      return setValue(state, "query.aggregations", payload.aggregations);
+      return setValue(state, "query.aggregations", aggregations);
     },
 
     /** Set the aggregation for a specific column */
@@ -81,17 +79,17 @@ export const DataExplorerStore = createStore({
     /** */
     setOrderByColumn: (
       state: DataExplorerState,
-      payload: { columnId: QueryableColumnId | undefined },
+      columnId: QueryableColumnId | undefined,
     ) => {
-      return setValue(state, "query.orderByColumn", payload.columnId);
+      return setValue(state, "query.orderByColumn", columnId);
     },
 
     /** Set the direction that we are ordering by. */
     setOrderByDirection: (
       state: DataExplorerState,
-      payload: { direction: OrderByDirection | undefined },
+      direction: OrderByDirection | undefined,
     ) => {
-      return setValue(state, "query.orderByDirection", payload.direction);
+      return setValue(state, "query.orderByDirection", direction);
     },
 
     /** Change the active visualization */
@@ -107,12 +105,9 @@ export const DataExplorerStore = createStore({
       );
     },
 
-    setVizConfig: (
-      state: DataExplorerState,
-      payload: { vizConfig: VizConfig },
-    ) => {
+    setVizConfig: (state: DataExplorerState, vizConfig: VizConfig) => {
       // fill in the defaults
-      return setValue(state, "vizConfig", payload.vizConfig);
+      return setValue(state, "vizConfig", vizConfig);
     },
   },
 });
