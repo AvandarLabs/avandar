@@ -4,22 +4,18 @@ import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { propPasses } from "@/lib/utils/objects/higherOrderFuncs";
 import { AvaDataTypeUtils } from "@/models/datasets/AvaDataType";
 import { QueryResultColumn } from "@/models/queries/QueryResultData/QueryResultData.types";
-
-export type ScatterChartSettings = {
-  xAxisKey: string | undefined;
-  yAxisKey: string | undefined;
-};
+import { ScatterPlotVizConfig } from "@/models/vizs/ScatterPlotVizConfig";
 
 type Props = {
   fields: readonly QueryResultColumn[];
-  settings: ScatterChartSettings;
-  onSettingsChange: (settings: ScatterChartSettings) => void;
+  config: ScatterPlotVizConfig;
+  onConfigChange: (newConfig: ScatterPlotVizConfig) => void;
 };
 
 export function ScatterChartForm({
   fields,
-  settings,
-  onSettingsChange,
+  config,
+  onConfigChange,
 }: Props): JSX.Element {
   const numericFields = useMemo(() => {
     return fields.filter(propPasses("dataType", AvaDataTypeUtils.isNumeric));
@@ -32,7 +28,7 @@ export function ScatterChartForm({
     });
   }, [numericFields]);
 
-  const { xAxisKey, yAxisKey } = settings;
+  const { xAxisKey, yAxisKey } = config;
 
   return (
     <>
@@ -48,8 +44,8 @@ export function ScatterChartForm({
           : "Select a field"
         }
         onChange={(field) => {
-          return onSettingsChange({
-            ...settings,
+          return onConfigChange({
+            ...config,
             xAxisKey: field ?? undefined,
           });
         }}
@@ -67,8 +63,8 @@ export function ScatterChartForm({
           : "Select a field"
         }
         onChange={(field) => {
-          return onSettingsChange({
-            ...settings,
+          return onConfigChange({
+            ...config,
             yAxisKey: field ?? undefined,
           });
         }}

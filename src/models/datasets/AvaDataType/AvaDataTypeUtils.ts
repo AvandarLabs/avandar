@@ -19,6 +19,9 @@ export const AvaDataTypes = registryKeys<AvaDataType>(
 );
 
 export const AvaDataTypeUtils = {
+  isText: (avaDataType: AvaDataType): avaDataType is "varchar" => {
+    return avaDataType === "varchar";
+  },
   isNumeric: (avaDataType: AvaDataType): avaDataType is "bigint" | "double" => {
     return avaDataType === "bigint" || avaDataType === "double";
   },

@@ -39,17 +39,17 @@ const YAxisKeySchema = string({
 });
 
 // Chart-specific schemas (can diverge later)
-const BarChartSettingsSchema = object({
+const BarChartConfigSchema = object({
   xAxisKey: XAxisKeySchema,
   yAxisKey: YAxisKeySchema,
 });
 
-const LineChartSettingsSchema = object({
+const LineChartConfigSchema = object({
   xAxisKey: XAxisKeySchema,
   yAxisKey: YAxisKeySchema,
 });
 
-const ScatterPlotSettingsSchema = object({
+const ScatterPlotConfigSchema = object({
   xAxisKey: XAxisKeySchema,
   yAxisKey: YAxisKeySchema,
 });
@@ -74,7 +74,7 @@ export function VisualizationContainer({ columns, data }: Props): JSX.Element {
   const columnNames = columns.map(prop("name"));
 
   const viz = match(vizConfig)
-    .with({ type: "table" }, () => {
+    .with({ vizType: "table" }, () => {
       return (
         <DataGrid
           columnNames={columnNames}
@@ -85,14 +85,14 @@ export function VisualizationContainer({ columns, data }: Props): JSX.Element {
         />
       );
     })
-    .with({ type: "bar" }, (config) => {
+    .with({ vizType: "bar" }, (config) => {
       const {
         success,
-        data: settings,
+        data: validConfig,
         error,
-      } = BarChartSettingsSchema.safeParse(config.settings);
+      } = BarChartConfigSchema.safeParse(config);
       if (success) {
-        return <BarChart data={data} height={700} {...settings} />;
+        return <BarChart data={data} height={700} {...validConfig} />;
       }
 
       // generate the error message
@@ -128,27 +128,27 @@ export function VisualizationContainer({ columns, data }: Props): JSX.Element {
         </Callout.Error>
       );
     })
-    .with({ type: "line" }, (config) => {
+    .with({ vizType: "line" }, (config) => {
       const {
         success,
-        data: settings,
+        data: validConfig,
         error,
-      } = LineChartSettingsSchema.safeParse(config.settings);
+      } = LineChartConfigSchema.safeParse(config);
 
       if (success) {
-        return <LineChart data={data} height={700} {...settings} />;
+        return <LineChart data={data} height={700} {...validConfig} />;
       }
       return <DangerText>{prettifyError(error)}</DangerText>;
     })
-    .with({ type: "scatter" }, (config) => {
+    .with({ vizType: "scatter" }, (config) => {
       const {
         success,
-        data: settings,
+        data: validConfig,
         error,
-      } = ScatterPlotSettingsSchema.safeParse(config.settings);
+      } = ScatterPlotConfigSchema.safeParse(config);
 
       if (success) {
-        return <ScatterChart data={data} height={700} {...settings} />;
+        return <ScatterChart data={data} height={700} {...validConfig} />;
       }
       return <DangerText>{prettifyError(error)}</DangerText>;
     })

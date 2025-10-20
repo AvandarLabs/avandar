@@ -6,15 +6,12 @@ import {
   OrderByDirection,
   PartialStructuredQuery,
 } from "@/models/queries/StructuredQuery";
+import { VizConfig, VizConfigUtils, VizType } from "@/models/vizs/VizConfig";
 import {
   QueryableColumn,
   QueryableColumnId,
 } from "../QueryableColumnMultiSelect";
 import { QueryableDataSource } from "../QueryableDataSourceSelect";
-import {
-  makeDefaultVizConfig,
-  VizConfig,
-} from "../VizSettingsForm/makeDefaultVizConfig";
 
 type DataExplorerState = {
   query: PartialStructuredQuery;
@@ -31,7 +28,9 @@ const DEFAULT_APP_STATE: DataExplorerState = {
     orderByDirection: undefined,
     aggregations: {},
   },
-  vizConfig: makeDefaultVizConfig("table"),
+  vizConfig: {
+    vizType: "table",
+  },
 };
 
 export const DataExplorerStore = createStore({
@@ -95,10 +94,24 @@ export const DataExplorerStore = createStore({
       return setValue(state, "query.orderByDirection", payload.direction);
     },
 
+    /** Change the active visualization */
+    setActiveVizType: (state: DataExplorerState, newVizType: VizType) => {
+      const { vizConfig, query } = state;
+      return setValue(
+        state,
+        "vizConfig",
+        VizConfigUtils.hydrateFromQuery(
+          VizConfigUtils.convertVizConfig(vizConfig, newVizType),
+          query,
+        ),
+      );
+    },
+
     setVizConfig: (
       state: DataExplorerState,
       payload: { vizConfig: VizConfig },
     ) => {
+      // fill in the defaults
       return setValue(state, "vizConfig", payload.vizConfig);
     },
   },

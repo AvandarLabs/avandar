@@ -5,22 +5,18 @@ import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { propPasses } from "@/lib/utils/objects/higherOrderFuncs";
 import { AvaDataTypeUtils } from "@/models/datasets/AvaDataType";
 import { QueryResultColumn } from "@/models/queries/QueryResultData/QueryResultData.types";
-
-export type BarChartSettings = {
-  xAxisKey: string | undefined;
-  yAxisKey: string | undefined;
-};
+import { BarChartVizConfig } from "@/models/vizs/BarChartVizConfig";
 
 type Props = {
   fields: readonly QueryResultColumn[];
-  settings: BarChartSettings;
-  onSettingsChange: (settings: BarChartSettings) => void;
+  config: BarChartVizConfig;
+  onConfigChange: (newConfig: BarChartVizConfig) => void;
 };
 
 export function BarChartForm({
   fields,
-  settings,
-  onSettingsChange,
+  config,
+  onConfigChange,
 }: Props): JSX.Element {
   const fieldOptions = useMemo(() => {
     return makeSelectOptions(fields, {
@@ -39,7 +35,7 @@ export function BarChartForm({
     );
   }, [fields]);
 
-  const { xAxisKey, yAxisKey } = settings;
+  const { xAxisKey, yAxisKey } = config;
 
   const xAxisDisabled = fieldOptions.length === 0;
   const yAxisDisabled =
@@ -62,7 +58,7 @@ export function BarChartForm({
             : "Select a column"
           }
           onChange={(field) => {
-            onSettingsChange({ ...settings, xAxisKey: field ?? undefined });
+            onConfigChange({ ...config, xAxisKey: field ?? undefined });
           }}
         />
       </Tooltip>
@@ -89,7 +85,7 @@ export function BarChartForm({
             : "Select a column"
           }
           onChange={(field) => {
-            onSettingsChange({ ...settings, yAxisKey: field ?? undefined });
+            onConfigChange({ ...config, yAxisKey: field ?? undefined });
           }}
         />
       </Tooltip>

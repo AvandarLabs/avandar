@@ -97,7 +97,9 @@ function arrowTableToJS<RowObject extends UnknownRow>(
   const jsDataRows = arrowTable.toArray().map((row) => {
     const jsRow = row.toJSON();
     return mapObjectValues(jsRow, (v) => {
-      if (v instanceof arrow.Vector) {
+      if (typeof v === "bigint") {
+        return Number(v);
+      } else if (v instanceof arrow.Vector) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return v.toArray().map((x: any) => {
           return x.toJSON();
@@ -713,7 +715,7 @@ class DuckDBClientImpl {
     return { numPages, numRows };
   }
 
-  async runStructuredQuery<T extends UnknownRow>({
+  async runStructuredQuery<RowObject extends UnknownRow>({
     tableName,
     selectColumnNames = "*",
     groupByColumnNames = [],
@@ -723,9 +725,9 @@ class DuckDBClientImpl {
     castTimestampsToISO,
     limit,
     offset,
-  }: DuckDBStructuredQuery): Promise<QueryResultData<T>> {
+  }: DuckDBStructuredQuery): Promise<QueryResultData<RowObject>> {
     const conn = await this.#connect();
-    let queryResults: QueryResultData<T>;
+    let queryResults: QueryResultData<RowObject>;
     const tableColumns = await this.getTableSchema(tableName);
     const timestampColumnNames = tableColumns
       .filter((col) => {
@@ -801,24 +803,11 @@ class DuckDBClientImpl {
     // run the query
     try {
       const queryString = query.toString();
-      const results = await conn.query<Record<string, arrow.DataType>>(
+      const arrowTable = await conn.query<Record<string, arrow.DataType>>(
         queryString,
       );
 
-      const jsDataRows = results.toArray().map((row) => {
-        return row.toJSON();
-      });
-
-      this.#logger.log("Ran query", {
-        queryString,
-        numResults: jsDataRows.length,
-      });
-
-      queryResults = {
-        columns: results.schema.fields.map(arrowFieldToQueryResultField),
-        data: jsDataRows,
-        numRows: jsDataRows.length,
-      };
+      queryResults = arrowTableToJS<RowObject>(arrowTable);
     } catch (error) {
       this.#logger.error(error, { query: query.toString() });
       throw error;

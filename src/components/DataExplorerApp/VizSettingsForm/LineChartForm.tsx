@@ -4,22 +4,18 @@ import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { propPasses } from "@/lib/utils/objects/higherOrderFuncs";
 import { AvaDataTypeUtils } from "@/models/datasets/AvaDataType";
 import { QueryResultColumn } from "@/models/queries/QueryResultData/QueryResultData.types";
-
-export type LineChartSettings = {
-  xAxisKey: string | undefined;
-  yAxisKey: string | undefined;
-};
+import { LineChartVizConfig } from "@/models/vizs/LineChartVizConfig";
 
 type Props = {
   fields: readonly QueryResultColumn[];
-  settings: LineChartSettings;
-  onSettingsChange: (settings: LineChartSettings) => void;
+  config: LineChartVizConfig;
+  onConfigChange: (newConfig: LineChartVizConfig) => void;
 };
 
 export function LineChartForm({
   fields,
-  settings,
-  onSettingsChange,
+  config,
+  onConfigChange,
 }: Props): JSX.Element {
   const fieldOptions = useMemo(() => {
     return makeSelectOptions(fields, { valueKey: "name", labelKey: "name" });
@@ -32,7 +28,7 @@ export function LineChartForm({
     );
   }, [fields]);
 
-  const { xAxisKey, yAxisKey } = settings;
+  const { xAxisKey, yAxisKey } = config;
 
   return (
     <>
@@ -48,8 +44,8 @@ export function LineChartForm({
           : "Select a field"
         }
         onChange={(field) => {
-          return onSettingsChange({
-            ...settings,
+          return onConfigChange({
+            ...config,
             xAxisKey: field ?? undefined,
           });
         }}
@@ -68,8 +64,8 @@ export function LineChartForm({
           : "Select a field"
         }
         onChange={(field) => {
-          return onSettingsChange({
-            ...settings,
+          return onConfigChange({
+            ...config,
             yAxisKey: field ?? undefined,
           });
         }}

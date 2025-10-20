@@ -1,5 +1,11 @@
 import type { UnknownObject } from "./common";
-import type { StringKeyOf as BroadStringKeyOf, UnknownRecord } from "type-fest";
+import type {
+  ConditionalKeys,
+  Simplify,
+  StringKeyOf as BroadStringKeyOf,
+  UnionToIntersection,
+  UnknownRecord,
+} from "type-fest";
 
 /**
  * A stricter version of type-fest's `StringKeyOf` that will return
@@ -149,46 +155,32 @@ export type ReplaceTypes<
 };
 
 /**
- * Converts a union of string literals into a record mapping each key
- * to `true`. This is a useful hack for when we are starting from a union
- * of string literals at the type level and need to enforce that an array
- * tuple has EVERY possible value from the string literal union.
+ * Converts a union of string literals into a record mapping each string literal
+ * to `unknown`. This is a useful hack for when we start at the type-level
+ * by defining a type union, but then need to create an array tuple with each
+ * literal value.
  *
- * The `UnionToTuple` type from type-fest is not stable and not a reliable
- * solution. So, instead we can create the array by using a registry.
+ * Type checking that this array **must** have every value from the string
+ * literal union is difficult. The `UnionToTuple` type from type-fest is not
+ * stable and not a reliable solution. So, instead, we create a registry and
+ * then extract the keys. We can enforce exhaustiveness on the registry.
  *
  * Example:
  * ```ts
  * type Letter = "a" | "b" | "c";
  *
- * const LETTERS = objectKeys({
- *   a: true,
- *   b: true,
- *   c: true,
- * } satisfies Registry<Letter>);
- * ```
- *
- * Or, equivalently, we can use the `registryKeys` function for cleaner syntax:
- *
- * ```ts
- * type Letter = "a" | "b" | "c";
  * const LETTERS = registryKeys<Letter>({
  *   a: true,
  *   b: true,
  *   c: true,
  * });
  * ```
- *
- * `Letters` is of type `("a" | "b" | "c")[]`. But if we exclude any of
- * the keys from the object (e.g. if "c" is removed from the object) then
- * you'd get a type error.
- *
- * This way we can be notified if a union is ever changed at the type-level,
- * we will be forced to also update this registry. That way the array remains
- * consistent with the type.
+ * The `registryKeys<>` function is a helper that type checks that the passed
+ * registry has every key. That ensures that the extracted array will also
+ * have every key.
  */
 export type Registry<StringLiteralUnion extends string> = {
-  [K in StringLiteralUnion]: true;
+  [K in StringLiteralUnion]: unknown;
 };
 
 /**
@@ -197,3 +189,19 @@ export type Registry<StringLiteralUnion extends string> = {
 export type RegistryOfArrays<T extends UnknownObject> = {
   [K in keyof T]: Array<T[K]>;
 };
+
+/**
+ * Convert a union of objects into a registry, keyed by a given prop.
+ */
+export type ObjectRegistry<
+  U extends object,
+  KeyProp extends ConditionalKeys<U, string>,
+> = Simplify<
+  UnionToIntersection<
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    U extends any ? {
+        [V in U as Extract<U[KeyProp], string>]: V;
+      }
+      : never
+  >
+>;
