@@ -9,6 +9,7 @@ import {
 import type { EntityConfigId } from "../EntityConfig.types";
 import type { UUID } from "@/lib/types/common";
 import type { AvaDataType } from "@/models/datasets/AvaDataType";
+import { Model } from "@/models/Model";
 
 export type EntityFieldConfigId = UUID<"EntityFieldConfig">;
 
@@ -50,7 +51,7 @@ export type MetricRead = {
   isArray: false;
 };
 
-type EntityFieldConfigRead = {
+type EntityFieldConfigRead = Model<"EntityFieldConfig", {
   id: EntityFieldConfigId;
   entityConfigId: EntityConfigId;
   workspaceId: WorkspaceId;
@@ -59,7 +60,7 @@ type EntityFieldConfigRead = {
   createdAt: string;
   updatedAt: string;
   options: DimensionRead | MetricRead;
-};
+}>;
 
 type EntityFieldConfigInsert = Merge<
   SetOptional<

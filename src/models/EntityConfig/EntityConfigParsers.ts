@@ -23,8 +23,8 @@ const DBReadSchema = z.object({
   allow_manual_creation: z.boolean(),
 });
 
-export const EntityConfigParsers =
-  makeParserRegistry<EntityConfigModel>().build({
+export const EntityConfigParsers = makeParserRegistry<EntityConfigModel>()
+  .build({
     modelName: "EntityConfig",
     DBReadSchema,
     fromDBReadToModelRead: pipe(
@@ -33,6 +33,7 @@ export const EntityConfigParsers =
       (obj): EntityConfig => {
         return {
           ...obj,
+          __type: "EntityConfig",
           id: uuid(obj.id),
           ownerId: uuid(obj.ownerId),
           workspaceId: uuid(obj.workspaceId),

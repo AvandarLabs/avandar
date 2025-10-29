@@ -1,5 +1,6 @@
 import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import type { GenericSeedData } from "../scripts/SeedRunner";
+import { Models } from "@/models/Model/Models";
 
 export const TEST_USER_EMAIL = "user@avandarlabs.com";
 export const TEST_USER_PASSWORD = "avandar";
@@ -72,19 +73,22 @@ export const SeedData = {
       datasetId: null,
       allowManualCreation: false,
       fields: [
-        {
-          name: "Name",
-          description: "This entity represents a US State",
-          options: {
-            class: "dimension",
-            baseDataType: "varchar",
-            valueExtractorType: "manual_entry",
-            allowManualEdit: true,
-            isIdField: true,
-            isTitleField: true,
-            isArray: false,
-          },
-        },
+        Models.make(
+          "EntityFieldConfig",
+          {
+            name: "Name",
+            description: "This entity represents a US State",
+            options: {
+              class: "dimension",
+              baseDataType: "varchar",
+              valueExtractorType: "manual_entry",
+              allowManualEdit: true,
+              isIdField: true,
+              isTitleField: true,
+              isArray: false,
+            },
+          } as const,
+        ),
       ] satisfies Array<
         Omit<EntityFieldConfig<"Insert">, "entityConfigId" | "workspaceId">
       >,

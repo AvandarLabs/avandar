@@ -1,2 +1,2 @@
-export * from "./ScatterPlotVizConfig.types";
-export * from "./ScatterPlotVizConfigUtils";
+export type * from "./ScatterPlotVizConfig.types";
+export * from "./ScatterPlotVizConfigs";

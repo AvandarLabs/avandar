@@ -1,1 +1,2 @@
-export * from "./TableVizConfig.types";
+export type * from "./TableVizConfig.types";
+export * from "./TableVizConfigs";

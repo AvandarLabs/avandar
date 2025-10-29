@@ -6,13 +6,15 @@ import { WorkspaceId } from "../Workspace/types";
 import { EntityFieldConfig } from "./EntityFieldConfig/EntityFieldConfig.types";
 import { EntityFieldValueExtractor } from "./ValueExtractor/types";
 import type { UUID } from "@/lib/types/common";
+import { Model } from "../Model";
 
-export type EntityConfigId = UUID<"EntityConfig">;
+type ModelType = "EntityConfig";
+export type EntityConfigId = UUID<ModelType>;
 
 /**
  * Defines the configuration schema for an Entity.
  */
-type EntityConfigRead = {
+type EntityConfigRead = Model<ModelType, {
   /** Unique identifier for this entity config */
   id: EntityConfigId;
 
@@ -36,7 +38,7 @@ type EntityConfigRead = {
 
   /** Whether users can manually create entities for this config */
   allowManualCreation: boolean;
-};
+}>;
 
 type EntityConfigInsert = SetOptional<
   EntityConfigRead,

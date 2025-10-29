@@ -1,61 +1,74 @@
 import { isNonEmptyArray } from "@/lib/utils/guards/guards";
-import { AvaDataTypeUtils } from "../datasets/AvaDataType";
 import { PartialStructuredQuery } from "../queries/StructuredQuery";
-import {
-  QueryColumn,
-  StructuredQueryUtils,
-} from "../queries/StructuredQuery/StructuredQueryUtils";
+import { QueryColumns } from "../queries/QueryColumn";
 
-function _getColumnNameWithAggregation(column: QueryColumn): string {
-  const { aggregation, sourceColumn } = column;
-  if (
-    aggregation === undefined || aggregation === "none" ||
-    aggregation === "group_by"
-  ) {
-    return sourceColumn.name;
-  }
-  return `${aggregation}("${sourceColumn.name}")`;
-}
+type XYAxesConfig = {
+  xAxisKey: string | undefined;
+  yAxisKey: string | undefined;
+};
 
+/**
+ * Hydrate the X and Y axes of a viz config from a query.
+ * @param currVizConfig The current viz config to hydrate.
+ * @param query The query to hydrate the axes from.
+ * @returns The new viz config with the axes hydrated.
+ */
 export function hydrateXYFromQuery<
-  VConfig extends {
-    xAxisKey: string | undefined;
-    yAxisKey: string | undefined;
-  },
+  VConfig extends XYAxesConfig,
 >(
-  vizConfig: VConfig,
+  currVizConfig: VConfig,
   query: PartialStructuredQuery,
 ): VConfig {
-  const { xAxisKey, yAxisKey } = vizConfig;
-  let newVizConfig: VConfig = vizConfig;
-  if (xAxisKey === undefined || yAxisKey === undefined) {
-    const queryColumns = StructuredQueryUtils.getQueryColumns(query);
+  const prevXAxisKey = currVizConfig.xAxisKey;
+  const prevYAxisKey = currVizConfig.yAxisKey;
+  // first let's check if the current x and y axes still exist in the query
+  // columns
+  const isXAXisStillValid = query.queryColumns.some((col) => {
+    // TODO(jpsyx): this will change when we compare columns by their IDs
+    // instead of their derived names
+    return QueryColumns.getDerivedColumnName(col) === prevXAxisKey;
+  });
+  const isYAxisStillValid = query.queryColumns.some((col) => {
+    // TODO(jpsyx): see note above for the X axis check
+    return QueryColumns.getDerivedColumnName(col) === prevYAxisKey;
+  });
 
-    // if we're missing an X axis, choose the first column available
-    if (xAxisKey === undefined && isNonEmptyArray(queryColumns)) {
-      const firstColumn = queryColumns[0];
+  // for each axis that is invalid, we clear it from the existing config
+  let newVizConfig: VConfig = {
+    ...currVizConfig,
+    xAxisKey: isXAXisStillValid ? prevXAxisKey : undefined,
+    yAxisKey: isYAxisStillValid ? prevYAxisKey : undefined,
+  };
+  const { xAxisKey, yAxisKey } = newVizConfig;
+
+  if (xAxisKey === undefined || yAxisKey === undefined) {
+    const { queryColumns } = query;
+    // if we're missing a Y axis, choose the first numeric column available
+    if (yAxisKey === undefined && isNonEmptyArray(queryColumns)) {
+      const firstNumericColumn = queryColumns.find(QueryColumns.isNumeric);
       newVizConfig = {
         ...newVizConfig,
-        xAxisKey: _getColumnNameWithAggregation(firstColumn!),
+        yAxisKey: firstNumericColumn
+          ? QueryColumns.getDerivedColumnName(firstNumericColumn)
+          : undefined,
       };
     }
 
-    // if we're missing a Y axis, choose the first numeric column available
-    if (yAxisKey === undefined && isNonEmptyArray(queryColumns)) {
-      const firstNumericColumn = queryColumns.find((column) => {
-        return AvaDataTypeUtils.isNumeric(
-          column.columnType === "DatasetColumn"
-            ? column.sourceColumn.dataType
-            : column.sourceColumn.options.baseDataType,
-        );
+    const newYAxisKey = newVizConfig.yAxisKey;
+
+    // if we're missing an X axis, choose the first column available that isn't
+    // the Y axis
+    if (xAxisKey === undefined && isNonEmptyArray(queryColumns)) {
+      const firstColumn = queryColumns.find((col) => {
+        return QueryColumns.getDerivedColumnName(col) !== newYAxisKey;
       });
 
-      if (firstNumericColumn !== undefined) {
-        newVizConfig = {
-          ...newVizConfig,
-          yAxisKey: _getColumnNameWithAggregation(firstNumericColumn),
-        };
-      }
+      newVizConfig = {
+        ...newVizConfig,
+        xAxisKey: firstColumn
+          ? QueryColumns.getDerivedColumnName(firstColumn)
+          : undefined,
+      };
     }
   }
   return newVizConfig;

@@ -1,2 +1,2 @@
-export * from "./AvaDataType.types";
-export * from "./AvaDataTypeUtils";
+export type * from "./AvaDataType.types";
+export * from "./AvaDataTypes";

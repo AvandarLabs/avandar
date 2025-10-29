@@ -1,17 +1,16 @@
 import { createStore } from "@/lib/utils/createStore";
+import { makeObject } from "@/lib/utils/objects/builders";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { setValue } from "@/lib/utils/objects/setValue";
-import { uuid } from "@/lib/utils/uuid";
 import { QueryAggregationType } from "@/models/queries/QueryAggregationType";
+import { QueryColumn, QueryColumnId } from "@/models/queries/QueryColumn";
+import { QueryDataSource } from "@/models/queries/QueryDataSource";
 import {
   OrderByDirection,
   PartialStructuredQuery,
 } from "@/models/queries/StructuredQuery";
-import { VizConfig, VizConfigUtils, VizType } from "@/models/vizs/VizConfig";
-import {
-  QueryableColumn,
-  QueryableColumnId,
-} from "../QueryableColumnMultiSelect";
-import { QueryableDataSource } from "../QueryableDataSourceSelect";
+import { StructuredQueries } from "@/models/queries/StructuredQuery/StructuredQueries";
+import { VizConfig, VizConfigs, VizType } from "@/models/vizs/VizConfig";
 
 type DataExplorerState = {
   query: PartialStructuredQuery;
@@ -19,15 +18,7 @@ type DataExplorerState = {
 };
 
 const DEFAULT_APP_STATE: DataExplorerState = {
-  query: {
-    id: uuid(),
-    version: 1,
-    dataSource: undefined,
-    queryColumns: [],
-    orderByColumn: undefined,
-    orderByDirection: undefined,
-    aggregations: {},
-  },
+  query: StructuredQueries.makeEmpty(),
   vizConfig: {
     vizType: "table",
   },
@@ -40,46 +31,74 @@ export const DataExplorerStore = createStore({
     /** Set the data source for the query. */
     setDataSource: (
       state: DataExplorerState,
-      dataSource: QueryableDataSource | undefined,
+      dataSource: QueryDataSource | undefined,
     ) => {
       return setValue(state, "query.dataSource", dataSource);
     },
 
     /** Set the columns for the query. */
-    setColumns: (
-      state: DataExplorerState,
-      columns: readonly QueryableColumn[],
-    ) => {
-      return setValue(state, "query.queryColumns", columns);
-    },
+    setColumns: (state: DataExplorerState, columns: readonly QueryColumn[]) => {
+      const {
+        query: { aggregations },
+      } = state;
+      const newColumnIds = columns.map(prop("id"));
+      const newAggregations = makeObject(newColumnIds, {
+        valueFn: (colId) => {
+          // if this column already had an aggregation we keep it
+          return aggregations[colId] ?? "none";
+        },
+      });
+      const newQuery = {
+        ...state.query,
+        queryColumns: columns,
+        aggregations: newAggregations,
+      };
+      const newVizConfig = VizConfigs.hydrateFromQuery(
+        state.vizConfig,
+        newQuery,
+      );
 
-    /** Set the aggregations for the query. */
-    setAggregations: (
-      state: DataExplorerState,
-      aggregations: Record<QueryableColumnId, QueryAggregationType>,
-    ) => {
-      return setValue(state, "query.aggregations", aggregations);
+      return { ...state, query: newQuery, vizConfig: newVizConfig };
     },
 
     /** Set the aggregation for a specific column */
     setColumnAggregation: (
       state: DataExplorerState,
       payload: {
-        columnId: QueryableColumnId;
+        columnId: QueryColumnId;
         aggregation: QueryAggregationType;
       },
     ) => {
+      const { query, vizConfig } = state;
+      const { queryColumns, aggregations } = query;
       const { columnId, aggregation } = payload;
-      return setValue(state, "query.aggregations", {
-        ...state.query.aggregations,
-        [columnId]: aggregation,
+      const newQueryColumns = queryColumns.map((col) => {
+        if (col.id === columnId && col.aggregation !== aggregation) {
+          return { ...col, aggregation };
+        }
+        return col;
       });
+      const newAggregations = {
+        ...aggregations,
+        [columnId]: aggregation,
+      };
+      const newQuery = {
+        ...query,
+        queryColumns: newQueryColumns,
+        aggregations: newAggregations,
+      };
+      const newVizConfig = VizConfigs.hydrateFromQuery(vizConfig, newQuery);
+      return {
+        ...state,
+        query: newQuery,
+        vizConfig: newVizConfig,
+      };
     },
 
-    /** */
+    /** Set the column that we are ordering by. */
     setOrderByColumn: (
       state: DataExplorerState,
-      columnId: QueryableColumnId | undefined,
+      columnId: QueryColumnId | undefined,
     ) => {
       return setValue(state, "query.orderByColumn", columnId);
     },
@@ -95,11 +114,14 @@ export const DataExplorerStore = createStore({
     /** Change the active visualization */
     setActiveVizType: (state: DataExplorerState, newVizType: VizType) => {
       const { vizConfig, query } = state;
+
+      // convert the viz config and then hydrate it from the query, so we can
+      // populate it with some reasonable default values
       return setValue(
         state,
         "vizConfig",
-        VizConfigUtils.hydrateFromQuery(
-          VizConfigUtils.convertVizConfig(vizConfig, newVizType),
+        VizConfigs.hydrateFromQuery(
+          VizConfigs.convertVizConfig(vizConfig, newVizType),
           query,
         ),
       );

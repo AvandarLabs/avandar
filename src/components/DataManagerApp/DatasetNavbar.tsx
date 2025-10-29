@@ -12,11 +12,8 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
 import { makeBucketMap } from "@/lib/utils/maps/builders";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import {
-  Dataset,
-  DatasetId,
-  DatasetSourceTypes,
-} from "@/models/datasets/Dataset";
+import { Dataset, DatasetId } from "@/models/datasets/Dataset";
+import { Datasets } from "@/models/datasets/Dataset/Datasets";
 
 type Props = {
   datasets: Dataset[];
@@ -61,7 +58,7 @@ export function DatasetNavbar({
       keyFn: prop("sourceType"),
     });
 
-    const datasetLinks = DatasetSourceTypes.flatMap((sourceType) => {
+    const datasetLinks = Datasets.SourceTypes.flatMap((sourceType) => {
       return (datasetsByType.get(sourceType) ?? []).map((dataset) => {
         return makeDatasetLink({
           workspaceSlug,

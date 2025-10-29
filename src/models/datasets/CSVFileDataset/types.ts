@@ -2,7 +2,7 @@ import { SetOptional } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { UUID } from "@/lib/types/common";
 import { WorkspaceId } from "@/models/Workspace/types";
-import { DatasetId } from "../Dataset/types";
+import { DatasetId } from "../Dataset/Dataset.types";
 
 export type CSVFileDatasetId = UUID<"CSVFileDatasetId">;
 

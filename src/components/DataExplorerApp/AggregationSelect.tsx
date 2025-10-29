@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { Select, SelectOption } from "@/lib/ui/inputs/Select";
 import { propIsInArray } from "@/lib/utils/objects/higherOrderFuncs";
 import { AvaDataType } from "@/models/datasets/AvaDataType";
-import { AvaDataTypeUtils } from "@/models/datasets/AvaDataType/AvaDataTypeUtils";
+import { AvaDataTypes } from "@/models/datasets/AvaDataType/AvaDataTypes";
 import { QueryAggregationType } from "@/models/queries/QueryAggregationType";
 
 type Props = {
@@ -31,8 +31,7 @@ export function AggregationSelect({
   defaultValue = "none",
   onChange,
 }: Props): JSX.Element {
-  const validAggregations =
-    AvaDataTypeUtils.getValidQueryAggregations(dataType);
+  const validAggregations = AvaDataTypes.getValidQueryAggregations(dataType);
 
   // only show valid aggregations as Select options
   const aggregationOptions = useMemo(() => {
