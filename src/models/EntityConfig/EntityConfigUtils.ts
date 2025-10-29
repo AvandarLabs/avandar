@@ -41,6 +41,8 @@ const boundModuleCache = new WeakMap<
   BindWithEntityConfig<IEntityConfigUtils>
 >();
 
+// TODO(jpsyx): this is overkill. Don't use a composed module pattern here.
+// Just use a simple object with functions.
 function createEntityConfigModule(): WithBind<IEntityConfigUtils> {
   const module: IEntityConfigUtils = {
     getTitleField: (

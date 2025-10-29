@@ -8,40 +8,17 @@ import { Select, SelectOptionGroup, SelectProps } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { makeBucketMap } from "@/lib/utils/maps/builders";
-import { Dataset, DatasetId } from "@/models/datasets/Dataset";
-import { EntityConfig, EntityConfigId } from "@/models/EntityConfig";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
-
-export type QueryableDataSourceIdWithType =
-  | {
-      type: "Dataset";
-      id: DatasetId;
-    }
-  | {
-      type: "EntityConfig";
-      id: EntityConfigId;
-    };
-
-export type QueryableDataSourceId = QueryableDataSourceIdWithType["id"];
-
-export type QueryableDataSource =
-  | {
-      type: "Dataset";
-      object: Dataset;
-    }
-  | {
-      type: "EntityConfig";
-      object: EntityConfig;
-    };
+import {
+  QueryDataSource,
+  QueryDataSourceId,
+} from "@/models/queries/QueryDataSource/QueryDataSource.types";
 
 type Props = {
-  value?: QueryableDataSource | null;
-  defaultValue?: QueryableDataSource | null;
-  onChange?: (value: QueryableDataSource | null) => void;
-} & Omit<
-  SelectProps<QueryableDataSourceId>,
-  "value" | "defaultValue" | "onChange"
->;
+  value?: QueryDataSource | null;
+  defaultValue?: QueryDataSource | null;
+  onChange?: (value: QueryDataSource | null) => void;
+} & Omit<SelectProps<QueryDataSourceId>, "value" | "defaultValue" | "onChange">;
 
 /**
  * A select component for selecting a data source, which can be
@@ -51,14 +28,14 @@ type Props = {
  * This component supports controlled and uncontrolled behavior and can be used
  * with `useForm`.
  */
-export function QueryableDataSourceSelect({
+export function QueryDataSourceSelect({
   defaultValue,
   value,
   onChange,
   ...selectProps
 }: Props): JSX.Element {
   const [currentDataSource, setCurrentDataSource] =
-    useUncontrolled<QueryableDataSource | null>({
+    useUncontrolled<QueryDataSource | null>({
       value,
       defaultValue,
       finalValue: null,
@@ -72,15 +49,8 @@ export function QueryableDataSourceSelect({
   const [entityConfigs] = EntityConfigClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
   );
-  const dataSources: QueryableDataSource[] = useMemo(() => {
-    return [
-      ...(datasets ?? []).map((d) => {
-        return { type: "Dataset" as const, object: d };
-      }),
-      ...(entityConfigs ?? []).map((ec) => {
-        return { type: "EntityConfig" as const, object: ec };
-      }),
-    ];
+  const dataSources: QueryDataSource[] = useMemo(() => {
+    return [...(datasets ?? []), ...(entityConfigs ?? [])];
   }, [datasets, entityConfigs]);
 
   useOnBecomesDefined(
@@ -112,7 +82,7 @@ export function QueryableDataSourceSelect({
     }
 
     // if we have more than 1 bucket that means we need to group things
-    const groups: Array<SelectOptionGroup<QueryableDataSourceId>> = [];
+    const groups: Array<SelectOptionGroup<QueryDataSourceId>> = [];
     datasetBucketsByType.forEach((bucketValues, bucketKey) => {
       const bucketName = match(bucketKey)
         .with("csv_file", () => {
@@ -146,12 +116,10 @@ export function QueryableDataSourceSelect({
     ];
   }, [datasets, entityConfigs]);
 
-  const onDataSourceChange = (
-    newDataSourceId: QueryableDataSourceId | null,
-  ) => {
+  const onDataSourceChange = (newDataSourceId: QueryDataSourceId | null) => {
     const newDataSource =
       dataSources.find((ds) => {
-        return ds.object.id === newDataSourceId;
+        return ds.id === newDataSourceId;
       }) ?? null;
     setCurrentDataSource(newDataSource);
   };
@@ -161,7 +129,7 @@ export function QueryableDataSourceSelect({
       data={dataSourceOptions}
       label="Data source"
       placeholder="Select a data source"
-      value={currentDataSource?.object.id ?? null}
+      value={currentDataSource?.id ?? null}
       onChange={onDataSourceChange}
       {...selectProps}
     />

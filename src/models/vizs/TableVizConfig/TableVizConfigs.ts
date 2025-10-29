@@ -1,13 +1,13 @@
 import { VizConfigType, VizType } from "../VizConfig";
 import { IVizConfigModule } from "../VizConfig/IVizConfigModule";
 import { match } from "ts-pattern";
-import { TableVizConfig } from "../TableVizConfig";
+import { TableVizConfig } from ".";
 import { LineChartVizConfig } from "../LineChartVizConfig";
 import { ScatterPlotVizConfig } from "../ScatterPlotVizConfig";
 import { Logger } from "@/lib/Logger";
 import { BarChartVizConfig } from "../BarChartVizConfig";
 
-export const TableVizConfigUtils = {
+export const TableVizConfigs = {
   vizType: "table",
   displayName: "Table",
 

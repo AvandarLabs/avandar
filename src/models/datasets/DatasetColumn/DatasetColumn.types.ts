@@ -2,13 +2,14 @@ import { SetOptional } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { UUID } from "@/lib/types/common";
 import { WorkspaceId } from "@/models/Workspace/types";
-import { DatasetId } from "../Dataset/types";
+import { DatasetId } from "../Dataset/Dataset.types";
 import { AvaDataType } from "../AvaDataType/AvaDataType.types";
 import { DuckDBDataType } from "@/clients/DuckDBClient/DuckDBDataType";
+import { Model } from "@/models/Model";
 
 export type DatasetColumnId = UUID<"DatasetColumn">;
 
-export type DatasetColumnRead = {
+export type DatasetColumnRead = Model<"DatasetColumn", {
   /** Timestamp of when the dataset column was created. */
   createdAt: string;
 
@@ -59,7 +60,7 @@ export type DatasetColumnRead = {
 
   /** Index of the column in the dataset. */
   columnIdx: number;
-};
+}>;
 
 /**
  * This is a subset of a DatasetColumn type with only the name, data type,

@@ -2,8 +2,8 @@ import { useMemo } from "react";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { propPasses } from "@/lib/utils/objects/higherOrderFuncs";
-import { AvaDataTypeUtils } from "@/models/datasets/AvaDataType";
-import { QueryResultColumn } from "@/models/queries/QueryResultData/QueryResultData.types";
+import { AvaDataTypes } from "@/models/datasets/AvaDataType";
+import { QueryResultColumn } from "@/models/queries/QueryResult/QueryResult.types";
 import { LineChartVizConfig } from "@/models/vizs/LineChartVizConfig";
 
 type Props = {
@@ -23,7 +23,7 @@ export function LineChartForm({
 
   const numericFieldOptions = useMemo(() => {
     return makeSelectOptions(
-      fields.filter(propPasses("dataType", AvaDataTypeUtils.isNumeric)),
+      fields.filter(propPasses("dataType", AvaDataTypes.isNumeric)),
       { valueKey: "name", labelKey: "name" },
     );
   }, [fields]);

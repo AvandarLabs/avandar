@@ -20,6 +20,7 @@ import { AggregationExtractor } from "@/models/EntityConfig/ValueExtractor/Aggre
 import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/types";
 import { ManualEntryExtractor } from "@/models/EntityConfig/ValueExtractor/ManualEntryExtractor/types";
 import { EntityFieldValueExtractorRegistry } from "@/models/EntityConfig/ValueExtractor/types";
+import { Models } from "@/models/Model";
 
 export type EntityFieldFormValues =
   & SetRequired<
@@ -87,7 +88,7 @@ export type EntityConfigFormType = FormType<
 export function getDefaultEntityConfigFormValues(): EntityConfigFormValues {
   const entityConfigId: EntityConfigId = uuid();
 
-  return {
+  return Models.make("EntityConfig", {
     id: entityConfigId,
     titleFieldId: undefined,
     name: "",
@@ -96,7 +97,7 @@ export function getDefaultEntityConfigFormValues(): EntityConfigFormValues {
     allowManualCreation: false,
     datasetColumnFields: [],
     manualEntryFields: [],
-  };
+  });
 }
 
 export function makeDefaultDatasetColumnField({
@@ -113,44 +114,47 @@ export function makeDefaultDatasetColumnField({
   isIdField?: boolean;
 }): EntityFieldFormValues {
   const entityFieldConfigId: EntityFieldConfigId = uuid();
-  return {
-    id: entityFieldConfigId,
-    entityConfigId,
-    name,
-    description: undefined,
-    options: {
-      class: "dimension",
-      baseDataType: datasetColumn.dataType,
-      valueExtractorType: "dataset_column_value",
-      isIdField,
-      isTitleField: false,
-      allowManualEdit: false,
-      isArray: true,
-    },
+  return Models.make(
+    "EntityFieldConfig",
+    {
+      id: entityFieldConfigId,
+      entityConfigId,
+      name,
+      description: undefined,
+      options: {
+        class: "dimension",
+        baseDataType: datasetColumn.dataType,
+        valueExtractorType: "dataset_column_value",
+        isIdField,
+        isTitleField: false,
+        allowManualEdit: false,
+        isArray: true,
+      },
 
-    // set up some default initial values for the value extractor configs
-    extractors: {
-      aggregation: {
-        type: "aggregation",
-        entityFieldConfigId,
-        aggregationType: "sum",
-        datasetId: undefined,
-        datasetFieldId: undefined,
-        filter: undefined,
+      // set up some default initial values for the value extractor configs
+      extractors: {
+        aggregation: {
+          type: "aggregation",
+          entityFieldConfigId,
+          aggregationType: "sum",
+          datasetId: undefined,
+          datasetFieldId: undefined,
+          filter: undefined,
+        },
+        manualEntry: {
+          type: "manual_entry",
+          entityFieldConfigId,
+        },
+        datasetColumnValue: {
+          type: "dataset_column_value",
+          entityFieldConfigId,
+          valuePickerRuleType: "most_frequent",
+          datasetId: dataset.id,
+          datasetFieldId: datasetColumn.id,
+        },
       },
-      manualEntry: {
-        type: "manual_entry",
-        entityFieldConfigId,
-      },
-      datasetColumnValue: {
-        type: "dataset_column_value",
-        entityFieldConfigId,
-        valuePickerRuleType: "most_frequent",
-        datasetId: dataset.id,
-        datasetFieldId: datasetColumn.id,
-      },
-    },
-  };
+    } as const,
+  );
 }
 
 export function makeDefaultManualEntryField({
@@ -161,42 +165,45 @@ export function makeDefaultManualEntryField({
   name: string;
 }): EntityFieldFormValues {
   const entityFieldConfigId: EntityFieldConfigId = uuid();
-  return {
-    id: entityFieldConfigId,
-    entityConfigId,
-    name,
-    description: undefined,
-    options: {
-      class: "dimension",
-      baseDataType: "varchar",
-      valueExtractorType: "manual_entry",
-      isIdField: false,
-      isTitleField: false,
-      allowManualEdit: false,
-      isArray: false,
-    },
+  return Models.make(
+    "EntityFieldConfig",
+    {
+      id: entityFieldConfigId,
+      entityConfigId,
+      name,
+      description: undefined,
+      options: {
+        class: "dimension",
+        baseDataType: "varchar",
+        valueExtractorType: "manual_entry",
+        isIdField: false,
+        isTitleField: false,
+        allowManualEdit: false,
+        isArray: false,
+      },
 
-    // set up some default initial values for the value extractor configs
-    extractors: {
-      aggregation: {
-        type: "aggregation",
-        entityFieldConfigId,
-        aggregationType: "sum",
-        datasetId: undefined,
-        datasetFieldId: undefined,
-        filter: undefined,
+      // set up some default initial values for the value extractor configs
+      extractors: {
+        aggregation: {
+          type: "aggregation",
+          entityFieldConfigId,
+          aggregationType: "sum",
+          datasetId: undefined,
+          datasetFieldId: undefined,
+          filter: undefined,
+        },
+        manualEntry: {
+          type: "manual_entry",
+          entityFieldConfigId,
+        },
+        datasetColumnValue: {
+          type: "dataset_column_value",
+          entityFieldConfigId,
+          valuePickerRuleType: "most_frequent",
+          datasetId: undefined,
+          datasetFieldId: undefined,
+        },
       },
-      manualEntry: {
-        type: "manual_entry",
-        entityFieldConfigId,
-      },
-      datasetColumnValue: {
-        type: "dataset_column_value",
-        entityFieldConfigId,
-        valuePickerRuleType: "most_frequent",
-        datasetId: undefined,
-        datasetFieldId: undefined,
-      },
-    },
-  };
+    } as const,
+  );
 }

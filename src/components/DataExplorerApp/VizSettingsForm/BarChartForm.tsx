@@ -3,8 +3,8 @@ import { useMemo } from "react";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { propPasses } from "@/lib/utils/objects/higherOrderFuncs";
-import { AvaDataTypeUtils } from "@/models/datasets/AvaDataType";
-import { QueryResultColumn } from "@/models/queries/QueryResultData/QueryResultData.types";
+import { AvaDataTypes } from "@/models/datasets/AvaDataType";
+import { QueryResultColumn } from "@/models/queries/QueryResult/QueryResult.types";
 import { BarChartVizConfig } from "@/models/vizs/BarChartVizConfig";
 
 type Props = {
@@ -27,22 +27,20 @@ export function BarChartForm({
 
   const numericFieldOptions = useMemo(() => {
     return makeSelectOptions(
-      fields.filter(propPasses("dataType", AvaDataTypeUtils.isNumeric)),
+      fields.filter(propPasses("dataType", AvaDataTypes.isNumeric)),
       {
         valueKey: "name",
         labelKey: "name",
       },
     );
   }, [fields]);
-
   const { xAxisKey, yAxisKey } = config;
-
   const xAxisDisabled = fieldOptions.length === 0;
   const yAxisDisabled =
     fieldOptions.length === 0 || numericFieldOptions.length === 0;
 
   const noColumnsTooltipMsg =
-    "You need to query for at least one column so there can be options available here";
+    "You need to add at least one column so there can be options available here";
   return (
     <>
       <Tooltip disabled={!xAxisDisabled} label={noColumnsTooltipMsg}>

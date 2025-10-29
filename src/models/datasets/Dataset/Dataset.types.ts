@@ -1,55 +1,50 @@
 import { SetOptional } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { UUID } from "@/lib/types/common";
-import { registryKeys } from "@/lib/utils/objects/misc";
 import { Enums } from "@/types/database.types";
 import { UserId, UserProfileId } from "../../User/types";
 import { WorkspaceId } from "../../Workspace/types";
 import { DatasetColumn } from "../DatasetColumn";
-import type { Registry } from "@/lib/types/utilityTypes";
+import { Model } from "@/models/Model";
 
-export type DatasetId = UUID<"Dataset">;
-
+type ModelType = "Dataset";
+export type DatasetId = UUID<ModelType>;
 export type DatasetSourceType = Enums<"datasets__source_type">;
 
-const DatasetRegistryType = {
-  csv_file: true,
-  google_sheets: true,
-} satisfies Registry<DatasetSourceType>;
+type DatasetRead = Model<
+  ModelType,
+  {
+    /** Timestamp of when the dataset was created. */
+    createdAt: string;
 
-export const DatasetSourceTypes = registryKeys(DatasetRegistryType);
+    /** Timestamp of when the dataset was last synced. */
+    dateOfLastSync: string | undefined;
 
-type DatasetRead = {
-  /** Timestamp of when the dataset was created. */
-  createdAt: string;
+    /** Description of the dataset. */
+    description: string | undefined;
 
-  /** Timestamp of when the dataset was last synced. */
-  dateOfLastSync: string | undefined;
+    /** Unique identifier of the dataset. */
+    id: DatasetId;
 
-  /** Description of the dataset. */
-  description: string | undefined;
+    /** Name of the dataset. */
+    name: string;
 
-  /** Unique identifier of the dataset. */
-  id: DatasetId;
+    /** Type of the dataset. */
+    sourceType: DatasetSourceType;
 
-  /** Name of the dataset. */
-  name: string;
+    /** Unique identifier of the owner of the dataset. */
+    ownerId: UserId;
 
-  /** Type of the dataset. */
-  sourceType: DatasetSourceType;
+    /** Unique identifier of the owner profile of the dataset. */
+    ownerProfileId: UserProfileId;
 
-  /** Unique identifier of the owner of the dataset. */
-  ownerId: UserId;
+    /** Unique identifier of the workspace the dataset belongs to. */
+    workspaceId: WorkspaceId;
 
-  /** Unique identifier of the owner profile of the dataset. */
-  ownerProfileId: UserProfileId;
-
-  /** Unique identifier of the workspace the dataset belongs to. */
-  workspaceId: WorkspaceId;
-
-  /** Timestamp of when the dataset metadata was last updated. */
-  updatedAt: string;
-};
+    /** Timestamp of when the dataset metadata was last updated. */
+    updatedAt: string;
+  }
+>;
 
 /**
  * CRUD type definitions for the Dataset model.

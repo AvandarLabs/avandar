@@ -20,11 +20,11 @@ import {
   EntityFieldConfigModel,
   MetricRead,
 } from "./EntityFieldConfig.types";
-import { AvaDataTypes, AvaDataTypeUtils } from "@/models/datasets/AvaDataType";
+import { AvaDataTypes } from "@/models/datasets/AvaDataType";
 
 const DBReadSchema = object({
   allow_manual_edit: boolean(),
-  base_data_type: zodEnum(AvaDataTypes),
+  base_data_type: zodEnum(AvaDataTypes.Types),
   class: zodEnum(["dimension", "metric"]),
   created_at: string(),
   description: string().nullable(),
@@ -87,7 +87,7 @@ function fromDBReadToModelRead(
     })
     .with({ class: "metric" }, (metricField) => {
       if (
-        AvaDataTypeUtils.isNumeric(metricField.baseDataType) &&
+        AvaDataTypes.isNumeric(metricField.baseDataType) &&
         metricField.valueExtractorType === "aggregation"
       ) {
         return {
@@ -106,7 +106,7 @@ function fromDBReadToModelRead(
     })
     .exhaustive();
 
-  return { ...coreField, options };
+  return { ...coreField, __type: "EntityFieldConfig", options };
 }
 
 export const EntityFieldConfigParsers = makeParserRegistry<

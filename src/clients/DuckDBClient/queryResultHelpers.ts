@@ -4,7 +4,7 @@ import {
   assertIsSingletonArray,
 } from "@/lib/utils/asserts";
 import { objectKeys } from "@/lib/utils/objects/misc";
-import { QueryResultData } from "@/models/queries/QueryResultData/QueryResultData.types";
+import { QueryResult } from "@/models/queries/QueryResult/QueryResult.types";
 
 /**
  * Returns the singular scalar value from a single-column row.
@@ -15,7 +15,7 @@ import { QueryResultData } from "@/models/queries/QueryResultData/QueryResultDat
  * row contains more than one column.
  */
 export function scalar<V, T extends { [key: string]: V }>(
-  query: QueryResultData<T>,
+  query: QueryResult<T>,
 ): V {
   assertIsNonEmptyArray(query.data, "No data found");
   assertIsSingletonArray(
@@ -44,7 +44,7 @@ export function scalar<V, T extends { [key: string]: V }>(
  * @throws If the result has more than one element.
  */
 export function singleton<T extends UnknownObject>(
-  query: QueryResultData<T>,
+  query: QueryResult<T>,
 ): T | undefined {
   if (query.data.length === 0) {
     return undefined;

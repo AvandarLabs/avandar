@@ -1,19 +1,25 @@
-import { match } from "ts-pattern";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { UnknownRow } from "@/clients/DuckDBClient";
 import { DuckDBQueryAggregationType } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { useQuery, UseQueryResultTuple } from "@/lib/hooks/query/useQuery";
-import { valNotEq } from "@/lib/utils/guards/higherOrderFuncs";
+import { isOfModelType } from "@/lib/utils/guards/guards";
+import {
+  valIsOfModelType,
+  valNotEq,
+} from "@/lib/utils/guards/higherOrderFuncs";
 import { makeIdLookupMap } from "@/lib/utils/maps/builders";
 import { makeObjectFromEntries } from "@/lib/utils/objects/builders";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries, objectValues } from "@/lib/utils/objects/misc";
 import { sortObjList } from "@/lib/utils/objects/sortObjList";
+import { Models } from "@/models/Model";
+import { QueryColumns } from "@/models/queries/QueryColumn";
 import {
+  QueryResult,
   QueryResultColumn,
-  QueryResultData,
-} from "@/models/queries/QueryResultData/QueryResultData.types";
+} from "@/models/queries/QueryResult/QueryResult.types";
+import { QueryResults } from "@/models/queries/QueryResult/QueryResults";
 import { PartialStructuredQuery } from "@/models/queries/StructuredQuery";
 
 type UseDataQueryOptions = {
@@ -22,7 +28,7 @@ type UseDataQueryOptions = {
 
 export function useDataQuery({
   query,
-}: UseDataQueryOptions): UseQueryResultTuple<QueryResultData<UnknownRow>> {
+}: UseDataQueryOptions): UseQueryResultTuple<QueryResult<UnknownRow>> {
   const {
     dataSource,
     queryColumns,
@@ -31,7 +37,7 @@ export function useDataQuery({
     orderByDirection,
   } = query;
   const sortedQueryColumns = sortObjList(queryColumns, {
-    sortBy: prop("column.id"),
+    sortBy: prop("id"),
   });
 
   return useQuery({
@@ -48,14 +54,14 @@ export function useDataQuery({
       orderByDirection,
     ],
 
-    queryFn: async () => {
+    queryFn: async (): Promise<QueryResult<UnknownRow>> => {
       if (dataSource && sortedQueryColumns.length > 0) {
-        const queryResults = await match(dataSource)
-          .with({ type: "Dataset" }, async ({ object: dataset }) => {
-            // Querying datasets is simple. We can just query the dataset
-            // directly.
-            const columnLookup = makeIdLookupMap(sortedQueryColumns, {
-              key: "column.id",
+        const queryResults = await Models.match(dataSource, {
+          // Querying datasets is simple. We can just query the dataset
+          // directly with the DatasetRawDataClient.
+          Dataset: async (dataset): Promise<QueryResult<UnknownRow>> => {
+            const queryColumnLookup = makeIdLookupMap(sortedQueryColumns, {
+              key: "id",
             });
 
             // First, we need to convert the structured query into a
@@ -71,12 +77,12 @@ export function useDataQuery({
             ).some(valNotEq("none"));
 
             objectEntries(aggregations).forEach(([columnId, aggregation]) => {
-              const column = columnLookup.get(columnId);
-              if (column?.type === "DatasetColumn") {
+              const column = queryColumnLookup.get(columnId);
+              if (isOfModelType("DatasetColumn", column?.baseColumn)) {
                 // "group_by" and "none" are not valid DucKDB aggregations, so
                 // we exclude them here.
                 if (aggregation !== "group_by" && aggregation !== "none") {
-                  duckDBAggregations[column.column.name] = aggregation;
+                  duckDBAggregations[column.baseColumn.name] = aggregation;
                 } else {
                   // But if the aggregation is "group_by" or there is at least
                   // one other column with an aggregation, then we add this
@@ -86,20 +92,21 @@ export function useDataQuery({
                     atLeastOneColumnHasAggregation ||
                     aggregation === "group_by"
                   ) {
-                    groupByColumnNames.push(column.column.name);
+                    groupByColumnNames.push(column.baseColumn.name);
                   }
                 }
               }
             });
 
             const selectColumnNames = sortedQueryColumns.map(
-              prop("column.name"),
+              prop("baseColumn.name"),
             );
             const orderByColumnName =
-              orderByColumn ?
-                columnLookup.get(orderByColumn)?.column.name
+              orderByColumn && queryColumnLookup.has(orderByColumn) ?
+                QueryColumns.getDerivedColumnName(
+                  queryColumnLookup.get(orderByColumn)!,
+                )
               : undefined;
-
             return await DatasetRawDataClient.runLocalStructuredQuery({
               query: {
                 datasetId: dataset.id,
@@ -110,15 +117,19 @@ export function useDataQuery({
                 orderByColumnName,
               },
             });
-          })
-          .with({ type: "EntityConfig" }, async ({ object: entityConfig }) => {
+          },
+
+          // querying entities is more complex and needs to go through
+          // EntityFieldValueClient, which in turn might need to query many
+          // other datasets.
+          EntityConfig: async (
+            entityConfig,
+          ): Promise<QueryResult<UnknownRow>> => {
             // TODO(jpsyx): optimize this by using a progressive
             // table-materialization approach
             const fields = sortedQueryColumns
-              .filter((col) => {
-                return col.type === "EntityFieldConfig";
-              })
-              .map(prop("column"));
+              .map(prop("baseColumn"))
+              .filter(valIsOfModelType("EntityFieldConfig"));
 
             // TODO(jpsyx): we still need to apply group bys, aggregations,
             // and sorting. Right now its just returning all values for the
@@ -152,13 +163,12 @@ export function useDataQuery({
               columns: queryResultColumns,
               numRows: rows.length,
             };
-          })
-          .exhaustive();
+          },
+        });
 
         return queryResults;
       }
-
-      return { columns: [], data: [], numRows: 0 };
+      return QueryResults.makeEmpty();
     },
   });
 }

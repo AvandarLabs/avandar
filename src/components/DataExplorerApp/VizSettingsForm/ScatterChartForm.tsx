@@ -2,8 +2,8 @@ import { useMemo } from "react";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { propPasses } from "@/lib/utils/objects/higherOrderFuncs";
-import { AvaDataTypeUtils } from "@/models/datasets/AvaDataType";
-import { QueryResultColumn } from "@/models/queries/QueryResultData/QueryResultData.types";
+import { AvaDataTypes } from "@/models/datasets/AvaDataType";
+import { QueryResultColumn } from "@/models/queries/QueryResult/QueryResult.types";
 import { ScatterPlotVizConfig } from "@/models/vizs/ScatterPlotVizConfig";
 
 type Props = {
@@ -18,7 +18,7 @@ export function ScatterChartForm({
   onConfigChange,
 }: Props): JSX.Element {
   const numericFields = useMemo(() => {
-    return fields.filter(propPasses("dataType", AvaDataTypeUtils.isNumeric));
+    return fields.filter(propPasses("dataType", AvaDataTypes.isNumeric));
   }, [fields]);
 
   const numericOptions = useMemo(() => {

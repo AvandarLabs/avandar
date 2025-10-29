@@ -1,1 +1,1 @@
-export * from "./StructuredQuery.types";
+export type * from "./StructuredQuery.types";

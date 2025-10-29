@@ -1,21 +1,15 @@
 import { Fieldset, Stack, Text } from "@mantine/core";
-import { match } from "ts-pattern";
 import { Select, SelectData } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { makeObject } from "@/lib/utils/objects/builders";
+import { isOfModelType } from "@/lib/utils/guards/guards";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
+import { Models } from "@/models/Model/Models";
 import { QueryAggregationType } from "@/models/queries/QueryAggregationType";
+import { QueryColumn, QueryColumns } from "@/models/queries/QueryColumn";
 import { AggregationSelect } from "./AggregationSelect";
 import { DataExplorerStore } from "./DataExplorerStore";
-import {
-  QueryableColumn,
-  QueryableColumnMultiSelect,
-} from "./QueryableColumnMultiSelect";
-import {
-  QueryableDataSource,
-  QueryableDataSourceIdWithType,
-  QueryableDataSourceSelect,
-} from "./QueryableDataSourceSelect";
+import { QueryColumnMultiSelect } from "./QueryColumnMultiSelect";
+import { QueryDataSourceSelect } from "./QueryDataSourceSelect";
 
 const HIDE_WHERE = true;
 const HIDE_LIMIT = true;
@@ -24,19 +18,6 @@ const orderDirectionOptions = [
   { value: "asc", label: "Ascending" },
   { value: "desc", label: "Descending" },
 ] as const satisfies SelectData<string>;
-
-function makeDataSourceIdWithType(
-  dataSource: QueryableDataSource,
-): QueryableDataSourceIdWithType {
-  return match(dataSource)
-    .with({ type: "Dataset" }, (d) => {
-      return { type: d.type, id: d.object.id };
-    })
-    .with({ type: "EntityConfig" }, (ec) => {
-      return { type: ec.type, id: ec.object.id };
-    })
-    .exhaustive();
-}
 
 export function QueryForm(): JSX.Element {
   const [{ query }, dispatch] = DataExplorerStore.use();
@@ -48,38 +29,30 @@ export function QueryForm(): JSX.Element {
     orderByDirection,
   } = query;
 
-  const fieldOptionsById = makeSelectOptions(queryColumns, {
-    valueFn: prop("column.id"),
-    labelFn: prop("column.name"),
+  const selectedColumnOptions = makeSelectOptions(queryColumns, {
+    valueFn: prop("id"),
+    labelFn: (col) => {
+      return QueryColumns.getDerivedColumnName(col);
+    },
   });
 
   return (
     <form>
       <Stack>
-        <QueryableDataSourceSelect
+        <QueryDataSourceSelect
           value={dataSource ?? null}
           onChange={(newDataSource) => {
             dispatch.setDataSource(newDataSource ?? undefined);
           }}
         />
 
-        <QueryableColumnMultiSelect
+        <QueryColumnMultiSelect
           label="Select columns"
           placeholder="Select columns to query"
-          dataSourceId={
-            dataSource ? makeDataSourceIdWithType(dataSource) : undefined
-          }
+          dataSourceId={dataSource ? Models.getTypedId(dataSource) : undefined}
           value={queryColumns}
-          onChange={(newColumns: readonly QueryableColumn[]) => {
+          onChange={(newColumns: readonly QueryColumn[]) => {
             dispatch.setColumns(newColumns);
-            const newColumnIds = newColumns.map(prop("column.id"));
-            const newAggregations = makeObject(newColumnIds, {
-              valueFn: (colId) => {
-                // if this column already had an aggregation we keep it
-                return aggregations[colId] ?? "none";
-              },
-            });
-            dispatch.setAggregations(newAggregations);
           }}
         />
 
@@ -91,17 +64,17 @@ export function QueryForm(): JSX.Element {
             {queryColumns.map((col) => {
               return (
                 <AggregationSelect
-                  key={col.column.id}
-                  label={col.column.name}
+                  key={col.id}
+                  label={col.baseColumn.name}
                   dataType={
-                    col.type === "DatasetColumn" ?
-                      col.column.dataType
-                    : col.column.options.baseDataType
+                    isOfModelType("DatasetColumn", col.baseColumn) ?
+                      col.baseColumn.dataType
+                    : col.baseColumn.options.baseDataType
                   }
-                  value={aggregations[col.column.id] ?? "none"}
+                  value={aggregations[col.id] ?? "none"}
                   onChange={(newAggregation: QueryAggregationType) => {
                     dispatch.setColumnAggregation({
-                      columnId: col.column.id,
+                      columnId: col.id,
                       aggregation: newAggregation,
                     });
                   }}
@@ -120,7 +93,7 @@ export function QueryForm(): JSX.Element {
           <Select
             clearable
             label="Column"
-            data={fieldOptionsById}
+            data={selectedColumnOptions}
             value={orderByColumn}
             placeholder="Select column to sort by"
             onChange={(newColId) => {

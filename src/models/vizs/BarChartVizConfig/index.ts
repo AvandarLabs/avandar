@@ -1,2 +1,2 @@
-export * from "./BarChartVizConfig.types";
-export * from "./BarChartVizConfigUtils";
+export type * from "./BarChartVizConfig.types";
+export * from "./BarChartVizConfigs";

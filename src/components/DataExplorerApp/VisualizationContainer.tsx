@@ -2,7 +2,6 @@ import { Flex, List, Text } from "@mantine/core";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { flattenError, object, prettifyError, string } from "zod";
-import { Logger } from "@/lib/Logger";
 import { UnknownDataFrame } from "@/lib/types/common";
 import { Callout } from "@/lib/ui/Callout";
 import { DangerText } from "@/lib/ui/text/DangerText";
@@ -13,8 +12,8 @@ import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
 import { isEpochMs, isIsoDateString } from "@/lib/utils/formatters/formatDate";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectValues } from "@/lib/utils/objects/misc";
-import { AvaDataTypeUtils } from "@/models/datasets/AvaDataType";
-import { QueryResultColumn } from "@/models/queries/QueryResultData/QueryResultData.types";
+import { AvaDataTypes } from "@/models/datasets/AvaDataType";
+import { QueryResultColumn } from "@/models/queries/QueryResult/QueryResult.types";
 import { DataExplorerStore } from "./DataExplorerStore";
 
 type Props = {
@@ -63,7 +62,7 @@ export function VisualizationContainer({ columns, data }: Props): JSX.Element {
         .filter((f) => {
           const sampleVal = data[0]?.[f.name];
           return (
-            AvaDataTypeUtils.isTemporal(f.dataType) ||
+            AvaDataTypes.isTemporal(f.dataType) ||
             isIsoDateString(sampleVal) ||
             isEpochMs(sampleVal)
           );
@@ -97,7 +96,6 @@ export function VisualizationContainer({ columns, data }: Props): JSX.Element {
 
       // generate the error message
       const errors = flattenError(error).fieldErrors;
-      Logger.log("errors", errors);
       const errorMessages = objectValues(errors).flat();
       const errorBlock = (
         <List size="xl">

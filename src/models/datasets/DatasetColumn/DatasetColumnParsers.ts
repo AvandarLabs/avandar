@@ -10,20 +10,20 @@ import {
 } from "@/lib/utils/objects/transformations";
 import { pipe } from "@/lib/utils/pipe";
 import { WorkspaceId } from "@/models/Workspace/types";
-import { DatasetId } from "../Dataset/types";
+import { DatasetId } from "../Dataset/Dataset.types";
 import {
   DatasetColumn,
   DatasetColumnId,
   DatasetColumnModel,
 } from "./DatasetColumn.types";
-import { AvaDataTypes } from "../AvaDataType";
 import { DuckDBDataTypes } from "@/clients/DuckDBClient/DuckDBDataType";
+import { AvaDataTypes } from "../AvaDataType";
 
 const DBReadSchema = object({
   created_at: iso.datetime({ offset: true }),
   original_data_type: string(),
   detected_data_type: zodEnum(DuckDBDataTypes),
-  data_type: zodEnum(AvaDataTypes),
+  data_type: zodEnum(AvaDataTypes.Types),
   dataset_id: uuid(),
   description: string().nullable(),
   id: uuid(),
@@ -43,6 +43,7 @@ export const DatasetColumnParsers = makeParserRegistry<DatasetColumnModel>()
       (obj): DatasetColumn => {
         return {
           ...obj,
+          __type: "DatasetColumn",
           id: obj.id as DatasetColumnId,
           datasetId: obj.datasetId as DatasetId,
           workspaceId: obj.workspaceId as WorkspaceId,

@@ -1,23 +1,21 @@
-import {
-  QueryableColumn,
-  QueryableColumnId,
-} from "@/components/DataExplorerApp/QueryableColumnMultiSelect";
-import { QueryableDataSource } from "@/components/DataExplorerApp/QueryableDataSourceSelect";
 import { QueryAggregationType } from "../QueryAggregationType";
 import { UUID } from "@/lib/types/common";
+import { QueryDataSource } from "../QueryDataSource/QueryDataSource.types";
+import { QueryColumn, QueryColumnId } from "../QueryColumn";
+import { Model } from "@/models/Model";
 
-export type OrderByDirection = "asc" | "desc";
-
+type ModelType = "StructuredQuery";
 type CurrentStructuredQueryVersion = 1;
 
-export type StructuredQueryId = UUID<"StructuredQuery">;
+export type OrderByDirection = "asc" | "desc";
+export type StructuredQueryId = UUID<ModelType>;
 
 /**
  * This is the canonical representation of a structured query in the Avandar
  * platform for the Data Explorer app. A DuckDB query is generated from this
  * representation to run local queries.
  */
-export type StructuredQuery = {
+export type StructuredQuery = Model<ModelType, {
   id: StructuredQueryId;
 
   /**
@@ -27,30 +25,30 @@ export type StructuredQuery = {
   version: CurrentStructuredQueryVersion;
 
   /** The data source we are querying from. */
-  dataSource: QueryableDataSource;
+  dataSource: QueryDataSource;
 
   /** The columns that are being queried. */
-  queryColumns: readonly QueryableColumn[];
+  queryColumns: readonly QueryColumn[];
 
   /** The column that we are ordering by. */
-  orderByColumn: QueryableColumnId | undefined;
+  orderByColumn: QueryColumnId | undefined;
 
   /** The direction that we are ordering by. */
   orderByDirection: OrderByDirection | undefined;
 
   /** The aggregations that are being applied to the query columns */
-  aggregations: Record<QueryableColumnId, QueryAggregationType>;
-};
+  aggregations: Record<QueryColumnId, QueryAggregationType>;
+}>;
 
-type EmptyStructuredQuery = {
+type EmptyStructuredQuery = Model<ModelType, {
   id: StructuredQueryId;
   version: CurrentStructuredQueryVersion;
   dataSource: undefined;
-  queryColumns: readonly QueryableColumn[];
+  queryColumns: readonly QueryColumn[];
   orderByColumn: undefined;
   orderByDirection: undefined;
-  aggregations: Record<QueryableColumnId, QueryAggregationType>;
-};
+  aggregations: Record<QueryColumnId, QueryAggregationType>;
+}>;
 
 /**
  * A StructuredQuery type that is still under construction. This is used in

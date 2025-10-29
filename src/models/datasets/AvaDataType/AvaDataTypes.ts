@@ -3,11 +3,9 @@ import { AvaDataType } from "./AvaDataType.types";
 import { registryKeys } from "@/lib/utils/objects/misc";
 import { QueryAggregationType } from "@/models/queries/QueryAggregationType";
 
-/**
- * Data types that can be handled in Avandar.
- */
-export const AvaDataTypes = registryKeys<AvaDataType>(
-  {
+export const AvaDataTypes = {
+  /** Data types that can be handled in Avandar. */
+  Types: registryKeys<AvaDataType>({
     varchar: true,
     bigint: true,
     double: true,
@@ -15,10 +13,7 @@ export const AvaDataTypes = registryKeys<AvaDataType>(
     date: true,
     timestamp: true,
     boolean: true,
-  },
-);
-
-export const AvaDataTypeUtils = {
+  }),
   isText: (avaDataType: AvaDataType): avaDataType is "varchar" => {
     return avaDataType === "varchar";
   },

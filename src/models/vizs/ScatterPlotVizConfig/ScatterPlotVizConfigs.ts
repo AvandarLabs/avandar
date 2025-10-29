@@ -1,39 +1,39 @@
 import { PartialStructuredQuery } from "@/models/queries/StructuredQuery";
 import { VizConfigType, VizType } from "../VizConfig";
 import { IVizConfigModule } from "../VizConfig/IVizConfigModule";
-import { LineChartVizConfig } from "./LineChartVizConfig.types";
+import { ScatterPlotVizConfig } from "./ScatterPlotVizConfig.types";
 import { match } from "ts-pattern";
 import { TableVizConfig } from "../TableVizConfig";
-import { ScatterPlotVizConfig } from "../ScatterPlotVizConfig";
 import { pick } from "@/lib/utils/objects/misc";
 import { Logger } from "@/lib/Logger";
 import { hydrateXYFromQuery } from "../hydrateXYFromQuery";
 import { BarChartVizConfig } from "../BarChartVizConfig";
+import { LineChartVizConfig } from "../LineChartVizConfig";
 
-export const LineChartVizConfigUtils = {
-  vizType: "line",
-  displayName: "Line Chart",
+export const ScatterPlotVizConfigs = {
+  vizType: "scatter",
+  displayName: "Scatter Plot",
 
-  /** Create an empty line chart config */
-  makeEmptyConfig: (): LineChartVizConfig => {
-    return { vizType: "line", xAxisKey: undefined, yAxisKey: undefined };
+  /** Create an empty scatter plot config */
+  makeEmptyConfig: (): ScatterPlotVizConfig => {
+    return { vizType: "scatter", xAxisKey: undefined, yAxisKey: undefined };
   },
 
   /**
-   * Hydrate a line chart viz config from a query config.
+   * Hydrate a scatter plot viz config from a query config.
    */
   hydrateFromQuery: (
-    vizConfig: LineChartVizConfig,
+    vizConfig: ScatterPlotVizConfig,
     query: PartialStructuredQuery,
-  ): LineChartVizConfig => {
+  ): ScatterPlotVizConfig => {
     return hydrateXYFromQuery(vizConfig, query);
   },
 
   /**
-   * Convert a line chart config to a new type.
+   * Convert a scatter plot config to a new type.
    */
   convertVizConfig: <K extends VizType = VizType>(
-    vizConfig: LineChartVizConfig,
+    vizConfig: ScatterPlotVizConfig,
     newVizType: K,
   ): VizConfigType<K> => {
     const currentAxes = pick(vizConfig, ["xAxisKey", "yAxisKey"]);
@@ -42,13 +42,13 @@ export const LineChartVizConfigUtils = {
         return { vizType };
       }).with("bar", (vizType): BarChartVizConfig => {
         return { vizType, ...currentAxes };
-      }).with("line", (): LineChartVizConfig => {
-        return vizConfig;
-      }).with("scatter", (vizType): ScatterPlotVizConfig => {
+      }).with("line", (vizType): LineChartVizConfig => {
         return { vizType, ...currentAxes };
+      }).with("scatter", (): ScatterPlotVizConfig => {
+        return vizConfig;
       }).exhaustive(() => {
         Logger.error("Invalid viz type", { vizType: newVizType });
         throw new Error(`Invalid viz type: ${newVizType}`);
       }) as VizConfigType<K>;
   },
-} as const satisfies IVizConfigModule<"line">;
+} as const satisfies IVizConfigModule<"scatter">;

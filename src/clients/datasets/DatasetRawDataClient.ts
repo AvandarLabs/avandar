@@ -18,7 +18,7 @@ import { DuckDBClient, UnknownRow } from "../DuckDBClient";
 import { DuckDBDataTypeUtils } from "../DuckDBClient/DuckDBDataType";
 import { scalar, singleton } from "../DuckDBClient/queryResultHelpers";
 import { DuckDBStructuredQuery } from "../DuckDBClient/DuckDBClient.types";
-import { QueryResultData } from "@/models/queries/QueryResultData/QueryResultData.types";
+import { QueryResult } from "@/models/queries/QueryResult/QueryResult.types";
 import { LocalDatasetClient } from "./LocalDatasetClient";
 
 type TextFieldSummary = {
@@ -86,7 +86,11 @@ type DatasetLocalStructuredQueryOptions = {
 
 type DatasetRawDataClientQueries = {
   /**
-   * Checks if a dataset is available locally.
+   * Checks if a dataset is available locally. A dataset being "available"
+   * locally means that we have its raw data persisted in IndexedDB (accessible
+   * through the LocalDatasetClient). It may not necessarily be in DuckDB (which
+   * is in-memory), but if it is in local disk (IndexedDB) then it can be loaded
+   * into memory when needed.
    *
    * @param params The {@link DatasetId} to check.
    * @returns `true` if the dataset is loaded locally, `false` otherwise.
@@ -114,7 +118,7 @@ type DatasetRawDataClientQueries = {
    */
   runLocalRawQuery: <T extends UnknownRow = UnknownRow>(
     params: DatasetLocalRawQueryOptions,
-  ) => Promise<QueryResultData<T>>;
+  ) => Promise<QueryResult<T>>;
 
   /**
    * Runs a structured query against the user's locally loaded raw data.
@@ -136,7 +140,7 @@ type DatasetRawDataClientQueries = {
    */
   runLocalStructuredQuery: <T extends UnknownRow = UnknownRow>(
     params: DatasetLocalStructuredQueryOptions,
-  ) => Promise<QueryResultData<T>>;
+  ) => Promise<QueryResult<T>>;
 
   getSummary: (params: { datasetId: DatasetId }) => Promise<DatasetSummary>;
 
@@ -250,7 +254,7 @@ function createDatasetRawDataClient(): WithLogger<
 
       runLocalStructuredQuery: async <T extends UnknownRow = UnknownRow>(
         params: DatasetLocalStructuredQueryOptions,
-      ): Promise<QueryResultData<T>> => {
+      ): Promise<QueryResult<T>> => {
         const logger = baseLogger.appendName("runLocalStructuredQuery");
         logger.log("Running structured query", params);
         const {

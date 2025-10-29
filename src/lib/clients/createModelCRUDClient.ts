@@ -1,7 +1,7 @@
+import { EmptyObject } from "type-fest";
 import { ILogger } from "../Logger";
 import { ModelCRUDParserRegistry } from "../models/makeParserRegistry";
 import { ModelCRUDTypes } from "../models/ModelCRUDTypes";
-import { EmptyObject } from "../types/common";
 import { AnyFunctionWithSignature } from "../types/utilityTypes";
 import { FiltersByColumn } from "../utils/filters/filtersByColumn";
 import { objectKeys, omit } from "../utils/objects/misc";
@@ -243,11 +243,13 @@ export type ModelCRUDClient<
   M extends ModelCRUDTypes,
   ExtendedQueriesClient extends HookableClient = EmptyObject,
   ExtendedMutationsClient extends HookableClient = EmptyObject,
-  FullClient extends BaseModelCRUDClient<ModelCRUDTypes> &
-    ExtendedQueriesClient &
-    ExtendedMutationsClient = BaseModelCRUDClient<M> &
-    ExtendedQueriesClient &
-    ExtendedMutationsClient,
+  FullClient extends
+    & BaseModelCRUDClient<ModelCRUDTypes>
+    & ExtendedQueriesClient
+    & ExtendedMutationsClient =
+      & BaseModelCRUDClient<M>
+      & ExtendedQueriesClient
+      & ExtendedMutationsClient,
 > = WithLogger<
   WithQueryHooks<
     FullClient,
@@ -382,11 +384,10 @@ export function createModelCRUDClient<
         // `getCount` query
         totalRows = pageRows.length;
       } else {
-        totalRows =
-          (await crudFunctions.getCount({
-            where: params.where,
-            logger,
-          })) ?? 0;
+        totalRows = (await crudFunctions.getCount({
+          where: params.where,
+          logger,
+        })) ?? 0;
       }
     }
 
@@ -653,7 +654,6 @@ export function createModelCRUDClient<
       ...baseClient,
       ...modelClientWithHooks,
       parsers,
-
       // Using `any` here only because TypeScript is struggling with the
       // complexity of the generics and function name extractions.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

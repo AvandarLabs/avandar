@@ -1,4 +1,4 @@
-import { iso, object, string, uuid, enum as zodEnum } from "zod";
+import { enum as zodEnum, iso, object, string, uuid } from "zod";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { excludeNullsExceptInProps } from "@/lib/utils/objects/higherOrderFuncs";
@@ -11,7 +11,8 @@ import {
 import { pipe } from "@/lib/utils/pipe";
 import { UserId, UserProfileId } from "@/models/User/types";
 import { WorkspaceId } from "@/models/Workspace/types";
-import { Dataset, DatasetId, DatasetModel, DatasetSourceTypes } from "./types";
+import { Dataset, DatasetId, DatasetModel } from "./Dataset.types";
+import { Datasets } from "./Datasets";
 
 const DBReadSchema = object({
   created_at: iso.datetime({ offset: true }),
@@ -21,7 +22,7 @@ const DBReadSchema = object({
   name: string(),
   owner_id: uuid(),
   owner_profile_id: uuid(),
-  source_type: zodEnum(DatasetSourceTypes),
+  source_type: zodEnum(Datasets.SourceTypes),
   updated_at: iso.datetime({ offset: true }),
   workspace_id: uuid(),
 });
@@ -35,6 +36,7 @@ export const DatasetParsers = makeParserRegistry<DatasetModel>().build({
     (obj): Dataset => {
       return {
         ...obj,
+        __type: "Dataset",
         id: obj.id as DatasetId,
         ownerId: obj.ownerId as UserId,
         ownerProfileId: obj.ownerProfileId as UserProfileId,

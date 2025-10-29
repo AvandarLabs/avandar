@@ -1,11 +1,10 @@
-import { emptyObjectSymbol } from "./global";
 import { Brand } from "./utilityTypes";
 
-export type UUID<B extends string = never> =
-  [B] extends [never] ? Brand<string, "UUID"> : Brand<string, `${B}UUID`>;
+export type UUID<B extends string = never> = [B] extends [never]
+  ? Brand<string, "UUID">
+  : Brand<string, `${B}UUID`>;
 
 export type UnknownObject = Record<PropertyKey, unknown>;
-export type EmptyObject = { [emptyObjectSymbol]?: never };
 
 /**
  * Raw Cell Values are *always* strings. This represents the type of
@@ -79,9 +78,12 @@ export enum MIMEType {
   APPLICATION_MS_WORD = "application/msword",
   APPLICATION_MS_EXCEL = "application/vnd.ms-excel",
   APPLICATION_MS_POWERPOINT = "application/vnd.ms-powerpoint",
-  APPLICATION_OPENXML_WORD = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  APPLICATION_OPENXML_EXCEL = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  APPLICATION_OPENXML_POWERPOINT = "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  APPLICATION_OPENXML_WORD =
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  APPLICATION_OPENXML_EXCEL =
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  APPLICATION_OPENXML_POWERPOINT =
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
 
   // Open Office / LibreOffice
   APPLICATION_OASIS_ODT = "application/vnd.oasis.opendocument.text",

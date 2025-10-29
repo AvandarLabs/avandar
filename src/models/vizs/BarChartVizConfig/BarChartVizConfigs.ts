@@ -10,7 +10,7 @@ import { pick } from "@/lib/utils/objects/misc";
 import { Logger } from "@/lib/Logger";
 import { hydrateXYFromQuery } from "../hydrateXYFromQuery";
 
-export const BarChartVizConfigUtils = {
+export const BarChartVizConfigs = {
   vizType: "bar",
   displayName: "Bar Chart",
 

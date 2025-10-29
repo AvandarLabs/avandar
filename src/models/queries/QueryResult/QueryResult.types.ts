@@ -6,7 +6,7 @@ export type QueryResultColumn = {
   dataType: AvaDataType;
 };
 
-export type QueryResultData<T extends UnknownObject = UnknownObject> = {
+export type QueryResult<T extends UnknownObject = UnknownObject> = {
   columns: QueryResultColumn[];
   data: T[];
 
@@ -14,8 +14,8 @@ export type QueryResultData<T extends UnknownObject = UnknownObject> = {
   numRows: number;
 };
 
-export type QueryResultDataPage<T extends UnknownObject = UnknownObject> =
-  & QueryResultData<T>
+export type QueryResultPage<T extends UnknownObject = UnknownObject> =
+  & QueryResult<T>
   & {
     /**
      * The total number of rows in the data store (for the query that

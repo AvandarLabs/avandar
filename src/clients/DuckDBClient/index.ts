@@ -27,9 +27,10 @@ import {
   DuckDBStructuredQuery,
 } from "./DuckDBClient.types";
 import {
-  QueryResultData,
-  QueryResultDataPage,
-} from "@/models/queries/QueryResultData/QueryResultData.types";
+  QueryResult,
+  QueryResultPage,
+} from "@/models/queries/QueryResult/QueryResult.types";
+import { DuckDBQueryAggregations } from "./DuckDBQueryAggregations";
 
 const MANUAL_BUNDLES: duckdb.DuckDBBundles = {
   mvp: {
@@ -93,7 +94,8 @@ export type UnknownRow = Record<string, unknown>;
 
 function arrowTableToJS<RowObject extends UnknownRow>(
   arrowTable: arrow.Table<Record<string, arrow.DataType>>,
-): QueryResultData<RowObject> {
+  { logger = Logger }: { logger?: ILogger } = {},
+): QueryResult<RowObject> {
   const jsDataRows = arrowTable.toArray().map((row) => {
     const jsRow = row.toJSON();
     return mapObjectValues(jsRow, (v) => {
@@ -109,7 +111,9 @@ function arrowTableToJS<RowObject extends UnknownRow>(
     });
   });
   return {
-    columns: arrowTable.schema.fields.map(arrowFieldToQueryResultField),
+    columns: arrowTable.schema.fields.map((field) => {
+      return arrowFieldToQueryResultField(field, { logger });
+    }),
     data: jsDataRows,
     numRows: jsDataRows.length,
   };
@@ -557,10 +561,10 @@ class DuckDBClientImpl {
       params?: Record<string, string | number | bigint>;
       conn?: duckdb.AsyncDuckDBConnection;
     } = {},
-  ): Promise<QueryResultData<RowObject>> {
+  ): Promise<QueryResult<RowObject>> {
     const { params = {} } = options;
     const conn = options.conn ?? (await this.#connect());
-    let queryResults: QueryResultData<RowObject>;
+    let queryResults: QueryResult<RowObject>;
     try {
       let queryStringToUse = queryString;
       const paramNames = objectKeys(params);
@@ -575,7 +579,9 @@ class DuckDBClientImpl {
       const arrowTable = await conn.query<Record<string, arrow.DataType>>(
         queryStringToUse,
       );
-      queryResults = arrowTableToJS<RowObject>(arrowTable);
+      queryResults = arrowTableToJS<RowObject>(arrowTable, {
+        logger: this.#logger,
+      });
     } catch (error) {
       this.#logger.error(error, { queryString });
       throw error;
@@ -600,7 +606,7 @@ class DuckDBClientImpl {
       },
       "limit" | "offset"
     >,
-  ): Promise<QueryResultDataPage<T>> {
+  ): Promise<QueryResultPage<T>> {
     const { tableName, pageSize, pageNum, totalRows } = queryParams;
     const pageData = await this.runStructuredQuery<T>({
       ...queryParams,
@@ -650,7 +656,7 @@ class DuckDBClientImpl {
   }: Omit<
     DuckDBStructuredQuery & { pageSize: number; pageNum: number },
     "limit" | "offset"
-  >): Promise<QueryResultDataPage<T>> {
+  >): Promise<QueryResultPage<T>> {
     const page = await this.#getPageHelper<T>({
       selectColumnNames: selectColumns,
       groupByColumnNames: groupByColumns,
@@ -675,7 +681,7 @@ class DuckDBClientImpl {
     }: Omit<DuckDBStructuredQuery, "limit" | "offset"> & {
       pageSize?: number;
     },
-    callback: (page: QueryResultDataPage<T>) => void | Promise<void>,
+    callback: (page: QueryResultPage<T>) => void | Promise<void>,
   ): Promise<{ numPages: number; numRows: number }> {
     const firstPage = await this.#getPageHelper<T>({
       selectColumnNames,
@@ -725,9 +731,9 @@ class DuckDBClientImpl {
     castTimestampsToISO,
     limit,
     offset,
-  }: DuckDBStructuredQuery): Promise<QueryResultData<RowObject>> {
+  }: DuckDBStructuredQuery): Promise<QueryResult<RowObject>> {
     const conn = await this.#connect();
-    let queryResults: QueryResultData<RowObject>;
+    let queryResults: QueryResult<RowObject>;
     const tableColumns = await this.getTableSchema(tableName);
     const timestampColumnNames = tableColumns
       .filter((col) => {
@@ -768,25 +774,31 @@ class DuckDBClientImpl {
 
     // apply aggregations
     query = objectEntries(aggregations).reduce(
-      (newQuery, [fieldName, aggType]) => {
+      (newQuery, [columnName, aggType]) => {
+        const aggregationColumnName = DuckDBQueryAggregations
+          .getAggregationColumnName(aggType, columnName);
+        const aggregationColumn = { [aggregationColumnName]: columnName };
+
         return match(aggType)
           .with("sum", () => {
-            return query.sum(fieldName);
+            return newQuery.sum(aggregationColumn);
           })
           .with("avg", () => {
-            return query.avg(fieldName);
+            return newQuery.avg(aggregationColumn);
           })
           .with("count", () => {
-            return query.count(fieldName);
+            return newQuery.count(aggregationColumn);
           })
           .with("max", () => {
-            return query.max(fieldName);
+            return newQuery.max(aggregationColumn);
           })
           .with("min", () => {
-            return query.min(fieldName);
+            return newQuery.min(aggregationColumn);
           })
           .exhaustive(() => {
-            return newQuery;
+            throw new Error(
+              `Invalid DuckDBQueryAggregationType: "${aggType}"`,
+            );
           });
       },
       query,
@@ -807,7 +819,9 @@ class DuckDBClientImpl {
         queryString,
       );
 
-      queryResults = arrowTableToJS<RowObject>(arrowTable);
+      queryResults = arrowTableToJS<RowObject>(arrowTable, {
+        logger: this.#logger,
+      });
     } catch (error) {
       this.#logger.error(error, { query: query.toString() });
       throw error;
