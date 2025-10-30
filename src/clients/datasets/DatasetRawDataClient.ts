@@ -37,7 +37,7 @@ type DateFieldSummary = {
   type: "date";
   mostRecentDate: string;
   oldestDate: string;
-  datasetDuration: string;
+  datasetCoverage: string;
 };
 
 export type ColumnSummary = {
@@ -423,14 +423,50 @@ function createDatasetRawDataClient(): WithLogger<
                   stdDev: stdDev,
                 };
               })
-              .with("date", "time", "timestamp", () => {
-                notifyDevAlert("Date field summary not implemented");
-                // TODO(jpsyx): implement this
+              .with("date", "time", "timestamp", async () => {
+                const singleQuery = dataType === "time"
+                  ? `SELECT
+                           COALESCE(CAST(MAX("$columnName$") AS VARCHAR), '') AS most_recent,
+                           COALESCE(CAST(MIN("$columnName$") AS VARCHAR), '') AS oldest,
+                           NULL AS days
+                         FROM "$tableName$"
+                         WHERE "$columnName$" IS NOT NULL`
+                  : `SELECT
+                           COALESCE(CAST(MAX("$columnName$") AS VARCHAR), '') AS most_recent,
+                           COALESCE(CAST(MIN("$columnName$") AS VARCHAR), '') AS oldest,
+                           CASE
+                             WHEN MIN("$columnName$") IS NULL OR MAX("$columnName$") IS NULL THEN 0
+                             ELSE DATE_DIFF('day',
+                               CAST(MIN("$columnName$") AS DATE),
+                               CAST(MAX("$columnName$") AS DATE)
+                             ) + 1
+                           END AS days
+                         FROM "$tableName$"
+                         WHERE "$columnName$" IS NOT NULL`;
+
+                const row = singleton(
+                  await DuckDBClient.runRawQuery<{
+                    most_recent: string | null;
+                    oldest: string | null;
+                    days: bigint | number | null;
+                  }>(singleQuery, {
+                    params: { columnName, tableName: datasetId },
+                  }),
+                ) ?? { most_recent: "", oldest: "", days: 0 };
+
+                const mostRecentDate = String(row.most_recent ?? "");
+                const oldestDate = String(row.oldest ?? "");
+                const datasetCoverage = row.days === null
+                  ? "Unknown"
+                  : Number(row.days) === 1
+                  ? "1 day"
+                  : `${Number(row.days)} days`;
+
                 return {
                   type: "date" as const,
-                  mostRecentDate: "",
-                  oldestDate: "",
-                  datasetDuration: "",
+                  mostRecentDate,
+                  oldestDate,
+                  datasetCoverage,
                 };
               })
               .with("boolean", () => {
