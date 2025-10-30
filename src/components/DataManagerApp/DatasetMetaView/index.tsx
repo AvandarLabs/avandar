@@ -29,6 +29,7 @@ import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { matchLiteral } from "@/lib/utils/strings/matchLiteral";
+import { AvaDataTypes } from "@/models/datasets/AvaDataType";
 import { Dataset, DatasetWithColumns } from "@/models/datasets/Dataset";
 import { DataSummaryView } from "./DataSummaryView";
 import { EditDatasetView } from "./EditDatasetView";
@@ -70,6 +71,9 @@ const DATASET_METADATA_RENDER_OPTIONS = {
       keyRenderOptions: {
         createdAt: {
           asDate: true,
+        },
+        dataType: {
+          renderValue: AvaDataTypes.toDisplayValue,
         },
       },
       includeKeys: ["name", "dataType", "description"],
