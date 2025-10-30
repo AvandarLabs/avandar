@@ -15,7 +15,7 @@ import {
   PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
   PrimitiveValue,
   PrimitiveValueRenderOptions,
-} from "../types";
+} from "../ObjectDescriptionList.types";
 import { NestedArraysBlock } from "./NestedArraysBlock";
 import { ObjectArrayBlock } from "./ObjectArrayBlock";
 import { PrimitiveFieldValueArrayBlock } from "./PrimitiveFieldValueArrayBlock";

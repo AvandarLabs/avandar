@@ -1,12 +1,15 @@
 import { Text } from "@mantine/core";
-import { formatDate } from "@/lib/utils/formatters/formatDate";
+import {
+  formatDate,
+  isValidDateValue,
+} from "@/lib/utils/formatters/formatDate";
 import { isDate } from "@/lib/utils/guards/guards";
 import { isStringOrNumber } from "./guards";
 import type {
   GenericRootData,
   PrimitiveValue,
   PrimitiveValueRenderOptions,
-} from "./types";
+} from "./ObjectDescriptionList.types";
 
 type Props<
   T extends PrimitiveValue,
@@ -22,9 +25,6 @@ type Props<
    * If `PrimitiveValueItem` is being used directly, outsiede of an
    * `ObjectDescriptionList` hierarchy, this prop does not need to be
    * passed in.
-   *
-   * TODO(jpsyx): this is a good indication that we should add `rootData`
-   * into a Context held by the `ObjectDescriptionList` component.
    */
   rootData?: RootData;
 } & PrimitiveValueRenderOptions<T, RootData>;
@@ -37,6 +37,7 @@ export function PrimitiveValueItem<
   RootData extends GenericRootData | undefined,
 >({
   value,
+  asDate = false,
   rootData = undefined,
   renderValue = undefined,
   renderEmptyString = "Empty text",
@@ -44,7 +45,8 @@ export function PrimitiveValueItem<
   renderBooleanFalse = "No",
   renderNullString = "No value",
   renderUndefinedString = "No value",
-  dateFormat,
+  dateFormat = "YYYY-MM-DDTHH:mm:ssZ",
+  dateTimeZone = "local",
 }: Props<T, RootData>): JSX.Element {
   if (renderValue !== undefined) {
     const customRenderedValue = renderValue(value, rootData as RootData);
@@ -91,14 +93,6 @@ export function PrimitiveValueItem<
     }
   }
 
-  if (typeof value === "string") {
-    return <Text span>{value}</Text>;
-  }
-
-  if (typeof value === "number") {
-    return <Text span>{Intl.NumberFormat().format(value)}</Text>;
-  }
-
   if (typeof value === "boolean") {
     if (isStringOrNumber(renderBooleanTrue)) {
       return <Text span>{value ? renderBooleanTrue : renderBooleanFalse}</Text>;
@@ -107,8 +101,20 @@ export function PrimitiveValueItem<
     }
   }
 
-  if (isDate(value)) {
-    return <Text span>{formatDate(value, dateFormat ?? "YYYY-MM-DD")}</Text>;
+  if (typeof value === "string" && !asDate) {
+    return <Text span>{value}</Text>;
+  }
+
+  if (typeof value === "number" && !asDate) {
+    return <Text span>{Intl.NumberFormat().format(value)}</Text>;
+  }
+
+  if (isDate(value) || (asDate && isValidDateValue(value))) {
+    return (
+      <Text span>
+        {formatDate(value, { format: dateFormat, zone: dateTimeZone })}
+      </Text>
+    );
   }
 
   // fallback, just cast to string

@@ -3,14 +3,17 @@ import { useMemo } from "react";
 import { objectKeys } from "@/lib/utils/objects/misc";
 import { camelToTitleCase } from "@/lib/utils/strings/transformations";
 import { CollapsibleItem } from "../CollapsibleItem";
+import { getOrderedKeys } from "../gerOrderedKeys/getOrderedKeys";
 import {
   AnyDescribableValueRenderOptions,
   DescribableObject,
   GenericRootData,
   ObjectArrayRenderOptions,
   ObjectRenderOptions,
-} from "../types";
+} from "../ObjectDescriptionList.types";
 import { ValueItemContainer } from "../ValueItemContainer";
+
+const DEFAULT_EXCLUDE_KEYS_PATTERN = "_";
 
 type Props<T extends DescribableObject, RootData extends GenericRootData> = {
   values: readonly T[];
@@ -32,9 +35,6 @@ export function ObjectArrayBlock<
   maxItemsCount,
   ...moreRenderOptions
 }: Props<T, RootData>): JSX.Element | null {
-  const excludeKeySet = new Set(itemRenderOptions?.excludeKeys);
-  const includeKeySet = new Set(itemRenderOptions?.includeKeys);
-
   const valuesToRender = useMemo(() => {
     return maxItemsCount === undefined ? values : (
         values.slice(0, maxItemsCount)
@@ -58,39 +58,32 @@ export function ObjectArrayBlock<
     };
 
     const firstEntity = valuesToRender[0]!;
-    const headers = objectKeys(firstEntity)
-      .filter((headerKey) => {
-        return (
-          (includeKeySet.has(headerKey) || includeKeySet.size === 0) &&
-          !excludeKeySet.has(headerKey)
-        );
-      })
-      .map((headerKey) => {
-        const customRenderedHeader =
-          renderTableHeader ?
-            renderTableHeader(headerKey, rootData)
-          : undefined;
+    const headerKeys = getOrderedKeys({
+      allKeys: objectKeys(firstEntity),
+      includeKeys: itemRenderOptions?.includeKeys ?? [],
+      excludeKeys: itemRenderOptions?.excludeKeys ?? [],
+      excludeKeysPattern:
+        itemRenderOptions?.excludeKeysPattern ?? DEFAULT_EXCLUDE_KEYS_PATTERN,
+    });
 
-        return (
-          <Table.Th key={headerKey} tt="capitalize">
-            {customRenderedHeader !== undefined ?
-              customRenderedHeader
-            : camelToTitleCase(headerKey)}
-          </Table.Th>
-        );
-      });
+    const headers = headerKeys.map((headerKey) => {
+      const customRenderedHeader =
+        renderTableHeader ? renderTableHeader(headerKey, rootData) : undefined;
+
+      return (
+        <Table.Th key={headerKey} tt="capitalize">
+          {customRenderedHeader !== undefined ?
+            customRenderedHeader
+          : camelToTitleCase(headerKey)}
+        </Table.Th>
+      );
+    });
 
     const rows = valuesToRender.map((rowObject, idx) => {
       const rowId = String(rowObject[idKey ?? "id"] ?? idx);
       return (
         <Table.Tr key={rowId}>
-          {objectKeys(rowObject).map((fieldKey) => {
-            if (
-              excludeKeySet.has(fieldKey) ||
-              (includeKeySet.size > 0 && !includeKeySet.has(fieldKey))
-            ) {
-              return null;
-            }
+          {headerKeys.map((fieldKey) => {
             const fieldVal = rowObject[fieldKey];
 
             // compute the child's render options to pass down

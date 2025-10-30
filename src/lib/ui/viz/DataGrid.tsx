@@ -3,7 +3,10 @@ import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
 import { Writable } from "type-fest";
 import { UnknownDataFrame } from "@/lib/types/common";
-import { formatDate } from "@/lib/utils/formatters/formatDate";
+import {
+  formatDate,
+  FormattableTimezone,
+} from "@/lib/utils/formatters/formatDate";
 
 type Props = {
   columnNames: readonly string[];
@@ -17,7 +20,7 @@ type Props = {
   height?: number | string;
   dateColumns?: ReadonlySet<string>;
   dateFormat?: string;
-  timezone?: string;
+  timezone?: FormattableTimezone;
 };
 
 export function DataGrid({
@@ -37,7 +40,10 @@ export function DataGrid({
         valueFormatter:
           dateColumns?.has(field) ?
             (p: { value: unknown }) => {
-              return formatDate(p.value, dateFormat, timezone);
+              return formatDate(p.value, {
+                format: dateFormat,
+                zone: timezone,
+              });
             }
           : undefined,
       };

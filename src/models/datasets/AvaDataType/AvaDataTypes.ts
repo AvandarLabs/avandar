@@ -1,7 +1,8 @@
 import { match } from "ts-pattern";
-import { AvaDataType } from "./AvaDataType.types";
 import { registryKeys } from "@/lib/utils/objects/misc";
+import { matchLiteral } from "@/lib/utils/strings/matchLiteral";
 import { QueryAggregationType } from "@/models/queries/QueryAggregationType";
+import { AvaDataType } from "./AvaDataType.types";
 
 export const AvaDataTypes = {
   /** Data types that can be handled in Avandar. */
@@ -20,11 +21,27 @@ export const AvaDataTypes = {
   isNumeric: (avaDataType: AvaDataType): avaDataType is "bigint" | "double" => {
     return avaDataType === "bigint" || avaDataType === "double";
   },
+  toDisplayValue: (avaDataType: AvaDataType): string => {
+    return matchLiteral(avaDataType, {
+      varchar: "Text",
+      bigint: "Number",
+      double: "Number",
+      time: "Time",
+      date: "Date",
+      timestamp: "Timestamp",
+      boolean: "Boolean",
+      _otherwise: avaDataType,
+    });
+  },
+
   isTemporal: (
     avaDataType: AvaDataType,
   ): avaDataType is "date" | "time" | "timestamp" => {
-    return avaDataType === "date" || avaDataType === "time" ||
-      avaDataType === "timestamp";
+    return (
+      avaDataType === "date" ||
+      avaDataType === "time" ||
+      avaDataType === "timestamp"
+    );
   },
   getValidQueryAggregations: (
     avaDataType: AvaDataType,

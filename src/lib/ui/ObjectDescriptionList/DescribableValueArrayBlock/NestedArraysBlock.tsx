@@ -5,7 +5,7 @@ import {
   DescribableValueArrayRenderOptions,
   GenericRootData,
   NestedArrayRenderOptions,
-} from "../types";
+} from "../ObjectDescriptionList.types";
 import { ValueItemContainer } from "../ValueItemContainer";
 
 type Props<T extends DescribableValue, RootData extends GenericRootData> = {
