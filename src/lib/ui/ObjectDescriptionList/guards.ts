@@ -1,5 +1,9 @@
 import { isArray, isPlainObject } from "@/lib/utils/guards/guards";
-import { DescribableObject, DescribableValue, PrimitiveValue } from "./types";
+import {
+  DescribableObject,
+  DescribableValue,
+  PrimitiveValue,
+} from "./ObjectDescriptionList.types";
 
 export function isPrimitiveDescribableValue(
   value: DescribableValue,

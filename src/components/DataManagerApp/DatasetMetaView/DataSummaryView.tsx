@@ -26,6 +26,12 @@ export function DataSummaryView({ datasetId }: Props): JSX.Element {
       {summary?.columnSummaries ?
         <>
           <ObjectDescriptionList
+            data={{
+              "Number of columns": summary.columns,
+              "Number of rows": summary.rows,
+            }}
+          />
+          <ObjectDescriptionList
             data={summary.columnSummaries}
             titleKey="name"
             defaultExpanded={true}
