@@ -2,7 +2,12 @@ import camelcaseKeys, { CamelCaseKeys } from "camelcase-keys";
 import snakecaseKeys, { SnakeCaseKeys } from "snakecase-keys";
 import { ConditionalKeys } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
-import { ExcludeDeep, ReplaceTypes, SwapDeep } from "@/lib/types/utilityTypes";
+import {
+  ExcludeDeep,
+  ReplaceTypes,
+  StringKeyOf,
+  SwapDeep,
+} from "@/lib/types/utilityTypes";
 import { isNull, isPlainObject, isUndefined } from "../guards/guards";
 import { constant } from "../higherOrderFuncs";
 import { objectKeys } from "./misc";
@@ -243,22 +248,26 @@ export function excludeNullsIn<T extends UnknownObject, K extends keyof T>(
 
 export type ExcludeNullsExceptIn<
   T extends UnknownObject,
-  K extends keyof T,
-  KeysToExcludeNulls extends keyof T = Exclude<keyof T, K>,
+  KeysToNotChange extends StringKeyOf<T>,
+  KeysToExcludeNulls extends StringKeyOf<T> = Exclude<
+    StringKeyOf<T>,
+    KeysToNotChange
+  >,
 > =
-  & Omit<T, KeysToExcludeNulls>
+  & Pick<T, KeysToNotChange>
   & {
     [Key in KeysToExcludeNulls]: Exclude<T[Key], null>;
   };
 
 /**
- * Excludes nulls from all keys except the specified keys. Those keys
- * will be left as is. This is a shallow operation.
+ * Excludes nulls from all keys except for the specified keys. Those keys will
+ * be left as is. This is a shallow operation.
  *
  * If no keys are specified, we assume `keysToKeepNull` is the entire
  * object. Therefore, the object is left unchanged.
  *
- * This is a shallow operation.
+ * At the type level, any keys that can possibly be `null` will now have a
+ * union with `undefined`.
  *
  * @param obj The object to exclude nulls from.
  * @param keysToKeepNull The keys to keep nulls for.
@@ -267,10 +276,10 @@ export type ExcludeNullsExceptIn<
  */
 export function excludeNullsExceptIn<
   T extends UnknownObject,
-  K extends keyof T,
+  K extends StringKeyOf<T>,
 >(
   obj: T,
-  keysToKeepNull: Extract<K, string> | readonly K[],
+  keysToKeepNull: K | readonly K[],
 ): ExcludeNullsExceptIn<T, K> {
   const keys = typeof keysToKeepNull === "string"
     ? [keysToKeepNull]

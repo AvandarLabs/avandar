@@ -3,6 +3,7 @@ import {
   formatDate,
   isValidDateValue,
 } from "@/lib/utils/formatters/formatDate";
+import { formatNumber } from "@/lib/utils/formatters/formatNumber";
 import { isDate } from "@/lib/utils/guards/guards";
 import { isStringOrNumber } from "./guards";
 import type {
@@ -106,7 +107,11 @@ export function PrimitiveValueItem<
   }
 
   if (typeof value === "number" && !asDate) {
-    return <Text span>{Intl.NumberFormat().format(value)}</Text>;
+    return (
+      <Text span>
+        {formatNumber(value, { locale: "en-US", useGrouping: true })}
+      </Text>
+    );
   }
 
   if (isDate(value) || (asDate && isValidDateValue(value))) {

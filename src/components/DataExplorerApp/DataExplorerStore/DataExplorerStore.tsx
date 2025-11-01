@@ -17,7 +17,7 @@ type DataExplorerState = {
   vizConfig: VizConfig;
 };
 
-const DEFAULT_APP_STATE: DataExplorerState = {
+const initialState: DataExplorerState = {
   query: StructuredQueries.makeEmpty(),
   vizConfig: {
     vizType: "table",
@@ -26,7 +26,7 @@ const DEFAULT_APP_STATE: DataExplorerState = {
 
 export const DataExplorerStore = createStore({
   name: "DataExplorer",
-  initialState: DEFAULT_APP_STATE,
+  initialState,
   actions: {
     /** Set the data source for the query. */
     setDataSource: (

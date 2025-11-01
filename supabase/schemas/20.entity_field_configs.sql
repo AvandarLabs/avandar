@@ -1,12 +1,6 @@
-create type public.entity_field_configs__class as enum(
-  'dimension',
-  'metric'
-);
-
 create type public.entity_field_configs__value_extractor_type as enum(
   'dataset_column_value',
-  'manual_entry',
-  'aggregation'
+  'manual_entry'
 );
 
 create table public.entity_field_configs (
@@ -20,35 +14,13 @@ create table public.entity_field_configs (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   -- Discriminating columns
-  class public.entity_field_configs__class not null,
-  base_data_type public.datasets__ava_data_type not null,
+  data_type public.datasets__ava_data_type not null,
   value_extractor_type public.entity_field_configs__value_extractor_type not null,
   -- Dimension-related columns
-  is_title_field boolean not null default false,
-  is_id_field boolean not null default false,
-  is_array boolean,
-  allow_manual_edit boolean not null default false,
-  -- Constraints
-  -- Ensure title and id fields can never be "metric" fields
-  constraint metrics_cant_be_titles check (
-    not (
-      class = 'metric' and
-      is_title_field
-    )
-  ),
-  constraint metrics_cant_be_ids check (
-    not (
-      class = 'metric' and
-      is_id_field
-    )
-  ),
-  -- Ensure metrics can never allow manual editing
-  constraint metrics_dont_allow_manual_edit check (
-    not (
-      class = 'metric' and
-      allow_manual_edit
-    )
-  )
+  is_title_field boolean not null,
+  is_id_field boolean not null,
+  is_array boolean not null,
+  allow_manual_edit boolean not null
 );
 
 -- Enable row level security

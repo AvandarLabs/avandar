@@ -13,6 +13,7 @@ import { UserId, UserProfileId } from "@/models/User/types";
 import { WorkspaceId } from "@/models/Workspace/types";
 import { Dataset, DatasetId, DatasetModel } from "./Dataset.types";
 import { Datasets } from "./Datasets";
+import { Models } from "@/models/Model";
 
 const DBReadSchema = object({
   created_at: iso.datetime({ offset: true }),
@@ -34,14 +35,13 @@ export const DatasetParsers = makeParserRegistry<DatasetModel>().build({
     camelCaseKeysDeep,
     nullsToUndefinedDeep,
     (obj): Dataset => {
-      return {
+      return Models.make("Dataset", {
         ...obj,
-        __type: "Dataset",
         id: obj.id as DatasetId,
         ownerId: obj.ownerId as UserId,
         ownerProfileId: obj.ownerProfileId as UserProfileId,
         workspaceId: obj.workspaceId as WorkspaceId,
-      };
+      });
     },
   ),
   fromModelInsertToDBInsert: pipe(

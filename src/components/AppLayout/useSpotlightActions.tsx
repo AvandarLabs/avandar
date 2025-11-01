@@ -1,8 +1,9 @@
+import { modals } from "@mantine/modals";
 import {
   SpotlightActionData,
   SpotlightActionGroupData,
 } from "@mantine/spotlight";
-import { IconTrash } from "@tabler/icons-react";
+import { IconDatabase, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { DuckDBClient } from "@/clients/DuckDBClient";
@@ -103,6 +104,23 @@ export function useSpotlightActions(
                 notifySuccess({
                   title: "Check the console",
                   message: "DuckDB tables have been printed to the console.",
+                });
+              },
+            },
+
+            {
+              id: "show-duckdb-schema",
+              label: "Show DuckDB schemas",
+              description: "Show the schema of the DuckDB database",
+              leftSection: <IconDatabase size={24} stroke={1.5} />,
+              onClick: async () => {
+                const { DevDuckDBTableSchemaView } = await import(
+                  "@/components/common/spotlight-modals/DevDuckDBTableSchemaView"
+                );
+                modals.open({
+                  title: "Dev: Show DuckDB schemas",
+                  children: <DevDuckDBTableSchemaView />,
+                  size: "80%",
                 });
               },
             },

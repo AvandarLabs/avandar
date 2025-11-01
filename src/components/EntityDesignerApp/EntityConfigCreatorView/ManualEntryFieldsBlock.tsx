@@ -30,14 +30,8 @@ export function ManualEntryFieldsBlock({
   const fieldRows = manualEntryFields.map((field, idx) => {
     const [fieldKeys, fieldInputProps] = entityConfigForm.keysAndProps(
       `manualEntryFields.${idx}`,
-      ["name"],
+      ["name", "allowManualEdit", "isArray"],
     );
-
-    const [fieldOptionsKeys, fieldOptionsInputProps] =
-      entityConfigForm.keysAndProps(`manualEntryFields.${idx}.options`, [
-        "allowManualEdit",
-        "isArray",
-      ]);
 
     return (
       <Stack key={field.id}>
@@ -70,14 +64,14 @@ export function ManualEntryFieldsBlock({
         </Group>
         <Group>
           <Checkbox
-            key={fieldOptionsKeys.allowManualEdit}
+            key={fieldKeys.allowManualEdit}
             label="Allow manual edit"
-            {...fieldOptionsInputProps.allowManualEdit({ type: "checkbox" })}
+            {...fieldInputProps.allowManualEdit({ type: "checkbox" })}
           />
           <Checkbox
-            key={fieldOptionsKeys.isArray}
+            key={fieldKeys.isArray}
             label="Allow multiple values"
-            {...fieldOptionsInputProps.isArray({ type: "checkbox" })}
+            {...fieldInputProps.isArray({ type: "checkbox" })}
           />
         </Group>
       </Stack>

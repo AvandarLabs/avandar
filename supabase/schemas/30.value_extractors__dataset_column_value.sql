@@ -1,6 +1,11 @@
 create type public.value_extractors__value_picker_rule_type as enum(
   'most_frequent',
-  'first'
+  'first',
+  'sum',
+  'avg',
+  'count',
+  'max',
+  'min'
 );
 
 create table public.value_extractors__dataset_column_value (
@@ -12,7 +17,7 @@ create table public.value_extractors__dataset_column_value (
   entity_field_config_id uuid not null unique references entity_field_configs (id) on update cascade on delete cascade,
   value_picker_rule_type public.value_extractors__value_picker_rule_type not null,
   dataset_id uuid not null,
-  dataset_field_id uuid not null
+  dataset_column_id uuid not null
 );
 
 -- Enable row level security

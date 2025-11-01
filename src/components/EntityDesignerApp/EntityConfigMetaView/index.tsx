@@ -33,9 +33,6 @@ const ENTITY_CONFIG_RENDER_OPTIONS: ObjectKeyRenderOptionsMap<
     itemRenderOptions: {
       excludeKeys: ["id", "entityConfigId"],
       keyRenderOptions: {
-        options: {
-          excludeKeys: ["class"],
-        },
         valueExtractor: {
           excludeKeys: ["id", "entityFieldConfigId"],
         },

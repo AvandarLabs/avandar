@@ -128,11 +128,6 @@ function createEntityFieldValueClient(): WithLogger<
           async (extractorType) => {
             logger.log("Processing extractor", extractorType);
             return match(extractorType)
-              .with("aggregation", (type) => {
-                throw new Error(
-                  `Extracting ${type} types are not supported yet.`,
-                );
-              })
               .with("manual_entry", (type) => {
                 throw new Error(
                   `Extracting ${type} types are not supported yet.`,
@@ -159,7 +154,7 @@ function createEntityFieldValueClient(): WithLogger<
                     where(
                       "id",
                       "in",
-                      extractors.map(prop("datasetFieldId")),
+                      extractors.map(prop("datasetColumnId")),
                     ),
                   ),
                   { key: "id" },
@@ -178,12 +173,12 @@ function createEntityFieldValueClient(): WithLogger<
                   objectEntries(extractorsByDatasetId),
                   async ([datasetId, datasetExtractors]) => {
                     const columns = datasetExtractors.map((ext) => {
-                      return datasetColumnsById[ext.datasetFieldId]!;
+                      return datasetColumnsById[ext.datasetColumnId]!;
                     });
                     const pkeyExtractor =
                       primaryKeyExtractorsByDatasetId[datasetId]!;
                     const pkeyColumn =
-                      datasetColumnsById[pkeyExtractor.datasetFieldId]!;
+                      datasetColumnsById[pkeyExtractor.datasetColumnId]!;
                     const columnNames = columns.map(prop("name"));
                     const requestedExtractors = datasetExtractors.filter(
                       isInSet(requestedFieldIds, {
@@ -219,7 +214,7 @@ function createEntityFieldValueClient(): WithLogger<
                           columnNameValueSelectors: requestedExtractors
                             .map((ext) => {
                               const column =
-                                datasetColumnsById[ext.datasetFieldId]!;
+                                datasetColumnsById[ext.datasetColumnId]!;
                               const colName = column.name;
                               const fieldId = ext.entityFieldConfigId;
                               return match(ext)
@@ -245,6 +240,41 @@ function createEntityFieldValueClient(): WithLogger<
                                     `;
                                   },
                                 )
+                                .with({ valuePickerRuleType: "sum" }, () => {
+                                  return `
+                                    -- Get the sum of the values
+                                    (SELECT CAST(SUM("${colName}") AS DOUBLE)
+                                    FROM entity_rows) AS "${fieldId}"
+                                  `;
+                                })
+                                .with({ valuePickerRuleType: "avg" }, () => {
+                                  return `
+                                    -- Get the average of the values
+                                    (SELECT CAST(AVG("${colName}") AS DOUBLE)
+                                    FROM entity_rows) AS "${fieldId}"
+                                  `;
+                                })
+                                .with({ valuePickerRuleType: "count" }, () => {
+                                  return `
+                                    -- Get the count of the values
+                                    (SELECT CAST(COUNT("${colName}") AS DOUBLE)
+                                    FROM entity_rows) AS "${fieldId}"
+                                  `;
+                                })
+                                .with({ valuePickerRuleType: "max" }, () => {
+                                  return `
+                                    -- Get the maximum value
+                                    (SELECT CAST(MAX("${colName}") AS DOUBLE)
+                                    FROM entity_rows) AS "${fieldId}"
+                                  `;
+                                })
+                                .with({ valuePickerRuleType: "min" }, () => {
+                                  return `
+                                    -- Get the minimum value
+                                    (SELECT CAST(MIN("${colName}") AS DOUBLE)
+                                    FROM entity_rows) AS "${fieldId}"
+                                  `;
+                                })
                                 .exhaustive();
                             })
                             .join(", "),
@@ -262,7 +292,6 @@ function createEntityFieldValueClient(): WithLogger<
                       extractedValues,
                     ).map((fieldConfigId) => {
                       const rawValue = extractedValues[fieldConfigId];
-                      const valueStr = rawValue ? String(rawValue) : undefined;
                       return {
                         id: uuid(),
                         entityId,
@@ -272,10 +301,10 @@ function createEntityFieldValueClient(): WithLogger<
                         entityFieldConfigId: fieldConfigId,
                         entityConfigId: entity.entityConfigId,
                         workspaceId: entity.workspaceId,
-                        value: valueStr,
+                        value: rawValue,
 
                         // TODO(jpsyx): this should have been extracted too
-                        valueSet: [valueStr].filter(isDefined),
+                        valueSet: [rawValue].filter(isDefined),
                       };
                     });
 

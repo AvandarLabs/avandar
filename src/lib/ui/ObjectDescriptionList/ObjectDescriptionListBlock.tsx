@@ -1,15 +1,15 @@
 import { ScrollArea } from "@mantine/core";
 import { objectKeys, pick } from "@/lib/utils/objects/misc";
-import { camelToTitleCase } from "@/lib/utils/strings/transformations";
 import { DescriptionList } from "../DescriptionList";
 import { getOrderedKeys } from "./gerOrderedKeys/getOrderedKeys";
+import { getObjectKeyTransformFn } from "./getObjectKeyTransformFn";
 import {
   AnyDescribableValueRenderOptions,
   DescribableObject,
   GenericRootData,
   ObjectRenderOptions,
   PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
-  PrimitiveValue,
+  PrimitiveValueRenderOptions,
 } from "./ObjectDescriptionList.types";
 import { ValueItemContainer } from "./ValueItemContainer";
 
@@ -17,6 +17,7 @@ type Props<T extends DescribableObject, RootData extends GenericRootData> = {
   data: T;
   rootData: RootData;
 } & ObjectRenderOptions<NonNullable<T>, RootData>;
+
 export type { Props as ObjectDescriptionListBlockProps };
 
 /**
@@ -37,6 +38,7 @@ export function ObjectDescriptionListBlock<
   renderObject,
   renderObjectKeyValue,
   renderObjectKeyLabel,
+  renderObjectKeyTransform = "camel-to-title-case",
   ...renderOptions
 }: Props<T, RootData>): JSX.Element {
   const parentPrimitiveValueRenderOptions = pick(
@@ -45,16 +47,19 @@ export function ObjectDescriptionListBlock<
   );
 
   if (getRenderableValue !== undefined) {
-    const objAsPrimitiveValue =
+    const objAsSingleValue =
       typeof getRenderableValue === "function" ?
         getRenderableValue(data, rootData)
-      : (data[getRenderableValue] as PrimitiveValue);
+      : data[getRenderableValue];
     return (
       <ValueItemContainer
-        type="primitive"
-        value={objAsPrimitiveValue}
+        type="unknown"
+        value={objAsSingleValue}
         rootData={rootData}
-        {...parentPrimitiveValueRenderOptions}
+        {...(parentPrimitiveValueRenderOptions as PrimitiveValueRenderOptions<
+          unknown,
+          GenericRootData
+        >)}
       />
     );
   }
@@ -102,7 +107,7 @@ export function ObjectDescriptionListBlock<
               key={key}
               label={
                 customRenderedKeyLabel === undefined ?
-                  camelToTitleCase(String(key))
+                  getObjectKeyTransformFn(renderObjectKeyTransform)(String(key))
                 : customRenderedKeyLabel
               }
             >

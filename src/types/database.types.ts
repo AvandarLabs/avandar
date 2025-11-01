@@ -394,13 +394,12 @@ export type Database = {
       entity_field_configs: {
         Row: {
           allow_manual_edit: boolean
-          base_data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
-          class: Database["public"]["Enums"]["entity_field_configs__class"]
           created_at: string
+          data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
           description: string | null
           entity_config_id: string
           id: string
-          is_array: boolean | null
+          is_array: boolean
           is_id_field: boolean
           is_title_field: boolean
           name: string
@@ -409,16 +408,15 @@ export type Database = {
           workspace_id: string
         }
         Insert: {
-          allow_manual_edit?: boolean
-          base_data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
-          class: Database["public"]["Enums"]["entity_field_configs__class"]
+          allow_manual_edit: boolean
           created_at?: string
+          data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
           description?: string | null
           entity_config_id: string
           id?: string
-          is_array?: boolean | null
-          is_id_field?: boolean
-          is_title_field?: boolean
+          is_array: boolean
+          is_id_field: boolean
+          is_title_field: boolean
           name: string
           updated_at?: string
           value_extractor_type: Database["public"]["Enums"]["entity_field_configs__value_extractor_type"]
@@ -426,13 +424,12 @@ export type Database = {
         }
         Update: {
           allow_manual_edit?: boolean
-          base_data_type?: Database["public"]["Enums"]["datasets__ava_data_type"]
-          class?: Database["public"]["Enums"]["entity_field_configs__class"]
           created_at?: string
+          data_type?: Database["public"]["Enums"]["datasets__ava_data_type"]
           description?: string | null
           entity_config_id?: string
           id?: string
-          is_array?: boolean | null
+          is_array?: boolean
           is_id_field?: boolean
           is_title_field?: boolean
           name?: string
@@ -589,61 +586,10 @@ export type Database = {
           },
         ]
       }
-      value_extractors__aggregation: {
-        Row: {
-          aggregation_type: Database["public"]["Enums"]["value_extractors__aggregation_type"]
-          created_at: string
-          dataset_field_id: string
-          dataset_id: string
-          entity_field_config_id: string
-          filter: Json | null
-          id: string
-          updated_at: string
-          workspace_id: string
-        }
-        Insert: {
-          aggregation_type: Database["public"]["Enums"]["value_extractors__aggregation_type"]
-          created_at?: string
-          dataset_field_id: string
-          dataset_id: string
-          entity_field_config_id: string
-          filter?: Json | null
-          id?: string
-          updated_at?: string
-          workspace_id: string
-        }
-        Update: {
-          aggregation_type?: Database["public"]["Enums"]["value_extractors__aggregation_type"]
-          created_at?: string
-          dataset_field_id?: string
-          dataset_id?: string
-          entity_field_config_id?: string
-          filter?: Json | null
-          id?: string
-          updated_at?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "value_extractors__aggregation_entity_field_config_id_fkey"
-            columns: ["entity_field_config_id"]
-            isOneToOne: true
-            referencedRelation: "entity_field_configs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "value_extractors__aggregation_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       value_extractors__dataset_column_value: {
         Row: {
           created_at: string
-          dataset_field_id: string
+          dataset_column_id: string
           dataset_id: string
           entity_field_config_id: string
           id: string
@@ -653,7 +599,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          dataset_field_id: string
+          dataset_column_id: string
           dataset_id: string
           entity_field_config_id: string
           id?: string
@@ -663,7 +609,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          dataset_field_id?: string
+          dataset_column_id?: string
           dataset_id?: string
           entity_field_config_id?: string
           id?: string
@@ -948,14 +894,17 @@ export type Database = {
         | "JSON"
         | "GEOMETRY"
       datasets__source_type: "csv_file" | "google_sheets"
-      entity_field_configs__base_data_type: "string" | "number" | "date"
-      entity_field_configs__class: "dimension" | "metric"
       entity_field_configs__value_extractor_type:
         | "dataset_column_value"
         | "manual_entry"
-        | "aggregation"
-      value_extractors__aggregation_type: "sum" | "max" | "count"
-      value_extractors__value_picker_rule_type: "most_frequent" | "first"
+      value_extractors__value_picker_rule_type:
+        | "most_frequent"
+        | "first"
+        | "sum"
+        | "avg"
+        | "count"
+        | "max"
+        | "min"
     }
     CompositeTypes: {
       dataset_column_input: {
@@ -1144,15 +1093,19 @@ export const Constants = {
         "GEOMETRY",
       ],
       datasets__source_type: ["csv_file", "google_sheets"],
-      entity_field_configs__base_data_type: ["string", "number", "date"],
-      entity_field_configs__class: ["dimension", "metric"],
       entity_field_configs__value_extractor_type: [
         "dataset_column_value",
         "manual_entry",
-        "aggregation",
       ],
-      value_extractors__aggregation_type: ["sum", "max", "count"],
-      value_extractors__value_picker_rule_type: ["most_frequent", "first"],
+      value_extractors__value_picker_rule_type: [
+        "most_frequent",
+        "first",
+        "sum",
+        "avg",
+        "count",
+        "max",
+        "min",
+      ],
     },
   },
 } as const

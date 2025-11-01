@@ -21,8 +21,8 @@ import {
   EntityFieldConfig,
   EntityFieldConfigId,
 } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
-import { DatasetColumnValueExtractorClient } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractorClient";
-import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/types";
+import { DatasetColumnValueExtractorClient } from "@/clients/entity-configs/DatasetColumnValueExtractorClient";
+import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractor.types";
 
 type FieldWithDatasetExtractor = {
   fieldConfig: EntityFieldConfig;
@@ -46,7 +46,7 @@ export function getSQLSelectOfExtractor({
   ruleType,
   outputColumnName,
   externalIdsTable = "external_ids",
-  externalIdsColumn = "external_id",
+  externalIdColumn = "external_id",
 }: {
   selectColumnName: string;
   primaryKeyColumnName: string;
@@ -54,30 +54,93 @@ export function getSQLSelectOfExtractor({
   ruleType: DatasetColumnValueExtractor["valuePickerRuleType"];
   outputColumnName: string;
   externalIdsTable?: string;
-  externalIdsColumn?: string;
+  externalIdColumn?: string;
 }): string {
   return match(ruleType)
     .with("first", () => {
       return `
         -- Get the first value
-        (SELECT "${selectColumnName}"
-        FROM "${datasetId}" dataset
-        WHERE "${externalIdsTable}"."${externalIdsColumn}" = dataset."${primaryKeyColumnName}"
-        LIMIT 1) as "${outputColumnName}"
+        (
+          SELECT "${selectColumnName}",
+          FROM "${datasetId}" dataset
+          WHERE
+            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+          LIMIT 1
+        ) AS "${outputColumnName}"
       `;
     })
     .with("most_frequent", () => {
       return `
         -- Get the most frequent value
-        (SELECT "${selectColumnName}"
-        FROM "${datasetId}" dataset
-        WHERE "${externalIdsTable}"."${externalIdsColumn}" = dataset."${primaryKeyColumnName}"
-        GROUP BY "${selectColumnName}"
-        ORDER BY COUNT(*) DESC, "${selectColumnName}"
-        LIMIT 1) as "${outputColumnName}"
+        (
+          SELECT "${selectColumnName}"
+          FROM "${datasetId}" dataset
+          WHERE
+            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+          GROUP BY "${selectColumnName}"
+          ORDER BY COUNT(*) DESC, "${selectColumnName}"
+          LIMIT 1
+        ) AS "${outputColumnName}"
       `;
     })
-    .exhaustive();
+    .with("sum", () => {
+      return `
+        -- Get the sum of the values
+        (
+          SELECT CAST(SUM("${selectColumnName}") AS DOUBLE)
+          FROM "${datasetId}" dataset
+          WHERE
+            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+        ) AS "${outputColumnName}"
+      `;
+    })
+    .with("avg", () => {
+      return `
+        -- Get the average of the values
+        (
+          SELECT CAST(AVG("${selectColumnName}") AS DOUBLE)
+          FROM "${datasetId}" dataset
+          WHERE
+            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+        ) AS "${outputColumnName}"
+      `;
+    })
+    .with("count", () => {
+      return `
+        -- Get the count of the values
+        (
+          SELECT CAST(COUNT("${selectColumnName}") AS DOUBLE)
+          FROM "${datasetId}" dataset
+          WHERE
+            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+        ) AS "${outputColumnName}"
+      `;
+    })
+    .with("max", () => {
+      return `
+        -- Get the maximum value
+        (
+          SELECT CAST(MAX("${selectColumnName}") AS DOUBLE)
+          FROM "${datasetId}" dataset
+          WHERE
+            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+        ) AS "${outputColumnName}"
+      `;
+    })
+    .with("min", () => {
+      return `
+        -- Get the minimum value
+        (
+          SELECT CAST(MIN("${selectColumnName}") AS DOUBLE)
+          FROM "${datasetId}" dataset
+          WHERE
+            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+        ) AS "${outputColumnName}"
+      `;
+    })
+    .exhaustive(() => {
+      throw new Error(`Invalid rule type: "${ruleType}"`);
+    });
 }
 
 async function _extractFieldValuesFromDataset({
@@ -130,7 +193,7 @@ async function _extractFieldValuesFromDataset({
             ruleType: field.extractor.valuePickerRuleType,
             outputColumnName: fieldId,
             externalIdsTable: "external_ids",
-            externalIdsColumn: "external_id",
+            externalIdColumn: "external_id",
           });
           return sqlStatement;
         })
@@ -200,8 +263,8 @@ export async function getDatasetColumnFieldValues({
 
   // Get all metadata of the columns we need to extract
   const allColumnIds = removeDuplicates([
-    ...primaryKeyFieldsWithExtractors.map(prop("extractor.datasetFieldId")),
-    ...fieldsWithExtractors.map(prop("extractor.datasetFieldId")),
+    ...primaryKeyFieldsWithExtractors.map(prop("extractor.datasetColumnId")),
+    ...fieldsWithExtractors.map(prop("extractor.datasetColumnId")),
   ]);
   const datasetColumnsById = makeIdLookupRecord(
     await DatasetColumnClient.getAll(where("id", "in", allColumnIds)),
@@ -212,13 +275,13 @@ export async function getDatasetColumnFieldValues({
   const requestedFields = fieldsWithExtractors.map((field) => {
     return {
       ...field,
-      datasetColumn: datasetColumnsById[field.extractor.datasetFieldId]!,
+      datasetColumn: datasetColumnsById[field.extractor.datasetColumnId]!,
     };
   });
   const primaryKeyFields = primaryKeyFieldsWithExtractors.map((field) => {
     return {
       ...field,
-      datasetColumn: datasetColumnsById[field.extractor.datasetFieldId]!,
+      datasetColumn: datasetColumnsById[field.extractor.datasetColumnId]!,
     };
   });
 

@@ -16,8 +16,7 @@ import {
   EntityFieldConfig,
   EntityFieldConfigId,
 } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
-import { AggregationExtractor } from "@/models/EntityConfig/ValueExtractor/AggregationExtractor/types";
-import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/types";
+import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractor.types";
 import { ManualEntryExtractor } from "@/models/EntityConfig/ValueExtractor/ManualEntryExtractor/types";
 import { EntityFieldValueExtractorRegistry } from "@/models/EntityConfig/ValueExtractor/types";
 import { Models } from "@/models/Model";
@@ -29,14 +28,10 @@ export type EntityFieldFormValues =
   >
   & {
     extractors: {
-      aggregation: SetOptional<
-        AggregationExtractor<"Insert">,
-        "datasetId" | "datasetFieldId" | "workspaceId"
-      >;
       manualEntry: SetOptional<ManualEntryExtractor<"Insert">, "workspaceId">;
       datasetColumnValue: SetOptional<
         DatasetColumnValueExtractor<"Insert">,
-        "datasetId" | "datasetFieldId" | "workspaceId"
+        "datasetId" | "datasetColumnId" | "workspaceId"
       >;
     };
   };
@@ -121,26 +116,15 @@ export function makeDefaultDatasetColumnField({
       entityConfigId,
       name,
       description: undefined,
-      options: {
-        class: "dimension",
-        baseDataType: datasetColumn.dataType,
-        valueExtractorType: "dataset_column_value",
-        isIdField,
-        isTitleField: false,
-        allowManualEdit: false,
-        isArray: true,
-      },
+      dataType: datasetColumn.dataType,
+      valueExtractorType: "dataset_column_value",
+      isIdField,
+      isTitleField: false,
+      allowManualEdit: false,
+      isArray: true,
 
       // set up some default initial values for the value extractor configs
       extractors: {
-        aggregation: {
-          type: "aggregation",
-          entityFieldConfigId,
-          aggregationType: "sum",
-          datasetId: undefined,
-          datasetFieldId: undefined,
-          filter: undefined,
-        },
         manualEntry: {
           type: "manual_entry",
           entityFieldConfigId,
@@ -150,7 +134,7 @@ export function makeDefaultDatasetColumnField({
           entityFieldConfigId,
           valuePickerRuleType: "most_frequent",
           datasetId: dataset.id,
-          datasetFieldId: datasetColumn.id,
+          datasetColumnId: datasetColumn.id,
         },
       },
     } as const,
@@ -172,26 +156,15 @@ export function makeDefaultManualEntryField({
       entityConfigId,
       name,
       description: undefined,
-      options: {
-        class: "dimension",
-        baseDataType: "varchar",
-        valueExtractorType: "manual_entry",
-        isIdField: false,
-        isTitleField: false,
-        allowManualEdit: false,
-        isArray: false,
-      },
+      dataType: "varchar",
+      valueExtractorType: "manual_entry",
+      isIdField: false,
+      isTitleField: false,
+      allowManualEdit: false,
+      isArray: false,
 
       // set up some default initial values for the value extractor configs
       extractors: {
-        aggregation: {
-          type: "aggregation",
-          entityFieldConfigId,
-          aggregationType: "sum",
-          datasetId: undefined,
-          datasetFieldId: undefined,
-          filter: undefined,
-        },
         manualEntry: {
           type: "manual_entry",
           entityFieldConfigId,
@@ -201,7 +174,7 @@ export function makeDefaultManualEntryField({
           entityFieldConfigId,
           valuePickerRuleType: "most_frequent",
           datasetId: undefined,
-          datasetFieldId: undefined,
+          datasetColumnId: undefined,
         },
       },
     } as const,

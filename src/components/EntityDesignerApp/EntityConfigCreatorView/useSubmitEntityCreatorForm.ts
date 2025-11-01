@@ -41,8 +41,8 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
       const extractorsToCreate: Array<EntityFieldValueExtractor<"Insert">> =
         fields
           .map((field) => {
-            const { options, extractors } = field;
-            return match(options.valueExtractorType)
+            const { valueExtractorType, extractors } = field;
+            return match(valueExtractorType)
               .with("manual_entry", () => {
                 return { ...extractors.manualEntry, workspaceId };
               })
@@ -53,24 +53,12 @@ export function useSubmitEntityCreatorForm(): UseMutationResultTuple<
                 if (
                   hasPropKeys(datasetColumnValueExtractor, [
                     "datasetId",
-                    "datasetFieldId",
+                    "datasetColumnId",
                   ])
                 ) {
                   return { ...datasetColumnValueExtractor, workspaceId };
                 }
 
-                return undefined;
-              })
-              .with("aggregation", () => {
-                const aggregationExtractor = extractors.aggregation;
-                if (
-                  hasPropKeys(aggregationExtractor, [
-                    "datasetId",
-                    "datasetFieldId",
-                  ])
-                ) {
-                  return { ...aggregationExtractor, workspaceId };
-                }
                 return undefined;
               })
               .exhaustive();

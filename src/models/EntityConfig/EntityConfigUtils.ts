@@ -49,7 +49,7 @@ function createEntityConfigModule(): WithBind<IEntityConfigUtils> {
       entityConfig: BuildableEntityConfig,
     ): EntityFieldConfigWithValueExtractor => {
       const titleField = entityConfig.fields.find((field) => {
-        return field.options.isTitleField;
+        return field.isTitleField;
       })!;
       assertIsDefined(
         titleField,
@@ -62,7 +62,7 @@ function createEntityConfigModule(): WithBind<IEntityConfigUtils> {
       entityConfig: BuildableEntityConfig,
     ): EntityFieldConfigWithValueExtractor[] => {
       return entityConfig.fields.filter((field) => {
-        return field.options.isIdField;
+        return field.isIdField;
       });
     },
   };

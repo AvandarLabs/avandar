@@ -1,15 +1,17 @@
 import { ReactNode } from "react";
-import { ConditionalKeys } from "type-fest";
 import { StringKeyOf } from "@/lib/types/utilityTypes";
 import { FormattableTimezone } from "@/lib/utils/formatters/formatDate";
 import { registryKeys } from "@/lib/utils/objects/misc";
+import { UnknownObject } from "@/lib/types/common";
+
+export type ObjectKeyTransformationType = "camel-to-title-case" | "none";
 
 /**
  * The root data of an `ObjectDescriptionList` must be a collection.
  * It can can only be either a `DescribableObject` or an array of
  * `DescribableValue`.
  */
-export type GenericRootData = DescribableObject | readonly DescribableValue[];
+export type GenericRootData = DescribableObject | readonly unknown[];
 
 /** A non-recursive value */
 export type PrimitiveValue =
@@ -21,24 +23,12 @@ export type PrimitiveValue =
   | undefined;
 
 /**
- * All possible values a DescribableObject can hold. This includes primitive
- * values, nested objects, and arrays of field values.
+ * The base definition of a describable object, which is just an unknown object
+ * with string keys and unknown values.
  */
-export type DescribableValue =
-  | PrimitiveValue
-  | DescribableObject
-  | readonly DescribableValue[];
+export type DescribableObject = UnknownObject;
 
-/**
- * The base definition of an entity object. This is a record of string
- * keys that map to values. Values can be primitives, nested entities,
- * or arrays of values.
- */
-export type DescribableObject = {
-  [key: string]: DescribableValue;
-};
-
-type DescribableObjectOf<T extends DescribableValue> = {
+type DescribableObjectOf<T> = {
   [key: string]: T;
 };
 
@@ -47,7 +37,7 @@ type DescribableObjectOf<T extends DescribableValue> = {
  * recursive DescribableValues to apply to its children.
  */
 export type PrimitiveValueRenderOptions<
-  T extends PrimitiveValue,
+  T,
   RootData extends GenericRootData | undefined,
 > = {
   /**
@@ -92,7 +82,7 @@ export type PrimitiveValueRenderOptions<
 };
 
 export const PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS = registryKeys<
-  keyof PrimitiveValueRenderOptions<PrimitiveValue, GenericRootData>
+  keyof PrimitiveValueRenderOptions<unknown, GenericRootData>
 >({
   asDate: true,
   renderValue: true,
@@ -113,14 +103,13 @@ export type ObjectKeyRenderOptionsMap<
   T extends NonNullable<DescribableObject>,
   RootData extends GenericRootData = T,
 > = {
-  [K in StringKeyOf<T>]?: NonNullable<T[K]> extends DescribableObject ?
-    ObjectRenderOptions<NonNullable<T[K]>, RootData>
-  : NonNullable<T[K]> extends (
-    ReadonlyArray<infer ArrayType extends DescribableValue>
-  ) ?
-    DescribableValueArrayRenderOptions<ArrayType, RootData>
-  : T[K] extends PrimitiveValue ? PrimitiveValueRenderOptions<T[K], RootData>
-  : PrimitiveValueRenderOptions<PrimitiveValue, RootData>;
+  [K in StringKeyOf<T>]?: NonNullable<T[K]> extends DescribableObject
+    ? ObjectRenderOptions<NonNullable<T[K]>, RootData>
+    : NonNullable<T[K]> extends (
+      ReadonlyArray<infer ArrayType>
+    ) ? DescribableValueArrayRenderOptions<ArrayType, RootData>
+    : T[K] extends PrimitiveValue ? PrimitiveValueRenderOptions<T[K], RootData>
+    : PrimitiveValueRenderOptions<unknown, RootData>;
 };
 
 /**
@@ -129,27 +118,25 @@ export type ObjectKeyRenderOptionsMap<
 export type ObjectRenderOptions<
   T extends NonNullable<DescribableObject>,
   RootData extends GenericRootData,
-> = PrimitiveValueRenderOptions<PrimitiveValue, RootData> & {
+> = PrimitiveValueRenderOptions<unknown, RootData> & {
   /**
    * This function or key is used to transform the entire object to a
-   * renderable primitive value. The value returned by this function will be
-   * rendered using the primitive value render options.
+   * single renderable value.
    *
    * `getRenderableValue` can either be a function or the object key
    * that will be used to extract the renderable value for this object.
-   * The value must be a PrimitiveValue.
    *
-   * If passed, the object will no longer be traversed to render any
-   * child items. The returned primitive value is considered the final
-   * value to render for this object.
+   * If passed, the returned value will now become the new value to render
+   * recursively. If the returned value is a primitive, the rendering will stop
+   * here.
    *
    * @param obj The object to render
    * @param rootData The root data of the object description list
    * @returns The value to render
    */
   getRenderableValue?:
-    | ConditionalKeys<T, PrimitiveValue>
-    | ((obj: T, rootData: RootData) => PrimitiveValue);
+    | keyof T
+    | ((obj: T, rootData: RootData) => unknown);
 
   /**
    * A custom render function for the object. If provided, this will take
@@ -164,25 +151,20 @@ export type ObjectRenderOptions<
   renderObject?: (obj: T, rootData: RootData) => ReactNode;
 
   /**
-   * A custom render function that receives an object key, so that you can
-   * have complete freedom on how any key is rendered.
+   * A custom render function that receives an object key and the object itself,
+   * so that you can have complete freedom on how any key's value is rendered.
    *
-   * If a `renderObjectKey` function is provided then **all** keys in this
+   * If a `renderObjectKeyValue` function is provided then **all** keys in this
    * object will be fed into this function, instead of using the other
    * render options.
    *
-   * If you do not want to have to specify how to render a key, you can
-   * return `undefined` for that key. This is helpful when you only need
-   * to customize how a single key is rendered, but you want to fall back
-   * to the default render options for the rest of the keys.
-   *
-   * If `undefined` is returned, this will be interpreted as a no-op, and
-   * we will fall back to using the other render options for that key.
+   * This function can return `undefined` to fall back to the default render
+   * options for that key.
    *
    * @param key The key of the object
    * @param currentObject The current object
    * @param rootData The root data of the object description list
-   * @returns The rendered key
+   * @returns The key's renderable value
    */
   renderObjectKeyValue?: (
     key: keyof T,
@@ -191,11 +173,12 @@ export type ObjectRenderOptions<
   ) => ReactNode;
 
   /**
-   * A custom render function that receives an object key, so that you can
-   * have complete freedom on how a key's label is rendered.
+   * A custom render function that receives an object key and the object itself,
+   * so that you can have complete freedom on how a key's label is rendered.
    *
-   * Return `undefined` to fall back to the default label, which is converting
-   * a key to Title Case.
+   * Return `undefined` to fall back to the key transformation specified in
+   * `renderObjectKeyTransform` (which defaults to converting a key from
+   * camelCase to Title Case).
    *
    * @param key The key of the object
    * @param currentObject The current object
@@ -207,6 +190,15 @@ export type ObjectRenderOptions<
     currentObject: T,
     rootData: RootData,
   ) => ReactNode;
+
+  /**
+   * How to transform the object keys into displayable labels.
+   * Defaults to "camel-to-title-case".
+   * Possible values:
+   * - 'camel-to-title-case': Convert camelCase keys to title case.
+   * - 'none': Do not transform the keys. We render them as-is.
+   */
+  renderObjectKeyTransform?: ObjectKeyTransformationType;
 
   /**
    * Keys to include when rendering the object. If not provided, all keys
@@ -261,18 +253,17 @@ export type ObjectRenderOptions<
    */
   itemRenderOptions?: [T] extends (
     [DescribableObjectOf<infer Item extends DescribableObject>]
-  ) ?
-    ObjectRenderOptions<Item, RootData>
-  : [T] extends [ReadonlyArray<infer Item extends DescribableValue>] ?
-    DescribableValueArrayRenderOptions<Item, RootData>
-  : [T] extends [PrimitiveValue] ? PrimitiveValueRenderOptions<T, RootData>
-  : PrimitiveValueRenderOptions<PrimitiveValue, RootData>;
+  ) ? ObjectRenderOptions<Item, RootData>
+    : [T] extends [ReadonlyArray<infer Item>]
+      ? DescribableValueArrayRenderOptions<Item, RootData>
+    : [T] extends [PrimitiveValue] ? PrimitiveValueRenderOptions<T, RootData>
+    : PrimitiveValueRenderOptions<unknown, RootData>;
 };
 
 type BaseObjectArrayRenderOptions<
   T extends NonNullable<DescribableObject>,
   RootData extends GenericRootData,
-> = PrimitiveValueRenderOptions<PrimitiveValue, RootData> & {
+> = PrimitiveValueRenderOptions<unknown, RootData> & {
   /**
    * The key to use as the React key in order to render the array of
    * items in a stable way. If an `idKey` is not provided we will
@@ -290,66 +281,73 @@ export type ObjectArrayRenderOptions<
   RootData extends GenericRootData,
 > =
   | (BaseObjectArrayRenderOptions<T, RootData> & {
-      /**
-       * By default object arrays render as a list of collapsible items.
-       * If `renderAsTable` is true then we will render as a table instead.
-       */
-      renderAsTable: true;
+    /**
+     * By default object arrays render as a list of collapsible items.
+     * If `renderAsTable` is true then we will render as a table instead.
+     */
+    renderAsTable: true;
 
-      /**
-       * A custom render function that receives an object key, so that you can
-       * have complete freedom on how a table column's header is rendered.
-       *
-       * Return `undefined` to fall back to the default render function, which
-       * just converts the key to Title Case.
-       */
-      renderTableHeader?: (key: keyof T, rootData: RootData) => ReactNode;
+    /**
+     * A custom render function that receives an object key, so that you can
+     * have complete freedom on how a table column's header is rendered.
+     *
+     * Return `undefined` to fall back to the default render function, which
+     * just converts the key to Title Case.
+     *
+     * **NOTE**: we cannot use `renderObjectKeyLabel` for table headers because
+     * `renderObjectKeyLabel` is called for each object (the object is a
+     * parameter to the function), which allows us to render keys differently
+     * for each object if we need to. On the other hand, `renderTableHeader`
+     * applies to the entire table (to all objects in the array), so we cannot
+     * render keys differently per object.
+     */
+    renderTableHeader?: (key: keyof T, rootData: RootData) => ReactNode;
 
-      /**
-       * Render options for each object in the array.
-       */
-      itemRenderOptions?: Omit<
-        ObjectRenderOptions<T, RootData>,
-        "renderObjectKeyLabel"
-      >;
-      defaultExpanded?: undefined;
-      titleKey?: undefined;
-    })
+    /**
+     * Render options for each object in the array.
+     */
+    itemRenderOptions?: Omit<
+      ObjectRenderOptions<T, RootData>,
+      "renderObjectKeyLabel"
+    >;
+    defaultExpanded?: undefined;
+    titleKey?: undefined;
+  })
   | (BaseObjectArrayRenderOptions<T, RootData> & {
-      /**
-       * By default object arrays render as a list of collapsible items.
-       * If `renderAsTable` is true then we will render as a table instead.
-       */
-      renderAsTable?: false;
+    /**
+     * By default object arrays render as a list of collapsible items.
+     * If `renderAsTable` is true then we will render as a table instead.
+     */
+    renderAsTable?: false;
 
-      /**
-       * If true (and we are not rendering as a table), we default each
-       * list item to start expanded rather than collapsed.
-       *
-       * Default is `true`.
-       */
-      defaultExpanded?: boolean;
+    /**
+     * If true (and we are not rendering as a table), we default each
+     * list item to start expanded rather than collapsed.
+     *
+     * Default is `true`.
+     */
+    defaultExpanded?: boolean;
 
-      /**
-       * The title to use for each list item. This is only applicable if
-       * `renderAsTable` is false.
-       */
-      titleKey?: StringKeyOf<T>;
+    /**
+     * The title to use for each list item. This is only applicable if
+     * `renderAsTable` is false.
+     */
+    titleKey?: StringKeyOf<T>;
 
-      /**
-       * Render options for each object in the array.
-       */
-      itemRenderOptions?: ObjectRenderOptions<T, RootData>;
-      renderTableHeader?: undefined;
-    });
+    /**
+     * Render options for each object in the array.
+     */
+    itemRenderOptions?: ObjectRenderOptions<T, RootData>;
+    renderTableHeader?: undefined;
+  });
 
 /**
  * Extended options for nested arrays
  */
 export type NestedArrayRenderOptions<
-  T extends DescribableValue,
+  T,
   RootData extends GenericRootData,
-> = PrimitiveValueRenderOptions<PrimitiveValue, RootData> & {
+> = PrimitiveValueRenderOptions<unknown, RootData> & {
   /** Options for each nested array within this array */
   itemRenderOptions?: DescribableValueArrayRenderOptions<T, RootData>;
 };
@@ -358,7 +356,7 @@ export type NestedArrayRenderOptions<
  * Common render options for all describable value arrays.
  */
 export type BaseDescribableValueArrayRenderOptions<
-  T extends DescribableValue,
+  T,
   RootData extends GenericRootData,
 > = {
   /**
@@ -393,22 +391,22 @@ export type BaseDescribableValueArrayRenderOptions<
  * Options for how to render an array of values.
  */
 export type DescribableValueArrayRenderOptions<
-  T extends DescribableValue,
+  T,
   RootData extends GenericRootData,
-> =
-  [T] extends [DescribableObject] ?
-    BaseDescribableValueArrayRenderOptions<T, RootData> &
-      ObjectArrayRenderOptions<T, RootData>
-  : [T] extends [readonly DescribableValue[]] ?
-    BaseDescribableValueArrayRenderOptions<T, RootData> &
-      NestedArrayRenderOptions<T, RootData>
+> = [T] extends [DescribableObject] ?
+    & BaseDescribableValueArrayRenderOptions<T, RootData>
+    & ObjectArrayRenderOptions<T, RootData>
+  : [T] extends [readonly unknown[]] ?
+      & BaseDescribableValueArrayRenderOptions<T, RootData>
+      & NestedArrayRenderOptions<T, RootData>
   : [T] extends [PrimitiveValue] ?
-    BaseDescribableValueArrayRenderOptions<T, RootData> &
-      PrimitiveValueRenderOptions<T, RootData>
-  : BaseDescribableValueArrayRenderOptions<T, RootData> &
-      PrimitiveValueRenderOptions<PrimitiveValue, RootData>;
+      & BaseDescribableValueArrayRenderOptions<T, RootData>
+      & PrimitiveValueRenderOptions<T, RootData>
+  :
+    & BaseDescribableValueArrayRenderOptions<T, RootData>
+    & PrimitiveValueRenderOptions<unknown, RootData>;
 
 export type AnyDescribableValueRenderOptions =
-  | PrimitiveValueRenderOptions<PrimitiveValue, GenericRootData>
+  | PrimitiveValueRenderOptions<unknown, GenericRootData>
   | ObjectRenderOptions<DescribableObject, GenericRootData>
-  | DescribableValueArrayRenderOptions<DescribableValue, GenericRootData>;
+  | DescribableValueArrayRenderOptions<unknown, GenericRootData>;

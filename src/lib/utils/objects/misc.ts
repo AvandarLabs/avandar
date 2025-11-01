@@ -83,6 +83,8 @@ export function pick<T extends UnknownObject, K extends keyof T>(
  * @param registry The registry to get the keys from.
  * @returns The keys from the registry.
  */
-export function registryKeys<T extends string>(registry: Registry<T>): T[] {
-  return objectKeys(registry) as unknown as T[];
+export function registryKeys<LiteralUnion extends string>(
+  registry: Registry<LiteralUnion>,
+): LiteralUnion[] {
+  return objectKeys(registry) as unknown as LiteralUnion[];
 }

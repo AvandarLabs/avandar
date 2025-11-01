@@ -53,9 +53,6 @@ async function _getEntityFieldValuesByExtractorType({
         .with("manual_entry", async (type) => {
           throw new Error(`Extracting ${type} types are not supported yet.`);
         })
-        .with("aggregation", async (type) => {
-          throw new Error(`Extracting ${type} types are not supported yet.`);
-        })
         .exhaustive();
     },
   );

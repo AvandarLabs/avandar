@@ -249,7 +249,7 @@ function createDatasetRawDataClient(): WithLogger<
 
         // run the query - at this point we can be confident that all dependent
         // datasets are loaded
-        return DuckDBClient.runRawQuery<T>(query, queryArgs);
+        return DuckDBClient.runRawQuery<T>(query, { params: queryArgs });
       },
 
       runLocalStructuredQuery: async <T extends UnknownRow = UnknownRow>(

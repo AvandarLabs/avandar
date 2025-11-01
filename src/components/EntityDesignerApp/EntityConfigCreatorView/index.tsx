@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { isNotEmpty } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -22,6 +22,7 @@ import { isDefined } from "@/lib/utils/guards/guards";
 import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { setValue } from "@/lib/utils/objects/setValue";
 import { DatasetColumnFieldsBlock } from "./DatasetColumnFieldsBlock";
+import { EntityConfigCreatorStore } from "./EntityConfigCreatorStore";
 import {
   EntityConfigFormSubmitValues,
   EntityConfigFormType,
@@ -35,7 +36,11 @@ import { useSubmitEntityCreatorForm } from "./useSubmitEntityCreatorForm";
 
 const IS_MANUAL_DATA_DISABLED = isFlagEnabled(FeatureFlag.DisableManualData);
 
-export function EntityCreatorView(): JSX.Element {
+export function EntityConfigCreatorView(): JSX.Element {
+  const [
+    { entityConfigName, singularEntityConfigName, pluralEntityConfigName },
+    dispatch,
+  ] = EntityConfigCreatorStore.use();
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
   const [sendEntityConfigForm, isSendEntityConfigFormPending] =
@@ -71,7 +76,7 @@ export function EntityCreatorView(): JSX.Element {
           // added as a datasetColumnField.
           const primaryField = values.datasetColumnFields.find(
             propEq(
-              "extractors.datasetColumnValue.datasetFieldId",
+              "extractors.datasetColumnValue.datasetColumnId",
               primaryKeyColumnId,
             ),
           );
@@ -79,7 +84,7 @@ export function EntityCreatorView(): JSX.Element {
           if (primaryField) {
             // if the primary key field was already added, we want to just
             // use that same field and set `isIdField` to true
-            return setValue(primaryField, "options.isIdField", true);
+            return setValue(primaryField, "isIdField", true);
           }
 
           // otherwise, create a datasetColumnField for this primary key
@@ -101,9 +106,9 @@ export function EntityCreatorView(): JSX.Element {
         .filter(isDefined);
 
       const nonPrimaryKeyFields = values.datasetColumnFields.filter((field) => {
-        if (field.options.valueExtractorType === "dataset_column_value") {
+        if (field.valueExtractorType === "dataset_column_value") {
           return !primaryKeyColumnIds.has(
-            field.extractors.datasetColumnValue.datasetFieldId,
+            field.extractors.datasetColumnValue.datasetColumnId,
           );
         }
         return false;
@@ -114,11 +119,8 @@ export function EntityCreatorView(): JSX.Element {
         .concat(values.manualEntryFields)
         // set the title field
         .map((field) => {
-          return (
-              field.id === values.titleFieldId &&
-                field.options.class === "dimension"
-            ) ?
-              setValue(field, "options.isTitleField", true)
+          return field.id === values.titleFieldId ?
+              setValue(field, "isTitleField", true)
             : field;
         });
       return {
@@ -134,17 +136,27 @@ export function EntityCreatorView(): JSX.Element {
     "allowManualCreation",
     "titleFieldId",
   ]);
+  const nameUpdateTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => {
+    return () => {
+      if (nameUpdateTimeoutRef.current) {
+        clearTimeout(nameUpdateTimeoutRef.current);
+      }
+    };
+  }, []);
 
   entityConfigForm.useFieldWatch("name", ({ value }) => {
-    // TODO(jpsyx): add a debounce
-    setEntityConfigName(value);
+    if (nameUpdateTimeoutRef.current) {
+      clearTimeout(nameUpdateTimeoutRef.current);
+    }
+    nameUpdateTimeoutRef.current = setTimeout(() => {
+      dispatch.setEntityConfigName(value);
+    }, 150);
   });
 
   const [allowDatasetFields, setAllowDatasetFields] = useState(false);
   const [allowManualEntryFields, setAllowManualEntryFields] = useState(false);
-  const [entityConfigName, setEntityConfigName] = useState("");
-  const singularEntityConfigName = entityConfigName.toLowerCase() || "profile";
-  const pluralEntityConfigName = `${entityConfigName.toLowerCase() || "profile"}s`;
 
   const {
     id: entityConfigId,
@@ -156,17 +168,16 @@ export function EntityCreatorView(): JSX.Element {
   // these are the fields that are eligible to be used as the entity ID or title
   const possibleTitleFields = useMemo(() => {
     return makeSelectOptions(datasetColumnFields.concat(manualEntryFields), {
-      valueFn: prop("id"),
-      labelFn: prop("name"),
+      valueKey: "id",
+      labelKey: "name",
     });
   }, [datasetColumnFields, manualEntryFields]);
 
   return (
-    <Container pt="lg" pb="xxl" fluid style={{ width: "75%" }}>
+    <Container pt="lg" pb="xxl" fluid w="100%">
       <Paper>
         <form
           onSubmit={entityConfigForm.onSubmit((values) => {
-            console.log("submitting form", values);
             return sendEntityConfigForm(values, {
               onSuccess: () => {
                 navigate(
