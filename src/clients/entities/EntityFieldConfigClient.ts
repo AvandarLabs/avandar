@@ -8,8 +8,7 @@ import { objectKeys } from "@/lib/utils/objects/misc";
 import { promiseFlatMap } from "@/lib/utils/promises";
 import { EntityFieldConfig } from "../../models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import { EntityFieldConfigParsers } from "../../models/EntityConfig/EntityFieldConfig/EntityFieldConfigParsers";
-import { AggregationExtractorClient } from "../../models/EntityConfig/ValueExtractor/AggregationExtractor/AggregationExtractorClient";
-import { DatasetColumnValueExtractorClient } from "../../models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractorClient";
+import { DatasetColumnValueExtractorClient } from "../entity-configs/DatasetColumnValueExtractorClient";
 import { ManualEntryExtractorClient } from "../../models/EntityConfig/ValueExtractor/ManualEntryExtractor/ManualEntryExtractorClient";
 import {
   EntityFieldValueExtractor,
@@ -43,7 +42,7 @@ export const EntityFieldConfigClient = createSupabaseCRUDClient({
         // Bucket each field by value extractor type, so we only query for
         // the extractor types that we need
         const fieldsByValueExtractorType = makeBucketRecord(fields, {
-          keyFn: prop("options.valueExtractorType"),
+          keyFn: prop("valueExtractorType"),
         });
 
         logger.log("Fetching value extractors for fields", {
@@ -57,11 +56,6 @@ export const EntityFieldConfigClient = createSupabaseCRUDClient({
             valueExtractorType: ValueExtractorType,
           ): Promise<EntityFieldValueExtractor[]> => {
             const extractors = await match(valueExtractorType)
-              .with("aggregation", () => {
-                return AggregationExtractorClient.getAll(
-                  where("entity_field_config_id", "in", fieldIds),
-                );
-              })
               .with("manual_entry", () => {
                 return ManualEntryExtractorClient.getAll(
                   where("entity_field_config_id", "in", fieldIds),

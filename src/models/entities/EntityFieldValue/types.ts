@@ -15,7 +15,7 @@ export type EntityFieldValue = {
   entityConfigId: EntityConfigId;
   id: EntityFieldValueId;
   updatedAt: string;
-  value: string | undefined;
-  valueSet: string[];
+  value: unknown;
+  valueSet: unknown[];
   workspaceId: WorkspaceId;
 };

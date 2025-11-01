@@ -47,7 +47,7 @@ export async function generateEntities(
     where(
       "id",
       "in",
-      datasetColumnValueExtractors.map(prop("datasetFieldId")),
+      datasetColumnValueExtractors.map(prop("datasetColumnId")),
     ),
   );
   const columnsById = makeObject(sourceDatasetColumns, { key: "id" });
@@ -56,10 +56,10 @@ export async function generateEntities(
   const extractorColumnsLookup = makeObject(datasetColumnValueExtractors, {
     key: "id",
     valueFn: (extractor) => {
-      const column = columnsById[extractor.datasetFieldId];
+      const column = columnsById[extractor.datasetColumnId];
       assertIsDefined(
         column,
-        `Could not find column "${extractor.datasetFieldId}"`,
+        `Could not find column "${extractor.datasetColumnId}"`,
       );
       return column;
     },
@@ -126,10 +126,11 @@ export async function generateEntities(
         ruleType: titleExtractor.valuePickerRuleType,
         outputColumnName: "name",
         externalIdsTable: "external_ids",
-        externalIdsColumn: "external_id",
+        externalIdColumn: "external_id",
       }),
     },
   });
+  Logger.log("Successfully generated all entities. Starting upsert...");
 
   // 3. Now upload all data to Supabase
   // TODO(jpsyx): NOTE: this will do an upsert on all rows. There is definitely

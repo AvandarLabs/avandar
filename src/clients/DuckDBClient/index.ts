@@ -100,8 +100,11 @@ function arrowTableToJS<RowObject extends UnknownRow>(
     const jsRow = row.toJSON();
     return mapObjectValues(jsRow, (v) => {
       if (typeof v === "bigint") {
+        // beware that `v` might be bigger than Number.MAX_SAFE_INTEGER
         return Number(v);
-      } else if (v instanceof arrow.Vector) {
+      }
+
+      if (v instanceof arrow.Vector) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return v.toArray().map((x: any) => {
           return x.toJSON();
@@ -565,15 +568,15 @@ class DuckDBClientImpl {
     const { params = {} } = options;
     const conn = options.conn ?? (await this.#connect());
     let queryResults: QueryResult<RowObject>;
+    const paramNames = objectKeys(params);
+    const queryStringToUse = paramNames.reduce((currQueryStr, paramName) => {
+      return currQueryStr.replace(
+        new RegExp(`\\$${paramName}\\$`, "g"),
+        params[paramName] ? String(params[paramName]) : "",
+      );
+    }, queryString);
+
     try {
-      let queryStringToUse = queryString;
-      const paramNames = objectKeys(params);
-      queryStringToUse = paramNames.reduce((currQueryStr, paramName) => {
-        return currQueryStr.replace(
-          new RegExp(`\\$${paramName}\\$`, "g"),
-          String(params[paramName]!),
-        );
-      }, queryString);
       this.#logger.log("Executing query", { query: queryStringToUse });
       // run the query
       const arrowTable = await conn.query<Record<string, arrow.DataType>>(
@@ -583,7 +586,10 @@ class DuckDBClientImpl {
         logger: this.#logger,
       });
     } catch (error) {
-      this.#logger.error(error, { queryString });
+      this.#logger.error(error, {
+        executedQueryString: queryStringToUse,
+        templatedQueryString: queryString,
+      });
       throw error;
     } finally {
       // If we created the connection in this function, then we can close it.
@@ -676,7 +682,7 @@ class DuckDBClientImpl {
       selectColumnNames = "*",
       groupByColumnNames = [],
       aggregations = {},
-      pageSize = 500,
+      pageSize = 1000,
       ...restOfStructuredQuery
     }: Omit<DuckDBStructuredQuery, "limit" | "offset"> & {
       pageSize?: number;
@@ -717,7 +723,6 @@ class DuckDBClientImpl {
       numPages += 1;
       numRows += newPage.numRows;
     }
-
     return { numPages, numRows };
   }
 
@@ -759,7 +764,7 @@ class DuckDBClientImpl {
           ? sql.raw(
             `strftime("${colName}"::TIMESTAMP, '%Y-%m-%dT%H:%M:%S.%fZ') as "${colName}"`,
           )
-          : `"${colName}"`;
+          : `${colName}`;
       })
       : columnNamesWithoutAggregations;
 

@@ -2,7 +2,6 @@ import { DescribableValueArrayBlockProps } from "./DescribableValueArrayBlock";
 import {
   AnyDescribableValueRenderOptions,
   DescribableObject,
-  DescribableValue,
   GenericRootData,
 } from "./ObjectDescriptionList.types";
 import { ObjectDescriptionListBlockProps } from "./ObjectDescriptionListBlock";
@@ -12,15 +11,14 @@ type DescribableObjectProps<
   T extends DescribableObject,
   RootData extends GenericRootData,
 > = Omit<ObjectDescriptionListBlockProps<T, RootData>, "rootData">;
-type DescribableValueArrayProps<
-  T extends DescribableValue,
-  RootData extends GenericRootData,
-> = Omit<DescribableValueArrayBlockProps<T, RootData>, "rootData">;
+type DescribableValueArrayProps<T, RootData extends GenericRootData> = Omit<
+  DescribableValueArrayBlockProps<T, RootData>,
+  "rootData"
+>;
 
 type Props<T extends GenericRootData> =
   T extends DescribableObject ? DescribableObjectProps<T, T>
-  : T extends ReadonlyArray<infer U extends DescribableValue> ?
-    DescribableValueArrayProps<U, T>
+  : T extends ReadonlyArray<infer U> ? DescribableValueArrayProps<U, T>
   : never;
 
 /**

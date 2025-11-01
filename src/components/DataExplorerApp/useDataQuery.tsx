@@ -143,7 +143,7 @@ export function useDataQuery({
               (field) => {
                 return {
                   name: field.name,
-                  dataType: field.options.baseDataType,
+                  dataType: field.dataType,
                 };
               },
             );

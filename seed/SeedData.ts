@@ -78,15 +78,12 @@ export const SeedData = {
           {
             name: "Name",
             description: "This entity represents a US State",
-            options: {
-              class: "dimension",
-              baseDataType: "varchar",
-              valueExtractorType: "manual_entry",
-              allowManualEdit: true,
-              isIdField: true,
-              isTitleField: true,
-              isArray: false,
-            },
+            dataType: "varchar",
+            valueExtractorType: "manual_entry",
+            allowManualEdit: true,
+            isIdField: true,
+            isTitleField: true,
+            isArray: false,
           } as const,
         ),
       ] satisfies Array<

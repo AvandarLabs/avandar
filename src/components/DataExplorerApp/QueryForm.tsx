@@ -1,7 +1,6 @@
 import { Fieldset, Stack, Text } from "@mantine/core";
 import { Select, SelectData } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { isOfModelType } from "@/lib/utils/guards/guards";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { Models } from "@/models/Model/Models";
 import { QueryAggregationType } from "@/models/queries/QueryAggregationType";
@@ -66,11 +65,7 @@ export function QueryForm(): JSX.Element {
                 <AggregationSelect
                   key={col.id}
                   label={col.baseColumn.name}
-                  dataType={
-                    isOfModelType("DatasetColumn", col.baseColumn) ?
-                      col.baseColumn.dataType
-                    : col.baseColumn.options.baseDataType
-                  }
+                  dataType={col.baseColumn.dataType}
                   value={aggregations[col.id] ?? "none"}
                   onChange={(newAggregation: QueryAggregationType) => {
                     dispatch.setColumnAggregation({

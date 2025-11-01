@@ -1,9 +1,9 @@
 import { List, Table, Text } from "@mantine/core";
 import { useMemo } from "react";
 import { objectKeys } from "@/lib/utils/objects/misc";
-import { camelToTitleCase } from "@/lib/utils/strings/transformations";
 import { CollapsibleItem } from "../CollapsibleItem";
 import { getOrderedKeys } from "../gerOrderedKeys/getOrderedKeys";
+import { getObjectKeyTransformFn } from "../getObjectKeyTransformFn";
 import {
   AnyDescribableValueRenderOptions,
   DescribableObject,
@@ -58,12 +58,18 @@ export function ObjectArrayBlock<
     };
 
     const firstEntity = valuesToRender[0]!;
+    const {
+      includeKeys = [],
+      excludeKeys = [],
+      excludeKeysPattern = DEFAULT_EXCLUDE_KEYS_PATTERN,
+      renderObjectKeyTransform = "camel-to-title-case",
+    } = itemRenderOptions ?? {};
+
     const headerKeys = getOrderedKeys({
       allKeys: objectKeys(firstEntity),
-      includeKeys: itemRenderOptions?.includeKeys ?? [],
-      excludeKeys: itemRenderOptions?.excludeKeys ?? [],
-      excludeKeysPattern:
-        itemRenderOptions?.excludeKeysPattern ?? DEFAULT_EXCLUDE_KEYS_PATTERN,
+      includeKeys,
+      excludeKeys,
+      excludeKeysPattern,
     });
 
     const headers = headerKeys.map((headerKey) => {
@@ -71,10 +77,10 @@ export function ObjectArrayBlock<
         renderTableHeader ? renderTableHeader(headerKey, rootData) : undefined;
 
       return (
-        <Table.Th key={headerKey} tt="capitalize">
+        <Table.Th key={headerKey}>
           {customRenderedHeader !== undefined ?
             customRenderedHeader
-          : camelToTitleCase(headerKey)}
+          : getObjectKeyTransformFn(renderObjectKeyTransform)(headerKey)}
         </Table.Th>
       );
     });

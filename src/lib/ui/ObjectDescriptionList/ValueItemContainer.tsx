@@ -1,3 +1,4 @@
+import { Text } from "@mantine/core";
 import { match } from "ts-pattern";
 import { constant } from "@/lib/utils/higherOrderFuncs";
 import { DescribableValueArrayBlock } from "./DescribableValueArrayBlock";
@@ -9,7 +10,6 @@ import {
 import {
   AnyDescribableValueRenderOptions,
   DescribableObject,
-  DescribableValue,
   DescribableValueArrayRenderOptions,
   GenericRootData,
   ObjectRenderOptions,
@@ -37,11 +37,11 @@ type Props<RootData extends GenericRootData> = {
     } & ObjectRenderOptions<DescribableObject, RootData>)
   | ({
       type: "array";
-      value: readonly DescribableValue[];
-    } & DescribableValueArrayRenderOptions<DescribableValue, RootData>)
+      value: readonly unknown[];
+    } & DescribableValueArrayRenderOptions<unknown, RootData>)
   | ({
       type: "unknown";
-      value: DescribableValue;
+      value: unknown;
     } & AnyDescribableValueRenderOptions)
 );
 
@@ -125,7 +125,8 @@ export function ValueItemContainer<RootData extends GenericRootData>(
           );
         }
 
-        return null;
+        // otherwise, we do our best by just casting to a string
+        return <Text>{String(value)}</Text>;
       },
     )
     .exhaustive(constant(null));

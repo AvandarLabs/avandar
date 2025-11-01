@@ -8,7 +8,7 @@ import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { Paper } from "@/lib/ui/Paper";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { isNonNullish } from "@/lib/utils/guards/guards";
-import { makeMap } from "@/lib/utils/maps/builders";
+import { makeIdLookupMap, makeMap } from "@/lib/utils/maps/builders";
 import { makeObject } from "@/lib/utils/objects/builders";
 import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { omit } from "@/lib/utils/objects/misc";
@@ -82,16 +82,9 @@ function useHydratedEntity({
       | undefined = undefined;
 
     if (entityFieldConfigs) {
-      const idField = entityFieldConfigs.find(
-        propEq("options.isIdField", true),
-      );
-      const nameField = entityFieldConfigs.find(
-        propEq("options.isTitleField", true),
-      );
-      fieldConfigsMap = makeMap(entityFieldConfigs, {
-        keyFn: prop("id"),
-      });
-
+      const idField = entityFieldConfigs.find(propEq("isIdField", true));
+      const nameField = entityFieldConfigs.find(propEq("isTitleField", true));
+      fieldConfigsMap = makeIdLookupMap(entityFieldConfigs);
       configInfo = {
         idField,
         nameField,

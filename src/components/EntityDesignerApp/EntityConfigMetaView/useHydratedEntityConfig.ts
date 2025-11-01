@@ -59,7 +59,7 @@ export function useHydratedEntityConfig({
       ...entityConfig,
       datasets,
       fields: entityFields?.map((field) => {
-        const { valueExtractorType } = field.options;
+        const { valueExtractorType } = field;
         const valueExtractor = valueExtractors?.find((extractor) => {
           return extractor.entityFieldConfigId === field.id;
         });

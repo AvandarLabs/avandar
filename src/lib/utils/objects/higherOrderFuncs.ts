@@ -6,7 +6,7 @@ import {
   UnknownArray,
 } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
-import { SetDefined } from "@/lib/types/utilityTypes";
+import { SetDefined, StringKeyOf } from "@/lib/types/utilityTypes";
 import { hasDefinedProps } from "../guards/guards";
 import { getValue, PathValue } from "./getValue";
 import { omit, pick } from "./misc";
@@ -194,22 +194,23 @@ export function excludeNullsInProps<T extends UnknownObject, K extends keyof T>(
 }
 
 /**
- * Returns a function that excludes nulls from all keys except the
- * specified keys. Those keys will be left unchanged.
+ * Returns a function that excludes nulls from all keys except the specified
+ * keys. Those keys will be left unchanged. This is a shallow operation.
  *
  * If no keys are specified, we assume `keysToKeepNull` is the entire
  * object. Therefore, the object is left unchanged.
  *
- * This is a shallow operation.
+ * At the type level, any keys that can possibly be `null` will now have a
+ * union with `undefined`.
  *
  * @param keys The keys to exclude nulls from.
  * @returns A function that excludes nulls from the specified keys.
  */
 export function excludeNullsExceptInProps<
   T extends UnknownObject,
-  K extends keyof T,
+  K extends StringKeyOf<T>,
 >(
-  keysToKeepNull: Extract<K, string> | readonly K[],
+  keysToKeepNull: K | readonly K[],
 ): (obj: T) => ExcludeNullsExceptIn<T, K> {
   return (obj: T) => {
     return excludeNullsExceptIn(obj, keysToKeepNull);

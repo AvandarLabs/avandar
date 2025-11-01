@@ -18,6 +18,7 @@ import {
 } from "./DatasetColumn.types";
 import { DuckDBDataTypes } from "@/clients/DuckDBClient/DuckDBDataType";
 import { AvaDataTypes } from "../AvaDataType";
+import { Models } from "@/models/Model";
 
 const DBReadSchema = object({
   created_at: iso.datetime({ offset: true }),
@@ -41,13 +42,12 @@ export const DatasetColumnParsers = makeParserRegistry<DatasetColumnModel>()
       camelCaseKeysDeep,
       nullsToUndefinedDeep,
       (obj): DatasetColumn => {
-        return {
+        return Models.make("DatasetColumn", {
           ...obj,
-          __type: "DatasetColumn",
           id: obj.id as DatasetColumnId,
           datasetId: obj.datasetId as DatasetId,
           workspaceId: obj.workspaceId as WorkspaceId,
-        };
+        });
       },
     ),
     fromModelInsertToDBInsert: pipe(

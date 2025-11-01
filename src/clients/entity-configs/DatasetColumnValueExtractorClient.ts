@@ -1,5 +1,5 @@
 import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
-import { DatasetColumnValueExtractorParsers } from "./parsers";
+import { DatasetColumnValueExtractorParsers } from "../../models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractorParsers";
 
 /**
  * Client for managing dataset column value extractor configurations

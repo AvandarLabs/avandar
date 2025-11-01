@@ -124,19 +124,27 @@ export const SeedJobs = [
 
         // now create the field configs for this entity config
         await promiseMap(entityConfig.fields, async (entityFieldConfig) => {
-          const { name, description, options } = entityFieldConfig;
+          const {
+            name,
+            description,
+            dataType,
+            valueExtractorType,
+            allowManualEdit,
+            isIdField,
+            isTitleField,
+            isArray,
+          } = entityFieldConfig;
           return await dbClient.from("entity_field_configs").insert({
             entity_config_id: insertedEntityConfig.id,
             workspace_id: workspace.id,
             name,
             description,
-            allow_manual_edit: options.allowManualEdit,
-            base_data_type: options.baseDataType,
-            class: options.class,
-            is_array: options.isArray,
-            is_id_field: options.isIdField,
-            is_title_field: options.isTitleField,
-            value_extractor_type: options.valueExtractorType,
+            allow_manual_edit: allowManualEdit,
+            data_type: dataType,
+            is_array: isArray,
+            is_id_field: isIdField,
+            is_title_field: isTitleField,
+            value_extractor_type: valueExtractorType,
           });
         });
       });

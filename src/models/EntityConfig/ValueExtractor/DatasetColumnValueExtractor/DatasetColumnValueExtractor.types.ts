@@ -5,10 +5,13 @@ import { DatasetColumnId } from "@/models/datasets/DatasetColumn";
 import { WorkspaceId } from "@/models/Workspace/types";
 import type { EntityFieldConfigId } from "../../EntityFieldConfig/EntityFieldConfig.types";
 import type { UUID } from "@/lib/types/common";
+import { Enums } from "@/types/database.types";
 
 export type DatasetColumnValueExtractorId = UUID<"DatasetColumnValueExtractor">;
 
-export type ValuePickerRuleType = "most_frequent" | "first";
+export type ValuePickerRuleType = Enums<
+  "value_extractors__value_picker_rule_type"
+>;
 
 type DatasetColumnValueExtractorRead = {
   /** Unique identifier for this extractor config */
@@ -29,12 +32,8 @@ type DatasetColumnValueExtractorRead = {
   /** ID of the dataset to extract from */
   datasetId: DatasetId;
 
-  /**
-   * ID of the specific field in the dataset to extract from
-   *
-   * TODO(jpsyx): this should be renamed to `datasetColumnId`
-   */
-  datasetFieldId: DatasetColumnId;
+  /** ID of the specific field in the dataset to extract from */
+  datasetColumnId: DatasetColumnId;
 
   /** Creation timestamp */
   createdAt: string;

@@ -3,7 +3,6 @@ import { QueryColumn, QueryColumnId } from "./QueryColumn.types";
 import { uuid } from "@/lib/utils/uuid";
 import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import { Models } from "@/models/Model";
-import { isOfModelType } from "@/lib/utils/guards/guards";
 import { AvaDataTypes } from "@/models/datasets/AvaDataType";
 import { QueryAggregationTypes } from "../QueryAggregationType/QueryAggregationTypes";
 
@@ -44,9 +43,6 @@ export const QueryColumns = {
   },
 
   isNumeric: (column: QueryColumn): boolean => {
-    const baseColumnDataType = isOfModelType("DatasetColumn", column.baseColumn)
-      ? column.baseColumn.dataType
-      : column.baseColumn.options.baseDataType;
-    return AvaDataTypes.isNumeric(baseColumnDataType);
+    return AvaDataTypes.isNumeric(column.baseColumn.dataType);
   },
 };
