@@ -1,2 +1,6 @@
-export * from "./DatasetColumnParsers";
-export type * from "./DatasetColumn.types";
+export { DatasetColumnParsers } from "./DatasetColumnParsers";
+export type {
+  DatasetColumn,
+  DatasetColumnId,
+  DetectedDatasetColumn,
+} from "./DatasetColumn.types";

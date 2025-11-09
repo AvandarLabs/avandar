@@ -1,2 +1,2 @@
-export type * from "./QueryAggregationType.types";
-export * from "./QueryAggregationTypes";
+export type { QueryAggregationType } from "./QueryAggregationType.types";
+export { QueryAggregationTypes } from "./QueryAggregationTypes";

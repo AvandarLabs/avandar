@@ -4,21 +4,22 @@ import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { identity } from "@/lib/utils/misc";
 import { uuidType } from "@/lib/utils/zodHelpers";
 import { DatasetId } from "../Dataset";
-import { LegacyLocalDatasetEntryModel } from "./types";
+import { LegacyLocalDatasetEntryModel } from "./Legacy_LocalDatasetEntry.types";
 
 const DBReadSchema = object({
   datasetId: uuidType<DatasetId>(),
   localTableName: string(),
 });
 
-export const LocalDatasetEntryParsers =
-  makeParserRegistry<LegacyLocalDatasetEntryModel>().build({
-    modelName: "LocalDatasetEntry",
-    DBReadSchema,
-    fromDBReadToModelRead: identity,
-    fromModelInsertToDBInsert: identity,
-    fromModelUpdateToDBUpdate: identity,
-  });
+export const Legacy_LocalDatasetEntryParsers = makeParserRegistry<
+  LegacyLocalDatasetEntryModel
+>().build({
+  modelName: "LocalDatasetEntry",
+  DBReadSchema,
+  fromDBReadToModelRead: identity,
+  fromModelInsertToDBInsert: identity,
+  fromModelUpdateToDBUpdate: identity,
+});
 
 /**
  * Do not remove these tests!

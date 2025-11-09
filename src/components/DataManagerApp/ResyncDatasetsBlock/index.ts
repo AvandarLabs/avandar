@@ -1,1 +1,1 @@
-export * from "./ResyncDatasetsBlock";
+export { ResyncDatasetsBlock } from "./ResyncDatasetsBlock";

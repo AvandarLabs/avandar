@@ -1,1 +1,1 @@
-export * from "./EntityFieldValueClient";
+export { EntityFieldValueClient } from "./EntityFieldValueClient";

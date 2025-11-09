@@ -1,2 +1,2 @@
-export type * from "./LineChartVizConfig.types";
-export * from "./LineChartVizConfigs";
+export type { LineChartVizConfig } from "./LineChartVizConfig.types";
+export { LineChartVizConfigs } from "./LineChartVizConfigs";

@@ -9,7 +9,7 @@ import {
 import { pipe } from "@/lib/utils/pipe";
 import { WorkspaceId } from "@/models/Workspace/types";
 import { DatasetId } from "../Dataset/Dataset.types";
-import { CSVFileDatasetId, CSVFileDatasetModel } from "./types";
+import { CSVFileDatasetId, CSVFileDatasetModel } from "./CSVFileDataset.types";
 
 const DBReadSchema = object({
   created_at: iso.datetime({ offset: true }),
@@ -29,7 +29,7 @@ const DBReadSchema = object({
   timestamp_format: string().nullable(),
 });
 
-export const LocalCSVDatasetParsers = makeParserRegistry<CSVFileDatasetModel>()
+export const CSVFileDatasetParsers = makeParserRegistry<CSVFileDatasetModel>()
   .build({
     modelName: "CSVFileDataset",
     DBReadSchema,

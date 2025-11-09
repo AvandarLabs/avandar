@@ -1,2 +1,7 @@
-export * from "./DatasetParsers";
-export type * from "./Dataset.types";
+export { DatasetParsers } from "./DatasetParsers";
+export type {
+  Dataset,
+  DatasetId,
+  DatasetSourceType,
+  DatasetWithColumns,
+} from "./Dataset.types";

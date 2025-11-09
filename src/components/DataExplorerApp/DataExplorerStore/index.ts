@@ -1,1 +1,1 @@
-export * from "./DataExplorerStore";
+export { DataExplorerStore } from "./DataExplorerStore";

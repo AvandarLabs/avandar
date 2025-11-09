@@ -1,1 +1,1 @@
-export * from "./EntityConfigCreatorStore";
+export { EntityConfigCreatorStore } from "./EntityConfigCreatorStore";

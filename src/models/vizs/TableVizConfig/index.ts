@@ -1,2 +1,2 @@
-export type * from "./TableVizConfig.types";
-export * from "./TableVizConfigs";
+export type { TableVizConfig } from "./TableVizConfig.types";
+export { TableVizConfigs } from "./TableVizConfigs";

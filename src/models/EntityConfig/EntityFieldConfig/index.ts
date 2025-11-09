@@ -1,3 +1,6 @@
-export * from "./EntityFieldConfig.types";
-export * from "./EntityFieldConfigParsers";
-export * from "./EntityFieldConfigs";
+export type {
+  EntityFieldConfig,
+  EntityFieldConfigId,
+} from "./EntityFieldConfig.types";
+export { EntityFieldConfigParsers } from "./EntityFieldConfigParsers";
+export { EntityFieldConfigs } from "./EntityFieldConfigs";

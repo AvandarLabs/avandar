@@ -8,7 +8,10 @@ import {
 import { pipe } from "@/lib/utils/pipe";
 import { WorkspaceId } from "@/models/Workspace/types";
 import { DatasetId } from "../Dataset/Dataset.types";
-import { GoogleSheetsDatasetId, GoogleSheetsDatasetModel } from "./types";
+import {
+  GoogleSheetsDatasetId,
+  GoogleSheetsDatasetModel,
+} from "./GoogleSheetsDataset.types";
 
 const DBReadSchema = object({
   created_at: iso.datetime({ offset: true }),

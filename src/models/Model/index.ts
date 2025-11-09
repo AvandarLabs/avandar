@@ -1,2 +1,2 @@
-export type * from "./Model.types";
-export * from "./Models";
+export type { Model, ModelTypeKey, TypedId } from "./Model.types";
+export { Models } from "./Models";

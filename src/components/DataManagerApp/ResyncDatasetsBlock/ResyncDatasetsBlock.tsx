@@ -5,6 +5,7 @@ import { ResyncDatasetCard } from "./ResyncDatasetCard";
 type Props = {
   datasets: Dataset[];
 };
+
 export function ResyncDatasetsBlock({ datasets }: Props): JSX.Element {
   return (
     <Stack>

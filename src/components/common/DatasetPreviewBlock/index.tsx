@@ -4,7 +4,7 @@ import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import {
-  DatasetColumnRead,
+  DatasetColumn,
   DetectedDatasetColumn,
 } from "@/models/datasets/DatasetColumn";
 
@@ -56,7 +56,7 @@ export function DatasetPreviewBlock({
         <ObjectDescriptionList
           data={columns}
           renderAsTable
-          renderTableHeader={(key: keyof DatasetColumnRead) => {
+          renderTableHeader={(key: keyof DatasetColumn) => {
             return key === "name" ? "Column Name" : undefined;
           }}
           itemRenderOptions={{

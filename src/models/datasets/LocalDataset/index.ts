@@ -1,2 +1,2 @@
-export * from "./LocalDatasetParsers";
-export type * from "./LocalDataset.types";
+export { LocalDatasetParsers } from "./LocalDatasetParsers";
+export type { LocalDataset, LocalDatasetModel } from "./LocalDataset.types";
