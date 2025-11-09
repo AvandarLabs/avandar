@@ -3,7 +3,6 @@ import {
   BoxProps,
   Loader,
   NavLinkProps,
-  Title,
   useMantineTheme,
 } from "@mantine/core";
 import { useMemo } from "react";
@@ -87,9 +86,6 @@ export function DatasetNavbar({
       {isLoading ?
         <Loader />
       : null}
-      <Title pl="sm" order={3}>
-        Uploaded Datasets
-      </Title>
       <NavLinkList
         pt="md"
         links={uploadedDatasetLinks}
