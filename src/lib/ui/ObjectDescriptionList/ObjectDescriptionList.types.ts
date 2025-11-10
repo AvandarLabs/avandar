@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { StringKeyOf } from "@/lib/types/utilityTypes";
-import { FormattableTimezone } from "@/lib/utils/formatters/formatDate";
+import { FormattableTimezone } from "@/lib/utils/formatters/formatDate/formatDate";
 import { registryKeys } from "@/lib/utils/objects/misc";
 import { UnknownObject } from "@/lib/types/common";
 

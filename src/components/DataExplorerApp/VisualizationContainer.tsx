@@ -9,7 +9,8 @@ import { BarChart } from "@/lib/ui/viz/BarChart";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { LineChart } from "@/lib/ui/viz/LineChart";
 import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
-import { isEpochMs, isIsoDateString } from "@/lib/utils/formatters/formatDate";
+import { isEpochMs } from "@/lib/utils/formatters/isEpochMs";
+import { isISODateString } from "@/lib/utils/formatters/isISODateString";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectValues } from "@/lib/utils/objects/misc";
 import { AvaDataTypes } from "@/models/datasets/AvaDataType";
@@ -63,7 +64,7 @@ export function VisualizationContainer({ columns, data }: Props): JSX.Element {
           const sampleVal = data[0]?.[f.name];
           return (
             AvaDataTypes.isTemporal(f.dataType) ||
-            isIsoDateString(sampleVal) ||
+            isISODateString(sampleVal) ||
             isEpochMs(sampleVal)
           );
         })

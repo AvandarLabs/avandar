@@ -1,8 +1,6 @@
 import { Text } from "@mantine/core";
-import {
-  formatDate,
-  isValidDateValue,
-} from "@/lib/utils/formatters/formatDate";
+import { formatDate } from "@/lib/utils/formatters/formatDate";
+import { isValidDateValue } from "@/lib/utils/formatters/isValidDateValue";
 import { formatNumber } from "@/lib/utils/formatters/formatNumber";
 import { isDate } from "@/lib/utils/guards/guards";
 import { isStringOrNumber } from "./guards";
