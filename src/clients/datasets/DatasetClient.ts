@@ -1,7 +1,6 @@
 import { SetOptional } from "type-fest";
 import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
-import { where } from "@/lib/utils/filters/filterBuilders";
-import { FiltersByColumn } from "@/lib/utils/filters/filtersByColumn";
+import { FiltersByColumn, where } from "@/lib/utils/filters/filters";
 import { makeBucketRecord } from "@/lib/utils/objects/builders";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { ExcludeNullsIn } from "@/lib/utils/objects/transformations";

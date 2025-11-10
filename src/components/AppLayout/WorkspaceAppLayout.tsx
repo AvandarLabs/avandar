@@ -6,7 +6,7 @@ import { useEnsureLocalStoragePersistence } from "@/hooks/browser/useEnsureLocal
 import { useSyncLocalDatasets } from "@/hooks/datasets/useSyncLocalDatasets";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AppShell } from "@/lib/ui/AppShell";
-import { where } from "@/lib/utils/filters/filterBuilders";
+import { where } from "@/lib/utils/filters/filters";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { DataExplorerStore } from "../DataExplorerApp/DataExplorerStore";
 import { useSpotlightActions } from "./useSpotlightActions";

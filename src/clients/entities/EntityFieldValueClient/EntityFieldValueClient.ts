@@ -6,7 +6,7 @@ import { withQueryHooks } from "@/lib/clients/withQueryHooks/withQueryHooks";
 import { ILogger } from "@/lib/Logger";
 import { RegistryOfArrays } from "@/lib/types/utilityTypes";
 import { assertIsDefined } from "@/lib/utils/asserts";
-import { where } from "@/lib/utils/filters/filterBuilders";
+import { where } from "@/lib/utils/filters/filters";
 import { isDefined } from "@/lib/utils/guards/guards";
 import {
   makeBucketRecord,

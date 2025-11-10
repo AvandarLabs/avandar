@@ -9,7 +9,7 @@ import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
-import { makeBucketMap } from "@/lib/utils/maps/builders";
+import { makeBucketMap } from "@/lib/utils/maps/makeBucketMap";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { Dataset, DatasetId } from "@/models/datasets/Dataset";
 import { Datasets } from "@/models/datasets/Dataset/Datasets";
