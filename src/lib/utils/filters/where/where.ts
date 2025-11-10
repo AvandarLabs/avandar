@@ -1,20 +1,11 @@
 import { UnknownObject } from "@/lib/types/common";
-import { FiltersByColumn } from "./filtersByColumn";
 import {
   ArrayValueOperator,
   FilterOperator,
+  FiltersByColumn,
   SingleValueOperator,
-} from "./filterTypes";
+} from "@/lib/utils/filters/filters.types";
 
-/**
- * Helper function to create a `where` filter for a specific column.
- * This returns a single-key object, with a `where` key, which contains
- * the filter object.
- *
- * @param column The column to filter by.
- * @param operator The operator to use for the filter.
- * @param value The value to filter by.
- */
 export function where<T extends UnknownObject, K extends keyof T>(
   column: K,
   operator: SingleValueOperator,

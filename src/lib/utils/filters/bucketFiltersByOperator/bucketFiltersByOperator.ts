@@ -1,20 +1,15 @@
 import { UnknownObject } from "@/lib/types/common";
-import { isArray } from "../guards/guards";
-import { objectKeys } from "../objects/misc";
-import { FilterOperatorRecord, FiltersByColumn } from "./filtersByColumn";
-import { FiltersByOperator } from "./filtersByOperator";
-import { isArrayValueOperator, isSingleValueOperator } from "./filterTypes";
-import { isEmptyFiltersObject } from "./isEmptyFiltersObject";
+import { isArray } from "@/lib/utils/guards/guards";
+import { objectKeys } from "@/lib/utils/objects/misc";
+import { isArrayValueOperator } from "@/lib/utils/filters/isArrayValueOperator";
+import { isSingleValueOperator } from "@/lib/utils/filters/isSingleValueOperator";
+import { isEmptyFiltersObject } from "@/lib/utils/filters/isEmptyFiltersObject";
+import {
+  FilterOperatorRecord,
+  FiltersByColumn,
+  FiltersByOperator,
+} from "@/lib/utils/filters/filters.types";
 
-/**
- * Convert from a column-based filter object to an operator-based filter object.
- *
- * They represent the same filters, just structured differently, based on what
- * is the more intuitive way to represent a filter for a given use case.
- *
- * @param filters
- * @returns
- */
 export function bucketFiltersByOperator<T extends UnknownObject>(
   filtersByColumn: FiltersByColumn<T> | undefined,
 ): FiltersByOperator<T> {
@@ -27,9 +22,11 @@ export function bucketFiltersByOperator<T extends UnknownObject>(
   objectKeys(filtersByColumn).forEach((column) => {
     const operatorRecord: FilterOperatorRecord<T[keyof T]> | undefined =
       filtersByColumn[column];
+
     if (operatorRecord) {
       objectKeys(operatorRecord).forEach((operator) => {
         const value = operatorRecord[operator]!;
+
         if (
           !(operator in filtersByOperator) ||
           filtersByOperator[operator] === undefined

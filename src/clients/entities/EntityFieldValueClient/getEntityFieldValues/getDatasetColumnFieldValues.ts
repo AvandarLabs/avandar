@@ -3,9 +3,9 @@ import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { assertIsDefined } from "@/lib/utils/asserts";
-import { where } from "@/lib/utils/filters/filterBuilders";
+import { where } from "@/lib/utils/filters/filters";
 import { isDefined } from "@/lib/utils/guards/guards";
-import { makeIdLookupMap } from "@/lib/utils/maps/builders";
+import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap";
 import {
   makeBucketRecord,
   makeIdLookupRecord,

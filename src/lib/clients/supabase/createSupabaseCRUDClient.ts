@@ -11,8 +11,10 @@ import { Database } from "@/types/database.types";
 import { ILogger } from "../../Logger";
 import { ModelCRUDParserRegistry } from "../../models/makeParserRegistry";
 import { SupabaseModelCRUDTypes } from "../../models/SupabaseModelCRUDTypes";
-import { FiltersByColumn } from "../../utils/filters/filtersByColumn";
-import { FilterOperator } from "../../utils/filters/filterTypes";
+import {
+  FilterOperator,
+  FiltersByColumn,
+} from "../../utils/filters/filters";
 import { objectEntries, objectKeys } from "../../utils/objects/misc";
 import {
   createModelCRUDClient,

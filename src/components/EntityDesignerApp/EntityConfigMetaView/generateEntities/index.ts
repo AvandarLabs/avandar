@@ -5,7 +5,7 @@ import { EntityClient } from "@/clients/entities/EntityClient";
 import { getSQLSelectOfExtractor } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getDatasetColumnFieldValues";
 import { Logger } from "@/lib/Logger";
 import { assertIsDefined } from "@/lib/utils/asserts";
-import { where } from "@/lib/utils/filters/filterBuilders";
+import { where } from "@/lib/utils/filters/filters";
 import { isDefined } from "@/lib/utils/guards/guards";
 import { makeObject } from "@/lib/utils/objects/builders";
 import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";

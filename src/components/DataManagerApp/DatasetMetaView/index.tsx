@@ -26,7 +26,7 @@ import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList.types";
 import { Paper } from "@/lib/ui/Paper";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
-import { where } from "@/lib/utils/filters/filterBuilders";
+import { where } from "@/lib/utils/filters/filters";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { matchLiteral } from "@/lib/utils/strings/matchLiteral";
 import { AvaDataTypes } from "@/models/datasets/AvaDataType";

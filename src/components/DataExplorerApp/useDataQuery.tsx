@@ -8,7 +8,7 @@ import {
   valIsOfModelType,
   valNotEq,
 } from "@/lib/utils/guards/higherOrderFuncs";
-import { makeIdLookupMap } from "@/lib/utils/maps/builders";
+import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap";
 import { makeObjectFromEntries } from "@/lib/utils/objects/builders";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries, objectValues } from "@/lib/utils/objects/misc";
