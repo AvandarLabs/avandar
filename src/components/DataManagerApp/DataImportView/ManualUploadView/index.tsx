@@ -19,6 +19,7 @@ import {
   notifyWarning,
 } from "@/lib/ui/notifications/notify";
 import { FileUploadForm } from "@/lib/ui/singleton-forms/FileUploadForm";
+import { formatNumber } from "@/lib/utils/formatters/formatNumber";
 import { snakeCaseKeysShallow } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
 import { Dataset, DatasetId } from "@/models/datasets/Dataset";
@@ -154,7 +155,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
       if (numRejectedRows === 0) {
         notifySuccess({
           title: "File loaded successfully",
-          message: `Parsed ${numSuccessRows} rows`,
+          message: `Parsed ${formatNumber(numSuccessRows)} rows`,
         });
       } else if (numSuccessRows === 0) {
         notifyError({

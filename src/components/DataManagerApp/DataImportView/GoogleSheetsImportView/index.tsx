@@ -25,6 +25,7 @@ import {
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
+import { formatNumber } from "@/lib/utils/formatters/formatNumber";
 import { snakeCaseKeysShallow } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
 import { csvCellValueSchema } from "@/lib/utils/zodHelpers";
@@ -180,7 +181,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
       if (numRejectedRows === 0) {
         notifySuccess({
           title: "File loaded successfully",
-          message: `Parsed ${numSuccessRows} rows`,
+          message: `Parsed ${formatNumber(numSuccessRows)} rows`,
         });
       } else if (numSuccessRows === 0) {
         notifyError({
