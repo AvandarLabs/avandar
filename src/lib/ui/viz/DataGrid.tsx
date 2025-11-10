@@ -3,10 +3,8 @@ import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
 import { Writable } from "type-fest";
 import { UnknownDataFrame } from "@/lib/types/common";
-import {
-  formatDate,
-  FormattableTimezone,
-} from "@/lib/utils/formatters/formatDate";
+import { formatDate } from "@/lib/utils/formatters/formatDate";
+import { FormattableTimezone } from "@/lib/utils/formatters/formatDate/formatDate";
 
 type Props = {
   columnNames: readonly string[];
