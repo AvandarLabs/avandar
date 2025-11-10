@@ -3,7 +3,6 @@ import { FormValidateInput, isEmail, useForm } from "@mantine/form";
 import { HTMLInputAutoCompleteAttribute, ReactNode, useMemo } from "react";
 import { match } from "ts-pattern";
 import { StringKeyOf } from "@/lib/types/utilityTypes";
-import { constant } from "@/lib/utils/higherOrderFuncs";
 import { propIsDefined } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys, objectValues } from "@/lib/utils/objects/misc";
 import { camelToTitleCase } from "@/lib/utils/strings/transformations";
@@ -70,14 +69,15 @@ function getDefaultFieldSchema(
 function getDefaultSemanticValidationFn(
   semanticType: SemanticTextType,
 ): ValidationFn | undefined {
-  switch (semanticType) {
-    case "email":
+  return match(semanticType)
+    .with("email", () => {
       return isEmail("Invalid email address");
-    case "text":
+    })
+    .with("text", () => {
       return undefined;
-  }
+    })
+    .exhaustive();
 }
-
 type Props<
   Fields extends Record<string, FormFieldSchema>,
   FormValues extends FieldsToValuesObject<Fields>,
@@ -111,7 +111,7 @@ export function BasicForm<
     const anyFieldRequiresSync = objectValues(fields).some(
       propIsDefined("syncWhileUntouched"),
     );
-
+    console.log(fields);
     objectKeys(fields).forEach((fieldKey) => {
       const field = fields[fieldKey]!;
 
@@ -124,9 +124,20 @@ export function BasicForm<
           getDefaultSemanticValidationFn(field.semanticType)
         : undefined;
 
-      if (field.validateFn || semanticValidationFn) {
-        validations[fieldKey] =
-          field.validateFn ?? semanticValidationFn ?? constant(undefined);
+      if (field.required || field.validateFn || semanticValidationFn) {
+        validations[fieldKey] = (value, values) => {
+          if (field.required && value.trim() === "") {
+            // this is not rendered but necessary to trigger
+            // Mantine's validator
+            return "required";
+          }
+
+          return (
+            field.validateFn?.(value, values) ??
+            semanticValidationFn?.(value, values) ??
+            undefined
+          );
+        };
       }
     });
 
@@ -213,7 +224,8 @@ export function BasicForm<
               loading={submitIsLoading}
               disabled={
                 submitIsLoading ||
-                (disableSubmitWhileUnchanged && !form.isDirty())
+                (disableSubmitWhileUnchanged && !form.isDirty()) ||
+                !form.isValid()
               }
               type="submit"
             >
