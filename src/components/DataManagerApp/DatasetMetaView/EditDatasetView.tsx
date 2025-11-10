@@ -1,6 +1,6 @@
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
-import { InputTextField } from "@/lib/ui/singleton-forms/InputTextField";
+import { InputTextForm } from "@/lib/ui/singleton-forms/InputTextForm";
 import { Dataset } from "@/models/datasets/Dataset";
 
 type Props = {
@@ -19,10 +19,11 @@ export function EditDatasetView({ dataset }: Props): JSX.Element {
   });
 
   return (
-    <InputTextField
+    <InputTextForm
       defaultValue={dataset.name}
       required
       hideLabel
+      validateOnChange
       minLength={2}
       inputWidth={300}
       showSubmitButton

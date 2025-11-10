@@ -4,12 +4,12 @@ import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { LocalDatasetEntryClient } from "@/clients/datasets/LocalDatasetEntryClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
-import { DuckDBDataType } from "@/clients/DuckDBClient/DuckDBDataType";
-import { getRandomTableName } from "@/clients/DuckDBClient/getRandomTableName";
-import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/types";
+import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/DuckDBClient.types";
+import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { AppConfig } from "@/config/AppConfig";
+import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useQuery } from "@/lib/hooks/query/useQuery";
 import { MIMEType, UnknownObject } from "@/lib/types/common";
@@ -18,11 +18,14 @@ import {
   notifySuccess,
   notifyWarning,
 } from "@/lib/ui/notifications/notify";
-import { FileUploadField } from "@/lib/ui/singleton-forms/FileUploadField";
+import { FileUploadForm } from "@/lib/ui/singleton-forms/FileUploadForm";
+import { formatNumber } from "@/lib/utils/formatters/formatNumber";
 import { snakeCaseKeysShallow } from "@/lib/utils/objects/transformations";
-import { Dataset } from "@/models/datasets/Dataset";
+import { uuid } from "@/lib/utils/uuid";
+import { Dataset, DatasetId } from "@/models/datasets/Dataset";
+import { DetectedDatasetColumn } from "@/models/datasets/DatasetColumn";
+import { UserId } from "@/models/User/types";
 import { WorkspaceId } from "@/models/Workspace/types";
-import { DetectedDatasetColumn } from "../../hooks/detectColumnDataTypes";
 import {
   DatasetUploadForm,
   DatasetUploadFormValues,
@@ -30,6 +33,7 @@ import {
 
 async function saveLocalCSVToBackend(params: {
   name: string;
+  datasetId: DatasetId;
   description: string;
   columns: DetectedDatasetColumn[];
   workspaceId: WorkspaceId;
@@ -40,6 +44,7 @@ async function saveLocalCSVToBackend(params: {
 }): Promise<Dataset> {
   const {
     name,
+    datasetId,
     description,
     sizeInBytes,
     workspaceId,
@@ -48,8 +53,9 @@ async function saveLocalCSVToBackend(params: {
     rowsToSkip,
     loadCSVResult,
   } = params;
-  const { csvSniff, tableName } = loadCSVResult;
+  const { csvSniff } = loadCSVResult;
   const dataset = await DatasetClient.insertCSVFileDataset({
+    datasetId,
     workspaceId,
     datasetName: name,
     datasetDescription: description,
@@ -71,16 +77,6 @@ async function saveLocalCSVToBackend(params: {
       timestampFormat: csvSniff.TimestampFormat,
     },
   });
-
-  // now that we've persisted the dataset to the backend, let's add an entry
-  // to IndexedDB to map the datasetId to the table name, so we can always
-  // remember where a dataset's locally loaded raw data is stored.
-  await LocalDatasetEntryClient.insert({
-    data: {
-      datasetId: dataset.id,
-      localTableName: tableName,
-    },
-  });
   return dataset;
 }
 
@@ -88,20 +84,26 @@ type Props = BoxProps;
 
 export function ManualUploadView({ ...props }: Props): JSX.Element {
   const queryClient = useQueryClient();
+  const user = useCurrentUser();
   const workspace = useCurrentWorkspace();
 
   const [parseOptions, setParseOptions] = useState<{
     file: File;
-    localTableName: string;
+    datasetId: DatasetId;
     numRowsToSkip?: number;
     delimiter?: string;
   }>();
 
   // query to load the data locally to DuckDB
+  // TODO(jpsyx): try again to set this to `useMutation` instead of `useQuery`
+  // the code is hard to follow with `useQuery` and i dont think we need to
+  // have it that way anymore. We used to need to but we worked around it i
+  // think.
   const [loadResults, isLoadingCSV, loadQueryObj] = useQuery({
-    queryKey: ["load-csv", parseOptions],
+    queryKey: ["load-csv", user!.id, workspace.id, parseOptions],
     queryFn: async (): Promise<
       | {
+          datasetId: DatasetId;
           metadata: DuckDBLoadCSVResult;
           previewRows: UnknownObject[];
         }
@@ -110,31 +112,38 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
       if (!parseOptions) {
         return undefined;
       }
-      const { file, localTableName, numRowsToSkip, delimiter } = parseOptions;
-      const loadResult = await DuckDBClient.loadCSV({
-        file,
-        numRowsToSkip,
-        delimiter,
-        tableName: localTableName,
+      const { file, datasetId, numRowsToSkip, delimiter } = parseOptions;
+      const loadResult = await LocalDatasetClient.storeLocalCSV({
+        datasetId,
+        workspaceId: workspace.id,
+        userId: user!.id as UserId,
+        csvParseOptions: {
+          file,
+          numRowsToSkip,
+          delimiter,
+        },
       });
+
       // now query the file for the rows to preview
+      // TODO(jpsyx): this should be using DatasetRawDataClient.getPreviewData
       const previewData = await DuckDBClient.runRawQuery(
         `SELECT * FROM "$tableName$" LIMIT $maxPreviewRows$`,
         {
-          tableName: localTableName,
-          maxPreviewRows: AppConfig.dataManagerApp.maxPreviewRows,
+          params: {
+            tableName: datasetId,
+            maxPreviewRows: AppConfig.dataManagerApp.maxPreviewRows,
+          },
         },
       );
-      return { metadata: loadResult, previewRows: previewData.data };
+      return { datasetId, metadata: loadResult, previewRows: previewData.data };
     },
     enabled: !!parseOptions,
     // this ensures that we dont immediately set `loadResults` to undefined when
     // the `parseOptions` change.
-    placeholderData: (prevValue) => {
-      return prevValue;
-    },
+    usePreviousDataAsPlaceholder: true,
     refetchOnWindowFocus: false,
     staleTime: Infinity,
+    retry: false,
   });
 
   // check if dataset has loaded and if so, show a notification
@@ -146,7 +155,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
       if (numRejectedRows === 0) {
         notifySuccess({
           title: "File loaded successfully",
-          message: `Parsed ${numSuccessRows} rows`,
+          message: `Parsed ${formatNumber(numSuccessRows)} rows`,
         });
       } else if (numSuccessRows === 0) {
         notifyError({
@@ -170,7 +179,9 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
     return loadResults?.metadata.columns.map((duckColumn, idx) => {
       return {
         name: duckColumn.column_name,
-        dataType: DuckDBDataType.toDatasetDataType(duckColumn.column_type),
+        originalDataType: duckColumn.column_type,
+        detectedDataType: duckColumn.column_type,
+        dataType: DuckDBDataTypeUtils.toAvaDataType(duckColumn.column_type),
         columnIdx: idx,
       };
     });
@@ -180,7 +191,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
     if (file) {
       setParseOptions({
         file,
-        localTableName: getRandomTableName(),
+        datasetId: uuid(),
       });
     } else {
       notifyError({
@@ -193,7 +204,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
   return (
     <Box {...props}>
       <Stack align="flex-start">
-        <FileUploadField
+        <FileUploadForm
           label="Upload a CSV"
           description="Select a CSV from your computer to import"
           placeholder="Select file"
@@ -213,6 +224,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
               datasetFormValues: DatasetUploadFormValues,
             ) => {
               const dataset = await saveLocalCSVToBackend({
+                datasetId: loadResults.datasetId,
                 workspaceId: workspace.id,
                 name: datasetFormValues.name,
                 description: datasetFormValues.description,
@@ -232,7 +244,9 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
               delimiter: string;
             }) => {
               // drop the dataset so we can re-parse it from scratch
-              await DuckDBClient.dropDataset(loadResults.metadata.tableName);
+              await LocalDatasetClient.dropLocalDataset({
+                datasetId: loadResults.datasetId,
+              });
               setParseOptions((prevParseOptions) => {
                 if (prevParseOptions) {
                   return {
@@ -240,8 +254,8 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
                     numRowsToSkip: parseConfig.numRowsToSkip,
                     delimiter: parseConfig.delimiter,
 
-                    // generate a new local table name for this new parsing
-                    localTableName: getRandomTableName(),
+                    // generate a new dataset id for this new parsing
+                    datasetId: uuid(),
                   };
                 }
                 return prevParseOptions;
@@ -257,7 +271,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
             if (uploadedFile) {
               setParseOptions({
                 file: uploadedFile,
-                localTableName: getRandomTableName(),
+                datasetId: uuid(),
               });
             }
           }}

@@ -1,9 +1,8 @@
 import { match } from "ts-pattern";
 import { makeBucketRecord } from "@/lib/utils/objects/builders";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys } from "@/lib/utils/objects/misc";
-import { AggregationExtractorClient } from "./AggregationExtractor/AggregationExtractorClient";
-import { DatasetColumnValueExtractorClient } from "./DatasetColumnValueExtractor/DatasetColumnValueExtractorClient";
+import { DatasetColumnValueExtractorClient } from "../../../clients/entity-configs/DatasetColumnValueExtractorClient";
 import { ManualEntryExtractorClient } from "./ManualEntryExtractor/ManualEntryExtractorClient";
 import {
   EntityFieldValueExtractor,
@@ -17,7 +16,7 @@ export const ValueExtractorClient = {
   }): Promise<void> => {
     // bucket the extractors by type
     const extractorsByType = makeBucketRecord(params.data, {
-      keyFn: getProp("type"),
+      keyFn: prop("type"),
     }) as {
       [K in ValueExtractorType]: Array<
         EntityFieldValueExtractorRegistry<"Insert">[K]
@@ -28,11 +27,6 @@ export const ValueExtractorClient = {
     await Promise.all(
       objectKeys(extractorsByType).map((extractorType) => {
         return match(extractorType)
-          .with("aggregation", (type) => {
-            return AggregationExtractorClient.bulkInsert({
-              data: extractorsByType[type],
-            });
-          })
           .with("manual_entry", (type) => {
             return ManualEntryExtractorClient.bulkInsert({
               data: extractorsByType[type],

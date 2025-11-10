@@ -2,28 +2,27 @@ import { removeDuplicates } from "@tiptap/react";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
-import { LocalDatasetEntryClient } from "@/clients/datasets/LocalDatasetEntryClient";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { where } from "@/lib/utils/filters/filterBuilders";
-import { isDefined } from "@/lib/utils/guards";
+import { isDefined } from "@/lib/utils/guards/guards";
 import { makeIdLookupMap } from "@/lib/utils/maps/builders";
 import {
   makeBucketRecord,
   makeIdLookupRecord,
 } from "@/lib/utils/objects/builders";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries } from "@/lib/utils/objects/misc";
 import { promiseFlatMap } from "@/lib/utils/promises";
 import { DatasetId } from "@/models/datasets/Dataset";
 import { DatasetColumn } from "@/models/datasets/DatasetColumn";
 import { EntityConfigId } from "@/models/EntityConfig";
-import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
+import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import {
   EntityFieldConfig,
   EntityFieldConfigId,
-} from "@/models/EntityConfig/EntityFieldConfig/types";
-import { DatasetColumnValueExtractorClient } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractorClient";
-import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/types";
+} from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
+import { DatasetColumnValueExtractorClient } from "@/clients/entity-configs/DatasetColumnValueExtractorClient";
+import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractor.types";
 
 type FieldWithDatasetExtractor = {
   fieldConfig: EntityFieldConfig;
@@ -43,42 +42,105 @@ type FieldWithDatasetExtractor = {
 export function getSQLSelectOfExtractor({
   selectColumnName,
   primaryKeyColumnName,
-  tableName,
+  datasetId,
   ruleType,
   outputColumnName,
   externalIdsTable = "external_ids",
-  externalIdsColumn = "external_id",
+  externalIdColumn = "external_id",
 }: {
   selectColumnName: string;
   primaryKeyColumnName: string;
-  tableName: string;
+  datasetId: string;
   ruleType: DatasetColumnValueExtractor["valuePickerRuleType"];
   outputColumnName: string;
   externalIdsTable?: string;
-  externalIdsColumn?: string;
+  externalIdColumn?: string;
 }): string {
   return match(ruleType)
     .with("first", () => {
       return `
         -- Get the first value
-        (SELECT "${selectColumnName}"
-        FROM "${tableName}" dataset
-        WHERE "${externalIdsTable}"."${externalIdsColumn}" = dataset."${primaryKeyColumnName}"
-        LIMIT 1) as "${outputColumnName}"
+        (
+          SELECT "${selectColumnName}",
+          FROM "${datasetId}" dataset
+          WHERE
+            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+          LIMIT 1
+        ) AS "${outputColumnName}"
       `;
     })
     .with("most_frequent", () => {
       return `
         -- Get the most frequent value
-        (SELECT "${selectColumnName}"
-        FROM "${tableName}" dataset
-        WHERE "${externalIdsTable}"."${externalIdsColumn}" = dataset."${primaryKeyColumnName}"
-        GROUP BY "${selectColumnName}"
-        ORDER BY COUNT(*) DESC, "${selectColumnName}"
-        LIMIT 1) as "${outputColumnName}"
+        (
+          SELECT "${selectColumnName}"
+          FROM "${datasetId}" dataset
+          WHERE
+            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+          GROUP BY "${selectColumnName}"
+          ORDER BY COUNT(*) DESC, "${selectColumnName}"
+          LIMIT 1
+        ) AS "${outputColumnName}"
       `;
     })
-    .exhaustive();
+    .with("sum", () => {
+      return `
+        -- Get the sum of the values
+        (
+          SELECT CAST(SUM("${selectColumnName}") AS DOUBLE)
+          FROM "${datasetId}" dataset
+          WHERE
+            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+        ) AS "${outputColumnName}"
+      `;
+    })
+    .with("avg", () => {
+      return `
+        -- Get the average of the values
+        (
+          SELECT CAST(AVG("${selectColumnName}") AS DOUBLE)
+          FROM "${datasetId}" dataset
+          WHERE
+            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+        ) AS "${outputColumnName}"
+      `;
+    })
+    .with("count", () => {
+      return `
+        -- Get the count of the values
+        (
+          SELECT CAST(COUNT("${selectColumnName}") AS DOUBLE)
+          FROM "${datasetId}" dataset
+          WHERE
+            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+        ) AS "${outputColumnName}"
+      `;
+    })
+    .with("max", () => {
+      return `
+        -- Get the maximum value
+        (
+          SELECT CAST(MAX("${selectColumnName}") AS DOUBLE)
+          FROM "${datasetId}" dataset
+          WHERE
+            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+        ) AS "${outputColumnName}"
+      `;
+    })
+    .with("min", () => {
+      return `
+        -- Get the minimum value
+        (
+          SELECT CAST(MIN("${selectColumnName}") AS DOUBLE)
+          FROM "${datasetId}" dataset
+          WHERE
+            "${externalIdsTable}"."${externalIdColumn}" = dataset."${primaryKeyColumnName}"
+        ) AS "${outputColumnName}"
+      `;
+    })
+    .exhaustive(() => {
+      throw new Error(`Invalid rule type: "${ruleType}"`);
+    });
 }
 
 async function _extractFieldValuesFromDataset({
@@ -98,12 +160,6 @@ async function _extractFieldValuesFromDataset({
     extractor: DatasetColumnValueExtractor;
   }>;
 }): Promise<Array<Record<EntityFieldConfigId, unknown>>> {
-  // TODO(jpsyx): this should eventually be unnecessary when we just use
-  // the dataset ids as the table names
-  const datasetEntry = await LocalDatasetEntryClient.getById({ id: datasetId });
-  assertIsDefined(datasetEntry, "Dataset not found locally");
-
-  const datasetTableName = datasetEntry.localTableName;
   const primaryKeyColumnName = primaryKeyField.datasetColumn.name;
 
   // returns rows where each column is an entity field ID
@@ -116,7 +172,7 @@ async function _extractFieldValuesFromDataset({
       WITH external_ids AS (
         SELECT
           DISTINCT "$primaryKeyColumnName$" as external_id
-        FROM "$datasetTableName$"
+        FROM "$datasetId$"
       )
       SELECT
         external_ids.external_id,
@@ -124,21 +180,20 @@ async function _extractFieldValuesFromDataset({
       FROM external_ids
     `,
     queryArgs: {
-      datasetTableName,
+      datasetId,
       primaryKeyColumnName,
       columnSelectors: requestedFields
         .map((field) => {
           const fieldId = field.fieldConfig.id;
           const colName = field.datasetColumn.name;
-          // TODO(jpsyx): replace this with a real extractor sql
           const sqlStatement = getSQLSelectOfExtractor({
             selectColumnName: colName,
             primaryKeyColumnName,
-            tableName: datasetTableName,
+            datasetId: datasetId,
             ruleType: field.extractor.valuePickerRuleType,
             outputColumnName: fieldId,
             externalIdsTable: "external_ids",
-            externalIdsColumn: "external_id",
+            externalIdColumn: "external_id",
           });
           return sqlStatement;
         })
@@ -169,7 +224,7 @@ async function _getPrimaryKeyFieldExtractors(
 
   // now get all the extractors for these fields
   const primaryKeyExtractors = await DatasetColumnValueExtractorClient.getAll(
-    where("entity_field_config_id", "in", primaryKeyFields.map(getProp("id"))),
+    where("entity_field_config_id", "in", primaryKeyFields.map(prop("id"))),
   );
 
   // now group them together
@@ -202,15 +257,15 @@ export async function getDatasetColumnFieldValues({
   entityConfigId: EntityConfigId;
   fieldsWithExtractors: readonly FieldWithDatasetExtractor[];
 }): Promise<Array<Record<EntityFieldConfigId, unknown>>> {
-  const primaryKeyFieldsWithExtractors =
-    await _getPrimaryKeyFieldExtractors(entityConfigId);
+  const primaryKeyFieldsWithExtractors = await _getPrimaryKeyFieldExtractors(
+    entityConfigId,
+  );
 
   // Get all metadata of the columns we need to extract
   const allColumnIds = removeDuplicates([
-    ...primaryKeyFieldsWithExtractors.map(getProp("extractor.datasetFieldId")),
-    ...fieldsWithExtractors.map(getProp("extractor.datasetFieldId")),
+    ...primaryKeyFieldsWithExtractors.map(prop("extractor.datasetColumnId")),
+    ...fieldsWithExtractors.map(prop("extractor.datasetColumnId")),
   ]);
-
   const datasetColumnsById = makeIdLookupRecord(
     await DatasetColumnClient.getAll(where("id", "in", allColumnIds)),
     { key: "id" },
@@ -220,14 +275,13 @@ export async function getDatasetColumnFieldValues({
   const requestedFields = fieldsWithExtractors.map((field) => {
     return {
       ...field,
-      datasetColumn: datasetColumnsById[field.extractor.datasetFieldId]!,
+      datasetColumn: datasetColumnsById[field.extractor.datasetColumnId]!,
     };
   });
-
   const primaryKeyFields = primaryKeyFieldsWithExtractors.map((field) => {
     return {
       ...field,
-      datasetColumn: datasetColumnsById[field.extractor.datasetFieldId]!,
+      datasetColumn: datasetColumnsById[field.extractor.datasetColumnId]!,
     };
   });
 
@@ -240,7 +294,7 @@ export async function getDatasetColumnFieldValues({
   // Each extractor corresponds to 1 dataset, but there can be
   // duplicate datasets, so let's bucket them by dataset.
   const requestedFieldsByDatasetId = makeBucketRecord(requestedFields, {
-    keyFn: getProp("extractor.datasetId"),
+    keyFn: prop("extractor.datasetId"),
   });
 
   // run a query for each dataset
@@ -252,13 +306,11 @@ export async function getDatasetColumnFieldValues({
         primaryKeyField,
         `Primary key field not found for dataset ${datasetId}`,
       );
-
       const rows = await _extractFieldValuesFromDataset({
         datasetId,
         primaryKeyField,
         requestedFields: reqFields,
       });
-
       return rows;
     },
   );

@@ -2,11 +2,13 @@ import { Outlet } from "@tanstack/react-router";
 import { ReactNode, useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
+import { useEnsureLocalStoragePersistence } from "@/hooks/browser/useEnsureLocalStoragePersistence";
+import { useSyncLocalDatasets } from "@/hooks/datasets/useSyncLocalDatasets";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AppShell } from "@/lib/ui/AppShell";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
-import { DataExplorerProvider } from "../DataExplorerApp/DataExplorerContext";
+import { DataExplorerStore } from "../DataExplorerApp/DataExplorerStore";
 import { useSpotlightActions } from "./useSpotlightActions";
 
 type Props = {
@@ -17,9 +19,20 @@ type Props = {
   children?: ReactNode;
 };
 
+// Hooks that need to run at the root level of the workspace
+function useWorkspaceChecks() {
+  useEnsureLocalStoragePersistence();
+
+  // At the root level of the app we should check if this workspace
+  // is missing any datasets that *should* be locally loaded
+  useSyncLocalDatasets();
+}
+
 export function WorkspaceAppLayout({
   children = <Outlet />,
 }: Props): JSX.Element {
+  useWorkspaceChecks();
+
   const workspace = useCurrentWorkspace();
   const [entityConfigs] = EntityConfigClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
@@ -56,7 +69,7 @@ export function WorkspaceAppLayout({
   }, [workspace.slug]);
 
   return (
-    <DataExplorerProvider>
+    <DataExplorerStore.Provider>
       <AppShell
         title={workspace.name}
         currentWorkspace={workspace}
@@ -67,6 +80,6 @@ export function WorkspaceAppLayout({
       >
         {children}
       </AppShell>
-    </DataExplorerProvider>
+    </DataExplorerStore.Provider>
   );
 }

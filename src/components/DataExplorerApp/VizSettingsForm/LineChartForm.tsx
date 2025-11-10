@@ -1,40 +1,34 @@
 import { useMemo } from "react";
-import { QueryResultColumn } from "@/clients/DuckDBClient/types";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
-
-export type LineChartSettings = {
-  xAxisKey: string | undefined;
-  yAxisKey: string | undefined;
-};
+import { propPasses } from "@/lib/utils/objects/higherOrderFuncs";
+import { AvaDataTypes } from "@/models/datasets/AvaDataType";
+import { QueryResultColumn } from "@/models/queries/QueryResult/QueryResult.types";
+import { LineChartVizConfig } from "@/models/vizs/LineChartVizConfig";
 
 type Props = {
   fields: readonly QueryResultColumn[];
-  settings: LineChartSettings;
-  onSettingsChange: (settings: LineChartSettings) => void;
+  config: LineChartVizConfig;
+  onConfigChange: (newConfig: LineChartVizConfig) => void;
 };
 
 export function LineChartForm({
   fields,
-  settings,
-  onSettingsChange,
+  config,
+  onConfigChange,
 }: Props): JSX.Element {
   const fieldOptions = useMemo(() => {
-    return makeSelectOptions(fields, {
-      valueFn: getProp("name"),
-      labelFn: getProp("name"),
-    });
+    return makeSelectOptions(fields, { valueKey: "name", labelKey: "name" });
   }, [fields]);
 
   const numericFieldOptions = useMemo(() => {
-    return makeSelectOptions(fields.filter(propIs("dataType", "number")), {
-      valueFn: getProp("name"),
-      labelFn: getProp("name"),
-    });
+    return makeSelectOptions(
+      fields.filter(propPasses("dataType", AvaDataTypes.isNumeric)),
+      { valueKey: "name", labelKey: "name" },
+    );
   }, [fields]);
 
-  const { xAxisKey, yAxisKey } = settings;
+  const { xAxisKey, yAxisKey } = config;
 
   return (
     <>
@@ -50,8 +44,8 @@ export function LineChartForm({
           : "Select a field"
         }
         onChange={(field) => {
-          return onSettingsChange({
-            ...settings,
+          return onConfigChange({
+            ...config,
             xAxisKey: field ?? undefined,
           });
         }}
@@ -70,8 +64,8 @@ export function LineChartForm({
           : "Select a field"
         }
         onChange={(field) => {
-          return onSettingsChange({
-            ...settings,
+          return onConfigChange({
+            ...config,
             yAxisKey: field ?? undefined,
           });
         }}

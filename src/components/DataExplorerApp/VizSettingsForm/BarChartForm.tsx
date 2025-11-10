@@ -1,75 +1,92 @@
+import { Tooltip } from "@mantine/core";
 import { useMemo } from "react";
-import { QueryResultColumn } from "@/clients/DuckDBClient/types";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
-
-export type BarChartSettings = {
-  xAxisKey: string | undefined;
-  yAxisKey: string | undefined;
-};
+import { propPasses } from "@/lib/utils/objects/higherOrderFuncs";
+import { AvaDataTypes } from "@/models/datasets/AvaDataType";
+import { QueryResultColumn } from "@/models/queries/QueryResult/QueryResult.types";
+import { BarChartVizConfig } from "@/models/vizs/BarChartVizConfig";
 
 type Props = {
   fields: readonly QueryResultColumn[];
-  settings: BarChartSettings;
-  onSettingsChange: (settings: BarChartSettings) => void;
+  config: BarChartVizConfig;
+  onConfigChange: (newConfig: BarChartVizConfig) => void;
 };
 
 export function BarChartForm({
   fields,
-  settings,
-  onSettingsChange,
+  config,
+  onConfigChange,
 }: Props): JSX.Element {
   const fieldOptions = useMemo(() => {
     return makeSelectOptions(fields, {
-      valueFn: getProp("name"),
-      labelFn: getProp("name"),
+      valueKey: "name",
+      labelKey: "name",
     });
   }, [fields]);
 
   const numericFieldOptions = useMemo(() => {
-    return makeSelectOptions(fields.filter(propIs("dataType", "number")), {
-      valueFn: getProp("name"),
-      labelFn: getProp("name"),
-    });
+    return makeSelectOptions(
+      fields.filter(propPasses("dataType", AvaDataTypes.isNumeric)),
+      {
+        valueKey: "name",
+        labelKey: "name",
+      },
+    );
   }, [fields]);
+  const { xAxisKey, yAxisKey } = config;
+  const xAxisDisabled = fieldOptions.length === 0;
+  const yAxisDisabled =
+    fieldOptions.length === 0 || numericFieldOptions.length === 0;
 
-  const { xAxisKey, yAxisKey } = settings;
-
+  const noColumnsTooltipMsg =
+    "You need to add at least one column so there can be options available here";
   return (
     <>
-      <Select
-        allowDeselect
-        data={fieldOptions}
-        label="X Axis"
-        value={xAxisKey}
-        disabled={fieldOptions.length === 0}
-        placeholder={
-          fieldOptions.length === 0 ?
-            "No fields have been queried"
-          : "Select a field"
-        }
-        onChange={(field) => {
-          onSettingsChange({ ...settings, xAxisKey: field ?? undefined });
-        }}
-      />
+      <Tooltip disabled={!xAxisDisabled} label={noColumnsTooltipMsg}>
+        <Select
+          allowDeselect
+          data={fieldOptions}
+          label="X Axis"
+          value={xAxisKey}
+          disabled={fieldOptions.length === 0}
+          placeholder={
+            fieldOptions.length === 0 ?
+              "No columns are available"
+            : "Select a column"
+          }
+          onChange={(field) => {
+            onConfigChange({ ...config, xAxisKey: field ?? undefined });
+          }}
+        />
+      </Tooltip>
 
-      <Select
-        allowDeselect
-        data={numericFieldOptions}
-        label="Y Axis"
-        value={yAxisKey}
-        disabled={fieldOptions.length === 0 || numericFieldOptions.length === 0}
-        placeholder={
-          fieldOptions.length === 0 ? "No fields have been queried"
-          : numericFieldOptions.length === 0 ?
-            "There are no queried numeric fields"
-          : "Select a field"
+      <Tooltip
+        disabled={!yAxisDisabled}
+        label={
+          fieldOptions.length === 0 ?
+            noColumnsTooltipMsg
+          : "A bar chart requires a numeric Y axis but you have not queried for any columns that contain numbers"
         }
-        onChange={(field) => {
-          onSettingsChange({ ...settings, yAxisKey: field ?? undefined });
-        }}
-      />
+      >
+        <Select
+          data={numericFieldOptions}
+          label="Y Axis"
+          value={yAxisKey}
+          disabled={
+            fieldOptions.length === 0 || numericFieldOptions.length === 0
+          }
+          placeholder={
+            fieldOptions.length === 0 ? "No columns are available"
+            : numericFieldOptions.length === 0 ?
+              "There are no numeric columns"
+            : "Select a column"
+          }
+          onChange={(field) => {
+            onConfigChange({ ...config, yAxisKey: field ?? undefined });
+          }}
+        />
+      </Tooltip>
     </>
   );
 }

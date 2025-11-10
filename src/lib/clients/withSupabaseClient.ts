@@ -1,6 +1,6 @@
-import { SupabaseClient } from "@supabase/supabase-js";
 import { Database } from "@/types/database.types";
 import { BaseClient } from "./BaseClient";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type WithSupabaseClient<Client extends BaseClient> = Client & {
   setDBClient: (newDBClient: SupabaseClient<Database>) => Client;

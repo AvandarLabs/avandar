@@ -1,6 +1,6 @@
 import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { render } from "@/test-utils";
+import { render } from "@/utils/testingUtils";
 import { BasicForm } from ".";
 
 describe("BasicForm", () => {

@@ -19,9 +19,10 @@ export function isInSet<
   options: { key?: HashKey; hashFn?: (item: ItemT) => SetT } = {},
 ): (value: ItemT) => boolean {
   return (value: ItemT): boolean => {
-    const hashedValue =
-      options.key !== undefined ? (value[options.key] as SetT)
-      : options.hashFn !== undefined ? options.hashFn(value)
+    const hashedValue = options.key !== undefined
+      ? (value[options.key] as SetT)
+      : options.hashFn !== undefined
+      ? options.hashFn(value)
       : (value as unknown as SetT);
     return set.has(hashedValue);
   };

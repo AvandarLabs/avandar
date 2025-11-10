@@ -1,7 +1,7 @@
 import { Argument, Command } from "commander";
 import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
-import { SupabaseDBClient } from "@/lib/clients/supabase/SupabaseDBClient";
+import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "../../../seed/SeedData";
 
 const httpMethodChoices = [
@@ -154,14 +154,11 @@ async function main() {
 
   const parsedMethod = HTTPMethod.parse(methodName);
 
-  const { data, error } = await SupabaseDBClient.functions.invoke(
+  const { data, error } = await AvaSupabase.DB.functions.invoke(
     fullFunctionName,
     {
-      body:
-        isBodyEmpty ?
-          parsedMethod === "GET" ?
-            undefined
-          : JSON.stringify({})
+      body: isBodyEmpty
+        ? parsedMethod === "GET" ? undefined : JSON.stringify({})
         : bodyParams,
       method: parsedMethod,
     },

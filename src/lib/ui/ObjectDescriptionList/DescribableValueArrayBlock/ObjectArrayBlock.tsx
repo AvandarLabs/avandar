@@ -1,17 +1,19 @@
 import { List, Table, Text } from "@mantine/core";
 import { useMemo } from "react";
-import { StringKeyOf } from "@/lib/types/utilityTypes";
 import { objectKeys } from "@/lib/utils/objects/misc";
-import { camelToTitleCase } from "@/lib/utils/strings/transformations";
 import { CollapsibleItem } from "../CollapsibleItem";
+import { getOrderedKeys } from "../gerOrderedKeys/getOrderedKeys";
+import { getObjectKeyTransformFn } from "../getObjectKeyTransformFn";
 import {
   AnyDescribableValueRenderOptions,
   DescribableObject,
   GenericRootData,
   ObjectArrayRenderOptions,
   ObjectRenderOptions,
-} from "../types";
+} from "../ObjectDescriptionList.types";
 import { ValueItemContainer } from "../ValueItemContainer";
+
+const DEFAULT_EXCLUDE_KEYS_PATTERN = "_";
 
 type Props<T extends DescribableObject, RootData extends GenericRootData> = {
   values: readonly T[];
@@ -29,17 +31,10 @@ export function ObjectArrayBlock<
 >({
   values,
   rootData,
-  renderAsTable,
-  titleKey,
   itemRenderOptions,
   maxItemsCount,
-  defaultExpanded = true,
-  ...primitiveValueRenderOptions
+  ...moreRenderOptions
 }: Props<T, RootData>): JSX.Element | null {
-  const excludeKeySet: ReadonlySet<StringKeyOf<T>> = useMemo(() => {
-    return new Set(itemRenderOptions?.excludeKeys);
-  }, [itemRenderOptions?.excludeKeys]);
-
   const valuesToRender = useMemo(() => {
     return maxItemsCount === undefined ? values : (
         values.slice(0, maxItemsCount)
@@ -50,38 +45,52 @@ export function ObjectArrayBlock<
     return null;
   }
 
-  // get the primitive value render options from the parent, and override
-  // them with the current `itemRenderOptions`
-  const parentRenderOptions = {
-    ...primitiveValueRenderOptions,
-    ...itemRenderOptions,
-  };
-
   // render each entity in the array as a row in a table
-  if (renderAsTable) {
-    const firstEntity = valuesToRender[0]!;
-    const headers = objectKeys(firstEntity)
-      .filter((headerKey) => {
-        return !excludeKeySet.has(headerKey);
-      })
-      .map((headerKey) => {
-        return (
-          <Table.Th key={headerKey} tt="capitalize">
-            {camelToTitleCase(headerKey)}
-          </Table.Th>
-        );
-      });
+  if (moreRenderOptions.renderAsTable) {
+    const { idKey, renderTableHeader, ...primitiveValueRenderOptions } =
+      moreRenderOptions;
 
-    const rows = valuesToRender.map((entityRow, idx) => {
-      // TODO(jpsyx): use a stable key
-      const entityId = String(entityRow[titleKey ?? "id"] ?? idx);
+    // get the primitive value render options from the parent, and override
+    // them with the current `itemRenderOptions`
+    const parentRenderOptions = {
+      ...primitiveValueRenderOptions,
+      ...itemRenderOptions,
+    };
+
+    const firstEntity = valuesToRender[0]!;
+    const {
+      includeKeys = [],
+      excludeKeys = [],
+      excludeKeysPattern = DEFAULT_EXCLUDE_KEYS_PATTERN,
+      renderObjectKeyTransform = "camel-to-title-case",
+    } = itemRenderOptions ?? {};
+
+    const headerKeys = getOrderedKeys({
+      allKeys: objectKeys(firstEntity),
+      includeKeys,
+      excludeKeys,
+      excludeKeysPattern,
+    });
+
+    const headers = headerKeys.map((headerKey) => {
+      const customRenderedHeader =
+        renderTableHeader ? renderTableHeader(headerKey, rootData) : undefined;
+
       return (
-        <Table.Tr key={entityId}>
-          {objectKeys(entityRow).map((fieldKey) => {
-            if (excludeKeySet.has(fieldKey)) {
-              return null;
-            }
-            const fieldVal = entityRow[fieldKey];
+        <Table.Th key={headerKey}>
+          {customRenderedHeader !== undefined ?
+            customRenderedHeader
+          : getObjectKeyTransformFn(renderObjectKeyTransform)(headerKey)}
+        </Table.Th>
+      );
+    });
+
+    const rows = valuesToRender.map((rowObject, idx) => {
+      const rowId = String(rowObject[idKey ?? "id"] ?? idx);
+      return (
+        <Table.Tr key={rowId}>
+          {headerKeys.map((fieldKey) => {
+            const fieldVal = rowObject[fieldKey];
 
             // compute the child's render options to pass down
             const childRenderOptions = {
@@ -114,11 +123,21 @@ export function ObjectArrayBlock<
     );
   }
 
+  const { idKey, defaultExpanded, titleKey, ...primitiveValueRenderOptions } =
+    moreRenderOptions;
+
+  // get the primitive value render options from the parent, and override
+  // them with the current `itemRenderOptions`
+  const parentRenderOptions = {
+    ...primitiveValueRenderOptions,
+    ...itemRenderOptions,
+  };
+
   // render the entities as a list, where each entity is a collapsible
   // entity description list.
   const listItems = valuesToRender.map((val, idx) => {
     // TODO(jpsyx): use a stable key
-    const entityId = String(val[titleKey ?? "id"] ?? idx);
+    const entityId = String(val[idKey ?? "id"] ?? idx);
 
     return (
       <CollapsibleItem

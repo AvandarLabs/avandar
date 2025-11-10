@@ -1,5 +1,5 @@
 import { UnknownObject } from "@/lib/types/common";
-import { isEmptyObject } from "../guards";
+import { isEmptyObject } from "../guards/guards";
 import { isFiltersByOperatorObject } from "./filtersByOperator";
 import type { FiltersByOperator } from "./filtersByOperator";
 import type { ArrayValueOperator, SingleValueOperator } from "./filterTypes";
@@ -52,12 +52,12 @@ export type FiltersByColumn<T extends UnknownObject> = {
  * - Each operator can only have a single target value.
  * - Any ArrayValueOperators can only have a single target array.
  * - All filters are automatically ANDed together.
- *
  */
-export type FilterOperatorRecord<TargetValue> = Partial<
-  Record<SingleValueOperator, TargetValue | undefined>
-> &
-  Partial<Record<ArrayValueOperator, ReadonlyArray<TargetValue | undefined>>>;
+export type FilterOperatorRecord<TargetValue> =
+  & Partial<
+    Record<SingleValueOperator, TargetValue | undefined>
+  >
+  & Partial<Record<ArrayValueOperator, ReadonlyArray<TargetValue | undefined>>>;
 
 export function isFiltersByColumnObject<T extends UnknownObject>(
   filters: FiltersByColumn<T> | FiltersByOperator<T>,

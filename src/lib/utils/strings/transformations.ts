@@ -1,4 +1,6 @@
-import { isDate, isEmptyObject, isPlainObject } from "../guards";
+import { LiteralUnion } from "type-fest";
+import { formatDate, isValidDateValue } from "../formatters/formatDate";
+import { isDate, isEmptyObject, isPlainObject } from "../guards/guards";
 import { objectEntries } from "../objects/misc";
 
 /**
@@ -6,7 +8,6 @@ import { objectEntries } from "../objects/misc";
  * @param value The value to convert.
  * @returns The string representation of the value.
  */
-
 export function unknownToString(
   value: unknown,
   {
@@ -19,6 +20,9 @@ export function unknownToString(
     emptyArrayString = "[Empty array]",
     emptyObjectString = "{Empty object}",
     objectEntriesSeparator = "\n",
+    asDate = false,
+    dateFormat = "YYYY-MM-DDTHH:mm:ssZ",
+    dateTimeZone = "local",
   }: {
     nullString?: string;
     undefinedString?: string;
@@ -29,6 +33,14 @@ export function unknownToString(
     emptyArrayString?: string;
     emptyObjectString?: string;
     objectEntriesSeparator?: string;
+
+    /**
+     * If true, we test strings and numbers to see if they are valid dates,
+     * before we allow them to be returned as-is. Defaults to false.
+     */
+    asDate?: boolean;
+    dateFormat?: string;
+    dateTimeZone?: LiteralUnion<"UTC" | "local", string>;
   } = {},
 ): string {
   if (value === null) {
@@ -43,28 +55,26 @@ export function unknownToString(
     return emptyString;
   }
 
-  if (typeof value === "string") {
-    return value;
-  }
-
-  if (typeof value === "number") {
-    return Intl.NumberFormat().format(value);
-  }
-
   if (typeof value === "boolean") {
     return value ? booleanTrue : booleanFalse;
   }
 
-  if (isDate(value)) {
-    // TODO(jpsyx): add options to format the date
-    return value.toISOString();
+  if (typeof value === "string" && !asDate) {
+    return value;
+  }
+
+  if (typeof value === "number" && !asDate) {
+    return Intl.NumberFormat().format(value);
+  }
+
+  if (isDate(value) || (asDate && isValidDateValue(value))) {
+    return formatDate(value, { format: dateFormat, zone: dateTimeZone });
   }
 
   if (Array.isArray(value)) {
     if (value.length === 0) {
       return emptyArrayString;
     }
-
     return value
       .map((item) => {
         return unknownToString(item);
@@ -208,5 +218,7 @@ export function wordJoin(
     return `${words[0]} ${endConnector} ${words[1]}`;
   }
 
-  return `${words.slice(0, -1).join(`${separator} `)} ${endConnector} ${words[words.length - 1]}`;
+  return `${words.slice(0, -1).join(`${separator} `)} ${endConnector} ${
+    words[words.length - 1]
+  }`;
 }

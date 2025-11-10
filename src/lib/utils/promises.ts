@@ -70,12 +70,13 @@ export async function promiseMapSequential<T, V>(
  */
 export async function promiseReduce<T, V>(
   array: readonly T[],
-  fn: (item: T, acc: V) => Promise<V> | V,
+  fn: (acc: V, item: T, idx: number) => Promise<V> | V,
   initialValue: V,
 ): Promise<V> {
   let acc = initialValue;
-  for (const item of array) {
-    acc = await fn(item, acc);
+  for (let idx = 0; idx < array.length; idx++) {
+    const item = array[idx]!;
+    acc = await fn(acc, item, idx);
   }
   return acc;
 }

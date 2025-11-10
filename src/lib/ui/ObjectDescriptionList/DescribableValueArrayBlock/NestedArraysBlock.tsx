@@ -1,24 +1,20 @@
 import { Fieldset, Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
 import {
-  DescribableValue,
   DescribableValueArrayRenderOptions,
   GenericRootData,
   NestedArrayRenderOptions,
-} from "../types";
+} from "../ObjectDescriptionList.types";
 import { ValueItemContainer } from "../ValueItemContainer";
 
-type Props<T extends DescribableValue, RootData extends GenericRootData> = {
+type Props<T, RootData extends GenericRootData> = {
   /** Array of arrays of field values */
   values: ReadonlyArray<readonly T[]>;
   maxItemsCount?: number;
   rootData: RootData;
 } & NestedArrayRenderOptions<T, RootData>;
 
-export function NestedArraysBlock<
-  T extends DescribableValue,
-  RootData extends GenericRootData,
->({
+export function NestedArraysBlock<T, RootData extends GenericRootData>({
   values,
   rootData,
   maxItemsCount,
@@ -56,7 +52,7 @@ export function NestedArraysBlock<
               value={valueArray}
               rootData={rootData}
               {...(arrayItemRenderOptions as DescribableValueArrayRenderOptions<
-                DescribableValue,
+                unknown,
                 RootData
               >)}
             />

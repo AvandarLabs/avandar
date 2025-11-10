@@ -3,7 +3,7 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { DatasetId } from "@/models/datasets/Dataset";
 import { EntityConfig } from "@/models/EntityConfig/EntityConfig.types";
-import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
+import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 
 /**
  * Given an entity config, finish hydrating it.
@@ -29,8 +29,8 @@ export function useHydratedEntityConfig({
     where("entity_config_id", "eq", entityConfig.id),
   );
 
-  const [valueExtractors, isLoadingValueExtractors] =
-    EntityFieldConfigClient.useGetAllValueExtractors({
+  const [valueExtractors, isLoadingValueExtractors] = EntityFieldConfigClient
+    .useGetAllValueExtractors({
       fields: entityFields,
       useQueryOptions: {
         enabled: !!entityFields,
@@ -59,7 +59,7 @@ export function useHydratedEntityConfig({
       ...entityConfig,
       datasets,
       fields: entityFields?.map((field) => {
-        const { valueExtractorType } = field.options;
+        const { valueExtractorType } = field;
         const valueExtractor = valueExtractors?.find((extractor) => {
           return extractor.entityFieldConfigId === field.id;
         });

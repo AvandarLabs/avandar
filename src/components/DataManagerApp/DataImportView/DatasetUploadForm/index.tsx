@@ -1,27 +1,18 @@
-import {
-  Button,
-  Group,
-  NumberInput,
-  ScrollArea,
-  Stack,
-  TextInput,
-} from "@mantine/core";
+import { Button, Group, NumberInput, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/types";
+import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/DuckDBClient.types";
+import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { UnknownObject } from "@/lib/types/common";
 import { Callout } from "@/lib/ui/Callout";
-import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
-import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
 import { Dataset } from "@/models/datasets/Dataset";
-import { DetectedDatasetColumn } from "../../hooks/detectColumnDataTypes";
+import { DetectedDatasetColumn } from "@/models/datasets/DatasetColumn";
 
 export type DatasetUploadFormValues = {
   name: string;
@@ -40,7 +31,6 @@ type Props = {
    */
   rows: UnknownObject[];
   defaultName: string;
-  // TODO(jpsyx): this should be a DatasetColumn<"Insert"> type
   columns: readonly DetectedDatasetColumn[];
   doDatasetSave: (
     datasetFormValues: DatasetUploadFormValues,
@@ -118,8 +108,6 @@ export function DatasetUploadForm({
     },
   });
 
-  const columnNames = columns.map(getProp("name"));
-
   const renderProcessState = () => {
     const { numRows: numSuccessRows, numRejectedRows } = loadCSVResult;
     const formattedSuccessNum = numSuccessRows.toLocaleString();
@@ -191,58 +179,47 @@ export function DatasetUploadForm({
 
         {renderProcessState()}
 
-        <Callout
-          title="Data Preview"
-          color="info"
-          message={`These are the first ${rows.length} rows of your dataset.
-            Check to see if the data is correct. If they are not, it's possible
-            your dataset does not start on the first row or the CSV uses a different.
-            delimiter. Try adjusting those settings here.`}
-        >
-          <Group align="flex-end">
-            <NumberInput
-              label="Number of rows to skip"
-              value={numRowsToSkip}
-              onChange={(value) => {
-                return setNumRowsToSkip(Number(value));
-              }}
-            />
-            <TextInput
-              label="Delimiter"
-              value={delimiter}
-              onChange={(e) => {
-                return setDelimiter(e.target.value);
-              }}
-            />
-            <Button
-              onClick={() => {
-                return onRequestDataParse({
-                  numRowsToSkip,
-                  delimiter,
-                });
-              }}
-              loading={isProcessing}
-              disabled={isProcessing}
-            >
-              Process data again
-            </Button>
-          </Group>
-        </Callout>
-        <DataGrid columnNames={columnNames} data={previewRows} />
-        <Callout
-          title="Column info"
-          color="info"
-          message={`${columns.length} columns were detected. Review the column
-            info below to make sure they are correct. If they are not, change
-            the import options above and click Upload again.`}
+        <DatasetPreviewBlock
+          previewRows={previewRows}
+          columns={columns}
+          dataPreviewCalloutMessage={`These are the first ${previewRows.length} rows
+            of your dataset. Check to see if the data is correct. If they are not,
+            it's possible your dataset does not start on the first row or the CSV
+            uses a different delimiter. Try adjusting those settings here.`}
+          dataColumnsCalloutMessage={`${columns.length} columns were detected.
+            Review the column info below to make sure they are correct. If they
+            are not, change the import options above and click Upload again.`}
+          dataPreviewCalloutContents={
+            <Group align="flex-end">
+              <NumberInput
+                label="Number of rows to skip"
+                value={numRowsToSkip}
+                onChange={(value) => {
+                  return setNumRowsToSkip(Number(value));
+                }}
+              />
+              <TextInput
+                label="Delimiter"
+                value={delimiter}
+                onChange={(e) => {
+                  return setDelimiter(e.target.value);
+                }}
+              />
+              <Button
+                onClick={() => {
+                  return onRequestDataParse({
+                    numRowsToSkip,
+                    delimiter,
+                  });
+                }}
+                loading={isProcessing}
+                disabled={isProcessing}
+              >
+                Process data again
+              </Button>
+            </Group>
+          }
         />
-        <ScrollArea h={500} type="auto">
-          <ObjectDescriptionList
-            data={columns}
-            renderAsTable
-            itemRenderOptions={{ excludeKeys: ["columnIdx"] }}
-          />
-        </ScrollArea>
 
         <Button loading={isSavePending} type="submit" disabled={disableSubmit}>
           Save Dataset

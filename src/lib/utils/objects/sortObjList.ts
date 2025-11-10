@@ -1,4 +1,4 @@
-import { isNullish, isNumber, isString } from "../guards";
+import { isNullish, isNumber, isString } from "../guards/guards";
 import { stringComparator } from "../strings/sort";
 
 /**
@@ -61,7 +61,7 @@ export function mixedComparator(
  * @param options.valueFn A function that returns the value to sort by.
  * @param options.comparator A comparator function to use for sorting. If no
  * function is passed, the default `mixedComparator` will be used.
- * @param options.nullOrUndefinedSortOrder The order to sort null or undefined
+ * @param options.sortNullishValues The order to sort null or undefined
  * values. Defaults to "last". If a `comparator` function is passed, this option
  * will be ignored.
  * @returns The sorted list of objects.
@@ -74,14 +74,14 @@ export function sortObjList<
   options: {
     sortBy: (obj: T) => SortValue;
     comparator?: (a: SortValue, b: SortValue) => number;
-    nullOrUndefinedSortOrder?: "last" | "first";
+    sortNullishValues?: "last" | "first";
   },
 ): T[] {
   const {
     sortBy: valueFn,
     comparator = (a, b) => {
       return mixedComparator(a, b, {
-        nullOrUndefinedSortOrder: options.nullOrUndefinedSortOrder,
+        nullOrUndefinedSortOrder: options.sortNullishValues,
       });
     },
   } = options;

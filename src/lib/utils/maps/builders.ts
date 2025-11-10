@@ -23,11 +23,11 @@ export function makeMap<
   InK extends keyof T | undefined,
   ValueKey extends keyof T | undefined,
   OutK extends undefined extends InK ? unknown
-  : T[Extract<InK, PropertyKey>] = undefined extends InK ? T
-  : T[Extract<InK, PropertyKey>],
+    : T[Extract<InK, PropertyKey>] = undefined extends InK ? T
+      : T[Extract<InK, PropertyKey>],
   OutV extends undefined extends ValueKey ? unknown
-  : T[Extract<ValueKey, PropertyKey>] = undefined extends ValueKey ? T
-  : T[Extract<ValueKey, PropertyKey>],
+    : T[Extract<ValueKey, PropertyKey>] = undefined extends ValueKey ? T
+      : T[Extract<ValueKey, PropertyKey>],
 >(
   list: readonly T[],
   {
@@ -72,11 +72,11 @@ export function makeBucketMap<
   InK extends keyof T | undefined,
   ValueKey extends keyof T | undefined,
   OutK extends undefined extends InK ? unknown
-  : T[Extract<InK, PropertyKey>] = undefined extends InK ? T
-  : T[Extract<InK, PropertyKey>],
+    : T[Extract<InK, PropertyKey>] = undefined extends InK ? T
+      : T[Extract<InK, PropertyKey>],
   OutV extends undefined extends ValueKey ? unknown
-  : T[Extract<ValueKey, PropertyKey>] = undefined extends ValueKey ? T
-  : T[Extract<ValueKey, PropertyKey>],
+    : T[Extract<ValueKey, PropertyKey>] = undefined extends ValueKey ? T
+      : T[Extract<ValueKey, PropertyKey>],
 >(
   list: readonly T[],
   {
@@ -95,9 +95,8 @@ export function makeBucketMap<
   list.forEach((item) => {
     const bucketName = (key ? item[key] : keyFn(item)) as OutK;
     const value: OutV = (
-      valueKey ?
-        item[valueKey]
-      : valueFn(item, bucketName)) as OutV;
+      valueKey ? item[valueKey] : valueFn(item, bucketName)
+    ) as OutV;
     const bucket: OutV[] = buckets.get(bucketName) ?? [];
     bucket.push(value);
     buckets.set(bucketName, bucket);
@@ -143,26 +142,23 @@ export function mergeBucketMaps<K, V>(
 export function makeIdLookupMap<
   T extends object,
   IdKey extends [Paths<T>] extends [never] ? keyof T : Paths<T> = "id" extends (
-    [Paths<T>] extends [never] ?
-      keyof T
-    : Paths<T>
-  ) ?
-    "id"
-  : never,
+    [Paths<T>] extends [never] ? keyof T
+      : Paths<T>
+  ) ? "id"
+    : never,
   IdType extends IdKey extends keyof T ? T[IdKey]
-  : IdKey extends Paths<T> ? PathValue<T, IdKey>
-  : never = IdKey extends keyof T ? T[IdKey]
-  : IdKey extends Paths<T> ? PathValue<T, IdKey>
-  : never,
+    : IdKey extends Paths<T> ? PathValue<T, IdKey>
+    : never = IdKey extends keyof T ? T[IdKey]
+      : IdKey extends Paths<T> ? PathValue<T, IdKey>
+      : never,
 >(
   list: readonly T[],
   { key = "id" as IdKey }: { key?: IdKey } = {},
 ): Map<IdType, T> {
   const map = new Map<IdType, T>();
   for (const item of list) {
-    const id =
-      String(key).includes(".") ?
-        (getValue(item, key) as IdType)
+    const id = String(key).includes(".")
+      ? (getValue(item, key) as IdType)
       : (item[key as keyof T] as IdType);
     map.set(id, item);
   }

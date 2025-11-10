@@ -3,7 +3,6 @@ import {
   BoxProps,
   Loader,
   NavLinkProps,
-  Title,
   useMantineTheme,
 } from "@mantine/core";
 import { useMemo } from "react";
@@ -11,12 +10,9 @@ import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
 import { makeBucketMap } from "@/lib/utils/maps/builders";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
-import {
-  Dataset,
-  DatasetId,
-  DatasetSourceTypes,
-} from "@/models/datasets/Dataset";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
+import { Dataset, DatasetId } from "@/models/datasets/Dataset";
+import { Datasets } from "@/models/datasets/Dataset/Datasets";
 
 type Props = {
   datasets: Dataset[];
@@ -58,10 +54,10 @@ export function DatasetNavbar({
 
   const [uploadedDatasetLinks] = useMemo(() => {
     const datasetsByType = makeBucketMap(datasets, {
-      keyFn: getProp("sourceType"),
+      keyFn: prop("sourceType"),
     });
 
-    const datasetLinks = DatasetSourceTypes.flatMap((sourceType) => {
+    const datasetLinks = Datasets.SourceTypes.flatMap((sourceType) => {
       return (datasetsByType.get(sourceType) ?? []).map((dataset) => {
         return makeDatasetLink({
           workspaceSlug,
@@ -90,9 +86,6 @@ export function DatasetNavbar({
       {isLoading ?
         <Loader />
       : null}
-      <Title pl="sm" order={3}>
-        Uploaded Datasets
-      </Title>
       <NavLinkList
         pt="md"
         links={uploadedDatasetLinks}

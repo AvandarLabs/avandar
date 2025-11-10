@@ -4,7 +4,7 @@
  *    yarn db:create-user <email> <password>
  */
 import { z } from "zod";
-import { SupabaseDBClient } from "@/lib/clients/supabase/SupabaseDBClient";
+import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { ScriptsUtil } from "./ScriptsUtil";
 
 function printUsage() {
@@ -21,7 +21,7 @@ async function main(): Promise<void> {
         email,
         password,
       },
-      SupabaseDBClient,
+      AvaSupabase.DB,
     );
     console.log(`Successfully created user with email ${email}`);
   } catch (error) {

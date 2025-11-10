@@ -20,9 +20,9 @@ import {
 } from "@/lib/ui/inputs/SegmentedControl";
 import { makeSegmentedControlItems } from "@/lib/ui/inputs/SegmentedControl/makeSegmentedControlItems";
 import { where } from "@/lib/utils/filters/filterBuilders";
-import { isNonEmptyArray } from "@/lib/utils/guards";
+import { isNonEmptyArray } from "@/lib/utils/guards/guards";
 import { makeBucketRecord } from "@/lib/utils/objects/builders";
-import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectEntries } from "@/lib/utils/objects/misc";
 import {
   Dataset,
@@ -91,7 +91,7 @@ export function DatasetColumnPickerList({
   });
 
   const [datasetColumns] = DatasetColumnClient.useGetAll({
-    ...where("dataset_id", "in", datasets?.map(getProp("id")) ?? []),
+    ...where("dataset_id", "in", datasets?.map(prop("id")) ?? []),
     useQueryOptions: { enabled: !!datasets },
   });
 
@@ -100,7 +100,7 @@ export function DatasetColumnPickerList({
       return [];
     }
     const datasetColumnBuckets = makeBucketRecord(datasetColumns, {
-      keyFn: getProp("datasetId"),
+      keyFn: prop("datasetId"),
     });
 
     return datasets.map((dataset) => {
@@ -124,8 +124,8 @@ export function DatasetColumnPickerList({
               return !excludeColumns?.includes(f.id);
             }) ?? [],
             {
-              valueFn: getProp("id"),
-              labelFn: getProp("name"),
+              valueFn: prop("id"),
+              labelFn: prop("name"),
             },
           ),
         };
@@ -147,7 +147,7 @@ export function DatasetColumnPickerList({
     // if the columns to exclude now includes the currently selected value,
     // then let's change the selected value to next value in the list
     if (excludeColumns?.includes(controlledValue) && prevColumnItems) {
-      const allColumns = prevColumnItems.flatMap(getProp("items"));
+      const allColumns = prevColumnItems.flatMap(prop("items"));
       const remainingColumns = allColumns.filter((col) => {
         // remember to still include the `controlledValue` because we
         // still need to find its index in the flattened array
@@ -157,7 +157,7 @@ export function DatasetColumnPickerList({
       });
 
       const currColumnIdx = remainingColumns.findIndex(
-        propIs("value", controlledValue),
+        propEq("value", controlledValue),
       );
 
       const nextIdx =
@@ -213,7 +213,7 @@ export function DatasetColumnPickerList({
                 // now select the first item in that dataset group
                 // first, find the selected dataset
                 const datasetItemGroup = datasetColumnItems.find(
-                  propIs("dataset.id", dataset.id),
+                  propEq("dataset.id", dataset.id),
                 );
                 if (
                   datasetItemGroup &&

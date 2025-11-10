@@ -10,6 +10,12 @@ type Props = {
 export function DataSummaryView({ datasetId }: Props): JSX.Element {
   const [summary, isLoadingSummary] = DatasetRawDataClient.useGetSummary({
     datasetId,
+    useQueryOptions: {
+      staleTime: Infinity,
+      refetchOnMount: false,
+      retry: false,
+      refetchOnWindowFocus: false,
+    },
   });
 
   return (
@@ -19,6 +25,12 @@ export function DataSummaryView({ datasetId }: Props): JSX.Element {
       : null}
       {summary?.columnSummaries ?
         <>
+          <ObjectDescriptionList
+            data={{
+              "Number of columns": summary.columns,
+              "Number of rows": summary.rows,
+            }}
+          />
           <ObjectDescriptionList
             data={summary.columnSummaries}
             titleKey="name"

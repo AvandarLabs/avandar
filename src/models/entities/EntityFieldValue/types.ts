@@ -1,7 +1,7 @@
 import { UUID } from "@/lib/types/common";
 import { DatasetId } from "@/models/datasets/Dataset";
 import { EntityConfigId } from "@/models/EntityConfig/EntityConfig.types";
-import { EntityFieldConfigId } from "@/models/EntityConfig/EntityFieldConfig/types";
+import { EntityFieldConfigId } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import { WorkspaceId } from "@/models/Workspace/types";
 import { EntityId } from "../Entity/Entity.types";
 
@@ -15,7 +15,7 @@ export type EntityFieldValue = {
   entityConfigId: EntityConfigId;
   id: EntityFieldValueId;
   updatedAt: string;
-  value: string | undefined;
-  valueSet: string[];
+  value: unknown;
+  valueSet: unknown[];
   workspaceId: WorkspaceId;
 };

@@ -9,8 +9,14 @@ import {
   undefinedsToNullsDeep,
 } from "@/lib/utils/objects/transformations";
 import { pipe } from "@/lib/utils/pipe";
-import { uuid } from "@/lib/utils/uuid";
-import { EntityConfig, EntityConfigModel } from "./EntityConfig.types";
+import {
+  EntityConfig,
+  EntityConfigId,
+  EntityConfigModel,
+} from "./EntityConfig.types";
+import { Models } from "../Model";
+import { UserId } from "../User/types";
+import { WorkspaceId } from "../Workspace/types";
 
 const DBReadSchema = z.object({
   created_at: z.string().datetime({ offset: true }),
@@ -23,20 +29,20 @@ const DBReadSchema = z.object({
   allow_manual_creation: z.boolean(),
 });
 
-export const EntityConfigParsers =
-  makeParserRegistry<EntityConfigModel>().build({
+export const EntityConfigParsers = makeParserRegistry<EntityConfigModel>()
+  .build({
     modelName: "EntityConfig",
     DBReadSchema,
     fromDBReadToModelRead: pipe(
       camelCaseKeysDeep,
       nullsToUndefinedDeep,
       (obj): EntityConfig => {
-        return {
+        return Models.make("EntityConfig", {
           ...obj,
-          id: uuid(obj.id),
-          ownerId: uuid(obj.ownerId),
-          workspaceId: uuid(obj.workspaceId),
-        };
+          id: obj.id as EntityConfigId,
+          ownerId: obj.ownerId as UserId,
+          workspaceId: obj.workspaceId as WorkspaceId,
+        });
       },
     ),
 

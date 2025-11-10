@@ -1,8 +1,11 @@
-import { isArray, isPlainObject } from "@/lib/utils/guards";
-import { DescribableObject, DescribableValue, PrimitiveValue } from "./types";
+import { isArray, isPlainObject } from "@/lib/utils/guards/guards";
+import {
+  DescribableObject,
+  PrimitiveValue,
+} from "./ObjectDescriptionList.types";
 
 export function isPrimitiveDescribableValue(
-  value: DescribableValue,
+  value: unknown,
 ): value is PrimitiveValue {
   return (
     typeof value === "string" ||
@@ -15,13 +18,17 @@ export function isPrimitiveDescribableValue(
 }
 
 export function isDescribableValueArray(
-  value: DescribableValue,
-): value is readonly DescribableValue[] {
+  value: unknown,
+): value is readonly unknown[] {
   return isArray(value);
 }
 
+/**
+ * A DescribableObject must be a plain object. We do not allow
+ * objects that are not plain objects, like Maps, Sets, etc.
+ */
 export function isDescribableObject(
-  value: DescribableValue,
+  value: unknown,
 ): value is DescribableObject {
   return isPlainObject(value);
 }

@@ -11,7 +11,7 @@ import {
   GPickerDocumentObject,
   GPickerResponseObject,
 } from "@/lib/types/google-picker";
-import { isNonEmptyArray } from "@/lib/utils/guards";
+import { isNonEmptyArray } from "@/lib/utils/guards/guards";
 import { noop } from "@/lib/utils/misc";
 import { useCurrentUserProfile } from "../users/useCurrentUserProfile";
 
@@ -45,8 +45,9 @@ export function useGooglePicker({
     queryFn: async () => {
       // TODO(jpsyx): you could actually have multiple!!!
       // A user can connect multiple google accounts to their account.
-      const { tokens: activeTokens } =
-        await APIClient.get("google-auth/tokens");
+      const { tokens: activeTokens } = await APIClient.get(
+        "google-auth/tokens",
+      );
       return activeTokens;
     },
     enabled: !!user,

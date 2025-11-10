@@ -226,7 +226,7 @@ export type ClientWithCache<
    * For a deeper explanation of how `ensureQueryData` works, see the
    * [Tanstack Query documentation](https://tanstack.com/query/v4/docs/reference/QueryClient#queryclientensurequerydata)
    */
-  withEnsureQueryData: () => ClientWithCache<ClientWithQueries>;
+  withEnsureQueryData: () => ClientWithQueries;
 
   /**
    * Return a new client with all query functions wrapped in
@@ -239,5 +239,5 @@ export type ClientWithCache<
    * For a deeper explanation of how `fetchQuery` works, see the
    * [Tanstack Query documentation](https://tanstack.com/query/v4/docs/reference/QueryClient#queryclientfetchquery)
    */
-  withFetchQuery: () => ClientWithCache<ClientWithQueries>;
+  withFetchQuery: () => ClientWithQueries;
 };

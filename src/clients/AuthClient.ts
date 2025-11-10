@@ -1,3 +1,4 @@
+import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import {
   AuthChangeEvent,
   Session,
@@ -5,7 +6,6 @@ import {
   User,
   WeakPassword,
 } from "@supabase/supabase-js";
-import { SupabaseDBClient } from "../lib/clients/supabase/SupabaseDBClient";
 
 export const AuthClient = {
   /**
@@ -14,7 +14,7 @@ export const AuthClient = {
    * @throws {AuthError} If the password reset fails
    */
   requestPasswordResetEmail: async (email: string): Promise<void> => {
-    const { error } = await SupabaseDBClient.auth.resetPasswordForEmail(email, {
+    const { error } = await AvaSupabase.DB.auth.resetPasswordForEmail(email, {
       redirectTo: `${import.meta.env.VITE_APP_URL}/update-password`,
     });
     if (error) {
@@ -29,7 +29,7 @@ export const AuthClient = {
    * @throws {AuthError} If the update fails
    */
   updatePassword: async (password: string): Promise<{ user: User }> => {
-    const { data, error } = await SupabaseDBClient.auth.updateUser({
+    const { data, error } = await AvaSupabase.DB.auth.updateUser({
       password,
     });
     if (error) {
@@ -51,7 +51,7 @@ export const AuthClient = {
    * @throws {AuthError} If the update fails
    */
   updateEmail: async (email: string): Promise<{ user: User }> => {
-    const { data, error } = await SupabaseDBClient.auth.updateUser({
+    const { data, error } = await AvaSupabase.DB.auth.updateUser({
       email,
     });
 
@@ -75,7 +75,7 @@ export const AuthClient = {
    * @throws {AuthError} If we failed to retrieve the user
    */
   getCurrentSession: async (): Promise<Session | undefined> => {
-    const { data, error } = await SupabaseDBClient.auth.getSession();
+    const { data, error } = await AvaSupabase.DB.auth.getSession();
     if (error) {
       console.error("Failed to get the current session", error);
       return undefined;
@@ -99,7 +99,7 @@ export const AuthClient = {
     weakPassword?: WeakPassword;
   }> => {
     const { email, password } = signInParams;
-    const { data, error } = await SupabaseDBClient.auth.signInWithPassword({
+    const { data, error } = await AvaSupabase.DB.auth.signInWithPassword({
       email,
       password,
     });
@@ -122,7 +122,7 @@ export const AuthClient = {
     password: string;
   }): Promise<{ user: User }> => {
     const { email, password } = registerParams;
-    const { error, data } = await SupabaseDBClient.auth.signUp({
+    const { error, data } = await AvaSupabase.DB.auth.signUp({
       email,
       password,
     });
@@ -145,7 +145,7 @@ export const AuthClient = {
    * @throws {AuthError} If the sign out fails
    */
   signOut: async (): Promise<void> => {
-    const { error } = await SupabaseDBClient.auth.signOut();
+    const { error } = await AvaSupabase.DB.auth.signOut();
     if (error) {
       throw error;
     }
@@ -166,7 +166,7 @@ export const AuthClient = {
   ): Subscription => {
     const {
       data: { subscription },
-    } = SupabaseDBClient.auth.onAuthStateChange(callback);
+    } = AvaSupabase.DB.auth.onAuthStateChange(callback);
     return subscription;
   },
 };

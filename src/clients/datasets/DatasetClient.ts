@@ -3,7 +3,7 @@ import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseC
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { FiltersByColumn } from "@/lib/utils/filters/filtersByColumn";
 import { makeBucketRecord } from "@/lib/utils/objects/builders";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { ExcludeNullsIn } from "@/lib/utils/objects/transformations";
 import {
   Dataset,
@@ -15,7 +15,7 @@ import { WorkspaceId } from "@/models/Workspace/types";
 import { CompositeTypes } from "@/types/database.types";
 import { DuckDBClient } from "../DuckDBClient";
 import { DatasetColumnClient } from "./DatasetColumnClient";
-import { LocalDatasetEntryClient } from "./LocalDatasetEntryClient";
+import { LocalDatasetClient } from "./LocalDatasetClient";
 
 type DatasetColumnInput = SetOptional<
   ExcludeNullsIn<CompositeTypes<"dataset_column_input">>,
@@ -70,7 +70,7 @@ export const DatasetClient = createSupabaseCRUDClient({
         logger.log("Getting all datasets with columns using params", params);
         const datasets = await DatasetClient.getAll(params);
         const allDatasetColumns = await DatasetColumnClient.getAll(
-          where("dataset_id", "in", datasets.map(getProp("id"))),
+          where("dataset_id", "in", datasets.map(prop("id"))),
         );
         const bucketedDatasetColumns = makeBucketRecord(allDatasetColumns, {
           key: "datasetId",
@@ -100,6 +100,7 @@ export const DatasetClient = createSupabaseCRUDClient({
        * @returns The inserted dataset.
        */
       insertCSVFileDataset: async (params: {
+        datasetId: DatasetId;
         workspaceId: WorkspaceId;
         datasetName: string;
         datasetDescription: string;
@@ -130,6 +131,7 @@ export const DatasetClient = createSupabaseCRUDClient({
         } = params;
         const { data: dataset } = await dbClient
           .rpc("rpc_datasets__add_csv_file_dataset", {
+            p_dataset_id: params.datasetId,
             p_workspace_id: workspaceId,
             p_dataset_name: datasetName,
             p_dataset_description: datasetDescription,
@@ -169,6 +171,7 @@ export const DatasetClient = createSupabaseCRUDClient({
        */
       insertGoogleSheetsDataset: async (params: {
         workspaceId: WorkspaceId;
+        datasetId: DatasetId;
         datasetName: string;
         datasetDescription: string;
         columns: DatasetColumnInput[];
@@ -187,6 +190,7 @@ export const DatasetClient = createSupabaseCRUDClient({
         });
         const { data: dataset } = await dbClient
           .rpc("rpc_datasets__add_google_sheets_dataset", {
+            p_dataset_id: params.datasetId,
             p_workspace_id: params.workspaceId,
             p_dataset_name: params.datasetName,
             p_dataset_description: params.datasetDescription,
@@ -215,15 +219,14 @@ export const DatasetClient = createSupabaseCRUDClient({
         await DatasetClient.delete({ id });
 
         // now delete things locally from IndexedDB
-        const localDatasetEntry = await LocalDatasetEntryClient.getById({
+        const localDataset = await LocalDatasetClient.getById({
           id,
         });
-        if (localDatasetEntry) {
-          const { datasetId, localTableName } = localDatasetEntry;
-          await LocalDatasetEntryClient.delete({ id: datasetId });
-
+        if (localDataset) {
+          const { datasetId } = localDataset;
+          await LocalDatasetClient.delete({ id: datasetId });
           // finally, delete the raw data locally from DuckDB
-          await DuckDBClient.dropDataset(localTableName);
+          await DuckDBClient.dropTableAndFile(datasetId);
         }
       },
     };

@@ -38,33 +38,39 @@ export type Database = {
         Row: {
           column_idx: number
           created_at: string
-          data_type: Database["public"]["Enums"]["datasets__column_data_type"]
+          data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
           dataset_id: string
           description: string | null
+          detected_data_type: Database["public"]["Enums"]["datasets__duckdb_data_type"]
           id: string
           name: string
+          original_data_type: string
           updated_at: string
           workspace_id: string
         }
         Insert: {
           column_idx: number
           created_at?: string
-          data_type: Database["public"]["Enums"]["datasets__column_data_type"]
+          data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
           dataset_id: string
           description?: string | null
+          detected_data_type: Database["public"]["Enums"]["datasets__duckdb_data_type"]
           id?: string
           name: string
+          original_data_type: string
           updated_at?: string
           workspace_id: string
         }
         Update: {
           column_idx?: number
           created_at?: string
-          data_type?: Database["public"]["Enums"]["datasets__column_data_type"]
+          data_type?: Database["public"]["Enums"]["datasets__ava_data_type"]
           dataset_id?: string
           description?: string | null
+          detected_data_type?: Database["public"]["Enums"]["datasets__duckdb_data_type"]
           id?: string
           name?: string
+          original_data_type?: string
           updated_at?: string
           workspace_id?: string
         }
@@ -388,13 +394,12 @@ export type Database = {
       entity_field_configs: {
         Row: {
           allow_manual_edit: boolean
-          base_data_type: Database["public"]["Enums"]["entity_field_configs__base_data_type"]
-          class: Database["public"]["Enums"]["entity_field_configs__class"]
           created_at: string
+          data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
           description: string | null
           entity_config_id: string
           id: string
-          is_array: boolean | null
+          is_array: boolean
           is_id_field: boolean
           is_title_field: boolean
           name: string
@@ -403,16 +408,15 @@ export type Database = {
           workspace_id: string
         }
         Insert: {
-          allow_manual_edit?: boolean
-          base_data_type: Database["public"]["Enums"]["entity_field_configs__base_data_type"]
-          class: Database["public"]["Enums"]["entity_field_configs__class"]
+          allow_manual_edit: boolean
           created_at?: string
+          data_type: Database["public"]["Enums"]["datasets__ava_data_type"]
           description?: string | null
           entity_config_id: string
           id?: string
-          is_array?: boolean | null
-          is_id_field?: boolean
-          is_title_field?: boolean
+          is_array: boolean
+          is_id_field: boolean
+          is_title_field: boolean
           name: string
           updated_at?: string
           value_extractor_type: Database["public"]["Enums"]["entity_field_configs__value_extractor_type"]
@@ -420,13 +424,12 @@ export type Database = {
         }
         Update: {
           allow_manual_edit?: boolean
-          base_data_type?: Database["public"]["Enums"]["entity_field_configs__base_data_type"]
-          class?: Database["public"]["Enums"]["entity_field_configs__class"]
           created_at?: string
+          data_type?: Database["public"]["Enums"]["datasets__ava_data_type"]
           description?: string | null
           entity_config_id?: string
           id?: string
-          is_array?: boolean | null
+          is_array?: boolean
           is_id_field?: boolean
           is_title_field?: boolean
           name?: string
@@ -583,61 +586,10 @@ export type Database = {
           },
         ]
       }
-      value_extractors__aggregation: {
-        Row: {
-          aggregation_type: Database["public"]["Enums"]["value_extractors__aggregation_type"]
-          created_at: string
-          dataset_field_id: string
-          dataset_id: string
-          entity_field_config_id: string
-          filter: Json | null
-          id: string
-          updated_at: string
-          workspace_id: string
-        }
-        Insert: {
-          aggregation_type: Database["public"]["Enums"]["value_extractors__aggregation_type"]
-          created_at?: string
-          dataset_field_id: string
-          dataset_id: string
-          entity_field_config_id: string
-          filter?: Json | null
-          id?: string
-          updated_at?: string
-          workspace_id: string
-        }
-        Update: {
-          aggregation_type?: Database["public"]["Enums"]["value_extractors__aggregation_type"]
-          created_at?: string
-          dataset_field_id?: string
-          dataset_id?: string
-          entity_field_config_id?: string
-          filter?: Json | null
-          id?: string
-          updated_at?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "value_extractors__aggregation_entity_field_config_id_fkey"
-            columns: ["entity_field_config_id"]
-            isOneToOne: true
-            referencedRelation: "entity_field_configs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "value_extractors__aggregation_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       value_extractors__dataset_column_value: {
         Row: {
           created_at: string
-          dataset_field_id: string
+          dataset_column_id: string
           dataset_id: string
           entity_field_config_id: string
           id: string
@@ -647,7 +599,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          dataset_field_id: string
+          dataset_column_id: string
           dataset_id: string
           entity_field_config_id: string
           id?: string
@@ -657,7 +609,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          dataset_field_id?: string
+          dataset_column_id?: string
           dataset_id?: string
           entity_field_config_id?: string
           id?: string
@@ -787,6 +739,7 @@ export type Database = {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
           p_comment_char: Database["public"]["CompositeTypes"]["util__nullable_text"]
           p_dataset_description: string
+          p_dataset_id: string
           p_dataset_name: string
           p_date_format: Database["public"]["CompositeTypes"]["datasets__csv_file__date_format"]
           p_delimiter: string
@@ -815,6 +768,7 @@ export type Database = {
         Args: {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
           p_dataset_description: string
+          p_dataset_id: string
           p_dataset_name: string
           p_dataset_source_type: Database["public"]["Enums"]["datasets__source_type"]
           p_workspace_id: string
@@ -836,6 +790,7 @@ export type Database = {
         Args: {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
           p_dataset_description: string
+          p_dataset_id: string
           p_dataset_name: string
           p_google_account_id: string
           p_google_document_id: string
@@ -899,24 +854,67 @@ export type Database = {
       }
     }
     Enums: {
-      datasets__column_data_type: "text" | "number" | "date"
+      datasets__ava_data_type:
+        | "boolean"
+        | "bigint"
+        | "double"
+        | "time"
+        | "date"
+        | "timestamp"
+        | "varchar"
+      datasets__duckdb_data_type:
+        | "BOOLEAN"
+        | "TINYINT"
+        | "SMALLINT"
+        | "INTEGER"
+        | "BIGINT"
+        | "UBIGINT"
+        | "UTINYINT"
+        | "USMALLINT"
+        | "UINTEGER"
+        | "FLOAT"
+        | "DOUBLE"
+        | "DECIMAL"
+        | "DATE"
+        | "TIME"
+        | "TIMESTAMP"
+        | "TIMESTAMP_TZ"
+        | "TIMESTAMP WITH TIME ZONE"
+        | "INTERVAL"
+        | "VARCHAR"
+        | "BLOB"
+        | "UUID"
+        | "HUGEINT"
+        | "BIT"
+        | "ENUM"
+        | "MAP"
+        | "STRUCT"
+        | "LIST"
+        | "UNION"
+        | "JSON"
+        | "GEOMETRY"
       datasets__source_type: "csv_file" | "google_sheets"
-      entity_field_configs__base_data_type: "string" | "number" | "date"
-      entity_field_configs__class: "dimension" | "metric"
       entity_field_configs__value_extractor_type:
         | "dataset_column_value"
         | "manual_entry"
-        | "aggregation"
-      value_extractors__aggregation_type: "sum" | "max" | "count"
-      value_extractors__value_picker_rule_type: "most_frequent" | "first"
+      value_extractors__value_picker_rule_type:
+        | "most_frequent"
+        | "first"
+        | "sum"
+        | "avg"
+        | "count"
+        | "max"
+        | "min"
     }
     CompositeTypes: {
       dataset_column_input: {
         name: string | null
         description: string | null
-        data_type:
-          | Database["public"]["Enums"]["datasets__column_data_type"]
+        original_data_type: string | null
+        detected_data_type:
+          | Database["public"]["Enums"]["datasets__duckdb_data_type"]
           | null
+        data_type: Database["public"]["Enums"]["datasets__ava_data_type"] | null
         column_idx: number | null
       }
       datasets__csv_file__date_format: {
@@ -1053,17 +1051,61 @@ export const Constants = {
   },
   public: {
     Enums: {
-      datasets__column_data_type: ["text", "number", "date"],
+      datasets__ava_data_type: [
+        "boolean",
+        "bigint",
+        "double",
+        "time",
+        "date",
+        "timestamp",
+        "varchar",
+      ],
+      datasets__duckdb_data_type: [
+        "BOOLEAN",
+        "TINYINT",
+        "SMALLINT",
+        "INTEGER",
+        "BIGINT",
+        "UBIGINT",
+        "UTINYINT",
+        "USMALLINT",
+        "UINTEGER",
+        "FLOAT",
+        "DOUBLE",
+        "DECIMAL",
+        "DATE",
+        "TIME",
+        "TIMESTAMP",
+        "TIMESTAMP_TZ",
+        "TIMESTAMP WITH TIME ZONE",
+        "INTERVAL",
+        "VARCHAR",
+        "BLOB",
+        "UUID",
+        "HUGEINT",
+        "BIT",
+        "ENUM",
+        "MAP",
+        "STRUCT",
+        "LIST",
+        "UNION",
+        "JSON",
+        "GEOMETRY",
+      ],
       datasets__source_type: ["csv_file", "google_sheets"],
-      entity_field_configs__base_data_type: ["string", "number", "date"],
-      entity_field_configs__class: ["dimension", "metric"],
       entity_field_configs__value_extractor_type: [
         "dataset_column_value",
         "manual_entry",
-        "aggregation",
       ],
-      value_extractors__aggregation_type: ["sum", "max", "count"],
-      value_extractors__value_picker_rule_type: ["most_frequent", "first"],
+      value_extractors__value_picker_rule_type: [
+        "most_frequent",
+        "first",
+        "sum",
+        "avg",
+        "count",
+        "max",
+        "min",
+      ],
     },
   },
 } as const

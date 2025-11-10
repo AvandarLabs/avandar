@@ -1,64 +1,60 @@
+import { Flex, List, Text } from "@mantine/core";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
-import { z } from "zod";
-import { QueryResultColumn } from "@/clients/DuckDBClient/types";
+import { flattenError, object, prettifyError, string } from "zod";
 import { UnknownDataFrame } from "@/lib/types/common";
-import { BarChart } from "@/lib/ui/data-viz/BarChart";
-import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
-import { LineChart } from "@/lib/ui/data-viz/LineChart";
-import { ScatterChart } from "@/lib/ui/data-viz/ScatterChart";
-import { DangerText } from "@/lib/ui/Text/DangerText";
+import { Callout } from "@/lib/ui/Callout";
+import { DangerText } from "@/lib/ui/text/DangerText";
+import { BarChart } from "@/lib/ui/viz/BarChart";
+import { DataGrid } from "@/lib/ui/viz/DataGrid";
+import { LineChart } from "@/lib/ui/viz/LineChart";
+import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
 import { isEpochMs, isIsoDateString } from "@/lib/utils/formatters/formatDate";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
-import { VizConfig } from "./VizSettingsForm/makeDefaultVizConfig";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
+import { objectValues } from "@/lib/utils/objects/misc";
+import { AvaDataTypes } from "@/models/datasets/AvaDataType";
+import { QueryResultColumn } from "@/models/queries/QueryResult/QueryResult.types";
+import { DataExplorerStore } from "./DataExplorerStore";
 
 type Props = {
-  vizConfig: VizConfig;
   columns: readonly QueryResultColumn[];
   data: UnknownDataFrame;
 };
 
 // Reusable XY schema “blocks”
-const xAxisKeySchema = z.string({
+const XAxisKeySchema = string({
   error: (issue) => {
     return issue.input === undefined ?
-        "X axis must be specified"
-      : "X axis must be a string";
+        "You haven't chosen an X axis"
+      : "Invalid X axis selected";
   },
 });
-const yAxisKeySchema = z.string({
+const YAxisKeySchema = string({
   error: (issue) => {
     return issue.input === undefined ?
-        "Y axis must be specified"
-      : "Y axis must be a string";
+        "You haven't chosen a Y axis"
+      : "Invalid Y axis selected";
   },
 });
 
 // Chart-specific schemas (can diverge later)
-const BarChartSettingsSchema = z.object({
-  xAxisKey: xAxisKeySchema,
-  yAxisKey: yAxisKeySchema,
+const BarChartConfigSchema = object({
+  xAxisKey: XAxisKeySchema,
+  yAxisKey: YAxisKeySchema,
 });
 
-const LineChartSettingsSchema = z.object({
-  xAxisKey: xAxisKeySchema,
-  yAxisKey: yAxisKeySchema,
+const LineChartConfigSchema = object({
+  xAxisKey: XAxisKeySchema,
+  yAxisKey: YAxisKeySchema,
 });
 
-const ScatterChartSettingsSchema = z.object({
-  xAxisKey: xAxisKeySchema,
-  yAxisKey: yAxisKeySchema,
+const ScatterPlotConfigSchema = object({
+  xAxisKey: XAxisKeySchema,
+  yAxisKey: YAxisKeySchema,
 });
 
-export function VisualizationContainer({
-  vizConfig,
-  columns,
-  data,
-}: Props): JSX.Element {
-  const fieldNames = useMemo(() => {
-    return columns.map(getProp("name"));
-  }, [columns]);
-
+export function VisualizationContainer({ columns, data }: Props): JSX.Element {
+  const [{ vizConfig }] = DataExplorerStore.use();
   // TODO(jpsyx): this should get supplied as a prop
   const dateColumns = useMemo(() => {
     return new Set(
@@ -66,22 +62,21 @@ export function VisualizationContainer({
         .filter((f) => {
           const sampleVal = data[0]?.[f.name];
           return (
-            f.dataType === "date" ||
+            AvaDataTypes.isTemporal(f.dataType) ||
             isIsoDateString(sampleVal) ||
             isEpochMs(sampleVal)
           );
         })
-        .map((f) => {
-          return f.name;
-        }),
+        .map(prop("name")),
     );
   }, [columns, data]);
+  const columnNames = columns.map(prop("name"));
 
-  return match(vizConfig)
-    .with({ type: "table" }, () => {
+  const viz = match(vizConfig)
+    .with({ vizType: "table" }, () => {
       return (
         <DataGrid
-          columnNames={fieldNames}
+          columnNames={columnNames}
           data={data}
           dateColumns={dateColumns}
           dateFormat="YYYY-MM-DD HH:mm:ss z"
@@ -89,18 +84,71 @@ export function VisualizationContainer({
         />
       );
     })
-    .with({ type: "bar" }, (config) => {
+    .with({ vizType: "bar" }, (config) => {
       const {
         success,
-        data: settings,
+        data: validConfig,
         error,
-      } = BarChartSettingsSchema.safeParse(config.settings);
+      } = BarChartConfigSchema.safeParse(config);
+      if (success) {
+        return <BarChart data={data} height={700} {...validConfig} />;
+      }
+
+      // generate the error message
+      const errors = flattenError(error).fieldErrors;
+      const errorMessages = objectValues(errors).flat();
+      const errorBlock = (
+        <List size="xl">
+          {errorMessages.map((errMsg) => {
+            return (
+              <List.Item key={errMsg}>
+                <Text display="flex" size="xl">
+                  {errMsg}
+                </Text>
+              </List.Item>
+            );
+          })}
+        </List>
+      );
+
+      const summaryMessage =
+        errors.xAxisKey || errors.yAxisKey ?
+          "The bar chart cannot be displayed because there are missing axes."
+        : "The bar chart cannot be displayed.";
+      return (
+        <Callout.Error
+          title="Cannot display bar chart"
+          message={summaryMessage}
+          w="fit-content"
+          mt="-20rem"
+        >
+          {errorBlock}
+        </Callout.Error>
+      );
+    })
+    .with({ vizType: "line" }, (config) => {
+      const {
+        success,
+        data: validConfig,
+        error,
+      } = LineChartConfigSchema.safeParse(config);
 
       if (success) {
-        return <BarChart data={data} height={700} {...settings} />;
+        return <LineChart data={data} height={700} {...validConfig} />;
       }
-      const errorMessages = z.prettifyError(error);
-      return <DangerText>{errorMessages}</DangerText>;
+      return <DangerText>{prettifyError(error)}</DangerText>;
+    })
+    .with({ vizType: "scatter" }, (config) => {
+      const {
+        success,
+        data: validConfig,
+        error,
+      } = ScatterPlotConfigSchema.safeParse(config);
+
+      if (success) {
+        return <ScatterChart data={data} height={700} {...validConfig} />;
+      }
+      return <DangerText>{prettifyError(error)}</DangerText>;
     })
     .with({ type: "line" }, (config) => {
       const {
@@ -127,4 +175,10 @@ export function VisualizationContainer({
       return <DangerText>{z.prettifyError(error)}</DangerText>;
     })
     .exhaustive();
+
+  return (
+    <Flex h="100%" w="100%" justify="center" align="center">
+      {viz}
+    </Flex>
+  );
 }

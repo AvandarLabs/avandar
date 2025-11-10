@@ -1,4 +1,3 @@
-import { invariant } from "@tanstack/react-router";
 import { match } from "ts-pattern";
 import { BaseClient, createBaseClient } from "@/lib/clients/BaseClient";
 import { WithLogger, withLogger } from "@/lib/clients/withLogger";
@@ -6,26 +5,57 @@ import {
   WithQueryHooks,
   withQueryHooks,
 } from "@/lib/clients/withQueryHooks/withQueryHooks";
-import { ILogger } from "@/lib/Logger";
+import { ILogger, Logger } from "@/lib/Logger";
 import { UnknownDataFrame } from "@/lib/types/common";
 import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
+import { difference, partition } from "@/lib/utils/arrays/misc";
 import { where } from "@/lib/utils/filters/filterBuilders";
-import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys } from "@/lib/utils/objects/misc";
-import { promiseMap } from "@/lib/utils/promises";
+import { promiseMap, promiseReduce } from "@/lib/utils/promises";
 import { DatasetId } from "@/models/datasets/Dataset";
-import {
-  ColumnSummary,
-  DatasetSummary,
-} from "@/models/datasets/DatasetRawData/getSummary";
 import { DuckDBClient, UnknownRow } from "../DuckDBClient";
-import { DuckDBDataType } from "../DuckDBClient/DuckDBDataType";
+import { DuckDBDataTypeUtils } from "../DuckDBClient/DuckDBDataType";
 import { scalar, singleton } from "../DuckDBClient/queryResultHelpers";
-import {
-  QueryResultData,
-  StructuredDuckDBQueryConfig,
-} from "../DuckDBClient/types";
-import { LocalDatasetEntryClient } from "./LocalDatasetEntryClient";
+import { DuckDBStructuredQuery } from "../DuckDBClient/DuckDBClient.types";
+import { QueryResult } from "@/models/queries/QueryResult/QueryResult.types";
+import { LocalDatasetClient } from "./LocalDatasetClient";
+
+type TextFieldSummary = {
+  type: "text";
+};
+
+type NumericFieldSummary = {
+  type: "number";
+  maxValue: number;
+  minValue: number;
+  averageValue: number;
+  stdDev: number;
+};
+
+type DateFieldSummary = {
+  type: "date";
+  mostRecentDate: string;
+  oldestDate: string;
+  datasetCoverage: string;
+};
+
+export type ColumnSummary = {
+  name: string;
+  distinctValuesCount: number;
+  emptyValuesCount: number;
+  percentMissingValues: number;
+  mostCommonValue: {
+    count: number;
+    value: string[];
+  };
+} & (TextFieldSummary | NumericFieldSummary | DateFieldSummary);
+
+type DatasetSummary = {
+  rows: number;
+  columns: number;
+  columnSummaries?: readonly ColumnSummary[];
+};
 
 type DatasetLocalRawQueryOptions = {
   /**
@@ -49,12 +79,26 @@ type DatasetLocalStructuredQueryOptions = {
   /**
    * The structured DuckDB query to run locally.
    */
-  query: Omit<StructuredDuckDBQueryConfig, "tableName"> & {
+  query: Omit<DuckDBStructuredQuery, "tableName"> & {
     datasetId: DatasetId;
   };
 };
 
 type DatasetRawDataClientQueries = {
+  /**
+   * Checks if a dataset is available locally. A dataset being "available"
+   * locally means that we have its raw data persisted in IndexedDB (accessible
+   * through the LocalDatasetClient). It may not necessarily be in DuckDB (which
+   * is in-memory), but if it is in local disk (IndexedDB) then it can be loaded
+   * into memory when needed.
+   *
+   * @param params The {@link DatasetId} to check.
+   * @returns `true` if the dataset is loaded locally, `false` otherwise.
+   */
+  isLocalDatasetAvailable: (params: {
+    datasetId: DatasetId;
+  }) => Promise<boolean>;
+
   /**
    * Runs a raw DuckDB query against the user's locally loaded raw data.
    * If the datasets specified in `dependencies` have not been loaded locally
@@ -74,7 +118,7 @@ type DatasetRawDataClientQueries = {
    */
   runLocalRawQuery: <T extends UnknownRow = UnknownRow>(
     params: DatasetLocalRawQueryOptions,
-  ) => Promise<QueryResultData<T>>;
+  ) => Promise<QueryResult<T>>;
 
   /**
    * Runs a structured query against the user's locally loaded raw data.
@@ -88,15 +132,15 @@ type DatasetRawDataClientQueries = {
    *   Until we can support "where", we will need to continue
    *   using runLocalRawQuery
    *
-   * @param params The {@link StructuredDuckDBQueryConfig} object to run
+   * @param params The {@link DuckDBStructuredQuery} object to run
    * @param params.query The query to run, structured as a
-   * {@link StructuredDuckDBQueryConfig} object, except with the `tableName`
+   * {@link DuckDBStructuredQuery} object, except with the `tableName`
    * replaced by a `datasetId` field.
    * @returns An array of rows
    */
   runLocalStructuredQuery: <T extends UnknownRow = UnknownRow>(
     params: DatasetLocalStructuredQueryOptions,
-  ) => Promise<QueryResultData<T>>;
+  ) => Promise<QueryResult<T>>;
 
   getSummary: (params: { datasetId: DatasetId }) => Promise<DatasetSummary>;
 
@@ -128,86 +172,98 @@ function createDatasetRawDataClient(): WithLogger<
 > {
   const baseClient = createBaseClient("DatasetRawData");
 
-  const helpers = {
-    async loadDatasetsLocally(datasetIds: DatasetId[]): Promise<void> {
-      if (datasetIds.length === 0) {
-        return;
-      }
+  /**
+   * Loads the given datasets to an in-memory DuckDB instance.
+   * TODO(jpsyx): this should be a function in LocalDatasetClient.
+   * @param datasetIds The IDs of the datasets to load into memory.
+   */
+  const _loadDatasetsToMemory = async (
+    datasetIds: DatasetId[],
+  ): Promise<void> => {
+    if (datasetIds.length === 0) {
+      return;
+    }
+    const localDatasets = await LocalDatasetClient.getAll(
+      where("datasetId", "in", datasetIds),
+    );
 
-      const localDatasetEntries = await LocalDatasetEntryClient.getAll(
-        where("datasetId", "in", datasetIds),
+    const missingLocalDatasets = difference(
+      datasetIds,
+      localDatasets.map(prop("datasetId")),
+    );
+    if (missingLocalDatasets.length > 0) {
+      throw new Error(
+        `The following datasets were not found locally: ${
+          missingLocalDatasets.join(", ")
+        }`,
       );
-      const datasetLoadStatus = await promiseMap(
-        localDatasetEntries,
-        async (entry) => {
-          const isDataLoaded = await DuckDBClient.hasTable(
-            entry.localTableName,
-          );
-          return {
-            datasetId: entry.datasetId,
-            localTableName: entry.localTableName,
-            isLoaded: isDataLoaded,
-          };
-        },
+    }
+    const datasetLoadStatuses = await promiseMap(
+      localDatasets,
+      async ({ datasetId, parquetData: rawData }) => {
+        const isAlreadyInMemory = await DuckDBClient.hasTable(datasetId);
+        if (!isAlreadyInMemory) {
+          await DuckDBClient.loadParquet({
+            tableName: datasetId,
+            blob: rawData,
+          });
+        }
+        return { datasetId, skipped: isAlreadyInMemory };
+      },
+    );
+    const [skippedDatasets, newlyLoadedDatasets] = partition(
+      datasetLoadStatuses,
+      propEq("skipped", true),
+    );
+    if (skippedDatasets.length > 0) {
+      Logger.log(
+        "The following datasets were already in memory",
+        skippedDatasets.map(prop("datasetId")),
       );
-
-      // check if a dataset is not loaded
-      if (datasetLoadStatus.some(propIs("isLoaded", false))) {
-        const datasetIdsNotLoaded = datasetLoadStatus
-          .filter(propIs("isLoaded", false))
-          .map(getProp("datasetId"))
-          .join(", ");
-
-        // TODO(jpsyx): we should not throw an error here by default.
-        // Instead, the dataset should get loaded **if possible**.
-        // CSV files that cannot be downloaded (if they were never synced
-        // to the cloud) cannot be loaded, so in that case we throw
-        // an error.
-        throw new Error(
-          `The following datasets could not be loaded: ${datasetIdsNotLoaded}`,
-        );
-      }
-    },
+    }
+    if (newlyLoadedDatasets.length > 0) {
+      Logger.log(
+        "The following datasets were loaded to memory",
+        newlyLoadedDatasets.map(prop("datasetId")),
+      );
+    }
   };
 
   return withLogger(baseClient, (baseLogger: ILogger) => {
     const queries: DatasetRawDataClientQueries = {
+      isLocalDatasetAvailable: async (params: { datasetId: DatasetId }) => {
+        const { datasetId } = params;
+        const localDataset = await LocalDatasetClient.getById({
+          id: datasetId,
+        });
+        return !!localDataset;
+      },
+
       runLocalRawQuery: async <T extends UnknownRow = UnknownRow>(
         params: DatasetLocalRawQueryOptions,
       ) => {
         const logger = baseLogger.appendName("runLocalRawQuery");
         logger.log("Running raw query", params);
         const { query, dependencies, queryArgs = {} } = params;
-
-        await helpers.loadDatasetsLocally(dependencies);
+        await _loadDatasetsToMemory(dependencies);
 
         // run the query - at this point we can be confident that all dependent
         // datasets are loaded
-        return DuckDBClient.runRawQuery<T>(query, queryArgs);
+        return DuckDBClient.runRawQuery<T>(query, { params: queryArgs });
       },
 
       runLocalStructuredQuery: async <T extends UnknownRow = UnknownRow>(
         params: DatasetLocalStructuredQueryOptions,
-      ): Promise<QueryResultData<T>> => {
+      ): Promise<QueryResult<T>> => {
         const logger = baseLogger.appendName("runLocalStructuredQuery");
         logger.log("Running structured query", params);
         const {
           query: { datasetId, ...queryParams },
         } = params;
-
-        await helpers.loadDatasetsLocally([datasetId]);
-
-        const datasetEntry = await LocalDatasetEntryClient.getById({
-          id: datasetId,
-        });
-
-        if (!datasetEntry) {
-          throw new Error(`Dataset ${datasetId} not found`);
-        }
-
+        await _loadDatasetsToMemory([datasetId]);
         return await DuckDBClient.runStructuredQuery<T>({
           ...queryParams,
-          tableName: datasetEntry.localTableName,
+          tableName: datasetId,
         });
       },
 
@@ -218,24 +274,13 @@ function createDatasetRawDataClient(): WithLogger<
         const logger = baseLogger.appendName("getPreviewData");
         logger.log("Getting preview data for dataset", params);
         const { datasetId, numRows } = params;
+        await _loadDatasetsToMemory([datasetId]);
 
-        // we have to get the local table name for the given dataset
-        const datasetEntry = await LocalDatasetEntryClient.getById({
-          id: datasetId,
-        });
-
-        if (datasetEntry) {
-          const tableName = datasetEntry?.localTableName;
-          const { data } = await DuckDBClient.runRawQuery(
-            `SELECT * FROM "${tableName}" LIMIT ${numRows}`,
-            { tableName },
-          );
-          return data;
-        }
-
-        throw new Error(
-          `Could not find a local entry for dataset ${datasetId}`,
+        const { data } = await DuckDBClient.runRawQuery(
+          'SELECT * FROM "$tableName$" LIMIT $numRows$',
+          { params: { numRows, tableName: datasetId } },
         );
+        return data;
       },
 
       getSummary: async (params: {
@@ -243,40 +288,31 @@ function createDatasetRawDataClient(): WithLogger<
       }): Promise<DatasetSummary> => {
         const logger = baseLogger.appendName("getSummary");
         logger.log("Calling `getSummary`", params);
-
-        const loadedDatasetEntry = await LocalDatasetEntryClient.getById({
-          id: params.datasetId,
-        });
-
-        invariant(
-          loadedDatasetEntry,
-          `Could not find a locally loaded entry for dataset ${params.datasetId}`,
-        );
-
-        const { localTableName } = loadedDatasetEntry;
-
-        const duckdbColumns = await DuckDBClient.getTableSchema(localTableName);
+        const { datasetId } = params;
+        await _loadDatasetsToMemory([datasetId]);
+        const duckdbColumns = await DuckDBClient.getTableSchema(datasetId);
         const columns = duckdbColumns.map((duckColumn, idx) => {
           return {
             name: duckColumn.column_name,
-            dataType: DuckDBDataType.toDatasetDataType(duckColumn.column_type),
+            dataType: DuckDBDataTypeUtils.toAvaDataType(
+              duckColumn.column_type,
+            ),
             columnIdx: idx,
           };
         });
-
         const numRows = Number(
           scalar(
             await DuckDBClient.runRawQuery<{
               count: bigint;
             }>(`SELECT COUNT(*) as count FROM "$tableName$"`, {
-              tableName: localTableName,
+              params: { tableName: datasetId },
             }),
           ),
         );
 
-        const columnSummaries = await promiseMap(
+        const columnSummaries: ColumnSummary[] = await promiseReduce(
           columns,
-          async (column): Promise<ColumnSummary> => {
+          async (summaries, column): Promise<ColumnSummary[]> => {
             const { name: columnName, dataType } = column;
 
             const distinctValuesCount = Number(
@@ -285,7 +321,12 @@ function createDatasetRawDataClient(): WithLogger<
                   count: bigint;
                 }>(
                   `SELECT COUNT(DISTINCT "$columnName$") as count FROM "$tableName$"`,
-                  { columnName: columnName, tableName: localTableName },
+                  {
+                    params: {
+                      columnName: columnName,
+                      tableName: datasetId,
+                    },
+                  },
                 ),
               ),
             );
@@ -298,9 +339,9 @@ function createDatasetRawDataClient(): WithLogger<
                   `SELECT COUNT("$columnName$") as count
                     FROM "$tableName$"
                     WHERE "$columnName$" IS NULL
-                    ${dataType === "text" ? `OR "$columnName$" = ''` : ""}
+                    ${dataType === "varchar" ? `OR "$columnName$" = ''` : ""}
                   `,
-                  { columnName, tableName: localTableName },
+                  { params: { columnName, tableName: datasetId } },
                 ),
               ),
             );
@@ -314,10 +355,10 @@ function createDatasetRawDataClient(): WithLogger<
                 FROM "$tableName$"
                 WHERE
                   "$columnName$" IS NOT NULL
-                  ${dataType === "text" ? `AND "$columnName$" <> ''` : ""}
+                  ${dataType === "varchar" ? `AND "$columnName$" <> ''` : ""}
                 GROUP BY "${columnName}"
               )`,
-              { columnName, tableName: localTableName },
+              { params: { columnName, tableName: datasetId } },
             );
             const maxCount = maxCountResult.data[0]?.max_count ?? 0n;
 
@@ -330,26 +371,28 @@ function createDatasetRawDataClient(): WithLogger<
                FROM "$tableName$"
                WHERE
                  "$columnName$" IS NOT NULL
-                 ${dataType === "text" ? `AND "$columnName$" <> ''` : ""}
+                 ${dataType === "varchar" ? `AND "$columnName$" <> ''` : ""}
                GROUP BY "$columnName$"
                HAVING COUNT(*) = $maxCount$
                ORDER BY value
                LIMIT 10`, // only get the top 10 to save memory
               {
-                columnName,
-                tableName: localTableName,
-                maxCount,
+                params: {
+                  columnName,
+                  tableName: datasetId,
+                  maxCount,
+                },
               },
             );
             const mostCommonValue = mostCommonValuesQuery.data;
 
             const typeSpecificSummary = await match(dataType)
-              .with("text", () => {
+              .with("varchar", () => {
                 return {
                   type: "text" as const,
                 };
               })
-              .with("number", async () => {
+              .with("bigint", "double", async () => {
                 // TODO(jpsyx): implement this
                 const {
                   max = NaN,
@@ -369,7 +412,7 @@ function createDatasetRawDataClient(): WithLogger<
                         AVG("$columnName$") as avg,
                         STDDEV_SAMP("$columnName$") as stdDev
                       FROM "$tableName$"`,
-                    { columnName, tableName: localTableName },
+                    { params: { columnName, tableName: datasetId } },
                   ),
                 ) ?? {};
                 return {
@@ -380,38 +423,84 @@ function createDatasetRawDataClient(): WithLogger<
                   stdDev: stdDev,
                 };
               })
-              .with("date", () => {
-                notifyDevAlert("Date field summary not implemented");
-                // TODO(jpsyx): implement this
+              .with("date", "time", "timestamp", async () => {
+                const singleQuery = dataType === "time"
+                  ? `SELECT
+                           COALESCE(CAST(MAX("$columnName$") AS VARCHAR), '') AS most_recent,
+                           COALESCE(CAST(MIN("$columnName$") AS VARCHAR), '') AS oldest,
+                           NULL AS days
+                         FROM "$tableName$"
+                         WHERE "$columnName$" IS NOT NULL`
+                  : `SELECT
+                           COALESCE(CAST(MAX("$columnName$") AS VARCHAR), '') AS most_recent,
+                           COALESCE(CAST(MIN("$columnName$") AS VARCHAR), '') AS oldest,
+                           CASE
+                             WHEN MIN("$columnName$") IS NULL OR MAX("$columnName$") IS NULL THEN 0
+                             ELSE DATE_DIFF('day',
+                               CAST(MIN("$columnName$") AS DATE),
+                               CAST(MAX("$columnName$") AS DATE)
+                             ) + 1
+                           END AS days
+                         FROM "$tableName$"
+                         WHERE "$columnName$" IS NOT NULL`;
+
+                const row = singleton(
+                  await DuckDBClient.runRawQuery<{
+                    most_recent: string | null;
+                    oldest: string | null;
+                    days: bigint | number | null;
+                  }>(singleQuery, {
+                    params: { columnName, tableName: datasetId },
+                  }),
+                ) ?? { most_recent: "", oldest: "", days: 0 };
+
+                const mostRecentDate = String(row.most_recent ?? "");
+                const oldestDate = String(row.oldest ?? "");
+                const datasetCoverage = row.days === null
+                  ? "Unknown"
+                  : Number(row.days) === 1
+                  ? "1 day"
+                  : `${Number(row.days)} days`;
+
                 return {
                   type: "date" as const,
-                  mostRecentDate: "",
-                  oldestDate: "",
-                  datasetDuration: "",
+                  mostRecentDate,
+                  oldestDate,
+                  datasetCoverage,
                 };
               })
-              .exhaustive();
+              .with("boolean", () => {
+                notifyDevAlert("Boolean field summary not implemented");
+                throw new Error(`Unsupported data type: ${dataType}`);
+              })
+              .exhaustive(() => {
+                notifyDevAlert(`Unsupported data type: ${dataType}`);
+                throw new Error(`Unsupported data type: ${dataType}`);
+              });
 
-            return {
+            const summary: ColumnSummary = {
               name: columnName,
               distinctValuesCount,
               emptyValuesCount,
               percentMissingValues: emptyValuesCount / distinctValuesCount,
-              mostCommonValue:
-                !mostCommonValue || mostCommonValue.length === 0 ?
-                  {
-                    count: 0,
-                    value: [],
-                  }
+              mostCommonValue: !mostCommonValue || mostCommonValue.length === 0
+                ? {
+                  count: 0,
+                  value: [],
+                }
                 : {
-                    count: Number(maxCount),
-                    value: mostCommonValue.map((row) => {
-                      return String(row.value);
-                    }),
-                  },
+                  count: Number(maxCount),
+                  value: mostCommonValue.map((row) => {
+                    return String(row.value);
+                  }),
+                },
               ...typeSpecificSummary,
             };
+
+            summaries.push(summary);
+            return summaries;
           },
+          [],
         );
 
         return {

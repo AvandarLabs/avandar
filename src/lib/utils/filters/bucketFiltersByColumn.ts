@@ -1,5 +1,5 @@
 import { UnknownObject } from "@/lib/types/common";
-import { isArray } from "../guards";
+import { isArray } from "../guards/guards";
 import { objectKeys } from "../objects/misc";
 import { FilterOperatorRecord, FiltersByColumn } from "./filtersByColumn";
 import { FiltersByOperator } from "./filtersByOperator";

@@ -3,6 +3,7 @@ import { IconChevronRight } from "@tabler/icons-react";
 import clsx from "clsx";
 import { Key, ReactNode } from "react";
 import { NavLink } from "@/lib/ui/links/NavLink";
+import { TruncatedText } from "@/lib/ui/text/TruncatedText";
 import { objectEntries } from "@/lib/utils/objects/misc";
 import type { NavLinkProps } from "@/lib/ui/links/NavLink";
 
@@ -86,9 +87,11 @@ export function NavLinkList({
         }
         py={gap}
         label={
-          <Text span fw={500}>
-            {label}
-          </Text>
+          typeof label === "string" ?
+            <TruncatedText withFullTextTooltip fw={500}>
+              {label}
+            </TruncatedText>
+          : label
         }
       />
     );

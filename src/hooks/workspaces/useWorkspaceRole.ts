@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { SupabaseDBClient } from "@/lib/clients/supabase/SupabaseDBClient";
+import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { WorkspaceRole } from "@/models/Workspace/types";
 import { useCurrentUser } from "../users/useCurrentUser";
 
@@ -13,7 +13,7 @@ export function useWorkspaceRole(): WorkspaceRole {
     enabled: !!workspace?.id && !!user?.id,
     staleTime: Infinity,
     queryFn: async () => {
-      const { data, error } = await SupabaseDBClient.from("user_roles")
+      const { data, error } = await AvaSupabase.DB.from("user_roles")
         .select("role")
         .eq("user_id", user!.id)
         .eq("workspace_id", workspace!.id)

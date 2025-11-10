@@ -1,20 +1,15 @@
 import { Enums } from "@/types/database.types";
-import { AggregationExtractorModel } from "./AggregationExtractor/types";
-import { DatasetColumnValueExtractorModel } from "./DatasetColumnValueExtractor/types";
+import { DatasetColumnValueExtractorModel } from "./DatasetColumnValueExtractor/DatasetColumnValueExtractor.types";
 import { ManualEntryExtractorModel } from "./ManualEntryExtractor/types";
 
-export type ValueExtractorType =
-  Enums<"entity_field_configs__value_extractor_type">;
-
-// Value extractor types for each field class
-export type DimensionExtractorType = "dataset_column_value" | "manual_entry";
-export type MetricExtractorType = "aggregation";
+export type ValueExtractorType = Enums<
+  "entity_field_configs__value_extractor_type"
+>;
 
 /**
  * Registry that maps extractor types to their CRUD model definitions.
  */
 export type EntityFieldValueExtractorModelRegistry = {
-  aggregation: AggregationExtractorModel;
   manual_entry: ManualEntryExtractorModel;
   dataset_column_value: DatasetColumnValueExtractorModel;
 };
@@ -45,5 +40,6 @@ export type EntityFieldValueExtractor<
   ExtractorType extends ValueExtractorType = ValueExtractorType,
 > = EntityFieldValueExtractorRegistry<T>[ExtractorType];
 
-export type EntityFieldValueExtractorId =
-  EntityFieldValueExtractorRegistry<"Read">[ValueExtractorType]["id"];
+export type EntityFieldValueExtractorId = EntityFieldValueExtractorRegistry<
+  "Read"
+>[ValueExtractorType]["id"];

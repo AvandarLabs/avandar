@@ -1,23 +1,23 @@
+import { Text } from "@mantine/core";
 import { match } from "ts-pattern";
 import { constant } from "@/lib/utils/higherOrderFuncs";
-import { ObjectDescriptionListBlock } from ".";
 import { DescribableValueArrayBlock } from "./DescribableValueArrayBlock";
 import {
   isDescribableObject,
   isDescribableValueArray,
   isPrimitiveDescribableValue,
 } from "./guards";
-import { PrimitiveValueItem } from "./PrimitiveValueItem";
 import {
   AnyDescribableValueRenderOptions,
   DescribableObject,
-  DescribableValue,
   DescribableValueArrayRenderOptions,
   GenericRootData,
   ObjectRenderOptions,
   PrimitiveValue,
   PrimitiveValueRenderOptions,
-} from "./types";
+} from "./ObjectDescriptionList.types";
+import { ObjectDescriptionListBlock } from "./ObjectDescriptionListBlock";
+import { PrimitiveValueItem } from "./PrimitiveValueItem";
 
 type Props<RootData extends GenericRootData> = {
   /**
@@ -37,14 +37,19 @@ type Props<RootData extends GenericRootData> = {
     } & ObjectRenderOptions<DescribableObject, RootData>)
   | ({
       type: "array";
-      value: readonly DescribableValue[];
-    } & DescribableValueArrayRenderOptions<DescribableValue, RootData>)
+      value: readonly unknown[];
+    } & DescribableValueArrayRenderOptions<unknown, RootData>)
   | ({
       type: "unknown";
-      value: DescribableValue;
+      value: unknown;
     } & AnyDescribableValueRenderOptions)
 );
 
+/**
+ * A generic component that renders a value of any type. This is useful for when
+ * we don't know exactly what subcomponent to render. It inspects the type of
+ * the value to call the appropriate subcomponent.
+ */
 export function ValueItemContainer<RootData extends GenericRootData>(
   props: Props<RootData>,
 ): JSX.Element | null {
@@ -120,7 +125,8 @@ export function ValueItemContainer<RootData extends GenericRootData>(
           );
         }
 
-        return null;
+        // otherwise, we do our best by just casting to a string
+        return <Text>{String(value)}</Text>;
       },
     )
     .exhaustive(constant(null));

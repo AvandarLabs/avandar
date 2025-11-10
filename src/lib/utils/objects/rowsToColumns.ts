@@ -1,6 +1,6 @@
 import { UnknownObject } from "@/lib/types/common";
 import { StringKeyOf } from "@/lib/types/utilityTypes";
-import { hasDefinedProps } from "../guards";
+import { hasDefinedProps } from "../guards/guards";
 import { objectKeys } from "./misc";
 
 /**

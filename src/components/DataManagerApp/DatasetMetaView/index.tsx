@@ -22,12 +22,14 @@ import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { DataGrid } from "@/lib/ui/data-viz/DataGrid";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
-import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/types";
+import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList.types";
 import { Paper } from "@/lib/ui/Paper";
+import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { where } from "@/lib/utils/filters/filterBuilders";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
+import { matchLiteral } from "@/lib/utils/strings/matchLiteral";
+import { AvaDataTypes } from "@/models/datasets/AvaDataType";
 import { Dataset, DatasetWithColumns } from "@/models/datasets/Dataset";
 import { DataSummaryView } from "./DataSummaryView";
 import { EditDatasetView } from "./EditDatasetView";
@@ -43,15 +45,38 @@ const EXCLUDED_DATASET_METADATA_KEYS = [
   "workspaceId",
   "ownerId",
   "ownerProfileId",
+  "dateOfLastSync",
 ] satisfies ReadonlyArray<keyof DatasetWithColumns>;
 
 const DATASET_METADATA_RENDER_OPTIONS = {
+  createdAt: {
+    asDate: true,
+  },
+  updatedAt: {
+    asDate: true,
+  },
+  sourceType: {
+    renderValue: (value) => {
+      return matchLiteral(value, {
+        csv_file: "CSV file",
+        google_sheets: "Google Sheets",
+        _otherwise: value,
+      });
+    },
+  },
   columns: {
     renderAsTable: true,
-    titleKey: "name",
     maxHeight: 400,
     itemRenderOptions: {
-      excludeKeys: ["id", "datasetId", "workspaceId", "columnIdx"],
+      keyRenderOptions: {
+        createdAt: {
+          asDate: true,
+        },
+        dataType: {
+          renderValue: AvaDataTypes.toDisplayValue,
+        },
+      },
+      includeKeys: ["name", "dataType", "description"],
     },
   },
 } satisfies ObjectKeyRenderOptionsMap<DatasetWithColumns>;
@@ -101,7 +126,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   };
 
   const isLoadingFullDataset = isLoadingPreviewData || isLoadingDatasetColumns;
-  const datasetColumnNames = datasetColumns?.map(getProp("name")) ?? [];
+  const datasetColumnNames = datasetColumns?.map(prop("name")) ?? [];
 
   return (
     <Container pt="lg">
@@ -180,6 +205,8 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
 
                 <ObjectDescriptionList
                   data={datasetWithColumns}
+                  dateFormat="MMMM D, YYYY"
+                  includeKeys={["updatedAt", "sourceType", "..."]}
                   excludeKeys={EXCLUDED_DATASET_METADATA_KEYS}
                   keyRenderOptions={DATASET_METADATA_RENDER_OPTIONS}
                 />

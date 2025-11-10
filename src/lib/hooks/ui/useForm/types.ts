@@ -45,6 +45,17 @@ export type FormType<
     // Improve type-safety for `key`
     key: (path: FormPath) => string;
 
+    // Improve type-safety for `setFieldValue`
+    setFieldValue: <P extends FormPath>(
+      path: P,
+      value:
+        | PathValue<FormValues, P>
+        | ((prevValue: PathValue<FormValues, P>) => PathValue<FormValues, P>),
+      options?: {
+        forceUpdate: boolean;
+      },
+    ) => void;
+
     // Improve type-safety for `getInputProps`
     getInputProps: (
       path: FormPath,

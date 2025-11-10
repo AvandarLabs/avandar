@@ -1,2 +1,2 @@
-export * from "./Entity.types";
-export * from "./EntityParsers";
+export type { Entity, EntityId } from "./Entity.types";
+export { EntityParsers } from "./EntityParsers";

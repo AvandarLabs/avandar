@@ -20,6 +20,19 @@ export type UseQueryOptions<
   TanstackUseQueryOptions<TQueryFnData, DefaultError, TData, TQueryKey>,
   {
     queryFn: QueryFunction<TQueryFnData, TQueryKey>;
+
+    /**
+     * When set, the previous data will be used as the placeholder data.
+     * So if the query is being re-fetched, the previous data will be returned
+     * until the query finishes, rather than returning `undefined`.
+     *
+     * This is the equivalent of passing the useQuery option:
+     *
+     * ```ts
+     * placeholderData: (prevValue) => prevValue;
+     * ```
+     */
+    usePreviousDataAsPlaceholder?: boolean;
   }
 >;
 
@@ -81,6 +94,12 @@ export function useQuery<
         throw error;
       }
     },
+    placeholderData:
+      options.usePreviousDataAsPlaceholder ?
+        (prevValue) => {
+          return prevValue;
+        }
+      : undefined,
   });
 
   return [

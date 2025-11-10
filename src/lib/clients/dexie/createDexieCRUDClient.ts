@@ -1,18 +1,19 @@
-import Dexie, { IDType, UpdateSpec } from "dexie";
+import { IDType, UpdateSpec } from "dexie";
 import { EmptyObject } from "type-fest";
 import { ILogger } from "@/lib/Logger";
 import { DexieModelCRUDTypes } from "@/lib/models/DexieModelCRUDTypes";
 import { ModelCRUDParserRegistry } from "@/lib/models/makeParserRegistry";
+import { assertIsDefined } from "@/lib/utils/asserts";
 import { applyFiltersToRows } from "@/lib/utils/filters/applyFiltersToRows";
 import { FiltersByColumn } from "@/lib/utils/filters/filtersByColumn";
-import { isDefined } from "@/lib/utils/guards";
+import { isDefined } from "@/lib/utils/guards/guards";
 import {
   createModelCRUDClient,
   HookableClient,
   ModelCRUDClient,
   UpsertOptions,
 } from "../createModelCRUDClient";
-import { DexieModelTable } from "./defineDexieDBVersion";
+import { DexieDBType } from "./DexieDBVersionManager";
 
 export type DexieCRUDClient<
   M extends DexieModelCRUDTypes,
@@ -24,7 +25,7 @@ type CreateDexieCRUDClientOptions<
   M extends DexieModelCRUDTypes,
   ExtendedQueriesClient extends HookableClient,
   ExtendedMutationsClient extends HookableClient,
-  DB extends Dexie & DexieModelTable<M> = Dexie & DexieModelTable<M>,
+  DB extends DexieDBType<M> = DexieDBType<M>,
 > = {
   /** The dexie database that backs this client */
   db: DB;
@@ -77,7 +78,7 @@ export function createDexieCRUDClient<
   M extends DexieModelCRUDTypes,
   ExtendedQueriesClient extends HookableClient = EmptyObject,
   ExtendedMutationsClient extends HookableClient = EmptyObject,
-  DB extends Dexie & DexieModelTable<M> = Dexie & DexieModelTable<M>,
+  DB extends DexieDBType<M> = DexieDBType<M>,
 >({
   db,
   modelName,
@@ -91,21 +92,21 @@ export function createDexieCRUDClient<
   DB
 >): DexieCRUDClient<M, ExtendedQueriesClient, ExtendedMutationsClient> {
   const dbTable = db[modelName];
+  assertIsDefined(dbTable, `Could not find Dexie table for model ${modelName}`);
+
   const modelClient = createModelCRUDClient({
     modelName,
     parsers,
-    additionalQueries:
-      queries ?
-        ({ clientLogger }) => {
-          return queries({ logger: clientLogger, db, dbTable });
-        }
+    additionalQueries: queries
+      ? ({ clientLogger }) => {
+        return queries({ logger: clientLogger, db, dbTable });
+      }
       : undefined,
 
-    additionalMutations:
-      mutations ?
-        ({ clientLogger }) => {
-          return mutations({ logger: clientLogger, db, dbTable });
-        }
+    additionalMutations: mutations
+      ? ({ clientLogger }) => {
+        return mutations({ logger: clientLogger, db, dbTable });
+      }
       : undefined,
 
     crudFunctions: {

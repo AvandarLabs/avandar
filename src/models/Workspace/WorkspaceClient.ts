@@ -1,6 +1,6 @@
 import { AuthClient } from "@/clients/AuthClient";
 import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
-import { getProp } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { camelCaseKeysShallow } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
 import { UserId } from "../User/types";
@@ -29,7 +29,7 @@ export const WorkspaceClient = createSupabaseCRUDClient({
           .select(`workspace:workspaces (*)`)
           .eq("user_id", session.user.id)
           .throwOnError();
-        const workspaces = memberships.map(getProp("workspace"));
+        const workspaces = memberships.map(prop("workspace"));
 
         logger.log("Found user workspaces", workspaces);
 

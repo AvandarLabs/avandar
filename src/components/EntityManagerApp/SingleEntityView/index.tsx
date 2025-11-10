@@ -1,26 +1,26 @@
 import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { SourceBadge } from "@/components/common/SourceBadge";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { Paper } from "@/lib/ui/Paper";
 import { where } from "@/lib/utils/filters/filterBuilders";
-import { isNonNullish } from "@/lib/utils/guards";
-import { makeMap } from "@/lib/utils/maps/builders";
+import { isNonNullish } from "@/lib/utils/guards/guards";
+import { makeIdLookupMap, makeMap } from "@/lib/utils/maps/builders";
 import { makeObject } from "@/lib/utils/objects/builders";
-import { getProp, propIs } from "@/lib/utils/objects/higherOrderFuncs";
+import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { omit } from "@/lib/utils/objects/misc";
 import { unknownToString } from "@/lib/utils/strings/transformations";
 import { DatasetSourceType } from "@/models/datasets/Dataset";
 import { Entity } from "@/models/entities/Entity";
 import { EntityFieldValue } from "@/models/entities/EntityFieldValue";
 import { EntityConfig } from "@/models/EntityConfig/EntityConfig.types";
-import { EntityFieldConfigClient } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfigClient";
 import {
   EntityFieldConfig,
   EntityFieldConfigId,
-} from "@/models/EntityConfig/EntityFieldConfig/types";
+} from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import { ActivityBlock } from "./ActivityBlock";
 import { StatusPill } from "./StatusPill";
 
@@ -62,9 +62,7 @@ function useHydratedEntity({
   const datasetIds = useMemo(() => {
     return [
       ...new Set(
-        (entityFieldValues ?? [])
-          .map(getProp("datasetId"))
-          .filter(isNonNullish),
+        (entityFieldValues ?? []).map(prop("datasetId")).filter(isNonNullish),
       ),
     ];
   }, [entityFieldValues]);
@@ -72,7 +70,7 @@ function useHydratedEntity({
   const [datasets] = DatasetClient.useGetAll(where("id", "in", datasetIds));
 
   const datasetsMap = useMemo(() => {
-    return datasets ? makeMap(datasets, { keyFn: getProp("id") }) : undefined;
+    return datasets ? makeMap(datasets, { keyFn: prop("id") }) : undefined;
   }, [datasets]);
 
   // TODO(jpsyx): move this to a module that can also use cacheing.
@@ -84,16 +82,9 @@ function useHydratedEntity({
       | undefined = undefined;
 
     if (entityFieldConfigs) {
-      const idField = entityFieldConfigs.find(
-        propIs("options.isIdField", true),
-      );
-      const nameField = entityFieldConfigs.find(
-        propIs("options.isTitleField", true),
-      );
-      fieldConfigsMap = makeMap(entityFieldConfigs, {
-        keyFn: getProp("id"),
-      });
-
+      const idField = entityFieldConfigs.find(propEq("isIdField", true));
+      const nameField = entityFieldConfigs.find(propEq("isTitleField", true));
+      fieldConfigsMap = makeIdLookupMap(entityFieldConfigs);
       configInfo = {
         idField,
         nameField,
@@ -103,7 +94,7 @@ function useHydratedEntity({
 
     if (entityFieldValues) {
       const fieldValuesMap = makeMap(entityFieldValues, {
-        keyFn: getProp("entityFieldConfigId"),
+        keyFn: prop("entityFieldConfigId"),
         valueFn: (fieldValue) => {
           const config = fieldConfigsMap?.get(fieldValue.entityFieldConfigId);
           const dataset =

@@ -2,25 +2,27 @@ import { ScrollArea, Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
 import { pick } from "@/lib/utils/objects/misc";
 import {
+  isDescribableObject,
   isDescribableValueArray,
   isPrimitiveDescribableValue,
   isStringOrNumber,
 } from "../guards";
 import {
   DescribableObject,
-  DescribableValue,
   DescribableValueArrayRenderOptions,
   GenericRootData,
+  NestedArrayRenderOptions,
+  ObjectArrayRenderOptions,
   PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
   PrimitiveValue,
   PrimitiveValueRenderOptions,
-} from "../types";
+} from "../ObjectDescriptionList.types";
 import { NestedArraysBlock } from "./NestedArraysBlock";
 import { ObjectArrayBlock } from "./ObjectArrayBlock";
 import { PrimitiveFieldValueArrayBlock } from "./PrimitiveFieldValueArrayBlock";
 
-type Props<T extends DescribableValue, RootData extends GenericRootData> = {
-  data: readonly DescribableValue[];
+type Props<T, RootData extends GenericRootData> = {
+  data: readonly T[];
   rootData: RootData;
 } & DescribableValueArrayRenderOptions<T, RootData>;
 export type { Props as DescribableValueArrayBlockProps };
@@ -30,7 +32,7 @@ export type { Props as DescribableValueArrayBlockProps };
  * splits it between primitive values, object values, and array values.
  */
 export function DescribableValueArrayBlock<
-  T extends DescribableValue,
+  T,
   RootData extends GenericRootData,
 >({
   data,
@@ -45,14 +47,21 @@ export function DescribableValueArrayBlock<
   const [describableObjects, describableValueArrays, primitiveValues] =
     useMemo(() => {
       const objs: DescribableObject[] = [];
-      const arrays: Array<readonly DescribableValue[]> = [];
+      const arrays: Array<readonly T[]> = [];
       const primitives: PrimitiveValue[] = [];
       data.forEach((v) => {
         if (isPrimitiveDescribableValue(v)) {
           primitives.push(v);
         } else if (isDescribableValueArray(v)) {
-          arrays.push(v);
-        } else {
+          arrays.push(v as readonly T[]);
+
+          // this does not match against objects that are not plain
+          // objects, like Maps, Sets, etc. For now, we will just ignore
+          // them. In the future, we may want to have other types of renderers
+          // for class instances. But it should be handled with a separate
+          // component, they should not be treated as DescribableObjects, which
+          // are specifically meant for plain objects.
+        } else if (isDescribableObject(v)) {
           objs.push(v);
         }
       });
@@ -97,13 +106,21 @@ export function DescribableValueArrayBlock<
           values={describableObjects}
           maxItemsCount={maxItemsCount}
           rootData={rootData}
-          {...objectArrayOrNestedArrayRenderOptions}
+          // eslint-disable-next-line max-len
+          {...(objectArrayOrNestedArrayRenderOptions as unknown as ObjectArrayRenderOptions<
+            DescribableObject,
+            RootData
+          >)}
         />
         <NestedArraysBlock
           values={describableValueArrays}
           maxItemsCount={maxItemsCount}
           rootData={rootData}
-          {...objectArrayOrNestedArrayRenderOptions}
+          // eslint-disable-next-line max-len
+          {...(objectArrayOrNestedArrayRenderOptions as unknown as NestedArrayRenderOptions<
+            T,
+            RootData
+          >)}
         />
       </Stack>
     : customRenderedArrayContent;

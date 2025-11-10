@@ -1,3 +1,5 @@
+import { ensureOPFSWritePermission } from "./ensureOPFSWritePermission";
+
 /**
  * Removes a file from the browser OPFS.
  *
@@ -6,5 +8,9 @@
 export async function removeOPFSFile(filePath: string): Promise<void> {
   const fileName = filePath.replace("opfs://", "");
   const root = await navigator.storage.getDirectory();
+
+  // Ensure write permission (some browsers require this explicitly)
+  await ensureOPFSWritePermission();
+
   await root.removeEntry(fileName, { recursive: false });
 }

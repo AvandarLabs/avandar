@@ -2,8 +2,13 @@ import camelcaseKeys, { CamelCaseKeys } from "camelcase-keys";
 import snakecaseKeys, { SnakeCaseKeys } from "snakecase-keys";
 import { ConditionalKeys } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
-import { ExcludeDeep, ReplaceTypes, SwapDeep } from "@/lib/types/utilityTypes";
-import { isNull, isPlainObject, isUndefined } from "../guards";
+import {
+  ExcludeDeep,
+  ReplaceTypes,
+  StringKeyOf,
+  SwapDeep,
+} from "@/lib/types/utilityTypes";
+import { isNull, isPlainObject, isUndefined } from "../guards/guards";
 import { constant } from "../higherOrderFuncs";
 import { objectKeys } from "./misc";
 
@@ -201,9 +206,11 @@ export function excludeNullsDeep<T extends Exclude<unknown, null>>(
 export type ExcludeNullsIn<
   T extends UnknownObject,
   K extends keyof T = keyof T,
-> = Omit<T, K> & {
-  [Key in K]: Exclude<T[Key], null>;
-};
+> =
+  & Omit<T, K>
+  & {
+    [Key in K]: Exclude<T[Key], null>;
+  };
 
 /**
  * Excludes nulls from the specified keys.
@@ -221,9 +228,10 @@ export function excludeNullsIn<T extends UnknownObject, K extends keyof T>(
   keysToTest: Extract<K, string> | readonly K[],
 ): ExcludeNullsIn<T, K> {
   const newObj = { ...obj };
-  const keys =
-    typeof keysToTest === "string" ? [keysToTest]
-    : keysToTest.length === 0 ? objectKeys(obj)
+  const keys = typeof keysToTest === "string"
+    ? [keysToTest]
+    : keysToTest.length === 0
+    ? objectKeys(obj)
     : keysToTest;
   keys.forEach((key) => {
     if (isNull(obj[key])) {
@@ -231,27 +239,35 @@ export function excludeNullsIn<T extends UnknownObject, K extends keyof T>(
     }
   });
 
-  return newObj as Omit<T, K> & {
-    [Key in K]: Exclude<T[Key], null>;
-  };
+  return newObj as
+    & Omit<T, K>
+    & {
+      [Key in K]: Exclude<T[Key], null>;
+    };
 }
 
 export type ExcludeNullsExceptIn<
   T extends UnknownObject,
-  K extends keyof T,
-  KeysToExcludeNulls extends keyof T = Exclude<keyof T, K>,
-> = Omit<T, KeysToExcludeNulls> & {
-  [Key in KeysToExcludeNulls]: Exclude<T[Key], null>;
-};
+  KeysToNotChange extends StringKeyOf<T>,
+  KeysToExcludeNulls extends StringKeyOf<T> = Exclude<
+    StringKeyOf<T>,
+    KeysToNotChange
+  >,
+> =
+  & Pick<T, KeysToNotChange>
+  & {
+    [Key in KeysToExcludeNulls]: Exclude<T[Key], null>;
+  };
 
 /**
- * Excludes nulls from all keys except the specified keys. Those keys
- * will be left as is. This is a shallow operation.
+ * Excludes nulls from all keys except for the specified keys. Those keys will
+ * be left as is. This is a shallow operation.
  *
  * If no keys are specified, we assume `keysToKeepNull` is the entire
  * object. Therefore, the object is left unchanged.
  *
- * This is a shallow operation.
+ * At the type level, any keys that can possibly be `null` will now have a
+ * union with `undefined`.
  *
  * @param obj The object to exclude nulls from.
  * @param keysToKeepNull The keys to keep nulls for.
@@ -260,13 +276,14 @@ export type ExcludeNullsExceptIn<
  */
 export function excludeNullsExceptIn<
   T extends UnknownObject,
-  K extends keyof T,
+  K extends StringKeyOf<T>,
 >(
   obj: T,
-  keysToKeepNull: Extract<K, string> | readonly K[],
+  keysToKeepNull: K | readonly K[],
 ): ExcludeNullsExceptIn<T, K> {
-  const keys =
-    typeof keysToKeepNull === "string" ? [keysToKeepNull] : keysToKeepNull;
+  const keys = typeof keysToKeepNull === "string"
+    ? [keysToKeepNull]
+    : keysToKeepNull;
   if (keys.length === 0) {
     return obj as ExcludeNullsExceptIn<T, K>;
   }
@@ -291,19 +308,16 @@ export function coerceDatesIn<T extends UnknownObject, K extends keyof T>(
   obj: T,
   keys: readonly K[],
 ): {
-  [Key in keyof T]: Key extends K ?
-    undefined extends T[Key] ?
-      Date | undefined
+  [Key in keyof T]: Key extends K ? undefined extends T[Key] ? Date | undefined
     : Date
-  : T[Key];
+    : T[Key];
 } {
   const newObj = { ...obj };
   keys.forEach((key) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    newObj[key] =
-      obj[key] === undefined ?
-        undefined
+    newObj[key] = obj[key] === undefined
+      ? undefined
       : new Date(obj[key] as unknown as string | number);
   });
   return newObj as ReplaceTypes<T, { [Key in K]: Date }>;
@@ -323,11 +337,10 @@ export function convertDatesToISOIn<
   obj: T,
   keys: readonly K[],
 ): {
-  [Key in keyof T]: Key extends K ?
-    undefined extends T[Key] ?
-      string | undefined
+  [Key in keyof T]: Key extends K
+    ? undefined extends T[Key] ? string | undefined
     : string
-  : T[Key];
+    : T[Key];
 } {
   const newObj = { ...obj };
   keys.forEach((key) => {

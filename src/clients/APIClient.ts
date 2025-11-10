@@ -1,4 +1,4 @@
-import { SupabaseDBClient } from "@/lib/clients/supabase/SupabaseDBClient";
+import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { Logger } from "@/lib/Logger";
 import { buildHTTPQueryString } from "@/lib/utils/buildHTTPQueryString";
 import type { API } from "@/types/http-api.types";
@@ -22,7 +22,8 @@ function buildURLWithParams(
     if (urlParams[paramName]) {
       return urlParams[paramName];
     }
-    const errMsg = `Could not build a URL for ${route}. No parameter was passed in for '${paramName}'`;
+    const errMsg =
+      `Could not build a URL for ${route}. No parameter was passed in for '${paramName}'`;
     Logger.error(errMsg, { route, pathParams: urlParams });
     throw new Error(errMsg);
   });
@@ -38,14 +39,16 @@ async function sendHTTPRequest<Route extends keyof API>(
   if (newRoutePath.includes(":")) {
     // if there is still a colon in the URL, it means we didn't find a path
     // param
-    const errMsg = `Could not build a URL for ${route}. Not all path parameters were replaced.`;
+    const errMsg =
+      `Could not build a URL for ${route}. Not all path parameters were replaced.`;
     Logger.error(errMsg, { route, pathParams });
     throw new Error(errMsg);
   }
 
-  const queryString =
-    queryParams ? buildHTTPQueryString(queryParams) : undefined;
-  const { data, error } = await SupabaseDBClient.functions.invoke<
+  const queryString = queryParams
+    ? buildHTTPQueryString(queryParams)
+    : undefined;
+  const { data, error } = await AvaSupabase.DB.functions.invoke<
     API[Route]["returnType"]
   >(
     queryString === undefined ? newRoutePath : `${newRoutePath}?${queryString}`,
