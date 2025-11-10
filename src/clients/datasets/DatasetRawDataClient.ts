@@ -8,7 +8,8 @@ import {
 import { ILogger, Logger } from "@/lib/Logger";
 import { UnknownDataFrame } from "@/lib/types/common";
 import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
-import { difference, partition } from "@/lib/utils/arrays/misc";
+import { difference } from "@/lib/utils/arrays/difference";
+import { partition } from "@/lib/utils/arrays/partition";
 import { where } from "@/lib/utils/filters/filterBuilders";
 import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys } from "@/lib/utils/objects/misc";

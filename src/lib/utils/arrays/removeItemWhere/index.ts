@@ -1,0 +1,1 @@
+export { removeItemWhere } from "./removeItemWhere";
