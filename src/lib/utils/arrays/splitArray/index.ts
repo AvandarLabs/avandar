@@ -1,0 +1,1 @@
+export { splitArray } from "./splitArray";

@@ -183,6 +183,7 @@ export interface FileRoutesByFullPath {
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
   "/$workspaceSlug": typeof AuthWorkspaceSlugRouteRouteWithChildren;
+  "/": typeof AuthnoWorkspaceIndexRoute;
   "/$workspaceSlug/data-manager": typeof AuthWorkspaceSlugDataManagerRouteRouteWithChildren;
   "/$workspaceSlug/entity-designer": typeof AuthWorkspaceSlugEntityDesignerRouteRouteWithChildren;
   "/$workspaceSlug/data-explorer": typeof AuthWorkspaceSlugDataExplorerRoute;
@@ -190,7 +191,6 @@ export interface FileRoutesByFullPath {
   "/$workspaceSlug/settings": typeof AuthWorkspaceSlugSettingsRoute;
   "/invalid-workspace": typeof AuthnoWorkspaceInvalidWorkspaceRoute;
   "/$workspaceSlug/": typeof AuthWorkspaceSlugIndexRoute;
-  "/": typeof AuthnoWorkspaceIndexRoute;
   "/$workspaceSlug/entity-manager/$entityConfigId": typeof AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRouteWithChildren;
   "/$workspaceSlug/data-manager/$datasetId": typeof AuthWorkspaceSlugDataManagerDatasetIdRoute;
   "/$workspaceSlug/data-manager/data-import": typeof AuthWorkspaceSlugDataManagerDataImportRoute;
@@ -259,6 +259,7 @@ export interface FileRouteTypes {
     | "/signin"
     | "/update-password"
     | "/$workspaceSlug"
+    | "/"
     | "/$workspaceSlug/data-manager"
     | "/$workspaceSlug/entity-designer"
     | "/$workspaceSlug/data-explorer"
@@ -266,7 +267,6 @@ export interface FileRouteTypes {
     | "/$workspaceSlug/settings"
     | "/invalid-workspace"
     | "/$workspaceSlug/"
-    | "/"
     | "/$workspaceSlug/entity-manager/$entityConfigId"
     | "/$workspaceSlug/data-manager/$datasetId"
     | "/$workspaceSlug/data-manager/data-import"
@@ -374,8 +374,8 @@ declare module "@tanstack/react-router" {
     };
     "/_auth/(no-workspace)": {
       id: "/_auth/(no-workspace)";
-      path: "";
-      fullPath: "";
+      path: "/";
+      fullPath: "/";
       preLoaderRoute: typeof AuthnoWorkspaceRouteRouteImport;
       parentRoute: typeof AuthRouteRoute;
     };

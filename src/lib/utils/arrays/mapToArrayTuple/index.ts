@@ -1,0 +1,1 @@
+export { mapToArrayTuple } from "./mapToArrayTuple";

@@ -5,7 +5,7 @@ import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { ResyncDatasetsBlock } from "@/components/DataManagerApp/ResyncDatasetsBlock";
 import { useQuery } from "@/lib/hooks/query/useQuery";
-import { difference } from "@/lib/utils/arrays/misc";
+import { difference } from "@/lib/utils/arrays/difference";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { isEmptyArray, isNullish, or } from "@/lib/utils/guards/guards";
 import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
