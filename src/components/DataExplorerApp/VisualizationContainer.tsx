@@ -150,30 +150,6 @@ export function VisualizationContainer({ columns, data }: Props): JSX.Element {
       }
       return <DangerText>{prettifyError(error)}</DangerText>;
     })
-    .with({ type: "line" }, (config) => {
-      const {
-        success,
-        data: settings,
-        error,
-      } = LineChartSettingsSchema.safeParse(config.settings);
-
-      if (success) {
-        return <LineChart data={data} height={700} {...settings} />;
-      }
-      return <DangerText>{z.prettifyError(error)}</DangerText>;
-    })
-    .with({ type: "scatter" }, (config) => {
-      const {
-        success,
-        data: settings,
-        error,
-      } = ScatterChartSettingsSchema.safeParse(config.settings);
-
-      if (success) {
-        return <ScatterChart data={data} height={700} {...settings} />;
-      }
-      return <DangerText>{z.prettifyError(error)}</DangerText>;
-    })
     .exhaustive();
 
   return (

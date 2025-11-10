@@ -77,46 +77,6 @@ async function saveGoogleSheetToBackend(params: {
   return dataset;
 }
 
-async function saveGoogleSheetToBackend(params: {
-  name: string;
-  description: string;
-  googleAccount: GoogleToken;
-  googleDocument: GPickerDocumentObject;
-  columns: DetectedDatasetColumn[];
-  workspaceId: WorkspaceId;
-  loadCSVResult: DuckDBLoadCSVResult;
-}): Promise<Dataset> {
-  const {
-    name,
-    description,
-    googleAccount,
-    googleDocument,
-    columns,
-    workspaceId,
-    loadCSVResult,
-  } = params;
-  const dataset = await DatasetClient.insertGoogleSheetsDataset({
-    workspaceId: workspaceId,
-    datasetName: name,
-    datasetDescription: description,
-    googleAccountId: googleAccount.google_account_id,
-    googleDocumentId: googleDocument.id,
-    columns: columns.map(snakeCaseKeysShallow),
-    rowsToSkip: loadCSVResult.csvSniff.SkipRows ?? 0,
-  });
-
-  // now that we've persisted the dataset to the backend, let's add an entry
-  // to IndexedDB to map the datasetId to the table name, so we can always
-  // remember where a dataset's locally loaded raw data is stored.
-  await LocalDatasetEntryClient.insert({
-    data: {
-      datasetId: dataset.id,
-      localTableName: loadCSVResult.tableName,
-    },
-  });
-  return dataset;
-}
-
 export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
   const queryClient = useQueryClient();
   const user = useCurrentUser();

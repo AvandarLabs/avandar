@@ -26,15 +26,13 @@ type WithBind<U extends IEntityConfigUtils> = U & {
   bind: (entityConfig: BuildableEntityConfig) => BindWithEntityConfig<U>;
 };
 
-type BindWithEntityConfig<U extends IEntityConfigUtils> = Simplify<
-  {
-    [K in keyof U]: U[K] extends AnyFunctionWithArguments<infer Args>
-      ? Args extends [EntityConfig, ...infer Rest]
-        ? (...args: Rest) => ReturnType<U[K]>
-      : never
-      : never;
-  }
->;
+type BindWithEntityConfig<U extends IEntityConfigUtils> = Simplify<{
+  [K in keyof U]: U[K] extends AnyFunctionWithArguments<infer Args> ?
+    Args extends [EntityConfig, ...infer Rest] ?
+      (...args: Rest) => ReturnType<U[K]>
+    : never
+  : never;
+}>;
 
 const boundModuleCache = new WeakMap<
   BuildableEntityConfig,

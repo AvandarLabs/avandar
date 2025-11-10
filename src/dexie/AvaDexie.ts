@@ -1,5 +1,5 @@
 import { User } from "@supabase/supabase-js";
-import { SupabaseDBClient } from "@/lib/clients/supabase/SupabaseDBClient";
+import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { Logger } from "@/lib/Logger";
 import { uuid } from "@/lib/utils/uuid";
 import { CurrentDexieDBVersion } from "./CurrentDexieDBVersion";
@@ -69,7 +69,7 @@ export const AvaDexie = {
     const dbId = (await CurrentDexieDBVersion.meta.get("db_id"))?.value;
     if (user && dbId) {
       // Sync the dexie db metadata to the backend
-      await SupabaseDBClient.from("dexie_dbs")
+      await AvaSupabase.DB.from("dexie_dbs")
         .upsert(
           {
             user_id: user.id,
