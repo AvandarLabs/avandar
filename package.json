@@ -5,7 +5,7 @@
   "version": "0.3.0-dev",
   "type": "module",
   "scripts": {
-    "dev": "yarn functions:update-env && vite",
+    "dev": "yarn fns:update-env && vite",
     "test": "vitest",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
@@ -24,15 +24,18 @@
     "new:model": "./scripts/newModel.sh",
     "new:route": "./scripts/newRoute.sh",
     "new:script": "./scripts/newScript.sh",
-    "new:function": "./scripts/edge-functions/newEdgeFunction.sh",
-    "functions:call": "./scripts/edge-functions/callFunction.sh",
-    "functions:update-env": "cp .env.development.edge supabase/functions/.env",
-    "functions:serve": "supabase functions serve",
+    "new:fn": "./scripts/edge-functions/newEdgeFunction.sh",
+    "fns:call": "./scripts/edge-functions/callFunction.sh",
+    "fns:update-env": "cp .env.development.edge supabase/functions/.env",
+    "fns:serve": "supabase functions serve",
     "vite-script": "vite-node --config ./vite.script.config.ts",
     "util:get-project-root": "./scripts/utils/getProjectRoot.sh"
   },
   "//comments:dependencies": {
-    "apache-arrow": "This needs to be the same version of apache-arrow used by duckdb-wasm."
+    "@polar-sh/adapter-utils": "Added for Deno type-checking in Supabase edge functions",
+    "@polar-sh/sdk": "Added for Deno type-checking in Supabase edge functions",
+    "apache-arrow": "This needs to be the same version of apache-arrow used by duckdb-wasm.",
+    "openai": "Added for Deno type-checking in Supabase edge functions"
   },
   "dependencies": {
     "@duckdb/duckdb-wasm": "1.30.0",
@@ -45,6 +48,8 @@
     "@mantine/notifications": "^8.3.4",
     "@mantine/spotlight": "^8.3.4",
     "@mantine/tiptap": "^8.3.4",
+    "@polar-sh/adapter-utils": "0.2.7",
+    "@polar-sh/sdk": "^0.41.3",
     "@supabase/supabase-js": "^2.49.2",
     "@tabler/icons-react": "^3.31.0",
     "@tanstack/react-query": "^5.81.5",

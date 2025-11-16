@@ -39,3 +39,7 @@ dist-ssr
 # Supabase
 supabase/.temp
 supabase/.branches
+
+# Supabase does not need deno.lock files, Supabase resolves dependencies
+# automatically when deployed
+supabase/**/deno.lock

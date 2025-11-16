@@ -4,7 +4,7 @@ import {
   GET,
   MiniServer,
   MiniServerRoutesDef,
-} from "../_shared/MiniServer/mod.ts";
+} from "../_shared/MiniServer/MiniServer.ts";
 import { API } from "./api.types.ts";
 import { getAuthURL } from "./getAuthURL.ts";
 import { getGoogleTokens } from "./getGoogleTokens.ts";

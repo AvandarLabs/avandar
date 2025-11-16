@@ -1,5 +1,13 @@
 /** Configuration for the app. */
 // TODO(jpsyx): move most of these to environment variables so that
+// they do not get bundled in every page of the app
+
+import {
+  BasicPlanConfig,
+  FreePlanConfig,
+  PremiumPlanConfig,
+} from "./SubscriptionPlansConfig";
+
 // changes do not require rebuilding production.
 type AppConfigType = {
   /**
@@ -28,6 +36,13 @@ type AppConfigType = {
 
   /** The email address to use for general inquiries */
   infoEmail: string;
+
+  /** Metadata for the subscription plans */
+  subscriptionPlansMetadata: {
+    free: typeof FreePlanConfig;
+    basic: typeof BasicPlanConfig;
+    premium: typeof PremiumPlanConfig;
+  };
 };
 
 export const AppConfig = {
@@ -40,4 +55,9 @@ export const AppConfig = {
   },
   supportEmail: "support@avandarlabs.com",
   infoEmail: "info@avandarlabs.com",
+  subscriptionPlansMetadata: {
+    free: FreePlanConfig,
+    basic: BasicPlanConfig,
+    premium: PremiumPlanConfig,
+  },
 } satisfies AppConfigType;

@@ -3,11 +3,11 @@ import { z } from "zod";
 import { AvaHTTPError } from "../_shared/AvaHTTPError.ts";
 import { GoogleAuthClient } from "../_shared/getGoogleAuthClient.ts";
 import { BAD_REQUEST } from "../_shared/httpCodes.ts";
-import { GET, MiniServer } from "../_shared/MiniServer/mod.ts";
+import { GET, MiniServer } from "../_shared/MiniServer/MiniServer.ts";
 import { redirect } from "../_shared/MiniServer/redirect.ts";
 import { SupabaseAdmin } from "../_shared/supabase.ts";
 import { API } from "./api.types.ts";
-import type { MiniServerRoutesDef } from "../_shared/MiniServer/mod.ts";
+import type { MiniServerRoutesDef } from "../_shared/MiniServer/MiniServer.ts";
 import type { TokenPayload } from "google-auth-library";
 
 const GoogleTokensSchema = z.object({
@@ -30,13 +30,13 @@ const Routes: MiniServerRoutesDef<API> = {
      * redirected to this GET endpoint. At this point, we retrieve the `code`
      * that Google provides and exchange this for a token.
      *
-     * NOTE: this function cannot be combined with the `google-auth` function
-     * because the `google-auth` function requires JWT verification, whereas
-     * `google-auth-callback` cannot require it. Toggling JWT verification for a
+     * NOTE: this route has to be a standalone function. It cannot be combined
+     * with the `google-auth` function because this route must be public. It
+     * needs to have JWT verification disabled. Toggling JWT verification for a
      * function is handled at a system level (in config.toml) so the functions
      * cannot be combined.
      */
-    "/": GET()
+    "/": GET("/")
       .disableJWTVerification()
       .querySchema({
         state: z.string(),

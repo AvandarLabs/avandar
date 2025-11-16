@@ -1,8 +1,95 @@
 import { LiteralUnion } from "type-fest";
 import { formatDate } from "../formatters/formatDate";
 import { isValidDateValue } from "../formatters/isValidDateValue";
-import { isDate, isEmptyObject, isPlainObject } from "../guards/guards";
+import {
+  isArray,
+  isDate,
+  isEmptyObject,
+  isPlainObject,
+} from "../guards/guards";
 import { objectEntries } from "../objects/misc";
+import { objectToPrettyString } from "../objects/objectToPrettyString";
+
+export type UnknownToStringOptions = {
+  /**
+   * The string to display for null values.
+   * @default "null"
+   */
+  nullString?: string;
+
+  /**
+   * The string to display for undefined values.
+   * @default "undefined"
+   */
+  undefinedString?: string;
+
+  /**
+   * The string to display for empty strings.
+   * @default "Empty text"
+   */
+  emptyString?: string;
+
+  /**
+   * The string to display for boolean true values.
+   * @default "true"
+   */
+  booleanTrue?: string;
+
+  /**
+   * The string to display for boolean false values.
+   * @default "false"
+   */
+  booleanFalse?: string;
+
+  /**
+   * The separator to use for array values.
+   * @default ";"
+   */
+  arraySeparator?: string;
+
+  /**
+   * The string to display for empty arrays.
+   * @default "[Empty array]"
+   */
+  emptyArrayString?: string;
+
+  /**
+   * The string to display for empty objects.
+   * @default "{Empty object}"
+   */
+  emptyObjectString?: string;
+
+  /**
+   * The separator to use for object entries.
+   * @default "|"
+   */
+  objectEntriesSeparator?: string;
+
+  /**
+   * If true, the object will be pretty-printed, using indentation for nesting.
+   * @default false
+   */
+  prettifyObject?: boolean;
+
+  /**
+   * If true, we test strings and numbers to see if they are valid dates,
+   * before we allow them to be returned as-is. Defaults to false.
+   * @default false
+   */
+  asDate?: boolean;
+
+  /**
+   * The format to use for dates.
+   * @default "YYYY-MM-DDTHH:mm:ssZ" (ISO 8601 format)
+   */
+  dateFormat?: string;
+
+  /**
+   * The timezone to use for dates.
+   * @default "local"
+   */
+  dateTimeZone?: LiteralUnion<"UTC" | "local", string>;
+};
 
 /**
  * Converts an unknown value to a string.
@@ -11,7 +98,9 @@ import { objectEntries } from "../objects/misc";
  */
 export function unknownToString(
   value: unknown,
-  {
+  options: UnknownToStringOptions = {},
+): string {
+  const {
     nullString = "null",
     undefinedString = "undefined",
     emptyString = "Empty text",
@@ -20,30 +109,13 @@ export function unknownToString(
     arraySeparator = ";",
     emptyArrayString = "[Empty array]",
     emptyObjectString = "{Empty object}",
-    objectEntriesSeparator = "\n",
+    objectEntriesSeparator = "|",
     asDate = false,
     dateFormat = "YYYY-MM-DDTHH:mm:ssZ",
     dateTimeZone = "local",
-  }: {
-    nullString?: string;
-    undefinedString?: string;
-    emptyString?: string;
-    booleanTrue?: string;
-    booleanFalse?: string;
-    arraySeparator?: string;
-    emptyArrayString?: string;
-    emptyObjectString?: string;
-    objectEntriesSeparator?: string;
+    prettifyObject = false,
+  } = options;
 
-    /**
-     * If true, we test strings and numbers to see if they are valid dates,
-     * before we allow them to be returned as-is. Defaults to false.
-     */
-    asDate?: boolean;
-    dateFormat?: string;
-    dateTimeZone?: LiteralUnion<"UTC" | "local", string>;
-  } = {},
-): string {
   if (value === null) {
     return nullString;
   }
@@ -72,13 +144,18 @@ export function unknownToString(
     return formatDate(value, { format: dateFormat, zone: dateTimeZone });
   }
 
-  if (Array.isArray(value)) {
+  if (isArray(value)) {
     if (value.length === 0) {
       return emptyArrayString;
     }
+
+    if (prettifyObject) {
+      return objectToPrettyString(value, options);
+    }
+
     return value
       .map((item) => {
-        return unknownToString(item);
+        return unknownToString(item, options);
       })
       .join(arraySeparator);
   }
@@ -88,9 +165,13 @@ export function unknownToString(
       return emptyObjectString;
     }
 
+    if (prettifyObject) {
+      return objectToPrettyString(value, options);
+    }
+
     const keyValuePairs = objectEntries(value)
       .map(([key, v]) => {
-        return `${String(key)}=${unknownToString(v)}`;
+        return `${String(key)}=${unknownToString(v, options)}`;
       })
       .join(objectEntriesSeparator);
 
@@ -102,13 +183,13 @@ export function unknownToString(
     value.forEach((v, k) => {
       objectAsMap[String(k)] = v;
     });
-    const keyValuePairs = unknownToString(objectAsMap);
+    const keyValuePairs = unknownToString(objectAsMap, options);
     return `Map<${keyValuePairs}>`;
   }
 
   if (value instanceof Set) {
     const internalValues = [...value.values()];
-    return `Set<${unknownToString(internalValues)}>`;
+    return `Set<${unknownToString(internalValues, options)}>`;
   }
 
   return String(value);

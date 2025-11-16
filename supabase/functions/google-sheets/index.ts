@@ -1,12 +1,12 @@
 // Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { google } from "npm:googleapis@154";
+import { google } from "googleapis";
 import { getGoogleAuthClient } from "../_shared/getGoogleAuthClient.ts";
 import {
   GET,
   MiniServer,
   MiniServerRoutesDef,
-} from "../_shared/MiniServer/mod.ts";
+} from "../_shared/MiniServer/MiniServer.ts";
 import { getGoogleTokens } from "../google-auth/getGoogleTokens.ts";
 import { API } from "./api.types.ts";
 
