@@ -3,39 +3,52 @@ import { corsHeaders } from "../cors.ts";
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from "../httpCodes.ts";
 import { createSupabaseClient } from "../supabase.ts";
 import {
-  DefaultPathSchema,
-  parseURLPatternParams,
-  ValidURLParamsSchema,
-  ValidURLParamsSchemaShape,
-} from "./parseURLPatternParams.ts";
+  parseURLPathParams,
+  ValidPathParamsSchema,
+  ValidPathParamsSchemaShape,
+} from "./parseURLPathParams.ts";
 import { isRedirect } from "./redirect.ts";
 import { responseError } from "./responseError.ts";
 import { responseSuccess } from "./responseSuccess.ts";
 import type { Database } from "../../../../src/types/database.types.ts";
-import type { APITypeStruct, ValidReturnType } from "./api.types.ts";
+import type {
+  AnyValidPathParamsRecord,
+  GenericAPITypeDef,
+  GenericRouteAPIRecord,
+  HTTPMethod,
+  UnknownRecord,
+  URLPathPattern,
+  ValidPathParams,
+  ValidReturnType,
+} from "./api.types.ts";
 import type { SupabaseClient, User } from "npm:@supabase/supabase-js@2";
+import type { ZodNever, ZodObject } from "npm:zod@4";
 
-type UnknownRecord = Record<string, unknown>;
-type HTTPMethod = "POST" | "GET" | "PUT" | "DELETE";
-type URLPathPattern = `/${string}`;
 /**
- * A valid query value schema must always be a string input but it can
- * be transformed to any type.
+ * A valid query value schema must always be a string input (or null/undefined)
+ * but it can be transformed to any type.
  */
+type QueryParamValueSchema<T> = z.ZodType<T, string | null | undefined>;
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// deno-lint-ignore no-explicit-any
-type ValidQueryValueSchema = z.ZodType<any, string>;
-/* eslint-enable @typescript-eslint/no-explicit-any */
-
-/** A record of valid query value schemas. */
-type ValidQueryParamsSchemaShape = Record<string, ValidQueryValueSchema>;
 type URLPathWithoutParams<Path extends URLPathPattern> =
   Path extends `${string}:${string}` ? never : Path;
-type ValidQueryParamsSchema =
-  | z.ZodObject<ValidQueryParamsSchemaShape>
-  | z.ZodRecord<z.ZodString, ValidQueryValueSchema>
-  | z.ZodUndefined;
+type ValidQueryParams = UnknownRecord;
+
+type MakeOptionalIfUndefined<T> = {
+  [K in keyof T as undefined extends T[K] ? K : never]?: T[K];
+} & {
+  [K in keyof T as undefined extends T[K] ? never : K]: T[K];
+};
+
+type QueryParamsSchemaShape<QueryParams extends ValidQueryParams> =
+  MakeOptionalIfUndefined<{
+    [K in keyof QueryParams]: QueryParamValueSchema<QueryParams[K]>;
+  }>;
+
+type QueryParamsSchema<QueryParams extends ValidQueryParams | undefined> =
+  QueryParams extends ValidQueryParams ?
+    ZodObject<QueryParamsSchemaShape<QueryParams>>
+  : undefined;
 
 /**
  * These are the parameters that will get passed into an HTTP handler
@@ -43,7 +56,7 @@ type ValidQueryParamsSchema =
  */
 type HTTPMethodActionFnParams<
   URLParams extends UnknownRecord | undefined,
-  QueryParams extends UnknownRecord | undefined,
+  QueryParams extends ValidQueryParams | undefined,
   Body,
   IsJWTVerificationDisabled extends boolean = false,
 > = {
@@ -53,10 +66,10 @@ type HTTPMethodActionFnParams<
    * For example, in the following URL:
    * `/path/:id/morePath/:name`
    *
-   * `urlParams` will be an object with the following keys:
+   * `pathParams` will be an object with the following keys:
    * `{ id: string, name: string }`
    */
-  urlParams: URLParams;
+  pathParams: URLParams;
 
   /**
    * Query params are parameters extracted from the URL query string,
@@ -78,14 +91,14 @@ type HTTPMethodActionFnParams<
 };
 
 type HTTPMethodActionFn<
-  URLParams extends UnknownRecord | undefined,
-  QueryParams extends UnknownRecord | undefined,
-  Body,
+  PathParams extends AnyValidPathParamsRecord | undefined,
+  QueryParams extends ValidQueryParams | undefined,
+  Body = never,
   IsJWTVerificationDisabled extends boolean = false,
   ReturnType = unknown,
 > = (
   params: HTTPMethodActionFnParams<
-    URLParams,
+    PathParams,
     QueryParams,
     Body,
     IsJWTVerificationDisabled
@@ -93,14 +106,14 @@ type HTTPMethodActionFn<
 ) => Promise<ReturnType> | ReturnType;
 
 const actionNotImplemented = <
-  URLParams extends UnknownRecord | undefined,
-  QueryParams extends UnknownRecord | undefined,
-  Body,
+  PathParams extends AnyValidPathParamsRecord | undefined,
+  QueryParams extends ValidQueryParams | undefined,
+  Body = never,
   IsJWTVerificationDisabled extends boolean = false,
   ReturnType extends ValidReturnType = UnknownRecord,
 >(
   _params: HTTPMethodActionFnParams<
-    URLParams,
+    PathParams,
     QueryParams,
     Body,
     IsJWTVerificationDisabled
@@ -110,17 +123,17 @@ const actionNotImplemented = <
 };
 
 function parseSearchParamsFromURL<
-  QueryParamsSchema extends ValidQueryParamsSchema,
+  QParamsSchema extends QueryParamsSchema<ValidQueryParams | undefined>,
 >(
   url: string,
-  queryParamsSchema: QueryParamsSchema,
-): z.infer<QueryParamsSchema> | undefined {
+  queryParamsSchema: QParamsSchema,
+): z.infer<QParamsSchema> | undefined {
   const urlObj = new URL(url);
   const searchParams = urlObj.searchParams;
 
   try {
     if (searchParams.size === 0) {
-      if (queryParamsSchema.def.type === "undefined") {
+      if (queryParamsSchema === undefined) {
         return undefined;
       }
       throw new Error(
@@ -128,9 +141,9 @@ function parseSearchParamsFromURL<
       );
     }
 
-    return queryParamsSchema.parse(
-      Object.fromEntries(searchParams),
-    ) as z.infer<QueryParamsSchema>;
+    return queryParamsSchema?.parse(Object.fromEntries(searchParams)) as
+      | z.infer<QParamsSchema>
+      | undefined;
   } catch (error) {
     const baseMessage = "Error parsing query params";
     if (error instanceof ZodError) {
@@ -166,8 +179,8 @@ type ServerRouteHandler<
   Method extends HTTPMethod,
   Path extends URLPathPattern,
   ReturnType extends ValidReturnType,
-  URLParamsSchema extends ValidURLParamsSchema<Path>,
-  QueryParamsSchema extends ValidQueryParamsSchema,
+  PathParams extends ValidPathParams<Path> | undefined,
+  QueryParams extends ValidQueryParams | undefined,
   BodySchema extends z.ZodTypeAny,
   IsJWTVerificationDisabled extends boolean,
 > = {
@@ -175,8 +188,8 @@ type ServerRouteHandler<
     method: Method;
     path: Path;
     action: HTTPMethodActionFn<
-      z.infer<URLParamsSchema>,
-      z.infer<QueryParamsSchema>,
+      PathParams,
+      QueryParams,
       z.infer<BodySchema>,
       IsJWTVerificationDisabled,
       ReturnType
@@ -188,9 +201,9 @@ type ServerRouteHandler<
      *
      * A pattern is of the format `/path/:param1/morePath/:param2`
      *
-     * @default z.ZodRecord<z.ZodString, z.ZodString>
+     * @default undefined (if there are no path params set)
      */
-    urlParamsSchema: URLParamsSchema;
+    pathParamsSchema: ValidPathParamsSchema<PathParams>;
 
     /**
      * The query params schema for the request. THis is used to validate
@@ -202,9 +215,9 @@ type ServerRouteHandler<
      *
      * `queryParam1` and `queryParam2` are the query parameters.
      *
-     * @default z.ZodUndefined
+     * @default undefined (if no query params are set)
      */
-    querySchema: QueryParamsSchema;
+    querySchema: QueryParamsSchema<QueryParams>;
 
     /**
      * The body schema for the request. This is used to validate the request
@@ -232,20 +245,22 @@ type ServerRouteHandler<
     Method,
     Path,
     ReturnType,
-    URLParamsSchema,
-    QueryParamsSchema,
+    PathParams,
+    QueryParams,
     T,
     IsJWTVerificationDisabled
   >;
 
-  querySchema: <T extends ValidQueryParamsSchemaShape>(
-    querySchema: T,
+  querySchema: <
+    NewQueryParamsSchemaShape extends QueryParamsSchemaShape<ValidQueryParams>,
+  >(
+    queryParamsSchemaShape: NewQueryParamsSchemaShape,
   ) => ServerRouteHandler<
     Method,
     Path,
     ReturnType,
-    URLParamsSchema,
-    z.ZodObject<T>,
+    PathParams,
+    MakeOptionalIfUndefined<z.infer<ZodObject<NewQueryParamsSchemaShape>>>,
     BodySchema,
     IsJWTVerificationDisabled
   >;
@@ -260,8 +275,8 @@ type ServerRouteHandler<
    */
   action: <NewReturnType extends ValidReturnType>(
     action: HTTPMethodActionFn<
-      z.infer<URLParamsSchema>,
-      z.infer<QueryParamsSchema>,
+      PathParams,
+      QueryParams,
       z.infer<BodySchema>,
       IsJWTVerificationDisabled,
       NewReturnType
@@ -270,8 +285,8 @@ type ServerRouteHandler<
     Method,
     Path,
     NewReturnType,
-    URLParamsSchema,
-    QueryParamsSchema,
+    PathParams,
+    QueryParams,
     BodySchema,
     IsJWTVerificationDisabled
   >;
@@ -284,8 +299,8 @@ type ServerRouteHandler<
     Method,
     Path,
     ReturnType,
-    URLParamsSchema,
-    QueryParamsSchema,
+    PathParams,
+    QueryParams,
     BodySchema,
     true
   >;
@@ -294,16 +309,16 @@ type ServerRouteHandler<
 function createGetHandler<
   Path extends URLPathPattern,
   ReturnType extends ValidReturnType,
-  URLParamsSchema extends ValidURLParamsSchema<Path>,
-  QueryParamsSchema extends ValidQueryParamsSchema,
+  PathParams extends ValidPathParams<Path> | undefined,
+  QueryParams extends ValidQueryParams | undefined,
   IsJWTVerificationDisabled extends boolean = false,
 >(
   state: ServerRouteHandler<
     "GET",
     Path,
     ReturnType,
-    URLParamsSchema,
-    QueryParamsSchema,
+    PathParams,
+    QueryParams,
     z.ZodNever,
     IsJWTVerificationDisabled
   >["state"],
@@ -311,8 +326,8 @@ function createGetHandler<
   "GET",
   Path,
   ReturnType,
-  URLParamsSchema,
-  QueryParamsSchema,
+  PathParams,
+  QueryParams,
   z.ZodNever,
   IsJWTVerificationDisabled
 > {
@@ -322,24 +337,32 @@ function createGetHandler<
       throw new Error("GET methods do not support changing the body schema");
     },
     querySchema: <
-      NewQueryParamsSchemaShape extends ValidQueryParamsSchemaShape,
+      NewQueryParamsSchemaShape extends
+        QueryParamsSchemaShape<ValidQueryParams>,
     >(
-      newQueryParamsSchema: NewQueryParamsSchemaShape,
+      newQueryParamsSchemaShape: NewQueryParamsSchemaShape,
     ): ServerRouteHandler<
       "GET",
       Path,
       ReturnType,
-      URLParamsSchema,
-      z.ZodObject<NewQueryParamsSchemaShape>,
-      z.ZodNever,
+      PathParams,
+      MakeOptionalIfUndefined<z.infer<ZodObject<NewQueryParamsSchemaShape>>>,
+      ZodNever,
       IsJWTVerificationDisabled
     > => {
       return createGetHandler({
         ...state,
-        querySchema: z.object(newQueryParamsSchema),
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        // deno-lint-ignore no-explicit-any
+        querySchema: z.object(newQueryParamsSchemaShape) as any,
+        /* eslint-enable  @typescript-eslint/no-explicit-any */
+
         action: actionNotImplemented as HTTPMethodActionFn<
-          z.infer<URLParamsSchema>,
-          z.infer<z.ZodObject<NewQueryParamsSchemaShape>>,
+          PathParams,
+          MakeOptionalIfUndefined<
+            z.infer<ZodObject<NewQueryParamsSchemaShape>>
+          >,
           never,
           IsJWTVerificationDisabled,
           ReturnType
@@ -350,8 +373,8 @@ function createGetHandler<
       "GET",
       Path,
       ReturnType,
-      URLParamsSchema,
-      QueryParamsSchema,
+      PathParams,
+      QueryParams,
       z.ZodNever,
       true
     > => {
@@ -359,8 +382,8 @@ function createGetHandler<
         ...state,
         isJWTVerificationDisabled: true,
         action: actionNotImplemented as HTTPMethodActionFn<
-          z.infer<URLParamsSchema>,
-          z.infer<QueryParamsSchema>,
+          PathParams,
+          QueryParams,
           never,
           true,
           ReturnType
@@ -369,8 +392,8 @@ function createGetHandler<
     },
     action: <NewReturnType extends ValidReturnType>(
       action: HTTPMethodActionFn<
-        z.infer<URLParamsSchema>,
-        z.infer<QueryParamsSchema>,
+        PathParams,
+        QueryParams,
         never,
         IsJWTVerificationDisabled,
         NewReturnType
@@ -379,8 +402,8 @@ function createGetHandler<
       "GET",
       Path,
       NewReturnType,
-      URLParamsSchema,
-      QueryParamsSchema,
+      PathParams,
+      QueryParams,
       z.ZodNever,
       IsJWTVerificationDisabled
     > => {
@@ -392,8 +415,8 @@ function createGetHandler<
 function createPostHandler<
   Path extends URLPathPattern,
   ReturnType extends ValidReturnType,
-  URLParamsSchema extends ValidURLParamsSchema<Path>,
-  QueryParamsSchema extends ValidQueryParamsSchema,
+  PathParams extends ValidPathParams<Path> | undefined,
+  QueryParams extends ValidQueryParams | undefined,
   BodySchema extends z.ZodTypeAny = z.ZodUndefined,
   IsJWTVerificationDisabled extends boolean = false,
 >(
@@ -401,8 +424,8 @@ function createPostHandler<
     "POST",
     Path,
     ReturnType,
-    URLParamsSchema,
-    QueryParamsSchema,
+    PathParams,
+    QueryParams,
     BodySchema,
     IsJWTVerificationDisabled
   >["state"],
@@ -410,8 +433,8 @@ function createPostHandler<
   "POST",
   Path,
   ReturnType,
-  URLParamsSchema,
-  QueryParamsSchema,
+  PathParams,
+  QueryParams,
   BodySchema,
   IsJWTVerificationDisabled
 > {
@@ -423,8 +446,8 @@ function createPostHandler<
       "POST",
       Path,
       ReturnType,
-      URLParamsSchema,
-      QueryParamsSchema,
+      PathParams,
+      QueryParams,
       NewBodySchema,
       IsJWTVerificationDisabled
     > => {
@@ -432,8 +455,8 @@ function createPostHandler<
         ...state,
         bodySchema: newBodySchema,
         action: actionNotImplemented as HTTPMethodActionFn<
-          z.infer<URLParamsSchema>,
-          z.infer<QueryParamsSchema>,
+          PathParams,
+          QueryParams,
           z.infer<NewBodySchema>,
           IsJWTVerificationDisabled,
           ReturnType
@@ -441,24 +464,32 @@ function createPostHandler<
       });
     },
     querySchema: <
-      NewQueryParamsSchemaShape extends ValidQueryParamsSchemaShape,
+      NewQueryParamsSchemaShape extends
+        QueryParamsSchemaShape<ValidQueryParams>,
     >(
-      newQueryParamsSchema: NewQueryParamsSchemaShape,
+      newQueryParamsSchemaShape: NewQueryParamsSchemaShape,
     ): ServerRouteHandler<
       "POST",
       Path,
       ReturnType,
-      URLParamsSchema,
-      z.ZodObject<NewQueryParamsSchemaShape>,
+      PathParams,
+      MakeOptionalIfUndefined<z.infer<ZodObject<NewQueryParamsSchemaShape>>>,
       BodySchema,
       IsJWTVerificationDisabled
     > => {
       return createPostHandler({
         ...state,
-        querySchema: z.object(newQueryParamsSchema),
+
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        // deno-lint-ignore no-explicit-any
+        querySchema: z.object(newQueryParamsSchemaShape) as any,
+        /* eslint-enable  @typescript-eslint/no-explicit-any */
+
         action: actionNotImplemented as HTTPMethodActionFn<
-          z.infer<URLParamsSchema>,
-          z.infer<z.ZodObject<NewQueryParamsSchemaShape>>,
+          PathParams,
+          MakeOptionalIfUndefined<
+            z.infer<ZodObject<NewQueryParamsSchemaShape>>
+          >,
           z.infer<BodySchema>,
           IsJWTVerificationDisabled,
           ReturnType
@@ -469,8 +500,8 @@ function createPostHandler<
       "POST",
       Path,
       ReturnType,
-      URLParamsSchema,
-      QueryParamsSchema,
+      PathParams,
+      QueryParams,
       BodySchema,
       true
     > => {
@@ -478,8 +509,8 @@ function createPostHandler<
         ...state,
         isJWTVerificationDisabled: true,
         action: actionNotImplemented as HTTPMethodActionFn<
-          z.infer<URLParamsSchema>,
-          z.infer<QueryParamsSchema>,
+          PathParams,
+          QueryParams,
           z.infer<BodySchema>,
           true,
           ReturnType
@@ -488,8 +519,8 @@ function createPostHandler<
     },
     action: <NewReturnType extends ValidReturnType>(
       action: HTTPMethodActionFn<
-        z.infer<URLParamsSchema>,
-        z.infer<QueryParamsSchema>,
+        PathParams,
+        QueryParams,
         z.infer<BodySchema>,
         IsJWTVerificationDisabled,
         NewReturnType
@@ -498,8 +529,8 @@ function createPostHandler<
       "POST",
       Path,
       NewReturnType,
-      URLParamsSchema,
-      QueryParamsSchema,
+      PathParams,
+      QueryParams,
       BodySchema,
       IsJWTVerificationDisabled
     > => {
@@ -515,8 +546,8 @@ export function GET<
   "GET",
   "/",
   ReturnType,
-  z.ZodUndefined,
-  z.ZodUndefined,
+  undefined,
+  undefined,
   z.ZodNever,
   false
 >;
@@ -529,75 +560,60 @@ export function GET<
   "GET",
   Path,
   ReturnType,
-  z.ZodUndefined,
-  z.ZodUndefined,
+  undefined,
+  undefined,
   z.ZodNever,
   false
 >;
 export function GET<
   Path extends URLPathPattern,
   ReturnType extends ValidReturnType,
->(
-  path: Path | { path: Path },
-): ServerRouteHandler<
-  "GET",
-  Path,
-  ReturnType,
-  DefaultPathSchema<Path>,
-  z.ZodUndefined,
-  z.ZodNever,
-  false
->;
-export function GET<
-  Path extends URLPathPattern,
-  ReturnType extends ValidReturnType,
-  URLParamsSchemaShape extends ValidURLParamsSchemaShape<Path>,
+  PathParams extends ValidPathParams<Path>,
 >(options: {
   path: Path;
-  schema: URLParamsSchemaShape;
+  schema: ValidPathParamsSchemaShape<PathParams>;
 }): ServerRouteHandler<
   "GET",
   Path,
   ReturnType,
-  z.ZodObject<URLParamsSchemaShape>,
-  z.ZodUndefined,
+  PathParams,
+  undefined,
   z.ZodNever,
   false
 >;
 export function GET<
   Path extends URLPathPattern,
   ReturnType extends ValidReturnType,
-  URLParamsSchemaShape extends ValidURLParamsSchemaShape<Path>,
+  PathParams extends ValidPathParams<Path>,
 >(
   path:
     | Path
     | {
         path: Path;
-        schema?: URLParamsSchemaShape;
+        schema: ValidPathParamsSchemaShape<PathParams>;
       } = "/" as Path,
 ): ServerRouteHandler<
   "GET",
   Path,
   ReturnType,
-  ValidURLParamsSchema<Path>,
-  z.ZodUndefined,
+  PathParams,
+  undefined,
   z.ZodNever,
   false
 > {
-  const pathString = typeof path === "string" ? path : path.path;
-  const pathHasParams = pathString.includes(":");
+  const pathSchemaShape =
+    typeof path === "object" && "schema" in path ? path.schema : undefined;
 
   return createGetHandler({
     method: "GET",
     path: typeof path === "string" ? path : path.path,
-    urlParamsSchema:
-      typeof path === "object" && "schema" in path ? z.object(path.schema)
-      : pathHasParams ? z.record(z.string(), z.string())
-      : z.undefined(),
-    querySchema: z.undefined(),
+    pathParamsSchema: (pathSchemaShape ?
+      z.object(pathSchemaShape)
+    : undefined) as ValidPathParamsSchema<PathParams>,
+    querySchema: undefined,
     bodySchema: z.never(),
     action: actionNotImplemented as HTTPMethodActionFn<
-      Record<string, unknown> | undefined,
+      AnyValidPathParamsRecord | undefined,
       undefined,
       never,
       false,
@@ -614,8 +630,8 @@ export function POST<
   "POST",
   "/",
   ReturnType,
-  z.ZodUndefined,
-  z.ZodUndefined,
+  undefined,
+  undefined,
   z.ZodRecord<z.ZodString, z.ZodNever>,
   false
 >;
@@ -628,73 +644,60 @@ export function POST<
   "POST",
   Path,
   ReturnType,
-  z.ZodUndefined,
-  z.ZodUndefined,
+  undefined,
+  undefined,
   z.ZodRecord<z.ZodString, z.ZodNever>,
   false
 >;
 export function POST<
   Path extends URLPathPattern,
   ReturnType extends ValidReturnType,
->(
-  path: Path | { path: Path },
-): ServerRouteHandler<
-  "POST",
-  Path,
-  ReturnType,
-  DefaultPathSchema<Path>,
-  z.ZodUndefined,
-  z.ZodRecord<z.ZodString, z.ZodNever>,
-  false
->;
-export function POST<
-  Path extends URLPathPattern,
-  ReturnType extends ValidReturnType,
-  URLParamsSchemaShape extends ValidURLParamsSchemaShape<Path>,
+  PathParams extends ValidPathParams<Path>,
 >(options: {
   path: Path;
-  schema: URLParamsSchemaShape;
+  schema: ValidPathParamsSchemaShape<PathParams>;
 }): ServerRouteHandler<
   "POST",
   Path,
   ReturnType,
-  z.ZodObject<URLParamsSchemaShape>,
-  z.ZodUndefined,
+  PathParams,
+  undefined,
   z.ZodRecord<z.ZodString, z.ZodNever>,
   false
 >;
 export function POST<
   Path extends URLPathPattern,
   ReturnType extends ValidReturnType,
-  URLParamsSchemaShape extends ValidURLParamsSchemaShape<Path>,
+  PathParams extends ValidPathParams<Path> | undefined,
 >(
   path:
     | Path
-    | { path: Path }
-    | { path: Path; schema: URLParamsSchemaShape } = "/" as Path,
+    | {
+        path: Path;
+        schema: ValidPathParamsSchemaShape<PathParams>;
+      } = "/" as Path,
 ): ServerRouteHandler<
   "POST",
   Path,
   ReturnType,
-  ValidURLParamsSchema<Path>,
-  z.ZodUndefined,
+  PathParams,
+  undefined,
   z.ZodRecord<z.ZodString, z.ZodNever>,
   false
 > {
-  const pathString = typeof path === "string" ? path : path.path;
-  const pathHasParams = pathString.includes(":");
+  const pathSchemaShape =
+    typeof path === "object" && "schema" in path ? path.schema : undefined;
 
   return createPostHandler({
     method: "POST",
     path: typeof path === "string" ? path : path.path,
-    urlParamsSchema:
-      typeof path === "object" && "schema" in path ? z.object(path.schema)
-      : pathHasParams ? z.record(z.string(), z.string())
-      : z.undefined(),
-    querySchema: z.undefined(),
+    pathParamsSchema: (pathSchemaShape ?
+      z.object(pathSchemaShape)
+    : undefined) as ValidPathParamsSchema<PathParams>,
+    querySchema: undefined,
     bodySchema: z.record(z.string(), z.never()),
     action: actionNotImplemented as HTTPMethodActionFn<
-      Record<string, unknown> | undefined,
+      AnyValidPathParamsRecord | undefined,
       undefined,
       Record<string, never>,
       false,
@@ -725,35 +728,50 @@ async function getSupabaseClientAndUser(request: Request): Promise<{
   };
 }
 
-export type MiniServerRoutesDef<API extends APITypeStruct> = {
-  [FnName in keyof API]: {
-    [RouteName in keyof API[FnName]]: RouteName extends `/${string}` ?
-      ServerRouteHandler<
-        HTTPMethod,
-        RouteName,
-        API[FnName][RouteName]["returnType"],
-        ValidURLParamsSchema<RouteName>,
-        ValidQueryParamsSchema,
-        z.ZodTypeAny,
-        boolean
-      >
-    : never;
-  };
+export type MiniServerRoutesDef<RoutesAPI extends GenericRouteAPIRecord> = {
+  [RouteName in keyof RoutesAPI]: RouteName extends `/${string}` ?
+    {
+      [Method in Extract<
+        keyof RoutesAPI[RouteName],
+        HTTPMethod
+      >]: RoutesAPI[RouteName][Method] extends object ?
+        ServerRouteHandler<
+          Method,
+          RouteName,
+          RoutesAPI[RouteName][Method]["returnType"],
+          RoutesAPI[RouteName][Method]["pathParams"] extends object ?
+            RoutesAPI[RouteName][Method]["pathParams"]
+          : undefined,
+          RoutesAPI[RouteName][Method]["queryParams"] extends object ?
+            RoutesAPI[RouteName][Method]["queryParams"]
+          : undefined,
+          Method extends "GET" ? z.ZodNever : z.ZodTypeAny,
+          boolean
+        >
+      : never;
+    }
+  : never;
+};
+
+export type MiniServerAPIDef<API extends GenericAPITypeDef> = {
+  [FnName in keyof API]: MiniServerRoutesDef<API[FnName]>;
 };
 
 /**
  * This function is used to ensure that the routes are consistent with the
  * manually-defined API type.
- * The function is effectively a no-op at runtime. It is just used for
- * type-checking.
+ *
+ * All this function does is attach the routes to the function name and build
+ * a new object. The primary purpose of this function is for type-checking.
  *
  * @param routesAPI - The API route definitions.
  * @returns The routes to be passed into the `MiniServer` function.
  */
-export function defineRoutes<T extends APITypeStruct>(
-  routesAPI: MiniServerRoutesDef<T>,
-): MiniServerRoutesDef<T> {
-  return routesAPI;
+export function defineRoutes<T extends GenericAPITypeDef>(
+  functionName: keyof T,
+  routesAPI: MiniServerRoutesDef<T[keyof T]>,
+): MiniServerAPIDef<T> {
+  return { [functionName]: routesAPI } as MiniServerAPIDef<T>;
 }
 
 /**
@@ -766,8 +784,8 @@ export function defineRoutes<T extends APITypeStruct>(
  * - Providing the authenticated user and Supabase client to request handlers
  * - Adding CORS headers and handling OPTIONS requests from browsers
  */
-export function MiniServer<API extends APITypeStruct>(
-  routeAPI: MiniServerRoutesDef<API>,
+export function MiniServer<API extends GenericRouteAPIRecord>(
+  routeAPI: MiniServerAPIDef<API>,
 ): { serve: () => void } {
   const functionNames = Object.keys(routeAPI);
   if (functionNames.length > 1) {
@@ -777,7 +795,7 @@ export function MiniServer<API extends APITypeStruct>(
   }
   const functionName = functionNames[0];
 
-  const routeHandlers = routeAPI[functionName];
+  const routeHandlers = routeAPI[functionName as keyof typeof routeAPI];
   const routeNames = Object.keys(routeHandlers);
   if (routeNames.length === 0) {
     throw new Error("At least one route is required.");
@@ -794,22 +812,29 @@ export function MiniServer<API extends APITypeStruct>(
 
           try {
             let handler = undefined;
-            let urlParams = {} as z.infer<ValidURLParamsSchema<URLPathPattern>>;
+            let pathParams = {} as AnyValidPathParamsRecord;
 
             for (const routeName of routeNames) {
-              const h = routeHandlers[routeName as keyof typeof routeHandlers];
+              const methodHandlers =
+                routeHandlers[routeName as keyof typeof routeHandlers];
+              const h =
+                methodHandlers[req.method as keyof typeof methodHandlers];
+
               if (h.state.method === req.method) {
-                const parsedURLParams = parseURLPatternParams({
+                const parsedPathParams = parseURLPathParams({
                   pattern: `/${functionName}${h.state.path}`,
                   url: req.url,
-                  paramSchema: h.state.urlParamsSchema,
+
+                  /* eslint-disable @typescript-eslint/no-explicit-any */
+                  // deno-lint-ignore no-explicit-any
+                  paramSchema: h.state.pathParamsSchema as any,
+                  /* eslint-enable @typescript-eslint/no-explicit-any */
                 });
 
-                if (parsedURLParams.success) {
+                if (parsedPathParams.success) {
                   handler = h;
-                  urlParams = parsedURLParams.params as z.infer<
-                    ValidURLParamsSchema<URLPathPattern>
-                  >;
+                  pathParams =
+                    parsedPathParams.params as AnyValidPathParamsRecord;
                   break;
                 }
               }
@@ -821,7 +846,17 @@ export function MiniServer<API extends APITypeStruct>(
                 querySchema,
                 bodySchema,
                 isJWTVerificationDisabled,
-              } = handler.state;
+              } = (
+                handler as unknown as ServerRouteHandler<
+                  HTTPMethod,
+                  URLPathPattern,
+                  ValidReturnType,
+                  AnyValidPathParamsRecord | undefined,
+                  ValidQueryParams | undefined,
+                  z.ZodTypeAny,
+                  boolean
+                >
+              ).state;
 
               const { supabaseClient, user } =
                 isJWTVerificationDisabled ?
@@ -831,16 +866,16 @@ export function MiniServer<API extends APITypeStruct>(
               const queryParams = parseSearchParamsFromURL(
                 req.url,
                 querySchema,
-              );
+              ) as ValidQueryParams | undefined;
               if (req.method === "GET") {
                 const response = await action({
                   body: undefined,
                   request: req,
                   info,
-                  queryParams,
                   supabaseClient,
                   user,
-                  urlParams,
+                  queryParams,
+                  pathParams,
                 });
                 return response instanceof Response ? response : (
                     responseSuccess(response)
@@ -853,7 +888,7 @@ export function MiniServer<API extends APITypeStruct>(
                 info,
                 supabaseClient,
                 user,
-                urlParams,
+                pathParams,
                 queryParams,
               });
               return response instanceof Response ? response : (

@@ -77,21 +77,13 @@ export function BillingView(): JSX.Element {
               );
             })
             .with({ type: "paid" }, (group) => {
-              const {
-                monthlyPlan,
-                annualPlan,
-                monthlyPayWhatYouWantPlan,
-                annualPayWhatYouWantPlan,
-                featurePlan,
-              } = group;
+              const { monthlyPlan, annualPlan, featurePlan } = group;
               return (
                 <PaidPlanCard
                   key={featurePlan.type}
-                  basePlanName={featurePlan.metadata.featurePlanName}
+                  featurePlanName={featurePlan.metadata.featurePlanName}
                   monthlyPlan={monthlyPlan}
                   annualPlan={annualPlan}
-                  monthlyPayWhatYouWantPlan={monthlyPayWhatYouWantPlan}
-                  annualPayWhatYouWantPlan={annualPayWhatYouWantPlan}
                   featurePlan={featurePlan}
                   isCurrentPlan={false}
                 />

@@ -1,8 +1,10 @@
 import { Badge, Box, Button, Card, Group, Stack, Text } from "@mantine/core";
 import { useState } from "react";
+import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { SegmentedControl } from "@/lib/ui/inputs/SegmentedControl";
-import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
+import { notifyExpiredSession } from "@/lib/ui/notifications/notifyExpiredSession";
 import { EarlySupporterCreditProgramBox } from "./EarlySupporterCreditProgramBox";
+import { goToPolarCheckout } from "./goToPolarCheckout";
 import { PlanFeatures } from "./PlanFeatures";
 import {
   FeaturePlan,
@@ -25,6 +27,7 @@ export function FreePlanCard({
   isCurrentPlan,
   featurePlan,
 }: FreePlanCardProps): JSX.Element {
+  const user = useCurrentUser();
   const [selectedPlanType, setSelectedPlanType] = useState<"free" | "custom">(
     payWhatYouWantPlan ? "custom" : "free",
   );
@@ -94,10 +97,18 @@ export function FreePlanCard({
           variant={isCurrentPlan ? "outline" : "filled"}
           fullWidth
           disabled={isCurrentPlan}
-          onClick={() => {
-            notifyDevAlert(
-              `Select plan clicked: ${basePlanName} (${selectedPlanType})`,
-            );
+          onClick={async () => {
+            if (!user) {
+              notifyExpiredSession();
+              return;
+            }
+
+            if (selectedPlan && user) {
+              await goToPolarCheckout({
+                polarProductId: selectedPlan.polarProductId,
+                userEmail: user.email,
+              });
+            }
           }}
         >
           {isCurrentPlan ? "Current Plan" : "Select Plan"}

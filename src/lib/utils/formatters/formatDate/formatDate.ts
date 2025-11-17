@@ -2,6 +2,7 @@ import dayjs, { isDayjs } from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { LiteralUnion } from "type-fest";
+import { isDate } from "../../guards/guards";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -38,6 +39,7 @@ export function formatDate(
   if (
     typeof value !== "number" &&
     typeof value !== "string" &&
+    !isDate(value) &&
     !isDayjs(value)
   ) {
     return String(value);

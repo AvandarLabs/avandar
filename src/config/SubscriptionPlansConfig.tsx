@@ -10,8 +10,8 @@ export const FreePlanConfig = {
   featurePlan: "free",
   featurePlanName: "Avandar Free",
   features: [
-    "Up to 5 data sources",
-    "Up to 2 team members in your workspace",
+    "You can invite 1 additional team member into your workspace",
+    "Manage up to 5 data sources",
     "Data source manager",
     "Data explorer",
     "Data profile designer",
@@ -23,8 +23,8 @@ export const BasicPlanConfig: PlanConfig = {
   featurePlanName: "Avandar Basic",
   features: [
     "Everything in the free plan",
-    "Up to 5 team members in your workspace",
-    "Up to 20 data sources, plus 5 data sources per team member",
+    "Unlimited team members for your workspace",
+    "Manage up to 10 data sources, plus 5 data sources per additional team member",
     "Early access to the upcoming Dashboard product",
     "Early access to the upcoming Map/GIS product",
     "Early access to upcoming AI features",
@@ -33,14 +33,14 @@ export const BasicPlanConfig: PlanConfig = {
 
 export const PremiumPlanConfig: PlanConfig = {
   featurePlan: "premium",
-  featurePlanName: "Avandar Premium",
+  featurePlanName: "Avandar Pro",
   features: [
     "Everything in the basic plan",
-    "Unlimited team members for your workspace",
-    "Up to 100 data sources, plus 10 data sources per team member",
+    "Manage up to 100 data sources, plus 10 data sources per additional team member",
     "Early access to Avandar's upcoming curated open data database",
     "Early access to Avandar's upcoming plugin marketplace",
     "Early access to serving your own public data APIs",
-    "Access to Premium-exclusive features and workshops",
+    "Access to Premium-exclusive features",
+    "Access to Premium-exclusive technical workshops",
   ],
 } as const satisfies PlanConfig;

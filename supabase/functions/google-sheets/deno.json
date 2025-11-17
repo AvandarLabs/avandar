@@ -1,5 +1,6 @@
 {
   "imports": {
-    "googleapis": "npm:googleapis@154"
+    "googleapis": "npm:googleapis@154",
+    "zod": "npm:zod@4"
   }
 }

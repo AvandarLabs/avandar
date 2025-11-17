@@ -5,7 +5,6 @@ import { makeBucketMap } from "@/lib/utils/maps/makeBucketMap";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import {
   isAnnualPaidSeatsPlan,
-  isAnnualPayWhatYouWantPlan,
   isFreePlan,
   isMonthlyPaidSeatsPlan,
   isMonthlyPayWhatYouWantPlan,
@@ -20,7 +19,9 @@ export function useSubscriptionPlans(): UseQueryResultTuple<
   return useQuery({
     queryKey: ["subscriptionPlans"],
     queryFn: async (): Promise<SubscriptionPlanGroup[]> => {
-      const data = await APIClient.get("billing/plans");
+      const data = await APIClient.get({
+        route: "billing/plans",
+      });
       // convert the Polar Product[] array to a SubscriptionPlan[] array
       const allPlans = data.plans
         .map(makeSubscriptionPlanFromPolarProduct)
@@ -62,12 +63,6 @@ export function useSubscriptionPlans(): UseQueryResultTuple<
           if (planGroup.some(isSeatBasedPlan)) {
             const monthlyPlan = planGroup.find(isMonthlyPaidSeatsPlan);
             const annualPlan = planGroup.find(isAnnualPaidSeatsPlan);
-            const monthlyPayWhatYouWantPlan = planGroup.find(
-              isMonthlyPayWhatYouWantPlan,
-            );
-            const annualPayWhatYouWantPlan = planGroup.find(
-              isAnnualPayWhatYouWantPlan,
-            );
 
             // there must be both a monthly and annual plan
             if (monthlyPlan && annualPlan) {
@@ -75,8 +70,6 @@ export function useSubscriptionPlans(): UseQueryResultTuple<
                 type: "paid" as const,
                 monthlyPlan,
                 annualPlan,
-                monthlyPayWhatYouWantPlan,
-                annualPayWhatYouWantPlan,
                 featurePlan: monthlyPlan.featurePlan,
               };
             }

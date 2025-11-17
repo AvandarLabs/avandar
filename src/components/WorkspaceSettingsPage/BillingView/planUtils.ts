@@ -5,15 +5,17 @@ import {
   PremiumPlanConfig,
 } from "@/config/SubscriptionPlansConfig";
 import { Logger } from "@/lib/Logger";
-import { Product } from "../../../../supabase/functions/_shared/PolarClient/Polar.types";
+import { BillingAPI } from "../../../../supabase/functions/billing/billing.types";
 import {
   AnnualPaidSeatsPlan,
-  AnnualPayWhatYouWantPlan,
   FeaturePlan,
   MonthlyPaidSeatsPlan,
   MonthlyPayWhatYouWantPlan,
   SubscriptionPlan,
 } from "./SubscriptionPlan.types";
+
+type AvaPolarProduct =
+  BillingAPI["billing"]["/plans"]["GET"]["returnType"]["plans"][number];
 
 /**
  * Extracts the base name from a product name by removing parentheses and their
@@ -72,13 +74,9 @@ export function isMonthlyPayWhatYouWantPlan(
   return plan?.priceType === "custom" && plan?.planInterval === "month";
 }
 
-export function isAnnualPayWhatYouWantPlan(
-  plan: SubscriptionPlan | undefined,
-): plan is AnnualPayWhatYouWantPlan {
-  return plan?.priceType === "custom" && plan?.planInterval === "year";
-}
-
-function _getFeaturePlanType(product: Product): FeaturePlan | undefined {
+function _getFeaturePlanType(
+  product: AvaPolarProduct,
+): FeaturePlan | undefined {
   const { metadata } = product;
   if ("featurePlanType" in metadata) {
     if (metadata.featurePlanType === "free") {
@@ -111,15 +109,23 @@ function _getFeaturePlanType(product: Product): FeaturePlan | undefined {
  * subscription plan (e.g. if it has no prices).
  */
 export function makeSubscriptionPlanFromPolarProduct(
-  product: Product,
+  product: AvaPolarProduct,
 ): SubscriptionPlan | undefined {
-  const { name, prices, description, isArchived, recurringInterval } = product;
+  const {
+    name,
+    prices,
+    description,
+    isArchived,
+    recurringInterval,
+    id: polarProductId,
+  } = product;
   const firstPrice = prices[0];
   if (!firstPrice) {
     return undefined;
   }
   const basePlanName = getBasePlanName(product.name);
   const featurePlan = _getFeaturePlanType(product);
+
   if (!featurePlan) {
     return undefined;
   }
@@ -128,6 +134,7 @@ export function makeSubscriptionPlanFromPolarProduct(
     .with({ amountType: "free" }, () => {
       return {
         priceType: "free" as const,
+        polarProductId,
         isArchived,
         description: description ?? "",
         planFullName: name,
@@ -145,6 +152,7 @@ export function makeSubscriptionPlanFromPolarProduct(
 
       return {
         priceType: "custom" as const,
+        polarProductId,
         isArchived,
         description: description ?? "",
         planFullName: name,
@@ -158,7 +166,7 @@ export function makeSubscriptionPlanFromPolarProduct(
       const { seatTiers, priceCurrency } = price;
 
       // Avandar plans don't have more than one tier
-      const firstTier = seatTiers.tiers[0];
+      const firstTier = seatTiers[0];
       if (!firstTier) {
         return undefined;
       }
@@ -172,6 +180,7 @@ export function makeSubscriptionPlanFromPolarProduct(
       const { pricePerSeat } = firstTier;
       return {
         priceType: "seat_based" as const,
+        polarProductId,
         isArchived,
         description: description ?? "",
         planFullName: name,
@@ -184,10 +193,6 @@ export function makeSubscriptionPlanFromPolarProduct(
         planInterval: recurringInterval,
         featurePlan,
       };
-    })
-    .with({ amountType: "fixed" }, { amountType: "metered_unit" }, () => {
-      // we do not allow this plan type
-      return undefined;
     })
     .exhaustive();
 }

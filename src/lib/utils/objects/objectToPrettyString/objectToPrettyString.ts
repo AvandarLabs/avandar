@@ -1,8 +1,6 @@
 import { isArray } from "../../guards/guards";
-import {
-  unknownToString,
-  UnknownToStringOptions,
-} from "../../strings/transformations";
+import { UnknownToStringOptions } from "../../strings/transformations";
+import { unknownToString } from "../../strings/unknownToString/unknownToString";
 
 function _repeatIndents(count: number): string {
   return "".padStart(count, "\t");

@@ -39,8 +39,8 @@ export function EarlySupporterCreditProgramBox({
             `above ${formattedBasePrice}/${basePrice.planInterval}`
           : ""}
         </strong>{" "}
-        during Avandar's beta phase, you'll receive $2 in credit towards any
-        plan once we fully launch. Your support now doubles in value!
+        during Avandar's beta phase, you'll receive $1 in credit towards any
+        plan once we fully launch. Your support now secures future savings!
       </Text>
     </Box>
   );

@@ -1,38 +1,64 @@
+import { Simplify } from "type-fest";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { Logger } from "@/lib/Logger";
-import { buildHTTPQueryString as _buildHTTPQueryString } from "@/lib/utils/buildHTTPQueryString";
-import type { API } from "@/types/http-api.types";
+import {
+  buildHTTPQueryString as _buildHTTPQueryString,
+  ValidURLQueryParamValue,
+} from "@/lib/utils/buildHTTPQueryString";
+import { HTTPMethod } from "../../supabase/functions/_shared/MiniServer/api.types";
+import type {
+  API,
+  APIPathParams,
+  APIQueryParams,
+  APIReturnType,
+} from "@/types/http-api.types";
 
-type HTTPRequestOptions = {
-  method: "GET" | "POST";
-  urlParams?: Record<string, string>;
-  queryParams?: Record<string, string | string[]>;
-  body?: unknown;
-};
+type HTTPRequestOptions<
+  Route extends keyof API,
+  Method extends HTTPMethod,
+> = Simplify<
+  {
+    method: Method;
+    route: Route;
+    body?: unknown;
+  } & (APIPathParams<Route, Method> extends Record<string, string | number> ?
+    { pathParams: APIPathParams<Route, Method> }
+  : { pathParams?: undefined }) &
+    (APIQueryParams<Route, Method> extends (
+      Record<string, ValidURLQueryParamValue>
+    ) ?
+      { queryParams: APIQueryParams<Route, Method> }
+    : { queryParams?: undefined })
+>;
 
 function _buildURLWithPathParams(
   route: string,
-  urlParams?: Record<string, string>,
+  pathParams?: Record<string, string | number>,
 ): string {
-  if (urlParams === undefined) {
+  if (pathParams === undefined) {
     return route;
   }
 
   return route.replace(/:([a-zA-Z0-9_]+)/g, (_, paramName) => {
-    if (urlParams[paramName]) {
-      return urlParams[paramName];
+    if (pathParams[paramName]) {
+      return String(pathParams[paramName]);
     }
     const errMsg = `Could not build a URL for ${route}. No parameter was passed in for '${paramName}'`;
-    Logger.error(errMsg, { route, pathParams: urlParams });
+    Logger.error(errMsg, { route, pathParams: pathParams });
     throw new Error(errMsg);
   });
 }
 
-function _buildRelativeAPIURL<Route extends keyof API>(
-  route: Route,
-  options: Pick<HTTPRequestOptions, "urlParams" | "queryParams">,
+function _buildRelativeAPIURL<
+  Route extends keyof API,
+  Method extends HTTPMethod,
+>(
+  options: Pick<
+    HTTPRequestOptions<Route, Method>,
+    "route" | "pathParams" | "queryParams"
+  >,
 ): string {
-  const { urlParams: pathParams, queryParams } = options;
+  const { route, pathParams, queryParams } = options;
   const newRoutePath = _buildURLWithPathParams(route, pathParams);
   if (newRoutePath.includes(":")) {
     // if there is still a colon in the URL, it means we didn't find a path
@@ -48,14 +74,16 @@ function _buildRelativeAPIURL<Route extends keyof API>(
     );
 }
 
-async function sendHTTPRequest<Route extends keyof API>(
-  route: Route,
-  options: HTTPRequestOptions,
-): Promise<API[Route]["returnType"]> {
+async function sendHTTPRequest<
+  Route extends keyof API,
+  Method extends HTTPMethod,
+>(
+  options: HTTPRequestOptions<Route, Method>,
+): Promise<APIReturnType<Route, Method>> {
   const { method, body } = options;
-  const relativeAPIURL = _buildRelativeAPIURL(route, options);
+  const relativeAPIURL = _buildRelativeAPIURL(options);
   const { data, error } = await AvaSupabase.DB.functions.invoke<
-    API[Route]["returnType"]
+    APIReturnType<Route, Method>
   >(relativeAPIURL, {
     method,
     body: body ? JSON.stringify(body) : undefined,
@@ -71,27 +99,22 @@ async function sendHTTPRequest<Route extends keyof API>(
  * HTTP client for making requests to our Supabase edge functions API.
  */
 export const APIClient = {
-  getFullURL: <Route extends keyof API>(
-    route: Route,
-    options: Pick<HTTPRequestOptions, "urlParams" | "queryParams"> = {},
-  ): string => {
-    return `${AvaSupabase.getEdgeFunctionsURL()}/${_buildRelativeAPIURL(route, options)}`;
-  },
   get: async <Route extends keyof API>(
-    route: Route,
-    options: Omit<HTTPRequestOptions, "method"> = {},
-  ): Promise<API[Route]["returnType"]> => {
-    return await sendHTTPRequest(route, { method: "GET", ...options });
+    options: Omit<HTTPRequestOptions<Route, "GET">, "method">,
+  ): Promise<APIReturnType<Route, "GET">> => {
+    return await sendHTTPRequest({
+      ...options,
+      method: "GET",
+    } as HTTPRequestOptions<Route, "GET">);
   },
 
   post: async <Route extends keyof API>(
-    route: Route,
-    options: Omit<HTTPRequestOptions, "method"> = {},
-  ): Promise<API[Route]["returnType"]> => {
-    return await sendHTTPRequest(route, {
-      method: "POST",
+    options: Omit<HTTPRequestOptions<Route, "POST">, "method">,
+  ): Promise<APIReturnType<Route, "POST">> => {
+    return await sendHTTPRequest({
       ...options,
+      method: "POST",
       body: options.body ?? {},
-    });
+    } as HTTPRequestOptions<Route, "POST">);
   },
 };

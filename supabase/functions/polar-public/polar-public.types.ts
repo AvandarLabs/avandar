@@ -1,15 +1,16 @@
 import type { APITypeDef } from "../_shared/MiniServer/api.types.ts";
 
-export type API = APITypeDef<{
-  "polar-public": {
+export type PolarPublicAPI = APITypeDef<
+  "polar-public",
+  ["/webhook"],
+  {
     "/webhook": {
-      returnType: {
-        success: boolean;
-        message?: string;
+      POST: {
+        returnType: {
+          success: boolean;
+          message?: string;
+        };
       };
     };
-    "/checkout-redirect": {
-      returnType: Response;
-    };
-  };
-}>;
+  }
+>;

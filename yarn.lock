@@ -783,21 +783,6 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
-"@polar-sh/adapter-utils@0.2.7":
-  version "0.2.7"
-  resolved "https://registry.yarnpkg.com/@polar-sh/adapter-utils/-/adapter-utils-0.2.7.tgz#5244321537bda35fd4806fb8e8cb4d3e412d9add"
-  integrity sha512-ITUYl+6xuSbuhPm/GvTX6aOxT6JF1CVbNShDYN2pLLev1QND3rpght5i6w58B4AfMPEIjqx6oicxsxKRWgKpVA==
-  dependencies:
-    "@polar-sh/sdk" "^0.35.3"
-
-"@polar-sh/sdk@^0.35.3":
-  version "0.35.4"
-  resolved "https://registry.yarnpkg.com/@polar-sh/sdk/-/sdk-0.35.4.tgz#abeae1c07aafd74a158a27f1e4e32ed5a7bf85cc"
-  integrity sha512-vv4Ptl5jNsHIZoLvzKr0wR+dGXJOpz8VWOOTEGqaiYx6YJvzIvrayg52qp8ZtBjsRBkySLZS2EVTV3wDHTACwA==
-  dependencies:
-    standardwebhooks "^1.0.0"
-    zod "^3.25.76"
-
 "@polar-sh/sdk@^0.41.3":
   version "0.41.3"
   resolved "https://registry.yarnpkg.com/@polar-sh/sdk/-/sdk-0.41.3.tgz#a328d656849ee5bbb5800e4b0de01ed0d949c987"
@@ -7134,7 +7119,7 @@ yocto-queue@^0.1.0:
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 
-zod@^3.24.2, zod@^3.25.76:
+zod@^3.24.2:
   version "3.25.76"
   resolved "https://registry.yarnpkg.com/zod/-/zod-3.25.76.tgz#26841c3f6fd22a6a2760e7ccb719179768471e34"
   integrity sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==

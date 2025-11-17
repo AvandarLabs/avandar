@@ -1,46 +1,24 @@
-import { z } from "npm:zod@4";
+import type { AnyValidPathParamsRecord, ValidPathParams } from "./api.types.ts";
+import type { ZodObject, ZodType } from "npm:zod@4";
 
-type _URLParamNameExtractor<
-  Pattern extends `/${string}`,
-  ParamNames extends readonly string[] = [],
+export type ValidPathParamsSchemaShape<
+  PathParams extends AnyValidPathParamsRecord | undefined,
+> = {
+  // the path param is always received as a string (that's what we get from the
+  // URL), but the output after parsing should be whatever is defined in the
+  // PathParams record
+  [K in keyof PathParams]: ZodType<PathParams[K], string>;
+};
+
+export type ValidPathParamsSchema<
+  PathParams extends AnyValidPathParamsRecord | undefined,
 > =
-  Pattern extends "/" ? ParamNames
-  : Pattern extends `/${infer Head}/${infer Rest}` ?
-    Head extends `:${infer ParamName}` ?
-      [...ParamNames, ParamName, ..._URLParamNameExtractor<`/${Rest}`>]
-    : [...ParamNames, ..._URLParamNameExtractor<`/${Rest}`>]
-  : Pattern extends `/:${infer ParamName}` ? [...ParamNames, ParamName]
-  : ParamNames;
+  PathParams extends AnyValidPathParamsRecord ?
+    ZodObject<ValidPathParamsSchemaShape<PathParams>>
+  : undefined;
 
 /**
- * Extracts the names of all params in a path pattern and converts them
- * to a record of strings. For example, the pattern `/users/:id` will
- * be converted to `{ id: string }`.
- */
-export type URLParams<Pattern extends `/${string}`> = {
-  [K in _URLParamNameExtractor<Pattern, []>[number]]: string;
-};
-
-export type ValidURLParamsSchemaShape<Pattern extends `/${string}`> = {
-  [K in keyof URLParams<Pattern>]: z.ZodTypeAny;
-};
-
-export type ValidURLParamsSchema<Pattern extends `/${string}`> =
-  | z.ZodObject<ValidURLParamsSchemaShape<Pattern>>
-  | z.ZodRecord<z.ZodString, z.ZodString>
-  | z.ZodUndefined;
-
-/**
- * Maps every param in a path pattern to a ZodString.
- * This is used if no path param schema is provided when defining a
- * server handler. In that case, all params will be parsed as strings.
- */
-export type DefaultPathSchema<Pattern extends `/${string}`> = z.ZodObject<{
-  [K in keyof URLParams<Pattern>]: z.ZodString;
-}>;
-
-/**
- * Parsers a URL pattern against a given URL.
+ * Parses a URL by extracting the path params given a path pattern.
  *
  * For example, given the pattern `/users/:id`, and a URL
  * `https://mydomain.com/users/abc`, it will return `{ id: "abc" }`.
@@ -49,10 +27,9 @@ export type DefaultPathSchema<Pattern extends `/${string}`> = z.ZodObject<{
  * a more type-rich object. If no schema is provided, it will return the params
  * as a record of strings.
  */
-export function parseURLPatternParams<
+export function parseURLPathParams<
   Pattern extends `/${string}`,
-  ParamsSchema extends
-    ValidURLParamsSchema<Pattern> = DefaultPathSchema<Pattern>,
+  PathParams extends ValidPathParams<Pattern> | undefined,
 >({
   pattern,
   url,
@@ -60,11 +37,11 @@ export function parseURLPatternParams<
 }: {
   pattern: Pattern;
   url: string;
-  paramSchema?: ParamsSchema;
+  paramSchema?: ValidPathParamsSchema<PathParams>;
 }):
   | {
       success: true;
-      params: z.infer<ParamsSchema>;
+      params: PathParams;
     }
   | { success: false; params: undefined } {
   // first, make sure the pattern starts with a slash, and doesn't end in one
@@ -92,7 +69,7 @@ export function parseURLPatternParams<
     if (urlToUse === "/") {
       return {
         success: true,
-        params: {} as z.infer<ParamsSchema>,
+        params: {} as PathParams,
       };
     }
     return { success: false, params: undefined };
@@ -104,7 +81,7 @@ export function parseURLPatternParams<
     if (patternToUse === urlToUse) {
       return {
         success: true,
-        params: {} as z.infer<ParamsSchema>,
+        params: {} as PathParams,
       };
     }
     return { success: false, params: undefined };
@@ -154,10 +131,10 @@ export function parseURLPatternParams<
   // If no schema is given, then return the params as is. We know it's a
   // record of strings at this point.
   if (!paramSchema) {
-    return { success: true, params: params as z.infer<ParamsSchema> };
+    return { success: true, params: params as PathParams };
   }
   return {
     success: true,
-    params: paramSchema.parse(params) as z.infer<ParamsSchema>,
+    params: paramSchema.parse(params) as PathParams,
   };
 }

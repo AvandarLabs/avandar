@@ -1,34 +1,22 @@
-import {
-  Badge,
-  Box,
-  Button,
-  Card,
-  Group,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
-import { modals } from "@mantine/modals";
+import { Badge, Box, Button, Card, Group, Stack, Text } from "@mantine/core";
 import { useState } from "react";
+import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { SegmentedControl } from "@/lib/ui/inputs/SegmentedControl";
-import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
+import { notifyExpiredSession } from "@/lib/ui/notifications/notifyExpiredSession";
 import { formatNumber } from "@/lib/utils/formatters/formatNumber";
 import { EarlySupporterCreditProgramBox } from "./EarlySupporterCreditProgramBox";
+import { goToPolarCheckout } from "./goToPolarCheckout";
 import { PlanFeatures } from "./PlanFeatures";
 import {
   AnnualPaidSeatsPlan,
-  AnnualPayWhatYouWantPlan,
   FeaturePlan,
   MonthlyPaidSeatsPlan,
-  MonthlyPayWhatYouWantPlan,
 } from "./SubscriptionPlan.types";
 
 type Props = {
-  basePlanName: string;
+  featurePlanName: string;
   monthlyPlan: MonthlyPaidSeatsPlan;
   annualPlan: AnnualPaidSeatsPlan;
-  monthlyPayWhatYouWantPlan?: MonthlyPayWhatYouWantPlan;
-  annualPayWhatYouWantPlan?: AnnualPayWhatYouWantPlan;
   featurePlan: FeaturePlan;
   isCurrentPlan: boolean;
 };
@@ -51,21 +39,23 @@ function calculateYearlyDiscount(options: {
  * and yearly billing.
  */
 export function PaidPlanCard({
-  basePlanName,
+  featurePlanName,
   monthlyPlan,
   annualPlan,
   featurePlan,
   isCurrentPlan,
 }: Props): JSX.Element {
+  const user = useCurrentUser();
   const [selectedInterval, setSelectedInterval] = useState<"month" | "year">(
     "year",
   );
-  const selectedPlan = selectedInterval === "year" ? annualPlan : monthlyPlan;
+  const selectedIntervalPlan =
+    selectedInterval === "year" ? annualPlan : monthlyPlan;
   const formattedPriceToDisplay = formatNumber(
-    selectedPlan.normalizedPricePerSeatPerMonth,
+    selectedIntervalPlan.normalizedPricePerSeatPerMonth,
     {
       style: "currency",
-      currency: selectedPlan?.priceCurrency.toUpperCase(),
+      currency: selectedIntervalPlan?.priceCurrency.toUpperCase(),
     },
   );
 
@@ -74,6 +64,20 @@ export function PaidPlanCard({
     annualPlanPricePerMonth: annualPlan.normalizedPricePerSeatPerMonth,
   });
 
+  const onSelectPlan = async () => {
+    if (!user) {
+      notifyExpiredSession();
+      return;
+    }
+    await goToPolarCheckout({
+      polarProductId: selectedIntervalPlan.polarProductId,
+      userEmail: user.email,
+      // request a checkout URL starting at a single seat. The user can change
+      // this in the checkout page.
+      numSeats: 1,
+    });
+  };
+
   return (
     <Card withBorder padding="lg" radius="md" style={{ flex: 1 }}>
       <Stack gap="md" h="100%">
@@ -81,7 +85,7 @@ export function PaidPlanCard({
           <div>
             <Group gap="sm" mb="xs">
               <Text fw={600} size="lg">
-                {basePlanName}
+                {featurePlanName}
               </Text>
               {isCurrentPlan ?
                 <Badge color="blue" variant="light">
@@ -95,7 +99,7 @@ export function PaidPlanCard({
               : null}
             </Group>
             <Text size="sm" c="dimmed">
-              {selectedPlan.description}
+              {selectedIntervalPlan.description}
             </Text>
           </div>
         </Group>
@@ -124,51 +128,16 @@ export function PaidPlanCard({
                 {selectedInterval === "year" ? " (paid yearly)" : null}
               </Text>
             </Text>
-            <Button
-              variant="outline"
-              fullWidth
-              fz="md"
-              onClick={() => {
-                modals.open({
-                  title: (
-                    <Title
-                      order={2}
-                    >{`${basePlanName}: Early Supporter`}</Title>
-                  ),
-                  size: 600,
-                  children: (
-                    <Stack>
-                      <EarlySupporterCreditProgramBox
-                        size="md"
-                        basePrice={{
-                          value: selectedPlan.pricePerSeat / 100,
-                          currency: selectedPlan.priceCurrency,
-                          planInterval: selectedInterval,
-                        }}
-                      />
-                      <Button size="xl">
-                        Select {basePlanName}: Early Supporter
-                      </Button>
-                    </Stack>
-                  ),
-                });
-              }}
-            >
-              Or pay what you want
-            </Button>
           </Box>
         </Stack>
+        <EarlySupporterCreditProgramBox />
         <PlanFeatures features={featurePlan.metadata.features} />
         <Button
           variant={isCurrentPlan ? "outline" : "filled"}
           fullWidth
           mt="auto"
           disabled={isCurrentPlan}
-          onClick={() => {
-            notifyDevAlert(
-              `Select plan clicked: ${basePlanName} (${selectedInterval})`,
-            );
-          }}
+          onClick={onSelectPlan}
         >
           {isCurrentPlan ? "Current Plan" : "Select Plan"}
         </Button>

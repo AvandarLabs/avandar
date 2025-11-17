@@ -1,9 +1,10 @@
-import { Simplify } from "type-fest";
+import { HTTPMethod } from "../../supabase/functions/_shared/MiniServer/api.types";
 import { BillingAPI } from "../../supabase/functions/billing/billing.types";
-import { API as GoogleAuthCallbackAPI } from "../../supabase/functions/google-auth-callback/api.types";
-import { API as GoogleAuthAPI } from "../../supabase/functions/google-auth/api.types";
-import { API as GoogleSheetsAPI } from "../../supabase/functions/google-sheets/api.types";
-import { API as PolarPublicAPI } from "../../supabase/functions/polar-public/polar-public.types";
+import { GoogleAuthCallbackAPI } from "../../supabase/functions/google-auth-callback/google-auth-callback.types";
+import { GoogleAuthAPI } from "../../supabase/functions/google-auth/google-auth.types";
+import { GoogleSheetsAPI } from "../../supabase/functions/google-sheets/google-sheets.types";
+import { PolarPublicAPI } from "../../supabase/functions/polar-public/polar-public.types";
+import type { Simplify } from "type-fest";
 
 /**
  * Any new APIs that get added to the supabase/functions directory should
@@ -30,4 +31,29 @@ type UnionToIntersection<U> =
   : never;
 
 export type API = Simplify<UnionToIntersection<FlattenedAPI>>;
-export type APIReturnType<Route extends keyof API> = API[Route]["returnType"];
+
+export type APIReturnType<Route extends keyof API, Method extends HTTPMethod> =
+  Method extends keyof API[Route] ?
+    "returnType" extends keyof API[Route][Method] ?
+      API[Route][Method]["returnType"]
+    : never
+  : never;
+
+export type APIRoute<Route extends keyof API, Method extends HTTPMethod> = {
+  route: Route;
+  method: Method;
+};
+
+export type APIQueryParams<Route extends keyof API, Method extends HTTPMethod> =
+  Method extends keyof API[Route] ?
+    "queryParams" extends keyof API[Route][Method] ?
+      API[Route][Method]["queryParams"]
+    : undefined
+  : undefined;
+
+export type APIPathParams<Route extends keyof API, Method extends HTTPMethod> =
+  Method extends keyof API[Route] ?
+    "pathParams" extends keyof API[Route][Method] ?
+      API[Route][Method]["pathParams"]
+    : undefined
+  : undefined;

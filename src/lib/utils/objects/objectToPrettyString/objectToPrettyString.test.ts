@@ -4,7 +4,7 @@ import { objectToPrettyString } from "./objectToPrettyString";
 describe("objectToPrettyString", () => {
   it("handles empty arrays", () => {
     const result = objectToPrettyString([]);
-    expect(result).toBe("[Empty array]");
+    expect(result).toBe("[]");
   });
 
   it("handles simple arrays", () => {
@@ -32,7 +32,7 @@ describe("objectToPrettyString", () => {
 
   it("handles empty objects", () => {
     const result = objectToPrettyString({});
-    expect(result).toBe("{Empty object}");
+    expect(result).toBe("{}");
   });
 
   it("handles simple objects", () => {
@@ -133,7 +133,7 @@ describe("objectToPrettyString", () => {
 \t\tid: 1
 \t\tname: first
 \t}
-\t{Empty object}
+\t{}
 \tnot an object
 \t{
 \t\tid: 2
@@ -192,7 +192,7 @@ describe("objectToPrettyString", () => {
 \t\t\tuser
 \t\t]
 \t}
-\tproperties: {Empty object}
+\tproperties: {}
 }`,
     );
   });
@@ -222,7 +222,7 @@ describe("objectToPrettyString", () => {
 \t\t3
 \t\t4
 \t]
-\t[Empty array]
+\t[]
 ]`);
   });
 });

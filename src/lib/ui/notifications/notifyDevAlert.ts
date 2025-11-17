@@ -1,5 +1,5 @@
 import { notifications } from "@mantine/notifications";
-import { unknownToString } from "@/lib/utils/strings/transformations";
+import { unknownToString } from "@/lib/utils/strings/unknownToString/unknownToString";
 
 /**
  * An alert that should never go into production.

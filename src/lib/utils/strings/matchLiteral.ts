@@ -1,5 +1,5 @@
 import { SetRequired, UnionToIntersection } from "type-fest";
-import { unknownToString } from "./transformations";
+import { unknownToString } from "./unknownToString/unknownToString";
 
 type KeyMatcher<Key> = ((key: Key) => unknown) | string | number | boolean;
 

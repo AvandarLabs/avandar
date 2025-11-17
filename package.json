@@ -32,7 +32,6 @@
     "util:get-project-root": "./scripts/utils/getProjectRoot.sh"
   },
   "//comments:dependencies": {
-    "@polar-sh/adapter-utils": "Added for Deno type-checking in Supabase edge functions",
     "@polar-sh/sdk": "Added for Deno type-checking in Supabase edge functions",
     "apache-arrow": "This needs to be the same version of apache-arrow used by duckdb-wasm.",
     "openai": "Added for Deno type-checking in Supabase edge functions"
@@ -48,7 +47,6 @@
     "@mantine/notifications": "^8.3.4",
     "@mantine/spotlight": "^8.3.4",
     "@mantine/tiptap": "^8.3.4",
-    "@polar-sh/adapter-utils": "0.2.7",
     "@polar-sh/sdk": "^0.41.3",
     "@supabase/supabase-js": "^2.49.2",
     "@tabler/icons-react": "^3.31.0",

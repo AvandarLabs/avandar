@@ -1,4 +1,4 @@
-import { Group, Stack, Text } from "@mantine/core";
+import { Box, Group, Stack, Text } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 
 type PlanFeaturesProps = {
@@ -11,7 +11,9 @@ export function PlanFeatures({ features }: PlanFeaturesProps): JSX.Element {
       {features.map((feature, index) => {
         return (
           <Group key={index} gap="xs" align="flex-start" w="100%" wrap="nowrap">
-            <IconCheck size={16} style={{ marginTop: 2 }} />
+            <Box>
+              <IconCheck size={16} />
+            </Box>
             <Text size="sm">{feature}</Text>
           </Group>
         );

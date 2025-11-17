@@ -19,6 +19,7 @@ export type FeaturePlan =
     };
 
 export type SubscriptionPlan = {
+  polarProductId: string;
   planFullName: string;
   description: string;
   isArchived: boolean;
@@ -44,8 +45,6 @@ type PaidSubscriptionPlanGroup = {
   type: "paid";
   monthlyPlan: MonthlyPaidSeatsPlan;
   annualPlan: AnnualPaidSeatsPlan;
-  monthlyPayWhatYouWantPlan?: MonthlyPayWhatYouWantPlan;
-  annualPayWhatYouWantPlan?: AnnualPayWhatYouWantPlan;
   featurePlan: FeaturePlan;
 };
 
@@ -81,9 +80,4 @@ export type FreePlan = SubscriptionPlan & {
 export type MonthlyPayWhatYouWantPlan = SubscriptionPlan & {
   priceType: "custom";
   planInterval: "month";
-};
-
-export type AnnualPayWhatYouWantPlan = SubscriptionPlan & {
-  priceType: "custom";
-  planInterval: "year";
 };
