@@ -4,6 +4,9 @@ import {
   PremiumPlanConfig,
 } from "@/config/SubscriptionPlansConfig";
 
+export type FreePlanVariants = "free" | "custom";
+export type PaidPlanVariants = "month" | "year";
+
 export type FeaturePlan =
   | {
       type: "free";
@@ -41,14 +44,14 @@ export type SubscriptionPlan = {
     }
 );
 
-type PaidSubscriptionPlanGroup = {
+export type PaidSubscriptionPlanGroup = {
   type: "paid";
   monthlyPlan: MonthlyPaidSeatsPlan;
   annualPlan: AnnualPaidSeatsPlan;
   featurePlan: FeaturePlan;
 };
 
-type FreeSubscriptionPlanGroup = {
+export type FreeSubscriptionPlanGroup = {
   type: "free";
   freePlan: FreePlan;
   payWhatYouWantPlan?: MonthlyPayWhatYouWantPlan;

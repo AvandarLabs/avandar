@@ -1,14 +1,14 @@
 import { Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { match } from "ts-pattern";
-import { FreePlanCard } from "./FreePlanCard";
-import { PaidPlanCard } from "./PaidPlanCard";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { PlanCard } from "./PlanCard";
 import { SubscriptionPlanGroup } from "./SubscriptionPlan.types";
 import { useSubscriptionPlans } from "./useSubscriptionPlans";
 
 export function BillingView(): JSX.Element {
-  const [subscriptionPlans = [], isLoadingSubscriptionPlans] =
+  const currentWorkspace = useCurrentWorkspace();
+  const [subscriptionPlanGroups = [], isLoadingSubscriptionPlans] =
     useSubscriptionPlans();
-  console.log("subscriptionPlans", subscriptionPlans);
 
   const titleBlock = (
     <div>
@@ -33,7 +33,7 @@ export function BillingView(): JSX.Element {
     );
   }
 
-  if (subscriptionPlans.length === 0) {
+  if (subscriptionPlanGroups.length === 0) {
     return (
       <Stack gap="lg">
         {titleBlock}
@@ -43,7 +43,7 @@ export function BillingView(): JSX.Element {
   }
 
   // Convert map to array and sort by price (cheapest first)
-  const sortedPlanGroups: SubscriptionPlanGroup[] = subscriptionPlans.sort(
+  const sortedPlanGroups: SubscriptionPlanGroup[] = subscriptionPlanGroups.sort(
     (planGroupA, planGroupB) => {
       const priceA =
         planGroupA.type === "free" ?
@@ -57,35 +57,37 @@ export function BillingView(): JSX.Element {
     },
   );
 
+  const currentSubscribedPlanId =
+    currentWorkspace.subscription?.polar_product_id;
+
   return (
     <Stack gap="lg">
       {titleBlock}
       <Group align="stretch" wrap="nowrap" gap="lg">
         {sortedPlanGroups.map((planGroup) => {
+          const isCurrentSubscribedPlanGroup =
+            currentWorkspace.subscription?.feature_plan_type ===
+            planGroup.featurePlan.type;
           return match(planGroup)
             .with({ type: "free" }, (group) => {
-              const { freePlan, payWhatYouWantPlan, featurePlan } = group;
               return (
-                <FreePlanCard
-                  key={featurePlan.type}
-                  basePlanName={featurePlan.metadata.featurePlanName}
-                  freePlan={freePlan}
-                  payWhatYouWantPlan={payWhatYouWantPlan}
-                  isCurrentPlan={false}
-                  featurePlan={featurePlan}
+                <PlanCard
+                  key={group.featurePlan.type}
+                  type="free"
+                  planGroup={group}
+                  currentSubscribedPlanId={currentSubscribedPlanId}
+                  defaultVariant="custom"
                 />
               );
             })
             .with({ type: "paid" }, (group) => {
-              const { monthlyPlan, annualPlan, featurePlan } = group;
               return (
-                <PaidPlanCard
-                  key={featurePlan.type}
-                  featurePlanName={featurePlan.metadata.featurePlanName}
-                  monthlyPlan={monthlyPlan}
-                  annualPlan={annualPlan}
-                  featurePlan={featurePlan}
-                  isCurrentPlan={false}
+                <PlanCard
+                  key={group.featurePlan.type}
+                  type="paid"
+                  planGroup={group}
+                  currentSubscribedPlanId={currentSubscribedPlanId}
+                  defaultVariant="year"
                 />
               );
             })

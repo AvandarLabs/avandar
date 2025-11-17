@@ -1,3 +1,4 @@
+import { SegmentedControlItem } from "@mantine/core";
 import { match } from "ts-pattern";
 import {
   BasicPlanConfig,
@@ -5,17 +6,43 @@ import {
   PremiumPlanConfig,
 } from "@/config/SubscriptionPlansConfig";
 import { Logger } from "@/lib/Logger";
+import { isOneOf } from "@/lib/utils/guards/guards";
+import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { BillingAPI } from "../../../../supabase/functions/billing/billing.types";
 import {
   AnnualPaidSeatsPlan,
   FeaturePlan,
+  FreePlanVariants,
   MonthlyPaidSeatsPlan,
   MonthlyPayWhatYouWantPlan,
+  PaidPlanVariants,
   SubscriptionPlan,
 } from "./SubscriptionPlan.types";
 
 type AvaPolarProduct =
   BillingAPI["billing"]["/plans"]["GET"]["returnType"]["plans"][number];
+
+export const FREE_CHOICES = [
+  { value: "custom", label: "Pay what you want" },
+  { value: "free", label: "Free" },
+] as const satisfies SegmentedControlItem[];
+
+export const PAID_CHOICES = [
+  { value: "year", label: "Pay yearly" },
+  { value: "month", label: "Pay monthly" },
+] as const satisfies SegmentedControlItem[];
+
+export function isValidFreePlanVariant(
+  choice: string,
+): choice is FreePlanVariants {
+  return isOneOf(choice, FREE_CHOICES.map(prop("value")));
+}
+
+export function isValidPaidPlanVariant(
+  choice: string,
+): choice is PaidPlanVariants {
+  return isOneOf(choice, PAID_CHOICES.map(prop("value")));
+}
 
 /**
  * Extracts the base name from a product name by removing parentheses and their
@@ -195,4 +222,17 @@ export function makeSubscriptionPlanFromPolarProduct(
       };
     })
     .exhaustive();
+}
+
+export function calculateYearlyDiscount(options: {
+  monthlyPlanPrice?: number;
+  annualPlanPricePerMonth?: number;
+}): number | undefined {
+  const { monthlyPlanPrice, annualPlanPricePerMonth } = options;
+  if (!monthlyPlanPrice || !annualPlanPricePerMonth || monthlyPlanPrice === 0) {
+    return undefined;
+  }
+  const discount =
+    ((monthlyPlanPrice - annualPlanPricePerMonth) / monthlyPlanPrice) * 100;
+  return Math.round(discount);
 }

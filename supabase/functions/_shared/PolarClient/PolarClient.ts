@@ -5,8 +5,18 @@ import { getPolarServerType } from "./getPolarServerType.ts";
 import type { AvaPolarProduct } from "./PolarClient.types.ts";
 import type { Checkout } from "npm:@polar-sh/sdk/models/components/checkout.js";
 import type { Product } from "npm:@polar-sh/sdk/models/components/product.js";
+import type { Subscription } from "npm:@polar-sh/sdk/models/components/subscription.js";
 
 export type PolarClient = {
+  /**
+   * Get a subscription by its ID.
+   * @param subscriptionId The ID of the subscription to get
+   * @returns The subscription
+   */
+  getSubscription: (options: {
+    subscriptionId: string;
+  }) => Promise<Subscription | null>;
+
   /**
    * Get the Polar products
    * @returns The subscription plans
@@ -19,8 +29,37 @@ export type PolarClient = {
    * @returns The checkout URL
    */
   createCheckoutSession: (options: {
+    /**
+     * Metadata that is specific to Avandar, to send with the Polar API reques
+     */
+    avandarMetadata: {
+      /**
+       * The Avandar User ID. This will be attached to the checkout metadata,
+       * so that we can read it back in a webhook.
+       */
+      userId: string;
+
+      /**
+       * The Avandar Workspace ID. This will be attached to the checkout
+       * metadata,so that we can read it back in a webhook and know which
+       * workspace the subscription is associated with.
+       */
+      workspaceId: string;
+    };
+
+    /**
+     * The ID of the Polar product to checkout.
+     */
     productId: string;
+
+    /**
+     * The URL to use in the Back button in Polar's checkout page.
+     */
     returnURL: string;
+
+    /**
+     * The URL to redirect to after the checkout is completed.
+     */
     successURL: string;
 
     /** The email of the user to auto-fill in the checkout form */
@@ -41,6 +80,13 @@ function createPolarClient(): PolarClient {
   });
 
   return {
+    getSubscription: async (options: { subscriptionId: string }) => {
+      const subscription = await polar.subscriptions.get({
+        id: options.subscriptionId,
+      });
+      return subscription;
+    },
+
     getProducts: async () => {
       const responses = await polar.products.list({
         page: 1,
@@ -106,6 +152,7 @@ function createPolarClient(): PolarClient {
       successURL,
       numSeats,
       userEmail,
+      avandarMetadata,
     }) => {
       const checkout = await polar.checkouts.create({
         products: [productId],
@@ -113,6 +160,7 @@ function createPolarClient(): PolarClient {
         successUrl: successURL,
         seats: numSeats,
         customerEmail: userEmail,
+        metadata: avandarMetadata,
       });
       return checkout;
     },

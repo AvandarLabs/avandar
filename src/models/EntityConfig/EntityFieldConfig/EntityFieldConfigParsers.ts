@@ -1,6 +1,7 @@
-import z, { boolean, enum as zodEnum, object, string, uuid } from "zod";
+import z, { boolean, object, string, uuid, enum as zodEnum } from "zod";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
+import { excludeNullsExceptInProps } from "@/lib/utils/objects/higherOrderFuncs";
 import {
   camelCaseKeysDeep,
   nullsToUndefinedDeep,
@@ -8,16 +9,15 @@ import {
   undefinedsToNullsDeep,
 } from "@/lib/utils/objects/transformations";
 import { pipe } from "@/lib/utils/pipe";
-import { WorkspaceId } from "@/models/Workspace/types";
+import { AvaDataTypes } from "@/models/datasets/AvaDataType";
+import { Models } from "@/models/Model";
+import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { EntityConfigId } from "../EntityConfig.types";
 import {
   EntityFieldConfig,
   EntityFieldConfigId,
   EntityFieldConfigModel,
 } from "./EntityFieldConfig.types";
-import { AvaDataTypes } from "@/models/datasets/AvaDataType";
-import { Models } from "@/models/Model";
-import { excludeNullsExceptInProps } from "@/lib/utils/objects/higherOrderFuncs";
 
 const DBReadSchema = object({
   allow_manual_edit: boolean(),
@@ -25,10 +25,7 @@ const DBReadSchema = object({
   created_at: string(),
   description: string().nullable(),
   entity_config_id: uuid(),
-  value_extractor_type: z.enum([
-    "dataset_column_value",
-    "manual_entry",
-  ]),
+  value_extractor_type: z.enum(["dataset_column_value", "manual_entry"]),
   id: uuid(),
   workspace_id: uuid(),
   is_array: boolean(),
@@ -38,36 +35,35 @@ const DBReadSchema = object({
   updated_at: string(),
 });
 
-export const EntityFieldConfigParsers = makeParserRegistry<
-  EntityFieldConfigModel
->().build({
-  modelName: "EntityFieldConfig",
-  DBReadSchema,
-  fromDBReadToModelRead: pipe(
-    camelCaseKeysDeep,
-    nullsToUndefinedDeep,
-    (obj): EntityFieldConfig => {
-      return Models.make("EntityFieldConfig", {
-        ...obj,
-        id: obj.id as EntityFieldConfigId,
-        entityConfigId: obj.entityConfigId as EntityConfigId,
-        workspaceId: obj.workspaceId as WorkspaceId,
-      });
-    },
-  ),
+export const EntityFieldConfigParsers =
+  makeParserRegistry<EntityFieldConfigModel>().build({
+    modelName: "EntityFieldConfig",
+    DBReadSchema,
+    fromDBReadToModelRead: pipe(
+      camelCaseKeysDeep,
+      nullsToUndefinedDeep,
+      (obj): EntityFieldConfig => {
+        return Models.make("EntityFieldConfig", {
+          ...obj,
+          id: obj.id as EntityFieldConfigId,
+          entityConfigId: obj.entityConfigId as EntityConfigId,
+          workspaceId: obj.workspaceId as WorkspaceId,
+        });
+      },
+    ),
 
-  fromModelInsertToDBInsert: pipe(
-    snakeCaseKeysDeep,
-    undefinedsToNullsDeep,
-    excludeNullsExceptInProps("description"),
-  ),
+    fromModelInsertToDBInsert: pipe(
+      snakeCaseKeysDeep,
+      undefinedsToNullsDeep,
+      excludeNullsExceptInProps("description"),
+    ),
 
-  fromModelUpdateToDBUpdate: pipe(
-    snakeCaseKeysDeep,
-    undefinedsToNullsDeep,
-    excludeNullsExceptInProps("description"),
-  ),
-});
+    fromModelUpdateToDBUpdate: pipe(
+      snakeCaseKeysDeep,
+      undefinedsToNullsDeep,
+      excludeNullsExceptInProps("description"),
+    ),
+  });
 
 /**
  * Do not remove these tests! These check that your Zod parsers are

@@ -22,6 +22,8 @@ export type BillingAPI = APITypeDef<
           returnURL: string;
           successURL: string;
           userEmail: string;
+          userId: string;
+          workspaceId: string;
           numSeats?: number;
         };
         returnType: {

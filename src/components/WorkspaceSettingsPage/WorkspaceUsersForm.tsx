@@ -20,7 +20,7 @@ import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { Modal } from "@/lib/ui/Modal";
 import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 import { notifyNotImplemented } from "@/lib/ui/notifications/notifyNotImplemented";
-import { WorkspaceRole } from "@/models/Workspace/types";
+import { WorkspaceRole } from "@/models/Workspace/Workspace.types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
 const IS_USER_INVITES_DISABLED = isFlagEnabled(FeatureFlag.DisableUserInvites);

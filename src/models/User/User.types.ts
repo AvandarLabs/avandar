@@ -1,7 +1,7 @@
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import { Merge } from "type-fest";
 import { UUID } from "@/lib/types/common";
-import { WorkspaceId } from "../Workspace/types";
+import { WorkspaceId } from "../Workspace/Workspace.types";
 
 export type UserId = UUID<"User">;
 export type UserProfileId = UUID<"UserProfile">;

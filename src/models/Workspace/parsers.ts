@@ -10,8 +10,8 @@ import {
 } from "@/lib/utils/objects/transformations";
 import { pipe } from "@/lib/utils/pipe";
 import { uuid } from "@/lib/utils/uuid";
-import { UserId } from "../User/types";
-import { Workspace, WorkspaceId, WorkspaceModel } from "./types";
+import { UserId } from "../User/User.types";
+import { Workspace, WorkspaceId, WorkspaceModel } from "./Workspace.types";
 
 const DBReadSchema = z.object({
   created_at: z.iso.datetime({ offset: true }),

@@ -1,7 +1,7 @@
 import { z, ZodError } from "npm:zod@4";
 import { corsHeaders } from "../cors.ts";
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from "../httpCodes.ts";
-import { createSupabaseClient } from "../supabase.ts";
+import { createSupabaseClient, SupabaseAdmin } from "../supabase.ts";
 import {
   parseURLPathParams,
   ValidPathParamsSchema,
@@ -22,7 +22,7 @@ import type {
   ValidReturnType,
 } from "./api.types.ts";
 import type { SupabaseClient, User } from "npm:@supabase/supabase-js@2";
-import type { ZodNever, ZodObject } from "npm:zod@4";
+import type { ZodNever, ZodObject, ZodType } from "npm:zod@4";
 
 /**
  * A valid query value schema must always be a string input (or null/undefined)
@@ -87,6 +87,7 @@ type HTTPMethodActionFnParams<
   info: Deno.ServeHandlerInfo<Deno.NetAddr>;
   supabaseClient: IsJWTVerificationDisabled extends true ? undefined
   : SupabaseClient<Database>;
+  supabaseAdminClient: SupabaseClient<Database>;
   user: IsJWTVerificationDisabled extends true ? undefined : User;
 };
 
@@ -181,7 +182,10 @@ type ServerRouteHandler<
   ReturnType extends ValidReturnType,
   PathParams extends ValidPathParams<Path> | undefined,
   QueryParams extends ValidQueryParams | undefined,
-  BodySchema extends z.ZodTypeAny,
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  // deno-lint-ignore no-explicit-any
+  BodySchema extends ZodType<any, any>,
+  /* eslint-enable @typescript-eslint/no-explicit-any */
   IsJWTVerificationDisabled extends boolean,
 > = {
   state: {
@@ -745,7 +749,10 @@ export type MiniServerRoutesDef<RoutesAPI extends GenericRouteAPIRecord> = {
           RoutesAPI[RouteName][Method]["queryParams"] extends object ?
             RoutesAPI[RouteName][Method]["queryParams"]
           : undefined,
-          Method extends "GET" ? z.ZodNever : z.ZodTypeAny,
+          /* eslint-disable @typescript-eslint/no-explicit-any */
+          // deno-lint-ignore no-explicit-any
+          Method extends "GET" ? z.ZodNever : ZodType<any, any>,
+          /* eslint-enable @typescript-eslint/no-explicit-any */
           boolean
         >
       : never;
@@ -841,6 +848,8 @@ export function MiniServer<API extends GenericRouteAPIRecord>(
             }
 
             if (handler) {
+              console.log(`Received request for path: '${handler.state.path}'`);
+
               const {
                 action,
                 querySchema,
@@ -876,6 +885,7 @@ export function MiniServer<API extends GenericRouteAPIRecord>(
                   user,
                   queryParams,
                   pathParams,
+                  supabaseAdminClient: SupabaseAdmin,
                 });
                 return response instanceof Response ? response : (
                     responseSuccess(response)
@@ -890,6 +900,7 @@ export function MiniServer<API extends GenericRouteAPIRecord>(
                 user,
                 pathParams,
                 queryParams,
+                supabaseAdminClient: SupabaseAdmin,
               });
               return response instanceof Response ? response : (
                   responseSuccess(response)

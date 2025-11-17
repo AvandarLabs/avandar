@@ -5,7 +5,6 @@ import { GoogleAuthClient } from "../_shared/getGoogleAuthClient.ts";
 import { BAD_REQUEST } from "../_shared/httpCodes.ts";
 import { defineRoutes, GET } from "../_shared/MiniServer/MiniServer.ts";
 import { redirect } from "../_shared/MiniServer/redirect.ts";
-import { SupabaseAdmin } from "../_shared/supabase.ts";
 import type { GoogleAuthCallbackAPI } from "./google-auth-callback.types.ts";
 import type { TokenPayload } from "google-auth-library";
 
@@ -43,7 +42,7 @@ export const Routes = defineRoutes<GoogleAuthCallbackAPI>(
           state: z.string(),
           code: z.string(),
         })
-        .action(async ({ queryParams }) => {
+        .action(async ({ queryParams, supabaseAdminClient }) => {
           const googleCode = queryParams.code;
           const { redirectURL, userId } = AuthStateSchema.parse(
             JSON.parse(queryParams.state),
@@ -82,7 +81,8 @@ export const Routes = defineRoutes<GoogleAuthCallbackAPI>(
           // We use an `upsert` with `onConflict` in order to update the tokens
           // if we already had a user_id+google_account_id pair, instead of
           // returning a database error.
-          await SupabaseAdmin.from("tokens__google")
+          await supabaseAdminClient
+            .from("tokens__google")
             .upsert(
               {
                 user_id: userId,

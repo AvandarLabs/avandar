@@ -454,6 +454,50 @@ export type Database = {
           },
         ]
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          feature_plan_type: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
+          id: string
+          polar_product_id: string
+          polar_subscription_id: string
+          subscription_owner_id: string
+          subscription_status: Database["public"]["Enums"]["subscriptions__status"]
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          feature_plan_type: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
+          id?: string
+          polar_product_id: string
+          polar_subscription_id: string
+          subscription_owner_id: string
+          subscription_status: Database["public"]["Enums"]["subscriptions__status"]
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          feature_plan_type?: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
+          id?: string
+          polar_product_id?: string
+          polar_subscription_id?: string
+          subscription_owner_id?: string
+          subscription_status?: Database["public"]["Enums"]["subscriptions__status"]
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: true
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tokens__google: {
         Row: {
           access_token: string
@@ -500,6 +544,8 @@ export type Database = {
           full_name: string
           id: string
           membership_id: string
+          polar_product_id: string | null
+          subscription_id: string | null
           updated_at: string
           user_id: string
           workspace_id: string
@@ -510,6 +556,8 @@ export type Database = {
           full_name: string
           id?: string
           membership_id: string
+          polar_product_id?: string | null
+          subscription_id?: string | null
           updated_at?: string
           user_id: string
           workspace_id: string
@@ -520,6 +568,8 @@ export type Database = {
           full_name?: string
           id?: string
           membership_id?: string
+          polar_product_id?: string | null
+          subscription_id?: string | null
           updated_at?: string
           user_id?: string
           workspace_id?: string
@@ -897,6 +947,15 @@ export type Database = {
       entity_field_configs__value_extractor_type:
         | "dataset_column_value"
         | "manual_entry"
+      subscriptions__feature_plan_type: "free" | "basic" | "premium"
+      subscriptions__status:
+        | "incomplete"
+        | "incomplete_expired"
+        | "trialing"
+        | "active"
+        | "past_due"
+        | "canceled"
+        | "unpaid"
       value_extractors__value_picker_rule_type:
         | "most_frequent"
         | "first"
@@ -1096,6 +1155,16 @@ export const Constants = {
       entity_field_configs__value_extractor_type: [
         "dataset_column_value",
         "manual_entry",
+      ],
+      subscriptions__feature_plan_type: ["free", "basic", "premium"],
+      subscriptions__status: [
+        "incomplete",
+        "incomplete_expired",
+        "trialing",
+        "active",
+        "past_due",
+        "canceled",
+        "unpaid",
       ],
       value_extractors__value_picker_rule_type: [
         "most_frequent",

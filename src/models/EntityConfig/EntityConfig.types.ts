@@ -1,12 +1,12 @@
 import { Paths, SetOptional, SetRequiredDeep, Simplify } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
-import { UserId } from "@/models/User/types";
+import { UserId } from "@/models/User/User.types";
 import { Dataset } from "../datasets/Dataset";
-import { WorkspaceId } from "../Workspace/types";
+import { Model } from "../Model";
+import { WorkspaceId } from "../Workspace/Workspace.types";
 import { EntityFieldConfig } from "./EntityFieldConfig/EntityFieldConfig.types";
 import { EntityFieldValueExtractor } from "./ValueExtractor/types";
 import type { UUID } from "@/lib/types/common";
-import { Model } from "../Model";
 
 type ModelType = "EntityConfig";
 export type EntityConfigId = UUID<ModelType>;
@@ -14,31 +14,34 @@ export type EntityConfigId = UUID<ModelType>;
 /**
  * Defines the configuration schema for an Entity.
  */
-type EntityConfigRead = Model<ModelType, {
-  /** Unique identifier for this entity config */
-  id: EntityConfigId;
+type EntityConfigRead = Model<
+  ModelType,
+  {
+    /** Unique identifier for this entity config */
+    id: EntityConfigId;
 
-  /** Workspace ID this entity config belongs to */
-  workspaceId: WorkspaceId;
+    /** Workspace ID this entity config belongs to */
+    workspaceId: WorkspaceId;
 
-  /** User ID of the owner of this entity config */
-  ownerId: UserId;
+    /** User ID of the owner of this entity config */
+    ownerId: UserId;
 
-  /** Display name of the entity */
-  name: string;
+    /** Display name of the entity */
+    name: string;
 
-  /** Optional description of what this entity represents */
-  description: string | undefined;
+    /** Optional description of what this entity represents */
+    description: string | undefined;
 
-  /** Timestamp when this entity config was created */
-  createdAt: string;
+    /** Timestamp when this entity config was created */
+    createdAt: string;
 
-  /** Timestamp when this entity config was last updated */
-  updatedAt: string;
+    /** Timestamp when this entity config was last updated */
+    updatedAt: string;
 
-  /** Whether users can manually create entities for this config */
-  allowManualCreation: boolean;
-}>;
+    /** Whether users can manually create entities for this config */
+    allowManualCreation: boolean;
+  }
+>;
 
 type EntityConfigInsert = SetOptional<
   EntityConfigRead,
