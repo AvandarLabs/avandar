@@ -1,7 +1,11 @@
 import { z, ZodError } from "npm:zod@4";
 import { corsHeaders } from "../cors.ts";
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from "../httpCodes.ts";
-import { createSupabaseClient, SupabaseAdmin } from "../supabase.ts";
+import {
+  AvaSupabaseClient,
+  createSupabaseClient,
+  SupabaseAdmin,
+} from "../supabase.ts";
 import {
   parseURLPathParams,
   ValidPathParamsSchema,
@@ -10,7 +14,6 @@ import {
 import { isRedirect } from "./redirect.ts";
 import { responseError } from "./responseError.ts";
 import { responseSuccess } from "./responseSuccess.ts";
-import type { Database } from "../../../../src/types/database.types.ts";
 import type {
   AnyValidPathParamsRecord,
   GenericAPITypeDef,
@@ -21,7 +24,7 @@ import type {
   ValidPathParams,
   ValidReturnType,
 } from "./api.types.ts";
-import type { SupabaseClient, User } from "npm:@supabase/supabase-js@2";
+import type { User } from "npm:@supabase/supabase-js@2";
 import type { ZodNever, ZodObject, ZodType } from "npm:zod@4";
 
 /**
@@ -86,8 +89,8 @@ type HTTPMethodActionFnParams<
   request: Request;
   info: Deno.ServeHandlerInfo<Deno.NetAddr>;
   supabaseClient: IsJWTVerificationDisabled extends true ? undefined
-  : SupabaseClient<Database>;
-  supabaseAdminClient: SupabaseClient<Database>;
+  : AvaSupabaseClient;
+  supabaseAdminClient: AvaSupabaseClient;
   user: IsJWTVerificationDisabled extends true ? undefined : User;
 };
 
@@ -712,7 +715,7 @@ export function POST<
 }
 
 async function getSupabaseClientAndUser(request: Request): Promise<{
-  supabaseClient: SupabaseClient<Database>;
+  supabaseClient: AvaSupabaseClient;
   user: User;
 }> {
   const supabaseClient = createSupabaseClient(request);

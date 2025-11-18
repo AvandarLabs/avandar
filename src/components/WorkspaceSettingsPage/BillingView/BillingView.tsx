@@ -57,17 +57,11 @@ export function BillingView(): JSX.Element {
     },
   );
 
-  const currentSubscribedPlanId =
-    currentWorkspace.subscription?.polar_product_id;
-
   return (
     <Stack gap="lg">
       {titleBlock}
       <Group align="stretch" wrap="nowrap" gap="lg">
         {sortedPlanGroups.map((planGroup) => {
-          const isCurrentSubscribedPlanGroup =
-            currentWorkspace.subscription?.feature_plan_type ===
-            planGroup.featurePlan.type;
           return match(planGroup)
             .with({ type: "free" }, (group) => {
               return (
@@ -75,7 +69,7 @@ export function BillingView(): JSX.Element {
                   key={group.featurePlan.type}
                   type="free"
                   planGroup={group}
-                  currentSubscribedPlanId={currentSubscribedPlanId}
+                  currentSubscription={currentWorkspace.subscription}
                   defaultVariant="custom"
                 />
               );
@@ -86,7 +80,7 @@ export function BillingView(): JSX.Element {
                   key={group.featurePlan.type}
                   type="paid"
                   planGroup={group}
-                  currentSubscribedPlanId={currentSubscribedPlanId}
+                  currentSubscription={currentWorkspace.subscription}
                   defaultVariant="year"
                 />
               );

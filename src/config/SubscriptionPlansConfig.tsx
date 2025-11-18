@@ -33,7 +33,7 @@ export const BasicPlanConfig: PlanConfig = {
 
 export const PremiumPlanConfig: PlanConfig = {
   featurePlan: "premium",
-  featurePlanName: "Avandar Pro",
+  featurePlanName: "Avandar Premium",
   features: [
     "Everything in the basic plan",
     "Manage up to 100 data sources, plus 10 data sources per additional team member",

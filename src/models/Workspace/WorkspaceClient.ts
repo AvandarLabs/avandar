@@ -48,7 +48,7 @@ export const WorkspaceClient = createSupabaseCRUDClient({
           // TODO(jpsyx): clean this up with a proper parser for a Subscription
           return {
             ...workspaceModel,
-            subscription: workspace.subscription ?? null,
+            subscription: workspace.subscription ?? undefined,
           };
         });
       },

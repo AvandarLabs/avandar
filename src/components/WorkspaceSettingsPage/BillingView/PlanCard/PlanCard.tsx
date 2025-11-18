@@ -3,8 +3,7 @@ import { useState } from "react";
 import { match } from "ts-pattern";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { notifyExpiredSession } from "@/lib/ui/notifications/notifyExpiredSession";
-import { EarlySupporterCreditProgramBox } from "../EarlySupporterCreditProgramBox";
-import { goToPolarCheckout } from "../goToPolarCheckout";
+import { WorkspaceWithSubscription } from "@/models/Workspace/Workspace.types";
 import { PlanFeatures } from "../PlanFeatures";
 import {
   calculateYearlyDiscount,
@@ -17,6 +16,8 @@ import {
   PaidPlanVariants,
   PaidSubscriptionPlanGroup,
 } from "../SubscriptionPlan.types";
+import { EarlySupporterCreditProgramBox } from "./EarlySupporterCreditProgramBox";
+import { goToPolarCheckout } from "./goToPolarCheckout";
 import { PaidPlanPriceRow } from "./PaidPlanPriceRow";
 import { PlanSwitch } from "./PlanVariantSwitch";
 
@@ -24,20 +25,21 @@ type Props =
   | {
       type: "free";
       planGroup: FreeSubscriptionPlanGroup;
-      currentSubscribedPlanId: string | undefined;
+      currentSubscription: WorkspaceWithSubscription["subscription"];
       defaultVariant: FreePlanVariants;
     }
   | {
       type: "paid";
       planGroup: PaidSubscriptionPlanGroup;
-      currentSubscribedPlanId: string | undefined;
+      currentSubscription: WorkspaceWithSubscription["subscription"];
       defaultVariant: PaidPlanVariants;
     };
 
 function getInitialSelectedVariant(
   options: Props,
 ): FreePlanVariants | PaidPlanVariants {
-  const { type, planGroup, currentSubscribedPlanId, defaultVariant } = options;
+  const { type, planGroup, defaultVariant } = options;
+  const currentSubscribedPlanId = options.currentSubscription?.polar_product_id;
   if (currentSubscribedPlanId === undefined) {
     return defaultVariant;
   }
@@ -53,7 +55,7 @@ function getInitialSelectedVariant(
 }
 
 export function PlanCard(props: Props): JSX.Element {
-  const { type, planGroup, currentSubscribedPlanId } = props;
+  const { type, planGroup, currentSubscription } = props;
   const [userProfile] = useCurrentUserProfile();
   const [selectedVariant, setSelectedVariant] = useState<
     FreePlanVariants | PaidPlanVariants
@@ -68,6 +70,9 @@ export function PlanCard(props: Props): JSX.Element {
     : planGroup.annualPlan;
   const { featurePlan } = selectedPlan;
   const [isLoadingCheckoutPage, setIsLoadingCheckoutPage] = useState(false);
+
+  const isCurrentSubscribedPlan =
+    currentSubscription?.polar_product_id === selectedPlan.polarProductId;
 
   const paidPlanDiscount =
     type === "paid" ?
@@ -89,7 +94,9 @@ export function PlanCard(props: Props): JSX.Element {
       polarProductId: selectedPlan.polarProductId,
       userId,
       workspaceId,
-      userEmail: email,
+      checkoutEmail: currentSubscription?.polar_customer_email ?? email,
+      currentSubscriptionId: currentSubscription?.polar_subscription_id,
+      currentCustomerId: currentSubscription?.polar_customer_id,
       // request a checkout URL starting at a single seat. The user can change
       // this in the checkout page.
       numSeats: selectedPlan.priceType === "seat_based" ? 1 : undefined,
@@ -118,6 +125,7 @@ export function PlanCard(props: Props): JSX.Element {
                 type="paid"
                 value={selectedVariant}
                 onChange={setSelectedVariant}
+                withHighlight={featurePlan.type === "premium"}
               />
             );
           }
@@ -142,9 +150,6 @@ export function PlanCard(props: Props): JSX.Element {
       return null;
     },
   };
-
-  const isCurrentSubscribedPlan =
-    currentSubscribedPlanId === selectedPlan.polarProductId;
 
   return (
     <Card withBorder padding="lg" radius="md" style={{ flex: 1 }}>

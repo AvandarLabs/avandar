@@ -41,7 +41,7 @@ export type PolarClient = {
 
       /**
        * The Avandar Workspace ID. This will be attached to the checkout
-       * metadata,so that we can read it back in a webhook and know which
+       * metadata, so that we can read it back in a webhook and know which
        * workspace the subscription is associated with.
        */
       workspaceId: string;
@@ -63,13 +63,25 @@ export type PolarClient = {
     successURL: string;
 
     /** The email of the user to auto-fill in the checkout form */
-    userEmail: string;
+    checkoutEmail: string;
 
     /**
      * Number of seats to purchase in the checkout. This is require
      * if the product being checked out has seat-based pricing.
      */
     numSeats?: number;
+
+    /**
+     * The ID of the current subscription if we are upgrading from a free plan
+     * to a paid plan.
+     */
+    currentSubscriptionId?: string | undefined;
+
+    /**
+     * The ID of the current customer in Polar (if they already exist)
+     * to make sure we link the checkout to the same customer in Polar.
+     */
+    currentCustomerId?: string | undefined;
   }) => Promise<Checkout>;
 };
 
@@ -151,16 +163,25 @@ function createPolarClient(): PolarClient {
       returnURL,
       successURL,
       numSeats,
-      userEmail,
+      checkoutEmail,
       avandarMetadata,
+      currentSubscriptionId,
+      currentCustomerId,
     }) => {
+      console.log("Creating a Polar checkout session for product", productId);
       const checkout = await polar.checkouts.create({
         products: [productId],
         returnUrl: returnURL,
         successUrl: successURL,
         seats: numSeats,
-        customerEmail: userEmail,
         metadata: avandarMetadata,
+        customerMetadata: {
+          avandarEmail: checkoutEmail,
+        },
+        customerEmail: checkoutEmail,
+        externalCustomerId: avandarMetadata.userId,
+        subscriptionId: currentSubscriptionId ?? undefined,
+        customerId: currentCustomerId ?? undefined,
       });
       return checkout;
     },

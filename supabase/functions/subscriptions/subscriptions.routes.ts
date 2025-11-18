@@ -1,12 +1,12 @@
 import { email, string, url, uuid } from "zod";
 import { defineRoutes, GET } from "../_shared/MiniServer/MiniServer.ts";
 import { PolarClient } from "../_shared/PolarClient/PolarClient.ts";
-import type { BillingAPI } from "./billing.types.ts";
+import type { SubscriptionsAPI } from "./subscriptions.types.ts";
 
 /**
  * This is the route handler for all billing-related endpoints.
  */
-export const Routes = defineRoutes<BillingAPI>("billing", {
+export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
   /**
    * Returns the list of available plans. Right now, that's the
    * list of all available Polar products.
@@ -37,7 +37,9 @@ export const Routes = defineRoutes<BillingAPI>("billing", {
         workspaceId: uuid(),
         returnURL: url(),
         successURL: url(),
-        userEmail: email(),
+        checkoutEmail: email(),
+        currentSubscriptionId: string().optional(),
+        currentCustomerId: string().optional(),
         numSeats: string()
           .optional()
           .transform((val) => {
@@ -49,10 +51,12 @@ export const Routes = defineRoutes<BillingAPI>("billing", {
         const {
           returnURL,
           successURL,
-          userEmail,
+          checkoutEmail,
           userId,
           workspaceId,
           numSeats,
+          currentSubscriptionId,
+          currentCustomerId,
         } = queryParams;
         const checkout = await PolarClient.createCheckoutSession({
           avandarMetadata: {
@@ -63,7 +67,9 @@ export const Routes = defineRoutes<BillingAPI>("billing", {
           returnURL,
           successURL,
           numSeats,
-          userEmail,
+          checkoutEmail,
+          currentCustomerId,
+          currentSubscriptionId,
         });
         return { checkoutURL: checkout.url };
       }),

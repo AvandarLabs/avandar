@@ -63,7 +63,7 @@ export const AppLinks = {
       key: "data-manager",
       to: "/$workspaceSlug/data-manager",
       params: { workspaceSlug },
-      label: "Datasets",
+      label: "Data Sources",
     };
   },
   dataManagerDatasetView: ({

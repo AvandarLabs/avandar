@@ -8,7 +8,7 @@ import {
 import { Logger } from "@/lib/Logger";
 import { isOneOf } from "@/lib/utils/guards/guards";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { BillingAPI } from "../../../../supabase/functions/billing/billing.types";
+import { SubscriptionsAPI } from "../../../../supabase/functions/subscriptions/subscriptions.types";
 import {
   AnnualPaidSeatsPlan,
   FeaturePlan,
@@ -20,7 +20,7 @@ import {
 } from "./SubscriptionPlan.types";
 
 type AvaPolarProduct =
-  BillingAPI["billing"]["/plans"]["GET"]["returnType"]["plans"][number];
+  SubscriptionsAPI["subscriptions"]["/plans"]["GET"]["returnType"]["plans"][number];
 
 export const FREE_CHOICES = [
   { value: "custom", label: "Pay what you want" },

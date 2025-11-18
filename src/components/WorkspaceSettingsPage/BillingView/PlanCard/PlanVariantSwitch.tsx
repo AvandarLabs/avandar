@@ -7,7 +7,9 @@ import {
 } from "../planUtils";
 import { FreePlanVariants, PaidPlanVariants } from "../SubscriptionPlan.types";
 
-type Props =
+type Props = {
+  withHighlight?: boolean;
+} & (
   | {
       type: "free";
       value: FreePlanVariants;
@@ -17,14 +19,20 @@ type Props =
       type: "paid";
       value: PaidPlanVariants;
       onChange: (value: PaidPlanVariants) => void;
-    };
+    }
+);
 
 /**
  * A switch to toggle between variants in a plan group.
  * If the type is 'free', we switch between 'Free' and 'Pay what you want'.
  * If the type is 'paid', we switch between 'Monthly' and 'Yearly'.
  */
-export function PlanSwitch({ type, value, onChange }: Props): JSX.Element {
+export function PlanSwitch({
+  type,
+  value,
+  onChange,
+  withHighlight = false,
+}: Props): JSX.Element {
   const choices = type === "free" ? FREE_CHOICES : PAID_CHOICES;
   const segmentedControl = (
     <SegmentedControl
@@ -41,7 +49,7 @@ export function PlanSwitch({ type, value, onChange }: Props): JSX.Element {
     />
   );
 
-  if (isValidFreePlanVariant(value)) {
+  if (withHighlight) {
     return (
       <Box
         p="sm"

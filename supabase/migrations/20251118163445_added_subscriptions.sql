@@ -6,10 +6,15 @@ create table "public"."subscriptions" (
     "id" uuid not null default gen_random_uuid(),
     "workspace_id" uuid not null,
     "subscription_owner_id" uuid not null,
+    "polar_customer_id" uuid not null,
+    "polar_customer_email" text not null,
     "polar_subscription_id" uuid not null,
     "polar_product_id" uuid not null,
     "created_at" timestamp with time zone not null default now(),
     "updated_at" timestamp with time zone not null default now(),
+    "started_at" timestamp with time zone,
+    "ends_at" timestamp with time zone,
+    "ended_at" timestamp with time zone,
     "feature_plan_type" subscriptions__feature_plan_type not null,
     "subscription_status" subscriptions__status not null
 );

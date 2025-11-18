@@ -1,3 +1,4 @@
+import { isDefined } from "./guards/guards";
 import { unknownToString } from "./strings/unknownToString/unknownToString";
 
 type ValidURLQueryParamPrimitiveValue =
@@ -27,6 +28,13 @@ export function buildHTTPQueryString(
 ): string {
   return Object.entries(params)
     .map(([key, value]) => {
+      // ignore undefined values, the key should not even be included in the
+      // query string, otherwise it will be encoded as an empty string (which
+      // is technically still a value)
+      if (value === undefined) {
+        return undefined;
+      }
+
       return `${key}=${encodeURIComponent(
         unknownToString(value, {
           arraySeparator: ";",
@@ -40,5 +48,6 @@ export function buildHTTPQueryString(
         }),
       )}`;
     })
+    .filter(isDefined)
     .join("&");
 }

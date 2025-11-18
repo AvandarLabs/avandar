@@ -26,14 +26,25 @@ create table public.subscriptions (
   workspace_id uuid not null unique references public.workspaces (id) on update cascade on delete restrict,
   -- User who is the billing manager for this subscription
   subscription_owner_id uuid not null references auth.users (id) on update cascade on delete restrict,
+  -- The customer id for this subscription in Polar
+  polar_customer_id uuid not null,
+  -- The customer email for this subscription in Polar
+  polar_customer_email text not null,
   -- Polar subscription id
   polar_subscription_id uuid not null,
   -- The Polar product id that the user is subscribed to
   polar_product_id uuid not null,
-  -- Timestamp when the membership was created
+  -- Timestamp when this row was created
   created_at timestamptz not null default now(),
-  -- Timestamp for last update
+  -- Timestamp for last update of this row
   updated_at timestamptz not null default now(),
+  -- Timestamp when the subscription started
+  started_at timestamptz,
+  -- Timestamp when the subscription ends
+  ends_at timestamptz,
+  -- Timestamp when the subscription officially ended. This only gets populated
+  -- once the `ends_at` timestamp has elapsed.
+  ended_at timestamptz,
   -- The feature plan type of the subscription
   feature_plan_type public.subscriptions__feature_plan_type not null,
   -- The status of the subscription

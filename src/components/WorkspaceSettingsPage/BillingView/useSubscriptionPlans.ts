@@ -20,7 +20,7 @@ export function useSubscriptionPlans(): UseQueryResultTuple<
     queryKey: ["subscriptionPlans"],
     queryFn: async (): Promise<SubscriptionPlanGroup[]> => {
       const data = await APIClient.get({
-        route: "billing/plans",
+        route: "subscriptions/plans",
       });
       // convert the Polar Product[] array to a SubscriptionPlan[] array
       const allPlans = data.plans

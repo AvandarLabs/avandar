@@ -9,32 +9,53 @@ export async function goToPolarCheckout({
   userId,
   workspaceId,
   numSeats,
-  userEmail,
+  checkoutEmail,
+  currentSubscriptionId,
+  currentCustomerId,
 }: {
   polarProductId: string;
   userId: UserId;
   workspaceId: WorkspaceId;
-  userEmail: string;
+
+  /**
+   * The email that will be stored in Polar as the customer's email. If a user
+   * already has a subscription, this should be the same as the user's email.
+   */
+  checkoutEmail: string;
 
   /**
    * This is required for paid plans. For the free plan, this should not get
    * set.
    */
   numSeats?: number;
+
+  /**
+   * The ID of the current subscription if we are upgrading from a free plan
+   * to a paid plan.
+   */
+  currentSubscriptionId: string | undefined;
+
+  /**
+   * The ID of the current customer in Polar (if they already exist)
+   * to make sure we link the checkout to the same customer in Polar.
+   */
+  currentCustomerId: string | undefined;
 }): Promise<void> {
   const currentURL = getCurrentURL();
   const { checkoutURL } = await APIClient.get({
-    route: "billing/checkout-url/:productId",
+    route: "subscriptions/checkout-url/:productId",
     pathParams: {
       productId: polarProductId,
     },
     queryParams: {
       successURL: currentURL,
       returnURL: currentURL,
-      userEmail,
+      checkoutEmail,
       numSeats,
       userId,
       workspaceId,
+      currentSubscriptionId: currentSubscriptionId ?? undefined,
+      currentCustomerId: currentCustomerId ?? undefined,
     },
   });
   navigateToExternalURL(checkoutURL);
