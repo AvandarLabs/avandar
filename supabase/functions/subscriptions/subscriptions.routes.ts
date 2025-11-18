@@ -7,6 +7,12 @@ import type { SubscriptionsAPI } from "./subscriptions.types.ts";
  * This is the route handler for all billing-related endpoints.
  */
 export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
+  "/": {
+    PATCH: PATCH("/").action(async () => {
+      return { message: "Hello, world!" };
+    }),
+  },
+
   /**
    * Returns the list of available plans. Right now, that's the
    * list of all available Polar products.

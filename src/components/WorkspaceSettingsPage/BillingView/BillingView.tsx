@@ -1,8 +1,12 @@
 import { Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { match } from "ts-pattern";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { isDefined } from "@/lib/utils/guards/guards";
 import { PlanCard } from "./PlanCard";
-import { SubscriptionPlanGroup } from "./SubscriptionPlan.types";
+import {
+  SubscriptionPlan,
+  SubscriptionPlanGroup,
+} from "./SubscriptionPlan.types";
 import { useSubscriptionPlans } from "./useSubscriptionPlans";
 
 export function BillingView(): JSX.Element {
@@ -57,6 +61,25 @@ export function BillingView(): JSX.Element {
     },
   );
 
+  const allPlans = sortedPlanGroups.flatMap(
+    (planGroup: SubscriptionPlanGroup): SubscriptionPlan[] => {
+      return match(planGroup)
+        .with({ type: "free" }, (group) => {
+          return [group.freePlan, group.payWhatYouWantPlan].filter(isDefined);
+        })
+        .with({ type: "paid" }, (group) => {
+          return [group.monthlyPlan, group.annualPlan];
+        })
+        .exhaustive();
+    },
+  );
+
+  const currentSubscribedPlan = allPlans.find((plan) => {
+    return (
+      plan.polarProductId === currentWorkspace.subscription?.polar_product_id
+    );
+  });
+
   return (
     <Stack gap="lg">
       {titleBlock}
@@ -70,6 +93,7 @@ export function BillingView(): JSX.Element {
                   type="free"
                   planGroup={group}
                   currentSubscription={currentWorkspace.subscription}
+                  currentSubscribedPlan={currentSubscribedPlan}
                   defaultVariant="custom"
                 />
               );
@@ -81,6 +105,7 @@ export function BillingView(): JSX.Element {
                   type="paid"
                   planGroup={group}
                   currentSubscription={currentWorkspace.subscription}
+                  currentSubscribedPlan={currentSubscribedPlan}
                   defaultVariant="year"
                 />
               );

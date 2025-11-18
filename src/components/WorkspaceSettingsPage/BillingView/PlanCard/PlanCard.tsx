@@ -2,6 +2,7 @@ import { Badge, Button, Card, Group, Stack, Text } from "@mantine/core";
 import { useState } from "react";
 import { match } from "ts-pattern";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
+import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
 import { notifyExpiredSession } from "@/lib/ui/notifications/notifyExpiredSession";
 import { WorkspaceWithSubscription } from "@/models/Workspace/Workspace.types";
 import { PlanFeatures } from "../PlanFeatures";
@@ -15,6 +16,7 @@ import {
   FreeSubscriptionPlanGroup,
   PaidPlanVariants,
   PaidSubscriptionPlanGroup,
+  SubscriptionPlan,
 } from "../SubscriptionPlan.types";
 import { EarlySupporterCreditProgramBox } from "./EarlySupporterCreditProgramBox";
 import { goToPolarCheckout } from "./goToPolarCheckout";
@@ -26,12 +28,14 @@ type Props =
       type: "free";
       planGroup: FreeSubscriptionPlanGroup;
       currentSubscription: WorkspaceWithSubscription["subscription"];
+      currentSubscribedPlan?: SubscriptionPlan;
       defaultVariant: FreePlanVariants;
     }
   | {
       type: "paid";
       planGroup: PaidSubscriptionPlanGroup;
       currentSubscription: WorkspaceWithSubscription["subscription"];
+      currentSubscribedPlan?: SubscriptionPlan;
       defaultVariant: PaidPlanVariants;
     };
 
@@ -55,7 +59,7 @@ function getInitialSelectedVariant(
 }
 
 export function PlanCard(props: Props): JSX.Element {
-  const { type, planGroup, currentSubscription } = props;
+  const { type, planGroup, currentSubscription, currentSubscribedPlan } = props;
   const [userProfile] = useCurrentUserProfile();
   const [selectedVariant, setSelectedVariant] = useState<
     FreePlanVariants | PaidPlanVariants
@@ -70,9 +74,8 @@ export function PlanCard(props: Props): JSX.Element {
     : planGroup.annualPlan;
   const { featurePlan } = selectedPlan;
   const [isLoadingCheckoutPage, setIsLoadingCheckoutPage] = useState(false);
-
   const isCurrentSubscribedPlan =
-    currentSubscription?.polar_product_id === selectedPlan.polarProductId;
+    currentSubscribedPlan?.polarProductId === selectedPlan.polarProductId;
 
   const paidPlanDiscount =
     type === "paid" ?
@@ -89,18 +92,30 @@ export function PlanCard(props: Props): JSX.Element {
       return;
     }
     const { userId, workspaceId, email } = userProfile;
-    setIsLoadingCheckoutPage(true);
-    await goToPolarCheckout({
-      polarProductId: selectedPlan.polarProductId,
-      userId,
-      workspaceId,
-      checkoutEmail: currentSubscription?.polar_customer_email ?? email,
-      currentSubscriptionId: currentSubscription?.polar_subscription_id,
-      currentCustomerId: currentSubscription?.polar_customer_id,
-      // request a checkout URL starting at a single seat. The user can change
-      // this in the checkout page.
-      numSeats: selectedPlan.priceType === "seat_based" ? 1 : undefined,
-    });
+
+    // if we have no current subscription, or the current plan is a free plan
+    // (meaning any plan we select is going to be an upgrade), then we have to
+    // take the user to the Polar checkout page.
+    if (
+      currentSubscription === undefined ||
+      currentSubscribedPlan?.priceType === "free"
+    ) {
+      setIsLoadingCheckoutPage(true);
+      await goToPolarCheckout({
+        polarProductId: selectedPlan.polarProductId,
+        userId,
+        workspaceId,
+        checkoutEmail: currentSubscription?.polar_customer_email ?? email,
+        currentSubscriptionId: currentSubscription?.polar_subscription_id,
+        currentCustomerId: currentSubscription?.polar_customer_id,
+      });
+      return;
+    }
+
+    // otherwise, we are just updating the current from a paid plan to another
+    // paid plan. Or paid plan to free plan. So we don't need to go through the
+    // official Polar checkout page for that.
+    notifyDevAlert("omg");
   };
 
   const elements = {

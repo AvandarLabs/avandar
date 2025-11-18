@@ -2,7 +2,7 @@ import {
   BasicPlanConfig,
   FreePlanConfig,
   PremiumPlanConfig,
-} from "@/config/SubscriptionPlansConfig";
+} from "@/config/FeaturePlansConfig";
 
 export type FreePlanVariants = "free" | "custom";
 export type PaidPlanVariants = "month" | "year";

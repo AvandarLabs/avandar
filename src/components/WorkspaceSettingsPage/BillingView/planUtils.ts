@@ -4,7 +4,7 @@ import {
   BasicPlanConfig,
   FreePlanConfig,
   PremiumPlanConfig,
-} from "@/config/SubscriptionPlansConfig";
+} from "@/config/FeaturePlansConfig";
 import { Logger } from "@/lib/Logger";
 import { isOneOf } from "@/lib/utils/guards/guards";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";

@@ -6,7 +6,7 @@ import {
   BasicPlanConfig,
   FreePlanConfig,
   PremiumPlanConfig,
-} from "./SubscriptionPlansConfig";
+} from "./FeaturePlansConfig";
 
 // changes do not require rebuilding production.
 type AppConfigType = {
@@ -37,8 +37,8 @@ type AppConfigType = {
   /** The email address to use for general inquiries */
   infoEmail: string;
 
-  /** Metadata for the subscription plans */
-  subscriptionPlansMetadata: {
+  /** Metadata for the subscribable feature plans */
+  featurePlansMetadata: {
     free: typeof FreePlanConfig;
     basic: typeof BasicPlanConfig;
     premium: typeof PremiumPlanConfig;
@@ -55,7 +55,7 @@ export const AppConfig = {
   },
   supportEmail: "support@avandarlabs.com",
   infoEmail: "info@avandarlabs.com",
-  subscriptionPlansMetadata: {
+  featurePlansMetadata: {
     free: FreePlanConfig,
     basic: BasicPlanConfig,
     premium: PremiumPlanConfig,
