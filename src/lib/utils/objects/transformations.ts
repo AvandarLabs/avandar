@@ -206,11 +206,9 @@ export function excludeNullsDeep<T extends Exclude<unknown, null>>(
 export type ExcludeNullsIn<
   T extends UnknownObject,
   K extends keyof T = keyof T,
-> =
-  & Omit<T, K>
-  & {
-    [Key in K]: Exclude<T[Key], null>;
-  };
+> = Omit<T, K> & {
+  [Key in K]: Exclude<T[Key], null>;
+};
 
 /**
  * Excludes nulls from the specified keys.
@@ -228,10 +226,9 @@ export function excludeNullsIn<T extends UnknownObject, K extends keyof T>(
   keysToTest: Extract<K, string> | readonly K[],
 ): ExcludeNullsIn<T, K> {
   const newObj = { ...obj };
-  const keys = typeof keysToTest === "string"
-    ? [keysToTest]
-    : keysToTest.length === 0
-    ? objectKeys(obj)
+  const keys =
+    typeof keysToTest === "string" ? [keysToTest]
+    : keysToTest.length === 0 ? objectKeys(obj)
     : keysToTest;
   keys.forEach((key) => {
     if (isNull(obj[key])) {
@@ -239,11 +236,9 @@ export function excludeNullsIn<T extends UnknownObject, K extends keyof T>(
     }
   });
 
-  return newObj as
-    & Omit<T, K>
-    & {
-      [Key in K]: Exclude<T[Key], null>;
-    };
+  return newObj as Omit<T, K> & {
+    [Key in K]: Exclude<T[Key], null>;
+  };
 }
 
 export type ExcludeNullsExceptIn<
@@ -253,11 +248,9 @@ export type ExcludeNullsExceptIn<
     StringKeyOf<T>,
     KeysToNotChange
   >,
-> =
-  & Pick<T, KeysToNotChange>
-  & {
-    [Key in KeysToExcludeNulls]: Exclude<T[Key], null>;
-  };
+> = Pick<T, KeysToNotChange> & {
+  [Key in KeysToExcludeNulls]: Exclude<T[Key], null>;
+};
 
 /**
  * Excludes nulls from all keys except for the specified keys. Those keys will
@@ -277,13 +270,9 @@ export type ExcludeNullsExceptIn<
 export function excludeNullsExceptIn<
   T extends UnknownObject,
   K extends StringKeyOf<T>,
->(
-  obj: T,
-  keysToKeepNull: K | readonly K[],
-): ExcludeNullsExceptIn<T, K> {
-  const keys = typeof keysToKeepNull === "string"
-    ? [keysToKeepNull]
-    : keysToKeepNull;
+>(obj: T, keysToKeepNull: K | readonly K[]): ExcludeNullsExceptIn<T, K> {
+  const keys =
+    typeof keysToKeepNull === "string" ? [keysToKeepNull] : keysToKeepNull;
   if (keys.length === 0) {
     return obj as ExcludeNullsExceptIn<T, K>;
   }
@@ -300,6 +289,9 @@ export function excludeNullsExceptIn<
 /**
  * Coerces the specified keys into dates.
  *
+ * `undefined` values are left as is and are not attempted to be coerced into
+ * dates.
+ *
  * @param obj The object to coerce dates from.
  * @param keys The keys to coerce into dates.
  * @returns The object with the specified keys coerced into dates.
@@ -308,16 +300,19 @@ export function coerceDatesIn<T extends UnknownObject, K extends keyof T>(
   obj: T,
   keys: readonly K[],
 ): {
-  [Key in keyof T]: Key extends K ? undefined extends T[Key] ? Date | undefined
+  [Key in keyof T]: Key extends K ?
+    undefined extends T[Key] ?
+      Date | undefined
     : Date
-    : T[Key];
+  : T[Key];
 } {
   const newObj = { ...obj };
   keys.forEach((key) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    newObj[key] = obj[key] === undefined
-      ? undefined
+    newObj[key] =
+      obj[key] === undefined ?
+        undefined
       : new Date(obj[key] as unknown as string | number);
   });
   return newObj as ReplaceTypes<T, { [Key in K]: Date }>;
@@ -337,10 +332,11 @@ export function convertDatesToISOIn<
   obj: T,
   keys: readonly K[],
 ): {
-  [Key in keyof T]: Key extends K
-    ? undefined extends T[Key] ? string | undefined
+  [Key in keyof T]: Key extends K ?
+    undefined extends T[Key] ?
+      string | undefined
     : string
-    : T[Key];
+  : T[Key];
 } {
   const newObj = { ...obj };
   keys.forEach((key) => {

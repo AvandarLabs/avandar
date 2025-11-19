@@ -1,6 +1,5 @@
-import { User } from "@supabase/supabase-js";
-import { SetRequired } from "type-fest";
 import { hasDefinedProps } from "@/lib/utils/guards/guards";
+import { User } from "@/models/User/User.types";
 import { Route as AuthRoute } from "@/routes/_auth/route";
 
 /**
@@ -12,7 +11,7 @@ import { Route as AuthRoute } from "@/routes/_auth/route";
  *
  * @returns The current user or undefined if not authenticated.
  */
-export function useCurrentUser(): SetRequired<User, "email"> | undefined {
+export function useCurrentUser(): User | undefined {
   const { user } = AuthRoute.useRouteContext();
   if (user && hasDefinedProps(user, "email")) {
     return user;

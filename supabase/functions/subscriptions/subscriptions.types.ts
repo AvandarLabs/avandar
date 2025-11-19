@@ -1,7 +1,38 @@
 import type { APITypeDef } from "../_shared/MiniServer/api.types.ts";
-import type { AvaPolarProduct } from "../_shared/PolarClient/PolarClient.types.ts";
 import type { Tables } from "../../../src/types/database.types.ts";
 
+/**
+ * A subset of the Polar Product type that is served to the frontend.
+ */
+export type AvaPolarProduct = {
+  id: string;
+  name: string;
+  description: string | null;
+  isArchived: boolean;
+  recurringInterval: "day" | "week" | "month" | "year" | null;
+  metadata: Record<string, string | number | boolean>;
+  prices: Array<
+    {
+      id: string;
+      isArchived: boolean;
+    } & (
+      | {
+          amountType: "free";
+        }
+      | {
+          amountType: "custom";
+          priceCurrency: string;
+        }
+      | {
+          amountType: "seat_based";
+          priceCurrency: string;
+          seatTiers: Array<{
+            pricePerSeat: number;
+          }>;
+        }
+    )
+  >;
+};
 export type SubscriptionsAPI = APITypeDef<
   "subscriptions",
   ["/:subscriptionId/product", "/products", "/checkout-url/:productId"],

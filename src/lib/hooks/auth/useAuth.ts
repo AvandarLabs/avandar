@@ -1,7 +1,9 @@
-import { User } from "@supabase/supabase-js";
+import { User as SupabaseUser } from "@supabase/supabase-js";
 import { AnyRouter } from "@tanstack/router-core";
 import { useEffect, useState } from "react";
 import { AuthClient } from "@/clients/AuthClient";
+import { hasDefinedProps } from "@/lib/utils/guards/guards";
+import { User } from "@/models/User/User.types";
 
 /**
  * This function should be called from the root component of the app.
@@ -12,7 +14,7 @@ import { AuthClient } from "@/clients/AuthClient";
  * @returns The current user or undefined if the user is not authenticated
  */
 export function useAuth(router: AnyRouter): { user: User | undefined } {
-  const [user, setUser] = useState<User | undefined>(undefined);
+  const [user, setUser] = useState<SupabaseUser | undefined>(undefined);
 
   useEffect(() => {
     const getSession = async () => {
@@ -35,5 +37,8 @@ export function useAuth(router: AnyRouter): { user: User | undefined } {
     };
   }, [router]);
 
-  return { user };
+  if (user && hasDefinedProps(user, "email")) {
+    return { user: user as User };
+  }
+  return { user: undefined };
 }

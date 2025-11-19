@@ -1,3 +1,4 @@
+import { match } from "ts-pattern";
 import { email, string, url, uuid } from "zod";
 import { defineRoutes, GET, PATCH } from "../_shared/MiniServer/MiniServer.ts";
 import { PolarClient } from "../_shared/PolarClient/PolarClient.ts";
@@ -6,7 +7,10 @@ import {
   PolarSubscriptionMetadataSchema,
 } from "../polar-public/PolarEventDataSchemas.ts";
 import { MAX_FREE_PLAN_SEATS } from "../polar-public/polarWebhookUtils.ts";
-import type { SubscriptionsAPI } from "./subscriptions.types.ts";
+import type {
+  AvaPolarProduct,
+  SubscriptionsAPI,
+} from "./subscriptions.types.ts";
 
 /**
  * This is the route handler for all billing-related endpoints.
@@ -100,8 +104,57 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
    */
   "/products": {
     GET: GET("/products").action(async () => {
-      const products = await PolarClient.getProducts();
-      return { products };
+      const polarProducts = await PolarClient.getProducts();
+      const simplifiedProducts: AvaPolarProduct[] = polarProducts.map(
+        (product) => {
+          return {
+            id: product.id,
+            name: product.name,
+            description: product.description,
+            isArchived: product.isArchived,
+            recurringInterval: product.recurringInterval,
+            metadata: product.metadata,
+            prices: product.prices
+              .map((price) => {
+                const { id, isArchived } = price;
+                return match(price)
+                  .with({ amountType: "free" }, (p) => {
+                    return {
+                      id,
+                      isArchived,
+                      amountType: p.amountType,
+                    };
+                  })
+                  .with({ amountType: "custom" }, (p) => {
+                    return {
+                      id,
+                      isArchived,
+                      amountType: p.amountType,
+                      priceCurrency: p.priceCurrency,
+                    };
+                  })
+                  .with({ amountType: "seat_based" }, (p) => {
+                    return {
+                      id,
+                      isArchived,
+                      amountType: p.amountType,
+                      priceCurrency: p.priceCurrency,
+                      seatTiers: p.seatTiers.tiers,
+                    };
+                  })
+                  .otherwise(() => {
+                    // we ignore all other price types for now. We do not want
+                    // to show them in the app
+                    return undefined;
+                  });
+              })
+              .filter((price): price is NonNullable<typeof price> => {
+                return price !== undefined;
+              }),
+          };
+        },
+      );
+      return { products: simplifiedProducts };
     }),
   },
 

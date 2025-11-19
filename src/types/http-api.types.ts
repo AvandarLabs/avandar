@@ -1,10 +1,11 @@
-import { HTTPMethod } from "../../supabase/functions/_shared/MiniServer/api.types";
 import { GoogleAuthCallbackAPI } from "../../supabase/functions/google-auth-callback/google-auth-callback.types";
 import { GoogleAuthAPI } from "../../supabase/functions/google-auth/google-auth.types";
 import { GoogleSheetsAPI } from "../../supabase/functions/google-sheets/google-sheets.types";
 import { PolarPublicAPI } from "../../supabase/functions/polar-public/polar-public.types";
 import { SubscriptionsAPI } from "../../supabase/functions/subscriptions/subscriptions.types";
 import type { Simplify } from "type-fest";
+
+export type HTTPMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 /**
  * Any new APIs that get added to the supabase/functions directory should

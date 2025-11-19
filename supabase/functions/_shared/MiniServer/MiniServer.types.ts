@@ -6,6 +6,7 @@ import type {
   HTTPMethod,
   UnknownRecord,
   URLPathPattern,
+  ValidBody,
   ValidPathParams,
   ValidReturnType,
 } from "./api.types.ts";
@@ -15,7 +16,6 @@ import type { User } from "npm:@supabase/supabase-js@2";
 import type { infer as ZodInfer, ZodObject, ZodType } from "npm:zod@4";
 
 export type ValidBodySchema = AnyZodType | Record<string, AnyZodType>;
-export type ValidBody = unknown;
 export type InferBody<T extends ValidBodySchema> =
   T extends AnyZodType ? ZodInfer<T>
   : {

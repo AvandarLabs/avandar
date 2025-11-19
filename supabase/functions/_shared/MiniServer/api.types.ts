@@ -1,5 +1,4 @@
-import { ValidBody } from "./MiniServer.types.ts";
-
+export type ValidBody = unknown;
 export type HTTPMethod = "POST" | "GET" | "PUT" | "DELETE" | "PATCH";
 export type UnknownRecord = Record<string, unknown>;
 export type URLPathPattern = `/${string}`;

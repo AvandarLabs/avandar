@@ -11,6 +11,7 @@ export type User = Merge<
   SupabaseUser,
   {
     id: UserId;
+    email: string;
   }
 >;
 

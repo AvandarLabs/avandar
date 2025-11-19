@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "type-check": "tsc -b --noEmit",
     "preview": "vite preview",
-    "tsc-watch": "concurrently --raw \"nodemon --ext ts,tsx --watch supabase/functions --exec 'deno check supabase/functions --quiet && echo \\\"\\033[32mType check passed in supabase/functions\\033[0m\\\" || true' 2>&1 | grep -v '\\[nodemon\\]'\" \"FORCE_COLOR=1 yarn tsc -b --watch\"",
+    "tsc-watch": "concurrently --raw \"nodemon --ext ts,tsx --watch supabase/functions --exec 'deno check supabase/functions --quiet && echo \\\"\\033[32mType check passed in supabase/functions\\033[0m\\\" || true' 2>&1 | grep -v '\\[nodemon\\]'\" \"FORCE_COLOR=1 yarn tsc -b --watch tsconfig.app.json tsconfig.node.json\"",
     "db:apply-migrations": "./scripts/applyMigrations.sh",
     "db:create-user": "yarn vite-script scripts/createUserScript.ts",
     "db:gen-types": "supabase gen types typescript --local > src/types/database.types.ts",

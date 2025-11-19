@@ -20,6 +20,7 @@ import type {
   GenericRouteAPIRecord,
   HTTPMethod,
   URLPathPattern,
+  ValidBody,
   ValidPathParams,
   ValidReturnType,
 } from "./api.types.ts";
@@ -30,7 +31,6 @@ import type {
   QueryParamsSchema,
   ServerRouteHandler,
   URLPathWithoutParams,
-  ValidBody,
   ValidQueryParams,
 } from "./MiniServer.types.ts";
 import type { User } from "npm:@supabase/supabase-js@2";

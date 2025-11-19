@@ -1,9 +1,7 @@
 import { Polar } from "npm:@polar-sh/sdk@0.41.3";
 import { CustomerSession } from "npm:@polar-sh/sdk/models/components/customersession.js";
-import { match } from "npm:ts-pattern@5";
 import { getPolarAccessToken } from "./getPolarAccessToken.ts";
 import { getPolarServerType } from "./getPolarServerType.ts";
-import type { AvaPolarProduct } from "./PolarClient.types.ts";
 import type { Checkout } from "npm:@polar-sh/sdk/models/components/checkout.js";
 import type { Product } from "npm:@polar-sh/sdk/models/components/product.js";
 import type { Subscription } from "npm:@polar-sh/sdk/models/components/subscription.js";
@@ -33,7 +31,7 @@ export type PolarClient = {
   /**
    * Get the Polar products, but with a simplified structure.
    */
-  getProducts: () => Promise<AvaPolarProduct[]>;
+  getProducts: () => Promise<Product[]>;
 
   /**
    * Create a checkout session for a single Polar product.
@@ -168,56 +166,7 @@ function createPolarClient(): PolarClient {
       const polarProducts: Product[] = pages.flatMap((page) => {
         return page.result.items;
       });
-      const simplifiedProducts: AvaPolarProduct[] = polarProducts.map(
-        (product) => {
-          return {
-            id: product.id,
-            name: product.name,
-            description: product.description,
-            isArchived: product.isArchived,
-            recurringInterval: product.recurringInterval,
-            metadata: product.metadata,
-            prices: product.prices
-              .map((price) => {
-                const { id, isArchived } = price;
-                return match(price)
-                  .with({ amountType: "free" }, (p) => {
-                    return {
-                      id,
-                      isArchived,
-                      amountType: p.amountType,
-                    };
-                  })
-                  .with({ amountType: "custom" }, (p) => {
-                    return {
-                      id,
-                      isArchived,
-                      amountType: p.amountType,
-                      priceCurrency: p.priceCurrency,
-                    };
-                  })
-                  .with({ amountType: "seat_based" }, (p) => {
-                    return {
-                      id,
-                      isArchived,
-                      amountType: p.amountType,
-                      priceCurrency: p.priceCurrency,
-                      seatTiers: p.seatTiers.tiers,
-                    };
-                  })
-                  .otherwise(() => {
-                    // we ignore all other price types for now. We do not want
-                    // to show them in the app
-                    return undefined;
-                  });
-              })
-              .filter((price): price is NonNullable<typeof price> => {
-                return price !== undefined;
-              }),
-          };
-        },
-      );
-      return simplifiedProducts;
+      return polarProducts;
     },
 
     createCheckoutSession: async ({

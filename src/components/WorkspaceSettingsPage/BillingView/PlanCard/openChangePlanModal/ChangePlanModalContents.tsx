@@ -78,8 +78,20 @@ export function ChangePlanModalContents({ newPlan }: Props): JSX.Element {
 
       <Paper shadow="xs" withBorder={false} bg="yellow.0">
         <Text c="yellow.9">
-          Please confirm that you would like to proceed with this plan change.
-          Your subscription will be updated accordingly.
+          {newPlan.priceType === "custom" ?
+            <>
+              <strong>
+                Upgrading to a &quot;Pay What You Want&quot; plan can only be
+                done through the billing portal.
+                <br />
+                The button below will take you there.
+              </strong>
+            </>
+          : <>
+              Please confirm that you would like to proceed with this plan
+              change. Your subscription will be updated accordingly.
+            </>
+          }
         </Text>
       </Paper>
     </Stack>

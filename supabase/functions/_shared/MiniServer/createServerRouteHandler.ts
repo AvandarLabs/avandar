@@ -11,6 +11,7 @@ import type {
   HTTPMethod,
   UnknownRecord,
   URLPathPattern,
+  ValidBody,
   ValidPathParams,
   ValidReturnType,
 } from "./api.types.ts";
@@ -21,7 +22,6 @@ import type {
   MakeOptionalIfUndefined,
   QueryParamsSchemaShape,
   ServerRouteHandler,
-  ValidBody,
   ValidBodySchema,
   ValidQueryParams,
 } from "./MiniServer.types.ts";

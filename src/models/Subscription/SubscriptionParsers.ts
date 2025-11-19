@@ -40,6 +40,7 @@ const DBReadSchema = z.object({
   ended_at: z.iso.datetime({ offset: true }).nullable(),
   created_at: z.iso.datetime({ offset: true }),
   updated_at: z.iso.datetime({ offset: true }),
+  max_seats_allowed: z.number(),
   current_period_start: z.iso.datetime({ offset: true }).nullable(),
   current_period_end: z.iso.datetime({ offset: true }).nullable(),
 });
@@ -57,6 +58,8 @@ export const SubscriptionParsers =
         "startedAt",
         "endsAt",
         "endedAt",
+        "currentPeriodStart",
+        "currentPeriodEnd",
       ]),
       (obj): Subscription => {
         return {
@@ -81,6 +84,8 @@ export const SubscriptionParsers =
         "started_at",
         "ends_at",
         "ended_at",
+        "current_period_start",
+        "current_period_end",
       ]),
     ),
 
@@ -94,6 +99,8 @@ export const SubscriptionParsers =
         "started_at",
         "ends_at",
         "ended_at",
+        "current_period_start",
+        "current_period_end",
       ]),
     ),
   });
