@@ -24,10 +24,10 @@ export const AvaSupabase = {
 
 export type GetSupabaseClientOptions<DB> =
   // Get the client options from the internal Supabase object, if it is set
-  DB extends { __InternalSupabase: { PostgrestVersion: string } }
-    ? DB["__InternalSupabase"]
-    // otherwise default to 12
-    : { PostgrestVersion: "12" };
+  DB extends { __InternalSupabase: { PostgrestVersion: string } } ?
+    DB["__InternalSupabase"]
+  : // otherwise default to 12
+    { PostgrestVersion: "12" };
 
 /**
  * An admin client for interacting with Supabase. This should only be used
