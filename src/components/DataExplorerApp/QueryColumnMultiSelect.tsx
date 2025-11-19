@@ -25,17 +25,6 @@ type Props = {
   onChange?: (fields: readonly QueryColumn[]) => void;
 };
 
-// Human readable names for fields
-// TODO(jpsyx): excluding these additional field names just for now
-/*
-const FIELD_NAME_OVERRIDES: Record<string, string> = {
-  assignedTo: "Assigned to",
-  status: "Status",
-  createdAt: "Created at",
-  updatedAt: "Updated at",
-};
-*/
-
 export function QueryColumnMultiSelect({
   label,
   placeholder,
