@@ -1,6 +1,6 @@
-import { User } from "@supabase/supabase-js";
 import { Logger } from "@/lib/Logger";
 import { uuid } from "@/lib/utils/uuid";
+import { User } from "@/models/User/User.types";
 import { AvaSupabase } from "../supabase/AvaSupabase";
 import {
   AvaDexieVersionManager,

@@ -39,10 +39,7 @@ export type UseQueryOptions<
 /**
  * A tuple containing [data, `isLoading` state, the query result object].
  */
-export type UseQueryResultTuple<
-  TQueryFnData = unknown,
-  TData = TQueryFnData,
-> = [
+export type UseQueryResultTuple<TData> = [
   data: undefined | TData,
   isLoading: boolean,
   queryResult: TanstackUseQueryResult<TData, DefaultError>,
@@ -60,7 +57,7 @@ export function useQuery<
   TQueryKey extends QueryKey = QueryKey,
 >(
   options: UseQueryOptions<TQueryFnData, TData, TQueryKey>,
-): UseQueryResultTuple<TQueryFnData, TData> {
+): UseQueryResultTuple<TData> {
   const { queryFn, ...queryOptions } = options;
   const queryResult = tanstackUseQuery({
     ...queryOptions,
@@ -106,5 +103,5 @@ export function useQuery<
     queryResult.data,
     queryResult.isLoading,
     queryResult,
-  ] as UseQueryResultTuple<TQueryFnData, TData>;
+  ] as UseQueryResultTuple<TData>;
 }

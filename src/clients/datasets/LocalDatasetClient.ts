@@ -3,8 +3,8 @@ import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { createDexieCRUDClient } from "@/lib/clients/dexie/createDexieCRUDClient";
 import { DatasetId } from "@/models/datasets/Dataset";
 import { LocalDatasetParsers } from "@/models/datasets/LocalDataset";
-import { UserId } from "@/models/User/types";
-import { WorkspaceId } from "@/models/Workspace/types";
+import { UserId } from "@/models/User/User.types";
+import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { DuckDBClient, DucKDBLoadCSVOptions } from "../DuckDBClient";
 import { DuckDBLoadCSVResult } from "../DuckDBClient/DuckDBClient.types";
 

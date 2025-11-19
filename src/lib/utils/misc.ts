@@ -4,7 +4,7 @@
  */
 
 import { notifyDevAlert } from "../ui/notifications/notifyDevAlert";
-import { unknownToString } from "./strings/transformations";
+import { unknownToString } from "./strings/unknownToString/unknownToString";
 
 /**
  * Literally do nothing.

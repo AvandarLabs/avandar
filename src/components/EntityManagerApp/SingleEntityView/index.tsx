@@ -13,7 +13,7 @@ import { makeMap } from "@/lib/utils/maps/makeMap";
 import { makeObject } from "@/lib/utils/objects/builders";
 import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { omit } from "@/lib/utils/objects/misc";
-import { unknownToString } from "@/lib/utils/strings/transformations";
+import { unknownToString } from "@/lib/utils/strings/unknownToString/unknownToString";
 import { DatasetSourceType } from "@/models/datasets/Dataset";
 import { Entity } from "@/models/entities/Entity";
 import { EntityFieldValue } from "@/models/entities/EntityFieldValue";

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
-import { WorkspaceRole } from "@/models/Workspace/types";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { WorkspaceRole } from "@/models/Workspace/Workspace.types";
 import { useCurrentUser } from "../users/useCurrentUser";
 
 export function useWorkspaceRole(): WorkspaceRole {

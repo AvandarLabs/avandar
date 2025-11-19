@@ -1,6 +1,6 @@
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { UseQueryResult } from "@/lib/hooks/query/useQuery";
-import { UserProfile } from "@/models/User/types";
+import { UserProfile } from "@/models/User/User.types";
 import { UserClient } from "@/models/User/UserClient";
 
 /**

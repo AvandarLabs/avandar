@@ -10,7 +10,7 @@ import {
   DatasetParsers,
   DatasetWithColumns,
 } from "@/models/datasets/Dataset";
-import { WorkspaceId } from "@/models/Workspace/types";
+import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { CompositeTypes } from "@/types/database.types";
 import { DuckDBClient } from "../DuckDBClient";
 import { DatasetColumnClient } from "./DatasetColumnClient";
