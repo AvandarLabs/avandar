@@ -86,6 +86,8 @@ export function PlanCard(props: Props): JSX.Element {
       })
     : undefined;
 
+  const isRecommended = planGroup.featurePlan.metadata.isRecommendedPlan;
+
   const onSelectPlan = async () => {
     if (!userProfile) {
       notifyExpiredSession();
@@ -173,7 +175,18 @@ export function PlanCard(props: Props): JSX.Element {
   };
 
   return (
-    <Card withBorder padding="lg" radius="md" style={{ flex: 1 }}>
+    <Card
+      withBorder
+      padding="lg"
+      radius="md"
+      style={{
+        flex: 1,
+        ...(isRecommended && {
+          borderWidth: 2,
+          borderColor: "var(--mantine-color-violet-5)",
+        }),
+      }}
+    >
       <Stack gap="md" h="100%">
         <Group justify="space-between" align="flex-start">
           <div>
@@ -181,6 +194,11 @@ export function PlanCard(props: Props): JSX.Element {
               <Text fw={600} size="lg">
                 {featurePlan.metadata.featurePlanName}
               </Text>
+              {isRecommended ?
+                <Badge color="violet" variant="light" size="lg">
+                  Recommended
+                </Badge>
+              : null}
               {isCurrentSubscribedPlan ?
                 <Badge color="blue" variant="light">
                   Current Plan

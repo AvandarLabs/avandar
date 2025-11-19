@@ -4,6 +4,7 @@ type PlanConfig = {
   featurePlan: "free" | "basic" | "premium";
   featurePlanName: string;
   features: readonly string[];
+  isRecommendedPlan: boolean;
 };
 
 export const FreePlanConfig = {
@@ -16,11 +17,12 @@ export const FreePlanConfig = {
     "Data explorer",
     "Data profile designer",
   ],
+  isRecommendedPlan: false,
 } as const satisfies PlanConfig;
 
 export const BasicPlanConfig: PlanConfig = {
   featurePlan: "basic",
-  featurePlanName: "Avandar Basic",
+  featurePlanName: "Avandar Starter",
   features: [
     "Everything in the free plan",
     "Unlimited team members for your workspace",
@@ -29,11 +31,13 @@ export const BasicPlanConfig: PlanConfig = {
     "Early access to the upcoming Map/GIS product",
     "Early access to upcoming AI features",
   ],
+  isRecommendedPlan: false,
 } as const satisfies PlanConfig;
 
 export const PremiumPlanConfig: PlanConfig = {
   featurePlan: "premium",
-  featurePlanName: "Avandar Premium",
+  featurePlanName: "Avandar Impact",
+  isRecommendedPlan: true,
   features: [
     "Everything in the basic plan",
     "Manage up to 100 data sources, plus 10 data sources per additional team member",
