@@ -1,5 +1,6 @@
 import { infer as zInfer } from "zod";
 import {
+  MAX_FREE_PLAN_SEATS,
   validatePolarSubscription,
   webhookFailureResponse,
   webhookSuccessResponse,
@@ -49,6 +50,8 @@ export async function handleSubscriptionUpdatedEvent(
       // Avandar email, so we should store it separately.
       polar_customer_email: customer.email,
       polar_customer_id: customer.id,
+      max_seats_allowed:
+        featurePlan === "free" ? MAX_FREE_PLAN_SEATS : (data.seats ?? 1),
     })
     .eq("polar_subscription_id", data.id)
     .throwOnError();

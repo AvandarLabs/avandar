@@ -3,8 +3,8 @@ import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseC
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { camelCaseKeysShallow } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
+import { SubscriptionParsers } from "../Subscription/SubscriptionParsers";
 import { UserId } from "../User/User.types";
-import { WorkspaceParsers } from "./parsers";
 import {
   Workspace,
   WorkspaceId,
@@ -12,6 +12,7 @@ import {
   WorkspaceUser,
   WorkspaceWithSubscription,
 } from "./Workspace.types";
+import { WorkspaceParsers } from "./WorkspaceParsers";
 
 export const WorkspaceClient = createSupabaseCRUDClient({
   modelName: "Workspace",
@@ -48,7 +49,12 @@ export const WorkspaceClient = createSupabaseCRUDClient({
           // TODO(jpsyx): clean this up with a proper parser for a Subscription
           return {
             ...workspaceModel,
-            subscription: workspace.subscription ?? undefined,
+            subscription:
+              workspace.subscription ?
+                SubscriptionParsers.fromDBReadToModelRead(
+                  workspace.subscription,
+                )
+              : undefined,
           };
         });
       },

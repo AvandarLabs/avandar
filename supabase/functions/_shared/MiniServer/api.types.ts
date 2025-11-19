@@ -1,4 +1,6 @@
-export type HTTPMethod = "POST" | "GET" | "PUT" | "DELETE";
+import { ValidBody } from "./MiniServer.types.ts";
+
+export type HTTPMethod = "POST" | "GET" | "PUT" | "DELETE" | "PATCH";
 export type UnknownRecord = Record<string, unknown>;
 export type URLPathPattern = `/${string}`;
 export type ValidReturnType = Record<string, unknown> | void | Response;
@@ -32,6 +34,7 @@ type ValidRouteAPI<Path extends URLPathPattern> = {
   returnType: ValidReturnType;
   pathParams?: ValidPathParams<Path>;
   queryParams?: Record<string, unknown>;
+  body?: ValidBody;
 };
 
 export type GenericRouteAPIRecord = {

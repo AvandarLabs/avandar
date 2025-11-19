@@ -2,7 +2,9 @@ import { Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { match } from "ts-pattern";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { isDefined } from "@/lib/utils/guards/guards";
+import { BillingPortalButton } from "./BillingPortalButton";
 import { PlanCard } from "./PlanCard";
+import { useCustomerPortalURL } from "./PlanCard/useCustomerPortalURL";
 import {
   SubscriptionPlan,
   SubscriptionPlanGroup,
@@ -13,6 +15,8 @@ export function BillingView(): JSX.Element {
   const currentWorkspace = useCurrentWorkspace();
   const [subscriptionPlanGroups = [], isLoadingSubscriptionPlans] =
     useSubscriptionPlans();
+  const [customerPortalURL, isLoadingCustomerPortalURL] =
+    useCustomerPortalURL();
 
   const titleBlock = (
     <div>
@@ -76,7 +80,7 @@ export function BillingView(): JSX.Element {
 
   const currentSubscribedPlan = allPlans.find((plan) => {
     return (
-      plan.polarProductId === currentWorkspace.subscription?.polar_product_id
+      plan.polarProductId === currentWorkspace.subscription?.polarProductId
     );
   });
 
@@ -113,6 +117,27 @@ export function BillingView(): JSX.Element {
             .exhaustive();
         })}
       </Group>
+      {!isLoadingCustomerPortalURL && customerPortalURL ?
+        <Stack gap="xs" align="flex-start">
+          <Text c="dimmed">
+            For more control over your subscription, you can manage your
+            subscription in your billing portal.
+          </Text>
+          <BillingPortalButton />
+        </Stack>
+      : null}
+
+      <div>
+        <Title order={3} mb="xs">
+          Payment Methods
+        </Title>
+        <Stack gap="xs" align="flex-start">
+          <Text c="dimmed">
+            Changes to your payment method can be made in your billing portal.
+          </Text>
+          <BillingPortalButton />
+        </Stack>
+      </div>
     </Stack>
   );
 }

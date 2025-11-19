@@ -18,6 +18,11 @@ export type PolarPublicAPI = APITypeDef<
   {
     "/webhook": {
       POST: {
+        body: {
+          type: string;
+          timestamp: string;
+          data: Record<string, unknown>;
+        };
         returnType: WebhookSuccessResponse | WebhookFailureResponse;
       };
     };

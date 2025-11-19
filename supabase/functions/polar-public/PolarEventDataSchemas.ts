@@ -18,12 +18,12 @@ const PolarSubscriptionStatus = zEnum([
  * The metadata is set when we call PolarClient's createCheckoutSession(). The
  * schema is our choice, it is not an official schema from the Polar API docs.
  */
-const PolarSubscriptionMetadataSchema = object({
+export const PolarSubscriptionMetadataSchema = object({
   userId: string(),
   workspaceId: string(),
 });
 
-const PolarProductMetadataSchema = object({
+export const PolarProductMetadataSchema = object({
   featurePlanType: zEnum(["free", "basic", "premium"]),
 });
 

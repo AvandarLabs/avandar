@@ -45,6 +45,9 @@ type AppConfigType = {
   };
 };
 
+export const SUPPORT_EMAIL = "support@avandarlabs.com";
+export const INFO_EMAIL = "info@avandarlabs.com";
+
 export const AppConfig = {
   logoFilename: "logoWhite.png",
   appName: "Avandar",
@@ -53,8 +56,8 @@ export const AppConfig = {
     maxDatasetDescriptionLength: 500,
     maxPreviewRows: 200,
   },
-  supportEmail: "support@avandarlabs.com",
-  infoEmail: "info@avandarlabs.com",
+  supportEmail: SUPPORT_EMAIL,
+  infoEmail: INFO_EMAIL,
   featurePlansMetadata: {
     free: FreePlanConfig,
     basic: BasicPlanConfig,

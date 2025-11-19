@@ -6,6 +6,8 @@ import type {
 } from "./polar-public.types.ts";
 import type { ZodError } from "zod";
 
+export const MAX_FREE_PLAN_SEATS = 2;
+
 /**
  * Validates that a subscription is a real one and not spoofed.
  * Since the polar webhooks are public endpoings, we need to validate that the

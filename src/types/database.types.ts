@@ -461,6 +461,7 @@ export type Database = {
           ends_at: string | null
           feature_plan_type: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
           id: string
+          max_seats_allowed: number
           polar_customer_email: string
           polar_customer_id: string
           polar_product_id: string
@@ -477,6 +478,7 @@ export type Database = {
           ends_at?: string | null
           feature_plan_type: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
           id?: string
+          max_seats_allowed: number
           polar_customer_email: string
           polar_customer_id: string
           polar_product_id: string
@@ -493,6 +495,7 @@ export type Database = {
           ends_at?: string | null
           feature_plan_type?: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
           id?: string
+          max_seats_allowed?: number
           polar_customer_email?: string
           polar_customer_id?: string
           polar_product_id?: string
@@ -971,6 +974,7 @@ export type Database = {
         | "past_due"
         | "canceled"
         | "unpaid"
+      subscriptions__update_status: "pending" | "completed"
       value_extractors__value_picker_rule_type:
         | "most_frequent"
         | "first"
@@ -1181,6 +1185,7 @@ export const Constants = {
         "canceled",
         "unpaid",
       ],
+      subscriptions__update_status: ["pending", "completed"],
       value_extractors__value_picker_rule_type: [
         "most_frequent",
         "first",

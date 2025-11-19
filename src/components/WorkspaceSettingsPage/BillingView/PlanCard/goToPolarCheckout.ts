@@ -10,7 +10,7 @@ export async function goToPolarCheckout({
   workspaceId,
   numSeats,
   checkoutEmail,
-  currentSubscriptionId,
+  currentPolarSubscriptionId,
   currentCustomerId,
 }: {
   polarProductId: string;
@@ -30,10 +30,10 @@ export async function goToPolarCheckout({
   numSeats?: number;
 
   /**
-   * The ID of the current subscription if we are upgrading from a free plan
-   * to a paid plan.
+   * The ID of the current Polar subscription if we are upgrading from a free
+   * plan to a paid plan.
    */
-  currentSubscriptionId: string | undefined;
+  currentPolarSubscriptionId: string | undefined;
 
   /**
    * The ID of the current customer in Polar (if they already exist)
@@ -54,7 +54,7 @@ export async function goToPolarCheckout({
       numSeats,
       userId,
       workspaceId,
-      currentSubscriptionId: currentSubscriptionId ?? undefined,
+      currentPolarSubscriptionId: currentPolarSubscriptionId ?? undefined,
       currentCustomerId: currentCustomerId ?? undefined,
     },
   });

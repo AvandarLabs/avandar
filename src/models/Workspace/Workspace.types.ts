@@ -1,6 +1,6 @@
 import { SetOptional } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
-import { Enums, Tables } from "@/types/database.types";
+import { Subscription } from "@/models/Subscription";
 import { UserId } from "../User/User.types";
 import type { UUID } from "@/lib/types/common";
 
@@ -51,12 +51,6 @@ export type WorkspaceModel = SupabaseModelCRUDTypes<
 export type Workspace<K extends keyof WorkspaceModel = "Read"> =
   WorkspaceModel[K];
 
-type SubscriptionDBRead = Tables<"subscriptions">;
-
-export type WorkspaceWithSubscription = Workspace & {
-  subscription: SubscriptionDBRead | undefined;
-};
-
 export type WorkspaceUser = {
   id: UserId;
   fullName: string;
@@ -67,17 +61,6 @@ export type WorkspaceUser = {
   role: string;
 };
 
-export type FeaturePlanType = Enums<"subscriptions__feature_plan_type">;
-export type SubscriptionId = UUID<"Subscription">;
-export type PolarProductId = UUID<"PolarProduct">;
-export type PolarSubscriptionId = UUID<"PolarSubscription">;
-export type Subscription = {
-  id: PolarSubscriptionId;
-  workspaceId: WorkspaceId;
-  subscriptionOwnerId: UserId;
-  createdAt: Date;
-  updatedAt: Date;
-  polarProductId: PolarProductId;
-  polarSubscriptionId: PolarSubscriptionId;
-  featurePlanType: FeaturePlanType;
+export type WorkspaceWithSubscription = Workspace & {
+  subscription: Subscription | undefined;
 };

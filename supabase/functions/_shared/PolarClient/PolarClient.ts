@@ -1,4 +1,5 @@
 import { Polar } from "npm:@polar-sh/sdk@0.41.3";
+import { CustomerSession } from "npm:@polar-sh/sdk/models/components/customersession.js";
 import { match } from "npm:ts-pattern@5";
 import { getPolarAccessToken } from "./getPolarAccessToken.ts";
 import { getPolarServerType } from "./getPolarServerType.ts";
@@ -18,8 +19,19 @@ export type PolarClient = {
   }) => Promise<Subscription | null>;
 
   /**
-   * Get the Polar products
-   * @returns The subscription plans
+   * Update a subscription's subscribed-to product.
+   *
+   * @param subscriptionId The ID of the subscription to update
+   * @param newProductId The ID of the new product to update the subscription to
+   * @returns The updated subscription
+   */
+  updateSubscriptionProduct: (options: {
+    subscriptionId: string;
+    newProductId: string;
+  }) => Promise<Subscription>;
+
+  /**
+   * Get the Polar products, but with a simplified structure.
    */
   getProducts: () => Promise<AvaPolarProduct[]>;
 
@@ -83,6 +95,33 @@ export type PolarClient = {
      */
     currentCustomerId?: string | undefined;
   }) => Promise<Checkout>;
+
+  /**
+   * Create a customer session for a customer in Polar.
+   * @param customerId The Polar ID of the customer to create a session for
+   * @returns The customer session
+   */
+  createCustomerSessions: (
+    options: {
+      /**
+       * The URL to redirect to after the customer session is created.
+       */
+      returnURL?: string;
+    } & (
+      | {
+          /**
+           * The Polar ID of the customer to create a session for
+           */
+          customerId: string;
+          avandarUserId?: undefined;
+        }
+      | {
+          /** * The ID of the customer in Avandar */
+          avandarUserId: string;
+          customerId?: undefined;
+        }
+    ),
+  ) => Promise<CustomerSession>;
 };
 
 function createPolarClient(): PolarClient {
@@ -95,6 +134,27 @@ function createPolarClient(): PolarClient {
     getSubscription: async (options: { subscriptionId: string }) => {
       const subscription = await polar.subscriptions.get({
         id: options.subscriptionId,
+      });
+      return subscription;
+    },
+
+    updateSubscriptionProduct: async (options: {
+      subscriptionId: string;
+      newProductId: string;
+    }) => {
+      console.log(
+        "[PolarClient] Requesting an update to a Polar subscription",
+        {
+          subscriptionId: options.subscriptionId,
+          newProductId: options.newProductId,
+        },
+      );
+      const subscription = await polar.subscriptions.update({
+        id: options.subscriptionId,
+        subscriptionUpdate: {
+          productId: options.newProductId,
+          prorationBehavior: "prorate",
+        },
       });
       return subscription;
     },
@@ -146,6 +206,8 @@ function createPolarClient(): PolarClient {
                     };
                   })
                   .otherwise(() => {
+                    // we ignore all other price types for now. We do not want
+                    // to show them in the app
                     return undefined;
                   });
               })
@@ -168,7 +230,10 @@ function createPolarClient(): PolarClient {
       currentSubscriptionId,
       currentCustomerId,
     }) => {
-      console.log("Creating a Polar checkout session for product", productId);
+      console.log(
+        "[PolarClient] Requesting a Polar checkout session for product",
+        productId,
+      );
       const checkout = await polar.checkouts.create({
         products: [productId],
         returnUrl: returnURL,
@@ -184,6 +249,22 @@ function createPolarClient(): PolarClient {
         customerId: currentCustomerId ?? undefined,
       });
       return checkout;
+    },
+
+    createCustomerSessions: async (options) => {
+      const { customerId, avandarUserId, returnURL } = options;
+      const customerSessionOptions =
+        customerId ? { customerId, returnUrl: returnURL }
+        : avandarUserId ?
+          { externalCustomerId: avandarUserId, returnUrl: returnURL }
+        : undefined;
+      if (!customerSessionOptions) {
+        throw new Error("No customer session options provided");
+      }
+      const customerSession = await polar.customerSessions.create(
+        customerSessionOptions,
+      );
+      return customerSession;
     },
   };
 }

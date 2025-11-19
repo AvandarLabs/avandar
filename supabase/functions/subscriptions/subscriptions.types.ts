@@ -1,14 +1,29 @@
 import type { APITypeDef } from "../_shared/MiniServer/api.types.ts";
 import type { AvaPolarProduct } from "../_shared/PolarClient/PolarClient.types.ts";
+import type { Tables } from "../../../src/types/database.types.ts";
 
 export type SubscriptionsAPI = APITypeDef<
   "subscriptions",
-  ["/plans", "/checkout-url/:productId"],
+  ["/:subscriptionId/product", "/products", "/checkout-url/:productId"],
   {
-    "/plans": {
+    "/:subscriptionId/product": {
+      PATCH: {
+        pathParams: {
+          subscriptionId: string;
+        };
+        body: {
+          newPolarProductId: string;
+        };
+        returnType: {
+          subscription: Tables<"subscriptions">;
+        };
+      };
+    };
+
+    "/products": {
       GET: {
         returnType: {
-          plans: AvaPolarProduct[];
+          products: AvaPolarProduct[];
         };
       };
     };
@@ -21,13 +36,33 @@ export type SubscriptionsAPI = APITypeDef<
         queryParams: {
           returnURL: string;
           successURL: string;
+
+          /**
+           * The email to use in the checkout. This is editable by the user in
+           * the checkout page, unless we specified a `currentCustomerId`, in
+           * which case the email will be pre-filled with their email info
+           * from Polar and is not editable.
+           */
           checkoutEmail: string;
+
+          /**
+           * The Avandar User ID. This will be stored in Polar as the user's
+           * external customer ID.
+           */
           userId: string;
+
+          /**
+           * The Avandar Workspace ID. This will be stored in Polar in the
+           * subscription's metadata.
+           */
           workspaceId: string;
 
           /**
-           * Number of seats to purchase in the checkout. This is require
+           * Number of seats to purchase in the checkout. This is required
            * if the product being checked out has seat-based pricing.
+           *
+           * The user can edit this in the checkout page, but we still need
+           * to supply an initial number.
            */
           numSeats?: number;
 
@@ -38,13 +73,27 @@ export type SubscriptionsAPI = APITypeDef<
           currentCustomerId?: string | undefined;
 
           /**
-           * The ID of the current subscription if we are upgrading from a free
-           * plan to a paid plan.
+           * The ID of the current Polar subscription if we are upgrading from
+           * a free plan to a paid plan.
            */
-          currentSubscriptionId?: string | undefined;
+          currentPolarSubscriptionId?: string | undefined;
         };
         returnType: {
           checkoutURL: string;
+        };
+      };
+    };
+
+    "/customer-portal/:userId": {
+      GET: {
+        pathParams: {
+          userId: string;
+        };
+        queryParams: {
+          returnURL: string;
+        };
+        returnType: {
+          customerPortalURL: string;
         };
       };
     };

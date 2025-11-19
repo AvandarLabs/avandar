@@ -8,6 +8,7 @@ import {
 import { HTTPMethod } from "../../supabase/functions/_shared/MiniServer/api.types";
 import type {
   API,
+  APIBody,
   APIPathParams,
   APIQueryParams,
   APIReturnType,
@@ -20,7 +21,7 @@ type HTTPRequestOptions<
   {
     method: Method;
     route: Route;
-    body?: unknown;
+    body?: APIBody<Route, Method>;
   } & (APIPathParams<Route, Method> extends Record<string, string | number> ?
     { pathParams: APIPathParams<Route, Method> }
   : { pathParams?: undefined }) &
@@ -116,5 +117,35 @@ export const APIClient = {
       method: "POST",
       body: options.body ?? {},
     } as HTTPRequestOptions<Route, "POST">);
+  },
+
+  patch: async <Route extends keyof API>(
+    options: Omit<HTTPRequestOptions<Route, "PATCH">, "method">,
+  ): Promise<APIReturnType<Route, "PATCH">> => {
+    return await sendHTTPRequest({
+      ...options,
+      method: "PATCH",
+      body: options.body ?? {},
+    } as HTTPRequestOptions<Route, "PATCH">);
+  },
+
+  put: async <Route extends keyof API>(
+    options: Omit<HTTPRequestOptions<Route, "PUT">, "method">,
+  ): Promise<APIReturnType<Route, "PUT">> => {
+    return await sendHTTPRequest({
+      ...options,
+      method: "PUT",
+      body: options.body ?? {},
+    } as HTTPRequestOptions<Route, "PUT">);
+  },
+
+  delete: async <Route extends keyof API>(
+    options: Omit<HTTPRequestOptions<Route, "DELETE">, "method">,
+  ): Promise<APIReturnType<Route, "DELETE">> => {
+    return await sendHTTPRequest({
+      ...options,
+      method: "DELETE",
+      body: options.body ?? {},
+    } as HTTPRequestOptions<Route, "DELETE">);
   },
 };

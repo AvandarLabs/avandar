@@ -15,10 +15,13 @@ create type public.subscriptions__status as enum(
   'unpaid'
 );
 
-/**
- * Table representing existing susbscriptions which associates a subscription
- * to a workspace and a billing manager (the workspace owner).
- */
+create type public.subscriptions__update_status as enum(
+  'pending',
+  'completed'
+);
+
+-- Table representing existing susbscriptions which associates a subscription
+-- to a workspace and a billing manager (the workspace owner).
 create table public.subscriptions (
   -- Primary key
   id uuid primary key default gen_random_uuid(),
@@ -47,8 +50,13 @@ create table public.subscriptions (
   ended_at timestamptz,
   -- The feature plan type of the subscription
   feature_plan_type public.subscriptions__feature_plan_type not null,
-  -- The status of the subscription
-  subscription_status public.subscriptions__status not null
+  -- The status of the subscription on Polar
+  subscription_status public.subscriptions__status not null,
+  -- The number of seats that are allowed in this subscription.
+  -- If on a free plan, this number needs to be explicitly set. If on a paid
+  -- plan, it depends on how many seats they've paid for (which we get from the
+  -- Polar API).
+  max_seats_allowed integer not null
 );
 
 -- Indexes to improve performance

@@ -57,3 +57,10 @@ export type APIPathParams<Route extends keyof API, Method extends HTTPMethod> =
       API[Route][Method]["pathParams"]
     : undefined
   : undefined;
+
+export type APIBody<Route extends keyof API, Method extends HTTPMethod> =
+  Method extends keyof API[Route] ?
+    "body" extends keyof API[Route][Method] ?
+      API[Route][Method]["body"]
+    : undefined
+  : undefined;

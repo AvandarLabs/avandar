@@ -20,7 +20,7 @@ import {
 } from "./SubscriptionPlan.types";
 
 type AvaPolarProduct =
-  SubscriptionsAPI["subscriptions"]["/plans"]["GET"]["returnType"]["plans"][number];
+  SubscriptionsAPI["subscriptions"]["/products"]["GET"]["returnType"]["products"][number];
 
 export const FREE_CHOICES = [
   { value: "custom", label: "Pay what you want" },

@@ -1,5 +1,6 @@
 import { Container, Stack, Title } from "@mantine/core";
 import { WorkspaceUserForm } from "@/components/WorkspaceSettingsPage/WorkspaceUsersForm";
+import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { BasicForm } from "@/lib/ui/BasicForm";
 import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
@@ -8,6 +9,7 @@ import { BillingView } from "./BillingView";
 
 export function WorkspaceSettingsPage(): JSX.Element {
   const workspace = useCurrentWorkspace();
+  const [userProfile] = useCurrentUserProfile();
 
   const [saveWorkspace, isWorkspaceSaving] = WorkspaceClient.useUpdate({
     onSuccess: () => {
@@ -23,6 +25,9 @@ export function WorkspaceSettingsPage(): JSX.Element {
       });
     },
   });
+
+  const isCurrentUserTheWorkspaceOwner =
+    workspace.ownerId === userProfile?.userId;
 
   return (
     <Container py="xxxl" size="xl">
@@ -52,7 +57,9 @@ export function WorkspaceSettingsPage(): JSX.Element {
         />
         <Title order={3}>Workspace Users</Title>
         <WorkspaceUserForm />
-        <BillingView />
+        {isCurrentUserTheWorkspaceOwner ?
+          <BillingView />
+        : null}
       </Stack>
     </Container>
   );
