@@ -19,18 +19,18 @@ export type DatasetColumnRead = Model<
      *  Original data type from the source data (if specified). Otherwise, this
      * will default to the DuckDB data type when we parse the dataset.
      * This value should never be changed, it is an inherent property of the
-     * column. It is intentionally not an enum, because some data sources may come
-     * with metadata about a column's type, which might be any string.
+     * column. It is intentionally not an enum, because some data sources may
+     * come with metadata about a column's type, which might be any string.
      */
     originalDataType: string;
 
     /**
      * The detected data type of the column, as inferred by DuckDB when parsing
-     * the dataset for the first time. This is an enum of valid DuckDB data types.
-     * This should never change after a dataset is parsed. We use this if we ever
-     * need to re-parse a dataset, so we can check that the new dataset's types
-     * are consistent with the original detected data types. This cannot be
-     * manually changed by the user.
+     * the dataset for the first time. This is an enum of valid DuckDB data
+     * types. This should never change after a dataset is parsed. We use this if
+     * we ever need to re-parse a dataset, so we can check that the new
+     * dataset's types are consistent with the original detected data types.
+     * This cannot be manually changed by the user.
      */
     detectedDataType: DuckDBDataType;
 
@@ -38,7 +38,8 @@ export type DatasetColumnRead = Model<
      * Queryable data type of the column. This may differ from the
      * `detected_data_type`, because sometimes a column may need to be
      * cast to a different data type (e.g. numbers to timestamps) to allow
-     * different operations. This value can also be changed manually by the user.
+     * different operations. This value can also be changed manually by the
+     * user.
      */
     dataType: AvaDataType;
 
