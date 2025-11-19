@@ -37,7 +37,7 @@ import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
 import { Link } from "@/lib/ui/links/Link";
 import { Modal } from "@/lib/ui/Modal";
-import { Workspace } from "@/models/Workspace/types";
+import { Workspace } from "@/models/Workspace/Workspace.types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 import { WorkspaceForm } from "../../../components/common/forms/WorkspaceForm";
 import { notifySuccess } from "../notifications/notify";

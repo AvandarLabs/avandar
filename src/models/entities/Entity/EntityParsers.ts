@@ -10,7 +10,7 @@ import {
 } from "@/lib/utils/objects/transformations";
 import { pipe } from "@/lib/utils/pipe";
 import { EntityConfigId } from "@/models/EntityConfig/EntityConfig.types";
-import { WorkspaceId } from "@/models/Workspace/types";
+import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { Entity, EntityId, EntityModel } from "./Entity.types";
 
 const DBReadSchema = object({

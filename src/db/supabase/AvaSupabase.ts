@@ -20,6 +20,21 @@ export const AvaSupabase = {
    * @see {@link https://supabase.com/docs/reference/javascript/start|Supabase JS Docs}
    */
   DB: supabaseDBClient,
+
+  getAPIURL: (): string => {
+    const supabaseAPIURL = import.meta.env.VITE_SUPABASE_API_URL;
+    if (!supabaseAPIURL) {
+      throw new Error(
+        "VITE_SUPABASE_API_URL is not set in the environment variables",
+      );
+    }
+    return supabaseAPIURL;
+  },
+
+  getEdgeFunctionsURL: (): string => {
+    const supabaseAPIURL = AvaSupabase.getAPIURL();
+    return `${supabaseAPIURL}/functions/v1`;
+  },
 };
 
 export type GetSupabaseClientOptions<DB> =

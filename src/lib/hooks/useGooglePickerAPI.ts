@@ -9,7 +9,10 @@ import { useBoolean } from "./state/useBoolean";
 const GOOGLE_API_JS_URL = "https://apis.google.com/js/api.js";
 const scriptSelector = `script[src="${GOOGLE_API_JS_URL}"]`;
 
-export type GoogleToken = APIReturnType<"google-auth/tokens">["tokens"][number];
+export type GoogleToken = APIReturnType<
+  "google-auth/tokens",
+  "GET"
+>["tokens"][number];
 
 function notifyErrorLoadingGoogleAPI() {
   notifyError(

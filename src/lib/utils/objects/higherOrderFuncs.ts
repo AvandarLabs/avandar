@@ -31,8 +31,8 @@ export function prop<
   T extends object,
   K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
   V extends K extends keyof T ? T[K]
-    : K extends Paths<T> ? PathValue<T, K>
-    : never,
+  : K extends Paths<T> ? PathValue<T, K>
+  : never,
 >(path: K): (obj: T) => V {
   return (obj: T) => {
     if (String(path).includes(".")) {
@@ -55,8 +55,8 @@ export function propEq<
   T extends object,
   K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
   V extends K extends keyof T ? T[K]
-    : K extends Paths<T> ? PathValue<T, K>
-    : never,
+  : K extends Paths<T> ? PathValue<T, K>
+  : never,
 >(path: K, value: V): (obj: T) => boolean {
   return (obj: T) => {
     if (String(path).includes(".")) {
@@ -79,8 +79,8 @@ export function propNotEq<
   T extends object,
   K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
   V extends K extends keyof T ? T[K]
-    : K extends Paths<T> ? PathValue<T, K>
-    : never,
+  : K extends Paths<T> ? PathValue<T, K>
+  : never,
 >(path: K, value: V): (obj: T) => boolean {
   return (obj: T) => {
     if (String(path).includes(".")) {
@@ -112,12 +112,9 @@ export function propIsInArray<
   T extends object,
   K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
   V extends K extends keyof T ? T[K]
-    : K extends Paths<T> ? PathValue<T, K>
-    : never,
->(
-  path: K,
-  array: readonly V[],
-): (obj: T) => boolean {
+  : K extends Paths<T> ? PathValue<T, K>
+  : never,
+>(path: K, array: readonly V[]): (obj: T) => boolean {
   return (obj: T) => {
     return array.includes(getValue(obj, path));
   };
@@ -209,9 +206,7 @@ export function excludeNullsInProps<T extends UnknownObject, K extends keyof T>(
 export function excludeNullsExceptInProps<
   T extends UnknownObject,
   K extends StringKeyOf<T>,
->(
-  keysToKeepNull: K | readonly K[],
-): (obj: T) => ExcludeNullsExceptIn<T, K> {
+>(keysToKeepNull: K | readonly K[]): (obj: T) => ExcludeNullsExceptIn<T, K> {
   return (obj: T) => {
     return excludeNullsExceptIn(obj, keysToKeepNull);
   };
@@ -220,15 +215,20 @@ export function excludeNullsExceptInProps<
 /**
  * Returns a function that coerces the specified keys into dates.
  *
+ * `undefined` values are left as is and are not attempted to be coerced into
+ * dates.
+ *
  * @param keys The keys to coerce into dates.
  * @returns A function that coerces the specified keys into dates.
  */
 export function coerceDatesInProps<T extends UnknownObject, K extends keyof T>(
   keys: readonly K[],
 ): (obj: T) => {
-  [Key in keyof T]: Key extends K ? undefined extends T[Key] ? Date | undefined
+  [Key in keyof T]: Key extends K ?
+    undefined extends T[Key] ?
+      Date | undefined
     : Date
-    : T[Key];
+  : T[Key];
 } {
   return (obj: T) => {
     return coerceDatesIn(obj, keys);
@@ -247,10 +247,11 @@ export function convertDatesToISOInProps<
 >(
   keys: readonly K[],
 ): (obj: T) => {
-  [Key in keyof T]: Key extends K
-    ? undefined extends T[Key] ? string | undefined
+  [Key in keyof T]: Key extends K ?
+    undefined extends T[Key] ?
+      string | undefined
     : string
-    : T[Key];
+  : T[Key];
 } {
   return (obj: T) => {
     return convertDatesToISOIn(obj, keys);
@@ -280,8 +281,8 @@ export function setPropValue<
   // to using `keyof T` which works fine for records.
   K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
   V extends K extends keyof T ? T[K]
-    : K extends Paths<T> ? PathValue<T, K>
-    : never,
+  : K extends Paths<T> ? PathValue<T, K>
+  : never,
 >(path: K, value: V): (obj: T) => T {
   return (obj: T) => {
     return setValue(obj, path, value);

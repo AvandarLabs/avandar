@@ -21,11 +21,11 @@ export function makeBucketMap<
   InK extends keyof T | undefined,
   ValueKey extends keyof T | undefined,
   OutK extends undefined extends InK ? unknown
-    : T[Extract<InK, PropertyKey>] = undefined extends InK ? T
-      : T[Extract<InK, PropertyKey>],
+  : T[Extract<InK, PropertyKey>] = undefined extends InK ? T
+  : T[Extract<InK, PropertyKey>],
   OutV extends undefined extends ValueKey ? unknown
-    : T[Extract<ValueKey, PropertyKey>] = undefined extends ValueKey ? T
-      : T[Extract<ValueKey, PropertyKey>],
+  : T[Extract<ValueKey, PropertyKey>] = undefined extends ValueKey ? T
+  : T[Extract<ValueKey, PropertyKey>],
 >(
   list: readonly T[],
   {
@@ -44,8 +44,9 @@ export function makeBucketMap<
   list.forEach((item) => {
     const bucketName = (key ? item[key] : keyFn(item)) as OutK;
     const value: OutV = (
-      valueKey ? item[valueKey] : valueFn(item, bucketName)
-    ) as OutV;
+      valueKey ?
+        item[valueKey]
+      : valueFn(item, bucketName)) as OutV;
     const bucket: OutV[] = buckets.get(bucketName) ?? [];
     bucket.push(value);
     buckets.set(bucketName, bucket);

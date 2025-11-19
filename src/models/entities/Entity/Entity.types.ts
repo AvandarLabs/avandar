@@ -2,7 +2,7 @@ import { SetOptional } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { UUID } from "@/lib/types/common";
 import { EntityConfigId } from "@/models/EntityConfig/EntityConfig.types";
-import { WorkspaceId } from "@/models/Workspace/types";
+import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 
 export type EntityId = UUID<"Entity">;
 

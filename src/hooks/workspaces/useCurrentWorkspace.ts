@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { AppLinks } from "@/config/AppLinks";
 import { Logger } from "@/lib/Logger";
 import { propEq } from "@/lib/utils/objects/higherOrderFuncs";
-import { Workspace } from "@/models/Workspace/types";
+import { WorkspaceWithSubscription } from "@/models/Workspace/Workspace.types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 import { WorkspaceRootRouteAPI } from "@/routes/_auth/$workspaceSlug/route";
 
@@ -12,7 +12,7 @@ import { WorkspaceRootRouteAPI } from "@/routes/_auth/$workspaceSlug/route";
  * within `/_auth/$workspaceSlug/`)
  * @returns The current workspace
  */
-export function useCurrentWorkspace(): Workspace {
+export function useCurrentWorkspace(): WorkspaceWithSubscription {
   const { workspaceSlug } = WorkspaceRootRouteAPI.useParams();
   const workspaceFromRoute = WorkspaceRootRouteAPI.useLoaderData();
   const [userWorkspaces, _, { isFetching, isSuccess }] =

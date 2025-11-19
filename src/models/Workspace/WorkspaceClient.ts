@@ -3,9 +3,16 @@ import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseC
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { camelCaseKeysShallow } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
-import { UserId } from "../User/types";
-import { WorkspaceParsers } from "./parsers";
-import { Workspace, WorkspaceId, WorkspaceRole, WorkspaceUser } from "./types";
+import { SubscriptionParsers } from "../Subscription/SubscriptionParsers";
+import { UserId } from "../User/User.types";
+import {
+  Workspace,
+  WorkspaceId,
+  WorkspaceRole,
+  WorkspaceUser,
+  WorkspaceWithSubscription,
+} from "./Workspace.types";
+import { WorkspaceParsers } from "./WorkspaceParsers";
 
 export const WorkspaceClient = createSupabaseCRUDClient({
   modelName: "Workspace",
@@ -14,7 +21,9 @@ export const WorkspaceClient = createSupabaseCRUDClient({
   parsers: WorkspaceParsers,
   queries: ({ clientLogger, dbClient, parsers }) => {
     return {
-      getWorkspacesOfCurrentUser: async (): Promise<Workspace[]> => {
+      getWorkspacesOfCurrentUser: async (): Promise<
+        WorkspaceWithSubscription[]
+      > => {
         const logger = clientLogger.appendName("getWorkspacesOfCurrentUser");
         logger.log("Calling getWorkspacesOfCurrentUser");
 
@@ -26,15 +35,27 @@ export const WorkspaceClient = createSupabaseCRUDClient({
 
         const { data: memberships } = await dbClient
           .from("workspace_memberships")
-          .select(`workspace:workspaces (*)`)
+          .select(`workspace:workspaces (*, subscription:subscriptions (*))`)
           .eq("user_id", session.user.id)
           .throwOnError();
+
         const workspaces = memberships.map(prop("workspace"));
 
         logger.log("Found user workspaces", workspaces);
 
         return workspaces.map((workspace) => {
-          return parsers.fromDBReadToModelRead(workspace);
+          const workspaceModel = parsers.fromDBReadToModelRead(workspace);
+
+          // TODO(jpsyx): clean this up with a proper parser for a Subscription
+          return {
+            ...workspaceModel,
+            subscription:
+              workspace.subscription ?
+                SubscriptionParsers.fromDBReadToModelRead(
+                  workspace.subscription,
+                )
+              : undefined,
+          };
         });
       },
 

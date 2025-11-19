@@ -2,16 +2,15 @@ import { SetOptional, Simplify } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { DatasetId } from "@/models/datasets/Dataset";
 import { DatasetColumnId } from "@/models/datasets/DatasetColumn";
-import { WorkspaceId } from "@/models/Workspace/types";
+import { WorkspaceId } from "@/models/Workspace/Workspace.types";
+import { Enums } from "@/types/database.types";
 import type { EntityFieldConfigId } from "../../EntityFieldConfig/EntityFieldConfig.types";
 import type { UUID } from "@/lib/types/common";
-import { Enums } from "@/types/database.types";
 
 export type DatasetColumnValueExtractorId = UUID<"DatasetColumnValueExtractor">;
 
-export type ValuePickerRuleType = Enums<
-  "value_extractors__value_picker_rule_type"
->;
+export type ValuePickerRuleType =
+  Enums<"value_extractors__value_picker_rule_type">;
 
 type DatasetColumnValueExtractorRead = {
   /** Unique identifier for this extractor config */
@@ -47,9 +46,8 @@ type DatasetColumnValueExtractorInsert = SetOptional<
   "id" | "createdAt" | "updatedAt"
 >;
 
-type DatasetColumnValueExtractorUpdate = Partial<
-  DatasetColumnValueExtractorRead
->;
+type DatasetColumnValueExtractorUpdate =
+  Partial<DatasetColumnValueExtractorRead>;
 
 /**
  * CRUD type definitions for the DatasetColumnValueExtractor model.

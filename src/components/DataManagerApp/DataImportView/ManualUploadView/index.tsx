@@ -24,8 +24,8 @@ import { snakeCaseKeysShallow } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
 import { Dataset, DatasetId } from "@/models/datasets/Dataset";
 import { DetectedDatasetColumn } from "@/models/datasets/DatasetColumn";
-import { UserId } from "@/models/User/types";
-import { WorkspaceId } from "@/models/Workspace/types";
+import { UserId } from "@/models/User/User.types";
+import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import {
   DatasetUploadForm,
   DatasetUploadFormValues,

@@ -7,6 +7,10 @@ create table public.user_profiles (
   updated_at timestamptz not null default now(),
   -- User this profile belongs to
   user_id uuid not null references auth.users (id) on update cascade on delete cascade,
+  -- Polar subscription id
+  subscription_id uuid,
+  -- The Polar product id that the user is subscribed to
+  polar_product_id uuid,
   -- Workspace this profile belongs to
   workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,
   -- membership this profile belongs to
