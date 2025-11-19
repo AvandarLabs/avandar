@@ -28,6 +28,9 @@ export type Subscription = {
   polarCustomerId: string;
   featurePlanType: FeaturePlanType;
   subscriptionStatus: SubscriptionStatus;
+  maxSeatsAllowed: number;
+  currentPeriodStart: Date | undefined;
+  currentPeriodEnd: Date | undefined;
 };
 
 export type SubscriptionModel = SupabaseModelCRUDTypes<

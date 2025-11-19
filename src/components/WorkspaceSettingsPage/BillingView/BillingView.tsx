@@ -4,7 +4,6 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { isDefined } from "@/lib/utils/guards/guards";
 import { BillingPortalButton } from "./BillingPortalButton";
 import { PlanCard } from "./PlanCard";
-import { useCustomerPortalURL } from "./PlanCard/useCustomerPortalURL";
 import {
   SubscriptionPlan,
   SubscriptionPlanGroup,
@@ -15,8 +14,6 @@ export function BillingView(): JSX.Element {
   const currentWorkspace = useCurrentWorkspace();
   const [subscriptionPlanGroups = [], isLoadingSubscriptionPlans] =
     useSubscriptionPlans();
-  const [customerPortalURL, isLoadingCustomerPortalURL] =
-    useCustomerPortalURL();
 
   const titleBlock = (
     <div>
@@ -84,6 +81,8 @@ export function BillingView(): JSX.Element {
     );
   });
 
+  const hasSubscription = !!currentWorkspace.subscription;
+
   return (
     <Stack gap="lg">
       {titleBlock}
@@ -117,27 +116,30 @@ export function BillingView(): JSX.Element {
             .exhaustive();
         })}
       </Group>
-      {!isLoadingCustomerPortalURL && customerPortalURL ?
-        <Stack gap="xs" align="flex-start">
-          <Text c="dimmed">
-            For more control over your subscription, you can manage your
-            subscription in your billing portal.
-          </Text>
-          <BillingPortalButton />
-        </Stack>
-      : null}
+      {hasSubscription ?
+        <>
+          <Stack gap="xs" align="flex-start">
+            <Text c="dimmed">
+              For more control over your subscription, you can manage your
+              subscription in your billing portal.
+            </Text>
+            <BillingPortalButton />
+          </Stack>
 
-      <div>
-        <Title order={3} mb="xs">
-          Payment Methods
-        </Title>
-        <Stack gap="xs" align="flex-start">
-          <Text c="dimmed">
-            Changes to your payment method can be made in your billing portal.
-          </Text>
-          <BillingPortalButton />
-        </Stack>
-      </div>
+          <div>
+            <Title order={3} mb="xs">
+              Payment Methods
+            </Title>
+            <Stack gap="xs" align="flex-start">
+              <Text c="dimmed">
+                Changes to your payment method can be made in your billing
+                portal.
+              </Text>
+              <BillingPortalButton />
+            </Stack>
+          </div>
+        </>
+      : null}
     </Stack>
   );
 }

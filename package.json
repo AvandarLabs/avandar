@@ -17,7 +17,7 @@
     "db:gen-types": "supabase gen types typescript --local > src/types/database.types.ts",
     "db:new-migration": "bash -c 'supabase stop && PGSSLMODE=disable supabase db diff -f \"$1\"' --",
     "db:down-migration": "./scripts/downMigration.sh",
-    "db:redo-migration": "./scripts/redoLastMigration.sh",
+    "db:redo-migration": "./scripts/redoLastMigration.sh --gen-types",
     "db:reset": "supabase start && ./scripts/resetDatabase.sh",
     "db:seed": "supabase start && yarn vite-script ./scripts/seedDatabaseScript.ts",
     "env:reset": "cp .env.example .env.development && cp .env.example.edge .env.development.edge",

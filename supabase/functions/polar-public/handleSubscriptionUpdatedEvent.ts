@@ -52,6 +52,8 @@ export async function handleSubscriptionUpdatedEvent(
       polar_customer_id: customer.id,
       max_seats_allowed:
         featurePlan === "free" ? MAX_FREE_PLAN_SEATS : (data.seats ?? 1),
+      current_period_start: data.current_period_start,
+      current_period_end: data.current_period_end,
     })
     .eq("polar_subscription_id", data.id)
     .throwOnError();

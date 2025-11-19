@@ -88,7 +88,7 @@ export function useChangePlanModal(): (
       : newPlan.priceType === "custom" ? "Pay What You Want"
       : "Free";
 
-    modals.openConfirmModal({
+    const modalId = modals.openConfirmModal({
       title: (
         <Text size="xl" fw={600} span>
           {isUpgradingPlan ?
@@ -101,16 +101,19 @@ export function useChangePlanModal(): (
         cancel: "Cancel",
       },
       closeOnConfirm: false,
-      confirmProps: {
-        loading: isUpdateSubscriptionPending,
-        disabled: isUpdateSubscriptionPending,
-      },
       size: "xxl",
       children: <ChangePlanModalContents newPlan={newPlan} />,
       onConfirm: () => {
         sendUpdateSubscriptionRequest({
           newPlan,
           currentSubscriptionId,
+        });
+        modals.updateModal({
+          modalId,
+          confirmProps: {
+            loading: true,
+            disabled: true,
+          },
         });
       },
     });

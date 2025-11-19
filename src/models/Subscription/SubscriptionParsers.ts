@@ -40,6 +40,8 @@ const DBReadSchema = z.object({
   ended_at: z.iso.datetime({ offset: true }).nullable(),
   created_at: z.iso.datetime({ offset: true }),
   updated_at: z.iso.datetime({ offset: true }),
+  current_period_start: z.iso.datetime({ offset: true }).nullable(),
+  current_period_end: z.iso.datetime({ offset: true }).nullable(),
 });
 
 export const SubscriptionParsers =

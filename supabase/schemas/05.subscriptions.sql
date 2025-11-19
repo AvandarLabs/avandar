@@ -41,13 +41,17 @@ create table public.subscriptions (
   created_at timestamptz not null default now(),
   -- Timestamp for last update of this row
   updated_at timestamptz not null default now(),
-  -- Timestamp when the subscription started
+  -- Timestamp of when the subscription started
   started_at timestamptz,
-  -- Timestamp when the subscription ends
+  -- Timestamp of when the subscription ends
   ends_at timestamptz,
-  -- Timestamp when the subscription officially ended. This only gets populated
+  -- Timestamp of when the subscription officially ended. This only gets populated
   -- once the `ends_at` timestamp has elapsed.
   ended_at timestamptz,
+  -- Timestamp of when the current period started
+  current_period_start timestamptz,
+  -- Timestamp of when the current period ends
+  current_period_end timestamptz,
   -- The feature plan type of the subscription
   feature_plan_type public.subscriptions__feature_plan_type not null,
   -- The status of the subscription on Polar

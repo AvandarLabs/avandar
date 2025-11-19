@@ -164,12 +164,25 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
       .querySchema({
         returnURL: url(),
       })
-      .action(async ({ pathParams, queryParams }) => {
+      .action(async ({ pathParams, queryParams, supabaseAdminClient }) => {
+        // first check if the user has a subscription
+        const { data: subscriptions } = await supabaseAdminClient
+          .from("subscriptions")
+          .select("id")
+          .eq("subscription_owner_id", pathParams.userId);
+        if (!subscriptions || subscriptions.length === 0) {
+          return { success: false };
+        }
+
+        // They have one, so we can create a customer session for them
         const customerSession = await PolarClient.createCustomerSessions({
           avandarUserId: pathParams.userId,
           returnURL: queryParams.returnURL,
         });
-        return { customerPortalURL: customerSession.customerPortalUrl };
+        return {
+          success: true,
+          customerPortalURL: customerSession.customerPortalUrl,
+        };
       }),
   },
 });

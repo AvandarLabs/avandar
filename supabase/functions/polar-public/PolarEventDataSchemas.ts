@@ -57,6 +57,8 @@ export const PolarEventDataSchemas = {
     started_at: iso.datetime().nullable(),
     ends_at: iso.datetime().nullable(),
     ended_at: iso.datetime().nullable(),
+    current_period_start: iso.datetime().nullable(),
+    current_period_end: iso.datetime().nullable(),
     product: object({
       id: string(),
       name: string(),
@@ -80,6 +82,8 @@ export const PolarEventDataSchemas = {
     started_at: iso.datetime().nullable(),
     ends_at: iso.datetime().nullable(),
     ended_at: iso.datetime().nullable(),
+    current_period_start: iso.datetime().nullable(),
+    current_period_end: iso.datetime().nullable(),
     product: object({
       id: string(),
       name: string(),

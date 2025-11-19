@@ -92,9 +92,14 @@ export type SubscriptionsAPI = APITypeDef<
         queryParams: {
           returnURL: string;
         };
-        returnType: {
-          customerPortalURL: string;
-        };
+        returnType:
+          | {
+              success: false;
+            }
+          | {
+              success: true;
+              customerPortalURL: string;
+            };
       };
     };
   }
