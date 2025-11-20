@@ -1,3 +1,5 @@
+import type { Registry } from "@/lib/types/utilityTypes";
+
 /**
  * Feature flags are used to enable or disable certain features in the app.
  * They are defined in the .env file and are separated by semicolons.
@@ -19,6 +21,15 @@ export enum FeatureFlag {
   DisableSelfRegistration = "disable-self-registration",
 
   /**
+   * Require a sign up code to register. A user's signup code and email
+   * combination must match an email/signup-code combination in the
+   * waitlist_signups table.
+   *
+   * This flag takes precedence over the DisableSelfRegistration flag.
+   */
+  RequireSignUpCode = "require-sign-up-code",
+
+  /**
    * Disable manual entity fields. Users are not allowed to manually change
    * the values of entity fields. This will be removed once the feature is
    * ready.
@@ -35,10 +46,10 @@ export const FeatureFlagConfig = {
   [FeatureFlag.DisableSelfRegistration]: {
     waitlistURL: "https://avandarlabs.com",
   },
+  [FeatureFlag.RequireSignUpCode]: undefined,
   [FeatureFlag.DisableManualData]: undefined,
   [FeatureFlag.DisableUserInvites]: undefined,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-} as const satisfies Record<FeatureFlag, any>;
+} as const satisfies Registry<FeatureFlag>;
 
 export function isFlagEnabled(featureFlag: FeatureFlag): boolean {
   const envFlagsStr = import.meta.env.VITE_FEATURE_FLAGS;

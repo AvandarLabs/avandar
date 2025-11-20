@@ -157,8 +157,11 @@ async function main() {
   const { data, error } = await AvaSupabase.DB.functions.invoke(
     fullFunctionName,
     {
-      body: isBodyEmpty
-        ? parsedMethod === "GET" ? undefined : JSON.stringify({})
+      body:
+        isBodyEmpty ?
+          parsedMethod === "GET" ?
+            undefined
+          : JSON.stringify({})
         : bodyParams,
       method: parsedMethod,
     },

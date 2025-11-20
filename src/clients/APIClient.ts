@@ -5,6 +5,7 @@ import {
   buildHTTPQueryString as _buildHTTPQueryString,
   ValidURLQueryParamValue,
 } from "@/lib/utils/buildHTTPQueryString";
+import { unknownToString } from "@/lib/utils/strings/unknownToString";
 import { HTTPMethod } from "../../supabase/functions/_shared/MiniServer/api.types";
 import type {
   API,
@@ -93,6 +94,19 @@ async function sendHTTPRequest<
   if (data) {
     return data;
   }
+
+  const errorContext = error?.context;
+  if (errorContext instanceof Response) {
+    const errorResponse = await errorContext.json();
+    if (
+      errorResponse &&
+      typeof errorResponse === "object" &&
+      "error" in errorResponse
+    ) {
+      throw new Error(unknownToString(errorResponse.error));
+    }
+  }
+
   throw error ? error : new Error("No data returned");
 }
 

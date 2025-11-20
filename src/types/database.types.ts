@@ -747,6 +747,30 @@ export type Database = {
           },
         ]
       }
+      waitlist_signups: {
+        Row: {
+          code_is_used: boolean
+          created_at: string
+          email: string
+          id: string
+          signup_code: string
+        }
+        Insert: {
+          code_is_used?: boolean
+          created_at?: string
+          email: string
+          id?: string
+          signup_code: string
+        }
+        Update: {
+          code_is_used?: boolean
+          created_at?: string
+          email?: string
+          id?: string
+          signup_code?: string
+        }
+        Relationships: []
+      }
       workspace_memberships: {
         Row: {
           created_at: string
@@ -921,6 +945,10 @@ export type Database = {
       util__get_auth_user_workspaces_by_role: {
         Args: { role: string }
         Returns: string[]
+      }
+      util__get_user_id_by_email: {
+        Args: { p_email: string }
+        Returns: string
       }
       util__get_workspace_members: {
         Args: { workspace_id: string }

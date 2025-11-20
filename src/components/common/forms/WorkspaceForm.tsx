@@ -73,7 +73,7 @@ export function WorkspaceForm({
           displayName: values.displayName,
         });
       }}
-      introText={introText}
+      introContent={introText}
     />
   );
 }
