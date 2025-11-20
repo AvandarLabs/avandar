@@ -34,7 +34,7 @@ export function WorkspaceSettingsPage(): JSX.Element {
       <Stack>
         <Title order={2}>Workspace Settings</Title>
         <BasicForm
-          introText="Update your workspace name. Editing the slug will come later."
+          introContent="Update your workspace name. Editing the slug will come later."
           fields={{
             workspaceName: {
               type: "text",

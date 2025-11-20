@@ -1,8 +1,9 @@
-import { GoogleAuthCallbackAPI } from "../../supabase/functions/google-auth-callback/google-auth-callback.types";
-import { GoogleAuthAPI } from "../../supabase/functions/google-auth/google-auth.types";
-import { GoogleSheetsAPI } from "../../supabase/functions/google-sheets/google-sheets.types";
-import { PolarPublicAPI } from "../../supabase/functions/polar-public/polar-public.types";
-import { SubscriptionsAPI } from "../../supabase/functions/subscriptions/subscriptions.types";
+import type { GoogleAuthCallbackAPI } from "../../supabase/functions/google-auth-callback/google-auth-callback.types";
+import type { GoogleAuthAPI } from "../../supabase/functions/google-auth/google-auth.types";
+import type { GoogleSheetsAPI } from "../../supabase/functions/google-sheets/google-sheets.types";
+import type { PolarPublicAPI } from "../../supabase/functions/polar-public/polar-public.types";
+import type { SubscriptionsAPI } from "../../supabase/functions/subscriptions/subscriptions.types";
+import type { WaitlistAPI } from "../../supabase/functions/waitlist/waitlist.types";
 import type { Simplify } from "type-fest";
 
 export type HTTPMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
@@ -15,7 +16,8 @@ type FullAPI = GoogleAuthAPI &
   GoogleAuthCallbackAPI &
   GoogleSheetsAPI &
   PolarPublicAPI &
-  SubscriptionsAPI;
+  SubscriptionsAPI &
+  WaitlistAPI;
 
 type FlattenedAPI = {
   [FnName in Extract<keyof FullAPI, string>]: {

@@ -271,7 +271,9 @@ export type MiniServerRoutesDef<RoutesAPI extends GenericRouteAPIRecord> = {
             RoutesAPI[RouteName][Method]["queryParams"]
           : undefined,
           Method extends "GET" ? undefined
-          : RoutesAPI[RouteName][Method]["body"],
+          : "body" extends keyof RoutesAPI[RouteName][Method] ?
+            RoutesAPI[RouteName][Method]["body"]
+          : Record<string, never>,
           boolean
         >
       : never;

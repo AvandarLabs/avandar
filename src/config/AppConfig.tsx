@@ -48,6 +48,8 @@ type AppConfigType = {
 export const SUPPORT_EMAIL = "support@avandarlabs.com";
 export const INFO_EMAIL = "info@avandarlabs.com";
 
+// TODO(jpsyx): split up the app config into separate consts and objects to
+// avoid bundling the entire config object into every page of the app.
 export const AppConfig = {
   logoFilename: "logoWhite.png",
   appName: "Avandar",
@@ -64,3 +66,9 @@ export const AppConfig = {
     premium: PremiumPlanConfig,
   },
 } satisfies AppConfigType;
+
+/**
+ * The URL to the waitlist page. This is only used if self-registration is
+ * disabled or if we require a sign up code to register.
+ */
+export const WAITLIST_URL = "https://avandarlabs.com";
