@@ -10,19 +10,23 @@ import {
 } from "./SubscriptionPlan.types";
 import { useSubscriptionPlans } from "./useSubscriptionPlans";
 
-export function BillingView(): JSX.Element {
+type Props = {
+  hideTitle?: boolean;
+};
+
+export function WorkspaceBillingView({ hideTitle }: Props): JSX.Element {
   const currentWorkspace = useCurrentWorkspace();
   const [subscriptionPlanGroups = [], isLoadingSubscriptionPlans] =
     useSubscriptionPlans();
 
   const titleBlock = (
     <div>
-      <Title order={3} mb="xs">
-        Billing
-      </Title>
-      <Text size="sm" c="dimmed">
-        Choose a plan that works best for your workspace.
-      </Text>
+      {!hideTitle ?
+        <Title order={3} mb="xs">
+          Billing
+        </Title>
+      : null}
+      <Text c="dimmed">Choose a plan that works best for your workspace.</Text>
     </div>
   );
 

@@ -1,3 +1,4 @@
+import { APIClient } from "@/clients/APIClient";
 import { AuthClient } from "@/clients/AuthClient";
 import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
@@ -111,6 +112,23 @@ export const WorkspaceClient = createSupabaseCRUDClient({
 
   mutations: ({ clientLogger, dbClient, parsers }) => {
     return {
+      validateWorkspaceSlug: async (options: {
+        workspaceSlug: string;
+      }): Promise<{ isValid: true } | { isValid: false; reason: string }> => {
+        const logger = clientLogger.appendName("validateWorkspaceSlug");
+        logger.log("Checking if workspace slug exists", {
+          workspaceSlug: options.workspaceSlug,
+        });
+        const validationResult = await APIClient.post({
+          route: "workspaces/validate-slug",
+          body: {
+            slug: options.workspaceSlug,
+          },
+        });
+        console.log("validationResult", validationResult);
+        return validationResult;
+      },
+
       createWorkspaceWithOwner: async (params: {
         workspaceName: string;
         workspaceSlug: string;

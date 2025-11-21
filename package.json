@@ -5,7 +5,7 @@
   "version": "0.3.0-dev",
   "type": "module",
   "scripts": {
-    "dev": "yarn fns:update-env && vite",
+    "dev": "./scripts/startAvandar.sh",
     "test": "vitest",
     "build": "tsc -b && vite build",
     "lint": "eslint .",

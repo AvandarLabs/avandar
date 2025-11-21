@@ -2,10 +2,10 @@ import { Container, Stack, Title } from "@mantine/core";
 import { WorkspaceUserForm } from "@/components/WorkspaceSettingsPage/WorkspaceUsersForm";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { BasicForm } from "@/lib/ui/BasicForm";
+import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
 import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
-import { BillingView } from "./BillingView";
+import { WorkspaceBillingView } from "./WorkspaceBillingView";
 
 export function WorkspaceSettingsPage(): JSX.Element {
   const workspace = useCurrentWorkspace();
@@ -33,7 +33,7 @@ export function WorkspaceSettingsPage(): JSX.Element {
     <Container py="xxxl" size="xl">
       <Stack>
         <Title order={2}>Workspace Settings</Title>
-        <BasicForm
+        <AvaForm
           introContent="Update your workspace name. Editing the slug will come later."
           fields={{
             workspaceName: {
@@ -58,7 +58,7 @@ export function WorkspaceSettingsPage(): JSX.Element {
         <Title order={3}>Workspace Users</Title>
         <WorkspaceUserForm />
         {isCurrentUserTheWorkspaceOwner ?
-          <BillingView />
+          <WorkspaceBillingView />
         : null}
       </Stack>
     </Container>

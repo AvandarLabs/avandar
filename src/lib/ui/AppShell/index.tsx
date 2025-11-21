@@ -39,8 +39,7 @@ import { Link } from "@/lib/ui/links/Link";
 import { Modal } from "@/lib/ui/Modal";
 import { Workspace } from "@/models/Workspace/Workspace.types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
-import { WorkspaceForm } from "../../../components/common/forms/WorkspaceForm";
-import { notifySuccess } from "../notifications/notify";
+import { CreateWorkspaceForm } from "../../../components/common/forms/CreateWorkspaceForm";
 import css from "./AppShell.module.css";
 
 const HEADER_DEFAULT_HEIGHT = 60;
@@ -93,17 +92,6 @@ export function AppShell({
   const [opened, open, close] = useBoolean(false);
 
   const navigate = useNavigate();
-  const [createWorkspace, isWorkspaceCreating] =
-    WorkspaceClient.useCreateWorkspaceWithOwner({
-      queryToInvalidate: [WorkspaceClient.getClientName()],
-      onSuccess: (newWorkspace) => {
-        notifySuccess("Workspace created successfully!");
-        close();
-
-        // navigate to the new workspace
-        navigate(AppLinks.workspaceHome(newWorkspace.slug));
-      },
-    });
 
   const [userWorkspaces] = WorkspaceClient.useGetWorkspacesOfCurrentUser({
     useQueryOptions: { staleTime: Infinity },
@@ -329,23 +317,7 @@ export function AppShell({
         </MantineAppShell.Main>
       </MantineAppShell>
       <Modal opened={opened} onClose={close}>
-        <WorkspaceForm
-          isLoading={isWorkspaceCreating}
-          onSubmit={({
-            workspaceName,
-            workspaceIdentifier,
-            fullName,
-            displayName,
-          }) => {
-            createWorkspace({
-              workspaceName,
-              workspaceSlug: workspaceIdentifier,
-              ownerName: fullName,
-              ownerDisplayName: displayName,
-            });
-          }}
-          introText="Create a new workspace. You can always edit it later."
-        />
+        <CreateWorkspaceForm introText="Create a new workspace. You can always edit it later." />
       </Modal>
 
       <Spotlight

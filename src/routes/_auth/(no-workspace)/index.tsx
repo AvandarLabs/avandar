@@ -1,8 +1,7 @@
 import { Container, Paper, Stack, Title } from "@mantine/core";
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import { WorkspaceForm } from "@/components/common/forms/WorkspaceForm";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { CreateWorkspaceForm } from "@/components/common/forms/CreateWorkspaceForm";
 import { AppLinks } from "@/config/AppLinks";
-import { notifySuccess } from "@/lib/ui/notifications/notify";
 import { isNonEmptyArray } from "@/lib/utils/guards/guards";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
@@ -40,43 +39,14 @@ export const Route = createFileRoute("/_auth/(no-workspace)/")({
  * We will always redirect them to their workspace page.
  */
 function CreateFirstWorkspacePage() {
-  const navigate = useNavigate();
-  const [createWorkspace, isWorkspaceCreating] =
-    WorkspaceClient.useCreateWorkspaceWithOwner({
-      queryToInvalidate: [WorkspaceClient.getClientName()],
-      onSuccess: (newWorkspace) => {
-        notifySuccess("Workspace created successfully!");
-
-        // navigate to the new workspace
-        navigate(AppLinks.workspaceHome(newWorkspace.slug));
-      },
-    });
-
   return (
     <Container py="xxxl">
       <Stack>
         <Title ta="center" order={1}>
           Welcome to your first workspace
         </Title>
-
         <Paper withBorder shadow="md" p="lg" mt="lg" radius="md" bg="white">
-          <WorkspaceForm
-            isLoading={isWorkspaceCreating}
-            onSubmit={({
-              workspaceName,
-              workspaceIdentifier,
-              fullName,
-              displayName,
-            }) => {
-              createWorkspace({
-                workspaceName,
-                workspaceSlug: workspaceIdentifier,
-                ownerName: fullName,
-                ownerDisplayName: displayName,
-              });
-            }}
-            introText="It's time to create your first workspace. Don't think for too long—you can always change these later!"
-          />
+          <CreateWorkspaceForm introText="It's time to create your first workspace. Don't think for too long—you can always change these later!" />
         </Paper>
       </Stack>
     </Container>

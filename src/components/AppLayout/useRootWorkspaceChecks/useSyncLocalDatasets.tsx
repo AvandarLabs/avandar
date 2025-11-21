@@ -11,8 +11,8 @@ import { isEmptyArray, isNullish, or } from "@/lib/utils/guards/guards";
 import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { promiseMap } from "@/lib/utils/promises";
 import { UserId } from "@/models/User/User.types";
-import { useCurrentUser } from "../users/useCurrentUser";
-import { useCurrentWorkspace } from "../workspaces/useCurrentWorkspace";
+import { useCurrentUser } from "../../../hooks/users/useCurrentUser";
+import { useCurrentWorkspace } from "../../../hooks/workspaces/useCurrentWorkspace";
 
 /**
  * This hook handles garbage collection of local datasets. Any datasets in
@@ -101,27 +101,32 @@ export function useSyncLocalDatasets(): void {
   });
 
   useEffect(() => {
-    // Do nothing if there are no missing datasets
-    if (or(missingDatasets, isNullish, isEmptyArray)) {
-      modals.closeAll();
-      setModalId(undefined);
-      return;
-    }
-    if (modalId) {
-      modals.updateModal({
-        modalId: modalId,
-        children: <ResyncDatasetsBlock datasets={missingDatasets} />,
-      });
-    } else {
-      setModalId(
-        modals.open({
-          title: "Some datasets are missing data",
-          withCloseButton: false,
-          closeOnClickOutside: false,
-          closeOnEscape: false,
+    // we use queue microtask to ensure that the Mantine ModalsProvider is
+    // ready before opening a modal
+    queueMicrotask(() => {
+      if (or(missingDatasets, isNullish, isEmptyArray)) {
+        if (modalId) {
+          modals.closeAll();
+        }
+        setModalId(undefined);
+        return;
+      }
+      if (modalId) {
+        modals.updateModal({
+          modalId: modalId,
           children: <ResyncDatasetsBlock datasets={missingDatasets} />,
-        }),
-      );
-    }
+        });
+      } else {
+        setModalId(
+          modals.open({
+            title: "Some datasets are missing data",
+            withCloseButton: false,
+            closeOnClickOutside: false,
+            closeOnEscape: false,
+            children: <ResyncDatasetsBlock datasets={missingDatasets} />,
+          }),
+        );
+      }
+    });
   }, [missingDatasets, modalId]);
 }

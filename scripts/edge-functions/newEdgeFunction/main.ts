@@ -117,15 +117,15 @@ async function updateHttpApiTypes(
     "\n" +
     content.slice(insertPosition);
 
-  // Add the type to FullAPI (as the last item before the semicolon)
-  const fullApiRegex = /(type FullAPI = .*?SubscriptionsAPI)(;)/s;
+  // Add the type to FullAPI (at the beginning, right after "type FullAPI = ")
+  const fullApiRegex = /(type FullAPI = )(.*?)(;)/s;
   if (!fullApiRegex.test(content)) {
     throw new Error(
       "Could not find FullAPI type definition in http-api.types.ts",
     );
   }
 
-  content = content.replace(fullApiRegex, `$1 &\n  ${apiTypeName}$2`);
+  content = content.replace(fullApiRegex, `$1${apiTypeName} & $2$3`);
 
   // Format with prettier
   const prettierConfig = await prettier.resolveConfig(httpApiTypesPath);

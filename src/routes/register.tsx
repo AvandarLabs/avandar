@@ -25,7 +25,7 @@ import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { useForm } from "@/lib/hooks/ui/useForm";
-import { BasicForm } from "@/lib/ui/BasicForm";
+import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
 import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 
 export const Route = createFileRoute("/register")({
@@ -230,7 +230,7 @@ function RegisterPage() {
                     </Text>
                   : null}
                   <Divider mb="sm" />
-                  <BasicForm
+                  <AvaForm
                     fields={{
                       email: {
                         type: "text",

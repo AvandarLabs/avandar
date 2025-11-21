@@ -4,6 +4,7 @@ import type { GoogleSheetsAPI } from "../../supabase/functions/google-sheets/goo
 import type { PolarPublicAPI } from "../../supabase/functions/polar-public/polar-public.types";
 import type { SubscriptionsAPI } from "../../supabase/functions/subscriptions/subscriptions.types";
 import type { WaitlistAPI } from "../../supabase/functions/waitlist/waitlist.types";
+import type { WorkspacesAPI } from "../../supabase/functions/workspaces/workspaces.types";
 import type { Simplify } from "type-fest";
 
 export type HTTPMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
@@ -12,7 +13,8 @@ export type HTTPMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
  * Any new APIs that get added to the supabase/functions directory should
  * be added here.
  */
-type FullAPI = GoogleAuthAPI &
+type FullAPI = WorkspacesAPI &
+  GoogleAuthAPI &
   GoogleAuthCallbackAPI &
   GoogleSheetsAPI &
   PolarPublicAPI &

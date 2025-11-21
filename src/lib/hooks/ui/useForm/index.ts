@@ -63,7 +63,7 @@ export type FormRulesRecord<
  * Mantine's `UseFormInput` type with improved type safety for the `validate`
  * option.
  */
-type UseFormInput<
+export type UseFormInput<
   FormValues extends UnknownObject,
   TransformValues = FormValues,
   FormPath extends Paths<FormValues> = Paths<FormValues>,

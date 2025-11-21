@@ -8,3 +8,8 @@ create table public.waitlist_signups (
   signup_code text unique not null,
   code_is_used boolean not null default false
 );
+
+-- Enable row level security
+-- But we intentionally do not add any policies because this should only be
+-- accessed via the Supabase service role.
+alter table public.subscriptions enable row level security;
