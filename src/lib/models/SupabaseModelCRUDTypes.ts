@@ -25,6 +25,7 @@ type DefaultDBPrimaryKey<TableName extends DatabaseTableNames> = {
 export type SupabaseModelCRUDTypes<
   ModelTypes extends DefaultModelTypes,
   DBPrimaryKey extends DefaultDBPrimaryKey<ModelTypes["tableName"]>,
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   ExtraTypes extends object = {},
 > = Merge<
   ModelCRUDTypes,
