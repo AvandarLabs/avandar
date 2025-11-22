@@ -11,3 +11,11 @@
 export function cssVar(name: string): string {
   return `var(--${name})`;
 }
+
+export function mantineColorVar(color: `${string}.${number}` | string): string {
+  if (color.includes(".")) {
+    const [colorName, shade] = color.split(".");
+    return `var(--mantine-color-${colorName}-${shade})`;
+  }
+  return `var(--mantine-color-${color})`;
+}
