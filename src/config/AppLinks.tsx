@@ -43,7 +43,7 @@ export const AppLinks = {
       key: "workspace-home",
       to: "/$workspaceSlug",
       params: { workspaceSlug },
-      label: "Workspace Home",
+      label: "Home",
     };
   },
 
