@@ -27,18 +27,14 @@ const IS_USER_INVITES_DISABLED = isFlagEnabled(FeatureFlag.DisableUserInvites);
 
 export function WorkspaceUserForm(): JSX.Element | null {
   const [isOpened, open, close] = useBoolean(false);
-
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<WorkspaceRole>("member");
-
   const workspaceRole = useWorkspaceRole();
   const workspace = useCurrentWorkspace();
-
   const [workspaceUsers, workspaceUsersLoading] =
     WorkspaceClient.useGetUsersForWorkspace({
       workspaceId: workspace.id,
     });
-
   const [removeMember, isRemovingMember] = WorkspaceClient.useRemoveMember({
     onSuccess: () => {
       return notifySuccess({ title: "User removed" });
