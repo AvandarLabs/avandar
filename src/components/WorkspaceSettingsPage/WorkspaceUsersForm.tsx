@@ -25,7 +25,7 @@ import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
 const IS_USER_INVITES_DISABLED = isFlagEnabled(FeatureFlag.DisableUserInvites);
 
-export function WorkspaceUserForm(): JSX.Element {
+export function WorkspaceUserForm(): JSX.Element | null {
   const [isOpened, open, close] = useBoolean(false);
 
   const [inviteEmail, setInviteEmail] = useState("");
@@ -97,31 +97,66 @@ export function WorkspaceUserForm(): JSX.Element {
     );
   });
 
+  if (IS_USER_INVITES_DISABLED) {
+    return (
+      <Card
+        withBorder
+        p="xl"
+        w="100%"
+        maw="600px"
+        mx="auto"
+        mt="xl"
+        shadow="sm"
+        radius="md"
+      >
+        <Flex direction="column" align="center" justify="center" gap="md">
+          <Flex
+            w="4rem"
+            h="4rem"
+            bg="linear-gradient(135deg, #DEE2FF 0%, #A5D8FF 100%)"
+            align="center"
+            justify="center"
+            mb="md"
+            bdrs="2rem"
+          >
+            <IconPencil size={32} color="#4263EB" />
+          </Flex>
+          <Text size="lg" fw={700} ta="center">
+            Inviting Users is Temporarily Disabled
+          </Text>
+          <Text size="sm" c="dimmed" ta="center" maw={380}>
+            Inviting new users to your team is currently <b>disabled</b>.<br />
+            This feature will be coming <u>very soon</u>.<br />
+            Stay tuned for updates and thank you for your patience!
+          </Text>
+        </Flex>
+      </Card>
+    );
+  }
+
   return (
     <Box w="100%">
       <LoadingOverlay
         visible={workspaceUsersLoading || isRemovingMember}
         zIndex={1000}
       />
-      {IS_USER_INVITES_DISABLED ? null : (
-        <Card withBorder p="lg" w="100%" maw="1000px">
-          <Flex justify="flex-end" align="center" mb="md">
-            <Button onClick={open}>Invite User</Button>
-          </Flex>
-          <Table>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th w="300px">
-                  <Box pr="lg">Name</Box>
-                </Table.Th>
-                <Table.Th w="600px">Role</Table.Th>
-                <Table.Th w="200px">Action</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{allWorkspaceUsers}</Table.Tbody>
-          </Table>
-        </Card>
-      )}
+      <Card withBorder p="lg" w="100%" maw="1000px">
+        <Flex justify="flex-end" align="center" mb="md">
+          <Button onClick={open}>Invite User</Button>
+        </Flex>
+        <Table>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th w="300px">
+                <Box pr="lg">Name</Box>
+              </Table.Th>
+              <Table.Th w="600px">Role</Table.Th>
+              <Table.Th w="200px">Action</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>{allWorkspaceUsers}</Table.Tbody>
+        </Table>
+      </Card>
       <Modal opened={isOpened} onClose={close} title="Add User to Workspace">
         <Stack>
           <Text size="sm" c="dimmed">

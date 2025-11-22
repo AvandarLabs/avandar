@@ -21,9 +21,6 @@ export function WorkspaceBillingView({ hideTitle }: Props): JSX.Element {
 
   const elements = {
     titleBlock: () => {
-      const currentFeaturePlanName =
-        currentSubscribedPlan?.featurePlan.metadata.featurePlanName;
-
       return (
         <div>
           {!hideTitle ?
@@ -34,17 +31,24 @@ export function WorkspaceBillingView({ hideTitle }: Props): JSX.Element {
           <Text c="dimmed">
             Choose a plan that works best for your workspace.
           </Text>
-          {currentFeaturePlanName ?
-            <Text size="md" mt="xs" fw={500}>
-              You are currently on the{" "}
-              <Text span fw={700}>
-                {currentFeaturePlanName}
-              </Text>{" "}
-              plan.
-            </Text>
-          : null}
         </div>
       );
+    },
+    currentPlan: () => {
+      const currentFeaturePlanName =
+        currentSubscribedPlan?.featurePlan.metadata.featurePlanName;
+      if (currentFeaturePlanName) {
+        return (
+          <Text size="md" mt="xs" fw={500}>
+            You are currently on the{" "}
+            <Text span fw={700}>
+              {currentFeaturePlanName}
+            </Text>{" "}
+            plan.
+          </Text>
+        );
+      }
+      return null;
     },
   };
 
@@ -107,7 +111,10 @@ export function WorkspaceBillingView({ hideTitle }: Props): JSX.Element {
 
   return (
     <Stack gap="lg">
-      {elements.titleBlock()}
+      <div>
+        {elements.titleBlock()}
+        {elements.currentPlan()}
+      </div>
       <Group align="stretch" wrap="nowrap" gap="lg">
         {sortedPlanGroups.map((planGroup) => {
           return match(planGroup)
