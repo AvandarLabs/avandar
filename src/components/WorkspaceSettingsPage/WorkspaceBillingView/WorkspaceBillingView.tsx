@@ -19,21 +19,39 @@ export function WorkspaceBillingView({ hideTitle }: Props): JSX.Element {
   const [subscriptionPlanGroups = [], isLoadingSubscriptionPlans] =
     useSubscriptionPlans();
 
-  const titleBlock = (
-    <div>
-      {!hideTitle ?
-        <Title order={3} mb="xs">
-          Billing
-        </Title>
-      : null}
-      <Text c="dimmed">Choose a plan that works best for your workspace.</Text>
-    </div>
-  );
+  const elements = {
+    titleBlock: () => {
+      const currentFeaturePlanName =
+        currentSubscribedPlan?.featurePlan.metadata.featurePlanName;
+
+      return (
+        <div>
+          {!hideTitle ?
+            <Title order={3} mb="xs">
+              Billing
+            </Title>
+          : null}
+          <Text c="dimmed">
+            Choose a plan that works best for your workspace.
+          </Text>
+          {currentFeaturePlanName ?
+            <Text size="md" mt="xs" fw={500}>
+              You are currently on the{" "}
+              <Text span fw={700}>
+                {currentFeaturePlanName}
+              </Text>{" "}
+              plan.
+            </Text>
+          : null}
+        </div>
+      );
+    },
+  };
 
   if (isLoadingSubscriptionPlans) {
     return (
       <Stack gap="lg">
-        {titleBlock}
+        {elements.titleBlock()}
         <Stack>
           <Text>Loading plans...</Text>
           <Loader />
@@ -45,7 +63,7 @@ export function WorkspaceBillingView({ hideTitle }: Props): JSX.Element {
   if (subscriptionPlanGroups.length === 0) {
     return (
       <Stack gap="lg">
-        {titleBlock}
+        {elements.titleBlock()}
         <Text>No plans available.</Text>
       </Stack>
     );
@@ -89,7 +107,7 @@ export function WorkspaceBillingView({ hideTitle }: Props): JSX.Element {
 
   return (
     <Stack gap="lg">
-      {titleBlock}
+      {elements.titleBlock()}
       <Group align="stretch" wrap="nowrap" gap="lg">
         {sortedPlanGroups.map((planGroup) => {
           return match(planGroup)
@@ -120,27 +138,26 @@ export function WorkspaceBillingView({ hideTitle }: Props): JSX.Element {
             .exhaustive();
         })}
       </Group>
-      {hasSubscription ?
+      {hasSubscription && currentSubscribedPlan?.priceType !== "free" ?
         <>
-          <Stack gap="xs" align="flex-start">
+          <Group gap="xxxs" align="center">
             <Text c="dimmed">
               For more control over your subscription, you can manage your
-              subscription in your billing portal.
+              subscription in your
             </Text>
-            <BillingPortalButton />
-          </Stack>
+            <BillingPortalButton>billing portal.</BillingPortalButton>
+          </Group>
 
           <div>
             <Title order={3} mb="xs">
               Payment Methods
             </Title>
-            <Stack gap="xs" align="flex-start">
+            <Group gap="xxxs" align="center">
               <Text c="dimmed">
-                Changes to your payment method can be made in your billing
-                portal.
+                Changes to your payment method can be made in your
               </Text>
-              <BillingPortalButton />
-            </Stack>
+              <BillingPortalButton>billing portal.</BillingPortalButton>
+            </Group>
           </div>
         </>
       : null}

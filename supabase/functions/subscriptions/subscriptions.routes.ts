@@ -226,7 +226,7 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
         // first check if the user has a subscription
         const { data: subscriptions } = await supabaseAdminClient
           .from("subscriptions")
-          .select("id")
+          .select("polar_subscription_id")
           .eq("subscription_owner_id", pathParams.userId);
         if (!subscriptions || subscriptions.length === 0) {
           return { success: false };

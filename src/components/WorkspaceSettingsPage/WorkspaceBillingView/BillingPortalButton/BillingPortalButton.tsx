@@ -1,10 +1,14 @@
-import { Button, ButtonProps } from "@mantine/core";
-import { useState } from "react";
+import { Button, Loader } from "@mantine/core";
+import { ReactNode, useState } from "react";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { goToBillingPortal } from "./goToBillingPortal";
 
-export function BillingPortalButton(props: ButtonProps): JSX.Element {
+type Props = {
+  children: ReactNode;
+};
+
+export function BillingPortalButton({ children }: Props): JSX.Element {
   const [isLoadingCustomerPortalURL, setIsLoadingCustomerPortalURL] =
     useState(false);
   const user = useCurrentUser();
@@ -13,7 +17,9 @@ export function BillingPortalButton(props: ButtonProps): JSX.Element {
   return (
     <Button
       disabled={isLoadingCustomerPortalURL || !userId}
-      loading={isLoadingCustomerPortalURL}
+      variant="subtle"
+      size="compact-md"
+      px="xxs"
       onClick={async () => {
         assertIsDefined(
           userId,
@@ -22,9 +28,11 @@ export function BillingPortalButton(props: ButtonProps): JSX.Element {
         setIsLoadingCustomerPortalURL(true);
         goToBillingPortal({ userId });
       }}
-      {...props}
     >
-      Go to billing portal
+      {children}
+      {isLoadingCustomerPortalURL ?
+        <Loader size="xs" ml="xs" />
+      : null}
     </Button>
   );
 }
