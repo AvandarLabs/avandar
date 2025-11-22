@@ -8,19 +8,25 @@ import {
   ThemeIcon,
   Title,
 } from "@mantine/core";
-import { IconAlertCircle, IconCheck } from "@tabler/icons-react";
+import { IconCheck } from "@tabler/icons-react";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { z } from "zod";
-import { SUPPORT_EMAIL } from "@/config/AppConfig";
+import { APIClient } from "@/clients/APIClient";
+import { AppLinks } from "@/config/AppLinks";
+import { useCurrentUser } from "@/hooks/users/useCurrentUser";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useQuery } from "@/lib/hooks/query/useQuery";
 
 const searchSchema = z.object({
   success: z.boolean().optional(),
+  checkout_id: z.uuid().optional(),
 });
 
 export const Route = createFileRoute("/_auth/$workspaceSlug/checkout")({
   validateSearch: searchSchema,
   beforeLoad: ({ search }) => {
-    if (search.success === undefined) {
+    if (!search.success) {
       throw redirect({ to: "/" });
     }
   },
@@ -28,8 +34,42 @@ export const Route = createFileRoute("/_auth/$workspaceSlug/checkout")({
 });
 
 function CheckoutPage() {
-  const { success } = Route.useSearch();
   const navigate = useNavigate();
+  const { success } = Route.useSearch();
+  const user = useCurrentUser();
+  const workspace = useCurrentWorkspace();
+  const [subscriptions] = useQuery({
+    queryKey: ["subscriptions", "fetch-and-sync", user?.id],
+    queryFn: async () => {
+      if (!user?.id) {
+        return undefined;
+      }
+      const data = await APIClient.get({
+        route: "subscriptions/fetch-and-sync",
+        queryParams: {
+          userId: user.id,
+        },
+      });
+      return data.subscriptions;
+    },
+    enabled: !!user,
+  });
+
+  useEffect(() => {
+    if (subscriptions) {
+      // iterate over the subscriptions and see if any of them correspond
+      // to the current workspace
+      if (
+        subscriptions.some((sub) => {
+          return sub.workspace_id === workspace.id;
+        })
+      ) {
+        // if there's a subscription for the current workspace then we
+        // can redirect to the workspace home
+        navigate(AppLinks.workspaceHome(workspace.slug));
+      }
+    }
+  }, [subscriptions, workspace.id, workspace.slug, navigate]);
 
   const contents =
     success === true ?
@@ -58,50 +98,7 @@ function CheckoutPage() {
           Continue to your workspace
         </Button>
       </>
-    : <>
-        <ThemeIcon size={64} radius="xl" variant="light" color="red">
-          <IconAlertCircle size={32} stroke={2.5} />
-        </ThemeIcon>
-        <Stack gap="xs" align="center">
-          <Title order={2} fw={600}>
-            Checkout Problem
-          </Title>
-          <Text size="lg" c="dimmed" maw={400}>
-            There was a problem with your checkout. Please reach out to{" "}
-            <Text
-              component="a"
-              href={`mailto:${SUPPORT_EMAIL}`}
-              c="blue"
-              fw={500}
-              td="underline"
-            >
-              {SUPPORT_EMAIL}
-            </Text>{" "}
-            for assistance.
-          </Text>
-        </Stack>
-        <Stack gap="xs" w="100%">
-          <Button
-            component="a"
-            href={`mailto:${SUPPORT_EMAIL}`}
-            variant="filled"
-            color="red"
-            size="md"
-            mt="md"
-          >
-            Contact Support
-          </Button>
-          <Button
-            onClick={() => {
-              navigate({ to: "/" });
-            }}
-            variant="subtle"
-            size="md"
-          >
-            Return to Home
-          </Button>
-        </Stack>
-      </>;
+    : null;
 
   // This shouldn't be reached due to beforeLoad redirect
   return (

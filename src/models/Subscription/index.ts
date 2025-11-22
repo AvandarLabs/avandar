@@ -1,7 +1,6 @@
 export type {
   Subscription,
-  SubscriptionId,
   FeaturePlanType,
   PolarProductId,
-  PolarSubscriptionId,
+  SubscriptionId,
 } from "./Subscription.types";

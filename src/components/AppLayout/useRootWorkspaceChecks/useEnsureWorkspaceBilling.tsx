@@ -11,8 +11,6 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 export function useEnsureWorkspaceBilling(): void {
   const workspace = useCurrentWorkspace();
   const { subscription } = workspace;
-  console.log("workspace", workspace);
-
   const matchRoute = useMatchRoute();
 
   // if we're in the checkout route we don't need to show the billing modal
@@ -47,5 +45,5 @@ export function useEnsureWorkspaceBilling(): void {
         });
       }
     });
-  }, [subscription]);
+  }, [subscription, isInCheckoutRoute]);
 }

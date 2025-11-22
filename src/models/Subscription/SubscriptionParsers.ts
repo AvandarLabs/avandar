@@ -18,7 +18,6 @@ import { WorkspaceId } from "../Workspace/Workspace.types";
 import {
   PolarCustomerId,
   PolarProductId,
-  PolarSubscriptionId,
   Subscription,
   SubscriptionId,
   SubscriptionModel,
@@ -26,12 +25,11 @@ import {
 import { Subscriptions } from "./Subscriptions";
 
 const DBReadSchema = z.object({
-  id: z.uuid(),
+  polar_subscription_id: z.uuid(),
   workspace_id: z.uuid(),
   subscription_owner_id: z.uuid(),
   polar_customer_id: z.uuid(),
   polar_customer_email: z.string(),
-  polar_subscription_id: z.uuid(),
   polar_product_id: z.uuid(),
   feature_plan_type: z.enum(Subscriptions.FeaturePlanTypes),
   subscription_status: z.enum(Subscriptions.Statuses),
@@ -64,11 +62,10 @@ export const SubscriptionParsers =
       (obj): Subscription => {
         return {
           ...obj,
-          id: obj.id as SubscriptionId,
           workspaceId: obj.workspaceId as WorkspaceId,
           subscriptionOwnerId: obj.subscriptionOwnerId as UserId,
           polarCustomerId: obj.polarCustomerId as PolarCustomerId,
-          polarSubscriptionId: obj.polarSubscriptionId as PolarSubscriptionId,
+          polarSubscriptionId: obj.polarSubscriptionId as SubscriptionId,
           polarProductId: obj.polarProductId as PolarProductId,
         };
       },

@@ -35,9 +35,32 @@ export type AvaPolarProduct = {
 };
 export type SubscriptionsAPI = APITypeDef<
   "subscriptions",
-  ["/:subscriptionId/product", "/products", "/checkout-url/:productId"],
+  [
+    "/fetch-and-sync",
+    "/:subscriptionId/product",
+    "/products",
+    "/checkout-url/:productId",
+    "/customer-portal/:userId",
+  ],
   {
+    /**
+     * Search for subscriptions by a user's Avandar ID and udpate them in our
+     * Supabase database in case anything has changed in Polar.
+     */
+    "/fetch-and-sync": {
+      GET: {
+        queryParams: {
+          /** The Avandar ID of the user to look up subscriptions for. */
+          userId: string;
+        };
+        returnType: {
+          subscriptions: Array<Tables<"subscriptions">>;
+        };
+      };
+    };
+
     "/:subscriptionId/product": {
+      /** Update a subscription to subscribe to a different product. */
       PATCH: {
         pathParams: {
           subscriptionId: string;
@@ -51,6 +74,7 @@ export type SubscriptionsAPI = APITypeDef<
       };
     };
 
+    /** Get the list of available products (plans) you can subscribe to. */
     "/products": {
       GET: {
         returnType: {
@@ -59,6 +83,7 @@ export type SubscriptionsAPI = APITypeDef<
       };
     };
 
+    /** Create a checkout URL for a single product. */
     "/checkout-url/:productId": {
       GET: {
         pathParams: {
@@ -115,6 +140,10 @@ export type SubscriptionsAPI = APITypeDef<
       };
     };
 
+    /**
+     * Create a customer portal URL for a user so they can manage their
+     * subscriptions in Polar.
+     */
     "/customer-portal/:userId": {
       GET: {
         pathParams: {

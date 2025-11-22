@@ -12,4 +12,4 @@ create table public.waitlist_signups (
 -- Enable row level security
 -- But we intentionally do not add any policies because this should only be
 -- accessed via the Supabase service role.
-alter table public.subscriptions enable row level security;
+alter table public.waitlist_signups enable row level security;

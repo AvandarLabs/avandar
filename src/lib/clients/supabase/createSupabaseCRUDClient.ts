@@ -6,15 +6,12 @@ import {
   DatabaseTableNames,
   GetSupabaseClientOptions,
 } from "@/db/supabase/AvaSupabase";
+import { ModelCRUDParserRegistry } from "@/lib/models/makeParserRegistry";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { Database } from "@/types/database.types";
 import { ILogger } from "../../Logger";
-import { ModelCRUDParserRegistry } from "../../models/makeParserRegistry";
-import { SupabaseModelCRUDTypes } from "../../models/SupabaseModelCRUDTypes";
-import {
-  FilterOperator,
-  FiltersByColumn,
-} from "../../utils/filters/filters";
+import { AnySupabaseModelCRUDTypes } from "../../models/SupabaseModelCRUDTypes";
+import { FilterOperator, FiltersByColumn } from "../../utils/filters/filters";
 import { objectEntries, objectKeys } from "../../utils/objects/misc";
 import {
   createModelCRUDClient,
@@ -29,7 +26,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 const MAXIMUM_PAGE_SIZE = 1000;
 
 export type SupabaseCRUDClient<
-  M extends SupabaseModelCRUDTypes,
+  M extends AnySupabaseModelCRUDTypes,
   ExtendedQueriesClient extends HookableClient,
   ExtendedMutationsClient extends HookableClient,
 > = ModelCRUDClient<M, ExtendedQueriesClient, ExtendedMutationsClient> & {
@@ -51,7 +48,7 @@ type SupabaseFilterableQuery = PostgrestFilterBuilder<
  * Creates a client for a model that maps to a Supabase table.
  */
 export function createSupabaseCRUDClient<
-  M extends SupabaseModelCRUDTypes,
+  M extends AnySupabaseModelCRUDTypes,
   ExtendedQueriesClient extends HookableClient = EmptyObject,
   ExtendedMutationsClient extends HookableClient = EmptyObject,
 >(options: {

@@ -462,7 +462,6 @@ export type Database = {
           ended_at: string | null
           ends_at: string | null
           feature_plan_type: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
-          id: string
           max_seats_allowed: number
           polar_customer_email: string
           polar_customer_id: string
@@ -481,7 +480,6 @@ export type Database = {
           ended_at?: string | null
           ends_at?: string | null
           feature_plan_type: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
-          id?: string
           max_seats_allowed: number
           polar_customer_email: string
           polar_customer_id: string
@@ -500,7 +498,6 @@ export type Database = {
           ended_at?: string | null
           ends_at?: string | null
           feature_plan_type?: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
-          id?: string
           max_seats_allowed?: number
           polar_customer_email?: string
           polar_customer_id?: string
@@ -861,6 +858,12 @@ export type Database = {
           updated_at: string
           workspace_id: string
         }
+        SetofOptions: {
+          from: "*"
+          to: "datasets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       rpc_datasets__add_dataset: {
         Args: {
@@ -882,6 +885,12 @@ export type Database = {
           source_type: Database["public"]["Enums"]["datasets__source_type"]
           updated_at: string
           workspace_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "datasets"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
       rpc_datasets__add_google_sheets_dataset: {
@@ -906,6 +915,12 @@ export type Database = {
           source_type: Database["public"]["Enums"]["datasets__source_type"]
           updated_at: string
           workspace_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "datasets"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
       rpc_workspaces__add_user: {
@@ -933,23 +948,20 @@ export type Database = {
           slug: string
           updated_at: string
         }
+        SetofOptions: {
+          from: "*"
+          to: "workspaces"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
-      util__get_auth_user_owned_workspaces: {
-        Args: Record<PropertyKey, never>
-        Returns: string[]
-      }
-      util__get_auth_user_workspaces: {
-        Args: Record<PropertyKey, never>
-        Returns: string[]
-      }
+      util__get_auth_user_owned_workspaces: { Args: never; Returns: string[] }
+      util__get_auth_user_workspaces: { Args: never; Returns: string[] }
       util__get_auth_user_workspaces_by_role: {
         Args: { role: string }
         Returns: string[]
       }
-      util__get_user_id_by_email: {
-        Args: { p_email: string }
-        Returns: string
-      }
+      util__get_user_id_by_email: { Args: { p_email: string }; Returns: string }
       util__get_workspace_members: {
         Args: { workspace_id: string }
         Returns: string[]

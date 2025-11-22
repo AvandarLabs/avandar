@@ -7,6 +7,7 @@ import {
   PolarSubscriptionMetadataSchema,
 } from "../polar-public/PolarEventDataSchemas.ts";
 import { MAX_FREE_PLAN_SEATS } from "../polar-public/polarWebhookUtils.ts";
+import { FetchAndSyncUserSubscriptions } from "./fetch-and-sync.ts";
 import type {
   AvaPolarProduct,
   SubscriptionsAPI,
@@ -16,6 +17,10 @@ import type {
  * This is the route handler for all billing-related endpoints.
  */
 export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
+  "/fetch-and-sync": {
+    GET: FetchAndSyncUserSubscriptions,
+  },
+
   "/:subscriptionId/product": {
     /**
      * Update a subscription's subscribed-to product.

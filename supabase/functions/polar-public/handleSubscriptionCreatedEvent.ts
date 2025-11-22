@@ -45,11 +45,12 @@ export async function handleSubscriptionCreatedEvent(
   // different code path)
   const existingSubscriptionResponse = await supabaseAdminClient
     .from("subscriptions")
-    .select("id")
+    .select("polar_subscription_id")
     .eq("polar_subscription_id", data.id)
-    .single();
+    .maybeSingle()
+    .throwOnError();
 
-  if (existingSubscriptionResponse.data?.id !== undefined) {
+  if (existingSubscriptionResponse.data?.polar_subscription_id !== undefined) {
     return webhookFailureResponse(
       `[${polarEvent.type}] Subscription with id '${data.id}' already exists. Nothing to do.`,
     );

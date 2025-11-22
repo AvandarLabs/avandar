@@ -1,10 +1,11 @@
 import { APIClient } from "@/clients/APIClient";
-import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
 import { UserId } from "@/models/User/User.types";
 import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 
 export async function goToPolarCheckout({
+  returnURL,
+  successURL,
   polarProductId,
   userId,
   workspaceId,
@@ -16,6 +17,14 @@ export async function goToPolarCheckout({
   polarProductId: string;
   userId: UserId;
   workspaceId: WorkspaceId;
+  returnURL: string;
+
+  /**
+   * The URL to redirect to after the checkout is completed.
+   * If you append the parameter `checkout_id={CHECKOUT_ID}` to the URL then
+   * Polar will fill this in with the checkout ID.
+   */
+  successURL: string;
 
   /**
    * The email that will be stored in Polar as the customer's email. If a user
@@ -41,15 +50,14 @@ export async function goToPolarCheckout({
    */
   currentCustomerId: string | undefined;
 }): Promise<void> {
-  const currentURL = getCurrentURL();
   const { checkoutURL } = await APIClient.get({
     route: "subscriptions/checkout-url/:productId",
     pathParams: {
       productId: polarProductId,
     },
     queryParams: {
-      successURL: currentURL,
-      returnURL: currentURL,
+      successURL,
+      returnURL,
       checkoutEmail,
       numSeats,
       userId,

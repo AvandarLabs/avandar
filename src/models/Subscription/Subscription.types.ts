@@ -5,16 +5,15 @@ import { Enums } from "@/types/database.types";
 import { UserId } from "../User/User.types";
 import { WorkspaceId } from "../Workspace/Workspace.types";
 
-export type SubscriptionId = UUID<"Subscription">;
 export type FeaturePlanType = Enums<"subscriptions__feature_plan_type">;
 export type PolarCustomerId = UUID<"PolarCustomer">;
 export type PolarProductId = UUID<"PolarProduct">;
-export type PolarSubscriptionId = UUID<"PolarSubscription">;
+export type SubscriptionId = UUID<"PolarSubscription">;
 export type SubscriptionStatus = Enums<"subscriptions__status">;
 
 export type Subscription = {
   /** The Avandar subscription ID */
-  id: SubscriptionId;
+  polarSubscriptionId: SubscriptionId;
   workspaceId: WorkspaceId;
   subscriptionOwnerId: UserId;
   createdAt: Date;
@@ -23,7 +22,6 @@ export type Subscription = {
   endedAt: Date | undefined;
   startedAt: Date | undefined;
   polarProductId: PolarProductId;
-  polarSubscriptionId: PolarSubscriptionId;
   polarCustomerEmail: string;
   polarCustomerId: string;
   featurePlanType: FeaturePlanType;
@@ -40,11 +38,20 @@ export type SubscriptionModel = SupabaseModelCRUDTypes<
     modelPrimaryKeyType: SubscriptionId;
     modelTypes: {
       Read: Subscription;
-      Insert: SetOptional<Subscription, "id" | "createdAt" | "updatedAt">;
+      Insert: SetOptional<
+        Subscription,
+        | "createdAt"
+        | "currentPeriodEnd"
+        | "currentPeriodStart"
+        | "endedAt"
+        | "endsAt"
+        | "startedAt"
+        | "updatedAt"
+      >;
       Update: Partial<Subscription>;
     };
   },
   {
-    dbTablePrimaryKey: "id";
+    dbTablePrimaryKey: "polar_subscription_id";
   }
 >;

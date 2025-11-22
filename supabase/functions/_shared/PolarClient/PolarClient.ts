@@ -1,15 +1,18 @@
 import { Polar } from "npm:@polar-sh/sdk@0.41.3";
-import { CustomerSession } from "npm:@polar-sh/sdk/models/components/customersession.js";
+import { CustomerSession } from "npm:@polar-sh/sdk@0.41.3/models/components/customersession.js";
 import { getPolarAccessToken } from "./getPolarAccessToken.ts";
 import { getPolarServerType } from "./getPolarServerType.ts";
-import type { Checkout } from "npm:@polar-sh/sdk/models/components/checkout.js";
-import type { Product } from "npm:@polar-sh/sdk/models/components/product.js";
-import type { Subscription } from "npm:@polar-sh/sdk/models/components/subscription.js";
+import type { Checkout } from "npm:@polar-sh/sdk@0.41.3/models/components/checkout.js";
+import type { Product } from "npm:@polar-sh/sdk@0.41.3/models/components/product.js";
+import type { Subscription } from "npm:@polar-sh/sdk@0.41.3/models/components/subscription.js";
 
 export type PolarClient = {
+  getCheckout: (options: { checkoutId: string }) => Promise<Checkout>;
+
   /**
    * Get a subscription by its ID.
-   * @param subscriptionId The ID of the subscription to get
+   * @param options The options for the search
+   * @param options.subscriptionId The ID of the subscription to get
    * @returns The subscription
    */
   getSubscription: (options: {
@@ -17,10 +20,26 @@ export type PolarClient = {
   }) => Promise<Subscription | null>;
 
   /**
+   * Get all the subscriptions for a customer.
+   * @param options The options for the search
+   * @param options.avandarUserId The ID of the Avandar user to get
+   * subscriptions for.
+   * @param options.productId The ID of the product to get subscriptions for
+   * @returns The subscriptions
+   * @returns
+   */
+  getSubscriptionsByUserId: (options: {
+    avandarUserId: string;
+    productId?: string;
+  }) => Promise<Subscription[]>;
+
+  /**
    * Update a subscription's subscribed-to product.
    *
-   * @param subscriptionId The ID of the subscription to update
-   * @param newProductId The ID of the new product to update the subscription to
+   * @param options The options for the update
+   * @param options.subscriptionId The ID of the subscription to update
+   * @param options.newProductId The ID of the new product to update the
+   * subscription to.
    * @returns The updated subscription
    */
   updateSubscriptionProduct: (options: {
@@ -35,7 +54,20 @@ export type PolarClient = {
 
   /**
    * Create a checkout session for a single Polar product.
-   * @param productId The ID of the product to checkout
+   * @param options The options for the checkout
+   * @param options.avandarMetadata The Avandar-relatedmetadata for the checkout
+   * @param options.avandarMetadata.userId The Avandar User ID
+   * @param options.avandarMetadata.workspaceId The Avandar Workspace ID
+   * @param options.productId The ID of the product to checkout
+   * @param options.returnURL The URL to use in the Back button in Polar's
+   * checkout page.
+   * @param options.successURL The URL to redirect to after the checkout is
+   * completed. If you attach `&checkout_id={CHECKOUT_ID}` to the URL then
+   * Polar will fill this in with the checkout ID.
+   * @param options.numSeats The number of seats to purchase in the checkout.
+   * Only fill this in if the product being checked out has seat-based pricing.
+   * @param options.checkoutEmail The email of the user to auto-fill in the
+   * checkout form
    * @returns The checkout URL
    */
   createCheckoutSession: (options: {
@@ -129,11 +161,38 @@ function createPolarClient(): PolarClient {
   });
 
   return {
+    getCheckout: async (options: { checkoutId: string }) => {
+      console.log("[PolarClient] Requesting a Polar checkout object by ID", {
+        checkoutId: options.checkoutId,
+      });
+      const checkout = await polar.checkouts.get({
+        id: options.checkoutId,
+      });
+      return checkout;
+    },
+
     getSubscription: async (options: { subscriptionId: string }) => {
       const subscription = await polar.subscriptions.get({
         id: options.subscriptionId,
       });
       return subscription;
+    },
+
+    getSubscriptionsByUserId: async (options: {
+      avandarUserId: string;
+      productId?: string;
+    }) => {
+      const subscriptions = await polar.subscriptions.list({
+        externalCustomerId: options.avandarUserId,
+        productId: options.productId,
+        page: 1,
+        limit: 100, // page size
+      });
+      const pages = await Array.fromAsync(subscriptions);
+      const allSubscriptions: Subscription[] = pages.flatMap((page) => {
+        return page.result.items;
+      });
+      return allSubscriptions;
     },
 
     updateSubscriptionProduct: async (options: {

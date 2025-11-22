@@ -23,8 +23,8 @@ create type public.subscriptions__update_status as enum(
 -- Table representing existing susbscriptions which associates a subscription
 -- to a workspace and a billing manager (the workspace owner).
 create table public.subscriptions (
-  -- Primary key
-  id uuid primary key default gen_random_uuid(),
+  -- Primary key: Polar subscription id.
+  polar_subscription_id uuid primary key not null,
   -- Workspace this subscription belongs to
   workspace_id uuid not null unique references public.workspaces (id) on update cascade on delete restrict,
   -- User who is the billing manager for this subscription
@@ -33,8 +33,6 @@ create table public.subscriptions (
   polar_customer_id uuid not null,
   -- The customer email for this subscription in Polar
   polar_customer_email text not null,
-  -- Polar subscription id
-  polar_subscription_id uuid not null,
   -- The Polar product id that the user is subscribed to
   polar_product_id uuid not null,
   -- Timestamp when this row was created

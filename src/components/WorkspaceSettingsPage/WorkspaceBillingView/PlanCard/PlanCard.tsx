@@ -1,8 +1,11 @@
 import { Badge, Button, Card, Group, Stack, Text } from "@mantine/core";
+import { useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { match } from "ts-pattern";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyExpiredSession } from "@/lib/ui/notifications/notifyExpiredSession";
+import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { WorkspaceWithSubscription } from "@/models/Workspace/Workspace.types";
 import { PlanFeatures } from "../PlanFeatures";
 import {
@@ -60,6 +63,8 @@ function getInitialSelectedVariant(
 
 export function PlanCard(props: Props): JSX.Element {
   const { type, planGroup, currentSubscription, currentSubscribedPlan } = props;
+  const router = useRouter();
+  const workspace = useCurrentWorkspace();
   const [userProfile] = useCurrentUserProfile();
   const [selectedVariant, setSelectedVariant] = useState<
     FreePlanVariants | PaidPlanVariants
@@ -89,7 +94,7 @@ export function PlanCard(props: Props): JSX.Element {
   const isRecommended = planGroup.featurePlan.metadata.isRecommendedPlan;
 
   const onSelectPlan = async () => {
-    if (!userProfile) {
+    if (!userProfile || !workspace) {
       notifyExpiredSession();
       return;
     }
@@ -103,11 +108,20 @@ export function PlanCard(props: Props): JSX.Element {
       currentSubscribedPlan === undefined ||
       currentSubscribedPlan.priceType === "free"
     ) {
+      const currentURL = getCurrentURL();
+      const successURL = router.buildLocation({
+        to: "/$workspaceSlug/checkout",
+        params: { workspaceSlug: workspace.slug },
+        search: { success: true },
+      });
+
       setIsLoadingCheckoutPage(true);
       await goToPolarCheckout({
         polarProductId: selectedPlan.polarProductId,
         userId,
         workspaceId,
+        returnURL: currentURL,
+        successURL: `${window.location.origin}${successURL.href}&checkout_id={CHECKOUT_ID}`,
         checkoutEmail: currentSubscription?.polarCustomerEmail ?? email,
         currentPolarSubscriptionId: currentSubscription?.polarSubscriptionId,
         currentCustomerId: currentSubscription?.polarCustomerId,
@@ -122,7 +136,7 @@ export function PlanCard(props: Props): JSX.Element {
     openChangePlanModal({
       newPlan: selectedPlan,
       currentPlan: currentSubscribedPlan,
-      currentSubscriptionId: currentSubscription.id,
+      currentSubscriptionId: currentSubscription.polarSubscriptionId,
     });
   };
 
