@@ -17,5 +17,9 @@ export function mantineColorVar(color: `${string}.${number}` | string): string {
     const [colorName, shade] = color.split(".");
     return `var(--mantine-color-${colorName}-${shade})`;
   }
-  return `var(--mantine-color-${color})`;
+  return `var(--mantine-color-${color}-6)`;
+}
+
+export function mantineVar(name: string): string {
+  return `var(--mantine-${name})`;
 }
