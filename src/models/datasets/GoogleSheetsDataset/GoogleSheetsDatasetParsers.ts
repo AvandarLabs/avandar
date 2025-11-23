@@ -6,7 +6,7 @@ import {
   snakeCaseKeysDeep,
 } from "@/lib/utils/objects/transformations";
 import { pipe } from "@/lib/utils/pipe";
-import { WorkspaceId } from "@/models/Workspace/types";
+import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { DatasetId } from "../Dataset/Dataset.types";
 import {
   GoogleSheetsDatasetId,
@@ -24,22 +24,21 @@ const DBReadSchema = object({
   workspace_id: uuid(),
 });
 
-export const GoogleSheetsDatasetParsers = makeParserRegistry<
-  GoogleSheetsDatasetModel
->().build({
-  modelName: "GoogleSheetsDataset",
-  DBReadSchema,
-  fromDBReadToModelRead: pipe(camelCaseKeysDeep, (obj) => {
-    return {
-      ...obj,
-      id: obj.id as GoogleSheetsDatasetId,
-      datasetId: obj.datasetId as DatasetId,
-      workspaceId: obj.workspaceId as WorkspaceId,
-    };
-  }),
-  fromModelInsertToDBInsert: snakeCaseKeysDeep,
-  fromModelUpdateToDBUpdate: snakeCaseKeysDeep,
-});
+export const GoogleSheetsDatasetParsers =
+  makeParserRegistry<GoogleSheetsDatasetModel>().build({
+    modelName: "GoogleSheetsDataset",
+    DBReadSchema,
+    fromDBReadToModelRead: pipe(camelCaseKeysDeep, (obj) => {
+      return {
+        ...obj,
+        id: obj.id as GoogleSheetsDatasetId,
+        datasetId: obj.datasetId as DatasetId,
+        workspaceId: obj.workspaceId as WorkspaceId,
+      };
+    }),
+    fromModelInsertToDBInsert: snakeCaseKeysDeep,
+    fromModelUpdateToDBUpdate: snakeCaseKeysDeep,
+  });
 
 /**
  * Do not remove these tests!

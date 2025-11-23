@@ -3,6 +3,7 @@ import { Callout } from "@/lib/ui/Callout";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
+import { AvaDataTypes } from "@/models/datasets/AvaDataType";
 import {
   DatasetColumn,
   DetectedDatasetColumn,
@@ -61,6 +62,11 @@ export function DatasetPreviewBlock({
           }}
           itemRenderOptions={{
             includeKeys: ["name", "dataType"],
+            keyRenderOptions: {
+              dataType: {
+                renderValue: AvaDataTypes.toDisplayValue,
+              },
+            },
           }}
         />
       </ScrollArea>

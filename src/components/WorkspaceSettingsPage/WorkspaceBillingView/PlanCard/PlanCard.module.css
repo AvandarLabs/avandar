@@ -1,0 +1,7 @@
+.currentPlanBadge {
+  box-shadow: var(--mantine-shadow-sm);
+}
+
+.currentPlanBadgeTooltip {
+  box-shadow: var(--mantine-shadow-lg);
+}

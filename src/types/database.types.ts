@@ -454,6 +454,71 @@ export type Database = {
           },
         ]
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          ended_at: string | null
+          ends_at: string | null
+          feature_plan_type: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
+          max_seats_allowed: number
+          polar_customer_email: string
+          polar_customer_id: string
+          polar_product_id: string
+          polar_subscription_id: string
+          started_at: string | null
+          subscription_owner_id: string
+          subscription_status: Database["public"]["Enums"]["subscriptions__status"]
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          ended_at?: string | null
+          ends_at?: string | null
+          feature_plan_type: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
+          max_seats_allowed: number
+          polar_customer_email: string
+          polar_customer_id: string
+          polar_product_id: string
+          polar_subscription_id: string
+          started_at?: string | null
+          subscription_owner_id: string
+          subscription_status: Database["public"]["Enums"]["subscriptions__status"]
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          ended_at?: string | null
+          ends_at?: string | null
+          feature_plan_type?: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
+          max_seats_allowed?: number
+          polar_customer_email?: string
+          polar_customer_id?: string
+          polar_product_id?: string
+          polar_subscription_id?: string
+          started_at?: string | null
+          subscription_owner_id?: string
+          subscription_status?: Database["public"]["Enums"]["subscriptions__status"]
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: true
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tokens__google: {
         Row: {
           access_token: string
@@ -500,6 +565,8 @@ export type Database = {
           full_name: string
           id: string
           membership_id: string
+          polar_product_id: string | null
+          subscription_id: string | null
           updated_at: string
           user_id: string
           workspace_id: string
@@ -510,6 +577,8 @@ export type Database = {
           full_name: string
           id?: string
           membership_id: string
+          polar_product_id?: string | null
+          subscription_id?: string | null
           updated_at?: string
           user_id: string
           workspace_id: string
@@ -520,6 +589,8 @@ export type Database = {
           full_name?: string
           id?: string
           membership_id?: string
+          polar_product_id?: string | null
+          subscription_id?: string | null
           updated_at?: string
           user_id?: string
           workspace_id?: string
@@ -673,6 +744,30 @@ export type Database = {
           },
         ]
       }
+      waitlist_signups: {
+        Row: {
+          code_is_used: boolean
+          created_at: string
+          email: string
+          id: string
+          signup_code: string
+        }
+        Insert: {
+          code_is_used?: boolean
+          created_at?: string
+          email: string
+          id?: string
+          signup_code: string
+        }
+        Update: {
+          code_is_used?: boolean
+          created_at?: string
+          email?: string
+          id?: string
+          signup_code?: string
+        }
+        Relationships: []
+      }
       workspace_memberships: {
         Row: {
           created_at: string
@@ -763,6 +858,12 @@ export type Database = {
           updated_at: string
           workspace_id: string
         }
+        SetofOptions: {
+          from: "*"
+          to: "datasets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       rpc_datasets__add_dataset: {
         Args: {
@@ -784,6 +885,12 @@ export type Database = {
           source_type: Database["public"]["Enums"]["datasets__source_type"]
           updated_at: string
           workspace_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "datasets"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
       rpc_datasets__add_google_sheets_dataset: {
@@ -808,6 +915,12 @@ export type Database = {
           source_type: Database["public"]["Enums"]["datasets__source_type"]
           updated_at: string
           workspace_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "datasets"
+          isOneToOne: true
+          isSetofReturn: false
         }
       }
       rpc_workspaces__add_user: {
@@ -835,19 +948,20 @@ export type Database = {
           slug: string
           updated_at: string
         }
+        SetofOptions: {
+          from: "*"
+          to: "workspaces"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
-      util__get_auth_user_owned_workspaces: {
-        Args: Record<PropertyKey, never>
-        Returns: string[]
-      }
-      util__get_auth_user_workspaces: {
-        Args: Record<PropertyKey, never>
-        Returns: string[]
-      }
+      util__get_auth_user_owned_workspaces: { Args: never; Returns: string[] }
+      util__get_auth_user_workspaces: { Args: never; Returns: string[] }
       util__get_auth_user_workspaces_by_role: {
         Args: { role: string }
         Returns: string[]
       }
+      util__get_user_id_by_email: { Args: { p_email: string }; Returns: string }
       util__get_workspace_members: {
         Args: { workspace_id: string }
         Returns: string[]
@@ -897,6 +1011,16 @@ export type Database = {
       entity_field_configs__value_extractor_type:
         | "dataset_column_value"
         | "manual_entry"
+      subscriptions__feature_plan_type: "free" | "basic" | "premium"
+      subscriptions__status:
+        | "incomplete"
+        | "incomplete_expired"
+        | "trialing"
+        | "active"
+        | "past_due"
+        | "canceled"
+        | "unpaid"
+      subscriptions__update_status: "pending" | "completed"
       value_extractors__value_picker_rule_type:
         | "most_frequent"
         | "first"
@@ -1097,6 +1221,17 @@ export const Constants = {
         "dataset_column_value",
         "manual_entry",
       ],
+      subscriptions__feature_plan_type: ["free", "basic", "premium"],
+      subscriptions__status: [
+        "incomplete",
+        "incomplete_expired",
+        "trialing",
+        "active",
+        "past_due",
+        "canceled",
+        "unpaid",
+      ],
+      subscriptions__update_status: ["pending", "completed"],
       value_extractors__value_picker_rule_type: [
         "most_frequent",
         "first",

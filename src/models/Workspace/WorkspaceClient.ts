@@ -1,11 +1,19 @@
+import { APIClient } from "@/clients/APIClient";
 import { AuthClient } from "@/clients/AuthClient";
 import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { camelCaseKeysShallow } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
-import { UserId } from "../User/types";
-import { WorkspaceParsers } from "./parsers";
-import { Workspace, WorkspaceId, WorkspaceRole, WorkspaceUser } from "./types";
+import { SubscriptionParsers } from "../Subscription/SubscriptionParsers";
+import { UserId } from "../User/User.types";
+import {
+  Workspace,
+  WorkspaceId,
+  WorkspaceRole,
+  WorkspaceUser,
+  WorkspaceWithSubscription,
+} from "./Workspace.types";
+import { WorkspaceParsers } from "./WorkspaceParsers";
 
 export const WorkspaceClient = createSupabaseCRUDClient({
   modelName: "Workspace",
@@ -14,7 +22,9 @@ export const WorkspaceClient = createSupabaseCRUDClient({
   parsers: WorkspaceParsers,
   queries: ({ clientLogger, dbClient, parsers }) => {
     return {
-      getWorkspacesOfCurrentUser: async (): Promise<Workspace[]> => {
+      getWorkspacesOfCurrentUser: async (): Promise<
+        WorkspaceWithSubscription[]
+      > => {
         const logger = clientLogger.appendName("getWorkspacesOfCurrentUser");
         logger.log("Calling getWorkspacesOfCurrentUser");
 
@@ -26,15 +36,27 @@ export const WorkspaceClient = createSupabaseCRUDClient({
 
         const { data: memberships } = await dbClient
           .from("workspace_memberships")
-          .select(`workspace:workspaces (*)`)
+          .select(`workspace:workspaces (*, subscription:subscriptions (*))`)
           .eq("user_id", session.user.id)
           .throwOnError();
+
         const workspaces = memberships.map(prop("workspace"));
 
         logger.log("Found user workspaces", workspaces);
 
         return workspaces.map((workspace) => {
-          return parsers.fromDBReadToModelRead(workspace);
+          const workspaceModel = parsers.fromDBReadToModelRead(workspace);
+
+          // TODO(jpsyx): clean this up with a proper parser for a Subscription
+          return {
+            ...workspaceModel,
+            subscription:
+              workspace.subscription ?
+                SubscriptionParsers.fromDBReadToModelRead(
+                  workspace.subscription,
+                )
+              : undefined,
+          };
         });
       },
 
@@ -90,6 +112,23 @@ export const WorkspaceClient = createSupabaseCRUDClient({
 
   mutations: ({ clientLogger, dbClient, parsers }) => {
     return {
+      validateWorkspaceSlug: async (options: {
+        workspaceSlug: string;
+      }): Promise<{ isValid: true } | { isValid: false; reason: string }> => {
+        const logger = clientLogger.appendName("validateWorkspaceSlug");
+        logger.log("Checking if workspace slug exists", {
+          workspaceSlug: options.workspaceSlug,
+        });
+        const validationResult = await APIClient.post({
+          route: "workspaces/validate-slug",
+          body: {
+            slug: options.workspaceSlug,
+          },
+        });
+        console.log("validationResult", validationResult);
+        return validationResult;
+      },
+
       createWorkspaceWithOwner: async (params: {
         workspaceName: string;
         workspaceSlug: string;

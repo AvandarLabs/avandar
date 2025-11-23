@@ -1,0 +1,88 @@
+import {
+  Box,
+  Button,
+  Flex,
+  Group,
+  LoadingOverlay,
+  MantineTheme,
+  Stack,
+} from "@mantine/core";
+import { IconDownload } from "@tabler/icons-react";
+import { DataExplorerStore } from "./DataExplorerStore";
+import { downloadRowsAsCSV } from "./downloadRowsAsCSV";
+import { QueryForm } from "./QueryForm";
+import { useDataQuery } from "./useDataQuery";
+import { VisualizationContainer } from "./VisualizationContainer";
+import { VizSettingsForm } from "./VizSettingsForm";
+
+const QUERY_FORM_WIDTH = 300;
+
+export function DataExplorerApp(): JSX.Element {
+  const [state] = DataExplorerStore.use();
+  const [queryResults, isLoadingResults] = useDataQuery({
+    query: state.query,
+  });
+  const queryResultColumns = queryResults?.columns ?? [];
+  const queryResultData = queryResults?.data ?? [];
+
+  return (
+    <Flex>
+      <Box
+        bg="neutral.0"
+        miw={QUERY_FORM_WIDTH}
+        w={QUERY_FORM_WIDTH}
+        mih="100dvh"
+        px="md"
+        py="md"
+        style={styles.queryFormContainer}
+      >
+        <QueryForm />
+        <VizSettingsForm columns={queryResultColumns} />
+      </Box>
+
+      <Stack flex={1} gap={0}>
+        <Group
+          bg="white"
+          py="xs"
+          w="100%"
+          justify="flex-end"
+          px="md"
+          style={styles.toolbar}
+        >
+          <Button
+            variant="outline"
+            color="neutral"
+            leftSection={<IconDownload size={16} />}
+            size="compact-sm"
+            disabled={isLoadingResults || queryResultData.length === 0}
+            onClick={() => {
+              downloadRowsAsCSV(queryResultData);
+            }}
+          >
+            Export
+          </Button>
+        </Group>
+        <Box flex={1} pos="relative" w="100%" h="100%" bg="white">
+          <LoadingOverlay visible={isLoadingResults} zIndex={99} />
+          <VisualizationContainer
+            columns={queryResultColumns}
+            data={queryResultData}
+          />
+        </Box>
+      </Stack>
+    </Flex>
+  );
+}
+
+const styles = {
+  queryFormContainer: (theme: MantineTheme) => {
+    return {
+      borderRight: `1px solid ${theme.colors.neutral[2]}`,
+    };
+  },
+  toolbar: (theme: MantineTheme) => {
+    return {
+      borderBottom: `1px solid ${theme.colors.neutral[2]}`,
+    };
+  },
+};

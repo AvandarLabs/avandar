@@ -1,16 +1,16 @@
-import { registryKeys } from "@/lib/utils/objects/misc";
+import { registry } from "@/lib/utils/objects/misc";
 import { ValuePickerRuleType } from "./DatasetColumnValueExtractor.types";
 
 export const DatasetColumnValueExtractors = {
-  ValuePickerTypes: registryKeys<ValuePickerRuleType>({
-    most_frequent: true,
-    first: true,
-    sum: true,
-    avg: true,
-    count: true,
-    max: true,
-    min: true,
-  }),
+  ValuePickerTypes: registry<ValuePickerRuleType>().keys(
+    "most_frequent",
+    "first",
+    "sum",
+    "avg",
+    "count",
+    "max",
+    "min",
+  ),
 
   ValuePickerMetadata: {
     most_frequent: {

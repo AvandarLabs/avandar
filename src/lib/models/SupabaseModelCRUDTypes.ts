@@ -1,16 +1,11 @@
-import { ConditionalKeys, Merge } from "type-fest";
+import { Merge } from "type-fest";
+import { DatabaseTableNames } from "@/db/supabase/AvaSupabase";
 import { UnknownObject } from "@/lib/types/common";
-import { Unbrand } from "@/lib/types/utilityTypes";
-import {
-  Database,
-  Tables,
-  TablesInsert,
-  TablesUpdate,
-} from "@/types/database.types";
+import { Database, Tables } from "@/types/database.types";
 import { ModelCRUDTypes } from "./ModelCRUDTypes";
 
 type DefaultModelTypes = {
-  tableName: keyof Database["public"]["Tables"];
+  tableName: DatabaseTableNames;
   modelName: string;
   modelPrimaryKeyType: string | number;
   modelTypes: {
@@ -20,23 +15,16 @@ type DefaultModelTypes = {
   };
 };
 
-type DefaultDBPrimaryKey<CoreTypes extends DefaultModelTypes> = {
-  dbTablePrimaryKey: Extract<
-    ConditionalKeys<
-      Tables<CoreTypes["tableName"]>,
-      Unbrand<CoreTypes["modelPrimaryKeyType"]>
-    >,
-    string
-  >;
+type DefaultDBPrimaryKey<TableName extends DatabaseTableNames> = {
+  dbTablePrimaryKey: keyof Tables<TableName>;
 };
 
 /**
  * A wrapper type to create the Supabase CRUD types for a model.
  */
 export type SupabaseModelCRUDTypes<
-  ModelTypes extends DefaultModelTypes = DefaultModelTypes,
-  DBPrimaryKey extends
-    DefaultDBPrimaryKey<ModelTypes> = DefaultDBPrimaryKey<ModelTypes>,
+  ModelTypes extends DefaultModelTypes,
+  DBPrimaryKey extends DefaultDBPrimaryKey<ModelTypes["tableName"]>,
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   ExtraTypes extends object = {},
 > = Merge<
@@ -61,13 +49,16 @@ export type SupabaseModelCRUDTypes<
      */
     dbTablePrimaryKey: DBPrimaryKey["dbTablePrimaryKey"];
 
-    DBRead: Tables<ModelTypes["tableName"]>;
+    DBRead: Database["public"]["Tables"][ModelTypes["tableName"]]["Row"];
     Read: ModelTypes["modelTypes"]["Read"];
 
-    DBInsert: TablesInsert<ModelTypes["tableName"]>;
+    DBInsert: Database["public"]["Tables"][ModelTypes["tableName"]]["Insert"];
     Insert: ModelTypes["modelTypes"]["Insert"];
 
-    DBUpdate: TablesUpdate<ModelTypes["tableName"]>;
+    DBUpdate: Database["public"]["Tables"][ModelTypes["tableName"]]["Update"];
     Update: ModelTypes["modelTypes"]["Update"];
   } & ExtraTypes
 >;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnySupabaseModelCRUDTypes = SupabaseModelCRUDTypes<any, any>;

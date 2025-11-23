@@ -7,7 +7,7 @@ import {
   snakeCaseKeysDeep,
 } from "@/lib/utils/objects/transformations";
 import { pipe } from "@/lib/utils/pipe";
-import { WorkspaceId } from "@/models/Workspace/types";
+import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { DatasetId } from "../Dataset/Dataset.types";
 import { CSVFileDatasetId, CSVFileDatasetModel } from "./CSVFileDataset.types";
 
@@ -29,8 +29,8 @@ const DBReadSchema = object({
   timestamp_format: string().nullable(),
 });
 
-export const CSVFileDatasetParsers = makeParserRegistry<CSVFileDatasetModel>()
-  .build({
+export const CSVFileDatasetParsers =
+  makeParserRegistry<CSVFileDatasetModel>().build({
     modelName: "CSVFileDataset",
     DBReadSchema,
     fromDBReadToModelRead: pipe(

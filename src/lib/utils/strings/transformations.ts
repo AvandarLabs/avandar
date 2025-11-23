@@ -1,117 +1,104 @@
 import { LiteralUnion } from "type-fest";
-import { formatDate, isValidDateValue } from "../formatters/formatDate";
-import { isDate, isEmptyObject, isPlainObject } from "../guards/guards";
-import { objectEntries } from "../objects/misc";
 
-/**
- * Converts an unknown value to a string.
- * @param value The value to convert.
- * @returns The string representation of the value.
- */
-export function unknownToString(
-  value: unknown,
-  {
-    nullString = "null",
-    undefinedString = "undefined",
-    emptyString = "Empty text",
-    booleanTrue = "true",
-    booleanFalse = "false",
-    arraySeparator = ";",
-    emptyArrayString = "[Empty array]",
-    emptyObjectString = "{Empty object}",
-    objectEntriesSeparator = "\n",
-    asDate = false,
-    dateFormat = "YYYY-MM-DDTHH:mm:ssZ",
-    dateTimeZone = "local",
-  }: {
-    nullString?: string;
-    undefinedString?: string;
-    emptyString?: string;
-    booleanTrue?: string;
-    booleanFalse?: string;
-    arraySeparator?: string;
-    emptyArrayString?: string;
-    emptyObjectString?: string;
-    objectEntriesSeparator?: string;
+export type UnknownToStringOptions = {
+  /**
+   * The string to display for null values.
+   * @default "null"
+   */
+  nullString?: string;
 
-    /**
-     * If true, we test strings and numbers to see if they are valid dates,
-     * before we allow them to be returned as-is. Defaults to false.
-     */
-    asDate?: boolean;
-    dateFormat?: string;
-    dateTimeZone?: LiteralUnion<"UTC" | "local", string>;
-  } = {},
-): string {
-  if (value === null) {
-    return nullString;
-  }
+  /**
+   * The string to display for undefined values.
+   * @default "undefined"
+   */
+  undefinedString?: string;
 
-  if (value === undefined) {
-    return undefinedString;
-  }
+  /**
+   * The string to display for empty strings.
+   * @default "Empty text"
+   */
+  emptyString?: string;
 
-  if (value === "") {
-    return emptyString;
-  }
+  /**
+   * The string to display for boolean true values.
+   * @default "true"
+   */
+  booleanTrue?: string;
 
-  if (typeof value === "boolean") {
-    return value ? booleanTrue : booleanFalse;
-  }
+  /**
+   * The string to display for boolean false values.
+   * @default "false"
+   */
+  booleanFalse?: string;
 
-  if (typeof value === "string" && !asDate) {
-    return value;
-  }
+  /**
+   * The separator to use for array values.
+   * @default ";"
+   */
+  arraySeparator?: string;
 
-  if (typeof value === "number" && !asDate) {
-    return Intl.NumberFormat().format(value);
-  }
+  /**
+   * The string to display for empty arrays.
+   * @default "[]"
+   */
+  emptyArrayString?: string;
 
-  if (isDate(value) || (asDate && isValidDateValue(value))) {
-    return formatDate(value, { format: dateFormat, zone: dateTimeZone });
-  }
+  /**
+   * The string to display for empty objects.
+   * @default "{}"
+   */
+  emptyObjectString?: string;
 
-  if (Array.isArray(value)) {
-    if (value.length === 0) {
-      return emptyArrayString;
-    }
-    return value
-      .map((item) => {
-        return unknownToString(item);
-      })
-      .join(arraySeparator);
-  }
+  /**
+   * The separator to use for object entries. This is ignored if we are using
+   * `prettifyObject` or `jsonifyObject`.
+   * @default "|"
+   */
+  objectEntriesSeparator?: string;
 
-  if (isPlainObject(value)) {
-    if (isEmptyObject(value)) {
-      return emptyObjectString;
-    }
+  /**
+   * If true, the object will be pretty-printed, using indentation for nesting.
+   * This applies to any value whose `typeof` is `'object'` (except 'null'). So,
+   * for example, this applies to arrays (not just plain objects).
+   *
+   * @default false
+   */
+  prettifyObject?: boolean;
 
-    const keyValuePairs = objectEntries(value)
-      .map(([key, v]) => {
-        return `${String(key)}=${unknownToString(v)}`;
-      })
-      .join(objectEntriesSeparator);
+  /**
+   * If true, an object will be converted to a JSON string with JSON.stringify
+   * rather than iterating recursively.
+   *
+   * This applies to any value whose `typeof` is `'object'` (except 'null'). So,
+   * for example, this applies to arrays (not just plain objects).
+   *
+   * If `prettifyObject` is true then `JSON.stringify` will be called with the
+   * arguments `JSON.stringify(value, null, 2)` (i.e. a 2-space indent is used
+   * for pretty-printing).
+   *
+   * @default false
+   */
+  jsonifyObject?: boolean;
 
-    return keyValuePairs;
-  }
+  /**
+   * If true, we test strings and numbers to see if they are valid dates,
+   * before we allow them to be returned as-is. Defaults to false.
+   * @default false
+   */
+  asDate?: boolean;
 
-  if (value instanceof Map) {
-    const objectAsMap: Record<string, unknown> = {};
-    value.forEach((v, k) => {
-      objectAsMap[String(k)] = v;
-    });
-    const keyValuePairs = unknownToString(objectAsMap);
-    return `Map<${keyValuePairs}>`;
-  }
+  /**
+   * The format to use for dates.
+   * @default "YYYY-MM-DDTHH:mm:ssZ" (ISO 8601 format)
+   */
+  dateFormat?: string;
 
-  if (value instanceof Set) {
-    const internalValues = [...value.values()];
-    return `Set<${unknownToString(internalValues)}>`;
-  }
-
-  return String(value);
-}
+  /**
+   * The timezone to use for dates.
+   * @default "local"
+   */
+  dateTimeZone?: LiteralUnion<"UTC" | "local", string>;
+};
 
 /**
  * Converts camelCase to title case.

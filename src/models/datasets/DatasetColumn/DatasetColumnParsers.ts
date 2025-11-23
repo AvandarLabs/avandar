@@ -1,4 +1,5 @@
-import { enum as zodEnum, iso, number, object, string, uuid } from "zod";
+import { iso, number, object, string, uuid, enum as zodEnum } from "zod";
+import { DuckDBDataTypes } from "@/clients/DuckDBClient/DuckDBDataType";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { excludeNullsExceptInProps } from "@/lib/utils/objects/higherOrderFuncs";
@@ -9,16 +10,15 @@ import {
   undefinedsToNullsDeep,
 } from "@/lib/utils/objects/transformations";
 import { pipe } from "@/lib/utils/pipe";
-import { WorkspaceId } from "@/models/Workspace/types";
+import { Models } from "@/models/Model";
+import { WorkspaceId } from "@/models/Workspace/Workspace.types";
+import { AvaDataTypes } from "../AvaDataType";
 import { DatasetId } from "../Dataset/Dataset.types";
 import {
   DatasetColumn,
   DatasetColumnId,
   DatasetColumnModel,
 } from "./DatasetColumn.types";
-import { DuckDBDataTypes } from "@/clients/DuckDBClient/DuckDBDataType";
-import { AvaDataTypes } from "../AvaDataType";
-import { Models } from "@/models/Model";
 
 const DBReadSchema = object({
   created_at: iso.datetime({ offset: true }),
@@ -34,8 +34,8 @@ const DBReadSchema = object({
   column_idx: number(),
 });
 
-export const DatasetColumnParsers = makeParserRegistry<DatasetColumnModel>()
-  .build({
+export const DatasetColumnParsers =
+  makeParserRegistry<DatasetColumnModel>().build({
     modelName: "DatasetColumn",
     DBReadSchema,
     fromDBReadToModelRead: pipe(

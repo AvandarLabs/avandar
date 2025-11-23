@@ -16,9 +16,9 @@ import { DangerousActionButton } from "@/lib/ui/buttons/DangerousActionButton";
 import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 import { Paper } from "@/lib/ui/Paper";
 import { assertIsDefined } from "@/lib/utils/asserts";
-import { where } from "@/lib/utils/filters/filterBuilders";
+import { where } from "@/lib/utils/filters/filters";
 import { Dataset, DatasetId } from "@/models/datasets/Dataset";
-import { UserId } from "@/models/User/types";
+import { UserId } from "@/models/User/User.types";
 
 type Props = {
   dataset: Dataset;

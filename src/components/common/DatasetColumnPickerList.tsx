@@ -19,7 +19,7 @@ import {
   SegmentedControlProps,
 } from "@/lib/ui/inputs/SegmentedControl";
 import { makeSegmentedControlItems } from "@/lib/ui/inputs/SegmentedControl/makeSegmentedControlItems";
-import { where } from "@/lib/utils/filters/filterBuilders";
+import { where } from "@/lib/utils/filters/filters";
 import { isNonEmptyArray } from "@/lib/utils/guards/guards";
 import { makeBucketRecord } from "@/lib/utils/objects/builders";
 import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";

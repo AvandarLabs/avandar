@@ -22,6 +22,7 @@ import { Route as AuthnoWorkspaceInvalidWorkspaceRouteImport } from "./routes/_a
 import { Route as AuthWorkspaceSlugSettingsRouteImport } from "./routes/_auth/$workspaceSlug/settings";
 import { Route as AuthWorkspaceSlugProfileRouteImport } from "./routes/_auth/$workspaceSlug/profile";
 import { Route as AuthWorkspaceSlugDataExplorerRouteImport } from "./routes/_auth/$workspaceSlug/data-explorer";
+import { Route as AuthWorkspaceSlugCheckoutRouteImport } from "./routes/_auth/$workspaceSlug/checkout";
 import { Route as AuthWorkspaceSlugEntityDesignerRouteRouteImport } from "./routes/_auth/$workspaceSlug/entity-designer/route";
 import { Route as AuthWorkspaceSlugDataManagerRouteRouteImport } from "./routes/_auth/$workspaceSlug/data-manager/route";
 import { Route as AuthWorkspaceSlugEntityManagerIndexRouteImport } from "./routes/_auth/$workspaceSlug/entity-manager/index";
@@ -100,6 +101,12 @@ const AuthWorkspaceSlugDataExplorerRoute =
   AuthWorkspaceSlugDataExplorerRouteImport.update({
     id: "/data-explorer",
     path: "/data-explorer",
+    getParentRoute: () => AuthWorkspaceSlugRouteRoute,
+  } as any);
+const AuthWorkspaceSlugCheckoutRoute =
+  AuthWorkspaceSlugCheckoutRouteImport.update({
+    id: "/checkout",
+    path: "/checkout",
     getParentRoute: () => AuthWorkspaceSlugRouteRoute,
   } as any);
 const AuthWorkspaceSlugEntityDesignerRouteRoute =
@@ -186,6 +193,7 @@ export interface FileRoutesByFullPath {
   "/": typeof AuthnoWorkspaceIndexRoute;
   "/$workspaceSlug/data-manager": typeof AuthWorkspaceSlugDataManagerRouteRouteWithChildren;
   "/$workspaceSlug/entity-designer": typeof AuthWorkspaceSlugEntityDesignerRouteRouteWithChildren;
+  "/$workspaceSlug/checkout": typeof AuthWorkspaceSlugCheckoutRoute;
   "/$workspaceSlug/data-explorer": typeof AuthWorkspaceSlugDataExplorerRoute;
   "/$workspaceSlug/profile": typeof AuthWorkspaceSlugProfileRoute;
   "/$workspaceSlug/settings": typeof AuthWorkspaceSlugSettingsRoute;
@@ -207,6 +215,7 @@ export interface FileRoutesByTo {
   "/register": typeof RegisterRoute;
   "/signin": typeof SigninRoute;
   "/update-password": typeof UpdatePasswordRoute;
+  "/$workspaceSlug/checkout": typeof AuthWorkspaceSlugCheckoutRoute;
   "/$workspaceSlug/data-explorer": typeof AuthWorkspaceSlugDataExplorerRoute;
   "/$workspaceSlug/profile": typeof AuthWorkspaceSlugProfileRoute;
   "/$workspaceSlug/settings": typeof AuthWorkspaceSlugSettingsRoute;
@@ -234,6 +243,7 @@ export interface FileRoutesById {
   "/_auth/(no-workspace)": typeof AuthnoWorkspaceRouteRouteWithChildren;
   "/_auth/$workspaceSlug/data-manager": typeof AuthWorkspaceSlugDataManagerRouteRouteWithChildren;
   "/_auth/$workspaceSlug/entity-designer": typeof AuthWorkspaceSlugEntityDesignerRouteRouteWithChildren;
+  "/_auth/$workspaceSlug/checkout": typeof AuthWorkspaceSlugCheckoutRoute;
   "/_auth/$workspaceSlug/data-explorer": typeof AuthWorkspaceSlugDataExplorerRoute;
   "/_auth/$workspaceSlug/profile": typeof AuthWorkspaceSlugProfileRoute;
   "/_auth/$workspaceSlug/settings": typeof AuthWorkspaceSlugSettingsRoute;
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | "/"
     | "/$workspaceSlug/data-manager"
     | "/$workspaceSlug/entity-designer"
+    | "/$workspaceSlug/checkout"
     | "/$workspaceSlug/data-explorer"
     | "/$workspaceSlug/profile"
     | "/$workspaceSlug/settings"
@@ -283,6 +294,7 @@ export interface FileRouteTypes {
     | "/register"
     | "/signin"
     | "/update-password"
+    | "/$workspaceSlug/checkout"
     | "/$workspaceSlug/data-explorer"
     | "/$workspaceSlug/profile"
     | "/$workspaceSlug/settings"
@@ -309,6 +321,7 @@ export interface FileRouteTypes {
     | "/_auth/(no-workspace)"
     | "/_auth/$workspaceSlug/data-manager"
     | "/_auth/$workspaceSlug/entity-designer"
+    | "/_auth/$workspaceSlug/checkout"
     | "/_auth/$workspaceSlug/data-explorer"
     | "/_auth/$workspaceSlug/profile"
     | "/_auth/$workspaceSlug/settings"
@@ -426,6 +439,13 @@ declare module "@tanstack/react-router" {
       path: "/data-explorer";
       fullPath: "/$workspaceSlug/data-explorer";
       preLoaderRoute: typeof AuthWorkspaceSlugDataExplorerRouteImport;
+      parentRoute: typeof AuthWorkspaceSlugRouteRoute;
+    };
+    "/_auth/$workspaceSlug/checkout": {
+      id: "/_auth/$workspaceSlug/checkout";
+      path: "/checkout";
+      fullPath: "/$workspaceSlug/checkout";
+      preLoaderRoute: typeof AuthWorkspaceSlugCheckoutRouteImport;
       parentRoute: typeof AuthWorkspaceSlugRouteRoute;
     };
     "/_auth/$workspaceSlug/entity-designer": {
@@ -578,6 +598,7 @@ const AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRouteWithChildren =
 interface AuthWorkspaceSlugRouteRouteChildren {
   AuthWorkspaceSlugDataManagerRouteRoute: typeof AuthWorkspaceSlugDataManagerRouteRouteWithChildren;
   AuthWorkspaceSlugEntityDesignerRouteRoute: typeof AuthWorkspaceSlugEntityDesignerRouteRouteWithChildren;
+  AuthWorkspaceSlugCheckoutRoute: typeof AuthWorkspaceSlugCheckoutRoute;
   AuthWorkspaceSlugDataExplorerRoute: typeof AuthWorkspaceSlugDataExplorerRoute;
   AuthWorkspaceSlugProfileRoute: typeof AuthWorkspaceSlugProfileRoute;
   AuthWorkspaceSlugSettingsRoute: typeof AuthWorkspaceSlugSettingsRoute;
@@ -592,6 +613,7 @@ const AuthWorkspaceSlugRouteRouteChildren: AuthWorkspaceSlugRouteRouteChildren =
       AuthWorkspaceSlugDataManagerRouteRouteWithChildren,
     AuthWorkspaceSlugEntityDesignerRouteRoute:
       AuthWorkspaceSlugEntityDesignerRouteRouteWithChildren,
+    AuthWorkspaceSlugCheckoutRoute: AuthWorkspaceSlugCheckoutRoute,
     AuthWorkspaceSlugDataExplorerRoute: AuthWorkspaceSlugDataExplorerRoute,
     AuthWorkspaceSlugProfileRoute: AuthWorkspaceSlugProfileRoute,
     AuthWorkspaceSlugSettingsRoute: AuthWorkspaceSlugSettingsRoute,

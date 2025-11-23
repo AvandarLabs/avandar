@@ -1,5 +1,6 @@
 import {
   Burger,
+  Divider,
   Group,
   Loader,
   AppShell as MantineAppShell,
@@ -29,6 +30,7 @@ import { Outlet, useNavigate, useRouter } from "@tanstack/react-router";
 import clsx from "clsx";
 import { ReactNode } from "react";
 import { AuthClient } from "@/clients/AuthClient";
+import { BetaBadge } from "@/components/common/BetaBadge";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLink, AppLinks } from "@/config/AppLinks";
 import { NavbarLink } from "@/config/NavbarLinks";
@@ -37,10 +39,9 @@ import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
 import { Link } from "@/lib/ui/links/Link";
 import { Modal } from "@/lib/ui/Modal";
-import { Workspace } from "@/models/Workspace/types";
+import { Workspace } from "@/models/Workspace/Workspace.types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
-import { WorkspaceForm } from "../../../components/common/forms/WorkspaceForm";
-import { notifySuccess } from "../notifications/notify";
+import { CreateWorkspaceForm } from "../../../components/common/forms/CreateWorkspaceForm";
 import css from "./AppShell.module.css";
 
 const HEADER_DEFAULT_HEIGHT = 60;
@@ -62,6 +63,8 @@ type Props = {
   spotlightActions?: Array<SpotlightActionData | SpotlightActionGroupData>;
   profileLink?: AppLink;
   navbarLinks: readonly NavbarLink[];
+
+  /** Utility links go on the bottom of the navbar */
   utilityLinks?: readonly NavbarLink[];
 
   /**
@@ -93,17 +96,6 @@ export function AppShell({
   const [opened, open, close] = useBoolean(false);
 
   const navigate = useNavigate();
-  const [createWorkspace, isWorkspaceCreating] =
-    WorkspaceClient.useCreateWorkspaceWithOwner({
-      queryToInvalidate: [WorkspaceClient.getClientName()],
-      onSuccess: (newWorkspace) => {
-        notifySuccess("Workspace created successfully!");
-        close();
-
-        // navigate to the new workspace
-        navigate(AppLinks.workspaceHome(newWorkspace.slug));
-      },
-    });
 
   const [userWorkspaces] = WorkspaceClient.useGetWorkspacesOfCurrentUser({
     useQueryOptions: { staleTime: Infinity },
@@ -181,7 +173,7 @@ export function AppShell({
           </MantineAppShell.Header>
         : null}
 
-        <MantineAppShell.Navbar style={$navbarBorder}>
+        <MantineAppShell.Navbar style={styles.navbar}>
           <Group
             className={clsx(css.anchor, "transition-colors")}
             px="md"
@@ -272,8 +264,8 @@ export function AppShell({
               </Menu.Dropdown>
             </Menu>
           </Group>
-          <Stack justify="space-between" h="100%">
-            <Stack gap={0}>
+          <Stack gap="xs" justify="space-between" h="100%">
+            <Stack flex={1} gap={0}>
               {navbarLinks.map(({ link, icon }) => {
                 return (
                   <Link
@@ -299,8 +291,9 @@ export function AppShell({
                 );
               })}
             </Stack>
-
-            <Stack gap={0} pb="md">
+            <BetaBadge style={{ alignSelf: "center" }} />
+            <Divider />
+            <Stack gap={0} pb="md" pos="relative">
               {utilityLinks.map(({ link, icon }) => {
                 return (
                   <Link
@@ -329,23 +322,7 @@ export function AppShell({
         </MantineAppShell.Main>
       </MantineAppShell>
       <Modal opened={opened} onClose={close}>
-        <WorkspaceForm
-          isLoading={isWorkspaceCreating}
-          onSubmit={({
-            workspaceName,
-            workspaceIdentifier,
-            fullName,
-            displayName,
-          }) => {
-            createWorkspace({
-              workspaceName,
-              workspaceSlug: workspaceIdentifier,
-              ownerName: fullName,
-              ownerDisplayName: displayName,
-            });
-          }}
-          introText="Create a new workspace. You can always edit it later."
-        />
+        <CreateWorkspaceForm introText="Create a new workspace. You can always edit it later." />
       </Modal>
 
       <Spotlight
@@ -361,8 +338,10 @@ export function AppShell({
   );
 }
 
-const $navbarBorder = (theme: MantineTheme) => {
-  return {
-    borderRight: `1px solid ${theme.colors.neutral[7]}`,
-  };
+const styles = {
+  navbar: (theme: MantineTheme) => {
+    return {
+      borderRight: `1px solid ${theme.colors.neutral[7]}`,
+    };
+  },
 };

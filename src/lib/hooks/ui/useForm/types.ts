@@ -1,5 +1,5 @@
 import { UseFormReturnType as MantineUseFormReturnType } from "@mantine/form";
-import { Merge, Paths } from "type-fest";
+import { Paths, Simplify } from "type-fest";
 import { UnknownObject } from "@/lib/types/common";
 import { PathValue } from "@/lib/utils/objects/getValue";
 import {
@@ -31,17 +31,21 @@ export type FormType<
   FormValues extends UnknownObject,
   TransformedValues = FormValues,
   FormPath extends Paths<FormValues> = Paths<FormValues>,
-> = Merge<
+> = Simplify<
   Omit<
     MantineUseFormReturnType<
       FormValues,
       (values: FormValues) => TransformedValues
     >,
-    // remove `values` so that we don't mistakenly use it. We should always
-    // use `getValues` instead.
-    "values"
-  >,
-  {
+    | "values"
+    | "key"
+    | "setFieldValue"
+    | "getInputProps"
+    | "watch"
+    | "watch"
+    | "insertListItem"
+    | "removeListItem"
+  > & {
     // Improve type-safety for `key`
     key: (path: FormPath) => string;
 

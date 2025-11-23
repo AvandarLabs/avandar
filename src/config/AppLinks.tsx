@@ -43,7 +43,7 @@ export const AppLinks = {
       key: "workspace-home",
       to: "/$workspaceSlug",
       params: { workspaceSlug },
-      label: "Workspace Home",
+      label: "Home",
     };
   },
 
@@ -63,7 +63,7 @@ export const AppLinks = {
       key: "data-manager",
       to: "/$workspaceSlug/data-manager",
       params: { workspaceSlug },
-      label: "Datasets",
+      label: "Data Sources",
     };
   },
   dataManagerDatasetView: ({

@@ -1,0 +1,13 @@
+import { defineRoutes, GET } from "../_shared/MiniServer/MiniServer.ts";
+import type { $FUNCTION_NAME_PASCAL_CASE$API } from "./$FUNCTION_NAME$.types.ts";
+
+/**
+ * This is the route handler for all $FUNCTION_NAME$ endpoints.
+ */
+export const Routes = defineRoutes<$FUNCTION_NAME_PASCAL_CASE$API>("$FUNCTION_NAME$", {
+  "/": {
+    GET: GET("/").action(() => {
+      return { success: true };
+    }),
+  },
+});

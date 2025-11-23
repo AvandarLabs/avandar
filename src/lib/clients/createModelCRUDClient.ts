@@ -3,7 +3,7 @@ import { ILogger } from "../Logger";
 import { ModelCRUDParserRegistry } from "../models/makeParserRegistry";
 import { ModelCRUDTypes } from "../models/ModelCRUDTypes";
 import { AnyFunctionWithSignature } from "../types/utilityTypes";
-import { FiltersByColumn } from "../utils/filters/filtersByColumn";
+import { FiltersByColumn } from "../utils/filters/filters";
 import { objectKeys, omit } from "../utils/objects/misc";
 import { BaseClient, createBaseClient } from "./BaseClient";
 import { WithLogger, withLogger } from "./withLogger";

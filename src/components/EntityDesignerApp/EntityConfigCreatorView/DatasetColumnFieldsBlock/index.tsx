@@ -21,7 +21,7 @@ import { useMap } from "@/lib/hooks/state/useMap";
 import { Callout } from "@/lib/ui/Callout";
 import { SegmentedControl } from "@/lib/ui/inputs/SegmentedControl";
 import { makeSegmentedControlItems } from "@/lib/ui/inputs/SegmentedControl/makeSegmentedControlItems";
-import { removeItemWhere } from "@/lib/utils/arrays/misc";
+import { removeItemWhere } from "@/lib/utils/arrays/removeItemWhere";
 import { identity } from "@/lib/utils/misc";
 import { makeObject } from "@/lib/utils/objects/builders";
 import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";

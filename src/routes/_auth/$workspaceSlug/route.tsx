@@ -2,12 +2,12 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { AppLayout } from "@/components/AppLayout";
 import { AppLinks } from "@/config/AppLinks";
 import { propEq } from "@/lib/utils/objects/higherOrderFuncs";
-import { Workspace } from "@/models/Workspace/types";
+import { WorkspaceWithSubscription } from "@/models/Workspace/Workspace.types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug")({
   component: WorkspaceRootLayout,
-  loader: async ({ params, context }): Promise<Workspace> => {
+  loader: async ({ params, context }): Promise<WorkspaceWithSubscription> => {
     const { queryClient } = context;
     const { workspaceSlug } = params;
     const workspaces = await WorkspaceClient.withCache(queryClient)

@@ -1,7 +1,7 @@
-import { z } from "zod";
+import { iso, object, string, uuid } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
-import { createBaseClient } from "@/lib/clients/BaseClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
+import { createBaseClient } from "@/lib/clients/BaseClient";
 import { WithLogger, withLogger } from "@/lib/clients/withLogger";
 import {
   WithQueryHooks,
@@ -14,11 +14,11 @@ import {
 import { ILogger } from "@/lib/Logger";
 import { omit } from "@/lib/utils/objects/misc";
 import { camelCaseKeysShallow } from "@/lib/utils/objects/transformations";
-import { uuid } from "@/lib/utils/uuid";
 import { Database, Tables } from "@/types/database.types";
-import { WorkspaceId } from "../Workspace/types";
-import { MembershipId, UserId, UserProfile, UserProfileId } from "./types";
+import { WorkspaceId } from "../Workspace/Workspace.types";
+import { MembershipId, UserId, UserProfile, UserProfileId } from "./User.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { ZodType } from "zod";
 
 type TUserClient = WithSupabaseClient<
   WithLogger<
@@ -41,33 +41,33 @@ type TUserClientOptions = {
   dbClient?: SupabaseClient<Database>;
 };
 
-const UserProfileDBReadToModelReadSchema: z.ZodType<
+const UserProfileDBReadToModelReadSchema: ZodType<
   UserProfile,
   Tables<"user_profiles">
-> = z
-  .object({
-    id: z.uuid(),
-    membership_id: z.uuid(),
-    user_id: z.uuid(),
-    workspace_id: z.uuid(),
-    email: z.string(),
-    full_name: z.string(),
-    display_name: z.string(),
-    created_at: z.iso.datetime({ offset: true }),
-    updated_at: z.iso.datetime({ offset: true }),
-  })
-  .transform((obj): UserProfile => {
-    const model = omit(camelCaseKeysShallow(obj), ["id"]);
-    return {
-      ...model,
-      profileId: uuid<UserProfileId>(obj.id),
-      membershipId: uuid<MembershipId>(model.membershipId),
-      userId: uuid<UserId>(model.userId),
-      workspaceId: uuid<WorkspaceId>(model.workspaceId),
-      createdAt: new Date(model.createdAt),
-      updatedAt: new Date(model.updatedAt),
-    };
-  });
+> = object({
+  id: uuid(),
+  membership_id: uuid(),
+  user_id: uuid(),
+  workspace_id: uuid(),
+  email: string(),
+  full_name: string(),
+  display_name: string(),
+  created_at: iso.datetime({ offset: true }),
+  updated_at: iso.datetime({ offset: true }),
+  polar_product_id: uuid().nullable(),
+  subscription_id: uuid().nullable(),
+}).transform((obj): UserProfile => {
+  const model = omit(camelCaseKeysShallow(obj), ["id"]);
+  return {
+    ...model,
+    profileId: obj.id as UserProfileId,
+    membershipId: model.membershipId as MembershipId,
+    userId: model.userId as UserId,
+    workspaceId: model.workspaceId as WorkspaceId,
+    createdAt: new Date(model.createdAt),
+    updatedAt: new Date(model.updatedAt),
+  };
+});
 
 function createUserClient(options?: TUserClientOptions): TUserClient {
   const { dbClient = AvaSupabase.DB } = options ?? {};

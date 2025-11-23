@@ -1,5 +1,13 @@
 /** Configuration for the app. */
 // TODO(jpsyx): move most of these to environment variables so that
+// they do not get bundled in every page of the app
+
+import {
+  BasicPlanConfig,
+  FreePlanConfig,
+  PremiumPlanConfig,
+} from "./FeaturePlansConfig";
+
 // changes do not require rebuilding production.
 type AppConfigType = {
   /**
@@ -28,8 +36,20 @@ type AppConfigType = {
 
   /** The email address to use for general inquiries */
   infoEmail: string;
+
+  /** Metadata for the subscribable feature plans */
+  featurePlansMetadata: {
+    free: typeof FreePlanConfig;
+    basic: typeof BasicPlanConfig;
+    premium: typeof PremiumPlanConfig;
+  };
 };
 
+export const SUPPORT_EMAIL = "support@avandarlabs.com";
+export const INFO_EMAIL = "info@avandarlabs.com";
+
+// TODO(jpsyx): split up the app config into separate consts and objects to
+// avoid bundling the entire config object into every page of the app.
 export const AppConfig = {
   logoFilename: "logoWhite.png",
   appName: "Avandar",
@@ -38,6 +58,17 @@ export const AppConfig = {
     maxDatasetDescriptionLength: 500,
     maxPreviewRows: 200,
   },
-  supportEmail: "support@avandarlabs.com",
-  infoEmail: "info@avandarlabs.com",
+  supportEmail: SUPPORT_EMAIL,
+  infoEmail: INFO_EMAIL,
+  featurePlansMetadata: {
+    free: FreePlanConfig,
+    basic: BasicPlanConfig,
+    premium: PremiumPlanConfig,
+  },
 } satisfies AppConfigType;
+
+/**
+ * The URL to the waitlist page. This is only used if self-registration is
+ * disabled or if we require a sign up code to register.
+ */
+export const WAITLIST_URL = "https://avandarlabs.com";

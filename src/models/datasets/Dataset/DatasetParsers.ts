@@ -1,4 +1,4 @@
-import { enum as zodEnum, iso, object, string, uuid } from "zod";
+import { iso, object, string, uuid, enum as zodEnum } from "zod";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { excludeNullsExceptInProps } from "@/lib/utils/objects/higherOrderFuncs";
@@ -9,11 +9,11 @@ import {
   undefinedsToNullsDeep,
 } from "@/lib/utils/objects/transformations";
 import { pipe } from "@/lib/utils/pipe";
-import { UserId, UserProfileId } from "@/models/User/types";
-import { WorkspaceId } from "@/models/Workspace/types";
+import { Models } from "@/models/Model";
+import { UserId, UserProfileId } from "@/models/User/User.types";
+import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { Dataset, DatasetId, DatasetModel } from "./Dataset.types";
 import { Datasets } from "./Datasets";
-import { Models } from "@/models/Model";
 
 const DBReadSchema = object({
   created_at: iso.datetime({ offset: true }),

@@ -32,15 +32,15 @@ import { csvCellValueSchema } from "@/lib/utils/zodHelpers";
 import { Dataset, DatasetId } from "@/models/datasets/Dataset";
 import { DetectedDatasetColumn } from "@/models/datasets/DatasetColumn";
 import { unparseDataset } from "@/models/LocalDataset/utils";
-import { UserId } from "@/models/User/types";
-import { WorkspaceId } from "@/models/Workspace/types";
+import { UserId } from "@/models/User/User.types";
+import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { APIReturnType } from "@/types/http-api.types";
 import {
   DatasetUploadForm,
   DatasetUploadFormValues,
 } from "../DatasetUploadForm";
 
-type GoogleSpreadsheetData = APIReturnType<"google-sheets/:id">;
+type GoogleSpreadsheetData = APIReturnType<"google-sheets/:id", "GET">;
 
 type Props = BoxProps | undefined;
 
@@ -98,8 +98,9 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
     queryKey: ["google-sheets", selectedDocumentId],
     queryFn: async (): Promise<GoogleSpreadsheetData> => {
       assertIsDefined(selectedDocumentId, "A spreadsheet must be selected");
-      const googleSpreadsheet = await APIClient.get("google-sheets/:id", {
-        urlParams: { id: selectedDocumentId },
+      const googleSpreadsheet = await APIClient.get({
+        route: "google-sheets/:id",
+        pathParams: { id: selectedDocumentId },
       });
       const csvString = unparseDataset({
         datasetType: MIMEType.APPLICATION_GOOGLE_SPREADSHEET,
@@ -252,14 +253,12 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
             size="md"
             onClick={async () => {
               try {
-                const { authorizeURL } = await APIClient.get(
-                  "google-auth/auth-url",
-                  {
-                    queryParams: {
-                      redirectURL: getCurrentURL(),
-                    },
+                const { authorizeURL } = await APIClient.get({
+                  route: "google-auth/auth-url",
+                  queryParams: {
+                    redirectURL: getCurrentURL(),
                   },
-                );
+                });
 
                 // Redirect to the auth URL
                 navigateToExternalURL(authorizeURL);

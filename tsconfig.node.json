@@ -30,5 +30,6 @@
     "experimentalDecorators": true,
     "resolveJsonModule": true
   },
-  "include": ["vite.config.ts"]
+  "include": ["vite.config.ts"],
+  "exclude": ["supabase/functions"]
 }

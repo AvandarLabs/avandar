@@ -1,20 +1,20 @@
 import { match } from "ts-pattern";
-import { registryKeys } from "@/lib/utils/objects/misc";
+import { registry } from "@/lib/utils/objects/misc";
 import { matchLiteral } from "@/lib/utils/strings/matchLiteral";
 import { QueryAggregationType } from "@/models/queries/QueryAggregationType";
 import { AvaDataType } from "./AvaDataType.types";
 
 export const AvaDataTypes = {
   /** Data types that can be handled in Avandar. */
-  Types: registryKeys<AvaDataType>({
-    varchar: true,
-    bigint: true,
-    double: true,
-    time: true,
-    date: true,
-    timestamp: true,
-    boolean: true,
-  }),
+  Types: registry<AvaDataType>().keys(
+    "varchar",
+    "bigint",
+    "double",
+    "time",
+    "date",
+    "timestamp",
+    "boolean",
+  ),
   isText: (avaDataType: AvaDataType): avaDataType is "varchar" => {
     return avaDataType === "varchar";
   },
@@ -24,7 +24,7 @@ export const AvaDataTypes = {
   toDisplayValue: (avaDataType: AvaDataType): string => {
     return matchLiteral(avaDataType, {
       varchar: "Text",
-      bigint: "Number",
+      bigint: "Integer",
       double: "Number",
       time: "Time",
       date: "Date",
