@@ -10,6 +10,8 @@ import { MAX_FREE_PLAN_SEATS } from "../polar-public/polarWebhookUtils.ts";
 /**
  * Search for subscriptions by a user's Avandar ID and udpate them in our
  * Supabase database in case anything has changed in Polar.
+ *
+ * TODO(jpsyx): this should be a POST request.
  */
 export const FetchAndSyncUserSubscriptions = GET("/fetch-and-sync")
   .querySchema({

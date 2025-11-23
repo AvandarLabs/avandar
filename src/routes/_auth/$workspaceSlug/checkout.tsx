@@ -9,6 +9,7 @@ import {
   Title,
 } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { z } from "zod";
@@ -17,6 +18,7 @@ import { AppLinks } from "@/config/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useQuery } from "@/lib/hooks/query/useQuery";
+import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
 const searchSchema = z.object({
   success: z.boolean().optional(),
@@ -34,6 +36,7 @@ export const Route = createFileRoute("/_auth/$workspaceSlug/checkout")({
 });
 
 function CheckoutPage() {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { success } = Route.useSearch();
   const user = useCurrentUser();
@@ -44,6 +47,8 @@ function CheckoutPage() {
       if (!user?.id) {
         return undefined;
       }
+      // TODO(jpsyx): this should be a POST request and should be
+      // done with the useMutation hook.
       const data = await APIClient.get({
         route: "subscriptions/fetch-and-sync",
         queryParams: {
@@ -64,12 +69,18 @@ function CheckoutPage() {
           return sub.workspace_id === workspace.id;
         })
       ) {
+        // invalidate all workspace queries so that when we navigate to the
+        // home page, we will refetch the workspace and get the updated
+        // subscription
+        queryClient.invalidateQueries({
+          queryKey: [WorkspaceClient.getClientName()],
+        });
         // if there's a subscription for the current workspace then we
         // can redirect to the workspace home
         navigate(AppLinks.workspaceHome(workspace.slug));
       }
     }
-  }, [subscriptions, workspace.id, workspace.slug, navigate]);
+  }, [subscriptions, workspace.id, workspace.slug, navigate, queryClient]);
 
   const contents =
     success === true ?
