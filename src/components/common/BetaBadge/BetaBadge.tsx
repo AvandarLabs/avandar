@@ -8,9 +8,13 @@ export function BetaBadge({ style, ...props }: Props): JSX.Element {
     <Tooltip
       multiline
       maw={340}
+      color="neutral.8"
       fz="md"
-      label="Avandar is still in beta. Some features may not work as expected and some may still be under construction. We appreciate your patience and feedback as we work around the clock to improve the product."
+      label="Avandar is still in beta. Some features may not work as expected and some may still be under construction. We appreciate your patience and feedback as we work to improve the product."
       transitionProps={{ transition: "pop" }}
+      style={{
+        boxShadow: mantineVar("shadow-lg"),
+      }}
     >
       <Badge
         color="warning.5"

@@ -1,4 +1,12 @@
-import { Badge, Button, Card, Group, Stack, Text } from "@mantine/core";
+import {
+  Badge,
+  Button,
+  Card,
+  Group,
+  Stack,
+  Text,
+  Tooltip,
+} from "@mantine/core";
 import { useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { match } from "ts-pattern";
@@ -24,6 +32,7 @@ import { EarlySupporterCreditProgramBox } from "./EarlySupporterCreditProgramBox
 import { goToPolarCheckout } from "./goToPolarCheckout";
 import { useChangePlanModal } from "./openChangePlanModal";
 import { PaidPlanPriceRow } from "./PaidPlanPriceRow";
+import css from "./PlanCard.module.css";
 import { PlanSwitch } from "./PlanVariantSwitch";
 
 type Props =
@@ -214,9 +223,22 @@ export function PlanCard(props: Props): JSX.Element {
                 </Badge>
               : null}
               {isCurrentSubscribedPlan ?
-                <Badge color="blue" variant="light">
-                  Current Plan
-                </Badge>
+                <Tooltip
+                  color="neutral.8"
+                  label="You are currently subscribed to this plan."
+                  className={css.currentPlanBadgeTooltip}
+                >
+                  <Badge
+                    className={css.currentPlanBadge}
+                    variant="gradient"
+                    gradient={{
+                      from: "primary.4",
+                      to: "primary.6",
+                    }}
+                  >
+                    Current Plan
+                  </Badge>
+                </Tooltip>
               : null}
 
               {paidPlanDiscount && selectedVariant === "year" ?
