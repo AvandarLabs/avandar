@@ -1,8 +1,10 @@
 import { Box } from "@mantine/core";
+import { themeMaterial } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
 import { Writable } from "type-fest";
 import { UnknownDataFrame } from "@/lib/types/common";
+import { mantineColorVar, mantineVar } from "@/lib/utils/browser/css";
 import { formatDate } from "@/lib/utils/formatters/formatDate";
 import { FormattableTimezone } from "@/lib/utils/formatters/formatDate/formatDate";
 
@@ -20,6 +22,13 @@ type Props = {
   dateFormat?: string;
   timezone?: FormattableTimezone;
 };
+
+const avandarGridTheme = themeMaterial.withParams({
+  spacing: 6,
+  popupShadow: mantineVar("shadow-md"),
+  tooltipBorder: "1px solid black",
+  primaryColor: mantineColorVar("primary"),
+});
 
 export function DataGrid({
   columnNames,
@@ -53,6 +62,7 @@ export function DataGrid({
     <Box style={{ height, width: "100%" }}>
       <AgGridReact
         columnDefs={columnDefs}
+        theme={avandarGridTheme}
         rowData={data as Writable<UnknownDataFrame>}
         pagination={true}
         paginationPageSize={50}
