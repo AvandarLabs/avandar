@@ -100,10 +100,8 @@ export function registryKeys<LiteralUnion extends string>(
  * as a generic type parameter.
  *
  * @example
- * ```ts
  * type Letter = "a" | "b" | "c";
  * const letters = registry<Letter>().keys("a", "b", "c"); // ["a", "b", "c"]
- * ```
  *
  * @returns A function to build an array of keys, type-checked against a literal
  * union.

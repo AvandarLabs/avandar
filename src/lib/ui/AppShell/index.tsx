@@ -1,5 +1,6 @@
 import {
   Burger,
+  Divider,
   Group,
   Loader,
   AppShell as MantineAppShell,
@@ -29,6 +30,7 @@ import { Outlet, useNavigate, useRouter } from "@tanstack/react-router";
 import clsx from "clsx";
 import { ReactNode } from "react";
 import { AuthClient } from "@/clients/AuthClient";
+import { BetaBadge } from "@/components/common/BetaBadge";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLink, AppLinks } from "@/config/AppLinks";
 import { NavbarLink } from "@/config/NavbarLinks";
@@ -61,6 +63,8 @@ type Props = {
   spotlightActions?: Array<SpotlightActionData | SpotlightActionGroupData>;
   profileLink?: AppLink;
   navbarLinks: readonly NavbarLink[];
+
+  /** Utility links go on the bottom of the navbar */
   utilityLinks?: readonly NavbarLink[];
 
   /**
@@ -169,7 +173,7 @@ export function AppShell({
           </MantineAppShell.Header>
         : null}
 
-        <MantineAppShell.Navbar style={$navbarBorder}>
+        <MantineAppShell.Navbar style={styles.navbar}>
           <Group
             className={clsx(css.anchor, "transition-colors")}
             px="md"
@@ -260,8 +264,8 @@ export function AppShell({
               </Menu.Dropdown>
             </Menu>
           </Group>
-          <Stack justify="space-between" h="100%">
-            <Stack gap={0}>
+          <Stack gap="xs" justify="space-between" h="100%">
+            <Stack flex={1} gap={0}>
               {navbarLinks.map(({ link, icon }) => {
                 return (
                   <Link
@@ -287,8 +291,9 @@ export function AppShell({
                 );
               })}
             </Stack>
-
-            <Stack gap={0} pb="md">
+            <BetaBadge style={{ alignSelf: "center" }} />
+            <Divider />
+            <Stack gap={0} pb="md" pos="relative">
               {utilityLinks.map(({ link, icon }) => {
                 return (
                   <Link
@@ -333,8 +338,10 @@ export function AppShell({
   );
 }
 
-const $navbarBorder = (theme: MantineTheme) => {
-  return {
-    borderRight: `1px solid ${theme.colors.neutral[7]}`,
-  };
+const styles = {
+  navbar: (theme: MantineTheme) => {
+    return {
+      borderRight: `1px solid ${theme.colors.neutral[7]}`,
+    };
+  },
 };
