@@ -8,8 +8,8 @@ import {
   Stack,
 } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
-import { notifyNotImplemented } from "@/lib/ui/notifications/notifyNotImplemented";
 import { DataExplorerStore } from "./DataExplorerStore";
+import { downloadRowsAsCSV } from "./downloadRowsAsCSV";
 import { QueryForm } from "./QueryForm";
 import { useDataQuery } from "./useDataQuery";
 import { VisualizationContainer } from "./VisualizationContainer";
@@ -54,8 +54,9 @@ export function DataExplorerApp(): JSX.Element {
             color="neutral"
             leftSection={<IconDownload size={16} />}
             size="compact-sm"
+            disabled={isLoadingResults || queryResultData.length === 0}
             onClick={() => {
-              notifyNotImplemented();
+              downloadRowsAsCSV(queryResultData);
             }}
           >
             Export
