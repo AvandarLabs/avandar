@@ -31,7 +31,7 @@ import clsx from "clsx";
 import { ReactNode } from "react";
 import { AuthClient } from "@/clients/AuthClient";
 import { BetaBadge } from "@/components/common/BetaBadge";
-import { AppConfig } from "@/config/AppConfig";
+import { APP_NAME, AppConfig } from "@/config/AppConfig";
 import { AppLink, AppLinks } from "@/config/AppLinks";
 import { NavbarLink } from "@/config/NavbarLinks";
 import { useMutation } from "@/lib/hooks/query/useMutation";
@@ -167,7 +167,7 @@ export function AppShell({
               />
               {logo}
               <Title order={2} size="md" textWrap="nowrap">
-                {title ?? AppConfig.appName}
+                {title ?? APP_NAME}
               </Title>
             </Group>
           </MantineAppShell.Header>
@@ -192,7 +192,7 @@ export function AppShell({
                   <div className="flex w-full items-center justify-between gap-2">
                     {logo}
                     <span className="flex-1 break-words text-base font-medium leading-tight">
-                      {title ?? AppConfig.appName}
+                      {title ?? APP_NAME}
                     </span>
                     <IconChevronDown size={18} className="min-h-4 min-w-4" />
                   </div>

@@ -81,7 +81,6 @@
 
    This will create a new directory in `src/models/[YourModel]/` with the following
    files:
-
    - `types.ts`: All TypeScript types for this model. Only types should exist here,
      no actual runtime-executable code.
    - `parsers.ts`: All Zod schemas for this model. This file also includes
@@ -91,7 +90,6 @@
 
 3. Update your model types in the `types.ts`. Make sure your frontend model's
    `Read`, `Insert`, and `Update` variants are correctly specified.
-
    - For `Insert`, our convention is to wrap the `Read` variant in
      `SetOptional<Required<ModelRead>, requiredFields>`. Meaning, we make the
      `Read` variant fully required, and then we specify the optional fields.
@@ -104,7 +102,6 @@
      `SetRequired<>` to each sub-type allows us to maintain the discriminated union.
 
 4. Set up the Zod schema parsers in `parsers.ts`.
-
    - Ensure the `DBRead`, `DBInsert`, and `DBUpdate` schemas match the model's
      database table in `src/types/database.types.ts`.
    - For the `DBInsertSchema` our convention is to call

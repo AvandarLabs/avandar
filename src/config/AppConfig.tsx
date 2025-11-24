@@ -8,16 +8,13 @@ import {
   PremiumPlanConfig,
 } from "./FeaturePlansConfig";
 
-// changes do not require rebuilding production.
+// TODO(jpsyx): split this up into individually exported consts
 type AppConfigType = {
   /**
    * The path and filename to the logo file relative to the `public/` directory.
    * The logo must be in the `public` directory.
    */
   logoFilename: string;
-
-  /** The name of the app. */
-  appName: string;
 
   /** Configuration for the data import app */
   dataManagerApp: {
@@ -45,14 +42,32 @@ type AppConfigType = {
   };
 };
 
+export const APP_NAME = "Avandar";
+
+/**
+ * The email address to use for support inquiries
+ *
+ * TODO(jpsyx): this should be an environment variable
+ */
 export const SUPPORT_EMAIL = "support@avandarlabs.com";
+
+/**
+ * The email address to use for general inquiries
+ *
+ * TODO(jpsyx): this should be an environment variable
+ */
 export const INFO_EMAIL = "info@avandarlabs.com";
+
+/**
+ * The URL to the waitlist page. This is only used if self-registration is
+ * disabled or if we require a sign up code to register.
+ */
+export const WAITLIST_URL = "https://avandarlabs.com";
 
 // TODO(jpsyx): split up the app config into separate consts and objects to
 // avoid bundling the entire config object into every page of the app.
 export const AppConfig = {
   logoFilename: "logoWhite.png",
-  appName: "Avandar",
   dataManagerApp: {
     maxDatasetNameLength: 100,
     maxDatasetDescriptionLength: 500,
@@ -66,9 +81,3 @@ export const AppConfig = {
     premium: PremiumPlanConfig,
   },
 } satisfies AppConfigType;
-
-/**
- * The URL to the waitlist page. This is only used if self-registration is
- * disabled or if we require a sign up code to register.
- */
-export const WAITLIST_URL = "https://avandarlabs.com";

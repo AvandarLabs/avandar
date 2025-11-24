@@ -7,6 +7,7 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "typeRoots": ["./node_modules/@types", "src/lib/types"],
+    "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"]
     },
@@ -35,6 +36,6 @@
     "experimentalDecorators": true,
     "resolveJsonModule": true
   },
-  "include": ["src", "tests", "seed", "scripts", "emails"],
+  "include": ["src", "tests", "seed", "scripts"],
   "exclude": ["supabase/functions"]
 }
