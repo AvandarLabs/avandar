@@ -3,12 +3,21 @@ import { EmailFullButton } from "./lib/EmailFullButton";
 import { EmailHeading } from "./lib/EmailHeading";
 import { EmailParagraph } from "./lib/EmailParagraph";
 import { EmailTemplate } from "./lib/EmailTemplate";
+import { getRelativeURL } from "./lib/getRelativeURL";
 
 type Props = {
   signupCode: string;
+  userEmail: string;
 };
 
-export function WaitlistSignupCodeEmail({ signupCode }: Props): JSX.Element {
+export function WaitlistSignupCodeEmail({
+  signupCode,
+  userEmail,
+}: Props): JSX.Element {
+  const registerURL = getRelativeURL("/register", {
+    email: userEmail,
+    signupCode: signupCode,
+  });
   return (
     <EmailTemplate previewText="🎉 You're off the waitlist! Your signup code is ready">
       <EmailHeading order={1}>You're In!</EmailHeading>
@@ -29,9 +38,7 @@ export function WaitlistSignupCodeEmail({ signupCode }: Props): JSX.Element {
         begin your journey with us!
       </EmailParagraph>
 
-      <EmailFullButton relativeHREF="#" href="#">
-        Create Your Account
-      </EmailFullButton>
+      <EmailFullButton href={registerURL}>Create Your Account</EmailFullButton>
 
       <Text style={styles.betaNotice}>
         <strong style={styles.betaNoticeTitle}>Beta Notice</strong>
@@ -83,4 +90,5 @@ export default WaitlistSignupCodeEmail;
 
 WaitlistSignupCodeEmail.defaultProps = {
   signupCode: "USER123ABC",
+  userEmail: "user@avandarlabs.com",
 };

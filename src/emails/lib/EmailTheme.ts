@@ -1,3 +1,5 @@
+import { getRelativeImageURL } from "./getRelativeImageURL";
+
 /**
  * The email address to use for the sender of transactional emails.
  *
@@ -7,6 +9,9 @@ export const EMAIL_FROM = "Avandar <avandar@notifications.avandarlabs.com>";
 
 /** Configuration for the logo to use in emails. */
 export const LOGO = {
+  /** The source image absolute URL for the logo. */
+  src: getRelativeImageURL("logoAndName.png"),
+
   /**
    * The real width of the logo. As in, the actual width of the source
    * image.
@@ -18,9 +23,6 @@ export const LOGO = {
    * image.
    */
   originalHeight: 410,
-
-  /** The scale factor to use when rendering the logo in emails. */
-  scaleForEmail: 0.2,
 };
 
 /** Configuration for the theme to use in emails. */

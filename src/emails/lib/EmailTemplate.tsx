@@ -2,6 +2,7 @@ import {
   Body,
   Container,
   Head,
+  Hr,
   Html,
   Img,
   Preview,
@@ -17,8 +18,10 @@ type Props = {
   previewText: string;
 };
 
-const logoWidth = LOGO.originalWidth * LOGO.scaleForEmail;
-const logoHeight = LOGO.originalHeight * LOGO.scaleForEmail;
+// the logo's scale factor to render it in the email header
+const LOGO_SCALE = 0.2;
+const logoWidth = LOGO.originalWidth * LOGO_SCALE;
+const logoHeight = LOGO.originalHeight * LOGO_SCALE;
 
 export function EmailTemplate({ children, previewText }: Props): JSX.Element {
   return (
@@ -35,6 +38,7 @@ export function EmailTemplate({ children, previewText }: Props): JSX.Element {
               width={logoWidth}
               height={logoHeight}
             />
+            <Hr />
           </Section>
           <Section style={styles.content}>{children}</Section>
         </Container>
