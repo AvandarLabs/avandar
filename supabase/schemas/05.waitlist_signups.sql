@@ -10,6 +10,14 @@ create table public.waitlist_signups (
 );
 
 -- Enable row level security
--- But we intentionally do not add any policies because this should only be
--- accessed via the Supabase service role.
+-- But we intentionally only allow an inserting, because any other operations
+-- should only be handled by the Supabase service role.
 alter table public.waitlist_signups enable row level security;
+
+-- Create policy to allow anyone to insert data
+create policy "
+  Anyone can INSERT to the waitlist
+" on public.waitlist_signups for insert to authenticated,
+anon
+with
+  check (true);
