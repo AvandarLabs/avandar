@@ -26,7 +26,7 @@ const CLIOptionSchema = z.object({
 
 function setupCLI() {
   program
-    .name("npm run email:send-notification")
+    .name("npm run email:send-notification --")
     .description("Send a notification email to a recipient")
     .argument(
       "<type>",
@@ -71,8 +71,9 @@ async function sendNotificationEmail(options: {
   email: string;
   notificationType: NotificationEmailType;
   supabaseAdminClient: SupabaseClient<Database>;
+  appURL: string;
 }): Promise<void> {
-  const { email, notificationType, supabaseAdminClient } = options;
+  const { email, notificationType, supabaseAdminClient, appURL } = options;
   console.log(
     `\x1b[36m📧\x1b[0m Sending ${BLUE}${notificationType}${RESET} notification email to ${GREEN}${email}${RESET}`,
   );
@@ -87,6 +88,7 @@ async function sendNotificationEmail(options: {
     recipientEmail: email,
     waitlistSignupCode,
     disableDevOverride: true,
+    appURL,
   });
 
   console.log(
@@ -102,7 +104,7 @@ async function confirmSend(options: {
   const { email, notificationType } = options;
   if (!isDevOverrideEmail(email)) {
     console.log(
-      `${RED}⚠️ You are about to send an email to a real email address. This is not a test.${RESET}`,
+      `${RED}⚠️  You are about to send an email to a real email address. This is not a test.${RESET}`,
     );
   }
   const rl = createInterface({ input, output });
@@ -130,7 +132,8 @@ async function main() {
       serviceRoleKey: productionEnv.SUPABASE_SERVICE_ROLE_KEY ?? undefined,
       apiUrl: productionEnv.VITE_SUPABASE_API_URL ?? undefined,
     });
-
+    const appURL =
+      (prod ? productionEnv.VITE_APP_URL : process.env.VITE_APP_URL) ?? "";
     console.log(
       `${BLUE}Preparing to send notification email${RESET}\n\n` +
         `Recipient: ${GREEN}${to}${RESET}\n` +
@@ -142,6 +145,7 @@ async function main() {
       email: to,
       notificationType: type,
       supabaseAdminClient,
+      appURL,
     });
     process.exit(0);
   } catch (error) {

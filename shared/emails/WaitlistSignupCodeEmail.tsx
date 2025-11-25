@@ -8,16 +8,23 @@ import { getRelativeURL } from "./lib/getRelativeURL";
 type Props = {
   signupCode: string;
   userEmail: string;
+  appURL: string;
 };
 
 export function WaitlistSignupCodeEmail({
   signupCode,
   userEmail,
+  appURL,
 }: Props): JSX.Element {
-  const registerURL = getRelativeURL("/register", {
-    email: userEmail,
-    signupCode: signupCode,
+  const registerURL = getRelativeURL({
+    domain: appURL,
+    path: "/register",
+    queryParams: {
+      email: userEmail,
+      signupCode: signupCode,
+    },
   });
+
   return (
     <EmailTemplate previewText="🎉 You're off the waitlist! Your signup code is ready">
       <EmailHeading order={1}>You're In!</EmailHeading>
@@ -91,4 +98,5 @@ export default WaitlistSignupCodeEmail;
 WaitlistSignupCodeEmail.PreviewProps = {
   signupCode: "USER123ABC",
   userEmail: "user@avandarlabs.com",
+  appURL: "https://app.avandarlabs.com",
 };

@@ -21,6 +21,13 @@ export type IEmailClient = {
     recipientEmail: string;
 
     /**
+     * The base URL of the application.
+     * It defaults to the `VITE_APP_URL` environment variable, but can be
+     * overridden if you need to send a production email locally.
+     */
+    appURL?: string;
+
+    /**
      * By default, if the NODE_ENV is "development" then we the
      * `DEV_EMAIL_OVERRIDE` environment variable will be used as the recipient's
      * address, regardless of which `to` address was passed. This is to avoid

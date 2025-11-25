@@ -29,7 +29,21 @@ function createEmailClient(): IEmailClient {
       recipientEmail,
       disableDevOverride,
       waitlistSignupCode,
+      appURL = process.env.VITE_APP_URL,
     }): Promise<CreateEmailResponseSuccess> => {
+      if (!appURL) {
+        throw new Error("App URL was not set");
+      }
+      if (
+        appURL.includes("localhost") &&
+        ((process.env.NODE_ENV && process.env.NODE_ENV !== "development") ||
+          (import.meta && import.meta.env && !import.meta.env.DEV))
+      ) {
+        throw new Error(
+          "Cannot send emails to localhost URLs in production. Fix the App URL before sending an email.",
+        );
+      }
+
       return match(type)
         .with("waitlist_signup_code", async () => {
           return await emailClient.sendTransactionalEmail({
@@ -44,6 +58,7 @@ function createEmailClient(): IEmailClient {
               <WaitlistSignupCodeEmail
                 signupCode={waitlistSignupCode}
                 userEmail={recipientEmail}
+                appURL={appURL}
               />
             ),
             replyTo: NOTIFICATION_EMAIL_FROM.email,

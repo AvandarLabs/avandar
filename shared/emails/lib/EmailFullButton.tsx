@@ -1,22 +1,23 @@
 import { Button } from "@react-email/components";
 import { ReactNode } from "react";
+import { DistributedOmit } from "type-fest";
 import { PRIMARY_COLOR } from "@/config/Theme";
+import { EmailLinkProps } from "./EmailLink";
 import { getRelativeURL } from "./getRelativeURL";
 
 type Props = {
   children: ReactNode;
-  href?: string;
-  relativeHREF?: string;
-};
+} & DistributedOmit<EmailLinkProps, "style">;
 
 export function EmailFullButton({
   children,
   href,
-  relativeHREF,
+  domain,
+  path,
 }: Props): JSX.Element {
   return (
     <Button
-      href={href ?? getRelativeURL(relativeHREF ?? "")}
+      href={href ?? getRelativeURL({ domain, path })}
       style={styles.button}
     >
       <div style={styles.content}>{children}</div>

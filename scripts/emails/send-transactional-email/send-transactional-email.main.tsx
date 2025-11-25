@@ -25,7 +25,7 @@ type CLIOptions = z.infer<typeof CLIOptionSchema>;
 
 function setupCLI() {
   program
-    .name("npm run email:send-email")
+    .name("npm run email:send-email --")
     .description("Send a transactional email to a recipient")
     .requiredOption("--subject <string>", "Email subject")
     .requiredOption("--body <markdown>", "Email body as Markdown")
@@ -64,7 +64,7 @@ async function sendEmail(options: CLIOptions): Promise<void> {
 async function confirmSend(recipient: string): Promise<void> {
   if (!isDevOverrideEmail(recipient)) {
     console.log(
-      `${RED}⚠️ You are about to send an email to a real email address. This is not a test.${RESET}`,
+      `${RED}⚠️  You are about to send an email to a real email address. This is not a test.${RESET}`,
     );
   }
 
