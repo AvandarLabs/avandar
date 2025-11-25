@@ -50,10 +50,14 @@ export type GetSupabaseClientOptions<DB> =
  * @returns An admin client for interacting with Supabase.
  */
 export function createSupabaseAdminClient(
-  serviceRoleKey: string,
+  options: {
+    apiUrl?: string;
+    serviceRoleKey?: string;
+  } = {},
 ): SupabaseClient<Database> {
-  return createClient(
-    import.meta.env.VITE_SUPABASE_API_URL ?? "",
-    serviceRoleKey,
-  );
+  const {
+    apiUrl = import.meta.env.VITE_SUPABASE_API_URL ?? "",
+    serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+  } = options;
+  return createClient(apiUrl, serviceRoleKey);
 }

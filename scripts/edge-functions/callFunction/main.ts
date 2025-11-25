@@ -31,7 +31,7 @@ const HTTPMethod = z
  * - All subsequent arguments are treated as key-value pairs for the body.
  *
  * @example
- * yarn functions:call my-func --name "John" --age 30 --isMember
+ * npm run functions:call my-func --name "John" --age 30 --isMember
  */
 async function main() {
   const program = new Command();

@@ -7,7 +7,7 @@
 #
 # Description:
 #   This script removes the most recent migration file from
-#   supabase/migrations/ and then runs `yarn db:reset` to restart
+#   supabase/migrations/ and then runs `npm run db:reset` to restart
 #   the local database, apply migrations, and reseed data.
 
 # Set the project root directory
@@ -19,7 +19,7 @@ set -euo pipefail
 
 usage() {
   echo "Usage: ./scripts/downMigrate.sh"
-  echo "Deletes the most recent Supabase migration and runs 'yarn db:reset'."
+  echo "Deletes the most recent Supabase migration and runs 'npm run db:reset'."
   echo "No arguments are required."
   exit 1
 }
@@ -48,7 +48,7 @@ else
 fi
 
 # Reset the database (starts Supabase, applies migrations, seeds data, etc.)
-echo "Running yarn db:reset..."
-yarn db:reset
+echo "Running npm run db:reset..."
+npm run db:reset
 
 echo "Down migration complete." 

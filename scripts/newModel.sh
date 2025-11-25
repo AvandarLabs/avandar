@@ -5,7 +5,7 @@ PROJECT_ROOT=$SCRIPT_DIR/../
 
 usage() {
   echo "Usage:"
-  echo "       yarn new:model <model-name>   # Create a model in src/models/"
+  echo "       npm run new:model <model-name>   # Create a model in src/models/"
   exit 1
 }
 

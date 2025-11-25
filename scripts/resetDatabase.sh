@@ -6,10 +6,10 @@
 # then optionally seed the database with custom data. To skip seeding
 # (and only reset the database), use the `--no-seed` option.
 #
-# This script is meant to be run with `yarn db:reset` (from the
+# This script is meant to be run with `npm run db:reset` (from the
 # project root directory)
 
-PROJECT_ROOT=$(yarn --silent util:get-project-root)
+PROJECT_ROOT=$(npm run -s util:get-project-root)
 cd "$PROJECT_ROOT" || exit
 
 SCRIPT_DIR="${PROJECT_ROOT}/scripts"
@@ -28,12 +28,12 @@ supabase db reset --no-seed
 
 # Whenever we reset, let's regenerate the types in case there were
 # any new migrations that got applied
-yarn db:gen-types
+npm run db:gen-types
 
 # Run our custom seed script unless --no-seed was specified
 if [ "$SKIP_SEED" = false ]; then
   echo "Seeding database with custom data..."
-  yarn vite-script "$SCRIPT_DIR/seedDatabaseScript.ts"
+  npm run vite-script "$SCRIPT_DIR/seedDatabaseScript.ts"
 else
   echo "Skipping database seed (--no-seed specified)"
 fi

@@ -1,11 +1,11 @@
 /**
  * CLI script to seed data as configured in `seed/SeedConfig.ts`.
  *
- * Usage: yarn vite-script scripts/lib/seedDatabaseScript.ts
+ * Usage: npm run vite-script scripts/lib/seedDatabaseScript.ts
  *
  * This script should rarely be called on its own, which is why there
  * is no package.json script to call it. It should typically run as
- * part of `resetDatabaseScript.sh` through the `yarn db:reset` command.
+ * part of `resetDatabaseScript.sh` through the `npm run db:reset` command.
  */
 import { SeedData } from "../seed/SeedData";
 import { SeedJobs } from "../seed/SeedJobs";

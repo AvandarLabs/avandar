@@ -28,7 +28,7 @@ cd "$PROJECT_ROOT" || exit 1
 # Check if .env.development exists
 if [ ! -f ".env.development" ]; then
   echo -e "${RED}Error: .env.development file not found in project root${NC}"
-  echo -e "${YELLOW}Please run 'yarn env:reset' to create it${NC}"
+  echo -e "${YELLOW}Please run 'npm run env:reset' to create it${NC}"
   exit 1
 fi
 
@@ -51,7 +51,7 @@ echo ""
 
 # Step 1: Update edge function environment variables
 echo -e "${BLUE}Step 1: Updating edge function environment variables...${NC}"
-if ! yarn fns:update-env; then
+if ! npm run fns:update-env; then
   echo -e "${RED}Error: Failed to update edge function environment variables${NC}"
   exit 1
 fi
@@ -68,7 +68,7 @@ echo ""
 # Check if concurrently is available
 if ! command -v concurrently &> /dev/null; then
   echo -e "${RED}Error: concurrently is not installed${NC}"
-  echo -e "${YELLOW}Please install it with: yarn add -D concurrently${NC}"
+  echo -e "${YELLOW}Please install it with: npm run add -D concurrently${NC}"
   exit 1
 fi
 
@@ -86,6 +86,6 @@ concurrently \
   --prefix "{name}" \
   --kill-others-on-fail \
   "vite" \
-  "yarn fns:serve" \
+  "npm run fns:serve" \
   "ngrok http --url=$REVERSE_PROXY_URL 54321 --log=stdout"
 

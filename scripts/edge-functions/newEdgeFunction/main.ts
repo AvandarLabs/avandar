@@ -162,7 +162,7 @@ async function main() {
   }
 
   // Get project root
-  const projectRoot = execSync("yarn --silent util:get-project-root", {
+  const projectRoot = execSync("npm run -s util:get-project-root", {
     encoding: "utf-8",
   }).trim();
 

@@ -1,10 +1,10 @@
-import { Polar } from "npm:@polar-sh/sdk@0.41.3";
-import { CustomerSession } from "npm:@polar-sh/sdk@0.41.3/models/components/customersession.js";
+import { Polar } from "npm:@polar-sh/sdk@0.41.5";
+import { CustomerSession } from "npm:@polar-sh/sdk@0.41.5/models/components/customersession.js";
 import { getPolarAccessToken } from "./getPolarAccessToken.ts";
 import { getPolarServerType } from "./getPolarServerType.ts";
-import type { Checkout } from "npm:@polar-sh/sdk@0.41.3/models/components/checkout.js";
-import type { Product } from "npm:@polar-sh/sdk@0.41.3/models/components/product.js";
-import type { Subscription } from "npm:@polar-sh/sdk@0.41.3/models/components/subscription.js";
+import type { Checkout } from "npm:@polar-sh/sdk@0.41.5/models/components/checkout.js";
+import type { Product } from "npm:@polar-sh/sdk@0.41.5/models/components/product.js";
+import type { Subscription } from "npm:@polar-sh/sdk@0.41.5/models/components/subscription.js";
 
 export type PolarClient = {
   getCheckout: (options: { checkoutId: string }) => Promise<Checkout>;

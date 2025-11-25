@@ -5,8 +5,8 @@ PROJECT_ROOT=$SCRIPT_DIR/../
 
 usage() {
   echo "Usage:"
-  echo "       yarn new:route <route-path>        # Create a route in src/routes/"
-  echo "       yarn new:route auth <route-path>   # Create a route in src/routes/_auth/"
+  echo "       npm run new:route <route-path>        # Create a route in src/routes/"
+  echo "       npm run new:route auth <route-path>   # Create a route in src/routes/_auth/"
   exit 1
 }
 

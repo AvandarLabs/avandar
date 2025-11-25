@@ -229,7 +229,3 @@ Libraries:
   functions or `table_name__` for functions pertaining to a specific table.
 - Triggers should be prefixed with `tr__table_name__` for the table it pertains
   to.
-
-## Terminal
-
-- Use `yarn` instead of `npm`.

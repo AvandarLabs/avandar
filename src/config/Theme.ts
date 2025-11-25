@@ -18,6 +18,9 @@ const AVANDAR_BLUE_SHADES = [
   "#143894",
 ] as const;
 
+export const PRIMARY_COLOR = AVANDAR_BLUE_SHADES[6];
+const PRIMARY_COLOR_LIGHT_SHADE = 6;
+
 const NEUTRAL_SHADES = [
   "#f0f4f8",
   "#d9e2ec",
@@ -34,7 +37,7 @@ const NEUTRAL_SHADES = [
 export const Theme = createTheme({
   scale: 1, // root font size is 1rem = 16px
   fontFamily: "Figtree, sans-serif",
-  primaryShade: { light: 6, dark: 8 },
+  primaryShade: { light: PRIMARY_COLOR_LIGHT_SHADE, dark: 8 },
 
   /**
    * This is the color that Mantine will use as the default for UI elements
