@@ -18,25 +18,25 @@ const GREEN = "\x1b[32m";
 const YELLOW = "\x1b[33m";
 const RESET = "\x1b[0m";
 
+const CLIArgumentsSchema = z.tuple([z.enum(NOTIFICATION_EMAIL_TYPES)]);
 const CLIOptionSchema = z.object({
   to: z.email(),
-  type: z.enum(NOTIFICATION_EMAIL_TYPES),
   prod: z.boolean().optional(),
 });
 
 function setupCLI() {
   program
-    .name("npm run email:send-notification --")
+    .name("npm run email:send-notification")
     .description("Send a notification email to a recipient")
+    .argument(
+      "<type>",
+      `Notification type. Valid types are: ${NOTIFICATION_EMAIL_TYPES.join(", ")}`,
+    )
     .requiredOption(
       "--to <email>",
       "Recipient email address",
       // if no email is provided, use the dev override email address
       getDevOverrideEmail(),
-    )
-    .requiredOption(
-      "--type <type>",
-      `Notification type. Valid types are: ${NOTIFICATION_EMAIL_TYPES.join(", ")}`,
     )
     .option(
       "--prod",
@@ -122,15 +122,14 @@ async function confirmSend(options: {
 
 async function main() {
   setupCLI();
-  const cliOptions = CLIOptionSchema.parse(program.opts());
-  const productionEnv = cliOptions.prod ? getProductionEnv() : {};
-  const supabaseAdminClient = createSupabaseAdminClient({
-    serviceRoleKey: productionEnv.SUPABASE_SERVICE_ROLE_KEY ?? undefined,
-    apiUrl: productionEnv.VITE_SUPABASE_API_URL ?? undefined,
-  });
-
   try {
-    const { to, type } = cliOptions;
+    const [type] = CLIArgumentsSchema.parse(program.args);
+    const { to, prod } = CLIOptionSchema.parse(program.opts());
+    const productionEnv = prod ? getProductionEnv() : {};
+    const supabaseAdminClient = createSupabaseAdminClient({
+      serviceRoleKey: productionEnv.SUPABASE_SERVICE_ROLE_KEY ?? undefined,
+      apiUrl: productionEnv.VITE_SUPABASE_API_URL ?? undefined,
+    });
 
     console.log(
       `${BLUE}Preparing to send notification email${RESET}\n\n` +
@@ -146,6 +145,13 @@ async function main() {
     });
     process.exit(0);
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.error(
+        `${RED}❌ Invalid arguments${RESET}\n\t`,
+        z.prettifyError(error),
+      );
+      process.exit(1);
+    }
     console.error(
       `${RED}❌ Error sending notification email${RESET}\n\t`,
       error,

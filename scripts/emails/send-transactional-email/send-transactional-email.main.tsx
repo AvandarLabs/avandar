@@ -25,7 +25,7 @@ type CLIOptions = z.infer<typeof CLIOptionSchema>;
 
 function setupCLI() {
   program
-    .name("npm run email:send-email --")
+    .name("npm run email:send-email")
     .description("Send a transactional email to a recipient")
     .requiredOption("--subject <string>", "Email subject")
     .requiredOption("--body <markdown>", "Email body as Markdown")
