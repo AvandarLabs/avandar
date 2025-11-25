@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "type-check": "tsc -b --noEmit",
     "preview": "vite preview",
-    "tsc-watch": "concurrently --raw \"nodemon --ext ts,tsx --watch supabase/functions --exec 'deno check supabase/functions --quiet && echo \\\"\\033[32mType check passed in supabase/functions\\033[0m\\\" || true' 2>&1 | grep -v '\\[nodemon\\]'\" \"FORCE_COLOR=1 tsc -b --watch tsconfig.app.json tsconfig.node.json\"",
+    "tsc-watch": "scripts/tsc-watch.sh",
     "db:apply-migrations": "./scripts/applyMigrations.sh",
     "db:create-user": "npm run vite-script scripts/createUserScript.ts",
     "db:gen-types": "supabase gen types typescript --local > src/types/database.types.ts",
@@ -32,6 +32,7 @@
     "fns:call": "./scripts/edge-functions/callFunction.sh",
     "fns:update-env": "cp .env.development.edge supabase/functions/.env",
     "fns:serve": "supabase functions serve",
+    "fns:install-deps": "deno install",
     "vite-script": "./scripts/utils/run-vite-script.sh",
     "util:get-current-version": "./scripts/utils/get-current-version.sh",
     "util:get-project-root": "./scripts/utils/get-project-root.sh"
@@ -82,7 +83,7 @@
     "snakecase-keys": "^8.0.1",
     "ts-pattern": "^5.7.0",
     "uuid": "^11.1.0",
-    "zod": "^4.0.5"
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
