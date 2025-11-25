@@ -13,8 +13,6 @@ dist-ssr
 *.local
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
 .idea
 .DS_Store
 *.suo
@@ -39,7 +37,3 @@ dist-ssr
 # Supabase
 supabase/.temp
 supabase/.branches
-
-# Supabase does not need deno.lock files, Supabase resolves dependencies
-# automatically when deployed
-supabase/**/deno.lock

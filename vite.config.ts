@@ -24,6 +24,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": "/src",
+      $: "/shared",
+      "~": "/",
     },
   },
   publicDir: "public",

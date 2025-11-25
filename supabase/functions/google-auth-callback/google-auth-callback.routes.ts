@@ -1,4 +1,3 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { z } from "zod";
 import { AvaHTTPError } from "../_shared/AvaHTTPError.ts";
 import { GoogleAuthClient } from "../_shared/getGoogleAuthClient.ts";
