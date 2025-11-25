@@ -13,6 +13,17 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": "/src",
+      $: "/shared",
+      "~": "/",
     },
+  },
+  ssr: {
+    noExternal: true,
+  },
+  optimizeDeps: {
+    // Don't optimize Node.js built-ins (Vite optimizes by excluding them by
+    // default to avoid bundling them into browser bundles. But this config is
+    // only for scripts, so it's easier to never exclude them.)
+    exclude: ["node:fs", "node:path", "node:url"],
   },
 });

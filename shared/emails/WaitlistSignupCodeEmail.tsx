@@ -88,7 +88,7 @@ const styles = {
 
 export default WaitlistSignupCodeEmail;
 
-WaitlistSignupCodeEmail.defaultProps = {
+WaitlistSignupCodeEmail.PreviewProps = {
   signupCode: "USER123ABC",
   userEmail: "user@avandarlabs.com",
 };

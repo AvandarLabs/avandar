@@ -18,9 +18,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "yarn"
-      - run: yarn install --frozen-lockfile
-      - run: yarn lint
+          cache: "npm"
+      - run: npm ci
+      - run: npm run lint
 
   # Run TypeScript checks
   typescript:
@@ -31,9 +31,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "yarn"
-      - run: yarn install --frozen-lockfile
-      - run: yarn type-check
+          cache: "npm"
+      - run: npm ci
+      - run: npm run type-check
 
   # Run tests
   test:
@@ -44,9 +44,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "yarn"
-      - run: yarn install --frozen-lockfile
-      - run: yarn test
+          cache: "npm"
+      - run: npm ci
+      - run: npm run test
 
   # Migrate Supabase Production database
   migrate:

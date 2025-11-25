@@ -44,18 +44,10 @@ type AppConfigType = {
 
 export const APP_NAME = "Avandar";
 
-/**
- * The email address to use for support inquiries
- *
- * TODO(jpsyx): this should be an environment variable
- */
+/** The email address to use for support inquiries */
 export const SUPPORT_EMAIL = "support@avandarlabs.com";
 
-/**
- * The email address to use for general inquiries
- *
- * TODO(jpsyx): this should be an environment variable
- */
+/** The email address to use for general inquiries */
 export const INFO_EMAIL = "info@avandarlabs.com";
 
 /**

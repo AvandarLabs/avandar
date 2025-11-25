@@ -1,9 +1,3 @@
-if (!process.env.VITE_APP_URL) {
-  throw new Error(
-    "VITE_APP_URL is not set. We cannot build absolute URLs without it.",
-  );
-}
-
 /**
  * Returns the absolute URL to a page in the website. The domain for the
  * absolute URL is taken from the `VITE_APP_URL` environment variable.
@@ -15,6 +9,12 @@ export function getRelativeURL(
   relativePath: string,
   params?: Record<string, string>,
 ): string {
+  if (!process.env.VITE_APP_URL) {
+    throw new Error(
+      "VITE_APP_URL is not set. We cannot build absolute URLs without it.",
+    );
+  }
+
   const fixedPath =
     relativePath.startsWith("/") ? relativePath : `/${relativePath}`;
   const fixedDomain =

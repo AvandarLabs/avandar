@@ -1,14 +1,14 @@
 /**
  * CLI script to create a test user with Supabase Auth.
  * Expected usage is through the package.json script:
- *    yarn db:create-user <email> <password>
+ *    npm run db:create-user <email> <password>
  */
 import { z } from "zod";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { ScriptsUtil } from "./ScriptsUtil";
 
 function printUsage() {
-  console.log("Usage: yarn db:create-user <email> <password>");
+  console.log("Usage: npm run db:create-user <email> <password>");
 }
 
 const ScriptArguments = z.tuple([z.string().email(), z.string()]);

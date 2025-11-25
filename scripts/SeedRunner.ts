@@ -59,9 +59,7 @@ export class SeedRunner<Data extends GenericSeedData> {
    * any potential issues with auth state in between seed jobs.
    */
   #getAdminClient(): SupabaseClient<Database> {
-    return createSupabaseAdminClient(
-      process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
-    );
+    return createSupabaseAdminClient();
   }
 
   async createUsers(): Promise<void> {
