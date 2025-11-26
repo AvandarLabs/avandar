@@ -22,6 +22,8 @@ export function getProductionEnv(): Record<string, string> {
 
   const content: string = readFileSync(abs, "utf8");
   const parsed: Record<string, string> = dotenv.parse(content);
-  console.log(`${YELLOW}⚠️ Loaded PRODUCTION environment variables ⚠️${RESET}`);
+  console.log(
+    `${YELLOW}⚠️  Loaded PRODUCTION environment variables ⚠️${RESET}`,
+  );
   return parsed;
 }

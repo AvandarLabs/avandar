@@ -4,19 +4,31 @@ import { getRelativeURL } from "./getRelativeURL";
 
 type Props = {
   children: ReactNode;
-  href?: string;
-  relativeHREF?: string;
   style?: CSSProperties;
-};
+} & (
+  | {
+      href: string;
+      domain?: undefined;
+      path?: undefined;
+    }
+  | {
+      href?: undefined;
+      domain: string;
+      path: string;
+    }
+);
+
+export type { Props as EmailLinkProps };
 
 export function EmailLink({
   children,
   href,
-  relativeHREF,
+  path,
+  domain,
   style,
 }: Props): JSX.Element {
   return (
-    <Link href={href ?? getRelativeURL(relativeHREF ?? "")} style={style}>
+    <Link href={href ?? getRelativeURL({ domain, path })} style={style}>
       {children}
     </Link>
   );

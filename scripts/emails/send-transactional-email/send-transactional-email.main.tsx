@@ -64,7 +64,7 @@ async function sendEmail(options: CLIOptions): Promise<void> {
 async function confirmSend(recipient: string): Promise<void> {
   if (!isDevOverrideEmail(recipient)) {
     console.log(
-      `${RED}⚠️ You are about to send an email to a real email address. This is not a test.${RESET}`,
+      `${RED}⚠️  You are about to send an email to a real email address. This is not a test.${RESET}`,
     );
   }
 
