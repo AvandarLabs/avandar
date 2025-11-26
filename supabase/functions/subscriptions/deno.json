@@ -1,5 +1,6 @@
 {
   "imports": {
+    "$/": "../../../shared/",
     "zod": "npm:zod@4",
     "ts-pattern": "npm:ts-pattern@5"
   }
