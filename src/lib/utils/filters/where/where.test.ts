@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { where } from "./where";
 
 type Row = { id: string };
@@ -11,11 +10,7 @@ describe("where", () => {
   });
 
   it("creates array-value filters", () => {
-    const { where: filters } = where<Row, "id">(
-      "id",
-      "in",
-      ["abc"],
-    );
+    const { where: filters } = where<Row, "id">("id", "in", ["abc"]);
     expect(filters).toEqual({ id: { in: ["abc"] } });
   });
 });

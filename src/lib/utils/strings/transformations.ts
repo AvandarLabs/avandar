@@ -1,3 +1,4 @@
+import { capitalize } from "./capitalize/capitalize";
 import type { LiteralUnion } from "type-fest";
 
 export type UnknownToStringOptions = {
@@ -117,15 +118,6 @@ export function camelToTitleCase(
     .replace(/([a-z])([A-Z])/g, "$1 $2")
     .replace(/([A-Z])([A-Z][a-z])/g, "$1 $2");
   return capitalizeFirstLetter ? capitalize(processedStr) : processedStr;
-}
-
-/**
- * Capitalizes the first letter of a string.
- * @param str The string to capitalize.
- * @returns The capitalized string.
- */
-export function capitalize<T extends string>(str: T): Capitalize<T> {
-  return (str.charAt(0).toUpperCase() + str.slice(1)) as Capitalize<T>;
 }
 
 /**

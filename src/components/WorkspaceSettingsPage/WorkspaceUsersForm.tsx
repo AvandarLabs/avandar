@@ -20,6 +20,7 @@ import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { Modal } from "@/lib/ui/Modal";
 import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 import { notifyNotImplemented } from "@/lib/ui/notifications/notifyNotImplemented";
+import { capitalize } from "@/lib/utils/strings/capitalize/capitalize";
 import { WorkspaceRole } from "@/models/Workspace/Workspace.types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
@@ -62,31 +63,28 @@ export function WorkspaceUserForm(): JSX.Element | null {
     return (
       <Table.Tr key={user.fullName}>
         <Table.Td>{user.fullName}</Table.Td>
-        <Table.Td>{user.role}</Table.Td>
+        <Table.Td>{capitalize(user.role)}</Table.Td>
         {isAdmin ?
           <Table.Td>
-            <Flex align="flex-end" gap="xs">
-              <IconPencil size={18} />
-              <IconTrash
-                style={{ cursor: "pointer" }}
-                size={18}
-                onClick={() => {
-                  modals.openConfirmModal({
-                    title: "Remove User",
-                    children:
-                      "Are you sure you want to remove this user from the workspace?",
-                    labels: { confirm: "Remove", cancel: "Cancel" },
-                    confirmProps: { color: "red" },
-                    onConfirm: () => {
-                      removeMember({
-                        workspaceId: workspace.id,
-                        userId: user.id,
-                      });
-                    },
-                  });
-                }}
-              />
-            </Flex>
+            <IconTrash
+              style={{ cursor: "pointer" }}
+              size={18}
+              onClick={() => {
+                modals.openConfirmModal({
+                  title: "Remove User",
+                  children:
+                    "Are you sure you want to remove this user from the workspace?",
+                  labels: { confirm: "Remove", cancel: "Cancel" },
+                  confirmProps: { color: "red" },
+                  onConfirm: () => {
+                    removeMember({
+                      workspaceId: workspace.id,
+                      userId: user.id,
+                    });
+                  },
+                });
+              }}
+            />
           </Table.Td>
         : null}
       </Table.Tr>
@@ -147,7 +145,7 @@ export function WorkspaceUserForm(): JSX.Element | null {
                 <Box pr="lg">Name</Box>
               </Table.Th>
               <Table.Th w="600px">Role</Table.Th>
-              <Table.Th w="200px">Action</Table.Th>
+              <Table.Th w="200px" /> {/* Action column. No header text. */}
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>{allWorkspaceUsers}</Table.Tbody>

@@ -1,4 +1,4 @@
-import { capitalize } from "@/lib/utils/strings/transformations";
+import { capitalize } from "@/lib/utils/strings/capitalize/capitalize";
 import { EmailParagraph } from "./EmailParagraph";
 
 type Props = {

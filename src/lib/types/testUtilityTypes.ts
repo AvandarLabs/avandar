@@ -3,7 +3,9 @@
  */
 
 import { And, IsEqual, Simplify } from "type-fest";
-import { z } from "zod";
+import type { input as ZodInput, output as ZodOutput, ZodTypeAny } from "zod";
+
+export type { And, IsEqual } from "type-fest";
 
 /**
  * A type that can be used in type tests to assert a type is true.
@@ -31,12 +33,12 @@ export type Not<T extends false> = true;
  * transforming between our database tables and our frontend models.
  */
 export type ZodSchemaEqualsTypes<
-  Z extends z.ZodTypeAny,
+  Z extends ZodTypeAny,
   Args extends {
-    input: z.input<Z>;
-    output: z.output<Z>;
+    input: ZodInput<Z>;
+    output: ZodOutput<Z>;
   },
 > = And<
-  IsEqual<Simplify<z.input<Z>>, Simplify<Args["input"]>>,
-  IsEqual<Simplify<z.output<Z>>, Simplify<Args["output"]>>
+  IsEqual<Simplify<ZodInput<Z>>, Simplify<Args["input"]>>,
+  IsEqual<Simplify<ZodOutput<Z>>, Simplify<Args["output"]>>
 >;

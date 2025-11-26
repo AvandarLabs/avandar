@@ -1,6 +1,7 @@
 import { DefaultError, QueryClient, QueryKey } from "@tanstack/react-query";
 import { useMutation, UseMutationOptions } from "@/lib/hooks/query/useMutation";
 import { useQuery } from "@/lib/hooks/query/useQuery";
+import { capitalize } from "@/lib/utils/strings/capitalize/capitalize";
 import { AnyFunction } from "../../types/utilityTypes";
 import {
   isEmptyObject,
@@ -9,7 +10,7 @@ import {
 } from "../../utils/guards/guards";
 import { objectKeys } from "../../utils/objects/misc";
 import { excludeDeep } from "../../utils/objects/transformations";
-import { capitalize, prefix } from "../../utils/strings/transformations";
+import { prefix } from "../../utils/strings/transformations";
 import { BaseClient } from "../BaseClient";
 import {
   ClientFnFirstParameter,
@@ -108,17 +109,13 @@ export function withQueryHooks<
       const useClientQuery = (
         options: UseClientQueryArg<Client, UseQueryFnName>,
       ) => {
-        const { useQueryOptions, ...clientFnParamsObj } = isPlainObject(options)
-          ? options
-          : { useQueryOptions: undefined };
+        const { useQueryOptions, ...clientFnParamsObj } =
+          isPlainObject(options) ? options : { useQueryOptions: undefined };
         const clientFnParam = (
-          isSingleArgObject(clientFnParamsObj)
-            ? clientFnParamsObj.arg
+          isSingleArgObject(clientFnParamsObj) ? clientFnParamsObj.arg
             // treat an empty object as undefined
-            : objectKeys(clientFnParamsObj).length === 0
-            ? undefined
-            : clientFnParamsObj
-        ) as ClientFnFirstParameter<
+          : objectKeys(clientFnParamsObj).length === 0 ? undefined
+          : clientFnParamsObj) as ClientFnFirstParameter<
           Client,
           UseQueryFnName
         >;
@@ -154,17 +151,16 @@ export function withQueryHooks<
 
         // make the wrapped `useMutation` function for this `mutationFnName`
         const useClientMutation = (
-          useMutationOptions?:
-            & Omit<
-              UseMutationOptions<
-                ClientFnReturnType<Client, UseMutationFnName>,
-                ClientFnFirstParameter<Client, UseMutationFnName>,
-                DefaultError,
-                unknown
-              >,
-              "mutationFn"
-            >
-            & ExtraUseClientMutationArgs,
+          useMutationOptions?: Omit<
+            UseMutationOptions<
+              ClientFnReturnType<Client, UseMutationFnName>,
+              ClientFnFirstParameter<Client, UseMutationFnName>,
+              DefaultError,
+              unknown
+            >,
+            "mutationFn"
+          > &
+            ExtraUseClientMutationArgs,
         ) => {
           const {
             invalidateGetAllQuery,
@@ -174,13 +170,12 @@ export function withQueryHooks<
           } = useMutationOptions ?? {};
 
           // get the query keys to invalidate
-          const singletonQueryToInvalidate = queryToInvalidate
-            ? [queryToInvalidate]
-            : undefined;
+          const singletonQueryToInvalidate =
+            queryToInvalidate ? [queryToInvalidate] : undefined;
           // if `queriesToInvalidate` is set, it takes precedence over the
           // singleton `queryToInvalidate` parameter
-          let newQueriesToInvalidate = queriesToInvalidate ??
-            singletonQueryToInvalidate ?? undefined;
+          let newQueriesToInvalidate =
+            queriesToInvalidate ?? singletonQueryToInvalidate ?? undefined;
 
           // if `invalidateGetAllQuery` is set, add the `getAll` query key
           if (
