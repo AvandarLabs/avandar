@@ -27,7 +27,7 @@ export type SendTransactionalEmailOptions = {
    *
    * @default false
    */
-  disableDevOverride?: boolean;
+  disableDevEmailOverride?: boolean;
 };
 
 export async function sendTransactionalEmail({
@@ -36,7 +36,7 @@ export async function sendTransactionalEmail({
   subject,
   replyTo,
   body,
-  disableDevOverride,
+  disableDevEmailOverride: disableDevOverride,
 }: SendTransactionalEmailOptions): Promise<CreateEmailResponseSuccess> {
   // If we are in development and the `disableDevOverride` option is not set,
   // then we should use the dev override email address

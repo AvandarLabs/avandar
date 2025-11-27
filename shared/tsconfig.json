@@ -1,0 +1,15 @@
+{
+  "__comment": "This tsconfig allows the `shared/emails` directory to compile with our path aliases when we run the preview server with `dev:email`.",
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "strict": true,
+    "jsx": "react-jsx",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "paths": {
+      "@/*": ["../src/*"],
+      "$/*": ["./*"],
+      "~/*": ["../*"]
+    }
+  },
+  "include": [".", "../src"]
+}

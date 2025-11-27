@@ -5,7 +5,7 @@
  * `RESEND_SITE_IMG_URL` environment variable.
  * @returns The absolute URL to the image
  */
-export function getRelativeImageURL(relativePath: string): string {
+export function buildRelativeImageURL(relativePath: string): string {
   if (!process.env.RESEND_SITE_IMG_URL) {
     throw new Error(
       "RESEND_SITE_IMG_URL is not set. We cannot build absolute image URLs without it.",

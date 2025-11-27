@@ -1,9 +1,9 @@
-import { getRelativeImageURL } from "./getRelativeImageURL";
+import { buildRelativeImageURL } from "./buildRelativeImageURL";
 
 /** Configuration for the logo to use in emails. */
 export const LOGO = {
   /** The source image absolute URL for the logo. */
-  src: getRelativeImageURL("logoAndName.png"),
+  src: buildRelativeImageURL("logoAndName.png"),
 
   /**
    * The real width of the logo. As in, the actual width of the source

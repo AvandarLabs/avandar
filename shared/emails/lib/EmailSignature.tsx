@@ -1,4 +1,4 @@
-import { capitalize } from "@/lib/utils/strings/capitalize/capitalize";
+import { capitalize } from "$/lib/utils/strings/capitalize/capitalize";
 import { EmailParagraph } from "./EmailParagraph";
 
 type Props = {
@@ -7,6 +7,7 @@ type Props = {
   title?: string;
   appName: string;
 };
+
 export function EmailSignature({
   signOff = "warmly",
   name,

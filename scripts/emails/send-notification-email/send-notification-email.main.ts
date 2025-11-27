@@ -1,7 +1,7 @@
 import { stdin as input, stdout as output } from "node:process";
 import { createInterface } from "node:readline/promises";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { getProductionEnv } from "~/scripts/utils/getProductionEnv";
+import { loadProductionEnv } from "~/scripts/utils/loadProductionEnv";
 import { EmailClient } from "$/EmailClient/EmailClient";
 import { NotificationEmailType } from "$/EmailClient/EmailClient.types";
 import { NOTIFICATION_EMAIL_TYPES } from "$/EmailClient/EmailClientConfig";
@@ -44,7 +44,8 @@ function setupCLI() {
 .env.development. This allows you to use the production Supabase to send
 emails. Only use this if you are sure you want to send emails to real
 users.`,
-    );
+    )
+    .showHelpAfterError();
   program.parse();
 }
 
@@ -71,9 +72,8 @@ async function sendNotificationEmail(options: {
   email: string;
   notificationType: NotificationEmailType;
   supabaseAdminClient: SupabaseClient<Database>;
-  appURL: string;
 }): Promise<void> {
-  const { email, notificationType, supabaseAdminClient, appURL } = options;
+  const { email, notificationType, supabaseAdminClient } = options;
   console.log(
     `\x1b[36m📧\x1b[0m Sending ${BLUE}${notificationType}${RESET} notification email to ${GREEN}${email}${RESET}`,
   );
@@ -87,8 +87,7 @@ async function sendNotificationEmail(options: {
     type: notificationType,
     recipientEmail: email,
     waitlistSignupCode,
-    disableDevOverride: true,
-    appURL,
+    disableDevEmailOverride: true,
   });
 
   console.log(
@@ -125,15 +124,16 @@ async function confirmSend(options: {
 async function main() {
   setupCLI();
   try {
-    const [type] = CLIArgumentsSchema.parse(program.args);
     const { to, prod } = CLIOptionSchema.parse(program.opts());
-    const productionEnv = prod ? getProductionEnv() : {};
+    const [type] = CLIArgumentsSchema.parse(program.args);
+    if (prod) {
+      loadProductionEnv();
+    }
+
     const supabaseAdminClient = createSupabaseAdminClient({
-      serviceRoleKey: productionEnv.SUPABASE_SERVICE_ROLE_KEY ?? undefined,
-      apiUrl: productionEnv.VITE_SUPABASE_API_URL ?? undefined,
+      serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY ?? undefined,
+      apiUrl: process.env.VITE_SUPABASE_API_URL ?? undefined,
     });
-    const appURL =
-      (prod ? productionEnv.VITE_APP_URL : process.env.VITE_APP_URL) ?? "";
     console.log(
       `${BLUE}Preparing to send notification email${RESET}\n\n` +
         `Recipient: ${GREEN}${to}${RESET}\n` +
@@ -145,7 +145,6 @@ async function main() {
       email: to,
       notificationType: type,
       supabaseAdminClient,
-      appURL,
     });
     process.exit(0);
   } catch (error) {

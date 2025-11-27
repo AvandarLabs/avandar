@@ -1,7 +1,7 @@
 import { DefaultError, QueryClient, QueryKey } from "@tanstack/react-query";
+import { capitalize } from "$/lib/utils/strings/capitalize/capitalize";
 import { useMutation, UseMutationOptions } from "@/lib/hooks/query/useMutation";
 import { useQuery } from "@/lib/hooks/query/useQuery";
-import { capitalize } from "@/lib/utils/strings/capitalize/capitalize";
 import { AnyFunction } from "../../types/utilityTypes";
 import {
   isEmptyObject,

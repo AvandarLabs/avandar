@@ -1,0 +1,10 @@
+import { Container } from '@mantine/core';
+import { createFileRoute } from "@tanstack/react-router";
+
+export const Route = createFileRoute("$ROUTE_PATH$")({
+  component: $ROUTE_COMPONENT_NAME$,
+});
+
+function $ROUTE_COMPONENT_NAME$() {
+  return <Container pt="xxxl">$ROUTE_PATH$</Container>;
+}

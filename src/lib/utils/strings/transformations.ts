@@ -1,4 +1,4 @@
-import { capitalize } from "./capitalize/capitalize";
+import { capitalize } from "../../../../shared/lib/utils/strings/capitalize/capitalize";
 import type { LiteralUnion } from "type-fest";
 
 export type UnknownToStringOptions = {

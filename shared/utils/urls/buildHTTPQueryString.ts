@@ -1,5 +1,5 @@
-import { isDefined } from "./guards/guards";
-import { unknownToString } from "./strings/unknownToString/unknownToString";
+import { isDefined } from "../../../src/lib/utils/guards/guards";
+import { unknownToString } from "../../../src/lib/utils/strings/unknownToString/unknownToString";
 
 type ValidURLQueryParamPrimitiveValue =
   | string
@@ -20,13 +20,23 @@ export type ValidURLQueryParamValue =
  * Encodings:
  * - All values are converted to strings
  * - Arrays are encoded as a semicolon-separated list of strings
+ *
  * @param params - The record of key-value pairs to build the query string from.
- * @returns The query string.
+ * @returns The query string. Empty string if `params` is empty.
  */
 export function buildHTTPQueryString(
-  params: Record<string, ValidURLQueryParamValue>,
+  params: Record<string, ValidURLQueryParamValue> | undefined,
 ): string {
-  return Object.entries(params)
+  if (params === undefined) {
+    return "";
+  }
+
+  const entries = Object.entries(params);
+  if (entries.length === 0) {
+    return "";
+  }
+
+  return entries
     .map(([key, value]) => {
       // ignore undefined values, the key should not even be included in the
       // query string, otherwise it will be encoded as an empty string (which

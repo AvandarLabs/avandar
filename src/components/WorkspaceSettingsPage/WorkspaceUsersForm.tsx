@@ -12,6 +12,7 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
+import { capitalize } from "$/lib/utils/strings/capitalize/capitalize";
 import { useState } from "react";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -20,7 +21,6 @@ import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { Modal } from "@/lib/ui/Modal";
 import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 import { notifyNotImplemented } from "@/lib/ui/notifications/notifyNotImplemented";
-import { capitalize } from "@/lib/utils/strings/capitalize/capitalize";
 import { WorkspaceRole } from "@/models/Workspace/Workspace.types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 

@@ -1,23 +1,20 @@
 import { Text } from "@react-email/components";
+import { buildAppPageURL } from "$/utils/urls/buildAppPageURL";
 import { EmailFullButton } from "./lib/EmailFullButton";
 import { EmailHeading } from "./lib/EmailHeading";
 import { EmailParagraph } from "./lib/EmailParagraph";
 import { EmailTemplate } from "./lib/EmailTemplate";
-import { getRelativeURL } from "./lib/getRelativeURL";
 
 type Props = {
   signupCode: string;
   userEmail: string;
-  appURL: string;
 };
 
 export function WaitlistSignupCodeEmail({
   signupCode,
   userEmail,
-  appURL,
 }: Props): JSX.Element {
-  const registerURL = getRelativeURL({
-    domain: appURL,
+  const registerURL = buildAppPageURL({
     path: "/register",
     queryParams: {
       email: userEmail,
@@ -98,5 +95,4 @@ export default WaitlistSignupCodeEmail;
 WaitlistSignupCodeEmail.PreviewProps = {
   signupCode: "USER123ABC",
   userEmail: "user@avandarlabs.com",
-  appURL: "https://app.avandarlabs.com",
-};
+} satisfies Props;

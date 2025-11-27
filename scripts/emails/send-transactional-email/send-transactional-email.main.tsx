@@ -30,7 +30,8 @@ function setupCLI() {
     .requiredOption("--subject <string>", "Email subject")
     .requiredOption("--body <markdown>", "Email body as Markdown")
     // if no email is provided, use the dev override email address
-    .option("--to <email>", "Recipient email address", getDevOverrideEmail());
+    .option("--to <email>", "Recipient email address", getDevOverrideEmail())
+    .showHelpAfterError();
   program.parse();
 }
 
@@ -41,7 +42,7 @@ async function sendEmail(options: CLIOptions): Promise<void> {
   );
 
   const result = await EmailClient.sendTransactionalEmail({
-    disableDevOverride: true,
+    disableDevEmailOverride: true,
     to,
     from: {
       email: NOTIFICATION_EMAIL_FROM.email,
