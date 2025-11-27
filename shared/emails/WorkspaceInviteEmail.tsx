@@ -11,7 +11,7 @@ type Props = {
   workspaceName: string;
 };
 
-export function UserInviteEmail({
+export function WorkspaceInviteEmail({
   inviteId,
   workspaceSlug,
   workspaceName,
@@ -79,9 +79,9 @@ const styles = {
   },
 };
 
-export default UserInviteEmail;
+export default WorkspaceInviteEmail;
 
-UserInviteEmail.PreviewProps = {
+WorkspaceInviteEmail.PreviewProps = {
   workspaceName: "Avandar Labs",
   workspaceSlug: "avandar-labs",
   inviteId: "1234567890",

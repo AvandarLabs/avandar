@@ -1,5 +1,5 @@
 {
-  "$schema": "https://pgtools.dev/schemas/0.3.1/schema.json",
+  "$schema": "https://pg-language-server.com/latest/schema.json",
   "vcs": {
     "enabled": false,
     "clientKind": "git",
@@ -13,6 +13,12 @@
     "rules": {
       "recommended": true
     }
+  },
+  "typecheck": {
+    "enabled": true
+  },
+  "plpgsqlCheck": {
+    "enabled": true
   },
   "db": {
     "host": "127.0.0.1",
