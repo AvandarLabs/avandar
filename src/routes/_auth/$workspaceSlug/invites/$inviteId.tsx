@@ -3,11 +3,11 @@ import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug/invites/$inviteId")(
   {
-    component: InviteIdPage,
+    component: AcceptInvitePage,
   },
 );
 
-function InviteIdPage() {
+function AcceptInvitePage() {
   return (
     <Container pt="xxxl">/_auth/$workspaceSlug/invites/$inviteId</Container>
   );
