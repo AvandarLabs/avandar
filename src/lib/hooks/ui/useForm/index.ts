@@ -10,15 +10,19 @@ import { FormType } from "./types";
 import { useKeysAndPropsCallback } from "./useKeysAndPropsCallback";
 
 // Improved type safety for `path` argument in a Rule function
-type RuleFn<Value, FullFormValues, FormPath extends Paths<FullFormValues>> = (
-  value: Value,
-  values: FullFormValues,
-  path: FormPath,
-) => React.ReactNode;
+export type RuleFn<
+  Value,
+  FullFormValues,
+  FormPath extends Paths<FullFormValues>,
+> = (value: Value, values: FullFormValues, path: FormPath) => React.ReactNode;
 
 // Improved type safety for form rules to better handle nullable values and
 // discriminated unions
-type FormRule<Value, FullFormValues, FormPath extends Paths<FullFormValues>> =
+export type FormRule<
+  Value,
+  FullFormValues,
+  FormPath extends Paths<FullFormValues>,
+> =
   NonNullable<Value> extends ReadonlyArray<infer ListElementType> ?
     | ({
         [K in keyof NonNullable<ListElementType>]?:

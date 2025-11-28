@@ -2,72 +2,40 @@ import { Box, Button, Flex, Stack, Text } from "@mantine/core";
 import { isEmail } from "@mantine/form";
 import { ReactElement, ReactNode, useMemo } from "react";
 import { match } from "ts-pattern";
-import { FormType, useForm } from "@/lib/hooks/ui/useForm";
+import { FormRulesRecord, useForm, UseFormInput } from "@/lib/hooks/ui/useForm";
 import { StringKeyOf } from "@/lib/types/utilityTypes";
 import { constant } from "@/lib/utils/higherOrderFuncs";
-import { propIsDefined } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys, objectValues } from "@/lib/utils/objects/misc";
-import { camelToTitleCase } from "@/lib/utils/strings/transformations";
 import {
+  AnyValidationFn,
   FormFieldSchema,
   GenericFormSchemaRecord,
   SemanticTextType,
-  ValidationFn,
+  ValidBaseValueType,
   ValuesOfFieldRecord,
 } from "./AvaForm.types";
-import { AvaTextInput } from "./AvaTextInput";
-import type { UseFormInput } from "@/lib/hooks/ui/useForm";
-
-function getDefaultFieldSchema<
-  FormValues extends ValuesOfFieldRecord<GenericFormSchemaRecord>,
-  FieldKey extends StringKeyOf<FormValues>,
->(
-  fieldKey: FieldKey,
-  providedSchema: FormFieldSchema<FormValues, FieldKey>,
-): FormFieldSchema<FormValues, FieldKey> {
-  const processedSchema = {
-    ...providedSchema,
-    label:
-      providedSchema.label ??
-      camelToTitleCase(String(fieldKey), { capitalizeFirstLetter: true }),
-  };
-
-  if (processedSchema.semanticType) {
-    return match(processedSchema.semanticType)
-      .with("email", () => {
-        return {
-          name: "email",
-          autoComplete: "email",
-          ...processedSchema,
-        };
-      })
-      .with("text", () => {
-        return processedSchema;
-      })
-      .exhaustive(() => {
-        return processedSchema;
-      });
-  }
-
-  return processedSchema;
-}
+import { AvaInput } from "./AvaInput";
 
 function getDefaultSemanticValidationFn(
   semanticType: SemanticTextType,
-): ValidationFn | undefined {
+): AnyValidationFn | undefined {
   return match(semanticType)
     .with("email", () => {
       return isEmail("Invalid email address");
     })
     .with("text", () => {
+      // a general "text" type is always valid
       return constant(undefined);
     })
-    .exhaustive();
+    .exhaustive(() => {
+      return undefined;
+    });
 }
 
 type Props<
   FieldSchemaRecord extends GenericFormSchemaRecord,
   FieldKey extends StringKeyOf<FieldSchemaRecord>,
+  FormValues extends ValuesOfFieldRecord<FieldSchemaRecord>,
 > = {
   /** Content to show at the top of the form. */
   introContent?: ReactNode;
@@ -96,8 +64,8 @@ type Props<
   buttonAlignment?: "right" | "left";
 
   /** The function to call when the form is submitted. */
-  onSubmit: (
-    values: ValuesOfFieldRecord<FieldSchemaRecord>,
+  onSubmit?: (
+    values: FormValues,
     event: React.FormEvent<HTMLFormElement> | undefined,
   ) => void;
 
@@ -117,8 +85,8 @@ type Props<
  */
 export function AvaForm<
   FieldSchemaRecord extends GenericFormSchemaRecord,
+  FieldKey extends StringKeyOf<FieldSchemaRecord>,
   FormValues extends ValuesOfFieldRecord<FieldSchemaRecord>,
-  FieldKey extends StringKeyOf<FieldSchemaRecord> & StringKeyOf<FormValues>,
 >({
   fields,
   formElements,
@@ -129,16 +97,13 @@ export function AvaForm<
   buttonAlignment,
   submitIsLoading,
   submitIsDisabled,
-}: Props<FieldSchemaRecord, FieldKey>): JSX.Element {
+}: Props<FieldSchemaRecord, FieldKey, FormValues>): JSX.Element {
   const formInitializer = useMemo(() => {
-    const initValues = {} as Record<FieldKey, string>;
-    const validations = {} as Record<
-      FieldKey,
-      ValidationFn<unknown, FormValues, FieldKey>
-    >;
-    const anyFieldRequiresSync = objectValues(fields).some(
-      propIsDefined("syncWhileUntouched"),
-    );
+    const initValues = {} as Record<FieldKey, ValidBaseValueType>;
+    const validations = {} as FormRulesRecord<FormValues, FormValues>;
+    const anyFieldRequiresSync = objectValues(fields).some((field) => {
+      return field.type === "text" && field.syncWhileUntouched;
+    });
 
     objectKeys(fields).forEach((objFieldKey) => {
       const fieldKey = objFieldKey as FieldKey;
@@ -149,42 +114,57 @@ export function AvaForm<
 
       // get the validation functions
       const semanticValidationFn =
-        field.semanticType ?
+        field.type === "text" && field.semanticType ?
           getDefaultSemanticValidationFn(field.semanticType)
         : undefined;
 
       if (field.validateFn || semanticValidationFn) {
-        validations[fieldKey] = (
-          value: unknown,
-          allFormValues: FormValues,
-          currentFieldKey: FieldKey,
-        ) => {
+        const fieldValidationFn = ((value, allFormValues, currentFieldKey) => {
           // before running validation, we first verify that the type of the
           // value is appropriate, before we call the custom validate function
           // (if one is provided)
           return match(field.type)
             .with("text", () => {
+              // if a custom validate function is provided, we use it, otherwise
+              // we'll use the semantic validation function (if there is one)
               if (field.validateFn) {
                 if (typeof value === "string") {
                   return field.validateFn(
                     value,
                     allFormValues,
-                    currentFieldKey,
+                    currentFieldKey as FieldKey,
                   );
                 }
                 return "Received a non-string value for a text field";
               }
               return semanticValidationFn?.(value, allFormValues, fieldKey);
             })
-            .exhaustive();
-        };
+            .with("select", () => {
+              if (field.validateFn) {
+                if (typeof value === "string") {
+                  return field.validateFn(
+                    value,
+                    allFormValues,
+                    currentFieldKey as FieldKey,
+                  );
+                }
+                return "Received a non-string value for a select field";
+              }
+              // there is no semantic validation function to use
+              return undefined;
+            })
+            .exhaustive(() => {
+              return undefined;
+            });
+        }) as FormRulesRecord<FormValues, FormValues>[FieldKey];
+        validations[fieldKey] = fieldValidationFn;
       }
     });
 
     return {
       mode: "uncontrolled" as const,
-      initialValues: initValues as FormValues,
-      validate: validations as UseFormInput<FormValues>["validate"],
+      initialValues: initValues,
+      validate: validations,
       touchTrigger:
         anyFieldRequiresSync ? ("focus" as const) : ("change" as const),
     };
@@ -192,7 +172,7 @@ export function AvaForm<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const form: FormType<FormValues> = useForm(formInitializer);
+  const form = useForm(formInitializer as UseFormInput<FormValues>);
 
   const elements = {
     content: (elt: ReactNode) => {
@@ -207,24 +187,21 @@ export function AvaForm<
         if (typeof formElement === "string") {
           if (formElement in fields) {
             const fieldKey = formElement as FieldKey;
-            const field = fields[fieldKey]!;
-            const { syncWhileUntouched, ...moreInputProps } =
-              getDefaultFieldSchema(fieldKey, field);
-            const { initialValue, debounceMs, onChange, ...restOfInputProps } =
-              moreInputProps;
+            const field = fields[fieldKey]! as FormFieldSchema<
+              FieldKey,
+              FormValues
+            >;
             return (
-              <AvaTextInput
-                key={fieldKey}
-                fieldKey={fieldKey}
+              <AvaInput
+                key={field.key}
+                fieldKey={field.key}
                 parentForm={form}
                 fields={fields}
-                debounceMs={debounceMs}
-                onChange={onChange}
-                {...restOfInputProps}
+                field={field}
               />
             );
           }
-          return <Text>{formElement}</Text>;
+          return <Text key={formElement}>{formElement}</Text>;
         }
         return formElement;
       });
@@ -232,7 +209,11 @@ export function AvaForm<
   };
 
   return (
-    <form onSubmit={form.onSubmit(onSubmit)}>
+    <form
+      onSubmit={form.onSubmit((values, event) => {
+        onSubmit?.(values, event);
+      })}
+    >
       <Stack gap="md">
         {elements.content(introContent)}
         {elements.innerFormElements()}

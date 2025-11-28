@@ -93,7 +93,7 @@ export function withQueryHooks<
   callableQueryFnNames.forEach((queryFnName) => {
     const clientFunction = client[queryFnName as UseQueryFnName];
     if (typeof clientFunction === "function") {
-      const boundClientFunction = clientFunction.bind(client);
+      const boundClientFunction = (clientFunction as AnyFunction).bind(client);
 
       // make the query key builder for this `queryFnName`
       const queryKeyBuilder = (
@@ -123,7 +123,9 @@ export function withQueryHooks<
         return useQuery({
           queryKey: queryKeyBuilder(clientFnParam),
           queryFn: async () => {
-            const result = await boundClientFunction(clientFnParam);
+            const result = await (boundClientFunction as AnyFunction)(
+              clientFnParam,
+            );
             return result;
           },
           ...(isPlainObject(useQueryOptions) ? useQueryOptions : undefined),
@@ -147,7 +149,9 @@ export function withQueryHooks<
     .forEach((mutationFnName) => {
       const clientFunction = client[mutationFnName as UseMutationFnName];
       if (typeof clientFunction === "function") {
-        const boundClientFunction = clientFunction.bind(client);
+        const boundClientFunction = (clientFunction as AnyFunction).bind(
+          client,
+        );
 
         // make the wrapped `useMutation` function for this `mutationFnName`
         const useClientMutation = (
@@ -242,7 +246,9 @@ export function withQueryHooks<
         callableQueryFnNames.forEach((queryFnName: UseQueryFnName) => {
           const clientFunction = client[queryFnName as UseQueryFnName];
           if (typeof clientFunction === "function") {
-            const boundClientFunction = clientFunction.bind(client);
+            const boundClientFunction = (clientFunction as AnyFunction).bind(
+              client,
+            );
             const wrappedQuery = async (
               params: ClientFnFirstParameter<Client, UseQueryFnName>,
             ) => {

@@ -1,13 +1,25 @@
-import { Simplify } from "type-fest";
+import { ExclusifyUnion } from "type-fest";
+import { SelectData } from "../inputs/Select";
 import type { StringKeyOf } from "@/lib/types/utilityTypes";
 import type { HTMLInputAutoCompleteAttribute, ReactNode } from "react";
 
+/** For now, forms can only have string values */
+export type ValidBaseValueType = string;
+
+export type AnyFormValues = Record<string, ValidBaseValueType>;
+
 export type SemanticTextType = "email" | "text";
 
+export type AnyValidationFn = ValidationFn<
+  string,
+  ValidBaseValueType,
+  AnyFormValues
+>;
+
 export type ValidationFn<
-  FieldValue = unknown,
-  FormValues extends { [key: string]: unknown } = { [key: string]: unknown },
-  FieldKey extends StringKeyOf<FormValues> = StringKeyOf<FormValues>,
+  FieldKey extends string,
+  FieldValue,
+  FormValues extends AnyFormValues,
 > = (
   value: FieldValue,
   allFormValues: FormValues,
@@ -20,41 +32,58 @@ export type ValidationFn<
  */
 export type ValuesOfFieldRecord<
   FieldSchemaRecord extends GenericFormSchemaRecord,
-> = Simplify<{
+> = {
   [FieldKey in StringKeyOf<FieldSchemaRecord>]: FieldSchemaRecord[FieldKey]["initialValue"];
-}>;
-
-export type GenericFormSchemaRecord<FieldKeys extends string = string> = {
-  [K in FieldKeys]: FormFieldSchema<
-    ValuesOfFieldRecord<GenericFormSchemaRecord>,
-    K
-  >;
 };
 
-/**
- * A schema for a form field.
- *
- * The `FormFieldKey` generic represents any valid key in the entire form.
- */
-export type FormFieldSchema<
-  FormValues extends { [key: string]: unknown },
-  FieldKey extends StringKeyOf<FormValues>,
+export type GenericFormSchemaRecord<FieldKeys extends string = string> = {
+  [K in FieldKeys]: FormFieldSchema<K, Record<FieldKeys, ValidBaseValueType>>;
+};
+
+export type BaseFormFieldSchema<
+  FieldKey extends string,
+  FormValues extends AnyFormValues,
 > = {
+  key: FieldKey;
+  initialValue: FormValues[FieldKey];
+  description?: ReactNode;
+  required?: boolean;
+  name?: string;
+  label?: string;
+  disabled?: boolean;
+
+  /**
+   * A function to validate the field value.
+   * This returns a ReactNode that will displayed as an error message to the
+   * user.
+   * Returning `undefined` means the field is valid.
+   *
+   * @param value - The current value of the field.
+   * @param allFormValues - The current values of all fields in the form.
+   * @param fieldKey - The key of the current field.
+   */
+  validateFn?: ValidationFn<FieldKey, FormValues[FieldKey], FormValues>;
+
+  /**
+   * The function to call when the field value changes.
+   */
+  onChange?: (value: FormValues[FieldKey]) => void;
+};
+
+export type TextFieldSchema<
+  FieldKey extends string,
+  FormValues extends AnyFormValues,
+> = BaseFormFieldSchema<FieldKey, FormValues> & {
   /** The type of the field. */
   type: "text";
-  initialValue: string;
-  description?: ReactNode;
 
   /**
    * The semantic type of the field. This controls things like how the Input
    * might render or how it is validated.
    */
   semanticType?: SemanticTextType;
-  required?: boolean;
-  name?: string;
-  label?: string;
   autoComplete?: HTMLInputAutoCompleteAttribute;
-  disabled?: boolean;
+  placeholder?: string;
 
   /**
    * Whether to sync the value of this field to another field. This is useful
@@ -78,25 +107,29 @@ export type FormFieldSchema<
   };
 
   /**
-   * A function to validate the field value.
-   * This returns a ReactNode that will displayed as an error message to the
-   * user.
-   * Returning `undefined` means the field is valid.
-   *
-   * @param value - The current value of the field.
-   * @param allFormValues - The current values of all fields in the form.
-   * @param fieldKey - The key of the current field.
-   */
-  validateFn?: ValidationFn<string, FormValues, FieldKey>;
-
-  /**
    * The number of milliseconds to debounce the field. This is useful to prevent
    * excessive re-renders when the user is typing.
    */
   debounceMs?: number;
-
-  /**
-   * The function to call when the field value changes.
-   */
-  onChange?: (value: string) => void;
 };
+
+export type SelectFieldSchema<
+  FieldKey extends string,
+  FormValues extends AnyFormValues,
+> = BaseFormFieldSchema<FieldKey, FormValues> & {
+  type: "select";
+  data: SelectData<FormValues[FieldKey]>;
+};
+
+/**
+ * A schema for a form field.
+ *
+ * The `FormFieldKey` generic represents any valid key in the entire form.
+ */
+export type FormFieldSchema<
+  FieldKey extends string,
+  FormValues extends AnyFormValues,
+> = ExclusifyUnion<
+  | TextFieldSchema<FieldKey, FormValues>
+  | SelectFieldSchema<FieldKey, FormValues>
+>;

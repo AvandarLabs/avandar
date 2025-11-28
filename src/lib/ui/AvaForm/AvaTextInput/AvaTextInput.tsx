@@ -3,13 +3,15 @@ import { useDebouncedCallback } from "@mantine/hooks";
 import { ChangeEvent } from "react";
 import { Paths } from "type-fest";
 import { FormType } from "@/lib/hooks/ui/useForm";
-import { UnknownObject } from "@/lib/types/common";
 import { StringKeyOf } from "@/lib/types/utilityTypes";
 import { isDefined } from "@/lib/utils/guards/guards";
 import { PathValue } from "@/lib/utils/objects/getValue";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { objectKeys } from "@/lib/utils/objects/misc";
-import { GenericFormSchemaRecord } from "../AvaForm.types";
+import type {
+  GenericFormSchemaRecord,
+  ValuesOfFieldRecord,
+} from "../AvaForm.types";
 
 type SyncedField<FieldSchemaRecord extends GenericFormSchemaRecord> = {
   fieldKey: StringKeyOf<FieldSchemaRecord>;
@@ -20,21 +22,27 @@ type SyncedField<FieldSchemaRecord extends GenericFormSchemaRecord> = {
 };
 
 type Props<
+  FieldKey extends string,
   FieldSchemaRecord extends GenericFormSchemaRecord,
-  FormValues extends UnknownObject,
-  FieldKey extends StringKeyOf<FormValues>,
+  FormValues extends ValuesOfFieldRecord<FieldSchemaRecord> &
+    Record<FieldKey, string>,
 > = {
   fieldKey: FieldKey;
+
+  /** The form instance, returned by `useForm` */
   parentForm: FormType<FormValues>;
+
+  /** The record of all field schemas */
   fields: FieldSchemaRecord;
   debounceMs?: number;
-  onChange?: (value: string) => void;
+  onChange?: (value: FormValues[FieldKey]) => void;
 } & Omit<TextInputProps, "onChange">;
 
 export function AvaTextInput<
+  FieldKey extends string,
   FieldSchemaRecord extends GenericFormSchemaRecord,
-  FormValues extends UnknownObject,
-  FieldKey extends StringKeyOf<FormValues>,
+  FormValues extends ValuesOfFieldRecord<FieldSchemaRecord> &
+    Record<FieldKey, string>,
 >({
   fieldKey: uncastedFieldKey,
   parentForm,
@@ -42,7 +50,7 @@ export function AvaTextInput<
   fields,
   onChange,
   ...props
-}: Props<FieldSchemaRecord, FormValues, FieldKey>): JSX.Element {
+}: Props<FieldKey, FieldSchemaRecord, FormValues>): JSX.Element {
   const fieldKey = uncastedFieldKey as Paths<FormValues>;
   const inputProps = parentForm.getInputProps(fieldKey);
   const fieldsToSyncTo = objectKeys(fields)
@@ -62,7 +70,7 @@ export function AvaTextInput<
     .filter(isDefined);
 
   const onValueChange = {
-    debounced: useDebouncedCallback((value: string) => {
+    debounced: useDebouncedCallback((value: FormValues[FieldKey]) => {
       if (onChange) {
         onChange(value);
       }
@@ -73,7 +81,7 @@ export function AvaTextInput<
     }, debounceMs ?? 0),
     immediate: (event: ChangeEvent<HTMLInputElement>) => {
       if (onChange) {
-        onChange(event.target.value);
+        onChange(event.target.value as FormValues[FieldKey]);
       }
       // when not debounced, we call the original onChange prop instead of
       // the form's `setFieldValue` function
@@ -109,7 +117,7 @@ export function AvaTextInput<
       {...inputProps}
       {...props}
       onChange={(event: ChangeEvent<HTMLInputElement>) => {
-        const newValue = event.target.value;
+        const newValue = event.target.value as FormValues[FieldKey];
 
         // update the synced values
         fieldsToSyncTo.forEach((syncedField) => {

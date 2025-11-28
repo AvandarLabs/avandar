@@ -233,11 +233,13 @@ function RegisterPage() {
                   <AvaForm
                     fields={{
                       email: {
+                        key: "email",
                         type: "text",
                         initialValue: searchParams.email ?? "",
                         required: true,
                       },
                       signupCode: {
+                        key: "signupCode",
                         type: "text",
                         initialValue: searchParams.signupCode ?? "",
                         required: true,
