@@ -1,4 +1,4 @@
-import { UnknownObject } from "@/lib/types/common";
+import { UnknownObject } from "$/lib/types/common";
 
 export type ModelCRUDTypes = {
   /** The name of the model */

@@ -5,8 +5,8 @@ import { loadProductionEnv } from "~/scripts/utils/loadProductionEnv";
 import { EmailClient } from "$/EmailClient/EmailClient";
 import { NotificationEmailType } from "$/EmailClient/EmailClient.types";
 import { NOTIFICATION_EMAIL_TYPES } from "$/EmailClient/EmailClientConfig";
-import { getDevOverrideEmail } from "$/EmailClient/getDevOverrideEmail";
 import { isDevOverrideEmail } from "$/EmailClient/isDevOverrideEmail";
+import { getDevOverrideEmail } from "$/env/getDevOverrideEmail";
 import { program } from "commander";
 import { z } from "zod";
 import { createSupabaseAdminClient } from "@/db/supabase/AvaSupabase";
@@ -83,8 +83,15 @@ async function sendNotificationEmail(options: {
     supabaseAdminClient,
   });
 
+  // we will only support waitlist signup notifications to be sent via this
+  // script for now until we have a need to support manual notifications more
+  // generally.
+  if (notificationType !== "waitlist_signup_code") {
+    throw new Error(`Unsupported notification type: ${notificationType}`);
+  }
+
   const result = await EmailClient.sendNotificationEmail({
-    type: notificationType,
+    type: "waitlist_signup_code",
     recipientEmail: email,
     waitlistSignupCode,
     disableDevEmailOverride: true,

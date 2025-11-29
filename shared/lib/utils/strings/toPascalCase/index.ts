@@ -1,1 +1,1 @@
-export { toPascalCase } from "./toPascalCase";
+export { toPascalCase } from "./toPascalCase.ts";

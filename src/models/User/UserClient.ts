@@ -1,3 +1,4 @@
+import { ILogger } from "$/lib/Logger/Logger";
 import { iso, object, string, uuid } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
@@ -11,7 +12,6 @@ import {
   WithSupabaseClient,
   withSupabaseClient,
 } from "@/lib/clients/withSupabaseClient";
-import { ILogger } from "@/lib/Logger";
 import { omit } from "@/lib/utils/objects/misc";
 import { camelCaseKeysShallow } from "@/lib/utils/objects/transformations";
 import { Database, Tables } from "@/types/database.types";

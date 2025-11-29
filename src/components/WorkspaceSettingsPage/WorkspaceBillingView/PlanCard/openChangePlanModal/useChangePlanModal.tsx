@@ -1,11 +1,11 @@
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
+import { SUPPORT_EMAIL } from "$/config/AppConfig";
+import { Logger } from "$/lib/Logger/Logger";
 import { match } from "ts-pattern";
 import { APIClient } from "@/clients/APIClient";
-import { SUPPORT_EMAIL } from "@/config/AppConfig";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useMutation } from "@/lib/hooks/query/useMutation";
-import { Logger } from "@/lib/Logger";
 import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 import { FeaturePlanType } from "@/models/Subscription";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";

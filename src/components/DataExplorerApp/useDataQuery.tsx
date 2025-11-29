@@ -1,3 +1,5 @@
+import { objectEntries } from "$/lib/utils/objects/objectEntries/objectEntries";
+import { objectValues } from "$/lib/utils/objects/objectValues/objectValues";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { UnknownRow } from "@/clients/DuckDBClient";
 import { DuckDBQueryAggregationType } from "@/clients/DuckDBClient/DuckDBClient.types";
@@ -11,7 +13,6 @@ import {
 import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap";
 import { makeObjectFromEntries } from "@/lib/utils/objects/builders";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { objectEntries, objectValues } from "@/lib/utils/objects/misc";
 import { sortObjList } from "@/lib/utils/objects/sortObjList";
 import { Models } from "@/models/Model";
 import { QueryColumns } from "@/models/queries/QueryColumn";

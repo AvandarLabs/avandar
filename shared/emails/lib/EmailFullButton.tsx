@@ -1,9 +1,9 @@
 import { Button } from "@react-email/components";
-import { ReactNode } from "react";
-import { DistributedOmit } from "type-fest";
-import { PRIMARY_COLOR } from "@/config/Theme";
-import { buildAppPageURL } from "../../utils/urls/buildAppPageURL";
-import { EmailLinkProps } from "./EmailLink";
+import { PRIMARY_COLOR } from "$/config/Theme.ts";
+import { buildAppPageURL } from "$/utils/urls/buildAppPageURL.ts";
+import type { EmailLinkProps } from "./EmailLink.tsx";
+import type { ReactNode } from "react";
+import type { DistributedOmit } from "type-fest";
 
 type Props = {
   children: ReactNode;

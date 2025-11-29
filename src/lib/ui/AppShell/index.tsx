@@ -27,11 +27,12 @@ import {
   IconUser,
 } from "@tabler/icons-react";
 import { Outlet, useNavigate, useRouter } from "@tanstack/react-router";
+import { APP_NAME } from "$/config/AppConfig";
 import clsx from "clsx";
 import { ReactNode } from "react";
 import { AuthClient } from "@/clients/AuthClient";
 import { BetaBadge } from "@/components/common/BetaBadge";
-import { APP_NAME, AppConfig } from "@/config/AppConfig";
+import { AppConfig } from "@/config/AppConfig";
 import { AppLink, AppLinks } from "@/config/AppLinks";
 import { NavbarLink } from "@/config/NavbarLinks";
 import { useMutation } from "@/lib/hooks/query/useMutation";

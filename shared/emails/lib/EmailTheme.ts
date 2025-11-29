@@ -1,4 +1,4 @@
-import { buildRelativeImageURL } from "./buildRelativeImageURL";
+import { buildRelativeImageURL } from "./buildRelativeImageURL.ts";
 
 /** Configuration for the logo to use in emails. */
 export const LOGO = {

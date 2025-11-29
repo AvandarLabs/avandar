@@ -1,7 +1,7 @@
+import { UUID } from "$/lib/types/common";
 import { SetOptional } from "type-fest";
 import { DuckDBDataType } from "@/clients/DuckDBClient/DuckDBDataType";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
-import { UUID } from "@/lib/types/common";
 import { Model } from "@/models/Model";
 import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { AvaDataType } from "../AvaDataType/AvaDataType.types";

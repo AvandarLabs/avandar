@@ -1,4 +1,4 @@
-import { Logger } from "@/lib/Logger";
+import { Logger } from "$/lib/Logger/Logger";
 import { uuid } from "@/lib/utils/uuid";
 import { User } from "@/models/User/User.types";
 import { AvaSupabase } from "../supabase/AvaSupabase";

@@ -1,11 +1,11 @@
-import { VizConfigType, VizType } from "../VizConfig";
-import { IVizConfigModule } from "../VizConfig/IVizConfigModule";
+import { Logger } from "$/lib/Logger/Logger";
 import { match } from "ts-pattern";
 import { TableVizConfig } from ".";
+import { BarChartVizConfig } from "../BarChartVizConfig";
 import { LineChartVizConfig } from "../LineChartVizConfig";
 import { ScatterPlotVizConfig } from "../ScatterPlotVizConfig";
-import { Logger } from "@/lib/Logger";
-import { BarChartVizConfig } from "../BarChartVizConfig";
+import { VizConfigType, VizType } from "../VizConfig";
+import { IVizConfigModule } from "../VizConfig/IVizConfigModule";
 
 export const TableVizConfigs = {
   vizType: "table",
@@ -34,13 +34,17 @@ export const TableVizConfigs = {
     return match<VizType>(newVizType)
       .with("table", (): TableVizConfig => {
         return vizConfig;
-      }).with("bar", (vizType): BarChartVizConfig => {
+      })
+      .with("bar", (vizType): BarChartVizConfig => {
         return { vizType, ...emptyAxes };
-      }).with("line", (vizType): LineChartVizConfig => {
+      })
+      .with("line", (vizType): LineChartVizConfig => {
         return { vizType, ...emptyAxes };
-      }).with("scatter", (vizType): ScatterPlotVizConfig => {
+      })
+      .with("scatter", (vizType): ScatterPlotVizConfig => {
         return { vizType, ...emptyAxes };
-      }).exhaustive(() => {
+      })
+      .exhaustive(() => {
         Logger.error("Invalid viz type", { vizType: newVizType });
         throw new Error(`Invalid viz type: ${newVizType}`);
       }) as VizConfigType<K>;

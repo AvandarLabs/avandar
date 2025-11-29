@@ -1,4 +1,5 @@
 import { useUncontrolled } from "@mantine/hooks";
+import { where } from "$/lib/utils/filters/filters";
 import { useCallback, useMemo } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
@@ -11,7 +12,6 @@ import {
   SelectProps,
 } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { where } from "@/lib/utils/filters/filters";
 import { makeBucketMap } from "@/lib/utils/maps/makeBucketMap";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import {

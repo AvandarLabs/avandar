@@ -1,5 +1,5 @@
+import { UnknownObject } from "$/lib/types/common";
 import { Paths, Simplify, UnknownArray } from "type-fest";
-import { UnknownObject } from "@/lib/types/common";
 
 /**
  * Set the type of a property given a shallow key.

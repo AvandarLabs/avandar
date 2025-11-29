@@ -1,3 +1,4 @@
+import { isEmail } from "@mantine/form";
 import { match } from "ts-pattern";
 import { getFieldLabel } from "../getFieldLabel";
 import type {
@@ -28,6 +29,7 @@ export function hydrateTextFieldSchema<
           return {
             autoComplete: "email",
             placeholder: "Enter email",
+            validateFn: isEmail("Invalid email address"),
             ...fieldSchema,
           };
         })

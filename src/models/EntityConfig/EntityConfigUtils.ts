@@ -1,10 +1,10 @@
-import { Simplify } from "type-fest";
 import {
   AnyFunction,
   AnyFunctionWithArguments,
-} from "@/lib/types/utilityTypes";
+} from "$/lib/types/utilityTypes";
+import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
+import { Simplify } from "type-fest";
 import { assertIsDefined } from "@/lib/utils/asserts";
-import { objectKeys } from "@/lib/utils/objects/misc";
 import { BuildableEntityConfig, EntityConfig } from "./EntityConfig.types";
 import { EntityFieldConfig } from "./EntityFieldConfig/EntityFieldConfig.types";
 import { EntityFieldValueExtractor } from "./ValueExtractor/types";
@@ -26,15 +26,13 @@ type WithBind<U extends IEntityConfigUtils> = U & {
   bind: (entityConfig: BuildableEntityConfig) => BindWithEntityConfig<U>;
 };
 
-type BindWithEntityConfig<U extends IEntityConfigUtils> = Simplify<
-  {
-    [K in keyof U]: U[K] extends AnyFunctionWithArguments<infer Args>
-      ? Args extends [EntityConfig, ...infer Rest]
-        ? (...args: Rest) => ReturnType<U[K]>
-      : never
-      : never;
-  }
->;
+type BindWithEntityConfig<U extends IEntityConfigUtils> = Simplify<{
+  [K in keyof U]: U[K] extends AnyFunctionWithArguments<infer Args> ?
+    Args extends [EntityConfig, ...infer Rest] ?
+      (...args: Rest) => ReturnType<U[K]>
+    : never
+  : never;
+}>;
 
 const boundModuleCache = new WeakMap<
   BuildableEntityConfig,

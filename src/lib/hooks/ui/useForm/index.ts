@@ -4,8 +4,8 @@ import {
   useForm as mantineUseForm,
   UseFormInput as MantineUseFormInput,
 } from "@mantine/form";
+import { UnknownObject } from "$/lib/types/common";
 import { Merge, Paths } from "type-fest";
-import { UnknownObject } from "@/lib/types/common";
 import { FormType } from "./types";
 import { useKeysAndPropsCallback } from "./useKeysAndPropsCallback";
 

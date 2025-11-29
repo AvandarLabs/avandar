@@ -1,6 +1,6 @@
 import { hasDefinedProps } from "@/lib/utils/guards/guards";
-import { User } from "@/models/User/User.types";
 import { Route as AuthRoute } from "@/routes/_auth/route";
+import type { User } from "@/models/User/User.types";
 
 /**
  * Get the current authenticated user.
@@ -14,7 +14,7 @@ import { Route as AuthRoute } from "@/routes/_auth/route";
 export function useCurrentUser(): User | undefined {
   const { user } = AuthRoute.useRouteContext();
   if (user && hasDefinedProps(user, "email")) {
-    return user;
+    return user as User;
   }
   return undefined;
 }

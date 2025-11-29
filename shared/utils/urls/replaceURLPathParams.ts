@@ -1,4 +1,4 @@
-import { Logger } from "@/lib/Logger";
+import { Logger } from "$/lib/Logger/Logger.ts";
 
 type _URLParamNameExtractor<
   RoutePath extends `/${string}`,

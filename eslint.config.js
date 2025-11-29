@@ -153,6 +153,23 @@ export default [
     },
   },
   {
+    // we require import extensions in the shared directory so it can work with
+    // Deno
+    files: ["shared/**/*.{ts,tsx}"],
+    rules: {
+      "import-x/extensions": [
+        "error",
+        "always",
+        {
+          js: "always",
+          jsx: "always",
+          ts: "always",
+          tsx: "always",
+        },
+      ],
+    },
+  },
+  {
     ignores: ["src/types/database.types.ts"],
   },
 ];

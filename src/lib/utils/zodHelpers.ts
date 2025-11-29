@@ -1,7 +1,12 @@
 import { z } from "zod";
 import { Json } from "@/types/database.types";
-import { MIMEType, RawCellValue, RawDataRow, UUID } from "../types/common";
-import { Brand } from "../types/utilityTypes";
+import {
+  Brand,
+  MIMEType,
+  RawCellValue,
+  RawDataRow,
+  UUID,
+} from "../../../shared/lib/types/common";
 
 /**
  * Returns a Zod type that represents a branded UUID. This expects

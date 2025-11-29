@@ -14,9 +14,10 @@ import {
 import { StrictMode, useEffect, useMemo } from "react";
 import { createRoot } from "react-dom/client";
 import { AvaQueryClient } from "./config/AvaQueryClient";
-import { AvaRouter, AvaRouterRootContext } from "./config/AvaRouter";
+import { AvaRouter } from "./config/AvaRouter";
 import { AvaDexie } from "./db/dexie/AvaDexie";
 import { useAuth } from "./lib/hooks/auth/useAuth";
+import type { AvaRouterRootContext } from "@/config/AvaRouter";
 
 AGGridModuleRegistry.registerModules([AllCommunityModule]);
 

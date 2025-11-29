@@ -1,5 +1,5 @@
+import { UnknownObject } from "$/lib/types/common";
 import { Merge } from "type-fest";
-import { UnknownObject } from "@/lib/types/common";
 import { ModelCRUDTypes } from "./ModelCRUDTypes";
 
 type DefaultModelTypes = {

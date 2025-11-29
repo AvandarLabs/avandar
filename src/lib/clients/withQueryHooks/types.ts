@@ -1,4 +1,9 @@
 import { DefaultError, QueryClient, QueryKey } from "@tanstack/react-query";
+import {
+  AnyFunction,
+  AnyFunctionWithReturn,
+  AnyFunctionWithSignature,
+} from "$/lib/types/utilityTypes";
 import { ConditionalKeys, Simplify } from "type-fest";
 import {
   UseMutationOptions,
@@ -8,11 +13,6 @@ import {
   UseQueryOptions,
   UseQueryResultTuple,
 } from "@/lib/hooks/query/useQuery";
-import {
-  AnyFunction,
-  AnyFunctionWithReturn,
-  AnyFunctionWithSignature,
-} from "@/lib/types/utilityTypes";
 import { BaseClient } from "../BaseClient";
 
 /**

@@ -1,4 +1,4 @@
-import { UUID } from "@/lib/types/common";
+import { UUID } from "$/lib/types/common";
 import { DatasetId } from "@/models/datasets/Dataset";
 import { EntityConfigId } from "@/models/EntityConfig/EntityConfig.types";
 import { EntityFieldConfigId } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";

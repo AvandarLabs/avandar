@@ -1,27 +1,27 @@
 import { removeDuplicates } from "@tiptap/react";
+import { where } from "$/lib/utils/filters/filters";
+import { isDefined } from "$/lib/utils/guards/isDefined";
+import { objectEntries } from "$/lib/utils/objects/objectEntries/objectEntries";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
+import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
+import { DatasetColumnValueExtractorClient } from "@/clients/entity-configs/DatasetColumnValueExtractorClient";
 import { assertIsDefined } from "@/lib/utils/asserts";
-import { where } from "@/lib/utils/filters/filters";
-import { isDefined } from "@/lib/utils/guards/guards";
 import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap";
 import {
   makeBucketRecord,
   makeIdLookupRecord,
 } from "@/lib/utils/objects/builders";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { objectEntries } from "@/lib/utils/objects/misc";
 import { promiseFlatMap } from "@/lib/utils/promises";
 import { DatasetId } from "@/models/datasets/Dataset";
 import { DatasetColumn } from "@/models/datasets/DatasetColumn";
 import { EntityConfigId } from "@/models/EntityConfig";
-import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import {
   EntityFieldConfig,
   EntityFieldConfigId,
 } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
-import { DatasetColumnValueExtractorClient } from "@/clients/entity-configs/DatasetColumnValueExtractorClient";
 import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractor.types";
 
 type FieldWithDatasetExtractor = {
@@ -257,9 +257,8 @@ export async function getDatasetColumnFieldValues({
   entityConfigId: EntityConfigId;
   fieldsWithExtractors: readonly FieldWithDatasetExtractor[];
 }): Promise<Array<Record<EntityFieldConfigId, unknown>>> {
-  const primaryKeyFieldsWithExtractors = await _getPrimaryKeyFieldExtractors(
-    entityConfigId,
-  );
+  const primaryKeyFieldsWithExtractors =
+    await _getPrimaryKeyFieldExtractors(entityConfigId);
 
   // Get all metadata of the columns we need to extract
   const allColumnIds = removeDuplicates([

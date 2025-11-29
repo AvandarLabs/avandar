@@ -4,10 +4,10 @@ import {
   ErrorComponentProps,
   notFound,
 } from "@tanstack/react-router";
+import { Logger } from "$/lib/Logger/Logger";
 import { useEffect } from "react";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { SingleEntityView } from "@/components/EntityManagerApp/SingleEntityView";
-import { Logger } from "@/lib/Logger";
 import { Callout } from "@/lib/ui/Callout";
 import { uuid } from "@/lib/utils/uuid";
 import { Entity } from "@/models/entities/Entity";

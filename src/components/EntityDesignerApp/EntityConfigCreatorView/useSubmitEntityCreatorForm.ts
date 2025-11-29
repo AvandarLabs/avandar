@@ -1,13 +1,14 @@
+import { isDefined } from "$/lib/utils/guards/isDefined";
 import { match } from "ts-pattern";
+import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import {
   useMutation,
   UseMutationResultTuple,
 } from "@/lib/hooks/query/useMutation";
-import { hasPropKeys, isDefined } from "@/lib/utils/guards/guards";
+import { hasPropKeys } from "@/lib/utils/guards/guards";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
-import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { EntityFieldValueExtractor } from "@/models/EntityConfig/ValueExtractor/types";
 import { ValueExtractorClient } from "@/models/EntityConfig/ValueExtractor/ValueExtractorClient";
 import { EntityConfigFormSubmitValues } from "./entityConfigFormTypes";

@@ -1,6 +1,6 @@
 import { usePrevious } from "@mantine/hooks";
+import { isDefined } from "$/lib/utils/guards/isDefined";
 import { useEffect } from "react";
-import { isDefined } from "../utils/guards/guards";
 
 /**
  * Calls `callback` when `value` changes from `undefined` to any value.

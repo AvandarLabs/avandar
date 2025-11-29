@@ -1,1 +1,0 @@
-export { isFiltersByOperatorObject } from "./isFiltersByOperatorObject";

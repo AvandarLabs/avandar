@@ -1,6 +1,6 @@
-import { isNonEmptyArray } from "@/lib/utils/guards/guards";
-import { PartialStructuredQuery } from "../queries/StructuredQuery";
+import { isNonEmptyArray } from "$/lib/utils/guards/isNonEmptyArray/isNonEmptyArray";
 import { QueryColumns } from "../queries/QueryColumn";
+import { PartialStructuredQuery } from "../queries/StructuredQuery";
 
 type XYAxesConfig = {
   xAxisKey: string | undefined;
@@ -13,9 +13,7 @@ type XYAxesConfig = {
  * @param query The query to hydrate the axes from.
  * @returns The new viz config with the axes hydrated.
  */
-export function hydrateXYFromQuery<
-  VConfig extends XYAxesConfig,
->(
+export function hydrateXYFromQuery<VConfig extends XYAxesConfig>(
   currVizConfig: VConfig,
   query: PartialStructuredQuery,
 ): VConfig {
@@ -48,8 +46,9 @@ export function hydrateXYFromQuery<
       const firstNumericColumn = queryColumns.find(QueryColumns.isNumeric);
       newVizConfig = {
         ...newVizConfig,
-        yAxisKey: firstNumericColumn
-          ? QueryColumns.getDerivedColumnName(firstNumericColumn)
+        yAxisKey:
+          firstNumericColumn ?
+            QueryColumns.getDerivedColumnName(firstNumericColumn)
           : undefined,
       };
     }
@@ -65,8 +64,9 @@ export function hydrateXYFromQuery<
 
       newVizConfig = {
         ...newVizConfig,
-        xAxisKey: firstColumn
-          ? QueryColumns.getDerivedColumnName(firstColumn)
+        xAxisKey:
+          firstColumn ?
+            QueryColumns.getDerivedColumnName(firstColumn)
           : undefined,
       };
     }

@@ -1,4 +1,4 @@
-import { registry } from "@/lib/utils/objects/misc";
+import { registry } from "$/lib/utils/objects/registry/registry";
 import { ValuePickerRuleType } from "./DatasetColumnValueExtractor.types";
 
 export const DatasetColumnValueExtractors = {

@@ -1,15 +1,6 @@
 {
-  "__comment": "This tsconfig allows the `shared/emails` directory to compile with our path aliases when we run the preview server with `dev:email`.",
+  "__comment": "This tsconfig allows the `dev:email` server (which uses NextJS) to identify this directory as a root in order to run the email server on `shared/emails`",
   "$schema": "https://json.schemastore.org/tsconfig",
-  "compilerOptions": {
-    "strict": true,
-    "jsx": "react-jsx",
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "paths": {
-      "@/*": ["../src/*"],
-      "$/*": ["./*"],
-      "~/*": ["../*"]
-    }
-  },
+  "extends": "../tsconfig.app.json",
   "include": [".", "../src"]
 }

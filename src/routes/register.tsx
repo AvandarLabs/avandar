@@ -14,13 +14,14 @@ import {
 import { isEmail } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
+import { INFO_EMAIL } from "$/config/AppConfig";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
 import { AuthClient } from "@/clients/AuthClient";
 import { AuthLayout } from "@/components/common/AuthLayout";
 import { BackToLoginLink } from "@/components/common/AuthLayout/BackToLoginLink";
-import { INFO_EMAIL, WAITLIST_URL } from "@/config/AppConfig";
+import { WAITLIST_URL } from "@/config/AppConfig";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";

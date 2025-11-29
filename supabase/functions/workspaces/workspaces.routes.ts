@@ -1,3 +1,4 @@
+import { EmailClient } from "$/EmailClient/EmailClient.tsx";
 import { z } from "zod";
 import { defineRoutes, POST } from "../_shared/MiniServer/MiniServer.ts";
 import type { WorkspacesAPI } from "./workspaces.types.ts";
@@ -67,5 +68,36 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
 
         return { isValid: true };
       }),
+  },
+  "/:workspaceSlug/invite": {
+    POST: POST({
+      path: "/:workspaceSlug/invite",
+      schema: {
+        workspaceSlug: z.string(),
+      },
+    })
+      .bodySchema({
+        emailToInvite: z.string(),
+        role: z.enum(["admin", "member"]),
+      })
+      .action(
+        async ({
+          pathParams: { workspaceSlug },
+          body: { emailToInvite, role },
+        }) => {
+          console.log("params", { workspaceSlug, emailToInvite, role });
+          await EmailClient.sendNotificationEmail({
+            type: "workspace_invite",
+            recipientEmail: emailToInvite,
+            workspaceSlug,
+            workspaceName: "Test Workspace",
+            inviteId: "123",
+          });
+
+          return await Promise.resolve({
+            inviteId: "123",
+          });
+        },
+      ),
   },
 });

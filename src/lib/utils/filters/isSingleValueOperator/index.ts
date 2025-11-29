@@ -1,1 +1,0 @@
-export { isSingleValueOperator } from "./isSingleValueOperator";

@@ -1,21 +1,57 @@
 import { Stack, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useRef } from "react";
+import { APIClient } from "@/clients/APIClient";
 import { useFeaturePlanType } from "@/hooks/workspaces/useCurrentSubscriptionType";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useMutation } from "@/lib/hooks/query/useMutation";
 import { AvaForm } from "@/lib/ui/AvaForm";
 import { AvaField } from "@/lib/ui/AvaForm/AvaField";
 import { AvaFormRef } from "@/lib/ui/AvaForm/AvaForm.types";
-import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
+import { notifySuccess } from "@/lib/ui/notifications/notify";
 import { WorkspaceRole } from "@/models/Workspace/Workspace.types";
 
 export function useWorkspaceInviteModal(): () => void {
   const featurePlanType = useFeaturePlanType();
+  const workspace = useCurrentWorkspace();
   const formRef =
     useRef<AvaFormRef<{ email: string; role: WorkspaceRole }>>(null);
+  const [inviteEmail] = useMutation({
+    mutationFn: (variables: {
+      workspaceSlug: string;
+      email: string;
+      role: WorkspaceRole;
+    }) => {
+      return APIClient.post({
+        route: "workspaces/:workspaceSlug/invite",
+        pathParams: {
+          workspaceSlug: variables.workspaceSlug,
+        },
+        body: {
+          emailToInvite: variables.email,
+          role: variables.role,
+        },
+      });
+    },
+  });
 
-  const onSendInvite = () => {
+  const onSendInviteClick = async (modalId: string) => {
     if (formRef.current) {
-      notifyDevAlert(formRef.current.getFormValues());
+      const validation = formRef.current.getForm().validate();
+      if (!validation.hasErrors) {
+        const { email, role } = formRef.current.getFormValues();
+        modals.updateModal({
+          modalId,
+          confirmProps: { loading: true },
+        });
+        await inviteEmail.async({
+          workspaceSlug: workspace.slug,
+          email,
+          role,
+        });
+        notifySuccess({ title: "Invite sent" });
+        modals.close(modalId);
+      }
     }
   };
 
@@ -31,8 +67,7 @@ export function useWorkspaceInviteModal(): () => void {
       },
       closeOnConfirm: false,
       onConfirm: () => {
-        onSendInvite();
-        modals.close(modalId);
+        onSendInviteClick(modalId);
       },
       children: (
         <Stack>
@@ -67,8 +102,10 @@ export function useWorkspaceInviteModal(): () => void {
               }),
             }}
             formElements={["email", "role"]}
-            onSubmit={() => {
-              onSendInvite();
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                onSendInviteClick(modalId);
+              }
             }}
           />
         </Stack>

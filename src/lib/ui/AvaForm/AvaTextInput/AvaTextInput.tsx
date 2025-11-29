@@ -1,13 +1,13 @@
 import { TextInput, TextInputProps } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
+import { StringKeyOf } from "$/lib/types/utilityTypes";
+import { isDefined } from "$/lib/utils/guards/isDefined";
+import { objectKeys } from "$/lib/utils/objects/objectKeys";
 import { ChangeEvent } from "react";
 import { Paths } from "type-fest";
 import { FormType } from "@/lib/hooks/ui/useForm";
-import { StringKeyOf } from "@/lib/types/utilityTypes";
-import { isDefined } from "@/lib/utils/guards/guards";
 import { PathValue } from "@/lib/utils/objects/getValue";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { objectKeys } from "@/lib/utils/objects/misc";
 import type {
   GenericFormSchemaRecord,
   ValuesOfFieldRecord,
@@ -44,15 +44,14 @@ export function AvaTextInput<
   FormValues extends ValuesOfFieldRecord<FieldSchemaRecord> &
     Record<FieldKey, string>,
 >({
-  fieldKey: uncastedFieldKey,
+  fieldKey,
   form,
   debounceMs,
   fields,
   onChange,
   ...props
 }: Props<FieldKey, FieldSchemaRecord, FormValues>): JSX.Element {
-  const fieldKey = uncastedFieldKey as Paths<FormValues>;
-  const formInputProps = form.getInputProps(fieldKey);
+  const formInputProps = form.getInputProps(fieldKey as Paths<FormValues>);
   const fieldsToSyncTo = objectKeys(fields)
     .map((otherFieldKey) => {
       const otherField = fields[otherFieldKey]!;
@@ -116,6 +115,7 @@ export function AvaTextInput<
       key={form.key(fieldKey as Paths<FormValues>)}
       {...formInputProps}
       {...props}
+      name={props.name ?? fieldKey}
       onChange={(event: ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value as FormValues[FieldKey];
 

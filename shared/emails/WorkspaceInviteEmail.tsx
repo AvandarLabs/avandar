@@ -1,9 +1,9 @@
 import { Text } from "@react-email/components";
-import { buildAppPageURL } from "$/utils/urls/buildAppPageURL";
-import { EmailFullButton } from "./lib/EmailFullButton";
-import { EmailHeading } from "./lib/EmailHeading";
-import { EmailParagraph } from "./lib/EmailParagraph";
-import { EmailTemplate } from "./lib/EmailTemplate";
+import { buildAppPageURL } from "$/utils/urls/buildAppPageURL.ts";
+import { EmailFullButton } from "./lib/EmailFullButton.tsx";
+import { EmailHeading } from "./lib/EmailHeading.tsx";
+import { EmailParagraph } from "./lib/EmailParagraph.tsx";
+import { EmailTemplate } from "./lib/EmailTemplate.tsx";
 
 type Props = {
   inviteId: string;
@@ -50,6 +50,7 @@ const styles = {
   heading: {
     fontSize: "1.75rem",
     fontWeight: "normal",
+    lineHeight: "1.5",
   },
   workspaceBox: {
     container: {

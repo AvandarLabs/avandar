@@ -1,7 +1,7 @@
-import { MAX_FREE_PLAN_SEATS } from "$/AppConfig.ts";
 import { z } from "zod";
 import { PATCH } from "../_shared/MiniServer/MiniServer.ts";
 import { PolarClient } from "../_shared/PolarClient/PolarClient.ts";
+import { MAX_FREE_PLAN_SEATS } from "../../../shared/config/AppConfig.ts";
 import {
   PolarProductMetadataSchema,
   PolarSubscriptionMetadataSchema,

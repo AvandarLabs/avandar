@@ -1,5 +1,7 @@
 import { Box, Button, Flex, Stack, Text } from "@mantine/core";
-import { isEmail } from "@mantine/form";
+import { StringKeyOf } from "$/lib/types/utilityTypes";
+import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
+import { objectValues } from "$/lib/utils/objects/objectValues/objectValues";
 import {
   ReactElement,
   ReactNode,
@@ -10,35 +12,15 @@ import {
 } from "react";
 import { match } from "ts-pattern";
 import { FormRulesRecord, useForm, UseFormInput } from "@/lib/hooks/ui/useForm";
-import { StringKeyOf } from "@/lib/types/utilityTypes";
-import { constant } from "@/lib/utils/higherOrderFuncs";
-import { objectKeys, objectValues } from "@/lib/utils/objects/misc";
 import {
-  AnyValidationFn,
   AvaFormRef,
   FormFieldSchema,
   GenericFormSchemaRecord,
-  SemanticTextType,
   ValidBaseValueType,
   ValuesOfFieldRecord,
 } from "./AvaForm.types";
-import { UnknownFieldInput } from "./UnknownFieldInput";
-
-function getDefaultSemanticValidationFn(
-  semanticType: SemanticTextType,
-): AnyValidationFn | undefined {
-  return match(semanticType)
-    .with("email", () => {
-      return isEmail("Invalid email address");
-    })
-    .with("text", () => {
-      // a general "text" type is always valid
-      return constant(undefined);
-    })
-    .exhaustive(() => {
-      return undefined;
-    });
-}
+import { hydrateTextFieldSchema } from "./AvaTextInput/hydrateTextFieldSchema";
+import { UnknownAvaInput } from "./UnknownAvaInput";
 
 type Props<
   FieldSchemaRecord extends Record<
@@ -91,6 +73,9 @@ type Props<
 
   /** The ref to the AvaForm */
   ref?: Ref<AvaFormRef<FormValues>>;
+
+  /** The function to call when a key is pressed down. */
+  onKeyDown?: (event: React.KeyboardEvent<HTMLFormElement>) => void;
 };
 
 /**
@@ -116,29 +101,53 @@ export function AvaForm<
   submitIsLoading,
   submitIsDisabled,
   hideSubmitButton,
+  onKeyDown,
 }: Props<FieldSchemaRecord, FieldKey, FormValues>): JSX.Element {
   const formNodeRef = useRef<HTMLFormElement>(null);
+
+  // first, we hydrate the fields with additional default values and validation
+  // functions based on their semantic types and other properties
+  const improvedFields = useMemo(() => {
+    const newFields = {} as FieldSchemaRecord;
+    objectKeys(fields).forEach((fieldKey) => {
+      const field = fields[fieldKey]! as FormFieldSchema<FieldKey, FormValues>;
+      const improvedField = match(field)
+        .with({ type: "text" }, (fieldSchema) => {
+          return hydrateTextFieldSchema(fieldSchema);
+        })
+        .with({ type: "select" }, (fieldSchema) => {
+          return fieldSchema;
+        })
+        .exhaustive(() => {
+          return field;
+        });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      newFields[fieldKey] = improvedField as any;
+    });
+    return newFields;
+    // disable exhaustive-deps because we only want to generate these once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const formInitializer = useMemo(() => {
     const initValues = {} as Record<FieldKey, ValidBaseValueType>;
     const validations = {} as FormRulesRecord<FormValues, FormValues>;
-    const anyFieldRequiresSync = objectValues(fields).some((field) => {
+    const anyFieldRequiresSync = objectValues(improvedFields).some((field) => {
       return field.type === "text" && field.syncWhileUntouched;
     });
 
-    objectKeys(fields).forEach((objFieldKey) => {
+    objectKeys(improvedFields).forEach((objFieldKey) => {
       const fieldKey = objFieldKey as FieldKey;
-      const field = fields[fieldKey]! as FormFieldSchema<FieldKey, FormValues>;
+      const field = improvedFields[fieldKey]! as FormFieldSchema<
+        FieldKey,
+        FormValues
+      >;
 
       // get the initial values
       initValues[fieldKey] = field.initialValue;
 
-      // get the validation functions
-      const semanticValidationFn =
-        field.type === "text" && field.semanticType ?
-          getDefaultSemanticValidationFn(field.semanticType)
-        : undefined;
-
-      if (field.validateFn || semanticValidationFn) {
+      if (field.validateFn) {
         const fieldValidationFn = ((value, allFormValues, currentFieldKey) => {
           // before running validation, we first verify that the type of the
           // value is appropriate, before we call the custom validate function
@@ -158,7 +167,7 @@ export function AvaForm<
                 }
                 return "Received a non-string value for a text field";
               }
-              return semanticValidationFn?.(value, allFormValues, fieldKey);
+              return undefined;
             })
             .with("select", () => {
               if (field.validateFn) {
@@ -220,18 +229,18 @@ export function AvaForm<
     innerFormElements: () => {
       return formElements.map((formElement) => {
         if (typeof formElement === "string") {
-          if (formElement in fields) {
+          if (formElement in improvedFields) {
             const fieldKey = formElement as FieldKey;
-            const field = fields[fieldKey]! as FormFieldSchema<
+            const field = improvedFields[fieldKey]! as FormFieldSchema<
               FieldKey,
               FormValues
             >;
             return (
-              <UnknownFieldInput
+              <UnknownAvaInput
                 key={field.key}
                 fieldKey={field.key}
                 parentForm={form}
-                fields={fields}
+                fields={improvedFields}
                 field={field}
               />
             );
@@ -249,6 +258,7 @@ export function AvaForm<
       onSubmit={form.onSubmit((values, event) => {
         onSubmit?.(values, event);
       })}
+      onKeyDown={onKeyDown}
     >
       <Stack gap="md">
         {elements.content(introContent)}

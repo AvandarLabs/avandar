@@ -36,10 +36,11 @@ concurrently \
   "nodemon \
     --ext ts,tsx \
     --watch supabase/functions \
+    --watch shared \
     --exec '
       find . -name "deno.lock" -delete 2>/dev/null; \
       find supabase/functions -type d -name "node_modules" -exec rm -rf {} + 2>/dev/null; \
-      deno check supabase/functions --quiet && \
+      deno check shared supabase/functions --quiet && \
         printf \"\033[32mType check passed in supabase/functions\033[0m\n\" || true
     ' 2>&1 | grep -v -E '\[nodemon\]'" \
   "FORCE_COLOR=1 tsc -b --watch tsconfig.app.json tsconfig.node.json"

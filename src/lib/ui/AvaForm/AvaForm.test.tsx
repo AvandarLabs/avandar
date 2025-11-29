@@ -62,7 +62,7 @@ describe("AvaForm", () => {
     );
     const emailInput = screen.getByLabelText("Contact Email");
 
-    expect(emailInput).toHaveAttribute("name", "email");
+    expect(emailInput).toHaveAttribute("name", "contactEmail");
     expect(emailInput).toHaveAttribute("autocomplete", "email");
 
     fireEvent.change(emailInput, { target: { value: "not-an-email" } });

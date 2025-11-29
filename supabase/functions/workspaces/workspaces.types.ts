@@ -2,7 +2,7 @@ import type { APITypeDef } from "../_shared/MiniServer/api.types.ts";
 
 export type WorkspacesAPI = APITypeDef<
   "workspaces",
-  ["/validate-slug"],
+  ["/validate-slug", "/:workspaceSlug/invite"],
   {
     "/validate-slug": {
       POST: {
@@ -17,6 +17,21 @@ export type WorkspacesAPI = APITypeDef<
               isValid: false;
               reason: string;
             };
+      };
+    };
+
+    "/:workspaceSlug/invite": {
+      POST: {
+        pathParams: {
+          workspaceSlug: string;
+        };
+        body: {
+          emailToInvite: string;
+          role: "admin" | "member";
+        };
+        returnType: {
+          inviteId: string;
+        };
       };
     };
   }

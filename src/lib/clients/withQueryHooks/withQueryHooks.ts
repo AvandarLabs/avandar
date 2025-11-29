@@ -1,14 +1,12 @@
 import { DefaultError, QueryClient, QueryKey } from "@tanstack/react-query";
+import { isEmptyObject } from "$/lib/utils/guards/isEmptyObject";
+import { isPlainObject } from "$/lib/utils/guards/isPlainObject";
+import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
 import { capitalize } from "$/lib/utils/strings/capitalize/capitalize";
 import { useMutation, UseMutationOptions } from "@/lib/hooks/query/useMutation";
 import { useQuery } from "@/lib/hooks/query/useQuery";
-import { AnyFunction } from "../../types/utilityTypes";
-import {
-  isEmptyObject,
-  isFunction,
-  isPlainObject,
-} from "../../utils/guards/guards";
-import { objectKeys } from "../../utils/objects/misc";
+import { AnyFunction } from "../../../../shared/lib/types/utilityTypes";
+import { isFunction } from "../../utils/guards/guards";
 import { excludeDeep } from "../../utils/objects/transformations";
 import { prefix } from "../../utils/strings/transformations";
 import { BaseClient } from "../BaseClient";

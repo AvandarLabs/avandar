@@ -16,14 +16,16 @@ function _cleanOrigin(origin: string | undefined): string {
  */
 export function getAppURL(fallback?: string): string {
   // node
-  if (process.env.VITE_APP_URL) {
+  if (process.env) {
     return _cleanOrigin(process.env.VITE_APP_URL ?? fallback);
   }
 
   // browser
-  if (import.meta?.env?.VITE_APP_URL) {
+  if (import.meta.env) {
     return _cleanOrigin(import.meta.env.VITE_APP_URL ?? fallback);
   }
+
+  // Deno
 
   if (!fallback) {
     // this env var is not expected to exist in Deno
