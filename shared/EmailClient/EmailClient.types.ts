@@ -2,6 +2,7 @@ import {
   CreateEmailResponseSuccess,
   SendBroadcastResponseSuccess,
 } from "resend";
+import { Simplify } from "type-fest";
 import { SendBroadcastEmailOptions } from "./sendBroadcastEmail.ts";
 import { SendTransactionalEmailOptions } from "./sendTransactionalEmail.ts";
 
@@ -49,7 +50,7 @@ export type IEmailClient = {
           workspaceName: string;
           inviteId: string;
         }),
-  ) => Promise<CreateEmailResponseSuccess>;
+  ) => Promise<Simplify<CreateEmailResponseSuccess>>;
 
   /**
    * Sends an email broadcast to a Resend audience. This uses Resend's

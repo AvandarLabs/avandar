@@ -1,7 +1,7 @@
 import { UUID } from "$/lib/types/common";
+import { Enums } from "$/types/database.types";
 import { SetOptional } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
-import { Enums } from "@/types/database.types";
 import { UserId } from "../User/User.types";
 import { WorkspaceId } from "../Workspace/Workspace.types";
 

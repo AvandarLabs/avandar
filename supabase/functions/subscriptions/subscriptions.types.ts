@@ -1,5 +1,5 @@
 import type { APITypeDef } from "../_shared/MiniServer/api.types.ts";
-import type { Tables } from "../../../src/types/database.types.ts";
+import type { Tables } from "$/types/database.types.ts";
 
 /**
  * A subset of the Polar Product type that is served to the frontend.

@@ -69,6 +69,7 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
         return { isValid: true };
       }),
   },
+
   "/:workspaceSlug/invite": {
     POST: POST({
       path: "/:workspaceSlug/invite",
@@ -84,19 +85,87 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
         async ({
           pathParams: { workspaceSlug },
           body: { emailToInvite, role },
+          supabaseClient,
+          supabaseAdminClient,
+          user,
         }) => {
           console.log("params", { workspaceSlug, emailToInvite, role });
+
+          // look up the workspace
+          const { data: workspace } = await supabaseClient
+            .from("workspaces")
+            .select("name, id, slug")
+            .single()
+            .throwOnError();
+
+          // is the user already registered?
+          const { data: invitedUserId } = await supabaseAdminClient.rpc(
+            "util__get_user_id_by_email",
+            { p_email: emailToInvite },
+          );
+
+          // if yes, are they already a member of the workspace?
+          if (invitedUserId) {
+            const { data: workspaceMembers } = await supabaseClient
+              .from("user_profiles")
+              .select("user_id")
+              .eq("user_id", invitedUserId)
+              .eq("workspace_id", workspace.id);
+
+            if (workspaceMembers && workspaceMembers.length > 0) {
+              throw new Error(
+                "This user is already a member of the workspace.",
+              );
+            }
+          }
+
+          // is the workspace already at the max number of members?
+          const { count } = await supabaseClient
+            .from("user_profiles")
+            .select("*", { count: "exact", head: true })
+            .eq("workspace_id", workspace.id)
+            .throwOnError();
+          if (count && count >= 2) {
+            throw new Error(
+              "Your workspace cannot have more than two members on the free plan",
+            );
+          }
+
+          // now, we check if this email has already been invited to this
+          // workspace
+          const { data: existingInvites } = await supabaseClient
+            .from("workspace_invites")
+            .select("id")
+            .eq("email", emailToInvite)
+            .eq("workspace_id", workspace.id)
+            .throwOnError();
+          if (existingInvites && existingInvites.length > 0) {
+            throw new Error("This email has already been invited.");
+          }
+
+          // it's finally safe to create the invite row
+          const { data: invite } = await supabaseClient
+            .from("workspace_invites")
+            .insert({
+              email: emailToInvite,
+              workspace_id: workspace.id,
+              invited_by: user.id,
+              invite_status: "pending",
+            })
+            .select()
+            .single()
+            .throwOnError();
+
+          // now send the invitation.
           await EmailClient.sendNotificationEmail({
             type: "workspace_invite",
             recipientEmail: emailToInvite,
-            workspaceSlug,
-            workspaceName: "Test Workspace",
-            inviteId: "123",
+            workspaceSlug: workspace.slug,
+            workspaceName: workspace.name,
+            inviteId: invite.id,
           });
 
-          return await Promise.resolve({
-            inviteId: "123",
-          });
+          return { invite };
         },
       ),
   },

@@ -1,4 +1,5 @@
 import { FiltersByColumn, where } from "$/lib/utils/filters/filters";
+import { CompositeTypes } from "$/types/database.types";
 import { SetOptional } from "type-fest";
 import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
 import { makeBucketRecord } from "@/lib/utils/objects/builders";
@@ -11,7 +12,6 @@ import {
   DatasetWithColumns,
 } from "@/models/datasets/Dataset";
 import { WorkspaceId } from "@/models/Workspace/Workspace.types";
-import { CompositeTypes } from "@/types/database.types";
 import { DuckDBClient } from "../DuckDBClient";
 import { DatasetColumnClient } from "./DatasetColumnClient";
 import { LocalDatasetClient } from "./LocalDatasetClient";

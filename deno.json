@@ -5,7 +5,7 @@
   "compilerOptions": {
     "lib": ["deno.ns", "dom", "dom.iterable"],
     "skipLibCheck": true,
-    "typeRoots": ["shared/lib/types"],
+    "typeRoots": ["shared/types", "shared/lib/types"],
     "types": ["react", "react/jsx-runtime"],
 
     "isolatedModules": true,
@@ -28,5 +28,5 @@
     "experimentalDecorators": true,
     "resolveJsonModule": true
   },
-  "types": ["shared/lib/types/global.d.ts"]
+  "types": ["shared/types/global.d.ts"]
 }

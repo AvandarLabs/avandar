@@ -6,7 +6,13 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
-    "typeRoots": ["./node_modules/@types", "src/lib/types", "shared/lib/types"],
+    "typeRoots": [
+      "./node_modules/@types",
+      "src/types",
+      "src/lib/types",
+      "shared/types",
+      "shared/lib/types"
+    ],
     "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"],

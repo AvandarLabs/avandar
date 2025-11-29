@@ -15,7 +15,7 @@
     "tsc-watch": "scripts/tsc-watch.sh",
     "db:apply-migrations": "./scripts/applyMigrations.sh",
     "db:create-user": "npm run vite-script scripts/createUserScript.ts",
-    "db:gen-types": "supabase gen types typescript --local > src/types/database.types.ts",
+    "db:gen-types": "supabase gen types typescript --local > shared/types/database.types.ts",
     "db:new-migration": "bash -c 'supabase stop && PGSSLMODE=disable supabase db diff -f \"$1\"' --",
     "db:down-migration": "./scripts/downMigration.sh",
     "db:redo-migration": "./scripts/redoLastMigration.sh --gen-types",

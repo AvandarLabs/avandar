@@ -38,7 +38,6 @@ concurrently \
     --watch supabase/functions \
     --watch shared \
     --exec '
-      find . -name "deno.lock" -delete 2>/dev/null; \
       find supabase/functions -type d -name "node_modules" -exec rm -rf {} + 2>/dev/null; \
       deno check shared supabase/functions --quiet && \
         printf \"\033[32mType check passed in supabase/functions\033[0m\n\" || true

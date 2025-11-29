@@ -7,10 +7,10 @@ import { NotificationEmailType } from "$/EmailClient/EmailClient.types";
 import { NOTIFICATION_EMAIL_TYPES } from "$/EmailClient/EmailClientConfig";
 import { isDevOverrideEmail } from "$/EmailClient/isDevOverrideEmail";
 import { getDevOverrideEmail } from "$/env/getDevOverrideEmail";
+import { Database } from "$/types/database.types";
 import { program } from "commander";
 import { z } from "zod";
 import { createSupabaseAdminClient } from "@/db/supabase/AvaSupabase";
-import { Database } from "@/types/database.types";
 
 const RED = "\x1b[31m";
 const BLUE = "\x1b[34m";

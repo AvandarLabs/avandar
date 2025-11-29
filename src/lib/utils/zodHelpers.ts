@@ -1,5 +1,5 @@
+import { Json } from "$/types/database.types";
 import { z } from "zod";
-import { Json } from "@/types/database.types";
 import {
   Brand,
   MIMEType,

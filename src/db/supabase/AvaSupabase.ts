@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "@/types/database.types";
+import type { Database } from "$/types/database.types";
 
 /** The names of the tables in the `public` schema of the database. */
 export type DatabaseTableNames = keyof Database["public"]["Tables"];

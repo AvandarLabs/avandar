@@ -1,6 +1,8 @@
 {
   "imports": {
-    "zod": "npm:zod@4",
-    "ts-pattern": "npm:ts-pattern@5"
+    "$/": "../../../shared/",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
+    "ts-pattern": "npm:ts-pattern@5",
+    "zod": "npm:zod@4"
   }
 }
