@@ -1,18 +1,22 @@
 import { match } from "ts-pattern";
 import { FormType } from "@/lib/hooks/ui/useForm";
+import { SelectData } from "../inputs/Select";
 import {
   FormFieldSchema,
   GenericFormSchemaRecord,
   ValidBaseValueType,
   ValuesOfFieldRecord,
 } from "./AvaForm.types";
+import { AvaSelectInput } from "./AvaSelectInput";
 import { AvaTextInput } from "./AvaTextInput";
 import { hydrateTextFieldSchema } from "./AvaTextInput/hydrateTextFieldSchema";
 
 type Props<
   FieldKey extends string,
+  FieldValue extends ValidBaseValueType,
   FieldSchemaRecord extends GenericFormSchemaRecord,
-  FormValues extends ValuesOfFieldRecord<FieldSchemaRecord>,
+  FormValues extends ValuesOfFieldRecord<FieldSchemaRecord> &
+    Record<FieldKey, FieldValue>,
 > = {
   fieldKey: FieldKey;
 
@@ -26,17 +30,18 @@ type Props<
   fields: FieldSchemaRecord;
 };
 
-export function AvaInput<
+export function UnknownFieldInput<
   FieldKey extends string,
+  FieldValue extends string,
   FieldSchemaRecord extends GenericFormSchemaRecord,
   FormValues extends ValuesOfFieldRecord<FieldSchemaRecord> &
-    Record<FieldKey, ValidBaseValueType>,
+    Record<FieldKey, FieldValue>,
 >({
   fieldKey,
   fields,
   field,
   parentForm,
-}: Props<FieldKey, FieldSchemaRecord, FormValues>): JSX.Element {
+}: Props<FieldKey, FieldValue, FieldSchemaRecord, FormValues>): JSX.Element {
   return match(field)
     .with({ type: "text" }, (fieldSchema) => {
       const { syncWhileUntouched, initialValue, ...textInputProps } =
@@ -45,13 +50,22 @@ export function AvaInput<
         <AvaTextInput
           fieldKey={fieldKey}
           fields={fields}
-          parentForm={parentForm}
+          form={parentForm}
           {...textInputProps}
         />
       );
     })
-    .with({ type: "select" }, () => {
-      return <div>Not implemented</div>;
+    .with({ type: "select" }, (fieldSchema) => {
+      const { data, ...selectInputProps } = fieldSchema;
+      return (
+        <AvaSelectInput
+          fieldKey={fieldKey}
+          fields={fields}
+          form={parentForm}
+          data={data as SelectData<FormValues[FieldKey]>}
+          {...selectInputProps}
+        />
+      );
     })
     .exhaustive(() => {
       return <div>omg</div>;

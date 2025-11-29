@@ -1,20 +1,22 @@
-import { Select, Stack, Text, TextInput } from "@mantine/core";
+import { Stack, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import { useState } from "react";
+import { useRef } from "react";
 import { useFeaturePlanType } from "@/hooks/workspaces/useCurrentSubscriptionType";
 import { AvaForm } from "@/lib/ui/AvaForm";
-import { notifyNotImplemented } from "@/lib/ui/notifications/notifyNotImplemented";
+import { AvaField } from "@/lib/ui/AvaForm/AvaField";
+import { AvaFormRef } from "@/lib/ui/AvaForm/AvaForm.types";
+import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
 import { WorkspaceRole } from "@/models/Workspace/Workspace.types";
 
 export function useWorkspaceInviteModal(): () => void {
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteRole, setInviteRole] = useState<WorkspaceRole>("member");
   const featurePlanType = useFeaturePlanType();
+  const formRef =
+    useRef<AvaFormRef<{ email: string; role: WorkspaceRole }>>(null);
 
   const onSendInvite = () => {
-    setInviteEmail("");
-    setInviteRole("member");
-    notifyNotImplemented();
+    if (formRef.current) {
+      notifyDevAlert(formRef.current.getFormValues());
+    }
   };
 
   return (): void => {
@@ -25,7 +27,7 @@ export function useWorkspaceInviteModal(): () => void {
         cancel: "Cancel",
       },
       confirmProps: {
-        disabled: !inviteEmail || !inviteRole,
+        disabled: true,
       },
       closeOnConfirm: false,
       onConfirm: () => {
@@ -41,43 +43,33 @@ export function useWorkspaceInviteModal(): () => void {
             : null}
           </Text>
           <AvaForm
+            ref={formRef}
+            hideSubmitButton
             fields={{
-              email: {
+              email: AvaField.email({
                 key: "email",
-                type: "text",
-                semanticType: "email",
                 initialValue: "",
                 label: "Email address",
-              },
-              role: {
+                onChange: (newEmail) => {
+                  modals.updateModal({
+                    modalId,
+                    confirmProps: { disabled: !newEmail },
+                  });
+                },
+              }),
+              role: AvaField.select({
                 key: "role",
-                type: "select",
-                initialValue: "",
-                label: "Role",
-                data: [],
-              },
+                data: [
+                  { value: "member", label: "Member" },
+                  { value: "admin", label: "Admin" },
+                ] as const,
+                initialValue: "member",
+              }),
             }}
             formElements={["email", "role"]}
-          />
-
-          <TextInput
-            label="Email address"
-            placeholder="Enter email"
-            value={inviteEmail}
-            onChange={(e) => {
-              return setInviteEmail(e.currentTarget.value);
+            onSubmit={() => {
+              onSendInvite();
             }}
-          />
-          <Select
-            label="Role"
-            value={inviteRole}
-            onChange={(val) => {
-              return setInviteRole(val as WorkspaceRole);
-            }}
-            data={[
-              { value: "member", label: "Member" },
-              { value: "admin", label: "Admin" },
-            ]}
           />
         </Stack>
       ),

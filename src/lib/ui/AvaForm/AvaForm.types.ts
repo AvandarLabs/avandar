@@ -1,26 +1,22 @@
-import { ExclusifyUnion } from "type-fest";
-import { SelectData } from "../inputs/Select";
+import { ExclusifyUnion, UnknownRecord } from "type-fest";
+import { FormType } from "@/lib/hooks/ui/useForm";
+import { SelectData, SelectOption } from "../inputs/Select";
 import type { StringKeyOf } from "@/lib/types/utilityTypes";
 import type { HTMLInputAutoCompleteAttribute, ReactNode } from "react";
 
 /** For now, forms can only have string values */
-export type ValidBaseValueType = string;
+export type ValidBaseValueType = string | null;
 
 export type AnyFormValues = Record<string, ValidBaseValueType>;
 
 export type SemanticTextType = "email" | "text";
 
-export type AnyValidationFn = ValidationFn<
-  string,
-  ValidBaseValueType,
-  AnyFormValues
->;
+export type AnyValidationFn = FieldValidationFn<string, ValidBaseValueType>;
 
-export type ValidationFn<
+export type FieldValidationFn<
   FieldKey extends string,
-  FieldValue,
-  FormValues extends AnyFormValues,
-> = (
+  FieldValue extends ValidBaseValueType,
+> = <FormValues extends AnyFormValues & Record<FieldKey, FieldValue>>(
   value: FieldValue,
   allFormValues: FormValues,
   fieldKey: FieldKey,
@@ -30,26 +26,43 @@ export type ValidationFn<
  * Convert a record of field schemas to a record mapping the field keys to their
  * value types.
  */
-export type ValuesOfFieldRecord<
-  FieldSchemaRecord extends GenericFormSchemaRecord,
-> = {
-  [FieldKey in StringKeyOf<FieldSchemaRecord>]: FieldSchemaRecord[FieldKey]["initialValue"];
+export type ValuesOfFieldRecord<FieldSchemaRecord extends UnknownRecord> = {
+  [FieldKey in StringKeyOf<FieldSchemaRecord>]: "initialValue" extends (
+    keyof FieldSchemaRecord[FieldKey]
+  ) ?
+    FieldSchemaRecord[FieldKey]["initialValue"]
+  : never;
 };
 
-export type GenericFormSchemaRecord<FieldKeys extends string = string> = {
-  [K in FieldKeys]: FormFieldSchema<K, Record<FieldKeys, ValidBaseValueType>>;
+export type GenericFormSchemaRecord<
+  FormValues extends AnyFormValues = AnyFormValues,
+> = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [K in Extract<keyof FormValues, string>]: any;
 };
 
 export type BaseFormFieldSchema<
   FieldKey extends string,
-  FormValues extends AnyFormValues,
+  FieldValue extends ValidBaseValueType,
 > = {
+  /** The key of the field. */
   key: FieldKey;
-  initialValue: FormValues[FieldKey];
+
+  /** The description of the field. */
   description?: ReactNode;
+
+  /** Whether the field is required. */
   required?: boolean;
+
+  /**
+   * The name of the field. This is used for the `name` attribute of the input.
+   */
   name?: string;
+
+  /** The label of the field. */
   label?: string;
+
+  /** Whether the field is disabled. */
   disabled?: boolean;
 
   /**
@@ -62,20 +75,18 @@ export type BaseFormFieldSchema<
    * @param allFormValues - The current values of all fields in the form.
    * @param fieldKey - The key of the current field.
    */
-  validateFn?: ValidationFn<FieldKey, FormValues[FieldKey], FormValues>;
-
-  /**
-   * The function to call when the field value changes.
-   */
-  onChange?: (value: FormValues[FieldKey]) => void;
+  validateFn?: FieldValidationFn<FieldKey, FieldValue>;
 };
 
 export type TextFieldSchema<
   FieldKey extends string,
-  FormValues extends AnyFormValues,
-> = BaseFormFieldSchema<FieldKey, FormValues> & {
+  FormValues extends AnyFormValues & Record<FieldKey, string>,
+> = BaseFormFieldSchema<FieldKey, string> & {
   /** The type of the field. */
   type: "text";
+
+  /** The initial value of the field. */
+  initialValue: string;
 
   /**
    * The semantic type of the field. This controls things like how the Input
@@ -111,14 +122,36 @@ export type TextFieldSchema<
    * excessive re-renders when the user is typing.
    */
   debounceMs?: number;
+
+  /**
+   * The function to call when the field value changes.
+   */
+  onChange?: (value: string) => void;
 };
+
+export type ValueOfSelectData<Data extends SelectData<string>> =
+  Data extends SelectData<infer T extends string> ? T : never;
 
 export type SelectFieldSchema<
   FieldKey extends string,
-  FormValues extends AnyFormValues,
-> = BaseFormFieldSchema<FieldKey, FormValues> & {
+  Data extends SelectData<string>,
+> = BaseFormFieldSchema<FieldKey, ValueOfSelectData<Data>> & {
+  /** The type of the field. */
   type: "select";
-  data: SelectData<FormValues[FieldKey]>;
+
+  /** The initial value of the field. */
+  initialValue: ValueOfSelectData<Data> | null;
+
+  /** The data for the select field. */
+  data: Data;
+
+  /**
+   * The function to call when the field value changes.
+   */
+  onChange?: (
+    value: ValueOfSelectData<Data> | null,
+    option: SelectOption<ValueOfSelectData<Data>>,
+  ) => void;
 };
 
 /**
@@ -128,8 +161,14 @@ export type SelectFieldSchema<
  */
 export type FormFieldSchema<
   FieldKey extends string,
-  FormValues extends AnyFormValues,
+  FormValues extends AnyFormValues & Record<FieldKey, ValidBaseValueType>,
 > = ExclusifyUnion<
-  | TextFieldSchema<FieldKey, FormValues>
-  | SelectFieldSchema<FieldKey, FormValues>
+  | TextFieldSchema<FieldKey, FormValues & Record<FieldKey, string>>
+  | SelectFieldSchema<FieldKey, SelectData<string>>
 >;
+
+export type AvaFormRef<FormValues extends AnyFormValues> = {
+  getForm: () => FormType<FormValues>;
+  getFormValues: () => FormValues;
+  getFormNode: () => HTMLFormElement | null;
+};

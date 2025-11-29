@@ -201,7 +201,7 @@ describe("AvaForm", () => {
             initialValue: "",
             syncWhileUntouched: {
               syncFrom: "workspaceName",
-              transform: (value) => {
+              transform: (value: string) => {
                 // slugifies the workspace name
                 return value.trim().toLowerCase().replace(/\s+/g, "-");
               },

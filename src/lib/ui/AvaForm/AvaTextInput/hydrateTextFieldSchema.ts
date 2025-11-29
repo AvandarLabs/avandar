@@ -16,7 +16,8 @@ import type {
 export function hydrateTextFieldSchema<
   FieldKey extends string,
   FieldSchemaRecord extends GenericFormSchemaRecord,
-  FormValues extends ValuesOfFieldRecord<FieldSchemaRecord>,
+  FormValues extends ValuesOfFieldRecord<FieldSchemaRecord> &
+    Record<FieldKey, string>,
 >(
   fieldSchema: TextFieldSchema<FieldKey, FormValues>,
 ): TextFieldSchema<FieldKey, FormValues> {

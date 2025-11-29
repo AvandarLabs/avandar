@@ -1,6 +1,13 @@
 import { Box, Button, Flex, Stack, Text } from "@mantine/core";
 import { isEmail } from "@mantine/form";
-import { ReactElement, ReactNode, useMemo } from "react";
+import {
+  ReactElement,
+  ReactNode,
+  Ref,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+} from "react";
 import { match } from "ts-pattern";
 import { FormRulesRecord, useForm, UseFormInput } from "@/lib/hooks/ui/useForm";
 import { StringKeyOf } from "@/lib/types/utilityTypes";
@@ -8,13 +15,14 @@ import { constant } from "@/lib/utils/higherOrderFuncs";
 import { objectKeys, objectValues } from "@/lib/utils/objects/misc";
 import {
   AnyValidationFn,
+  AvaFormRef,
   FormFieldSchema,
   GenericFormSchemaRecord,
   SemanticTextType,
   ValidBaseValueType,
   ValuesOfFieldRecord,
 } from "./AvaForm.types";
-import { AvaInput } from "./AvaInput";
+import { UnknownFieldInput } from "./UnknownFieldInput";
 
 function getDefaultSemanticValidationFn(
   semanticType: SemanticTextType,
@@ -33,7 +41,10 @@ function getDefaultSemanticValidationFn(
 }
 
 type Props<
-  FieldSchemaRecord extends GenericFormSchemaRecord,
+  FieldSchemaRecord extends Record<
+    string,
+    FormFieldSchema<string, Record<string, ValidBaseValueType>>
+  >,
   FieldKey extends StringKeyOf<FieldSchemaRecord>,
   FormValues extends ValuesOfFieldRecord<FieldSchemaRecord>,
 > = {
@@ -53,6 +64,9 @@ type Props<
    * in the form's layout, by letting us inject dividers, titles, etc.
    */
   formElements: ReadonlyArray<FieldKey | ReactElement | null | undefined>;
+
+  /** Whether to hide the submit button. */
+  hideSubmitButton?: boolean;
 
   /** Content to show at the bottom of the form. */
   outroContent?: ReactNode;
@@ -74,6 +88,9 @@ type Props<
 
   /** Whether the submit button is disabled. */
   submitIsDisabled?: boolean;
+
+  /** The ref to the AvaForm */
+  ref?: Ref<AvaFormRef<FormValues>>;
 };
 
 /**
@@ -88,6 +105,7 @@ export function AvaForm<
   FieldKey extends StringKeyOf<FieldSchemaRecord>,
   FormValues extends ValuesOfFieldRecord<FieldSchemaRecord>,
 >({
+  ref,
   fields,
   formElements,
   onSubmit,
@@ -97,7 +115,9 @@ export function AvaForm<
   buttonAlignment,
   submitIsLoading,
   submitIsDisabled,
+  hideSubmitButton,
 }: Props<FieldSchemaRecord, FieldKey, FormValues>): JSX.Element {
+  const formNodeRef = useRef<HTMLFormElement>(null);
   const formInitializer = useMemo(() => {
     const initValues = {} as Record<FieldKey, ValidBaseValueType>;
     const validations = {} as FormRulesRecord<FormValues, FormValues>;
@@ -107,7 +127,7 @@ export function AvaForm<
 
     objectKeys(fields).forEach((objFieldKey) => {
       const fieldKey = objFieldKey as FieldKey;
-      const field = fields[fieldKey]!;
+      const field = fields[fieldKey]! as FormFieldSchema<FieldKey, FormValues>;
 
       // get the initial values
       initValues[fieldKey] = field.initialValue;
@@ -125,8 +145,9 @@ export function AvaForm<
           // (if one is provided)
           return match(field.type)
             .with("text", () => {
-              // if a custom validate function is provided, we use it, otherwise
-              // we'll use the semantic validation function (if there is one)
+              // if a custom validate function is provided, we use it,
+              // otherwise we'll use the semantic validation function (if
+              // there is one)
               if (field.validateFn) {
                 if (typeof value === "string") {
                   return field.validateFn(
@@ -174,6 +195,20 @@ export function AvaForm<
 
   const form = useForm(formInitializer as UseFormInput<FormValues>);
 
+  useImperativeHandle(ref, () => {
+    return {
+      getForm: () => {
+        return form;
+      },
+      getFormNode: () => {
+        return formNodeRef.current;
+      },
+      getFormValues: () => {
+        return form.getValues();
+      },
+    };
+  }, [form, formNodeRef]);
+
   const elements = {
     content: (elt: ReactNode) => {
       if (typeof elt === "string") {
@@ -192,7 +227,7 @@ export function AvaForm<
               FormValues
             >;
             return (
-              <AvaInput
+              <UnknownFieldInput
                 key={field.key}
                 fieldKey={field.key}
                 parentForm={form}
@@ -210,6 +245,7 @@ export function AvaForm<
 
   return (
     <form
+      ref={formNodeRef}
       onSubmit={form.onSubmit((values, event) => {
         onSubmit?.(values, event);
       })}
@@ -218,23 +254,25 @@ export function AvaForm<
         {elements.content(introContent)}
         {elements.innerFormElements()}
         {elements.content(outroContent)}
-        <Box mt="sm">
-          <Flex
-            justify={buttonAlignment === "left" ? "flex-start" : "flex-end"}
-          >
-            <Button
-              loading={submitIsLoading}
-              disabled={
-                submitIsLoading ||
-                (disableSubmitWhileUnchanged && !form.isDirty()) ||
-                submitIsDisabled
-              }
-              type="submit"
+        {hideSubmitButton ? null : (
+          <Box mt="sm">
+            <Flex
+              justify={buttonAlignment === "left" ? "flex-start" : "flex-end"}
             >
-              Submit
-            </Button>
-          </Flex>
-        </Box>
+              <Button
+                loading={submitIsLoading}
+                disabled={
+                  submitIsLoading ||
+                  (disableSubmitWhileUnchanged && !form.isDirty()) ||
+                  submitIsDisabled
+                }
+                type="submit"
+              >
+                Submit
+              </Button>
+            </Flex>
+          </Box>
+        )}
       </Stack>
     </form>
   );

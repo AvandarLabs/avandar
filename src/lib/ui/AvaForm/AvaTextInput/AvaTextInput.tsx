@@ -30,13 +30,13 @@ type Props<
   fieldKey: FieldKey;
 
   /** The form instance, returned by `useForm` */
-  parentForm: FormType<FormValues>;
+  form: FormType<FormValues>;
 
   /** The record of all field schemas */
   fields: FieldSchemaRecord;
   debounceMs?: number;
   onChange?: (value: FormValues[FieldKey]) => void;
-} & Omit<TextInputProps, "onChange">;
+} & Omit<TextInputProps, "onChange" | "form">;
 
 export function AvaTextInput<
   FieldKey extends string,
@@ -45,14 +45,14 @@ export function AvaTextInput<
     Record<FieldKey, string>,
 >({
   fieldKey: uncastedFieldKey,
-  parentForm,
+  form,
   debounceMs,
   fields,
   onChange,
   ...props
 }: Props<FieldKey, FieldSchemaRecord, FormValues>): JSX.Element {
   const fieldKey = uncastedFieldKey as Paths<FormValues>;
-  const inputProps = parentForm.getInputProps(fieldKey);
+  const formInputProps = form.getInputProps(fieldKey);
   const fieldsToSyncTo = objectKeys(fields)
     .map((otherFieldKey) => {
       const otherField = fields[otherFieldKey]!;
@@ -74,7 +74,7 @@ export function AvaTextInput<
       if (onChange) {
         onChange(value);
       }
-      parentForm.setFieldValue(
+      form.setFieldValue(
         fieldKey as Paths<FormValues>,
         value as PathValue<FormValues, Paths<FormValues>>,
       );
@@ -85,7 +85,7 @@ export function AvaTextInput<
       }
       // when not debounced, we call the original onChange prop instead of
       // the form's `setFieldValue` function
-      inputProps.onChange(event);
+      formInputProps.onChange(event);
     },
   };
 
@@ -113,20 +113,22 @@ export function AvaTextInput<
 
   return (
     <TextInput
-      key={parentForm.key(fieldKey as Paths<FormValues>)}
-      {...inputProps}
+      key={form.key(fieldKey as Paths<FormValues>)}
+      {...formInputProps}
       {...props}
       onChange={(event: ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value as FormValues[FieldKey];
 
         // update the synced values
         fieldsToSyncTo.forEach((syncedField) => {
-          if (!parentForm.isTouched(syncedField.fieldKey)) {
+          if (!form.isTouched(syncedField.fieldKey)) {
             const newSyncedValue =
               syncedField.transform ?
                 syncedField.transform(newValue)
               : newValue;
-            parentForm.setFieldValue(
+
+            // set the synced value in the form
+            form.setFieldValue(
               syncedField.fieldKey as Paths<FormValues>,
               newSyncedValue as PathValue<FormValues, Paths<FormValues>>,
             );
