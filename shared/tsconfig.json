@@ -1,0 +1,6 @@
+{
+  "__comment": "This tsconfig allows the `dev:email` server (which uses NextJS) to identify this directory as a root in order to run the email server on `shared/emails`",
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../tsconfig.app.json",
+  "include": [".", "../src"]
+}

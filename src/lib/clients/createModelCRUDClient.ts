@@ -1,10 +1,11 @@
+import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
 import { EmptyObject } from "type-fest";
-import { ILogger } from "../Logger";
+import { ILogger } from "../../../shared/lib/Logger/Logger";
+import { AnyFunctionWithSignature } from "../../../shared/lib/types/utilityTypes";
+import { FiltersByColumn } from "../../../shared/lib/utils/filters/filters";
 import { ModelCRUDParserRegistry } from "../models/makeParserRegistry";
 import { ModelCRUDTypes } from "../models/ModelCRUDTypes";
-import { AnyFunctionWithSignature } from "../types/utilityTypes";
-import { FiltersByColumn } from "../utils/filters/filters";
-import { objectKeys, omit } from "../utils/objects/misc";
+import { omit } from "../utils/objects/misc";
 import { BaseClient, createBaseClient } from "./BaseClient";
 import { WithLogger, withLogger } from "./withLogger";
 import { HookableFnName, WithQueryHooks } from "./withQueryHooks/types";
@@ -243,13 +244,11 @@ export type ModelCRUDClient<
   M extends ModelCRUDTypes,
   ExtendedQueriesClient extends HookableClient = EmptyObject,
   ExtendedMutationsClient extends HookableClient = EmptyObject,
-  FullClient extends
-    & BaseModelCRUDClient<ModelCRUDTypes>
-    & ExtendedQueriesClient
-    & ExtendedMutationsClient =
-      & BaseModelCRUDClient<M>
-      & ExtendedQueriesClient
-      & ExtendedMutationsClient,
+  FullClient extends BaseModelCRUDClient<ModelCRUDTypes> &
+    ExtendedQueriesClient &
+    ExtendedMutationsClient = BaseModelCRUDClient<M> &
+    ExtendedQueriesClient &
+    ExtendedMutationsClient,
 > = WithLogger<
   WithQueryHooks<
     FullClient,
@@ -384,10 +383,11 @@ export function createModelCRUDClient<
         // `getCount` query
         totalRows = pageRows.length;
       } else {
-        totalRows = (await crudFunctions.getCount({
-          where: params.where,
-          logger,
-        })) ?? 0;
+        totalRows =
+          (await crudFunctions.getCount({
+            where: params.where,
+            logger,
+          })) ?? 0;
       }
     }
 

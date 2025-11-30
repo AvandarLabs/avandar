@@ -17,6 +17,7 @@ describe("AvaForm", () => {
         outroContent={<span>Outro text</span>}
         fields={{
           fullName: {
+            key: "fullName",
             type: "text",
             initialValue: "Ada Lovelace",
             description: "Your legal name",
@@ -49,6 +50,7 @@ describe("AvaForm", () => {
       <AvaForm
         fields={{
           contactEmail: {
+            key: "contactEmail",
             type: "text",
             initialValue: "",
             semanticType: "email",
@@ -60,7 +62,7 @@ describe("AvaForm", () => {
     );
     const emailInput = screen.getByLabelText("Contact Email");
 
-    expect(emailInput).toHaveAttribute("name", "email");
+    expect(emailInput).toHaveAttribute("name", "contactEmail");
     expect(emailInput).toHaveAttribute("autocomplete", "email");
 
     fireEvent.change(emailInput, { target: { value: "not-an-email" } });
@@ -96,6 +98,7 @@ describe("AvaForm", () => {
       <AvaForm
         fields={{
           username: {
+            key: "username",
             type: "text",
             initialValue: "ab",
             label: "Username",
@@ -145,8 +148,14 @@ describe("AvaForm", () => {
     render(
       <AvaForm
         fields={{
-          firstName: { type: "text", initialValue: "", label: "First Name" },
+          firstName: {
+            key: "firstName",
+            type: "text",
+            initialValue: "",
+            label: "First Name",
+          },
           displayName: {
+            key: "displayName",
             type: "text",
             initialValue: "",
             label: "Display Name",
@@ -182,15 +191,17 @@ describe("AvaForm", () => {
       <AvaForm
         fields={{
           workspaceName: {
+            key: "workspaceName",
             type: "text",
             initialValue: "",
           },
           workspaceSlug: {
+            key: "workspaceSlug",
             type: "text",
             initialValue: "",
             syncWhileUntouched: {
               syncFrom: "workspaceName",
-              transform: (value) => {
+              transform: (value: string) => {
                 // slugifies the workspace name
                 return value.trim().toLowerCase().replace(/\s+/g, "-");
               },

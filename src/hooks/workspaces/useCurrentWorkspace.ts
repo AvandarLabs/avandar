@@ -1,6 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
+import { Logger } from "$/lib/Logger/Logger";
 import { AppLinks } from "@/config/AppLinks";
-import { Logger } from "@/lib/Logger";
 import { propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { WorkspaceWithSubscription } from "@/models/Workspace/Workspace.types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";

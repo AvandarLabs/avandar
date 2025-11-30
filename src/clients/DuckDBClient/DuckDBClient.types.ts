@@ -1,4 +1,4 @@
-import { UUID } from "@/lib/types/common";
+import { UUID } from "$/lib/types/common";
 import { DuckDBDataType } from "./DuckDBDataType";
 
 /**

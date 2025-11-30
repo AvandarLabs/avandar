@@ -8,8 +8,8 @@ import {
   UseQueryOptions as TanstackUseQueryOptions,
   UseQueryResult as TanstackUseQueryResult,
 } from "@tanstack/react-query";
+import { Logger } from "$/lib/Logger/Logger";
 import { Merge } from "type-fest";
-import { Logger } from "@/lib/Logger";
 
 export type UseQueryResult<TData> = TanstackUseQueryResult<TData, DefaultError>;
 export type UseQueryOptions<

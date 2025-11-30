@@ -1,7 +1,7 @@
 import { Group, Loader, Stack, Text, Title } from "@mantine/core";
+import { isDefined } from "$/lib/utils/guards/isDefined";
 import { match } from "ts-pattern";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { isDefined } from "@/lib/utils/guards/guards";
 import { BillingPortalButton } from "./BillingPortalButton/BillingPortalButton";
 import { PlanCard } from "./PlanCard";
 import {

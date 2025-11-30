@@ -1,10 +1,10 @@
 import { Outlet } from "@tanstack/react-router";
+import { where } from "$/lib/utils/filters/filters";
 import { ReactNode, useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AppShell } from "@/lib/ui/AppShell";
-import { where } from "@/lib/utils/filters/filters";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
 import { DataExplorerStore } from "../DataExplorerApp/DataExplorerStore";
 import { useRootWorkspaceChecks } from "./useRootWorkspaceChecks/useRootWorkspaceChecks";

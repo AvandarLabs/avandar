@@ -1,25 +1,17 @@
 import { Button } from "@react-email/components";
-import { ReactNode } from "react";
-import { DistributedOmit } from "type-fest";
-import { PRIMARY_COLOR } from "@/config/Theme";
-import { EmailLinkProps } from "./EmailLink";
-import { getRelativeURL } from "./getRelativeURL";
+import { PRIMARY_COLOR } from "$/config/Theme.ts";
+import { buildAppPageURL } from "$/utils/urls/buildAppPageURL.ts";
+import type { EmailLinkProps } from "./EmailLink.tsx";
+import type { ReactNode } from "react";
+import type { DistributedOmit } from "type-fest";
 
 type Props = {
   children: ReactNode;
 } & DistributedOmit<EmailLinkProps, "style">;
 
-export function EmailFullButton({
-  children,
-  href,
-  domain,
-  path,
-}: Props): JSX.Element {
+export function EmailFullButton({ children, href, path }: Props): JSX.Element {
   return (
-    <Button
-      href={href ?? getRelativeURL({ domain, path })}
-      style={styles.button}
-    >
+    <Button href={href ?? buildAppPageURL({ path })} style={styles.button}>
       <div style={styles.content}>{children}</div>
     </Button>
   );

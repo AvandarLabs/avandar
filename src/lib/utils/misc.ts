@@ -3,8 +3,8 @@
  * quite fit in any other category.
  */
 
+import { unknownToString } from "../../../shared/lib/utils/strings/unknownToString/unknownToString";
 import { notifyDevAlert } from "../ui/notifications/notifyDevAlert";
-import { unknownToString } from "./strings/unknownToString/unknownToString";
 
 /**
  * Literally do nothing.

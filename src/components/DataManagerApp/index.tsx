@@ -1,8 +1,8 @@
 import { Box, Flex, MantineTheme } from "@mantine/core";
 import { Outlet } from "@tanstack/react-router";
+import { where } from "$/lib/utils/filters/filters";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { where } from "@/lib/utils/filters/filters";
 import { DatasetNavbar } from "./DatasetNavbar";
 
 export function DataManagerApp(): JSX.Element {

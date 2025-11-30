@@ -1,6 +1,6 @@
 import { registryKeys } from "@/lib/utils/objects/misc";
-import type { Registry } from "@/lib/types/utilityTypes";
 import type { DatasetSourceType } from "./Dataset.types";
+import type { Registry } from "$/lib/types/utilityTypes";
 
 const DatasetSourceTypeRegistry = {
   csv_file: true,

@@ -1,12 +1,12 @@
+import { Logger } from "$/lib/Logger/Logger";
+import { where } from "$/lib/utils/filters/filters";
+import { isDefined } from "$/lib/utils/guards/isDefined";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { getSQLSelectOfExtractor } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getDatasetColumnFieldValues";
-import { Logger } from "@/lib/Logger";
 import { assertIsDefined } from "@/lib/utils/asserts";
-import { where } from "@/lib/utils/filters/filters";
-import { isDefined } from "@/lib/utils/guards/guards";
 import { makeObject } from "@/lib/utils/objects/builders";
 import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { Entity } from "@/models/entities/Entity";
@@ -30,8 +30,8 @@ export async function generateEntities(
 
   const datasetColumnValueExtractors = allFields
     .map((field) => {
-      return field.valueExtractor.type === "dataset_column_value"
-        ? field.valueExtractor
+      return field.valueExtractor.type === "dataset_column_value" ?
+          field.valueExtractor
         : undefined;
     })
     .filter(isDefined);
@@ -78,9 +78,10 @@ export async function generateEntities(
     key: "datasetId",
   });
   const titleColumn = extractorColumnsLookup[titleExtractor.id]!;
-  const titleDatasetPrimaryKeyColumn = extractorColumnsLookup[
-    primaryKeyExtractorsByDatasetId[titleColumn.datasetId]!.id
-  ]!;
+  const titleDatasetPrimaryKeyColumn =
+    extractorColumnsLookup[
+      primaryKeyExtractorsByDatasetId[titleColumn.datasetId]!.id
+    ]!;
 
   await DatasetRawDataClient.runLocalRawQuery({
     dependencies: sourceDatasetIds,

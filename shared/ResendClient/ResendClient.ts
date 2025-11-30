@@ -1,7 +1,7 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { ErrorResponse, Resend } from "resend";
-import type { IResendClient } from "./ResendClient.types";
+import type { IResendClient } from "./ResendClient.types.ts";
 
 const LIMITER_ID = "resend-rate-limit";
 

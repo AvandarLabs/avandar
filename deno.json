@@ -1,5 +1,32 @@
 {
   "imports": {
     "$/": "./shared/"
-  }
+  },
+  "compilerOptions": {
+    "lib": ["deno.ns", "dom", "dom.iterable"],
+    "skipLibCheck": true,
+    "typeRoots": ["shared/types", "shared/lib/types"],
+    "types": ["react", "react/jsx-runtime"],
+
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "moduleDetection": "force",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUncheckedIndexedAccess": true,
+    "noUncheckedSideEffectImports": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strict": true,
+
+    "experimentalDecorators": true,
+    "resolveJsonModule": true
+  },
+  "types": ["shared/types/global.d.ts"]
 }

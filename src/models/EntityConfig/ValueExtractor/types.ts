@@ -1,10 +1,9 @@
-import { Enums } from "@/types/database.types";
+import { Enums } from "$/types/database.types";
 import { DatasetColumnValueExtractorModel } from "./DatasetColumnValueExtractor/DatasetColumnValueExtractor.types";
 import { ManualEntryExtractorModel } from "./ManualEntryExtractor/types";
 
-export type ValueExtractorType = Enums<
-  "entity_field_configs__value_extractor_type"
->;
+export type ValueExtractorType =
+  Enums<"entity_field_configs__value_extractor_type">;
 
 /**
  * Registry that maps extractor types to their CRUD model definitions.
@@ -40,6 +39,5 @@ export type EntityFieldValueExtractor<
   ExtractorType extends ValueExtractorType = ValueExtractorType,
 > = EntityFieldValueExtractorRegistry<T>[ExtractorType];
 
-export type EntityFieldValueExtractorId = EntityFieldValueExtractorRegistry<
-  "Read"
->[ValueExtractorType]["id"];
+export type EntityFieldValueExtractorId =
+  EntityFieldValueExtractorRegistry<"Read">[ValueExtractorType]["id"];

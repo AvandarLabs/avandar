@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import type { SegmentedControlItem } from ".";
-import type { UnknownObject } from "@/lib/types/common";
+import type { UnknownObject } from "$/lib/types/common";
 
 /**
  * Given a list of objects, conver this to a list of objects with `value`

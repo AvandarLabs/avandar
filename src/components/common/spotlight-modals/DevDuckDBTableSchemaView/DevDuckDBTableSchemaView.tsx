@@ -1,10 +1,10 @@
 import { Loader, Stack, Text } from "@mantine/core";
+import { where } from "$/lib/utils/filters/filters";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useQuery } from "@/lib/hooks/query/useQuery";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
-import { where } from "@/lib/utils/filters/filters";
 import { propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { promiseMap } from "@/lib/utils/promises";
 import { DatasetId } from "@/models/datasets/Dataset";

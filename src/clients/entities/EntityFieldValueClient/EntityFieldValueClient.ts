@@ -1,19 +1,21 @@
+import { ILogger } from "$/lib/Logger/Logger";
+import { RegistryOfArrays } from "$/lib/types/utilityTypes";
+import { where } from "$/lib/utils/filters/filters";
+import { isDefined } from "$/lib/utils/guards/isDefined";
+import { objectEntries } from "$/lib/utils/objects/objectEntries/objectEntries";
+import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
 import { match } from "ts-pattern";
+import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { BaseClient, createBaseClient } from "@/lib/clients/BaseClient";
 import { WithLogger, withLogger } from "@/lib/clients/withLogger";
 import { WithQueryHooks } from "@/lib/clients/withQueryHooks/types";
 import { withQueryHooks } from "@/lib/clients/withQueryHooks/withQueryHooks";
-import { ILogger } from "@/lib/Logger";
-import { RegistryOfArrays } from "@/lib/types/utilityTypes";
 import { assertIsDefined } from "@/lib/utils/asserts";
-import { where } from "@/lib/utils/filters/filters";
-import { isDefined } from "@/lib/utils/guards/guards";
 import {
   makeBucketRecord,
   makeIdLookupRecord,
 } from "@/lib/utils/objects/builders";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { objectEntries, objectKeys } from "@/lib/utils/objects/misc";
 import { promiseFlatMap, promiseMap } from "@/lib/utils/promises";
 import { makeSet } from "@/lib/utils/sets/builders";
 import { isInSet } from "@/lib/utils/sets/higherOrderFuncs";
@@ -21,7 +23,6 @@ import { wrapString } from "@/lib/utils/strings/higherOrderFuncs";
 import { uuid } from "@/lib/utils/uuid";
 import { EntityId } from "@/models/entities/Entity";
 import { EntityConfigId } from "@/models/EntityConfig";
-import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import {
   EntityFieldConfig,
   EntityFieldConfigId,
@@ -46,9 +47,8 @@ type EntityFieldValueClientQueries = {
   }) => Promise<EntityFieldValue[]>;
 };
 
-export type IEntityFieldValueClient =
-  & BaseClient
-  & EntityFieldValueClientQueries;
+export type IEntityFieldValueClient = BaseClient &
+  EntityFieldValueClientQueries;
 
 function createEntityFieldValueClient(): WithLogger<
   WithQueryHooks<
@@ -108,8 +108,8 @@ function createEntityFieldValueClient(): WithLogger<
         // get all value extractors, including the primary key extractors (which
         // may not have been explicitly requested, but we cannot join datasets
         // without them)
-        const valueExtractors = await EntityFieldConfigClient
-          .getAllValueExtractors({
+        const valueExtractors =
+          await EntityFieldConfigClient.getAllValueExtractors({
             fields: entityFieldConfigs.concat(primaryKeyFields),
           });
 
@@ -138,8 +138,8 @@ function createEntityFieldValueClient(): WithLogger<
                 const primaryKeyExtractors = primaryKeyFields
                   .map((field) => {
                     const extractor = valueExtractorsByFieldId[field.id];
-                    return extractor?.type === "dataset_column_value"
-                      ? extractor
+                    return extractor?.type === "dataset_column_value" ?
+                        extractor
                       : undefined;
                   })
                   .filter(isDefined);
@@ -151,11 +151,7 @@ function createEntityFieldValueClient(): WithLogger<
                 // Get all metadata of the columns we need to extract
                 const datasetColumnsById = makeIdLookupRecord(
                   await DatasetColumnClient.getAll(
-                    where(
-                      "id",
-                      "in",
-                      extractors.map(prop("datasetColumnId")),
-                    ),
+                    where("id", "in", extractors.map(prop("datasetColumnId"))),
                   ),
                   { key: "id" },
                 );

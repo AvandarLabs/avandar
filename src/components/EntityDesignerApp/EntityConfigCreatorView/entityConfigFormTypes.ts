@@ -1,7 +1,7 @@
+import { Expect } from "$/lib/types/testUtilityTypes";
 import { CamelCaseKeys } from "camelcase-keys";
 import { SetOptional, SetRequired } from "type-fest";
 import { FormType } from "@/lib/hooks/ui/useForm";
-import { Expect } from "@/lib/types/testUtilityTypes";
 import { uuid } from "@/lib/utils/uuid";
 import { Dataset, DatasetWithColumns } from "@/models/datasets/Dataset";
 import {
@@ -21,20 +21,18 @@ import { ManualEntryExtractor } from "@/models/EntityConfig/ValueExtractor/Manua
 import { EntityFieldValueExtractorRegistry } from "@/models/EntityConfig/ValueExtractor/types";
 import { Models } from "@/models/Model";
 
-export type EntityFieldFormValues =
-  & SetRequired<
-    SetOptional<EntityFieldConfig<"Insert">, "workspaceId">,
-    "id"
-  >
-  & {
-    extractors: {
-      manualEntry: SetOptional<ManualEntryExtractor<"Insert">, "workspaceId">;
-      datasetColumnValue: SetOptional<
-        DatasetColumnValueExtractor<"Insert">,
-        "datasetId" | "datasetColumnId" | "workspaceId"
-      >;
-    };
+export type EntityFieldFormValues = SetRequired<
+  SetOptional<EntityFieldConfig<"Insert">, "workspaceId">,
+  "id"
+> & {
+  extractors: {
+    manualEntry: SetOptional<ManualEntryExtractor<"Insert">, "workspaceId">;
+    datasetColumnValue: SetOptional<
+      DatasetColumnValueExtractor<"Insert">,
+      "datasetId" | "datasetColumnId" | "workspaceId"
+    >;
   };
+};
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -45,31 +43,30 @@ type _Test_EntityFieldFormValues = Expect<
     [T in keyof CamelCaseKeys<EntityFieldValueExtractorRegistry>]: Partial<
       CamelCaseKeys<EntityFieldValueExtractorRegistry>[T]
     >;
-  } ? true
-    : false
+  } ?
+    true
+  : false
 >;
 
-export type EntityConfigFormValues =
-  & SetOptional<
-    SetRequired<EntityConfig<"Insert">, "id">,
-    "workspaceId"
-  >
-  & {
-    /** The id of the field that should be used as the title field */
-    titleFieldId: EntityFieldConfigId | undefined;
+export type EntityConfigFormValues = SetOptional<
+  SetRequired<EntityConfig<"Insert">, "id">,
+  "workspaceId"
+> & {
+  /** The id of the field that should be used as the title field */
+  titleFieldId: EntityFieldConfigId | undefined;
 
-    /**
-     * If any fields are configured as datasetColumnValue extractors,
-     * this array holds the ids of the datasets we will extract from,
-     * coupled with the id of the column to use as the primary key.
-     */
-    sourceDatasets: Array<{
-      dataset: DatasetWithColumns;
-      primaryKeyColumnId?: DatasetColumnId;
-    }>;
-    datasetColumnFields: EntityFieldFormValues[];
-    manualEntryFields: EntityFieldFormValues[];
-  };
+  /**
+   * If any fields are configured as datasetColumnValue extractors,
+   * this array holds the ids of the datasets we will extract from,
+   * coupled with the id of the column to use as the primary key.
+   */
+  sourceDatasets: Array<{
+    dataset: DatasetWithColumns;
+    primaryKeyColumnId?: DatasetColumnId;
+  }>;
+  datasetColumnFields: EntityFieldFormValues[];
+  manualEntryFields: EntityFieldFormValues[];
+};
 
 export type EntityConfigFormSubmitValues = EntityConfigFormValues & {
   fields: EntityFieldFormValues[];
@@ -109,36 +106,33 @@ export function makeDefaultDatasetColumnField({
   isIdField?: boolean;
 }): EntityFieldFormValues {
   const entityFieldConfigId: EntityFieldConfigId = uuid();
-  return Models.make(
-    "EntityFieldConfig",
-    {
-      id: entityFieldConfigId,
-      entityConfigId,
-      name,
-      description: undefined,
-      dataType: datasetColumn.dataType,
-      valueExtractorType: "dataset_column_value",
-      isIdField,
-      isTitleField: false,
-      allowManualEdit: false,
-      isArray: true,
+  return Models.make("EntityFieldConfig", {
+    id: entityFieldConfigId,
+    entityConfigId,
+    name,
+    description: undefined,
+    dataType: datasetColumn.dataType,
+    valueExtractorType: "dataset_column_value",
+    isIdField,
+    isTitleField: false,
+    allowManualEdit: false,
+    isArray: true,
 
-      // set up some default initial values for the value extractor configs
-      extractors: {
-        manualEntry: {
-          type: "manual_entry",
-          entityFieldConfigId,
-        },
-        datasetColumnValue: {
-          type: "dataset_column_value",
-          entityFieldConfigId,
-          valuePickerRuleType: "most_frequent",
-          datasetId: dataset.id,
-          datasetColumnId: datasetColumn.id,
-        },
+    // set up some default initial values for the value extractor configs
+    extractors: {
+      manualEntry: {
+        type: "manual_entry",
+        entityFieldConfigId,
       },
-    } as const,
-  );
+      datasetColumnValue: {
+        type: "dataset_column_value",
+        entityFieldConfigId,
+        valuePickerRuleType: "most_frequent",
+        datasetId: dataset.id,
+        datasetColumnId: datasetColumn.id,
+      },
+    },
+  } as const);
 }
 
 export function makeDefaultManualEntryField({
@@ -149,34 +143,31 @@ export function makeDefaultManualEntryField({
   name: string;
 }): EntityFieldFormValues {
   const entityFieldConfigId: EntityFieldConfigId = uuid();
-  return Models.make(
-    "EntityFieldConfig",
-    {
-      id: entityFieldConfigId,
-      entityConfigId,
-      name,
-      description: undefined,
-      dataType: "varchar",
-      valueExtractorType: "manual_entry",
-      isIdField: false,
-      isTitleField: false,
-      allowManualEdit: false,
-      isArray: false,
+  return Models.make("EntityFieldConfig", {
+    id: entityFieldConfigId,
+    entityConfigId,
+    name,
+    description: undefined,
+    dataType: "varchar",
+    valueExtractorType: "manual_entry",
+    isIdField: false,
+    isTitleField: false,
+    allowManualEdit: false,
+    isArray: false,
 
-      // set up some default initial values for the value extractor configs
-      extractors: {
-        manualEntry: {
-          type: "manual_entry",
-          entityFieldConfigId,
-        },
-        datasetColumnValue: {
-          type: "dataset_column_value",
-          entityFieldConfigId,
-          valuePickerRuleType: "most_frequent",
-          datasetId: undefined,
-          datasetColumnId: undefined,
-        },
+    // set up some default initial values for the value extractor configs
+    extractors: {
+      manualEntry: {
+        type: "manual_entry",
+        entityFieldConfigId,
       },
-    } as const,
-  );
+      datasetColumnValue: {
+        type: "dataset_column_value",
+        entityFieldConfigId,
+        valuePickerRuleType: "most_frequent",
+        datasetId: undefined,
+        datasetColumnId: undefined,
+      },
+    },
+  } as const);
 }

@@ -105,7 +105,7 @@ echo -e "${GREEN}✅ Successfully removed the last migration${NC}"
 
 # Step 2: Create a new migration
 echo -e "${YELLOW}📝 Step 2: Creating new migration with name: ${MIGRATION_NAME}${NC}"
-npm run db:new-migration "$MIGRATION_NAME"
+npm run db:new-migration -- "$MIGRATION_NAME"
 
 if [ $? -ne 0 ]; then
   echo -e "${RED}❌ Error: Failed to create new migration${NC}"
@@ -117,7 +117,7 @@ echo -e "${GREEN}✅ Successfully created new migration${NC}"
 # Step 3: Apply migrations
 echo -e "${YELLOW}🚀 Step 3: Applying migrations...${NC}"
 if [ "$GEN_TYPES" = true ]; then
-  npm run db:apply-migrations --gen-types
+  npm run db:apply-migrations -- --gen-types
 else
   npm run db:apply-migrations
 fi

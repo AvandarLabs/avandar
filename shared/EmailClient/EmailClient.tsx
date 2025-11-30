@@ -1,21 +1,22 @@
-import { WaitlistSignupCodeEmail } from "$/emails/WaitlistSignupCodeEmail";
-import { AvaHTTPError } from "$/utils/http/AvaHTTPError";
-import { HTTPResponseCodes } from "$/utils/http/HTTPResponseCodes";
+import { WaitlistSignupCodeEmail } from "$/emails/WaitlistSignupCodeEmail.tsx";
+import WorkspaceInviteEmail from "$/emails/WorkspaceInviteEmail.tsx";
+import { AvaHTTPError } from "$/utils/http/AvaHTTPError.ts";
+import { HTTPResponseCodes } from "$/utils/http/HTTPResponseCodes.ts";
 import {
   CreateEmailResponseSuccess,
   SendBroadcastResponseSuccess,
 } from "resend";
 import { match } from "ts-pattern";
-import { IEmailClient } from "./EmailClient.types";
-import { NOTIFICATION_EMAIL_FROM } from "./EmailClientConfig";
+import { NOTIFICATION_EMAIL_FROM } from "./EmailClientConfig.ts";
 import {
   sendBroadcastEmail,
   SendBroadcastEmailOptions,
-} from "./sendBroadcastEmail";
+} from "./sendBroadcastEmail.ts";
 import {
   sendTransactionalEmail,
   SendTransactionalEmailOptions,
-} from "./sendTransactionalEmail";
+} from "./sendTransactionalEmail.ts";
+import type { IEmailClient } from "./EmailClient.types.ts";
 
 function createEmailClient(): IEmailClient {
   // make sure the RESEND_API_KEY is set otherwise throw an error.
@@ -24,49 +25,49 @@ function createEmailClient(): IEmailClient {
   }
 
   const emailClient: IEmailClient = {
-    sendNotificationEmail: async ({
-      type,
-      recipientEmail,
-      disableDevOverride,
-      waitlistSignupCode,
-      appURL = process.env.VITE_APP_URL,
-    }): Promise<CreateEmailResponseSuccess> => {
-      if (!appURL) {
-        throw new Error("App URL was not set");
-      }
-      if (
-        appURL.includes("localhost") &&
-        ((process.env.NODE_ENV && process.env.NODE_ENV !== "development") ||
-          (import.meta && import.meta.env && !import.meta.env.DEV))
-      ) {
-        throw new Error(
-          "Cannot send emails to localhost URLs in production. Fix the App URL before sending an email.",
-        );
-      }
+    sendNotificationEmail: async (
+      options,
+    ): Promise<CreateEmailResponseSuccess> => {
+      const { recipientEmail, disableDevEmailOverride } = options;
+      const baseConfig = {
+        disableDevEmailOverride,
+        from: NOTIFICATION_EMAIL_FROM,
+        to: recipientEmail,
+        replyTo: NOTIFICATION_EMAIL_FROM.email,
+      };
 
-      return match(type)
-        .with("waitlist_signup_code", async () => {
+      return match(options)
+        .with({ type: "waitlist_signup_code" }, async (opts) => {
+          const { waitlistSignupCode } = opts;
           return await emailClient.sendTransactionalEmail({
-            disableDevOverride,
-            from: {
-              email: NOTIFICATION_EMAIL_FROM.email,
-              name: NOTIFICATION_EMAIL_FROM.name,
-            },
-            to: recipientEmail,
+            ...baseConfig,
             subject: "You're in! Your signup code is ready",
             body: (
               <WaitlistSignupCodeEmail
                 signupCode={waitlistSignupCode}
                 userEmail={recipientEmail}
-                appURL={appURL}
               />
             ),
-            replyTo: NOTIFICATION_EMAIL_FROM.email,
+          });
+        })
+        .with({ type: "workspace_invite" }, async (opts) => {
+          const { workspaceSlug, workspaceName, inviteId } = opts;
+          return await emailClient.sendTransactionalEmail({
+            ...baseConfig,
+            subject: "You've been invited to join a workspace",
+            body: (
+              <WorkspaceInviteEmail
+                workspaceSlug={workspaceSlug}
+                workspaceName={workspaceName}
+                inviteId={inviteId}
+                inviteEmail={recipientEmail}
+              />
+            ),
           });
         })
         .exhaustive(() => {
           throw AvaHTTPError.fromString({
-            message: `Unknown notification type: ${type}`,
+            message: `Unknown notification type: ${options.type}`,
             status: HTTPResponseCodes.BAD_REQUEST,
           });
         });

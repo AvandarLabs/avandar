@@ -107,9 +107,7 @@ create policy "
   )
 );
 
-/**
- * Trigger the `updated_at` update.
- */
+-- Trigger the `updated_at` update
 create trigger tr_datasets__set_updated_at before
 update on public.datasets for each row
 execute function public.util__set_updated_at ();

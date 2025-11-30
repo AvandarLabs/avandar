@@ -2,10 +2,30 @@ import {
   CreateEmailResponseSuccess,
   SendBroadcastResponseSuccess,
 } from "resend";
-import { SendBroadcastEmailOptions } from "./sendBroadcastEmail";
-import { SendTransactionalEmailOptions } from "./sendTransactionalEmail";
+import { Simplify } from "type-fest";
+import { SendBroadcastEmailOptions } from "./sendBroadcastEmail.ts";
+import { SendTransactionalEmailOptions } from "./sendTransactionalEmail.ts";
 
-export type NotificationEmailType = "waitlist_signup_code";
+export type NotificationEmailType = "waitlist_signup_code" | "workspace_invite";
+
+type BaseNotificationEmailOptions = {
+  /** The email address of the recipient to send the email to. */
+  recipientEmail: string;
+
+  /**
+   * By default, if the NODE_ENV is "development" then we the
+   * `DEV_EMAIL_OVERRIDE` environment variable will be used as the recipient's
+   * address, regardless of which `to` address was passed. This is to avoid
+   * accidentally sending real emails during development.
+   *
+   * To disable this behavior, set this option to `true`. This should only be
+   * disabled when manually running email scripts locally, so we can send
+   * real emails from our local environment.
+   *
+   * @default false
+   */
+  disableDevEmailOverride?: boolean;
+};
 
 export type IEmailClient = {
   /**
@@ -16,34 +36,21 @@ export type IEmailClient = {
    * To have complete control over the email content, use
    * `sendTransactionalEmail` instead.
    */
-  sendNotificationEmail: (options: {
-    type: NotificationEmailType;
-    recipientEmail: string;
+  sendNotificationEmail: (
+    options:
+      | (BaseNotificationEmailOptions & {
+          type: "waitlist_signup_code";
 
-    /**
-     * The base URL of the application.
-     * It defaults to the `VITE_APP_URL` environment variable, but can be
-     * overridden if you need to send a production email locally.
-     */
-    appURL?: string;
-
-    /**
-     * By default, if the NODE_ENV is "development" then we the
-     * `DEV_EMAIL_OVERRIDE` environment variable will be used as the recipient's
-     * address, regardless of which `to` address was passed. This is to avoid
-     * accidentally sending real emails during development.
-     *
-     * To disable this behavior, set this option to `true`. This should only be
-     * disabled when manually running email scripts locally, so we can send
-     * real emails from our local environment.
-     *
-     * @default false
-     */
-    disableDevOverride?: boolean;
-
-    /** The recipient's waitlist signup code */
-    waitlistSignupCode: string;
-  }) => Promise<CreateEmailResponseSuccess>;
+          /** The recipient's waitlist signup code */
+          waitlistSignupCode: string;
+        })
+      | (BaseNotificationEmailOptions & {
+          type: "workspace_invite";
+          workspaceSlug: string;
+          workspaceName: string;
+          inviteId: string;
+        }),
+  ) => Promise<Simplify<CreateEmailResponseSuccess>>;
 
   /**
    * Sends an email broadcast to a Resend audience. This uses Resend's

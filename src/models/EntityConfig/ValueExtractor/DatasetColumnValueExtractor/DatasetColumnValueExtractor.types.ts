@@ -1,11 +1,11 @@
+import { Enums } from "$/types/database.types";
 import { SetOptional, Simplify } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { DatasetId } from "@/models/datasets/Dataset";
 import { DatasetColumnId } from "@/models/datasets/DatasetColumn";
 import { WorkspaceId } from "@/models/Workspace/Workspace.types";
-import { Enums } from "@/types/database.types";
 import type { EntityFieldConfigId } from "../../EntityFieldConfig/EntityFieldConfig.types";
-import type { UUID } from "@/lib/types/common";
+import type { UUID } from "$/lib/types/common";
 
 export type DatasetColumnValueExtractorId = UUID<"DatasetColumnValueExtractor">;
 

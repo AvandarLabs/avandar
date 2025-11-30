@@ -1,11 +1,11 @@
 import { SegmentedControlItem } from "@mantine/core";
+import { Logger } from "$/lib/Logger/Logger";
 import { match } from "ts-pattern";
 import {
   BasicPlanConfig,
   FreePlanConfig,
   PremiumPlanConfig,
 } from "@/config/FeaturePlansConfig";
-import { Logger } from "@/lib/Logger";
 import { isOneOf } from "@/lib/utils/guards/guards";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { SubscriptionsAPI } from "../../../../supabase/functions/subscriptions/subscriptions.types";

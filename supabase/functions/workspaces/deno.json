@@ -1,5 +1,23 @@
 {
   "imports": {
+    "$/": "../../../shared/",
+    "@react-email/components": "npm:@react-email/components@0",
+    "@react-email/render": "npm:@react-email/render@1",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
+    "@upstash/ratelimit": "npm:@upstash/ratelimit@2",
+    "@upstash/redis": "npm:@upstash/redis@1",
+    "dayjs": "npm:dayjs@1.11.13",
+    "dayjs/plugin/utc": "npm:dayjs@1.11.13/plugin/utc.js",
+    "dayjs/plugin/timezone": "npm:dayjs@1.11.13/plugin/timezone.js",
+    "react": "npm:react@19",
+    "resend": "npm:resend@6",
+    "ts-pattern": "npm:ts-pattern@5",
+    "type-fest": "npm:type-fest@5",
     "zod": "npm:zod@4"
+  },
+  "compilerOptions": {
+    "lib": ["deno.ns", "dom", "dom.iterable"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
   }
 }

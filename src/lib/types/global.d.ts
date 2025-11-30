@@ -1,17 +1,6 @@
 import { GooglePickerAPI } from "./google-picker";
-import "react";
 
 declare global {
-  /**
-   * Adding JSX.Element to our global namespace just to make return
-   * types for React functional components easier so we can just type
-   * `JSX.Element` rather than `React.JSX.Element` every time.
-   */
-  namespace JSX {
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    interface Element extends React.JSX.Element {}
-  }
-
   interface Window {
     /**
      * Google API's for different services. This is optional because
@@ -25,4 +14,11 @@ declare global {
       picker?: GooglePickerAPI;
     };
   }
+
+  /**
+   * Deno global namespace. This is not available in browsers or Node. We add it
+   * here only so that our code in `shared/` (which contains Deno-specific
+   * variables) can pass type-checking.
+   */
+  var Deno: typeof globalThis.Deno | undefined;
 }

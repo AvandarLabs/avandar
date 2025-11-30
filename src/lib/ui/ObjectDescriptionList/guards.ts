@@ -1,4 +1,5 @@
-import { isArray, isPlainObject } from "@/lib/utils/guards/guards";
+import { isArray } from "$/lib/utils/guards/isArray";
+import { isPlainObject } from "$/lib/utils/guards/isPlainObject";
 import {
   DescribableObject,
   PrimitiveValue,

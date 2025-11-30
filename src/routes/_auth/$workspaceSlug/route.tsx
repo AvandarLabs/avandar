@@ -7,7 +7,10 @@ import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug")({
   component: WorkspaceRootLayout,
-  loader: async ({ params, context }): Promise<WorkspaceWithSubscription> => {
+  loader: async ({
+    params,
+    context,
+  }): Promise<WorkspaceWithSubscription | undefined> => {
     const { queryClient } = context;
     const { workspaceSlug } = params;
     const workspaces = await WorkspaceClient.withCache(queryClient)
