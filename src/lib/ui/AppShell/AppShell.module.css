@@ -20,6 +20,26 @@
   }
 }
 
+.navbarLinkPill {
+  transition:
+    background-color 0.2s ease-in-out,
+    padding 0.2s ease-in-out;
+  color: var(--mantine-navbar-color);
+}
+
+/* Apply hover and active states based on parent Link */
+a:hover .navbarLinkPill {
+  background-color: var(--mantine-navbar-hover-background);
+}
+
+a[data-status="active"] .navbarLinkPill {
+  background-color: var(--mantine-navbar-active-background);
+}
+
+a[data-status="active"]:hover .navbarLinkPill {
+  background-color: var(--mantine-navbar-active-hover-background);
+}
+
 .collapsibleText {
   transition: opacity 0.3s ease-in-out;
   white-space: nowrap;
