@@ -1,48 +1,16 @@
-import { ActionIcon, Flex, Popover, Stack, Text } from "@mantine/core";
+import { ActionIcon, Flex, Popover } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
-import { IconPalette } from "@tabler/icons-react";
+import { IconFilter } from "@tabler/icons-react";
+import { QueryForm } from "@/components/DataExplorerApp/QueryForm";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
-import {
-  SegmentedControl,
-  SegmentedControlItem,
-} from "@/lib/ui/inputs/SegmentedControl";
 import { mantineColorVar, mantineVar } from "@/lib/utils/browser/css";
-import { MapStyleKey, MapStyleKeys } from "./mapStyles";
 
-type MapStyle = {
-  url: string;
-  name: string;
-};
-
-type MapStylesRecord = Record<string, MapStyle>;
-
-type Props = {
-  mapStyles: MapStylesRecord;
-  value?: string;
-  defaultValue?: string;
-  onChange?: (value: string) => void;
-};
-
-export function MapStylePicker({
-  mapStyles,
-  value,
-  defaultValue,
-  onChange,
-}: Props): JSX.Element {
+export function QueryFormContainer(): JSX.Element {
   const [isPopoverOpen, , close, toggle] = useBoolean(false);
-
   const { hovered, ref } = useHover();
-  const items: Array<SegmentedControlItem<MapStyleKey>> = MapStyleKeys.map(
-    (styleKey: MapStyleKey) => {
-      return {
-        value: styleKey,
-        label: mapStyles[styleKey]?.name ?? styleKey,
-      };
-    },
-  );
 
   return (
-    <Flex ref={ref} pos="relative" align="center">
+    <Flex ref={ref} pos="relative" align="center" mt="xs">
       <Popover
         opened={isPopoverOpen}
         onChange={toggle}
@@ -75,23 +43,13 @@ export function MapStylePicker({
                 : isPopoverOpen ? mantineVar("shadow-sm")
                 : mantineVar("shadow-md"),
             }}
-            aria-label="Theme picker"
+            aria-label="Query form"
           >
-            <IconPalette size={20} />
+            <IconFilter size={20} />
           </ActionIcon>
         </Popover.Target>
         <Popover.Dropdown p="xs">
-          <Stack gap="xs">
-            <Text size="sm" fw={500}>
-              Theme
-            </Text>
-            <SegmentedControl
-              data={items}
-              value={value}
-              defaultValue={defaultValue}
-              onChange={onChange}
-            />
-          </Stack>
+          <QueryForm withinPortal={false} />
         </Popover.Dropdown>
       </Popover>
     </Flex>

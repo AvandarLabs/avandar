@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { applyMapStyles } from "./applyMapStyles";
 import { MapStylePicker } from "./MapStylePicker";
 import { MapStyleKey, mapStyles } from "./mapStyles";
+import { QueryFormContainer } from "./QueryFormContainer";
 
 type MapProps = {
   initialLongitude?: number;
@@ -99,6 +100,7 @@ export function DataMap({
             setCurrentStyle(value as MapStyleKey);
           }}
         />
+        <QueryFormContainer />
       </Box>
     </>
   );
