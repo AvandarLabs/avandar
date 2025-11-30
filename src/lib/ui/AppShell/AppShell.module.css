@@ -1,6 +1,7 @@
 .navbar {
   background-color: var(--mantine-navbar-background);
   color: var(--mantine-navbar-color);
+  transition: width 0.2s ease-in-out;
 }
 
 .anchor {
@@ -17,4 +18,29 @@
       background-color: var(--mantine-navbar-active-hover-background);
     }
   }
+}
+
+.collapsibleText {
+  transition: opacity 0.3s ease-in-out;
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: 1;
+}
+
+.collapsibleTextHidden {
+  opacity: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.collapsibleContent {
+  transition:
+    opacity 0.2s ease-in-out,
+    visibility 0.2s ease-in-out;
+}
+
+.collapsibleContentHidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }

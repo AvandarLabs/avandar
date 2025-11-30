@@ -1,8 +1,9 @@
-import { ActionIcon, Flex, Popover, Tooltip } from "@mantine/core";
+import { ActionIcon, Flex, Popover } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import { IconFilter } from "@tabler/icons-react";
 import { QueryForm } from "@/components/DataExplorerApp/QueryForm";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
+import { AvaTooltip } from "@/lib/ui/AvaTooltip";
 import { mantineColorVar, mantineVar } from "@/lib/utils/browser/css";
 
 export function QueryFormContainer(): JSX.Element {
@@ -25,17 +26,7 @@ export function QueryFormContainer(): JSX.Element {
         shadow="md"
       >
         <Popover.Target>
-          <Tooltip
-            label="Filter"
-            multiline
-            maw={340}
-            color="neutral.8"
-            fz="md"
-            transitionProps={{ transition: "pop" }}
-            style={{
-              boxShadow: mantineVar("shadow-lg"),
-            }}
-          >
+          <AvaTooltip label="Filter" position="right">
             <ActionIcon
               size="lg"
               variant="white"
@@ -55,7 +46,7 @@ export function QueryFormContainer(): JSX.Element {
             >
               <IconFilter size={20} />
             </ActionIcon>
-          </Tooltip>
+          </AvaTooltip>
         </Popover.Target>
         <Popover.Dropdown p="xs">
           <QueryForm withinPortal={false} />

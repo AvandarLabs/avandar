@@ -1,4 +1,6 @@
 import {
+  ActionIcon,
+  Box,
   Burger,
   Divider,
   Group,
@@ -11,7 +13,6 @@ import {
   Title,
   UnstyledButton,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import {
   Spotlight,
@@ -20,6 +21,8 @@ import {
 } from "@mantine/spotlight";
 import {
   IconChevronDown,
+  IconChevronLeft,
+  IconChevronRight,
   IconLogout,
   IconPlus,
   IconSearch,
@@ -37,7 +40,9 @@ import { AppLink, AppLinks } from "@/config/AppLinks";
 import { NavbarLink } from "@/config/NavbarLinks";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
+import { useToggleBoolean } from "@/lib/hooks/state/useToggleBoolean";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
+import { AvaTooltip } from "@/lib/ui/AvaTooltip";
 import { Link } from "@/lib/ui/links/Link";
 import { Modal } from "@/lib/ui/Modal";
 import { Workspace } from "@/models/Workspace/Workspace.types";
@@ -45,7 +50,7 @@ import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 import { CreateWorkspaceForm } from "../../../components/common/forms/CreateWorkspaceForm";
 import css from "./AppShell.module.css";
 
-const HEADER_DEFAULT_HEIGHT = 60;
+const HEADER_DEFAULT_HEIGHT = 42;
 const FOOTER_DEFAULT_HEIGHT = 60;
 const ASIDE_DEFAULT_WIDTH = 300;
 const NAVBAR_DEFAULT_WIDTH = 220;
@@ -60,7 +65,7 @@ type Props = {
   headerHeight?: number;
   footerHeight?: number;
   asideWidth?: number;
-  navbarWidth?: number;
+  defaultNavbarWidth?: number;
   spotlightActions?: Array<SpotlightActionData | SpotlightActionGroupData>;
   profileLink?: AppLink;
   navbarLinks: readonly NavbarLink[];
@@ -84,7 +89,7 @@ export function AppShell({
   headerHeight = HEADER_DEFAULT_HEIGHT,
   footerHeight = FOOTER_DEFAULT_HEIGHT,
   asideWidth = ASIDE_DEFAULT_WIDTH,
-  navbarWidth = NAVBAR_DEFAULT_WIDTH,
+  defaultNavbarWidth = NAVBAR_DEFAULT_WIDTH,
   children = <Outlet />,
   title,
   profileLink,
@@ -95,9 +100,7 @@ export function AppShell({
 }: Props): JSX.Element {
   const router = useRouter();
   const [opened, open, close] = useBoolean(false);
-
   const navigate = useNavigate();
-
   const [userWorkspaces] = WorkspaceClient.useGetWorkspacesOfCurrentUser({
     useQueryOptions: { staleTime: Infinity },
   });
@@ -119,18 +122,26 @@ export function AppShell({
     },
   });
 
-  const [isNavbarOpened, { toggle: toggleNavbar }] = useDisclosure(false);
-
+  const [isMobileNavbarOpened, toggleMobileNavbar] = useToggleBoolean(false);
+  const [isDesktopNavbarCollapsed, toggleDesktopNavbar] =
+    useToggleBoolean(false);
   const isMobileViewSize = useIsMobileSize() ?? false;
+  const navbarWidth = isDesktopNavbarCollapsed ? 60 : defaultNavbarWidth;
 
-  const logo = (
-    <img
-      src={`/${AppConfig.logoFilename}`}
-      className="logo"
-      alt="Logo"
-      width={28}
-    />
-  );
+  const logo =
+    isMobileViewSize ?
+      <img
+        src={`/${AppConfig.logoFilename}`}
+        className="logo"
+        alt="Logo"
+        width={25}
+      />
+    : <img
+        src={`/${AppConfig.logoFilename}`}
+        className="logo"
+        alt="Logo"
+        width={28}
+      />;
 
   return (
     <>
@@ -144,7 +155,7 @@ export function AppShell({
         navbar={{
           width: navbarWidth,
           breakpoint: "sm",
-          collapsed: { mobile: !isNavbarOpened },
+          collapsed: { mobile: !isMobileNavbarOpened },
         }}
         aside={{
           width: asideWidth,
@@ -154,20 +165,21 @@ export function AppShell({
         padding="md"
       >
         {isMobileViewSize ?
-          <MantineAppShell.Header>
+          <MantineAppShell.Header bg="neutral">
             <Group
               h="100%"
               px="md"
               className={clsx(css.anchor, "transition-colors")}
             >
               <Burger
-                opened={isNavbarOpened}
-                onClick={toggleNavbar}
+                color="white"
+                opened={isMobileNavbarOpened}
+                onClick={toggleMobileNavbar}
                 size="sm"
                 hiddenFrom="sm"
               />
               {logo}
-              <Title order={2} size="md" textWrap="nowrap">
+              <Title order={2} size="md" textWrap="nowrap" fw={500}>
                 {title ?? APP_NAME}
               </Title>
             </Group>
@@ -180,90 +192,133 @@ export function AppShell({
             px="md"
             py="sm"
             wrap="nowrap"
+            justify="space-between"
+            gap={0}
           >
-            <Burger
-              opened={isNavbarOpened}
-              onClick={toggleNavbar}
-              size="sm"
-              hiddenFrom="sm"
-            />
-            <Menu shadow="md" width={200}>
-              <Menu.Target>
-                <UnstyledButton className="w-full text-left">
-                  <div className="flex w-full items-center justify-between gap-2">
-                    {logo}
-                    <span className="flex-1 break-words text-base font-medium leading-tight">
-                      {title ?? APP_NAME}
-                    </span>
-                    <IconChevronDown size={18} className="min-h-4 min-w-4" />
-                  </div>
-                </UnstyledButton>
-              </Menu.Target>
-              <Menu.Dropdown style={{ width: "max-content", minWidth: 200 }}>
-                {profileLink ?
-                  <>
-                    <Menu.Item
-                      leftSection={<IconUser size={16} />}
-                      onClick={() => {
-                        router.navigate({ to: profileLink.to });
-                      }}
+            <Group
+              wrap="nowrap"
+              style={{ flex: 1, minWidth: 0 }}
+              className={clsx(
+                css.collapsibleContent,
+                isDesktopNavbarCollapsed && css.collapsibleContentHidden,
+              )}
+            >
+              <Burger
+                opened={isMobileNavbarOpened}
+                color="white"
+                onClick={toggleMobileNavbar}
+                size="sm"
+                hiddenFrom="sm"
+              />
+              <Menu shadow="md" width={200}>
+                <Menu.Target>
+                  <UnstyledButton className="w-full text-left">
+                    <Group
+                      gap={0}
+                      w="100%"
+                      justify="space-between"
+                      align="center"
                     >
-                      <Text span>Profile</Text>
-                    </Menu.Item>
-                    <Menu.Item
-                      leftSection={<IconPlus size={16} />}
-                      onClick={open}
-                    >
-                      <Text span>Create Workspace</Text>
-                    </Menu.Item>
-                    {userWorkspaces && userWorkspaces?.length > 1 ?
-                      <Menu.Sub>
-                        <Menu.Sub.Target>
-                          <Menu.Sub.Item
-                            leftSection={<IconSwitch2 size={14} />}
-                          >
-                            <Text>Switch Workspace</Text>
-                          </Menu.Sub.Item>
-                        </Menu.Sub.Target>
+                      <Group gap="xs">
+                        {logo}
+                        <Text
+                          className="text-base font-medium leading-tight"
+                          style={{ flex: 1, minWidth: 0 }}
+                          truncate
+                        >
+                          {title ?? APP_NAME}
+                        </Text>
+                        <IconChevronDown
+                          size={18}
+                          className="min-h-4 min-w-4 shrink-0"
+                        />
+                      </Group>
+                    </Group>
+                  </UnstyledButton>
+                </Menu.Target>
+                <Menu.Dropdown style={{ width: "max-content", minWidth: 200 }}>
+                  {profileLink ?
+                    <>
+                      <Menu.Item
+                        leftSection={<IconUser size={16} />}
+                        onClick={() => {
+                          router.navigate({ to: profileLink.to });
+                        }}
+                      >
+                        <Text span>Profile</Text>
+                      </Menu.Item>
+                      <Menu.Item
+                        leftSection={<IconPlus size={16} />}
+                        onClick={open}
+                      >
+                        <Text span>Create Workspace</Text>
+                      </Menu.Item>
+                      {userWorkspaces && userWorkspaces?.length > 1 ?
+                        <Menu.Sub>
+                          <Menu.Sub.Target>
+                            <Menu.Sub.Item
+                              leftSection={<IconSwitch2 size={14} />}
+                            >
+                              <Text>Switch Workspace</Text>
+                            </Menu.Sub.Item>
+                          </Menu.Sub.Target>
 
-                        <Menu.Sub.Dropdown>
-                          {userWorkspaces?.map((ws) => {
-                            return (
-                              <Menu.Item
-                                key={ws.id}
-                                onClick={() => {
-                                  navigate(AppLinks.workspaceHome(ws.slug));
-                                }}
-                                disabled={
-                                  currentWorkspace &&
-                                  ws.slug === currentWorkspace.slug
-                                }
-                              >
-                                {ws.name}
-                              </Menu.Item>
-                            );
-                          })}
-                        </Menu.Sub.Dropdown>
-                      </Menu.Sub>
-                    : null}
-                  </>
-                : null}
+                          <Menu.Sub.Dropdown>
+                            {userWorkspaces?.map((ws) => {
+                              return (
+                                <Menu.Item
+                                  key={ws.id}
+                                  onClick={() => {
+                                    navigate(AppLinks.workspaceHome(ws.slug));
+                                  }}
+                                  disabled={
+                                    currentWorkspace &&
+                                    ws.slug === currentWorkspace.slug
+                                  }
+                                >
+                                  {ws.name}
+                                </Menu.Item>
+                              );
+                            })}
+                          </Menu.Sub.Dropdown>
+                        </Menu.Sub>
+                      : null}
+                    </>
+                  : null}
 
-                <Menu.Item
-                  leftSection={<IconLogout size={16} />}
-                  onClick={() => {
-                    sendSignOutRequest();
-                  }}
-                >
-                  <Group>
-                    <Text span>Sign Out</Text>
-                    {isSignOutPending ?
-                      <Loader />
-                    : null}
-                  </Group>
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
+                  <Menu.Item
+                    leftSection={<IconLogout size={16} />}
+                    onClick={() => {
+                      sendSignOutRequest();
+                    }}
+                  >
+                    <Group>
+                      <Text span>Sign Out</Text>
+                      {isSignOutPending ?
+                        <Loader />
+                      : null}
+                    </Group>
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            </Group>
+            <AvaTooltip
+              label={
+                isDesktopNavbarCollapsed ? "Open sidebar" : "Close sidebar"
+              }
+            >
+              <ActionIcon
+                variant="subtle"
+                color="white"
+                size="md"
+                onClick={toggleDesktopNavbar}
+                aria-label="Close sidebar"
+              >
+                {isDesktopNavbarCollapsed ?
+                  <IconChevronRight size={18} />
+                : <IconChevronLeft size={18} />}
+              </ActionIcon>
+            </AvaTooltip>
           </Group>
           <Stack gap="xs" justify="space-between" h="100%">
             <Stack flex={1} gap={0}>
@@ -282,9 +337,22 @@ export function AppShell({
                       : undefined
                     }
                   >
-                    <Group>
-                      {icon}
-                      <Text span fw={500}>
+                    <Group gap={0} wrap="nowrap">
+                      {isDesktopNavbarCollapsed ?
+                        <AvaTooltip label={link.label} position="right">
+                          <Box mr="xs">{icon}</Box>
+                        </AvaTooltip>
+                      : <Box mr="xs">{icon}</Box>}
+                      <Text
+                        span
+                        fw={500}
+                        className={clsx(
+                          css.collapsibleText,
+                          isDesktopNavbarCollapsed ?
+                            css.collapsibleTextHidden
+                          : undefined,
+                        )}
+                      >
                         {link.label}
                       </Text>
                     </Group>
@@ -292,7 +360,10 @@ export function AppShell({
                 );
               })}
             </Stack>
-            <BetaBadge style={{ alignSelf: "center" }} />
+            <BetaBadge
+              size={isDesktopNavbarCollapsed ? "xs" : "md"}
+              style={{ alignSelf: "center" }}
+            />
             <Divider />
             <Stack gap={0} pb="md" pos="relative">
               {utilityLinks.map(({ link, icon }) => {
@@ -305,9 +376,20 @@ export function AppShell({
                     px="md"
                     py="sm"
                   >
-                    <Group>
-                      {icon}
-                      <Text span fw={500}>
+                    <Group gap={0} wrap="nowrap">
+                      {isDesktopNavbarCollapsed ?
+                        <AvaTooltip label={link.label} position="right">
+                          <Box mr="xs">{icon}</Box>
+                        </AvaTooltip>
+                      : <Box mr="xs">{icon}</Box>}
+                      <Text
+                        span
+                        fw={500}
+                        className={clsx(
+                          css.collapsibleText,
+                          isDesktopNavbarCollapsed && css.collapsibleTextHidden,
+                        )}
+                      >
                         {link.label}
                       </Text>
                     </Group>

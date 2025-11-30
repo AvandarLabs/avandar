@@ -1,7 +1,8 @@
-import { ActionIcon, Flex, Popover, Stack, Text, Tooltip } from "@mantine/core";
+import { ActionIcon, Flex, Popover, Stack, Text } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import { IconPalette } from "@tabler/icons-react";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
+import { AvaTooltip } from "@/lib/ui/AvaTooltip";
 import {
   SegmentedControl,
   SegmentedControlItem,
@@ -55,17 +56,7 @@ export function MapStylePicker({
         shadow="md"
       >
         <Popover.Target>
-          <Tooltip
-            label="Theme"
-            multiline
-            maw={340}
-            color="neutral.8"
-            fz="md"
-            transitionProps={{ transition: "pop" }}
-            style={{
-              boxShadow: mantineVar("shadow-lg"),
-            }}
-          >
+          <AvaTooltip label="Theme" position="right">
             <ActionIcon
               size="lg"
               variant="white"
@@ -85,7 +76,7 @@ export function MapStylePicker({
             >
               <IconPalette size={20} />
             </ActionIcon>
-          </Tooltip>
+          </AvaTooltip>
         </Popover.Target>
         <Popover.Dropdown p="xs">
           <Stack gap="xs">
