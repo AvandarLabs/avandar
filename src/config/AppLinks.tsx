@@ -106,6 +106,16 @@ export const AppLinks = {
     };
   },
 
+  // Map links
+  map: (workspaceSlug: string) => {
+    return {
+      key: "map",
+      to: "/$workspaceSlug/map",
+      params: { workspaceSlug },
+      label: "Geo Explorer",
+    };
+  },
+
   // Entity Designer links
   entityDesignerHome: (workspaceSlug: string) => {
     return {

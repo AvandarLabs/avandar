@@ -2,6 +2,7 @@ import {
   IconBlocks,
   IconDatabase,
   IconHome,
+  IconMap,
   IconSettings,
   IconTable,
 } from "@tabler/icons-react";
@@ -42,6 +43,12 @@ export const NavbarLinks = {
     return {
       link: AppLinks.dataExplorer(workspaceSlug),
       icon: <IconTable size={24} stroke={1.5} />,
+    };
+  },
+  map: (workspaceSlug: string) => {
+    return {
+      link: AppLinks.map(workspaceSlug),
+      icon: <IconMap size={24} stroke={1.5} />,
     };
   },
   entityDesignerHome: (workspaceSlug: string) => {

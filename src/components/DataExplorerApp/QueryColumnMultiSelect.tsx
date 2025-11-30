@@ -1,4 +1,4 @@
-import { MultiSelect } from "@mantine/core";
+import { MultiSelect, MultiSelectProps } from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
 import { where } from "$/lib/utils/filters/filters";
 import { ReactNode, useEffect, useMemo } from "react";
@@ -23,7 +23,7 @@ type Props = {
   value?: readonly QueryColumn[];
   defaultValue?: readonly QueryColumn[];
   onChange?: (fields: readonly QueryColumn[]) => void;
-};
+} & Omit<MultiSelectProps, "value" | "defaultValue" | "onChange">;
 
 export function QueryColumnMultiSelect({
   label,
@@ -32,6 +32,7 @@ export function QueryColumnMultiSelect({
   value,
   defaultValue,
   onChange,
+  ...multiSelectProps
 }: Props): JSX.Element {
   const [currentSelectedColumns, setCurrentSelectedColumns] = useUncontrolled<
     readonly QueryColumn[]
@@ -112,6 +113,7 @@ export function QueryColumnMultiSelect({
         setCurrentSelectedColumns(newSelectedColumns);
       }}
       nothingFoundMessage="No fields"
+      {...multiSelectProps}
     />
   );
 }

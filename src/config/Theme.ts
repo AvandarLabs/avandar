@@ -165,3 +165,5 @@ export const cssVariablesResolver: CSSVariablesResolver = (
     },
   };
 };
+
+export const ThemeColors = { ...DEFAULT_THEME.colors, ...Theme.colors };
