@@ -1,10 +1,11 @@
 .navbar {
+  --navbar-transition-duration: 0.1s;
   background-color: var(--mantine-navbar-background);
   color: var(--mantine-navbar-color);
-  transition: width 0.2s ease-in-out;
+  transition: width var(--navbar-transition-duration) ease-in-out;
 }
 
-.anchor {
+.navbarTitleLink {
   color: var(--mantine-navbar-color);
 
   &:hover {
@@ -21,9 +22,7 @@
 }
 
 .navbarLinkPill {
-  transition:
-    background-color 0.2s ease-in-out,
-    padding 0.2s ease-in-out;
+  transition: background-color var(--navbar-transition-duration) ease-in-out;
   color: var(--mantine-navbar-color);
 }
 
@@ -41,7 +40,7 @@ a[data-status="active"]:hover .navbarLinkPill {
 }
 
 .collapsibleText {
-  transition: opacity 0.3s ease-in-out;
+  transition: opacity var(--navbar-transition-duration) ease-in-out;
   white-space: nowrap;
   overflow: hidden;
   opacity: 1;
@@ -55,8 +54,8 @@ a[data-status="active"]:hover .navbarLinkPill {
 
 .collapsibleContent {
   transition:
-    opacity 0.2s ease-in-out,
-    visibility 0.2s ease-in-out;
+    opacity var(--navbar-transition-duration) ease-in-out,
+    visibility var(--navbar-transition-duration) ease-in-out;
 }
 
 .collapsibleContentHidden {

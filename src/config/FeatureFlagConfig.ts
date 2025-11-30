@@ -40,15 +40,21 @@ export enum FeatureFlag {
    * Disable inviting users to a workspace until the feature is ready.
    */
   DisableUserInvites = "disable-user-invites",
+
+  /**
+   * Disable the Geo Explorer feature.
+   */
+  DisableGeoExplorer = "disable-geo-explorer",
 }
 
 export const FeatureFlagConfig = {
   [FeatureFlag.DisableSelfRegistration]: {
-    waitlistURL: "https://avandarlabs.com",
+    waitlistURL: "https://avandarlabs.com/waitlist",
   },
   [FeatureFlag.RequireSignUpCode]: undefined,
   [FeatureFlag.DisableManualData]: undefined,
   [FeatureFlag.DisableUserInvites]: undefined,
+  [FeatureFlag.DisableGeoExplorer]: undefined,
 } as const satisfies Registry<FeatureFlag>;
 
 export function isFlagEnabled(featureFlag: FeatureFlag): boolean {

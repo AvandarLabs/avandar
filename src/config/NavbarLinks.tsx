@@ -8,10 +8,16 @@ import {
 } from "@tabler/icons-react";
 import { ReactNode } from "react";
 import { AppLink, AppLinkKey, AppLinks } from "./AppLinks";
+import { FeatureFlag } from "./FeatureFlagConfig";
 
 export type NavbarLink = {
   link: AppLink;
   icon: ReactNode;
+
+  /**
+   * The feature flag that disables this link if toggled on in the environment
+   * */
+  disableFeatureFlag?: FeatureFlag;
 };
 
 type NavbarLinksRecord = Partial<
@@ -49,6 +55,7 @@ export const NavbarLinks = {
     return {
       link: AppLinks.map(workspaceSlug),
       icon: <IconMap size={24} stroke={1.5} />,
+      disableFeatureFlag: FeatureFlag.DisableGeoExplorer,
     };
   },
   entityDesignerHome: (workspaceSlug: string) => {

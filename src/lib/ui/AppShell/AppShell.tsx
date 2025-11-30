@@ -38,6 +38,7 @@ import { AuthClient } from "@/clients/AuthClient";
 import { BetaBadge } from "@/components/common/BetaBadge";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLink, AppLinks } from "@/config/AppLinks";
+import { isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { NavbarLink } from "@/config/NavbarLinks";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
@@ -170,7 +171,7 @@ export function AppShell({
             <Group
               h="100%"
               px="md"
-              className={clsx(css.anchor, "transition-colors")}
+              className={clsx(css.navbarTitleLink, "transition-colors")}
             >
               <Burger
                 color="white"
@@ -189,7 +190,7 @@ export function AppShell({
 
         <MantineAppShell.Navbar style={styles.navbar}>
           <Group
-            className={clsx(css.anchor, "transition-colors")}
+            className={clsx(css.navbarTitleLink, "transition-colors")}
             px="md"
             pt="sm"
             pb="xs"
@@ -324,11 +325,16 @@ export function AppShell({
           </Group>
           <Stack gap="xs" justify="space-between" h="100%">
             <Stack flex={1} gap={0}>
-              {navbarLinks.map(({ link, icon }) => {
+              {navbarLinks.map(({ link, icon, disableFeatureFlag }) => {
+                if (disableFeatureFlag && isFlagEnabled(disableFeatureFlag)) {
+                  return null;
+                }
+
                 return (
                   <Link
                     key={link.key}
                     to={link.to}
+                    underline="never"
                     params={link.params}
                     className="transition-colors"
                     py="xxs"
@@ -341,7 +347,7 @@ export function AppShell({
                     }
                   >
                     <Flex
-                      px={isDesktopNavbarCollapsed ? "xs" : "sm"}
+                      px="xs"
                       py="xs"
                       bdrs="md"
                       align="center"
@@ -376,12 +382,13 @@ export function AppShell({
               style={{ alignSelf: "center" }}
             />
             <Divider />
-            <Stack gap={0} pb="md" pos="relative">
+            <Stack gap={0} pb="xs" pos="relative">
               {utilityLinks.map(({ link, icon }) => {
                 return (
                   <Link
                     key={link.key}
                     to={link.to}
+                    underline="never"
                     params={link.params}
                     className="transition-colors"
                     py="xxs"
