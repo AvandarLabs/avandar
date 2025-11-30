@@ -105,8 +105,8 @@ export function parseURLPathParams<
   const params: Record<string, string> = {};
 
   for (let i = 0; i < patternParts.length; i++) {
-    const patternPart = patternParts[i];
-    const urlPart = urlParts[i];
+    const patternPart = patternParts[i]!;
+    const urlPart = urlParts[i]!;
 
     if (patternPart.startsWith(":")) {
       // this is a param. Remove the colon and use it as the key.

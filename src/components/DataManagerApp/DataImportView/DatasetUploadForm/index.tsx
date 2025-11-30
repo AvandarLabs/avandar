@@ -1,6 +1,7 @@
 import { Button, Group, NumberInput, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
+import { UnknownObject } from "$/lib/types/common";
 import { useMemo, useState } from "react";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock";
@@ -8,7 +9,6 @@ import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useMutation } from "@/lib/hooks/query/useMutation";
-import { UnknownObject } from "@/lib/types/common";
 import { Callout } from "@/lib/ui/Callout";
 import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 import { Dataset } from "@/models/datasets/Dataset";

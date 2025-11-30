@@ -1,28 +1,34 @@
+import { Logger } from "$/lib/Logger/Logger";
+import { UnknownObject } from "$/lib/types/common";
+import { isArray } from "$/lib/utils/guards/isArray";
 import { Paths, UnknownArray } from "type-fest";
 import { object } from "zod";
-import { Logger } from "@/lib/Logger";
-import { UnknownObject } from "@/lib/types/common";
-import { isArray, isPrimitive } from "../guards/guards";
+import { isPrimitive } from "../guards/guards";
 
 /**
  * Gets the type of a value from an object given a key path in
  * dot notation.
  */
-export type PathValue<T, P extends Paths<T>> = P extends
-  `${infer K}.${infer Rest}`
-  ? K extends keyof T ? Rest extends Paths<T[K]> ? PathValue<T[K], Rest>
-    : never
-  : K extends `${number}`
-    ? T extends UnknownArray
-      ? Rest extends Paths<T[number]> ? PathValue<T[number], Rest>
+export type PathValue<T, P extends Paths<T>> =
+  P extends `${infer K}.${infer Rest}` ?
+    K extends keyof T ?
+      Rest extends Paths<T[K]> ?
+        PathValue<T[K], Rest>
+      : never
+    : K extends `${number}` ?
+      T extends UnknownArray ?
+        Rest extends Paths<T[number]> ?
+          PathValue<T[number], Rest>
+        : never
       : never
     : never
-  : never
-  // evaluate the final key. Check if this is an array access.
-  : P extends `${number}` ? T extends UnknownArray ? T[number]
+  : // evaluate the final key. Check if this is an array access.
+  P extends `${number}` ?
+    T extends UnknownArray ?
+      T[number]
     : never
-  // else, check if this is a valid key in T we can access
-  : P extends keyof T ? T[P]
+  : // else, check if this is a valid key in T we can access
+  P extends keyof T ? T[P]
   : never;
 
 /**
@@ -37,8 +43,8 @@ export function getValue<
   T extends object,
   K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
   V extends K extends keyof T ? T[K]
-    : K extends Paths<T> ? PathValue<T, K>
-    : never,
+  : K extends Paths<T> ? PathValue<T, K>
+  : never,
 >(obj: T, path: K): V {
   const fullPathAsString = String(path);
   const pathParts = fullPathAsString.split(".");
@@ -90,9 +96,9 @@ export function _getValue(
   if (isPrimitive(value)) {
     const remainingPath = pathTail.join(".");
     throw new Error(
-      `Key '${key}' is a primitive value '${
-        String(value)
-      }', but there is still more path to traverse. Remaining path: '${remainingPath}'`,
+      `Key '${key}' is a primitive value '${String(
+        value,
+      )}', but there is still more path to traverse. Remaining path: '${remainingPath}'`,
     );
   }
 

@@ -8,10 +8,10 @@ import {
   Preview,
   Section,
 } from "@react-email/components";
+import { APP_NAME } from "$/config/AppConfig.ts";
 import { ReactNode } from "react";
-import { APP_NAME } from "@/config/AppConfig";
-import { LOGO, THEME } from "./EmailTheme";
-import { getRelativeImageURL } from "./getRelativeImageURL";
+import { buildRelativeImageURL } from "./buildRelativeImageURL.ts";
+import { LOGO, THEME } from "./EmailTheme.ts";
 
 type Props = {
   children: ReactNode;
@@ -32,7 +32,7 @@ export function EmailTemplate({ children, previewText }: Props): JSX.Element {
         <Container style={styles.container}>
           <Section style={styles.header}>
             <Img
-              src={getRelativeImageURL("logoAndName.png")}
+              src={buildRelativeImageURL("logoAndName.png")}
               alt={`${APP_NAME} logo`}
               style={styles.logo}
               width={logoWidth}

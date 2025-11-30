@@ -96,11 +96,13 @@ export function CreateWorkspaceForm({
       fields={
         {
           workspaceName: {
+            key: "workspaceName",
             type: "text",
             initialValue: "",
             required: true,
           },
           workspaceSlug: {
+            key: "workspaceSlug",
             type: "text",
             description:
               "This is the unique ID of your organization used in URLs.",
@@ -116,11 +118,13 @@ export function CreateWorkspaceForm({
             validateFn: validateSlugString,
           },
           fullName: {
+            key: "fullName",
             type: "text",
             initialValue: "",
             required: true,
           },
           displayName: {
+            key: "displayName",
             type: "text",
             description: "The name you want other team members to see.",
             initialValue: "",

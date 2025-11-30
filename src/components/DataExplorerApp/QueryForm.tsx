@@ -18,7 +18,11 @@ const orderDirectionOptions = [
   { value: "desc", label: "Descending" },
 ] as const satisfies SelectData<string>;
 
-export function QueryForm(): JSX.Element {
+type Props = {
+  withinPortal?: boolean;
+};
+
+export function QueryForm({ withinPortal = true }: Props): JSX.Element {
   const [{ query }, dispatch] = DataExplorerStore.use();
   const {
     dataSource,
@@ -43,6 +47,7 @@ export function QueryForm(): JSX.Element {
           onChange={(newDataSource) => {
             dispatch.setDataSource(newDataSource ?? undefined);
           }}
+          comboboxProps={{ withinPortal }}
         />
 
         <QueryColumnMultiSelect
@@ -53,6 +58,7 @@ export function QueryForm(): JSX.Element {
           onChange={(newColumns: readonly QueryColumn[]) => {
             dispatch.setColumns(newColumns);
           }}
+          comboboxProps={{ withinPortal }}
         />
 
         {queryColumns.length > 0 ?
@@ -73,6 +79,7 @@ export function QueryForm(): JSX.Element {
                       aggregation: newAggregation,
                     });
                   }}
+                  comboboxProps={{ withinPortal }}
                 />
               );
             })}
@@ -94,6 +101,7 @@ export function QueryForm(): JSX.Element {
             onChange={(newColId) => {
               dispatch.setOrderByColumn(newColId ?? undefined);
             }}
+            comboboxProps={{ withinPortal }}
           />
           <Select
             clearable={false}
@@ -104,6 +112,7 @@ export function QueryForm(): JSX.Element {
             onChange={(value) => {
               dispatch.setOrderByDirection(value ?? undefined);
             }}
+            comboboxProps={{ withinPortal }}
           />
         </Fieldset>
 

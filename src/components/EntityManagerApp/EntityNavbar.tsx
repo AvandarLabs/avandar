@@ -8,12 +8,12 @@ import {
 } from "@mantine/core";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { where } from "$/lib/utils/filters/filters";
 import { useEffect, useMemo, useRef } from "react";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
-import { where } from "@/lib/utils/filters/filters";
 import { constant } from "@/lib/utils/higherOrderFuncs";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { EntityConfig } from "@/models/EntityConfig/EntityConfig.types";

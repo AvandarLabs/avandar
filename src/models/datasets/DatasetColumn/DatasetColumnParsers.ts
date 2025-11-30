@@ -1,7 +1,7 @@
+import { Expect, ZodSchemaEqualsTypes } from "$/lib/types/testUtilityTypes";
 import { iso, number, object, string, uuid, enum as zodEnum } from "zod";
 import { DuckDBDataTypes } from "@/clients/DuckDBClient/DuckDBDataType";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
-import { Expect, ZodSchemaEqualsTypes } from "@/lib/types/testUtilityTypes";
 import { excludeNullsExceptInProps } from "@/lib/utils/objects/higherOrderFuncs";
 import {
   camelCaseKeysDeep,

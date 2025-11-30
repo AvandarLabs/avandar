@@ -191,7 +191,7 @@ async function main() {
       output: "index.ts",
     },
     {
-      template: "routes.ts.template.txt",
+      template: "route.tsx.template.txt",
       output: `${functionName}.routes.ts`,
     },
     {

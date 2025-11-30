@@ -8,8 +8,8 @@ import {
   UseMutationResult as TanstackUseMutationResult,
   useQueryClient,
 } from "@tanstack/react-query";
+import { Logger } from "$/lib/Logger/Logger";
 import { Simplify } from "type-fest";
-import { Logger } from "@/lib/Logger";
 import { notifyError } from "@/lib/ui/notifications/notify";
 
 export type UseMutationResult<

@@ -1,4 +1,3 @@
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import {
   AuthChangeEvent,
   Session,
@@ -6,6 +5,7 @@ import {
   User,
   WeakPassword,
 } from "@supabase/supabase-js";
+import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 
 export const AuthClient = {
   /**

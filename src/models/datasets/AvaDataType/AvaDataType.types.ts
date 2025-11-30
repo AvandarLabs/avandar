@@ -1,4 +1,4 @@
-import { Enums } from "@/types/database.types";
+import { Enums } from "$/types/database.types";
 
 /**
  * An enum of all the base data types that can be handled in Avandar.

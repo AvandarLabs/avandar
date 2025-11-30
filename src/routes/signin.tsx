@@ -1,7 +1,12 @@
 import { Button, Loader, PasswordInput, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  redirect,
+  useNavigate,
+  useRouter,
+} from "@tanstack/react-router";
 import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
 import { AuthLayout } from "@/components/common/AuthLayout";
@@ -28,13 +33,14 @@ export const Route = createFileRoute("/signin")({
 
 function SignInPage() {
   const router = useRouter();
+  const navigate = useNavigate();
   const searchParams = Route.useSearch();
 
   const [sendSignInRequest, isSignInPending] = useMutation({
     mutationFn: AuthClient.signIn,
     onSuccess: () => {
       if (searchParams.redirect) {
-        router.history.push(searchParams.redirect);
+        navigate({ to: searchParams.redirect });
       } else {
         router.invalidate();
       }

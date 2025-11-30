@@ -3,20 +3,23 @@ import ehWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url";
 import mvpWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?url";
 import duckDBWasmEh from "@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url";
 import duckDBWasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
+import { ILogger, Logger } from "$/lib/Logger/Logger";
+import { MIMEType } from "$/lib/types/common";
+import { isNonEmptyArray } from "$/lib/utils/guards/isNonEmptyArray/isNonEmptyArray";
+import { objectEntries } from "$/lib/utils/objects/objectEntries/objectEntries";
+import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
-import { ILogger, Logger } from "@/lib/Logger";
-import { MIMEType } from "@/lib/types/common";
 import { assertIsDefined } from "@/lib/utils/asserts";
-import { isNonEmptyArray } from "@/lib/utils/guards/guards";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { objectEntries, objectKeys } from "@/lib/utils/objects/misc";
 import { mapObjectValues } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
+import {
+  QueryResult,
+  QueryResultPage,
+} from "@/models/queries/QueryResult/QueryResult.types";
 import { arrowFieldToQueryResultField } from "./arrowFieldToQueryResultField";
-import { DuckDBDataType, DuckDBDataTypeUtils } from "./DuckDBDataType";
-import { singleton } from "./queryResultHelpers";
 import {
   DuckDBColumnSchema,
   DuckDBCSVSniffResult,
@@ -26,11 +29,9 @@ import {
   DuckDBScan,
   DuckDBStructuredQuery,
 } from "./DuckDBClient.types";
-import {
-  QueryResult,
-  QueryResultPage,
-} from "@/models/queries/QueryResult/QueryResult.types";
+import { DuckDBDataType, DuckDBDataTypeUtils } from "./DuckDBDataType";
 import { DuckDBQueryAggregations } from "./DuckDBQueryAggregations";
+import { singleton } from "./queryResultHelpers";
 
 const MANUAL_BUNDLES: duckdb.DuckDBBundles = {
   mvp: {
@@ -342,9 +343,9 @@ class DuckDBClientImpl {
       // Loading a CSV will ALWAYS overwrite existing data.
       await this.dropTableAndFile(tableName);
       await this.#registerCSVFile(
-        "file" in options
-          ? { tableName, file: options.file }
-          : { tableName, fileText: options.fileText },
+        "file" in options ?
+          { tableName, file: options.file }
+        : { tableName, fileText: options.fileText },
       );
 
       const cleanCommentChar = commentChar === "(empty)" ? null : commentChar;
@@ -368,16 +369,14 @@ class DuckDBClientImpl {
               ${dateFormat ? `, dateformat='${dateFormat}'` : ""}
               ${timestampFormat ? `, timestampformat='${timestampFormat}'` : ""}
               ${
-            columns
-              ? `, columns={${
-                columns
-                  .map(([name, type]) => {
-                    return `'${name}': '${type}'`;
-                  })
-                  .join(",")
-              }}`
-              : ""
-          }
+                columns ?
+                  `, columns={${columns
+                    .map(([name, type]) => {
+                      return `'${name}': '${type}'`;
+                    })
+                    .join(",")}}`
+                : ""
+              }
             ) t
           `,
           { conn, params: { tableName } },
@@ -516,9 +515,8 @@ class DuckDBClientImpl {
       await db.dropFile(tempParquetFileName);
       return parquetBlob;
     } catch (error) {
-      const errorMessage = error instanceof Error
-        ? error.message
-        : "Unknown error";
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       this.#logger.error(error, {
         msg: "Failed to export table as parquet",
         errMsg: errorMessage,
@@ -579,9 +577,8 @@ class DuckDBClientImpl {
     try {
       this.#logger.log("Executing query", { query: queryStringToUse });
       // run the query
-      const arrowTable = await conn.query<Record<string, arrow.DataType>>(
-        queryStringToUse,
-      );
+      const arrowTable =
+        await conn.query<Record<string, arrow.DataType>>(queryStringToUse);
       queryResults = arrowTableToJS<RowObject>(arrowTable, {
         logger: this.#logger,
       });
@@ -637,9 +634,8 @@ class DuckDBClientImpl {
     }
 
     // special case for when there's 0 rows, we still say there is 1 page
-    const totalPages = totalRowsInSource === 0
-      ? 1
-      : Math.ceil(totalRowsInSource / pageSize);
+    const totalPages =
+      totalRowsInSource === 0 ? 1 : Math.ceil(totalRowsInSource / pageSize);
     const nextPage = pageNum + 1 === totalPages ? undefined : pageNum + 1;
     const prevPage = pageNum === 0 ? undefined : pageNum - 1;
 
@@ -746,26 +742,26 @@ class DuckDBClientImpl {
       })
       .map(prop("column_name"));
 
-    const columnNames = selectColumnNames === "*"
-      ? tableColumns.map(prop("column_name"))
+    const columnNames =
+      selectColumnNames === "*" ?
+        tableColumns.map(prop("column_name"))
       : selectColumnNames;
 
     const columnNamesWithoutAggregations = columnNames.filter((colName) => {
-      return (
-        aggregations[colName] === undefined
-      );
+      return aggregations[colName] === undefined;
     });
 
     // if requested, cast any timestamp columns that will go in the SELECT
     // clause to ISO strings
-    const adjustedFieldNames = castTimestampsToISO
-      ? columnNamesWithoutAggregations.map((colName) => {
-        return timestampColumnNames.includes(colName)
-          ? sql.raw(
-            `strftime("${colName}"::TIMESTAMP, '%Y-%m-%dT%H:%M:%S.%fZ') as "${colName}"`,
-          )
-          : `${colName}`;
-      })
+    const adjustedFieldNames =
+      castTimestampsToISO ?
+        columnNamesWithoutAggregations.map((colName) => {
+          return timestampColumnNames.includes(colName) ?
+              sql.raw(
+                `strftime("${colName}"::TIMESTAMP, '%Y-%m-%dT%H:%M:%S.%fZ') as "${colName}"`,
+              )
+            : `${colName}`;
+        })
       : columnNamesWithoutAggregations;
 
     let query = sql.select(...adjustedFieldNames).from(tableName);
@@ -780,8 +776,8 @@ class DuckDBClientImpl {
     // apply aggregations
     query = objectEntries(aggregations).reduce(
       (newQuery, [columnName, aggType]) => {
-        const aggregationColumnName = DuckDBQueryAggregations
-          .getAggregationColumnName(aggType, columnName);
+        const aggregationColumnName =
+          DuckDBQueryAggregations.getAggregationColumnName(aggType, columnName);
         const aggregationColumn = { [aggregationColumnName]: columnName };
 
         return match(aggType)
@@ -801,9 +797,7 @@ class DuckDBClientImpl {
             return newQuery.min(aggregationColumn);
           })
           .exhaustive(() => {
-            throw new Error(
-              `Invalid DuckDBQueryAggregationType: "${aggType}"`,
-            );
+            throw new Error(`Invalid DuckDBQueryAggregationType: "${aggType}"`);
           });
       },
       query,
@@ -820,9 +814,8 @@ class DuckDBClientImpl {
     // run the query
     try {
       const queryString = query.toString();
-      const arrowTable = await conn.query<Record<string, arrow.DataType>>(
-        queryString,
-      );
+      const arrowTable =
+        await conn.query<Record<string, arrow.DataType>>(queryString);
 
       queryResults = arrowTableToJS<RowObject>(arrowTable, {
         logger: this.#logger,

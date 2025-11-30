@@ -3,7 +3,7 @@
  * These are hardcoded, which means if we need to support longer pipes,
  * just add a new annotation for more functions.
  */
-import { AnyFunction } from "../types/utilityTypes";
+import { AnyFunction } from "../../../shared/lib/types/utilityTypes";
 
 export function pipe<A, B, C>(
   op1: (input: A) => B,

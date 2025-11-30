@@ -1,3 +1,5 @@
+import { ILogger } from "$/lib/Logger/Logger";
+import { Database, Tables } from "$/types/database.types";
 import { iso, object, string, uuid } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
@@ -11,10 +13,8 @@ import {
   WithSupabaseClient,
   withSupabaseClient,
 } from "@/lib/clients/withSupabaseClient";
-import { ILogger } from "@/lib/Logger";
 import { omit } from "@/lib/utils/objects/misc";
 import { camelCaseKeysShallow } from "@/lib/utils/objects/transformations";
-import { Database, Tables } from "@/types/database.types";
 import { WorkspaceId } from "../Workspace/Workspace.types";
 import { MembershipId, UserId, UserProfile, UserProfileId } from "./User.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -41,7 +41,7 @@ type TUserClientOptions = {
   dbClient?: SupabaseClient<Database>;
 };
 
-const UserProfileDBReadToModelReadSchema: ZodType<
+export const UserProfileDBReadToModelReadSchema: ZodType<
   UserProfile,
   Tables<"user_profiles">
 > = object({

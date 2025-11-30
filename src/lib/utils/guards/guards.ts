@@ -1,7 +1,11 @@
-import { EmptyObject, SetFieldType, SetRequired, Simplify } from "type-fest";
-import { UnknownObject } from "@/lib/types/common";
-import { AnyFunction, SetDefined } from "../../types/utilityTypes";
-import { Model } from "@/models/Model";
+import { UnknownObject } from "$/lib/types/common";
+import { isArray } from "$/lib/utils/guards/isArray";
+import { SetFieldType, SetRequired, Simplify } from "type-fest";
+import type {
+  AnyFunction,
+  SetDefined,
+} from "../../../../shared/lib/types/utilityTypes";
+import type { Model } from "@/models/Model";
 
 /**
  * Returns a predicate that is true if any of the predicates are true.
@@ -16,69 +20,10 @@ export function or<T, Predicates extends Array<(value: any) => value is any>>(
   ...predicates: Predicates
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): value is Predicates[number] extends (value: any) => value is infer R ? T & R
-  : never {
+: never {
   return predicates.some((predicate) => {
     return predicate(value);
   });
-}
-
-/**
- * Inspired from Remeda's `isPlainObject`.
- * Checks if `value` is a plain object, i.e. an object with string
- * keys and values. This will not consider other entities JavaScript
- * considers an object using `typeof` (like Arrays, Maps, Sets, etc.).
- *
- * We're talking about just plain old objects defined with curly braces {}.
- *
- * **Examples**
- *
- * ```ts
- * isPlainObject({}); // true
- * isPlainObject({ foo: 'bar' }); // true
- * isPlainObject([]) // false
- * isPlainObject("foo"); // false
- * isPlainObject(new Date()) // false
- * isPlainObject(null) // false
- * ```
- */
-export function isPlainObject<T>(
-  value: Readonly<UnknownObject> | T,
-): value is T & UnknownObject {
-  if (typeof value !== "object" || value === null) {
-    return false;
-  }
-
-  // Inspired from Remeda's `isPlainObject` - this is a low-level check
-  const proto = Object.getPrototypeOf(value);
-  return proto === null || proto === Object.prototype;
-}
-
-/**
- * Checks if `value` is an array.
- * This is better than `Array.isArray` because it is more type-safe and
- * uses `unknown` rather than `any`.
- *
- * @param value - The value to check.
- * @returns `true` if `value` is an array, `false` otherwise.
- */
-export function isArray(value: unknown): value is readonly unknown[] {
-  return Array.isArray(value);
-}
-
-/**
- * Checks if `value` is a `Date` instance.
- *
- * **Examples**
- *
- * ```ts
- * isDate(new Date()); // true
- * isDate("2023-01-01"); // false
- * isDate(null); // false
- * isDate(undefined); // false
- * ```
- */
-export function isDate(value: unknown): value is Date {
-  return value instanceof Date;
 }
 
 /**
@@ -96,24 +41,6 @@ export function isDate(value: unknown): value is Date {
  */
 export function isNonNullish<T>(value: T): value is NonNullable<T> {
   return value !== null && value !== undefined;
-}
-
-/**
- * Checks if `value` is not `undefined`.
- *
- * NOTE: the value can still be `null`. This counts as a defined value.
- *
- * **Examples**
- *
- * ```ts
- * isDefined(undefined); // false
- * isDefined("foo"); // true
- * isDefined(0); // true
- * isDefined(false); // true
- * ```
- */
-export function isDefined<T>(value: T): value is Exclude<T, undefined> {
-  return value !== undefined;
 }
 
 export function isNullish(value: unknown): value is null | undefined {
@@ -232,21 +159,6 @@ export function hasDefinedProps<T extends object, Key extends keyof T>(
 }
 
 /**
- * Checks if `v` is an empty object.
- *
- * @param v - The value to check. It must be narrowed to an object type already.
- * @returns `true` if `v` is an empty object, `false` otherwise.
- */
-export function isEmptyObject(v: UnknownObject): v is EmptyObject {
-  for (const _ in v) {
-    // if there is a single key we will enter this loop and return false
-    return false;
-  }
-
-  return true;
-}
-
-/**
  * Checks if `value` is one of the values in `values`.
  *
  * @param value - The value to check.
@@ -259,21 +171,6 @@ export function isOneOf<T extends string | boolean | number>(
   values: readonly T[],
 ): value is T {
   return values.includes(value as T);
-}
-
-/**
- * Checks if `value` is a non-empty array.
- *
- * This is easy enough to check with just `.length` but this function gives
- * enforces at the type-level that there **must** be at least one element.
- *
- * @param value - The value to check.
- * @returns `true` if `value` is a non-empty array, `false` otherwise.
- */
-export function isNonEmptyArray<T>(
-  value: readonly T[] | null | undefined,
-): value is readonly [T, ...T[]] {
-  return isArray(value) && value.length > 0;
 }
 
 /**
@@ -295,13 +192,14 @@ export function isEmptyArray<T>(
  * @param modelType - The model type to check.
  * @returns `true` if `value` is a model of the given type, `false` otherwise.
  */
-export function isOfModelType<
-  M extends Model<string>,
-  MType extends string,
->(
+export function isOfModelType<M extends Model<string>, MType extends string>(
   modelType: MType,
   value: M | null | undefined,
 ): value is Simplify<M & SetFieldType<M, "__type", MType>> {
-  return value !== null && value !== undefined && "__type" in value &&
-    value.__type === modelType;
+  return (
+    value !== null &&
+    value !== undefined &&
+    "__type" in value &&
+    value.__type === modelType
+  );
 }

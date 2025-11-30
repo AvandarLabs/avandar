@@ -1,6 +1,6 @@
 import { useUncontrolled } from "@mantine/hooks";
 import { useMemo } from "react";
-import { Select, SelectOption } from "@/lib/ui/inputs/Select";
+import { Select, SelectOption, SelectProps } from "@/lib/ui/inputs/Select";
 import { propIsInArray } from "@/lib/utils/objects/higherOrderFuncs";
 import { AvaDataType } from "@/models/datasets/AvaDataType";
 import { AvaDataTypes } from "@/models/datasets/AvaDataType/AvaDataTypes";
@@ -12,7 +12,10 @@ type Props = {
   value?: QueryAggregationType;
   defaultValue?: QueryAggregationType;
   onChange?: (aggregation: QueryAggregationType) => void;
-};
+} & Omit<
+  SelectProps<QueryAggregationType>,
+  "value" | "defaultValue" | "onChange"
+>;
 
 const AGGREGATION_OPTIONS: Array<SelectOption<QueryAggregationType>> = [
   { value: "none", label: "None" },
@@ -28,8 +31,9 @@ export function AggregationSelect({
   dataType,
   label,
   value,
-  defaultValue = "none",
+  defaultValue,
   onChange,
+  ...selectProps
 }: Props): JSX.Element {
   const validAggregations = AvaDataTypes.getValidQueryAggregations(dataType);
 
@@ -59,6 +63,7 @@ export function AggregationSelect({
           setCurrentAggregation(newValue);
         }
       }}
+      {...selectProps}
     />
   );
 }

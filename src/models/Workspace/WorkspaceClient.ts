@@ -1,16 +1,16 @@
+import { isDefined } from "$/lib/utils/guards/isDefined";
 import { APIClient } from "@/clients/APIClient";
 import { AuthClient } from "@/clients/AuthClient";
 import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
+import { isOneOf } from "@/lib/utils/guards/guards";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { camelCaseKeysShallow } from "@/lib/utils/objects/transformations";
-import { uuid } from "@/lib/utils/uuid";
 import { SubscriptionParsers } from "../Subscription/SubscriptionParsers";
-import { UserId } from "../User/User.types";
+import { UserId, UserProfileWithRole } from "../User/User.types";
+import { UserProfileDBReadToModelReadSchema } from "../User/UserClient";
 import {
   Workspace,
   WorkspaceId,
-  WorkspaceRole,
-  WorkspaceUser,
+  WorkspaceInvite,
   WorkspaceWithSubscription,
 } from "./Workspace.types";
 import { WorkspaceParsers } from "./WorkspaceParsers";
@@ -60,52 +60,64 @@ export const WorkspaceClient = createSupabaseCRUDClient({
         });
       },
 
-      // TODO: Update user_roles to reference
-      // user_profiles instead of auth.users. See issue #123.
       getUsersForWorkspace: async ({
         workspaceId,
       }: {
         workspaceId: WorkspaceId;
-      }): Promise<WorkspaceUser[]> => {
+      }): Promise<UserProfileWithRole[]> => {
         const logger = clientLogger.appendName("getUsersForWorkspace");
         logger.log("Fetching all users for workspace", { workspaceId });
 
-        const { data: profiles } = await dbClient
-          .from("user_profiles")
+        const session = await AuthClient.getCurrentSession();
+        if (!session?.user) {
+          throw new Error("User not found.");
+        }
+
+        const { data: memberships } = await dbClient
+          .from("workspace_memberships")
+          .select("*, user_profile:user_profiles (*), user_role:user_roles (*)")
+          .eq("workspace_id", workspaceId)
+          .throwOnError();
+
+        const profiles: UserProfileWithRole[] = memberships
+          .map((membership) => {
+            if (
+              membership.user_profile &&
+              membership.user_role &&
+              isOneOf(membership.user_role.role, ["admin", "member"])
+            ) {
+              const profile = UserProfileDBReadToModelReadSchema.parse({
+                ...membership.user_profile,
+                email: session?.user?.email,
+              });
+              const role = membership.user_role.role;
+              return {
+                ...profile,
+                role,
+              };
+            }
+            return undefined;
+          })
+          .filter(isDefined);
+
+        return profiles;
+      },
+
+      getPendingInvites: async ({
+        workspaceId,
+      }: {
+        workspaceId: WorkspaceId;
+      }): Promise<WorkspaceInvite[]> => {
+        const logger = clientLogger.appendName("getPendingInvites");
+        logger.log("Fetching pending invites for workspace", { workspaceId });
+
+        const { data: invites } = await dbClient
+          .from("workspace_invites")
           .select("*")
           .eq("workspace_id", workspaceId)
+          .eq("invite_status", "pending")
           .throwOnError();
-
-        const userIds = profiles.map((p) => {
-          return p.user_id;
-        });
-        const { data: roles } = await dbClient
-          .from("user_roles")
-          .select("user_id, role")
-          .in("user_id", userIds)
-          .eq("workspace_id", workspaceId)
-          .throwOnError();
-
-        const roleMap = new Map(
-          roles.map((r) => {
-            return [r.user_id, r.role];
-          }),
-        );
-
-        const transformed = profiles.map((row) => {
-          const model = camelCaseKeysShallow(row);
-          return {
-            ...model,
-            id: uuid<UserId>(model.id),
-            workspaceId: uuid<WorkspaceId>(model.workspaceId),
-            createdAt: new Date(model.createdAt),
-            updatedAt: new Date(model.updatedAt),
-            role: roleMap.get(row.user_id) ?? "member",
-          };
-        });
-
-        logger.log("Users retrieved", { users: transformed });
-        return transformed;
+        return invites;
       },
     };
   },
@@ -125,7 +137,6 @@ export const WorkspaceClient = createSupabaseCRUDClient({
             slug: options.workspaceSlug,
           },
         });
-        console.log("validationResult", validationResult);
         return validationResult;
       },
 
@@ -156,31 +167,6 @@ export const WorkspaceClient = createSupabaseCRUDClient({
         return parsers.fromDBReadToModelRead(workspace);
       },
 
-      addMember: async (params: {
-        workspaceId: WorkspaceId;
-        userId: UserId;
-        role: WorkspaceRole;
-      }): Promise<void> => {
-        const logger = clientLogger.appendName("addMember");
-
-        logger.log("Adding member to workspace", params);
-
-        const { workspaceId, userId, role } = params;
-
-        // adding a member to a workspace involves many database operations,
-        // so we use a stored procedure to handle it
-        await dbClient
-          .rpc("rpc_workspaces__add_user", {
-            p_workspace_id: workspaceId,
-            p_user_id: userId,
-            p_full_name: "",
-            p_display_name: "",
-            p_user_role: role,
-          })
-          .throwOnError();
-
-        logger.log("Successfully added member to workspace");
-      },
       removeMember: async (params: {
         workspaceId: WorkspaceId;
         userId: UserId;
@@ -193,6 +179,13 @@ export const WorkspaceClient = createSupabaseCRUDClient({
 
         await dbClient
           .from("workspace_memberships")
+          .delete()
+          .match({ workspace_id: workspaceId, user_id: userId })
+          .throwOnError();
+
+        // also remove them from the invites list if they were invited before
+        await dbClient
+          .from("workspace_invites")
           .delete()
           .match({ workspace_id: workspaceId, user_id: userId })
           .throwOnError();

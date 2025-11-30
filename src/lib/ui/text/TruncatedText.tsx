@@ -1,5 +1,6 @@
 import { Text, TextProps, Tooltip } from "@mantine/core";
 import { useWindowEvent } from "@mantine/hooks";
+import { isArray } from "$/lib/utils/guards/isArray";
 import {
   DependencyList,
   RefObject,
@@ -8,7 +9,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { isArray } from "@/lib/utils/guards/guards";
 
 type Props = {
   children: string;

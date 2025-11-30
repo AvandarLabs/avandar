@@ -1,9 +1,11 @@
 .navbar {
+  --navbar-transition-duration: 0.1s;
   background-color: var(--mantine-navbar-background);
   color: var(--mantine-navbar-color);
+  transition: width var(--navbar-transition-duration) ease-in-out;
 }
 
-.anchor {
+.navbarTitleLink {
   color: var(--mantine-navbar-color);
 
   &:hover {
@@ -17,4 +19,47 @@
       background-color: var(--mantine-navbar-active-hover-background);
     }
   }
+}
+
+.navbarLinkPill {
+  transition: background-color var(--navbar-transition-duration) ease-in-out;
+  color: var(--mantine-navbar-color);
+}
+
+/* Apply hover and active states based on parent Link */
+a:hover .navbarLinkPill {
+  background-color: var(--mantine-navbar-hover-background);
+}
+
+a[data-status="active"] .navbarLinkPill {
+  background-color: var(--mantine-navbar-active-background);
+}
+
+a[data-status="active"]:hover .navbarLinkPill {
+  background-color: var(--mantine-navbar-active-hover-background);
+}
+
+.collapsibleText {
+  transition: opacity var(--navbar-transition-duration) ease-in-out;
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: 1;
+}
+
+.collapsibleTextHidden {
+  opacity: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.collapsibleContent {
+  transition:
+    opacity var(--navbar-transition-duration) ease-in-out,
+    visibility var(--navbar-transition-duration) ease-in-out;
+}
+
+.collapsibleContentHidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }

@@ -56,6 +56,7 @@ async function main() {
       "-q, --query [params...]",
       "Specify query search params as a space-separated list of key=value pairs. E.g. --query name=John age=30",
     )
+    .showHelpAfterError()
     .parse(process.argv);
 
   const [functionName, methodName] = program.args;

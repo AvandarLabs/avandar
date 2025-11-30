@@ -1,6 +1,6 @@
 import { UseFormReturnType as MantineUseFormReturnType } from "@mantine/form";
+import { UnknownObject } from "$/lib/types/common";
 import { Paths, Simplify } from "type-fest";
-import { UnknownObject } from "@/lib/types/common";
 import { PathValue } from "@/lib/utils/objects/getValue";
 import {
   GetInputPropsOptions,

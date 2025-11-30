@@ -1,15 +1,14 @@
 import { DefaultError, QueryClient, QueryKey } from "@tanstack/react-query";
+import { isEmptyObject } from "$/lib/utils/guards/isEmptyObject";
+import { isPlainObject } from "$/lib/utils/guards/isPlainObject";
+import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
+import { capitalize } from "$/lib/utils/strings/capitalize/capitalize";
 import { useMutation, UseMutationOptions } from "@/lib/hooks/query/useMutation";
 import { useQuery } from "@/lib/hooks/query/useQuery";
-import { AnyFunction } from "../../types/utilityTypes";
-import {
-  isEmptyObject,
-  isFunction,
-  isPlainObject,
-} from "../../utils/guards/guards";
-import { objectKeys } from "../../utils/objects/misc";
+import { AnyFunction } from "../../../../shared/lib/types/utilityTypes";
+import { isFunction } from "../../utils/guards/guards";
 import { excludeDeep } from "../../utils/objects/transformations";
-import { capitalize, prefix } from "../../utils/strings/transformations";
+import { prefix } from "../../utils/strings/transformations";
 import { BaseClient } from "../BaseClient";
 import {
   ClientFnFirstParameter,
@@ -92,7 +91,7 @@ export function withQueryHooks<
   callableQueryFnNames.forEach((queryFnName) => {
     const clientFunction = client[queryFnName as UseQueryFnName];
     if (typeof clientFunction === "function") {
-      const boundClientFunction = clientFunction.bind(client);
+      const boundClientFunction = (clientFunction as AnyFunction).bind(client);
 
       // make the query key builder for this `queryFnName`
       const queryKeyBuilder = (
@@ -108,17 +107,13 @@ export function withQueryHooks<
       const useClientQuery = (
         options: UseClientQueryArg<Client, UseQueryFnName>,
       ) => {
-        const { useQueryOptions, ...clientFnParamsObj } = isPlainObject(options)
-          ? options
-          : { useQueryOptions: undefined };
+        const { useQueryOptions, ...clientFnParamsObj } =
+          isPlainObject(options) ? options : { useQueryOptions: undefined };
         const clientFnParam = (
-          isSingleArgObject(clientFnParamsObj)
-            ? clientFnParamsObj.arg
+          isSingleArgObject(clientFnParamsObj) ? clientFnParamsObj.arg
             // treat an empty object as undefined
-            : objectKeys(clientFnParamsObj).length === 0
-            ? undefined
-            : clientFnParamsObj
-        ) as ClientFnFirstParameter<
+          : objectKeys(clientFnParamsObj).length === 0 ? undefined
+          : clientFnParamsObj) as ClientFnFirstParameter<
           Client,
           UseQueryFnName
         >;
@@ -126,7 +121,9 @@ export function withQueryHooks<
         return useQuery({
           queryKey: queryKeyBuilder(clientFnParam),
           queryFn: async () => {
-            const result = await boundClientFunction(clientFnParam);
+            const result = await (boundClientFunction as AnyFunction)(
+              clientFnParam,
+            );
             return result;
           },
           ...(isPlainObject(useQueryOptions) ? useQueryOptions : undefined),
@@ -150,21 +147,22 @@ export function withQueryHooks<
     .forEach((mutationFnName) => {
       const clientFunction = client[mutationFnName as UseMutationFnName];
       if (typeof clientFunction === "function") {
-        const boundClientFunction = clientFunction.bind(client);
+        const boundClientFunction = (clientFunction as AnyFunction).bind(
+          client,
+        );
 
         // make the wrapped `useMutation` function for this `mutationFnName`
         const useClientMutation = (
-          useMutationOptions?:
-            & Omit<
-              UseMutationOptions<
-                ClientFnReturnType<Client, UseMutationFnName>,
-                ClientFnFirstParameter<Client, UseMutationFnName>,
-                DefaultError,
-                unknown
-              >,
-              "mutationFn"
-            >
-            & ExtraUseClientMutationArgs,
+          useMutationOptions?: Omit<
+            UseMutationOptions<
+              ClientFnReturnType<Client, UseMutationFnName>,
+              ClientFnFirstParameter<Client, UseMutationFnName>,
+              DefaultError,
+              unknown
+            >,
+            "mutationFn"
+          > &
+            ExtraUseClientMutationArgs,
         ) => {
           const {
             invalidateGetAllQuery,
@@ -174,13 +172,12 @@ export function withQueryHooks<
           } = useMutationOptions ?? {};
 
           // get the query keys to invalidate
-          const singletonQueryToInvalidate = queryToInvalidate
-            ? [queryToInvalidate]
-            : undefined;
+          const singletonQueryToInvalidate =
+            queryToInvalidate ? [queryToInvalidate] : undefined;
           // if `queriesToInvalidate` is set, it takes precedence over the
           // singleton `queryToInvalidate` parameter
-          let newQueriesToInvalidate = queriesToInvalidate ??
-            singletonQueryToInvalidate ?? undefined;
+          let newQueriesToInvalidate =
+            queriesToInvalidate ?? singletonQueryToInvalidate ?? undefined;
 
           // if `invalidateGetAllQuery` is set, add the `getAll` query key
           if (
@@ -247,7 +244,9 @@ export function withQueryHooks<
         callableQueryFnNames.forEach((queryFnName: UseQueryFnName) => {
           const clientFunction = client[queryFnName as UseQueryFnName];
           if (typeof clientFunction === "function") {
-            const boundClientFunction = clientFunction.bind(client);
+            const boundClientFunction = (clientFunction as AnyFunction).bind(
+              client,
+            );
             const wrappedQuery = async (
               params: ClientFnFirstParameter<Client, UseQueryFnName>,
             ) => {

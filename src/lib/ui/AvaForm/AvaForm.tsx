@@ -1,73 +1,34 @@
 import { Box, Button, Flex, Stack, Text } from "@mantine/core";
-import { isEmail } from "@mantine/form";
-import { ReactElement, ReactNode, useMemo } from "react";
-import { match } from "ts-pattern";
-import { FormType, useForm } from "@/lib/hooks/ui/useForm";
-import { StringKeyOf } from "@/lib/types/utilityTypes";
-import { constant } from "@/lib/utils/higherOrderFuncs";
-import { propIsDefined } from "@/lib/utils/objects/higherOrderFuncs";
-import { objectKeys, objectValues } from "@/lib/utils/objects/misc";
-import { camelToTitleCase } from "@/lib/utils/strings/transformations";
+import { StringKeyOf } from "$/lib/types/utilityTypes";
+import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
+import { objectValues } from "$/lib/utils/objects/objectValues/objectValues";
 import {
+  ReactElement,
+  ReactNode,
+  Ref,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+} from "react";
+import { match } from "ts-pattern";
+import { FormRulesRecord, useForm, UseFormInput } from "@/lib/hooks/ui/useForm";
+import {
+  AvaFormRef,
   FormFieldSchema,
   GenericFormSchemaRecord,
-  SemanticTextType,
-  ValidationFn,
+  ValidBaseValueType,
   ValuesOfFieldRecord,
 } from "./AvaForm.types";
-import { AvaTextInput } from "./AvaTextInput";
-import type { UseFormInput } from "@/lib/hooks/ui/useForm";
-
-function getDefaultFieldSchema<
-  FormValues extends ValuesOfFieldRecord<GenericFormSchemaRecord>,
-  FieldKey extends StringKeyOf<FormValues>,
->(
-  fieldKey: FieldKey,
-  providedSchema: FormFieldSchema<FormValues, FieldKey>,
-): FormFieldSchema<FormValues, FieldKey> {
-  const processedSchema = {
-    ...providedSchema,
-    label:
-      providedSchema.label ??
-      camelToTitleCase(String(fieldKey), { capitalizeFirstLetter: true }),
-  };
-
-  if (processedSchema.semanticType) {
-    return match(processedSchema.semanticType)
-      .with("email", () => {
-        return {
-          name: "email",
-          autoComplete: "email",
-          ...processedSchema,
-        };
-      })
-      .with("text", () => {
-        return processedSchema;
-      })
-      .exhaustive(() => {
-        return processedSchema;
-      });
-  }
-
-  return processedSchema;
-}
-
-function getDefaultSemanticValidationFn(
-  semanticType: SemanticTextType,
-): ValidationFn | undefined {
-  return match(semanticType)
-    .with("email", () => {
-      return isEmail("Invalid email address");
-    })
-    .with("text", () => {
-      return constant(undefined);
-    })
-    .exhaustive();
-}
+import { hydrateTextFieldSchema } from "./AvaTextInput/hydrateTextFieldSchema";
+import { UnknownAvaInput } from "./UnknownAvaInput";
 
 type Props<
-  FieldSchemaRecord extends GenericFormSchemaRecord,
+  FieldSchemaRecord extends Record<
+    string,
+    FormFieldSchema<string, Record<string, ValidBaseValueType>>
+  >,
   FieldKey extends StringKeyOf<FieldSchemaRecord>,
+  FormValues extends ValuesOfFieldRecord<FieldSchemaRecord>,
 > = {
   /** Content to show at the top of the form. */
   introContent?: ReactNode;
@@ -86,6 +47,9 @@ type Props<
    */
   formElements: ReadonlyArray<FieldKey | ReactElement | null | undefined>;
 
+  /** Whether to hide the submit button. */
+  hideSubmitButton?: boolean;
+
   /** Content to show at the bottom of the form. */
   outroContent?: ReactNode;
 
@@ -96,8 +60,8 @@ type Props<
   buttonAlignment?: "right" | "left";
 
   /** The function to call when the form is submitted. */
-  onSubmit: (
-    values: ValuesOfFieldRecord<FieldSchemaRecord>,
+  onSubmit?: (
+    values: FormValues,
     event: React.FormEvent<HTMLFormElement> | undefined,
   ) => void;
 
@@ -106,6 +70,12 @@ type Props<
 
   /** Whether the submit button is disabled. */
   submitIsDisabled?: boolean;
+
+  /** The ref to the AvaForm */
+  ref?: Ref<AvaFormRef<FormValues>>;
+
+  /** The function to call when a key is pressed down. */
+  onKeyDown?: (event: React.KeyboardEvent<HTMLFormElement>) => void;
 };
 
 /**
@@ -117,9 +87,10 @@ type Props<
  */
 export function AvaForm<
   FieldSchemaRecord extends GenericFormSchemaRecord,
+  FieldKey extends StringKeyOf<FieldSchemaRecord>,
   FormValues extends ValuesOfFieldRecord<FieldSchemaRecord>,
-  FieldKey extends StringKeyOf<FieldSchemaRecord> & StringKeyOf<FormValues>,
 >({
+  ref,
   fields,
   formElements,
   onSubmit,
@@ -129,62 +100,101 @@ export function AvaForm<
   buttonAlignment,
   submitIsLoading,
   submitIsDisabled,
-}: Props<FieldSchemaRecord, FieldKey>): JSX.Element {
-  const formInitializer = useMemo(() => {
-    const initValues = {} as Record<FieldKey, string>;
-    const validations = {} as Record<
-      FieldKey,
-      ValidationFn<unknown, FormValues, FieldKey>
-    >;
-    const anyFieldRequiresSync = objectValues(fields).some(
-      propIsDefined("syncWhileUntouched"),
-    );
+  hideSubmitButton,
+  onKeyDown,
+}: Props<FieldSchemaRecord, FieldKey, FormValues>): JSX.Element {
+  const formNodeRef = useRef<HTMLFormElement>(null);
 
-    objectKeys(fields).forEach((objFieldKey) => {
+  // first, we hydrate the fields with additional default values and validation
+  // functions based on their semantic types and other properties
+  const improvedFields = useMemo(() => {
+    const newFields = {} as FieldSchemaRecord;
+    objectKeys(fields).forEach((fieldKey) => {
+      const field = fields[fieldKey]! as FormFieldSchema<FieldKey, FormValues>;
+      const improvedField = match(field)
+        .with({ type: "text" }, (fieldSchema) => {
+          return hydrateTextFieldSchema(fieldSchema);
+        })
+        .with({ type: "select" }, (fieldSchema) => {
+          return fieldSchema;
+        })
+        .exhaustive(() => {
+          return field;
+        });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      newFields[fieldKey] = improvedField as any;
+    });
+    return newFields;
+    // disable exhaustive-deps because we only want to generate these once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const formInitializer = useMemo(() => {
+    const initValues = {} as Record<FieldKey, ValidBaseValueType>;
+    const validations = {} as FormRulesRecord<FormValues, FormValues>;
+    const anyFieldRequiresSync = objectValues(improvedFields).some((field) => {
+      return field.type === "text" && field.syncWhileUntouched;
+    });
+
+    objectKeys(improvedFields).forEach((objFieldKey) => {
       const fieldKey = objFieldKey as FieldKey;
-      const field = fields[fieldKey]!;
+      const field = improvedFields[fieldKey]! as FormFieldSchema<
+        FieldKey,
+        FormValues
+      >;
 
       // get the initial values
       initValues[fieldKey] = field.initialValue;
 
-      // get the validation functions
-      const semanticValidationFn =
-        field.semanticType ?
-          getDefaultSemanticValidationFn(field.semanticType)
-        : undefined;
-
-      if (field.validateFn || semanticValidationFn) {
-        validations[fieldKey] = (
-          value: unknown,
-          allFormValues: FormValues,
-          currentFieldKey: FieldKey,
-        ) => {
+      if (field.validateFn) {
+        const fieldValidationFn = ((value, allFormValues, currentFieldKey) => {
           // before running validation, we first verify that the type of the
           // value is appropriate, before we call the custom validate function
           // (if one is provided)
           return match(field.type)
             .with("text", () => {
+              // if a custom validate function is provided, we use it,
+              // otherwise we'll use the semantic validation function (if
+              // there is one)
               if (field.validateFn) {
                 if (typeof value === "string") {
                   return field.validateFn(
                     value,
                     allFormValues,
-                    currentFieldKey,
+                    currentFieldKey as FieldKey,
                   );
                 }
                 return "Received a non-string value for a text field";
               }
-              return semanticValidationFn?.(value, allFormValues, fieldKey);
+              return undefined;
             })
-            .exhaustive();
-        };
+            .with("select", () => {
+              if (field.validateFn) {
+                if (typeof value === "string") {
+                  return field.validateFn(
+                    value,
+                    allFormValues,
+                    currentFieldKey as FieldKey,
+                  );
+                }
+                return "Received a non-string value for a select field";
+              }
+              // there is no semantic validation function to use
+              return undefined;
+            })
+            .exhaustive(() => {
+              return undefined;
+            });
+        }) as FormRulesRecord<FormValues, FormValues>[FieldKey];
+        validations[fieldKey] = fieldValidationFn;
       }
     });
 
     return {
       mode: "uncontrolled" as const,
-      initialValues: initValues as FormValues,
-      validate: validations as UseFormInput<FormValues>["validate"],
+      initialValues: initValues,
+      validate: validations,
       touchTrigger:
         anyFieldRequiresSync ? ("focus" as const) : ("change" as const),
     };
@@ -192,7 +202,21 @@ export function AvaForm<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const form: FormType<FormValues> = useForm(formInitializer);
+  const form = useForm(formInitializer as UseFormInput<FormValues>);
+
+  useImperativeHandle(ref, () => {
+    return {
+      getForm: () => {
+        return form;
+      },
+      getFormNode: () => {
+        return formNodeRef.current;
+      },
+      getFormValues: () => {
+        return form.getValues();
+      },
+    };
+  }, [form, formNodeRef]);
 
   const elements = {
     content: (elt: ReactNode) => {
@@ -205,26 +229,23 @@ export function AvaForm<
     innerFormElements: () => {
       return formElements.map((formElement) => {
         if (typeof formElement === "string") {
-          if (formElement in fields) {
+          if (formElement in improvedFields) {
             const fieldKey = formElement as FieldKey;
-            const field = fields[fieldKey]!;
-            const { syncWhileUntouched, ...moreInputProps } =
-              getDefaultFieldSchema(fieldKey, field);
-            const { initialValue, debounceMs, onChange, ...restOfInputProps } =
-              moreInputProps;
+            const field = improvedFields[fieldKey]! as FormFieldSchema<
+              FieldKey,
+              FormValues
+            >;
             return (
-              <AvaTextInput
-                key={fieldKey}
-                fieldKey={fieldKey}
+              <UnknownAvaInput
+                key={field.key}
+                fieldKey={field.key}
                 parentForm={form}
-                fields={fields}
-                debounceMs={debounceMs}
-                onChange={onChange}
-                {...restOfInputProps}
+                fields={improvedFields}
+                field={field}
               />
             );
           }
-          return <Text>{formElement}</Text>;
+          return <Text key={formElement}>{formElement}</Text>;
         }
         return formElement;
       });
@@ -232,28 +253,36 @@ export function AvaForm<
   };
 
   return (
-    <form onSubmit={form.onSubmit(onSubmit)}>
+    <form
+      ref={formNodeRef}
+      onSubmit={form.onSubmit((values, event) => {
+        onSubmit?.(values, event);
+      })}
+      onKeyDown={onKeyDown}
+    >
       <Stack gap="md">
         {elements.content(introContent)}
         {elements.innerFormElements()}
         {elements.content(outroContent)}
-        <Box mt="sm">
-          <Flex
-            justify={buttonAlignment === "left" ? "flex-start" : "flex-end"}
-          >
-            <Button
-              loading={submitIsLoading}
-              disabled={
-                submitIsLoading ||
-                (disableSubmitWhileUnchanged && !form.isDirty()) ||
-                submitIsDisabled
-              }
-              type="submit"
+        {hideSubmitButton ? null : (
+          <Box mt="sm">
+            <Flex
+              justify={buttonAlignment === "left" ? "flex-start" : "flex-end"}
             >
-              Submit
-            </Button>
-          </Flex>
-        </Box>
+              <Button
+                loading={submitIsLoading}
+                disabled={
+                  submitIsLoading ||
+                  (disableSubmitWhileUnchanged && !form.isDirty()) ||
+                  submitIsDisabled
+                }
+                type="submit"
+              >
+                Submit
+              </Button>
+            </Flex>
+          </Box>
+        )}
       </Stack>
     </form>
   );

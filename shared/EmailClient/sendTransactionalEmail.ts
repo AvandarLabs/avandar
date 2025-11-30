@@ -1,8 +1,8 @@
 import { render } from "@react-email/render";
+import { getDevOverrideEmail } from "$/env/getDevOverrideEmail.ts";
 import { ReactNode } from "react";
 import { CreateEmailResponseSuccess } from "resend";
-import { getDevOverrideEmail } from "./getDevOverrideEmail";
-import { ResendClient } from "./ResendClient";
+import { ResendClient } from "./ResendClient.ts";
 
 export type SendTransactionalEmailOptions = {
   to: string | string[];
@@ -27,7 +27,7 @@ export type SendTransactionalEmailOptions = {
    *
    * @default false
    */
-  disableDevOverride?: boolean;
+  disableDevEmailOverride?: boolean;
 };
 
 export async function sendTransactionalEmail({
@@ -36,15 +36,10 @@ export async function sendTransactionalEmail({
   subject,
   replyTo,
   body,
-  disableDevOverride,
+  disableDevEmailOverride: disableDevOverride,
 }: SendTransactionalEmailOptions): Promise<CreateEmailResponseSuccess> {
-  // If we are in development and the `disableDevOverride` option is not set,
-  // then we should use the dev override email address
   const devEmailOverride =
-    process.env.NODE_ENV === "development" && !disableDevOverride ?
-      getDevOverrideEmail()
-    : undefined;
-
+    disableDevOverride ? undefined : getDevOverrideEmail();
   const plaintextContent = await render(body, { plainText: true });
   const { data, error } = await ResendClient.sendEmail({
     from: `${from.name} <${from.email}>`,

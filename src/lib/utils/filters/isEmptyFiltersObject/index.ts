@@ -1,1 +1,0 @@
-export { isEmptyFiltersObject } from "./isEmptyFiltersObject";

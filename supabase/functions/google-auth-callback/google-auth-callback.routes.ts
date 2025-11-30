@@ -59,7 +59,7 @@ export const Routes = defineRoutes<GoogleAuthCallbackAPI>(
           }
 
           const payload = JSON.parse(
-            atob(idToken.split(".")[1]),
+            atob(idToken.split(".")[1]!),
           ) as TokenPayload;
           const googleAccountID = payload.sub;
           const googleEmail = payload.email;

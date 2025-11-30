@@ -2,10 +2,10 @@ import { stdin as input, stdout as output } from "node:process";
 import { createInterface } from "node:readline/promises";
 import { EmailClient } from "$/EmailClient/EmailClient";
 import { NOTIFICATION_EMAIL_FROM } from "$/EmailClient/EmailClientConfig";
-import { getDevOverrideEmail } from "$/EmailClient/getDevOverrideEmail";
 import { isDevOverrideEmail } from "$/EmailClient/isDevOverrideEmail";
 import { EmailMarkdown } from "$/emails/lib/EmailMarkdown";
 import { EmailTemplate } from "$/emails/lib/EmailTemplate";
+import { getDevOverrideEmail } from "$/env/getDevOverrideEmail";
 import { program } from "commander";
 import { z } from "zod";
 
@@ -30,7 +30,8 @@ function setupCLI() {
     .requiredOption("--subject <string>", "Email subject")
     .requiredOption("--body <markdown>", "Email body as Markdown")
     // if no email is provided, use the dev override email address
-    .option("--to <email>", "Recipient email address", getDevOverrideEmail());
+    .option("--to <email>", "Recipient email address", getDevOverrideEmail())
+    .showHelpAfterError();
   program.parse();
 }
 
@@ -41,7 +42,7 @@ async function sendEmail(options: CLIOptions): Promise<void> {
   );
 
   const result = await EmailClient.sendTransactionalEmail({
-    disableDevOverride: true,
+    disableDevEmailOverride: true,
     to,
     from: {
       email: NOTIFICATION_EMAIL_FROM.email,

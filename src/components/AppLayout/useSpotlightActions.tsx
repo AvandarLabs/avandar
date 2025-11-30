@@ -5,11 +5,11 @@ import {
 } from "@mantine/spotlight";
 import { IconDatabase, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "@tanstack/react-router";
+import { Logger } from "$/lib/Logger/Logger";
 import { useMemo } from "react";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { SpotlightLinks } from "@/config/SpotlightLinks";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
-import { Logger } from "@/lib/Logger";
 import { notifySuccess } from "@/lib/ui/notifications/notify";
 import { clearOPFS } from "@/lib/utils/browser/clearOPFS";
 

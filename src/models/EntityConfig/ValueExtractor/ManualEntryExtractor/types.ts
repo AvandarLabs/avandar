@@ -2,7 +2,7 @@ import { SetOptional, Simplify } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import type { EntityFieldConfigId } from "../../EntityFieldConfig/EntityFieldConfig.types";
-import type { UUID } from "@/lib/types/common";
+import type { UUID } from "$/lib/types/common";
 
 export type ManualEntryExtractorId = UUID<"ManualEntryExtractor">;
 

@@ -10,6 +10,7 @@ import {
 } from "@mantine/core";
 import { isNotEmpty } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
+import { isDefined } from "$/lib/utils/guards/isDefined";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
@@ -18,7 +19,6 @@ import { useForm } from "@/lib/hooks/ui/useForm";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { Paper } from "@/lib/ui/Paper";
-import { isDefined } from "@/lib/utils/guards/guards";
 import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { setValue } from "@/lib/utils/objects/setValue";
 import { DatasetColumnFieldsBlock } from "./DatasetColumnFieldsBlock";

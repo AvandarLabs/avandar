@@ -1,7 +1,7 @@
 import { ConditionalKeys } from "type-fest";
 import { identity } from "@/lib/utils/misc";
-import type { UnknownObject } from "@/lib/types/common";
 import type { SelectOption } from "@/lib/ui/inputs/Select";
+import type { UnknownObject } from "$/lib/types/common";
 
 /**
  * Given a list of objects, conver this to a list of objects with `value`

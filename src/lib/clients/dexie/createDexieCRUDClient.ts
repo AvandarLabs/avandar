@@ -1,11 +1,14 @@
+import { ILogger } from "$/lib/Logger/Logger";
+import {
+  applyFiltersToRows,
+  FiltersByColumn,
+} from "$/lib/utils/filters/filters";
+import { isDefined } from "$/lib/utils/guards/isDefined";
 import { IDType, UpdateSpec } from "dexie";
 import { EmptyObject } from "type-fest";
-import { ILogger } from "@/lib/Logger";
 import { DexieModelCRUDTypes } from "@/lib/models/DexieModelCRUDTypes";
 import { ModelCRUDParserRegistry } from "@/lib/models/makeParserRegistry";
 import { assertIsDefined } from "@/lib/utils/asserts";
-import { FiltersByColumn, applyFiltersToRows } from "@/lib/utils/filters/filters";
-import { isDefined } from "@/lib/utils/guards/guards";
 import {
   createModelCRUDClient,
   HookableClient,
@@ -96,16 +99,18 @@ export function createDexieCRUDClient<
   const modelClient = createModelCRUDClient({
     modelName,
     parsers,
-    additionalQueries: queries
-      ? ({ clientLogger }) => {
-        return queries({ logger: clientLogger, db, dbTable });
-      }
+    additionalQueries:
+      queries ?
+        ({ clientLogger }) => {
+          return queries({ logger: clientLogger, db, dbTable });
+        }
       : undefined,
 
-    additionalMutations: mutations
-      ? ({ clientLogger }) => {
-        return mutations({ logger: clientLogger, db, dbTable });
-      }
+    additionalMutations:
+      mutations ?
+        ({ clientLogger }) => {
+          return mutations({ logger: clientLogger, db, dbTable });
+        }
       : undefined,
 
     crudFunctions: {

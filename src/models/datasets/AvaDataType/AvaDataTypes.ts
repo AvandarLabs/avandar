@@ -1,5 +1,5 @@
+import { registry } from "$/lib/utils/objects/registry/registry";
 import { match } from "ts-pattern";
-import { registry } from "@/lib/utils/objects/misc";
 import { matchLiteral } from "@/lib/utils/strings/matchLiteral";
 import { QueryAggregationType } from "@/models/queries/QueryAggregationType";
 import { AvaDataType } from "./AvaDataType.types";
