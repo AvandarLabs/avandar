@@ -1,6 +1,6 @@
 import { EmailClient } from "$/EmailClient/EmailClient.tsx";
 import { z } from "zod";
-import { defineRoutes, POST } from "../_shared/MiniServer/MiniServer.ts";
+import { defineRoutes, GET, POST } from "../_shared/MiniServer/MiniServer.ts";
 import type { WorkspacesAPI } from "./workspaces.types.ts";
 
 const SLUG_MIN_LENGTH = 3;
@@ -33,8 +33,6 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
             reason: "This workspace ID is already taken",
           };
         }
-
-        console.log("slug", slug);
 
         // now check that the slug has no spaces or invalid URL characters
         if (slug.includes(" ")) {
@@ -89,12 +87,11 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
           supabaseAdminClient,
           user,
         }) => {
-          console.log("params", { workspaceSlug, emailToInvite, role });
-
           // look up the workspace
           const { data: workspace } = await supabaseClient
             .from("workspaces")
             .select("name, id, slug")
+            .eq("slug", workspaceSlug)
             .single()
             .throwOnError();
 
@@ -148,9 +145,11 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
             .from("workspace_invites")
             .insert({
               email: emailToInvite,
+              user_id: invitedUserId,
               workspace_id: workspace.id,
               invited_by: user.id,
               invite_status: "pending",
+              role,
             })
             .select()
             .single()
@@ -165,7 +164,149 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
             inviteId: invite.id,
           });
 
+          return invite;
+        },
+      ),
+  },
+
+  "/invites/:inviteId": {
+    GET: GET({
+      path: "/invites/:inviteId",
+      schema: {
+        inviteId: z.uuid(),
+      },
+    })
+      .querySchema({
+        workspaceSlug: z.string(),
+        email: z.string(),
+      })
+      .action(
+        async ({
+          pathParams: { inviteId },
+          queryParams: { email, workspaceSlug },
+          supabaseAdminClient,
+        }) => {
+          const { data: workspace } = await supabaseAdminClient
+            .from("workspaces")
+            .select("id")
+            .eq("slug", workspaceSlug)
+            .single()
+            .throwOnError();
+
+          const { data: invite } = await supabaseAdminClient
+            .from("workspace_invites")
+            .select("*")
+            .match({
+              id: inviteId,
+              workspace_id: workspace.id,
+              email,
+            })
+            .maybeSingle()
+            .throwOnError();
           return { invite };
+        },
+      ),
+  },
+
+  "/invites/:inviteId/accept": {
+    POST: POST({
+      path: "/invites/:inviteId/accept",
+      schema: {
+        inviteId: z.uuid(),
+      },
+    })
+      .bodySchema({
+        userId: z.uuid(),
+        workspaceSlug: z.string(),
+      })
+      .action(
+        async ({
+          pathParams: { inviteId },
+          body: { userId, workspaceSlug },
+          supabaseAdminClient,
+        }) => {
+          const { data: workspace } = await supabaseAdminClient
+            .from("workspaces")
+            .select("id")
+            .eq("slug", workspaceSlug)
+            .single()
+            .throwOnError();
+          const {
+            data: { user },
+          } = await supabaseAdminClient.auth.admin.getUserById(userId);
+
+          if (!user || !user.email) {
+            throw new Error("User not found");
+          }
+
+          const { data: invite } = await supabaseAdminClient
+            .from("workspace_invites")
+            .select("*")
+            .match({
+              id: inviteId,
+              email: user?.email,
+              workspace_id: workspace.id,
+            })
+            .maybeSingle()
+            .throwOnError();
+
+          if (!invite) {
+            throw new Error("Sorry! No invitation was found.");
+          }
+
+          if (invite.invite_status === "accepted") {
+            throw new Error("This invite has already been accepted.");
+          }
+
+          // now mark it as accepted and link it to the user's account
+          const { data: updatedInvite } = await supabaseAdminClient
+            .from("workspace_invites")
+            .update({
+              invite_status: "accepted",
+              user_id: user.id,
+            })
+            .eq("id", invite.id)
+            .select()
+            .single()
+            .throwOnError();
+
+          // create the workspace membership
+          const { data: membership } = await supabaseAdminClient
+            .from("workspace_memberships")
+            .insert({
+              workspace_id: workspace.id,
+              user_id: user.id,
+            })
+            .select()
+            .single()
+            .throwOnError();
+
+          // create the user profile
+          const { data: profile } = await supabaseAdminClient
+            .from("user_profiles")
+            .insert({
+              workspace_id: workspace.id,
+              user_id: user.id,
+              membership_id: membership.id,
+              full_name: user.email,
+              display_name: user.email,
+            })
+            .select()
+            .single();
+
+          // create the user role
+          const { data: role } = await supabaseAdminClient
+            .from("user_roles")
+            .insert({
+              workspace_id: workspace.id,
+              user_id: user.id,
+              membership_id: membership.id,
+              role: invite.role,
+            })
+            .select()
+            .single();
+
+          return { invite: updatedInvite, membership, profile, role };
         },
       ),
   },

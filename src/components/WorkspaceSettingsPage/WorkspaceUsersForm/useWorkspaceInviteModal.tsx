@@ -10,6 +10,7 @@ import { AvaField } from "@/lib/ui/AvaForm/AvaField";
 import { AvaFormRef } from "@/lib/ui/AvaForm/AvaForm.types";
 import { notifySuccess } from "@/lib/ui/notifications/notify";
 import { WorkspaceRole } from "@/models/Workspace/Workspace.types";
+import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
 export function useWorkspaceInviteModal(): () => void {
   const featurePlanType = useFeaturePlanType();
@@ -33,6 +34,11 @@ export function useWorkspaceInviteModal(): () => void {
         },
       });
     },
+    queriesToInvalidate: [
+      WorkspaceClient.QueryKeys.getPendingInvites({
+        workspaceId: workspace.id,
+      }),
+    ],
   });
 
   const onSendInviteClick = async (modalId: string) => {

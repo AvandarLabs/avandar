@@ -13,7 +13,9 @@ create table public.workspace_invites (
   -- User this invite is for. Allow null because the user might not exist yet.
   user_id uuid references auth.users (id) on update cascade on delete cascade,
   -- The email address that was invited
-  email text,
+  email text not null,
+  -- The role of the user invited
+  role text not null,
   -- the status of the invite
   invite_status public.workspace_invites__status not null,
   -- Timestamp of when the invite was created

@@ -7,20 +7,23 @@ import { EmailTemplate } from "./lib/EmailTemplate.tsx";
 
 type Props = {
   inviteId: string;
+  inviteEmail: string;
   workspaceSlug: string;
   workspaceName: string;
 };
 
 export function WorkspaceInviteEmail({
   inviteId,
+  inviteEmail,
   workspaceSlug,
   workspaceName,
 }: Props): JSX.Element {
   const acceptInviteURL = buildAppPageURL({
-    path: "/$workspaceSlug/invites/$inviteId",
+    path: "/invites/$inviteId",
+    pathParams: { inviteId },
     queryParams: {
       workspaceSlug,
-      inviteId,
+      email: inviteEmail,
     },
   });
 
@@ -86,4 +89,5 @@ WorkspaceInviteEmail.PreviewProps = {
   workspaceName: "Avandar Labs",
   workspaceSlug: "avandar-labs",
   inviteId: "1234567890",
+  inviteEmail: "user@avandarlabs.com",
 } satisfies Props;

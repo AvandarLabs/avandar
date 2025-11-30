@@ -14,6 +14,8 @@ import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useWorkspaceRole } from "@/hooks/workspaces/useWorkspaceRole";
 import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
+import { UserProfileWithRole } from "@/models/User/User.types";
+import { WorkspaceInvite } from "@/models/Workspace/Workspace.types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 import { useWorkspaceInviteModal } from "./useWorkspaceInviteModal";
 
@@ -22,8 +24,12 @@ const IS_USER_INVITES_DISABLED = isFlagEnabled(FeatureFlag.DisableUserInvites);
 export function WorkspaceUsersForm(): JSX.Element | null {
   const workspaceRole = useWorkspaceRole();
   const workspace = useCurrentWorkspace();
-  const [workspaceUsers, workspaceUsersLoading] =
+  const [workspaceUsers = [], workspaceUsersLoading] =
     WorkspaceClient.useGetUsersForWorkspace({
+      workspaceId: workspace.id,
+    });
+  const [pendingInvites = [], pendingInvitesLoading] =
+    WorkspaceClient.useGetPendingInvites({
       workspaceId: workspace.id,
     });
   const [removeMember, isRemovingMember] = WorkspaceClient.useRemoveMember({
@@ -37,6 +43,9 @@ export function WorkspaceUsersForm(): JSX.Element | null {
       WorkspaceClient.QueryKeys.getUsersForWorkspace({
         workspaceId: workspace.id,
       }),
+      WorkspaceClient.QueryKeys.getPendingInvites({
+        workspaceId: workspace.id,
+      }),
     ],
   });
 
@@ -44,37 +53,41 @@ export function WorkspaceUsersForm(): JSX.Element | null {
 
   const isAdmin = workspaceRole === "admin";
 
-  const allWorkspaceUsers = workspaceUsers?.map((user) => {
-    return (
-      <Table.Tr key={user.fullName}>
-        <Table.Td>{user.fullName}</Table.Td>
-        <Table.Td>{capitalize(user.role)}</Table.Td>
-        {isAdmin ?
-          <Table.Td>
-            <IconTrash
-              style={{ cursor: "pointer" }}
-              size={18}
-              onClick={() => {
-                modals.openConfirmModal({
-                  title: "Remove User",
-                  children:
-                    "Are you sure you want to remove this user from the workspace?",
-                  labels: { confirm: "Remove", cancel: "Cancel" },
-                  confirmProps: { color: "red" },
-                  onConfirm: () => {
-                    removeMember({
-                      workspaceId: workspace.id,
-                      userId: user.id,
+  const allWorkspaceUsers = [...workspaceUsers, ...pendingInvites].map(
+    (user: UserProfileWithRole | WorkspaceInvite) => {
+      return (
+        <Table.Tr key={user.email}>
+          <Table.Td>{"fullName" in user ? user.fullName : user.email}</Table.Td>
+          <Table.Td>{capitalize(user.role)}</Table.Td>
+          {isAdmin ?
+            <Table.Td>
+              {"userId" in user ?
+                <IconTrash
+                  style={{ cursor: "pointer" }}
+                  size={18}
+                  onClick={() => {
+                    modals.openConfirmModal({
+                      title: "Remove User",
+                      children:
+                        "Are you sure you want to remove this user from the workspace?",
+                      labels: { confirm: "Remove", cancel: "Cancel" },
+                      confirmProps: { color: "red" },
+                      onConfirm: async () => {
+                        removeMember({
+                          workspaceId: workspace.id,
+                          userId: user.userId,
+                        });
+                      },
                     });
-                  },
-                });
-              }}
-            />
-          </Table.Td>
-        : null}
-      </Table.Tr>
-    );
-  });
+                  }}
+                />
+              : user.invite_status}
+            </Table.Td>
+          : null}
+        </Table.Tr>
+      );
+    },
+  );
 
   if (IS_USER_INVITES_DISABLED) {
     return (
@@ -116,7 +129,9 @@ export function WorkspaceUsersForm(): JSX.Element | null {
   return (
     <Box w="100%">
       <LoadingOverlay
-        visible={workspaceUsersLoading || isRemovingMember}
+        visible={
+          workspaceUsersLoading || isRemovingMember || pendingInvitesLoading
+        }
         zIndex={1000}
       />
       <Card withBorder p="lg" w="100%" maw="1000px">

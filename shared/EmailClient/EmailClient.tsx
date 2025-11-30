@@ -60,6 +60,7 @@ function createEmailClient(): IEmailClient {
                 workspaceSlug={workspaceSlug}
                 workspaceName={workspaceName}
                 inviteId={inviteId}
+                inviteEmail={recipientEmail}
               />
             ),
           });

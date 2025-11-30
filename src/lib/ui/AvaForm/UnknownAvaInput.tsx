@@ -48,7 +48,7 @@ export function UnknownAvaInput<
 >): JSX.Element | null {
   return match(field)
     .with({ type: "text" }, (fieldSchema) => {
-      const { syncWhileUntouched, initialValue, ...textInputProps } =
+      const { key, syncWhileUntouched, initialValue, ...textInputProps } =
         fieldSchema;
       return (
         <AvaTextInput
@@ -60,7 +60,7 @@ export function UnknownAvaInput<
       );
     })
     .with({ type: "select" }, (fieldSchema) => {
-      const { data, ...selectInputProps } = fieldSchema;
+      const { key, data, ...selectInputProps } = fieldSchema;
       return (
         <AvaSelectInput
           fieldKey={fieldKey}

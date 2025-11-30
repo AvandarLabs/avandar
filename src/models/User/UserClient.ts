@@ -41,7 +41,7 @@ type TUserClientOptions = {
   dbClient?: SupabaseClient<Database>;
 };
 
-const UserProfileDBReadToModelReadSchema: ZodType<
+export const UserProfileDBReadToModelReadSchema: ZodType<
   UserProfile,
   Tables<"user_profiles">
 > = object({
