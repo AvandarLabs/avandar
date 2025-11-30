@@ -1,5 +1,5 @@
-import { capitalize } from "@/lib/utils/strings/transformations";
-import { EmailParagraph } from "./EmailParagraph";
+import { capitalize } from "$/lib/utils/strings/capitalize/capitalize.ts";
+import { EmailParagraph } from "./EmailParagraph.tsx";
 
 type Props = {
   signOff?: "warmly";
@@ -7,6 +7,7 @@ type Props = {
   title?: string;
   appName: string;
 };
+
 export function EmailSignature({
   signOff = "warmly",
   name,

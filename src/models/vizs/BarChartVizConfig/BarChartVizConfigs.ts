@@ -1,14 +1,14 @@
+import { Logger } from "$/lib/Logger/Logger";
+import { match } from "ts-pattern";
+import { pick } from "@/lib/utils/objects/misc";
 import { PartialStructuredQuery } from "@/models/queries/StructuredQuery";
+import { hydrateXYFromQuery } from "../hydrateXYFromQuery";
+import { LineChartVizConfig } from "../LineChartVizConfig";
+import { ScatterPlotVizConfig } from "../ScatterPlotVizConfig";
+import { TableVizConfig } from "../TableVizConfig";
 import { VizConfigType, VizType } from "../VizConfig";
 import { IVizConfigModule } from "../VizConfig/IVizConfigModule";
 import { BarChartVizConfig } from "./BarChartVizConfig.types";
-import { match } from "ts-pattern";
-import { TableVizConfig } from "../TableVizConfig";
-import { LineChartVizConfig } from "../LineChartVizConfig";
-import { ScatterPlotVizConfig } from "../ScatterPlotVizConfig";
-import { pick } from "@/lib/utils/objects/misc";
-import { Logger } from "@/lib/Logger";
-import { hydrateXYFromQuery } from "../hydrateXYFromQuery";
 
 export const BarChartVizConfigs = {
   vizType: "bar",
@@ -44,13 +44,17 @@ export const BarChartVizConfigs = {
     return match<VizType>(newVizType)
       .with("table", (vizType): TableVizConfig => {
         return { vizType };
-      }).with("bar", (): BarChartVizConfig => {
+      })
+      .with("bar", (): BarChartVizConfig => {
         return vizConfig;
-      }).with("line", (vizType): LineChartVizConfig => {
+      })
+      .with("line", (vizType): LineChartVizConfig => {
         return { vizType, ...currentAxes };
-      }).with("scatter", (vizType): ScatterPlotVizConfig => {
+      })
+      .with("scatter", (vizType): ScatterPlotVizConfig => {
         return { vizType, ...currentAxes };
-      }).exhaustive(() => {
+      })
+      .exhaustive(() => {
         Logger.error("Invalid viz type", { vizType: newVizType });
         throw new Error(`Invalid viz type: ${newVizType}`);
       }) as VizConfigType<K>;

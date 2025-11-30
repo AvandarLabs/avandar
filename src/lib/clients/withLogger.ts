@@ -1,4 +1,4 @@
-import { createLogger, ILogger } from "../Logger";
+import { createLogger, ILogger } from "../../../shared/lib/Logger/Logger";
 import { BaseClient } from "./BaseClient";
 
 export type WithLogger<Module extends BaseClient> = Module & {

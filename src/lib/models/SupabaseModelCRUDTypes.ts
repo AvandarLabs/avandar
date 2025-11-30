@@ -1,7 +1,7 @@
+import { UnknownObject } from "$/lib/types/common";
+import { Database, Tables } from "$/types/database.types";
 import { Merge } from "type-fest";
 import { DatabaseTableNames } from "@/db/supabase/AvaSupabase";
-import { UnknownObject } from "@/lib/types/common";
-import { Database, Tables } from "@/types/database.types";
 import { ModelCRUDTypes } from "./ModelCRUDTypes";
 
 type DefaultModelTypes = {

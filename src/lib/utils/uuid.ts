@@ -1,6 +1,6 @@
+import { UUID } from "$/lib/types/common";
 import { v4 as uuidv4 } from "uuid";
-import { UUID } from "@/lib/types/common";
-import { Logger } from "../Logger";
+import { Logger } from "../../../shared/lib/Logger/Logger";
 import { uuidType } from "./zodHelpers";
 
 /**

@@ -1,7 +1,7 @@
 /** Configuration for the app. */
 // TODO(jpsyx): move most of these to environment variables so that
 // they do not get bundled in every page of the app
-
+import { INFO_EMAIL, SUPPORT_EMAIL } from "$/config/AppConfig";
 import {
   BasicPlanConfig,
   FreePlanConfig,
@@ -41,14 +41,6 @@ type AppConfigType = {
     premium: typeof PremiumPlanConfig;
   };
 };
-
-export const APP_NAME = "Avandar";
-
-/** The email address to use for support inquiries */
-export const SUPPORT_EMAIL = "support@avandarlabs.com";
-
-/** The email address to use for general inquiries */
-export const INFO_EMAIL = "info@avandarlabs.com";
 
 /**
  * The URL to the waitlist page. This is only used if self-registration is

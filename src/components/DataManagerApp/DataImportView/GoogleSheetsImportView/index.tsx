@@ -1,5 +1,7 @@
 import { Box, BoxProps, Button, Loader, Stack, Text } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
+import { Logger } from "$/lib/Logger/Logger";
+import { MIMEType, UnknownObject } from "$/lib/types/common";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
@@ -14,8 +16,6 @@ import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useQuery } from "@/lib/hooks/query/useQuery";
 import { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
-import { Logger } from "@/lib/Logger";
-import { MIMEType, UnknownObject } from "@/lib/types/common";
 import { GPickerDocumentObject } from "@/lib/types/google-picker";
 import {
   notifyError,

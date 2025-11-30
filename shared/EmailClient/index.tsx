@@ -1,1 +1,1 @@
-export { EmailClient } from "./EmailClient";
+export { EmailClient } from "./EmailClient.tsx";

@@ -6,7 +6,13 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
-    "typeRoots": ["./node_modules/@types", "src/lib/types"],
+    "typeRoots": [
+      "./node_modules/@types",
+      "src/types",
+      "src/lib/types",
+      "shared/types",
+      "shared/lib/types"
+    ],
     "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"],
@@ -38,6 +44,6 @@
     "experimentalDecorators": true,
     "resolveJsonModule": true
   },
-  "include": ["src", "tests", "seed", "scripts", "shared"],
+  "include": ["src", "tests", "seed", "scripts", "shared", "next.config.js"],
   "exclude": ["supabase/functions"]
 }

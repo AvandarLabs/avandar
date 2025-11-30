@@ -1,5 +1,6 @@
 import { ScrollArea } from "@mantine/core";
-import { objectKeys, pick } from "@/lib/utils/objects/misc";
+import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
+import { pick } from "@/lib/utils/objects/misc";
 import { DescriptionList } from "../DescriptionList";
 import { getOrderedKeys } from "./gerOrderedKeys/getOrderedKeys";
 import { getObjectKeyTransformFn } from "./getObjectKeyTransformFn";

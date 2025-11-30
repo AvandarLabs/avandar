@@ -1,4 +1,4 @@
-import { prettifyError, ZodError } from "npm:zod@4";
+import { prettifyError, ZodError } from "zod";
 import { corsHeaders } from "../cors.ts";
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from "../httpCodes.ts";
 import {
@@ -33,8 +33,8 @@ import type {
   URLPathWithoutParams,
   ValidQueryParams,
 } from "./MiniServer.types.ts";
-import type { User } from "npm:@supabase/supabase-js@2";
-import type { infer as ZodInfer } from "npm:zod@4";
+import type { User } from "@supabase/supabase-js";
+import type { infer as ZodInfer } from "zod";
 
 function parseSearchParamsFromURL<
   QParamsSchema extends QueryParamsSchema<ValidQueryParams | undefined>,

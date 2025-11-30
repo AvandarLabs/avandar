@@ -1,1 +1,0 @@
-export { isFiltersByColumnObject } from "./isFiltersByColumnObject";

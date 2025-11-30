@@ -1,4 +1,4 @@
-import { Logger } from "../Logger";
+import { Logger } from "../../../shared/lib/Logger/Logger";
 
 /**
  * Asserts that `condition` is truthy.

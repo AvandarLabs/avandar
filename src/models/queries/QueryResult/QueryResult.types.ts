@@ -1,4 +1,4 @@
-import { UnknownObject } from "@/lib/types/common";
+import { UnknownObject } from "$/lib/types/common";
 import { AvaDataType } from "@/models/datasets/AvaDataType";
 
 export type QueryResultColumn = {
@@ -15,8 +15,7 @@ export type QueryResult<T extends UnknownObject = UnknownObject> = {
 };
 
 export type QueryResultPage<T extends UnknownObject = UnknownObject> =
-  & QueryResult<T>
-  & {
+  QueryResult<T> & {
     /**
      * The total number of rows in the data store (for the query that
      * generated this page)

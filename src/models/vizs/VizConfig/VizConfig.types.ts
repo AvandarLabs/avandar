@@ -1,8 +1,8 @@
-import { TableVizConfig } from "../TableVizConfig";
+import { ObjectRegistry } from "$/lib/types/utilityTypes";
 import { BarChartVizConfig } from "../BarChartVizConfig";
 import { LineChartVizConfig } from "../LineChartVizConfig";
 import { ScatterPlotVizConfig } from "../ScatterPlotVizConfig";
-import { ObjectRegistry } from "@/lib/types/utilityTypes";
+import { TableVizConfig } from "../TableVizConfig";
 import { IVizConfigModule } from "./IVizConfigModule";
 
 export type VizConfig =

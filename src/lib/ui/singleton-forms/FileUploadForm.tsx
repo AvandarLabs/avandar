@@ -1,7 +1,7 @@
 import { Box, Button, FileInput, FileInputProps, Group } from "@mantine/core";
+import { MIMEType } from "$/lib/types/common";
 import { useRef, useState } from "react";
 import { useForm } from "@/lib/hooks/ui/useForm";
-import { MIMEType } from "@/lib/types/common";
 
 type Props = {
   /**

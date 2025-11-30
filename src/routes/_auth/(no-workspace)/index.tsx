@@ -1,8 +1,8 @@
 import { Container, Paper, Stack, Title } from "@mantine/core";
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { isNonEmptyArray } from "$/lib/utils/guards/isNonEmptyArray/isNonEmptyArray";
 import { CreateWorkspaceForm } from "@/components/common/forms/CreateWorkspaceForm";
 import { AppLinks } from "@/config/AppLinks";
-import { isNonEmptyArray } from "@/lib/utils/guards/guards";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
 /**

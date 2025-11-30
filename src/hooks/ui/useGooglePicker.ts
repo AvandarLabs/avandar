@@ -1,3 +1,4 @@
+import { isNonEmptyArray } from "$/lib/utils/guards/isNonEmptyArray/isNonEmptyArray";
 import { useEffect, useMemo, useState } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { useQuery } from "@/lib/hooks/query/useQuery";
@@ -11,7 +12,6 @@ import {
   GPickerDocumentObject,
   GPickerResponseObject,
 } from "@/lib/types/google-picker";
-import { isNonEmptyArray } from "@/lib/utils/guards/guards";
 import { noop } from "@/lib/utils/misc";
 import { useCurrentUserProfile } from "../users/useCurrentUserProfile";
 

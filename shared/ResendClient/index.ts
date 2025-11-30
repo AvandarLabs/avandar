@@ -1,2 +1,2 @@
-export { ResendClient } from "./ResendClient";
-export type { IResendClient } from "./ResendClient.types";
+export { ResendClient } from "./ResendClient.ts";
+export type { IResendClient } from "./ResendClient.types.ts";

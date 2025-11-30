@@ -1,4 +1,4 @@
-import type { Registry } from "@/lib/types/utilityTypes";
+import type { Registry } from "$/lib/types/utilityTypes";
 
 /**
  * Feature flags are used to enable or disable certain features in the app.

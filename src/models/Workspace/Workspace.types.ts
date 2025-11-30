@@ -1,8 +1,9 @@
+import { Tables } from "$/types/database.types";
 import { SetOptional } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { Subscription } from "@/models/Subscription";
 import { UserId } from "../User/User.types";
-import type { UUID } from "@/lib/types/common";
+import type { UUID } from "$/lib/types/common";
 
 export type WorkspaceId = UUID<"Workspace">;
 
@@ -51,16 +52,8 @@ export type WorkspaceModel = SupabaseModelCRUDTypes<
 export type Workspace<K extends keyof WorkspaceModel = "Read"> =
   WorkspaceModel[K];
 
-export type WorkspaceUser = {
-  id: UserId;
-  fullName: string;
-  displayName: string;
-  workspaceId: WorkspaceId;
-  createdAt: Date;
-  updatedAt: Date;
-  role: string;
-};
-
 export type WorkspaceWithSubscription = Workspace & {
   subscription: Subscription | undefined;
 };
+
+export type WorkspaceInvite = Tables<"workspace_invites">;

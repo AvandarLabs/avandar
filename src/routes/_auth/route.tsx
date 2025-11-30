@@ -14,7 +14,18 @@ export const Route = createFileRoute("/_auth")({
     // in the initial load, so we need to call AuthClient directly
     // to check if the user is authenticated.
     const session = await AuthClient.getCurrentSession();
+
     if (!session?.user) {
+      // check if we are trying to access the `/invites/` route
+      if (location.pathname.includes("/invites/")) {
+        // if so, then we need to redirect to the `/register` page, but add a
+        // a param to redirect back to the invite page after registration
+        throw redirect({
+          to: "/register",
+          search: { redirect: location.href },
+        });
+      }
+
       throw redirect({
         to: AppLinks.signin.to,
         search: {

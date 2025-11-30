@@ -13,14 +13,20 @@ import {
 } from "@mantine/core";
 import { isEmail } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  redirect,
+  useNavigate,
+  useRouter,
+} from "@tanstack/react-router";
+import { INFO_EMAIL } from "$/config/AppConfig";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
 import { AuthClient } from "@/clients/AuthClient";
 import { AuthLayout } from "@/components/common/AuthLayout";
 import { BackToLoginLink } from "@/components/common/AuthLayout/BackToLoginLink";
-import { INFO_EMAIL, WAITLIST_URL } from "@/config/AppConfig";
+import { WAITLIST_URL } from "@/config/AppConfig";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
@@ -33,6 +39,7 @@ export const Route = createFileRoute("/register")({
   validateSearch: z.object({
     email: z.email().optional(),
     signupCode: z.string().optional(),
+    redirect: z.string().optional(),
   }),
   beforeLoad: async () => {
     const session = await AuthClient.getCurrentSession();
@@ -50,6 +57,7 @@ const IS_SIGN_UP_CODE_REQUIRED = isFlagEnabled(FeatureFlag.RequireSignUpCode);
 
 function RegisterPage() {
   const router = useRouter();
+  const navigate = useNavigate();
   const searchParams = Route.useSearch();
   const [isRegistrationFormVisible, showRegistrationForm] = useBoolean(
     !IS_REGISTRATION_DISABLED && !IS_SIGN_UP_CODE_REQUIRED,
@@ -108,7 +116,11 @@ function RegisterPage() {
       }
     },
     onSuccess: () => {
-      router.invalidate();
+      if (searchParams.redirect) {
+        navigate({ to: searchParams.redirect });
+      } else {
+        router.invalidate();
+      }
       setIsRegistrationSuccess(true);
       notifySuccess({
         title: "Please check your email",
@@ -233,11 +245,13 @@ function RegisterPage() {
                   <AvaForm
                     fields={{
                       email: {
+                        key: "email",
                         type: "text",
                         initialValue: searchParams.email ?? "",
                         required: true,
                       },
                       signupCode: {
+                        key: "signupCode",
                         type: "text",
                         initialValue: searchParams.signupCode ?? "",
                         required: true,

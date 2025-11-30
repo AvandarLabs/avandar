@@ -28,6 +28,7 @@ import { Route as AuthWorkspaceSlugDataManagerRouteRouteImport } from "./routes/
 import { Route as AuthWorkspaceSlugEntityManagerIndexRouteImport } from "./routes/_auth/$workspaceSlug/entity-manager/index";
 import { Route as AuthWorkspaceSlugEntityDesignerIndexRouteImport } from "./routes/_auth/$workspaceSlug/entity-designer/index";
 import { Route as AuthWorkspaceSlugDataManagerIndexRouteImport } from "./routes/_auth/$workspaceSlug/data-manager/index";
+import { Route as AuthnoWorkspaceInvitesInviteIdRouteImport } from "./routes/_auth/(no-workspace)/invites/$inviteId";
 import { Route as AuthWorkspaceSlugEntityDesignerEntityCreatorRouteImport } from "./routes/_auth/$workspaceSlug/entity-designer/entity-creator";
 import { Route as AuthWorkspaceSlugEntityDesignerEntityConfigIdRouteImport } from "./routes/_auth/$workspaceSlug/entity-designer/$entityConfigId";
 import { Route as AuthWorkspaceSlugDataManagerDataImportRouteImport } from "./routes/_auth/$workspaceSlug/data-manager/data-import";
@@ -139,6 +140,12 @@ const AuthWorkspaceSlugDataManagerIndexRoute =
     path: "/",
     getParentRoute: () => AuthWorkspaceSlugDataManagerRouteRoute,
   } as any);
+const AuthnoWorkspaceInvitesInviteIdRoute =
+  AuthnoWorkspaceInvitesInviteIdRouteImport.update({
+    id: "/invites/$inviteId",
+    path: "/invites/$inviteId",
+    getParentRoute: () => AuthnoWorkspaceRouteRoute,
+  } as any);
 const AuthWorkspaceSlugEntityDesignerEntityCreatorRoute =
   AuthWorkspaceSlugEntityDesignerEntityCreatorRouteImport.update({
     id: "/entity-creator",
@@ -204,6 +211,7 @@ export interface FileRoutesByFullPath {
   "/$workspaceSlug/data-manager/data-import": typeof AuthWorkspaceSlugDataManagerDataImportRoute;
   "/$workspaceSlug/entity-designer/$entityConfigId": typeof AuthWorkspaceSlugEntityDesignerEntityConfigIdRoute;
   "/$workspaceSlug/entity-designer/entity-creator": typeof AuthWorkspaceSlugEntityDesignerEntityCreatorRoute;
+  "/invites/$inviteId": typeof AuthnoWorkspaceInvitesInviteIdRoute;
   "/$workspaceSlug/data-manager/": typeof AuthWorkspaceSlugDataManagerIndexRoute;
   "/$workspaceSlug/entity-designer/": typeof AuthWorkspaceSlugEntityDesignerIndexRoute;
   "/$workspaceSlug/entity-manager": typeof AuthWorkspaceSlugEntityManagerIndexRoute;
@@ -226,6 +234,7 @@ export interface FileRoutesByTo {
   "/$workspaceSlug/data-manager/data-import": typeof AuthWorkspaceSlugDataManagerDataImportRoute;
   "/$workspaceSlug/entity-designer/$entityConfigId": typeof AuthWorkspaceSlugEntityDesignerEntityConfigIdRoute;
   "/$workspaceSlug/entity-designer/entity-creator": typeof AuthWorkspaceSlugEntityDesignerEntityCreatorRoute;
+  "/invites/$inviteId": typeof AuthnoWorkspaceInvitesInviteIdRoute;
   "/$workspaceSlug/data-manager": typeof AuthWorkspaceSlugDataManagerIndexRoute;
   "/$workspaceSlug/entity-designer": typeof AuthWorkspaceSlugEntityDesignerIndexRoute;
   "/$workspaceSlug/entity-manager": typeof AuthWorkspaceSlugEntityManagerIndexRoute;
@@ -255,6 +264,7 @@ export interface FileRoutesById {
   "/_auth/$workspaceSlug/data-manager/data-import": typeof AuthWorkspaceSlugDataManagerDataImportRoute;
   "/_auth/$workspaceSlug/entity-designer/$entityConfigId": typeof AuthWorkspaceSlugEntityDesignerEntityConfigIdRoute;
   "/_auth/$workspaceSlug/entity-designer/entity-creator": typeof AuthWorkspaceSlugEntityDesignerEntityCreatorRoute;
+  "/_auth/(no-workspace)/invites/$inviteId": typeof AuthnoWorkspaceInvitesInviteIdRoute;
   "/_auth/$workspaceSlug/data-manager/": typeof AuthWorkspaceSlugDataManagerIndexRoute;
   "/_auth/$workspaceSlug/entity-designer/": typeof AuthWorkspaceSlugEntityDesignerIndexRoute;
   "/_auth/$workspaceSlug/entity-manager/": typeof AuthWorkspaceSlugEntityManagerIndexRoute;
@@ -283,6 +293,7 @@ export interface FileRouteTypes {
     | "/$workspaceSlug/data-manager/data-import"
     | "/$workspaceSlug/entity-designer/$entityConfigId"
     | "/$workspaceSlug/entity-designer/entity-creator"
+    | "/invites/$inviteId"
     | "/$workspaceSlug/data-manager/"
     | "/$workspaceSlug/entity-designer/"
     | "/$workspaceSlug/entity-manager"
@@ -305,6 +316,7 @@ export interface FileRouteTypes {
     | "/$workspaceSlug/data-manager/data-import"
     | "/$workspaceSlug/entity-designer/$entityConfigId"
     | "/$workspaceSlug/entity-designer/entity-creator"
+    | "/invites/$inviteId"
     | "/$workspaceSlug/data-manager"
     | "/$workspaceSlug/entity-designer"
     | "/$workspaceSlug/entity-manager"
@@ -333,6 +345,7 @@ export interface FileRouteTypes {
     | "/_auth/$workspaceSlug/data-manager/data-import"
     | "/_auth/$workspaceSlug/entity-designer/$entityConfigId"
     | "/_auth/$workspaceSlug/entity-designer/entity-creator"
+    | "/_auth/(no-workspace)/invites/$inviteId"
     | "/_auth/$workspaceSlug/data-manager/"
     | "/_auth/$workspaceSlug/entity-designer/"
     | "/_auth/$workspaceSlug/entity-manager/"
@@ -483,6 +496,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthWorkspaceSlugDataManagerIndexRouteImport;
       parentRoute: typeof AuthWorkspaceSlugDataManagerRouteRoute;
     };
+    "/_auth/(no-workspace)/invites/$inviteId": {
+      id: "/_auth/(no-workspace)/invites/$inviteId";
+      path: "/invites/$inviteId";
+      fullPath: "/invites/$inviteId";
+      preLoaderRoute: typeof AuthnoWorkspaceInvitesInviteIdRouteImport;
+      parentRoute: typeof AuthnoWorkspaceRouteRoute;
+    };
     "/_auth/$workspaceSlug/entity-designer/entity-creator": {
       id: "/_auth/$workspaceSlug/entity-designer/entity-creator";
       path: "/entity-creator";
@@ -632,11 +652,13 @@ const AuthWorkspaceSlugRouteRouteWithChildren =
 interface AuthnoWorkspaceRouteRouteChildren {
   AuthnoWorkspaceInvalidWorkspaceRoute: typeof AuthnoWorkspaceInvalidWorkspaceRoute;
   AuthnoWorkspaceIndexRoute: typeof AuthnoWorkspaceIndexRoute;
+  AuthnoWorkspaceInvitesInviteIdRoute: typeof AuthnoWorkspaceInvitesInviteIdRoute;
 }
 
 const AuthnoWorkspaceRouteRouteChildren: AuthnoWorkspaceRouteRouteChildren = {
   AuthnoWorkspaceInvalidWorkspaceRoute: AuthnoWorkspaceInvalidWorkspaceRoute,
   AuthnoWorkspaceIndexRoute: AuthnoWorkspaceIndexRoute,
+  AuthnoWorkspaceInvitesInviteIdRoute: AuthnoWorkspaceInvitesInviteIdRoute,
 };
 
 const AuthnoWorkspaceRouteRouteWithChildren =

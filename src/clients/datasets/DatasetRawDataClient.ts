@@ -1,3 +1,7 @@
+import { ILogger, Logger } from "$/lib/Logger/Logger";
+import { UnknownDataFrame } from "$/lib/types/common";
+import { where } from "$/lib/utils/filters/filters";
+import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
 import { match } from "ts-pattern";
 import { BaseClient, createBaseClient } from "@/lib/clients/BaseClient";
 import { WithLogger, withLogger } from "@/lib/clients/withLogger";
@@ -5,21 +9,17 @@ import {
   WithQueryHooks,
   withQueryHooks,
 } from "@/lib/clients/withQueryHooks/withQueryHooks";
-import { ILogger, Logger } from "@/lib/Logger";
-import { UnknownDataFrame } from "@/lib/types/common";
 import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
 import { difference } from "@/lib/utils/arrays/difference";
 import { partition } from "@/lib/utils/arrays/partition";
-import { where } from "@/lib/utils/filters/filters";
 import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
-import { objectKeys } from "@/lib/utils/objects/misc";
 import { promiseMap, promiseReduce } from "@/lib/utils/promises";
 import { DatasetId } from "@/models/datasets/Dataset";
+import { QueryResult } from "@/models/queries/QueryResult/QueryResult.types";
 import { DuckDBClient, UnknownRow } from "../DuckDBClient";
+import { DuckDBStructuredQuery } from "../DuckDBClient/DuckDBClient.types";
 import { DuckDBDataTypeUtils } from "../DuckDBClient/DuckDBDataType";
 import { scalar, singleton } from "../DuckDBClient/queryResultHelpers";
-import { DuckDBStructuredQuery } from "../DuckDBClient/DuckDBClient.types";
-import { QueryResult } from "@/models/queries/QueryResult/QueryResult.types";
 import { LocalDatasetClient } from "./LocalDatasetClient";
 
 type TextFieldSummary = {
@@ -194,9 +194,9 @@ function createDatasetRawDataClient(): WithLogger<
     );
     if (missingLocalDatasets.length > 0) {
       throw new Error(
-        `The following datasets were not found locally: ${
-          missingLocalDatasets.join(", ")
-        }`,
+        `The following datasets were not found locally: ${missingLocalDatasets.join(
+          ", ",
+        )}`,
       );
     }
     const datasetLoadStatuses = await promiseMap(
@@ -295,9 +295,7 @@ function createDatasetRawDataClient(): WithLogger<
         const columns = duckdbColumns.map((duckColumn, idx) => {
           return {
             name: duckColumn.column_name,
-            dataType: DuckDBDataTypeUtils.toAvaDataType(
-              duckColumn.column_type,
-            ),
+            dataType: DuckDBDataTypeUtils.toAvaDataType(duckColumn.column_type),
             columnIdx: idx,
           };
         });
@@ -425,8 +423,9 @@ function createDatasetRawDataClient(): WithLogger<
                 };
               })
               .with("date", "time", "timestamp", async () => {
-                const singleQuery = dataType === "time"
-                  ? `SELECT
+                const singleQuery =
+                  dataType === "time" ?
+                    `SELECT
                            COALESCE(CAST(MAX("$columnName$") AS VARCHAR), '') AS most_recent,
                            COALESCE(CAST(MIN("$columnName$") AS VARCHAR), '') AS oldest,
                            NULL AS days
@@ -457,10 +456,9 @@ function createDatasetRawDataClient(): WithLogger<
 
                 const mostRecentDate = String(row.most_recent ?? "");
                 const oldestDate = String(row.oldest ?? "");
-                const datasetCoverage = row.days === null
-                  ? "Unknown"
-                  : Number(row.days) === 1
-                  ? "1 day"
+                const datasetCoverage =
+                  row.days === null ? "Unknown"
+                  : Number(row.days) === 1 ? "1 day"
                   : `${Number(row.days)} days`;
 
                 return {
@@ -484,17 +482,18 @@ function createDatasetRawDataClient(): WithLogger<
               distinctValuesCount,
               emptyValuesCount,
               percentMissingValues: emptyValuesCount / distinctValuesCount,
-              mostCommonValue: !mostCommonValue || mostCommonValue.length === 0
-                ? {
-                  count: 0,
-                  value: [],
-                }
+              mostCommonValue:
+                !mostCommonValue || mostCommonValue.length === 0 ?
+                  {
+                    count: 0,
+                    value: [],
+                  }
                 : {
-                  count: Number(maxCount),
-                  value: mostCommonValue.map((row) => {
-                    return String(row.value);
-                  }),
-                },
+                    count: Number(maxCount),
+                    value: mostCommonValue.map((row) => {
+                      return String(row.value);
+                    }),
+                  },
               ...typeSpecificSummary,
             };
 

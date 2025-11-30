@@ -1,7 +1,8 @@
+import { Logger } from "$/lib/Logger/Logger";
+import { UnknownObject } from "$/lib/types/common";
+import { isArray } from "$/lib/utils/guards/isArray/isArray";
 import { Paths, UnknownArray } from "type-fest";
-import { Logger } from "@/lib/Logger";
-import { UnknownObject } from "@/lib/types/common";
-import { isArray, isPrimitive } from "../guards/guards";
+import { isPrimitive } from "../guards/guards";
 import { PathValue } from "./getValue";
 
 /**
@@ -20,8 +21,8 @@ export function setValue<
   // to using `keyof T` which works fine for records.
   K extends [Paths<T>] extends [never] ? keyof T : Paths<T>,
   V extends K extends keyof T ? T[K]
-    : K extends Paths<T> ? PathValue<T, K>
-    : never,
+  : K extends Paths<T> ? PathValue<T, K>
+  : never,
 >(obj: T, path: K, value: V): T {
   const fullPathAsString = String(path);
   const pathParts = fullPathAsString.split(".");
@@ -66,9 +67,9 @@ export function _setValue(
   if (isPrimitive(nextObj)) {
     const remainingPath = pathTail.join(".");
     throw new Error(
-      `Key '${key}' is a primitive value '${
-        String(value)
-      }', but there is still more path to traverse. Remaining path: '${remainingPath}'`,
+      `Key '${key}' is a primitive value '${String(
+        value,
+      )}', but there is still more path to traverse. Remaining path: '${remainingPath}'`,
     );
   }
 

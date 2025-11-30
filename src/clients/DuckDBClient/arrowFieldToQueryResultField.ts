@@ -1,8 +1,8 @@
+import { ILogger, Logger } from "$/lib/Logger/Logger";
 import * as arrow from "apache-arrow";
 import { match } from "ts-pattern";
-import { QueryResultColumn } from "@/models/queries/QueryResult/QueryResult.types";
 import { constant } from "@/lib/utils/higherOrderFuncs";
-import { ILogger, Logger } from "@/lib/Logger";
+import { QueryResultColumn } from "@/models/queries/QueryResult/QueryResult.types";
 
 export function arrowFieldToQueryResultField(
   field: arrow.Field<arrow.DataType>,
@@ -16,14 +16,16 @@ export function arrowFieldToQueryResultField(
         arrow.Type.DateDay,
         arrow.Type.DateMillisecond,
         constant("date" as const),
-      ).with(
+      )
+      .with(
         arrow.Type.Time,
         arrow.Type.TimeSecond,
         arrow.Type.TimeMillisecond,
         arrow.Type.TimeMicrosecond,
         arrow.Type.TimeNanosecond,
         constant("time" as const),
-      ).with(
+      )
+      .with(
         arrow.Type.Timestamp,
         arrow.Type.TimestampSecond,
         arrow.Type.TimestampMillisecond,
@@ -53,15 +55,8 @@ export function arrowFieldToQueryResultField(
           return "bigint" as const;
         },
       )
-      .with(
-        arrow.Type.Bool,
-        constant("boolean" as const),
-      )
-      .with(
-        arrow.Type.Utf8,
-        arrow.Type.LargeUtf8,
-        constant("varchar" as const),
-      )
+      .with(arrow.Type.Bool, constant("boolean" as const))
+      .with(arrow.Type.Utf8, arrow.Type.LargeUtf8, constant("varchar" as const))
       .with(
         arrow.Type.NONE,
         arrow.Type.Null,

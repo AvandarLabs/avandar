@@ -6,7 +6,7 @@ import { Model } from "../Model";
 import { WorkspaceId } from "../Workspace/Workspace.types";
 import { EntityFieldConfig } from "./EntityFieldConfig/EntityFieldConfig.types";
 import { EntityFieldValueExtractor } from "./ValueExtractor/types";
-import type { UUID } from "@/lib/types/common";
+import type { UUID } from "$/lib/types/common";
 
 type ModelType = "EntityConfig";
 export type EntityConfigId = UUID<ModelType>;

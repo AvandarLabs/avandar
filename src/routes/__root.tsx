@@ -2,16 +2,16 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { AvandarUIProvider } from "@/components/common/AvandarUIProvider";
-import { RootRouteContext } from "@/lib/types/RootRouteContext";
+import type { AvaRouterRootContext } from "@/config/AvaRouter";
 
 /**
  * This is the root route of the app. It only renders the <App> component.
  */
-export const Route = createRootRouteWithContext<RootRouteContext>()({
-  component: RootComponent,
+export const Route = createRootRouteWithContext<AvaRouterRootContext>()({
+  component: RouterRootComponent,
 });
 
-function RootComponent() {
+function RouterRootComponent() {
   return (
     <AvandarUIProvider>
       <Outlet />
