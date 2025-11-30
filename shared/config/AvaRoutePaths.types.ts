@@ -7,6 +7,7 @@ export type AvaRoutePaths =
   | "/invites/$inviteId"
   | "/$workspaceSlug/checkout"
   | "/$workspaceSlug/data-explorer"
+  | "/$workspaceSlug/map"
   | "/$workspaceSlug/profile"
   | "/$workspaceSlug/settings"
   | "/invalid-workspace"
