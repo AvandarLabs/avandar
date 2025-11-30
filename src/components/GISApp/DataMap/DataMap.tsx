@@ -1,10 +1,11 @@
-import { Box } from "@mantine/core";
+import { Box, Stack } from "@mantine/core";
 import maplibregl, { Map as MapLibreMap } from "maplibre-gl";
 import { useEffect, useRef, useState } from "react";
 import { applyMapStyles } from "./applyMapStyles";
 import { MapStylePicker } from "./MapStylePicker";
 import { MapStyleKey, mapStyles } from "./mapStyles";
 import { QueryFormContainer } from "./QueryFormContainer";
+import { useBroadStCholeraData } from "./useBroadStCholeraData";
 
 type MapProps = {
   initialLongitude?: number;
@@ -19,7 +20,11 @@ export function DataMap({
 }: MapProps): JSX.Element {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
+  const [mapInstance, setMapInstance] = useState<MapLibreMap | null>(null);
   const [currentStyle, setCurrentStyle] = useState<MapStyleKey>("avandar");
+
+  // Load Broad Street cholera data
+  useBroadStCholeraData(mapInstance);
 
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) {
@@ -43,10 +48,12 @@ export function DataMap({
     });
 
     mapRef.current = map;
+    setMapInstance(map);
 
     return () => {
       map.remove();
       mapRef.current = null;
+      setMapInstance(null);
     };
   }, [initialLongitude, initialLatitude, initialZoom, currentStyle]);
 
@@ -92,15 +99,32 @@ export function DataMap({
           height: "100%",
         }}
       />
-      <Box pos="absolute" top="md" left="md" style={{ zIndex: 1 }}>
-        <MapStylePicker
-          mapStyles={mapStyles}
-          value={currentStyle}
-          onChange={(value) => {
-            setCurrentStyle(value as MapStyleKey);
-          }}
-        />
-        <QueryFormContainer />
+      <Box
+        pos="absolute"
+        style={{
+          zIndex: 1,
+          left: 8,
+          top: 16,
+          backgroundColor: "rgba(255, 255, 255, 0.7)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          borderRadius: 12,
+          padding: 8,
+          border: "1px solid rgba(255, 255, 255, 0.3)",
+          boxShadow:
+            "0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)",
+        }}
+      >
+        <Stack gap="xxxs">
+          <MapStylePicker
+            mapStyles={mapStyles}
+            value={currentStyle}
+            onChange={(value) => {
+              setCurrentStyle(value as MapStyleKey);
+            }}
+          />
+          <QueryFormContainer />
+        </Stack>
       </Box>
     </>
   );

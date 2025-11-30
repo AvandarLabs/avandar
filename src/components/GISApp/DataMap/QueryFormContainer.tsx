@@ -1,4 +1,4 @@
-import { ActionIcon, Flex, Popover } from "@mantine/core";
+import { ActionIcon, Flex, Popover, Tooltip } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import { IconFilter } from "@tabler/icons-react";
 import { QueryForm } from "@/components/DataExplorerApp/QueryForm";
@@ -25,28 +25,37 @@ export function QueryFormContainer(): JSX.Element {
         shadow="md"
       >
         <Popover.Target>
-          <ActionIcon
-            size="lg"
-            variant="white"
-            color="neutral"
-            onClick={toggle}
+          <Tooltip
+            label="Filter"
+            multiline
+            maw={340}
+            color="neutral.8"
+            fz="md"
+            transitionProps={{ transition: "pop" }}
             style={{
-              borderRadius: "50%",
-              border: `1px solid ${mantineColorVar("neutral.3")}`,
-              transition: "transform 0.2s ease, box-shadow 0.2s ease",
-              transform:
-                hovered ? "scale(1.1)"
-                : isPopoverOpen ? "scale(0.95)"
-                : "scale(1)",
-              boxShadow:
-                hovered ? mantineVar("shadow-lg")
-                : isPopoverOpen ? mantineVar("shadow-sm")
-                : mantineVar("shadow-md"),
+              boxShadow: mantineVar("shadow-lg"),
             }}
-            aria-label="Query form"
           >
-            <IconFilter size={20} />
-          </ActionIcon>
+            <ActionIcon
+              size="lg"
+              variant="white"
+              color="neutral"
+              onClick={toggle}
+              style={{
+                borderRadius: "50%",
+                border: `1px solid ${mantineColorVar("neutral.3")}`,
+                transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                transform: isPopoverOpen || hovered ? "scale(1.2)" : "scale(1)",
+                boxShadow:
+                  isPopoverOpen || hovered ?
+                    mantineVar("shadow-lg")
+                  : mantineVar("shadow-md"),
+              }}
+              aria-label="Query form"
+            >
+              <IconFilter size={20} />
+            </ActionIcon>
+          </Tooltip>
         </Popover.Target>
         <Popover.Dropdown p="xs">
           <QueryForm withinPortal={false} />
