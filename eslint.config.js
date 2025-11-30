@@ -153,6 +153,6 @@ export default [
     },
   },
   {
-    ignores: ["src/types/database.types.ts"],
+    ignores: ["shared/types/database.types.ts"],
   },
 ];
