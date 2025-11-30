@@ -3,16 +3,24 @@ import maplibregl, {
   Map as MapLibreMap,
   Popup,
 } from "maplibre-gl";
-import { useEffect, useRef } from "react";
+import { RefObject, useEffect, useRef } from "react";
 
 const GEOJSON_SOURCE_ID = "broad-st-cholera-source";
 const GEOJSON_LAYER_ID = "broad-st-cholera-layer";
+
+export type MapViewState = {
+  latLong: [number, number];
+  zoom: number;
+};
 
 /**
  * Hook to load and display Broad Street cholera data on a MapLibre map.
  * Automatically loads the GeoJSON data and adds it as a point layer.
  */
-export function useBroadStCholeraData(map: MapLibreMap | null): void {
+export function useBroadStCholeraData(
+  map: MapLibreMap | null,
+  mapViewState: RefObject<MapViewState>,
+): void {
   const dataLoadedRef = useRef(false);
   const popupRef = useRef<Popup | null>(null);
 
@@ -118,6 +126,18 @@ export function useBroadStCholeraData(map: MapLibreMap | null): void {
                 padding: { top: 50, bottom: 50, left: 50, right: 50 },
                 duration: 1000,
               });
+
+              // Update initial lat/long and zoom after fitBounds completes
+              if (mapViewState) {
+                map.once("moveend", () => {
+                  const center = map.getCenter();
+                  const zoom = map.getZoom();
+                  mapViewState.current = {
+                    latLong: [center.lat, center.lng],
+                    zoom,
+                  };
+                });
+              }
             }
           }
         };
@@ -318,25 +338,34 @@ export function useBroadStCholeraData(map: MapLibreMap | null): void {
     map.on("style.load", handleStyleData);
 
     return () => {
-      // Cleanup: remove event listeners
-      map.off("click", GEOJSON_LAYER_ID, handleClick);
-      map.off("mouseenter", GEOJSON_LAYER_ID, handleMouseEnter);
-      map.off("mouseleave", GEOJSON_LAYER_ID, handleMouseLeave);
-      map.off("style.load", handleStyleData);
+      try {
+        // Cleanup: remove event listeners
+        map.off("click", GEOJSON_LAYER_ID, handleClick);
+        map.off("mouseenter", GEOJSON_LAYER_ID, handleMouseEnter);
+        map.off("mouseleave", GEOJSON_LAYER_ID, handleMouseLeave);
+        map.off("style.load", handleStyleData);
 
-      // Remove popup if it exists
-      if (popupRef.current) {
-        popupRef.current.remove();
-        popupRef.current = null;
-      }
+        // Remove popup if it exists
+        if (popupRef.current) {
+          popupRef.current.remove();
+          popupRef.current = null;
+        }
 
-      // Cleanup: remove layer and source
-      if (map.getLayer(GEOJSON_LAYER_ID)) {
-        map.removeLayer(GEOJSON_LAYER_ID);
-      }
-      if (map.getSource(GEOJSON_SOURCE_ID)) {
-        map.removeSource(GEOJSON_SOURCE_ID);
+        // Cleanup: remove layer and source
+        if (map.getLayer(GEOJSON_LAYER_ID)) {
+          map.removeLayer(GEOJSON_LAYER_ID);
+        }
+        if (map.getSource(GEOJSON_SOURCE_ID)) {
+          map.removeSource(GEOJSON_SOURCE_ID);
+        }
+      } catch (error) {
+        // Map style might be in transition, ignore cleanup errors
+
+        console.error(
+          "Could not cleanup map layers during style transition:",
+          error,
+        );
       }
     };
-  }, [map]);
+  }, [map, mapViewState]);
 }

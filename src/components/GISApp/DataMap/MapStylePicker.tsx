@@ -14,19 +14,17 @@ type MapStyle = {
   name: string;
 };
 
-type MapStylesRecord = Record<string, MapStyle>;
+type MapStylesRecord = Record<MapStyleKey, MapStyle>;
 
 type Props = {
   mapStyles: MapStylesRecord;
-  value?: string;
-  defaultValue?: string;
-  onChange?: (value: string) => void;
+  value?: MapStyleKey;
+  onChange?: (value: MapStyleKey) => void;
 };
 
 export function MapStylePicker({
   mapStyles,
   value,
-  defaultValue,
   onChange,
 }: Props): JSX.Element {
   const [isPopoverOpen, , close, toggle] = useBoolean(false);
@@ -94,12 +92,7 @@ export function MapStylePicker({
             <Text size="sm" fw={500}>
               Theme
             </Text>
-            <SegmentedControl
-              data={items}
-              value={value}
-              defaultValue={defaultValue}
-              onChange={onChange}
-            />
+            <SegmentedControl data={items} value={value} onChange={onChange} />
           </Stack>
         </Popover.Dropdown>
       </Popover>

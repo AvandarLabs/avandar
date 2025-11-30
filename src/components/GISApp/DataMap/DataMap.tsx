@@ -8,23 +8,30 @@ import { QueryFormContainer } from "./QueryFormContainer";
 import { useBroadStCholeraData } from "./useBroadStCholeraData";
 
 type MapProps = {
-  initialLongitude?: number;
-  initialLatitude?: number;
-  initialZoom?: number;
+  defaultLatitude?: number;
+  defaultLongitude?: number;
+  defaultZoom?: number;
 };
 
 export function DataMap({
-  initialLongitude = -74.006,
-  initialLatitude = 40.7128,
-  initialZoom = 10,
+  defaultLatitude = 40.7128,
+  defaultLongitude = -74.006,
+  defaultZoom = 10,
 }: MapProps): JSX.Element {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const [mapInstance, setMapInstance] = useState<MapLibreMap | null>(null);
   const [currentStyle, setCurrentStyle] = useState<MapStyleKey>("avandar");
+  const mapViewState = useRef<{
+    latLong: [number, number];
+    zoom: number;
+  }>({
+    latLong: [defaultLatitude, defaultLongitude],
+    zoom: defaultZoom,
+  });
 
   // Load Broad Street cholera data
-  useBroadStCholeraData(mapInstance);
+  useBroadStCholeraData(mapInstance, mapViewState);
 
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) {
@@ -34,8 +41,8 @@ export function DataMap({
     const map: MapLibreMap = new maplibregl.Map({
       container: mapContainerRef.current,
       style: mapStyles[currentStyle].url,
-      center: [initialLongitude, initialLatitude],
-      zoom: initialZoom,
+      center: mapViewState.current.latLong,
+      zoom: mapViewState.current.zoom,
     });
 
     map.addControl(new maplibregl.NavigationControl(), "top-right");
@@ -55,7 +62,7 @@ export function DataMap({
       mapRef.current = null;
       setMapInstance(null);
     };
-  }, [initialLongitude, initialLatitude, initialZoom, currentStyle]);
+  }, [mapViewState, currentStyle]);
 
   // Handle style changes after map is initialized
   useEffect(() => {
@@ -119,9 +126,7 @@ export function DataMap({
           <MapStylePicker
             mapStyles={mapStyles}
             value={currentStyle}
-            onChange={(value) => {
-              setCurrentStyle(value as MapStyleKey);
-            }}
+            onChange={setCurrentStyle}
           />
           <QueryFormContainer />
         </Stack>
