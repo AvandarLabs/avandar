@@ -1,4 +1,4 @@
-import { Button, Stack, Textarea } from "@mantine/core";
+import { Button, Fieldset, Group, Paper, Stack, Textarea } from "@mantine/core";
 import { useState } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
@@ -47,37 +47,87 @@ export function LLMQueryForm(): JSX.Element {
   // TODO(jpsyx): create a TextareaForm like we have for InputTextForm, and use
   // that singleton form here.
   return (
-    <Stack>
-      <Textarea
-        value={prompt}
-        onChange={(event) => {
-          setPrompt(event.currentTarget.value);
-        }}
-      />
-      <Button
-        onClick={() => {
-          if (promptToSend.length === 0) {
-            notifyError("Prompt cannot be empty");
-          } else {
-            generateQuery({ prompt: promptToSend, workspaceId: workspace.id });
-          }
-        }}
-        loading={isGenerating}
-        disabled={isGenerating || promptToSend.length === 0}
+    <Stack gap="md">
+      <Fieldset
+        legend="Describe your query"
+        style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
       >
-        Generate
-      </Button>
+        <Stack gap="sm">
+          <Textarea
+            label="Natural language prompt"
+            placeholder="e.g., Show me all customers from California with orders over $1000"
+            value={prompt}
+            onChange={(event) => {
+              setPrompt(event.currentTarget.value);
+            }}
+            minRows={4}
+            autosize
+            styles={{
+              input: {
+                fontFamily: "monospace",
+              },
+            }}
+          />
+          <Group justify="flex-end">
+            <Button
+              onClick={() => {
+                if (promptToSend.length === 0) {
+                  notifyError("Prompt cannot be empty");
+                } else {
+                  generateQuery({
+                    prompt: promptToSend,
+                    workspaceId: workspace.id,
+                  });
+                }
+              }}
+              loading={isGenerating}
+              disabled={isGenerating || promptToSend.length === 0}
+            >
+              Generate Query
+            </Button>
+          </Group>
+        </Stack>
+      </Fieldset>
+
       {generatedSQL === undefined ? null : (
-        <Textarea value={generatedSQL} readOnly />
-      )}
-      {generatedSQL === undefined ? null : (
-        <Button
-          onClick={() => {
-            dispatch.setRawSQL(generatedSQL);
-          }}
+        <Fieldset
+          legend="Generated SQL"
+          style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
         >
-          Run Query
-        </Button>
+          <Stack gap="sm">
+            <Paper
+              p="sm"
+              style={{
+                backgroundColor: "var(--mantine-color-gray-0)",
+                border: "1px solid var(--mantine-color-gray-3)",
+              }}
+            >
+              <Textarea
+                value={generatedSQL}
+                readOnly
+                minRows={6}
+                autosize
+                styles={{
+                  input: {
+                    fontFamily: "monospace",
+                    backgroundColor: "transparent",
+                    border: "none",
+                    padding: 0,
+                  },
+                }}
+              />
+            </Paper>
+            <Group justify="flex-end">
+              <Button
+                onClick={() => {
+                  dispatch.setRawSQL(generatedSQL);
+                }}
+              >
+                Run Query
+              </Button>
+            </Group>
+          </Stack>
+        </Fieldset>
       )}
     </Stack>
   );
