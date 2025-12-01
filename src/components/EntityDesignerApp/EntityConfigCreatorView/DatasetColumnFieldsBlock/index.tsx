@@ -183,7 +183,7 @@ export function DatasetColumnFieldsBlock({
     <Fieldset legend="Fields that come from datasets">
       <Stack>
         <Callout.Info
-          title="Select the columns you want in this profile"
+          title={`Select the columns you want in this ${entityConfigName}`}
           icon={<IconCircleNumber1Filled />}
         >
           <Text>
@@ -191,7 +191,7 @@ export function DatasetColumnFieldsBlock({
           </Text>
           <Text>
             This is where you select which columns from which datasets should be
-            added into this profile.
+            added into this {entityConfigName}.
           </Text>
         </Callout.Info>
         <Group align="flex-start">
