@@ -382,7 +382,7 @@ function RegisterPage() {
                     </Group>
 
                     {isRegistrationSuccess ?
-                      <Text c="green">
+                      <Text mt="lg" c="green">
                         Please check your email for a confirmation link. It may
                         take a few minutes to arrive.
                       </Text>

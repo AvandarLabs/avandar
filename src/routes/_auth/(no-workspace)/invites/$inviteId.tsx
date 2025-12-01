@@ -2,6 +2,7 @@ import { Container, Text, Title } from "@mantine/core";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
+import { AuthClient } from "@/clients/AuthClient";
 import { AppLinks } from "@/config/AppLinks";
 
 export const Route = createFileRoute("/_auth/(no-workspace)/invites/$inviteId")(
@@ -13,8 +14,13 @@ export const Route = createFileRoute("/_auth/(no-workspace)/invites/$inviteId")(
     beforeLoad: async ({ params, search, context }) => {
       const { inviteId } = params;
       const { email, workspaceSlug } = search;
-      const { user, queryClient } = context;
-      if (user) {
+      const { queryClient } = context;
+
+      // check if we're authenticated. But don't rely on the `context` session
+      // we need to make sure we are doing a fresh new check
+      const session = await AuthClient.getCurrentSession();
+      if (session?.user) {
+        const { user } = session;
         const { invite } = await APIClient.get({
           route: "workspaces/invites/:inviteId",
           pathParams: { inviteId },
@@ -48,9 +54,12 @@ export const Route = createFileRoute("/_auth/(no-workspace)/invites/$inviteId")(
         }
       }
 
-      // if we're not authenticated then this was handled by one of the parent
-      // routes already
-      return undefined;
+      // if we're not authenticated then redirect to the signin page and set
+      // the redirect param
+      throw redirect({
+        to: AppLinks.signin.to,
+        search: { redirect: location.href },
+      });
     },
     component: AcceptInvitePage,
   },
