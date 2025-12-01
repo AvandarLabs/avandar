@@ -10,7 +10,7 @@ import {
 import { IconDownload } from "@tabler/icons-react";
 import { DataExplorerStore } from "./DataExplorerStore";
 import { downloadRowsAsCSV } from "./downloadRowsAsCSV";
-import { QueryFormAccordion } from "./QueryForm";
+import { QueryForm } from "./QueryForm";
 import { useDataQuery } from "./useDataQuery";
 import { VisualizationContainer } from "./VisualizationContainer";
 import { VizSettingsForm } from "./VizSettingsForm";
@@ -21,6 +21,7 @@ export function DataExplorerApp(): JSX.Element {
   const [state] = DataExplorerStore.use();
   const [queryResults, isLoadingResults] = useDataQuery({
     query: state.query,
+    rawSQL: state.rawSQL,
   });
   const queryResultColumns = queryResults?.columns ?? [];
   const queryResultData = queryResults?.data ?? [];
@@ -36,7 +37,7 @@ export function DataExplorerApp(): JSX.Element {
         py="md"
         style={styles.queryFormContainer}
       >
-        <QueryFormAccordion />
+        <QueryForm />
         <VizSettingsForm columns={queryResultColumns} />
       </Box>
 

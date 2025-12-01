@@ -6,9 +6,7 @@ type Props = {
   withinPortal?: boolean;
 };
 
-export function QueryFormAccordion({
-  withinPortal = true,
-}: Props): JSX.Element {
+export function QueryForm({ withinPortal = true }: Props): JSX.Element {
   return (
     <Accordion defaultValue="manual-query">
       <Accordion.Item value="llm-query">

@@ -292,7 +292,8 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
               display_name: user.email,
             })
             .select()
-            .single();
+            .single()
+            .throwOnError();
 
           // create the user role
           const { data: role } = await supabaseAdminClient
@@ -304,7 +305,8 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
               role: invite.role,
             })
             .select()
-            .single();
+            .single()
+            .throwOnError();
 
           return { invite: updatedInvite, membership, profile, role };
         },

@@ -1,7 +1,7 @@
 import { objectEntries } from "$/lib/utils/objects/objectEntries/objectEntries";
 import { objectValues } from "$/lib/utils/objects/objectValues/objectValues";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
-import { UnknownRow } from "@/clients/DuckDBClient";
+import { DuckDBClient, UnknownRow } from "@/clients/DuckDBClient";
 import { DuckDBQueryAggregationType } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { useQuery, UseQueryResultTuple } from "@/lib/hooks/query/useQuery";
@@ -25,10 +25,17 @@ import { PartialStructuredQuery } from "@/models/queries/StructuredQuery";
 
 type UseDataQueryOptions = {
   query: PartialStructuredQuery;
+  rawSQL: string | undefined;
 };
 
+/**
+ * This is the main hook in the DataExplorerApp that will query the data.
+ * This hook calls the appropriate clients to query the data, which in turn
+ * will call the appropriate sub-systems to pull the source data.
+ */
 export function useDataQuery({
   query,
+  rawSQL,
 }: UseDataQueryOptions): UseQueryResultTuple<QueryResult<UnknownRow>> {
   const {
     dataSource,
@@ -44,6 +51,8 @@ export function useDataQuery({
   return useQuery({
     enabled: !!dataSource,
     queryKey: [
+      "rawSQL",
+      rawSQL,
       "dataSource",
       dataSource,
       "select",
@@ -56,6 +65,10 @@ export function useDataQuery({
     ],
 
     queryFn: async (): Promise<QueryResult<UnknownRow>> => {
+      if (rawSQL) {
+        return await DuckDBClient.runRawQuery<UnknownRow>(rawSQL);
+      }
+
       if (dataSource && sortedQueryColumns.length > 0) {
         const queryResults = await Models.match(dataSource, {
           // Querying datasets is simple. We can just query the dataset

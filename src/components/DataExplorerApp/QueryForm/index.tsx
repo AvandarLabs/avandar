@@ -1,2 +1,1 @@
-export { QueryFormAccordion } from "./QueryFormAccordion";
-
+export { QueryForm } from "./QueryForm";
