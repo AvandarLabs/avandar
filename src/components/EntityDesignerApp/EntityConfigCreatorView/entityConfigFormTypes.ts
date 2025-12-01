@@ -116,7 +116,7 @@ export function makeDefaultDatasetColumnField({
     isIdField,
     isTitleField: false,
     allowManualEdit: false,
-    isArray: true,
+    isArray: false,
 
     // set up some default initial values for the value extractor configs
     extractors: {
