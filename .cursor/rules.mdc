@@ -214,8 +214,12 @@ Libraries:
 
 - Ensure high accessibility (a11y) standards using ARIA roles and native
   accessibility props.
-- Use Mantine themes and props for styling instead of TailwindCSS. Only use
-  TailwindCSS when Mantine's design tokens and props cannot do what we need.
+- Use Mantine themes and props for styling instead of TailwindCSS or inline styles.
+  - E.g. use props `pos`, `pl`, `my`, etc. instead of creating an inline style object.
+- Only use TailwindCSS when a Mantine component's
+  style props cannot do what we need.
+- Only use an inline style object when neither TailwindCSS nor Mantine's style
+  props can do what you need.
 
 ## Icons
 

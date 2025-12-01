@@ -1,7 +1,7 @@
 import { ActionIcon, Flex, Popover } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import { IconFilter } from "@tabler/icons-react";
-import { QueryForm } from "@/components/DataExplorerApp/QueryForm";
+import { QueryFormAccordion } from "@/components/DataExplorerApp/QueryForm";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { AvaTooltip } from "@/lib/ui/AvaTooltip";
 import { mantineColorVar, mantineVar } from "@/lib/utils/browser/css";
@@ -49,7 +49,7 @@ export function QueryFormContainer(): JSX.Element {
           </AvaTooltip>
         </Popover.Target>
         <Popover.Dropdown p="xs">
-          <QueryForm withinPortal={false} />
+          <QueryFormAccordion withinPortal={false} />
         </Popover.Dropdown>
       </Popover>
     </Flex>

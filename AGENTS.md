@@ -34,3 +34,8 @@
 - Use Mantine's style props as much as possible. Only use tailwind when something
   cannot be styled using Mantine directly.
 - Use Context7 to refer to Mantine's up-to-date documentation.
+
+## Review
+
+After every task, review your changes against the ~/.cursor/rules.mdc file to
+make sure all styles and conventions have ben followed appropriately.
