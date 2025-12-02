@@ -14,6 +14,12 @@ import { VizConfig, VizConfigs, VizType } from "@/models/vizs/VizConfig";
 
 type DataExplorerState = {
   query: PartialStructuredQuery;
+
+  /**
+   * If raw SQL was generated, we should use that for our query instead of
+   * the structured query.
+   */
+  rawSQL: string | undefined;
   vizConfig: VizConfig;
 };
 
@@ -22,6 +28,7 @@ const initialState: DataExplorerState = {
   vizConfig: {
     vizType: "table",
   },
+  rawSQL: undefined,
 };
 
 export const DataExplorerStore = createStore({
@@ -130,6 +137,10 @@ export const DataExplorerStore = createStore({
     setVizConfig: (state: DataExplorerState, vizConfig: VizConfig) => {
       // fill in the defaults
       return setValue(state, "vizConfig", vizConfig);
+    },
+
+    setRawSQL: (state: DataExplorerState, rawSQL: string | undefined) => {
+      return setValue(state, "rawSQL", rawSQL);
     },
   },
 });

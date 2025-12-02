@@ -5,10 +5,10 @@ import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { Models } from "@/models/Model/Models";
 import { QueryAggregationType } from "@/models/queries/QueryAggregationType";
 import { QueryColumn, QueryColumns } from "@/models/queries/QueryColumn";
-import { AggregationSelect } from "./AggregationSelect";
-import { DataExplorerStore } from "./DataExplorerStore";
-import { QueryColumnMultiSelect } from "./QueryColumnMultiSelect";
-import { QueryDataSourceSelect } from "./QueryDataSourceSelect";
+import { AggregationSelect } from "../AggregationSelect";
+import { DataExplorerStore } from "../DataExplorerStore";
+import { QueryColumnMultiSelect } from "../QueryColumnMultiSelect";
+import { QueryDataSourceSelect } from "../QueryDataSourceSelect";
 
 const HIDE_WHERE = true;
 const HIDE_LIMIT = true;
@@ -22,7 +22,7 @@ type Props = {
   withinPortal?: boolean;
 };
 
-export function QueryForm({ withinPortal = true }: Props): JSX.Element {
+export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
   const [{ query }, dispatch] = DataExplorerStore.use();
   const {
     dataSource,

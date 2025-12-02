@@ -21,6 +21,7 @@ export function DataExplorerApp(): JSX.Element {
   const [state] = DataExplorerStore.use();
   const [queryResults, isLoadingResults] = useDataQuery({
     query: state.query,
+    rawSQL: state.rawSQL,
   });
   const queryResultColumns = queryResults?.columns ?? [];
   const queryResultData = queryResults?.data ?? [];
@@ -32,8 +33,7 @@ export function DataExplorerApp(): JSX.Element {
         miw={QUERY_FORM_WIDTH}
         w={QUERY_FORM_WIDTH}
         mih="100dvh"
-        px="md"
-        py="md"
+        mah="100vh"
         style={styles.queryFormContainer}
       >
         <QueryForm />
@@ -78,6 +78,7 @@ const styles = {
   queryFormContainer: (theme: MantineTheme) => {
     return {
       borderRight: `1px solid ${theme.colors.neutral[2]}`,
+      overflowY: "auto",
     };
   },
   toolbar: (theme: MantineTheme) => {

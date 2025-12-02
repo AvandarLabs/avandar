@@ -47,7 +47,7 @@ function ErrorView({ error }: ErrorComponentProps) {
   }, [error]);
 
   return (
-    <Center h="50%">
+    <Center h="50%" pt="xxxl">
       <Callout
         title="Entity failed to load"
         message="The entity failed to load. Please try again later or reach out to support."
