@@ -5,6 +5,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { notifySuccess } from "@/lib/ui/notifications/notify";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList.types";
 import { Paper } from "@/lib/ui/Paper";
@@ -77,11 +78,7 @@ export function EntityConfigMetaView({ entityConfig }: Props): JSX.Element {
                   });
                   setIsGeneratingEntities(false);
 
-                  notifications.show({
-                    title: "Entities generated",
-                    message: "Entities generated successfully",
-                    color: "green",
-                  });
+                  notifySuccess(`Finished syncing ${entityConfig.name} data`);
                 } else {
                   notifications.show({
                     title: "Cannot sync this entity",

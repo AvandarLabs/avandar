@@ -103,7 +103,7 @@
 
 4. Set up the Zod schema parsers in `parsers.ts`.
    - Ensure the `DBRead`, `DBInsert`, and `DBUpdate` schemas match the model's
-     database table in `src/types/database.types.ts`.
+     database table in `shared/types/database.types.ts`.
    - For the `DBInsertSchema` our convention is to call
      `DBReadSchema.required().partial({ fields })`. Meaning, we make the
      `DBReadSchema` fully required, and then we specify which fields are optional.
