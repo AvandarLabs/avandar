@@ -1,11 +1,15 @@
 import { z } from "zod";
 import { defineRoutes, GET } from "../_shared/MiniServer/MiniServer.ts";
+import { DuckDBSpatialExtensionDocumentation } from "./DuckDBSpatialExtensionDocumentation.ts";
+import { SPATIAL_KEYWORDS } from "./SpatialKeywords.ts";
 import type { QueriesAPI } from "./queries.types.ts";
 
 const openaiApiKey = Deno.env.get("OPENAI_API_KEY");
 if (!openaiApiKey) {
   throw new Error("OPENAI_API_KEY environment variable is not set");
 }
+
+const spatialKeywordsSet = new Set(SPATIAL_KEYWORDS);
 
 /**
  * This is the route handler for all queries endpoints.
@@ -38,35 +42,51 @@ export const Routes = defineRoutes<QueriesAPI>("queries", {
           .select("dataset_id, name, data_type")
           .throwOnError();
 
+        const isSpatialPrompt = prompt
+          // remove newlines, tabs, and special characters to make this easier
+          .replace(/[\n\t\r\W]+/g, " ")
+          .toLowerCase()
+          .split(" ")
+          .some((word) => {
+            return spatialKeywordsSet.has(word);
+          });
+
         // Build the system prompt
         const systemPrompt = `You are a DuckDB SQL query generator. Given a natural language prompt and database schema, generate a valid DuckDB SQL SELECT query.
 
 Available datasets:
 ${datasets
   .map((d) => {
-    return `- ${d.name} (id: ${d.id})`;
+    return `- ${d.name} (table name: "${d.id}")`;
   })
   .join("\n")}
 
 Schema:
 ${columns
   .map((c) => {
-    return `- ${c.name} (${c.data_type}) in dataset ${c.dataset_id}`;
+    return `- "${c.name}" (${c.data_type}) in table "${c.dataset_id}"`;
   })
   .join("\n")}
 
+Notes:
+
 - Dataset names are for semantic convenience only. The tables in SQL are named
-  after the dataset IDs, not the dataset names.
+  after the dataset UUIDs, not the dataset names.
 - The SQL query should reference the dataset IDs instead of names.
 - Wrap all table IDs and column names in quotation marks, to avoid syntax errors.
-- The query will run in DuckDB. Review that the syntax and function names exist
-  in DuckDB.
+- The query will run in DuckDB and should only use DuckDB functions supported
+  by DuckDB.
 
 Output:
-Generate only the SQL query, no explanations.`;
+Generate only the SQL query, no explanations.
 
-        console.log("systemPrompt", systemPrompt);
-        console.log("user prompt", prompt);
+${
+  isSpatialPrompt ?
+    `Reference documentation:
+If the query requires any geospatial operations, refer to the following document:
+${DuckDBSpatialExtensionDocumentation}`
+  : ""
+}`;
 
         // Call OpenAI
         const response = await fetch(

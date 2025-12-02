@@ -50,7 +50,6 @@ export function LLMQueryForm(): JSX.Element {
             defaultValue=""
             description="Enter your question or instructions in natural language to generate a SQL query"
             label="Prompt"
-            placeholder="e.g., Show me all customers from California with orders over $1000"
             required
             minRows={4}
             autosize
