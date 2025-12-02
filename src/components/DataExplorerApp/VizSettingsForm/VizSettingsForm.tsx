@@ -1,3 +1,4 @@
+import { Box } from "@mantine/core";
 import { match } from "ts-pattern";
 import { Select, SelectData } from "@/lib/ui/inputs/Select";
 import { QueryResultColumn } from "@/models/queries/QueryResult/QueryResult.types";
@@ -21,7 +22,7 @@ export function VizSettingsForm({ columns }: Props): JSX.Element {
   });
 
   return (
-    <form>
+    <Box component="form" px="md" py="md">
       <Select
         allowDeselect={false}
         data={vizTypeOptions}
@@ -72,6 +73,6 @@ export function VizSettingsForm({ columns }: Props): JSX.Element {
           );
         })
         .exhaustive()}
-    </form>
+    </Box>
   );
 }

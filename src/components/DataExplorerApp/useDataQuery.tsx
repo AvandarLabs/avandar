@@ -1,9 +1,12 @@
+import { where } from "$/lib/utils/filters/filters";
 import { objectEntries } from "$/lib/utils/objects/objectEntries/objectEntries";
 import { objectValues } from "$/lib/utils/objects/objectValues/objectValues";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { UnknownRow } from "@/clients/DuckDBClient";
 import { DuckDBQueryAggregationType } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useQuery, UseQueryResultTuple } from "@/lib/hooks/query/useQuery";
 import { isOfModelType } from "@/lib/utils/guards/guards";
 import {
@@ -25,11 +28,19 @@ import { PartialStructuredQuery } from "@/models/queries/StructuredQuery";
 
 type UseDataQueryOptions = {
   query: PartialStructuredQuery;
+  rawSQL: string | undefined;
 };
 
+/**
+ * This is the main hook in the DataExplorerApp that will query the data.
+ * This hook calls the appropriate clients to query the data, which in turn
+ * will call the appropriate sub-systems to pull the source data.
+ */
 export function useDataQuery({
   query,
+  rawSQL,
 }: UseDataQueryOptions): UseQueryResultTuple<QueryResult<UnknownRow>> {
+  const workspace = useCurrentWorkspace();
   const {
     dataSource,
     queryColumns,
@@ -40,10 +51,15 @@ export function useDataQuery({
   const sortedQueryColumns = sortObjList(queryColumns, {
     sortBy: prop("id"),
   });
+  const workspaceId = workspace.id;
 
   return useQuery({
-    enabled: !!dataSource,
+    enabled: !!dataSource || !!rawSQL,
     queryKey: [
+      "workspace",
+      workspaceId,
+      "rawSQL",
+      rawSQL,
       "dataSource",
       dataSource,
       "select",
@@ -56,6 +72,24 @@ export function useDataQuery({
     ],
 
     queryFn: async (): Promise<QueryResult<UnknownRow>> => {
+      if (rawSQL) {
+        const allDatasets = await DatasetClient.getAll(
+          where("workspace_id", "eq", workspaceId),
+        );
+        const allDatasetIds = allDatasets.map(prop("id"));
+
+        // if a dataset id is mentioned anywhere in the rawSQL, then we treat
+        // it as a dependency that needs to be loaded into memory.
+        const datasetsToLoad = allDatasetIds.filter((datasetId) => {
+          return rawSQL.includes(datasetId);
+        });
+
+        return await DatasetRawDataClient.runLocalRawQuery({
+          dependencies: datasetsToLoad,
+          query: rawSQL,
+        });
+      }
+
       if (dataSource && sortedQueryColumns.length > 0) {
         const queryResults = await Models.match(dataSource, {
           // Querying datasets is simple. We can just query the dataset
