@@ -147,6 +147,12 @@ class DuckDBClientImpl {
     const logger = new duckdb.ConsoleLogger();
     const db = new duckdb.AsyncDuckDB(logger, worker);
     await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+
+    // enable the spatial extension
+    // TODO(jpsyx): we should only do this when necessary
+    const conn = await db.connect();
+    await conn.query("LOAD spatial;");
+    await conn.close();
     return db;
   }
 
