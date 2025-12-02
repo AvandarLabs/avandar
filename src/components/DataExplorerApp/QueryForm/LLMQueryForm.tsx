@@ -1,4 +1,5 @@
-import { Fieldset, Paper, Stack, Textarea } from "@mantine/core";
+import { Button, Fieldset, Group, Paper, Stack, Textarea } from "@mantine/core";
+import { useState } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -10,6 +11,7 @@ import { DataExplorerStore } from "../DataExplorerStore";
 export function LLMQueryForm(): JSX.Element {
   const [{ rawSQL }, dispatch] = DataExplorerStore.use();
   const workspace = useCurrentWorkspace();
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const [generateAndRunQuery, isRunningQuery] = useMutation({
     mutationFn: async (options: {
@@ -71,32 +73,79 @@ export function LLMQueryForm(): JSX.Element {
 
       {rawSQL === undefined ? null : (
         <Fieldset
-          legend="Generated SQL"
+          legend={
+            <Group justify="space-between" style={{ width: "100%" }}>
+              <span>Generated SQL</span>
+              {!isEditMode && (
+                <Button
+                  size="xs"
+                  variant="subtle"
+                  onClick={() => {
+                    setIsEditMode(true);
+                  }}
+                >
+                  Edit query
+                </Button>
+              )}
+            </Group>
+          }
           style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
         >
           <Stack gap="sm">
-            <Paper
-              p="sm"
-              style={{
-                backgroundColor: "var(--mantine-color-gray-0)",
-                border: "1px solid var(--mantine-color-gray-3)",
-              }}
-            >
-              <Textarea
-                value={rawSQL}
-                readOnly
+            {isEditMode ?
+              <TextareaForm
+                // use the rawSQL as the key to force the textarea form to
+                // re-initialize when we re-run a query, so we can properly
+                // detect dirty state
+                key={rawSQL}
+                defaultValue={rawSQL}
                 minRows={6}
                 autosize
+                showSubmitButton={true}
+                showCancelButton={true}
+                submitButtonLabel="Re-run query"
+                cancelButtonLabel="Cancel"
+                isSubmitting={false}
                 styles={{
                   input: {
                     fontFamily: "monospace",
-                    backgroundColor: "transparent",
-                    border: "none",
-                    padding: 0,
                   },
                 }}
+                validateOnChange={true}
+                required={true}
+                disabledUntilDirty={true}
+                onSubmit={(value) => {
+                  const trimmedValue = value.trim();
+                  dispatch.setRawSQL(trimmedValue);
+                  setIsEditMode(false);
+                }}
+                onCancel={() => {
+                  setIsEditMode(false);
+                }}
               />
-            </Paper>
+            : <Paper
+                p="sm"
+                style={{
+                  backgroundColor: "var(--mantine-color-gray-0)",
+                  border: "1px solid var(--mantine-color-gray-3)",
+                }}
+              >
+                <Textarea
+                  value={rawSQL}
+                  readOnly
+                  minRows={6}
+                  autosize
+                  styles={{
+                    input: {
+                      fontFamily: "monospace",
+                      backgroundColor: "transparent",
+                      border: "none",
+                      padding: 0,
+                    },
+                  }}
+                />
+              </Paper>
+            }
           </Stack>
         </Fieldset>
       )}

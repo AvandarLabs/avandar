@@ -1,7 +1,7 @@
 import { Button, Group, Text, Textarea } from "@mantine/core";
-import { useForm } from "@mantine/form";
 import { getHotkeyHandler } from "@mantine/hooks";
 import { useMemo, useRef } from "react";
+import { useForm } from "@/lib/hooks/ui/useForm";
 import type { TextareaProps } from "@mantine/core";
 
 type Props = {
@@ -30,6 +30,12 @@ type Props = {
    * called when the cancel button is clicked.
    */
   showCancelButton?: boolean;
+
+  /**
+   * If true, the submit button will be disabled until the input value
+   * has changed from its initial defaultValue.
+   */
+  disabledUntilDirty?: boolean;
 
   onSubmit?: (value: string) => void;
   onCancel?: () => void;
@@ -71,6 +77,7 @@ export function TextareaForm({
   showCancelButton = false,
   submitButtonLabel = "Submit",
   cancelButtonLabel = "Cancel",
+  disabledUntilDirty = false,
   ...moreTextareaProps
 }: Props): JSX.Element {
   const form = useForm<SingleInputForm>({
@@ -78,7 +85,6 @@ export function TextareaForm({
     initialValues: {
       value: defaultValue,
     },
-
     validateInputOnBlur: validateOnBlur,
     validateInputOnChange: validateOnChange,
     validate: {
@@ -97,7 +103,6 @@ export function TextareaForm({
   });
 
   const formRef = useRef<HTMLFormElement>(null);
-
   const isMac = useMemo(() => {
     if (typeof navigator === "undefined") {
       return false;
@@ -146,7 +151,11 @@ export function TextareaForm({
           <Button
             type="submit"
             loading={isSubmitting}
-            disabled={isSubmitting || (validateOnChange && !form.isValid())}
+            disabled={
+              isSubmitting ||
+              (validateOnChange && !form.isValid()) ||
+              (disabledUntilDirty && !form.isDirty())
+            }
           >
             {submitButtonLabel}
             <Text ml="xxs" span size="xs" c="white">
