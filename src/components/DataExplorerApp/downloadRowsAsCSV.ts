@@ -7,6 +7,11 @@ function _escapeCSVValue(value: unknown): string {
   if (value === null || value === undefined) {
     return "";
   }
+  if (typeof value === "number") {
+    // we do not format numbers, we just convert them to strings
+    return String(value);
+  }
+
   const str = unknownToString(value);
   if (str.includes('"') || str.includes(",") || str.includes("\n")) {
     // Escape double quotes
