@@ -3,7 +3,7 @@ import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useMutation } from "@/lib/hooks/query/useMutation";
-import { TextAreaForm } from "@/lib/ui/singleton-forms/TextAreaForm";
+import { TextareaForm } from "@/lib/ui/singleton-forms/TextareaForm/TextareaForm";
 import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { DataExplorerStore } from "../DataExplorerStore";
 
@@ -44,7 +44,7 @@ export function LLMQueryForm(): JSX.Element {
         style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
       >
         <Stack gap="sm">
-          <TextAreaForm
+          <TextareaForm
             defaultValue=""
             description="Enter your question or instructions in natural language to generate a SQL query"
             label="Prompt"
