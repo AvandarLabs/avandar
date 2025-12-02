@@ -1,22 +1,17 @@
-import { Button, Fieldset, Group, Paper, Stack, Textarea } from "@mantine/core";
-import { useState } from "react";
+import { Fieldset, Paper, Stack, Textarea } from "@mantine/core";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useMutation } from "@/lib/hooks/query/useMutation";
-import { notifyError } from "@/lib/ui/notifications/notify";
+import { TextAreaForm } from "@/lib/ui/singleton-forms/TextAreaForm";
 import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { DataExplorerStore } from "../DataExplorerStore";
 
 export function LLMQueryForm(): JSX.Element {
-  const [prompt, setPrompt] = useState("");
-  const [generatedSQL, setGeneratedSQL] = useState<string | undefined>(
-    undefined,
-  );
-  const [, dispatch] = DataExplorerStore.use();
+  const [{ rawSQL }, dispatch] = DataExplorerStore.use();
   const workspace = useCurrentWorkspace();
 
-  const [generateQuery, isGenerating] = useMutation({
+  const [generateAndRunQuery, isRunningQuery] = useMutation({
     mutationFn: async (options: {
       prompt: string;
       workspaceId: WorkspaceId;
@@ -38,14 +33,10 @@ export function LLMQueryForm(): JSX.Element {
       return sql;
     },
     onSuccess: (sql) => {
-      setGeneratedSQL(sql);
+      dispatch.setRawSQL(sql);
     },
   });
 
-  const promptToSend = prompt.trim();
-
-  // TODO(jpsyx): create a TextareaForm like we have for InputTextForm, and use
-  // that singleton form here.
   return (
     <Stack gap="md">
       <Fieldset
@@ -53,43 +44,32 @@ export function LLMQueryForm(): JSX.Element {
         style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
       >
         <Stack gap="sm">
-          <Textarea
-            label="Natural language prompt"
+          <TextAreaForm
+            defaultValue=""
+            description="Enter your question or instructions in natural language to generate a SQL query"
+            label="Prompt"
             placeholder="e.g., Show me all customers from California with orders over $1000"
-            value={prompt}
-            onChange={(event) => {
-              setPrompt(event.currentTarget.value);
-            }}
+            required
             minRows={4}
             autosize
+            isSubmitting={isRunningQuery}
+            submitButtonLabel="Run Query"
             styles={{
               input: {
                 fontFamily: "monospace",
               },
             }}
+            onSubmit={(value) => {
+              generateAndRunQuery({
+                prompt: value.trim(),
+                workspaceId: workspace.id,
+              });
+            }}
           />
-          <Group justify="flex-end">
-            <Button
-              onClick={() => {
-                if (promptToSend.length === 0) {
-                  notifyError("Prompt cannot be empty");
-                } else {
-                  generateQuery({
-                    prompt: promptToSend,
-                    workspaceId: workspace.id,
-                  });
-                }
-              }}
-              loading={isGenerating}
-              disabled={isGenerating || promptToSend.length === 0}
-            >
-              Generate Query
-            </Button>
-          </Group>
         </Stack>
       </Fieldset>
 
-      {generatedSQL === undefined ? null : (
+      {rawSQL === undefined ? null : (
         <Fieldset
           legend="Generated SQL"
           style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
@@ -103,7 +83,7 @@ export function LLMQueryForm(): JSX.Element {
               }}
             >
               <Textarea
-                value={generatedSQL}
+                value={rawSQL}
                 readOnly
                 minRows={6}
                 autosize
@@ -117,15 +97,6 @@ export function LLMQueryForm(): JSX.Element {
                 }}
               />
             </Paper>
-            <Group justify="flex-end">
-              <Button
-                onClick={() => {
-                  dispatch.setRawSQL(generatedSQL);
-                }}
-              >
-                Run Query
-              </Button>
-            </Group>
           </Stack>
         </Fieldset>
       )}

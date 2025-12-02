@@ -1,4 +1,5 @@
 import { Stack, Text } from "@mantine/core";
+import { getHotkeyHandler } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { useRef } from "react";
 import { APIClient } from "@/clients/APIClient";
@@ -108,11 +109,15 @@ export function useWorkspaceInviteModal(): () => void {
               }),
             }}
             formElements={["email", "role"]}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                onSendInviteClick(modalId);
-              }
-            }}
+            onKeyDown={getHotkeyHandler([
+              [
+                "Enter",
+                (event) => {
+                  event.preventDefault();
+                  onSendInviteClick(modalId);
+                },
+              ],
+            ])}
           />
         </Stack>
       ),

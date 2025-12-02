@@ -1,9 +1,12 @@
+import { where } from "$/lib/utils/filters/filters";
 import { objectEntries } from "$/lib/utils/objects/objectEntries/objectEntries";
 import { objectValues } from "$/lib/utils/objects/objectValues/objectValues";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
-import { DuckDBClient, UnknownRow } from "@/clients/DuckDBClient";
+import { UnknownRow } from "@/clients/DuckDBClient";
 import { DuckDBQueryAggregationType } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useQuery, UseQueryResultTuple } from "@/lib/hooks/query/useQuery";
 import { isOfModelType } from "@/lib/utils/guards/guards";
 import {
@@ -37,6 +40,7 @@ export function useDataQuery({
   query,
   rawSQL,
 }: UseDataQueryOptions): UseQueryResultTuple<QueryResult<UnknownRow>> {
+  const workspace = useCurrentWorkspace();
   const {
     dataSource,
     queryColumns,
@@ -47,10 +51,13 @@ export function useDataQuery({
   const sortedQueryColumns = sortObjList(queryColumns, {
     sortBy: prop("id"),
   });
+  const workspaceId = workspace.id;
 
   return useQuery({
-    enabled: !!dataSource,
+    enabled: !!dataSource || !!rawSQL,
     queryKey: [
+      "workspace",
+      workspaceId,
       "rawSQL",
       rawSQL,
       "dataSource",
@@ -66,7 +73,21 @@ export function useDataQuery({
 
     queryFn: async (): Promise<QueryResult<UnknownRow>> => {
       if (rawSQL) {
-        return await DuckDBClient.runRawQuery<UnknownRow>(rawSQL);
+        const allDatasets = await DatasetClient.getAll(
+          where("workspace_id", "eq", workspaceId),
+        );
+        const allDatasetIds = allDatasets.map(prop("id"));
+
+        // if a dataset id is mentioned anywhere in the rawSQL, then we treat
+        // it as a dependency that needs to be loaded into memory.
+        const datasetsToLoad = allDatasetIds.filter((datasetId) => {
+          return rawSQL.includes(datasetId);
+        });
+
+        return await DatasetRawDataClient.runLocalRawQuery({
+          dependencies: datasetsToLoad,
+          query: rawSQL,
+        });
       }
 
       if (dataSource && sortedQueryColumns.length > 0) {

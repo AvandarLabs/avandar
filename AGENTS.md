@@ -37,5 +37,5 @@
 
 ## Review
 
-After every task, review your changes against the ~/.cursor/rules.mdc file to
-make sure all styles and conventions have ben followed appropriately.
+After every task, review your changes against the `~/.cursor/rules/global.mdc`
+file to make sure all styles and conventions have ben followed appropriately.
