@@ -1,10 +1,10 @@
-import { DatasetColumn } from "@/models/datasets/DatasetColumn";
-import { QueryColumn, QueryColumnId } from "./QueryColumn.types";
 import { uuid } from "@/lib/utils/uuid";
+import { AvaDataTypes } from "@/models/datasets/AvaDataType";
+import { DatasetColumn } from "@/models/datasets/DatasetColumn";
 import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import { Models } from "@/models/Model";
-import { AvaDataTypes } from "@/models/datasets/AvaDataType";
 import { QueryAggregationTypes } from "../QueryAggregationType/QueryAggregationTypes";
+import { QueryColumn, QueryColumnId } from "./QueryColumn.types";
 
 export const QueryColumns = {
   makeFromEntityFieldConfig: (field: EntityFieldConfig): QueryColumn => {
@@ -31,7 +31,8 @@ export const QueryColumns = {
   getDerivedColumnName: (column: QueryColumn): string => {
     const { aggregation } = column;
     if (
-      aggregation === undefined || aggregation === "none" ||
+      aggregation === undefined ||
+      aggregation === "none" ||
       aggregation === "group_by"
     ) {
       return column.baseColumn.name;

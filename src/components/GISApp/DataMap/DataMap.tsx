@@ -1,17 +1,24 @@
 import { Box, Stack } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import maplibregl, { Map as MapLibreMap } from "maplibre-gl";
 import { useEffect, useRef, useState } from "react";
+import { QueryColumn } from "@/models/queries/QueryColumn";
+import { QueryDataSource } from "@/models/queries/QueryDataSource";
 import { applyMapStyles } from "./applyMapStyles";
+import { GeometryDrawer } from "./GeometryDrawer";
 import { MapStylePicker } from "./MapStylePicker";
 import { MapStyleKey, mapStyles } from "./mapStyles";
-import { QueryFormContainer } from "./QueryFormContainer";
-import { useBroadStCholeraData } from "./useBroadStCholeraData";
+import { QueryFormContainer } from "./QueryFormContainer/QueryFormContainer";
+import { useSelectedMapDataSource } from "./useSelectedMapDataSource";
 
 type MapProps = {
   defaultLatitude?: number;
   defaultLongitude?: number;
   defaultZoom?: number;
 };
+
+// hardcoding this for now until we have style changes working correctly
+const HIDE_STYLE_PICKER = true;
 
 export function DataMap({
   defaultLatitude = 40.7128,
@@ -22,16 +29,46 @@ export function DataMap({
   const mapRef = useRef<MapLibreMap | null>(null);
   const [mapInstance, setMapInstance] = useState<MapLibreMap | null>(null);
   const [currentStyle, setCurrentStyle] = useState<MapStyleKey>("avandar");
+  const [selectedDataSource, setSelectedDataSource] = useState<
+    QueryDataSource | undefined
+  >(undefined);
+  const [latitudeColumn, setLatitudeColumn] = useState<QueryColumn | undefined>(
+    undefined,
+  );
+  const [longitudeColumn, setLongitudeColumn] = useState<
+    QueryColumn | undefined
+  >(undefined);
+  const [symbolSizeColumn, setSymbolSizeColumn] = useState<
+    QueryColumn | undefined
+  >(undefined);
+  const [symbolColor, setSymbolColor] = useState<string | undefined>(undefined);
+  const [selectedFeature, setSelectedFeature] =
+    useState<GeoJSON.Feature | null>(null);
+  const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
+    useDisclosure(false);
   const mapViewState = useRef<{
     latLong: [number, number];
     zoom: number;
   }>({
-    latLong: [defaultLatitude, defaultLongitude],
+    latLong: [defaultLongitude, defaultLatitude], // [lng, lat] for MapLibre
     zoom: defaultZoom,
   });
 
-  // Load Broad Street cholera data
-  useBroadStCholeraData(mapInstance, mapViewState);
+  // Load selected data source on map
+  useSelectedMapDataSource({
+    map: mapInstance,
+    mapViewState,
+    selectedDataSource,
+    latitudeColumn,
+    longitudeColumn,
+    symbolSizeColumn,
+    symbolColor,
+    selectedFeature: drawerOpened ? selectedFeature : null,
+    onFeatureClick: (feature) => {
+      setSelectedFeature(feature);
+      openDrawer();
+    },
+  });
 
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) {
@@ -108,6 +145,8 @@ export function DataMap({
       />
       <Box
         pos="absolute"
+        px="xs"
+        pb="xs"
         style={{
           zIndex: 1,
           left: 8,
@@ -116,21 +155,41 @@ export function DataMap({
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
           borderRadius: 12,
-          padding: 8,
           border: "1px solid rgba(255, 255, 255, 0.3)",
           boxShadow:
             "0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)",
         }}
       >
         <Stack gap="xxxs">
-          <MapStylePicker
-            mapStyles={mapStyles}
-            value={currentStyle}
-            onChange={setCurrentStyle}
+          {HIDE_STYLE_PICKER ? null : (
+            <MapStylePicker
+              mapStyles={mapStyles}
+              value={currentStyle}
+              onChange={setCurrentStyle}
+            />
+          )}
+          <QueryFormContainer
+            selectedDataSource={selectedDataSource}
+            onSelectedDataSourceChange={setSelectedDataSource}
+            latitudeColumn={latitudeColumn}
+            onLatitudeColumnChange={setLatitudeColumn}
+            longitudeColumn={longitudeColumn}
+            onLongitudeColumnChange={setLongitudeColumn}
+            symbolSizeColumn={symbolSizeColumn}
+            onSymbolSizeColumnChange={setSymbolSizeColumn}
+            symbolColor={symbolColor}
+            onSymbolColorChange={setSymbolColor}
           />
-          <QueryFormContainer />
         </Stack>
       </Box>
+      <GeometryDrawer
+        opened={drawerOpened}
+        onClose={() => {
+          closeDrawer();
+          setSelectedFeature(null);
+        }}
+        feature={selectedFeature}
+      />
     </>
   );
 }
