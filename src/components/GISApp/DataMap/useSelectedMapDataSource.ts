@@ -1,8 +1,4 @@
-import maplibregl, {
-  MapLayerMouseEvent,
-  Map as MapLibreMap,
-  Popup,
-} from "maplibre-gl";
+import { MapLayerMouseEvent, Map as MapLibreMap } from "maplibre-gl";
 import { RefObject, useEffect, useRef } from "react";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
@@ -13,6 +9,7 @@ import { QueryDataSource } from "@/models/queries/QueryDataSource";
 
 const GEOJSON_SOURCE_ID = "selected-datasource-source";
 const GEOJSON_LAYER_ID = "selected-datasource-layer";
+const HIGHLIGHT_LAYER_ID = "selected-datasource-highlight-layer";
 
 export type MapViewState = {
   latLong: [number, number];
@@ -27,6 +24,8 @@ type UseSelectedMapDataSourceOptions = {
   longitudeColumn?: QueryColumn;
   symbolSizeColumn?: QueryColumn;
   symbolColor?: string;
+  selectedFeature?: GeoJSON.Feature | null;
+  onFeatureClick?: (feature: GeoJSON.Feature) => void;
 };
 
 /**
@@ -43,9 +42,10 @@ export function useSelectedMapDataSource({
   longitudeColumn,
   symbolSizeColumn,
   symbolColor,
+  selectedFeature,
+  onFeatureClick,
 }: UseSelectedMapDataSourceOptions): void {
   const dataLoadedRef = useRef(false);
-  const popupRef = useRef<Popup | null>(null);
   const previousDataSourceIdRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
@@ -114,14 +114,6 @@ export function useSelectedMapDataSource({
       }
     }
 
-    // Create popup instance for displaying feature data
-    const popup = new maplibregl.Popup({
-      closeButton: true,
-      closeOnClick: true,
-      maxWidth: "300px",
-    });
-    popupRef.current = popup;
-
     // Handle click events on the layer
     const handleClick = (e: MapLayerMouseEvent) => {
       const feature = e.features?.[0];
@@ -129,58 +121,10 @@ export function useSelectedMapDataSource({
         return;
       }
 
-      const properties = feature.properties;
-
-      // Create HTML content with Mantine-like styling
-      const htmlContent = `
-        <div style="
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-          padding: 12px;
-          color: #212529;
-        ">
-          <div style="
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: #1c1c1e;
-            border-bottom: 1px solid #e9ecef;
-            padding-bottom: 8px;
-          ">
-            Data Point
-          </div>
-          <div style="
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-          ">
-            ${Object.entries(properties)
-              .map(([key, value]) => {
-                return `
-              <div style="
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-              ">
-                <span style="
-                  font-weight: 500;
-                  color: #495057;
-                  font-size: 14px;
-                ">${key}:</span>
-                <span style="
-                  font-weight: 500;
-                  color: #212529;
-                  font-size: 14px;
-                ">${value ?? "N/A"}</span>
-              </div>
-            `;
-              })
-              .join("")}
-          </div>
-        </div>
-      `;
-
-      // Set popup content and position
-      popup.setLngLat(e.lngLat).setHTML(htmlContent).addTo(map);
+      // Call the onFeatureClick callback if provided
+      if (onFeatureClick) {
+        onFeatureClick(feature as GeoJSON.Feature);
+      }
     };
 
     const handleMouseEnter = () => {
@@ -247,7 +191,7 @@ export function useSelectedMapDataSource({
 
         // Convert query results to GeoJSON FeatureCollection format
         const features: GeoJSON.Feature[] = queryResult.data
-          .map((row) => {
+          .map((row, index) => {
             const { geometry: geometryData, ...properties } = row;
 
             // ST_AsGeoJSON returns a JSON object, which may be a string or
@@ -277,6 +221,13 @@ export function useSelectedMapDataSource({
             delete cleanProperties[latColumnName];
             delete cleanProperties[lngColumnName];
             // Note: symbolSizeColumnName kept in properties for styling
+
+            // Add a unique feature ID for highlighting
+            // Use index and coordinates as a unique identifier
+            const coordinates =
+              geometry.type === "Point" ? geometry.coordinates : [];
+            const featureId = `feature_${index}_${JSON.stringify(coordinates)}`;
+            cleanProperties._featureId = featureId;
 
             const feature: GeoJSON.Feature = {
               type: "Feature",
@@ -389,6 +340,24 @@ export function useSelectedMapDataSource({
           map.on("mouseenter", GEOJSON_LAYER_ID, handleMouseEnter);
           map.on("mouseleave", GEOJSON_LAYER_ID, handleMouseLeave);
 
+          // Add highlight layer (initially hidden)
+          // This layer shows the selected feature with a thick yellow border
+          if (!map.getLayer(HIGHLIGHT_LAYER_ID)) {
+            map.addLayer({
+              id: HIGHLIGHT_LAYER_ID,
+              type: "circle",
+              source: GEOJSON_SOURCE_ID,
+              paint: {
+                "circle-radius": circleRadius, // Same radius as base layer
+                "circle-color": circleColor, // Same color as base layer
+                "circle-opacity": 0.8, // Same opacity as base layer
+                "circle-stroke-width": 5, // Thick yellow border
+                "circle-stroke-color": "#ffd700", // Yellow highlight border
+              },
+              filter: ["==", "_featureId", ""], // Initially filter out all features
+            });
+          }
+
           // Recenter map to fit the data bounds
           map.fitBounds(featureBounds, {
             padding: { top: 50, bottom: 50, left: 50, right: 50 },
@@ -469,6 +438,24 @@ export function useSelectedMapDataSource({
               "circle-stroke-color": "#ffffff",
             },
           });
+
+          // Add highlight layer (initially hidden)
+          // This layer shows the selected feature with a thick yellow border
+          if (!map.getLayer(HIGHLIGHT_LAYER_ID)) {
+            map.addLayer({
+              id: HIGHLIGHT_LAYER_ID,
+              type: "circle",
+              source: GEOJSON_SOURCE_ID,
+              paint: {
+                "circle-radius": circleRadius, // Same radius as base layer
+                "circle-color": circleColor, // Same color as base layer
+                "circle-opacity": 0.8, // Same opacity as base layer
+                "circle-stroke-width": 5, // Thick yellow border
+                "circle-stroke-color": "#ffd700", // Yellow highlight border
+              },
+              filter: ["==", "_featureId", ""], // Initially filter out all features
+            });
+          }
         }
       }
     };
@@ -490,13 +477,10 @@ export function useSelectedMapDataSource({
           map.off("mouseleave", GEOJSON_LAYER_ID, handleMouseLeave);
           map.off("style.load", handleStyleData);
 
-          // Remove popup if it exists
-          if (popupRef.current) {
-            popupRef.current.remove();
-            popupRef.current = null;
+          // Cleanup: remove layers and source
+          if (map.getLayer(HIGHLIGHT_LAYER_ID)) {
+            map.removeLayer(HIGHLIGHT_LAYER_ID);
           }
-
-          // Cleanup: remove layer and source
           if (map.getLayer(GEOJSON_LAYER_ID)) {
             map.removeLayer(GEOJSON_LAYER_ID);
           }
@@ -525,6 +509,49 @@ export function useSelectedMapDataSource({
     longitudeColumn?.baseColumn.id,
     symbolSizeColumn?.baseColumn.id,
     symbolColor,
+    selectedFeature,
+    onFeatureClick,
     /* eslint-enable react-hooks/exhaustive-deps */
   ]);
+
+  // Separate effect to handle feature highlighting
+  useEffect(() => {
+    if (!map || !map.getSource(GEOJSON_SOURCE_ID)) {
+      return;
+    }
+
+    const updateHighlight = () => {
+      if (!map.getLayer(HIGHLIGHT_LAYER_ID)) {
+        return;
+      }
+
+      if (selectedFeature?.properties?._featureId) {
+        // Show the selected feature
+        const featureId = selectedFeature.properties._featureId as string;
+        map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "_featureId", featureId]);
+      } else {
+        // Hide all features (filter out everything)
+        map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "_featureId", ""]);
+      }
+    };
+
+    // Wait for map to be ready
+    if (map.loaded()) {
+      updateHighlight();
+    } else {
+      map.once("load", updateHighlight);
+    }
+
+    return () => {
+      // Cleanup: remove highlight when component unmounts or feature changes
+      try {
+        if (map.getLayer(HIGHLIGHT_LAYER_ID)) {
+          map.setFilter(HIGHLIGHT_LAYER_ID, ["==", "_featureId", ""]);
+        }
+      } catch (error) {
+        // Ignore errors during cleanup
+        console.warn("Error cleaning up highlight:", error);
+      }
+    };
+  }, [map, selectedFeature]);
 }
