@@ -1251,7 +1251,7 @@ Returns true if the first geometry is within the second
 BOOLEAN ST_WithinProperly (geom1 GEOMETRY, geom2 GEOMETRY)
 \`\`\`
 
-Returns true if the first geometry \"properly\" is contained by the second geometry
+Returns true if the first geometry "properly" is contained by the second geometry
 
 ### ST_X
 

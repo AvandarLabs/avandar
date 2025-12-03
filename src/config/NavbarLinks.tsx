@@ -7,17 +7,22 @@ import {
   IconTable,
 } from "@tabler/icons-react";
 import { ReactNode } from "react";
+import { User } from "@/models/User/User.types";
+import { WorkspaceWithSubscription } from "@/models/Workspace/Workspace.types";
 import { AppLink, AppLinkKey, AppLinks } from "./AppLinks";
-import { FeatureFlag } from "./FeatureFlagConfig";
+import { FeatureFlag, isFlagEnabled } from "./FeatureFlagConfig";
 
 export type NavbarLink = {
   link: AppLink;
   icon: ReactNode;
 
   /**
-   * The feature flag that disables this link if toggled on in the environment
-   * */
-  disableFeatureFlag?: FeatureFlag;
+   * Whether or not this link should be shown
+   */
+  isEnabled?: (options: {
+    user: User;
+    workspace: WorkspaceWithSubscription;
+  }) => boolean;
 };
 
 type NavbarLinksRecord = Partial<
@@ -55,7 +60,26 @@ export const NavbarLinks = {
     return {
       link: AppLinks.map(workspaceSlug),
       icon: <IconMap size={24} stroke={1.5} />,
-      disableFeatureFlag: FeatureFlag.DisableGeoExplorer,
+      isEnabled: ({ user, workspace }) => {
+        const isGloballyDisabled = isFlagEnabled(
+          FeatureFlag.DisableGeoExplorer,
+        );
+        if (isGloballyDisabled) {
+          return false;
+        }
+
+        if (!workspace.subscription) {
+          return false;
+        }
+
+        if (workspace.subscription?.featurePlanType === "free") {
+          // if on free plan, only enable for Avandar employees
+          return user.email.endsWith("@avandarlabs.com");
+        }
+
+        // otherwise, enable for all users
+        return true;
+      },
     };
   },
   entityDesignerHome: (workspaceSlug: string) => {

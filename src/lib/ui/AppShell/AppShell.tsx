@@ -38,8 +38,8 @@ import { AuthClient } from "@/clients/AuthClient";
 import { BetaBadge } from "@/components/common/BetaBadge";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLink, AppLinks } from "@/config/AppLinks";
-import { isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { NavbarLink } from "@/config/NavbarLinks";
+import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { useToggleBoolean } from "@/lib/hooks/state/useToggleBoolean";
@@ -47,7 +47,7 @@ import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
 import { AvaTooltip } from "@/lib/ui/AvaTooltip";
 import { Link } from "@/lib/ui/links/Link";
 import { Modal } from "@/lib/ui/Modal";
-import { Workspace } from "@/models/Workspace/Workspace.types";
+import { WorkspaceWithSubscription } from "@/models/Workspace/Workspace.types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 import { CreateWorkspaceForm } from "../../../components/common/forms/CreateWorkspaceForm";
 import css from "./AppShell.module.css";
@@ -79,7 +79,7 @@ type Props = {
    * The main content of the app shell.
    * Defaults to `<Outlet />` so it can be used in a router.
    */
-  currentWorkspace?: Workspace;
+  currentWorkspace?: WorkspaceWithSubscription;
 };
 
 /**
@@ -103,6 +103,7 @@ export function AppShell({
   const router = useRouter();
   const [opened, open, close] = useBoolean(false);
   const navigate = useNavigate();
+  const user = useCurrentUser();
   const [userWorkspaces] = WorkspaceClient.useGetWorkspacesOfCurrentUser({
     useQueryOptions: { staleTime: Infinity },
   });
@@ -325,8 +326,12 @@ export function AppShell({
           </Group>
           <Stack gap="xs" justify="space-between" h="100%">
             <Stack flex={1} gap={0}>
-              {navbarLinks.map(({ link, icon, disableFeatureFlag }) => {
-                if (disableFeatureFlag && isFlagEnabled(disableFeatureFlag)) {
+              {navbarLinks.map(({ link, icon, isEnabled }) => {
+                if (
+                  !user ||
+                  !currentWorkspace ||
+                  isEnabled?.({ user, workspace: currentWorkspace })
+                ) {
                   return null;
                 }
 
