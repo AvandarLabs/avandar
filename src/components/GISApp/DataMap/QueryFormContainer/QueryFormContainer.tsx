@@ -38,6 +38,7 @@ export function QueryFormContainer({
         onDismiss={close}
         position="bottom-start"
         offset={8}
+        withinPortal={false}
         transitionProps={{
           transition: "pop-top-left",
           duration: 200,

@@ -341,12 +341,15 @@ export function useSelectedMapDataSource({
           console.log("Map layer added successfully");
         };
 
-        // If map is already loaded, add source/layer immediately
+        // Check if map is loaded AFTER async operations complete
+        // The map might have loaded while we were doing async work
         if (map.loaded()) {
+          console.log("trying to add map layer");
           addSourceAndLayer();
         } else {
           // Otherwise wait for map to load
-          map.once("load", addSourceAndLayer);
+          console.log("waiting to add map layer");
+          map.on("load", addSourceAndLayer);
         }
       } catch (error) {
         console.error("Error loading selected data source:", error);
@@ -381,6 +384,7 @@ export function useSelectedMapDataSource({
 
     return () => {
       try {
+        console.log("doing the cleanup");
         // Cleanup: remove event listeners
         map.off("click", GEOJSON_LAYER_ID, handleClick);
         map.off("mouseenter", GEOJSON_LAYER_ID, handleMouseEnter);
@@ -408,5 +412,15 @@ export function useSelectedMapDataSource({
         );
       }
     };
-  }, [map, mapViewState, selectedDataSource, latitudeColumn, longitudeColumn]);
+    // we disable exhaustive deps because we want to be more specific on
+    // when to trigger a map re-load
+    /* eslint-disable react-hooks/exhaustive-deps */
+  }, [
+    map,
+    mapViewState,
+    selectedDataSource?.id,
+    latitudeColumn?.baseColumn.id,
+    longitudeColumn?.baseColumn.id,
+    /* eslint-enable react-hooks/exhaustive-deps */
+  ]);
 }
