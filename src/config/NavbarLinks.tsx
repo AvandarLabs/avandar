@@ -10,7 +10,6 @@ import { ReactNode } from "react";
 import { User } from "@/models/User/User.types";
 import { WorkspaceWithSubscription } from "@/models/Workspace/Workspace.types";
 import { AppLink, AppLinkKey, AppLinks } from "./AppLinks";
-import { FeatureFlag, isFlagEnabled } from "./FeatureFlagConfig";
 
 export type NavbarLink = {
   link: AppLink;
@@ -60,26 +59,6 @@ export const NavbarLinks = {
     return {
       link: AppLinks.map(workspaceSlug),
       icon: <IconMap size={24} stroke={1.5} />,
-      isEnabled: ({ user, workspace }) => {
-        const isGloballyDisabled = isFlagEnabled(
-          FeatureFlag.DisableGeoExplorer,
-        );
-        if (isGloballyDisabled) {
-          return false;
-        }
-
-        if (!workspace.subscription) {
-          return false;
-        }
-
-        if (workspace.subscription?.featurePlanType === "free") {
-          // if on free plan, only enable for Avandar employees
-          return user.email.endsWith("@avandarlabs.com");
-        }
-
-        // otherwise, enable for all users
-        return true;
-      },
     };
   },
   entityDesignerHome: (workspaceSlug: string) => {
