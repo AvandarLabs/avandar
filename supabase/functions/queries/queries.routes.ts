@@ -36,10 +36,19 @@ export const Routes = defineRoutes<QueriesAPI>("queries", {
           .eq("workspace_id", workspaceId)
           .throwOnError();
 
+        console.log("datasets", datasets);
+
         // Get dataset columns for schema context
         const { data: columns } = await supabaseClient
           .from("dataset_columns")
           .select("dataset_id, name, data_type")
+          .eq("workspace_id", workspaceId)
+          .in(
+            "dataset_id",
+            datasets.map((d) => {
+              return d.id;
+            }),
+          )
           .throwOnError();
 
         const isSpatialPrompt = prompt
