@@ -1,5 +1,26 @@
 # Avandar
 
+[Avandar](https://www.avandarlabs.com/) is the data management platform for the
+social sector. We provide a suite of tools for mission-driven organizations to
+unify their data, programs, and reporting in one streamlined platform.
+
+Whether it's data cleanup, visualization, analytics, or reporting, Avandar's
+goal is to be the go-to platform that the social sector can rely on to solve
+any data-related problem.
+
+Anyone can sign up for Avandar, but the platform is optimized for
+resource-constrained teams that have too much data to manage comfortably
+in spreadsheets, but too little data to make the expense and complexity of
+Big Data software worth it. This is far from a niche data scale and is actually
+where 80% of organizations in the social sector fit. Avandar is built to fill
+that gap.
+
+If you have questions, comments, bug reports, or feature requests, join our
+Discord server and we'll help you! Discord link: <https://discord.gg/8u8FHAbuw7>
+
+The platform is still in beta so your feedback is vital to helping shape
+the product into something that truly serves your mission.
+
 ## Local development
 
 ### Prerequisites
