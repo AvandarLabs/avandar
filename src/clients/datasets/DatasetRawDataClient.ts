@@ -101,6 +101,14 @@ type DatasetRawDataClientQueries = {
   }) => Promise<boolean>;
 
   /**
+   * Loads a dataset into memory (DuckDB). If the dataset is already in memory,
+   * this is a no-op.
+   *
+   * @param params The {@link DatasetId} to load.
+   */
+  loadLocalDataset: (params: { datasetId: DatasetId }) => Promise<void>;
+
+  /**
    * Runs a raw DuckDB query against the user's locally loaded raw data.
    * If the datasets specified in `dependencies` have not been loaded locally
    * yet, then this will throw an error.
@@ -238,6 +246,13 @@ function createDatasetRawDataClient(): WithLogger<
           id: datasetId,
         });
         return !!localDataset;
+      },
+
+      loadLocalDataset: async (params: { datasetId: DatasetId }) => {
+        const logger = baseLogger.appendName("loadLocalDataset");
+        logger.log("Loading dataset to memory", params);
+        const { datasetId } = params;
+        await _loadDatasetsToMemory([datasetId]);
       },
 
       runLocalRawQuery: async <T extends UnknownRow = UnknownRow>(

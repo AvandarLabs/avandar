@@ -1,8 +1,7 @@
 import { ActionIcon, Flex, Popover, Stack } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import { IconFilter } from "@tabler/icons-react";
-import { useState } from "react";
-import { QueryColumnMultiSelect } from "@/components/DataExplorerApp/QueryColumnMultiSelect";
+import { QueryColumnSingleSelect } from "@/components/DataExplorerApp/QueryColumnSingleSelect";
 import { QueryDataSourceSelect } from "@/components/DataExplorerApp/QueryDataSourceSelect";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { AvaTooltip } from "@/lib/ui/AvaTooltip";
@@ -11,17 +10,25 @@ import { Models } from "@/models/Model/Models";
 import { QueryColumn } from "@/models/queries/QueryColumn";
 import { QueryDataSource } from "@/models/queries/QueryDataSource";
 
-export function QueryFormContainer(): JSX.Element {
+type Props = {
+  selectedDataSource?: QueryDataSource;
+  onSelectedDataSourceChange: (dataSource: QueryDataSource | undefined) => void;
+  latitudeColumn?: QueryColumn;
+  onLatitudeColumnChange: (column: QueryColumn | undefined) => void;
+  longitudeColumn?: QueryColumn;
+  onLongitudeColumnChange: (column: QueryColumn | undefined) => void;
+};
+
+export function QueryFormContainer({
+  selectedDataSource,
+  onSelectedDataSourceChange,
+  latitudeColumn,
+  onLatitudeColumnChange,
+  longitudeColumn,
+  onLongitudeColumnChange,
+}: Props): JSX.Element {
   const [isPopoverOpen, , close, toggle] = useBoolean(false);
   const { hovered, ref } = useHover();
-  const [selectedDataSource, setSelectedDataSource] =
-    useState<QueryDataSource | null>(null);
-  const [latitudeColumn, setLatitudeColumn] = useState<readonly QueryColumn[]>(
-    [],
-  );
-  const [longitudeColumn, setLongitudeColumn] = useState<
-    readonly QueryColumn[]
-  >([]);
 
   return (
     <Flex ref={ref} pos="relative" align="center" mt="xs">
@@ -64,11 +71,13 @@ export function QueryFormContainer(): JSX.Element {
         <Popover.Dropdown p="xs">
           <Stack gap="md">
             <QueryDataSourceSelect
-              value={selectedDataSource}
-              onChange={setSelectedDataSource}
+              value={selectedDataSource ?? null}
+              onChange={(value) => {
+                onSelectedDataSourceChange(value ?? undefined);
+              }}
               comboboxProps={{ withinPortal: false }}
             />
-            <QueryColumnMultiSelect
+            <QueryColumnSingleSelect
               label="Latitude column"
               placeholder="Select latitude column"
               dataSourceId={
@@ -76,11 +85,13 @@ export function QueryFormContainer(): JSX.Element {
                   Models.getTypedId(selectedDataSource)
                 : undefined
               }
-              value={latitudeColumn}
-              onChange={setLatitudeColumn}
+              value={latitudeColumn ?? null}
+              onChange={(value) => {
+                onLatitudeColumnChange(value ?? undefined);
+              }}
               comboboxProps={{ withinPortal: false }}
             />
-            <QueryColumnMultiSelect
+            <QueryColumnSingleSelect
               label="Longitude column"
               placeholder="Select longitude column"
               dataSourceId={
@@ -88,8 +99,10 @@ export function QueryFormContainer(): JSX.Element {
                   Models.getTypedId(selectedDataSource)
                 : undefined
               }
-              value={longitudeColumn}
-              onChange={setLongitudeColumn}
+              value={longitudeColumn ?? null}
+              onChange={(value) => {
+                onLongitudeColumnChange(value ?? undefined);
+              }}
               comboboxProps={{ withinPortal: false }}
             />
           </Stack>

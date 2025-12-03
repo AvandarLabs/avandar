@@ -1,6 +1,6 @@
 import { useUncontrolled } from "@mantine/hooks";
 import { where } from "$/lib/utils/filters/filters";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -58,16 +58,20 @@ export function QueryDataSourceSelect({
     return [...(datasets ?? []), ...(entityConfigs ?? [])];
   }, [datasets, entityConfigs]);
 
-  useOnBecomesDefined(
-    dataSources,
-    useCallback(
-      (dsources) => {
-        const firstDataSource = dsources[0];
-        setCurrentDataSource(firstDataSource ?? null);
-      },
-      [setCurrentDataSource],
-    ),
-  );
+  useOnBecomesDefined(dataSources, (dsources) => {
+    // if the current value is contained in the datasource list, then
+    // we don't have to trigger any change
+    if (
+      dsources.some((ds) => {
+        return ds.id === currentDataSource?.id;
+      })
+    ) {
+      return;
+    }
+
+    const firstDataSource = dsources[0];
+    setCurrentDataSource(firstDataSource ?? null);
+  });
 
   const dataSourceOptions: SelectData<QueryDataSourceId> = useMemo(() => {
     const datasetBucketsByType = makeBucketMap(datasets ?? [], {
