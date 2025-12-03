@@ -33,6 +33,10 @@ export function DataMap({
   const [longitudeColumn, setLongitudeColumn] = useState<
     QueryColumn | undefined
   >(undefined);
+  const [symbolSizeColumn, setSymbolSizeColumn] = useState<
+    QueryColumn | undefined
+  >(undefined);
+  const [symbolColor, setSymbolColor] = useState<string | undefined>(undefined);
   const mapViewState = useRef<{
     latLong: [number, number];
     zoom: number;
@@ -48,6 +52,8 @@ export function DataMap({
     selectedDataSource,
     latitudeColumn,
     longitudeColumn,
+    symbolSizeColumn,
+    symbolColor,
   });
 
   useEffect(() => {
@@ -152,6 +158,10 @@ export function DataMap({
             onLatitudeColumnChange={setLatitudeColumn}
             longitudeColumn={longitudeColumn}
             onLongitudeColumnChange={setLongitudeColumn}
+            symbolSizeColumn={symbolSizeColumn}
+            onSymbolSizeColumnChange={setSymbolSizeColumn}
+            symbolColor={symbolColor}
+            onSymbolColorChange={setSymbolColor}
           />
         </Stack>
       </Box>

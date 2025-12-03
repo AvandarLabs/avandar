@@ -25,6 +25,8 @@ type UseSelectedMapDataSourceOptions = {
   selectedDataSource?: QueryDataSource;
   latitudeColumn?: QueryColumn;
   longitudeColumn?: QueryColumn;
+  symbolSizeColumn?: QueryColumn;
+  symbolColor?: string;
 };
 
 /**
@@ -39,9 +41,12 @@ export function useSelectedMapDataSource({
   selectedDataSource,
   latitudeColumn,
   longitudeColumn,
+  symbolSizeColumn,
+  symbolColor,
 }: UseSelectedMapDataSourceOptions): void {
   const dataLoadedRef = useRef(false);
   const popupRef = useRef<Popup | null>(null);
+  const previousDataSourceIdRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     if (!map) {
@@ -63,7 +68,50 @@ export function useSelectedMapDataSource({
         map.removeSource(GEOJSON_SOURCE_ID);
       }
       dataLoadedRef.current = false;
+      previousDataSourceIdRef.current = undefined;
       return;
+    }
+
+    // Track current data source ID for cleanup comparison
+    const currentDataSourceId = selectedDataSource.id;
+
+    // If only symbolSizeColumn or symbolColor changed and layer exists,
+    // update paint property
+    if (
+      dataLoadedRef.current &&
+      map.getLayer(GEOJSON_LAYER_ID) &&
+      map.getSource(GEOJSON_SOURCE_ID) &&
+      previousDataSourceIdRef.current === currentDataSourceId
+    ) {
+      const symbolSizeColumnName =
+        symbolSizeColumn ?
+          QueryColumns.getDerivedColumnName(symbolSizeColumn)
+        : undefined;
+
+      const circleRadius =
+        symbolSizeColumnName ?
+          ([
+            "coalesce",
+            [
+              "*",
+              ["+", ["to-number", ["get", symbolSizeColumnName]], 1],
+              3, // 3 * (value + 1): value 1 = 6, then +3 per unit
+            ],
+            6, // Default fallback
+          ] as unknown as number)
+        : 6;
+
+      const circleColor = symbolColor ?? "#3b82f6";
+
+      try {
+        map.setPaintProperty(GEOJSON_LAYER_ID, "circle-radius", circleRadius);
+        map.setPaintProperty(GEOJSON_LAYER_ID, "circle-color", circleColor);
+        console.log("Updated circle radius and color paint properties");
+        return;
+      } catch (error) {
+        console.error("Error updating circle paint properties:", error);
+        // Fall through to reload if update fails
+      }
     }
 
     // Create popup instance for displaying feature data
@@ -149,10 +197,15 @@ export function useSelectedMapDataSource({
         const latColumnName = QueryColumns.getDerivedColumnName(latitudeColumn);
         const lngColumnName =
           QueryColumns.getDerivedColumnName(longitudeColumn);
+        const symbolSizeColumnName =
+          symbolSizeColumn ?
+            QueryColumns.getDerivedColumnName(symbolSizeColumn)
+          : undefined;
 
         console.log("Loading dataset:", datasetId);
         console.log("Lat column:", latColumnName);
         console.log("Lng column:", lngColumnName);
+        console.log("Symbol size column:", symbolSizeColumnName);
 
         // Load the dataset into memory
         await DatasetRawDataClient.loadLocalDataset({ datasetId });
@@ -217,12 +270,13 @@ export function useSelectedMapDataSource({
             }
 
             // Remove geometry and lat/lng columns from properties to avoid
-            // duplication
+            // duplication, but keep symbolSizeColumn for styling
             const cleanProperties: GeoJSON.GeoJsonProperties = {
               ...properties,
             };
             delete cleanProperties[latColumnName];
             delete cleanProperties[lngColumnName];
+            // Note: symbolSizeColumnName kept in properties for styling
 
             const feature: GeoJSON.Feature = {
               type: "Feature",
@@ -301,13 +355,29 @@ export function useSelectedMapDataSource({
           });
 
           // Add a circle layer to display the points
+          // Use data-driven styling for circle radius if symbolSizeColumn set
+          const circleRadius =
+            symbolSizeColumnName ?
+              ([
+                "coalesce",
+                [
+                  "*",
+                  ["+", ["to-number", ["get", symbolSizeColumnName]], 1],
+                  3, // 3 * (value + 1): value 1 = 6, then +3 per unit
+                ],
+                6, // Default fallback
+              ] as unknown as number)
+            : 6;
+
+          const circleColor = symbolColor ?? "#3b82f6";
+
           map.addLayer({
             id: GEOJSON_LAYER_ID,
             type: "circle",
             source: GEOJSON_SOURCE_ID,
             paint: {
-              "circle-radius": 6,
-              "circle-color": "#3b82f6",
+              "circle-radius": circleRadius,
+              "circle-color": circleColor,
               "circle-opacity": 0.8,
               "circle-stroke-width": 1,
               "circle-stroke-color": "#ffffff",
@@ -341,6 +411,9 @@ export function useSelectedMapDataSource({
           console.log("Map layer added successfully");
         };
 
+        // Update the ref after data is successfully loaded
+        previousDataSourceIdRef.current = currentDataSourceId;
+
         // Check if map is loaded AFTER async operations complete
         // The map might have loaded while we were doing async work
         if (map.loaded()) {
@@ -364,13 +437,33 @@ export function useSelectedMapDataSource({
       if (dataLoadedRef.current && map.getSource(GEOJSON_SOURCE_ID)) {
         // Source already exists, just ensure layer exists
         if (!map.getLayer(GEOJSON_LAYER_ID)) {
+          const symbolSizeColumnName =
+            symbolSizeColumn ?
+              QueryColumns.getDerivedColumnName(symbolSizeColumn)
+            : undefined;
+
+          const circleRadius =
+            symbolSizeColumnName ?
+              ([
+                "coalesce",
+                [
+                  "*",
+                  ["+", ["to-number", ["get", symbolSizeColumnName]], 1],
+                  3, // 3 * (value + 1): value 1 = 6, then +3 per unit
+                ],
+                6, // Default fallback
+              ] as unknown as number)
+            : 6;
+
+          const circleColor = symbolColor ?? "#3b82f6";
+
           map.addLayer({
             id: GEOJSON_LAYER_ID,
             type: "circle",
             source: GEOJSON_SOURCE_ID,
             paint: {
-              "circle-radius": 6,
-              "circle-color": "#3b82f6",
+              "circle-radius": circleRadius,
+              "circle-color": circleColor,
               "circle-opacity": 0.8,
               "circle-stroke-width": 1,
               "circle-stroke-color": "#ffffff",
@@ -384,25 +477,34 @@ export function useSelectedMapDataSource({
 
     return () => {
       try {
-        console.log("doing the cleanup");
-        // Cleanup: remove event listeners
-        map.off("click", GEOJSON_LAYER_ID, handleClick);
-        map.off("mouseenter", GEOJSON_LAYER_ID, handleMouseEnter);
-        map.off("mouseleave", GEOJSON_LAYER_ID, handleMouseLeave);
-        map.off("style.load", handleStyleData);
+        // Only cleanup if data source changed
+        const shouldCleanup =
+          !selectedDataSource ||
+          previousDataSourceIdRef.current !== selectedDataSource?.id;
 
-        // Remove popup if it exists
-        if (popupRef.current) {
-          popupRef.current.remove();
-          popupRef.current = null;
-        }
+        if (shouldCleanup) {
+          console.log("doing the cleanup - data source changed");
+          // Cleanup: remove event listeners
+          map.off("click", GEOJSON_LAYER_ID, handleClick);
+          map.off("mouseenter", GEOJSON_LAYER_ID, handleMouseEnter);
+          map.off("mouseleave", GEOJSON_LAYER_ID, handleMouseLeave);
+          map.off("style.load", handleStyleData);
 
-        // Cleanup: remove layer and source
-        if (map.getLayer(GEOJSON_LAYER_ID)) {
-          map.removeLayer(GEOJSON_LAYER_ID);
-        }
-        if (map.getSource(GEOJSON_SOURCE_ID)) {
-          map.removeSource(GEOJSON_SOURCE_ID);
+          // Remove popup if it exists
+          if (popupRef.current) {
+            popupRef.current.remove();
+            popupRef.current = null;
+          }
+
+          // Cleanup: remove layer and source
+          if (map.getLayer(GEOJSON_LAYER_ID)) {
+            map.removeLayer(GEOJSON_LAYER_ID);
+          }
+          if (map.getSource(GEOJSON_SOURCE_ID)) {
+            map.removeSource(GEOJSON_SOURCE_ID);
+          }
+        } else {
+          console.log("skipping cleanup - data source unchanged");
         }
       } catch (error) {
         // Map style might be in transition, ignore cleanup errors
@@ -421,6 +523,8 @@ export function useSelectedMapDataSource({
     selectedDataSource?.id,
     latitudeColumn?.baseColumn.id,
     longitudeColumn?.baseColumn.id,
+    symbolSizeColumn?.baseColumn.id,
+    symbolColor,
     /* eslint-enable react-hooks/exhaustive-deps */
   ]);
 }

@@ -330,7 +330,8 @@ export function AppShell({
                 if (
                   !user ||
                   !currentWorkspace ||
-                  isEnabled?.({ user, workspace: currentWorkspace })
+                  (isEnabled &&
+                    !isEnabled?.({ user, workspace: currentWorkspace }))
                 ) {
                   return null;
                 }
