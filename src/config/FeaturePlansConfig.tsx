@@ -15,6 +15,7 @@ export const FreePlanConfig = {
     "Manage up to 5 data sources",
     "Data source manager",
     "Data explorer",
+    "Geospatial explorer",
     "Data profile designer",
   ],
   isRecommendedPlan: false,
@@ -28,8 +29,7 @@ export const BasicPlanConfig: PlanConfig = {
     "Unlimited team members for your workspace",
     "Manage up to 10 data sources, plus 5 data sources per additional team member",
     "Early access to the upcoming Dashboard product",
-    "Early access to the upcoming Map/GIS product",
-    "Early access to upcoming AI features",
+    "Unlimited AI-driven data exploration",
   ],
   isRecommendedPlan: false,
 } as const satisfies PlanConfig;
