@@ -2,7 +2,7 @@
   "name": "avandar",
   "license": "CPAL-1.0",
   "private": true,
-  "version": "0.6.3",
+  "version": "0.6.4",
   "type": "module",
   "scripts": {
     "dev": "./scripts/startAvandar.sh",
@@ -15,6 +15,7 @@
     "tsc-watch": "scripts/tsc-watch.sh",
     "db:apply-migrations": "./scripts/applyMigrations.sh",
     "db:create-user": "npm run vite-script scripts/createUserScript.ts",
+    "db:delete-user": "./scripts/db/delete-user/delete-user.sh",
     "db:gen-types": "supabase gen types typescript --local > shared/types/database.types.ts",
     "db:new-migration": "bash -c 'supabase stop && PGSSLMODE=disable supabase db diff -f \"$1\"' --",
     "db:down-migration": "./scripts/downMigration.sh",
