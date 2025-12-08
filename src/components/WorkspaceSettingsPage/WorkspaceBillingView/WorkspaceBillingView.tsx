@@ -126,7 +126,7 @@ export function WorkspaceBillingView({ hideTitle }: Props): JSX.Element {
                   planGroup={group}
                   currentSubscription={currentWorkspace.subscription}
                   currentSubscribedPlan={currentSubscribedPlan}
-                  defaultVariant="custom"
+                  defaultVariant={group.payWhatYouWantPlan ? "custom" : "free"}
                 />
               );
             })
