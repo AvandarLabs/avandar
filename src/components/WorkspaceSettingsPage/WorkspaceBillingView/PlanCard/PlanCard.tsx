@@ -151,6 +151,13 @@ export function PlanCard(props: Props): JSX.Element {
 
   const elements = {
     planSwitch: () => {
+      if (
+        planGroup.type === "free" &&
+        planGroup.payWhatYouWantPlan === undefined
+      ) {
+        return null;
+      }
+
       return match(type)
         .with("free", () => {
           if (isValidFreePlanVariant(selectedVariant)) {

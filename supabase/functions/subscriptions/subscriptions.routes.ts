@@ -22,8 +22,8 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
   },
 
   /**
-   * Returns the list of available products (plans)you can subscribe to.
-   * Right now, that's the list of all available Polar products.
+   * Returns the list of available and active products (plans) you can subscribe
+   * to. Right now, that's the list of all available Polar products.
    *
    * TODO(jpsyx): we should store this response in our Supabase db so that
    * we dont have to hit the Polar API every time, which is slower.
@@ -31,8 +31,8 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
   "/products": {
     GET: GET("/products").action(async () => {
       const polarProducts = await PolarClient.getProducts();
-      const simplifiedProducts: AvaPolarProduct[] = polarProducts.map(
-        (product) => {
+      const simplifiedProducts: AvaPolarProduct[] = polarProducts
+        .map((product) => {
           return {
             id: product.id,
             name: product.name,
@@ -78,8 +78,10 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
                 return price !== undefined;
               }),
           };
-        },
-      );
+        })
+        .filter((product) => {
+          return !product.isArchived;
+        });
       return { products: simplifiedProducts };
     }),
   },
