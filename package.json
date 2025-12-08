@@ -2,7 +2,7 @@
   "name": "avandar",
   "license": "CPAL-1.0",
   "private": true,
-  "version": "0.7.0-dev",
+  "version": "0.6.6",
   "type": "module",
   "scripts": {
     "dev": "./scripts/startAvandar.sh",
