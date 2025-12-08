@@ -7,7 +7,7 @@ create table public.dexie_dbs (
   -- Primary key
   id uuid primary key default gen_random_uuid(),
   -- User id associated with this dexie db
-  user_id uuid not null default auth.uid () references auth.users (id) on update cascade on delete no action,
+  user_id uuid not null default auth.uid () references auth.users (id) on update cascade on delete cascade,
   -- The dexie id of the database, unique per browser.
   -- The user can still manually clear their local storage, so it's possible
   -- to end up with some stale entries here.
