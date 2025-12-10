@@ -60,9 +60,11 @@ function getInitialSelectedVariant(
     return defaultVariant;
   }
   if (type === "free") {
-    return planGroup.freePlan.polarProductId === currentSubscribedPlanId ?
-        "free"
-      : "custom";
+    return (
+      planGroup.freePlan.polarProductId === currentSubscribedPlanId ? "free"
+      : planGroup.payWhatYouWantPlan ? "custom"
+      : "free"
+    );
   }
 
   return planGroup.monthlyPlan.polarProductId === currentSubscribedPlanId ?
