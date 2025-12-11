@@ -25,6 +25,7 @@ import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
 import { AuthClient } from "@/clients/AuthClient";
 import { AuthLayout } from "@/components/common/AuthLayout";
+import { AuthFooter } from "@/components/common/AuthLayout/AuthFooter";
 import { BackToLoginLink } from "@/components/common/AuthLayout/BackToLoginLink";
 import { WAITLIST_URL } from "@/config/AppConfig";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
@@ -306,6 +307,7 @@ function RegisterPage() {
     <AuthLayout
       title="Create a new account"
       subtitle="Start your journey with us"
+      footer={<AuthFooter />}
     >
       {IS_REGISTRATION_DISABLED && !IS_SIGN_UP_CODE_REQUIRED ?
         elements.disabledRegistrationNotice()

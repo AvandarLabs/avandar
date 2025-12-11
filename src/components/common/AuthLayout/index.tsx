@@ -6,9 +6,15 @@ type Props = {
   title: string;
   subtitle?: ReactNode;
   children: ReactNode;
+  footer?: ReactNode;
 };
 
-export function AuthLayout({ title, subtitle, children }: Props): JSX.Element {
+export function AuthLayout({
+  title,
+  subtitle,
+  children,
+  footer,
+}: Props): JSX.Element {
   return (
     <Container size={512} py="xxl">
       <Stack>
@@ -23,6 +29,8 @@ export function AuthLayout({ title, subtitle, children }: Props): JSX.Element {
         : null}
 
         <Paper>{children}</Paper>
+
+        {footer ? footer : null}
       </Stack>
     </Container>
   );
