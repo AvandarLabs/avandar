@@ -10,6 +10,7 @@ import {
 import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
 import { AuthLayout } from "@/components/common/AuthLayout";
+import { AuthFooter } from "@/components/common/AuthLayout/AuthFooter";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { Link } from "@/lib/ui/links/Link";
 
@@ -78,6 +79,7 @@ function SignInPage() {
           <Link to="/register">Create account</Link>
         </>
       }
+      footer={<AuthFooter />}
     >
       <form onSubmit={onFormSubmit}>
         <Stack>
