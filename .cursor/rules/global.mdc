@@ -4,6 +4,8 @@ globs:
 alwaysApply: true
 ---
 
+# Global Rules
+
 ## Codebase information
 
 Directories:
@@ -35,8 +37,8 @@ Libraries:
 - Use the library versions referenced in this document. Do not look up
   documentation from older versions.
 - If an external library import shares a name with one of our files in our local
-  library in `src/lib/**`, import our local version instead of the external library.
-  For example:
+  library in `src/lib/**`, import our local version instead of the external
+  library. For example:
   - Import `useQuery` from `@/lib/hooks/query/useQuery`.
   - Import `Link` components from `@/lib/ui/links/`.
   - Import utility functions from `@/lib/utils/`.
@@ -58,7 +60,11 @@ Libraries:
 ## General Code Style & Formatting
 
 - Always declare the types of each variable, function, parameters, and return
-  values.
+  values that are at the top level of a file or at a module boundary.
+  - Local variables within a function do not need type declarations.
+  - A nested function (e.g. an arrow function inside another function) does not
+    need to have its parameters or return types annotated.
+    declarations.
 - Use JSDoc to document public classes and methods.
 - Use functional and declarative programming patterns. Avoid classes.
 - Use higher-order functions (map, filter, reduce) to simplify logic.
@@ -91,14 +97,18 @@ Libraries:
   objects representing modules, namespaces, or static singletons.
 - Use camelCase for variables, functions, and methods.
 - Use UPPERCASE for environment variables or hard-coded constants.
-- Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
+- Use descriptive variable names with auxiliary verbs (e.g., isLoading,
+  hasError).
 - Event handlers should be prefixed with `on` (E.g. Good: `onSubmit`) instead of
   `handle` (e.g. Bad: `handleSubmit`).
-- Avoid abbreviated names, such as `val`, use the full word `value`. Only exception
-  is when it would collide with another variable name in the same scope.
+- Avoid abbreviated names, such as `val`, use the full word `value`. Only
+  exception is when it would collide with another variable name in the same
+  scope.
 - Avoid vague names like `next`, `prev`, or `n`, that don't say what the
-  variable actually actually holds. Always include a noun, such as `nextPage`, `prevRow`
-  or `numPeople`.
+  variable actually actually holds. Always include a noun, such as `nextPage`,
+  `prevRow` or `numPeople`.
+- Always name a React component's props just `Props`. Do not name props after
+  the component, such as `MyComponentProps`.
 
 ## File, Directory, and Module Conventions
 
@@ -138,7 +148,11 @@ Libraries:
 - Use `undefined` instead of `null` except when an API requires `null`.
   For example: JSON in HTTP requests; returning `null` in React to skip render.
 - Use RO-RO (Receive Object, Return Object) for passing and returning multiple
-  parameters.
+  parameters (only when there is more than one parameter).
+  - If there is only one parameter, accept it directly without wrapping it in
+    an object.
+  - If you do wrap multiple parameters in an object, default to naming the
+    argument as `options`.
 - Top-level functions should always use the `function` keyword. Nested functions
   (inside a function or as an object parameter) should always be arrow functions.
 - Never use instantly-applied anonymous functions to assign a value to a
@@ -175,8 +189,11 @@ Libraries:
   a traditional OOP `interface` to be implemented by a class.
 - Use string literal unions instead of enums.
 - Avoid excessive use of primitive types; encapsulate data in composite types.
-- Prefer immutability for data:
-  - Use `readonly` for immutable properties.
+- Use local mutability and global immutability.
+  - Local variables can be mutable. However, any data that crosses module
+    boundaries (e.g. React props) should be immutable.
+  - For cross-module immutability: use `readonly` for arrays, `Readonly<>` for
+    objects, `ReadonlySet` for sets, and `ReadonlyMap` for maps.
   - Use `as const` for literals that never change.
 
 ## React Code Style
