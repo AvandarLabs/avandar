@@ -1,0 +1,1 @@
+export { isPascalCase } from "./isPascalCase";

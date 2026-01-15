@@ -1,5 +1,5 @@
 import { Acclimate } from "@avandar/acclimate";
-import { DevCLI } from "./dev-cli/DevCLI";
+import { DevCLI } from "./DevCLI";
 
 const cli = Acclimate.createCLI("test")
   .addCommand("dev", DevCLI)

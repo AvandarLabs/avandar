@@ -1,4 +1,1 @@
-export type {
-  Dashboard,
-  DashboardId,
-} from "./Dashboard.types";
+export type { Dashboard, DashboardId } from "./Dashboard.types";

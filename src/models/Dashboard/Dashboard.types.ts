@@ -1,4 +1,4 @@
-import { VersionedModel } from "../Model/Model.types";
+import { VersionedModel } from "@/models/Model";
 
 type ModelType = "Dashboard";
 
