@@ -8,6 +8,7 @@ import {
   Title,
 } from "@mantine/core";
 import { IconLayoutDashboard, IconPlus } from "@tabler/icons-react";
+import { useNavigate } from "@tanstack/react-router";
 import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
 import { Paper } from "@/lib/ui/Paper";
 import { Dashboard } from "@/models/Dashboard";
@@ -15,9 +16,14 @@ import { DashboardCard } from "./DashboardCard";
 
 type Props = {
   dashboards: Dashboard[];
+  workspaceSlug: string;
 };
 
-export function DashboardListView({ dashboards }: Props): JSX.Element {
+export function DashboardListView({
+  dashboards,
+  workspaceSlug,
+}: Props): JSX.Element {
+  const navigate = useNavigate();
   const isEmpty = dashboards.length === 0;
 
   const onCreateDashboard = () => {
@@ -78,7 +84,13 @@ export function DashboardListView({ dashboards }: Props): JSX.Element {
       <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
         {dashboards.map((dashboard) => {
           const onCardClick = () => {
-            notifyDevAlert("Dashboard clicked", dashboard.id);
+            navigate({
+              to: "/$workspaceSlug/dashboards/$dashboardId",
+              params: {
+                workspaceSlug,
+                dashboardId: dashboard.id as unknown as string,
+              },
+            });
           };
 
           return (
