@@ -9,9 +9,14 @@ import {
 } from "@mantine/core";
 import { IconLayoutDashboard, IconPlus } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
+import { DashboardClient } from "@/clients/dashboards/DashboardClient";
+import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
 import { Paper } from "@/lib/ui/Paper";
 import { Dashboard } from "@/models/Dashboard";
+import { DashboardConfigs } from "@/models/Dashboard/DashboardConfig/DashboardConfigs";
+import { Models } from "@/models/Model";
 import { DashboardCard } from "./DashboardCard";
 
 type Props = {
@@ -24,10 +29,46 @@ export function DashboardListView({
   workspaceSlug,
 }: Props): JSX.Element {
   const navigate = useNavigate();
+  const workspace = useCurrentWorkspace();
+  const [userProfile, isLoadingUserProfile] = useCurrentUserProfile();
+
+  const [insertDashboard, isInsertDashboardPending] = DashboardClient.useInsert(
+    {
+      onSuccess: (createdDashboard) => {
+        navigate({
+          to: "/$workspaceSlug/dashboards/$dashboardId",
+          params: {
+            workspaceSlug,
+            dashboardId: createdDashboard.id,
+          },
+        });
+      },
+    },
+  );
+
   const isEmpty = dashboards.length === 0;
 
   const onCreateDashboard = () => {
-    notifyDevAlert("Create dashboard clicked");
+    if (!userProfile) {
+      notifyDevAlert("User profile not loaded yet");
+      return;
+    }
+
+    const now = new Date();
+    insertDashboard({
+      data: Models.make("Dashboard", {
+        workspaceId: workspace.id,
+        ownerId: userProfile.userId,
+        ownerProfileId: userProfile.profileId,
+        name: "Untitled dashboard",
+        description: undefined,
+        slug: undefined,
+        isPublic: false,
+        config: DashboardConfigs.makeEmpty(),
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
+      }),
+    });
   };
 
   if (isEmpty) {
@@ -51,6 +92,8 @@ export function DashboardListView({
             leftSection={<IconPlus size={18} />}
             onClick={onCreateDashboard}
             size="md"
+            loading={isInsertDashboardPending}
+            disabled={isLoadingUserProfile}
           >
             Create a dashboard
           </Button>
@@ -76,6 +119,8 @@ export function DashboardListView({
           onClick={onCreateDashboard}
           size="md"
           variant="light"
+          loading={isInsertDashboardPending}
+          disabled={isLoadingUserProfile}
         >
           Create a dashboard
         </Button>
