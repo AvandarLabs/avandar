@@ -106,6 +106,16 @@ export const AppLinks = {
     };
   },
 
+  // Dashboards links
+  dashboards: (workspaceSlug: string) => {
+    return {
+      key: "dashboards",
+      to: "/$workspaceSlug/dashboards",
+      params: { workspaceSlug },
+      label: "Dashboards",
+    };
+  },
+
   // Map links
   map: (workspaceSlug: string) => {
     return {

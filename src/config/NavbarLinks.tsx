@@ -2,6 +2,7 @@ import {
   IconBlocks,
   IconDatabase,
   IconHome,
+  IconLayoutDashboard,
   IconMap,
   IconSettings,
   IconTable,
@@ -53,6 +54,12 @@ export const NavbarLinks = {
     return {
       link: AppLinks.dataExplorer(workspaceSlug),
       icon: <IconTable size={24} stroke={1.5} />,
+    };
+  },
+  dashboards: (workspaceSlug: string) => {
+    return {
+      link: AppLinks.dashboards(workspaceSlug),
+      icon: <IconLayoutDashboard size={24} stroke={1.5} />,
     };
   },
   map: (workspaceSlug: string) => {

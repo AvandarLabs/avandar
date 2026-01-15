@@ -45,6 +45,7 @@ export function WorkspaceAppLayout({
       NavbarLinks.workspaceHome(workspace.slug),
       NavbarLinks.dataManagerHome(workspace.slug),
       NavbarLinks.dataExplorer(workspace.slug),
+      NavbarLinks.dashboards(workspace.slug),
       NavbarLinks.map(workspace.slug),
       NavbarLinks.entityDesignerHome(workspace.slug),
       ...entityManagerLinks,
