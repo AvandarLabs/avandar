@@ -12,7 +12,7 @@
     "dev:email": "dotenv -e .env.development -- email dev --dir shared/emails",
     "test": "vitest",
     "build": "tsc -b && vite build",
-    "build:ava-cli": "npm run -w @avandar/ava-cli build",
+    "build:ava-cli": "npm run -w @avandar/ava-cli build && npm link -w @avandar/ava-cli",
     "lint": "eslint .",
     "type-check": "tsc -b --noEmit",
     "preview": "vite preview",
@@ -94,7 +94,7 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
-    "@avandar/acclimate": "^0.1.1",
+    "@avandar/acclimate": "^0.1.5",
     "@eslint/js": "^9.21.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.4.1",
     "@nabla/vite-plugin-eslint": "^2.0.5",

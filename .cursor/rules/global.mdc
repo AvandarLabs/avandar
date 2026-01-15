@@ -109,6 +109,9 @@ Libraries:
   `prevRow` or `numPeople`.
 - Always name a React component's props just `Props`. Do not name props after
   the component, such as `MyComponentProps`.
+- If a variable contains an acronym, either keep the acronym fully lower-cased
+  or fully upper-cased. This is bad: `myHtml`, `HtmlClass`. This is good:
+  `myHTML`, `HTMLClass`, `htmlString`.
 
 ## File, Directory, and Module Conventions
 
@@ -153,6 +156,29 @@ Libraries:
     an object.
   - If you do wrap multiple parameters in an object, default to naming the
     argument as `options`.
+  - If you use an object, use an inline type annotation. Only extract the object
+    into a named type if it will be reused.
+
+    Examples:
+
+    ```ts
+    // Only a single argument, so we do not wrap in an object:
+    function foo(singleArg: string): void {}
+
+    // Type annotation for argument is inline
+    function bar(options: { name: string; age: number }): void {}
+
+    // Type annotation is extracted a named type alias, because the object
+    // is re-used
+    type Person = {
+      name: string;
+      title: string;
+    };
+
+    function doSomething(options: Person): void {}
+    function doSomethingElse(options: Person): void {}
+    ```
+
 - Top-level functions should always use the `function` keyword. Nested functions
   (inside a function or as an object parameter) should always be arrow functions.
 - Never use instantly-applied anonymous functions to assign a value to a
@@ -189,12 +215,12 @@ Libraries:
   a traditional OOP `interface` to be implemented by a class.
 - Use string literal unions instead of enums.
 - Avoid excessive use of primitive types; encapsulate data in composite types.
-- Use local mutability and global immutability.
-  - Local variables can be mutable. However, any data that crosses module
-    boundaries (e.g. React props) should be immutable.
-  - For cross-module immutability: use `readonly` for arrays, `Readonly<>` for
-    objects, `ReadonlySet` for sets, and `ReadonlyMap` for maps.
-  - Use `as const` for literals that never change.
+- Use mutable types by default. Use immutable types for:
+  - Data that crosses module boundaries (e.g. React props)
+  - Parameters in exported functions
+- To make a type immutable: use `readonly` for arrays, `Readonly<>` for
+  objects, `ReadonlySet` for sets, and `ReadonlyMap` for maps.
+- Use `as const` for literals that never change.
 
 ## React Code Style
 

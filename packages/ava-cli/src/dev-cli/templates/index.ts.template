@@ -1,0 +1,4 @@
+export type {
+  $MODEL_NAME$,
+  $MODEL_NAME$Id,
+} from "./$MODEL_NAME$.types";
