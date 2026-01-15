@@ -7,6 +7,7 @@
     "created_at" timestamp with time zone not null default now(),
     "updated_at" timestamp with time zone not null default now(),
     "name" text not null,
+    "description" text,
     "is_public" boolean not null default false,
     "slug" text,
     "config" jsonb not null

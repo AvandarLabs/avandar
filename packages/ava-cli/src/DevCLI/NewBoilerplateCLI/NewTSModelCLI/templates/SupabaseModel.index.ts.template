@@ -1,0 +1,2 @@
+export { $MODEL_NAME$Parsers } from "./$MODEL_NAME$Parsers";
+export type { $MODEL_NAME$, $MODEL_NAME$Id } from "./$MODEL_NAME$.types";

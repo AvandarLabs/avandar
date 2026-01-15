@@ -16,14 +16,14 @@ export function newSupabaseTable({
 }>): void {
   const templateParams = {
     TABLE_NAME: tableName,
-    RESOURCE_NAME: resourceName,
+    RESOURCE_NAME: resourceName.toLowerCase(),
   };
 
   const outputFileName = `${prefix}.${tableName}.sql`;
 
   writeFileFromTemplate({
     templateDir: TEMPLATES_DIR,
-    templateFileName: "[tableName].sql.template",
+    templateFileName: "table.sql.template",
     params: templateParams,
     outputDir: dir,
     outputFileName: outputFileName,

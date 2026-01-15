@@ -7,8 +7,19 @@ import type { TemplateParams } from "./parseTemplate/parseTemplate";
 // accurate.
 const PROJECT_ROOT = path.join(process.cwd());
 
+let _prettierPromise: Promise<typeof import("prettier")> | undefined;
+
+function _getPrettier(): Promise<typeof import("prettier")> {
+  if (_prettierPromise === undefined) {
+    _prettierPromise = import("prettier");
+  }
+
+  return _prettierPromise;
+}
+
 /**
  * Writes a file from a template.
+ *
  * This will also create any parent directories for the file if they do not
  *
  * @param options - The options for writing a file from a template.
@@ -36,12 +47,14 @@ export function writeFileFromTemplate(options: {
     ...options.outputDir.split("/"),
     options.outputFileName,
   );
-  const template = readTemplateFile(templateAbsPath);
+  const template = _readTemplateFile(templateAbsPath);
   const contents = parseTemplate({ template, params: options.params });
-  writeNewFile({ filePath: outputAbsPath, contents });
+  _writeNewFile({ filePath: outputAbsPath, contents });
+
+  void _formatFileWithPrettier(outputAbsPath);
 }
 
-function readTemplateFile(templateFilePath: string): string {
+function _readTemplateFile(templateFilePath: string): string {
   if (!fs.existsSync(templateFilePath)) {
     throw new Error(`Template file not found: ${templateFilePath}`);
   }
@@ -49,11 +62,38 @@ function readTemplateFile(templateFilePath: string): string {
   return fs.readFileSync(templateFilePath, "utf8");
 }
 
-function writeNewFile(options: { filePath: string; contents: string }): void {
+function _writeNewFile(options: { filePath: string; contents: string }): void {
   if (fs.existsSync(options.filePath)) {
     throw new Error(`Refusing to overwrite existing file: ${options.filePath}`);
   }
 
   fs.mkdirSync(path.dirname(options.filePath), { recursive: true });
   fs.writeFileSync(options.filePath, options.contents, "utf8");
+}
+
+async function _formatFileWithPrettier(filePath: string): Promise<void> {
+  const prettier = await _getPrettier();
+  const fileContents = await fs.promises.readFile(filePath, "utf8");
+
+  const resolvedConfig = await prettier.resolveConfig(filePath);
+  const ignorePath = path.join(PROJECT_ROOT, ".prettierignore");
+  const fileInfo = await prettier.getFileInfo(filePath, {
+    ignorePath: fs.existsSync(ignorePath) ? ignorePath : undefined,
+  });
+
+  if (!fileInfo.inferredParser) {
+    return;
+  }
+
+  const formatted = await prettier.format(fileContents, {
+    ...resolvedConfig,
+    filepath: filePath,
+    parser: fileInfo.inferredParser,
+  });
+
+  if (formatted === fileContents) {
+    return;
+  }
+
+  await fs.promises.writeFile(filePath, formatted, "utf8");
 }

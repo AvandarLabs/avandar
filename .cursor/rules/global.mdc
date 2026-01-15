@@ -101,6 +101,18 @@ Libraries:
   hasError).
 - Event handlers should be prefixed with `on` (E.g. Good: `onSubmit`) instead of
   `handle` (e.g. Bad: `handleSubmit`).
+- Top-level helper functions that do not get exported, should be prefixed with an
+  underscore `_`
+  Example:
+
+  ```ts
+  function _doSomething(): void {}
+
+  export function exportedFunction(): void {
+    _doSomething();
+  }
+  ```
+
 - Avoid abbreviated names, such as `val`, use the full word `value`. Only
   exception is when it would collide with another variable name in the same
   scope.

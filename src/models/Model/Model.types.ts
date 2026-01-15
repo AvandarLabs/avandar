@@ -1,4 +1,3 @@
-import { UUID } from "$/lib/types/common";
 import type { DistributedPick, EmptyObject, Merge } from "type-fest";
 
 /** The internal key stored in a model object which holds its string type. */
@@ -13,7 +12,7 @@ export type VersionedModel<
   MType extends string = string,
   Version extends number = number,
   MProps extends Record<string, unknown> = EmptyObject,
-> = Merge<{ __type: MType; version: Version; id: UUID<MType> }, MProps>;
+> = Merge<{ __type: MType; version: Version }, MProps>;
 
 /** Utility type: gets the string type of a model. */
 export type ModelType<M extends Model<string>> = M[ModelTypeKey];

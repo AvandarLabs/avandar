@@ -9,57 +9,58 @@ import {
   undefinedsToNullsDeep,
 } from "@/lib/utils/objects/transformations";
 import { pipe } from "@/lib/utils/pipe";
+import { supabaseJSONSchema } from "@/lib/utils/zodHelpers";
 import { Models } from "@/models/Model";
-import { UserId, UserProfileId } from "@/models/User/User.types";
-import { WorkspaceId } from "@/models/Workspace/Workspace.types";
-import { Dataset, DatasetId, DatasetModel } from "./Dataset.types";
-import { Datasets } from "./Datasets";
+import { UserId, UserProfileId } from "../User/User.types";
+import type { Dashboard, DashboardId, DashboardModel } from "./Dashboard.types";
+import type { WorkspaceId } from "@/models/Workspace/Workspace.types";
 
 const DBReadSchema = z.object({
+  config: supabaseJSONSchema,
   created_at: z.iso.datetime({ offset: true }),
-  date_of_last_sync: z.iso.datetime({ offset: true }).nullable(),
   description: z.string().nullable(),
   id: z.uuid(),
+  is_public: z.boolean(),
   name: z.string(),
   owner_id: z.uuid(),
   owner_profile_id: z.uuid(),
-  source_type: z.enum(Datasets.SourceTypes),
+  slug: z.string().nullable(),
   updated_at: z.iso.datetime({ offset: true }),
   workspace_id: z.uuid(),
 });
 
-export const DatasetParsers = makeParserRegistry<DatasetModel>().build({
-  modelName: "Dataset",
+export const DashboardParsers = makeParserRegistry<DashboardModel>().build({
+  modelName: "Dashboard",
   DBReadSchema,
   fromDBReadToModelRead: pipe(
     camelCaseKeysDeep,
     nullsToUndefinedDeep,
-    (obj): Dataset => {
-      return Models.make("Dataset", {
+    (obj): Dashboard => {
+      return Models.make("Dashboard", {
         ...obj,
-        id: obj.id as DatasetId,
+        id: obj.id as DashboardId,
+        workspaceId: obj.workspaceId as WorkspaceId,
         ownerId: obj.ownerId as UserId,
         ownerProfileId: obj.ownerProfileId as UserProfileId,
-        workspaceId: obj.workspaceId as WorkspaceId,
       });
     },
   ),
   fromModelInsertToDBInsert: pipe(
     snakeCaseKeysDeep,
     undefinedsToNullsDeep,
-    excludeNullsExceptInProps(["date_of_last_sync", "description"]),
+    excludeNullsExceptInProps(["config", "description", "slug"]),
   ),
   fromModelUpdateToDBUpdate: pipe(
     snakeCaseKeysDeep,
     undefinedsToNullsDeep,
-    excludeNullsExceptInProps(["date_of_last_sync", "description"]),
+    excludeNullsExceptInProps(["config", "description", "slug"]),
   ),
 });
 
 /**
  * Do not remove these tests!
  */
-type CRUDTypes = DatasetModel;
+type CRUDTypes = DashboardModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

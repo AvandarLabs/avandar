@@ -14,6 +14,8 @@ create table public.dashboards (
   updated_at timestamptz not null default now(),
   -- Name of the dashboard
   name text not null,
+  -- Description of the dashboard
+  description text,
   -- Whether the dashboard is public
   is_public boolean not null default false,
   -- Optional unique slug for sharing/dashboard URLs
