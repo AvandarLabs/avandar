@@ -4,7 +4,7 @@ import type { Database } from "$/types/database.types.ts";
 
 export const SupabaseAdmin = createClient<Database>(
   Deno.env.get("SUPABASE_URL")!,
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  Deno.env.get("SB_SECRET_KEY")!,
 );
 
 export type AvaSupabaseClient = SupabaseClient<Database>;
