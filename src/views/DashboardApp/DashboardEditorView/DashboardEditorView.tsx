@@ -140,7 +140,6 @@ type RootPadding = "none" | "xs" | "sm" | "md" | "lg" | "xl";
 
 type DashboardRootLayoutProps = {
   horizontalPadding: RootPadding;
-  isPaddingDisabled: boolean;
   verticalPadding: RootPadding;
 };
 
@@ -243,9 +242,7 @@ function _getStringProp(options: {
 
 function _getBooleanProp(options: {
   props: unknown;
-  key:
-    | keyof DashboardRootVisibilityProps
-    | keyof Pick<DashboardRootLayoutProps, "isPaddingDisabled">;
+  key: keyof DashboardRootVisibilityProps;
 }): boolean | undefined {
   if (!_isRecord(options.props)) {
     return undefined;
@@ -587,14 +584,6 @@ function _getPuckConfig(options: {
             { label: "Yes", value: true },
           ],
         },
-        isPaddingDisabled: {
-          label: "Remove page padding",
-          type: "radio",
-          options: [
-            { label: "No", value: false },
-            { label: "Yes", value: true },
-          ],
-        },
         verticalPadding: {
           label: "Vertical padding",
           type: "select",
@@ -624,7 +613,6 @@ function _getPuckConfig(options: {
         author: "",
         horizontalPadding: "md",
         isAuthorHidden: false,
-        isPaddingDisabled: false,
         isPublishedAtHidden: false,
         isSubtitleHidden: false,
         isTitleHidden: false,
@@ -642,8 +630,6 @@ function _getPuckConfig(options: {
           _getBooleanProp({ props, key: "isAuthorHidden" }) ?? false;
         const isPublishedAtHidden: boolean =
           _getBooleanProp({ props, key: "isPublishedAtHidden" }) ?? false;
-        const isPaddingDisabled: boolean =
-          _getBooleanProp({ props, key: "isPaddingDisabled" }) ?? false;
 
         const verticalPadding: RootPadding =
           _getRootPaddingProp({ props, key: "verticalPadding" }) ?? "lg";
@@ -692,8 +678,8 @@ function _getPuckConfig(options: {
           <Stack
             maw={860}
             mx="auto"
-            py={isPaddingDisabled ? 0 : _getRootPaddingValue(verticalPadding)}
-            px={isPaddingDisabled ? 0 : _getRootPaddingValue(horizontalPadding)}
+            py={_getRootPaddingValue(verticalPadding)}
+            px={_getRootPaddingValue(horizontalPadding)}
             gap="lg"
           >
             <Stack gap={6}>
@@ -724,10 +710,10 @@ function _getPuckConfig(options: {
         title: "Content",
         defaultExpanded: true,
         components: [
+          "DataViz",
           "Card",
           "CalloutBlock",
           "CodeBlock",
-          "DataViz",
           "HeadingBlock",
           "ParagraphBlock",
           "ListBlock",
@@ -1187,7 +1173,7 @@ function _getPuckConfig(options: {
         },
       },
       DataViz: {
-        label: "Visualizations / DataViz",
+        label: "DataViz",
         fields: {
           prompt: {
             label: "Prompt",

@@ -7,8 +7,8 @@ import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { StructuredQueries } from "@/models/queries/StructuredQuery/StructuredQueries";
 
 type Props = {
-  readonly rawSQL: string;
-  readonly isStale: boolean;
+  rawSQL: string;
+  isStale: boolean;
 };
 
 export function TableViz({ rawSQL, isStale }: Props): JSX.Element {
