@@ -32,12 +32,8 @@ export type DashboardConfig = VersionedModel<
   ModelType,
   1,
   {
-    createdAt: string;
-    name: string;
-    slug: string;
     id: DashboardConfigId;
     queries: Record<NLPQueryId, NLPQuery>;
     widgets: Record<DashboardWidgetId, DashboardWidget>;
-    updatedAt: string;
   }
 >;

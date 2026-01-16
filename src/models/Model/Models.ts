@@ -10,7 +10,7 @@ export type IModels = {
    */
   make: <
     MType extends string,
-    MProps extends Record<string, unknown> = EmptyObject,
+    const MProps extends Record<string, unknown> = EmptyObject,
   >(
     modelType: MType,
     modelProps: MProps,

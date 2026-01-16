@@ -31,12 +31,12 @@ export function DashboardListView({
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
   const [userProfile, isLoadingUserProfile] = useCurrentUserProfile();
-
   const [insertDashboard, isInsertDashboardPending] = DashboardClient.useInsert(
     {
+      queryToInvalidate: DashboardClient.QueryKeys.getAll(),
       onSuccess: (createdDashboard) => {
         navigate({
-          to: "/$workspaceSlug/dashboards/$dashboardId",
+          to: "/$workspaceSlug/dashboards/edit/$dashboardId",
           params: {
             workspaceSlug,
             dashboardId: createdDashboard.id,
@@ -130,10 +130,10 @@ export function DashboardListView({
         {dashboards.map((dashboard) => {
           const onCardClick = () => {
             navigate({
-              to: "/$workspaceSlug/dashboards/$dashboardId",
+              to: "/$workspaceSlug/dashboards/edit/$dashboardId",
               params: {
                 workspaceSlug,
-                dashboardId: dashboard.id as unknown as string,
+                dashboardId: dashboard.id,
               },
             });
           };
