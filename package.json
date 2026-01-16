@@ -95,7 +95,7 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
-    "@avandar/acclimate": "^0.2.1",
+    "@avandar/acclimate": "^0.2.2",
     "@eslint/js": "^9.21.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.4.1",
     "@nabla/vite-plugin-eslint": "^2.0.5",
