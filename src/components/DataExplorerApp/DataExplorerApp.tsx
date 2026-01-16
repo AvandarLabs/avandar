@@ -8,6 +8,7 @@ import {
   Stack,
 } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStore } from "./DataExplorerStore";
 import { downloadRowsAsCSV } from "./downloadRowsAsCSV";
 import { QueryForm } from "./QueryForm";
@@ -19,9 +20,11 @@ const QUERY_FORM_WIDTH = 300;
 
 export function DataExplorerApp(): JSX.Element {
   const [state] = DataExplorerStore.use();
+  const workspace = useCurrentWorkspace();
   const [queryResults, isLoadingResults] = useDataQuery({
     query: state.query,
     rawSQL: state.rawSQL,
+    workspaceId: workspace.id,
   });
   const queryResultColumns = queryResults?.columns ?? [];
   const queryResultData = queryResults?.data ?? [];

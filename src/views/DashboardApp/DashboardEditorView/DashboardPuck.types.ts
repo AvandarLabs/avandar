@@ -117,6 +117,19 @@ export type DashboardRootLayoutProps = {
   verticalPadding: RootPadding;
 };
 
+export type DashboardRootWidthUnit = "%" | "px";
+
+export type DashboardRootWidthProps = {
+  /**
+   * Root container width control. If unit is "%", we apply a percentage width
+   * (centered). If unit is "px", we apply a max-width in pixels (centered).
+   */
+  containerMaxWidth: {
+    unit: DashboardRootWidthUnit;
+    value: number;
+  };
+};
+
 export type DashboardRootVisibilityProps = {
   isAuthorHidden: boolean;
   isPublishedAtHidden: boolean;
@@ -126,6 +139,7 @@ export type DashboardRootVisibilityProps = {
 
 export type DashboardRootProps = DashboardRootTextProps &
   DashboardRootLayoutProps &
+  DashboardRootWidthProps &
   DashboardRootVisibilityProps;
 
 type DashboardPuckComponents = {

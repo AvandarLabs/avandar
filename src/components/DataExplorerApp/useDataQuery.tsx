@@ -6,7 +6,6 @@ import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { UnknownRow } from "@/clients/DuckDBClient";
 import { DuckDBQueryAggregationType } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useQuery, UseQueryResultTuple } from "@/lib/hooks/query/useQuery";
 import { isOfModelType } from "@/lib/utils/guards/guards";
 import {
@@ -25,22 +24,31 @@ import {
 } from "@/models/queries/QueryResult/QueryResult.types";
 import { QueryResults } from "@/models/queries/QueryResult/QueryResults";
 import { PartialStructuredQuery } from "@/models/queries/StructuredQuery";
+import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 
 type UseDataQueryOptions = {
   query: PartialStructuredQuery;
   rawSQL: string | undefined;
+  workspaceId: WorkspaceId | undefined;
 };
 
 /**
  * This is the main hook in the DataExplorerApp that will query the data.
  * This hook calls the appropriate clients to query the data, which in turn
  * will call the appropriate sub-systems to pull the source data.
+ *
+ * If the workspaceId is `undefined` then the query will be run as a public
+ * user.
+ *
+ * TODO(jpsyx): we should not support public querying here. That is just
+ * a stopgap. We should have a proper usePublicDataQuery hook to handle
+ * it properly.
  */
 export function useDataQuery({
   query,
   rawSQL,
+  workspaceId,
 }: UseDataQueryOptions): UseQueryResultTuple<QueryResult<UnknownRow>> {
-  const workspace = useCurrentWorkspace();
   const {
     dataSource,
     queryColumns,
@@ -51,7 +59,6 @@ export function useDataQuery({
   const sortedQueryColumns = sortObjList(queryColumns, {
     sortBy: prop("id"),
   });
-  const workspaceId = workspace.id;
 
   return useQuery({
     enabled: !!dataSource || !!rawSQL,
@@ -74,7 +81,7 @@ export function useDataQuery({
     queryFn: async (): Promise<QueryResult<UnknownRow>> => {
       if (rawSQL) {
         const allDatasets = await DatasetClient.getAll(
-          where("workspace_id", "eq", workspaceId),
+          workspaceId ? where("workspace_id", "eq", workspaceId) : undefined,
         );
         const allDatasetIds = allDatasets.map(prop("id"));
 

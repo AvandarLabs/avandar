@@ -26,6 +26,7 @@ export function TableViz({ rawSQL, isStale }: Props): JSX.Element {
   const [queryResults, isLoadingResults] = useDataQuery({
     query: StructuredQueries.makeEmpty(),
     rawSQL: storeRawSQL,
+    workspaceId: undefined,
   });
 
   const columnNames: readonly string[] = (queryResults?.columns ?? []).map(

@@ -223,16 +223,46 @@ Libraries:
 ## TypeScript Best Practices
 
 - Do not use `any`.
+- Use `as const` for literals that never change.
 - Use `type` instead of `interface`. **Only** use `interface` when it represents
   a traditional OOP `interface` to be implemented by a class.
 - Use string literal unions instead of enums.
 - Avoid excessive use of primitive types; encapsulate data in composite types.
 - Use mutable types by default. Use immutable types for:
-  - Data that crosses module boundaries (e.g. React props)
-  - Parameters in exported functions
+  - Parameters in exported functions. Example:
+
+    ```ts
+    export function foo(myArr: readonly string[]) {}
+    ```
+
+  - Data that is exported across module boundaries (e.g. React props).
+
 - To make a type immutable: use `readonly` for arrays, `Readonly<>` for
   objects, `ReadonlySet` for sets, and `ReadonlyMap` for maps.
-- Use `as const` for literals that never change.
+
+  EXCEPTION: for React props, even if the function component is exported (i.e.
+  crosses module boundaries), our convention is to only make inner props
+  immutable instead of the full object.
+
+  This is bad:
+
+  ```ts
+  type Props = Readonly<{
+    names: readonly string[]}
+  }>
+
+  type Props = {
+    readonly name: readonly string[]
+  }
+  ```
+
+  This is good:
+
+  ```ts
+  type Props = {
+    names: readonly string[];
+  };
+  ```
 
 ## React Code Style
 

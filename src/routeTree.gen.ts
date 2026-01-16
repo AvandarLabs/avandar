@@ -30,6 +30,7 @@ import { Route as AuthWorkspaceSlugEntityManagerIndexRouteImport } from "./route
 import { Route as AuthWorkspaceSlugEntityDesignerIndexRouteImport } from "./routes/_auth/$workspaceSlug/entity-designer/index";
 import { Route as AuthWorkspaceSlugDataManagerIndexRouteImport } from "./routes/_auth/$workspaceSlug/data-manager/index";
 import { Route as AuthWorkspaceSlugDashboardsIndexRouteImport } from "./routes/_auth/$workspaceSlug/dashboards/index";
+import { Route as PublicDashboardsWorkspaceSlugDashboardIdRouteImport } from "./routes/public/dashboards/$workspaceSlug/$dashboardId";
 import { Route as AuthnoWorkspaceInvitesInviteIdRouteImport } from "./routes/_auth/(no-workspace)/invites/$inviteId";
 import { Route as AuthWorkspaceSlugEntityDesignerEntityCreatorRouteImport } from "./routes/_auth/$workspaceSlug/entity-designer/entity-creator";
 import { Route as AuthWorkspaceSlugEntityDesignerEntityConfigIdRouteImport } from "./routes/_auth/$workspaceSlug/entity-designer/$entityConfigId";
@@ -154,6 +155,12 @@ const AuthWorkspaceSlugDashboardsIndexRoute =
     path: "/dashboards/",
     getParentRoute: () => AuthWorkspaceSlugRouteRoute,
   } as any);
+const PublicDashboardsWorkspaceSlugDashboardIdRoute =
+  PublicDashboardsWorkspaceSlugDashboardIdRouteImport.update({
+    id: "/public/dashboards/$workspaceSlug/$dashboardId",
+    path: "/public/dashboards/$workspaceSlug/$dashboardId",
+    getParentRoute: () => rootRouteImport,
+  } as any);
 const AuthnoWorkspaceInvitesInviteIdRoute =
   AuthnoWorkspaceInvitesInviteIdRouteImport.update({
     id: "/invites/$inviteId",
@@ -233,6 +240,7 @@ export interface FileRoutesByFullPath {
   "/$workspaceSlug/entity-designer/$entityConfigId": typeof AuthWorkspaceSlugEntityDesignerEntityConfigIdRoute;
   "/$workspaceSlug/entity-designer/entity-creator": typeof AuthWorkspaceSlugEntityDesignerEntityCreatorRoute;
   "/invites/$inviteId": typeof AuthnoWorkspaceInvitesInviteIdRoute;
+  "/public/dashboards/$workspaceSlug/$dashboardId": typeof PublicDashboardsWorkspaceSlugDashboardIdRoute;
   "/$workspaceSlug/dashboards": typeof AuthWorkspaceSlugDashboardsIndexRoute;
   "/$workspaceSlug/data-manager/": typeof AuthWorkspaceSlugDataManagerIndexRoute;
   "/$workspaceSlug/entity-designer/": typeof AuthWorkspaceSlugEntityDesignerIndexRoute;
@@ -259,6 +267,7 @@ export interface FileRoutesByTo {
   "/$workspaceSlug/entity-designer/$entityConfigId": typeof AuthWorkspaceSlugEntityDesignerEntityConfigIdRoute;
   "/$workspaceSlug/entity-designer/entity-creator": typeof AuthWorkspaceSlugEntityDesignerEntityCreatorRoute;
   "/invites/$inviteId": typeof AuthnoWorkspaceInvitesInviteIdRoute;
+  "/public/dashboards/$workspaceSlug/$dashboardId": typeof PublicDashboardsWorkspaceSlugDashboardIdRoute;
   "/$workspaceSlug/dashboards": typeof AuthWorkspaceSlugDashboardsIndexRoute;
   "/$workspaceSlug/data-manager": typeof AuthWorkspaceSlugDataManagerIndexRoute;
   "/$workspaceSlug/entity-designer": typeof AuthWorkspaceSlugEntityDesignerIndexRoute;
@@ -292,6 +301,7 @@ export interface FileRoutesById {
   "/_auth/$workspaceSlug/entity-designer/$entityConfigId": typeof AuthWorkspaceSlugEntityDesignerEntityConfigIdRoute;
   "/_auth/$workspaceSlug/entity-designer/entity-creator": typeof AuthWorkspaceSlugEntityDesignerEntityCreatorRoute;
   "/_auth/(no-workspace)/invites/$inviteId": typeof AuthnoWorkspaceInvitesInviteIdRoute;
+  "/public/dashboards/$workspaceSlug/$dashboardId": typeof PublicDashboardsWorkspaceSlugDashboardIdRoute;
   "/_auth/$workspaceSlug/dashboards/": typeof AuthWorkspaceSlugDashboardsIndexRoute;
   "/_auth/$workspaceSlug/data-manager/": typeof AuthWorkspaceSlugDataManagerIndexRoute;
   "/_auth/$workspaceSlug/entity-designer/": typeof AuthWorkspaceSlugEntityDesignerIndexRoute;
@@ -324,6 +334,7 @@ export interface FileRouteTypes {
     | "/$workspaceSlug/entity-designer/$entityConfigId"
     | "/$workspaceSlug/entity-designer/entity-creator"
     | "/invites/$inviteId"
+    | "/public/dashboards/$workspaceSlug/$dashboardId"
     | "/$workspaceSlug/dashboards"
     | "/$workspaceSlug/data-manager/"
     | "/$workspaceSlug/entity-designer/"
@@ -350,6 +361,7 @@ export interface FileRouteTypes {
     | "/$workspaceSlug/entity-designer/$entityConfigId"
     | "/$workspaceSlug/entity-designer/entity-creator"
     | "/invites/$inviteId"
+    | "/public/dashboards/$workspaceSlug/$dashboardId"
     | "/$workspaceSlug/dashboards"
     | "/$workspaceSlug/data-manager"
     | "/$workspaceSlug/entity-designer"
@@ -382,6 +394,7 @@ export interface FileRouteTypes {
     | "/_auth/$workspaceSlug/entity-designer/$entityConfigId"
     | "/_auth/$workspaceSlug/entity-designer/entity-creator"
     | "/_auth/(no-workspace)/invites/$inviteId"
+    | "/public/dashboards/$workspaceSlug/$dashboardId"
     | "/_auth/$workspaceSlug/dashboards/"
     | "/_auth/$workspaceSlug/data-manager/"
     | "/_auth/$workspaceSlug/entity-designer/"
@@ -397,6 +410,7 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute;
   SigninRoute: typeof SigninRoute;
   UpdatePasswordRoute: typeof UpdatePasswordRoute;
+  PublicDashboardsWorkspaceSlugDashboardIdRoute: typeof PublicDashboardsWorkspaceSlugDashboardIdRoute;
 }
 
 declare module "@tanstack/react-router" {
@@ -547,6 +561,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/$workspaceSlug/dashboards";
       preLoaderRoute: typeof AuthWorkspaceSlugDashboardsIndexRouteImport;
       parentRoute: typeof AuthWorkspaceSlugRouteRoute;
+    };
+    "/public/dashboards/$workspaceSlug/$dashboardId": {
+      id: "/public/dashboards/$workspaceSlug/$dashboardId";
+      path: "/public/dashboards/$workspaceSlug/$dashboardId";
+      fullPath: "/public/dashboards/$workspaceSlug/$dashboardId";
+      preLoaderRoute: typeof PublicDashboardsWorkspaceSlugDashboardIdRouteImport;
+      parentRoute: typeof rootRouteImport;
     };
     "/_auth/(no-workspace)/invites/$inviteId": {
       id: "/_auth/(no-workspace)/invites/$inviteId";
@@ -751,6 +772,8 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   SigninRoute: SigninRoute,
   UpdatePasswordRoute: UpdatePasswordRoute,
+  PublicDashboardsWorkspaceSlugDashboardIdRoute:
+    PublicDashboardsWorkspaceSlugDashboardIdRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
