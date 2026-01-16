@@ -14,164 +14,39 @@ import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
 import { Paper } from "@/lib/ui/Paper";
 import type { DashboardRead } from "@/models/Dashboard/Dashboard.types";
-import type { Config, Data as PuckData } from "@puckeditor/core";
 import "@puckeditor/core/puck.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { notifySuccess } from "@/lib/ui/notifications/notify";
+import {
+  CalloutBlockProps,
+  CodeBlockProps,
+  DashboardPuckConfig,
+  DashboardPuckData,
+  DashboardRootLayoutProps,
+  DashboardRootProps,
+  DashboardRootTextProps,
+  DashboardRootVisibilityProps,
+  EmbedBlockProps,
+  FigureBlockProps,
+  HeadingBlockProps,
+  ListBlockProps,
+  ParagraphBlockProps,
+  QuoteBlockProps,
+  RootPadding,
+  SectionProps,
+  SlotRenderer,
+  TableBlockProps,
+} from "./DashboardPuck.types";
 import { DataViz } from "./DataViz";
 import { GenerateSQLButtonField } from "./GenerateSQLButtonField";
 import { generateSQLFromPrompt } from "./generateSQLFromPrompt";
+import { SaveDashboardButton } from "./SaveDashboardButton";
 import type { DataVizProps } from "./DataViz";
 import type { ReactNode } from "react";
 
 type Props = {
   readonly dashboard: DashboardRead | undefined;
 };
-
-type SlotRenderer = (options?: unknown) => ReactNode;
-
-type HeadingBlockProps = {
-  align: "left" | "center" | "right";
-  level: 1 | 2 | 3 | 4;
-  text: string;
-};
-
-type ParagraphBlockProps = {
-  align: "left" | "center" | "right";
-  text: string;
-};
-
-type QuoteBlockProps = {
-  cite: string;
-  quote: string;
-};
-
-type DividerBlockProps = Record<string, never>;
-
-type FigureBlockProps = {
-  alt: string;
-  caption: string;
-  src: string;
-};
-
-type CalloutBlockProps = {
-  body: string;
-  title: string;
-  tone: "info" | "warning" | "neutral";
-};
-
-type ListBlockProps = {
-  items: ReadonlyArray<{ text: string }>;
-  type: "ordered" | "unordered";
-};
-
-type CodeBlockProps = {
-  code: string;
-  language: string;
-};
-
-type EmbedBlockProps = {
-  height: number;
-  title: string;
-  url: string;
-};
-
-type TableBlockProps = {
-  data: string;
-  delimiter: "comma" | "tab" | "pipe";
-  hasHeader: boolean;
-};
-
-type SectionProps = {
-  background: "none" | "subtle";
-  content: unknown;
-  maxWidth: "narrow" | "normal" | "wide" | "full";
-  padding: "sm" | "md" | "lg";
-};
-
-type ColumnsProps = {
-  collapseAt: "sm" | "md" | "lg";
-  col1: unknown;
-  col10: unknown;
-  col11: unknown;
-  col12: unknown;
-  col2: unknown;
-  col3: unknown;
-  col4: unknown;
-  col5: unknown;
-  col6: unknown;
-  col7: unknown;
-  col8: unknown;
-  col9: unknown;
-  gap: "xs" | "sm" | "md" | "lg";
-  leftSpan?: number;
-  numColumns: number;
-  rightSpan?: number;
-};
-
-type SidebarLayoutProps = {
-  collapseAt: "sm" | "md" | "lg";
-  gap: "xs" | "sm" | "md" | "lg";
-  main: unknown;
-  sidebar: unknown;
-  sidebarPosition: "left" | "right";
-  sidebarSpan: number;
-};
-
-type GridProps = {
-  gap: "xs" | "sm" | "md" | "lg";
-  numColumns: number;
-  numRows: number;
-} & Record<`r${number}c${number}`, unknown>;
-
-type CardProps = {
-  content: unknown;
-  title: string;
-};
-
-type DashboardRootTextProps = {
-  author: string;
-  publishedAt: string;
-  subtitle: string;
-  title: string;
-};
-
-type RootPadding = "none" | "xs" | "sm" | "md" | "lg" | "xl";
-
-type DashboardRootLayoutProps = {
-  horizontalPadding: RootPadding;
-  verticalPadding: RootPadding;
-};
-
-type DashboardRootVisibilityProps = {
-  isAuthorHidden: boolean;
-  isPublishedAtHidden: boolean;
-  isSubtitleHidden: boolean;
-  isTitleHidden: boolean;
-};
-
-type DashboardRootProps = DashboardRootTextProps &
-  DashboardRootLayoutProps &
-  DashboardRootVisibilityProps;
-
-type DashboardPuckData = PuckData<{
-  Card: CardProps;
-  CalloutBlock: CalloutBlockProps;
-  Columns: ColumnsProps;
-  CodeBlock: CodeBlockProps;
-  DataViz: DataVizProps;
-  DividerBlock: DividerBlockProps;
-  EmbedBlock: EmbedBlockProps;
-  FigureBlock: FigureBlockProps;
-  Grid: GridProps;
-  HeadingBlock: HeadingBlockProps;
-  ListBlock: ListBlockProps;
-  ParagraphBlock: ParagraphBlockProps;
-  QuoteBlock: QuoteBlockProps;
-  Section: SectionProps;
-  SidebarLayout: SidebarLayoutProps;
-  TableBlock: TableBlockProps;
-}>;
 
 const EMPTY_DATA: DashboardPuckData = {
   root: { props: {} },
@@ -515,24 +390,7 @@ function _getInitialPuckData(options: {
 function _getPuckConfig(options: {
   dashboardTitle: string;
   workspaceId: DashboardRead["workspaceId"] | undefined;
-}): Config<{
-  Card: CardProps;
-  CalloutBlock: CalloutBlockProps;
-  Columns: ColumnsProps;
-  CodeBlock: CodeBlockProps;
-  DataViz: DataVizProps;
-  DividerBlock: DividerBlockProps;
-  EmbedBlock: EmbedBlockProps;
-  FigureBlock: FigureBlockProps;
-  Grid: GridProps;
-  HeadingBlock: HeadingBlockProps;
-  ListBlock: ListBlockProps;
-  ParagraphBlock: ParagraphBlockProps;
-  QuoteBlock: QuoteBlockProps;
-  Section: SectionProps;
-  SidebarLayout: SidebarLayoutProps;
-  TableBlock: TableBlockProps;
-}> {
+}): DashboardPuckConfig {
   return {
     root: {
       fields: {
@@ -1728,18 +1586,18 @@ export function DashboardEditorView({ dashboard }: Props): JSX.Element {
     },
   });
 
-  const onPublish = useCallback(
-    (publishedData: DashboardPuckData): void => {
+  const onSave = useCallback(
+    (savedData: DashboardPuckData): void => {
       if (!dashboard) {
         notifyDevAlert("Dashboard is not loaded yet.");
         return;
       }
 
       const publishedTitle: string =
-        _getDashboardTitleFromPuckData(publishedData) ?? dashboardTitle;
+        _getDashboardTitleFromPuckData(savedData) ?? dashboardTitle;
 
       const publishedConfig: DashboardRead["config"] =
-        publishedData as unknown as DashboardRead["config"];
+        savedData as unknown as DashboardRead["config"];
 
       saveDashboard({
         id: dashboard.id,
@@ -1757,7 +1615,11 @@ export function DashboardEditorView({ dashboard }: Props): JSX.Element {
       config={puckConfig}
       data={data}
       onChange={setData}
-      onPublish={onPublish}
+      overrides={{
+        headerActions: () => {
+          return <SaveDashboardButton onSave={onSave} />;
+        },
+      }}
     />
   );
 }
