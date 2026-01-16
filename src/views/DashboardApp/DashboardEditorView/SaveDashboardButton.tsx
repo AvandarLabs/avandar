@@ -1,16 +1,14 @@
 import { Button } from "@mantine/core";
-import { createUsePuck } from "@puckeditor/core";
 import { IconDeviceFloppy } from "@tabler/icons-react";
-import { DashboardPuckConfig, DashboardPuckData } from "./DashboardPuck.types";
+import { DashboardPuckData } from "./DashboardPuck.types";
+import { useDashboardPuck } from "./useDashboardPuck";
 
 type Props = {
   onSave: (data: DashboardPuckData) => void;
 };
 
-const usePuck = createUsePuck<DashboardPuckConfig>();
-
 export function SaveDashboardButton({ onSave }: Props): JSX.Element {
-  const appState = usePuck((s) => {
+  const appState = useDashboardPuck((s) => {
     return s.appState;
   });
 

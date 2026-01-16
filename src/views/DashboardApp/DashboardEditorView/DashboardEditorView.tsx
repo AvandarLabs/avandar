@@ -40,6 +40,7 @@ import {
 import { DataViz } from "./DataViz";
 import { GenerateSQLButtonField } from "./GenerateSQLButtonField";
 import { generateSQLFromPrompt } from "./generateSQLFromPrompt";
+import { PublishDashboardButton } from "./PublishDashboardButton";
 import { SaveDashboardButton } from "./SaveDashboardButton";
 import type { DataVizProps } from "./DataViz";
 import type { ReactNode } from "react";
@@ -1560,6 +1561,9 @@ export function DashboardEditorView({ dashboard }: Props): JSX.Element {
 
   const lastDashboardIdRef = useRef<DashboardRead["id"] | undefined>(undefined);
 
+  // simple counter to force Puck to re-mount when the initial data changes
+  const [editorKey, setEditorKey] = useState(0);
+
   useEffect(() => {
     if (!dashboard) {
       return;
@@ -1571,6 +1575,9 @@ export function DashboardEditorView({ dashboard }: Props): JSX.Element {
 
     lastDashboardIdRef.current = dashboard.id;
     setData(_getInitialPuckData({ dashboard }));
+    setEditorKey((prevEditorKey) => {
+      return prevEditorKey + 1;
+    });
   }, [dashboard]);
 
   const puckConfig = useMemo(() => {
@@ -1612,12 +1619,21 @@ export function DashboardEditorView({ dashboard }: Props): JSX.Element {
 
   return (
     <Puck
+      key={editorKey}
       config={puckConfig}
       data={data}
       onChange={setData}
       overrides={{
         headerActions: () => {
-          return <SaveDashboardButton onSave={onSave} />;
+          return (
+            <>
+              <SaveDashboardButton onSave={onSave} />
+              <PublishDashboardButton
+                dashboardId={dashboard?.id}
+                isPublic={dashboard?.isPublic}
+              />
+            </>
+          );
         },
       }}
     />
