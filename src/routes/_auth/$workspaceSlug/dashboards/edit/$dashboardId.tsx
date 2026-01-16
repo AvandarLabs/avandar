@@ -1,4 +1,3 @@
-import { Container } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { DashboardEditorView } from "@/views/DashboardApp/DashboardEditorView";
@@ -25,9 +24,5 @@ function DashboardEditorPage(): JSX.Element {
     dashboard: DashboardRead | undefined;
   };
 
-  return (
-    <Container py="xl">
-      <DashboardEditorView dashboard={dashboard} />
-    </Container>
-  );
+  return <DashboardEditorView dashboard={dashboard} />;
 }
