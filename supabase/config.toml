@@ -89,7 +89,12 @@ port = 51634
 [storage]
 enabled = true
 # The maximum file size allowed (e.g. "5MB", "500KB").
-file_size_limit = "50MiB"
+file_size_limit = "50MB"
+
+[storage.buckets.datasets]
+public = false
+objects_path = "./buckets/datasets"
+
 
 # Image transformation API is available to Supabase Pro plan.
 # [storage.image_transformation]
@@ -309,7 +314,7 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 
 [functions.google-auth]
 enabled = true
-verify_jwt = true
+verify_jwt = false
 import_map = "./functions/google-auth/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
@@ -331,7 +336,7 @@ entrypoint = "./functions/google-auth-callback/index.ts"
 
 [functions.google-sheets]
 enabled = true
-verify_jwt = true
+verify_jwt = false
 import_map = "./functions/google-sheets/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
@@ -353,7 +358,7 @@ entrypoint = "./functions/polar-public/index.ts"
 
 [functions.subscriptions]
 enabled = true
-verify_jwt = true
+verify_jwt = false
 import_map = "./functions/subscriptions/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
@@ -375,7 +380,7 @@ entrypoint = "./functions/waitlist/index.ts"
 
 [functions.workspaces]
 enabled = true
-verify_jwt = true
+verify_jwt = false
 import_map = "./functions/workspaces/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
@@ -386,7 +391,7 @@ entrypoint = "./functions/workspaces/index.ts"
 
 [functions.queries]
 enabled = true
-verify_jwt = true
+verify_jwt = false
 import_map = "./functions/queries/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
