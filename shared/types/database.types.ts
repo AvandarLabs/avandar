@@ -213,6 +213,7 @@ export type Database = {
           has_header: boolean
           id: string
           newline_delimiter: string
+          offline_only: boolean
           quote_char: string | null
           rows_to_skip: number
           size_in_bytes: number
@@ -230,6 +231,7 @@ export type Database = {
           has_header?: boolean
           id?: string
           newline_delimiter?: string
+          offline_only?: boolean
           quote_char?: string | null
           rows_to_skip?: number
           size_in_bytes: number
@@ -247,6 +249,7 @@ export type Database = {
           has_header?: boolean
           id?: string
           newline_delimiter?: string
+          offline_only?: boolean
           quote_char?: string | null
           rows_to_skip?: number
           size_in_bytes?: number
@@ -942,6 +945,7 @@ export type Database = {
           p_escape_char: Database["public"]["CompositeTypes"]["util__nullable_text"]
           p_has_header: boolean
           p_newline_delimiter: string
+          p_offline_only: boolean
           p_quote_char: Database["public"]["CompositeTypes"]["util__nullable_text"]
           p_rows_to_skip: number
           p_size_in_bytes: number

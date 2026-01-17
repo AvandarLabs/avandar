@@ -1,5 +1,5 @@
 import { Expect, ZodSchemaEqualsTypes } from "$/lib/types/testUtilityTypes";
-import { boolean, iso, number, object, string, uuid } from "zod";
+import { z } from "zod";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import {
   camelCaseKeysDeep,
@@ -11,22 +11,23 @@ import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { DatasetId } from "../Dataset/Dataset.types";
 import { CSVFileDatasetId, CSVFileDatasetModel } from "./CSVFileDataset.types";
 
-const DBReadSchema = object({
-  created_at: iso.datetime({ offset: true }),
-  dataset_id: uuid(),
-  id: uuid(),
-  updated_at: iso.datetime({ offset: true }),
-  workspace_id: uuid(),
-  size_in_bytes: number(),
-  rows_to_skip: number(),
-  quote_char: string().nullable(),
-  escape_char: string().nullable(),
-  delimiter: string(),
-  newline_delimiter: string(),
-  comment_char: string().nullable(),
-  has_header: boolean(),
-  date_format: string().nullable(),
-  timestamp_format: string().nullable(),
+const DBReadSchema = z.object({
+  created_at: z.iso.datetime({ offset: true }),
+  dataset_id: z.uuid(),
+  id: z.uuid(),
+  updated_at: z.iso.datetime({ offset: true }),
+  workspace_id: z.uuid(),
+  offline_only: z.boolean(),
+  size_in_bytes: z.number(),
+  rows_to_skip: z.number(),
+  quote_char: z.string().nullable(),
+  escape_char: z.string().nullable(),
+  delimiter: z.string(),
+  newline_delimiter: z.string(),
+  comment_char: z.string().nullable(),
+  has_header: z.boolean(),
+  date_format: z.string().nullable(),
+  timestamp_format: z.string().nullable(),
 });
 
 export const CSVFileDatasetParsers =

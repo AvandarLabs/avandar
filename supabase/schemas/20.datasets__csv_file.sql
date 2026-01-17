@@ -13,7 +13,7 @@ create table public.datasets__csv_file (
   -- By default, all CSV datasets are sync'd with the cloud. If the user sets
   -- this to true, the dataset will be removed from cloud storage, and so the
   -- user can only access it offline.
-  offline_only boolean default false,
+  offline_only boolean not null default false,
   -- Size of the CSV in bytes
   size_in_bytes integer not null,
   -- Number of rows to skip at the start of the file

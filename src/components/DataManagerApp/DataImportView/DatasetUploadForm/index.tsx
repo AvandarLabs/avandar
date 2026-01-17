@@ -1,5 +1,12 @@
-import { Button, Group, NumberInput, Stack, TextInput } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import {
+  Button,
+  Checkbox,
+  Group,
+  NumberInput,
+  Stack,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { useNavigate } from "@tanstack/react-router";
 import { UnknownObject } from "$/lib/types/common";
 import { useMemo, useState } from "react";
@@ -9,6 +16,7 @@ import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useMutation } from "@/lib/hooks/query/useMutation";
+import { useForm } from "@/lib/hooks/ui/useForm";
 import { Callout } from "@/lib/ui/Callout";
 import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 import { Dataset } from "@/models/datasets/Dataset";
@@ -17,6 +25,7 @@ import { DetectedDatasetColumn } from "@/models/datasets/DatasetColumn";
 export type DatasetUploadFormValues = {
   name: string;
   description: string;
+  onlineStorageAllowed: boolean;
 };
 
 const { maxDatasetNameLength, maxDatasetDescriptionLength } =
@@ -94,6 +103,7 @@ export function DatasetUploadForm({
     initialValues: {
       name: defaultName,
       description: "",
+      onlineStorageAllowed: true,
     },
     validateInputOnChange: true,
     validate: {
@@ -219,6 +229,32 @@ export function DatasetUploadForm({
               </Button>
             </Group>
           }
+        />
+
+        <Checkbox
+          key={form.key("onlineStorageAllowed")}
+          label={
+            <>
+              <Text span>This dataset can be stored in the cloud. </Text>
+              {!form.getValues().onlineStorageAllowed ?
+                <Callout
+                  mt="sm"
+                  title="This dataset will be offline-only"
+                  titleSize="xl"
+                >
+                  <Text c="red.8">
+                    This dataset will no longer be stored online and can only be
+                    accessed as long as it is on your personal computer. Nobody
+                    on your team will be able to access this data. This is
+                    recommended only for very sensitive data.
+                  </Text>
+                </Callout>
+              : null}
+            </>
+          }
+          {...form.getInputProps("onlineStorageAllowed", {
+            type: "checkbox",
+          })}
         />
 
         <Button loading={isSavePending} type="submit" disabled={disableSubmit}>

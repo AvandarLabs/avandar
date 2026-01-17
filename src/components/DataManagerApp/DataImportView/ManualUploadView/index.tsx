@@ -37,6 +37,7 @@ async function saveLocalCSVToBackend(params: {
   description: string;
   columns: DetectedDatasetColumn[];
   workspaceId: WorkspaceId;
+  offlineOnly: boolean;
   loadCSVResult: DuckDBLoadCSVResult;
   sizeInBytes: number;
   rowsToSkip?: number;
@@ -46,6 +47,7 @@ async function saveLocalCSVToBackend(params: {
     name,
     datasetId,
     description,
+    offlineOnly,
     sizeInBytes,
     workspaceId,
     columns,
@@ -60,6 +62,7 @@ async function saveLocalCSVToBackend(params: {
     datasetName: name,
     datasetDescription: description,
     columns: columns.map(snakeCaseKeysShallow),
+    offlineOnly,
     sizeInBytes,
     parseOptions: {
       // use the user-defined parse options here first. Otherwise, default to
@@ -228,6 +231,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
                 workspaceId: workspace.id,
                 name: datasetFormValues.name,
                 description: datasetFormValues.description,
+                offlineOnly: !datasetFormValues.onlineStorageAllowed,
                 sizeInBytes: parseOptions.file.size,
                 rowsToSkip: parseOptions.numRowsToSkip,
                 columns: detectedColumns,

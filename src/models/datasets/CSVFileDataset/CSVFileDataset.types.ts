@@ -22,6 +22,9 @@ export type CSVFileDatasetRead = {
   /** Unique identifier of the workspace the dataset belongs to. */
   workspaceId: WorkspaceId;
 
+  /** If true, the CSV will no longer be persisted in cloud storage. */
+  offlineOnly: boolean;
+
   /** Size of the dataset in bytes. */
   sizeInBytes: number;
 

@@ -104,6 +104,7 @@ export const DatasetClient = createSupabaseCRUDClient({
         datasetName: string;
         datasetDescription: string;
         columns: DatasetColumnInput[];
+        offlineOnly: boolean;
         sizeInBytes: number;
         parseOptions: {
           rowsToSkip: number;
@@ -122,6 +123,7 @@ export const DatasetClient = createSupabaseCRUDClient({
 
         const {
           columns,
+          offlineOnly,
           sizeInBytes,
           workspaceId,
           datasetName,
@@ -137,6 +139,7 @@ export const DatasetClient = createSupabaseCRUDClient({
             p_columns: columns.map((col) => {
               return { ...col, description: col.description ?? null };
             }),
+            p_offline_only: offlineOnly,
             p_size_in_bytes: sizeInBytes,
             p_rows_to_skip: parseOptions.rowsToSkip,
             p_quote_char: {
