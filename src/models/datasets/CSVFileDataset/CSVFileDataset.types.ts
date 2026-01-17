@@ -63,7 +63,7 @@ export type CSVFileDatasetModel = SupabaseModelCRUDTypes<
   {
     tableName: "datasets__csv_file";
     modelName: "CSVFileDataset";
-    modelPrimaryKeyType: DatasetId;
+    modelPrimaryKeyType: CSVFileDatasetId;
     modelTypes: {
       Read: CSVFileDatasetRead;
       Insert: SetOptional<CSVFileDatasetRead, "createdAt" | "id" | "updatedAt">;

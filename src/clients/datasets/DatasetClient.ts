@@ -5,15 +5,21 @@ import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseC
 import { makeBucketRecord } from "@/lib/utils/objects/builders";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { ExcludeNullsIn } from "@/lib/utils/objects/transformations";
+import { matchLiteral } from "@/lib/utils/strings/matchLiteral";
+import { CSVFileDataset } from "@/models/datasets/CSVFileDataset";
 import {
   Dataset,
   DatasetId,
   DatasetParsers,
+  DatasetSourceType,
   DatasetWithColumns,
 } from "@/models/datasets/Dataset";
+import { GoogleSheetsDataset } from "@/models/datasets/GoogleSheetsDataset";
 import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { DuckDBClient } from "../DuckDBClient";
+import { CSVFileDatasetClient } from "./CSVFileDatasetClient";
 import { DatasetColumnClient } from "./DatasetColumnClient";
+import { GoogleSheetsDatasetClient } from "./GoogleSheetsDatasetClient";
 import { LocalDatasetClient } from "./LocalDatasetClient";
 
 type DatasetColumnInput = SetOptional<
@@ -32,6 +38,31 @@ export const DatasetClient = createSupabaseCRUDClient({
   parsers: DatasetParsers,
   queries: ({ clientLogger, dbClient, parsers }) => {
     return {
+      /**
+       * For a given dataset, get its source-specific dataset, e.g.
+       * if it is a CSVFileDataset, GoogleSheetsDataset, etc.
+       */
+      getSourceDataset: async (params: {
+        datasetId: DatasetId;
+        sourceType: DatasetSourceType;
+      }): Promise<CSVFileDataset | GoogleSheetsDataset | undefined> => {
+        const logger = clientLogger.appendName("getSourceDataset");
+        logger.log("Getting the source dataset", params);
+        const { datasetId, sourceType } = params;
+        return matchLiteral(sourceType, {
+          csv_file: () => {
+            return CSVFileDatasetClient.getOne(
+              where("dataset_id", "eq", datasetId),
+            );
+          },
+          google_sheets: () => {
+            return GoogleSheetsDatasetClient.getOne(
+              where("dataset_id", "eq", datasetId),
+            );
+          },
+        });
+      },
+
       getWithColumns: async (params: {
         id: DatasetId | undefined;
       }): Promise<DatasetWithColumns | undefined> => {

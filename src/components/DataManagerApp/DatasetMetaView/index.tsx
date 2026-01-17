@@ -30,7 +30,9 @@ import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { matchLiteral } from "@/lib/utils/strings/matchLiteral";
 import { AvaDataTypes } from "@/models/datasets/AvaDataType";
+import { CSVFileDataset } from "@/models/datasets/CSVFileDataset";
 import { Dataset, DatasetWithColumns } from "@/models/datasets/Dataset";
+import { GoogleSheetsDataset } from "@/models/datasets/GoogleSheetsDataset";
 import { DataSummaryView } from "./DataSummaryView";
 import { EditDatasetView } from "./EditDatasetView";
 
@@ -46,7 +48,10 @@ const EXCLUDED_DATASET_METADATA_KEYS = [
   "ownerId",
   "ownerProfileId",
   "dateOfLastSync",
-] satisfies ReadonlyArray<keyof DatasetWithColumns>;
+  "datasetId",
+] satisfies ReadonlyArray<
+  keyof DatasetWithColumns | keyof CSVFileDataset | keyof GoogleSheetsDataset
+>;
 
 const DATASET_METADATA_RENDER_OPTIONS = {
   createdAt: {
@@ -92,7 +97,11 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   const [deleteDataset, isDeletePending] = DatasetClient.useFullDelete({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
   });
-
+  const [sourceDataset, isLoadingSourceDataset] =
+    DatasetClient.useGetSourceDataset({
+      datasetId: dataset.id,
+      sourceType: dataset.sourceType,
+    });
   const [previewData, isLoadingPreviewData] =
     DatasetRawDataClient.useGetPreviewData({
       datasetId: dataset.id,
@@ -102,8 +111,12 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
     DatasetColumnClient.useGetAll(where("dataset_id", "eq", dataset.id));
 
   const datasetWithColumns = useMemo(() => {
-    return { ...dataset, columns: datasetColumns };
-  }, [dataset, datasetColumns]);
+    return {
+      ...dataset,
+      ...(!isLoadingSourceDataset && sourceDataset ? sourceDataset : {}),
+      columns: datasetColumns,
+    };
+  }, [dataset, datasetColumns, isLoadingSourceDataset, sourceDataset]);
 
   const [isEditingDataset, setIsEditingDataset] = useState<boolean>(false);
 
