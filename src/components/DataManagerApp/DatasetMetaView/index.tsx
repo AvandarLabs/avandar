@@ -40,6 +40,10 @@ type Props = {
   dataset: Dataset;
 };
 
+type DatasetWithColumnsAndSource = DatasetWithColumns & {
+  source: CSVFileDataset | GoogleSheetsDataset;
+};
+
 const EXCLUDED_DATASET_METADATA_KEYS = [
   "id",
   "name",
@@ -48,10 +52,7 @@ const EXCLUDED_DATASET_METADATA_KEYS = [
   "ownerId",
   "ownerProfileId",
   "dateOfLastSync",
-  "datasetId",
-] satisfies ReadonlyArray<
-  keyof DatasetWithColumns | keyof CSVFileDataset | keyof GoogleSheetsDataset
->;
+] satisfies ReadonlyArray<keyof DatasetWithColumnsAndSource>;
 
 const DATASET_METADATA_RENDER_OPTIONS = {
   createdAt: {
@@ -84,7 +85,10 @@ const DATASET_METADATA_RENDER_OPTIONS = {
       includeKeys: ["name", "dataType", "description"],
     },
   },
-} satisfies ObjectKeyRenderOptionsMap<DatasetWithColumns>;
+  source: {
+    excludeKeys: ["createdAt", "id", "datasetId", "updatedAt", "workspaceId"],
+  },
+} satisfies ObjectKeyRenderOptionsMap<DatasetWithColumnsAndSource>;
 
 type DatasetTabId = "dataset-metadata" | "dataset-summary";
 
@@ -110,10 +114,11 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   const [datasetColumns, isLoadingDatasetColumns] =
     DatasetColumnClient.useGetAll(where("dataset_id", "eq", dataset.id));
 
-  const datasetWithColumns = useMemo(() => {
+  const datasetWithColumnsAndSource = useMemo(() => {
     return {
       ...dataset,
-      ...(!isLoadingSourceDataset && sourceDataset ? sourceDataset : {}),
+      source:
+        !isLoadingSourceDataset && sourceDataset ? sourceDataset : undefined,
       columns: datasetColumns,
     };
   }, [dataset, datasetColumns, isLoadingSourceDataset, sourceDataset]);
@@ -217,7 +222,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                 <Text>{dataset.description}</Text>
 
                 <ObjectDescriptionList
-                  data={datasetWithColumns}
+                  data={datasetWithColumnsAndSource}
                   dateFormat="MMMM D, YYYY"
                   includeKeys={["updatedAt", "sourceType", "..."]}
                   excludeKeys={EXCLUDED_DATASET_METADATA_KEYS}
