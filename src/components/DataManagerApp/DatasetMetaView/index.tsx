@@ -1,10 +1,10 @@
 import {
-  ActionIcon,
   Button,
   Container,
   FloatingIndicator,
   Group,
   Loader,
+  ActionIcon as MantineActionIcon,
   MantineTheme,
   Stack,
   Tabs,
@@ -23,6 +23,7 @@ import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { ActionIcon } from "@/lib/ui/ActionIcon";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList.types";
 import { Paper } from "@/lib/ui/Paper";
@@ -35,6 +36,7 @@ import { Dataset, DatasetWithColumns } from "@/models/datasets/Dataset";
 import { GoogleSheetsDataset } from "@/models/datasets/GoogleSheetsDataset";
 import { DataSummaryView } from "./DataSummaryView";
 import { EditDatasetView } from "./EditDatasetView";
+import { ToggleOfflineOnlyButton } from "./ToggleOfflineOnlyButton";
 
 type Props = {
   dataset: Dataset;
@@ -155,7 +157,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
               isEditingDataset ?
                 <Group>
                   <EditDatasetView dataset={dataset} />
-                  <ActionIcon
+                  <MantineActionIcon
                     variant="subtle"
                     aria-label="Exit edit"
                     onClick={() => {
@@ -163,7 +165,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                     }}
                   >
                     <IconX size={20} />
-                  </ActionIcon>
+                  </MantineActionIcon>
                 </Group>
                 // optional “exit edit” action
               : <Group>
@@ -171,12 +173,30 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                   <ActionIcon
                     variant="subtle"
                     aria-label="Edit dataset"
+                    tooltip="Edit dataset"
                     onClick={() => {
                       return setIsEditingDataset(true);
                     }}
                   >
                     <IconPencil size={20} />
                   </ActionIcon>
+
+                  {(
+                    // only show the button if the source dataset has an
+                    // "offlineOnly" property
+                    datasetWithColumnsAndSource.source &&
+                    "offlineOnly" in datasetWithColumnsAndSource.source &&
+                    // this toggle is currently only supported for CSV datasets
+                    dataset.sourceType === "csv_file"
+                  ) ?
+                    <ToggleOfflineOnlyButton
+                      isOfflineOnly={
+                        datasetWithColumnsAndSource.source.offlineOnly
+                      }
+                      datasetId={dataset.id}
+                      csvFileDatasetId={datasetWithColumnsAndSource.source.id}
+                    />
+                  : null}
                 </Group>
 
             }
