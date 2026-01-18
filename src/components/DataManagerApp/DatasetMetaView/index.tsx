@@ -24,6 +24,7 @@ import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ActionIcon } from "@/lib/ui/ActionIcon";
+import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList.types";
 import { Paper } from "@/lib/ui/Paper";
@@ -168,10 +169,11 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                   </MantineActionIcon>
                 </Group>
                 // optional “exit edit” action
-              : <Group>
+              : <Group gap="xxs">
                   <Title order={2}>{dataset.name}</Title>
                   <ActionIcon
-                    variant="subtle"
+                    ml="md"
+                    variant="default"
                     color="neutral"
                     aria-label="Edit dataset"
                     tooltip="Edit dataset"
@@ -196,6 +198,24 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                       }
                       datasetId={dataset.id}
                       csvFileDatasetId={datasetWithColumnsAndSource.source.id}
+                      onRequestOfflineOnly={() => {
+                        if (datasetWithColumnsAndSource.source) {
+                          notifyDevAlert("onRequestOfflineOnly called", {
+                            datasetId: dataset.id,
+                            csvFileDatasetId:
+                              datasetWithColumnsAndSource.source.id,
+                          });
+                        }
+                      }}
+                      onRequestOnlineSync={() => {
+                        if (datasetWithColumnsAndSource.source) {
+                          notifyDevAlert("onRequestOnlineSync called", {
+                            datasetId: dataset.id,
+                            csvFileDatasetId:
+                              datasetWithColumnsAndSource.source.id,
+                          });
+                        }
+                      }}
                     />
                   : null}
                 </Group>

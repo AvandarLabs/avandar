@@ -12,6 +12,8 @@ type Props = {
   isOfflineOnly: boolean;
   csvFileDatasetId: CSVFileDatasetId;
   datasetId: DatasetId;
+  onRequestOfflineOnly?: () => void;
+  onRequestOnlineSync?: () => void;
 };
 
 /**
@@ -21,6 +23,8 @@ export function ToggleOfflineOnlyButton({
   isOfflineOnly,
   csvFileDatasetId,
   datasetId,
+  onRequestOfflineOnly,
+  onRequestOnlineSync,
 }: Props): JSX.Element {
   const [updateCSVFileDataset, isUpdatePending] =
     CSVFileDatasetClient.useUpdate({
@@ -70,6 +74,12 @@ export function ToggleOfflineOnlyButton({
             accessed in other devices.
           </Text>,
       onConfirm: () => {
+        if (nextIsOfflineOnly) {
+          onRequestOfflineOnly();
+        } else {
+          onRequestOnlineSync();
+        }
+
         return updateCSVFileDataset({
           id: csvFileDatasetId,
           data: {
@@ -83,7 +93,7 @@ export function ToggleOfflineOnlyButton({
   return (
     <ActionIcon
       tooltip={isOfflineOnly ? "Allow online syncing" : "Make offline-only"}
-      variant="subtle"
+      variant="default"
       color="neutral"
       aria-label={isOfflineOnly ? "Allow online syncing" : "Make offline-only"}
       disabled={isUpdatePending}
