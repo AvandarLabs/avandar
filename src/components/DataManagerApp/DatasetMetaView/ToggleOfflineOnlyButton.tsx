@@ -5,6 +5,7 @@ import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { ActionIcon } from "@/lib/ui/ActionIcon";
 import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
+import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
 import type { CSVFileDatasetId } from "@/models/datasets/CSVFileDataset";
 import type { DatasetId } from "@/models/datasets/Dataset";
 
@@ -12,8 +13,6 @@ type Props = {
   isOfflineOnly: boolean;
   csvFileDatasetId: CSVFileDatasetId;
   datasetId: DatasetId;
-  onRequestOfflineOnly?: () => void;
-  onRequestOnlineSync?: () => void;
 };
 
 /**
@@ -23,8 +22,6 @@ export function ToggleOfflineOnlyButton({
   isOfflineOnly,
   csvFileDatasetId,
   datasetId,
-  onRequestOfflineOnly,
-  onRequestOnlineSync,
 }: Props): JSX.Element {
   const [updateCSVFileDataset, isUpdatePending] =
     CSVFileDatasetClient.useUpdate({
@@ -43,6 +40,19 @@ export function ToggleOfflineOnlyButton({
         );
       },
     });
+
+  const onRequestOfflineOnly = () => {
+    notifyDevAlert("onRequestOfflineOnly called", {
+      datasetId,
+      csvFileDatasetId,
+    });
+  };
+  const onRequestOnlineSync = () => {
+    notifyDevAlert("onRequestOnlineSync called", {
+      datasetId,
+      csvFileDatasetId,
+    });
+  };
 
   const onClick = () => {
     if (isUpdatePending) {
