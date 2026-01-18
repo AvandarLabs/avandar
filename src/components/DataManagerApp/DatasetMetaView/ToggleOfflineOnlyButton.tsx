@@ -84,6 +84,7 @@ export function ToggleOfflineOnlyButton({
     <ActionIcon
       tooltip={isOfflineOnly ? "Allow online syncing" : "Make offline-only"}
       variant="subtle"
+      color="neutral"
       aria-label={isOfflineOnly ? "Allow online syncing" : "Make offline-only"}
       disabled={isUpdatePending}
       onClick={onClick}

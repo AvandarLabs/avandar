@@ -172,6 +172,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                   <Title order={2}>{dataset.name}</Title>
                   <ActionIcon
                     variant="subtle"
+                    color="neutral"
                     aria-label="Edit dataset"
                     tooltip="Edit dataset"
                     onClick={() => {
