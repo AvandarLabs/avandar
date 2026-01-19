@@ -3,11 +3,16 @@ import { modals } from "@mantine/modals";
 import { IconWorld, IconWorldOff } from "@tabler/icons-react";
 import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useMutation } from "@/lib/hooks/query/useMutation";
 import { ActionIcon } from "@/lib/ui/ActionIcon";
 import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
-import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
 import type { CSVFileDatasetId } from "@/models/datasets/CSVFileDataset";
 import type { DatasetId } from "@/models/datasets/Dataset";
+
+const DIRECT_UPLOAD_MAX_BYTES = 6 * 1024 * 1024;
 
 type Props = {
   isOfflineOnly: boolean;
@@ -23,6 +28,8 @@ export function ToggleOfflineOnlyButton({
   csvFileDatasetId,
   datasetId,
 }: Props): JSX.Element {
+  const workspace = useCurrentWorkspace();
+
   const [updateCSVFileDataset, isUpdatePending] =
     CSVFileDatasetClient.useUpdate({
       queryToInvalidate: DatasetClient.QueryKeys.getSourceDataset({
@@ -41,21 +48,51 @@ export function ToggleOfflineOnlyButton({
       },
     });
 
-  const onRequestOfflineOnly = () => {
-    notifyDevAlert("onRequestOfflineOnly called", {
-      datasetId,
-      csvFileDatasetId,
-    });
-  };
-  const onRequestOnlineSync = () => {
-    notifyDevAlert("onRequestOnlineSync called", {
-      datasetId,
-      csvFileDatasetId,
-    });
-  };
+  const [uploadParquetForOnlineSync, isUploadPending] = useMutation({
+    mutationFn: async (uploadDatasetId: DatasetId): Promise<void> => {
+      const localDataset = await LocalDatasetClient.getById({
+        id: uploadDatasetId,
+      });
+
+      if (!localDataset) {
+        throw new Error("Dataset is not available locally on this device.");
+      }
+
+      const parquetBlob = localDataset.parquetData;
+
+      if (parquetBlob.size > DIRECT_UPLOAD_MAX_BYTES) {
+        throw new Error("This dataset is too large to sync online yet.");
+      }
+
+      await DatasetParquetStorageClient.uploadDatasetParquet({
+        workspaceId: workspace.id,
+        datasetId: uploadDatasetId,
+        parquetBlob,
+      });
+    },
+    onSuccess: () => {
+      return updateCSVFileDataset({
+        id: csvFileDatasetId,
+        data: {
+          offlineOnly: false,
+        },
+      });
+    },
+    onError: (error) => {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+
+      notifyError({
+        title: "Unable to sync dataset online",
+        message: errorMessage,
+      });
+    },
+  });
 
   const onClick = () => {
-    if (isUpdatePending) {
+    const isPending = isUpdatePending || isUploadPending;
+
+    if (isPending) {
       return;
     }
 
@@ -69,7 +106,7 @@ export function ToggleOfflineOnlyButton({
       },
       confirmProps: {
         color: nextIsOfflineOnly ? "danger" : undefined,
-        loading: isUpdatePending,
+        loading: isPending,
       },
       children:
         nextIsOfflineOnly ?
@@ -85,20 +122,20 @@ export function ToggleOfflineOnlyButton({
           </Text>,
       onConfirm: () => {
         if (nextIsOfflineOnly) {
-          onRequestOfflineOnly();
+          return updateCSVFileDataset({
+            id: csvFileDatasetId,
+            data: {
+              offlineOnly: true,
+            },
+          });
         } else {
-          onRequestOnlineSync();
+          return uploadParquetForOnlineSync.async(datasetId);
         }
-
-        return updateCSVFileDataset({
-          id: csvFileDatasetId,
-          data: {
-            offlineOnly: nextIsOfflineOnly,
-          },
-        });
       },
     });
   };
+
+  const isPending = isUpdatePending || isUploadPending;
 
   return (
     <ActionIcon
@@ -106,7 +143,7 @@ export function ToggleOfflineOnlyButton({
       variant="default"
       color="neutral"
       aria-label={isOfflineOnly ? "Allow online syncing" : "Make offline-only"}
-      disabled={isUpdatePending}
+      disabled={isPending}
       onClick={onClick}
     >
       {isOfflineOnly ?
