@@ -153,6 +153,37 @@ Libraries:
   export type { MyType } from ...;
   ```
 
+- All exported classes, objects, and functions must **always** have a docstring
+  attached to them. This includes functions that are exported as part of an
+  object's or class' top-level API. For example:
+
+  ```ts
+  /**
+   * Docstring describing `foo`.
+   *
+   * @param options The options to pass.
+   * @param options.name The name of the person
+   * @param options.age The age of the person
+   * @returns void
+   */
+  export function foo(options: { name: string; age: number }): void {}
+
+  /**
+   * Docstring necessary to describe `MyObject`.
+   */
+  export const MyObject = {
+    // docstring already attached to `foo` above, no need to duplicate here
+    foo,
+
+    /**
+     * Docstring necessary here.
+     */
+    hello: () => {
+      return 'hello, world';
+    }
+  };
+  ```
+
 ## Functions & Logic
 
 - Keep functions short and single-purpose (< 30 lines).

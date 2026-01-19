@@ -3,6 +3,7 @@ import { modals } from "@mantine/modals";
 import { IconWorld, IconWorldOff } from "@tabler/icons-react";
 import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DuckDBClient } from "@/clients/DuckDBClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -48,6 +49,32 @@ export function ToggleOfflineOnlyButton({
       },
     });
 
+  const [deleteParquetForOfflineOnly, isDeletePending] = useMutation({
+    mutationFn: async (deleteDatasetId: DatasetId): Promise<void> => {
+      await DatasetParquetStorageClient.deleteDatasetParquetObjects({
+        workspaceId: workspace.id,
+        datasetId: deleteDatasetId,
+      });
+    },
+    onSuccess: () => {
+      return updateCSVFileDataset({
+        id: csvFileDatasetId,
+        data: {
+          offlineOnly: true,
+        },
+      });
+    },
+    onError: (error) => {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+
+      notifyError({
+        title: "Unable to make dataset offline-only",
+        message: errorMessage,
+      });
+    },
+  });
+
   const [uploadParquetForOnlineSync, isUploadPending] = useMutation({
     mutationFn: async (uploadDatasetId: DatasetId): Promise<void> => {
       const localDataset = await LocalDatasetClient.getById({
@@ -64,11 +91,26 @@ export function ToggleOfflineOnlyButton({
         throw new Error("This dataset is too large to sync online yet.");
       }
 
-      await DatasetParquetStorageClient.uploadDatasetParquet({
-        workspaceId: workspace.id,
-        datasetId: uploadDatasetId,
+      const zstdParquetBlob = await DuckDBClient.exportParquetBlobAsZSTD(
         parquetBlob,
-      });
+      );
+
+      if (zstdParquetBlob.size > DIRECT_UPLOAD_MAX_BYTES) {
+        throw new Error("This dataset is too large to sync online yet.");
+      }
+
+      await Promise.all([
+        DatasetParquetStorageClient.uploadDatasetParquet({
+          workspaceId: workspace.id,
+          datasetId: uploadDatasetId,
+          parquetBlob,
+        }),
+        DatasetParquetStorageClient.uploadDatasetParquetZSTD({
+          workspaceId: workspace.id,
+          datasetId: uploadDatasetId,
+          parquetBlob: zstdParquetBlob,
+        }),
+      ]);
     },
     onSuccess: () => {
       return updateCSVFileDataset({
@@ -90,7 +132,7 @@ export function ToggleOfflineOnlyButton({
   });
 
   const onClick = () => {
-    const isPending = isUpdatePending || isUploadPending;
+    const isPending = isUpdatePending || isUploadPending || isDeletePending;
 
     if (isPending) {
       return;
@@ -122,20 +164,15 @@ export function ToggleOfflineOnlyButton({
           </Text>,
       onConfirm: () => {
         if (nextIsOfflineOnly) {
-          return updateCSVFileDataset({
-            id: csvFileDatasetId,
-            data: {
-              offlineOnly: true,
-            },
-          });
+          return deleteParquetForOfflineOnly(datasetId);
         } else {
-          return uploadParquetForOnlineSync.async(datasetId);
+          return uploadParquetForOnlineSync(datasetId);
         }
       },
     });
   };
 
-  const isPending = isUpdatePending || isUploadPending;
+  const isPending = isUpdatePending || isUploadPending || isDeletePending;
 
   return (
     <ActionIcon
