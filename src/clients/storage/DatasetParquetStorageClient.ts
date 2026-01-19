@@ -8,32 +8,10 @@ const WORKSPACES_BUCKET_NAME = "workspaces" as const;
 function _getDatasetParquetObjectPath(options: {
   workspaceId: WorkspaceId;
   datasetId: DatasetId;
-  fileNameSuffix?: string;
 }): string {
-  const { workspaceId, datasetId, fileNameSuffix } = options;
-
-  const suffix = fileNameSuffix ? `-${fileNameSuffix}` : "";
-  return `${workspaceId}/datasets/${datasetId}${suffix}.parquet`;
-}
-
-function _getDatasetParquetObjectPaths(options: {
-  workspaceId: WorkspaceId;
-  datasetId: DatasetId;
-}): readonly [string, string] {
   const { workspaceId, datasetId } = options;
 
-  const plainPath = _getDatasetParquetObjectPath({
-    workspaceId,
-    datasetId,
-  });
-
-  const zstdPath = _getDatasetParquetObjectPath({
-    workspaceId,
-    datasetId,
-    fileNameSuffix: "zstd",
-  });
-
-  return [plainPath, zstdPath] as const;
+  return `${workspaceId}/datasets/${datasetId}.parquet`;
 }
 
 async function uploadDatasetParquet(options: {
@@ -44,37 +22,6 @@ async function uploadDatasetParquet(options: {
   const { workspaceId, datasetId, parquetBlob } = options;
 
   const objectPath = _getDatasetParquetObjectPath({ workspaceId, datasetId });
-
-  const { error } = await AvaSupabase.DB.storage
-    .from(WORKSPACES_BUCKET_NAME)
-    .upload(objectPath, parquetBlob, {
-      contentType: MIMEType.APPLICATION_PARQUET,
-      upsert: true,
-    });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-}
-
-/**
- * Uploads a ZSTD compressed Parquet file to the dataset's object storage
- * bucket.
- * This is an experimental function we are using in the short term just to
- * see if we get any storage gains from using ZSTD compression on parquet files.
- */
-async function uploadDatasetParquetZSTD(options: {
-  workspaceId: WorkspaceId;
-  datasetId: DatasetId;
-  parquetBlob: Blob;
-}): Promise<void> {
-  const { workspaceId, datasetId, parquetBlob } = options;
-
-  const objectPath = _getDatasetParquetObjectPath({
-    workspaceId,
-    datasetId,
-    fileNameSuffix: "zstd",
-  });
 
   const { error } = await AvaSupabase.DB.storage
     .from(WORKSPACES_BUCKET_NAME)
@@ -102,14 +49,14 @@ async function deleteDatasetParquetObjects(options: {
 }): Promise<void> {
   const { workspaceId, datasetId } = options;
 
-  const objectPaths = _getDatasetParquetObjectPaths({
+  const objectPath = _getDatasetParquetObjectPath({
     workspaceId,
     datasetId,
   });
 
   const { error } = await AvaSupabase.DB.storage
     .from(WORKSPACES_BUCKET_NAME)
-    .remove([...objectPaths]);
+    .remove([objectPath]);
 
   if (error) {
     throw new Error(error.message);
@@ -118,6 +65,5 @@ async function deleteDatasetParquetObjects(options: {
 
 export const DatasetParquetStorageClient = {
   uploadDatasetParquet,
-  uploadDatasetParquetZSTD,
   deleteDatasetParquetObjects,
 };

@@ -1,9 +1,8 @@
-import { Text } from "@mantine/core";
+import { Text, ThemeIcon } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconWorld, IconWorldOff } from "@tabler/icons-react";
 import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { DuckDBClient } from "@/clients/DuckDBClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -91,26 +90,11 @@ export function ToggleOfflineOnlyButton({
         throw new Error("This dataset is too large to sync online yet.");
       }
 
-      const zstdParquetBlob = await DuckDBClient.exportParquetBlobAsZSTD(
+      await DatasetParquetStorageClient.uploadDatasetParquet({
+        workspaceId: workspace.id,
+        datasetId: uploadDatasetId,
         parquetBlob,
-      );
-
-      if (zstdParquetBlob.size > DIRECT_UPLOAD_MAX_BYTES) {
-        throw new Error("This dataset is too large to sync online yet.");
-      }
-
-      await Promise.all([
-        DatasetParquetStorageClient.uploadDatasetParquet({
-          workspaceId: workspace.id,
-          datasetId: uploadDatasetId,
-          parquetBlob,
-        }),
-        DatasetParquetStorageClient.uploadDatasetParquetZSTD({
-          workspaceId: workspace.id,
-          datasetId: uploadDatasetId,
-          parquetBlob: zstdParquetBlob,
-        }),
-      ]);
+      });
     },
     onSuccess: () => {
       return updateCSVFileDataset({
@@ -176,7 +160,7 @@ export function ToggleOfflineOnlyButton({
 
   return (
     <ActionIcon
-      tooltip={isOfflineOnly ? "Allow online syncing" : "Make offline-only"}
+      tooltip={isOfflineOnly ? "This dataset is offline-only. Click to allow online syncing." : "This dataset is synced online. Click to make offline-only."}
       variant="default"
       color="neutral"
       aria-label={isOfflineOnly ? "Allow online syncing" : "Make offline-only"}
@@ -184,8 +168,8 @@ export function ToggleOfflineOnlyButton({
       onClick={onClick}
     >
       {isOfflineOnly ?
-        <IconWorldOff size={20} />
-      : <IconWorld size={20} />}
+        <ThemeIcon variant="transparent" c="neutral.4"><IconWorldOff size={20} /></ThemeIcon>
+      : <ThemeIcon variant="transparent" c="blue"><IconWorld size={20} /></ThemeIcon>}
     </ActionIcon>
   );
 }

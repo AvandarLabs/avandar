@@ -498,56 +498,12 @@ class DuckDBClientImpl {
     return loadResults;
   }
 
+  /**
+   * Exports a table as a Parquet file using ZSTD compression (default).
+   *
+   * @param tableName The name of the table to export as a Parquet file.
+   */
   async exportTableAsParquet(tableName: string): Promise<Blob> {
-    return this.exportTableAsParquetDefault(tableName);
-  }
-
-  /**
-   * Exports a table as a Parquet file using the default compression codec,
-   * which is Snappy.
-   * 
-   * @param tableName The name of the table to export as a Parquet file.
-   */
-  async exportTableAsParquetDefault(tableName: string): Promise<Blob> {
-    try {
-      const db = await this.#getDB();
-      const tempParquetFileName = `${tableName}.temp`;
-
-      // create the parquet file in the DuckDB internal file system
-      await this.runRawQuery(
-        `COPY '$tableName$' TO '$parquetFileName$' (FORMAT 'parquet')`,
-        { params: { tableName, parquetFileName: tempParquetFileName } },
-      );
-      const parquetBuffer: Uint8Array<ArrayBuffer> = (await db.copyFileToBuffer(
-        tempParquetFileName,
-        // enforce ArrayBuffer type so TypeScript doesn't think it's a
-        // SharedArrayBuffer
-      )) as Uint8Array<ArrayBuffer>;
-      const parquetBlob = new Blob([parquetBuffer], {
-        type: MIMEType.APPLICATION_PARQUET,
-      });
-
-      // now drop the parquet file now that we've successfully exported it
-      await db.dropFile(tempParquetFileName);
-      return parquetBlob;
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-      this.#logger.error(error, {
-        msg: "Failed to export table as parquet",
-        errMsg: errorMessage,
-      });
-      throw new Error(`Parquet export failed: ${errorMessage}`);
-    }
-  }
-
-  /**
-   * Exports a table as a Parquet file using ZSTD compression.
-   * @param tableName The name of the table to export as a Parquet file.
-   * @returns A promise that resolves when the table is exported as a Parquet
-   * file.
-   */
-  async exportTableAsParquetZSTD(tableName: string): Promise<Blob> {
     try {
       const db = await this.#getDB();
       const tempParquetFileName = `${tableName}.temp`;
@@ -575,28 +531,6 @@ class DuckDBClientImpl {
         errMsg: errorMessage,
       });
       throw new Error(`Parquet export failed: ${errorMessage}`);
-    }
-  }
-
-  /**
-   * Exports a parquet blob as a ZSTD compressed Parquet file. We use this when
-   * we already have a parquet blob, but we want to compress it using ZSTD
-   * compression. This requires loading the parquet blob into DuckDB memory,
-   * and then re-exporting it with the ZSTD compression codec.
-   * 
-   * @param parquetBlob The parquet blob to export as a ZSTD compressed Parquet
-   * file.
-   * @returns 
-   */
-  async exportParquetBlobAsZSTD(parquetBlob: Blob): Promise<Blob> {
-    const tempTableName = `tmp_${uuid().replace(/-/g, "_")}`;
-
-    try {
-      await this.loadParquet({ tableName: tempTableName, blob: parquetBlob });
-
-      return await this.exportTableAsParquetZSTD(tempTableName);
-    } finally {
-      await this.dropTableAndFile(tempTableName);
     }
   }
 
