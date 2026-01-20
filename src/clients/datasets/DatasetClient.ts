@@ -17,6 +17,7 @@ import {
 import { GoogleSheetsDataset } from "@/models/datasets/GoogleSheetsDataset";
 import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { DuckDBClient } from "../DuckDBClient";
+import { DatasetParquetStorageClient } from "../storage/DatasetParquetStorageClient";
 import { CSVFileDatasetClient } from "./CSVFileDatasetClient";
 import { DatasetColumnClient } from "./DatasetColumnClient";
 import { GoogleSheetsDatasetClient } from "./GoogleSheetsDatasetClient";
@@ -249,6 +250,16 @@ export const DatasetClient = createSupabaseCRUDClient({
         logger.log("Deleting dataset", params);
 
         const { id } = params;
+
+        const dataset = await DatasetClient.getById({ id });
+        if (dataset) {
+          // delete the Parquet file from cloud object storage if it exists
+          await DatasetParquetStorageClient.deleteDatasetParquetObjects({
+            workspaceId: dataset.workspaceId,
+            datasetId: id,
+          });
+        }
+
         await DatasetClient.delete({ id });
 
         // now delete things locally from IndexedDB

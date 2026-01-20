@@ -160,7 +160,11 @@ export function ToggleOfflineOnlyButton({
 
   return (
     <ActionIcon
-      tooltip={isOfflineOnly ? "This dataset is offline-only. Click to allow online syncing." : "This dataset is synced online. Click to make offline-only."}
+      tooltip={
+        isOfflineOnly ?
+          "This dataset is offline-only. Click to allow online syncing."
+        : "This dataset is synced online. Click to make offline-only."
+      }
       variant="default"
       color="neutral"
       aria-label={isOfflineOnly ? "Allow online syncing" : "Make offline-only"}
@@ -168,8 +172,13 @@ export function ToggleOfflineOnlyButton({
       onClick={onClick}
     >
       {isOfflineOnly ?
-        <ThemeIcon variant="transparent" c="neutral.4"><IconWorldOff size={20} /></ThemeIcon>
-      : <ThemeIcon variant="transparent" c="blue"><IconWorld size={20} /></ThemeIcon>}
+        <ThemeIcon variant="transparent" c="neutral.4">
+          <IconWorldOff size={20} />
+        </ThemeIcon>
+      : <ThemeIcon variant="transparent" c="blue">
+          <IconWorld size={20} />
+        </ThemeIcon>
+      }
     </ActionIcon>
   );
 }
