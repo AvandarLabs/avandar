@@ -4,7 +4,6 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { ResyncDatasetsBlock } from "@/components/DataManagerApp/ResyncDatasetsBlock";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { useQuery } from "@/lib/hooks/query/useQuery";
 import { difference } from "@/lib/utils/arrays/difference";
 import { assertIsDefined } from "@/lib/utils/asserts";
@@ -12,40 +11,8 @@ import { isEmptyArray, isNullish, or } from "@/lib/utils/guards/guards";
 import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { promiseMap } from "@/lib/utils/promises";
 import { UserId } from "@/models/User/User.types";
-import type { DatasetId } from "@/models/datasets/Dataset";
-import type { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { useCurrentUser } from "../../../hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "../../../hooks/workspaces/useCurrentWorkspace";
-
-async function _downloadParquetToLocalDataset(options: {
-  workspaceId: WorkspaceId;
-  userId: UserId;
-  datasetId: DatasetId;
-}): Promise<void> {
-  const { workspaceId, userId, datasetId } = options;
-
-  const objectPath = `${workspaceId}/datasets/${datasetId}.parquet`;
-  const { data: parquetBlob, error } = await AvaSupabase.DB.storage
-    .from("workspaces")
-    .download(objectPath);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  if (!parquetBlob) {
-    throw new Error("Parquet blob download returned empty data");
-  }
-
-  await LocalDatasetClient.insert({
-    data: {
-      datasetId,
-      workspaceId,
-      userId,
-      parquetData: parquetBlob,
-    },
-  });
-}
 
 /**
  * This hook handles garbage collection of local datasets. Any datasets in
@@ -98,7 +65,6 @@ function useGarbageDatasetCollection(): void {
  * In this modal, the user can either re-upload the dataset or delete it.
  *
  * TODO(jpsyx): add syncing google sheets from backend
- * TODO(jpsyx): once CSVs can be cloud-persisted, add re-downloading them
  */
 export function useSyncLocalDatasets(): void {
   useGarbageDatasetCollection();
@@ -130,23 +96,22 @@ export function useSyncLocalDatasets(): void {
         });
 
         if (isLoaded) {
-        return { dataset, isLoaded };
+          return { dataset, isLoaded };
         }
 
-      // if not in our local storage, then fetch it from cloud object storage
-      // and store it in IndexedDB.
-          try {
-            await _downloadParquetToLocalDataset({
-              workspaceId: workspace.id,
-              userId: user.id as UserId,
-              datasetId: dataset.id,
-            });
+        // if not in our local storage, then fetch it from cloud object storage
+        // and store it in IndexedDB.
+        try {
+          await LocalDatasetClient.fetchCloudDatasetToLocalStorage({
+            datasetId: dataset.id,
+            workspaceId: workspace.id,
+            userId: user.id as UserId,
+          });
 
-            return { dataset, isLoaded: true };
-          } catch {
-            return { dataset, isLoaded: false };
-          }
-
+          return { dataset, isLoaded: true };
+        } catch {
+          return { dataset, isLoaded: false };
+        }
       });
 
       return datasetStatuses

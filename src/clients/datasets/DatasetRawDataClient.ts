@@ -3,6 +3,8 @@ import { UnknownDataFrame } from "$/lib/types/common";
 import { where } from "$/lib/utils/filters/filters";
 import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
 import { match } from "ts-pattern";
+import { AuthClient } from "@/clients/AuthClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { BaseClient, createBaseClient } from "@/lib/clients/BaseClient";
 import { WithLogger, withLogger } from "@/lib/clients/withLogger";
 import {
@@ -16,6 +18,7 @@ import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { promiseMap, promiseReduce } from "@/lib/utils/promises";
 import { DatasetId } from "@/models/datasets/Dataset";
 import { QueryResult } from "@/models/queries/QueryResult/QueryResult.types";
+import { UserId } from "@/models/User/User.types";
 import { DuckDBClient, UnknownRow } from "../DuckDBClient";
 import { DuckDBStructuredQuery } from "../DuckDBClient/DuckDBClient.types";
 import { DuckDBDataTypeUtils } from "../DuckDBClient/DuckDBDataType";
@@ -192,7 +195,7 @@ function createDatasetRawDataClient(): WithLogger<
     if (datasetIds.length === 0) {
       return;
     }
-    const localDatasets = await LocalDatasetClient.getAll(
+    let localDatasets = await LocalDatasetClient.getAll(
       where("datasetId", "in", datasetIds),
     );
 
@@ -201,11 +204,46 @@ function createDatasetRawDataClient(): WithLogger<
       localDatasets.map(prop("datasetId")),
     );
     if (missingLocalDatasets.length > 0) {
-      throw new Error(
-        `The following datasets were not found locally: ${missingLocalDatasets.join(
-          ", ",
-        )}`,
+      const session = await AuthClient.getCurrentSession();
+      const userId = session?.user?.id;
+      if (!userId) {
+        throw new Error(
+          "Missing datasets could not be downloaded because user is not " +
+            "authenticated.",
+        );
+      }
+
+      const missingDatasetMeta = await DatasetClient.getAll(
+        where("id", "in", missingLocalDatasets),
       );
+
+      await promiseMap(missingDatasetMeta, async (dataset) => {
+        try {
+          await LocalDatasetClient.fetchCloudDatasetToLocalStorage({
+            datasetId: dataset.id,
+            workspaceId: dataset.workspaceId,
+            userId: userId as UserId,
+          });
+        } catch {
+          // ignored - we re-check what is still missing below
+        }
+      });
+
+      const localDatasetsAfterFetch = await LocalDatasetClient.getAll(
+        where("datasetId", "in", datasetIds),
+      );
+      localDatasets = localDatasetsAfterFetch;
+      const stillMissingLocalDatasets = difference(
+        datasetIds,
+        localDatasetsAfterFetch.map(prop("datasetId")),
+      );
+
+      if (stillMissingLocalDatasets.length > 0) {
+        throw new Error(
+          `The following datasets were not found locally: ` +
+            `${stillMissingLocalDatasets.join(", ")}`,
+        );
+      }
     }
     const datasetLoadStatuses = await promiseMap(
       localDatasets,

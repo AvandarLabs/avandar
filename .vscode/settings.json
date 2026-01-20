@@ -1,3 +1,10 @@
 {
-  "deno.enablePaths": ["./supabase/functions", "./shared"]
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "deno.enablePaths": ["./supabase/functions", "./shared"],
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
 }
