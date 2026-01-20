@@ -53,6 +53,12 @@ type Props = {
     delimiter: string;
   }) => void;
   isProcessing?: boolean;
+
+  /**
+   * If true, show the "cloud storage" toggle which can mark the dataset as
+   * offline-only.
+   */
+  showOnlineStorageAllowed?: boolean;
 };
 
 export function DatasetUploadForm({
@@ -64,6 +70,7 @@ export function DatasetUploadForm({
   loadCSVResult,
   onRequestDataParse,
   isProcessing = false,
+  showOnlineStorageAllowed = true,
 }: Props): JSX.Element {
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
@@ -231,31 +238,33 @@ export function DatasetUploadForm({
           }
         />
 
-        <Checkbox
-          key={form.key("onlineStorageAllowed")}
-          label={
-            <>
-              <Text span>This dataset can be stored in the cloud. </Text>
-              {!form.getValues().onlineStorageAllowed ?
-                <Callout
-                  mt="sm"
-                  title="This dataset will be offline-only"
-                  titleSize="xl"
-                >
-                  <Text c="red.8">
-                    This dataset will no longer be stored online and can only be
-                    accessed as long as it is on your personal computer. Nobody
-                    on your team will be able to access this data. This is
-                    recommended only for very sensitive data.
-                  </Text>
-                </Callout>
-              : null}
-            </>
-          }
-          {...form.getInputProps("onlineStorageAllowed", {
-            type: "checkbox",
-          })}
-        />
+        {showOnlineStorageAllowed ?
+          <Checkbox
+            key={form.key("onlineStorageAllowed")}
+            label={
+              <>
+                <Text span>This dataset can be stored in the cloud. </Text>
+                {!form.getValues().onlineStorageAllowed ?
+                  <Callout
+                    mt="sm"
+                    title="This dataset will be offline-only"
+                    titleSize="xl"
+                  >
+                    <Text c="red.8">
+                      This dataset will no longer be stored online and can only
+                      be accessed as long as it is on your personal computer.
+                      Nobody on your team will be able to access this data. This
+                      is recommended only for very sensitive data.
+                    </Text>
+                  </Callout>
+                : null}
+              </>
+            }
+            {...form.getInputProps("onlineStorageAllowed", {
+              type: "checkbox",
+            })}
+          />
+        : null}
 
         <Button loading={isSavePending} type="submit" disabled={disableSubmit}>
           Save Dataset

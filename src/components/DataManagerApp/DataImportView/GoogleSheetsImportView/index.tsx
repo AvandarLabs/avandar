@@ -291,6 +291,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
             defaultName={parseOptions.spreadsheetName}
             rows={loadResults.previewRows}
             columns={detectedColumns}
+            showOnlineStorageAllowed={false}
             doDatasetSave={async (
               datasetFormValues: DatasetUploadFormValues,
             ) => {
