@@ -1,4 +1,4 @@
-import { Text, ThemeIcon } from "@mantine/core";
+import { Loader, Text, ThemeIcon } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconWorld, IconWorldOff } from "@tabler/icons-react";
 import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
@@ -171,7 +171,9 @@ export function ToggleOfflineOnlyButton({
       disabled={isPending}
       onClick={onClick}
     >
-      {isOfflineOnly ?
+      {isUploadPending ?
+        <Loader size={20} />
+      : isOfflineOnly ?
         <ThemeIcon variant="transparent" c="neutral.4">
           <IconWorldOff size={20} />
         </ThemeIcon>
