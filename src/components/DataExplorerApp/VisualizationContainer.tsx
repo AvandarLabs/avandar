@@ -15,7 +15,7 @@ import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { AvaDataTypes } from "@/models/datasets/AvaDataType";
 import { QueryResultColumn } from "@/models/queries/QueryResult/QueryResult.types";
-import { DataExplorerStore } from "./DataExplorerStore";
+import { DataExplorerStateManager } from "./DataExplorerStateManager";
 
 type Props = {
   columns: readonly QueryResultColumn[];
@@ -55,7 +55,7 @@ const ScatterPlotConfigSchema = object({
 });
 
 export function VisualizationContainer({ columns, data }: Props): JSX.Element {
-  const [{ vizConfig }] = DataExplorerStore.use();
+  const { vizConfig } = DataExplorerStateManager.useState();
   // TODO(jpsyx): this should get supplied as a prop
   const dateColumns = useMemo(() => {
     return new Set(

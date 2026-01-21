@@ -1,4 +1,4 @@
-import { createStore } from "@/lib/utils/createStore";
+import { createAppStateManager } from "@/lib/utils/state/createAppStateManager";
 
 type EntityConfigCreatorState = {
   entityConfigName: string;
@@ -12,7 +12,7 @@ const initialState: EntityConfigCreatorState = {
   pluralEntityConfigName: "profiles",
 };
 
-export const EntityConfigCreatorStore = createStore({
+export const EntityConfigCreatorStore = createAppStateManager({
   name: "EntityConfigCreator",
   initialState,
   actions: {

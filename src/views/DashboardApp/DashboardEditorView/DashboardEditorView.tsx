@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { notifySuccess } from "@/lib/ui/notifications/notify";
 import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
+import { DeleteDashboardButton } from "./DeleteDashboardButton";
 import {
   getDashboardPuckConfig,
   getDashboardTitleFromPuckData,
@@ -82,6 +83,13 @@ export function DashboardEditorView({
   }, [dashboard?.workspaceId, dashboardTitle]);
 
   const [saveDashboard] = DashboardClient.useUpdate({
+    queriesToInvalidate:
+      dashboard ?
+        [
+          DashboardClient.QueryKeys.getAll(),
+          DashboardClient.QueryKeys.getById({ id: dashboard.id }),
+        ]
+      : undefined,
     onSuccess: () => {
       notifySuccess("Dashboard saved successfully!");
     },
@@ -129,6 +137,10 @@ export function DashboardEditorView({
               <PublishDashboardButton
                 dashboardId={dashboard?.id}
                 isPublic={dashboard?.isPublic}
+              />
+              <DeleteDashboardButton
+                workspaceSlug={workspaceSlug}
+                dashboardId={dashboard?.id}
               />
             </>
           );

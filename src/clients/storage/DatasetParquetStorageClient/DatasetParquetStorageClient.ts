@@ -1,39 +1,8 @@
-import { MIMEType } from "$/lib/types/common";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
+import { startDatasetUpload } from "./startDatasetUpload";
+import { getDatasetParquetStoragePath, WORKSPACES_BUCKET_NAME } from "./utils";
 import type { DatasetId } from "@/models/datasets/Dataset";
 import type { WorkspaceId } from "@/models/Workspace/Workspace.types";
-
-const WORKSPACES_BUCKET_NAME = "workspaces" as const;
-
-function _getDatasetParquetObjectPath(options: {
-  workspaceId: WorkspaceId;
-  datasetId: DatasetId;
-}): string {
-  const { workspaceId, datasetId } = options;
-
-  return `${workspaceId}/datasets/${datasetId}.parquet`;
-}
-
-async function uploadDatasetParquet(options: {
-  workspaceId: WorkspaceId;
-  datasetId: DatasetId;
-  parquetBlob: Blob;
-}): Promise<void> {
-  const { workspaceId, datasetId, parquetBlob } = options;
-
-  const objectPath = _getDatasetParquetObjectPath({ workspaceId, datasetId });
-
-  const { error } = await AvaSupabase.DB.storage
-    .from(WORKSPACES_BUCKET_NAME)
-    .upload(objectPath, parquetBlob, {
-      contentType: MIMEType.APPLICATION_PARQUET,
-      upsert: true,
-    });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-}
 
 /**
  * Deletes all Parquet files for a dataset from object storage.
@@ -43,13 +12,13 @@ async function uploadDatasetParquet(options: {
  * @param options.datasetId The ID of the dataset to delete the Parquet files
  * for.
  */
-async function deleteDatasetParquetObjects(options: {
+async function deleteDataset(options: {
   workspaceId: WorkspaceId;
   datasetId: DatasetId;
 }): Promise<void> {
   const { workspaceId, datasetId } = options;
 
-  const objectPath = _getDatasetParquetObjectPath({
+  const objectPath = getDatasetParquetStoragePath({
     workspaceId,
     datasetId,
   });
@@ -74,17 +43,17 @@ async function deleteDatasetParquetObjects(options: {
  * file is not found. Defaults to false (does not throw error).
  * @returns
  */
-async function downloadParquetDataset(options: {
+async function downloadDataset(options: {
   workspaceId: WorkspaceId;
   datasetId: DatasetId;
   throwIfNotFound?: false | undefined;
 }): Promise<Blob | undefined>;
-async function downloadParquetDataset(options: {
+async function downloadDataset(options: {
   workspaceId: WorkspaceId;
   datasetId: DatasetId;
   throwIfNotFound: true;
 }): Promise<Blob>;
-async function downloadParquetDataset({
+async function downloadDataset({
   workspaceId,
   datasetId,
   throwIfNotFound = false,
@@ -115,7 +84,7 @@ async function downloadParquetDataset({
 }
 
 export const DatasetParquetStorageClient = {
-  uploadDatasetParquet,
-  deleteDatasetParquetObjects,
-  downloadParquetDataset,
+  startDatasetUpload,
+  deleteDataset,
+  downloadDataset,
 };

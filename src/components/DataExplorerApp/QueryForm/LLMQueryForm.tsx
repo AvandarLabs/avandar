@@ -2,11 +2,11 @@ import { Button, Fieldset, Group, Paper, Stack, Textarea } from "@mantine/core";
 import { useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { TextareaForm } from "@/lib/ui/singleton-forms/TextareaForm/TextareaForm";
-import { DataExplorerStore } from "../DataExplorerStore";
+import { DataExplorerStateManager } from "../DataExplorerStateManager";
 import { useNLPQuery } from "./useNLPQuery";
 
 export function LLMQueryForm(): JSX.Element {
-  const [{ rawSQL }, dispatch] = DataExplorerStore.use();
+  const [{ rawSQL }, dispatch] = DataExplorerStateManager.useContext();
   const workspace = useCurrentWorkspace();
   const [isEditMode, setIsEditMode] = useState(false);
 

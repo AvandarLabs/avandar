@@ -137,3 +137,55 @@ export enum MIMEType {
  */
 
 export type Brand<T, B extends string> = T & { __brand: B };
+
+/**
+ * Interface for an external store that can be used with React's
+ * `useSyncExternalStore`.
+ *
+ * @see {@link https://react.dev/reference/react/useSyncExternalStore}
+ */
+export interface IExternalStore<T> {
+  /**
+   * Subscribes to the store. This callback will be provided by
+   * React's `useSyncExternalStore`. When the store changes, we should call
+   * this callback for all subscribers. It is the responsibility of the store
+   * to call this callback when the store changes.
+   *
+   * When this callback is fired, it will cause React to re-call
+   * `getSnapshot` (the second argument to `useSyncExternalStore`),
+   * and (if needed) re-render the component that is using
+   * `useSyncExternalStore`.
+   *
+   * @example
+   * function MyComponent() {
+   *   const myStoredValue = useSyncExternalStore(
+   *     store.subscribe,
+   *     store.getSnapshot,
+   *     store.getServerSnapshot,
+   *   );
+   *   return <div>{myStoredValue}</div>;
+   * }
+   *
+   * @param onStoreChange - The callback to subscribe to the store.
+   * @returns A function to unsubscribe from the store.
+   */
+  subscribe: (onStoreChange: () => void) => () => void;
+
+  /**
+   * Returns the current snapshot of the store.
+   * @returns The current snapshot of the store.
+   */
+  getSnapshot: () => T;
+
+  /**
+   * Returns an initial snapshot of the data in the store.
+   *
+   * This is optional, and only needed for server rendering and during hydration
+   * of server-rendered content on the client.
+   *
+   * The server snapshot must be the same between the client and the server.
+   *
+   * @returns The server snapshot of the store.
+   */
+  getServerSnapshot?: () => T;
+}

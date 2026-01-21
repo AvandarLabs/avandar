@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
-import { DataExplorerStore } from "@/components/DataExplorerApp/DataExplorerStore";
+import { DataExplorerStateManager } from "@/components/DataExplorerApp/DataExplorerStateManager";
 import { DashboardViewerView } from "@/views/DashboardApp/DashboardViewerView";
 import type {
   DashboardId,
@@ -26,8 +26,8 @@ function DashboardViewerPage(): JSX.Element {
   };
 
   return (
-    <DataExplorerStore.Provider>
+    <DataExplorerStateManager.Provider>
       <DashboardViewerView dashboard={dashboard} />
-    </DataExplorerStore.Provider>
+    </DataExplorerStateManager.Provider>
   );
 }

@@ -10,7 +10,7 @@ import { UserId } from "@/models/User/User.types";
 import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { DuckDBClient, DucKDBLoadCSVOptions } from "../DuckDBClient";
 import { DuckDBLoadCSVResult } from "../DuckDBClient/DuckDBClient.types";
-import { DatasetParquetStorageClient } from "../storage/DatasetParquetStorageClient";
+import { DatasetParquetStorageClient } from "../storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 
 export const LocalDatasetClient = createDexieCRUDClient({
   db: AvaDexie.DB,
@@ -99,11 +99,12 @@ export const LocalDatasetClient = createDexieCRUDClient({
             "fetchCloudDatasetToLocalStorage",
           );
           logger.log("Fetching cloud dataset to local storage", params);
-          const parquetBlob =
-            await DatasetParquetStorageClient.downloadParquetDataset({
+          const parquetBlob = await DatasetParquetStorageClient.downloadDataset(
+            {
               datasetId,
               workspaceId,
-            });
+            },
+          );
 
           if (!parquetBlob) {
             return undefined;

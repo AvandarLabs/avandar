@@ -6,7 +6,7 @@ import { Models } from "@/models/Model/Models";
 import { QueryAggregationType } from "@/models/queries/QueryAggregationType";
 import { QueryColumn, QueryColumns } from "@/models/queries/QueryColumn";
 import { AggregationSelect } from "../AggregationSelect";
-import { DataExplorerStore } from "../DataExplorerStore";
+import { DataExplorerStateManager } from "../DataExplorerStateManager";
 import { QueryColumnMultiSelect } from "../QueryColumnMultiSelect";
 import { QueryDataSourceSelect } from "../QueryDataSourceSelect";
 
@@ -23,7 +23,7 @@ type Props = {
 };
 
 export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
-  const [{ query }, dispatch] = DataExplorerStore.use();
+  const [{ query }, dispatch] = DataExplorerStateManager.useContext();
   const {
     dataSource,
     queryColumns,

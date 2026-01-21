@@ -1,7 +1,7 @@
-import { createStore } from "@/lib/utils/createStore";
 import { makeObject } from "@/lib/utils/objects/builders";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { setValue } from "@/lib/utils/objects/setValue";
+import { createAppStateManager } from "@/lib/utils/state/createAppStateManager";
 import { QueryAggregationType } from "@/models/queries/QueryAggregationType";
 import { QueryColumn, QueryColumnId } from "@/models/queries/QueryColumn";
 import { QueryDataSource } from "@/models/queries/QueryDataSource";
@@ -12,7 +12,7 @@ import {
 import { StructuredQueries } from "@/models/queries/StructuredQuery/StructuredQueries";
 import { VizConfig, VizConfigs, VizType } from "@/models/vizs/VizConfig";
 
-type DataExplorerState = {
+type DataExplorerAppState = {
   query: PartialStructuredQuery;
 
   /**
@@ -23,7 +23,7 @@ type DataExplorerState = {
   vizConfig: VizConfig;
 };
 
-const initialState: DataExplorerState = {
+const initialState: DataExplorerAppState = {
   query: StructuredQueries.makeEmpty(),
   vizConfig: {
     vizType: "table",
@@ -37,20 +37,23 @@ const initialState: DataExplorerState = {
  * This store is used at the WorkspaceAppLayout level therefore it is reachable
  * from any app view in the workspace.
  */
-export const DataExplorerStore = createStore({
+export const DataExplorerStateManager = createAppStateManager({
   name: "DataExplorer",
   initialState,
   actions: {
     /** Set the data source for the query. */
     setDataSource: (
-      state: DataExplorerState,
+      state: DataExplorerAppState,
       dataSource: QueryDataSource | undefined,
     ) => {
       return setValue(state, "query.dataSource", dataSource);
     },
 
     /** Set the columns for the query. */
-    setColumns: (state: DataExplorerState, columns: readonly QueryColumn[]) => {
+    setColumns: (
+      state: DataExplorerAppState,
+      columns: readonly QueryColumn[],
+    ) => {
       const {
         query: { aggregations },
       } = state;
@@ -76,7 +79,7 @@ export const DataExplorerStore = createStore({
 
     /** Set the aggregation for a specific column */
     setColumnAggregation: (
-      state: DataExplorerState,
+      state: DataExplorerAppState,
       payload: {
         columnId: QueryColumnId;
         aggregation: QueryAggregationType;
@@ -110,7 +113,7 @@ export const DataExplorerStore = createStore({
 
     /** Set the column that we are ordering by. */
     setOrderByColumn: (
-      state: DataExplorerState,
+      state: DataExplorerAppState,
       columnId: QueryColumnId | undefined,
     ) => {
       return setValue(state, "query.orderByColumn", columnId);
@@ -118,14 +121,14 @@ export const DataExplorerStore = createStore({
 
     /** Set the direction that we are ordering by. */
     setOrderByDirection: (
-      state: DataExplorerState,
+      state: DataExplorerAppState,
       direction: OrderByDirection | undefined,
     ) => {
       return setValue(state, "query.orderByDirection", direction);
     },
 
     /** Change the active visualization */
-    setActiveVizType: (state: DataExplorerState, newVizType: VizType) => {
+    setActiveVizType: (state: DataExplorerAppState, newVizType: VizType) => {
       const { vizConfig, query } = state;
 
       // convert the viz config and then hydrate it from the query, so we can
@@ -140,12 +143,12 @@ export const DataExplorerStore = createStore({
       );
     },
 
-    setVizConfig: (state: DataExplorerState, vizConfig: VizConfig) => {
+    setVizConfig: (state: DataExplorerAppState, vizConfig: VizConfig) => {
       // fill in the defaults
       return setValue(state, "vizConfig", vizConfig);
     },
 
-    setRawSQL: (state: DataExplorerState, rawSQL: string | undefined) => {
+    setRawSQL: (state: DataExplorerAppState, rawSQL: string | undefined) => {
       return setValue(state, "rawSQL", rawSQL);
     },
   },

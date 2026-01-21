@@ -33,7 +33,7 @@ export function DatasetColumnExtractorCreator({
   fieldIdx,
   fieldName,
 }: Props): JSX.Element {
-  const [state] = EntityConfigCreatorStore.use();
+  const [state] = EntityConfigCreatorStore.useContext();
   const [fieldKeys, fieldInputProps] = entityConfigForm.keysAndProps(
     `datasetColumnFields.${fieldIdx}`,
     ["isArray", "allowManualEdit"],

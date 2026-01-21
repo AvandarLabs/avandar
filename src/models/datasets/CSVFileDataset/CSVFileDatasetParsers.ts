@@ -17,7 +17,7 @@ const DBReadSchema = z.object({
   id: z.uuid(),
   updated_at: z.iso.datetime({ offset: true }),
   workspace_id: z.uuid(),
-  offline_only: z.boolean(),
+  is_in_cloud_storage: z.boolean(),
   size_in_bytes: z.number(),
   rows_to_skip: z.number(),
   quote_char: z.string().nullable(),

@@ -17,7 +17,7 @@ import {
 import { GoogleSheetsDataset } from "@/models/datasets/GoogleSheetsDataset";
 import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { DuckDBClient } from "../DuckDBClient";
-import { DatasetParquetStorageClient } from "../storage/DatasetParquetStorageClient";
+import { DatasetParquetStorageClient } from "../storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { CSVFileDatasetClient } from "./CSVFileDatasetClient";
 import { DatasetColumnClient } from "./DatasetColumnClient";
 import { GoogleSheetsDatasetClient } from "./GoogleSheetsDatasetClient";
@@ -136,7 +136,7 @@ export const DatasetClient = createSupabaseCRUDClient({
         datasetName: string;
         datasetDescription: string;
         columns: DatasetColumnInput[];
-        offlineOnly: boolean;
+        isInCloudStorage: boolean;
         sizeInBytes: number;
         parseOptions: {
           rowsToSkip: number;
@@ -155,7 +155,7 @@ export const DatasetClient = createSupabaseCRUDClient({
 
         const {
           columns,
-          offlineOnly,
+          isInCloudStorage,
           sizeInBytes,
           workspaceId,
           datasetName,
@@ -171,7 +171,7 @@ export const DatasetClient = createSupabaseCRUDClient({
             p_columns: columns.map((col) => {
               return { ...col, description: col.description ?? null };
             }),
-            p_offline_only: offlineOnly,
+            p_is_in_cloud_storage: isInCloudStorage,
             p_size_in_bytes: sizeInBytes,
             p_rows_to_skip: parseOptions.rowsToSkip,
             p_quote_char: {
@@ -254,7 +254,7 @@ export const DatasetClient = createSupabaseCRUDClient({
         const dataset = await DatasetClient.getById({ id });
         if (dataset) {
           // delete the Parquet file from cloud object storage if it exists
-          await DatasetParquetStorageClient.deleteDatasetParquetObjects({
+          await DatasetParquetStorageClient.deleteDataset({
             workspaceId: dataset.workspaceId,
             datasetId: id,
           });

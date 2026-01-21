@@ -192,7 +192,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                     dataset.sourceType === "csv_file"
                   ) ?
                     <ToggleOfflineOnlyButton
-                      isOfflineOnly={
+                      isInCloudStorage={
                         datasetWithColumnsAndSource.source.offlineOnly
                       }
                       datasetId={dataset.id}

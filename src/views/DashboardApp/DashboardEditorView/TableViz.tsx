@@ -1,6 +1,6 @@
 import { Box, LoadingOverlay, Text } from "@mantine/core";
 import { useEffect } from "react";
-import { DataExplorerStore } from "@/components/DataExplorerApp/DataExplorerStore";
+import { DataExplorerStateManager } from "@/components/DataExplorerApp/DataExplorerStateManager";
 import { useDataQuery } from "@/components/DataExplorerApp/useDataQuery";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
@@ -12,7 +12,8 @@ type Props = {
 };
 
 export function TableViz({ rawSQL, isStale }: Props): JSX.Element {
-  const [{ rawSQL: storeRawSQL }, dispatch] = DataExplorerStore.use();
+  const [{ rawSQL: storeRawSQL }, dispatch] =
+    DataExplorerStateManager.useContext();
 
   const shouldSyncRawSQL: boolean =
     isStale === false && rawSQL.trim().length > 0 && rawSQL !== storeRawSQL;

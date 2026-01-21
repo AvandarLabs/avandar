@@ -40,7 +40,7 @@ export function EntityConfigCreatorView(): JSX.Element {
   const [
     { entityConfigName, singularEntityConfigName, pluralEntityConfigName },
     dispatch,
-  ] = EntityConfigCreatorStore.use();
+  ] = EntityConfigCreatorStore.useContext();
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
   const [sendEntityConfigForm, isSendEntityConfigFormPending] =

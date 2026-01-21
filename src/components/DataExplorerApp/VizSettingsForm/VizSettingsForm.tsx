@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 import { Select, SelectData } from "@/lib/ui/inputs/Select";
 import { QueryResultColumn } from "@/models/queries/QueryResult/QueryResult.types";
 import { VizConfigs, VizType, VizTypes } from "@/models/vizs/VizConfig";
-import { DataExplorerStore } from "../DataExplorerStore";
+import { DataExplorerStateManager } from "../DataExplorerStateManager";
 import { BarChartForm } from "./BarChartForm";
 import { LineChartForm } from "./LineChartForm";
 import { ScatterChartForm } from "./ScatterChartForm";
@@ -13,7 +13,7 @@ type Props = {
 };
 
 export function VizSettingsForm({ columns }: Props): JSX.Element {
-  const [{ vizConfig }, dispatch] = DataExplorerStore.use();
+  const [{ vizConfig }, dispatch] = DataExplorerStateManager.useContext();
   const vizTypeOptions: SelectData<VizType> = VizTypes.map((vizType) => {
     return {
       label: VizConfigs.getDisplayName(vizType),
