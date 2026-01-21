@@ -83,7 +83,7 @@ async function _uploadDatasetToSupabase(options: {
   await CSVFileDatasetClient.update({
     id: csvFileDataset.id,
     data: {
-      isInCloudStorage: false,
+      isInCloudStorage: true,
     },
   });
 

@@ -46,14 +46,16 @@ export function ToggleOfflineOnlyButton({
       },
     });
 
-  const [deleteParquetForOfflineOnly, isDeletePending] = useMutation({
-    mutationFn: async (deleteDatasetId: DatasetId): Promise<void> => {
+  const [deleteDatasetFromStorage, isDeletePending] = useMutation({
+    mutationFn: async (datasetIdToDelete: DatasetId): Promise<void> => {
       await DatasetParquetStorageClient.deleteDataset({
         workspaceId: workspace.id,
-        datasetId: deleteDatasetId,
+        datasetId: datasetIdToDelete,
       });
     },
     onSuccess: () => {
+      // successfully deleted the dataset from storage, so we update the CSV
+      // file to reflect that it is no longer in cloud storage.
       return updateCSVFileDataset({
         id: csvFileDatasetId,
         data: {
@@ -81,20 +83,18 @@ export function ToggleOfflineOnlyButton({
       return;
     }
 
-    const nextIsOfflineOnly = !isInCloudStorage;
-
     modals.openConfirmModal({
-      title: nextIsOfflineOnly ? "Make dataset offline-only?" : "Sync online?",
+      title: isInCloudStorage ? "Make dataset offline-only?" : "Sync online?",
       labels: {
-        confirm: nextIsOfflineOnly ? "Make offline-only" : "Allow syncing",
+        confirm: isInCloudStorage ? "Make offline-only" : "Allow syncing",
         cancel: "Cancel",
       },
       confirmProps: {
-        color: nextIsOfflineOnly ? "danger" : undefined,
+        color: isInCloudStorage ? "danger" : undefined,
         loading: isPending,
       },
       children:
-        nextIsOfflineOnly ?
+        isInCloudStorage ?
           <Text c="red.8">
             This dataset will no longer be stored online and can only be
             accessed as long as it is on your personal computer. Nobody on your
@@ -106,8 +106,8 @@ export function ToggleOfflineOnlyButton({
             accessed in other devices.
           </Text>,
       onConfirm: () => {
-        if (nextIsOfflineOnly) {
-          return deleteParquetForOfflineOnly(datasetId);
+        if (isInCloudStorage) {
+          return deleteDatasetFromStorage(datasetId);
         } else {
           return DatasetParquetStorageClient.startDatasetUpload({
             workspaceId: workspace.id,
