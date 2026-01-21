@@ -25,7 +25,7 @@
     "db:down-migration": "./scripts/downMigration.sh",
     "db:redo-migration": "./scripts/redoLastMigration.sh --gen-types",
     "db:reset": "supabase start && ./scripts/resetDatabase.sh",
-    "db:seed": "supabase start && npm run vite-script scripts/seedDatabaseScript.ts && mkdir -p supabase/buckets/datasets && supabase seed buckets --local",
+    "db:seed": "supabase start && npm run vite-script scripts/seedDatabaseScript.ts",
     "db:sql": "PGPASSWORD=postgres psql -d postgres -U postgres -h 127.0.0.1 -p 54322",
     "db:sql-cmd": "PGPASSWORD=postgres psql -d postgres -U postgres -h 127.0.0.1 -p 54322 -c",
     "env:reset": "cp .env.example .env.development && cp .env.example.edge .env.development.edge",
