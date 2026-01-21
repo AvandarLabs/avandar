@@ -185,15 +185,15 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
 
                   {(
                     // only show the button if the source dataset has an
-                    // "offlineOnly" property
+                    // "isInCloudStorage" property
                     datasetWithColumnsAndSource.source &&
-                    "offlineOnly" in datasetWithColumnsAndSource.source &&
+                    "isInCloudStorage" in datasetWithColumnsAndSource.source &&
                     // this toggle is currently only supported for CSV datasets
                     dataset.sourceType === "csv_file"
                   ) ?
                     <ToggleOfflineOnlyButton
                       isInCloudStorage={
-                        datasetWithColumnsAndSource.source.offlineOnly
+                        datasetWithColumnsAndSource.source.isInCloudStorage
                       }
                       datasetId={dataset.id}
                       csvFileDatasetId={datasetWithColumnsAndSource.source.id}

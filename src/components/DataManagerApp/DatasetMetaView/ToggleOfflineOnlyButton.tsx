@@ -3,6 +3,7 @@ import { modals } from "@mantine/modals";
 import { IconWorld, IconWorldOff } from "@tabler/icons-react";
 import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { useIsDatasetUploadInProgress } from "@/clients/storage/DatasetParquetStorageClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useMutation } from "@/lib/hooks/query/useMutation";
@@ -71,10 +72,7 @@ export function ToggleOfflineOnlyButton({
     },
   });
 
-  const isUploadPending =
-    DatasetParquetStorageClient.useIsDatasetParquetOnlineSyncInProgress(
-      datasetId,
-    );
+  const isUploadPending = useIsDatasetUploadInProgress(datasetId);
 
   const onClick = () => {
     const isPending = isUpdatePending || isUploadPending || isDeletePending;
