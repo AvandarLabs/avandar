@@ -24,7 +24,7 @@ done
 
 # Always reset the database with Supabase's --no-seed option
 # (we'll handle seeding ourselves)
-supabase db reset --no-seed
+supabase db reset --yes --local
 
 # Whenever we reset, let's regenerate the types in case there were
 # any new migrations that got applied
