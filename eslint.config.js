@@ -14,6 +14,9 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default [
+  {
+    ignores: ["**/dist/**"],
+  },
   eslintPluginImportX.flatConfigs.recommended,
   ...eslintPluginTailwindCSS.configs["flat/recommended"],
   ...eslintPluginRouter.configs["flat/recommended"],
