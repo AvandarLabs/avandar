@@ -1,10 +1,12 @@
 import { Acclimate } from "@avandar/acclimate";
 import { DevCLI } from "./DevCLI";
+import { PolarCLI } from "./PolarCLI";
 
 const cli = Acclimate.createCLI("test")
   .addCommand("dev", DevCLI)
+  .addCommand("polar", PolarCLI)
   .action(() => {
-    console.log("test, hello!");
+    Acclimate.log("test, hello!");
   });
 
 Acclimate.run(cli);
