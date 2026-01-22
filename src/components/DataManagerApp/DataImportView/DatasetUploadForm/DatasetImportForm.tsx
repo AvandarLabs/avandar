@@ -31,8 +31,6 @@ export type DatasetImportFormValues = {
 const { maxDatasetNameLength, maxDatasetDescriptionLength } =
   AppConfig.dataManagerApp;
 
-const TOO_MANY_ERRORS_THRESHOLD = 1000;
-
 type Props = {
   /**
    * Regardless of how many rows are passed in, only the first
@@ -149,11 +147,10 @@ export function DatasetImportForm({
   });
 
   const renderProcessState = () => {
-    const { numRows: numSuccessRows, numRejectedRows } = loadCSVResult;
-    const formattedSuccessNum = numSuccessRows.toLocaleString();
-    const formattedRejectedNum = numRejectedRows.toLocaleString();
+    const { numRows } = loadCSVResult;
+    const formattedNumRows = numRows.toLocaleString();
 
-    if (numSuccessRows === 0) {
+    if (numRows === 0) {
       return (
         <Callout
           title="Data processing failed"
@@ -161,37 +158,13 @@ export function DatasetImportForm({
           message="No rows were read successfully"
         />
       );
-    } else if (numRejectedRows === 0) {
-      return (
-        <Callout
-          title="Data processed successfully"
-          color="success"
-          message={`Parsed ${formattedSuccessNum} rows successfully`}
-        />
-      );
-    } else if (
-      numSuccessRows > numRejectedRows * 2 &&
-      numRejectedRows < TOO_MANY_ERRORS_THRESHOLD
-    ) {
-      // if the number of success rows is greater than double the number
-      // of errors, then we can say that it was mostly a success
-      return (
-        <Callout
-          title="Data processed successfully with some errors"
-          color="warning"
-          message={`Parsed ${formattedSuccessNum} rows successfully, but ${formattedRejectedNum} rows were rejected`}
-        />
-      );
     }
+
     return (
       <Callout
-        title="Data processed successfully with a large number of errors"
-        color="warning"
-        message={`Parsed ${formattedSuccessNum} rows successfully, but ${
-          numRejectedRows > 1000 ?
-            " over 1000 rows were rejected"
-          : ` ${formattedRejectedNum} rows were rejected`
-        }`}
+        title="Data processed successfully"
+        color="success"
+        message={`Parsed ${formattedNumRows} rows successfully`}
       />
     );
   };

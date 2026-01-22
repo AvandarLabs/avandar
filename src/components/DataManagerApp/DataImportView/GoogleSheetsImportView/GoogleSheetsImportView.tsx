@@ -20,7 +20,6 @@ import { GPickerDocumentObject } from "@/lib/types/google-picker";
 import {
   notifyError,
   notifySuccess,
-  notifyWarning,
 } from "@/lib/ui/notifications/notify";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
@@ -177,30 +176,31 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
   useEffect(() => {
     if (loadResults) {
       const {
-        metadata: { numRows: numSuccessRows, numRejectedRows },
+        metadata: { numRows },
       } = loadResults;
-      if (numRejectedRows === 0) {
-        notifySuccess({
-          title: "File loaded successfully",
-          message: `Parsed ${formatNumber(numSuccessRows)} rows`,
-        });
-      } else if (numSuccessRows === 0) {
+
+      if (numRows === 0) {
         notifyError({
           title: "File failed to load",
           message: "No rows were read successfully",
         });
       } else {
-        notifyWarning({
-          title: "File was partially loaded",
-          message: `Parsed ${numSuccessRows} rows successfully, but ${
-            numRejectedRows > 1000 ?
-              " over 1000 rows were rejected"
-            : ` ${numRejectedRows} rows were rejected`
-          }`,
+        notifySuccess({
+          title: "File loaded successfully",
+          message: `Parsed ${formatNumber(numRows)} rows`,
         });
       }
     }
   }, [loadResults]);
+
+  useEffect(() => {
+    if (loadQueryObj.isError) {
+      notifyError({
+        title: "File failed to load",
+        message: "An error occurred while loading the file",
+      });
+    }
+  }, [loadQueryObj.isError]);
 
   const detectedColumns = useMemo(() => {
     return loadResults?.metadata?.columns.map((duckColumn, idx) => {
@@ -283,6 +283,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
           parseOptions &&
           spreadsheet &&
           loadResults &&
+          !loadQueryObj.isError &&
           selectedGoogleAccount &&
           selectedDocument
         ) ?

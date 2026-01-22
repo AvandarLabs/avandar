@@ -5,7 +5,6 @@ import duckDBWasmEh from "@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url";
 import duckDBWasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
 import { ILogger, Logger } from "$/lib/Logger/Logger";
 import { MIMEType } from "$/lib/types/common";
-import { isNonEmptyArray } from "$/lib/utils/guards/isNonEmptyArray/isNonEmptyArray";
 import { objectEntries } from "$/lib/utils/objects/objectEntries/objectEntries";
 import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
 import * as arrow from "apache-arrow";
@@ -25,8 +24,6 @@ import {
   DuckDBCSVSniffResult,
   DuckDBLoadCSVResult,
   DuckDBLoadParquetResult,
-  DuckDBRejectedRow,
-  DuckDBScan,
   DuckDBStructuredQuery,
 } from "./DuckDBClient.types";
 import { DuckDBDataType, DuckDBDataTypeUtils } from "./DuckDBDataType";
@@ -69,23 +66,6 @@ type BaseDuckDBLoadCSVOptions = {
 export type DucKDBLoadCSVOptions =
   | (BaseDuckDBLoadCSVOptions & { file: File })
   | (BaseDuckDBLoadCSVOptions & { fileText: string });
-
-/**
- * The maximum number of rejected rows to store in DuckDB per file.
- * During a scan, once we have hit this limit, the CSV will still
- * continue to parse, but any more rejected rows will be ignored.
- *
- * This limit is intentionally set to 1001 (instead of 1000), so that
- * if we hit this number of errors, our UI can correctly make statements
- * like "Over 1000 rows were rejected." If we left this at 1000, we would
- * not know if there were exaclty 1000 rows or greater.
- *
- * We do not want to store over this many rejected rows because its a waste
- * of space. But we do not want to make this number too low, because
- * for smaller error counts it is helpful for the user to know the exact
- * number of errors.
- */
-const REJECTED_ROW_STORAGE_LIMIT = 1001;
 
 /**
  * An object representing a row with unknown column types.
@@ -222,6 +202,18 @@ class DuckDBClientImpl {
     return dbTableNames.includes(tableName);
   }
 
+  async hasView(viewName: string): Promise<boolean> {
+    const { data } = await this.runRawQuery<{ count: bigint }>(
+      `SELECT count(*) as count
+        FROM information_schema.tables
+        WHERE table_schema = 'main'
+          AND table_name = '$viewName$'
+          AND table_type = 'VIEW'`,
+      { params: { viewName } },
+    );
+    return Number(data[0]?.count ?? 0n) > 0;
+  }
+
   /**
    * Registers a CSV file in DuckDB's internal file system.
    * @param options The options for registering the dataset.
@@ -286,19 +278,28 @@ class DuckDBClientImpl {
    * to it. If the `tableName` does not exist, this will do nothing. It does
    * not throw an error.
    *
-   * @param tableName The table name to drop. This will also be used as the file
-   * name to drop.
+   * @param tableOrViewName The table or view name to drop. This will also be
+   * used as the file name to drop.
    */
-  async dropTableAndFile(tableName: string): Promise<void> {
+  async dropTableViewAndFile(tableOrViewName: string): Promise<void> {
     const db = await this.#getDB();
 
-    // delete the table associated to this file
-    await this.runRawQuery('DROP TABLE IF EXISTS "$tableName$"', {
-      params: { tableName },
-    });
+    const hasView = await this.hasView(tableOrViewName);
+    if (hasView) {
+      await this.runRawQuery('DROP VIEW "$tableName$"', {
+        params: { tableName: tableOrViewName },
+      });
+    } else {
+      const hasTable = await this.hasTable(tableOrViewName);
+      if (hasTable) {
+        await this.runRawQuery('DROP TABLE "$tableName$"', {
+          params: { tableName: tableOrViewName },
+        });
+      }
+    }
 
     // finally, drop the file from DuckDB's internal file system
-    await db.dropFile(tableName);
+    await db.dropFile(tableOrViewName);
   }
 
   /**
@@ -347,7 +348,7 @@ class DuckDBClientImpl {
     try {
       // If the dataset already exists, we drop it and then recreate it.
       // Loading a CSV will ALWAYS overwrite existing data.
-      await this.dropTableAndFile(tableName);
+      await this.dropTableViewAndFile(tableName);
       await this.#registerCSVFile(
         "file" in options ?
           { tableName, file: options.file }
@@ -364,7 +365,7 @@ class DuckDBClientImpl {
             t.* FROM sniff_csv(
               '$tableName$', 
               strict_mode=false,
-              ignore_errors=true
+              ignore_errors=false
               ${numRowsToSkip ? `, skip=${numRowsToSkip}` : ""}
               ${delimiter ? `, delim='${delimiter}'` : ""}
               ${cleanQuoteChar ? `, quote='${cleanQuoteChar}'` : ""}
@@ -390,53 +391,23 @@ class DuckDBClientImpl {
       );
       assertIsDefined(csvSniffResult, "CSV Sniff result is undefined");
 
-      // insert the CSV file as a table
+      // Insert the CSV file as a VIEW (low-memory interactive querying).
       await this.runRawQuery(
-        `CREATE TABLE "$tableName$" AS SELECT * $sniffCSVPrompt$`,
+        `CREATE VIEW "$tableName$" AS SELECT * $sniffCSVPrompt$`,
         {
           conn,
           params: {
             tableName,
-            sniffCSVPrompt: csvSniffResult.Prompt.replace(
-              "ignore_errors=true",
-              `encoding='utf-8',
-              store_rejects=true,
-              rejects_scan='reject_scans',
-              rejects_table='reject_errors',
-              rejects_limit=${REJECTED_ROW_STORAGE_LIMIT}`,
-            ),
+            sniffCSVPrompt: csvSniffResult.Prompt,
           },
         },
       );
-
-      // get the parsing errors
-      let rejectedScans: DuckDBScan[] = [];
-      let rejectedRows: DuckDBRejectedRow[] = [];
-      const rejectedScansResult = await this.runRawQuery<DuckDBScan>(
-        `SELECT * FROM reject_scans WHERE file_path='$tableName$'`,
-        { conn, params: { tableName } },
-      );
-      rejectedScans = rejectedScansResult.data;
-
-      if (isNonEmptyArray(rejectedScans)) {
-        // if there are scans, then let's see if there are any rejected rows
-        const fileId = rejectedScans[0].file_id;
-        const rejectedRowsResult = await this.runRawQuery<DuckDBRejectedRow>(
-          `SELECT * FROM reject_errors WHERE file_id='$fileId$'`,
-          { conn, params: { fileId } },
-        );
-        rejectedRows = rejectedRowsResult.data;
-      }
 
       this.#logger.log("Successfully loaded CSV into DuckDB!");
 
       // now let's collect all information we need to return
       const tableColumns = await this.getTableSchema(tableName);
       const csvRowCount = await this.getTableRowCount(tableName);
-      const csvErrors = {
-        rejectedScans,
-        rejectedRows,
-      };
 
       loadResults = {
         id: uuid(),
@@ -444,8 +415,6 @@ class DuckDBClientImpl {
         csvName: tableName,
         numRows: csvRowCount,
         columns: tableColumns,
-        errors: csvErrors,
-        numRejectedRows: csvErrors.rejectedRows.length,
         csvSniff: csvSniffResult,
       };
     } finally {
@@ -473,12 +442,12 @@ class DuckDBClientImpl {
 
     try {
       // Drop the dataset and recreate it. We are overwriting the data.
-      await this.dropTableAndFile(tableName);
+      await this.dropTableViewAndFile(tableName);
       await this.#registerParquetFile({ tableName, blob });
 
-      // re-ingest the parquet data into a table
+      // Re-ingest the parquet data into a view (low-memory querying).
       await this.runRawQuery(
-        `CREATE TABLE IF NOT EXISTS "$tableName$" AS
+        `CREATE VIEW "$tableName$" AS
             SELECT * FROM read_parquet('$tableName$')`,
         { conn, params: { tableName } },
       );

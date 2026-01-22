@@ -48,7 +48,7 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
       if (localDataset) {
         await LocalDatasetClient.delete({ id: localDataset.datasetId });
       }
-      await DuckDBClient.dropTableAndFile(datasetId);
+      await DuckDBClient.dropTableViewAndFile(datasetId);
     },
   });
 

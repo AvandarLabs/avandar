@@ -68,7 +68,7 @@ export const LocalDatasetClient = createDexieCRUDClient({
         logger.log("Dropping local dataset", params);
         const { datasetId } = params;
         await LocalDatasetClient.delete({ id: datasetId });
-        await DuckDBClient.dropTableAndFile(datasetId);
+        await DuckDBClient.dropTableViewAndFile(datasetId);
       },
 
       /**

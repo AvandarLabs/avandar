@@ -14,11 +14,7 @@ import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useQuery } from "@/lib/hooks/query/useQuery";
-import {
-  notifyError,
-  notifySuccess,
-  notifyWarning,
-} from "@/lib/ui/notifications/notify";
+import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 import { FileUploadForm } from "@/lib/ui/singleton-forms/FileUploadForm";
 import { formatNumber } from "@/lib/utils/formatters/formatNumber";
 import { snakeCaseKeysShallow } from "@/lib/utils/objects/transformations";
@@ -154,30 +150,31 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
   useEffect(() => {
     if (loadResults) {
       const {
-        metadata: { numRows: numSuccessRows, numRejectedRows },
+        metadata: { numRows },
       } = loadResults;
-      if (numRejectedRows === 0) {
-        notifySuccess({
-          title: "File loaded successfully",
-          message: `Parsed ${formatNumber(numSuccessRows)} rows`,
-        });
-      } else if (numSuccessRows === 0) {
+
+      if (numRows === 0) {
         notifyError({
           title: "File failed to load",
           message: "No rows were read successfully",
         });
       } else {
-        notifyWarning({
-          title: "File was partially loaded",
-          message: `Parsed ${numSuccessRows} rows successfully, but ${
-            numRejectedRows > 1000 ?
-              " over 1000 rows were rejected"
-            : ` ${numRejectedRows} rows were rejected`
-          }`,
+        notifySuccess({
+          title: "File loaded successfully",
+          message: `Parsed ${formatNumber(numRows)} rows`,
         });
       }
     }
   }, [loadResults]);
+
+  useEffect(() => {
+    if (loadQueryObj.isError) {
+      notifyError({
+        title: "File failed to load",
+        message: "An error occurred while loading the file",
+      });
+    }
+  }, [loadQueryObj.isError]);
 
   const detectedColumns = useMemo(() => {
     return loadResults?.metadata.columns.map((duckColumn, idx) => {
@@ -218,7 +215,12 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
           onSubmit={onFileSubmit}
         />
 
-        {detectedColumns && parseOptions && loadResults ?
+        {(
+          detectedColumns &&
+          parseOptions &&
+          loadResults &&
+          !loadQueryObj.isError
+        ) ?
           <DatasetImportForm
             key={loadResults.metadata.id}
             defaultName={parseOptions.file.name}
