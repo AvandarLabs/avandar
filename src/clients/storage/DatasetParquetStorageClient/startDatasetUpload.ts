@@ -1,5 +1,8 @@
+import Uppy from "@uppy/core";
+import Tus from "@uppy/tus";
 import { MIMEType } from "$/lib/types/common";
 import { where } from "$/lib/utils/filters/filters";
+import { AuthClient } from "@/clients/AuthClient";
 import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
@@ -14,6 +17,85 @@ import {
   getDatasetParquetStoragePath,
   WORKSPACES_BUCKET_NAME,
 } from "./utils";
+
+async function _getTusHeaders(): Promise<Record<string, string>> {
+  const session = await AuthClient.getCurrentSession();
+  const accessToken = session?.access_token;
+  if (!accessToken) {
+    throw new Error("You must be signed in to sync datasets online.");
+  }
+
+  const apiKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+  if (!apiKey) {
+    throw new Error("VITE_SUPABASE_ANON_KEY is not set.");
+  }
+
+  return {
+    apikey: apiKey,
+    authorization: `Bearer ${accessToken}`,
+    "x-upsert": "true",
+  };
+}
+
+async function _resumableParquetBlobUpload(options: {
+  workspaceId: WorkspaceId;
+  datasetId: DatasetId;
+  parquetBlob: Blob;
+}): Promise<void> {
+  const { workspaceId, datasetId, parquetBlob } = options;
+
+  const endpoint = `${AvaSupabase.getAPIURL()}/storage/v1/upload/resumable`;
+  const objectPath = getDatasetParquetStoragePath({ workspaceId, datasetId });
+
+  const tusHeaders = await _getTusHeaders();
+
+  const parquetFile = new File([parquetBlob], `${datasetId}.parquet`, {
+    type: MIMEType.APPLICATION_PARQUET,
+  });
+
+  const uppy = new Uppy({
+    autoProceed: true,
+    allowMultipleUploads: false,
+  });
+
+  uppy.use(Tus, {
+    endpoint,
+    chunkSize: 6 * 1024 * 1024,
+    retryDelays: [0, 1000, 3000, 5000, 10000],
+    headers: tusHeaders,
+    removeFingerprintOnSuccess: true,
+  });
+
+  uppy.addFile({
+    name: parquetFile.name,
+    type: parquetFile.type,
+    data: parquetFile,
+    meta: {
+      bucketName: WORKSPACES_BUCKET_NAME,
+      objectName: objectPath,
+      contentType: MIMEType.APPLICATION_PARQUET,
+      metadata: JSON.stringify({ datasetId, workspaceId }),
+    },
+  });
+
+  uppy.on("upload-progress", (_file, progress) => {
+    DatasetUploadProgressStore.setUploadedBytes(
+      datasetId,
+      progress.bytesUploaded,
+    );
+  });
+
+  try {
+    const result = await uppy.upload();
+    const failedUploads = result?.failed ?? [];
+    if (failedUploads.length > 0) {
+      const firstFailure = failedUploads[0];
+      throw firstFailure?.error ?? new Error("Upload failed.");
+    }
+  } finally {
+    uppy.destroy();
+  }
+}
 
 /**
  * Uploads the parquet blob to Supabase storage as a single async operation.
@@ -49,26 +131,26 @@ async function _oneShotParquetBlobUpload(options: {
 async function _uploadDatasetToSupabase(options: {
   workspaceId: WorkspaceId;
   datasetId: DatasetId;
+  parquetBlob: Blob;
 }): Promise<void> {
-  const { workspaceId, datasetId } = options;
+  const { workspaceId, datasetId, parquetBlob } = options;
 
-  const localDataset = await LocalDatasetClient.getById({ id: datasetId });
-  if (!localDataset) {
-    throw new Error("Dataset is not available locally on this device.");
-  }
-
-  const parquetBlob = localDataset.parquetData;
-
-  // TODO(jpsyx): support chunked uploads with resumability for larger sizes
   if (parquetBlob.size > DIRECT_UPLOAD_MAX_BYTES) {
-    throw new Error("This dataset is too large to sync online yet.");
+    await _resumableParquetBlobUpload({
+      workspaceId,
+      datasetId,
+      parquetBlob,
+    });
+  } else {
+    await _oneShotParquetBlobUpload({
+      workspaceId,
+      datasetId,
+      parquetBlob,
+    });
   }
 
-  await _oneShotParquetBlobUpload({
-    workspaceId,
-    datasetId,
-    parquetBlob,
-  });
+  DatasetUploadProgressStore.setUploadedBytes(datasetId, parquetBlob.size);
+  DatasetUploadProgressStore.markCompleted(datasetId);
 
   const csvFileDataset = await CSVFileDatasetClient.getOne(
     where("dataset_id", "eq", datasetId),
@@ -122,10 +204,22 @@ export async function startDatasetUpload(options: {
     return await currentUpload;
   }
 
-  const uploadPromise = _uploadDatasetToSupabase(options)
+  const localDataset = await LocalDatasetClient.getById({ id: datasetId });
+  if (!localDataset) {
+    throw new Error("Dataset is not available locally on this device.");
+  }
+
+  const parquetBlob = localDataset.parquetData;
+
+  const uploadPromise = _uploadDatasetToSupabase({
+    ...options,
+    parquetBlob,
+  })
     .catch((error: unknown) => {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
+
+      DatasetUploadProgressStore.markError(datasetId, errorMessage);
       notifyError({
         title: "Unable to sync dataset online",
         message: errorMessage,
@@ -136,6 +230,9 @@ export async function startDatasetUpload(options: {
       DatasetUploadProgressStore.removeUpload(datasetId);
     });
 
-  DatasetUploadProgressStore.addUpload(datasetId, uploadPromise);
+  DatasetUploadProgressStore.startUpload(datasetId, {
+    totalBytes: parquetBlob.size,
+    uploadPromise,
+  });
   return await uploadPromise;
 }

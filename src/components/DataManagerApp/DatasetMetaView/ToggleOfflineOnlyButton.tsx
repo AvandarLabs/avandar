@@ -1,10 +1,11 @@
-import { Loader, Text, ThemeIcon } from "@mantine/core";
+import { Loader, Progress, Stack, Text, ThemeIcon } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconWorld, IconWorldOff } from "@tabler/icons-react";
 import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { useIsDatasetUploadInProgress } from "@/clients/storage/DatasetParquetStorageClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
+import { useUploadPercent } from "@/clients/storage/DatasetParquetStorageClient/useUploadPercent";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { ActionIcon } from "@/lib/ui/ActionIcon";
@@ -75,6 +76,7 @@ export function ToggleOfflineOnlyButton({
   });
 
   const isUploadPending = useIsDatasetUploadInProgress(datasetId);
+  const uploadPercent = useUploadPercent(datasetId);
 
   const onClick = () => {
     const isPending = isUpdatePending || isUploadPending || isDeletePending;
@@ -121,31 +123,37 @@ export function ToggleOfflineOnlyButton({
   const isPending = isUpdatePending || isUploadPending || isDeletePending;
 
   return (
-    <ActionIcon
-      tooltip={
-        isUploadPending ? "Syncing dataset online..."
+    <Stack gap={4} align="center">
+      <ActionIcon
+        tooltip={
+          isUploadPending ? "Syncing dataset online..."
+          : isInCloudStorage ?
+            "This dataset is synced online. Click to make offline-only."
+          : "This dataset is offline-only. Click to allow online syncing."
+        }
+        variant="default"
+        color="neutral"
+        aria-label={
+          isInCloudStorage ? "Make offline-only" : "Allow online syncing"
+        }
+        disabled={isPending}
+        onClick={onClick}
+      >
+        {isUploadPending ?
+          <Loader size={20} />
         : isInCloudStorage ?
-          "This dataset is synced online. Click to make offline-only."
-        : "This dataset is offline-only. Click to allow online syncing."
-      }
-      variant="default"
-      color="neutral"
-      aria-label={
-        isInCloudStorage ? "Make offline-only" : "Allow online syncing"
-      }
-      disabled={isPending}
-      onClick={onClick}
-    >
-      {isUploadPending ?
-        <Loader size={20} />
-      : isInCloudStorage ?
-        <ThemeIcon variant="transparent" c="blue">
-          <IconWorld size={20} />
-        </ThemeIcon>
-      : <ThemeIcon variant="transparent" c="neutral.4">
-          <IconWorldOff size={20} />
-        </ThemeIcon>
-      }
-    </ActionIcon>
+          <ThemeIcon variant="transparent" c="blue">
+            <IconWorld size={20} />
+          </ThemeIcon>
+        : <ThemeIcon variant="transparent" c="neutral.4">
+            <IconWorldOff size={20} />
+          </ThemeIcon>
+        }
+      </ActionIcon>
+
+      {isUploadPending && uploadPercent !== undefined ?
+        <Progress value={uploadPercent} w={80} size={4} />
+      : null}
+    </Stack>
   );
 }
