@@ -5,6 +5,7 @@ import duckDBWasmEh from "@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url";
 import duckDBWasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
 import { ILogger, Logger } from "$/lib/Logger/Logger";
 import { MIMEType } from "$/lib/types/common";
+import { isNonEmptyArray } from "$/lib/utils/guards/isNonEmptyArray";
 import { objectEntries } from "$/lib/utils/objects/objectEntries/objectEntries";
 import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
 import * as arrow from "apache-arrow";
@@ -24,6 +25,8 @@ import {
   DuckDBCSVSniffResult,
   DuckDBLoadCSVResult,
   DuckDBLoadParquetResult,
+  DuckDBRejectedRow,
+  DuckDBScan,
   DuckDBStructuredQuery,
 } from "./DuckDBClient.types";
 import { DuckDBDataType, DuckDBDataTypeUtils } from "./DuckDBDataType";
@@ -72,6 +75,23 @@ export type DucKDBLoadCSVOptions =
  * This is very similar to `UnknownObject` except that keys can only be strings.
  */
 export type UnknownRow = Record<string, unknown>;
+
+/**
+ * The maximum number of rejected rows to store in DuckDB per file.
+ * During a scan, once we have hit this limit, the CSV will still
+ * continue to parse, but any more rejected rows will be ignored.
+ *
+ * This limit is intentionally set to 1001 (instead of 1000), so that
+ * if we hit this number of errors, our UI can correctly make statements
+ * like "Over 1000 rows were rejected." If we left this at 1000, we would
+ * not know if there were exaclty 1000 rows or greater.
+ *
+ * We do not want to store over this many rejected rows because its a waste
+ * of space. But we do not want to make this number too low, because
+ * for smaller error counts it is helpful for the user to know the exact
+ * number of errors.
+ */
+const REJECTED_ROW_STORAGE_LIMIT = 1001;
 
 function arrowTableToJS<RowObject extends UnknownRow>(
   arrowTable: arrow.Table<Record<string, arrow.DataType>>,
@@ -372,9 +392,9 @@ class DuckDBClientImpl {
           `SELECT
             '$tableName$' AS table_name,
             t.* FROM sniff_csv(
-              '$tableName$', 
-              strict_mode=false,
-              ignore_errors=false
+              '$tableName$',
+              strict_mode=true,
+              ignore_errors=true
               ${numRowsToSkip ? `, skip=${numRowsToSkip}` : ""}
               ${delimiter ? `, delim='${delimiter}'` : ""}
               ${cleanQuoteChar ? `, quote='${cleanQuoteChar}'` : ""}
@@ -402,21 +422,51 @@ class DuckDBClientImpl {
 
       // Insert the CSV file as a VIEW (low-memory interactive querying).
       await this.runRawQuery(
-        `CREATE VIEW "$tableName$" AS SELECT * $sniffCSVPrompt$`,
+        `CREATE TABLE "$tableName$" AS SELECT * $sniffCSVPrompt$`,
         {
           conn,
           params: {
             tableName,
-            sniffCSVPrompt: csvSniffResult.Prompt,
+            sniffCSVPrompt: csvSniffResult.Prompt.replace(
+              "ignore_errors=true",
+              `encoding='utf-8',
+              store_rejects=true,
+              rejects_scan='reject_scans',
+              rejects_table='reject_errors',
+              rejects_limit=${REJECTED_ROW_STORAGE_LIMIT}`,
+            ),
           },
         },
       );
+
+      // get the parsing errors
+      let rejectedScans: DuckDBScan[] = [];
+      let rejectedRows: DuckDBRejectedRow[] = [];
+      const rejectedScansResult = await this.runRawQuery<DuckDBScan>(
+        `SELECT * FROM reject_scans WHERE file_path='$tableName$'`,
+        { conn, params: { tableName } },
+      );
+      rejectedScans = rejectedScansResult.data;
+
+      if (isNonEmptyArray(rejectedScans)) {
+        // if there are scans, then let's see if there are any rejected rows
+        const fileId = rejectedScans[0].file_id;
+        const rejectedRowsResult = await this.runRawQuery<DuckDBRejectedRow>(
+          `SELECT * FROM reject_errors WHERE file_id='$fileId$'`,
+          { conn, params: { fileId } },
+        );
+        rejectedRows = rejectedRowsResult.data;
+      }
 
       this.#logger.log("Successfully loaded CSV into DuckDB!");
 
       // now let's collect all information we need to return
       const tableColumns = await this.getTableSchema(tableName);
       const csvRowCount = await this.getTableRowCount(tableName);
+      const csvErrors = {
+        rejectedScans,
+        rejectedRows,
+      };
 
       loadResults = {
         id: uuid(),
@@ -424,6 +474,8 @@ class DuckDBClientImpl {
         csvName: tableName,
         numRows: csvRowCount,
         columns: tableColumns,
+        errors: csvErrors,
+        numRejectedRows: csvErrors.rejectedRows.length,
         csvSniff: csvSniffResult,
       };
     } finally {

@@ -8,9 +8,6 @@ import type { DashboardId } from "@/models/Dashboard/Dashboard.types";
  * This does not include `userId` because public viewers are unauthenticated.
  */
 type PublicDatasetDBRead = {
-  /** `${dashboardId}/${datasetId}`; used as the Dexie primary key. */
-  publicDatasetId: string;
-
   /** The public dashboard that owns this published dataset copy. */
   dashboardId: DashboardId;
 
@@ -26,8 +23,8 @@ type PublicDatasetDBRead = {
 
 export type LocalPublicDatasetModel = DexieModelCRUDTypes<{
   modelName: "LocalPublicDataset";
-  primaryKey: "publicDatasetId";
-  primaryKeyType: string;
+  primaryKey: "datasetId";
+  primaryKeyType: DatasetId;
   dbTypes: {
     DBRead: PublicDatasetDBRead;
     DBUpdate: Partial<PublicDatasetDBRead>;

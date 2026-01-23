@@ -35,7 +35,6 @@ type Schemas = {
   v1: { version: 1; models: [LegacyLocalDatasetEntryModel] };
   v2: { version: 2; models: [LocalDatasetModel] };
   v3: { version: 3; models: [LocalDatasetModel, LocalPublicDatasetModel] };
-  v4: { version: 4; models: [LocalDatasetModel, LocalPublicDatasetModel] };
 };
 
 export const AvaDexieVersionManager = DexieDBVersionManager.make<Schemas>();
@@ -88,32 +87,14 @@ const DBDefinitions = [
         columnsToIndex: ["userId", "workspaceId"],
       },
       LocalPublicDataset: {
-        primaryKey: "publicDatasetId",
+        primaryKey: "datasetId",
       },
     },
 
     upgrader: async () => {},
   }),
-
-  AvaDexieVersionManager.defineVersion<4>({
-    db,
-    version: 4,
-    models: {
-      LocalDataset: {
-        primaryKey: "datasetId",
-        columnsToIndex: ["userId", "workspaceId"],
-      },
-      LocalPublicDataset: {
-        primaryKey: "publicDatasetId",
-      },
-    },
-
-    upgrader: async (tx) => {
-      await tx.table("LocalPublicDataset").clear();
-    },
-  }),
 ] as const;
 
 AvaDexieVersionManager.registerVersions(DBDefinitions);
 
-export const CURRENT_AVA_DEXIE_VERSION = "v4" as const satisfies keyof Schemas;
+export const CURRENT_AVA_DEXIE_VERSION = "v3" as const satisfies keyof Schemas;

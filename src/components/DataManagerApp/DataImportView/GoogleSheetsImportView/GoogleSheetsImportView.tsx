@@ -20,6 +20,7 @@ import { GPickerDocumentObject } from "@/lib/types/google-picker";
 import {
   notifyError,
   notifySuccess,
+  notifyWarning,
 } from "@/lib/ui/notifications/notify";
 import { assertIsDefined } from "@/lib/utils/asserts";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
@@ -176,18 +177,26 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
   useEffect(() => {
     if (loadResults) {
       const {
-        metadata: { numRows },
+        metadata: { numRows: numSuccessRows, numRejectedRows },
       } = loadResults;
-
-      if (numRows === 0) {
+      if (numRejectedRows === 0) {
+        notifySuccess({
+          title: "File loaded successfully",
+          message: `Parsed ${formatNumber(numSuccessRows)} rows`,
+        });
+      } else if (numSuccessRows === 0) {
         notifyError({
           title: "File failed to load",
           message: "No rows were read successfully",
         });
       } else {
-        notifySuccess({
-          title: "File loaded successfully",
-          message: `Parsed ${formatNumber(numRows)} rows`,
+        notifyWarning({
+          title: "File was partially loaded",
+          message: `Parsed ${numSuccessRows} rows successfully, but ${
+            numRejectedRows > 1000 ?
+              " over 1000 rows were rejected"
+            : ` ${numRejectedRows} rows were rejected`
+          }`,
         });
       }
     }

@@ -14,7 +14,11 @@ import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useQuery } from "@/lib/hooks/query/useQuery";
-import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
+import {
+  notifyError,
+  notifySuccess,
+  notifyWarning,
+} from "@/lib/ui/notifications/notify";
 import { FileUploadForm } from "@/lib/ui/singleton-forms/FileUploadForm";
 import { formatNumber } from "@/lib/utils/formatters/formatNumber";
 import { snakeCaseKeysShallow } from "@/lib/utils/objects/transformations";
@@ -150,18 +154,26 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
   useEffect(() => {
     if (loadResults) {
       const {
-        metadata: { numRows },
+        metadata: { numRows: numSuccessRows, numRejectedRows },
       } = loadResults;
-
-      if (numRows === 0) {
+      if (numRejectedRows === 0) {
+        notifySuccess({
+          title: "File loaded successfully",
+          message: `Parsed ${formatNumber(numSuccessRows)} rows`,
+        });
+      } else if (numSuccessRows === 0) {
         notifyError({
           title: "File failed to load",
           message: "No rows were read successfully",
         });
       } else {
-        notifySuccess({
-          title: "File loaded successfully",
-          message: `Parsed ${formatNumber(numRows)} rows`,
+        notifyWarning({
+          title: "File was partially loaded",
+          message: `Parsed ${numSuccessRows} rows successfully, but ${
+            numRejectedRows > 1000 ?
+              " over 1000 rows were rejected"
+            : ` ${numRejectedRows} rows were rejected`
+          }`,
         });
       }
     }

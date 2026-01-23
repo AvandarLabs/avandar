@@ -51,9 +51,8 @@ function createLocalPublicDatasetRawQueryClient(): WithLogger<
               return;
             }
 
-            const publicDatasetId: string = `${dashboardId}/${datasetId}`;
             const cachedDataset = await LocalPublicDatasetClient.getById({
-              id: publicDatasetId,
+              id: datasetId,
             });
 
             let publicDataset: LocalPublicDataset;

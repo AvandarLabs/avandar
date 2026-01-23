@@ -8,7 +8,6 @@ import type { LocalPublicDatasetModel } from "./LocalPublicDataset.types";
 import type { DashboardId } from "@/models/Dashboard/Dashboard.types";
 
 const DBReadSchema = z.object({
-  publicDatasetId: z.string(),
   dashboardId: uuidType<DashboardId>(),
   datasetId: uuidType<DatasetId>(),
   parquetData: z.instanceof(Blob),

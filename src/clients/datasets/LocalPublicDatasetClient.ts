@@ -51,22 +51,21 @@ export const LocalPublicDatasetClient = createDexieCRUDClient<
         dashboardId: DashboardId;
         datasetId: DatasetId;
       }): Promise<LocalPublicDataset> => {
-        const publicDatasetId: string = `${params.dashboardId}/${params.datasetId}`;
+        const { dashboardId, datasetId } = params;
         const existingPromise =
-          downloadsInProgressByPublicDatasetId.get(publicDatasetId);
+          downloadsInProgressByPublicDatasetId.get(datasetId);
         if (existingPromise) {
           return await existingPromise;
         }
 
         const downloadPromise = (async () => {
-          const { dashboardId, datasetId } = params;
           const logger = config.logger.appendName(
             "fetchPublicDatasetToIndexedDB",
           );
           logger.log("Fetching public dataset to IndexedDB", params);
 
           const existing = await LocalPublicDatasetClient.getById({
-            id: publicDatasetId,
+            id: datasetId,
           });
           if (existing) {
             return existing;
@@ -81,7 +80,6 @@ export const LocalPublicDatasetClient = createDexieCRUDClient<
 
           const publicDataset = await LocalPublicDatasetClient.insert({
             data: {
-              publicDatasetId,
               dashboardId,
               datasetId,
               parquetData: parquetBlob,
@@ -91,13 +89,10 @@ export const LocalPublicDatasetClient = createDexieCRUDClient<
 
           return publicDataset;
         })().finally(() => {
-          downloadsInProgressByPublicDatasetId.delete(publicDatasetId);
+          downloadsInProgressByPublicDatasetId.delete(datasetId);
         });
 
-        downloadsInProgressByPublicDatasetId.set(
-          publicDatasetId,
-          downloadPromise,
-        );
+        downloadsInProgressByPublicDatasetId.set(datasetId, downloadPromise);
         return await downloadPromise;
       },
     };
