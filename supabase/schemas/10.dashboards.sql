@@ -36,11 +36,16 @@ create policy "
   User can SELECT dashboards in their workspace
 " on public.dashboards for
 select
-  to authenticated using (
-    public.dashboards.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
+  to authenticated,
+  anon using (
+    public.dashboards.is_public = true or
+    (
+      auth.uid () is not null and
+      public.dashboards.workspace_id = any (
+        array(
+          select
+            public.util__get_auth_user_workspaces ()
+        )
       )
     )
   );
