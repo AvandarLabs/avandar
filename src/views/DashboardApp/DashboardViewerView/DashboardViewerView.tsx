@@ -1,11 +1,14 @@
-import { Box, Stack, Text, Title } from "@mantine/core";
+import { Box, LoadingOverlay, Stack, Text, Title } from "@mantine/core";
 import { Render } from "@puckeditor/core";
+import { useEffect } from "react";
 import "@puckeditor/core/puck.css";
+import { notifyError } from "@/lib/ui/notifications/notify";
 import { Paper } from "@/lib/ui/Paper";
 import {
   getDashboardPuckConfig,
   getInitialDashboardPuckData,
 } from "../DashboardEditorView/getDashboardPuckConfig";
+import { useEnsurePublishedDashboardDatasets } from "./useEnsurePublishedDashboardDatasets";
 import type { Dashboard } from "@/models/Dashboard/Dashboard.types";
 
 type Props = {
@@ -13,6 +16,20 @@ type Props = {
 };
 
 export function DashboardViewerView({ dashboard }: Props): JSX.Element {
+  const [isLoadingDatasets, loadingDatasetsError] =
+    useEnsurePublishedDashboardDatasets(dashboard);
+
+  useEffect(() => {
+    if (!loadingDatasetsError) {
+      return;
+    }
+
+    notifyError({
+      title: "Unable to load dashboard datasets",
+      message: loadingDatasetsError.message,
+    });
+  }, [loadingDatasetsError]);
+
   if (!dashboard) {
     return (
       <Paper p="xxl" maw={720} mx="auto">
@@ -50,6 +67,35 @@ export function DashboardViewerView({ dashboard }: Props): JSX.Element {
   });
 
   const data = getInitialDashboardPuckData({ dashboard });
+
+  if (isLoadingDatasets) {
+    return (
+      <Paper p="xxl" maw={720} mx="auto" pos="relative">
+        <LoadingOverlay visible />
+        <Stack gap="xs">
+          <Title order={2} fw={650}>
+            Loading dashboard datasets
+          </Title>
+          <Text c="dimmed">Preparing data for the visualizations…</Text>
+        </Stack>
+      </Paper>
+    );
+  }
+
+  if (loadingDatasetsError) {
+    return (
+      <Paper p="xxl" maw={720} mx="auto">
+        <Stack gap="xs">
+          <Title order={2} fw={650}>
+            Unable to load dashboard
+          </Title>
+          <Text c="dimmed">
+            Some published datasets could not be loaded. Please try again later.
+          </Text>
+        </Stack>
+      </Paper>
+    );
+  }
 
   return (
     <Box>

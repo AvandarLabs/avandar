@@ -1,5 +1,12 @@
 # Agent Rules
 
+## Documentation
+
+- Refer to `package.json` for the most recent library versions
+- Refer to the root `README.md` for the repo description and other conventions.
+- Use Context7 MCP to reference the most up-to-date documentation of any
+  library when you need it.
+
 ## Scope
 
 - Only implement what is requested. Do not fix other bugs, clean up any other
@@ -31,10 +38,28 @@
 - Only one React component per file.
 - Split up components into logical sub-components. Avoid monolithic components.
 - Use either our internal UI library in `src/lib/ui` or Mantine components.
-  Do not build new core UI elements from scratch.
-- Use Mantine's style props as much as possible. Only use Tailwind when something
-  cannot be styled using Mantine directly.
-- Use Context7 to refer to Mantine's up-to-date documentation.
+  Do not build new core UI elements from scratch unless specifically asked to.
+
+## CSS styling
+
+When styling components, use the following approaches, in the priority given.
+Only use a lower priority approach when the higher priority methods does not
+have the flexibility you need.
+
+1. Use Mantine's style prop shorthands (e.g. `c`, `mt`, `pd`, `bg`, `bd`, `bdrs`,
+   . etc.) as much as possible.
+   - This also applies to responsive designs. We use Mantine's breakpoints and
+     `hiddenFrom` and `visibleFrom` props when necessary.
+     Only use Tailwind when something cannot be styled using Mantine directly.
+2. Use Mantine's `classNames` prop with Tailwind classes. Use Context7 to look
+   up the component's selectors for the `classNames` object. Use the `clsx`
+   for conditional classes.
+3. Use Tailwind classes directly in a `className` prop. Use the `clsx` library
+   for conditional classes.
+4. Use `.css` modules and import the CSS into the component.
+5. Use the `style` or `styles` prop with an object or a function (whose argument
+   is the Mantine theme object) that returns an object. Only use this when we
+   need to dynamically compute styles.
 
 ## Files to ignore
 

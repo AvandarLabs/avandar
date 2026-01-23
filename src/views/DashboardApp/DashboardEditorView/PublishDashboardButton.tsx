@@ -15,7 +15,7 @@ export function PublishDashboardButton({
   dashboardId,
   isPublic,
 }: Props): JSX.Element {
-  const [publishDashboard, isPublishing] = DashboardClient.useUpdate({
+  const [publishDashboard, isPublishing] = DashboardClient.usePublishDashboard({
     onSuccess: () => {
       notifySuccess("Dashboard published!");
     },
@@ -40,8 +40,7 @@ export function PublishDashboardButton({
           labels: { confirm: "Publish", cancel: "Cancel" },
           onConfirm: () => {
             publishDashboard({
-              id: dashboardId,
-              data: { isPublic: true },
+              dashboardId,
             });
           },
         });
