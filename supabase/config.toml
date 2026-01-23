@@ -56,7 +56,10 @@ enabled = true
 # Specifies an ordered list of seed files to load during db reset.
 # Supports glob patterns relative to supabase directory: "./seeds/*.sql"
 # sql_paths = ["./seed.sql"]
-sql_paths = ["./migrations/20260119164300_STORAGE-workspaces-bucket.sql"]
+sql_paths = [
+  "./migrations/20260119164300_STORAGE-workspaces-bucket.sql",
+  "./migrations/20260122161802_STORAGE-public-bucket.sql",
+]
 
 [realtime]
 enabled = true
