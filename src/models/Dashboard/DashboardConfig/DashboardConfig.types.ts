@@ -28,6 +28,8 @@ type DashboardWidget = VersionedModel<
   }
 >;
 
+// TODO(jpsyx): decide if we even keep this type or not since we are using
+// Puck dashboard configs directly now.
 export type DashboardConfig = VersionedModel<
   ModelType,
   1,

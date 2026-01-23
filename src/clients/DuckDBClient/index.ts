@@ -214,6 +214,15 @@ class DuckDBClientImpl {
     return Number(data[0]?.count ?? 0n) > 0;
   }
 
+  async hasTableOrView(tableNameOrViewName: string): Promise<boolean> {
+    const hasTable = await this.hasTable(tableNameOrViewName);
+    if (hasTable) {
+      return true;
+    }
+    const hasView = await this.hasView(tableNameOrViewName);
+    return hasView;
+  }
+
   /**
    * Registers a CSV file in DuckDB's internal file system.
    * @param options The options for registering the dataset.

@@ -37,3 +37,10 @@ dist-ssr
 # Supabase
 supabase/.temp
 supabase/.branches
+
+# Cursor
+.cursor/plans
+
+# Common scratch or temp files
+todo.md
+TODO.md
