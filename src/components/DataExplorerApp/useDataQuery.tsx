@@ -6,7 +6,6 @@ import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { UnknownRow } from "@/clients/DuckDBClient";
 import { DuckDBQueryAggregationType } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useQuery, UseQueryResultTuple } from "@/lib/hooks/query/useQuery";
 import { isOfModelType } from "@/lib/utils/guards/guards";
 import {
@@ -50,7 +49,6 @@ export function useDataQuery({
   rawSQL,
   workspaceId,
 }: UseDataQueryOptions): UseQueryResultTuple<QueryResult<UnknownRow>> {
-  const workspace = useCurrentWorkspace();
   const {
     dataSource,
     queryColumns,
@@ -61,7 +59,6 @@ export function useDataQuery({
   const sortedQueryColumns = sortObjList(queryColumns, {
     sortBy: prop("id"),
   });
-  const workspaceId = workspace.id;
 
   return useQuery({
     enabled: !!dataSource || !!rawSQL,
