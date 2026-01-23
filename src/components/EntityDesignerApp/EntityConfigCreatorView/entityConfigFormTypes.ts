@@ -60,12 +60,12 @@ export type EntityConfigFormValues = SetOptional<
    * this array holds the ids of the datasets we will extract from,
    * coupled with the id of the column to use as the primary key.
    */
-  sourceDatasets: Array<{
+  sourceDatasets: ReadonlyArray<{
     dataset: DatasetWithColumns;
     primaryKeyColumnId?: DatasetColumnId;
   }>;
-  datasetColumnFields: EntityFieldFormValues[];
-  manualEntryFields: EntityFieldFormValues[];
+  datasetColumnFields: readonly EntityFieldFormValues[];
+  manualEntryFields: readonly EntityFieldFormValues[];
 };
 
 export type EntityConfigFormSubmitValues = EntityConfigFormValues & {

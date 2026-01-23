@@ -1,10 +1,10 @@
 import {
-  ActionIcon,
   Button,
   Container,
   FloatingIndicator,
   Group,
   Loader,
+  ActionIcon as MantineActionIcon,
   MantineTheme,
   Stack,
   Tabs,
@@ -23,6 +23,7 @@ import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { ActionIcon } from "@/lib/ui/ActionIcon";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList.types";
 import { Paper } from "@/lib/ui/Paper";
@@ -30,12 +31,19 @@ import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { matchLiteral } from "@/lib/utils/strings/matchLiteral";
 import { AvaDataTypes } from "@/models/datasets/AvaDataType";
+import { CSVFileDataset } from "@/models/datasets/CSVFileDataset";
 import { Dataset, DatasetWithColumns } from "@/models/datasets/Dataset";
+import { GoogleSheetsDataset } from "@/models/datasets/GoogleSheetsDataset";
 import { DataSummaryView } from "./DataSummaryView";
 import { EditDatasetView } from "./EditDatasetView";
+import { ToggleOfflineOnlyButton } from "./ToggleOfflineOnlyButton";
 
 type Props = {
   dataset: Dataset;
+};
+
+type DatasetWithColumnsAndSource = DatasetWithColumns & {
+  source: CSVFileDataset | GoogleSheetsDataset;
 };
 
 const EXCLUDED_DATASET_METADATA_KEYS = [
@@ -46,7 +54,7 @@ const EXCLUDED_DATASET_METADATA_KEYS = [
   "ownerId",
   "ownerProfileId",
   "dateOfLastSync",
-] satisfies ReadonlyArray<keyof DatasetWithColumns>;
+] satisfies ReadonlyArray<keyof DatasetWithColumnsAndSource>;
 
 const DATASET_METADATA_RENDER_OPTIONS = {
   createdAt: {
@@ -79,7 +87,10 @@ const DATASET_METADATA_RENDER_OPTIONS = {
       includeKeys: ["name", "dataType", "description"],
     },
   },
-} satisfies ObjectKeyRenderOptionsMap<DatasetWithColumns>;
+  source: {
+    excludeKeys: ["createdAt", "id", "datasetId", "updatedAt", "workspaceId"],
+  },
+} satisfies ObjectKeyRenderOptionsMap<DatasetWithColumnsAndSource>;
 
 type DatasetTabId = "dataset-metadata" | "dataset-summary";
 
@@ -92,7 +103,11 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   const [deleteDataset, isDeletePending] = DatasetClient.useFullDelete({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
   });
-
+  const [sourceDataset, isLoadingSourceDataset] =
+    DatasetClient.useGetSourceDataset({
+      datasetId: dataset.id,
+      sourceType: dataset.sourceType,
+    });
   const [previewData, isLoadingPreviewData] =
     DatasetRawDataClient.useGetPreviewData({
       datasetId: dataset.id,
@@ -101,9 +116,14 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   const [datasetColumns, isLoadingDatasetColumns] =
     DatasetColumnClient.useGetAll(where("dataset_id", "eq", dataset.id));
 
-  const datasetWithColumns = useMemo(() => {
-    return { ...dataset, columns: datasetColumns };
-  }, [dataset, datasetColumns]);
+  const datasetWithColumnsAndSource = useMemo(() => {
+    return {
+      ...dataset,
+      source:
+        !isLoadingSourceDataset && sourceDataset ? sourceDataset : undefined,
+      columns: datasetColumns,
+    };
+  }, [dataset, datasetColumns, isLoadingSourceDataset, sourceDataset]);
 
   const [isEditingDataset, setIsEditingDataset] = useState<boolean>(false);
 
@@ -137,7 +157,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
               isEditingDataset ?
                 <Group>
                   <EditDatasetView dataset={dataset} />
-                  <ActionIcon
+                  <MantineActionIcon
                     variant="subtle"
                     aria-label="Exit edit"
                     onClick={() => {
@@ -145,20 +165,40 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                     }}
                   >
                     <IconX size={20} />
-                  </ActionIcon>
+                  </MantineActionIcon>
                 </Group>
                 // optional “exit edit” action
-              : <Group>
+              : <Group gap="xxs">
                   <Title order={2}>{dataset.name}</Title>
                   <ActionIcon
-                    variant="subtle"
+                    ml="md"
+                    variant="default"
+                    color="neutral"
                     aria-label="Edit dataset"
+                    tooltip="Edit dataset"
                     onClick={() => {
                       return setIsEditingDataset(true);
                     }}
                   >
                     <IconPencil size={20} />
                   </ActionIcon>
+
+                  {(
+                    // only show the button if the source dataset has an
+                    // "isInCloudStorage" property
+                    datasetWithColumnsAndSource.source &&
+                    "isInCloudStorage" in datasetWithColumnsAndSource.source &&
+                    // this toggle is currently only supported for CSV datasets
+                    dataset.sourceType === "csv_file"
+                  ) ?
+                    <ToggleOfflineOnlyButton
+                      isInCloudStorage={
+                        datasetWithColumnsAndSource.source.isInCloudStorage
+                      }
+                      datasetId={dataset.id}
+                      csvFileDatasetId={datasetWithColumnsAndSource.source.id}
+                    />
+                  : null}
                 </Group>
 
             }
@@ -204,7 +244,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                 <Text>{dataset.description}</Text>
 
                 <ObjectDescriptionList
-                  data={datasetWithColumns}
+                  data={datasetWithColumnsAndSource}
                   dateFormat="MMMM D, YYYY"
                   includeKeys={["updatedAt", "sourceType", "..."]}
                   excludeKeys={EXCLUDED_DATASET_METADATA_KEYS}

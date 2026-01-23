@@ -1,0 +1,1 @@
+export { writeFileFromTemplate } from "./writeFileFromTemplate";

@@ -10,6 +10,7 @@ import { IconAlertCircle } from "@tabler/icons-react";
 
 type Props = {
   title: string;
+  titleSize?: TextProps["size"];
 
   /**
    * If a message is provided, it will be displayed in a Text component.
@@ -22,6 +23,7 @@ type Props = {
 export function Callout({
   title,
   message,
+  titleSize,
   color = "danger",
   variant = "light",
   icon = <IconAlertCircle size={32} />,
@@ -42,7 +44,11 @@ export function Callout({
     <Alert
       color={color}
       variant={variant}
-      title={<Title order={2}>{title}</Title>}
+      title={
+        <Title order={2} size={titleSize}>
+          {title}
+        </Title>
+      }
       icon={icon}
       styles={{ icon: { width: "fit-content", height: "fit-content" } }}
       children={contents}

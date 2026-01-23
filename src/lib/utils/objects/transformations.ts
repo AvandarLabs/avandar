@@ -255,7 +255,7 @@ export type ExcludeNullsExceptIn<
 
 /**
  * Excludes nulls from all keys except for the specified keys. Those keys will
- * be left as is. This is a shallow operation.
+ * continue to allow `null` values. This is a shallow operation.
  *
  * If no keys are specified, we assume `keysToKeepNull` is the entire
  * object. Therefore, the object is left unchanged.

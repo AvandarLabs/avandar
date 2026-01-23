@@ -10,7 +10,7 @@ export type IModels = {
    */
   make: <
     MType extends string,
-    MProps extends Record<string, unknown> = EmptyObject,
+    const MProps extends Record<string, unknown> = EmptyObject,
   >(
     modelType: MType,
     modelProps: MProps,
@@ -40,10 +40,11 @@ export type IModels = {
     M extends Model,
     FunctionRecord extends UnionToIntersection<
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      M extends any ? {
+      M extends any ?
+        {
           [Mod in M as ModelType<Mod>]: (model: Mod) => unknown;
         }
-        : never
+      : never
     >,
   >(
     model: M,
@@ -80,10 +81,11 @@ export const Models: IModels = {
     M extends Model,
     FunctionRecord extends UnionToIntersection<
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      M extends any ? {
+      M extends any ?
+        {
           [Mod in M as ModelType<Mod>]: (model: Mod) => unknown;
         }
-        : never
+      : never
     >,
   >(
     model: M,

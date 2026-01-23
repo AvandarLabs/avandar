@@ -65,12 +65,14 @@ function useGarbageDatasetCollection(): void {
  * In this modal, the user can either re-upload the dataset or delete it.
  *
  * TODO(jpsyx): add syncing google sheets from backend
- * TODO(jpsyx): once CSVs can be cloud-persisted, add re-downloading them
  */
 export function useSyncLocalDatasets(): void {
   useGarbageDatasetCollection();
   const workspace = useCurrentWorkspace();
+  const user = useCurrentUser();
   const [modalId, setModalId] = useState<string | undefined>(undefined);
+
+  // get all datasets that are available to this user and are of type "csv_file"
   const [datasets] = DatasetClient.useGetAll({
     where: {
       workspace_id: { eq: workspace.id },
@@ -80,18 +82,36 @@ export function useSyncLocalDatasets(): void {
 
   // TODO(jpsyx): this should be a DatasetClient query
   const [missingDatasets] = useQuery({
-    enabled: !!datasets,
+    enabled: !!datasets && !!user,
     usePreviousDataAsPlaceholder: true,
-    queryKey: ["missing-datasets", datasets],
+    queryKey: ["missing-datasets", datasets, user],
     queryFn: async () => {
       assertIsDefined(datasets);
+      assertIsDefined(user);
 
       // get the locally loaded datasets
       const datasetStatuses = await promiseMap(datasets, async (dataset) => {
         const isLoaded = await DatasetRawDataClient.isLocalDatasetAvailable({
           datasetId: dataset.id,
         });
-        return { dataset, isLoaded };
+
+        if (isLoaded) {
+          return { dataset, isLoaded };
+        }
+
+        // if not in our local storage, then fetch it from cloud object storage
+        // and store it in IndexedDB.
+        try {
+          await LocalDatasetClient.fetchCloudDatasetToLocalStorage({
+            datasetId: dataset.id,
+            workspaceId: workspace.id,
+            userId: user.id as UserId,
+          });
+
+          return { dataset, isLoaded: true };
+        } catch {
+          return { dataset, isLoaded: false };
+        }
       });
 
       return datasetStatuses

@@ -1,0 +1,9 @@
+import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
+import { $MODEL_NAME$Parsers } from "$PATH_TO_PARSERS$/$MODEL_NAME$";
+
+export const $MODEL_NAME$Client = createSupabaseCRUDClient({
+  modelName: "$MODEL_NAME$",
+  tableName: "$TABLE_NAME$",
+  dbTablePrimaryKey: "id",
+  parsers: $MODEL_NAME$Parsers,
+});

@@ -1,4 +1,5 @@
-import { prettifyError, ZodError } from "zod";
+import { z } from "zod";
+import { authMiddleware } from "../authMiddleware.ts";
 import { corsHeaders } from "../cors.ts";
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from "../httpCodes.ts";
 import {
@@ -34,14 +35,13 @@ import type {
   ValidQueryParams,
 } from "./MiniServer.types.ts";
 import type { User } from "@supabase/supabase-js";
-import type { infer as ZodInfer } from "zod";
 
 function parseSearchParamsFromURL<
   QParamsSchema extends QueryParamsSchema<ValidQueryParams | undefined>,
 >(
   url: string,
   queryParamsSchema: QParamsSchema,
-): ZodInfer<QParamsSchema> | undefined {
+): z.infer<QParamsSchema> | undefined {
   const urlObj = new URL(url);
   const searchParams = urlObj.searchParams;
 
@@ -56,12 +56,12 @@ function parseSearchParamsFromURL<
     }
 
     return queryParamsSchema?.parse(Object.fromEntries(searchParams)) as
-      | ZodInfer<QParamsSchema>
+      | z.infer<QParamsSchema>
       | undefined;
   } catch (error) {
     const baseMessage = "Error parsing query params";
-    if (error instanceof ZodError) {
-      throw new Error(`${baseMessage}\n${prettifyError(error)}`);
+    if (error instanceof z.ZodError) {
+      throw new Error(`${baseMessage}\n${z.prettifyError(error)}`);
     }
     if (error instanceof Error) {
       throw new Error(`${baseMessage}: ${String(error.message)}`);
@@ -73,14 +73,14 @@ function parseSearchParamsFromURL<
 async function parseBodyParams<Body extends AnyZodType>(
   req: Request,
   bodySchema: Body,
-): Promise<ZodInfer<Body>> {
+): Promise<z.infer<Body>> {
   try {
     const reqBody = await req.json();
     return bodySchema.parse(reqBody);
   } catch (error) {
     const baseMessage = "Error parsing body params";
-    if (error instanceof ZodError) {
-      throw new Error(`${baseMessage}. ${prettifyError(error)}`);
+    if (error instanceof z.ZodError) {
+      throw new Error(`${baseMessage}. ${z.prettifyError(error)}`);
     }
     if (error instanceof Error) {
       throw new Error(`${baseMessage}: ${String(error.message)}`);
@@ -331,9 +331,9 @@ export function MiniServer<API extends GenericRouteAPIRecord>(
   return {
     serve: () => {
       Deno.serve(
-        async (req: Request, info: Deno.ServeHandlerInfo<Deno.NetAddr>) => {
+        async (r: Request, info: Deno.ServeHandlerInfo<Deno.NetAddr>) => {
           // This is needed for functions invoked from a browser.
-          if (req.method === "OPTIONS") {
+          if (r.method === "OPTIONS") {
             return new Response("ok", { headers: corsHeaders });
           }
 
@@ -344,15 +344,14 @@ export function MiniServer<API extends GenericRouteAPIRecord>(
             for (const routeName of routeNames) {
               const methodHandlers =
                 routeHandlers[routeName as keyof typeof routeHandlers];
-              const h =
-                methodHandlers[req.method as keyof typeof methodHandlers];
+              const h = methodHandlers[r.method as keyof typeof methodHandlers];
 
               // find the first handler that matches the requested method and
               // that parses the path params successfully
-              if (h && h.state.method === req.method) {
+              if (h && h.state.method === r.method) {
                 const parsedPathParams = parseURLPathParams({
                   pattern: `/${functionName}${h.state.path}`,
-                  url: req.url,
+                  url: r.url,
 
                   /* eslint-disable @typescript-eslint/no-explicit-any */
                   // deno-lint-ignore no-explicit-any
@@ -389,45 +388,52 @@ export function MiniServer<API extends GenericRouteAPIRecord>(
                 >
               ).state;
 
-              const { supabaseClient, user } =
-                isJWTVerificationDisabled ?
-                  {}
-                : await _getSupabaseClientAndUser(req);
+              return await authMiddleware({
+                request: r,
+                skipJWTVerification: isJWTVerificationDisabled,
+                callback: async (options: {
+                  req: Request;
+                  supabaseClient: AvaSupabaseClient | undefined;
+                  user: User | undefined;
+                }) => {
+                  const { req, supabaseClient, user } = options;
 
-              const queryParams = parseSearchParamsFromURL(
-                req.url,
-                querySchema,
-              ) as ValidQueryParams | undefined;
-              if (req.method === "GET") {
-                const response = await action({
-                  body: undefined,
-                  request: req,
-                  info,
-                  supabaseClient,
-                  user,
-                  queryParams,
-                  pathParams,
-                  supabaseAdminClient: SupabaseAdmin,
-                });
-                return response instanceof Response ? response : (
-                    responseSuccess(response)
-                  );
-              }
+                  const queryParams = parseSearchParamsFromURL(
+                    req.url,
+                    querySchema,
+                  ) as ValidQueryParams | undefined;
+                  if (req.method === "GET") {
+                    const response = await action({
+                      body: undefined,
+                      request: req,
+                      info,
+                      supabaseClient,
+                      user,
+                      queryParams,
+                      pathParams,
+                      supabaseAdminClient: SupabaseAdmin,
+                    });
+                    return response instanceof Response ? response : (
+                        responseSuccess(response)
+                      );
+                  }
 
-              const body = await parseBodyParams(req, bodySchema);
-              const response = await action({
-                body,
-                request: req,
-                info,
-                supabaseClient,
-                user,
-                pathParams,
-                queryParams,
-                supabaseAdminClient: SupabaseAdmin,
+                  const body = await parseBodyParams(req, bodySchema);
+                  const response = await action({
+                    body,
+                    request: req,
+                    info,
+                    supabaseClient,
+                    user,
+                    pathParams,
+                    queryParams,
+                    supabaseAdminClient: SupabaseAdmin,
+                  });
+                  return response instanceof Response ? response : (
+                      responseSuccess(response)
+                    );
+                },
               });
-              return response instanceof Response ? response : (
-                  responseSuccess(response)
-                );
             }
 
             return responseError("Method not allowed", BAD_REQUEST);

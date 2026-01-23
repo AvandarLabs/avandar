@@ -146,6 +146,9 @@ export type BaseModelCRUDClient<M extends ModelCRUDTypes> = {
    * @param params.where Filters to apply. If multiple instances pass the
    * filter, the first instance is returned.
    *
+   * TODO(jpsyx): add a `throwIfNotFound` option to throw an error if no
+   * instance is found. Allow passing an error message for that case.
+   *
    * @returns A promise resolving to the model instance or undefined
    * if not found. If multiple instances pass the `where` filter, only
    * the first instance is returned.

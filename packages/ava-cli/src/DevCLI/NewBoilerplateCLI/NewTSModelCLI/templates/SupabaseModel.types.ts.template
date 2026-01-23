@@ -1,0 +1,54 @@
+import type { Model } from "@/models/Model";
+import type { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
+import type { SetOptional } from "type-fest";
+import type { WorkspaceId } from "@/models/Workspace/Workspace.types";
+import type { UUID } from "$/lib/types/common";
+
+type ModelType = "$MODEL_NAME$";
+
+export type $MODEL_NAME$Id = UUID<ModelType>;
+
+export type $MODEL_NAME$Read = Model<
+  ModelType,
+  {
+    /** Timestamp of when the $MODEL_NAME$ was created. */
+    createdAt: string;
+
+    /** The $MODEL_NAME$'s unique identifier. */
+    id: $MODEL_NAME$Id;
+
+    /** Workspace id the $MODEL_NAME$ belongs to. */
+    workspaceId: WorkspaceId;
+
+    /** Timestamp of when the $MODEL_NAME$ was last updated. */
+    updatedAt: string;
+
+    // Add additional fields here...
+  }
+>;
+
+/**
+ * CRUD type definitions for the $MODEL_NAME$ model.
+ */
+export type $MODEL_NAME$Model = SupabaseModelCRUDTypes<
+  {
+    tableName: "$TABLE_NAME$";
+    modelName: "$MODEL_NAME$";
+    modelPrimaryKeyType: $MODEL_NAME$Id;
+    modelTypes: {
+      Read: $MODEL_NAME$Read;
+      Insert: SetOptional<
+        $MODEL_NAME$Read,
+        | "createdAt"
+        | "id"
+        | "updatedAt"
+      >;
+      Update: Partial<$MODEL_NAME$Read>;
+    };
+  },
+  {
+    dbTablePrimaryKey: "id";
+  }
+>;
+
+export type $MODEL_NAME$<K extends keyof $MODEL_NAME$Model = "Read"> = $MODEL_NAME$Model[K];

@@ -55,7 +55,11 @@ schema_paths = []
 enabled = true
 # Specifies an ordered list of seed files to load during db reset.
 # Supports glob patterns relative to supabase directory: "./seeds/*.sql"
-sql_paths = ["./seed.sql"]
+# sql_paths = ["./seed.sql"]
+sql_paths = [
+  "./migrations/20260119164300_STORAGE-workspaces-bucket.sql",
+  "./migrations/20260122161802_STORAGE-public-bucket.sql",
+]
 
 [realtime]
 enabled = true
@@ -78,7 +82,8 @@ openai_api_key = "env(OPENAI_API_KEY)"
 [inbucket]
 enabled = true
 # Port to use for the email testing server web interface.
-port = 54324
+# Changed the port away from the default 54324 due to conflicts with MacOS' rapportd
+port = 51634
 # Uncomment to expose additional ports for testing user applications that send emails.
 # smtp_port = 54325
 # pop3_port = 54326
@@ -88,7 +93,7 @@ port = 54324
 [storage]
 enabled = true
 # The maximum file size allowed (e.g. "5MB", "500KB").
-file_size_limit = "50MiB"
+file_size_limit = "50MB"
 
 # Image transformation API is available to Supabase Pro plan.
 # [storage.image_transformation]
@@ -308,7 +313,7 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 
 [functions.google-auth]
 enabled = true
-verify_jwt = true
+verify_jwt = false
 import_map = "./functions/google-auth/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
@@ -330,7 +335,7 @@ entrypoint = "./functions/google-auth-callback/index.ts"
 
 [functions.google-sheets]
 enabled = true
-verify_jwt = true
+verify_jwt = false
 import_map = "./functions/google-sheets/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
@@ -352,7 +357,7 @@ entrypoint = "./functions/polar-public/index.ts"
 
 [functions.subscriptions]
 enabled = true
-verify_jwt = true
+verify_jwt = false
 import_map = "./functions/subscriptions/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
@@ -374,7 +379,7 @@ entrypoint = "./functions/waitlist/index.ts"
 
 [functions.workspaces]
 enabled = true
-verify_jwt = true
+verify_jwt = false
 import_map = "./functions/workspaces/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
@@ -385,7 +390,7 @@ entrypoint = "./functions/workspaces/index.ts"
 
 [functions.queries]
 enabled = true
-verify_jwt = true
+verify_jwt = false
 import_map = "./functions/queries/deno.json"
 # Uncomment to specify a custom file path to the entrypoint.
 # Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx

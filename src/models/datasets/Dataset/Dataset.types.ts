@@ -3,8 +3,8 @@ import { Enums } from "$/types/database.types";
 import { SetOptional } from "type-fest";
 import { SupabaseModelCRUDTypes } from "@/lib/models/SupabaseModelCRUDTypes";
 import { Model } from "@/models/Model";
+import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { UserId, UserProfileId } from "../../User/User.types";
-import { WorkspaceId } from "../../Workspace/Workspace.types";
 import { DatasetColumn } from "../DatasetColumn";
 
 type ModelType = "Dataset";

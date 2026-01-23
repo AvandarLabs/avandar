@@ -25,6 +25,14 @@ const fallbackError = (failedKey: unknown): never => {
   );
 };
 
+/**
+ * Use a dictionary to match a literal and get the value that corresponds to
+ * that literal.
+ *
+ * If the value is a function, that function will be called with the matched
+ * literal. This is a helpful way to lazy evaluate values or compute values
+ * that depend on the matched literal.
+ */
 export function matchLiteral<
   Key extends PropertyKey,
   Values extends ValueRecord<Key>,

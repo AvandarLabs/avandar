@@ -6,7 +6,7 @@ import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AppShell } from "@/lib/ui/AppShell";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
-import { DataExplorerStore } from "../DataExplorerApp/DataExplorerStore";
+import { DataExplorerStateManager } from "../DataExplorerApp/DataExplorerStateManager";
 import { useRootWorkspaceChecks } from "./useRootWorkspaceChecks/useRootWorkspaceChecks";
 import { useSpotlightActions } from "./useSpotlightActions";
 
@@ -45,6 +45,7 @@ export function WorkspaceAppLayout({
       NavbarLinks.workspaceHome(workspace.slug),
       NavbarLinks.dataManagerHome(workspace.slug),
       NavbarLinks.dataExplorer(workspace.slug),
+      NavbarLinks.dashboards(workspace.slug),
       NavbarLinks.map(workspace.slug),
       NavbarLinks.entityDesignerHome(workspace.slug),
       ...entityManagerLinks,
@@ -60,7 +61,7 @@ export function WorkspaceAppLayout({
   }, [workspace.slug]);
 
   return (
-    <DataExplorerStore.Provider>
+    <DataExplorerStateManager.Provider>
       <AppShell
         title={workspace.name}
         currentWorkspace={workspace}
@@ -71,6 +72,6 @@ export function WorkspaceAppLayout({
       >
         {children}
       </AppShell>
-    </DataExplorerStore.Provider>
+    </DataExplorerStateManager.Provider>
   );
 }

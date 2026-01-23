@@ -17,7 +17,7 @@ begin
     where public.workspace_memberships.user_id = auth.uid()
   );
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer stable;
 
 /**
  * Get all workspaces that the auth user is an owner of
@@ -31,7 +31,7 @@ begin
     where public.workspaces.owner_id = auth.uid()
   );
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer stable;
 
 /**
  * Get all workspaces where the auth user has a given role
@@ -50,7 +50,7 @@ begin
       and public.user_roles.role = $1
   );
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer stable;
 
 /**
  * Get all workspace members given a workspace id
@@ -67,4 +67,4 @@ begin
     where workspace_memberships.workspace_id = $1
   );
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer stable;

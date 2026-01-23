@@ -192,7 +192,8 @@ export function excludeNullsInProps<T extends UnknownObject, K extends keyof T>(
 
 /**
  * Returns a function that excludes nulls from all keys except the specified
- * keys. Those keys will be left unchanged. This is a shallow operation.
+ * keys. Those keys will continue to allow `null` values. This is a shallow
+ * operation.
  *
  * If no keys are specified, we assume `keysToKeepNull` is the entire
  * object. Therefore, the object is left unchanged.

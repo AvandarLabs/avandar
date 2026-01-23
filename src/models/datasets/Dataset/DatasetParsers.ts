@@ -1,5 +1,5 @@
 import { Expect, ZodSchemaEqualsTypes } from "$/lib/types/testUtilityTypes";
-import { iso, object, string, uuid, enum as zodEnum } from "zod";
+import { z } from "zod";
 import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
 import { excludeNullsExceptInProps } from "@/lib/utils/objects/higherOrderFuncs";
 import {
@@ -15,17 +15,17 @@ import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { Dataset, DatasetId, DatasetModel } from "./Dataset.types";
 import { Datasets } from "./Datasets";
 
-const DBReadSchema = object({
-  created_at: iso.datetime({ offset: true }),
-  date_of_last_sync: iso.datetime({ offset: true }).nullable(),
-  description: string().nullable(),
-  id: uuid(),
-  name: string(),
-  owner_id: uuid(),
-  owner_profile_id: uuid(),
-  source_type: zodEnum(Datasets.SourceTypes),
-  updated_at: iso.datetime({ offset: true }),
-  workspace_id: uuid(),
+const DBReadSchema = z.object({
+  created_at: z.iso.datetime({ offset: true }),
+  date_of_last_sync: z.iso.datetime({ offset: true }).nullable(),
+  description: z.string().nullable(),
+  id: z.uuid(),
+  name: z.string(),
+  owner_id: z.uuid(),
+  owner_profile_id: z.uuid(),
+  source_type: z.enum(Datasets.SourceTypes),
+  updated_at: z.iso.datetime({ offset: true }),
+  workspace_id: z.uuid(),
 });
 
 export const DatasetParsers = makeParserRegistry<DatasetModel>().build({

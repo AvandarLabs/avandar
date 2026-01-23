@@ -1,0 +1,60 @@
+import { z } from "zod";
+import { Expect, ZodSchemaEqualsTypes } from "$/lib/types/testUtilityTypes";
+import { makeParserRegistry } from "@/lib/models/makeParserRegistry";
+import {
+  camelCaseKeysDeep,
+  nullsToUndefinedDeep,
+  snakeCaseKeysDeep,
+  undefinedsToNullsDeep,
+} from "@/lib/utils/objects/transformations";
+import { pipe } from "@/lib/utils/pipe";
+import { Models } from "@/models/Model";
+import type { WorkspaceId } from "@/models/Workspace/Workspace.types";
+import type { $MODEL_NAME$, $MODEL_NAME$Id, $MODEL_NAME$Model } from "./$MODEL_NAME$.types";
+
+const DBReadSchema = z.object({
+  created_at: z.iso.datetime({ offset: true }),
+  id: z.uuid(),
+  updated_at: z.iso.datetime({ offset: true }),
+  workspace_id: z.uuid(),
+});
+
+export const $MODEL_NAME$Parsers = makeParserRegistry<$MODEL_NAME$Model>().build({
+  modelName: "$MODEL_NAME$",
+  DBReadSchema,
+  fromDBReadToModelRead: pipe(
+    camelCaseKeysDeep,
+    nullsToUndefinedDeep,
+    (obj): $MODEL_NAME$ => {
+      return Models.make("$MODEL_NAME$", {
+        ...obj,
+        id: obj.id as $MODEL_NAME$Id,
+        workspaceId: obj.workspaceId as WorkspaceId,
+      });
+    },
+  ),
+  fromModelInsertToDBInsert: pipe(
+    snakeCaseKeysDeep,
+    undefinedsToNullsDeep,
+  ),
+  fromModelUpdateToDBUpdate: pipe(
+    snakeCaseKeysDeep,
+    undefinedsToNullsDeep,
+  ),
+});
+
+/**
+ * Do not remove these tests!
+ */
+type CRUDTypes = $MODEL_NAME$Model;
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore Type tests - this variable is intentionally not used
+type ZodConsistencyTests = [
+  // Check that the DBReadSchema is consistent with the DBRead type.
+  Expect<
+    ZodSchemaEqualsTypes<
+      typeof DBReadSchema,
+      { input: CRUDTypes["DBRead"]; output: CRUDTypes["DBRead"] }
+    >
+  >,
+];

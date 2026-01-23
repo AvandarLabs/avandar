@@ -22,6 +22,9 @@ export type CSVFileDatasetRead = {
   /** Unique identifier of the workspace the dataset belongs to. */
   workspaceId: WorkspaceId;
 
+  /** If true it means the CSV is persisted in cloud storage */
+  isInCloudStorage: boolean;
+
   /** Size of the dataset in bytes. */
   sizeInBytes: number;
 
@@ -60,7 +63,7 @@ export type CSVFileDatasetModel = SupabaseModelCRUDTypes<
   {
     tableName: "datasets__csv_file";
     modelName: "CSVFileDataset";
-    modelPrimaryKeyType: DatasetId;
+    modelPrimaryKeyType: CSVFileDatasetId;
     modelTypes: {
       Read: CSVFileDatasetRead;
       Insert: SetOptional<CSVFileDatasetRead, "createdAt" | "id" | "updatedAt">;

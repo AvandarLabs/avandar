@@ -1,6 +1,6 @@
 import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
 import { createContext, useContext, useMemo, useReducer } from "react";
-import { assertIsDefined } from "./asserts";
+import { assertIsDefined } from "../asserts";
 
 type GenericActionRegistry<State> = Record<
   string,
@@ -8,12 +8,21 @@ type GenericActionRegistry<State> = Record<
   (state: State, payload: any) => State
 >;
 
-type StateStoreContext<
+type AppStateContextTuple<
   State,
   ActionRegistry extends GenericActionRegistry<State>,
 > = readonly [
   state: State,
-  dispatchRecord: {
+
+  /**
+   * Record of action types and their action functions
+   *
+   * @example
+   * const [state, dispatch] = MyAppState.use();
+   * dispatch.setName("John Doe");
+   *
+   */
+  dispatch: {
     [ActionType in keyof ActionRegistry]: (
       action: Parameters<ActionRegistry[ActionType]>[1],
     ) => void;
@@ -21,14 +30,28 @@ type StateStoreContext<
 ];
 
 /**
- * A state store to manage a component hierarchy's state.
+ * A manager for an application's state. Holds the Provider component and a
+ * hook to access the state and dispatch functions.
  */
-type StateStore<State, ActionRegistry extends GenericActionRegistry<State>> = {
+type AppStateManager<
+  State,
+  ActionRegistry extends GenericActionRegistry<State>,
+> = {
   /**
    * A `use` hook which returns a tuple of the state and a record of dispatch
    * functions.
    */
-  use: () => StateStoreContext<State, ActionRegistry>;
+  useContext: () => AppStateContextTuple<State, ActionRegistry>;
+
+  /**
+   * A `useState` hook which returns the current state.
+   */
+  useState: () => State;
+
+  /**
+   * A `useDispatch` hook which returns the app state's dispatch functions.
+   */
+  useDispatch: () => AppStateContextTuple<State, ActionRegistry>[1];
 
   /**
    * A `Provider` component which provides the state and dispatch functions
@@ -41,7 +64,7 @@ type StateStore<State, ActionRegistry extends GenericActionRegistry<State>> = {
 type ActionPayload<ActionRegistry extends GenericActionRegistry<any>> =
   Parameters<ActionRegistry[keyof ActionRegistry]>[1];
 
-export function createStore<
+export function createAppStateManager<
   State,
   ActionRegistry extends GenericActionRegistry<State>,
 >({
@@ -52,9 +75,9 @@ export function createStore<
   name: string;
   initialState: State;
   actions: ActionRegistry;
-}): StateStore<State, ActionRegistry> {
-  const StoreContext = createContext<
-    StateStoreContext<State, ActionRegistry> | undefined
+}): AppStateManager<State, ActionRegistry> {
+  const AppStateContext = createContext<
+    AppStateContextTuple<State, ActionRegistry> | undefined
   >(undefined);
 
   const reducer = (
@@ -76,18 +99,36 @@ export function createStore<
   const actionTypes = objectKeys(actions);
 
   return {
-    use: () => {
-      const context = useContext(StoreContext);
+    useContext: () => {
+      const context = useContext(AppStateContext);
       assertIsDefined(
         context,
-        `${name}.use() must be used within a <${name}.Provider>`,
+        `${name}.useContext() must be called within a <${name}.Provider>`,
       );
       return context;
     },
 
+    useState: () => {
+      const [state] = useContext(AppStateContext) ?? [];
+      assertIsDefined(
+        state,
+        `${name}.useState() must be called within a <${name}.Provider>`,
+      );
+      return state;
+    },
+
+    useDispatch: () => {
+      const [, dispatch] = useContext(AppStateContext) ?? [];
+      assertIsDefined(
+        dispatch,
+        `${name}.useDispatch() must be called within a <${name}.Provider>`,
+      );
+      return dispatch;
+    },
+
     Provider: ({ children }) => {
       const [state, dispatch] = useReducer(reducer, initialState);
-      const storeDispatch = useMemo(() => {
+      const appDispatch = useMemo(() => {
         const fnRecord = {} as {
           [ActionType in keyof ActionRegistry]: (
             payload: ActionPayload<ActionRegistry>,
@@ -102,13 +143,13 @@ export function createStore<
       }, [dispatch]);
 
       const context = useMemo(() => {
-        return [state, storeDispatch] as const;
-      }, [state, storeDispatch]);
+        return [state, appDispatch] as const;
+      }, [state, appDispatch]);
 
       return (
-        <StoreContext.Provider value={context}>
+        <AppStateContext.Provider value={context}>
           {children}
-        </StoreContext.Provider>
+        </AppStateContext.Provider>
       );
     },
   };

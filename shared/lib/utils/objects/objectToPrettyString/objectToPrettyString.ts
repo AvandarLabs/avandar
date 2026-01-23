@@ -19,7 +19,7 @@ function _objectToPrettyStringHelper(
 
   if (isArray(value)) {
     if (value.length === 0) {
-      return `${unknownToString(value, formatOptions)}`;
+      return formatOptions.emptyArrayString ?? "[]";
     }
 
     const itemStrings = value.map((item) => {
@@ -40,7 +40,7 @@ function _objectToPrettyStringHelper(
 
   const objKeys = Object.keys(value);
   if (objKeys.length === 0) {
-    return unknownToString(value, formatOptions);
+    return formatOptions.emptyObjectString ?? "{}";
   }
 
   const keyValueStrings = objKeys.map((key) => {

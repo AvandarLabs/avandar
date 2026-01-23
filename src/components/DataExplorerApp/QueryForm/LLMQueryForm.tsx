@@ -1,42 +1,17 @@
 import { Button, Fieldset, Group, Paper, Stack, Textarea } from "@mantine/core";
-import { where } from "$/lib/utils/filters/filters";
 import { useState } from "react";
-import { APIClient } from "@/clients/APIClient";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useMutation } from "@/lib/hooks/query/useMutation";
 import { TextareaForm } from "@/lib/ui/singleton-forms/TextareaForm/TextareaForm";
-import { WorkspaceId } from "@/models/Workspace/Workspace.types";
-import { DataExplorerStore } from "../DataExplorerStore";
+import { DataExplorerStateManager } from "../DataExplorerStateManager";
+import { useNLPQuery } from "./useNLPQuery";
 
 export function LLMQueryForm(): JSX.Element {
-  const [{ rawSQL }, dispatch] = DataExplorerStore.use();
+  const [{ rawSQL }, dispatch] = DataExplorerStateManager.useContext();
   const workspace = useCurrentWorkspace();
   const [isEditMode, setIsEditMode] = useState(false);
 
-  const [generateAndRunQuery, isRunningQuery] = useMutation({
-    mutationFn: async (options: {
-      prompt: string;
-      workspaceId: WorkspaceId;
-    }) => {
-      const datasets = await DatasetClient.getAll(
-        where("workspace_id", "eq", options.workspaceId),
-      );
-      const firstDataset = datasets[0];
-      if (!firstDataset) {
-        throw new Error("No datasets found");
-      }
-      const { sql } = await APIClient.get({
-        route: "queries/:workspaceId/generate",
-        pathParams: {
-          workspaceId: workspace.id,
-        },
-        queryParams: {
-          prompt: options.prompt,
-        },
-      });
-      return sql;
-    },
+  const [generateAndRunQuery, isRunningQuery] = useNLPQuery({
+    workspaceId: workspace.id,
     onSuccess: (sql) => {
       dispatch.setRawSQL(sql);
     },
@@ -66,7 +41,6 @@ export function LLMQueryForm(): JSX.Element {
             onSubmit={(value) => {
               generateAndRunQuery({
                 prompt: value.trim(),
-                workspaceId: workspace.id,
               });
             }}
           />

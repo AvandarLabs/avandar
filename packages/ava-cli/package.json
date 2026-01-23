@@ -1,0 +1,30 @@
+{
+  "name": "@avandar/ava-cli",
+  "version": "0.0.0",
+  "description": "Avandar CLI",
+  "license": "CPAL-1.0",
+  "type": "module",
+  "bin": {
+    "ava": "dist/main.cjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/main.cjs",
+  "types": "./dist/main.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "type-check": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "prettier": "^3.5.3"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "typescript": "~5.9.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

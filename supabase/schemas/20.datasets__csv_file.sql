@@ -9,6 +9,11 @@ create table public.datasets__csv_file (
   created_at timestamptz not null default now(),
   -- Timestamp of when the dataset was last updated.
   updated_at timestamptz not null default now(),
+  -- Whether the dataset is available in cloud storage.
+  -- When a dataset is uploaded to the Supabase storage, we set this to true.
+  -- When a dataset is deleted from the Supabase storage (or has not yet
+  -- finished uploading), we set this to false.
+  is_in_cloud_storage boolean not null default false,
   -- Size of the CSV in bytes
   size_in_bytes integer not null,
   -- Number of rows to skip at the start of the file

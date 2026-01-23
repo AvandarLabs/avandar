@@ -22,10 +22,15 @@ export function responseError(error: unknown, statusCode: number): Response {
     errorType = "Unknown";
   }
 
-  console.error("Sending back an error response", {
-    type: errorType,
-    error: errorMessage,
-  });
+  console.error(
+    "Sending back an error response",
+    {
+      type: errorType,
+      error: errorMessage,
+    },
+    error,
+  );
+
   return new Response(JSON.stringify({ error: errorMessage }), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
     status: httpCode,
