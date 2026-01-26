@@ -4,5 +4,29 @@
     "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
     "type-fest": "npm:type-fest@5",
     "zod": "npm:zod@4"
+  },
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "lib": ["deno.ns", "dom", "dom.iterable"],
+    "moduleDetection": "force",
+    "moduleResolution": "bundler",
+    "module": "preserve",
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUncheckedIndexedAccess": true,
+    "noUncheckedSideEffectImports": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "typeRoots": ["shared/types", "shared/lib/types"],
+    "types": ["react", "react/jsx-runtime"]
   }
 }

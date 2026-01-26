@@ -21,6 +21,14 @@ function _getAuthToken(req: Request) {
   if (bearer !== "Bearer") {
     throw new AvaHTTPError(`Auth header is not 'Bearer {token}'`, BAD_REQUEST);
   }
+
+  if (!token) {
+    throw new AvaHTTPError(
+      "Missing token in authorization header",
+      BAD_REQUEST,
+    );
+  }
+
   return token;
 }
 

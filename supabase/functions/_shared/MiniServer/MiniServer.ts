@@ -2,11 +2,7 @@ import { z } from "zod";
 import { authMiddleware } from "../authMiddleware.ts";
 import { corsHeaders } from "../cors.ts";
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from "../httpCodes.ts";
-import {
-  AvaSupabaseClient,
-  createSupabaseClient,
-  SupabaseAdmin,
-} from "../supabase.ts";
+import { AvaSupabaseClient, SupabaseAdmin } from "../supabase.ts";
 import { createDefaultRouteHandler } from "./createServerRouteHandler.ts";
 import {
   parseURLPathParams,
@@ -261,27 +257,6 @@ export function PATCH<
     pathSchema:
       typeof path === "object" && "schema" in path ? path.schema : undefined,
   });
-}
-
-async function _getSupabaseClientAndUser(request: Request): Promise<{
-  supabaseClient: AvaSupabaseClient;
-  user: User;
-}> {
-  const supabaseClient = createSupabaseClient(request);
-  const authHeader = request.headers.get("Authorization");
-  const token = authHeader?.replace("Bearer ", "");
-  const {
-    data: { user },
-  } = await supabaseClient.auth.getUser(token);
-
-  if (!user) {
-    throw new Error("User not found");
-  }
-
-  return {
-    supabaseClient,
-    user,
-  };
 }
 
 /**

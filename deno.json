@@ -1,16 +1,15 @@
 {
+  "__comment": "This is the Deno config for the local repo. It is used only to make Deno type checking work locally. It is not loaded into Supabase edge functions",
   "imports": {
-    "$/": "./shared/"
+    "$/": "./shared/",
+    "jose": "jsr:@panva/jose@6"
   },
   "compilerOptions": {
-    "lib": ["deno.ns", "dom", "dom.iterable"],
-    "skipLibCheck": true,
-    "typeRoots": ["shared/types", "shared/lib/types"],
-    "types": ["react", "react/jsx-runtime"],
-
+    "experimentalDecorators": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
+    "lib": ["deno.ns", "dom", "dom.iterable"],
     "moduleDetection": "force",
     "moduleResolution": "bundler",
     "module": "preserve",
@@ -23,10 +22,11 @@
     "noUncheckedSideEffectImports": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
     "strict": true,
-
-    "experimentalDecorators": true,
-    "resolveJsonModule": true
+    "typeRoots": ["shared/types", "shared/lib/types"],
+    "types": ["react", "react/jsx-runtime"]
   },
   "types": ["shared/types/global.d.ts"]
 }
