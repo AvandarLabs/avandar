@@ -54,6 +54,10 @@ const sql = knex({
   useNullAsDefault: true,
 });
 
+function _quoteSQLIdentifier(identifier: string): string {
+  return `"${identifier.replace(/"/g, '""')}"`;
+}
+
 type BaseDuckDBLoadCSVOptions = {
   tableName: string;
   numRowsToSkip?: number;
@@ -1020,21 +1024,32 @@ class DuckDBClientImpl {
     const adjustedFieldNames =
       castTimestampsToISO ?
         columnNamesWithoutAggregations.map((colName) => {
+          const quotedColName = _quoteSQLIdentifier(colName);
           return timestampColumnNames.includes(colName) ?
               sql.raw(
-                `strftime("${colName}"::TIMESTAMP, '%Y-%m-%dT%H:%M:%S.%fZ') as "${colName}"`,
+                `strftime(${quotedColName}::TIMESTAMP, ` +
+                  "'%Y-%m-%dT%H:%M:%S.%fZ') as " +
+                  quotedColName,
               )
-            : `${colName}`;
+            : sql.raw(quotedColName);
         })
-      : columnNamesWithoutAggregations;
+      : columnNamesWithoutAggregations.map((colName) => {
+          return sql.raw(_quoteSQLIdentifier(colName));
+        });
 
     let query = sql.select(...adjustedFieldNames).from(tableName);
     if (groupByColumnNames.length > 0) {
-      query = query.groupBy(...groupByColumnNames);
+      const groupByClause = groupByColumnNames
+        .map((colName) => {
+          return _quoteSQLIdentifier(colName);
+        })
+        .join(", ");
+      query = query.groupByRaw(groupByClause);
     }
 
     if (orderByColumnName && orderByDirection) {
-      query = query.orderBy(orderByColumnName, orderByDirection);
+      const quotedOrderByColumn = _quoteSQLIdentifier(orderByColumnName);
+      query = query.orderByRaw(`${quotedOrderByColumn} ${orderByDirection}`);
     }
 
     // apply aggregations
@@ -1042,23 +1057,46 @@ class DuckDBClientImpl {
       (newQuery, [columnName, aggType]) => {
         const aggregationColumnName =
           DuckDBQueryAggregations.getAggregationColumnName(aggType, columnName);
-        const aggregationColumn = { [aggregationColumnName]: columnName };
+        const quotedColumnName = _quoteSQLIdentifier(columnName);
+        const quotedAggregationColumnName = _quoteSQLIdentifier(
+          aggregationColumnName,
+        );
 
         return match(aggType)
           .with("sum", () => {
-            return newQuery.sum(aggregationColumn);
+            return newQuery.select(
+              sql.raw(
+                `sum(${quotedColumnName}) as ${quotedAggregationColumnName}`,
+              ),
+            );
           })
           .with("avg", () => {
-            return newQuery.avg(aggregationColumn);
+            return newQuery.select(
+              sql.raw(
+                `avg(${quotedColumnName}) as ${quotedAggregationColumnName}`,
+              ),
+            );
           })
           .with("count", () => {
-            return newQuery.count(aggregationColumn);
+            return newQuery.select(
+              sql.raw(
+                `count(${quotedColumnName}) as ${quotedAggregationColumnName}`,
+              ),
+            );
           })
           .with("max", () => {
-            return newQuery.max(aggregationColumn);
+            return newQuery.select(
+              sql.raw(
+                `max(${quotedColumnName}) as ${quotedAggregationColumnName}`,
+              ),
+            );
           })
           .with("min", () => {
-            return newQuery.min(aggregationColumn);
+            return newQuery.select(
+              sql.raw(
+                `min(${quotedColumnName}) as ${quotedAggregationColumnName}`,
+              ),
+            );
           })
           .exhaustive(() => {
             throw new Error(`Invalid DuckDBQueryAggregationType: "${aggType}"`);
