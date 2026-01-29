@@ -85,13 +85,21 @@ export async function authMiddleware(options: {
 }): Promise<Response> {
   const { request, skipJWTVerification, callback } = options;
   try {
-    const { supabaseClient, user } =
-      skipJWTVerification ? {} : await _getSupabaseClientAndUser(request);
+    if (skipJWTVerification) {
+      return await callback({
+        req: request,
+        supabaseClient: undefined,
+        user: undefined,
+      });
+    }
+
+    const { supabaseClient, user } = await _getSupabaseClientAndUser(request);
     const callbackOptions = {
       req: request,
       supabaseClient,
       user,
     };
+
     const token = _getAuthToken(request);
     const isValidJWT = await _verifySupabaseJWT(token);
     if (isValidJWT) {
