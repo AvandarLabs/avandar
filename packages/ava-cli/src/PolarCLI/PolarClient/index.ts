@@ -9,4 +9,3 @@ export {
   hasSubscriptionForProduct,
 } from "./polarHelpers";
 export type { PolarCustomer, PolarProduct } from "./polarHelpers";
-

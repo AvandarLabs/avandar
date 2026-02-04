@@ -1,16 +1,6 @@
 import { Acclimate } from "@avandar/acclimate";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const dotenvConfigMock = vi.fn(() => {
-  return {};
-});
-
-vi.mock("dotenv", () => {
-  return {
-    config: dotenvConfigMock,
-  };
-});
-
 type PolarConstructorArgs = Readonly<{
   accessToken: string;
   server: "sandbox" | "production";
@@ -69,10 +59,7 @@ describe("runCustomerRemove", () => {
 
   it("does nothing if there is no customer with that email", async () => {
     const { runCustomerRemove } = await import("./CustomerRemoveCLI");
-
     await runCustomerRemove({ email: "nope@example.com" });
-
-    expect(dotenvConfigMock).toHaveBeenCalled();
     expect(polarMocks.customersDelete).not.toHaveBeenCalled();
   });
 

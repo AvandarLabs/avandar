@@ -1,0 +1,19 @@
+{
+  "name": "@avandar/server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p ../../tsconfig.node.json",
+    "start": "node --import tsx/esm src/index.ts",
+    "lint": "eslint .",
+    "test": "vitest run -c vitest.config.ts",
+    "deploy": "fly deploy --config \"$FLY_CONFIG\""
+  },
+  "dependencies": {
+    "fastify": "^5.6.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.5"
+  }
+}

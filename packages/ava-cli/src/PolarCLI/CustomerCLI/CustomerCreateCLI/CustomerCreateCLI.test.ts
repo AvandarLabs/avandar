@@ -1,16 +1,6 @@
 import { Acclimate } from "@avandar/acclimate";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const dotenvConfigMock = vi.fn(() => {
-  return {};
-});
-
-vi.mock("dotenv", () => {
-  return {
-    config: dotenvConfigMock,
-  };
-});
-
 type PolarConstructorArgs = Readonly<{
   accessToken: string;
   server: "sandbox" | "production";
@@ -140,7 +130,6 @@ describe("runCustomerCreate", () => {
 
     await runCustomerCreate();
 
-    expect(dotenvConfigMock).toHaveBeenCalled();
     expect(polarMocks.customersCreate).toHaveBeenCalledWith({
       organizationId: "org_1",
       email: "user@avandarlabs.com",

@@ -8,11 +8,11 @@ import { MIMEType } from "$/lib/types/common";
 import { isNonEmptyArray } from "$/lib/utils/guards/isNonEmptyArray";
 import { objectEntries } from "$/lib/utils/objects/objectEntries/objectEntries";
 import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
+import { objectValuesMap } from "$/lib/utils/objects/objectValuesMap/objectValuesMap";
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { mapObjectValues } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
 import {
   QueryResult,
@@ -278,7 +278,7 @@ function arrowTableToJS<RowObject extends UnknownRow>(
 ): QueryResult<RowObject> {
   const jsDataRows = arrowTable.toArray().map((row) => {
     const jsRow = row.toJSON();
-    return mapObjectValues(jsRow, (v) => {
+    return objectValuesMap(jsRow, (v) => {
       if (typeof v === "bigint") {
         // beware that `v` might be bigger than Number.MAX_SAFE_INTEGER
         return Number(v);

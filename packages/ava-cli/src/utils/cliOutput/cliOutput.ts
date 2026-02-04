@@ -19,4 +19,3 @@ export function printWarn(message: string): void {
 export function printError(message: string): void {
   Acclimate.log(`|red|${message}`);
 }
-

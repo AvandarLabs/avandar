@@ -6,6 +6,10 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "typeRoots": ["./node_modules/@types"],
+    "paths": {
+      "$/*": ["./shared/*"],
+      "~/*": ["./*"]
+    },
 
     /* Bundler mode */
     "allowImportingTsExtensions": true,
@@ -30,6 +34,10 @@
     "experimentalDecorators": true,
     "resolveJsonModule": true
   },
-  "include": ["vite.config.ts"],
+  "include": [
+    "vite.config.ts",
+    "packages/dev-fanout-server/src/**/*.ts",
+    "packages/dev-fanout-server/vitest.config.ts"
+  ],
   "exclude": ["supabase/functions"]
 }
