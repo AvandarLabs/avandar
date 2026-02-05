@@ -75,7 +75,8 @@ echo '{ "targets": [] }' > /data/ngrok-dev-urls.json
 ### How to build locally
 
 ```bash
-docker build -f packages/dev-fanout-server/Dockerfile -t dev-fanout-server:local .
+docker build -f packages/dev-fanout-server/Dockerfile \
+  -t dev-fanout-server:local .
 ```
 
 ### How to deploy on Fly
