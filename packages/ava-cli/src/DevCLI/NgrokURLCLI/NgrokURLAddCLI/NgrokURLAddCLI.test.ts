@@ -73,7 +73,7 @@ describe("runNgrokURLAdd", () => {
     expect(init?.body).toBe(JSON.stringify({ url: "https://a.example/" }));
 
     const logs = _getCombinedLogs();
-    expect(logs).toContain("Added ngrok URL.");
+    expect(logs).toContain("Registered ngrok URL.");
   });
 
   it("throws on non-2xx responses", async () => {

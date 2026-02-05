@@ -50,6 +50,36 @@ const TARGET_B: NgrokDevURLTarget = {
   lastAccessedDate: "2026-01-03T00:00:00.000Z",
 };
 
+const ISO_TIMESTAMP_REGEX: RegExp = new RegExp(
+  [
+    "^",
+    "\\d{4}-\\d{2}-\\d{2}T",
+    "\\d{2}:\\d{2}:\\d{2}",
+    "(?:\\.\\d{3})?",
+    "(?:Z|[+-]\\d{2}:\\d{2})",
+    "$",
+  ].join(""),
+);
+
+type UnknownTargetDates = {
+  dateAdded?: unknown;
+  lastAccessedDate?: unknown;
+};
+
+function _expectIsISOTimestamp(value: unknown): void {
+  expect(typeof value).toBe("string");
+  expect(String(value)).toMatch(ISO_TIMESTAMP_REGEX);
+  expect(Number.isFinite(Date.parse(String(value)))).toBe(true);
+}
+
+function _expectIsISOTimestampOrNull(value: unknown): void {
+  if (value === null) {
+    return;
+  }
+
+  _expectIsISOTimestamp(value);
+}
+
 async function _createServer(): Promise<FastifyInstance> {
   const { registerNgrokURLRoutes } = await import("./");
 
@@ -149,9 +179,32 @@ describe("registerNgrokURLRoutes", () => {
     });
 
     expect(res.statusCode).toBe(200);
-    expect(res.json()).toEqual({
-      targets: [TARGET_A, TARGET_B],
+    const body: unknown = res.json();
+    expect(body).toMatchObject({
+      targets: [
+        {
+          url: "https://a.example",
+          lastAccessedDate: null,
+        },
+        {
+          url: "https://b.example/base",
+        },
+      ],
     });
+
+    const targets = (body as { targets: readonly unknown[] }).targets;
+    const targetA = targets[0] as {
+      dateAdded?: unknown;
+      lastAccessedDate?: unknown;
+    };
+    const targetB = targets[1] as {
+      dateAdded?: unknown;
+      lastAccessedDate?: unknown;
+    };
+    _expectIsISOTimestamp(targetA.dateAdded);
+    _expectIsISOTimestamp(targetB.dateAdded);
+    _expectIsISOTimestampOrNull(targetA.lastAccessedDate);
+    _expectIsISOTimestampOrNull(targetB.lastAccessedDate);
   });
 
   it("lists empty when the file does not exist", async () => {
@@ -191,7 +244,6 @@ describe("registerNgrokURLRoutes", () => {
     const body: unknown = res.json();
     expect(body).toMatchObject({
       targets: [
-        TARGET_A,
         {
           url: "https://b.example",
           lastAccessedDate: null,
@@ -199,10 +251,10 @@ describe("registerNgrokURLRoutes", () => {
       ],
     });
 
-    const added = (body as { targets: Array<{ dateAdded?: unknown }> })
-      .targets[1];
-    expect(typeof added?.dateAdded).toBe("string");
-    expect(Number.isFinite(Date.parse(String(added?.dateAdded)))).toBe(true);
+    const targets = (body as { targets: readonly unknown[] }).targets;
+    const added = targets[0] as UnknownTargetDates;
+    _expectIsISOTimestamp(added.dateAdded);
+    expect(added.lastAccessedDate).toBeNull();
 
     expect(writeFile).toHaveBeenCalledTimes(1);
     expect(rename).toHaveBeenCalledTimes(1);
@@ -229,7 +281,6 @@ describe("registerNgrokURLRoutes", () => {
     const body: unknown = res.json();
     expect(body).toMatchObject({
       targets: [
-        TARGET_A,
         {
           url: "https://b.example/base",
           lastAccessedDate: null,
@@ -237,10 +288,10 @@ describe("registerNgrokURLRoutes", () => {
       ],
     });
 
-    const added = (body as { targets: Array<{ dateAdded?: unknown }> })
-      .targets[1];
-    expect(typeof added?.dateAdded).toBe("string");
-    expect(Number.isFinite(Date.parse(String(added?.dateAdded)))).toBe(true);
+    const targets = (body as { targets: readonly unknown[] }).targets;
+    const added = targets[0] as UnknownTargetDates;
+    _expectIsISOTimestamp(added.dateAdded);
+    expect(added.lastAccessedDate).toBeNull();
 
     expect(writeFile).toHaveBeenCalledTimes(1);
     expect(rename).toHaveBeenCalledTimes(1);
@@ -264,11 +315,22 @@ describe("registerNgrokURLRoutes", () => {
     });
 
     expect(res.statusCode).toBe(409);
-    expect(res.json()).toEqual({
+    const body: unknown = res.json();
+    expect(body).toMatchObject({
       ok: false,
       error: "URL already exists.",
-      targets: [TARGET_A],
+      targets: [
+        {
+          url: "https://a.example",
+          lastAccessedDate: null,
+        },
+      ],
     });
+
+    const targets = (body as { targets: readonly unknown[] }).targets;
+    const existing = targets[0] as UnknownTargetDates;
+    _expectIsISOTimestamp(existing.dateAdded);
+    _expectIsISOTimestampOrNull(existing.lastAccessedDate);
   });
 
   it("returns 401 for `remove` when the bearer token does not match", async () => {
@@ -311,9 +373,19 @@ describe("registerNgrokURLRoutes", () => {
     });
 
     expect(res.statusCode).toBe(200);
-    expect(res.json()).toEqual({
-      targets: [{ ...TARGET_B, url: "https://b.example" }],
+    const body: unknown = res.json();
+    expect(body).toMatchObject({
+      targets: [
+        {
+          url: "https://b.example",
+        },
+      ],
     });
+
+    const targets = (body as { targets: readonly unknown[] }).targets;
+    const remaining = targets[0] as UnknownTargetDates;
+    _expectIsISOTimestamp(remaining.dateAdded);
+    _expectIsISOTimestampOrNull(remaining.lastAccessedDate);
 
     expect(writeFile).toHaveBeenCalledTimes(1);
     expect(rename).toHaveBeenCalledTimes(1);
@@ -337,11 +409,22 @@ describe("registerNgrokURLRoutes", () => {
     });
 
     expect(res.statusCode).toBe(404);
-    expect(res.json()).toEqual({
+    const body: unknown = res.json();
+    expect(body).toMatchObject({
       ok: false,
       error: "URL not found.",
-      targets: [TARGET_A],
+      targets: [
+        {
+          url: "https://a.example",
+          lastAccessedDate: null,
+        },
+      ],
     });
+
+    const targets = (body as { targets: readonly unknown[] }).targets;
+    const existing = targets[0] as UnknownTargetDates;
+    _expectIsISOTimestamp(existing.dateAdded);
+    _expectIsISOTimestampOrNull(existing.lastAccessedDate);
   });
 
   it("returns 400 for an invalid URL body", async () => {

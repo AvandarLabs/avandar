@@ -14,7 +14,7 @@ export async function runNgrokURLRemove(options: {
   try {
     printInfo(`Removing ngrok URL: ${url}`);
     const { targets } = await sendNgrokURLManagerRequest({
-      path: "/ngrok-url/admin/remove",
+      path: "/ngrok-url/remove",
       method: "POST",
       body: { url },
     });

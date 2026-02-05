@@ -96,16 +96,17 @@ export async function onAddNgrokURL(
       });
     }
 
+    const newTarget: NgrokDevURLTarget = {
+      url: normalizedURL,
+      dateAdded: new Date().toISOString(),
+      lastAccessedDate: null,
+    };
     const updatedTargets: readonly NgrokDevURLTarget[] = [
       ...targets,
-      {
-        url: normalizedURL,
-        dateAdded: new Date().toISOString(),
-        lastAccessedDate: null,
-      },
+      newTarget,
     ];
     await NgrokDevURLsManager.writeNgrokDevURLs({ targets: updatedTargets });
-    return await reply.send({ targets: updatedTargets });
+    return await reply.send({ targets: [newTarget] });
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return await reply.status(400).send({

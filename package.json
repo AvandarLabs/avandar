@@ -17,7 +17,7 @@
     "test": "npm run test:frontend && npm run test:ava-cli && npm run test:dev-fanout-server",
     "test:frontend": "vitest run --exclude \"packages/**\"",
     "test:ava-cli": "npm run -w @avandar/ava-cli test",
-    "test:dev-fanout-server": "npm run -w @avandar/server test",
+    "test:dev-fanout-server": "npm run -w @avandar/dev-fanout-server test",
     "build": "tsc -b && vite build",
     "build:ava-cli": "npm run -w @avandar/ava-cli build && npm link -w @avandar/ava-cli",
     "lint": "eslint .",

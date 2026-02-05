@@ -12,13 +12,12 @@ export async function runNgrokURLAdd(options: { url: string }): Promise<void> {
 
   try {
     printInfo(`Adding ngrok URL: ${url}`);
-    const { targets } = await sendNgrokURLManagerRequest({
+    await sendNgrokURLManagerRequest({
       path: "/ngrok-url/add",
       method: "POST",
       body: { url },
     });
-    printSuccess("Added ngrok URL.");
-    printSuccess(`numTargets: ${targets.length}`);
+    printSuccess("Registered ngrok URL.");
   } catch (error: unknown) {
     const message: string =
       error instanceof Error ? error.message : String(error);
