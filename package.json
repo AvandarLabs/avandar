@@ -13,6 +13,7 @@
   "scripts": {
     "dev": "./scripts/startAvandar.sh",
     "dev:email": "dotenv -e .env.development -- email dev --dir shared/emails",
+    "deploy:dev-fanout-server": "fly deploy --config packages/dev-fanout-server/fly.production.toml",
     "test": "npm run test:frontend && npm run test:ava-cli && npm run test:dev-fanout-server",
     "test:frontend": "vitest run --exclude \"packages/**\"",
     "test:ava-cli": "npm run -w @avandar/ava-cli test",

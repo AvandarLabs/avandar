@@ -15,7 +15,7 @@ COPY packages/dev-fanout-server/package.json \
 
 # `tsx` is a devDependency of `@avandar/dev-fanout-server` but is required at
 # runtime because `npm run start` executes TypeScript directly.
-RUN npm ci --include=dev
+RUN npm ci -w @avandar/dev-fanout-server --include=dev
 
 FROM base AS runner
 
