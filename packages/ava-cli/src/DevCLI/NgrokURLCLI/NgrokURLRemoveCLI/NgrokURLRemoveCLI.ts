@@ -13,13 +13,12 @@ export async function runNgrokURLRemove(options: {
   const { url } = options;
   try {
     printInfo(`Removing ngrok URL: ${url}`);
-    const { targets } = await sendNgrokURLManagerRequest({
+    await sendNgrokURLManagerRequest({
       path: "/ngrok-url/remove",
       method: "POST",
       body: { url },
     });
     printSuccess("Removed ngrok URL.");
-    printSuccess(`numTargets: ${targets.length}`);
   } catch (error: unknown) {
     const message: string =
       error instanceof Error ? error.message : String(error);
