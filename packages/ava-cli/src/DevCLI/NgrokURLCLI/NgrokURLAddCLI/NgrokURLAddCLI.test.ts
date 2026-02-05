@@ -40,7 +40,7 @@ describe("runNgrokURLAdd", () => {
     vi.clearAllMocks();
 
     process.env.AVA_DEV_FANOUT_SERVER_URL = "https://fanout.example/";
-    process.env.AVA_DEV_FANOUT_SERVER_SECRET = "secret";
+    process.env.AVA_DEV_FANOUT_ADMIN_SERVER_SECRET = "secret";
 
     vi.spyOn(Acclimate, "log").mockImplementation(() => {});
   });

@@ -44,7 +44,7 @@ async function _readErrorBody(res: Response): Promise<string> {
 }
 
 export async function sendNgrokURLManagerRequest(options: {
-  path: "/ngrok-url/list" | "/ngrok-url/add" | "/ngrok-url/remove";
+  path: "/ngrok-url/add" | "/ngrok-url/list" | "/ngrok-url/remove";
   method: "GET" | "POST";
   body?: unknown;
 }): Promise<NgrokTargetsResponse> {

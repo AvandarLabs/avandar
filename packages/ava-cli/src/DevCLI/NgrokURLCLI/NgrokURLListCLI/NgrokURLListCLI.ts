@@ -24,7 +24,7 @@ export async function runNgrokURLList(): Promise<void> {
   try {
     printInfo("Fetching registered ngrok URLs...");
     const { targets } = await sendNgrokURLManagerRequest({
-      path: "/ngrok-url/list",
+      path: "/ngrok-url/admin/list",
       method: "GET",
     });
 

@@ -2,7 +2,7 @@ import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import z from "zod";
 
-const DEFAULT_NGROK_DEV_URLS_FILE_PATH = "/data/ngrok-dev-urls.json";
+const NGROK_DEV_URLS_FILE_PATH = "/data/ngrok-dev-urls.json";
 
 export type NgrokDevURLTarget = Readonly<{
   url: string;
@@ -21,25 +21,13 @@ const NgrokDevURLsFileSchema = z.object({
 });
 
 /**
- * Get the file path used for persisting dev ngrok URLs.
- *
- * Defaults to `/data/ngrok-dev-urls.json`, which should be backed by a Fly
- * Volume mounted at `/data` in production.
- */
-function _getNgrokDevURLsFilePath(): string {
-  const raw = process.env.AVA_NGROK_DEV_URLS_FILE_PATH;
-  return raw?.trim() || DEFAULT_NGROK_DEV_URLS_FILE_PATH;
-}
-
-/**
  * Read all registered dev target URLs from `ngrok-dev-urls.json`.
  *
  * If the file does not exist, this returns an empty list.
  */
 async function readNgrokDevURLs(): Promise<readonly NgrokDevURLTarget[]> {
-  const filePath: string = _getNgrokDevURLsFilePath();
   try {
-    const rawFile: string = await readFile(filePath, "utf8");
+    const rawFile: string = await readFile(NGROK_DEV_URLS_FILE_PATH, "utf8");
     const json: unknown = JSON.parse(rawFile);
 
     const parsed = NgrokDevURLsFileSchema.parse(json);
@@ -64,14 +52,13 @@ async function readNgrokDevURLs(): Promise<readonly NgrokDevURLTarget[]> {
 async function writeNgrokDevURLs(options: {
   targets: readonly NgrokDevURLTarget[];
 }): Promise<void> {
-  const devURLsFilePath: string = _getNgrokDevURLsFilePath();
-  const dirPath: string = path.dirname(devURLsFilePath);
+  const dirPath: string = path.dirname(NGROK_DEV_URLS_FILE_PATH);
 
   // create the intermediate directories if they don't exist yet
   await mkdir(dirPath, { recursive: true });
 
   const suffix = `${Date.now()}-${process.pid}`;
-  const tempFilePath = `${devURLsFilePath}.${suffix}.tmp`;
+  const tempFilePath = `${NGROK_DEV_URLS_FILE_PATH}.${suffix}.tmp`;
   const contents: string = JSON.stringify(
     {
       targets: [...options.targets],
@@ -81,7 +68,7 @@ async function writeNgrokDevURLs(options: {
   );
 
   await writeFile(tempFilePath, `${contents}\n`, "utf8");
-  await rename(tempFilePath, devURLsFilePath);
+  await rename(tempFilePath, NGROK_DEV_URLS_FILE_PATH);
 }
 
 /**

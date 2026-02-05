@@ -85,7 +85,7 @@ describe("registerNgrokURLRoutes", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    process.env.AVA_DEV_FANOUT_SERVER_SECRET = AUTH_SECRET;
+    process.env.AVA_DEV_FANOUT_ADMIN_SERVER_SECRET = AUTH_SECRET;
 
     vi.useRealTimers();
 
@@ -99,7 +99,7 @@ describe("registerNgrokURLRoutes", () => {
   });
 
   afterEach(async () => {
-    delete process.env.AVA_DEV_FANOUT_SERVER_SECRET;
+    delete process.env.AVA_DEV_FANOUT_ADMIN_SERVER_SECRET;
 
     if (server) {
       await server.close();
@@ -107,7 +107,7 @@ describe("registerNgrokURLRoutes", () => {
     }
   });
 
-  it("returns 401 when missing auth", async () => {
+  it("returns 401 when `list` is missing auth", async () => {
     _mockNgrokDevURLsJSON({ targets: [] });
     server = await _createServer();
 
@@ -119,7 +119,7 @@ describe("registerNgrokURLRoutes", () => {
     expect(res.statusCode).toBe(401);
   });
 
-  it("returns 401 when the bearer token does not match", async () => {
+  it("returns 401 when `list` is called without an incorrect bearer token", async () => {
     _mockNgrokDevURLsJSON({ targets: [] });
     server = await _createServer();
 
@@ -168,28 +168,6 @@ describe("registerNgrokURLRoutes", () => {
 
     expect(res.statusCode).toBe(200);
     expect(res.json()).toEqual({ targets: [] });
-  });
-
-  it("returns 401 for add when the bearer token does not match", async () => {
-    _mockNgrokDevURLsJSON({
-      targets: [TARGET_A],
-    });
-    server = await _createServer();
-
-    const res = await server.inject({
-      method: "POST",
-      url: "/ngrok-url/add",
-      headers: {
-        authorization: "Bearer wrong-secret",
-      },
-      payload: {
-        url: "https://b.example",
-      },
-    });
-
-    expect(res.statusCode).toBe(401);
-    expect(writeFile).not.toHaveBeenCalled();
-    expect(rename).not.toHaveBeenCalled();
   });
 
   it("adds a URL and persists it", async () => {
@@ -293,7 +271,7 @@ describe("registerNgrokURLRoutes", () => {
     });
   });
 
-  it("returns 401 for remove when the bearer token does not match", async () => {
+  it("returns 401 for `remove` when the bearer token does not match", async () => {
     _mockNgrokDevURLsJSON({
       targets: [TARGET_A, { ...TARGET_B, url: "https://b.example" }],
     });

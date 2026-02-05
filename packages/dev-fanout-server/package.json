@@ -1,5 +1,5 @@
 {
-  "name": "@avandar/server",
+  "name": "@avandar/dev-fanout-server",
   "private": true,
   "type": "module",
   "scripts": {

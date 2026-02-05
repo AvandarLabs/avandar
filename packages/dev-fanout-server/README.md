@@ -15,7 +15,7 @@ The fanout server can be interacted with using the ava CLI.
 1. Make sure you've built ava-cli locally with `npm run build:ava-cli`
 2. In `.env.development` (repo root), set:
    - `AVA_DEV_FANOUT_SERVER_URL=https://<your-fly-app>.fly.dev`
-   - `AVA_DEV_FANOUT_SERVER_SECRET=<same token as Fly secret>`
+   - `AVA_DEV_FANOUT_ADMIN_SERVER_SECRET=<same token as Fly secret>`
 
 3. Developers can now register or remove ngrok URLs from the dev fanout server
    using:
@@ -43,7 +43,7 @@ File schema:
 These endpoints manage the persisted URL list. They require an Authorization
 header:
 
-- `Authorization: Bearer $AVA_DEV_FANOUT_SERVER_SECRET`
+- `Authorization: Bearer $AVA_DEV_FANOUT_ADMIN_SERVER_SECRET`
 
 Endpoints:
 
@@ -55,7 +55,8 @@ Endpoints:
 
 Server:
 
-- `AVA_DEV_FANOUT_SERVER_SECRET` (required): Bearer token for admin endpoints.
+- `AVA_DEV_FANOUT_ADMIN_SERVER_SECRET` (required): Bearer token for admin
+  endpoints.
 - `AVA_NGROK_DEV_URLS_FILE_PATH` (optional): Override JSON file path.
 
 ### Fly.io setup
@@ -63,10 +64,22 @@ Server:
 - Create a Fly app for this service.
 - Create a Fly Volume (1GB is fine) and mount it at `/data`.
 - Set secrets:
-  - `AVA_DEV_FANOUT_SERVER_SECRET`
+  - `AVA_DEV_FANOUT_ADMIN_SERVER_SECRET`
   - (optional) `AVA_NGROK_DEV_URLS_FILE_PATH=/data/ngrok-dev-urls.json`
 - Initialize the file on the volume:
 
 ```bash
 echo '{ "targets": [] }' > /data/ngrok-dev-urls.json
+```
+
+### How to build locally
+
+```bash
+docker build -f packages/dev-fanout-server/Dockerfile -t dev-fanout-server:local .
+```
+
+### How to deploy on Fly
+
+```bash
+fly deploy --config packages/dev-fanout-server/fly.production.toml
 ```

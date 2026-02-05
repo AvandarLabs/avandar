@@ -31,16 +31,16 @@ function _getBaseURL(): string {
 }
 
 function _getAdminSecret(): string {
-  const raw = process.env.AVA_DEV_FANOUT_SERVER_SECRET;
+  const raw = process.env.AVA_DEV_FANOUT_ADMIN_SERVER_SECRET;
   if (!raw) {
     throw new Error(
-      "AVA_DEV_FANOUT_SERVER_SECRET is not set in .env.development",
+      "AVA_DEV_FANOUT_ADMIN_SERVER_SECRET is not set in .env.development",
     );
   }
   const trimmed: string = raw.trim();
   if (!trimmed) {
     throw new Error(
-      "AVA_DEV_FANOUT_SERVER_SECRET is not set in .env.development",
+      "AVA_DEV_FANOUT_ADMIN_SERVER_SECRET is not set in .env.development",
     );
   }
   return trimmed;
@@ -50,7 +50,7 @@ function _getAdminSecret(): string {
  * Create an authenticated client config for the dev-fanout-server.
  *
  * Loads `.env.development` to read `AVA_DEV_FANOUT_SERVER_URL` and
- * `AVA_DEV_FANOUT_SERVER_SECRET`.
+ * `AVA_DEV_FANOUT_ADMIN_SERVER_SECRET`.
  */
 export function getDevFanoutServerClientConfig(): DevFanoutClientConfig {
   return {

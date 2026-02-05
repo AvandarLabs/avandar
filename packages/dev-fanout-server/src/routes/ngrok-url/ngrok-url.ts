@@ -12,7 +12,8 @@ const RemoveBodySchema = z.object({
 });
 
 function _getAdminSecret(): string | undefined {
-  const rawToken: string | undefined = process.env.AVA_DEV_FANOUT_SERVER_SECRET;
+  const rawToken: string | undefined =
+    process.env.AVA_DEV_FANOUT_ADMIN_SERVER_SECRET;
   return rawToken?.trim();
 }
 
@@ -39,7 +40,7 @@ async function _requireAdminAuth(options: {
   if (!expectedToken) {
     return await options.reply.status(500).send({
       ok: false,
-      error: "Server is missing AVA_DEV_FANOUT_SERVER_SECRET.",
+      error: "Server is missing AVA_DEV_FANOUT_ADMIN_SERVER_SECRET.",
     });
   }
 
@@ -76,11 +77,6 @@ export async function onAddNgrokURL(
   request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<FastifyReply> {
-  const authError = await _requireAdminAuth({ request, reply });
-  if (authError) {
-    return authError;
-  }
-
   try {
     const body = AddBodySchema.parse(request.body);
     const normalizedURL: string = _stripTrailingSlash(body.url);
