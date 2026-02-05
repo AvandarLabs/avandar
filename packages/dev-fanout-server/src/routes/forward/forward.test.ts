@@ -56,13 +56,21 @@ async function _createServer(): Promise<FastifyInstance> {
     logger: false,
   });
 
+  const parseAsBuffer = (
+    _request: unknown,
+    body: unknown,
+    done: (err: Error | null, body: unknown) => void,
+  ): void => {
+    done(null, body);
+  };
+
   server.addContentTypeParser(
-    "*",
+    ["application/json", "application/*+json"],
     { parseAs: "buffer" },
-    (_request, body, done) => {
-      done(null, body);
-    },
+    parseAsBuffer,
   );
+
+  server.addContentTypeParser("*", { parseAs: "buffer" }, parseAsBuffer);
 
   await server.register(registerForwardRoute);
   return server;
@@ -262,6 +270,46 @@ describe("registerForwardingRoutes", () => {
     expect(firstInit?.body).toBeUndefined();
 
     expect(writeFile).toHaveBeenCalledTimes(1);
+  });
+
+  it("forwards JSON bodies as raw buffers", async () => {
+    _mockNgrokTargetsJSON({
+      targets: [TARGET_A],
+    });
+
+    const fetchMock = _mockFetchSequence({
+      impls: [
+        async () => {
+          return new Response(null, { status: 204 });
+        },
+      ],
+    });
+
+    server = await _createServer();
+
+    const jsonBody: string = JSON.stringify({
+      type: "ping",
+      timestamp: "2026-02-05T00:00:00Z",
+      data: {},
+    });
+
+    const res = await server.inject({
+      method: "POST",
+      url: "/forward/functions/v1/polar-public/webhook",
+      headers: {
+        "content-type": "application/json",
+      },
+      payload: jsonBody,
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(fetchMock.mock.calls.length).toBe(1);
+
+    const [, forwardedInit] = fetchMock.mock.calls[0]!;
+    expect(forwardedInit?.method).toBe("POST");
+    const forwardedBody: unknown = forwardedInit?.body;
+    expect(forwardedBody).toBeInstanceOf(Buffer);
+    expect((forwardedBody as Buffer).toString("utf8")).toBe(jsonBody);
   });
 
   it("captures fetch errors per-target and returns them in results", async () => {
