@@ -27,8 +27,8 @@ the product into something that truly serves your mission.
 
 1. Node.js
 2. Docker Desktop
-3. Supabase CLI
-4. ngrok
+3. Supabase CLI (`brew install supabase/tap/supabase`)
+4. ngrok (`brew install ngrok`)
 
 ### Set up
 
