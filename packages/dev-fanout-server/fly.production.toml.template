@@ -1,6 +1,6 @@
 # Fly production config for `packages/dev-fanout-server`.
 
-app = "REPLACE_ME"
+app = "avandar-dev-fanout-prod"
 primary_region = "iad"
 
 [build]
