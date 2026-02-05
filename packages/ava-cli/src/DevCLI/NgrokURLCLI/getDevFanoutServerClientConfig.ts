@@ -17,33 +17,22 @@ function _normalizeBaseURL(rawBaseURL: string): string {
 }
 
 function _getBaseURL(): string {
-  const raw = process.env.AVA_DEV_FANOUT_SERVER_URL;
-  if (!raw) {
+  const url = (process.env.AVA_DEV_FANOUT_SERVER_URL ?? "").trim();
+  if (!url) {
     throw new Error("AVA_DEV_FANOUT_SERVER_URL is not set in .env.development");
   }
 
-  const trimmed: string = raw.trim();
-  if (!trimmed) {
-    throw new Error("AVA_DEV_FANOUT_SERVER_URL is not set in .env.development");
-  }
-
-  return _normalizeBaseURL(trimmed);
+  return _normalizeBaseURL(url);
 }
 
 function _getAdminSecret(): string {
-  const raw = process.env.AVA_DEV_FANOUT_ADMIN_SERVER_SECRET;
-  if (!raw) {
+  const secret = (process.env.AVA_DEV_FANOUT_ADMIN_SERVER_SECRET ?? "").trim();
+  if (!secret) {
     throw new Error(
       "AVA_DEV_FANOUT_ADMIN_SERVER_SECRET is not set in .env.development",
     );
   }
-  const trimmed: string = raw.trim();
-  if (!trimmed) {
-    throw new Error(
-      "AVA_DEV_FANOUT_ADMIN_SERVER_SECRET is not set in .env.development",
-    );
-  }
-  return trimmed;
+  return secret;
 }
 
 /**

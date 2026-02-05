@@ -50,8 +50,6 @@ export async function sendNgrokURLManagerRequest(options: {
 }): Promise<NgrokTargetsResponse> {
   const config = getDevFanoutServerClientConfig();
   const url: string = `${config.baseURL}${options.path}`;
-
-  console.log("url", url);
   const res: Response = await fetch(url, {
     method: options.method,
     headers: {
