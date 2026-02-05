@@ -83,12 +83,11 @@ fi
 
 # Run all processes concurrently with clean output
 concurrently \
-  --names "vite,functions,ngrok,fanout" \
-  --prefix-colors "blue,green,yellow,cyan" \
+  --names "vite,functions,ngrok" \
+  --prefix-colors "blue,green,yellow" \
   --prefix "{name}" \
   --kill-others-on-fail \
   "vite" \
   "npm run fns:serve" \
-  "ngrok http --url=$REVERSE_PROXY_URL 54321 --log=stdout" \
-  "npm run -w server dev"
+  "ngrok http --url=$REVERSE_PROXY_URL 54321 --log=stdout"
 
