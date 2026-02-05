@@ -10,6 +10,7 @@ type DotenvConfigResult = Readonly<{
 function _loadDevEnv(): void {
   const result = dotenv.config({
     path: ".env.development",
+    quiet: true,
   }) as DotenvConfigResult;
 
   if (result.error !== undefined) {

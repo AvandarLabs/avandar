@@ -28,10 +28,16 @@ the product into something that truly serves your mission.
 1. Node.js
 2. Docker Desktop
 3. Supabase CLI
+4. ngrok
 
 ### Set up
 
-1. Clone this repo
+1. Clone this repo and install dependencies
+
+   ```bash
+   npm install
+   npm run build:ava-cli
+   ```
 
 2. Initiate a local instance of Supabase (you need to have installed Supabase
    CLI for this)
