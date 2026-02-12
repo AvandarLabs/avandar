@@ -1,6 +1,7 @@
 import { Group, NumberInput, Stack } from "@mantine/core";
 import { FieldLabel } from "@puckeditor/core";
 import { SegmentedControl } from "@/lib/ui/inputs/SegmentedControl";
+import { DashboardFieldProps } from "../../utils/puck.types";
 
 export type ContainerMaxWidthUnit = "%" | "px";
 
@@ -9,11 +10,7 @@ export type ContainerMaxWidthValue = {
   value: number;
 };
 
-type Props = {
-  readonly value: unknown;
-  readonly onChange: (value: ContainerMaxWidthValue) => void;
-  readonly readOnly?: boolean;
-};
+type Props = DashboardFieldProps<ContainerMaxWidthValue>;
 
 const DEFAULT_PERCENT_VALUE = 100;
 const DEFAULT_PX_VALUE = 860;
@@ -66,6 +63,11 @@ function _clampValue(options: {
   return Math.round(options.value);
 }
 
+/**
+ * A custom field that allows the user to set the maximum width of a container.
+ * It provides an editable text input and a toggle button to switch between
+ * percentage and pixel units.
+ */
 export function ContainerMaxWidthField({
   value,
   onChange,

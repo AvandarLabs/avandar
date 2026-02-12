@@ -581,7 +581,7 @@ class DuckDBClientImpl {
 
       // Insert the CSV file as a VIEW (low-memory interactive querying).
       await this.runRawQuery(
-        `CREATE TABLE "$tableName$" AS
+        `CREATE TABLE IF NOT EXISTS "$tableName$" AS
           SELECT *
           FROM read_csv(
             '$tableName$',
@@ -702,17 +702,17 @@ class DuckDBClientImpl {
     blob: Blob;
   }): Promise<DuckDBLoadParquetResult> {
     const { tableName, blob } = options;
-    const conn = await this.#connect();
     let loadResults: DuckDBLoadParquetResult;
 
-    try {
-      // Drop the dataset and recreate it. We are overwriting the data.
-      await this.dropTableViewAndFile(tableName);
-      await this.#registerParquetFile({ tableName, blob });
+    // Drop the dataset and recreate it. We are overwriting the data.
+    await this.dropTableViewAndFile(tableName);
+    await this.#registerParquetFile({ tableName, blob });
 
+    const conn = await this.#connect();
+    try {
       // Re-ingest the parquet data into a view (low-memory querying).
       await this.runRawQuery(
-        `CREATE VIEW "$tableName$" AS
+        `CREATE VIEW IF NOT EXISTS "$tableName$" AS
             SELECT * FROM read_parquet('$tableName$')`,
         { conn, params: { tableName } },
       );

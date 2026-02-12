@@ -2,6 +2,7 @@ import { Button, Fieldset, Group, Paper, Stack, Textarea } from "@mantine/core";
 import { useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { TextareaForm } from "@/lib/ui/singleton-forms/TextareaForm/TextareaForm";
+import { mantineColorVar } from "@/lib/utils/browser/css";
 import { DataExplorerStateManager } from "../DataExplorerStateManager";
 import { useNLPQuery } from "./useNLPQuery";
 
@@ -9,7 +10,6 @@ export function LLMQueryForm(): JSX.Element {
   const [{ rawSQL }, dispatch] = DataExplorerStateManager.useContext();
   const workspace = useCurrentWorkspace();
   const [isEditMode, setIsEditMode] = useState(false);
-
   const [generateAndRunQuery, isRunningQuery] = useNLPQuery({
     workspaceId: workspace.id,
     onSuccess: (sql) => {
@@ -102,8 +102,8 @@ export function LLMQueryForm(): JSX.Element {
             : <Paper
                 p="sm"
                 style={{
-                  backgroundColor: "var(--mantine-color-gray-0)",
-                  border: "1px solid var(--mantine-color-gray-3)",
+                  backgroundColor: mantineColorVar("gray.0"),
+                  border: `1px solid ${mantineColorVar("gray.3")}`,
                 }}
               >
                 <Textarea
