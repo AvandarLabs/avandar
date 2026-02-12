@@ -1,10 +1,16 @@
 import { Button, Group, Text, Textarea } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
-import { useMemo, useRef } from "react";
+import { useId, useMemo, useRef } from "react";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import type { TextareaProps } from "@mantine/core";
 
 type Props = {
+  /**
+   * When true, renders without wrapping the component in a `<form>` element.
+   * This is useful when you want to use this sub-form as a field in a larger
+   * form.
+   */
+  asField?: boolean;
   defaultValue: string;
   required?: boolean;
   minLength?: number;
@@ -37,7 +43,10 @@ type Props = {
    */
   disabledUntilDirty?: boolean;
 
-  onSubmit?: (value: string) => void;
+  onSubmit?: (
+    value: string,
+    event: React.FormEvent<HTMLFormElement> | undefined,
+  ) => void;
   onCancel?: () => void;
   submitButtonLabel?: string;
   cancelButtonLabel?: string;
@@ -62,6 +71,7 @@ type SingleInputForm = {
  * multiple XField components.
  */
 export function TextareaForm({
+  asField = false,
   defaultValue,
   required = false,
   minLength,
@@ -80,6 +90,7 @@ export function TextareaForm({
   disabledUntilDirty = false,
   ...moreTextareaProps
 }: Props): JSX.Element {
+  const formId = useId();
   const form = useForm<SingleInputForm>({
     mode: "uncontrolled",
     initialValues: {
@@ -122,53 +133,74 @@ export function TextareaForm({
 
   const shortcutText = isMac ? "⌘↵" : "Ctrl↵";
 
-  return (
-    <form
-      ref={formRef}
-      onSubmit={form.onSubmit(({ value }) => {
-        onSubmit?.(value);
-      })}
-    >
-      <Group gap="xs" align="start" wrap="wrap">
-        <Textarea
-          key={form.key("value")}
-          {...form.getInputProps("value")}
-          required={required}
-          label={hideLabel ? undefined : label}
-          style={{ width: inputWidth }}
-          onKeyDown={getHotkeyHandler([
-            [
-              "mod+Enter",
-              (event) => {
-                event.preventDefault();
+  const onFormSubmit = form.onSubmit(({ value }, event) => {
+    onSubmit?.(value, event);
+  });
+
+  const formContent = (
+    <Group gap="xs" align="start" wrap="wrap">
+      <Textarea
+        key={form.key("value")}
+        {...form.getInputProps("value")}
+        required={required}
+        label={hideLabel ? undefined : label}
+        style={{ width: inputWidth }}
+        onKeyDown={getHotkeyHandler([
+          [
+            "mod+Enter",
+            (event) => {
+              event.preventDefault();
+              if (asField) {
+                onFormSubmit();
+              } else {
+                // trigger the `<form>` element's submit event, which will in
+                // turn call `onFormSubmit()`
                 formRef.current?.requestSubmit();
-              },
-            ],
-          ])}
-          {...moreTextareaProps}
-        />
-        {showSubmitButton ?
-          <Button
-            type="submit"
-            loading={isSubmitting}
-            disabled={
-              isSubmitting ||
-              (validateOnChange && !form.isValid()) ||
-              (disabledUntilDirty && !form.isDirty())
-            }
-          >
-            {submitButtonLabel}
-            <Text ml="xxs" span size="xs" c="white">
-              {shortcutText}
-            </Text>
-          </Button>
-        : null}
-        {showCancelButton ?
-          <Button variant="default" onClick={onCancel}>
-            {cancelButtonLabel}
-          </Button>
-        : null}
-      </Group>
+              }
+            },
+          ],
+        ])}
+        {...moreTextareaProps}
+      />
+      {showSubmitButton ?
+        <Button
+          type="submit"
+          form={formId}
+          loading={isSubmitting}
+          onClick={
+            asField ?
+              () => {
+                onFormSubmit();
+              }
+            : undefined
+          }
+          disabled={
+            isSubmitting ||
+            (validateOnChange && !form.isValid()) ||
+            (disabledUntilDirty && !form.isDirty())
+          }
+        >
+          {submitButtonLabel}
+          <Text ml="xxs" span size="xs" c="white">
+            {shortcutText}
+          </Text>
+        </Button>
+      : null}
+      {showCancelButton ?
+        <Button variant="default" onClick={onCancel}>
+          {cancelButtonLabel}
+        </Button>
+      : null}
+    </Group>
+  );
+
+  if (asField) {
+    return formContent;
+  }
+
+  return (
+    <form ref={formRef} id={formId} onSubmit={onFormSubmit}>
+      {formContent}
     </form>
   );
 }

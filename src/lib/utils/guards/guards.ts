@@ -1,10 +1,7 @@
 import { UnknownObject } from "$/lib/types/common";
 import { isArray } from "$/lib/utils/guards/isArray";
 import { SetFieldType, SetRequired, Simplify } from "type-fest";
-import type {
-  AnyFunction,
-  SetDefined,
-} from "../../../../shared/lib/types/utilityTypes";
+import type { SetDefined } from "../../../../shared/lib/types/utilityTypes";
 import type { Model } from "@/models/Model";
 
 /**
@@ -24,73 +21,6 @@ export function or<T, Predicates extends Array<(value: any) => value is any>>(
   return predicates.some((predicate) => {
     return predicate(value);
   });
-}
-
-/**
- * Checks if `value` is not `null` or `undefined`.
- *
- * **Examples**
- *
- * ```ts
- * isNonNullish(null); // false
- * isNonNullish(undefined); // false
- * isNonNullish("foo"); // true
- * isNonNullish(0); // true
- * isNonNullish(false); // true
- * ```
- */
-export function isNonNullish<T>(value: T): value is NonNullable<T> {
-  return value !== null && value !== undefined;
-}
-
-export function isNullish(value: unknown): value is null | undefined {
-  return value === undefined || value === null;
-}
-
-export function isUndefined(value: unknown): value is undefined {
-  return value === undefined;
-}
-
-export function isNull(value: unknown): value is null {
-  return value === null;
-}
-
-export function isNotNull(value: unknown): value is Exclude<unknown, null> {
-  return value !== null;
-}
-
-/**
- * Checks if `value` is a function.
- *
- * @param value - The value to check.
- * @returns `true` if `value` is a function, `false` otherwise.
- */
-export function isFunction(value: unknown): value is AnyFunction {
-  return typeof value === "function";
-}
-
-/**
- * Checks if `value` is a number.
- *
- * @param value - The value to check.
- * @returns `true` if `value` is a number, `false` otherwise.
- */
-export function isNumber(value: unknown): value is number {
-  return typeof value === "number";
-}
-
-/**
- * Checks if `value` is a string.
- *
- * @param value - The value to check.
- * @returns `true` if `value` is a string, `false` otherwise.
- */
-export function isString(value: unknown): value is string {
-  return typeof value === "string";
-}
-
-export function isBoolean(value: unknown): value is boolean {
-  return typeof value === "boolean";
 }
 
 export function isPrimitive(

@@ -1,6 +1,6 @@
 import { Text } from "@mantine/core";
+import { constant } from "$/lib/utils/constant/constant";
 import { match } from "ts-pattern";
-import { constant } from "@/lib/utils/higherOrderFuncs";
 import { DescribableValueArrayBlock } from "./DescribableValueArrayBlock";
 import {
   isDescribableObject,

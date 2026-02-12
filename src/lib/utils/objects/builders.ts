@@ -1,5 +1,5 @@
+import { constant } from "$/lib/utils/constant/constant";
 import { ConditionalKeys } from "type-fest";
-import { constant } from "../higherOrderFuncs";
 import { identity } from "../misc";
 
 /**
@@ -28,45 +28,43 @@ export function makeObject<
   InK extends ConditionalKeys<T, PropertyKey> | undefined,
   ValueKey extends ConditionalKeys<T, PropertyKey> | undefined,
   OutK extends undefined extends InK ? PropertyKey
-    : Extract<T[Extract<InK, PropertyKey>], PropertyKey> = undefined extends InK
-      ? string
-      : Extract<T[Extract<InK, PropertyKey>], PropertyKey>,
+  : Extract<T[Extract<InK, PropertyKey>], PropertyKey> = undefined extends InK ?
+    string
+  : Extract<T[Extract<InK, PropertyKey>], PropertyKey>,
   OutV extends undefined extends ValueKey ? unknown
-    : T[Extract<ValueKey, PropertyKey>] = undefined extends ValueKey ? T
-      : T[Extract<ValueKey, PropertyKey>],
+  : T[Extract<ValueKey, PropertyKey>] = undefined extends ValueKey ? T
+  : T[Extract<ValueKey, PropertyKey>],
 >(
   list: readonly T[],
   options:
     | {
-      keyFn?: (item: T) => OutK;
-      key?: InK;
-      valueFn?: (item: T) => OutV;
-      valueKey?: ValueKey;
-    }
+        keyFn?: (item: T) => OutK;
+        key?: InK;
+        valueFn?: (item: T) => OutV;
+        valueKey?: ValueKey;
+      }
     | {
-      keyFn?: (item: T) => OutK;
-      key?: InK;
-      defaultValue: OutV;
-    } = {},
+        keyFn?: (item: T) => OutK;
+        key?: InK;
+        defaultValue: OutV;
+      } = {},
 ): Record<OutK, OutV> {
   const keyFn = (options.keyFn ??
     ((item) => {
       return String(item);
     })) as (item: T) => OutK;
-  const valueFn = "valueFn" in options && options.valueFn
-    ? options.valueFn
-    : "defaultValue" in options
-    ? constant(options.defaultValue)
+  const valueFn =
+    "valueFn" in options && options.valueFn ? options.valueFn
+    : "defaultValue" in options ? constant(options.defaultValue)
     : (identity as (item: T) => OutV);
 
   const obj = {} as Record<OutK, OutV>;
   list.forEach((item) => {
     const key = (options.key ? item[options.key] : keyFn(item)) as OutK;
     const value = (
-      "valueKey" in options && options.valueKey
-        ? item[options.valueKey]
-        : valueFn(item)
-    ) as OutV;
+      "valueKey" in options && options.valueKey ?
+        item[options.valueKey]
+      : valueFn(item)) as OutV;
     if (key !== undefined && key !== null) {
       obj[key] = value;
     }
@@ -112,12 +110,12 @@ export function makeBucketRecord<
   InK extends keyof T | undefined,
   ValueKey extends keyof T | undefined,
   OutK extends undefined extends InK ? PropertyKey
-    : Extract<T[Extract<InK, PropertyKey>], PropertyKey> = undefined extends InK
-      ? string
-      : Extract<T[Extract<InK, PropertyKey>], PropertyKey>,
+  : Extract<T[Extract<InK, PropertyKey>], PropertyKey> = undefined extends InK ?
+    string
+  : Extract<T[Extract<InK, PropertyKey>], PropertyKey>,
   OutV extends undefined extends ValueKey ? unknown
-    : T[Extract<ValueKey, PropertyKey>] = undefined extends ValueKey ? T
-      : T[Extract<ValueKey, PropertyKey>],
+  : T[Extract<ValueKey, PropertyKey>] = undefined extends ValueKey ? T
+  : T[Extract<ValueKey, PropertyKey>],
 >(
   list: readonly T[],
   {
@@ -164,10 +162,11 @@ export function makeIdLookupRecord<
   T extends object,
   IdKey extends ConditionalKeys<T, PropertyKey> = "id" extends (
     ConditionalKeys<T, PropertyKey>
-  ) ? "id"
-    : never,
-  OutKey extends T[IdKey] extends PropertyKey ? T[IdKey]
-    : never = T[IdKey] extends PropertyKey ? T[IdKey] : never,
+  ) ?
+    "id"
+  : never,
+  OutKey extends T[IdKey] extends PropertyKey ? T[IdKey] : never =
+    T[IdKey] extends PropertyKey ? T[IdKey] : never,
 >(
   list: readonly T[],
   { key = "id" as IdKey }: { key?: IdKey } = {},

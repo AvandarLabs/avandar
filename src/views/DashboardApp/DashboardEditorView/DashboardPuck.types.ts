@@ -1,5 +1,7 @@
 import { ReactNode } from "react";
-import type { DataVizProps } from "./DataViz";
+import { Simplify } from "type-fest";
+import { CURRENT_SCHEMA_VERSION } from "./migrations/constants";
+import type { DataVizWidgetProps } from "./widgets/DataVizWidget";
 import type { Config as PuckConfig, Data as PuckData } from "@puckeditor/core";
 
 export type SlotRenderer = (options?: unknown) => ReactNode;
@@ -103,23 +105,17 @@ export type CardProps = {
   title: string;
 };
 
-export type DashboardRootTextProps = {
+export type RootPadding = "none" | "xs" | "sm" | "md" | "lg" | "xl";
+
+export type DashboardRootWidthUnit = "%" | "px";
+
+export type DashboardRootProps = {
   author: string;
   publishedAt: string;
   subtitle: string;
   title: string;
-};
-
-export type RootPadding = "none" | "xs" | "sm" | "md" | "lg" | "xl";
-
-export type DashboardRootLayoutProps = {
   horizontalPadding: RootPadding;
   verticalPadding: RootPadding;
-};
-
-export type DashboardRootWidthUnit = "%" | "px";
-
-export type DashboardRootWidthProps = {
   /**
    * Root container width control. If unit is "%", we apply a percentage width
    * (centered). If unit is "px", we apply a max-width in pixels (centered).
@@ -128,26 +124,19 @@ export type DashboardRootWidthProps = {
     unit: DashboardRootWidthUnit;
     value: number;
   };
-};
-
-export type DashboardRootVisibilityProps = {
   isAuthorHidden: boolean;
   isPublishedAtHidden: boolean;
   isSubtitleHidden: boolean;
   isTitleHidden: boolean;
+  schemaVersion: typeof CURRENT_SCHEMA_VERSION;
 };
-
-export type DashboardRootProps = DashboardRootTextProps &
-  DashboardRootLayoutProps &
-  DashboardRootWidthProps &
-  DashboardRootVisibilityProps;
 
 type DashboardPuckComponents = {
   Card: CardProps;
   CalloutBlock: CalloutBlockProps;
   Columns: ColumnsProps;
   CodeBlock: CodeBlockProps;
-  DataViz: DataVizProps;
+  DataViz: DataVizWidgetProps;
   DividerBlock: DividerBlockProps;
   EmbedBlock: EmbedBlockProps;
   FigureBlock: FigureBlockProps;
@@ -161,5 +150,7 @@ type DashboardPuckComponents = {
   TableBlock: TableBlockProps;
 };
 
-export type DashboardPuckData = PuckData<DashboardPuckComponents>;
+export type DashboardPuckData = Simplify<
+  PuckData<DashboardPuckComponents, DashboardRootProps>
+>;
 export type DashboardPuckConfig = PuckConfig<DashboardPuckComponents>;

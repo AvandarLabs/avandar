@@ -1,5 +1,6 @@
 import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { where } from "$/lib/utils/filters/filters";
+import { isNonNullish } from "$/lib/utils/guards/isNonNullish/isNonNullish";
 import { unknownToString } from "$/lib/utils/strings/unknownToString/unknownToString";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
@@ -8,7 +9,6 @@ import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClien
 import { SourceBadge } from "@/components/common/SourceBadge";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
 import { Paper } from "@/lib/ui/Paper";
-import { isNonNullish } from "@/lib/utils/guards/guards";
 import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap";
 import { makeMap } from "@/lib/utils/maps/makeMap";
 import { makeObject } from "@/lib/utils/objects/builders";

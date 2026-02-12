@@ -1,7 +1,7 @@
 import { ILogger, Logger } from "$/lib/Logger/Logger";
+import { constant } from "$/lib/utils/constant/constant";
 import * as arrow from "apache-arrow";
 import { match } from "ts-pattern";
-import { constant } from "@/lib/utils/higherOrderFuncs";
 import { QueryResultColumn } from "@/models/queries/QueryResult/QueryResult.types";
 
 export function arrowFieldToQueryResultField(

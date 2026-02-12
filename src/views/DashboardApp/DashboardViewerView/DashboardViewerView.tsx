@@ -1,13 +1,13 @@
 import { Box, LoadingOverlay, Stack, Text, Title } from "@mantine/core";
-import { Render } from "@puckeditor/core";
-import { useEffect } from "react";
+import { Render as PuckPageRender } from "@puckeditor/core";
+import { useEffect, useMemo } from "react";
 import "@puckeditor/core/puck.css";
 import { notifyError } from "@/lib/ui/notifications/notify";
 import { Paper } from "@/lib/ui/Paper";
-import {
-  getDashboardPuckConfig,
-  getInitialDashboardPuckData,
-} from "../DashboardEditorView/getDashboardPuckConfig";
+import { getDashboardPuckConfig } from "../DashboardEditorView/getDashboardPuckConfig";
+import { getVersionFromConfigData } from "../DashboardEditorView/migrations/getVersionFromConfigData";
+import { DashboardGenericData } from "../DashboardEditorView/utils/puck.types";
+import { upgradePuckConfig } from "../DashboardEditorView/utils/upgradePuckConfig";
 import { useEnsurePublishedDashboardDatasets } from "./useEnsurePublishedDashboardDatasets";
 import type { Dashboard } from "@/models/Dashboard/Dashboard.types";
 
@@ -18,6 +18,38 @@ type Props = {
 export function DashboardViewerView({ dashboard }: Props): JSX.Element {
   const [isLoadingDatasets, loadingDatasetsError] =
     useEnsurePublishedDashboardDatasets(dashboard);
+
+  const config = getDashboardPuckConfig({
+    dashboardTitle: dashboard?.name ?? "Untitled dashboard",
+    workspaceId: dashboard?.workspaceId,
+  });
+
+  const data = useMemo(() => {
+    if (!dashboard) {
+      return {
+        root: {
+          props: {
+            title: "Untitled dashboard",
+          },
+        },
+        content: [],
+      };
+    }
+    const dashboardConfigData =
+      dashboard.config as unknown as DashboardGenericData;
+    const puckData = {
+      ...dashboardConfigData,
+      root: {
+        ...dashboardConfigData.root,
+        props: {
+          ...dashboardConfigData.root.props,
+          title: dashboard.name || "Untitled dashboard",
+          schemaVersion: getVersionFromConfigData(dashboardConfigData),
+        },
+      },
+    };
+    return upgradePuckConfig(puckData);
+  }, [dashboard]);
 
   useEffect(() => {
     if (!loadingDatasetsError) {
@@ -61,13 +93,6 @@ export function DashboardViewerView({ dashboard }: Props): JSX.Element {
     );
   }
 
-  const config = getDashboardPuckConfig({
-    dashboardTitle: dashboard.name,
-    workspaceId: dashboard.workspaceId,
-  });
-
-  const data = getInitialDashboardPuckData({ dashboard });
-
   if (isLoadingDatasets) {
     return (
       <Paper p="xxl" maw={720} mx="auto" pos="relative">
@@ -99,7 +124,7 @@ export function DashboardViewerView({ dashboard }: Props): JSX.Element {
 
   return (
     <Box>
-      <Render config={config} data={data} />
+      <PuckPageRender config={config} data={data} />
     </Box>
   );
 }

@@ -5,22 +5,21 @@ import { useMutation } from "@/lib/hooks/query/useMutation";
 import type { UseMutationResultTuple } from "@/lib/hooks/query/useMutation";
 import type { WorkspaceId } from "@/models/Workspace/Workspace.types";
 
-type UseNLPQueryOptions = {
-  workspaceId: WorkspaceId;
-  onSuccess: (sql: string) => void;
-};
-
-type NLPQueryMutationOptions = {
+type UseNLPQueryVariables = {
   prompt: string;
 };
 
-export function useNLPQuery(
-  options: UseNLPQueryOptions,
-): UseMutationResultTuple<string, NLPQueryMutationOptions> {
+export function useNLPQuery({
+  workspaceId,
+  onSuccess,
+}: {
+  workspaceId: WorkspaceId;
+  onSuccess: (sql: string, mutationVars: UseNLPQueryVariables) => void;
+}): UseMutationResultTuple<string, UseNLPQueryVariables> {
   return useMutation({
-    mutationFn: async (mutationOptions) => {
+    mutationFn: async ({ prompt }: UseNLPQueryVariables) => {
       const datasets = await DatasetClient.getAll(
-        where("workspace_id", "eq", options.workspaceId),
+        where("workspace_id", "eq", workspaceId),
       );
       const firstDataset = datasets[0];
       if (!firstDataset) {
@@ -30,16 +29,14 @@ export function useNLPQuery(
       const { sql } = await APIClient.get({
         route: "queries/:workspaceId/generate",
         pathParams: {
-          workspaceId: options.workspaceId,
+          workspaceId: workspaceId,
         },
         queryParams: {
-          prompt: mutationOptions.prompt,
+          prompt: prompt,
         },
       });
       return sql;
     },
-    onSuccess: (sql) => {
-      options.onSuccess(sql);
-    },
+    onSuccess,
   });
 }

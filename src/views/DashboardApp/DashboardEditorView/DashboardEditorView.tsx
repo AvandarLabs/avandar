@@ -1,4 +1,4 @@
-import { Puck } from "@puckeditor/core";
+import { Data, Puck } from "@puckeditor/core";
 import "@puckeditor/core/puck.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
@@ -6,55 +6,37 @@ import { notifySuccess } from "@/lib/ui/notifications/notify";
 import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
 import { DeleteDashboardButton } from "./DeleteDashboardButton";
 import {
+  createInitialDashboardPuckData,
   getDashboardPuckConfig,
   getDashboardTitleFromPuckData,
-  getInitialDashboardPuckData,
 } from "./getDashboardPuckConfig";
+import { getVersionFromConfigData } from "./migrations/getVersionFromConfigData";
 import { PublishDashboardButton } from "./PublishDashboardButton";
 import { SaveDashboardButton } from "./SaveDashboardButton";
+import { upgradePuckConfig } from "./utils/upgradePuckConfig";
 import { ViewDashboardButton } from "./ViewDashboardButton";
 import type { DashboardPuckData } from "./DashboardPuck.types";
-import type { DashboardRead } from "@/models/Dashboard/Dashboard.types";
+import type {
+  Dashboard,
+  DashboardId,
+} from "@/models/Dashboard/Dashboard.types";
 
 type Props = {
-  readonly dashboard: DashboardRead | undefined;
-  readonly workspaceSlug: string;
+  dashboard: Dashboard | undefined;
+  workspaceSlug: string;
 };
-
-const EMPTY_DATA: DashboardPuckData = {
-  root: { props: {} },
-  content: [],
-};
-
-function _withDashboardTitle(options: {
-  data: DashboardPuckData;
-  title: string;
-}): DashboardPuckData {
-  return {
-    ...options.data,
-    root: {
-      ...options.data.root,
-      props: {
-        ...(options.data.root.props ?? {}),
-        title: options.title,
-      },
-    },
-  };
-}
-
 export function DashboardEditorView({
   dashboard,
   workspaceSlug,
 }: Props): JSX.Element {
-  const dashboardTitle: string = dashboard?.name ?? "Untitled dashboard";
   const [data, setData] = useState<DashboardPuckData>(() => {
-    return _withDashboardTitle({
-      data: EMPTY_DATA,
-      title: dashboardTitle,
+    return createInitialDashboardPuckData({
+      dashboardTitle: dashboard?.name ?? "Untitled dashboard",
     });
   });
+  const dashboardTitle: string = dashboard?.name ?? "Untitled dashboard";
 
-  const lastDashboardIdRef = useRef<DashboardRead["id"] | undefined>(undefined);
+  const lastDashboardIdRef = useRef<DashboardId | undefined>(undefined);
 
   // simple counter to force Puck to re-mount when the initial data changes
   const [editorKey, setEditorKey] = useState(0);
@@ -69,11 +51,23 @@ export function DashboardEditorView({
     }
 
     lastDashboardIdRef.current = dashboard.id;
-    setData(getInitialDashboardPuckData({ dashboard }));
+    const dashboardConfigData = dashboard.config as DashboardPuckData;
+    const puckData = {
+      ...dashboardConfigData,
+      root: {
+        ...dashboardConfigData.root,
+        props: {
+          ...dashboardConfigData.root.props,
+          title: dashboard.name || "Untitled dashboard",
+          schemaVersion: getVersionFromConfigData(dashboardConfigData),
+        },
+      },
+    };
+    setData(upgradePuckConfig(puckData));
     setEditorKey((prevEditorKey) => {
       return prevEditorKey + 1;
     });
-  }, [dashboard]);
+  }, [dashboard, dashboardTitle]);
 
   const puckConfig = useMemo(() => {
     return getDashboardPuckConfig({
@@ -104,9 +98,8 @@ export function DashboardEditorView({
 
       const publishedTitle: string =
         getDashboardTitleFromPuckData(savedData) ?? dashboardTitle;
-
-      const publishedConfig: DashboardRead["config"] =
-        savedData as unknown as DashboardRead["config"];
+      const publishedConfig: Dashboard["config"] =
+        savedData as unknown as Dashboard["config"];
 
       saveDashboard({
         id: dashboard.id,
@@ -124,7 +117,9 @@ export function DashboardEditorView({
       key={editorKey}
       config={puckConfig}
       data={data}
-      onChange={setData}
+      onChange={(d: Data) => {
+        setData(d as DashboardPuckData);
+      }}
       overrides={{
         headerActions: () => {
           return (

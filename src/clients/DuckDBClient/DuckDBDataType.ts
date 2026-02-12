@@ -1,7 +1,7 @@
+import { constant } from "$/lib/utils/constant/constant";
 import { match } from "ts-pattern";
-import { constant } from "@/lib/utils/higherOrderFuncs";
-import { AvaDataType } from "@/models/datasets/AvaDataType";
 import { registryKeys } from "@/lib/utils/objects/misc";
+import { AvaDataType } from "@/models/datasets/AvaDataType";
 
 export type DuckDBDataType =
   | "BOOLEAN"
@@ -44,40 +44,38 @@ export type DuckDBSniffableDataType = Extract<
   "BOOLEAN" | "BIGINT" | "DOUBLE" | "TIME" | "DATE" | "TIMESTAMP" | "VARCHAR"
 >;
 
-export const DuckDBDataTypes = registryKeys<DuckDBDataType>(
-  {
-    BOOLEAN: true,
-    TINYINT: true,
-    SMALLINT: true,
-    INTEGER: true,
-    BIGINT: true,
-    UBIGINT: true,
-    UTINYINT: true,
-    USMALLINT: true,
-    UINTEGER: true,
-    FLOAT: true,
-    DOUBLE: true,
-    DECIMAL: true,
-    DATE: true,
-    TIME: true,
-    TIMESTAMP: true,
-    TIMESTAMP_TZ: true,
-    "TIMESTAMP WITH TIME ZONE": true,
-    INTERVAL: true,
-    VARCHAR: true,
-    BLOB: true,
-    UUID: true,
-    HUGEINT: true,
-    BIT: true,
-    ENUM: true,
-    MAP: true,
-    STRUCT: true,
-    LIST: true,
-    UNION: true,
-    JSON: true,
-    GEOMETRY: true,
-  },
-);
+export const DuckDBDataTypes = registryKeys<DuckDBDataType>({
+  BOOLEAN: true,
+  TINYINT: true,
+  SMALLINT: true,
+  INTEGER: true,
+  BIGINT: true,
+  UBIGINT: true,
+  UTINYINT: true,
+  USMALLINT: true,
+  UINTEGER: true,
+  FLOAT: true,
+  DOUBLE: true,
+  DECIMAL: true,
+  DATE: true,
+  TIME: true,
+  TIMESTAMP: true,
+  TIMESTAMP_TZ: true,
+  "TIMESTAMP WITH TIME ZONE": true,
+  INTERVAL: true,
+  VARCHAR: true,
+  BLOB: true,
+  UUID: true,
+  HUGEINT: true,
+  BIT: true,
+  ENUM: true,
+  MAP: true,
+  STRUCT: true,
+  LIST: true,
+  UNION: true,
+  JSON: true,
+  GEOMETRY: true,
+});
 
 export const DuckDBDataTypeUtils = {
   isDateOrTimestamp: (duckDBDataType: DuckDBDataType): boolean => {
@@ -95,9 +93,7 @@ export const DuckDBDataTypeUtils = {
    */
   // TODO(jpsyx): move this to AvaDataTypeUtils and rename to
   // `fromDuckDBDataType`
-  toAvaDataType: (
-    duckDBDataType: DuckDBDataType,
-  ): AvaDataType => {
+  toAvaDataType: (duckDBDataType: DuckDBDataType): AvaDataType => {
     return (
       match(duckDBDataType)
         .with(
@@ -112,12 +108,7 @@ export const DuckDBDataTypeUtils = {
           "HUGEINT",
           constant("bigint" as const),
         )
-        .with(
-          "FLOAT",
-          "DOUBLE",
-          "DECIMAL",
-          constant("double" as const),
-        )
+        .with("FLOAT", "DOUBLE", "DECIMAL", constant("double" as const))
         .with("TIME", constant("time" as const))
         .with("DATE", constant("date" as const))
         .with(

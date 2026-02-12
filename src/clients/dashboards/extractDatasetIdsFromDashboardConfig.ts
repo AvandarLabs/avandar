@@ -6,8 +6,8 @@
  */
 
 import { isPlainObject } from "$/lib/utils/guards/isPlainObject/isPlainObject";
+import { isString } from "$/lib/utils/guards/isString/isString";
 import { traverse } from "$/lib/utils/traverse/traverse";
-import { isString } from "@/lib/utils/guards/guards";
 import { DatasetId } from "@/models/datasets/Dataset";
 
 type DataVizLikeProps = {
