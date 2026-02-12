@@ -2,7 +2,7 @@
   "name": "avandar",
   "license": "CPAL-1.0",
   "private": true,
-  "version": "0.7.3",
+  "version": "0.7.4",
   "type": "module",
   "engines": {
     "node": ">=22.0.0"
@@ -13,7 +13,11 @@
   "scripts": {
     "dev": "./scripts/startAvandar.sh",
     "dev:email": "dotenv -e .env.development -- email dev --dir shared/emails",
-    "test": "vitest",
+    "deploy:dev-fanout-server": "fly deploy --config packages/dev-fanout-server/fly.production.toml",
+    "test": "npm run test:frontend && npm run test:ava-cli && npm run test:dev-fanout-server",
+    "test:frontend": "vitest run --exclude \"packages/**\"",
+    "test:ava-cli": "npm run -w @avandar/ava-cli test",
+    "test:dev-fanout-server": "npm run -w @avandar/dev-fanout-server test",
     "build": "tsc -b && vite build",
     "build:ava-cli": "npm run -w @avandar/ava-cli build && npm link -w @avandar/ava-cli",
     "lint": "eslint .",
@@ -124,6 +128,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.21",
     "commander": "^14.0.0",
+    "concurrently": "^9.2.1",
     "dotenv": "^17.2.3",
     "dotenv-cli": "^11.0.0",
     "eslint": "^9.21.0",

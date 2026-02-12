@@ -14,7 +14,7 @@
     ],
     "packageJson": {
       "dependencies": [
-        "npm:@avandar/acclimate@~0.3.1",
+        "npm:@avandar/acclimate@~0.3.2",
         "npm:@duckdb/duckdb-wasm@1.30.0",
         "npm:@eslint/js@^9.21.0",
         "npm:@ianvs/prettier-plugin-sort-imports@^4.4.1",
@@ -72,6 +72,7 @@
         "npm:autoprefixer@^10.4.21",
         "npm:camelcase-keys@^9.1.3",
         "npm:commander@14",
+        "npm:concurrently@^9.2.1",
         "npm:dayjs@^1.11.13",
         "npm:dexie@^4.0.11",
         "npm:dotenv-cli@11",
@@ -127,6 +128,14 @@
             "npm:prettier@^3.5.3",
             "npm:tsup@^8.5.0",
             "npm:typescript@~5.9.3"
+          ]
+        }
+      },
+      "packages/dev-fanout-server": {
+        "packageJson": {
+          "dependencies": [
+            "npm:fastify@^5.6.0",
+            "npm:tsx@^4.20.5"
           ]
         }
       }

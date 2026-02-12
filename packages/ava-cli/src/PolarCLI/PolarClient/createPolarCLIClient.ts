@@ -1,5 +1,4 @@
 import { Polar } from "@polar-sh/sdk";
-import * as dotenv from "dotenv";
 import { getItemsFromListPage } from "./listUtils";
 
 export type PolarServerType = "sandbox" | "production";
@@ -8,23 +7,6 @@ export type PolarCLIClient = {
   polar: Polar;
   organizationId: string;
 };
-
-type DotenvConfigResult = Readonly<{
-  error?: unknown;
-}>;
-
-function _loadDevEnv(): void {
-  const result = dotenv.config({
-    path: ".env.development",
-  }) as DotenvConfigResult;
-
-  if (result.error !== undefined) {
-    throw new Error(
-      "Failed to load .env.development. Run this command from the repo root " +
-        "so we can load POLAR_ACCESS_TOKEN and POLAR_SERVER_TYPE.",
-    );
-  }
-}
 
 function _getPolarServerType(): PolarServerType {
   const serverType = process.env.POLAR_SERVER_TYPE;
@@ -77,8 +59,6 @@ async function _getOrganizationId(polar: Polar): Promise<string> {
  * `POLAR_SERVER_TYPE`.
  */
 export async function createPolarCLIClient(): Promise<PolarCLIClient> {
-  _loadDevEnv();
-
   const accessToken = _getPolarAccessToken();
   const serverType = _getPolarServerType();
 

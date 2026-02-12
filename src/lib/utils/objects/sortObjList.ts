@@ -1,4 +1,6 @@
-import { isNullish, isNumber, isString } from "../guards/guards";
+import { isNullish } from "$/lib/utils/guards/isNullish/isNullish";
+import { isNumber } from "$/lib/utils/guards/isNumber/isNumber";
+import { isString } from "$/lib/utils/guards/isString/isString";
 import { stringComparator } from "../strings/sort";
 
 /**

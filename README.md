@@ -27,11 +27,17 @@ the product into something that truly serves your mission.
 
 1. Node.js
 2. Docker Desktop
-3. Supabase CLI
+3. Supabase CLI (`brew install supabase/tap/supabase`)
+4. ngrok (`brew install ngrok`)
 
 ### Set up
 
-1. Clone this repo
+1. Clone this repo and install dependencies
+
+   ```bash
+   npm install
+   npm run build:ava-cli
+   ```
 
 2. Initiate a local instance of Supabase (you need to have installed Supabase
    CLI for this)
@@ -117,10 +123,11 @@ the product into something that truly serves your mission.
    - If your `Read` variant has a discriminated union, you will need sub-types for
      each part of the union, and then reference them in the `Insert` and `Update`
      variants. See [EntityFieldConfig.types.ts](src/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts)
-     for an example. This is because if you apply `Partial<>` or `SetRequired<>` to
-     the full object, TypeScript loses the discriminated union and treats it as a
-     regular union. Splitting up the union into types and applying `Partial<>` or
-     `SetRequired<>` to each sub-type allows us to maintain the discriminated union.
+     for an example. This is because if you apply `Partial<>` or `SetRequired<>`
+     to the full object, TypeScript loses the discriminated union and treats it
+     as a regular union. Splitting up the union into types and applying
+     `Partial<>` or `SetRequired<>` to each sub-type allows us to maintain the
+     discriminated union.
 
 4. Set up the Zod schema parsers in `parsers.ts`.
    - Ensure the `DBRead`, `DBInsert`, and `DBUpdate` schemas match the model's

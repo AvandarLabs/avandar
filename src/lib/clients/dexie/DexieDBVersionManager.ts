@@ -119,8 +119,8 @@ type DexieDBVersionManager<
     ) ?
       V
     : never,
-    DBSchema extends
-      DBSchemaRegistry[`v${VersionNum}`] = DBSchemaRegistry[`v${VersionNum}`],
+    DBSchema extends DBSchemaRegistry[`v${VersionNum}`] =
+      DBSchemaRegistry[`v${VersionNum}`],
   >(
     config: DBSchemaConfig<DBSchema>,
   ) => DBSchemaConfig<DBSchema>;
@@ -202,32 +202,30 @@ function createDexieDBVersionManager<
     return castedDB;
   }
 
-  const registerVersions = (
-    dbSchemas: ReadonlyArray<
-      DBSchemaConfig<SchemasOfRegistry<DBSchemaRegistry>>
-    >,
-  ): void => {
-    dbSchemas.forEach((dbSchema) => {
-      _registerDexieDBVersion(dbSchema);
-    });
-  };
-
-  const getVersion = <
-    Version extends Extract<keyof DBSchemaRegistry, `v${number}`> = Extract<
-      keyof DBSchemaRegistry,
-      `v${number}`
-    >,
-  >(
-    version: Version,
-  ): DexieDBType<DBSchemaRegistry[Version]["models"][number]> => {
-    const db = registeredDexieDBVersions[version as `v${number}`];
-    assertIsDefined(db, `Could not find a Dexie DB with version ${version}`);
-    return db as DexieDBType<DBSchemaRegistry[Version]["models"][number]>;
-  };
-
   return {
-    registerVersions,
-    getVersion,
+    registerVersions: (
+      dbSchemas: ReadonlyArray<
+        DBSchemaConfig<SchemasOfRegistry<DBSchemaRegistry>>
+      >,
+    ): void => {
+      dbSchemas.forEach((dbSchema) => {
+        _registerDexieDBVersion(dbSchema);
+      });
+    },
+
+    getVersion: <
+      Version extends Extract<keyof DBSchemaRegistry, `v${number}`> = Extract<
+        keyof DBSchemaRegistry,
+        `v${number}`
+      >,
+    >(
+      version: Version,
+    ): DexieDBType<DBSchemaRegistry[Version]["models"][number]> => {
+      const db = registeredDexieDBVersions[version as `v${number}`];
+      assertIsDefined(db, `Could not find a Dexie DB with version ${version}`);
+      return db as DexieDBType<DBSchemaRegistry[Version]["models"][number]>;
+    },
+
     defineVersion: identity,
   };
 }

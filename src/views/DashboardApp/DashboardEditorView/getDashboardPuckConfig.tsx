@@ -10,19 +10,16 @@ import {
   Title,
 } from "@mantine/core";
 import { Paper } from "@/lib/ui/Paper";
-import { ContainerMaxWidthField } from "./ContainerMaxWidthField";
-import { DataViz } from "./DataViz";
-import { GenerateSQLButtonField } from "./GenerateSQLButtonField";
-import { generateSQLFromPrompt } from "./generateSQLFromPrompt";
+import { WorkspaceId } from "@/models/Workspace/Workspace.types";
+import { buildContainerMaxWidthFieldConfig } from "./fields/ContainerMaxWidthField";
+import { CURRENT_SCHEMA_VERSION } from "./migrations/constants";
+import { buildDataVizWidgetConfig } from "./widgets/DataVizWidget";
 import type {
   CalloutBlockProps,
   CodeBlockProps,
   DashboardPuckConfig,
   DashboardPuckData,
-  DashboardRootLayoutProps,
   DashboardRootProps,
-  DashboardRootTextProps,
-  DashboardRootVisibilityProps,
   EmbedBlockProps,
   FigureBlockProps,
   HeadingBlockProps,
@@ -34,14 +31,26 @@ import type {
   SlotRenderer,
   TableBlockProps,
 } from "./DashboardPuck.types";
-import type { DataVizProps } from "./DataViz";
-import type { DashboardRead } from "@/models/Dashboard/Dashboard.types";
 import type { ReactNode } from "react";
 
-const EMPTY_DATA: DashboardPuckData = {
-  root: { props: {} },
-  content: [],
-};
+export function buildDefaultRootProps(options: {
+  dashboardTitle: string;
+}): DashboardRootProps {
+  return {
+    schemaVersion: CURRENT_SCHEMA_VERSION,
+    author: "",
+    containerMaxWidth: { unit: "%", value: 100 },
+    horizontalPadding: "md",
+    isAuthorHidden: false,
+    isPublishedAtHidden: false,
+    isSubtitleHidden: false,
+    isTitleHidden: false,
+    publishedAt: "",
+    subtitle: "",
+    title: options.dashboardTitle,
+    verticalPadding: "lg",
+  };
+}
 
 function _isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -74,25 +83,9 @@ export function getDashboardTitleFromPuckData(
     : undefined;
 }
 
-function _withDashboardTitle(options: {
-  data: DashboardPuckData;
-  title: string;
-}): DashboardPuckData {
-  return {
-    ...options.data,
-    root: {
-      ...options.data.root,
-      props: {
-        ...(options.data.root.props ?? {}),
-        title: options.title,
-      },
-    },
-  };
-}
-
 function _getStringProp(options: {
   props: unknown;
-  key: keyof DashboardRootTextProps;
+  key: keyof DashboardRootProps;
 }): string | undefined {
   if (!_isRecord(options.props)) {
     return undefined;
@@ -107,7 +100,7 @@ function _getStringProp(options: {
 
 function _getBooleanProp(options: {
   props: unknown;
-  key: keyof DashboardRootVisibilityProps;
+  key: keyof DashboardRootProps;
 }): boolean | undefined {
   if (!_isRecord(options.props)) {
     return undefined;
@@ -129,10 +122,7 @@ const ROOT_PADDING_OPTIONS: readonly RootPadding[] = [
 
 function _getRootPaddingProp(options: {
   props: unknown;
-  key: keyof Pick<
-    DashboardRootLayoutProps,
-    "horizontalPadding" | "verticalPadding"
-  >;
+  key: keyof Pick<DashboardRootProps, "horizontalPadding" | "verticalPadding">;
 }): RootPadding | undefined {
   if (!_isRecord(options.props)) {
     return undefined;
@@ -349,83 +339,39 @@ function _parseTableRows(options: {
     });
 }
 
-export function getInitialDashboardPuckData(options: {
-  dashboard: DashboardRead;
+// TODO(jpsyx): refactor this mess of slop
+export function createInitialDashboardPuckData(options: {
+  dashboardTitle: string;
 }): DashboardPuckData {
-  const config: unknown = options.dashboard.config;
-  const dashboardTitle: string = options.dashboard.name;
-
-  if (
-    _isRecord(config) &&
-    _isRecord(config.root) &&
-    _isRecord(config.root.props) &&
-    Array.isArray(config.content)
-  ) {
-    const dataFromBackend: DashboardPuckData = config as DashboardPuckData;
-
-    // Backwards compat: older dashboards used `containerWidthPercent`.
-    // Convert to the new `containerMaxWidth` structure if needed.
-    const rootProps = (
-      dataFromBackend.root as { props?: Record<string, unknown> }
-    ).props;
-
-    const hasNewWidthProp: boolean =
-      _isRecord(rootProps) && "containerMaxWidth" in rootProps;
-    const oldWidthPercent: unknown =
-      _isRecord(rootProps) ? rootProps.containerWidthPercent : undefined;
-
-    const migratedData: DashboardPuckData =
-      !hasNewWidthProp && typeof oldWidthPercent === "number" ?
-        ({
-          ...dataFromBackend,
-          root: {
-            ...dataFromBackend.root,
-            props: {
-              ...(dataFromBackend.root.props ?? {}),
-              containerMaxWidth: { unit: "%", value: oldWidthPercent },
-            },
-          },
-        } as DashboardPuckData)
-      : dataFromBackend;
-
-    return getDashboardTitleFromPuckData(migratedData) ? migratedData : (
-        _withDashboardTitle({
-          data: migratedData,
-          title: dashboardTitle,
-        })
-      );
-  }
-
-  return _withDashboardTitle({
-    data: EMPTY_DATA,
-    title: dashboardTitle,
-  });
+  return {
+    root: {
+      props: buildDefaultRootProps({ dashboardTitle: options.dashboardTitle }),
+    },
+    content: [],
+  };
 }
 
 export function getDashboardPuckConfig(options: {
   dashboardTitle: string;
-  workspaceId: DashboardRead["workspaceId"] | undefined;
+  workspaceId: WorkspaceId | undefined;
 }): DashboardPuckConfig {
   return {
     root: {
       fields: {
+        schemaVersion: {
+          // leave this as `false`. Set to `true` only for debugging
+          visible: false,
+          type: "custom",
+          label: "Schema version",
+          render: ({ value }) => {
+            return <>Version: {value}</>;
+          },
+        },
         title: {
           label: "Page title",
           type: "text",
         },
-        containerMaxWidth: {
-          label: "Container max width",
-          type: "custom",
-          render: (props) => {
-            return (
-              <ContainerMaxWidthField
-                value={props.value}
-                readOnly={props.readOnly}
-                onChange={props.onChange}
-              />
-            );
-          },
-        },
+        containerMaxWidth: buildContainerMaxWidthFieldConfig(),
         isTitleHidden: {
           label: "Hide title",
           type: "radio",
@@ -496,6 +442,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       defaultProps: {
+        schemaVersion: CURRENT_SCHEMA_VERSION,
         author: "",
         containerMaxWidth: { unit: "%", value: 100 },
         horizontalPadding: "md",
@@ -507,7 +454,9 @@ export function getDashboardPuckConfig(options: {
         subtitle: "",
         title: options.dashboardTitle,
         verticalPadding: "lg",
-      },
+      } satisfies DashboardRootProps,
+
+      // the render function for rendering the root dashboard page
       render: (props) => {
         const isTitleHidden: boolean =
           _getBooleanProp({ props, key: "isTitleHidden" }) ?? false;
@@ -621,6 +570,12 @@ export function getDashboardPuckConfig(options: {
         );
       },
     },
+
+    // dictionary of categories (the left sidebar in the editor) for organizing
+    // the draggable widgets (Puck calls them "components" but we'll use the
+    // term "widgets" to specifically refer to dashboard blocks, because the
+    // term "block" or "component" is too general and is used all over our
+    // codebase for other non-dashboard things).
     categories: {
       layout: {
         title: "Layout",
@@ -648,9 +603,10 @@ export function getDashboardPuckConfig(options: {
         components: ["FigureBlock", "EmbedBlock"],
       },
     },
+
     components: {
       Section: {
-        label: "Layout / Section",
+        label: "Section",
         fields: {
           maxWidth: {
             label: "Max width",
@@ -692,7 +648,6 @@ export function getDashboardPuckConfig(options: {
         },
         render: (props) => {
           const maxWidth: number | string = _getMaxWidthValue(props.maxWidth);
-
           return (
             <Box
               mx="auto"
@@ -707,7 +662,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       Columns: {
-        label: "Layout / Columns",
+        label: "Columns",
         fields: {
           numColumns: {
             label: "Number of columns",
@@ -882,7 +837,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       SidebarLayout: {
-        label: "Layout / Sidebar layout",
+        label: "Sidebar layout",
         fields: {
           sidebarPosition: {
             label: "Sidebar position",
@@ -986,7 +941,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       Grid: {
-        label: "Layout / Grid",
+        label: "Grid",
         fields: {
           numColumns: {
             label: "Number of columns",
@@ -1093,130 +1048,7 @@ export function getDashboardPuckConfig(options: {
           );
         },
       },
-      DataViz: {
-        label: "DataViz",
-        fields: {
-          prompt: {
-            label: "Prompt",
-            type: "textarea",
-          },
-          generateSqlRequestId: {
-            label: "Run Query",
-            type: "custom",
-            render: (props) => {
-              return (
-                <GenerateSQLButtonField
-                  id={props.id}
-                  readOnly={props.readOnly}
-                  onChange={props.onChange}
-                />
-              );
-            },
-          },
-          sqlError: {
-            label: "SQL generation error",
-            type: "custom",
-            render: (props) => {
-              return (
-                  typeof props.value === "string" &&
-                    props.value.trim().length > 0
-                ) ?
-                  <Text c="red" fz="sm">
-                    {props.value}
-                  </Text>
-                : <></>;
-            },
-          },
-          sqlGeneratedFromPrompt: {
-            label: "SQL generated from prompt",
-            type: "custom",
-            render: () => {
-              return <></>;
-            },
-          },
-          sql: {
-            label: "SQL",
-            type: "textarea",
-          },
-        },
-        defaultProps: {
-          prompt: "",
-          sql: "",
-          sqlError: "",
-          sqlGeneratedFromPrompt: "",
-          generateSqlRequestId: "",
-        },
-        resolveData: async (data, params) => {
-          const props: unknown = data.props;
-          const prompt: string =
-            typeof (props as Partial<DataVizProps>).prompt === "string" ?
-              ((props as Partial<DataVizProps>).prompt ?? "").trim()
-            : "";
-
-          const shouldGenerate: boolean =
-            params.trigger === "force" ||
-            params.changed.generateSqlRequestId === true;
-
-          if (!shouldGenerate) {
-            return data;
-          }
-
-          if (!options.workspaceId) {
-            return {
-              ...data,
-              props: {
-                ...(data.props ?? {}),
-                sqlError: "Cannot generate SQL without a workspace.",
-                sqlGeneratedFromPrompt: "",
-              },
-            };
-          }
-
-          if (prompt.length === 0) {
-            return {
-              ...data,
-              props: {
-                ...(data.props ?? {}),
-                sql: "",
-                sqlError: "Cannot generate SQL without a prompt.",
-                sqlGeneratedFromPrompt: "",
-              },
-            };
-          }
-
-          try {
-            const sql: string = await generateSQLFromPrompt({
-              prompt,
-              workspaceId: options.workspaceId,
-            });
-
-            return {
-              ...data,
-              props: {
-                ...(data.props ?? {}),
-                sql,
-                sqlError: "",
-                sqlGeneratedFromPrompt: prompt,
-              },
-            };
-          } catch (e) {
-            const errorMessage: string =
-              e instanceof Error ? e.message : String(e);
-
-            return {
-              ...data,
-              props: {
-                ...(data.props ?? {}),
-                sqlError: errorMessage,
-                sqlGeneratedFromPrompt: "",
-              },
-            };
-          }
-        },
-        render: (props: DataVizProps) => {
-          return <DataViz {...props} />;
-        },
-      },
+      DataViz: buildDataVizWidgetConfig(options),
       HeadingBlock: {
         fields: {
           text: {

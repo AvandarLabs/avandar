@@ -5,13 +5,14 @@ import {
   StringKeyOf,
   SwapDeep,
 } from "$/lib/types/utilityTypes";
+import { constant } from "$/lib/utils/constant/constant";
+import { isNull } from "$/lib/utils/guards/isNull";
 import { isPlainObject } from "$/lib/utils/guards/isPlainObject";
+import { isUndefined } from "$/lib/utils/guards/isUndefined/isUndefined";
 import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
 import camelcaseKeys, { CamelCaseKeys } from "camelcase-keys";
 import snakecaseKeys, { SnakeCaseKeys } from "snakecase-keys";
 import { ConditionalKeys } from "type-fest";
-import { isNull, isUndefined } from "../guards/guards";
-import { constant } from "../higherOrderFuncs";
 
 /**
  * Converts an object's keys to camelCase. This is a deep conversion.
@@ -400,28 +401,4 @@ export function excludeUndefinedShallow<T extends UnknownObject>(
     }
   });
   return newObj as ExcludeUndefinedShallow<T>;
-}
-
-/**
- * Maps the values of an object shallowly.
- *
- * @param obj The object to map values from.
- * @param fn The function to apply to each value.
- * @returns The object with all values mapped.
- */
-export function mapObjectValues<T extends UnknownObject, V>(
-  obj: T,
-  fn: (value: T[keyof T], key: keyof T) => V,
-): { [K in keyof T]: V } {
-  const newObj = {} as { [K in keyof T]: V };
-
-  // intentionally using a for loop here since this is a low-level
-  // function that we really need to be performant if it is used
-  // in huge arrays
-  for (const key in obj) {
-    if (Object.hasOwn(obj, key)) {
-      newObj[key] = fn(obj[key], key);
-    }
-  }
-  return newObj;
 }

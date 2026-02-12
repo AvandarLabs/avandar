@@ -5,7 +5,8 @@
 # Description:
 #   This script starts the Avandar development environment by:
 #   1. Updating edge function environment variables
-#   2. Running vite, supabase functions serve, and ngrok concurrently
+#   2. Running vite, supabase functions serve, ngrok, and fastify server
+#      concurrently
 #
 # Usage:
 #   ./scripts/startAvandar.sh
@@ -63,6 +64,7 @@ echo -e "${BLUE}Step 2: Starting development processes...${NC}"
 echo -e "${CYAN}  - Vite (frontend dev server)${NC}"
 echo -e "${CYAN}  - Supabase Functions (edge functions server)${NC}"
 echo -e "${CYAN}  - ngrok (reverse proxy tunnel)${NC}"
+echo -e "${CYAN}  - fastify server${NC}"
 echo ""
 
 # Check if concurrently is available
@@ -79,7 +81,7 @@ if ! command -v ngrok &> /dev/null; then
   exit 1
 fi
 
-# Run all three processes concurrently with clean output
+# Run all processes concurrently with clean output
 concurrently \
   --names "vite,functions,ngrok" \
   --prefix-colors "blue,green,yellow" \

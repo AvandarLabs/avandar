@@ -16,7 +16,7 @@ export function SaveDashboardButton({ onSave }: Props): JSX.Element {
     <Button
       leftSection={<IconDeviceFloppy size={16} />}
       onClick={() => {
-        onSave(appState.data);
+        onSave(appState.data as DashboardPuckData);
       }}
     >
       Save

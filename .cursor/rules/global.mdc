@@ -179,8 +179,8 @@ Libraries:
      * Docstring necessary here.
      */
     hello: () => {
-      return 'hello, world';
-    }
+      return "hello, world";
+    },
   };
   ```
 
@@ -195,10 +195,9 @@ Libraries:
   For example: JSON in HTTP requests; returning `null` in React to skip render.
 - Use RO-RO (Receive Object, Return Object) for passing and returning multiple
   parameters (only when there is more than one parameter).
-  - If there is only one parameter, accept it directly without wrapping it in
-    an object.
-  - If you do wrap multiple parameters in an object, default to naming the
-    argument as `options`.
+  - If there is only one parameter, do not wrap it in an object
+  - For a multi-parameter object, name the argument `options` unless `params`
+    or `config` are more appropriate choices.
   - If you use an object, use an inline type annotation. Only extract the object
     into a named type if it will be reused.
 
@@ -269,19 +268,21 @@ Libraries:
   - Data that is exported across module boundaries (e.g. React props).
 
 - To make a type immutable: use `readonly` for arrays, `Readonly<>` for
-  objects, `ReadonlySet` for sets, and `ReadonlyMap` for maps.
+  objects (instead of `readonly` on each key), `ReadonlySet<>` for sets,
+  and `ReadonlyMap<>` for maps.
 
-  EXCEPTION: for React props, even if the function component is exported (i.e.
-  crosses module boundaries), our convention is to only make inner props
-  immutable instead of the full object.
+  **EXCEPTION:** for React props, even if the component is exported, our
+  convention is to only make inner props immutable instead of the full object.
 
   This is bad:
 
   ```ts
+  // do not make the entire Props object immutable
   type Props = Readonly<{
     names: readonly string[]}
   }>
 
+  // do not make individual keys immutable
   type Props = {
     readonly name: readonly string[]
   }
@@ -290,6 +291,7 @@ Libraries:
   This is good:
 
   ```ts
+  // only the inner types are immutable
   type Props = {
     names: readonly string[];
   };

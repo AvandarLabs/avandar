@@ -1,4 +1,3 @@
-import { Logger } from "$/lib/Logger/Logger.ts";
 import { isNonEmptyArray } from "../isNonEmptyArray/isNonEmptyArray.ts";
 
 /**
@@ -12,7 +11,6 @@ export function assertIsNonEmptyArray<T>(
   msg: string = "Expected value to be a non-empty array",
 ): asserts value is readonly [T, ...T[]] {
   if (!isNonEmptyArray(value)) {
-    Logger.error(msg, { value });
     throw new Error(msg);
   }
 }

@@ -1,6 +1,6 @@
 import { IExternalStore } from "$/lib/types/common";
 import { AnyFunction, AnyFunctionWithReturn } from "$/lib/types/utilityTypes";
-import { mapObjectValues } from "../objects/transformations";
+import { objectValuesMap } from "$/lib/utils/objects/objectValuesMap/objectValuesMap";
 
 /**
  * Creates an external store that can be used with React's
@@ -41,7 +41,7 @@ export function createExternalStore<
   const { getters, updaters } = builder(_state);
 
   // wrap all updater functions with a call to notify subscribers
-  const wrappedUpdaters = mapObjectValues(updaters, (updater) => {
+  const wrappedUpdaters = objectValuesMap(updaters, (updater) => {
     return (...args: unknown[]) => {
       updater(...args);
       _notifySubscribers();

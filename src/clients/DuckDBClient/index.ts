@@ -8,11 +8,11 @@ import { MIMEType } from "$/lib/types/common";
 import { isNonEmptyArray } from "$/lib/utils/guards/isNonEmptyArray";
 import { objectEntries } from "$/lib/utils/objects/objectEntries/objectEntries";
 import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
+import { objectValuesMap } from "$/lib/utils/objects/objectValuesMap/objectValuesMap";
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { mapObjectValues } from "@/lib/utils/objects/transformations";
 import { uuid } from "@/lib/utils/uuid";
 import {
   QueryResult,
@@ -278,7 +278,7 @@ function arrowTableToJS<RowObject extends UnknownRow>(
 ): QueryResult<RowObject> {
   const jsDataRows = arrowTable.toArray().map((row) => {
     const jsRow = row.toJSON();
-    return mapObjectValues(jsRow, (v) => {
+    return objectValuesMap(jsRow, (v) => {
       if (typeof v === "bigint") {
         // beware that `v` might be bigger than Number.MAX_SAFE_INTEGER
         return Number(v);
@@ -581,7 +581,7 @@ class DuckDBClientImpl {
 
       // Insert the CSV file as a VIEW (low-memory interactive querying).
       await this.runRawQuery(
-        `CREATE TABLE "$tableName$" AS
+        `CREATE TABLE IF NOT EXISTS "$tableName$" AS
           SELECT *
           FROM read_csv(
             '$tableName$',
@@ -702,17 +702,17 @@ class DuckDBClientImpl {
     blob: Blob;
   }): Promise<DuckDBLoadParquetResult> {
     const { tableName, blob } = options;
-    const conn = await this.#connect();
     let loadResults: DuckDBLoadParquetResult;
 
-    try {
-      // Drop the dataset and recreate it. We are overwriting the data.
-      await this.dropTableViewAndFile(tableName);
-      await this.#registerParquetFile({ tableName, blob });
+    // Drop the dataset and recreate it. We are overwriting the data.
+    await this.dropTableViewAndFile(tableName);
+    await this.#registerParquetFile({ tableName, blob });
 
+    const conn = await this.#connect();
+    try {
       // Re-ingest the parquet data into a view (low-memory querying).
       await this.runRawQuery(
-        `CREATE VIEW "$tableName$" AS
+        `CREATE VIEW IF NOT EXISTS "$tableName$" AS
             SELECT * FROM read_parquet('$tableName$')`,
         { conn, params: { tableName } },
       );

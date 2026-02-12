@@ -15,6 +15,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "test": "vitest run -c vitest.config.ts",
     "type-check": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

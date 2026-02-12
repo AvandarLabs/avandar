@@ -1,7 +1,7 @@
+import { constant } from "$/lib/utils/constant/constant";
 import { match } from "ts-pattern";
-import { QueryAggregationType } from "./QueryAggregationType.types";
 import { DuckDBQueryAggregations } from "@/clients/DuckDBClient/DuckDBQueryAggregations";
-import { constant } from "@/lib/utils/higherOrderFuncs";
+import { QueryAggregationType } from "./QueryAggregationType.types";
 
 export const QueryAggregationTypes = {
   getAggregationColumnName: (

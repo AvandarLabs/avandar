@@ -6,12 +6,13 @@ import { StructuredQueries } from "@/models/queries/StructuredQuery/StructuredQu
 
 type Props = {
   rawSQL: string;
-  isStale: boolean;
 };
 
-export function TableViz({ rawSQL, isStale }: Props): JSX.Element {
+const emptyStructuredQuery = StructuredQueries.makeEmpty();
+
+export function TableViz({ rawSQL }: Props): JSX.Element {
   const [queryResults, isLoadingResults] = useDataQuery({
-    query: StructuredQueries.makeEmpty(),
+    query: emptyStructuredQuery,
     rawSQL,
     workspaceId: undefined,
   });
@@ -25,14 +26,6 @@ export function TableViz({ rawSQL, isStale }: Props): JSX.Element {
     return (
       <Text c="dimmed" fz="sm">
         Run a query to see results.
-      </Text>
-    );
-  }
-
-  if (isStale) {
-    return (
-      <Text c="dimmed" fz="sm">
-        SQL is out of date. Re-run the query to refresh results.
       </Text>
     );
   }

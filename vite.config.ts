@@ -5,33 +5,38 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { defineConfig } from "vitest/config";
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [
-    TanStackRouterVite({
-      target: "react",
-      autoCodeSplitting: true,
-      quoteStyle: "double",
-      semicolons: true,
-      routesDirectory: "src/routes",
-      generatedRouteTree: "src/routeTree.gen.ts",
-    }),
-    react(),
-    eslintPlugin(),
+export default defineConfig(({ mode }) => {
+  return {
+    plugins:
+      mode === "test" ?
+        [react()]
+      : [
+          TanStackRouterVite({
+            target: "react",
+            autoCodeSplitting: true,
+            quoteStyle: "double",
+            semicolons: true,
+            routesDirectory: "src/routes",
+            generatedRouteTree: "src/routeTree.gen.ts",
+          }),
+          react(),
+          eslintPlugin(),
 
-    // node polyfills are necessary to run `knex` in browser
-    nodePolyfills(),
-  ],
-  resolve: {
-    alias: {
-      "@": "/src",
-      $: "/shared",
-      "~": "/",
+          // node polyfills are necessary to run `knex` in browser
+          nodePolyfills(),
+        ],
+    resolve: {
+      alias: {
+        "@": "/src",
+        $: "/shared",
+        "~": "/",
+      },
     },
-  },
-  publicDir: "public",
-  test: {
-    globals: true,
-    environment: "jsdom",
-    setupFiles: "./tests/vitest.setup.ts",
-  },
+    publicDir: "public",
+    test: {
+      globals: true,
+      environment: "jsdom",
+      setupFiles: "./tests/vitest.setup.ts",
+    },
+  };
 });

@@ -1,8 +1,39 @@
 import { Acclimate } from "@avandar/acclimate";
 import { isSnakeCase } from "../../../utils/validators/isSnakeCase";
-import { newSupabaseTable } from "./newSupabaseTable";
+import { writeFileFromTemplate } from "../../../utils/writeFileFromTemplate";
 
 const OUTPUT_DIR = "supabase/schemas";
+const TEMPLATES_DIR =
+  "packages/ava-cli/src/DevCLI/NewBoilerplateCLI/NewSupabaseTableCLI/templates";
+
+function writeNewSupabaseTable({
+  tableName,
+  resourceName,
+  dir,
+  prefix,
+}: Readonly<{
+  tableName: string;
+  dir: string;
+  prefix: string;
+  resourceName: string;
+}>): void {
+  const templateParams = {
+    TABLE_NAME: tableName,
+    RESOURCE_NAME: resourceName.toLowerCase(),
+  };
+
+  const outputFileName = `${prefix}.${tableName}.sql`;
+
+  writeFileFromTemplate({
+    templateDir: TEMPLATES_DIR,
+    templateFileName: "table.sql.template",
+    params: templateParams,
+    outputDir: dir,
+    outputFileName: outputFileName,
+  });
+
+  console.log(`Created supabase schema file: ${dir}/${outputFileName}`);
+}
 
 export const NewSupabaseTableCLI = Acclimate.createCLI("table")
   .addPositionalArg({
@@ -39,4 +70,4 @@ export const NewSupabaseTableCLI = Acclimate.createCLI("table")
     defaultValue: OUTPUT_DIR,
     required: false,
   })
-  .action(newSupabaseTable);
+  .action(writeNewSupabaseTable);
