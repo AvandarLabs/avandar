@@ -21,11 +21,11 @@ export const PuckConfigMigrationV1 = {
           return {
             nlQuery: {
               prompt,
-              rawSQL: sql,
+              rawSql: sql,
               generations: [
                 {
                   prompt,
-                  rawSQL: sql,
+                  rawSql: sql,
                 },
               ],
             },
@@ -48,10 +48,10 @@ export const PuckConfigMigrationV1 = {
         const { nlQuery } = props;
         return {
           prompt: nlQuery.prompt,
-          sql: nlQuery.rawSQL,
+          sql: nlQuery.rawSql,
           generateSqlRequestId: "",
           sqlError: "",
-          sqlGeneratedFromPrompt: nlQuery.rawSQL,
+          sqlGeneratedFromPrompt: nlQuery.rawSql,
         };
       },
     }) as DashboardGenericData;

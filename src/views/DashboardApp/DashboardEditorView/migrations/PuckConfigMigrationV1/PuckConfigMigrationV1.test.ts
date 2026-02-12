@@ -45,11 +45,11 @@ const v1Data: DashboardGenericData = {
         id: TEST_DATA_VIZ_ID,
         nlQuery: {
           prompt: TEST_PROMPT,
-          rawSQL: TEST_SQL,
+          rawSql: TEST_SQL,
           generations: [
             {
               prompt: TEST_PROMPT,
-              rawSQL: TEST_SQL,
+              rawSql: TEST_SQL,
             },
           ],
         },
@@ -85,11 +85,11 @@ describe("PuckConfigMigration - v1", () => {
         id: TEST_DATA_VIZ_ID,
         nlQuery: {
           prompt: TEST_PROMPT,
-          rawSQL: TEST_SQL,
+          rawSql: TEST_SQL,
           generations: [
             {
               prompt: TEST_PROMPT,
-              rawSQL: TEST_SQL,
+              rawSql: TEST_SQL,
             },
           ],
         },
