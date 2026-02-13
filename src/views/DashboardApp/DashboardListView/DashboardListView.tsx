@@ -64,7 +64,8 @@ export function DashboardListView({
         description: undefined,
         slug: undefined,
         isPublic: false,
-        config: DashboardConfigs.makeEmpty(),
+        // TODO(jpsyx): avoid coercing the type here
+        config: DashboardConfigs.makeEmpty() as unknown as Dashboard["config"],
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
       }),
