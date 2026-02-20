@@ -46,6 +46,8 @@ export const DashboardClient = createSupabaseCRUDClient({
           dashboard.config,
         );
 
+        console.log("datasetIdCandidates", datasetIdCandidates);
+
         // if there are dataset IDs in our dashboard config, then we need to
         // copy them to public storage. They are dependencies of the dashboard.
         if (datasetIdCandidates.length > 0) {

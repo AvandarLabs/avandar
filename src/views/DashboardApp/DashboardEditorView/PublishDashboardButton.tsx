@@ -26,7 +26,7 @@ export function PublishDashboardButton({
       variant="outline"
       leftSection={<IconWorld size={16} />}
       loading={isPublishing}
-      disabled={!dashboardId || isPublic === true}
+      disabled={!dashboardId}
       onClick={() => {
         if (!dashboardId) {
           notifyDevAlert("Dashboard is not loaded yet.");

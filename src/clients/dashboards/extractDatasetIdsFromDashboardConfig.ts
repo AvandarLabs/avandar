@@ -11,9 +11,10 @@ import { traverse } from "$/lib/utils/traverse/traverse";
 import { DatasetId } from "@/models/datasets/Dataset";
 
 type DataVizLikeProps = {
-  prompt?: unknown;
-  sql?: unknown;
-  sqlGeneratedFromPrompt?: unknown;
+  nlQuery: {
+    rawSql: unknown;
+    prompt: unknown;
+  };
 };
 
 function _toTrimmedString(value: unknown): string {
@@ -59,18 +60,9 @@ function _extractDataVizSQLStrings(dashConfig: unknown): string[] {
     }
 
     const dataVizProps: DataVizLikeProps = props as DataVizLikeProps;
-    const sql: string = _toTrimmedString(dataVizProps.sql);
-    const prompt: string = _toTrimmedString(dataVizProps.prompt);
-    const sqlGeneratedFromPrompt: string = _toTrimmedString(
-      dataVizProps.sqlGeneratedFromPrompt,
-    );
+    const sql: string = _toTrimmedString(dataVizProps.nlQuery.rawSql);
 
     if (sql.length === 0) {
-      return;
-    }
-
-    const isStale = _isSQLStale({ prompt, sqlGeneratedFromPrompt });
-    if (isStale) {
       return;
     }
 

@@ -22,6 +22,7 @@ async function uploadDataset(options: {
     dashboardId,
     datasetId,
   });
+
   const { error } = await AvaSupabase.DB.storage
     .from(PUBLIC_BUCKET_NAME)
     .upload(objectPath, parquetBlob, {
