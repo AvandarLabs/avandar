@@ -2,6 +2,7 @@ import { Acclimate } from "@avandar/acclimate";
 import * as dotenv from "dotenv";
 import { DevCLI } from "./DevCLI";
 import { PolarCLI } from "./PolarCLI";
+import { SupabaseCLI } from "./SupabaseCLI/SupabaseCLI";
 
 type DotenvConfigResult = Readonly<{
   error?: unknown;
@@ -23,7 +24,8 @@ function _loadDevEnv(): void {
 
 const cli = Acclimate.createCLI("ava")
   .addCommand("dev", DevCLI)
-  .addCommand("polar", PolarCLI);
+  .addCommand("polar", PolarCLI)
+  .addCommand("supabase", SupabaseCLI);
 
 _loadDevEnv();
 Acclimate.run(cli);

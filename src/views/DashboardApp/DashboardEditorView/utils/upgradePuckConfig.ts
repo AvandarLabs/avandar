@@ -1,7 +1,7 @@
-import { DashboardPuckData } from "../DashboardPuck.types";
 import { PuckConfigMigrationV1 } from "../migrations/PuckConfigMigrationV1/PuckConfigMigrationV1";
 import { PuckConfigVersionMigrator } from "../migrations/PuckConfigVersionMigrator";
-import { DashboardGenericData } from "./puck.types";
+import type { DashboardPuckData } from "../DashboardPuck.types";
+import type { DashboardGenericData } from "./puck.types";
 
 const versionTransforms = [PuckConfigMigrationV1] as const;
 

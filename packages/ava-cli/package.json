@@ -19,7 +19,8 @@
     "type-check": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "prettier": "^3.5.3"
+    "prettier": "^3.5.3",
+    "tsconfig-paths": "^4.2.0"
   },
   "devDependencies": {
     "tsup": "^8.5.0",
