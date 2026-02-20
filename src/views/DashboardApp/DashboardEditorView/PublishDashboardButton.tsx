@@ -8,13 +8,9 @@ import type { DashboardId } from "@/models/Dashboard/Dashboard.types";
 
 type Props = {
   dashboardId: DashboardId | undefined;
-  isPublic: boolean | undefined;
 };
 
-export function PublishDashboardButton({
-  dashboardId,
-  isPublic,
-}: Props): JSX.Element {
+export function PublishDashboardButton({ dashboardId }: Props): JSX.Element {
   const [publishDashboard, isPublishing] = DashboardClient.usePublishDashboard({
     onSuccess: () => {
       notifySuccess("Dashboard published!");

@@ -25,19 +25,6 @@ function _toTrimmedString(value: unknown): string {
   return value.trim();
 }
 
-function _isSQLStale(options: {
-  prompt: string;
-  sqlGeneratedFromPrompt: string;
-}): boolean {
-  const { prompt, sqlGeneratedFromPrompt } = options;
-
-  return (
-    prompt.length > 0 &&
-    sqlGeneratedFromPrompt.length > 0 &&
-    prompt.trim() !== sqlGeneratedFromPrompt.trim()
-  );
-}
-
 /**
  * Extract all non-stale, non-empty SQL strings from any DataViz blocks
  * within a dashboard config.

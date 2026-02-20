@@ -129,10 +129,7 @@ export function DashboardEditorView({
                 workspaceSlug={workspaceSlug}
                 dashboardId={dashboard?.id}
               />
-              <PublishDashboardButton
-                dashboardId={dashboard?.id}
-                isPublic={dashboard?.isPublic}
-              />
+              <PublishDashboardButton dashboardId={dashboard?.id} />
               <DeleteDashboardButton
                 workspaceSlug={workspaceSlug}
                 dashboardId={dashboard?.id}
