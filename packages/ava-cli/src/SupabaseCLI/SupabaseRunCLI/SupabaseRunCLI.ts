@@ -2,7 +2,6 @@ import * as path from "node:path";
 import { Acclimate } from "@avandar/acclimate";
 import { createClient } from "@supabase/supabase-js";
 import * as dotenv from "dotenv";
-import { register } from "tsconfig-paths";
 
 const PROJECT_ROOT = path.join(process.cwd());
 
@@ -11,14 +10,6 @@ type DotenvConfigResult = Readonly<{
 }>;
 
 console.log(PROJECT_ROOT);
-register({
-  baseUrl: PROJECT_ROOT,
-  paths: {
-    "@/*": ["./src/*"],
-    "$/*": ["./shared/*"],
-    "~/*": ["./*"],
-  },
-});
 
 function loadProductionEnv(): void {
   const result = dotenv.config({

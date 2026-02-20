@@ -79,6 +79,10 @@ export function NLQueryField({ value, onChange }: Props): JSX.Element {
         }}
         onSubmit={(promptStr) => {
           const trimmedPrompt = promptStr.trim();
+          onChange({
+            ...value,
+            prompt: trimmedPrompt,
+          });
           if (trimmedPrompt) {
             generateAndRunQuery({ prompt: trimmedPrompt });
           }
