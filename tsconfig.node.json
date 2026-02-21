@@ -36,6 +36,7 @@
   },
   "include": [
     "vite.config.ts",
+    ".ava/**/*.ts",
     "packages/dev-fanout-server/src/**/*.ts",
     "packages/dev-fanout-server/vitest.config.ts"
   ],

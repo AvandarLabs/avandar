@@ -19,10 +19,15 @@
     "type-check": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "knex": "^3.1.0",
+    "pg": "^8.18.0",
     "prettier": "^3.5.3"
   },
   "devDependencies": {
+    "@avandar/acclimate": "^0.3.4",
+    "@types/pg": "^8.16.0",
     "tsup": "^8.5.0",
+    "type-fest": "^5.4.4",
     "typescript": "~5.9.3"
   },
   "engines": {

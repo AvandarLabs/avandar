@@ -44,3 +44,6 @@ supabase/.branches
 # Common scratch or temp files
 todo.md
 TODO.md
+
+# Ava CLI
+.ava/
