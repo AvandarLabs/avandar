@@ -145,7 +145,5 @@ export type V0_DashboardData = {
 };
 
 export type V1_DashboardRootProps = DashboardRootProps;
-
 export type V1_DashboardBlocksProps = DashboardBlockProps;
-
 export type V1_DashboardData = DashboardPuckData;

@@ -14,6 +14,11 @@ const SCHEMA_VERSION = 1;
 export const PuckConfigMigrationV1 = {
   downgradedVersion: undefined,
   upgradedVersion: SCHEMA_VERSION,
+
+  /**
+   * Upgrade from dashboard v0 to v1.
+   * This changes the old DataViz block to now hold an `nlQuery` object.
+   */
   upgrade: (prevData: V0_DashboardData): V1_DashboardData => {
     return transformProps<
       V0_DashboardBlocksProps,
