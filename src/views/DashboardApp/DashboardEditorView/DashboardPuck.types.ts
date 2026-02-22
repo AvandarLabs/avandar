@@ -2,7 +2,11 @@ import { ReactNode } from "react";
 import { Simplify } from "type-fest";
 import { CURRENT_SCHEMA_VERSION } from "./migrations/constants";
 import type { DataVizWidgetProps } from "./widgets/DataVizWidget";
-import type { Config as PuckConfig, Data as PuckData } from "@puckeditor/core";
+import type {
+  CustomFieldRender,
+  Config as PuckConfig,
+  Data as PuckData,
+} from "@puckeditor/core";
 
 export type SlotRenderer = (options?: unknown) => ReactNode;
 
@@ -131,7 +135,7 @@ export type DashboardRootProps = {
   schemaVersion: typeof CURRENT_SCHEMA_VERSION;
 };
 
-type DashboardPuckComponents = {
+export type DashboardBlockProps = {
   Card: CardProps;
   CalloutBlock: CalloutBlockProps;
   Columns: ColumnsProps;
@@ -151,6 +155,32 @@ type DashboardPuckComponents = {
 };
 
 export type DashboardPuckData = Simplify<
-  PuckData<DashboardPuckComponents, DashboardRootProps>
+  PuckData<DashboardBlockProps, DashboardRootProps>
 >;
-export type DashboardPuckConfig = PuckConfig<DashboardPuckComponents>;
+export type DashboardPuckConfig = PuckConfig<DashboardBlockProps>;
+
+/**
+ * The foundational base data type for the Puck editor, no matter how old or
+ * new the schema version is, it will always have, at minimum, this structure
+ * and base props.
+ */
+export type DashboardGenericData = {
+  root: {
+    props?: {
+      title: string;
+      schemaVersion?: number | undefined;
+      [key: string]: unknown;
+    };
+  };
+  content: Array<{
+    type: string;
+    props: {
+      id: string;
+      [key: string]: unknown;
+    };
+  }>;
+};
+
+export type DashboardFieldProps<Value> = Parameters<
+  CustomFieldRender<Value>
+>[0];

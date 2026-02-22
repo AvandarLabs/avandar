@@ -4,7 +4,7 @@ import { useNLPQuery } from "@/components/DataExplorerApp/QueryForm/useNLPQuery"
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { TextareaForm } from "@/lib/ui/singleton-forms/TextareaForm/TextareaForm";
 import { mantineColorVar } from "@/lib/utils/browser/css";
-import { DashboardFieldProps } from "../../utils/puck.types";
+import type { DashboardFieldProps } from "../../DashboardPuck.types";
 
 export type NLQuery = {
   /**

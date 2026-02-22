@@ -1,5 +1,5 @@
-import { EmptyObject, Simplify, UnionToIntersection } from "type-fest";
-import { Model, ModelType, ModelTypeKey, TypedId } from "./Model.types";
+import type { Model, ModelType, ModelTypeKey, TypedId } from "./Model.types";
+import type { EmptyObject, Simplify, UnionToIntersection } from "type-fest";
 
 export type IModels = {
   /**

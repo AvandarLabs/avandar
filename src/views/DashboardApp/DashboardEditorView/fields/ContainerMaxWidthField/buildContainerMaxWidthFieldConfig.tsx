@@ -1,6 +1,6 @@
 import { CustomField } from "@puckeditor/core";
 import { constant } from "$/lib/utils/constant/constant";
-import { DashboardFieldProps } from "../../utils/puck.types";
+import { DashboardFieldProps } from "../../DashboardPuck.types";
 import {
   ContainerMaxWidthField,
   ContainerMaxWidthValue,

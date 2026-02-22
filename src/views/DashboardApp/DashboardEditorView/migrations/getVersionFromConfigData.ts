@@ -1,4 +1,4 @@
-import { isNumber } from "@tiptap/react";
+import { isNumber } from "$/lib/utils/guards/isNumber";
 
 /**
  * Gets the schema version of the PuckConfig data.
@@ -7,7 +7,7 @@ import { isNumber } from "@tiptap/react";
  */
 export function getVersionFromConfigData(
   data: Readonly<{
-    root: { props?: { schemaVersion: number | undefined } };
+    root: { props?: { schemaVersion?: number | undefined } };
   }>,
 ): number | undefined {
   if (data.root.props) {

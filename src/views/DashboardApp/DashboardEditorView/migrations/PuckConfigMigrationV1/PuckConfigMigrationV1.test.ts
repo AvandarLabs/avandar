@@ -3,17 +3,32 @@ import { propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { getVersionFromConfigData } from "../getVersionFromConfigData";
 import { PuckConfigVersionMigrator } from "../PuckConfigVersionMigrator";
 import { PuckConfigMigrationV1 } from "./PuckConfigMigrationV1";
-import type { DashboardGenericData } from "../../utils/puck.types";
+import {
+  V0_DashboardData,
+  V1_DashboardData,
+} from "./PuckConfigMigrationV1.types";
 
 const TEST_PROMPT = "Find all covid data";
 const TEST_SQL = "SELECT * FROM some_covid_table;";
 const TEST_DATA_VIZ_ID = "some-uuid";
 
-const v0Data = {
+const v0Data: V0_DashboardData = {
   root: {
     props: {
       title: "v0 Dashboard",
-      schemaVersion: undefined,
+      author: "John Doe",
+      publishedAt: "2021-01-01",
+      subtitle: "A subtitle",
+      horizontalPadding: "none",
+      verticalPadding: "none",
+      containerMaxWidth: {
+        unit: "%",
+        value: 100,
+      },
+      isAuthorHidden: false,
+      isPublishedAtHidden: false,
+      isSubtitleHidden: false,
+      isTitleHidden: false,
     },
   },
   content: [
@@ -28,13 +43,26 @@ const v0Data = {
         sqlGeneratedFromPrompt: TEST_SQL,
       },
     },
-  ] as const,
-} as const satisfies DashboardGenericData;
+  ],
+};
 
-const v1Data: DashboardGenericData = {
+const v1Data: V1_DashboardData = {
   root: {
     props: {
       title: "v1 Dashboard",
+      author: "John Doe",
+      publishedAt: "2021-01-01",
+      subtitle: "A subtitle",
+      horizontalPadding: "none",
+      verticalPadding: "none",
+      containerMaxWidth: {
+        unit: "%",
+        value: 100,
+      },
+      isAuthorHidden: false,
+      isPublishedAtHidden: false,
+      isSubtitleHidden: false,
+      isTitleHidden: false,
       schemaVersion: 1,
     },
   },

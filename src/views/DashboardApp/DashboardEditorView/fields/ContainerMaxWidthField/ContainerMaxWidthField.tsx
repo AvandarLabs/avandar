@@ -1,7 +1,7 @@
 import { Group, NumberInput, Stack } from "@mantine/core";
 import { FieldLabel } from "@puckeditor/core";
 import { SegmentedControl } from "@/lib/ui/inputs/SegmentedControl";
-import { DashboardFieldProps } from "../../utils/puck.types";
+import { DashboardFieldProps } from "../../DashboardPuck.types";
 
 export type ContainerMaxWidthUnit = "%" | "px";
 
