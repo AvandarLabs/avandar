@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { AuthClient } from "@/clients/AuthClient";
 import { AppLinks } from "@/config/AppLinks";
-import { isValidRedirectPath } from "@/utils/routeUtils";
+import { isValidRedirectPath } from "@/utils/isValidRedirectPath/isValidRedirectPath";
 
 export const Route = createFileRoute("/_auth")({
   component: MainAppRootLayout,

@@ -13,7 +13,7 @@ import { AuthLayout } from "@/components/common/AuthLayout";
 import { AuthFooter } from "@/components/common/AuthLayout/AuthFooter";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { Link } from "@/lib/ui/links/Link";
-import { isValidRedirectPath } from "@/utils/routeUtils";
+import { isValidRedirectPath } from "@/utils/isValidRedirectPath/isValidRedirectPath";
 
 // TODO(jpsyx): move this to some shared utility file.
 export const Route = createFileRoute("/signin")({
