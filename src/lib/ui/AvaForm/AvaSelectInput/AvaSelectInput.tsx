@@ -34,7 +34,9 @@ export function AvaSelectInput<
   onChange,
   ...props
 }: Props<FieldKey, FieldSchemaRecord, FormValues>): JSX.Element {
-  const formInputProps = form.getInputProps(fieldKey as Paths<FormValues>);
+  const formInputProps = form.getInputProps(
+    fieldKey as unknown as Paths<FormValues>,
+  );
 
   const onValueChange = (
     value: FormValues[FieldKey] | null,
@@ -50,7 +52,7 @@ export function AvaSelectInput<
 
   return (
     <Select
-      key={form.key(fieldKey as Paths<FormValues>)}
+      key={form.key(fieldKey as unknown as Paths<FormValues>)}
       {...formInputProps}
       {...props}
       data={data}

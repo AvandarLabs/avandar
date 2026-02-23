@@ -1,14 +1,31 @@
 import { transformProps } from "@puckeditor/core";
-import { isString } from "$/lib/utils/guards/isString";
-import type { DashboardGenericData } from "../../utils/puck.types";
+import { PuckConfigVersionMigration } from "../PuckConfigVersionMigrator";
+import {
+  V0_DashboardBlocksProps,
+  V0_DashboardData,
+  V0_DashboardRootProps,
+  V1_DashboardBlocksProps,
+  V1_DashboardData,
+  V1_DashboardRootProps,
+} from "./PuckConfigMigrationV1.types";
 
 const SCHEMA_VERSION = 1;
 
 export const PuckConfigMigrationV1 = {
   downgradedVersion: undefined,
   upgradedVersion: SCHEMA_VERSION,
-  upgrade: (prevData: DashboardGenericData): DashboardGenericData => {
-    return transformProps(prevData, {
+
+  /**
+   * Upgrade from dashboard v0 to v1.
+   * This changes the old DataViz block to now hold an `nlQuery` object.
+   */
+  upgrade: (prevData: V0_DashboardData): V1_DashboardData => {
+    return transformProps<
+      V0_DashboardBlocksProps,
+      V0_DashboardRootProps,
+      V1_DashboardBlocksProps,
+      V1_DashboardRootProps
+    >(prevData, {
       root: (props) => {
         return {
           ...props,
@@ -17,32 +34,32 @@ export const PuckConfigMigrationV1 = {
       },
       DataViz: (props) => {
         const { prompt, sql } = props;
-        if (isString(prompt) && isString(sql)) {
-          return {
-            nlQuery: {
-              prompt,
-              rawSql: sql,
-              generations: [
-                {
-                  prompt,
-                  rawSql: sql,
-                },
-              ],
-            },
-          };
-        }
-        return props;
+        return {
+          nlQuery: {
+            prompt: String(prompt),
+            rawSql: String(sql),
+            generations: [
+              {
+                prompt: String(prompt),
+                rawSql: String(sql),
+              },
+            ],
+          },
+        };
       },
-    }) as DashboardGenericData;
+    });
   },
 
-  downgrade: (currData: DashboardGenericData): DashboardGenericData => {
-    return transformProps(currData, {
+  downgrade: (currData: V1_DashboardData): V0_DashboardData => {
+    return transformProps<
+      V1_DashboardBlocksProps,
+      V1_DashboardRootProps,
+      V0_DashboardBlocksProps,
+      V0_DashboardRootProps
+    >(currData, {
       root: (props) => {
-        return {
-          ...props,
-          schemaVersion: undefined,
-        };
+        const { schemaVersion, ...rest } = props;
+        return { ...rest };
       },
       DataViz: (props) => {
         const { nlQuery } = props;
@@ -54,6 +71,6 @@ export const PuckConfigMigrationV1 = {
           sqlGeneratedFromPrompt: nlQuery.rawSql,
         };
       },
-    }) as DashboardGenericData;
+    });
   },
-};
+} satisfies PuckConfigVersionMigration<V0_DashboardData, V1_DashboardData>;

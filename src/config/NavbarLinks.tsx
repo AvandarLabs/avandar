@@ -11,6 +11,7 @@ import { ReactNode } from "react";
 import { User } from "@/models/User/User.types";
 import { WorkspaceWithSubscription } from "@/models/Workspace/Workspace.types";
 import { AppLink, AppLinkKey, AppLinks } from "./AppLinks";
+import { FeatureFlag, isFlagEnabled } from "./FeatureFlagConfig";
 
 export type NavbarLink = {
   link: AppLink;
@@ -66,12 +67,18 @@ export const NavbarLinks = {
     return {
       link: AppLinks.map(workspaceSlug),
       icon: <IconMap size={24} stroke={1.5} />,
+      isEnabled: () => {
+        return !isFlagEnabled(FeatureFlag.DisableGeoExplorer);
+      },
     };
   },
   entityDesignerHome: (workspaceSlug: string) => {
     return {
       link: AppLinks.entityDesignerHome(workspaceSlug),
       icon: <IconBlocks size={24} stroke={1.5} />,
+      isEnabled: () => {
+        return !isFlagEnabled(FeatureFlag.DisableProfileManager);
+      },
     };
   },
   entityManagerHome: ({
@@ -90,6 +97,9 @@ export const NavbarLinks = {
         entityConfigName,
       }),
       icon: <IconBlocks size={24} stroke={1.5} />,
+      isEnabled: () => {
+        return !isFlagEnabled(FeatureFlag.DisableProfileManager);
+      },
     };
   },
   workspaceSettings: (workspaceSlug: string) => {

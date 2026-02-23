@@ -36,7 +36,7 @@ export function WorkspaceAppLayout({
         entityConfigId: entityConfig.id,
         entityConfigName: entityConfig.name,
       });
-      return { link: navLink.link, icon: navLink.icon };
+      return navLink;
     });
   }, [workspace.slug, entityConfigs]);
 

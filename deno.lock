@@ -14,7 +14,6 @@
     ],
     "packageJson": {
       "dependencies": [
-        "npm:@avandar/acclimate@~0.3.2",
         "npm:@duckdb/duckdb-wasm@1.30.0",
         "npm:@eslint/js@^9.21.0",
         "npm:@ianvs/prettier-plugin-sort-imports@^4.4.1",
@@ -30,7 +29,7 @@
         "npm:@nabla/vite-plugin-eslint@^2.0.5",
         "npm:@polar-sh/sdk@~0.41.5",
         "npm:@postgres-language-server/cli@0.19",
-        "npm:@puckeditor/core@0.21",
+        "npm:@puckeditor/core@~0.21.1",
         "npm:@react-email/components@~0.5.7",
         "npm:@react-email/preview-server@^5.0.5",
         "npm:@react-email/render@^1.4.0",
@@ -125,8 +124,13 @@
       "packages/ava-cli": {
         "packageJson": {
           "dependencies": [
+            "npm:@avandar/acclimate@~0.3.4",
+            "npm:@types/pg@^8.16.0",
+            "npm:knex@^3.1.0",
+            "npm:pg@^8.18.0",
             "npm:prettier@^3.5.3",
             "npm:tsup@^8.5.0",
+            "npm:type-fest@^5.4.4",
             "npm:typescript@~5.9.3"
           ]
         }

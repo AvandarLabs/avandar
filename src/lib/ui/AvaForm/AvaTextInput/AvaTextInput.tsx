@@ -51,7 +51,9 @@ export function AvaTextInput<
   onChange,
   ...props
 }: Props<FieldKey, FieldSchemaRecord, FormValues>): JSX.Element {
-  const formInputProps = form.getInputProps(fieldKey as Paths<FormValues>);
+  const formInputProps = form.getInputProps(
+    fieldKey as unknown as Paths<FormValues>,
+  );
   const fieldsToSyncTo = objectKeys(fields)
     .map((otherFieldKey) => {
       const otherField = fields[otherFieldKey]!;
@@ -74,7 +76,7 @@ export function AvaTextInput<
         onChange(value);
       }
       form.setFieldValue(
-        fieldKey as Paths<FormValues>,
+        fieldKey as unknown as Paths<FormValues>,
         value as PathValue<FormValues, Paths<FormValues>>,
       );
     }, debounceMs ?? 0),
@@ -112,7 +114,7 @@ export function AvaTextInput<
 
   return (
     <TextInput
-      key={form.key(fieldKey as Paths<FormValues>)}
+      key={form.key(fieldKey as unknown as Paths<FormValues>)}
       {...formInputProps}
       {...props}
       name={props.name ?? fieldKey}

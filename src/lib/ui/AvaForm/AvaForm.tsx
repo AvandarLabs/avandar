@@ -162,7 +162,7 @@ export function AvaForm<
                   return field.validateFn(
                     value,
                     allFormValues,
-                    currentFieldKey as FieldKey,
+                    currentFieldKey as unknown as FieldKey,
                   );
                 }
                 return "Received a non-string value for a text field";
@@ -175,7 +175,7 @@ export function AvaForm<
                   return field.validateFn(
                     value,
                     allFormValues,
-                    currentFieldKey as FieldKey,
+                    currentFieldKey as unknown as FieldKey,
                   );
                 }
                 return "Received a non-string value for a select field";
