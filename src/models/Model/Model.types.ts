@@ -14,12 +14,6 @@ export type VersionedModel<
   MProps extends Record<string, unknown> = EmptyObject,
 > = Simplify<{ __type: MType; version: Version } & MProps>;
 
-export type VersionedModel<
-  MType extends string = string,
-  Version extends number = number,
-  MProps extends Record<string, unknown> = EmptyObject,
-> = Merge<{ __type: MType; version: Version }, MProps>;
-
 /** Utility type: gets the string type of a model. */
 export type ModelType<M extends Model<string>> = M[ModelTypeKey];
 
