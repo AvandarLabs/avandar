@@ -1,11 +1,11 @@
 import { isNumber } from "$/lib/utils/guards/isNumber";
 
 /**
- * Gets the schema version of the PuckConfig data.
- * @param data The PuckConfig data to get the version from.
- * @returns The schema version of the PuckConfig data.
+ * Gets the schema version of the AvaPageData object.
+ * @param data The AvaPageData object to get the version from.
+ * @returns The schema version or undefined if none found
  */
-export function getVersionFromConfigData(
+export function getVersionFromAvaPageData(
   data: Readonly<{
     root: { props?: { schemaVersion?: number | undefined } };
   }>,

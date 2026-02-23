@@ -1,7 +1,7 @@
 import { Group, NumberInput, Stack } from "@mantine/core";
 import { FieldLabel } from "@puckeditor/core";
 import { SegmentedControl } from "@/lib/ui/inputs/SegmentedControl";
-import { DashboardFieldProps } from "../../DashboardPuck.types";
+import { AvaPageFieldProps } from "../../AvaPage.types";
 
 export type ContainerMaxWidthUnit = "%" | "px";
 
@@ -10,7 +10,7 @@ export type ContainerMaxWidthValue = {
   value: number;
 };
 
-type Props = DashboardFieldProps<ContainerMaxWidthValue>;
+type Props = AvaPageFieldProps<ContainerMaxWidthValue>;
 
 const DEFAULT_PERCENT_VALUE = 100;
 const DEFAULT_PX_VALUE = 860;

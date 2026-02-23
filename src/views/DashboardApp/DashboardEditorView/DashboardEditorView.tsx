@@ -10,12 +10,12 @@ import {
   getDashboardPuckConfig,
   getDashboardTitleFromPuckData,
 } from "./getDashboardPuckConfig";
-import { getVersionFromConfigData } from "./migrations/getVersionFromConfigData";
+import { getVersionFromAvaPageData } from "./migrations/getVersionFromAvaPageData";
 import { PublishDashboardButton } from "./PublishDashboardButton";
 import { SaveDashboardButton } from "./SaveDashboardButton";
-import { upgradePuckConfig } from "./utils/upgradePuckConfig";
+import { upgradeAvaPageData } from "./utils/upgradeAvaPageData";
 import { ViewDashboardButton } from "./ViewDashboardButton";
-import type { DashboardPuckData } from "./DashboardPuck.types";
+import type { AvaPageData } from "./AvaPage.types";
 import type {
   Dashboard,
   DashboardId,
@@ -29,7 +29,7 @@ export function DashboardEditorView({
   dashboard,
   workspaceSlug,
 }: Props): JSX.Element {
-  const [data, setData] = useState<DashboardPuckData>(() => {
+  const [data, setData] = useState<AvaPageData>(() => {
     return createInitialDashboardPuckData({
       dashboardTitle: dashboard?.name ?? "Untitled dashboard",
     });
@@ -51,7 +51,7 @@ export function DashboardEditorView({
     }
 
     lastDashboardIdRef.current = dashboard.id;
-    const dashboardConfigData = dashboard.config as DashboardPuckData;
+    const dashboardConfigData = dashboard.config as AvaPageData;
     const puckData = {
       ...dashboardConfigData,
       root: {
@@ -59,11 +59,11 @@ export function DashboardEditorView({
         props: {
           ...dashboardConfigData.root.props,
           title: dashboard.name || "Untitled dashboard",
-          schemaVersion: getVersionFromConfigData(dashboardConfigData),
+          schemaVersion: getVersionFromAvaPageData(dashboardConfigData),
         },
       },
     };
-    setData(upgradePuckConfig(puckData));
+    setData(upgradeAvaPageData(puckData));
     setEditorKey((prevEditorKey) => {
       return prevEditorKey + 1;
     });
@@ -90,7 +90,7 @@ export function DashboardEditorView({
   });
 
   const onSave = useCallback(
-    (savedData: DashboardPuckData): void => {
+    (savedData: AvaPageData): void => {
       if (!dashboard) {
         notifyDevAlert("Dashboard is not loaded yet.");
         return;
@@ -118,7 +118,7 @@ export function DashboardEditorView({
       config={puckConfig}
       data={data}
       onChange={(d: Data) => {
-        setData(d as DashboardPuckData);
+        setData(d as AvaPageData);
       }}
       overrides={{
         headerActions: () => {

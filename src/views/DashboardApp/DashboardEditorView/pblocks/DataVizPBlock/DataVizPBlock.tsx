@@ -7,9 +7,9 @@ type Props = {
   nlQuery: NLQuery;
 };
 
-export { type Props as DataVizWidgetProps };
+export { type Props as DataVizPBlockProps };
 
-export function DataVizWidget({ nlQuery }: Props): JSX.Element {
+export function DataVizPBlock({ nlQuery }: Props): JSX.Element {
   const { prompt, rawSql } = nlQuery;
   return (
     <Paper withBorder p="md">

@@ -1,9 +1,10 @@
 import { ComponentConfig } from "@puckeditor/core";
 import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { buildNLQueryFieldConfig } from "../../fields/NLQueryField/buildNLQueryFieldConfig";
-import { DataVizWidget, DataVizWidgetProps } from "./DataVizWidget";
+import { DataVizPBlock } from "./DataVizPBlock";
+import type { DataVizPBlockProps } from "./DataVizPBlock";
 
-const defaultProps: DataVizWidgetProps = {
+const defaultProps: DataVizPBlockProps = {
   nlQuery: {
     prompt: "",
     rawSql: "",
@@ -11,16 +12,16 @@ const defaultProps: DataVizWidgetProps = {
   },
 };
 
-export function buildDataVizWidgetConfig(_options: {
+export function buildDataVizPBlockConfig(_options: {
   dashboardTitle: string;
   workspaceId: WorkspaceId | undefined;
-}): ComponentConfig<DataVizWidgetProps> {
+}): ComponentConfig<DataVizPBlockProps> {
   return {
     label: "DataViz",
     fields: {
       nlQuery: buildNLQueryFieldConfig(),
     },
     defaultProps,
-    render: DataVizWidget,
+    render: DataVizPBlock,
   };
 }

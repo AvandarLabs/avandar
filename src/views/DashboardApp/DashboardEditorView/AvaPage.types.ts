@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Simplify } from "type-fest";
 import { CURRENT_SCHEMA_VERSION } from "./migrations/constants";
-import type { DataVizWidgetProps } from "./widgets/DataVizWidget";
+import { DataVizPBlockProps } from "./pblocks/DataVizPBlock";
 import type {
   CustomFieldRender,
   Config as PuckConfig,
@@ -111,9 +111,9 @@ export type CardProps = {
 
 export type RootPadding = "none" | "xs" | "sm" | "md" | "lg" | "xl";
 
-export type DashboardRootWidthUnit = "%" | "px";
+export type AvaPageRootWidthUnit = "%" | "px";
 
-export type DashboardRootProps = {
+export type AvaPageRootProps = {
   author: string;
   publishedAt: string;
   subtitle: string;
@@ -125,7 +125,7 @@ export type DashboardRootProps = {
    * (centered). If unit is "px", we apply a max-width in pixels (centered).
    */
   containerMaxWidth: {
-    unit: DashboardRootWidthUnit;
+    unit: AvaPageRootWidthUnit;
     value: number;
   };
   isAuthorHidden: boolean;
@@ -135,12 +135,12 @@ export type DashboardRootProps = {
   schemaVersion: typeof CURRENT_SCHEMA_VERSION;
 };
 
-export type DashboardBlockProps = {
+export type PBlockPropsRegistry = {
   Card: CardProps;
   CalloutBlock: CalloutBlockProps;
   Columns: ColumnsProps;
   CodeBlock: CodeBlockProps;
-  DataViz: DataVizWidgetProps;
+  DataViz: DataVizPBlockProps;
   DividerBlock: DividerBlockProps;
   EmbedBlock: EmbedBlockProps;
   FigureBlock: FigureBlockProps;
@@ -154,17 +154,17 @@ export type DashboardBlockProps = {
   TableBlock: TableBlockProps;
 };
 
-export type DashboardPuckData = Simplify<
-  PuckData<DashboardBlockProps, DashboardRootProps>
+export type AvaPageData = Simplify<
+  PuckData<PBlockPropsRegistry, AvaPageRootProps>
 >;
-export type DashboardPuckConfig = PuckConfig<DashboardBlockProps>;
+export type AvaPageConfig = PuckConfig<PBlockPropsRegistry>;
 
 /**
- * The foundational base data type for the Puck editor, no matter how old or
- * new the schema version is, it will always have, at minimum, this structure
- * and base props.
+ * The foundational base data type for an Ava Page, as expected by the Puck
+ * editor library. No matter how old or new the schema version is, it will
+ * always have, at minimum, this structure and base props.
  */
-export type DashboardGenericData = {
+export type AvaPageGenericData = {
   root: {
     props?: {
       title: string;
@@ -181,6 +181,15 @@ export type DashboardGenericData = {
   }>;
 };
 
-export type DashboardFieldProps<Value> = Parameters<
-  CustomFieldRender<Value>
->[0];
+export type AvaPageFieldProps<Value> = Parameters<CustomFieldRender<Value>>[0];
+
+/**
+ * The grouped types for an Ava Page. This is useful only in migration modules
+ * to keep imports cleaner. If you're not writing migration code, you should
+ * import the individual types directly instead.
+ */
+export type AvaPageTypes = {
+  Data: AvaPageData;
+  RootProps: AvaPageRootProps;
+  PBlockPropsRegistry: PBlockPropsRegistry;
+};

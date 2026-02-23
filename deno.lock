@@ -14,7 +14,6 @@
     ],
     "packageJson": {
       "dependencies": [
-        "npm:@avandar/acclimate@~0.3.2",
         "npm:@duckdb/duckdb-wasm@1.30.0",
         "npm:@eslint/js@^9.21.0",
         "npm:@ianvs/prettier-plugin-sort-imports@^4.4.1",

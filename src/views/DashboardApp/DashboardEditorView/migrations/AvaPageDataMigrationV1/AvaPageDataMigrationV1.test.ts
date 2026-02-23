@@ -1,18 +1,18 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { propEq } from "@/lib/utils/objects/higherOrderFuncs";
-import { getVersionFromConfigData } from "../getVersionFromConfigData";
-import { PuckConfigVersionMigrator } from "../PuckConfigVersionMigrator";
-import { PuckConfigMigrationV1 } from "./PuckConfigMigrationV1";
-import {
-  V0_DashboardData,
-  V1_DashboardData,
-} from "./PuckConfigMigrationV1.types";
+import { AvaPageDataMigrator } from "../AvaPageDataMigrator";
+import { getVersionFromAvaPageData } from "../getVersionFromAvaPageData";
+import { AvaPageDataMigrationV1 } from "./AvaPageDataMigrationV1";
+import type {
+  V0_AvaPageData,
+  V1_AvaPageData,
+} from "./AvaPageDataMigrationV1.types";
 
 const TEST_PROMPT = "Find all covid data";
 const TEST_SQL = "SELECT * FROM some_covid_table;";
 const TEST_DATA_VIZ_ID = "some-uuid";
 
-const v0Data: V0_DashboardData = {
+const v0Data: V0_AvaPageData = {
   root: {
     props: {
       title: "v0 Dashboard",
@@ -46,7 +46,7 @@ const v0Data: V0_DashboardData = {
   ],
 };
 
-const v1Data: V1_DashboardData = {
+const v1Data: V1_AvaPageData = {
   root: {
     props: {
       title: "v1 Dashboard",
@@ -86,23 +86,23 @@ const v1Data: V1_DashboardData = {
   ],
 };
 
-describe("PuckConfigMigration - v1", () => {
+describe("AvaPageConfigMigration - v1", () => {
   beforeAll(() => {
-    PuckConfigVersionMigrator.registerMigrations([PuckConfigMigrationV1]);
+    AvaPageDataMigrator.registerMigrations([AvaPageDataMigrationV1]);
   });
 
-  it("should upgrade the PuckConfig data to version 1", () => {
-    const upgradedData = PuckConfigVersionMigrator.upgrade(v0Data);
-    expect(getVersionFromConfigData(upgradedData)).toEqual(1);
+  it("should upgrade the AvaPageConfig data to version 1", () => {
+    const upgradedData = AvaPageDataMigrator.upgrade(v0Data);
+    expect(getVersionFromAvaPageData(upgradedData)).toEqual(1);
   });
 
-  it("should downgrade the PuckConfig data to version undefined", () => {
-    const downgradedData = PuckConfigVersionMigrator.downgradeOnce(v1Data);
-    expect(getVersionFromConfigData(downgradedData)).toEqual(undefined);
+  it("should downgrade the AvaPageConfig data to version undefined", () => {
+    const downgradedData = AvaPageDataMigrator.downgradeOnce(v1Data);
+    expect(getVersionFromAvaPageData(downgradedData)).toEqual(undefined);
   });
 
   it("should upgrade the DataViz block to hold an `nlQuery`object", () => {
-    const upgradedData = PuckConfigVersionMigrator.upgrade(v0Data);
+    const upgradedData = AvaPageDataMigrator.upgrade(v0Data);
     const upgradedDataViz = upgradedData.content.find(
       propEq("type", "DataViz"),
     );
@@ -126,7 +126,7 @@ describe("PuckConfigMigration - v1", () => {
   });
 
   it("should downgrade the DataViz block to hold `prompt, `sql`, and `sqlGeneratedFromPrompt` and empty string for the rest", () => {
-    const downgradedData = PuckConfigVersionMigrator.downgradeOnce(v1Data);
+    const downgradedData = AvaPageDataMigrator.downgradeOnce(v1Data);
     const downgradedDataViz = downgradedData.content.find(
       propEq("type", "DataViz"),
     );

@@ -4,7 +4,7 @@ import { useNLPQuery } from "@/components/DataExplorerApp/QueryForm/useNLPQuery"
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { TextareaForm } from "@/lib/ui/singleton-forms/TextareaForm/TextareaForm";
 import { mantineColorVar } from "@/lib/utils/browser/css";
-import type { DashboardFieldProps } from "../../DashboardPuck.types";
+import type { AvaPageFieldProps } from "../../AvaPage.types";
 
 export type NLQuery = {
   /**
@@ -38,7 +38,7 @@ export type NLQuery = {
   >;
 };
 
-type Props = DashboardFieldProps<NLQuery>;
+type Props = AvaPageFieldProps<NLQuery>;
 
 export function NLQueryField({ value, onChange }: Props): JSX.Element {
   const workspace = useCurrentWorkspace();

@@ -1,25 +1,24 @@
 /**
- * This file contains the types for the previous dashboard config version
- * and the current version.
+ * This file contains the types for the AvaPageData v0 and v1.
  *
  * Rules:
  * 1. Do NOT import any types from the rest of the codebase. Consider this file
  *    purely isolated to this module.
- * 2. ONLY import `DashboardPuckConfig` if this is migration module for the most
+ * 2. ONLY import `AvaPageTypes` if this is the migration module for the most
  *    recent version.
- * 3. When this migration module stops being the most recent version, remove the
- *    the import and manually write out the types.
+ * 3. Once this module no longer represents the most recent version, remove
+ *    the `AvaPageTypes` import and manually write out the types.
  *
- * We reduce imports here to avoid long import chains of legacy code and so we
- * can keep a statically readable history of each version's types.
+ * Reasoning:
+ * - We want to keep a statically readable history of each version's types so
+ *   different versions can be individually referenced and tested.
+ * - Avoid long import chains of legacy code.
+ * - We want to allow the most current AvaPage types to change freely without
+ *   raising type errors in tests or migration code for older versions.
  */
-import type {
-  DashboardBlockProps,
-  DashboardPuckData,
-  DashboardRootProps,
-} from "../../DashboardPuck.types";
+import type { AvaPageTypes } from "../../AvaPage.types";
 
-export type V0_DashboardRootProps = {
+export type V0_AvaPageRootProps = {
   author: string;
   publishedAt: string;
   subtitle: string;
@@ -36,7 +35,7 @@ export type V0_DashboardRootProps = {
   isTitleHidden: boolean;
 };
 
-export type V0_DashboardBlocksProps = {
+export type V0_PBlockPropsRegistry = {
   Card: {
     content: unknown;
     title: string;
@@ -130,20 +129,20 @@ export type V0_DashboardBlocksProps = {
   };
 };
 
-export type V0_DashboardData = {
+export type V0_AvaPageData = {
   root: {
-    props?: V0_DashboardRootProps;
+    props?: V0_AvaPageRootProps;
   };
   content: Array<
     {
-      [K in keyof V0_DashboardBlocksProps]: {
+      [K in keyof V0_PBlockPropsRegistry]: {
         type: K;
-        props: { id: string } & V0_DashboardBlocksProps[K];
+        props: { id: string } & V0_PBlockPropsRegistry[K];
       };
-    }[keyof V0_DashboardBlocksProps]
+    }[keyof V0_PBlockPropsRegistry]
   >;
 };
 
-export type V1_DashboardRootProps = DashboardRootProps;
-export type V1_DashboardBlocksProps = DashboardBlockProps;
-export type V1_DashboardData = DashboardPuckData;
+export type V1_AvaPageRootProps = AvaPageTypes["RootProps"];
+export type V1_PBlockPropsRegistry = AvaPageTypes["PBlockPropsRegistry"];
+export type V1_AvaPageData = AvaPageTypes["Data"];

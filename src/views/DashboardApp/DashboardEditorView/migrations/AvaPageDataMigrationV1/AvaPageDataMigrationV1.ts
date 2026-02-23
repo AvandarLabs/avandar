@@ -1,17 +1,17 @@
 import { transformProps } from "@puckeditor/core";
-import { PuckConfigVersionMigration } from "../PuckConfigVersionMigrator";
-import {
-  V0_DashboardBlocksProps,
-  V0_DashboardData,
-  V0_DashboardRootProps,
-  V1_DashboardBlocksProps,
-  V1_DashboardData,
-  V1_DashboardRootProps,
-} from "./PuckConfigMigrationV1.types";
+import { AvaPageDataMigration } from "../AvaPageDataMigrator";
+import type {
+  V0_AvaPageData,
+  V0_AvaPageRootProps,
+  V0_PBlockPropsRegistry,
+  V1_AvaPageData,
+  V1_AvaPageRootProps,
+  V1_PBlockPropsRegistry,
+} from "./AvaPageDataMigrationV1.types";
 
 const SCHEMA_VERSION = 1;
 
-export const PuckConfigMigrationV1 = {
+export const AvaPageDataMigrationV1 = {
   downgradedVersion: undefined,
   upgradedVersion: SCHEMA_VERSION,
 
@@ -19,12 +19,12 @@ export const PuckConfigMigrationV1 = {
    * Upgrade from dashboard v0 to v1.
    * This changes the old DataViz block to now hold an `nlQuery` object.
    */
-  upgrade: (prevData: V0_DashboardData): V1_DashboardData => {
+  upgrade: (prevData: V0_AvaPageData): V1_AvaPageData => {
     return transformProps<
-      V0_DashboardBlocksProps,
-      V0_DashboardRootProps,
-      V1_DashboardBlocksProps,
-      V1_DashboardRootProps
+      V0_PBlockPropsRegistry,
+      V0_AvaPageRootProps,
+      V1_PBlockPropsRegistry,
+      V1_AvaPageRootProps
     >(prevData, {
       root: (props) => {
         return {
@@ -50,12 +50,12 @@ export const PuckConfigMigrationV1 = {
     });
   },
 
-  downgrade: (currData: V1_DashboardData): V0_DashboardData => {
+  downgrade: (currData: V1_AvaPageData): V0_AvaPageData => {
     return transformProps<
-      V1_DashboardBlocksProps,
-      V1_DashboardRootProps,
-      V0_DashboardBlocksProps,
-      V0_DashboardRootProps
+      V1_PBlockPropsRegistry,
+      V1_AvaPageRootProps,
+      V0_PBlockPropsRegistry,
+      V0_AvaPageRootProps
     >(currData, {
       root: (props) => {
         const { schemaVersion, ...rest } = props;
@@ -73,4 +73,4 @@ export const PuckConfigMigrationV1 = {
       },
     });
   },
-} satisfies PuckConfigVersionMigration<V0_DashboardData, V1_DashboardData>;
+} satisfies AvaPageDataMigration<V0_AvaPageData, V1_AvaPageData>;

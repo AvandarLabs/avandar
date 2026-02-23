@@ -13,13 +13,13 @@ import { Paper } from "@/lib/ui/Paper";
 import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { buildContainerMaxWidthFieldConfig } from "./fields/ContainerMaxWidthField";
 import { CURRENT_SCHEMA_VERSION } from "./migrations/constants";
-import { buildDataVizWidgetConfig } from "./widgets/DataVizWidget";
+import { buildDataVizPBlockConfig } from "./pblocks/DataVizPBlock/buildDataVizPBlockConfig";
 import type {
+  AvaPageConfig,
+  AvaPageData,
+  AvaPageRootProps,
   CalloutBlockProps,
   CodeBlockProps,
-  DashboardPuckConfig,
-  DashboardPuckData,
-  DashboardRootProps,
   EmbedBlockProps,
   FigureBlockProps,
   HeadingBlockProps,
@@ -30,12 +30,12 @@ import type {
   SectionProps,
   SlotRenderer,
   TableBlockProps,
-} from "./DashboardPuck.types";
+} from "./AvaPage.types";
 import type { ReactNode } from "react";
 
 export function buildDefaultRootProps(options: {
   dashboardTitle: string;
-}): DashboardRootProps {
+}): AvaPageRootProps {
   return {
     schemaVersion: CURRENT_SCHEMA_VERSION,
     author: "",
@@ -70,13 +70,13 @@ function _renderSlot(
 }
 
 export function getDashboardTitleFromPuckData(
-  data: DashboardPuckData,
+  data: AvaPageData,
 ): string | undefined {
   if (!_isRecord(data.root.props)) {
     return undefined;
   }
 
-  const title: unknown = (data.root.props as Partial<DashboardRootProps>).title;
+  const title: unknown = (data.root.props as Partial<AvaPageRootProps>).title;
 
   return typeof title === "string" && title.trim().length > 0 ?
       title
@@ -85,7 +85,7 @@ export function getDashboardTitleFromPuckData(
 
 function _getStringProp(options: {
   props: unknown;
-  key: keyof DashboardRootProps;
+  key: keyof AvaPageRootProps;
 }): string | undefined {
   if (!_isRecord(options.props)) {
     return undefined;
@@ -100,7 +100,7 @@ function _getStringProp(options: {
 
 function _getBooleanProp(options: {
   props: unknown;
-  key: keyof DashboardRootProps;
+  key: keyof AvaPageRootProps;
 }): boolean | undefined {
   if (!_isRecord(options.props)) {
     return undefined;
@@ -122,7 +122,7 @@ const ROOT_PADDING_OPTIONS: readonly RootPadding[] = [
 
 function _getRootPaddingProp(options: {
   props: unknown;
-  key: keyof Pick<DashboardRootProps, "horizontalPadding" | "verticalPadding">;
+  key: keyof Pick<AvaPageRootProps, "horizontalPadding" | "verticalPadding">;
 }): RootPadding | undefined {
   if (!_isRecord(options.props)) {
     return undefined;
@@ -342,7 +342,7 @@ function _parseTableRows(options: {
 // TODO(jpsyx): refactor this mess of slop
 export function createInitialDashboardPuckData(options: {
   dashboardTitle: string;
-}): DashboardPuckData {
+}): AvaPageData {
   return {
     root: {
       props: buildDefaultRootProps({ dashboardTitle: options.dashboardTitle }),
@@ -354,7 +354,7 @@ export function createInitialDashboardPuckData(options: {
 export function getDashboardPuckConfig(options: {
   dashboardTitle: string;
   workspaceId: WorkspaceId | undefined;
-}): DashboardPuckConfig {
+}): AvaPageConfig {
   return {
     root: {
       fields: {
@@ -454,7 +454,7 @@ export function getDashboardPuckConfig(options: {
         subtitle: "",
         title: options.dashboardTitle,
         verticalPadding: "lg",
-      } satisfies DashboardRootProps,
+      } satisfies AvaPageRootProps,
 
       // the render function for rendering the root dashboard page
       render: (props) => {
@@ -468,7 +468,7 @@ export function getDashboardPuckConfig(options: {
           _getBooleanProp({ props, key: "isPublishedAtHidden" }) ?? false;
 
         const containerMaxWidthRaw: unknown = (
-          props as Partial<DashboardRootProps>
+          props as Partial<AvaPageRootProps>
         ).containerMaxWidth;
 
         const containerMaxWidth:
@@ -572,10 +572,8 @@ export function getDashboardPuckConfig(options: {
     },
 
     // dictionary of categories (the left sidebar in the editor) for organizing
-    // the draggable widgets (Puck calls them "components" but we'll use the
-    // term "widgets" to specifically refer to dashboard blocks, because the
-    // term "block" or "component" is too general and is used all over our
-    // codebase for other non-dashboard things).
+    // the draggable pblocks (Puck calls them "components" but we'll use the
+    // term "pblocks" to mean "Page Blocks")
     categories: {
       layout: {
         title: "Layout",
@@ -1048,7 +1046,7 @@ export function getDashboardPuckConfig(options: {
           );
         },
       },
-      DataViz: buildDataVizWidgetConfig(options),
+      DataViz: buildDataVizPBlockConfig(options),
       HeadingBlock: {
         fields: {
           text: {
