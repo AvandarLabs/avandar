@@ -45,6 +45,11 @@ export enum FeatureFlag {
    * Disable the Geo Explorer feature.
    */
   DisableGeoExplorer = "disable-geo-explorer",
+
+  /**
+   * Disable the Profile Manager feature.
+   */
+  DisableProfileManager = "disable-profile-manager",
 }
 
 export const FeatureFlagConfig = {
@@ -55,6 +60,7 @@ export const FeatureFlagConfig = {
   [FeatureFlag.DisableManualData]: undefined,
   [FeatureFlag.DisableUserInvites]: undefined,
   [FeatureFlag.DisableGeoExplorer]: undefined,
+  [FeatureFlag.DisableProfileManager]: undefined,
 } as const satisfies Registry<FeatureFlag>;
 
 export function isFlagEnabled(featureFlag: FeatureFlag): boolean {

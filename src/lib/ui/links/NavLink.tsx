@@ -27,12 +27,11 @@ const DEFAULT_PRIMARY_SHADE =
     DEFAULT_THEME.primaryShade.light
   : DEFAULT_THEME.primaryShade;
 
-interface NewMantineNavLinkProps
-  extends Omit<
-    MantineNavLinkProps &
-      Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "onChange" | "style">,
-    "href"
-  > {
+interface NewMantineNavLinkProps extends Omit<
+  MantineNavLinkProps &
+    Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "onChange" | "style">,
+  "href"
+> {
   /** Color of inactive nav links when hovered */
   inactiveHoverColor?: MantineColor;
 }
