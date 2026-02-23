@@ -13,7 +13,9 @@ import { AuthLayout } from "@/components/common/AuthLayout";
 import { AuthFooter } from "@/components/common/AuthLayout/AuthFooter";
 import { useMutation } from "@/lib/hooks/query/useMutation";
 import { Link } from "@/lib/ui/links/Link";
+import { isValidRedirectPath } from "@/utils/routeUtils";
 
+// TODO(jpsyx): move this to some shared utility file.
 export const Route = createFileRoute("/signin")({
   component: SignInPage,
   validateSearch: z.object({
@@ -22,9 +24,9 @@ export const Route = createFileRoute("/signin")({
   beforeLoad: async ({ search }) => {
     const session = await AuthClient.getCurrentSession();
     if (session?.user) {
-      if (search.redirect) {
-        // if we're already authenticated and there's a redirect,
-        // let's go to it
+      // if we're already authenticated and there's a valid redirect,
+      // let's go to it
+      if (search.redirect && isValidRedirectPath(search.redirect)) {
         throw redirect({ to: search.redirect });
       }
       throw redirect({ to: "/" });

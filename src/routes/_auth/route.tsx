@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { AuthClient } from "@/clients/AuthClient";
 import { AppLinks } from "@/config/AppLinks";
+import { isValidRedirectPath } from "@/utils/routeUtils";
 
 export const Route = createFileRoute("/_auth")({
   component: MainAppRootLayout,
@@ -28,12 +29,19 @@ export const Route = createFileRoute("/_auth")({
 
       throw redirect({
         to: AppLinks.signin.to,
-        search: {
-          // Use the current location to power a redirect after login
-          // (Do not use `router.state.resolvedLocation` as it can potentially
-          // lag behind the actual current location.
-          redirect: location.href,
-        },
+
+        // if the current path is valid for redirects then we add a redirect
+        // search param
+        ...(isValidRedirectPath(location.href) ?
+          {
+            search: {
+              // Use the current location to power a redirect after login
+              // (Do not use `router.state.resolvedLocation` as it can
+              // potentially lag behind the actual current location.
+              redirect: location.href,
+            },
+          }
+        : {}),
       });
     }
   },

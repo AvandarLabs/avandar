@@ -124,7 +124,7 @@
       "packages/ava-cli": {
         "packageJson": {
           "dependencies": [
-            "npm:@avandar/acclimate@~0.3.4",
+            "npm:@avandar/acclimate@0.4",
             "npm:@types/pg@^8.16.0",
             "npm:pg@^8.18.0",
             "npm:prettier@^3.5.3",
