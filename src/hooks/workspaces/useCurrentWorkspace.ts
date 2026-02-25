@@ -46,7 +46,7 @@ export function useCurrentWorkspace(): WorkspaceWithSubscription {
     navigate({
       to: AppLinks.invalidWorkspace.to,
       search: {
-        redirectReason: "Workspace not found or access was revoked",
+        redirectReason: "NOT_FOUND_OR_ACCESS_REVOKED",
       },
       replace: true,
     });

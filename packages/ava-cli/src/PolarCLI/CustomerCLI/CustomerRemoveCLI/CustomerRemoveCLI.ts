@@ -75,5 +75,6 @@ export const CustomerRemoveCLI = Acclimate.createCLI("remove")
     description: "Email of the Polar customer to remove.",
     type: "string",
     required: true,
+    askIfEmpty: true,
   })
   .action(runCustomerRemove);

@@ -28,7 +28,6 @@ import {
   PaidSubscriptionPlanGroup,
   SubscriptionPlan,
 } from "../SubscriptionPlan.types";
-import { EarlySupporterCreditProgramBox } from "./EarlySupporterCreditProgramBox";
 import { goToPolarCheckout } from "./goToPolarCheckout";
 import { useChangePlanModal } from "./openChangePlanModal";
 import { PaidPlanPriceRow } from "./PaidPlanPriceRow";
@@ -249,12 +248,6 @@ export function PlanCard(props: Props): JSX.Element {
                   </Badge>
                 </Tooltip>
               : null}
-
-              {paidPlanDiscount && selectedVariant === "year" ?
-                <Badge color="green" variant="light" size="lg">
-                  Save {paidPlanDiscount}%
-                </Badge>
-              : null}
             </Group>
             <Text size="sm" c="dimmed">
               {selectedPlan.description}
@@ -263,9 +256,6 @@ export function PlanCard(props: Props): JSX.Element {
         </Group>
         {elements.planSwitch()}
         {elements.priceRow()}
-        {selectedVariant !== "free" ?
-          <EarlySupporterCreditProgramBox />
-        : null}
         <PlanFeatures features={featurePlan.metadata.features} />
         <Button
           variant={isCurrentSubscribedPlan ? "outline" : "filled"}

@@ -2,7 +2,7 @@
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "target": "ES2022",
-    "lib": ["ES2023"],
+    "lib": ["ESNext"],
     "module": "ESNext",
     "skipLibCheck": true,
     "typeRoots": ["./node_modules/@types"],
@@ -38,7 +38,8 @@
     "vite.config.ts",
     ".ava/**/*.ts",
     "packages/dev-fanout-server/src/**/*.ts",
-    "packages/dev-fanout-server/vitest.config.ts"
+    "packages/dev-fanout-server/vitest.config.ts",
+    "packages/ava-cli/src/**/*.ts"
   ],
   "exclude": ["supabase/functions"]
 }
