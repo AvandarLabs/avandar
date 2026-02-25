@@ -248,12 +248,6 @@ export function PlanCard(props: Props): JSX.Element {
                   </Badge>
                 </Tooltip>
               : null}
-
-              {paidPlanDiscount && selectedVariant === "year" ?
-                <Badge color="green" variant="light" size="lg">
-                  Save {paidPlanDiscount}%
-                </Badge>
-              : null}
             </Group>
             <Text size="sm" c="dimmed">
               {selectedPlan.description}
