@@ -1,4 +1,4 @@
-import { useEnsureLocalStoragePersistence } from "@/components/AppLayout/useRootWorkspaceChecks/useEnsureLocalStoragePersistence";
+import { useEnsureLocalStoragePersistence } from "./useEnsureLocalStoragePersistence";
 import { useEnsureWorkspaceBilling } from "./useEnsureWorkspaceBilling";
 import { useSyncLocalDatasets } from "./useSyncLocalDatasets";
 

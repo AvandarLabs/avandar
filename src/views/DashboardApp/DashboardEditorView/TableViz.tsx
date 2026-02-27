@@ -1,8 +1,8 @@
 import { Box, LoadingOverlay, Text } from "@mantine/core";
-import { useDataQuery } from "@/components/DataExplorerApp/useDataQuery";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { StructuredQueries } from "@/models/queries/StructuredQuery/StructuredQueries";
+import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 
 type Props = {
   rawSQL: string;

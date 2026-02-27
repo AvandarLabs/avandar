@@ -3,6 +3,8 @@ import {
   BoxProps,
   Loader,
   NavLinkProps,
+  ScrollArea,
+  Text,
   useMantineTheme,
 } from "@mantine/core";
 import { useMemo } from "react";
@@ -52,7 +54,7 @@ export function DatasetNavbar({
     };
   }, [theme.radius]);
 
-  const [uploadedDatasetLinks] = useMemo(() => {
+  const uploadedDatasetLinks = useMemo(() => {
     const datasetsByType = makeBucketMap(datasets, {
       keyFn: prop("sourceType"),
     });
@@ -68,30 +70,46 @@ export function DatasetNavbar({
       });
     });
 
-    return [
-      [
-        ...datasetLinks,
-        {
-          to: AppLinks.dataImport(workspaceSlug).to,
-          label: "Add new dataset",
-          style: borderStyle,
-          key: "create-new",
-        },
-      ],
-    ];
+    return datasetLinks;
   }, [datasets, borderStyle, workspaceSlug]);
 
+  const elements = {
+    emptyList() {
+      return (
+        <Box ta="center">
+          <Text>No datasets added yet</Text>
+        </Box>
+      );
+    },
+    mainContent() {
+      return (
+        <NavLinkList
+          links={uploadedDatasetLinks}
+          pt="md"
+          pr="md"
+          gap="xs"
+          inactiveHoverColor="neutral.1"
+          h="100%"
+          style={{ minHeight: 0 }}
+        />
+      );
+    },
+  };
+
   return (
-    <Box bg="neutral.1" pt="lg" {...boxProps}>
-      {isLoading ?
-        <Loader />
-      : null}
-      <NavLinkList
-        pt="md"
-        links={uploadedDatasetLinks}
-        pr="md"
-        inactiveHoverColor="neutral.1"
-      />
+    <Box
+      bg="neutral.0"
+      style={{ minHeight: 0, alignSelf: "stretch" }}
+      {...boxProps}
+    >
+      <ScrollArea h="100%" w="100%">
+        {isLoading ?
+          <Loader />
+        : null}
+        {uploadedDatasetLinks.length === 0 ?
+          elements.emptyList()
+        : elements.mainContent()}
+      </ScrollArea>
     </Box>
   );
 }

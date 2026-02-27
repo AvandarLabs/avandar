@@ -7,9 +7,9 @@ import {
 import { Logger } from "$/lib/Logger/Logger";
 import { useEffect } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { DatasetMetaView } from "@/components/DataManagerApp/DatasetMetaView";
 import { Callout } from "@/lib/ui/Callout";
 import { Dataset, DatasetId } from "@/models/datasets/Dataset";
+import { DatasetMetaView } from "@/views/DataManagerApp/DatasetMetaView";
 
 export const Route = createFileRoute(
   "/_auth/$workspaceSlug/data-manager/$datasetId",

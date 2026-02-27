@@ -34,7 +34,7 @@ const initialState: DataExplorerAppState = {
 /**
  * This store is used to manage the state of the Data Explorer app.
  *
- * This store is used at the WorkspaceAppLayout level therefore it is reachable
+ * This store is used at the WorkspaceLayout level therefore it is reachable
  * from any app view in the workspace.
  */
 export const DataExplorerStateManager = createAppStateManager({

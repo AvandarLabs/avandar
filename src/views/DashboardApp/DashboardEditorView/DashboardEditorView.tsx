@@ -1,7 +1,9 @@
 import { Data, Puck } from "@puckeditor/core";
 import "@puckeditor/core/puck.css";
+import { Flex } from "@mantine/core";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
+import { AppLayout } from "@/components/common/layouts/AppLayout";
 import { notifySuccess } from "@/lib/ui/notifications/notify";
 import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
 import { DeleteDashboardButton } from "./DeleteDashboardButton";
@@ -113,31 +115,36 @@ export function DashboardEditorView({
   );
 
   return (
-    <Puck
-      key={editorKey}
-      config={puckConfig}
-      data={data}
-      onChange={(d: Data) => {
-        setData(d as AvaPageData);
-      }}
-      overrides={{
-        headerActions: () => {
-          return (
-            <>
-              <SaveDashboardButton onSave={onSave} />
-              <ViewDashboardButton
-                workspaceSlug={workspaceSlug}
-                dashboardId={dashboard?.id}
-              />
-              <PublishDashboardButton dashboardId={dashboard?.id} />
-              <DeleteDashboardButton
-                workspaceSlug={workspaceSlug}
-                dashboardId={dashboard?.id}
-              />
-            </>
-          );
-        },
-      }}
-    />
+    <AppLayout floatingToolbar>
+      <Flex direction="column" h="100%">
+        <Puck
+          key={editorKey}
+          config={puckConfig}
+          height="100%"
+          data={data}
+          onChange={(d: Data) => {
+            setData(d as AvaPageData);
+          }}
+          overrides={{
+            headerActions: () => {
+              return (
+                <>
+                  <SaveDashboardButton onSave={onSave} />
+                  <ViewDashboardButton
+                    workspaceSlug={workspaceSlug}
+                    dashboardId={dashboard?.id}
+                  />
+                  <PublishDashboardButton dashboardId={dashboard?.id} />
+                  <DeleteDashboardButton
+                    workspaceSlug={workspaceSlug}
+                    dashboardId={dashboard?.id}
+                  />
+                </>
+              );
+            },
+          }}
+        />
+      </Flex>
+    </AppLayout>
   );
 }

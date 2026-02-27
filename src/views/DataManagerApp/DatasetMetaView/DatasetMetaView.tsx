@@ -149,7 +149,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   const datasetColumnNames = datasetColumns?.map(prop("name")) ?? [];
 
   return (
-    <Container pt="lg">
+    <Container py="md">
       <Stack>
         <Group justify="space-between" align="center">
           <Group gap="xs" align="center">

@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AppLayout } from "@/components/AppLayout";
+import { RootLayout } from "@/components/common/layouts/RootLayout";
 
 export const Route = createFileRoute("/_auth/(no-workspace)")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  return <AppLayout mode="no-workspace" />;
+  return <RootLayout mode="no-workspace" />;
 }

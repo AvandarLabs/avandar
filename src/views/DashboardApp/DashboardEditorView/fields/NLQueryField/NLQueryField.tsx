@@ -1,9 +1,9 @@
 import { Button, Fieldset, Group, Paper, Stack, Textarea } from "@mantine/core";
 import { useState } from "react";
-import { useNLPQuery } from "@/components/DataExplorerApp/QueryForm/useNLPQuery";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { TextareaForm } from "@/lib/ui/singleton-forms/TextareaForm/TextareaForm";
 import { mantineColorVar } from "@/lib/utils/browser/css";
+import { useNLPQuery } from "@/views/DataExplorerApp/QueryForm/useNLPQuery";
 import type { AvaPageFieldProps } from "../../AvaPage.types";
 
 export type NLQuery = {

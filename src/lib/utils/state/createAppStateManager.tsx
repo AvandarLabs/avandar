@@ -8,6 +8,15 @@ type GenericActionRegistry<State> = Record<
   (state: State, payload: any) => State
 >;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ActionFunctionRecord<ActionRegistry extends GenericActionRegistry<any>> = {
+  [ActionType in keyof ActionRegistry]: Parameters<
+    ActionRegistry[ActionType]
+  >["length"] extends 1 ?
+    () => void
+  : (payload: Parameters<ActionRegistry[ActionType]>[1]) => void;
+};
+
 type AppStateContextTuple<
   State,
   ActionRegistry extends GenericActionRegistry<State>,
@@ -18,15 +27,11 @@ type AppStateContextTuple<
    * Record of action types and their action functions
    *
    * @example
-   * const [state, dispatch] = MyAppState.use();
+   * const [state, dispatch] = MyAppState.useContext();
    * dispatch.setName("John Doe");
    *
    */
-  dispatch: {
-    [ActionType in keyof ActionRegistry]: (
-      action: Parameters<ActionRegistry[ActionType]>[1],
-    ) => void;
-  },
+  dispatch: ActionFunctionRecord<ActionRegistry>,
 ];
 
 /**
@@ -64,6 +69,51 @@ type AppStateManager<
 type ActionPayload<ActionRegistry extends GenericActionRegistry<any>> =
   Parameters<ActionRegistry[keyof ActionRegistry]>[1];
 
+/**
+ * Creates an app state manager.
+ *
+ * @example
+ * // Create the state manager
+ * type MyAppState = {
+ *   count: number;
+ * };
+ *
+ * const initialState: MyAppState = {
+ *   count: 0,
+ * };
+ *
+ * const MyAppStateManager = createAppStateManager({
+ *   name: "MyApp",
+ *   initialState,
+ *   actions: {
+ *     setCount: (state: MyAppState, count: number) => {
+ *       return { ...state, count };
+ *     },
+ *   },
+ * });
+ *
+ * @example
+ * // Wrap your app in the Provider
+ * <MyAppStateManager.Provider>
+ *   <MyAppContent />
+ * </MyAppStateManager.Provider>
+ *
+ * @example
+ * // Use the app dispatch
+ * const dispatch = MyAppStateManager.useDispatch();
+ * dispatch.setCount(1);
+ *
+ * // Use the app state
+ * const state = MyAppStateManager.useState();
+ *
+ * // Use state and dispatch in a single call
+ * const [state, dispatch] = MyAppStateManager.useContext();
+ *
+ * @param name - The name of the app state manager.
+ * @param initialState - The initial state of the app state manager.
+ * @param actions - The actions of the app state manager.
+ * @returns The app state manager.
+ */
 export function createAppStateManager<
   State,
   ActionRegistry extends GenericActionRegistry<State>,
@@ -129,17 +179,16 @@ export function createAppStateManager<
     Provider: ({ children }) => {
       const [state, dispatch] = useReducer(reducer, initialState);
       const appDispatch = useMemo(() => {
-        const fnRecord = {} as {
-          [ActionType in keyof ActionRegistry]: (
-            payload: ActionPayload<ActionRegistry>,
-          ) => void;
-        };
+        const fnRecord = {} as Record<
+          keyof ActionRegistry,
+          (payload: ActionPayload<ActionRegistry>) => void
+        >;
         actionTypes.forEach((actionType) => {
-          fnRecord[actionType] = (payload: ActionPayload<ActionRegistry>) => {
+          fnRecord[actionType] = (payload) => {
             dispatch({ type: actionType, payload });
           };
         });
-        return fnRecord;
+        return fnRecord as ActionFunctionRecord<ActionRegistry>;
       }, [dispatch]);
 
       const context = useMemo(() => {

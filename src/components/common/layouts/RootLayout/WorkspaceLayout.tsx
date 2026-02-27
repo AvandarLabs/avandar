@@ -6,7 +6,7 @@ import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AppShell } from "@/lib/ui/AppShell";
 import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
-import { DataExplorerStateManager } from "../DataExplorerApp/DataExplorerStateManager";
+import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager";
 import { useRootWorkspaceChecks } from "./useRootWorkspaceChecks/useRootWorkspaceChecks";
 import { useSpotlightActions } from "./useSpotlightActions";
 
@@ -18,9 +18,7 @@ type Props = {
   children?: ReactNode;
 };
 
-export function WorkspaceAppLayout({
-  children = <Outlet />,
-}: Props): JSX.Element {
+export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
   useRootWorkspaceChecks();
 
   const workspace = useCurrentWorkspace();

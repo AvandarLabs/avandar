@@ -1,4 +1,3 @@
-import { Container } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
@@ -30,11 +29,9 @@ function DashboardsPage(): JSX.Element {
   });
 
   return (
-    <Container py="xl">
-      <DashboardListView
-        dashboards={dashboards ?? []}
-        workspaceSlug={workspaceSlug}
-      />
-    </Container>
+    <DashboardListView
+      dashboards={dashboards ?? []}
+      workspaceSlug={workspaceSlug}
+    />
   );
 }

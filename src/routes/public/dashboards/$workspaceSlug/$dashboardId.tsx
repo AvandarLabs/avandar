@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
-import { DataExplorerStateManager } from "@/components/DataExplorerApp/DataExplorerStateManager";
 import { DashboardViewerView } from "@/views/DashboardApp/DashboardViewerView";
+import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager";
 import type {
   DashboardId,
   DashboardRead,
