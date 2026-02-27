@@ -17,6 +17,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useQuery } from "@/lib/hooks/query/useQuery";
 import { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import { GPickerDocumentObject } from "@/lib/types/google-picker";
+import { AvaTooltip } from "@/lib/ui/AvaTooltip";
 import {
   notifyError,
   notifySuccess,
@@ -256,35 +257,38 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
               </>
             : null}
           </>
-        : <Button
-            fullWidth
-            variant="filled"
-            size="md"
-            onClick={async () => {
-              try {
-                const { authorizeURL } = await APIClient.get({
-                  route: "google-auth/auth-url",
-                  queryParams: {
-                    redirectURL: getCurrentURL(),
-                  },
-                });
+        : <AvaTooltip label="Google sheets connector is disabled while this feature is under maintenance.">
+            <Button
+              disabled
+              fullWidth
+              variant="filled"
+              size="md"
+              onClick={async () => {
+                try {
+                  const { authorizeURL } = await APIClient.get({
+                    route: "google-auth/auth-url",
+                    queryParams: {
+                      redirectURL: getCurrentURL(),
+                    },
+                  });
 
-                // Redirect to the auth URL
-                navigateToExternalURL(authorizeURL);
-              } catch (error) {
-                Logger.error(error, {
-                  devMsg: "Error while fetching Google auth URL",
-                });
-                notifyError(
-                  "Google authentication error",
-                  "There was an error while trying to authenticate with Google Sheets.",
-                );
-                return;
-              }
-            }}
-          >
-            Connect to Google Sheets
-          </Button>
+                  // Redirect to the auth URL
+                  navigateToExternalURL(authorizeURL);
+                } catch (error) {
+                  Logger.error(error, {
+                    devMsg: "Error while fetching Google auth URL",
+                  });
+                  notifyError(
+                    "Google authentication error",
+                    "There was an error while trying to authenticate with Google Sheets.",
+                  );
+                  return;
+                }
+              }}
+            >
+              Connect to Google Sheets
+            </Button>
+          </AvaTooltip>
         }
 
         {(
