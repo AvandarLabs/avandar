@@ -69,6 +69,7 @@ export function AppLayout({
           <Container
             w="100%"
             fluid
+            bg="gray.0"
             flex={1}
             p={0}
             h="100%"

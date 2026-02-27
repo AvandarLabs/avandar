@@ -18,6 +18,7 @@ export function AppToolbar({
     <Group
       px="xxs"
       py="xxs"
+      bg="white"
       style={
         floatingToolbar ?
           {
