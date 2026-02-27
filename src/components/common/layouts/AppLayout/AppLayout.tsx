@@ -1,6 +1,11 @@
-import { Container, ContainerProps, Flex } from "@mantine/core";
+import {
+  Container,
+  ContainerProps,
+  Flex,
+  MantineTheme,
+  Paper,
+} from "@mantine/core";
 import { ReactNode } from "react";
-import { Paper } from "@/lib/ui/Paper";
 import { AppToolbar } from "./AppToolbar/AppToolbar";
 
 type Props = {
@@ -39,7 +44,7 @@ export function AppLayout({
       p="xs"
       mah="100dvh"
       h="100dvh"
-      bg="neutral"
+      style={styles.root}
     >
       <Paper
         p={0}
@@ -77,3 +82,11 @@ export function AppLayout({
     </Flex>
   );
 }
+
+const styles = {
+  root: (theme: MantineTheme) => {
+    return {
+      backgroundColor: theme.other.navbar.backgroundColor,
+    };
+  },
+};
