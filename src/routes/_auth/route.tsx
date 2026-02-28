@@ -27,12 +27,19 @@ export const Route = createFileRoute("/_auth")({
         });
       }
 
+      // If there is no user session, then we want to set the current URL
+      // as a redirect search param, so the user can be redirected to it
+      // after sign-in. But we do not want to do this if the user had manually
+      // triggered a sign-out. We only want it if the session had expired.
+      const shouldRedirect =
+        !AuthClient.isManuallySignedOut() && isValidRedirectPath(location.href);
+
+      AuthClient.resetManualSignOut();
+
       throw redirect({
         to: AppLinks.signin.to,
 
-        // if the current path is valid for redirects then we add a redirect
-        // search param
-        ...(isValidRedirectPath(location.href) ?
+        ...(shouldRedirect ?
           {
             search: {
               // Use the current location to power a redirect after login
