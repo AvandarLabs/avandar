@@ -1,7 +1,9 @@
 import { Data, Puck } from "@puckeditor/core";
 import "@puckeditor/core/puck.css";
+import { Flex } from "@mantine/core";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
+import { AppLayout } from "@/components/common/layouts/AppLayout";
 import { notifySuccess } from "@/lib/ui/notifications/notify";
 import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
 import { DeleteDashboardButton } from "./DeleteDashboardButton";
@@ -10,12 +12,12 @@ import {
   getDashboardPuckConfig,
   getDashboardTitleFromPuckData,
 } from "./getDashboardPuckConfig";
-import { getVersionFromConfigData } from "./migrations/getVersionFromConfigData";
+import { getVersionFromAvaPageData } from "./migrations/getVersionFromAvaPageData";
 import { PublishDashboardButton } from "./PublishDashboardButton";
 import { SaveDashboardButton } from "./SaveDashboardButton";
-import { upgradePuckConfig } from "./utils/upgradePuckConfig";
+import { upgradeAvaPageData } from "./utils/upgradeAvaPageData";
 import { ViewDashboardButton } from "./ViewDashboardButton";
-import type { DashboardPuckData } from "./DashboardPuck.types";
+import type { AvaPageData } from "./AvaPage.types";
 import type {
   Dashboard,
   DashboardId,
@@ -29,7 +31,7 @@ export function DashboardEditorView({
   dashboard,
   workspaceSlug,
 }: Props): JSX.Element {
-  const [data, setData] = useState<DashboardPuckData>(() => {
+  const [data, setData] = useState<AvaPageData>(() => {
     return createInitialDashboardPuckData({
       dashboardTitle: dashboard?.name ?? "Untitled dashboard",
     });
@@ -51,7 +53,7 @@ export function DashboardEditorView({
     }
 
     lastDashboardIdRef.current = dashboard.id;
-    const dashboardConfigData = dashboard.config as DashboardPuckData;
+    const dashboardConfigData = dashboard.config as AvaPageData;
     const puckData = {
       ...dashboardConfigData,
       root: {
@@ -59,11 +61,11 @@ export function DashboardEditorView({
         props: {
           ...dashboardConfigData.root.props,
           title: dashboard.name || "Untitled dashboard",
-          schemaVersion: getVersionFromConfigData(dashboardConfigData),
+          schemaVersion: getVersionFromAvaPageData(dashboardConfigData),
         },
       },
     };
-    setData(upgradePuckConfig(puckData));
+    setData(upgradeAvaPageData(puckData));
     setEditorKey((prevEditorKey) => {
       return prevEditorKey + 1;
     });
@@ -90,7 +92,7 @@ export function DashboardEditorView({
   });
 
   const onSave = useCallback(
-    (savedData: DashboardPuckData): void => {
+    (savedData: AvaPageData): void => {
       if (!dashboard) {
         notifyDevAlert("Dashboard is not loaded yet.");
         return;
@@ -113,31 +115,36 @@ export function DashboardEditorView({
   );
 
   return (
-    <Puck
-      key={editorKey}
-      config={puckConfig}
-      data={data}
-      onChange={(d: Data) => {
-        setData(d as DashboardPuckData);
-      }}
-      overrides={{
-        headerActions: () => {
-          return (
-            <>
-              <SaveDashboardButton onSave={onSave} />
-              <ViewDashboardButton
-                workspaceSlug={workspaceSlug}
-                dashboardId={dashboard?.id}
-              />
-              <PublishDashboardButton dashboardId={dashboard?.id} />
-              <DeleteDashboardButton
-                workspaceSlug={workspaceSlug}
-                dashboardId={dashboard?.id}
-              />
-            </>
-          );
-        },
-      }}
-    />
+    <AppLayout floatingToolbar>
+      <Flex direction="column" h="100%">
+        <Puck
+          key={editorKey}
+          config={puckConfig}
+          height="100%"
+          data={data}
+          onChange={(d: Data) => {
+            setData(d as AvaPageData);
+          }}
+          overrides={{
+            headerActions: () => {
+              return (
+                <>
+                  <SaveDashboardButton onSave={onSave} />
+                  <ViewDashboardButton
+                    workspaceSlug={workspaceSlug}
+                    dashboardId={dashboard?.id}
+                  />
+                  <PublishDashboardButton dashboardId={dashboard?.id} />
+                  <DeleteDashboardButton
+                    workspaceSlug={workspaceSlug}
+                    dashboardId={dashboard?.id}
+                  />
+                </>
+              );
+            },
+          }}
+        />
+      </Flex>
+    </AppLayout>
   );
 }

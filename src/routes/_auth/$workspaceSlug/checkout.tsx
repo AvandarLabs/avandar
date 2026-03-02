@@ -41,6 +41,7 @@ function CheckoutPage() {
   const { success } = Route.useSearch();
   const user = useCurrentUser();
   const workspace = useCurrentWorkspace();
+
   const [subscriptions] = useQuery({
     queryKey: ["subscriptions", "fetch-and-sync", user?.id],
     queryFn: async () => {
@@ -55,6 +56,7 @@ function CheckoutPage() {
           userId: user.id,
         },
       });
+
       return data.subscriptions;
     },
     enabled: !!user,
@@ -75,6 +77,7 @@ function CheckoutPage() {
         queryClient.invalidateQueries({
           queryKey: [WorkspaceClient.getClientName()],
         });
+
         // if there's a subscription for the current workspace then we
         // can redirect to the workspace home
         navigate(AppLinks.workspaceHome(workspace.slug));

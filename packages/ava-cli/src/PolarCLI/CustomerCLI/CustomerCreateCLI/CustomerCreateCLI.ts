@@ -15,7 +15,7 @@ import {
 /**
  * Create a test customer and subscribe them to the Free plan.
  *
- * This is separated from the CLI wiring so it can be unit-tested.
+ * If the customer already has a Free plan subscription we will do nothing.
  */
 export async function runCustomerCreate(): Promise<void> {
   const email = "user@avandarlabs.com";

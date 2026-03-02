@@ -1,5 +1,6 @@
 import { Acclimate } from "@avandar/acclimate";
 import { CustomerCreateCLI } from "./CustomerCreateCLI";
+import { CustomerListCLI } from "./CustomerListCLI";
 import { CustomerRemoveCLI } from "./CustomerRemoveCLI";
 
 /** A CLI for managing Polar customers. */
@@ -8,4 +9,5 @@ export const CustomerCLI = Acclimate.createCLI("customer")
     "Manage Polar customers. All commands default to the staging environment.",
   )
   .addCommand("create", CustomerCreateCLI)
-  .addCommand("remove", CustomerRemoveCLI);
+  .addCommand("remove", CustomerRemoveCLI)
+  .addCommand("list", CustomerListCLI);

@@ -15,15 +15,14 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "vitest run -c vitest.config.ts",
-    "type-check": "tsc -p tsconfig.json --noEmit"
+    "test": "vitest run -c vitest.config.ts"
   },
   "dependencies": {
+    "@avandar/acclimate": "^0.4.0",
     "pg": "^8.18.0",
     "prettier": "^3.5.3"
   },
   "devDependencies": {
-    "@avandar/acclimate": "^0.3.4",
     "@types/pg": "^8.16.0",
     "tsup": "^8.5.0"
   },

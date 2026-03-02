@@ -1,6 +1,6 @@
 import { CustomField } from "@puckeditor/core";
 import { constant } from "$/lib/utils/constant/constant";
-import { DashboardFieldProps } from "../../DashboardPuck.types";
+import { AvaPageFieldProps } from "../../AvaPage.types";
 import {
   ContainerMaxWidthField,
   ContainerMaxWidthValue,
@@ -11,7 +11,7 @@ import {
 const containerMaxWidthFieldConfig: CustomField<ContainerMaxWidthValue> = {
   label: "Container max width",
   type: "custom",
-  render: (props: DashboardFieldProps<ContainerMaxWidthValue>) => {
+  render: (props: AvaPageFieldProps<ContainerMaxWidthValue>) => {
     return <ContainerMaxWidthField {...props} />;
   },
 };

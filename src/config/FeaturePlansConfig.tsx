@@ -12,11 +12,10 @@ export const FreePlanConfig = {
   featurePlanName: "Avandar Free",
   features: [
     "You can invite 1 additional team member into your workspace",
-    "Manage up to 5 data sources",
-    "Data source manager",
-    "Data explorer",
-    "Geospatial explorer",
-    "Data profile designer",
+    "Add up to 5 data sources",
+    "Create up to 5 dashboards",
+    "Limited to 1 public dashboard",
+    "Limited AI usage",
   ],
   isRecommendedPlan: false,
 } as const satisfies PlanConfig;
@@ -27,9 +26,10 @@ export const BasicPlanConfig: PlanConfig = {
   features: [
     "Everything in the free plan",
     "Unlimited team members for your workspace",
-    "Manage up to 10 data sources, plus 5 data sources per additional team member",
-    "Early access to the upcoming Dashboard product",
-    "Unlimited AI-driven data exploration",
+    "Add up to 10 data sources, plus 5 data sources per additional team member",
+    "Unlimited internal and public dashboards",
+    "Limited maximum data size per dashboard",
+    "Extended AI usage",
   ],
   isRecommendedPlan: false,
 } as const satisfies PlanConfig;
@@ -40,11 +40,10 @@ export const PremiumPlanConfig: PlanConfig = {
   isRecommendedPlan: true,
   features: [
     "Everything in the basic plan",
-    "Manage up to 100 data sources, plus 10 data sources per additional team member",
-    "Early access to Avandar's upcoming curated open data database",
-    "Early access to Avandar's upcoming plugin marketplace",
-    "Early access to serving your own public data APIs",
-    "Access to Premium-exclusive features",
-    "Access to Premium-exclusive technical workshops",
+    "Add up to 100 data sources, plus 10 data sources per additional team member",
+    "Unlimited internal and public dashboards",
+    "Unlimited data size per dashboard",
+    "Unlimited AI usage",
+    "Priority support and attention to feature requests",
   ],
 } as const satisfies PlanConfig;

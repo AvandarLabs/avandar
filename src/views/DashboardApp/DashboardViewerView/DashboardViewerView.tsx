@@ -4,10 +4,10 @@ import { useEffect, useMemo } from "react";
 import "@puckeditor/core/puck.css";
 import { notifyError } from "@/lib/ui/notifications/notify";
 import { Paper } from "@/lib/ui/Paper";
-import { DashboardGenericData } from "../DashboardEditorView/DashboardPuck.types";
+import { AvaPageGenericData } from "../DashboardEditorView/AvaPage.types";
 import { getDashboardPuckConfig } from "../DashboardEditorView/getDashboardPuckConfig";
-import { getVersionFromConfigData } from "../DashboardEditorView/migrations/getVersionFromConfigData";
-import { upgradePuckConfig } from "../DashboardEditorView/utils/upgradePuckConfig";
+import { getVersionFromAvaPageData } from "../DashboardEditorView/migrations/getVersionFromAvaPageData";
+import { upgradeAvaPageData } from "../DashboardEditorView/utils/upgradeAvaPageData";
 import { useEnsurePublishedDashboardDatasets } from "./useEnsurePublishedDashboardDatasets";
 import type { Dashboard } from "@/models/Dashboard/Dashboard.types";
 
@@ -36,7 +36,7 @@ export function DashboardViewerView({ dashboard }: Props): JSX.Element {
       };
     }
     const dashboardConfigData =
-      dashboard.config as unknown as DashboardGenericData;
+      dashboard.config as unknown as AvaPageGenericData;
     const puckData = {
       ...dashboardConfigData,
       root: {
@@ -44,11 +44,11 @@ export function DashboardViewerView({ dashboard }: Props): JSX.Element {
         props: {
           ...dashboardConfigData.root.props,
           title: dashboard.name || "Untitled dashboard",
-          schemaVersion: getVersionFromConfigData(dashboardConfigData),
+          schemaVersion: getVersionFromAvaPageData(dashboardConfigData),
         },
       },
     };
-    return upgradePuckConfig(puckData);
+    return upgradeAvaPageData(puckData);
   }, [dashboard]);
 
   useEffect(() => {

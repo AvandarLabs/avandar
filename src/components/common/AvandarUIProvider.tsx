@@ -12,7 +12,7 @@ export function AvandarUIProvider({ children }: Props): JSX.Element {
   return (
     <MantineProvider theme={Theme} cssVariablesResolver={cssVariablesResolver}>
       <ModalsProvider>
-        <Notifications position="top-right" />
+        <Notifications position="bottom-right" />
         {children}
       </ModalsProvider>
     </MantineProvider>

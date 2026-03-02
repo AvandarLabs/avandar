@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_auth/$workspaceSlug/data-manager/")({
  */
 function DataManagerRoot() {
   return (
-    <Center h="50%">
+    <Center h="50%" pt="xl">
       <Callout
         title="No dataset selected"
         color="info"

@@ -15,7 +15,7 @@ export function useFeaturePlanType(): FeaturePlanType {
     navigate({
       to: AppLinks.invalidWorkspace.to,
       search: {
-        redirectReason: "This workspace does not have a valid subscription",
+        redirectReason: "NO_SUBSCRIPTION",
       },
       replace: true,
     });

@@ -127,8 +127,8 @@ Libraries:
 
 ## File, Directory, and Module Conventions
 
-- If you create a new directory for a function or component, then use a small
-  barrel file to export it. For example:
+- If you create a new directory for a function or component, then use a
+  mini-barrel file to export it. For example:
 
   ```plaintext
   MyComponent
@@ -137,25 +137,25 @@ Libraries:
     | MyComponent.test.tsx
   ```
 
-  The `index.tsx` should **only** export what is intended to be imported by
-  other parts of the codebase. Think of it as a public interface. Any functions
-  that were used only in this directory should not be publicly exported in
-  the barrel file.
+  Treat `index.tsx` as a public interface and the other files in this directory
+  as private. `index.tsx` should **only** export members that need to be
+  importable in other parts of the codebase.
 
 - Never create monolithic barrel files. The only types of barrel files we allow
-  are the small, modular, barrel files described above.
-- Never use `export * from ...`. Always explicitly name your exports, e.g.
-  `export { MyComponent } from ...`.
-- Types should always be imported or exported with the `type` keyword, e.g.
+  are the small, modular, barrel files described above, which we will refer to
+  as "mini-barrel" files.
+- Never use namespace exports. Always use named exports.
+  This is bad: `export * from ...`.
+  This is good: `export { MyComponent } from ...`.
+- Type imports/exports always use the `type` keyword. E.g.
 
   ```ts
   import type { MyType } from ...;
   export type { MyType } from ...;
   ```
 
-- All exported classes, objects, and functions must **always** have a docstring
-  attached to them. This includes functions that are exported as part of an
-  object's or class' top-level API. For example:
+- All exported classes, objects, and functions must always have a docstring.
+  If an object is exported, its top-level methods should also have docstrings.
 
   ```ts
   /**
@@ -169,14 +169,13 @@ Libraries:
   export function foo(options: { name: string; age: number }): void {}
 
   /**
-   * Docstring necessary to describe `MyObject`.
+   * Docstring describing `MyObject`.
    */
   export const MyObject = {
-    // docstring already attached to `foo` above, no need to duplicate here
-    foo,
+    foo, // docstring already attached to its declaration, no need to duplciate
 
     /**
-     * Docstring necessary here.
+     * Docstring describing the `hello` method.
      */
     hello: () => {
       return "hello, world";

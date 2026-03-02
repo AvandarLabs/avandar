@@ -1,8 +1,8 @@
-import { DashboardPuckData } from "@/views/DashboardApp/DashboardEditorView/DashboardPuck.types";
+import { AvaPageData } from "@/views/DashboardApp/DashboardEditorView/AvaPage.types";
 import { createInitialDashboardPuckData } from "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig";
 
 export const DashboardConfigs = {
-  makeEmpty: (): DashboardPuckData => {
+  makeEmpty: (): AvaPageData => {
     return createInitialDashboardPuckData({
       dashboardTitle: "Untitled dashboard",
     });

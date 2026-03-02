@@ -3,7 +3,14 @@ import type { Polar } from "@polar-sh/sdk";
 
 export type PolarCustomer = Readonly<{
   id: string;
+  createdAt: Date;
+  metadata: Record<string, string>;
+  externalId: string;
   email: string;
+  emailVerified: false;
+  name: string | null;
+  billingAddress: string | null;
+  deletedAt: Date | null;
 }>;
 
 export type PolarProduct = Readonly<{
@@ -186,4 +193,21 @@ export async function hasSubscriptionForProduct(options: {
 
   const productIds = _getSubscribedProductIds(state);
   return productIds.includes(options.productId);
+}
+
+export async function listCustomers(options: {
+  polar: Polar;
+  organizationId: string;
+}): Promise<PolarCustomer[]> {
+  const responses: AsyncIterable<unknown> = await options.polar.customers.list({
+    organizationId: options.organizationId,
+    page: 1,
+    limit: 100,
+  });
+
+  const pages = await Array.fromAsync(responses);
+  const customers = pages.flatMap((page) => {
+    return getItemsFromListPage<PolarCustomer>(page);
+  });
+  return customers;
 }

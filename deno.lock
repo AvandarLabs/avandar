@@ -109,7 +109,7 @@
         "npm:supabase@^2.72.7",
         "npm:tailwindcss@^3.4.14",
         "npm:ts-pattern@^5.7.0",
-        "npm:type-fest@^5.2.0",
+        "npm:type-fest@^5.4.4",
         "npm:typescript-eslint@^8.24.1",
         "npm:typescript@~5.9.3",
         "npm:uuid@^11.1.0",
@@ -124,14 +124,11 @@
       "packages/ava-cli": {
         "packageJson": {
           "dependencies": [
-            "npm:@avandar/acclimate@~0.3.4",
+            "npm:@avandar/acclimate@0.4",
             "npm:@types/pg@^8.16.0",
-            "npm:knex@^3.1.0",
             "npm:pg@^8.18.0",
             "npm:prettier@^3.5.3",
-            "npm:tsup@^8.5.0",
-            "npm:type-fest@^5.4.4",
-            "npm:typescript@~5.9.3"
+            "npm:tsup@^8.5.0"
           ]
         }
       },

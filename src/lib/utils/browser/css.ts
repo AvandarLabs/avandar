@@ -31,6 +31,15 @@ export function mantineColorVar(color: `${string}.${number}` | string): string {
   return `var(--mantine-color-${color}-6)`;
 }
 
+/**
+ * Returns a string that references a Mantine color variable.
+ *
+ * @example
+ * mantineVar('shadow-lg'); // "var(--mantine-shadow-lg)"
+ *
+ * @param {string} name - The base variable name to use
+ * @returns {string} The full Mantine var string
+ */
 export function mantineVar(name: string): string {
   return `var(--mantine-${name})`;
 }

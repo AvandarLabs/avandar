@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { AppLayout } from "@/components/AppLayout";
+import { RootLayout } from "@/components/common/layouts/RootLayout";
 import { AppLinks } from "@/config/AppLinks";
 import { propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { WorkspaceWithSubscription } from "@/models/Workspace/Workspace.types";
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/_auth/$workspaceSlug")({
  * This is the layout for loading a workspace.
  */
 function WorkspaceRootLayout() {
-  return <AppLayout mode="workspace" />;
+  return <RootLayout mode="workspace" />;
 }
 
 export const WorkspaceRootRouteAPI = Route;

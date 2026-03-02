@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { AuthClient } from "@/clients/AuthClient";
 import { AppLinks } from "@/config/AppLinks";
+import { isValidRedirectPath } from "@/utils/isValidRedirectPath/isValidRedirectPath";
 
 export const Route = createFileRoute("/_auth")({
   component: MainAppRootLayout,
@@ -26,14 +27,28 @@ export const Route = createFileRoute("/_auth")({
         });
       }
 
+      // If there is no user session, then we want to set the current URL
+      // as a redirect search param, so the user can be redirected to it
+      // after sign-in. But we do not want to do this if the user had manually
+      // triggered a sign-out. We only want it if the session had expired.
+      const shouldRedirect =
+        !AuthClient.isManuallySignedOut() && isValidRedirectPath(location.href);
+
+      AuthClient.resetManualSignOut();
+
       throw redirect({
         to: AppLinks.signin.to,
-        search: {
-          // Use the current location to power a redirect after login
-          // (Do not use `router.state.resolvedLocation` as it can potentially
-          // lag behind the actual current location.
-          redirect: location.href,
-        },
+
+        ...(shouldRedirect ?
+          {
+            search: {
+              // Use the current location to power a redirect after login
+              // (Do not use `router.state.resolvedLocation` as it can
+              // potentially lag behind the actual current location.
+              redirect: location.href,
+            },
+          }
+        : {}),
       });
     }
   },

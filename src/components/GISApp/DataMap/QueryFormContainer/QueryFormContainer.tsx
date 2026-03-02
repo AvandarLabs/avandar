@@ -1,8 +1,6 @@
 import { ActionIcon, ColorInput, Flex, Popover, Stack } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import { IconFilter } from "@tabler/icons-react";
-import { QueryColumnSingleSelect } from "@/components/DataExplorerApp/QueryColumnSingleSelect";
-import { QueryDataSourceSelect } from "@/components/DataExplorerApp/QueryDataSourceSelect";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { AvaTooltip } from "@/lib/ui/AvaTooltip";
 import { notifyError } from "@/lib/ui/notifications/notify";
@@ -11,6 +9,8 @@ import { Models } from "@/models/Model/Models";
 import { QueryColumn } from "@/models/queries/QueryColumn";
 import { QueryColumns } from "@/models/queries/QueryColumn/QueryColumns";
 import { QueryDataSource } from "@/models/queries/QueryDataSource";
+import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect";
+import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
 
 type Props = {
   selectedDataSource?: QueryDataSource;
