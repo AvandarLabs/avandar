@@ -1,11 +1,11 @@
 import {
-  IconBlocks,
-  IconDatabase,
-  IconHome,
-  IconLayoutDashboard,
-  IconMap,
-  IconSettings,
-  IconTable,
+    IconBlocks,
+    IconDatabase,
+    IconHome,
+    IconLayoutDashboard,
+    IconMap,
+    IconSettings,
+    IconTable,
 } from "@tabler/icons-react";
 import { ReactNode } from "react";
 import { User } from "@/models/User/User.types";
@@ -63,12 +63,6 @@ export const NavbarLinks = {
     return {
       link: AppLinks.dashboards(workspaceSlug),
       icon: <IconLayoutDashboard size={DEFAULT_ICON_SIZE} stroke={1.5} />,
-    };
-  },
-  dashboards: (workspaceSlug: string) => {
-    return {
-      link: AppLinks.dashboards(workspaceSlug),
-      icon: <IconLayoutDashboard size={24} stroke={1.5} />,
     };
   },
   map: (workspaceSlug: string) => {
