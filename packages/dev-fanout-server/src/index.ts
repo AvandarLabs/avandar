@@ -31,22 +31,6 @@ async function main(): Promise<void> {
     logger: true,
   });
 
-  const parseAsBuffer = (
-    _request: unknown,
-    body: unknown,
-    done: (err: Error | null, body: unknown) => void,
-  ): void => {
-    done(null, body);
-  };
-
-  server.addContentTypeParser(
-    ["application/json", "application/*+json"],
-    { parseAs: "buffer" },
-    parseAsBuffer,
-  );
-
-  server.addContentTypeParser("*", { parseAs: "buffer" }, parseAsBuffer);
-
   // register endpoints
   server.get("/healthz", async () => {
     return { ok: true };
