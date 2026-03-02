@@ -2,7 +2,7 @@
   background-color: var(--mantine-navbar-background);
   color: var(--mantine-navbar-color);
   overscroll-behavior: none;
-  overflow: scroll;
+  overflow: auto;
 }
 
 .root {

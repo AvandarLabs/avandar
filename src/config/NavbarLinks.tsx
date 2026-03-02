@@ -1,11 +1,11 @@
 import {
-    IconBlocks,
-    IconDatabase,
-    IconHome,
-    IconLayoutDashboard,
-    IconMap,
-    IconSettings,
-    IconTable,
+  IconBlocks,
+  IconDatabase,
+  IconHome,
+  IconLayoutDashboard,
+  IconMap,
+  IconSettings,
+  IconTable,
 } from "@tabler/icons-react";
 import { ReactNode } from "react";
 import { User } from "@/models/User/User.types";
