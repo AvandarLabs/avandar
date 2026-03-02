@@ -1,8 +1,8 @@
 .navbar {
   background-color: var(--mantine-navbar-background);
   color: var(--mantine-navbar-color);
-  overscroll-behavior: none;
   overflow: auto;
+  overscroll-behavior: none;
 }
 
 .root {
@@ -10,9 +10,9 @@
 }
 
 .main {
+  pointer-events: none;
   position: relative;
   z-index: 201;
-  pointer-events: none;
 }
 
 .main > * {

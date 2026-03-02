@@ -8,6 +8,7 @@
 
   &[data-status="active"] {
     background-color: var(--mantine-navbar-active-background);
+
     &:hover {
       background-color: var(--mantine-navbar-active-hover-background);
     }
@@ -15,8 +16,8 @@
 }
 
 .navbarLinkPill {
-  transition: background-color var(--navbar-transition-duration) ease-in-out;
   color: var(--mantine-navbar-color);
+  transition: background-color var(--navbar-transition-duration) ease-in-out;
 }
 
 /* Apply hover and active states based on parent Link */
