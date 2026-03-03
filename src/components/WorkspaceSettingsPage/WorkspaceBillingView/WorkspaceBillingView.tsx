@@ -12,15 +12,22 @@ import { useSubscriptionPlans } from "./useSubscriptionPlans";
 
 type Props = {
   hideTitle?: boolean;
+  hideIntroText?: boolean;
 };
 
-export function WorkspaceBillingView({ hideTitle }: Props): JSX.Element {
+export function WorkspaceBillingView({
+  hideTitle,
+  hideIntroText,
+}: Props): JSX.Element {
   const currentWorkspace = useCurrentWorkspace();
   const [subscriptionPlanGroups = [], isLoadingSubscriptionPlans] =
     useSubscriptionPlans();
 
   const elements = {
     titleBlock: () => {
+      if (hideIntroText) {
+        return null;
+      }
       return (
         <div>
           {!hideTitle ?
@@ -35,6 +42,10 @@ export function WorkspaceBillingView({ hideTitle }: Props): JSX.Element {
       );
     },
     currentPlan: () => {
+      if (hideIntroText) {
+        return null;
+      }
+
       const currentFeaturePlanName =
         currentSubscribedPlan?.featurePlan.metadata.featurePlanName;
       if (currentFeaturePlanName) {

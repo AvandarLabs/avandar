@@ -12,8 +12,14 @@ import { AvaFormRef } from "@/lib/ui/AvaForm/AvaForm.types";
 import { notifySuccess } from "@/lib/ui/notifications/notify";
 import { WorkspaceRole } from "@/models/Workspace/Workspace.types";
 import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
+import { Workspaces } from "@/models/Workspace/Workspaces";
+import { WorkspaceBillingView } from "../WorkspaceBillingView";
 
-export function useWorkspaceInviteModal(): () => void {
+export function useWorkspaceInviteModal({
+  numberOfSeats,
+}: {
+  numberOfSeats: number | undefined;
+}): () => void {
   const featurePlanType = useFeaturePlanType();
   const workspace = useCurrentWorkspace();
   const formRef =
@@ -63,6 +69,38 @@ export function useWorkspaceInviteModal(): () => void {
   };
 
   return (): void => {
+    // do nothing if we don't know how many seats are in the workspace
+    // ideally, this function should have never gotten called yet.
+    if (numberOfSeats === undefined) {
+      return;
+    }
+
+    if (
+      !Workspaces.Features.canInviteMoreUsers({
+        workspace,
+        numSeatsInWorkspace: numberOfSeats,
+      })
+    ) {
+      return void modals.open({
+        title: "Seat limit reached",
+        size: "100%",
+        styles: {
+          content: { height: "100%" },
+        },
+        children: (
+          <Stack>
+            <Text>
+              Your workspace is on the Free plan, which supports up to 2 seats.
+              To invite more team members, upgrade to a paid plan for unlimited
+              seats.
+            </Text>
+
+            <WorkspaceBillingView hideTitle hideIntroText />
+          </Stack>
+        ),
+      });
+    }
+
     const modalId = modals.openConfirmModal({
       title: "Add a member to your Workspace",
       labels: {
