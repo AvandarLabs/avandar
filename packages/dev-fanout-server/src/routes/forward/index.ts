@@ -19,6 +19,21 @@ import { onFanoutRequest } from "./forward";
  * `/data/ngrok-dev-urls.json` (backed by a Fly Volume).
  */
 export const registerForwardRoute: FastifyPluginAsync = async (server) => {
+  const parseAsBuffer = (
+    _request: unknown,
+    body: unknown,
+    done: (err: Error | null, body: unknown) => void,
+  ): void => {
+    done(null, body);
+  };
+
+  server.addContentTypeParser(
+    ["application/json", "application/*+json"],
+    { parseAs: "buffer" },
+    parseAsBuffer,
+  );
+  server.addContentTypeParser("*", { parseAs: "buffer" }, parseAsBuffer);
+
   // Catch-all: match both `/forward` and any sub-path like `/forward/foo/bar`.
   server.all("/forward", onFanoutRequest);
   server.all("/forward/*", onFanoutRequest);

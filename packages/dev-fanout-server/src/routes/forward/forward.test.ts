@@ -56,22 +56,6 @@ async function _createServer(): Promise<FastifyInstance> {
     logger: false,
   });
 
-  const parseAsBuffer = (
-    _request: unknown,
-    body: unknown,
-    done: (err: Error | null, body: unknown) => void,
-  ): void => {
-    done(null, body);
-  };
-
-  server.addContentTypeParser(
-    ["application/json", "application/*+json"],
-    { parseAs: "buffer" },
-    parseAsBuffer,
-  );
-
-  server.addContentTypeParser("*", { parseAs: "buffer" }, parseAsBuffer);
-
   await server.register(registerForwardRoute);
   return server;
 }

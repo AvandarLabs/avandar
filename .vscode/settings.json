@@ -7,5 +7,19 @@
   },
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "stylelint.configFile": "stylelint.config.js",
+  "stylelint.validate": ["css", "tailwindcss"],
+  "css.validate": false,
+  "postcss.validate": false,
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "cssVariables.lookupFiles": [
+    "**/*.css",
+    "**/*.scss",
+    "**/*.sass",
+    "**/*.less",
+    "node_modules/@mantine/core/styles.css",
+    "node_modules/mantine/styles/global.css"
+  ]
 }

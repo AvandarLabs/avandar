@@ -49,7 +49,12 @@ export function WorkspaceUsersForm(): JSX.Element | null {
     ],
   });
 
-  const openInviteModal = useWorkspaceInviteModal();
+  const loadingSeats = pendingInvitesLoading || workspaceUsersLoading;
+
+  const openInviteModal = useWorkspaceInviteModal({
+    numberOfSeats:
+      loadingSeats ? undefined : pendingInvites.length + workspaceUsers.length,
+  });
 
   const isAdmin = workspaceRole === "admin";
 
@@ -136,7 +141,9 @@ export function WorkspaceUsersForm(): JSX.Element | null {
       />
       <Card withBorder p="lg" w="100%" maw="1000px">
         <Flex justify="flex-end" align="center" mb="md">
-          <Button onClick={openInviteModal}>Invite User</Button>
+          <Button disabled={loadingSeats} onClick={openInviteModal}>
+            Invite User
+          </Button>
         </Flex>
         <Table>
           <Table.Thead>

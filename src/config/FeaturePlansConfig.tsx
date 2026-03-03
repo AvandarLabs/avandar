@@ -5,6 +5,7 @@ type PlanConfig = {
   featurePlanName: string;
   features: readonly string[];
   isRecommendedPlan: boolean;
+  maxSeatsAllowed: number;
 };
 
 export const FreePlanConfig = {
@@ -14,10 +15,11 @@ export const FreePlanConfig = {
     "You can invite 1 additional team member into your workspace",
     "Add up to 5 data sources",
     "Create up to 5 dashboards",
-    "Limited to 1 public dashboard",
+    "Limited to 1 shareable or public dashboard",
     "Limited AI usage",
   ],
   isRecommendedPlan: false,
+  maxSeatsAllowed: 2,
 } as const satisfies PlanConfig;
 
 export const BasicPlanConfig: PlanConfig = {
@@ -27,11 +29,12 @@ export const BasicPlanConfig: PlanConfig = {
     "Everything in the free plan",
     "Unlimited team members for your workspace",
     "Add up to 10 data sources, plus 5 data sources per additional team member",
-    "Unlimited internal and public dashboards",
+    "Unlimited internal, shareable, and public dashboards",
     "Limited maximum data size per dashboard",
     "Extended AI usage",
   ],
   isRecommendedPlan: false,
+  maxSeatsAllowed: Infinity,
 } as const satisfies PlanConfig;
 
 export const PremiumPlanConfig: PlanConfig = {
@@ -41,9 +44,10 @@ export const PremiumPlanConfig: PlanConfig = {
   features: [
     "Everything in the basic plan",
     "Add up to 100 data sources, plus 10 data sources per additional team member",
-    "Unlimited internal and public dashboards",
+    "Unlimited internal, shareable, and public dashboards",
     "Unlimited data size per dashboard",
     "Unlimited AI usage",
     "Priority support and attention to feature requests",
   ],
+  maxSeatsAllowed: Infinity,
 } as const satisfies PlanConfig;

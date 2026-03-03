@@ -17,3 +17,20 @@ button {
     cursor: not-allowed;
   }
 }
+
+/*
+ * These are the same variables specified in `src/config/Theme.ts` in the
+ * `cssVariablesResolver` function.
+ * These variables are compiled at runtime and injected in the DOM. We are
+ * hardcoding them here just so that intellisense can pick them up in the
+ * editor for an improved developer experience.
+ */
+:root {
+  --mantine-navbar-background: ;
+  --mantine-navbar-color: ;
+  --mantine-navbar-hover-background: ;
+  --mantine-navbar-active-background: ;
+  --mantine-navbar-active-hover-background: ;
+  --mantine-color-body: ;
+  --mantine-color-text: ;
+}
