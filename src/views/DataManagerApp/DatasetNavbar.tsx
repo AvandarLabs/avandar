@@ -76,7 +76,7 @@ export function DatasetNavbar({
   const elements = {
     emptyList() {
       return (
-        <Box ta="center">
+        <Box ta="center" py="md">
           <Text>No datasets added yet</Text>
         </Box>
       );
