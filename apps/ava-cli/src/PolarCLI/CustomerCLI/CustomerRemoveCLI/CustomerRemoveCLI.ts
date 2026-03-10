@@ -4,8 +4,9 @@ import {
   printInfo,
   printSuccess,
   printWarn,
-} from "../../../utils/cliOutput";
-import { createPolarCLIClient, getItemsFromListPage } from "../../PolarClient";
+} from "../../../utils/cliOutput/cliOutput";
+import { createPolarCLIClient } from "../../PolarClient/createPolarCLIClient";
+import { getItemsFromListPage } from "../../PolarClient/listUtils";
 
 type PolarCustomer = Readonly<{
   id: string;

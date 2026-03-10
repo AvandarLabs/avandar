@@ -1,6 +1,6 @@
 import * as path from "node:path";
 import { Acclimate } from "@avandar/acclimate";
-import { isPascalCase } from "../../../utils/validators/isPascalCase";
+import { isPascalCase } from "../../../utils/validators/isPascalCase/isPascalCase";
 import { writeBasicModelBoilerplate } from "./writeBasicModelBoilerplate";
 import { writeSupabaseModelBoilerplate } from "./writeSupabaseModelBoilerplate";
 

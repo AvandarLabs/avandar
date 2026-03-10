@@ -1,7 +1,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { Acclimate } from "@avandar/acclimate";
-import { writeFileFromTemplate } from "../../../utils/writeFileFromTemplate";
+import { writeFileFromTemplate } from "../../../utils/writeFileFromTemplate/writeFileFromTemplate";
 import {
   EDGE_FUNCTION_DENO_TEMPLATE_PATH,
   PACKAGES_DIR,
@@ -13,6 +13,7 @@ import {
 const PROJECT_ROOT = process.cwd();
 const TSCONFIG_PATH = "tsconfig.base.json";
 const DENO_JSON_PATH = "deno.json";
+const VITE_CONFIG_PATH = "vite.config.ts";
 
 /**
  * Writes all boilerplate files for a new package and
@@ -64,7 +65,11 @@ export function writeNewPackageBoilerplate(options: {
   const alias = `@avandar/${packageName}`;
   const aliasTarget = `./packages/${packageName}/src/index.ts`;
 
-  const edgeFunctionAliasTarget = `../../../packages/${packageName}/src/index.ts`;
+  const edgeFunctionAliasTarget =
+    `../../../packages/${packageName}/src/index.ts`;
+
+  const viteAliasTarget =
+    `/packages/${packageName}/src/index.ts`;
 
   const packageDir = `./packages/${packageName}`;
 
@@ -79,6 +84,10 @@ export function writeNewPackageBoilerplate(options: {
     aliasTarget: edgeFunctionAliasTarget,
   });
   _addVscodeDenoEnablePath(packageDir);
+  _addViteConfigAlias({
+    alias,
+    aliasTarget: viteAliasTarget,
+  });
 
   Acclimate.log(`|green|Created package in: ${outputDir}`);
   Acclimate.log(`|green|Registered alias: ${alias}`);
@@ -268,4 +277,48 @@ function _addEdgeFunctionTemplateImportAlias(options: {
     JSON.stringify(config, undefined, 2) + "\n",
     "utf8",
   );
+}
+
+function _addViteConfigAlias(options: {
+  alias: string;
+  aliasTarget: string;
+}): void {
+  const filePath = path.join(PROJECT_ROOT, VITE_CONFIG_PATH);
+
+  if (!fs.existsSync(filePath)) {
+    return;
+  }
+
+  const content = fs.readFileSync(filePath, "utf8");
+
+  if (content.includes(`"${options.alias}"`)) {
+    Acclimate.log(
+      `|yellow|vite.config.ts already has alias ` +
+        `"${options.alias}", skipping.`,
+    );
+    return;
+  }
+
+  const lines = content.split("\n");
+  let lastAvandarIndex = -1;
+  lines.forEach((line, index) => {
+    if (line.includes("@avandar/")) {
+      lastAvandarIndex = index;
+    }
+  });
+
+  if (lastAvandarIndex === -1) {
+    Acclimate.log(
+      "|yellow|Could not find @avandar aliases in " +
+        "vite.config.ts, skipping.",
+    );
+    return;
+  }
+
+  const newLine =
+    `        "${options.alias}": ` +
+    `"${options.aliasTarget}",`;
+  lines.splice(lastAvandarIndex + 1, 0, newLine);
+
+  fs.writeFileSync(filePath, lines.join("\n"), "utf8");
 }

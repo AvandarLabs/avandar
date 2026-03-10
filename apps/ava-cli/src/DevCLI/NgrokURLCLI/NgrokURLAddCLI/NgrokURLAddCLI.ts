@@ -1,5 +1,5 @@
 import { Acclimate } from "@avandar/acclimate";
-import { printError, printInfo, printSuccess } from "../../../utils/cliOutput";
+import { printError, printInfo, printSuccess } from "../../../utils/cliOutput/cliOutput";
 import { sendNgrokURLManagerRequest } from "../sendNgrokURLManagerRequest";
 
 /**

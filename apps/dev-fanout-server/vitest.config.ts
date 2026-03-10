@@ -8,6 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       $: resolve(configDir, "../../shared"),
+      "@avandar/utils": resolve(configDir, "../../packages/utils/src/index.ts"),
     },
   },
   test: {

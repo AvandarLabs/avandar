@@ -4,13 +4,13 @@ import {
   printInfo,
   printSuccess,
   printWarn,
-} from "../../../utils/cliOutput";
+} from "../../../utils/cliOutput/cliOutput";
+import { createPolarCLIClient } from "../../PolarClient/createPolarCLIClient";
 import {
-  createPolarCLIClient,
   getFreeProduct,
   getOrCreateCustomerByEmail,
   hasSubscriptionForProduct,
-} from "../../PolarClient";
+} from "../../PolarClient/polarHelpers";
 
 /**
  * Create a test customer and subscribe them to the Free plan.

@@ -1,7 +1,7 @@
 import { Acclimate } from "@avandar/acclimate";
-import { CustomerCreateCLI } from "./CustomerCreateCLI";
-import { CustomerListCLI } from "./CustomerListCLI";
-import { CustomerRemoveCLI } from "./CustomerRemoveCLI";
+import { CustomerCreateCLI } from "./CustomerCreateCLI/CustomerCreateCLI";
+import { CustomerListCLI } from "./CustomerListCLI/CustomerListCLI";
+import { CustomerRemoveCLI } from "./CustomerRemoveCLI/CustomerRemoveCLI";
 
 /** A CLI for managing Polar customers. */
 export const CustomerCLI = Acclimate.createCLI("customer")

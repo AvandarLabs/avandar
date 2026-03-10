@@ -1,5 +1,5 @@
 import { Acclimate } from "@avandar/acclimate";
-import { SupabaseRunCLI } from "./SupabaseRunCLI";
+import { SupabaseRunCLI } from "./SupabaseRunCLI/SupabaseRunCLI";
 
 /** A CLI for managing Avandar's Supabase database. */
 export const SupabaseCLI = Acclimate.createCLI("supabase")

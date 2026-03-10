@@ -1,1 +1,0 @@
-export { isKebabCase } from "./isKebabCase";

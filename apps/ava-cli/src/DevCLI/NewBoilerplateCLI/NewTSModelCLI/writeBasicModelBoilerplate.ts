@@ -1,5 +1,5 @@
 import { Acclimate } from "@avandar/acclimate";
-import { writeFileFromTemplate } from "../../../utils/writeFileFromTemplate";
+import { writeFileFromTemplate } from "../../../utils/writeFileFromTemplate/writeFileFromTemplate";
 import { TEMPLATES_DIR } from "./constants";
 
 export function writeBasicModelBoilerplate(options: {

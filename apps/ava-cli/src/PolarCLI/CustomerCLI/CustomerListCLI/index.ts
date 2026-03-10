@@ -1,1 +1,0 @@
-export { CustomerListCLI } from "./CustomerListCLI";

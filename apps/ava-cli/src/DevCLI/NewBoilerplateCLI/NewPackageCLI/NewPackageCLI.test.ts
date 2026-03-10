@@ -2,7 +2,7 @@ import * as fs from "node:fs";
 import { Acclimate } from "@avandar/acclimate";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../../../utils/writeFileFromTemplate", () => {
+vi.mock("../../../utils/writeFileFromTemplate/writeFileFromTemplate", () => {
   return {
     writeFileFromTemplate: vi.fn(),
   };
@@ -128,7 +128,7 @@ describe("writeNewPackageBoilerplate", () => {
 
   it("calls writeFileFromTemplate for each file", async () => {
     const { writeFileFromTemplate } =
-      await import("../../../utils/writeFileFromTemplate");
+      await import("../../../utils/writeFileFromTemplate/writeFileFromTemplate");
     const { writeNewPackageBoilerplate } =
       await import("./writeNewPackageBoilerplate");
 

@@ -1,5 +1,5 @@
 import { Acclimate } from "@avandar/acclimate";
-import { isKebabCase } from "../../../utils/validators/isKebabCase";
+import { isKebabCase } from "../../../utils/validators/isKebabCase/isKebabCase";
 import { writeNewPackageBoilerplate } from "./writeNewPackageBoilerplate";
 
 /** CLI for scaffolding a new workspace package. */
