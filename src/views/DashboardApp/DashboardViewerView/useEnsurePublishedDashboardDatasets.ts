@@ -1,9 +1,9 @@
+import { useQuery } from "@avandar/react-query";
 import { useMemo } from "react";
 import { extractDatasetIdsFromDashboardConfig } from "@/clients/dashboards/extractDatasetIdsFromDashboardConfig";
 import { LocalPublicDatasetRawDataClient } from "@/clients/datasets/LocalPublicDatasetRawDataClient";
-import { useQuery } from "@/lib/hooks/query/useQuery";
-import type { Dashboard } from "@/models/Dashboard/Dashboard.types";
-import type { DatasetId } from "@/models/datasets/Dataset";
+import type { Dashboard } from "$/models/Dashboard/Dashboard.types";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 /**
  * Ensures all published dataset dependencies for a dashboard are loaded into

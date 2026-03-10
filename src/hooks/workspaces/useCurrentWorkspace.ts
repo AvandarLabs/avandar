@@ -1,10 +1,10 @@
+import { propEq } from "@avandar/utils";
 import { useNavigate } from "@tanstack/react-router";
-import { Logger } from "$/lib/Logger/Logger";
+import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppLinks } from "@/config/AppLinks";
-import { propEq } from "@/lib/utils/objects/higherOrderFuncs";
-import { WorkspaceWithSubscription } from "@/models/Workspace/Workspace.types";
-import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 import { WorkspaceRootRouteAPI } from "@/routes/_auth/$workspaceSlug/route";
+import { Logger } from "@/utils/Logger";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
  * Get the current workspace.
@@ -12,7 +12,7 @@ import { WorkspaceRootRouteAPI } from "@/routes/_auth/$workspaceSlug/route";
  * within `/_auth/$workspaceSlug/`)
  * @returns The current workspace
  */
-export function useCurrentWorkspace(): WorkspaceWithSubscription {
+export function useCurrentWorkspace(): Workspace.WithSubscription {
   const { workspaceSlug } = WorkspaceRootRouteAPI.useParams();
   const workspaceFromRoute = WorkspaceRootRouteAPI.useLoaderData();
   const [userWorkspaces, _, { isFetching, isSuccess }] =

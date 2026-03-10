@@ -1,6 +1,6 @@
 import { Stack } from "@mantine/core";
-import { ReactNode } from "react";
 import { DescriptionListItem } from "./DescriptionListItem";
+import type { ReactNode } from "react";
 
 type Props = {
   /** Children should be `DescriptionListItem` components */

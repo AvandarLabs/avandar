@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { removeItem } from "./index";
+import { removeItem } from "./removeItem";
 
 describe("removeItem", () => {
   it("removes the value at the provided index", () => {

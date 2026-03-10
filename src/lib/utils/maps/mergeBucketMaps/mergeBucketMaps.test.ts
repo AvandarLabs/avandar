@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { mergeBucketMaps } from "./mergeBucketMaps";
 
 describe("mergeBucketMaps", () => {

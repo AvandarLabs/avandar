@@ -1,10 +1,9 @@
+import { notifyDevAlert, notifySuccess } from "@avandar/ui";
 import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconWorld } from "@tabler/icons-react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
-import { notifySuccess } from "@/lib/ui/notifications/notify";
-import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
-import type { DashboardId } from "@/models/Dashboard/Dashboard.types";
+import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 
 type Props = {
   dashboardId: DashboardId | undefined;

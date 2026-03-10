@@ -2,7 +2,7 @@ import { execSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
-import { toPascalCase } from "$/lib/utils/strings/toPascalCase";
+import { toPascalCase } from "@avandar/utils";
 import { program } from "commander";
 import prettier from "prettier";
 import { z } from "zod";
@@ -124,7 +124,7 @@ function processTemplate(templatePath: string, routePath: string): string {
  * Gets the project root directory
  */
 function getProjectRoot(): string {
-  return execSync("npm run -s util:get-project-root", {
+  return execSync("pnpm -s util:get-project-root", {
     encoding: "utf-8",
   }).trim();
 }
@@ -193,7 +193,7 @@ async function createRouteFile(
 
 function setupCLI() {
   program
-    .name("npm run new:route --")
+    .name("pnpm new:route --")
     .description(
       `${YELLOW}Create a new route in src/routes/
 

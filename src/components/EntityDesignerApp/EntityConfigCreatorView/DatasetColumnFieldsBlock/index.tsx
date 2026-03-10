@@ -1,3 +1,4 @@
+import { identity, prop, propEq } from "@avandar/utils";
 import {
   ActionIcon,
   Box,
@@ -14,6 +15,7 @@ import {
   IconCircleNumber1Filled,
   IconCircleNumber2Filled,
 } from "@tabler/icons-react";
+import { makeObject } from "$/lib/objects/builders";
 import { useCallback, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnPickerList } from "@/components/common/DatasetColumnPickerList";
@@ -21,23 +23,20 @@ import { useMap } from "@/lib/hooks/state/useMap";
 import { Callout } from "@/lib/ui/Callout";
 import { SegmentedControl } from "@/lib/ui/inputs/SegmentedControl";
 import { makeSegmentedControlItems } from "@/lib/ui/inputs/SegmentedControl/makeSegmentedControlItems";
-import { removeItemWhere } from "@/lib/utils/arrays/removeItemWhere";
-import { identity } from "@/lib/utils/misc";
-import { makeObject } from "@/lib/utils/objects/builders";
-import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
-import { DatasetWithColumns } from "@/models/datasets/Dataset";
-import {
-  DatasetColumn,
-  DatasetColumnId,
-} from "@/models/datasets/DatasetColumn";
-import { EntityConfigId } from "@/models/EntityConfig/EntityConfig.types";
-import { EntityFieldConfigId } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
+import { removeItemWhere } from "@/lib/utils/arrays/removeItemWhere/removeItemWhere";
 import {
   EntityConfigFormType,
   makeDefaultDatasetColumnField,
 } from "../entityConfigFormTypes";
 import { DatasetColumnExtractorCreator } from "./DatasetColumnExtractorCreator";
 import { IDConfigBlock } from "./IDConfigBlock";
+import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
+import type {
+  DatasetColumn,
+  DatasetColumnId,
+} from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
+import type { EntityFieldConfigId } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 
 type Props = {
   entityConfigForm: EntityConfigFormType;

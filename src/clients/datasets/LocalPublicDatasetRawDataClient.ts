@@ -1,14 +1,15 @@
-import { isDefined } from "$/lib/utils/guards/isDefined";
-import { BaseClient, createBaseClient } from "@/lib/clients/BaseClient";
-import { WithLogger, withLogger } from "@/lib/clients/withLogger";
-import { WithQueryHooks } from "@/lib/clients/withQueryHooks/types";
-import { withQueryHooks } from "@/lib/clients/withQueryHooks/withQueryHooks";
+import { createServiceClient } from "@avandar/clients";
+import { withLogger } from "@avandar/logger";
+import { WithQueryHooks, withQueryHooks } from "@avandar/react-query";
+import { isDefined } from "@avandar/utils";
 import { promiseMap } from "@/lib/utils/promises";
 import { DuckDBClient } from "../DuckDBClient";
 import { LocalPublicDatasetClient } from "./LocalPublicDatasetClient";
-import type { DashboardId } from "@/models/Dashboard/Dashboard.types";
-import type { DatasetId } from "@/models/datasets/Dataset";
-import type { LocalPublicDataset } from "@/models/datasets/LocalPublicDataset";
+import type { LocalPublicDataset } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
+import type { ServiceClient } from "@avandar/clients";
+import type { WithLogger } from "@avandar/logger";
+import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 type LocalPublicDatasetRawDataClientMutations = {
   /**
@@ -24,8 +25,9 @@ type LocalPublicDatasetRawDataClientMutations = {
   }) => Promise<{ loadedDatasetIds: readonly DatasetId[] }>;
 };
 
-type ILocalPublicDatasetRawQueryClient = BaseClient &
-  LocalPublicDatasetRawDataClientMutations;
+type ILocalPublicDatasetRawQueryClient =
+  ServiceClient<"LocalPublicDatasetRawQueryClient"> &
+    LocalPublicDatasetRawDataClientMutations;
 
 function createLocalPublicDatasetRawQueryClient(): WithLogger<
   WithQueryHooks<
@@ -34,7 +36,7 @@ function createLocalPublicDatasetRawQueryClient(): WithLogger<
     "loadDatasetsToMemory"
   >
 > {
-  const baseClient = createBaseClient("LocalPublicDatasetRawQuery");
+  const baseClient = createServiceClient("LocalPublicDatasetRawQueryClient");
 
   return withLogger(baseClient, (clientLogger) => {
     const mutations: LocalPublicDatasetRawDataClientMutations = {
@@ -91,7 +93,7 @@ function createLocalPublicDatasetRawQueryClient(): WithLogger<
     };
 
     return withQueryHooks(
-      { ...baseClient, ...mutations } as ILocalPublicDatasetRawQueryClient,
+      { ...baseClient, ...mutations },
       {
         queryFns: [],
         mutationFns: ["loadDatasetsToMemory"],

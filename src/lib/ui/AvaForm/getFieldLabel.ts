@@ -1,4 +1,4 @@
-import { camelToTitleCase } from "@/lib/utils/strings/transformations";
+import { camelToTitleCase } from "$/lib/strings/transformations";
 import type { BaseFormFieldSchema, ValidBaseValueType } from "./AvaForm.types";
 
 export function getFieldLabel<

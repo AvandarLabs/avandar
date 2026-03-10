@@ -1,8 +1,9 @@
+import { makeBucketMap, where } from "@avandar/utils";
 import { useUncontrolled } from "@mantine/hooks";
-import { where } from "$/lib/utils/filters/filters";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
 import {
@@ -12,12 +13,10 @@ import {
   SelectProps,
 } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { makeBucketMap } from "@/lib/utils/maps/makeBucketMap";
-import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
-import {
+import type {
   QueryDataSource,
   QueryDataSourceId,
-} from "@/models/queries/QueryDataSource/QueryDataSource.types";
+} from "$/models/queries/QueryDataSource/QueryDataSource.types";
 
 type Props = {
   value?: QueryDataSource | null;

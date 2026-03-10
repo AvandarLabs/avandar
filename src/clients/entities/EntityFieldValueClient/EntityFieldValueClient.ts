@@ -1,39 +1,38 @@
-import { ILogger } from "$/lib/Logger/Logger";
-import { RegistryOfArrays } from "$/lib/types/utilityTypes";
-import { where } from "$/lib/utils/filters/filters";
-import { isDefined } from "$/lib/utils/guards/isDefined";
-import { objectEntries } from "$/lib/utils/objects/objectEntries/objectEntries";
-import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
+import { createServiceClient } from "@avandar/clients";
+import { withLogger } from "@avandar/logger";
+import { withQueryHooks, WithQueryHooks } from "@avandar/react-query";
+import {
+  assertIsDefined,
+  isDefined,
+  objectEntries,
+  objectKeys,
+  prop,
+  where,
+} from "@avandar/utils";
+import { makeBucketRecord, makeIdLookupRecord } from "$/lib/objects/builders";
+import { wrapString } from "$/lib/strings/higherOrderFuncs";
+import { uuid } from "$/lib/uuid";
 import { match } from "ts-pattern";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
-import { BaseClient, createBaseClient } from "@/lib/clients/BaseClient";
-import { WithLogger, withLogger } from "@/lib/clients/withLogger";
-import { WithQueryHooks } from "@/lib/clients/withQueryHooks/types";
-import { withQueryHooks } from "@/lib/clients/withQueryHooks/withQueryHooks";
-import { assertIsDefined } from "@/lib/utils/asserts";
-import {
-  makeBucketRecord,
-  makeIdLookupRecord,
-} from "@/lib/utils/objects/builders";
-import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { promiseFlatMap, promiseMap } from "@/lib/utils/promises";
 import { makeSet } from "@/lib/utils/sets/builders";
 import { isInSet } from "@/lib/utils/sets/higherOrderFuncs";
-import { wrapString } from "@/lib/utils/strings/higherOrderFuncs";
-import { uuid } from "@/lib/utils/uuid";
-import { EntityId } from "@/models/entities/Entity";
-import { EntityConfigId } from "@/models/EntityConfig";
-import {
-  EntityFieldConfig,
-  EntityFieldConfigId,
-} from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
-import { EntityFieldValueExtractorRegistry } from "@/models/EntityConfig/ValueExtractor/types";
 import { DatasetColumnClient } from "../../datasets/DatasetColumnClient";
 import { DatasetRawDataClient } from "../../datasets/DatasetRawDataClient";
 import { singleton } from "../../DuckDBClient/queryResultHelpers";
 import { EntityClient } from "../EntityClient";
 import { getEntityFieldValues } from "./getEntityFieldValues/getEntityFieldValues";
-import type { EntityFieldValue } from "@/models/entities/EntityFieldValue";
+import type { ServiceClient } from "@avandar/clients";
+import type { ILogger, WithLogger } from "@avandar/logger";
+import type { RegistryOfArrays } from "@avandar/utils";
+import type { EntityId } from "$/models/entities/Entity/Entity.types";
+import type { EntityFieldValue } from "$/models/entities/EntityFieldValue/EntityFieldValue.types";
+import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
+import type {
+  EntityFieldConfig,
+  EntityFieldConfigId,
+} from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
+import type { EntityFieldValueExtractorRegistry } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types";
 
 type EntityFieldValueClientQueries = {
   getAllEntityFieldValues: (params: {
@@ -47,7 +46,7 @@ type EntityFieldValueClientQueries = {
   }) => Promise<EntityFieldValue[]>;
 };
 
-export type IEntityFieldValueClient = BaseClient &
+export type IEntityFieldValueClient = ServiceClient &
   EntityFieldValueClientQueries;
 
 function createEntityFieldValueClient(): WithLogger<
@@ -57,7 +56,7 @@ function createEntityFieldValueClient(): WithLogger<
     never
   >
 > {
-  const baseClient = createBaseClient("DatasetRawData");
+  const baseClient = createServiceClient("DatasetRawDataClient");
   return withLogger(baseClient, (baseLogger: ILogger) => {
     const queries = {
       getAllEntityFieldValues: async (params: {

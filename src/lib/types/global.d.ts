@@ -1,4 +1,4 @@
-import { GooglePickerAPI } from "./google-picker";
+import type { GooglePickerAPI } from "./google-picker";
 
 declare global {
   interface Window {

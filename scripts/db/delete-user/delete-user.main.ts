@@ -1,9 +1,9 @@
 import { stdin as input, stdout as output } from "node:process";
 import { createInterface } from "node:readline/promises";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { loadProductionEnv } from "~/scripts/utils/loadProductionEnv";
 import { Database } from "$/types/database.types";
 import { program } from "commander";
+import { loadProductionEnv } from "scripts/utils/loadProductionEnv";
 import { z } from "zod";
 import { createSupabaseAdminClient } from "@/db/supabase/AvaSupabase";
 
@@ -20,7 +20,7 @@ const CLIOptionSchema = z.object({
 
 function setupCLI() {
   program
-    .name("npm run db:delete-user --")
+    .name("pnpm db:delete-user --")
     .description("Delete a user from Supabase by email")
     .requiredOption("--email <email>", "Email address of the user to delete")
     .option(

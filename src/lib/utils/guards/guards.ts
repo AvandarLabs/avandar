@@ -1,8 +1,7 @@
-import { UnknownObject } from "$/lib/types/common";
-import { isArray } from "$/lib/utils/guards/isArray";
-import { SetFieldType, SetRequired, Simplify } from "type-fest";
-import type { SetDefined } from "../../../../shared/lib/types/utilityTypes";
-import type { Model } from "@/models/Model";
+import { isArray } from "@avandar/utils";
+import type { Model } from "@avandar/models";
+import type { UnknownObject } from "@avandar/utils";
+import type { SetFieldType, SetRequired, Simplify } from "type-fest";
 
 /**
  * Returns a predicate that is true if any of the predicates are true.
@@ -21,19 +20,6 @@ export function or<T, Predicates extends Array<(value: any) => value is any>>(
   return predicates.some((predicate) => {
     return predicate(value);
   });
-}
-
-export function isPrimitive(
-  value: unknown,
-): value is string | number | bigint | boolean | symbol | undefined | null {
-  return (
-    typeof value === "string" ||
-    typeof value === "number" ||
-    typeof value === "boolean" ||
-    typeof value === "symbol" ||
-    typeof value === "undefined" ||
-    value === null
-  );
 }
 
 /**
@@ -59,32 +45,6 @@ export function hasPropKeys<T extends UnknownObject, Key extends keyof T>(
   }
   return properties.every((prop) => {
     return prop in obj;
-  });
-}
-
-/**
- * Checks if `obj` has all the properties in `properties` and that they are
- * not undefined.
- *
- * NOTE: this guard only works properly for strictly defined objects and keys
- * as literals. For objects with indexers or keys as broad strings, you should
- * do a manual check instead of using this guard.
- *
- * NOTE: this still allows `null` values. This literally just checks that it's
- * not `undefined`.
- *
- * @param obj - The object to check.
- * @param properties - The properties to check.
- * @returns `true` if `obj` has all the properties in `properties` and that
- * they are not undefined, `false` otherwise.
- */
-export function hasDefinedProps<T extends object, Key extends keyof T>(
-  obj: T,
-  properties: Extract<Key, string> | readonly Key[],
-): obj is SetRequired<T, Key> & SetDefined<T, Key> {
-  const props = typeof properties === "string" ? [properties] : properties;
-  return props.every((prop) => {
-    return prop in obj && obj[prop] !== undefined;
   });
 }
 
@@ -122,7 +82,10 @@ export function isEmptyArray<T>(
  * @param modelType - The model type to check.
  * @returns `true` if `value` is a model of the given type, `false` otherwise.
  */
-export function isOfModelType<M extends Model<string>, MType extends string>(
+export function isOfModelType<
+  M extends Model.Base<string>,
+  MType extends string,
+>(
   modelType: MType,
   value: M | null | undefined,
 ): value is Simplify<M & SetFieldType<M, "__type", MType>> {

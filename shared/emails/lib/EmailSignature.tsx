@@ -1,4 +1,4 @@
-import { capitalize } from "$/lib/utils/strings/capitalize/capitalize.ts";
+import { capitalize } from "@avandar/utils";
 import { EmailParagraph } from "./EmailParagraph.tsx";
 
 type Props = {

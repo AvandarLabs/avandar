@@ -6,7 +6,7 @@ import {
   BasicPlanConfig,
   FreePlanConfig,
   PremiumPlanConfig,
-} from "./FeaturePlansConfig";
+} from "../../shared/config/FeaturePlansConfig";
 
 // TODO(jpsyx): split this up into individually exported consts
 type AppConfigType = {

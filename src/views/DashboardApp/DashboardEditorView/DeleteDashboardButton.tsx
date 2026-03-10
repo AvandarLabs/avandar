@@ -1,11 +1,10 @@
+import { notifyDevAlert, notifySuccess } from "@avandar/ui";
 import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconTrash } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
-import { notifySuccess } from "@/lib/ui/notifications/notify";
-import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
-import type { DashboardId } from "@/models/Dashboard/Dashboard.types";
+import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 
 type Props = {
   workspaceSlug: string;

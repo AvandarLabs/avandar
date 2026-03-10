@@ -1,9 +1,14 @@
-import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
-import { EntityParsers } from "@/models/entities/Entity/EntityParsers";
+import { createSupabaseCRUDClient } from "@avandar/clients";
+import { EntityParsers } from "$/models/entities/Entity/EntityParsers";
+import { AvaSupabase } from "@/db/supabase/AvaSupabase";
+import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 
-export const EntityClient = createSupabaseCRUDClient({
-  modelName: "Entity",
-  tableName: "entities",
-  dbTablePrimaryKey: "id",
-  parsers: EntityParsers,
-});
+export const EntityClient = createUsableServiceClient(
+  createSupabaseCRUDClient({
+    dbClient: AvaSupabase.DB,
+    modelName: "Entity",
+    tableName: "entities",
+    dbTablePrimaryKey: "id",
+    parsers: EntityParsers,
+  }),
+);

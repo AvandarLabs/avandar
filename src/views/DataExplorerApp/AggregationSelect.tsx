@@ -1,10 +1,10 @@
+import { propIsInArray } from "@avandar/utils";
 import { useUncontrolled } from "@mantine/hooks";
+import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { useMemo } from "react";
 import { Select, SelectOption, SelectProps } from "@/lib/ui/inputs/Select";
-import { propIsInArray } from "@/lib/utils/objects/higherOrderFuncs";
-import { AvaDataType } from "@/models/datasets/AvaDataType";
-import { AvaDataTypes } from "@/models/datasets/AvaDataType/AvaDataTypes";
-import { QueryAggregationType } from "@/models/queries/QueryAggregationType";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.types";
+import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
 
 type Props = {
   dataType: AvaDataType;

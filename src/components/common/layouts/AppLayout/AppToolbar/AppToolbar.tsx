@@ -1,7 +1,7 @@
 import { Box, Group, Title } from "@mantine/core";
 import { ReactNode } from "react";
 import { mantineColorVar } from "@/lib/utils/browser/css";
-import { NavbarDesktopToggle } from "./NavbarDesktopToggle";
+import { NavbarDesktopToggle } from "./NavbarDesktopToggle/NavbarDesktopToggle";
 
 type Props = {
   children?: ReactNode;

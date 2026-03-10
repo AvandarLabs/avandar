@@ -1,22 +1,21 @@
+import { notifyError } from "@avandar/ui";
+import { MIMEType, where } from "@avandar/utils";
 import Uppy from "@uppy/core";
 import Tus from "@uppy/tus";
-import { MIMEType } from "$/lib/types/common";
-import { where } from "$/lib/utils/filters/filters";
 import { AuthClient } from "@/clients/AuthClient";
 import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
-import { notifyError } from "@/lib/ui/notifications/notify";
-import { DatasetId } from "@/models/datasets/Dataset";
-import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { DatasetUploadProgressStore } from "./DatasetUploadProgressStore";
 import {
   DIRECT_UPLOAD_MAX_BYTES,
   getDatasetParquetStoragePath,
   WORKSPACES_BUCKET_NAME,
 } from "./utils";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 async function _getTusHeaders(): Promise<Record<string, string>> {
   const session = await AuthClient.getCurrentSession();
@@ -38,7 +37,7 @@ async function _getTusHeaders(): Promise<Record<string, string>> {
 }
 
 async function _resumableParquetBlobUpload(options: {
-  workspaceId: WorkspaceId;
+  workspaceId: Workspace.Id;
   datasetId: DatasetId;
   parquetBlob: Blob;
 }): Promise<void> {
@@ -103,7 +102,7 @@ async function _resumableParquetBlobUpload(options: {
  * resumability.
  */
 async function _oneShotParquetBlobUpload(options: {
-  workspaceId: WorkspaceId;
+  workspaceId: Workspace.Id;
   datasetId: DatasetId;
   parquetBlob: Blob;
 }): Promise<void> {
@@ -129,7 +128,7 @@ async function _oneShotParquetBlobUpload(options: {
  * For now, we only allow one-shot uploads.
  */
 async function _uploadDatasetToSupabase(options: {
-  workspaceId: WorkspaceId;
+  workspaceId: Workspace.Id;
   datasetId: DatasetId;
   parquetBlob: Blob;
 }): Promise<void> {
@@ -193,7 +192,7 @@ async function _uploadDatasetToSupabase(options: {
  * @returns A promise that resolves when the dataset upload is complete.
  */
 export async function startDatasetUpload(options: {
-  workspaceId: WorkspaceId;
+  workspaceId: Workspace.Id;
   datasetId: DatasetId;
 }): Promise<void> {
   const { datasetId } = options;

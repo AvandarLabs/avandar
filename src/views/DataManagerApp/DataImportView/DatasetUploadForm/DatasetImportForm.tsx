@@ -1,3 +1,5 @@
+import { useMutation } from "@avandar/react-query";
+import { notifyError, notifySuccess } from "@avandar/ui";
 import {
   Button,
   Checkbox,
@@ -8,19 +10,17 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useNavigate } from "@tanstack/react-router";
-import { UnknownObject } from "$/lib/types/common";
 import { useMemo, useState } from "react";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { Callout } from "@/lib/ui/Callout";
-import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
-import { Dataset } from "@/models/datasets/Dataset";
-import { DetectedDatasetColumn } from "@/models/datasets/DatasetColumn";
+import type { UnknownObject } from "@avandar/utils";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset.types";
+import type { DetectedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 
 export type DatasetImportFormValues = {
   name: string;

@@ -1,6 +1,6 @@
 import { BarChart as MantineBarChart } from "@mantine/charts";
 import { useMemo } from "react";
-import { XYChartProps } from "./ChartTypes";
+import type { XYChartProps } from "./ChartTypes";
 
 export function BarChart({
   data,

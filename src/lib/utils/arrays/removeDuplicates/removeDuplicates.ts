@@ -13,7 +13,7 @@
  */
 export function removeDuplicates<T>(
   array: readonly T[],
-  { hashFn }: { hashFn?: (item: T) => unknown },
+  { hashFn }: { hashFn?: (item: T) => unknown } = {},
 ): T[] {
   const addedItems = new Map<unknown, T>();
 

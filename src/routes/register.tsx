@@ -1,3 +1,5 @@
+import { useMutation } from "@avandar/react-query";
+import { notifyError, notifySuccess } from "@avandar/ui";
 import {
   Anchor,
   Box,
@@ -29,11 +31,9 @@ import { AuthFooter } from "@/components/common/AuthLayout/AuthFooter";
 import { BackToLoginLink } from "@/components/common/AuthLayout/BackToLoginLink";
 import { WAITLIST_URL } from "@/config/AppConfig";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
-import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
-import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,

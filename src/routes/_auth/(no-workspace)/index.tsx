@@ -1,9 +1,9 @@
+import { isNonEmptyArray } from "@avandar/utils";
 import { Container, Paper, Stack, Title } from "@mantine/core";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { isNonEmptyArray } from "$/lib/utils/guards/isNonEmptyArray/isNonEmptyArray";
+import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { CreateWorkspaceForm } from "@/components/common/forms/CreateWorkspaceForm";
 import { AppLinks } from "@/config/AppLinks";
-import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
 /**
  * This is the `/` root page. We already checked if the user is logged in

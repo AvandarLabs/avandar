@@ -4,7 +4,7 @@ import {
   IconLayoutSidebarLeftExpand,
 } from "@tabler/icons-react";
 import { AppShellStateManager } from "@/lib/ui/AppShell/AppShellStateManager";
-import { AvaTooltip } from "@/lib/ui/AvaTooltip";
+import { AvaTooltip } from "@/lib/ui/AvaTooltip/AvaTooltip";
 
 /**
  * Toggle icon to control the navbar

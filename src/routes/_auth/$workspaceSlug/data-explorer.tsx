@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DataExplorerApp } from "@/views/DataExplorerApp";
+import { DataExplorerApp } from "@/views/DataExplorerApp/DataExplorerApp";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug/data-explorer")({
   component: RouteComponent,

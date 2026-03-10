@@ -1,3 +1,4 @@
+import process from "node:process";
 import { isDenoRuntime } from "./isDenoRuntime.ts";
 import { isNodeRuntime } from "./isNodeRuntime.ts";
 import { isViteBrowserRuntime } from "./isViteBrowserRuntime.ts";

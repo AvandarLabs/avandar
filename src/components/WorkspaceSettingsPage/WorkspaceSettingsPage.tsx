@@ -1,12 +1,12 @@
+import { notifyError, notifySuccess } from "@avandar/ui";
 import { Container, Stack, Title } from "@mantine/core";
+import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
-import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
-import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
-import { AppLayout } from "../common/layouts/AppLayout";
-import { WorkspaceBillingView } from "./WorkspaceBillingView";
-import { WorkspaceUsersForm } from "./WorkspaceUsersForm";
+import { AppLayout } from "../common/layouts/AppLayout/AppLayout";
+import { WorkspaceBillingView } from "./WorkspaceBillingView/WorkspaceBillingView";
+import { WorkspaceUsersForm } from "./WorkspaceUsersForm/WorkspaceUsersForm";
 
 export function WorkspaceSettingsPage(): JSX.Element {
   const workspace = useCurrentWorkspace();

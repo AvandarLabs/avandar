@@ -44,7 +44,7 @@ supabase start && supabase migration up
 # Generate types if required
 if [ "$GEN_TYPES" = true ]; then
   echo "Generating TypeScript types..."
-  npm run db:gen-types
+  pnpm db:gen-types
 fi
 
 echo "Migrations applied successfully."

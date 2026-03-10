@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { WorkspaceSettingsPage } from "@/components/WorkspaceSettingsPage";
+import { WorkspaceSettingsPage } from "@/components/WorkspaceSettingsPage/WorkspaceSettingsPage";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug/settings")({
   component: WorkspaceSettingsPage,

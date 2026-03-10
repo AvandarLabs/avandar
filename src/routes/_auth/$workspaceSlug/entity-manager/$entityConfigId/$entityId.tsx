@@ -4,15 +4,15 @@ import {
   ErrorComponentProps,
   notFound,
 } from "@tanstack/react-router";
-import { Logger } from "$/lib/Logger/Logger";
+import { uuid } from "$/lib/uuid";
 import { useEffect } from "react";
 import { EntityClient } from "@/clients/entities/EntityClient";
+import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { SingleEntityView } from "@/components/EntityManagerApp/SingleEntityView";
 import { Callout } from "@/lib/ui/Callout";
-import { uuid } from "@/lib/utils/uuid";
-import { Entity } from "@/models/entities/Entity";
-import { EntityConfig } from "@/models/EntityConfig/EntityConfig.types";
-import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
+import { Logger } from "@/utils/Logger";
+import type { Entity } from "$/models/entities/Entity/Entity.types";
+import type { EntityConfig } from "$/models/EntityConfig/EntityConfig.types";
 
 export const Route = createFileRoute(
   "/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId",

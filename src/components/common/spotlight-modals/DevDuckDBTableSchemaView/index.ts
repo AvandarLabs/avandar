@@ -1,1 +1,0 @@
-export { DevDuckDBTableSchemaView } from "./DevDuckDBTableSchemaView";

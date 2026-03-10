@@ -1,3 +1,4 @@
+import { makeBucketMap, prop } from "@avandar/utils";
 import {
   Box,
   BoxProps,
@@ -7,14 +8,15 @@ import {
   Text,
   useMantineTheme,
 } from "@mantine/core";
+import { Datasets } from "$/models/datasets/Dataset/Datasets";
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
-import { makeBucketMap } from "@/lib/utils/maps/makeBucketMap";
-import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { Dataset, DatasetId } from "@/models/datasets/Dataset";
-import { Datasets } from "@/models/datasets/Dataset/Datasets";
+import type {
+  Dataset,
+  DatasetId,
+} from "$/models/datasets/Dataset/Dataset.types";
 
 type Props = {
   datasets: Dataset[];

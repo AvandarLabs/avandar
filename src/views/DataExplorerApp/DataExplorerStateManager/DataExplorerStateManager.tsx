@@ -1,16 +1,22 @@
-import { makeObject } from "@/lib/utils/objects/builders";
-import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { setValue } from "@/lib/utils/objects/setValue";
+import { prop, setValue } from "@avandar/utils";
+import { makeObject } from "$/lib/objects/builders";
+import { StructuredQueries } from "$/models/queries/StructuredQuery/StructuredQueries";
+import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager";
-import { QueryAggregationType } from "@/models/queries/QueryAggregationType";
-import { QueryColumn, QueryColumnId } from "@/models/queries/QueryColumn";
-import { QueryDataSource } from "@/models/queries/QueryDataSource";
-import {
+import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
+import type {
+  QueryColumn,
+  QueryColumnId,
+} from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
+import type {
   OrderByDirection,
   PartialStructuredQuery,
-} from "@/models/queries/StructuredQuery";
-import { StructuredQueries } from "@/models/queries/StructuredQuery/StructuredQueries";
-import { VizConfig, VizConfigs, VizType } from "@/models/vizs/VizConfig";
+} from "$/models/queries/StructuredQuery/StructuredQuery.types";
+import type {
+  VizConfig,
+  VizType,
+} from "$/models/vizs/VizConfig/VizConfig.types";
 
 type DataExplorerAppState = {
   query: PartialStructuredQuery;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { difference } from "./index";
+import { difference } from "./difference";
 
 describe("difference", () => {
   it("removes every occurrence found in the second array", () => {

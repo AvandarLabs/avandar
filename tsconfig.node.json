@@ -1,45 +1,17 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "target": "ES2022",
     "lib": ["ESNext"],
-    "module": "ESNext",
-    "skipLibCheck": true,
     "typeRoots": ["./node_modules/@types"],
-    "paths": {
-      "$/*": ["./shared/*"],
-      "~/*": ["./*"]
-    },
-
-    /* Bundler mode */
-    "allowImportingTsExtensions": true,
-    "incremental": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "moduleDetection": "force",
-    "moduleResolution": "bundler",
-
-    /* Linting */
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noUncheckedIndexedAccess": true,
-    "noUncheckedSideEffectImports": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "strict": true,
-
-    /* Additional features */
-    "experimentalDecorators": true,
-    "resolveJsonModule": true
+    "incremental": true
   },
   "include": [
     "vite.config.ts",
     ".ava/**/*.ts",
-    "packages/dev-fanout-server/src/**/*.ts",
-    "packages/dev-fanout-server/vitest.config.ts",
-    "packages/ava-cli/src/**/*.ts"
+    "apps/dev-fanout-server/src/**/*.ts",
+    "apps/ava-cli/src/**/*.ts"
   ],
   "exclude": ["supabase/functions"]
 }

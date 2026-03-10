@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 import { NavbarLinks } from "@/config/NavbarLinks";
-import { AppShell } from "@/lib/ui/AppShell";
+import { AppShell } from "@/lib/ui/AppShell/AppShell";
 import { WorkspaceLayout } from "./WorkspaceLayout";
 
 type Props = {

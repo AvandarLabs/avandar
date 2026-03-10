@@ -1,10 +1,10 @@
+import { propPasses } from "@avandar/utils";
+import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { useMemo } from "react";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { propPasses } from "@/lib/utils/objects/higherOrderFuncs";
-import { AvaDataTypes } from "@/models/datasets/AvaDataType";
-import { QueryResultColumn } from "@/models/queries/QueryResult/QueryResult.types";
-import { ScatterPlotVizConfig } from "@/models/vizs/ScatterPlotVizConfig";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types";
 
 type Props = {
   fields: readonly QueryResultColumn[];

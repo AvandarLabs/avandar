@@ -1,8 +1,6 @@
-import { UnknownObject } from "$/lib/types/common";
-import { StringKeyOf } from "$/lib/types/utilityTypes";
-import { FormattableTimezone } from "$/lib/utils/dates/formatDate/formatDate";
-import { ReactNode } from "react";
-import { registryKeys } from "@/lib/utils/objects/misc";
+import { registry, StringKeyOf } from "@avandar/utils";
+import type { FormattableTimezone, UnknownObject } from "@avandar/utils";
+import type { ReactNode } from "react";
 
 export type ObjectKeyTransformationType = "camel-to-title-case" | "none";
 
@@ -81,19 +79,19 @@ export type PrimitiveValueRenderOptions<
   dateTimeZone?: FormattableTimezone;
 };
 
-export const PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS = registryKeys<
+export const PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS = registry<
   keyof PrimitiveValueRenderOptions<unknown, GenericRootData>
->({
-  asDate: true,
-  renderValue: true,
-  renderEmptyString: true,
-  renderNullString: true,
-  renderUndefinedString: true,
-  renderBooleanTrue: true,
-  renderBooleanFalse: true,
-  dateFormat: true,
-  dateTimeZone: true,
-});
+>().keys(
+  "asDate",
+  "renderValue",
+  "renderEmptyString",
+  "renderNullString",
+  "renderUndefinedString",
+  "renderBooleanTrue",
+  "renderBooleanFalse",
+  "dateFormat",
+  "dateTimeZone",
+);
 
 /**
  * A mapping of object keys to their render options.

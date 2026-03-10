@@ -1,3 +1,4 @@
+import { useMutation } from "@avandar/react-query";
 import {
   Box,
   Burger,
@@ -23,18 +24,18 @@ import { useNavigate, useRouter } from "@tanstack/react-router";
 import { APP_NAME } from "$/config/AppConfig";
 import { clsx } from "clsx";
 import { AuthClient } from "@/clients/AuthClient";
-import { BetaBadge } from "@/components/common/BetaBadge";
+import { WorkspaceClient } from "@/clients/WorkspaceClient";
+import { BetaBadge } from "@/components/common/BetaBadge/BetaBadge";
 import { CreateWorkspaceForm } from "@/components/common/forms/CreateWorkspaceForm";
-import { AppLink, AppLinks } from "@/config/AppLinks";
-import { NavbarLink } from "@/config/NavbarLinks";
+import { AppLinks } from "@/config/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
-import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { Link } from "@/lib/ui/links/Link";
-import { WorkspaceWithSubscription } from "@/models/Workspace/Workspace.types";
-import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 import { Logo } from "../Logo";
 import css from "./Navbar.module.css";
+import type { AppLink } from "@/config/AppLinks";
+import type { NavbarLink } from "@/config/NavbarLinks";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 type Props = {
   isMobileNavbarOpened: boolean;
@@ -47,7 +48,7 @@ type Props = {
 
   /** Utility links go on the bottom of the navbar */
   utilityLinks: readonly NavbarLink[];
-  currentWorkspace?: WorkspaceWithSubscription;
+  currentWorkspace?: Workspace.WithSubscription;
 };
 
 export function Navbar({

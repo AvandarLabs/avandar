@@ -1,1 +1,0 @@
-export { DataManagerApp } from "./DataManagerApp";

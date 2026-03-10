@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export function isNotEqualTo<FormValue, TestValue extends FormValue>(
   testValue: TestValue,

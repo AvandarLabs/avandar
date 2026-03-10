@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { RootLayout } from "@/components/common/layouts/RootLayout";
+import { RootLayout } from "@/components/common/layouts/RootLayout/RootLayout";
 
 export const Route = createFileRoute("/_auth/(no-workspace)")({
   component: RouteComponent,

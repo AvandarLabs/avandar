@@ -1,6 +1,6 @@
 import { Container, Stack, Text, Title } from "@mantine/core";
 import { ReactNode } from "react";
-import { Paper } from "@/lib/ui/Paper";
+import { Paper } from "@/lib/ui/Paper/Paper";
 
 type Props = {
   title: string;

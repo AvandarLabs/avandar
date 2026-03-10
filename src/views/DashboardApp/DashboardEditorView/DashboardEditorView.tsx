@@ -1,14 +1,13 @@
 import { Data, Puck } from "@puckeditor/core";
 import "@puckeditor/core/puck.css";
+import { notifyDevAlert, notifySuccess } from "@avandar/ui";
 import { Flex } from "@mantine/core";
+import { createInitialDashboardPuckData } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
-import { AppLayout } from "@/components/common/layouts/AppLayout";
-import { notifySuccess } from "@/lib/ui/notifications/notify";
-import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
+import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
 import { DeleteDashboardButton } from "./DeleteDashboardButton";
 import {
-  createInitialDashboardPuckData,
   getDashboardPuckConfig,
   getDashboardTitleFromPuckData,
 } from "./getDashboardPuckConfig";
@@ -21,7 +20,7 @@ import type { AvaPageData } from "./AvaPage.types";
 import type {
   Dashboard,
   DashboardId,
-} from "@/models/Dashboard/Dashboard.types";
+} from "$/models/Dashboard/Dashboard.types";
 
 type Props = {
   dashboard: Dashboard | undefined;

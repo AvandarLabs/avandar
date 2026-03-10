@@ -1,7 +1,7 @@
 import { Button } from "@mantine/core";
 import { IconEye } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import type { DashboardId } from "@/models/Dashboard/Dashboard.types";
+import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 
 type Props = {
   workspaceSlug: string;

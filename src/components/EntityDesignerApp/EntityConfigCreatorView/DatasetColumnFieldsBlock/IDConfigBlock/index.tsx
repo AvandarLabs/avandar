@@ -1,13 +1,11 @@
+import { isDefined, prop, where } from "@avandar/utils";
 import { Box, Group, Loader, Stack, Text } from "@mantine/core";
-import { where } from "$/lib/utils/filters/filters";
-import { isDefined } from "$/lib/utils/guards/isDefined";
+import { makeObject } from "$/lib/objects/builders";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { makeObject } from "@/lib/utils/objects/builders";
-import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { EntityConfigFormType } from "../../entityConfigFormTypes";
+import type { EntityConfigFormType } from "../../entityConfigFormTypes";
 
 type Props = {
   entityConfigForm: EntityConfigFormType;

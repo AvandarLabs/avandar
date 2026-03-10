@@ -1,1 +1,0 @@
-export { NewSupabaseTableCLI } from "./NewSupabaseTableCLI";

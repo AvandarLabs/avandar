@@ -1,2 +1,0 @@
-export { CustomerCreateCLI } from "./CustomerCreateCLI";
-

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { partition } from "./index";
+import { partition } from "./partition";
 
 describe("partition", () => {
   it("partitions values according to the predicate", () => {

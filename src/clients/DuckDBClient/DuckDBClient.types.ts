@@ -1,5 +1,6 @@
-import { UUID } from "$/lib/types/common";
-import { DuckDBDataType } from "./DuckDBDataType";
+import type { DuckDBDataType } from "./DuckDBDataType.types";
+import type { DuckDBQueryAggregationType } from "./DuckDBQueryAggregations";
+import type { UUID } from "@avandar/utils";
 
 /**
  * The CSV Reject Scans Table returns the following information:
@@ -169,13 +170,6 @@ export type DuckDBCSVSniffResult = {
    */
   table_name: string;
 };
-
-export type DuckDBQueryAggregationType =
-  | "sum"
-  | "avg"
-  | "count"
-  | "max"
-  | "min";
 
 export type DuckDBStructuredQuery = {
   tableName: string;

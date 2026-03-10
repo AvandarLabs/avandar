@@ -1,7 +1,10 @@
-import { Paths } from "type-fest";
-import { FormType } from "@/lib/hooks/ui/useForm";
 import { Select, SelectOption, SelectProps } from "../../inputs/Select";
-import { GenericFormSchemaRecord, ValuesOfFieldRecord } from "../AvaForm.types";
+import type {
+  GenericFormSchemaRecord,
+  ValuesOfFieldRecord,
+} from "../AvaForm.types";
+import type { FormType } from "@/lib/hooks/ui/useForm";
+import type { Paths } from "type-fest";
 
 type Props<
   FieldKey extends string,

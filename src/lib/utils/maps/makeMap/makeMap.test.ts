@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-
 import { makeMap } from "./makeMap";
 
 describe("makeMap", () => {
@@ -28,11 +27,17 @@ describe("makeMap", () => {
         return `${item.firstName}:${item.lastName}`;
       },
       valueFn: (item) => {
-        return { fullName: `${item.firstName} ${item.lastName}`, age: item.age };
+        return {
+          fullName: `${item.firstName} ${item.lastName}`,
+          age: item.age,
+        };
       },
     });
 
-    expect(result.get("Alice:Smith")).toEqual({ fullName: "Alice Smith", age: 30 });
+    expect(result.get("Alice:Smith")).toEqual({
+      fullName: "Alice Smith",
+      age: 30,
+    });
     expect(result.get("Bob:Jones")).toEqual({ fullName: "Bob Jones", age: 28 });
   });
 

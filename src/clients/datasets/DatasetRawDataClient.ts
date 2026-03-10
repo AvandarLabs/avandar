@@ -1,29 +1,27 @@
-import { ILogger, Logger } from "$/lib/Logger/Logger";
-import { UnknownDataFrame } from "$/lib/types/common";
-import { where } from "$/lib/utils/filters/filters";
-import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
+import { createServiceClient } from "@avandar/clients";
+import { withLogger } from "@avandar/logger";
+import { WithQueryHooks, withQueryHooks } from "@avandar/react-query";
+import { notifyDevAlert } from "@avandar/ui";
+import { objectKeys, prop, propEq, where } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { AuthClient } from "@/clients/AuthClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { BaseClient, createBaseClient } from "@/lib/clients/BaseClient";
-import { WithLogger, withLogger } from "@/lib/clients/withLogger";
-import {
-  WithQueryHooks,
-  withQueryHooks,
-} from "@/lib/clients/withQueryHooks/withQueryHooks";
-import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
-import { difference } from "@/lib/utils/arrays/difference";
-import { partition } from "@/lib/utils/arrays/partition";
-import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
+import { difference } from "@/lib/utils/arrays/difference/difference";
+import { partition } from "@/lib/utils/arrays/partition/partition";
 import { promiseMap, promiseReduce } from "@/lib/utils/promises";
-import { DatasetId } from "@/models/datasets/Dataset";
-import { QueryResult } from "@/models/queries/QueryResult/QueryResult.types";
-import { UserId } from "@/models/User/User.types";
-import { DuckDBClient, UnknownRow } from "../DuckDBClient";
-import { DuckDBStructuredQuery } from "../DuckDBClient/DuckDBClient.types";
+import { Logger } from "@/utils/Logger";
+import { DuckDBClient } from "../DuckDBClient";
 import { DuckDBDataTypeUtils } from "../DuckDBClient/DuckDBDataType";
 import { scalar, singleton } from "../DuckDBClient/queryResultHelpers";
 import { LocalDatasetClient } from "./LocalDatasetClient";
+import type { UnknownRow } from "../DuckDBClient";
+import type { DuckDBStructuredQuery } from "../DuckDBClient/DuckDBClient.types";
+import type { ServiceClient } from "@avandar/clients";
+import type { ILogger, WithLogger } from "@avandar/logger";
+import type { UnknownDataFrame } from "@avandar/utils";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
+import type { UserId } from "$/models/User/User.types";
 
 type TextFieldSummary = {
   type: "text";
@@ -168,7 +166,7 @@ type DatasetRawDataClientQueries = {
   }) => Promise<UnknownDataFrame>;
 };
 
-export type IDatasetRawDataClient = BaseClient & DatasetRawDataClientQueries;
+export type IDatasetRawDataClient = ServiceClient & DatasetRawDataClientQueries;
 
 /**
  * Creates a client to query a dataset's raw data.
@@ -182,7 +180,7 @@ function createDatasetRawDataClient(): WithLogger<
     never
   >
 > {
-  const baseClient = createBaseClient("DatasetRawData");
+  const baseClient = createServiceClient("DatasetRawDataClient");
 
   /**
    * Loads the given datasets to an in-memory DuckDB instance.

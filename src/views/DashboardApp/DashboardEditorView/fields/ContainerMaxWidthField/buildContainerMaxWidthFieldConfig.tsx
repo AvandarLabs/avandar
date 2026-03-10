@@ -1,5 +1,5 @@
+import { constant } from "@avandar/utils";
 import { CustomField } from "@puckeditor/core";
-import { constant } from "$/lib/utils/constant/constant";
 import { AvaPageFieldProps } from "../../AvaPage.types";
 import {
   ContainerMaxWidthField,

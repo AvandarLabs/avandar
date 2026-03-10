@@ -1,7 +1,7 @@
 import { Box, Flex, MantineTheme } from "@mantine/core";
 import { Outlet } from "@tanstack/react-router";
-import { EntityConfig } from "@/models/EntityConfig/EntityConfig.types";
 import { EntityNavbar } from "./EntityNavbar";
+import type { EntityConfig } from "$/models/EntityConfig/EntityConfig.types";
 
 type Props = {
   entityConfig: EntityConfig;

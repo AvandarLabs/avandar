@@ -1,6 +1,10 @@
 {
   "imports": {
     "$/": "../../../shared/",
+    "@avandar/utils": "../../../packages/utils/src/index.ts",
+    "@avandar/logger": "../../../packages/logger/src/index.ts",
+    "@avandar/models": "../../../packages/models/src/index.ts",
+    "@avandar/modules": "../../../packages/modules/src/index.ts",
     "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
     "googleapis": "npm:googleapis@154",
     "zod": "npm:zod@4"

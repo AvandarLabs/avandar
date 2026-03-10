@@ -1,16 +1,16 @@
+import { Model } from "@avandar/models";
+import { notifyError } from "@avandar/ui";
 import { ActionIcon, ColorInput, Flex, Popover, Stack } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import { IconFilter } from "@tabler/icons-react";
+import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
-import { AvaTooltip } from "@/lib/ui/AvaTooltip";
-import { notifyError } from "@/lib/ui/notifications/notify";
+import { AvaTooltip } from "@/lib/ui/AvaTooltip/AvaTooltip";
 import { mantineColorVar, mantineVar } from "@/lib/utils/browser/css";
-import { Models } from "@/models/Model/Models";
-import { QueryColumn } from "@/models/queries/QueryColumn";
-import { QueryColumns } from "@/models/queries/QueryColumn/QueryColumns";
-import { QueryDataSource } from "@/models/queries/QueryDataSource";
 import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect";
 import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 
 type Props = {
   selectedDataSource?: QueryDataSource;
@@ -93,7 +93,7 @@ export function QueryFormContainer({
               placeholder="Select latitude column"
               dataSourceId={
                 selectedDataSource ?
-                  Models.getTypedId(selectedDataSource)
+                  Model.getTypedId(selectedDataSource)
                 : undefined
               }
               value={latitudeColumn ?? null}
@@ -107,7 +107,7 @@ export function QueryFormContainer({
               placeholder="Select longitude column"
               dataSourceId={
                 selectedDataSource ?
-                  Models.getTypedId(selectedDataSource)
+                  Model.getTypedId(selectedDataSource)
                 : undefined
               }
               value={longitudeColumn ?? null}
@@ -121,7 +121,7 @@ export function QueryFormContainer({
               placeholder="Select symbol size column"
               dataSourceId={
                 selectedDataSource ?
-                  Models.getTypedId(selectedDataSource)
+                  Model.getTypedId(selectedDataSource)
                 : undefined
               }
               value={symbolSizeColumn ?? null}

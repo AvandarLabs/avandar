@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { TextareaForm } from "@/lib/ui/singleton-forms/TextareaForm/TextareaForm";
 import { mantineColorVar } from "@/lib/utils/browser/css";
-import { DataExplorerStateManager } from "../DataExplorerStateManager";
+import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useNLPQuery } from "./useNLPQuery";
 
 export function LLMQueryForm(): JSX.Element {

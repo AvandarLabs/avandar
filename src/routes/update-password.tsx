@@ -1,10 +1,10 @@
+import { useMutation } from "@avandar/react-query";
 import { Button, Loader, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
-import { useMutation } from "@/lib/hooks/query/useMutation";
 
 export const Route = createFileRoute("/update-password")({
   component: UpdatePasswordPage,

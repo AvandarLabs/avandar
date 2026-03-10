@@ -26,7 +26,7 @@ cd "$PROJECT_ROOT" || exit 1
 # Check if concurrently is available
 if ! command -v concurrently &> /dev/null; then
   echo "Error: concurrently is not installed"
-  echo "Please install it with: npm install -D concurrently"
+  echo "Please install it with: pnpm add -D concurrently"
   exit 1
 fi
 

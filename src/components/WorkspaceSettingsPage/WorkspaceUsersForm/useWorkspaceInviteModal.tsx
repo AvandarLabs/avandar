@@ -1,19 +1,18 @@
+import { useMutation } from "@avandar/react-query";
+import { notifySuccess } from "@avandar/ui";
 import { Stack, Text } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
+import { Workspace } from "$/models/Workspace/Workspace";
 import { useRef } from "react";
 import { APIClient } from "@/clients/APIClient";
+import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { useFeaturePlanType } from "@/hooks/workspaces/useCurrentSubscriptionType";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useMutation } from "@/lib/hooks/query/useMutation";
-import { AvaForm } from "@/lib/ui/AvaForm";
 import { AvaField } from "@/lib/ui/AvaForm/AvaField";
+import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
 import { AvaFormRef } from "@/lib/ui/AvaForm/AvaForm.types";
-import { notifySuccess } from "@/lib/ui/notifications/notify";
-import { WorkspaceRole } from "@/models/Workspace/Workspace.types";
-import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
-import { Workspaces } from "@/models/Workspace/Workspaces";
-import { WorkspaceBillingView } from "../WorkspaceBillingView";
+import { WorkspaceBillingView } from "../WorkspaceBillingView/WorkspaceBillingView";
 
 export function useWorkspaceInviteModal({
   numberOfSeats,
@@ -23,17 +22,17 @@ export function useWorkspaceInviteModal({
   const featurePlanType = useFeaturePlanType();
   const workspace = useCurrentWorkspace();
   const formRef =
-    useRef<AvaFormRef<{ email: string; role: WorkspaceRole }>>(null);
+    useRef<AvaFormRef<{ email: string; role: Workspace.Role }>>(null);
   const [inviteEmail] = useMutation({
     mutationFn: (variables: {
-      workspaceSlug: string;
+      workspaceId: Workspace.Id;
       email: string;
-      role: WorkspaceRole;
+      role: Workspace.Role;
     }) => {
       return APIClient.post({
-        route: "workspaces/:workspaceSlug/invite",
+        route: "workspaces/:workspaceId/invite",
         pathParams: {
-          workspaceSlug: variables.workspaceSlug,
+          workspaceId: variables.workspaceId,
         },
         body: {
           emailToInvite: variables.email,
@@ -58,7 +57,7 @@ export function useWorkspaceInviteModal({
           confirmProps: { loading: true },
         });
         await inviteEmail.async({
-          workspaceSlug: workspace.slug,
+          workspaceId: workspace.id,
           email,
           role,
         });
@@ -76,7 +75,7 @@ export function useWorkspaceInviteModal({
     }
 
     if (
-      !Workspaces.Features.canInviteMoreUsers({
+      !Workspace.Features.canInviteMoreUsers({
         workspace,
         numSeatsInWorkspace: numberOfSeats,
       })

@@ -1,1 +1,0 @@
-export { parseTemplate } from "./parseTemplate";

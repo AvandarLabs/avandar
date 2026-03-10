@@ -1,8 +1,6 @@
+import { formatDate, isDate, isValidDateValue } from "@avandar/utils";
 import { Text } from "@mantine/core";
-import { formatDate } from "$/lib/utils/dates/formatDate";
-import { isDate } from "$/lib/utils/guards/isDate";
-import { isValidDateValue } from "$/lib/utils/guards/isValidDateValue";
-import { formatNumber } from "@/lib/utils/formatters/formatNumber";
+import { formatNumber } from "@/lib/utils/formatters/formatNumber/formatNumber";
 import { isStringOrNumber } from "./guards";
 import type {
   GenericRootData,

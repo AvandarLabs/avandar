@@ -1,15 +1,14 @@
+import { useQuery } from "@avandar/react-query";
+import { propEq, where } from "@avandar/utils";
 import { Loader, Stack, Text } from "@mantine/core";
-import { where } from "$/lib/utils/filters/filters";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
+import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useQuery } from "@/lib/hooks/query/useQuery";
-import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
-import { propEq } from "@/lib/utils/objects/higherOrderFuncs";
+import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList";
 import { promiseMap } from "@/lib/utils/promises";
-import { DatasetId } from "@/models/datasets/Dataset";
-import { EntityConfigId } from "@/models/EntityConfig";
-import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
 
 export function DevDuckDBTableSchemaView(): JSX.Element {
   const workspace = useCurrentWorkspace();

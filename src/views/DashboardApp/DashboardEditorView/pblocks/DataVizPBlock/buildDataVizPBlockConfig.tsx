@@ -1,8 +1,8 @@
 import { ComponentConfig } from "@puckeditor/core";
-import { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import { buildNLQueryFieldConfig } from "../../fields/NLQueryField/buildNLQueryFieldConfig";
 import { DataVizPBlock } from "./DataVizPBlock";
 import type { DataVizPBlockProps } from "./DataVizPBlock";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 const defaultProps: DataVizPBlockProps = {
   nlQuery: {
@@ -14,7 +14,7 @@ const defaultProps: DataVizPBlockProps = {
 
 export function buildDataVizPBlockConfig(_options: {
   dashboardTitle: string;
-  workspaceId: WorkspaceId | undefined;
+  workspaceId: Workspace.Id | undefined;
 }): ComponentConfig<DataVizPBlockProps> {
   return {
     label: "DataViz",

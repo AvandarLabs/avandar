@@ -1,1 +1,0 @@
-export { ManualUploadView } from "./ManualUploadView";

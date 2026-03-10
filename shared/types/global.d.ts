@@ -1,4 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import "react";
+import process from "node:process";
+
+console.log(process);
 
 declare global {
   /**
@@ -17,7 +21,6 @@ declare global {
     DEV: boolean;
     PROD: boolean;
     SSR: boolean;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
   }
 

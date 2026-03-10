@@ -1,4 +1,11 @@
 import {
+  isNonEmptyArray,
+  objectEntries,
+  prop,
+  propEq,
+  where,
+} from "@avandar/utils";
+import {
   Button,
   Divider,
   Flex,
@@ -8,9 +15,7 @@ import {
   Title,
 } from "@mantine/core";
 import { usePrevious, useUncontrolled } from "@mantine/hooks";
-import { where } from "$/lib/utils/filters/filters";
-import { isNonEmptyArray } from "$/lib/utils/guards/isNonEmptyArray/isNonEmptyArray";
-import { objectEntries } from "$/lib/utils/objects/objectEntries/objectEntries";
+import { makeBucketRecord } from "$/lib/objects/builders";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
@@ -22,14 +27,12 @@ import {
   SegmentedControlProps,
 } from "@/lib/ui/inputs/SegmentedControl";
 import { makeSegmentedControlItems } from "@/lib/ui/inputs/SegmentedControl/makeSegmentedControlItems";
-import { makeBucketRecord } from "@/lib/utils/objects/builders";
-import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
-import {
+import type {
   Dataset,
   DatasetId,
   DatasetWithColumns,
-} from "@/models/datasets/Dataset";
-import { DatasetColumnId } from "@/models/datasets/DatasetColumn";
+} from "$/models/datasets/Dataset/Dataset.types";
+import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 
 type Props = {
   /**

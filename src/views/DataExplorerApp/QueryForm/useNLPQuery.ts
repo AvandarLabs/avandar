@@ -1,9 +1,9 @@
-import { where } from "$/lib/utils/filters/filters";
+import { useMutation } from "@avandar/react-query";
+import { where } from "@avandar/utils";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { useMutation } from "@/lib/hooks/query/useMutation";
-import type { UseMutationResultTuple } from "@/lib/hooks/query/useMutation";
-import type { WorkspaceId } from "@/models/Workspace/Workspace.types";
+import type { UseMutationResultTuple } from "@avandar/react-query";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 type UseNLPQueryVariables = {
   prompt: string;
@@ -13,7 +13,7 @@ export function useNLPQuery({
   workspaceId,
   onSuccess,
 }: {
-  workspaceId: WorkspaceId;
+  workspaceId: Workspace.Id;
   onSuccess: (sql: string, mutationVars: UseNLPQueryVariables) => void;
 }): UseMutationResultTuple<string, UseNLPQueryVariables> {
   return useMutation({

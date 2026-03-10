@@ -68,11 +68,11 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
       }),
   },
 
-  "/:workspaceSlug/invite": {
+  "/:workspaceId/invite": {
     POST: POST({
-      path: "/:workspaceSlug/invite",
+      path: "/:workspaceId/invite",
       schema: {
-        workspaceSlug: z.string(),
+        workspaceId: z.uuid(),
       },
     })
       .bodySchema({
@@ -81,7 +81,7 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
       })
       .action(
         async ({
-          pathParams: { workspaceSlug },
+          pathParams: { workspaceId },
           body: { emailToInvite, role },
           supabaseClient,
           supabaseAdminClient,
@@ -91,7 +91,7 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
           const { data: workspace } = await supabaseClient
             .from("workspaces")
             .select("name, id, slug")
-            .eq("slug", workspaceSlug)
+            .eq("id", workspaceId)
             .single()
             .throwOnError();
 
@@ -311,5 +311,17 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
           return { invite: updatedInvite, membership, profile, role };
         },
       ),
+  },
+  "/:workspaceId/features": {
+    GET: GET({
+      path: "/:workspaceId/features",
+      schema: {
+        workspaceId: z.uuid(),
+      },
+    }).action(({ pathParams: { workspaceId }, supabaseAdminClient }) => {
+      console.log("workspaceId", workspaceId);
+      console.log("supabaseAdminClient", supabaseAdminClient);
+      return { features: [] };
+    }),
   },
 });

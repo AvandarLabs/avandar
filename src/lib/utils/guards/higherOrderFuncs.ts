@@ -1,6 +1,6 @@
-import { Model } from "@/models/Model";
-import { SetFieldType, Simplify } from "type-fest";
 import { isOfModelType } from "./guards";
+import type { Model } from "@avandar/models";
+import type { SetFieldType, Simplify } from "type-fest";
 
 /**
  * Returns a function that checks if a value is equal to the given value.
@@ -18,11 +18,9 @@ export function valEq<T>(value: T): (v: unknown) => v is T {
  * @param value - The value to check.
  * @returns A function that checks if a value is not equal to a given value.
  */
-export function valNotEq<V>(
-  value: V,
-): <T>(v: T) => v is Exclude<T, V> {
+export function valNotEq<V>(value: V): <T>(v: T) => v is Exclude<T, V> {
   return <T>(v: T): v is Exclude<T, V> => {
-    return v !== value as unknown as T;
+    return v !== (value as unknown as T);
   };
 }
 
@@ -31,14 +29,12 @@ export function valNotEq<V>(
  * @param modelType - The model type to check.
  * @returns A function that checks if a value is a model of the given type.
  */
-export function valIsOfModelType<
-  MType extends string,
->(
+export function valIsOfModelType<MType extends string>(
   modelType: MType,
-): <M extends Model<string>>(
+): <M extends Model.Base<string>>(
   v: M | null | undefined,
 ) => v is Simplify<M & SetFieldType<M, "__type", MType>> {
-  return <M extends Model<string>>(
+  return <M extends Model.Base<string>>(
     v: M | null | undefined,
   ): v is M & SetFieldType<M, "__type", MType> => {
     return isOfModelType(modelType, v);

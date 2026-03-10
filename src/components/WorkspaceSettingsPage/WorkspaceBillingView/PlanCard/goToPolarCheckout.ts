@@ -1,7 +1,7 @@
 import { APIClient } from "@/clients/APIClient";
 import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
-import { UserId } from "@/models/User/User.types";
-import { WorkspaceId } from "@/models/Workspace/Workspace.types";
+import type { UserId } from "$/models/User/User.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 export async function goToPolarCheckout({
   returnURL,
@@ -16,7 +16,7 @@ export async function goToPolarCheckout({
 }: {
   polarProductId: string;
   userId: UserId;
-  workspaceId: WorkspaceId;
+  workspaceId: Workspace.Id;
   returnURL: string;
 
   /**

@@ -1,5 +1,5 @@
-import type { DashboardId } from "@/models/Dashboard/Dashboard.types";
-import type { DatasetId } from "@/models/datasets/Dataset";
+import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 // Due to a Supabase bug we cannot use "public" as a bucket name, so
 // we use "published" instead.

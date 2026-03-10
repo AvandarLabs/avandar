@@ -10,15 +10,15 @@ import {
 } from "@mantine/core";
 import { IconDatabase, IconTable } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import { AppLayout } from "@/components/common/layouts/AppLayout";
+import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
-import { Paper } from "@/lib/ui/Paper";
+import { Paper } from "@/lib/ui/Paper/Paper";
 import { mantineColorVar } from "@/lib/utils/browser/css";
-import { WorkspaceWithSubscription } from "@/models/Workspace/Workspace.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 type Props = {
-  workspace: WorkspaceWithSubscription;
+  workspace: Workspace.WithSubscription;
 };
 
 export function WorkspaceHomeView({ workspace }: Props): JSX.Element {

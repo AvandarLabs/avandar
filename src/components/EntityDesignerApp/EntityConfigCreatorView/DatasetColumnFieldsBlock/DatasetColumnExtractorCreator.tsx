@@ -1,9 +1,9 @@
 import { Checkbox, Fieldset, Select, Stack, Tooltip } from "@mantine/core";
-import { FormType } from "@/lib/hooks/ui/useForm";
-import { matchLiteral } from "@/lib/utils/strings/matchLiteral";
-import { DatasetColumnValueExtractors } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractors";
+import { matchLiteral } from "$/lib/strings/matchLiteral";
+import { DatasetColumnValueExtractors } from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractors";
 import { EntityConfigCreatorStore } from "../EntityConfigCreatorStore";
-import { EntityConfigFormValues } from "../entityConfigFormTypes";
+import type { EntityConfigFormValues } from "../entityConfigFormTypes";
+import type { FormType } from "@/lib/hooks/ui/useForm";
 
 type Props = {
   entityConfigForm: FormType<EntityConfigFormValues>;

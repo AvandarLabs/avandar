@@ -1,6 +1,6 @@
 import { Grid, Text } from "@mantine/core";
-import { ReactNode } from "react";
 import css from "./DescriptionListItem.module.css";
+import type { ReactNode } from "react";
 
 type Props = {
   label: ReactNode;

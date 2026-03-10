@@ -1,5 +1,4 @@
-import { assertIsNonEmptyArray } from "$/lib/utils/guards/assertIsNonEmptyArray/assertIsNonEmptyArray.ts";
-import { isNonEmptyArray } from "$/lib/utils/guards/isNonEmptyArray/isNonEmptyArray.ts";
+import { assertIsNonEmptyArray, isNonEmptyArray } from "@avandar/utils";
 import { google } from "googleapis";
 import { string } from "zod";
 import { getGoogleAuthClient } from "../_shared/getGoogleAuthClient.ts";
@@ -62,13 +61,18 @@ export const Routes = defineRoutes<GoogleSheetsAPI>("google-sheets", {
 
         assertIsNonEmptyArray(sheets, "No sheets found");
 
+        const firstSpreadsheet = sheets[0];
+        if (!firstSpreadsheet) {
+          throw new Error("No spreadsheets found");
+        }
+
         // TODO(jpsyx): google API limits to only 10 MB of data
         // transferred per read request. We will need to handle pagination
         // for large sheets. Or simply return an error and say the sheet is
         // too large to connect to.
         const firstSheet = await SheetsAPI.spreadsheets.values.get({
           spreadsheetId: pathParams.id,
-          range: sheets[0].name,
+          range: firstSpreadsheet.name,
         });
 
         // TODO(jpsyx): we should look into caching (either with Redix or S3
@@ -76,7 +80,7 @@ export const Routes = defineRoutes<GoogleSheetsAPI>("google-sheets", {
         // avoid re-querying Google Sheets over and over again
         return {
           rows: firstSheet.data.values ?? [],
-          sheetName: sheets[0].name,
+          sheetName: firstSpreadsheet.name,
           spreadsheetName: spreadsheet.data.properties?.title ?? "",
           availableSheets: sheets,
         };

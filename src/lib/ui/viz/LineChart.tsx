@@ -1,6 +1,6 @@
 import { LineChart as MantineLineChart } from "@mantine/charts";
 import { useMemo } from "react";
-import { XYChartProps } from "./ChartTypes";
+import type { XYChartProps } from "./ChartTypes";
 
 export function LineChart({
   data,

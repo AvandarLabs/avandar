@@ -1,17 +1,17 @@
+import { objectKeys } from "@avandar/utils";
 import { List, Table, Text } from "@mantine/core";
-import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
 import { useMemo } from "react";
 import { CollapsibleItem } from "../CollapsibleItem";
 import { getOrderedKeys } from "../gerOrderedKeys/getOrderedKeys";
 import { getObjectKeyTransformFn } from "../getObjectKeyTransformFn";
-import {
+import { ValueItemContainer } from "../ValueItemContainer";
+import type {
   AnyDescribableValueRenderOptions,
   DescribableObject,
   GenericRootData,
   ObjectArrayRenderOptions,
   ObjectRenderOptions,
 } from "../ObjectDescriptionList.types";
-import { ValueItemContainer } from "../ValueItemContainer";
 
 const DEFAULT_EXCLUDE_KEYS_PATTERN = "_";
 

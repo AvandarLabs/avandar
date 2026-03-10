@@ -1,14 +1,13 @@
+import { prop } from "@avandar/utils";
 import { SegmentedControlItem } from "@mantine/core";
-import { Logger } from "$/lib/Logger/Logger";
-import { match } from "ts-pattern";
 import {
   BasicPlanConfig,
   FreePlanConfig,
   PremiumPlanConfig,
-} from "@/config/FeaturePlansConfig";
+} from "$/config/FeaturePlansConfig";
+import { match } from "ts-pattern";
 import { isOneOf } from "@/lib/utils/guards/guards";
-import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { SubscriptionsAPI } from "../../../../supabase/functions/subscriptions/subscriptions.types";
+import { Logger } from "@/utils/Logger";
 import {
   AnnualPaidSeatsPlan,
   FeaturePlan,
@@ -18,6 +17,7 @@ import {
   PaidPlanVariants,
   SubscriptionPlan,
 } from "./SubscriptionPlan.types";
+import type { SubscriptionsAPI } from "../../../../supabase/functions/subscriptions/subscriptions.types";
 
 type AvaPolarProduct =
   SubscriptionsAPI["subscriptions"]["/products"]["GET"]["returnType"]["products"][number];

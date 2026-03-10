@@ -17,15 +17,15 @@
         "npm:@duckdb/duckdb-wasm@1.30.0",
         "npm:@eslint/js@^9.21.0",
         "npm:@ianvs/prettier-plugin-sort-imports@^4.4.1",
-        "npm:@mantine/charts@^8.3.13",
-        "npm:@mantine/core@^8.3.13",
-        "npm:@mantine/dropzone@^8.3.13",
-        "npm:@mantine/form@^8.3.13",
-        "npm:@mantine/hooks@^8.3.13",
-        "npm:@mantine/modals@^8.3.13",
-        "npm:@mantine/notifications@^8.3.13",
-        "npm:@mantine/spotlight@^8.3.13",
-        "npm:@mantine/tiptap@^8.3.13",
+        "npm:@mantine/charts@^8.3.15",
+        "npm:@mantine/core@^8.3.15",
+        "npm:@mantine/dropzone@^8.3.15",
+        "npm:@mantine/form@^8.3.15",
+        "npm:@mantine/hooks@^8.3.15",
+        "npm:@mantine/modals@^8.3.15",
+        "npm:@mantine/notifications@^8.3.15",
+        "npm:@mantine/spotlight@^8.3.15",
+        "npm:@mantine/tiptap@^8.3.15",
         "npm:@nabla/vite-plugin-eslint@^2.0.5",
         "npm:@polar-sh/sdk@~0.41.5",
         "npm:@postgres-language-server/cli@0.19",
@@ -126,7 +126,7 @@
       ]
     },
     "members": {
-      "packages/ava-cli": {
+      "apps/ava-cli": {
         "packageJson": {
           "dependencies": [
             "npm:@avandar/acclimate@0.4",
@@ -137,7 +137,7 @@
           ]
         }
       },
-      "packages/dev-fanout-server": {
+      "apps/dev-fanout-server": {
         "packageJson": {
           "dependencies": [
             "npm:fastify@^5.6.0",

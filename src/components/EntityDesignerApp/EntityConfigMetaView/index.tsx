@@ -1,19 +1,19 @@
+import { notifySuccess } from "@avandar/ui";
+import { hasDefinedProps } from "@avandar/utils";
 import { Button, Container, Group, Stack, Text, Title } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { notifySuccess } from "@/lib/ui/notifications/notify";
-import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
-import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList.types";
-import { Paper } from "@/lib/ui/Paper";
-import { hasDefinedProps } from "@/lib/utils/guards/guards";
-import { EntityConfig } from "@/models/EntityConfig/EntityConfig.types";
-import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
+import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList";
+import { Paper } from "@/lib/ui/Paper/Paper";
 import { generateEntities } from "./generateEntities";
 import { useHydratedEntityConfig } from "./useHydratedEntityConfig";
+import type { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList.types";
+import type { EntityConfig } from "$/models/EntityConfig/EntityConfig.types";
 
 type Props = {
   entityConfig: EntityConfig;

@@ -1,79 +1,85 @@
-import { where } from "$/lib/utils/filters/filters";
-import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
+import { createSupabaseCRUDClient } from "@avandar/clients";
+import { objectKeys, prop, where } from "@avandar/utils";
+import { makeBucketRecord } from "$/lib/objects/builders";
+import { EntityFieldConfigParsers } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfigParsers";
 import { match } from "ts-pattern";
-import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
+import { DatasetColumnValueExtractorClient } from "@/clients/entity-configs/DatasetColumnValueExtractorClient";
+import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
-import { makeBucketRecord } from "@/lib/utils/objects/builders";
-import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import { promiseFlatMap } from "@/lib/utils/promises";
-import { EntityFieldConfig } from "../../models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
-import { EntityFieldConfigParsers } from "../../models/EntityConfig/EntityFieldConfig/EntityFieldConfigParsers";
-import { ManualEntryExtractorClient } from "../../models/EntityConfig/ValueExtractor/ManualEntryExtractor/ManualEntryExtractorClient";
-import {
+import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
+import { ManualEntryExtractorClient } from "../entity-configs/ManualEntryExtractorClient";
+import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
+import type {
   EntityFieldValueExtractor,
   ValueExtractorType,
-} from "../../models/EntityConfig/ValueExtractor/types";
-import { DatasetColumnValueExtractorClient } from "../entity-configs/DatasetColumnValueExtractorClient";
+} from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types";
 
-export const EntityFieldConfigClient = createSupabaseCRUDClient({
-  modelName: "EntityFieldConfig",
-  tableName: "entity_field_configs",
-  dbTablePrimaryKey: "id",
-  parsers: EntityFieldConfigParsers,
-  queries: ({ clientLogger }) => {
-    /**
-     * Given a list of entity field configs, fetch all the value extractors
-     * for those fields.
-     */
-    return {
-      getAllValueExtractors: async (params: {
-        fields: readonly EntityFieldConfig[] | undefined;
-      }): Promise<EntityFieldValueExtractor[]> => {
-        const logger = clientLogger.appendName("getAllValueExtractors");
-        const { fields: inputFields } = params;
-        if (!inputFields) {
-          return [];
-        }
-        const fields = removeDuplicates(inputFields, {
-          hashFn: prop("id"),
-        });
-        const fieldIds = fields.map(prop("id"));
+export const EntityFieldConfigClient = createUsableServiceClient(
+  createSupabaseCRUDClient({
+    dbClient: AvaSupabase.DB,
+    modelName: "EntityFieldConfig",
+    tableName: "entity_field_configs",
+    dbTablePrimaryKey: "id",
+    parsers: EntityFieldConfigParsers,
+    queries: ({ clientLogger }) => {
+      /**
+       * Given a list of entity field configs, fetch all the value extractors
+       * for those fields.
+       */
+      return {
+        getAllValueExtractors: async (params: {
+          fields: readonly EntityFieldConfig[] | undefined;
+        }): Promise<EntityFieldValueExtractor[]> => {
+          const logger = clientLogger.appendName("getAllValueExtractors");
+          const { fields: inputFields } = params;
+          if (!inputFields) {
+            return [];
+          }
+          const fields = removeDuplicates(inputFields, {
+            hashFn: prop("id"),
+          });
+          const fieldIds = fields.map(prop("id"));
 
-        // Bucket each field by value extractor type, so we only query for
-        // the extractor types that we need
-        const fieldsByValueExtractorType = makeBucketRecord(fields, {
-          keyFn: prop("valueExtractorType"),
-        });
+          // Bucket each field by value extractor type, so we only query for
+          // the extractor types that we need
+          const fieldsByValueExtractorType = makeBucketRecord(fields, {
+            keyFn: prop("valueExtractorType"),
+          });
 
-        logger.log("Fetching value extractors for fields", {
-          fieldIds,
-        });
+          logger.log("Fetching value extractors for fields", {
+            fieldIds,
+          });
 
-        // Now make one query per extractor type
-        const valueExtractors = await promiseFlatMap(
-          objectKeys(fieldsByValueExtractorType),
-          async (
-            valueExtractorType: ValueExtractorType,
-          ): Promise<EntityFieldValueExtractor[]> => {
-            const extractors = await match(valueExtractorType)
-              .with("manual_entry", () => {
-                return ManualEntryExtractorClient.getAll(
-                  where("entity_field_config_id", "in", fieldIds),
-                );
-              })
-              .with("dataset_column_value", () => {
-                return DatasetColumnValueExtractorClient.getAll(
-                  where("entity_field_config_id", "in", fieldIds),
-                );
-              })
-              .exhaustive();
-            return extractors;
-          },
-        );
+          // Now make one query per extractor type
+          const valueExtractors = await promiseFlatMap(
+            objectKeys(fieldsByValueExtractorType),
+            async (
+              valueExtractorType: ValueExtractorType,
+            ): Promise<EntityFieldValueExtractor[]> => {
+              const extractors = await match(valueExtractorType)
+                .with("manual_entry", () => {
+                  return ManualEntryExtractorClient.getAll(
+                    where("entity_field_config_id", "in", fieldIds),
+                  );
+                })
+                .with("dataset_column_value", () => {
+                  return DatasetColumnValueExtractorClient.getAll(
+                    where("entity_field_config_id", "in", fieldIds),
+                  );
+                })
+                .exhaustive();
+              return extractors;
+            },
+          );
 
-        logger.log("Received value extractors", valueExtractors);
-        return valueExtractors;
-      },
-    };
+          logger.log("Received value extractors", valueExtractors);
+          return valueExtractors;
+        },
+      };
+    },
+  }),
+  {
+    queryFns: ["getAllValueExtractors"],
   },
-});
+);

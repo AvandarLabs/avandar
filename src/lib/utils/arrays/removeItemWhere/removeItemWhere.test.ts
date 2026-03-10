@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { removeItemWhere } from "./index";
+import { removeItemWhere } from "./removeItemWhere";
 
 describe("removeItemWhere", () => {
   it("removes the first item that matches the predicate", () => {

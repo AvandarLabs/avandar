@@ -1,11 +1,11 @@
-import { MIMEType } from "$/lib/types/common";
+import { MIMEType } from "@avandar/utils";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import {
   getPublicDatasetParquetStoragePath,
   PUBLIC_BUCKET_NAME,
 } from "./utils";
-import type { DashboardId } from "@/models/Dashboard/Dashboard.types";
-import type { DatasetId } from "@/models/datasets/Dataset";
+import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 /**
  * Uploads published dataset Parquet blobs to the `public` Supabase

@@ -5,7 +5,10 @@ import {
   isValidPaidPlanVariant,
   PAID_CHOICES,
 } from "../planUtils";
-import { FreePlanVariants, PaidPlanVariants } from "../SubscriptionPlan.types";
+import type {
+  FreePlanVariants,
+  PaidPlanVariants,
+} from "../SubscriptionPlan.types";
 
 type Props = {
   withHighlight?: boolean;

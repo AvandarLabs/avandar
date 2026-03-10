@@ -1,1 +1,0 @@
-export { isValidRedirectPath } from "./isValidRedirectPath";

@@ -1,14 +1,14 @@
+import { isDefined } from "@avandar/utils";
 import { Group, Loader, Stack, Text, Title } from "@mantine/core";
-import { isDefined } from "$/lib/utils/guards/isDefined";
 import { match } from "ts-pattern";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { BillingPortalButton } from "./BillingPortalButton/BillingPortalButton";
-import { PlanCard } from "./PlanCard";
-import {
+import { PlanCard } from "./PlanCard/PlanCard";
+import { useSubscriptionPlans } from "./useSubscriptionPlans";
+import type {
   SubscriptionPlan,
   SubscriptionPlanGroup,
 } from "./SubscriptionPlan.types";
-import { useSubscriptionPlans } from "./useSubscriptionPlans";
 
 type Props = {
   hideTitle?: boolean;

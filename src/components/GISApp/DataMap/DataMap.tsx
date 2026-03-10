@@ -2,14 +2,14 @@ import { Box, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import maplibregl, { Map as MapLibreMap } from "maplibre-gl";
 import { useEffect, useRef, useState } from "react";
-import { QueryColumn } from "@/models/queries/QueryColumn";
-import { QueryDataSource } from "@/models/queries/QueryDataSource";
 import { applyMapStyles } from "./applyMapStyles";
 import { GeometryDrawer } from "./GeometryDrawer";
 import { MapStylePicker } from "./MapStylePicker";
 import { MapStyleKey, mapStyles } from "./mapStyles";
 import { QueryFormContainer } from "./QueryFormContainer/QueryFormContainer";
 import { useSelectedMapDataSource } from "./useSelectedMapDataSource";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 
 type MapProps = {
   defaultLatitude?: number;

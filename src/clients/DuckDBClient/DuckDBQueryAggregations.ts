@@ -1,6 +1,12 @@
-import { constant } from "$/lib/utils/constant/constant";
+import { constant } from "@avandar/utils";
 import { match } from "ts-pattern";
-import { DuckDBQueryAggregationType } from "./DuckDBClient.types";
+
+export type DuckDBQueryAggregationType =
+  | "sum"
+  | "avg"
+  | "count"
+  | "max"
+  | "min";
 
 export const DuckDBQueryAggregations = {
   /**

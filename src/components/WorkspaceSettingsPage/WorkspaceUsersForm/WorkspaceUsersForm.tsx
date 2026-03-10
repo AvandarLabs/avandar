@@ -1,3 +1,5 @@
+import { notifyError, notifySuccess } from "@avandar/ui";
+import { capitalize } from "@avandar/utils";
 import {
   Box,
   Button,
@@ -9,15 +11,13 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
-import { capitalize } from "$/lib/utils/strings/capitalize/capitalize";
+import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useWorkspaceRole } from "@/hooks/workspaces/useWorkspaceRole";
-import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
-import { UserProfileWithRole } from "@/models/User/User.types";
-import { WorkspaceInvite } from "@/models/Workspace/Workspace.types";
-import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 import { useWorkspaceInviteModal } from "./useWorkspaceInviteModal";
+import type { UserProfileWithRole } from "$/models/User/User.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 const IS_USER_INVITES_DISABLED = isFlagEnabled(FeatureFlag.DisableUserInvites);
 
@@ -59,7 +59,7 @@ export function WorkspaceUsersForm(): JSX.Element | null {
   const isAdmin = workspaceRole === "admin";
 
   const allWorkspaceUsers = [...workspaceUsers, ...pendingInvites].map(
-    (user: UserProfileWithRole | WorkspaceInvite) => {
+    (user: UserProfileWithRole | Workspace.Invite) => {
       return (
         <Table.Tr key={user.email}>
           <Table.Td>{"fullName" in user ? user.fullName : user.email}</Table.Td>

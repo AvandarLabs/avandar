@@ -1,6 +1,6 @@
-import { EntityFieldConfig } from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
-import { Models } from "@/models/Model/Models";
+import { Model } from "@avandar/models";
 import type { GenericSeedData } from "../scripts/SeedRunner";
+import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 
 export const TEST_USER_EMAIL = "user@avandarlabs.com";
 export const TEST_USER_PASSWORD = "avandar";
@@ -73,7 +73,7 @@ export const SeedData = {
       datasetId: null,
       allowManualCreation: false,
       fields: [
-        Models.make("EntityFieldConfig", {
+        Model.make("EntityFieldConfig", {
           name: "Name",
           description: "This entity represents a US State",
           dataType: "varchar",

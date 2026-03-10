@@ -1,4 +1,4 @@
-import { splitArray } from "@/lib/utils/arrays/splitArray";
+import { splitArray } from "@/lib/utils/arrays/splitArray/splitArray";
 
 const REST_KEY = "...";
 

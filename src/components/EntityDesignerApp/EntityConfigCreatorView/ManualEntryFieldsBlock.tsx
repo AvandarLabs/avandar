@@ -9,12 +9,12 @@ import {
   TextInput,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-import { FormType } from "@/lib/hooks/ui/useForm";
-import { EntityConfigId } from "@/models/EntityConfig/EntityConfig.types";
 import {
   EntityConfigFormValues,
   makeDefaultManualEntryField,
 } from "./entityConfigFormTypes";
+import type { FormType } from "@/lib/hooks/ui/useForm";
+import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
 
 type Props = {
   entityConfigForm: FormType<EntityConfigFormValues>;

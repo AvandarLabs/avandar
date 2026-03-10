@@ -1,7 +1,7 @@
+import { identity } from "@avandar/utils";
+import { camelToTitleCase } from "$/lib/strings/transformations";
 import { match } from "ts-pattern";
-import { ObjectKeyTransformationType } from "./ObjectDescriptionList.types";
-import { identity } from "@/lib/utils/misc";
-import { camelToTitleCase } from "@/lib/utils/strings/transformations";
+import type { ObjectKeyTransformationType } from "./ObjectDescriptionList.types";
 
 export function getObjectKeyTransformFn(
   transformationType: ObjectKeyTransformationType,

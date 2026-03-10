@@ -5,7 +5,7 @@ import {
   IconTable,
 } from "@tabler/icons-react";
 import { match } from "ts-pattern";
-import { DatasetSourceType } from "@/models/datasets/Dataset";
+import type { DatasetSourceType } from "$/models/datasets/Dataset/Dataset.types";
 
 export function SourceBadge({
   sourceType,

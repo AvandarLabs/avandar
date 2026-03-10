@@ -1,3 +1,4 @@
+import { useMutation } from "@avandar/react-query";
 import { Button, Loader, PasswordInput, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
@@ -11,7 +12,6 @@ import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
 import { AuthLayout } from "@/components/common/AuthLayout";
 import { AuthFooter } from "@/components/common/AuthLayout/AuthFooter";
-import { useMutation } from "@/lib/hooks/query/useMutation";
 import { Link } from "@/lib/ui/links/Link";
 import { isValidRedirectPath } from "@/utils/isValidRedirectPath/isValidRedirectPath";
 

@@ -1,4 +1,4 @@
-import { isNumber } from "$/lib/utils/guards/isNumber";
+import { isNumber } from "@avandar/utils";
 
 /**
  * Gets the schema version of the AvaPageData object.

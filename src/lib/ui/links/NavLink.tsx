@@ -1,3 +1,4 @@
+import { noop } from "@avandar/utils";
 import {
   DEFAULT_THEME,
   MantineColor,
@@ -6,11 +7,7 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { useHover, useMergedRef } from "@mantine/hooks";
-import {
-  createLink,
-  LinkComponent,
-  LinkComponentProps,
-} from "@tanstack/react-router";
+import { createLink } from "@tanstack/react-router";
 import {
   AnchorHTMLAttributes,
   forwardRef,
@@ -20,7 +17,7 @@ import {
   useState,
 } from "react";
 import { Theme } from "@/config/Theme";
-import { noop } from "@/lib/utils/misc";
+import type { LinkComponent, LinkComponentProps } from "@tanstack/react-router";
 
 const DEFAULT_PRIMARY_SHADE =
   typeof DEFAULT_THEME.primaryShade === "object" ?

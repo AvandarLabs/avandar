@@ -1,26 +1,25 @@
+import { isNonNullish, prop, where } from "@avandar/utils";
 import { MultiSelect, MultiSelectProps } from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
-import { where } from "$/lib/utils/filters/filters";
-import { isNonNullish } from "$/lib/utils/guards/isNonNullish/isNonNullish";
-import { ReactNode, useEffect, useMemo } from "react";
+import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
+import { useEffect, useMemo } from "react";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { isOfModelType } from "@/lib/utils/guards/guards";
-import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap";
-import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { TypedId } from "@/models/Model";
-import {
+import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap/makeIdLookupMap";
+import type { Model } from "@avandar/models";
+import type {
   QueryColumn,
   QueryColumnId,
-  QueryColumns,
-} from "@/models/queries/QueryColumn";
-import { QueryDataSource } from "@/models/queries/QueryDataSource";
+} from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
+import type { ReactNode } from "react";
 
 type Props = {
   label: ReactNode;
   placeholder: string;
-  dataSourceId?: TypedId<QueryDataSource>;
+  dataSourceId?: Model.TypedId<QueryDataSource>;
   value?: readonly QueryColumn[];
   defaultValue?: readonly QueryColumn[];
   onChange?: (fields: readonly QueryColumn[]) => void;

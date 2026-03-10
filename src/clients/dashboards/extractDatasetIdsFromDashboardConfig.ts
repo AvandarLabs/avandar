@@ -5,10 +5,8 @@
  * they agree on which datasets are required.
  */
 
-import { isPlainObject } from "$/lib/utils/guards/isPlainObject/isPlainObject";
-import { isString } from "$/lib/utils/guards/isString/isString";
-import { traverse } from "$/lib/utils/traverse/traverse";
-import { DatasetId } from "@/models/datasets/Dataset";
+import { isPlainObject, isString, traverse } from "@avandar/utils";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 type DataVizLikeProps = {
   nlQuery: {

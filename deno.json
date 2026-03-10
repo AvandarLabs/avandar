@@ -1,8 +1,30 @@
 {
   "__comment": "This is the Deno config for the local repo. It is used only to make Deno type checking work locally. It is not loaded into Supabase edge functions",
+  "workspace": [
+    "./packages/clients",
+    "./packages/logger",
+    "./packages/models",
+    "./packages/modules",
+    "./packages/utils",
+    "./supabase/functions/_shared",
+    "./supabase/functions/google-auth",
+    "./supabase/functions/google-auth-callback",
+    "./supabase/functions/google-sheets",
+    "./supabase/functions/health",
+    "./supabase/functions/polar-public",
+    "./supabase/functions/queries",
+    "./supabase/functions/subscriptions",
+    "./supabase/functions/waitlist",
+    "./supabase/functions/workspaces"
+  ],
   "imports": {
     "$/": "./shared/",
-    "jose": "jsr:@panva/jose@6"
+    "jose": "jsr:@panva/jose@6",
+    "@avandar/clients": "./packages/clients/src/index.ts",
+    "@avandar/logger": "./packages/logger/src/index.ts",
+    "@avandar/models": "./packages/models/src/index.ts",
+    "@avandar/modules": "./packages/modules/src/index.ts",
+    "@avandar/utils": "./packages/utils/src/index.ts"
   },
   "compilerOptions": {
     "experimentalDecorators": true,

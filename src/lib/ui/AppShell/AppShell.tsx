@@ -6,16 +6,16 @@ import {
 } from "@mantine/spotlight";
 import { IconSearch } from "@tabler/icons-react";
 import { Outlet } from "@tanstack/react-router";
-import { ReactNode } from "react";
-import { AppLink } from "@/config/AppLinks";
-import { NavbarLink } from "@/config/NavbarLinks";
 import { useToggleBoolean } from "@/lib/hooks/state/useToggleBoolean";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
-import { WorkspaceWithSubscription } from "@/models/Workspace/Workspace.types";
 import css from "./AppShell.module.css";
 import { AppShellStateManager } from "./AppShellStateManager";
 import { MobileHeader } from "./MobileHeader";
 import { Navbar } from "./Navbar/Navbar";
+import type { AppLink } from "@/config/AppLinks";
+import type { NavbarLink } from "@/config/NavbarLinks";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ReactNode } from "react";
 
 const HEADER_MOBILE_DEFAULT_HEIGHT = 42;
 const NAVBAR_DEFAULT_WIDTH = 220;
@@ -36,7 +36,7 @@ type Props = {
 
   /** Utility links go on the bottom of the navbar */
   utilityLinks?: readonly NavbarLink[];
-  currentWorkspace?: WorkspaceWithSubscription;
+  currentWorkspace?: Workspace.WithSubscription;
 };
 
 /**
