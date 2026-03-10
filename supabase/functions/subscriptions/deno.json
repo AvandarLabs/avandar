@@ -1,6 +1,11 @@
 {
   "imports": {
     "$/": "../../../shared/",
+    "@avandar/clients": "../../../packages/shared/clients/src/index.ts",
+    "@avandar/logger": "../../../packages/shared/logger/src/index.ts",
+    "@avandar/models": "../../../packages/shared/models/src/index.ts",
+    "@avandar/modules": "../../../packages/shared/modules/src/index.ts",
+    "@avandar/utils": "../../../packages/shared/utils/src/index.ts",
     "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
     "ts-pattern": "npm:ts-pattern@5",
     "zod": "npm:zod@4"

@@ -22,7 +22,7 @@ export type WorkspacesAPI = APITypeDef<
     "/:workspaceId/features": {
       GET: {
         pathParams: {
-          workspaceId: Workspace.Id;
+          workspaceId: string;
         };
         returnType: {
           features: Workspace.Feature[];
@@ -56,7 +56,7 @@ export type WorkspacesAPI = APITypeDef<
     "/:workspaceId/invite": {
       POST: {
         pathParams: {
-          workspaceId: Workspace.Id;
+          workspaceId: string;
         };
         body: {
           emailToInvite: string;

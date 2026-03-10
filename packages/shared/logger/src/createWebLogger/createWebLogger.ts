@@ -71,14 +71,21 @@ function _makeLogHeading(logType: "WARN" | "LOG", caller: LogCaller): string {
  * @param config - Configuration options for the logger.
  * @param config.loggerName - The name of the logger.
  * @param config.enabled - Whether to enable the logger. Defaults to true.
+ * @param config.suppressConsoleLog - Avoid printing to console for `log` calls.
  * @returns A new logger instance.
  */
 export function createWebLogger(config?: {
   loggerName?: string;
   callerName?: string;
   enabled?: boolean;
+  suppressConsoleLog?: boolean;
 }): ILogger {
-  const { loggerName, callerName, enabled = true } = config ?? {};
+  const {
+    loggerName,
+    callerName,
+    enabled = true,
+    suppressConsoleLog = false,
+  } = config ?? {};
   const styledMsgTemplate = loggerName ? `%c [${loggerName}] %s` : "%c %s";
   const state = { enabled };
 
@@ -158,29 +165,17 @@ export function createWebLogger(config?: {
      * dev mode. This also prints the function caller and location.
      */
     log: (...args: unknown[]): void => {
-      if (!state.enabled) {
+      if (!state.enabled || suppressConsoleLog) {
         return;
       }
 
-      // TODO(jpsyx): environment, or `printToConsole` should get passed as a
-      // config option
-      if (import.meta.env) {
-        if (import.meta.env.DEV) {
-          const caller = getCaller();
-          const styles = [
-            `background: #d5f5fa; ${LOG_HEADER_STYLES}`,
-            args.length > 1 ?
-              LOG_BODY_STYLES
-            : `font-size: ${LOG_BODY_FONT_SIZE};`,
-          ];
-          const logHeading = _makeLogHeading("LOG", caller);
-          console.log(
-            `${logHeading}\n${styledMsgTemplate} `,
-            ...styles,
-            ...args,
-          );
-        }
-      }
+      const caller = getCaller();
+      const styles = [
+        `background: #d5f5fa; ${LOG_HEADER_STYLES}`,
+        args.length > 1 ? LOG_BODY_STYLES : `font-size: ${LOG_BODY_FONT_SIZE};`,
+      ];
+      const logHeading = _makeLogHeading("LOG", caller);
+      console.log(`${logHeading}\n${styledMsgTemplate} `, ...styles, ...args);
     },
   };
 }

@@ -1,9 +1,9 @@
 import {
   createModelCRUDClient,
   ModelCRUDParserRegistry,
+  UpsertOptions,
 } from "@avandar/clients";
 import { applyFiltersToRows, assertIsDefined, isDefined } from "@avandar/utils";
-import { UpsertOptions } from "packages/clients/src/ModelCRUDClient/ModelCRUDClient.types";
 import { DexieCRUDClientModelSpec } from "./DexieCRUDClient.types";
 import type { DexieDBType } from "./DexieDBVersionManager";
 import type {

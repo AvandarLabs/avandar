@@ -2,6 +2,7 @@ import process from "node:process";
 import { isDenoRuntime } from "./isDenoRuntime.ts";
 import { isNodeRuntime } from "./isNodeRuntime.ts";
 import { isViteBrowserRuntime } from "./isViteBrowserRuntime.ts";
+import type {} from "$/types/global.d.ts";
 
 // remove trailing slash if it's present
 function _cleanOrigin(origin: string | undefined): string {

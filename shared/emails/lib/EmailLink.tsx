@@ -24,7 +24,12 @@ type Props = {
 
 export type { Props as EmailLinkProps };
 
-export function EmailLink({ children, href, path, style }: Props): JSX.Element {
+export function EmailLink({
+  children,
+  href,
+  path,
+  style,
+}: Props): React.JSX.Element {
   return (
     <Link href={href ?? buildAppPageURL({ path })} style={style}>
       {children}

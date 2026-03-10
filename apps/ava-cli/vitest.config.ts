@@ -11,7 +11,10 @@ export default defineConfig({
   resolve: {
     alias: {
       $: resolve(configDir, "../../shared"),
-      "@avandar/utils": resolve(configDir, "../../packages/utils/src/index.ts"),
+      "@avandar/utils": resolve(
+        configDir,
+        "../../packages/shared/utils/src/index.ts",
+      ),
     },
   },
 });

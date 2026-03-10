@@ -1,11 +1,11 @@
 {
   "__comment": "This is the Deno config for the local repo. It is used only to make Deno type checking work locally. It is not loaded into Supabase edge functions",
   "workspace": [
-    "./packages/clients",
-    "./packages/logger",
-    "./packages/models",
-    "./packages/modules",
-    "./packages/utils",
+    "./packages/shared/clients",
+    "./packages/shared/logger",
+    "./packages/shared/models",
+    "./packages/shared/modules",
+    "./packages/shared/utils",
     "./supabase/functions/_shared",
     "./supabase/functions/google-auth",
     "./supabase/functions/google-auth-callback",
@@ -20,17 +20,20 @@
   "imports": {
     "$/": "./shared/",
     "jose": "jsr:@panva/jose@6",
-    "@avandar/clients": "./packages/clients/src/index.ts",
-    "@avandar/logger": "./packages/logger/src/index.ts",
-    "@avandar/models": "./packages/models/src/index.ts",
-    "@avandar/modules": "./packages/modules/src/index.ts",
-    "@avandar/utils": "./packages/utils/src/index.ts"
+    "react": "npm:react@^19.0.0",
+    "react-dom": "npm:react-dom@^19.0.0",
+    "@avandar/clients": "./packages/shared/clients/src/index.ts",
+    "@avandar/logger": "./packages/shared/logger/src/index.ts",
+    "@avandar/models": "./packages/shared/models/src/index.ts",
+    "@avandar/modules": "./packages/shared/modules/src/index.ts",
+    "@avandar/utils": "./packages/shared/utils/src/index.ts"
   },
   "compilerOptions": {
     "experimentalDecorators": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
+    "jsxImportSourceTypes": "@types/react",
     "lib": ["deno.ns", "dom", "dom.iterable"],
     "moduleDetection": "force",
     "moduleResolution": "bundler",
@@ -47,8 +50,6 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "typeRoots": ["shared/types", "shared/lib/types"],
     "types": ["react", "react/jsx-runtime"]
-  },
-  "types": ["shared/types/global.d.ts"]
+  }
 }

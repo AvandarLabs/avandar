@@ -1,8 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import "react";
-import process from "node:process";
-
-console.log(process);
 
 declare global {
   /**

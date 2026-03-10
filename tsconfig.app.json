@@ -23,11 +23,7 @@
     "scripts",
     "shared",
     "next.config.js",
-    "./packages/clients/src",
-    "./packages/logger/src",
-    "./packages/models/src",
-    "./packages/modules/src",
-    "./packages/utils/src",
+    "./packages/shared/*/src",
     "./packages/web/*/src"
   ],
   "exclude": ["supabase/functions"]

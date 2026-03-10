@@ -10,10 +10,13 @@ export { createModelCRUDClient } from "./ModelCRUDClient/createModelCRUDClient.t
 export type { CRUDClientModelSpec } from "./ModelCRUDClient/ModelCRUDClient.types.ts";
 export type { ClientReturningOnlyPromises } from "./ModelCRUDClient/ModelCRUDClient.types.ts";
 export type { ModelCRUDClient } from "./ModelCRUDClient/ModelCRUDClient.types.ts";
+export type { UpsertOptions } from "./ModelCRUDClient/ModelCRUDClient.types.ts";
 
 // Supabase client
 export { createSupabaseCRUDClient } from "./SupabaseCRUDClient/createSupabaseCRUDClient.ts";
+export { withSupabaseClient } from "./SupabaseCRUDClient/withSupabaseClient.ts";
 export type { SupabaseCRUDClientModelSpec } from "./SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
+export type { WithSupabaseClient } from "./SupabaseCRUDClient/withSupabaseClient.ts";
 
 // Parser registry
 export { makeParserRegistry } from "./makeParserRegistry.ts";

@@ -10,8 +10,9 @@
   "include": [
     "vite.config.ts",
     ".ava/**/*.ts",
-    "apps/dev-fanout-server/src/**/*.ts",
-    "apps/ava-cli/src/**/*.ts"
+    "apps/dev-fanout-server/src",
+    "apps/ava-cli/src",
+    "packages/shared/*/src"
   ],
   "exclude": ["supabase/functions"]
 }

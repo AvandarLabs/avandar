@@ -17,7 +17,7 @@ export function WorkspaceInviteEmail({
   inviteEmail,
   workspaceSlug,
   workspaceName,
-}: Props): JSX.Element {
+}: Props): React.JSX.Element {
   const acceptInviteURL = buildAppPageURL({
     path: "/invites/$inviteId",
     pathParams: { inviteId },

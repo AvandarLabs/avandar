@@ -5,16 +5,14 @@ import { defineConfig } from "vitest/config";
 const configDir: string = fileURLToPath(new URL(".", import.meta.url));
 
 export default defineConfig({
-  resolve: {
-    alias: {
-      $: resolve(configDir, "../../shared"),
-      "@avandar/utils": resolve(
-        configDir,
-        "../../packages/shared/utils/src/index.ts",
-      ),
-    },
-  },
   test: {
     environment: "node",
+  },
+  resolve: {
+    alias: {
+      $: resolve(configDir, "../../../shared"),
+      "@avandar/utils": resolve(configDir, "../utils/src/index.ts"),
+      "@avandar/modules": resolve(configDir, "../modules/src/index.ts"),
+    },
   },
 });

@@ -1,18 +1,14 @@
-import { createServiceClient } from "@avandar/clients";
+import { createServiceClient, withSupabaseClient } from "@avandar/clients";
 import { withLogger } from "@avandar/logger";
 import { WithQueryHooks, withQueryHooks } from "@avandar/react-query";
 import { camelCaseKeysShallow, omit } from "@avandar/utils";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { WorkspaceId } from "$/models/Workspace/Workspace.types";
 import { Database, Tables } from "$/types/database.types";
-import {
-  WithSupabaseClient,
-  withSupabaseClient,
-} from "packages/clients/src/SupabaseCRUDClient/withSupabaseClient";
 import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
-import type { ServiceClient } from "@avandar/clients";
+import type { ServiceClient, WithSupabaseClient } from "@avandar/clients";
 import type { ILogger, WithLogger } from "@avandar/logger";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type {

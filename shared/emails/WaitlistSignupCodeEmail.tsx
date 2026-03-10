@@ -13,7 +13,7 @@ type Props = {
 export function WaitlistSignupCodeEmail({
   signupCode,
   userEmail,
-}: Props): JSX.Element {
+}: Props): React.JSX.Element {
   const registerURL = buildAppPageURL({
     path: "/register",
     queryParams: {

@@ -158,14 +158,7 @@ export default [
   {
     // we require import extensions for directories that will be used in
     // Deno runtimes (such as Supabase edge functions).
-    files: [
-      "shared/**/*.{ts,tsx}",
-      "packages/clients/**/*.{ts,tsx}",
-      "packages/logger/**/*.{ts,tsx}",
-      "packages/models/**/*.{ts,tsx}",
-      "packages/modules/**/*.{ts,tsx}",
-      "packages/utils/**/*.{ts,tsx}",
-    ],
+    files: ["shared/**/*.{ts,tsx}", "packages/shared/**/*.{ts,tsx}"],
     rules: {
       "import-x/extensions": [
         "error",

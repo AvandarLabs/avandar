@@ -381,7 +381,7 @@ importers:
         specifier: ^5.6.0
         version: 5.8.1
 
-  packages/clients:
+  packages/shared/clients:
     dependencies:
       '@supabase/postgrest-js':
         specifier: ^2.99.0
@@ -400,7 +400,7 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@25.3.4)(happy-dom@20.8.3)(jiti@2.4.2)(jsdom@26.1.0)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0)
 
-  packages/logger:
+  packages/shared/logger:
     devDependencies:
       typescript:
         specifier: ~5.9.3
@@ -409,7 +409,7 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@25.3.4)(happy-dom@20.8.3)(jiti@2.4.2)(jsdom@26.1.0)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0)
 
-  packages/models:
+  packages/shared/models:
     dependencies:
       type-fest:
         specifier: ^5.4.4
@@ -422,7 +422,7 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@25.3.4)(happy-dom@20.8.3)(jiti@2.4.2)(jsdom@26.1.0)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0)
 
-  packages/modules:
+  packages/shared/modules:
     devDependencies:
       typescript:
         specifier: ~5.9.3
@@ -431,7 +431,7 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@25.3.4)(happy-dom@20.8.3)(jiti@2.4.2)(jsdom@26.1.0)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0)
 
-  packages/utils:
+  packages/shared/utils:
     dependencies:
       camelcase-keys:
         specifier: ^9.1.3
@@ -458,6 +458,24 @@ importers:
       zod:
         specifier: ^4.1.13
         version: 4.3.6
+
+  packages/web/react-query:
+    devDependencies:
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.4(@types/node@25.3.4)(happy-dom@20.8.3)(jiti@2.4.2)(jsdom@26.1.0)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0)
+
+  packages/web/ui:
+    devDependencies:
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.4(@types/node@25.3.4)(happy-dom@20.8.3)(jiti@2.4.2)(jsdom@26.1.0)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0)
 
 packages:
 
@@ -9742,14 +9760,6 @@ snapshots:
     optionalDependencies:
       vite: 7.3.1(@types/node@25.3.4)(jiti@1.21.7)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0)
 
-  '@vitest/mocker@3.2.4(vite@7.3.1(@types/node@25.3.4)(jiti@2.4.2)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0))':
-    dependencies:
-      '@vitest/spy': 3.2.4
-      estree-walker: 3.0.3
-      magic-string: 0.30.21
-    optionalDependencies:
-      vite: 7.3.1(@types/node@25.3.4)(jiti@2.4.2)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0)
-
   '@vitest/pretty-format@3.2.4':
     dependencies:
       tinyrainbow: 2.0.0
@@ -14276,7 +14286,7 @@ snapshots:
     dependencies:
       '@types/chai': 5.2.3
       '@vitest/expect': 3.2.4
-      '@vitest/mocker': 3.2.4(vite@7.3.1(@types/node@25.3.4)(jiti@2.4.2)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0))
+      '@vitest/mocker': 3.2.4(vite@7.3.1(@types/node@25.3.4)(jiti@1.21.7)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0))
       '@vitest/pretty-format': 3.2.4
       '@vitest/runner': 3.2.4
       '@vitest/snapshot': 3.2.4
