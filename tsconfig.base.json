@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+
+    /* Linting */
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUncheckedIndexedAccess": true,
+    "noUncheckedSideEffectImports": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+
+    /* Paths aliases */
+    "paths": {
+      "@/*": ["./src/*"],
+      "$/*": ["./shared/*"],
+      "@avandar/clients": ["./packages/clients/src/index.ts"],
+      "@avandar/logger": ["./packages/logger/src/index.ts"],
+      "@avandar/models": ["./packages/models/src/index.ts"],
+      "@avandar/modules": ["./packages/modules/src/index.ts"],
+      "@avandar/utils": ["./packages/utils/src/index.ts"],
+      "@avandar/ui": ["./packages/web/ui/src/index.ts"],
+      "@avandar/react-query": ["./packages/web/react-query/src/index.ts"]
+    }
+  }
+}

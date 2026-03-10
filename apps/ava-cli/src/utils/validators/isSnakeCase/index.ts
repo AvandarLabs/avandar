@@ -1,0 +1,1 @@
+export { isSnakeCase } from "./isSnakeCase";

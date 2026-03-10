@@ -1,0 +1,129 @@
+import { excludeUndefinedDeep, objectKeys, pick } from "@avandar/utils";
+import type { CRUDClientModelSpec } from "./ModelCRUDClient/ModelCRUDClient.types.ts";
+import type { z } from "zod";
+
+type GenericDBReadSchema<M extends CRUDClientModelSpec> = z.ZodObject<{
+  [K in keyof M["DBRead"]]: z.ZodType<M["DBRead"][K], M["DBRead"][K]>;
+}>;
+
+type CRUDTransformerFunctions<M extends CRUDClientModelSpec> = {
+  /**
+   * Transforms a DBRead object into a ModelRead object.
+   *
+   * @param data The DBRead object to transform.
+   * @returns The transformed ModelRead object.
+   */
+  fromDBReadToModelRead: (data: M["DBRead"]) => M["Read"];
+
+  /**
+   * Transforms a ModelInsert object into a DBInsert object.
+   *
+   * @param data The ModelInsert object to transform.
+   * @returns The transformed DBInsert object.
+   */
+  fromModelInsertToDBInsert: (data: M["Insert"]) => M["DBInsert"];
+
+  /**
+   * Transforms a ModelUpdate object into a DBUpdate object.
+   *
+   * @param data The ModelUpdate object to transform.
+   * @returns The transformed DBUpdate object.
+   */
+  fromModelUpdateToDBUpdate: (data: M["Update"]) => M["DBUpdate"];
+};
+
+export type ModelCRUDParserRegistry<M extends CRUDClientModelSpec> = {
+  DBReadSchema: GenericDBReadSchema<M>;
+} & CRUDTransformerFunctions<M>;
+
+type ParserRegistryBuilderFn<M extends CRUDClientModelSpec> = (
+  config: {
+    modelName: M["modelName"];
+    DBReadSchema: GenericDBReadSchema<M>;
+  } & CRUDTransformerFunctions<M>,
+) => ModelCRUDParserRegistry<M>;
+
+/**
+ * Appends the model name and schema name to the Zod error message.
+ *
+ * @param modelName The name of the model.
+ * @param schemaName The name of the schema.
+ * @returns A custom error map for the given model and schema.
+ */
+export function getErrorMap({
+  modelName,
+  schemaName,
+}: {
+  modelName: string;
+  schemaName: string;
+}): z.ZodErrorMap {
+  return (issue) => {
+    return {
+      message:
+        issue.message ?
+          `[${modelName}:${schemaName}] (${issue.code}) ${issue.message}`
+        : `[${modelName}:${schemaName}] (${issue.code})Error parsing schema.`,
+    };
+  };
+}
+
+/**
+ * Helper function which returns a builder function for creating a parser
+ * registry.
+ *
+ * @returns A builder function for creating a parser registry.
+ */
+export function makeParserRegistry<M extends CRUDClientModelSpec = never>(): {
+  build: ParserRegistryBuilderFn<M>;
+} {
+  return {
+    build: (
+      config: {
+        modelName: M["modelName"];
+        DBReadSchema: GenericDBReadSchema<M>;
+      } & CRUDTransformerFunctions<M>,
+    ): ModelCRUDParserRegistry<M> => {
+      const dbKeys = objectKeys(config.DBReadSchema.shape);
+
+      return {
+        ...config,
+        fromDBReadToModelRead: (data: M["DBRead"]) => {
+          return config.fromDBReadToModelRead(
+            // run the DBReadSchema parser to be extra sure we are receiving
+            // a valid DBRead model
+            config.DBReadSchema.parse(data, {
+              error: getErrorMap({
+                modelName: config.modelName,
+                schemaName: "DBReadSchema",
+              }),
+            }),
+          );
+        },
+
+        fromModelInsertToDBInsert: (modelObj: M["Insert"]): M["DBInsert"] => {
+          const dbObj = config.fromModelInsertToDBInsert(modelObj);
+
+          // Only pass the keys defined in the database. Some databases
+          // can reject inputs with extra keys
+          const strippedDBObj = pick(dbObj, dbKeys);
+
+          // the pick operation may have added some `undefined` values
+          // back in, so we need to drop them
+          return excludeUndefinedDeep(strippedDBObj) as M["DBInsert"];
+        },
+
+        fromModelUpdateToDBUpdate: (modelObj: M["Update"]): M["DBUpdate"] => {
+          const dbObj = config.fromModelUpdateToDBUpdate(modelObj);
+
+          // Only pass the keys defined in the database. Some databases
+          // can reject inputs with extra keys
+          const strippedDBObj = pick(dbObj, dbKeys);
+
+          // the pick operation may have added some `undefined` values
+          // back in, so we need to drop them
+          return excludeUndefinedDeep(strippedDBObj) as M["DBUpdate"];
+        },
+      };
+    },
+  };
+}

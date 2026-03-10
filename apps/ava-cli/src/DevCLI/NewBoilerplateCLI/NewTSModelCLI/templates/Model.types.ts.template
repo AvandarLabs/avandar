@@ -1,0 +1,14 @@
+import type { VersionedModel } from "@/models/Model";
+import type { UUID } from "$/lib/types/common";
+
+type ModelType = "$MODEL_NAME$";
+
+export type $MODEL_NAME$Id = UUID<ModelType>;
+
+export type $MODEL_NAME$ = VersionedModel<
+  ModelType,
+  1,
+  {
+    id: $MODEL_NAME$Id;
+  }
+>;

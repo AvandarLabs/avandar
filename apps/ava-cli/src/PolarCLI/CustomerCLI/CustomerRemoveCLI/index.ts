@@ -1,0 +1,2 @@
+export { CustomerRemoveCLI } from "./CustomerRemoveCLI";
+
