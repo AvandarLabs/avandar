@@ -1,4 +1,3 @@
-// deno-lint-ignore-file no-empty-interface, no-explicit-any
 /**
  * Consumer-facing registry interface. Augment this via declaration
  * merging to register your Supabase database type with

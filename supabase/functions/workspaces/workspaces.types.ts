@@ -1,5 +1,5 @@
 import type { APITypeDef } from "../_shared/MiniServer/api.types.ts";
-import type { Workspace } from "$/models/Workspace/Workspace.ts";
+import type { WorkspaceFeature } from "$/models/Workspace/Workspace.types.ts";
 import type { Tables } from "$/types/database.types.ts";
 
 export type WorkspacesAPI = APITypeDef<
@@ -25,7 +25,7 @@ export type WorkspacesAPI = APITypeDef<
           workspaceId: string;
         };
         returnType: {
-          features: Workspace.Feature[];
+          features: WorkspaceFeature[];
         };
       };
     };

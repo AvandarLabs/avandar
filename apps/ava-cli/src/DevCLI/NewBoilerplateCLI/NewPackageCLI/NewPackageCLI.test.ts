@@ -28,7 +28,7 @@ const MOCK_TSCONFIG = JSON.stringify(
   {
     compilerOptions: {
       paths: {
-        "@avandar/utils": ["./packages/utils/src/index.ts"],
+        "@avandar/utils": ["./packages/shared/utils/src/index.ts"],
       },
     },
   },
@@ -39,13 +39,13 @@ const MOCK_TSCONFIG = JSON.stringify(
 const MOCK_DENO_JSON = JSON.stringify(
   {
     workspace: [
-      "./packages/clients",
-      "./packages/utils",
+      "./packages/shared/clients",
+      "./packages/shared/utils",
       "./supabase/functions/_shared",
       "./supabase/functions/health",
     ],
     imports: {
-      "@avandar/utils": "./packages/utils/src/index.ts",
+      "@avandar/utils": "./packages/shared/utils/src/index.ts",
     },
   },
   undefined,
@@ -57,8 +57,8 @@ const MOCK_VSCODE_SETTINGS = JSON.stringify(
     "deno.enablePaths": [
       "./supabase/functions",
       "./shared",
-      "./packages/clients",
-      "./packages/utils",
+      "./packages/shared/clients",
+      "./packages/shared/utils",
     ],
   },
   undefined,
@@ -70,8 +70,8 @@ const MOCK_TSCONFIG_APP = JSON.stringify(
     include: [
       "src",
       "shared",
-      "./packages/clients/src",
-      "./packages/utils/src",
+      "./packages/shared/clients/src",
+      "./packages/shared/utils/src",
     ],
   },
   undefined,
@@ -81,7 +81,7 @@ const MOCK_TSCONFIG_APP = JSON.stringify(
 const MOCK_EDGE_FUNCTION_DENO_TEMPLATE = JSON.stringify(
   {
     imports: {
-      "@avandar/utils": "../../../packages/utils/src/index.ts",
+      "@avandar/utils": "../../../packages/shared/utils/src/index.ts",
     },
   },
   undefined,
@@ -134,20 +134,22 @@ describe("writeNewPackageBoilerplate", () => {
 
     writeNewPackageBoilerplate({
       packageName: "my-lib",
+      runtime: "shared",
     });
 
     const mock = writeFileFromTemplate as ReturnType<typeof vi.fn>;
-    expect(mock).toHaveBeenCalledTimes(4);
+    expect(mock).toHaveBeenCalledTimes(5);
 
     const calls = mock.mock.calls as Array<[Record<string, string>]>;
     const outputFiles = calls.map((c) => {
       return `${c[0].outputDir}/${c[0].outputFileName}`;
     });
 
-    expect(outputFiles).toContain("packages/my-lib/package.json");
-    expect(outputFiles).toContain("packages/my-lib/tsconfig.json");
-    expect(outputFiles).toContain("packages/my-lib/src/helloWorld.ts");
-    expect(outputFiles).toContain("packages/my-lib/src/index.ts");
+    expect(outputFiles).toContain("packages/shared/my-lib/package.json");
+    expect(outputFiles).toContain("packages/shared/my-lib/tsconfig.json");
+    expect(outputFiles).toContain("packages/shared/my-lib/vitest.config.ts");
+    expect(outputFiles).toContain("packages/shared/my-lib/src/helloWorld.ts");
+    expect(outputFiles).toContain("packages/shared/my-lib/src/index.ts");
   });
 
   it("writes the alias to tsconfig.base.json", async () => {
@@ -156,6 +158,7 @@ describe("writeNewPackageBoilerplate", () => {
 
     writeNewPackageBoilerplate({
       packageName: "my-lib",
+      runtime: "shared",
     });
 
     const writeMock = fs.writeFileSync as ReturnType<typeof vi.fn>;
@@ -171,7 +174,7 @@ describe("writeNewPackageBoilerplate", () => {
       };
     };
     expect(written.compilerOptions.paths["@avandar/my-lib"]).toEqual([
-      "./packages/my-lib/src/index.ts",
+      "./packages/shared/my-lib/src/index.ts",
     ]);
   });
 
@@ -181,6 +184,7 @@ describe("writeNewPackageBoilerplate", () => {
 
     writeNewPackageBoilerplate({
       packageName: "my-lib",
+      runtime: "shared",
     });
 
     const writeMock = fs.writeFileSync as ReturnType<typeof vi.fn>;
@@ -194,7 +198,7 @@ describe("writeNewPackageBoilerplate", () => {
       include: string[];
     };
     expect(written.include[written.include.length - 1]).toBe(
-      "./packages/my-lib/src",
+      "./packages/shared/my-lib/src",
     );
   });
 
@@ -204,6 +208,7 @@ describe("writeNewPackageBoilerplate", () => {
 
     writeNewPackageBoilerplate({
       packageName: "my-lib",
+      runtime: "shared",
     });
 
     const writeMock = fs.writeFileSync as ReturnType<typeof vi.fn>;
@@ -217,7 +222,7 @@ describe("writeNewPackageBoilerplate", () => {
       imports: Record<string, string>;
     };
     expect(written.imports["@avandar/my-lib"]).toBe(
-      "./packages/my-lib/src/index.ts",
+      "./packages/shared/my-lib/src/index.ts",
     );
   });
 
@@ -230,6 +235,7 @@ describe("writeNewPackageBoilerplate", () => {
 
       writeNewPackageBoilerplate({
         packageName: "my-lib",
+        runtime: "shared",
       });
 
       const writeMock = fs.writeFileSync as ReturnType<typeof vi.fn>;
@@ -241,74 +247,70 @@ describe("writeNewPackageBoilerplate", () => {
         const parsed = JSON.parse(c[1]) as {
           workspace?: string[];
         };
-        return parsed.workspace?.includes("./packages/my-lib");
+        return parsed.workspace?.includes("./packages/shared/my-lib");
       });
 
       expect(workspaceWrite).toBeDefined();
 
       const written = JSON.parse(workspaceWrite![1]) as { workspace: string[] };
       const workspace = written.workspace;
-      const newIndex = workspace.indexOf("./packages/my-lib");
+      const newIndex = workspace.indexOf("./packages/shared/my-lib");
 
       expect(newIndex).not.toBe(-1);
 
-      expect(workspace[newIndex - 1]).toBe("./packages/utils");
+      expect(workspace[newIndex - 1]).toBe("./packages/shared/utils");
       expect(workspace[newIndex + 1]).toBe("./supabase/functions/_shared");
     },
   );
 
-  it(
-    "adds the package to .vscode/settings.json " + "deno.enablePaths",
-    async () => {
-      const { writeNewPackageBoilerplate } =
-        await import("./writeNewPackageBoilerplate");
+  it("adds the package to .vscode/settings.json deno.enablePaths", async () => {
+    const { writeNewPackageBoilerplate } =
+      await import("./writeNewPackageBoilerplate");
 
-      writeNewPackageBoilerplate({
-        packageName: "my-lib",
-      });
+    writeNewPackageBoilerplate({
+      packageName: "my-lib",
+      runtime: "shared",
+    });
 
-      const writeMock = fs.writeFileSync as ReturnType<typeof vi.fn>;
-      const settingsWrite = writeMock.mock.calls.find((c: unknown[]) => {
-        return typeof c[0] === "string" && c[0].endsWith("settings.json");
-      }) as [string, string, string] | undefined;
+    const writeMock = fs.writeFileSync as ReturnType<typeof vi.fn>;
+    const settingsWrite = writeMock.mock.calls.find((c: unknown[]) => {
+      return typeof c[0] === "string" && c[0].endsWith("settings.json");
+    }) as [string, string, string] | undefined;
 
-      expect(settingsWrite).toBeDefined();
+    expect(settingsWrite).toBeDefined();
 
-      const written = JSON.parse(settingsWrite![1]) as {
-        "deno.enablePaths": string[];
-      };
-      const paths = written["deno.enablePaths"];
-      expect(paths[paths.length - 1]).toBe("./packages/my-lib");
-    },
-  );
+    const written = JSON.parse(settingsWrite![1]) as {
+      "deno.enablePaths": string[];
+    };
+    const paths = written["deno.enablePaths"];
+    expect(paths[paths.length - 1]).toBe("./packages/shared/my-lib");
+  });
 
-  it(
-    "writes the alias to deno.json.template.txt " + "with relative path",
-    async () => {
-      const { writeNewPackageBoilerplate } =
-        await import("./writeNewPackageBoilerplate");
+  it("writes the alias to deno.json.template.txt with relative path", async () => {
+    const { writeNewPackageBoilerplate } =
+      await import("./writeNewPackageBoilerplate");
 
-      writeNewPackageBoilerplate({
-        packageName: "my-lib",
-      });
+    writeNewPackageBoilerplate({
+      packageName: "my-lib",
+      runtime: "shared",
+    });
 
-      const writeMock = fs.writeFileSync as ReturnType<typeof vi.fn>;
-      const templateWrite = writeMock.mock.calls.find((c: unknown[]) => {
-        return (
-          typeof c[0] === "string" && c[0].endsWith("deno.json.template.txt")
-        );
-      }) as [string, string, string] | undefined;
-
-      expect(templateWrite).toBeDefined();
-
-      const written = JSON.parse(templateWrite![1]) as {
-        imports: Record<string, string>;
-      };
-      expect(written.imports["@avandar/my-lib"]).toBe(
-        "../../../packages/my-lib/src/index.ts",
+    const writeMock = fs.writeFileSync as ReturnType<typeof vi.fn>;
+    const templateWrite = writeMock.mock.calls.find((c: unknown[]) => {
+      return (
+        typeof c[0] === "string" && c[0].endsWith("deno.json.template.txt")
       );
-    },
-  );
+    }) as [string, string, string] | undefined;
+
+    expect(templateWrite).toBeDefined();
+
+    const written = JSON.parse(templateWrite![1]) as {
+      imports: Record<string, string>;
+    };
+    expect(written.imports["@avandar/my-lib"]).toBe(
+      "../../../packages/shared/my-lib/src/index.ts",
+    );
+  });
 
   it("skips tsconfig alias when it already exists", async () => {
     const readMock = fs.readFileSync as ReturnType<typeof vi.fn>;
@@ -317,7 +319,7 @@ describe("writeNewPackageBoilerplate", () => {
         return JSON.stringify({
           compilerOptions: {
             paths: {
-              "@avandar/my-lib": ["./packages/my-lib/src/index.ts"],
+              "@avandar/my-lib": ["./packages/shared/my-lib/src/index.ts"],
             },
           },
         });
@@ -342,6 +344,7 @@ describe("writeNewPackageBoilerplate", () => {
 
     writeNewPackageBoilerplate({
       packageName: "my-lib",
+      runtime: "shared",
     });
 
     const logs = _getCombinedLogs();
@@ -358,7 +361,7 @@ describe("writeNewPackageBoilerplate", () => {
         }
         if (filePath.endsWith("tsconfig.app.json")) {
           return JSON.stringify({
-            include: ["src", "./packages/my-lib/src"],
+            include: ["src", "./packages/shared/my-lib/src"],
           });
         }
         if (filePath.endsWith("deno.json.template.txt")) {
@@ -378,6 +381,7 @@ describe("writeNewPackageBoilerplate", () => {
 
       writeNewPackageBoilerplate({
         packageName: "my-lib",
+        runtime: "shared",
       });
 
       const logs = _getCombinedLogs();
@@ -403,12 +407,12 @@ describe("writeNewPackageBoilerplate", () => {
       if (filePath.endsWith("deno.json")) {
         return JSON.stringify({
           workspace: [
-            "./packages/utils",
-            "./packages/my-lib",
+            "./packages/shared/utils",
+            "./packages/shared/my-lib",
             "./supabase/functions/_shared",
           ],
           imports: {
-            "@avandar/utils": "./packages/utils/src/index.ts",
+            "@avandar/utils": "./packages/shared/utils/src/index.ts",
           },
         });
       }
@@ -420,6 +424,7 @@ describe("writeNewPackageBoilerplate", () => {
 
     writeNewPackageBoilerplate({
       packageName: "my-lib",
+      runtime: "shared",
     });
 
     const logs = _getCombinedLogs();
@@ -440,7 +445,7 @@ describe("writeNewPackageBoilerplate", () => {
       }
       if (filePath.endsWith("settings.json")) {
         return JSON.stringify({
-          "deno.enablePaths": ["./packages/my-lib"],
+          "deno.enablePaths": ["./packages/shared/my-lib"],
         });
       }
       if (filePath.endsWith("deno.json")) {
@@ -454,6 +459,7 @@ describe("writeNewPackageBoilerplate", () => {
 
     writeNewPackageBoilerplate({
       packageName: "my-lib",
+      runtime: "shared",
     });
 
     const logs = _getCombinedLogs();
@@ -466,10 +472,11 @@ describe("writeNewPackageBoilerplate", () => {
 
     writeNewPackageBoilerplate({
       packageName: "my-lib",
+      runtime: "shared",
     });
 
     const logs = _getCombinedLogs();
-    expect(logs).toContain("Created package in: packages/my-lib");
+    expect(logs).toContain("Created package in: packages/shared/my-lib");
     expect(logs).toContain("Registered alias: @avandar/my-lib");
   });
 });

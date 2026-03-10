@@ -10,6 +10,8 @@ import {
   VSCODE_SETTINGS_PATH,
 } from "./constants";
 
+export type PackageRuntime = "shared" | "web";
+
 const PROJECT_ROOT = process.cwd();
 const TSCONFIG_PATH = "tsconfig.base.json";
 const DENO_JSON_PATH = "deno.json";
@@ -22,9 +24,11 @@ const VITE_CONFIG_PATH = "vite.config.ts";
  */
 export function writeNewPackageBoilerplate(options: {
   packageName: string;
+  runtime: PackageRuntime;
 }): void {
-  const { packageName } = options;
-  const outputDir = `${PACKAGES_DIR}/${packageName}`;
+  const { packageName, runtime } = options;
+  const outputDir =
+    `${PACKAGES_DIR}/${runtime}/${packageName}`;
   const srcDir = `${outputDir}/src`;
   const templateParams = {
     PACKAGE_NAME: packageName,
@@ -48,6 +52,14 @@ export function writeNewPackageBoilerplate(options: {
 
   writeFileFromTemplate({
     templateDir: TEMPLATES_DIR,
+    templateFileName: "vitest.config.template.ts",
+    params: {},
+    outputDir,
+    outputFileName: "vitest.config.ts",
+  });
+
+  writeFileFromTemplate({
+    templateDir: TEMPLATES_DIR,
     templateFileName: "helloWorld.ts.template",
     params: templateParams,
     outputDir: srcDir,
@@ -63,17 +75,21 @@ export function writeNewPackageBoilerplate(options: {
   });
 
   const alias = `@avandar/${packageName}`;
-  const aliasTarget = `./packages/${packageName}/src/index.ts`;
+
+  const aliasTarget =
+    `./packages/${runtime}/${packageName}/src/index.ts`;
 
   const edgeFunctionAliasTarget =
-    `../../../packages/${packageName}/src/index.ts`;
+    `../../../packages/${runtime}/${packageName}/src/index.ts`;
 
   const viteAliasTarget =
-    `/packages/${packageName}/src/index.ts`;
+    `/packages/${runtime}/${packageName}/src/index.ts`;
 
-  const packageDir = `./packages/${packageName}`;
+  const packageDir =
+    `./packages/${runtime}/${packageName}`;
 
-  const packageSrcDir = `./packages/${packageName}/src`;
+  const packageSrcDir =
+    `./packages/${runtime}/${packageName}/src`;
 
   _addTsconfigPathAlias({ alias, aliasTarget });
   _addTsconfigAppInclude(packageSrcDir);
@@ -89,9 +105,13 @@ export function writeNewPackageBoilerplate(options: {
     aliasTarget: viteAliasTarget,
   });
 
-  Acclimate.log(`|green|Created package in: ${outputDir}`);
+  Acclimate.log(
+    `|green|Created package in: ${outputDir}`,
+  );
   Acclimate.log(`|green|Registered alias: ${alias}`);
-  Acclimate.log("|cyan|Run `pnpm install` to link the new package.");
+  Acclimate.log(
+    "|cyan|Run `pnpm install` to link the new package.",
+  );
 }
 
 function _addTsconfigPathAlias(options: {

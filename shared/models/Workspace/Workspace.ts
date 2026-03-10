@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 /* eslint-disable import-x/export */
-// deno-lint-ignore-file no-namespace
 import { Tables } from "$/types/database.types.ts";
 import {
   WorkspaceFeature,
