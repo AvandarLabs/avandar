@@ -1,7 +1,5 @@
 import dayjs from "dayjs";
-// eslint-disable-next-line import-x/extensions
 import timezone from "dayjs/plugin/timezone";
-// eslint-disable-next-line import-x/extensions
 import utc from "dayjs/plugin/utc";
 import { describe, expect, it } from "vitest";
 import { formatDate } from "./formatDate.ts";

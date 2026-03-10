@@ -1,7 +1,5 @@
 import dayjs from "dayjs";
-// eslint-disable-next-line import-x/extensions
 import timezone from "dayjs/plugin/timezone";
-// eslint-disable-next-line import-x/extensions
 import utc from "dayjs/plugin/utc";
 import { isDate } from "../../guards/isDate/isDate.ts";
 import type { LiteralUnion } from "type-fest";

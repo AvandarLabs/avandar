@@ -245,9 +245,9 @@ export const DatasetClient = createUsableServiceClient(
 
         /**
          * This deletes a dataset fully, including the locally stored raw data.
-         * This should be used any time a dataset needs to be deleted, instead of
-         * using the `DatasetClient.delete()` function, which will only delete the
-         * dataset (and related rows) from the backend.
+         * This should be used any time a dataset needs to be deleted, instead
+         * of using the `DatasetClient.delete()` function, which will only
+         * delete the dataset (and related rows) from the backend.
          */
         fullDelete: async (params: { id: DatasetId }): Promise<void> => {
           const logger = clientLogger.appendName("fullDelete");

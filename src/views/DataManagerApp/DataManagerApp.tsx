@@ -1,4 +1,3 @@
-import { notifyDevAlert } from "@avandar/ui";
 import { where } from "@avandar/utils";
 import { Button, Flex, MantineTheme, ScrollArea } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
@@ -23,10 +22,8 @@ export function DataManagerApp(): JSX.Element {
         <Button
           leftSection={<IconPlus size={18} />}
           onClick={() => {
-            if (true) {
-              notifyDevAlert("show modal");
-            }
-
+            // TODO(jpsyx): this is where we should check if the user is allowed
+            // to add more data based on their subscription plan
             navigate(AppLinks.dataImport(workspace.slug));
           }}
           size="compact-sm"
