@@ -1,4 +1,4 @@
-import { isNonEmptyArray } from "@avandar/utils";
+import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray.ts";
 import { QueryColumns } from "../queries/QueryColumn/QueryColumns.ts";
 import type { PartialStructuredQuery } from "../queries/StructuredQuery/StructuredQuery.types.ts";
 

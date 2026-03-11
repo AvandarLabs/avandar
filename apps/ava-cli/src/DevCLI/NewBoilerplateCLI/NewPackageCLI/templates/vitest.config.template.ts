@@ -10,8 +10,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@avandar/utils": resolve(configDir, "../utils/src/index.ts"),
-      "@avandar/modules": resolve(configDir, "../modules/src/index.ts"),
+      "@utils": resolve(configDir, "../utils/src"),
+      "@modules": resolve(configDir, "../modules/src"),
     },
   },
 });

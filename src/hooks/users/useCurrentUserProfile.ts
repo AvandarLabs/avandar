@@ -1,6 +1,6 @@
 import { UserClient } from "@/clients/UserClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import type { UseQueryResult } from "@avandar/react-query";
+import type { UseQueryResult } from "@hooks/useQuery/useQuery";
 import type { UserProfile } from "$/models/User/User.types";
 
 /**

@@ -1,5 +1,7 @@
-import { isDefined, prop, where } from "@avandar/utils";
 import { Box, Group, Loader, Stack, Text } from "@mantine/core";
+import { where } from "@utils/filters/where/where";
+import { isDefined } from "@utils/guards/isDefined/isDefined";
+import { prop } from "@utils/objects/hofs/prop/prop";
 import { makeObject } from "$/lib/objects/builders";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";

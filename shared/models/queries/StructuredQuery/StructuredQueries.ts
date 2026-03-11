@@ -1,4 +1,4 @@
-import { Model } from "@avandar/models";
+import { Model } from "@models/Model/Model.ts";
 import { uuid } from "../../../lib/uuid.ts";
 import type {
   PartialStructuredQuery,

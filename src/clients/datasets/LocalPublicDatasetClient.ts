@@ -6,7 +6,7 @@ import type {
   LocalPublicDataset,
   LocalPublicDatasetModel,
 } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
-import type { EmptyObject } from "@avandar/utils";
+import type { EmptyObject } from "@utils/types/common";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 

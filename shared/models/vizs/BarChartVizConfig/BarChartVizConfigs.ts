@@ -1,4 +1,4 @@
-import { pick } from "@avandar/utils";
+import { pick } from "@utils/objects/pick/pick.ts";
 import { match } from "ts-pattern";
 import { hydrateXYFromQuery } from "../hydrateXYFromQuery.ts";
 import type { PartialStructuredQuery } from "../../queries/StructuredQuery/StructuredQuery.types.ts";

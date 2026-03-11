@@ -1,4 +1,4 @@
-import { hasDefinedProps } from "@avandar/utils";
+import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
 import { Route as AuthRoute } from "@/routes/_auth/route";
 import type { User } from "$/models/User/User.types";
 

@@ -22,18 +22,17 @@
     "jose": "jsr:@panva/jose@6",
     "react": "npm:react@^19.0.0",
     "react-dom": "npm:react-dom@^19.0.0",
-    "@avandar/clients": "./packages/shared/clients/src/index.ts",
-    "@avandar/logger": "./packages/shared/logger/src/index.ts",
-    "@avandar/models": "./packages/shared/models/src/index.ts",
-    "@avandar/modules": "./packages/shared/modules/src/index.ts",
-    "@avandar/utils": "./packages/shared/utils/src/index.ts"
+    "@clients/": "./packages/shared/clients/src/",
+    "@logger/": "./packages/shared/logger/src/",
+    "@models/": "./packages/shared/models/src/",
+    "@modules/": "./packages/shared/modules/src/",
+    "@utils/": "./packages/shared/utils/src/"
   },
   "compilerOptions": {
     "experimentalDecorators": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "jsxImportSourceTypes": "@types/react",
     "lib": ["deno.ns", "dom", "dom.iterable"],
     "moduleDetection": "force",
     "moduleResolution": "bundler",

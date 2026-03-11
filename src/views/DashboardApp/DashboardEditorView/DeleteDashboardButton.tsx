@@ -1,8 +1,9 @@
-import { notifyDevAlert, notifySuccess } from "@avandar/ui";
 import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconTrash } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
+import { notifySuccess } from "@ui/notifications/notify";
+import { notifyDevAlert } from "@ui/notifications/notifyDevAlert";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 

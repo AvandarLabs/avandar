@@ -1,4 +1,3 @@
-import { notifySuccess } from "@avandar/ui";
 import { modals } from "@mantine/modals";
 import {
   SpotlightActionData,
@@ -6,6 +5,7 @@ import {
 } from "@mantine/spotlight";
 import { IconDatabase, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "@tanstack/react-router";
+import { notifySuccess } from "@ui/notifications/notify";
 import { useMemo } from "react";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { SpotlightLinks } from "@/config/SpotlightLinks";

@@ -1,4 +1,3 @@
-import { makeBucketMap, prop } from "@avandar/utils";
 import {
   Box,
   BoxProps,
@@ -8,6 +7,8 @@ import {
   Text,
   useMantineTheme,
 } from "@mantine/core";
+import { makeBucketMap } from "@utils/maps/makeBucketMap/makeBucketMap";
+import { prop } from "@utils/objects/hofs/prop/prop";
 import { Datasets } from "$/models/datasets/Dataset/Datasets";
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";

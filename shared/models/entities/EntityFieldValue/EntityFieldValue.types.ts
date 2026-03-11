@@ -1,5 +1,5 @@
 import type { EntityId } from "../Entity/Entity.types.ts";
-import type { UUID } from "@avandar/utils";
+import type { UUID } from "@utils/types/common.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types.ts";
 import type { EntityFieldConfigId } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";

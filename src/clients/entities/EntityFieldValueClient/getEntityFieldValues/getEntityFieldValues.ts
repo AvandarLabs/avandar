@@ -1,11 +1,11 @@
-import { objectKeys } from "@avandar/utils";
+import { objectKeys } from "@utils/objects/objectKeys";
 import { makeBucketRecord, makeIdLookupRecord } from "$/lib/objects/builders";
 import { match } from "ts-pattern";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { promiseFlatMap } from "@/lib/utils/promises";
 import { Logger } from "@/utils/Logger";
 import { getDatasetColumnFieldValues } from "./getDatasetColumnFieldValues";
-import type { RegistryOfArrays } from "@avandar/utils";
+import type { RegistryOfArrays } from "@utils/types/utilityTypes";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
 import type {
   EntityFieldConfig,

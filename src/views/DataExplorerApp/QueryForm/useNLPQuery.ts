@@ -1,8 +1,8 @@
-import { useMutation } from "@avandar/react-query";
-import { where } from "@avandar/utils";
+import { useMutation } from "@hooks/useMutation/useMutation";
+import { where } from "@utils/filters/where/where";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import type { UseMutationResultTuple } from "@avandar/react-query";
+import type { UseMutationResultTuple } from "@hooks/useMutation/useMutation";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 type UseNLPQueryVariables = {

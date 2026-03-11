@@ -2,7 +2,7 @@ import type {
   WorkspaceId,
   WorkspaceRole,
 } from "../Workspace/Workspace.types.ts";
-import type { UUID } from "@avandar/utils";
+import type { UUID } from "@utils/types/common.ts";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import type { Merge } from "type-fest";
 

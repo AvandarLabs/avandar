@@ -1,4 +1,4 @@
-import type { Module } from "@avandar/modules";
+import type { Module } from "@modules/createModule.ts";
 
 /**
  * The base module type for a client that is used to access a service.

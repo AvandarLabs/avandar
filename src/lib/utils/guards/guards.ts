@@ -1,6 +1,6 @@
-import { isArray } from "@avandar/utils";
-import type { Model } from "@avandar/models";
-import type { UnknownObject } from "@avandar/utils";
+import { isArray } from "@utils/guards/isArray/isArray";
+import type { Model } from "@models/Model/Model";
+import type { UnknownObject } from "@utils/types/common";
 import type { SetFieldType, SetRequired, Simplify } from "type-fest";
 
 /**

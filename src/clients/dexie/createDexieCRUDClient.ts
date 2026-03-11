@@ -1,17 +1,18 @@
-import {
-  createModelCRUDClient,
-  ModelCRUDParserRegistry,
-  UpsertOptions,
-} from "@avandar/clients";
-import { applyFiltersToRows, assertIsDefined, isDefined } from "@avandar/utils";
+import { ModelCRUDParserRegistry } from "@clients/makeParserRegistry";
+import { createModelCRUDClient } from "@clients/ModelCRUDClient/createModelCRUDClient";
+import { UpsertOptions } from "@clients/ModelCRUDClient/ModelCRUDClient.types";
+import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
+import { applyFiltersToRows } from "@utils/filters/applyFiltersToRows/applyFiltersToRows";
+import { isDefined } from "@utils/guards/isDefined/isDefined";
 import { DexieCRUDClientModelSpec } from "./DexieCRUDClient.types";
 import type { DexieDBType } from "./DexieDBVersionManager";
 import type {
   ClientReturningOnlyPromises,
   ModelCRUDClient,
-} from "@avandar/clients";
-import type { ILogger } from "@avandar/logger";
-import type { EmptyObject, FiltersByColumn } from "@avandar/utils";
+} from "@clients/ModelCRUDClient/ModelCRUDClient.types";
+import type { ILogger } from "@logger/Logger.types";
+import type { FiltersByColumn } from "@utils/filters/filters";
+import type { EmptyObject } from "@utils/types/common";
 import type { IDType, UpdateSpec } from "dexie";
 
 export type DexieCRUDClient<

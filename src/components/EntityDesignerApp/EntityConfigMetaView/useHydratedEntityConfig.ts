@@ -1,4 +1,4 @@
-import { where } from "@avandar/utils";
+import { where } from "@utils/filters/where/where";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";

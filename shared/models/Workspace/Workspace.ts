@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 /* eslint-disable import-x/export */
 import { Tables } from "$/types/database.types.ts";
-import {
+import type {
   WorkspaceFeature,
   WorkspaceId,
   WorkspaceModel,

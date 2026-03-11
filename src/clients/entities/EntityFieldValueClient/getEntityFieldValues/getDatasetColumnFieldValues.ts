@@ -1,10 +1,8 @@
-import {
-  assertIsDefined,
-  isDefined,
-  objectEntries,
-  prop,
-  where,
-} from "@avandar/utils";
+import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
+import { where } from "@utils/filters/where/where";
+import { isDefined } from "@utils/guards/isDefined/isDefined";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { objectEntries } from "@utils/objects/objectEntries";
 import { makeBucketRecord, makeIdLookupRecord } from "$/lib/objects/builders";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";

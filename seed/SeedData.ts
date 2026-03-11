@@ -1,4 +1,4 @@
-import { Model } from "@avandar/models";
+import { Model } from "@models/Model/Model";
 import type { GenericSeedData } from "../scripts/SeedRunner";
 import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 

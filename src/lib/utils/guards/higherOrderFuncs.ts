@@ -1,5 +1,5 @@
 import { isOfModelType } from "./guards";
-import type { Model } from "@avandar/models";
+import type { Model } from "@models/Model/Model";
 import type { SetFieldType, Simplify } from "type-fest";
 
 /**

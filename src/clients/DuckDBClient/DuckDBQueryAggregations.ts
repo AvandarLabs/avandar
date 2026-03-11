@@ -1,4 +1,4 @@
-import { constant } from "@avandar/utils";
+import { constant } from "@utils/misc/constant/constant";
 import { match } from "ts-pattern";
 
 export type DuckDBQueryAggregationType =

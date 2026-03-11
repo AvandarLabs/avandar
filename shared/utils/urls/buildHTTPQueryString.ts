@@ -1,4 +1,5 @@
-import { isDefined, unknownToString } from "@avandar/utils";
+import { isDefined } from "@utils/guards/isDefined/isDefined.ts";
+import { unknownToString } from "@utils/strings/unknownToString/unknownToString.ts";
 
 type ValidURLQueryParamPrimitiveValue =
   | string

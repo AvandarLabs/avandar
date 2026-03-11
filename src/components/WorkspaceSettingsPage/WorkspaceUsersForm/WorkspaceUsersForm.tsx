@@ -1,5 +1,3 @@
-import { notifyError, notifySuccess } from "@avandar/ui";
-import { capitalize } from "@avandar/utils";
 import {
   Box,
   Button,
@@ -11,6 +9,8 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
+import { notifyError, notifySuccess } from "@ui/notifications/notify";
+import { capitalize } from "@utils/strings/capitalize/capitalize";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";

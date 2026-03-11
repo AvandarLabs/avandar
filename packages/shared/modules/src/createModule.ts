@@ -1,4 +1,7 @@
-import type { EmptyObject, UnknownObject } from "@avandar/utils";
+import type {
+  EmptyObject,
+  UnknownObject,
+} from "@utils/types/common.ts";
 import type { Simplify } from "type-fest";
 
 /**

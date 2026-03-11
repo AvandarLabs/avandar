@@ -1,5 +1,5 @@
-import { propIsInArray } from "@avandar/utils";
 import { useUncontrolled } from "@mantine/hooks";
+import { propIsInArray } from "@utils/objects/hofs/propIsInArray/propIsInArray";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { useMemo } from "react";
 import { Select, SelectOption, SelectProps } from "@/lib/ui/inputs/Select";

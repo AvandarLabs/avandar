@@ -1,4 +1,4 @@
-import { createSupabaseCRUDClient } from "@avandar/clients";
+import { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupabaseCRUDClient";
 import { DatasetColumnValueExtractorParsers } from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractorParsers";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 

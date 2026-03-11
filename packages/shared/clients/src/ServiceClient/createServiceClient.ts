@@ -1,4 +1,4 @@
-import { createModule } from "@avandar/modules";
+import { createModule } from "@modules/createModule.ts";
 import { ServiceClient } from "./ServiceClient.types.ts";
 
 /**

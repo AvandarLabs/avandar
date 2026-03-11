@@ -1,7 +1,7 @@
-import { where } from "@avandar/utils";
 import { Button, Flex, MantineTheme, ScrollArea } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { Outlet, useNavigate } from "@tanstack/react-router";
+import { where } from "@utils/filters/where/where";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
 import { AppLinks } from "@/config/AppLinks";

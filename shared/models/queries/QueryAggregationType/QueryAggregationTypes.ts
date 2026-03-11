@@ -1,4 +1,4 @@
-import { constant } from "@avandar/utils";
+import { constant } from "@utils/misc/constant/constant.ts";
 import { match } from "ts-pattern";
 import { DuckDBQueryAggregations } from "../../../../src/clients/DuckDBClient/DuckDBQueryAggregations.ts";
 import type { QueryAggregationType } from "./QueryAggregationType.types.ts";

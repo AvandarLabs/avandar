@@ -1,5 +1,6 @@
-import { useQuery } from "@avandar/react-query";
-import { isNonEmptyArray, noop } from "@avandar/utils";
+import { useQuery } from "@hooks/useQuery/useQuery";
+import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray";
+import { noop } from "@utils/misc/noop";
 import { useEffect, useMemo, useState } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { useGooglePickerAPI } from "@/lib/hooks/useGooglePickerAPI";

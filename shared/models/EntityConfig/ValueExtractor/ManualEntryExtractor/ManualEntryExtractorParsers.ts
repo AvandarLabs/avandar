@@ -1,19 +1,20 @@
-import { makeParserRegistry } from "@avandar/clients";
-import {
-  camelCaseKeysDeep,
-  excludeUndefinedDeep,
-  nullsToUndefinedDeep,
-  omitProps,
-  pipe,
-  snakeCaseKeysDeep,
-} from "@avandar/utils";
+import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
+import { pipe } from "@utils/misc/pipe/pipe.ts";
+import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeysDeep/camelCaseKeysDeep.ts";
+import { excludeUndefinedDeep } from "@utils/objects/excludeUndefinedDeep/excludeUndefinedDeep.ts";
+import { omitProps } from "@utils/objects/hofs/omitProps/omitProps.ts";
+import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
+import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
 import { z } from "zod";
 import type {
   ManualEntryExtractor,
   ManualEntryExtractorId,
   ManualEntryExtractorModel,
 } from "./ManualEntryExtractor.types.ts";
-import type { Expect, ZodSchemaEqualsTypes } from "@avandar/utils";
+import type {
+  Expect,
+  ZodSchemaEqualsTypes,
+} from "@utils/types/testUtilityTypes.ts";
 import type { EntityFieldConfigId } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 

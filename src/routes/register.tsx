@@ -1,5 +1,4 @@
-import { useMutation } from "@avandar/react-query";
-import { notifyError, notifySuccess } from "@avandar/ui";
+import { useMutation } from "@hooks/useMutation/useMutation";
 import {
   Anchor,
   Box,
@@ -21,6 +20,7 @@ import {
   useNavigate,
   useRouter,
 } from "@tanstack/react-router";
+import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { INFO_EMAIL } from "$/config/AppConfig";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";

@@ -1,5 +1,5 @@
-import type { CRUDClientModelSpec } from "@avandar/clients";
-import type { UnknownObject } from "@avandar/utils";
+import type { CRUDClientModelSpec } from "@clients/ModelCRUDClient/ModelCRUDClient.types";
+import type { UnknownObject } from "@utils/types/common";
 import type { Merge } from "type-fest";
 
 type DefaultModelTypes = {

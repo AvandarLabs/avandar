@@ -1,4 +1,5 @@
-import { prop, setValue } from "@avandar/utils";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { setValue } from "@utils/objects/setValue/setValue";
 import { makeObject } from "$/lib/objects/builders";
 import { StructuredQueries } from "$/models/queries/StructuredQuery/StructuredQueries";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";

@@ -1,10 +1,15 @@
-import { useQuery } from "@avandar/react-query";
-import { notifyError, notifySuccess, notifyWarning } from "@avandar/ui";
-import { MIMEType, snakeCaseKeysShallow } from "@avandar/utils";
+import { useQuery } from "@hooks/useQuery/useQuery";
 import { Box, BoxProps, Stack } from "@mantine/core";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
+import {
+  notifyError,
+  notifySuccess,
+  notifyWarning,
+} from "@ui/notifications/notify";
+import { snakeCaseKeysShallow } from "@utils/objects/snakeCaseKeysShallow/snakeCaseKeysShallow";
+import { MIMEType } from "@utils/types/common";
 import { uuid } from "$/lib/uuid";
 import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
@@ -22,7 +27,7 @@ import {
   DatasetImportForm,
   DatasetImportFormValues,
 } from "../DatasetUploadForm";
-import type { UnknownObject } from "@avandar/utils";
+import type { UnknownObject } from "@utils/types/common";
 import type {
   Dataset,
   DatasetId,

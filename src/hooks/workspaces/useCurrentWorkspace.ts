@@ -1,5 +1,5 @@
-import { propEq } from "@avandar/utils";
 import { useNavigate } from "@tanstack/react-router";
+import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppLinks } from "@/config/AppLinks";
 import { WorkspaceRootRouteAPI } from "@/routes/_auth/$workspaceSlug/route";

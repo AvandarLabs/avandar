@@ -1,5 +1,6 @@
-import { createSupabaseCRUDClient } from "@avandar/clients";
-import { prop, where } from "@avandar/utils";
+import { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupabaseCRUDClient";
+import { where } from "@utils/filters/where/where";
+import { prop } from "@utils/objects/hofs/prop/prop";
 import { makeBucketRecord } from "$/lib/objects/builders";
 import { matchLiteral } from "$/lib/strings/matchLiteral";
 import { CSVFileDataset } from "$/models/datasets/CSVFileDataset/CSVFileDataset.types";
@@ -19,7 +20,8 @@ import { CSVFileDatasetClient } from "./CSVFileDatasetClient";
 import { DatasetColumnClient } from "./DatasetColumnClient";
 import { GoogleSheetsDatasetClient } from "./GoogleSheetsDatasetClient";
 import { LocalDatasetClient } from "./LocalDatasetClient";
-import type { ExcludeNullsIn, FiltersByColumn } from "@avandar/utils";
+import type { FiltersByColumn } from "@utils/filters/filters";
+import type { ExcludeNullsIn } from "@utils/objects/excludeNullsIn/excludeNullsIn";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { CompositeTypes } from "$/types/database.types";

@@ -1,4 +1,6 @@
-import { excludeUndefinedDeep, objectKeys, pick } from "@avandar/utils";
+import { excludeUndefinedDeep } from "@utils/objects/excludeUndefinedDeep/excludeUndefinedDeep.ts";
+import { objectKeys } from "@utils/objects/objectKeys.ts";
+import { pick } from "@utils/objects/pick/pick.ts";
 import type { CRUDClientModelSpec } from "./ModelCRUDClient/ModelCRUDClient.types.ts";
 import type { z } from "zod";
 

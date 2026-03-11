@@ -1,5 +1,4 @@
-import { useMutation } from "@avandar/react-query";
-import { notifyError, notifySuccess } from "@avandar/ui";
+import { useMutation } from "@hooks/useMutation/useMutation";
 import {
   Button,
   Checkbox,
@@ -10,6 +9,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useNavigate } from "@tanstack/react-router";
+import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { useMemo, useState } from "react";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock";
@@ -18,7 +18,7 @@ import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { Callout } from "@/lib/ui/Callout";
-import type { UnknownObject } from "@avandar/utils";
+import type { UnknownObject } from "@utils/types/common";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.types";
 import type { DetectedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 

@@ -1,5 +1,5 @@
 import type { Model } from "@/models/Model";
-import type { SupabaseCRUDClientModelSpec } from "@avandar/clients";
+import type { SupabaseCRUDClientModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
 import type { SetOptional } from "type-fest";
 import type { WorkspaceId } from "@/models/Workspace/Workspace.types";
 import type { UUID } from "$/lib/types/common";

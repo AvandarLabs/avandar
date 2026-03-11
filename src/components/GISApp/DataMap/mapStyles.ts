@@ -1,4 +1,4 @@
-import { registry } from "@avandar/utils";
+import { registry } from "@utils/objects/registry/registry";
 
 export const mapStyles = {
   positron: {

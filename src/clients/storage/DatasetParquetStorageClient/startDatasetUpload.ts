@@ -1,7 +1,8 @@
-import { notifyError } from "@avandar/ui";
-import { MIMEType, where } from "@avandar/utils";
+import { notifyError } from "@ui/notifications/notify";
 import Uppy from "@uppy/core";
 import Tus from "@uppy/tus";
+import { where } from "@utils/filters/where/where";
+import { MIMEType } from "@utils/types/common";
 import { AuthClient } from "@/clients/AuthClient";
 import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";

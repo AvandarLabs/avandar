@@ -1,6 +1,6 @@
 import { SelectData, SelectOption } from "../inputs/Select";
 import type { FormType } from "@/lib/hooks/ui/useForm";
-import type { StringKeyOf } from "@avandar/utils";
+import type { StringKeyOf } from "@utils/types/utilityTypes";
 import type { HTMLInputAutoCompleteAttribute, ReactNode } from "react";
 import type { ExclusifyUnion, UnknownRecord } from "type-fest";
 

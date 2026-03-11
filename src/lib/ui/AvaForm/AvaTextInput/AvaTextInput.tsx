@@ -1,12 +1,15 @@
-import { isDefined, objectKeys, prop } from "@avandar/utils";
 import { TextInput, TextInputProps } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
+import { isDefined } from "@utils/guards/isDefined/isDefined";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { objectKeys } from "@utils/objects/objectKeys";
 import type {
   GenericFormSchemaRecord,
   ValuesOfFieldRecord,
 } from "../AvaForm.types";
 import type { FormType } from "@/lib/hooks/ui/useForm";
-import type { PathValue, StringKeyOf } from "@avandar/utils";
+import type { PathValue } from "@utils/objects/getValue/getValue";
+import type { StringKeyOf } from "@utils/types/utilityTypes";
 import type { ChangeEvent } from "react";
 import type { Paths } from "type-fest";
 

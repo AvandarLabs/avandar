@@ -1,6 +1,6 @@
 import type { Subscription } from "../Subscription/Subscription.types.ts";
-import type { SupabaseCRUDClientModelSpec } from "@avandar/clients";
-import type { UUID } from "@avandar/utils";
+import type { SupabaseCRUDClientModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
+import type { UUID } from "@utils/types/common.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { Tables } from "$/types/database.types.ts";
 import type { SetOptional } from "type-fest";

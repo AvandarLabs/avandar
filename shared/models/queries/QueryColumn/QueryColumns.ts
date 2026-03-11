@@ -1,4 +1,4 @@
-import { Model } from "@avandar/models";
+import { Model } from "@models/Model/Model.ts";
 import { uuid } from "$/lib/uuid.ts";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes.ts";
 import { QueryAggregationTypes } from "../QueryAggregationType/QueryAggregationTypes.ts";

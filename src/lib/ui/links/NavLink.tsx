@@ -1,4 +1,3 @@
-import { noop } from "@avandar/utils";
 import {
   DEFAULT_THEME,
   MantineColor,
@@ -8,6 +7,7 @@ import {
 } from "@mantine/core";
 import { useHover, useMergedRef } from "@mantine/hooks";
 import { createLink } from "@tanstack/react-router";
+import { noop } from "@utils/misc/noop";
 import {
   AnchorHTMLAttributes,
   forwardRef,

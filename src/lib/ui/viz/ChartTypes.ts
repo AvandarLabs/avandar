@@ -1,4 +1,4 @@
-import type { UnknownDataFrame } from "@avandar/utils";
+import type { UnknownDataFrame } from "@utils/types/common";
 
 export type XYSettings = {
   xAxisKey: string;

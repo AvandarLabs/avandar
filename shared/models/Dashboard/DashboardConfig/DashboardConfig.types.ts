@@ -1,5 +1,5 @@
-import type { Model } from "@avandar/models";
-import type { UUID } from "@avandar/utils";
+import type { Model } from "@models/Model/Model.ts";
+import type { UUID } from "@utils/types/common.ts";
 
 type ModelType = "DashboardConfig";
 

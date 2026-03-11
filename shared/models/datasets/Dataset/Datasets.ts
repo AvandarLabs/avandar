@@ -1,4 +1,4 @@
-import { registry } from "@avandar/utils";
+import { registry } from "@utils/objects/registry/registry.ts";
 import type { DatasetSourceType } from "./Dataset.types.ts";
 
 export const Datasets = {

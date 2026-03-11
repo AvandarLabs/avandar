@@ -1,6 +1,6 @@
-import type { SupabaseCRUDClientModelSpec } from "@avandar/clients";
-import type { Model } from "@avandar/models";
-import type { UUID } from "@avandar/utils";
+import type { SupabaseCRUDClientModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
+import type { Model } from "@models/Model/Model.ts";
+import type { UUID } from "@utils/types/common.ts";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 import type { UserId, UserProfileId } from "$/models/User/User.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";

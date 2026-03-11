@@ -1,4 +1,4 @@
-import type { BaseModule } from "@avandar/modules";
+import type { BaseModule } from "@modules/createModule.ts";
 
 export type ILogger = {
   error: (error: unknown, extraData?: unknown) => void;

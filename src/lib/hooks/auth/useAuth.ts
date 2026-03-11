@@ -1,4 +1,4 @@
-import { hasDefinedProps } from "@avandar/utils";
+import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
 import { useEffect, useState } from "react";
 import { AuthClient } from "@/clients/AuthClient";
 import type { User as SupabaseUser } from "@supabase/supabase-js";

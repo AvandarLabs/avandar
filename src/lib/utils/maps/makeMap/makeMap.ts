@@ -1,4 +1,4 @@
-import { identity } from "@avandar/utils";
+import { identity } from "@utils/misc/identity";
 
 /**
  * Creates a map from a list of items, given a function to extract the key

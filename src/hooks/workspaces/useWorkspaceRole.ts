@@ -1,4 +1,4 @@
-import { useQuery } from "@avandar/react-query";
+import { useQuery } from "@hooks/useQuery/useQuery";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useCurrentUser } from "../users/useCurrentUser";

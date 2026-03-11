@@ -4,7 +4,7 @@ import {
   RawCellValue,
   RawDataRow,
   UUID,
-} from "@avandar/utils";
+} from "@utils/types/common.ts";
 import { Json } from "$/types/database.types.ts";
 import { z } from "zod";
 

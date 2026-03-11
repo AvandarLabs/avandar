@@ -1,5 +1,5 @@
-import { pick } from "@avandar/utils";
 import { ScrollArea, Stack, Text } from "@mantine/core";
+import { pick } from "@utils/objects/pick/pick";
 import { useMemo } from "react";
 import {
   isDescribableObject,

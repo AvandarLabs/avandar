@@ -1,5 +1,3 @@
-import { Model } from "@avandar/models";
-import { notifyDevAlert } from "@avandar/ui";
 import {
   Button,
   SimpleGrid,
@@ -8,8 +6,10 @@ import {
   ThemeIcon,
   Title,
 } from "@mantine/core";
+import { Model } from "@models/Model/Model";
 import { IconLayoutDashboard, IconPlus } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
+import { notifyDevAlert } from "@ui/notifications/notifyDevAlert";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";

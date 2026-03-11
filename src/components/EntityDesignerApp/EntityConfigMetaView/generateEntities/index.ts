@@ -1,10 +1,8 @@
-import {
-  assertIsDefined,
-  isDefined,
-  prop,
-  propEq,
-  where,
-} from "@avandar/utils";
+import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
+import { where } from "@utils/filters/where/where";
+import { isDefined } from "@utils/guards/isDefined/isDefined";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { makeObject } from "$/lib/objects/builders";
 import { EntityConfigModule } from "$/models/EntityConfig/EntityConfigUtils";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";

@@ -1,4 +1,4 @@
-import type { Registry } from "@avandar/utils";
+import type { Registry } from "@utils/types/utilityTypes";
 
 /**
  * Feature flags are used to enable or disable certain features in the app.

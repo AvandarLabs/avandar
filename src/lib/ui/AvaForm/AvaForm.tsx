@@ -1,5 +1,6 @@
-import { objectKeys, objectValues } from "@avandar/utils";
 import { Box, Button, Flex, Stack, Text } from "@mantine/core";
+import { objectKeys } from "@utils/objects/objectKeys";
+import { objectValues } from "@utils/objects/objectValues";
 import { useImperativeHandle, useMemo, useRef } from "react";
 import { match } from "ts-pattern";
 import { useForm } from "@/lib/hooks/ui/useForm";
@@ -13,7 +14,7 @@ import type {
   ValuesOfFieldRecord,
 } from "./AvaForm.types";
 import type { FormRulesRecord, UseFormInput } from "@/lib/hooks/ui/useForm";
-import type { StringKeyOf } from "@avandar/utils";
+import type { StringKeyOf } from "@utils/types/utilityTypes";
 import type { ReactElement, ReactNode, Ref } from "react";
 
 type Props<

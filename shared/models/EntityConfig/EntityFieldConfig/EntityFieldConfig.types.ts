@@ -1,8 +1,8 @@
 import type { EntityConfigId } from "../EntityConfig.types.ts";
 import type { ValueExtractorType } from "../ValueExtractor/ValueExtractor.types.ts";
-import type { SupabaseCRUDClientModelSpec } from "@avandar/clients";
-import type { Model } from "@avandar/models";
-import type { UUID } from "@avandar/utils";
+import type { SupabaseCRUDClientModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
+import type { Model } from "@models/Model/Model.ts";
+import type { UUID } from "@utils/types/common.ts";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { SetOptional, Simplify } from "type-fest";

@@ -3,7 +3,7 @@
  * These are hardcoded, which means if we need to support longer pipes,
  * just add a new annotation for more functions.
  */
-import type { AnyFunction } from "@avandar/utils";
+import type { AnyFunction } from "@utils/types/utilityTypes.ts";
 
 export function pipe<A, B, C>(
   op1: (input: A) => B,

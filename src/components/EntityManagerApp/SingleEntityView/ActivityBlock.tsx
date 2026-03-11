@@ -1,4 +1,3 @@
-import { notifyNotImplemented } from "@avandar/ui";
 import { Button, Flex, Stack, Title } from "@mantine/core";
 import { RichTextEditor } from "@mantine/tiptap";
 import Highlight from "@tiptap/extension-highlight";
@@ -10,6 +9,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import Underline from "@tiptap/extension-underline";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { notifyNotImplemented } from "@ui/notifications/notifyNotImplemented";
 
 export function ActivityBlock(): JSX.Element {
   const editor = useEditor({

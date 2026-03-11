@@ -1,4 +1,4 @@
-import { notifyError, notifySuccess } from "@avandar/ui";
+import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { InputTextForm } from "@/lib/ui/singleton-forms/InputTextForm";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.types";

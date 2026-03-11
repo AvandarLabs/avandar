@@ -1,9 +1,9 @@
-import { notifySuccess } from "@avandar/ui";
-import { hasDefinedProps } from "@avandar/utils";
 import { Button, Container, Group, Stack, Text, Title } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
+import { notifySuccess } from "@ui/notifications/notify";
+import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
 import { useState } from "react";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { AppLinks } from "@/config/AppLinks";

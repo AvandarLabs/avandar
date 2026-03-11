@@ -1,6 +1,6 @@
-import { createSupabaseCRUDClient } from "@avandar/clients";
-import { notifyError } from "@avandar/ui";
-import { where } from "@avandar/utils";
+import { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupabaseCRUDClient";
+import { notifyError } from "@ui/notifications/notify";
+import { where } from "@utils/filters/where/where";
 import { DashboardParsers } from "$/models/Dashboard/DashboardParsers";
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";

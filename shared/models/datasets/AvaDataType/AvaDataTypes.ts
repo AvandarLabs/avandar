@@ -1,4 +1,4 @@
-import { registry } from "@avandar/utils";
+import { registry } from "@utils/objects/registry/registry.ts";
 import { matchLiteral } from "$/lib/strings/matchLiteral.ts";
 import { match } from "ts-pattern";
 import type { AvaDataType } from "./AvaDataType.types.ts";

@@ -1,5 +1,5 @@
-import { getValue } from "@avandar/utils";
-import type { PathValue } from "@avandar/utils";
+import { getValue } from "@utils/objects/getValue/getValue";
+import type { PathValue } from "@utils/objects/getValue/getValue";
 import type { Paths } from "type-fest";
 
 /**

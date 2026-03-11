@@ -1,4 +1,5 @@
-import { ModelCRUDClient } from "@avandar/clients";
+import { ModelCRUDClient } from "@clients/ModelCRUDClient/ModelCRUDClient.types";
+import { withQueryHooks } from "@hooks/withQueryHooks/withQueryHooks";
 import {
   DEFAULT_MUTATION_FN_NAMES,
   DEFAULT_QUERY_FN_NAMES,
@@ -6,8 +7,7 @@ import {
   DefaultQueryFnName,
   FnNameReturningPromise,
   WithQueryHooks,
-  withQueryHooks,
-} from "@avandar/react-query";
+} from "@hooks/withQueryHooks/withQueryHooks.types";
 
 export function createUsableServiceClient<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

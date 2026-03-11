@@ -1,6 +1,7 @@
-import type { SupabaseCRUDClientModelSpec } from "@avandar/clients";
-import type { Model } from "@avandar/models";
-import type { SwapDeep, UUID } from "@avandar/utils";
+import type { SupabaseCRUDClientModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
+import type { Model } from "@models/Model/Model.ts";
+import type { UUID } from "@utils/types/common.ts";
+import type { SwapDeep } from "@utils/types/utilityTypes.ts";
 import type { UserId, UserProfileId } from "$/models/User/User.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { Json } from "$/types/database.types.ts";

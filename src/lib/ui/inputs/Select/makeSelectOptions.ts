@@ -1,6 +1,6 @@
-import { identity } from "@avandar/utils";
+import { identity } from "@utils/misc/identity";
 import type { SelectOption } from "@/lib/ui/inputs/Select";
-import type { UnknownObject } from "@avandar/utils";
+import type { UnknownObject } from "@utils/types/common";
 import type { ConditionalKeys } from "type-fest";
 
 /**

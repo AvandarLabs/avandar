@@ -1,5 +1,5 @@
-import { ILogger } from "@avandar/logger";
-import { constant } from "@avandar/utils";
+import { ILogger } from "@logger/Logger.types";
+import { constant } from "@utils/misc/constant/constant";
 import { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import * as arrow from "apache-arrow";
 import { match } from "ts-pattern";

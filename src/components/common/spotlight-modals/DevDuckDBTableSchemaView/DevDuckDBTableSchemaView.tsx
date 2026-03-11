@@ -1,6 +1,7 @@
-import { useQuery } from "@avandar/react-query";
-import { propEq, where } from "@avandar/utils";
+import { useQuery } from "@hooks/useQuery/useQuery";
 import { Loader, Stack, Text } from "@mantine/core";
+import { where } from "@utils/filters/where/where";
+import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";

@@ -1,8 +1,8 @@
-import { useMutation } from "@avandar/react-query";
-import { notifySuccess } from "@avandar/ui";
+import { useMutation } from "@hooks/useMutation/useMutation";
 import { Stack, Text } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
+import { notifySuccess } from "@ui/notifications/notify";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { useRef } from "react";
 import { APIClient } from "@/clients/APIClient";

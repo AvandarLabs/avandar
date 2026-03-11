@@ -1,9 +1,12 @@
-import { makeParserRegistry } from "@avandar/clients";
-import { identity } from "@avandar/utils";
+import { makeParserRegistry } from "@clients/makeParserRegistry";
+import { identity } from "@utils/misc/identity";
 import { uuidType } from "$/lib/zodHelpers";
 import { z } from "zod";
 import type { LocalDatasetModel } from "./LocalDataset.types";
-import type { Expect, ZodSchemaEqualsTypes } from "@avandar/utils";
+import type {
+  Expect,
+  ZodSchemaEqualsTypes,
+} from "@utils/types/testUtilityTypes";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { UserId } from "$/models/User/User.types";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";

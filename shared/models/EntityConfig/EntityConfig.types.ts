@@ -2,9 +2,9 @@ import type { Dataset } from "../datasets/Dataset/Dataset.types.ts";
 import type { Workspace } from "../Workspace/Workspace.ts";
 import type { EntityFieldConfig } from "./EntityFieldConfig/EntityFieldConfig.types.ts";
 import type { EntityFieldValueExtractor } from "./ValueExtractor/ValueExtractor.types.ts";
-import type { SupabaseCRUDClientModelSpec } from "@avandar/clients";
-import type { Model } from "@avandar/models";
-import type { UUID } from "@avandar/utils";
+import type { SupabaseCRUDClientModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
+import type { Model } from "@models/Model/Model.ts";
+import type { UUID } from "@utils/types/common.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { Paths, SetOptional, SetRequiredDeep, Simplify } from "type-fest";
 

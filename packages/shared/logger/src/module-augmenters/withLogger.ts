@@ -1,6 +1,6 @@
 import { createWebLogger } from "../createWebLogger/createWebLogger.ts";
 import type { ILogger, WithLogger } from "../Logger.types.ts";
-import type { BaseModule } from "@avandar/modules";
+import type { BaseModule } from "@modules/createModule.ts";
 
 /**
  * Adds a logger that is accessible to all module functions. The logger is

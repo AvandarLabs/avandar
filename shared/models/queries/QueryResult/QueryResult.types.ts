@@ -1,4 +1,4 @@
-import type { UnknownObject } from "@avandar/utils";
+import type { UnknownObject } from "@utils/types/common.ts";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.types.ts";
 
 export type QueryResultColumn = {

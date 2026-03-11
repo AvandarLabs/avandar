@@ -1,4 +1,4 @@
-import { notifyError } from "@avandar/ui";
+import { notifyError } from "@ui/notifications/notify";
 import { UserId } from "$/models/User/User.types";
 import { APIClient } from "@/clients/APIClient";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";

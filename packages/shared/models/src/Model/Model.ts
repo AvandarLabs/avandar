@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-namespace,import-x/export */
-// deno-lint-ignore-file no-namespace
 import type { ModelTypeKey } from "./Model.types.ts";
 import type { DistributedPick, EmptyObject, Simplify } from "type-fest";
 

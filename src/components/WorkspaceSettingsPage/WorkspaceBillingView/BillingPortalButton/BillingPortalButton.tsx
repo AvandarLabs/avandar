@@ -1,5 +1,5 @@
-import { assertIsDefined } from "@avandar/utils";
 import { Button, Loader } from "@mantine/core";
+import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
 import { ReactNode, useState } from "react";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { goToBillingPortal } from "./goToBillingPortal";

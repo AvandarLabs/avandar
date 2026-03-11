@@ -3,7 +3,7 @@ import type { LineChartVizConfig } from "../LineChartVizConfig/LineChartVizConfi
 import type { ScatterPlotVizConfig } from "../ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts";
 import type { TableVizConfig } from "../TableVizConfig/TableVizConfig.types.ts";
 import type { IVizConfigModule } from "./IVizConfigModule.ts";
-import type { ObjectRegistry } from "@avandar/utils";
+import type { ObjectRegistry } from "@utils/types/utilityTypes.ts";
 
 export type VizConfig =
   | TableVizConfig

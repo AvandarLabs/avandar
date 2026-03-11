@@ -1,4 +1,4 @@
-import { propPasses } from "@avandar/utils";
+import { propPasses } from "@utils/objects/hofs/propPasses/propPasses";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { useMemo } from "react";
 import { Select } from "@/lib/ui/inputs/Select";

@@ -1,11 +1,11 @@
 {
   "imports": {
     "$/": "../../../shared/",
-    "@avandar/clients": "../../../packages/shared/clients/src/index.ts",
-    "@avandar/logger": "../../../packages/shared/logger/src/index.ts",
-    "@avandar/models": "../../../packages/shared/models/src/index.ts",
-    "@avandar/modules": "../../../packages/shared/modules/src/index.ts",
-    "@avandar/utils": "../../../packages/shared/utils/src/index.ts",
+    "@clients/": "../../../packages/shared/clients/src/",
+    "@logger/": "../../../packages/shared/logger/src/",
+    "@models/": "../../../packages/shared/models/src/",
+    "@modules/": "../../../packages/shared/modules/src/",
+    "@utils/": "../../../packages/shared/utils/src/",
     "@react-email/components": "npm:@react-email/components@0",
     "@react-email/render": "npm:@react-email/render@1",
     "@supabase/supabase-js": "npm:@supabase/supabase-js@2",

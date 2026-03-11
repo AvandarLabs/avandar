@@ -20,7 +20,7 @@
  * was lost and we should clear the IndexedDB database and try to seed it as
  * much as possible with defaults or data we can get from the backend.
  */
-import { prop } from "@avandar/utils";
+import { prop } from "@utils/objects/hofs/prop/prop";
 import Dexie from "dexie";
 import { DexieDBVersionManager } from "@/clients/dexie/DexieDBVersionManager";
 import { clearOPFS } from "@/lib/utils/browser/clearOPFS";

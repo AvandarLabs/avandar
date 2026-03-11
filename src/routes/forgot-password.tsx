@@ -1,4 +1,4 @@
-import { useMutation } from "@avandar/react-query";
+import { useMutation } from "@hooks/useMutation/useMutation";
 import { Button, Group, Stack, TextInput } from "@mantine/core";
 import { isEmail, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";

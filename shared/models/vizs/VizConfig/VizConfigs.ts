@@ -1,4 +1,4 @@
-import { registry } from "@avandar/utils";
+import { registry } from "@utils/objects/registry/registry.ts";
 import { BarChartVizConfigs } from "../BarChartVizConfig/BarChartVizConfigs.ts";
 import { LineChartVizConfigs } from "../LineChartVizConfig/LineChartVizConfigs.ts";
 import { ScatterPlotVizConfigs } from "../ScatterPlotVizConfig/ScatterPlotVizConfigs.ts";

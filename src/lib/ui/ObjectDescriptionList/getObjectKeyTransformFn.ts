@@ -1,4 +1,4 @@
-import { identity } from "@avandar/utils";
+import { identity } from "@utils/misc/identity";
 import { camelToTitleCase } from "$/lib/strings/transformations";
 import { match } from "ts-pattern";
 import type { ObjectKeyTransformationType } from "./ObjectDescriptionList.types";

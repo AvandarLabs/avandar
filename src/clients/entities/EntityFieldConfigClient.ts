@@ -1,5 +1,7 @@
-import { createSupabaseCRUDClient } from "@avandar/clients";
-import { objectKeys, prop, where } from "@avandar/utils";
+import { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupabaseCRUDClient";
+import { where } from "@utils/filters/where/where";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { objectKeys } from "@utils/objects/objectKeys";
 import { makeBucketRecord } from "$/lib/objects/builders";
 import { EntityFieldConfigParsers } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfigParsers";
 import { match } from "ts-pattern";

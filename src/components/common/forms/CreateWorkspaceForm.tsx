@@ -1,6 +1,6 @@
-import { notifySuccess } from "@avandar/ui";
 import { Divider, Loader, Text, Title } from "@mantine/core";
 import { useNavigate } from "@tanstack/react-router";
+import { notifySuccess } from "@ui/notifications/notify";
 import { slugify } from "$/lib/strings/transformations";
 import { useState } from "react";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";

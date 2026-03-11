@@ -1,5 +1,5 @@
-import { prop } from "@avandar/utils";
 import { ScrollArea, Stack, StackProps } from "@mantine/core";
+import { prop } from "@utils/objects/hofs/prop/prop";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { Callout } from "@/lib/ui/Callout";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList";

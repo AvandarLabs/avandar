@@ -1,6 +1,6 @@
-import { isNonEmptyArray } from "@avandar/utils";
 import { Container, Paper, Stack, Title } from "@mantine/core";
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { CreateWorkspaceForm } from "@/components/common/forms/CreateWorkspaceForm";
 import { AppLinks } from "@/config/AppLinks";

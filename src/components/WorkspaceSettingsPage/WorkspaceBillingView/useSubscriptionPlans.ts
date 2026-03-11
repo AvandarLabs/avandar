@@ -1,5 +1,7 @@
-import { useQuery } from "@avandar/react-query";
-import { isDefined, makeBucketMap, prop } from "@avandar/utils";
+import { useQuery } from "@hooks/useQuery/useQuery";
+import { isDefined } from "@utils/guards/isDefined/isDefined";
+import { makeBucketMap } from "@utils/maps/makeBucketMap/makeBucketMap";
+import { prop } from "@utils/objects/hofs/prop/prop";
 import { APIClient } from "@/clients/APIClient";
 import {
   isAnnualPaidSeatsPlan,
@@ -10,7 +12,7 @@ import {
   makeSubscriptionPlanFromPolarProduct,
 } from "./planUtils";
 import type { SubscriptionPlanGroup } from "./SubscriptionPlan.types";
-import type { UseQueryResultTuple } from "@avandar/react-query";
+import type { UseQueryResultTuple } from "@hooks/useQuery/useQuery";
 
 export function useSubscriptionPlans(): UseQueryResultTuple<
   SubscriptionPlanGroup[]

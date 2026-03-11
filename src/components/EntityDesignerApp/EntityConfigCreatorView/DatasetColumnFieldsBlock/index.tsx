@@ -1,4 +1,3 @@
-import { identity, prop, propEq } from "@avandar/utils";
 import {
   ActionIcon,
   Box,
@@ -15,6 +14,9 @@ import {
   IconCircleNumber1Filled,
   IconCircleNumber2Filled,
 } from "@tabler/icons-react";
+import { identity } from "@utils/misc/identity";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { makeObject } from "$/lib/objects/builders";
 import { useCallback, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";

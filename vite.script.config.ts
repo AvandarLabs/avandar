@@ -14,11 +14,11 @@ export default defineConfig({
     alias: {
       "@": "/src",
       $: "/shared",
-      "@avandar/clients": "/packages/clients/src/index.ts",
-      "@avandar/logger": "/packages/logger/src/index.ts",
-      "@avandar/models": "/packages/models/src/index.ts",
-      "@avandar/modules": "/packages/modules/src/index.ts",
-      "@avandar/utils": "/packages/utils/src/index.ts",
+      "@clients": "/packages/clients/src/index.ts",
+      "@logger": "/packages/logger/src/index.ts",
+      "@models": "/packages/models/src/index.ts",
+      "@modules": "/packages/modules/src/index.ts",
+      "@utils": "/packages/utils/src/index.ts",
     },
   },
   ssr: {

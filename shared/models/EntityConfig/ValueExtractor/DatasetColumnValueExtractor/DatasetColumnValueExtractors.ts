@@ -1,4 +1,4 @@
-import { registry } from "@avandar/utils";
+import { registry } from "@utils/objects/registry/registry.ts";
 import type { ValuePickerRuleType } from "./DatasetColumnValueExtractor.types.ts";
 
 export const DatasetColumnValueExtractors = {

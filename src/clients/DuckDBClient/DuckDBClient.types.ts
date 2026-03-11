@@ -1,6 +1,6 @@
 import type { DuckDBDataType } from "./DuckDBDataType.types";
 import type { DuckDBQueryAggregationType } from "./DuckDBQueryAggregations";
-import type { UUID } from "@avandar/utils";
+import type { UUID } from "@utils/types/common";
 
 /**
  * The CSV Reject Scans Table returns the following information:

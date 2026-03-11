@@ -1,4 +1,6 @@
-import { assertIsDefined, objectEntries, objectKeys } from "@avandar/utils";
+import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined.ts";
+import { objectEntries } from "@utils/objects/objectEntries.ts";
+import { objectKeys } from "@utils/objects/objectKeys.ts";
 import { match } from "ts-pattern";
 import { EmptyObject } from "type-fest";
 import { createModelCRUDClient } from "../ModelCRUDClient/createModelCRUDClient.ts";
@@ -13,8 +15,11 @@ import type {
   AnySupabaseCRUDClientModelSpec,
   SupabaseCRUDClient,
 } from "./SupabaseCRUDClient.types.ts";
-import type { ILogger } from "@avandar/logger";
-import type { FilterOperator, FiltersByColumn } from "@avandar/utils";
+import type { ILogger } from "@logger/Logger.types.ts";
+import type {
+  FilterOperator,
+  FiltersByColumn,
+} from "@utils/filters/filters.ts";
 import type { PostgrestFilterBuilder } from "@supabase/postgrest-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
 

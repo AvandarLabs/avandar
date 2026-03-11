@@ -1,7 +1,7 @@
 /**
  * Consumer-facing registry interface. Augment this via declaration
  * merging to register your Supabase database type with
- * `@avandar/clients`.
+ * `@clients`.
  *
  * @example
  * ```ts
@@ -15,7 +15,7 @@
  * ```
  */
 
-import type { UnknownObject } from "@avandar/utils";
+import type { UnknownObject } from "@utils/types/common.ts";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Register {}

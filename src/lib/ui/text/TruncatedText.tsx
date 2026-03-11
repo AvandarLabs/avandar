@@ -1,6 +1,6 @@
-import { isArray } from "@avandar/utils";
 import { Text, TextProps, Tooltip } from "@mantine/core";
 import { useWindowEvent } from "@mantine/hooks";
+import { isArray } from "@utils/guards/isArray/isArray";
 import {
   DependencyList,
   RefObject,

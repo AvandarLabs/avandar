@@ -1,5 +1,5 @@
-import { isDefined } from "@avandar/utils";
 import { Group, Loader, Stack, Text, Title } from "@mantine/core";
+import { isDefined } from "@utils/guards/isDefined/isDefined";
 import { match } from "ts-pattern";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { BillingPortalButton } from "./BillingPortalButton/BillingPortalButton";

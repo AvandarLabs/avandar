@@ -1,4 +1,4 @@
-import { useMutation } from "@avandar/react-query";
+import { useMutation } from "@hooks/useMutation/useMutation";
 import {
   Button,
   Container,

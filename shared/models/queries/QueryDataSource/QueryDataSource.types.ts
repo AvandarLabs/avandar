@@ -1,4 +1,4 @@
-import type { Model } from "@avandar/models";
+import type { Model } from "@models/Model/Model.ts";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig.types.ts";
 

@@ -1,4 +1,3 @@
-import { constant, prop, where } from "@avandar/utils";
 import {
   BoxProps,
   Flex,
@@ -9,6 +8,9 @@ import {
 } from "@mantine/core";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { where } from "@utils/filters/where/where";
+import { constant } from "@utils/misc/constant/constant";
+import { prop } from "@utils/objects/hofs/prop/prop";
 import { useEffect, useMemo, useRef } from "react";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { AppLinks } from "@/config/AppLinks";

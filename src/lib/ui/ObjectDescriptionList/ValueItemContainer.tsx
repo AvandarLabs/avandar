@@ -1,5 +1,5 @@
-import { constant } from "@avandar/utils";
 import { Text } from "@mantine/core";
+import { constant } from "@utils/misc/constant/constant";
 import { match } from "ts-pattern";
 import { DescribableValueArrayBlock } from "./DescribableValueArrayBlock";
 import {

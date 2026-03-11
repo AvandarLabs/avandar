@@ -1,6 +1,8 @@
-import { isNonNullish, prop, where } from "@avandar/utils";
 import { MultiSelect, MultiSelectProps } from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
+import { where } from "@utils/filters/where/where";
+import { isNonNullish } from "@utils/guards/isNonNullish/isNonNullish";
+import { prop } from "@utils/objects/hofs/prop/prop";
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
 import { useEffect, useMemo } from "react";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
@@ -8,7 +10,7 @@ import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigCli
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { isOfModelType } from "@/lib/utils/guards/guards";
 import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap/makeIdLookupMap";
-import type { Model } from "@avandar/models";
+import type { Model } from "@models/Model/Model";
 import type {
   QueryColumn,
   QueryColumnId,

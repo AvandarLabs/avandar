@@ -1,4 +1,3 @@
-import { notifyExpiredSession } from "@avandar/ui";
 import {
   Badge,
   Button,
@@ -9,6 +8,7 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { useRouter } from "@tanstack/react-router";
+import { notifyExpiredSession } from "@ui/notifications/notifyExpiredSession";
 import { useState } from "react";
 import { match } from "ts-pattern";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";

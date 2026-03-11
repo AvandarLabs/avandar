@@ -1,14 +1,12 @@
-import { createServiceClient } from "@avandar/clients";
-import { withLogger } from "@avandar/logger";
-import { withQueryHooks, WithQueryHooks } from "@avandar/react-query";
-import {
-  assertIsDefined,
-  isDefined,
-  objectEntries,
-  objectKeys,
-  prop,
-  where,
-} from "@avandar/utils";
+import { createServiceClient } from "@clients/ServiceClient/createServiceClient";
+import { withQueryHooks } from "@hooks/withQueryHooks/withQueryHooks";
+import { withLogger } from "@logger/module-augmenters/withLogger";
+import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
+import { where } from "@utils/filters/where/where";
+import { isDefined } from "@utils/guards/isDefined/isDefined";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { objectEntries } from "@utils/objects/objectEntries";
+import { objectKeys } from "@utils/objects/objectKeys";
 import { makeBucketRecord, makeIdLookupRecord } from "$/lib/objects/builders";
 import { wrapString } from "$/lib/strings/higherOrderFuncs";
 import { uuid } from "$/lib/uuid";
@@ -22,9 +20,10 @@ import { DatasetRawDataClient } from "../../datasets/DatasetRawDataClient";
 import { singleton } from "../../DuckDBClient/queryResultHelpers";
 import { EntityClient } from "../EntityClient";
 import { getEntityFieldValues } from "./getEntityFieldValues/getEntityFieldValues";
-import type { ServiceClient } from "@avandar/clients";
-import type { ILogger, WithLogger } from "@avandar/logger";
-import type { RegistryOfArrays } from "@avandar/utils";
+import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
+import type { WithQueryHooks } from "@hooks/withQueryHooks/withQueryHooks.types";
+import type { ILogger, WithLogger } from "@logger/Logger.types";
+import type { RegistryOfArrays } from "@utils/types/utilityTypes";
 import type { EntityId } from "$/models/entities/Entity/Entity.types";
 import type { EntityFieldValue } from "$/models/entities/EntityFieldValue/EntityFieldValue.types";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";

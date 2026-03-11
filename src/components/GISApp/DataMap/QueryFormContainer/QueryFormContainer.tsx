@@ -1,8 +1,8 @@
-import { Model } from "@avandar/models";
-import { notifyError } from "@avandar/ui";
 import { ActionIcon, ColorInput, Flex, Popover, Stack } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
+import { Model } from "@models/Model/Model";
 import { IconFilter } from "@tabler/icons-react";
+import { notifyError } from "@ui/notifications/notify";
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { AvaTooltip } from "@/lib/ui/AvaTooltip/AvaTooltip";

@@ -1,17 +1,18 @@
-import { makeParserRegistry } from "@avandar/clients";
-import {
-  camelCaseKeysDeep,
-  nullsToUndefinedDeep,
-  pipe,
-  snakeCaseKeysDeep,
-} from "@avandar/utils";
+import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
+import { pipe } from "@utils/misc/pipe/pipe.ts";
+import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeysDeep/camelCaseKeysDeep.ts";
+import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
+import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
 import { z } from "zod";
 import type { DatasetId } from "../Dataset/Dataset.types.ts";
 import type {
   CSVFileDatasetId,
   CSVFileDatasetModel,
 } from "./CSVFileDataset.types.ts";
-import type { Expect, ZodSchemaEqualsTypes } from "@avandar/utils";
+import type {
+  Expect,
+  ZodSchemaEqualsTypes,
+} from "@utils/types/testUtilityTypes.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 
 const DBReadSchema = z.object({

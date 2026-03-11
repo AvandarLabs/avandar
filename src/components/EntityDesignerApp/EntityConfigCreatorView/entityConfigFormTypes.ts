@@ -1,10 +1,10 @@
-import { Model } from "@avandar/models";
+import { Model } from "@models/Model/Model";
 import { uuid } from "$/lib/uuid";
 import { DatasetColumnValueExtractor } from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractor.types";
 import { ManualEntryExtractor } from "$/models/EntityConfig/ValueExtractor/ManualEntryExtractor/ManualEntryExtractor.types";
 import { EntityFieldValueExtractorRegistry } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types";
 import type { FormType } from "@/lib/hooks/ui/useForm";
-import type { Expect } from "@avandar/utils";
+import type { Expect } from "@utils/types/testUtilityTypes";
 import type {
   Dataset,
   DatasetWithColumns,

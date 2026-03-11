@@ -1,6 +1,6 @@
-import { Model } from "@avandar/models";
-import { prop } from "@avandar/utils";
 import { Fieldset, Stack, Text } from "@mantine/core";
+import { Model } from "@models/Model/Model";
+import { prop } from "@utils/objects/hofs/prop/prop";
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
 import { Select, SelectData } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";

@@ -1,6 +1,9 @@
-import { Model } from "@avandar/models";
-import { useQuery } from "@avandar/react-query";
-import { objectEntries, objectValues, prop, where } from "@avandar/utils";
+import { useQuery } from "@hooks/useQuery/useQuery";
+import { Model } from "@models/Model/Model";
+import { where } from "@utils/filters/where/where";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { objectEntries } from "@utils/objects/objectEntries";
+import { objectValues } from "@utils/objects/objectValues";
 import { makeObjectFromEntries } from "$/lib/objects/builders";
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
 import { QueryResults } from "$/models/queries/QueryResult/QueryResults";
@@ -16,7 +19,7 @@ import {
 import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap/makeIdLookupMap";
 import { sortObjList } from "@/lib/utils/objects/sortObjList";
 import type { UnknownRow } from "@/clients/DuckDBClient";
-import type { UseQueryResultTuple } from "@avandar/react-query";
+import type { UseQueryResultTuple } from "@hooks/useQuery/useQuery";
 import type {
   QueryResult,
   QueryResultColumn,

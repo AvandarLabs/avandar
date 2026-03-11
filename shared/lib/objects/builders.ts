@@ -1,4 +1,5 @@
-import { constant, identity } from "@avandar/utils";
+import { constant } from "@utils/misc/constant/constant.ts";
+import { identity } from "@utils/misc/identity.ts";
 import type { ConditionalKeys } from "type-fest";
 
 /**

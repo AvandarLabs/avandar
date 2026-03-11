@@ -28,7 +28,7 @@ const MOCK_TSCONFIG = JSON.stringify(
   {
     compilerOptions: {
       paths: {
-        "@avandar/utils": ["./packages/shared/utils/src/index.ts"],
+        "@utils/*": ["./packages/shared/utils/src/*"],
       },
     },
   },
@@ -45,7 +45,7 @@ const MOCK_DENO_JSON = JSON.stringify(
       "./supabase/functions/health",
     ],
     imports: {
-      "@avandar/utils": "./packages/shared/utils/src/index.ts",
+      "@utils/": "./packages/shared/utils/src/",
     },
   },
   undefined,
@@ -81,7 +81,7 @@ const MOCK_TSCONFIG_APP = JSON.stringify(
 const MOCK_EDGE_FUNCTION_DENO_TEMPLATE = JSON.stringify(
   {
     imports: {
-      "@avandar/utils": "../../../packages/shared/utils/src/index.ts",
+      "@utils/": "../../../packages/shared/utils/",
     },
   },
   undefined,
@@ -173,8 +173,8 @@ describe("writeNewPackageBoilerplate", () => {
         paths: Record<string, string[]>;
       };
     };
-    expect(written.compilerOptions.paths["@avandar/my-lib"]).toEqual([
-      "./packages/shared/my-lib/src/index.ts",
+    expect(written.compilerOptions.paths["@my-lib/*"]).toEqual([
+      "./packages/shared/my-lib/src/*",
     ]);
   });
 
@@ -221,9 +221,7 @@ describe("writeNewPackageBoilerplate", () => {
     const written = JSON.parse(denoWrite![1]) as {
       imports: Record<string, string>;
     };
-    expect(written.imports["@avandar/my-lib"]).toBe(
-      "./packages/shared/my-lib/src/index.ts",
-    );
+    expect(written.imports["@my-lib/"]).toBe("./packages/shared/my-lib/src/");
   });
 
   it(
@@ -307,8 +305,8 @@ describe("writeNewPackageBoilerplate", () => {
     const written = JSON.parse(templateWrite![1]) as {
       imports: Record<string, string>;
     };
-    expect(written.imports["@avandar/my-lib"]).toBe(
-      "../../../packages/shared/my-lib/src/index.ts",
+    expect(written.imports["@my-lib/"]).toBe(
+      "../../../packages/shared/my-lib/src/",
     );
   });
 
@@ -319,7 +317,7 @@ describe("writeNewPackageBoilerplate", () => {
         return JSON.stringify({
           compilerOptions: {
             paths: {
-              "@avandar/my-lib": ["./packages/shared/my-lib/src/index.ts"],
+              "@my-lib/*": ["./packages/shared/my-lib/src/*"],
             },
           },
         });
@@ -412,7 +410,7 @@ describe("writeNewPackageBoilerplate", () => {
             "./supabase/functions/_shared",
           ],
           imports: {
-            "@avandar/utils": "./packages/shared/utils/src/index.ts",
+            "@utils/": "./packages/shared/utils/src/",
           },
         });
       }
@@ -477,6 +475,6 @@ describe("writeNewPackageBoilerplate", () => {
 
     const logs = _getCombinedLogs();
     expect(logs).toContain("Created package in: packages/shared/my-lib");
-    expect(logs).toContain("Registered alias: @avandar/my-lib");
+    expect(logs).toContain("Registered alias: @my-lib");
   });
 });

@@ -1,13 +1,14 @@
-import { createServiceClient } from "@avandar/clients";
-import { withLogger } from "@avandar/logger";
-import { WithQueryHooks, withQueryHooks } from "@avandar/react-query";
-import { isDefined } from "@avandar/utils";
+import { createServiceClient } from "@clients/ServiceClient/createServiceClient";
+import { WithQueryHooks } from "@hooks/index";
+import { withQueryHooks } from "@hooks/withQueryHooks/withQueryHooks";
+import { withLogger } from "@logger/module-augmenters/withLogger";
+import { isDefined } from "@utils/guards/isDefined/isDefined";
 import { promiseMap } from "@/lib/utils/promises";
 import { DuckDBClient } from "../DuckDBClient";
 import { LocalPublicDatasetClient } from "./LocalPublicDatasetClient";
 import type { LocalPublicDataset } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
-import type { ServiceClient } from "@avandar/clients";
-import type { WithLogger } from "@avandar/logger";
+import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
+import type { WithLogger } from "@logger/Logger.types";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 

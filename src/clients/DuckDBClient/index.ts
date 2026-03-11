@@ -1,17 +1,15 @@
-import { ILogger } from "@avandar/logger";
-import {
-  isNonEmptyArray,
-  MIMEType,
-  objectEntries,
-  objectKeys,
-  objectValuesMap,
-  prop,
-} from "@avandar/utils";
 import * as duckdb from "@duckdb/duckdb-wasm";
 import ehWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url";
 import mvpWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?url";
 import duckDBWasmEh from "@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url";
 import duckDBWasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
+import { ILogger } from "@logger/Logger.types";
+import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { objectEntries } from "@utils/objects/objectEntries";
+import { objectKeys } from "@utils/objects/objectKeys";
+import { objectValuesMap } from "@utils/objects/objectValuesMap/objectValuesMap";
+import { MIMEType } from "@utils/types/common";
 import { uuid } from "$/lib/uuid";
 import * as arrow from "apache-arrow";
 import knex from "knex";

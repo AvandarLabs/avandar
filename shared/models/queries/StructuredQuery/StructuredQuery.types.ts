@@ -4,8 +4,8 @@ import type {
   QueryColumnId,
 } from "../QueryColumn/QueryColumn.types.ts";
 import type { QueryDataSource } from "../QueryDataSource/QueryDataSource.types.ts";
-import type { Model } from "@avandar/models";
-import type { UUID } from "@avandar/utils";
+import type { Model } from "@models/Model/Model.ts";
+import type { UUID } from "@utils/types/common.ts";
 
 type ModelType = "StructuredQuery";
 type CurrentStructuredQueryVersion = 1;

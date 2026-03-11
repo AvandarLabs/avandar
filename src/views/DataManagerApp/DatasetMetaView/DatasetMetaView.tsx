@@ -1,4 +1,3 @@
-import { prop, where } from "@avandar/utils";
 import {
   Button,
   Container,
@@ -16,6 +15,8 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { IconPencil, IconX } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
+import { where } from "@utils/filters/where/where";
+import { prop } from "@utils/objects/hofs/prop/prop";
 import { matchLiteral } from "$/lib/strings/matchLiteral";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { useMemo, useState } from "react";

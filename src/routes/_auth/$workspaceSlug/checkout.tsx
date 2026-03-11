@@ -1,4 +1,4 @@
-import { useQuery } from "@avandar/react-query";
+import { useQuery } from "@hooks/useQuery/useQuery";
 import {
   Button,
   Center,

@@ -3,8 +3,9 @@ import type {
   GetInputPropsReturnType,
   GetKeyAndPropsFn,
 } from "./useKeysAndPropsCallback";
-import type { PathValue, UnknownObject } from "@avandar/utils";
 import type { UseFormReturnType as MantineUseFormReturnType } from "@mantine/form";
+import type { PathValue } from "@utils/objects/getValue/getValue";
+import type { UnknownObject } from "@utils/types/common";
 import type { Paths, Simplify } from "type-fest";
 
 type InsertListItemFn<FormValues extends UnknownObject> = <

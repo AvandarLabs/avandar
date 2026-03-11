@@ -1,4 +1,5 @@
-import { constant, registry } from "@avandar/utils";
+import { constant } from "@utils/misc/constant/constant";
+import { registry } from "@utils/objects/registry/registry";
 import { match } from "ts-pattern";
 import type { DuckDBDataType } from "./DuckDBDataType.types";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.types";

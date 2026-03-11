@@ -1,5 +1,5 @@
 import type { RegisteredSupabaseDatabase } from "../Register.types.ts";
-import type { ServiceClient } from "@avandar/clients";
+import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type WithSupabaseClient<Client extends ServiceClient> = Client & {

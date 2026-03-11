@@ -1,4 +1,5 @@
-import { FiltersByColumn, omit } from "@avandar/utils";
+import { FiltersByColumn } from "@utils/filters/filters.ts";
+import { omit } from "@utils/objects/omit/omit.ts";
 import { withLogger } from "../../../logger/src/module-augmenters/withLogger.ts";
 import { createServiceClient } from "../ServiceClient/createServiceClient.ts";
 import {
@@ -10,7 +11,7 @@ import {
   UpsertOptions,
 } from "./ModelCRUDClient.types.ts";
 import type { ModelCRUDParserRegistry } from "../makeParserRegistry.ts";
-import type { ILogger } from "@avandar/logger";
+import type { ILogger } from "@logger/Logger.types.ts";
 import type { EmptyObject } from "type-fest";
 
 type CreateModelCRUDClientOptions<

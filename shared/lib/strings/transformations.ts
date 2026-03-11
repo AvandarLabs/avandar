@@ -1,4 +1,4 @@
-import { capitalize } from "@avandar/utils";
+import { capitalize } from "@utils/strings/capitalize/capitalize.ts";
 
 /**
  * Converts camelCase to title case.

@@ -1,12 +1,12 @@
 import type { ModelCRUDParserRegistry } from "../makeParserRegistry.ts";
 import type { ServiceClient } from "../ServiceClient/ServiceClient.types.ts";
-import type { ILogger } from "@avandar/logger";
+import type { ILogger } from "@logger/Logger.types.ts";
+import type { FiltersByColumn } from "@utils/filters/filters.ts";
 import type {
-  AnyFunctionWithSignature,
   EmptyObject,
-  FiltersByColumn,
   UnknownObject,
-} from "@avandar/utils";
+} from "@utils/types/common.ts";
+import type { AnyFunctionWithSignature } from "@utils/types/utilityTypes.ts";
 
 /**
  * A client with only functions that have a single parameter and

@@ -1,4 +1,4 @@
-import { MIMEType } from "@avandar/utils";
+import { MIMEType } from "@utils/types/common";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import {
   getPublicDatasetParquetStoragePath,

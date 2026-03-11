@@ -1,5 +1,5 @@
-import { objectKeys } from "@avandar/utils";
 import { List, Table, Text } from "@mantine/core";
+import { objectKeys } from "@utils/objects/objectKeys";
 import { useMemo } from "react";
 import { CollapsibleItem } from "../CollapsibleItem";
 import { getOrderedKeys } from "../gerOrderedKeys/getOrderedKeys";

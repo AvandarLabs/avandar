@@ -1,6 +1,6 @@
-import { where } from "@avandar/utils";
 import { Box, Flex, MantineTheme } from "@mantine/core";
 import { Outlet } from "@tanstack/react-router";
+import { where } from "@utils/filters/where/where";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { EntityConfigNavbar } from "./EntityConfigNavbar";

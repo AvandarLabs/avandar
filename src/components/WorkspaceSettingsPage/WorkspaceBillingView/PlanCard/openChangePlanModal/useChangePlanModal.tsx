@@ -1,7 +1,7 @@
-import { useMutation } from "@avandar/react-query";
-import { notifyError, notifySuccess } from "@avandar/ui";
+import { useMutation } from "@hooks/useMutation/useMutation";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
+import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { SUPPORT_EMAIL } from "$/config/AppConfig";
 import { match } from "ts-pattern";
 import { APIClient } from "@/clients/APIClient";

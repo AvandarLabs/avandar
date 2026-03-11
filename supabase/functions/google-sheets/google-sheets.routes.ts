@@ -1,4 +1,5 @@
-import { assertIsNonEmptyArray, isNonEmptyArray } from "@avandar/utils";
+import { assertIsNonEmptyArray } from "@utils/asserts/assertIsNonEmptyArray/assertIsNonEmptyArray.ts";
+import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray.ts";
 import { google } from "googleapis";
 import { string } from "zod";
 import { getGoogleAuthClient } from "../_shared/getGoogleAuthClient.ts";

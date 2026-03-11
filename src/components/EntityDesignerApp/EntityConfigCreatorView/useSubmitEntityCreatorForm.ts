@@ -1,5 +1,9 @@
-import { useMutation, UseMutationResultTuple } from "@avandar/react-query";
-import { isDefined, prop } from "@avandar/utils";
+import {
+  useMutation,
+  UseMutationResultTuple,
+} from "@hooks/useMutation/useMutation";
+import { isDefined } from "@utils/guards/isDefined/isDefined";
+import { prop } from "@utils/objects/hofs/prop/prop";
 import { match } from "ts-pattern";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";

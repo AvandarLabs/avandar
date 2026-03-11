@@ -1,7 +1,7 @@
-import { noop } from "@avandar/utils";
 import { ActionIcon, Button, Tooltip } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconTrash } from "@tabler/icons-react";
+import { noop } from "@utils/misc/noop";
 
 type Props = {
   label: string;
