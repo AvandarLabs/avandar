@@ -3,25 +3,24 @@ import { identity } from "@utils/misc/identity";
 import { objectKeys } from "@utils/objects/objectKeys";
 import Dexie, { EntityTable, Transaction } from "dexie";
 import { UnionToIntersection } from "type-fest";
-import type { DexieCRUDClientModelSpec } from "./DexieCRUDClient.types";
+import type { DexieCRUDModelSpec } from "./DexieCRUDClient.types";
 
 /**
  * A record of Dexie tables representing CRUD models.
  * Each key is a model name and the values are Dexie tables type definitions.
  */
-type DexieModelTableRecord<M extends DexieCRUDClientModelSpec> =
-  UnionToIntersection<
-    // we use a distributive conditional here to create a union of records, so
-    // we can then intersect them all together. This way we can ensure each
-    // model name is associated to its correct model type, rather than being a
-    // union of all model types.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    M extends any ?
-      {
-        [K in M["modelName"]]: EntityTable<M["DBRead"], M["modelPrimaryKey"]>;
-      }
-    : never
-  >;
+type DexieModelTableRecord<M extends DexieCRUDModelSpec> = UnionToIntersection<
+  // we use a distributive conditional here to create a union of records, so
+  // we can then intersect them all together. This way we can ensure each
+  // model name is associated to its correct model type, rather than being a
+  // union of all model types.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  M extends any ?
+    {
+      [K in M["modelName"]]: EntityTable<M["DBRead"], M["modelPrimaryKey"]>;
+    }
+  : never
+>;
 
 /**
  * A Dexie table representing the 'meta' table.
@@ -31,14 +30,14 @@ type DexieMetaTable = EntityTable<{ key: string; value: string }, "key">;
 /**
  * A type representing a Dexie database with a specific union of models.
  */
-export type DexieDBType<M extends DexieCRUDClientModelSpec> = Dexie &
+export type DexieDBType<M extends DexieCRUDModelSpec> = Dexie &
   DexieModelTableRecord<M> & {
     meta: DexieMetaTable;
   };
 
 type DBSchemaType = {
   version: number;
-  models: readonly [DexieCRUDClientModelSpec, ...DexieCRUDClientModelSpec[]];
+  models: readonly [DexieCRUDModelSpec, ...DexieCRUDModelSpec[]];
 };
 
 type DBSchemaConfig<DBSchema extends DBSchemaType = DBSchemaType> =
@@ -80,7 +79,7 @@ type GenericDexieDBSchema = {
   version: number;
 
   /** Models must be specified as a fixed tuple. */
-  models: readonly [DexieCRUDClientModelSpec, ...DexieCRUDClientModelSpec[]];
+  models: readonly [DexieCRUDModelSpec, ...DexieCRUDModelSpec[]];
 };
 
 type GenericDexieDBSchemaRegistry = Record<`v${number}`, GenericDexieDBSchema>;

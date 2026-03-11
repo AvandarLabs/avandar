@@ -8,7 +8,7 @@ import type {
   UseQueryResultTuple,
 } from "../useQuery/useQuery";
 import type {
-  CRUDClientModelSpec,
+  CRUDModelSpec,
   ModelCRUDClient,
 } from "@clients/ModelCRUDClient/ModelCRUDClient.types";
 import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
@@ -255,7 +255,7 @@ export const DEFAULT_QUERY_FN_NAMES = [
   "getOne",
   "getCount",
 ] as const satisfies ReadonlyArray<
-  FnNameReturningPromise<ModelCRUDClient<CRUDClientModelSpec>>
+  FnNameReturningPromise<ModelCRUDClient<CRUDModelSpec>>
 >;
 export type DefaultQueryFnName = (typeof DEFAULT_QUERY_FN_NAMES)[number];
 
@@ -270,7 +270,7 @@ export const DEFAULT_MUTATION_FN_NAMES = [
   "delete",
   "bulkDelete",
 ] as const satisfies ReadonlyArray<
-  FnNameReturningPromise<ModelCRUDClient<CRUDClientModelSpec>>
+  FnNameReturningPromise<ModelCRUDClient<CRUDModelSpec>>
 >;
 
 export type DefaultMutationFnName = (typeof DEFAULT_MUTATION_FN_NAMES)[number];
@@ -278,7 +278,7 @@ export type DefaultMutationFnName = (typeof DEFAULT_MUTATION_FN_NAMES)[number];
 /*
 export type UsableModelCRUDClient<
   // These args should be passed explicitly
-  M extends CRUDClientModelSpec,
+  M extends CRUDModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises = EmptyObject,
   ExtendedMutationsClient extends ClientReturningOnlyPromises = EmptyObject,
   FullClient extends BaseModelCRUDClient<M> &

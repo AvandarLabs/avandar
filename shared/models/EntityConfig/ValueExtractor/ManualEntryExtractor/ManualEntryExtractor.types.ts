@@ -1,5 +1,5 @@
 import type { EntityFieldConfigId } from "../../EntityFieldConfig/EntityFieldConfig.types.ts";
-import type { SupabaseCRUDClientModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
+import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
 import type { UUID } from "@utils/types/common.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { SetOptional, Simplify } from "type-fest";
@@ -36,7 +36,7 @@ type ManualEntryExtractorInsert = SetOptional<
 
 type ManualEntryExtractorUpdate = Partial<ManualEntryExtractorRead>;
 
-export type ManualEntryExtractorModel = SupabaseCRUDClientModelSpec<
+export type ManualEntryExtractorModel = SupabaseCRUDModelSpec<
   {
     tableName: "value_extractors__manual_entry";
     modelName: "ManualEntryExtractor";

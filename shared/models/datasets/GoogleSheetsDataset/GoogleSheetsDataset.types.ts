@@ -1,5 +1,5 @@
 import type { DatasetId } from "../Dataset/Dataset.types.ts";
-import type { SupabaseCRUDClientModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
+import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
 import type { UUID } from "@utils/types/common.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { SetOptional } from "type-fest";
@@ -35,7 +35,7 @@ export type GoogleSheetsDatasetRead = {
 /**
  * CRUD type definitions for the GoogleSheetsDataset model.
  */
-export type GoogleSheetsDatasetModel = SupabaseCRUDClientModelSpec<
+export type GoogleSheetsDatasetModel = SupabaseCRUDModelSpec<
   {
     tableName: "datasets__google_sheets";
     modelName: "GoogleSheetsDataset";

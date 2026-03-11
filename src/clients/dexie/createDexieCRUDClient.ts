@@ -4,7 +4,7 @@ import { UpsertOptions } from "@clients/ModelCRUDClient/ModelCRUDClient.types";
 import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
 import { applyFiltersToRows } from "@utils/filters/applyFiltersToRows/applyFiltersToRows";
 import { isDefined } from "@utils/guards/isDefined/isDefined";
-import { DexieCRUDClientModelSpec } from "./DexieCRUDClient.types";
+import { DexieCRUDModelSpec } from "./DexieCRUDClient.types";
 import type { DexieDBType } from "./DexieDBVersionManager";
 import type {
   ClientReturningOnlyPromises,
@@ -16,13 +16,13 @@ import type { EmptyObject } from "@utils/types/common";
 import type { IDType, UpdateSpec } from "dexie";
 
 export type DexieCRUDClient<
-  M extends DexieCRUDClientModelSpec,
+  M extends DexieCRUDModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises,
   ExtendedMutationsClient extends ClientReturningOnlyPromises,
 > = ModelCRUDClient<M, ExtendedQueriesClient, ExtendedMutationsClient>;
 
 type CreateDexieCRUDClientOptions<
-  M extends DexieCRUDClientModelSpec,
+  M extends DexieCRUDModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises,
   ExtendedMutationsClient extends ClientReturningOnlyPromises,
   DB extends DexieDBType<M> = DexieDBType<M>,
@@ -75,7 +75,7 @@ type CreateDexieCRUDClientOptions<
  * Creates a client for a model that maps to a Dexie table.
  */
 export function createDexieCRUDClient<
-  M extends DexieCRUDClientModelSpec,
+  M extends DexieCRUDModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises = EmptyObject,
   ExtendedMutationsClient extends ClientReturningOnlyPromises = EmptyObject,
   DB extends DexieDBType<M> = DexieDBType<M>,

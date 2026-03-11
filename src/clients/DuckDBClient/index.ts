@@ -11,6 +11,11 @@ import { objectKeys } from "@utils/objects/objectKeys";
 import { objectValuesMap } from "@utils/objects/objectValuesMap/objectValuesMap";
 import { MIMEType } from "@utils/types/common";
 import { uuid } from "$/lib/uuid";
+import {
+  DuckDBDataType,
+  DuckDBDataTypes,
+} from "$/models/datasets/DatasetColumn/DuckDBDataTypes";
+import { DuckDBQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationTypes";
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
@@ -25,9 +30,7 @@ import {
   DuckDBScan,
   DuckDBStructuredQuery,
 } from "./DuckDBClient.types";
-import { DuckDBDataTypes, DuckDBDataTypeUtils } from "./DuckDBDataType";
-import { DuckDBDataType } from "./DuckDBDataType.types";
-import { DuckDBQueryAggregations } from "./DuckDBQueryAggregations";
+import { DuckDBDataTypeUtils } from "./DuckDBDataType";
 import type {
   QueryResult,
   QueryResultPage,

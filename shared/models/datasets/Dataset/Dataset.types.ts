@@ -1,4 +1,4 @@
-import type { SupabaseCRUDClientModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
+import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
 import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.ts";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
@@ -49,7 +49,7 @@ type DatasetRead = Model.Base<
 /**
  * CRUD type definitions for the Dataset model.
  */
-export type DatasetModel = SupabaseCRUDClientModelSpec<
+export type DatasetModel = SupabaseCRUDModelSpec<
   {
     tableName: "datasets";
     modelName: "Dataset";

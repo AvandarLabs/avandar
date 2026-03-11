@@ -1,6 +1,6 @@
 import type { UserId } from "../User/User.types.ts";
 import type { Workspace } from "../Workspace/Workspace.ts";
-import type { SupabaseCRUDClientModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
+import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
 import type { UUID } from "@utils/types/common.ts";
 import type { Enums } from "$/types/database.types.ts";
 import type { SetOptional } from "type-fest";
@@ -31,7 +31,7 @@ export type Subscription = {
   currentPeriodEnd: Date | undefined;
 };
 
-export type SubscriptionModel = SupabaseCRUDClientModelSpec<
+export type SubscriptionModel = SupabaseCRUDModelSpec<
   {
     tableName: "subscriptions";
     modelName: "Subscription";

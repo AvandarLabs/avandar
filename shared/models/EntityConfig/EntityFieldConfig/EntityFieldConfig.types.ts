@@ -1,6 +1,6 @@
 import type { EntityConfigId } from "../EntityConfig.types.ts";
 import type { ValueExtractorType } from "../ValueExtractor/ValueExtractor.types.ts";
-import type { SupabaseCRUDClientModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
+import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
 import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.ts";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.types.ts";
@@ -35,7 +35,7 @@ type EntityFieldConfigInsert = SetOptional<
 
 type EntityFieldConfigUpdate = Partial<EntityFieldConfigRead>;
 
-export type EntityFieldConfigModel = SupabaseCRUDClientModelSpec<
+export type EntityFieldConfigModel = SupabaseCRUDModelSpec<
   {
     tableName: "entity_field_configs";
     modelName: "EntityFieldConfig";

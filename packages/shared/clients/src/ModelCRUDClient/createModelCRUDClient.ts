@@ -4,7 +4,7 @@ import { withLogger } from "../../../logger/src/module-augmenters/withLogger.ts"
 import { createServiceClient } from "../ServiceClient/createServiceClient.ts";
 import {
   ClientReturningOnlyPromises,
-  CRUDClientModelSpec,
+  CRUDModelSpec,
   ModelCRUDClient,
   ModelCRUDFunctions,
   ModelCRUDPage,
@@ -15,7 +15,7 @@ import type { ILogger } from "@logger/Logger.types.ts";
 import type { EmptyObject } from "type-fest";
 
 type CreateModelCRUDClientOptions<
-  M extends CRUDClientModelSpec,
+  M extends CRUDModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises,
   ExtendedMutationsClient extends ClientReturningOnlyPromises,
 > = {
@@ -45,7 +45,7 @@ type CreateModelCRUDClientOptions<
 };
 
 export function createModelCRUDClient<
-  M extends CRUDClientModelSpec,
+  M extends CRUDModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises = EmptyObject,
   ExtendedMutationsClient extends ClientReturningOnlyPromises = EmptyObject,
 >({

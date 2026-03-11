@@ -2,10 +2,7 @@ import type { ModelCRUDParserRegistry } from "../makeParserRegistry.ts";
 import type { ServiceClient } from "../ServiceClient/ServiceClient.types.ts";
 import type { ILogger } from "@logger/Logger.types.ts";
 import type { FiltersByColumn } from "@utils/filters/filters.ts";
-import type {
-  EmptyObject,
-  UnknownObject,
-} from "@utils/types/common.ts";
+import type { EmptyObject, UnknownObject } from "@utils/types/common.ts";
 import type { AnyFunctionWithSignature } from "@utils/types/utilityTypes.ts";
 
 /**
@@ -66,7 +63,7 @@ export type UpsertOptions = {
   };
 };
 
-export type CRUDClientModelSpec = {
+export type CRUDModelSpec = {
   /** The name of the model */
   modelName: string;
 
@@ -105,7 +102,7 @@ export type CRUDClientModelSpec = {
   Update: UnknownObject;
 };
 
-export type ModelCRUDFunctions<M extends CRUDClientModelSpec> = {
+export type ModelCRUDFunctions<M extends CRUDModelSpec> = {
   // `Get` queries
   getById: (params: {
     id: M["modelPrimaryKeyType"] | null | undefined;
@@ -161,7 +158,7 @@ export type ModelCRUDFunctions<M extends CRUDClientModelSpec> = {
  * All of these functions will have auto-generated `useQuery` and `useMutation`
  * hooks.
  */
-export type BaseModelCRUDClient<M extends CRUDClientModelSpec> = {
+export type BaseModelCRUDClient<M extends CRUDModelSpec> = {
   /** The parsers for the model */
   parsers: ModelCRUDParserRegistry<M>;
 
@@ -323,7 +320,7 @@ export type BaseModelCRUDClient<M extends CRUDClientModelSpec> = {
 } & ServiceClient<`${M["modelName"]}Client`>;
 
 export type ModelCRUDClient<
-  M extends CRUDClientModelSpec,
+  M extends CRUDModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises = EmptyObject,
   ExtendedMutationsClient extends ClientReturningOnlyPromises = EmptyObject,
 > = BaseModelCRUDClient<M> & ExtendedQueriesClient & ExtendedMutationsClient;

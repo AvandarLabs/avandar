@@ -1,14 +1,14 @@
 import { excludeUndefinedDeep } from "@utils/objects/excludeUndefinedDeep/excludeUndefinedDeep.ts";
 import { objectKeys } from "@utils/objects/objectKeys.ts";
 import { pick } from "@utils/objects/pick/pick.ts";
-import type { CRUDClientModelSpec } from "./ModelCRUDClient/ModelCRUDClient.types.ts";
+import type { CRUDModelSpec } from "./ModelCRUDClient/ModelCRUDClient.types.ts";
 import type { z } from "zod";
 
-type GenericDBReadSchema<M extends CRUDClientModelSpec> = z.ZodObject<{
+type GenericDBReadSchema<M extends CRUDModelSpec> = z.ZodObject<{
   [K in keyof M["DBRead"]]: z.ZodType<M["DBRead"][K], M["DBRead"][K]>;
 }>;
 
-type CRUDTransformerFunctions<M extends CRUDClientModelSpec> = {
+type CRUDTransformerFunctions<M extends CRUDModelSpec> = {
   /**
    * Transforms a DBRead object into a ModelRead object.
    *
@@ -34,11 +34,11 @@ type CRUDTransformerFunctions<M extends CRUDClientModelSpec> = {
   fromModelUpdateToDBUpdate: (data: M["Update"]) => M["DBUpdate"];
 };
 
-export type ModelCRUDParserRegistry<M extends CRUDClientModelSpec> = {
+export type ModelCRUDParserRegistry<M extends CRUDModelSpec> = {
   DBReadSchema: GenericDBReadSchema<M>;
 } & CRUDTransformerFunctions<M>;
 
-type ParserRegistryBuilderFn<M extends CRUDClientModelSpec> = (
+type ParserRegistryBuilderFn<M extends CRUDModelSpec> = (
   config: {
     modelName: M["modelName"];
     DBReadSchema: GenericDBReadSchema<M>;
@@ -75,7 +75,7 @@ export function getErrorMap({
  *
  * @returns A builder function for creating a parser registry.
  */
-export function makeParserRegistry<M extends CRUDClientModelSpec = never>(): {
+export function makeParserRegistry<M extends CRUDModelSpec = never>(): {
   build: ParserRegistryBuilderFn<M>;
 } {
   return {

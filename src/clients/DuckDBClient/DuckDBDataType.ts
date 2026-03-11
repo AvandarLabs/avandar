@@ -1,8 +1,7 @@
 import { constant } from "@utils/misc/constant/constant";
-import { registry } from "@utils/objects/registry/registry";
 import { match } from "ts-pattern";
-import type { DuckDBDataType } from "./DuckDBDataType.types";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.types";
+import type { DuckDBDataType } from "$/models/datasets/DatasetColumn/DuckDBDataTypes";
 
 /**
  * This is a subset of DuckDBDataType. These are the possible data that
@@ -12,39 +11,6 @@ export type DuckDBSniffableDataType = Extract<
   DuckDBDataType,
   "BOOLEAN" | "BIGINT" | "DOUBLE" | "TIME" | "DATE" | "TIMESTAMP" | "VARCHAR"
 >;
-
-export const DuckDBDataTypes = registry<DuckDBDataType>().keys(
-  "BOOLEAN",
-  "TINYINT",
-  "SMALLINT",
-  "INTEGER",
-  "BIGINT",
-  "UBIGINT",
-  "UTINYINT",
-  "USMALLINT",
-  "UINTEGER",
-  "FLOAT",
-  "DOUBLE",
-  "DECIMAL",
-  "DATE",
-  "TIME",
-  "TIMESTAMP",
-  "TIMESTAMP_TZ",
-  "TIMESTAMP WITH TIME ZONE",
-  "INTERVAL",
-  "VARCHAR",
-  "BLOB",
-  "UUID",
-  "HUGEINT",
-  "BIT",
-  "ENUM",
-  "MAP",
-  "STRUCT",
-  "LIST",
-  "UNION",
-  "JSON",
-  "GEOMETRY",
-);
 
 export const DuckDBDataTypeUtils = {
   isDateOrTimestamp: (duckDBDataType: DuckDBDataType): boolean => {

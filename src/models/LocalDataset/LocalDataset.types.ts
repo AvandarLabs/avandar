@@ -1,4 +1,4 @@
-import type { DexieCRUDClientModelSpec } from "@/clients/dexie/DexieCRUDClient.types";
+import type { DexieCRUDModelSpec } from "@/clients/dexie/DexieCRUDClient.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -21,7 +21,7 @@ type LocalDatasetDBRead = {
   parquetData: Blob;
 };
 
-export type LocalDatasetModel = DexieCRUDClientModelSpec<{
+export type LocalDatasetModel = DexieCRUDModelSpec<{
   modelName: "LocalDataset";
   primaryKey: "datasetId";
   primaryKeyType: DatasetId;

@@ -1,7 +1,7 @@
-import type { DuckDBDataType } from "../../../../src/clients/DuckDBClient/DuckDBDataType.types.ts";
 import type { AvaDataType } from "../AvaDataType/AvaDataType.types.ts";
 import type { DatasetId } from "../Dataset/Dataset.types.ts";
-import type { SupabaseCRUDClientModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
+import type { DuckDBDataType } from "./DuckDBDataTypes.ts";
+import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
 import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
@@ -78,7 +78,7 @@ export type DetectedDatasetColumn = Pick<
 /**
  * CRUD type definitions for the DatasetColumn model.
  */
-export type DatasetColumnModel = SupabaseCRUDClientModelSpec<
+export type DatasetColumnModel = SupabaseCRUDModelSpec<
   {
     tableName: "dataset_columns";
     modelName: "DatasetColumn";

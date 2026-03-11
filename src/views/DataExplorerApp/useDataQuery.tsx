@@ -5,11 +5,11 @@ import { prop } from "@utils/objects/hofs/prop/prop";
 import { objectEntries } from "@utils/objects/objectEntries";
 import { objectValues } from "@utils/objects/objectValues";
 import { makeObjectFromEntries } from "$/lib/objects/builders";
+import { DuckDBQueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationTypes";
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
 import { QueryResults } from "$/models/queries/QueryResult/QueryResults";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
-import { DuckDBQueryAggregationType } from "@/clients/DuckDBClient/DuckDBQueryAggregations";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { isOfModelType } from "@/lib/utils/guards/guards";
 import {

@@ -1,4 +1,4 @@
-import type { DexieCRUDClientModelSpec } from "@/clients/dexie/DexieCRUDClient.types";
+import type { DexieCRUDModelSpec } from "@/clients/dexie/DexieCRUDClient.types";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
@@ -21,7 +21,7 @@ type PublicDatasetDBRead = {
   downloadedAt: string;
 };
 
-export type LocalPublicDatasetModel = DexieCRUDClientModelSpec<{
+export type LocalPublicDatasetModel = DexieCRUDModelSpec<{
   modelName: "LocalPublicDataset";
   primaryKey: "datasetId";
   primaryKeyType: DatasetId;

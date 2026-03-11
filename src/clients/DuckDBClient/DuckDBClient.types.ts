@@ -1,6 +1,6 @@
-import type { DuckDBDataType } from "./DuckDBDataType.types";
-import type { DuckDBQueryAggregationType } from "./DuckDBQueryAggregations";
 import type { UUID } from "@utils/types/common";
+import type { DuckDBDataType } from "$/models/datasets/DatasetColumn/DuckDBDataTypes";
+import type { DuckDBQueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationTypes";
 
 /**
  * The CSV Reject Scans Table returns the following information:

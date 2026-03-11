@@ -1,5 +1,5 @@
 import type { DatasetId } from "../Dataset/Dataset.types.ts";
-import type { SupabaseCRUDClientModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
+import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
 import type { UUID } from "@utils/types/common.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { SetOptional } from "type-fest";
@@ -59,7 +59,7 @@ export type CSVFileDatasetRead = {
 /**
  * CRUD type definitions for the LocalCSVDataset model.
  */
-export type CSVFileDatasetModel = SupabaseCRUDClientModelSpec<
+export type CSVFileDatasetModel = SupabaseCRUDModelSpec<
   {
     tableName: "datasets__csv_file";
     modelName: "CSVFileDataset";

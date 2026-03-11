@@ -7,8 +7,8 @@ import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsT
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
 import { undefinedsToNullsDeep } from "@utils/objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
 import z from "zod";
-import { DuckDBDataTypes } from "../../../../src/clients/DuckDBClient/DuckDBDataType.ts";
 import { AvaDataTypes } from "../AvaDataType/AvaDataTypes.ts";
+import { DuckDBDataTypes } from "./DuckDBDataTypes.ts";
 import type { DatasetId } from "../Dataset/Dataset.types.ts";
 import type {
   DatasetColumn,

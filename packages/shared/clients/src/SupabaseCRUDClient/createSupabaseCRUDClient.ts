@@ -12,16 +12,16 @@ import type {
 } from "../ModelCRUDClient/ModelCRUDClient.types.ts";
 import type { RegisteredSupabaseDatabase } from "../Register.types.ts";
 import type {
-  AnySupabaseCRUDClientModelSpec,
+  AnySupabaseCRUDModelSpec,
   SupabaseCRUDClient,
 } from "./SupabaseCRUDClient.types.ts";
 import type { ILogger } from "@logger/Logger.types.ts";
+import type { PostgrestFilterBuilder } from "@supabase/postgrest-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   FilterOperator,
   FiltersByColumn,
 } from "@utils/filters/filters.ts";
-import type { PostgrestFilterBuilder } from "@supabase/postgrest-js";
-import type { SupabaseClient } from "@supabase/supabase-js";
 
 /** The maximum page size configured in Supabase */
 const MAXIMUM_PAGE_SIZE = 1000;
@@ -42,7 +42,7 @@ type AnySupabaseFilterableQuery = PostgrestFilterBuilder<
  * Creates a client for a model that maps to a Supabase table.
  */
 export function createSupabaseCRUDClient<
-  M extends AnySupabaseCRUDClientModelSpec,
+  M extends AnySupabaseCRUDModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises = EmptyObject,
   ExtendedMutationsClient extends ClientReturningOnlyPromises = EmptyObject,
 >(options: {

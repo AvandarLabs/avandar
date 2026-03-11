@@ -1,4 +1,4 @@
-import type { SupabaseCRUDClientModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
+import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
 import type { UUID } from "@utils/types/common.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
@@ -52,7 +52,7 @@ type DatasetColumnValueExtractorUpdate =
 /**
  * CRUD type definitions for the DatasetColumnValueExtractor model.
  */
-export type DatasetColumnValueExtractorModel = SupabaseCRUDClientModelSpec<
+export type DatasetColumnValueExtractorModel = SupabaseCRUDModelSpec<
   {
     tableName: "value_extractors__dataset_column_value";
     modelName: "DatasetColumnValueExtractor";

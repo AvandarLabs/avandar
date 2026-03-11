@@ -1,4 +1,4 @@
-import type { SupabaseCRUDClientModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
+import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
 import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.ts";
 import type { SwapDeep } from "@utils/types/utilityTypes.ts";
@@ -52,7 +52,7 @@ export type DashboardRead = Model.Base<
 /**
  * CRUD type definitions for the Dashboard model.
  */
-export type DashboardModel = SupabaseCRUDClientModelSpec<
+export type DashboardModel = SupabaseCRUDModelSpec<
   {
     tableName: "dashboards";
     modelName: "Dashboard";
