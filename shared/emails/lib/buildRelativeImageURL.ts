@@ -1,4 +1,3 @@
-// deno-lint-ignore-file no-process-global
 /**
  * Returns the absolute URL to an image whose `relativePath` is relative to the
  * `RESEND_SITE_IMG_URL` environment variable.

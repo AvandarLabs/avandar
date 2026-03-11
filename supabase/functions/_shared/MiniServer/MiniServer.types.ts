@@ -159,10 +159,8 @@ export type ServerRouteHandler<
      * For other types of requests, if no body schema is specified, it will
      * default to `z.record(z.string(), z.never())` (i.e. an empty record).
      */
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    // deno-lint-ignore no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     bodySchema: ZodType<Body, any>;
-    /* eslint-enable @typescript-eslint/no-explicit-any */
 
     /**
      * This should only be set to `true` if the edge function has JWT
