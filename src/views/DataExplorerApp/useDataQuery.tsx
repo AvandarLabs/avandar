@@ -1,35 +1,36 @@
-import { where } from "$/lib/utils/filters/filters";
-import { objectEntries } from "$/lib/utils/objects/objectEntries/objectEntries";
-import { objectValues } from "$/lib/utils/objects/objectValues/objectValues";
+import { useQuery } from "@hooks/useQuery/useQuery";
+import { Model } from "@models/Model/Model";
+import { where } from "@utils/filters/where/where";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { objectEntries } from "@utils/objects/objectEntries";
+import { objectValues } from "@utils/objects/objectValues";
+import { makeObjectFromEntries } from "$/lib/objects/builders";
+import { DuckDBQueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationTypes";
+import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
+import { QueryResults } from "$/models/queries/QueryResult/QueryResults";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
-import { UnknownRow } from "@/clients/DuckDBClient";
-import { DuckDBQueryAggregationType } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
-import { useQuery, UseQueryResultTuple } from "@/lib/hooks/query/useQuery";
 import { isOfModelType } from "@/lib/utils/guards/guards";
 import {
   valIsOfModelType,
   valNotEq,
 } from "@/lib/utils/guards/higherOrderFuncs";
-import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap";
-import { makeObjectFromEntries } from "@/lib/utils/objects/builders";
-import { prop } from "@/lib/utils/objects/higherOrderFuncs";
+import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap/makeIdLookupMap";
 import { sortObjList } from "@/lib/utils/objects/sortObjList";
-import { Models } from "@/models/Model";
-import { QueryColumns } from "@/models/queries/QueryColumn";
-import {
+import type { UnknownRow } from "@/clients/DuckDBClient";
+import type { UseQueryResultTuple } from "@hooks/useQuery/useQuery";
+import type {
   QueryResult,
   QueryResultColumn,
-} from "@/models/queries/QueryResult/QueryResult.types";
-import { QueryResults } from "@/models/queries/QueryResult/QueryResults";
-import { PartialStructuredQuery } from "@/models/queries/StructuredQuery";
-import { WorkspaceId } from "@/models/Workspace/Workspace.types";
+} from "$/models/queries/QueryResult/QueryResult.types";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 type UseDataQueryOptions = {
   query: PartialStructuredQuery;
   rawSQL: string | undefined;
-  workspaceId: WorkspaceId | undefined;
+  workspaceId: Workspace.Id | undefined;
 };
 
 /**
@@ -98,7 +99,7 @@ export function useDataQuery({
       }
 
       if (dataSource && sortedQueryColumns.length > 0) {
-        const queryResults = await Models.match(dataSource, {
+        const queryResults = await Model.match(dataSource, {
           // Querying datasets is simple. We can just query the dataset
           // directly with the DatasetRawDataClient.
           Dataset: async (dataset): Promise<QueryResult<UnknownRow>> => {

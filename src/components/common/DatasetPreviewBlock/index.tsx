@@ -1,13 +1,13 @@
 import { ScrollArea, Stack, StackProps } from "@mantine/core";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { Callout } from "@/lib/ui/Callout";
-import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
+import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
-import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { AvaDataTypes } from "@/models/datasets/AvaDataType";
-import {
+import type {
   DatasetColumn,
   DetectedDatasetColumn,
-} from "@/models/datasets/DatasetColumn";
+} from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 
 type Props = {
   /** The preview rows to display in the data grid */

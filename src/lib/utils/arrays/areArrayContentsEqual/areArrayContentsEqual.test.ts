@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { areArrayContentsEqual } from "./index";
+import { areArrayContentsEqual } from "./areArrayContentsEqual";
 
 describe("areArrayContentsEqual", () => {
   it("returns true for the same reference", () => {

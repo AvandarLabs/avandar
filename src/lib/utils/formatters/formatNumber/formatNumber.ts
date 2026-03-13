@@ -241,20 +241,19 @@ type DigitsAndGroupingOptions = {
  * These are a typed, lightweight veneer over Intl.NumberFormatOptions.
  * Only common fields are exposed to keep bundle size and API simple.
  */
-export type FormatNumberOptions =
-  & {
-    /**
-     * Locale(s) used for formatting. Locales must be specified as BCP 47 tags.
-     * If an array is provided, the first locale that is supported will be used
-     * (this is how you can specify fallbacks).
-     *
-     * If `undefined`, the environment default locale will be used.
-     *
-     * @see {@link https://developer.mozilla.org/en-US/docs/Glossary/BCP_47_language_tag | BCP 47 language tag}
-     */
-    locale?: string | string[];
+export type FormatNumberOptions = {
+  /**
+   * Locale(s) used for formatting. Locales must be specified as BCP 47 tags.
+   * If an array is provided, the first locale that is supported will be used
+   * (this is how you can specify fallbacks).
+   *
+   * If `undefined`, the environment default locale will be used.
+   *
+   * @see {@link https://developer.mozilla.org/en-US/docs/Glossary/BCP_47_language_tag | BCP 47 language tag}
+   */
+  locale?: string | string[];
 
-    /**
+  /**
      * High level format style.
      * - "decimal": plain numbers
      * - "currency": needs `currency`
@@ -264,52 +263,51 @@ export type FormatNumberOptions =
 
      * @defaultValue "decimal"
      */
-    style?: "decimal" | "currency" | "percent" | "unit";
+  style?: "decimal" | "currency" | "percent" | "unit";
 
-    /**
-     * Rounding strategy for fraction trimming.
-     * Examples assume maximumFractionDigits: 1.
-     * - ceil (1.21 → 1.3)
-     * - floor (1.21 → 1.2)
-     * - expand (-1.21 → -1.3)
-     * - trunc (-1.21 → -1.2)
-     * - halfCeil (1.25 → 1.3)
-     * - halfFloor (1.25 → 1.2)
-     * - halfExpand (1.25 → 1.3)
-     * - halfTrunc (1.25 → 1.2)
-     * - halfEven (1.25 → 1.2)
-     */
-    roundingMode?:
-      | "ceil"
-      | "floor"
-      | "expand"
-      | "trunc"
-      | "halfCeil"
-      | "halfFloor"
-      | "halfExpand"
-      | "halfTrunc"
-      | "halfEven";
+  /**
+   * Rounding strategy for fraction trimming.
+   * Examples assume maximumFractionDigits: 1.
+   * - ceil (1.21 → 1.3)
+   * - floor (1.21 → 1.2)
+   * - expand (-1.21 → -1.3)
+   * - trunc (-1.21 → -1.2)
+   * - halfCeil (1.25 → 1.3)
+   * - halfFloor (1.25 → 1.2)
+   * - halfExpand (1.25 → 1.3)
+   * - halfTrunc (1.25 → 1.2)
+   * - halfEven (1.25 → 1.2)
+   */
+  roundingMode?:
+    | "ceil"
+    | "floor"
+    | "expand"
+    | "trunc"
+    | "halfCeil"
+    | "halfFloor"
+    | "halfExpand"
+    | "halfTrunc"
+    | "halfEven";
 
-    /**
-     * Trailing zeros behavior.
-     * - "auto": keep zeros per locale and options
-     * - "stripIfInteger": remove if result is an integer
-     */
-    trailingZeroDisplay?: "auto" | "stripIfInteger";
+  /**
+   * Trailing zeros behavior.
+   * - "auto": keep zeros per locale and options
+   * - "stripIfInteger": remove if result is an integer
+   */
+  trailingZeroDisplay?: "auto" | "stripIfInteger";
 
-    /**
-     * Sign rendering policy.
-     * - "auto": negatives only
-     * - "always": always show sign
-     * - "exceptZero": signs for non-zero values
-     * - "negative": parentheses for negatives in some locales
-     */
-    signDisplay?: "auto" | "always" | "exceptZero" | "negative";
-  }
-  & NotationOptions
-  & DigitsAndGroupingOptions
-  & FormatCurrencyOptions
-  & NumberUnitOptions;
+  /**
+   * Sign rendering policy.
+   * - "auto": negatives only
+   * - "always": always show sign
+   * - "exceptZero": signs for non-zero values
+   * - "negative": parentheses for negatives in some locales
+   */
+  signDisplay?: "auto" | "always" | "exceptZero" | "negative";
+} & NotationOptions &
+  DigitsAndGroupingOptions &
+  FormatCurrencyOptions &
+  NumberUnitOptions;
 
 // Cache of Intl.NumberFormat instances keyed by a stable string of
 // (locale, options).
@@ -334,9 +332,8 @@ function _getNumberFormatter(
   options: Intl.NumberFormatOptions,
 ): Intl.NumberFormat {
   const formatterKey: string = _getFormatterKey(locale, options);
-  const formatter: Intl.NumberFormat | undefined = formatterCache.get(
-    formatterKey,
-  );
+  const formatter: Intl.NumberFormat | undefined =
+    formatterCache.get(formatterKey);
   if (formatter) {
     return formatter;
   }

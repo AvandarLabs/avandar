@@ -9,9 +9,9 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { Paper } from "@/lib/ui/Paper";
-import { WorkspaceId } from "@/models/Workspace/Workspace.types";
-import { buildContainerMaxWidthFieldConfig } from "./fields/ContainerMaxWidthField";
+import { Workspace } from "$/models/Workspace/Workspace";
+import { Paper } from "@/lib/ui/Paper/Paper";
+import { buildContainerMaxWidthFieldConfig } from "./fields/ContainerMaxWidthField/buildContainerMaxWidthFieldConfig";
 import { CURRENT_SCHEMA_VERSION } from "./migrations/constants";
 import { buildDataVizPBlockConfig } from "./pblocks/DataVizPBlock/buildDataVizPBlockConfig";
 import type {
@@ -32,25 +32,6 @@ import type {
   TableBlockProps,
 } from "./AvaPage.types";
 import type { ReactNode } from "react";
-
-export function buildDefaultRootProps(options: {
-  dashboardTitle: string;
-}): AvaPageRootProps {
-  return {
-    schemaVersion: CURRENT_SCHEMA_VERSION,
-    author: "",
-    containerMaxWidth: { unit: "%", value: 100 },
-    horizontalPadding: "md",
-    isAuthorHidden: false,
-    isPublishedAtHidden: false,
-    isSubtitleHidden: false,
-    isTitleHidden: false,
-    publishedAt: "",
-    subtitle: "",
-    title: options.dashboardTitle,
-    verticalPadding: "lg",
-  };
-}
 
 function _isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -339,21 +320,9 @@ function _parseTableRows(options: {
     });
 }
 
-// TODO(jpsyx): refactor this mess of slop
-export function createInitialDashboardPuckData(options: {
-  dashboardTitle: string;
-}): AvaPageData {
-  return {
-    root: {
-      props: buildDefaultRootProps({ dashboardTitle: options.dashboardTitle }),
-    },
-    content: [],
-  };
-}
-
 export function getDashboardPuckConfig(options: {
   dashboardTitle: string;
-  workspaceId: WorkspaceId | undefined;
+  workspaceId: Workspace.Id | undefined;
 }): AvaPageConfig {
   return {
     root: {

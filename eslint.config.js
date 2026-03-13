@@ -156,18 +156,19 @@ export default [
     },
   },
   {
-    // we require import extensions in the shared directory so it can work with
-    // Deno
-    files: ["shared/**/*.{ts,tsx}"],
+    // we require import extensions for directories that will be used in
+    // Deno runtimes (such as Supabase edge functions).
+    files: ["shared/**/*.{ts,tsx}", "packages/shared/**/*.{ts,tsx}"],
     rules: {
       "import-x/extensions": [
         "error",
-        "always",
+        "ignorePackages",
         {
           js: "always",
           jsx: "always",
           ts: "always",
           tsx: "always",
+          checkTypeImports: true,
         },
       ],
     },

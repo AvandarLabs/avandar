@@ -1,8 +1,8 @@
-import { UseFormReturnType as MantineUseFormReturnType } from "@mantine/form";
-import { UnknownObject } from "$/lib/types/common";
-import { IdentityFnType } from "$/lib/types/utilityTypes";
 import { useCallback } from "react";
-import { Paths, Simplify } from "type-fest";
+import type { UseFormReturnType as MantineUseFormReturnType } from "@mantine/form";
+import type { UnknownObject } from "@utils/types/common";
+import type { IdentityFnType } from "@utils/types/utilityTypes";
+import type { Paths, Simplify } from "type-fest";
 
 type GetPathTail<Path, PathHead extends string> =
   Path extends `${PathHead}.${infer Tail}` ? Tail : never;

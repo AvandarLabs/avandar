@@ -1,0 +1,43 @@
+import { isArray } from "../../guards/isArray/isArray.ts";
+import { objectKeys } from "../../objects/objectKeys.ts";
+import { isArrayValueOperator } from "../isArrayValueOperator/isArrayValueOperator.ts";
+import { isEmptyFiltersObject } from "../isEmptyFiltersObject/isEmptyFiltersObject.ts";
+import { isSingleValueOperator } from "../isSingleValueOperator/isSingleValueOperator.ts";
+import type { UnknownObject } from "../../types/common.ts";
+import type {
+  FilterOperatorRecord,
+  FiltersByColumn,
+  FiltersByOperator,
+} from "../filters.ts";
+
+export function bucketFiltersByColumn<T extends UnknownObject>(
+  filtersByOperator: FiltersByOperator<T> | undefined,
+): FiltersByColumn<T> {
+  const filtersByColumn: FiltersByColumn<T> = {} as FiltersByColumn<T>;
+
+  if (!filtersByOperator || isEmptyFiltersObject(filtersByOperator)) {
+    return filtersByColumn;
+  }
+
+  objectKeys(filtersByOperator).forEach((operator) => {
+    const filterTuples = filtersByOperator[operator];
+    if (filterTuples) {
+      filterTuples.forEach(([column, value]) => {
+        if (
+          !(column in filtersByColumn) ||
+          filtersByColumn[column] === undefined
+        ) {
+          filtersByColumn[column] = {} as FilterOperatorRecord<T[keyof T]>;
+        }
+
+        if (isSingleValueOperator(operator) && !isArray(value)) {
+          filtersByColumn[column][operator] = value;
+        } else if (isArrayValueOperator(operator) && isArray(value)) {
+          filtersByColumn[column][operator] = value;
+        }
+      });
+    }
+  });
+
+  return filtersByColumn;
+}

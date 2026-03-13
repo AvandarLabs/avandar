@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { DashboardListView } from "@/views/DashboardApp/DashboardListView";
+import { DashboardListView } from "@/views/DashboardApp/DashboardListView/DashboardListView";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug/dashboards/")({
   component: DashboardsPage,

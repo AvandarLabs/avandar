@@ -1,11 +1,11 @@
 import { Divider, Loader, Text, Title } from "@mantine/core";
 import { useNavigate } from "@tanstack/react-router";
+import { notifySuccess } from "@ui/notifications/notify";
+import { slugify } from "$/lib/strings/transformations";
 import { useState } from "react";
+import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppLinks } from "@/config/AppLinks";
 import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
-import { notifySuccess } from "@/lib/ui/notifications/notify";
-import { slugify } from "@/lib/utils/strings/transformations";
-import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
 
 type Props = {
   onSubmit?: (values: {

@@ -1,0 +1,4 @@
+/** Logs a hello world message for this module. */
+export function helloWorld(): void {
+  console.log("This is the entry point for $PACKAGE_NAME$");
+}

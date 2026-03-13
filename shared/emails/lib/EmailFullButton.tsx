@@ -9,7 +9,11 @@ type Props = {
   children: ReactNode;
 } & DistributedOmit<EmailLinkProps, "style">;
 
-export function EmailFullButton({ children, href, path }: Props): JSX.Element {
+export function EmailFullButton({
+  children,
+  href,
+  path,
+}: Props): React.JSX.Element {
   return (
     <Button href={href ?? buildAppPageURL({ path })} style={styles.button}>
       <div style={styles.content}>{children}</div>

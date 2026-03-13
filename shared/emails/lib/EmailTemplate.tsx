@@ -23,7 +23,10 @@ const LOGO_SCALE = 0.2;
 const logoWidth = LOGO.originalWidth * LOGO_SCALE;
 const logoHeight = LOGO.originalHeight * LOGO_SCALE;
 
-export function EmailTemplate({ children, previewText }: Props): JSX.Element {
+export function EmailTemplate({
+  children,
+  previewText,
+}: Props): React.JSX.Element {
   return (
     <Html>
       <Head />

@@ -5,10 +5,10 @@ PROJECT_ROOT=$SCRIPT_DIR/../
 
 usage() {
   echo "Usage:"
-  echo "       npm run new:component <ComponentName>"
+  echo "       pnpm new:component <ComponentName>"
   echo "Creates a new React component in src/components/<ComponentName>/"
   echo "Example:"
-  echo "       npm run new:component MyNewComponent"
+  echo "       pnpm new:component MyNewComponent"
   echo "       Creates src/components/MyNewComponent/index.tsx"
   exit 1
 }

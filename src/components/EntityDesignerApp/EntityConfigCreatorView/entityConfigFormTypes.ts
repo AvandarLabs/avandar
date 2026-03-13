@@ -1,25 +1,28 @@
-import { Expect } from "$/lib/types/testUtilityTypes";
-import { CamelCaseKeys } from "camelcase-keys";
-import { SetOptional, SetRequired } from "type-fest";
-import { FormType } from "@/lib/hooks/ui/useForm";
-import { uuid } from "@/lib/utils/uuid";
-import { Dataset, DatasetWithColumns } from "@/models/datasets/Dataset";
-import {
+import { Model } from "@models/Model/Model";
+import { uuid } from "$/lib/uuid";
+import { DatasetColumnValueExtractor } from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractor.types";
+import { ManualEntryExtractor } from "$/models/EntityConfig/ValueExtractor/ManualEntryExtractor/ManualEntryExtractor.types";
+import { EntityFieldValueExtractorRegistry } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types";
+import type { FormType } from "@/lib/hooks/ui/useForm";
+import type { Expect } from "@utils/types/testUtilityTypes";
+import type {
+  Dataset,
+  DatasetWithColumns,
+} from "$/models/datasets/Dataset/Dataset.types";
+import type {
   DatasetColumn,
   DatasetColumnId,
-} from "@/models/datasets/DatasetColumn";
-import {
+} from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type {
   EntityConfig,
   EntityConfigId,
-} from "@/models/EntityConfig/EntityConfig.types";
-import {
+} from "$/models/EntityConfig/EntityConfig.types";
+import type {
   EntityFieldConfig,
   EntityFieldConfigId,
-} from "@/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
-import { DatasetColumnValueExtractor } from "@/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractor.types";
-import { ManualEntryExtractor } from "@/models/EntityConfig/ValueExtractor/ManualEntryExtractor/types";
-import { EntityFieldValueExtractorRegistry } from "@/models/EntityConfig/ValueExtractor/types";
-import { Models } from "@/models/Model";
+} from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
+import type { CamelCaseKeys } from "camelcase-keys";
+import type { SetOptional, SetRequired } from "type-fest";
 
 export type EntityFieldFormValues = SetRequired<
   SetOptional<EntityFieldConfig<"Insert">, "workspaceId">,
@@ -80,7 +83,7 @@ export type EntityConfigFormType = FormType<
 export function getDefaultEntityConfigFormValues(): EntityConfigFormValues {
   const entityConfigId: EntityConfigId = uuid();
 
-  return Models.make("EntityConfig", {
+  return Model.make("EntityConfig", {
     id: entityConfigId,
     titleFieldId: undefined,
     name: "",
@@ -106,7 +109,7 @@ export function makeDefaultDatasetColumnField({
   isIdField?: boolean;
 }): EntityFieldFormValues {
   const entityFieldConfigId: EntityFieldConfigId = uuid();
-  return Models.make("EntityFieldConfig", {
+  return Model.make("EntityFieldConfig", {
     id: entityFieldConfigId,
     entityConfigId,
     name,
@@ -143,7 +146,7 @@ export function makeDefaultManualEntryField({
   name: string;
 }): EntityFieldFormValues {
   const entityFieldConfigId: EntityFieldConfigId = uuid();
-  return Models.make("EntityFieldConfig", {
+  return Model.make("EntityFieldConfig", {
     id: entityFieldConfigId,
     entityConfigId,
     name,

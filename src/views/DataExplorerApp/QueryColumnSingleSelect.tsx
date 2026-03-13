@@ -1,25 +1,26 @@
 import { useUncontrolled } from "@mantine/hooks";
-import { where } from "$/lib/utils/filters/filters";
-import { ReactNode, useEffect, useMemo } from "react";
+import { where } from "@utils/filters/where/where";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
+import { useEffect, useMemo } from "react";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { Select, SelectProps } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
 import { isOfModelType } from "@/lib/utils/guards/guards";
-import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap";
-import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { TypedId } from "@/models/Model";
-import {
+import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap/makeIdLookupMap";
+import type { Model } from "@models/Model/Model";
+import type {
   QueryColumn,
   QueryColumnId,
-  QueryColumns,
-} from "@/models/queries/QueryColumn";
-import { QueryDataSource } from "@/models/queries/QueryDataSource";
+} from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
+import type { ReactNode } from "react";
 
 type Props = {
   label: ReactNode;
   placeholder: string;
-  dataSourceId?: TypedId<QueryDataSource>;
+  dataSourceId?: Model.TypedId<QueryDataSource>;
   value?: QueryColumn | null;
   defaultValue?: QueryColumn | null;
   onChange?: (field: QueryColumn | null) => void;
@@ -46,8 +47,8 @@ export function QueryColumnSingleSelect({
     DatasetColumnClient.useGetAll({
       ...where("dataset_id", "eq", dataSourceId?.id),
       useQueryOptions: {
-        enabled: isOfModelType("Dataset", dataSourceId),
         usePreviousDataAsPlaceholder: true,
+        enabled: isOfModelType("Dataset", dataSourceId),
       },
     });
 

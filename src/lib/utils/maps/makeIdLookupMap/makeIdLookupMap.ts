@@ -1,6 +1,6 @@
-import { Paths } from "type-fest";
-
-import { getValue, PathValue } from "@/lib/utils/objects/getValue";
+import { getValue } from "@utils/objects/getValue/getValue";
+import type { PathValue } from "@utils/objects/getValue/getValue";
+import type { Paths } from "type-fest";
 
 /**
  * Creates a lookup from a list of objects, indexed by an object's id field.
@@ -16,23 +16,26 @@ import { getValue, PathValue } from "@/lib/utils/objects/getValue";
 export function makeIdLookupMap<
   T extends object,
   IdKey extends [Paths<T>] extends [never] ? keyof T : Paths<T> = "id" extends (
-    [Paths<T>] extends [never] ? keyof T
-      : Paths<T>
-  ) ? "id"
-    : never,
+    [Paths<T>] extends [never] ?
+      keyof T
+    : Paths<T>
+  ) ?
+    "id"
+  : never,
   IdType extends IdKey extends keyof T ? T[IdKey]
-    : IdKey extends Paths<T> ? PathValue<T, IdKey>
-    : never = IdKey extends keyof T ? T[IdKey]
-      : IdKey extends Paths<T> ? PathValue<T, IdKey>
-      : never,
+  : IdKey extends Paths<T> ? PathValue<T, IdKey>
+  : never = IdKey extends keyof T ? T[IdKey]
+  : IdKey extends Paths<T> ? PathValue<T, IdKey>
+  : never,
 >(
   list: readonly T[],
   { key = "id" as IdKey }: { key?: IdKey } = {},
 ): Map<IdType, T> {
   const map = new Map<IdType, T>();
   for (const item of list) {
-    const id = String(key).includes(".")
-      ? (getValue(item, key) as IdType)
+    const id =
+      String(key).includes(".") ?
+        (getValue(item, key) as IdType)
       : (item[key as keyof T] as IdType);
     map.set(id, item);
   }

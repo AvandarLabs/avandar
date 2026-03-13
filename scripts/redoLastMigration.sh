@@ -94,7 +94,7 @@ fi
 # Step 1: Remove the last migration
 echo -e "${YELLOW}📦 Step 1: Removing the last migration...${NC}"
 echo -e "${BLUE}   Deleting: $LATEST_MIGRATION${NC}"
-npm run db:down-migration
+pnpm db:down-migration
 
 if [ $? -ne 0 ]; then
   echo -e "${RED}❌ Error: Failed to remove the last migration${NC}"
@@ -105,7 +105,7 @@ echo -e "${GREEN}✅ Successfully removed the last migration${NC}"
 
 # Step 2: Create a new migration
 echo -e "${YELLOW}📝 Step 2: Creating new migration with name: ${MIGRATION_NAME}${NC}"
-npm run db:new-migration -- "$MIGRATION_NAME"
+pnpm db:new-migration -- "$MIGRATION_NAME"
 
 if [ $? -ne 0 ]; then
   echo -e "${RED}❌ Error: Failed to create new migration${NC}"
@@ -117,9 +117,9 @@ echo -e "${GREEN}✅ Successfully created new migration${NC}"
 # Step 3: Apply migrations
 echo -e "${YELLOW}🚀 Step 3: Applying migrations...${NC}"
 if [ "$GEN_TYPES" = true ]; then
-  npm run db:apply-migrations -- --gen-types
+  pnpm db:apply-migrations -- --gen-types
 else
-  npm run db:apply-migrations
+  pnpm db:apply-migrations
 fi
 
 if [ $? -ne 0 ]; then
@@ -135,7 +135,7 @@ if [ "$GEN_TYPES" = false ]; then
   read -r response
   if [[ "$response" =~ ^[Yy]$ ]]; then
     echo -e "${YELLOW}📘 Generating TypeScript types...${NC}"
-    npm run db:gen-types
+    pnpm db:gen-types
     if [ $? -ne 0 ]; then
       echo -e "${RED}❌ Error: Failed to generate TypeScript types${NC}"
       exit 1

@@ -1,5 +1,5 @@
-import { snakeify } from "@/lib/utils/strings/transformations";
-import { uuid } from "@/lib/utils/uuid";
+import { snakeify } from "$/lib/strings/transformations";
+import { uuid } from "$/lib/uuid";
 
 /**
  * Generates a random table name (a snakeified UUID).

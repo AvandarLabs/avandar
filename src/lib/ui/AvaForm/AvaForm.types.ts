@@ -1,8 +1,8 @@
-import { ExclusifyUnion, UnknownRecord } from "type-fest";
-import { FormType } from "@/lib/hooks/ui/useForm";
 import { SelectData, SelectOption } from "../inputs/Select";
-import type { StringKeyOf } from "$/lib/types/utilityTypes";
+import type { FormType } from "@/lib/hooks/ui/useForm";
+import type { StringKeyOf } from "@utils/types/utilityTypes";
 import type { HTMLInputAutoCompleteAttribute, ReactNode } from "react";
+import type { ExclusifyUnion, UnknownRecord } from "type-fest";
 
 /** For now, forms can only have string values */
 export type ValidBaseValueType = string | null;

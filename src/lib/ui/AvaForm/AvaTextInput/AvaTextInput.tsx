@@ -1,17 +1,17 @@
 import { TextInput, TextInputProps } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
-import { StringKeyOf } from "$/lib/types/utilityTypes";
-import { isDefined } from "$/lib/utils/guards/isDefined";
-import { objectKeys } from "$/lib/utils/objects/objectKeys";
-import { ChangeEvent } from "react";
-import { Paths } from "type-fest";
-import { FormType } from "@/lib/hooks/ui/useForm";
-import { PathValue } from "@/lib/utils/objects/getValue";
-import { prop } from "@/lib/utils/objects/higherOrderFuncs";
+import { isDefined } from "@utils/guards/isDefined/isDefined";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { objectKeys } from "@utils/objects/objectKeys";
 import type {
   GenericFormSchemaRecord,
   ValuesOfFieldRecord,
 } from "../AvaForm.types";
+import type { FormType } from "@/lib/hooks/ui/useForm";
+import type { PathValue } from "@utils/objects/getValue/getValue";
+import type { StringKeyOf } from "@utils/types/utilityTypes";
+import type { ChangeEvent } from "react";
+import type { Paths } from "type-fest";
 
 type SyncedField<FieldSchemaRecord extends GenericFormSchemaRecord> = {
   fieldKey: StringKeyOf<FieldSchemaRecord>;

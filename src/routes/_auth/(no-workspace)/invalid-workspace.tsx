@@ -1,9 +1,9 @@
 import { Container, Stack, Text, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
-import { Logger } from "$/lib/Logger";
 import { useEffect } from "react";
 import { match } from "ts-pattern";
 import { z } from "zod";
+import { Logger } from "@/utils/Logger";
 
 const searchSchema = z.object({
   redirectReason: z.string().optional(),

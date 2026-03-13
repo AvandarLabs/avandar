@@ -5,7 +5,7 @@ type Props = {
   children: ReactNode;
 };
 
-export function EmailParagraph({ children }: Props): JSX.Element {
+export function EmailParagraph({ children }: Props): React.JSX.Element {
   return <Text style={styles.paragraph}>{children}</Text>;
 }
 

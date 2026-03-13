@@ -1,8 +1,9 @@
-import { ILogger, Logger } from "$/lib/Logger/Logger";
-import { constant } from "$/lib/utils/constant/constant";
+import { ILogger } from "@logger/Logger.types";
+import { constant } from "@utils/misc/constant/constant";
+import { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import * as arrow from "apache-arrow";
 import { match } from "ts-pattern";
-import { QueryResultColumn } from "@/models/queries/QueryResult/QueryResult.types";
+import { Logger } from "@/utils/Logger";
 
 export function arrowFieldToQueryResultField(
   field: arrow.Field<arrow.DataType>,

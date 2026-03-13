@@ -1,19 +1,17 @@
-import { isNonEmptyArray } from "$/lib/utils/guards/isNonEmptyArray/isNonEmptyArray";
+import { useQuery } from "@hooks/useQuery/useQuery";
+import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray";
+import { noop } from "@utils/misc/noop";
 import { useEffect, useMemo, useState } from "react";
 import { APIClient } from "@/clients/APIClient";
-import { useQuery } from "@/lib/hooks/query/useQuery";
-import {
-  GoogleToken,
-  useGooglePickerAPI,
-} from "@/lib/hooks/useGooglePickerAPI";
-import {
+import { useGooglePickerAPI } from "@/lib/hooks/useGooglePickerAPI";
+import { useCurrentUserProfile } from "../users/useCurrentUserProfile";
+import type { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
+import type {
   GooglePickerAPI,
   GPicker,
   GPickerDocumentObject,
   GPickerResponseObject,
 } from "@/lib/types/google-picker";
-import { noop } from "@/lib/utils/misc";
-import { useCurrentUserProfile } from "../users/useCurrentUserProfile";
 
 const GOOGLE_PICKER_API_KEY = import.meta.env.VITE_GOOGLE_PICKER_API_KEY!;
 if (!GOOGLE_PICKER_API_KEY) {

@@ -1,14 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from "@hooks/useQuery/useQuery";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { WorkspaceRole } from "@/models/Workspace/Workspace.types";
 import { useCurrentUser } from "../users/useCurrentUser";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
-export function useWorkspaceRole(): WorkspaceRole {
+export function useWorkspaceRole(): Workspace.Role {
   const user = useCurrentUser();
   const workspace = useCurrentWorkspace();
 
-  const { data: role } = useQuery({
+  const [role] = useQuery({
     queryKey: ["UserRoles", workspace?.id, user?.id],
     enabled: !!workspace?.id && !!user?.id,
     staleTime: Infinity,
@@ -27,5 +27,5 @@ export function useWorkspaceRole(): WorkspaceRole {
     },
   });
 
-  return (role ?? "member") as WorkspaceRole;
+  return (role ?? "member") as Workspace.Role;
 }

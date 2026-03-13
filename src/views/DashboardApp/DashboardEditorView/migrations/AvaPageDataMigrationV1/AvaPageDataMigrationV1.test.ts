@@ -1,5 +1,5 @@
+import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { beforeAll, describe, expect, it } from "vitest";
-import { propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { AvaPageDataMigrator } from "../AvaPageDataMigrator";
 import { getVersionFromAvaPageData } from "../getVersionFromAvaPageData";
 import { AvaPageDataMigrationV1 } from "./AvaPageDataMigrationV1";

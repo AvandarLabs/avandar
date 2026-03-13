@@ -1,5 +1,5 @@
 import { Text } from "@mantine/core";
-import { constant } from "$/lib/utils/constant/constant";
+import { constant } from "@utils/misc/constant/constant";
 import { match } from "ts-pattern";
 import { DescribableValueArrayBlock } from "./DescribableValueArrayBlock";
 import {
@@ -7,7 +7,9 @@ import {
   isDescribableValueArray,
   isPrimitiveDescribableValue,
 } from "./guards";
-import {
+import { ObjectDescriptionListBlock } from "./ObjectDescriptionListBlock";
+import { PrimitiveValueItem } from "./PrimitiveValueItem";
+import type {
   AnyDescribableValueRenderOptions,
   DescribableObject,
   DescribableValueArrayRenderOptions,
@@ -16,8 +18,6 @@ import {
   PrimitiveValue,
   PrimitiveValueRenderOptions,
 } from "./ObjectDescriptionList.types";
-import { ObjectDescriptionListBlock } from "./ObjectDescriptionListBlock";
-import { PrimitiveValueItem } from "./PrimitiveValueItem";
 
 type Props<RootData extends GenericRootData> = {
   /**

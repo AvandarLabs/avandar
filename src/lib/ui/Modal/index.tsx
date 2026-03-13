@@ -1,4 +1,5 @@
-import { Modal as MantineModal, ModalProps } from "@mantine/core";
+import { Modal as MantineModal } from "@mantine/core";
+import type { ModalProps } from "@mantine/core";
 
 export function Modal(props: ModalProps): JSX.Element {
   return (

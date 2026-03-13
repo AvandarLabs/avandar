@@ -1,7 +1,7 @@
 import { Button } from "@mantine/core";
 import { IconDeviceFloppy } from "@tabler/icons-react";
-import { AvaPageData } from "./AvaPage.types";
 import { useDashboardPuck } from "./useDashboardPuck";
+import type { AvaPageData } from "./AvaPage.types";
 
 type Props = {
   onSave: (data: AvaPageData) => void;

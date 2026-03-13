@@ -1,0 +1,60 @@
+import type { EntityFieldConfigId } from "../../EntityFieldConfig/EntityFieldConfig.types.ts";
+import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
+import type { UUID } from "@utils/types/common.ts";
+import type { Workspace } from "$/models/Workspace/Workspace.ts";
+import type { SetOptional, Simplify } from "type-fest";
+
+export type ManualEntryExtractorId = UUID<"ManualEntryExtractor">;
+
+/**
+ * CRUD type definition for the manual entry extractor config
+ */
+type ManualEntryExtractorRead = {
+  /** Unique identifier for this extractor config */
+  id: ManualEntryExtractorId;
+
+  /** ID of the associated workspace */
+  workspaceId: Workspace.Id;
+
+  /** Type of extractor */
+  type: "manual_entry";
+
+  /** ID of the associated entity field config */
+  entityFieldConfigId: EntityFieldConfigId;
+
+  /** Creation timestamp */
+  createdAt: string;
+
+  /** Last update timestamp */
+  updatedAt: string;
+};
+
+type ManualEntryExtractorInsert = SetOptional<
+  ManualEntryExtractorRead,
+  "id" | "createdAt" | "updatedAt"
+>;
+
+type ManualEntryExtractorUpdate = Partial<ManualEntryExtractorRead>;
+
+export type ManualEntryExtractorModel = SupabaseCRUDModelSpec<
+  {
+    tableName: "value_extractors__manual_entry";
+    modelName: "ManualEntryExtractor";
+    modelPrimaryKeyType: ManualEntryExtractorId;
+    modelTypes: {
+      Read: ManualEntryExtractorRead;
+      Insert: ManualEntryExtractorInsert;
+      Update: ManualEntryExtractorUpdate;
+    };
+  },
+  {
+    dbTablePrimaryKey: "id";
+  }
+>;
+
+/**
+ * Helper type for a specific variant of the ManualEntryExtractor model
+ */
+export type ManualEntryExtractor<
+  K extends keyof ManualEntryExtractorModel = "Read",
+> = Simplify<ManualEntryExtractorModel[K]>;

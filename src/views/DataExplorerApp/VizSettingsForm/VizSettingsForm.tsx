@@ -1,12 +1,13 @@
 import { Box } from "@mantine/core";
+import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
 import { match } from "ts-pattern";
 import { Select, SelectData } from "@/lib/ui/inputs/Select";
-import { QueryResultColumn } from "@/models/queries/QueryResult/QueryResult.types";
-import { VizConfigs, VizType, VizTypes } from "@/models/vizs/VizConfig";
-import { DataExplorerStateManager } from "../DataExplorerStateManager";
+import { DataExplorerStateManager } from "../DataExplorerStateManager/DataExplorerStateManager";
 import { BarChartForm } from "./BarChartForm";
 import { LineChartForm } from "./LineChartForm";
 import { ScatterChartForm } from "./ScatterChartForm";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { VizType } from "$/models/vizs/VizConfig/VizConfig.types";
 
 type Props = {
   columns: readonly QueryResultColumn[];

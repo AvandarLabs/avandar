@@ -8,14 +8,14 @@ import {
   Stack,
 } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
-import { AppLayout } from "@/components/common/layouts/AppLayout";
+import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { DataExplorerStateManager } from "./DataExplorerStateManager";
+import { DataExplorerStateManager } from "./DataExplorerStateManager/DataExplorerStateManager";
 import { downloadRowsAsCSV } from "./downloadRowsAsCSV";
-import { QueryForm } from "./QueryForm";
+import { QueryForm } from "./QueryForm/QueryForm";
 import { useDataQuery } from "./useDataQuery";
 import { VisualizationContainer } from "./VisualizationContainer";
-import { VizSettingsForm } from "./VizSettingsForm";
+import { VizSettingsForm } from "./VizSettingsForm/VizSettingsForm";
 
 const QUERY_FORM_WIDTH = 300;
 

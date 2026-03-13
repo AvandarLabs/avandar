@@ -1,3 +1,5 @@
+import process from "node:process";
+
 /**
  * Checks if the current environment is Node (determined by the presence of
  * process.env.NODE_ENV). This function can be called from many different

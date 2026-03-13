@@ -1,6 +1,9 @@
-import { IExternalStore } from "$/lib/types/common";
-import { AnyFunction, AnyFunctionWithReturn } from "$/lib/types/utilityTypes";
-import { objectValuesMap } from "$/lib/utils/objects/objectValuesMap/objectValuesMap";
+import { objectValuesMap } from "@utils/objects/objectValuesMap/objectValuesMap";
+import type { IExternalStore } from "@utils/types/common";
+import type {
+  AnyFunction,
+  AnyFunctionWithReturn,
+} from "@utils/types/utilityTypes";
 
 /**
  * Creates an external store that can be used with React's

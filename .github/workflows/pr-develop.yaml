@@ -6,18 +6,19 @@ on:
       - develop
 
 env:
-  NODE_VERSION: 22
+  NODE_VERSION: 24
 
 jobs:
   lint-typecheck-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - run: corepack enable
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run type-check
-      - run: npm run test
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm type-check
+      - run: pnpm test

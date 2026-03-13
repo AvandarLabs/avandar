@@ -6,18 +6,18 @@ import {
   ThemeIcon,
   Title,
 } from "@mantine/core";
+import { Model } from "@models/Model/Model";
 import { IconLayoutDashboard, IconPlus } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
+import { notifyDevAlert } from "@ui/notifications/notifyDevAlert";
+import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
-import { AppLayout } from "@/components/common/layouts/AppLayout";
+import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { notifyDevAlert } from "@/lib/ui/notifications/notifyDevAlert";
-import { Paper } from "@/lib/ui/Paper";
-import { Dashboard } from "@/models/Dashboard";
-import { DashboardConfigs } from "@/models/Dashboard/DashboardConfig/DashboardConfigs";
-import { Models } from "@/models/Model";
+import { Paper } from "@/lib/ui/Paper/Paper";
 import { DashboardCard } from "./DashboardCard";
+import type { Dashboard } from "$/models/Dashboard/Dashboard.types";
 
 type Props = {
   dashboards: Dashboard[];
@@ -56,7 +56,7 @@ export function DashboardListView({
 
     const now = new Date();
     insertDashboard({
-      data: Models.make("Dashboard", {
+      data: Model.make("Dashboard", {
         workspaceId: workspace.id,
         ownerId: userProfile.userId,
         ownerProfileId: userProfile.profileId,

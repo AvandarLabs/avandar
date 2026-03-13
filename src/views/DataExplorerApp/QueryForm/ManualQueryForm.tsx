@@ -1,14 +1,15 @@
 import { Fieldset, Stack, Text } from "@mantine/core";
+import { Model } from "@models/Model/Model";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
 import { Select, SelectData } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { Models } from "@/models/Model/Models";
-import { QueryAggregationType } from "@/models/queries/QueryAggregationType";
-import { QueryColumn, QueryColumns } from "@/models/queries/QueryColumn";
+import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { AggregationSelect } from "../AggregationSelect";
-import { DataExplorerStateManager } from "../DataExplorerStateManager";
 import { QueryColumnMultiSelect } from "../QueryColumnMultiSelect";
 import { QueryDataSourceSelect } from "../QueryDataSourceSelect";
+import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.types";
 
 const HIDE_WHERE = true;
 const HIDE_LIMIT = true;
@@ -53,7 +54,7 @@ export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
         <QueryColumnMultiSelect
           label="Select columns"
           placeholder="Select columns to query"
-          dataSourceId={dataSource ? Models.getTypedId(dataSource) : undefined}
+          dataSourceId={dataSource ? Model.getTypedId(dataSource) : undefined}
           value={queryColumns}
           onChange={(newColumns: readonly QueryColumn[]) => {
             dispatch.setColumns(newColumns);

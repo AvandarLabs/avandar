@@ -1,5 +1,5 @@
 import { Stack, Text } from "@mantine/core";
-import { Paper } from "@/lib/ui/Paper";
+import { Paper } from "@/lib/ui/Paper/Paper";
 import { NLQuery } from "../../fields/NLQueryField/NLQueryField";
 import { TableViz } from "../../TableViz";
 

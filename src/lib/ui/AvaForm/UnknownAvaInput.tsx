@@ -1,14 +1,14 @@
 import { match } from "ts-pattern";
-import { FormType } from "@/lib/hooks/ui/useForm";
 import { SelectData } from "../inputs/Select";
-import {
+import { AvaSelectInput } from "./AvaSelectInput/AvaSelectInput";
+import { AvaTextInput } from "./AvaTextInput/AvaTextInput";
+import type {
   FormFieldSchema,
   GenericFormSchemaRecord,
   ValidBaseValueType,
   ValuesOfFieldRecord,
 } from "./AvaForm.types";
-import { AvaSelectInput } from "./AvaSelectInput";
-import { AvaTextInput } from "./AvaTextInput";
+import type { FormType } from "@/lib/hooks/ui/useForm";
 
 type Props<
   FieldKey extends string,

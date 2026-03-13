@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+
+    /* Linting */
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUncheckedIndexedAccess": true,
+    "noUncheckedSideEffectImports": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+
+    /* Paths aliases */
+    "paths": {
+      "@/*": ["./src/*"],
+      "$/*": ["./shared/*"],
+      "@clients/*": ["./packages/shared/clients/src/*"],
+      "@logger/*": ["./packages/shared/logger/src/*"],
+      "@models/*": ["./packages/shared/models/src/*"],
+      "@modules/*": ["./packages/shared/modules/src/*"],
+      "@utils/*": ["./packages/shared/utils/src/*"],
+      "@ui/*": ["./packages/web/ui/src/*"],
+      "@hooks/*": ["./packages/web/hooks/src/*"]
+    }
+  }
+}

@@ -7,14 +7,17 @@ import {
   Text,
   useMantineTheme,
 } from "@mantine/core";
+import { makeBucketMap } from "@utils/maps/makeBucketMap/makeBucketMap";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { Datasets } from "$/models/datasets/Dataset/Datasets";
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
-import { makeBucketMap } from "@/lib/utils/maps/makeBucketMap";
-import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { Dataset, DatasetId } from "@/models/datasets/Dataset";
-import { Datasets } from "@/models/datasets/Dataset/Datasets";
+import type {
+  Dataset,
+  DatasetId,
+} from "$/models/datasets/Dataset/Dataset.types";
 
 type Props = {
   datasets: Dataset[];
@@ -76,7 +79,7 @@ export function DatasetNavbar({
   const elements = {
     emptyList() {
       return (
-        <Box ta="center">
+        <Box ta="center" py="md">
           <Text>No datasets added yet</Text>
         </Box>
       );

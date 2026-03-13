@@ -11,7 +11,7 @@ export function EmailHeading({
   children,
   order = 2,
   style,
-}: Props): JSX.Element {
+}: Props): React.JSX.Element {
   return (
     <Heading
       as={`h${order}`}

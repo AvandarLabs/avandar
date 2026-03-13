@@ -1,8 +1,8 @@
 import { Container, Stack, Title } from "@mantine/core";
-import { Paper } from "@/lib/ui/Paper";
+import { Paper } from "@/lib/ui/Paper/Paper";
 import { Tabs } from "@/lib/ui/Tabs";
-import { GoogleSheetsImportView } from "./GoogleSheetsImportView";
-import { ManualUploadView } from "./ManualUploadView";
+import { GoogleSheetsImportView } from "./GoogleSheetsImportView/GoogleSheetsImportView";
+import { ManualUploadView } from "./ManualUploadView/ManualUploadView";
 
 export function DataImportView(): JSX.Element {
   return (

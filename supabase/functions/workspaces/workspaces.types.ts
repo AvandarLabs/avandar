@@ -1,10 +1,34 @@
 import type { APITypeDef } from "../_shared/MiniServer/api.types.ts";
+import type { WorkspaceFeature } from "$/models/Workspace/Workspace.types.ts";
 import type { Tables } from "$/types/database.types.ts";
 
 export type WorkspacesAPI = APITypeDef<
   "workspaces",
-  ["/validate-slug", "/:workspaceSlug/invite"],
+  [
+    "/validate-slug",
+    "/:workspaceId/invite",
+    "/:workspaceId/features",
+    "/invites/:inviteId",
+    "/invites/:inviteId/accept",
+  ],
   {
+    /**
+     * Fetches the features that are enabled for a workspace based on the
+     * subscription type.
+     *
+     * @param pathParams.workspaceId - The id of the workspace to fetch the
+     * features for.
+     */
+    "/:workspaceId/features": {
+      GET: {
+        pathParams: {
+          workspaceId: string;
+        };
+        returnType: {
+          features: WorkspaceFeature[];
+        };
+      };
+    };
     "/validate-slug": {
       POST: {
         body: {
@@ -29,10 +53,10 @@ export type WorkspacesAPI = APITypeDef<
      * @param body.emailToInvite - The email address to invite.
      * @param body.role - The role of the user invited.
      */
-    "/:workspaceSlug/invite": {
+    "/:workspaceId/invite": {
       POST: {
         pathParams: {
-          workspaceSlug: string;
+          workspaceId: string;
         };
         body: {
           emailToInvite: string;

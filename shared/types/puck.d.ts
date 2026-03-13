@@ -8,6 +8,7 @@ import type {
 import type { Simplify } from "type-fest";
 
 declare module "@puckeditor/core" {
+  // Improved type annotations for the transformProps function
   export function transformProps<
     InputComponents extends DefaultComponents = DefaultComponents,
     InputRootProps extends DefaultComponentProps = DefaultRootFieldProps,

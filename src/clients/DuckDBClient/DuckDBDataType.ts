@@ -1,39 +1,7 @@
-import { constant } from "$/lib/utils/constant/constant";
+import { constant } from "@utils/misc/constant/constant";
 import { match } from "ts-pattern";
-import { registryKeys } from "@/lib/utils/objects/misc";
-import { AvaDataType } from "@/models/datasets/AvaDataType";
-
-export type DuckDBDataType =
-  | "BOOLEAN"
-  | "TINYINT"
-  | "SMALLINT"
-  | "INTEGER"
-  | "BIGINT"
-  | "UBIGINT"
-  | "UTINYINT"
-  | "USMALLINT"
-  | "UINTEGER"
-  | "FLOAT"
-  | "DOUBLE"
-  | "DECIMAL"
-  | "DATE"
-  | "TIME"
-  | "TIMESTAMP"
-  | "TIMESTAMP_TZ"
-  | "TIMESTAMP WITH TIME ZONE"
-  | "INTERVAL"
-  | "VARCHAR"
-  | "BLOB"
-  | "UUID"
-  | "HUGEINT"
-  | "BIT"
-  | "ENUM"
-  | "MAP"
-  | "STRUCT"
-  | "LIST"
-  | "UNION"
-  | "JSON"
-  | "GEOMETRY";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.types";
+import type { DuckDBDataType } from "$/models/datasets/DatasetColumn/DuckDBDataTypes";
 
 /**
  * This is a subset of DuckDBDataType. These are the possible data that
@@ -43,39 +11,6 @@ export type DuckDBSniffableDataType = Extract<
   DuckDBDataType,
   "BOOLEAN" | "BIGINT" | "DOUBLE" | "TIME" | "DATE" | "TIMESTAMP" | "VARCHAR"
 >;
-
-export const DuckDBDataTypes = registryKeys<DuckDBDataType>({
-  BOOLEAN: true,
-  TINYINT: true,
-  SMALLINT: true,
-  INTEGER: true,
-  BIGINT: true,
-  UBIGINT: true,
-  UTINYINT: true,
-  USMALLINT: true,
-  UINTEGER: true,
-  FLOAT: true,
-  DOUBLE: true,
-  DECIMAL: true,
-  DATE: true,
-  TIME: true,
-  TIMESTAMP: true,
-  TIMESTAMP_TZ: true,
-  "TIMESTAMP WITH TIME ZONE": true,
-  INTERVAL: true,
-  VARCHAR: true,
-  BLOB: true,
-  UUID: true,
-  HUGEINT: true,
-  BIT: true,
-  ENUM: true,
-  MAP: true,
-  STRUCT: true,
-  LIST: true,
-  UNION: true,
-  JSON: true,
-  GEOMETRY: true,
-});
 
 export const DuckDBDataTypeUtils = {
   isDateOrTimestamp: (duckDBDataType: DuckDBDataType): boolean => {

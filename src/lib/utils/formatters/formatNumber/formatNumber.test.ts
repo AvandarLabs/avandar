@@ -18,7 +18,8 @@ describe("formatNumber caching", () => {
       });
 
     try {
-      const { formatNumber: freshFormatNumber } = await import("./formatNumber");
+      const { formatNumber: freshFormatNumber } =
+        await import("./formatNumber");
       const first = freshFormatNumber(100, { locale: "en-US" });
       const second = freshFormatNumber(200, { locale: "en-US" });
       const third = freshFormatNumber(300, {
@@ -115,9 +116,9 @@ describe("formatNumber", () => {
   });
 
   it("can disable digit grouping or control integer padding", () => {
-    expect(
-      formatNumber(12345, { locale: "en-US", useGrouping: false }),
-    ).toBe("12345");
+    expect(formatNumber(12345, { locale: "en-US", useGrouping: false })).toBe(
+      "12345",
+    );
     expect(
       formatNumber(42, {
         locale: "en-US",

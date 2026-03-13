@@ -31,10 +31,8 @@ import type {
 } from "./parseURLPathParams.ts";
 import type { infer as ZodInfer, ZodObject } from "npm:zod@4";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// deno-lint-ignore no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AnyZodType = ZodType<any, any>;
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 export function actionNotImplemented<
   PathParams extends AnyValidPathParamsRecord | undefined,
@@ -150,10 +148,8 @@ export function createServerRouteHandler<
       return createServerRouteHandler({
         ...state,
 
-        /* eslint-disable @typescript-eslint/no-explicit-any */
-        // deno-lint-ignore no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         querySchema: object(newQueryParamsSchemaShape) as any,
-        /* eslint-enable  @typescript-eslint/no-explicit-any */
 
         // if the query schema is changed AFTER we had already set the action,
         // then we need to reset the action to the not-implemented function
@@ -242,10 +238,8 @@ export function createDefaultRouteHandler<
       record(string(), zNever())
     )) as unknown as ZodType<
       Method extends "GET" ? undefined : Record<string, never>,
-      /* eslint-disable @typescript-eslint/no-explicit-any */
-      // deno-lint-ignore no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       any
-      /* eslint-enable @typescript-eslint/no-explicit-any */
     >,
     action: actionNotImplemented as HTTPMethodActionFn<
       AnyValidPathParamsRecord | undefined,

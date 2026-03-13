@@ -1,9 +1,9 @@
-import { where } from "$/lib/utils/filters/filters";
+import { where } from "@utils/filters/where/where";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
-import { DatasetId } from "@/models/datasets/Dataset";
-import { EntityConfig } from "@/models/EntityConfig/EntityConfig.types";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { EntityConfig } from "$/models/EntityConfig/EntityConfig.types";
 
 /**
  * Given an entity config, finish hydrating it.

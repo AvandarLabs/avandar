@@ -1,19 +1,20 @@
+import { useQuery } from "@hooks/useQuery/useQuery";
 import { modals } from "@mantine/modals";
-import { isNullish } from "$/lib/utils/guards/isNullish/isNullish";
+import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
+import { isNullish } from "@utils/guards/isNullish/isNullish";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { propEq } from "@utils/objects/hofs/propEq/propEq";
+import { UserId } from "$/models/User/User.types";
 import { useEffect, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useQuery } from "@/lib/hooks/query/useQuery";
-import { difference } from "@/lib/utils/arrays/difference";
-import { assertIsDefined } from "@/lib/utils/asserts";
+import { difference } from "@/lib/utils/arrays/difference/difference";
 import { isEmptyArray, or } from "@/lib/utils/guards/guards";
-import { prop, propEq } from "@/lib/utils/objects/higherOrderFuncs";
 import { promiseMap } from "@/lib/utils/promises";
-import { UserId } from "@/models/User/User.types";
-import { ResyncDatasetsBlock } from "@/views/DataManagerApp/ResyncDatasetsBlock";
+import { ResyncDatasetsBlock } from "@/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetsBlock";
 
 /**
  * This hook handles garbage collection of local datasets. Any datasets in

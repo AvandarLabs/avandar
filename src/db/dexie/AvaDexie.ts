@@ -1,11 +1,11 @@
-import { Logger } from "$/lib/Logger/Logger";
-import { uuid } from "@/lib/utils/uuid";
-import { User } from "@/models/User/User.types";
+import { uuid } from "$/lib/uuid";
+import { Logger } from "@/utils/Logger";
 import { AvaSupabase } from "../supabase/AvaSupabase";
 import {
   AvaDexieVersionManager,
   CURRENT_AVA_DEXIE_VERSION,
 } from "./dexieVersions";
+import type { User } from "$/models/User/User.types";
 
 const currentDexieDBVersion = AvaDexieVersionManager.getVersion(
   CURRENT_AVA_DEXIE_VERSION,

@@ -1,11 +1,11 @@
+import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
 import { MapLayerMouseEvent, Map as MapLibreMap } from "maplibre-gl";
 import { RefObject, useEffect, useRef } from "react";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { isOfModelType } from "@/lib/utils/guards/guards";
-import { QueryColumn } from "@/models/queries/QueryColumn";
-import { QueryColumns } from "@/models/queries/QueryColumn/QueryColumns";
-import { QueryDataSource } from "@/models/queries/QueryDataSource";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 
 const GEOJSON_SOURCE_ID = "selected-datasource-source";
 const GEOJSON_LAYER_ID = "selected-datasource-layer";

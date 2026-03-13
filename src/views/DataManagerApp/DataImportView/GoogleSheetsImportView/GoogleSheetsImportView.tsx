@@ -1,7 +1,16 @@
+import { useQuery } from "@hooks/useQuery/useQuery";
 import { Box, BoxProps, Button, Loader, Stack, Text } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
-import { Logger } from "$/lib/Logger/Logger";
-import { MIMEType, UnknownObject } from "$/lib/types/common";
+import {
+  notifyError,
+  notifySuccess,
+  notifyWarning,
+} from "@ui/notifications/notify";
+import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
+import { snakeCaseKeysShallow } from "@utils/objects/snakeCaseKeysShallow/snakeCaseKeysShallow";
+import { MIMEType } from "@utils/types/common";
+import { uuid } from "$/lib/uuid";
+import { csvCellValueSchema } from "$/lib/zodHelpers";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
@@ -14,32 +23,27 @@ import { AppConfig } from "@/config/AppConfig";
 import { useGooglePicker } from "@/hooks/ui/useGooglePicker";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useQuery } from "@/lib/hooks/query/useQuery";
 import { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import { GPickerDocumentObject } from "@/lib/types/google-picker";
-import { AvaTooltip } from "@/lib/ui/AvaTooltip";
-import {
-  notifyError,
-  notifySuccess,
-  notifyWarning,
-} from "@/lib/ui/notifications/notify";
-import { assertIsDefined } from "@/lib/utils/asserts";
+import { AvaTooltip } from "@/lib/ui/AvaTooltip/AvaTooltip";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
-import { formatNumber } from "@/lib/utils/formatters/formatNumber";
-import { snakeCaseKeysShallow } from "@/lib/utils/objects/transformations";
-import { uuid } from "@/lib/utils/uuid";
-import { csvCellValueSchema } from "@/lib/utils/zodHelpers";
-import { Dataset, DatasetId } from "@/models/datasets/Dataset";
-import { DetectedDatasetColumn } from "@/models/datasets/DatasetColumn";
-import { unparseDataset } from "@/models/LocalDataset/utils";
-import { UserId } from "@/models/User/User.types";
-import { WorkspaceId } from "@/models/Workspace/Workspace.types";
+import { formatNumber } from "@/lib/utils/formatters/formatNumber/formatNumber";
+import { unparseDataset } from "@/models/LocalDataset/LocalDatasetUtils";
 import { APIReturnType } from "@/types/http-api.types";
+import { Logger } from "@/utils/Logger";
 import {
   DatasetImportForm,
   DatasetImportFormValues,
 } from "../DatasetUploadForm";
+import type { UnknownObject } from "@utils/types/common";
+import type {
+  Dataset,
+  DatasetId,
+} from "$/models/datasets/Dataset/Dataset.types";
+import type { DetectedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { UserId } from "$/models/User/User.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 type GoogleSpreadsheetData = APIReturnType<"google-sheets/:id", "GET">;
 
@@ -52,7 +56,7 @@ async function saveGoogleSheetToBackend(params: {
   googleAccount: GoogleToken;
   googleDocument: GPickerDocumentObject;
   columns: DetectedDatasetColumn[];
-  workspaceId: WorkspaceId;
+  workspaceId: Workspace.Id;
   loadCSVResult: DuckDBLoadCSVResult;
 }): Promise<Dataset> {
   const {

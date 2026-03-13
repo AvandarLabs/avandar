@@ -1,17 +1,17 @@
+import { useMutation } from "@hooks/useMutation/useMutation";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
+import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { SUPPORT_EMAIL } from "$/config/AppConfig";
-import { Logger } from "$/lib/Logger/Logger";
 import { match } from "ts-pattern";
 import { APIClient } from "@/clients/APIClient";
+import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
-import { useMutation } from "@/lib/hooks/query/useMutation";
-import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
-import { FeaturePlanType } from "@/models/Subscription";
-import { WorkspaceClient } from "@/models/Workspace/WorkspaceClient";
-import { goToBillingPortal } from "../../BillingPortalButton";
-import { SubscriptionPlan } from "../../SubscriptionPlan.types";
+import { Logger } from "@/utils/Logger";
+import { goToBillingPortal } from "../../BillingPortalButton/goToBillingPortal";
 import { ChangePlanModalContents } from "./ChangePlanModalContents";
+import type { SubscriptionPlan } from "../../SubscriptionPlan.types";
+import type { FeaturePlanType } from "$/models/Subscription/Subscription.types";
 
 function featurePlanTypeToLevel(featurePlanType: FeaturePlanType): number {
   return match(featurePlanType)

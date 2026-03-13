@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { AppLinks } from "@/config/AppLinks";
-import { FeaturePlanType } from "@/models/Subscription";
 import { useCurrentWorkspace } from "./useCurrentWorkspace";
+import type { FeaturePlanType } from "$/models/Subscription/Subscription.types";
 
 export function useFeaturePlanType(): FeaturePlanType {
   const workspace = useCurrentWorkspace();

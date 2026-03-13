@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Simplify } from "type-fest";
 import { CURRENT_SCHEMA_VERSION } from "./migrations/constants";
-import { DataVizPBlockProps } from "./pblocks/DataVizPBlock";
+import type { DataVizPBlockProps } from "./pblocks/DataVizPBlock/DataVizPBlock";
 import type {
   CustomFieldRender,
   Config as PuckConfig,

@@ -1,8 +1,10 @@
 import { Flex, List, Text } from "@mantine/core";
-import { UnknownDataFrame } from "$/lib/types/common";
-import { isEpochMs } from "$/lib/utils/guards/isEpochMs";
-import { isISODateString } from "$/lib/utils/guards/isISODateString";
-import { objectValues } from "$/lib/utils/objects/objectValues/objectValues";
+import { isEpochMs } from "@utils/guards/isEpochMs/isEpochMs";
+import { isISODateString } from "@utils/guards/isISODateString/isISODateString";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { objectValues } from "@utils/objects/objectValues";
+import { UnknownDataFrame } from "@utils/types/common";
+import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { flattenError, object, prettifyError, string } from "zod";
@@ -12,10 +14,8 @@ import { BarChart } from "@/lib/ui/viz/BarChart";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { LineChart } from "@/lib/ui/viz/LineChart";
 import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
-import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { AvaDataTypes } from "@/models/datasets/AvaDataType";
-import { QueryResultColumn } from "@/models/queries/QueryResult/QueryResult.types";
-import { DataExplorerStateManager } from "./DataExplorerStateManager";
+import { DataExplorerStateManager } from "./DataExplorerStateManager/DataExplorerStateManager";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 
 type Props = {
   columns: readonly QueryResultColumn[];

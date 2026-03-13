@@ -1,12 +1,12 @@
 import { Outlet } from "@tanstack/react-router";
-import { where } from "$/lib/utils/filters/filters";
+import { where } from "@utils/filters/where/where";
 import { ReactNode, useMemo } from "react";
+import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { AppLinks } from "@/config/AppLinks";
 import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { AppShell } from "@/lib/ui/AppShell";
-import { EntityConfigClient } from "@/models/EntityConfig/EntityConfigClient";
-import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager";
+import { AppShell } from "@/lib/ui/AppShell/AppShell";
+import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useRootWorkspaceChecks } from "./useRootWorkspaceChecks/useRootWorkspaceChecks";
 import { useSpotlightActions } from "./useSpotlightActions";
 

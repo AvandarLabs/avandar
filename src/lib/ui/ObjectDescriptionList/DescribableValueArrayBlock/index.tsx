@@ -1,25 +1,25 @@
 import { ScrollArea, Stack, Text } from "@mantine/core";
+import { pick } from "@utils/objects/pick/pick";
 import { useMemo } from "react";
-import { pick } from "@/lib/utils/objects/misc";
 import {
   isDescribableObject,
   isDescribableValueArray,
   isPrimitiveDescribableValue,
   isStringOrNumber,
 } from "../guards";
-import {
+import { PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS } from "../ObjectDescriptionList.types";
+import { NestedArraysBlock } from "./NestedArraysBlock";
+import { ObjectArrayBlock } from "./ObjectArrayBlock";
+import { PrimitiveFieldValueArrayBlock } from "./PrimitiveFieldValueArrayBlock";
+import type {
   DescribableObject,
   DescribableValueArrayRenderOptions,
   GenericRootData,
   NestedArrayRenderOptions,
   ObjectArrayRenderOptions,
-  PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
   PrimitiveValue,
   PrimitiveValueRenderOptions,
 } from "../ObjectDescriptionList.types";
-import { NestedArraysBlock } from "./NestedArraysBlock";
-import { ObjectArrayBlock } from "./ObjectArrayBlock";
-import { PrimitiveFieldValueArrayBlock } from "./PrimitiveFieldValueArrayBlock";
 
 type Props<T, RootData extends GenericRootData> = {
   data: readonly T[];

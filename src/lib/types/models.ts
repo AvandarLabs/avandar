@@ -1,4 +1,4 @@
-import { UUID } from "../../../shared/lib/types/common";
+import type { UUID } from "@utils/types/common";
 
 export type BaseModel<T extends string> = {
   id: UUID<T>;

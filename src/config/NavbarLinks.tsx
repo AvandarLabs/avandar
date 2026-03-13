@@ -7,11 +7,11 @@ import {
   IconSettings,
   IconTable,
 } from "@tabler/icons-react";
+import { User } from "$/models/User/User.types";
 import { ReactNode } from "react";
-import { User } from "@/models/User/User.types";
-import { WorkspaceWithSubscription } from "@/models/Workspace/Workspace.types";
 import { AppLink, AppLinkKey, AppLinks } from "./AppLinks";
 import { FeatureFlag, isFlagEnabled } from "./FeatureFlagConfig";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 export type NavbarLink = {
   link: AppLink;
@@ -22,7 +22,7 @@ export type NavbarLink = {
    */
   isEnabled?: (options: {
     user: User;
-    workspace: WorkspaceWithSubscription;
+    workspace: Workspace.WithSubscription;
   }) => boolean;
 };
 

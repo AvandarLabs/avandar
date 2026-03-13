@@ -26,7 +26,7 @@ cd "$PROJECT_ROOT" || exit 1
 # Check if concurrently is available
 if ! command -v concurrently &> /dev/null; then
   echo "Error: concurrently is not installed"
-  echo "Please install it with: npm install -D concurrently"
+  echo "Please install it with: pnpm add -D concurrently"
   exit 1
 fi
 
@@ -37,9 +37,10 @@ concurrently \
     --ext ts,tsx \
     --watch supabase/functions \
     --watch shared \
+    --watch packages/shared \
     --exec '
       find supabase/functions -type d -name "node_modules" -exec rm -rf {} + 2>/dev/null; \
-      deno check shared supabase/functions --quiet && \
-        printf \"\033[32mType check passed in supabase/functions\033[0m\n\" || true
+      deno check shared supabase/functions packages/shared --quiet && \
+        printf \"\033[32mType check passed in Deno runtimes\033[0m\n\" || true
     ' 2>&1 | grep -v -E '\[nodemon\]'" \
   "FORCE_COLOR=1 tsc -b --watch tsconfig.app.json tsconfig.node.json"

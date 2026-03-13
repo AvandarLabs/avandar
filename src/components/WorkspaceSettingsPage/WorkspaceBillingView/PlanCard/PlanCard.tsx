@@ -8,44 +8,44 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { useRouter } from "@tanstack/react-router";
+import { notifyExpiredSession } from "@ui/notifications/notifyExpiredSession";
 import { useState } from "react";
 import { match } from "ts-pattern";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { notifyExpiredSession } from "@/lib/ui/notifications/notifyExpiredSession";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
-import { WorkspaceWithSubscription } from "@/models/Workspace/Workspace.types";
 import { PlanFeatures } from "../PlanFeatures";
 import {
   calculateYearlyDiscount,
   isValidFreePlanVariant,
   isValidPaidPlanVariant,
 } from "../planUtils";
-import {
+import { goToPolarCheckout } from "./goToPolarCheckout";
+import { useChangePlanModal } from "./openChangePlanModal/useChangePlanModal";
+import { PaidPlanPriceRow } from "./PaidPlanPriceRow";
+import css from "./PlanCard.module.css";
+import { PlanSwitch } from "./PlanVariantSwitch";
+import type {
   FreePlanVariants,
   FreeSubscriptionPlanGroup,
   PaidPlanVariants,
   PaidSubscriptionPlanGroup,
   SubscriptionPlan,
 } from "../SubscriptionPlan.types";
-import { goToPolarCheckout } from "./goToPolarCheckout";
-import { useChangePlanModal } from "./openChangePlanModal";
-import { PaidPlanPriceRow } from "./PaidPlanPriceRow";
-import css from "./PlanCard.module.css";
-import { PlanSwitch } from "./PlanVariantSwitch";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 type Props =
   | {
       type: "free";
       planGroup: FreeSubscriptionPlanGroup;
-      currentSubscription: WorkspaceWithSubscription["subscription"];
+      currentSubscription: Workspace.WithSubscription["subscription"];
       currentSubscribedPlan?: SubscriptionPlan;
       defaultVariant: FreePlanVariants;
     }
   | {
       type: "paid";
       planGroup: PaidSubscriptionPlanGroup;
-      currentSubscription: WorkspaceWithSubscription["subscription"];
+      currentSubscription: Workspace.WithSubscription["subscription"];
       currentSubscribedPlan?: SubscriptionPlan;
       defaultVariant: PaidPlanVariants;
     };

@@ -1,18 +1,18 @@
 import { ScrollArea } from "@mantine/core";
-import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
-import { pick } from "@/lib/utils/objects/misc";
+import { objectKeys } from "@utils/objects/objectKeys";
+import { pick } from "@utils/objects/pick/pick";
 import { DescriptionList } from "../DescriptionList";
 import { getOrderedKeys } from "./gerOrderedKeys/getOrderedKeys";
 import { getObjectKeyTransformFn } from "./getObjectKeyTransformFn";
-import {
+import { PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS } from "./ObjectDescriptionList.types";
+import { ValueItemContainer } from "./ValueItemContainer";
+import type {
   AnyDescribableValueRenderOptions,
   DescribableObject,
   GenericRootData,
   ObjectRenderOptions,
-  PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS,
   PrimitiveValueRenderOptions,
 } from "./ObjectDescriptionList.types";
-import { ValueItemContainer } from "./ValueItemContainer";
 
 type Props<T extends DescribableObject, RootData extends GenericRootData> = {
   data: T;

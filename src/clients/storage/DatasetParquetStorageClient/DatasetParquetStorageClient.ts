@@ -1,8 +1,8 @@
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { startDatasetUpload } from "./startDatasetUpload";
 import { getDatasetParquetStoragePath, WORKSPACES_BUCKET_NAME } from "./utils";
-import type { DatasetId } from "@/models/datasets/Dataset";
-import type { WorkspaceId } from "@/models/Workspace/Workspace.types";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
  * Deletes all Parquet files for a dataset from object storage.
@@ -13,7 +13,7 @@ import type { WorkspaceId } from "@/models/Workspace/Workspace.types";
  * for.
  */
 async function deleteDataset(options: {
-  workspaceId: WorkspaceId;
+  workspaceId: Workspace.Id;
   datasetId: DatasetId;
 }): Promise<void> {
   const { workspaceId, datasetId } = options;
@@ -44,12 +44,12 @@ async function deleteDataset(options: {
  * @returns
  */
 async function downloadDataset(options: {
-  workspaceId: WorkspaceId;
+  workspaceId: Workspace.Id;
   datasetId: DatasetId;
   throwIfNotFound?: false | undefined;
 }): Promise<Blob | undefined>;
 async function downloadDataset(options: {
-  workspaceId: WorkspaceId;
+  workspaceId: Workspace.Id;
   datasetId: DatasetId;
   throwIfNotFound: true;
 }): Promise<Blob>;
@@ -58,7 +58,7 @@ async function downloadDataset({
   datasetId,
   throwIfNotFound = false,
 }: {
-  workspaceId: WorkspaceId;
+  workspaceId: Workspace.Id;
   datasetId: DatasetId;
   throwIfNotFound?: boolean;
 }): Promise<Blob | undefined> {

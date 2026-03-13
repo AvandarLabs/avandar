@@ -1,9 +1,9 @@
-import { User as SupabaseUser } from "@supabase/supabase-js";
-import { AnyRouter } from "@tanstack/router-core";
+import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
 import { useEffect, useState } from "react";
 import { AuthClient } from "@/clients/AuthClient";
-import { hasDefinedProps } from "@/lib/utils/guards/guards";
-import { User } from "@/models/User/User.types";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
+import type { AnyRouter } from "@tanstack/react-router";
+import type { User } from "$/models/User/User.types";
 
 /**
  * This function should be called from the root component of the app.

@@ -4,12 +4,15 @@ import {
   ErrorComponentProps,
   notFound,
 } from "@tanstack/react-router";
-import { Logger } from "$/lib/Logger/Logger";
 import { useEffect } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { Callout } from "@/lib/ui/Callout";
-import { Dataset, DatasetId } from "@/models/datasets/Dataset";
-import { DatasetMetaView } from "@/views/DataManagerApp/DatasetMetaView";
+import { Logger } from "@/utils/Logger";
+import { DatasetMetaView } from "@/views/DataManagerApp/DatasetMetaView/DatasetMetaView";
+import type {
+  Dataset,
+  DatasetId,
+} from "$/models/datasets/Dataset/Dataset.types";
 
 export const Route = createFileRoute(
   "/_auth/$workspaceSlug/data-manager/$datasetId",

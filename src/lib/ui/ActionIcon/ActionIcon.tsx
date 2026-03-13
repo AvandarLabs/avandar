@@ -1,7 +1,7 @@
 import { ActionIcon as MantineActionIcon } from "@mantine/core";
-import { ButtonHTMLAttributes, ReactNode } from "react";
-import { AvaTooltip } from "../AvaTooltip";
+import { AvaTooltip } from "@/lib/ui/AvaTooltip/AvaTooltip";
 import type { ActionIconProps, TooltipProps } from "@mantine/core";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 type Props = {
   tooltip?: ReactNode;

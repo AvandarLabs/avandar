@@ -35,8 +35,8 @@ the product into something that truly serves your mission.
 1. Clone this repo and install dependencies
 
    ```bash
-   npm install
-   npm run build:ava-cli
+   pnpm install
+   pnpm build:ava-cli
    ```
 
 2. Initiate a local instance of Supabase (you need to have installed Supabase
@@ -52,7 +52,7 @@ the product into something that truly serves your mission.
 3. Set up your environment variables
 
    ```bash
-   npm run env:reset
+   pnpm env:reset
    ```
 
    This will create `.env.development` and `.env.development.edge` files which
@@ -66,7 +66,7 @@ the product into something that truly serves your mission.
 4. Set up your local database
 
    ```bash
-   npm run db:reset
+   pnpm db:reset
    ```
 
    This will reset your Supabase database, apply all local migrations from
@@ -76,7 +76,7 @@ the product into something that truly serves your mission.
 5. Start the development server
 
    ```bash
-   npm run dev
+   pnpm dev
    ```
 
 ## Stack
@@ -96,14 +96,14 @@ the product into something that truly serves your mission.
 ### 1. DB schema changes
 
 1. Create a SQL DB schema in `supabase/schemas`
-2. Generate a new migration with `npm run db:new-migration your_migration_name`
+2. Generate a new migration with `pnpm db:new-migration your_migration_name`
 3. Review that the generated migration makes sense and does what you need to.
-4. Apply the new migration with `npm run db:apply-migrations`
+4. Apply the new migration with `pnpm db:apply-migrations`
 
 ### 2. Set up the TypeScript models
 
-1. Generate the new types with `npm run db:gen-types`
-2. Run `npm run new:model YourModel your_db_table_name` to create your new model
+1. Generate the new types with `pnpm db:gen-types`
+2. Run `pnpm new:model YourModel your_db_table_name` to create your new model
    with CRUD variants.
 
    This will create a new directory in `src/models/[YourModel]/` with the following

@@ -6,10 +6,10 @@
 # then optionally seed the database with custom data. To skip seeding
 # (and only reset the database), use the `--no-seed` option.
 #
-# This script is meant to be run with `npm run db:reset` (from the
+# This script is meant to be run with `pnpm db:reset` (from the
 # project root directory)
 
-PROJECT_ROOT=$(npm run -s util:get-project-root)
+PROJECT_ROOT=$(pnpm -s util:get-project-root)
 cd "$PROJECT_ROOT" || exit
 
 SCRIPT_DIR="${PROJECT_ROOT}/scripts"
@@ -26,12 +26,12 @@ supabase db reset --yes --local
 
 # Whenever we reset, let's regenerate the types in case there were
 # any new migrations that got applied
-npm run db:gen-types
+pnpm db:gen-types
 
 # Run our custom seed script unless --no-seed was specified
 if [ "$SKIP_SEED" = false ]; then
   echo "Seeding database with custom data..."
-  npm run vite-script "$SCRIPT_DIR/seedDatabaseScript.ts"
+  pnpm vite-script "$SCRIPT_DIR/seedDatabaseScript.ts"
 else
   echo "Skipping database seed (--no-seed specified)"
 fi

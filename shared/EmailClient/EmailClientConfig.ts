@@ -1,4 +1,4 @@
-import { registry } from "$/lib/utils/objects/registry/registry.ts";
+import { registry } from "@utils/objects/registry/registry.ts";
 import type { NotificationEmailType } from "./EmailClient.types.ts";
 
 export const NOTIFICATION_EMAIL_FROM = {

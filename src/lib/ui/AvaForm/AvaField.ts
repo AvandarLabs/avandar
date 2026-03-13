@@ -1,4 +1,3 @@
-import { config } from "zod";
 import { SelectData } from "../inputs/Select";
 import {
   AnyFormValues,
@@ -38,7 +37,6 @@ export const AvaField = {
   ): SelectFieldSchema<FieldKey, Data> => {
     return {
       type: "select",
-      ...config,
       ...options,
     };
   },

@@ -1,3 +1,4 @@
+import { useMutation } from "@hooks/useMutation/useMutation";
 import { Button, Group, Stack, TextInput } from "@mantine/core";
 import { isEmail, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
@@ -5,7 +6,6 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { AuthClient } from "@/clients/AuthClient";
 import { AuthLayout } from "@/components/common/AuthLayout";
 import { BackToLoginLink } from "@/components/common/AuthLayout/BackToLoginLink";
-import { useMutation } from "@/lib/hooks/query/useMutation";
 
 export const Route = createFileRoute("/forgot-password")({
   component: ForgotPasswordPage,

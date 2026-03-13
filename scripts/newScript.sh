@@ -5,10 +5,10 @@ PROJECT_ROOT=$SCRIPT_DIR/../
 
 usage() {
   echo "Usage:"
-  echo "       npm run new:script <scriptname>"
+  echo "       pnpm new:script <scriptname>"
   echo "Creates a new shell script in the scripts/ directory"
   echo "Example:"
-  echo "       npm run new:script hello   # Creates scripts/hello.sh"
+  echo "       pnpm new:script hello   # Creates scripts/hello.sh"
   exit 1
 }
 

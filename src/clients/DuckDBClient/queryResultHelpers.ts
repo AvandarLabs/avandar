@@ -1,10 +1,8 @@
-import { UnknownObject } from "$/lib/types/common";
-import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
-import {
-  assertIsNonEmptyArray,
-  assertIsSingletonArray,
-} from "@/lib/utils/asserts";
-import { QueryResult } from "@/models/queries/QueryResult/QueryResult.types";
+import { assertIsNonEmptyArray } from "@utils/asserts/assertIsNonEmptyArray/assertIsNonEmptyArray";
+import { assertIsSingletonArray } from "@utils/asserts/assertIsSingletonArray/assertIsSingletonArray";
+import { objectKeys } from "@utils/objects/objectKeys";
+import type { UnknownObject } from "@utils/types/common";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 
 /**
  * Returns the singular scalar value from a single-column row.

@@ -1,0 +1,72 @@
+create table public.$TABLE_NAME$ (
+  -- Primary key
+  id uuid primary key default gen_random_uuid(),
+  -- Workspace this $RESOURCE_NAME$ belongs to
+  workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,
+  -- Timestamp of when the $RESOURCE_NAME$ was created.
+  created_at timestamptz not null default now(),
+  -- Timestamp of when the $RESOURCE_NAME$ was last updated.
+  updated_at timestamptz not null default now()
+
+  -- Add additional columns here...
+);
+
+-- Enable row level security
+alter table public.$TABLE_NAME$ enable row level security;
+
+-- Policies
+create policy "
+  User can SELECT $TABLE_NAME$ in their workspace
+" on public.$TABLE_NAME$ for select to authenticated using (
+  public.$TABLE_NAME$.workspace_id = any (
+    array(
+      select
+        public.util__get_auth_user_workspaces ()
+    )
+  )
+);
+
+create policy "
+  User can INSERT $TABLE_NAME$ in their workspace
+" on public.$TABLE_NAME$ for insert to authenticated with check (
+  public.$TABLE_NAME$.workspace_id = any (
+    array(
+      select
+        public.util__get_auth_user_workspaces ()
+    )
+  )
+);
+
+create policy "User can UPDATE $TABLE_NAME$ in their workspace" on
+public.$TABLE_NAME$ for update to authenticated using (
+  public.$TABLE_NAME$.workspace_id = any (
+    array(
+      select
+        public.util__get_auth_user_workspaces ()
+    )
+  )
+) with check (
+  -- Updated row must still be in the auth user's workspace
+  public.$TABLE_NAME$.workspace_id = any (
+    array(
+      select
+        public.util__get_auth_user_workspaces ()
+    )
+  )
+);
+
+create policy "
+  User can DELETE $TABLE_NAME$ in their workspace
+" on public.$TABLE_NAME$ for delete to authenticated using (
+  public.$TABLE_NAME$.workspace_id = any (
+    array(
+      select
+        public.util__get_auth_user_workspaces ()
+    )
+  )
+);
+
+-- Trigger the `updated_at` update
+create trigger tr_$TABLE_NAME$__set_updated_at before
+update on public.$TABLE_NAME$ for each row
+execute function public.util__set_updated_at ();

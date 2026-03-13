@@ -1,8 +1,16 @@
+import { useQuery } from "@hooks/useQuery/useQuery";
 import { Box, BoxProps, Stack } from "@mantine/core";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { MIMEType, UnknownObject } from "$/lib/types/common";
+import {
+  notifyError,
+  notifySuccess,
+  notifyWarning,
+} from "@ui/notifications/notify";
+import { snakeCaseKeysShallow } from "@utils/objects/snakeCaseKeysShallow/snakeCaseKeysShallow";
+import { MIMEType } from "@utils/types/common";
+import { uuid } from "$/lib/uuid";
 import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
@@ -13,31 +21,27 @@ import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetSto
 import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useQuery } from "@/lib/hooks/query/useQuery";
-import {
-  notifyError,
-  notifySuccess,
-  notifyWarning,
-} from "@/lib/ui/notifications/notify";
 import { FileUploadForm } from "@/lib/ui/singleton-forms/FileUploadForm";
-import { formatNumber } from "@/lib/utils/formatters/formatNumber";
-import { snakeCaseKeysShallow } from "@/lib/utils/objects/transformations";
-import { uuid } from "@/lib/utils/uuid";
-import { Dataset, DatasetId } from "@/models/datasets/Dataset";
-import { DetectedDatasetColumn } from "@/models/datasets/DatasetColumn";
-import { UserId } from "@/models/User/User.types";
-import { WorkspaceId } from "@/models/Workspace/Workspace.types";
+import { formatNumber } from "@/lib/utils/formatters/formatNumber/formatNumber";
 import {
   DatasetImportForm,
   DatasetImportFormValues,
 } from "../DatasetUploadForm";
+import type { UnknownObject } from "@utils/types/common";
+import type {
+  Dataset,
+  DatasetId,
+} from "$/models/datasets/Dataset/Dataset.types";
+import type { DetectedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { UserId } from "$/models/User/User.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 async function saveLocalCSVToBackend(params: {
   name: string;
   datasetId: DatasetId;
   description: string;
   columns: DetectedDatasetColumn[];
-  workspaceId: WorkspaceId;
+  workspaceId: Workspace.Id;
   isInCloudStorage: boolean;
   loadCSVResult: DuckDBLoadCSVResult;
   sizeInBytes: number;

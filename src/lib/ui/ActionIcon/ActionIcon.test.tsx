@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@/utils/testingUtils";
-import { ActionIcon } from "./index";
+import { ActionIcon } from "./ActionIcon";
 import type { ReactNode } from "react";
 
 type ClickableProps = {

@@ -2,7 +2,7 @@ import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useMatchRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { WorkspaceBillingView } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView";
+import { WorkspaceBillingView } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 
 /**

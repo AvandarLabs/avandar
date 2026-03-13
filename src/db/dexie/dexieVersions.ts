@@ -20,14 +20,14 @@
  * was lost and we should clear the IndexedDB database and try to seed it as
  * much as possible with defaults or data we can get from the backend.
  */
+import { prop } from "@utils/objects/hofs/prop/prop";
 import Dexie from "dexie";
-import { DexieDBVersionManager } from "@/lib/clients/dexie/DexieDBVersionManager";
+import { DexieDBVersionManager } from "@/clients/dexie/DexieDBVersionManager";
 import { clearOPFS } from "@/lib/utils/browser/clearOPFS";
-import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { LegacyLocalDatasetEntryModel } from "@/models/datasets/Legacy_LocalDatasetEntry";
-import { LocalDatasetModel } from "@/models/datasets/LocalDataset";
 import { AvaSupabase } from "../supabase/AvaSupabase";
-import type { LocalPublicDatasetModel } from "@/models/datasets/LocalPublicDataset";
+import type { LegacyLocalDatasetEntryModel } from "@/models/Legacy_LocalDatasetEntry/Legacy_LocalDatasetEntry.types";
+import type { LocalDatasetModel } from "@/models/LocalDataset/LocalDataset.types";
+import type { LocalPublicDatasetModel } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
 
 const db = new Dexie("AvandarDB");
 

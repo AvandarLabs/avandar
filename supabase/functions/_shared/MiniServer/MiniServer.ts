@@ -328,10 +328,8 @@ export function MiniServer<API extends GenericRouteAPIRecord>(
                   pattern: `/${functionName}${h.state.path}`,
                   url: r.url,
 
-                  /* eslint-disable @typescript-eslint/no-explicit-any */
-                  // deno-lint-ignore no-explicit-any
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   paramSchema: h.state.pathParamsSchema as any,
-                  /* eslint-enable @typescript-eslint/no-explicit-any */
                 });
 
                 if (parsedPathParams.success) {

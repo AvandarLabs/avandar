@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
-import { DashboardEditorView } from "@/views/DashboardApp/DashboardEditorView";
+import { DashboardEditorView } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView";
 import type {
   DashboardId,
   DashboardRead,
-} from "@/models/Dashboard/Dashboard.types";
+} from "$/models/Dashboard/Dashboard.types";
 
 export const Route = createFileRoute(
   "/_auth/$workspaceSlug/dashboards/edit/$dashboardId",

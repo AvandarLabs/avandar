@@ -1,11 +1,11 @@
 import { Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
-import {
+import { PrimitiveValueItem } from "../PrimitiveValueItem";
+import type {
   GenericRootData,
   PrimitiveValue,
   PrimitiveValueRenderOptions,
 } from "../ObjectDescriptionList.types";
-import { PrimitiveValueItem } from "../PrimitiveValueItem";
 
 type Props<T extends PrimitiveValue, RootData extends GenericRootData> = {
   values: readonly T[];

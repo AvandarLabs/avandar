@@ -1,5 +1,5 @@
 import { Key } from "react";
-import { LinkProps } from "@/lib/ui/links/Link";
+import type { LinkProps } from "@/lib/ui/links/Link";
 
 /**
  * Configuration for a navigable link in the app.

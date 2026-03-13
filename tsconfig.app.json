@@ -1,12 +1,10 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "target": "ESNext",
     "useDefineForClassFields": true,
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
     "plugins": [{ "name": "typescript-plugin-css-modules" }],
-    "skipLibCheck": true,
     "typeRoots": [
       "./node_modules/@types",
       "src/types",
@@ -15,36 +13,18 @@
       "shared/lib/types"
     ],
     "baseUrl": "./",
-    "paths": {
-      "@/*": ["./src/*"],
-      "$/*": ["./shared/*"],
-      "~/*": ["./*"]
-    },
-
-    /* Bundler mode */
-    "allowImportingTsExtensions": true,
     "incremental": true,
-    "isolatedModules": true,
-    "jsx": "react-jsx",
-    "moduleDetection": "force",
-    "moduleResolution": "bundler",
-    "noEmit": true,
-
-    /* Linting */
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noUncheckedIndexedAccess": true,
-    "noUncheckedSideEffectImports": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "strict": true,
-
-    /* Additional features */
-    "experimentalDecorators": true,
-    "resolveJsonModule": true
+    "jsx": "react-jsx"
   },
-  "include": ["src", "tests", "seed", "scripts", "shared", "next.config.js"],
+  "include": [
+    "src",
+    "tests",
+    "seed",
+    "scripts",
+    "shared",
+    "next.config.js",
+    "./packages/shared/*/src",
+    "./packages/web/*/src"
+  ],
   "exclude": ["supabase/functions"]
 }

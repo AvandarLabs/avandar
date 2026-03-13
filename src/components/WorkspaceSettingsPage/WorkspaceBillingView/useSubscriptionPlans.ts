@@ -1,8 +1,8 @@
-import { isDefined } from "$/lib/utils/guards/isDefined";
+import { useQuery } from "@hooks/useQuery/useQuery";
+import { isDefined } from "@utils/guards/isDefined/isDefined";
+import { makeBucketMap } from "@utils/maps/makeBucketMap/makeBucketMap";
+import { prop } from "@utils/objects/hofs/prop/prop";
 import { APIClient } from "@/clients/APIClient";
-import { useQuery, UseQueryResultTuple } from "@/lib/hooks/query/useQuery";
-import { makeBucketMap } from "@/lib/utils/maps/makeBucketMap";
-import { prop } from "@/lib/utils/objects/higherOrderFuncs";
 import {
   isAnnualPaidSeatsPlan,
   isFreePlan,
@@ -11,7 +11,8 @@ import {
   isSeatBasedPlan,
   makeSubscriptionPlanFromPolarProduct,
 } from "./planUtils";
-import { SubscriptionPlanGroup } from "./SubscriptionPlan.types";
+import type { SubscriptionPlanGroup } from "./SubscriptionPlan.types";
+import type { UseQueryResultTuple } from "@hooks/useQuery/useQuery";
 
 export function useSubscriptionPlans(): UseQueryResultTuple<
   SubscriptionPlanGroup[]

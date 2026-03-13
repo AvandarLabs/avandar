@@ -15,7 +15,10 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { IconPencil, IconX } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import { where } from "$/lib/utils/filters/filters";
+import { where } from "@utils/filters/where/where";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { matchLiteral } from "$/lib/strings/matchLiteral";
+import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
@@ -23,20 +26,20 @@ import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { ActionIcon } from "@/lib/ui/ActionIcon";
-import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList";
+import { ActionIcon } from "@/lib/ui/ActionIcon/ActionIcon";
+import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList";
 import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList.types";
-import { Paper } from "@/lib/ui/Paper";
+import { Paper } from "@/lib/ui/Paper/Paper";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
-import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { matchLiteral } from "@/lib/utils/strings/matchLiteral";
-import { AvaDataTypes } from "@/models/datasets/AvaDataType";
-import { CSVFileDataset } from "@/models/datasets/CSVFileDataset";
-import { Dataset, DatasetWithColumns } from "@/models/datasets/Dataset";
-import { GoogleSheetsDataset } from "@/models/datasets/GoogleSheetsDataset";
 import { DataSummaryView } from "./DataSummaryView";
 import { EditDatasetView } from "./EditDatasetView";
 import { ToggleOfflineOnlyButton } from "./ToggleOfflineOnlyButton";
+import type { CSVFileDataset } from "$/models/datasets/CSVFileDataset/CSVFileDataset.types";
+import type {
+  Dataset,
+  DatasetWithColumns,
+} from "$/models/datasets/Dataset/Dataset.types";
+import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types";
 
 type Props = {
   dataset: Dataset;

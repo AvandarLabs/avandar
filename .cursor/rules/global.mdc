@@ -13,8 +13,10 @@ Directories:
 - `src/components`: All React components
 - `src/routes`: All router pages
 - `src/lib`: Our local library of hooks, utilities, and UI components.
-- `src/config`: The application config and theme.
+- `src/config`: The web application config and theme.
 - `src/clients`: Clients to interact with external services.
+- `apps/`: All standalone apps, such as the Avandar CLI.
+- `packages/`: All avandar libraries that are publishable as their own packages
 
 Libraries:
 
@@ -127,23 +129,22 @@ Libraries:
 
 ## File, Directory, and Module Conventions
 
-- If you create a new directory for a function or component, then use a
-  mini-barrel file to export it. For example:
+- When a module can not be encapsulated in a single file, create a directory
+  to represent the module. Some examples of when a module should be a directory
+  are: when a module has a `.test` file or has tightly-coupled helper functions
+  or sub-components in separate files.
+
+  The directory structure should be as follows:
 
   ```plaintext
   MyComponent
-    | index.tsx
     | MyComponent.tsx
     | MyComponent.test.tsx
+    | SubComponent.tsx
   ```
 
-  Treat `index.tsx` as a public interface and the other files in this directory
-  as private. `index.tsx` should **only** export members that need to be
-  importable in other parts of the codebase.
-
-- Never create monolithic barrel files. The only types of barrel files we allow
-  are the small, modular, barrel files described above, which we will refer to
-  as "mini-barrel" files.
+- Never create barrel files (an `index.ts` that re-exports contents of the
+  directory).
 - Never use namespace exports. Always use named exports.
   This is bad: `export * from ...`.
   This is good: `export { MyComponent } from ...`.

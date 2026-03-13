@@ -1,7 +1,7 @@
+import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 import { InputTextForm } from "@/lib/ui/singleton-forms/InputTextForm";
-import { Dataset } from "@/models/datasets/Dataset";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset.types";
 
 type Props = {
   dataset: Dataset;

@@ -3,21 +3,23 @@ import ehWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url";
 import mvpWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?url";
 import duckDBWasmEh from "@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url";
 import duckDBWasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
-import { ILogger, Logger } from "$/lib/Logger/Logger";
-import { MIMEType } from "$/lib/types/common";
-import { isNonEmptyArray } from "$/lib/utils/guards/isNonEmptyArray";
-import { objectEntries } from "$/lib/utils/objects/objectEntries/objectEntries";
-import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
-import { objectValuesMap } from "$/lib/utils/objects/objectValuesMap/objectValuesMap";
+import { ILogger } from "@logger/Logger.types";
+import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { objectEntries } from "@utils/objects/objectEntries";
+import { objectKeys } from "@utils/objects/objectKeys";
+import { objectValuesMap } from "@utils/objects/objectValuesMap/objectValuesMap";
+import { MIMEType } from "@utils/types/common";
+import { uuid } from "$/lib/uuid";
+import {
+  DuckDBDataType,
+  DuckDBDataTypes,
+} from "$/models/datasets/DatasetColumn/DuckDBDataTypes";
+import { DuckDBQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationTypes";
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
-import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { uuid } from "@/lib/utils/uuid";
-import {
-  QueryResult,
-  QueryResultPage,
-} from "@/models/queries/QueryResult/QueryResult.types";
+import { Logger } from "@/utils/Logger";
 import { arrowFieldToQueryResultField } from "./arrowFieldToQueryResultField";
 import {
   DuckDBColumnSchema,
@@ -28,12 +30,11 @@ import {
   DuckDBScan,
   DuckDBStructuredQuery,
 } from "./DuckDBClient.types";
-import {
-  DuckDBDataType,
-  DuckDBDataTypes,
-  DuckDBDataTypeUtils,
-} from "./DuckDBDataType";
-import { DuckDBQueryAggregations } from "./DuckDBQueryAggregations";
+import { DuckDBDataTypeUtils } from "./DuckDBDataType";
+import type {
+  QueryResult,
+  QueryResultPage,
+} from "$/models/queries/QueryResult/QueryResult.types";
 
 const MANUAL_BUNDLES: duckdb.DuckDBBundles = {
   mvp: {

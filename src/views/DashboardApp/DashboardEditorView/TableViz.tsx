@@ -1,7 +1,7 @@
 import { Box, LoadingOverlay, Text } from "@mantine/core";
+import { prop } from "@utils/objects/hofs/prop/prop";
+import { StructuredQueries } from "$/models/queries/StructuredQuery/StructuredQueries";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
-import { prop } from "@/lib/utils/objects/higherOrderFuncs";
-import { StructuredQueries } from "@/models/queries/StructuredQuery/StructuredQueries";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 
 type Props = {

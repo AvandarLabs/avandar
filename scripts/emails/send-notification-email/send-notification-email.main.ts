@@ -1,7 +1,6 @@
 import { stdin as input, stdout as output } from "node:process";
 import { createInterface } from "node:readline/promises";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { loadProductionEnv } from "~/scripts/utils/loadProductionEnv";
 import { EmailClient } from "$/EmailClient/EmailClient";
 import { NotificationEmailType } from "$/EmailClient/EmailClient.types";
 import { NOTIFICATION_EMAIL_TYPES } from "$/EmailClient/EmailClientConfig";
@@ -9,6 +8,7 @@ import { isDevOverrideEmail } from "$/EmailClient/isDevOverrideEmail";
 import { getDevOverrideEmail } from "$/env/getDevOverrideEmail";
 import { Database } from "$/types/database.types";
 import { program } from "commander";
+import { loadProductionEnv } from "scripts/utils/loadProductionEnv";
 import { z } from "zod";
 import { createSupabaseAdminClient } from "@/db/supabase/AvaSupabase";
 
@@ -26,7 +26,7 @@ const CLIOptionSchema = z.object({
 
 function setupCLI() {
   program
-    .name("npm run email:send-notification --")
+    .name("pnpm email:send-notification --")
     .description("Send a notification email to a recipient")
     .argument(
       "<type>",

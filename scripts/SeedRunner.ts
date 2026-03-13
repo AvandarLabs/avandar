@@ -2,8 +2,8 @@ import { Database } from "$/types/database.types";
 import { createSupabaseAdminClient } from "@/db/supabase/AvaSupabase";
 import { promiseMap, promiseMapSequential } from "@/lib/utils/promises";
 import { ScriptsUtil } from "./ScriptsUtil";
-import type { User } from "@/models/User/User.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { User } from "$/models/User/User.types";
 
 export type SeedHelpers = {
   getUserByEmail: (email: string) => User;

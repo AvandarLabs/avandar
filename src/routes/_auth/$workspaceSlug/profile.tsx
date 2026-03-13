@@ -1,3 +1,4 @@
+import { useMutation } from "@hooks/useMutation/useMutation";
 import {
   Button,
   Container,
@@ -13,7 +14,6 @@ import { notifications } from "@mantine/notifications";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AuthClient } from "@/clients/AuthClient";
 import { AppLinks } from "@/config/AppLinks";
-import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useToggleBoolean } from "@/lib/hooks/state/useToggleBoolean";
 import { InputTextForm } from "@/lib/ui/singleton-forms/InputTextForm";
 

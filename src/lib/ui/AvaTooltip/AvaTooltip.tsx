@@ -1,5 +1,6 @@
-import { Tooltip, TooltipProps } from "@mantine/core";
+import { Tooltip } from "@mantine/core";
 import { mantineVar } from "@/lib/utils/browser/css";
+import type { TooltipProps } from "@mantine/core";
 
 type Props = TooltipProps;
 

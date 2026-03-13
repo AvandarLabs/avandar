@@ -1,26 +1,21 @@
 import { Box, Button, Flex, Stack, Text } from "@mantine/core";
-import { StringKeyOf } from "$/lib/types/utilityTypes";
-import { objectKeys } from "$/lib/utils/objects/objectKeys/objectKeys";
-import { objectValues } from "$/lib/utils/objects/objectValues/objectValues";
-import {
-  ReactElement,
-  ReactNode,
-  Ref,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-} from "react";
+import { objectKeys } from "@utils/objects/objectKeys";
+import { objectValues } from "@utils/objects/objectValues";
+import { useImperativeHandle, useMemo, useRef } from "react";
 import { match } from "ts-pattern";
-import { FormRulesRecord, useForm, UseFormInput } from "@/lib/hooks/ui/useForm";
-import {
+import { useForm } from "@/lib/hooks/ui/useForm";
+import { hydrateTextFieldSchema } from "./AvaTextInput/hydrateTextFieldSchema";
+import { UnknownAvaInput } from "./UnknownAvaInput";
+import type {
   AvaFormRef,
   FormFieldSchema,
   GenericFormSchemaRecord,
   ValidBaseValueType,
   ValuesOfFieldRecord,
 } from "./AvaForm.types";
-import { hydrateTextFieldSchema } from "./AvaTextInput/hydrateTextFieldSchema";
-import { UnknownAvaInput } from "./UnknownAvaInput";
+import type { FormRulesRecord, UseFormInput } from "@/lib/hooks/ui/useForm";
+import type { StringKeyOf } from "@utils/types/utilityTypes";
+import type { ReactElement, ReactNode, Ref } from "react";
 
 type Props<
   FieldSchemaRecord extends Record<

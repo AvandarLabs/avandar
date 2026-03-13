@@ -1,5 +1,3 @@
-import { Logger } from "$/lib/Logger/Logger.ts";
-
 type _URLParamNameExtractor<
   RoutePath extends `/${string}`,
   ParamNames extends readonly string[] = [],
@@ -35,7 +33,6 @@ export function replaceURLPathParams<RoutePath extends `/${string}`>(options: {
       return String(paramValue);
     }
     const errMsg = `Could not build a URL for ${path}. No parameter was passed in for '${paramName}'`;
-    Logger.error(errMsg, { path, pathParams });
     throw new Error(errMsg);
   });
 }

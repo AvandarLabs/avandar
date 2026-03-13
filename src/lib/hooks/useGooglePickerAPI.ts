@@ -1,10 +1,11 @@
+import { useQuery } from "@hooks/useQuery/useQuery";
+import { notifyError } from "@ui/notifications/notify";
 import { useEffect } from "react";
-import { useQuery, UseQueryResult } from "@/lib/hooks/query/useQuery";
-import { APIReturnType } from "@/types/http-api.types";
-import { Logger } from "../../../shared/lib/Logger/Logger";
-import { GooglePickerAPI } from "../types/google-picker";
-import { notifyError } from "../ui/notifications/notify";
+import { Logger } from "@/utils/Logger";
 import { useBoolean } from "./state/useBoolean";
+import type { GooglePickerAPI } from "../types/google-picker";
+import type { APIReturnType } from "@/types/http-api.types";
+import type { UseQueryResult } from "@hooks/useQuery/useQuery";
 
 const GOOGLE_API_JS_URL = "https://apis.google.com/js/api.js";
 const scriptSelector = `script[src="${GOOGLE_API_JS_URL}"]`;

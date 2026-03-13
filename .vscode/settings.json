@@ -1,7 +1,11 @@
 {
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "deno.enablePaths": ["./supabase/functions", "./shared"],
+  "deno.suggest.autoImports": true,
+  "deno.suggest.imports.autoDiscover": true,
+  "deno.organizeImports.enabled": true,
+  "deno.lint": false,
+  "deno.enablePaths": ["./supabase/functions", "./shared", "./packages/shared"],
   "deno.config": "./deno.json",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },

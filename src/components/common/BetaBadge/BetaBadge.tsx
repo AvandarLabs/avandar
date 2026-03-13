@@ -1,5 +1,5 @@
 import { Badge, BadgeProps } from "@mantine/core";
-import { AvaTooltip } from "@/lib/ui/AvaTooltip";
+import { AvaTooltip } from "@/lib/ui/AvaTooltip/AvaTooltip";
 import { mantineVar } from "@/lib/utils/browser/css";
 
 type Props = BadgeProps;

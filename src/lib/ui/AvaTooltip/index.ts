@@ -1,1 +1,0 @@
-export { AvaTooltip } from "./AvaTooltip";

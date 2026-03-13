@@ -1,8 +1,8 @@
 import { promiseMap } from "@/lib/utils/promises";
-import { UserId } from "@/models/User/User.types";
-import { WorkspaceRole } from "@/models/Workspace/Workspace.types";
-import { GenericSeedJob } from "../scripts/SeedRunner";
-import { TSeedData } from "./SeedData";
+import type { GenericSeedJob } from "../scripts/SeedRunner";
+import type { TSeedData } from "./SeedData";
+import type { UserId } from "$/models/User/User.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 export type SeedJob = GenericSeedJob<TSeedData>;
 
@@ -32,7 +32,7 @@ export const SeedJobs = [
           email: string;
           fullName: string;
           displayName: string;
-          role: WorkspaceRole;
+          role: Workspace.Role;
         }) => {
           // create the workspace membership row
           const { data: membership } = await dbClient

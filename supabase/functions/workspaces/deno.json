@@ -1,6 +1,11 @@
 {
   "imports": {
     "$/": "../../../shared/",
+    "@clients/": "../../../packages/shared/clients/src/",
+    "@logger/": "../../../packages/shared/logger/src/",
+    "@models/": "../../../packages/shared/models/src/",
+    "@modules/": "../../../packages/shared/modules/src/",
+    "@utils/": "../../../packages/shared/utils/src/",
     "@react-email/components": "npm:@react-email/components@0",
     "@react-email/render": "npm:@react-email/render@1",
     "@supabase/supabase-js": "npm:@supabase/supabase-js@2",
@@ -17,26 +22,17 @@
   },
   "compilerOptions": {
     "experimentalDecorators": true,
-    "isolatedModules": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "lib": ["deno.ns", "dom", "dom.iterable"],
-    "moduleDetection": "force",
-    "moduleResolution": "bundler",
-    "module": "preserve",
-    "noEmit": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noUncheckedIndexedAccess": true,
-    "noUncheckedSideEffectImports": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
     "strict": true,
-    "typeRoots": ["shared/types", "shared/lib/types"],
     "types": ["react", "react/jsx-runtime"]
   }
 }

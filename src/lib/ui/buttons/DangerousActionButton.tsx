@@ -1,7 +1,7 @@
 import { ActionIcon, Button, Tooltip } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconTrash } from "@tabler/icons-react";
-import { noopEventHandler } from "@/lib/utils/misc";
+import { noop } from "@utils/misc/noop";
 
 type Props = {
   label: string;
@@ -25,7 +25,7 @@ const DEFAULT_CONFIRM_PROPS = {
     "Are you sure you want to proceed with this action? This cannot be undone.",
   confirmLabel: "Confirm",
   cancelLabel: "Cancel",
-  onConfirm: noopEventHandler,
+  onConfirm: noop,
 };
 
 export function DangerousActionButton({

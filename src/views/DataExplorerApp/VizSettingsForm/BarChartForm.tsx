@@ -1,11 +1,11 @@
 import { Tooltip } from "@mantine/core";
+import { propPasses } from "@utils/objects/hofs/propPasses/propPasses";
+import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { useMemo } from "react";
 import { Select } from "@/lib/ui/inputs/Select";
 import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { propPasses } from "@/lib/utils/objects/higherOrderFuncs";
-import { AvaDataTypes } from "@/models/datasets/AvaDataType";
-import { QueryResultColumn } from "@/models/queries/QueryResult/QueryResult.types";
-import { BarChartVizConfig } from "@/models/vizs/BarChartVizConfig";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
 
 type Props = {
   fields: readonly QueryResultColumn[];

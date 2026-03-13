@@ -1,14 +1,14 @@
-import { EmptyObject } from "type-fest";
+import { createDexieCRUDClient } from "@/clients/dexie/createDexieCRUDClient";
+import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
-import { createDexieCRUDClient } from "@/lib/clients/dexie/createDexieCRUDClient";
-import { LocalPublicDatasetParsers } from "@/models/datasets/LocalPublicDataset";
-import { PublicDatasetParquetStorageClient } from "../storage/PublicDatasetParquetStorageClient";
-import type { DashboardId } from "@/models/Dashboard/Dashboard.types";
-import type { DatasetId } from "@/models/datasets/Dataset";
+import { LocalPublicDatasetParsers } from "@/models/LocalPublicDataset/LocalPublicDatasetParsers";
 import type {
   LocalPublicDataset,
   LocalPublicDatasetModel,
-} from "@/models/datasets/LocalPublicDataset";
+} from "@/models/LocalPublicDataset/LocalPublicDataset.types";
+import type { EmptyObject } from "@utils/types/common";
+import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 type LocalPublicDatasetClientMutations = {
   /**

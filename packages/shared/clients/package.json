@@ -1,0 +1,27 @@
+{
+  "name": "@avandar/clients",
+  "version": "0.1.0",
+  "description": "Typed CRUD client primitives and database-specific CRUD type helpers",
+  "license": "CPAL-1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/postgrest-js": "^2.99.0",
+    "@supabase/supabase-js": "^2.98.0",
+    "type-fest": "^5.4.4"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

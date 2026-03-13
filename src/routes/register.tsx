@@ -1,3 +1,4 @@
+import { useMutation } from "@hooks/useMutation/useMutation";
 import {
   Anchor,
   Box,
@@ -19,6 +20,7 @@ import {
   useNavigate,
   useRouter,
 } from "@tanstack/react-router";
+import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { INFO_EMAIL } from "$/config/AppConfig";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
@@ -29,11 +31,9 @@ import { AuthFooter } from "@/components/common/AuthLayout/AuthFooter";
 import { BackToLoginLink } from "@/components/common/AuthLayout/BackToLoginLink";
 import { WAITLIST_URL } from "@/config/AppConfig";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
-import { useMutation } from "@/lib/hooks/query/useMutation";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
-import { notifyError, notifySuccess } from "@/lib/ui/notifications/notify";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,

@@ -14,7 +14,11 @@ export default defineConfig({
     alias: {
       "@": "/src",
       $: "/shared",
-      "~": "/",
+      "@clients": "/packages/clients/src/index.ts",
+      "@logger": "/packages/logger/src/index.ts",
+      "@models": "/packages/models/src/index.ts",
+      "@modules": "/packages/modules/src/index.ts",
+      "@utils": "/packages/utils/src/index.ts",
     },
   },
   ssr: {
