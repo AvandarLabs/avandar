@@ -13,9 +13,7 @@ import {
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
-import { EditButton } from "@ui/buttons/EditButton";
 import { EditableDisplayText } from "@ui/EditableDisplayText/EditableDisplayText";
-import { notifyDevAlert } from "@ui/index";
 import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import {
   ObjectDescriptionList,
@@ -80,16 +78,7 @@ const DATASET_METADATA_RENDER_OPTIONS = {
   columns: {
     renderAsTable: true,
     maxHeight: 400,
-    renderActionColumn: () => {
-      return (
-        <EditButton
-          as="button"
-          onClick={() => {
-            notifyDevAlert("Edit dataset columns");
-          }}
-        />
-      );
-    },
+    editable: true,
     itemRenderOptions: {
       keyRenderOptions: {
         createdAt: {

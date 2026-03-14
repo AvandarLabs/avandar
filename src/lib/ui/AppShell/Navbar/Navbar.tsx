@@ -1,3 +1,4 @@
+import { useBoolean } from "@hooks/useBoolean/useBoolean";
 import { useMutation } from "@hooks/useMutation/useMutation";
 import {
   Box,
@@ -29,7 +30,6 @@ import { BetaBadge } from "@/components/common/BetaBadge/BetaBadge";
 import { CreateWorkspaceForm } from "@/components/common/forms/CreateWorkspaceForm";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
-import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { Link } from "@/lib/ui/links/Link";
 import { Logo } from "../Logo";
 import css from "./Navbar.module.css";

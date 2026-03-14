@@ -310,7 +310,14 @@ export type ObjectArrayRenderOptions<
       >;
       defaultExpanded?: undefined;
       titleKey?: undefined;
-      renderActionColumn?: (item: T, rootData: RootData) => ReactNode;
+
+      /**
+       * Whether the items in the array are editable.
+       * This will render an extra column in the table with an edit button.
+       * When clicked, the item in each column will switch to an editable
+       * variant.
+       */
+      editable?: boolean;
     })
   | (BaseObjectArrayRenderOptions<T, RootData> & {
       /**

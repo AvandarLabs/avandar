@@ -1,4 +1,5 @@
 import { useMutation } from "@hooks/useMutation/useMutation";
+import { useToggleBoolean } from "@hooks/useToggleBoolean/useToggleBoolean";
 import {
   Button,
   Container,
@@ -14,7 +15,6 @@ import { notifications } from "@mantine/notifications";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AuthClient } from "@/clients/AuthClient";
 import { AppLinks } from "@/config/AppLinks";
-import { useToggleBoolean } from "@/lib/hooks/state/useToggleBoolean";
 import { InputTextForm } from "@/lib/ui/singleton-forms/InputTextForm";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug/profile")({

@@ -9,7 +9,7 @@ import {
 } from "../guards";
 import { PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS } from "../ObjectDescriptionList.types";
 import { NestedArraysBlock } from "./NestedArraysBlock";
-import { ObjectArrayBlock } from "./ObjectArrayBlock";
+import { ObjectArrayBlock } from "./ObjectArrayBlock/ObjectArrayBlock";
 import { PrimitiveFieldValueArrayBlock } from "./PrimitiveFieldValueArrayBlock";
 import type {
   DescribableObject,

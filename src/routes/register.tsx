@@ -1,3 +1,4 @@
+import { useBoolean } from "@hooks/useBoolean/useBoolean";
 import { useMutation } from "@hooks/useMutation/useMutation";
 import {
   Anchor,
@@ -31,7 +32,6 @@ import { AuthFooter } from "@/components/common/AuthLayout/AuthFooter";
 import { BackToLoginLink } from "@/components/common/AuthLayout/BackToLoginLink";
 import { WAITLIST_URL } from "@/config/AppConfig";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
-import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
 

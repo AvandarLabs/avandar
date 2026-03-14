@@ -1,7 +1,7 @@
+import { useToggleBoolean } from "@hooks/useToggleBoolean/useToggleBoolean";
 import { Box, Collapse, Group, Text, UnstyledButton } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
 import { clsx } from "clsx";
-import { useToggleBoolean } from "@/lib/hooks/state/useToggleBoolean";
 import type { ReactNode } from "react";
 
 type Props = {
