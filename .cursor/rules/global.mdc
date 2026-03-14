@@ -58,6 +58,9 @@ Libraries:
   for it in `src/lib/ui`. If we do, import our wrapper instead.
 - When using `useForm`, always set a `key={form.key('fieldId')}` prop
   to each input component even if they are not in an array.
+- When using `useMutation` (or any hooks that wrap it), call the non-async mutate
+  function and set necessary `onSuccess` and `onError` handlers at the hook level.
+  Do not call the `.async()` version unless strictly necessary, which is rare.
 
 ## General Code Style & Formatting
 
@@ -91,6 +94,17 @@ Libraries:
   if (someCondition) {
     doSomething();
   }
+  ```
+
+- Use string interpolation instead of concatenation.
+
+  This is bad:
+  ```ts
+  // This is bad:
+  const myString = "Hello, " + name;
+
+  // This is good
+  const myString = `Hello ${name}`;
   ```
 
 ## Naming Conventions

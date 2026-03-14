@@ -15,11 +15,13 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { IconPencil, IconX } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
+import { EditableText } from "@ui/EditableText/EditableText";
+import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { where } from "@utils/filters/where/where";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { matchLiteral } from "$/lib/strings/matchLiteral";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
@@ -118,6 +120,15 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
     });
   const [datasetColumns, isLoadingDatasetColumns] =
     DatasetColumnClient.useGetAll(where("dataset_id", "eq", dataset.id));
+  const [updateDataset, isUpdatePending] = DatasetClient.useUpdate({
+    queryToInvalidate: DatasetClient.QueryKeys.getAll(),
+    onSuccess: () => {
+      notifySuccess("Dataset updated successfully!");
+    },
+    onError: (err) => {
+      notifyError(`There was an error on update: ${err.message}`);
+    },
+  });
 
   const datasetWithColumnsAndSource = useMemo(() => {
     return {
@@ -150,6 +161,13 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
 
   const isLoadingFullDataset = isLoadingPreviewData || isLoadingDatasetColumns;
   const datasetColumnNames = datasetColumns?.map(prop("name")) ?? [];
+  const [datasetDescription, setDatasetDescription] = useState(
+    dataset.description ?? "",
+  );
+
+  useEffect(() => {
+    setDatasetDescription(dataset.description ?? "");
+  }, [dataset.description, dataset.id]);
 
   return (
     <Container py="md">
@@ -244,7 +262,29 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
 
             <Tabs.Panel value="dataset-metadata">
               <Stack>
-                <Text>{dataset.description}</Text>
+                <EditableText
+                  value={datasetDescription}
+                  onChange={setDatasetDescription}
+                  isSaving={isUpdatePending}
+                  emptyStateText="This dataset has no description."
+                  editIconLabel="Edit dataset description"
+                  onSave={(newDescription) => {
+                    const descriptionToSave =
+                      newDescription.trim().length === 0 ?
+                        undefined
+                      : newDescription;
+
+                    updateDataset({
+                      id: dataset.id,
+                      data: {
+                        description: descriptionToSave,
+                      },
+                    });
+                  }}
+                  onCancel={() => {
+                    setDatasetDescription(dataset.description ?? "");
+                  }}
+                />
 
                 <ObjectDescriptionList
                   data={datasetWithColumnsAndSource}
