@@ -4,7 +4,6 @@ import {
   FloatingIndicator,
   Group,
   Loader,
-  ActionIcon as MantineActionIcon,
   MantineTheme,
   Stack,
   Tabs,
@@ -13,9 +12,8 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { IconPencil, IconX } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import { EditableText } from "@ui/EditableText/EditableText";
+import { EditableDisplayText } from "@ui/EditableDisplayText/EditableDisplayText";
 import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { where } from "@utils/filters/where/where";
 import { prop } from "@utils/objects/hofs/prop/prop";
@@ -28,13 +26,11 @@ import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { ActionIcon } from "@/lib/ui/ActionIcon/ActionIcon";
 import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList";
 import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList.types";
 import { Paper } from "@/lib/ui/Paper/Paper";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { DataSummaryView } from "./DataSummaryView";
-import { EditDatasetView } from "./EditDatasetView";
 import { ToggleOfflineOnlyButton } from "./ToggleOfflineOnlyButton";
 import type { CSVFileDataset } from "$/models/datasets/CSVFileDataset/CSVFileDataset.types";
 import type {
@@ -139,8 +135,6 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
     };
   }, [dataset, datasetColumns, isLoadingSourceDataset, sourceDataset]);
 
-  const [isEditingDataset, setIsEditingDataset] = useState<boolean>(false);
-
   const [currentTab, setCurrentTab] =
     useState<DatasetTabId>("dataset-metadata");
 
@@ -161,9 +155,14 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
 
   const isLoadingFullDataset = isLoadingPreviewData || isLoadingDatasetColumns;
   const datasetColumnNames = datasetColumns?.map(prop("name")) ?? [];
+  const [datasetName, setDatasetName] = useState(dataset.name);
   const [datasetDescription, setDatasetDescription] = useState(
     dataset.description ?? "",
   );
+
+  useEffect(() => {
+    setDatasetName(dataset.name);
+  }, [dataset.id, dataset.name]);
 
   useEffect(() => {
     setDatasetDescription(dataset.description ?? "");
@@ -174,55 +173,61 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
       <Stack>
         <Group justify="space-between" align="center">
           <Group gap="xs" align="center">
-            {
-              isEditingDataset ?
-                <Group>
-                  <EditDatasetView dataset={dataset} />
-                  <MantineActionIcon
-                    variant="subtle"
-                    aria-label="Exit edit"
-                    onClick={() => {
-                      return setIsEditingDataset(false);
-                    }}
-                  >
-                    <IconX size={20} />
-                  </MantineActionIcon>
-                </Group>
-                // optional “exit edit” action
-              : <Group gap="xxs">
-                  <Title order={2}>{dataset.name}</Title>
-                  <ActionIcon
-                    ml="md"
-                    variant="default"
-                    color="neutral"
-                    aria-label="Edit dataset"
-                    tooltip="Edit dataset"
-                    onClick={() => {
-                      return setIsEditingDataset(true);
-                    }}
-                  >
-                    <IconPencil size={20} />
-                  </ActionIcon>
+            <Group gap="xxs" align="center">
+              <EditableDisplayText
+                value={datasetName}
+                onChange={setDatasetName}
+                onSave={(newName) => {
+                  updateDataset({
+                    id: dataset.id,
+                    data: {
+                      name: newName.trim(),
+                    },
+                  });
+                }}
+                onCancel={() => {
+                  setDatasetName(dataset.name);
+                }}
+                isSaving={isUpdatePending}
+                isSaveDisabled={datasetName.trim().length < 2}
+                minRows={1}
+                maxRows={2}
+                error={
+                  datasetName.trim().length > 0 &&
+                    datasetName.trim().length < 2 ?
+                    "Dataset name must be at least 2 characters."
+                  : undefined
+                }
+                emptyDisplayText="Untitled dataset"
+                editIconLabel="Edit dataset title"
+                displayTextProps={{
+                  fw: "var(--mantine-h2-font-weight)",
+                  fz: "var(--mantine-h2-font-size)",
+                  lh: "var(--mantine-h2-line-height)",
+                  m: 0,
+                }}
+                fw="var(--mantine-h2-font-weight)"
+                fz="var(--mantine-h2-font-size)"
+                lh="var(--mantine-h2-line-height)"
+              />
 
-                  {(
-                    // only show the button if the source dataset has an
-                    // "isInCloudStorage" property
-                    datasetWithColumnsAndSource.source &&
-                    "isInCloudStorage" in datasetWithColumnsAndSource.source &&
-                    // this toggle is currently only supported for CSV datasets
-                    dataset.sourceType === "csv_file"
-                  ) ?
-                    <ToggleOfflineOnlyButton
-                      isInCloudStorage={
-                        datasetWithColumnsAndSource.source.isInCloudStorage
-                      }
-                      datasetId={dataset.id}
-                      csvFileDatasetId={datasetWithColumnsAndSource.source.id}
-                    />
-                  : null}
-                </Group>
-
-            }
+              {(
+                // only show the button if the source dataset has an
+                // "isInCloudStorage" property
+                datasetWithColumnsAndSource.source &&
+                "isInCloudStorage" in datasetWithColumnsAndSource.source &&
+                // this toggle is currently only supported for CSV datasets
+                dataset.sourceType === "csv_file"
+              ) ?
+                <ToggleOfflineOnlyButton
+                  isInCloudStorage={
+                    datasetWithColumnsAndSource.source.isInCloudStorage
+                  }
+                  datasetId={dataset.id}
+                  csvFileDatasetId={datasetWithColumnsAndSource.source.id}
+                />
+              : null}
+            </Group>
           </Group>
         </Group>
 
@@ -262,11 +267,12 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
 
             <Tabs.Panel value="dataset-metadata">
               <Stack>
-                <EditableText
+                <EditableDisplayText
                   value={datasetDescription}
+                  textarea
                   onChange={setDatasetDescription}
                   isSaving={isUpdatePending}
-                  emptyStateText="This dataset has no description."
+                  emptyDisplayText="This dataset has no description."
                   editIconLabel="Edit dataset description"
                   onSave={(newDescription) => {
                     const descriptionToSave =

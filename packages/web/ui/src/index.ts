@@ -7,4 +7,4 @@ export { notifyNotImplemented } from "./notifications/notifyNotImplemented";
 export { notifyDevAlert } from "./notifications/notifyDevAlert";
 
 // text
-export { EditableText } from "./EditableText/EditableText";
+export { EditableDisplayText } from "./EditableDisplayText/EditableDisplayText";
