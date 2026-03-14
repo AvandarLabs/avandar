@@ -15,7 +15,7 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { SourceBadge } from "@/components/common/SourceBadge";
-import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList";
+import { ObjectDescriptionList } from "@ui/ObjectDescriptionList";
 import { Paper } from "@/lib/ui/Paper/Paper";
 import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap/makeIdLookupMap";
 import { makeMap } from "@/lib/utils/maps/makeMap/makeMap";

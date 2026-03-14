@@ -15,6 +15,12 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { IconPencil, IconX } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
+import { EditIconButton } from "@ui/buttons/EditIconButton";
+import { notifyDevAlert } from "@ui/index";
+import {
+  ObjectDescriptionList,
+  ObjectKeyRenderOptionsMap,
+} from "@ui/ObjectDescriptionList";
 import { where } from "@utils/filters/where/where";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { matchLiteral } from "$/lib/strings/matchLiteral";
@@ -27,8 +33,6 @@ import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ActionIcon } from "@/lib/ui/ActionIcon/ActionIcon";
-import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList";
-import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList.types";
 import { Paper } from "@/lib/ui/Paper/Paper";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { DataSummaryView } from "./DataSummaryView";
@@ -78,6 +82,16 @@ const DATASET_METADATA_RENDER_OPTIONS = {
   columns: {
     renderAsTable: true,
     maxHeight: 400,
+    renderActionColumn: () => {
+      return (
+        <EditIconButton
+          as="button"
+          onClick={() => {
+            notifyDevAlert("Edit dataset columns");
+          }}
+        />
+      );
+    },
     itemRenderOptions: {
       keyRenderOptions: {
         createdAt: {
@@ -245,7 +259,6 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
             <Tabs.Panel value="dataset-metadata">
               <Stack>
                 <Text>{dataset.description}</Text>
-
                 <ObjectDescriptionList
                   data={datasetWithColumnsAndSource}
                   dateFormat="MMMM D, YYYY"
@@ -253,7 +266,6 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                   excludeKeys={EXCLUDED_DATASET_METADATA_KEYS}
                   keyRenderOptions={DATASET_METADATA_RENDER_OPTIONS}
                 />
-
                 <Title order={5}>Data preview</Title>
                 {isLoadingPreviewData ?
                   <Loader />

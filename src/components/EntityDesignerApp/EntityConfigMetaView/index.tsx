@@ -8,11 +8,11 @@ import { useState } from "react";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList";
+import { ObjectDescriptionList } from "@ui/ObjectDescriptionList";
 import { Paper } from "@/lib/ui/Paper/Paper";
 import { generateEntities } from "./generateEntities";
 import { useHydratedEntityConfig } from "./useHydratedEntityConfig";
-import type { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList.types";
+import type { ObjectKeyRenderOptionsMap } from "@ui/ObjectDescriptionList";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig.types";
 
 type Props = {

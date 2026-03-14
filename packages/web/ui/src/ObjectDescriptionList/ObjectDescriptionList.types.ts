@@ -310,6 +310,7 @@ export type ObjectArrayRenderOptions<
       >;
       defaultExpanded?: undefined;
       titleKey?: undefined;
+      renderActionColumn?: (item: T, rootData: RootData) => ReactNode;
     })
   | (BaseObjectArrayRenderOptions<T, RootData> & {
       /**

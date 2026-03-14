@@ -1,5 +1,6 @@
 import { List, Table, Text } from "@mantine/core";
 import { objectKeys } from "@utils/objects/objectKeys";
+import { StringKeyOf } from "@utils/types/utilityTypes";
 import { useMemo } from "react";
 import { CollapsibleItem } from "../CollapsibleItem";
 import { getOrderedKeys } from "../gerOrderedKeys/getOrderedKeys";
@@ -14,6 +15,7 @@ import type {
 } from "../ObjectDescriptionList.types";
 
 const DEFAULT_EXCLUDE_KEYS_PATTERN = "_";
+const ACTION_COLUMN_HEADER_KEY = "__ACTION_COLUMN__";
 
 type Props<T extends DescribableObject, RootData extends GenericRootData> = {
   values: readonly T[];
@@ -47,8 +49,12 @@ export function ObjectArrayBlock<
 
   // render each entity in the array as a row in a table
   if (moreRenderOptions.renderAsTable) {
-    const { idKey, renderTableHeader, ...primitiveValueRenderOptions } =
-      moreRenderOptions;
+    const {
+      idKey,
+      renderTableHeader,
+      renderActionColumn,
+      ...primitiveValueRenderOptions
+    } = moreRenderOptions;
 
     // get the primitive value render options from the parent, and override
     // them with the current `itemRenderOptions`
@@ -72,9 +78,20 @@ export function ObjectArrayBlock<
       excludeKeysPattern,
     });
 
-    const headers = headerKeys.map((headerKey) => {
+    const headerKeysToRender: Array<
+      StringKeyOf<T> | typeof ACTION_COLUMN_HEADER_KEY
+    > =
+      renderActionColumn ?
+        [...headerKeys, ACTION_COLUMN_HEADER_KEY]
+      : headerKeys;
+
+    const headers = headerKeysToRender.map((headerKey) => {
       const customRenderedHeader =
         renderTableHeader ? renderTableHeader(headerKey, rootData) : undefined;
+
+      if (headerKey === ACTION_COLUMN_HEADER_KEY) {
+        return <Table.Th key={headerKey}>Actions</Table.Th>;
+      }
 
       return (
         <Table.Th key={headerKey}>
@@ -89,13 +106,23 @@ export function ObjectArrayBlock<
       const rowId = String(rowObject[idKey ?? "id"] ?? idx);
       return (
         <Table.Tr key={rowId}>
-          {headerKeys.map((fieldKey) => {
+          {headerKeysToRender.map((fieldKey) => {
+            if (fieldKey === ACTION_COLUMN_HEADER_KEY && renderActionColumn) {
+              return (
+                <Table.Td key={fieldKey}>
+                  {renderActionColumn(rowObject, rootData)}
+                </Table.Td>
+              );
+            }
+
             const fieldVal = rowObject[fieldKey];
 
             // compute the child's render options to pass down
             const childRenderOptions = {
               ...parentRenderOptions,
-              ...(itemRenderOptions?.keyRenderOptions?.[fieldKey] ?? {}),
+              ...(itemRenderOptions?.keyRenderOptions?.[
+                fieldKey as StringKeyOf<T>
+              ] ?? {}),
             } as AnyDescribableValueRenderOptions;
 
             return (

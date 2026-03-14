@@ -1,6 +1,6 @@
 import { Loader, Stack } from "@mantine/core";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
-import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList";
+import { ObjectDescriptionList } from "@ui/ObjectDescriptionList";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 type Props = {
