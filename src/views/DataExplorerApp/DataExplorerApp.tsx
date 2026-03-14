@@ -57,6 +57,26 @@ export function DataExplorerApp(): JSX.Element {
             <Button
               variant="outline"
               color="neutral"
+              size="compact-sm"
+              onClick={() => {
+                alert("Clicked");
+              }}
+            >
+              Save Visualization
+            </Button>
+            <Button
+              variant="outline"
+              color="neutral"
+              size="compact-sm"
+              onClick={() => {
+                alert("Clicked");
+              }}
+            >
+              Save Data
+            </Button>
+            <Button
+              variant="outline"
+              color="neutral"
               leftSection={<IconDownload size={16} />}
               size="compact-sm"
               disabled={isLoadingResults || queryResultData.length === 0}

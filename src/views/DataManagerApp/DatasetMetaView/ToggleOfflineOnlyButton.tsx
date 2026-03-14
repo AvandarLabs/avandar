@@ -2,6 +2,7 @@ import { useMutation } from "@hooks/useMutation/useMutation";
 import { Loader, Progress, Stack, Text, ThemeIcon } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconWorld, IconWorldOff } from "@tabler/icons-react";
+import { ActionIcon } from "@ui/ActionIcon/ActionIcon";
 import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
@@ -9,7 +10,6 @@ import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetSto
 import { useIsDatasetUploadInProgress } from "@/clients/storage/DatasetParquetStorageClient/useIsDatasetUploadInProgress";
 import { useUploadPercent } from "@/clients/storage/DatasetParquetStorageClient/useUploadPercent";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { ActionIcon } from "@ui/ActionIcon/ActionIcon";
 import type { CSVFileDatasetId } from "$/models/datasets/CSVFileDataset/CSVFileDataset.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 

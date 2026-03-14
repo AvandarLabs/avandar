@@ -1,5 +1,4 @@
 import { Tooltip as MantineTooltip } from "@mantine/core";
-import css from "./Tooltip.module.css";
 import type { TooltipProps } from "@mantine/core";
 
 type Props = TooltipProps;
@@ -19,8 +18,12 @@ export function Tooltip({
 }: Props): JSX.Element {
   return (
     <MantineTooltip
+      color={color}
+      fz={fz}
+      maw={maw}
+      withArrow={withArrow}
+      multiline={multiline}
       transitionProps={{ transition: "pop", ...transitionProps }}
-      className={css.root}
       {...props}
     >
       {children}

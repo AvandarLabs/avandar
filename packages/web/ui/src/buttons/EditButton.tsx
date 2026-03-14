@@ -6,14 +6,26 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
 type HTMLButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
 type HTMLAnchorProps = AnchorHTMLAttributes<HTMLAnchorElement>;
 
+type BaseProps = {
+  /**
+   * The name of the item to edit. The name will be used in the tooltip label
+   * as "Edit ${name}". */
+  name?: string;
+
+  /** Whether to show a tooltip with the item name. */
+  withTooltip?: boolean;
+};
+
 type Props =
   | ({
       as?: "button";
-    } & HTMLButtonProps &
+    } & BaseProps &
+      HTMLButtonProps &
       ActionIconProps)
   | ({
       as: "a";
-    } & HTMLAnchorProps &
+    } & BaseProps &
+      HTMLAnchorProps &
       ActionIconProps);
 
 const DEFAULT_ICON_SIZE = 16;
@@ -37,7 +49,11 @@ const defaultAnchorProps: ActionIconProps & HTMLAnchorProps = {
  * pencil icon by default.
  * This component can be rendered as either a button or an anchor element.
  */
-export function EditButton({ as, ...props }: Props): JSX.Element {
+export function EditButton({
+  as = "button",
+  withTooltip = true,
+  ...props
+}: Props): JSX.Element {
   const passThroughProps =
     as === "button" ?
       {
@@ -50,7 +66,16 @@ export function EditButton({ as, ...props }: Props): JSX.Element {
       };
 
   return (
-    <ActionIcon {...passThroughProps}>
+    <ActionIcon
+      tooltip={
+        withTooltip ?
+          props.name ?
+            `Edit ${props.name}`
+          : "Edit"
+        : undefined
+      }
+      {...passThroughProps}
+    >
       <IconPencil size={DEFAULT_ICON_SIZE} />
     </ActionIcon>
   );

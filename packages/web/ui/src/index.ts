@@ -18,3 +18,6 @@ export { notifyWarning } from "./notifications/notify";
 export { notifyExpiredSession } from "./notifications/notifyExpiredSession";
 export { notifyNotImplemented } from "./notifications/notifyNotImplemented";
 export { notifyDevAlert } from "./notifications/notifyDevAlert";
+
+// text
+export { EditableDisplayText } from "./EditableDisplayText/EditableDisplayText";
