@@ -25,7 +25,7 @@ import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import { GPickerDocumentObject } from "@/lib/types/google-picker";
-import { AvaTooltip } from "@/lib/ui/AvaTooltip/AvaTooltip";
+import { Tooltip } from "@ui/Tooltip/Tooltip";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
 import { formatNumber } from "@/lib/utils/formatters/formatNumber/formatNumber";
@@ -261,7 +261,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
               </>
             : null}
           </>
-        : <AvaTooltip label="Google sheets connector is disabled while this feature is under maintenance.">
+        : <Tooltip label="Google sheets connector is disabled while this feature is under maintenance.">
             <Button
               disabled
               fullWidth
@@ -292,7 +292,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
             >
               Connect to Google Sheets
             </Button>
-          </AvaTooltip>
+          </Tooltip>
         }
 
         {(

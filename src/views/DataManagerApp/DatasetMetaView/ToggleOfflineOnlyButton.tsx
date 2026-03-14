@@ -9,7 +9,7 @@ import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetSto
 import { useIsDatasetUploadInProgress } from "@/clients/storage/DatasetParquetStorageClient/useIsDatasetUploadInProgress";
 import { useUploadPercent } from "@/clients/storage/DatasetParquetStorageClient/useUploadPercent";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { ActionIcon } from "@/lib/ui/ActionIcon/ActionIcon";
+import { ActionIcon } from "@ui/ActionIcon/ActionIcon";
 import type { CSVFileDatasetId } from "$/models/datasets/CSVFileDataset/CSVFileDataset.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 

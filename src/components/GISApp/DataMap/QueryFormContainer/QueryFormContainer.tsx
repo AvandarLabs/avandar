@@ -5,7 +5,7 @@ import { IconFilter } from "@tabler/icons-react";
 import { notifyError } from "@ui/notifications/notify";
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
 import { useBoolean } from "@/lib/hooks/state/useBoolean";
-import { AvaTooltip } from "@/lib/ui/AvaTooltip/AvaTooltip";
+import { Tooltip } from "@ui/Tooltip/Tooltip";
 import { mantineColorVar, mantineVar } from "@/lib/utils/browser/css";
 import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect";
 import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
@@ -57,7 +57,7 @@ export function QueryFormContainer({
         shadow="md"
       >
         <Popover.Target>
-          <AvaTooltip label="Filter" position="right">
+          <Tooltip label="Filter" position="right">
             <ActionIcon
               size="lg"
               variant="white"
@@ -77,7 +77,7 @@ export function QueryFormContainer({
             >
               <IconFilter size={20} />
             </ActionIcon>
-          </AvaTooltip>
+          </Tooltip>
         </Popover.Target>
         <Popover.Dropdown p="xs">
           <Stack gap="md">

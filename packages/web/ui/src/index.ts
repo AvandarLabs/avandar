@@ -1,5 +1,11 @@
+// ActionIcon
+export { ActionIcon } from "./ActionIcon/ActionIcon";
+
 // buttons
-export { EditIconButton } from "./buttons/EditIconButton";
+export { EditButton as EditIconButton } from "./buttons/EditButton";
+
+// Tooltip
+export { Tooltip } from "./Tooltip/Tooltip";
 
 // ObjectDescriptionList
 export { ObjectDescriptionList } from "./ObjectDescriptionList/ObjectDescriptionList";

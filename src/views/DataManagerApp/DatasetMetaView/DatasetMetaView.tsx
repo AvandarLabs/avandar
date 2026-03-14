@@ -15,7 +15,8 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { IconPencil, IconX } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import { EditIconButton } from "@ui/buttons/EditIconButton";
+import { ActionIcon } from "@ui/ActionIcon/ActionIcon";
+import { EditButton } from "@ui/buttons/EditButton";
 import { notifyDevAlert } from "@ui/index";
 import {
   ObjectDescriptionList,
@@ -32,7 +33,6 @@ import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { ActionIcon } from "@/lib/ui/ActionIcon/ActionIcon";
 import { Paper } from "@/lib/ui/Paper/Paper";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { DataSummaryView } from "./DataSummaryView";
@@ -84,7 +84,7 @@ const DATASET_METADATA_RENDER_OPTIONS = {
     maxHeight: 400,
     renderActionColumn: () => {
       return (
-        <EditIconButton
+        <EditButton
           as="button"
           onClick={() => {
             notifyDevAlert("Edit dataset columns");
