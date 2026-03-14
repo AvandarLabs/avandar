@@ -3,7 +3,7 @@ import { getHotkeyHandler } from "@mantine/hooks";
 import { EditButton } from "@ui/buttons/EditButton";
 import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
 import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { TextareaProps, TextInputProps, TextProps } from "@mantine/core";
 
 type BaseProps = {
@@ -88,7 +88,19 @@ export function EditableDisplayText({
   ...passThroughProps
 }: Props): JSX.Element {
   const [isEditing, setIsEditing] = useState(false);
+  const textInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const hasText = value.trim().length > 0;
+
+  useEffect(() => {
+    if (isEditing) {
+      if (passThroughProps.textarea) {
+        textareaRef.current?.focus();
+      } else {
+        textInputRef.current?.focus();
+      }
+    }
+  }, [isEditing, passThroughProps.textarea]);
   const hasExplicitWidth =
     (!passThroughProps.textarea && hasDefinedProps(passThroughProps, "w")) ||
     (isPlainObject(passThroughProps.style) &&
@@ -171,6 +183,7 @@ export function EditableDisplayText({
       }
       return (
         <TextInput
+          ref={textInputRef}
           variant="unstyled"
           name={name}
           value={value}
@@ -206,6 +219,7 @@ export function EditableDisplayText({
 
       return (
         <Textarea
+          ref={textareaRef}
           variant="unstyled"
           name={name}
           autosize
@@ -287,7 +301,7 @@ export function EditableDisplayText({
   }
 
   return (
-    <Group gap="xxs" align="start" wrap="nowrap" justify="space-between">
+    <Group gap="xxs" align="center" wrap="nowrap" justify="space-between">
       <Text
         style={{ whiteSpace: "pre-wrap" }}
         c={hasText ? undefined : "dimmed"}
