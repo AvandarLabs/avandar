@@ -1,11 +1,4 @@
-import {
-  ActionIcon,
-  Box,
-  Button,
-  Group,
-  Text,
-  Textarea,
-} from "@mantine/core";
+import { ActionIcon, Box, Button, Group, Text, Textarea } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
 import { IconPencil } from "@tabler/icons-react";
 import { useEffect, useMemo, useState } from "react";
@@ -23,10 +16,9 @@ type Props = {
   onChange: (value: string) => void;
 
   /**
-   * Called when the user saves.
-   * Keep this as a pure callback (no internal API logic in this component).
+   * Called when the user clicks save.
    */
-  onSave: (value: string) => void | Promise<void>;
+  onSave: (value: string) => void;
 
   /**
    * Called when the user cancels editing.
@@ -34,9 +26,15 @@ type Props = {
   onCancel?: () => void;
   isSaving?: boolean;
   disabled?: boolean;
+
+  /** Min rows for the editable text area */
   minRows?: number;
+
+  /** Max rows for the editable text area */
   maxRows?: number;
-  emptyStateText?: string;
+
+  /** Display text to show when `value` is empty */
+  emptyDisplayText?: string;
   editIconLabel?: string;
 } & Omit<TextareaProps, "value" | "onChange" | "onSubmit">;
 
@@ -49,14 +47,11 @@ export function EditableText({
   disabled = false,
   minRows = 2,
   maxRows = 8,
-  emptyStateText = "No description provided yet.",
+  emptyDisplayText = "Empty",
   editIconLabel = "Edit text",
   ...textareaProps
 }: Props): JSX.Element {
   const [isEditing, setIsEditing] = useState(false);
-  const [isSavingInternal, setIsSavingInternal] = useState(false);
-
-  const isSubmitting = isSaving || isSavingInternal;
   const hasText = value.trim().length > 0;
 
   const isMac = useMemo(() => {
@@ -77,41 +72,28 @@ export function EditableText({
   }, []);
   const keyboardShortcut = isMac ? "⌘↵" : "Ctrl↵";
 
-  useEffect(() => {
-    if (!isEditing) {
-      setIsSavingInternal(false);
-    }
-  }, [isEditing]);
-
-  const handleStartEditing = (): void => {
+  const onStartEditing = () => {
     if (disabled) {
       return;
     }
     setIsEditing(true);
   };
 
-  const handleCancel = (): void => {
-    if (disabled || isSubmitting) {
+  const onCancelClick = () => {
+    if (disabled || isSaving) {
       return;
     }
     onCancel?.();
     setIsEditing(false);
   };
 
-  const handleSave = async (): Promise<void> => {
-    if (disabled || isSubmitting) {
+  const onSaveClick = () => {
+    if (disabled || isSaving) {
       return;
     }
 
-    setIsSavingInternal(true);
-    try {
-      await onSave(value);
-      setIsEditing(false);
-    } catch {
-      // Keep the component in edit mode and defer error handling to the parent.
-    } finally {
-      setIsSavingInternal(false);
-    }
+    onSave(value);
+    setIsEditing(false);
   };
 
   if (isEditing) {
@@ -136,14 +118,14 @@ export function EditableText({
               "mod+Enter",
               (event) => {
                 event.preventDefault();
-                void handleSave();
+                onSaveClick();
               },
             ],
             [
               "Escape",
               (event) => {
                 event.preventDefault();
-                handleCancel();
+                onCancelClick();
               },
             ],
           ])}
@@ -163,9 +145,9 @@ export function EditableText({
             size="compact-sm"
             variant="light"
             onClick={() => {
-              void handleSave();
+              void onSaveClick();
             }}
-            loading={isSubmitting}
+            loading={isSaving}
             disabled={disabled}
           >
             Save
@@ -173,8 +155,8 @@ export function EditableText({
           <Button
             size="compact-sm"
             variant="default"
-            onClick={handleCancel}
-            disabled={disabled || isSubmitting}
+            onClick={onCancelClick}
+            disabled={disabled || isSaving}
           >
             Cancel
           </Button>
@@ -193,13 +175,13 @@ export function EditableText({
         c={hasText ? undefined : "dimmed"}
         fs={hasText ? undefined : "italic"}
       >
-        {hasText ? value : emptyStateText}
+        {hasText ? value : emptyDisplayText}
       </Text>
       <ActionIcon
         variant="subtle"
         color="gray"
         aria-label={editIconLabel}
-        onClick={handleStartEditing}
+        onClick={onStartEditing}
         disabled={disabled}
       >
         <IconPencil size={16} />
