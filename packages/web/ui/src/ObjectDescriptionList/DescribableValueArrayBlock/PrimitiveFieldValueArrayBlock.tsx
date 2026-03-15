@@ -1,6 +1,6 @@
 import { Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
-import { PrimitiveValueItem } from "../PrimitiveValueItem";
+import { PrimitiveValueItem } from "../PrimitiveValueItem/PrimitiveValueItem";
 import type {
   GenericRootData,
   PrimitiveValue,

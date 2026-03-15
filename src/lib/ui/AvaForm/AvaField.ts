@@ -1,4 +1,4 @@
-import { SelectData } from "../inputs/Select";
+import type { SelectData } from "@ui/inputs/Select/Select";
 import {
   AnyFormValues,
   SelectFieldSchema,

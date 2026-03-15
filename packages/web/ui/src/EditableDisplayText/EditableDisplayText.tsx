@@ -37,7 +37,6 @@ type BaseProps = {
 
   /** Display text to show when `value` is empty */
   emptyDisplayText?: string;
-  editIconLabel?: string;
   isSaveDisabled?: boolean;
   displayTextProps?: TextProps;
 };
@@ -82,7 +81,6 @@ export function EditableDisplayText({
   isSaving = false,
   disabled = false,
   emptyDisplayText = "Empty",
-  editIconLabel = "Edit text",
   isSaveDisabled = false,
   displayTextProps,
   ...passThroughProps

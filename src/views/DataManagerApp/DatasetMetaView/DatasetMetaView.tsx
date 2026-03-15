@@ -15,14 +15,8 @@ import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
 import { EditableDisplayText } from "@ui/EditableDisplayText/EditableDisplayText";
 import { notifyError, notifySuccess } from "@ui/notifications/notify";
-import {
-  ObjectDescriptionList,
-  ObjectKeyRenderOptionsMap,
-} from "@ui/ObjectDescriptionList";
 import { where } from "@utils/filters/where/where";
 import { prop } from "@utils/objects/hofs/prop/prop";
-import { matchLiteral } from "$/lib/strings/matchLiteral";
-import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
@@ -32,69 +26,14 @@ import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { Paper } from "@/lib/ui/Paper/Paper";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
+import { DatasetMetadataList } from "./DatasetMetadataList";
 import { DataSummaryView } from "./DataSummaryView";
 import { ToggleOfflineOnlyButton } from "./ToggleOfflineOnlyButton";
-import type { CSVFileDataset } from "$/models/datasets/CSVFileDataset/CSVFileDataset.types";
-import type {
-  Dataset,
-  DatasetWithColumns,
-} from "$/models/datasets/Dataset/Dataset.types";
-import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset.types";
 
 type Props = {
   dataset: Dataset;
 };
-
-type DatasetWithColumnsAndSource = DatasetWithColumns & {
-  source: CSVFileDataset | GoogleSheetsDataset;
-};
-
-const EXCLUDED_DATASET_METADATA_KEYS = [
-  "id",
-  "name",
-  "description",
-  "workspaceId",
-  "ownerId",
-  "ownerProfileId",
-  "dateOfLastSync",
-] satisfies ReadonlyArray<keyof DatasetWithColumnsAndSource>;
-
-const DATASET_METADATA_RENDER_OPTIONS = {
-  createdAt: {
-    asDate: true,
-  },
-  updatedAt: {
-    asDate: true,
-  },
-  sourceType: {
-    renderValue: (value) => {
-      return matchLiteral(value, {
-        csv_file: "CSV file",
-        google_sheets: "Google Sheets",
-        _otherwise: value,
-      });
-    },
-  },
-  columns: {
-    renderAsTable: true,
-    maxHeight: 400,
-    editable: true,
-    itemRenderOptions: {
-      keyRenderOptions: {
-        createdAt: {
-          asDate: true,
-        },
-        dataType: {
-          renderValue: AvaDataTypes.toDisplayValue,
-        },
-      },
-      includeKeys: ["name", "dataType", "description"],
-    },
-  },
-  source: {
-    excludeKeys: ["createdAt", "id", "datasetId", "updatedAt", "workspaceId"],
-  },
-} satisfies ObjectKeyRenderOptionsMap<DatasetWithColumnsAndSource>;
 
 type DatasetTabId = "dataset-metadata" | "dataset-summary";
 
@@ -205,7 +144,6 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                   : undefined
                 }
                 emptyDisplayText="Untitled dataset"
-                editIconLabel="Edit dataset title"
                 displayTextProps={{
                   fw: "var(--mantine-h2-font-weight)",
                   fz: "var(--mantine-h2-font-size)",
@@ -280,7 +218,6 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                   onChange={setDatasetDescription}
                   isSaving={isUpdatePending}
                   emptyDisplayText="This dataset has no description."
-                  editIconLabel="Edit dataset description"
                   onSave={(newDescription) => {
                     const descriptionToSave =
                       newDescription.trim().length === 0 ?
@@ -299,13 +236,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                   }}
                 />
 
-                <ObjectDescriptionList
-                  data={datasetWithColumnsAndSource}
-                  dateFormat="MMMM D, YYYY"
-                  includeKeys={["updatedAt", "sourceType", "..."]}
-                  excludeKeys={EXCLUDED_DATASET_METADATA_KEYS}
-                  keyRenderOptions={DATASET_METADATA_RENDER_OPTIONS}
-                />
+                <DatasetMetadataList dataset={datasetWithColumnsAndSource} />
                 <Title order={5}>Data preview</Title>
                 {isLoadingPreviewData ?
                   <Loader />

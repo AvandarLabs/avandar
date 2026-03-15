@@ -10,6 +10,7 @@ import type {
   AnyDescribableValueRenderOptions,
   DescribableObject,
   GenericRootData,
+  GetChildObjects,
   ObjectRenderOptions,
   PrimitiveValueRenderOptions,
 } from "./ObjectDescriptionList.types";
@@ -17,6 +18,9 @@ import type {
 type Props<T extends DescribableObject, RootData extends GenericRootData> = {
   data: T;
   rootData: RootData;
+
+  /** Called when a value is edited and the changes are submitted */
+  onSubmitChange?: (newValue: GetChildObjects<RootData>) => void;
 } & ObjectRenderOptions<NonNullable<T>, RootData>;
 
 export type { Props as ObjectDescriptionListBlockProps };
@@ -31,6 +35,7 @@ export function ObjectDescriptionListBlock<
 >({
   data,
   rootData,
+  onSubmitChange,
   excludeKeys,
   includeKeys,
   excludeKeysPattern = "_",
@@ -57,6 +62,7 @@ export function ObjectDescriptionListBlock<
         type="unknown"
         value={objAsSingleValue}
         rootData={rootData}
+        onSubmitChange={onSubmitChange}
         {...(parentPrimitiveValueRenderOptions as PrimitiveValueRenderOptions<
           unknown,
           GenericRootData
@@ -117,6 +123,7 @@ export function ObjectDescriptionListBlock<
                   type="unknown"
                   value={data[key]}
                   rootData={rootData}
+                  onSubmitChange={onSubmitChange}
                   {...childRenderOptions}
                 />
               : customRenderedKeyContent}

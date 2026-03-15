@@ -1,8 +1,8 @@
+import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
 import { propPasses } from "@utils/objects/hofs/propPasses/propPasses";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { useMemo } from "react";
-import { Select } from "@/lib/ui/inputs/Select";
-import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
+import { Select } from "@ui/inputs/Select/Select";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
 

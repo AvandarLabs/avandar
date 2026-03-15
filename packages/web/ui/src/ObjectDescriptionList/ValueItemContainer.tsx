@@ -8,12 +8,13 @@ import {
   isPrimitiveDescribableValue,
 } from "./guards";
 import { ObjectDescriptionListBlock } from "./ObjectDescriptionListBlock";
-import { PrimitiveValueItem } from "./PrimitiveValueItem";
+import { PrimitiveValueItem } from "./PrimitiveValueItem/PrimitiveValueItem";
 import type {
   AnyDescribableValueRenderOptions,
   DescribableObject,
   DescribableValueArrayRenderOptions,
   GenericRootData,
+  GetChildObjects,
   ObjectRenderOptions,
   PrimitiveValue,
   PrimitiveValueRenderOptions,
@@ -26,6 +27,15 @@ type Props<RootData extends GenericRootData> = {
    * `renderObjectKey`, or `renderArray`.
    */
   rootData: RootData;
+
+  /** Whether to render the value in edit mode. */
+  editMode?: boolean;
+
+  /** Called when a value changes. */
+  onChange?: (value: unknown) => void;
+
+  /** Called when a value is edited and the changes are submitted */
+  onSubmitChange?: (newValue: GetChildObjects<RootData>) => void;
 } & (
   | ({
       type: "primitive";
@@ -56,10 +66,11 @@ export function ValueItemContainer<RootData extends GenericRootData>(
   return match(props)
     .with(
       { type: "primitive" },
-      ({ type, value, rootData, ...primitiveValueRenderOptions }) => {
+      ({ type, value, rootData, onChange, ...primitiveValueRenderOptions }) => {
         return (
           <PrimitiveValueItem
             value={value}
+            onChange={onChange}
             rootData={rootData}
             {...primitiveValueRenderOptions}
           />
@@ -68,11 +79,12 @@ export function ValueItemContainer<RootData extends GenericRootData>(
     )
     .with(
       { type: "array" },
-      ({ type, value, rootData, ...arrayRenderOptions }) => {
+      ({ type, value, rootData, onSubmitChange, ...arrayRenderOptions }) => {
         return (
           <DescribableValueArrayBlock
             data={value}
             rootData={rootData}
+            onSubmitChange={onSubmitChange}
             {...arrayRenderOptions}
           />
         );
@@ -80,11 +92,12 @@ export function ValueItemContainer<RootData extends GenericRootData>(
     )
     .with(
       { type: "object" },
-      ({ type, value, rootData, ...objectRenderOptions }) => {
+      ({ type, value, rootData, onSubmitChange, ...objectRenderOptions }) => {
         return (
           <ObjectDescriptionListBlock
             data={value}
             rootData={rootData}
+            onSubmitChange={onSubmitChange}
             {...objectRenderOptions}
           />
         );
@@ -92,13 +105,23 @@ export function ValueItemContainer<RootData extends GenericRootData>(
     )
     .with(
       { type: "unknown" },
-      ({ type, value, rootData, ...renderOptions }) => {
+      ({
+        type,
+        value,
+        rootData,
+        editMode,
+        onChange,
+        onSubmitChange,
+        ...renderOptions
+      }) => {
         // if no explicit type was passed, we rely on narrowing the type from
         // the `value` itself
         if (isPrimitiveDescribableValue(value)) {
           return (
             <PrimitiveValueItem
+              editMode={editMode}
               value={value}
+              onChange={onChange}
               rootData={rootData}
               {...renderOptions}
             />
@@ -110,6 +133,7 @@ export function ValueItemContainer<RootData extends GenericRootData>(
             <DescribableValueArrayBlock
               data={value}
               rootData={rootData}
+              onSubmitChange={onSubmitChange}
               {...renderOptions}
             />
           );
@@ -120,6 +144,7 @@ export function ValueItemContainer<RootData extends GenericRootData>(
             <ObjectDescriptionListBlock
               data={value}
               rootData={rootData}
+              onSubmitChange={onSubmitChange}
               {...renderOptions}
             />
           );

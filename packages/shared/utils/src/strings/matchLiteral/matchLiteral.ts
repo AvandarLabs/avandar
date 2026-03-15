@@ -1,4 +1,4 @@
-import { unknownToString } from "@utils/strings/unknownToString/unknownToString.ts";
+import { unknownToString } from "../unknownToString/unknownToString.ts";
 import type { SetRequired, UnionToIntersection } from "type-fest";
 
 type KeyMatcher<Key> = ((key: Key) => unknown) | string | number | boolean;

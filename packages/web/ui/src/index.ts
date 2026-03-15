@@ -21,3 +21,10 @@ export { notifyDevAlert } from "./notifications/notifyDevAlert";
 
 // text
 export { EditableDisplayText } from "./EditableDisplayText/EditableDisplayText";
+
+// Select
+export { Select } from "./inputs/Select/Select";
+export { makeSelectOptions } from "./inputs/Select/makeSelectOptions";
+export type { SelectOption } from "./inputs/Select/Select";
+export type { SelectOptionGroup } from "./inputs/Select/Select";
+export type { SelectData } from "./inputs/Select/Select";

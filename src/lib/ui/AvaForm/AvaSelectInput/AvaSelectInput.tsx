@@ -1,4 +1,8 @@
-import { Select, SelectOption, SelectProps } from "../../inputs/Select";
+import {
+  Select,
+  type SelectOption,
+  type SelectProps,
+} from "@ui/inputs/Select/Select";
 import type {
   GenericFormSchemaRecord,
   ValuesOfFieldRecord,

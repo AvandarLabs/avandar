@@ -15,6 +15,7 @@ import type {
   DescribableObject,
   DescribableValueArrayRenderOptions,
   GenericRootData,
+  GetChildObjects,
   NestedArrayRenderOptions,
   ObjectArrayRenderOptions,
   PrimitiveValue,
@@ -24,6 +25,9 @@ import type {
 type Props<T, RootData extends GenericRootData> = {
   data: readonly T[];
   rootData: RootData;
+
+  /** Called when a value is edited and the changes are submitted */
+  onSubmitChange?: (newValue: GetChildObjects<RootData>) => void;
 } & DescribableValueArrayRenderOptions<T, RootData>;
 export type { Props as DescribableValueArrayBlockProps };
 
@@ -37,6 +41,7 @@ export function DescribableValueArrayBlock<
 >({
   data,
   rootData,
+  onSubmitChange,
   renderEmptyArray = "There are no values",
   renderArray,
   maxHeight,
@@ -106,6 +111,7 @@ export function DescribableValueArrayBlock<
           values={describableObjects}
           maxItemsCount={maxItemsCount}
           rootData={rootData}
+          onSubmitChange={onSubmitChange}
           // eslint-disable-next-line max-len
           {...(objectArrayOrNestedArrayRenderOptions as unknown as ObjectArrayRenderOptions<
             DescribableObject,
@@ -116,6 +122,7 @@ export function DescribableValueArrayBlock<
           values={describableValueArrays}
           maxItemsCount={maxItemsCount}
           rootData={rootData}
+          onSubmitChange={onSubmitChange}
           // eslint-disable-next-line max-len
           {...(objectArrayOrNestedArrayRenderOptions as unknown as NestedArrayRenderOptions<
             T,

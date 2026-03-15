@@ -1,5 +1,6 @@
 import { registry } from "@utils/objects/registry/registry";
 import { StringKeyOf } from "@utils/types/utilityTypes";
+import type { SelectData } from "@ui/inputs/Select/Select";
 import type { FormattableTimezone } from "@utils/dates/formatDate/formatDate";
 import type { UnknownObject } from "@utils/types/common";
 import type { ReactNode } from "react";
@@ -33,6 +34,19 @@ type DescribableObjectOf<T> = {
 };
 
 /**
+ * Options to render a display value and editable value as a specific type.
+ */
+export type RenderAsTypeOptions =
+  | "date"
+  | "number"
+  | "boolean"
+  | "text"
+  | {
+      type: "text";
+      choices: SelectData<string>;
+    };
+
+/**
  * Render options for primitive values. These can also be passed to any
  * recursive DescribableValues to apply to its children.
  */
@@ -41,10 +55,22 @@ export type PrimitiveValueRenderOptions<
   RootData extends GenericRootData | undefined,
 > = {
   /**
-   * If true, we test strings and numbers to see if they are valid dates,
-   * before we allow them to be returned as-is. Defaults to false.
+   * When rendering we will do our best to infer the type of the value based on
+   * its JavaScript type. However, for better control over how it is rendered,
+   * you can explicitly set an `asType` prop.
+   *
+   * This prop is most useful if the value should be editable, so that the
+   * correct editable component can be used. For example, if the value is `null`
+   * or `undefined` then it is impossible to infer what input component to use
+   * to allow the user to enter a value.
+   *
+   * `renderAsType` controls how the value is rendered in display mode and edit
+   * mode. If either `renderValue` or `renderEditableValue` props are provided,
+   * these will override how the value is rendered in display or edit mode,
+   * respectively.
+   *
    */
-  asDate?: boolean;
+  renderAsType?: RenderAsTypeOptions;
 
   /**
    * A custom render function for the value. If provided, this will take
@@ -54,6 +80,16 @@ export type PrimitiveValueRenderOptions<
    * we will fall back to using the other render options for that value.
    */
   renderValue?: (value: T, rootData: RootData) => ReactNode;
+
+  /**
+   * A custom render function for the value in edit mode. If provided, this will
+   * take precedence over the `renderAsType` prop.
+   *
+   * If `undefined` is returned, this will be interpreted as a no-op, and
+   * we will fall back to using `renderAsType` to render the editable value in
+   * edit mode.
+   */
+  renderEditableValue?: (value: T, rootData: RootData) => ReactNode;
 
   /** The string to display for empty strings */
   renderEmptyString?: NonNullable<ReactNode>;
@@ -84,8 +120,9 @@ export type PrimitiveValueRenderOptions<
 export const PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS = registry<
   keyof PrimitiveValueRenderOptions<unknown, GenericRootData>
 >().keys(
-  "asDate",
+  "renderAsType",
   "renderValue",
+  "renderEditableValue",
   "renderEmptyString",
   "renderNullString",
   "renderUndefinedString",
@@ -272,6 +309,15 @@ type BaseObjectArrayRenderOptions<
 };
 
 /**
+ * The render options for an object row. This is used when objects in an
+ * array are being rendered as table rows.
+ */
+export type ObjectRowRenderOptions<
+  T extends NonNullable<DescribableObject>,
+  RootData extends GenericRootData,
+> = Omit<ObjectRenderOptions<T, RootData>, "renderObjectKeyLabel">;
+
+/**
  * Extended options for arrays of objects.
  */
 export type ObjectArrayRenderOptions<
@@ -416,3 +462,39 @@ export type AnyDescribableValueRenderOptions =
   | PrimitiveValueRenderOptions<unknown, GenericRootData>
   | ObjectRenderOptions<DescribableObject, GenericRootData>
   | DescribableValueArrayRenderOptions<unknown, GenericRootData>;
+
+export type _GetChildObjectsHelper<T extends GenericRootData> =
+  T extends DescribableObject ?
+    | T
+    | {
+        [K in keyof T]: T[K] extends infer V ?
+          V extends DescribableObject ? V | _GetChildObjectsHelper<V>
+          : V extends ReadonlyArray<infer U extends GenericRootData> ?
+            _GetChildObjectsHelper<U>
+          : V extends Array<infer U extends GenericRootData> ?
+            _GetChildObjectsHelper<U>
+          : never
+        : never;
+      }[keyof T]
+  : T extends ReadonlyArray<infer U extends GenericRootData> ?
+    _GetChildObjectsHelper<U>
+  : T extends Array<infer U extends GenericRootData> ? _GetChildObjectsHelper<U>
+  : never;
+
+/**
+ * Utility function to get all the child objects of a given type. These are all
+ * the types that could potentially be used in an `onSubmitChange` callback.
+ */
+export type GetChildObjects<T extends GenericRootData> =
+  T extends DescribableObject ?
+    {
+      [K in keyof T]: T[K] extends infer V ?
+        V extends GenericRootData ?
+          _GetChildObjectsHelper<V>
+        : never
+      : never;
+    }[keyof T]
+  : T extends ReadonlyArray<infer U extends GenericRootData> ?
+    _GetChildObjectsHelper<U>
+  : T extends Array<infer U extends GenericRootData> ? _GetChildObjectsHelper<U>
+  : never;

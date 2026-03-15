@@ -11,6 +11,7 @@ type DescribableObjectProps<
   T extends DescribableObject,
   RootData extends GenericRootData,
 > = Omit<ObjectDescriptionListBlockProps<T, RootData>, "rootData">;
+
 type DescribableValueArrayProps<T, RootData extends GenericRootData> = Omit<
   DescribableValueArrayBlockProps<T, RootData>,
   "rootData"
@@ -32,6 +33,7 @@ type Props<T extends GenericRootData> =
  */
 export function ObjectDescriptionList<T extends GenericRootData>({
   data,
+  onSubmitChange,
   ...renderOptions
 }: Props<T>): JSX.Element {
   // pass the data to `UnknownValueItem` to decide how to render things
@@ -40,6 +42,7 @@ export function ObjectDescriptionList<T extends GenericRootData>({
       type="unknown"
       value={data}
       rootData={data}
+      onSubmitChange={onSubmitChange}
       {...(renderOptions as Omit<AnyDescribableValueRenderOptions, "rootData">)}
     />
   );

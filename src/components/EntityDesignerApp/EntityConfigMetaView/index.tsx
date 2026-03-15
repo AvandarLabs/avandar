@@ -3,16 +3,16 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
 import { notifySuccess } from "@ui/notifications/notify";
+import { ObjectDescriptionList } from "@ui/ObjectDescriptionList/ObjectDescriptionList";
 import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
 import { useState } from "react";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { ObjectDescriptionList } from "@ui/ObjectDescriptionList";
 import { Paper } from "@/lib/ui/Paper/Paper";
 import { generateEntities } from "./generateEntities";
 import { useHydratedEntityConfig } from "./useHydratedEntityConfig";
-import type { ObjectKeyRenderOptionsMap } from "@ui/ObjectDescriptionList";
+import type { ObjectKeyRenderOptionsMap } from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig.types";
 
 type Props = {

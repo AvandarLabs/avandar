@@ -7,6 +7,13 @@ type Props = {
   children: ReactNode;
 };
 
+/**
+ * A two-column list of items to render metadata. This component is
+ * useful to render key-value pairs.
+ *
+ * First column is the label, second column is the rendered value.
+ * Rendered as a description list using HTML `<dt>` and `<dd>` elements.
+ */
 export function DescriptionListItem({ label, children }: Props): JSX.Element {
   return (
     <Grid className={css.root} px="xs" py="sm">

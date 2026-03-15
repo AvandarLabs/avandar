@@ -1,9 +1,9 @@
 import { Fieldset, Stack, Text } from "@mantine/core";
 import { Model } from "@models/Model/Model";
+import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
-import { Select, SelectData } from "@/lib/ui/inputs/Select";
-import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
+import { Select, type SelectData } from "@ui/inputs/Select/Select";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { AggregationSelect } from "../AggregationSelect";
 import { QueryColumnMultiSelect } from "../QueryColumnMultiSelect";

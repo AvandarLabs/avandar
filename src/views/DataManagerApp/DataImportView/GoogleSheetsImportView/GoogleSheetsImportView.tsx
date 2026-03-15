@@ -28,7 +28,7 @@ import { GPickerDocumentObject } from "@/lib/types/google-picker";
 import { Tooltip } from "@ui/Tooltip/Tooltip";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
-import { formatNumber } from "@/lib/utils/formatters/formatNumber/formatNumber";
+import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
 import { unparseDataset } from "@/models/LocalDataset/LocalDatasetUtils";
 import { APIReturnType } from "@/types/http-api.types";
 import { Logger } from "@/utils/Logger";

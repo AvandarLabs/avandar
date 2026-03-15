@@ -1,6 +1,5 @@
-import { beforeAll, describe, expect, it, vi } from "vitest";
-
-let formatNumber: typeof import("./formatNumber").formatNumber;
+import { describe, expect, it, vi } from "vitest";
+import { formatNumber } from "./formatNumber.ts";
 
 describe("formatNumber caching", () => {
   it("reuses Intl.NumberFormat instances for identical option sets", async () => {
@@ -18,11 +17,9 @@ describe("formatNumber caching", () => {
       });
 
     try {
-      const { formatNumber: freshFormatNumber } =
-        await import("./formatNumber");
-      const first = freshFormatNumber(100, { locale: "en-US" });
-      const second = freshFormatNumber(200, { locale: "en-US" });
-      const third = freshFormatNumber(300, {
+      const first = formatNumber(100, { locale: "en-US" });
+      const second = formatNumber(200, { locale: "en-US" });
+      const third = formatNumber(300, {
         locale: "en-US",
         style: "currency",
         currency: "USD",
@@ -43,10 +40,6 @@ describe("formatNumber caching", () => {
 });
 
 describe("formatNumber", () => {
-  beforeAll(async () => {
-    ({ formatNumber } = await import("./formatNumber"));
-  });
-
   it("returns an empty string for NaN or infinite values", () => {
     expect(formatNumber(Number.NaN)).toBe("");
     expect(formatNumber(Number.POSITIVE_INFINITY)).toBe("");

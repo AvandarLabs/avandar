@@ -9,6 +9,13 @@ export { assertIsSingletonArray } from "./asserts/assertIsSingletonArray/assertI
 export { formatDate } from "./dates/formatDate/formatDate.ts";
 export type { FormattableTimezone } from "./dates/formatDate/formatDate.ts";
 
+// numbers
+export { formatNumber } from "./numbers/formatNumber/formatNumber.ts";
+export type {
+  FormatNumberOptions,
+  SignDisplay,
+} from "./numbers/formatNumber/formatNumber.ts";
+
 // filters
 export { applyFiltersToRows } from "./filters/applyFiltersToRows/applyFiltersToRows.ts";
 export { bucketFiltersByColumn } from "./filters/bucketFiltersByColumn/bucketFiltersByColumn.ts";

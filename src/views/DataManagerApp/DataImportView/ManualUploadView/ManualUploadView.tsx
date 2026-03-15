@@ -22,7 +22,7 @@ import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { FileUploadForm } from "@/lib/ui/singleton-forms/FileUploadForm";
-import { formatNumber } from "@/lib/utils/formatters/formatNumber/formatNumber";
+import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
 import {
   DatasetImportForm,
   DatasetImportFormValues,

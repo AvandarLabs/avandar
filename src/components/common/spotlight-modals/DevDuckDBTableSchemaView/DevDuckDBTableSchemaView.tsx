@@ -1,12 +1,12 @@
 import { useQuery } from "@hooks/useQuery/useQuery";
 import { Loader, Stack, Text } from "@mantine/core";
+import { ObjectDescriptionList } from "@ui/ObjectDescriptionList/ObjectDescriptionList";
 import { where } from "@utils/filters/where/where";
 import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { ObjectDescriptionList } from "@ui/ObjectDescriptionList";
 import { promiseMap } from "@/lib/utils/promises";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";

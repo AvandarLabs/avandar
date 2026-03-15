@@ -4,6 +4,7 @@ import { ValueItemContainer } from "../ValueItemContainer";
 import type {
   DescribableValueArrayRenderOptions,
   GenericRootData,
+  GetChildObjects,
   NestedArrayRenderOptions,
 } from "../ObjectDescriptionList.types";
 
@@ -12,11 +13,15 @@ type Props<T, RootData extends GenericRootData> = {
   values: ReadonlyArray<readonly T[]>;
   maxItemsCount?: number;
   rootData: RootData;
+
+  /** Called when a value is edited and the changes are submitted */
+  onSubmitChange?: (newValue: GetChildObjects<RootData>) => void;
 } & NestedArrayRenderOptions<T, RootData>;
 
 export function NestedArraysBlock<T, RootData extends GenericRootData>({
   values,
   rootData,
+  onSubmitChange,
   maxItemsCount,
   itemRenderOptions,
   ...primitiveRenderValueOptions
@@ -51,6 +56,7 @@ export function NestedArraysBlock<T, RootData extends GenericRootData>({
               type="array"
               value={valueArray}
               rootData={rootData}
+              onSubmitChange={onSubmitChange}
               {...(arrayItemRenderOptions as DescribableValueArrayRenderOptions<
                 unknown,
                 RootData
