@@ -76,6 +76,10 @@ export { camelCaseKeysShallow } from "./objects/camelCaseKeysShallow/camelCaseKe
 export { coerceDatesIn } from "./objects/coerceDatesIn/coerceDatesIn.ts";
 export { convertDatesToISOIn } from "./objects/convertDatesToISOIn/convertDatesToISOIn.ts";
 export { getValue } from "./objects/getValue/getValue.ts";
+export { makeBucketRecord } from "./objects/makeBucketRecord/makeBucketRecord.ts";
+export { makeIdLookupRecord } from "./objects/makeIdLookupRecord/makeIdLookupRecord.ts";
+export { makeObject } from "./objects/makeObject/makeObject.ts";
+export { makeObjectFromEntries } from "./objects/makeObjectFromEntries/makeObjectFromEntries.ts";
 export { setValue } from "./objects/setValue/setValue.ts";
 export { excludeDeep } from "./objects/excludeDeep/excludeDeep.ts";
 export { excludeNullsDeep } from "./objects/excludeNullsDeep/excludeNullsDeep.ts";

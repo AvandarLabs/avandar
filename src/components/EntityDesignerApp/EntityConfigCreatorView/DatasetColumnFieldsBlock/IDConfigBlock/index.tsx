@@ -3,7 +3,7 @@ import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
 import { where } from "@utils/filters/where/where";
 import { isDefined } from "@utils/guards/isDefined/isDefined";
 import { prop } from "@utils/objects/hofs/prop/prop";
-import { makeObject } from "$/lib/objects/builders";
+import { makeObject } from "@utils/objects/makeObject/makeObject";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { Select } from "@ui/inputs/Select/Select";

@@ -1,5 +1,6 @@
+import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
+import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord";
 import { objectKeys } from "@utils/objects/objectKeys";
-import { makeBucketRecord, makeIdLookupRecord } from "$/lib/objects/builders";
 import { match } from "ts-pattern";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { promiseFlatMap } from "@/lib/utils/promises";

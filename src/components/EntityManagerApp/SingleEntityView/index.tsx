@@ -4,9 +4,9 @@ import { where } from "@utils/filters/where/where";
 import { isNonNullish } from "@utils/guards/isNonNullish/isNonNullish";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { propEq } from "@utils/objects/hofs/propEq/propEq";
+import { makeObject } from "@utils/objects/makeObject/makeObject";
 import { omit } from "@utils/objects/omit/omit";
 import { unknownToString } from "@utils/strings/unknownToString/unknownToString";
-import { makeObject } from "$/lib/objects/builders";
 import {
   EntityFieldConfig,
   EntityFieldConfigId,

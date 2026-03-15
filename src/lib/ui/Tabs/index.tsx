@@ -5,7 +5,7 @@ import {
   MantineTheme,
   Text,
 } from "@mantine/core";
-import { makeObject } from "$/lib/objects/builders";
+import { makeObject } from "@utils/objects/makeObject/makeObject";
 import { ReactNode, useState } from "react";
 
 type Props<TabId extends string> = {

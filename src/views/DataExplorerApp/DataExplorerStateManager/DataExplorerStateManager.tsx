@@ -1,6 +1,6 @@
 import { prop } from "@utils/objects/hofs/prop/prop";
+import { makeObject } from "@utils/objects/makeObject/makeObject";
 import { setValue } from "@utils/objects/setValue/setValue";
-import { makeObject } from "$/lib/objects/builders";
 import { StructuredQueries } from "$/models/queries/StructuredQuery/StructuredQueries";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager";
