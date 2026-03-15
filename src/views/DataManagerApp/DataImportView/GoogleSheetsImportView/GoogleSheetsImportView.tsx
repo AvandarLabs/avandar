@@ -6,7 +6,9 @@ import {
   notifySuccess,
   notifyWarning,
 } from "@ui/notifications/notify";
+import { Tooltip } from "@ui/Tooltip/Tooltip";
 import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
+import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
 import { snakeCaseKeysShallow } from "@utils/objects/snakeCaseKeysShallow/snakeCaseKeysShallow";
 import { MIMEType } from "@utils/types/common";
 import { uuid } from "$/lib/uuid";
@@ -25,10 +27,8 @@ import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import { GPickerDocumentObject } from "@/lib/types/google-picker";
-import { Tooltip } from "@ui/Tooltip/Tooltip";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
-import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
 import { unparseDataset } from "@/models/LocalDataset/LocalDatasetUtils";
 import { APIReturnType } from "@/types/http-api.types";
 import { Logger } from "@/utils/Logger";
@@ -220,6 +220,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
     return loadResults?.metadata?.columns.map((duckColumn, idx) => {
       return {
         name: duckColumn.column_name,
+        originalName: duckColumn.column_name,
         originalDataType: duckColumn.column_type,
         detectedDataType: duckColumn.column_type,
         dataType: DuckDBDataTypeUtils.toAvaDataType(duckColumn.column_type),

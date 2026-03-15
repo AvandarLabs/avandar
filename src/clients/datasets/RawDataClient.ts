@@ -3,9 +3,13 @@ import { withQueryHooks } from "@hooks/withQueryHooks/withQueryHooks";
 import { withLogger } from "@logger/module-augmenters/withLogger";
 import { notifyDevAlert } from "@ui/notifications/notifyDevAlert";
 import { where } from "@utils/filters/where/where";
+import { isDefined } from "@utils/guards/isDefined/isDefined";
+import { assertIsDefined } from "@utils/index";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { objectKeys } from "@utils/objects/objectKeys";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.types";
+import { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { match } from "ts-pattern";
 import { AuthClient } from "@/clients/AuthClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
@@ -16,6 +20,9 @@ import { Logger } from "@/utils/Logger";
 import { DuckDBClient } from "../DuckDBClient";
 import { DuckDBDataTypeUtils } from "../DuckDBClient/DuckDBDataType";
 import { scalar, singleton } from "../DuckDBClient/queryResultHelpers";
+import { DatasetParquetStorageClient } from "../storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
+import { CSVFileDatasetClient } from "./CSVFileDatasetClient";
+import { DatasetColumnClient } from "./DatasetColumnClient";
 import { LocalDatasetClient } from "./LocalDatasetClient";
 import type { UnknownRow } from "../DuckDBClient";
 import type { DuckDBStructuredQuery } from "../DuckDBClient/DuckDBClient.types";
@@ -23,7 +30,10 @@ import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
 import type { WithQueryHooks } from "@hooks/withQueryHooks/withQueryHooks.types";
 import type { ILogger, WithLogger } from "@logger/Logger.types";
 import type { UnknownDataFrame } from "@utils/types/common";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type {
+  DatasetId,
+  DatasetSourceType,
+} from "$/models/datasets/Dataset/Dataset.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 import type { UserId } from "$/models/User/User.types";
 
@@ -71,7 +81,7 @@ type DatasetLocalRawQueryOptions = {
   query: string;
 
   /** Parameters to pass into the query */
-  queryArgs?: Record<string, string | number | bigint>;
+  queryArgs?: Record<string, string | number | bigint | undefined>;
 
   /**
    * A list of datasets that this query depends on.
@@ -90,13 +100,15 @@ type DatasetLocalStructuredQueryOptions = {
   };
 };
 
-type DatasetRawDataClientQueries = {
+type RawDataClientQueries = {
   /**
    * Checks if a dataset is available locally. A dataset being "available"
-   * locally means that we have its raw data persisted in IndexedDB (accessible
-   * through the LocalDatasetClient). It may not necessarily be in DuckDB (which
-   * is in-memory), but if it is in local disk (IndexedDB) then it can be loaded
-   * into memory when needed.
+   * locally means that its raw data is persisted on disk (in IndexedDB,
+   * accessible with the LocalDatasetClient).
+   *
+   * This function does not tell us if the data is in-memory, in DuckDB. But
+   * if it is in local disk then we know it can be loaded into memory when
+   * needed.
    *
    * @param params The {@link DatasetId} to check.
    * @returns `true` if the dataset is loaded locally, `false` otherwise.
@@ -106,8 +118,12 @@ type DatasetRawDataClientQueries = {
   }) => Promise<boolean>;
 
   /**
-   * Loads a dataset into memory (DuckDB). If the dataset is already in memory,
+   * Loads a dataset into memory (DuckDB). This will fetch the dataset from
+   * cloud storage if necessary. If the dataset is already in memory,
    * this is a no-op.
+   *
+   * This is our go-to function to make sure a dataset is available in-memory
+   * in DuckDB.
    *
    * @param params The {@link DatasetId} to load.
    */
@@ -124,7 +140,8 @@ type DatasetRawDataClientQueries = {
    * @param params The {@link DatasetLocalRawQueryOptions} object.
    * @param params.query The SQL query to run. Any parameter tokens inside the
    * query can be specified using `$paramName$` syntax in the string.
-   * @param params.params Parameters to pass into the query
+   * @param params.queryArgs Parameters to pass into the query. Undefined values
+   * will be ignored.
    * @param params.dependencies Optional list of dataset IDs that this query
    * depends on. These datasets will be loaded locally before the query is
    * executed.
@@ -170,24 +187,60 @@ type DatasetRawDataClientQueries = {
   }) => Promise<UnknownDataFrame>;
 };
 
-export type IDatasetRawDataClient = ServiceClient & DatasetRawDataClientQueries;
+type RawDataClientMutations = {
+  /**
+   * Updates the raw column's metadata. The only supported changes are renaming
+   * a column or casting its data type.
+   *
+   * 1. Fetch and load the data into memory if necessary.
+   * 2. Apply the transformations to the data in memory using DuckDB.
+   * 3. Store the updated raw data back to local storage as a Parquet blob.
+   * 4. Sync the data back to cloud storage (if necessary and allowed, only
+   *    for manually-uploaded datasets where we manage the actual source file).
+   * 5. If everything succeeds, we write the updated column metadata to the
+   *    database.
+   *
+   * @param params.columnId The {@link DatasetColumnId} of the column to
+   * update.
+   * @param params.datasetId The {@link DatasetId} of the dataset the column
+   * belongs to.
+   * @param params.sourceType The {@link DatasetSourceType} of the dataset.
+   * @param params.prevColumnName The previous name of the column.
+   * @param params.newColumnName The new name of the column.
+   * @param params.newDataType The new data type of the column.
+   */
+  updateRawColumnMetadata: (params: {
+    columnId: DatasetColumnId;
+    datasetId: DatasetId;
+    sourceType: DatasetSourceType;
+    prevColumnName: string;
+    newColumnName?: string;
+    newDataType?: AvaDataType;
+  }) => Promise<void>;
+};
+
+export type IDatasetRawDataClient = ServiceClient &
+  RawDataClientQueries &
+  RawDataClientMutations;
 
 /**
  * Creates a client to query a dataset's raw data.
  *
  * This client is not a CRUD client, so it does not support CRUD functions.
  */
-function createDatasetRawDataClient(): WithLogger<
+function createRawDataClient(): WithLogger<
   WithQueryHooks<
     IDatasetRawDataClient,
-    keyof DatasetRawDataClientQueries,
-    never
+    keyof RawDataClientQueries,
+    keyof RawDataClientMutations
   >
 > {
-  const baseClient = createServiceClient("DatasetRawDataClient");
+  const baseClient = createServiceClient("RawDataClient");
 
   /**
    * Loads the given datasets to an in-memory DuckDB instance.
+   * This will fetch datasets from cloud storage if they are not in local
+   * storage.
    * TODO(jpsyx): this should be a function in LocalDatasetClient.
    * @param datasetIds The IDs of the datasets to load into memory.
    */
@@ -279,7 +332,143 @@ function createDatasetRawDataClient(): WithLogger<
   };
 
   return withLogger(baseClient, (baseLogger: ILogger) => {
-    const queries: DatasetRawDataClientQueries = {
+    const mutations: RawDataClientMutations = {
+      updateRawColumnMetadata: async ({
+        columnId,
+        datasetId,
+        sourceType,
+        prevColumnName,
+        newColumnName,
+        newDataType,
+      }: {
+        columnId: DatasetColumnId;
+        datasetId: DatasetId;
+        sourceType: DatasetSourceType;
+        prevColumnName: string;
+        newColumnName?: string;
+        newDataType?: AvaDataType;
+      }) => {
+        if (newColumnName === undefined && newDataType === undefined) {
+          // no changes to make
+          return;
+        }
+
+        // Ensure dataset is loaded (creates view over parquet)
+        await RawDataClient.loadLocalDataset({
+          datasetId,
+        });
+
+        const tempTableName = `${datasetId}_temp`;
+
+        try {
+          // 1. Materialize view to table (views are read-only; need table to
+          // alter)
+          await RawDataClient.runLocalRawQuery({
+            query: `CREATE TABLE "$tempTableName$" AS SELECT * FROM "$datasetId$"`,
+            dependencies: [datasetId],
+            queryArgs: { tempTableName, datasetId },
+          });
+
+          // 2. Drop the view and parquet file from DuckDB's buffer
+          await DuckDBClient.dropTableViewAndFile(datasetId);
+
+          // 3. Alter the materialized table (type cast and/or rename) in a
+          // single transaction
+          const alterStatements: string[] = [
+            newDataType !== undefined ?
+              'ALTER TABLE "$tempTableName$" ALTER COLUMN "$columnName$" ' +
+              'TYPE $newDataType$ USING cast("$columnName$" AS $newDataType$)'
+            : undefined,
+            newColumnName !== undefined ?
+              'ALTER TABLE "$tempTableName$" RENAME COLUMN "$columnName$" ' +
+              'TO "$newColumnName$"'
+            : undefined,
+          ].filter(isDefined);
+          const alterTransaction =
+            alterStatements.length > 0 ?
+              `BEGIN; ${alterStatements.join("; ")}; COMMIT;`
+            : undefined;
+          if (alterTransaction) {
+            await RawDataClient.runLocalRawQuery({
+              query: alterTransaction,
+              dependencies: [datasetId],
+              queryArgs: {
+                tempTableName,
+                columnName: prevColumnName,
+                newColumnName: newColumnName,
+                newDataType:
+                  newDataType ?
+                    DuckDBDataTypeUtils.fromDatasetColumnType(newDataType)
+                  : undefined,
+              },
+            });
+          }
+
+          // 4. Export the altered table to a parquet blob
+          const newParquetBlob =
+            await DuckDBClient.exportTableAsParquet(tempTableName);
+
+          // 5. Drop the temp materialized table
+          await DuckDBClient.runRawQuery(
+            `DROP TABLE IF EXISTS "$tempTableName$"`,
+            { params: { tempTableName } },
+          );
+
+          // 6. Re-register the parquet and recreate the view
+          await DuckDBClient.loadParquet({
+            tableName: datasetId,
+            blob: newParquetBlob,
+          });
+
+          // 7. Persist the updated parquet to local storage (IndexedDB)
+          const localDataset = await LocalDatasetClient.getById({
+            id: datasetId,
+          });
+          assertIsDefined(localDataset, { name: "local dataset" });
+          await LocalDatasetClient.update({
+            id: datasetId,
+            data: { parquetData: newParquetBlob },
+          });
+
+          // 8. determine if we need to sync to cloud storage. If yes, sync it.
+          if (sourceType === "csv_file") {
+            const csvFileDataset = await CSVFileDatasetClient.getOne(
+              where("dataset_id", "eq", datasetId),
+            );
+            if (csvFileDataset?.isInCloudStorage) {
+              // sync it!
+              await DatasetParquetStorageClient.startDatasetUpload({
+                workspaceId: csvFileDataset.workspaceId,
+                datasetId,
+              });
+            }
+          }
+
+          // 9. Now update the column metadata in the database
+          await DatasetColumnClient.update({
+            id: columnId,
+            data: {
+              dataType: newDataType,
+              name: newColumnName,
+            },
+          });
+        } catch (error) {
+          if (error instanceof Error) {
+            if (error.message.includes("Conversion Error")) {
+              const errMatch = error.message.match(/.*: (.+?)\s+LINE/);
+              const shortMsg = errMatch?.[1]?.trim() ?? "Unknown error";
+              throw new Error(
+                `Failed to change the column data type. ${shortMsg}`,
+                { cause: error },
+              );
+            }
+          }
+          throw error;
+        }
+      },
+    };
+
+    const queries: RawDataClientQueries = {
       isLocalDatasetAvailable: async (params: { datasetId: DatasetId }) => {
         const { datasetId } = params;
         const localDataset = await LocalDatasetClient.getById({
@@ -567,27 +756,34 @@ function createDatasetRawDataClient(): WithLogger<
     };
 
     return withQueryHooks(
-      { ...baseClient, ...queries },
+      { ...baseClient, ...queries, ...mutations },
       {
         queryFns: objectKeys(queries),
-        mutationFns: [],
+        mutationFns: objectKeys(mutations),
       },
     );
   });
 }
 
 /**
- * A client to query a dataset's raw data.
+ * A client to manage the raw data of datasets.
  *
  * This client should be the only way we ever query a dataset's contents.
  * DuckDB and any external APIs should never be used directly by any components.
- * All dataset data should be queried through this client, which will handle
- * loading any necessary data locally, running external queries (and making sure
- * we query only exactly what is needed), caching results, etc.
+ * All dataset data should be queried through this client.
+ *
+ * This client handles running external queries, caching results, and loading
+ * all necessary data locally. Queries are finally run against local data in
+ * DuckDB.
+ *
+ * For now, since we do not support any external data sources, this client is
+ * only interacting with local data, fetching data from our Supabase buckets,
+ * and querying with DuckDB. We also do not handle any caching or any other
+ * performance optimizations yet.
  *
  * This client uses the Facade software pattern. It provides a single interface
  * that our components can use to query for dataset data. Internally, this
  * client will then query the necessary sub-systems (e.g. DuckDB, external APIs)
  * to extract and transform the required data.
  */
-export const DatasetRawDataClient = createDatasetRawDataClient();
+export const RawDataClient = createRawDataClient();

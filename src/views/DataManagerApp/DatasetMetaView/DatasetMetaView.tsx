@@ -20,7 +20,7 @@ import { prop } from "@utils/objects/hofs/prop/prop";
 import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
+import { RawDataClient } from "@/clients/datasets/RawDataClient";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -51,11 +51,10 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
       datasetId: dataset.id,
       sourceType: dataset.sourceType,
     });
-  const [previewData, isLoadingPreviewData] =
-    DatasetRawDataClient.useGetPreviewData({
-      datasetId: dataset.id,
-      numRows: AppConfig.dataManagerApp.maxPreviewRows,
-    });
+  const [previewData, isLoadingPreviewData] = RawDataClient.useGetPreviewData({
+    datasetId: dataset.id,
+    numRows: AppConfig.dataManagerApp.maxPreviewRows,
+  });
   const [datasetColumns, isLoadingDatasetColumns] =
     DatasetColumnClient.useGetAll(where("dataset_id", "eq", dataset.id));
   const [updateDataset, isUpdatePending] = DatasetClient.useUpdate({

@@ -1,9 +1,12 @@
 import { Model } from "@models/index";
 import { notifyError, notifySuccess } from "@ui/index";
 import { ObjectDescriptionList } from "@ui/ObjectDescriptionList/ObjectDescriptionList";
+import { where } from "@utils/filters/where/where";
+import { assertIsDefined } from "@utils/index";
 import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { RawDataClient } from "@/clients/datasets/RawDataClient";
 import type { ObjectKeyRenderOptionsMap } from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
 import type { CSVFileDataset } from "$/models/datasets/CSVFileDataset";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
@@ -81,6 +84,20 @@ const DATASET_METADATA_RENDER_OPTIONS = {
 } satisfies ObjectKeyRenderOptionsMap<DatasetWithColumnsAndSource>;
 
 export function DatasetMetadataList({ dataset }: Props): JSX.Element {
+  const [updateRawColumnMetadata] = RawDataClient.useUpdateRawColumnMetadata({
+    queriesToInvalidate: [
+      RawDataClient.QueryKeys.getSummary({
+        datasetId: dataset.id,
+      }),
+      DatasetColumnClient.QueryKeys.getAll(
+        where("dataset_id", "eq", dataset.id),
+      ),
+    ],
+    onSuccess: () => {
+      notifySuccess("Dataset column updated successfully!");
+    },
+  });
+
   const [updateDatasetColumn] = DatasetColumnClient.useUpdate({
     queryToInvalidate: DatasetColumnClient.QueryKeys.getAll(),
     onSuccess: () => {
@@ -99,13 +116,30 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
       excludeKeys={EXCLUDED_DATASET_METADATA_KEYS}
       keyRenderOptions={DATASET_METADATA_RENDER_OPTIONS}
       onSubmitChange={(value) => {
-        if (Model.isModel(value, "DatasetColumn")) {
+        if (Model.isModelOfType(value, "DatasetColumn")) {
           const datasetColumn = value;
-          // try and cast the dataset column to the correct type here
+          const prevDatasetColumn = dataset.columns?.find((column) => {
+            return column.id === value.id;
+          });
 
-          updateDatasetColumn({
-            id: datasetColumn.id,
-            data: datasetColumn,
+          assertIsDefined(prevDatasetColumn);
+
+          updateRawColumnMetadata({
+            columnId: datasetColumn.id,
+            datasetId: datasetColumn.datasetId,
+            prevColumnName: prevDatasetColumn.name,
+            sourceType: dataset.sourceType,
+            newColumnName:
+              datasetColumn.name !== prevDatasetColumn.name ?
+                datasetColumn.name
+              : undefined,
+            newDataType:
+              (
+                (datasetColumn.dataType as string) !==
+                datasetColumn.detectedDataType
+              ) ?
+                datasetColumn.dataType
+              : undefined,
           });
         }
       }}

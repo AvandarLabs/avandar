@@ -734,17 +734,20 @@ class DuckDBClientImpl {
   }
 
   /**
-   * Exports a table as a Parquet file using ZSTD compression (default).
+   * Exports a table or view as a Parquet file using ZSTD compression (default).
    *
-   * @param tableName The name of the table to export as a Parquet file.
+   * "Exporting" means that we turn it into a blob (a binary object).
+   *
+   * @param tableOrViewName The name of the table or view to export as a Parquet
+   * blob.
    */
-  async exportTableAsParquet(tableName: string): Promise<Blob> {
+  async exportTableAsParquet(tableOrViewName: string): Promise<Blob> {
     try {
       const db = await this.#getDB();
-      const tempParquetFileName = `${tableName}.temp`;
+      const tempParquetFileName = `${tableOrViewName}.temp`;
 
       await this.#copyTableToParquetWithZSTD({
-        tableName,
+        tableName: tableOrViewName,
         parquetFileName: tempParquetFileName,
       });
 
@@ -770,7 +773,7 @@ class DuckDBClientImpl {
   }
 
   async #copyTableToParquetWithZSTD(options: {
-    tableName: string;
+    tableName: string; // can be a view name too
     parquetFileName: string;
   }): Promise<void> {
     const { tableName, parquetFileName } = options;
@@ -818,6 +821,7 @@ class DuckDBClientImpl {
    * @param queryString The query to run.
    * @param options Additional options for the query
    * @param options.params The parameters to replace in the query string.
+   * Undefined values will be ignored.
    * @param options.conn The connection to use for the query. If not
    * provided, a new connection will be created. This is useful when previous
    * operations have created temporary data (e.g. transient tables) that will
@@ -828,7 +832,7 @@ class DuckDBClientImpl {
   async runRawQuery<RowObject extends UnknownRow = UnknownRow>(
     queryString: string,
     options: {
-      params?: Record<string, string | number | bigint>;
+      params?: Record<string, string | number | bigint | undefined>;
       conn?: duckdb.AsyncDuckDBConnection;
     } = {},
   ): Promise<QueryResult<RowObject>> {
@@ -837,9 +841,13 @@ class DuckDBClientImpl {
     let queryResults: QueryResult<RowObject>;
     const paramNames = objectKeys(params);
     const queryStringToUse = paramNames.reduce((currQueryStr, paramName) => {
+      const argValue = params[paramName];
+      if (argValue === undefined) {
+        return currQueryStr;
+      }
       return currQueryStr.replace(
         new RegExp(`\\$${paramName}\\$`, "g"),
-        params[paramName] ? String(params[paramName]) : "",
+        String(argValue),
       );
     }, queryString);
 

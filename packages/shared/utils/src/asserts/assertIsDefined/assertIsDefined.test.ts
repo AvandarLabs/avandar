@@ -51,6 +51,12 @@ describe("assertIsDefined", () => {
     }).toThrow(Error);
   });
 
+  it("throws with custom name", () => {
+    expect(() => {
+      return assertIsDefined(undefined, { name: "id" });
+    }).toThrow("Expected id to be defined. Received undefined.");
+  });
+
   describe("type narrowing", () => {
     it("narrows string | undefined to string", () => {
       const value: string | undefined = "hello";

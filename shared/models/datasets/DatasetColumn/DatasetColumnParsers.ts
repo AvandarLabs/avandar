@@ -29,6 +29,7 @@ const DBReadSchema = z.object({
   dataset_id: z.uuid(),
   description: z.string().nullable(),
   id: z.uuid(),
+  original_name: z.string(),
   name: z.string(),
   updated_at: z.iso.datetime({ offset: true }),
   workspace_id: z.uuid(),

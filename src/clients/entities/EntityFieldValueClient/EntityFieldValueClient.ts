@@ -16,7 +16,7 @@ import { promiseFlatMap, promiseMap } from "@/lib/utils/promises";
 import { makeSet } from "@/lib/utils/sets/builders";
 import { isInSet } from "@/lib/utils/sets/higherOrderFuncs";
 import { DatasetColumnClient } from "../../datasets/DatasetColumnClient";
-import { DatasetRawDataClient } from "../../datasets/DatasetRawDataClient";
+import { RawDataClient } from "../../datasets/RawDataClient";
 import { singleton } from "../../DuckDBClient/queryResultHelpers";
 import { EntityClient } from "../EntityClient";
 import { getEntityFieldValues } from "./getEntityFieldValues/getEntityFieldValues";
@@ -181,7 +181,7 @@ function createEntityFieldValueClient(): WithLogger<
                     );
 
                     const extractedValues = singleton(
-                      await DatasetRawDataClient.runLocalRawQuery<
+                      await RawDataClient.runLocalRawQuery<
                         Record<EntityFieldConfigId, unknown>
                       >({
                         dependencies: [datasetId],
