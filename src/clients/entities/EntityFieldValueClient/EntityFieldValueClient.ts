@@ -5,9 +5,10 @@ import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined"
 import { where } from "@utils/filters/where/where";
 import { isDefined } from "@utils/guards/isDefined/isDefined";
 import { prop } from "@utils/objects/hofs/prop/prop";
+import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
+import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord";
 import { objectEntries } from "@utils/objects/objectEntries";
 import { objectKeys } from "@utils/objects/objectKeys";
-import { makeBucketRecord, makeIdLookupRecord } from "$/lib/objects/builders";
 import { wrapString } from "$/lib/strings/higherOrderFuncs";
 import { uuid } from "$/lib/uuid";
 import { match } from "ts-pattern";

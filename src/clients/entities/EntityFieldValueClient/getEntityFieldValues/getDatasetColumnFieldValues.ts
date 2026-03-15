@@ -2,8 +2,9 @@ import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined"
 import { where } from "@utils/filters/where/where";
 import { isDefined } from "@utils/guards/isDefined/isDefined";
 import { prop } from "@utils/objects/hofs/prop/prop";
+import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
+import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord";
 import { objectEntries } from "@utils/objects/objectEntries";
-import { makeBucketRecord, makeIdLookupRecord } from "$/lib/objects/builders";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";

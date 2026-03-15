@@ -17,7 +17,7 @@ import {
 import { identity } from "@utils/misc/identity";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { propEq } from "@utils/objects/hofs/propEq/propEq";
-import { makeObject } from "$/lib/objects/builders";
+import { makeObject } from "@utils/objects/makeObject/makeObject";
 import { useCallback, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnPickerList } from "@/components/common/DatasetColumnPickerList";
