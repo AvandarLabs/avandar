@@ -4,7 +4,6 @@ import { withLogger } from "@logger/module-augmenters/withLogger";
 import { notifyDevAlert } from "@ui/notifications/notifyDevAlert";
 import { where } from "@utils/filters/where/where";
 import { isDefined } from "@utils/guards/isDefined/isDefined";
-import { assertIsDefined } from "@utils/index";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { objectKeys } from "@utils/objects/objectKeys";
@@ -208,6 +207,8 @@ type RawDataClientMutations = {
    * @param params.prevColumnName The previous name of the column.
    * @param params.newColumnName The new name of the column.
    * @param params.newDataType The new data type of the column.
+   * @returns An object containing the `newDataType` and `newColumnName`, or
+   * undefined for any of those values that were not changed.
    */
   updateRawColumnMetadata: (params: {
     columnId: DatasetColumnId;
@@ -216,7 +217,7 @@ type RawDataClientMutations = {
     prevColumnName: string;
     newColumnName?: string;
     newDataType?: AvaDataType;
-  }) => Promise<void>;
+  }) => Promise<{ newDataType?: AvaDataType; newColumnName?: string }>;
 };
 
 export type IDatasetRawDataClient = ServiceClient &
@@ -303,7 +304,7 @@ function createRawDataClient(): WithLogger<
     const datasetLoadStatuses = await promiseMap(
       localDatasets,
       async ({ datasetId, parquetData: rawData }) => {
-        const isAlreadyInMemory = await DuckDBClient.hasTable(datasetId);
+        const isAlreadyInMemory = await DuckDBClient.hasTableOrView(datasetId);
         if (!isAlreadyInMemory) {
           await DuckDBClient.loadParquet({
             tableName: datasetId,
@@ -347,10 +348,10 @@ function createRawDataClient(): WithLogger<
         prevColumnName: string;
         newColumnName?: string;
         newDataType?: AvaDataType;
-      }) => {
+      }): Promise<{ newDataType?: AvaDataType; newColumnName?: string }> => {
         if (newColumnName === undefined && newDataType === undefined) {
           // no changes to make
-          return;
+          return { newDataType: undefined, newColumnName: undefined };
         }
 
         // Ensure dataset is loaded (creates view over parquet)
@@ -362,18 +363,8 @@ function createRawDataClient(): WithLogger<
 
         try {
           // 1. Materialize view to table (views are read-only; need table to
-          // alter)
-          await RawDataClient.runLocalRawQuery({
-            query: `CREATE TABLE "$tempTableName$" AS SELECT * FROM "$datasetId$"`,
-            dependencies: [datasetId],
-            queryArgs: { tempTableName, datasetId },
-          });
-
-          // 2. Drop the view and parquet file from DuckDB's buffer
-          await DuckDBClient.dropTableViewAndFile(datasetId);
-
-          // 3. Alter the materialized table (type cast and/or rename) in a
-          // single transaction
+          // alter) and then alter the materialized table (type cast and/or
+          // rename) in a single transaction
           const alterStatements: string[] = [
             newDataType !== undefined ?
               'ALTER TABLE "$tempTableName$" ALTER COLUMN "$columnName$" ' +
@@ -386,13 +377,17 @@ function createRawDataClient(): WithLogger<
           ].filter(isDefined);
           const alterTransaction =
             alterStatements.length > 0 ?
-              `BEGIN; ${alterStatements.join("; ")}; COMMIT;`
+              `BEGIN;
+CREATE TABLE "$tempTableName$" AS SELECT * FROM "$datasetId$";
+${alterStatements.join("; ")};
+COMMIT;`
             : undefined;
           if (alterTransaction) {
             await RawDataClient.runLocalRawQuery({
               query: alterTransaction,
               dependencies: [datasetId],
               queryArgs: {
+                datasetId,
                 tempTableName,
                 columnName: prevColumnName,
                 newColumnName: newColumnName,
@@ -404,9 +399,20 @@ function createRawDataClient(): WithLogger<
             });
           }
 
-          // 4. Export the altered table to a parquet blob
+          // 2. Drop the old view and parquet file from DuckDB's buffer
+          await DuckDBClient.dropTableViewAndFile(datasetId);
+
+          // 3. Export the altered table to a parquet blob
           const newParquetBlob =
             await DuckDBClient.exportTableAsParquet(tempTableName);
+
+          // 4. Persist the updated parquet to local storage (IndexedDB)
+          await LocalDatasetClient.update({
+            id: datasetId,
+            data: {
+              parquetData: newParquetBlob,
+            },
+          });
 
           // 5. Drop the temp materialized table
           await DuckDBClient.runRawQuery(
@@ -414,23 +420,7 @@ function createRawDataClient(): WithLogger<
             { params: { tempTableName } },
           );
 
-          // 6. Re-register the parquet and recreate the view
-          await DuckDBClient.loadParquet({
-            tableName: datasetId,
-            blob: newParquetBlob,
-          });
-
-          // 7. Persist the updated parquet to local storage (IndexedDB)
-          const localDataset = await LocalDatasetClient.getById({
-            id: datasetId,
-          });
-          assertIsDefined(localDataset, { name: "local dataset" });
-          await LocalDatasetClient.update({
-            id: datasetId,
-            data: { parquetData: newParquetBlob },
-          });
-
-          // 8. determine if we need to sync to cloud storage. If yes, sync it.
+          // 6. determine if we need to sync to cloud storage. If yes, sync it.
           if (sourceType === "csv_file") {
             const csvFileDataset = await CSVFileDatasetClient.getOne(
               where("dataset_id", "eq", datasetId),
@@ -444,7 +434,7 @@ function createRawDataClient(): WithLogger<
             }
           }
 
-          // 9. Now update the column metadata in the database
+          // 7. Now update the column metadata in the database
           await DatasetColumnClient.update({
             id: columnId,
             data: {
@@ -465,6 +455,11 @@ function createRawDataClient(): WithLogger<
           }
           throw error;
         }
+
+        return {
+          newDataType,
+          newColumnName,
+        };
       },
     };
 

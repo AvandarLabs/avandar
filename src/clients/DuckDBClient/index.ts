@@ -329,9 +329,10 @@ class DuckDBClientImpl {
     await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
 
     // enable the spatial extension
-    // TODO(jpsyx): we should only do this when necessary
+    // TODO(jpsyx): we should only enable spatial extension when it's needed
     const conn = await db.connect();
     await conn.query("LOAD spatial;");
+    await conn.query("LOAD parquet;");
     await conn.close();
     return db;
   }
@@ -402,16 +403,29 @@ class DuckDBClientImpl {
     return dbTableNames.includes(tableName);
   }
 
+  async getViewNames(): Promise<string[]> {
+    const conn = await this.#connect();
+    const result = await conn.query<{ table_name: arrow.DataType }>(`
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = 'main' AND table_type = 'VIEW'
+    `);
+    const viewNames: string[] = result.toArray().map((row) => {
+      return row.table_name;
+    });
+    await this.#closeConnection(conn);
+    return viewNames;
+  }
+
   async hasView(viewName: string): Promise<boolean> {
-    const { data } = await this.runRawQuery<{ count: bigint }>(
-      `SELECT count(*) as count
-        FROM information_schema.tables
-        WHERE table_schema = 'main'
-          AND table_name = '$viewName$'
-          AND table_type = 'VIEW'`,
-      { params: { viewName } },
-    );
-    return Number(data[0]?.count ?? 0n) > 0;
+    const dbViewNames = await this.getViewNames();
+    return dbViewNames.includes(viewName);
+  }
+
+  async getTableOrViewNames(): Promise<string[]> {
+    const tableNames = await this.getTableNames();
+    const viewNames = await this.getViewNames();
+    return [...tableNames, ...viewNames];
   }
 
   async hasTableOrView(tableNameOrViewName: string): Promise<boolean> {
@@ -713,8 +727,11 @@ class DuckDBClientImpl {
     try {
       // Re-ingest the parquet data into a view (low-memory querying).
       await this.runRawQuery(
-        `CREATE VIEW IF NOT EXISTS "$tableName$" AS
-            SELECT * FROM read_parquet('$tableName$')`,
+        `SET enable_external_file_cache = false;
+CREATE VIEW IF NOT EXISTS "$tableName$" AS
+    SELECT * FROM read_parquet('$tableName$');
+SET enable_external_file_cache = true;
+            `,
         { conn, params: { tableName } },
       );
 
@@ -751,7 +768,7 @@ class DuckDBClientImpl {
         parquetFileName: tempParquetFileName,
       });
 
-      const parquetBuffer: Uint8Array<ArrayBuffer> = (await db.copyFileToBuffer(
+      const parquetBuffer = (await db.copyFileToBuffer(
         tempParquetFileName,
       )) as Uint8Array<ArrayBuffer>;
 
@@ -778,23 +795,13 @@ class DuckDBClientImpl {
   }): Promise<void> {
     const { tableName, parquetFileName } = options;
 
-    try {
-      await this.runRawQuery(
-        `COPY '$tableName$' TO '$parquetFileName$' (
+    await this.runRawQuery(
+      `COPY '$tableName$' TO '$parquetFileName$' (
           FORMAT 'parquet',
           COMPRESSION 'ZSTD'
         )`,
-        { params: { tableName, parquetFileName } },
-      );
-    } catch {
-      await this.runRawQuery(
-        `COPY '$tableName$' TO '$parquetFileName$' (
-          FORMAT 'parquet',
-          CODEC 'ZSTD'
-        )`,
-        { params: { tableName, parquetFileName } },
-      );
-    }
+      { params: { tableName, parquetFileName } },
+    );
   }
 
   /**

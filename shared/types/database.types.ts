@@ -1131,6 +1131,7 @@ export type Database = {
     }
     CompositeTypes: {
       dataset_column_input: {
+        original_name: string | null
         name: string | null
         description: string | null
         original_data_type: string | null

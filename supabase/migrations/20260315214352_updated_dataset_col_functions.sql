@@ -1,46 +1,57 @@
-create type public.dataset_column_input as (
-  -- The original name of the column from the source data
-  original_name text,
-  -- The name of the column
-  name text,
-  -- The description of the column
-  description text,
-  -- The original data type of the column
-  original_data_type text,
-  -- The detected data type of the column, as inferred by DuckDB when parsing
-  -- the dataset for the first time.
-  detected_data_type public.datasets__duckdb_data_type,
-  -- The queryable data type of the column
-  data_type public.datasets__ava_data_type,
-  -- The index of the column, so we can display columns in order in the UI
-  column_idx integer
+-- Drop functions that depend on dataset_column_input before dropping the type
+drop function if exists public.rpc_datasets__add_csv_file_dataset (
+  p_dataset_id uuid,
+  p_workspace_id uuid,
+  p_dataset_name text,
+  p_dataset_description text,
+  p_columns public.dataset_column_input[],
+  p_is_in_cloud_storage boolean,
+  p_size_in_bytes integer,
+  p_rows_to_skip integer,
+  p_quote_char public.util__nullable_text,
+  p_escape_char public.util__nullable_text,
+  p_delimiter text,
+  p_newline_delimiter text,
+  p_comment_char public.util__nullable_text,
+  p_has_header boolean,
+  p_date_format public.datasets__csv_file__date_format
 );
 
-create type public.datasets__csv_file__date_format as (
-  date_format text,
-  timestamp_format text
+drop function if exists public.rpc_datasets__add_google_sheets_dataset (
+  p_dataset_id uuid,
+  p_workspace_id uuid,
+  p_dataset_name text,
+  p_dataset_description text,
+  p_columns public.dataset_column_input[],
+  p_google_account_id text,
+  p_google_document_id text,
+  p_rows_to_skip integer
 );
 
-/**
- * Add a dataset to a given workspace.
- * This function should never be called directly and instead we should
- * always call one of the more specific functions such as
- * `rpc_datasets__add_google_sheets_dataset` or
- * `rpc_datasets__add_csv_file_dataset`.
- *
- * The requesting user must be an admin of the workspace.
- *
- * @param p_dataset_id: The id of the dataset to add
- * @param p_workspace_id: The workspace id to add the dataset to
- * @param p_dataset_name: The name of the dataset
- * @param p_dataset_description: The description of the dataset
- * @param p_dataset_source_type: The source type of the dataset
- * @param p_columns: The columns of the dataset
- *
- * @returns: The created dataset
- *
- * TODO(jpsyx): add this function to a private schema
- */
+drop function if exists public.rpc_datasets__add_dataset (
+  p_dataset_id uuid,
+  p_workspace_id uuid,
+  p_dataset_name text,
+  p_dataset_description text,
+  p_dataset_source_type public.datasets__source_type,
+  p_columns public.dataset_column_input[]
+);
+
+drop type "public"."dataset_column_input";
+
+set
+  check_function_bodies = off;
+
+create type "public"."dataset_column_input" as (
+  "original_name" text,
+  "name" text,
+  "description" text,
+  "original_data_type" text,
+  "detected_data_type" public.datasets__duckdb_data_type,
+  "data_type" public.datasets__ava_data_type,
+  "column_idx" integer
+);
+
 create or replace function public.rpc_datasets__add_dataset (
   p_dataset_id uuid,
   p_workspace_id uuid,

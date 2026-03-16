@@ -76,15 +76,16 @@ export function useSpotlightActions(
 
             {
               id: "list-duckdb-tables",
-              label: "List DuckDB tables",
+              label: "List DuckDB tables and views",
               description: "List all DuckDB tables",
               leftSection: <IconTrash size={24} stroke={1.5} />,
               onClick: async () => {
-                const tableNames = await DuckDBClient.getTableNames();
-                Logger.log("Table names", tableNames.join("; "));
+                const relationNames = await DuckDBClient.getTableOrViewNames();
+                Logger.log("Relation names", relationNames.join("; "));
                 notifySuccess({
                   title: "Check the console",
-                  message: "DuckDB tables have been printed to the console.",
+                  message:
+                    "DuckDB tables and views have been printed to the console.",
                 });
               },
             },
