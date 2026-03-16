@@ -115,9 +115,11 @@ function RegisterPage() {
         title: "Please check your email",
         message: "A confirmation email has been sent to your email address.",
       });
-      // Navigation is handled by useAuth's onAuthStateChange, which fires when
-      // signUp creates the session. That ensures the router uses the updated
-      // user context rather than racing with a stale one.
+      // Navigation is driven by useAuth's onAuthStateChange. When signUp
+      // creates a session, onAuthStateChange fires, invalidates the workspace
+      // cache, and updates user state. A useEffect in useAuth then invalidates
+      // the router (and navigates to any redirect param) with the correct
+      // user context already in place.
     },
     onError: (error) => {
       notifications.show({
