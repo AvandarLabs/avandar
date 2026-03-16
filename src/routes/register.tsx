@@ -15,12 +15,7 @@ import {
 } from "@mantine/core";
 import { isEmail } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import {
-  createFileRoute,
-  redirect,
-  useNavigate,
-  useRouter,
-} from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { INFO_EMAIL } from "$/config/AppConfig";
 import { useEffect, useRef, useState } from "react";
@@ -57,8 +52,6 @@ const IS_REGISTRATION_DISABLED = isFlagEnabled(
 const IS_SIGN_UP_CODE_REQUIRED = isFlagEnabled(FeatureFlag.RequireSignUpCode);
 
 function RegisterPage() {
-  const router = useRouter();
-  const navigate = useNavigate();
   const searchParams = Route.useSearch();
   const [isRegistrationFormVisible, showRegistrationForm] = useBoolean(
     !IS_REGISTRATION_DISABLED && !IS_SIGN_UP_CODE_REQUIRED,
@@ -117,16 +110,14 @@ function RegisterPage() {
       }
     },
     onSuccess: () => {
-      if (searchParams.redirect) {
-        navigate({ to: searchParams.redirect });
-      } else {
-        router.invalidate();
-      }
       setIsRegistrationSuccess(true);
       notifySuccess({
         title: "Please check your email",
         message: "A confirmation email has been sent to your email address.",
       });
+      // Navigation is handled by useAuth's onAuthStateChange, which fires when
+      // signUp creates the session. That ensures the router uses the updated
+      // user context rather than racing with a stale one.
     },
     onError: (error) => {
       notifications.show({
