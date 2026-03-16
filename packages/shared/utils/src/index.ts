@@ -1,3 +1,6 @@
+// arrays
+export { splitArray } from "./arrays/splitArray/splitArray.ts";
+
 // asserts
 export { assert } from "./asserts/assert/assert.ts";
 export { assertIsDefined } from "./asserts/assertIsDefined/assertIsDefined.ts";
