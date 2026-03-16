@@ -14,7 +14,7 @@ import {
   Transition,
 } from "@mantine/core";
 import { isEmail } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
+
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { INFO_EMAIL } from "$/config/AppConfig";
@@ -122,11 +122,7 @@ function RegisterPage() {
       // user context already in place.
     },
     onError: (error) => {
-      notifications.show({
-        title: "Registration failed",
-        message: error.message,
-        color: "danger",
-      });
+      registrationForm.setFieldError("email", error.message);
     },
   });
 
@@ -340,6 +336,10 @@ function RegisterPage() {
                         IS_REGISTRATION_DISABLED || IS_SIGN_UP_CODE_REQUIRED
                       }
                       {...registrationForm.getInputProps("email")}
+                      onChange={(e) => {
+                        registrationForm.getInputProps("email").onChange?.(e);
+                        registrationForm.clearFieldError("email");
+                      }}
                     />
                     <PasswordInput
                       key={registrationForm.key("password")}
