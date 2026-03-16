@@ -102,6 +102,7 @@ export type Database = {
           id: string
           name: string
           original_data_type: string
+          original_name: string
           updated_at: string
           workspace_id: string
         }
@@ -115,6 +116,7 @@ export type Database = {
           id?: string
           name: string
           original_data_type: string
+          original_name: string
           updated_at?: string
           workspace_id: string
         }
@@ -128,6 +130,7 @@ export type Database = {
           id?: string
           name?: string
           original_data_type?: string
+          original_name?: string
           updated_at?: string
           workspace_id?: string
         }
@@ -1128,6 +1131,7 @@ export type Database = {
     }
     CompositeTypes: {
       dataset_column_input: {
+        original_name: string | null
         name: string | null
         description: string | null
         original_data_type: string | null

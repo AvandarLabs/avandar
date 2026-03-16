@@ -4,7 +4,7 @@ import {
   IconLayoutSidebarLeftExpand,
 } from "@tabler/icons-react";
 import { AppShellStateManager } from "@/lib/ui/AppShell/AppShellStateManager";
-import { AvaTooltip } from "@/lib/ui/AvaTooltip/AvaTooltip";
+import { Tooltip } from "@ui/Tooltip/Tooltip";
 
 /**
  * Toggle icon to control the navbar
@@ -14,7 +14,7 @@ export function NavbarDesktopToggle(): JSX.Element {
     AppShellStateManager.useContext();
 
   return (
-    <AvaTooltip
+    <Tooltip
       label={isDesktopNavbarCollapsed ? "Open sidebar" : "Close sidebar"}
     >
       <ActionIcon
@@ -30,6 +30,6 @@ export function NavbarDesktopToggle(): JSX.Element {
           <IconLayoutSidebarLeftExpand size={18} />
         : <IconLayoutSidebarLeftCollapse size={18} />}
       </ActionIcon>
-    </AvaTooltip>
+    </Tooltip>
   );
 }

@@ -9,8 +9,8 @@ import { MIMEType } from "@utils/types/common";
 import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { RawDataClient } from "@/clients/datasets/RawDataClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
@@ -106,7 +106,7 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
       );
 
       // Query the loaded data for preview
-      const previewData = await DatasetRawDataClient.getPreviewData({
+      const previewData = await RawDataClient.getPreviewData({
         datasetId: dataset.id,
         numRows: 100,
       });

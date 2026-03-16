@@ -1,7 +1,7 @@
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
 import { MapLayerMouseEvent, Map as MapLibreMap } from "maplibre-gl";
 import { RefObject, useEffect, useRef } from "react";
-import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
+import { RawDataClient } from "@/clients/datasets/RawDataClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { isOfModelType } from "@/lib/utils/guards/guards";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.types";
@@ -152,7 +152,7 @@ export function useSelectedMapDataSource({
         console.log("Symbol size column:", symbolSizeColumnName);
 
         // Load the dataset into memory
-        await DatasetRawDataClient.loadLocalDataset({ datasetId });
+        await RawDataClient.loadLocalDataset({ datasetId });
 
         // Convert the dataset to GeoJSON using DuckDB spatial functions
         // We use ST_Point to create points from lat/lng columns

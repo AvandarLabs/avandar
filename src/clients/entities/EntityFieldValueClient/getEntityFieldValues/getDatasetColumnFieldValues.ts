@@ -7,7 +7,7 @@ import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLook
 import { objectEntries } from "@utils/objects/objectEntries";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
+import { RawDataClient } from "@/clients/datasets/RawDataClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { DatasetColumnValueExtractorClient } from "@/clients/entity-configs/DatasetColumnValueExtractorClient";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
@@ -161,7 +161,7 @@ async function _extractFieldValuesFromDataset({
   const primaryKeyColumnName = primaryKeyField.datasetColumn.name;
 
   // returns rows where each column is an entity field ID
-  const queryResult = await DatasetRawDataClient.runLocalRawQuery<
+  const queryResult = await RawDataClient.runLocalRawQuery<
     Record<EntityFieldConfigId, unknown>
   >({
     dependencies: [datasetId],

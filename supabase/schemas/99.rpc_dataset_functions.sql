@@ -1,4 +1,6 @@
 create type public.dataset_column_input as (
+  -- The original name of the column from the source data
+  original_name text,
   -- The name of the column
   name text,
   -- The description of the column
@@ -87,6 +89,9 @@ begin
   ) returning * into v_dataset;
 
   foreach v_column in array p_columns loop
+    if v_column.original_name is null then
+      raise exception 'Column original name is required';
+    end if;
     if v_column.name is null then
       raise exception 'Column name is required';
     end if;
@@ -100,6 +105,7 @@ begin
     insert into public.dataset_columns (
       dataset_id,
       workspace_id,
+      original_name,
       name,
       original_data_type,
       detected_data_type,
@@ -109,6 +115,7 @@ begin
     ) values (
       v_dataset.id,
       p_workspace_id,
+      v_column.original_name,
       v_column.name,
       v_column.original_data_type,
       v_column.detected_data_type,

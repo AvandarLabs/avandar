@@ -6,7 +6,7 @@ import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { makeObject } from "@utils/objects/makeObject/makeObject";
 import { EntityConfigModule } from "$/models/EntityConfig/EntityConfigUtils";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
+import { RawDataClient } from "@/clients/datasets/RawDataClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { getSQLSelectOfExtractor } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getDatasetColumnFieldValues";
@@ -82,7 +82,7 @@ export async function generateEntities(
       primaryKeyExtractorsByDatasetId[titleColumn.datasetId]!.id
     ]!;
 
-  await DatasetRawDataClient.runLocalRawQuery({
+  await RawDataClient.runLocalRawQuery({
     dependencies: sourceDatasetIds,
     query: `
       DROP TABLE IF EXISTS "$entityConfigId$";

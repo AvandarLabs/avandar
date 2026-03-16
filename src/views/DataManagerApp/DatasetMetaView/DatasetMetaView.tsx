@@ -17,81 +17,23 @@ import { EditableDisplayText } from "@ui/EditableDisplayText/EditableDisplayText
 import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { where } from "@utils/filters/where/where";
 import { prop } from "@utils/objects/hofs/prop/prop";
-import { matchLiteral } from "$/lib/strings/matchLiteral";
-import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
+import { RawDataClient } from "@/clients/datasets/RawDataClient";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList";
-import { ObjectKeyRenderOptionsMap } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList.types";
 import { Paper } from "@/lib/ui/Paper/Paper";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
+import { DatasetMetadataList } from "./DatasetMetadataList";
 import { DataSummaryView } from "./DataSummaryView";
 import { ToggleOfflineOnlyButton } from "./ToggleOfflineOnlyButton";
-import type { CSVFileDataset } from "$/models/datasets/CSVFileDataset/CSVFileDataset.types";
-import type {
-  Dataset,
-  DatasetWithColumns,
-} from "$/models/datasets/Dataset/Dataset.types";
-import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset.types";
 
 type Props = {
   dataset: Dataset;
 };
-
-type DatasetWithColumnsAndSource = DatasetWithColumns & {
-  source: CSVFileDataset | GoogleSheetsDataset;
-};
-
-const EXCLUDED_DATASET_METADATA_KEYS = [
-  "id",
-  "name",
-  "description",
-  "workspaceId",
-  "ownerId",
-  "ownerProfileId",
-  "dateOfLastSync",
-] satisfies ReadonlyArray<keyof DatasetWithColumnsAndSource>;
-
-const DATASET_METADATA_RENDER_OPTIONS = {
-  createdAt: {
-    asDate: true,
-  },
-  updatedAt: {
-    asDate: true,
-  },
-  sourceType: {
-    renderValue: (value) => {
-      return matchLiteral(value, {
-        csv_file: "CSV file",
-        google_sheets: "Google Sheets",
-        _otherwise: value,
-      });
-    },
-  },
-  columns: {
-    renderAsTable: true,
-    maxHeight: 400,
-    itemRenderOptions: {
-      keyRenderOptions: {
-        createdAt: {
-          asDate: true,
-        },
-        dataType: {
-          renderValue: AvaDataTypes.toDisplayValue,
-        },
-      },
-      includeKeys: ["name", "dataType", "description"],
-    },
-  },
-  source: {
-    excludeKeys: ["createdAt", "id", "datasetId", "updatedAt", "workspaceId"],
-  },
-} satisfies ObjectKeyRenderOptionsMap<DatasetWithColumnsAndSource>;
 
 type DatasetTabId = "dataset-metadata" | "dataset-summary";
 
@@ -109,11 +51,10 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
       datasetId: dataset.id,
       sourceType: dataset.sourceType,
     });
-  const [previewData, isLoadingPreviewData] =
-    DatasetRawDataClient.useGetPreviewData({
-      datasetId: dataset.id,
-      numRows: AppConfig.dataManagerApp.maxPreviewRows,
-    });
+  const [previewData, isLoadingPreviewData] = RawDataClient.useGetPreviewData({
+    datasetId: dataset.id,
+    numRows: AppConfig.dataManagerApp.maxPreviewRows,
+  });
   const [datasetColumns, isLoadingDatasetColumns] =
     DatasetColumnClient.useGetAll(where("dataset_id", "eq", dataset.id));
   const [updateDataset, isUpdatePending] = DatasetClient.useUpdate({
@@ -175,6 +116,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
           <Group gap="xs" align="center">
             <Group gap="xxs" align="center">
               <EditableDisplayText
+                name="dataset name"
                 value={datasetName}
                 onChange={setDatasetName}
                 onSave={(newName) => {
@@ -193,13 +135,14 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                 minRows={1}
                 maxRows={2}
                 error={
-                  datasetName.trim().length > 0 &&
-                    datasetName.trim().length < 2 ?
+                  (
+                    datasetName.trim().length > 0 &&
+                    datasetName.trim().length < 2
+                  ) ?
                     "Dataset name must be at least 2 characters."
                   : undefined
                 }
                 emptyDisplayText="Untitled dataset"
-                editIconLabel="Edit dataset title"
                 displayTextProps={{
                   fw: "var(--mantine-h2-font-weight)",
                   fz: "var(--mantine-h2-font-size)",
@@ -268,12 +211,12 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
             <Tabs.Panel value="dataset-metadata">
               <Stack>
                 <EditableDisplayText
+                  name="description"
                   value={datasetDescription}
                   textarea
                   onChange={setDatasetDescription}
                   isSaving={isUpdatePending}
                   emptyDisplayText="This dataset has no description."
-                  editIconLabel="Edit dataset description"
                   onSave={(newDescription) => {
                     const descriptionToSave =
                       newDescription.trim().length === 0 ?
@@ -292,14 +235,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                   }}
                 />
 
-                <ObjectDescriptionList
-                  data={datasetWithColumnsAndSource}
-                  dateFormat="MMMM D, YYYY"
-                  includeKeys={["updatedAt", "sourceType", "..."]}
-                  excludeKeys={EXCLUDED_DATASET_METADATA_KEYS}
-                  keyRenderOptions={DATASET_METADATA_RENDER_OPTIONS}
-                />
-
+                <DatasetMetadataList dataset={datasetWithColumnsAndSource} />
                 <Title order={5}>Data preview</Title>
                 {isLoadingPreviewData ?
                   <Loader />

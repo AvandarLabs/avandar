@@ -1,3 +1,4 @@
+import { useToggleBoolean } from "@hooks/useToggleBoolean/useToggleBoolean";
 import { AppShell as MantineAppShell } from "@mantine/core";
 import {
   Spotlight,
@@ -6,7 +7,6 @@ import {
 } from "@mantine/spotlight";
 import { IconSearch } from "@tabler/icons-react";
 import { Outlet } from "@tanstack/react-router";
-import { useToggleBoolean } from "@/lib/hooks/state/useToggleBoolean";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
 import css from "./AppShell.module.css";
 import { AppShellStateManager } from "./AppShellStateManager";

@@ -66,6 +66,23 @@ export type IModelModule = {
   getTypedId: <M extends ModelBase<string> & { id: unknown }>(
     model: M,
   ) => Simplify<ModelTypedId<M>>;
+
+  /**
+   * Checks if a value is a model object of any type.
+   * @param val - The value to check.
+   * @returns `true` if the value is a model, `false` otherwise.
+   */
+  isModel: (val: unknown) => val is ModelBase;
+
+  /**
+   * Checks if a value is a model of the given type.
+   * @param val - The value to check.
+   * @param modelType - The model type to check.
+   */
+  isModelOfType: <T extends string>(
+    val: unknown,
+    modelType: T,
+  ) => val is ModelBase<T>;
 };
 
 export const ModelModule: IModelModule = {
@@ -79,7 +96,7 @@ export const ModelModule: IModelModule = {
     return {
       __type: modelType,
       ...modelProps,
-    };
+    } as ModelBase<MType, MProps>;
   },
 
   match: <
@@ -109,5 +126,27 @@ export const ModelModule: IModelModule = {
       __type: model.__type,
       id: model.id,
     } as ModelTypedId<M>;
+  },
+
+  isModel: (val: unknown): val is ModelBase => {
+    return (
+      typeof val === "object" &&
+      val !== null &&
+      "__type" in val &&
+      typeof val.__type === "string"
+    );
+  },
+
+  isModelOfType: <T extends string, B>(
+    val: B,
+    modelType: T,
+  ): val is B & ModelBase<T> => {
+    return (
+      typeof val === "object" &&
+      val !== null &&
+      "__type" in val &&
+      typeof val.__type === "string" &&
+      (modelType === undefined || val.__type === modelType)
+    );
   },
 };

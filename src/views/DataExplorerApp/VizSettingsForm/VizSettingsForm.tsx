@@ -1,7 +1,7 @@
 import { Box } from "@mantine/core";
+import { Select, SelectData } from "@ui/inputs/Select/Select";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
 import { match } from "ts-pattern";
-import { Select, SelectData } from "@/lib/ui/inputs/Select";
 import { DataExplorerStateManager } from "../DataExplorerStateManager/DataExplorerStateManager";
 import { BarChartForm } from "./BarChartForm";
 import { LineChartForm } from "./LineChartForm";

@@ -9,7 +9,7 @@ import { DuckDBQueryAggregationType } from "$/models/queries/QueryAggregationTyp
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
 import { QueryResults } from "$/models/queries/QueryResult/QueryResults";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
+import { RawDataClient } from "@/clients/datasets/RawDataClient";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { isOfModelType } from "@/lib/utils/guards/guards";
 import {
@@ -92,7 +92,7 @@ export function useDataQuery({
           return rawSQL.includes(datasetId);
         });
 
-        return await DatasetRawDataClient.runLocalRawQuery({
+        return await RawDataClient.runLocalRawQuery({
           dependencies: datasetsToLoad,
           query: rawSQL,
         });
@@ -150,7 +150,7 @@ export function useDataQuery({
                   queryColumnLookup.get(orderByColumn)!,
                 )
               : undefined;
-            return await DatasetRawDataClient.runLocalStructuredQuery({
+            return await RawDataClient.runLocalStructuredQuery({
               query: {
                 datasetId: dataset.id,
                 aggregations: duckDBAggregations,

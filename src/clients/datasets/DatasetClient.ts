@@ -2,7 +2,7 @@ import { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupa
 import { where } from "@utils/filters/where/where";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
-import { matchLiteral } from "$/lib/strings/matchLiteral";
+import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral";
 import { CSVFileDataset } from "$/models/datasets/CSVFileDataset/CSVFileDataset.types";
 import {
   Dataset,

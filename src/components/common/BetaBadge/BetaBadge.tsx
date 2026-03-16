@@ -1,12 +1,12 @@
 import { Badge, BadgeProps } from "@mantine/core";
-import { AvaTooltip } from "@/lib/ui/AvaTooltip/AvaTooltip";
+import { Tooltip } from "@ui/Tooltip/Tooltip";
 import { mantineVar } from "@/lib/utils/browser/css";
 
 type Props = BadgeProps;
 
 export function BetaBadge({ style, ...props }: Props): JSX.Element {
   return (
-    <AvaTooltip label="Avandar is still in beta. Some features may not work as expected and some may still be under construction. We appreciate your patience and feedback as we work to improve the product.">
+    <Tooltip label="Avandar is still in beta. Some features may not work as expected and some may still be under construction. We appreciate your patience and feedback as we work to improve the product.">
       <Badge
         color="warning.5"
         c="dark.9"
@@ -24,6 +24,6 @@ export function BetaBadge({ style, ...props }: Props): JSX.Element {
       >
         Beta
       </Badge>
-    </AvaTooltip>
+    </Tooltip>
   );
 }

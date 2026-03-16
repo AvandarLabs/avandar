@@ -1,4 +1,5 @@
 import { useUncontrolled } from "@mantine/hooks";
+import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
 import { where } from "@utils/filters/where/where";
 import { makeBucketMap } from "@utils/maps/makeBucketMap/makeBucketMap";
 import { useMemo } from "react";
@@ -9,11 +10,10 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
 import {
   Select,
-  SelectData,
-  SelectOptionGroup,
-  SelectProps,
-} from "@/lib/ui/inputs/Select";
-import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
+  type SelectData,
+  type SelectOptionGroup,
+  type SelectProps,
+} from "@ui/inputs/Select/Select";
 import type {
   QueryDataSource,
   QueryDataSourceId,

@@ -10,6 +10,7 @@ import {
 } from "@mantine/core";
 import { isNotEmpty } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
+import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
 import { isDefined } from "@utils/guards/isDefined/isDefined";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { propEq } from "@utils/objects/hofs/propEq/propEq";
@@ -19,8 +20,7 @@ import { AppLinks } from "@/config/AppLinks";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useForm } from "@/lib/hooks/ui/useForm";
-import { Select } from "@/lib/ui/inputs/Select";
-import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
+import { Select } from "@ui/inputs/Select/Select";
 import { Paper } from "@/lib/ui/Paper/Paper";
 import { DatasetColumnFieldsBlock } from "./DatasetColumnFieldsBlock";
 import { EntityConfigCreatorStore } from "./EntityConfigCreatorStore";

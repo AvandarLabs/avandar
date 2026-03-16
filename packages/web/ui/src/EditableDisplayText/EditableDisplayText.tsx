@@ -1,17 +1,9 @@
-import {
-  ActionIcon,
-  Box,
-  Button,
-  Group,
-  Text,
-  Textarea,
-  TextInput,
-} from "@mantine/core";
+import { Box, Button, Group, Text, Textarea, TextInput } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
-import { IconPencil } from "@tabler/icons-react";
+import { EditButton } from "@ui/buttons/EditButton";
 import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
 import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { TextareaProps, TextInputProps, TextProps } from "@mantine/core";
 
 type BaseProps = {
@@ -37,9 +29,14 @@ type BaseProps = {
   isSaving?: boolean;
   disabled?: boolean;
 
+  /**
+   * The name of the item to edit. The name will be used in the tooltip label
+   * as "Edit ${name}".
+   */
+  name?: string;
+
   /** Display text to show when `value` is empty */
   emptyDisplayText?: string;
-  editIconLabel?: string;
   isSaveDisabled?: boolean;
   displayTextProps?: TextProps;
 };
@@ -76,6 +73,7 @@ type Props =
       >);
 
 export function EditableDisplayText({
+  name,
   value,
   onChange,
   onSave,
@@ -83,13 +81,24 @@ export function EditableDisplayText({
   isSaving = false,
   disabled = false,
   emptyDisplayText = "Empty",
-  editIconLabel = "Edit text",
   isSaveDisabled = false,
   displayTextProps,
   ...passThroughProps
 }: Props): JSX.Element {
   const [isEditing, setIsEditing] = useState(false);
+  const textInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const hasText = value.trim().length > 0;
+
+  useEffect(() => {
+    if (isEditing) {
+      if (passThroughProps.textarea) {
+        textareaRef.current?.focus();
+      } else {
+        textInputRef.current?.focus();
+      }
+    }
+  }, [isEditing, passThroughProps.textarea]);
   const hasExplicitWidth =
     (!passThroughProps.textarea && hasDefinedProps(passThroughProps, "w")) ||
     (isPlainObject(passThroughProps.style) &&
@@ -117,6 +126,11 @@ export function EditableDisplayText({
       isMac ? "⌘↵"
       : "Ctrl↵"
     : "Enter";
+  const keyboardShortcutSymbol =
+    passThroughProps.textarea ?
+      isMac ? "⌘↵"
+      : "Ctrl↵"
+    : "↵";
 
   const onStartEditing = () => {
     if (disabled) {
@@ -167,7 +181,9 @@ export function EditableDisplayText({
       }
       return (
         <TextInput
+          ref={textInputRef}
           variant="unstyled"
+          name={name}
           value={value}
           onChange={(event) => {
             onChange(event.currentTarget.value);
@@ -201,7 +217,9 @@ export function EditableDisplayText({
 
       return (
         <Textarea
+          ref={textareaRef}
           variant="unstyled"
+          name={name}
           autosize
           minRows={minRows}
           maxRows={maxRows}
@@ -257,7 +275,12 @@ export function EditableDisplayText({
             loading={isSaving}
             disabled={disabled || isSaveDisabled}
           >
-            Save
+            <Group gap="xxs" align="bottom">
+              Save
+              <Text span size="xs" c="primary.6">
+                {keyboardShortcutSymbol}
+              </Text>
+            </Group>
           </Button>
           <Button
             size="compact-sm"
@@ -276,7 +299,7 @@ export function EditableDisplayText({
   }
 
   return (
-    <Group gap="xxs" align="start" wrap="nowrap">
+    <Group gap="xxs" align="center" wrap="nowrap" justify="space-between">
       <Text
         style={{ whiteSpace: "pre-wrap" }}
         c={hasText ? undefined : "dimmed"}
@@ -285,15 +308,7 @@ export function EditableDisplayText({
       >
         {hasText ? value : emptyDisplayText}
       </Text>
-      <ActionIcon
-        variant="subtle"
-        color="gray"
-        aria-label={editIconLabel}
-        onClick={onStartEditing}
-        disabled={disabled}
-      >
-        <IconPencil size={16} />
-      </ActionIcon>
+      <EditButton onClick={onStartEditing} disabled={disabled} name={name} />
     </Group>
   );
 }

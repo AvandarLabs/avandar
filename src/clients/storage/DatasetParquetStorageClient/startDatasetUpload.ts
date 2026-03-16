@@ -182,7 +182,8 @@ async function _uploadDatasetToSupabase(options: {
 }
 
 /**
- * Starts syncing a dataset's Parquet to object storage.
+ * Starts syncing a dataset's Parquet to object storage. This requires that the
+ * parquet to upload already be in local storage (IndexedDB).
  *
  * This is safe to call multiple times; duplicate calls for the same dataset
  * will reuse the same in-flight promise.
