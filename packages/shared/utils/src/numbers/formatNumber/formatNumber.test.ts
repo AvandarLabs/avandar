@@ -1,41 +1,47 @@
-import { describe, expect, it, vi } from "vitest";
-import { formatNumber } from "./formatNumber.ts";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { formatNumber as FormatNumberFn } from "./formatNumber.ts";
+
+// Re-import before each test so every test gets a fresh formatterCache.
+// Without this, a test that mocks Intl.NumberFormat would poison the cache
+// and subsequent tests would receive the mock's output instead of real values.
+let formatNumber: typeof FormatNumberFn;
+
+beforeEach(async () => {
+  vi.resetModules();
+  const mod = await import("./formatNumber.ts");
+  formatNumber = mod.formatNumber;
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("formatNumber caching", () => {
-  it("reuses Intl.NumberFormat instances for identical option sets", async () => {
-    vi.resetModules();
-
+  it("reuses Intl.NumberFormat instances for identical option sets", () => {
     const formatSpy = vi.fn((value: number) => {
       return `formatted-${value}`;
     });
     const numberFormatSpy = vi
       .spyOn(Intl, "NumberFormat")
       .mockImplementation(() => {
-        return {
-          format: formatSpy,
-        } as unknown as Intl.NumberFormat;
+        return { format: formatSpy } as unknown as Intl.NumberFormat;
       });
 
-    try {
-      const first = formatNumber(100, { locale: "en-US" });
-      const second = formatNumber(200, { locale: "en-US" });
-      const third = formatNumber(300, {
-        locale: "en-US",
-        style: "currency",
-        currency: "USD",
-      });
+    const first = formatNumber(100, { locale: "en-US" });
+    const second = formatNumber(200, { locale: "en-US" });
+    const third = formatNumber(300, {
+      locale: "en-US",
+      style: "currency",
+      currency: "USD",
+    });
 
-      expect(first).toBe("formatted-100");
-      expect(second).toBe("formatted-200");
-      expect(third).toBe("formatted-300");
-      expect(numberFormatSpy).toHaveBeenCalledTimes(2);
-      expect(formatSpy).toHaveBeenNthCalledWith(1, 100);
-      expect(formatSpy).toHaveBeenNthCalledWith(2, 200);
-      expect(formatSpy).toHaveBeenNthCalledWith(3, 300);
-    } finally {
-      numberFormatSpy.mockRestore();
-      vi.resetModules();
-    }
+    expect(first).toBe("formatted-100");
+    expect(second).toBe("formatted-200");
+    expect(third).toBe("formatted-300");
+    expect(numberFormatSpy).toHaveBeenCalledTimes(2);
+    expect(formatSpy).toHaveBeenNthCalledWith(1, 100);
+    expect(formatSpy).toHaveBeenNthCalledWith(2, 200);
+    expect(formatSpy).toHaveBeenNthCalledWith(3, 300);
   });
 });
 
