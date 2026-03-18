@@ -22,7 +22,7 @@
     "test:ui": "pnpm --filter @avandar/ui test",
     "test:utils": "pnpm --filter @avandar/utils test",
     "build": "tsc -b && vite build",
-    "build:ava-cli": "pnpm --filter @avandar/ava-cli build && ln -sf \"$(pwd)/apps/ava-cli/dist/main.cjs\" \"$PNPM_HOME/ava\"",
+    "build:ava-cli": "pnpm --filter @avandar/ava-cli build && ln -sf \"$(pwd)/apps/ava-cli/dist/main.cjs\" \"$(dirname $(which pnpm))/ava\"",
     "lint": "eslint . && stylelint \"src/**/*.css\"",
     "lint:css": "stylelint \"src/**/*.css\"",
     "lint:css:fix": "stylelint \"src/**/*.css\" --fix",
