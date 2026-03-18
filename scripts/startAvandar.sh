@@ -45,8 +45,16 @@ if [ -z "$REVERSE_PROXY_URL" ]; then
   exit 1
 fi
 
-# Extract hostname from URL for ngrok (ngrok 3.x uses --hostname, not --url)
-REVERSE_PROXY_HOST=$(echo "$REVERSE_PROXY_URL" | sed -e 's|^https\?://||' -e 's|/.*||')
+# ngrok-free domains need --hostname, while paid/custom domains still use --url.
+REVERSE_PROXY_HOST="${REVERSE_PROXY_URL#http://}"
+REVERSE_PROXY_HOST="${REVERSE_PROXY_HOST#https://}"
+REVERSE_PROXY_HOST="${REVERSE_PROXY_HOST%%/*}"
+
+if [[ "$REVERSE_PROXY_URL" == *"ngrok-free"* ]]; then
+  NGROK_COMMAND="ngrok http --hostname=$REVERSE_PROXY_HOST 54321 --log=stdout"
+else
+  NGROK_COMMAND="ngrok http --url=$REVERSE_PROXY_URL 54321 --log=stdout"
+fi
 
 echo -e "${CYAN}==========================================${NC}"
 echo -e "${CYAN}Starting Avandar Development Environment${NC}"
@@ -92,5 +100,4 @@ concurrently \
   --kill-others-on-fail \
   "vite" \
   "pnpm fns:serve" \
-  "ngrok http --hostname=$REVERSE_PROXY_HOST 54321 --log=stdout"
-
+  "$NGROK_COMMAND"
