@@ -57,6 +57,11 @@ export const DatasetClient = createUsableServiceClient(
           logger.log("Getting the source dataset", params);
           const { datasetId, sourceType } = params;
           return matchLiteral(sourceType, {
+            query_result: () => {
+              return QueryResultDatasetClient.getOne(
+                where("dataset_id", "eq", datasetId),
+              );
+            },
             csv_file: () => {
               return CSVFileDatasetClient.getOne(
                 where("dataset_id", "eq", datasetId),

@@ -1,11 +1,7 @@
 import { Flex, List, Text } from "@mantine/core";
-import { isEpochMs } from "@utils/guards/isEpochMs/isEpochMs";
-import { isISODateString } from "@utils/guards/isISODateString/isISODateString";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { objectValues } from "@utils/objects/objectValues";
 import { UnknownDataFrame } from "@utils/types/common";
-import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
-import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { flattenError, object, prettifyError, string } from "zod";
 import { Callout } from "@/lib/ui/Callout";
@@ -19,6 +15,14 @@ import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult
 
 type Props = {
   columns: readonly QueryResultColumn[];
+
+  /**
+   * The names of the query result columns that are dates.
+   *
+   * This is not a great way to handle date columns and we should find a
+   * better way to handle this.
+   */
+  dateColumns: ReadonlySet<string>;
   data: UnknownDataFrame;
 };
 
@@ -54,23 +58,12 @@ const ScatterPlotConfigSchema = object({
   yAxisKey: YAxisKeySchema,
 });
 
-export function VisualizationContainer({ columns, data }: Props): JSX.Element {
+export function VisualizationContainer({
+  columns,
+  data,
+  dateColumns,
+}: Props): JSX.Element {
   const { vizConfig } = DataExplorerStateManager.useState();
-  // TODO(jpsyx): this should get supplied as a prop
-  const dateColumns = useMemo(() => {
-    return new Set(
-      columns
-        .filter((f) => {
-          const sampleVal = data[0]?.[f.name];
-          return (
-            AvaDataTypes.isTemporal(f.dataType) ||
-            isISODateString(sampleVal) ||
-            isEpochMs(sampleVal)
-          );
-        })
-        .map(prop("name")),
-    );
-  }, [columns, data]);
   const columnNames = columns.map(prop("name"));
 
   const viz = match(vizConfig)
