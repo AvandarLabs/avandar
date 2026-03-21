@@ -1,3 +1,4 @@
+import { getDevOverrideEmail } from "$/env/getDevOverrideEmail.ts";
 import { match } from "ts-pattern";
 import { email, string, url, uuid } from "zod";
 import { defineRoutes, GET } from "../_shared/MiniServer/MiniServer.ts";
@@ -123,6 +124,15 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
           currentPolarSubscriptionId,
           currentCustomerId,
         } = queryParams;
+
+        // In dev, use a Polar-acceptable email (e.g. delivered@resend.dev)
+        // since Polar rejects test domains like test@test.com
+        const devOverride = getDevOverrideEmail();
+        const emailForPolar =
+          Deno.env.get("MODE") === "development" && devOverride
+            ? devOverride
+            : checkoutEmail;
+
         const checkout = await PolarClient.createCheckoutSession({
           avandarMetadata: {
             userId,
@@ -132,7 +142,7 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
           returnURL,
           successURL,
           numSeats,
-          checkoutEmail,
+          checkoutEmail: emailForPolar,
           currentCustomerId,
           currentSubscriptionId: currentPolarSubscriptionId ?? undefined,
         });

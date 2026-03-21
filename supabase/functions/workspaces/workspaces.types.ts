@@ -1,6 +1,8 @@
 import type { APITypeDef } from "../_shared/MiniServer/api.types.ts";
-import type { WorkspaceFeature } from "$/models/Workspace/Workspace.types.ts";
 import type { Tables } from "$/types/database.types.ts";
+
+/** Inlined to avoid importing @clients (which fails in Deno edge runtime). */
+type WorkspaceFeature = "add_datasets" | "invite_users";
 
 export type WorkspacesAPI = APITypeDef<
   "workspaces",

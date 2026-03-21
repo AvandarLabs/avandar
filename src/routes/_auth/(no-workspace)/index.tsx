@@ -2,6 +2,7 @@ import { Container, Paper, Stack, Title } from "@mantine/core";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
+import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
 import { CreateWorkspaceForm } from "@/components/common/forms/CreateWorkspaceForm";
 import { AppLinks } from "@/config/AppLinks";
 
@@ -22,7 +23,7 @@ export const Route = createFileRoute("/_auth/(no-workspace)/")({
   beforeLoad: async ({ context }) => {
     const { queryClient } = context;
     const userWorkspaces = await WorkspaceClient.withCache(queryClient)
-      .withEnsureQueryData()
+      .withFetchQuery()
       .getWorkspacesOfCurrentUser();
 
     if (isNonEmptyArray(userWorkspaces)) {
@@ -40,15 +41,17 @@ export const Route = createFileRoute("/_auth/(no-workspace)/")({
  */
 function CreateFirstWorkspacePage() {
   return (
-    <Container py="xxxl">
-      <Stack>
-        <Title ta="center" order={1}>
-          Welcome to your first workspace
-        </Title>
-        <Paper withBorder shadow="md" p="lg" mt="lg" radius="md" bg="white">
-          <CreateWorkspaceForm introText="It's time to create your first workspace. Don't think for too long—you can always change these later!" />
-        </Paper>
-      </Stack>
-    </Container>
+    <AppLayout>
+      <Container py="xxxl">
+        <Stack>
+          <Title ta="center" order={1}>
+            Welcome to your first workspace
+          </Title>
+          <Paper withBorder shadow="md" p="lg" mt="lg" radius="md" bg="white">
+            <CreateWorkspaceForm introText="It's time to create your first workspace. Don't think for too long—you can always change these later!" />
+          </Paper>
+        </Stack>
+      </Container>
+    </AppLayout>
   );
 }

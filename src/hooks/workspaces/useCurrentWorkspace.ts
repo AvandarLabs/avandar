@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
@@ -30,6 +31,22 @@ export function useCurrentWorkspace(): Workspace.WithSubscription {
   const workspaceFromCache =
     isSuccess ? userWorkspaces?.find(propEq("slug", workspaceSlug)) : undefined;
 
+  // If the query is done and the workspace isn't found, the user
+  // lost access to this workspace. Navigate in an effect to avoid
+  // calling router.navigate during a render cycle.
+  useEffect(() => {
+    if (!isSuccess || isFetching || workspaceFromCache) {
+      return;
+    }
+    navigate({
+      to: AppLinks.invalidWorkspace.to,
+      search: {
+        redirectReason: "NOT_FOUND_OR_ACCESS_REVOKED",
+      },
+      replace: true,
+    });
+  }, [isSuccess, isFetching, workspaceFromCache, navigate]);
+
   if (workspaceFromCache) {
     return workspaceFromCache;
   }
@@ -38,18 +55,6 @@ export function useCurrentWorkspace(): Workspace.WithSubscription {
   // WorkspaceRootRouteAPI is our best source of truth
   if (isFetching && workspaceFromRoute) {
     return workspaceFromRoute;
-  }
-
-  // If the query is done but the workspace isn't found, the user
-  // lost access to this workspace
-  if (isSuccess && !workspaceFromCache) {
-    navigate({
-      to: AppLinks.invalidWorkspace.to,
-      search: {
-        redirectReason: "NOT_FOUND_OR_ACCESS_REVOKED",
-      },
-      replace: true,
-    });
   }
 
   // Fallback to prevent a page crash
