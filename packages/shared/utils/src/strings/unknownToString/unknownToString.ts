@@ -6,7 +6,7 @@ import { isPlainObject } from "../../guards/isPlainObject/isPlainObject.ts";
 import { isValidDateValue } from "../../guards/isValidDateValue/isValidDateValue.ts";
 import { objectEntries } from "../../objects/objectEntries.ts";
 import { objectToPrettyString } from "../../objects/objectToPrettyString/objectToPrettyString.ts";
-import type { UnknownObject } from "../../types/common.ts";
+import type { UnknownObject } from "../../types/common.types.ts";
 import type { LiteralUnion } from "type-fest";
 
 export type UnknownToStringOptions = {

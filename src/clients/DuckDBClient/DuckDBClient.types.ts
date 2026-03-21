@@ -1,4 +1,4 @@
-import type { UUID } from "@utils/types/common";
+import type { UUID } from "@utils/types/common.types";
 import type { DuckDBDataType } from "$/models/datasets/DatasetColumn/DuckDBDataTypes";
 import type { DuckDBQueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationTypes";
 

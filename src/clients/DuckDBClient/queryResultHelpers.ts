@@ -1,7 +1,7 @@
 import { assertIsNonEmptyArray } from "@utils/asserts/assertIsNonEmptyArray/assertIsNonEmptyArray";
 import { assertIsSingletonArray } from "@utils/asserts/assertIsSingletonArray/assertIsSingletonArray";
 import { objectKeys } from "@utils/objects/objectKeys";
-import type { UnknownObject } from "@utils/types/common";
+import type { UnknownObject } from "@utils/types/common.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 
 /**

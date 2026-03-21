@@ -6,7 +6,7 @@ import type { LocalPublicDatasetModel } from "./LocalPublicDataset.types";
 import type {
   Expect,
   ZodSchemaEqualsTypes,
-} from "@utils/types/testUtilityTypes";
+} from "@utils/types/test-utilities.types";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 

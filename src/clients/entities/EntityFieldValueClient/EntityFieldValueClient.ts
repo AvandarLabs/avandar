@@ -9,22 +9,23 @@ import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketReco
 import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord";
 import { objectEntries } from "@utils/objects/objectEntries";
 import { objectKeys } from "@utils/objects/objectKeys";
+import { template } from "@utils/strings/template/template";
 import { wrapString } from "$/lib/strings/higherOrderFuncs";
 import { uuid } from "$/lib/uuid";
 import { match } from "ts-pattern";
+import { WorkspaceQETLClient } from "@/clients/datasets/LocalDatasetClient/QETLClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { promiseFlatMap, promiseMap } from "@/lib/utils/promises";
 import { makeSet } from "@/lib/utils/sets/builders";
 import { isInSet } from "@/lib/utils/sets/higherOrderFuncs";
 import { DatasetColumnClient } from "../../datasets/DatasetColumnClient";
-import { RawDataClient } from "../../datasets/RawDataClient";
 import { singleton } from "../../DuckDBClient/queryResultHelpers";
 import { EntityClient } from "../EntityClient";
 import { getEntityFieldValues } from "./getEntityFieldValues/getEntityFieldValues";
 import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
 import type { WithQueryHooks } from "@hooks/withQueryHooks/withQueryHooks.types";
 import type { ILogger, WithLogger } from "@logger/Logger.types";
-import type { RegistryOfArrays } from "@utils/types/utilityTypes";
+import type { RegistryOfArrays } from "@utils/types/utilities.types";
 import type { EntityId } from "$/models/entities/Entity/Entity.types";
 import type { EntityFieldValue } from "$/models/entities/EntityFieldValue/EntityFieldValue.types";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
@@ -33,16 +34,19 @@ import type {
   EntityFieldConfigId,
 } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import type { EntityFieldValueExtractorRegistry } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 type EntityFieldValueClientQueries = {
   getAllEntityFieldValues: (params: {
     entityConfigId: EntityConfigId;
     entityFieldConfigs: readonly EntityFieldConfig[];
+    workspaceId: Workspace.Id;
   }) => Promise<Array<Record<EntityFieldConfigId, unknown>>>;
 
   getEntityFieldValues: (params: {
     entityId: EntityId;
     entityFieldConfigs: readonly EntityFieldConfig[];
+    workspaceId: Workspace.Id;
   }) => Promise<EntityFieldValue[]>;
 };
 
@@ -62,12 +66,14 @@ function createEntityFieldValueClient(): WithLogger<
       getAllEntityFieldValues: async (params: {
         entityConfigId: EntityConfigId;
         entityFieldConfigs: readonly EntityFieldConfig[];
+        workspaceId: Workspace.Id;
       }): Promise<Array<Record<EntityFieldConfigId, unknown>>> => {
         const logger = baseLogger.appendName("getAllEntityFieldValues");
         logger.log("Getting all entity field values from query", params);
         const allFieldValues = await getEntityFieldValues({
           entityConfigId: params.entityConfigId,
           entityFieldConfigs: params.entityFieldConfigs,
+          workspaceId: params.workspaceId,
         });
         logger.log("Got all entity field values", allFieldValues);
         return allFieldValues;
@@ -182,11 +188,11 @@ function createEntityFieldValueClient(): WithLogger<
                     );
 
                     const extractedValues = singleton(
-                      await RawDataClient.runLocalRawQuery<
+                      await WorkspaceQETLClient.runQuery<
                         Record<EntityFieldConfigId, unknown>
                       >({
-                        dependencies: [datasetId],
-                        query: `
+                        workspaceId: entity.workspaceId,
+                        rawSQL: template(`
                           -- Get all rows matching this external_id
                           WITH entity_rows AS (
                             SELECT
@@ -198,8 +204,7 @@ function createEntityFieldValueClient(): WithLogger<
                           -- Get all the values
                           SELECT
                             $columnNameValueSelectors$;
-                        `,
-                        queryArgs: {
+                        `).parse({
                           columnNames: columnNames
                             .map(wrapString('"'))
                             .join(", "),
@@ -273,7 +278,7 @@ function createEntityFieldValueClient(): WithLogger<
                                 .exhaustive();
                             })
                             .join(", "),
-                        },
+                        }),
                       }),
                     );
 

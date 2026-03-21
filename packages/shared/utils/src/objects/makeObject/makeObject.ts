@@ -2,10 +2,10 @@ import { constant } from "../../misc/constant/constant.ts";
 import { identity } from "../../misc/identity.ts";
 import type { ConditionalKeys } from "type-fest";
 
-type ObjectKeyValue<
-  T,
-  InK extends ConditionalKeys<T, PropertyKey>,
-> = Extract<T[Extract<InK, PropertyKey>], PropertyKey>;
+type ObjectKeyValue<T, InK extends ConditionalKeys<T, PropertyKey>> = Extract<
+  T[Extract<InK, PropertyKey>],
+  PropertyKey
+>;
 
 type ObjectValue<
   T,

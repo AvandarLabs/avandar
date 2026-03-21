@@ -1,5 +1,5 @@
 import { excludeNullsIn } from "../../excludeNullsIn/excludeNullsIn.ts";
-import type { UnknownObject } from "../../../types/common.ts";
+import type { UnknownObject } from "../../../types/common.types.ts";
 import type { ExcludeNullsIn } from "../../excludeNullsIn/excludeNullsIn.ts";
 
 /**

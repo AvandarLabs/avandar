@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { Expect, IsEqual } from "../../types/testUtilityTypes.ts";
 import { makeObjectFromEntries } from "./makeObjectFromEntries.ts";
+import type { Expect, IsEqual } from "../../types/test-utilities.types.ts";
 
 describe("makeObjectFromEntries", () => {
   it("keeps the last value for duplicate keys across string and numeric entries", () => {
@@ -39,7 +39,10 @@ const objectFromNumberEntries = makeObjectFromEntries(numberEntries);
 // @ts-expect-error allow unused variable declaration.
 type TypeTests = [
   Expect<
-    IsEqual<typeof objectFromStringEntries, Record<"draft" | "published", 0 | 1>>
+    IsEqual<
+      typeof objectFromStringEntries,
+      Record<"draft" | "published", 0 | 1>
+    >
   >,
   Expect<IsEqual<typeof objectFromNumberEntries, Record<1 | 2, "one" | "two">>>,
 ];

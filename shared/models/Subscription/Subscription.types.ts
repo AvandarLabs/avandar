@@ -1,7 +1,7 @@
 import type { UserId } from "../User/User.types.ts";
 import type { Workspace } from "../Workspace/Workspace.ts";
 import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
-import type { UUID } from "@utils/types/common.ts";
+import type { UUID } from "@utils/types/common.types.ts";
 import type { Enums } from "$/types/database.types.ts";
 import type { SetOptional } from "type-fest";
 

@@ -7,7 +7,7 @@ import { themeMaterial } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
 import { mantineColorVar, mantineVar } from "@/lib/utils/browser/css";
-import type { UnknownDataFrame } from "@utils/types/common";
+import type { UnknownDataFrame } from "@utils/types/common.types";
 import type { Writable } from "type-fest";
 
 type Props = {

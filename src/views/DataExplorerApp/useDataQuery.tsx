@@ -1,6 +1,5 @@
 import { useQuery } from "@hooks/useQuery/useQuery";
 import { Model } from "@models/Model/Model";
-import { where } from "@utils/filters/where/where";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { makeObjectFromEntries } from "@utils/objects/makeObjectFromEntries/makeObjectFromEntries";
 import { objectEntries } from "@utils/objects/objectEntries";
@@ -8,7 +7,7 @@ import { objectValues } from "@utils/objects/objectValues";
 import { DuckDBQueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationTypes";
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
 import { QueryResults } from "$/models/queries/QueryResult/QueryResults";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { WorkspaceQETLClient } from "@/clients/datasets/LocalDatasetClient/QETLClient";
 import { RawDataClient } from "@/clients/datasets/RawDataClient";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { isOfModelType } from "@/lib/utils/guards/guards";
@@ -80,21 +79,14 @@ export function useDataQuery({
     ],
 
     queryFn: async (): Promise<QueryResult<UnknownRow>> => {
+      if (!workspaceId) {
+        throw new Error("Workspace ID is required to run a query");
+      }
+
       if (rawSQL) {
-        const allDatasets = await DatasetClient.getAll(
-          workspaceId ? where("workspace_id", "eq", workspaceId) : undefined,
-        );
-        const allDatasetIds = allDatasets.map(prop("id"));
-
-        // if a dataset id is mentioned anywhere in the rawSQL, then we treat
-        // it as a dependency that needs to be loaded into memory.
-        const datasetsToLoad = allDatasetIds.filter((datasetId) => {
-          return rawSQL.includes(datasetId);
-        });
-
-        return await RawDataClient.runLocalRawQuery({
-          dependencies: datasetsToLoad,
-          query: rawSQL,
+        return await WorkspaceQETLClient.runQuery({
+          rawSQL,
+          workspaceId,
         });
       }
 
@@ -180,6 +172,7 @@ export function useDataQuery({
             const rows = await EntityFieldValueClient.getAllEntityFieldValues({
               entityConfigId: entityConfig.id,
               entityFieldConfigs: fields,
+              workspaceId,
             });
 
             const queryResultColumns: QueryResultColumn[] = fields.map(

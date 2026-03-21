@@ -1,11 +1,11 @@
 import { isEmptyObject } from "@utils/guards/isEmptyObject/isEmptyObject";
-import { isFunction } from "@utils/guards/isFunction/isFunction";
+import { isFunction } from "@utils/guards/isFunction.ts";
 import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject";
 import { excludeDeep } from "@utils/objects/excludeDeep/excludeDeep";
 import { objectKeys } from "@utils/objects/objectKeys";
 import { capitalize } from "@utils/strings/capitalize/capitalize";
 import { prefix } from "@utils/strings/prefix/prefix";
-import { AnyFunction } from "@utils/types/utilityTypes";
+import { AnyFunction } from "@utils/types/utilities.types";
 import { DefaultError, QueryClient, QueryKey } from "../core.types";
 import { useMutation } from "../useMutation/useMutation";
 import { useQuery } from "../useQuery/useQuery";

@@ -18,7 +18,7 @@ import {
 import type {
   Expect,
   ZodSchemaEqualsTypes,
-} from "@utils/types/testUtilityTypes.ts";
+} from "@utils/types/test-utilities.types.ts";
 
 const DBReadSchema = z.object({
   allow_manual_edit: z.boolean(),

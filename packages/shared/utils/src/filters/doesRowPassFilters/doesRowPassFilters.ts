@@ -1,6 +1,6 @@
 import { objectKeys } from "../../objects/objectKeys.ts";
 import { doesValuePassFilters } from "../doesValuePassFilters/doesValuePassFilters.ts";
-import type { UnknownObject } from "../../types/common.ts";
+import type { UnknownObject } from "../../types/common.types.ts";
 import type { FilterOperatorRecord, FiltersByColumn } from "../filters.ts";
 
 export function doesRowPassFilters<T extends UnknownObject>(

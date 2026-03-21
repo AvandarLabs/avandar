@@ -1,4 +1,4 @@
-import type { UnknownObject } from "../../types/common.ts";
+import type { UnknownObject } from "../../types/common.types.ts";
 import type {
   ArrayValueOperator,
   FilterOperator,

@@ -10,7 +10,7 @@ import type {
   RegisteredSupabaseTableUpdate,
 } from "../Register.types.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { UnknownObject } from "@utils/types/common.ts";
+import type { UnknownObject } from "@utils/types/common.types.ts";
 
 type DefaultModelTypes = {
   tableName: RegisteredSupabaseDatabaseTableNames;

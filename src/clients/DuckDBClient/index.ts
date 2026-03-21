@@ -9,7 +9,7 @@ import { prop } from "@utils/objects/hofs/prop/prop";
 import { objectEntries } from "@utils/objects/objectEntries";
 import { objectKeys } from "@utils/objects/objectKeys";
 import { objectValuesMap } from "@utils/objects/objectValuesMap/objectValuesMap";
-import { MIMEType } from "@utils/types/common";
+import { MIMEType } from "@utils/types/common.types";
 import { uuid } from "$/lib/uuid";
 import {
   DuckDBDataType,
@@ -715,8 +715,15 @@ class DuckDBClientImpl {
   async loadParquet(options: {
     tableName: string;
     blob: Blob;
+    columnReplacements?: Record<
+      string,
+      {
+        alias?: string;
+        dataType?: DuckDBDataType;
+      }
+    >;
   }): Promise<DuckDBLoadParquetResult> {
-    const { tableName, blob } = options;
+    const { tableName, blob, columnReplacements } = options;
     let loadResults: DuckDBLoadParquetResult;
 
     // Drop the dataset and recreate it. We are overwriting the data.
@@ -725,14 +732,35 @@ class DuckDBClientImpl {
 
     const conn = await this.#connect();
     try {
+      const replaceClause = (() => {
+        if (!columnReplacements) {
+          return "";
+        }
+        const replacementSubClauses: string[] = objectEntries(
+          columnReplacements,
+        ).map(([colName, { alias, dataType }]) => {
+          const newColumnName = alias ?? colName;
+          const castPart =
+            dataType ? `TRY_CAST("${colName}" AS ${dataType})` : `"${colName}"`;
+          const newNamePart = ` AS "${newColumnName}"`;
+          return `${castPart}${newNamePart}`;
+        });
+
+        if (replacementSubClauses.length === 0) {
+          return "";
+        }
+        return `REPLACE (${replacementSubClauses.join(", ")})`;
+      })();
+
       // Re-ingest the parquet data into a view (low-memory querying).
       await this.runRawQuery(
         `SET enable_external_file_cache = false;
 CREATE VIEW IF NOT EXISTS "$tableName$" AS
-    SELECT * FROM read_parquet('$tableName$');
+    SELECT * $replaceClause$
+    FROM read_parquet("$tableName$");
 SET enable_external_file_cache = true;
             `,
-        { conn, params: { tableName } },
+        { conn, params: { tableName, replaceClause } },
       );
 
       // now let's collect all information we need to return

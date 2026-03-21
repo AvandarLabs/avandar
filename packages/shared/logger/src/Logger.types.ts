@@ -1,4 +1,4 @@
-import type { BaseModule } from "@modules/createModule.ts";
+import type { Module } from "@modules/createModule.ts";
 
 export type ILogger = {
   error: (error: unknown, extraData?: unknown) => void;
@@ -35,9 +35,9 @@ export type ILogger = {
   setCallerName: (callerName: string) => ILogger;
 };
 
-export type WithLogger<Module extends BaseModule> = Module & {
+export type WithLogger<M extends Module> = M & {
   /**
    * @returns A new instance of the module with the logger enabled.
    */
-  withLogger: (callerNameOverride?: string) => Module;
+  withLogger: (callerNameOverride?: string) => M;
 };
