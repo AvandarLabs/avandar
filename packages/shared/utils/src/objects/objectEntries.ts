@@ -1,5 +1,5 @@
-import type { UnknownObject } from "../types/common.ts";
-import type { Entries } from "../types/utilityTypes.ts";
+import type { UnknownObject } from "../types/common.types.ts";
+import type { Entries } from "../types/utilities.types.ts";
 
 /**
  * Returns an array of entries from an object.

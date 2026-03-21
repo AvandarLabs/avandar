@@ -1,6 +1,6 @@
 import { List, Table, Text } from "@mantine/core";
 import { objectKeys } from "@utils/objects/objectKeys";
-import { StringKeyOf } from "@utils/types/utilityTypes";
+import { StringKeyOf } from "@utils/types/utilities.types";
 import { useMemo } from "react";
 import { CollapsibleItem } from "../../CollapsibleItem";
 import { getOrderedKeys } from "../../gerOrderedKeys/getOrderedKeys";

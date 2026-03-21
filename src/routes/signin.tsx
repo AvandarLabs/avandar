@@ -1,7 +1,6 @@
 import { useMutation } from "@hooks/useMutation/useMutation";
 import { Button, Loader, PasswordInput, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
 import {
   createFileRoute,
   redirect,
@@ -39,6 +38,14 @@ function SignInPage() {
   const navigate = useNavigate();
   const searchParams = Route.useSearch();
 
+  const form = useForm({
+    mode: "uncontrolled",
+    initialValues: {
+      email: "",
+      password: "",
+    },
+  });
+
   const [sendSignInRequest, isSignInPending] = useMutation({
     mutationFn: AuthClient.signIn,
     onSuccess: () => {
@@ -49,19 +56,7 @@ function SignInPage() {
       }
     },
     onError: (error) => {
-      notifications.show({
-        title: "Sign in failed",
-        message: error.message,
-        color: "danger",
-      });
-    },
-  });
-
-  const form = useForm({
-    mode: "uncontrolled",
-    initialValues: {
-      email: "",
-      password: "",
+      form.setFieldError("password", error.message);
     },
   });
 
@@ -100,6 +95,10 @@ function SignInPage() {
             type="password"
             key={form.key("password")}
             {...form.getInputProps("password")}
+            onChange={(e) => {
+              form.getInputProps("password").onChange?.(e);
+              form.clearFieldError("password");
+            }}
           />
           <Button type="submit" disabled={isSignInPending}>
             Sign in

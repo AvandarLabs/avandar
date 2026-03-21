@@ -1,5 +1,5 @@
 import type { Model } from "@models/Model/Model.ts";
-import type { UUID } from "@utils/types/common.ts";
+import type { UUID } from "@utils/types/common.types.ts";
 
 type ModelType = "DashboardConfig";
 

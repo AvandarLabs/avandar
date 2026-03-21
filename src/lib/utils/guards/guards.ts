@@ -1,6 +1,6 @@
 import { isArray } from "@utils/guards/isArray/isArray";
 import type { Model } from "@models/Model/Model";
-import type { UnknownObject } from "@utils/types/common";
+import type { UnknownObject } from "@utils/types/common.types";
 import type { SetFieldType, SetRequired, Simplify } from "type-fest";
 
 /**

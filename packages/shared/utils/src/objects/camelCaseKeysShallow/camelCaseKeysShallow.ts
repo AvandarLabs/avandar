@@ -1,5 +1,5 @@
 import camelCaseKeys from "camelcase-keys";
-import type { UnknownObject } from "../../types/common.ts";
+import type { UnknownObject } from "../../types/common.types.ts";
 import type { CamelCaseKeys } from "camelcase-keys";
 
 /**

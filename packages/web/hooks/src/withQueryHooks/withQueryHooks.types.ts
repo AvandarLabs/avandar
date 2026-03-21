@@ -16,7 +16,7 @@ import type {
   AnyFunction,
   AnyFunctionWithReturn,
   AnyFunctionWithSignature,
-} from "@utils/types/utilityTypes";
+} from "@utils/types/utilities.types";
 import type { ConditionalKeys, Simplify } from "type-fest";
 
 /**

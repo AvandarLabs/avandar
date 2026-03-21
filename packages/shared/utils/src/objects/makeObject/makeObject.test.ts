@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import type { Expect, IsEqual } from "../../types/testUtilityTypes.ts";
 import { makeObject } from "./makeObject.ts";
+import type { Expect, IsEqual } from "../../types/test-utilities.types.ts";
 
 describe("makeObject", () => {
   it("uses structural keys over functions and keeps the last duplicate entry", () => {
@@ -97,7 +97,5 @@ type TypeTests = [
       Record<"alpha" | "beta", "Alpha" | "Beta">
     >
   >,
-  Expect<
-    IsEqual<typeof objectFromFns, Record<"group-a" | "group-b", 1 | 2>>
-  >,
+  Expect<IsEqual<typeof objectFromFns, Record<"group-a" | "group-b", 1 | 2>>>,
 ];

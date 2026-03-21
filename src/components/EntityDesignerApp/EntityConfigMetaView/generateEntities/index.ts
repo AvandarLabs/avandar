@@ -1,12 +1,13 @@
 import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
 import { where } from "@utils/filters/where/where";
 import { isDefined } from "@utils/guards/isDefined/isDefined";
+import { template } from "@utils/index";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { makeObject } from "@utils/objects/makeObject/makeObject";
 import { EntityConfigModule } from "$/models/EntityConfig/EntityConfigUtils";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { RawDataClient } from "@/clients/datasets/RawDataClient";
+import { WorkspaceQETLClient } from "@/clients/datasets/LocalDatasetClient/QETLClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { getSQLSelectOfExtractor } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getDatasetColumnFieldValues";
@@ -34,12 +35,6 @@ export async function generateEntities(
         : undefined;
     })
     .filter(isDefined);
-
-  // get all source datasets and their local DuckDB table names
-  const sourceDatasetIds = [
-    // remove duplicates
-    ...new Set(datasetColumnValueExtractors.map(prop("datasetId"))),
-  ].filter(isDefined);
 
   // get all columns that we need to extract values from
   const sourceDatasetColumns = await DatasetColumnClient.getAll(
@@ -82,9 +77,8 @@ export async function generateEntities(
       primaryKeyExtractorsByDatasetId[titleColumn.datasetId]!.id
     ]!;
 
-  await RawDataClient.runLocalRawQuery({
-    dependencies: sourceDatasetIds,
-    query: `
+  await WorkspaceQETLClient.runQuery({
+    rawSQL: template(`
       DROP TABLE IF EXISTS "$entityConfigId$";
 
       CREATE TABLE "$entityConfigId$" AS (
@@ -109,8 +103,7 @@ export async function generateEntities(
           $titleSelector$
         FROM external_ids
       );
-    `,
-    queryArgs: {
+    `).parse({
       workspaceId: entityConfig.workspaceId,
       entityConfigId: entityConfig.id,
       externalIdSelectors: primaryKeyExtractors
@@ -128,7 +121,8 @@ export async function generateEntities(
         externalIdsTable: "external_ids",
         externalIdColumn: "external_id",
       }),
-    },
+    }),
+    workspaceId: entityConfig.workspaceId,
   });
   Logger.log("Successfully generated all entities. Starting upsert...");
 

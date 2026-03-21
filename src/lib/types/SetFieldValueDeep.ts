@@ -1,4 +1,4 @@
-import type { UnknownObject } from "@utils/types/common";
+import type { UnknownObject } from "@utils/types/common.types";
 import type { Paths, Simplify, UnknownArray } from "type-fest";
 
 /**

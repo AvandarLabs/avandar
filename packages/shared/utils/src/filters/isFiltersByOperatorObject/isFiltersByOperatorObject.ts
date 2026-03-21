@@ -1,7 +1,7 @@
 import { isEmptyObject } from "../../guards/isEmptyObject/isEmptyObject.ts";
 import { objectKeys } from "../../objects/objectKeys.ts";
 import { FILTER_TYPES_SET } from "../filters.ts";
-import type { UnknownObject } from "../../types/common.ts";
+import type { UnknownObject } from "../../types/common.types.ts";
 import type {
   FilterOperator,
   FiltersByColumn,

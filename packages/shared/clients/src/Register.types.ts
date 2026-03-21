@@ -15,7 +15,7 @@
  * ```
  */
 
-import type { UnknownObject } from "@utils/types/common.ts";
+import type { UnknownObject } from "@utils/types/common.types.ts";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Register {}

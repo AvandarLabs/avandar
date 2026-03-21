@@ -1,8 +1,8 @@
 import { registry } from "@utils/objects/registry/registry";
-import { StringKeyOf } from "@utils/types/utilityTypes";
+import { StringKeyOf } from "@utils/types/utilities.types";
 import type { SelectData } from "@ui/inputs/Select/Select";
 import type { FormattableTimezone } from "@utils/dates/formatDate/formatDate";
-import type { UnknownObject } from "@utils/types/common";
+import type { UnknownObject } from "@utils/types/common.types";
 import type { ReactNode } from "react";
 
 export type ObjectKeyTransformationType = "camel-to-title-case" | "none";

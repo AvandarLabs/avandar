@@ -1,6 +1,6 @@
 import { createWebLogger } from "../createWebLogger/createWebLogger.ts";
 import type { ILogger, WithLogger } from "../Logger.types.ts";
-import type { BaseModule } from "@modules/createModule.ts";
+import type { Module } from "@modules/createModule.ts";
 
 /**
  * Adds a logger that is accessible to all module functions. The logger is
@@ -14,10 +14,7 @@ import type { BaseModule } from "@modules/createModule.ts";
  * @param moduleBuilder A function that builds the new module.
  * @returns The module with a `withLogger` method.
  */
-export function withLogger<
-  Module extends BaseModule,
-  ReturnModule extends BaseModule,
->(
+export function withLogger<ReturnModule extends Module>(
   baseModule: Module,
   moduleBuilder: (baseLogger: ILogger) => ReturnModule,
 ): WithLogger<ReturnModule> {

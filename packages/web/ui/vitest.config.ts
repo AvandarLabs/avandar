@@ -2,18 +2,18 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
-const configDir: string = fileURLToPath(new URL(".", import.meta.url));
+const configDir = fileURLToPath(new URL(".", import.meta.url));
+const rootDir = resolve(configDir, "../../..");
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@utils": resolve(rootDir, "packages/shared/utils/src"),
+    },
+  },
   test: {
     globals: true,
     environment: "jsdom",
-    setupFiles: [resolve(configDir, "../../../tests/vitest.setup.ts")],
-  },
-  resolve: {
-    alias: {
-      $: resolve(configDir, "../../../shared"),
-      "@utils": resolve(configDir, "../../shared/utils/src"),
-    },
+    setupFiles: [resolve(rootDir, "tests/vitest.setup.ts")],
   },
 });

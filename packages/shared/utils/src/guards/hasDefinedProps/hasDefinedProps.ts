@@ -1,4 +1,4 @@
-import type { SetDefined } from "../../types/utilityTypes.ts";
+import type { SetDefined } from "../../types/utilities.types.ts";
 import type { SetRequired } from "type-fest";
 
 /**

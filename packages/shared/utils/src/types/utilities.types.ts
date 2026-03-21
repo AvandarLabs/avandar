@@ -1,4 +1,4 @@
-import type { Brand, UnknownObject } from "./common.ts";
+import type { Brand, EmptyObject, UnknownObject } from "./common.types.ts";
 import type {
   KeyAsString as BroadStringKeyOf,
   ConditionalKeys,
@@ -140,6 +140,16 @@ export type SetDefined<
   [K in keyof T]: K extends KeysToSet ? Exclude<T[K], undefined> : T[K];
 };
 
+/**
+ * Replaces the types of the properties in `OriginalObject` with the types in
+ * `NewTypes`. This effectively overwrites keys from `OriginalObject`, it does
+ * not do an intersection.
+ *
+ * @param OriginalObject - The object to replace the types of.
+ * @param NewTypes - The types to replace the types of `OriginalObject` with.
+ * @returns A new object with the types of `OriginalObject` replaced with the
+ * types of `NewTypes`.
+ */
 export type ReplaceTypes<
   OriginalObject extends UnknownRecord,
   NewTypes extends UnknownRecord,
@@ -183,3 +193,22 @@ export type ObjectRegistry<
     : never
   >
 >;
+
+/**
+ * Merges two objects together, where its possible for either to be of type
+ * EmptyObject.
+ *
+ * Sometimes the type `EmptyObject` can cause issues in intersections of
+ * objects, so this is a safer way to merge objects if there's a chance any
+ * type might be `EmptyObject`.
+ */
+export type MergeObjects<
+  ObjA extends UnknownObject | EmptyObject,
+  ObjB extends UnknownObject | EmptyObject,
+> =
+  ObjA extends EmptyObject ?
+    ObjB extends EmptyObject ?
+      EmptyObject
+    : ObjB
+  : ObjB extends EmptyObject ? ObjA
+  : ObjA & ObjB;

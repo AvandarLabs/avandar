@@ -47,7 +47,7 @@ export { isDate } from "./guards/isDate/isDate.ts";
 export { isDefined } from "./guards/isDefined/isDefined.ts";
 export { isEmptyObject } from "./guards/isEmptyObject/isEmptyObject.ts";
 export { isEpochMs } from "./guards/isEpochMs/isEpochMs.ts";
-export { isFunction } from "./guards/isFunction/isFunction.ts";
+export { isFunction } from "./guards/isFunction.ts";
 export { isISODateString } from "./guards/isISODateString/isISODateString.ts";
 export { isNonEmptyArray } from "./guards/isNonEmptyArray/isNonEmptyArray.ts";
 export { isNonNullish } from "./guards/isNonNullish/isNonNullish.ts";
@@ -121,17 +121,20 @@ export { setPropValue } from "./objects/hofs/setPropValue/setPropValue.ts";
 
 // strings
 export { capitalize } from "./strings/capitalize/capitalize.ts";
+export { splitArray } from "./arrays/splitArray/splitArray.ts";
 export { toPascalCase } from "./strings/toPascalCase/toPascalCase.ts";
 export { unknownToString } from "./strings/unknownToString/unknownToString.ts";
 export { prefix } from "./strings/prefix/prefix.ts";
+export { template } from "./strings/template/template.ts";
 
 // constants
-export { MIMEType } from "./types/common.ts";
+export { MIMEType } from "./types/common.types.ts";
 
 // types
 export type {
   UUID,
   UnknownObject,
+  UnknownArray,
   EmptyObject,
   RawCellValue,
   RawDataRow,
@@ -141,7 +144,7 @@ export type {
   JSONValue,
   Brand,
   IExternalStore,
-} from "./types/common.ts";
+} from "./types/common.types.ts";
 export type {
   And,
   IsEqual,
@@ -149,7 +152,7 @@ export type {
   IsArray,
   Not,
   ZodSchemaEqualsTypes,
-} from "./types/testUtilityTypes.ts";
+} from "./types/test-utilities.types.ts";
 export type {
   StringKeyOf,
   Entries,
@@ -171,7 +174,8 @@ export type {
   Registry,
   RegistryOfArrays,
   ObjectRegistry,
-} from "./types/utilityTypes.ts";
+  MergeObjects,
+} from "./types/utilities.types.ts";
 export type { PathValue } from "./objects/getValue/getValue.ts";
 export type { ExcludeNullsExceptIn } from "./objects/excludeNullsExceptIn/excludeNullsExceptIn.ts";
 export type { ExcludeNullsIn } from "./objects/excludeNullsIn/excludeNullsIn.ts";

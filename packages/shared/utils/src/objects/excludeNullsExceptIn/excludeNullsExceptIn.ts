@@ -1,7 +1,7 @@
 import { isNull } from "../../guards/isNull/isNull.ts";
 import { objectKeys } from "../objectKeys.ts";
-import type { UnknownObject } from "../../types/common.ts";
-import type { StringKeyOf } from "../../types/utilityTypes.ts";
+import type { UnknownObject } from "../../types/common.types.ts";
+import type { StringKeyOf } from "../../types/utilities.types.ts";
 
 /**
  * The result type of `excludeNullsExceptIn`.
