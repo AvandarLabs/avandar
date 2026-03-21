@@ -1,5 +1,5 @@
 import { isEmptyObject } from "@utils/guards/isEmptyObject/isEmptyObject";
-import { isFunction } from "@utils/guards/isFunction.ts";
+import { isFunction } from "@utils/guards/isFunction";
 import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject";
 import { excludeDeep } from "@utils/objects/excludeDeep/excludeDeep";
 import { objectKeys } from "@utils/objects/objectKeys";

@@ -118,6 +118,7 @@ export { setPropValue } from "./objects/hofs/setPropValue/setPropValue.ts";
 
 // strings
 export { capitalize } from "./strings/capitalize/capitalize.ts";
+export { splitArray } from "./arrays/splitArray/splitArray.ts";
 export { toPascalCase } from "./strings/toPascalCase/toPascalCase.ts";
 export { unknownToString } from "./strings/unknownToString/unknownToString.ts";
 export { prefix } from "./strings/prefix/prefix.ts";
