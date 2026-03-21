@@ -1,5 +1,5 @@
 import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
-import type { UUID } from "@utils/types/common.ts";
+import type { UUID } from "@utils/types/common.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 import type { EntityFieldConfigId } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";

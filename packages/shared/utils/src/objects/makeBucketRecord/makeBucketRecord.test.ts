@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { makeBucketRecord } from "./makeBucketRecord.ts";
-import type { Expect, IsEqual } from "../../types/testUtilityTypes.ts";
+import type { Expect, IsEqual } from "../../types/test-utilities.types.ts";
 
 describe("makeBucketRecord", () => {
   it("groups values by a provided key and appends colliding entries", () => {

@@ -6,7 +6,7 @@ import type { LegacyLocalDatasetEntryModel } from "./Legacy_LocalDatasetEntry.ty
 import type {
   Expect,
   ZodSchemaEqualsTypes,
-} from "@utils/types/testUtilityTypes";
+} from "@utils/types/test-utilities.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 const DBReadSchema = z.object({

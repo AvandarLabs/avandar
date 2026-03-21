@@ -1,4 +1,4 @@
-import type { UnknownObject } from "../types/common.ts";
+import type { UnknownObject } from "../types/common.types.ts";
 
 /**
  * Returns an array of values from an object.

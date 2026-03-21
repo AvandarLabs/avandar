@@ -3,7 +3,7 @@ import { isEpochMs } from "@utils/guards/isEpochMs/isEpochMs";
 import { isISODateString } from "@utils/guards/isISODateString/isISODateString";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { objectValues } from "@utils/objects/objectValues";
-import { UnknownDataFrame } from "@utils/types/common";
+import { UnknownDataFrame } from "@utils/types/common.types";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { useMemo } from "react";
 import { match } from "ts-pattern";

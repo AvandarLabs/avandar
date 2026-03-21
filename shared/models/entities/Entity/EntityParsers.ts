@@ -5,10 +5,10 @@ import { excludeNullsExceptInProps } from "@utils/objects/hofs/excludeNullsExcep
 import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
 import { undefinedsToNullsDeep } from "@utils/objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
-import { ZodSchemaEqualsTypes } from "@utils/types/testUtilityTypes.ts";
+import { ZodSchemaEqualsTypes } from "@utils/types/test-utilities.types.ts";
 import { z } from "zod";
 import type { Entity, EntityId, EntityModel } from "./Entity.types.ts";
-import type { Expect } from "@utils/types/testUtilityTypes.ts";
+import type { Expect } from "@utils/types/test-utilities.types.ts";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 

@@ -23,3 +23,45 @@ export function prop<
     return obj[path as keyof T] as V;
   };
 }
+
+/*
+// TODO(jpsyx): use these improved type annotations
+type PropTypeError<X extends string> = {
+  error: `Invalid path: ${X}`;
+};
+export function prop2<X extends string>(
+  path: X,
+): <
+  T extends object,
+  K extends X extends ([Paths<T>] extends [never] ? keyof T : Paths<T>) ? X
+  : PropTypeError<X>,
+  V extends K extends PropTypeError<X> ? PropTypeError<X>
+  : K extends keyof T ? T[K]
+  : K extends Paths<T> ? PathValue<T, K>
+  : never,
+>(
+  obj: T,
+) => V {
+  return (obj: T) => {
+    if (String(path).includes(".")) {
+      return getValue(obj, path);
+    }
+    return obj[path as keyof T] as V;
+  };
+}
+
+const zz = prop2("name");
+const zzz = zz({ name: "Alice", age: 30 });
+const x = prop2("namez")({ name: "Alice", age: 30 }); // 'Alice'
+
+const y = [
+  { name: "Alice", age: 30 },
+  { name: "Bob", age: 20 },
+].map(prop2("age")); // ['Alice', 'Bob']
+
+const z = [
+  { name: "Alice", age: 30 },
+  { name: "Bob", age: 20 },
+].map(prop2("namez")); // ['Alice', 'Bob']
+
+*/

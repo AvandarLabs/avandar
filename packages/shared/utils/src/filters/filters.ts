@@ -1,4 +1,4 @@
-import type { UnknownObject } from "../types/common.ts";
+import type { UnknownObject } from "../types/common.types.ts";
 
 export const SINGLE_VALUE_OPERATORS = ["eq"] as const;
 export const ARRAY_VALUE_OPERATORS = ["in"] as const;

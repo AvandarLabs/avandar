@@ -3,7 +3,7 @@ import { doesRowPassFilters } from "../doesRowPassFilters/doesRowPassFilters.ts"
 import { isEmptyFiltersObject } from "../isEmptyFiltersObject/isEmptyFiltersObject.ts";
 import { isFiltersByColumnObject } from "../isFiltersByColumnObject/isFiltersByColumnObject.ts";
 import { isFiltersByOperatorObject } from "../isFiltersByOperatorObject/isFiltersByOperatorObject.ts";
-import type { UnknownObject } from "../../types/common.ts";
+import type { UnknownObject } from "../../types/common.types.ts";
 import type { FiltersByColumn, FiltersByOperator } from "../filters.ts";
 
 function applyColumnFilters<T extends UnknownObject>(

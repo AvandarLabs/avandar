@@ -3,7 +3,7 @@ import { objectKeys } from "../../objects/objectKeys.ts";
 import { isArrayValueOperator } from "../isArrayValueOperator/isArrayValueOperator.ts";
 import { isEmptyFiltersObject } from "../isEmptyFiltersObject/isEmptyFiltersObject.ts";
 import { isSingleValueOperator } from "../isSingleValueOperator/isSingleValueOperator.ts";
-import type { UnknownObject } from "../../types/common.ts";
+import type { UnknownObject } from "../../types/common.types.ts";
 import type {
   FilterOperatorRecord,
   FiltersByColumn,

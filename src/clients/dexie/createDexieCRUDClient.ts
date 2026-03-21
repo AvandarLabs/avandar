@@ -12,7 +12,7 @@ import type {
 } from "@clients/ModelCRUDClient/ModelCRUDClient.types";
 import type { ILogger } from "@logger/Logger.types";
 import type { FiltersByColumn } from "@utils/filters/filters";
-import type { EmptyObject } from "@utils/types/common";
+import type { EmptyObject } from "@utils/types/common.types";
 import type { IDType, UpdateSpec } from "dexie";
 
 export type DexieCRUDClient<

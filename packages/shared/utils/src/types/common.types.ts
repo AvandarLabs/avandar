@@ -4,6 +4,7 @@ export type UUID<B extends string = never> =
   [B] extends [never] ? Brand<string, "UUID"> : Brand<string, `${B}UUID`>;
 
 export type UnknownObject = Record<PropertyKey, unknown>;
+export type UnknownArray = readonly unknown[];
 
 // re-export type-fest's EmptyObject as it is
 export type { EmptyObject };

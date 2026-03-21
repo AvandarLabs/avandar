@@ -1,4 +1,4 @@
-import type { Registry } from "../../types/utilityTypes.ts";
+import type { Registry } from "../../types/utilities.types.ts";
 
 /**
  * Helper function to generate a type-safe registry.

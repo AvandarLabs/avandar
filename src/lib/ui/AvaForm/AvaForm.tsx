@@ -14,7 +14,7 @@ import type {
   ValuesOfFieldRecord,
 } from "./AvaForm.types";
 import type { FormRulesRecord, UseFormInput } from "@/lib/hooks/ui/useForm";
-import type { StringKeyOf } from "@utils/types/utilityTypes";
+import type { StringKeyOf } from "@utils/types/utilities.types";
 import type { ReactElement, ReactNode, Ref } from "react";
 
 type Props<

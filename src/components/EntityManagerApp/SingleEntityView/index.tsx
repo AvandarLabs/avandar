@@ -57,6 +57,7 @@ function useHydratedEntity({
     });
   const [entityFieldValues, isLoadingEntityFieldValues] =
     EntityFieldValueClient.withLogger().useGetEntityFieldValues({
+      workspaceId: entity.workspaceId,
       entityId: entity.id,
       entityFieldConfigs: entityFieldConfigs ?? [],
     });

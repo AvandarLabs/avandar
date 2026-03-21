@@ -75,6 +75,7 @@ export function useQuery<
 
         if (import.meta.env.DEV) {
           // only show a frontend notification about this if we're in dev mode
+          console.error(error);
           notifications.show({
             title: "Error!",
             message: errorMessage,

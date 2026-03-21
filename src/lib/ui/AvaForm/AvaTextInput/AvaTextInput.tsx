@@ -9,7 +9,7 @@ import type {
 } from "../AvaForm.types";
 import type { FormType } from "@/lib/hooks/ui/useForm";
 import type { PathValue } from "@utils/objects/getValue/getValue";
-import type { StringKeyOf } from "@utils/types/utilityTypes";
+import type { StringKeyOf } from "@utils/types/utilities.types";
 import type { ChangeEvent } from "react";
 import type { Paths } from "type-fest";
 

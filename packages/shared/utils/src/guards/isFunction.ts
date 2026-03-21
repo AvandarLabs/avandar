@@ -1,4 +1,4 @@
-import type { AnyFunction } from "../../types/utilityTypes.ts";
+import type { AnyFunction } from "../types/utilities.types.ts";
 
 /**
  * Checks if `value` is a function.

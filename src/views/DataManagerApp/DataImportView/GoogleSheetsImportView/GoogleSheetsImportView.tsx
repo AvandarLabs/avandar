@@ -10,14 +10,14 @@ import { Tooltip } from "@ui/Tooltip/Tooltip";
 import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
 import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
 import { snakeCaseKeysShallow } from "@utils/objects/snakeCaseKeysShallow/snakeCaseKeysShallow";
-import { MIMEType } from "@utils/types/common";
+import { MIMEType } from "@utils/types/common.types";
 import { uuid } from "$/lib/uuid";
 import { csvCellValueSchema } from "$/lib/zodHelpers";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
@@ -36,7 +36,7 @@ import {
   DatasetImportForm,
   DatasetImportFormValues,
 } from "../DatasetUploadForm";
-import type { UnknownObject } from "@utils/types/common";
+import type { UnknownObject } from "@utils/types/common.types";
 import type {
   Dataset,
   DatasetId,

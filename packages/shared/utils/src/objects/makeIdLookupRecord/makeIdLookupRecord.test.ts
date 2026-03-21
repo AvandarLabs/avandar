@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { Expect, IsEqual } from "../../types/testUtilityTypes.ts";
 import { makeIdLookupRecord } from "./makeIdLookupRecord.ts";
+import type { Expect, IsEqual } from "../../types/test-utilities.types.ts";
 
 describe("makeIdLookupRecord", () => {
   it("indexes records by the default id key and keeps the last duplicate entry", () => {
@@ -56,9 +56,15 @@ type LookupItem = (typeof makeIdLookupRecordTypeInput)[number];
 // @ts-expect-error allow unused variable declaration.
 type TypeTests = [
   Expect<
-    IsEqual<typeof idLookupByDefaultKey, Record<"user-1" | "user-2", LookupItem>>
+    IsEqual<
+      typeof idLookupByDefaultKey,
+      Record<"user-1" | "user-2", LookupItem>
+    >
   >,
   Expect<
-    IsEqual<typeof idLookupByCustomStringKey, Record<"alpha" | "beta", LookupItem>>
+    IsEqual<
+      typeof idLookupByCustomStringKey,
+      Record<"alpha" | "beta", LookupItem>
+    >
   >,
 ];

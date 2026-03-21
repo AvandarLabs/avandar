@@ -6,8 +6,7 @@ import { assertIsDefined, where } from "@utils/index";
 import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { RawDataClient } from "@/clients/datasets/RawDataClient";
-import { AppConfig } from "@/config/AppConfig";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import type { ObjectKeyRenderOptionsMap } from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
 import type { CSVFileDataset } from "$/models/datasets/CSVFileDataset";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
@@ -85,30 +84,9 @@ const DATASET_METADATA_RENDER_OPTIONS = {
 } satisfies ObjectKeyRenderOptionsMap<DatasetWithColumnsAndSource>;
 
 export function DatasetMetadataList({ dataset }: Props): JSX.Element {
-  const [updateRawColumnMetadata, isUpdatingRawColumnMetadata] =
-    RawDataClient.useUpdateRawColumnMetadata({
-      queriesToInvalidate: [
-        RawDataClient.QueryKeys.getSummary({
-          datasetId: dataset.id,
-        }),
-        RawDataClient.QueryKeys.getPreviewData({
-          datasetId: dataset.id,
-          numRows: AppConfig.dataManagerApp.maxPreviewRows,
-        }),
-        DatasetColumnClient.QueryKeys.getAll(
-          where("dataset_id", "eq", dataset.id),
-        ),
-      ],
-      onSuccess: ({ newDataType, newColumnName }) => {
-        if (newDataType && newColumnName) {
-          notifySuccess("Column name and type updated successfully!");
-        } else if (newDataType) {
-          notifySuccess("Column type updated successfully!");
-        } else if (newColumnName) {
-          notifySuccess("Column name updated successfully!");
-        }
-      },
-    });
+  const [dropLocalDataset] = LocalDatasetClient.useDropLocalDataset({
+    queryToInvalidate: LocalDatasetClient.QueryKeys.getAll(),
+  });
 
   const [updateDatasetColumn, isUpdatingDatasetColumn] =
     DatasetColumnClient.useUpdate({
@@ -117,6 +95,10 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
       ),
       onSuccess: () => {
         notifySuccess("Column description updated successfully!");
+
+        // drop the local column data so it can be re-materialized when the
+        // dataset is next loaded. No need to await this promise though.
+        dropLocalDataset({ datasetId: dataset.id });
       },
     });
 
@@ -128,13 +110,14 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
         includeKeys={["updatedAt", "sourceType", "..."]}
         excludeKeys={EXCLUDED_DATASET_METADATA_KEYS}
         keyRenderOptions={DATASET_METADATA_RENDER_OPTIONS}
-        onSubmitChange={(value) => {
+        onSubmitChange={async (value) => {
           if (Model.isModelOfType(value, "DatasetColumn")) {
             const datasetColumn = value;
             const prevDatasetColumn = dataset.columns?.find((column) => {
               return column.id === value.id;
             });
             assertIsDefined(prevDatasetColumn);
+
             const newColumnName =
               datasetColumn.name !== prevDatasetColumn.name ?
                 datasetColumn.name
@@ -146,23 +129,24 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
               ) ?
                 datasetColumn.dataType
               : undefined;
-            if (newColumnName !== undefined || newDataType !== undefined) {
-              updateRawColumnMetadata({
-                columnId: datasetColumn.id,
-                datasetId: datasetColumn.datasetId,
-                prevColumnName: prevDatasetColumn.name,
-                sourceType: dataset.sourceType,
-                newColumnName,
-                newDataType,
-              });
-            }
+            const newDescription =
+              datasetColumn.description !== prevDatasetColumn.description ?
+                datasetColumn.description
+              : undefined;
 
-            // update the description
-            if (datasetColumn.description !== prevDatasetColumn.description) {
+            // update the column metadata in the backend if any changes were
+            // made to the description, data type, or name
+            if (
+              newDescription !== undefined ||
+              newDataType !== undefined ||
+              newColumnName !== undefined
+            ) {
               updateDatasetColumn({
                 id: datasetColumn.id,
                 data: {
-                  description: datasetColumn.description,
+                  description: newDescription,
+                  dataType: newDataType,
+                  name: newColumnName,
                 },
               });
             }
@@ -170,7 +154,7 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
         }}
       />
       <FloatingLoader
-        visible={isUpdatingRawColumnMetadata || isUpdatingDatasetColumn}
+        visible={isUpdatingDatasetColumn}
         label="Updating dataset"
       />
     </>

@@ -19,7 +19,7 @@ import { DatasetParquetStorageClient } from "../storage/DatasetParquetStorageCli
 import { CSVFileDatasetClient } from "./CSVFileDatasetClient";
 import { DatasetColumnClient } from "./DatasetColumnClient";
 import { GoogleSheetsDatasetClient } from "./GoogleSheetsDatasetClient";
-import { LocalDatasetClient } from "./LocalDatasetClient";
+import { LocalDatasetClient } from "./LocalDatasetClient/LocalDatasetClient";
 import type { FiltersByColumn } from "@utils/filters/filters";
 import type { ExcludeNullsIn } from "@utils/objects/excludeNullsIn/excludeNullsIn";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types";

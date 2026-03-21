@@ -1,5 +1,5 @@
 import type { VersionedModel } from "@/models/Model";
-import type { UUID } from "$/lib/types/common";
+import type { UUID } from "$/lib/types/common.types";
 
 type ModelType = "$MODEL_NAME$";
 

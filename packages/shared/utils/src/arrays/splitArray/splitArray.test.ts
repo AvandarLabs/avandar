@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { splitArray } from "./splitArray";
+import { splitArray } from "./splitArray.ts";
 
 describe("splitArray", () => {
   it("splits by predicate functions and omits matching items", () => {

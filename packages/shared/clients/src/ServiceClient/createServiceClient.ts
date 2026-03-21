@@ -11,11 +11,13 @@ import { ServiceClient } from "./ServiceClient.types.ts";
 export function createServiceClient<ClientName extends string>(
   clientName: ClientName,
 ): ServiceClient<ClientName> {
-  return createModule(clientName).mixin(({ module }) => {
-    return {
-      getClientName() {
-        return module.getModuleName();
-      },
-    };
+  return createModule(clientName, {
+    builder: (module) => {
+      return {
+        getClientName: () => {
+          return module.getModuleName();
+        },
+      };
+    },
   });
 }

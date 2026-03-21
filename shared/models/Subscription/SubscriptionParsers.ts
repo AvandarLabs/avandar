@@ -21,7 +21,7 @@ import type {
 import type {
   Expect,
   ZodSchemaEqualsTypes,
-} from "@utils/types/testUtilityTypes.ts";
+} from "@utils/types/test-utilities.types.ts";
 
 const DBReadSchema = z.object({
   polar_subscription_id: z.uuid(),

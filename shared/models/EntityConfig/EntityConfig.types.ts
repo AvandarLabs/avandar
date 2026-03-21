@@ -4,7 +4,7 @@ import type { EntityFieldConfig } from "./EntityFieldConfig/EntityFieldConfig.ty
 import type { EntityFieldValueExtractor } from "./ValueExtractor/ValueExtractor.types.ts";
 import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
 import type { Model } from "@models/Model/Model.ts";
-import type { UUID } from "@utils/types/common.ts";
+import type { UUID } from "@utils/types/common.types.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { Paths, SetOptional, SetRequiredDeep, Simplify } from "type-fest";
 

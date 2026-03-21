@@ -2,7 +2,7 @@ import type { Model } from "@/models/Model";
 import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
 import type { SetOptional } from "type-fest";
 import type { WorkspaceId } from "@/models/Workspace/Workspace.types";
-import type { UUID } from "$/lib/types/common";
+import type { UUID } from "$/lib/types/common.types";
 
 type ModelType = "$MODEL_NAME$";
 
