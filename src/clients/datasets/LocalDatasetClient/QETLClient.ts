@@ -2,14 +2,14 @@ import { createModule } from "@modules/createModule";
 import { createModuleFactory } from "@modules/createModuleFactory";
 import { where } from "@utils/filters/where/where";
 import { isDefined } from "@utils/guards/isDefined/isDefined";
-import { EmptyObject, propEq, UnknownObject } from "@utils/index";
+import { EmptyObject, objectKeys, propEq, UnknownObject } from "@utils/index";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
 import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord";
-import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral";
 import { CSVFileDataset } from "$/models/datasets/CSVFileDataset";
 import { Dataset, DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import { DuckDBDataType } from "$/models/datasets/DatasetColumn/DuckDBDataTypes";
+import { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types";
 import { match } from "ts-pattern";
 import { AuthClient } from "@/clients/AuthClient";
 import { DuckDBClient, UnknownRow } from "@/clients/DuckDBClient";
@@ -17,12 +17,14 @@ import { DuckDBLoadParquetResult } from "@/clients/DuckDBClient/DuckDBClient.typ
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { difference } from "@/lib/utils/arrays/difference/difference";
-import { promiseMap } from "@/lib/utils/promises";
+import { promiseFlatMap, promiseMap } from "@/lib/utils/promises";
 import { CSVFileDatasetClient } from "../CSVFileDatasetClient";
 import { DatasetClient } from "../DatasetClient";
 import { DatasetColumnClient } from "../DatasetColumnClient";
+import { VirtualDatasetClient } from "../VirtualDatasetClient";
 import { LocalDatasetClient } from "./LocalDatasetClient";
 import type { Module } from "@modules/createModule";
+import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -57,15 +59,21 @@ type ColumnReplacement = {
   dataType?: DuckDBDataType;
 };
 
-type Extractor =
+type DiceExtractor =
   | {
       sourceType: "csv_file";
-      dataset: Dataset;
       sourceDataset: CSVFileDataset;
+      dataset: Dataset;
     }
   | {
-      // TODO(jpsyx): implement Google Sheets extraction
+      sourceType: "virtual";
+      sourceDataset: VirtualDataset.T;
+      dataset: Dataset;
+    }
+  | {
       sourceType: "google_sheets";
+      dataset: Dataset;
+      sourceDataset: GoogleSheetsDataset;
     };
 
 /**
@@ -191,44 +199,55 @@ const QETLClientFactory = createModuleFactory<IQETLClient>("QETLClient", {
       }: {
         dice: readonly DatasetId[];
       }): Promise<{
-        extractors: readonly Extractor[];
+        diceExtractors: DiceExtractor[];
       }> => {
         const datasets = await DatasetClient.getAll(where("id", "in", dice));
-        const csvFileDatasets = makeIdLookupRecord(
-          await CSVFileDatasetClient.getAll(
-            where("dataset_id", "in", datasets.map(prop("id"))),
-          ),
-          { key: "datasetId" },
+        const datasetsById = makeIdLookupRecord(datasets);
+        const datasetsBySourceType = makeBucketRecord(datasets, {
+          key: "sourceType",
+        });
+
+        const diceExtractors = await promiseFlatMap(
+          objectKeys(datasetsBySourceType),
+          async (sourceType) => {
+            const extractors: DiceExtractor[] = await match(sourceType)
+              .with("csv_file", async (type) => {
+                const ids = datasetsBySourceType[type].map(prop("id"));
+                const csvDatasets = await CSVFileDatasetClient.getAll(
+                  where("dataset_id", "in", ids),
+                );
+                return csvDatasets.map((csvDataset) => {
+                  return {
+                    dataset: datasetsById[csvDataset.datasetId]!,
+                    sourceType: "csv_file",
+                    sourceDataset: csvDataset,
+                  } as const;
+                });
+              })
+              .with("virtual", async (type) => {
+                const ids = datasetsBySourceType[type].map(prop("id"));
+                const virtualDatasets = await VirtualDatasetClient.getAll(
+                  where("dataset_id", "in", ids),
+                );
+                return virtualDatasets.map((virtualDataset) => {
+                  return {
+                    dataset: datasetsById[virtualDataset.datasetId]!,
+                    sourceType: "virtual",
+                    sourceDataset: virtualDataset,
+                  } as const;
+                });
+              })
+              .with("google_sheets", async () => {
+                throw new Error(
+                  "Google Sheets extraction is not supported yet",
+                );
+              })
+              .exhaustive();
+            return extractors;
+          },
         );
 
-        return {
-          extractors: datasets
-            .map((dataset) => {
-              return matchLiteral(dataset.sourceType, {
-                csv_file: () => {
-                  if (!csvFileDatasets[dataset.id]) {
-                    return undefined;
-                  }
-                  return {
-                    dataset,
-                    sourceType: "csv_file",
-                    sourceDataset: csvFileDatasets[dataset.id]!,
-                  } as const;
-                },
-                google_sheets: () => {
-                  throw new Error(
-                    "Google Sheets extraction is not supported yet",
-                  );
-                },
-                exhaustive: () => {
-                  throw new Error(
-                    `Invalid dataset source type to build an extractor: ${dataset.sourceType}`,
-                  );
-                },
-              });
-            })
-            .filter(isDefined),
-        };
+        return { diceExtractors };
       },
     };
 
@@ -245,25 +264,25 @@ const QETLClientFactory = createModuleFactory<IQETLClient>("QETLClient", {
       fetchData: async ({
         extractors,
       }: {
-        extractors: readonly Extractor[];
+        extractors: readonly DiceExtractor[];
       }): Promise<Array<{ datasetId: DatasetId; parquetBlob: Blob }>> => {
         const blobs = await promiseMap(extractors, async (extractor) => {
+          // first check if the dataset is in the local storage cache
+          const localDataset = await LocalDatasetClient.getById({
+            id: extractor.dataset.id,
+          });
+
+          // if we have a cache hit, then return the parquet blob, no need
+          // to download from cloud storage
+          if (localDataset) {
+            return {
+              datasetId: extractor.dataset.id,
+              parquetBlob: localDataset.parquetData,
+            };
+          }
+
           return match(extractor)
             .with({ sourceType: "csv_file" }, async (ex) => {
-              // first check if the dataset is in the local storage cache
-              const localDataset = await LocalDatasetClient.getById({
-                id: ex.dataset.id,
-              });
-
-              // if we have a cache hit, then return the parquet blob, no need
-              // to download from cloud storage
-              if (localDataset) {
-                return {
-                  datasetId: ex.dataset.id,
-                  parquetBlob: localDataset.parquetData,
-                };
-              }
-
               const parquetBlob =
                 await DatasetParquetStorageClient.downloadDataset({
                   datasetId: ex.dataset.id,
@@ -275,8 +294,19 @@ const QETLClientFactory = createModuleFactory<IQETLClient>("QETLClient", {
                   `Failed to download data for CSV file dataset '${ex.dataset.id}' (${ex.dataset.name})`,
                 );
               }
-
               return { datasetId: ex.dataset.id, parquetBlob };
+            })
+            .with({ sourceType: "virtual" }, async (ex) => {
+              // virtual datasets result in a recursive QETL call
+              const evaluatedBlob = await runQuery({
+                rawSQL: ex.sourceDataset.rawSQL,
+                returnType: "parquet",
+              });
+
+              return {
+                datasetId: ex.dataset.id,
+                parquetBlob: evaluatedBlob,
+              };
             })
             .with({ sourceType: "google_sheets" }, () => {
               throw new Error(
@@ -318,7 +348,7 @@ const QETLClientFactory = createModuleFactory<IQETLClient>("QETLClient", {
         );
 
         const columnsByDatasetId = makeBucketRecord(columns, {
-          keyFn: prop("datasetId"),
+          key: "datasetId",
         });
 
         // iterate through each fact and load it into the MemoryCube. We know
@@ -355,88 +385,106 @@ const QETLClientFactory = createModuleFactory<IQETLClient>("QETLClient", {
       },
     };
 
-    return {
-      runQuery: async <RowObject extends UnknownObject = UnknownRow>({
+    async function runQuery(options: {
+      rawSQL: string;
+      returnType: "parquet";
+    }): Promise<Blob>;
+    async function runQuery<
+      RowObject extends UnknownObject = UnknownRow,
+    >(options: {
+      rawSQL: string;
+      returnType?: "js";
+    }): Promise<QueryResult<RowObject>>;
+    async function runQuery<RowObject extends UnknownObject = UnknownRow>({
+      rawSQL,
+      returnType = "js",
+    }: {
+      rawSQL: string;
+      returnType?: "parquet" | "js";
+    }): Promise<Blob | QueryResult<RowObject>> {
+      // From Baldacci et. al. (2017) p.6:
+      // 1. Dice management determines the set of missing dice and transmits
+      //    them to optimization and filtering.
+      // 2. Optimization determines a set of optimal extractions and calls the
+      //    ETL service accordingly.
+      // 3. ETL sends a fetching query to the source data provider.
+      // 4. The source data provider returns the required data.
+      // 5. ETL puts the data in multidimensional form and sends the resulting
+      //    facts to filtering.
+      //    If there is not enough room in the cube:
+      //    5.1. Dice management chooses the dice to be dropped from the cube.
+      // 6. Filtering loads the filtered facts into the cube.
+
+      // For our purposes, the "cube" will be two-layered: the local DuckDB
+      // database for in-memory querying, and IndexedDB for local storage.
+
+      // For now, our dice management will be naive. We will not actually use
+      // any ranges, intervals, or dice. We will simply use the dataset IDs as
+      // the dice. This is far from optimized and will need to be changed
+      // packaging this as its own library.
+
+      // 1. Determine the set of missing dice
+      // First, we inspect the query to determine which datasets are needed
+      // TODO(jpsyx): In a real QETL implementation, we would use a more
+      //   sophisticated algorithm to determine the 'facts' and 'dice' that
+      //   are needed to answer the query. For now, we will just take all
+      //   dataset ids and see which are in memory and local storage. We are
+      //   not using anything more sophisticated for v0.
+      const { missingDice } = await DiceManager.determineMissingDice({
         rawSQL,
-      }: {
-        rawSQL: string;
-      }): Promise<QueryResult<RowObject>> => {
-        // From Baldacci et. al. (2017) p.6:
-        // 1. Dice management determines the set of missing dice and transmits
-        //    them to optimization and filtering.
-        // 2. Optimization determines a set of optimal extractions and calls the
-        //    ETL service accordingly.
-        // 3. ETL sends a fetching query to the source data provider.
-        // 4. The source data provider returns the required data.
-        // 5. ETL puts the data in multidimensional form and sends the resulting
-        //    facts to filtering.
-        //    If there is not enough room in the cube:
-        //    5.1. Dice management chooses the dice to be dropped from the cube.
-        // 6. Filtering loads the filtered facts into the cube.
+      });
 
-        // For our purposes, the "cube" will be two-layered: the local DuckDB
-        // database for in-memory querying, and IndexedDB for local storage.
-
-        // For now, our dice management will be naive. We will not actually use
-        // any ranges, intervals, or dice. We will simply use the dataset IDs as
-        // the dice. This is far from optimized and will need to be changed
-        // packaging this as its own library.
-
-        // 1. Determine the set of missing dice
-        // First, we inspect the query to determine which datasets are needed
-        // TODO(jpsyx): In a real QETL implementation, we would use a more
-        //   sophisticated algorithm to determine the 'facts' and 'dice' that
-        //   are needed to answer the query. For now, we will just take all
-        //   dataset ids and see which are in memory and local storage. We are
-        //   not using anything more sophisticated for v0.
-        const { missingDice } = await DiceManager.determineMissingDice({
-          rawSQL,
-        });
-
-        // 2. Optimization engine determines set of optimal extractions
-        const { extractors } = await OptimizationEngine.determineExtractions({
+      // 2. Optimization engine determines set of optimal extractions
+      const { diceExtractors: extractors } =
+        await OptimizationEngine.determineExtractions({
           dice: missingDice,
         });
 
-        // 3. Call the ETL service to fetch the data, which will in turn
-        //   send a fetching query to the appropriate source data providers.
-        const fetchedData = await ETLService.fetchData({
-          extractors,
+      // 3. Call the ETL service to fetch the data, which will in turn
+      //   send a fetching query to the appropriate source data providers.
+      const fetchedData = await ETLService.fetchData({
+        extractors,
+      });
+
+      // 4. ETL puts the data in multidimensional form and sends the resulting
+      //    facts to filtering.
+      //    TODO(jpsyx): For now, this is just an identity function that
+      //    returns the data. It is a noop with no side-effects, we are not
+      //    doing any of what Baldacci et. al. (2017) describes for this step.
+      //    We will implement this when we have a real QETL implementation
+      //    with proper data cubes and dice management.
+      //    Also, is this even necessary for non-OLAP queries? Perhaps we can
+      //    have a flag in this client for OLAP and non-OLAP (transactional)
+      //    queries.
+      const preparedData = await ETLService.prepareFacts({
+        data: fetchedData,
+      });
+
+      // 5. Dice management chooses the dice to be dropped from the cube (and
+      //    from local storage cache), before we load new data.
+      //    TODO(jpsyx): also not implementing this for now, but it's a
+      //    crucial bit of performance optimization that we need to implement.
+      //    We should decide based on memory and storage usage in the browser.
+      //    The MemoryCube and StorageCubes have to both be managed. The
+      //    MemoryCube will require more swapping.
+
+      // 6. Filtering loads the filtered facts into the MemoryCube
+      await FilteringEngine.loadFacts({
+        facts: preparedData,
+      });
+
+      // now run the actual query against the memory cube, because we can be
+      // confident that all the data is in the memory cube.
+      if (returnType === "js") {
+        return await DuckDBClient.runRawQuery<RowObject>(rawSQL);
+      } else {
+        return await DuckDBClient.runRawQuery(rawSQL, {
+          returnType: "parquet",
         });
+      }
+    }
 
-        // 4. ETL puts the data in multidimensional form and sends the resulting
-        //    facts to filtering.
-        //    TODO(jpsyx): For now, this is just an identity function that
-        //    returns the data. It is a noop with no side-effects, we are not
-        //    doing any of what Baldacci et. al. (2017) describes for this step.
-        //    We will implement this when we have a real QETL implementation
-        //    with proper data cubes and dice management.
-        //    Also, is this even necessary for non-OLAP queries? Perhaps we can
-        //    have a flag in this client for OLAP and non-OLAP (transactional)
-        //    queries.
-        const preparedData = await ETLService.prepareFacts({
-          data: fetchedData,
-        });
-
-        // 5. Dice management chooses the dice to be dropped from the cube (and
-        //    from local storage cache), before we load new data.
-        //    TODO(jpsyx): also not implementing this for now, but it's a
-        //    crucial bit of performance optimization that we need to implement.
-        //    We should decide based on memory and storage usage in the browser.
-        //    The MemoryCube and StorageCubes have to both be managed. The
-        //    MemoryCube will require more swapping.
-
-        // 6. Filtering loads the filtered facts into the MemoryCube
-        await FilteringEngine.loadFacts({
-          facts: preparedData,
-        });
-
-        // now run the actual query against the memory cube, because we can be
-        // confident that all the data is in the memory cube.
-        const result = await DuckDBClient.runRawQuery<RowObject>(rawSQL);
-        return result;
-      },
-    };
+    return { runQuery };
   },
 });
 
@@ -511,12 +559,12 @@ export const WorkspaceQETLClient = createModule("WorkspaceQETLClient", {
             "Cannot run query because user is not authenticated.",
           );
         }
+
         const client = await _getClient({
           workspaceId,
           userId: session.user.id as UserId,
         });
 
-        console.log("runQuery workspace", rawSQL);
         const queryResults = await client.runQuery<RowObject>({ rawSQL });
         return queryResults;
       },

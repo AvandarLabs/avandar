@@ -6,18 +6,20 @@ import { assertIsDefined, where } from "@utils/index";
 import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import type { ObjectKeyRenderOptionsMap } from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
 import type { CSVFileDataset } from "$/models/datasets/CSVFileDataset";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types";
+import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { SetOptional } from "type-fest";
 
 type DatasetWithColumnsAndSource = SetOptional<
   DatasetWithColumns,
   "columns"
 > & {
-  source: CSVFileDataset | GoogleSheetsDataset | undefined;
+  source: CSVFileDataset | GoogleSheetsDataset | VirtualDataset.T | undefined;
 };
 
 type Props = {
@@ -46,6 +48,7 @@ const DATASET_METADATA_RENDER_OPTIONS = {
       return matchLiteral(value, {
         csv_file: "CSV file",
         google_sheets: "Google Sheets",
+        virtual: "Derived Dataset",
         _otherwise: value,
       });
     },
@@ -90,9 +93,12 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
 
   const [updateDatasetColumn, isUpdatingDatasetColumn] =
     DatasetColumnClient.useUpdate({
-      queryToInvalidate: DatasetColumnClient.QueryKeys.getAll(
-        where("dataset_id", "eq", dataset.id),
-      ),
+      queriesToInvalidate: [
+        DatasetColumnClient.QueryKeys.getAll(
+          where("dataset_id", "eq", dataset.id),
+        ),
+        [DatasetQueryClient.getClientName()],
+      ],
       onSuccess: () => {
         notifySuccess("Column description updated successfully!");
 

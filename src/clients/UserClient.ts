@@ -3,7 +3,7 @@ import { withSupabaseClient } from "@clients/SupabaseCRUDClient/withSupabaseClie
 import { withQueryHooks } from "@hooks/withQueryHooks/withQueryHooks";
 import { WithQueryHooks } from "@hooks/withQueryHooks/withQueryHooks.types";
 import { withLogger } from "@logger/module-augmenters/withLogger";
-import { camelCaseKeysShallow } from "@utils/objects/camelCaseKeysShallow/camelCaseKeysShallow";
+import { camelCaseKeysShallow } from "@utils/objects/camelCaseKeys/camelCaseKeys";
 import { omit } from "@utils/objects/omit/omit";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { WorkspaceId } from "$/models/Workspace/Workspace.types";

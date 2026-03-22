@@ -3,11 +3,9 @@ import { where } from "@utils/filters/where/where";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
 import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral";
-import { CSVFileDataset } from "$/models/datasets/CSVFileDataset/CSVFileDataset.types";
 import {
   Dataset,
   DatasetId,
-  DatasetSourceType,
   DatasetWithColumns,
 } from "$/models/datasets/Dataset/Dataset.types";
 import { DatasetParsers } from "$/models/datasets/Dataset/DatasetParsers";
@@ -20,9 +18,10 @@ import { CSVFileDatasetClient } from "./CSVFileDatasetClient";
 import { DatasetColumnClient } from "./DatasetColumnClient";
 import { GoogleSheetsDatasetClient } from "./GoogleSheetsDatasetClient";
 import { LocalDatasetClient } from "./LocalDatasetClient/LocalDatasetClient";
+import { VirtualDatasetClient } from "./VirtualDatasetClient";
 import type { FiltersByColumn } from "@utils/filters/filters";
 import type { ExcludeNullsIn } from "@utils/objects/excludeNullsIn/excludeNullsIn";
-import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { CompositeTypes } from "$/types/database.types";
 import type { SetOptional } from "type-fest";
@@ -51,14 +50,14 @@ export const DatasetClient = createUsableServiceClient(
          */
         getSourceDataset: async (params: {
           datasetId: DatasetId;
-          sourceType: DatasetSourceType;
-        }): Promise<CSVFileDataset | GoogleSheetsDataset | undefined> => {
+          sourceType: DatasetSource.SourceType;
+        }): Promise<DatasetSource.T | undefined> => {
           const logger = clientLogger.appendName("getSourceDataset");
           logger.log("Getting the source dataset", params);
           const { datasetId, sourceType } = params;
           return matchLiteral(sourceType, {
-            query_result: () => {
-              return QueryResultDatasetClient.getOne(
+            virtual: () => {
+              return VirtualDatasetClient.getOne(
                 where("dataset_id", "eq", datasetId),
               );
             },

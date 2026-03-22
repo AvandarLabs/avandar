@@ -786,15 +786,26 @@ SET enable_external_file_cache = true;
    * @param tableOrViewName The name of the table or view to export as a Parquet
    * blob.
    */
-  async exportTableAsParquet(tableOrViewName: string): Promise<Blob> {
+  async exportTableAsParquet(
+    tableOrViewName: string,
+    conn?: duckdb.AsyncDuckDBConnection,
+  ): Promise<Blob> {
     try {
       const db = await this.#getDB();
       const tempParquetFileName = `${tableOrViewName}.temp`;
-
-      await this.#copyTableToParquetWithZSTD({
-        tableName: tableOrViewName,
-        parquetFileName: tempParquetFileName,
-      });
+      await this.runRawQuery(
+        `COPY '$tableName$' TO '$parquetFileName$' (
+          FORMAT 'parquet',
+          COMPRESSION 'ZSTD'
+        )`,
+        {
+          conn,
+          params: {
+            tableName: tableOrViewName,
+            parquetFileName: tempParquetFileName,
+          },
+        },
+      );
 
       const parquetBuffer = (await db.copyFileToBuffer(
         tempParquetFileName,
@@ -807,6 +818,8 @@ SET enable_external_file_cache = true;
       await db.dropFile(tempParquetFileName);
       return parquetBlob;
     } catch (error) {
+      // drop the view so it's not left behind
+      await conn?.query(`DROP VIEW IF EXISTS "${tableOrViewName}"`);
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
       this.#logger.error(error, {
@@ -815,21 +828,6 @@ SET enable_external_file_cache = true;
       });
       throw new Error(`Parquet export failed: ${errorMessage}`);
     }
-  }
-
-  async #copyTableToParquetWithZSTD(options: {
-    tableName: string; // can be a view name too
-    parquetFileName: string;
-  }): Promise<void> {
-    const { tableName, parquetFileName } = options;
-
-    await this.runRawQuery(
-      `COPY '$tableName$' TO '$parquetFileName$' (
-          FORMAT 'parquet',
-          COMPRESSION 'ZSTD'
-        )`,
-      { params: { tableName, parquetFileName } },
-    );
   }
 
   /**
@@ -866,14 +864,31 @@ SET enable_external_file_cache = true;
    */
   async runRawQuery<RowObject extends UnknownRow = UnknownRow>(
     queryString: string,
+    options?: {
+      params?: Record<string, string | number | bigint | undefined>;
+      returnType?: "js";
+      conn?: duckdb.AsyncDuckDBConnection;
+    },
+  ): Promise<QueryResult<RowObject>>;
+  async runRawQuery(
+    queryString: string,
+    options?: {
+      params?: Record<string, string | number | bigint | undefined>;
+      returnType: "parquet";
+      conn?: duckdb.AsyncDuckDBConnection;
+    },
+  ): Promise<Blob>;
+  async runRawQuery<RowObject extends UnknownRow = UnknownRow>(
+    queryString: string,
     options: {
       params?: Record<string, string | number | bigint | undefined>;
+      returnType?: "parquet" | "js";
       conn?: duckdb.AsyncDuckDBConnection;
     } = {},
-  ): Promise<QueryResult<RowObject>> {
-    const { params = {} } = options;
+  ): Promise<Blob | QueryResult<RowObject>> {
+    const { params = {}, returnType = "js" } = options;
     const conn = options.conn ?? (await this.#connect());
-    let queryResults: QueryResult<RowObject>;
+    let queryResults: QueryResult<RowObject> | Blob;
     const paramNames = objectKeys(params);
     const queryStringToUse = paramNames.reduce((currQueryStr, paramName) => {
       const argValue = params[paramName];
@@ -889,11 +904,20 @@ SET enable_external_file_cache = true;
     try {
       this.#logger.log("Executing query", { query: queryStringToUse });
       // run the query
-      const arrowTable =
-        await conn.query<Record<string, arrow.DataType>>(queryStringToUse);
-      queryResults = arrowTableToJS<RowObject>(arrowTable, {
-        logger: this.#logger,
-      });
+      if (returnType === "js") {
+        const arrowTable =
+          await conn.query<Record<string, arrow.DataType>>(queryStringToUse);
+        queryResults = arrowTableToJS<RowObject>(arrowTable, {
+          logger: this.#logger,
+        });
+      } else {
+        // return as parquet blob
+        const tempViewName = uuid();
+        await conn.query(
+          `CREATE TEMP VIEW "${tempViewName}" AS ${queryStringToUse}`,
+        );
+        queryResults = await this.exportTableAsParquet(tempViewName, conn);
+      }
     } catch (error) {
       this.#logger.error(error, {
         executedQueryString: queryStringToUse,

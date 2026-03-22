@@ -1,5 +1,6 @@
 // arrays
 export { splitArray } from "./arrays/splitArray/splitArray.ts";
+export { append } from "./arrays/hofs/append/append.ts";
 
 // asserts
 export { assert } from "./asserts/assert/assert.ts";
@@ -74,8 +75,9 @@ export { traverse } from "./misc/traverse/traverse.ts";
 export { pipe } from "./misc/pipe/pipe.ts";
 
 // objects
-export { camelCaseKeysDeep } from "./objects/camelCaseKeysDeep/camelCaseKeysDeep.ts";
-export { camelCaseKeysShallow } from "./objects/camelCaseKeysShallow/camelCaseKeysShallow.ts";
+export { camelCaseKeys } from "./objects/camelCaseKeys/camelCaseKeys.ts";
+export { camelCaseKeysDeep } from "./objects/camelCaseKeys/camelCaseKeys.ts";
+export { camelCaseKeysShallow } from "./objects/camelCaseKeys/camelCaseKeys.ts";
 export { coerceDatesIn } from "./objects/coerceDatesIn/coerceDatesIn.ts";
 export { convertDatesToISOIn } from "./objects/convertDatesToISOIn/convertDatesToISOIn.ts";
 export { getValue } from "./objects/getValue/getValue.ts";
@@ -121,7 +123,6 @@ export { setPropValue } from "./objects/hofs/setPropValue/setPropValue.ts";
 
 // strings
 export { capitalize } from "./strings/capitalize/capitalize.ts";
-export { splitArray } from "./arrays/splitArray/splitArray.ts";
 export { toPascalCase } from "./strings/toPascalCase/toPascalCase.ts";
 export { unknownToString } from "./strings/unknownToString/unknownToString.ts";
 export { prefix } from "./strings/prefix/prefix.ts";
@@ -155,6 +156,7 @@ export type {
 } from "./types/test-utilities.types.ts";
 export type {
   StringKeyOf,
+  CamelCase,
   Entries,
   Unbrand,
   ExcludeDeep,

@@ -1,7 +1,7 @@
 create type public.datasets__source_type as enum(
   'csv_file',
   'google_sheets',
-  'query_result'
+  'virtual'
 );
 
 create table public.datasets (

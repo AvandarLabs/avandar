@@ -332,7 +332,7 @@ export type Database = {
           },
         ]
       }
-      datasets__query_result: {
+      datasets__virtual: {
         Row: {
           created_at: string
           dataset_id: string
@@ -359,14 +359,14 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "datasets__query_result_dataset_id_fkey"
+            foreignKeyName: "datasets__virtual_dataset_id_fkey"
             columns: ["dataset_id"]
             isOneToOne: true
             referencedRelation: "datasets"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "datasets__query_result_workspace_id_fkey"
+            foreignKeyName: "datasets__virtual_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -1073,7 +1073,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      rpc_datasets__add_query_result_dataset: {
+      rpc_datasets__add_virtual_dataset: {
         Args: {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
           p_dataset_description: string
@@ -1175,7 +1175,7 @@ export type Database = {
         | "UNION"
         | "JSON"
         | "GEOMETRY"
-      datasets__source_type: "csv_file" | "google_sheets" | "query_result"
+      datasets__source_type: "csv_file" | "google_sheets" | "virtual"
       entity_field_configs__value_extractor_type:
         | "dataset_column_value"
         | "manual_entry"
@@ -1386,7 +1386,7 @@ export const Constants = {
         "JSON",
         "GEOMETRY",
       ],
-      datasets__source_type: ["csv_file", "google_sheets", "query_result"],
+      datasets__source_type: ["csv_file", "google_sheets", "virtual"],
       entity_field_configs__value_extractor_type: [
         "dataset_column_value",
         "manual_entry",

@@ -1,5 +1,6 @@
 import { useUncontrolled } from "@mantine/hooks";
 import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
+import { Select } from "@ui/inputs/Select/Select";
 import { where } from "@utils/filters/where/where";
 import { makeBucketMap } from "@utils/maps/makeBucketMap/makeBucketMap";
 import { useMemo } from "react";
@@ -8,11 +9,10 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
-import {
-  Select,
-  type SelectData,
-  type SelectOptionGroup,
-  type SelectProps,
+import type {
+  SelectData,
+  SelectOptionGroup,
+  SelectProps,
 } from "@ui/inputs/Select/Select";
 import type {
   QueryDataSource,
@@ -99,6 +99,9 @@ export function QueryDataSourceSelect({
         })
         .with("google_sheets", () => {
           return "Google Sheets";
+        })
+        .with("virtual", () => {
+          return "Derived Dataset";
         })
         .exhaustive(() => {
           return undefined;
