@@ -14,7 +14,7 @@ import {
   IconDownload,
   IconInfoCircle,
 } from "@tabler/icons-react";
-import { notifyNotImplemented } from "@ui/index";
+import { notifyError, notifyNotImplemented } from "@ui/index";
 import { Tooltip } from "@ui/Tooltip/Tooltip";
 import { isEpochMs, isISODateString, prop } from "@utils/index";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
@@ -23,7 +23,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "./DataExplorerStateManager/DataExplorerStateManager";
 import { downloadRowsAsCSV } from "./downloadRowsAsCSV";
 import { QueryForm } from "./QueryForm/QueryForm";
-import { SaveAsNewDatasetForm } from "./SaveAsNewDatasetForm";
+import { SaveAsNewDatasetForm } from "./SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { useDataQuery } from "./useDataQuery";
 import { VisualizationContainer } from "./VisualizationContainer";
 import { VizSettingsForm } from "./VizSettingsForm/VizSettingsForm";
@@ -92,13 +92,21 @@ export function DataExplorerApp(): JSX.Element {
                 <Menu.Item
                   disabled={queryResultData.length === 0}
                   onClick={() => {
+                    if (!state.rawSQL) {
+                      notifyError(
+                        "Saving a new dataset is only supported for AI queries",
+                      );
+                      return;
+                    }
                     modals.open({
                       title: "Save As New Dataset",
+                      size: "xl",
                       children: (
                         <SaveAsNewDatasetForm
                           queryResultData={queryResultData}
                           columns={queryResultColumns}
                           dateColumns={dateColumns}
+                          rawSQL={state.rawSQL}
                         />
                       ),
                     });

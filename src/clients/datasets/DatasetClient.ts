@@ -134,6 +134,32 @@ export const DatasetClient = createUsableServiceClient(
 
     mutations: ({ clientLogger, dbClient, parsers }) => {
       return {
+        insertVirtualDataset: async (params: {
+          datasetId: DatasetId;
+          workspaceId: WorkspaceId;
+          datasetName: string;
+          datasetDescription: string;
+          columns: DatasetColumnInput[];
+          rawSQL: string;
+        }): Promise<Dataset> => {
+          const logger = clientLogger.appendName("insertVirtualDataset");
+          logger.log("Creating virtual dataset", params);
+          const { data: dataset } = await dbClient
+            .rpc("rpc_datasets__add_virtual_dataset", {
+              p_dataset_id: params.datasetId,
+              p_workspace_id: params.workspaceId,
+              p_dataset_name: params.datasetName,
+              p_dataset_description: params.datasetDescription,
+              p_columns: params.columns.map((col) => {
+                return { ...col, description: col.description ?? null };
+              }),
+              p_raw_sql: params.rawSQL,
+            })
+            .throwOnError();
+          logger.log("Successfully added virtual dataset", dataset);
+          return parsers.fromDBReadToModelRead(dataset);
+        },
+
         /**
          * Inserts a new local CSV dataset into the database.
          *
@@ -160,7 +186,7 @@ export const DatasetClient = createUsableServiceClient(
             timestampFormat: string | null;
           };
         }): Promise<Dataset> => {
-          const logger = clientLogger.appendName("addNewDataset");
+          const logger = clientLogger.appendName("insertCSVFileDataset");
           logger.log("Creating dataset", params);
 
           const {
@@ -295,6 +321,7 @@ export const DatasetClient = createUsableServiceClient(
     mutationFns: [
       "insertCSVFileDataset",
       "insertGoogleSheetsDataset",
+      "insertVirtualDataset",
       "fullDelete",
     ],
   },
