@@ -1,6 +1,7 @@
 create type public.datasets__source_type as enum(
   'csv_file',
-  'google_sheets'
+  'google_sheets',
+  'virtual'
 );
 
 create table public.datasets (
@@ -35,9 +36,7 @@ create table public.datasets (
 alter table public.datasets enable row level security;
 
 -- Policies
-create policy "
-  User can SELECT datasets in their workspace
-" on public.datasets for
+create policy "User can select datasets in their workspace" on public.datasets for
 select
   to authenticated using (
     public.datasets.workspace_id = any (
@@ -48,9 +47,7 @@ select
     )
   );
 
-create policy "
-  User can INSERT datasets in their workspace
-" on public.datasets for insert to authenticated
+create policy "User can insert datasets in their workspace" on public.datasets for insert to authenticated
 with
   check (
     public.datasets.workspace_id = any (
@@ -66,7 +63,7 @@ with
     )
   );
 
-create policy "User can UPDATE datasets in their workspace" on public.datasets
+create policy "User can update datasets in their workspace" on public.datasets
 for update
   to authenticated using (
     public.datasets.workspace_id = any (
@@ -96,9 +93,7 @@ with
     )
   );
 
-create policy "
-  User can DELETE datasets in their workspace
-" on public.datasets for delete to authenticated using (
+create policy "User can delete datasets in their workspace" on public.datasets for delete to authenticated using (
   public.datasets.workspace_id = any (
     array(
       select

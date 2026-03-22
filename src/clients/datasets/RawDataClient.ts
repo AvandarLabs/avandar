@@ -38,6 +38,10 @@ type RawDataClientQueries = {
    * {@link DuckDBStructuredQuery} object, except with the `tableName`
    * replaced by a `datasetId` field.
    * @returns An array of rows
+   *
+   * TODO(jpsyx): this is the only reason we can't fully delete this module yet.
+   * We need to find a way to convert structured queries to raw SQL queries and
+   * then call the WorkspaceQETLClient instead.
    */
   runLocalStructuredQuery: <T extends UnknownRow = UnknownRow>(
     params: DatasetLocalStructuredQueryOptions,
@@ -103,5 +107,8 @@ function createRawDataClient(): WithLogger<
  * that our components can use to query for dataset data. Internally, this
  * client will then query the necessary sub-systems (e.g. DuckDB, external APIs)
  * to extract and transform the required data.
+ *
+ * @deprecated This client is deprecated. We should use the
+ * {@link WorkspaceQETLClient} instead.
  */
 export const RawDataClient = createRawDataClient();

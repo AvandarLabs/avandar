@@ -3,6 +3,7 @@ import type {
   KeyAsString as BroadStringKeyOf,
   ConditionalKeys,
   Simplify,
+  CamelCase as StringToCamelCase,
   UnionToIntersection,
   UnknownRecord,
 } from "type-fest";
@@ -15,6 +16,11 @@ import type {
 export type StringKeyOf<T> =
   BroadStringKeyOf<T> extends `${infer S extends string}` ? S
   : BroadStringKeyOf<T>;
+
+export type CamelCase<
+  T extends string,
+  PreserveUppercase extends boolean | undefined = true,
+> = StringToCamelCase<T, { preserveConsecutiveUppercase: PreserveUppercase }>;
 
 /**
  * Get all the entries of an object as an array of tuples that preserve the

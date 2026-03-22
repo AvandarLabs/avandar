@@ -21,7 +21,7 @@ import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap/makeIdLookupMa
 import { makeMap } from "@/lib/utils/maps/makeMap/makeMap";
 import { ActivityBlock } from "./ActivityBlock";
 import { StatusPill } from "./StatusPill";
-import type { DatasetSourceType } from "$/models/datasets/Dataset/Dataset.types";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { Entity } from "$/models/entities/Entity/Entity.types";
 import type { EntityFieldValue } from "$/models/entities/EntityFieldValue/EntityFieldValue.types";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig.types";
@@ -33,7 +33,7 @@ type HydratedEntity = Entity & {
   fieldValues?: Array<
     EntityFieldValue & {
       fieldName?: string;
-      sourceType?: DatasetSourceType;
+      sourceType?: DatasetSource.SourceType;
       sourceName?: string;
     }
   >;
@@ -142,7 +142,7 @@ type Props = {
 
 type FieldValueMetadata = {
   value: EntityFieldValue["value"];
-  sourceType?: DatasetSourceType;
+  sourceType?: DatasetSource.SourceType;
   sourceName?: string;
 };
 

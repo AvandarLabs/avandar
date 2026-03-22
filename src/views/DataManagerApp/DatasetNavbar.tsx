@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { makeBucketMap } from "@utils/maps/makeBucketMap/makeBucketMap";
 import { prop } from "@utils/objects/hofs/prop/prop";
-import { Datasets } from "$/models/datasets/Dataset/Datasets";
+import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -62,7 +62,7 @@ export function DatasetNavbar({
       keyFn: prop("sourceType"),
     });
 
-    const datasetLinks = Datasets.SourceTypes.flatMap((sourceType) => {
+    const datasetLinks = DatasetSource.SourceTypes.flatMap((sourceType) => {
       return (datasetsByType.get(sourceType) ?? []).map((dataset) => {
         return makeDatasetLink({
           workspaceSlug,

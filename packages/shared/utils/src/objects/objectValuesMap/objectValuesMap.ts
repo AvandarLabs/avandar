@@ -13,12 +13,12 @@ import type { UnknownObject } from "../../types/common.types.ts";
 export function objectValuesMap<T extends UnknownObject, V>(
   obj: T,
   fn: (value: T[keyof T], key: keyof T) => V,
-  options?: { excludeUndefined?: false },
+  options?: { excludeUndefinedFromResult?: false },
 ): { [K in keyof T]: V };
 export function objectValuesMap<T extends UnknownObject, V>(
   obj: T,
   fn: (value: T[keyof T], key: keyof T) => V,
-  options: { excludeUndefined: true },
+  options: { excludeUndefinedFromResult: true },
 ): { [K in keyof T]: Exclude<V, undefined> };
 export function objectValuesMap<T extends UnknownObject, V>(
   obj: T,
@@ -30,12 +30,12 @@ export function objectValuesMap<T extends UnknownObject, V>(
      * from the result.
      * @default false
      */
-    excludeUndefined?: boolean;
+    excludeUndefinedFromResult?: boolean;
   } = {},
 ): {
   [K in keyof T]: V;
 } {
-  const { excludeUndefined = false } = options;
+  const { excludeUndefinedFromResult = false } = options;
   const newObj = {} as { [K in keyof T]: V };
 
   // intentionally using a for loop here since this is a low-level
@@ -44,7 +44,7 @@ export function objectValuesMap<T extends UnknownObject, V>(
   for (const key in obj) {
     if (Object.hasOwn(obj, key)) {
       const mappedValue = fn(obj[key], key);
-      if (excludeUndefined && mappedValue === undefined) {
+      if (excludeUndefinedFromResult && mappedValue === undefined) {
         continue;
       }
       newObj[key] = mappedValue;

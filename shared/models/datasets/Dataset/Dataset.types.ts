@@ -1,15 +1,14 @@
+import type { DatasetSource } from "../DatasetSource/DatasetSource.ts";
 import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
 import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 import type { UserId, UserProfileId } from "$/models/User/User.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
-import type { Enums } from "$/types/database.types.ts";
 import type { SetOptional } from "type-fest";
 
 type ModelType = "Dataset";
 export type DatasetId = UUID<ModelType>;
-export type DatasetSourceType = Enums<"datasets__source_type">;
 
 type DatasetRead = Model.Base<
   ModelType,
@@ -30,7 +29,7 @@ type DatasetRead = Model.Base<
     name: string;
 
     /** Type of the dataset. */
-    sourceType: DatasetSourceType;
+    sourceType: DatasetSource.SourceType;
 
     /** Unique identifier of the owner of the dataset. */
     ownerId: UserId;

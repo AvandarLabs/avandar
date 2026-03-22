@@ -12,6 +12,7 @@ import type { Writable } from "type-fest";
 
 type Props = {
   columnNames: readonly string[];
+  className?: string;
 
   /**
    * The `data` is a conventional data frame represented as an array of rows,
@@ -23,6 +24,7 @@ type Props = {
   dateColumns?: ReadonlySet<string>;
   dateFormat?: string;
   timezone?: FormattableTimezone;
+  style?: React.CSSProperties;
 };
 
 const avandarGridTheme = themeMaterial.withParams({
@@ -34,11 +36,13 @@ const avandarGridTheme = themeMaterial.withParams({
 
 export function DataGrid({
   columnNames,
+  className,
   data,
   dateColumns,
   height = 500,
   dateFormat = "YYYY-MM-DD HH:mm:ss",
   timezone,
+  style,
 }: Props): JSX.Element {
   const columnDefs = useMemo(() => {
     return columnNames.map((field) => {
@@ -61,8 +65,9 @@ export function DataGrid({
 
   // AgGrid will fill the size of the parent container
   return (
-    <Box style={{ height, width: "100%" }}>
+    <Box className={className} style={{ height, width: "100%", ...style }}>
       <AgGridReact
+        defaultColDef={{ flex: 1, minWidth: 120 }}
         columnDefs={columnDefs}
         theme={avandarGridTheme}
         rowData={data as Writable<UnknownDataFrame>}

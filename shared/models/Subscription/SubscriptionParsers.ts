@@ -1,6 +1,6 @@
 import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
 import { pipe } from "@utils/misc/pipe/pipe.ts";
-import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeysDeep/camelCaseKeysDeep.ts";
+import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
 import { excludeNullsDeep } from "@utils/objects/excludeNullsDeep/excludeNullsDeep.ts";
 import { coerceDatesInProps } from "@utils/objects/hofs/coerceDatesInProps/coerceDatesInProps.ts";
 import { convertDatesToISOInProps } from "@utils/objects/hofs/convertDatesToISOInProps/convertDatesToISOInProps.ts";
