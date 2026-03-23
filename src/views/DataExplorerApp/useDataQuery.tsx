@@ -2,32 +2,21 @@ import { useQuery } from "@hooks/useQuery/useQuery";
 import { Model } from "@models/Model/Model";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { makeObjectFromEntries } from "@utils/objects/makeObjectFromEntries/makeObjectFromEntries";
-import { objectEntries } from "@utils/objects/objectEntries";
-import { objectValues } from "@utils/objects/objectValues";
-import { DuckDBQueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationTypes";
-import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
+import { sortObjList } from "@utils/objects/sortObjList/sortObjList";
 import { QueryResults } from "$/models/queries/QueryResult/QueryResults";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { WorkspaceQETLClient } from "@/clients/datasets/LocalDatasetClient/QETLClient";
-import { RawDataClient } from "@/clients/datasets/RawDataClient";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
-import { isOfModelType } from "@/lib/utils/guards/guards";
-import {
-  valIsOfModelType,
-  valNotEq,
-} from "@/lib/utils/guards/higherOrderFuncs";
-import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap/makeIdLookupMap";
-import { sortObjList } from "@/lib/utils/objects/sortObjList";
 import type { UnknownRow } from "@/clients/DuckDBClient";
 import type { UseQueryResultTuple } from "@hooks/useQuery/useQuery";
 import type {
   QueryResult,
   QueryResultColumn,
 } from "$/models/queries/QueryResult/QueryResult.types";
-import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 type UseDataQueryOptions = {
-  query: PartialStructuredQuery;
+  query: StructuredQuery.Partial;
   rawSQL: string | undefined;
   workspaceId: Workspace.Id | undefined;
 };
@@ -94,63 +83,10 @@ export function useDataQuery({
         const queryResults = await Model.match(dataSource, {
           // Querying datasets is simple. We can just query the dataset
           // directly with the DatasetRawDataClient.
-          Dataset: async (dataset): Promise<QueryResult<UnknownRow>> => {
-            const queryColumnLookup = makeIdLookupMap(sortedQueryColumns, {
-              key: "id",
-            });
-
-            // First, we need to convert the structured query into a
-            // DuckDB structured query.
-            const duckDBAggregations = {} as Record<
-              string, // duckdb uses column names for aggregations
-              DuckDBQueryAggregationType
-            >;
-            const groupByColumnNames = [] as string[];
-
-            const atLeastOneColumnHasAggregation = objectValues(
-              aggregations,
-            ).some(valNotEq("none"));
-
-            objectEntries(aggregations).forEach(([columnId, aggregation]) => {
-              const column = queryColumnLookup.get(columnId);
-              if (isOfModelType("DatasetColumn", column?.baseColumn)) {
-                // "group_by" and "none" are not valid DucKDB aggregations, so
-                // we exclude them here.
-                if (aggregation !== "group_by" && aggregation !== "none") {
-                  duckDBAggregations[column.baseColumn.name] = aggregation;
-                } else {
-                  // But if the aggregation is "group_by" or there is at least
-                  // one other column with an aggregation, then we add this
-                  // column to the groupBy list to make sure our SQL query
-                  // remains valid.
-                  if (
-                    atLeastOneColumnHasAggregation ||
-                    aggregation === "group_by"
-                  ) {
-                    groupByColumnNames.push(column.baseColumn.name);
-                  }
-                }
-              }
-            });
-
-            const selectColumnNames = sortedQueryColumns.map(
-              prop("baseColumn.name"),
-            );
-            const orderByColumnName =
-              orderByColumn && queryColumnLookup.has(orderByColumn) ?
-                QueryColumns.getDerivedColumnName(
-                  queryColumnLookup.get(orderByColumn)!,
-                )
-              : undefined;
-            return await RawDataClient.runLocalStructuredQuery({
-              query: {
-                datasetId: dataset.id,
-                aggregations: duckDBAggregations,
-                selectColumnNames,
-                groupByColumnNames,
-                orderByDirection,
-                orderByColumnName,
-              },
+          Dataset: async (): Promise<QueryResult<UnknownRow>> => {
+            return await WorkspaceQETLClient.runQuery({
+              rawSQL: StructuredQuery.toRawDuckDBQuery(query),
+              workspaceId,
             });
           },
 
@@ -164,7 +100,7 @@ export function useDataQuery({
             // table-materialization approach
             const fields = sortedQueryColumns
               .map(prop("baseColumn"))
-              .filter(valIsOfModelType("EntityFieldConfig"));
+              .filter(Model.valIsOfModelType("EntityFieldConfig"));
 
             // TODO(jpsyx): we still need to apply group bys, aggregations,
             // and sorting. Right now its just returning all values for the

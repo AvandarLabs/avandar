@@ -117,7 +117,7 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
         excludeKeys={EXCLUDED_DATASET_METADATA_KEYS}
         keyRenderOptions={DATASET_METADATA_RENDER_OPTIONS}
         onSubmitChange={async (value) => {
-          if (Model.isModelOfType(value, "DatasetColumn")) {
+          if (Model.isOfModelType(value, "DatasetColumn")) {
             const datasetColumn = value;
             const prevDatasetColumn = dataset.columns?.find((column) => {
               return column.id === value.id;

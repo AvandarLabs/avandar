@@ -1,4 +1,4 @@
-import { identity } from "@utils/misc/identity";
+import { identity } from "@utils/misc/identity.ts";
 
 /**
  * Creates a map from a list of items, given a function to extract the key

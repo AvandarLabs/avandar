@@ -63,8 +63,15 @@ export { isPrimitive } from "./guards/isPrimitive/isPrimitive.ts";
 export { isValidDateValue } from "./guards/isValidDateValue/isValidDateValue.ts";
 export { hasDefinedProps } from "./guards/hasDefinedProps/hasDefinedProps.ts";
 
+// guards - higher order functions
+export { valEq } from "./guards/hofs/valEq.ts";
+export { valNotEq } from "./guards/hofs/valNotEq.ts";
+
 // maps
 export { makeBucketMap } from "./maps/makeBucketMap/makeBucketMap.ts";
+export { makeIdLookupMap } from "./maps/makeIdLookupMap/makeIdLookupMap.ts";
+export { makeMap } from "./maps/makeMap/makeMap.ts";
+export { mergeBucketMaps } from "./maps/mergeBucketMaps/mergeBucketMaps.ts";
 
 // misc
 export { constant } from "./misc/constant/constant.ts";
@@ -105,6 +112,10 @@ export { snakeCaseKeysDeep } from "./objects/snakeCaseKeysDeep/snakeCaseKeysDeep
 export { snakeCaseKeysShallow } from "./objects/snakeCaseKeysShallow/snakeCaseKeysShallow.ts";
 export { swapDeep } from "./objects/swapDeep/swapDeep.ts";
 export { undefinedsToNullsDeep } from "./objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
+export {
+  mixedComparator,
+  sortObjList,
+} from "./objects/sortObjList/sortObjList.ts";
 
 // objects - higher order functions
 export { coerceDatesInProps } from "./objects/hofs/coerceDatesInProps/coerceDatesInProps.ts";
@@ -123,6 +134,10 @@ export { setPropValue } from "./objects/hofs/setPropValue/setPropValue.ts";
 
 // strings
 export { capitalize } from "./strings/capitalize/capitalize.ts";
+export {
+  sortStrings,
+  stringComparator,
+} from "./strings/sortStrings/sortStrings.ts";
 export { toPascalCase } from "./strings/toPascalCase/toPascalCase.ts";
 export { unknownToString } from "./strings/unknownToString/unknownToString.ts";
 export { prefix } from "./strings/prefix/prefix.ts";

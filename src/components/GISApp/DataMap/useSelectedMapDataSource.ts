@@ -1,9 +1,9 @@
+import { Model } from "@models/Model/Model";
 import { template } from "@utils/index";
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
 import { MapLayerMouseEvent, Map as MapLibreMap } from "maplibre-gl";
 import { RefObject, useEffect, useRef } from "react";
 import { WorkspaceQETLClient } from "@/clients/datasets/LocalDatasetClient/QETLClient";
-import { isOfModelType } from "@/lib/utils/guards/guards";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.types";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 
@@ -58,7 +58,7 @@ export function useSelectedMapDataSource({
       !selectedDataSource ||
       !latitudeColumn ||
       !longitudeColumn ||
-      !isOfModelType("Dataset", selectedDataSource)
+      !Model.isOfModelType(selectedDataSource, "Dataset")
     ) {
       // Remove existing layer and source if they exist
       if (map.getLayer(GEOJSON_LAYER_ID)) {
