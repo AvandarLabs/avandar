@@ -23,7 +23,6 @@ import {
 } from "@tabler/icons-react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { APP_NAME } from "$/config/AppConfig";
-import { clsx } from "clsx";
 import { AuthClient } from "@/clients/AuthClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { BetaBadge } from "@/components/common/BetaBadge/BetaBadge";
@@ -109,36 +108,58 @@ export function Navbar({
   return (
     <>
       <Group
-        className={clsx(css.navbarTitleLink, "transition-colors")}
-        px="md"
+        pl="xs"
         pt="sm"
         pb="xs"
         wrap="nowrap"
-        justify="space-between"
-        gap={0}
+        align="center"
+        gap="xs"
+        w="100%"
       >
-        <Group wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
-          {mobile.burgerIcon}
-          <Menu shadow="md" width={200}>
+        {mobile.burgerIcon}
+        <Box flex={1} miw={0}>
+          <Menu shadow="md" width={200} w="100%">
             <Menu.Target>
               <UnstyledButton className="w-full text-left">
-                <Group gap={0} w="100%" justify="space-between" align="center">
-                  <Group gap="xs">
-                    {logo}
-                    <Text
-                      className="font-medium leading-tight"
+                <Flex
+                  px="xs"
+                  py="xs"
+                  bdrs="md"
+                  align="center"
+                  className={css.navbarLinkPill}
+                  w="100%"
+                >
+                  <Group
+                    gap="xs"
+                    wrap="nowrap"
+                    align="center"
+                    justify="space-between"
+                    style={{ flex: 1, minWidth: 0 }}
+                  >
+                    <Group
+                      gap="xs"
+                      wrap="nowrap"
+                      align="center"
                       style={{ flex: 1, minWidth: 0 }}
-                      size="sm"
-                      truncate
                     >
-                      {title ?? APP_NAME}
-                    </Text>
+                      <Box className="shrink-0" mr="xs">
+                        {logo}
+                      </Box>
+                      <Text
+                        className="font-medium leading-tight"
+                        style={{ flex: 1, minWidth: 0 }}
+                        size="sm"
+                        truncate
+                      >
+                        {title ?? APP_NAME}
+                      </Text>
+                    </Group>
                     <IconChevronDown
                       size={18}
                       className="min-h-4 min-w-4 shrink-0"
                     />
                   </Group>
-                </Group>
+                </Flex>
               </UnstyledButton>
             </Menu.Target>
             <Menu.Dropdown style={{ width: "max-content", minWidth: 200 }}>
@@ -204,7 +225,7 @@ export function Navbar({
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
-        </Group>
+        </Box>
       </Group>
       <Stack gap="xs" justify="space-between" h="100%">
         <Stack flex={1} gap="xxs" pl="xs">
