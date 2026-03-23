@@ -14,20 +14,20 @@ export function MobileHeader({
   onToggleMobileNavbar,
 }: Props): JSX.Element {
   return (
-    <>
-      <Group h="100%" px="md" className="transition-colors">
-        <Burger
-          color="white"
-          opened={isMobileNavbarOpened}
-          onClick={onToggleMobileNavbar}
-          size="sm"
-          hiddenFrom="sm"
-        />
+    <Group h="100%" px="md" className="transition-colors" gap="sm">
+      <Burger
+        color="white"
+        opened={isMobileNavbarOpened}
+        onClick={onToggleMobileNavbar}
+        size="sm"
+        hiddenFrom="sm"
+      />
+      <Group gap="xxs">
         <Logo size="small" />
-        <Title order={2} size="md" textWrap="nowrap" fw={500}>
+        <Title order={2} size="md" textWrap="nowrap" fw={500} c="white">
           {title ?? APP_NAME}
         </Title>
       </Group>
-    </>
+    </Group>
   );
 }

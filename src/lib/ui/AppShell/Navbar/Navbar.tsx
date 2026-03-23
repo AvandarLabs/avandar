@@ -108,12 +108,11 @@ export function Navbar({
   return (
     <>
       <Group
+        pt="xs"
         pl="xs"
-        pt="sm"
-        pb="xs"
         wrap="nowrap"
-        align="center"
-        gap="xs"
+        gap={0}
+        justify="space-between"
         w="100%"
       >
         {mobile.burgerIcon}
@@ -123,7 +122,7 @@ export function Navbar({
               <UnstyledButton className="w-full text-left">
                 <Flex
                   px="xs"
-                  py="xs"
+                  py="xxs"
                   bdrs="md"
                   align="center"
                   className={css.navbarLinkPill}
@@ -134,20 +133,21 @@ export function Navbar({
                     wrap="nowrap"
                     align="center"
                     justify="space-between"
-                    style={{ flex: 1, minWidth: 0 }}
+                    flex={1}
+                    miw={0}
                   >
                     <Group
                       gap="xs"
                       wrap="nowrap"
                       align="center"
-                      style={{ flex: 1, minWidth: 0 }}
+                      flex={1}
+                      miw={0}
                     >
-                      <Box className="shrink-0" mr="xs">
-                        {logo}
-                      </Box>
+                      <Box className="shrink-0">{logo}</Box>
                       <Text
                         className="font-medium leading-tight"
-                        style={{ flex: 1, minWidth: 0 }}
+                        flex={1}
+                        miw={0}
                         size="sm"
                         truncate
                       >

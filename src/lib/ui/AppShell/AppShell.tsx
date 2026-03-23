@@ -85,7 +85,14 @@ function AppShellComponent({
           : null}
         </MantineAppShell.Header>
 
-        <MantineAppShell.Navbar withBorder={false}>
+        <MantineAppShell.Navbar
+          withBorder={false}
+          style={
+            isMobileViewSize ?
+              { zIndex: 300, marginTop: -40, height: "100%" }
+            : undefined
+          }
+        >
           <Navbar
             isMobileNavbarOpened={isMobileNavbarOpened}
             onToggleMobileNavbar={toggleMobileNavbar}
@@ -96,7 +103,12 @@ function AppShellComponent({
             currentWorkspace={currentWorkspace}
           />
         </MantineAppShell.Navbar>
-        <MantineAppShell.Main py="0" pr="0" ml={-16}>
+        <MantineAppShell.Main
+          py="0"
+          pr="0"
+          ml={-16}
+          mt={isMobileViewSize ? 30 : 0}
+        >
           {children}
         </MantineAppShell.Main>
       </MantineAppShell>
