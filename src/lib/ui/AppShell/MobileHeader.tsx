@@ -1,7 +1,5 @@
 import { Burger, Group, Title } from "@mantine/core";
 import { APP_NAME } from "$/config/AppConfig";
-import { clsx } from "clsx";
-import css from "./AppShell.module.css";
 import { Logo } from "./Logo";
 
 type Props = {
@@ -17,11 +15,7 @@ export function MobileHeader({
 }: Props): JSX.Element {
   return (
     <>
-      <Group
-        h="100%"
-        px="md"
-        className={clsx(css.navbarTitleLink, "transition-colors")}
-      >
+      <Group h="100%" px="md" className="transition-colors">
         <Burger
           color="white"
           opened={isMobileNavbarOpened}
