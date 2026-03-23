@@ -297,7 +297,10 @@ const QETLClientFactory = createModuleFactory<IQETLClient>("QETLClient", {
               return { datasetId: ex.dataset.id, parquetBlob };
             })
             .with({ sourceType: "virtual" }, async (ex) => {
-              // virtual datasets result in a recursive QETL call
+              // virtual datasets result in a recursive QETL call, where we
+              // evaluate the virtual dataset's raw SQL query in order to
+              // materialize it into a parquet blob.
+              // This blob is a dice we can use to answer the original query.
               const evaluatedBlob = await runQuery({
                 rawSQL: ex.sourceDataset.rawSQL,
                 returnType: "parquet",

@@ -15,6 +15,11 @@ export const AvaDataTypes = {
     "timestamp",
     "boolean",
   ),
+  isDateOrTimestamp: (
+    avaDataType: AvaDataType,
+  ): avaDataType is "date" | "time" | "timestamp" => {
+    return ["date", "time", "timestamp"].includes(avaDataType);
+  },
   isText: (avaDataType: AvaDataType): avaDataType is "varchar" => {
     return avaDataType === "varchar";
   },

@@ -1,7 +1,7 @@
-import { isNullish } from "@utils/guards/isNullish/isNullish";
-import { isNumber } from "@utils/guards/isNumber/isNumber";
-import { isString } from "@utils/guards/isString/isString";
-import { stringComparator } from "$/lib/strings/sort";
+import { isNullish } from "@utils/guards/isNullish/isNullish.ts";
+import { isNumber } from "@utils/guards/isNumber/isNumber.ts";
+import { isString } from "@utils/guards/isString/isString.ts";
+import { stringComparator } from "@utils/strings/sortStrings/sortStrings.ts";
 
 /**
  * Compares two values of string or number types.

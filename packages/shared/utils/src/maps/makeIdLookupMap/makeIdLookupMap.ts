@@ -1,5 +1,5 @@
-import { getValue } from "@utils/objects/getValue/getValue";
-import type { PathValue } from "@utils/objects/getValue/getValue";
+import { getValue } from "@utils/objects/getValue/getValue.ts";
+import type { PathValue } from "@utils/objects/getValue/getValue.ts";
 import type { Paths } from "type-fest";
 
 /**

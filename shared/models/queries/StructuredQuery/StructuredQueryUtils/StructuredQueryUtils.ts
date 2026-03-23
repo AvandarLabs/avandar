@@ -1,11 +1,13 @@
 import { Model } from "@models/Model/Model.ts";
-import { uuid } from "../../../lib/uuid.ts";
+import { uuid } from "../../../../lib/uuid.ts";
+import { toRawDuckDBQuery } from "./toRawDuckDBQuery.ts";
 import type {
   PartialStructuredQuery,
   StructuredQueryId,
-} from "./StructuredQuery.types.ts";
+  StructuredQueryRead,
+} from "../StructuredQuery.types.ts";
 
-export const StructuredQueries = {
+export const StructuredQueryUtils = {
   makeEmpty: (): PartialStructuredQuery => {
     return Model.make("StructuredQuery", {
       id: uuid<StructuredQueryId>(),
@@ -15,6 +17,12 @@ export const StructuredQueries = {
       orderByColumn: undefined,
       orderByDirection: undefined,
       aggregations: {},
+      offset: undefined,
+      limit: undefined,
     } as const);
+  },
+
+  toRawDuckDBQuery: (query: StructuredQueryRead): string => {
+    return toRawDuckDBQuery(query);
   },
 };

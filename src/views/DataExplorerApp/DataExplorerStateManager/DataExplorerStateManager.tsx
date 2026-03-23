@@ -1,7 +1,7 @@
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { makeObject } from "@utils/objects/makeObject/makeObject";
 import { setValue } from "@utils/objects/setValue/setValue";
-import { StructuredQueries } from "$/models/queries/StructuredQuery/StructuredQueries";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
@@ -31,7 +31,7 @@ type DataExplorerAppState = {
 };
 
 const initialState: DataExplorerAppState = {
-  query: StructuredQueries.makeEmpty(),
+  query: StructuredQuery.makeEmpty(),
   vizConfig: {
     vizType: "table",
   },

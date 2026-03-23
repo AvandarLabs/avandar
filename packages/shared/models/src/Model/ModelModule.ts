@@ -79,10 +79,21 @@ export type IModelModule = {
    * @param val - The value to check.
    * @param modelType - The model type to check.
    */
-  isModelOfType: <T extends string>(
+  isOfModelType: <T extends string>(
     val: unknown,
     modelType: T,
   ) => val is ModelBase<T>;
+
+  /**
+   * Returns a function that checks if a value is a model of the given type.
+   * @param modelType - The model type to check.
+   * @returns A function that checks if a value is a model of the given type.
+   */
+  valIsOfModelType: <MType extends string>(
+    modelType: MType,
+  ) => <MaybeModel extends ModelBase<string>>(
+    v: MaybeModel | null | undefined,
+  ) => v is MaybeModel & ModelBase<MType>;
 };
 
 export const ModelModule: IModelModule = {
@@ -137,10 +148,10 @@ export const ModelModule: IModelModule = {
     );
   },
 
-  isModelOfType: <T extends string, B>(
-    val: B,
-    modelType: T,
-  ): val is B & ModelBase<T> => {
+  isOfModelType: <MType extends string, MaybeModel>(
+    val: MaybeModel,
+    modelType: MType,
+  ): val is MaybeModel & ModelBase<MType> => {
     return (
       typeof val === "object" &&
       val !== null &&
@@ -148,5 +159,15 @@ export const ModelModule: IModelModule = {
       typeof val.__type === "string" &&
       (modelType === undefined || val.__type === modelType)
     );
+  },
+
+  valIsOfModelType: <MType extends string>(
+    modelType: MType,
+  ): (<MaybeModel extends ModelBase<string>>(
+    v: MaybeModel | null | undefined,
+  ) => v is MaybeModel & ModelBase<MType>) => {
+    return (v) => {
+      return ModelModule.isOfModelType(v, modelType);
+    };
   },
 };

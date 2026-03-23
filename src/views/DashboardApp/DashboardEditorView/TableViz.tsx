@@ -1,6 +1,6 @@
 import { Box, LoadingOverlay, Text } from "@mantine/core";
 import { prop } from "@utils/objects/hofs/prop/prop";
-import { StructuredQueries } from "$/models/queries/StructuredQuery/StructuredQueries";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 
@@ -8,7 +8,7 @@ type Props = {
   rawSQL: string;
 };
 
-const emptyStructuredQuery = StructuredQueries.makeEmpty();
+const emptyStructuredQuery = StructuredQuery.makeEmpty();
 
 export function TableViz({ rawSQL }: Props): JSX.Element {
   const [queryResults, isLoadingResults] = useDataQuery({
