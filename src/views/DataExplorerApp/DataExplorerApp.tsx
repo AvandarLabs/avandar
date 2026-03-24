@@ -36,6 +36,7 @@ export function DataExplorerApp(): JSX.Element {
   const [queryResults, isLoadingResults] = useDataQuery({
     query: state.query,
     rawSQL: state.rawSQL,
+    auth: "workspace",
     workspaceId: workspace.id,
   });
   const queryResultColumns = queryResults?.columns ?? [];

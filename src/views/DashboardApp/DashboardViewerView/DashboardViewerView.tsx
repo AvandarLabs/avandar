@@ -5,15 +5,15 @@ import "@puckeditor/core/puck.css";
 import { notifyError } from "@ui/notifications/notify";
 import { Paper } from "@/lib/ui/Paper/Paper";
 import { AvaPageGenericData } from "../AvaPage/AvaPage.types";
-import { AvaPageStateManager } from "../AvaPage/AvaPageStateManager/AvaPageStateManager";
 import { getVersionFromAvaPageData } from "../AvaPage/migrations/getVersionFromAvaPageData";
+import { getAvaPageMetadataFromDashboard } from "../AvaPage/utils/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "../AvaPage/utils/upgradeAvaPageData";
 import { getDashboardPuckConfig } from "../DashboardEditorView/getDashboardPuckConfig";
 import { useEnsurePublishedDashboardDatasets } from "./useEnsurePublishedDashboardDatasets";
 import type { Dashboard } from "$/models/Dashboard/Dashboard.types";
 
 type Props = {
-  dashboard: Dashboard | undefined;
+  dashboard: Dashboard;
 };
 
 export function DashboardViewerView({ dashboard }: Props): JSX.Element {
@@ -26,16 +26,6 @@ export function DashboardViewerView({ dashboard }: Props): JSX.Element {
   });
 
   const data = useMemo(() => {
-    if (!dashboard) {
-      return {
-        root: {
-          props: {
-            title: "Untitled dashboard",
-          },
-        },
-        content: [],
-      };
-    }
     const dashboardConfigData =
       dashboard.config as unknown as AvaPageGenericData;
     const puckData = {
@@ -63,20 +53,9 @@ export function DashboardViewerView({ dashboard }: Props): JSX.Element {
     });
   }, [loadingDatasetsError]);
 
-  if (!dashboard) {
-    return (
-      <Paper p="xxl" maw={720} mx="auto">
-        <Stack gap="xs">
-          <Title order={2} fw={650}>
-            Dashboard not found
-          </Title>
-          <Text c="dimmed">
-            The dashboard you requested could not be found.
-          </Text>
-        </Stack>
-      </Paper>
-    );
-  }
+  const avaPageMetadata = useMemo(() => {
+    return getAvaPageMetadataFromDashboard(dashboard);
+  }, [dashboard]);
 
   if (!dashboard.isPublic) {
     return (
@@ -124,10 +103,8 @@ export function DashboardViewerView({ dashboard }: Props): JSX.Element {
   }
 
   return (
-    <AvaPageStateManager.Provider>
-      <Box>
-        <PuckPageRender config={config} data={data} />
-      </Box>
-    </AvaPageStateManager.Provider>
+    <Box>
+      <PuckPageRender config={config} data={data} metadata={avaPageMetadata} />
+    </Box>
   );
 }

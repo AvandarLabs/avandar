@@ -39,6 +39,7 @@ type AppStateContextTuple<
  * hook to access the state and dispatch functions.
  */
 type AppStateManager<
+  InitArg,
   State,
   ActionRegistry extends GenericActionRegistry<State>,
 > = {
@@ -62,7 +63,11 @@ type AppStateManager<
    * A `Provider` component which provides the state and dispatch functions
    * to the downstream component hierarchy.
    */
-  Provider: React.FC<{ children: React.ReactNode }>;
+  Provider: React.FC<{
+    children: React.ReactNode;
+    initialStateOverrides?: State;
+    initArgOverrides?: InitArg;
+  }>;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -121,7 +126,7 @@ export function createAppStateManager<
   name: string;
   initialState: State;
   actions: ActionRegistry;
-}): AppStateManager<State, ActionRegistry>;
+}): AppStateManager<undefined, State, ActionRegistry>;
 export function createAppStateManager<
   InitArg,
   State,
@@ -131,7 +136,7 @@ export function createAppStateManager<
   initArg: InitArg;
   initFn: (initArg: InitArg) => State;
   actions: ActionRegistry;
-}): AppStateManager<State, ActionRegistry>;
+}): AppStateManager<InitArg, State, ActionRegistry>;
 export function createAppStateManager<
   InitArg,
   State,
@@ -148,7 +153,7 @@ export function createAppStateManager<
   initArg?: InitArg;
   initFn?: (initArg: InitArg) => State;
   actions: ActionRegistry;
-}): AppStateManager<State, ActionRegistry> {
+}): AppStateManager<InitArg, State, ActionRegistry> {
   const AppStateContext = createContext<
     AppStateContextTuple<State, ActionRegistry> | undefined
   >(undefined);
@@ -199,13 +204,25 @@ export function createAppStateManager<
       return dispatch;
     },
 
-    Provider: ({ children }) => {
+    Provider: ({ children, initialStateOverrides, initArgOverrides }) => {
+      const reducerInitialState =
+        initialState !== undefined ?
+          {
+            ...initialState,
+            ...initialStateOverrides,
+          }
+        : {
+            ...initArg,
+            ...initArgOverrides,
+          };
+      const reducerInitFn = initialState !== undefined ? undefined : initFn;
+
       const [state, dispatch] = useReducer(
         reducer,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (initialState ?? initArg) as any,
+        reducerInitialState as any,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (initialState ? undefined : initFn) as any,
+        reducerInitFn as any,
       );
       const appDispatch = useMemo(() => {
         const fnRecord = {} as Record<

@@ -1,11 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { DashboardViewerView } from "@/views/DashboardApp/DashboardViewerView/DashboardViewerView";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import type {
-  Dashboard,
-  DashboardId,
-} from "$/models/Dashboard/Dashboard.types";
+import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 
 export const Route = createFileRoute(
   "/public/dashboards/$workspaceSlug/$dashboardId",
@@ -15,15 +12,17 @@ export const Route = createFileRoute(
       id: params.dashboardId as DashboardId,
     });
 
+    if (!dashboard) {
+      throw notFound();
+    }
+
     return { dashboard };
   },
   component: DashboardViewerPage,
 });
 
 function DashboardViewerPage(): JSX.Element {
-  const { dashboard } = Route.useLoaderData() as {
-    dashboard: Dashboard | undefined;
-  };
+  const { dashboard } = Route.useLoaderData();
 
   return (
     <DataExplorerStateManager.Provider>
