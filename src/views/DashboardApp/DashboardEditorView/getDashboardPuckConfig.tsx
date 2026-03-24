@@ -1017,6 +1017,7 @@ export function getDashboardPuckConfig(options: {
       },
       DataViz: buildDataVizPBlockConfig(options),
       HeadingBlock: {
+        label: "Heading",
         fields: {
           text: {
             label: "Text",
@@ -1056,6 +1057,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       ParagraphBlock: {
+        label: "Paragraph",
         fields: {
           text: {
             label: "Text",
@@ -1084,6 +1086,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       QuoteBlock: {
+        label: "Quote",
         fields: {
           quote: {
             label: "Quote",
@@ -1107,12 +1110,14 @@ export function getDashboardPuckConfig(options: {
         },
       },
       DividerBlock: {
+        label: "Divider",
         fields: {},
         render: () => {
           return <Divider />;
         },
       },
       FigureBlock: {
+        label: "Image",
         fields: {
           src: {
             label: "Image URL",
@@ -1151,6 +1156,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       CalloutBlock: {
+        label: "Callout",
         fields: {
           tone: {
             label: "Tone",
@@ -1194,6 +1200,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       ListBlock: {
+        label: "List",
         fields: {
           type: {
             label: "Type",
@@ -1236,6 +1243,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       CodeBlock: {
+        label: "Code",
         fields: {
           language: {
             label: "Language",
@@ -1277,6 +1285,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       EmbedBlock: {
+        label: "Embed",
         fields: {
           title: {
             label: "Title",
@@ -1328,6 +1337,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       TableBlock: {
+        label: "Table",
         fields: {
           delimiter: {
             label: "Delimiter",
