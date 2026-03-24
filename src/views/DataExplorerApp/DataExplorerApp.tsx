@@ -99,7 +99,7 @@ export function DataExplorerApp(): JSX.Element {
                       );
                       return;
                     }
-                    modals.open({
+                    const modalId = modals.open({
                       title: "Save As New Dataset",
                       size: "xl",
                       children: (
@@ -108,6 +108,9 @@ export function DataExplorerApp(): JSX.Element {
                           columns={queryResultColumns}
                           dateColumns={dateColumns}
                           rawSQL={state.rawSQL}
+                          onSaveSuccess={() => {
+                            modals.close(modalId);
+                          }}
                         />
                       ),
                     });
