@@ -15,6 +15,7 @@ type Props = {
   columns: readonly QueryResultColumn[];
   dateColumns: ReadonlySet<string>;
   rawSQL: string;
+  onSaveSuccess: () => void;
 };
 
 export function SaveAsNewDatasetForm({
@@ -22,11 +23,14 @@ export function SaveAsNewDatasetForm({
   columns,
   dateColumns,
   rawSQL,
+  onSaveSuccess,
 }: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
   const [saveNewDataset, isSavingNewDataset] =
     DatasetClient.useInsertVirtualDataset({
+      queryToInvalidate: DatasetClient.QueryKeys.getAll(),
       onSuccess: () => {
+        onSaveSuccess();
         notifySuccess("Dataset saved successfully!");
       },
       onError: (error) => {
