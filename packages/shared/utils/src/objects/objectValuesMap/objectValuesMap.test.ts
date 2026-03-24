@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import { objectValuesMap } from "./objectValuesMap.ts";
 
 describe("objectValuesMap", () => {
@@ -153,7 +153,7 @@ describe("objectValuesMap", () => {
 
         return "kept";
       },
-      { excludeUndefined: true },
+      { excludeUndefinedFromResult: true },
     );
 
     expect(calledKeys).toEqual(["a", "b", "c", "d", "e"]);
@@ -170,9 +170,50 @@ describe("objectValuesMap", () => {
       (value) => {
         return value === undefined ? "was undefined" : "was defined";
       },
-      { excludeUndefined: true },
+      { excludeUndefinedFromResult: true },
     );
 
     expect(result).toEqual({ a: "was undefined", b: "was defined" });
+  });
+});
+
+// ============================================================================
+// Type tests
+// ============================================================================
+
+describe("objectValuesMap type tests", () => {
+  it("keeps undefined in the value union when exclusions are off", () => {
+    const input = { a: 1, b: 2 };
+    const result = objectValuesMap(input, (value) => {
+      return value === 1 ? undefined : value * 2;
+    });
+    expectTypeOf(result).toEqualTypeOf<{
+      a: number | undefined;
+      b: number | undefined;
+    }>();
+  });
+
+  it("excludes undefined from the value type when excludeUndefinedFromResult is true", () => {
+    const input = { a: 1, b: 2 };
+    const result = objectValuesMap(
+      input,
+      (value) => {
+        return value === 1 ? undefined : value * 2;
+      },
+      { excludeUndefinedFromResult: true },
+    );
+    expectTypeOf(result).toEqualTypeOf<{ a: number; b: number }>();
+  });
+
+  it("still allows null in the value type when only undefined is excluded", () => {
+    const input = { a: 1, b: 2 };
+    const result = objectValuesMap(
+      input,
+      (_value, key) => {
+        return key === "a" ? undefined : null;
+      },
+      { excludeUndefinedFromResult: true },
+    );
+    expectTypeOf(result).toEqualTypeOf<{ a: null; b: null }>();
   });
 });

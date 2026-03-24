@@ -12,6 +12,27 @@ import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { DistributedOmit } from "type-fest";
 
+/**
+ * A client for managing datasets in local storage and in local memory.
+ *
+ * This client provides a unified interface to manage datasets locally,
+ * regardless of the dataset's source type (e.g. CSV vs Google Sheets).
+ *
+ * LocalDatasetClient manages fetching datasets from the cloud, storing them
+ * in local storage (if they were already fetched as parquet blobs), loading
+ * them into memory, and exporting the loaded data from DuckDB as parquet blobs
+ * in order to store them in local storage.
+ *
+ * ===Definitions===
+ *
+ * "Local storage" refers to the user's browser's IndexedDB, i.e. on disk. This
+ * is different from "cloud storage" (which is when a dataset is sync'd to
+ * the cloud and stored in Supabase storage buckets).
+ *
+ * "Local memory" or "in memory" refers to a dataset being loaded into DuckDB,
+ * which is transient and is lost when the browser or tab is closed.
+ *
+ */
 export const LocalDatasetClient = createUsableServiceClient(
   createDexieCRUDClient({
     db: AvaDexie.DB,

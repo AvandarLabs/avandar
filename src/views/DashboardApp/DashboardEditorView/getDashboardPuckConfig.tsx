@@ -11,9 +11,9 @@ import {
 } from "@mantine/core";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { Paper } from "@/lib/ui/Paper/Paper";
-import { buildContainerMaxWidthFieldConfig } from "./fields/ContainerMaxWidthField/buildContainerMaxWidthFieldConfig";
-import { CURRENT_SCHEMA_VERSION } from "./migrations/constants";
-import { buildDataVizPBlockConfig } from "./pblocks/DataVizPBlock/buildDataVizPBlockConfig";
+import { CURRENT_SCHEMA_VERSION } from "../AvaPage/migrations/config";
+import { buildDataVizPBlockConfig } from "../AvaPage/pblocks/DataVizPBlock/buildDataVizPBlockConfig";
+import { buildContainerMaxWidthPFieldConfig } from "../AvaPage/pfields/ContainerMaxWidthPField/buildContainerMaxWidthPFieldConfig";
 import type {
   AvaPageConfig,
   AvaPageData,
@@ -30,7 +30,7 @@ import type {
   SectionProps,
   SlotRenderer,
   TableBlockProps,
-} from "./AvaPage.types";
+} from "../AvaPage/AvaPage.types";
 import type { ReactNode } from "react";
 
 function _isRecord(value: unknown): value is Record<string, unknown> {
@@ -340,7 +340,7 @@ export function getDashboardPuckConfig(options: {
           label: "Page title",
           type: "text",
         },
-        containerMaxWidth: buildContainerMaxWidthFieldConfig(),
+        containerMaxWidth: buildContainerMaxWidthPFieldConfig(),
         isTitleHidden: {
           label: "Hide title",
           type: "radio",

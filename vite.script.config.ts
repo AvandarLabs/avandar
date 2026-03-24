@@ -14,11 +14,11 @@ export default defineConfig({
     alias: {
       "@": "/src",
       $: "/shared",
-      "@clients": "/packages/clients/src/index.ts",
-      "@logger": "/packages/logger/src/index.ts",
-      "@models": "/packages/models/src/index.ts",
-      "@modules": "/packages/modules/src/index.ts",
-      "@utils": "/packages/utils/src/index.ts",
+      "@clients": "/packages/shared/clients/src",
+      "@logger": "/packages/shared/logger/src",
+      "@models": "/packages/shared/models/src",
+      "@modules": "/packages/shared/modules/src",
+      "@utils": "/packages/shared/utils/src",
     },
   },
   ssr: {

@@ -5,14 +5,14 @@ import {
   IconTable,
 } from "@tabler/icons-react";
 import { match } from "ts-pattern";
-import type { DatasetSourceType } from "$/models/datasets/Dataset/Dataset.types";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 
 export function SourceBadge({
   sourceType,
   sourceName,
   size = 18,
 }: {
-  sourceType?: DatasetSourceType;
+  sourceType?: DatasetSource.SourceType;
   sourceName?: string;
   size?: number;
 }): JSX.Element | null {

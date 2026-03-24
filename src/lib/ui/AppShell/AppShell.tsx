@@ -1,3 +1,4 @@
+import { useToggleBoolean } from "@hooks/useToggleBoolean/useToggleBoolean";
 import { AppShell as MantineAppShell } from "@mantine/core";
 import {
   Spotlight,
@@ -6,7 +7,6 @@ import {
 } from "@mantine/spotlight";
 import { IconSearch } from "@tabler/icons-react";
 import { Outlet } from "@tanstack/react-router";
-import { useToggleBoolean } from "@/lib/hooks/state/useToggleBoolean";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
 import css from "./AppShell.module.css";
 import { AppShellStateManager } from "./AppShellStateManager";
@@ -85,7 +85,14 @@ function AppShellComponent({
           : null}
         </MantineAppShell.Header>
 
-        <MantineAppShell.Navbar withBorder={false}>
+        <MantineAppShell.Navbar
+          withBorder={false}
+          style={
+            isMobileViewSize ?
+              { zIndex: 300, marginTop: -40, height: "100%" }
+            : undefined
+          }
+        >
           <Navbar
             isMobileNavbarOpened={isMobileNavbarOpened}
             onToggleMobileNavbar={toggleMobileNavbar}
@@ -96,7 +103,12 @@ function AppShellComponent({
             currentWorkspace={currentWorkspace}
           />
         </MantineAppShell.Navbar>
-        <MantineAppShell.Main py="0" pr="0" ml={-16}>
+        <MantineAppShell.Main
+          py="0"
+          pr="0"
+          ml={-16}
+          mt={isMobileViewSize ? 30 : 0}
+        >
           {children}
         </MantineAppShell.Main>
       </MantineAppShell>

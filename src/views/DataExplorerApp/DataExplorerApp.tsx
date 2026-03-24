@@ -5,14 +5,25 @@ import {
   Group,
   LoadingOverlay,
   MantineTheme,
+  Menu,
   Stack,
 } from "@mantine/core";
-import { IconDownload } from "@tabler/icons-react";
+import { modals } from "@mantine/modals";
+import {
+  IconChevronDown,
+  IconDownload,
+  IconInfoCircle,
+} from "@tabler/icons-react";
+import { notifyError, notifyNotImplemented } from "@ui/index";
+import { Tooltip } from "@ui/Tooltip/Tooltip";
+import { isEpochMs, isISODateString, prop } from "@utils/index";
+import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "./DataExplorerStateManager/DataExplorerStateManager";
 import { downloadRowsAsCSV } from "./downloadRowsAsCSV";
 import { QueryForm } from "./QueryForm/QueryForm";
+import { SaveAsNewDatasetForm } from "./SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { useDataQuery } from "./useDataQuery";
 import { VisualizationContainer } from "./VisualizationContainer";
 import { VizSettingsForm } from "./VizSettingsForm/VizSettingsForm";
@@ -25,10 +36,23 @@ export function DataExplorerApp(): JSX.Element {
   const [queryResults, isLoadingResults] = useDataQuery({
     query: state.query,
     rawSQL: state.rawSQL,
+    auth: "workspace",
     workspaceId: workspace.id,
   });
   const queryResultColumns = queryResults?.columns ?? [];
   const queryResultData = queryResults?.data ?? [];
+  const dateColumns = new Set(
+    queryResultColumns
+      .filter((f) => {
+        const sampleVal = queryResultData[0]?.[f.name];
+        return (
+          AvaDataTypes.isTemporal(f.dataType) ||
+          isISODateString(sampleVal) ||
+          isEpochMs(sampleVal)
+        );
+      })
+      .map(prop("name")),
+  );
 
   return (
     <AppLayout title="Data Explorer">
@@ -54,6 +78,58 @@ export function DataExplorerApp(): JSX.Element {
             px="md"
             style={styles.toolbar}
           >
+            <Menu shadow="md" width={180}>
+              <Menu.Target>
+                <Button
+                  variant="outline"
+                  color="neutral"
+                  size="compact-sm"
+                  rightSection={<IconChevronDown size={16} />}
+                >
+                  Save As
+                </Button>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  disabled={queryResultData.length === 0}
+                  onClick={() => {
+                    if (!state.rawSQL) {
+                      notifyError(
+                        "Saving a new dataset is only supported for AI queries",
+                      );
+                      return;
+                    }
+                    modals.open({
+                      title: "Save As New Dataset",
+                      size: "xl",
+                      children: (
+                        <SaveAsNewDatasetForm
+                          queryResultData={queryResultData}
+                          columns={queryResultColumns}
+                          dateColumns={dateColumns}
+                          rawSQL={state.rawSQL}
+                        />
+                      ),
+                    });
+                  }}
+                >
+                  New Dataset
+                </Menu.Item>
+                <Menu.Item
+                  disabled
+                  onClick={() => {
+                    notifyNotImplemented();
+                  }}
+                  rightSection={
+                    <Tooltip label="This feature is not implemented yet.">
+                      <IconInfoCircle size={16} />
+                    </Tooltip>
+                  }
+                >
+                  Dashboard Block
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
             <Button
               variant="outline"
               color="neutral"
@@ -72,6 +148,7 @@ export function DataExplorerApp(): JSX.Element {
             <VisualizationContainer
               columns={queryResultColumns}
               data={queryResultData}
+              dateColumns={dateColumns}
             />
           </Box>
         </Stack>

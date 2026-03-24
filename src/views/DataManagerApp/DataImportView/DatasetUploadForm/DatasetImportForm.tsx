@@ -18,7 +18,7 @@ import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { Callout } from "@/lib/ui/Callout";
-import type { UnknownObject } from "@utils/types/common";
+import type { UnknownObject } from "@utils/types/common.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.types";
 import type { DetectedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 

@@ -7,24 +7,25 @@ import { createInitialDashboardPuckData } from "$/models/Dashboard/DashboardConf
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
+import { getVersionFromAvaPageData } from "../AvaPage/migrations/getVersionFromAvaPageData";
+import { getAvaPageMetadataFromDashboard } from "../AvaPage/utils/getAvaPageMetadataFromDashboard";
+import { upgradeAvaPageData } from "../AvaPage/utils/upgradeAvaPageData";
 import { DeleteDashboardButton } from "./DeleteDashboardButton";
 import {
   getDashboardPuckConfig,
   getDashboardTitleFromPuckData,
 } from "./getDashboardPuckConfig";
-import { getVersionFromAvaPageData } from "./migrations/getVersionFromAvaPageData";
 import { PublishDashboardButton } from "./PublishDashboardButton";
 import { SaveDashboardButton } from "./SaveDashboardButton";
-import { upgradeAvaPageData } from "./utils/upgradeAvaPageData";
 import { ViewDashboardButton } from "./ViewDashboardButton";
-import type { AvaPageData } from "./AvaPage.types";
+import type { AvaPageData } from "../AvaPage/AvaPage.types";
 import type {
   Dashboard,
   DashboardId,
 } from "$/models/Dashboard/Dashboard.types";
 
 type Props = {
-  dashboard: Dashboard | undefined;
+  dashboard: Dashboard;
   workspaceSlug: string;
 };
 export function DashboardEditorView({
@@ -33,10 +34,10 @@ export function DashboardEditorView({
 }: Props): JSX.Element {
   const [data, setData] = useState<AvaPageData>(() => {
     return createInitialDashboardPuckData({
-      dashboardTitle: dashboard?.name ?? "Untitled dashboard",
+      dashboardTitle: dashboard.name ?? "Untitled dashboard",
     });
   });
-  const dashboardTitle: string = dashboard?.name ?? "Untitled dashboard";
+  const dashboardTitle: string = dashboard.name ?? "Untitled dashboard";
 
   const lastDashboardIdRef = useRef<DashboardId | undefined>(undefined);
 
@@ -44,10 +45,6 @@ export function DashboardEditorView({
   const [editorKey, setEditorKey] = useState(0);
 
   useEffect(() => {
-    if (!dashboard) {
-      return;
-    }
-
     if (lastDashboardIdRef.current === dashboard.id) {
       return;
     }
@@ -74,9 +71,9 @@ export function DashboardEditorView({
   const puckConfig = useMemo(() => {
     return getDashboardPuckConfig({
       dashboardTitle,
-      workspaceId: dashboard?.workspaceId,
+      workspaceId: dashboard.workspaceId,
     });
-  }, [dashboard?.workspaceId, dashboardTitle]);
+  }, [dashboard.workspaceId, dashboardTitle]);
 
   const [saveDashboard] = DashboardClient.useUpdate({
     queriesToInvalidate:
@@ -114,11 +111,16 @@ export function DashboardEditorView({
     [dashboard, dashboardTitle, saveDashboard],
   );
 
+  const avaPageMetadata = useMemo(() => {
+    return getAvaPageMetadataFromDashboard(dashboard);
+  }, [dashboard]);
+
   return (
     <AppLayout floatingToolbar>
       <Flex direction="column" h="100%">
         <Puck
           key={editorKey}
+          metadata={avaPageMetadata}
           config={puckConfig}
           height="100%"
           data={data}
@@ -132,12 +134,12 @@ export function DashboardEditorView({
                   <SaveDashboardButton onSave={onSave} />
                   <ViewDashboardButton
                     workspaceSlug={workspaceSlug}
-                    dashboardId={dashboard?.id}
+                    dashboardId={dashboard.id}
                   />
-                  <PublishDashboardButton dashboardId={dashboard?.id} />
+                  <PublishDashboardButton dashboardId={dashboard.id} />
                   <DeleteDashboardButton
                     workspaceSlug={workspaceSlug}
-                    dashboardId={dashboard?.id}
+                    dashboardId={dashboard.id}
                   />
                 </>
               );

@@ -1,4 +1,4 @@
-import type { UnknownDataFrame } from "@utils/types/common";
+import type { UnknownDataFrame } from "@utils/types/common.types";
 
 export type XYSettings = {
   xAxisKey: string;

@@ -1,6 +1,6 @@
 import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
 import { pipe } from "@utils/misc/pipe/pipe.ts";
-import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeysDeep/camelCaseKeysDeep.ts";
+import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
 import { excludeNullsDeep } from "@utils/objects/excludeNullsDeep/excludeNullsDeep.ts";
 import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
@@ -14,7 +14,7 @@ import type {
 import type {
   Expect,
   ZodSchemaEqualsTypes,
-} from "@utils/types/testUtilityTypes.ts";
+} from "@utils/types/test-utilities.types.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 
 const DBReadSchema = z.object({

@@ -1,16 +1,15 @@
 import { MultiSelect, MultiSelectProps } from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
+import { Model } from "@models/Model/Model";
+import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
 import { where } from "@utils/filters/where/where";
 import { isNonNullish } from "@utils/guards/isNonNullish/isNonNullish";
+import { makeIdLookupMap } from "@utils/index";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
 import { useEffect, useMemo } from "react";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
-import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { isOfModelType } from "@/lib/utils/guards/guards";
-import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap/makeIdLookupMap";
-import type { Model } from "@models/Model/Model";
 import type {
   QueryColumn,
   QueryColumnId,
@@ -49,7 +48,7 @@ export function QueryColumnMultiSelect({
     DatasetColumnClient.useGetAll({
       ...where("dataset_id", "eq", dataSourceId?.id),
       useQueryOptions: {
-        enabled: isOfModelType("Dataset", dataSourceId),
+        enabled: Model.isOfModelType(dataSourceId, "Dataset"),
       },
     });
 
@@ -57,7 +56,7 @@ export function QueryColumnMultiSelect({
     EntityFieldConfigClient.useGetAll({
       ...where("entity_config_id", "eq", dataSourceId?.id),
       useQueryOptions: {
-        enabled: isOfModelType("EntityConfig", dataSourceId),
+        enabled: Model.isOfModelType(dataSourceId, "EntityConfig"),
       },
     });
 

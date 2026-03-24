@@ -2,7 +2,11 @@ import { useUncontrolled } from "@mantine/hooks";
 import { propIsInArray } from "@utils/objects/hofs/propIsInArray/propIsInArray";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { useMemo } from "react";
-import { Select, SelectOption, SelectProps } from "@/lib/ui/inputs/Select";
+import {
+  Select,
+  type SelectOption,
+  type SelectProps,
+} from "@ui/inputs/Select/Select";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.types";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
 

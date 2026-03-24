@@ -1,15 +1,15 @@
 import { useUncontrolled } from "@mantine/hooks";
+import { Model } from "@models/Model/Model";
+import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
+import { Select } from "@ui/inputs/Select/Select";
 import { where } from "@utils/filters/where/where";
+import { makeIdLookupMap } from "@utils/index";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
 import { useEffect, useMemo } from "react";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
-import { Select, SelectProps } from "@/lib/ui/inputs/Select";
-import { makeSelectOptions } from "@/lib/ui/inputs/Select/makeSelectOptions";
-import { isOfModelType } from "@/lib/utils/guards/guards";
-import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap/makeIdLookupMap";
-import type { Model } from "@models/Model/Model";
+import type { SelectProps } from "@ui/inputs/Select/Select";
 import type {
   QueryColumn,
   QueryColumnId,
@@ -48,7 +48,7 @@ export function QueryColumnSingleSelect({
       ...where("dataset_id", "eq", dataSourceId?.id),
       useQueryOptions: {
         usePreviousDataAsPlaceholder: true,
-        enabled: isOfModelType("Dataset", dataSourceId),
+        enabled: Model.isOfModelType(dataSourceId, "Dataset"),
       },
     });
 
@@ -56,7 +56,7 @@ export function QueryColumnSingleSelect({
     EntityFieldConfigClient.useGetAll({
       ...where("entity_config_id", "eq", dataSourceId?.id),
       useQueryOptions: {
-        enabled: isOfModelType("EntityConfig", dataSourceId),
+        enabled: Model.isOfModelType(dataSourceId, "EntityConfig"),
         usePreviousDataAsPlaceholder: true,
       },
     });

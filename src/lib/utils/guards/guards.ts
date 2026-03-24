@@ -1,7 +1,6 @@
 import { isArray } from "@utils/guards/isArray/isArray";
-import type { Model } from "@models/Model/Model";
-import type { UnknownObject } from "@utils/types/common";
-import type { SetFieldType, SetRequired, Simplify } from "type-fest";
+import type { UnknownObject } from "@utils/types/common.types";
+import type { SetRequired } from "type-fest";
 
 /**
  * Returns a predicate that is true if any of the predicates are true.
@@ -73,26 +72,4 @@ export function isEmptyArray<T>(
   value: readonly T[] | null | undefined,
 ): value is readonly T[] & readonly [] {
   return isArray(value) && value.length === 0;
-}
-
-/**
- * Checks if `value` is a model of the given type.
- *
- * @param value - The value to check.
- * @param modelType - The model type to check.
- * @returns `true` if `value` is a model of the given type, `false` otherwise.
- */
-export function isOfModelType<
-  M extends Model.Base<string>,
-  MType extends string,
->(
-  modelType: MType,
-  value: M | null | undefined,
-): value is Simplify<M & SetFieldType<M, "__type", MType>> {
-  return (
-    value !== null &&
-    value !== undefined &&
-    "__type" in value &&
-    value.__type === modelType
-  );
 }

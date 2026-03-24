@@ -5,11 +5,11 @@ import { IconUpload } from "@tabler/icons-react";
 import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
 import { where } from "@utils/filters/where/where";
-import { MIMEType } from "@utils/types/common";
+import { MIMEType } from "@utils/types/common.types";
 import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
+import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock";
@@ -106,9 +106,10 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
       );
 
       // Query the loaded data for preview
-      const previewData = await DatasetRawDataClient.getPreviewData({
+      const previewData = await DatasetQueryClient.getPreviewData({
         datasetId: dataset.id,
         numRows: 100,
+        workspaceId: dataset.workspaceId,
       });
 
       const confirmationModalId = modals.openConfirmModal({

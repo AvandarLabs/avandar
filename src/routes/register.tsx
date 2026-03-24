@@ -1,3 +1,4 @@
+import { useBoolean } from "@hooks/useBoolean/useBoolean";
 import { useMutation } from "@hooks/useMutation/useMutation";
 import {
   Anchor,
@@ -13,13 +14,8 @@ import {
   Transition,
 } from "@mantine/core";
 import { isEmail } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import {
-  createFileRoute,
-  redirect,
-  useNavigate,
-  useRouter,
-} from "@tanstack/react-router";
+
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { INFO_EMAIL } from "$/config/AppConfig";
 import { useEffect, useRef, useState } from "react";
@@ -31,7 +27,6 @@ import { AuthFooter } from "@/components/common/AuthLayout/AuthFooter";
 import { BackToLoginLink } from "@/components/common/AuthLayout/BackToLoginLink";
 import { WAITLIST_URL } from "@/config/AppConfig";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
-import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
 
@@ -57,8 +52,6 @@ const IS_REGISTRATION_DISABLED = isFlagEnabled(
 const IS_SIGN_UP_CODE_REQUIRED = isFlagEnabled(FeatureFlag.RequireSignUpCode);
 
 function RegisterPage() {
-  const router = useRouter();
-  const navigate = useNavigate();
   const searchParams = Route.useSearch();
   const [isRegistrationFormVisible, showRegistrationForm] = useBoolean(
     !IS_REGISTRATION_DISABLED && !IS_SIGN_UP_CODE_REQUIRED,
@@ -117,23 +110,19 @@ function RegisterPage() {
       }
     },
     onSuccess: () => {
-      if (searchParams.redirect) {
-        navigate({ to: searchParams.redirect });
-      } else {
-        router.invalidate();
-      }
       setIsRegistrationSuccess(true);
       notifySuccess({
         title: "Please check your email",
         message: "A confirmation email has been sent to your email address.",
       });
+      // Navigation is driven by useAuth's onAuthStateChange. When signUp
+      // creates a session, onAuthStateChange fires, invalidates the workspace
+      // cache, and updates user state. A useEffect in useAuth then invalidates
+      // the router (and navigates to any redirect param) with the correct
+      // user context already in place.
     },
     onError: (error) => {
-      notifications.show({
-        title: "Registration failed",
-        message: error.message,
-        color: "danger",
-      });
+      registrationForm.setFieldError("email", error.message);
     },
   });
 
@@ -347,6 +336,10 @@ function RegisterPage() {
                         IS_REGISTRATION_DISABLED || IS_SIGN_UP_CODE_REQUIRED
                       }
                       {...registrationForm.getInputProps("email")}
+                      onChange={(e) => {
+                        registrationForm.getInputProps("email").onChange?.(e);
+                        registrationForm.clearFieldError("email");
+                      }}
                     />
                     <PasswordInput
                       key={registrationForm.key("password")}

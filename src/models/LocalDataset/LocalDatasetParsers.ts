@@ -6,7 +6,7 @@ import type { LocalDatasetModel } from "./LocalDataset.types";
 import type {
   Expect,
   ZodSchemaEqualsTypes,
-} from "@utils/types/testUtilityTypes";
+} from "@utils/types/test-utilities.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { UserId } from "$/models/User/User.types";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";

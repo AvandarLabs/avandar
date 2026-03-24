@@ -3,12 +3,20 @@ import {
   CSSVariablesResolver,
   DEFAULT_THEME,
   MantineTheme,
+  Modal,
 } from "@mantine/core";
 import {
   AVANDAR_BLUE_SHADES,
   NEUTRAL_SHADES,
   PRIMARY_COLOR_LIGHT_SHADE,
 } from "../../shared/config/Theme";
+
+/**
+ * Modal z-index above AppShell main (`AppShell.module.css` uses 201).
+ * Mantine's `getDefaultZIndex("modal")` is hardcoded to 200 and ignores
+ * `theme.zIndex`, so defaults are set on `Modal` and `ModalsProvider`.
+ */
+export const MODAL_ROOT_Z_INDEX = 300;
 
 export const Theme = createTheme({
   scale: 1, // root font size is 1rem = 16px
@@ -20,6 +28,15 @@ export const Theme = createTheme({
    * like buttons, links, or headlines.
    */
   primaryColor: "primary",
+
+  components: {
+    Modal: Modal.extend({
+      defaultProps: {
+        zIndex: MODAL_ROOT_Z_INDEX,
+      },
+    }),
+  },
+
   colors: {
     /**
      * Our primary brand color.

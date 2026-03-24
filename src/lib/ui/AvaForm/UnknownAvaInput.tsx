@@ -1,5 +1,5 @@
 import { match } from "ts-pattern";
-import { SelectData } from "../inputs/Select";
+import type { SelectData } from "@ui/inputs/Select/Select";
 import { AvaSelectInput } from "./AvaSelectInput/AvaSelectInput";
 import { AvaTextInput } from "./AvaTextInput/AvaTextInput";
 import type {

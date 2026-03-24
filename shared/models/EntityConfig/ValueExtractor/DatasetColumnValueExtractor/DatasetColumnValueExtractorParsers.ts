@@ -1,6 +1,6 @@
 import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
 import { pipe } from "@utils/misc/pipe/pipe.ts";
-import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeysDeep/camelCaseKeysDeep.ts";
+import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
 import { excludeUndefinedDeep } from "@utils/objects/excludeUndefinedDeep/excludeUndefinedDeep.ts";
 import { omitProps } from "@utils/objects/hofs/omitProps/omitProps.ts";
 import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
@@ -15,7 +15,7 @@ import type {
 import type {
   Expect,
   ZodSchemaEqualsTypes,
-} from "@utils/types/testUtilityTypes.ts";
+} from "@utils/types/test-utilities.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 import type { EntityFieldConfigId } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";

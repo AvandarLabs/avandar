@@ -66,6 +66,34 @@ export type IModelModule = {
   getTypedId: <M extends ModelBase<string> & { id: unknown }>(
     model: M,
   ) => Simplify<ModelTypedId<M>>;
+
+  /**
+   * Checks if a value is a model object of any type.
+   * @param val - The value to check.
+   * @returns `true` if the value is a model, `false` otherwise.
+   */
+  isModel: (val: unknown) => val is ModelBase;
+
+  /**
+   * Checks if a value is a model of the given type.
+   * @param val - The value to check.
+   * @param modelType - The model type to check.
+   */
+  isOfModelType: <T extends string>(
+    val: unknown,
+    modelType: T,
+  ) => val is ModelBase<T>;
+
+  /**
+   * Returns a function that checks if a value is a model of the given type.
+   * @param modelType - The model type to check.
+   * @returns A function that checks if a value is a model of the given type.
+   */
+  valIsOfModelType: <MType extends string>(
+    modelType: MType,
+  ) => <MaybeModel extends ModelBase<string>>(
+    v: MaybeModel | null | undefined,
+  ) => v is MaybeModel & ModelBase<MType>;
 };
 
 export const ModelModule: IModelModule = {
@@ -79,7 +107,7 @@ export const ModelModule: IModelModule = {
     return {
       __type: modelType,
       ...modelProps,
-    };
+    } as ModelBase<MType, MProps>;
   },
 
   match: <
@@ -109,5 +137,37 @@ export const ModelModule: IModelModule = {
       __type: model.__type,
       id: model.id,
     } as ModelTypedId<M>;
+  },
+
+  isModel: (val: unknown): val is ModelBase => {
+    return (
+      typeof val === "object" &&
+      val !== null &&
+      "__type" in val &&
+      typeof val.__type === "string"
+    );
+  },
+
+  isOfModelType: <MType extends string, MaybeModel>(
+    val: MaybeModel,
+    modelType: MType,
+  ): val is MaybeModel & ModelBase<MType> => {
+    return (
+      typeof val === "object" &&
+      val !== null &&
+      "__type" in val &&
+      typeof val.__type === "string" &&
+      (modelType === undefined || val.__type === modelType)
+    );
+  },
+
+  valIsOfModelType: <MType extends string>(
+    modelType: MType,
+  ): (<MaybeModel extends ModelBase<string>>(
+    v: MaybeModel | null | undefined,
+  ) => v is MaybeModel & ModelBase<MType>) => {
+    return (v) => {
+      return ModelModule.isOfModelType(v, modelType);
+    };
   },
 };

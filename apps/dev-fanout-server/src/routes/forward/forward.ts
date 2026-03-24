@@ -105,7 +105,7 @@ function _buildForwardedRequestHeaders(options: {
       }
       return undefined;
     },
-    { excludeUndefined: true },
+    { excludeUndefinedFromResult: true },
   );
 }
 

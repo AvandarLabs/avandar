@@ -1,18 +1,18 @@
 import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
 import { Model } from "@models/Model/Model.ts";
 import { pipe } from "@utils/misc/pipe/pipe.ts";
-import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeysDeep/camelCaseKeysDeep.ts";
+import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
 import { excludeNullsExceptInProps } from "@utils/objects/hofs/excludeNullsExceptInProps/excludeNullsExceptInProps.ts";
 import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
 import { undefinedsToNullsDeep } from "@utils/objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
 import { z } from "zod";
-import { Datasets } from "./Datasets.ts";
+import { DatasetSource } from "../DatasetSource/DatasetSource.ts";
 import type { Dataset, DatasetId, DatasetModel } from "./Dataset.types.ts";
 import type {
   Expect,
   ZodSchemaEqualsTypes,
-} from "@utils/types/testUtilityTypes.ts";
+} from "@utils/types/test-utilities.types.ts";
 import type { UserId, UserProfileId } from "$/models/User/User.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 
@@ -24,7 +24,7 @@ const DBReadSchema = z.object({
   name: z.string(),
   owner_id: z.uuid(),
   owner_profile_id: z.uuid(),
-  source_type: z.enum(Datasets.SourceTypes),
+  source_type: z.enum(DatasetSource.SourceTypes),
   updated_at: z.iso.datetime({ offset: true }),
   workspace_id: z.uuid(),
 });

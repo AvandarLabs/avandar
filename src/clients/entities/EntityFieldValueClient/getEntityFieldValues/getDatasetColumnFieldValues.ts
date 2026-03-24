@@ -1,16 +1,18 @@
 import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
 import { where } from "@utils/filters/where/where";
 import { isDefined } from "@utils/guards/isDefined/isDefined";
+import { makeIdLookupMap } from "@utils/maps/makeIdLookupMap/makeIdLookupMap";
 import { prop } from "@utils/objects/hofs/prop/prop";
+import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
+import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord";
 import { objectEntries } from "@utils/objects/objectEntries";
-import { makeBucketRecord, makeIdLookupRecord } from "$/lib/objects/builders";
+import { template } from "@utils/strings/template/template";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { DatasetColumnValueExtractorClient } from "@/clients/entity-configs/DatasetColumnValueExtractorClient";
+import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
-import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap/makeIdLookupMap";
 import { promiseFlatMap } from "@/lib/utils/promises";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
@@ -20,6 +22,7 @@ import type {
   EntityFieldConfigId,
 } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import type { DatasetColumnValueExtractor } from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractor.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 type FieldWithDatasetExtractor = {
   fieldConfig: EntityFieldConfig;
@@ -143,6 +146,7 @@ export function getSQLSelectOfExtractor({
 async function _extractFieldValuesFromDataset({
   datasetId,
   primaryKeyField,
+  workspaceId,
   requestedFields,
 }: {
   datasetId: DatasetId;
@@ -151,6 +155,7 @@ async function _extractFieldValuesFromDataset({
     fieldConfig: EntityFieldConfig;
     extractor: DatasetColumnValueExtractor;
   };
+  workspaceId: Workspace.Id;
   requestedFields: ReadonlyArray<{
     datasetColumn: DatasetColumn;
     fieldConfig: EntityFieldConfig;
@@ -160,11 +165,11 @@ async function _extractFieldValuesFromDataset({
   const primaryKeyColumnName = primaryKeyField.datasetColumn.name;
 
   // returns rows where each column is an entity field ID
-  const queryResult = await DatasetRawDataClient.runLocalRawQuery<
+  const queryResult = await WorkspaceQETLClient.runQuery<
     Record<EntityFieldConfigId, unknown>
   >({
-    dependencies: [datasetId],
-    query: `
+    workspaceId,
+    rawSQL: template(`
       -- Get all the external IDs we will pull values for
       WITH external_ids AS (
         SELECT
@@ -175,8 +180,7 @@ async function _extractFieldValuesFromDataset({
         external_ids.external_id,
         $columnSelectors$
       FROM external_ids
-    `,
-    queryArgs: {
+    `).parse({
       datasetId,
       primaryKeyColumnName,
       columnSelectors: requestedFields
@@ -195,7 +199,7 @@ async function _extractFieldValuesFromDataset({
           return sqlStatement;
         })
         .join(", "),
-    },
+    }),
   });
 
   return queryResult.data;
@@ -249,9 +253,11 @@ async function _getPrimaryKeyFieldExtractors(
  */
 export async function getDatasetColumnFieldValues({
   entityConfigId,
+  workspaceId,
   fieldsWithExtractors,
 }: {
   entityConfigId: EntityConfigId;
+  workspaceId: Workspace.Id;
   fieldsWithExtractors: readonly FieldWithDatasetExtractor[];
 }): Promise<Array<Record<EntityFieldConfigId, unknown>>> {
   const primaryKeyFieldsWithExtractors =
@@ -304,6 +310,7 @@ export async function getDatasetColumnFieldValues({
       );
       const rows = await _extractFieldValuesFromDataset({
         datasetId,
+        workspaceId,
         primaryKeyField,
         requestedFields: reqFields,
       });

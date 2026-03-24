@@ -1,5 +1,5 @@
 import { registry } from "@utils/objects/registry/registry.ts";
-import { matchLiteral } from "$/lib/strings/matchLiteral.ts";
+import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral.ts";
 import { match } from "ts-pattern";
 import type { AvaDataType } from "./AvaDataType.types.ts";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
@@ -15,6 +15,11 @@ export const AvaDataTypes = {
     "timestamp",
     "boolean",
   ),
+  isDateOrTimestamp: (
+    avaDataType: AvaDataType,
+  ): avaDataType is "date" | "time" | "timestamp" => {
+    return ["date", "time", "timestamp"].includes(avaDataType);
+  },
   isText: (avaDataType: AvaDataType): avaDataType is "varchar" => {
     return avaDataType === "varchar";
   },

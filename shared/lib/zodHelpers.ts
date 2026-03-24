@@ -4,7 +4,7 @@ import {
   RawCellValue,
   RawDataRow,
   UUID,
-} from "@utils/types/common.ts";
+} from "@utils/types/common.types.ts";
 import { Json } from "$/types/database.types.ts";
 import { z } from "zod";
 

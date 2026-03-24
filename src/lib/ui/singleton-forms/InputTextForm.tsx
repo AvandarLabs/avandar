@@ -1,5 +1,6 @@
 import { Button, Group, Loader, TextInput } from "@mantine/core";
-import { isEmail, useForm } from "@mantine/form";
+import { isEmail } from "@mantine/form";
+import { useForm } from "@/lib/hooks/ui/useForm";
 
 type Props = {
   defaultValue: string;

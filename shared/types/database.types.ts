@@ -102,6 +102,7 @@ export type Database = {
           id: string
           name: string
           original_data_type: string
+          original_name: string
           updated_at: string
           workspace_id: string
         }
@@ -115,6 +116,7 @@ export type Database = {
           id?: string
           name: string
           original_data_type: string
+          original_name: string
           updated_at?: string
           workspace_id: string
         }
@@ -128,6 +130,7 @@ export type Database = {
           id?: string
           name?: string
           original_data_type?: string
+          original_name?: string
           updated_at?: string
           workspace_id?: string
         }
@@ -322,6 +325,48 @@ export type Database = {
           },
           {
             foreignKeyName: "datasets__google_sheets_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      datasets__virtual: {
+        Row: {
+          created_at: string
+          dataset_id: string
+          id: string
+          raw_sql: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          dataset_id: string
+          id?: string
+          raw_sql: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          dataset_id?: string
+          id?: string
+          raw_sql?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "datasets__virtual_dataset_id_fkey"
+            columns: ["dataset_id"]
+            isOneToOne: true
+            referencedRelation: "datasets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "datasets__virtual_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -1028,6 +1073,34 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      rpc_datasets__add_virtual_dataset: {
+        Args: {
+          p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
+          p_dataset_description: string
+          p_dataset_id: string
+          p_dataset_name: string
+          p_raw_sql: string
+          p_workspace_id: string
+        }
+        Returns: {
+          created_at: string
+          date_of_last_sync: string | null
+          description: string | null
+          id: string
+          name: string
+          owner_id: string
+          owner_profile_id: string
+          source_type: Database["public"]["Enums"]["datasets__source_type"]
+          updated_at: string
+          workspace_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "datasets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       rpc_workspaces__create_with_owner: {
         Args: {
           p_display_name: string
@@ -1102,7 +1175,7 @@ export type Database = {
         | "UNION"
         | "JSON"
         | "GEOMETRY"
-      datasets__source_type: "csv_file" | "google_sheets"
+      datasets__source_type: "csv_file" | "google_sheets" | "virtual"
       entity_field_configs__value_extractor_type:
         | "dataset_column_value"
         | "manual_entry"
@@ -1128,6 +1201,7 @@ export type Database = {
     }
     CompositeTypes: {
       dataset_column_input: {
+        original_name: string | null
         name: string | null
         description: string | null
         original_data_type: string | null
@@ -1312,7 +1386,7 @@ export const Constants = {
         "JSON",
         "GEOMETRY",
       ],
-      datasets__source_type: ["csv_file", "google_sheets"],
+      datasets__source_type: ["csv_file", "google_sheets", "virtual"],
       entity_field_configs__value_extractor_type: [
         "dataset_column_value",
         "manual_entry",

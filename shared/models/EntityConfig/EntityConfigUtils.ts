@@ -9,7 +9,7 @@ import type { EntityFieldValueExtractor } from "./ValueExtractor/ValueExtractor.
 import type {
   AnyFunction,
   AnyFunctionWithArguments,
-} from "@utils/types/utilityTypes.ts";
+} from "@utils/types/utilities.types.ts";
 import type { Simplify } from "type-fest";
 
 type EntityFieldConfigWithValueExtractor = EntityFieldConfig & {

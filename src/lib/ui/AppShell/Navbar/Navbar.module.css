@@ -1,20 +1,3 @@
-.navbarTitleLink {
-  color: var(--mantine-navbar-color);
-
-  &:hover {
-    background-color: var(--mantine-navbar-hover-background);
-    text-decoration: none;
-  }
-
-  &[data-status="active"] {
-    background-color: var(--mantine-navbar-active-background);
-
-    &:hover {
-      background-color: var(--mantine-navbar-active-hover-background);
-    }
-  }
-}
-
 .navbarLinkPill {
   color: var(--mantine-navbar-color);
   transition: background-color var(--navbar-transition-duration) ease-in-out;
@@ -29,6 +12,19 @@ a[data-status="active"] .navbarLinkPill {
   background-color: var(--mantine-navbar-active-background);
 }
 
+button:hover .navbarLinkPill,
+button:focus-visible .navbarLinkPill {
+  background-color: var(--mantine-navbar-hover-background);
+}
+
+button[aria-expanded="true"] .navbarLinkPill {
+  background-color: var(--mantine-navbar-active-background);
+}
+
 a[data-status="active"]:hover .navbarLinkPill {
+  background-color: var(--mantine-navbar-active-hover-background);
+}
+
+button[aria-expanded="true"]:hover .navbarLinkPill {
   background-color: var(--mantine-navbar-active-hover-background);
 }

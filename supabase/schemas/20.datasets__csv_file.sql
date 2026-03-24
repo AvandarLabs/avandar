@@ -40,9 +40,7 @@ create table public.datasets__csv_file (
 alter table public.datasets__csv_file enable row level security;
 
 -- Policies
-create policy "
-  User can SELECT datasets__csv_file in their workspace
-" on public.datasets__csv_file for
+create policy "User can select datasets__csv_file in their workspace" on public.datasets__csv_file for
 select
   to authenticated using (
     public.datasets__csv_file.workspace_id = any (
@@ -53,9 +51,7 @@ select
     )
   );
 
-create policy "
-  User can INSERT datasets__csv_file in their workspace
-" on public.datasets__csv_file for insert to authenticated
+create policy "User can insert datasets__csv_file in their workspace" on public.datasets__csv_file for insert to authenticated
 with
   check (
     public.datasets__csv_file.workspace_id = any (
@@ -66,9 +62,7 @@ with
     )
   );
 
-create policy "
-  User can UPDATE datasets__csv_file in their workspace
-" on public.datasets__csv_file
+create policy "User can update datasets__csv_file in their workspace" on public.datasets__csv_file
 for update
   to authenticated using (
     public.datasets__csv_file.workspace_id = any (
@@ -89,9 +83,7 @@ with
     )
   );
 
-create policy "
-  User can DELETE datasets__csv_file in their workspace
-" on public.datasets__csv_file for delete to authenticated using (
+create policy "User can delete datasets__csv_file in their workspace" on public.datasets__csv_file for delete to authenticated using (
   public.datasets__csv_file.workspace_id = any (
     array(
       select

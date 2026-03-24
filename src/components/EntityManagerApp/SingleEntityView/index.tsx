@@ -1,11 +1,14 @@
 import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
+import { ObjectDescriptionList } from "@ui/ObjectDescriptionList/ObjectDescriptionList";
 import { where } from "@utils/filters/where/where";
 import { isNonNullish } from "@utils/guards/isNonNullish/isNonNullish";
+import { makeIdLookupMap } from "@utils/maps/makeIdLookupMap/makeIdLookupMap";
+import { makeMap } from "@utils/maps/makeMap/makeMap";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { propEq } from "@utils/objects/hofs/propEq/propEq";
+import { makeObject } from "@utils/objects/makeObject/makeObject";
 import { omit } from "@utils/objects/omit/omit";
 import { unknownToString } from "@utils/strings/unknownToString/unknownToString";
-import { makeObject } from "$/lib/objects/builders";
 import {
   EntityFieldConfig,
   EntityFieldConfigId,
@@ -15,13 +18,10 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { SourceBadge } from "@/components/common/SourceBadge";
-import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList";
 import { Paper } from "@/lib/ui/Paper/Paper";
-import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap/makeIdLookupMap";
-import { makeMap } from "@/lib/utils/maps/makeMap/makeMap";
 import { ActivityBlock } from "./ActivityBlock";
 import { StatusPill } from "./StatusPill";
-import type { DatasetSourceType } from "$/models/datasets/Dataset/Dataset.types";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { Entity } from "$/models/entities/Entity/Entity.types";
 import type { EntityFieldValue } from "$/models/entities/EntityFieldValue/EntityFieldValue.types";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig.types";
@@ -33,7 +33,7 @@ type HydratedEntity = Entity & {
   fieldValues?: Array<
     EntityFieldValue & {
       fieldName?: string;
-      sourceType?: DatasetSourceType;
+      sourceType?: DatasetSource.SourceType;
       sourceName?: string;
     }
   >;
@@ -57,6 +57,7 @@ function useHydratedEntity({
     });
   const [entityFieldValues, isLoadingEntityFieldValues] =
     EntityFieldValueClient.withLogger().useGetEntityFieldValues({
+      workspaceId: entity.workspaceId,
       entityId: entity.id,
       entityFieldConfigs: entityFieldConfigs ?? [],
     });
@@ -141,7 +142,7 @@ type Props = {
 
 type FieldValueMetadata = {
   value: EntityFieldValue["value"];
-  sourceType?: DatasetSourceType;
+  sourceType?: DatasetSource.SourceType;
   sourceName?: string;
 };
 

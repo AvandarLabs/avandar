@@ -1,3 +1,7 @@
+// arrays
+export { splitArray } from "./arrays/splitArray/splitArray.ts";
+export { append } from "./arrays/hofs/append/append.ts";
+
 // asserts
 export { assert } from "./asserts/assert/assert.ts";
 export { assertIsDefined } from "./asserts/assertIsDefined/assertIsDefined.ts";
@@ -8,6 +12,13 @@ export { assertIsSingletonArray } from "./asserts/assertIsSingletonArray/assertI
 // dates
 export { formatDate } from "./dates/formatDate/formatDate.ts";
 export type { FormattableTimezone } from "./dates/formatDate/formatDate.ts";
+
+// numbers
+export { formatNumber } from "./numbers/formatNumber/formatNumber.ts";
+export type {
+  FormatNumberOptions,
+  SignDisplay,
+} from "./numbers/formatNumber/formatNumber.ts";
 
 // filters
 export { applyFiltersToRows } from "./filters/applyFiltersToRows/applyFiltersToRows.ts";
@@ -37,7 +48,7 @@ export { isDate } from "./guards/isDate/isDate.ts";
 export { isDefined } from "./guards/isDefined/isDefined.ts";
 export { isEmptyObject } from "./guards/isEmptyObject/isEmptyObject.ts";
 export { isEpochMs } from "./guards/isEpochMs/isEpochMs.ts";
-export { isFunction } from "./guards/isFunction/isFunction.ts";
+export { isFunction } from "./guards/isFunction.ts";
 export { isISODateString } from "./guards/isISODateString/isISODateString.ts";
 export { isNonEmptyArray } from "./guards/isNonEmptyArray/isNonEmptyArray.ts";
 export { isNonNullish } from "./guards/isNonNullish/isNonNullish.ts";
@@ -52,8 +63,15 @@ export { isPrimitive } from "./guards/isPrimitive/isPrimitive.ts";
 export { isValidDateValue } from "./guards/isValidDateValue/isValidDateValue.ts";
 export { hasDefinedProps } from "./guards/hasDefinedProps/hasDefinedProps.ts";
 
+// guards - higher order functions
+export { valEq } from "./guards/hofs/valEq.ts";
+export { valNotEq } from "./guards/hofs/valNotEq.ts";
+
 // maps
 export { makeBucketMap } from "./maps/makeBucketMap/makeBucketMap.ts";
+export { makeIdLookupMap } from "./maps/makeIdLookupMap/makeIdLookupMap.ts";
+export { makeMap } from "./maps/makeMap/makeMap.ts";
+export { mergeBucketMaps } from "./maps/mergeBucketMaps/mergeBucketMaps.ts";
 
 // misc
 export { constant } from "./misc/constant/constant.ts";
@@ -64,11 +82,16 @@ export { traverse } from "./misc/traverse/traverse.ts";
 export { pipe } from "./misc/pipe/pipe.ts";
 
 // objects
-export { camelCaseKeysDeep } from "./objects/camelCaseKeysDeep/camelCaseKeysDeep.ts";
-export { camelCaseKeysShallow } from "./objects/camelCaseKeysShallow/camelCaseKeysShallow.ts";
+export { camelCaseKeys } from "./objects/camelCaseKeys/camelCaseKeys.ts";
+export { camelCaseKeysDeep } from "./objects/camelCaseKeys/camelCaseKeys.ts";
+export { camelCaseKeysShallow } from "./objects/camelCaseKeys/camelCaseKeys.ts";
 export { coerceDatesIn } from "./objects/coerceDatesIn/coerceDatesIn.ts";
 export { convertDatesToISOIn } from "./objects/convertDatesToISOIn/convertDatesToISOIn.ts";
 export { getValue } from "./objects/getValue/getValue.ts";
+export { makeBucketRecord } from "./objects/makeBucketRecord/makeBucketRecord.ts";
+export { makeIdLookupRecord } from "./objects/makeIdLookupRecord/makeIdLookupRecord.ts";
+export { makeObject } from "./objects/makeObject/makeObject.ts";
+export { makeObjectFromEntries } from "./objects/makeObjectFromEntries/makeObjectFromEntries.ts";
 export { setValue } from "./objects/setValue/setValue.ts";
 export { excludeDeep } from "./objects/excludeDeep/excludeDeep.ts";
 export { excludeNullsDeep } from "./objects/excludeNullsDeep/excludeNullsDeep.ts";
@@ -89,6 +112,10 @@ export { snakeCaseKeysDeep } from "./objects/snakeCaseKeysDeep/snakeCaseKeysDeep
 export { snakeCaseKeysShallow } from "./objects/snakeCaseKeysShallow/snakeCaseKeysShallow.ts";
 export { swapDeep } from "./objects/swapDeep/swapDeep.ts";
 export { undefinedsToNullsDeep } from "./objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
+export {
+  mixedComparator,
+  sortObjList,
+} from "./objects/sortObjList/sortObjList.ts";
 
 // objects - higher order functions
 export { coerceDatesInProps } from "./objects/hofs/coerceDatesInProps/coerceDatesInProps.ts";
@@ -107,17 +134,23 @@ export { setPropValue } from "./objects/hofs/setPropValue/setPropValue.ts";
 
 // strings
 export { capitalize } from "./strings/capitalize/capitalize.ts";
+export {
+  sortStrings,
+  stringComparator,
+} from "./strings/sortStrings/sortStrings.ts";
 export { toPascalCase } from "./strings/toPascalCase/toPascalCase.ts";
 export { unknownToString } from "./strings/unknownToString/unknownToString.ts";
 export { prefix } from "./strings/prefix/prefix.ts";
+export { template } from "./strings/template/template.ts";
 
 // constants
-export { MIMEType } from "./types/common.ts";
+export { MIMEType } from "./types/common.types.ts";
 
 // types
 export type {
   UUID,
   UnknownObject,
+  UnknownArray,
   EmptyObject,
   RawCellValue,
   RawDataRow,
@@ -127,7 +160,7 @@ export type {
   JSONValue,
   Brand,
   IExternalStore,
-} from "./types/common.ts";
+} from "./types/common.types.ts";
 export type {
   And,
   IsEqual,
@@ -135,9 +168,10 @@ export type {
   IsArray,
   Not,
   ZodSchemaEqualsTypes,
-} from "./types/testUtilityTypes.ts";
+} from "./types/test-utilities.types.ts";
 export type {
   StringKeyOf,
+  CamelCase,
   Entries,
   Unbrand,
   ExcludeDeep,
@@ -157,7 +191,8 @@ export type {
   Registry,
   RegistryOfArrays,
   ObjectRegistry,
-} from "./types/utilityTypes.ts";
+  MergeObjects,
+} from "./types/utilities.types.ts";
 export type { PathValue } from "./objects/getValue/getValue.ts";
 export type { ExcludeNullsExceptIn } from "./objects/excludeNullsExceptIn/excludeNullsExceptIn.ts";
 export type { ExcludeNullsIn } from "./objects/excludeNullsIn/excludeNullsIn.ts";

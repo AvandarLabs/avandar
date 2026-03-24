@@ -1,6 +1,6 @@
 import { isNull } from "../../guards/isNull/isNull.ts";
 import { excludeDeep } from "../excludeDeep/excludeDeep.ts";
-import type { ExcludeDeep } from "../../types/utilityTypes.ts";
+import type { ExcludeDeep } from "../../types/utilities.types.ts";
 
 /**
  * Drop all keys that have a `null` value. This is a deep transformation.

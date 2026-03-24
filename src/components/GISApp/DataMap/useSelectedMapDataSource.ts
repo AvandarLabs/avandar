@@ -1,9 +1,9 @@
+import { Model } from "@models/Model/Model";
+import { template } from "@utils/index";
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
 import { MapLayerMouseEvent, Map as MapLibreMap } from "maplibre-gl";
 import { RefObject, useEffect, useRef } from "react";
-import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
-import { DuckDBClient } from "@/clients/DuckDBClient";
-import { isOfModelType } from "@/lib/utils/guards/guards";
+import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.types";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 
@@ -58,7 +58,7 @@ export function useSelectedMapDataSource({
       !selectedDataSource ||
       !latitudeColumn ||
       !longitudeColumn ||
-      !isOfModelType("Dataset", selectedDataSource)
+      !Model.isOfModelType(selectedDataSource, "Dataset")
     ) {
       // Remove existing layer and source if they exist
       if (map.getLayer(GEOJSON_LAYER_ID)) {
@@ -151,16 +151,13 @@ export function useSelectedMapDataSource({
         console.log("Lng column:", lngColumnName);
         console.log("Symbol size column:", symbolSizeColumnName);
 
-        // Load the dataset into memory
-        await DatasetRawDataClient.loadLocalDataset({ datasetId });
-
         // Convert the dataset to GeoJSON using DuckDB spatial functions
         // We use ST_Point to create points from lat/lng columns
         // and ST_AsGeoJSON to convert to GeoJSON format
         // Note: ST_AsGeoJSON returns a JSON object, which DuckDB will
         // return as a string
         // ST_Point takes (x, y) where x is longitude and y is latitude
-        const geojsonQuery = `
+        const geojsonQuery = template(`
           SELECT 
             ST_AsGeoJSON(
               ST_Point(
@@ -173,18 +170,19 @@ export function useSelectedMapDataSource({
           WHERE 
             "$latColumnName$" IS NOT NULL 
             AND "$lngColumnName$" IS NOT NULL
-        `;
+        `).parse({
+          latColumnName,
+          lngColumnName,
+          datasetId,
+        });
 
         console.log("Running GeoJSON query...");
-        const queryResult = await DuckDBClient.runRawQuery<{
+        const queryResult = await WorkspaceQETLClient.runQuery<{
           geometry: unknown;
           [key: string]: unknown;
-        }>(geojsonQuery, {
-          params: {
-            latColumnName,
-            lngColumnName,
-            datasetId,
-          },
+        }>({
+          rawSQL: geojsonQuery,
+          workspaceId: selectedDataSource.workspaceId,
         });
 
         console.log("Query result rows:", queryResult.data.length);

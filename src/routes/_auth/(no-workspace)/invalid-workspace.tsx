@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { match } from "ts-pattern";
 import { z } from "zod";
+import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
 import { Logger } from "@/utils/Logger";
 
 const searchSchema = z.object({
@@ -26,32 +27,34 @@ function InvalidWorkspacePage() {
   }, [redirectReason]);
 
   return (
-    <Container ta="center" fluid py="xxxl">
-      <Stack gap="md">
-        <Title order={1}>No workspace was found</Title>
-        <Text size="xl">
-          {match(redirectReason)
-            .with("NOT_FOUND_OR_ACCESS_REVOKED", () => {
-              return (
-                <>
-                  The workspace you are trying to access either does not exist
-                  or you do not have access to it.
-                </>
-              );
-            })
-            .with("NO_SUBSCRIPTION", () => {
-              return <>This workspace does not have a valid subscription.</>;
-            })
-            .otherwise(() => {
-              return (
-                <>
-                  The workspace you are trying to access either does not exist
-                  or you do not have access to it.
-                </>
-              );
-            })}
-        </Text>
-      </Stack>
-    </Container>
+    <AppLayout>
+      <Container ta="center" fluid py="xxxl">
+        <Stack gap="md">
+          <Title order={1}>No workspace was found</Title>
+          <Text size="xl">
+            {match(redirectReason)
+              .with("NOT_FOUND_OR_ACCESS_REVOKED", () => {
+                return (
+                  <>
+                    The workspace you are trying to access either does not exist
+                    or you do not have access to it.
+                  </>
+                );
+              })
+              .with("NO_SUBSCRIPTION", () => {
+                return <>This workspace does not have a valid subscription.</>;
+              })
+              .otherwise(() => {
+                return (
+                  <>
+                    The workspace you are trying to access either does not exist
+                    or you do not have access to it.
+                  </>
+                );
+              })}
+          </Text>
+        </Stack>
+      </Container>
+    </AppLayout>
   );
 }

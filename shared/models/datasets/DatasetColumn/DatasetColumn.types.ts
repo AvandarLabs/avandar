@@ -3,7 +3,7 @@ import type { DatasetId } from "../Dataset/Dataset.types.ts";
 import type { DuckDBDataType } from "./DuckDBDataTypes.ts";
 import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
 import type { Model } from "@models/Model/Model.ts";
-import type { UUID } from "@utils/types/common.ts";
+import type { UUID } from "@utils/types/common.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { SetOptional } from "type-fest";
 
@@ -52,7 +52,17 @@ export type DatasetColumnRead = Model.Base<
     /** Unique identifier of the dataset column */
     id: DatasetColumnId;
 
-    /** Name of the column. */
+    /**
+     * Original name of the column from the source data. This is not
+     * user-editable so we can always have a reference to the original name
+     * from the source data.
+     */
+    originalName: string;
+
+    /**
+     * Name of the column. This is user-editable. It can differ from the
+     * `originalName` field if the user renames the column.
+     */
     name: string;
 
     /** Timestamp of when the dataset column metadata last updated. */
@@ -72,7 +82,12 @@ export type DatasetColumnRead = Model.Base<
  */
 export type DetectedDatasetColumn = Pick<
   DatasetColumn,
-  "name" | "originalDataType" | "detectedDataType" | "dataType" | "columnIdx"
+  | "originalName"
+  | "name"
+  | "originalDataType"
+  | "detectedDataType"
+  | "dataType"
+  | "columnIdx"
 >;
 
 /**

@@ -1,13 +1,11 @@
 import { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupabaseCRUDClient";
 import { where } from "@utils/filters/where/where";
 import { prop } from "@utils/objects/hofs/prop/prop";
-import { makeBucketRecord } from "$/lib/objects/builders";
-import { matchLiteral } from "$/lib/strings/matchLiteral";
-import { CSVFileDataset } from "$/models/datasets/CSVFileDataset/CSVFileDataset.types";
+import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
+import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral";
 import {
   Dataset,
   DatasetId,
-  DatasetSourceType,
   DatasetWithColumns,
 } from "$/models/datasets/Dataset/Dataset.types";
 import { DatasetParsers } from "$/models/datasets/Dataset/DatasetParsers";
@@ -20,9 +18,10 @@ import { CSVFileDatasetClient } from "./CSVFileDatasetClient";
 import { DatasetColumnClient } from "./DatasetColumnClient";
 import { GoogleSheetsDatasetClient } from "./GoogleSheetsDatasetClient";
 import { LocalDatasetClient } from "./LocalDatasetClient";
+import { VirtualDatasetClient } from "./VirtualDatasetClient";
 import type { FiltersByColumn } from "@utils/filters/filters";
 import type { ExcludeNullsIn } from "@utils/objects/excludeNullsIn/excludeNullsIn";
-import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { CompositeTypes } from "$/types/database.types";
 import type { SetOptional } from "type-fest";
@@ -51,12 +50,17 @@ export const DatasetClient = createUsableServiceClient(
          */
         getSourceDataset: async (params: {
           datasetId: DatasetId;
-          sourceType: DatasetSourceType;
-        }): Promise<CSVFileDataset | GoogleSheetsDataset | undefined> => {
+          sourceType: DatasetSource.SourceType;
+        }): Promise<DatasetSource.T | undefined> => {
           const logger = clientLogger.appendName("getSourceDataset");
           logger.log("Getting the source dataset", params);
           const { datasetId, sourceType } = params;
           return matchLiteral(sourceType, {
+            virtual: () => {
+              return VirtualDatasetClient.getOne(
+                where("dataset_id", "eq", datasetId),
+              );
+            },
             csv_file: () => {
               return CSVFileDatasetClient.getOne(
                 where("dataset_id", "eq", datasetId),
@@ -130,6 +134,32 @@ export const DatasetClient = createUsableServiceClient(
 
     mutations: ({ clientLogger, dbClient, parsers }) => {
       return {
+        insertVirtualDataset: async (params: {
+          datasetId: DatasetId;
+          workspaceId: WorkspaceId;
+          datasetName: string;
+          datasetDescription: string;
+          columns: DatasetColumnInput[];
+          rawSQL: string;
+        }): Promise<Dataset> => {
+          const logger = clientLogger.appendName("insertVirtualDataset");
+          logger.log("Creating virtual dataset", params);
+          const { data: dataset } = await dbClient
+            .rpc("rpc_datasets__add_virtual_dataset", {
+              p_dataset_id: params.datasetId,
+              p_workspace_id: params.workspaceId,
+              p_dataset_name: params.datasetName,
+              p_dataset_description: params.datasetDescription,
+              p_columns: params.columns.map((col) => {
+                return { ...col, description: col.description ?? null };
+              }),
+              p_raw_sql: params.rawSQL,
+            })
+            .throwOnError();
+          logger.log("Successfully added virtual dataset", dataset);
+          return parsers.fromDBReadToModelRead(dataset);
+        },
+
         /**
          * Inserts a new local CSV dataset into the database.
          *
@@ -156,7 +186,7 @@ export const DatasetClient = createUsableServiceClient(
             timestampFormat: string | null;
           };
         }): Promise<Dataset> => {
-          const logger = clientLogger.appendName("addNewDataset");
+          const logger = clientLogger.appendName("insertCSVFileDataset");
           logger.log("Creating dataset", params);
 
           const {
@@ -291,6 +321,7 @@ export const DatasetClient = createUsableServiceClient(
     mutationFns: [
       "insertCSVFileDataset",
       "insertGoogleSheetsDataset",
+      "insertVirtualDataset",
       "fullDelete",
     ],
   },

@@ -1,37 +1,37 @@
 import { useQuery } from "@hooks/useQuery/useQuery";
 import { Model } from "@models/Model/Model";
-import { where } from "@utils/filters/where/where";
 import { prop } from "@utils/objects/hofs/prop/prop";
-import { objectEntries } from "@utils/objects/objectEntries";
-import { objectValues } from "@utils/objects/objectValues";
-import { makeObjectFromEntries } from "$/lib/objects/builders";
-import { DuckDBQueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationTypes";
-import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
+import { makeObjectFromEntries } from "@utils/objects/makeObjectFromEntries/makeObjectFromEntries";
+import { sortObjList } from "@utils/objects/sortObjList/sortObjList";
+import { uuid } from "$/lib/uuid";
+import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { QueryResults } from "$/models/queries/QueryResult/QueryResults";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
-import { isOfModelType } from "@/lib/utils/guards/guards";
-import {
-  valIsOfModelType,
-  valNotEq,
-} from "@/lib/utils/guards/higherOrderFuncs";
-import { makeIdLookupMap } from "@/lib/utils/maps/makeIdLookupMap/makeIdLookupMap";
-import { sortObjList } from "@/lib/utils/objects/sortObjList";
+import { PublicQETLClient } from "@/clients/qetl/PublicQETLClient";
+import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import type { UnknownRow } from "@/clients/DuckDBClient";
 import type { UseQueryResultTuple } from "@hooks/useQuery/useQuery";
 import type {
   QueryResult,
   QueryResultColumn,
+  QueryResultId,
 } from "$/models/queries/QueryResult/QueryResult.types";
-import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 type UseDataQueryOptions = {
-  query: PartialStructuredQuery;
+  query: StructuredQuery.Partial;
   rawSQL: string | undefined;
-  workspaceId: Workspace.Id | undefined;
-};
+} & (
+  | {
+      auth: "workspace";
+      workspaceId: Workspace.Id;
+    }
+  | {
+      auth: "public";
+      publicAvaPageId: DashboardId;
+    }
+);
 
 /**
  * This is the main hook in the DataExplorerApp that will query the data.
@@ -45,11 +45,10 @@ type UseDataQueryOptions = {
  * a stopgap. We should have a proper usePublicDataQuery hook to handle
  * it properly.
  */
-export function useDataQuery({
-  query,
-  rawSQL,
-  workspaceId,
-}: UseDataQueryOptions): UseQueryResultTuple<QueryResult<UnknownRow>> {
+export function useDataQuery(
+  options: UseDataQueryOptions,
+): UseQueryResultTuple<QueryResult<UnknownRow>> {
+  const { auth, query, rawSQL } = options;
   const {
     dataSource,
     queryColumns,
@@ -64,8 +63,8 @@ export function useDataQuery({
   return useQuery({
     enabled: !!dataSource || !!rawSQL,
     queryKey: [
-      "workspace",
-      workspaceId,
+      auth,
+      auth === "workspace" ? options.workspaceId : options.publicAvaPageId,
       "rawSQL",
       rawSQL,
       "dataSource",
@@ -81,84 +80,34 @@ export function useDataQuery({
 
     queryFn: async (): Promise<QueryResult<UnknownRow>> => {
       if (rawSQL) {
-        const allDatasets = await DatasetClient.getAll(
-          workspaceId ? where("workspace_id", "eq", workspaceId) : undefined,
+        if (auth === "public") {
+          // if no workspace id then this is a public query
+          return await PublicQETLClient.runQuery({
+            rawSQL,
+            dashboardId: options.publicAvaPageId,
+          });
+        }
+
+        return await WorkspaceQETLClient.runQuery({
+          rawSQL,
+          workspaceId: options.workspaceId,
+        });
+      }
+
+      if (auth === "public") {
+        throw new Error(
+          "Public queries are not supported for structured queries. Use raw SQL instead.",
         );
-        const allDatasetIds = allDatasets.map(prop("id"));
-
-        // if a dataset id is mentioned anywhere in the rawSQL, then we treat
-        // it as a dependency that needs to be loaded into memory.
-        const datasetsToLoad = allDatasetIds.filter((datasetId) => {
-          return rawSQL.includes(datasetId);
-        });
-
-        return await DatasetRawDataClient.runLocalRawQuery({
-          dependencies: datasetsToLoad,
-          query: rawSQL,
-        });
       }
 
       if (dataSource && sortedQueryColumns.length > 0) {
         const queryResults = await Model.match(dataSource, {
           // Querying datasets is simple. We can just query the dataset
           // directly with the DatasetRawDataClient.
-          Dataset: async (dataset): Promise<QueryResult<UnknownRow>> => {
-            const queryColumnLookup = makeIdLookupMap(sortedQueryColumns, {
-              key: "id",
-            });
-
-            // First, we need to convert the structured query into a
-            // DuckDB structured query.
-            const duckDBAggregations = {} as Record<
-              string, // duckdb uses column names for aggregations
-              DuckDBQueryAggregationType
-            >;
-            const groupByColumnNames = [] as string[];
-
-            const atLeastOneColumnHasAggregation = objectValues(
-              aggregations,
-            ).some(valNotEq("none"));
-
-            objectEntries(aggregations).forEach(([columnId, aggregation]) => {
-              const column = queryColumnLookup.get(columnId);
-              if (isOfModelType("DatasetColumn", column?.baseColumn)) {
-                // "group_by" and "none" are not valid DucKDB aggregations, so
-                // we exclude them here.
-                if (aggregation !== "group_by" && aggregation !== "none") {
-                  duckDBAggregations[column.baseColumn.name] = aggregation;
-                } else {
-                  // But if the aggregation is "group_by" or there is at least
-                  // one other column with an aggregation, then we add this
-                  // column to the groupBy list to make sure our SQL query
-                  // remains valid.
-                  if (
-                    atLeastOneColumnHasAggregation ||
-                    aggregation === "group_by"
-                  ) {
-                    groupByColumnNames.push(column.baseColumn.name);
-                  }
-                }
-              }
-            });
-
-            const selectColumnNames = sortedQueryColumns.map(
-              prop("baseColumn.name"),
-            );
-            const orderByColumnName =
-              orderByColumn && queryColumnLookup.has(orderByColumn) ?
-                QueryColumns.getDerivedColumnName(
-                  queryColumnLookup.get(orderByColumn)!,
-                )
-              : undefined;
-            return await DatasetRawDataClient.runLocalStructuredQuery({
-              query: {
-                datasetId: dataset.id,
-                aggregations: duckDBAggregations,
-                selectColumnNames,
-                groupByColumnNames,
-                orderByDirection,
-                orderByColumnName,
-              },
+          Dataset: async (): Promise<QueryResult<UnknownRow>> => {
+            return await WorkspaceQETLClient.runQuery({
+              rawSQL: StructuredQuery.toRawDuckDBQuery(query),
+              workspaceId: options.workspaceId,
             });
           },
 
@@ -172,7 +121,7 @@ export function useDataQuery({
             // table-materialization approach
             const fields = sortedQueryColumns
               .map(prop("baseColumn"))
-              .filter(valIsOfModelType("EntityFieldConfig"));
+              .filter(Model.valIsOfModelType("EntityFieldConfig"));
 
             // TODO(jpsyx): we still need to apply group bys, aggregations,
             // and sorting. Right now its just returning all values for the
@@ -180,6 +129,7 @@ export function useDataQuery({
             const rows = await EntityFieldValueClient.getAllEntityFieldValues({
               entityConfigId: entityConfig.id,
               entityFieldConfigs: fields,
+              workspaceId: options.workspaceId,
             });
 
             const queryResultColumns: QueryResultColumn[] = fields.map(
@@ -192,6 +142,7 @@ export function useDataQuery({
             );
 
             return {
+              id: uuid() as QueryResultId,
               data: rows.map((row) => {
                 return makeObjectFromEntries(
                   queryResultColumns.map((col) => {

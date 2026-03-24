@@ -5,7 +5,7 @@ import type {
 } from "../QueryColumn/QueryColumn.types.ts";
 import type { QueryDataSource } from "../QueryDataSource/QueryDataSource.types.ts";
 import type { Model } from "@models/Model/Model.ts";
-import type { UUID } from "@utils/types/common.ts";
+import type { UUID } from "@utils/types/common.types.ts";
 
 type ModelType = "StructuredQuery";
 type CurrentStructuredQueryVersion = 1;
@@ -18,16 +18,11 @@ export type StructuredQueryId = UUID<ModelType>;
  * platform for the Data Explorer app. A DuckDB query is generated from this
  * representation to run local queries.
  */
-export type StructuredQuery = Model.Base<
+export type StructuredQueryRead = Model.Versioned<
   ModelType,
+  CurrentStructuredQueryVersion,
   {
     id: StructuredQueryId;
-
-    /**
-     * The current version of the StructuredQuery type. These queries can be
-     * persisted, so we need to version it.
-     */
-    version: CurrentStructuredQueryVersion;
 
     /** The data source we are querying from. */
     dataSource: QueryDataSource;
@@ -43,19 +38,27 @@ export type StructuredQuery = Model.Base<
 
     /** The aggregations that are being applied to the query columns */
     aggregations: Record<QueryColumnId, QueryAggregationType>;
+
+    /** The offset of the query. */
+    offset: number | undefined;
+
+    /** The limit of the query. */
+    limit: number | undefined;
   }
 >;
 
-type EmptyStructuredQuery = Model.Base<
+type EmptyStructuredQuery = Model.Versioned<
   ModelType,
+  CurrentStructuredQueryVersion,
   {
     id: StructuredQueryId;
-    version: CurrentStructuredQueryVersion;
     dataSource: undefined;
     queryColumns: readonly QueryColumn[];
     orderByColumn: undefined;
     orderByDirection: undefined;
     aggregations: Record<QueryColumnId, QueryAggregationType>;
+    offset: undefined;
+    limit: undefined;
   }
 >;
 
@@ -63,4 +66,4 @@ type EmptyStructuredQuery = Model.Base<
  * A StructuredQuery type that is still under construction. This is used in
  * the Data Explorer app when a user is still building their query.
  */
-export type PartialStructuredQuery = EmptyStructuredQuery | StructuredQuery;
+export type PartialStructuredQuery = EmptyStructuredQuery | StructuredQueryRead;

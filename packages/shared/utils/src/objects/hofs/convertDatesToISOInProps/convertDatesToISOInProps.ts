@@ -1,5 +1,5 @@
 import { convertDatesToISOIn } from "../../convertDatesToISOIn/convertDatesToISOIn.ts";
-import type { UnknownObject } from "../../../types/common.ts";
+import type { UnknownObject } from "../../../types/common.types.ts";
 import type { ConditionalKeys } from "type-fest";
 
 /**

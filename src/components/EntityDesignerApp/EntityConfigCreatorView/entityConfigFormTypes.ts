@@ -4,7 +4,7 @@ import { DatasetColumnValueExtractor } from "$/models/EntityConfig/ValueExtracto
 import { ManualEntryExtractor } from "$/models/EntityConfig/ValueExtractor/ManualEntryExtractor/ManualEntryExtractor.types";
 import { EntityFieldValueExtractorRegistry } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types";
 import type { FormType } from "@/lib/hooks/ui/useForm";
-import type { Expect } from "@utils/types/testUtilityTypes";
+import type { Expect } from "@utils/types/test-utilities.types";
 import type {
   Dataset,
   DatasetWithColumns,

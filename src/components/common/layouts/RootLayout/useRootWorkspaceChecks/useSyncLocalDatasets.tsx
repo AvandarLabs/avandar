@@ -7,7 +7,6 @@ import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { UserId } from "$/models/User/User.types";
 import { useEffect, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -93,12 +92,12 @@ export function useSyncLocalDatasets(): void {
 
       // get the locally loaded datasets
       const datasetStatuses = await promiseMap(datasets, async (dataset) => {
-        const isLoaded = await DatasetRawDataClient.isLocalDatasetAvailable({
-          datasetId: dataset.id,
+        const isInLocalStorage = await LocalDatasetClient.getById({
+          id: dataset.id,
         });
 
-        if (isLoaded) {
-          return { dataset, isLoaded };
+        if (isInLocalStorage) {
+          return { dataset, isLoaded: true };
         }
 
         // if not in our local storage, then fetch it from cloud object storage

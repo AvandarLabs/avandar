@@ -1,5 +1,5 @@
 import type { SegmentedControlItem } from ".";
-import type { UnknownObject } from "@utils/types/common";
+import type { UnknownObject } from "@utils/types/common.types";
 import type { ReactNode } from "react";
 
 /**

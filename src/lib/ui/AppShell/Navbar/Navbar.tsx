@@ -1,3 +1,4 @@
+import { useBoolean } from "@hooks/useBoolean/useBoolean";
 import { useMutation } from "@hooks/useMutation/useMutation";
 import {
   Box,
@@ -22,14 +23,12 @@ import {
 } from "@tabler/icons-react";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { APP_NAME } from "$/config/AppConfig";
-import { clsx } from "clsx";
 import { AuthClient } from "@/clients/AuthClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { BetaBadge } from "@/components/common/BetaBadge/BetaBadge";
 import { CreateWorkspaceForm } from "@/components/common/forms/CreateWorkspaceForm";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
-import { useBoolean } from "@/lib/hooks/state/useBoolean";
 import { Link } from "@/lib/ui/links/Link";
 import { Logo } from "../Logo";
 import css from "./Navbar.module.css";
@@ -109,36 +108,58 @@ export function Navbar({
   return (
     <>
       <Group
-        className={clsx(css.navbarTitleLink, "transition-colors")}
-        px="md"
-        pt="sm"
-        pb="xs"
+        pt="xs"
+        pl="xs"
         wrap="nowrap"
-        justify="space-between"
         gap={0}
+        justify="space-between"
+        w="100%"
       >
-        <Group wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
-          {mobile.burgerIcon}
+        {mobile.burgerIcon}
+        <Box flex={1} miw={0} w="100%">
           <Menu shadow="md" width={200}>
             <Menu.Target>
               <UnstyledButton className="w-full text-left">
-                <Group gap={0} w="100%" justify="space-between" align="center">
-                  <Group gap="xs">
-                    {logo}
-                    <Text
-                      className="font-medium leading-tight"
-                      style={{ flex: 1, minWidth: 0 }}
-                      size="sm"
-                      truncate
+                <Flex
+                  px="xs"
+                  py="xxs"
+                  bdrs="md"
+                  align="center"
+                  className={css.navbarLinkPill}
+                  w="100%"
+                >
+                  <Group
+                    gap="xs"
+                    wrap="nowrap"
+                    align="center"
+                    justify="space-between"
+                    flex={1}
+                    miw={0}
+                  >
+                    <Group
+                      gap="xs"
+                      wrap="nowrap"
+                      align="center"
+                      flex={1}
+                      miw={0}
                     >
-                      {title ?? APP_NAME}
-                    </Text>
+                      <Box className="shrink-0">{logo}</Box>
+                      <Text
+                        className="font-medium leading-tight"
+                        flex={1}
+                        miw={0}
+                        size="sm"
+                        truncate
+                      >
+                        {title ?? APP_NAME}
+                      </Text>
+                    </Group>
                     <IconChevronDown
                       size={18}
                       className="min-h-4 min-w-4 shrink-0"
                     />
                   </Group>
-                </Group>
+                </Flex>
               </UnstyledButton>
             </Menu.Target>
             <Menu.Dropdown style={{ width: "max-content", minWidth: 200 }}>
@@ -204,7 +225,7 @@ export function Navbar({
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
-        </Group>
+        </Box>
       </Group>
       <Stack gap="xs" justify="space-between" h="100%">
         <Stack flex={1} gap="xxs" pl="xs">

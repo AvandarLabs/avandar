@@ -9,7 +9,7 @@ import { prop } from "@utils/objects/hofs/prop/prop";
 import { objectEntries } from "@utils/objects/objectEntries";
 import { objectKeys } from "@utils/objects/objectKeys";
 import { objectValuesMap } from "@utils/objects/objectValuesMap/objectValuesMap";
-import { MIMEType } from "@utils/types/common";
+import { MIMEType } from "@utils/types/common.types";
 import { uuid } from "$/lib/uuid";
 import {
   DuckDBDataType,
@@ -295,6 +295,7 @@ function arrowTableToJS<RowObject extends UnknownRow>(
     });
   });
   return {
+    id: uuid(),
     columns: arrowTable.schema.fields.map((field) => {
       return arrowFieldToQueryResultField(field, { logger });
     }),
@@ -329,9 +330,10 @@ class DuckDBClientImpl {
     await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
 
     // enable the spatial extension
-    // TODO(jpsyx): we should only do this when necessary
+    // TODO(jpsyx): we should only enable spatial extension when it's needed
     const conn = await db.connect();
     await conn.query("LOAD spatial;");
+    await conn.query("LOAD parquet;");
     await conn.close();
     return db;
   }
@@ -402,16 +404,29 @@ class DuckDBClientImpl {
     return dbTableNames.includes(tableName);
   }
 
+  async getViewNames(): Promise<string[]> {
+    const conn = await this.#connect();
+    const result = await conn.query<{ table_name: arrow.DataType }>(`
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = 'main' AND table_type = 'VIEW'
+    `);
+    const viewNames: string[] = result.toArray().map((row) => {
+      return row.table_name;
+    });
+    await this.#closeConnection(conn);
+    return viewNames;
+  }
+
   async hasView(viewName: string): Promise<boolean> {
-    const { data } = await this.runRawQuery<{ count: bigint }>(
-      `SELECT count(*) as count
-        FROM information_schema.tables
-        WHERE table_schema = 'main'
-          AND table_name = '$viewName$'
-          AND table_type = 'VIEW'`,
-      { params: { viewName } },
-    );
-    return Number(data[0]?.count ?? 0n) > 0;
+    const dbViewNames = await this.getViewNames();
+    return dbViewNames.includes(viewName);
+  }
+
+  async getTableOrViewNames(): Promise<string[]> {
+    const tableNames = await this.getTableNames();
+    const viewNames = await this.getViewNames();
+    return [...tableNames, ...viewNames];
   }
 
   async hasTableOrView(tableNameOrViewName: string): Promise<boolean> {
@@ -701,8 +716,15 @@ class DuckDBClientImpl {
   async loadParquet(options: {
     tableName: string;
     blob: Blob;
+    columnReplacements?: Record<
+      string,
+      {
+        alias?: string;
+        dataType?: DuckDBDataType;
+      }
+    >;
   }): Promise<DuckDBLoadParquetResult> {
-    const { tableName, blob } = options;
+    const { tableName, blob, columnReplacements } = options;
     let loadResults: DuckDBLoadParquetResult;
 
     // Drop the dataset and recreate it. We are overwriting the data.
@@ -711,11 +733,35 @@ class DuckDBClientImpl {
 
     const conn = await this.#connect();
     try {
+      const replaceClause = (() => {
+        if (!columnReplacements) {
+          return "";
+        }
+        const replacementSubClauses: string[] = objectEntries(
+          columnReplacements,
+        ).map(([colName, { alias, dataType }]) => {
+          const newColumnName = alias ?? colName;
+          const castPart =
+            dataType ? `TRY_CAST("${colName}" AS ${dataType})` : `"${colName}"`;
+          const newNamePart = ` AS "${newColumnName}"`;
+          return `${castPart}${newNamePart}`;
+        });
+
+        if (replacementSubClauses.length === 0) {
+          return "";
+        }
+        return `REPLACE (${replacementSubClauses.join(", ")})`;
+      })();
+
       // Re-ingest the parquet data into a view (low-memory querying).
       await this.runRawQuery(
-        `CREATE VIEW IF NOT EXISTS "$tableName$" AS
-            SELECT * FROM read_parquet('$tableName$')`,
-        { conn, params: { tableName } },
+        `SET enable_external_file_cache = false;
+CREATE VIEW IF NOT EXISTS "$tableName$" AS
+    SELECT * $replaceClause$
+    FROM read_parquet("$tableName$");
+SET enable_external_file_cache = true;
+            `,
+        { conn, params: { tableName, replaceClause } },
       );
 
       // now let's collect all information we need to return
@@ -734,21 +780,35 @@ class DuckDBClientImpl {
   }
 
   /**
-   * Exports a table as a Parquet file using ZSTD compression (default).
+   * Exports a table or view as a Parquet file using ZSTD compression (default).
    *
-   * @param tableName The name of the table to export as a Parquet file.
+   * "Exporting" means that we turn it into a blob (a binary object).
+   *
+   * @param tableOrViewName The name of the table or view to export as a Parquet
+   * blob.
    */
-  async exportTableAsParquet(tableName: string): Promise<Blob> {
+  async exportTableAsParquet(
+    tableOrViewName: string,
+    conn?: duckdb.AsyncDuckDBConnection,
+  ): Promise<Blob> {
     try {
       const db = await this.#getDB();
-      const tempParquetFileName = `${tableName}.temp`;
+      const tempParquetFileName = `${tableOrViewName}.temp`;
+      await this.runRawQuery(
+        `COPY '$tableName$' TO '$parquetFileName$' (
+          FORMAT 'parquet',
+          COMPRESSION 'ZSTD'
+        )`,
+        {
+          conn,
+          params: {
+            tableName: tableOrViewName,
+            parquetFileName: tempParquetFileName,
+          },
+        },
+      );
 
-      await this.#copyTableToParquetWithZSTD({
-        tableName,
-        parquetFileName: tempParquetFileName,
-      });
-
-      const parquetBuffer: Uint8Array<ArrayBuffer> = (await db.copyFileToBuffer(
+      const parquetBuffer = (await db.copyFileToBuffer(
         tempParquetFileName,
       )) as Uint8Array<ArrayBuffer>;
 
@@ -759,6 +819,8 @@ class DuckDBClientImpl {
       await db.dropFile(tempParquetFileName);
       return parquetBlob;
     } catch (error) {
+      // drop the view so it's not left behind
+      await conn?.query(`DROP VIEW IF EXISTS "${tableOrViewName}"`);
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
       this.#logger.error(error, {
@@ -766,31 +828,6 @@ class DuckDBClientImpl {
         errMsg: errorMessage,
       });
       throw new Error(`Parquet export failed: ${errorMessage}`);
-    }
-  }
-
-  async #copyTableToParquetWithZSTD(options: {
-    tableName: string;
-    parquetFileName: string;
-  }): Promise<void> {
-    const { tableName, parquetFileName } = options;
-
-    try {
-      await this.runRawQuery(
-        `COPY '$tableName$' TO '$parquetFileName$' (
-          FORMAT 'parquet',
-          COMPRESSION 'ZSTD'
-        )`,
-        { params: { tableName, parquetFileName } },
-      );
-    } catch {
-      await this.runRawQuery(
-        `COPY '$tableName$' TO '$parquetFileName$' (
-          FORMAT 'parquet',
-          CODEC 'ZSTD'
-        )`,
-        { params: { tableName, parquetFileName } },
-      );
     }
   }
 
@@ -818,6 +855,7 @@ class DuckDBClientImpl {
    * @param queryString The query to run.
    * @param options Additional options for the query
    * @param options.params The parameters to replace in the query string.
+   * Undefined values will be ignored.
    * @param options.conn The connection to use for the query. If not
    * provided, a new connection will be created. This is useful when previous
    * operations have created temporary data (e.g. transient tables) that will
@@ -827,30 +865,60 @@ class DuckDBClientImpl {
    */
   async runRawQuery<RowObject extends UnknownRow = UnknownRow>(
     queryString: string,
+    options?: {
+      params?: Record<string, string | number | bigint | undefined>;
+      returnType?: "js";
+      conn?: duckdb.AsyncDuckDBConnection;
+    },
+  ): Promise<QueryResult<RowObject>>;
+  async runRawQuery(
+    queryString: string,
+    options?: {
+      params?: Record<string, string | number | bigint | undefined>;
+      returnType: "parquet";
+      conn?: duckdb.AsyncDuckDBConnection;
+    },
+  ): Promise<Blob>;
+  async runRawQuery<RowObject extends UnknownRow = UnknownRow>(
+    queryString: string,
     options: {
-      params?: Record<string, string | number | bigint>;
+      params?: Record<string, string | number | bigint | undefined>;
+      returnType?: "parquet" | "js";
       conn?: duckdb.AsyncDuckDBConnection;
     } = {},
-  ): Promise<QueryResult<RowObject>> {
-    const { params = {} } = options;
+  ): Promise<Blob | QueryResult<RowObject>> {
+    const { params = {}, returnType = "js" } = options;
     const conn = options.conn ?? (await this.#connect());
-    let queryResults: QueryResult<RowObject>;
+    let queryResults: QueryResult<RowObject> | Blob;
     const paramNames = objectKeys(params);
     const queryStringToUse = paramNames.reduce((currQueryStr, paramName) => {
+      const argValue = params[paramName];
+      if (argValue === undefined) {
+        return currQueryStr;
+      }
       return currQueryStr.replace(
         new RegExp(`\\$${paramName}\\$`, "g"),
-        params[paramName] ? String(params[paramName]) : "",
+        String(argValue),
       );
     }, queryString);
 
     try {
       this.#logger.log("Executing query", { query: queryStringToUse });
       // run the query
-      const arrowTable =
-        await conn.query<Record<string, arrow.DataType>>(queryStringToUse);
-      queryResults = arrowTableToJS<RowObject>(arrowTable, {
-        logger: this.#logger,
-      });
+      if (returnType === "js") {
+        const arrowTable =
+          await conn.query<Record<string, arrow.DataType>>(queryStringToUse);
+        queryResults = arrowTableToJS<RowObject>(arrowTable, {
+          logger: this.#logger,
+        });
+      } else {
+        // return as parquet blob
+        const tempViewName = uuid();
+        await conn.query(
+          `CREATE TEMP VIEW "${tempViewName}" AS ${queryStringToUse}`,
+        );
+        queryResults = await this.exportTableAsParquet(tempViewName, conn);
+      }
     } catch (error) {
       this.#logger.error(error, {
         executedQueryString: queryStringToUse,

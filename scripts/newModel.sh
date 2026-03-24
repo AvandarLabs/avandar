@@ -22,7 +22,7 @@ mkdir -p $PROJECT_ROOT/src/models
 
 # Create the model file with default contents
 cat > $MODEL_FILE << EOL
-import type { UUID } from "@/lib/types/common";
+import type { UUID } from "@/lib/types/common.types";
 
 export type ${MODEL_NAME}Id = UUID<"${MODEL_NAME}">;
 

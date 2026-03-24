@@ -8,8 +8,9 @@ import {
   notifySuccess,
   notifyWarning,
 } from "@ui/notifications/notify";
+import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
 import { snakeCaseKeysShallow } from "@utils/objects/snakeCaseKeysShallow/snakeCaseKeysShallow";
-import { MIMEType } from "@utils/types/common";
+import { MIMEType } from "@utils/types/common.types";
 import { uuid } from "$/lib/uuid";
 import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
@@ -22,12 +23,11 @@ import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { FileUploadForm } from "@/lib/ui/singleton-forms/FileUploadForm";
-import { formatNumber } from "@/lib/utils/formatters/formatNumber/formatNumber";
 import {
   DatasetImportForm,
   DatasetImportFormValues,
 } from "../DatasetUploadForm";
-import type { UnknownObject } from "@utils/types/common";
+import type { UnknownObject } from "@utils/types/common.types";
 import type {
   Dataset,
   DatasetId,
@@ -196,6 +196,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
     return loadResults?.metadata.columns.map((duckColumn, idx) => {
       return {
         name: duckColumn.column_name,
+        originalName: duckColumn.column_name,
         originalDataType: duckColumn.column_type,
         detectedDataType: duckColumn.column_type,
         dataType: DuckDBDataTypeUtils.toAvaDataType(duckColumn.column_type),

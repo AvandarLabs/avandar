@@ -1,25 +1,29 @@
+import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
+import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord";
 import { objectKeys } from "@utils/objects/objectKeys";
-import { makeBucketRecord, makeIdLookupRecord } from "$/lib/objects/builders";
 import { match } from "ts-pattern";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { promiseFlatMap } from "@/lib/utils/promises";
 import { Logger } from "@/utils/Logger";
 import { getDatasetColumnFieldValues } from "./getDatasetColumnFieldValues";
-import type { RegistryOfArrays } from "@utils/types/utilityTypes";
+import type { RegistryOfArrays } from "@utils/types/utilities.types";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
 import type {
   EntityFieldConfig,
   EntityFieldConfigId,
 } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import type { EntityFieldValueExtractorRegistry } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { Simplify } from "type-fest";
 
 async function _getEntityFieldValuesByExtractorType({
   entityConfigId,
+  workspaceId,
   requestedFields,
   extractorsByType,
 }: {
   entityConfigId: EntityConfigId;
+  workspaceId: Workspace.Id;
   requestedFields: readonly EntityFieldConfig[];
   extractorsByType: Simplify<
     Partial<RegistryOfArrays<EntityFieldValueExtractorRegistry>>
@@ -44,6 +48,7 @@ async function _getEntityFieldValuesByExtractorType({
 
           return getDatasetColumnFieldValues({
             entityConfigId,
+            workspaceId,
             fieldsWithExtractors,
           });
         })
@@ -63,9 +68,11 @@ async function _getEntityFieldValuesByExtractorType({
 export async function getEntityFieldValues({
   entityConfigId,
   entityFieldConfigs,
+  workspaceId,
 }: {
   entityConfigId: EntityConfigId;
   entityFieldConfigs: readonly EntityFieldConfig[];
+  workspaceId: Workspace.Id;
 }): Promise<Array<Record<EntityFieldConfigId, unknown>>> {
   const valueExtractors = await EntityFieldConfigClient.getAllValueExtractors({
     fields: entityFieldConfigs,
@@ -78,6 +85,7 @@ export async function getEntityFieldValues({
 
   const fieldValues = await _getEntityFieldValuesByExtractorType({
     entityConfigId,
+    workspaceId,
     requestedFields: entityFieldConfigs,
     extractorsByType: valueExtractorsByType,
   });

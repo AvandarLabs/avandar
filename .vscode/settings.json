@@ -12,7 +12,7 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "stylelint.configFile": "stylelint.config.js",
+  "stylelint.configFile": "${workspaceFolder}/stylelint.config.js",
   "stylelint.validate": ["css", "tailwindcss"],
   "css.validate": false,
   "postcss.validate": false,

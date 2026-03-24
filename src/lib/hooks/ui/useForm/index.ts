@@ -5,7 +5,7 @@ import type {
   FormErrors,
   UseFormInput as MantineUseFormInput,
 } from "@mantine/form";
-import type { UnknownObject } from "@utils/types/common";
+import type { UnknownObject } from "@utils/types/common.types";
 import type { Merge, Paths } from "type-fest";
 
 // Improved type safety for `path` argument in a Rule function

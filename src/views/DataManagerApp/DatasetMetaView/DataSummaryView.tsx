@@ -1,6 +1,7 @@
 import { Loader, Stack } from "@mantine/core";
-import { DatasetRawDataClient } from "@/clients/datasets/DatasetRawDataClient";
-import { ObjectDescriptionList } from "@/lib/ui/ObjectDescriptionList/ObjectDescriptionList";
+import { ObjectDescriptionList } from "@ui/ObjectDescriptionList/ObjectDescriptionList";
+import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 type Props = {
@@ -8,8 +9,10 @@ type Props = {
 };
 
 export function DataSummaryView({ datasetId }: Props): JSX.Element {
-  const [summary, isLoadingSummary] = DatasetRawDataClient.useGetSummary({
+  const workspace = useCurrentWorkspace();
+  const [summary, isLoadingSummary] = DatasetQueryClient.useGetSummary({
     datasetId,
+    workspaceId: workspace.id,
     useQueryOptions: {
       staleTime: Infinity,
       refetchOnMount: false,
