@@ -7,17 +7,18 @@ import { createInitialDashboardPuckData } from "$/models/Dashboard/DashboardConf
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
+import { AvaPageStateManager } from "../AvaPage/AvaPageStateManager/AvaPageStateManager";
+import { getVersionFromAvaPageData } from "../AvaPage/migrations/getVersionFromAvaPageData";
+import { upgradeAvaPageData } from "../AvaPage/utils/upgradeAvaPageData";
 import { DeleteDashboardButton } from "./DeleteDashboardButton";
 import {
   getDashboardPuckConfig,
   getDashboardTitleFromPuckData,
 } from "./getDashboardPuckConfig";
-import { getVersionFromAvaPageData } from "./migrations/getVersionFromAvaPageData";
 import { PublishDashboardButton } from "./PublishDashboardButton";
 import { SaveDashboardButton } from "./SaveDashboardButton";
-import { upgradeAvaPageData } from "./utils/upgradeAvaPageData";
 import { ViewDashboardButton } from "./ViewDashboardButton";
-import type { AvaPageData } from "./AvaPage.types";
+import type { AvaPageData } from "../AvaPage/AvaPage.types";
 import type {
   Dashboard,
   DashboardId,
@@ -115,36 +116,38 @@ export function DashboardEditorView({
   );
 
   return (
-    <AppLayout floatingToolbar>
-      <Flex direction="column" h="100%">
-        <Puck
-          key={editorKey}
-          config={puckConfig}
-          height="100%"
-          data={data}
-          onChange={(d: Data) => {
-            setData(d as AvaPageData);
-          }}
-          overrides={{
-            headerActions: () => {
-              return (
-                <>
-                  <SaveDashboardButton onSave={onSave} />
-                  <ViewDashboardButton
-                    workspaceSlug={workspaceSlug}
-                    dashboardId={dashboard?.id}
-                  />
-                  <PublishDashboardButton dashboardId={dashboard?.id} />
-                  <DeleteDashboardButton
-                    workspaceSlug={workspaceSlug}
-                    dashboardId={dashboard?.id}
-                  />
-                </>
-              );
-            },
-          }}
-        />
-      </Flex>
-    </AppLayout>
+    <AvaPageStateManager.Provider>
+      <AppLayout floatingToolbar>
+        <Flex direction="column" h="100%">
+          <Puck
+            key={editorKey}
+            config={puckConfig}
+            height="100%"
+            data={data}
+            onChange={(d: Data) => {
+              setData(d as AvaPageData);
+            }}
+            overrides={{
+              headerActions: () => {
+                return (
+                  <>
+                    <SaveDashboardButton onSave={onSave} />
+                    <ViewDashboardButton
+                      workspaceSlug={workspaceSlug}
+                      dashboardId={dashboard?.id}
+                    />
+                    <PublishDashboardButton dashboardId={dashboard?.id} />
+                    <DeleteDashboardButton
+                      workspaceSlug={workspaceSlug}
+                      dashboardId={dashboard?.id}
+                    />
+                  </>
+                );
+              },
+            }}
+          />
+        </Flex>
+      </AppLayout>
+    </AvaPageStateManager.Provider>
   );
 }

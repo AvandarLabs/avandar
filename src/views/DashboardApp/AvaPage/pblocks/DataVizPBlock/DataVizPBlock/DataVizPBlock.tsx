@@ -1,7 +1,7 @@
 import { Stack, Text } from "@mantine/core";
 import { Paper } from "@/lib/ui/Paper/Paper";
-import { NLQuery } from "../../fields/NLQueryField/NLQueryField";
-import { TableViz } from "../../TableViz";
+import { NLQuery } from "../../../pfields/NLQueryPField/NLQueryPField";
+import { TableViz } from "./TableViz";
 
 type Props = {
   nlQuery: NLQuery;

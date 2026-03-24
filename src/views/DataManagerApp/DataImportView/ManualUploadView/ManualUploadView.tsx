@@ -14,7 +14,7 @@ import { MIMEType } from "@utils/types/common.types";
 import { uuid } from "$/lib/uuid";
 import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";

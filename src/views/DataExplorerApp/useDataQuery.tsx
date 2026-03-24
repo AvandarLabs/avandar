@@ -5,8 +5,8 @@ import { makeObjectFromEntries } from "@utils/objects/makeObjectFromEntries/make
 import { sortObjList } from "@utils/objects/sortObjList/sortObjList";
 import { QueryResults } from "$/models/queries/QueryResult/QueryResults";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { WorkspaceQETLClient } from "@/clients/datasets/LocalDatasetClient/QETLClient";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
+import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import type { UnknownRow } from "@/clients/DuckDBClient";
 import type { UseQueryResultTuple } from "@hooks/useQuery/useQuery";
 import type {

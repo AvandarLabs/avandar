@@ -117,13 +117,36 @@ type ActionPayload<ActionRegistry extends GenericActionRegistry<any>> =
 export function createAppStateManager<
   State,
   ActionRegistry extends GenericActionRegistry<State>,
+>(options: {
+  name: string;
+  initialState: State;
+  actions: ActionRegistry;
+}): AppStateManager<State, ActionRegistry>;
+export function createAppStateManager<
+  InitArg,
+  State,
+  ActionRegistry extends GenericActionRegistry<State>,
+>(options: {
+  name: string;
+  initArg: InitArg;
+  initFn: (initArg: InitArg) => State;
+  actions: ActionRegistry;
+}): AppStateManager<State, ActionRegistry>;
+export function createAppStateManager<
+  InitArg,
+  State,
+  ActionRegistry extends GenericActionRegistry<State>,
 >({
   name,
   initialState,
+  initArg,
+  initFn,
   actions,
 }: {
   name: string;
-  initialState: State;
+  initialState?: State;
+  initArg?: InitArg;
+  initFn?: (initArg: InitArg) => State;
   actions: ActionRegistry;
 }): AppStateManager<State, ActionRegistry> {
   const AppStateContext = createContext<
@@ -177,7 +200,13 @@ export function createAppStateManager<
     },
 
     Provider: ({ children }) => {
-      const [state, dispatch] = useReducer(reducer, initialState);
+      const [state, dispatch] = useReducer(
+        reducer,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (initialState ?? initArg) as any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (initialState ? undefined : initFn) as any,
+      );
       const appDispatch = useMemo(() => {
         const fnRecord = {} as Record<
           keyof ActionRegistry,

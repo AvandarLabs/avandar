@@ -3,6 +3,7 @@ import { prop } from "@utils/objects/hofs/prop/prop";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
+import { AvaPageStateManager } from "../../../AvaPageStateManager/AvaPageStateManager";
 
 type Props = {
   rawSQL: string;
@@ -11,10 +12,12 @@ type Props = {
 const emptyStructuredQuery = StructuredQuery.makeEmpty();
 
 export function TableViz({ rawSQL }: Props): JSX.Element {
+  const { access } = AvaPageStateManager.useState();
+  console.log("access", access);
   const [queryResults, isLoadingResults] = useDataQuery({
     query: emptyStructuredQuery,
     rawSQL,
-    workspaceId: undefined,
+    workspaceId: access.mode === "workspace" ? access.workspaceId : undefined,
   });
 
   const columnNames: readonly string[] = (queryResults?.columns ?? []).map(

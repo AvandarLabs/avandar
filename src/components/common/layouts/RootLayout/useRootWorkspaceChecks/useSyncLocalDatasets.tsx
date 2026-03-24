@@ -7,7 +7,7 @@ import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { UserId } from "$/models/User/User.types";
 import { useEffect, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { difference } from "@/lib/utils/arrays/difference/difference";

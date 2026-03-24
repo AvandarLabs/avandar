@@ -8,7 +8,7 @@ describe("Theme modal stacking", () => {
 
   it("registers Modal defaults on the theme", () => {
     expect(Theme.components?.Modal).toBeDefined();
-    expect(Theme.components?.Modal.defaultProps?.zIndex).toBe(
+    expect(Theme.components?.Modal?.defaultProps?.zIndex).toBe(
       MODAL_ROOT_Z_INDEX,
     );
   });

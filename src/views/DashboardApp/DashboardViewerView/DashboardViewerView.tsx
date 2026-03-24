@@ -4,10 +4,11 @@ import { useEffect, useMemo } from "react";
 import "@puckeditor/core/puck.css";
 import { notifyError } from "@ui/notifications/notify";
 import { Paper } from "@/lib/ui/Paper/Paper";
-import { AvaPageGenericData } from "../DashboardEditorView/AvaPage.types";
+import { AvaPageGenericData } from "../AvaPage/AvaPage.types";
+import { AvaPageStateManager } from "../AvaPage/AvaPageStateManager/AvaPageStateManager";
+import { getVersionFromAvaPageData } from "../AvaPage/migrations/getVersionFromAvaPageData";
+import { upgradeAvaPageData } from "../AvaPage/utils/upgradeAvaPageData";
 import { getDashboardPuckConfig } from "../DashboardEditorView/getDashboardPuckConfig";
-import { getVersionFromAvaPageData } from "../DashboardEditorView/migrations/getVersionFromAvaPageData";
-import { upgradeAvaPageData } from "../DashboardEditorView/utils/upgradeAvaPageData";
 import { useEnsurePublishedDashboardDatasets } from "./useEnsurePublishedDashboardDatasets";
 import type { Dashboard } from "$/models/Dashboard/Dashboard.types";
 
@@ -123,8 +124,10 @@ export function DashboardViewerView({ dashboard }: Props): JSX.Element {
   }
 
   return (
-    <Box>
-      <PuckPageRender config={config} data={data} />
-    </Box>
+    <AvaPageStateManager.Provider>
+      <Box>
+        <PuckPageRender config={config} data={data} />
+      </Box>
+    </AvaPageStateManager.Provider>
   );
 }

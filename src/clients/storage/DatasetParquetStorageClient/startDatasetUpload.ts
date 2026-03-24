@@ -6,7 +6,7 @@ import { MIMEType } from "@utils/types/common.types";
 import { AuthClient } from "@/clients/AuthClient";
 import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { DatasetUploadProgressStore } from "./DatasetUploadProgressStore";

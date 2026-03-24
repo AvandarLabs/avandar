@@ -10,7 +10,7 @@ import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { DuckDBClient } from "@/clients/DuckDBClient";
 import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
