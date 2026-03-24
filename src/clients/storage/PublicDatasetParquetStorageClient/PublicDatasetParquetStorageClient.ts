@@ -89,7 +89,66 @@ async function downloadDataset({
   return undefined;
 }
 
+/**
+ * Lists dataset IDs that have a published Parquet object under the dashboard's
+ * `dashboards/{dashboardId}/datasets/` prefix in the public bucket.
+ *
+ * @param options The list options.
+ * @param options.dashboardId The dashboard whose published datasets to list.
+ */
+async function listDatasetIdsForDashboard(options: {
+  dashboardId: DashboardId;
+}): Promise<readonly DatasetId[]> {
+  const { dashboardId } = options;
+  const folderPath = `dashboards/${dashboardId}/datasets`;
+
+  // TODO(jpsyx): we are limiting to 1000 datasets per dashboard for now, but
+  // when we switch to data cubes and dice we may need to change to something
+  // more dynamic
+  const pageSize = 1000;
+
+  const collectFromOffset = async (
+    offset: number,
+    acc: readonly DatasetId[],
+  ): Promise<readonly DatasetId[]> => {
+    const { data, error } = await AvaSupabase.DB.storage
+      .from(PUBLIC_BUCKET_NAME)
+      .list(folderPath, {
+        limit: pageSize,
+        offset,
+        sortBy: { column: "name", order: "asc" },
+      });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    if (!data || data.length === 0) {
+      return acc;
+    }
+
+    const pageIds = data
+      .filter((file) => {
+        return file.name.endsWith(".parquet");
+      })
+      .map((file) => {
+        return file.name.slice(0, -".parquet".length);
+      }) as DatasetId[];
+
+    const nextAcc = acc.concat(pageIds);
+
+    if (data.length < pageSize) {
+      return nextAcc;
+    }
+
+    return collectFromOffset(offset + pageSize, nextAcc);
+  };
+
+  return collectFromOffset(0, []);
+}
+
 export const PublicDatasetParquetStorageClient = {
   uploadDataset,
   downloadDataset,
+  listDatasetIdsForDashboard,
 };

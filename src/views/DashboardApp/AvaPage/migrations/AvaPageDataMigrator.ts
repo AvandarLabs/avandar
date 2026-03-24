@@ -1,7 +1,10 @@
 import { Get } from "type-fest";
-import { CURRENT_SCHEMA_VERSION } from "./constants";
+import { CURRENT_SCHEMA_VERSION } from "./config";
 import { getVersionFromAvaPageData } from "./getVersionFromAvaPageData";
-import type { AvaPageData, AvaPageGenericData } from "../AvaPage.types";
+import type {
+  AvaPageData,
+  AvaPageGenericData,
+} from "../../AvaPage/AvaPage.types";
 
 type MigrationFunction<
   InputData extends AvaPageGenericData,

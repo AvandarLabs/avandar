@@ -295,6 +295,7 @@ function arrowTableToJS<RowObject extends UnknownRow>(
     });
   });
   return {
+    id: uuid(),
     columns: arrowTable.schema.fields.map((field) => {
       return arrowFieldToQueryResultField(field, { logger });
     }),

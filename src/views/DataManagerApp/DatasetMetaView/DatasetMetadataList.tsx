@@ -7,7 +7,7 @@ import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import type { ObjectKeyRenderOptionsMap } from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
 import type { CSVFileDataset } from "$/models/datasets/CSVFileDataset";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";

@@ -1,5 +1,6 @@
 import { Group, NumberInput, Stack } from "@mantine/core";
 import { FieldLabel } from "@puckeditor/core";
+import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject";
 import { SegmentedControl } from "@/lib/ui/inputs/SegmentedControl";
 import { AvaPageFieldProps } from "../../AvaPage.types";
 
@@ -15,12 +16,8 @@ type Props = AvaPageFieldProps<ContainerMaxWidthValue>;
 const DEFAULT_PERCENT_VALUE = 100;
 const DEFAULT_PX_VALUE = 860;
 
-function _isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
 function _normalizeContainerMaxWidth(value: unknown): ContainerMaxWidthValue {
-  if (_isRecord(value)) {
+  if (isPlainObject(value)) {
     const unit: unknown = value.unit;
     const rawValue: unknown = value.value;
 
@@ -68,7 +65,7 @@ function _clampValue(options: {
  * It provides an editable text input and a toggle button to switch between
  * percentage and pixel units.
  */
-export function ContainerMaxWidthField({
+export function ContainerMaxWidthPField({
   value,
   onChange,
   readOnly,

@@ -40,7 +40,7 @@ export type NLQuery = {
 
 type Props = AvaPageFieldProps<NLQuery>;
 
-export function NLQueryField({ value, onChange }: Props): JSX.Element {
+export function NLQueryPField({ value, onChange }: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
   const [isEditSQLMode, setIsEditSQLMode] = useState(false);
   const [generateAndRunQuery, isRunningQuery] = useNLPQuery({

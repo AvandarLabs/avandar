@@ -8,6 +8,11 @@ import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
 import { mantineColorVar, mantineVar } from "@/lib/utils/browser/css";
 import type { UnknownDataFrame } from "@utils/types/common.types";
+import type {
+  GridReadyEvent,
+  GridSizeChangedEvent,
+  RowDataUpdatedEvent,
+} from "ag-grid-community";
 import type { Writable } from "type-fest";
 
 type Props = {
@@ -25,6 +30,10 @@ type Props = {
   dateFormat?: string;
   timezone?: FormattableTimezone;
   style?: React.CSSProperties;
+  onRowDataUpdated?: (params: RowDataUpdatedEvent) => void;
+  onGridReady?: (params: GridReadyEvent) => void;
+  onGridSizeChanged?: (params: GridSizeChangedEvent) => void;
+  pagination?: boolean;
 };
 
 const avandarGridTheme = themeMaterial.withParams({
@@ -43,6 +52,10 @@ export function DataGrid({
   dateFormat = "YYYY-MM-DD HH:mm:ss",
   timezone,
   style,
+  pagination = true,
+  onRowDataUpdated,
+  onGridReady,
+  onGridSizeChanged,
 }: Props): JSX.Element {
   const columnDefs = useMemo(() => {
     return columnNames.map((field) => {
@@ -71,8 +84,11 @@ export function DataGrid({
         columnDefs={columnDefs}
         theme={avandarGridTheme}
         rowData={data as Writable<UnknownDataFrame>}
-        pagination={true}
+        pagination={pagination}
         paginationPageSize={50}
+        onGridReady={onGridReady}
+        onGridSizeChanged={onGridSizeChanged}
+        onRowDataUpdated={onRowDataUpdated}
       />
     </Box>
   );

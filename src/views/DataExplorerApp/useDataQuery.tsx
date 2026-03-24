@@ -3,23 +3,35 @@ import { Model } from "@models/Model/Model";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { makeObjectFromEntries } from "@utils/objects/makeObjectFromEntries/makeObjectFromEntries";
 import { sortObjList } from "@utils/objects/sortObjList/sortObjList";
+import { uuid } from "$/lib/uuid";
+import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { QueryResults } from "$/models/queries/QueryResult/QueryResults";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { WorkspaceQETLClient } from "@/clients/datasets/LocalDatasetClient/QETLClient";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
+import { PublicQETLClient } from "@/clients/qetl/PublicQETLClient";
+import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import type { UnknownRow } from "@/clients/DuckDBClient";
 import type { UseQueryResultTuple } from "@hooks/useQuery/useQuery";
 import type {
   QueryResult,
   QueryResultColumn,
+  QueryResultId,
 } from "$/models/queries/QueryResult/QueryResult.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 type UseDataQueryOptions = {
   query: StructuredQuery.Partial;
   rawSQL: string | undefined;
-  workspaceId: Workspace.Id | undefined;
-};
+} & (
+  | {
+      auth: "workspace";
+      workspaceId: Workspace.Id;
+    }
+  | {
+      auth: "public";
+      publicAvaPageId: DashboardId;
+    }
+);
 
 /**
  * This is the main hook in the DataExplorerApp that will query the data.
@@ -33,11 +45,10 @@ type UseDataQueryOptions = {
  * a stopgap. We should have a proper usePublicDataQuery hook to handle
  * it properly.
  */
-export function useDataQuery({
-  query,
-  rawSQL,
-  workspaceId,
-}: UseDataQueryOptions): UseQueryResultTuple<QueryResult<UnknownRow>> {
+export function useDataQuery(
+  options: UseDataQueryOptions,
+): UseQueryResultTuple<QueryResult<UnknownRow>> {
+  const { auth, query, rawSQL } = options;
   const {
     dataSource,
     queryColumns,
@@ -52,8 +63,8 @@ export function useDataQuery({
   return useQuery({
     enabled: !!dataSource || !!rawSQL,
     queryKey: [
-      "workspace",
-      workspaceId,
+      auth,
+      auth === "workspace" ? options.workspaceId : options.publicAvaPageId,
       "rawSQL",
       rawSQL,
       "dataSource",
@@ -68,15 +79,25 @@ export function useDataQuery({
     ],
 
     queryFn: async (): Promise<QueryResult<UnknownRow>> => {
-      if (!workspaceId) {
-        throw new Error("Workspace ID is required to run a query");
-      }
-
       if (rawSQL) {
+        if (auth === "public") {
+          // if no workspace id then this is a public query
+          return await PublicQETLClient.runQuery({
+            rawSQL,
+            dashboardId: options.publicAvaPageId,
+          });
+        }
+
         return await WorkspaceQETLClient.runQuery({
           rawSQL,
-          workspaceId,
+          workspaceId: options.workspaceId,
         });
+      }
+
+      if (auth === "public") {
+        throw new Error(
+          "Public queries are not supported for structured queries. Use raw SQL instead.",
+        );
       }
 
       if (dataSource && sortedQueryColumns.length > 0) {
@@ -86,7 +107,7 @@ export function useDataQuery({
           Dataset: async (): Promise<QueryResult<UnknownRow>> => {
             return await WorkspaceQETLClient.runQuery({
               rawSQL: StructuredQuery.toRawDuckDBQuery(query),
-              workspaceId,
+              workspaceId: options.workspaceId,
             });
           },
 
@@ -108,7 +129,7 @@ export function useDataQuery({
             const rows = await EntityFieldValueClient.getAllEntityFieldValues({
               entityConfigId: entityConfig.id,
               entityFieldConfigs: fields,
-              workspaceId,
+              workspaceId: options.workspaceId,
             });
 
             const queryResultColumns: QueryResultColumn[] = fields.map(
@@ -121,6 +142,7 @@ export function useDataQuery({
             );
 
             return {
+              id: uuid() as QueryResultId,
               data: rows.map((row) => {
                 return makeObjectFromEntries(
                   queryResultColumns.map((col) => {
