@@ -116,8 +116,8 @@ export function Navbar({
         w="100%"
       >
         {mobile.burgerIcon}
-        <Box flex={1} miw={0}>
-          <Menu shadow="md" width={200} w="100%">
+        <Box flex={1} miw={0} w="100%">
+          <Menu shadow="md" width={200}>
             <Menu.Target>
               <UnstyledButton className="w-full text-left">
                 <Flex
