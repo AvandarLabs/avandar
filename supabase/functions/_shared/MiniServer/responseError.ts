@@ -1,6 +1,6 @@
+import { AvaHTTPError } from "@sfn/_shared/AvaHTTPError.ts";
+import { corsHeaders } from "@sfn/_shared/cors.ts";
 import { z, ZodError } from "npm:zod@4";
-import { AvaHTTPError } from "../AvaHTTPError.ts";
-import { corsHeaders } from "../cors.ts";
 
 export function responseError(error: unknown, statusCode: number): Response {
   let errorMessage;

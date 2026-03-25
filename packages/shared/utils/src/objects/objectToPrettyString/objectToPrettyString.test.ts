@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { objectToPrettyString } from "./objectToPrettyString.ts";
+import { objectToPrettyString } from "@utils/objects/objectToPrettyString/objectToPrettyString.ts";
 
 describe("objectToPrettyString", () => {
   it("handles empty arrays", () => {

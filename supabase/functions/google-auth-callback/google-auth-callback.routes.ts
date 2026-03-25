@@ -1,10 +1,10 @@
+import { AvaHTTPError } from "@sfn/_shared/AvaHTTPError.ts";
+import { GoogleAuthClient } from "@sfn/_shared/getGoogleAuthClient.ts";
+import { BAD_REQUEST } from "@sfn/_shared/httpCodes.ts";
+import { defineRoutes, GET } from "@sfn/_shared/MiniServer/MiniServer.ts";
+import { redirect } from "@sfn/_shared/MiniServer/redirect.ts";
 import { z } from "zod";
-import { AvaHTTPError } from "../_shared/AvaHTTPError.ts";
-import { GoogleAuthClient } from "../_shared/getGoogleAuthClient.ts";
-import { BAD_REQUEST } from "../_shared/httpCodes.ts";
-import { defineRoutes, GET } from "../_shared/MiniServer/MiniServer.ts";
-import { redirect } from "../_shared/MiniServer/redirect.ts";
-import type { GoogleAuthCallbackAPI } from "./google-auth-callback.types.ts";
+import type { GoogleAuthCallbackAPI } from "@sfn/google-auth-callback/google-auth-callback.types.ts";
 import type { TokenPayload } from "google-auth-library";
 
 const GoogleTokensSchema = z.object({

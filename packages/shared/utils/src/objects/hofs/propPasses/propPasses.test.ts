@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { propPasses } from "./propPasses.ts";
+import { propPasses } from "@utils/objects/hofs/propPasses/propPasses.ts";
 
 describe("propPasses", () => {
   it("returns true when the predicate passes", () => {

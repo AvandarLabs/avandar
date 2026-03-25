@@ -1,9 +1,9 @@
 import { createModule, Module } from "@modules/createModule";
-import { AuthClient } from "../AuthClient";
-import { LocalPublicDatasetClient } from "../datasets/LocalPublicDatasetClient";
-import { PublicDatasetParquetStorageClient } from "../storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
-import { IQETLClient, QETLClientFactory } from "./QETLClient";
-import type { UnknownRow } from "../DuckDBClient";
+import { AuthClient } from "@/clients/AuthClient";
+import { LocalPublicDatasetClient } from "@/clients/datasets/LocalPublicDatasetClient";
+import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
+import { IQETLClient, QETLClientFactory } from "@/clients/qetl/QETLClient";
+import type { UnknownRow } from "@/clients/DuckDBClient/index";
 import type { EmptyObject } from "@utils/types/common.types";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";

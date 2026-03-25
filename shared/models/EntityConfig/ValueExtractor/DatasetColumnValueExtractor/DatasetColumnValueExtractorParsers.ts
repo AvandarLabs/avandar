@@ -6,12 +6,12 @@ import { omitProps } from "@utils/objects/hofs/omitProps/omitProps.ts";
 import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
 import { z } from "zod";
-import { DatasetColumnValueExtractors } from "./DatasetColumnValueExtractors.ts";
+import { DatasetColumnValueExtractors } from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractors.ts";
 import type {
   DatasetColumnValueExtractor,
   DatasetColumnValueExtractorId,
   DatasetColumnValueExtractorModel,
-} from "./DatasetColumnValueExtractor.types.ts";
+} from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractor.types.ts";
 import type {
   Expect,
   ZodSchemaEqualsTypes,

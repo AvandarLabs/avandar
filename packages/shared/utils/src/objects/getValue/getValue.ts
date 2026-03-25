@@ -1,6 +1,6 @@
-import { isArray } from "../../guards/isArray/isArray.ts";
-import { isPrimitive } from "../../guards/isPrimitive/isPrimitive.ts";
-import type { UnknownObject } from "../../types/common.types.ts";
+import { isArray } from "@utils/guards/isArray/isArray.ts";
+import { isPrimitive } from "@utils/guards/isPrimitive/isPrimitive.ts";
+import type { UnknownObject } from "@utils/types/common.types.ts";
 import type { Paths, UnknownArray } from "type-fest";
 
 /**

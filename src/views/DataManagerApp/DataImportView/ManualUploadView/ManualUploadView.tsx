@@ -26,7 +26,7 @@ import { FileUploadForm } from "@/lib/ui/singleton-forms/FileUploadForm";
 import {
   DatasetImportForm,
   DatasetImportFormValues,
-} from "../DatasetUploadForm";
+} from "@/views/DataManagerApp/DataImportView/DatasetUploadForm/index";
 import type { UnknownObject } from "@utils/types/common.types";
 import type {
   Dataset,

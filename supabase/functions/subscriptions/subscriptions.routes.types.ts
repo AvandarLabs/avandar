@@ -1,4 +1,5 @@
-import type { APITypeDef } from "../_shared/MiniServer/api.types.ts";
+import type { APITypeDef } from "@sfn/_shared/MiniServer/api.types.ts";
+import type { SubscriptionPermission } from "$/models/Subscription/Subscription.types.ts";
 import type { Tables } from "$/types/database.types.ts";
 
 /**
@@ -41,6 +42,7 @@ export type SubscriptionsAPI = APITypeDef<
     "/products",
     "/checkout-url/:productId",
     "/customer-portal/:userId",
+    "/:subscriptionId/permissions/:permissionType",
   ],
   {
     /**
@@ -160,6 +162,17 @@ export type SubscriptionsAPI = APITypeDef<
               success: true;
               customerPortalURL: string;
             };
+      };
+    };
+    "/:subscriptionId/permissions/:permissionType": {
+      GET: {
+        pathParams: {
+          subscriptionId: string;
+          permissionType: SubscriptionPermission;
+        };
+        returnType: {
+          allowed: boolean;
+        };
       };
     };
   }

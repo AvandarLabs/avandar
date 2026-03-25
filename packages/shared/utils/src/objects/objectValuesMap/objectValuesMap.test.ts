@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { objectValuesMap } from "./objectValuesMap.ts";
+import { objectValuesMap } from "@utils/objects/objectValuesMap/objectValuesMap.ts";
 
 describe("objectValuesMap", () => {
   it("maps all own enumerable values shallowly", () => {

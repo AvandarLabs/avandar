@@ -4,7 +4,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { TextareaForm } from "@/lib/ui/singleton-forms/TextareaForm/TextareaForm";
 import { mantineColorVar } from "@/lib/utils/browser/css";
 import { useNLPQuery } from "@/views/DataExplorerApp/QueryForm/useNLPQuery";
-import type { AvaPageFieldProps } from "../../AvaPage.types";
+import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 export type NLQuery = {
   /**

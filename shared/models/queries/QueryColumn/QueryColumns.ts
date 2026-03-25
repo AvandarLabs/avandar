@@ -1,8 +1,8 @@
 import { Model } from "@models/Model/Model.ts";
 import { uuid } from "$/lib/uuid.ts";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes.ts";
-import { QueryAggregationTypes } from "../QueryAggregationType/QueryAggregationTypes.ts";
-import type { QueryColumn, QueryColumnId } from "./QueryColumn.types.ts";
+import { QueryAggregationTypes } from "$/models/queries/QueryAggregationType/QueryAggregationTypes.ts";
+import type { QueryColumn, QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";
 

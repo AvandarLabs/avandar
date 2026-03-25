@@ -1,10 +1,10 @@
 import { match } from "ts-pattern";
-import type { BarChartVizConfig } from "../BarChartVizConfig/BarChartVizConfig.types.ts";
-import type { LineChartVizConfig } from "../LineChartVizConfig/LineChartVizConfig.types.ts";
-import type { ScatterPlotVizConfig } from "../ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts";
-import type { IVizConfigModule } from "../VizConfig/IVizConfigModule.ts";
-import type { VizConfigType, VizType } from "../VizConfig/VizConfig.types.ts";
-import type { TableVizConfig } from "./TableVizConfig.types.ts";
+import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types.ts";
+import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types.ts";
+import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts";
+import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
+import type { VizConfigType, VizType } from "$/models/vizs/VizConfig/VizConfig.types.ts";
+import type { TableVizConfig } from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
 
 export const TableVizConfigs = {
   vizType: "table",

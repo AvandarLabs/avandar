@@ -4,9 +4,9 @@ import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
-import { AppLayout } from "../common/layouts/AppLayout/AppLayout";
-import { WorkspaceBillingView } from "./WorkspaceBillingView/WorkspaceBillingView";
-import { WorkspaceUsersForm } from "./WorkspaceUsersForm/WorkspaceUsersForm";
+import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
+import { WorkspaceBillingView } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
+import { WorkspaceUsersForm } from "@/components/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceUsersForm";
 
 export function WorkspaceSettingsPage(): JSX.Element {
   const workspace = useCurrentWorkspace();

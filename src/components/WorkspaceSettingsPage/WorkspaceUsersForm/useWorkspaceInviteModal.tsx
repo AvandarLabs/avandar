@@ -3,6 +3,7 @@ import { Stack, Text } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifySuccess } from "@ui/notifications/notify";
+import { Subscription } from "$/models/Subscription/Subscription";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { useRef } from "react";
 import { APIClient } from "@/clients/APIClient";
@@ -12,7 +13,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AvaField } from "@/lib/ui/AvaForm/AvaField";
 import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
 import { AvaFormRef } from "@/lib/ui/AvaForm/AvaForm.types";
-import { WorkspaceBillingView } from "../WorkspaceBillingView/WorkspaceBillingView";
+import { WorkspaceBillingView } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 
 export function useWorkspaceInviteModal({
   numberOfSeats,
@@ -70,14 +71,14 @@ export function useWorkspaceInviteModal({
   return (): void => {
     // do nothing if we don't know how many seats are in the workspace
     // ideally, this function should have never gotten called yet.
-    if (numberOfSeats === undefined) {
+    if (numberOfSeats === undefined || workspace.subscription === undefined) {
       return;
     }
 
     if (
-      !Workspace.Features.canInviteMoreUsers({
-        workspace,
-        numSeatsInWorkspace: numberOfSeats,
+      !Subscription.canInviteMembers({
+        subscription: workspace.subscription,
+        numMembersInWorkspace: numberOfSeats,
       })
     ) {
       return void modals.open({

@@ -10,7 +10,7 @@ import type {
   WorkspaceId,
   WorkspaceModel,
   WorkspaceRead,
-} from "./Workspace.types.ts";
+} from "$/models/Workspace/Workspace.types.ts";
 import type {
   Expect,
   ZodSchemaEqualsTypes,

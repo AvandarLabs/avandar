@@ -16,7 +16,7 @@
  * - We want to allow the most current AvaPage types to change freely without
  *   raising type errors in tests or migration code for older versions.
  */
-import type { AvaPageTypes } from "../../../AvaPage/AvaPage.types";
+import type { AvaPageTypes } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 export type V0_AvaPageRootProps = {
   author: string;

@@ -9,12 +9,12 @@ import { undefinedsToNullsDeep } from "@utils/objects/undefinedsToNullsDeep/unde
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes.ts";
 import { Workspace } from "$/models/Workspace/Workspace.ts";
 import { z } from "zod";
-import { EntityConfigId } from "../EntityConfig.types.ts";
+import { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types.ts";
 import {
   EntityFieldConfig,
   EntityFieldConfigId,
   EntityFieldConfigModel,
-} from "./EntityFieldConfig.types.ts";
+} from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";
 import type {
   Expect,
   ZodSchemaEqualsTypes,

@@ -1,4 +1,4 @@
-import { isArray } from "../isArray/isArray.ts";
+import { isArray } from "@utils/guards/isArray/isArray.ts";
 
 /**
  * Checks if `value` is a non-empty array.

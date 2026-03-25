@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { snakeCaseKeysShallow } from "./snakeCaseKeysShallow.ts";
+import { snakeCaseKeysShallow } from "@utils/objects/snakeCaseKeysShallow/snakeCaseKeysShallow.ts";
 
 describe("snakeCaseKeysShallow", () => {
   it("converts top-level keys to snake_case", () => {

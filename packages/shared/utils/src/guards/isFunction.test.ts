@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isFunction } from "./isFunction.ts";
+import { isFunction } from "@utils/guards/isFunction.ts";
 
 describe("isFunction", () => {
   it("returns true for functions", () => {

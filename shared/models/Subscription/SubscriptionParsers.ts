@@ -8,16 +8,16 @@ import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsT
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
 import { undefinedsToNullsDeep } from "@utils/objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
 import { z } from "zod";
-import { SubscriptionModule } from "./SubscriptionModule.ts";
-import type { UserId } from "../User/User.types.ts";
-import type { WorkspaceId } from "../Workspace/Workspace.types.ts";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule.ts";
+import type { UserId } from "$/models/User/User.types.ts";
+import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 import type {
   PolarCustomerId,
   PolarProductId,
-  Subscription,
   SubscriptionId,
   SubscriptionModel,
-} from "./Subscription.types.ts";
+  SubscriptionRead,
+} from "$/models/Subscription/Subscription.types.ts";
 import type {
   Expect,
   ZodSchemaEqualsTypes,
@@ -37,9 +37,12 @@ const DBReadSchema = z.object({
   ended_at: z.iso.datetime({ offset: true }).nullable(),
   created_at: z.iso.datetime({ offset: true }),
   updated_at: z.iso.datetime({ offset: true }),
-  max_seats_allowed: z.number(),
   current_period_start: z.iso.datetime({ offset: true }).nullable(),
   current_period_end: z.iso.datetime({ offset: true }).nullable(),
+  max_seats_allowed: z.number(),
+  max_datasets_allowed: z.number().nullable(),
+  max_dashboards_allowed: z.number().nullable(),
+  max_shareable_dashboards_allowed: z.number().nullable(),
 });
 
 export const SubscriptionParsers =
@@ -58,7 +61,7 @@ export const SubscriptionParsers =
         "currentPeriodStart",
         "currentPeriodEnd",
       ]),
-      (obj): Subscription => {
+      (obj): SubscriptionRead => {
         return {
           ...obj,
           workspaceId: obj.workspaceId as WorkspaceId,

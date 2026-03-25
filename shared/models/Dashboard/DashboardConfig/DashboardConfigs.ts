@@ -1,4 +1,4 @@
-import { CURRENT_SCHEMA_VERSION } from "./constants.ts";
+import { CURRENT_SCHEMA_VERSION } from "$/models/Dashboard/DashboardConfig/constants.ts";
 
 // TODO(jpsyx): refactor this mess of slop
 export function createInitialDashboardPuckData(options: {

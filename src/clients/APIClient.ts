@@ -6,7 +6,6 @@ import {
 import { Simplify } from "type-fest";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { Logger } from "@/utils/Logger";
-import { HTTPMethod } from "../../supabase/functions/_shared/MiniServer/api.types";
 import type {
   API,
   APIBody,
@@ -14,6 +13,7 @@ import type {
   APIQueryParams,
   APIReturnType,
 } from "@/types/http-api.types";
+import type { HTTPMethod } from "@sfn/_shared/MiniServer/api.types";
 
 type HTTPRequestOptions<
   Route extends keyof API,

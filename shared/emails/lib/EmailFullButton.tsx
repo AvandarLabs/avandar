@@ -1,7 +1,7 @@
 import { Button } from "@react-email/components";
 import { PRIMARY_COLOR } from "$/config/Theme.ts";
 import { buildAppPageURL } from "$/utils/urls/buildAppPageURL.ts";
-import type { EmailLinkProps } from "./EmailLink.tsx";
+import type { EmailLinkProps } from "$/emails/lib/EmailLink.tsx";
 import type { ReactNode } from "react";
 import type { DistributedOmit } from "type-fest";
 

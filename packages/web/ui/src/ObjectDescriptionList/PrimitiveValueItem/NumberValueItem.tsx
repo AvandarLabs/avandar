@@ -2,7 +2,7 @@ import { NumberInput, Text } from "@mantine/core";
 import { isNullish } from "@utils/guards/isNullish/isNullish";
 import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
 import { ReactNode } from "react";
-import { NullOrUndefinedValueItem } from "./NullOrUndefinedValueItem";
+import { NullOrUndefinedValueItem } from "@ui/ObjectDescriptionList/PrimitiveValueItem/NullOrUndefinedValueItem";
 
 type Props = {
   /** Whether to render the value in edit mode. */

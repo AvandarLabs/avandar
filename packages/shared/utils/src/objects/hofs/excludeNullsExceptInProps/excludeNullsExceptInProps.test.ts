@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { excludeNullsExceptInProps } from "./excludeNullsExceptInProps.ts";
+import { excludeNullsExceptInProps } from "@utils/objects/hofs/excludeNullsExceptInProps/excludeNullsExceptInProps.ts";
 
 describe("excludeNullsExceptInProps", () => {
   it("keeps null for the specified key and removes other nulls", () => {

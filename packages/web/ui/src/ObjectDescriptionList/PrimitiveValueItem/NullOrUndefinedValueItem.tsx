@@ -1,5 +1,5 @@
 import { Text } from "@mantine/core";
-import { isStringOrNumber } from "../guards";
+import { isStringOrNumber } from "@ui/ObjectDescriptionList/guards";
 import type { ReactNode } from "react";
 
 type Props = {

@@ -1,11 +1,11 @@
+import { getGoogleAuthClient } from "@sfn/_shared/getGoogleAuthClient.ts";
+import { defineRoutes, GET } from "@sfn/_shared/MiniServer/MiniServer.ts";
+import { getGoogleTokens } from "@sfn/google-auth/getGoogleTokens.ts";
 import { assertIsNonEmptyArray } from "@utils/asserts/assertIsNonEmptyArray/assertIsNonEmptyArray.ts";
 import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray.ts";
 import { google } from "googleapis";
 import { string } from "zod";
-import { getGoogleAuthClient } from "../_shared/getGoogleAuthClient.ts";
-import { defineRoutes, GET } from "../_shared/MiniServer/MiniServer.ts";
-import { getGoogleTokens } from "../google-auth/getGoogleTokens.ts";
-import type { GoogleSheetsAPI } from "./google-sheets.types.ts";
+import type { GoogleSheetsAPI } from "@sfn/google-sheets/google-sheets.types.ts";
 
 export const Routes = defineRoutes<GoogleSheetsAPI>("google-sheets", {
   // TODO(jpsyx): update this to use DuckDB WASM so we can send the data as

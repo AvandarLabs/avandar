@@ -1,4 +1,4 @@
-import { FOUND } from "../httpCodes.ts";
+import { FOUND } from "@sfn/_shared/httpCodes.ts";
 
 type AvaRedirect = {
   type: "redirect";

@@ -7,8 +7,8 @@ import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsT
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
 import { undefinedsToNullsDeep } from "@utils/objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
 import { z } from "zod";
-import { DatasetSource } from "../DatasetSource/DatasetSource.ts";
-import type { Dataset, DatasetId, DatasetModel } from "./Dataset.types.ts";
+import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource.ts";
+import type { Dataset, DatasetId, DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type {
   Expect,
   ZodSchemaEqualsTypes,

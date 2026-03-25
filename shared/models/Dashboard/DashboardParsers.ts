@@ -13,7 +13,7 @@ import type {
   Dashboard,
   DashboardId,
   DashboardModel,
-} from "./Dashboard.types.ts";
+} from "$/models/Dashboard/Dashboard.types.ts";
 import type {
   Expect,
   ZodSchemaEqualsTypes,

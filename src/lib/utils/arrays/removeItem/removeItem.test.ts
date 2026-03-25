@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { removeItem } from "./removeItem";
+import { removeItem } from "@/lib/utils/arrays/removeItem/removeItem";
 
 describe("removeItem", () => {
   it("removes the value at the provided index", () => {

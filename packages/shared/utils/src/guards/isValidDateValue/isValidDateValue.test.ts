@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { describe, expect, it } from "vitest";
-import { isValidDateValue } from "./isValidDateValue.ts";
+import { isValidDateValue } from "@utils/guards/isValidDateValue/isValidDateValue.ts";
 
 describe("isValidDateValue", () => {
   it("accepts ISO strings, epoch numbers, and Dayjs instances", () => {

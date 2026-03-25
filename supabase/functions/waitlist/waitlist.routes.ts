@@ -1,6 +1,6 @@
+import { defineRoutes, POST } from "@sfn/_shared/MiniServer/MiniServer.ts";
 import { z } from "zod";
-import { defineRoutes, POST } from "../_shared/MiniServer/MiniServer.ts";
-import type { WaitlistAPI } from "./waitlist.types.ts";
+import type { WaitlistAPI } from "@sfn/waitlist/waitlist.types.ts";
 
 /**
  * This is the route handler for all waitlist endpoints.

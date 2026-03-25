@@ -4,11 +4,11 @@ import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts
 import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
 import { z } from "zod";
-import type { DatasetId } from "../Dataset/Dataset.types.ts";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type {
   CSVFileDatasetId,
   CSVFileDatasetModel,
-} from "./CSVFileDataset.types.ts";
+} from "$/models/datasets/CSVFileDataset/CSVFileDataset.types.ts";
 import type {
   Expect,
   ZodSchemaEqualsTypes,

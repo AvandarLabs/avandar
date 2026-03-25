@@ -104,6 +104,17 @@ export default [
             controlComponents: [],
           },
         ],
+        "no-restricted-imports": [
+          "error",
+          {
+            patterns: [
+              {
+                regex: "^\\./",
+                message: "Use path aliases instead of relative imports.",
+              },
+            ],
+          },
+        ],
         "no-unused-vars": "off",
 
         // we use the @typescript-eslint one instead

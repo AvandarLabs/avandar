@@ -15,7 +15,7 @@ import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useWorkspaceRole } from "@/hooks/workspaces/useWorkspaceRole";
-import { useWorkspaceInviteModal } from "./useWorkspaceInviteModal";
+import { useWorkspaceInviteModal } from "@/components/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal";
 import type { UserProfileWithRole } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 

@@ -1,6 +1,6 @@
 import { Burger, Group, Title } from "@mantine/core";
 import { APP_NAME } from "$/config/AppConfig";
-import { Logo } from "./Logo";
+import { Logo } from "@/lib/ui/AppShell/Logo";
 
 type Props = {
   isMobileNavbarOpened: boolean;

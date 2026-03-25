@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { setPropValue } from "./setPropValue.ts";
+import { setPropValue } from "@utils/objects/hofs/setPropValue/setPropValue.ts";
 
 describe("setPropValue", () => {
   it("returns a function that sets a top-level key", () => {

@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { describe, expect, it } from "vitest";
-import { formatDate } from "./formatDate.ts";
+import { formatDate } from "@utils/dates/formatDate/formatDate.ts";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);

@@ -19,6 +19,7 @@
   ],
   "imports": {
     "$/": "./shared/",
+    "@sfn/": "./supabase/functions/",
     "jose": "jsr:@panva/jose@6",
     "react": "npm:react@^19.0.0",
     "react-dom": "npm:react-dom@^19.0.0",

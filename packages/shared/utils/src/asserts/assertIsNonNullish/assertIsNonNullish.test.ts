@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { assertIsNonNullish } from "./assertIsNonNullish.ts";
+import { assertIsNonNullish } from "@utils/asserts/assertIsNonNullish/assertIsNonNullish.ts";
 
 describe("assertIsNonNullish", () => {
   it("does not throw for non-nullish values", () => {

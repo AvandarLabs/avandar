@@ -9,6 +9,7 @@ export default defineConfig({
     alias: {
       $: resolve(configDir, "../../shared"),
       "@utils": resolve(configDir, "../../packages/shared/utils/src"),
+      "@fanout-server": resolve(configDir, "src"),
     },
   },
   test: {

@@ -10,7 +10,7 @@ import type {
   ManualEntryExtractor,
   ManualEntryExtractorId,
   ManualEntryExtractorModel,
-} from "./ManualEntryExtractor.types.ts";
+} from "$/models/EntityConfig/ValueExtractor/ManualEntryExtractor/ManualEntryExtractor.types.ts";
 import type {
   Expect,
   ZodSchemaEqualsTypes,

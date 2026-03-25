@@ -36,6 +36,7 @@ export default defineConfig(({ mode }) => {
         "@utils": "/packages/shared/utils/src",
         "@ui": "/packages/web/ui/src",
         "@hooks": "/packages/web/hooks/src",
+        "@sfn": "/supabase/functions",
       },
     },
     publicDir: "public",

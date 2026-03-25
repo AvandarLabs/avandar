@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { coerceDatesIn } from "./coerceDatesIn.ts";
+import { coerceDatesIn } from "@utils/objects/coerceDatesIn/coerceDatesIn.ts";
 
 describe("coerceDatesIn", () => {
   it("coerces an ISO string into a Date", () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { setValue } from "./setValue.ts";
+import { setValue } from "@utils/objects/setValue/setValue.ts";
 
 describe("setValue", () => {
   describe("top-level keys", () => {

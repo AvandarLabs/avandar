@@ -1,4 +1,4 @@
-import type { DatasetSource } from "../DatasetSource/DatasetSource.ts";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource.ts";
 import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
 import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";

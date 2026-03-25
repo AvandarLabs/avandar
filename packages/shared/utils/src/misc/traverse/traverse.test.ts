@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { traverse } from "./traverse.ts";
+import { traverse } from "@utils/misc/traverse/traverse.ts";
 
 function _makeCollector() {
   const nodes: unknown[] = [];

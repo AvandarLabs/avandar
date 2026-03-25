@@ -1,6 +1,6 @@
+import { registerForwardRoute } from "@fanout-server/routes/forward";
+import { registerNgrokURLRoutes } from "@fanout-server/routes/ngrok-url";
 import Fastify from "fastify";
-import { registerForwardRoute } from "./routes/forward";
-import { registerNgrokURLRoutes } from "./routes/ngrok-url";
 
 function _getPort(): number {
   const defaultPort: number = 8080;

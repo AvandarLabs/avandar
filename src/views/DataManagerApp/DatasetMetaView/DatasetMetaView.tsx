@@ -26,9 +26,9 @@ import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { Paper } from "@/lib/ui/Paper/Paper";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
-import { DatasetMetadataList } from "./DatasetMetadataList";
-import { DataSummaryView } from "./DataSummaryView";
-import { ToggleOfflineOnlyButton } from "./ToggleOfflineOnlyButton";
+import { DatasetMetadataList } from "@/views/DataManagerApp/DatasetMetaView/DatasetMetadataList";
+import { DataSummaryView } from "@/views/DataManagerApp/DatasetMetaView/DataSummaryView";
+import { ToggleOfflineOnlyButton } from "@/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.types";
 
 type Props = {

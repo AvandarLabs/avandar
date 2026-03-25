@@ -14,7 +14,7 @@ import type {
   ValidBody,
   ValidPathParams,
   ValidReturnType,
-} from "./api.types.ts";
+} from "@sfn/_shared/MiniServer/api.types.ts";
 import type {
   HTTPMethodActionFn,
   HTTPMethodActionFnOptions,
@@ -24,11 +24,11 @@ import type {
   ServerRouteHandler,
   ValidBodySchema,
   ValidQueryParams,
-} from "./MiniServer.types.ts";
+} from "@sfn/_shared/MiniServer/MiniServer.types.ts";
 import type {
   ValidPathParamsSchema,
   ValidPathParamsSchemaShape,
-} from "./parseURLPathParams.ts";
+} from "@sfn/_shared/MiniServer/parseURLPathParams.ts";
 import type { infer as ZodInfer, ZodObject } from "npm:zod@4";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

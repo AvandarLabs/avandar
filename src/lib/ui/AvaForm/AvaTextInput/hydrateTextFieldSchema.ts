@@ -5,7 +5,7 @@ import type {
   GenericFormSchemaRecord,
   TextFieldSchema,
   ValuesOfFieldRecord,
-} from "../AvaForm.types";
+} from "@/lib/ui/AvaForm/AvaForm.types";
 
 /**
  * Fill in the text field schema with default values based on its semantic type

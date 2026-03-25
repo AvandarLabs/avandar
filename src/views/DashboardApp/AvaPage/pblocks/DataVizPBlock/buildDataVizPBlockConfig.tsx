@@ -1,7 +1,7 @@
 import { ComponentConfig } from "@puckeditor/core";
-import { buildNLQueryPFieldConfig } from "../../pfields/NLQueryPField/buildNLQueryFieldConfig";
-import { DataVizPBlock } from "./DataVizPBlock/DataVizPBlock";
-import type { DataVizPBlockProps } from "./DataVizPBlock/DataVizPBlock";
+import { buildNLQueryPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/buildNLQueryFieldConfig";
+import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
+import type { DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 const defaultProps: DataVizPBlockProps = {

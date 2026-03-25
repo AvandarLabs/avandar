@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { excludeUndefinedShallow } from "./excludeUndefinedShallow.ts";
+import { excludeUndefinedShallow } from "@utils/objects/excludeUndefinedShallow/excludeUndefinedShallow.ts";
 
 describe("excludeUndefinedShallow", () => {
   it("removes top-level undefined values", () => {

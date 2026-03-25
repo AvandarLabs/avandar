@@ -1,4 +1,4 @@
-import type { RegisteredSupabaseDatabase } from "../Register.types.ts";
+import type { RegisteredSupabaseDatabase } from "@clients/Register.types.ts";
 import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
 

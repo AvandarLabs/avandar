@@ -3,7 +3,7 @@ import {
   AnyFormValues,
   SelectFieldSchema,
   TextFieldSchema,
-} from "./AvaForm.types";
+} from "@/lib/ui/AvaForm/AvaForm.types";
 
 export const AvaField = {
   text: <

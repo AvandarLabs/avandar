@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { prop } from "./prop.ts";
+import { prop } from "@utils/objects/hofs/prop/prop.ts";
 
 describe("prop", () => {
   it("returns a function that gets a top-level key", () => {

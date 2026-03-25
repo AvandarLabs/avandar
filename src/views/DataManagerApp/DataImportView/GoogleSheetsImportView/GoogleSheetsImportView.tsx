@@ -35,7 +35,7 @@ import { Logger } from "@/utils/Logger";
 import {
   DatasetImportForm,
   DatasetImportFormValues,
-} from "../DatasetUploadForm";
+} from "@/views/DataManagerApp/DataImportView/DatasetUploadForm/index";
 import type { UnknownObject } from "@utils/types/common.types";
 import type {
   Dataset,

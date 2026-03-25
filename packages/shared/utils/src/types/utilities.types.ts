@@ -1,4 +1,4 @@
-import type { Brand, EmptyObject, UnknownObject } from "./common.types.ts";
+import type { Brand, EmptyObject, UnknownObject } from "@utils/types/common.types.ts";
 import type {
   KeyAsString as BroadStringKeyOf,
   ConditionalKeys,

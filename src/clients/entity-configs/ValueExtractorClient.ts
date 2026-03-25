@@ -8,7 +8,7 @@ import {
 } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types";
 import { match } from "ts-pattern";
 import { DatasetColumnValueExtractorClient } from "@/clients/entity-configs/DatasetColumnValueExtractorClient";
-import { ManualEntryExtractorClient } from "./ManualEntryExtractorClient";
+import { ManualEntryExtractorClient } from "@/clients/entity-configs/ManualEntryExtractorClient";
 
 export const ValueExtractorClient = {
   bulkInsert: async (params: {

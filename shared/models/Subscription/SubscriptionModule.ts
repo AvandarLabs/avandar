@@ -1,15 +1,10 @@
 import { registry } from "@utils/objects/registry/registry.ts";
 import {
-  BasicPlanConfig,
-  FreePlanConfig,
-  PremiumPlanConfig,
-} from "$/config/FeaturePlansConfig.tsx";
-import { match } from "ts-pattern";
-import {
   FeaturePlanType,
-  Subscription,
+  SubscriptionPermission,
+  SubscriptionRead,
   SubscriptionStatus,
-} from "./Subscription.types.ts";
+} from "$/models/Subscription/Subscription.types.ts";
 
 export const SubscriptionModule = {
   FeaturePlanTypes: registry<FeaturePlanType>().keys(
@@ -26,25 +21,45 @@ export const SubscriptionModule = {
     "canceled",
     "unpaid",
   ),
+  Permissions: registry<SubscriptionPermission>().keys(
+    "can_add_datasets",
+    "can_invite_users",
+  ),
 
   /**
-   * Get the maximum number of seats allowed for a given feature plan type.
-   * @param featurePlanType - The feature plan type to get the maximum number
-   * of seats for.
-   * @returns The maximum number of seats allowed for the given feature plan
-   * type.
+   * Checks if the subscription allows the user to add more datasets.
+   * @param options.subscription - The subscription to check.
+   * @param options.numDatasetsInWorkspace - The number of datasets in the
+   *   workspace.
+   * @returns True if the subscription allows the user to add more datasets.
    */
-  getMaxSeatsAllowed: (subscription: Subscription): number => {
-    return match(subscription.featurePlanType)
-      .with("free", () => {
-        return FreePlanConfig.maxSeatsAllowed;
-      })
-      .with("basic", () => {
-        return BasicPlanConfig.maxSeatsAllowed;
-      })
-      .with("premium", () => {
-        return PremiumPlanConfig.maxSeatsAllowed;
-      })
-      .exhaustive();
+  canAddDatasets: ({
+    subscription,
+    numDatasetsInWorkspace,
+  }: {
+    subscription: SubscriptionRead;
+    numDatasetsInWorkspace: number;
+  }): boolean => {
+    if (subscription.maxDatasetsAllowed === undefined) {
+      return true;
+    }
+    return numDatasetsInWorkspace < subscription.maxDatasetsAllowed;
+  },
+
+  /**
+   * Checks if the subscription allows the user to invite more members.
+   * @param options.subscription - The subscription to check.
+   * @param options.numMembersInWorkspace - The number of members in the
+   *   workspace.
+   * @returns True if the subscription allows the user to invite more members.
+   */
+  canInviteMembers: ({
+    subscription,
+    numMembersInWorkspace,
+  }: {
+    subscription: SubscriptionRead;
+    numMembersInWorkspace: number;
+  }): boolean => {
+    return numMembersInWorkspace < subscription.maxSeatsAllowed;
   },
 };

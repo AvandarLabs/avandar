@@ -3,11 +3,11 @@ import { pipe } from "@utils/misc/pipe/pipe.ts";
 import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
 import { z } from "zod";
-import type { DatasetId } from "../Dataset/Dataset.types.ts";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type {
   GoogleSheetsDatasetId,
   GoogleSheetsDatasetModel,
-} from "./GoogleSheetsDataset.types.ts";
+} from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types.ts";
 import type {
   Expect,
   ZodSchemaEqualsTypes,

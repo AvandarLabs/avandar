@@ -7,12 +7,12 @@ import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsT
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
 import { undefinedsToNullsDeep } from "@utils/objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
 import { z } from "zod";
-import type { Workspace } from "../Workspace/Workspace.ts";
+import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type {
   EntityConfig,
   EntityConfigId,
   EntityConfigModel,
-} from "./EntityConfig.types.ts";
+} from "$/models/EntityConfig/EntityConfig.types.ts";
 import type {
   Expect,
   ZodSchemaEqualsTypes,

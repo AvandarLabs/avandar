@@ -1,9 +1,9 @@
 import { getAppURL } from "$/env/getAppURL.ts";
-import { buildHTTPQueryString } from "./buildHTTPQueryString.ts";
-import { replaceURLPathParams } from "./replaceURLPathParams.ts";
-import type { ValidURLQueryParamValue } from "./buildHTTPQueryString.ts";
-import type { PathParams } from "./replaceURLPathParams.ts";
+import { buildHTTPQueryString } from "$/utils/urls/buildHTTPQueryString.ts";
+import { replaceURLPathParams } from "$/utils/urls/replaceURLPathParams.ts";
 import type { AvaRoutePaths } from "$/config/AvaRoutePaths.types.ts";
+import type { ValidURLQueryParamValue } from "$/utils/urls/buildHTTPQueryString.ts";
+import type { PathParams } from "$/utils/urls/replaceURLPathParams.ts";
 
 /**
  * Constructs a full URL string for the given app page, optionally replacing

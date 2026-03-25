@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@/utils/testingUtils";
-import { AvaForm } from "./AvaForm";
+import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
 
 function expectAnyEvent() {
   return expect.objectContaining({

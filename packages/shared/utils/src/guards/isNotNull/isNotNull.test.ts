@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isNotNull } from "./isNotNull.ts";
+import { isNotNull } from "@utils/guards/isNotNull/isNotNull.ts";
 
 describe("isNotNull", () => {
   it("returns true for non-null values", () => {

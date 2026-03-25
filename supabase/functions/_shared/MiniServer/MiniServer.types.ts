@@ -1,4 +1,3 @@
-import type { AvaSupabaseClient } from "../supabase.ts";
 import type {
   AnyValidPathParamsRecord,
   GenericAPITypeDef,
@@ -9,9 +8,10 @@ import type {
   ValidBody,
   ValidPathParams,
   ValidReturnType,
-} from "./api.types.ts";
-import type { AnyZodType } from "./createServerRouteHandler.ts";
-import type { ValidPathParamsSchema } from "./parseURLPathParams.ts";
+} from "@sfn/_shared/MiniServer/api.types.ts";
+import type { AnyZodType } from "@sfn/_shared/MiniServer/createServerRouteHandler.ts";
+import type { ValidPathParamsSchema } from "@sfn/_shared/MiniServer/parseURLPathParams.ts";
+import type { AvaSupabaseClient } from "@sfn/_shared/supabase.ts";
 import type { User } from "npm:@supabase/supabase-js@2";
 import type { infer as ZodInfer, ZodObject, ZodType } from "npm:zod@4";
 
@@ -206,7 +206,7 @@ export type ServerRouteHandler<
    * If you have a GET request and need to return a redirect, you can use:
    *
    * ```ts
-   * import { redirect } from '../_shared/redirect';
+   * import { redirect } from '@sfn/_shared/MiniServer/redirect.ts';
    *
    * GET('/').action(() => {
    *   throw redirect(url);

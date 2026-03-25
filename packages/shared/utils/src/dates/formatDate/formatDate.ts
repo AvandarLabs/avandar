@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import { isDate } from "../../guards/isDate/isDate.ts";
+import { isDate } from "@utils/guards/isDate/isDate.ts";
 import type { LiteralUnion } from "type-fest";
 
 dayjs.extend(utc);

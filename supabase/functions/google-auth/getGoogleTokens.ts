@@ -1,8 +1,8 @@
-import { AvaHTTPError } from "../_shared/AvaHTTPError.ts";
-import { getGoogleAuthClient } from "../_shared/getGoogleAuthClient.ts";
-import { BAD_GATEWAY } from "../_shared/httpCodes.ts";
-import { AvaSupabaseClient } from "../_shared/supabase.ts";
-import type { DBGoogleToken } from "../_shared/types/models.types.ts";
+import { AvaHTTPError } from "@sfn/_shared/AvaHTTPError.ts";
+import { getGoogleAuthClient } from "@sfn/_shared/getGoogleAuthClient.ts";
+import { BAD_GATEWAY } from "@sfn/_shared/httpCodes.ts";
+import { AvaSupabaseClient } from "@sfn/_shared/supabase.ts";
+import type { DBGoogleToken } from "@sfn/_shared/types/models.types.ts";
 
 // tokens within this many ms of expiry will be refreshed
 const TOKEN_REFRESH_THRESHOLD = 5 * 60 * 1000; // 5 minutes

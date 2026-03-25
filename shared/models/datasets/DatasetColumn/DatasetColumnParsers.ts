@@ -7,14 +7,14 @@ import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsT
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
 import { undefinedsToNullsDeep } from "@utils/objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
 import z from "zod";
-import { AvaDataTypes } from "../AvaDataType/AvaDataTypes.ts";
-import { DuckDBDataTypes } from "./DuckDBDataTypes.ts";
-import type { DatasetId } from "../Dataset/Dataset.types.ts";
+import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes.ts";
+import { DuckDBDataTypes } from "$/models/datasets/DatasetColumn/DuckDBDataTypes.ts";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type {
   DatasetColumn,
   DatasetColumnId,
   DatasetColumnModel,
-} from "./DatasetColumn.types.ts";
+} from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 import type {
   Expect,
   ZodSchemaEqualsTypes,

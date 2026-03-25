@@ -20,7 +20,7 @@ import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
 import { Logger } from "@/utils/Logger";
-import { arrowFieldToQueryResultField } from "./arrowFieldToQueryResultField";
+import { arrowFieldToQueryResultField } from "@/clients/DuckDBClient/arrowFieldToQueryResultField";
 import {
   DuckDBColumnSchema,
   DuckDBCSVSniffResult,
@@ -29,8 +29,8 @@ import {
   DuckDBRejectedRow,
   DuckDBScan,
   DuckDBStructuredQuery,
-} from "./DuckDBClient.types";
-import { DuckDBDataTypeUtils } from "./DuckDBDataType";
+} from "@/clients/DuckDBClient/DuckDBClient.types";
+import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import type {
   QueryResult,
   QueryResultPage,

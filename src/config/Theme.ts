@@ -9,7 +9,7 @@ import {
   AVANDAR_BLUE_SHADES,
   NEUTRAL_SHADES,
   PRIMARY_COLOR_LIGHT_SHADE,
-} from "../../shared/config/Theme";
+} from "$/config/Theme";
 
 /**
  * Modal z-index above AppShell main (`AppShell.module.css` uses 201).

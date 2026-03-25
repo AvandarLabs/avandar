@@ -6,8 +6,6 @@ import {
   PremiumPlanConfig,
 } from "$/config/FeaturePlansConfig";
 import { match } from "ts-pattern";
-import { isOneOf } from "@/lib/utils/guards/guards";
-import { Logger } from "@/utils/Logger";
 import {
   AnnualPaidSeatsPlan,
   FeaturePlan,
@@ -16,8 +14,10 @@ import {
   MonthlyPayWhatYouWantPlan,
   PaidPlanVariants,
   SubscriptionPlan,
-} from "./SubscriptionPlan.types";
-import type { SubscriptionsAPI } from "../../../../supabase/functions/subscriptions/subscriptions.types";
+} from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
+import { isOneOf } from "@/lib/utils/guards/guards";
+import { Logger } from "@/utils/Logger";
+import type { SubscriptionsAPI } from "@sfn/subscriptions/subscriptions.routes.types";
 
 type AvaPolarProduct =
   SubscriptionsAPI["subscriptions"]["/products"]["GET"]["returnType"]["products"][number];

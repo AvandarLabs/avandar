@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { makeBucketMap } from "./makeBucketMap.ts";
+import { makeBucketMap } from "@utils/maps/makeBucketMap/makeBucketMap.ts";
 
 describe("makeBucketMap", () => {
   it("groups entries by a provided key", () => {

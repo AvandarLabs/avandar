@@ -1,7 +1,7 @@
 import { Checkbox, Text } from "@mantine/core";
 import { isNullish } from "@utils/guards/isNullish/isNullish";
-import { isStringOrNumber } from "../guards";
-import { NullOrUndefinedValueItem } from "./NullOrUndefinedValueItem";
+import { isStringOrNumber } from "@ui/ObjectDescriptionList/guards";
+import { NullOrUndefinedValueItem } from "@ui/ObjectDescriptionList/PrimitiveValueItem/NullOrUndefinedValueItem";
 import type { ReactNode } from "react";
 
 type Props = {

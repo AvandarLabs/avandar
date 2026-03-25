@@ -1,7 +1,7 @@
+import { defineRoutes, GET, POST } from "@sfn/_shared/MiniServer/MiniServer.ts";
 import { EmailClient } from "$/EmailClient/EmailClient.tsx";
 import { z } from "zod";
-import { defineRoutes, GET, POST } from "../_shared/MiniServer/MiniServer.ts";
-import type { WorkspacesAPI } from "./workspaces.types.ts";
+import type { WorkspacesAPI } from "@sfn/workspaces/workspaces.routes.types.ts";
 
 const SLUG_MIN_LENGTH = 3;
 const SLUG_MAX_LENGTH = 20;
@@ -311,17 +311,5 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
           return { invite: updatedInvite, membership, profile, role };
         },
       ),
-  },
-  "/:workspaceId/features": {
-    GET: GET({
-      path: "/:workspaceId/features",
-      schema: {
-        workspaceId: z.uuid(),
-      },
-    }).action(({ pathParams: { workspaceId }, supabaseAdminClient }) => {
-      console.log("workspaceId", workspaceId);
-      console.log("supabaseAdminClient", supabaseAdminClient);
-      return { features: [] };
-    }),
   },
 });

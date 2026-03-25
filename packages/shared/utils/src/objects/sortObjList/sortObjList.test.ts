@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mixedComparator, sortObjList } from "./sortObjList.ts";
+import { mixedComparator, sortObjList } from "@utils/objects/sortObjList/sortObjList.ts";
 
 describe("mixedComparator", () => {
   it("returns zero when both values are nullish", () => {

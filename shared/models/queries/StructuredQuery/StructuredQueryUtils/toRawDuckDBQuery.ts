@@ -10,7 +10,7 @@ import { DuckDBQueryAggregations } from "$/models/queries/QueryAggregationType/Q
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns.ts";
 import knex from "knex";
 import { match } from "ts-pattern";
-import type { PartialStructuredQuery } from "../StructuredQuery.types.ts";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { DuckDBQueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationTypes.ts";
 
 const sql = knex({

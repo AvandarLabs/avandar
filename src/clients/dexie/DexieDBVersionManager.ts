@@ -3,7 +3,7 @@ import { identity } from "@utils/misc/identity";
 import { objectKeys } from "@utils/objects/objectKeys";
 import Dexie, { EntityTable, Transaction } from "dexie";
 import { UnionToIntersection } from "type-fest";
-import type { DexieCRUDModelSpec } from "./DexieCRUDClient.types";
+import type { DexieCRUDModelSpec } from "@/clients/dexie/DexieCRUDClient.types";
 
 /**
  * A record of Dexie tables representing CRUD models.

@@ -1,4 +1,4 @@
-import type { CamelCase } from "../../types/utilities.types.ts";
+import type { CamelCase } from "@utils/types/utilities.types.ts";
 
 /**
  * Converts a string to camelCase.

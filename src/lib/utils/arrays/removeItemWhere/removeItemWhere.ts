@@ -1,4 +1,4 @@
-import { removeItem } from "../removeItem/removeItem";
+import { removeItem } from "@/lib/utils/arrays/removeItem/removeItem";
 
 /**
  * Removes the first item from an array where the `predicate` returns true.

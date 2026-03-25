@@ -1,16 +1,16 @@
-import { z } from "zod";
-import { authMiddleware } from "../authMiddleware.ts";
-import { corsHeaders } from "../cors.ts";
-import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from "../httpCodes.ts";
-import { AvaSupabaseClient, SupabaseAdmin } from "../supabase.ts";
-import { createDefaultRouteHandler } from "./createServerRouteHandler.ts";
+import { authMiddleware } from "@sfn/_shared/authMiddleware.ts";
+import { corsHeaders } from "@sfn/_shared/cors.ts";
+import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from "@sfn/_shared/httpCodes.ts";
+import { createDefaultRouteHandler } from "@sfn/_shared/MiniServer/createServerRouteHandler.ts";
 import {
   parseURLPathParams,
   ValidPathParamsSchemaShape,
-} from "./parseURLPathParams.ts";
-import { isRedirect } from "./redirect.ts";
-import { responseError } from "./responseError.ts";
-import { responseSuccess } from "./responseSuccess.ts";
+} from "@sfn/_shared/MiniServer/parseURLPathParams.ts";
+import { isRedirect } from "@sfn/_shared/MiniServer/redirect.ts";
+import { responseError } from "@sfn/_shared/MiniServer/responseError.ts";
+import { responseSuccess } from "@sfn/_shared/MiniServer/responseSuccess.ts";
+import { AvaSupabaseClient, SupabaseAdmin } from "@sfn/_shared/supabase.ts";
+import { z } from "zod";
 import type {
   AnyValidPathParamsRecord,
   GenericAPITypeDef,
@@ -20,8 +20,8 @@ import type {
   ValidBody,
   ValidPathParams,
   ValidReturnType,
-} from "./api.types.ts";
-import type { AnyZodType } from "./createServerRouteHandler.ts";
+} from "@sfn/_shared/MiniServer/api.types.ts";
+import type { AnyZodType } from "@sfn/_shared/MiniServer/createServerRouteHandler.ts";
 import type {
   MiniServerAPIDef,
   MiniServerRoutesDef,
@@ -29,7 +29,7 @@ import type {
   ServerRouteHandler,
   URLPathWithoutParams,
   ValidQueryParams,
-} from "./MiniServer.types.ts";
+} from "@sfn/_shared/MiniServer/MiniServer.types.ts";
 import type { User } from "@supabase/supabase-js";
 
 function parseSearchParamsFromURL<

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { removeDuplicates } from "./removeDuplicates";
+import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
 
 describe("removeDuplicates", () => {
   it("removes duplicate numbers while preserving first-seen order", () => {

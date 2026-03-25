@@ -10,8 +10,8 @@ import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient"
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { Paper } from "@/lib/ui/Paper/Paper";
-import { generateEntities } from "./generateEntities";
-import { useHydratedEntityConfig } from "./useHydratedEntityConfig";
+import { generateEntities } from "@/components/EntityDesignerApp/EntityConfigMetaView/generateEntities/index";
+import { useHydratedEntityConfig } from "@/components/EntityDesignerApp/EntityConfigMetaView/useHydratedEntityConfig";
 import type { ObjectKeyRenderOptionsMap } from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig.types";
 

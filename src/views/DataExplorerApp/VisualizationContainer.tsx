@@ -10,7 +10,7 @@ import { BarChart } from "@/lib/ui/viz/BarChart";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { LineChart } from "@/lib/ui/viz/LineChart";
 import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
-import { DataExplorerStateManager } from "./DataExplorerStateManager/DataExplorerStateManager";
+import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 
 type Props = {

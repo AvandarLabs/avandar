@@ -1,37 +1,37 @@
 // arrays
-export { splitArray } from "./arrays/splitArray/splitArray.ts";
-export { append } from "./arrays/hofs/append/append.ts";
+export { splitArray } from "@utils/arrays/splitArray/splitArray.ts";
+export { append } from "@utils/arrays/hofs/append/append.ts";
 
 // asserts
-export { assert } from "./asserts/assert/assert.ts";
-export { assertIsDefined } from "./asserts/assertIsDefined/assertIsDefined.ts";
-export { assertIsNonEmptyArray } from "./asserts/assertIsNonEmptyArray/assertIsNonEmptyArray.ts";
-export { assertIsNonNullish } from "./asserts/assertIsNonNullish/assertIsNonNullish.ts";
-export { assertIsSingletonArray } from "./asserts/assertIsSingletonArray/assertIsSingletonArray.ts";
+export { assert } from "@utils/asserts/assert/assert.ts";
+export { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined.ts";
+export { assertIsNonEmptyArray } from "@utils/asserts/assertIsNonEmptyArray/assertIsNonEmptyArray.ts";
+export { assertIsNonNullish } from "@utils/asserts/assertIsNonNullish/assertIsNonNullish.ts";
+export { assertIsSingletonArray } from "@utils/asserts/assertIsSingletonArray/assertIsSingletonArray.ts";
 
 // dates
-export { formatDate } from "./dates/formatDate/formatDate.ts";
-export type { FormattableTimezone } from "./dates/formatDate/formatDate.ts";
+export { formatDate } from "@utils/dates/formatDate/formatDate.ts";
+export type { FormattableTimezone } from "@utils/dates/formatDate/formatDate.ts";
 
 // numbers
-export { formatNumber } from "./numbers/formatNumber/formatNumber.ts";
+export { formatNumber } from "@utils/numbers/formatNumber/formatNumber.ts";
 export type {
   FormatNumberOptions,
   SignDisplay,
-} from "./numbers/formatNumber/formatNumber.ts";
+} from "@utils/numbers/formatNumber/formatNumber.ts";
 
 // filters
-export { applyFiltersToRows } from "./filters/applyFiltersToRows/applyFiltersToRows.ts";
-export { bucketFiltersByColumn } from "./filters/bucketFiltersByColumn/bucketFiltersByColumn.ts";
-export { bucketFiltersByOperator } from "./filters/bucketFiltersByOperator/bucketFiltersByOperator.ts";
-export { doesRowPassFilters } from "./filters/doesRowPassFilters/doesRowPassFilters.ts";
-export { doesValuePassFilters } from "./filters/doesValuePassFilters/doesValuePassFilters.ts";
-export { isArrayValueOperator } from "./filters/isArrayValueOperator/isArrayValueOperator.ts";
-export { isEmptyFiltersObject } from "./filters/isEmptyFiltersObject/isEmptyFiltersObject.ts";
-export { isFiltersByColumnObject } from "./filters/isFiltersByColumnObject/isFiltersByColumnObject.ts";
-export { isFiltersByOperatorObject } from "./filters/isFiltersByOperatorObject/isFiltersByOperatorObject.ts";
-export { isSingleValueOperator } from "./filters/isSingleValueOperator/isSingleValueOperator.ts";
-export { where } from "./filters/where/where.ts";
+export { applyFiltersToRows } from "@utils/filters/applyFiltersToRows/applyFiltersToRows.ts";
+export { bucketFiltersByColumn } from "@utils/filters/bucketFiltersByColumn/bucketFiltersByColumn.ts";
+export { bucketFiltersByOperator } from "@utils/filters/bucketFiltersByOperator/bucketFiltersByOperator.ts";
+export { doesRowPassFilters } from "@utils/filters/doesRowPassFilters/doesRowPassFilters.ts";
+export { doesValuePassFilters } from "@utils/filters/doesValuePassFilters/doesValuePassFilters.ts";
+export { isArrayValueOperator } from "@utils/filters/isArrayValueOperator/isArrayValueOperator.ts";
+export { isEmptyFiltersObject } from "@utils/filters/isEmptyFiltersObject/isEmptyFiltersObject.ts";
+export { isFiltersByColumnObject } from "@utils/filters/isFiltersByColumnObject/isFiltersByColumnObject.ts";
+export { isFiltersByOperatorObject } from "@utils/filters/isFiltersByOperatorObject/isFiltersByOperatorObject.ts";
+export { isSingleValueOperator } from "@utils/filters/isSingleValueOperator/isSingleValueOperator.ts";
+export { where } from "@utils/filters/where/where.ts";
 
 // filter types
 export type {
@@ -39,112 +39,112 @@ export type {
   FilterOperatorRecord,
   FiltersByColumn,
   FiltersByOperator,
-} from "./filters/filters.ts";
+} from "@utils/filters/filters.ts";
 
 // guards
-export { isArray } from "./guards/isArray/isArray.ts";
-export { isBoolean } from "./guards/isBoolean/isBoolean.ts";
-export { isDate } from "./guards/isDate/isDate.ts";
-export { isDefined } from "./guards/isDefined/isDefined.ts";
-export { isEmptyObject } from "./guards/isEmptyObject/isEmptyObject.ts";
-export { isEpochMs } from "./guards/isEpochMs/isEpochMs.ts";
-export { isFunction } from "./guards/isFunction.ts";
-export { isISODateString } from "./guards/isISODateString/isISODateString.ts";
-export { isNonEmptyArray } from "./guards/isNonEmptyArray/isNonEmptyArray.ts";
-export { isNonNullish } from "./guards/isNonNullish/isNonNullish.ts";
-export { isNotNull } from "./guards/isNotNull/isNotNull.ts";
-export { isNull } from "./guards/isNull/isNull.ts";
-export { isNullish } from "./guards/isNullish/isNullish.ts";
-export { isNumber } from "./guards/isNumber/isNumber.ts";
-export { isPlainObject } from "./guards/isPlainObject/isPlainObject.ts";
-export { isString } from "./guards/isString/isString.ts";
-export { isUndefined } from "./guards/isUndefined/isUndefined.ts";
-export { isPrimitive } from "./guards/isPrimitive/isPrimitive.ts";
-export { isValidDateValue } from "./guards/isValidDateValue/isValidDateValue.ts";
-export { hasDefinedProps } from "./guards/hasDefinedProps/hasDefinedProps.ts";
+export { isArray } from "@utils/guards/isArray/isArray.ts";
+export { isBoolean } from "@utils/guards/isBoolean/isBoolean.ts";
+export { isDate } from "@utils/guards/isDate/isDate.ts";
+export { isDefined } from "@utils/guards/isDefined/isDefined.ts";
+export { isEmptyObject } from "@utils/guards/isEmptyObject/isEmptyObject.ts";
+export { isEpochMs } from "@utils/guards/isEpochMs/isEpochMs.ts";
+export { isFunction } from "@utils/guards/isFunction.ts";
+export { isISODateString } from "@utils/guards/isISODateString/isISODateString.ts";
+export { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray.ts";
+export { isNonNullish } from "@utils/guards/isNonNullish/isNonNullish.ts";
+export { isNotNull } from "@utils/guards/isNotNull/isNotNull.ts";
+export { isNull } from "@utils/guards/isNull/isNull.ts";
+export { isNullish } from "@utils/guards/isNullish/isNullish.ts";
+export { isNumber } from "@utils/guards/isNumber/isNumber.ts";
+export { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject.ts";
+export { isString } from "@utils/guards/isString/isString.ts";
+export { isUndefined } from "@utils/guards/isUndefined/isUndefined.ts";
+export { isPrimitive } from "@utils/guards/isPrimitive/isPrimitive.ts";
+export { isValidDateValue } from "@utils/guards/isValidDateValue/isValidDateValue.ts";
+export { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps.ts";
 
 // guards - higher order functions
-export { valEq } from "./guards/hofs/valEq.ts";
-export { valNotEq } from "./guards/hofs/valNotEq.ts";
+export { valEq } from "@utils/guards/hofs/valEq.ts";
+export { valNotEq } from "@utils/guards/hofs/valNotEq.ts";
 
 // maps
-export { makeBucketMap } from "./maps/makeBucketMap/makeBucketMap.ts";
-export { makeIdLookupMap } from "./maps/makeIdLookupMap/makeIdLookupMap.ts";
-export { makeMap } from "./maps/makeMap/makeMap.ts";
-export { mergeBucketMaps } from "./maps/mergeBucketMaps/mergeBucketMaps.ts";
+export { makeBucketMap } from "@utils/maps/makeBucketMap/makeBucketMap.ts";
+export { makeIdLookupMap } from "@utils/maps/makeIdLookupMap/makeIdLookupMap.ts";
+export { makeMap } from "@utils/maps/makeMap/makeMap.ts";
+export { mergeBucketMaps } from "@utils/maps/mergeBucketMaps/mergeBucketMaps.ts";
 
 // misc
-export { constant } from "./misc/constant/constant.ts";
-export { identity } from "./misc/identity.ts";
-export { noop } from "./misc/noop.ts";
-export { sleep } from "./misc/sleep/sleep.ts";
-export { traverse } from "./misc/traverse/traverse.ts";
-export { pipe } from "./misc/pipe/pipe.ts";
+export { constant } from "@utils/misc/constant/constant.ts";
+export { identity } from "@utils/misc/identity.ts";
+export { noop } from "@utils/misc/noop.ts";
+export { sleep } from "@utils/misc/sleep/sleep.ts";
+export { traverse } from "@utils/misc/traverse/traverse.ts";
+export { pipe } from "@utils/misc/pipe/pipe.ts";
 
 // objects
-export { camelCaseKeys } from "./objects/camelCaseKeys/camelCaseKeys.ts";
-export { camelCaseKeysDeep } from "./objects/camelCaseKeys/camelCaseKeys.ts";
-export { camelCaseKeysShallow } from "./objects/camelCaseKeys/camelCaseKeys.ts";
-export { coerceDatesIn } from "./objects/coerceDatesIn/coerceDatesIn.ts";
-export { convertDatesToISOIn } from "./objects/convertDatesToISOIn/convertDatesToISOIn.ts";
-export { getValue } from "./objects/getValue/getValue.ts";
-export { makeBucketRecord } from "./objects/makeBucketRecord/makeBucketRecord.ts";
-export { makeIdLookupRecord } from "./objects/makeIdLookupRecord/makeIdLookupRecord.ts";
-export { makeObject } from "./objects/makeObject/makeObject.ts";
-export { makeObjectFromEntries } from "./objects/makeObjectFromEntries/makeObjectFromEntries.ts";
-export { setValue } from "./objects/setValue/setValue.ts";
-export { excludeDeep } from "./objects/excludeDeep/excludeDeep.ts";
-export { excludeNullsDeep } from "./objects/excludeNullsDeep/excludeNullsDeep.ts";
-export { excludeNullsExceptIn } from "./objects/excludeNullsExceptIn/excludeNullsExceptIn.ts";
-export { excludeNullsIn } from "./objects/excludeNullsIn/excludeNullsIn.ts";
-export { excludeUndefinedDeep } from "./objects/excludeUndefinedDeep/excludeUndefinedDeep.ts";
-export { excludeUndefinedShallow } from "./objects/excludeUndefinedShallow/excludeUndefinedShallow.ts";
-export { nullsToUndefinedDeep } from "./objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
-export { objectEntries } from "./objects/objectEntries.ts";
-export { objectKeys } from "./objects/objectKeys.ts";
-export { objectToPrettyString } from "./objects/objectToPrettyString/objectToPrettyString.ts";
-export { objectValues } from "./objects/objectValues.ts";
-export { objectValuesMap } from "./objects/objectValuesMap/objectValuesMap.ts";
-export { omit } from "./objects/omit/omit.ts";
-export { pick } from "./objects/pick/pick.ts";
-export { registry } from "./objects/registry/registry.ts";
-export { snakeCaseKeysDeep } from "./objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
-export { snakeCaseKeysShallow } from "./objects/snakeCaseKeysShallow/snakeCaseKeysShallow.ts";
-export { swapDeep } from "./objects/swapDeep/swapDeep.ts";
-export { undefinedsToNullsDeep } from "./objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
+export { camelCaseKeys } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
+export { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
+export { camelCaseKeysShallow } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
+export { coerceDatesIn } from "@utils/objects/coerceDatesIn/coerceDatesIn.ts";
+export { convertDatesToISOIn } from "@utils/objects/convertDatesToISOIn/convertDatesToISOIn.ts";
+export { getValue } from "@utils/objects/getValue/getValue.ts";
+export { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord.ts";
+export { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord.ts";
+export { makeObject } from "@utils/objects/makeObject/makeObject.ts";
+export { makeObjectFromEntries } from "@utils/objects/makeObjectFromEntries/makeObjectFromEntries.ts";
+export { setValue } from "@utils/objects/setValue/setValue.ts";
+export { excludeDeep } from "@utils/objects/excludeDeep/excludeDeep.ts";
+export { excludeNullsDeep } from "@utils/objects/excludeNullsDeep/excludeNullsDeep.ts";
+export { excludeNullsExceptIn } from "@utils/objects/excludeNullsExceptIn/excludeNullsExceptIn.ts";
+export { excludeNullsIn } from "@utils/objects/excludeNullsIn/excludeNullsIn.ts";
+export { excludeUndefinedDeep } from "@utils/objects/excludeUndefinedDeep/excludeUndefinedDeep.ts";
+export { excludeUndefinedShallow } from "@utils/objects/excludeUndefinedShallow/excludeUndefinedShallow.ts";
+export { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
+export { objectEntries } from "@utils/objects/objectEntries.ts";
+export { objectKeys } from "@utils/objects/objectKeys.ts";
+export { objectToPrettyString } from "@utils/objects/objectToPrettyString/objectToPrettyString.ts";
+export { objectValues } from "@utils/objects/objectValues.ts";
+export { objectValuesMap } from "@utils/objects/objectValuesMap/objectValuesMap.ts";
+export { omit } from "@utils/objects/omit/omit.ts";
+export { pick } from "@utils/objects/pick/pick.ts";
+export { registry } from "@utils/objects/registry/registry.ts";
+export { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
+export { snakeCaseKeysShallow } from "@utils/objects/snakeCaseKeysShallow/snakeCaseKeysShallow.ts";
+export { swapDeep } from "@utils/objects/swapDeep/swapDeep.ts";
+export { undefinedsToNullsDeep } from "@utils/objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
 export {
   mixedComparator,
   sortObjList,
-} from "./objects/sortObjList/sortObjList.ts";
+} from "@utils/objects/sortObjList/sortObjList.ts";
 
 // objects - higher order functions
-export { coerceDatesInProps } from "./objects/hofs/coerceDatesInProps/coerceDatesInProps.ts";
-export { convertDatesToISOInProps } from "./objects/hofs/convertDatesToISOInProps/convertDatesToISOInProps.ts";
-export { excludeNullsExceptInProps } from "./objects/hofs/excludeNullsExceptInProps/excludeNullsExceptInProps.ts";
-export { excludeNullsInProps } from "./objects/hofs/excludeNullsInProps/excludeNullsInProps.ts";
-export { omitProps } from "./objects/hofs/omitProps/omitProps.ts";
-export { pickProps } from "./objects/hofs/pickProps/pickProps.ts";
-export { prop } from "./objects/hofs/prop/prop.ts";
-export { propEq } from "./objects/hofs/propEq/propEq.ts";
-export { propIsDefined } from "./objects/hofs/propIsDefined/propIsDefined.ts";
-export { propIsInArray } from "./objects/hofs/propIsInArray/propIsInArray.ts";
-export { propNotEq } from "./objects/hofs/propNotEq/propNotEq.ts";
-export { propPasses } from "./objects/hofs/propPasses/propPasses.ts";
-export { setPropValue } from "./objects/hofs/setPropValue/setPropValue.ts";
+export { coerceDatesInProps } from "@utils/objects/hofs/coerceDatesInProps/coerceDatesInProps.ts";
+export { convertDatesToISOInProps } from "@utils/objects/hofs/convertDatesToISOInProps/convertDatesToISOInProps.ts";
+export { excludeNullsExceptInProps } from "@utils/objects/hofs/excludeNullsExceptInProps/excludeNullsExceptInProps.ts";
+export { excludeNullsInProps } from "@utils/objects/hofs/excludeNullsInProps/excludeNullsInProps.ts";
+export { omitProps } from "@utils/objects/hofs/omitProps/omitProps.ts";
+export { pickProps } from "@utils/objects/hofs/pickProps/pickProps.ts";
+export { prop } from "@utils/objects/hofs/prop/prop.ts";
+export { propEq } from "@utils/objects/hofs/propEq/propEq.ts";
+export { propIsDefined } from "@utils/objects/hofs/propIsDefined/propIsDefined.ts";
+export { propIsInArray } from "@utils/objects/hofs/propIsInArray/propIsInArray.ts";
+export { propNotEq } from "@utils/objects/hofs/propNotEq/propNotEq.ts";
+export { propPasses } from "@utils/objects/hofs/propPasses/propPasses.ts";
+export { setPropValue } from "@utils/objects/hofs/setPropValue/setPropValue.ts";
 
 // strings
-export { capitalize } from "./strings/capitalize/capitalize.ts";
+export { capitalize } from "@utils/strings/capitalize/capitalize.ts";
 export {
   sortStrings,
   stringComparator,
-} from "./strings/sortStrings/sortStrings.ts";
-export { toPascalCase } from "./strings/toPascalCase/toPascalCase.ts";
-export { unknownToString } from "./strings/unknownToString/unknownToString.ts";
-export { prefix } from "./strings/prefix/prefix.ts";
-export { template } from "./strings/template/template.ts";
+} from "@utils/strings/sortStrings/sortStrings.ts";
+export { toPascalCase } from "@utils/strings/toPascalCase/toPascalCase.ts";
+export { unknownToString } from "@utils/strings/unknownToString/unknownToString.ts";
+export { prefix } from "@utils/strings/prefix/prefix.ts";
+export { template } from "@utils/strings/template/template.ts";
 
 // constants
-export { MIMEType } from "./types/common.types.ts";
+export { MIMEType } from "@utils/types/common.types.ts";
 
 // types
 export type {
@@ -160,7 +160,7 @@ export type {
   JSONValue,
   Brand,
   IExternalStore,
-} from "./types/common.types.ts";
+} from "@utils/types/common.types.ts";
 export type {
   And,
   IsEqual,
@@ -168,7 +168,7 @@ export type {
   IsArray,
   Not,
   ZodSchemaEqualsTypes,
-} from "./types/test-utilities.types.ts";
+} from "@utils/types/test-utilities.types.ts";
 export type {
   StringKeyOf,
   CamelCase,
@@ -192,8 +192,8 @@ export type {
   RegistryOfArrays,
   ObjectRegistry,
   MergeObjects,
-} from "./types/utilities.types.ts";
-export type { PathValue } from "./objects/getValue/getValue.ts";
-export type { ExcludeNullsExceptIn } from "./objects/excludeNullsExceptIn/excludeNullsExceptIn.ts";
-export type { ExcludeNullsIn } from "./objects/excludeNullsIn/excludeNullsIn.ts";
-export type { ExcludeUndefinedShallow } from "./objects/excludeUndefinedShallow/excludeUndefinedShallow.ts";
+} from "@utils/types/utilities.types.ts";
+export type { PathValue } from "@utils/objects/getValue/getValue.ts";
+export type { ExcludeNullsExceptIn } from "@utils/objects/excludeNullsExceptIn/excludeNullsExceptIn.ts";
+export type { ExcludeNullsIn } from "@utils/objects/excludeNullsIn/excludeNullsIn.ts";
+export type { ExcludeUndefinedShallow } from "@utils/objects/excludeUndefinedShallow/excludeUndefinedShallow.ts";
