@@ -1,4 +1,5 @@
-import { Text, TextProps, Tooltip } from "@mantine/core";
+import { Text, type TextProps, type TooltipProps } from "@mantine/core";
+import { Tooltip } from "@ui/Tooltip/Tooltip";
 import { useWindowEvent } from "@mantine/hooks";
 import { isArray } from "@utils/guards/isArray/isArray";
 import {
@@ -10,9 +11,16 @@ import {
   useState,
 } from "react";
 
+type TooltipPassthroughProps = Omit<
+  TooltipProps,
+  "children" | "label" | "disabled"
+>;
+
 type Props = {
   children: string;
   withFullTextTooltip?: boolean;
+  /** Extra props for the tooltip (e.g. position in modals). */
+  tooltipProps?: TooltipPassthroughProps;
 } & Omit<TextProps, "children" | "truncate" | "display">;
 
 function useCheckTruncatedText(
@@ -52,6 +60,7 @@ export function TruncatedText({
   children,
   maw = 250,
   withFullTextTooltip: withTooltip = false,
+  tooltipProps,
   ...textProps
 }: Props): JSX.Element {
   const [textRef, isTextTruncated] = useCheckTruncatedText([children]);
@@ -64,10 +73,11 @@ export function TruncatedText({
 
   return withTooltip ?
       <Tooltip
+        position="left"
+        withArrow
+        {...tooltipProps}
         label={children}
         disabled={!isTextTruncated}
-        withArrow
-        position="left"
       >
         {textContents}
       </Tooltip>

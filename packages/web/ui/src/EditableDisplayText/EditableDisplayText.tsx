@@ -1,10 +1,49 @@
 import { Box, Button, Group, Text, Textarea, TextInput } from "@mantine/core";
-import { getHotkeyHandler } from "@mantine/hooks";
+import { getHotkeyHandler, useWindowEvent } from "@mantine/hooks";
 import { EditButton } from "@ui/buttons/EditButton";
+import { Tooltip } from "@ui/Tooltip/Tooltip";
 import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
+import { isArray } from "@utils/guards/isArray/isArray";
 import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject";
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  DependencyList,
+  RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { TextareaProps, TextInputProps, TextProps } from "@mantine/core";
+
+function useCheckTruncatedText(
+  dependencies: unknown | DependencyList = [],
+): [textRef: RefObject<HTMLParagraphElement | null>, isTextTruncated: boolean] {
+  const textRef = useRef<HTMLParagraphElement>(null);
+  const [isTextTruncated, setIsTextTruncated] = useState(false);
+
+  const checkTruncation = useCallback(() => {
+    if (textRef.current) {
+      setIsTextTruncated(
+        textRef.current.scrollWidth > textRef.current.clientWidth,
+      );
+    }
+  }, []);
+
+  useEffect(
+    () => {
+      checkTruncation();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    isArray(dependencies) ? dependencies : [dependencies],
+  );
+
+  useWindowEvent("resize", () => {
+    return checkTruncation();
+  });
+
+  return [textRef, isTextTruncated];
+}
 
 type BaseProps = {
   /**
@@ -103,7 +142,6 @@ export function EditableDisplayText({
     (!passThroughProps.textarea && hasDefinedProps(passThroughProps, "w")) ||
     (isPlainObject(passThroughProps.style) &&
       hasDefinedProps(passThroughProps.style, "width"));
-  const singleLineInputWidth = `calc(${Math.max(value.length, 1)}ch + 1rem)`;
 
   const isMac = useMemo(() => {
     if (typeof navigator === "undefined") {
@@ -164,15 +202,17 @@ export function EditableDisplayText({
       lineHeight: "inherit",
       color: "inherit",
       width:
-        !passThroughProps.textarea && !hasExplicitWidth ?
-          singleLineInputWidth
-        : undefined,
-      fieldSizing:
-        !passThroughProps.textarea && !hasExplicitWidth ?
-          ("content" as const)
-        : undefined,
+        !passThroughProps.textarea && !hasExplicitWidth ? "100%" : undefined,
+      minWidth: !passThroughProps.textarea && !hasExplicitWidth ? 0 : undefined,
     },
   };
+
+  const [displayTextRef, isDisplayTextTruncated] = useCheckTruncatedText([
+    value,
+    hasText,
+    emptyDisplayText,
+    passThroughProps.textarea,
+  ]);
 
   const elements = {
     textInput() {
@@ -258,11 +298,10 @@ export function EditableDisplayText({
         bd="1px dashed var(--mantine-color-neutral-4)"
         bg="neutral.0"
         w={
-          !passThroughProps.textarea && !hasExplicitWidth ?
-            "fit-content"
-          : undefined
+          !passThroughProps.textarea && !hasExplicitWidth ? "100%" : undefined
         }
         maw="100%"
+        miw={0}
       >
         {passThroughProps.textarea ? elements.textarea() : elements.textInput()}
         <Group mt="xxs" gap="xs">
@@ -298,17 +337,50 @@ export function EditableDisplayText({
     );
   }
 
+  if (passThroughProps.textarea) {
+    return (
+      <Group gap="xxs" align="center" wrap="nowrap" justify="space-between">
+        <Text
+          style={{ whiteSpace: "pre-wrap" }}
+          c={hasText ? undefined : "dimmed"}
+          fs={hasText ? undefined : "italic"}
+          {...displayTextProps}
+        >
+          {hasText ? value : emptyDisplayText}
+        </Text>
+        <EditButton onClick={onStartEditing} disabled={disabled} name={name} />
+      </Group>
+    );
+  }
+
+  const labelForTooltip = hasText ? value : emptyDisplayText;
+
   return (
-    <Group gap="xxs" align="center" wrap="nowrap" justify="space-between">
-      <Text
-        style={{ whiteSpace: "pre-wrap" }}
-        c={hasText ? undefined : "dimmed"}
-        fs={hasText ? undefined : "italic"}
-        {...displayTextProps}
-      >
-        {hasText ? value : emptyDisplayText}
-      </Text>
-      <EditButton onClick={onStartEditing} disabled={disabled} name={name} />
+    <Group gap="xxs" align="center" wrap="nowrap" w="100%" miw={0}>
+      <Box miw={0} style={{ flex: 1 }}>
+        <Tooltip
+          label={labelForTooltip}
+          disabled={!isDisplayTextTruncated}
+          position="top"
+        >
+          <Text
+            ref={displayTextRef}
+            display="block"
+            truncate
+            w="100%"
+            maw="100%"
+            miw={0}
+            c={hasText ? undefined : "dimmed"}
+            fs={hasText ? undefined : "italic"}
+            {...displayTextProps}
+          >
+            {hasText ? value : emptyDisplayText}
+          </Text>
+        </Tooltip>
+      </Box>
+      <Box style={{ flexShrink: 0 }}>
+        <EditButton onClick={onStartEditing} disabled={disabled} name={name} />
+      </Box>
     </Group>
   );
 }
