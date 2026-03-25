@@ -1,6 +1,6 @@
 import { Acclimate } from "@avandar/acclimate";
 import { DevCLI } from "./DevCLI/DevCLI";
-import { loadDevEnv } from "./loadDevEnv";
+import { loadDevEnv } from "./loadDevEnv/loadDevEnv";
 import { PipelineCLI } from "./PipelineCLI/PipelineCLI";
 import { PolarCLI } from "./PolarCLI/PolarCLI";
 import { SupabaseCLI } from "./SupabaseCLI/SupabaseCLI";

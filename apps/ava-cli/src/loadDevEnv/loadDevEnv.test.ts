@@ -4,7 +4,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { loadDevEnv } from "./loadDevEnv";
 
 describe("loadDevEnv", () => {
-  const thisDirectoryPath: string = path.dirname(fileURLToPath(import.meta.url));
+  const thisDirectoryPath: string = path.dirname(
+    fileURLToPath(import.meta.url)
+  );
   const repoRootPath: string = path.resolve(thisDirectoryPath, "../../..");
   const originalPipelineServerSecret: string | undefined =
     process.env.AVA_PIPELINE_SERVER_SECRET;
