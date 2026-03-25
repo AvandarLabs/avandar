@@ -26,7 +26,11 @@
     "paths": {
       "$/*": ["./shared/*"],
       "@/*": ["./src/*"],
+
+      /* Supabase edge functions */
       "@sfn/*": ["./supabase/functions/*"],
+
+      /* Packages */
       "@clients/*": ["./packages/shared/clients/src/*"],
       "@logger/*": ["./packages/shared/logger/src/*"],
       "@models/*": ["./packages/shared/models/src/*"],
@@ -34,6 +38,9 @@
       "@utils/*": ["./packages/shared/utils/src/*"],
       "@ui/*": ["./packages/web/ui/src/*"],
       "@hooks/*": ["./packages/web/hooks/src/*"],
+
+      /* Apps */
+      "@ava-cli/*": ["./apps/ava-cli/src/*"],
       "@fanout-server/*": ["./apps/dev-fanout-server/src/*"]
     }
   }

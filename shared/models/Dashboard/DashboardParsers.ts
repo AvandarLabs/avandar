@@ -7,7 +7,8 @@ import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsT
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
 import { undefinedsToNullsDeep } from "@utils/objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
 import { supabaseJSONSchema } from "$/lib/zodHelpers.ts";
-import { UserId, UserProfileId } from "$/models/User/User.types.ts";
+import type { UserId } from "$/models/User/User.types.ts";
+import type { UserProfileId } from "$/models/User/UserProfile.types.ts";
 import { z } from "zod";
 import type {
   Dashboard,

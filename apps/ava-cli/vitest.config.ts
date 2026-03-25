@@ -12,6 +12,7 @@ export default defineConfig({
     alias: {
       $: resolve(configDir, "../../shared"),
       "@utils": resolve(configDir, "../../packages/shared/utils/src"),
+      "@ava-cli": resolve(configDir, "src"),
     },
   },
 });

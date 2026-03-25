@@ -2,7 +2,8 @@ import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/Supabase
 import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
 import type { SwapDeep } from "@utils/types/utilities.types.ts";
-import type { UserId, UserProfileId } from "$/models/User/User.types.ts";
+import type { UserProfileId } from "$/models/User/UserProfile.types.ts";
+import type { UserId } from "$/models/User/User.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { Json } from "$/types/database.types.ts";
 import type { SetOptional } from "type-fest";

@@ -13,7 +13,8 @@ import type {
   Expect,
   ZodSchemaEqualsTypes,
 } from "@utils/types/test-utilities.types.ts";
-import type { UserId, UserProfileId } from "$/models/User/User.types.ts";
+import type { UserId } from "$/models/User/User.types.ts";
+import type { UserProfileId } from "$/models/User/UserProfile.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 
 const DBReadSchema = z.object({

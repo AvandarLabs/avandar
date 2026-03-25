@@ -1,8 +1,8 @@
 import { Acclimate } from "@avandar/acclimate";
 import * as dotenv from "dotenv";
-import { DevCLI } from "./DevCLI/DevCLI";
-import { PolarCLI } from "./PolarCLI/PolarCLI";
-import { SupabaseCLI } from "./SupabaseCLI/SupabaseCLI";
+import { DevCLI } from "@ava-cli/DevCLI/DevCLI";
+import { PolarCLI } from "@ava-cli/PolarCLI/PolarCLI";
+import { SupabaseCLI } from "@ava-cli/SupabaseCLI/SupabaseCLI";
 
 type DotenvConfigResult = Readonly<{
   error?: unknown;

@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 import { DEFAULT_THEME } from "@mantine/core";
-import { Theme } from "./src/config/Theme";
+import { Theme } from "@/config/Theme";
 
 /**
  * Convert all our mantine colors to tailwind color objects.

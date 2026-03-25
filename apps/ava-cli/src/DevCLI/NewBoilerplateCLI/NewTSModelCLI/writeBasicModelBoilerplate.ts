@@ -1,6 +1,6 @@
 import { Acclimate } from "@avandar/acclimate";
-import { writeFileFromTemplate } from "../../../utils/writeFileFromTemplate/writeFileFromTemplate";
-import { TEMPLATES_DIR } from "./constants";
+import { writeFileFromTemplate } from "@ava-cli/utils/writeFileFromTemplate/writeFileFromTemplate";
+import { TEMPLATES_DIR } from "@ava-cli/DevCLI/NewBoilerplateCLI/NewTSModelCLI/constants";
 
 export function writeBasicModelBoilerplate(options: {
   modelName: string;

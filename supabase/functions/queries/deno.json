@@ -1,7 +1,7 @@
 {
   "imports": {
     "$/": "../../../shared/",
-    "@sfn/": "../../../supabase/functions/",
+    "@sfn/": "../",
     "@clients/": "../../../packages/shared/clients/src/",
     "@logger/": "../../../packages/shared/logger/src/",
     "@models/": "../../../packages/shared/models/src/",
