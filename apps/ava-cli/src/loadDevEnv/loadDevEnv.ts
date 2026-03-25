@@ -6,13 +6,10 @@ type DotenvConfigResult = Readonly<{
   error?: unknown;
 }>;
 
-type LoadDevEnvOptions = Readonly<{
-  envFilePath?: string;
-}>;
-
 function _getDefaultEnvFilePath(): string {
   let currentDirectoryPath: string = process.cwd();
 
+  // climb up the directory tree until we find a .env.development
   while (true) {
     const envFilePath: string = path.join(
       currentDirectoryPath,
@@ -32,7 +29,7 @@ function _getDefaultEnvFilePath(): string {
   }
 }
 
-export function loadDevEnv(options: LoadDevEnvOptions = {}): void {
+export function loadDevEnv(options: { envFilePath?: string } = {}): void {
   const result = dotenv.config({
     path: options.envFilePath ?? _getDefaultEnvFilePath(),
     quiet: true,
