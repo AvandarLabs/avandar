@@ -58,6 +58,8 @@ Server:
 - `AVA_DEV_FANOUT_ADMIN_SERVER_SECRET` (required): Bearer token for admin
   endpoints.
 - `AVA_NGROK_DEV_URLS_FILE_PATH` (optional): Override JSON file path.
+- `HOST` (optional): Defaults to `0.0.0.0`.
+- `PORT` (optional): For localhost only, defaults to `4610`.
 
 ### Fly.io setup
 
