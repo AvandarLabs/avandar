@@ -11,6 +11,8 @@
     "vite.config.ts",
     ".ava/**/*.ts",
     "apps/dev-fanout-server/src",
+    "apps/pipeline-server/pipelines",
+    "apps/pipeline-server/src",
     "apps/ava-cli/src",
     "packages/shared/*/src"
   ],
