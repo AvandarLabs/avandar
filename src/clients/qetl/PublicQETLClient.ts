@@ -1,5 +1,4 @@
 import { createModule, Module } from "@modules/createModule";
-import { AuthClient } from "../AuthClient";
 import { LocalPublicDatasetClient } from "../datasets/LocalPublicDatasetClient";
 import { PublicDatasetParquetStorageClient } from "../storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
 import { IQETLClient, QETLClientFactory } from "./QETLClient";
@@ -76,17 +75,7 @@ export const PublicQETLClient = createModule("PublicQETLClient", {
         rawSQL: string;
         dashboardId: DashboardId;
       }): Promise<QueryResult<RowObject>> => {
-        const session = await AuthClient.getCurrentSession();
-        if (!session?.user) {
-          throw new Error(
-            "Cannot run query because user is not authenticated.",
-          );
-        }
-
-        const client = await _getClient({
-          dashboardId,
-        });
-
+        const client = await _getClient({ dashboardId });
         const queryResults = await client.runQuery<RowObject>({ rawSQL });
         return queryResults;
       },
