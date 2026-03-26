@@ -1,5 +1,5 @@
 import Fastify from "fastify";
-import { registerPipelineRoutes } from "./routes/pipeline-name/registerPipelineRoutes";
+import { registerPipelineRoutes } from "@pipeline-server/routes/pipeline-name/registerPipelineRoutes";
 
 function _getPort(): number {
   const defaultPort: number = 4611;

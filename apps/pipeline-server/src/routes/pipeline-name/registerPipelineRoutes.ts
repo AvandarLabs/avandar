@@ -1,5 +1,5 @@
 import { FastifyPluginAsync } from "fastify";
-import { run } from "./run/run";
+import { run } from "@pipeline-server/routes/pipeline-name/run/run";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 type RunPipelineRequest = FastifyRequest<{

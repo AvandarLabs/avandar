@@ -1,7 +1,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { loadDevEnv } from "./loadDevEnv";
+import { loadDevEnv } from "@ava-cli/loadDevEnv/loadDevEnv";
 
 describe("loadDevEnv", () => {
   const thisDirectoryPath: string = path.dirname(
