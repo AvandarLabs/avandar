@@ -1,49 +1,21 @@
-import { Box, Button, Group, Text, Textarea, TextInput } from "@mantine/core";
-import { getHotkeyHandler, useWindowEvent } from "@mantine/hooks";
+import {
+  Box,
+  Button,
+  Group,
+  Text,
+  Textarea,
+  TextInput,
+  type TextareaProps,
+  type TextInputProps,
+  type TextProps,
+} from "@mantine/core";
+import { getHotkeyHandler } from "@mantine/hooks";
 import { EditButton } from "@ui/buttons/EditButton";
+import { useCheckTruncatedText } from "@ui/hooks/useCheckTruncatedText";
 import { Tooltip } from "@ui/Tooltip/Tooltip";
 import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
-import { isArray } from "@utils/guards/isArray/isArray";
 import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject";
-import {
-  DependencyList,
-  RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import type { TextareaProps, TextInputProps, TextProps } from "@mantine/core";
-
-function useCheckTruncatedText(
-  dependencies: unknown | DependencyList = [],
-): [textRef: RefObject<HTMLParagraphElement | null>, isTextTruncated: boolean] {
-  const textRef = useRef<HTMLParagraphElement>(null);
-  const [isTextTruncated, setIsTextTruncated] = useState(false);
-
-  const checkTruncation = useCallback(() => {
-    if (textRef.current) {
-      setIsTextTruncated(
-        textRef.current.scrollWidth > textRef.current.clientWidth,
-      );
-    }
-  }, []);
-
-  useEffect(
-    () => {
-      checkTruncation();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    isArray(dependencies) ? dependencies : [dependencies],
-  );
-
-  useWindowEvent("resize", () => {
-    return checkTruncation();
-  });
-
-  return [textRef, isTextTruncated];
-}
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type BaseProps = {
   /**
@@ -207,12 +179,13 @@ export function EditableDisplayText({
     },
   };
 
-  const [displayTextRef, isDisplayTextTruncated] = useCheckTruncatedText([
-    value,
-    hasText,
-    emptyDisplayText,
-    passThroughProps.textarea,
-  ]);
+  const [displayTextRef, isDisplayTextTruncated] =
+    useCheckTruncatedText<HTMLParagraphElement>([
+      value,
+      hasText,
+      emptyDisplayText,
+      passThroughProps.textarea,
+    ]);
 
   const elements = {
     textInput() {

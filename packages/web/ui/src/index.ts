@@ -4,6 +4,9 @@ export { ActionIcon } from "./ActionIcon/ActionIcon";
 // buttons
 export { EditButton as EditIconButton } from "./buttons/EditButton";
 
+// hooks
+export { useCheckTruncatedText } from "./hooks/useCheckTruncatedText";
+
 // Tooltip
 export { Tooltip } from "./Tooltip/Tooltip";
 
