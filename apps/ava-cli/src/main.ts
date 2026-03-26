@@ -1,31 +1,15 @@
 import { Acclimate } from "@avandar/acclimate";
-import * as dotenv from "dotenv";
-import { DevCLI } from "@ava-cli/DevCLI/DevCLI";
-import { PolarCLI } from "@ava-cli/PolarCLI/PolarCLI";
-import { SupabaseCLI } from "@ava-cli/SupabaseCLI/SupabaseCLI";
-
-type DotenvConfigResult = Readonly<{
-  error?: unknown;
-}>;
-
-function _loadDevEnv(): void {
-  const result = dotenv.config({
-    path: ".env.development",
-    quiet: true,
-  }) as DotenvConfigResult;
-
-  if (result.error !== undefined) {
-    throw new Error(
-      "Failed to load .env.development. Run this command from the repo root " +
-        "so we can load the environment variables.",
-    );
-  }
-}
+import { DevCLI } from "./DevCLI/DevCLI";
+import { loadDevEnv } from "./loadDevEnv/loadDevEnv";
+import { PipelineCLI } from "./PipelineCLI/PipelineCLI";
+import { PolarCLI } from "./PolarCLI/PolarCLI";
+import { SupabaseCLI } from "./SupabaseCLI/SupabaseCLI";
 
 const cli = Acclimate.createCLI("ava")
   .addCommand("dev", DevCLI)
+  .addCommand("pipeline", PipelineCLI)
   .addCommand("polar", PolarCLI)
   .addCommand("supabase", SupabaseCLI);
 
-_loadDevEnv();
+loadDevEnv();
 Acclimate.run(cli);

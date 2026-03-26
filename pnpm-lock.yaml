@@ -375,6 +375,12 @@ importers:
         specifier: ^5.6.0
         version: 5.8.1
 
+  apps/pipeline-server:
+    dependencies:
+      fastify:
+        specifier: ^5.6.0
+        version: 5.8.1
+
   packages/shared/clients:
     dependencies:
       '@supabase/postgrest-js':

@@ -1,7 +1,7 @@
 import type {
-  AnyValidPathParamsRecord,
-  ValidPathParams,
-} from "@sfn/_shared/MiniServer/api.types.ts";
+    AnyValidPathParamsRecord,
+    ValidPathParams,
+} from "@sbfn/_shared/MiniServer/api.types.ts";
 import type { ZodObject, ZodType } from "npm:zod@4";
 
 export type ValidPathParamsSchemaShape<

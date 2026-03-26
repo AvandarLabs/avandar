@@ -3,7 +3,7 @@ import { registerNgrokURLRoutes } from "@fanout-server/routes/ngrok-url";
 import Fastify from "fastify";
 
 function _getPort(): number {
-  const defaultPort: number = 8080;
+  const defaultPort: number = 4610;
   const rawPort: string | undefined = process.env.PORT;
 
   if (!rawPort) {

@@ -1,7 +1,7 @@
-import { defineRoutes, GET, POST } from "@sfn/_shared/MiniServer/MiniServer.ts";
+import { defineRoutes, GET, POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { EmailClient } from "$/EmailClient/EmailClient.tsx";
 import { z } from "zod";
-import type { WorkspacesAPI } from "@sfn/workspaces/workspaces.routes.types.ts";
+import type { WorkspacesAPI } from "@sbfn/workspaces/workspaces.routes.types.ts";
 
 const SLUG_MIN_LENGTH = 3;
 const SLUG_MAX_LENGTH = 20;

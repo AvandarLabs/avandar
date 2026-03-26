@@ -26,9 +26,10 @@ the product into something that truly serves your mission.
 ### Prerequisites
 
 1. Node.js
-2. Docker Desktop
-3. Supabase CLI (`brew install supabase/tap/supabase`)
-4. ngrok (`brew install ngrok`)
+2. Bun (the repo pins this in `.bun-version`)
+3. Docker Desktop
+4. Supabase CLI (`brew install supabase/tap/supabase`)
+5. ngrok (`brew install ngrok`)
 
 ### Set up
 
@@ -38,6 +39,9 @@ the product into something that truly serves your mission.
    pnpm install
    pnpm build:ava-cli
    ```
+
+   `pnpm` remains the package manager for the monorepo. Some app scripts run
+   with Bun, and the expected Bun version is pinned in `.bun-version`.
 
 2. Initiate a local instance of Supabase (you need to have installed Supabase
    CLI for this)

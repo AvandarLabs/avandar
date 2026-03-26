@@ -1,8 +1,8 @@
-import { defineRoutes, GET } from "@sfn/_shared/MiniServer/MiniServer.ts";
-import { DuckDBSpatialExtensionDocumentation } from "@sfn/queries/DuckDBSpatialExtensionDocumentation.ts";
-import { SPATIAL_KEYWORDS } from "@sfn/queries/SpatialKeywords.ts";
+import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { DuckDBSpatialExtensionDocumentation } from "@sbfn/queries/DuckDBSpatialExtensionDocumentation.ts";
+import { SPATIAL_KEYWORDS } from "@sbfn/queries/SpatialKeywords.ts";
 import { z } from "zod";
-import type { QueriesAPI } from "@sfn/queries/queries.types.ts";
+import type { QueriesAPI } from "@sbfn/queries/queries.types.ts";
 
 const openaiApiKey = Deno.env.get("OPENAI_API_KEY");
 if (!openaiApiKey) {

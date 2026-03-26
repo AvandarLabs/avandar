@@ -1,4 +1,4 @@
-import type { APITypeDef } from "@sfn/_shared/MiniServer/api.types.ts";
+import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 import type { SubscriptionPermission } from "$/models/Subscription/Subscription.types.ts";
 import type { Tables } from "$/types/database.types.ts";
 

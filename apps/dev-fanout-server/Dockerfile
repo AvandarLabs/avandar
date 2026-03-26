@@ -14,7 +14,7 @@ COPY apps/dev-fanout-server/package.json \
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts
 
 # --- Stage 2: run with bun ---
-FROM oven/bun:1-slim AS runner
+FROM oven/bun:1.3.11-slim AS runner
 
 WORKDIR /avandar
 

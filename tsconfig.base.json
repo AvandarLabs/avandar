@@ -28,7 +28,7 @@
       "@/*": ["./src/*"],
 
       /* Supabase edge functions */
-      "@sfn/*": ["./supabase/functions/*"],
+      "@sbfn/*": ["./supabase/functions/*"],
 
       /* Packages */
       "@clients/*": ["./packages/shared/clients/src/*"],

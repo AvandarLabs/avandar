@@ -1,7 +1,7 @@
 {
   "imports": {
     "$/": "../../../shared/",
-    "@sfn/": "../",
+    "@sbfn/": "../",
     "@clients": "../../../packages/shared/clients/src/index.ts",
     "@logger": "../../../packages/shared/logger/src/index.ts",
     "@models": "../../../packages/shared/models/src/index.ts",

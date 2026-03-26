@@ -1,7 +1,7 @@
-import { defineRoutes, GET } from "@sfn/_shared/MiniServer/MiniServer.ts";
-import { PolarClient } from "@sfn/_shared/PolarClient/PolarClient.ts";
-import { UpdateSubscriptionProduct } from "@sfn/subscriptions/[subscriptionId].product.ts";
-import { FetchAndSyncUserSubscriptions } from "@sfn/subscriptions/fetch-and-sync.ts";
+import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
+import { UpdateSubscriptionProduct } from "@sbfn/subscriptions/[subscriptionId].product.ts";
+import { FetchAndSyncUserSubscriptions } from "@sbfn/subscriptions/fetch-and-sync.ts";
 import { getDevOverrideEmail } from "$/env/getDevOverrideEmail.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { match } from "ts-pattern";
@@ -9,7 +9,7 @@ import { z } from "zod";
 import type {
   AvaPolarProduct,
   SubscriptionsAPI,
-} from "@sfn/subscriptions/subscriptions.routes.types.ts";
+} from "@sbfn/subscriptions/subscriptions.routes.types.ts";
 
 /**
  * This is the route handler for all billing-related endpoints.
