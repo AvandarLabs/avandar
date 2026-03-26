@@ -20,9 +20,8 @@ export function TruncatedText({
   tooltipProps,
   ...textProps
 }: Props): JSX.Element {
-  const [textRef, isTextTruncated] = useCheckTruncatedText<HTMLParagraphElement>(
-    [children],
-  );
+  const [textRef, isTextTruncated] =
+    useCheckTruncatedText<HTMLParagraphElement>([children]);
 
   const textContents = (
     <Text span maw={maw} truncate ref={textRef} display="block" {...textProps}>
