@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -23,11 +25,26 @@ describe("loadDevEnv", () => {
   });
 
   it("overrides pre-existing environment variables with .env.development values", () => {
+    const tempDirectoryPath: string = fs.mkdtempSync(
+      path.join(os.tmpdir(), "loadDevEnv-"),
+    );
+    const envFilePath: string = path.join(tempDirectoryPath, ".env.fixture");
+    const expectedSecret = "fixture-pipeline-secret";
+
+    fs.writeFileSync(
+      envFilePath,
+      `AVA_PIPELINE_SERVER_SECRET=${expectedSecret}\n`,
+      "utf8",
+    );
+
     process.env.AVA_PIPELINE_SERVER_SECRET = "stale-secret";
 
-    loadDevEnv();
-
-    expect(process.env.AVA_PIPELINE_SERVER_SECRET).toBe("hX2$Mu1#Qx3*iCnJ");
+    try {
+      loadDevEnv({ envFilePath });
+      expect(process.env.AVA_PIPELINE_SERVER_SECRET).toBe(expectedSecret);
+    } finally {
+      fs.rmSync(tempDirectoryPath, { recursive: true, force: true });
+    }
   });
 
   it("throws a friendly error when .env.development cannot be loaded", () => {
