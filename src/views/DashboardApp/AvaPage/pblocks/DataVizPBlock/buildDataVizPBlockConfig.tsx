@@ -17,7 +17,7 @@ export function buildDataVizPBlockConfig(_options: {
   workspaceId: Workspace.Id | undefined;
 }): ComponentConfig<DataVizPBlockProps> {
   return {
-    label: "DataViz",
+    label: "Data Visualization",
     fields: {
       nlQuery: buildNLQueryPFieldConfig(),
     },

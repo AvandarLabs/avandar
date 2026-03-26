@@ -8,8 +8,8 @@ WORKDIR /avandar
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
-COPY apps/dev-fanout-server/package.json \
-  apps/dev-fanout-server/package.json
+COPY apps/pipeline-server/package.json \
+  apps/pipeline-server/package.json
 
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts
 
@@ -19,18 +19,12 @@ FROM oven/bun:1.3.11-slim AS runner
 WORKDIR /avandar
 
 COPY --from=deps /avandar/node_modules /avandar/node_modules
-COPY --from=deps /avandar/apps/dev-fanout-server/node_modules \
-  /avandar/apps/dev-fanout-server/node_modules
+COPY --from=deps /avandar/apps/pipeline-server/node_modules \
+  /avandar/apps/pipeline-server/node_modules
 COPY package.json ./
+COPY apps/pipeline-server apps/pipeline-server
 
-# `@avandar/dev-fanout-server` uses the `$/*` TS path alias, which points to
-# `shared/*`. The local tsconfig.json extends the root tsconfig.node.json so
-# that Bun resolves these paths at runtime.
-COPY tsconfig.node.json tsconfig.node.json
-COPY apps/dev-fanout-server apps/dev-fanout-server
-COPY shared shared
-
-WORKDIR /avandar/apps/dev-fanout-server
+WORKDIR /avandar/apps/pipeline-server
 
 ENV HOST=0.0.0.0
 ENV PORT=8080
