@@ -9,21 +9,31 @@ export async function goToBillingPortal({
 }: {
   userId: UserId;
 }): Promise<void> {
-  const customerPortalResponse = await APIClient.get({
-    route: "subscriptions/customer-portal/:userId",
-    pathParams: {
-      userId: userId,
-    },
-    queryParams: {
-      returnURL: getCurrentURL(),
-    },
-  });
+  try {
+    const customerPortalResponse = await APIClient.get({
+      route: "subscriptions/customer-portal/:userId",
+      pathParams: {
+        userId: userId,
+      },
+      queryParams: {
+        returnURL: getCurrentURL(),
+      },
+    });
 
-  if (customerPortalResponse.success) {
-    navigateToExternalURL(customerPortalResponse.customerPortalURL);
-  } else {
+    if (customerPortalResponse.success) {
+      navigateToExternalURL(
+        customerPortalResponse.customerPortalURL,
+      );
+    } else {
+      notifyError(
+        "Billing portal cannot be loaded because you do not"
+          + " have a subscription yet.",
+      );
+    }
+  } catch {
     notifyError(
-      "Billing portal cannot be loaded because you do not have a subscription yet.",
+      "Unable to open the billing portal. Please try"
+        + " again later.",
     );
   }
 }
