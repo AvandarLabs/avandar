@@ -1,6 +1,8 @@
 import { notifyError } from "@ui/notifications/notify";
 import { UserId } from "$/models/User/User.types";
 import { APIClient } from "@/clients/APIClient";
+import { WorkspaceClient } from "@/clients/WorkspaceClient";
+import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
 
@@ -21,6 +23,12 @@ export async function goToBillingPortal({
     });
 
     if (customerPortalResponse.success) {
+      // Invalidate workspace data so it refetches with the
+      // updated subscription when the user returns from the
+      // billing portal.
+      AvaQueryClient.invalidateQueries({
+        queryKey: [WorkspaceClient.getClientName()],
+      });
       navigateToExternalURL(
         customerPortalResponse.customerPortalURL,
       );
