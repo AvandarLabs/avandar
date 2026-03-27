@@ -116,16 +116,42 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
             }
           }
 
+          // look up the workspace's subscription
+          const { data: subscription } = await supabaseAdminClient
+            .from("subscriptions")
+            .select("max_seats_allowed, feature_plan_type")
+            .eq("workspace_id", workspace.id)
+            .single()
+            .throwOnError();
+
+          if (!subscription) {
+            throw new Error("Workspace does not have a subscription.");
+          }
+
           // is the workspace already at the max number of members?
-          const { count } = await supabaseClient
+          const { count: memberCount } = await supabaseAdminClient
             .from("user_profiles")
             .select("*", { count: "exact", head: true })
             .eq("workspace_id", workspace.id)
             .throwOnError();
-          if (count && count >= 2) {
-            throw new Error(
-              "Your workspace cannot have more than two members on the free plan",
-            );
+
+          // count pending invites against the seat limit
+          const { count: pendingInviteCount } = await supabaseAdminClient
+            .from("workspace_invites")
+            .select("*", { count: "exact", head: true })
+            .eq("workspace_id", workspace.id)
+            .eq("invite_status", "pending")
+            .throwOnError();
+
+          const totalOccupiedSeats =
+            (memberCount ?? 0) + (pendingInviteCount ?? 0);
+
+          if (totalOccupiedSeats >= subscription.max_seats_allowed) {
+            const message =
+              subscription.feature_plan_type === "free"
+                ? "Your workspace is on the Free plan, which supports up to 2 seats. To invite more team members, upgrade to a paid plan."
+                : "All seats in your workspace are currently in use. Purchase an additional seat from the billing portal to invite more members.";
+            throw new Error(message);
           }
 
           // now, we check if this email has already been invited to this
