@@ -185,6 +185,12 @@ export default [
     },
   },
   {
+    files: ["**/vitest.config.ts"],
+    rules: {
+      "no-restricted-imports": "off",
+    },
+  },
+  {
     ignores: ["shared/types/database.types.ts"],
   },
 ];
