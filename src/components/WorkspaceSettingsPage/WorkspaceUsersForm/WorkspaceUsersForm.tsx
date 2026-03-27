@@ -11,13 +11,14 @@ import { modals } from "@mantine/modals";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
 import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { capitalize } from "@utils/strings/capitalize/capitalize";
+import { Workspace } from "$/models/Workspace/Workspace";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useWorkspaceRole } from "@/hooks/workspaces/useWorkspaceRole";
 import { useWorkspaceInviteModal } from "@/components/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal";
 import type { UserProfileWithRole } from "$/models/User/UserProfile.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
 const IS_USER_INVITES_DISABLED = isFlagEnabled(FeatureFlag.DisableUserInvites);
 
@@ -57,6 +58,12 @@ export function WorkspaceUsersForm(): JSX.Element | null {
   });
 
   const isAdmin = workspaceRole === "admin";
+
+  const { usedSeats, maxSeats, isUnlimitedSeats, remainingSeats } =
+    SubscriptionModule.getSeatInfo({
+      subscription: workspace.subscription,
+      numMembersInWorkspace: workspaceUsers.length + pendingInvites.length,
+    });
 
   const allWorkspaceUsers = [...workspaceUsers, ...pendingInvites].map(
     (user: UserProfileWithRole | Workspace.Invite) => {
@@ -140,7 +147,14 @@ export function WorkspaceUsersForm(): JSX.Element | null {
         zIndex={1000}
       />
       <Card withBorder p="lg" w="100%" maw="1000px">
-        <Flex justify="flex-end" align="center" mb="md">
+        <Flex justify="space-between" align="center" mb="md">
+          {!loadingSeats && maxSeats != null ?
+            <Text size="sm" c="dimmed">
+              {isUnlimitedSeats ?
+                `${usedSeats} seat${usedSeats === 1 ? "" : "s"} used (unlimited)`
+              : `${usedSeats} of ${maxSeats} seat${maxSeats === 1 ? "" : "s"} used · ${remainingSeats} remaining`}
+            </Text>
+          : <Box />}
           <Button disabled={loadingSeats} onClick={openInviteModal}>
             Invite User
           </Button>
