@@ -1,10 +1,7 @@
 import { access, readdir } from "node:fs/promises";
 import path from "node:path";
+import { printError, printSuccess } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
-import {
-    printError,
-    printSuccess,
-} from "../../utils/cliOutput/cliOutput";
 
 type GetAvailablePipelineNamesOptions = Readonly<{
   pipelinesDirPath?: string;

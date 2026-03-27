@@ -109,7 +109,7 @@ export default [
           {
             patterns: [
               {
-                regex: "^\\./",
+                regex: "^\\.{1,2}/",
                 message: "Use path aliases instead of relative imports.",
               },
             ],

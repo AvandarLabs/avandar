@@ -1,6 +1,6 @@
 import { Model } from "@models/Model/Model";
-import type { GenericSeedData } from "../scripts/SeedRunner";
 import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
+import type { GenericSeedData } from "scripts/SeedRunner";
 
 export const TEST_USER_EMAIL = "user@avandarlabs.com";
 export const TEST_USER_PASSWORD = "avandar";

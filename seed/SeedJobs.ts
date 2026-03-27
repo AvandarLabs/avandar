@@ -1,7 +1,7 @@
 import { promiseMap } from "@/lib/utils/promises";
-import type { GenericSeedJob } from "../scripts/SeedRunner";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { GenericSeedJob } from "scripts/SeedRunner";
 import type { TSeedData } from "seed/SeedData";
 
 export type SeedJob = GenericSeedJob<TSeedData>;

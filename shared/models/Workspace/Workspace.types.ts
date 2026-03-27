@@ -1,6 +1,6 @@
-import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
 import type { UUID } from "@utils/types/common.types.ts";
 import type { Subscription } from "$/models/Subscription/Subscription.ts";
+import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { Tables } from "$/types/database.types.ts";
 import type { SetOptional } from "type-fest";

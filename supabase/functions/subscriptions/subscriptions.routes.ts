@@ -2,8 +2,10 @@ import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
 import { UpdateSubscriptionProduct } from "@sbfn/subscriptions/[subscriptionId].product.ts";
 import { FetchAndSyncUserSubscriptions } from "@sbfn/subscriptions/fetch-and-sync.ts";
+import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral.ts";
 import { getDevOverrideEmail } from "$/env/getDevOverrideEmail.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
+import { SubscriptionParsers } from "$/models/Subscription/SubscriptionParsers.ts";
 import { match } from "ts-pattern";
 import { z } from "zod";
 import type {
@@ -187,24 +189,66 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
         permissionType: z.enum(Subscription.Permissions),
       },
     }).action(
-      async ({ pathParams: { subscriptionId }, supabaseAdminClient }) => {
-        console.log({
-          subscriptionId,
-        });
-        console.log(!!supabaseAdminClient);
-        /*
-        const { data: subscription } = await supabaseAdminClient
+      async ({
+        pathParams: { subscriptionId, permissionType },
+        supabaseAdminClient,
+      }) => {
+        const { data: dbSubscription } = await supabaseAdminClient
           .from("subscriptions")
-          .select(
-            "max_seats_allowed, max_datasets_allowed, "
-            + "max_dashboards_allowed, max_shareable_dashboards_allowed",
-          )
+          .select("*")
           .eq("id", subscriptionId)
           .single()
           .throwOnError();
-*/
+        const subscription =
+          SubscriptionParsers.fromDBReadToModelRead(dbSubscription);
 
-        return { allowed: true };
+        return matchLiteral(permissionType, {
+          can_add_datasets: async () => {
+            // get number of datasets in workspace
+            const { count } = await supabaseAdminClient
+              .from("datasets")
+              .select("id", { count: "exact" })
+              .eq("workspace_id", subscription.workspaceId)
+              .throwOnError();
+            if (count === null) {
+              return { allowed: false };
+            }
+            return {
+              allowed: Subscription.canAddDatasets({
+                subscription,
+                numDatasetsInWorkspace: count,
+              }),
+            };
+          },
+
+          can_invite_users: async () => {
+            const [{ count: numMembers }, { count: numPendingInvites }] =
+              await Promise.all([
+                supabaseAdminClient
+                  .from("workspace_memberships")
+                  .select("id", { count: "exact" })
+                  .eq("workspace_id", subscription.workspaceId)
+                  .throwOnError(),
+                supabaseAdminClient
+                  .from("workspace_invites")
+                  .select("*")
+                  .eq("workspace_id", subscription.workspaceId)
+                  .eq("invite_status", "pending")
+                  .throwOnError(),
+              ]);
+
+            if (numMembers === null || numPendingInvites === null) {
+              return { allowed: false };
+            }
+
+            return {
+              allowed: Subscription.canInviteMembers({
+                subscription,
+                numMembersInWorkspace: numMembers + numPendingInvites,
+              }),
+            };
+          },
+        });
       },
     ),
   },

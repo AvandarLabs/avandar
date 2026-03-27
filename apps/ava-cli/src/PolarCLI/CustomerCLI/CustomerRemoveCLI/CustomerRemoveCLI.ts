@@ -1,12 +1,12 @@
-import { Acclimate } from "@avandar/acclimate";
+import { createPolarCLIClient } from "@ava-cli/PolarCLI/PolarClient/createPolarCLIClient";
+import { getItemsFromListPage } from "@ava-cli/PolarCLI/PolarClient/listUtils";
 import {
   printError,
   printInfo,
   printSuccess,
   printWarn,
-} from "../../../utils/cliOutput/cliOutput";
-import { createPolarCLIClient } from "../../PolarClient/createPolarCLIClient";
-import { getItemsFromListPage } from "../../PolarClient/listUtils";
+} from "@ava-cli/utils/cliOutput/cliOutput";
+import { Acclimate } from "@avandar/acclimate";
 
 type PolarCustomer = Readonly<{
   id: string;

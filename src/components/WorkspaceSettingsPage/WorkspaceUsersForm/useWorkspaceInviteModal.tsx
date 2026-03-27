@@ -8,12 +8,12 @@ import { Workspace } from "$/models/Workspace/Workspace";
 import { useRef } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
+import { WorkspaceBillingView } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 import { useFeaturePlanType } from "@/hooks/workspaces/useCurrentSubscriptionType";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AvaField } from "@/lib/ui/AvaForm/AvaField";
 import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
 import { AvaFormRef } from "@/lib/ui/AvaForm/AvaForm.types";
-import { WorkspaceBillingView } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 
 export function useWorkspaceInviteModal({
   numberOfSeats,

@@ -3,6 +3,7 @@
   "specifiers": {
     "jsr:@panva/jose@6": "6.1.3",
     "npm:@avandar/acclimate@0.4": "0.4.0",
+    "npm:@duckdb/duckdb-wasm@1.33.1-dev20.0": "1.33.1-dev20.0",
     "npm:@eslint/js@^9.21.0": "9.39.4",
     "npm:@ianvs/prettier-plugin-sort-imports@^4.4.1": "4.7.1_prettier@3.8.1",
     "npm:@mantine/charts@^8.3.16": "8.3.16_@mantine+core@8.3.16__@mantine+hooks@8.3.16___react@19.2.4__react@19.2.4__react-dom@19.2.4___react@19.2.4__@types+react@19.2.14_@mantine+hooks@8.3.16__react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4_recharts@2.15.4__react@19.2.4__react-dom@19.2.4___react@19.2.4_@types+react@19.2.14",
@@ -13,7 +14,7 @@
     "npm:@mantine/modals@^8.3.16": "8.3.16_@mantine+core@8.3.16__@mantine+hooks@8.3.16___react@19.2.4__react@19.2.4__react-dom@19.2.4___react@19.2.4__@types+react@19.2.14_@mantine+hooks@8.3.16__react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4_@types+react@19.2.14",
     "npm:@mantine/notifications@^8.3.16": "8.3.16_@mantine+core@8.3.16__@mantine+hooks@8.3.16___react@19.2.4__react@19.2.4__react-dom@19.2.4___react@19.2.4__@types+react@19.2.14_@mantine+hooks@8.3.16__react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4_@types+react@19.2.14",
     "npm:@mantine/spotlight@^8.3.16": "8.3.16_@mantine+core@8.3.16__@mantine+hooks@8.3.16___react@19.2.4__react@19.2.4__react-dom@19.2.4___react@19.2.4__@types+react@19.2.14_@mantine+hooks@8.3.16__react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4_@types+react@19.2.14",
-    "npm:@mantine/tiptap@^8.3.16": "8.3.16_@mantine+core@8.3.16__@mantine+hooks@8.3.16___react@19.2.4__react@19.2.4__react-dom@19.2.4___react@19.2.4__@types+react@19.2.14_@mantine+hooks@8.3.16__react@19.2.4_@tiptap+extension-link@2.27.2__@tiptap+core@2.27.2___@tiptap+pm@2.27.2__@tiptap+pm@2.27.2_@tiptap+react@2.27.2__@tiptap+core@2.27.2___@tiptap+pm@2.27.2__@tiptap+pm@2.27.2__react@19.2.4__react-dom@19.2.4___react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4",
+    "npm:@mantine/tiptap@^8.3.16": "8.3.16_@mantine+core@8.3.16__@mantine+hooks@8.3.16___react@19.2.4__react@19.2.4__react-dom@19.2.4___react@19.2.4__@types+react@19.2.14_@mantine+hooks@8.3.16__react@19.2.4_@tiptap+extension-link@2.27.2__@tiptap+core@2.27.2___@tiptap+pm@2.27.2__@tiptap+pm@2.27.2_@tiptap+react@2.27.2__@tiptap+core@2.27.2___@tiptap+pm@2.27.2__@tiptap+pm@2.27.2__react@19.2.4__react-dom@19.2.4___react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4_@tiptap+core@2.27.2__@tiptap+pm@2.27.2_@tiptap+pm@2.27.2_@types+react@19.2.14",
     "npm:@nabla/vite-plugin-eslint@^2.0.5": "2.0.6_eslint@9.39.4_vite@7.3.1",
     "npm:@polar-sh/sdk@~0.41.5": "0.41.5",
     "npm:@postgres-language-server/cli@0.19": "0.19.0",
@@ -62,6 +63,7 @@
     "npm:@upstash/redis@^1.35.6": "1.36.4",
     "npm:@vitejs/plugin-react@^4.3.4": "4.7.0_vite@7.3.1",
     "npm:ag-grid-community@^35.1.0": "35.1.0",
+    "npm:ag-grid-react@^35.1.0": "35.1.0_react@19.2.4_react-dom@19.2.4__react@19.2.4",
     "npm:apache-arrow@17": "17.0.0",
     "npm:autoprefixer@^10.4.21": "10.4.27_postcss@8.5.8",
     "npm:camelcase-keys@^9.1.3": "9.1.3",
@@ -84,9 +86,7 @@
     "npm:eslint-plugin-unused-imports@^4.1.4": "4.4.1_eslint@9.39.4",
     "npm:eslint@^9.21.0": "9.39.4",
     "npm:globals@^15.15.0": "15.15.0",
-    "npm:google-auth-library@10": "10.6.1",
     "npm:google-auth-library@^10.1.0": "10.6.1",
-    "npm:googleapis@153": "153.0.0",
     "npm:googleapis@154": "154.1.0",
     "npm:jsdom@^26.1.0": "26.1.0",
     "npm:knex@^3.1.0": "3.1.0",
@@ -454,10 +454,11 @@
         "tslib"
       ]
     },
-    "@duckdb/duckdb-wasm@1.30.0": {
-      "integrity": "sha512-9aWrm+4ayl4sTlvGtl/b+LxrUyXaac3yyVqkoJ3F7Vkd62PoS8PcQIRJ/KjXBW36LP1CnPY5jjvFyIcTFLtcXA==",
+    "@duckdb/duckdb-wasm@1.33.1-dev20.0": {
+      "integrity": "sha512-ual3d/WDZnyZHNZ3tGdFvTZY22IDdg63Bh0icSBA6JPOy1u89rNfVH/3wQhtoJPv3Xn7eWVJ/4gpT3wprrisoA==",
       "dependencies": [
-        "apache-arrow"
+        "apache-arrow",
+        "qs"
       ]
     },
     "@emnapi/core@1.8.1": {
@@ -1154,7 +1155,7 @@
         "react"
       ]
     },
-    "@mantine/tiptap@8.3.16_@mantine+core@8.3.16__@mantine+hooks@8.3.16___react@19.2.4__react@19.2.4__react-dom@19.2.4___react@19.2.4__@types+react@19.2.14_@mantine+hooks@8.3.16__react@19.2.4_@tiptap+extension-link@2.27.2__@tiptap+core@2.27.2___@tiptap+pm@2.27.2__@tiptap+pm@2.27.2_@tiptap+react@2.27.2__@tiptap+core@2.27.2___@tiptap+pm@2.27.2__@tiptap+pm@2.27.2__react@19.2.4__react-dom@19.2.4___react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4": {
+    "@mantine/tiptap@8.3.16_@mantine+core@8.3.16__@mantine+hooks@8.3.16___react@19.2.4__react@19.2.4__react-dom@19.2.4___react@19.2.4__@types+react@19.2.14_@mantine+hooks@8.3.16__react@19.2.4_@tiptap+extension-link@2.27.2__@tiptap+core@2.27.2___@tiptap+pm@2.27.2__@tiptap+pm@2.27.2_@tiptap+react@2.27.2__@tiptap+core@2.27.2___@tiptap+pm@2.27.2__@tiptap+pm@2.27.2__react@19.2.4__react-dom@19.2.4___react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4_@tiptap+core@2.27.2__@tiptap+pm@2.27.2_@tiptap+pm@2.27.2_@types+react@19.2.14": {
       "integrity": "sha512-CA8LSAnBa+yXlhBrc6wL/Uh+VnO4Wg9taRorWG8MbzkksTy1iA8Yg+Tny33hgPJaqwHZivmjIGpDZmzKVtzTJg==",
       "dependencies": [
         "@mantine/core",
@@ -3349,28 +3350,19 @@
       "integrity": "sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw==",
       "bin": true
     },
-    "ag-charts-types@12.3.1": {
-      "integrity": "sha512-5216xYoawnvMXDFI6kTpPku+mH0Csiwu/FE7lsAm8Z22HEN6ciSG/V7g+IrpLWncELqksgENebCTP75PZ3CsHA=="
-    },
     "ag-charts-types@13.1.0": {
       "integrity": "sha512-DytRM3CXli+Y013SC1Mr8lQBrhVTACK+11ilDHOhwUM0sRpmGuR51XFGcBKOliW1Vas1AycP31Cm3Pp0jx3hqw=="
-    },
-    "ag-grid-community@34.3.1": {
-      "integrity": "sha512-PwlrPudsFOzGumphi2y9ihWeaUlIwKhOra/MXu2LjeV2U8DgLLcYS8CartE5Hszhn1poJHawwI9HWrxlKliwdw==",
-      "dependencies": [
-        "ag-charts-types@12.3.1"
-      ]
     },
     "ag-grid-community@35.1.0": {
       "integrity": "sha512-yWFQfRNjv3KUBkHHzFdDOYGjPcDMU0B8Up4qG651diFlGRUGEGVs94SK73niWvk1FDZdpV9oWrwq3f30/qAoVg==",
       "dependencies": [
-        "ag-charts-types@13.1.0"
+        "ag-charts-types"
       ]
     },
-    "ag-grid-react@34.3.1_react@19.2.4_react-dom@19.2.4__react@19.2.4": {
-      "integrity": "sha512-1UTlBT+xJkjNZAuf7RxK61mgxKGTPB+6XR99oIHq7cYC89kJmLbWqhHt/1XqRWF5cAgSKk8u+HtOQaN8tAZStw==",
+    "ag-grid-react@35.1.0_react@19.2.4_react-dom@19.2.4__react@19.2.4": {
+      "integrity": "sha512-n8pJh4RTpos8stzz91nEhTCZZdLy9bjQYAGxIxJ8ocVagnEsAk9T5Vz/VEKUhOGz36il68n7TVbVWSuUA3a+mg==",
       "dependencies": [
-        "ag-grid-community@34.3.1",
+        "ag-grid-community",
         "prop-types",
         "react",
         "react-dom"
@@ -5329,13 +5321,6 @@
         "google-auth-library",
         "qs",
         "url-template"
-      ]
-    },
-    "googleapis@153.0.0": {
-      "integrity": "sha512-QT9Tdy9lx7KuZx620RaR/YsjwZTSw/dqlPKQRVLnMKTzOEghN0uZaKvpsm8aXjK+yEKWhJ8HQ6qOXRsJPLZHpw==",
-      "dependencies": [
-        "google-auth-library",
-        "googleapis-common"
       ]
     },
     "googleapis@154.1.0": {
@@ -9078,8 +9063,11 @@
   "workspace": {
     "dependencies": [
       "jsr:@panva/jose@6",
+      "npm:@supabase/supabase-js@2",
       "npm:react-dom@19",
-      "npm:react@19"
+      "npm:react@19",
+      "npm:type-fest@5",
+      "npm:zod@4"
     ],
     "packageJson": {
       "dependencies": [

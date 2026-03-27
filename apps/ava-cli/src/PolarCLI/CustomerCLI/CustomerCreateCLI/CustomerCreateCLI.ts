@@ -1,16 +1,16 @@
-import { Acclimate } from "@avandar/acclimate";
+import { createPolarCLIClient } from "@ava-cli/PolarCLI/PolarClient/createPolarCLIClient";
+import {
+  getFreeProduct,
+  getOrCreateCustomerByEmail,
+  hasSubscriptionForProduct,
+} from "@ava-cli/PolarCLI/PolarClient/polarHelpers";
 import {
   printError,
   printInfo,
   printSuccess,
   printWarn,
-} from "../../../utils/cliOutput/cliOutput";
-import { createPolarCLIClient } from "../../PolarClient/createPolarCLIClient";
-import {
-  getFreeProduct,
-  getOrCreateCustomerByEmail,
-  hasSubscriptionForProduct,
-} from "../../PolarClient/polarHelpers";
+} from "@ava-cli/utils/cliOutput/cliOutput";
+import { Acclimate } from "@avandar/acclimate";
 
 /**
  * Create a test customer and subscribe them to the Free plan.
