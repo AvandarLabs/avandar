@@ -11,20 +11,20 @@ import { useRouter } from "@tanstack/react-router";
 import { notifyExpiredSession } from "@ui/notifications/notifyExpiredSession";
 import { useState } from "react";
 import { match } from "ts-pattern";
-import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
+import { goToPolarCheckout } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/goToPolarCheckout";
+import { useChangePlanModal } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal";
+import { PaidPlanPriceRow } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow";
+import css from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.module.css";
+import { PlanSwitch } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanVariantSwitch";
 import { PlanFeatures } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanFeatures";
 import {
   calculateYearlyDiscount,
   isValidFreePlanVariant,
   isValidPaidPlanVariant,
 } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/planUtils";
-import { goToPolarCheckout } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/goToPolarCheckout";
-import { useChangePlanModal } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal";
-import { PaidPlanPriceRow } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow";
-import css from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.module.css";
-import { PlanSwitch } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanVariantSwitch";
+import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import type {
   FreePlanVariants,
   FreeSubscriptionPlanGroup,

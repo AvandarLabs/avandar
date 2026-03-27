@@ -1,4 +1,5 @@
 import { Model } from "@models/Model/Model";
+import { CamelCaseKeys } from "@utils/objects/camelCaseKeys/camelCaseKeys";
 import { uuid } from "$/lib/uuid";
 import { DatasetColumnValueExtractor } from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractor.types";
 import { ManualEntryExtractor } from "$/models/EntityConfig/ValueExtractor/ManualEntryExtractor/ManualEntryExtractor.types";
@@ -21,7 +22,6 @@ import type {
   EntityFieldConfig,
   EntityFieldConfigId,
 } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
-import type { CamelCaseKeys } from "camelcase-keys";
 import type { SetOptional, SetRequired } from "type-fest";
 
 export type EntityFieldFormValues = SetRequired<

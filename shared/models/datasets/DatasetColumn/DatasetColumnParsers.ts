@@ -4,21 +4,21 @@ import { pipe } from "@utils/misc/pipe/pipe.ts";
 import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
 import { excludeNullsExceptInProps } from "@utils/objects/hofs/excludeNullsExceptInProps/excludeNullsExceptInProps.ts";
 import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
-import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
+import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeys/snakeCaseKeys.ts";
 import { undefinedsToNullsDeep } from "@utils/objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
-import z from "zod";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes.ts";
 import { DuckDBDataTypes } from "$/models/datasets/DatasetColumn/DuckDBDataTypes.ts";
+import z from "zod";
+import type {
+  Expect,
+  ZodSchemaEqualsTypes,
+} from "@utils/types/test-utilities.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type {
   DatasetColumn,
   DatasetColumnId,
   DatasetColumnModel,
 } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
-import type {
-  Expect,
-  ZodSchemaEqualsTypes,
-} from "@utils/types/test-utilities.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 
 const DBReadSchema = z.object({

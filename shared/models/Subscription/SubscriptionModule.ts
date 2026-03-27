@@ -37,9 +37,12 @@ export const SubscriptionModule = {
     subscription,
     numDatasetsInWorkspace,
   }: {
-    subscription: SubscriptionRead;
+    subscription: SubscriptionRead | undefined;
     numDatasetsInWorkspace: number;
   }): boolean => {
+    if (subscription === undefined) {
+      return false;
+    }
     if (subscription.maxDatasetsAllowed === undefined) {
       return true;
     }
@@ -57,9 +60,12 @@ export const SubscriptionModule = {
     subscription,
     numMembersInWorkspace,
   }: {
-    subscription: SubscriptionRead;
+    subscription: SubscriptionRead | undefined;
     numMembersInWorkspace: number;
   }): boolean => {
+    if (subscription === undefined) {
+      return false;
+    }
     return numMembersInWorkspace < subscription.maxSeatsAllowed;
   },
 };

@@ -8,6 +8,7 @@ import type {
   ConditionalKeys,
   Simplify,
   CamelCase as StringToCamelCase,
+  SnakeCase as StringToSnakeCase,
   UnionToIntersection,
   UnknownRecord,
 } from "type-fest";
@@ -25,6 +26,8 @@ export type CamelCase<
   T extends string,
   PreserveUppercase extends boolean | undefined = true,
 > = StringToCamelCase<T, { preserveConsecutiveUppercase: PreserveUppercase }>;
+
+export type SnakeCase<T extends string> = StringToSnakeCase<T>;
 
 /**
  * Get all the entries of an object as an array of tuples that preserve the

@@ -5,7 +5,7 @@ import { excludeNullsDeep } from "@utils/objects/excludeNullsDeep/excludeNullsDe
 import { coerceDatesInProps } from "@utils/objects/hofs/coerceDatesInProps/coerceDatesInProps.ts";
 import { convertDatesToISOInProps } from "@utils/objects/hofs/convertDatesToISOInProps/convertDatesToISOInProps.ts";
 import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
-import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
+import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeys/snakeCaseKeys.ts";
 import { undefinedsToNullsDeep } from "@utils/objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule.ts";
 import { z } from "zod";

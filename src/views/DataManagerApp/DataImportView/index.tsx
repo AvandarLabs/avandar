@@ -1,10 +1,59 @@
-import { Container, Stack, Title } from "@mantine/core";
+import { useQuery } from "@hooks/useQuery/useQuery";
+import { Container, Modal, Stack, Text, Title } from "@mantine/core";
+import { where } from "@utils/index";
+import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
+import { APIClient } from "@/clients/APIClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { Paper } from "@/lib/ui/Paper/Paper";
 import { Tabs } from "@/lib/ui/Tabs";
 import { GoogleSheetsImportView } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView";
 import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
 
 export function DataImportView(): JSX.Element {
+  const workspace = useCurrentWorkspace();
+
+  const [allDatasets = []] = DatasetClient.useGetAll(
+    where("workspace_id", "eq", workspace.id),
+  );
+
+  // we should check if the user is allowed to add more datasets based on their
+  // subscription plan
+  const [canAddDatasets] = useQuery({
+    queryKey: [
+      "subscriptionPermission",
+      workspace.subscription?.polarSubscriptionId,
+      "permissions",
+      "can_add_datasets",
+    ],
+    queryFn: async () => {
+      return await APIClient.get({
+        route: "subscriptions/:subscriptionId/permissions/:permissionType",
+        pathParams: {
+          subscriptionId: workspace.subscription?.polarSubscriptionId ?? "",
+          permissionType: "can_add_datasets",
+        },
+      });
+    },
+    enabled: !!workspace.subscription?.polarSubscriptionId,
+  });
+
+  const isAddAllowed =
+    canAddDatasets !== undefined ?
+      canAddDatasets.allowed
+      // if the permissions check in the backend isn't complete yet, then we do
+      // an eager frontend check. But this may be inaccurate if the user does
+      // not have permissions to view all workspace datasets, so the count will
+      // not be the real workspace dataset count.
+    : SubscriptionModule.canAddDatasets({
+        subscription: workspace.subscription,
+        numDatasetsInWorkspace: allDatasets.length,
+      });
+
+  console.log("isAddAllowed", {
+    canAddDatasets,
+  });
+
   return (
     <Container pt="xxl">
       <Paper>
@@ -27,6 +76,28 @@ export function DataImportView(): JSX.Element {
           />
         </Stack>
       </Paper>
+
+      {
+        // We did a backend check to see if the user is allowed to add more
+        // datasets. If they're not, then we show a modal asking them to
+        // upgrade. If we don't show this modal, we should still do a backend
+        // check when the user tries to add a new dataset. This is to avoid
+        // race conditions where multiple users in the workspace might be
+        // adding datasets at the same time.
+      }
+      {isAddAllowed ? null : (
+        <Modal
+          title="This workspace has reached its limit of its subscription"
+          opened={!isAddAllowed}
+          onClose={() => {}}
+        >
+          1. show text 2. ask for upgrade 3. if on max plan, say they need more
+          seats 4. if no ugprade, say they need to delete some datasets 5. if
+          cancel, return to main view 6. when saving, check the backend
+          permission again.
+          <Text>You have reached the limit of your subscription :(</Text>
+        </Modal>
+      )}
     </Container>
   );
 }

@@ -14,7 +14,7 @@
     "npm:@mantine/modals@^8.3.16": "8.3.16_@mantine+core@8.3.16__@mantine+hooks@8.3.16___react@19.2.4__react@19.2.4__react-dom@19.2.4___react@19.2.4__@types+react@19.2.14_@mantine+hooks@8.3.16__react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4_@types+react@19.2.14",
     "npm:@mantine/notifications@^8.3.16": "8.3.16_@mantine+core@8.3.16__@mantine+hooks@8.3.16___react@19.2.4__react@19.2.4__react-dom@19.2.4___react@19.2.4__@types+react@19.2.14_@mantine+hooks@8.3.16__react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4_@types+react@19.2.14",
     "npm:@mantine/spotlight@^8.3.16": "8.3.16_@mantine+core@8.3.16__@mantine+hooks@8.3.16___react@19.2.4__react@19.2.4__react-dom@19.2.4___react@19.2.4__@types+react@19.2.14_@mantine+hooks@8.3.16__react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4_@types+react@19.2.14",
-    "npm:@mantine/tiptap@^8.3.16": "8.3.16_@mantine+core@8.3.16__@mantine+hooks@8.3.16___react@19.2.4__react@19.2.4__react-dom@19.2.4___react@19.2.4__@types+react@19.2.14_@mantine+hooks@8.3.16__react@19.2.4_@tiptap+extension-link@2.27.2__@tiptap+core@2.27.2___@tiptap+pm@2.27.2__@tiptap+pm@2.27.2_@tiptap+react@2.27.2__@tiptap+core@2.27.2___@tiptap+pm@2.27.2__@tiptap+pm@2.27.2__react@19.2.4__react-dom@19.2.4___react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4_@tiptap+core@2.27.2__@tiptap+pm@2.27.2_@tiptap+pm@2.27.2_@types+react@19.2.14",
+    "npm:@mantine/tiptap@^8.3.16": "8.3.16_@mantine+core@8.3.16__@mantine+hooks@8.3.16___react@19.2.4__react@19.2.4__react-dom@19.2.4___react@19.2.4__@types+react@19.2.14_@mantine+hooks@8.3.16__react@19.2.4_@tiptap+extension-link@2.27.2__@tiptap+core@2.27.2___@tiptap+pm@2.27.2__@tiptap+pm@2.27.2_@tiptap+react@2.27.2__@tiptap+core@2.27.2___@tiptap+pm@2.27.2__@tiptap+pm@2.27.2__react@19.2.4__react-dom@19.2.4___react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4",
     "npm:@nabla/vite-plugin-eslint@^2.0.5": "2.0.6_eslint@9.39.4_vite@7.3.1",
     "npm:@polar-sh/sdk@~0.41.5": "0.41.5",
     "npm:@postgres-language-server/cli@0.19": "0.19.0",
@@ -70,8 +70,7 @@
     "npm:clsx@^2.1.1": "2.1.1",
     "npm:commander@14": "14.0.3",
     "npm:concurrently@^9.2.1": "9.2.1",
-    "npm:dayjs@1.11.13": "1.11.13",
-    "npm:dayjs@^1.11.13": "1.11.13",
+    "npm:dayjs@^1.11.13": "1.11.20",
     "npm:dexie@^4.0.11": "4.3.0",
     "npm:dotenv-cli@11": "11.0.0",
     "npm:dotenv@^17.2.3": "17.3.1",
@@ -86,7 +85,9 @@
     "npm:eslint-plugin-unused-imports@^4.1.4": "4.4.1_eslint@9.39.4",
     "npm:eslint@^9.21.0": "9.39.4",
     "npm:globals@^15.15.0": "15.15.0",
+    "npm:google-auth-library@10": "10.6.1",
     "npm:google-auth-library@^10.1.0": "10.6.1",
+    "npm:googleapis@153": "153.0.0",
     "npm:googleapis@154": "154.1.0",
     "npm:jsdom@^26.1.0": "26.1.0",
     "npm:knex@^3.1.0": "3.1.0",
@@ -105,8 +106,6 @@
     "npm:recharts@2": "2.15.4_react@19.2.4_react-dom@19.2.4__react@19.2.4",
     "npm:resend@6": "6.9.3_@react-email+render@1.4.0__react@19.2.4__react-dom@19.2.4___react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4",
     "npm:resend@^6.5.2": "6.9.3_@react-email+render@1.4.0__react@19.2.4__react-dom@19.2.4___react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4",
-    "npm:snakecase-keys@^8.0.1": "8.1.0",
-    "npm:snakecase-keys@^8.1.0": "8.1.0",
     "npm:stylelint-config-css-modules@^4.6.0": "4.6.0_stylelint@17.4.0__typescript@5.9.3_typescript@5.9.3",
     "npm:stylelint-config-standard@40": "40.0.0_stylelint@17.4.0__typescript@5.9.3_typescript@5.9.3",
     "npm:stylelint-order@^7.0.1": "7.0.1_stylelint@17.4.0__typescript@5.9.3_typescript@5.9.3",
@@ -1155,7 +1154,7 @@
         "react"
       ]
     },
-    "@mantine/tiptap@8.3.16_@mantine+core@8.3.16__@mantine+hooks@8.3.16___react@19.2.4__react@19.2.4__react-dom@19.2.4___react@19.2.4__@types+react@19.2.14_@mantine+hooks@8.3.16__react@19.2.4_@tiptap+extension-link@2.27.2__@tiptap+core@2.27.2___@tiptap+pm@2.27.2__@tiptap+pm@2.27.2_@tiptap+react@2.27.2__@tiptap+core@2.27.2___@tiptap+pm@2.27.2__@tiptap+pm@2.27.2__react@19.2.4__react-dom@19.2.4___react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4_@tiptap+core@2.27.2__@tiptap+pm@2.27.2_@tiptap+pm@2.27.2_@types+react@19.2.14": {
+    "@mantine/tiptap@8.3.16_@mantine+core@8.3.16__@mantine+hooks@8.3.16___react@19.2.4__react@19.2.4__react-dom@19.2.4___react@19.2.4__@types+react@19.2.14_@mantine+hooks@8.3.16__react@19.2.4_@tiptap+extension-link@2.27.2__@tiptap+core@2.27.2___@tiptap+pm@2.27.2__@tiptap+pm@2.27.2_@tiptap+react@2.27.2__@tiptap+core@2.27.2___@tiptap+pm@2.27.2__@tiptap+pm@2.27.2__react@19.2.4__react-dom@19.2.4___react@19.2.4_react@19.2.4_react-dom@19.2.4__react@19.2.4": {
       "integrity": "sha512-CA8LSAnBa+yXlhBrc6wL/Uh+VnO4Wg9taRorWG8MbzkksTy1iA8Yg+Tny33hgPJaqwHZivmjIGpDZmzKVtzTJg==",
       "dependencies": [
         "@mantine/core",
@@ -3828,7 +3827,7 @@
       "integrity": "sha512-Rircqi9ch8AnZscQcsA1C47NFdaO3wukpmIRzYcDOrmvgt78hM/sj5pZhZNec2NM12uk5vTwRHZ4anGcrC4ZTg==",
       "dependencies": [
         "camelcase",
-        "map-obj@5.0.0",
+        "map-obj",
         "quick-lru",
         "type-fest@4.41.0"
       ]
@@ -4253,8 +4252,8 @@
         "is-data-view"
       ]
     },
-    "dayjs@1.11.13": {
-      "integrity": "sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg=="
+    "dayjs@1.11.20": {
+      "integrity": "sha512-YbwwqR/uYpeoP4pu043q+LTDLFBLApUP6VxRihdfNTqu4ubqMlGDLd6ErXhEgsyvY0K6nCs7nggYumAN+9uEuQ=="
     },
     "debounce-fn@6.0.0": {
       "integrity": "sha512-rBMW+F2TXryBwB54Q0d8drNEI+TfoS9JpNTAoVpukbWEhjXQq4rySFYLaqXMFXwdv61Zb2OHtj5bviSoimqxRQ==",
@@ -4396,13 +4395,6 @@
         "dom-serializer",
         "domelementtype",
         "domhandler"
-      ]
-    },
-    "dot-case@3.0.4": {
-      "integrity": "sha512-Kv5nKlh6yRrdrGvxeJ2e5y2eRUpkUosIW4A2AS38zwSz27zu7ufDwQPi5Jhs3XAlGNetl3bmnGhQsMtkKJnj3w==",
-      "dependencies": [
-        "no-case",
-        "tslib"
       ]
     },
     "dot-prop@10.1.0": {
@@ -5323,6 +5315,13 @@
         "url-template"
       ]
     },
+    "googleapis@153.0.0": {
+      "integrity": "sha512-QT9Tdy9lx7KuZx620RaR/YsjwZTSw/dqlPKQRVLnMKTzOEghN0uZaKvpsm8aXjK+yEKWhJ8HQ6qOXRsJPLZHpw==",
+      "dependencies": [
+        "google-auth-library",
+        "googleapis-common"
+      ]
+    },
     "googleapis@154.1.0": {
       "integrity": "sha512-lsgKftflkjR+PNdKDjy5e4zZUQO3BMaNLO0Q91uvr9YCy3aOqtEwkDtfhcBguFtFLsqj+XjdfDu2on6rtHNvYg==",
       "dependencies": [
@@ -6096,12 +6095,6 @@
     "loupe@3.2.1": {
       "integrity": "sha512-CdzqowRJCeLU72bHvWqwRBBlLcMEtIvGrlvef74kMnV2AolS9Y8xUv1I0U/MNAWMhBlKIoyuEgoJ0t/bbwHbLQ=="
     },
-    "lower-case@2.0.2": {
-      "integrity": "sha512-7fm3l3NAF9WfN6W3JOmf5drwpVqX78JtoGJ3A6W0a6ZnldM41w2fV5D490psKFTpMds8TJse/eHLFFsNHHjHgg==",
-      "dependencies": [
-        "tslib"
-      ]
-    },
     "lru-cache@10.4.3": {
       "integrity": "sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ=="
     },
@@ -6130,9 +6123,6 @@
         "pify@4.0.1",
         "semver@5.7.2"
       ]
-    },
-    "map-obj@4.3.0": {
-      "integrity": "sha512-hdN1wVrZbb29eBGiGjJbeP8JbKjq1urkHJ/LIP/NY48MZ1QVXUsQBV1G1zvYFHn1XE06cwjBsOI2K3Ulnj1YXQ=="
     },
     "map-obj@5.0.0": {
       "integrity": "sha512-2L3MIgJynYrZ3TYMriLDLWocz15okFakV6J12HXvMXDHui2x/zgChzg1u9mFFGbbGWE+GsLpQByt4POb9Or+uA=="
@@ -6374,13 +6364,6 @@
         "sharp"
       ],
       "bin": true
-    },
-    "no-case@3.0.4": {
-      "integrity": "sha512-fgAN3jGAh+RoxUGZHTSOLJIqUc2wmoBwGR4tbpNAKmmovFoWq0OdRkb0VkldReO2a2iBT/OEulG9XSUc10r3zg==",
-      "dependencies": [
-        "lower-case",
-        "tslib"
-      ]
     },
     "node-addon-api@7.1.1": {
       "integrity": "sha512-5m3bsyrjFWE1xf7nz7YXdN4udnVtXK6/Yfgn5qnahL6bCkf2yKt4k3nuTKAtT4r3IG8JNR2ncsIMdZuAzJjHQQ=="
@@ -7840,21 +7823,6 @@
         "is-fullwidth-code-point"
       ]
     },
-    "snake-case@3.0.4": {
-      "integrity": "sha512-LAOh4z89bGQvl9pFfNF8V146i7o7/CqFPbqzYgP+yYzDIDeS9HaNFtXABamRW+AQzEVODcvE79ljJ+8a9YSdMg==",
-      "dependencies": [
-        "dot-case",
-        "tslib"
-      ]
-    },
-    "snakecase-keys@8.1.0": {
-      "integrity": "sha512-9/Eug2btrCiOi+9+vIXJnxUcKVfcbLy5Uwff4BrO6PQf3Oq/2iYQ/1zkmnrpIIjfel/DAasAlux7OvAmCa+Xnw==",
-      "dependencies": [
-        "map-obj@4.3.0",
-        "snake-case",
-        "type-fest@4.41.0"
-      ]
-    },
     "socket.io-adapter@2.5.6": {
       "integrity": "sha512-DkkO/dz7MGln0dHn5bmN3pPy+JmywNICWrJqVWiVOyvXjWQFIv9c2h24JrQLLFJ2aQVQf/Cvl1vblnd4r2apLQ==",
       "dependencies": [
@@ -9165,7 +9133,6 @@
         "npm:react@19",
         "npm:recharts@2",
         "npm:resend@^6.5.2",
-        "npm:snakecase-keys@^8.0.1",
         "npm:stylelint-config-css-modules@^4.6.0",
         "npm:stylelint-config-standard@40",
         "npm:stylelint-order@^7.0.1",
@@ -9225,8 +9192,6 @@
       "packages/shared/utils": {
         "packageJson": {
           "dependencies": [
-            "npm:dayjs@^1.11.13",
-            "npm:snakecase-keys@^8.1.0",
             "npm:ts-pattern@^5.7.0",
             "npm:type-fest@^5.4.4",
             "npm:typescript@~5.9.3",
@@ -9304,7 +9269,6 @@
           "npm:@supabase/supabase-js@2",
           "npm:@upstash/ratelimit@2",
           "npm:@upstash/redis@1",
-          "npm:dayjs@1.11.13",
           "npm:react@19",
           "npm:resend@6",
           "npm:ts-pattern@5",

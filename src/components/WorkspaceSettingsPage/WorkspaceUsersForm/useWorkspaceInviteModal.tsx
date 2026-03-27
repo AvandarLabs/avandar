@@ -24,7 +24,7 @@ export function useWorkspaceInviteModal({
   const workspace = useCurrentWorkspace();
   const formRef =
     useRef<AvaFormRef<{ email: string; role: Workspace.Role }>>(null);
-  const [inviteEmail] = useMutation({
+  const [sendInvite] = useMutation({
     mutationFn: (variables: {
       workspaceId: Workspace.Id;
       email: string;
@@ -57,7 +57,7 @@ export function useWorkspaceInviteModal({
           modalId,
           confirmProps: { loading: true },
         });
-        await inviteEmail.async({
+        await sendInvite.async({
           workspaceId: workspace.id,
           email,
           role,
@@ -75,6 +75,12 @@ export function useWorkspaceInviteModal({
       return;
     }
 
+    // since we have the number of members already, we can eagerly check on
+    // the frontend if the workspace has reached its seat limit.
+    // But even if we don't show this modal, we should still do a backend check
+    // when users invite a new member to make sure they are still allowed to
+    // invite more members (in case of any race conditions. E.g. if there
+    // are multiple admins inviting users at the same time).
     if (
       !Subscription.canInviteMembers({
         subscription: workspace.subscription,

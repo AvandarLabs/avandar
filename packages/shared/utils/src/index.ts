@@ -12,6 +12,7 @@ export { assertIsSingletonArray } from "@utils/asserts/assertIsSingletonArray/as
 // dates
 export { formatDate } from "@utils/dates/formatDate/formatDate.ts";
 export type { FormattableTimezone } from "@utils/dates/formatDate/formatDate.ts";
+export { parseDate } from "@utils/dates/parseDate/parseDate.ts";
 
 // numbers
 export { formatNumber } from "@utils/numbers/formatNumber/formatNumber.ts";
@@ -108,8 +109,9 @@ export { objectValuesMap } from "@utils/objects/objectValuesMap/objectValuesMap.
 export { omit } from "@utils/objects/omit/omit.ts";
 export { pick } from "@utils/objects/pick/pick.ts";
 export { registry } from "@utils/objects/registry/registry.ts";
-export { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
-export { snakeCaseKeysShallow } from "@utils/objects/snakeCaseKeysShallow/snakeCaseKeysShallow.ts";
+export { snakeCaseKeys } from "@utils/objects/snakeCaseKeys/snakeCaseKeys.ts";
+export { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeys/snakeCaseKeys.ts";
+export { snakeCaseKeysShallow } from "@utils/objects/snakeCaseKeys/snakeCaseKeys.ts";
 export { swapDeep } from "@utils/objects/swapDeep/swapDeep.ts";
 export { undefinedsToNullsDeep } from "@utils/objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
 export {
@@ -142,6 +144,7 @@ export { toPascalCase } from "@utils/strings/toPascalCase/toPascalCase.ts";
 export { unknownToString } from "@utils/strings/unknownToString/unknownToString.ts";
 export { prefix } from "@utils/strings/prefix/prefix.ts";
 export { template } from "@utils/strings/template/template.ts";
+export { toSnakeCase } from "@utils/strings/toSnakeCase/toSnakeCase.ts";
 
 // constants
 export { MIMEType } from "@utils/types/common.types.ts";
@@ -172,6 +175,7 @@ export type {
 export type {
   StringKeyOf,
   CamelCase,
+  SnakeCase,
   Entries,
   Unbrand,
   ExcludeDeep,
@@ -197,3 +201,5 @@ export type { PathValue } from "@utils/objects/getValue/getValue.ts";
 export type { ExcludeNullsExceptIn } from "@utils/objects/excludeNullsExceptIn/excludeNullsExceptIn.ts";
 export type { ExcludeNullsIn } from "@utils/objects/excludeNullsIn/excludeNullsIn.ts";
 export type { ExcludeUndefinedShallow } from "@utils/objects/excludeUndefinedShallow/excludeUndefinedShallow.ts";
+export type { CamelCaseKeys } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
+export type { SnakeCaseKeys } from "@utils/objects/snakeCaseKeys/snakeCaseKeys.ts";

@@ -4,14 +4,9 @@ import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts
 import { excludeUndefinedDeep } from "@utils/objects/excludeUndefinedDeep/excludeUndefinedDeep.ts";
 import { omitProps } from "@utils/objects/hofs/omitProps/omitProps.ts";
 import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
-import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
-import { z } from "zod";
+import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeys/snakeCaseKeys.ts";
 import { DatasetColumnValueExtractors } from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractors.ts";
-import type {
-  DatasetColumnValueExtractor,
-  DatasetColumnValueExtractorId,
-  DatasetColumnValueExtractorModel,
-} from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractor.types.ts";
+import { z } from "zod";
 import type {
   Expect,
   ZodSchemaEqualsTypes,
@@ -19,6 +14,11 @@ import type {
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 import type { EntityFieldConfigId } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";
+import type {
+  DatasetColumnValueExtractor,
+  DatasetColumnValueExtractorId,
+  DatasetColumnValueExtractorModel,
+} from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractor.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 
 const DBReadSchema = z.object({

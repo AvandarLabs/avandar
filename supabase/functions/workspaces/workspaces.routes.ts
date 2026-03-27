@@ -1,7 +1,13 @@
-import { defineRoutes, GET, POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import {
+  defineRoutes,
+  GET,
+  POST,
+} from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { hasSubscriptionPermission } from "@sbfn/subscriptions/services/hasSubscriptionPermission.ts";
 import { EmailClient } from "$/EmailClient/EmailClient.tsx";
 import { z } from "zod";
 import type { WorkspacesAPI } from "@sbfn/workspaces/workspaces.routes.types.ts";
+import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 
 const SLUG_MIN_LENGTH = 3;
 const SLUG_MAX_LENGTH = 20;
@@ -116,16 +122,14 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
             }
           }
 
-          // is the workspace already at the max number of members?
-          const { count } = await supabaseClient
-            .from("user_profiles")
-            .select("*", { count: "exact", head: true })
-            .eq("workspace_id", workspace.id)
-            .throwOnError();
-          if (count && count >= 2) {
-            throw new Error(
-              "Your workspace cannot have more than two members on the free plan",
-            );
+          // is the workspace allowed to invite more members?
+          const canInviteUsers = await hasSubscriptionPermission({
+            workspaceId: workspaceId as WorkspaceId,
+            permissionType: "can_invite_users",
+            supabaseAdminClient,
+          });
+          if (!canInviteUsers) {
+            throw new Error("Your workspace cannot invite any more members.");
           }
 
           // now, we check if this email has already been invited to this

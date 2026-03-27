@@ -22,8 +22,6 @@ export function DataManagerApp(): JSX.Element {
         <Button
           leftSection={<IconPlus size={18} />}
           onClick={() => {
-            // TODO(jpsyx): this is where we should check if the user is allowed
-            // to add more data based on their subscription plan
             navigate(AppLinks.dataImport(workspace.slug));
           }}
           size="compact-sm"
