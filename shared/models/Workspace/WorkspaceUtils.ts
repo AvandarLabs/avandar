@@ -35,5 +35,34 @@ export const WorkspaceUtils = {
       );
       return numSeatsInWorkspace < maxSeatsAllowed;
     },
+
+    getSeatInfo: ({
+      workspace,
+      numSeatsInWorkspace,
+    }: {
+      workspace: WorkspaceWithSubscription;
+      numSeatsInWorkspace: number;
+    }): {
+      usedSeats: number;
+      maxSeats: number | undefined;
+      isUnlimitedSeats: boolean;
+      remainingSeats: number | undefined;
+    } => {
+      const maxSeats =
+        workspace.subscription
+          ? SubscriptionModule.getMaxSeatsAllowed(workspace.subscription)
+          : undefined;
+      const isUnlimitedSeats = maxSeats === Infinity;
+      const remainingSeats =
+        maxSeats != null && !isUnlimitedSeats
+          ? maxSeats - numSeatsInWorkspace
+          : undefined;
+      return {
+        usedSeats: numSeatsInWorkspace,
+        maxSeats,
+        isUnlimitedSeats,
+        remainingSeats,
+      };
+    },
   },
 };
