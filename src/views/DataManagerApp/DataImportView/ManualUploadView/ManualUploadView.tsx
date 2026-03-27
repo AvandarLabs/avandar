@@ -9,7 +9,7 @@ import {
   notifyWarning,
 } from "@ui/notifications/notify";
 import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
-import { snakeCaseKeysShallow } from "@utils/objects/snakeCaseKeys/snakeCaseKeys.ts";
+import { snakeCaseKeysShallow } from "@utils/objects/snakeCaseKeys/snakeCaseKeys";
 import { MIMEType } from "@utils/types/common.types";
 import { uuid } from "$/lib/uuid";
 import { useEffect, useMemo, useState } from "react";
