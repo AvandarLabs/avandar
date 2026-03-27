@@ -2,11 +2,11 @@ import { List, Table, Text } from "@mantine/core";
 import { objectKeys } from "@utils/objects/objectKeys";
 import { StringKeyOf } from "@utils/types/utilities.types";
 import { useMemo } from "react";
-import { CollapsibleItem } from "../../CollapsibleItem";
-import { getOrderedKeys } from "../../gerOrderedKeys/getOrderedKeys";
-import { getObjectKeyTransformFn } from "../../getObjectKeyTransformFn";
-import { ValueItemContainer } from "../../ValueItemContainer";
-import { ObjectTableRow } from "./ObjectTableRow";
+import { CollapsibleItem } from "@ui/ObjectDescriptionList/CollapsibleItem";
+import { getOrderedKeys } from "@ui/ObjectDescriptionList/gerOrderedKeys/getOrderedKeys";
+import { getObjectKeyTransformFn } from "@ui/ObjectDescriptionList/getObjectKeyTransformFn";
+import { ValueItemContainer } from "@ui/ObjectDescriptionList/ValueItemContainer";
+import { ObjectTableRow } from "@ui/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectTableRow";
 import type {
   AnyDescribableValueRenderOptions,
   DescribableObject,
@@ -14,7 +14,7 @@ import type {
   GetChildObjects,
   ObjectArrayRenderOptions,
   ObjectRenderOptions,
-} from "../../ObjectDescriptionList.types";
+} from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
 
 const DEFAULT_EXCLUDE_KEYS_PATTERN = "_";
 const ACTION_COLUMN_HEADER_KEY = "__ACTION_COLUMN__";

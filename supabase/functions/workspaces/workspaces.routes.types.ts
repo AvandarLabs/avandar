@@ -1,36 +1,10 @@
-import type { APITypeDef } from "../_shared/MiniServer/api.types.ts";
+import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 import type { Tables } from "$/types/database.types.ts";
-
-/** Inlined to avoid importing @clients (which fails in Deno edge runtime). */
-type WorkspaceFeature = "add_datasets" | "invite_users";
 
 export type WorkspacesAPI = APITypeDef<
   "workspaces",
-  [
-    "/validate-slug",
-    "/:workspaceId/invite",
-    "/:workspaceId/features",
-    "/invites/:inviteId",
-    "/invites/:inviteId/accept",
-  ],
+  ["/validate-slug", "/:workspaceId/invite"],
   {
-    /**
-     * Fetches the features that are enabled for a workspace based on the
-     * subscription type.
-     *
-     * @param pathParams.workspaceId - The id of the workspace to fetch the
-     * features for.
-     */
-    "/:workspaceId/features": {
-      GET: {
-        pathParams: {
-          workspaceId: string;
-        };
-        returnType: {
-          features: WorkspaceFeature[];
-        };
-      };
-    };
     "/validate-slug": {
       POST: {
         body: {

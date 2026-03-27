@@ -1,12 +1,12 @@
-import { z } from "zod";
 import {
-  defineRoutes,
-  GET,
-  MiniServer,
-} from "../_shared/MiniServer/MiniServer.ts";
-import { getAuthURL } from "./getAuthURL.ts";
-import { getGoogleTokens } from "./getGoogleTokens.ts";
-import type { GoogleAuthAPI } from "./google-auth.types.ts";
+    defineRoutes,
+    GET,
+    MiniServer,
+} from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { getAuthURL } from "@sbfn/google-auth/getAuthURL.ts";
+import { getGoogleTokens } from "@sbfn/google-auth/getGoogleTokens.ts";
+import { z } from "zod";
+import type { GoogleAuthAPI } from "@sbfn/google-auth/google-auth.types.ts";
 
 export const Routes = defineRoutes<GoogleAuthAPI>("google-auth", {
   /**

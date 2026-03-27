@@ -1,5 +1,5 @@
-export { CSVFileDatasetParsers } from "./CSVFileDatasetParsers.ts";
+export { CSVFileDatasetParsers } from "$/models/datasets/CSVFileDataset/CSVFileDatasetParsers.ts";
 export type {
   CSVFileDataset,
   CSVFileDatasetId,
-} from "./CSVFileDataset.types.ts";
+} from "$/models/datasets/CSVFileDataset/CSVFileDataset.types.ts";

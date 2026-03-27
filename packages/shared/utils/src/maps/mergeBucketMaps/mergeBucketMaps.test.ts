@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mergeBucketMaps } from "./mergeBucketMaps.ts";
+import { mergeBucketMaps } from "@utils/maps/mergeBucketMaps/mergeBucketMaps.ts";
 
 describe("mergeBucketMaps", () => {
   it("concatenates buckets with matching keys", () => {

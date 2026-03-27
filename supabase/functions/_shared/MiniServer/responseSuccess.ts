@@ -1,5 +1,5 @@
-import { corsHeaders } from "../cors.ts";
-import { OK } from "../httpCodes.ts";
+import { corsHeaders } from "@sbfn/_shared/cors.ts";
+import { OK } from "@sbfn/_shared/httpCodes.ts";
 
 /**
  * Wraps the data in a response with the success status and the CORS headers.

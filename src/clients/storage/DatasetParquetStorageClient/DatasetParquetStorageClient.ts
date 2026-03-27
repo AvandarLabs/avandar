@@ -1,6 +1,6 @@
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
-import { startDatasetUpload } from "./startDatasetUpload";
-import { getDatasetParquetStoragePath, WORKSPACES_BUCKET_NAME } from "./utils";
+import { startDatasetUpload } from "@/clients/storage/DatasetParquetStorageClient/startDatasetUpload";
+import { getDatasetParquetStoragePath, WORKSPACES_BUCKET_NAME } from "@/clients/storage/DatasetParquetStorageClient/utils";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 

@@ -1,5 +1,5 @@
 import { Stack, Text } from "@mantine/core";
-import { ResyncDatasetCard } from "./ResyncDatasetCard";
+import { ResyncDatasetCard } from "@/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.types";
 
 type Props = {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { unknownToString } from "./unknownToString.ts";
+import { unknownToString } from "@utils/strings/unknownToString/unknownToString.ts";
 
 const complexJsonObject = {
   plan: "premium",

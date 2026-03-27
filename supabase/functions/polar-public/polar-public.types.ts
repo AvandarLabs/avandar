@@ -1,4 +1,4 @@
-import type { APITypeDef } from "../_shared/MiniServer/api.types.ts";
+import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 
 export type WebhookSuccessResponse = {
   success: true;

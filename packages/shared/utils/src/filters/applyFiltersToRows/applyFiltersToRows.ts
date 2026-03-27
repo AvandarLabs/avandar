@@ -1,10 +1,10 @@
-import { bucketFiltersByColumn } from "../bucketFiltersByColumn/bucketFiltersByColumn.ts";
-import { doesRowPassFilters } from "../doesRowPassFilters/doesRowPassFilters.ts";
-import { isEmptyFiltersObject } from "../isEmptyFiltersObject/isEmptyFiltersObject.ts";
-import { isFiltersByColumnObject } from "../isFiltersByColumnObject/isFiltersByColumnObject.ts";
-import { isFiltersByOperatorObject } from "../isFiltersByOperatorObject/isFiltersByOperatorObject.ts";
-import type { UnknownObject } from "../../types/common.types.ts";
-import type { FiltersByColumn, FiltersByOperator } from "../filters.ts";
+import { bucketFiltersByColumn } from "@utils/filters/bucketFiltersByColumn/bucketFiltersByColumn.ts";
+import { doesRowPassFilters } from "@utils/filters/doesRowPassFilters/doesRowPassFilters.ts";
+import { isEmptyFiltersObject } from "@utils/filters/isEmptyFiltersObject/isEmptyFiltersObject.ts";
+import { isFiltersByColumnObject } from "@utils/filters/isFiltersByColumnObject/isFiltersByColumnObject.ts";
+import { isFiltersByOperatorObject } from "@utils/filters/isFiltersByOperatorObject/isFiltersByOperatorObject.ts";
+import type { UnknownObject } from "@utils/types/common.types.ts";
+import type { FiltersByColumn, FiltersByOperator } from "@utils/filters/filters.ts";
 
 function applyColumnFilters<T extends UnknownObject>(
   data: T[],

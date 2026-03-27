@@ -1,7 +1,7 @@
 import { UserClient } from "@/clients/UserClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { UseQueryResult } from "@hooks/useQuery/useQuery";
-import type { UserProfile } from "$/models/User/User.types";
+import type { UserProfile } from "$/models/User/UserProfile.types";
 
 /**
  * Get the current user profile for the current workspace.

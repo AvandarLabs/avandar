@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Model } from "./Model.ts";
+import { Model } from "@models/Model/Model.ts";
 
 describe("Model.make", () => {
   it("creates a model with the given type and props", () => {

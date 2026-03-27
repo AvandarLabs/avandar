@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isPlainObject } from "./isPlainObject.ts";
+import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject.ts";
 
 describe("isPlainObject", () => {
   it("returns true for plain objects", () => {

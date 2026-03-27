@@ -1,4 +1,4 @@
-import { getItemsFromListPage } from "./listUtils";
+import { getItemsFromListPage } from "@ava-cli/PolarCLI/PolarClient/listUtils";
 import type { Polar } from "@polar-sh/sdk";
 
 export type PolarCustomer = Readonly<{

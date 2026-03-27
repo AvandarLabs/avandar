@@ -1,4 +1,4 @@
-import { makeObject } from "../makeObject/makeObject.ts";
+import { makeObject } from "@utils/objects/makeObject/makeObject.ts";
 import type { ConditionalKeys } from "type-fest";
 
 /**

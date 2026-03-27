@@ -1,4 +1,4 @@
-import type { VizConfigType, VizType } from "./VizConfig.types.ts";
+import type { VizConfigType, VizType } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 
 export interface IVizConfigModule<

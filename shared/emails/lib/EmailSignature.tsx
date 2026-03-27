@@ -1,5 +1,5 @@
 import { capitalize } from "@utils/strings/capitalize/capitalize.ts";
-import { EmailParagraph } from "./EmailParagraph.tsx";
+import { EmailParagraph } from "$/emails/lib/EmailParagraph.tsx";
 
 type Props = {
   signOff?: "warmly";

@@ -1,5 +1,5 @@
 import { camelToTitleCase } from "$/lib/strings/transformations";
-import type { BaseFormFieldSchema, ValidBaseValueType } from "./AvaForm.types";
+import type { BaseFormFieldSchema, ValidBaseValueType } from "@/lib/ui/AvaForm/AvaForm.types";
 
 export function getFieldLabel<
   FieldKey extends string,

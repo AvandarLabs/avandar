@@ -1,5 +1,5 @@
+import { parseTemplate } from "@ava-cli/utils/writeFileFromTemplate/parseTemplate/parseTemplate";
 import { describe, expect, it } from "vitest";
-import { parseTemplate } from "./parseTemplate";
 
 const SIMPLE_TEMPLATE = "Hello, $NAME$!";
 const MULTI_TEMPLATE = [

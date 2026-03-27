@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { propNotEq } from "./propNotEq.ts";
+import { propNotEq } from "@utils/objects/hofs/propNotEq/propNotEq.ts";
 
 describe("propNotEq", () => {
   it("returns true when the property does not equal the value", () => {

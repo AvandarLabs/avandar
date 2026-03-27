@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { pickProps } from "./pickProps.ts";
+import { pickProps } from "@utils/objects/hofs/pickProps/pickProps.ts";
 
 describe("pickProps", () => {
   it("returns a function that picks a single key", () => {

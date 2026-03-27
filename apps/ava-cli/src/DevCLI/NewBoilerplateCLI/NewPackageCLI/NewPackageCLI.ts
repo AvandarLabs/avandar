@@ -1,7 +1,7 @@
 import { Acclimate } from "@avandar/acclimate";
-import { isKebabCase } from "../../../utils/validators/isKebabCase/isKebabCase";
-import { writeNewPackageBoilerplate } from "./writeNewPackageBoilerplate";
-import type { PackageRuntime } from "./writeNewPackageBoilerplate";
+import { isKebabCase } from "@ava-cli/utils/validators/isKebabCase/isKebabCase";
+import { writeNewPackageBoilerplate } from "@ava-cli/DevCLI/NewBoilerplateCLI/NewPackageCLI/writeNewPackageBoilerplate";
+import type { PackageRuntime } from "@ava-cli/DevCLI/NewBoilerplateCLI/NewPackageCLI/writeNewPackageBoilerplate";
 
 /** CLI for scaffolding a new workspace package. */
 export const NewPackageCLI = Acclimate.createCLI("package")

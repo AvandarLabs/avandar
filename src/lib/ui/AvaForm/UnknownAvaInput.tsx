@@ -1,13 +1,13 @@
 import { match } from "ts-pattern";
 import type { SelectData } from "@ui/inputs/Select/Select";
-import { AvaSelectInput } from "./AvaSelectInput/AvaSelectInput";
-import { AvaTextInput } from "./AvaTextInput/AvaTextInput";
+import { AvaSelectInput } from "@/lib/ui/AvaForm/AvaSelectInput/AvaSelectInput";
+import { AvaTextInput } from "@/lib/ui/AvaForm/AvaTextInput/AvaTextInput";
 import type {
   FormFieldSchema,
   GenericFormSchemaRecord,
   ValidBaseValueType,
   ValuesOfFieldRecord,
-} from "./AvaForm.types";
+} from "@/lib/ui/AvaForm/AvaForm.types";
 import type { FormType } from "@/lib/hooks/ui/useForm";
 
 type Props<

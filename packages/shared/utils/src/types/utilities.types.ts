@@ -1,9 +1,14 @@
-import type { Brand, EmptyObject, UnknownObject } from "./common.types.ts";
+import type {
+  Brand,
+  EmptyObject,
+  UnknownObject,
+} from "@utils/types/common.types.ts";
 import type {
   KeyAsString as BroadStringKeyOf,
   ConditionalKeys,
   Simplify,
   CamelCase as StringToCamelCase,
+  SnakeCase as StringToSnakeCase,
   UnionToIntersection,
   UnknownRecord,
 } from "type-fest";
@@ -21,6 +26,8 @@ export type CamelCase<
   T extends string,
   PreserveUppercase extends boolean | undefined = true,
 > = StringToCamelCase<T, { preserveConsecutiveUppercase: PreserveUppercase }>;
+
+export type SnakeCase<T extends string> = StringToSnakeCase<T>;
 
 /**
  * Get all the entries of an object as an array of tuples that preserve the

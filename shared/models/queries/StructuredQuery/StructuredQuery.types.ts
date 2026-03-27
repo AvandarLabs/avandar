@@ -1,9 +1,9 @@
-import type { QueryAggregationType } from "../QueryAggregationType/QueryAggregationType.types.ts";
+import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
 import type {
   QueryColumn,
   QueryColumnId,
-} from "../QueryColumn/QueryColumn.types.ts";
-import type { QueryDataSource } from "../QueryDataSource/QueryDataSource.types.ts";
+} from "$/models/queries/QueryColumn/QueryColumn.types.ts";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types.ts";
 import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
 

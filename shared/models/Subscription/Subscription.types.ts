@@ -1,7 +1,7 @@
-import type { UserId } from "../User/User.types.ts";
-import type { Workspace } from "../Workspace/Workspace.ts";
-import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
 import type { UUID } from "@utils/types/common.types.ts";
+import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
+import type { UserId } from "$/models/User/User.types.ts";
+import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { Enums } from "$/types/database.types.ts";
 import type { SetOptional } from "type-fest";
 
@@ -10,8 +10,9 @@ export type PolarCustomerId = UUID<"PolarCustomer">;
 export type PolarProductId = UUID<"PolarProduct">;
 export type SubscriptionId = UUID<"PolarSubscription">;
 export type SubscriptionStatus = Enums<"subscriptions__status">;
+export type SubscriptionPermission = "can_add_datasets" | "can_invite_users";
 
-export type Subscription = {
+export type SubscriptionRead = {
   /** The Avandar subscription ID */
   polarSubscriptionId: SubscriptionId;
   workspaceId: Workspace.Id;
@@ -27,6 +28,9 @@ export type Subscription = {
   featurePlanType: FeaturePlanType;
   subscriptionStatus: SubscriptionStatus;
   maxSeatsAllowed: number;
+  maxDatasetsAllowed: number | undefined;
+  maxDashboardsAllowed: number | undefined;
+  maxShareableDashboardsAllowed: number | undefined;
   currentPeriodStart: Date | undefined;
   currentPeriodEnd: Date | undefined;
 };
@@ -37,9 +41,9 @@ export type SubscriptionModel = SupabaseCRUDModelSpec<
     modelName: "Subscription";
     modelPrimaryKeyType: SubscriptionId;
     modelTypes: {
-      Read: Subscription;
+      Read: SubscriptionRead;
       Insert: SetOptional<
-        Subscription,
+        SubscriptionRead,
         | "createdAt"
         | "currentPeriodEnd"
         | "currentPeriodStart"
@@ -48,7 +52,7 @@ export type SubscriptionModel = SupabaseCRUDModelSpec<
         | "startedAt"
         | "updatedAt"
       >;
-      Update: Partial<Subscription>;
+      Update: Partial<SubscriptionRead>;
     };
   },
   {

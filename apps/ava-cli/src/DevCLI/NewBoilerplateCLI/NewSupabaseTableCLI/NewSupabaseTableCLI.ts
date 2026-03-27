@@ -1,6 +1,6 @@
+import { isSnakeCase } from "@ava-cli/utils/validators/isSnakeCase/isSnakeCase";
+import { writeFileFromTemplate } from "@ava-cli/utils/writeFileFromTemplate/writeFileFromTemplate";
 import { Acclimate } from "@avandar/acclimate";
-import { isSnakeCase } from "../../../utils/validators/isSnakeCase/isSnakeCase";
-import { writeFileFromTemplate } from "../../../utils/writeFileFromTemplate/writeFileFromTemplate";
 
 const OUTPUT_DIR = "supabase/schemas";
 const TEMPLATES_DIR =

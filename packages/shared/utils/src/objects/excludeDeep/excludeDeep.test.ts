@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { isNull } from "../../guards/isNull/isNull.ts";
-import { isUndefined } from "../../guards/isUndefined/isUndefined.ts";
-import { excludeDeep } from "./excludeDeep.ts";
+import { isNull } from "@utils/guards/isNull/isNull.ts";
+import { isUndefined } from "@utils/guards/isUndefined/isUndefined.ts";
+import { excludeDeep } from "@utils/objects/excludeDeep/excludeDeep.ts";
 
 function _isNumber(value: unknown): value is number {
   return typeof value === "number";

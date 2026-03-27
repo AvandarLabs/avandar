@@ -1,5 +1,5 @@
+import { createWebLogger } from "@logger/createWebLogger/createWebLogger.ts";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createWebLogger } from "./createWebLogger.ts";
 
 describe("createWebLogger", () => {
   afterEach(() => {

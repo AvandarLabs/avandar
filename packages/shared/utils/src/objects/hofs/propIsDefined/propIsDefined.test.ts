@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { propIsDefined } from "./propIsDefined.ts";
+import { propIsDefined } from "@utils/objects/hofs/propIsDefined/propIsDefined.ts";
 
 describe("propIsDefined", () => {
   it("returns true when the property is defined", () => {

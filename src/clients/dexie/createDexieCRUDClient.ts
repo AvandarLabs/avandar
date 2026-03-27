@@ -4,8 +4,8 @@ import { UpsertOptions } from "@clients/ModelCRUDClient/ModelCRUDClient.types";
 import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
 import { applyFiltersToRows } from "@utils/filters/applyFiltersToRows/applyFiltersToRows";
 import { isDefined } from "@utils/guards/isDefined/isDefined";
-import { DexieCRUDModelSpec } from "./DexieCRUDClient.types";
-import type { DexieDBType } from "./DexieDBVersionManager";
+import { DexieCRUDModelSpec } from "@/clients/dexie/DexieCRUDClient.types";
+import type { DexieDBType } from "@/clients/dexie/DexieDBVersionManager";
 import type {
   ClientReturningOnlyPromises,
   ModelCRUDClient,

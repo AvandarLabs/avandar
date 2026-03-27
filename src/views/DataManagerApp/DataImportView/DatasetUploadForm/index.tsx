@@ -1,2 +1,2 @@
-export { DatasetImportForm } from "./DatasetImportForm";
-export type { DatasetImportFormValues } from "./DatasetImportForm";
+export { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetUploadForm/DatasetImportForm";
+export type { DatasetImportFormValues } from "@/views/DataManagerApp/DataImportView/DatasetUploadForm/DatasetImportForm";

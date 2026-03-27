@@ -8,10 +8,10 @@ import {
 import { IconSearch } from "@tabler/icons-react";
 import { Outlet } from "@tanstack/react-router";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
-import css from "./AppShell.module.css";
-import { AppShellStateManager } from "./AppShellStateManager";
-import { MobileHeader } from "./MobileHeader";
-import { Navbar } from "./Navbar/Navbar";
+import css from "@/lib/ui/AppShell/AppShell.module.css";
+import { AppShellStateManager } from "@/lib/ui/AppShell/AppShellStateManager";
+import { MobileHeader } from "@/lib/ui/AppShell/MobileHeader";
+import { Navbar } from "@/lib/ui/AppShell/Navbar/Navbar";
 import type { AppLink } from "@/config/AppLinks";
 import type { NavbarLink } from "@/config/NavbarLinks";
 import type { Workspace } from "$/models/Workspace/Workspace";

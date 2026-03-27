@@ -1,4 +1,4 @@
-import { identity } from "../../misc/identity.ts";
+import { identity } from "@utils/misc/identity.ts";
 
 /**
  * Creates a map of buckets from a list. The `keyFn` extracts the bucket

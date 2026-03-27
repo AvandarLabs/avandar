@@ -1,5 +1,5 @@
 import { Stack } from "@mantine/core";
-import { DescriptionListItem } from "./DescriptionListItem";
+import { DescriptionListItem } from "@ui/DescriptionList/DescriptionListItem";
 import type { ReactNode } from "react";
 
 type Props = {

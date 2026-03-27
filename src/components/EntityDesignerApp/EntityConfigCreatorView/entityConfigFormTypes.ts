@@ -4,6 +4,7 @@ import { DatasetColumnValueExtractor } from "$/models/EntityConfig/ValueExtracto
 import { ManualEntryExtractor } from "$/models/EntityConfig/ValueExtractor/ManualEntryExtractor/ManualEntryExtractor.types";
 import { EntityFieldValueExtractorRegistry } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types";
 import type { FormType } from "@/lib/hooks/ui/useForm";
+import type { CamelCaseKeys } from "@utils/objects/camelCaseKeys/camelCaseKeys";
 import type { Expect } from "@utils/types/test-utilities.types";
 import type {
   Dataset,
@@ -21,7 +22,6 @@ import type {
   EntityFieldConfig,
   EntityFieldConfigId,
 } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
-import type { CamelCaseKeys } from "camelcase-keys";
 import type { SetOptional, SetRequired } from "type-fest";
 
 export type EntityFieldFormValues = SetRequired<

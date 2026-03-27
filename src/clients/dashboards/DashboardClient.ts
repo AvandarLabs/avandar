@@ -6,9 +6,9 @@ import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatas
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { promiseMap } from "@/lib/utils/promises";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
-import { DatasetClient } from "../datasets/DatasetClient";
-import { DatasetParquetStorageClient } from "../storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
-import { extractDatasetIdsFromDashboardConfig } from "./extractDatasetIdsFromDashboardConfig";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
+import { extractDatasetIdsFromDashboardConfig } from "@/clients/dashboards/extractDatasetIdsFromDashboardConfig";
 import type {
   Dashboard,
   DashboardId,

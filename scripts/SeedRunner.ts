@@ -1,7 +1,7 @@
 import { Database } from "$/types/database.types";
+import { ScriptsUtil } from "scripts/ScriptsUtil";
 import { createSupabaseAdminClient } from "@/db/supabase/AvaSupabase";
 import { promiseMap, promiseMapSequential } from "@/lib/utils/promises";
-import { ScriptsUtil } from "./ScriptsUtil";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { User } from "$/models/User/User.types";
 

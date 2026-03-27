@@ -1,6 +1,6 @@
-import { isUndefined } from "../../guards/isUndefined/isUndefined.ts";
-import { excludeDeep } from "../excludeDeep/excludeDeep.ts";
-import type { ExcludeDeep } from "../../types/utilities.types.ts";
+import { isUndefined } from "@utils/guards/isUndefined/isUndefined.ts";
+import { excludeDeep } from "@utils/objects/excludeDeep/excludeDeep.ts";
+import type { ExcludeDeep } from "@utils/types/utilities.types.ts";
 
 /**
  * Drop all keys that have an `undefined` value. This is a deep transformation.

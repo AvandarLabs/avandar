@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { sleep } from "./sleep.ts";
+import { sleep } from "@utils/misc/sleep/sleep.ts";
 
 describe("wait", () => {
   it("resolves after the specified number of milliseconds", async () => {

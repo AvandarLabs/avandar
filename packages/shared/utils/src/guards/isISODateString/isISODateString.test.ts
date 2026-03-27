@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isISODateString } from "./isISODateString.ts";
+import { isISODateString } from "@utils/guards/isISODateString/isISODateString.ts";
 
 describe("isISODateString", () => {
   it("recognizes ISO 8601 strings", () => {

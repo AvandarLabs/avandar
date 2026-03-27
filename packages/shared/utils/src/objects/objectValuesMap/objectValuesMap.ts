@@ -1,4 +1,4 @@
-import type { UnknownObject } from "../../types/common.types.ts";
+import type { UnknownObject } from "@utils/types/common.types.ts";
 
 /**
  * Maps the values of an object shallowly.

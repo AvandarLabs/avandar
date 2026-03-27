@@ -6,11 +6,11 @@ import {
   isDescribableValueArray,
   isPrimitiveDescribableValue,
   isStringOrNumber,
-} from "../guards";
-import { PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS } from "../ObjectDescriptionList.types";
-import { NestedArraysBlock } from "./NestedArraysBlock";
-import { ObjectArrayBlock } from "./ObjectArrayBlock/ObjectArrayBlock";
-import { PrimitiveFieldValueArrayBlock } from "./PrimitiveFieldValueArrayBlock";
+} from "@ui/ObjectDescriptionList/guards";
+import { PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS } from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
+import { NestedArraysBlock } from "@ui/ObjectDescriptionList/DescribableValueArrayBlock/NestedArraysBlock";
+import { ObjectArrayBlock } from "@ui/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectArrayBlock";
+import { PrimitiveFieldValueArrayBlock } from "@ui/ObjectDescriptionList/DescribableValueArrayBlock/PrimitiveFieldValueArrayBlock";
 import type {
   DescribableObject,
   DescribableValueArrayRenderOptions,
@@ -20,7 +20,7 @@ import type {
   ObjectArrayRenderOptions,
   PrimitiveValue,
   PrimitiveValueRenderOptions,
-} from "../ObjectDescriptionList.types";
+} from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
 
 type Props<T, RootData extends GenericRootData> = {
   data: readonly T[];

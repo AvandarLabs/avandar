@@ -1,7 +1,7 @@
 import process from "node:process";
-import { isDenoRuntime } from "./isDenoRuntime.ts";
-import { isNodeRuntime } from "./isNodeRuntime.ts";
-import { isViteBrowserRuntime } from "./isViteBrowserRuntime.ts";
+import { isDenoRuntime } from "$/env/isDenoRuntime.ts";
+import { isNodeRuntime } from "$/env/isNodeRuntime.ts";
+import { isViteBrowserRuntime } from "$/env/isViteBrowserRuntime.ts";
 import type {} from "$/types/global.d.ts";
 
 // remove trailing slash if it's present

@@ -8,16 +8,16 @@ import {
   SendBroadcastResponseSuccess,
 } from "resend";
 import { match } from "ts-pattern";
-import { NOTIFICATION_EMAIL_FROM } from "./EmailClientConfig.ts";
+import { NOTIFICATION_EMAIL_FROM } from "$/EmailClient/EmailClientConfig.ts";
 import {
   sendBroadcastEmail,
   SendBroadcastEmailOptions,
-} from "./sendBroadcastEmail.ts";
+} from "$/EmailClient/sendBroadcastEmail.ts";
 import {
   sendTransactionalEmail,
   SendTransactionalEmailOptions,
-} from "./sendTransactionalEmail.ts";
-import type { IEmailClient } from "./EmailClient.types.ts";
+} from "$/EmailClient/sendTransactionalEmail.ts";
+import type { IEmailClient } from "$/EmailClient/EmailClient.types.ts";
 
 function createEmailClient(): IEmailClient {
   // make sure the RESEND_API_KEY is set otherwise throw an error.

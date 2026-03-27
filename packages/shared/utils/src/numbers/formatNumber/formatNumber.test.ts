@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { formatNumber as FormatNumberFn } from "./formatNumber.ts";
+import type { formatNumber as FormatNumberFn } from "@utils/numbers/formatNumber/formatNumber.ts";
 
 // Re-import before each test so every test gets a fresh formatterCache.
 // Without this, a test that mocks Intl.NumberFormat would poison the cache
@@ -8,7 +8,7 @@ let formatNumber: typeof FormatNumberFn;
 
 beforeEach(async () => {
   vi.resetModules();
-  const mod = await import("./formatNumber.ts");
+  const mod = await import("@utils/numbers/formatNumber/formatNumber.ts");
   formatNumber = mod.formatNumber;
 });
 

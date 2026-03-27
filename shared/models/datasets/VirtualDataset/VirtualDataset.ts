@@ -2,7 +2,7 @@
 import type {
   VirtualDatasetId,
   VirtualDatasetModel,
-} from "./VirtualDataset.types.ts";
+} from "$/models/datasets/VirtualDataset/VirtualDataset.types.ts";
 
 export namespace VirtualDataset {
   export type T<K extends keyof VirtualDatasetModel = "Read"> =

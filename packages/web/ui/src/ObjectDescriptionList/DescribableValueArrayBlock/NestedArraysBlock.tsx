@@ -1,12 +1,12 @@
 import { Fieldset, Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
-import { ValueItemContainer } from "../ValueItemContainer";
+import { ValueItemContainer } from "@ui/ObjectDescriptionList/ValueItemContainer";
 import type {
   DescribableValueArrayRenderOptions,
   GenericRootData,
   GetChildObjects,
   NestedArrayRenderOptions,
-} from "../ObjectDescriptionList.types";
+} from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
 
 type Props<T, RootData extends GenericRootData> = {
   /** Array of arrays of field values */

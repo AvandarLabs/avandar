@@ -1,11 +1,11 @@
 import { createModule, Module } from "@modules/createModule";
 import { EmptyObject, prop, where } from "@utils/index";
 import { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import { AuthClient } from "../AuthClient";
-import { DatasetClient } from "../datasets/DatasetClient";
-import { LocalDatasetClient } from "../datasets/LocalDatasetClient";
-import { UnknownRow } from "../DuckDBClient";
-import { IQETLClient, QETLClientFactory } from "./QETLClient";
+import { AuthClient } from "@/clients/AuthClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { UnknownRow } from "@/clients/DuckDBClient/index";
+import { IQETLClient, QETLClientFactory } from "@/clients/qetl/QETLClient";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";

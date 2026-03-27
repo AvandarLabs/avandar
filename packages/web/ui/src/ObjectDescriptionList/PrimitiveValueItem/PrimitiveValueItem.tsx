@@ -6,17 +6,17 @@ import { isNullish } from "@utils/guards/isNullish/isNullish";
 import { isNumber } from "@utils/guards/isNumber/isNumber";
 import { isString } from "@utils/guards/isString/isString";
 import { match } from "ts-pattern";
-import { isStringOrNumber } from "../guards";
-import { BooleanValueItem } from "./BooleanValueItem";
-import { DateValueItem } from "./DateValueItem";
-import { NullOrUndefinedValueItem } from "./NullOrUndefinedValueItem";
-import { NumberValueItem } from "./NumberValueItem";
-import { TextValueItem } from "./TextValueItem";
+import { isStringOrNumber } from "@ui/ObjectDescriptionList/guards";
+import { BooleanValueItem } from "@ui/ObjectDescriptionList/PrimitiveValueItem/BooleanValueItem";
+import { DateValueItem } from "@ui/ObjectDescriptionList/PrimitiveValueItem/DateValueItem";
+import { NullOrUndefinedValueItem } from "@ui/ObjectDescriptionList/PrimitiveValueItem/NullOrUndefinedValueItem";
+import { NumberValueItem } from "@ui/ObjectDescriptionList/PrimitiveValueItem/NumberValueItem";
+import { TextValueItem } from "@ui/ObjectDescriptionList/PrimitiveValueItem/TextValueItem";
 import type {
   GenericRootData,
   PrimitiveValue,
   PrimitiveValueRenderOptions,
-} from "../ObjectDescriptionList.types";
+} from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
 
 type Props<
   T extends PrimitiveValue,
