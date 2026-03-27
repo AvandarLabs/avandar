@@ -1,5 +1,5 @@
 import { useMutation } from "@hooks/useMutation/useMutation";
-import { Stack, Text } from "@mantine/core";
+import { Button, Group, Stack, Text } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifySuccess } from "@ui/notifications/notify";
@@ -9,11 +9,13 @@ import { useRef } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { WorkspaceBillingView } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
+import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useFeaturePlanType } from "@/hooks/workspaces/useCurrentSubscriptionType";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AvaField } from "@/lib/ui/AvaForm/AvaField";
 import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
 import { AvaFormRef } from "@/lib/ui/AvaForm/AvaForm.types";
+import { goToBillingPortal } from "../WorkspaceBillingView/BillingPortalButton/goToBillingPortal";
 
 export function useWorkspaceInviteModal({
   numberOfSeats,
@@ -22,6 +24,9 @@ export function useWorkspaceInviteModal({
 }): () => void {
   const featurePlanType = useFeaturePlanType();
   const workspace = useCurrentWorkspace();
+
+  const user = useCurrentUser();
+  console.log({ user, workspace });
   const formRef =
     useRef<AvaFormRef<{ email: string; role: Workspace.Role }>>(null);
   const [sendInvite] = useMutation({
@@ -87,21 +92,56 @@ export function useWorkspaceInviteModal({
         numMembersInWorkspace: numberOfSeats,
       })
     ) {
+      if (featurePlanType === "free") {
+        return void modals.open({
+          title: "Seat limit reached",
+          size: "100%",
+          styles: {
+            content: { height: "100%" },
+          },
+          children: (
+            <Stack>
+              <Text>
+                Your workspace is on the Free plan, which supports up to 2
+                seats. To invite more team members, upgrade to a paid plan for
+                unlimited seats.
+              </Text>
+
+              <WorkspaceBillingView hideTitle hideIntroText />
+            </Stack>
+          ),
+        });
+      }
+
       return void modals.open({
-        title: "Seat limit reached",
-        size: "100%",
-        styles: {
-          content: { height: "100%" },
-        },
+        title: "Additional seat required",
         children: (
           <Stack>
-            <Text>
-              Your workspace is on the Free plan, which supports up to 2 seats.
-              To invite more team members, upgrade to a paid plan for unlimited
-              seats.
+            <Text size="sm">
+              Your workspace has used all its seats. To invite another member,
+              you'll need to purchase an additional seat. You'll be redirected
+              to your billing portal.
             </Text>
-
-            <WorkspaceBillingView hideTitle hideIntroText />
+            <Group justify="flex-end">
+              <Button
+                variant="default"
+                onClick={() => {
+                  modals.closeAll();
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  modals.closeAll();
+                  goToBillingPortal({
+                    userId: user!.id,
+                  });
+                }}
+              >
+                Go to Billing Portal
+              </Button>
+            </Group>
           </Stack>
         ),
       });
