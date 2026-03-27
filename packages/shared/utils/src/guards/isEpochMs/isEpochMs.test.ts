@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isEpochMs } from "./isEpochMs.ts";
+import { isEpochMs } from "@utils/guards/isEpochMs/isEpochMs.ts";
 
 describe("isEpochMs", () => {
   it("accepts millisecond epoch values", () => {

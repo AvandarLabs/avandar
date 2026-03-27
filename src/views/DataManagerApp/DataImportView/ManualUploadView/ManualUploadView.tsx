@@ -9,7 +9,7 @@ import {
   notifyWarning,
 } from "@ui/notifications/notify";
 import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
-import { snakeCaseKeysShallow } from "@utils/objects/snakeCaseKeysShallow/snakeCaseKeysShallow";
+import { snakeCaseKeysShallow } from "@utils/objects/snakeCaseKeys/snakeCaseKeys";
 import { MIMEType } from "@utils/types/common.types";
 import { uuid } from "$/lib/uuid";
 import { useEffect, useMemo, useState } from "react";
@@ -26,7 +26,7 @@ import { FileUploadForm } from "@/lib/ui/singleton-forms/FileUploadForm";
 import {
   DatasetImportForm,
   DatasetImportFormValues,
-} from "../DatasetUploadForm";
+} from "@/views/DataManagerApp/DataImportView/DatasetUploadForm/index";
 import type { UnknownObject } from "@utils/types/common.types";
 import type {
   Dataset,

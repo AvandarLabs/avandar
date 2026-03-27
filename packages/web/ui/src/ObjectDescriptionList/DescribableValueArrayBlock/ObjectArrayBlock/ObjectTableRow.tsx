@@ -3,14 +3,14 @@ import { Button, Group, Table } from "@mantine/core";
 import { EditButton } from "@ui/buttons/EditButton";
 import { StringKeyOf } from "@utils/types/utilities.types";
 import { useState } from "react";
-import { ValueItemContainer } from "../../ValueItemContainer";
+import { ValueItemContainer } from "@ui/ObjectDescriptionList/ValueItemContainer";
 import type {
   AnyDescribableValueRenderOptions,
   DescribableObject,
   GenericRootData,
   GetChildObjects,
   ObjectRowRenderOptions,
-} from "../../ObjectDescriptionList.types";
+} from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
 
 const ACTION_COLUMN_HEADER_KEY = "__ACTION_COLUMN__";
 

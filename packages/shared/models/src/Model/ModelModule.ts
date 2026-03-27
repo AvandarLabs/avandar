@@ -4,7 +4,7 @@ import type {
   ModelType,
   ModelTypedId,
   ModelTypeKey,
-} from "./Model.types.ts";
+} from "@models/Model/Model.types.ts";
 import type { EmptyObject, Simplify, UnionToIntersection } from "type-fest";
 
 export type IModelModule = {

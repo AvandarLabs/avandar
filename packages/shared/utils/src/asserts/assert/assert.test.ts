@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { assert } from "./assert.ts";
+import { assert } from "@utils/asserts/assert/assert.ts";
 
 describe("assert", () => {
   it("does not throw for truthy values", () => {

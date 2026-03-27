@@ -1,5 +1,5 @@
 import { registry } from "@utils/objects/registry/registry.ts";
-import type { NotificationEmailType } from "./EmailClient.types.ts";
+import type { NotificationEmailType } from "$/EmailClient/EmailClient.types.ts";
 
 export const NOTIFICATION_EMAIL_FROM = {
   email: "avandar@notifications.avandarlabs.com",

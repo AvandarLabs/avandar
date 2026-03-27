@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { isFiltersByColumnObject } from "./isFiltersByColumnObject.ts";
-import type { FiltersByColumn, FiltersByOperator } from "../filters.ts";
+import { isFiltersByColumnObject } from "@utils/filters/isFiltersByColumnObject/isFiltersByColumnObject.ts";
+import type { FiltersByColumn, FiltersByOperator } from "@utils/filters/filters.ts";
 
 type Row = { id: string };
 

@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { assertHasDefinedProps } from "./assertHasDefinedProps.ts";
+import { assertHasDefinedProps } from "@utils/asserts/assertHasDefinedProps/assertHasDefinedProps.ts";
 
 describe("assertHasDefinedProps", () => {
   describe("runtime", () => {

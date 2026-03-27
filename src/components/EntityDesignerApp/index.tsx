@@ -3,7 +3,7 @@ import { Outlet } from "@tanstack/react-router";
 import { where } from "@utils/filters/where/where";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { EntityConfigNavbar } from "./EntityConfigNavbar";
+import { EntityConfigNavbar } from "@/components/EntityDesignerApp/EntityConfigNavbar";
 
 export function EntityDesignerApp(): JSX.Element {
   const workspace = useCurrentWorkspace();

@@ -1,6 +1,6 @@
 import { Simplify } from "type-fest";
-import { isArray } from "../../../guards/isArray/isArray.ts";
-import { UnknownArray } from "../../../index.ts";
+import { isArray } from "@utils/guards/isArray/isArray.ts";
+import { UnknownArray } from "@utils/index.ts";
 
 type ItemTypeError<SeedType, ExpectedType> = {
   error: "ItemTypeError";

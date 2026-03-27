@@ -1,4 +1,4 @@
-import { createModule } from "./createModule.ts";
+import { createModule } from "@modules/createModule.ts";
 import type {
   Accessors,
   AnyModule,
@@ -6,7 +6,7 @@ import type {
   Module,
   NameOfModule,
   StateOfModule,
-} from "./createModule.ts";
+} from "@modules/createModule.ts";
 import type { EmptyObject } from "@utils/types/common.types.ts";
 
 export type ModuleFactory<ChildModule extends AnyModule> = Module<

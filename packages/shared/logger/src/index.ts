@@ -1,3 +1,3 @@
-export { createWebLogger } from "./createWebLogger/createWebLogger.ts";
-export { withLogger } from "./module-augmenters/withLogger.ts";
-export type { ILogger, WithLogger } from "./Logger.types.ts";
+export { createWebLogger } from "@logger/createWebLogger/createWebLogger.ts";
+export { withLogger } from "@logger/module-augmenters/withLogger.ts";
+export type { ILogger, WithLogger } from "@logger/Logger.types.ts";

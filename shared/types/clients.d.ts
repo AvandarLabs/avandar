@@ -1,4 +1,4 @@
-import type { Database } from "./database.types.ts";
+import type { Database } from "$/types/database.types.ts";
 
 declare module "@clients/Register.types.ts" {
   interface Register {

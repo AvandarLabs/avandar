@@ -1,5 +1,5 @@
-import type { ModelCRUDParserRegistry } from "../makeParserRegistry.ts";
-import type { ServiceClient } from "../ServiceClient/ServiceClient.types.ts";
+import type { ModelCRUDParserRegistry } from "@clients/makeParserRegistry.ts";
+import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types.ts";
 import type { ILogger } from "@logger/Logger.types.ts";
 import type { FiltersByColumn } from "@utils/filters/filters.ts";
 import type { EmptyObject, UnknownObject } from "@utils/types/common.types.ts";

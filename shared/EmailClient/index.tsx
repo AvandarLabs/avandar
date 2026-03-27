@@ -1,1 +1,1 @@
-export { EmailClient } from "./EmailClient.tsx";
+export { EmailClient } from "$/EmailClient/EmailClient.tsx";

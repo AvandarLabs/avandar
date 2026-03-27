@@ -3,7 +3,7 @@ import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
 import type {
   AnnualPaidSeatsPlan,
   MonthlyPaidSeatsPlan,
-} from "../SubscriptionPlan.types";
+} from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 
 type Props = {
   discount: number | undefined;

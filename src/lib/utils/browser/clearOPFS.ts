@@ -1,4 +1,4 @@
-import { removeOPFSFile } from "./removeOPFSFile";
+import { removeOPFSFile } from "@/lib/utils/browser/removeOPFSFile";
 
 /**
  * Remove all files from the browser OPFS.

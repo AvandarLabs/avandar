@@ -10,7 +10,8 @@ import { UserProfileDBReadToModelReadSchema } from "@/clients/UserClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { isOneOf } from "@/lib/utils/guards/guards";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
-import type { UserId, UserProfileWithRole } from "$/models/User/User.types";
+import type { UserId } from "$/models/User/User.types";
+import type { UserProfileWithRole } from "$/models/User/UserProfile.types";
 
 export const WorkspaceClient = createUsableServiceClient(
   createSupabaseCRUDClient({

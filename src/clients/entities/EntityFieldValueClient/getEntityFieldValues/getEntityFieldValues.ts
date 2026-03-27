@@ -5,7 +5,7 @@ import { match } from "ts-pattern";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { promiseFlatMap } from "@/lib/utils/promises";
 import { Logger } from "@/utils/Logger";
-import { getDatasetColumnFieldValues } from "./getDatasetColumnFieldValues";
+import { getDatasetColumnFieldValues } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getDatasetColumnFieldValues";
 import type { RegistryOfArrays } from "@utils/types/utilities.types";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
 import type {

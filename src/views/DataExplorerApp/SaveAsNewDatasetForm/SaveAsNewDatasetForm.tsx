@@ -8,7 +8,7 @@ import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
-import css from "./SaveAsNewDatasetForm.module.css";
+import css from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.module.css";
 
 type Props = {
   queryResultData: UnknownDataFrame;

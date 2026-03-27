@@ -1,5 +1,5 @@
 import { IconPencil } from "@tabler/icons-react";
-import { ActionIcon } from "../ActionIcon/ActionIcon";
+import { ActionIcon } from "@ui/ActionIcon/ActionIcon";
 import type { ActionIconProps } from "@mantine/core";
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
 

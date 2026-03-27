@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { doesValuePassFilters } from "./doesValuePassFilters.ts";
+import { doesValuePassFilters } from "@utils/filters/doesValuePassFilters/doesValuePassFilters.ts";
 
 describe("doesValuePassFilters", () => {
   it("handles equality comparisons", () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { run } from "./run";
+import { run } from "@pipeline-server/routes/pipeline-name/run/run";
 
 describe("run pipeline", () => {
   it("runs the requested pipeline module", async () => {

@@ -2,7 +2,7 @@ import { Group, NumberInput, Stack } from "@mantine/core";
 import { FieldLabel } from "@puckeditor/core";
 import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject";
 import { SegmentedControl } from "@/lib/ui/inputs/SegmentedControl";
-import { AvaPageFieldProps } from "../../AvaPage.types";
+import { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 export type ContainerMaxWidthUnit = "%" | "px";
 

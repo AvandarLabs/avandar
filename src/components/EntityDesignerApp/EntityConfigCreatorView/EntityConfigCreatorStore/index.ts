@@ -1,1 +1,1 @@
-export { EntityConfigCreatorStore } from "./EntityConfigCreatorStore";
+export { EntityConfigCreatorStore } from "@/components/EntityDesignerApp/EntityConfigCreatorView/EntityConfigCreatorStore/EntityConfigCreatorStore";

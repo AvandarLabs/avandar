@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { prefix } from "./prefix.ts";
+import { prefix } from "@utils/strings/prefix/prefix.ts";
 
 describe("prefix", () => {
   it("prefixes a string with the given prefix", () => {

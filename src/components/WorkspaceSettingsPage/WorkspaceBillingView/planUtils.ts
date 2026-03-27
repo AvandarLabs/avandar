@@ -1,23 +1,23 @@
 import { SegmentedControlItem } from "@mantine/core";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import {
-  BasicPlanConfig,
-  FreePlanConfig,
-  PremiumPlanConfig,
+    BasicPlanConfig,
+    FreePlanConfig,
+    PremiumPlanConfig,
 } from "$/config/FeaturePlansConfig";
 import { match } from "ts-pattern";
+import {
+    AnnualPaidSeatsPlan,
+    FeaturePlan,
+    FreePlanVariants,
+    MonthlyPaidSeatsPlan,
+    MonthlyPayWhatYouWantPlan,
+    PaidPlanVariants,
+    SubscriptionPlan,
+} from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 import { isOneOf } from "@/lib/utils/guards/guards";
 import { Logger } from "@/utils/Logger";
-import {
-  AnnualPaidSeatsPlan,
-  FeaturePlan,
-  FreePlanVariants,
-  MonthlyPaidSeatsPlan,
-  MonthlyPayWhatYouWantPlan,
-  PaidPlanVariants,
-  SubscriptionPlan,
-} from "./SubscriptionPlan.types";
-import type { SubscriptionsAPI } from "../../../../supabase/functions/subscriptions/subscriptions.types";
+import type { SubscriptionsAPI } from "@sbfn/subscriptions/subscriptions.routes.types";
 
 type AvaPolarProduct =
   SubscriptionsAPI["subscriptions"]["/products"]["GET"]["returnType"]["products"][number];

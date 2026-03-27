@@ -7,9 +7,9 @@
  * is no package.json script to call it. It should typically run as
  * part of `resetDatabaseScript.sh` through the `pnpm db:reset` command.
  */
-import { SeedData } from "../seed/SeedData";
-import { SeedJobs } from "../seed/SeedJobs";
-import { SeedRunner } from "./SeedRunner";
+import { SeedRunner } from "scripts/SeedRunner";
+import { SeedData } from "seed/SeedData";
+import { SeedJobs } from "seed/SeedJobs";
 
 async function main(): Promise<void> {
   console.log("Initializing the database seed runner");

@@ -1,7 +1,7 @@
 import { FiltersByColumn } from "@utils/filters/filters.ts";
 import { omit } from "@utils/objects/omit/omit.ts";
-import { withLogger } from "../../../logger/src/module-augmenters/withLogger.ts";
-import { createServiceClient } from "../ServiceClient/createServiceClient.ts";
+import { withLogger } from "@logger/module-augmenters/withLogger.ts";
+import { createServiceClient } from "@clients/ServiceClient/createServiceClient.ts";
 import {
   ClientReturningOnlyPromises,
   CRUDModelSpec,
@@ -9,8 +9,8 @@ import {
   ModelCRUDFunctions,
   ModelCRUDPage,
   UpsertOptions,
-} from "./ModelCRUDClient.types.ts";
-import type { ModelCRUDParserRegistry } from "../makeParserRegistry.ts";
+} from "@clients/ModelCRUDClient/ModelCRUDClient.types.ts";
+import type { ModelCRUDParserRegistry } from "@clients/makeParserRegistry.ts";
 import type { ILogger } from "@logger/Logger.types.ts";
 import type { EmptyObject } from "type-fest";
 

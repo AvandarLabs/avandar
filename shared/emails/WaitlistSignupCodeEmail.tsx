@@ -1,9 +1,9 @@
 import { Text } from "@react-email/components";
 import { buildAppPageURL } from "$/utils/urls/buildAppPageURL.ts";
-import { EmailFullButton } from "./lib/EmailFullButton.tsx";
-import { EmailHeading } from "./lib/EmailHeading.tsx";
-import { EmailParagraph } from "./lib/EmailParagraph.tsx";
-import { EmailTemplate } from "./lib/EmailTemplate.tsx";
+import { EmailFullButton } from "$/emails/lib/EmailFullButton.tsx";
+import { EmailHeading } from "$/emails/lib/EmailHeading.tsx";
+import { EmailParagraph } from "$/emails/lib/EmailParagraph.tsx";
+import { EmailTemplate } from "$/emails/lib/EmailTemplate.tsx";
 
 type Props = {
   signupCode: string;

@@ -20,13 +20,13 @@ import { isEpochMs, isISODateString, prop } from "@utils/index";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { DataExplorerStateManager } from "./DataExplorerStateManager/DataExplorerStateManager";
-import { downloadRowsAsCSV } from "./downloadRowsAsCSV";
-import { QueryForm } from "./QueryForm/QueryForm";
-import { SaveAsNewDatasetForm } from "./SaveAsNewDatasetForm/SaveAsNewDatasetForm";
-import { useDataQuery } from "./useDataQuery";
-import { VisualizationContainer } from "./VisualizationContainer";
-import { VizSettingsForm } from "./VizSettingsForm/VizSettingsForm";
+import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import { downloadRowsAsCSV } from "@/views/DataExplorerApp/downloadRowsAsCSV";
+import { QueryForm } from "@/views/DataExplorerApp/QueryForm/QueryForm";
+import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
+import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
+import { VisualizationContainer } from "@/views/DataExplorerApp/VisualizationContainer";
+import { VizSettingsForm } from "@/views/DataExplorerApp/VizSettingsForm/VizSettingsForm";
 
 const QUERY_FORM_WIDTH = 300;
 

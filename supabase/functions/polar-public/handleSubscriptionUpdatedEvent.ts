@@ -1,15 +1,15 @@
-import { infer as zInfer } from "zod";
 import {
-  MAX_FREE_PLAN_SEATS,
-  validatePolarSubscription,
-  webhookFailureResponse,
-  webhookSuccessResponse,
-} from "./polarWebhookUtils.ts";
-import type { WebhookResponse } from "./polar-public.types.ts";
+    MAX_FREE_PLAN_SEATS,
+    validatePolarSubscription,
+    webhookFailureResponse,
+    webhookSuccessResponse,
+} from "@sbfn/polar-public/polarWebhookUtils.ts";
+import { infer as zInfer } from "zod";
+import type { WebhookResponse } from "@sbfn/polar-public/polar-public.types.ts";
 import type {
-  PolarEventDataSchemas,
-  PolarWebhookHandlerOptions,
-} from "./PolarEventDataSchemas.ts";
+    PolarEventDataSchemas,
+    PolarWebhookHandlerOptions,
+} from "@sbfn/polar-public/PolarEventDataSchemas.ts";
 
 type SubscriptionUpdatedData = zInfer<
   typeof PolarEventDataSchemas.SubscriptionUpdated

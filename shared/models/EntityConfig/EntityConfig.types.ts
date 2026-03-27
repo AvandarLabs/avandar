@@ -1,11 +1,11 @@
-import type { Dataset } from "../datasets/Dataset/Dataset.types.ts";
-import type { Workspace } from "../Workspace/Workspace.ts";
-import type { EntityFieldConfig } from "./EntityFieldConfig/EntityFieldConfig.types.ts";
-import type { EntityFieldValueExtractor } from "./ValueExtractor/ValueExtractor.types.ts";
-import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
 import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset.types.ts";
+import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";
+import type { EntityFieldValueExtractor } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types.ts";
+import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
+import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { Paths, SetOptional, SetRequiredDeep, Simplify } from "type-fest";
 
 type ModelType = "EntityConfig";

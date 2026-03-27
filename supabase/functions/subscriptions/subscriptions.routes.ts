@@ -1,14 +1,16 @@
+import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
+import { UpdateSubscriptionProduct } from "@sbfn/subscriptions/[subscriptionId].product.ts";
+import { FetchAndSyncUserSubscriptions } from "@sbfn/subscriptions/fetch-and-sync.ts";
+import { hasSubscriptionPermission } from "@sbfn/subscriptions/services/hasSubscriptionPermission.ts";
 import { getDevOverrideEmail } from "$/env/getDevOverrideEmail.ts";
+import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { match } from "ts-pattern";
-import { email, string, url, uuid } from "zod";
-import { defineRoutes, GET } from "../_shared/MiniServer/MiniServer.ts";
-import { PolarClient } from "../_shared/PolarClient/PolarClient.ts";
-import { UpdateSubscriptionProduct } from "./[subscriptionId].product.ts";
-import { FetchAndSyncUserSubscriptions } from "./fetch-and-sync.ts";
+import { z } from "zod";
 import type {
   AvaPolarProduct,
   SubscriptionsAPI,
-} from "./subscriptions.types.ts";
+} from "@sbfn/subscriptions/subscriptions.routes.types.ts";
 
 /**
  * This is the route handler for all billing-related endpoints.
@@ -95,18 +97,19 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
     GET: GET({
       path: "/checkout-url/:productId",
       schema: {
-        productId: string(),
+        productId: z.string(),
       },
     })
       .querySchema({
-        userId: uuid(),
-        workspaceId: uuid(),
-        returnURL: url(),
-        successURL: url(),
-        checkoutEmail: email(),
-        currentPolarSubscriptionId: string().optional(),
-        currentCustomerId: string().optional(),
-        numSeats: string()
+        userId: z.string(),
+        workspaceId: z.string(),
+        returnURL: z.string(),
+        successURL: z.string(),
+        checkoutEmail: z.string(),
+        currentPolarSubscriptionId: z.string().optional(),
+        currentCustomerId: z.string().optional(),
+        numSeats: z
+          .string()
           .optional()
           .transform((val) => {
             return val ? Number(val) : undefined;
@@ -129,9 +132,9 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
         // since Polar rejects test domains like test@test.com
         const devOverride = getDevOverrideEmail();
         const emailForPolar =
-          Deno.env.get("MODE") === "development" && devOverride
-            ? devOverride
-            : checkoutEmail;
+          Deno.env.get("MODE") === "development" && devOverride ?
+            devOverride
+          : checkoutEmail;
 
         const checkout = await PolarClient.createCheckoutSession({
           avandarMetadata: {
@@ -151,9 +154,9 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
   },
 
   "/customer-portal/:userId": {
-    GET: GET({ path: "/customer-portal/:userId", schema: { userId: uuid() } })
+    GET: GET({ path: "/customer-portal/:userId", schema: { userId: z.uuid() } })
       .querySchema({
-        returnURL: url(),
+        returnURL: z.url(),
       })
       .action(async ({ pathParams, queryParams, supabaseAdminClient }) => {
         // first check if the user has a subscription
@@ -175,5 +178,28 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
           customerPortalURL: customerSession.customerPortalUrl,
         };
       }),
+  },
+
+  "/:subscriptionId/permissions/:permissionType": {
+    GET: GET({
+      path: "/:subscriptionId/permissions/:permissionType",
+      schema: {
+        subscriptionId: z.uuid(),
+        permissionType: z.enum(Subscription.Permissions),
+      },
+    }).action(
+      async ({
+        pathParams: { subscriptionId, permissionType },
+        supabaseAdminClient,
+      }) => {
+        return {
+          allowed: await hasSubscriptionPermission({
+            subscriptionId: subscriptionId as Subscription.Id,
+            permissionType,
+            supabaseAdminClient,
+          }),
+        };
+      },
+    ),
   },
 });

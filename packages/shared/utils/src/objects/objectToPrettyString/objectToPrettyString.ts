@@ -1,6 +1,6 @@
-import { isArray } from "../../guards/isArray/isArray.ts";
-import { unknownToString } from "../../strings/unknownToString/unknownToString.ts";
-import type { UnknownToStringOptions } from "../../strings/unknownToString/unknownToString.ts";
+import { isArray } from "@utils/guards/isArray/isArray.ts";
+import { unknownToString } from "@utils/strings/unknownToString/unknownToString.ts";
+import type { UnknownToStringOptions } from "@utils/strings/unknownToString/unknownToString.ts";
 
 function _repeatIndents(count: number): string {
   return "".padStart(count, "\t");

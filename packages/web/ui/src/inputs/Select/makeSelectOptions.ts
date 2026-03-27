@@ -1,5 +1,5 @@
 import { identity } from "@utils/misc/identity";
-import type { SelectOption } from "./Select";
+import type { SelectOption } from "@ui/inputs/Select/Select";
 import type { UnknownObject } from "@utils/types/common.types";
 import type { ConditionalKeys } from "type-fest";
 

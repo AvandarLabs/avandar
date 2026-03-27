@@ -1,1 +1,1 @@
-export { Model } from "./Model/Model.ts";
+export { Model } from "@models/Model/Model.ts";

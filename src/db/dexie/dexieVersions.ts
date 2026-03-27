@@ -24,7 +24,7 @@ import { prop } from "@utils/objects/hofs/prop/prop";
 import Dexie from "dexie";
 import { DexieDBVersionManager } from "@/clients/dexie/DexieDBVersionManager";
 import { clearOPFS } from "@/lib/utils/browser/clearOPFS";
-import { AvaSupabase } from "../supabase/AvaSupabase";
+import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import type { LegacyLocalDatasetEntryModel } from "@/models/Legacy_LocalDatasetEntry/Legacy_LocalDatasetEntry.types";
 import type { LocalDatasetModel } from "@/models/LocalDataset/LocalDataset.types";
 import type { LocalPublicDatasetModel } from "@/models/LocalPublicDataset/LocalPublicDataset.types";

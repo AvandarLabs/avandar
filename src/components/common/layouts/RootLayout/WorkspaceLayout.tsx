@@ -7,8 +7,8 @@ import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AppShell } from "@/lib/ui/AppShell/AppShell";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import { useRootWorkspaceChecks } from "./useRootWorkspaceChecks/useRootWorkspaceChecks";
-import { useSpotlightActions } from "./useSpotlightActions";
+import { useRootWorkspaceChecks } from "@/components/common/layouts/RootLayout/useRootWorkspaceChecks/useRootWorkspaceChecks";
+import { useSpotlightActions } from "@/components/common/layouts/RootLayout/useSpotlightActions";
 
 type Props = {
   /**

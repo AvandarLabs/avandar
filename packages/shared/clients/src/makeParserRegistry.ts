@@ -1,7 +1,7 @@
 import { excludeUndefinedDeep } from "@utils/objects/excludeUndefinedDeep/excludeUndefinedDeep.ts";
 import { objectKeys } from "@utils/objects/objectKeys.ts";
 import { pick } from "@utils/objects/pick/pick.ts";
-import type { CRUDModelSpec } from "./ModelCRUDClient/ModelCRUDClient.types.ts";
+import type { CRUDModelSpec } from "@clients/ModelCRUDClient/ModelCRUDClient.types.ts";
 import type { z } from "zod";
 
 type GenericDBReadSchema<M extends CRUDModelSpec> = z.ZodObject<{

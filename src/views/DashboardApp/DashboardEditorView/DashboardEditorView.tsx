@@ -7,18 +7,18 @@ import { createInitialDashboardPuckData } from "$/models/Dashboard/DashboardConf
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
-import { getVersionFromAvaPageData } from "../AvaPage/migrations/getVersionFromAvaPageData";
-import { getAvaPageMetadataFromDashboard } from "../AvaPage/utils/getAvaPageMetadataFromDashboard";
-import { upgradeAvaPageData } from "../AvaPage/utils/upgradeAvaPageData";
-import { DeleteDashboardButton } from "./DeleteDashboardButton";
+import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
+import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard";
+import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
+import { DeleteDashboardButton } from "@/views/DashboardApp/DashboardEditorView/DeleteDashboardButton";
 import {
   getDashboardPuckConfig,
   getDashboardTitleFromPuckData,
-} from "./getDashboardPuckConfig";
-import { PublishDashboardButton } from "./PublishDashboardButton";
-import { SaveDashboardButton } from "./SaveDashboardButton";
-import { ViewDashboardButton } from "./ViewDashboardButton";
-import type { AvaPageData } from "../AvaPage/AvaPage.types";
+} from "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig";
+import { PublishDashboardButton } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardButton";
+import { SaveDashboardButton } from "@/views/DashboardApp/DashboardEditorView/SaveDashboardButton";
+import { ViewDashboardButton } from "@/views/DashboardApp/DashboardEditorView/ViewDashboardButton";
+import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type {
   Dashboard,
   DashboardId,

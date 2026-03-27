@@ -1,4 +1,4 @@
-import { ensureOPFSWritePermission } from "./ensureOPFSWritePermission";
+import { ensureOPFSWritePermission } from "@/lib/utils/browser/ensureOPFSWritePermission";
 
 /**
  * Removes a file from the browser OPFS.

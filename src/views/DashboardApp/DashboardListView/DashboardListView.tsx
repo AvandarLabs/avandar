@@ -16,7 +16,7 @@ import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { Paper } from "@/lib/ui/Paper/Paper";
-import { DashboardCard } from "./DashboardCard";
+import { DashboardCard } from "@/views/DashboardApp/DashboardListView/DashboardCard";
 import type { Dashboard } from "$/models/Dashboard/Dashboard.types";
 
 type Props = {

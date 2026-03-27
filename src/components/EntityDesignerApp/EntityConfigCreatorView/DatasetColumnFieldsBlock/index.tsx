@@ -29,9 +29,9 @@ import { removeItemWhere } from "@/lib/utils/arrays/removeItemWhere/removeItemWh
 import {
   EntityConfigFormType,
   makeDefaultDatasetColumnField,
-} from "../entityConfigFormTypes";
-import { DatasetColumnExtractorCreator } from "./DatasetColumnExtractorCreator";
-import { IDConfigBlock } from "./IDConfigBlock";
+} from "@/components/EntityDesignerApp/EntityConfigCreatorView/entityConfigFormTypes";
+import { DatasetColumnExtractorCreator } from "@/components/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator";
+import { IDConfigBlock } from "@/components/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
 import type {
   DatasetColumn,

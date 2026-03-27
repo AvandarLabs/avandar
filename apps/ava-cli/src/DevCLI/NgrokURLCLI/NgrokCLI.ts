@@ -1,7 +1,7 @@
 import { Acclimate } from "@avandar/acclimate";
-import { NgrokURLAddCLI } from "./NgrokURLAddCLI/NgrokURLAddCLI";
-import { NgrokURLListCLI } from "./NgrokURLListCLI/NgrokURLListCLI";
-import { NgrokURLRemoveCLI } from "./NgrokURLRemoveCLI/NgrokURLRemoveCLI";
+import { NgrokURLAddCLI } from "@ava-cli/DevCLI/NgrokURLCLI/NgrokURLAddCLI/NgrokURLAddCLI";
+import { NgrokURLListCLI } from "@ava-cli/DevCLI/NgrokURLCLI/NgrokURLListCLI/NgrokURLListCLI";
+import { NgrokURLRemoveCLI } from "@ava-cli/DevCLI/NgrokURLCLI/NgrokURLRemoveCLI/NgrokURLRemoveCLI";
 
 /** Manage registered dev ngrok URLs for the dev-fanout-server. */
 export const NgrokCLI = Acclimate.createCLI("ngrok")

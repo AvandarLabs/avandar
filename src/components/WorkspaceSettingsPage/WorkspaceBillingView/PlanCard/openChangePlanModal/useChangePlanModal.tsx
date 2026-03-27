@@ -8,9 +8,9 @@ import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { Logger } from "@/utils/Logger";
-import { goToBillingPortal } from "../../BillingPortalButton/goToBillingPortal";
-import { ChangePlanModalContents } from "./ChangePlanModalContents";
-import type { SubscriptionPlan } from "../../SubscriptionPlan.types";
+import { goToBillingPortal } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal";
+import { ChangePlanModalContents } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/ChangePlanModalContents";
+import type { SubscriptionPlan } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 import type { FeaturePlanType } from "$/models/Subscription/Subscription.types";
 
 function featurePlanTypeToLevel(featurePlanType: FeaturePlanType): number {

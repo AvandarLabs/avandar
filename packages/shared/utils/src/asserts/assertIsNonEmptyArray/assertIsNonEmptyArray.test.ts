@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { assertIsNonEmptyArray } from "./assertIsNonEmptyArray.ts";
+import { assertIsNonEmptyArray } from "@utils/asserts/assertIsNonEmptyArray/assertIsNonEmptyArray.ts";
 
 describe("assertIsNonEmptyArray", () => {
   it("does not throw for non-empty arrays", () => {

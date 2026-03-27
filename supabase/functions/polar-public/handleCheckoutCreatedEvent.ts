@@ -1,10 +1,10 @@
+import { webhookSuccessResponse } from "@sbfn/polar-public/polarWebhookUtils.ts";
 import { infer as zInfer } from "zod";
-import { webhookSuccessResponse } from "./polarWebhookUtils.ts";
-import type { WebhookResponse } from "./polar-public.types.ts";
+import type { WebhookResponse } from "@sbfn/polar-public/polar-public.types.ts";
 import type {
-  PolarEventDataSchemas,
-  PolarWebhookHandlerOptions,
-} from "./PolarEventDataSchemas.ts";
+    PolarEventDataSchemas,
+    PolarWebhookHandlerOptions,
+} from "@sbfn/polar-public/PolarEventDataSchemas.ts";
 
 type CheckoutCreatedData = zInfer<typeof PolarEventDataSchemas.CheckoutCreated>;
 

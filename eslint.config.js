@@ -104,6 +104,17 @@ export default [
             controlComponents: [],
           },
         ],
+        "no-restricted-imports": [
+          "error",
+          {
+            patterns: [
+              {
+                regex: "^\\.{1,2}/",
+                message: "Use path aliases instead of relative imports.",
+              },
+            ],
+          },
+        ],
         "no-unused-vars": "off",
 
         // we use the @typescript-eslint one instead
@@ -171,6 +182,12 @@ export default [
           checkTypeImports: true,
         },
       ],
+    },
+  },
+  {
+    files: ["**/vitest.config.ts"],
+    rules: {
+      "no-restricted-imports": "off",
     },
   },
   {

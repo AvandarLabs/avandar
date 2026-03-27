@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { convertDatesToISOIn } from "./convertDatesToISOIn.ts";
+import { convertDatesToISOIn } from "@utils/objects/convertDatesToISOIn/convertDatesToISOIn.ts";
 
 describe("convertDatesToISOIn", () => {
   it("converts a Date to an ISO string", () => {

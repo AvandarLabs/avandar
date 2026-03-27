@@ -9,7 +9,7 @@ import {
 import { Tooltip } from "@ui/Tooltip/Tooltip";
 import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
 import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
-import { snakeCaseKeysShallow } from "@utils/objects/snakeCaseKeysShallow/snakeCaseKeysShallow";
+import { snakeCaseKeysShallow } from "@utils/objects/snakeCaseKeys/snakeCaseKeys";
 import { MIMEType } from "@utils/types/common.types";
 import { uuid } from "$/lib/uuid";
 import { csvCellValueSchema } from "$/lib/zodHelpers";
@@ -35,7 +35,7 @@ import { Logger } from "@/utils/Logger";
 import {
   DatasetImportForm,
   DatasetImportFormValues,
-} from "../DatasetUploadForm";
+} from "@/views/DataManagerApp/DataImportView/DatasetUploadForm/index";
 import type { UnknownObject } from "@utils/types/common.types";
 import type {
   Dataset,

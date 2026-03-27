@@ -1,10 +1,10 @@
 import { CustomField } from "@puckeditor/core";
 import { constant } from "@utils/misc/constant/constant";
-import { AvaPageFieldProps } from "../../AvaPage.types";
+import { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import {
   ContainerMaxWidthPField,
   ContainerMaxWidthValue,
-} from "./ContainerMaxWidthPField";
+} from "@/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/ContainerMaxWidthPField";
 
 // TODO(jpsyx): this should not be of type `unknown` and should be something
 // more specific

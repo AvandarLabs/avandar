@@ -6,7 +6,7 @@ import { objectKeys } from "@utils/objects/objectKeys";
 import type {
   GenericFormSchemaRecord,
   ValuesOfFieldRecord,
-} from "../AvaForm.types";
+} from "@/lib/ui/AvaForm/AvaForm.types";
 import type { FormType } from "@/lib/hooks/ui/useForm";
 import type { PathValue } from "@utils/objects/getValue/getValue";
 import type { StringKeyOf } from "@utils/types/utilities.types";

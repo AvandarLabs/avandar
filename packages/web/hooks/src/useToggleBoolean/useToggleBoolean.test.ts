@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { useToggleBoolean } from "./useToggleBoolean";
+import { useToggleBoolean } from "@hooks/useToggleBoolean/useToggleBoolean";
 
 describe("useToggleBoolean", () => {
   it("returns initial state", () => {

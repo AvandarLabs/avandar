@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { makeObjectFromEntries } from "./makeObjectFromEntries.ts";
-import type { Expect, IsEqual } from "../../types/test-utilities.types.ts";
+import { makeObjectFromEntries } from "@utils/objects/makeObjectFromEntries/makeObjectFromEntries.ts";
+import type { Expect, IsEqual } from "@utils/types/test-utilities.types.ts";
 
 describe("makeObjectFromEntries", () => {
   it("keeps the last value for duplicate keys across string and numeric entries", () => {

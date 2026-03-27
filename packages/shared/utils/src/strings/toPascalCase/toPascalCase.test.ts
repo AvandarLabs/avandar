@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toPascalCase } from "./toPascalCase.ts";
+import { toPascalCase } from "@utils/strings/toPascalCase/toPascalCase.ts";
 
 describe("toPascalCase", () => {
   it("converts simple lowercase words", () => {

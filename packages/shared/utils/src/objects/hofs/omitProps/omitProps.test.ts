@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { omitProps } from "./omitProps.ts";
+import { omitProps } from "@utils/objects/hofs/omitProps/omitProps.ts";
 
 describe("omitProps", () => {
   it("returns a function that omits a single key", () => {

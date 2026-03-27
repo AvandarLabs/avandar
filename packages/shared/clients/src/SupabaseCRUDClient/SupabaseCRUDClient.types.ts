@@ -1,14 +1,14 @@
 import type {
   ClientReturningOnlyPromises,
   ModelCRUDClient,
-} from "../ModelCRUDClient/ModelCRUDClient.types.ts";
+} from "@clients/ModelCRUDClient/ModelCRUDClient.types.ts";
 import type {
   RegisteredSupabaseDatabase,
   RegisteredSupabaseDatabaseTableNames,
   RegisteredSupabaseTableInsert,
   RegisteredSupabaseTableRow,
   RegisteredSupabaseTableUpdate,
-} from "../Register.types.ts";
+} from "@clients/Register.types.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { UnknownObject } from "@utils/types/common.types.ts";
 

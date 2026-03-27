@@ -2,7 +2,7 @@ import { spawn } from "node:child_process";
 import * as path from "node:path";
 import { Acclimate } from "@avandar/acclimate";
 import * as dotenv from "dotenv";
-import { getSupabaseScriptsList } from "./getSupabaseScriptsList";
+import { getSupabaseScriptsList } from "@ava-cli/SupabaseCLI/SupabaseRunCLI/getSupabaseScriptsList";
 
 const PROJECT_ROOT = path.join(process.cwd());
 

@@ -1,5 +1,5 @@
 import { registry } from "@utils/objects/registry/registry.ts";
-import type { ValuePickerRuleType } from "./DatasetColumnValueExtractor.types.ts";
+import type { ValuePickerRuleType } from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractor.types.ts";
 
 export const DatasetColumnValueExtractors = {
   ValuePickerTypes: registry<ValuePickerRuleType>().keys(
