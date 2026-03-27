@@ -5,7 +5,7 @@ import { toCamelCase } from "@utils/strings/toCamelCase/toCamelCase.ts";
 import type { UnknownArray, UnknownObject } from "@utils/types/common.types.ts";
 import type { CamelCase } from "@utils/types/utilities.types.ts";
 
-export type CamelCaseKeys<T, IsDeep extends boolean | undefined> =
+export type CamelCaseKeys<T, IsDeep extends boolean | undefined = false> =
   T extends UnknownArray ?
     IsDeep extends true ?
       T extends readonly [infer ItemType] ? [CamelCaseKeys<ItemType, true>]

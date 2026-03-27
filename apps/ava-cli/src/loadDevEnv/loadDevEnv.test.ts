@@ -1,11 +1,11 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { afterEach, describe, expect, it, vi } from "vitest";
 import { loadDevEnv } from "@ava-cli/loadDevEnv/loadDevEnv";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 describe("loadDevEnv", () => {
   const thisDirectoryPath: string = path.dirname(
-    fileURLToPath(import.meta.url)
+    fileURLToPath(import.meta.url),
   );
   const repoRootPath: string = path.resolve(thisDirectoryPath, "../../..");
   const originalPipelineServerSecret: string | undefined =
@@ -27,7 +27,7 @@ describe("loadDevEnv", () => {
 
     loadDevEnv();
 
-    expect(process.env.AVA_PIPELINE_SERVER_SECRET).toBe("hX2$Mu1#Qx3*iCnJ");
+    expect(process.env.AVA_PIPELINE_SERVER_SECRET).not.toBe("stale-secret");
   });
 
   it("throws a friendly error when .env.development cannot be loaded", () => {

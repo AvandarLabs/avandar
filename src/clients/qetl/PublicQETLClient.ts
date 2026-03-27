@@ -1,9 +1,8 @@
 import { createModule, Module } from "@modules/createModule";
-import { AuthClient } from "@/clients/AuthClient";
 import { LocalPublicDatasetClient } from "@/clients/datasets/LocalPublicDatasetClient";
-import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
 import { IQETLClient, QETLClientFactory } from "@/clients/qetl/QETLClient";
-import type { UnknownRow } from "@/clients/DuckDBClient/index";
+import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
+import type { UnknownRow } from "@/clients/DuckDBClient";
 import type { EmptyObject } from "@utils/types/common.types";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
@@ -76,17 +75,7 @@ export const PublicQETLClient = createModule("PublicQETLClient", {
         rawSQL: string;
         dashboardId: DashboardId;
       }): Promise<QueryResult<RowObject>> => {
-        const session = await AuthClient.getCurrentSession();
-        if (!session?.user) {
-          throw new Error(
-            "Cannot run query because user is not authenticated.",
-          );
-        }
-
-        const client = await _getClient({
-          dashboardId,
-        });
-
+        const client = await _getClient({ dashboardId });
         const queryResults = await client.runQuery<RowObject>({ rawSQL });
         return queryResults;
       },

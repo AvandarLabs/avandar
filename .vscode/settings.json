@@ -1,4 +1,5 @@
 {
+  "deno.suggest.autoImports": true,
   "deno.suggest.imports.autoDiscover": true,
   "deno.organizeImports.enabled": true,
   "deno.lint": false,
