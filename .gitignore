@@ -47,3 +47,7 @@ TODO.md
 
 # Ava CLI
 .ava/
+
+# ETL files
+etl-input/
+etl-output/

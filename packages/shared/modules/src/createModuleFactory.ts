@@ -30,7 +30,7 @@ export function createModuleFactory<ChildModule extends AnyModule>(
   },
 ): ModuleFactory<ChildModule> {
   return createModule(`${moduleName}Factory`, {
-    builder: () => {
+    builder() {
       return {
         create: (moduleState: StateOfModule<ChildModule>): ChildModule => {
           const { mixin, ...accessors } = createModule(moduleName, {

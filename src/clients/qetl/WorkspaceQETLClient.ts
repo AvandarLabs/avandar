@@ -22,7 +22,7 @@ export type IWorkspaceQETLClient = Module<
 >;
 
 export const WorkspaceQETLClient = createModule("WorkspaceQETLClient", {
-  builder: () => {
+  builder() {
     const clientCache: Record<`${Workspace.Id}_${UserId}`, IQETLClient> = {};
     const _getClient = async ({
       workspaceId,

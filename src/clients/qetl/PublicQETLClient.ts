@@ -20,7 +20,7 @@ export type IPublicQETLClient = Module<
 >;
 
 export const PublicQETLClient = createModule("PublicQETLClient", {
-  builder: () => {
+  builder() {
     const clientCache: Record<DashboardId, IQETLClient> = {};
     const _getClient = async ({
       dashboardId,

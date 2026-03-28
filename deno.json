@@ -1,6 +1,7 @@
 {
   "__comment": "This is the Deno config for the local repo. It is used only to make Deno type checking work locally. It is not loaded into Supabase edge functions",
   "workspace": [
+    "./packages/shared/etl-engine",
     "./packages/shared/clients",
     "./packages/shared/logger",
     "./packages/shared/models",
@@ -20,6 +21,7 @@
   "imports": {
     "$/": "./shared/",
     "@sbfn/": "./supabase/functions/",
+    "@etl-engine/": "./packages/shared/etl-engine/src/",
     "@clients/": "./packages/shared/clients/src/",
     "@logger/": "./packages/shared/logger/src/",
     "@models/": "./packages/shared/models/src/",
