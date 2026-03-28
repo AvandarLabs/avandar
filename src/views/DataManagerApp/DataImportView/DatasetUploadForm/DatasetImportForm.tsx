@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { useNavigate } from "@tanstack/react-router";
 import { notifyError, notifySuccess } from "@ui/notifications/notify";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock";
 import { AppConfig } from "@/config/AppConfig";
@@ -21,6 +21,7 @@ import { Callout } from "@/lib/ui/Callout";
 import type { UnknownObject } from "@utils/types/common.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.types";
 import type { DetectedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { FormErrors } from "@mantine/form";
 
 export type DatasetImportFormValues = {
   name: string;
@@ -30,6 +31,27 @@ export type DatasetImportFormValues = {
 
 const { maxDatasetNameLength, maxDatasetDescriptionLength } =
   AppConfig.dataManagerApp;
+
+const VALIDATION_FIELD_ORDER = ["name", "description"] as const;
+
+type ValidationField = (typeof VALIDATION_FIELD_ORDER)[number];
+
+function _errorMessageForField(
+  field: ValidationField,
+  value: string,
+): string | null {
+  if (field === "name") {
+    return value.length < maxDatasetNameLength ?
+        null
+      : `Dataset name must be under ${maxDatasetNameLength} characters ` +
+          `(current: ${value.length}).`;
+  }
+
+  return value.length < maxDatasetDescriptionLength ?
+      null
+    : `Description must be under ${maxDatasetDescriptionLength} characters ` +
+        `(current: ${value.length}).`;
+}
 
 type Props = {
   /**
@@ -84,13 +106,36 @@ export function DatasetImportForm({
 }: Props): JSX.Element {
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const descriptionInputRef = useRef<HTMLInputElement>(null);
+  const [showValidationSummary, setShowValidationSummary] = useState(false);
+
   const [numRowsToSkip, setNumRowsToSkip] = useState(
     loadCSVResult.csvSniff.SkipRows,
   );
   const [delimiter, setDelimiter] = useState(loadCSVResult.csvSniff.Delimiter);
+
+  const form = useForm<DatasetImportFormValues>({
+    initialValues: {
+      name: defaultName,
+      description: "",
+      onlineStorageAllowed: true,
+    },
+    validateInputOnChange: true,
+    validate: {
+      name: (value) => {
+        return _errorMessageForField("name", value);
+      },
+      description: (value) => {
+        return _errorMessageForField("description", value);
+      },
+    },
+  });
+
   const [saveDataset, isSavePending] = useMutation({
     mutationFn: doDatasetSave,
     onSuccess: async (savedDataset) => {
+      setShowValidationSummary(false);
       notifySuccess({
         title: "Dataset saved",
         message: `Dataset "${savedDataset.name}" saved successfully`,
@@ -127,23 +172,46 @@ export function DatasetImportForm({
     return rows.slice(0, AppConfig.dataManagerApp.maxPreviewRows);
   }, [rows]);
 
-  const form = useForm<DatasetImportFormValues>({
-    initialValues: {
-      name: defaultName,
-      description: "",
-      onlineStorageAllowed: true,
-    },
-    validateInputOnChange: true,
-    validate: {
-      name: (value) => {
-        return value.length < maxDatasetNameLength ? null : "Name is too long";
-      },
-      description: (value) => {
-        return value.length < maxDatasetDescriptionLength ?
-            null
-          : "Description is too long";
-      },
-    },
+  const onValidationFailure = (
+    errors: FormErrors,
+    _values: DatasetImportFormValues,
+  ) => {
+    setShowValidationSummary(true);
+
+    for (const field of VALIDATION_FIELD_ORDER) {
+      if (!errors[field]) {
+        continue;
+      }
+
+      const message =
+        typeof errors[field] === "string" ?
+          errors[field]
+        : "Please fix the highlighted fields.";
+
+      notifyError({
+        title: "Can't save dataset",
+        message,
+      });
+
+      const inputRef =
+        field === "name" ? nameInputRef : descriptionInputRef;
+      const node = inputRef.current;
+      if (node) {
+        node.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        node.focus({ preventScroll: true });
+      }
+      break;
+    }
+  };
+
+  const validationSummaryItems = VALIDATION_FIELD_ORDER.flatMap((field) => {
+    const err = form.errors[field];
+    if (!err) {
+      return [];
+    }
+    const label = field === "name" ? "Dataset name" : "Description";
+    const text = typeof err === "string" ? err : String(err);
+    return [{ field, line: `${label}: ${text}` }];
   });
 
   const renderProcessState = () => {
@@ -171,12 +239,18 @@ export function DatasetImportForm({
 
   return (
     <form
-      onSubmit={form.onSubmit((values) => {
-        saveDataset(values);
-      })}
+      onSubmit={form.onSubmit(
+        (values) => {
+          saveDataset(values);
+        },
+        (errors, values, _event) => {
+          onValidationFailure(errors, values);
+        },
+      )}
     >
       <Stack>
         <TextInput
+          ref={nameInputRef}
           key={form.key("name")}
           label="Dataset Name"
           placeholder="Enter a name for this dataset"
@@ -184,6 +258,7 @@ export function DatasetImportForm({
           {...form.getInputProps("name")}
         />
         <TextInput
+          ref={descriptionInputRef}
           key={form.key("description")}
           label="Description"
           placeholder="Enter a description for this dataset"
@@ -215,7 +290,7 @@ export function DatasetImportForm({
                 label="Delimiter"
                 value={delimiter}
                 onChange={(e) => {
-                  return setDelimiter(e.target.value);
+                  return setDelimiter(e.currentTarget.value);
                 }}
               />
               <Button
@@ -260,6 +335,29 @@ export function DatasetImportForm({
               type: "checkbox",
             })}
           />
+        : null}
+
+        {showValidationSummary && validationSummaryItems.length > 0 ?
+          <Callout
+            color="error"
+            title="Fix these issues before saving"
+            message="Scroll up to the fields above, or use the list below."
+          >
+            <Stack
+              component="ul"
+              gap="xs"
+              mt="xs"
+              style={{ listStyle: "disc", paddingInlineStart: "1.25rem" }}
+            >
+              {validationSummaryItems.map((item) => {
+                return (
+                  <Text component="li" key={item.field} size="sm" c="red.8">
+                    {item.line}
+                  </Text>
+                );
+              })}
+            </Stack>
+          </Callout>
         : null}
 
         <Button loading={isSavePending} type="submit" disabled={disableSubmit}>

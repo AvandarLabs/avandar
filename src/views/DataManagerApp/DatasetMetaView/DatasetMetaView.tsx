@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Container,
   FloatingIndicator,
@@ -114,12 +115,25 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   return (
     <Container py="md">
       <Stack>
-        <Group justify="space-between" align="center">
-          <Group gap="xs" align="center">
-            <Group gap="xxs" align="center">
-              <EditableDisplayText
-                name="dataset name"
-                value={datasetName}
+        <Group justify="space-between" align="center" wrap="nowrap" w="100%">
+          <Group
+            gap="xs"
+            align="center"
+            wrap="nowrap"
+            miw={0}
+            style={{ flex: 1 }}
+          >
+            <Group
+              gap="xxs"
+              align="center"
+              wrap="nowrap"
+              miw={0}
+              style={{ flex: 1 }}
+            >
+              <Box miw={0} style={{ flex: 1 }}>
+                <EditableDisplayText
+                  name="dataset name"
+                  value={datasetName}
                 onChange={setDatasetName}
                 onSave={(newName) => {
                   updateDataset({
@@ -154,7 +168,8 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                 fw="var(--mantine-h2-font-weight)"
                 fz="var(--mantine-h2-font-size)"
                 lh="var(--mantine-h2-line-height)"
-              />
+                />
+              </Box>
 
               {(
                 // only show the button if the source dataset has an
@@ -164,13 +179,15 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                 // this toggle is currently only supported for CSV datasets
                 dataset.sourceType === "csv_file"
               ) ?
-                <ToggleOfflineOnlyButton
-                  isInCloudStorage={
-                    datasetWithColumnsAndSource.source.isInCloudStorage
-                  }
-                  datasetId={dataset.id}
-                  csvFileDatasetId={datasetWithColumnsAndSource.source.id}
-                />
+                <Box style={{ flexShrink: 0 }}>
+                  <ToggleOfflineOnlyButton
+                    isInCloudStorage={
+                      datasetWithColumnsAndSource.source.isInCloudStorage
+                    }
+                    datasetId={dataset.id}
+                    csvFileDatasetId={datasetWithColumnsAndSource.source.id}
+                  />
+                </Box>
               : null}
             </Group>
           </Group>
