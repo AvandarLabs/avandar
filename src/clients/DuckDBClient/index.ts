@@ -19,7 +19,6 @@ import { DuckDBQueryAggregations } from "$/models/queries/QueryAggregationType/Q
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
-import { Logger } from "@/utils/Logger";
 import { arrowFieldToQueryResultField } from "@/clients/DuckDBClient/arrowFieldToQueryResultField";
 import {
   DuckDBColumnSchema,
@@ -31,6 +30,7 @@ import {
   DuckDBStructuredQuery,
 } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
+import { Logger } from "@/utils/Logger";
 import type {
   QueryResult,
   QueryResultPage,
@@ -733,35 +733,38 @@ class DuckDBClientImpl {
 
     const conn = await this.#connect();
     try {
-      const replaceClause = (() => {
-        if (!columnReplacements) {
-          return "";
-        }
-        const replacementSubClauses: string[] = objectEntries(
-          columnReplacements,
-        ).map(([colName, { alias, dataType }]) => {
+      const exclusions: string[] = [];
+      const replacements: string[] = [];
+
+      objectEntries(columnReplacements ?? {}).forEach(
+        ([colName, { alias, dataType }]) => {
           const newColumnName = alias ?? colName;
           const castPart =
             dataType ? `TRY_CAST("${colName}" AS ${dataType})` : `"${colName}"`;
           const newNamePart = ` AS "${newColumnName}"`;
-          return `${castPart}${newNamePart}`;
-        });
-
-        if (replacementSubClauses.length === 0) {
-          return "";
-        }
-        return `REPLACE (${replacementSubClauses.join(", ")})`;
-      })();
+          replacements.push(`${castPart}${newNamePart}`);
+          exclusions.push(`"${colName}"`);
+        },
+      );
 
       // Re-ingest the parquet data into a view (low-memory querying).
       await this.runRawQuery(
         `SET enable_external_file_cache = false;
 CREATE VIEW IF NOT EXISTS "$tableName$" AS
-    SELECT * $replaceClause$
+    SELECT * $excludeClause$ $replaceClause$
     FROM read_parquet("$tableName$");
 SET enable_external_file_cache = true;
             `,
-        { conn, params: { tableName, replaceClause } },
+        {
+          conn,
+          params: {
+            tableName,
+            replaceClause:
+              replacements.length > 0 ? `, ${replacements.join(", ")}` : "",
+            excludeClause:
+              exclusions.length > 0 ? `EXCLUDE (${exclusions.join(", ")})` : "",
+          },
+        },
       );
 
       // now let's collect all information we need to return
