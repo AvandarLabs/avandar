@@ -567,7 +567,10 @@ export type Database = {
           ended_at: string | null
           ends_at: string | null
           feature_plan_type: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
+          max_dashboards_allowed: number | null
+          max_datasets_allowed: number | null
           max_seats_allowed: number
+          max_shareable_dashboards_allowed: number | null
           polar_customer_email: string
           polar_customer_id: string
           polar_product_id: string
@@ -585,7 +588,10 @@ export type Database = {
           ended_at?: string | null
           ends_at?: string | null
           feature_plan_type: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
+          max_dashboards_allowed?: number | null
+          max_datasets_allowed?: number | null
           max_seats_allowed: number
+          max_shareable_dashboards_allowed?: number | null
           polar_customer_email: string
           polar_customer_id: string
           polar_product_id: string
@@ -603,7 +609,10 @@ export type Database = {
           ended_at?: string | null
           ends_at?: string | null
           feature_plan_type?: Database["public"]["Enums"]["subscriptions__feature_plan_type"]
+          max_dashboards_allowed?: number | null
+          max_datasets_allowed?: number | null
           max_seats_allowed?: number
+          max_shareable_dashboards_allowed?: number | null
           polar_customer_email?: string
           polar_customer_id?: string
           polar_product_id?: string

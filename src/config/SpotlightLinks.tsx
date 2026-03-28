@@ -1,7 +1,7 @@
 import { IconPencilPlus, IconUpload, IconUser } from "@tabler/icons-react";
 import { ReactNode } from "react";
-import { AppLink, AppLinkKey, AppLinks } from "./AppLinks";
-import { NavbarLinks } from "./NavbarLinks";
+import { AppLink, AppLinkKey, AppLinks } from "@/config/AppLinks";
+import { NavbarLinks } from "@/config/NavbarLinks";
 
 /**
  * This is a link that shows up in the Spotlight (Cmd+K) and is used

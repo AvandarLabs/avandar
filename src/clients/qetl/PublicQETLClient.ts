@@ -1,9 +1,8 @@
 import { createModule, Module } from "@modules/createModule";
-import { AuthClient } from "../AuthClient";
-import { LocalPublicDatasetClient } from "../datasets/LocalPublicDatasetClient";
-import { PublicDatasetParquetStorageClient } from "../storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
-import { IQETLClient, QETLClientFactory } from "./QETLClient";
-import type { UnknownRow } from "../DuckDBClient";
+import { LocalPublicDatasetClient } from "@/clients/datasets/LocalPublicDatasetClient";
+import { IQETLClient, QETLClientFactory } from "@/clients/qetl/QETLClient";
+import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
+import type { UnknownRow } from "@/clients/DuckDBClient";
 import type { EmptyObject } from "@utils/types/common.types";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
@@ -52,6 +51,11 @@ export const PublicQETLClient = createModule("PublicQETLClient", {
           const downloadedAt = new Date().toISOString();
 
           await LocalPublicDatasetClient.bulkInsert({
+            upsert: true,
+            onConflict: {
+              columnNames: ["datasetId"],
+              ignoreDuplicates: false,
+            },
             data: facts.map(({ datasetId, parquetBlob }) => {
               return {
                 dashboardId,
@@ -76,17 +80,7 @@ export const PublicQETLClient = createModule("PublicQETLClient", {
         rawSQL: string;
         dashboardId: DashboardId;
       }): Promise<QueryResult<RowObject>> => {
-        const session = await AuthClient.getCurrentSession();
-        if (!session?.user) {
-          throw new Error(
-            "Cannot run query because user is not authenticated.",
-          );
-        }
-
-        const client = await _getClient({
-          dashboardId,
-        });
-
+        const client = await _getClient({ dashboardId });
         const queryResults = await client.runQuery<RowObject>({ rawSQL });
         return queryResults;
       },

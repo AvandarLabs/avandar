@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isNumber } from "./isNumber.ts";
+import { isNumber } from "@utils/guards/isNumber/isNumber.ts";
 
 describe("isNumber", () => {
   it("returns true for numbers", () => {

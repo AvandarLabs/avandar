@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { propEq } from "./propEq.ts";
+import { propEq } from "@utils/objects/hofs/propEq/propEq.ts";
 
 describe("propEq", () => {
   it("returns true when the property equals the value", () => {

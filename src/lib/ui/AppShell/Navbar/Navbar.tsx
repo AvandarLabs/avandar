@@ -30,8 +30,8 @@ import { CreateWorkspaceForm } from "@/components/common/forms/CreateWorkspaceFo
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { Link } from "@/lib/ui/links/Link";
-import { Logo } from "../Logo";
-import css from "./Navbar.module.css";
+import { Logo } from "@/lib/ui/AppShell/Logo";
+import css from "@/lib/ui/AppShell/Navbar/Navbar.module.css";
 import type { AppLink } from "@/config/AppLinks";
 import type { NavbarLink } from "@/config/NavbarLinks";
 import type { Workspace } from "$/models/Workspace/Workspace";

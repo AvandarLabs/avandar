@@ -1,15 +1,15 @@
+import { defineRoutes, POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { handleCheckoutCreatedEvent } from "@sbfn/polar-public/handleCheckoutCreatedEvent.ts";
+import { handleSubscriptionCreatedEvent } from "@sbfn/polar-public/handleSubscriptionCreatedEvent.ts";
+import { handleSubscriptionUpdatedEvent } from "@sbfn/polar-public/handleSubscriptionUpdatedEvent.ts";
+import { PolarEventDataSchemas } from "@sbfn/polar-public/PolarEventDataSchemas.ts";
+import {
+    parseEventDataFailureResponse,
+    webhookFailureResponse,
+} from "@sbfn/polar-public/polarWebhookUtils.ts";
 import { match } from "ts-pattern";
 import { any, iso, object, record, string } from "zod";
-import { defineRoutes, POST } from "../_shared/MiniServer/MiniServer.ts";
-import { handleCheckoutCreatedEvent } from "./handleCheckoutCreatedEvent.ts";
-import { handleSubscriptionCreatedEvent } from "./handleSubscriptionCreatedEvent.ts";
-import { handleSubscriptionUpdatedEvent } from "./handleSubscriptionUpdatedEvent.ts";
-import { PolarEventDataSchemas } from "./PolarEventDataSchemas.ts";
-import {
-  parseEventDataFailureResponse,
-  webhookFailureResponse,
-} from "./polarWebhookUtils.ts";
-import type { PolarPublicAPI } from "./polar-public.types.ts";
+import type { PolarPublicAPI } from "@sbfn/polar-public/polar-public.types.ts";
 
 const MinimalPolarWebhookEventSchema = object({
   type: string(),

@@ -1,17 +1,17 @@
 import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
 import { pipe } from "@utils/misc/pipe/pipe.ts";
 import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
-import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeysDeep/snakeCaseKeysDeep.ts";
+import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeys/snakeCaseKeys.ts";
 import { z } from "zod";
-import type { DatasetId } from "../Dataset/Dataset.types.ts";
-import type {
-  GoogleSheetsDatasetId,
-  GoogleSheetsDatasetModel,
-} from "./GoogleSheetsDataset.types.ts";
 import type {
   Expect,
   ZodSchemaEqualsTypes,
 } from "@utils/types/test-utilities.types.ts";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
+import type {
+  GoogleSheetsDatasetId,
+  GoogleSheetsDatasetModel,
+} from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 
 const DBReadSchema = z.object({

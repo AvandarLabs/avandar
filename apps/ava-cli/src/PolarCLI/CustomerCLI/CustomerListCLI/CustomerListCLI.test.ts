@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { PolarCustomer } from "../../PolarClient/polarHelpers";
+import type { PolarCustomer } from "@ava-cli/PolarCLI/PolarClient/polarHelpers";
 
 type PolarConstructorArgs = Readonly<{
   accessToken: string;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isArrayValueOperator } from "./isArrayValueOperator.ts";
+import { isArrayValueOperator } from "@utils/filters/isArrayValueOperator/isArrayValueOperator.ts";
 
 describe("isArrayValueOperator", () => {
   it("identifies array-based operators", () => {

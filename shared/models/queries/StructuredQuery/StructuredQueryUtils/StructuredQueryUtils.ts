@@ -1,11 +1,11 @@
 import { Model } from "@models/Model/Model.ts";
-import { uuid } from "../../../../lib/uuid.ts";
-import { toRawDuckDBQuery } from "./toRawDuckDBQuery.ts";
+import { uuid } from "$/lib/uuid.ts";
+import { toRawDuckDBQuery } from "$/models/queries/StructuredQuery/StructuredQueryUtils/toRawDuckDBQuery.ts";
 import type {
   PartialStructuredQuery,
   StructuredQueryId,
   StructuredQueryRead,
-} from "../StructuredQuery.types.ts";
+} from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 
 export const StructuredQueryUtils = {
   makeEmpty: (): PartialStructuredQuery => {

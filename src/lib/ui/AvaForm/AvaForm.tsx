@@ -4,15 +4,15 @@ import { objectValues } from "@utils/objects/objectValues";
 import { useImperativeHandle, useMemo, useRef } from "react";
 import { match } from "ts-pattern";
 import { useForm } from "@/lib/hooks/ui/useForm";
-import { hydrateTextFieldSchema } from "./AvaTextInput/hydrateTextFieldSchema";
-import { UnknownAvaInput } from "./UnknownAvaInput";
+import { hydrateTextFieldSchema } from "@/lib/ui/AvaForm/AvaTextInput/hydrateTextFieldSchema";
+import { UnknownAvaInput } from "@/lib/ui/AvaForm/UnknownAvaInput";
 import type {
   AvaFormRef,
   FormFieldSchema,
   GenericFormSchemaRecord,
   ValidBaseValueType,
   ValuesOfFieldRecord,
-} from "./AvaForm.types";
+} from "@/lib/ui/AvaForm/AvaForm.types";
 import type { FormRulesRecord, UseFormInput } from "@/lib/hooks/ui/useForm";
 import type { StringKeyOf } from "@utils/types/utilities.types";
 import type { ReactElement, ReactNode, Ref } from "react";

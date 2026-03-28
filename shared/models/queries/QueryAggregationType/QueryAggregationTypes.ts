@@ -1,6 +1,6 @@
 import { constant } from "@utils/misc/constant/constant.ts";
 import { match } from "ts-pattern";
-import type { QueryAggregationType } from "./QueryAggregationType.types.ts";
+import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
 
 export type DuckDBQueryAggregationType =
   | "sum"

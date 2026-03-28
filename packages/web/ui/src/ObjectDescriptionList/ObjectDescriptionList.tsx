@@ -1,11 +1,11 @@
-import { ValueItemContainer } from "./ValueItemContainer";
-import type { DescribableValueArrayBlockProps } from "./DescribableValueArrayBlock";
+import { ValueItemContainer } from "@ui/ObjectDescriptionList/ValueItemContainer";
+import type { DescribableValueArrayBlockProps } from "@ui/ObjectDescriptionList/DescribableValueArrayBlock/index";
 import type {
   AnyDescribableValueRenderOptions,
   DescribableObject,
   GenericRootData,
-} from "./ObjectDescriptionList.types";
-import type { ObjectDescriptionListBlockProps } from "./ObjectDescriptionListBlock";
+} from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
+import type { ObjectDescriptionListBlockProps } from "@ui/ObjectDescriptionList/ObjectDescriptionListBlock";
 
 type DescribableObjectProps<
   T extends DescribableObject,

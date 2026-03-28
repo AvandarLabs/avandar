@@ -2,10 +2,10 @@ import { Box } from "@mantine/core";
 import { Select, SelectData } from "@ui/inputs/Select/Select";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
 import { match } from "ts-pattern";
-import { DataExplorerStateManager } from "../DataExplorerStateManager/DataExplorerStateManager";
-import { BarChartForm } from "./BarChartForm";
-import { LineChartForm } from "./LineChartForm";
-import { ScatterChartForm } from "./ScatterChartForm";
+import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import { BarChartForm } from "@/views/DataExplorerApp/VizSettingsForm/BarChartForm";
+import { LineChartForm } from "@/views/DataExplorerApp/VizSettingsForm/LineChartForm";
+import { ScatterChartForm } from "@/views/DataExplorerApp/VizSettingsForm/ScatterChartForm";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { VizType } from "$/models/vizs/VizConfig/VizConfig.types";
 

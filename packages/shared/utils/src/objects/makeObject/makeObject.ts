@@ -1,5 +1,5 @@
-import { constant } from "../../misc/constant/constant.ts";
-import { identity } from "../../misc/identity.ts";
+import { constant } from "@utils/misc/constant/constant.ts";
+import { identity } from "@utils/misc/identity.ts";
 import type { ConditionalKeys } from "type-fest";
 
 type ObjectKeyValue<T, InK extends ConditionalKeys<T, PropertyKey>> = Extract<

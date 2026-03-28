@@ -1,11 +1,11 @@
-import { isArray } from "../../guards/isArray/isArray.ts";
-import { isPlainObject } from "../../guards/isPlainObject/isPlainObject.ts";
-import { toCamelCase } from "../../strings/toCamelCase/toCamelCase.ts";
-import { objectKeys } from "../objectKeys.ts";
-import type { UnknownArray, UnknownObject } from "../../types/common.types.ts";
-import type { CamelCase } from "../../types/utilities.types.ts";
+import { isArray } from "@utils/guards/isArray/isArray.ts";
+import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject.ts";
+import { objectKeys } from "@utils/objects/objectKeys.ts";
+import { toCamelCase } from "@utils/strings/toCamelCase/toCamelCase.ts";
+import type { UnknownArray, UnknownObject } from "@utils/types/common.types.ts";
+import type { CamelCase } from "@utils/types/utilities.types.ts";
 
-type CamelCaseKeys<T, IsDeep extends boolean | undefined> =
+export type CamelCaseKeys<T, IsDeep extends boolean | undefined = false> =
   T extends UnknownArray ?
     IsDeep extends true ?
       T extends readonly [infer ItemType] ? [CamelCaseKeys<ItemType, true>]

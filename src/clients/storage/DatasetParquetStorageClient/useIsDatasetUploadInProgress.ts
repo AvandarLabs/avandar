@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { DatasetUploadProgressStore } from "./DatasetUploadProgressStore";
+import { DatasetUploadProgressStore } from "@/clients/storage/DatasetParquetStorageClient/DatasetUploadProgressStore";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 /**

@@ -11,9 +11,9 @@ import {
 } from "@mantine/core";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { Paper } from "@/lib/ui/Paper/Paper";
-import { CURRENT_SCHEMA_VERSION } from "../AvaPage/migrations/config";
-import { buildDataVizPBlockConfig } from "../AvaPage/pblocks/DataVizPBlock/buildDataVizPBlockConfig";
-import { buildContainerMaxWidthPFieldConfig } from "../AvaPage/pfields/ContainerMaxWidthPField/buildContainerMaxWidthPFieldConfig";
+import { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
+import { buildDataVizPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/buildDataVizPBlockConfig";
+import { buildContainerMaxWidthPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/buildContainerMaxWidthPFieldConfig";
 import type {
   AvaPageConfig,
   AvaPageData,
@@ -30,7 +30,7 @@ import type {
   SectionProps,
   SlotRenderer,
   TableBlockProps,
-} from "../AvaPage/AvaPage.types";
+} from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { ReactNode } from "react";
 
 function _isRecord(value: unknown): value is Record<string, unknown> {

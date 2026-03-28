@@ -12,7 +12,7 @@ import { IconTrash } from "@tabler/icons-react";
 import {
   EntityConfigFormValues,
   makeDefaultManualEntryField,
-} from "./entityConfigFormTypes";
+} from "@/components/EntityDesignerApp/EntityConfigCreatorView/entityConfigFormTypes";
 import type { FormType } from "@/lib/hooks/ui/useForm";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
 

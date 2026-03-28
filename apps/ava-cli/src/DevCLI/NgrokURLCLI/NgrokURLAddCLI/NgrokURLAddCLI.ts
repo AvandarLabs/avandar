@@ -1,6 +1,10 @@
+import { sendNgrokURLManagerRequest } from "@ava-cli/DevCLI/NgrokURLCLI/sendNgrokURLManagerRequest";
+import {
+  printError,
+  printInfo,
+  printSuccess,
+} from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
-import { printError, printInfo, printSuccess } from "../../../utils/cliOutput/cliOutput";
-import { sendNgrokURLManagerRequest } from "../sendNgrokURLManagerRequest";
 
 /**
  * Add a dev ngrok URL to the registry.

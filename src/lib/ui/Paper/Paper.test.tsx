@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@/utils/testingUtils";
-import { Paper } from "./Paper";
+import { Paper } from "@/lib/ui/Paper/Paper";
 
 describe("Paper", () => {
   it("renders without crashing", () => {

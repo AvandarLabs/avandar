@@ -9,12 +9,12 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
-import { DatasetUploadProgressStore } from "./DatasetUploadProgressStore";
+import { DatasetUploadProgressStore } from "@/clients/storage/DatasetParquetStorageClient/DatasetUploadProgressStore";
 import {
   DIRECT_UPLOAD_MAX_BYTES,
   getDatasetParquetStoragePath,
   WORKSPACES_BUCKET_NAME,
-} from "./utils";
+} from "@/clients/storage/DatasetParquetStorageClient/utils";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 

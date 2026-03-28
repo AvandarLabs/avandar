@@ -1,5 +1,5 @@
-import type { DatasetColumnValueExtractorModel } from "./DatasetColumnValueExtractor/DatasetColumnValueExtractor.types.ts";
-import type { ManualEntryExtractorModel } from "./ManualEntryExtractor/ManualEntryExtractor.types.ts";
+import type { DatasetColumnValueExtractorModel } from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractor.types.ts";
+import type { ManualEntryExtractorModel } from "$/models/EntityConfig/ValueExtractor/ManualEntryExtractor/ManualEntryExtractor.types.ts";
 import type { Enums } from "$/types/database.types.ts";
 
 export type ValueExtractorType =

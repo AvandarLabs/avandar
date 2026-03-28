@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { makeMap } from "./makeMap.ts";
+import { makeMap } from "@utils/maps/makeMap/makeMap.ts";
 
 describe("makeMap", () => {
   it("maps using property keys when key/valueKey are provided", () => {

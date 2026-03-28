@@ -22,8 +22,8 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useForm } from "@/lib/hooks/ui/useForm";
 import { Select } from "@ui/inputs/Select/Select";
 import { Paper } from "@/lib/ui/Paper/Paper";
-import { DatasetColumnFieldsBlock } from "./DatasetColumnFieldsBlock";
-import { EntityConfigCreatorStore } from "./EntityConfigCreatorStore";
+import { DatasetColumnFieldsBlock } from "@/components/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index";
+import { EntityConfigCreatorStore } from "@/components/EntityDesignerApp/EntityConfigCreatorView/EntityConfigCreatorStore/index";
 import {
   EntityConfigFormSubmitValues,
   EntityConfigFormType,
@@ -31,9 +31,9 @@ import {
   getDefaultEntityConfigFormValues,
   makeDefaultDatasetColumnField,
   makeDefaultManualEntryField,
-} from "./entityConfigFormTypes";
-import { ManualEntryFieldsBlock } from "./ManualEntryFieldsBlock";
-import { useSubmitEntityCreatorForm } from "./useSubmitEntityCreatorForm";
+} from "@/components/EntityDesignerApp/EntityConfigCreatorView/entityConfigFormTypes";
+import { ManualEntryFieldsBlock } from "@/components/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock";
+import { useSubmitEntityCreatorForm } from "@/components/EntityDesignerApp/EntityConfigCreatorView/useSubmitEntityCreatorForm";
 
 const IS_MANUAL_DATA_DISABLED = isFlagEnabled(FeatureFlag.DisableManualData);
 

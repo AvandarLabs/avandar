@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { excludeUndefinedDeep } from "./excludeUndefinedDeep.ts";
+import { excludeUndefinedDeep } from "@utils/objects/excludeUndefinedDeep/excludeUndefinedDeep.ts";
 
 describe("excludeUndefinedDeep", () => {
   describe("primitives and non-object values", () => {

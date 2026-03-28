@@ -8,7 +8,7 @@ import {
   SegmentedControlItem,
 } from "@/lib/ui/inputs/SegmentedControl";
 import { mantineColorVar, mantineVar } from "@/lib/utils/browser/css";
-import { MapStyleKey, MapStyleKeys } from "./mapStyles";
+import { MapStyleKey, MapStyleKeys } from "@/components/GISApp/DataMap/mapStyles";
 
 type MapStyle = {
   url: string;

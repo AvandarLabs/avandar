@@ -1,5 +1,5 @@
-import { omit } from "../../omit/omit.ts";
-import type { UnknownObject } from "../../../types/common.types.ts";
+import { omit } from "@utils/objects/omit/omit.ts";
+import type { UnknownObject } from "@utils/types/common.types.ts";
 
 /**
  * Returns a function that removes the specified keys from an object.

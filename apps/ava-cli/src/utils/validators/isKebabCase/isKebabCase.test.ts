@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isKebabCase } from "./isKebabCase";
+import { isKebabCase } from "@ava-cli/utils/validators/isKebabCase/isKebabCase";
 
 describe("isKebabCase", () => {
   it("returns a validator function", () => {

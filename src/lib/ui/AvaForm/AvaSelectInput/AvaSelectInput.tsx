@@ -6,7 +6,7 @@ import {
 import type {
   GenericFormSchemaRecord,
   ValuesOfFieldRecord,
-} from "../AvaForm.types";
+} from "@/lib/ui/AvaForm/AvaForm.types";
 import type { FormType } from "@/lib/hooks/ui/useForm";
 import type { Paths } from "type-fest";
 

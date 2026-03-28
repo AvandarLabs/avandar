@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { coerceDatesInProps } from "./coerceDatesInProps.ts";
+import { coerceDatesInProps } from "@utils/objects/hofs/coerceDatesInProps/coerceDatesInProps.ts";
 
 describe("coerceDatesInProps", () => {
   it("returns a function that coerces keys to dates", () => {

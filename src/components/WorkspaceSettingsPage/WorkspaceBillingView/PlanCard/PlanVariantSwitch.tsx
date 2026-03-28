@@ -4,11 +4,11 @@ import {
   isValidFreePlanVariant,
   isValidPaidPlanVariant,
   PAID_CHOICES,
-} from "../planUtils";
+} from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/planUtils";
 import type {
   FreePlanVariants,
   PaidPlanVariants,
-} from "../SubscriptionPlan.types";
+} from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 
 type Props = {
   withHighlight?: boolean;

@@ -1,12 +1,12 @@
 import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { beforeAll, describe, expect, it } from "vitest";
-import { AvaPageDataMigrator } from "../AvaPageDataMigrator";
-import { getVersionFromAvaPageData } from "../getVersionFromAvaPageData";
-import { AvaPageDataMigrationV1 } from "./AvaPageDataMigrationV1";
+import { AvaPageDataMigrator } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
+import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
+import { AvaPageDataMigrationV1 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV1/AvaPageDataMigrationV1";
 import type {
   V0_AvaPageData,
   V1_AvaPageData,
-} from "./AvaPageDataMigrationV1.types";
+} from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV1/AvaPageDataMigrationV1.types";
 
 const TEST_PROMPT = "Find all covid data";
 const TEST_SQL = "SELECT * FROM some_covid_table;";

@@ -1,6 +1,6 @@
 import { formRootRule, useForm as mantineUseForm } from "@mantine/form";
-import { useKeysAndPropsCallback } from "./useKeysAndPropsCallback";
-import type { FormType } from "./useForm.types";
+import { useKeysAndPropsCallback } from "@/lib/hooks/ui/useForm/useKeysAndPropsCallback";
+import type { FormType } from "@/lib/hooks/ui/useForm/useForm.types";
 import type {
   FormErrors,
   UseFormInput as MantineUseFormInput,

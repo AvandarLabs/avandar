@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isBoolean } from "./isBoolean.ts";
+import { isBoolean } from "@utils/guards/isBoolean/isBoolean.ts";
 
 describe("isBoolean", () => {
   it("returns true for booleans", () => {

@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-imports */
 /** @type {import('tailwindcss').Config} */
 import { DEFAULT_THEME } from "@mantine/core";
 import { Theme } from "./src/config/Theme";

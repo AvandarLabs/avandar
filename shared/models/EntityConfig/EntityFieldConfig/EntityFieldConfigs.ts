@@ -1,4 +1,4 @@
-import type { ValueExtractorType } from "../ValueExtractor/ValueExtractor.types.ts";
+import type { ValueExtractorType } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types.ts";
 
 export const EntityFieldConfigs = {
   ValueExtractorTypesMetadata: {

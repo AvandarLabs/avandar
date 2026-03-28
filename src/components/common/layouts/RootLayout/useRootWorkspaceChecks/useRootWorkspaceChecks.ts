@@ -1,6 +1,6 @@
-import { useEnsureLocalStoragePersistence } from "./useEnsureLocalStoragePersistence";
-import { useEnsureWorkspaceBilling } from "./useEnsureWorkspaceBilling";
-import { useSyncLocalDatasets } from "./useSyncLocalDatasets";
+import { useEnsureLocalStoragePersistence } from "@/components/common/layouts/RootLayout/useRootWorkspaceChecks/useEnsureLocalStoragePersistence";
+import { useEnsureWorkspaceBilling } from "@/components/common/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling";
+import { useSyncLocalDatasets } from "@/components/common/layouts/RootLayout/useRootWorkspaceChecks/useSyncLocalDatasets";
 
 /**
  * These are all checks that need to run at the root level of a workspace.

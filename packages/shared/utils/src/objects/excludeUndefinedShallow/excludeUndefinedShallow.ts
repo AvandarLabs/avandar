@@ -1,6 +1,6 @@
-import { isUndefined } from "../../guards/isUndefined/isUndefined.ts";
-import { objectKeys } from "../objectKeys.ts";
-import type { UnknownObject } from "../../types/common.types.ts";
+import { isUndefined } from "@utils/guards/isUndefined/isUndefined.ts";
+import { objectKeys } from "@utils/objects/objectKeys.ts";
+import type { UnknownObject } from "@utils/types/common.types.ts";
 
 /** The result type of `excludeUndefinedShallow`. */
 export type ExcludeUndefinedShallow<T extends UnknownObject> = {
