@@ -51,6 +51,11 @@ export const PublicQETLClient = createModule("PublicQETLClient", {
           const downloadedAt = new Date().toISOString();
 
           await LocalPublicDatasetClient.bulkInsert({
+            upsert: true,
+            onConflict: {
+              columnNames: ["datasetId"],
+              ignoreDuplicates: false,
+            },
             data: facts.map(({ datasetId, parquetBlob }) => {
               return {
                 dashboardId,

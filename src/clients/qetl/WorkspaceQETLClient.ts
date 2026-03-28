@@ -51,6 +51,11 @@ export const WorkspaceQETLClient = createModule("WorkspaceQETLClient", {
           facts: Array<{ datasetId: DatasetId; parquetBlob: Blob }>;
         }) => {
           await LocalDatasetClient.bulkInsert({
+            upsert: true,
+            onConflict: {
+              columnNames: ["datasetId"],
+              ignoreDuplicates: false,
+            },
             data: facts.map(({ datasetId, parquetBlob }) => {
               return {
                 datasetId,
