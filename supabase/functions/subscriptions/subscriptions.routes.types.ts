@@ -39,6 +39,7 @@ export type SubscriptionsAPI = APITypeDef<
   [
     "/fetch-and-sync",
     "/:subscriptionId/product",
+    "/:subscriptionId/seats",
     "/products",
     "/checkout-url/:productId",
     "/customer-portal/:userId",
@@ -69,6 +70,21 @@ export type SubscriptionsAPI = APITypeDef<
         };
         body: {
           newPolarProductId: string;
+        };
+        returnType: {
+          subscription: Tables<"subscriptions">;
+        };
+      };
+    };
+
+    "/:subscriptionId/seats": {
+      /** Update a subscription's seat count. */
+      PATCH: {
+        pathParams: {
+          subscriptionId: string;
+        };
+        body: {
+          seatsToAdd: number;
         };
         returnType: {
           subscription: Tables<"subscriptions">;

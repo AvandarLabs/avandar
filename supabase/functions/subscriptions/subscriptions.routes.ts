@@ -7,6 +7,7 @@ import { getDevOverrideEmail } from "$/env/getDevOverrideEmail.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { match } from "ts-pattern";
 import { z } from "zod";
+import { UpdateSubscriptionSeats } from "@sbfn/subscriptions/[subscriptionId].seats.ts";
 import type {
   AvaPolarProduct,
   SubscriptionsAPI,
@@ -22,6 +23,10 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
 
   "/:subscriptionId/product": {
     PATCH: UpdateSubscriptionProduct,
+  },
+
+  "/:subscriptionId/seats": {
+    PATCH: UpdateSubscriptionSeats,
   },
 
   /**
