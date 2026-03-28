@@ -4,6 +4,7 @@ import { email, string, url, uuid } from "zod";
 import { defineRoutes, GET } from "../_shared/MiniServer/MiniServer.ts";
 import { PolarClient } from "../_shared/PolarClient/PolarClient.ts";
 import { UpdateSubscriptionProduct } from "./[subscriptionId].product.ts";
+import { UpdateSubscriptionSeats } from "./[subscriptionId].seats.ts";
 import { FetchAndSyncUserSubscriptions } from "./fetch-and-sync.ts";
 import type {
   AvaPolarProduct,
@@ -20,6 +21,10 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
 
   "/:subscriptionId/product": {
     PATCH: UpdateSubscriptionProduct,
+  },
+
+  "/:subscriptionId/seats": {
+    PATCH: UpdateSubscriptionSeats,
   },
 
   /**
