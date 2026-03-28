@@ -1,0 +1,23 @@
+{
+  "name": "@avandar/etl-engine",
+  "version": "0.1.0",
+  "description": "Avandar ETL library",
+  "license": "CPAL-1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@avandar/modules": "workspace:*",
+    "duckdb": "^1.4.4"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vitest": "^3.2.4"
+  }
+}

@@ -10,17 +10,17 @@ import { Dataset, DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import { DuckDBDataType } from "$/models/datasets/DatasetColumn/DuckDBDataTypes";
 import { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types";
 import { match } from "ts-pattern";
+import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
 import { DuckDBClient, UnknownRow } from "@/clients/DuckDBClient";
 import { DuckDBLoadParquetResult } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { difference } from "@/lib/utils/arrays/difference/difference";
 import { promiseFlatMap, promiseMap } from "@/lib/utils/promises";
-import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
-import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
 import type { Module } from "@modules/createModule";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
@@ -98,7 +98,7 @@ type DiceExtractor =
 export const QETLClientFactory = createModuleFactory<IQETLClient>(
   "QETLClient",
   {
-    childBuilder: (module) => {
+    childBuilder(module) {
       const { getDiceFromSQL, insertToStorageCache } = module.getState();
 
       // The Memory Cube is an in-memory DuckDB instance.
