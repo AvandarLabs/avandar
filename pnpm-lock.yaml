@@ -178,6 +178,9 @@ importers:
       '@nabla/vite-plugin-eslint':
         specifier: ^2.0.5
         version: 2.0.6(eslint@9.39.3(jiti@1.21.7))(vite@7.3.1(@types/node@25.3.4)(jiti@1.21.7)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0))
+      '@playwright/test':
+        specifier: ^1.58.2
+        version: 1.58.2
       '@polar-sh/sdk':
         specifier: ^0.41.5
         version: 0.41.5
@@ -186,7 +189,7 @@ importers:
         version: 0.19.0
       '@react-email/preview-server':
         specifier: ^5.0.5
-        version: 5.2.9(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3)
+        version: 5.2.9(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3)
       '@tanstack/eslint-plugin-query':
         specifier: ^5.68.0
         version: 5.91.4(eslint@9.39.3(jiti@1.21.7))(typescript@5.9.3)
@@ -1829,6 +1832,11 @@ packages:
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
+
+  '@playwright/test@1.58.2':
+    resolution: {integrity: sha512-akea+6bHYBBfA9uQqSYmlJXn61cTa+jbO87xVLCWbTqbWadRVmhxlXATaOjOgcBaWU4ePo0wB41KMFv3o35IXA==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   '@polar-sh/sdk@0.41.5':
     resolution: {integrity: sha512-E+VoVV+WvebZKmj+KZ/fj1byBZbG7J8hHyzYD9kktvAToigPM19sywo2tFCHeb44aWGCVACMOP8r31e6je7dxA==}
@@ -4538,6 +4546,11 @@ packages:
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
 
+  fsevents@2.3.2:
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
+    os: [darwin]
+
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -5878,6 +5891,16 @@ packages:
 
   pkg-types@2.3.0:
     resolution: {integrity: sha512-SIqCzDRg0s9npO5XQ3tNZioRY1uK06lA41ynBC1YmFTmnY6FjUjVt6s4LoADmwoig1qqD0oK8h1p/8mlMx8Oig==}
+
+  playwright-core@1.58.2:
+    resolution: {integrity: sha512-yZkEtftgwS8CsfYo7nm0KE8jsvm6i/PTgVtB8DL726wNf6H2IMsDuxCpJj59KDaxCtSnrWan2AeDqM7JBaultg==}
+    engines: {node: '>=18'}
+    hasBin: true
+
+  playwright@1.58.2:
+    resolution: {integrity: sha512-vA30H8Nvkq/cPBnNw4Q8TWz1EJyqgpuinBcHET0YVJVFldr8JDNiU9LaWAE1KqSkRYazuaBhTpB5ZzShOezQ6A==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
@@ -8636,6 +8659,10 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
+  '@playwright/test@1.58.2':
+    dependencies:
+      playwright: 1.58.2
+
   '@polar-sh/sdk@0.41.5':
     dependencies:
       standardwebhooks: 1.0.0
@@ -8992,10 +9019,10 @@ snapshots:
       marked: 15.0.12
       react: 19.2.4
 
-  '@react-email/preview-server@5.2.9(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3)':
+  '@react-email/preview-server@5.2.9(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3)':
     dependencies:
       esbuild: 0.25.10
-      next: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3)
+      next: 16.1.6(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3)
     transitivePeerDependencies:
       - '@babel/core'
       - '@opentelemetry/api'
@@ -10087,14 +10114,6 @@ snapshots:
       magic-string: 0.30.21
     optionalDependencies:
       vite: 7.3.1(@types/node@25.3.4)(jiti@1.21.7)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0)
-
-  '@vitest/mocker@3.2.4(vite@7.3.1(@types/node@25.3.4)(jiti@2.4.2)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0))':
-    dependencies:
-      '@vitest/spy': 3.2.4
-      estree-walker: 3.0.3
-      magic-string: 0.30.21
-    optionalDependencies:
-      vite: 7.3.1(@types/node@25.3.4)(jiti@2.4.2)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0)
 
   '@vitest/pretty-format@3.2.4':
     dependencies:
@@ -11607,6 +11626,9 @@ snapshots:
 
   fs.realpath@1.0.0: {}
 
+  fsevents@2.3.2:
+    optional: true
+
   fsevents@2.3.3:
     optional: true
 
@@ -12658,7 +12680,7 @@ snapshots:
 
   negotiator@0.6.3: {}
 
-  next@16.1.6(@babel/core@7.29.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3):
+  next@16.1.6(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.3):
     dependencies:
       '@next/env': 16.1.6
       '@swc/helpers': 0.5.15
@@ -12677,6 +12699,7 @@ snapshots:
       '@next/swc-linux-x64-musl': 16.1.6
       '@next/swc-win32-arm64-msvc': 16.1.6
       '@next/swc-win32-x64-msvc': 16.1.6
+      '@playwright/test': 1.58.2
       sass: 1.97.3
       sharp: 0.34.5
     transitivePeerDependencies:
@@ -13064,6 +13087,14 @@ snapshots:
       confbox: 0.2.4
       exsolve: 1.0.8
       pathe: 2.0.3
+
+  playwright-core@1.58.2: {}
+
+  playwright@1.58.2:
+    dependencies:
+      playwright-core: 1.58.2
+    optionalDependencies:
+      fsevents: 2.3.2
 
   possible-typed-array-names@1.1.0: {}
 
@@ -14864,7 +14895,7 @@ snapshots:
     dependencies:
       '@types/chai': 5.2.3
       '@vitest/expect': 3.2.4
-      '@vitest/mocker': 3.2.4(vite@7.3.1(@types/node@25.3.4)(jiti@2.4.2)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0))
+      '@vitest/mocker': 3.2.4(vite@7.3.1(@types/node@25.3.4)(jiti@1.21.7)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0))
       '@vitest/pretty-format': 3.2.4
       '@vitest/runner': 3.2.4
       '@vitest/snapshot': 3.2.4
