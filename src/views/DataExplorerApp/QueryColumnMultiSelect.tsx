@@ -1,4 +1,8 @@
-import { MultiSelect, MultiSelectProps } from "@mantine/core";
+import {
+  defaultOptionsFilter,
+  isOptionsGroup,
+  MultiSelect,
+} from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
 import { Model } from "@models/Model/Model";
 import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
@@ -7,15 +11,39 @@ import { isNonNullish } from "@utils/guards/isNonNullish/isNonNullish";
 import { makeIdLookupMap } from "@utils/index";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
+import { matchSorter } from "match-sorter";
 import { useEffect, useMemo } from "react";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
+import type {
+  ComboboxItem,
+  ComboboxParsedItem,
+  MultiSelectProps,
+  OptionsFilter,
+} from "@mantine/core";
 import type {
   QueryColumn,
   QueryColumnId,
 } from "$/models/queries/QueryColumn/QueryColumn.types";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { ReactNode } from "react";
+
+/**
+ * Maps combobox option values to items, including nested group items.
+ */
+function _optionByValueFromParsed(
+  options: ComboboxParsedItem[],
+): Map<string, ComboboxItem> {
+  const entries = options.flatMap((item) => {
+    if (isOptionsGroup(item)) {
+      return item.items.map((subItem) => {
+        return [subItem.value, subItem] as const;
+      });
+    }
+    return [[item.value, item] as const];
+  });
+  return new Map(entries);
+}
 
 type Props = {
   label: ReactNode;
@@ -62,8 +90,8 @@ export function QueryColumnMultiSelect({
 
   const isLoading = isLoadingDatasetColumns || isLoadingEntityFieldConfigs;
 
-  const { selectableOptions, queryColumnLookup } = useMemo(() => {
-    const queryColumns = [
+  const { queryColumns, selectableOptions, queryColumnLookup } = useMemo(() => {
+    const columns = [
       ...(datasetColumns ?? []).map((col) => {
         return QueryColumns.makeFromDatasetColumn(col);
       }),
@@ -73,13 +101,37 @@ export function QueryColumnMultiSelect({
     ];
 
     return {
-      selectableOptions: makeSelectOptions(queryColumns, {
-        valueFn: prop("id"),
+      queryColumns: columns,
+      selectableOptions: makeSelectOptions(columns, {
+        valueKey: "id",
         labelFn: prop("baseColumn.name"),
       }),
-      queryColumnLookup: makeIdLookupMap(queryColumns),
+      queryColumnLookup: makeIdLookupMap(columns),
     };
   }, [datasetColumns, entityFieldConfigs]);
+
+  const matchColumnFilter = useMemo((): OptionsFilter => {
+    return ({ options, search, limit }) => {
+      const trimmedSearch = search.trim();
+      if (trimmedSearch === "") {
+        return defaultOptionsFilter({ options, search, limit });
+      }
+      const optionByValue = _optionByValueFromParsed(options);
+      const matchedColumns = matchSorter(queryColumns, trimmedSearch, {
+        keys: [
+          (column) => {
+            return column.baseColumn.name;
+          },
+        ],
+      });
+      return matchedColumns
+        .map((column) => {
+          return optionByValue.get(column.id);
+        })
+        .filter(isNonNullish)
+        .slice(0, limit);
+    };
+  }, [queryColumns]);
 
   // If the available columns change (e.g. if the `dataSourceId` changed)
   // we should drop any selections that are no longer valid.
@@ -115,6 +167,7 @@ export function QueryColumnMultiSelect({
       }}
       nothingFoundMessage="No fields"
       {...multiSelectProps}
+      filter={matchColumnFilter}
     />
   );
 }

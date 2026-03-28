@@ -2,7 +2,7 @@
   "name": "avandar",
   "license": "CPAL-1.0",
   "private": true,
-  "version": "0.8.3-dev",
+  "version": "0.8.4-dev",
   "type": "module",
   "engines": {
     "node": ">=22.0.0"
@@ -78,6 +78,7 @@
     "@puckeditor/core": "^0.21.1",
     "@react-email/components": "^0.5.7",
     "@react-email/render": "^1.4.0",
+    "@supabase/postgrest-js": "^2.100.1",
     "@supabase/supabase-js": "^2.90.1",
     "@tabler/icons-react": "^3.31.0",
     "@tanstack/react-query": "^5.81.5",
@@ -105,6 +106,7 @@
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "dexie": "^4.0.11",
+    "match-sorter": "^8.2.0",
     "knex": "^3.1.0",
     "maplibre-gl": "^5.13.0",
     "papaparse": "^5.5.2",

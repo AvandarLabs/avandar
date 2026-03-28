@@ -1,10 +1,10 @@
+import { createModelCRUDClient } from "@clients/ModelCRUDClient/createModelCRUDClient.ts";
+import { withSupabaseClient } from "@clients/SupabaseCRUDClient/withSupabaseClient.ts";
 import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined.ts";
 import { objectEntries } from "@utils/objects/objectEntries.ts";
 import { objectKeys } from "@utils/objects/objectKeys.ts";
 import { match } from "ts-pattern";
 import { EmptyObject } from "type-fest";
-import { createModelCRUDClient } from "@clients/ModelCRUDClient/createModelCRUDClient.ts";
-import { withSupabaseClient } from "@clients/SupabaseCRUDClient/withSupabaseClient.ts";
 import type { ModelCRUDParserRegistry } from "@clients/makeParserRegistry.ts";
 import type {
   ClientReturningOnlyPromises,
