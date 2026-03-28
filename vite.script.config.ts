@@ -19,6 +19,8 @@ export default defineConfig({
       "@models": "/packages/shared/models/src",
       "@modules": "/packages/shared/modules/src",
       "@utils": "/packages/shared/utils/src",
+      "@etl-engine": "/packages/shared/etl-engine/src",
+      "@pipeline-server": "/apps/pipeline-server/src",
     },
   },
   ssr: {

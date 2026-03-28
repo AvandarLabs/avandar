@@ -13,6 +13,7 @@ function _getSharedPackageVitestAliases(
   return {
     $: resolve(rootDir, "shared"),
     "@clients": resolve(rootDir, "packages/shared/clients/src"),
+    "@etl-engine": resolve(rootDir, "packages/shared/etl-engine/src"),
     "@logger": resolve(rootDir, "packages/shared/logger/src"),
     "@models": resolve(rootDir, "packages/shared/models/src"),
     "@modules": resolve(rootDir, "packages/shared/modules/src"),

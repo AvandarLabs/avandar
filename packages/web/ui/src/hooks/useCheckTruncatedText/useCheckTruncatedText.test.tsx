@@ -1,7 +1,7 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
+import { useCheckTruncatedText } from "@ui/hooks/useCheckTruncatedText/useCheckTruncatedText";
 import { useState } from "react";
 import { describe, expect, it } from "vitest";
-import { useCheckTruncatedText } from "./useCheckTruncatedText";
 
 function mockElementWidths(
   element: HTMLElement,
@@ -43,9 +43,8 @@ function TruncationHarness(props: HarnessProps) {
 
 function TruncationHarnessSingleDep(props: { measureKey: number }) {
   const { measureKey } = props;
-  const [setRef, isTruncated] = useCheckTruncatedText<HTMLDivElement>(
-    measureKey,
-  );
+  const [setRef, isTruncated] =
+    useCheckTruncatedText<HTMLDivElement>(measureKey);
 
   return (
     <div
@@ -67,7 +66,10 @@ function UnmountRefHarness() {
 
   return (
     <>
-      <span data-testid="truncation-flag" data-truncated={String(isTruncated)} />
+      <span
+        data-testid="truncation-flag"
+        data-truncated={String(isTruncated)}
+      />
       {showTarget ?
         <div data-testid="inner" ref={setRef}>
           inner

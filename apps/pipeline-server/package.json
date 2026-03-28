@@ -9,6 +9,7 @@
     "test": "vitest run -c vitest.config.ts"
   },
   "dependencies": {
+    "@avandar/etl-engine": "workspace:*",
     "fastify": "^5.6.0"
   }
 }

@@ -377,6 +377,9 @@ importers:
 
   apps/pipeline-server:
     dependencies:
+      '@avandar/etl-engine':
+        specifier: workspace:*
+        version: link:../../packages/shared/etl-engine
       fastify:
         specifier: ^5.6.0
         version: 5.8.1

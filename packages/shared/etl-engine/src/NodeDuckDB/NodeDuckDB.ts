@@ -2,7 +2,12 @@ import { randomUUID } from "node:crypto";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import {
+  duckDBDescribeColumnTypeToSniffable,
+  SNIFF_CSV_MAX_ROWS,
+} from "@etl-engine/NodeDuckDB/DuckDBSniffableDataType.ts";
 import duckdb from "duckdb";
+import type { DuckDBSniffableDataType } from "@etl-engine/NodeDuckDB/DuckDBSniffableDataType.ts";
 
 type UnknownRow = Record<string, unknown>;
 
@@ -79,7 +84,7 @@ function _quoteIdentifier(identifier: string): string {
   return `"${identifier.replace(/"/g, '""')}"`;
 }
 
-function _escapeSqlSingleQuotedString(value: string): string {
+function _escapeSQLSingleQuotedString(value: string): string {
   return value.replace(/'/g, "''");
 }
 
@@ -115,13 +120,21 @@ function _applyParams(
   }, queryString);
 }
 
-export type NodeDuckDBReadCsvColumn = Readonly<{
+export type NodeDuckDBReadCSVColumn = Readonly<{
   name: string;
-  /** DuckDB type, e.g. `VARCHAR`, `BIGINT`, `DOUBLE`, `TIMESTAMP`. */
-  type: string;
+  /** DuckDB type for `read_csv` `columns={...}` casts. */
+  type: DuckDBSniffableDataType;
 }>;
 
-export type NodeDuckDBReadCsvIntoViewOptions = Readonly<{
+/**
+ * One column from {@link NodeDuckDB.sniffCSV} (name plus sniffable type).
+ */
+export type NodeDuckDBSniffCSVColumn = Readonly<{
+  name: string;
+  type: DuckDBSniffableDataType;
+}>;
+
+export type NodeDuckDBReadCSVIntoViewOptions = Readonly<{
   /** Absolute or relative path to the CSV file on disk. */
   csvPath: string;
   /** Name of the view to create in the `main` schema. */
@@ -130,7 +143,7 @@ export type NodeDuckDBReadCsvIntoViewOptions = Readonly<{
    * When set, passed to `read_csv` as `columns={...}`; when omitted, types are
    * inferred (`auto_detect` applies).
    */
-  columns?: readonly NodeDuckDBReadCsvColumn[];
+  columns?: readonly NodeDuckDBReadCSVColumn[];
   autoDetect?: boolean;
   header?: boolean;
   skip?: number;
@@ -139,7 +152,7 @@ export type NodeDuckDBReadCsvIntoViewOptions = Readonly<{
 
 /**
  * Thin Node.js wrapper around the `duckdb` native bindings: raw SQL, CSV
- * views, and ZSTD Parquet export.
+ * views, and ZSTD Parquet export (DuckDB `COMPRESSION ZSTD`).
  */
 export class NodeDuckDB {
   readonly #db: duckdb.Database;
@@ -175,10 +188,46 @@ export class NodeDuckDB {
   }
 
   /**
+   * Executes SQL without returning rows (DDL, COPY, etc.).
+   */
+  async execSQL(sql: string): Promise<void> {
+    await _connectionExec(this.#connection, sql);
+  }
+
+  /**
+   * Infers column names and types using DuckDB `sniff_csv` (CSV sniffer), with
+   * `sample_size` set to {@link SNIFF_CSV_MAX_ROWS}. Passes `header=true` so
+   * the first row is always treated as the header (avoids `column0`-style
+   * names when auto-detect misclassifies the file).
+   */
+  async sniffCSV(options: {
+    csvPath: string;
+  }): Promise<readonly NodeDuckDBSniffCSVColumn[]> {
+    const pathLiteral = _escapeSQLSingleQuotedString(options.csvPath);
+    const sampleSize = String(SNIFF_CSV_MAX_ROWS);
+    const sql =
+      `SELECT * FROM sniff_csv('${pathLiteral}', ` +
+      `header=true, sample_size=${sampleSize})`;
+    const rows = await this.runRawQuery<{
+      Columns: ReadonlyArray<{ name: string; type: string }>;
+    }>(sql);
+    const sniffRow = rows[0];
+    if (!sniffRow?.Columns) {
+      return [];
+    }
+    return sniffRow.Columns.map((column) => {
+      return {
+        name: column.name,
+        type: duckDBDescribeColumnTypeToSniffable(column.type),
+      };
+    });
+  }
+
+  /**
    * Creates or replaces a view that reads a CSV via `read_csv`.
    */
-  async readCsvIntoView(
-    options: NodeDuckDBReadCsvIntoViewOptions,
+  async readCSVIntoView(
+    options: NodeDuckDBReadCSVIntoViewOptions,
   ): Promise<void> {
     const {
       csvPath,
@@ -189,8 +238,14 @@ export class NodeDuckDB {
       skip,
       delimiter,
     } = options;
-    const pathLiteral = _escapeSqlSingleQuotedString(csvPath);
-    const parts: string[] = [`auto_detect=${autoDetect}`, `encoding='utf-8'`];
+    const pathLiteral = _escapeSQLSingleQuotedString(csvPath);
+    const parts: string[] = [
+      `auto_detect=${autoDetect}`,
+      `encoding='utf-8'`,
+      `strict_mode=false`,
+      `null_padding=true`,
+      `parallel=false`,
+    ];
     if (header !== undefined) {
       parts.push(`header=${header}`);
     }
@@ -198,14 +253,14 @@ export class NodeDuckDB {
       parts.push(`skip=${skip}`);
     }
     if (delimiter !== undefined) {
-      parts.push(`delim='${_escapeSqlSingleQuotedString(delimiter)}'`);
+      parts.push(`delim='${_escapeSQLSingleQuotedString(delimiter)}'`);
     }
     if (columns !== undefined && columns.length > 0) {
       const columnMap = columns
         .map((col) => {
           return (
-            `'${_escapeSqlSingleQuotedString(col.name)}': ` +
-            `'${_escapeSqlSingleQuotedString(col.type)}'`
+            `'${_escapeSQLSingleQuotedString(col.name)}': ` +
+            `'${_escapeSQLSingleQuotedString(col.type)}'`
           );
         })
         .join(", ");
@@ -223,24 +278,49 @@ export class NodeDuckDB {
    * Writes a table or view to a temporary Parquet file with ZSTD compression
    * and returns the file bytes.
    */
-  async exportTableOrViewAsZstdParquetBlob(
+  async exportTableOrViewAsZSTDParquetBlob(
     tableOrViewName: string,
   ): Promise<Uint8Array> {
     const tmpDir = await mkdtemp(join(tmpdir(), "node-duckdb-"));
     const outName = `${randomUUID()}.parquet`;
     const outPath = join(tmpDir, outName);
-    const outLiteral = _escapeSqlSingleQuotedString(outPath);
+    const outLiteral = _escapeSQLSingleQuotedString(outPath);
     const relIdent = _quoteIdentifier(tableOrViewName);
-    const copySql =
+    const copySQL =
       `COPY ${relIdent} TO '${outLiteral}' ` +
       `(FORMAT PARQUET, COMPRESSION ZSTD);`;
     try {
-      await _connectionExec(this.#connection, copySql);
+      await _connectionExec(this.#connection, copySQL);
       const fileBytes = await readFile(outPath);
       return new Uint8Array(fileBytes);
     } finally {
       await rm(tmpDir, { force: true, recursive: true });
     }
+  }
+
+  /**
+   * Row count and column names for a Parquet file on disk.
+   */
+  async summarizeParquetFile(parquetPath: string): Promise<{
+    rowCount: number;
+    columnNames: readonly string[];
+  }> {
+    const escaped = _escapeSQLSingleQuotedString(parquetPath);
+    const countRows = await this.runRawQuery<{ c: bigint | number }>(
+      `SELECT COUNT(*)::BIGINT AS c FROM read_parquet('${escaped}')`,
+    );
+    const describeRows = await this.runRawQuery<{
+      column_name: string;
+    }>(`DESCRIBE SELECT * FROM read_parquet('${escaped}')`);
+    const firstCount = countRows[0]?.c;
+    const rowCount =
+      typeof firstCount === "bigint" ?
+        Number(firstCount)
+      : Number(firstCount ?? 0);
+    const columnNames = describeRows.map((row) => {
+      return row.column_name;
+    });
+    return { rowCount, columnNames };
   }
 
   /**

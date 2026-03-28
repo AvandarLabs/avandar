@@ -1,17 +1,20 @@
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { ETLEngine } from "@etl-engine/ETLEngine/ETLEngine.ts";
+import {
+  ETL_INPUT_BASE_DIR,
+  ETL_OUTPUT_BASE_DIR,
+  ETL_PATHS_ROOT_ENV,
+  getETLLoadDir,
+  getETLOutputDir,
+  getETLPipelineInputDir,
+  resetETLPathsRootForTesting,
+  setETLPathsRootForTesting,
+} from "@etl-engine/ETLEngine/etlPaths.ts";
+import { transformedCSVsToParquetBlobs } from "@etl-engine/ETLEngine/transformedCSVsToParquetBlobs.ts";
 import { MIMEType } from "@utils/types/common.types.ts";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { ETLEngine } from "./ETLEngine.ts";
-import {
-  getEtlInputDir,
-  getEtlLoadDir,
-  getEtlOutputDir,
-  resetEtlPathsRootForTesting,
-  setEtlPathsRootForTesting,
-} from "./etlPaths.ts";
-import { transformedCsvsToParquetBlobs } from "./transformedCsvsToParquetBlobs.ts";
 import type { UUID } from "@utils/types/common.types.ts";
 
 type PipelineRunId = UUID<"PipelineRun">;
@@ -21,44 +24,47 @@ describe("etlPaths", () => {
 
   beforeEach(async () => {
     testRoot = await mkdtemp(join(tmpdir(), "etl-paths-"));
-    setEtlPathsRootForTesting(testRoot);
+    setETLPathsRootForTesting(testRoot);
   });
 
   afterEach(() => {
-    resetEtlPathsRootForTesting();
+    resetETLPathsRootForTesting();
   });
 
-  it("resolves extract input under input/<run>/extract", () => {
+  it("uses etl-output base and pipeline name in paths", () => {
     const runId = "00000000-0000-4000-8000-000000000001" as PipelineRunId;
-    expect(getEtlInputDir(runId, "extract")).toBe(
-      join(testRoot, "input", runId, "extract"),
+    const pipelineName = "my-pipeline";
+    expect(getETLOutputDir(pipelineName, runId, "extract")).toBe(
+      join(testRoot, ETL_OUTPUT_BASE_DIR, pipelineName, runId, "extract"),
     );
-  });
-
-  it("resolves transform input to prior extract output directory", () => {
-    const runId = "00000000-0000-4000-8000-000000000002" as PipelineRunId;
-    expect(getEtlInputDir(runId, "transform")).toBe(
-      join(testRoot, "output", runId, "extract"),
+    expect(getETLOutputDir(pipelineName, runId, "transform")).toBe(
+      join(testRoot, ETL_OUTPUT_BASE_DIR, pipelineName, runId, "transform"),
     );
-  });
-
-  it("resolves extract and transform output dirs under output/<run>/", () => {
-    const runId = "00000000-0000-4000-8000-000000000003" as PipelineRunId;
-    expect(getEtlOutputDir(runId, "extract")).toBe(
-      join(testRoot, "output", runId, "extract"),
+    expect(getETLLoadDir(pipelineName, runId)).toBe(
+      join(testRoot, ETL_OUTPUT_BASE_DIR, pipelineName, runId, "load"),
     );
-    expect(getEtlOutputDir(runId, "transform")).toBe(
-      join(testRoot, "output", runId, "transform"),
+    expect(getETLPipelineInputDir(pipelineName)).toBe(
+      join(testRoot, ETL_INPUT_BASE_DIR, pipelineName),
     );
-  });
-
-  it("resolves load dir as output/<run>/load", () => {
-    const runId = "00000000-0000-4000-8000-000000000004" as PipelineRunId;
-    expect(getEtlLoadDir(runId)).toBe(join(testRoot, "output", runId, "load"));
   });
 });
 
-describe("transformedCsvsToParquetBlobs", () => {
+describe("etlPaths ETL_PATHS_ROOT env", () => {
+  afterEach(() => {
+    delete process.env[ETL_PATHS_ROOT_ENV];
+    resetETLPathsRootForTesting();
+  });
+
+  it("uses ETL_PATHS_ROOT when the test override is unset", () => {
+    process.env[ETL_PATHS_ROOT_ENV] = "/custom/root";
+
+    expect(getETLPipelineInputDir("my-pipeline")).toBe(
+      join("/custom/root", ETL_INPUT_BASE_DIR, "my-pipeline"),
+    );
+  });
+});
+
+describe("transformedCSVsToParquetBlobs", () => {
   let testRoot: string;
 
   beforeEach(async () => {
@@ -77,7 +83,7 @@ describe("transformedCsvsToParquetBlobs", () => {
       "region,amount\n" + "east,10\n" + "west,20\n",
       "utf8",
     );
-    const blobs = await transformedCsvsToParquetBlobs({
+    const blobs = await transformedCSVsToParquetBlobs({
       transformOutputDir: transformDir,
       descriptions: [
         {
@@ -92,6 +98,27 @@ describe("transformedCsvsToParquetBlobs", () => {
     expect(blobs).toHaveLength(1);
     expect(blobs[0]?.size).toBeGreaterThan(0);
   });
+
+  it("reads fully inferred CSV when columns array is empty", async () => {
+    const transformDir = join(testRoot, "transform");
+    await mkdir(transformDir, { recursive: true });
+    await writeFile(
+      join(transformDir, "sales.csv"),
+      "region,amount\n" + "east,10\n" + "west,20\n",
+      "utf8",
+    );
+    const blobs = await transformedCSVsToParquetBlobs({
+      transformOutputDir: transformDir,
+      descriptions: [
+        {
+          name: "sales",
+          columns: [],
+        },
+      ],
+    });
+    expect(blobs).toHaveLength(1);
+    expect(blobs[0]?.size).toBeGreaterThan(0);
+  });
 });
 
 describe("ETLEngine", () => {
@@ -99,36 +126,42 @@ describe("ETLEngine", () => {
 
   beforeEach(async () => {
     testRoot = await mkdtemp(join(tmpdir(), "etl-engine-"));
-    setEtlPathsRootForTesting(testRoot);
+    setETLPathsRootForTesting(testRoot);
   });
 
   afterEach(async () => {
-    resetEtlPathsRootForTesting();
+    resetETLPathsRootForTesting();
     await rm(testRoot, { force: true, recursive: true });
   });
 
-  it("runs extract → transform CSV → parquet on disk → load", async () => {
+  it("runs extract → identity copy → CSV → parquet on disk → load", async () => {
     const loadCalls: Array<{
-      blobCount: number;
+      parquetTableBaseNames: readonly string[];
+      pipelineName: string;
       pipelineRunId: PipelineRunId;
     }> = [];
 
+    const pipelineName = "test-pipeline";
+
     const pipeline = ETLEngine.create({
-      name: "test-pipeline",
+      name: pipelineName,
       extract: async ({ pipelineRunId }) => {
-        expect(pipelineRunId).toBeDefined();
-        return {
-          files: [{ name: "raw.csv", mimeType: MIMEType.TEXT_CSV }],
-          context: { ok: true },
-        };
-      },
-      transform: async (_extracted, { pipelineRunId }) => {
-        const dir = getEtlOutputDir(pipelineRunId, "transform");
+        const extractDir = getETLOutputDir(
+          pipelineName,
+          pipelineRunId,
+          "extract",
+        );
         await writeFile(
-          join(dir, "metrics.csv"),
+          join(extractDir, "metrics.csv"),
           "day,count\n" + "1,5\n" + "2,7\n",
           "utf8",
         );
+        return {
+          files: [{ name: "metrics.csv", mimeType: MIMEType.TEXT_CSV }],
+          context: { ok: true },
+        };
+      },
+      transform: async () => {
         return [
           {
             name: "metrics",
@@ -139,25 +172,85 @@ describe("ETLEngine", () => {
           },
         ];
       },
-      load: async (parquetBlobs, { pipelineRunId }) => {
-        loadCalls.push({
-          blobCount: parquetBlobs.length,
-          pipelineRunId,
-        });
+      load: async (options) => {
+        loadCalls.push(options);
       },
     });
 
     const { pipelineRunId } = await pipeline.run();
-    expect(loadCalls).toEqual([{ blobCount: 1, pipelineRunId }]);
+    expect(loadCalls).toEqual([
+      {
+        pipelineName,
+        pipelineRunId,
+        parquetTableBaseNames: ["metrics"],
+      },
+    ]);
 
     const parquetPath = join(
       testRoot,
-      "output",
+      ETL_OUTPUT_BASE_DIR,
+      pipelineName,
       pipelineRunId,
       "load",
       "metrics.parquet",
     );
     const bytes = await readFile(parquetPath);
     expect(bytes.byteLength).toBeGreaterThan(0);
+
+    const descriptionsPath = join(
+      testRoot,
+      ETL_OUTPUT_BASE_DIR,
+      pipelineName,
+      pipelineRunId,
+      "load",
+      "transform-csv-descriptions.json",
+    );
+    const descriptionsJson = JSON.parse(
+      await readFile(descriptionsPath, "utf8"),
+    ) as unknown;
+    expect(descriptionsJson).toEqual([
+      {
+        name: "metrics",
+        columns: [
+          { name: "day", type: "BIGINT" },
+          { name: "count", type: "BIGINT" },
+        ],
+      },
+    ]);
+  });
+
+  it("storeExtractedData writes under etl-output extract dir", async () => {
+    const pipelineName = "store-test";
+    const runId = "00000000-0000-4000-8000-000000000099" as PipelineRunId;
+    const src = join(testRoot, "src.csv");
+    await writeFile(src, "a,b\n1,2\n", "utf8");
+    await ETLEngine.storeExtractedData({
+      pipelineName,
+      pipelineRunId: runId,
+      sourcePath: src,
+      destinationBasename: "out.csv",
+    });
+    const dest = join(
+      testRoot,
+      ETL_OUTPUT_BASE_DIR,
+      pipelineName,
+      runId,
+      "extract",
+      "out.csv",
+    );
+    const text = await readFile(dest, "utf8");
+    expect(text).toContain("a,b");
+  });
+
+  it("getLoadParquetPathForTable points at load parquet path", () => {
+    const runId = "00000000-0000-4000-8000-000000000088" as PipelineRunId;
+    const path = ETLEngine.getLoadParquetPathForTable({
+      pipelineName: "p",
+      pipelineRunId: runId,
+      tableBaseName: "t",
+    });
+    expect(path).toBe(
+      join(testRoot, ETL_OUTPUT_BASE_DIR, "p", runId, "load", "t.parquet"),
+    );
   });
 });

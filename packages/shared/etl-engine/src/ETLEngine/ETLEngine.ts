@@ -1,9 +1,13 @@
 import { randomUUID } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
+import { access, copyFile, mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import {
+  getETLLoadDir,
+  getETLOutputDir,
+} from "@etl-engine/ETLEngine/etlPaths.ts";
+import { transformedCSVsToParquetBlobs } from "@etl-engine/ETLEngine/transformedCSVsToParquetBlobs.ts";
 import { createModuleFactory } from "@modules/createModuleFactory.ts";
-import { getEtlInputDir, getEtlLoadDir, getEtlOutputDir } from "./etlPaths.ts";
-import { transformedCsvsToParquetBlobs } from "./transformedCsvsToParquetBlobs.ts";
+import type { TransformedDataDescriptionForParquet } from "@etl-engine/ETLEngine/transformedCSVsToParquetBlobs.ts";
 import type {
   Accessors,
   Module,
@@ -19,9 +23,10 @@ type PromisedOrValue<T> = Promise<T> | T;
  * and an optional context object. The optional context object is used to
  * store any metadata that the Transform step needs to do its job.
  *
- * The extracted data is written to the ETL's `output/<pipelineRunId>/extract`
- * directory. The extracted data can consist of one or more files, whose names
- * are specified in the `filenames` array.
+ * The extracted data is written to
+ * `etl-output/<pipeline-name>/<pipelineRunId>/extract`. The extracted data can
+ * consist of one or more files, whose names are specified in the `files`
+ * array.
  */
 type ExtractedDataContext = {
   files: ReadonlyArray<{
@@ -33,29 +38,17 @@ type ExtractedDataContext = {
 
 /**
  * The output of the Transform step is an object describing the transformed
- * data. The Transform step is expected to have written the transformed data
- * to an output CSV file in `output/<pipelineRunId>/transform/<name>.csv`.
+ * data. For identity transforms, CSVs live under the extract directory; the
+ * engine copies `extract/<name>.csv` to `transform/<name>.csv` before Parquet
+ * conversion when the extract file exists.
  *
- * After the Transform step writes a CSV file to disk, the ETL module will
- * use this object to covert it to a compressed parquet file which will be
- * stored in the `output/<pipelineRunId>/load` directory under the name
- * `<name>.parquet`.
+ * After CSVs exist under the transform directory, the ETL module converts
+ * each to ZSTD Parquet in `etl-output/<pipeline-name>/<pipelineRunId>/load`
+ * as `<name>.parquet`.
+ *
+ * Each column entry must include a `type` (`DuckDBSniffableDataType`), unless
+ * `columns` is empty and the pipeline relies on full CSV inference.
  */
-type TransformedDataDescription = {
-  name: string;
-  columns: ReadonlyArray<{
-    name: string;
-    type:
-      | "BOOLEAN"
-      | "BIGINT"
-      | "DOUBLE"
-      | "TIME"
-      | "DATE"
-      | "TIMESTAMP"
-      | "VARCHAR";
-  }>;
-};
-
 type ETLContext = {
   pipelineRunId: PipelineRunId;
 };
@@ -69,13 +62,12 @@ type IETLEngine = Module<
     transform: (
       extractedDataContext: ExtractedDataContext,
       etlContext: ETLContext,
-    ) => PromisedOrValue<TransformedDataDescription[]>;
-    load: (
-      parquetBlobs: readonly Blob[],
-      etlContext: {
-        pipelineRunId: PipelineRunId;
-      },
-    ) => Promise<void>;
+    ) => PromisedOrValue<TransformedDataDescriptionForParquet[]>;
+    load: (options: {
+      pipelineName: string;
+      pipelineRunId: PipelineRunId;
+      parquetTableBaseNames: readonly string[];
+    }) => Promise<void>;
   },
   {
     run: () => Promise<ETLContext>;
@@ -83,17 +75,64 @@ type IETLEngine = Module<
 >;
 
 /**
- * Ensures pipeline directories exist: extract input, extract/transform outputs,
- * and load.
+ * Copies `extract/<name>.csv` to `transform/<name>.csv` when the extract file
+ * exists; otherwise the transform path must already exist (non-identity
+ * transform).
  */
-async function _ensurePipelineDirectories(
-  pipelineRunId: PipelineRunId,
-): Promise<void> {
+async function _ensureTransformCSVsFromExtractOrTransform(options: {
+  pipelineName: string;
+  pipelineRunId: PipelineRunId;
+  descriptions: readonly TransformedDataDescriptionForParquet[];
+}): Promise<void> {
+  const { pipelineName, pipelineRunId, descriptions } = options;
+  const extractDir = getETLOutputDir(pipelineName, pipelineRunId, "extract");
+  const transformDir = getETLOutputDir(
+    pipelineName,
+    pipelineRunId,
+    "transform",
+  );
+  const copyTasks = descriptions.map(async (description) => {
+    const src = join(extractDir, `${description.name}.csv`);
+    const dest = join(transformDir, `${description.name}.csv`);
+    try {
+      await copyFile(src, dest);
+    } catch (error: unknown) {
+      const code =
+        (
+          error !== null &&
+          typeof error === "object" &&
+          "code" in error &&
+          typeof error.code === "string"
+        ) ?
+          error.code
+        : undefined;
+      if (code !== "ENOENT") {
+        throw error;
+      }
+      try {
+        await access(dest);
+      } catch {
+        throw new Error(
+          `Missing CSV for "${description.name}": expected ${src} or ${dest}.`,
+        );
+      }
+    }
+  });
+  await Promise.all(copyTasks);
+}
+
+/**
+ * Ensures pipeline directories exist: extract, transform, and load.
+ */
+async function _ensurePipelineDirectories(options: {
+  pipelineName: string;
+  pipelineRunId: PipelineRunId;
+}): Promise<void> {
+  const { pipelineName, pipelineRunId } = options;
   const dirs = [
-    getEtlInputDir(pipelineRunId, "extract"),
-    getEtlOutputDir(pipelineRunId, "extract"),
-    getEtlOutputDir(pipelineRunId, "transform"),
-    getEtlLoadDir(pipelineRunId),
+    getETLOutputDir(pipelineName, pipelineRunId, "extract"),
+    getETLOutputDir(pipelineName, pipelineRunId, "transform"),
+    getETLLoadDir(pipelineName, pipelineRunId),
   ];
   await Promise.all(
     dirs.map((dirPath) => {
@@ -102,16 +141,23 @@ async function _ensurePipelineDirectories(
   );
 }
 
+/** JSON sidecar by Parquet outputs for manual review of transform metadata. */
+const TRANSFORM_CSV_DESCRIPTIONS_JSON_FILE = "transform-csv-descriptions.json";
+
 /**
- * Writes Parquet blobs to `output/<pipelineRunId>/load/<name>.parquet`.
+ * Writes Parquet blobs to
+ * `etl-output/<pipeline-name>/<pipelineRunId>/load/<name>.parquet`, and
+ * {@link TRANSFORM_CSV_DESCRIPTIONS_JSON_FILE} with the transform
+ * descriptions (column names and sniffable types).
  */
 async function _writeParquetBlobsToLoadDir(options: {
+  pipelineName: string;
   pipelineRunId: PipelineRunId;
-  descriptions: readonly TransformedDataDescription[];
+  descriptions: readonly TransformedDataDescriptionForParquet[];
   parquetBlobs: readonly Blob[];
 }): Promise<void> {
-  const { pipelineRunId, descriptions, parquetBlobs } = options;
-  const loadDir = getEtlLoadDir(pipelineRunId);
+  const { pipelineName, pipelineRunId, descriptions, parquetBlobs } = options;
+  const loadDir = getETLLoadDir(pipelineName, pipelineRunId);
   await mkdir(loadDir, { recursive: true });
   const writeTasks = descriptions.map(async (description, index) => {
     const blob = parquetBlobs[index];
@@ -125,9 +171,54 @@ async function _writeParquetBlobsToLoadDir(options: {
     await writeFile(outPath, bytes);
   });
   await Promise.all(writeTasks);
+  const descriptionsPath = join(loadDir, TRANSFORM_CSV_DESCRIPTIONS_JSON_FILE);
+  await writeFile(
+    descriptionsPath,
+    `${JSON.stringify(descriptions, undefined, 2)}\n`,
+    "utf8",
+  );
 }
 
-export const ETLEngine = createModuleFactory<IETLEngine>("ETLEngine", {
+/**
+ * Copies a source file into the extract output directory for this run.
+ *
+ * @param options.pipelineName Pipeline folder name under `etl-output`.
+ * @param options.pipelineRunId Run identifier.
+ * @param options.sourcePath Absolute or relative path to the file to copy.
+ * @param options.destinationBasename Filename in the extract directory
+ * (e.g. `WDIData.csv`).
+ */
+async function storeExtractedData(options: {
+  pipelineName: string;
+  pipelineRunId: PipelineRunId;
+  sourcePath: string;
+  destinationBasename: string;
+}): Promise<void> {
+  const { pipelineName, pipelineRunId, sourcePath, destinationBasename } =
+    options;
+  const extractDir = getETLOutputDir(pipelineName, pipelineRunId, "extract");
+  await mkdir(extractDir, { recursive: true });
+  const dest = join(extractDir, destinationBasename);
+  await copyFile(sourcePath, dest);
+}
+
+/**
+ * Absolute path to a Parquet file produced for the load stage.
+ *
+ * @param options.tableBaseName Table key without `.parquet` (matches transform
+ * `name`).
+ */
+function getLoadParquetPathForTable(options: {
+  pipelineName: string;
+  pipelineRunId: PipelineRunId;
+  tableBaseName: string;
+}): string {
+  const { pipelineName, pipelineRunId, tableBaseName } = options;
+  const loadDir = getETLLoadDir(pipelineName, pipelineRunId);
+  return join(loadDir, `${tableBaseName}.parquet`);
+}
+
+const ETLEngineFactory = createModuleFactory<IETLEngine>("ETLEngine", {
   childBuilder(
     accessors: Accessors<
       "ETLEngine",
@@ -139,8 +230,13 @@ export const ETLEngine = createModuleFactory<IETLEngine>("ETLEngine", {
 
     return {
       run: async () => {
-        const { extract, transform, load } = accessors.getState();
-        await _ensurePipelineDirectories(pipelineRunId);
+        const {
+          name: pipelineName,
+          extract,
+          transform,
+          load,
+        } = accessors.getState();
+        await _ensurePipelineDirectories({ pipelineName, pipelineRunId });
 
         const extractedDataContext = await extract({ pipelineRunId });
         const transformedDataDescriptions = await transform(
@@ -150,22 +246,52 @@ export const ETLEngine = createModuleFactory<IETLEngine>("ETLEngine", {
           },
         );
 
-        const transformDir = getEtlOutputDir(pipelineRunId, "transform");
-        const parquetBlobs = await transformedCsvsToParquetBlobs({
+        await _ensureTransformCSVsFromExtractOrTransform({
+          pipelineName,
+          pipelineRunId,
+          descriptions: transformedDataDescriptions,
+        });
+
+        const transformDir = getETLOutputDir(
+          pipelineName,
+          pipelineRunId,
+          "transform",
+        );
+        const parquetBlobs = await transformedCSVsToParquetBlobs({
           transformOutputDir: transformDir,
           descriptions: transformedDataDescriptions,
         });
 
         await _writeParquetBlobsToLoadDir({
+          pipelineName,
           pipelineRunId,
           descriptions: transformedDataDescriptions,
           parquetBlobs,
         });
 
-        await load(parquetBlobs, { pipelineRunId });
+        const parquetTableBaseNames = transformedDataDescriptions.map(
+          (description) => {
+            return description.name;
+          },
+        );
+
+        await load({
+          pipelineName,
+          pipelineRunId,
+          parquetTableBaseNames,
+        });
 
         return { pipelineRunId };
       },
     };
   },
+});
+
+/**
+ * Factory for ETL pipelines plus helpers for extract paths and load Parquet
+ * paths.
+ */
+export const ETLEngine = Object.assign(ETLEngineFactory, {
+  storeExtractedData,
+  getLoadParquetPathForTable,
 });

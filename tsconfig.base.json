@@ -43,7 +43,8 @@
       /* Apps */
       "@ava-cli/*": ["./apps/ava-cli/src/*"],
       "@fanout-server/*": ["./apps/dev-fanout-server/src/*"],
-      "@pipeline-server/*": ["./apps/pipeline-server/src/*"]
+      "@pipeline-server/*": ["./apps/pipeline-server/src/*"],
+      "@pipelines/*": ["./apps/pipeline-server/pipelines/*"]
     }
   }
 }

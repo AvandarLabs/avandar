@@ -7,7 +7,10 @@ type PipelineRunModule = Readonly<{
 }>;
 
 function _getPipelineModuleURL(pipelineName: string): URL {
-  return new URL(`../../../../pipelines/${pipelineName}/run.ts`, import.meta.url);
+  return new URL(
+    `../../../../pipelines/${pipelineName}/run.ts`,
+    import.meta.url,
+  );
 }
 
 export async function run(options: RunPipelineOptions): Promise<string> {

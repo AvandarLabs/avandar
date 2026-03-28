@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.node.json",
   "compilerOptions": {
+    "baseUrl": "../../",
     "moduleResolution": "node",
     "noEmit": false
   },

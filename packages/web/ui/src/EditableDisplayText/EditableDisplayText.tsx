@@ -1,21 +1,12 @@
-import {
-  Box,
-  Button,
-  Group,
-  Text,
-  Textarea,
-  TextInput,
-  type TextareaProps,
-  type TextInputProps,
-  type TextProps,
-} from "@mantine/core";
+import { Box, Button, Group, Text, Textarea, TextInput } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
 import { EditButton } from "@ui/buttons/EditButton";
-import { useCheckTruncatedText } from "@ui/hooks/useCheckTruncatedText";
+import { useCheckTruncatedText } from "@ui/hooks/useCheckTruncatedText/useCheckTruncatedText";
 import { Tooltip } from "@ui/Tooltip/Tooltip";
 import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
 import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject";
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { TextareaProps, TextInputProps, TextProps } from "@mantine/core";
 
 type BaseProps = {
   /**
@@ -270,9 +261,7 @@ export function EditableDisplayText({
         bdrs="sm"
         bd="1px dashed var(--mantine-color-neutral-4)"
         bg="neutral.0"
-        w={
-          !passThroughProps.textarea && !hasExplicitWidth ? "100%" : undefined
-        }
+        w={!passThroughProps.textarea && !hasExplicitWidth ? "100%" : undefined}
         maw="100%"
         miw={0}
       >
