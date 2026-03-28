@@ -3,9 +3,9 @@ import { objectKeys } from "@utils/objects/objectKeys.ts";
 import type {
   BuildableEntityConfig,
   EntityConfig,
-} from "./EntityConfig.types.ts";
-import type { EntityFieldConfig } from "./EntityFieldConfig/EntityFieldConfig.types.ts";
-import type { EntityFieldValueExtractor } from "./ValueExtractor/ValueExtractor.types.ts";
+} from "$/models/EntityConfig/EntityConfig.types.ts";
+import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";
+import type { EntityFieldValueExtractor } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types.ts";
 import type {
   AnyFunction,
   AnyFunctionWithArguments,

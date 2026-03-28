@@ -1,4 +1,4 @@
-import type { AvaPageMetadata } from "../useAvaPageMetadata";
+import type { AvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
 import type { Dashboard } from "$/models/Dashboard/Dashboard.types";
 
 export function getAvaPageMetadataFromDashboard(

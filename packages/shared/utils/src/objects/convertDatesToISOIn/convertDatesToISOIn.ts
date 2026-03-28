@@ -1,5 +1,5 @@
-import type { UnknownObject } from "../../types/common.types.ts";
-import type { ReplaceTypes } from "../../types/utilities.types.ts";
+import type { UnknownObject } from "@utils/types/common.types.ts";
+import type { ReplaceTypes } from "@utils/types/utilities.types.ts";
 import type { ConditionalKeys } from "type-fest";
 
 /**

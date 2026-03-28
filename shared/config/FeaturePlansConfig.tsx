@@ -5,7 +5,6 @@ type PlanConfig = {
   featurePlanName: string;
   features: readonly string[];
   isRecommendedPlan: boolean;
-  maxSeatsAllowed: number;
 };
 
 export const FreePlanConfig = {
@@ -19,7 +18,6 @@ export const FreePlanConfig = {
     "Limited AI usage",
   ],
   isRecommendedPlan: false,
-  maxSeatsAllowed: 2,
 } as const satisfies PlanConfig;
 
 export const BasicPlanConfig: PlanConfig = {
@@ -34,7 +32,6 @@ export const BasicPlanConfig: PlanConfig = {
     "Extended AI usage",
   ],
   isRecommendedPlan: false,
-  maxSeatsAllowed: Infinity,
 } as const satisfies PlanConfig;
 
 export const PremiumPlanConfig: PlanConfig = {
@@ -49,5 +46,4 @@ export const PremiumPlanConfig: PlanConfig = {
     "Unlimited AI usage",
     "Priority support and attention to feature requests",
   ],
-  maxSeatsAllowed: Infinity,
 } as const satisfies PlanConfig;

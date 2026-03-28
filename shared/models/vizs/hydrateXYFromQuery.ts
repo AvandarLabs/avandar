@@ -1,6 +1,6 @@
 import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray.ts";
-import { QueryColumns } from "../queries/QueryColumn/QueryColumns.ts";
-import type { PartialStructuredQuery } from "../queries/StructuredQuery/StructuredQuery.types.ts";
+import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns.ts";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 
 type XYAxesConfig = {
   xAxisKey: string | undefined;

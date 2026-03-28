@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isEmptyObject } from "./isEmptyObject.ts";
+import { isEmptyObject } from "@utils/guards/isEmptyObject/isEmptyObject.ts";
 
 describe("isEmptyObject", () => {
   it("returns true for empty object", () => {

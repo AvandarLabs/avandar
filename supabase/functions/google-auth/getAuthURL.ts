@@ -1,4 +1,4 @@
-import { GoogleAuthClient } from "../_shared/getGoogleAuthClient.ts";
+import { GoogleAuthClient } from "@sbfn/_shared/getGoogleAuthClient.ts";
 
 /**
  * This function generates the URL that will be used for the Google

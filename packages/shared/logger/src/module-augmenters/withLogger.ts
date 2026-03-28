@@ -1,5 +1,5 @@
-import { createWebLogger } from "../createWebLogger/createWebLogger.ts";
-import type { ILogger, WithLogger } from "../Logger.types.ts";
+import { createWebLogger } from "@logger/createWebLogger/createWebLogger.ts";
+import type { ILogger, WithLogger } from "@logger/Logger.types.ts";
 import type { Module } from "@modules/createModule.ts";
 
 /**

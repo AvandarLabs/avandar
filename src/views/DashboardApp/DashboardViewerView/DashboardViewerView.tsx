@@ -4,12 +4,12 @@ import { useEffect, useMemo } from "react";
 import "@puckeditor/core/puck.css";
 import { notifyError } from "@ui/notifications/notify";
 import { Paper } from "@/lib/ui/Paper/Paper";
-import { AvaPageGenericData } from "../AvaPage/AvaPage.types";
-import { getVersionFromAvaPageData } from "../AvaPage/migrations/getVersionFromAvaPageData";
-import { getAvaPageMetadataFromDashboard } from "../AvaPage/utils/getAvaPageMetadataFromDashboard";
-import { upgradeAvaPageData } from "../AvaPage/utils/upgradeAvaPageData";
-import { getDashboardPuckConfig } from "../DashboardEditorView/getDashboardPuckConfig";
-import { useEnsurePublishedDashboardDatasets } from "./useEnsurePublishedDashboardDatasets";
+import { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
+import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard";
+import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
+import { getDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig";
+import { useEnsurePublishedDashboardDatasets } from "@/views/DashboardApp/DashboardViewerView/useEnsurePublishedDashboardDatasets";
 import type { Dashboard } from "$/models/Dashboard/Dashboard.types";
 
 type Props = {

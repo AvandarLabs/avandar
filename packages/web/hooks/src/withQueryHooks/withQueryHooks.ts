@@ -6,9 +6,9 @@ import { objectKeys } from "@utils/objects/objectKeys";
 import { capitalize } from "@utils/strings/capitalize/capitalize";
 import { prefix } from "@utils/strings/prefix/prefix";
 import { AnyFunction } from "@utils/types/utilities.types";
-import { DefaultError, QueryClient, QueryKey } from "../core.types";
-import { useMutation } from "../useMutation/useMutation";
-import { useQuery } from "../useQuery/useQuery";
+import { DefaultError, QueryClient, QueryKey } from "@hooks/core.types";
+import { useMutation } from "@hooks/useMutation/useMutation";
+import { useQuery } from "@hooks/useQuery/useQuery";
 import {
   ClientFnFirstParameter,
   ClientWithCache,
@@ -20,8 +20,8 @@ import {
   UseMutationFunctionsRecord,
   UseQueryFunctionsRecord,
   WithQueryHooks,
-} from "./withQueryHooks.types";
-import type { UseMutationOptions } from "../useMutation/useMutation";
+} from "@hooks/withQueryHooks/withQueryHooks.types";
+import type { UseMutationOptions } from "@hooks/useMutation/useMutation";
 import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
 
 function isSingletonObject(arg: unknown): arg is { arg: unknown } {

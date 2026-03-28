@@ -1,11 +1,11 @@
-import { z } from "zod";
-import { GET } from "../_shared/MiniServer/MiniServer.ts";
-import { PolarClient } from "../_shared/PolarClient/PolarClient.ts";
+import { GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
 import {
   PolarProductMetadataSchema,
   PolarSubscriptionMetadataSchema,
-} from "../polar-public/PolarEventDataSchemas.ts";
-import { MAX_FREE_PLAN_SEATS } from "../polar-public/polarWebhookUtils.ts";
+} from "@sbfn/polar-public/PolarEventDataSchemas.ts";
+import { MAX_FREE_PLAN_SEATS } from "@sbfn/polar-public/polarWebhookUtils.ts";
+import { z } from "zod";
 
 /**
  * Search for subscriptions by a user's Avandar ID and udpate them in our

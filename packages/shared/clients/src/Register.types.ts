@@ -5,7 +5,7 @@
  *
  * @example
  * ```ts
- * import type { Database } from "./database.types";
+ * import type { Database } from "@clients/database.types";
  *
  * declare module "@avandar/clients" {
  *   interface Register {

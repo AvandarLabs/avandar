@@ -1,5 +1,5 @@
 import { registry } from "@utils/objects/registry/registry.ts";
-import type { DatasetSource } from "../DatasetSource/DatasetSource.ts";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource.ts";
 
 export const DatasetSourceUtils = {
   SourceTypes: registry<DatasetSource.SourceType>().keys(

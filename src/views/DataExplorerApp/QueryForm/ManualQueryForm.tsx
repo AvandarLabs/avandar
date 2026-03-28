@@ -5,9 +5,9 @@ import { prop } from "@utils/objects/hofs/prop/prop";
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
 import { Select, type SelectData } from "@ui/inputs/Select/Select";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import { AggregationSelect } from "../AggregationSelect";
-import { QueryColumnMultiSelect } from "../QueryColumnMultiSelect";
-import { QueryDataSourceSelect } from "../QueryDataSourceSelect";
+import { AggregationSelect } from "@/views/DataExplorerApp/AggregationSelect";
+import { QueryColumnMultiSelect } from "@/views/DataExplorerApp/QueryColumnMultiSelect";
+import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.types";
 

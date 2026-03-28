@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { convertDatesToISOInProps } from "./convertDatesToISOInProps.ts";
+import { convertDatesToISOInProps } from "@utils/objects/hofs/convertDatesToISOInProps/convertDatesToISOInProps.ts";
 
 describe("convertDatesToISOInProps", () => {
   it("returns a function that converts dates to ISO strings", () => {

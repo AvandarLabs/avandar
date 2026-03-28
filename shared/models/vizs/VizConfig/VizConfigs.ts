@@ -1,15 +1,15 @@
 import { registry } from "@utils/objects/registry/registry.ts";
-import { BarChartVizConfigs } from "../BarChartVizConfig/BarChartVizConfigs.ts";
-import { LineChartVizConfigs } from "../LineChartVizConfig/LineChartVizConfigs.ts";
-import { ScatterPlotVizConfigs } from "../ScatterPlotVizConfig/ScatterPlotVizConfigs.ts";
-import { TableVizConfigs } from "../TableVizConfig/TableVizConfigs.ts";
+import { BarChartVizConfigs } from "$/models/vizs/BarChartVizConfig/BarChartVizConfigs.ts";
+import { LineChartVizConfigs } from "$/models/vizs/LineChartVizConfig/LineChartVizConfigs.ts";
+import { ScatterPlotVizConfigs } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfigs.ts";
+import { TableVizConfigs } from "$/models/vizs/TableVizConfig/TableVizConfigs.ts";
 import {
   VizConfig,
   VizConfigType,
   VizConfigUtilRegistry,
   VizType,
-} from "./VizConfig.types.ts";
-import type { IVizConfigModule } from "./IVizConfigModule.ts";
+} from "$/models/vizs/VizConfig/VizConfig.types.ts";
+import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 
 const VizConfigModulesRegistry = {

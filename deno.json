@@ -19,14 +19,13 @@
   ],
   "imports": {
     "$/": "./shared/",
-    "jose": "jsr:@panva/jose@6",
-    "react": "npm:react@^19.0.0",
-    "react-dom": "npm:react-dom@^19.0.0",
+    "@sbfn/": "./supabase/functions/",
     "@clients/": "./packages/shared/clients/src/",
     "@logger/": "./packages/shared/logger/src/",
     "@models/": "./packages/shared/models/src/",
     "@modules/": "./packages/shared/modules/src/",
-    "@utils/": "./packages/shared/utils/src/"
+    "@utils/": "./packages/shared/utils/src/",
+    "jose": "jsr:@panva/jose@6"
   },
   "compilerOptions": {
     "experimentalDecorators": true,

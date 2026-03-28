@@ -1,4 +1,4 @@
 import { createUsePuck } from "@puckeditor/core";
-import type { AvaPageConfig } from "../AvaPage/AvaPage.types";
+import type { AvaPageConfig } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 export const useDashboardPuck = createUsePuck<AvaPageConfig>();

@@ -1,8 +1,8 @@
 import * as path from "node:path";
 import { Acclimate } from "@avandar/acclimate";
-import { isPascalCase } from "../../../utils/validators/isPascalCase/isPascalCase";
-import { writeBasicModelBoilerplate } from "./writeBasicModelBoilerplate";
-import { writeSupabaseModelBoilerplate } from "./writeSupabaseModelBoilerplate";
+import { isPascalCase } from "@ava-cli/utils/validators/isPascalCase/isPascalCase";
+import { writeBasicModelBoilerplate } from "@ava-cli/DevCLI/NewBoilerplateCLI/NewTSModelCLI/writeBasicModelBoilerplate";
+import { writeSupabaseModelBoilerplate } from "@ava-cli/DevCLI/NewBoilerplateCLI/NewTSModelCLI/writeSupabaseModelBoilerplate";
 
 const OUTPUT_MODELS_DIR_BASE = "src/models";
 const OUTPUT_CLIENTS_DIR_BASE = "src/clients";

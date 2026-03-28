@@ -4,7 +4,7 @@ import { noop } from "@utils/misc/noop";
 import { useEffect, useMemo, useState } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { useGooglePickerAPI } from "@/lib/hooks/useGooglePickerAPI";
-import { useCurrentUserProfile } from "../users/useCurrentUserProfile";
+import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import type { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import type {
   GooglePickerAPI,

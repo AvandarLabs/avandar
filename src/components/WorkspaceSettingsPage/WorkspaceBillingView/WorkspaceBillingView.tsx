@@ -2,13 +2,13 @@ import { Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { isDefined } from "@utils/guards/isDefined/isDefined";
 import { match } from "ts-pattern";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { BillingPortalButton } from "./BillingPortalButton/BillingPortalButton";
-import { PlanCard } from "./PlanCard/PlanCard";
-import { useSubscriptionPlans } from "./useSubscriptionPlans";
+import { BillingPortalButton } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/BillingPortalButton";
+import { PlanCard } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard";
+import { useSubscriptionPlans } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/useSubscriptionPlans";
 import type {
   SubscriptionPlan,
   SubscriptionPlanGroup,
-} from "./SubscriptionPlan.types";
+} from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 
 type Props = {
   hideTitle?: boolean;

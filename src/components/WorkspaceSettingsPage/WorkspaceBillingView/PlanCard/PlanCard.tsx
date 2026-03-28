@@ -11,27 +11,27 @@ import { useRouter } from "@tanstack/react-router";
 import { notifyExpiredSession } from "@ui/notifications/notifyExpiredSession";
 import { useState } from "react";
 import { match } from "ts-pattern";
-import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
-import { PlanFeatures } from "../PlanFeatures";
+import { goToPolarCheckout } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/goToPolarCheckout";
+import { useChangePlanModal } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal";
+import { PaidPlanPriceRow } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow";
+import css from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanCard.module.css";
+import { PlanSwitch } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PlanVariantSwitch";
+import { PlanFeatures } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanFeatures";
 import {
   calculateYearlyDiscount,
   isValidFreePlanVariant,
   isValidPaidPlanVariant,
-} from "../planUtils";
-import { goToPolarCheckout } from "./goToPolarCheckout";
-import { useChangePlanModal } from "./openChangePlanModal/useChangePlanModal";
-import { PaidPlanPriceRow } from "./PaidPlanPriceRow";
-import css from "./PlanCard.module.css";
-import { PlanSwitch } from "./PlanVariantSwitch";
+} from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/planUtils";
+import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import type {
   FreePlanVariants,
   FreeSubscriptionPlanGroup,
   PaidPlanVariants,
   PaidSubscriptionPlanGroup,
   SubscriptionPlan,
-} from "../SubscriptionPlan.types";
+} from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 type Props =

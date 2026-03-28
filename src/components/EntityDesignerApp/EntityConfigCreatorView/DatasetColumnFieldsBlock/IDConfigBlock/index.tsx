@@ -7,7 +7,7 @@ import { makeObject } from "@utils/objects/makeObject/makeObject";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { Select } from "@ui/inputs/Select/Select";
-import type { EntityConfigFormType } from "../../entityConfigFormTypes";
+import type { EntityConfigFormType } from "@/components/EntityDesignerApp/EntityConfigCreatorView/entityConfigFormTypes";
 
 type Props = {
   entityConfigForm: EntityConfigFormType;

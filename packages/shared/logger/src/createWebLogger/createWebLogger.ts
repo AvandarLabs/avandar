@@ -1,4 +1,4 @@
-import type { ILogger } from "../Logger.types.ts";
+import type { ILogger } from "@logger/Logger.types.ts";
 
 const LOG_HEADER_FONT_SIZE = "11px";
 const LOG_BODY_FONT_SIZE = "13px";

@@ -19,8 +19,8 @@ import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigCli
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { SourceBadge } from "@/components/common/SourceBadge";
 import { Paper } from "@/lib/ui/Paper/Paper";
-import { ActivityBlock } from "./ActivityBlock";
-import { StatusPill } from "./StatusPill";
+import { ActivityBlock } from "@/components/EntityManagerApp/SingleEntityView/ActivityBlock";
+import { StatusPill } from "@/components/EntityManagerApp/SingleEntityView/StatusPill";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { Entity } from "$/models/entities/Entity/Entity.types";
 import type { EntityFieldValue } from "$/models/entities/EntityFieldValue/EntityFieldValue.types";

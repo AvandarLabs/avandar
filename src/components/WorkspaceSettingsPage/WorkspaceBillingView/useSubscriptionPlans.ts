@@ -10,8 +10,8 @@ import {
   isMonthlyPayWhatYouWantPlan,
   isSeatBasedPlan,
   makeSubscriptionPlanFromPolarProduct,
-} from "./planUtils";
-import type { SubscriptionPlanGroup } from "./SubscriptionPlan.types";
+} from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/planUtils";
+import type { SubscriptionPlanGroup } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 import type { UseQueryResultTuple } from "@hooks/useQuery/useQuery";
 
 export function useSubscriptionPlans(): UseQueryResultTuple<

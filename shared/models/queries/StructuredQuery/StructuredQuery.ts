@@ -2,9 +2,9 @@
 import type {
   PartialStructuredQuery,
   StructuredQueryRead,
-} from "./StructuredQuery.types.ts";
+} from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 
-export { StructuredQueryUtils as StructuredQuery } from "./StructuredQueryUtils/StructuredQueryUtils.ts";
+export { StructuredQueryUtils as StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQueryUtils/StructuredQueryUtils.ts";
 
 export namespace StructuredQuery {
   export type T = StructuredQueryRead;

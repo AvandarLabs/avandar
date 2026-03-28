@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { capitalize } from "./capitalize.ts";
-import type { Expect, IsEqual } from "../../types/test-utilities.types.ts";
+import { capitalize } from "@utils/strings/capitalize/capitalize.ts";
+import type { Expect, IsEqual } from "@utils/types/test-utilities.types.ts";
 
 describe("capitalize", () => {
   it("capitalizes the first letter of a lowercase word", () => {

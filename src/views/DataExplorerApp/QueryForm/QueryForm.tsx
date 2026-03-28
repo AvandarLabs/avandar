@@ -1,6 +1,6 @@
 import { Accordion } from "@mantine/core";
-import { LLMQueryForm } from "./LLMQueryForm";
-import { ManualQueryForm } from "./ManualQueryForm";
+import { LLMQueryForm } from "@/views/DataExplorerApp/QueryForm/LLMQueryForm";
+import { ManualQueryForm } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm";
 
 type Props = {
   withinPortal?: boolean;

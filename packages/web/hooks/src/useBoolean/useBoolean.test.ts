@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { useBoolean } from "./useBoolean";
+import { useBoolean } from "@hooks/useBoolean/useBoolean";
 
 describe("useBoolean", () => {
   it("returns initial state", () => {

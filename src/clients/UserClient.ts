@@ -17,10 +17,11 @@ import type { ILogger, WithLogger } from "@logger/Logger.types.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   MembershipId,
-  UserId,
   UserProfile,
   UserProfileId,
-} from "$/models/User/User.types";
+} from "$/models/User/UserProfile.types";
+import type { UserId } from "$/models/User/User.types";
+
 
 type TUserClient = WithSupabaseClient<
   WithLogger<

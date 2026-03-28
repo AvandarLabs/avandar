@@ -1,9 +1,9 @@
-import { isEmptyObject } from "../../guards/isEmptyObject/isEmptyObject.ts";
-import { objectValues } from "../../objects/objectValues.ts";
-import { isFiltersByColumnObject } from "../isFiltersByColumnObject/isFiltersByColumnObject.ts";
-import { isFiltersByOperatorObject } from "../isFiltersByOperatorObject/isFiltersByOperatorObject.ts";
-import type { UnknownObject } from "../../types/common.types.ts";
-import type { FiltersByColumn, FiltersByOperator } from "../filters.ts";
+import { isEmptyObject } from "@utils/guards/isEmptyObject/isEmptyObject.ts";
+import { objectValues } from "@utils/objects/objectValues.ts";
+import { isFiltersByColumnObject } from "@utils/filters/isFiltersByColumnObject/isFiltersByColumnObject.ts";
+import { isFiltersByOperatorObject } from "@utils/filters/isFiltersByOperatorObject/isFiltersByOperatorObject.ts";
+import type { UnknownObject } from "@utils/types/common.types.ts";
+import type { FiltersByColumn, FiltersByOperator } from "@utils/filters/filters.ts";
 
 function isEmptyFiltersByColumnObject<T extends UnknownObject>(
   filtersByColumn: FiltersByColumn<T> | undefined,

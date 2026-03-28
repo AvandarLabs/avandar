@@ -10,7 +10,7 @@ import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient"
 import { ValueExtractorClient } from "@/clients/entity-configs/ValueExtractorClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { hasPropKeys } from "@/lib/utils/guards/guards";
-import type { EntityConfigFormSubmitValues } from "./entityConfigFormTypes";
+import type { EntityConfigFormSubmitValues } from "@/components/EntityDesignerApp/EntityConfigCreatorView/entityConfigFormTypes";
 import type { EntityFieldValueExtractor } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types";
 
 export function useSubmitEntityCreatorForm(): UseMutationResultTuple<

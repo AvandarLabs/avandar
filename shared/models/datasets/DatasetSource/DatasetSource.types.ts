@@ -1,6 +1,6 @@
-import type { CSVFileDataset } from "../CSVFileDataset/CSVFileDataset.types.ts";
-import type { GoogleSheetsDataset } from "../GoogleSheetsDataset/GoogleSheetsDataset.types.ts";
-import type { VirtualDataset } from "../VirtualDataset/VirtualDataset.ts";
+import type { CSVFileDataset } from "$/models/datasets/CSVFileDataset/CSVFileDataset.types.ts";
+import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types.ts";
+import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset.ts";
 import type { Enums } from "$/types/database.types.ts";
 
 export type DatasetSourceType = Enums<"datasets__source_type">;

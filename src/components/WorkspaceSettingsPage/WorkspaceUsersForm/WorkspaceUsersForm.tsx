@@ -15,8 +15,8 @@ import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useWorkspaceRole } from "@/hooks/workspaces/useWorkspaceRole";
-import { useWorkspaceInviteModal } from "./useWorkspaceInviteModal";
-import type { UserProfileWithRole } from "$/models/User/User.types";
+import { useWorkspaceInviteModal } from "@/components/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal";
+import type { UserProfileWithRole } from "$/models/User/UserProfile.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 const IS_USER_INVITES_DISABLED = isFlagEnabled(FeatureFlag.DisableUserInvites);

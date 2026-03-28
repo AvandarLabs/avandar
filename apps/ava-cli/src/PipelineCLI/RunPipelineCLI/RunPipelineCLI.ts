@@ -1,10 +1,10 @@
-import { Acclimate } from "@avandar/acclimate";
+import { sendRunPipelineRequest } from "@ava-cli/PipelineCLI/sendRunPipelineRequest";
 import {
   printError,
   printInfo,
   printSuccess,
-} from "../../utils/cliOutput/cliOutput";
-import { sendRunPipelineRequest } from "../sendRunPipelineRequest";
+} from "@ava-cli/utils/cliOutput/cliOutput";
+import { Acclimate } from "@avandar/acclimate";
 
 export async function runPipelineCommand(options: {
   name: string;

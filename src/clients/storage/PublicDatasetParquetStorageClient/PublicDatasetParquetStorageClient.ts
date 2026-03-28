@@ -3,7 +3,7 @@ import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import {
   getPublicDatasetParquetStoragePath,
   PUBLIC_BUCKET_NAME,
-} from "./utils";
+} from "@/clients/storage/PublicDatasetParquetStorageClient/utils";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 

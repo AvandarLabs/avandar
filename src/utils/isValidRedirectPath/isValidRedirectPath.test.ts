@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isValidRedirectPath } from "./isValidRedirectPath";
+import { isValidRedirectPath } from "@/utils/isValidRedirectPath/isValidRedirectPath";
 
 describe("isValidRedirectPath", () => {
   it("returns true for valid internal paths", () => {

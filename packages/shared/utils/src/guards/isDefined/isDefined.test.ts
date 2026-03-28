@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isDefined } from "./isDefined.ts";
+import { isDefined } from "@utils/guards/isDefined/isDefined.ts";
 
 describe("isDefined", () => {
   it("returns false for undefined", () => {

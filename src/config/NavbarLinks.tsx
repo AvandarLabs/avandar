@@ -9,8 +9,8 @@ import {
 } from "@tabler/icons-react";
 import { User } from "$/models/User/User.types";
 import { ReactNode } from "react";
-import { AppLink, AppLinkKey, AppLinks } from "./AppLinks";
-import { FeatureFlag, isFlagEnabled } from "./FeatureFlagConfig";
+import { AppLink, AppLinkKey, AppLinks } from "@/config/AppLinks";
+import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 export type NavbarLink = {

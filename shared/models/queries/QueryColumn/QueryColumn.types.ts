@@ -1,4 +1,4 @@
-import type { QueryAggregationType } from "../QueryAggregationType/QueryAggregationType.types.ts";
+import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
 import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";

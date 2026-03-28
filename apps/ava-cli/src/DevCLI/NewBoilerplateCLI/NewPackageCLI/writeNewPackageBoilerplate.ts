@@ -1,14 +1,14 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { Acclimate } from "@avandar/acclimate";
-import { writeFileFromTemplate } from "../../../utils/writeFileFromTemplate/writeFileFromTemplate";
+import { writeFileFromTemplate } from "@ava-cli/utils/writeFileFromTemplate/writeFileFromTemplate";
 import {
   EDGE_FUNCTION_DENO_TEMPLATE_PATH,
   PACKAGES_DIR,
   TEMPLATES_DIR,
   TSCONFIG_APP_PATH,
   VSCODE_SETTINGS_PATH,
-} from "./constants";
+} from "@ava-cli/DevCLI/NewBoilerplateCLI/NewPackageCLI/constants";
 
 export type PackageRuntime = "shared" | "web";
 

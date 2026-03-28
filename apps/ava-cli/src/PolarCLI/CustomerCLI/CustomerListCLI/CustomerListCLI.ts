@@ -1,7 +1,7 @@
+import { createPolarCLIClient } from "@ava-cli/PolarCLI/PolarClient/createPolarCLIClient";
+import { listCustomers } from "@ava-cli/PolarCLI/PolarClient/polarHelpers";
+import { printError, printInfo } from "@ava-cli/utils/cliOutput/cliOutput";
 import { Acclimate } from "@avandar/acclimate";
-import { printError, printInfo } from "../../../utils/cliOutput/cliOutput";
-import { createPolarCLIClient } from "../../PolarClient/createPolarCLIClient";
-import { listCustomers } from "../../PolarClient/polarHelpers";
 
 type PrintableColumn = {
   key: string;

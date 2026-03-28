@@ -1,7 +1,7 @@
 import { Container, ContainerProps, Flex, Paper } from "@mantine/core";
 import { ReactNode } from "react";
-import css from "./AppLayout.module.css";
-import { AppToolbar } from "./AppToolbar/AppToolbar";
+import css from "@/components/common/layouts/AppLayout/AppLayout.module.css";
+import { AppToolbar } from "@/components/common/layouts/AppLayout/AppToolbar/AppToolbar";
 
 type Props = {
   /** The main app view to render. */

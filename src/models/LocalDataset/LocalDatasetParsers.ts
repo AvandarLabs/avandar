@@ -2,7 +2,7 @@ import { makeParserRegistry } from "@clients/makeParserRegistry";
 import { identity } from "@utils/misc/identity";
 import { uuidType } from "$/lib/zodHelpers";
 import { z } from "zod";
-import type { LocalDatasetModel } from "./LocalDataset.types";
+import type { LocalDatasetModel } from "@/models/LocalDataset/LocalDataset.types";
 import type {
   Expect,
   ZodSchemaEqualsTypes,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mapToArrayTuple } from "./mapToArrayTuple";
+import { mapToArrayTuple } from "@/lib/utils/arrays/mapToArrayTuple/mapToArrayTuple";
 
 describe("mapToArrayTuple", () => {
   it("maps values into two separate arrays", () => {

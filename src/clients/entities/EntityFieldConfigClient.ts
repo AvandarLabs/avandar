@@ -10,7 +10,7 @@ import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
 import { promiseFlatMap } from "@/lib/utils/promises";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
-import { ManualEntryExtractorClient } from "../entity-configs/ManualEntryExtractorClient";
+import { ManualEntryExtractorClient } from "@/clients/entity-configs/ManualEntryExtractorClient";
 import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import type {
   EntityFieldValueExtractor,

@@ -55,10 +55,24 @@ create table public.subscriptions (
   -- The status of the subscription on Polar
   subscription_status public.subscriptions__status not null,
   -- The number of seats that are allowed in this subscription.
-  -- If on a free plan, this number needs to be explicitly set. If on a paid
-  -- plan, it depends on how many seats they've paid for (which we get from the
-  -- Polar API).
-  max_seats_allowed integer not null
+  -- This number changes based on the feature plan type. If on a paid plan,
+  -- this should be kept in sync with the number of paid seats.
+  max_seats_allowed integer not null,
+  -- The number of datasets that are allowed in this subscription.
+  -- This number changes based on the feature plan type. If on a paid plan,
+  -- this should be kept in sync with the number of paid seats.
+  -- Use `null` to indicate unlimited.
+  max_datasets_allowed integer,
+  -- The number of dashboards that are allowed in this subscription.
+  -- This number changes based on the feature plan type. If on a paid plan,
+  -- this should be kept in sync with the number of paid seats.
+  -- Use `null` to indicate unlimited.
+  max_dashboards_allowed integer,
+  -- The number of shareable dashboards that are allowed in this subscription.
+  -- This number changes based on the feature plan type. If on a paid plan,
+  -- this should be kept in sync with the number of paid seats.
+  -- Use `null` to indicate unlimited.
+  max_shareable_dashboards_allowed integer
 );
 
 -- Indexes to improve performance

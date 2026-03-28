@@ -1,4 +1,4 @@
-import { getPipelineServerClientConfig } from "./getPipelineServerClientConfig";
+import { getPipelineServerClientConfig } from "@ava-cli/PipelineCLI/getPipelineServerClientConfig";
 
 async function _readErrorBody(res: Response): Promise<string> {
   try {

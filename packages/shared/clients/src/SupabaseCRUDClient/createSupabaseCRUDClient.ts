@@ -1,20 +1,20 @@
+import { createModelCRUDClient } from "@clients/ModelCRUDClient/createModelCRUDClient.ts";
+import { withSupabaseClient } from "@clients/SupabaseCRUDClient/withSupabaseClient.ts";
 import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined.ts";
 import { objectEntries } from "@utils/objects/objectEntries.ts";
 import { objectKeys } from "@utils/objects/objectKeys.ts";
 import { match } from "ts-pattern";
 import { EmptyObject } from "type-fest";
-import { createModelCRUDClient } from "../ModelCRUDClient/createModelCRUDClient.ts";
-import { withSupabaseClient } from "./withSupabaseClient.ts";
-import type { ModelCRUDParserRegistry } from "../makeParserRegistry.ts";
+import type { ModelCRUDParserRegistry } from "@clients/makeParserRegistry.ts";
 import type {
   ClientReturningOnlyPromises,
   UpsertOptions,
-} from "../ModelCRUDClient/ModelCRUDClient.types.ts";
-import type { RegisteredSupabaseDatabase } from "../Register.types.ts";
+} from "@clients/ModelCRUDClient/ModelCRUDClient.types.ts";
+import type { RegisteredSupabaseDatabase } from "@clients/Register.types.ts";
 import type {
   AnySupabaseCRUDModelSpec,
   SupabaseCRUDClient,
-} from "./SupabaseCRUDClient.types.ts";
+} from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
 import type { ILogger } from "@logger/Logger.types.ts";
 import type { PostgrestFilterBuilder } from "@supabase/postgrest-js";
 import type { SupabaseClient } from "@supabase/supabase-js";

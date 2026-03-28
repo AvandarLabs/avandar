@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { pipe } from "./pipe.ts";
-import type { Expect, IsEqual } from "../../types/test-utilities.types.ts";
+import { pipe } from "@utils/misc/pipe/pipe.ts";
+import type { Expect, IsEqual } from "@utils/types/test-utilities.types.ts";
 
 describe("pipe", () => {
   it("composes two functions left to right", () => {

@@ -6,7 +6,7 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { DatasetNavbar } from "./DatasetNavbar";
+import { DatasetNavbar } from "@/views/DataManagerApp/DatasetNavbar";
 
 export function DataManagerApp(): JSX.Element {
   const workspace = useCurrentWorkspace();
@@ -22,8 +22,6 @@ export function DataManagerApp(): JSX.Element {
         <Button
           leftSection={<IconPlus size={18} />}
           onClick={() => {
-            // TODO(jpsyx): this is where we should check if the user is allowed
-            // to add more data based on their subscription plan
             navigate(AppLinks.dataImport(workspace.slug));
           }}
           size="compact-sm"
