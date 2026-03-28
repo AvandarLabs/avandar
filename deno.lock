@@ -9022,12 +9022,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@panva/jose@6",
-      "npm:@supabase/supabase-js@2",
-      "npm:react-dom@19",
-      "npm:react@19",
-      "npm:type-fest@5",
-      "npm:zod@4"
+      "jsr:@panva/jose@6"
     ],
     "packageJson": {
       "dependencies": [
@@ -9051,6 +9046,7 @@
         "npm:@react-email/components@~0.5.7",
         "npm:@react-email/preview-server@^5.0.5",
         "npm:@react-email/render@^1.4.0",
+        "npm:@supabase/postgrest-js@^2.100.1",
         "npm:@supabase/supabase-js@^2.90.1",
         "npm:@tabler/icons-react@^3.31.0",
         "npm:@tanstack/eslint-plugin-query@^5.68.0",
