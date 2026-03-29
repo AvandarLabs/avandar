@@ -68,4 +68,25 @@ export const SubscriptionModule = {
     }
     return numMembersInWorkspace < subscription.maxSeatsAllowed;
   },
+
+  getSeatInfo: ({
+    subscription,
+    numMembersInWorkspace,
+  }: {
+    subscription: SubscriptionRead | undefined;
+    numMembersInWorkspace: number;
+  }): {
+    usedSeats: number;
+    maxSeats: number | undefined;
+    remainingSeats: number | undefined;
+  } => {
+    const maxSeats = subscription?.maxSeatsAllowed;
+    const remainingSeats =
+      maxSeats != null ? maxSeats - numMembersInWorkspace : undefined;
+    return {
+      usedSeats: numMembersInWorkspace,
+      maxSeats,
+      remainingSeats,
+    };
+  },
 };

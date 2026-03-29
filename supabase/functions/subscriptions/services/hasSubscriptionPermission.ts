@@ -67,7 +67,7 @@ export async function hasSubscriptionPermission(
             .throwOnError(),
           supabaseAdminClient
             .from("workspace_invites")
-            .select("*")
+            .select("id", { count: "exact" })
             .eq("workspace_id", subscription.workspaceId)
             .eq("invite_status", "pending")
             .throwOnError(),
