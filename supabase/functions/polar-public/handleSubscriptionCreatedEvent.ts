@@ -3,7 +3,7 @@ import {
   webhookFailureResponse,
   webhookSuccessResponse,
 } from "@sbfn/polar-public/polarWebhookUtils.ts";
-import { computeSubscriptionLimits } from "$/config/FeaturePlansConfig.tsx";
+import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { infer as zInfer } from "zod";
 import type { WebhookResponse } from "@sbfn/polar-public/polar-public.types.ts";
 import type {
@@ -75,7 +75,10 @@ export async function handleSubscriptionCreatedEvent(
       // Avandar email, so we should store it separately.
       polar_customer_email: customer.email,
       polar_customer_id: customer.id,
-      ...computeSubscriptionLimits(featurePlan, data.seats ?? 1),
+      ...Subscription.computeSubscriptionLimitsForDB({
+        featurePlan,
+        numSeats: data.seats ?? 1,
+      }),
       current_period_start: data.current_period_start,
       current_period_end: data.current_period_end,
     })

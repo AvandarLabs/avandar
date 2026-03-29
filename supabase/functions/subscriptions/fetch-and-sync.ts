@@ -4,7 +4,7 @@ import {
   PolarProductMetadataSchema,
   PolarSubscriptionMetadataSchema,
 } from "@sbfn/polar-public/PolarEventDataSchemas.ts";
-import { computeSubscriptionLimits } from "$/config/FeaturePlansConfig.tsx";
+import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { z } from "zod";
 
 /**
@@ -50,7 +50,10 @@ export const FetchAndSyncUserSubscriptions = GET("/fetch-and-sync")
           // Avandar email, so we should store it separately.
           polar_customer_email: customer.email,
           polar_customer_id: customer.id,
-          ...computeSubscriptionLimits(featurePlan, subscription.seats ?? 1),
+          ...Subscription.computeSubscriptionLimitsForDB({
+            featurePlan,
+            numSeats: subscription.seats ?? 1,
+          }),
           current_period_start: subscription.currentPeriodStart.toISOString(),
           current_period_end: subscription.currentPeriodEnd?.toISOString(),
         };
