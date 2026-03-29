@@ -7,7 +7,7 @@ create table public.datasets__google_sheets (
   workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,
   -- Timestamp of when the dataset was created.
   created_at timestamptz not null default now(),
-  -- Timestamp of when the dataset was last updated.
+  -- Timestamp of when this row was last updated.
   updated_at timestamptz not null default now(),
   -- Google account id associated with this dataset for
   -- google authentication. Do not allow deletion of a token
@@ -27,9 +27,7 @@ create table public.datasets__google_sheets (
 alter table public.datasets__google_sheets enable row level security;
 
 -- Policies
-create policy "
-  User can SELECT datasets__google_sheets in their workspace
-" on public.datasets__google_sheets for
+create policy "User can select datasets__google_sheets in their workspace" on public.datasets__google_sheets for
 select
   to authenticated using (
     public.datasets__google_sheets.workspace_id = any (
@@ -40,9 +38,7 @@ select
     )
   );
 
-create policy "
-  User can INSERT datasets__google_sheets in their workspace
-" on public.datasets__google_sheets for insert to authenticated
+create policy "User can insert datasets__google_sheets in their workspace" on public.datasets__google_sheets for insert to authenticated
 with
   check (
     public.datasets__google_sheets.workspace_id = any (
@@ -53,9 +49,7 @@ with
     )
   );
 
-create policy "
-  User can UPDATE datasets__google_sheets in their workspace
-" on public.datasets__google_sheets
+create policy "User can update datasets__google_sheets in their workspace" on public.datasets__google_sheets
 for update
   to authenticated using (
     public.datasets__google_sheets.workspace_id = any (
@@ -76,9 +70,7 @@ with
     )
   );
 
-create policy "
-  User can DELETE datasets__google_sheets in their workspace
-" on public.datasets__google_sheets for delete to authenticated using (
+create policy "User can delete datasets__google_sheets in their workspace" on public.datasets__google_sheets for delete to authenticated using (
   public.datasets__google_sheets.workspace_id = any (
     array(
       select

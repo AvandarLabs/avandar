@@ -1,7 +1,8 @@
 create type public.datasets__source_type as enum(
   'csv_file',
   'google_sheets',
-  'virtual'
+  'virtual',
+  'open_data'
 );
 
 create table public.datasets (
@@ -9,7 +10,7 @@ create table public.datasets (
   id uuid primary key default gen_random_uuid(),
   -- Timestamp of when the dataset was created.
   created_at timestamptz not null default now(),
-  -- Timestamp of when the dataset was last updated.
+  -- Timestamp of when this row was last updated.
   updated_at timestamptz not null default now(),
   -- User id of the owner. We cannot delete users that still own
   -- datasets.

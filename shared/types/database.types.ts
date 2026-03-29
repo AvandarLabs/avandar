@@ -34,6 +34,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      catalog_entries__open_data: {
+        Row: {
+          canonical_urls: string[] | null
+          coverage_end_date: string | null
+          coverage_start_date: string | null
+          created_at: string
+          date_of_last_sync: string | null
+          date_of_last_update: string | null
+          description: string | null
+          external_dataset_id: string | null
+          external_organization_name: string
+          external_service_name: string | null
+          id: string
+          license: string | null
+          metadata: Json | null
+          notes: string | null
+          source_url: string | null
+          update_frequency: string | null
+          updated_at: string
+        }
+        Insert: {
+          canonical_urls?: string[] | null
+          coverage_end_date?: string | null
+          coverage_start_date?: string | null
+          created_at?: string
+          date_of_last_sync?: string | null
+          date_of_last_update?: string | null
+          description?: string | null
+          external_dataset_id?: string | null
+          external_organization_name: string
+          external_service_name?: string | null
+          id?: string
+          license?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          source_url?: string | null
+          update_frequency?: string | null
+          updated_at?: string
+        }
+        Update: {
+          canonical_urls?: string[] | null
+          coverage_end_date?: string | null
+          coverage_start_date?: string | null
+          created_at?: string
+          date_of_last_sync?: string | null
+          date_of_last_update?: string | null
+          description?: string | null
+          external_dataset_id?: string | null
+          external_organization_name?: string
+          external_service_name?: string | null
+          id?: string
+          license?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          source_url?: string | null
+          update_frequency?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       dashboards: {
         Row: {
           config: Json
@@ -325,6 +385,55 @@ export type Database = {
           },
           {
             foreignKeyName: "datasets__google_sheets_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      datasets__open_data: {
+        Row: {
+          catalog_entry_id: string
+          created_at: string
+          dataset_id: string
+          id: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          catalog_entry_id: string
+          created_at?: string
+          dataset_id: string
+          id?: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          catalog_entry_id?: string
+          created_at?: string
+          dataset_id?: string
+          id?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "datasets__open_data_catalog_entry_id_fkey"
+            columns: ["catalog_entry_id"]
+            isOneToOne: false
+            referencedRelation: "catalog_entries__open_data"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "datasets__open_data_dataset_id_fkey"
+            columns: ["dataset_id"]
+            isOneToOne: true
+            referencedRelation: "datasets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "datasets__open_data_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -1082,6 +1191,34 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      rpc_datasets__add_open_data_dataset: {
+        Args: {
+          p_catalog_entry_id: string
+          p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
+          p_dataset_description: string
+          p_dataset_id: string
+          p_dataset_name: string
+          p_workspace_id: string
+        }
+        Returns: {
+          created_at: string
+          date_of_last_sync: string | null
+          description: string | null
+          id: string
+          name: string
+          owner_id: string
+          owner_profile_id: string
+          source_type: Database["public"]["Enums"]["datasets__source_type"]
+          updated_at: string
+          workspace_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "datasets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       rpc_datasets__add_virtual_dataset: {
         Args: {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
@@ -1184,7 +1321,11 @@ export type Database = {
         | "UNION"
         | "JSON"
         | "GEOMETRY"
-      datasets__source_type: "csv_file" | "google_sheets" | "virtual"
+      datasets__source_type:
+        | "csv_file"
+        | "google_sheets"
+        | "virtual"
+        | "open_data"
       entity_field_configs__value_extractor_type:
         | "dataset_column_value"
         | "manual_entry"
@@ -1395,7 +1536,12 @@ export const Constants = {
         "JSON",
         "GEOMETRY",
       ],
-      datasets__source_type: ["csv_file", "google_sheets", "virtual"],
+      datasets__source_type: [
+        "csv_file",
+        "google_sheets",
+        "virtual",
+        "open_data",
+      ],
       entity_field_configs__value_extractor_type: [
         "dataset_column_value",
         "manual_entry",

@@ -51,7 +51,7 @@ create table public.dataset_columns (
   workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,
   -- Timestamp of when the dataset column was created.
   created_at timestamptz not null default now(),
-  -- Timestamp of when the dataset column was last updated.
+  -- Timestamp of when this row was last updated.
   updated_at timestamptz not null default now(),
   -- Original name of the column from the source data. This value should never
   -- be changed, it is an inherent property of the original data. The user is

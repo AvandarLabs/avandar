@@ -1,5 +1,5 @@
 /**
- * Add a Query Result dataset to a workspace.
+ * Add a virtual dataset to a workspace.
  * Calls rpc_datasets__add_dataset and inserts metadata into
  * datasets__virtual.
  *

@@ -14,7 +14,7 @@ create table public.datasets__virtual (
   workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,
   -- Timestamp of when the dataset was created.
   created_at timestamptz not null default now(),
-  -- Timestamp of when the dataset was last updated.
+  -- Timestamp of when this row was last updated.
   updated_at timestamptz not null default now(),
   -- The query that was used to generate the dataset
   raw_sql text not null
