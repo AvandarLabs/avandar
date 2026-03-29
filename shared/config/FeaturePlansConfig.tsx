@@ -60,55 +60,13 @@ export const FreePlanLimitsConfig = {
 export const BasicPlanLimitsConfig = {
   maxDatasetsBase: 10,
   datasetsPerAdditionalSeat: 5,
-  maxDashboardsAllowed: null,          // unlimited
+  maxDashboardsAllowed: null, // unlimited
   maxShareableDashboardsAllowed: null, // unlimited
 } as const;
 
 export const PremiumPlanLimitsConfig = {
   maxDatasetsBase: 100,
   datasetsPerAdditionalSeat: 10,
-  maxDashboardsAllowed: null,          // unlimited
+  maxDashboardsAllowed: null, // unlimited
   maxShareableDashboardsAllowed: null, // unlimited
 } as const;
-
-/**
- * Computes the four subscription limit columns to store in the `subscriptions`
- * table. Returns DB-column-name keys so the result can be spread directly into
- * a Supabase insert/update/upsert object.
- *
- * @param featurePlan - "free" | "basic" | "premium"
- * @param seats - Number of purchased seats (>= 1)
- */
-export function computeSubscriptionLimits(
-  featurePlan: FeaturePlan,
-  seats: number,
-): {
-  max_seats_allowed: number;
-  max_datasets_allowed: number | null;
-  max_dashboards_allowed: number | null;
-  max_shareable_dashboards_allowed: number | null;
-} {
-  if (featurePlan === "free") {
-    return {
-      max_seats_allowed: FreePlanLimitsConfig.maxSeatsAllowed,
-      max_datasets_allowed: FreePlanLimitsConfig.maxDatasetsAllowed,
-      max_dashboards_allowed: FreePlanLimitsConfig.maxDashboardsAllowed,
-      max_shareable_dashboards_allowed:
-        FreePlanLimitsConfig.maxShareableDashboardsAllowed,
-    };
-  }
-
-  const limitsConfig =
-    featurePlan === "basic" ? BasicPlanLimitsConfig : PremiumPlanLimitsConfig;
-  const additionalSeats = seats - 1;
-
-  return {
-    max_seats_allowed: seats,
-    max_datasets_allowed:
-      limitsConfig.maxDatasetsBase +
-      additionalSeats * limitsConfig.datasetsPerAdditionalSeat,
-    max_dashboards_allowed: limitsConfig.maxDashboardsAllowed,
-    max_shareable_dashboards_allowed:
-      limitsConfig.maxShareableDashboardsAllowed,
-  };
-}

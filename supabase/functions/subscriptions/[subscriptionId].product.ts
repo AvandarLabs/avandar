@@ -4,7 +4,7 @@ import {
   PolarProductMetadataSchema,
   PolarSubscriptionMetadataSchema,
 } from "@sbfn/polar-public/PolarEventDataSchemas.ts";
-import { computeSubscriptionLimits } from "$/config/FeaturePlansConfig.tsx";
+import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { z } from "zod";
 
 /**
@@ -69,10 +69,10 @@ export const UpdateSubscriptionProduct = PATCH({
         ended_at: updatedSubscription.endedAt?.toISOString(),
         polar_customer_email: customer.email,
         polar_customer_id: customer.id,
-        ...computeSubscriptionLimits(
+        ...Subscription.computeSubscriptionLimitsForDB({
           featurePlan,
-          updatedSubscription.seats ?? 1,
-        ),
+          numSeats: updatedSubscription.seats ?? 1,
+        }),
       })
       .eq("polar_subscription_id", updatedSubscription.id)
       .throwOnError();

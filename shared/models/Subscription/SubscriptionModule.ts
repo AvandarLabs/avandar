@@ -1,5 +1,10 @@
 import { registry } from "@utils/objects/registry/registry.ts";
 import {
+  BasicPlanLimitsConfig,
+  FreePlanLimitsConfig,
+  PremiumPlanLimitsConfig,
+} from "$/config/FeaturePlansConfig.tsx";
+import {
   FeaturePlanType,
   SubscriptionPermission,
   SubscriptionRead,
@@ -87,6 +92,51 @@ export const SubscriptionModule = {
       usedSeats: numMembersInWorkspace,
       maxSeats,
       remainingSeats,
+    };
+  },
+
+  /**
+   * Computes the four subscription limit columns to store in the
+   * `subscriptions` table. Returns DB-column-name keys so the result can be
+   * spread directly into a Supabase insert/update/upsert object.
+   *
+   * @param options.featurePlan - "free" | "basic" | "premium"
+   * @param options.numSeats - Number of purchased seats (>= 1)
+   */
+  computeSubscriptionLimitsForDB: ({
+    featurePlan,
+    numSeats,
+  }: {
+    featurePlan: FeaturePlanType;
+    numSeats: number;
+  }): {
+    max_seats_allowed: number;
+    max_datasets_allowed: number | null;
+    max_dashboards_allowed: number | null;
+    max_shareable_dashboards_allowed: number | null;
+  } => {
+    if (featurePlan === "free") {
+      return {
+        max_seats_allowed: FreePlanLimitsConfig.maxSeatsAllowed,
+        max_datasets_allowed: FreePlanLimitsConfig.maxDatasetsAllowed,
+        max_dashboards_allowed: FreePlanLimitsConfig.maxDashboardsAllowed,
+        max_shareable_dashboards_allowed:
+          FreePlanLimitsConfig.maxShareableDashboardsAllowed,
+      };
+    }
+
+    const limitsConfig =
+      featurePlan === "basic" ? BasicPlanLimitsConfig : PremiumPlanLimitsConfig;
+    const additionalSeats = numSeats - 1;
+
+    return {
+      max_seats_allowed: numSeats,
+      max_datasets_allowed:
+        limitsConfig.maxDatasetsBase +
+        additionalSeats * limitsConfig.datasetsPerAdditionalSeat,
+      max_dashboards_allowed: limitsConfig.maxDashboardsAllowed,
+      max_shareable_dashboards_allowed:
+        limitsConfig.maxShareableDashboardsAllowed,
     };
   },
 };
