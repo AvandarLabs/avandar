@@ -4,12 +4,12 @@ import { withLogger } from "@logger/module-augmenters/withLogger";
 import { notifyDevAlert } from "@ui/index";
 import { where } from "@utils/index";
 import { objectKeys } from "@utils/objects/objectKeys";
-import { template } from "@utils/strings/template/template";
+import { sqlTemplate } from "@utils/strings/template/sqlTemplate";
 import { match } from "ts-pattern";
-import { promiseReduce } from "@/lib/utils/promises";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { scalar, singleton } from "@/clients/DuckDBClient/queryResultHelpers";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
-import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { promiseReduce } from "@/lib/utils/promises";
 import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
 import type { WithQueryHooks } from "@hooks/withQueryHooks/withQueryHooks.types";
 import type { WithLogger } from "@logger/Logger.types";
@@ -80,7 +80,7 @@ function createDatasetQueryClient(): WithLogger<
         logger.log("Getting preview data for dataset", params);
         const { datasetId, numRows, workspaceId } = params;
 
-        const queryString = template(
+        const queryString = sqlTemplate(
           'SELECT * FROM "$tableName$" LIMIT $numRows$',
         ).parse({ numRows, tableName: datasetId });
 
@@ -113,7 +113,7 @@ function createDatasetQueryClient(): WithLogger<
               count: bigint;
             }>({
               workspaceId,
-              rawSQL: template(
+              rawSQL: sqlTemplate(
                 'SELECT COUNT(*) as count FROM "$tableName$"',
               ).parse({ tableName: datasetId }),
             }),
@@ -131,7 +131,7 @@ function createDatasetQueryClient(): WithLogger<
                   count: bigint;
                 }>({
                   workspaceId,
-                  rawSQL: template(
+                  rawSQL: sqlTemplate(
                     'SELECT COUNT(DISTINCT "$columnName$") as count FROM "$tableName$"',
                   ).parse({
                     columnName: columnName,
@@ -147,7 +147,7 @@ function createDatasetQueryClient(): WithLogger<
                   count: bigint;
                 }>({
                   workspaceId,
-                  rawSQL: template(
+                  rawSQL: sqlTemplate(
                     `SELECT COUNT("$columnName$") as count
                     FROM "$tableName$"
                     WHERE "$columnName$" IS NULL
@@ -163,7 +163,7 @@ function createDatasetQueryClient(): WithLogger<
               max_count: bigint;
             }>({
               workspaceId,
-              rawSQL: template(
+              rawSQL: sqlTemplate(
                 `SELECT MAX(cnt) as max_count FROM (
                 SELECT COUNT(*) as cnt
                 FROM "$tableName$"
@@ -182,7 +182,7 @@ function createDatasetQueryClient(): WithLogger<
               count: bigint;
             }>({
               workspaceId,
-              rawSQL: template(
+              rawSQL: sqlTemplate(
                 `SELECT "$columnName$" AS value, COUNT(*) AS count
                FROM "$tableName$"
                WHERE
@@ -221,7 +221,7 @@ function createDatasetQueryClient(): WithLogger<
                     stdDev: number;
                   }>({
                     workspaceId,
-                    rawSQL: template(
+                    rawSQL: sqlTemplate(
                       `SELECT
                         MAX("$columnName$") as max,
                         MIN("$columnName$") as min,
@@ -268,7 +268,7 @@ function createDatasetQueryClient(): WithLogger<
                     days: bigint | number | null;
                   }>({
                     workspaceId,
-                    rawSQL: template(singleQuery).parse({
+                    rawSQL: sqlTemplate(singleQuery).parse({
                       columnName,
                       tableName: datasetId,
                     }),

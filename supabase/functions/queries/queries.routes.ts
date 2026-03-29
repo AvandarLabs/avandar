@@ -119,7 +119,8 @@ ${DuckDBSpatialExtensionDocumentation}`
                 },
               ],
               temperature: 0.3, // Lower temperature for more deterministic SQL
-              max_tokens: 500, // Adjust based on expected query length
+              // Wide tables (e.g. WDI year columns) need more than 500 tokens.
+              max_tokens: 4096,
             }),
           },
         );

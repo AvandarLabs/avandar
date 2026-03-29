@@ -1,7 +1,7 @@
 import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
 import { where } from "@utils/filters/where/where";
 import { isDefined } from "@utils/guards/isDefined/isDefined";
-import { template } from "@utils/index";
+import { sqlTemplate } from "@utils/index";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { makeObject } from "@utils/objects/makeObject/makeObject";
@@ -78,7 +78,7 @@ export async function generateEntities(
     ]!;
 
   await WorkspaceQETLClient.runQuery({
-    rawSQL: template(`
+    rawSQL: sqlTemplate(`
       DROP TABLE IF EXISTS "$entityConfigId$";
 
       CREATE TABLE "$entityConfigId$" AS (

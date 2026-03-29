@@ -23,7 +23,11 @@ export type OpenDataCatalogEntryRead = {
 
   coverageEndDate: string | undefined;
 
-  datasetName: string;
+  /** Parquet object name in storage (e.g. `series.parquet`). */
+  parquetFileName: string;
+
+  /** Display name shown in the catalog UI. */
+  displayName: string;
 
   pipelineName: string;
 

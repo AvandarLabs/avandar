@@ -299,11 +299,14 @@ export class NodeDuckDB {
   }
 
   /**
-   * Row count and column names for a Parquet file on disk.
+   * Row count, column names, and DuckDB `DESCRIBE` column types for a Parquet
+   * file on disk.
    */
   async summarizeParquetFile(parquetPath: string): Promise<{
     rowCount: number;
     columnNames: readonly string[];
+    /** Parallel `column_type` strings from `DESCRIBE`. */
+    columnTypeDescriptions: readonly string[];
   }> {
     const escaped = _escapeSQLSingleQuotedString(parquetPath);
     const countRows = await this.runRawQuery<{ c: bigint | number }>(
@@ -311,6 +314,7 @@ export class NodeDuckDB {
     );
     const describeRows = await this.runRawQuery<{
       column_name: string;
+      column_type: string;
     }>(`DESCRIBE SELECT * FROM read_parquet('${escaped}')`);
     const firstCount = countRows[0]?.c;
     const rowCount =
@@ -320,7 +324,10 @@ export class NodeDuckDB {
     const columnNames = describeRows.map((row) => {
       return row.column_name;
     });
-    return { rowCount, columnNames };
+    const columnTypeDescriptions = describeRows.map((row) => {
+      return row.column_type;
+    });
+    return { rowCount, columnNames, columnTypeDescriptions };
   }
 
   /**

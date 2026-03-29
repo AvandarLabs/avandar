@@ -104,6 +104,7 @@ const worldBankWdiETL = ETLEngine.create({
           tableBaseName,
           rowCount: summary.rowCount,
           columnNames: summary.columnNames,
+          columnTypeDescriptions: summary.columnTypeDescriptions,
           yearCoverage,
         });
       }

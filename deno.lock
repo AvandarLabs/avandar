@@ -9102,6 +9102,7 @@
         "npm:eslint-plugin-tailwindcss@^3.18.0",
         "npm:eslint-plugin-unused-imports@^4.1.4",
         "npm:eslint@^9.21.0",
+        "npm:fuse.js@^7.1.0",
         "npm:globals@^15.15.0",
         "npm:google-auth-library@^10.1.0",
         "npm:googleapis@154",

@@ -6,7 +6,7 @@ import { prop } from "@utils/objects/hofs/prop/prop";
 import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
 import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord";
 import { objectEntries } from "@utils/objects/objectEntries";
-import { template } from "@utils/strings/template/template";
+import { sqlTemplate } from "@utils/strings/template/sqlTemplate";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
@@ -169,7 +169,7 @@ async function _extractFieldValuesFromDataset({
     Record<EntityFieldConfigId, unknown>
   >({
     workspaceId,
-    rawSQL: template(`
+    rawSQL: sqlTemplate(`
       -- Get all the external IDs we will pull values for
       WITH external_ids AS (
         SELECT

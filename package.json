@@ -2,7 +2,7 @@
   "name": "avandar",
   "license": "CPAL-1.0",
   "private": true,
-  "version": "0.8.4-dev",
+  "version": "0.8.5-dev",
   "type": "module",
   "engines": {
     "node": ">=22.0.0"
@@ -106,6 +106,7 @@
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "dexie": "^4.0.11",
+    "fuse.js": "^7.1.0",
     "knex": "^3.1.0",
     "maplibre-gl": "^5.13.0",
     "match-sorter": "^8.2.0",

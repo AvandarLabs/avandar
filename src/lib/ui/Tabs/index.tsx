@@ -2,11 +2,14 @@ import {
   FloatingIndicator,
   Tabs as MantineTabs,
   TabsProps as MantineTabsProps,
-  MantineTheme,
   Text,
+  useMantineTheme,
 } from "@mantine/core";
 import { makeObject } from "@utils/objects/makeObject/makeObject";
 import { ReactNode, useState } from "react";
+import classes from "@/lib/ui/Tabs/Tabs.module.css";
+
+export type TabsIndicatorVariant = "underline" | "floating";
 
 type Props<TabId extends string> = {
   /**
@@ -22,6 +25,13 @@ type Props<TabId extends string> = {
   renderTabPanel:
     | { [K in TabId]: (tabId: K) => ReactNode }
     | ((tabId: TabId) => ReactNode);
+
+  /**
+   * Visual style for the `FloatingIndicator` behind the active tab.
+   * - `underline`: bottom border on the list + accent line under the tab.
+   * - `floating`: pill background, border, and shadow (Mantine demo style).
+   */
+  indicatorVariant?: TabsIndicatorVariant;
 } & Omit<MantineTabsProps, "variant" | "children">;
 
 /**
@@ -32,8 +42,10 @@ export function Tabs<TabId extends string>({
   tabIds,
   renderTabHeader,
   renderTabPanel,
+  indicatorVariant = "underline",
   ...props
 }: Props<TabId>): JSX.Element {
+  const theme = useMantineTheme();
   const [currentTab, setCurrentTab] = useState<TabId>(tabIds[0]!);
 
   // track the tab list refs so we can animate the tab indicator
@@ -50,6 +62,8 @@ export function Tabs<TabId extends string>({
     };
   };
 
+  const isFloating = indicatorVariant === "floating";
+
   return (
     <MantineTabs
       variant="none"
@@ -60,19 +74,32 @@ export function Tabs<TabId extends string>({
       {...props}
     >
       <MantineTabs.List
-        mb="xs"
+        mb={isFloating ? undefined : "xs"}
         ref={setTabListRef}
         pos="relative"
-        style={styles.tabList}
+        className={isFloating ? classes.list : undefined}
+        style={
+          isFloating ? undefined : (
+            {
+              borderBottom: `2px solid ${theme.colors.neutral[1]}`,
+            }
+          )
+        }
       >
         {tabIds.map((tabId) => {
+          const isActive = currentTab === tabId;
           return (
             <MantineTabs.Tab
               key={tabId}
               value={tabId}
               ref={tabItemRefCallback(tabId)}
+              className={isFloating ? classes.tab : undefined}
             >
-              <Text span>
+              <Text
+                span
+                fw={isActive ? 500 : 400}
+                c={!isActive ? "dimmed" : undefined}
+              >
                 {typeof renderTabHeader === "function" ?
                   renderTabHeader(tabId)
                 : typeof renderTabHeader[tabId] === "function" ?
@@ -86,7 +113,16 @@ export function Tabs<TabId extends string>({
         <FloatingIndicator
           target={tabItemRefs[currentTab]}
           parent={tabListRef}
-          style={styles.tabIndicator}
+          className={isFloating ? classes.indicator : undefined}
+          style={
+            isFloating ? undefined : (
+              {
+                position: "absolute",
+                top: "2px",
+                borderBottom: `2px solid ${theme.colors.primary[6]}`,
+              }
+            )
+          }
         />
       </MantineTabs.List>
 
@@ -102,18 +138,3 @@ export function Tabs<TabId extends string>({
     </MantineTabs>
   );
 }
-
-const styles = {
-  tabList: (theme: MantineTheme) => {
-    return {
-      borderBottom: `2px solid ${theme.colors.neutral[1]}`,
-    };
-  },
-  tabIndicator: (theme: MantineTheme) => {
-    return {
-      position: "absolute",
-      top: "2px",
-      borderBottom: `2px solid ${theme.colors.primary[6]}`,
-    };
-  },
-};

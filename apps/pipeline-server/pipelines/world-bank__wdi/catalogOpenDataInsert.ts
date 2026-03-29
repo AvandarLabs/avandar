@@ -1,3 +1,5 @@
+import { duckDBDescribeColumnTypeToSniffable } from "@ava-etl/NodeDuckDB/DuckDBSniffableDataType";
+import { getWdiCatalogDatasetPresentation } from "@pipelines/world-bank__wdi/wdiCatalogDatasetConfig";
 import { createClient } from "@supabase/supabase-js";
 import type { NodeDuckDB } from "@ava-etl/NodeDuckDB/NodeDuckDB";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -6,10 +8,6 @@ const OPENDATA_BUCKET_DEFAULT = "opendata";
 
 const WDI_SOURCE_URL =
   "https://data.worldbank.org/data-catalog/world-development-indicators";
-
-const WDI_DESCRIPTION =
-  "World Development Indicators: official World Bank compilation " +
-  "of development indicators from accepted international sources.";
 
 /** Min/max calendar years for one Parquet table (WDI `Year` column). */
 export type WdiYearCoverage = Readonly<{
@@ -25,8 +23,19 @@ export type WdiTableParquetSummary = Readonly<{
   tableBaseName: string;
   rowCount: number;
   columnNames: readonly string[];
+  /** Parallel DuckDB `column_type` strings from `DESCRIBE`. */
+  columnTypeDescriptions: readonly string[];
   yearCoverage: WdiYearCoverage | undefined;
 }>;
+
+/**
+ * Maps DuckDB `DESCRIBE` `column_type` to `datasets__duckdb_data_type`.
+ */
+function mapDescribeColumnTypeToCastDataType(
+  columnType: string,
+): ReturnType<typeof duckDBDescribeColumnTypeToSniffable> {
+  return duckDBDescribeColumnTypeToSniffable(columnType);
+}
 
 /**
  * Creates a Supabase client using the service role key (bypasses RLS).
@@ -138,8 +147,8 @@ function _buildMetadataForTable(options: {
 
 /**
  * Upserts one `catalog_entries__open_data` row per loaded Parquet dataset.
- * `dataset_name` is each table’s base name (same as storage object stem).
- * Conflicts on (`dataset_name`, `pipeline_name`) replace the existing row.
+ * `parquet_file_name` is the Parquet object stem (e.g. `series.parquet`).
+ * Conflicts on (`parquet_file_name`, `pipeline_name`) replace the existing row.
  */
 export async function upsertWorldBankWdiCatalogEntry(options: {
   supabase: SupabaseClient;
@@ -153,6 +162,9 @@ export async function upsertWorldBankWdiCatalogEntry(options: {
   const nowIso = new Date().toISOString();
 
   const rows = tableSummaries.map((summary) => {
+    const presentation = getWdiCatalogDatasetPresentation({
+      tableBaseName: summary.tableBaseName,
+    });
     const objectPath = `${prefix}/${summary.tableBaseName}.parquet`;
     const { data } = supabase.storage.from(bucket).getPublicUrl(objectPath);
     const publicParquetUrl = data.publicUrl;
@@ -166,8 +178,11 @@ export async function upsertWorldBankWdiCatalogEntry(options: {
         _coverageEndIso(summary.yearCoverage.maxYear)
       : undefined;
 
+    const parquetFileName = `${summary.tableBaseName}.parquet`;
+
     return {
-      dataset_name: summary.tableBaseName,
+      display_name: presentation.display_name,
+      parquet_file_name: parquetFileName,
       date_of_last_sync: nowIso,
       coverage_start_date: coverageStart,
       coverage_end_date: coverageEnd,
@@ -185,7 +200,7 @@ export async function upsertWorldBankWdiCatalogEntry(options: {
       ],
       license: "CC BY 4.0",
       update_frequency: "Annual",
-      description: WDI_DESCRIPTION,
+      description: presentation.description,
       metadata: _buildMetadataForTable({
         bucket,
         storagePrefix: prefix,
@@ -194,15 +209,93 @@ export async function upsertWorldBankWdiCatalogEntry(options: {
     };
   });
 
-  const { error } = await supabase
+  const { data: upsertedEntries, error } = await supabase
     .from("catalog_entries__open_data")
     .upsert(rows, {
-      onConflict: "dataset_name,pipeline_name",
-    });
+      onConflict: "parquet_file_name,pipeline_name",
+    })
+    .select("id, parquet_file_name");
 
   if (error) {
     throw new Error(
       `catalog_entries__open_data upsert failed: ${error.message}`,
+    );
+  }
+
+  if (!upsertedEntries || upsertedEntries.length === 0) {
+    return;
+  }
+
+  const upsertedCatalogEntryIds = upsertedEntries.map((row) => {
+    return row.id;
+  });
+
+  const { error: deleteColumnsError } = await supabase
+    .from("catalog_entries__dataset_column")
+    .delete()
+    .in("catalog_entry_id", upsertedCatalogEntryIds);
+
+  if (deleteColumnsError) {
+    throw new Error(
+      `catalog_entries__dataset_column delete failed: ` +
+        `${deleteColumnsError.message}`,
+    );
+  }
+
+  const columnRows: Array<{
+    catalog_entry_id: string;
+    column_name: string;
+    display_order: number;
+    original_data_type: string;
+    cast_data_type: ReturnType<typeof mapDescribeColumnTypeToCastDataType>;
+  }> = [];
+
+  for (const summary of tableSummaries) {
+    const expectedParquetFileName = `${summary.tableBaseName}.parquet`;
+    const catalogEntryId = upsertedEntries.find((row) => {
+      return row.parquet_file_name === expectedParquetFileName;
+    })?.id;
+
+    if (!catalogEntryId) {
+      continue;
+    }
+
+    if (summary.columnNames.length !== summary.columnTypeDescriptions.length) {
+      throw new Error(
+        `Column name / type length mismatch for table "${summary.tableBaseName}".`,
+      );
+    }
+
+    summary.columnNames.forEach((columnName, columnIdx) => {
+      const typeDescription = summary.columnTypeDescriptions[columnIdx];
+      if (typeDescription === undefined) {
+        throw new Error(
+          `Missing column type for "${columnName}" in "${summary.tableBaseName}".`,
+        );
+      }
+
+      columnRows.push({
+        catalog_entry_id: catalogEntryId,
+        column_name: columnName,
+        display_order: columnIdx,
+        original_data_type: typeDescription,
+        cast_data_type: mapDescribeColumnTypeToCastDataType(typeDescription),
+      });
+    });
+  }
+
+  if (columnRows.length === 0) {
+    return;
+  }
+
+  const { error: insertColumnsError } = await supabase
+    .from("catalog_entries__dataset_column")
+    .insert(columnRows);
+
+  if (insertColumnsError) {
+    throw new Error(
+      `catalog_entries__dataset_column insert failed: ` +
+        `${insertColumnsError.message}`,
     );
   }
 }

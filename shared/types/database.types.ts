@@ -34,16 +34,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      catalog_entries__dataset_column: {
+        Row: {
+          cast_data_type: Database["public"]["Enums"]["datasets__duckdb_data_type"]
+          catalog_entry_id: string
+          column_name: string
+          created_at: string | null
+          display_order: number | null
+          id: string
+          original_data_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          cast_data_type: Database["public"]["Enums"]["datasets__duckdb_data_type"]
+          catalog_entry_id: string
+          column_name: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          original_data_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          cast_data_type?: Database["public"]["Enums"]["datasets__duckdb_data_type"]
+          catalog_entry_id?: string
+          column_name?: string
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          original_data_type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catalog_entries__dataset_column_catalog_entry_id_fkey"
+            columns: ["catalog_entry_id"]
+            isOneToOne: false
+            referencedRelation: "catalog_entries__open_data"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       catalog_entries__open_data: {
         Row: {
           canonical_urls: string[] | null
           coverage_end_date: string | null
           coverage_start_date: string | null
           created_at: string
-          dataset_name: string
           date_of_last_sync: string | null
           date_of_last_update: string | null
           description: string | null
+          display_name: string
           external_dataset_id: string | null
           external_organization_name: string
           external_service_name: string | null
@@ -51,6 +92,7 @@ export type Database = {
           license: string | null
           metadata: Json | null
           notes: string | null
+          parquet_file_name: string
           pipeline_name: string
           pipeline_run_id: string
           source_url: string | null
@@ -62,10 +104,10 @@ export type Database = {
           coverage_end_date?: string | null
           coverage_start_date?: string | null
           created_at?: string
-          dataset_name: string
           date_of_last_sync?: string | null
           date_of_last_update?: string | null
           description?: string | null
+          display_name: string
           external_dataset_id?: string | null
           external_organization_name: string
           external_service_name?: string | null
@@ -73,6 +115,7 @@ export type Database = {
           license?: string | null
           metadata?: Json | null
           notes?: string | null
+          parquet_file_name: string
           pipeline_name: string
           pipeline_run_id: string
           source_url?: string | null
@@ -84,10 +127,10 @@ export type Database = {
           coverage_end_date?: string | null
           coverage_start_date?: string | null
           created_at?: string
-          dataset_name?: string
           date_of_last_sync?: string | null
           date_of_last_update?: string | null
           description?: string | null
+          display_name?: string
           external_dataset_id?: string | null
           external_organization_name?: string
           external_service_name?: string | null
@@ -95,6 +138,7 @@ export type Database = {
           license?: string | null
           metadata?: Json | null
           notes?: string | null
+          parquet_file_name?: string
           pipeline_name?: string
           pipeline_run_id?: string
           source_url?: string | null
