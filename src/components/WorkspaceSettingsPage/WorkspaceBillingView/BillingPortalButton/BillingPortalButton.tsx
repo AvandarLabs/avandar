@@ -26,7 +26,11 @@ export function BillingPortalButton({ children }: Props): JSX.Element {
           "User ID is required to get the customer portal URL",
         );
         setIsLoadingCustomerPortalURL(true);
-        goToBillingPortal({ userId });
+        try {
+          await goToBillingPortal({ userId });
+        } finally {
+          setIsLoadingCustomerPortalURL(false);
+        }
       }}
     >
       {children}

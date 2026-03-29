@@ -7,6 +7,7 @@ import { getDevOverrideEmail } from "$/env/getDevOverrideEmail.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { match } from "ts-pattern";
 import { z } from "zod";
+import { UpdateSubscriptionSeats } from "@sbfn/subscriptions/[subscriptionId].seats.ts";
 import type {
   AvaPolarProduct,
   SubscriptionsAPI,
@@ -22,6 +23,10 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
 
   "/:subscriptionId/product": {
     PATCH: UpdateSubscriptionProduct,
+  },
+
+  "/:subscriptionId/seats": {
+    PATCH: UpdateSubscriptionSeats,
   },
 
   /**
@@ -162,7 +167,7 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
         // first check if the user has a subscription
         const { data: subscriptions } = await supabaseAdminClient
           .from("subscriptions")
-          .select("polar_subscription_id")
+          .select("polar_subscription_id, polar_customer_id")
           .eq("subscription_owner_id", pathParams.userId);
         if (!subscriptions || subscriptions.length === 0) {
           return { success: false };
@@ -170,7 +175,7 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
 
         // They have one, so we can create a customer session for them
         const customerSession = await PolarClient.createCustomerSessions({
-          avandarUserId: pathParams.userId,
+          customerId: subscriptions[0].polar_customer_id,
           returnURL: queryParams.returnURL,
         });
         return {
