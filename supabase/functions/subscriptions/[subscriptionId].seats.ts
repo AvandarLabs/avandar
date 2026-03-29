@@ -4,14 +4,7 @@ import {
   PolarProductMetadataSchema,
   PolarSubscriptionMetadataSchema,
 } from "@sbfn/polar-public/PolarEventDataSchemas.ts";
-import {
-  BASE_BASIC_PLAN_DATASETS,
-  BASE_PREMIUM_PLAN_DATASETS,
-  MAX_FREE_PLAN_DASHBOARDS,
-  MAX_FREE_PLAN_DATASETS,
-  MAX_FREE_PLAN_SEATS,
-  MAX_FREE_PLAN_SHAREABLE_DASHBOARDS,
-} from "@sbfn/polar-public/polarWebhookUtils.ts";
+import { computeSubscriptionLimits } from "$/config/FeaturePlansConfig.tsx";
 import { z } from "zod";
 
 /**
@@ -77,21 +70,10 @@ export const UpdateSubscriptionSeats = PATCH({
         ended_at: updatedSubscription.endedAt?.toISOString(),
         polar_customer_email: customer.email,
         polar_customer_id: customer.id,
-        max_seats_allowed:
-          featurePlan === "free" ? MAX_FREE_PLAN_SEATS : (
-            (updatedSubscription.seats ?? 1)
-          ),
-        max_datasets_allowed:
-          featurePlan === "free" ? MAX_FREE_PLAN_DATASETS
-          : featurePlan === "basic" ?
-            BASE_BASIC_PLAN_DATASETS +
-            ((updatedSubscription.seats ?? 1) - 1) * 5
-          : BASE_PREMIUM_PLAN_DATASETS +
-            ((updatedSubscription.seats ?? 1) - 1) * 10,
-        max_dashboards_allowed:
-          featurePlan === "free" ? MAX_FREE_PLAN_DASHBOARDS : null,
-        max_shareable_dashboards_allowed:
-          featurePlan === "free" ? MAX_FREE_PLAN_SHAREABLE_DASHBOARDS : null,
+        ...computeSubscriptionLimits(
+          featurePlan,
+          updatedSubscription.seats ?? 1,
+        ),
       })
       .eq("polar_subscription_id", updatedSubscription.id)
       .throwOnError();
