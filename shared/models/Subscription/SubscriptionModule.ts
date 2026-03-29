@@ -78,19 +78,14 @@ export const SubscriptionModule = {
   }): {
     usedSeats: number;
     maxSeats: number | undefined;
-    isUnlimitedSeats: boolean;
     remainingSeats: number | undefined;
   } => {
     const maxSeats = subscription?.maxSeatsAllowed;
-    const isUnlimitedSeats = maxSeats === Infinity;
     const remainingSeats =
-      maxSeats != null && !isUnlimitedSeats ?
-        maxSeats - numMembersInWorkspace
-      : undefined;
+      maxSeats != null ? maxSeats - numMembersInWorkspace : undefined;
     return {
       usedSeats: numMembersInWorkspace,
       maxSeats,
-      isUnlimitedSeats,
       remainingSeats,
     };
   },

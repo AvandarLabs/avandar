@@ -59,7 +59,7 @@ export function WorkspaceUsersForm(): JSX.Element | null {
 
   const isAdmin = workspaceRole === "admin";
 
-  const { usedSeats, maxSeats, isUnlimitedSeats, remainingSeats } =
+  const { usedSeats, maxSeats, remainingSeats } =
     SubscriptionModule.getSeatInfo({
       subscription: workspace.subscription,
       numMembersInWorkspace: workspaceUsers.length + pendingInvites.length,
@@ -150,9 +150,7 @@ export function WorkspaceUsersForm(): JSX.Element | null {
         <Flex justify="space-between" align="center" mb="md">
           {!loadingSeats && maxSeats != null ?
             <Text size="sm" c="dimmed">
-              {isUnlimitedSeats ?
-                `${usedSeats} seat${usedSeats === 1 ? "" : "s"} used (unlimited)`
-              : `${usedSeats} of ${maxSeats} seat${maxSeats === 1 ? "" : "s"} used · ${remainingSeats} remaining`}
+              {`${usedSeats} of ${maxSeats} seat${maxSeats === 1 ? "" : "s"} used · ${remainingSeats} remaining`}
             </Text>
           : <Box />}
           <Button disabled={loadingSeats} onClick={openInviteModal}>

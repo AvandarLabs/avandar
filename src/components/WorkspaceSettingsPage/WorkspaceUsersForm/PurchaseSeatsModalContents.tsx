@@ -9,16 +9,15 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifySuccess } from "@ui/notifications/notify";
-import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
 import { useState } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { goToBillingPortal } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal";
-import type { Subscription } from "$/models/Subscription/Subscription.types";
+import type { SubscriptionRead } from "$/models/Subscription/Subscription.types";
 import type { UserId } from "$/models/User/User.types";
 
 type PurchaseSeatsModalContentsProps = {
-  subscription: Subscription;
+  subscription: SubscriptionRead;
   currentSeatUsage: number;
   userId: UserId;
   onSeatsAdded: () => void;

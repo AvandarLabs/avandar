@@ -61,13 +61,20 @@ export function useWorkspaceInviteModal({
           modalId,
           confirmProps: { loading: true },
         });
-        await sendInvite.async({
-          workspaceId: workspace.id,
-          email,
-          role,
-        });
-        notifySuccess({ title: "Invite sent" });
-        modals.close(modalId);
+        try {
+          await sendInvite.async({
+            workspaceId: workspace.id,
+            email,
+            role,
+          });
+          notifySuccess({ title: "Invite sent" });
+          modals.close(modalId);
+        } catch {
+          modals.updateModal({
+            modalId,
+            confirmProps: { loading: false },
+          });
+        }
       }
     }
   };
