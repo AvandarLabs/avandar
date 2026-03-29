@@ -9,19 +9,19 @@ import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketReco
 import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord";
 import { objectEntries } from "@utils/objects/objectEntries";
 import { objectKeys } from "@utils/objects/objectKeys";
-import { template } from "@utils/strings/template/template";
+import { sqlTemplate } from "@utils/strings/template/sqlTemplate";
 import { wrapString } from "$/lib/strings/higherOrderFuncs";
 import { uuid } from "$/lib/uuid";
 import { match } from "ts-pattern";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { singleton } from "@/clients/DuckDBClient/queryResultHelpers";
+import { EntityClient } from "@/clients/entities/EntityClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
+import { getEntityFieldValues } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getEntityFieldValues";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import { promiseFlatMap, promiseMap } from "@/lib/utils/promises";
 import { makeSet } from "@/lib/utils/sets/builders";
 import { isInSet } from "@/lib/utils/sets/higherOrderFuncs";
-import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { singleton } from "@/clients/DuckDBClient/queryResultHelpers";
-import { EntityClient } from "@/clients/entities/EntityClient";
-import { getEntityFieldValues } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getEntityFieldValues";
 import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
 import type { WithQueryHooks } from "@hooks/withQueryHooks/withQueryHooks.types";
 import type { ILogger, WithLogger } from "@logger/Logger.types";
@@ -192,7 +192,7 @@ function createEntityFieldValueClient(): WithLogger<
                         Record<EntityFieldConfigId, unknown>
                       >({
                         workspaceId: entity.workspaceId,
-                        rawSQL: template(`
+                        rawSQL: sqlTemplate(`
                           -- Get all rows matching this external_id
                           WITH entity_rows AS (
                             SELECT

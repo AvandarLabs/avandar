@@ -17,8 +17,10 @@ create table public.catalog_entries__open_data (
   coverage_start_date timestamptz,
   -- Coverage end date of the dataset
   coverage_end_date timestamptz,
-  -- Name of the dataset
-  dataset_name text not null,
+  -- Name of the parquet dataset in storage
+  parquet_file_name text not null,
+  -- Display name of the dataset to be shown in the data catalog UI
+  display_name text not null,
   -- Name of the pipeline that syncs this dataset
   pipeline_name text not null,
   -- ID of the pipeline run that synced this dataset
@@ -45,8 +47,8 @@ create table public.catalog_entries__open_data (
   notes text,
   -- Additional metadata about the dataset
   metadata jsonb,
-  constraint unique_dataset_pipeline unique (
-    dataset_name,
+  constraint unique_parquet_file_pipeline unique (
+    parquet_file_name,
     pipeline_name
   )
 );
@@ -55,7 +57,7 @@ create table public.catalog_entries__open_data (
 alter table public.catalog_entries__open_data enable row level security;
 
 -- Policies
-create policy "User can select catalog_entries__open_data" on public.catalog_entries__open_data for
+create policy "User can select open data catalog entries" on public.catalog_entries__open_data for
 select
   to authenticated using (true);
 
