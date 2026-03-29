@@ -1,14 +1,9 @@
 import {
-  BASE_BASIC_PLAN_DATASETS,
-  BASE_PREMIUM_PLAN_DATASETS,
-  MAX_FREE_PLAN_DASHBOARDS,
-  MAX_FREE_PLAN_DATASETS,
-  MAX_FREE_PLAN_SEATS,
-  MAX_FREE_PLAN_SHAREABLE_DASHBOARDS,
   validatePolarSubscription,
   webhookFailureResponse,
   webhookSuccessResponse,
 } from "@sbfn/polar-public/polarWebhookUtils.ts";
+import { computeSubscriptionLimits } from "$/config/FeaturePlansConfig.tsx";
 import { infer as zInfer } from "zod";
 import type { WebhookResponse } from "@sbfn/polar-public/polar-public.types.ts";
 import type {
@@ -55,17 +50,7 @@ export async function handleSubscriptionUpdatedEvent(
       // Avandar email, so we should store it separately.
       polar_customer_email: customer.email,
       polar_customer_id: customer.id,
-      max_seats_allowed:
-        featurePlan === "free" ? MAX_FREE_PLAN_SEATS : (data.seats ?? 1),
-      max_datasets_allowed:
-        featurePlan === "free" ? MAX_FREE_PLAN_DATASETS
-        : featurePlan === "basic" ?
-          BASE_BASIC_PLAN_DATASETS + ((data.seats ?? 1) - 1) * 5
-        : BASE_PREMIUM_PLAN_DATASETS + ((data.seats ?? 1) - 1) * 10,
-      max_dashboards_allowed:
-        featurePlan === "free" ? MAX_FREE_PLAN_DASHBOARDS : null,
-      max_shareable_dashboards_allowed:
-        featurePlan === "free" ? MAX_FREE_PLAN_SHAREABLE_DASHBOARDS : null,
+      ...computeSubscriptionLimits(featurePlan, data.seats ?? 1),
       current_period_start: data.current_period_start,
       current_period_end: data.current_period_end,
     })
