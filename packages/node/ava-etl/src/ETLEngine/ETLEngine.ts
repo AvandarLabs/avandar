@@ -266,6 +266,7 @@ async function uploadParquetToStorage(options: {
     });
     const bytes = await readFile(localPath);
     const objectPath = `${prefix}/${tableBaseName}.parquet`;
+    // Same object path every run (no pipelineRunId), so re-runs replace files.
     const { error } = await supabase.storage
       .from(bucket)
       .upload(objectPath, bytes, {

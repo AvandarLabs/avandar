@@ -17,6 +17,12 @@ create table public.catalog_entries__open_data (
   coverage_start_date timestamptz,
   -- Coverage end date of the dataset
   coverage_end_date timestamptz,
+  -- Name of the dataset
+  dataset_name text not null,
+  -- Name of the pipeline that syncs this dataset
+  pipeline_name text not null,
+  -- ID of the pipeline run that synced this dataset
+  pipeline_run_id text not null,
   -- External organization this dataset comes from (e.g. World Bank)
   external_organization_name text not null,
   -- External name of the service, such as the API (e.g. World Bank WDI API)
@@ -38,7 +44,11 @@ create table public.catalog_entries__open_data (
   -- Notes about the dataset
   notes text,
   -- Additional metadata about the dataset
-  metadata jsonb
+  metadata jsonb,
+  constraint unique_dataset_pipeline unique (
+    dataset_name,
+    pipeline_name
+  )
 );
 
 -- Enable row level security

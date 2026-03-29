@@ -386,6 +386,9 @@ importers:
       '@avandar/ava-etl':
         specifier: workspace:*
         version: link:../../packages/node/ava-etl
+      '@supabase/supabase-js':
+        specifier: ^2.98.0
+        version: 2.98.0
       fastify:
         specifier: ^5.6.0
         version: 5.8.1

@@ -40,6 +40,7 @@ export type Database = {
           coverage_end_date: string | null
           coverage_start_date: string | null
           created_at: string
+          dataset_name: string
           date_of_last_sync: string | null
           date_of_last_update: string | null
           description: string | null
@@ -50,6 +51,8 @@ export type Database = {
           license: string | null
           metadata: Json | null
           notes: string | null
+          pipeline_name: string
+          pipeline_run_id: string
           source_url: string | null
           update_frequency: string | null
           updated_at: string
@@ -59,6 +62,7 @@ export type Database = {
           coverage_end_date?: string | null
           coverage_start_date?: string | null
           created_at?: string
+          dataset_name: string
           date_of_last_sync?: string | null
           date_of_last_update?: string | null
           description?: string | null
@@ -69,6 +73,8 @@ export type Database = {
           license?: string | null
           metadata?: Json | null
           notes?: string | null
+          pipeline_name: string
+          pipeline_run_id: string
           source_url?: string | null
           update_frequency?: string | null
           updated_at?: string
@@ -78,6 +84,7 @@ export type Database = {
           coverage_end_date?: string | null
           coverage_start_date?: string | null
           created_at?: string
+          dataset_name?: string
           date_of_last_sync?: string | null
           date_of_last_update?: string | null
           description?: string | null
@@ -88,6 +95,8 @@ export type Database = {
           license?: string | null
           metadata?: Json | null
           notes?: string | null
+          pipeline_name?: string
+          pipeline_run_id?: string
           source_url?: string | null
           update_frequency?: string | null
           updated_at?: string

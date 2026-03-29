@@ -6,8 +6,14 @@ import {
   getETLPipelineInputDir,
 } from "@ava-etl/ETLEngine/etlPaths";
 import { NodeDuckDB } from "@ava-etl/NodeDuckDB/NodeDuckDB";
+import {
+  createSupabaseAdminClient,
+  getWdiYearCoverageFromParquet,
+  upsertWorldBankWdiCatalogEntry,
+} from "@pipelines/world-bank__wdi/catalogOpenDataInsert";
 import { MIMEType } from "@utils/types/common.types";
 import type { TransformedDataDescriptionForParquet } from "@ava-etl/ETLEngine/transformedCSVsToParquetBlobs";
+import type { WdiTableParquetSummary } from "@pipelines/world-bank__wdi/catalogOpenDataInsert";
 
 const PIPELINE_NAME = "world-bank__wdi" as const;
 
@@ -75,6 +81,8 @@ const worldBankWdiETL = ETLEngine.create({
   load: async ({ pipelineName, pipelineRunId, parquetTableBaseNames }) => {
     const db = new NodeDuckDB();
     try {
+      const tableSummaries: WdiTableParquetSummary[] = [];
+
       for (const tableBaseName of parquetTableBaseNames) {
         const parquetPath = ETLEngine.getLoadParquetPathForTable({
           pipelineName,
@@ -87,11 +95,31 @@ const worldBankWdiETL = ETLEngine.create({
           `[WDI load] ${tableBaseName}: rows=${String(summary.rowCount)} ` +
             `columns=${columnList}`,
         );
+        const yearCoverage = await getWdiYearCoverageFromParquet({
+          db,
+          parquetPath,
+          columnNames: summary.columnNames,
+        });
+        tableSummaries.push({
+          tableBaseName,
+          rowCount: summary.rowCount,
+          columnNames: summary.columnNames,
+          yearCoverage,
+        });
       }
+
       await ETLEngine.uploadParquetToStorage({
         pipelineName,
         pipelineRunId,
         parquetTableBaseNames,
+      });
+
+      const supabase = createSupabaseAdminClient();
+      await upsertWorldBankWdiCatalogEntry({
+        supabase,
+        pipelineName,
+        pipelineRunId,
+        tableSummaries,
       });
     } finally {
       await db.close();

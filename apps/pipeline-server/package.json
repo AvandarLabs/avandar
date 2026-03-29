@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@avandar/ava-etl": "workspace:*",
+    "@supabase/supabase-js": "^2.98.0",
     "fastify": "^5.6.0"
   }
 }
