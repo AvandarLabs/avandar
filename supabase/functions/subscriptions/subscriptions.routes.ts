@@ -1,13 +1,13 @@
 import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
 import { UpdateSubscriptionProduct } from "@sbfn/subscriptions/[subscriptionId].product.ts";
+import { UpdateSubscriptionSeats } from "@sbfn/subscriptions/[subscriptionId].seats.ts";
 import { FetchAndSyncUserSubscriptions } from "@sbfn/subscriptions/fetch-and-sync.ts";
 import { hasSubscriptionPermission } from "@sbfn/subscriptions/services/hasSubscriptionPermission.ts";
 import { getDevOverrideEmail } from "$/env/getDevOverrideEmail.ts";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
 import { match } from "ts-pattern";
 import { z } from "zod";
-import { UpdateSubscriptionSeats } from "@sbfn/subscriptions/[subscriptionId].seats.ts";
 import type {
   AvaPolarProduct,
   SubscriptionsAPI,
@@ -175,7 +175,7 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
 
         // They have one, so we can create a customer session for them
         const customerSession = await PolarClient.createCustomerSessions({
-          customerId: subscriptions[0].polar_customer_id,
+          customerId: subscriptions[0]!.polar_customer_id,
           returnURL: queryParams.returnURL,
         });
         return {

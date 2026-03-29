@@ -1,11 +1,18 @@
-import { z } from "zod";
 import { PATCH } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
-import { MAX_FREE_PLAN_SEATS } from "$/config/AppConfig.ts";
 import {
   PolarProductMetadataSchema,
   PolarSubscriptionMetadataSchema,
 } from "@sbfn/polar-public/PolarEventDataSchemas.ts";
+import {
+  BASE_BASIC_PLAN_DATASETS,
+  BASE_PREMIUM_PLAN_DATASETS,
+  MAX_FREE_PLAN_DASHBOARDS,
+  MAX_FREE_PLAN_DATASETS,
+  MAX_FREE_PLAN_SEATS,
+  MAX_FREE_PLAN_SHAREABLE_DASHBOARDS,
+} from "@sbfn/polar-public/polarWebhookUtils.ts";
+import { z } from "zod";
 
 /**
  * Update a subscription's seat count.
@@ -74,6 +81,17 @@ export const UpdateSubscriptionSeats = PATCH({
           featurePlan === "free" ? MAX_FREE_PLAN_SEATS : (
             (updatedSubscription.seats ?? 1)
           ),
+        max_datasets_allowed:
+          featurePlan === "free" ? MAX_FREE_PLAN_DATASETS
+          : featurePlan === "basic" ?
+            BASE_BASIC_PLAN_DATASETS +
+            ((updatedSubscription.seats ?? 1) - 1) * 5
+          : BASE_PREMIUM_PLAN_DATASETS +
+            ((updatedSubscription.seats ?? 1) - 1) * 10,
+        max_dashboards_allowed:
+          featurePlan === "free" ? MAX_FREE_PLAN_DASHBOARDS : null,
+        max_shareable_dashboards_allowed:
+          featurePlan === "free" ? MAX_FREE_PLAN_SHAREABLE_DASHBOARDS : null,
       })
       .eq("polar_subscription_id", updatedSubscription.id)
       .throwOnError();
