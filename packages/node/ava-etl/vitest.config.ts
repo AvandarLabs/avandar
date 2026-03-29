@@ -1,7 +1,7 @@
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
-import { getAppVitestAliases } from "../../../tests/vitestAliases.ts";
+import { getAppVitestAliases } from "../../../tests/vitestAliases";
 
 const repoRootDir: string = resolve(
   fileURLToPath(new URL(".", import.meta.url)),
@@ -9,13 +9,13 @@ const repoRootDir: string = resolve(
 );
 
 export default defineConfig({
+  test: {
+    environment: "node",
+  },
   resolve: {
     alias: getAppVitestAliases({
       repoRootDir,
-      include: ["shared"],
+      include: ["shared", "node"],
     }),
-  },
-  test: {
-    environment: "node",
   },
 });

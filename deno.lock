@@ -9136,6 +9136,7 @@
         "npm:uuid@^11.1.0",
         "npm:vite-node@^3.2.4",
         "npm:vite-plugin-node-polyfills@0.24",
+        "npm:vite-tsconfig-paths@^6.1.1",
         "npm:vite@^7.0.4",
         "npm:vitest@^3.2.4",
         "npm:zod@^4.1.13"
@@ -9148,15 +9149,6 @@
             "npm:@supabase/postgrest-js@^2.99.0",
             "npm:@supabase/supabase-js@^2.98.0",
             "npm:type-fest@^5.4.4",
-            "npm:typescript@~5.9.3",
-            "npm:vitest@^3.2.4"
-          ]
-        }
-      },
-      "packages/shared/etl-engine": {
-        "packageJson": {
-          "dependencies": [
-            "npm:duckdb@^1.4.4",
             "npm:typescript@~5.9.3",
             "npm:vitest@^3.2.4"
           ]

@@ -31,8 +31,8 @@
       "@sbfn/*": ["./supabase/functions/*"],
 
       /* Packages */
+      "@ava-etl/*": ["./packages/node/ava-etl/src/*"],
       "@clients/*": ["./packages/shared/clients/src/*"],
-      "@etl-engine/*": ["./packages/shared/etl-engine/src/*"],
       "@logger/*": ["./packages/shared/logger/src/*"],
       "@models/*": ["./packages/shared/models/src/*"],
       "@modules/*": ["./packages/shared/modules/src/*"],

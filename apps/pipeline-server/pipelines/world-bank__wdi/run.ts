@@ -1,13 +1,13 @@
 import { mkdir, readdir } from "node:fs/promises";
 import { join } from "node:path";
-import { ETLEngine } from "@etl-engine/ETLEngine/ETLEngine";
+import { ETLEngine } from "@ava-etl/ETLEngine/ETLEngine";
 import {
   getETLOutputDir,
   getETLPipelineInputDir,
-} from "@etl-engine/ETLEngine/etlPaths";
-import { NodeDuckDB } from "@etl-engine/NodeDuckDB/NodeDuckDB";
+} from "@ava-etl/ETLEngine/etlPaths";
+import { NodeDuckDB } from "@ava-etl/NodeDuckDB/NodeDuckDB";
 import { MIMEType } from "@utils/types/common.types";
-import type { TransformedDataDescriptionForParquet } from "@etl-engine/ETLEngine/transformedCSVsToParquetBlobs";
+import type { TransformedDataDescriptionForParquet } from "@ava-etl/ETLEngine/transformedCSVsToParquetBlobs";
 
 const PIPELINE_NAME = "world-bank__wdi" as const;
 
@@ -88,6 +88,11 @@ const worldBankWdiETL = ETLEngine.create({
             `columns=${columnList}`,
         );
       }
+      await ETLEngine.uploadParquetToStorage({
+        pipelineName,
+        pipelineRunId,
+        parquetTableBaseNames,
+      });
     } finally {
       await db.close();
     }

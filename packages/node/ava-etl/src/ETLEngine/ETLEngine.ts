@@ -1,19 +1,17 @@
 import { randomUUID } from "node:crypto";
-import { access, copyFile, mkdir, writeFile } from "node:fs/promises";
+import { access, copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import {
-  getETLLoadDir,
-  getETLOutputDir,
-} from "@etl-engine/ETLEngine/etlPaths.ts";
-import { transformedCSVsToParquetBlobs } from "@etl-engine/ETLEngine/transformedCSVsToParquetBlobs.ts";
-import { createModuleFactory } from "@modules/createModuleFactory.ts";
-import type { TransformedDataDescriptionForParquet } from "@etl-engine/ETLEngine/transformedCSVsToParquetBlobs.ts";
+import { getETLLoadDir, getETLOutputDir } from "@ava-etl/ETLEngine/etlPaths";
+import { transformedCSVsToParquetBlobs } from "@ava-etl/ETLEngine/transformedCSVsToParquetBlobs";
+import { createModuleFactory } from "@modules/createModuleFactory";
+import { createClient } from "@supabase/supabase-js";
+import type { TransformedDataDescriptionForParquet } from "@ava-etl/ETLEngine/transformedCSVsToParquetBlobs";
 import type {
   Accessors,
   Module,
   StateOfModule,
 } from "@modules/createModule.ts";
-import type { MIMEType, UUID } from "@utils/types/common.types.ts";
+import type { MIMEType, UUID } from "@utils/types/common.types";
 
 type PipelineRunId = UUID<"PipelineRun">;
 type PromisedOrValue<T> = Promise<T> | T;
@@ -218,6 +216,75 @@ function getLoadParquetPathForTable(options: {
   return join(loadDir, `${tableBaseName}.parquet`);
 }
 
+const OPENDATA_BUCKET_DEFAULT = "opendata";
+
+const PARQUET_STORAGE_CONTENT_TYPE = "application/vnd.apache.parquet";
+
+/**
+ * Reads `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`, optional
+ * `SUPABASE_OPENDATA_BUCKET` (defaults to `opendata`).
+ */
+function _createSupabaseClientForOpenDataUpload() {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error(
+      "uploadParquetToStorage requires SUPABASE_URL and " +
+        "SUPABASE_SERVICE_ROLE_KEY.",
+    );
+  }
+  return createClient(supabaseUrl, serviceRoleKey);
+}
+
+/**
+ * Uploads each load-stage Parquet file to Supabase Storage at
+ * `{bucket}/{pipelineName}/datasets/{table}.parquet`, replacing any prior
+ * object with the same path (`upsert`).
+ *
+ * @param options.pipelineName Folder segment for this pipeline (e.g.
+ * `world-bank__wdi`).
+ * @param options.pipelineRunId Current run id (resolves local Parquet paths).
+ * @param options.parquetTableBaseNames Transform table names (without
+ * `.parquet`).
+ */
+async function uploadParquetToStorage(options: {
+  pipelineName: string;
+  pipelineRunId: PipelineRunId;
+  parquetTableBaseNames: readonly string[];
+}): Promise<void> {
+  const { pipelineName, pipelineRunId, parquetTableBaseNames } = options;
+  const bucket =
+    process.env.SUPABASE_OPENDATA_BUCKET ?? OPENDATA_BUCKET_DEFAULT;
+  const supabase = _createSupabaseClientForOpenDataUpload();
+  const prefix = `${pipelineName}/datasets`;
+
+  const uploadTasks = parquetTableBaseNames.map(async (tableBaseName) => {
+    const localPath = getLoadParquetPathForTable({
+      pipelineName,
+      pipelineRunId,
+      tableBaseName,
+    });
+    const bytes = await readFile(localPath);
+    const objectPath = `${prefix}/${tableBaseName}.parquet`;
+    const { error } = await supabase.storage
+      .from(bucket)
+      .upload(objectPath, bytes, {
+        contentType: PARQUET_STORAGE_CONTENT_TYPE,
+        upsert: true,
+      });
+    if (error) {
+      throw new Error(
+        `Supabase upload failed for ${objectPath}: ${error.message}`,
+      );
+    }
+  });
+  await Promise.all(uploadTasks);
+  console.log(
+    `[ETL] Uploaded ${String(parquetTableBaseNames.length)} Parquet ` +
+      `file(s) to ${bucket}/${prefix}/`,
+  );
+}
+
 const ETLEngineFactory = createModuleFactory<IETLEngine>("ETLEngine", {
   childBuilder(
     accessors: Accessors<
@@ -294,4 +361,5 @@ const ETLEngineFactory = createModuleFactory<IETLEngine>("ETLEngine", {
 export const ETLEngine = Object.assign(ETLEngineFactory, {
   storeExtractedData,
   getLoadParquetPathForTable,
+  uploadParquetToStorage,
 });

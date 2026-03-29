@@ -349,6 +349,9 @@ importers:
       vite-plugin-node-polyfills:
         specifier: ^0.24.0
         version: 0.24.0(rollup@4.59.0)(vite@7.3.1(@types/node@25.3.4)(jiti@1.21.7)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0))
+      vite-tsconfig-paths:
+        specifier: ^6.1.1
+        version: 6.1.1(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.4)(jiti@1.21.7)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0))
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@25.3.4)(happy-dom@20.8.3)(jiti@1.21.7)(jsdom@26.1.0)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0)
@@ -380,12 +383,31 @@ importers:
 
   apps/pipeline-server:
     dependencies:
-      '@avandar/etl-engine':
+      '@avandar/ava-etl':
         specifier: workspace:*
-        version: link:../../packages/shared/etl-engine
+        version: link:../../packages/node/ava-etl
       fastify:
         specifier: ^5.6.0
         version: 5.8.1
+
+  packages/node/ava-etl:
+    dependencies:
+      '@avandar/modules':
+        specifier: workspace:*
+        version: link:../../shared/modules
+      '@supabase/supabase-js':
+        specifier: ^2.98.0
+        version: 2.98.0
+      duckdb:
+        specifier: ^1.4.4
+        version: 1.4.4(encoding@0.1.13)
+    devDependencies:
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.4(@types/node@25.3.4)(happy-dom@20.8.3)(jiti@2.4.2)(jsdom@26.1.0)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0)
 
   packages/shared/clients:
     dependencies:
@@ -398,22 +420,6 @@ importers:
       type-fest:
         specifier: ^5.4.4
         version: 5.4.4
-    devDependencies:
-      typescript:
-        specifier: ~5.9.3
-        version: 5.9.3
-      vitest:
-        specifier: ^3.2.4
-        version: 3.2.4(@types/node@25.3.4)(happy-dom@20.8.3)(jiti@2.4.2)(jsdom@26.1.0)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0)
-
-  packages/shared/etl-engine:
-    dependencies:
-      '@avandar/modules':
-        specifier: workspace:*
-        version: link:../modules
-      duckdb:
-        specifier: ^1.4.4
-        version: 1.4.4(encoding@0.1.13)
     devDependencies:
       typescript:
         specifier: ~5.9.3
@@ -4687,6 +4693,9 @@ packages:
   globjoin@0.1.4:
     resolution: {integrity: sha512-xYfnw62CKG8nLkZBfWbhWwDw02CHty86jfPcc2cr3ZfeuK9ysoVPPEUxf21bAD/rWAgk52SuBrLJlefNy8mvFg==}
 
+  globrex@0.1.2:
+    resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
+
   goober@2.1.18:
     resolution: {integrity: sha512-2vFqsaDVIT9Gz7N6kAL++pLpp41l3PfDuusHcjnGLfR6+huZkl6ziX+zgVC3ZxpqWhzH6pyDdGrCeDhMIvwaxw==}
     peerDependencies:
@@ -7116,6 +7125,16 @@ packages:
   ts-pattern@5.9.0:
     resolution: {integrity: sha512-6s5V71mX8qBUmlgbrfL33xDUwO0fq48rxAu2LBE11WBeGdpCPOsXksQbZJHvHwhrd3QjUusd3mAOM5Gg0mFBLg==}
 
+  tsconfck@3.1.6:
+    resolution: {integrity: sha512-ks6Vjr/jEw0P1gmOVwutM3B7fWxoWBL2KRDb1JfqGVawBmO5UsvmWOQFGHBPl5yxYz4eERr19E6L7NMv+Fej4w==}
+    engines: {node: ^18 || >=20}
+    hasBin: true
+    peerDependencies:
+      typescript: ^5.0.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   tsconfig-paths@4.2.0:
     resolution: {integrity: sha512-NoZ4roiN7LnbKn9QqE1amc9DJfzvZXxF4xDavcOWt1BPkdx+m+0gJuPM+S0vCe7zTJMYUP0R8pO2XMr+Y8oLIg==}
     engines: {node: '>=6'}
@@ -7363,6 +7382,11 @@ packages:
     resolution: {integrity: sha512-GA9QKLH+vIM8NPaGA+o2t8PDfFUl32J8rUp1zQfMKVJQiNkOX4unE51tR6ppl6iKw5yOrDAdSH7r/UIFLCVhLw==}
     peerDependencies:
       vite: ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
+
+  vite-tsconfig-paths@6.1.1:
+    resolution: {integrity: sha512-2cihq7zliibCCZ8P9cKJrQBkfgdvcFkOOc3Y02o3GWUDLgqjWsZudaoiuOwO/gzTzy17cS5F7ZPo4bsnS4DGkg==}
+    peerDependencies:
+      vite: '*'
 
   vite@7.3.1:
     resolution: {integrity: sha512-w+N7Hifpc3gRjZ63vYBXA56dvvRlNWRczTdmCBBa+CotUzAPf5b7YMdMR/8CQoeYE5LX3W4wj6RYTgonm1b9DA==}
@@ -11800,6 +11824,8 @@ snapshots:
 
   globjoin@0.1.4: {}
 
+  globrex@0.1.2: {}
+
   goober@2.1.18(csstype@3.2.3):
     dependencies:
       csstype: 3.2.3
@@ -14462,6 +14488,10 @@ snapshots:
 
   ts-pattern@5.9.0: {}
 
+  tsconfck@3.1.6(typescript@5.9.3):
+    optionalDependencies:
+      typescript: 5.9.3
+
   tsconfig-paths@4.2.0:
     dependencies:
       json5: 2.2.3
@@ -14811,6 +14841,16 @@ snapshots:
       vite: 7.3.1(@types/node@25.3.4)(jiti@1.21.7)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0)
     transitivePeerDependencies:
       - rollup
+
+  vite-tsconfig-paths@6.1.1(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.4)(jiti@1.21.7)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0)):
+    dependencies:
+      debug: 4.4.3(supports-color@5.5.0)
+      globrex: 0.1.2
+      tsconfck: 3.1.6(typescript@5.9.3)
+      vite: 7.3.1(@types/node@25.3.4)(jiti@1.21.7)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0)
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
 
   vite@7.3.1(@types/node@25.3.4)(jiti@1.21.7)(less@4.5.1)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(tsx@4.21.0):
     dependencies:

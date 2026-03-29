@@ -5,9 +5,9 @@ import { join } from "node:path";
 import {
   duckDBDescribeColumnTypeToSniffable,
   SNIFF_CSV_MAX_ROWS,
-} from "@etl-engine/NodeDuckDB/DuckDBSniffableDataType.ts";
+} from "@ava-etl/NodeDuckDB/DuckDBSniffableDataType";
 import duckdb from "duckdb";
-import type { DuckDBSniffableDataType } from "@etl-engine/NodeDuckDB/DuckDBSniffableDataType.ts";
+import type { DuckDBSniffableDataType } from "@ava-etl/NodeDuckDB/DuckDBSniffableDataType";
 
 type UnknownRow = Record<string, unknown>;
 

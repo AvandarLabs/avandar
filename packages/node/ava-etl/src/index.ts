@@ -1,4 +1,4 @@
-export { ETLEngine } from "@etl-engine/ETLEngine/ETLEngine.ts";
+export { ETLEngine } from "@ava-etl/ETLEngine/ETLEngine";
 export {
   ETL_INPUT_BASE_DIR,
   ETL_OUTPUT_BASE_DIR,
@@ -9,20 +9,20 @@ export {
   getETLPipelineInputDir,
   resetETLPathsRootForTesting,
   setETLPathsRootForTesting,
-} from "@etl-engine/ETLEngine/etlPaths.ts";
+} from "@ava-etl/ETLEngine/etlPaths";
 export {
   transformedCSVsToParquetBlobs,
   type TransformedColumnDescription,
   type TransformedDataDescriptionForParquet,
-} from "@etl-engine/ETLEngine/transformedCSVsToParquetBlobs.ts";
+} from "@ava-etl/ETLEngine/transformedCSVsToParquetBlobs";
 export {
   duckDBDescribeColumnTypeToSniffable,
   SNIFF_CSV_MAX_ROWS,
   type DuckDBSniffableDataType,
-} from "@etl-engine/NodeDuckDB/DuckDBSniffableDataType.ts";
+} from "@ava-etl/NodeDuckDB/DuckDBSniffableDataType";
 export {
   NodeDuckDB,
   type NodeDuckDBReadCSVColumn,
   type NodeDuckDBReadCSVIntoViewOptions,
   type NodeDuckDBSniffCSVColumn,
-} from "@etl-engine/NodeDuckDB/NodeDuckDB.ts";
+} from "@ava-etl/NodeDuckDB/NodeDuckDB";

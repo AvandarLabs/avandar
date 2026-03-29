@@ -1,7 +1,7 @@
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { ETLEngine } from "@etl-engine/ETLEngine/ETLEngine.ts";
+import { ETLEngine } from "@ava-etl/ETLEngine/ETLEngine";
 import {
   ETL_INPUT_BASE_DIR,
   ETL_OUTPUT_BASE_DIR,
@@ -11,11 +11,11 @@ import {
   getETLPipelineInputDir,
   resetETLPathsRootForTesting,
   setETLPathsRootForTesting,
-} from "@etl-engine/ETLEngine/etlPaths.ts";
-import { transformedCSVsToParquetBlobs } from "@etl-engine/ETLEngine/transformedCSVsToParquetBlobs.ts";
-import { MIMEType } from "@utils/types/common.types.ts";
+} from "@ava-etl/ETLEngine/etlPaths";
+import { transformedCSVsToParquetBlobs } from "@ava-etl/ETLEngine/transformedCSVsToParquetBlobs";
+import { MIMEType } from "@utils/types/common.types";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import type { UUID } from "@utils/types/common.types.ts";
+import type { UUID } from "@utils/types/common.types";
 
 type PipelineRunId = UUID<"PipelineRun">;
 
@@ -125,7 +125,7 @@ describe("ETLEngine", () => {
   let testRoot: string;
 
   beforeEach(async () => {
-    testRoot = await mkdtemp(join(tmpdir(), "etl-engine-"));
+    testRoot = await mkdtemp(join(tmpdir(), "ava-etl-"));
     setETLPathsRootForTesting(testRoot);
   });
 

@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import type { UUID } from "@utils/types/common.types.ts";
+import type { UUID } from "@utils/types/common.types";
 
 type PipelineRunId = UUID<"PipelineRun">;
 

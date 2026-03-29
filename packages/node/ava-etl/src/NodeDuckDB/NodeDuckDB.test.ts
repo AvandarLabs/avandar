@@ -1,8 +1,8 @@
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { duckDBDescribeColumnTypeToSniffable } from "@etl-engine/NodeDuckDB/DuckDBSniffableDataType.ts";
-import { NodeDuckDB } from "@etl-engine/NodeDuckDB/NodeDuckDB.ts";
+import { duckDBDescribeColumnTypeToSniffable } from "@ava-etl/NodeDuckDB/DuckDBSniffableDataType";
+import { NodeDuckDB } from "@ava-etl/NodeDuckDB/NodeDuckDB";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 describe("duckDBDescribeColumnTypeToSniffable", () => {

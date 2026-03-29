@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import tsConfigPaths from "vite-tsconfig-paths";
 
 /**
  * This configuration should be passed to vite-node with
@@ -9,7 +10,7 @@ export default defineConfig({
   server: {
     watch: null,
   },
-  plugins: [],
+  plugins: [tsConfigPaths()],
   resolve: {
     alias: {
       "@": "/src",
@@ -19,7 +20,7 @@ export default defineConfig({
       "@models": "/packages/shared/models/src",
       "@modules": "/packages/shared/modules/src",
       "@utils": "/packages/shared/utils/src",
-      "@etl-engine": "/packages/shared/etl-engine/src",
+      "@ava-etl": "/packages/node/ava-etl/src",
       "@pipeline-server": "/apps/pipeline-server/src",
     },
   },

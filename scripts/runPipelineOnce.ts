@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-/** Env name for ETL root; matches etl-engine `ETL_PATHS_ROOT_ENV`. */
+/** Env name for ETL root; matches ava-etl `ETL_PATHS_ROOT_ENV`. */
 const _ETL_PATHS_ROOT_ENV = "ETL_PATHS_ROOT";
 
 /**
