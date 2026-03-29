@@ -2,6 +2,7 @@ import { Box, Button, FileInput, Group } from "@mantine/core";
 import { MIMEType } from "@utils/types/common.types";
 import { useRef, useState } from "react";
 import { useForm } from "@/lib/hooks/ui/useForm";
+import { TruncatedFileInputValue } from "@/lib/ui/singleton-forms/TruncatedFileInputValue";
 import type { FileInputProps } from "@mantine/core";
 
 type Props = {
@@ -82,18 +83,31 @@ export function FileUploadForm({
         onSubmit(values.file ?? undefined);
         setIsSubmitted(true);
       })}
-      style={{ width: fullWidth ? "100%" : undefined }}
+      style={{
+        width: fullWidth ? "100%" : undefined,
+        minWidth: 0,
+        maxWidth: fullWidth ? "100%" : undefined,
+      }}
     >
-      <Group mt="md">
-        <FileInput
-          style={{ flex: 1 }}
-          key={form.key("file")}
-          {...form.getInputProps("file")}
-          clearable={clearable}
-          accept={accept}
-          {...fileInputProps}
-        />
-        <Box style={{ alignSelf: "flex-end" }}>
+      <Group mt="md" wrap="nowrap" w="100%" align="flex-end" miw={0}>
+        <Box miw={0} style={{ flex: 1 }}>
+          <FileInput
+            w="100%"
+            key={form.key("file")}
+            {...form.getInputProps("file")}
+            clearable={clearable}
+            accept={accept}
+            {...fileInputProps}
+            styles={{
+              input: {
+                minWidth: 0,
+                maxWidth: "100%",
+              },
+            }}
+            valueComponent={TruncatedFileInputValue}
+          />
+        </Box>
+        <Box style={{ alignSelf: "flex-end", flexShrink: 0 }}>
           <Button
             ref={submitBtnRef}
             type="submit"

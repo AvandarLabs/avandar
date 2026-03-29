@@ -1,47 +1,3 @@
--- This is a valid Avandar data type
-create type public.datasets__ava_data_type as enum(
-  'boolean',
-  'bigint',
-  'double',
-  'time',
-  'date',
-  'timestamp',
-  'varchar'
-);
-
-create type public.datasets__duckdb_data_type as enum(
-  'BOOLEAN',
-  'TINYINT',
-  'SMALLINT',
-  'INTEGER',
-  'BIGINT',
-  'UBIGINT',
-  'UTINYINT',
-  'USMALLINT',
-  'UINTEGER',
-  'FLOAT',
-  'DOUBLE',
-  'DECIMAL',
-  'DATE',
-  'TIME',
-  'TIMESTAMP',
-  'TIMESTAMP_TZ',
-  'TIMESTAMP WITH TIME ZONE',
-  'INTERVAL',
-  'VARCHAR',
-  'BLOB',
-  'UUID',
-  'HUGEINT',
-  'BIT',
-  'ENUM',
-  'MAP',
-  'STRUCT',
-  'LIST',
-  'UNION',
-  'JSON',
-  'GEOMETRY'
-);
-
 create table public.dataset_columns (
   -- Primary key
   id uuid primary key default gen_random_uuid(),
@@ -51,7 +7,7 @@ create table public.dataset_columns (
   workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,
   -- Timestamp of when the dataset column was created.
   created_at timestamptz not null default now(),
-  -- Timestamp of when the dataset column was last updated.
+  -- Timestamp of when this row was last updated.
   updated_at timestamptz not null default now(),
   -- Original name of the column from the source data. This value should never
   -- be changed, it is an inherent property of the original data. The user is

@@ -48,6 +48,20 @@ export type PolarClient = {
   }) => Promise<Subscription>;
 
   /**
+   * Update the seat count on an existing subscription.
+   *
+   * @param options The options for the update
+   * @param options.subscriptionId The ID of the subscription to update
+   * @param options.newTotalSeats The new total number of seats for the
+   * subscription.
+   * @returns The updated subscription
+   */
+  updateSubscriptionSeats: (options: {
+    subscriptionId: string;
+    newTotalSeats: number;
+  }) => Promise<Subscription>;
+
+  /**
    * Get the Polar products, but with a simplified structure.
    */
   getProducts: () => Promise<Product[]>;
@@ -211,6 +225,23 @@ function createPolarClient(): PolarClient {
         subscriptionUpdate: {
           productId: options.newProductId,
           prorationBehavior: "prorate",
+        },
+      });
+      return subscription;
+    },
+
+    updateSubscriptionSeats: async (options: {
+      subscriptionId: string;
+      newTotalSeats: number;
+    }) => {
+      console.log("[PolarClient] Updating seat count on subscription", {
+        subscriptionId: options.subscriptionId,
+        newTotalSeats: options.newTotalSeats,
+      });
+      const subscription = await polar.subscriptions.update({
+        id: options.subscriptionId,
+        subscriptionUpdate: {
+          seats: options.newTotalSeats,
         },
       });
       return subscription;

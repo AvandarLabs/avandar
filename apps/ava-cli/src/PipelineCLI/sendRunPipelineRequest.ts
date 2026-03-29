@@ -29,12 +29,39 @@ export async function sendRunPipelineRequest(options: {
   const config = getPipelineServerClientConfig();
   const encodedPipelineName: string = encodeURIComponent(options.pipelineName);
   const url: string = `${config.baseURL}/${encodedPipelineName}/run`;
-  const res: Response = await fetch(url, {
-    method: "POST",
-    headers: {
-      authorization: `Bearer ${config.serverSecret}`,
-    },
-  });
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${config.serverSecret}`,
+      },
+    });
+  } catch (error: unknown) {
+    const cause: unknown =
+      error instanceof Error && "cause" in error ?
+        (error as Error & { cause?: unknown }).cause
+      : undefined;
+    const code: unknown =
+      (
+        cause !== null &&
+        typeof cause === "object" &&
+        "code" in cause &&
+        typeof (cause as { code: unknown }).code === "string"
+      ) ?
+        (cause as { code: string }).code
+      : undefined;
+
+    if (code === "ECONNREFUSED") {
+      throw new Error(
+        `Cannot reach pipeline server at ${config.baseURL}. Start it with ` +
+          "`pnpm dev:pipeline-server` from the repo root, or run without a " +
+          "server: `ava pipeline run <name> --local`.",
+      );
+    }
+
+    throw error;
+  }
 
   if (!res.ok) {
     const message: string = await _readErrorBody(res);

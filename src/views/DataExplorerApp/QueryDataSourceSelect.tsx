@@ -103,6 +103,9 @@ export function QueryDataSourceSelect({
         .with("virtual", () => {
           return "Derived Dataset";
         })
+        .with("open_data", () => {
+          return "Open Data";
+        })
         .exhaustive(() => {
           return undefined;
         });

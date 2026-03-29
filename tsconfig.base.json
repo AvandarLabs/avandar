@@ -31,6 +31,7 @@
       "@sbfn/*": ["./supabase/functions/*"],
 
       /* Packages */
+      "@ava-etl/*": ["./packages/node/ava-etl/src/*"],
       "@clients/*": ["./packages/shared/clients/src/*"],
       "@logger/*": ["./packages/shared/logger/src/*"],
       "@models/*": ["./packages/shared/models/src/*"],
@@ -42,7 +43,8 @@
       /* Apps */
       "@ava-cli/*": ["./apps/ava-cli/src/*"],
       "@fanout-server/*": ["./apps/dev-fanout-server/src/*"],
-      "@pipeline-server/*": ["./apps/pipeline-server/src/*"]
+      "@pipeline-server/*": ["./apps/pipeline-server/src/*"],
+      "@pipelines/*": ["./apps/pipeline-server/pipelines/*"]
     }
   }
 }

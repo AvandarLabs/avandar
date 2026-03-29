@@ -10,17 +10,19 @@ import {
 } from "$/models/datasets/Dataset/Dataset.types";
 import { DatasetParsers } from "$/models/datasets/Dataset/DatasetParsers";
 import { WorkspaceId } from "$/models/Workspace/Workspace.types";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
-import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
-import { DuckDBClient } from "@/clients/DuckDBClient/index";
-import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { GoogleSheetsDatasetClient } from "@/clients/datasets/GoogleSheetsDatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { OpenDataDatasetClient } from "@/clients/datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
+import { DuckDBClient } from "@/clients/DuckDBClient/index";
+import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
+import { AvaSupabase } from "@/db/supabase/AvaSupabase";
+import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { FiltersByColumn } from "@utils/filters/filters";
 import type { ExcludeNullsIn } from "@utils/objects/excludeNullsIn/excludeNullsIn";
+import type { OpenDataCatalogEntryId } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { CompositeTypes } from "$/types/database.types";
@@ -68,6 +70,11 @@ export const DatasetClient = createUsableServiceClient(
             },
             google_sheets: () => {
               return GoogleSheetsDatasetClient.getOne(
+                where("dataset_id", "eq", datasetId),
+              );
+            },
+            open_data: () => {
+              return OpenDataDatasetClient.getOne(
                 where("dataset_id", "eq", datasetId),
               );
             },
@@ -276,6 +283,38 @@ export const DatasetClient = createUsableServiceClient(
         },
 
         /**
+         * Inserts an open-data catalog dataset into the workspace.
+         *
+         * @param params - Catalog entry, columns, and dataset identity.
+         * @returns The created dataset row.
+         */
+        insertOpenDataDataset: async (params: {
+          datasetId: DatasetId;
+          workspaceId: WorkspaceId;
+          datasetName: string;
+          datasetDescription: string;
+          catalogEntryId: OpenDataCatalogEntryId;
+          columns: DatasetColumnInput[];
+        }): Promise<Dataset> => {
+          const logger = clientLogger.appendName("insertOpenDataDataset");
+          logger.log("Creating open data dataset", params);
+          const { data: dataset } = await dbClient
+            .rpc("rpc_datasets__add_open_data_dataset", {
+              p_dataset_id: params.datasetId,
+              p_workspace_id: params.workspaceId,
+              p_dataset_name: params.datasetName,
+              p_dataset_description: params.datasetDescription,
+              p_catalog_entry_id: params.catalogEntryId,
+              p_columns: params.columns.map((col) => {
+                return { ...col, description: col.description ?? null };
+              }),
+            })
+            .throwOnError();
+          logger.log("Successfully added open data dataset", dataset);
+          return parsers.fromDBReadToModelRead(dataset);
+        },
+
+        /**
          * This deletes a dataset fully, including the locally stored raw data.
          * This should be used any time a dataset needs to be deleted, instead
          * of using the `DatasetClient.delete()` function, which will only
@@ -321,6 +360,7 @@ export const DatasetClient = createUsableServiceClient(
     mutationFns: [
       "insertCSVFileDataset",
       "insertGoogleSheetsDataset",
+      "insertOpenDataDataset",
       "insertVirtualDataset",
       "fullDelete",
     ],

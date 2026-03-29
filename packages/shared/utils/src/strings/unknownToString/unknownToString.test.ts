@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { unknownToString } from "@utils/strings/unknownToString/unknownToString.ts";
+import { describe, expect, it } from "vitest";
 
 const complexJsonObject = {
   plan: "premium",
@@ -65,6 +65,13 @@ describe("unknownToString", () => {
     expect(unknownToString(false, options)).toBe("NO");
     expect(unknownToString(12345.678, options)).toBe(formattedNumber);
     expect(unknownToString("plain text", options)).toBe("plain text");
+  });
+
+  it("uses plain number text when formatNumbers is false", () => {
+    expect(unknownToString(1516, { formatNumbers: false })).toBe("1516");
+    expect(unknownToString(12345.678, { formatNumbers: false })).toBe(
+      "12345.678",
+    );
   });
 
   it("formats date values when requested and falls back for invalid ones", () => {

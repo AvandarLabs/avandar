@@ -9,11 +9,13 @@ import { useRef } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { WorkspaceBillingView } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
+import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useFeaturePlanType } from "@/hooks/workspaces/useCurrentSubscriptionType";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AvaField } from "@/lib/ui/AvaForm/AvaField";
 import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
 import { AvaFormRef } from "@/lib/ui/AvaForm/AvaForm.types";
+import { PurchaseSeatsModalContents } from "@/components/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents";
 
 export function useWorkspaceInviteModal({
   numberOfSeats,
@@ -22,6 +24,8 @@ export function useWorkspaceInviteModal({
 }): () => void {
   const featurePlanType = useFeaturePlanType();
   const workspace = useCurrentWorkspace();
+
+  const user = useCurrentUser();
   const formRef =
     useRef<AvaFormRef<{ email: string; role: Workspace.Role }>>(null);
   const [sendInvite] = useMutation({
@@ -57,56 +61,25 @@ export function useWorkspaceInviteModal({
           modalId,
           confirmProps: { loading: true },
         });
-        await sendInvite.async({
-          workspaceId: workspace.id,
-          email,
-          role,
-        });
-        notifySuccess({ title: "Invite sent" });
-        modals.close(modalId);
+        try {
+          await sendInvite.async({
+            workspaceId: workspace.id,
+            email,
+            role,
+          });
+          notifySuccess({ title: "Invite sent" });
+          modals.close(modalId);
+        } catch {
+          modals.updateModal({
+            modalId,
+            confirmProps: { loading: false },
+          });
+        }
       }
     }
   };
 
-  return (): void => {
-    // do nothing if we don't know how many seats are in the workspace
-    // ideally, this function should have never gotten called yet.
-    if (numberOfSeats === undefined || workspace.subscription === undefined) {
-      return;
-    }
-
-    // since we have the number of members already, we can eagerly check on
-    // the frontend if the workspace has reached its seat limit.
-    // But even if we don't show this modal, we should still do a backend check
-    // when users invite a new member to make sure they are still allowed to
-    // invite more members (in case of any race conditions. E.g. if there
-    // are multiple admins inviting users at the same time).
-    if (
-      !Subscription.canInviteMembers({
-        subscription: workspace.subscription,
-        numMembersInWorkspace: numberOfSeats,
-      })
-    ) {
-      return void modals.open({
-        title: "Seat limit reached",
-        size: "100%",
-        styles: {
-          content: { height: "100%" },
-        },
-        children: (
-          <Stack>
-            <Text>
-              Your workspace is on the Free plan, which supports up to 2 seats.
-              To invite more team members, upgrade to a paid plan for unlimited
-              seats.
-            </Text>
-
-            <WorkspaceBillingView hideTitle hideIntroText />
-          </Stack>
-        ),
-      });
-    }
-
+  const openInviteModal = (): void => {
     const modalId = modals.openConfirmModal({
       title: "Add a member to your Workspace",
       labels: {
@@ -166,5 +139,65 @@ export function useWorkspaceInviteModal({
         </Stack>
       ),
     });
+  };
+
+  return (): void => {
+    // do nothing if we don't know how many seats are in the workspace
+    // ideally, this function should have never gotten called yet.
+    if (numberOfSeats === undefined || workspace.subscription === undefined) {
+      return;
+    }
+
+    // since we have the number of members already, we can eagerly check on
+    // the frontend if the workspace has reached its seat limit.
+    // But even if we don't show this modal, we should still do a backend check
+    // when users invite a new member to make sure they are still allowed to
+    // invite more members (in case of any race conditions. E.g. if there
+    // are multiple admins inviting users at the same time).
+    if (
+      !Subscription.canInviteMembers({
+        subscription: workspace.subscription,
+        numMembersInWorkspace: numberOfSeats,
+      })
+    ) {
+      if (featurePlanType === "free") {
+        return void modals.open({
+          title: "Seat limit reached",
+          size: "100%",
+          styles: {
+            content: { height: "100%" },
+          },
+          children: (
+            <Stack>
+              <Text>
+                Your workspace is on the Free plan, which supports up to 2
+                seats. To invite more team members, upgrade to a paid plan for
+                unlimited seats.
+              </Text>
+
+              <WorkspaceBillingView hideTitle hideIntroText />
+            </Stack>
+          ),
+        });
+      }
+
+      return void modals.open({
+        title: "Additional seats required",
+        children: (
+          <PurchaseSeatsModalContents
+            subscription={workspace.subscription!}
+            currentSeatUsage={numberOfSeats}
+            userId={user!.id}
+            onSeatsAdded={() => {
+              setTimeout(() => {
+                openInviteModal();
+              }, 300);
+            }}
+          />
+        ),
+      });
+    }
+
+    openInviteModal();
   };
 }

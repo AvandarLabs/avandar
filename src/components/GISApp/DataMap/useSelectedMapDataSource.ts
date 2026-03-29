@@ -1,5 +1,5 @@
 import { Model } from "@models/Model/Model";
-import { template } from "@utils/index";
+import { sqlTemplate } from "@utils/index";
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
 import { MapLayerMouseEvent, Map as MapLibreMap } from "maplibre-gl";
 import { RefObject, useEffect, useRef } from "react";
@@ -157,7 +157,7 @@ export function useSelectedMapDataSource({
         // Note: ST_AsGeoJSON returns a JSON object, which DuckDB will
         // return as a string
         // ST_Point takes (x, y) where x is longitude and y is latitude
-        const geojsonQuery = template(`
+        const geojsonQuery = sqlTemplate(`
           SELECT 
             ST_AsGeoJSON(
               ST_Point(

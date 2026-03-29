@@ -1,5 +1,5 @@
 /**
- * Add a Local CSV dataset to a workspace.
+ * Add a CSV file dataset to a workspace.
  * Calls rpc_datasets__add_dataset and inserts metadata into
  * datasets__csv_file.
  *

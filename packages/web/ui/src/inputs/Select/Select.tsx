@@ -18,10 +18,7 @@ export type SelectData<T extends NonNullable<string>> = ReadonlyArray<
   T | SelectOption<T> | SelectOptionGroup<T>
 >;
 
-type Props<T extends NonNullable<string>> = Omit<
-  MantineSelectProps,
-  "value" | "defaultValue" | "onChange" | "onOptionSubmit" | "data"
-> & {
+type Props<T extends NonNullable<string>> = {
   /**
    * Value of the select. Use this to make the component controlled.
    * `null` is intentionally allowed to match Mantine's API to represent no
@@ -51,12 +48,26 @@ type Props<T extends NonNullable<string>> = Omit<
    * will be thrown and the component will not render.
    */
   data?: SelectData<T>;
-};
 
-export function Select<T extends NonNullable<string>>(
-  props: Props<T>,
-): JSX.Element {
-  return <MantineSelect {...(props as MantineSelectProps)} />;
+  /** Whether the select is searchable. */
+  searchable?: boolean;
+} & Omit<
+  MantineSelectProps,
+  | "value"
+  | "defaultValue"
+  | "onChange"
+  | "onOptionSubmit"
+  | "data"
+  | "searchable"
+>;
+
+export function Select<T extends NonNullable<string>>({
+  searchable = false,
+  ...rest
+}: Props<T>): JSX.Element {
+  return (
+    <MantineSelect searchable={searchable} {...(rest as MantineSelectProps)} />
+  );
 }
 
 export type { Props as SelectProps };

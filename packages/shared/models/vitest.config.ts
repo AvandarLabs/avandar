@@ -3,18 +3,19 @@ import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 import { getAppVitestAliases } from "../../../tests/vitestAliases.ts";
 
-const configDir: string = fileURLToPath(new URL(".", import.meta.url));
-const rootDir: string = resolve(configDir, "../../..");
+const repoRootDir: string = resolve(
+  fileURLToPath(new URL(".", import.meta.url)),
+  "../../..",
+);
 
 export default defineConfig({
   test: {
     environment: "node",
   },
   resolve: {
-    alias: getAppVitestAliases(rootDir, {
-      include: "only-shared",
-      selfAlias: "@models",
-      selfSrcDir: resolve(configDir, "src"),
+    alias: getAppVitestAliases({
+      repoRootDir,
+      include: ["shared"],
     }),
   },
 });

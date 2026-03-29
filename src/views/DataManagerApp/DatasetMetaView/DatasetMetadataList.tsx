@@ -12,6 +12,7 @@ import type { ObjectKeyRenderOptionsMap } from "@ui/ObjectDescriptionList/Object
 import type { CSVFileDataset } from "$/models/datasets/CSVFileDataset";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types";
+import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenDataDataset.types";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { SetOptional } from "type-fest";
 
@@ -19,7 +20,12 @@ type DatasetWithColumnsAndSource = SetOptional<
   DatasetWithColumns,
   "columns"
 > & {
-  source: CSVFileDataset | GoogleSheetsDataset | VirtualDataset.T | undefined;
+  source:
+    | CSVFileDataset
+    | GoogleSheetsDataset
+    | OpenDataDataset
+    | VirtualDataset.T
+    | undefined;
 };
 
 type Props = {
@@ -49,6 +55,7 @@ const DATASET_METADATA_RENDER_OPTIONS = {
         csv_file: "CSV file",
         google_sheets: "Google Sheets",
         virtual: "Derived Dataset",
+        open_data: "Open Data",
         _otherwise: value,
       });
     },

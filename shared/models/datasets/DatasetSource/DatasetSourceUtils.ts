@@ -6,5 +6,6 @@ export const DatasetSourceUtils = {
     "csv_file",
     "google_sheets",
     "virtual",
+    "open_data",
   ),
 };

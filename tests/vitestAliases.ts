@@ -33,32 +33,64 @@ function _getWebPackageVitestAliases(rootDir: string): Record<string, string> {
 }
 
 /**
- * Vitest aliases: shared (`$`, `@clients`, …), optionally web (`@ui`,
- * `@hooks`), plus this package or app’s `selfAlias` → `selfSrcDir`.
+ * Extra Vitest aliases for `packages/node/*` (`@ava-etl`).
  *
  * @param rootDir Repository root directory.
- * @param options.include `only-shared` or shared plus web.
- * @param options.selfAlias Import prefix for this package or app.
- * @param options.selfSrcDir Absolute path to that package or app’s `src`.
  */
-export function getAppVitestAliases(
-  rootDir: string,
-  options: {
-    include: "only-shared" | "shared-and-web";
-    selfAlias: string;
-    selfSrcDir: string;
-  },
-): Record<string, string> {
-  const baseAliases: Record<string, string> =
-    options.include === "shared-and-web" ?
-      {
-        ..._getSharedPackageVitestAliases(rootDir),
-        ..._getWebPackageVitestAliases(rootDir),
-      }
-    : _getSharedPackageVitestAliases(rootDir);
+function _getNodePackageVitestAliases(rootDir: string): Record<string, string> {
+  return {
+    "@ava-etl": resolve(rootDir, "packages/node/ava-etl/src"),
+  };
+}
+
+type PackageType = "shared" | "web" | "node";
+
+/**
+ * Vitest aliases to include in the `resolve.alias` section of the
+ * vitest.config.ts file.
+ *
+ * - shared (`$`, `@clients`, …)
+ * - web (`@ui`, `@hooks`)
+ * - node (`@ava-etl`)
+ *
+ * Plus optional `moreAliases` resolved from the repository root.
+ *
+ * @param options.repoRootDir Repository root directory.
+ * @param options.include Which package groups: `shared`, `web`, `node`
+ *   (repeat as needed).
+ * @param options.moreAliases Extra aliases: keys are import prefixes; values
+ *   are paths relative to the repository root.
+ */
+export function getAppVitestAliases(options: {
+  repoRootDir: string;
+  include?: readonly PackageType[];
+  moreAliases?: Record<string, string>;
+}): Record<string, string> {
+  const { repoRootDir, include = [], moreAliases = {} } = options;
+
+  const baseAliases: Record<string, string> = include.reduce((acc, type) => {
+    switch (type) {
+      case "shared":
+        return { ...acc, ..._getSharedPackageVitestAliases(repoRootDir) };
+      case "web":
+        return { ...acc, ..._getWebPackageVitestAliases(repoRootDir) };
+      case "node":
+        return { ...acc, ..._getNodePackageVitestAliases(repoRootDir) };
+      default:
+        return acc;
+    }
+  }, {});
+
+  const additionalAliases = Object.entries(moreAliases).reduce(
+    (acc, [aliasName, path]) => {
+      acc[aliasName] = resolve(repoRootDir, path);
+      return acc;
+    },
+    {} as Record<string, string>,
+  );
 
   return {
     ...baseAliases,
-    [options.selfAlias]: options.selfSrcDir,
+    ...additionalAliases,
   };
 }

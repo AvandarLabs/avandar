@@ -1,13 +1,14 @@
 import { Fieldset, Stack, Text } from "@mantine/core";
 import { Model } from "@models/Model/Model";
 import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
+import { Select } from "@ui/inputs/Select/Select";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
-import { Select, type SelectData } from "@ui/inputs/Select/Select";
-import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { AggregationSelect } from "@/views/DataExplorerApp/AggregationSelect";
+import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { QueryColumnMultiSelect } from "@/views/DataExplorerApp/QueryColumnMultiSelect";
 import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
+import type { SelectData } from "@ui/inputs/Select/Select";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.types";
 
@@ -42,7 +43,7 @@ export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
 
   return (
     <form>
-      <Stack>
+      <Stack px="sm">
         <QueryDataSourceSelect
           value={dataSource ?? null}
           onChange={(newDataSource) => {

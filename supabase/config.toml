@@ -59,6 +59,7 @@ enabled = true
 sql_paths = [
   "./migrations/20260119164300_STORAGE-workspaces-bucket.sql",
   "./migrations/20260122161802_STORAGE-public-bucket.sql",
+  "./migrations/20260329000000-STORAGE-opendata-bucket.sql",
 ]
 
 [realtime]

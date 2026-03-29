@@ -2,7 +2,7 @@
   "name": "avandar",
   "license": "CPAL-1.0",
   "private": true,
-  "version": "0.8.3",
+  "version": "0.8.4",
   "type": "module",
   "engines": {
     "node": ">=22.0.0"
@@ -13,8 +13,9 @@
     "dev:pipeline-server": "dotenv --no-expand -o -e .env.development -- pnpm --filter @avandar/pipeline-server dev",
     "deploy:dev-fanout-server": "fly deploy --config apps/dev-fanout-server/fly.production.toml",
     "deploy:pipeline-server": "fly deploy --config apps/pipeline-server/fly.production.toml",
-    "test": "pnpm test:frontend && pnpm test:utils && pnpm test:ava-cli && pnpm test:dev-fanout-server && pnpm test:pipeline-server && pnpm test:logger && pnpm test:clients && pnpm test:models && pnpm test:hooks && pnpm test:ui",
+    "test": "pnpm test:frontend && pnpm test:utils && pnpm test:ava-cli && pnpm test:ava-etl && pnpm test:dev-fanout-server && pnpm test:pipeline-server && pnpm test:logger && pnpm test:clients && pnpm test:models && pnpm test:hooks && pnpm test:ui",
     "test:ava-cli": "pnpm --filter @avandar/ava-cli test",
+    "test:ava-etl": "pnpm --filter @avandar/ava-etl test",
     "test:clients": "pnpm --filter @avandar/clients test",
     "test:dev-fanout-server": "pnpm --filter @avandar/dev-fanout-server test",
     "test:pipeline-server": "pnpm --filter @avandar/pipeline-server test",
@@ -105,9 +106,10 @@
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "dexie": "^4.0.11",
-    "match-sorter": "^8.2.0",
+    "fuse.js": "^7.1.0",
     "knex": "^3.1.0",
     "maplibre-gl": "^5.13.0",
+    "match-sorter": "^8.2.0",
     "papaparse": "^5.5.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -121,6 +123,7 @@
     "@eslint/js": "^9.21.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.4.1",
     "@nabla/vite-plugin-eslint": "^2.0.5",
+    "@playwright/test": "^1.58.2",
     "@polar-sh/sdk": "^0.41.5",
     "@postgres-language-server/cli": "^0.19.0",
     "@react-email/preview-server": "^5.0.5",
@@ -178,10 +181,14 @@
     "vite": "^7.0.4",
     "vite-node": "^3.2.4",
     "vite-plugin-node-polyfills": "^0.24.0",
+    "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^3.2.4"
   },
   "packageManager": "pnpm@10.30.3+sha512.c961d1e0a2d8e354ecaa5166b822516668b7f44cb5bd95122d590dd81922f606f5473b6d23ec4a5be05e7fcd18e8488d47d978bbe981872f1145d06e9a740017",
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "duckdb"
+    ],
     "overrides": {
       "@mantine/tiptap>@tiptap/extension-link": "^2.27.2",
       "@mantine/tiptap>@tiptap/react": "^2.27.2"

@@ -144,6 +144,7 @@ export { toPascalCase } from "@utils/strings/toPascalCase/toPascalCase.ts";
 export { unknownToString } from "@utils/strings/unknownToString/unknownToString.ts";
 export { prefix } from "@utils/strings/prefix/prefix.ts";
 export { template } from "@utils/strings/template/template.ts";
+export { sqlTemplate } from "@utils/strings/template/sqlTemplate.ts";
 export { toSnakeCase } from "@utils/strings/toSnakeCase/toSnakeCase.ts";
 
 // constants

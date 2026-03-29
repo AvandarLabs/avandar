@@ -7,7 +7,7 @@ create table public.datasets__csv_file (
   workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,
   -- Timestamp of when the dataset was created.
   created_at timestamptz not null default now(),
-  -- Timestamp of when the dataset was last updated.
+  -- Timestamp of when this row was last updated.
   updated_at timestamptz not null default now(),
   -- Whether the dataset is available in cloud storage.
   -- When a dataset is uploaded to the Supabase storage, we set this to true.

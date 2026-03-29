@@ -107,6 +107,13 @@ export type UnknownToStringOptions = {
    * @default "local"
    */
   dateTimeZone?: LiteralUnion<"UTC" | "local", string>;
+
+  /**
+   * When true, numbers use `Intl.NumberFormat()` (locale-aware grouping).
+   * When false, numbers use `String(value)` (plain digits, e.g. for SQL).
+   * @default true
+   */
+  formatNumbers?: boolean;
 };
 
 /**
@@ -133,6 +140,7 @@ export function unknownToString(
     dateTimeZone = "local",
     prettifyObject = false,
     jsonifyObject = false,
+    formatNumbers = true,
   } = options;
 
   if (value === null) {
@@ -156,7 +164,7 @@ export function unknownToString(
   }
 
   if (typeof value === "number" && !asDate) {
-    return Intl.NumberFormat().format(value);
+    return formatNumbers ? Intl.NumberFormat().format(value) : String(value);
   }
 
   if (isDate(value) || (asDate && isValidDateValue(value))) {

@@ -45,22 +45,24 @@ describe("runPipelineCommand", () => {
 
   it("runs a pipeline", async () => {
     const fetchMock = _mockFetch(async () => {
-      return new Response("first-pipeline", { status: 200 });
+      return new Response("00000000-0000-4000-8000-000000000001", {
+        status: 200,
+      });
     });
 
     const { runPipelineCommand } = await import("./RunPipelineCLI");
-    await runPipelineCommand({ name: "first-pipeline" });
+    await runPipelineCommand({ name: "world-bank__wdi", local: false });
 
     expect(fetchMock.mock.calls.length).toBe(1);
 
     const [url, init] = fetchMock.mock.calls[0]!;
-    expect(url).toBe("https://pipeline.example/first-pipeline/run");
+    expect(url).toBe("https://pipeline.example/world-bank__wdi/run");
     expect(init?.method).toBe("POST");
     expect(init?.headers?.authorization).toBe("Bearer secret");
 
     const logs = _getCombinedLogs();
-    expect(logs).toContain("Running pipeline: first-pipeline");
-    expect(logs).toContain("first-pipeline");
+    expect(logs).toContain("Running pipeline: world-bank__wdi");
+    expect(logs).toContain("00000000-0000-4000-8000-000000000001");
   });
 
   it("throws when AVA_PIPELINE_SERVER_URL is missing", async () => {
@@ -69,7 +71,7 @@ describe("runPipelineCommand", () => {
     const { runPipelineCommand } = await import("./RunPipelineCLI");
 
     await expect(
-      runPipelineCommand({ name: "first-pipeline" }),
+      runPipelineCommand({ name: "world-bank__wdi", local: false }),
     ).rejects.toThrow("AVA_PIPELINE_SERVER_URL is not set in .env.development");
   });
 
@@ -90,10 +92,10 @@ describe("runPipelineCommand", () => {
     const { runPipelineCommand } = await import("./RunPipelineCLI");
 
     await expect(
-      runPipelineCommand({ name: "first-pipeline" }),
+      runPipelineCommand({ name: "world-bank__wdi", local: false }),
     ).rejects.toThrow("401 Unauthorized");
 
     const logs = _getCombinedLogs();
-    expect(logs).toContain("Failed to run pipeline: first-pipeline");
+    expect(logs).toContain("Failed to run pipeline: world-bank__wdi");
   });
 });

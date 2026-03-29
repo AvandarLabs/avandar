@@ -10,6 +10,7 @@ import { Tabs } from "@/lib/ui/Tabs";
 import { DatasetLimitReachedModal } from "@/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal";
 import { GoogleSheetsImportView } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView";
 import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
+import { OpenDataCatalogView } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogView";
 
 export function DataImportView(): JSX.Element {
   const workspace = useCurrentWorkspace();
@@ -55,12 +56,15 @@ export function DataImportView(): JSX.Element {
     <Container pt="xxl">
       <Paper>
         <Stack>
-          <Title order={2}>Import your data</Title>
+          <Title order={2}>Import data</Title>
           <Tabs
-            tabIds={["upload-view", "connectors-view"] as const}
+            tabIds={
+              ["upload-view", "connectors-view", "open-data-catalog"] as const
+            }
             renderTabHeader={{
               "upload-view": "Upload",
               "connectors-view": "Connectors",
+              "open-data-catalog": "Open data",
             }}
             renderTabPanel={{
               "upload-view": () => {
@@ -68,6 +72,11 @@ export function DataImportView(): JSX.Element {
               },
               "connectors-view": () => {
                 return <GoogleSheetsImportView py="md" />;
+              },
+              "open-data-catalog": () => {
+                return (
+                  <OpenDataCatalogView isAddAllowed={isAddAllowed} py="md" />
+                );
               },
             }}
           />

@@ -1,12 +1,17 @@
 import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
 import { prettifyError } from "zod";
 import type {
-    WebhookFailureResponse,
-    WebhookSuccessResponse,
+  WebhookFailureResponse,
+  WebhookSuccessResponse,
 } from "@sbfn/polar-public/polar-public.types.ts";
 import type { ZodError } from "zod";
 
 export const MAX_FREE_PLAN_SEATS = 2;
+export const MAX_FREE_PLAN_DATASETS = 5;
+export const MAX_FREE_PLAN_DASHBOARDS = 5;
+export const MAX_FREE_PLAN_SHAREABLE_DASHBOARDS = 1;
+export const BASE_BASIC_PLAN_DATASETS = 10;
+export const BASE_PREMIUM_PLAN_DATASETS = 100;
 
 /**
  * Validates that a subscription is a real one and not spoofed.

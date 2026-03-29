@@ -44,6 +44,11 @@ supabase/.branches
 # Common scratch or temp files
 todo.md
 TODO.md
+/tmp/
 
 # Ava CLI
 .ava/
+
+# ETL files
+etl-input/
+etl-output/

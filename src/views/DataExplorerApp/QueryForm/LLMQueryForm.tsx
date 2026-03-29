@@ -1,5 +1,15 @@
-import { Button, Fieldset, Group, Paper, Stack, Textarea } from "@mantine/core";
+import {
+  Button,
+  Fieldset,
+  Group,
+  Paper,
+  Stack,
+  Text,
+  Textarea,
+} from "@mantine/core";
+import { where } from "@utils/filters/where/where";
 import { useState } from "react";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { TextareaForm } from "@/lib/ui/singleton-forms/TextareaForm/TextareaForm";
 import { mantineColorVar } from "@/lib/utils/browser/css";
@@ -9,6 +19,14 @@ import { useNLPQuery } from "@/views/DataExplorerApp/QueryForm/useNLPQuery";
 export function LLMQueryForm(): JSX.Element {
   const [{ rawSQL }, dispatch] = DataExplorerStateManager.useContext();
   const workspace = useCurrentWorkspace();
+  const [datasets] = DatasetClient.useGetAll(
+    where("workspace_id", "eq", workspace.id),
+  );
+  const firstDataset = datasets?.[0];
+  const promptPlaceholder =
+    firstDataset !== undefined ?
+      `Example: Show me the first 20 rows of ${firstDataset.name}`
+    : "Example: Show rows where status is open, sorted by " + "updated date";
   const [isEditMode, setIsEditMode] = useState(false);
   const [generateAndRunQuery, isRunningQuery] = useNLPQuery({
     workspaceId: workspace.id,
@@ -18,34 +36,32 @@ export function LLMQueryForm(): JSX.Element {
   });
 
   return (
-    <Stack gap="md">
-      <Fieldset
-        legend="Describe your query"
-        style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
-      >
-        <Stack gap="sm">
-          <TextareaForm
-            defaultValue=""
-            description="Enter your question or instructions in natural language to generate a SQL query"
-            label="Prompt"
-            required
-            minRows={4}
-            autosize
-            isSubmitting={isRunningQuery}
-            submitButtonLabel="Run Query"
-            styles={{
-              input: {
-                fontFamily: "monospace",
-              },
-            }}
-            onSubmit={(value) => {
-              generateAndRunQuery({
-                prompt: value.trim(),
-              });
-            }}
-          />
+    <Stack gap="md" px="sm">
+      <Stack gap="md">
+        <Stack gap={4}>
+          <Text size="sm" maw={640}>
+            Type your question in plain language. We&apos;ll generate the SQL
+            for you.
+          </Text>
         </Stack>
-      </Fieldset>
+
+        <TextareaForm
+          defaultValue=""
+          hideLabel
+          placeholder={promptPlaceholder}
+          required
+          minRows={10}
+          autosize
+          inputWidth="100%"
+          isSubmitting={isRunningQuery}
+          submitButtonLabel="Run Query"
+          onSubmit={(value) => {
+            generateAndRunQuery({
+              prompt: value.trim(),
+            });
+          }}
+        />
+      </Stack>
 
       {rawSQL === undefined ? null : (
         <Fieldset

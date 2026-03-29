@@ -9040,6 +9040,7 @@
         "npm:@mantine/spotlight@^8.3.16",
         "npm:@mantine/tiptap@^8.3.16",
         "npm:@nabla/vite-plugin-eslint@^2.0.5",
+        "npm:@playwright/test@^1.58.2",
         "npm:@polar-sh/sdk@~0.41.5",
         "npm:@postgres-language-server/cli@0.19",
         "npm:@puckeditor/core@~0.21.1",
@@ -9101,6 +9102,7 @@
         "npm:eslint-plugin-tailwindcss@^3.18.0",
         "npm:eslint-plugin-unused-imports@^4.1.4",
         "npm:eslint@^9.21.0",
+        "npm:fuse.js@^7.1.0",
         "npm:globals@^15.15.0",
         "npm:google-auth-library@^10.1.0",
         "npm:googleapis@154",
@@ -9135,6 +9137,7 @@
         "npm:uuid@^11.1.0",
         "npm:vite-node@^3.2.4",
         "npm:vite-plugin-node-polyfills@0.24",
+        "npm:vite-tsconfig-paths@^6.1.1",
         "npm:vite@^7.0.4",
         "npm:vitest@^3.2.4",
         "npm:zod@^4.1.13"

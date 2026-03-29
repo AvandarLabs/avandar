@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Container,
   FloatingIndicator,
@@ -114,47 +115,61 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   return (
     <Container py="md">
       <Stack>
-        <Group justify="space-between" align="center">
-          <Group gap="xs" align="center">
-            <Group gap="xxs" align="center">
-              <EditableDisplayText
-                name="dataset name"
-                value={datasetName}
-                onChange={setDatasetName}
-                onSave={(newName) => {
-                  updateDataset({
-                    id: dataset.id,
-                    data: {
-                      name: newName.trim(),
-                    },
-                  });
-                }}
-                onCancel={() => {
-                  setDatasetName(dataset.name);
-                }}
-                isSaving={isUpdatePending}
-                isSaveDisabled={datasetName.trim().length < 2}
-                minRows={1}
-                maxRows={2}
-                error={
-                  (
-                    datasetName.trim().length > 0 &&
-                    datasetName.trim().length < 2
-                  ) ?
-                    "Dataset name must be at least 2 characters."
-                  : undefined
-                }
-                emptyDisplayText="Untitled dataset"
-                displayTextProps={{
-                  fw: "var(--mantine-h2-font-weight)",
-                  fz: "var(--mantine-h2-font-size)",
-                  lh: "var(--mantine-h2-line-height)",
-                  m: 0,
-                }}
-                fw="var(--mantine-h2-font-weight)"
-                fz="var(--mantine-h2-font-size)"
-                lh="var(--mantine-h2-line-height)"
-              />
+        <Group justify="space-between" align="center" wrap="nowrap" w="100%">
+          <Group
+            gap="xs"
+            align="center"
+            wrap="nowrap"
+            miw={0}
+            style={{ flex: 1 }}
+          >
+            <Group
+              gap="xxs"
+              align="center"
+              wrap="nowrap"
+              miw={0}
+              style={{ flex: 1 }}
+            >
+              <Box miw={0} style={{ flex: 1 }}>
+                <EditableDisplayText
+                  name="dataset name"
+                  value={datasetName}
+                  onChange={setDatasetName}
+                  onSave={(newName) => {
+                    updateDataset({
+                      id: dataset.id,
+                      data: {
+                        name: newName.trim(),
+                      },
+                    });
+                  }}
+                  onCancel={() => {
+                    setDatasetName(dataset.name);
+                  }}
+                  isSaving={isUpdatePending}
+                  isSaveDisabled={datasetName.trim().length < 2}
+                  minRows={1}
+                  maxRows={2}
+                  error={
+                    (
+                      datasetName.trim().length > 0 &&
+                      datasetName.trim().length < 2
+                    ) ?
+                      "Dataset name must be at least 2 characters."
+                    : undefined
+                  }
+                  emptyDisplayText="Untitled dataset"
+                  displayTextProps={{
+                    fw: "var(--mantine-h2-font-weight)",
+                    fz: "var(--mantine-h2-font-size)",
+                    lh: "var(--mantine-h2-line-height)",
+                    m: 0,
+                  }}
+                  fw="var(--mantine-h2-font-weight)"
+                  fz="var(--mantine-h2-font-size)"
+                  lh="var(--mantine-h2-line-height)"
+                />
+              </Box>
 
               {(
                 // only show the button if the source dataset has an
@@ -164,13 +179,15 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                 // this toggle is currently only supported for CSV datasets
                 dataset.sourceType === "csv_file"
               ) ?
-                <ToggleOfflineOnlyButton
-                  isInCloudStorage={
-                    datasetWithColumnsAndSource.source.isInCloudStorage
-                  }
-                  datasetId={dataset.id}
-                  csvFileDatasetId={datasetWithColumnsAndSource.source.id}
-                />
+                <Box style={{ flexShrink: 0 }}>
+                  <ToggleOfflineOnlyButton
+                    isInCloudStorage={
+                      datasetWithColumnsAndSource.source.isInCloudStorage
+                    }
+                    datasetId={dataset.id}
+                    csvFileDatasetId={datasetWithColumnsAndSource.source.id}
+                  />
+                </Box>
               : null}
             </Group>
           </Group>
@@ -251,9 +268,15 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
             </Tabs.Panel>
 
             <Tabs.Panel value="dataset-summary">
-              {isLoadingFullDataset || !previewData || !datasetColumns ?
-                <Loader />
-              : <DataSummaryView datasetId={dataset.id} />}
+              {
+                currentTab !== "dataset-summary" ?
+                  null
+                  // lazy load the data summary view because it has an expensive
+                  // query
+                : isLoadingFullDataset || !previewData || !datasetColumns ?
+                  <Loader />
+                : <DataSummaryView datasetId={dataset.id} />
+              }
             </Tabs.Panel>
 
             <Button

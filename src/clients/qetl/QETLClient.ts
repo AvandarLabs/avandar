@@ -10,18 +10,21 @@ import { Dataset, DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import { DuckDBDataType } from "$/models/datasets/DatasetColumn/DuckDBDataTypes";
 import { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types";
 import { match } from "ts-pattern";
+import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
+import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { OpenDataDatasetClient } from "@/clients/datasets/OpenDataDatasetClient";
+import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
 import { DuckDBClient, UnknownRow } from "@/clients/DuckDBClient";
 import { DuckDBLoadParquetResult } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { difference } from "@/lib/utils/arrays/difference/difference";
 import { promiseFlatMap, promiseMap } from "@/lib/utils/promises";
-import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
-import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
 import type { Module } from "@modules/createModule";
+import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenDataDataset.types";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 
@@ -70,6 +73,11 @@ type DiceExtractor =
       sourceType: "google_sheets";
       dataset: Dataset;
       sourceDataset: GoogleSheetsDataset;
+    }
+  | {
+      sourceType: "open_data";
+      dataset: Dataset;
+      sourceDataset: OpenDataDataset;
     };
 
 /**
@@ -98,7 +106,7 @@ type DiceExtractor =
 export const QETLClientFactory = createModuleFactory<IQETLClient>(
   "QETLClient",
   {
-    childBuilder: (module) => {
+    childBuilder(module) {
       const { getDiceFromSQL, insertToStorageCache } = module.getState();
 
       // The Memory Cube is an in-memory DuckDB instance.
@@ -243,6 +251,19 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
                     "Google Sheets extraction is not supported yet",
                   );
                 })
+                .with("open_data", async (type) => {
+                  const ids = datasetsBySourceType[type].map(prop("id"));
+                  const openDataDatasets = await OpenDataDatasetClient.getAll(
+                    where("dataset_id", "in", ids),
+                  );
+                  return openDataDatasets.map((openDataDataset) => {
+                    return {
+                      dataset: datasetsById[openDataDataset.datasetId]!,
+                      sourceType: "open_data" as const,
+                      sourceDataset: openDataDataset,
+                    } as const;
+                  });
+                })
                 .exhaustive();
               return extractors;
             },
@@ -316,6 +337,33 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
                 throw new Error(
                   "Google Sheets data fetching is not supported yet",
                 );
+              })
+              .with({ sourceType: "open_data" }, async (ex) => {
+                const catalogEntry = await OpenDataCatalogEntryClient.getOne(
+                  where("id", "eq", ex.sourceDataset.catalogEntryId),
+                );
+                if (!catalogEntry) {
+                  throw new Error(
+                    `Missing catalog entry for open data dataset ` +
+                      `'${ex.dataset.id}' (${ex.dataset.name})`,
+                  );
+                }
+                const parquetUrl = catalogEntry.canonicalUrls?.find((url) => {
+                  return url.toLowerCase().endsWith(".parquet");
+                });
+                if (!parquetUrl) {
+                  throw new Error(
+                    `No Parquet URL in catalog for dataset '${ex.dataset.name}'`,
+                  );
+                }
+                const response = await fetch(parquetUrl);
+                if (!response.ok) {
+                  throw new Error(
+                    `Open data Parquet download failed: ${response.statusText}`,
+                  );
+                }
+                const parquetBlob = await response.blob();
+                return { datasetId: ex.dataset.id, parquetBlob };
               })
               .exhaustive(() => {
                 throw new Error(
