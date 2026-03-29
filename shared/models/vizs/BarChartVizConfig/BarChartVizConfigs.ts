@@ -1,7 +1,9 @@
 import { pick } from "@utils/objects/pick/pick.ts";
 import { hydrateXYFromQuery } from "$/models/vizs/hydrateXYFromQuery.ts";
+import { hydrateXYFromQueryResult } from "$/models/vizs/hydrateXYFromQueryResult.ts";
 import { match } from "ts-pattern";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types.ts";
 import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types.ts";
 import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts";
@@ -33,6 +35,16 @@ export const BarChartVizConfigs = {
     query: PartialStructuredQuery,
   ): BarChartVizConfig => {
     return hydrateXYFromQuery(vizConfig, query);
+  },
+
+  /**
+   * Hydrate axis keys from query result columns when they are undefined.
+   */
+  hydrateFromQueryResult: (
+    vizConfig: BarChartVizConfig,
+    columns: readonly QueryResultColumn[],
+  ): BarChartVizConfig => {
+    return hydrateXYFromQueryResult(vizConfig, columns, "bar");
   },
 
   /**

@@ -11,6 +11,7 @@ import {
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 const VizConfigModulesRegistry = {
   table: TableVizConfigs,
@@ -74,5 +75,19 @@ export const VizConfigs = {
   ): VizConfigType<VType> => {
     const vizUtils = _getVizTypeModule(vizConfig.vizType as VType);
     return vizUtils.hydrateFromQuery(vizConfig, query);
+  },
+
+  /**
+   * Hydrate a viz config from query result column metadata.
+   * @param vizConfig The viz config
+   * @param columns Columns from the executed query result
+   * @returns The updated viz config
+   */
+  hydrateFromQueryResult: <VType extends VizType>(
+    vizConfig: VizConfigType<VType>,
+    columns: readonly QueryResultColumn[],
+  ): VizConfigType<VType> => {
+    const vizUtils = _getVizTypeModule(vizConfig.vizType as VType);
+    return vizUtils.hydrateFromQueryResult(vizConfig, columns);
   },
 };

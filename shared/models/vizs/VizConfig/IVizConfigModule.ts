@@ -1,5 +1,6 @@
 import type { VizConfigType, VizType } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 export interface IVizConfigModule<
   VType extends VizType,
@@ -23,6 +24,19 @@ export interface IVizConfigModule<
   hydrateFromQuery(
     vizConfig: TVizConfig,
     query: PartialStructuredQuery,
+  ): TVizConfig;
+
+  /**
+   * Hydrate empty values from query result column metadata (names and types).
+   * Fills only where structured query hydration is insufficient (see app
+   * layer). Typically fills undefined axis keys only.
+   * @param vizConfig The viz config
+   * @param columns Columns returned with the query result
+   * @returns The updated viz config
+   */
+  hydrateFromQueryResult(
+    vizConfig: TVizConfig,
+    columns: readonly QueryResultColumn[],
   ): TVizConfig;
 
   /**

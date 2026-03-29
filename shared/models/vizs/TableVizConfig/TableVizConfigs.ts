@@ -5,6 +5,7 @@ import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/Sc
 import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
 import type { VizConfigType, VizType } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 import type { TableVizConfig } from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 export const TableVizConfigs = {
   vizType: "table",
@@ -19,6 +20,16 @@ export const TableVizConfigs = {
    * Hydrate a table viz config from a query config.
    */
   hydrateFromQuery: (vizConfig: TableVizConfig): TableVizConfig => {
+    return vizConfig;
+  },
+
+  /**
+   * Table viz has no axis keys to hydrate from query results.
+   */
+  hydrateFromQueryResult: (
+    vizConfig: TableVizConfig,
+    _columns: readonly QueryResultColumn[],
+  ): TableVizConfig => {
     return vizConfig;
   },
 
