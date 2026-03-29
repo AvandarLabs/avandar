@@ -43,7 +43,7 @@ export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
 
   return (
     <form>
-      <Stack>
+      <Stack px="sm">
         <QueryDataSourceSelect
           value={dataSource ?? null}
           onChange={(newDataSource) => {
