@@ -45,6 +45,21 @@ describe("shouldHydrateVizFromQueryResult", () => {
     ).toBe(true);
   });
 
+  it("returns false when both axes are valid in result (2B), even with rawSQL", () => {
+    expect(
+      shouldHydrateVizFromQueryResult({
+        rawSQL: "SELECT month, total FROM t",
+        query: emptyQuery,
+        vizConfig: {
+          vizType: "bar",
+          xAxisKey: "month",
+          yAxisKey: "total",
+        },
+        resultColumnNames: new Set(["month", "total"]),
+      }),
+    ).toBe(false);
+  });
+
   it("returns false when rawSQL is only whitespace and structured matches", () => {
     const q = {
       queryColumns: [mockColumn("month"), mockColumn("total_cases")],

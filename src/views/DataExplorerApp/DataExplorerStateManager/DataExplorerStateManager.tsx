@@ -2,6 +2,10 @@ import { prop } from "@utils/objects/hofs/prop/prop";
 import { makeObject } from "@utils/objects/makeObject/makeObject";
 import { setValue } from "@utils/objects/setValue/setValue";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import {
+  applyVizConfigFromQueryResult,
+  isVizConfigEqualForQueryResultSync,
+} from "$/models/vizs/applyVizConfigFromQueryResult";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
@@ -14,6 +18,7 @@ import type {
   OrderByDirection,
   PartialStructuredQuery,
 } from "$/models/queries/StructuredQuery/StructuredQuery.types";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type {
   VizConfig,
   VizType,
@@ -134,12 +139,16 @@ export const DataExplorerStateManager = createAppStateManager({
       return setValue(state, "query.orderByDirection", direction);
     },
 
-    /** Change the active visualization */
+    /**
+     * Change the active visualization.
+     *
+     * Converts the config and applies structured `hydrateFromQuery`.
+     * Result-based `hydrateFromQueryResult` runs in `DataExplorerApp` when
+     * query results are present (see `syncVizFromQueryResult`).
+     */
     setActiveVizType: (state: DataExplorerAppState, newVizType: VizType) => {
       const { vizConfig, query } = state;
 
-      // convert the viz config and then hydrate it from the query, so we can
-      // populate it with some reasonable default values
       return setValue(
         state,
         "vizConfig",
@@ -148,6 +157,28 @@ export const DataExplorerStateManager = createAppStateManager({
           query,
         ),
       );
+    },
+
+    /**
+     * Clears axis keys missing from the latest result columns and applies
+     * `hydrateFromQueryResult` when `shouldHydrateVizFromQueryResult` is true.
+     */
+    syncVizFromQueryResult: (
+      state: DataExplorerAppState,
+      columns: readonly QueryResultColumn[],
+    ) => {
+      const next = applyVizConfigFromQueryResult({
+        vizConfig: state.vizConfig,
+        rawSQL: state.rawSQL,
+        query: state.query,
+        columns,
+      });
+
+      if (isVizConfigEqualForQueryResultSync(next, state.vizConfig)) {
+        return state;
+      }
+
+      return { ...state, vizConfig: next };
     },
 
     setVizConfig: (state: DataExplorerAppState, vizConfig: VizConfig) => {

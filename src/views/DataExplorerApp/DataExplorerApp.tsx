@@ -14,6 +14,7 @@ import {
   IconDownload,
   IconInfoCircle,
 } from "@tabler/icons-react";
+import { useEffect, useMemo } from "react";
 import { notifyError, notifyNotImplemented } from "@ui/index";
 import { Tooltip } from "@ui/Tooltip/Tooltip";
 import { isEpochMs, isISODateString, prop } from "@utils/index";
@@ -32,6 +33,7 @@ const QUERY_FORM_WIDTH = 300;
 
 export function DataExplorerApp(): JSX.Element {
   const state = DataExplorerStateManager.useState();
+  const dispatch = DataExplorerStateManager.useDispatch();
   const workspace = useCurrentWorkspace();
   const [queryResults, isLoadingResults] = useDataQuery({
     query: state.query,
@@ -40,6 +42,53 @@ export function DataExplorerApp(): JSX.Element {
     workspaceId: workspace.id,
   });
   const queryResultColumns = queryResults?.columns ?? [];
+
+  const columnSignature = useMemo(() => {
+    if (!queryResults) {
+      return "";
+    }
+
+    return queryResults.columns
+      .map((col) => {
+        return `${col.name}:${col.dataType}`;
+      })
+      .join("|");
+  }, [queryResults]);
+
+  const querySyncSignature = useMemo(() => {
+    return JSON.stringify({
+      queryColumns: state.query.queryColumns,
+      rawSQL: state.rawSQL,
+      dataSource: state.query.dataSource,
+      orderByColumn: state.query.orderByColumn,
+      orderByDirection: state.query.orderByDirection,
+    });
+  }, [
+    state.query.queryColumns,
+    state.rawSQL,
+    state.query.dataSource,
+    state.query.orderByColumn,
+    state.query.orderByDirection,
+  ]);
+
+  useEffect(() => {
+    if (isLoadingResults) {
+      return;
+    }
+
+    if (!queryResults) {
+      return;
+    }
+
+    dispatch.syncVizFromQueryResult(queryResults.columns);
+  }, [
+    isLoadingResults,
+    columnSignature,
+    querySyncSignature,
+    state.vizConfig.vizType,
+    queryResults,
+    dispatch,
+  ]);
   const queryResultData = queryResults?.data ?? [];
   const dateColumns = new Set(
     queryResultColumns

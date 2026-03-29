@@ -17,12 +17,30 @@ type Options = {
  * SQL path, no structured columns, axis keys missing from the result, or no
  * overlap between structured derived column names and result names.
  *
+ * **2B:** When both X and Y are set and each name still appears in the result,
+ * returns false so we do not re-invoke result hydration on every refetch
+ * (manual axis choices preserved across identical schemas).
+ *
  * Table viz returns false (no XY axes to infer here).
  */
 export function shouldHydrateVizFromQueryResult(options: Options): boolean {
   const { rawSQL, query, vizConfig, resultColumnNames } = options;
 
   if (vizConfig.vizType === "table") {
+    return false;
+  }
+
+  const xy = vizConfig as {
+    xAxisKey: string | undefined;
+    yAxisKey: string | undefined;
+  };
+
+  if (
+    xy.xAxisKey !== undefined &&
+    xy.yAxisKey !== undefined &&
+    resultColumnNames.has(xy.xAxisKey) &&
+    resultColumnNames.has(xy.yAxisKey)
+  ) {
     return false;
   }
 
@@ -33,11 +51,6 @@ export function shouldHydrateVizFromQueryResult(options: Options): boolean {
   if (query.queryColumns.length === 0) {
     return true;
   }
-
-  const xy = vizConfig as {
-    xAxisKey: string | undefined;
-    yAxisKey: string | undefined;
-  };
 
   if (xy.xAxisKey !== undefined && !resultColumnNames.has(xy.xAxisKey)) {
     return true;
