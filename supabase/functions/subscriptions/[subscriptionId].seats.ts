@@ -1,11 +1,11 @@
 import { z } from "zod";
-import { PATCH } from "../_shared/MiniServer/MiniServer.ts";
-import { PolarClient } from "../_shared/PolarClient/PolarClient.ts";
-import { MAX_FREE_PLAN_SEATS } from "../../../shared/config/AppConfig.ts";
+import { PATCH } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
+import { MAX_FREE_PLAN_SEATS } from "$/config/AppConfig.ts";
 import {
   PolarProductMetadataSchema,
   PolarSubscriptionMetadataSchema,
-} from "../polar-public/PolarEventDataSchemas.ts";
+} from "@sbfn/polar-public/PolarEventDataSchemas.ts";
 
 /**
  * Update a subscription's seat count.

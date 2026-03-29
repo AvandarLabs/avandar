@@ -15,7 +15,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AvaField } from "@/lib/ui/AvaForm/AvaField";
 import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
 import { AvaFormRef } from "@/lib/ui/AvaForm/AvaForm.types";
-import { PurchaseSeatsModalContents } from "./PurchaseSeatsModalContents";
+import { PurchaseSeatsModalContents } from "@/components/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents";
 
 export function useWorkspaceInviteModal({
   numberOfSeats,

@@ -1,16 +1,21 @@
 import { useMutation } from "@hooks/useMutation/useMutation";
-import { Button, Divider, Group, NumberInput, Stack, Text } from "@mantine/core";
+import {
+  Button,
+  Divider,
+  Group,
+  NumberInput,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifySuccess } from "@ui/notifications/notify";
 import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
-import type { UserId } from "$/models/User/User.types";
-import type { Subscription } from "$/models/Subscription/Subscription.types";
 import { useState } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
-import { isSeatBasedPlan } from "../WorkspaceBillingView/planUtils";
-import { useSubscriptionPlans } from "../WorkspaceBillingView/useSubscriptionPlans";
-import { goToBillingPortal } from "../WorkspaceBillingView/BillingPortalButton/goToBillingPortal";
+import { goToBillingPortal } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal";
+import type { Subscription } from "$/models/Subscription/Subscription.types";
+import type { UserId } from "$/models/User/User.types";
 
 type PurchaseSeatsModalContentsProps = {
   subscription: Subscription;
@@ -26,17 +31,6 @@ export function PurchaseSeatsModalContents({
   onSeatsAdded,
 }: PurchaseSeatsModalContentsProps): JSX.Element {
   const [seatsToAdd, setSeatsToAdd] = useState(1);
-
-  const [planGroups] = useSubscriptionPlans();
-  const allPlans = planGroups?.flatMap((group) => {
-    return group.type === "paid" ?
-      [group.monthlyPlan, group.annualPlan]
-    : [];
-  });
-  const currentPlan = allPlans?.find((plan) => {
-    return plan.polarProductId === subscription.polarProductId;
-  });
-  const seatBasedPlan = isSeatBasedPlan(currentPlan) ? currentPlan : undefined;
 
   const [purchaseSeats, isPurchasing] = useMutation({
     mutationFn: (variables: { seatsToAdd: number }) => {
