@@ -9040,6 +9040,7 @@
         "npm:@mantine/spotlight@^8.3.16",
         "npm:@mantine/tiptap@^8.3.16",
         "npm:@nabla/vite-plugin-eslint@^2.0.5",
+        "npm:@playwright/test@^1.58.2",
         "npm:@polar-sh/sdk@~0.41.5",
         "npm:@postgres-language-server/cli@0.19",
         "npm:@puckeditor/core@~0.21.1",

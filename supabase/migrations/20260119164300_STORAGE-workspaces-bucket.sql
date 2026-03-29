@@ -14,7 +14,7 @@ values
 on conflict (id) do nothing;
 
 -- Set policies for the workspaces bucket
-create policy "Users can SELECT workspace datasets" on storage.objects for
+create policy "Users can select workspace datasets" on storage.objects for
 select
   to authenticated using (
     bucket_id = 'workspaces' and
@@ -33,7 +33,7 @@ select
     ) [2] = 'datasets'
   );
 
-create policy "Users can UPLOAD workspace datasets" on storage.objects for insert to authenticated
+create policy "Users can upload workspace datasets" on storage.objects for insert to authenticated
 with
   check (
     bucket_id = 'workspaces' and
@@ -52,7 +52,7 @@ with
     ) [2] = 'datasets'
   );
 
-create policy "Users can UPDATE workspace datasets" on storage.objects
+create policy "Users can update workspace datasets" on storage.objects
 for update
   to authenticated using (
     bucket_id = 'workspaces' and
@@ -88,7 +88,7 @@ with
     ) [2] = 'datasets'
   );
 
-create policy "Users can DELETE workspace datasets" on storage.objects for delete to authenticated using (
+create policy "Users can delete workspace datasets" on storage.objects for delete to authenticated using (
   bucket_id = 'workspaces' and
   (
     storage.foldername (name)

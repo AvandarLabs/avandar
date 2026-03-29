@@ -14,7 +14,7 @@ values
 on conflict (id) do nothing;
 
 -- Set policies for the public bucket
-create policy "Anyone can SELECT published datasets" on storage.objects for
+create policy "Anyone can select published datasets" on storage.objects for
 select
   to authenticated,
   anon using (
@@ -24,7 +24,7 @@ select
     ) [3] = 'datasets'
   );
 
-create policy "Authenticated users can UPLOAD published datasets" on storage.objects for insert to authenticated
+create policy "Auth users can upload published datasets" on storage.objects for insert to authenticated
 with
   check (
     bucket_id = 'published' and
@@ -33,7 +33,7 @@ with
     ) [3] = 'datasets'
   );
 
-create policy "Authenticated users can UPDATE published datasets" on storage.objects
+create policy "Auth users can update published datasets" on storage.objects
 for update
   to authenticated using (
     bucket_id = 'published' and

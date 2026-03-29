@@ -149,3 +149,13 @@ the product into something that truly serves your mission.
      `makeParserRegistry` line or in the type-level tests at the end of the file.
 
 5. Verify there are no TypeScript errors in `[YourModel]Client.ts`.
+
+## Adding new Supabase storage buckets
+
+1. Create a migration script in `./migrations/<timestamp>_STORAGE-<bucket-name>-bucket.sql`.
+   - Examples:
+     - `./migrations/20260119164300_STORAGE-workspaces-bucket.sql`
+     - `./migrations/20260122161802_STORAGE-public-bucket.sql`
+2. Add the new SQL script to the `sql_paths` array in the `[db.seed]` section
+   of `supabase/config.toml`. This creates the bucket locally whenever we run
+   `pnpm db:reset`.
