@@ -1,4 +1,5 @@
 import { duckDBDescribeColumnTypeToSniffable } from "@ava-etl/NodeDuckDB/DuckDBSniffableDataType";
+import { getWdiCatalogDatasetPresentation } from "@pipelines/world-bank__wdi/wdiCatalogDatasetConfig";
 import { createClient } from "@supabase/supabase-js";
 import type { NodeDuckDB } from "@ava-etl/NodeDuckDB/NodeDuckDB";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -7,10 +8,6 @@ const OPENDATA_BUCKET_DEFAULT = "opendata";
 
 const WDI_SOURCE_URL =
   "https://data.worldbank.org/data-catalog/world-development-indicators";
-
-const WDI_DESCRIPTION =
-  "World Development Indicators: official World Bank compilation " +
-  "of development indicators from accepted international sources.";
 
 /** Min/max calendar years for one Parquet table (WDI `Year` column). */
 export type WdiYearCoverage = Readonly<{
@@ -165,6 +162,9 @@ export async function upsertWorldBankWdiCatalogEntry(options: {
   const nowIso = new Date().toISOString();
 
   const rows = tableSummaries.map((summary) => {
+    const presentation = getWdiCatalogDatasetPresentation({
+      tableBaseName: summary.tableBaseName,
+    });
     const objectPath = `${prefix}/${summary.tableBaseName}.parquet`;
     const { data } = supabase.storage.from(bucket).getPublicUrl(objectPath);
     const publicParquetUrl = data.publicUrl;
@@ -181,7 +181,7 @@ export async function upsertWorldBankWdiCatalogEntry(options: {
     const parquetFileName = `${summary.tableBaseName}.parquet`;
 
     return {
-      display_name: summary.tableBaseName,
+      display_name: presentation.display_name,
       parquet_file_name: parquetFileName,
       date_of_last_sync: nowIso,
       coverage_start_date: coverageStart,
@@ -200,7 +200,7 @@ export async function upsertWorldBankWdiCatalogEntry(options: {
       ],
       license: "CC BY 4.0",
       update_frequency: "Annual",
-      description: WDI_DESCRIPTION,
+      description: presentation.description,
       metadata: _buildMetadataForTable({
         bucket,
         storagePrefix: prefix,

@@ -134,40 +134,40 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                 <EditableDisplayText
                   name="dataset name"
                   value={datasetName}
-                onChange={setDatasetName}
-                onSave={(newName) => {
-                  updateDataset({
-                    id: dataset.id,
-                    data: {
-                      name: newName.trim(),
-                    },
-                  });
-                }}
-                onCancel={() => {
-                  setDatasetName(dataset.name);
-                }}
-                isSaving={isUpdatePending}
-                isSaveDisabled={datasetName.trim().length < 2}
-                minRows={1}
-                maxRows={2}
-                error={
-                  (
-                    datasetName.trim().length > 0 &&
-                    datasetName.trim().length < 2
-                  ) ?
-                    "Dataset name must be at least 2 characters."
-                  : undefined
-                }
-                emptyDisplayText="Untitled dataset"
-                displayTextProps={{
-                  fw: "var(--mantine-h2-font-weight)",
-                  fz: "var(--mantine-h2-font-size)",
-                  lh: "var(--mantine-h2-line-height)",
-                  m: 0,
-                }}
-                fw="var(--mantine-h2-font-weight)"
-                fz="var(--mantine-h2-font-size)"
-                lh="var(--mantine-h2-line-height)"
+                  onChange={setDatasetName}
+                  onSave={(newName) => {
+                    updateDataset({
+                      id: dataset.id,
+                      data: {
+                        name: newName.trim(),
+                      },
+                    });
+                  }}
+                  onCancel={() => {
+                    setDatasetName(dataset.name);
+                  }}
+                  isSaving={isUpdatePending}
+                  isSaveDisabled={datasetName.trim().length < 2}
+                  minRows={1}
+                  maxRows={2}
+                  error={
+                    (
+                      datasetName.trim().length > 0 &&
+                      datasetName.trim().length < 2
+                    ) ?
+                      "Dataset name must be at least 2 characters."
+                    : undefined
+                  }
+                  emptyDisplayText="Untitled dataset"
+                  displayTextProps={{
+                    fw: "var(--mantine-h2-font-weight)",
+                    fz: "var(--mantine-h2-font-size)",
+                    lh: "var(--mantine-h2-line-height)",
+                    m: 0,
+                  }}
+                  fw="var(--mantine-h2-font-weight)"
+                  fz="var(--mantine-h2-font-size)"
+                  lh="var(--mantine-h2-line-height)"
                 />
               </Box>
 
@@ -268,9 +268,15 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
             </Tabs.Panel>
 
             <Tabs.Panel value="dataset-summary">
-              {isLoadingFullDataset || !previewData || !datasetColumns ?
-                <Loader />
-              : <DataSummaryView datasetId={dataset.id} />}
+              {
+                currentTab !== "dataset-summary" ?
+                  null
+                  // lazy load the data summary view because it has an expensive
+                  // query
+                : isLoadingFullDataset || !previewData || !datasetColumns ?
+                  <Loader />
+                : <DataSummaryView datasetId={dataset.id} />
+              }
             </Tabs.Panel>
 
             <Button
