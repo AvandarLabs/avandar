@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { StructuredQueryUtils } from "$/models/queries/StructuredQuery/StructuredQueryUtils/StructuredQueryUtils.ts";
 import { shouldHydrateVizFromQueryResult } from "$/models/vizs/shouldHydrateVizFromQueryResult.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
@@ -11,12 +12,18 @@ function mockColumn(name: string): QueryColumn {
   } as QueryColumn;
 }
 
-const emptyQuery = {
-  queryColumns: [],
-  aggregations: {},
-} as PartialStructuredQuery;
+function _makeQueryWithColumns(
+  columns: QueryColumn[],
+): PartialStructuredQuery {
+  return {
+    ...StructuredQueryUtils.makeEmpty(),
+    queryColumns: columns,
+  } as unknown as PartialStructuredQuery;
+}
 
 describe("shouldHydrateVizFromQueryResult", () => {
+  const emptyQuery = StructuredQueryUtils.makeEmpty();
+
   const barEmpty: VizConfig = {
     vizType: "bar",
     xAxisKey: undefined,
@@ -61,14 +68,13 @@ describe("shouldHydrateVizFromQueryResult", () => {
   });
 
   it("returns false when rawSQL is only whitespace and structured matches", () => {
-    const q = {
-      queryColumns: [mockColumn("month"), mockColumn("total_cases")],
-      aggregations: {},
-    } as PartialStructuredQuery;
     expect(
       shouldHydrateVizFromQueryResult({
         rawSQL: "   \n  ",
-        query: q,
+        query: _makeQueryWithColumns([
+          mockColumn("month"),
+          mockColumn("total_cases"),
+        ]),
         vizConfig: {
           vizType: "bar",
           xAxisKey: "month",
@@ -91,14 +97,10 @@ describe("shouldHydrateVizFromQueryResult", () => {
   });
 
   it("returns true when an axis key is missing from the result", () => {
-    const q = {
-      queryColumns: [mockColumn("month")],
-      aggregations: {},
-    } as PartialStructuredQuery;
     expect(
       shouldHydrateVizFromQueryResult({
         rawSQL: undefined,
-        query: q,
+        query: _makeQueryWithColumns([mockColumn("month")]),
         vizConfig: {
           vizType: "bar",
           xAxisKey: "old_x",
@@ -110,14 +112,10 @@ describe("shouldHydrateVizFromQueryResult", () => {
   });
 
   it("returns true when structured names do not overlap result", () => {
-    const q = {
-      queryColumns: [mockColumn("structured_only")],
-      aggregations: {},
-    } as PartialStructuredQuery;
     expect(
       shouldHydrateVizFromQueryResult({
         rawSQL: undefined,
-        query: q,
+        query: _makeQueryWithColumns([mockColumn("structured_only")]),
         vizConfig: barEmpty,
         resultColumnNames: new Set(["from_sql_alias", "metric"]),
       }),
@@ -125,14 +123,13 @@ describe("shouldHydrateVizFromQueryResult", () => {
   });
 
   it("returns false when structured overlaps result and axes are valid", () => {
-    const q = {
-      queryColumns: [mockColumn("month"), mockColumn("total_cases")],
-      aggregations: {},
-    } as PartialStructuredQuery;
     expect(
       shouldHydrateVizFromQueryResult({
         rawSQL: undefined,
-        query: q,
+        query: _makeQueryWithColumns([
+          mockColumn("month"),
+          mockColumn("total_cases"),
+        ]),
         vizConfig: {
           vizType: "line",
           xAxisKey: "month",
