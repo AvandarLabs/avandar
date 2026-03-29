@@ -73,7 +73,7 @@ export function VisualizationContainer({
           columnNames={columnNames}
           data={data}
           dateColumns={dateColumns}
-          dateFormat="YYYY-MM-DD HH:mm:ss z"
+          dateFormat="YYYY-MM-DD HH:mm:ss Z"
           height="100%"
         />
       );
@@ -85,7 +85,14 @@ export function VisualizationContainer({
         error,
       } = BarChartConfigSchema.safeParse(config);
       if (success) {
-        return <BarChart data={data} height={700} {...validConfig} />;
+        return (
+          <BarChart
+            data={data}
+            height={700}
+            dateColumns={dateColumns}
+            {...validConfig}
+          />
+        );
       }
 
       // generate the error message
@@ -128,7 +135,14 @@ export function VisualizationContainer({
       } = LineChartConfigSchema.safeParse(config);
 
       if (success) {
-        return <LineChart data={data} height={700} {...validConfig} />;
+        return (
+          <LineChart
+            data={data}
+            height={700}
+            dateColumns={dateColumns}
+            {...validConfig}
+          />
+        );
       }
       return <DangerText>{prettifyError(error)}</DangerText>;
     })
