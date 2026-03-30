@@ -16,4 +16,10 @@ export type BarChartVizConfig = {
    * TODO(jpsyx): create a concept of a QueryColumn and use QueryColumnId here.
    */
   yAxisKey: string | undefined;
+
+  /** Show the chart legend when `true`. */
+  withLegend: boolean;
+
+  /** Optional CSS color override for the data series (e.g. `"#ff0000"`). */
+  color?: string;
 };

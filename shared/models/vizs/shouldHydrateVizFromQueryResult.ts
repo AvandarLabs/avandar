@@ -1,5 +1,7 @@
 import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns.ts";
-import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+import type {
+  PartialStructuredQuery,
+} from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
 type Options = {
@@ -13,15 +15,15 @@ type Options = {
 /**
  * Whether the app should run `hydrateFromQueryResult` for the current viz.
  *
- * True when structured `hydrateFromQuery` cannot reliably drive XY axes: raw
+ * True when structured `hydrateFromQuery` cannot reliably drive axes: raw
  * SQL path, no structured columns, axis keys missing from the result, or no
  * overlap between structured derived column names and result names.
  *
- * **2B:** When both X and Y are set and each name still appears in the result,
- * returns false so we do not re-invoke result hydration on every refetch
- * (manual axis choices preserved across identical schemas).
+ * **2B:** When all primary axis keys are set and each name still appears in
+ * the result, returns false so we do not re-invoke result hydration on every
+ * refetch (manual axis choices preserved across identical schemas).
  *
- * Table viz returns false (no XY axes to infer here).
+ * Table viz returns false (no axis keys to infer here).
  */
 export function shouldHydrateVizFromQueryResult(options: Options): boolean {
   const { rawSQL, query, vizConfig, resultColumnNames } = options;
@@ -30,16 +32,13 @@ export function shouldHydrateVizFromQueryResult(options: Options): boolean {
     return false;
   }
 
-  const xy = vizConfig as {
-    xAxisKey: string | undefined;
-    yAxisKey: string | undefined;
-  };
+  const { key1, key2 } = _getPrimaryAxisKeys(vizConfig);
 
   if (
-    xy.xAxisKey !== undefined &&
-    xy.yAxisKey !== undefined &&
-    resultColumnNames.has(xy.xAxisKey) &&
-    resultColumnNames.has(xy.yAxisKey)
+    key1 !== undefined &&
+    key2 !== undefined &&
+    resultColumnNames.has(key1) &&
+    resultColumnNames.has(key2)
   ) {
     return false;
   }
@@ -52,11 +51,11 @@ export function shouldHydrateVizFromQueryResult(options: Options): boolean {
     return true;
   }
 
-  if (xy.xAxisKey !== undefined && !resultColumnNames.has(xy.xAxisKey)) {
+  if (key1 !== undefined && !resultColumnNames.has(key1)) {
     return true;
   }
 
-  if (xy.yAxisKey !== undefined && !resultColumnNames.has(xy.yAxisKey)) {
+  if (key2 !== undefined && !resultColumnNames.has(key2)) {
     return true;
   }
 
@@ -72,4 +71,30 @@ export function shouldHydrateVizFromQueryResult(options: Options): boolean {
   }
 
   return false;
+}
+
+/**
+ * Returns the two "primary" axis keys for a given viz config.
+ * - Pie-like (pie, funnel, radar): nameKey + valueKey
+ * - All others: xAxisKey + yAxisKey
+ */
+function _getPrimaryAxisKeys(vizConfig: VizConfig): {
+  key1: string | undefined;
+  key2: string | undefined;
+} {
+  const vt = vizConfig.vizType;
+
+  if (vt === "pie" || vt === "funnel" || vt === "radar") {
+    const pv = vizConfig as {
+      nameKey: string | undefined;
+      valueKey: string | undefined;
+    };
+    return { key1: pv.nameKey, key2: pv.valueKey };
+  }
+
+  const xy = vizConfig as {
+    xAxisKey: string | undefined;
+    yAxisKey: string | undefined;
+  };
+  return { key1: xy.xAxisKey, key2: xy.yAxisKey };
 }

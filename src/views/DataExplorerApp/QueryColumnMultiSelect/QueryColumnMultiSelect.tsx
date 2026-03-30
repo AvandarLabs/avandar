@@ -15,6 +15,7 @@ import { matchSorter } from "match-sorter";
 import { useEffect, useMemo } from "react";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
+import { remapColumnsByBaseId } from "@/views/DataExplorerApp/QueryColumnMultiSelect/remapColumnsByBaseId";
 import type {
   ComboboxItem,
   ComboboxParsedItem,
@@ -133,16 +134,18 @@ export function QueryColumnMultiSelect({
     };
   }, [queryColumns]);
 
-  // If the available columns change (e.g. if the `dataSourceId` changed)
-  // we should drop any selections that are no longer valid.
+  // When available columns change (e.g. data source changed, or columns
+  // were restored from URL with different synthetic UUIDs), remap the
+  // current selection to the canonical instances from the available set.
   useEffect(() => {
-    const prunedSelectedColumns = currentSelectedColumns.filter((col) => {
-      return queryColumnLookup.has(col.id);
+    const remapped = remapColumnsByBaseId({
+      selectedColumns: currentSelectedColumns,
+      availableColumns: queryColumns,
     });
-    if (prunedSelectedColumns.length !== currentSelectedColumns.length) {
-      setCurrentSelectedColumns(prunedSelectedColumns);
+    if (remapped !== undefined) {
+      setCurrentSelectedColumns(remapped);
     }
-  }, [queryColumnLookup, currentSelectedColumns, setCurrentSelectedColumns]);
+  }, [queryColumns, currentSelectedColumns, setCurrentSelectedColumns]);
 
   const selectedColumnIds = useMemo(() => {
     return currentSelectedColumns.map(prop("id"));

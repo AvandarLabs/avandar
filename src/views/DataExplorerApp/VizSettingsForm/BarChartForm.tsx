@@ -1,8 +1,9 @@
-import { Tooltip } from "@mantine/core";
+import { ColorInput, Switch, Tooltip } from "@mantine/core";
 import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
 import { Select } from "@ui/inputs/Select/Select";
 import { propPasses } from "@utils/objects/hofs/propPasses/propPasses";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
+import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import { useMemo } from "react";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
@@ -34,7 +35,7 @@ export function BarChartForm({
       },
     );
   }, [fields]);
-  const { xAxisKey, yAxisKey } = config;
+  const { xAxisKey, yAxisKey, withLegend } = config;
   const xAxisDisabled = fieldOptions.length === 0;
   const yAxisDisabled =
     fieldOptions.length === 0 || numericFieldOptions.length === 0;
@@ -87,6 +88,30 @@ export function BarChartForm({
           }}
         />
       </Tooltip>
+
+      <Switch
+        label="Show legend"
+        checked={withLegend}
+        mt="sm"
+        onChange={(event) => {
+          onConfigChange({
+            ...config,
+            withLegend: event.currentTarget.checked,
+          });
+        }}
+      />
+
+      <ColorInput
+        label={yAxisKey ?? "Series"}
+        value={config.color ?? ""}
+        mt="sm"
+        swatches={CHART_COLOR_SWATCHES}
+        withEyeDropper={false}
+        format="hex"
+        onChange={(value) => {
+          onConfigChange({ ...config, color: value || undefined });
+        }}
+      />
     </>
   );
 }

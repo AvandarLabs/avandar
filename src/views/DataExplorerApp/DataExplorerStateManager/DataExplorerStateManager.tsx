@@ -1,47 +1,29 @@
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { makeObject } from "@utils/objects/makeObject/makeObject";
 import { setValue } from "@utils/objects/setValue/setValue";
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import {
   applyVizConfigFromQueryResult,
   isVizConfigEqualForQueryResultSync,
 } from "$/models/vizs/applyVizConfigFromQueryResult";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager";
+import { INITIAL_DATA_EXPLORER_STATE } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
+import type {
+  DataExplorerAppState,
+  OpenDatasetInfo,
+} from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
 import type {
   QueryColumn,
   QueryColumnId,
 } from "$/models/queries/QueryColumn/QueryColumn.types";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
-import type {
-  OrderByDirection,
-  PartialStructuredQuery,
-} from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import type {
   VizConfig,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types";
-
-type DataExplorerAppState = {
-  query: PartialStructuredQuery;
-
-  /**
-   * If raw SQL was generated, we should use that for our query instead of
-   * the structured query.
-   */
-  rawSQL: string | undefined;
-  vizConfig: VizConfig;
-};
-
-const initialState: DataExplorerAppState = {
-  query: StructuredQuery.makeEmpty(),
-  vizConfig: {
-    vizType: "table",
-  },
-  rawSQL: undefined,
-};
 
 /**
  * This store is used to manage the state of the Data Explorer app.
@@ -51,7 +33,7 @@ const initialState: DataExplorerAppState = {
  */
 export const DataExplorerStateManager = createAppStateManager({
   name: "DataExplorer",
-  initialState,
+  initialState: INITIAL_DATA_EXPLORER_STATE,
   actions: {
     /** Set the data source for the query. */
     setDataSource: (
@@ -188,6 +170,22 @@ export const DataExplorerStateManager = createAppStateManager({
 
     setRawSQL: (state: DataExplorerAppState, rawSQL: string | undefined) => {
       return setValue(state, "rawSQL", rawSQL);
+    },
+
+    /**
+     * Set (or clear) the currently open saved dataset. Pass `undefined` to
+     * indicate no dataset is open.
+     */
+    setOpenDataset: (
+      state: DataExplorerAppState,
+      openDataset: OpenDatasetInfo | undefined,
+    ): DataExplorerAppState => {
+      return { ...state, openDataset };
+    },
+
+    /** Reset the Data Explorer to its initial (blank) state. */
+    resetState: (_state: DataExplorerAppState): DataExplorerAppState => {
+      return INITIAL_DATA_EXPLORER_STATE;
     },
   },
 });

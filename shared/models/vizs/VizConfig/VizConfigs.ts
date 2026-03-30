@@ -1,8 +1,31 @@
 import { registry } from "@utils/objects/registry/registry.ts";
-import { BarChartVizConfigs } from "$/models/vizs/BarChartVizConfig/BarChartVizConfigs.ts";
-import { LineChartVizConfigs } from "$/models/vizs/LineChartVizConfig/LineChartVizConfigs.ts";
-import { ScatterPlotVizConfigs } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfigs.ts";
-import { TableVizConfigs } from "$/models/vizs/TableVizConfig/TableVizConfigs.ts";
+import {
+  AreaChartVizConfigs,
+} from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfigs.ts";
+import {
+  BarChartVizConfigs,
+} from "$/models/vizs/BarChartVizConfig/BarChartVizConfigs.ts";
+import {
+  BubbleChartVizConfigs,
+} from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfigs.ts";
+import {
+  FunnelChartVizConfigs,
+} from "$/models/vizs/FunnelChartVizConfig/FunnelChartVizConfigs.ts";
+import {
+  LineChartVizConfigs,
+} from "$/models/vizs/LineChartVizConfig/LineChartVizConfigs.ts";
+import {
+  PieChartVizConfigs,
+} from "$/models/vizs/PieChartVizConfig/PieChartVizConfigs.ts";
+import {
+  RadarChartVizConfigs,
+} from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfigs.ts";
+import {
+  ScatterPlotVizConfigs,
+} from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfigs.ts";
+import {
+  TableVizConfigs,
+} from "$/models/vizs/TableVizConfig/TableVizConfigs.ts";
 import {
   VizConfig,
   VizConfigType,
@@ -10,21 +33,35 @@ import {
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
-import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type {
+  PartialStructuredQuery,
+} from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+import type {
+  QueryResultColumn,
+} from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 const VizConfigModulesRegistry = {
   table: TableVizConfigs,
   bar: BarChartVizConfigs,
   line: LineChartVizConfigs,
+  area: AreaChartVizConfigs,
   scatter: ScatterPlotVizConfigs,
+  pie: PieChartVizConfigs,
+  funnel: FunnelChartVizConfigs,
+  radar: RadarChartVizConfigs,
+  bubble: BubbleChartVizConfigs,
 } as const satisfies VizConfigUtilRegistry;
 
 export const VizTypes = registry<VizType>().keys(
   "table",
   "bar",
   "line",
+  "area",
   "scatter",
+  "pie",
+  "funnel",
+  "radar",
+  "bubble",
 );
 
 /** Get the specific utils module for a given viz type.*/
