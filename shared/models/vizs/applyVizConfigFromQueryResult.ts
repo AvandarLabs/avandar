@@ -27,8 +27,14 @@ export function isVizConfigEqualForQueryResultSync(
     return true;
   }
 
-  const ax = a as { xAxisKey: string | undefined; yAxisKey: string | undefined };
-  const bx = b as { xAxisKey: string | undefined; yAxisKey: string | undefined };
+  const ax = a as {
+    xAxisKey: string | undefined;
+    yAxisKey: string | undefined;
+  };
+  const bx = b as {
+    xAxisKey: string | undefined;
+    yAxisKey: string | undefined;
+  };
 
   return ax.xAxisKey === bx.xAxisKey && ax.yAxisKey === bx.yAxisKey;
 }
@@ -46,7 +52,11 @@ export function applyVizConfigFromQueryResult(
   input: ApplyVizConfigFromQueryResultInput,
 ): VizConfig {
   const { vizConfig, rawSQL, query, columns } = input;
-  const resultColumnNames = new Set(columns.map((c) => c.name));
+  const resultColumnNames = new Set(
+    columns.map((c) => {
+      return c.name;
+    }),
+  );
 
   let next: VizConfig = vizConfig;
 

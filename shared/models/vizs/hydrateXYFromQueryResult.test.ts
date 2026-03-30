@@ -3,7 +3,10 @@ import { hydrateXYFromQueryResult } from "$/models/vizs/hydrateXYFromQueryResult
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 function cols(
-  pairs: readonly { name: string; dataType: QueryResultColumn["dataType"] }[],
+  pairs: ReadonlyArray<{
+    name: string;
+    dataType: QueryResultColumn["dataType"];
+  }>,
 ): QueryResultColumn[] {
   return pairs.map((p) => {
     return { name: p.name, dataType: p.dataType };

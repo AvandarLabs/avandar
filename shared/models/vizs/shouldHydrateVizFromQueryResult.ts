@@ -60,7 +60,9 @@ export function shouldHydrateVizFromQueryResult(options: Options): boolean {
     return true;
   }
 
-  const derivedNames = query.queryColumns.map(QueryColumns.getDerivedColumnName);
+  const derivedNames = query.queryColumns.map(
+    QueryColumns.getDerivedColumnName,
+  );
   const anyDerivedAppearsInResult = derivedNames.some((name) => {
     return resultColumnNames.has(name);
   });
