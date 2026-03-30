@@ -24,4 +24,10 @@ export type PieChartVizConfig = {
 
   /** Controls what each label displays. Defaults to `"value"`. */
   labelsType: "value" | "percent";
+
+  /**
+   * Optional per-slice color overrides, keyed by the slice's name value.
+   * Values are CSS color strings (e.g. `"#ff0000"` or `"blue.6"`).
+   */
+  seriesColors?: Record<string, string>;
 };

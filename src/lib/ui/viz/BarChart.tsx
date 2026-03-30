@@ -6,6 +6,7 @@ import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 
 type Props = XYChartProps & {
   withLegend?: boolean;
+  color?: string;
 };
 
 export function BarChart({
@@ -17,10 +18,11 @@ export function BarChart({
   dateFormat = "YYYY-MM-DD",
   timezone,
   withLegend = false,
+  color,
 }: Props): JSX.Element {
   const series = useMemo(() => {
-    return [{ name: yAxisKey }];
-  }, [yAxisKey]);
+    return [{ name: yAxisKey, ...(color ? { color } : {}) }];
+  }, [yAxisKey, color]);
 
   const isDateAxis = dateColumns?.has(xAxisKey) ?? false;
 

@@ -12,4 +12,10 @@ export type FunnelChartVizConfig = {
    * This is a column name, not an ID.
    */
   valueKey: string | undefined;
+
+  /**
+   * Optional per-step color overrides, keyed by the step's name value.
+   * Values are CSS color strings (e.g. `"#ff0000"` or `"blue.6"`).
+   */
+  seriesColors?: Record<string, string>;
 };

@@ -1,8 +1,9 @@
+import { ColorInput, Switch } from "@mantine/core";
 import { Select } from "@ui/inputs/Select/Select";
 import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
 import { propPasses } from "@utils/objects/hofs/propPasses/propPasses";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
-import { Switch } from "@mantine/core";
+import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import { useMemo } from "react";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
@@ -99,6 +100,18 @@ export function AreaChartForm({
             ...config,
             withLegend: event.currentTarget.checked,
           });
+        }}
+      />
+
+      <ColorInput
+        label={yAxisKey ?? "Series"}
+        value={config.color ?? ""}
+        mt="sm"
+        swatches={CHART_COLOR_SWATCHES}
+        withEyeDropper={false}
+        format="hex"
+        onChange={(value) => {
+          onConfigChange({ ...config, color: value || undefined });
         }}
       />
     </>

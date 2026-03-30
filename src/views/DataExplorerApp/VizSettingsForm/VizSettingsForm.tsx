@@ -29,14 +29,16 @@ import {
 import {
   ScatterChartForm,
 } from "@/views/DataExplorerApp/VizSettingsForm/ScatterChartForm";
+import type { UnknownDataFrame } from "@utils/types/common.types";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { VizType } from "$/models/vizs/VizConfig/VizConfig.types";
 
 type Props = {
   columns: readonly QueryResultColumn[];
+  data: UnknownDataFrame;
 };
 
-export function VizSettingsForm({ columns }: Props): JSX.Element {
+export function VizSettingsForm({ columns, data }: Props): JSX.Element {
   const [{ vizConfig }, dispatch] = DataExplorerStateManager.useContext();
   const vizTypeOptions: SelectData<VizType> = VizTypes.map((vizType) => {
     return {
@@ -112,6 +114,7 @@ export function VizSettingsForm({ columns }: Props): JSX.Element {
             <PieChartForm
               fields={columns}
               config={config}
+              data={data}
               onConfigChange={(newConfig) => {
                 dispatch.setVizConfig({ ...config, ...newConfig });
               }}
@@ -123,6 +126,7 @@ export function VizSettingsForm({ columns }: Props): JSX.Element {
             <FunnelChartForm
               fields={columns}
               config={config}
+              data={data}
               onConfigChange={(newConfig) => {
                 dispatch.setVizConfig({ ...config, ...newConfig });
               }}

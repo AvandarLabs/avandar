@@ -13,6 +13,7 @@ type Props = {
   isDonut: boolean;
   withLabels: boolean;
   labelsType: "value" | "percent";
+  seriesColors?: Record<string, string>;
   size?: number;
 };
 
@@ -23,18 +24,23 @@ export function PieChart({
   isDonut,
   withLabels,
   labelsType,
+  seriesColors,
   size = 300,
 }: Props): JSX.Element {
   const chartData = useMemo(() => {
     return data.map((row, index) => {
       const r = row as Record<string, unknown>;
+      const name = String(r[nameKey] ?? "");
       return {
-        name: String(r[nameKey] ?? ""),
+        name,
         value: Number(r[valueKey] ?? 0),
-        color: CHART_COLORS[index % CHART_COLORS.length],
+        color:
+          seriesColors?.[name] ??
+          CHART_COLORS[index % CHART_COLORS.length] ??
+          "blue.6",
       };
     });
-  }, [data, nameKey, valueKey]);
+  }, [data, nameKey, valueKey, seriesColors]);
 
   if (isDonut) {
     return (

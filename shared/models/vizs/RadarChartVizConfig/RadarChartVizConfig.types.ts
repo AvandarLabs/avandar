@@ -12,4 +12,7 @@ export type RadarChartVizConfig = {
    * This is a column name, not an ID.
    */
   valueKey: string | undefined;
+
+  /** Optional CSS color override for the radar polygon (e.g. `"#ff0000"`). */
+  color?: string;
 };

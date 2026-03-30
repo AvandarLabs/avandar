@@ -1,4 +1,4 @@
-import { Flex, List, Text } from "@mantine/core";
+import { Box, Flex, List, Text } from "@mantine/core";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { objectValues } from "@utils/objects/objectValues";
 import { UnknownDataFrame } from "@utils/types/common.types";
@@ -14,9 +14,7 @@ import { LineChart } from "@/lib/ui/viz/LineChart";
 import { PieChart } from "@/lib/ui/viz/PieChart";
 import { RadarChart } from "@/lib/ui/viz/RadarChart";
 import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
-import {
-  DataExplorerStateManager,
-} from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { DangerText } from "@/lib/ui/text/DangerText";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 
@@ -139,13 +137,16 @@ export function VisualizationContainer({
       } = BarChartConfigSchema.safeParse(config);
       if (success) {
         return (
-          <BarChart
-            data={data}
-            height={700}
-            dateColumns={dateColumns}
-            withLegend={config.withLegend}
-            {...validConfig}
-          />
+          <Box w="100%">
+            <BarChart
+              data={data}
+              height={700}
+              dateColumns={dateColumns}
+              withLegend={config.withLegend}
+              color={config.color}
+              {...validConfig}
+            />
+          </Box>
         );
       }
 
@@ -189,14 +190,17 @@ export function VisualizationContainer({
 
       if (success) {
         return (
-          <LineChart
-            data={data}
-            height={700}
-            dateColumns={dateColumns}
-            withLegend={config.withLegend}
-            curveType={config.curveType}
-            {...validConfig}
-          />
+          <Box w="100%">
+            <LineChart
+              data={data}
+              height={700}
+              dateColumns={dateColumns}
+              withLegend={config.withLegend}
+              curveType={config.curveType}
+              color={config.color}
+              {...validConfig}
+            />
+          </Box>
         );
       }
       return <DangerText>{prettifyError(error)}</DangerText>;
@@ -210,14 +214,17 @@ export function VisualizationContainer({
 
       if (success) {
         return (
-          <AreaChart
-            data={data}
-            height={700}
-            dateColumns={dateColumns}
-            withLegend={config.withLegend}
-            curveType={config.curveType}
-            {...validConfig}
-          />
+          <Box w="100%">
+            <AreaChart
+              data={data}
+              height={700}
+              dateColumns={dateColumns}
+              withLegend={config.withLegend}
+              curveType={config.curveType}
+              color={config.color}
+              {...validConfig}
+            />
+          </Box>
         );
       }
       return <DangerText>{prettifyError(error)}</DangerText>;
@@ -250,6 +257,7 @@ export function VisualizationContainer({
             isDonut={config.isDonut}
             withLabels={config.withLabels}
             labelsType={config.labelsType}
+            seriesColors={config.seriesColors}
           />
         );
       }
@@ -268,6 +276,7 @@ export function VisualizationContainer({
             data={data}
             nameKey={validConfig.nameKey}
             valueKey={validConfig.valueKey}
+            seriesColors={config.seriesColors}
           />
         );
       }
@@ -286,6 +295,7 @@ export function VisualizationContainer({
             data={data}
             nameKey={validConfig.nameKey}
             valueKey={validConfig.valueKey}
+            color={config.color}
           />
         );
       }

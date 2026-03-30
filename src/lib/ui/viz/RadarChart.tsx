@@ -6,6 +6,7 @@ type Props = {
   data: UnknownDataFrame;
   nameKey: string;
   valueKey: string;
+  color?: string;
   height?: number;
 };
 
@@ -13,11 +14,12 @@ export function RadarChart({
   data,
   nameKey,
   valueKey,
+  color = "blue.6",
   height = 300,
 }: Props): JSX.Element {
   const series = useMemo(() => {
-    return [{ name: valueKey, color: "blue.6", opacity: 0.2 }];
-  }, [valueKey]);
+    return [{ name: valueKey, color, opacity: 0.2 }];
+  }, [valueKey, color]);
 
   return (
     <MantineRadarChart

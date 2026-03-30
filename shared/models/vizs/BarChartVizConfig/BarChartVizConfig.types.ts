@@ -19,4 +19,7 @@ export type BarChartVizConfig = {
 
   /** Show the chart legend when `true`. */
   withLegend: boolean;
+
+  /** Optional CSS color override for the data series (e.g. `"#ff0000"`). */
+  color?: string;
 };

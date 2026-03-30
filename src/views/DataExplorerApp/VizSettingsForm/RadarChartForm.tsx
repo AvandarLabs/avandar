@@ -1,7 +1,9 @@
+import { ColorInput } from "@mantine/core";
 import { Select } from "@ui/inputs/Select/Select";
 import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
 import { propPasses } from "@utils/objects/hofs/propPasses/propPasses";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
+import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import { useMemo } from "react";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";
@@ -60,6 +62,18 @@ export function RadarChartForm({
         }
         onChange={(field) => {
           onConfigChange({ ...config, valueKey: field ?? undefined });
+        }}
+      />
+
+      <ColorInput
+        label={valueKey ?? "Series"}
+        value={config.color ?? ""}
+        mt="sm"
+        swatches={CHART_COLOR_SWATCHES}
+        withEyeDropper={false}
+        format="hex"
+        onChange={(value) => {
+          onConfigChange({ ...config, color: value || undefined });
         }}
       />
     </>

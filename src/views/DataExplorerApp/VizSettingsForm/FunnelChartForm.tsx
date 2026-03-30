@@ -1,20 +1,25 @@
+import { ColorInput, Divider } from "@mantine/core";
 import { Select } from "@ui/inputs/Select/Select";
 import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
 import { propPasses } from "@utils/objects/hofs/propPasses/propPasses";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
+import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import { useMemo } from "react";
+import type { UnknownDataFrame } from "@utils/types/common.types";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { FunnelChartVizConfig } from "$/models/vizs/FunnelChartVizConfig/FunnelChartVizConfig.types";
 
 type Props = {
   fields: readonly QueryResultColumn[];
   config: FunnelChartVizConfig;
+  data: UnknownDataFrame;
   onConfigChange: (newConfig: FunnelChartVizConfig) => void;
 };
 
 export function FunnelChartForm({
   fields,
   config,
+  data,
   onConfigChange,
 }: Props): JSX.Element {
   const fieldOptions = useMemo(() => {
@@ -27,6 +32,20 @@ export function FunnelChartForm({
       { valueKey: "name", labelKey: "name" },
     );
   }, [fields]);
+
+  const sliceNames = useMemo(() => {
+    if (!config.nameKey) {
+      return [];
+    }
+    const seen = new Set<string>();
+    data.forEach((row) => {
+      const name = String(row[config.nameKey ?? ""] ?? "");
+      if (name) {
+        seen.add(name);
+      }
+    });
+    return Array.from(seen);
+  }, [data, config.nameKey]);
 
   const { nameKey, valueKey } = config;
 
@@ -62,6 +81,34 @@ export function FunnelChartForm({
           onConfigChange({ ...config, valueKey: field ?? undefined });
         }}
       />
+
+      {sliceNames.length > 0 ? (
+        <>
+          <Divider label="Slice colors" mt="sm" mb="xs" />
+          {sliceNames.map((name) => {
+            return (
+              <ColorInput
+                key={name}
+                label={name}
+                value={config.seriesColors?.[name] ?? ""}
+                mt="xs"
+                swatches={CHART_COLOR_SWATCHES}
+                withEyeDropper={false}
+                format="hex"
+                onChange={(value) => {
+                  onConfigChange({
+                    ...config,
+                    seriesColors: {
+                      ...config.seriesColors,
+                      [name]: value || undefined,
+                    } as Record<string, string>,
+                  });
+                }}
+              />
+            );
+          })}
+        </>
+      ) : null}
     </>
   );
 }

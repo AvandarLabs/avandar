@@ -32,8 +32,8 @@ function makeCol(name: string, dataType: DatasetColumn["dataType"]) {
     id: name as DatasetColumn["id"],
     name,
     dataType,
-    order: 0,
-  });
+    columnIdx: 0,
+  } as DatasetColumn);
 }
 
 function makeQuery(

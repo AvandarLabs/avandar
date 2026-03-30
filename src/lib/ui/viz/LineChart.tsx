@@ -8,6 +8,7 @@ import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 type Props = XYChartProps & {
   withLegend?: boolean;
   curveType?: CurveType;
+  color?: string;
 };
 
 export function LineChart({
@@ -20,10 +21,11 @@ export function LineChart({
   timezone,
   withLegend = false,
   curveType = "monotone",
+  color,
 }: Props): JSX.Element {
   const series = useMemo(() => {
-    return [{ name: yAxisKey }];
-  }, [yAxisKey]);
+    return [{ name: yAxisKey, ...(color ? { color } : {}) }];
+  }, [yAxisKey, color]);
 
   const isDateAxis = dateColumns?.has(xAxisKey) ?? false;
 

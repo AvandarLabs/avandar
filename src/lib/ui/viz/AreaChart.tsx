@@ -33,6 +33,7 @@ import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 type Props = XYChartProps & {
   withLegend?: boolean;
   curveType?: CurveType;
+  color?: string;
 };
 
 export function AreaChart({
@@ -45,6 +46,7 @@ export function AreaChart({
   timezone,
   withLegend = false,
   curveType = "monotone",
+  color = "var(--mantine-color-blue-6)",
 }: Props): JSX.Element {
   const gradientId = useId();
   const isDateAxis = dateColumns?.has(xAxisKey) ?? false;
@@ -76,16 +78,8 @@ export function AreaChart({
         >
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-              <stop
-                offset="0%"
-                stopColor="var(--mantine-color-blue-6)"
-                stopOpacity={0.2}
-              />
-              <stop
-                offset="100%"
-                stopColor="var(--mantine-color-blue-6)"
-                stopOpacity={0.01}
-              />
+              <stop offset="0%" stopColor={color} stopOpacity={0.2} />
+              <stop offset="100%" stopColor={color} stopOpacity={0.01} />
             </linearGradient>
           </defs>
           <CartesianGrid
@@ -113,18 +107,14 @@ export function AreaChart({
           <Area
             type={curveType}
             dataKey={yAxisKey}
-            stroke="var(--mantine-color-blue-6)"
+            stroke={color}
             strokeWidth={2}
             fill={`url(#${gradientId})`}
-            dot={{
-              r: 4,
-              fill: "var(--mantine-color-blue-6)",
-              strokeWidth: 0,
-            }}
+            dot={{ r: 4, fill: color, strokeWidth: 0 }}
             activeDot={{
               r: 5,
               fill: "white",
-              stroke: "var(--mantine-color-blue-6)",
+              stroke: color,
               strokeWidth: 2,
             }}
           />

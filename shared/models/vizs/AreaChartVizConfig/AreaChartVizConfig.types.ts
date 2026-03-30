@@ -20,4 +20,7 @@ export type AreaChartVizConfig = {
 
   /** Curve interpolation style. Defaults to `"monotone"`. */
   curveType: CurveType;
+
+  /** Optional CSS color override for the data series (e.g. `"#ff0000"`). */
+  color?: string;
 };

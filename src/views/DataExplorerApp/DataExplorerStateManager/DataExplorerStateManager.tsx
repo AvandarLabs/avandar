@@ -8,6 +8,8 @@ import {
 } from "$/models/vizs/applyVizConfigFromQueryResult";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager";
+import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { VirtualDatasetId } from "$/models/datasets/VirtualDataset/VirtualDataset.types";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
 import type {
   QueryColumn,
@@ -24,7 +26,17 @@ import type {
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types";
 
-type DataExplorerAppState = {
+/**
+ * Identifies the currently open saved dataset in the Data Explorer, if any.
+ * Stored in state so the toolbar can offer "Save Over" and "Delete" actions.
+ */
+export type OpenDatasetInfo = {
+  datasetId: DatasetId;
+  name: string;
+  virtualDatasetId: VirtualDatasetId;
+};
+
+export type DataExplorerAppState = {
   query: PartialStructuredQuery;
 
   /**
@@ -33,14 +45,18 @@ type DataExplorerAppState = {
    */
   rawSQL: string | undefined;
   vizConfig: VizConfig;
+
+  /** The currently open saved dataset, or `undefined` if none is open. */
+  openDataset: OpenDatasetInfo | undefined;
 };
 
-const initialState: DataExplorerAppState = {
+export const INITIAL_DATA_EXPLORER_STATE: DataExplorerAppState = {
   query: StructuredQuery.makeEmpty(),
   vizConfig: {
     vizType: "table",
   },
   rawSQL: undefined,
+  openDataset: undefined,
 };
 
 /**
@@ -51,7 +67,7 @@ const initialState: DataExplorerAppState = {
  */
 export const DataExplorerStateManager = createAppStateManager({
   name: "DataExplorer",
-  initialState,
+  initialState: INITIAL_DATA_EXPLORER_STATE,
   actions: {
     /** Set the data source for the query. */
     setDataSource: (
@@ -188,6 +204,22 @@ export const DataExplorerStateManager = createAppStateManager({
 
     setRawSQL: (state: DataExplorerAppState, rawSQL: string | undefined) => {
       return setValue(state, "rawSQL", rawSQL);
+    },
+
+    /**
+     * Set (or clear) the currently open saved dataset. Pass `undefined` to
+     * indicate no dataset is open.
+     */
+    setOpenDataset: (
+      state: DataExplorerAppState,
+      openDataset: OpenDatasetInfo | undefined,
+    ): DataExplorerAppState => {
+      return { ...state, openDataset };
+    },
+
+    /** Reset the Data Explorer to its initial (blank) state. */
+    resetState: (_state: DataExplorerAppState): DataExplorerAppState => {
+      return INITIAL_DATA_EXPLORER_STATE;
     },
   },
 });

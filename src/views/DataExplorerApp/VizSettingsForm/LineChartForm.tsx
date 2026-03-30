@@ -1,7 +1,8 @@
+import { ColorInput, Switch } from "@mantine/core";
 import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
 import { propPasses } from "@utils/objects/hofs/propPasses/propPasses";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
-import { Switch } from "@mantine/core";
+import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import { useMemo } from "react";
 import { Select } from "@ui/inputs/Select/Select";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
@@ -106,6 +107,18 @@ export function LineChartForm({
             ...config,
             withLegend: event.currentTarget.checked,
           });
+        }}
+      />
+
+      <ColorInput
+        label={yAxisKey ?? "Series"}
+        value={config.color ?? ""}
+        mt="sm"
+        swatches={CHART_COLOR_SWATCHES}
+        withEyeDropper={false}
+        format="hex"
+        onChange={(value) => {
+          onConfigChange({ ...config, color: value || undefined });
         }}
       />
     </>
