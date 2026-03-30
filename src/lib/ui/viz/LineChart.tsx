@@ -2,7 +2,13 @@ import { LineChart as MantineLineChart } from "@mantine/charts";
 import { formatDate } from "@utils/dates/formatDate/formatDate";
 import { useMemo } from "react";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
+import type { CurveType } from "$/models/vizs/CurveType";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
+
+type Props = XYChartProps & {
+  withLegend?: boolean;
+  curveType?: CurveType;
+};
 
 export function LineChart({
   data,
@@ -12,7 +18,9 @@ export function LineChart({
   dateColumns,
   dateFormat = "YYYY-MM-DD",
   timezone,
-}: XYChartProps): JSX.Element {
+  withLegend = false,
+  curveType = "monotone",
+}: Props): JSX.Element {
   const series = useMemo(() => {
     return [{ name: yAxisKey }];
   }, [yAxisKey]);
@@ -50,6 +58,8 @@ export function LineChart({
       series={series}
       xAxisProps={xAxisProps}
       tooltipProps={tooltipProps}
+      withLegend={withLegend}
+      curveType={curveType}
     />
   );
 }

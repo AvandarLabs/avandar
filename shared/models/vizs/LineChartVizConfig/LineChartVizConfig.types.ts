@@ -1,3 +1,5 @@
+import type { CurveType } from "$/models/vizs/CurveType.ts";
+
 export type LineChartVizConfig = {
   vizType: "line";
 
@@ -16,4 +18,10 @@ export type LineChartVizConfig = {
    * TODO(jpsyx): create a concept of a QueryColumn and use QueryColumnId here.
    */
   yAxisKey: string | undefined;
+
+  /** Show the chart legend when `true`. */
+  withLegend: boolean;
+
+  /** Curve interpolation style. Defaults to `"monotone"`. */
+  curveType: CurveType;
 };

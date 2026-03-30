@@ -5,12 +5,19 @@ import { UnknownDataFrame } from "@utils/types/common.types";
 import { match } from "ts-pattern";
 import { flattenError, object, prettifyError, string } from "zod";
 import { Callout } from "@/lib/ui/Callout";
-import { DangerText } from "@/lib/ui/text/DangerText";
+import { AreaChart } from "@/lib/ui/viz/AreaChart";
 import { BarChart } from "@/lib/ui/viz/BarChart";
+import { BubbleChart } from "@/lib/ui/viz/BubbleChart";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
+import { FunnelChart } from "@/lib/ui/viz/FunnelChart";
 import { LineChart } from "@/lib/ui/viz/LineChart";
+import { PieChart } from "@/lib/ui/viz/PieChart";
+import { RadarChart } from "@/lib/ui/viz/RadarChart";
 import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
-import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import {
+  DataExplorerStateManager,
+} from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import { DangerText } from "@/lib/ui/text/DangerText";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 
 type Props = {
@@ -26,7 +33,7 @@ type Props = {
   data: UnknownDataFrame;
 };
 
-// Reusable XY schema “blocks”
+// Reusable XY schema "blocks"
 const XAxisKeySchema = string({
   error: (issue) => {
     return issue.input === undefined ?
@@ -41,8 +48,28 @@ const YAxisKeySchema = string({
       : "Invalid Y axis selected";
   },
 });
+const NameKeySchema = string({
+  error: (issue) => {
+    return issue.input === undefined ?
+        "You haven't chosen a name column"
+      : "Invalid name column selected";
+  },
+});
+const ValueKeySchema = string({
+  error: (issue) => {
+    return issue.input === undefined ?
+        "You haven't chosen a value column"
+      : "Invalid value column selected";
+  },
+});
+const SizeKeySchema = string({
+  error: (issue) => {
+    return issue.input === undefined ?
+        "You haven't chosen a size column"
+      : "Invalid size column selected";
+  },
+});
 
-// Chart-specific schemas (can diverge later)
 const BarChartConfigSchema = object({
   xAxisKey: XAxisKeySchema,
   yAxisKey: YAxisKeySchema,
@@ -53,9 +80,35 @@ const LineChartConfigSchema = object({
   yAxisKey: YAxisKeySchema,
 });
 
+const AreaChartConfigSchema = object({
+  xAxisKey: XAxisKeySchema,
+  yAxisKey: YAxisKeySchema,
+});
+
 const ScatterPlotConfigSchema = object({
   xAxisKey: XAxisKeySchema,
   yAxisKey: YAxisKeySchema,
+});
+
+const PieChartConfigSchema = object({
+  nameKey: NameKeySchema,
+  valueKey: ValueKeySchema,
+});
+
+const FunnelChartConfigSchema = object({
+  nameKey: NameKeySchema,
+  valueKey: ValueKeySchema,
+});
+
+const RadarChartConfigSchema = object({
+  nameKey: NameKeySchema,
+  valueKey: ValueKeySchema,
+});
+
+const BubbleChartConfigSchema = object({
+  xAxisKey: XAxisKeySchema,
+  yAxisKey: YAxisKeySchema,
+  sizeKey: SizeKeySchema,
 });
 
 export function VisualizationContainer({
@@ -90,12 +143,12 @@ export function VisualizationContainer({
             data={data}
             height={700}
             dateColumns={dateColumns}
+            withLegend={config.withLegend}
             {...validConfig}
           />
         );
       }
 
-      // generate the error message
       const errors = flattenError(error).fieldErrors;
       const errorMessages = objectValues(errors).flat();
       const errorBlock = (
@@ -140,6 +193,29 @@ export function VisualizationContainer({
             data={data}
             height={700}
             dateColumns={dateColumns}
+            withLegend={config.withLegend}
+            curveType={config.curveType}
+            {...validConfig}
+          />
+        );
+      }
+      return <DangerText>{prettifyError(error)}</DangerText>;
+    })
+    .with({ vizType: "area" }, (config) => {
+      const {
+        success,
+        data: validConfig,
+        error,
+      } = AreaChartConfigSchema.safeParse(config);
+
+      if (success) {
+        return (
+          <AreaChart
+            data={data}
+            height={700}
+            dateColumns={dateColumns}
+            withLegend={config.withLegend}
+            curveType={config.curveType}
             {...validConfig}
           />
         );
@@ -155,6 +231,83 @@ export function VisualizationContainer({
 
       if (success) {
         return <ScatterChart data={data} height={700} {...validConfig} />;
+      }
+      return <DangerText>{prettifyError(error)}</DangerText>;
+    })
+    .with({ vizType: "pie" }, (config) => {
+      const {
+        success,
+        data: validConfig,
+        error,
+      } = PieChartConfigSchema.safeParse(config);
+
+      if (success) {
+        return (
+          <PieChart
+            data={data}
+            nameKey={validConfig.nameKey}
+            valueKey={validConfig.valueKey}
+            isDonut={config.isDonut}
+            withLabels={config.withLabels}
+            labelsType={config.labelsType}
+          />
+        );
+      }
+      return <DangerText>{prettifyError(error)}</DangerText>;
+    })
+    .with({ vizType: "funnel" }, (config) => {
+      const {
+        success,
+        data: validConfig,
+        error,
+      } = FunnelChartConfigSchema.safeParse(config);
+
+      if (success) {
+        return (
+          <FunnelChart
+            data={data}
+            nameKey={validConfig.nameKey}
+            valueKey={validConfig.valueKey}
+          />
+        );
+      }
+      return <DangerText>{prettifyError(error)}</DangerText>;
+    })
+    .with({ vizType: "radar" }, (config) => {
+      const {
+        success,
+        data: validConfig,
+        error,
+      } = RadarChartConfigSchema.safeParse(config);
+
+      if (success) {
+        return (
+          <RadarChart
+            data={data}
+            nameKey={validConfig.nameKey}
+            valueKey={validConfig.valueKey}
+          />
+        );
+      }
+      return <DangerText>{prettifyError(error)}</DangerText>;
+    })
+    .with({ vizType: "bubble" }, (config) => {
+      const {
+        success,
+        data: validConfig,
+        error,
+      } = BubbleChartConfigSchema.safeParse(config);
+
+      if (success) {
+        return (
+          <BubbleChart
+            data={data}
+            height={700}
+            xAxisKey={validConfig.xAxisKey}
+            yAxisKey={validConfig.yAxisKey}
+            sizeKey={validConfig.sizeKey}
+          />
+        );
       }
       return <DangerText>{prettifyError(error)}</DangerText>;
     })

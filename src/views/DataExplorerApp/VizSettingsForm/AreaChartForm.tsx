@@ -1,16 +1,16 @@
+import { Select } from "@ui/inputs/Select/Select";
 import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
 import { propPasses } from "@utils/objects/hofs/propPasses/propPasses";
 import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
 import { Switch } from "@mantine/core";
 import { useMemo } from "react";
-import { Select } from "@ui/inputs/Select/Select";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
+import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
 
 type Props = {
   fields: readonly QueryResultColumn[];
-  config: LineChartVizConfig;
-  onConfigChange: (newConfig: LineChartVizConfig) => void;
+  config: AreaChartVizConfig;
+  onConfigChange: (newConfig: AreaChartVizConfig) => void;
 };
 
 const CURVE_TYPE_OPTIONS = [
@@ -20,7 +20,7 @@ const CURVE_TYPE_OPTIONS = [
   { label: "Step", value: "step" },
 ];
 
-export function LineChartForm({
+export function AreaChartForm({
   fields,
   config,
   onConfigChange,
@@ -47,15 +47,11 @@ export function LineChartForm({
         value={xAxisKey}
         disabled={fieldOptions.length === 0}
         placeholder={
-          fieldOptions.length === 0 ?
-            "No fields have been queried"
+          fieldOptions.length === 0 ? "No fields have been queried"
           : "Select a field"
         }
         onChange={(field) => {
-          return onConfigChange({
-            ...config,
-            xAxisKey: field ?? undefined,
-          });
+          onConfigChange({ ...config, xAxisKey: field ?? undefined });
         }}
       />
 
@@ -72,10 +68,7 @@ export function LineChartForm({
           : "Select a field"
         }
         onChange={(field) => {
-          return onConfigChange({
-            ...config,
-            yAxisKey: field ?? undefined,
-          });
+          onConfigChange({ ...config, yAxisKey: field ?? undefined });
         }}
       />
 
@@ -102,7 +95,7 @@ export function LineChartForm({
         checked={withLegend}
         mt="sm"
         onChange={(event) => {
-          return onConfigChange({
+          onConfigChange({
             ...config,
             withLegend: event.currentTarget.checked,
           });
