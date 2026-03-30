@@ -2,13 +2,13 @@ import { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupa
 import { notifyError } from "@ui/notifications/notify";
 import { where } from "@utils/filters/where/where";
 import { DashboardParsers } from "$/models/Dashboard/DashboardParsers";
+import { extractDatasetIdsFromDashboardConfig } from "@/clients/dashboards/extractDatasetIdsFromDashboardConfig";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { promiseMap } from "@/lib/utils/promises";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
-import { extractDatasetIdsFromDashboardConfig } from "@/clients/dashboards/extractDatasetIdsFromDashboardConfig";
 import type {
   Dashboard,
   DashboardId,
@@ -49,8 +49,6 @@ export const DashboardClient = createUsableServiceClient(
           const datasetIdCandidates = extractDatasetIdsFromDashboardConfig(
             dashboard.config,
           );
-
-          console.log("datasetIdCandidates", datasetIdCandidates);
 
           // if there are dataset IDs in our dashboard config, then we need to
           // copy them to public storage. They are dependencies of the
