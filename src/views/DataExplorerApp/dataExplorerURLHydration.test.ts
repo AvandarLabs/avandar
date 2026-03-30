@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 import {
   shouldDeferURLHydrationForStructuredLoading,
   urlSearchHasHydrateableExplorerKeys,
 } from "@/views/DataExplorerApp/dataExplorerURLHydration";
+import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
 import type { ParsedURLState } from "@/views/DataExplorerApp/DataExplorerURLState";
-import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 
 const _minimalBarViz: VizConfig = {
   vizType: "bar",
@@ -49,9 +49,9 @@ describe("urlSearchHasHydrateableExplorerKeys", () => {
       name: "n",
       virtualDatasetId: "v",
     } as OpenDatasetInfo;
-    expect(
-      urlSearchHasHydrateableExplorerKeys(_parsed({ openDataset })),
-    ).toBe(false);
+    expect(urlSearchHasHydrateableExplorerKeys(_parsed({ openDataset }))).toBe(
+      false,
+    );
   });
 });
 

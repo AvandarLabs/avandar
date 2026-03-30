@@ -1,11 +1,11 @@
 import { z } from "zod";
-import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
-import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 import type {
   DataExplorerAppState,
   OpenDatasetInfo,
-} from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+} from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
+import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
+import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 
 /**
  * Zod schema for the Data Explorer URL search params.
@@ -68,9 +68,7 @@ function _isValidAgg(value: string): value is QueryAggregationType {
  * Parses the raw URL search params into typed, structured state that the
  * Data Explorer can use to restore its session.
  */
-export function parseURLSearch(
-  search: DataExplorerURLSearch,
-): ParsedURLState {
+export function parseURLSearch(search: DataExplorerURLSearch): ParsedURLState {
   const result: ParsedURLState = {};
 
   if (search.ds) {
@@ -225,9 +223,7 @@ export function serializeStateToURL(
  * Returns `true` when the Data Explorer state has not yet been modified from
  * its initial blank state (no data source, no columns, no raw SQL).
  */
-export function isDefaultExplorerState(
-  state: DataExplorerAppState,
-): boolean {
+export function isDefaultExplorerState(state: DataExplorerAppState): boolean {
   return (
     state.query.dataSource === undefined &&
     state.query.queryColumns.length === 0 &&

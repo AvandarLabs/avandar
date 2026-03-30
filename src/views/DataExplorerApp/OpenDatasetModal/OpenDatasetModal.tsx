@@ -1,3 +1,4 @@
+import { useMutation } from "@hooks/useMutation/useMutation";
 import {
   ActionIcon,
   Button,
@@ -10,16 +11,15 @@ import {
 import { useDebouncedValue } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { IconSearch, IconTrash } from "@tabler/icons-react";
-import { where } from "@utils/filters/where/where";
 import { notifyError, notifySuccess } from "@ui/index";
+import { where } from "@utils/filters/where/where";
 import { useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useMutation } from "@hooks/useMutation/useMutation";
+import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset.types";
 import type { VirtualDatasetRead } from "$/models/datasets/VirtualDataset/VirtualDataset.types";
-import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 
 type Props = {
   onOpen: (info: OpenDatasetInfo, rawSQL: string) => void;

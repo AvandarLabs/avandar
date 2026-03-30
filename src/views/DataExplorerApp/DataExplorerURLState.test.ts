@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import { describe, expect, it } from "vitest";
 import {
   isDefaultExplorerState,
   parseURLSearch,
@@ -8,12 +8,15 @@ import {
 import type {
   DataExplorerAppState,
   OpenDatasetInfo,
-} from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+} from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { VirtualDatasetId } from "$/models/datasets/VirtualDataset/VirtualDataset.types";
-import type { QueryColumn, QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { VirtualDatasetId } from "$/models/datasets/VirtualDataset/VirtualDataset.types";
+import type {
+  QueryColumn,
+  QueryColumnId,
+} from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 
@@ -306,9 +309,9 @@ describe("isDefaultExplorerState", () => {
   });
 
   it("returns false when rawSQL is set", () => {
-    expect(
-      isDefaultExplorerState(_makeState({ rawSQL: "SELECT 1" })),
-    ).toBe(false);
+    expect(isDefaultExplorerState(_makeState({ rawSQL: "SELECT 1" }))).toBe(
+      false,
+    );
   });
 });
 
@@ -342,10 +345,10 @@ describe("round-trip: serialize then parse", () => {
     const col1 = _mockQueryColumn("q1", "b1", "month");
     const state = _makeState({
       query: _makeQueryWithColumns(MOCK_DS, [col1]),
-      rawSQL: "SELECT * FROM \"dummy\"",
+      rawSQL: 'SELECT * FROM "dummy"',
     });
     const parsed = parseURLSearch(serializeStateToURL(state));
-    expect(parsed.rawSQL).toBe("SELECT * FROM \"dummy\"");
+    expect(parsed.rawSQL).toBe('SELECT * FROM "dummy"');
     expect(parsed.dsId).toBeUndefined();
     expect(parsed.colNames).toBeUndefined();
   });
