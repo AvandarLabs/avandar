@@ -1,10 +1,16 @@
 import { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupabaseCRUDClient";
 import { notifyError } from "@ui/notifications/notify";
 import { where } from "@utils/filters/where/where";
+import { assertIsDefined, prop } from "@utils/index";
 import { DashboardParsers } from "$/models/Dashboard/DashboardParsers";
 import { extractDatasetIdsFromDashboardConfig } from "@/clients/dashboards/extractDatasetIdsFromDashboardConfig";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { OpenDataDatasetClient } from "@/clients/datasets/OpenDataDatasetClient";
+import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
+import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
+import { OpenDatasetParquetStorageClient } from "@/clients/storage/OpenDatasetParquetStorageClient/OpenDatasetParquetStorageClient";
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { promiseMap } from "@/lib/utils/promises";
@@ -35,16 +41,10 @@ export const DashboardClient = createUsableServiceClient(
           const { dashboardId } = params;
           const logger = config.clientLogger.appendName("publishDashboard");
 
-          const { data: dbDashboard } = await config.dbClient
-            .from("dashboards")
-            .select("*")
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .eq("id", dashboardId as any)
-            .single()
-            .throwOnError();
-
-          const dashboard: Dashboard =
-            config.parsers.fromDBReadToModelRead(dbDashboard);
+          const dashboard = await DashboardClient.getById({
+            id: dashboardId,
+          });
+          assertIsDefined(dashboard, { name: "dashboard" });
 
           const datasetIdCandidates = extractDatasetIdsFromDashboardConfig(
             dashboard.config,
@@ -54,39 +54,111 @@ export const DashboardClient = createUsableServiceClient(
           // copy them to public storage. They are dependencies of the
           // dashboard.
           if (datasetIdCandidates.length > 0) {
-            const datasets =
+            const datasetsInDashboard =
               datasetIdCandidates.length === 0 ?
                 []
-              : await DatasetClient.getAll(
-                  where("id", "in", datasetIdCandidates as DatasetId[]),
-                );
+              : await DatasetClient.getAll({
+                  where: {
+                    id: { in: datasetIdCandidates as DatasetId[] },
+                    workspace_id: { eq: dashboard.workspaceId },
+                  },
+                });
 
-            const datasetsInDashboardWorkspace = datasets.filter((dataset) => {
-              return dataset.workspaceId === dashboard.workspaceId;
-            });
-
-            const dependentDatasetIds: DatasetId[] =
-              datasetsInDashboardWorkspace.map((d) => {
-                return d.id;
-              });
+            const dependentDatasetIds: DatasetId[] = datasetsInDashboard.map(
+              prop("id"),
+            );
 
             logger.log("Copying dataset parquet blobs to public bucket", {
               dashboardId,
               dependentDatasetIds,
             });
 
-            await promiseMap(dependentDatasetIds, async (datasetId) => {
+            await promiseMap(datasetsInDashboard, async (dataset) => {
               try {
+                if (dataset.sourceType === "virtual") {
+                  const virtualDataset = await VirtualDatasetClient.getOne(
+                    where("dataset_id", "eq", dataset.id),
+                  );
+
+                  assertIsDefined(virtualDataset, {
+                    name: "virtualDataset",
+                  });
+
+                  const innerSql = virtualDataset.rawSQL
+                    .trim()
+                    .replace(/;\s*$/, "");
+                  const materializedSql = `SELECT * FROM (${innerSql}) AS _virtual_publish`;
+
+                  const parquetBlob = await WorkspaceQETLClient.runQuery({
+                    rawSQL: materializedSql,
+                    workspaceId: dashboard.workspaceId,
+                    returnType: "parquet",
+                  });
+
+                  await PublicDatasetParquetStorageClient.uploadDataset({
+                    dashboardId,
+                    datasetId: dataset.id,
+                    parquetBlob,
+                  });
+
+                  return;
+                }
+                if (dataset.sourceType === "open_data") {
+                  // Open data is public at source; we still mirror a copy into
+                  // the public bucket for the published dashboard.
+                  const localDataset = await LocalDatasetClient.getById({
+                    id: dataset.id,
+                  });
+
+                  let parquetBlob: Blob;
+
+                  if (localDataset !== undefined) {
+                    parquetBlob = localDataset.parquetData;
+                  } else {
+                    const openDataDataset = await OpenDataDatasetClient.getOne(
+                      where("dataset_id", "eq", dataset.id),
+                    );
+
+                    assertIsDefined(openDataDataset, {
+                      name: "openDataDataset",
+                    });
+
+                    parquetBlob =
+                      await OpenDatasetParquetStorageClient.download({
+                        catalogEntryId: openDataDataset.catalogEntryId,
+                      });
+                  }
+
+                  // TODO(jpsyx): this is hugely inefficient but the easiest way
+                  // for now. An open dataset should not require re-uploading.
+                  // It is slow. Instead, public dashboards should be able to
+                  // download directly from the open data buckets.
+                  await PublicDatasetParquetStorageClient.uploadDataset({
+                    dashboardId,
+                    datasetId: dataset.id,
+                    parquetBlob,
+                  });
+
+                  return;
+                }
+
+                // TODO(jpsyx): downloading is probably unnecessary if it
+                // already exists in indexed DB. Either way, we shouldn't
+                // default to uploading the full dataset. We should find the
+                // relevant facts and dice (the superset of all data) and
+                // upload only that. Or ask the user if they want to make all
+                // dataset available in the dashboard (if they want to let the
+                // users do their own exploration).
                 const parquetBlob =
                   await DatasetParquetStorageClient.downloadDataset({
                     workspaceId: dashboard.workspaceId,
-                    datasetId,
+                    datasetId: dataset.id,
                     throwIfNotFound: true,
                   });
 
                 await PublicDatasetParquetStorageClient.uploadDataset({
                   dashboardId,
-                  datasetId,
+                  datasetId: dataset.id,
                   parquetBlob,
                 });
               } catch (error: unknown) {
