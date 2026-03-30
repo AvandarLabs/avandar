@@ -2,9 +2,14 @@ import { ModelCRUDParserRegistry } from "@clients/makeParserRegistry";
 import { createModelCRUDClient } from "@clients/ModelCRUDClient/createModelCRUDClient";
 import { UpsertOptions } from "@clients/ModelCRUDClient/ModelCRUDClient.types";
 import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
-import { applyFiltersToRows } from "@utils/filters/applyFiltersToRows/applyFiltersToRows";
+import { isEmptyFiltersObject } from "@utils/filters/isEmptyFiltersObject/isEmptyFiltersObject";
 import { isDefined } from "@utils/guards/isDefined/isDefined";
+import { assertDexieColumnsAreIndexed } from "@/clients/dexie/dexieColumnIsIndexed";
 import { DexieCRUDModelSpec } from "@/clients/dexie/DexieCRUDClient.types";
+import {
+  buildFilteredDexieCollection,
+  findFirstConflictingRowByIndexedColumns,
+} from "@/clients/dexie/dexieFilteredCollection";
 import { promiseMapSequential, promiseReduce } from "@/lib/utils/promises";
 import type { DexieDBType } from "@/clients/dexie/DexieDBVersionManager";
 import type {
@@ -14,7 +19,13 @@ import type {
 import type { ILogger } from "@logger/Logger.types";
 import type { FiltersByColumn } from "@utils/filters/filters";
 import type { EmptyObject } from "@utils/types/common.types";
-import type { IDType, IndexableType, IndexSpec, UpdateSpec } from "dexie";
+import type {
+  IDType,
+  IndexableType,
+  IndexSpec,
+  Table,
+  UpdateSpec,
+} from "dexie";
 
 /**
  * Reads the IndexedDB primary key value from a row using the table key path.
@@ -198,11 +209,15 @@ export function createDexieCRUDClient<
         logger: ILogger;
       }): Promise<number> => {
         const { where } = params;
-        let allData = await dbTable.toArray();
-        if (where) {
-          allData = applyFiltersToRows(allData, where);
+        if (!where || isEmptyFiltersObject(where)) {
+          return dbTable.count();
         }
-        return allData.length;
+        const collection = buildFilteredDexieCollection(
+          String(modelName),
+          dbTable as unknown as Table<M["DBRead"], IndexableType>,
+          where,
+        );
+        return collection.count();
       },
 
       getPage: async (params: {
@@ -212,15 +227,20 @@ export function createDexieCRUDClient<
         logger: ILogger;
       }) => {
         const { where, pageSize, pageNum } = params;
-        let allData: Array<M["DBRead"]> = await dbTable.toArray();
-        if (where) {
-          allData = applyFiltersToRows(allData, where);
-        }
-        // Now apply the page range
         const startIndex = pageNum * pageSize;
-        const endIndex = (pageNum + 1) * pageSize;
-        const pageRows = allData.slice(startIndex, endIndex);
-        return pageRows;
+        if (!where || isEmptyFiltersObject(where)) {
+          return dbTable
+            .toCollection()
+            .offset(startIndex)
+            .limit(pageSize)
+            .toArray();
+        }
+        const collection = buildFilteredDexieCollection(
+          String(modelName),
+          dbTable as unknown as Table<M["DBRead"], IndexableType>,
+          where,
+        );
+        return collection.offset(startIndex).limit(pageSize).toArray();
       },
 
       insert: async (
@@ -269,6 +289,7 @@ export function createDexieCRUDClient<
         }
 
         assertIsDefined(columnNames);
+        assertDexieColumnsAreIndexed(String(modelName), dbTable, columnNames);
         const ignoreDuplicates = onConflict.ignoreDuplicates;
 
         // `onConflict.columnNames` equals the PK path: detect duplicates with
@@ -302,12 +323,12 @@ export function createDexieCRUDClient<
           return insertedData;
         }
 
-        // `onConflict` on non-PK columns: no native keyed lookup; load rows and
-        // find a duplicate in memory, then merge+`put` or `add`.
+        // `onConflict` on non-PK columns: indexed lookup, then merge+`put` or
+        // `add`.
         return await db.transaction("rw", dbTable, async () => {
-          const allRows = await dbTable.toArray();
-          const conflict = _findConflictingRow(
-            allRows as Array<Record<string, unknown>>,
+          const conflict = await findFirstConflictingRowByIndexedColumns(
+            String(modelName),
+            dbTable as Table<Record<string, unknown>, IndexableType>,
             data as Record<string, unknown>,
             columnNames,
           );
@@ -389,6 +410,7 @@ export function createDexieCRUDClient<
         }
 
         assertIsDefined(columnNames);
+        assertDexieColumnsAreIndexed(String(modelName), dbTable, columnNames);
         const ignoreDuplicates = onConflict.ignoreDuplicates;
 
         // PK conflict path: `bulkGet` existing rows by key, then `bulkPut`
@@ -457,27 +479,41 @@ export function createDexieCRUDClient<
           );
         }
 
-        // Non-PK `onConflict`: `toArray` + ordered reduce so each item sees
-        // prior inserts/merges in `working` (app-level duplicate detection).
+        // Non-PK `onConflict`: indexed lookups + `working` rows from this batch
+        // only (no full-table `toArray`).
         return await db.transaction("rw", dbTable, async () => {
           type Acc = {
             working: Array<M["DBRead"]>;
             output: Array<M["DBRead"]>;
           };
-          const initialWorking = await dbTable.toArray();
           const reduced = await promiseReduce(
             data,
             async (acc: Acc, item: M["DBInsert"]) => {
-              const conflict = _findConflictingRow(
+              const batchConflict = _findConflictingRow(
                 acc.working as Array<Record<string, unknown>>,
                 item as Record<string, unknown>,
                 columnNames,
               );
+              let conflict: M["DBRead"] | undefined = batchConflict as
+                | M["DBRead"]
+                | undefined;
+
+              if (!conflict) {
+                const dbConflict =
+                  await findFirstConflictingRowByIndexedColumns(
+                    String(modelName),
+                    dbTable as Table<Record<string, unknown>, IndexableType>,
+                    item as Record<string, unknown>,
+                    columnNames,
+                  );
+                conflict = dbConflict as M["DBRead"] | undefined;
+              }
+
               if (conflict) {
                 if (ignoreDuplicates) {
                   return {
                     working: acc.working,
-                    output: [...acc.output, conflict as M["DBRead"]],
+                    output: [...acc.output, conflict],
                   };
                 }
                 const merged = {
@@ -502,21 +538,19 @@ export function createDexieCRUDClient<
                     "Could not find the model after bulk upsert merge.",
                   );
                 }
-                const conflictIndex = acc.working.findIndex((r) => {
-                  return _rowsMatchOnConflictColumns(
-                    r as Record<string, unknown>,
+                const withoutOld = acc.working.filter((row) => {
+                  return !_rowsMatchOnConflictColumns(
+                    row as Record<string, unknown>,
                     conflict as Record<string, unknown>,
                     columnNames,
                   );
                 });
-                const nextWorking = acc.working.map((r, index) => {
-                  return index === conflictIndex ? finalRow : r;
-                });
                 return {
-                  working: nextWorking,
+                  working: [...withoutOld, finalRow],
                   output: [...acc.output, finalRow],
                 };
               }
+
               await dbTable.add(item);
               const pk = _extractPrimaryKeyFromRow(
                 item as Record<string, unknown>,
@@ -541,7 +575,7 @@ export function createDexieCRUDClient<
               };
             },
             {
-              working: initialWorking,
+              working: [] as Array<M["DBRead"]>,
               output: [] as Array<M["DBRead"]>,
             },
           );
