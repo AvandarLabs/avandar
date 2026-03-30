@@ -1,4 +1,8 @@
 import { match } from "ts-pattern";
+import { hydratePieFromQuery } from "$/models/vizs/hydratePieFromQuery.ts";
+import {
+  hydratePieFromQueryResult,
+} from "$/models/vizs/hydratePieFromQueryResult.ts";
 import type {
   AreaChartVizConfig,
 } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types.ts";
@@ -24,6 +28,9 @@ import type {
   ScatterPlotVizConfig,
 } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts";
 import type {
+  TableVizConfig,
+} from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
+import type {
   IVizConfigModule,
 } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
 import type {
@@ -31,58 +38,62 @@ import type {
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 import type {
-  TableVizConfig,
-} from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
+  PartialStructuredQuery,
+} from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type {
   QueryResultColumn,
 } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
-export const TableVizConfigs = {
-  vizType: "table",
-  displayName: "Table",
+export const FunnelChartVizConfigs = {
+  vizType: "funnel",
+  displayName: "Funnel Chart",
 
-  /** Create an empty table config */
-  makeEmptyConfig: (): TableVizConfig => {
-    return { vizType: "table" };
+  /** Create an empty funnel chart config. */
+  makeEmptyConfig: (): FunnelChartVizConfig => {
+    return { vizType: "funnel", nameKey: undefined, valueKey: undefined };
   },
 
   /**
-   * Hydrate a table viz config from a query config.
+   * Hydrate a funnel chart viz config from a query config.
    */
-  hydrateFromQuery: (vizConfig: TableVizConfig): TableVizConfig => {
-    return vizConfig;
+  hydrateFromQuery: (
+    vizConfig: FunnelChartVizConfig,
+    query: PartialStructuredQuery,
+  ): FunnelChartVizConfig => {
+    return hydratePieFromQuery(vizConfig, query);
   },
 
   /**
-   * Table viz has no axis keys to hydrate from query results.
+   * Hydrate `nameKey` and `valueKey` from query result column metadata.
    */
   hydrateFromQueryResult: (
-    vizConfig: TableVizConfig,
-    _columns: readonly QueryResultColumn[],
-  ): TableVizConfig => {
-    return vizConfig;
+    vizConfig: FunnelChartVizConfig,
+    columns: readonly QueryResultColumn[],
+  ): FunnelChartVizConfig => {
+    return hydratePieFromQueryResult(vizConfig, columns);
   },
 
   /**
-   * Convert a table config to a new type.
+   * Convert a funnel chart config to a new viz type.
    */
   convertVizConfig: <K extends VizType = VizType>(
-    vizConfig: TableVizConfig,
+    vizConfig: FunnelChartVizConfig,
     newVizType: K,
   ): VizConfigType<K> => {
-    const emptyXY = { xAxisKey: undefined, yAxisKey: undefined };
-    const emptyPie = { nameKey: undefined, valueKey: undefined };
+    const { nameKey, valueKey } = vizConfig;
+    const xyAxes = { xAxisKey: nameKey, yAxisKey: valueKey };
+    const pieAxes = { nameKey, valueKey };
     return match<VizType>(newVizType)
-      .with("table", (): TableVizConfig => {
-        return vizConfig;
+      .with("table", (vizType): TableVizConfig => {
+        return { vizType };
       })
       .with("bar", (vizType): BarChartVizConfig => {
-        return { vizType, ...emptyXY, withLegend: true };
+        return { vizType, ...xyAxes, withLegend: true };
       })
       .with("line", (vizType): LineChartVizConfig => {
         return {
           vizType,
-          ...emptyXY,
+          ...xyAxes,
           withLegend: true,
           curveType: "monotone",
         };
@@ -90,34 +101,34 @@ export const TableVizConfigs = {
       .with("area", (vizType): AreaChartVizConfig => {
         return {
           vizType,
-          ...emptyXY,
+          ...xyAxes,
           withLegend: true,
           curveType: "monotone",
         };
       })
       .with("scatter", (vizType): ScatterPlotVizConfig => {
-        return { vizType, ...emptyXY };
+        return { vizType, ...xyAxes };
       })
       .with("pie", (vizType): PieChartVizConfig => {
         return {
           vizType,
-          ...emptyPie,
+          ...pieAxes,
           isDonut: false,
           withLabels: true,
           labelsType: "value",
         };
       })
-      .with("funnel", (vizType): FunnelChartVizConfig => {
-        return { vizType, ...emptyPie };
+      .with("funnel", (): FunnelChartVizConfig => {
+        return vizConfig;
       })
       .with("radar", (vizType): RadarChartVizConfig => {
-        return { vizType, ...emptyPie };
+        return { vizType, ...pieAxes };
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {
-        return { vizType, ...emptyXY, sizeKey: undefined };
+        return { vizType, ...xyAxes, sizeKey: undefined };
       })
       .exhaustive(() => {
         throw new Error(`Invalid viz type: ${newVizType}`);
       }) as VizConfigType<K>;
   },
-} as const satisfies IVizConfigModule<"table">;
+} as const satisfies IVizConfigModule<"funnel">;

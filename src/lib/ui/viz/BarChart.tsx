@@ -4,6 +4,11 @@ import { useMemo } from "react";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 
+type Props = XYChartProps & {
+  withLegend?: boolean;
+  color?: string;
+};
+
 export function BarChart({
   data,
   xAxisKey,
@@ -12,10 +17,12 @@ export function BarChart({
   dateColumns,
   dateFormat = "YYYY-MM-DD",
   timezone,
-}: XYChartProps): JSX.Element {
+  withLegend = false,
+  color,
+}: Props): JSX.Element {
   const series = useMemo(() => {
-    return [{ name: yAxisKey }];
-  }, [yAxisKey]);
+    return [{ name: yAxisKey, ...(color ? { color } : {}) }];
+  }, [yAxisKey, color]);
 
   const isDateAxis = dateColumns?.has(xAxisKey) ?? false;
 
@@ -50,6 +57,7 @@ export function BarChart({
       series={series}
       xAxisProps={xAxisProps}
       tooltipProps={tooltipProps}
+      withLegend={withLegend}
     />
   );
 }

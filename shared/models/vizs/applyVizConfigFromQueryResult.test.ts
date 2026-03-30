@@ -35,6 +35,7 @@ describe("isVizConfigEqualForQueryResultSync", () => {
           vizType: "bar",
           xAxisKey: undefined,
           yAxisKey: undefined,
+          withLegend: true,
         },
       ),
     ).toBe(false);
@@ -45,11 +46,13 @@ describe("isVizConfigEqualForQueryResultSync", () => {
       vizType: "bar" as const,
       xAxisKey: "a",
       yAxisKey: "b",
+      withLegend: true,
     };
     const b = {
       vizType: "bar" as const,
       xAxisKey: "a",
       yAxisKey: "b",
+      withLegend: true,
     };
     expect(isVizConfigEqualForQueryResultSync(a, b)).toBe(true);
   });
@@ -74,6 +77,7 @@ describe("applyVizConfigFromQueryResult", () => {
         vizType: "bar",
         xAxisKey: "gone",
         yAxisKey: "n",
+        withLegend: true,
       },
       rawSQL: undefined,
       query: {
@@ -92,6 +96,7 @@ describe("applyVizConfigFromQueryResult", () => {
         vizType: "bar",
         xAxisKey: undefined,
         yAxisKey: undefined,
+        withLegend: true,
       },
       rawSQL: "SELECT * FROM t",
       query: emptyQuery,
@@ -110,6 +115,7 @@ describe("applyVizConfigFromQueryResult", () => {
         vizType: "bar",
         xAxisKey: "month",
         yAxisKey: "total",
+        withLegend: true,
       },
       rawSQL: "SELECT * FROM t",
       query: emptyQuery,

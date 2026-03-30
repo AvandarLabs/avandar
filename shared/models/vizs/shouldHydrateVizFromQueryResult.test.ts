@@ -28,6 +28,7 @@ describe("shouldHydrateVizFromQueryResult", () => {
     vizType: "bar",
     xAxisKey: undefined,
     yAxisKey: undefined,
+    withLegend: true,
   };
 
   it("returns false for table viz", () => {
@@ -61,6 +62,7 @@ describe("shouldHydrateVizFromQueryResult", () => {
           vizType: "bar",
           xAxisKey: "month",
           yAxisKey: "total",
+          withLegend: true,
         },
         resultColumnNames: new Set(["month", "total"]),
       }),
@@ -79,6 +81,7 @@ describe("shouldHydrateVizFromQueryResult", () => {
           vizType: "bar",
           xAxisKey: "month",
           yAxisKey: "total_cases",
+          withLegend: true,
         },
         resultColumnNames: new Set(["month", "total_cases"]),
       }),
@@ -105,6 +108,7 @@ describe("shouldHydrateVizFromQueryResult", () => {
           vizType: "bar",
           xAxisKey: "old_x",
           yAxisKey: "y",
+          withLegend: true,
         },
         resultColumnNames: new Set(["month", "y"]),
       }),
@@ -134,6 +138,8 @@ describe("shouldHydrateVizFromQueryResult", () => {
           vizType: "line",
           xAxisKey: "month",
           yAxisKey: "total_cases",
+          withLegend: true,
+          curveType: "monotone",
         },
         resultColumnNames: new Set(["month", "total_cases"]),
       }),
