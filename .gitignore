@@ -52,3 +52,6 @@ TODO.md
 # ETL files
 etl-input/
 etl-output/
+
+# Loom / task video ingest (local scripts, transcripts, downloaded videos)
+.loom-task-video-ingest/

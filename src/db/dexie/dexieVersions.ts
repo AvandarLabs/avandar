@@ -23,8 +23,8 @@
 import { prop } from "@utils/objects/hofs/prop/prop";
 import Dexie from "dexie";
 import { DexieDBVersionManager } from "@/clients/dexie/DexieDBVersionManager";
-import { clearOPFS } from "@/lib/utils/browser/clearOPFS";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
+import { clearOPFS } from "@/lib/utils/browser/clearOPFS";
 import type { LegacyLocalDatasetEntryModel } from "@/models/Legacy_LocalDatasetEntry/Legacy_LocalDatasetEntry.types";
 import type { LocalDatasetModel } from "@/models/LocalDataset/LocalDataset.types";
 import type { LocalPublicDatasetModel } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
@@ -35,6 +35,7 @@ type Schemas = {
   v1: { version: 1; models: [LegacyLocalDatasetEntryModel] };
   v2: { version: 2; models: [LocalDatasetModel] };
   v3: { version: 3; models: [LocalDatasetModel, LocalPublicDatasetModel] };
+  v4: { version: 4; models: [LocalDatasetModel, LocalPublicDatasetModel] };
 };
 
 export const AvaDexieVersionManager = DexieDBVersionManager.make<Schemas>();
@@ -93,8 +94,29 @@ const DBDefinitions = [
 
     upgrader: async () => {},
   }),
+
+  /**
+   * Adds a secondary index on `dashboardId` for `LocalPublicDataset` so
+   * filters and upserts can target that column without full-table scans.
+   */
+  AvaDexieVersionManager.defineVersion<4>({
+    db,
+    version: 4,
+    models: {
+      LocalDataset: {
+        primaryKey: "datasetId",
+        columnsToIndex: ["userId", "workspaceId"],
+      },
+      LocalPublicDataset: {
+        primaryKey: "datasetId",
+        columnsToIndex: ["dashboardId"],
+      },
+    },
+
+    upgrader: async () => {},
+  }),
 ] as const;
 
 AvaDexieVersionManager.registerVersions(DBDefinitions);
 
-export const CURRENT_AVA_DEXIE_VERSION = "v3" as const satisfies keyof Schemas;
+export const CURRENT_AVA_DEXIE_VERSION = "v4" as const satisfies keyof Schemas;
