@@ -1,9 +1,9 @@
 import { Stack, Text } from "@mantine/core";
 import { WithPuckProps } from "@puckeditor/core";
 import { Paper } from "@/lib/ui/Paper/Paper";
+import { TableViz } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/TableViz";
 import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
-import { TableViz } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/TableViz";
 
 type Props = {
   nlQuery: NLQuery;

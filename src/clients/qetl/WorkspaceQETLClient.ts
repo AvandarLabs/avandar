@@ -15,10 +15,18 @@ export type IWorkspaceQETLClient = Module<
   "WorkspaceQETLClient",
   EmptyObject,
   {
-    runQuery: <RowObject extends UnknownRow = UnknownRow>(params: {
-      rawSQL: string;
-      workspaceId: Workspace.Id;
-    }) => Promise<QueryResult<RowObject>>;
+    runQuery: {
+      <RowObject extends UnknownRow = UnknownRow>(params: {
+        rawSQL: string;
+        workspaceId: Workspace.Id;
+        returnType?: "js";
+      }): Promise<QueryResult<RowObject>>;
+      (params: {
+        rawSQL: string;
+        workspaceId: Workspace.Id;
+        returnType: "parquet";
+      }): Promise<Blob>;
+    };
   }
 >;
 
@@ -86,10 +94,12 @@ export const WorkspaceQETLClient = createModule("WorkspaceQETLClient", {
       runQuery: async <RowObject extends UnknownRow = UnknownRow>({
         rawSQL,
         workspaceId,
+        returnType = "js",
       }: {
         rawSQL: string;
         workspaceId: Workspace.Id;
-      }): Promise<QueryResult<RowObject>> => {
+        returnType?: "js" | "parquet";
+      }): Promise<QueryResult<RowObject> | Blob> => {
         const session = await AuthClient.getCurrentSession();
         if (!session?.user) {
           throw new Error(
@@ -102,9 +112,12 @@ export const WorkspaceQETLClient = createModule("WorkspaceQETLClient", {
           userId: session.user.id as UserId,
         });
 
-        const queryResults = await client.runQuery<RowObject>({ rawSQL });
-        return queryResults;
+        if (returnType === "parquet") {
+          return await client.runQuery({ rawSQL, returnType: "parquet" });
+        }
+
+        return await client.runQuery<RowObject>({ rawSQL, returnType: "js" });
       },
     };
   },
-}) satisfies IWorkspaceQETLClient;
+}) as IWorkspaceQETLClient;

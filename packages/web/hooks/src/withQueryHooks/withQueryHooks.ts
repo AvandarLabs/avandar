@@ -1,11 +1,3 @@
-import { isEmptyObject } from "@utils/guards/isEmptyObject/isEmptyObject";
-import { isFunction } from "@utils/guards/isFunction";
-import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject";
-import { excludeDeep } from "@utils/objects/excludeDeep/excludeDeep";
-import { objectKeys } from "@utils/objects/objectKeys";
-import { capitalize } from "@utils/strings/capitalize/capitalize";
-import { prefix } from "@utils/strings/prefix/prefix";
-import { AnyFunction } from "@utils/types/utilities.types";
 import { DefaultError, QueryClient, QueryKey } from "@hooks/core.types";
 import { useMutation } from "@hooks/useMutation/useMutation";
 import { useQuery } from "@hooks/useQuery/useQuery";
@@ -21,8 +13,16 @@ import {
   UseQueryFunctionsRecord,
   WithQueryHooks,
 } from "@hooks/withQueryHooks/withQueryHooks.types";
-import type { UseMutationOptions } from "@hooks/useMutation/useMutation";
+import { isEmptyObject } from "@utils/guards/isEmptyObject/isEmptyObject";
+import { isFunction } from "@utils/guards/isFunction";
+import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject";
+import { excludeDeep } from "@utils/objects/excludeDeep/excludeDeep";
+import { objectKeys } from "@utils/objects/objectKeys";
+import { capitalize } from "@utils/strings/capitalize/capitalize";
+import { prefix } from "@utils/strings/prefix/prefix";
+import { AnyFunction } from "@utils/types/utilities.types";
 import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
+import type { UseMutationOptions } from "@hooks/useMutation/useMutation";
 
 function isSingletonObject(arg: unknown): arg is { arg: unknown } {
   return isPlainObject(arg) && "arg" in arg && objectKeys(arg).length === 1;
@@ -267,7 +267,9 @@ export function withQueryHooks<
               // @ts-expect-error This is not completely safe, but oh well
               const data = await boundQueryClientFn({
                 queryKey: queryKeyBuilders[queryFnName](params),
-                queryFn: boundClientFunction,
+                queryFn: () => {
+                  return boundClientFunction(params);
+                },
               });
               return data;
             };

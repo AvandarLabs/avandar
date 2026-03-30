@@ -1,5 +1,10 @@
 import { DefaultError, QueryClient, QueryKey } from "@hooks/core.types";
 import type {
+  CRUDModelSpec,
+  ModelCRUDClient,
+} from "@clients/ModelCRUDClient/ModelCRUDClient.types";
+import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
+import type {
   UseMutationOptions,
   UseMutationResultTuple,
 } from "@hooks/useMutation/useMutation";
@@ -7,11 +12,6 @@ import type {
   UseQueryOptions,
   UseQueryResultTuple,
 } from "@hooks/useQuery/useQuery";
-import type {
-  CRUDModelSpec,
-  ModelCRUDClient,
-} from "@clients/ModelCRUDClient/ModelCRUDClient.types";
-import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
 import type {
   AnyFunction,
   AnyFunctionWithReturn,

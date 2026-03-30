@@ -77,7 +77,6 @@ export function useDataQuery(
       orderByColumn,
       orderByDirection,
     ],
-
     queryFn: async (): Promise<QueryResult<UnknownRow>> => {
       if (rawSQL) {
         if (auth === "public") {

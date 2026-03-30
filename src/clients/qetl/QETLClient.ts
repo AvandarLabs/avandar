@@ -1,10 +1,11 @@
 import { createModuleFactory } from "@modules/createModuleFactory";
 import { where } from "@utils/filters/where/where";
 import { isDefined } from "@utils/guards/isDefined/isDefined";
-import { objectKeys, propEq, UnknownObject } from "@utils/index";
 import { prop } from "@utils/objects/hofs/prop/prop";
+import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
 import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord";
+import { objectKeys } from "@utils/objects/objectKeys";
 import { CSVFileDataset } from "$/models/datasets/CSVFileDataset";
 import { Dataset, DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import { DuckDBDataType } from "$/models/datasets/DatasetColumn/DuckDBDataTypes";
@@ -25,6 +26,7 @@ import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { difference } from "@/lib/utils/arrays/difference/difference";
 import { promiseFlatMap, promiseMap } from "@/lib/utils/promises";
 import type { Module } from "@modules/createModule";
+import type { UnknownObject } from "@utils/types/common.types";
 import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenDataDataset.types";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
@@ -42,11 +44,16 @@ export type IQETLClient = Module<
   },
   {
     /**
-     * Runs an OLAP query.
+     * Runs an OLAP query. Use `returnType: "parquet"` to materialize the full
+     * result set as a Parquet blob.
      */
-    runQuery: <RowObject extends UnknownRow = UnknownRow>(params: {
-      rawSQL: string;
-    }) => Promise<QueryResult<RowObject>>;
+    runQuery: {
+      <RowObject extends UnknownRow = UnknownRow>(params: {
+        rawSQL: string;
+        returnType?: "js";
+      }): Promise<QueryResult<RowObject>>;
+      (params: { rawSQL: string; returnType: "parquet" }): Promise<Blob>;
+    };
   }
 >;
 
