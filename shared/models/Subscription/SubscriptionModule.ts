@@ -3,7 +3,7 @@ import {
   BasicPlanLimitsConfig,
   FreePlanLimitsConfig,
   PremiumPlanLimitsConfig,
-} from "$/config/FeaturePlansConfig.tsx";
+} from "$/config/FeaturePlansConfig.ts";
 import {
   FeaturePlanType,
   SubscriptionPermission,
