@@ -11,6 +11,7 @@
     "dev": "./scripts/startAvandar.sh",
     "dev:email": "dotenv -e .env.development -- email dev --dir shared/emails",
     "dev:pipeline-server": "dotenv --no-expand -o -e .env.development -- pnpm --filter @avandar/pipeline-server dev",
+    "dev:pipeline-server-prod": "dotenv --no-expand -o -e .env.development -e .env.production -- pnpm --filter @avandar/pipeline-server dev",
     "deploy:dev-fanout-server": "fly deploy --config apps/dev-fanout-server/fly.production.toml",
     "deploy:pipeline-server": "fly deploy --config apps/pipeline-server/fly.production.toml",
     "test": "pnpm test:frontend && pnpm test:utils && pnpm test:ava-cli && pnpm test:ava-etl && pnpm test:dev-fanout-server && pnpm test:pipeline-server && pnpm test:logger && pnpm test:clients && pnpm test:models && pnpm test:hooks && pnpm test:ui",
