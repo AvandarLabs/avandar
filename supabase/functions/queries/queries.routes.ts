@@ -36,8 +36,6 @@ export const Routes = defineRoutes<QueriesAPI>("queries", {
           .eq("workspace_id", workspaceId)
           .throwOnError();
 
-        console.log("datasets", datasets);
-
         // Get dataset columns for schema context
         const { data: columns } = await supabaseClient
           .from("dataset_columns")
@@ -107,7 +105,7 @@ ${DuckDBSpatialExtensionDocumentation}`
               Authorization: `Bearer ${openaiApiKey}`,
             },
             body: JSON.stringify({
-              model: "gpt-4o",
+              model: "gpt-5.4-mini",
               messages: [
                 {
                   role: "system",
@@ -120,7 +118,7 @@ ${DuckDBSpatialExtensionDocumentation}`
               ],
               temperature: 0.3, // Lower temperature for more deterministic SQL
               // Wide tables (e.g. WDI year columns) need more than 500 tokens.
-              max_tokens: 4096,
+              max_completion_tokens: 4096,
             }),
           },
         );
