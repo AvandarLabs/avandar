@@ -21,6 +21,7 @@ import { DuckDBClient, UnknownRow } from "@/clients/DuckDBClient";
 import { DuckDBLoadParquetResult } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
+import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { difference } from "@/lib/utils/arrays/difference/difference";
 import { promiseFlatMap, promiseMap } from "@/lib/utils/promises";
 import type { Module } from "@modules/createModule";
@@ -210,7 +211,9 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
         }): Promise<{
           diceExtractors: DiceExtractor[];
         }> => {
-          const datasets = await DatasetClient.getAll(where("id", "in", dice));
+          const datasets = await DatasetClient.withCache(AvaQueryClient)
+            .withEnsureQueryData()
+            .getAll(where("id", "in", dice));
           const datasetsById = makeIdLookupRecord(datasets);
           const datasetsBySourceType = makeBucketRecord(datasets, {
             key: "sourceType",
@@ -222,9 +225,11 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
               const extractors: DiceExtractor[] = await match(sourceType)
                 .with("csv_file", async (type) => {
                   const ids = datasetsBySourceType[type].map(prop("id"));
-                  const csvDatasets = await CSVFileDatasetClient.getAll(
-                    where("dataset_id", "in", ids),
-                  );
+                  const csvDatasets = await CSVFileDatasetClient.withCache(
+                    AvaQueryClient,
+                  )
+                    .withEnsureQueryData()
+                    .getAll(where("dataset_id", "in", ids));
                   return csvDatasets.map((csvDataset) => {
                     return {
                       dataset: datasetsById[csvDataset.datasetId]!,
@@ -235,9 +240,11 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
                 })
                 .with("virtual", async (type) => {
                   const ids = datasetsBySourceType[type].map(prop("id"));
-                  const virtualDatasets = await VirtualDatasetClient.getAll(
-                    where("dataset_id", "in", ids),
-                  );
+                  const virtualDatasets = await VirtualDatasetClient.withCache(
+                    AvaQueryClient,
+                  )
+                    .withEnsureQueryData()
+                    .getAll(where("dataset_id", "in", ids));
                   return virtualDatasets.map((virtualDataset) => {
                     return {
                       dataset: datasetsById[virtualDataset.datasetId]!,
@@ -253,9 +260,10 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
                 })
                 .with("open_data", async (type) => {
                   const ids = datasetsBySourceType[type].map(prop("id"));
-                  const openDataDatasets = await OpenDataDatasetClient.getAll(
-                    where("dataset_id", "in", ids),
-                  );
+                  const openDataDatasets =
+                    await OpenDataDatasetClient.withCache(AvaQueryClient)
+                      .withEnsureQueryData()
+                      .getAll(where("dataset_id", "in", ids));
                   return openDataDatasets.map((openDataDataset) => {
                     return {
                       dataset: datasetsById[openDataDataset.datasetId]!,
@@ -383,9 +391,11 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
         }): Promise<void> => {
           // first, we figure out which facts are not in our local storage
           // cache, so we can store them
-          const factsInLocalStorage = await LocalDatasetClient.getAll(
-            where("datasetId", "in", facts.map(prop("datasetId"))),
-          );
+          const factsInLocalStorage = await LocalDatasetClient.withCache(
+            AvaQueryClient,
+          )
+            .withEnsureQueryData()
+            .getAll(where("datasetId", "in", facts.map(prop("datasetId"))));
           const factsToCache = facts.filter((fact) => {
             return !factsInLocalStorage.some(
               propEq("datasetId", fact.datasetId),
@@ -397,9 +407,9 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
             facts: factsToCache,
           });
 
-          const columns = await DatasetColumnClient.getAll(
-            where("dataset_id", "in", facts.map(prop("datasetId"))),
-          );
+          const columns = await DatasetColumnClient.withCache(AvaQueryClient)
+            .withEnsureQueryData()
+            .getAll(where("dataset_id", "in", facts.map(prop("datasetId"))));
 
           const columnsByDatasetId = makeBucketRecord(columns, {
             key: "datasetId",

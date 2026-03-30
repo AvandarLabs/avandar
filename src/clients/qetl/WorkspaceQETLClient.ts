@@ -6,6 +6,7 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { UnknownRow } from "@/clients/DuckDBClient/index";
 import { IQETLClient, QETLClientFactory } from "@/clients/qetl/QETLClient";
+import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -38,8 +39,17 @@ export const WorkspaceQETLClient = createModule("WorkspaceQETLClient", {
 
       const qetlClient = QETLClientFactory.create({
         getDiceFromSQL: async (rawSQL: string) => {
+          /**
+           * Reuse the same TanStack Query cache as `DatasetClient.useGetAll`
+           * (via `withEnsureQueryData`), so each QETL `runQuery` does not
+           * refetch the workspace dataset list from Supabase. Staleness matches
+           * other `getAll` queries: invalidate `DatasetClient.QueryKeys.getAll`
+           * (or rely on default `staleTime` on `AvaQueryClient`).
+           */
           const allWorkspaceDatasetIds = (
-            await DatasetClient.getAll(where("workspace_id", "eq", workspaceId))
+            await DatasetClient.withCache(AvaQueryClient)
+              .withEnsureQueryData()
+              .getAll(where("workspace_id", "eq", workspaceId))
           ).map(prop("id"));
           return allWorkspaceDatasetIds.filter((datasetId) => {
             return rawSQL.includes(datasetId);
