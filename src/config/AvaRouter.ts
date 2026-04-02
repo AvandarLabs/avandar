@@ -1,8 +1,8 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
-import { User } from "$/models/User/User.types";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { routeTree } from "@/routeTree.gen";
+import type { User } from "$/models/User/User";
 
 export const AvaRouter = createRouter({
   routeTree,
@@ -15,7 +15,7 @@ export const AvaRouter = createRouter({
 });
 
 export type AvaRouterRootContext = {
-  user: User | undefined;
+  user: User.T | undefined;
   queryClient: QueryClient;
 };
 

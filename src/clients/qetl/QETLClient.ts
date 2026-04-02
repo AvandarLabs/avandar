@@ -6,10 +6,7 @@ import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
 import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord";
 import { objectKeys } from "@utils/objects/objectKeys";
-import { CSVFileDataset } from "$/models/datasets/CSVFileDataset";
-import { Dataset, DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import { DuckDBDataType } from "$/models/datasets/DatasetColumn/DuckDBDataTypes";
-import { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types";
 import { match } from "ts-pattern";
 import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
 import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
@@ -18,7 +15,7 @@ import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
-import { DuckDBClient, UnknownRow } from "@/clients/DuckDBClient";
+import { DuckDBClient, UnknownRow } from "@/clients/DuckDBClient/DuckDBClient";
 import { DuckDBLoadParquetResult } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
@@ -27,7 +24,10 @@ import { difference } from "@/lib/utils/arrays/difference/difference";
 import { promiseFlatMap, promiseMap } from "@/lib/utils/promises";
 import type { Module } from "@modules/createModule";
 import type { UnknownObject } from "@utils/types/common.types";
-import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenDataDataset.types";
+import type { CSVFileDataset } from "$/models/datasets/CSVFileDataset/CSVFileDataset";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
+import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenDataDataset";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 
@@ -35,11 +35,11 @@ export type IQETLClient = Module<
   "QETLClient",
   {
     /** Get the necessary dice to answer the given SQL query. */
-    getDiceFromSQL: (rawSQL: string) => Promise<readonly DatasetId[]>;
+    getDiceFromSQL: (rawSQL: string) => Promise<readonly Dataset.Id[]>;
 
     /** Insert the given facts into the local storage cache. */
     insertToStorageCache: (params: {
-      facts: Array<{ datasetId: DatasetId; parquetBlob: Blob }>;
+      facts: Array<{ datasetId: Dataset.Id; parquetBlob: Blob }>;
     }) => Promise<void>;
   },
   {
@@ -69,23 +69,23 @@ type ColumnReplacement = {
 type DiceExtractor =
   | {
       sourceType: "csv_file";
-      sourceDataset: CSVFileDataset;
-      dataset: Dataset;
+      sourceDataset: CSVFileDataset.T;
+      dataset: Dataset.T;
     }
   | {
       sourceType: "virtual";
       sourceDataset: VirtualDataset.T;
-      dataset: Dataset;
+      dataset: Dataset.T;
     }
   | {
       sourceType: "google_sheets";
-      dataset: Dataset;
-      sourceDataset: GoogleSheetsDataset;
+      dataset: Dataset.T;
+      sourceDataset: GoogleSheetsDataset.T;
     }
   | {
       sourceType: "open_data";
-      dataset: Dataset;
-      sourceDataset: OpenDataDataset;
+      dataset: Dataset.T;
+      sourceDataset: OpenDataDataset.T;
     };
 
 /**
@@ -127,7 +127,7 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
         dropDice: async ({
           datasetId,
         }: {
-          datasetId: DatasetId;
+          datasetId: Dataset.Id;
         }): Promise<void> => {
           return DuckDBClient.dropTableViewAndFile(datasetId);
         },
@@ -148,7 +148,7 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
           parquetBlob,
           columnReplacements,
         }: {
-          datasetId: DatasetId;
+          datasetId: Dataset.Id;
           parquetBlob: Blob;
           columnReplacements?: readonly ColumnReplacement[];
         }): Promise<DuckDBLoadParquetResult> => {
@@ -170,7 +170,7 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
           rawSQL,
         }: {
           rawSQL: string;
-        }): Promise<{ missingDice: DatasetId[] }> => {
+        }): Promise<{ missingDice: Dataset.Id[] }> => {
           const queryDependencies = await getDiceFromSQL(rawSQL);
 
           if (queryDependencies.length === 0) {
@@ -214,7 +214,7 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
         determineExtractions: async ({
           dice,
         }: {
-          dice: readonly DatasetId[];
+          dice: readonly Dataset.Id[];
         }): Promise<{
           diceExtractors: DiceExtractor[];
         }> => {
@@ -292,8 +292,8 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
         prepareFacts: ({
           data,
         }: {
-          data: Array<{ datasetId: DatasetId; parquetBlob: Blob }>;
-        }): Promise<Array<{ datasetId: DatasetId; parquetBlob: Blob }>> => {
+          data: Array<{ datasetId: Dataset.Id; parquetBlob: Blob }>;
+        }): Promise<Array<{ datasetId: Dataset.Id; parquetBlob: Blob }>> => {
           // TODO(jpsyx): identity function for now but this should be replaced
           // with a real implementation of Baldacci et. al. (2017).
           return Promise.resolve(data);
@@ -302,7 +302,7 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
           extractors,
         }: {
           extractors: readonly DiceExtractor[];
-        }): Promise<Array<{ datasetId: DatasetId; parquetBlob: Blob }>> => {
+        }): Promise<Array<{ datasetId: Dataset.Id; parquetBlob: Blob }>> => {
           const blobs = await promiseMap(extractors, async (extractor) => {
             // first check if the dataset is in the local storage cache
             const localDataset = await LocalDatasetClient.getById({
@@ -394,7 +394,7 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
         loadFacts: async ({
           facts,
         }: {
-          facts: Array<{ datasetId: DatasetId; parquetBlob: Blob }>;
+          facts: Array<{ datasetId: Dataset.Id; parquetBlob: Blob }>;
         }): Promise<void> => {
           // first, we figure out which facts are not in our local storage
           // cache, so we can store them

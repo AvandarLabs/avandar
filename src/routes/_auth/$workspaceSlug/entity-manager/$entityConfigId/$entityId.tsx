@@ -11,8 +11,8 @@ import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient"
 import { SingleEntityView } from "@/components/EntityManagerApp/SingleEntityView";
 import { Callout } from "@/lib/ui/Callout";
 import { Logger } from "@/utils/Logger";
-import type { Entity } from "$/models/entities/Entity/Entity.types";
-import type { EntityConfig } from "$/models/EntityConfig/EntityConfig.types";
+import type { Entity } from "$/models/entities/Entity/Entity";
+import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 
 export const Route = createFileRoute(
   "/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId",
@@ -20,7 +20,7 @@ export const Route = createFileRoute(
   component: RouteComponent,
   loader: async ({
     params: { entityId, entityConfigId },
-  }): Promise<{ entityConfig: EntityConfig; entity: Entity }> => {
+  }): Promise<{ entityConfig: EntityConfig.T; entity: Entity.T }> => {
     const [entityConfig, entity] = await Promise.all([
       EntityConfigClient.getById({ id: uuid(entityConfigId) }),
       EntityClient.getById({ id: uuid(entityId) }),

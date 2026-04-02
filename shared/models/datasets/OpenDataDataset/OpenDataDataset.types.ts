@@ -46,6 +46,3 @@ export type OpenDataDatasetModel = SupabaseCRUDModelSpec<
     dbTablePrimaryKey: "id";
   }
 >;
-
-export type OpenDataDataset<K extends keyof OpenDataDatasetModel = "Read"> =
-  OpenDataDatasetModel[K];

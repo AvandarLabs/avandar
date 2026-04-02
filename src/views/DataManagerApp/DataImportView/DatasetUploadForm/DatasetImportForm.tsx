@@ -16,12 +16,12 @@ import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useForm } from "@/lib/hooks/ui/useForm";
+import { useForm } from "@/lib/hooks/ui/useForm/useForm";
 import { Callout } from "@/lib/ui/Callout";
-import type { UnknownObject } from "@utils/types/common.types";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset.types";
-import type { DetectedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import type { FormErrors } from "@mantine/form";
+import type { UnknownObject } from "@utils/types/common.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DetectedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 
 export type DatasetImportFormValues = {
   name: string;
@@ -63,7 +63,7 @@ type Props = {
   columns: readonly DetectedDatasetColumn[];
   doDatasetSave: (
     datasetFormValues: DatasetImportFormValues,
-  ) => Promise<Dataset>;
+  ) => Promise<Dataset.T>;
   disableSubmit?: boolean;
   loadCSVResult: DuckDBLoadCSVResult;
 
@@ -87,7 +87,7 @@ type Props = {
    * (like online syncing) without blocking navigation.
    */
   onDatasetSaved?: (options: {
-    savedDataset: Dataset;
+    savedDataset: Dataset.T;
     datasetFormValues: DatasetImportFormValues;
   }) => void;
 };
@@ -193,8 +193,7 @@ export function DatasetImportForm({
         message,
       });
 
-      const inputRef =
-        field === "name" ? nameInputRef : descriptionInputRef;
+      const inputRef = field === "name" ? nameInputRef : descriptionInputRef;
       const node = inputRef.current;
       if (node) {
         node.scrollIntoView({ behavior: "smooth", block: "nearest" });

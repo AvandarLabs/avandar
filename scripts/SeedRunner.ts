@@ -3,10 +3,10 @@ import { ScriptsUtil } from "scripts/ScriptsUtil";
 import { createSupabaseAdminClient } from "@/db/supabase/AvaSupabase";
 import { promiseMap, promiseMapSequential } from "@/lib/utils/promises";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { User } from "$/models/User/User.types";
+import type { User } from "$/models/User/User";
 
 export type SeedHelpers = {
-  getUserByEmail: (email: string) => User;
+  getUserByEmail: (email: string) => User.T;
 };
 
 export type GenericSeedData = {
@@ -45,7 +45,7 @@ export type SeedRunnerConfig<Data extends GenericSeedData> = {
  */
 export class SeedRunner<Data extends GenericSeedData> {
   #config: SeedRunnerConfig<Data>;
-  #userLookup: Map<string, User> = new Map();
+  #userLookup: Map<string, User.T> = new Map();
   #jobs: Array<GenericSeedJob<Data>> = [];
 
   constructor(config: SeedRunnerConfig<Data>) {
@@ -63,9 +63,12 @@ export class SeedRunner<Data extends GenericSeedData> {
   }
 
   async createUsers(): Promise<void> {
-    const users: User[] = await promiseMap(this.#config.data.users, (user) => {
-      return ScriptsUtil.createUser(user, this.#getAdminClient());
-    });
+    const users: User.T[] = await promiseMap(
+      this.#config.data.users,
+      (user) => {
+        return ScriptsUtil.createUser(user, this.#getAdminClient());
+      },
+    );
     users.forEach((user) => {
       if (user.email) {
         this.#userLookup.set(user.email, user);
@@ -81,7 +84,7 @@ export class SeedRunner<Data extends GenericSeedData> {
    * @param email email of the user to retrieve
    * @returns the user with the given email
    */
-  getUserByEmail(email: string): User {
+  getUserByEmail(email: string): User.T {
     const user = this.#userLookup.get(email);
     if (!user) {
       throw new Error(`Could not find user with email ${email}`);

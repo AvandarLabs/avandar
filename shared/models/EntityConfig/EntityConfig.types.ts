@@ -1,7 +1,7 @@
 import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset.types.ts";
-import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";
+import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
+import type { EntityFieldConfigModel } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";
 import type { EntityFieldValueExtractor } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types.ts";
 import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
@@ -50,10 +50,10 @@ type EntityConfigInsert = SetOptional<
 
 type EntityConfigUpdate = Partial<EntityConfigInsert>;
 
-type EntityConfigFull = EntityConfig & {
-  datasets?: Dataset[];
+type EntityConfigFull = EntityConfigRead & {
+  datasets?: Array<DatasetModel["Read"]>;
   fields?: ReadonlyArray<
-    EntityFieldConfig & {
+    EntityFieldConfigModel["Read"] & {
       valueExtractor?: EntityFieldValueExtractor;
     }
   >;
@@ -81,11 +81,8 @@ export type EntityConfigModel = SupabaseCRUDModelSpec<
   }
 >;
 
-export type EntityConfig<K extends keyof EntityConfigModel = "Read"> =
-  EntityConfigModel[K];
-
-export type EntityConfigWith<Keys extends Paths<EntityConfig<"Full">>> =
-  Simplify<SetRequiredDeep<EntityConfig<"Full">, Keys>>;
+export type EntityConfigWith<Keys extends Paths<EntityConfigModel["Full"]>> =
+  Simplify<SetRequiredDeep<EntityConfigModel["Full"], Keys>>;
 
 export type BuildableEntityConfig = EntityConfigWith<
   "datasets" | "fields" | `fields.${number}.valueExtractor`

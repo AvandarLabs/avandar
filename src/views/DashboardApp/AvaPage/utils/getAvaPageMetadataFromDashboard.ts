@@ -1,8 +1,8 @@
 import type { AvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
-import type { Dashboard } from "$/models/Dashboard/Dashboard.types";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 export function getAvaPageMetadataFromDashboard(
-  dashboard: Dashboard,
+  dashboard: Dashboard.T,
 ): AvaPageMetadata {
   if (dashboard.isPublic) {
     return {

@@ -1,17 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 import { hydratePieFromQuery } from "$/models/vizs/hydratePieFromQuery.ts";
-import {
-  StructuredQuery,
-} from "$/models/queries/StructuredQuery/StructuredQuery.ts";
-import {
-  QueryColumns,
-} from "$/models/queries/QueryColumn/QueryColumns.ts";
-import type {
-  DatasetColumn,
-} from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
-import type {
-  PieChartVizConfig,
-} from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types.ts";
+import { describe, expect, it } from "vitest";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";
+import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types.ts";
 
 function makePieConfig(
   overrides: Partial<PieChartVizConfig> = {},
@@ -27,13 +19,13 @@ function makePieConfig(
   };
 }
 
-function makeCol(name: string, dataType: DatasetColumn["dataType"]) {
-  return QueryColumns.makeFromDatasetColumn({
-    id: name as DatasetColumn["id"],
+function makeCol(name: string, dataType: DatasetColumn.T["dataType"]) {
+  return QueryColumn.makeFromDatasetColumn({
+    id: name as DatasetColumn.T["id"],
     name,
     dataType,
     columnIdx: 0,
-  } as DatasetColumn);
+  } as DatasetColumn.T);
 }
 
 function makeQuery(

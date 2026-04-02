@@ -2,9 +2,9 @@ import { ColorInput, Switch, Tooltip } from "@mantine/core";
 import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
 import { Select } from "@ui/inputs/Select/Select";
 import { propPasses } from "@utils/objects/hofs/propPasses/propPasses";
-import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
-import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useMemo } from "react";
+import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
 
@@ -28,7 +28,7 @@ export function BarChartForm({
 
   const numericFieldOptions = useMemo(() => {
     return makeSelectOptions(
-      fields.filter(propPasses("dataType", AvaDataTypes.isNumeric)),
+      fields.filter(propPasses("dataType", AvaDataType.isNumeric)),
       {
         valueKey: "name",
         labelKey: "name",

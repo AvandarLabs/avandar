@@ -14,6 +14,7 @@ import { prop } from "@utils/objects/hofs/prop/prop";
 import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
 import { objectEntries } from "@utils/objects/objectEntries";
+import { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
@@ -25,12 +26,12 @@ import {
   SegmentedControlProps,
 } from "@/lib/ui/inputs/SegmentedControl";
 import { makeSegmentedControlItems } from "@/lib/ui/inputs/SegmentedControl/makeSegmentedControlItems";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
-  Dataset,
   DatasetId,
   DatasetWithColumns,
 } from "$/models/datasets/Dataset/Dataset.types";
-import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
 type Props = {
   /**
@@ -113,8 +114,8 @@ export function DatasetColumnPickerList({
   }, [datasets, datasetColumns]);
 
   const datasetColumnItems: Array<{
-    dataset: Dataset;
-    items: Array<SegmentedControlItem<DatasetColumnId>>;
+    dataset: Dataset.T;
+    items: Array<SegmentedControlItem<DatasetColumn.Id>>;
   }> = useMemo(() => {
     return (
       datasetsWithColumns?.map((dataset) => {

@@ -6,7 +6,7 @@ import { excludeNullsExceptInProps } from "@utils/objects/hofs/excludeNullsExcep
 import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeys/snakeCaseKeys.ts";
 import { undefinedsToNullsDeep } from "@utils/objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
-import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes.ts";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { DuckDBDataTypes } from "$/models/datasets/DatasetColumn/DuckDBDataTypes.ts";
 import z from "zod";
 import type {
@@ -15,7 +15,6 @@ import type {
 } from "@utils/types/test-utilities.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type {
-  DatasetColumn,
   DatasetColumnId,
   DatasetColumnModel,
 } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
@@ -25,7 +24,7 @@ const DBReadSchema = z.object({
   created_at: z.iso.datetime({ offset: true }),
   original_data_type: z.string(),
   detected_data_type: z.enum(DuckDBDataTypes),
-  data_type: z.enum(AvaDataTypes.Types),
+  data_type: z.enum(AvaDataType.Types),
   dataset_id: z.uuid(),
   description: z.string().nullable(),
   id: z.uuid(),
@@ -43,7 +42,7 @@ export const DatasetColumnParsers =
     fromDBReadToModelRead: pipe(
       camelCaseKeysDeep,
       nullsToUndefinedDeep,
-      (obj): DatasetColumn => {
+      (obj): DatasetColumnModel["Read"] => {
         return Model.make("DatasetColumn", {
           ...obj,
           id: obj.id as DatasetColumnId,

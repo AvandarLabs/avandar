@@ -1,27 +1,24 @@
 import { useUncontrolled } from "@mantine/hooks";
+import { Select } from "@ui/inputs/Select/Select";
 import { propIsInArray } from "@utils/objects/hofs/propIsInArray/propIsInArray";
-import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
+import { AvaDataType as AvaDataTypeFns } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useMemo } from "react";
-import {
-  Select,
-  type SelectOption,
-  type SelectProps,
-} from "@ui/inputs/Select/Select";
-import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.types";
-import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
+import type { SelectOption, SelectProps } from "@ui/inputs/Select/Select";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 
 type Props = {
-  dataType: AvaDataType;
+  dataType: AvaDataType.T;
   label: string;
-  value?: QueryAggregationType;
-  defaultValue?: QueryAggregationType;
-  onChange?: (aggregation: QueryAggregationType) => void;
+  value?: QueryAggregationType.T;
+  defaultValue?: QueryAggregationType.T;
+  onChange?: (aggregation: QueryAggregationType.T) => void;
 } & Omit<
-  SelectProps<QueryAggregationType>,
+  SelectProps<QueryAggregationType.T>,
   "value" | "defaultValue" | "onChange"
 >;
 
-const AGGREGATION_OPTIONS: Array<SelectOption<QueryAggregationType>> = [
+const AGGREGATION_OPTIONS: Array<SelectOption<QueryAggregationType.T>> = [
   { value: "none", label: "None" },
   { value: "group_by", label: "Group by" },
   { value: "sum", label: "Sum" },
@@ -39,7 +36,7 @@ export function AggregationSelect({
   onChange,
   ...selectProps
 }: Props): JSX.Element {
-  const validAggregations = AvaDataTypes.getValidQueryAggregations(dataType);
+  const validAggregations = AvaDataTypeFns.getValidQueryAggregations(dataType);
 
   // only show valid aggregations as Select options
   const aggregationOptions = useMemo(() => {
@@ -49,7 +46,7 @@ export function AggregationSelect({
   }, [validAggregations]);
 
   const [currentAggregation, setCurrentAggregation] =
-    useUncontrolled<QueryAggregationType>({
+    useUncontrolled<QueryAggregationType.T>({
       value,
       defaultValue,
       finalValue: "none",

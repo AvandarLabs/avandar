@@ -1,8 +1,6 @@
 import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray.ts";
-import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns.ts";
-import type {
-  PartialStructuredQuery,
-} from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 
 type PieAxesConfig = {
   nameKey: string | undefined;
@@ -27,10 +25,10 @@ export function hydratePieFromQuery<VConfig extends PieAxesConfig>(
   const { queryColumns } = query;
 
   const isNameKeyValid = queryColumns.some((col) => {
-    return QueryColumns.getDerivedColumnName(col) === currVizConfig.nameKey;
+    return QueryColumn.getDerivedColumnName(col) === currVizConfig.nameKey;
   });
   const isValueKeyValid = queryColumns.some((col) => {
-    return QueryColumns.getDerivedColumnName(col) === currVizConfig.valueKey;
+    return QueryColumn.getDerivedColumnName(col) === currVizConfig.valueKey;
   });
 
   let next: VConfig = {
@@ -44,12 +42,13 @@ export function hydratePieFromQuery<VConfig extends PieAxesConfig>(
     isNonEmptyArray(queryColumns)
   ) {
     if (next.valueKey === undefined) {
-      const firstNumericCol = queryColumns.find(QueryColumns.isNumeric);
+      const firstNumericCol = queryColumns.find(QueryColumn.isNumeric);
       next = {
         ...next,
-        valueKey: firstNumericCol ?
-          QueryColumns.getDerivedColumnName(firstNumericCol)
-        : undefined,
+        valueKey:
+          firstNumericCol ?
+            QueryColumn.getDerivedColumnName(firstNumericCol)
+          : undefined,
       };
     }
 
@@ -57,19 +56,18 @@ export function hydratePieFromQuery<VConfig extends PieAxesConfig>(
       const valueKey = next.valueKey;
       const firstNonNumericCol = queryColumns.find((col) => {
         return (
-          !QueryColumns.isNumeric(col) &&
-          QueryColumns.getDerivedColumnName(col) !== valueKey
+          !QueryColumn.isNumeric(col) &&
+          QueryColumn.getDerivedColumnName(col) !== valueKey
         );
       });
       const fallbackCol = queryColumns.find((col) => {
-        return QueryColumns.getDerivedColumnName(col) !== valueKey;
+        return QueryColumn.getDerivedColumnName(col) !== valueKey;
       });
       const nameCol = firstNonNumericCol ?? fallbackCol;
       next = {
         ...next,
-        nameKey: nameCol ?
-          QueryColumns.getDerivedColumnName(nameCol)
-        : undefined,
+        nameKey:
+          nameCol ? QueryColumn.getDerivedColumnName(nameCol) : undefined,
       };
     }
   }

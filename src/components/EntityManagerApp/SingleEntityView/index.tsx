@@ -9,35 +9,32 @@ import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { makeObject } from "@utils/objects/makeObject/makeObject";
 import { omit } from "@utils/objects/omit/omit";
 import { unknownToString } from "@utils/strings/unknownToString/unknownToString";
-import {
-  EntityFieldConfig,
-  EntityFieldConfigId,
-} from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { SourceBadge } from "@/components/common/SourceBadge";
-import { Paper } from "@/lib/ui/Paper/Paper";
 import { ActivityBlock } from "@/components/EntityManagerApp/SingleEntityView/ActivityBlock";
 import { StatusPill } from "@/components/EntityManagerApp/SingleEntityView/StatusPill";
+import { Paper } from "@/lib/ui/Paper/Paper";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
-import type { Entity } from "$/models/entities/Entity/Entity.types";
-import type { EntityFieldValue } from "$/models/entities/EntityFieldValue/EntityFieldValue.types";
-import type { EntityConfig } from "$/models/EntityConfig/EntityConfig.types";
+import type { Entity } from "$/models/entities/Entity/Entity";
+import type { EntityFieldValue } from "$/models/entities/EntityFieldValue/EntityFieldValue";
+import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
+import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
 
-type HydratedEntity = Entity & {
-  idField?: EntityFieldConfig;
-  nameField?: EntityFieldConfig;
-  fieldConfigs?: EntityFieldConfig[];
+type HydratedEntity = Entity.T & {
+  idField?: EntityFieldConfig.T;
+  nameField?: EntityFieldConfig.T;
+  fieldConfigs?: EntityFieldConfig.T[];
   fieldValues?: Array<
-    EntityFieldValue & {
+    EntityFieldValue.T & {
       fieldName?: string;
       sourceType?: DatasetSource.SourceType;
       sourceName?: string;
     }
   >;
-  nameFieldValue?: EntityFieldValue;
+  nameFieldValue?: EntityFieldValue.T;
 };
 
 /**
@@ -47,8 +44,8 @@ function useHydratedEntity({
   entityConfig,
   entity,
 }: {
-  entityConfig: EntityConfig;
-  entity: Entity;
+  entityConfig: EntityConfig.T;
+  entity: Entity.T;
 }): [HydratedEntity, boolean] {
   // TODO(jpsyx): move this to a generalized implementation of useHydration
   const [entityFieldConfigs, isLoadingEntityFieldConfigs] =
@@ -81,7 +78,7 @@ function useHydratedEntity({
     let configInfo = undefined;
     let fieldValuesInfo = undefined;
     let fieldConfigsMap:
-      | Map<EntityFieldConfigId, EntityFieldConfig>
+      | Map<EntityFieldConfig.Id, EntityFieldConfig.T>
       | undefined = undefined;
 
     if (entityFieldConfigs) {
@@ -136,12 +133,12 @@ function useHydratedEntity({
 }
 
 type Props = {
-  entityConfig: EntityConfig;
-  entity: Entity;
+  entityConfig: EntityConfig.T;
+  entity: Entity.T;
 };
 
 type FieldValueMetadata = {
-  value: EntityFieldValue["value"];
+  value: EntityFieldValue.T["value"];
   sourceType?: DatasetSource.SourceType;
   sourceName?: string;
 };

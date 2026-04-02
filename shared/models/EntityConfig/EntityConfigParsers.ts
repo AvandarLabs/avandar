@@ -12,7 +12,6 @@ import type {
   ZodSchemaEqualsTypes,
 } from "@utils/types/test-utilities.types.ts";
 import type {
-  EntityConfig,
   EntityConfigId,
   EntityConfigModel,
 } from "$/models/EntityConfig/EntityConfig.types.ts";
@@ -37,7 +36,7 @@ export const EntityConfigParsers =
     fromDBReadToModelRead: pipe(
       camelCaseKeysDeep,
       nullsToUndefinedDeep,
-      (obj): EntityConfig => {
+      (obj): EntityConfigModel["Read"] => {
         return Model.make("EntityConfig", {
           ...obj,
           id: obj.id as EntityConfigId,

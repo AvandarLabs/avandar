@@ -3,29 +3,27 @@ import { uuid } from "$/lib/uuid";
 import { DatasetColumnValueExtractor } from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractor.types";
 import { ManualEntryExtractor } from "$/models/EntityConfig/ValueExtractor/ManualEntryExtractor/ManualEntryExtractor.types";
 import { EntityFieldValueExtractorRegistry } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types";
-import type { FormType } from "@/lib/hooks/ui/useForm";
+import type { FormType } from "@/lib/hooks/ui/useForm/useForm";
 import type { CamelCaseKeys } from "@utils/objects/camelCaseKeys/camelCaseKeys";
 import type { Expect } from "@utils/types/test-utilities.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
 import type {
-  Dataset,
-  DatasetWithColumns,
-} from "$/models/datasets/Dataset/Dataset.types";
-import type {
-  DatasetColumn,
   DatasetColumnId,
+  DatasetColumnRead,
 } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import type {
-  EntityConfig,
   EntityConfigId,
+  EntityConfigModel,
 } from "$/models/EntityConfig/EntityConfig.types";
 import type {
-  EntityFieldConfig,
   EntityFieldConfigId,
+  EntityFieldConfigModel,
 } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import type { SetOptional, SetRequired } from "type-fest";
 
 export type EntityFieldFormValues = SetRequired<
-  SetOptional<EntityFieldConfig<"Insert">, "workspaceId">,
+  SetOptional<EntityFieldConfigModel["Insert"], "workspaceId">,
   "id"
 > & {
   extractors: {
@@ -52,7 +50,7 @@ type _Test_EntityFieldFormValues = Expect<
 >;
 
 export type EntityConfigFormValues = SetOptional<
-  SetRequired<EntityConfig<"Insert">, "id">,
+  SetRequired<EntityConfigModel["Insert"], "id">,
   "workspaceId"
 > & {
   /** The id of the field that should be used as the title field */
@@ -104,8 +102,8 @@ export function makeDefaultDatasetColumnField({
 }: {
   entityConfigId: EntityConfigId;
   name: string;
-  dataset: Dataset;
-  datasetColumn: DatasetColumn;
+  dataset: Dataset.T;
+  datasetColumn: DatasetColumnRead;
   isIdField?: boolean;
 }): EntityFieldFormValues {
   const entityFieldConfigId: EntityFieldConfigId = uuid();

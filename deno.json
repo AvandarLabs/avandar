@@ -10,7 +10,7 @@
     "./supabase/functions/google-auth",
     "./supabase/functions/google-auth-callback",
     "./supabase/functions/google-sheets",
-    "./supabase/functions/health",
+    "./supabase/functions/healthz",
     "./supabase/functions/polar-public",
     "./supabase/functions/queries",
     "./supabase/functions/subscriptions",

@@ -8,7 +8,7 @@ import { MapStylePicker } from "@/components/GISApp/DataMap/MapStylePicker";
 import { MapStyleKey, mapStyles } from "@/components/GISApp/DataMap/mapStyles";
 import { QueryFormContainer } from "@/components/GISApp/DataMap/QueryFormContainer/QueryFormContainer";
 import { useSelectedMapDataSource } from "@/components/GISApp/DataMap/useSelectedMapDataSource";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 
 type MapProps = {
@@ -32,14 +32,14 @@ export function DataMap({
   const [selectedDataSource, setSelectedDataSource] = useState<
     QueryDataSource | undefined
   >(undefined);
-  const [latitudeColumn, setLatitudeColumn] = useState<QueryColumn | undefined>(
-    undefined,
-  );
+  const [latitudeColumn, setLatitudeColumn] = useState<
+    QueryColumn.T | undefined
+  >(undefined);
   const [longitudeColumn, setLongitudeColumn] = useState<
-    QueryColumn | undefined
+    QueryColumn.T | undefined
   >(undefined);
   const [symbolSizeColumn, setSymbolSizeColumn] = useState<
-    QueryColumn | undefined
+    QueryColumn.T | undefined
   >(undefined);
   const [symbolColor, setSymbolColor] = useState<string | undefined>(undefined);
   const [selectedFeature, setSelectedFeature] =

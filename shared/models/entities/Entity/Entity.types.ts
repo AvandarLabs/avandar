@@ -39,5 +39,3 @@ export type EntityModel = SupabaseCRUDModelSpec<
     dbTablePrimaryKey: "id";
   }
 >;
-
-export type Entity<K extends keyof EntityModel = "Read"> = EntityModel[K];

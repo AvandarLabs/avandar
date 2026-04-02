@@ -1,11 +1,11 @@
 import type { UnknownObject, UUID } from "@utils/types/common.types.ts";
-import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.types.ts";
+import type { AvaDataTypeT } from "$/models/datasets/AvaDataType/AvaDataType.types.ts";
 
 export type QueryResultId = UUID<"QueryResult">;
 
 export type QueryResultColumn = {
   name: string;
-  dataType: AvaDataType;
+  dataType: AvaDataTypeT;
 };
 
 export type QueryResult<T extends UnknownObject = UnknownObject> = {

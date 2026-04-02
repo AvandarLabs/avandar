@@ -10,10 +10,10 @@ import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/ut
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { getDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig";
 import { useEnsurePublishedDashboardDatasets } from "@/views/DashboardApp/DashboardViewerView/useEnsurePublishedDashboardDatasets";
-import type { Dashboard } from "$/models/Dashboard/Dashboard.types";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 type Props = {
-  dashboard: Dashboard;
+  dashboard: Dashboard.T;
 };
 
 export function DashboardViewerView({ dashboard }: Props): JSX.Element {

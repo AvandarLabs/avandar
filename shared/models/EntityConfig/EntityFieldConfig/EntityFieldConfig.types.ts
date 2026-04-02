@@ -1,11 +1,11 @@
 import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
-import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.types.ts";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types.ts";
 import type { ValueExtractorType } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types.ts";
 import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
-import type { SetOptional, Simplify } from "type-fest";
+import type { SetOptional } from "type-fest";
 
 export type EntityFieldConfigId = UUID<"EntityFieldConfig">;
 
@@ -19,7 +19,7 @@ type EntityFieldConfigRead = Model.Base<
     description: string | undefined;
     createdAt: string;
     updatedAt: string;
-    dataType: AvaDataType;
+    dataType: AvaDataType.T;
     valueExtractorType: ValueExtractorType;
     isTitleField: boolean;
     isIdField: boolean;
@@ -50,6 +50,3 @@ export type EntityFieldConfigModel = SupabaseCRUDModelSpec<
     dbTablePrimaryKey: "id";
   }
 >;
-
-export type EntityFieldConfig<K extends keyof EntityFieldConfigModel = "Read"> =
-  Simplify<EntityFieldConfigModel[K]>;

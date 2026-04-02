@@ -1,7 +1,7 @@
-import { Select } from "@ui/inputs/Select/Select";
 import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
+import { Select } from "@ui/inputs/Select/Select";
 import { propPasses } from "@utils/objects/hofs/propPasses/propPasses";
-import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useMemo } from "react";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { BubbleChartVizConfig } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types";
@@ -19,7 +19,7 @@ export function BubbleChartForm({
 }: Props): JSX.Element {
   const numericFieldOptions = useMemo(() => {
     return makeSelectOptions(
-      fields.filter(propPasses("dataType", AvaDataTypes.isNumeric)),
+      fields.filter(propPasses("dataType", AvaDataType.isNumeric)),
       { valueKey: "name", labelKey: "name" },
     );
   }, [fields]);

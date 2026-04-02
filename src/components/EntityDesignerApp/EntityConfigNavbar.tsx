@@ -3,10 +3,10 @@ import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
-import type { EntityConfig } from "$/models/EntityConfig/EntityConfig.types";
+import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 
 type Props = {
-  entityConfigs: readonly EntityConfig[];
+  entityConfigs: readonly EntityConfig.T[];
   isLoading: boolean;
 } & BoxProps;
 

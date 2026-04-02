@@ -6,12 +6,12 @@ import { objectKeys } from "@utils/objects/objectKeys";
 import { EntityFieldConfigParsers } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfigParsers";
 import { match } from "ts-pattern";
 import { DatasetColumnValueExtractorClient } from "@/clients/entity-configs/DatasetColumnValueExtractorClient";
+import { ManualEntryExtractorClient } from "@/clients/entity-configs/ManualEntryExtractorClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
 import { promiseFlatMap } from "@/lib/utils/promises";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
-import { ManualEntryExtractorClient } from "@/clients/entity-configs/ManualEntryExtractorClient";
-import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
+import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
 import type {
   EntityFieldValueExtractor,
   ValueExtractorType,
@@ -31,7 +31,7 @@ export const EntityFieldConfigClient = createUsableServiceClient(
        */
       return {
         getAllValueExtractors: async (params: {
-          fields: readonly EntityFieldConfig[] | undefined;
+          fields: readonly EntityFieldConfig.T[] | undefined;
         }): Promise<EntityFieldValueExtractor[]> => {
           const logger = clientLogger.appendName("getAllValueExtractors");
           const { fields: inputFields } = params;

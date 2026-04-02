@@ -11,20 +11,17 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
-import { DuckDBClient } from "@/clients/DuckDBClient";
+import { DuckDBClient } from "@/clients/DuckDBClient/DuckDBClient";
 import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { DangerousActionButton } from "@/lib/ui/buttons/DangerousActionButton";
 import { Paper } from "@/lib/ui/Paper/Paper";
 import { Logger } from "@/utils/Logger";
-import type {
-  Dataset,
-  DatasetId,
-} from "$/models/datasets/Dataset/Dataset.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { UserId } from "$/models/User/User.types";
 
 type Props = {
-  dataset: Dataset;
+  dataset: Dataset.T;
 };
 
 /**
@@ -44,7 +41,7 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
   });
   const [deleteDatasetLocally] = useMutation({
     queryToRefetch: ["missing-datasets"],
-    mutationFn: async (datasetId: DatasetId) => {
+    mutationFn: async (datasetId: Dataset.Id) => {
       const localDataset = await LocalDatasetClient.getById({
         id: datasetId,
       });

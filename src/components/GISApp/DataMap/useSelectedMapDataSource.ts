@@ -1,10 +1,9 @@
 import { Model } from "@models/Model/Model";
 import { sqlTemplate } from "@utils/index";
-import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { MapLayerMouseEvent, Map as MapLibreMap } from "maplibre-gl";
 import { RefObject, useEffect, useRef } from "react";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.types";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 
 const GEOJSON_SOURCE_ID = "selected-datasource-source";
@@ -20,9 +19,9 @@ type UseSelectedMapDataSourceOptions = {
   map: MapLibreMap | null;
   mapViewState: RefObject<MapViewState>;
   selectedDataSource?: QueryDataSource;
-  latitudeColumn?: QueryColumn;
-  longitudeColumn?: QueryColumn;
-  symbolSizeColumn?: QueryColumn;
+  latitudeColumn?: QueryColumn.T;
+  longitudeColumn?: QueryColumn.T;
+  symbolSizeColumn?: QueryColumn.T;
   symbolColor?: string;
   selectedFeature?: GeoJSON.Feature | null;
   onFeatureClick?: (feature: GeoJSON.Feature) => void;
@@ -85,7 +84,7 @@ export function useSelectedMapDataSource({
     ) {
       const symbolSizeColumnName =
         symbolSizeColumn ?
-          QueryColumns.getDerivedColumnName(symbolSizeColumn)
+          QueryColumn.getDerivedColumnName(symbolSizeColumn)
         : undefined;
 
       const circleRadius =
@@ -138,12 +137,11 @@ export function useSelectedMapDataSource({
     const loadData = async () => {
       try {
         const datasetId = selectedDataSource.id;
-        const latColumnName = QueryColumns.getDerivedColumnName(latitudeColumn);
-        const lngColumnName =
-          QueryColumns.getDerivedColumnName(longitudeColumn);
+        const latColumnName = QueryColumn.getDerivedColumnName(latitudeColumn);
+        const lngColumnName = QueryColumn.getDerivedColumnName(longitudeColumn);
         const symbolSizeColumnName =
           symbolSizeColumn ?
-            QueryColumns.getDerivedColumnName(symbolSizeColumn)
+            QueryColumn.getDerivedColumnName(symbolSizeColumn)
           : undefined;
 
         console.log("Loading dataset:", datasetId);
@@ -406,7 +404,7 @@ export function useSelectedMapDataSource({
         if (!map.getLayer(GEOJSON_LAYER_ID)) {
           const symbolSizeColumnName =
             symbolSizeColumn ?
-              QueryColumns.getDerivedColumnName(symbolSizeColumn)
+              QueryColumn.getDerivedColumnName(symbolSizeColumn)
             : undefined;
 
           const circleRadius =

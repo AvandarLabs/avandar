@@ -3,14 +3,14 @@ import { Model } from "@models/Model/Model";
 import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
 import { Select } from "@ui/inputs/Select/Select";
 import { prop } from "@utils/objects/hofs/prop/prop";
-import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
+import { QueryColumn as QueryColumnModule } from "$/models/queries/QueryColumn/QueryColumn";
 import { AggregationSelect } from "@/views/DataExplorerApp/AggregationSelect";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { QueryColumnMultiSelect } from "@/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect";
 import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
 import type { SelectData } from "@ui/inputs/Select/Select";
-import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
+import type { QueryColumnRead } from "$/models/queries/QueryColumn/QueryColumn.types";
 
 const HIDE_WHERE = true;
 const HIDE_LIMIT = true;
@@ -37,7 +37,7 @@ export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
   const selectedColumnOptions = makeSelectOptions(queryColumns, {
     valueFn: prop("id"),
     labelFn: (col) => {
-      return QueryColumns.getDerivedColumnName(col);
+      return QueryColumnModule.getDerivedColumnName(col);
     },
   });
 
@@ -57,7 +57,7 @@ export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
           placeholder="Select columns to query"
           dataSourceId={dataSource ? Model.getTypedId(dataSource) : undefined}
           value={queryColumns}
-          onChange={(newColumns: readonly QueryColumn[]) => {
+          onChange={(newColumns: readonly QueryColumnRead[]) => {
             dispatch.setColumns(newColumns);
           }}
           comboboxProps={{ withinPortal }}
@@ -75,7 +75,7 @@ export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
                   label={col.baseColumn.name}
                   dataType={col.baseColumn.dataType}
                   value={aggregations[col.id] ?? "none"}
-                  onChange={(newAggregation: QueryAggregationType) => {
+                  onChange={(newAggregation: QueryAggregationType.T) => {
                     dispatch.setColumnAggregation({
                       columnId: col.id,
                       aggregation: newAggregation,

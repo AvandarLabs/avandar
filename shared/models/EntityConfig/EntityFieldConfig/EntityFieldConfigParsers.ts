@@ -6,10 +6,9 @@ import { excludeNullsExceptInProps } from "@utils/objects/hofs/excludeNullsExcep
 import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeys/snakeCaseKeys.ts";
 import { undefinedsToNullsDeep } from "@utils/objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
-import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes.ts";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types.ts";
 import {
-  EntityFieldConfig,
   EntityFieldConfigId,
   EntityFieldConfigModel,
 } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";
@@ -22,7 +21,7 @@ import type {
 
 const DBReadSchema = z.object({
   allow_manual_edit: z.boolean(),
-  data_type: z.enum(AvaDataTypes.Types),
+  data_type: z.enum(AvaDataType.Types),
   created_at: z.string(),
   description: z.string().nullable(),
   entity_config_id: z.uuid(),
@@ -43,7 +42,7 @@ export const EntityFieldConfigParsers =
     fromDBReadToModelRead: pipe(
       camelCaseKeysDeep,
       nullsToUndefinedDeep,
-      (obj): EntityFieldConfig => {
+      (obj): EntityFieldConfigModel["Read"] => {
         return Model.make("EntityFieldConfig", {
           ...obj,
           id: obj.id as EntityFieldConfigId,

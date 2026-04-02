@@ -7,6 +7,7 @@ import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketReco
 import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord";
 import { objectEntries } from "@utils/objects/objectEntries";
 import { sqlTemplate } from "@utils/strings/template/sqlTemplate";
+import { EntityFieldConfigId } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
@@ -15,17 +16,14 @@ import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import { removeDuplicates } from "@/lib/utils/arrays/removeDuplicates/removeDuplicates";
 import { promiseFlatMap } from "@/lib/utils/promises";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
-import type {
-  EntityFieldConfig,
-  EntityFieldConfigId,
-} from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
+import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
 import type { DatasetColumnValueExtractor } from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractor.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 type FieldWithDatasetExtractor = {
-  fieldConfig: EntityFieldConfig;
+  fieldConfig: EntityFieldConfig.T;
   extractor: DatasetColumnValueExtractor;
 };
 
@@ -151,17 +149,17 @@ async function _extractFieldValuesFromDataset({
 }: {
   datasetId: DatasetId;
   primaryKeyField: {
-    datasetColumn: DatasetColumn;
-    fieldConfig: EntityFieldConfig;
+    datasetColumn: DatasetColumn.T;
+    fieldConfig: EntityFieldConfig.T;
     extractor: DatasetColumnValueExtractor;
   };
   workspaceId: Workspace.Id;
   requestedFields: ReadonlyArray<{
-    datasetColumn: DatasetColumn;
-    fieldConfig: EntityFieldConfig;
+    datasetColumn: DatasetColumn.T;
+    fieldConfig: EntityFieldConfig.T;
     extractor: DatasetColumnValueExtractor;
   }>;
-}): Promise<Array<Record<EntityFieldConfigId, unknown>>> {
+}): Promise<Array<Record<EntityFieldConfig.Id, unknown>>> {
   const primaryKeyColumnName = primaryKeyField.datasetColumn.name;
 
   // returns rows where each column is an entity field ID

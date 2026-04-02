@@ -3,11 +3,6 @@ import { where } from "@utils/filters/where/where";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
 import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral";
-import {
-  Dataset,
-  DatasetId,
-  DatasetWithColumns,
-} from "$/models/datasets/Dataset/Dataset.types";
 import { DatasetParsers } from "$/models/datasets/Dataset/DatasetParsers";
 import { WorkspaceId } from "$/models/Workspace/Workspace.types";
 import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
@@ -16,13 +11,18 @@ import { GoogleSheetsDatasetClient } from "@/clients/datasets/GoogleSheetsDatase
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
-import { DuckDBClient } from "@/clients/DuckDBClient/index";
+import { DuckDBClient } from "@/clients/DuckDBClient/DuckDBClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { FiltersByColumn } from "@utils/filters/filters";
 import type { ExcludeNullsIn } from "@utils/objects/excludeNullsIn/excludeNullsIn";
 import type { OpenDataCatalogEntryId } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type {
+  DatasetId,
+  DatasetWithColumns,
+} from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { CompositeTypes } from "$/types/database.types";
@@ -112,7 +112,7 @@ export const DatasetClient = createUsableServiceClient(
         },
 
         getAllDatasetsWithColumns: async (params?: {
-          where?: FiltersByColumn<Dataset<"DBRead">>;
+          where?: FiltersByColumn<Dataset.T<"DBRead">>;
         }): Promise<DatasetWithColumns[]> => {
           const logger = clientLogger.appendName("getAllDatasetsWithColumns");
           logger.log("Getting all datasets with columns using params", params);
@@ -123,7 +123,7 @@ export const DatasetClient = createUsableServiceClient(
           const bucketedDatasetColumns = makeBucketRecord(allDatasetColumns, {
             key: "datasetId",
           });
-          const datasetsWithColumns = datasets.map((dataset: Dataset) => {
+          const datasetsWithColumns = datasets.map((dataset: Dataset.T) => {
             return {
               ...dataset,
               columns: bucketedDatasetColumns[dataset.id] ?? [],
@@ -148,7 +148,7 @@ export const DatasetClient = createUsableServiceClient(
           datasetDescription: string;
           columns: DatasetColumnInput[];
           rawSQL: string;
-        }): Promise<Dataset> => {
+        }): Promise<Dataset.T> => {
           const logger = clientLogger.appendName("insertVirtualDataset");
           logger.log("Creating virtual dataset", params);
           const { data: dataset } = await dbClient
@@ -192,7 +192,7 @@ export const DatasetClient = createUsableServiceClient(
             dateFormat: string | null;
             timestampFormat: string | null;
           };
-        }): Promise<Dataset> => {
+        }): Promise<Dataset.T> => {
           const logger = clientLogger.appendName("insertCSVFileDataset");
           logger.log("Creating dataset", params);
 
@@ -255,7 +255,7 @@ export const DatasetClient = createUsableServiceClient(
           rowsToSkip: number;
           googleAccountId: string;
           googleDocumentId: string;
-        }): Promise<Dataset> => {
+        }): Promise<Dataset.T> => {
           const logger = clientLogger.appendName("addNewDataset");
           logger.log("Creating dataset", params);
 
@@ -295,7 +295,7 @@ export const DatasetClient = createUsableServiceClient(
           datasetDescription: string;
           catalogEntryId: OpenDataCatalogEntryId;
           columns: DatasetColumnInput[];
-        }): Promise<Dataset> => {
+        }): Promise<Dataset.T> => {
           const logger = clientLogger.appendName("insertOpenDataDataset");
           logger.log("Creating open data dataset", params);
           const { data: dataset } = await dbClient

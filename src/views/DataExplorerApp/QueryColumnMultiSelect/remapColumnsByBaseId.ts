@@ -1,5 +1,5 @@
 import { isNonNullish } from "@utils/guards/isNonNullish/isNonNullish";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 /**
  * Re-maps a selection of `QueryColumn`s to canonical instances from the
@@ -20,9 +20,9 @@ import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.types
  * @returns Remapped array, or `undefined` if no change was needed.
  */
 export function remapColumnsByBaseId(options: {
-  selectedColumns: readonly QueryColumn[];
-  availableColumns: readonly QueryColumn[];
-}): readonly QueryColumn[] | undefined {
+  selectedColumns: readonly QueryColumn.T[];
+  availableColumns: readonly QueryColumn.T[];
+}): readonly QueryColumn.T[] | undefined {
   const { selectedColumns, availableColumns } = options;
 
   // Index available columns by their stable DB id for O(1) lookup.

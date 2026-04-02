@@ -12,6 +12,11 @@ import { objectKeys } from "@utils/objects/objectKeys";
 import { sqlTemplate } from "@utils/strings/template/sqlTemplate";
 import { wrapString } from "$/lib/strings/higherOrderFuncs";
 import { uuid } from "$/lib/uuid";
+import { EntityFieldValueRead } from "$/models/entities/EntityFieldValue/EntityFieldValue.types";
+import {
+  EntityFieldConfigId,
+  EntityFieldConfigModel,
+} from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { singleton } from "@/clients/DuckDBClient/queryResultHelpers";
@@ -27,27 +32,24 @@ import type { WithQueryHooks } from "@hooks/withQueryHooks/withQueryHooks.types"
 import type { ILogger, WithLogger } from "@logger/Logger.types";
 import type { RegistryOfArrays } from "@utils/types/utilities.types";
 import type { EntityId } from "$/models/entities/Entity/Entity.types";
-import type { EntityFieldValue } from "$/models/entities/EntityFieldValue/EntityFieldValue.types";
+import type { EntityFieldValue } from "$/models/entities/EntityFieldValue/EntityFieldValue";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
-import type {
-  EntityFieldConfig,
-  EntityFieldConfigId,
-} from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
+import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
 import type { EntityFieldValueExtractorRegistry } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 type EntityFieldValueClientQueries = {
   getAllEntityFieldValues: (params: {
     entityConfigId: EntityConfigId;
-    entityFieldConfigs: readonly EntityFieldConfig[];
+    entityFieldConfigs: readonly EntityFieldConfig.T[];
     workspaceId: Workspace.Id;
-  }) => Promise<Array<Record<EntityFieldConfigId, unknown>>>;
+  }) => Promise<Array<Record<EntityFieldConfig.Id, unknown>>>;
 
   getEntityFieldValues: (params: {
     entityId: EntityId;
-    entityFieldConfigs: readonly EntityFieldConfig[];
+    entityFieldConfigs: readonly EntityFieldConfig.T[];
     workspaceId: Workspace.Id;
-  }) => Promise<EntityFieldValue[]>;
+  }) => Promise<EntityFieldValue.T[]>;
 };
 
 export type IEntityFieldValueClient = ServiceClient &
@@ -65,7 +67,7 @@ function createEntityFieldValueClient(): WithLogger<
     const queries = {
       getAllEntityFieldValues: async (params: {
         entityConfigId: EntityConfigId;
-        entityFieldConfigs: readonly EntityFieldConfig[];
+        entityFieldConfigs: ReadonlyArray<EntityFieldConfigModel["Read"]>;
         workspaceId: Workspace.Id;
       }): Promise<Array<Record<EntityFieldConfigId, unknown>>> => {
         const logger = baseLogger.appendName("getAllEntityFieldValues");
@@ -81,8 +83,8 @@ function createEntityFieldValueClient(): WithLogger<
 
       getEntityFieldValues: async (params: {
         entityId: EntityId;
-        entityFieldConfigs: readonly EntityFieldConfig[];
-      }): Promise<EntityFieldValue[]> => {
+        entityFieldConfigs: ReadonlyArray<EntityFieldConfigModel["Read"]>;
+      }): Promise<EntityFieldValueRead[]> => {
         const logger = baseLogger.appendName("getEntityFieldValues");
         logger.log("Getting entity field values", params);
 
@@ -288,25 +290,24 @@ function createEntityFieldValueClient(): WithLogger<
                     });
 
                     assertIsDefined(extractedValues);
-                    const entityFieldValues: EntityFieldValue[] = objectKeys(
-                      extractedValues,
-                    ).map((fieldConfigId) => {
-                      const rawValue = extractedValues[fieldConfigId];
-                      return {
-                        id: uuid(),
-                        entityId,
-                        datasetId,
-                        createdAt: new Date().toISOString(),
-                        updatedAt: new Date().toISOString(),
-                        entityFieldConfigId: fieldConfigId,
-                        entityConfigId: entity.entityConfigId,
-                        workspaceId: entity.workspaceId,
-                        value: rawValue,
+                    const entityFieldValues: EntityFieldValueRead[] =
+                      objectKeys(extractedValues).map((fieldConfigId) => {
+                        const rawValue = extractedValues[fieldConfigId];
+                        return {
+                          id: uuid(),
+                          entityId,
+                          datasetId,
+                          createdAt: new Date().toISOString(),
+                          updatedAt: new Date().toISOString(),
+                          entityFieldConfigId: fieldConfigId,
+                          entityConfigId: entity.entityConfigId,
+                          workspaceId: entity.workspaceId,
+                          value: rawValue,
 
-                        // TODO(jpsyx): this should have been extracted too
-                        valueSet: [rawValue].filter(isDefined),
-                      };
-                    });
+                          // TODO(jpsyx): this should have been extracted too
+                          valueSet: [rawValue].filter(isDefined),
+                        };
+                      });
 
                     return entityFieldValues;
                   },

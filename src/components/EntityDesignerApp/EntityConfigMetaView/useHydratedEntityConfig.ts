@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { EntityConfig } from "$/models/EntityConfig/EntityConfig.types";
+import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 
 /**
  * Given an entity config, finish hydrating it.
@@ -16,9 +16,9 @@ import type { EntityConfig } from "$/models/EntityConfig/EntityConfig.types";
 export function useHydratedEntityConfig({
   entityConfig,
 }: {
-  entityConfig: EntityConfig;
+  entityConfig: EntityConfig.T;
 }): [
-  EntityConfig<"Full">,
+  EntityConfig.T<"Full">,
   {
     isLoadingFields: boolean;
     isLoadingDatasets: boolean;
@@ -54,7 +54,7 @@ export function useHydratedEntityConfig({
     },
   });
 
-  const hydratedEntityConfig: EntityConfig<"Full"> = useMemo(() => {
+  const hydratedEntityConfig: EntityConfig.T<"Full"> = useMemo(() => {
     return {
       ...entityConfig,
       datasets,

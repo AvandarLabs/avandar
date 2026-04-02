@@ -14,19 +14,16 @@ import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
-import type {
-  Dataset,
-  DatasetId,
-} from "$/models/datasets/Dataset/Dataset.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type Props = {
-  datasets: Dataset[];
+  datasets: Dataset.T[];
   isLoading: boolean;
 } & BoxProps;
 
 function makeDatasetLink(options: {
   workspaceSlug: string;
-  datasetId: DatasetId;
+  datasetId: Dataset.Id;
   datasetName: string;
   style?: NavLinkProps["style"];
   label?: string;

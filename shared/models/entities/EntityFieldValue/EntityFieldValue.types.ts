@@ -1,13 +1,13 @@
-import type { EntityId } from "$/models/entities/Entity/Entity.types.ts";
 import type { UUID } from "@utils/types/common.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
+import type { EntityId } from "$/models/entities/Entity/Entity.types.ts";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types.ts";
 import type { EntityFieldConfigId } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 
 export type EntityFieldValueId = UUID<"EntityFieldValue">;
 
-export type EntityFieldValue = {
+export type EntityFieldValueRead = {
   createdAt: string;
   datasetId: DatasetId | undefined;
   entityFieldConfigId: EntityFieldConfigId;

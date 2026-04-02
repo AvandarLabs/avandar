@@ -74,6 +74,3 @@ export type CSVFileDatasetModel = SupabaseCRUDModelSpec<
     dbTablePrimaryKey: "id";
   }
 >;
-
-export type CSVFileDataset<K extends keyof CSVFileDatasetModel = "Read"> =
-  CSVFileDatasetModel[K];

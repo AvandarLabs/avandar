@@ -30,10 +30,10 @@ import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { DatasetMetadataList } from "@/views/DataManagerApp/DatasetMetaView/DatasetMetadataList";
 import { DataSummaryView } from "@/views/DataManagerApp/DatasetMetaView/DataSummaryView";
 import { ToggleOfflineOnlyButton } from "@/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type Props = {
-  dataset: Dataset;
+  dataset: Dataset.T;
 };
 
 type DatasetTabId = "dataset-metadata" | "dataset-summary";

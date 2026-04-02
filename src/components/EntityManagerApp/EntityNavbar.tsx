@@ -16,10 +16,10 @@ import { EntityClient } from "@/clients/entities/EntityClient";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { NavLinkList } from "@/lib/ui/links/NavLinkList";
-import type { EntityConfig } from "$/models/EntityConfig/EntityConfig.types";
+import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 
 type Props = {
-  entityConfig: EntityConfig;
+  entityConfig: EntityConfig.T;
 } & BoxProps;
 
 // TODO(jpsyx): generalize these navbars

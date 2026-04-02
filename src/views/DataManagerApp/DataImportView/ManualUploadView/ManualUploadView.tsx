@@ -15,7 +15,7 @@ import { uuid } from "$/lib/uuid";
 import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
-import { DuckDBClient } from "@/clients/DuckDBClient";
+import { DuckDBClient } from "@/clients/DuckDBClient/DuckDBClient";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
@@ -28,17 +28,14 @@ import {
   DatasetImportFormValues,
 } from "@/views/DataManagerApp/DataImportView/DatasetUploadForm/index";
 import type { UnknownObject } from "@utils/types/common.types";
-import type {
-  Dataset,
-  DatasetId,
-} from "$/models/datasets/Dataset/Dataset.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DetectedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 async function saveLocalCSVToBackend(params: {
   name: string;
-  datasetId: DatasetId;
+  datasetId: Dataset.Id;
   description: string;
   columns: DetectedDatasetColumn[];
   workspaceId: Workspace.Id;
@@ -47,7 +44,7 @@ async function saveLocalCSVToBackend(params: {
   sizeInBytes: number;
   rowsToSkip?: number;
   delimiter?: string;
-}): Promise<Dataset> {
+}): Promise<Dataset.T> {
   const {
     name,
     datasetId,
@@ -97,7 +94,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
 
   const [parseOptions, setParseOptions] = useState<{
     file: File;
-    datasetId: DatasetId;
+    datasetId: Dataset.Id;
     numRowsToSkip?: number;
     delimiter?: string;
   }>();
@@ -111,7 +108,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
     queryKey: ["load-csv", user!.id, workspace.id, parseOptions],
     queryFn: async (): Promise<
       | {
-          datasetId: DatasetId;
+          datasetId: Dataset.Id;
           metadata: DuckDBLoadCSVResult;
           previewRows: UnknownObject[];
         }

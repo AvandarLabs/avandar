@@ -3,7 +3,7 @@ import type {
   DataExplorerAppState,
   OpenDatasetInfo,
 } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
-import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
+import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 
@@ -42,7 +42,7 @@ export type DataExplorerURLSearch = z.infer<typeof DataExplorerSearchSchema>;
 export type ParsedURLState = {
   dsId?: string;
   colNames?: readonly string[];
-  aggregations?: Readonly<Record<string, QueryAggregationType>>;
+  aggregations?: Readonly<Record<string, QueryAggregationType.T>>;
   orderByColName?: string;
   orderDir?: OrderByDirection;
   rawSQL?: string;
@@ -60,7 +60,7 @@ const VALID_AGGREGATION_VALUES = new Set([
   "none",
 ]);
 
-function _isValidAgg(value: string): value is QueryAggregationType {
+function _isValidAgg(value: string): value is QueryAggregationType.T {
   return VALID_AGGREGATION_VALUES.has(value);
 }
 
@@ -80,7 +80,7 @@ export function parseURLSearch(search: DataExplorerURLSearch): ParsedURLState {
   }
 
   if (search.agg) {
-    const agg: Record<string, QueryAggregationType> = {};
+    const agg: Record<string, QueryAggregationType.T> = {};
     search.agg.split(",").forEach((pair) => {
       const idx = pair.indexOf(":");
       if (idx === -1) {

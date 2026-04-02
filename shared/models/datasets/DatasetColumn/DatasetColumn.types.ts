@@ -1,6 +1,6 @@
 import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
-import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.types.ts";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { DuckDBDataType } from "$/models/datasets/DatasetColumn/DuckDBDataTypes.ts";
 import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
@@ -41,7 +41,7 @@ export type DatasetColumnRead = Model.Base<
      * different operations. This value can also be changed manually by the
      * user.
      */
-    dataType: AvaDataType;
+    dataType: AvaDataType.T;
 
     /** Unique identifier of the dataset the column belongs to. */
     datasetId: DatasetId;
@@ -81,7 +81,7 @@ export type DatasetColumnRead = Model.Base<
  * and column index.
  */
 export type DetectedDatasetColumn = Pick<
-  DatasetColumn,
+  DatasetColumnRead,
   | "originalName"
   | "name"
   | "originalDataType"
@@ -111,6 +111,3 @@ export type DatasetColumnModel = SupabaseCRUDModelSpec<
     dbTablePrimaryKey: "id";
   }
 >;
-
-export type DatasetColumn<K extends keyof DatasetColumnModel = "Read"> =
-  DatasetColumnModel[K];

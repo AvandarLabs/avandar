@@ -17,10 +17,10 @@ import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { Paper } from "@/lib/ui/Paper/Paper";
 import { DashboardCard } from "@/views/DashboardApp/DashboardListView/DashboardCard";
-import type { Dashboard } from "$/models/Dashboard/Dashboard.types";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 type Props = {
-  dashboards: Dashboard[];
+  dashboards: Dashboard.T[];
   workspaceSlug: string;
 };
 
@@ -65,7 +65,8 @@ export function DashboardListView({
         slug: undefined,
         isPublic: false,
         // TODO(jpsyx): avoid coercing the type here
-        config: DashboardConfigs.makeEmpty() as unknown as Dashboard["config"],
+        config:
+          DashboardConfigs.makeEmpty() as unknown as Dashboard.T["config"],
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
       }),

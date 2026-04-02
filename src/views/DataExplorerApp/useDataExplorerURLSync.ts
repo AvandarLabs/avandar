@@ -1,11 +1,11 @@
-import { isNonNullish } from "@utils/guards/isNonNullish/isNonNullish";
 import { where } from "@utils/filters/where/where";
-import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
+import { isNonNullish } from "@utils/guards/isNonNullish/isNonNullish";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
+import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import {
@@ -44,10 +44,7 @@ type Options = {
  *   change is serialised back to the URL using `replace: true` so the browser
  *   history stays clean.
  */
-export function useDataExplorerURLSync({
-  urlSearch,
-  navigate,
-}: Options): void {
+export function useDataExplorerURLSync({ urlSearch, navigate }: Options): void {
   const state = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
   const workspace = useCurrentWorkspace();
@@ -87,7 +84,8 @@ export function useDataExplorerURLSync({
       Boolean(restoredDataSource) &&
       (datasets?.some((d) => {
         return d.id === restoredDataSource?.id;
-      }) ?? false)
+      }) ??
+        false)
     );
   }, [restoredDataSource, datasets]);
 
@@ -96,7 +94,8 @@ export function useDataExplorerURLSync({
       Boolean(restoredDataSource) &&
       (entityConfigs?.some((e) => {
         return e.id === restoredDataSource?.id;
-      }) ?? false)
+      }) ??
+        false)
     );
   }, [restoredDataSource, entityConfigs]);
 
@@ -156,10 +155,10 @@ export function useDataExplorerURLSync({
     ) {
       const allQueryColumns = [
         ...(datasetColumns ?? []).map((col) => {
-          return QueryColumns.makeFromDatasetColumn(col);
+          return QueryColumn.makeFromDatasetColumn(col);
         }),
         ...(entityFieldConfigs ?? []).map((col) => {
-          return QueryColumns.makeFromEntityFieldConfig(col);
+          return QueryColumn.makeFromEntityFieldConfig(col);
         }),
       ];
 

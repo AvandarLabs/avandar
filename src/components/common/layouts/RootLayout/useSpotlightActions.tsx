@@ -7,7 +7,7 @@ import { IconDatabase, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "@tanstack/react-router";
 import { notifySuccess } from "@ui/notifications/notify";
 import { useMemo } from "react";
-import { DuckDBClient } from "@/clients/DuckDBClient";
+import { DuckDBClient } from "@/clients/DuckDBClient/DuckDBClient";
 import { SpotlightLinks } from "@/config/SpotlightLinks";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { clearOPFS } from "@/lib/utils/browser/clearOPFS";

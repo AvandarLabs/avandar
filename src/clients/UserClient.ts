@@ -15,13 +15,12 @@ import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
 import type { WithSupabaseClient } from "@clients/SupabaseCRUDClient/withSupabaseClient";
 import type { ILogger, WithLogger } from "@logger/Logger.types.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { UserId } from "$/models/User/User.types";
+import type { UserProfile } from "$/models/User/UserProfile";
 import type {
   MembershipId,
-  UserProfile,
   UserProfileId,
 } from "$/models/User/UserProfile.types";
-import type { UserId } from "$/models/User/User.types";
-
 
 type TUserClient = WithSupabaseClient<
   WithLogger<
@@ -31,7 +30,7 @@ type TUserClient = WithSupabaseClient<
           workspaceId,
         }: {
           workspaceId: Workspace.Id;
-        }) => Promise<UserProfile>;
+        }) => Promise<UserProfile.T>;
       },
       "getProfile",
       never
@@ -44,7 +43,7 @@ type TUserClientOptions = {
 };
 
 export const UserProfileDBReadToModelReadSchema: z.ZodType<
-  UserProfile,
+  UserProfile.T,
   Tables<"user_profiles">
 > = z
   .object({
@@ -60,7 +59,7 @@ export const UserProfileDBReadToModelReadSchema: z.ZodType<
     polar_product_id: z.uuid().nullable(),
     subscription_id: z.uuid().nullable(),
   })
-  .transform((obj): UserProfile => {
+  .transform((obj): UserProfile.T => {
     const model = omit(camelCaseKeysShallow(obj), ["id"]);
     return {
       ...model,
@@ -93,7 +92,7 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
           workspaceId,
         }: {
           workspaceId: WorkspaceId;
-        }): Promise<UserProfile> => {
+        }): Promise<UserProfile.T> => {
           const logger = baseLogger.appendName("getProfile");
           logger.log("Calling `getProfile` with params", {
             workspaceId,

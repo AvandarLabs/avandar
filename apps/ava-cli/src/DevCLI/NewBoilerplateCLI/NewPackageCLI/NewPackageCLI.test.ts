@@ -42,7 +42,7 @@ const MOCK_DENO_JSON = JSON.stringify(
       "./packages/shared/clients",
       "./packages/shared/utils",
       "./supabase/functions/_shared",
-      "./supabase/functions/health",
+      "./supabase/functions/healthz",
     ],
     imports: {
       "@utils/": "./packages/shared/utils/src/",

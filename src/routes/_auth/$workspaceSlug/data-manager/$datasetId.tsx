@@ -9,18 +9,15 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { Callout } from "@/lib/ui/Callout";
 import { Logger } from "@/utils/Logger";
 import { DatasetMetaView } from "@/views/DataManagerApp/DatasetMetaView/DatasetMetaView";
-import type {
-  Dataset,
-  DatasetId,
-} from "$/models/datasets/Dataset/Dataset.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 export const Route = createFileRoute(
   "/_auth/$workspaceSlug/data-manager/$datasetId",
 )({
   component: RouteComponent,
-  loader: async ({ params: { datasetId } }): Promise<Dataset> => {
+  loader: async ({ params: { datasetId } }): Promise<Dataset.T> => {
     const dataset = await DatasetClient.getById({
-      id: datasetId as DatasetId,
+      id: datasetId as Dataset.Id,
     });
     if (!dataset) {
       throw notFound();

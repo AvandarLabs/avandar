@@ -5,7 +5,7 @@ import {
 } from "@/db/dexie/dexieVersions";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { Logger } from "@/utils/Logger";
-import type { User } from "$/models/User/User.types";
+import type { User } from "$/models/User/User";
 
 const currentDexieDBVersion = AvaDexieVersionManager.getVersion(
   CURRENT_AVA_DEXIE_VERSION,
@@ -37,7 +37,7 @@ export const AvaDexie = {
    *    idea of which users still have stale DBs and when it's safe to delete an
    *    older Dexie version from our codebase so we no longer have to bundle it.
    */
-  syncDBVersion: async (user: User | undefined): Promise<void> => {
+  syncDBVersion: async (user: User.T | undefined): Promise<void> => {
     if (currentDexieDBVersion.verno && currentDexieDBVersion.verno > 0) {
       // first, make sure the `meta` table exists and the user didn't just
       // fully delete it

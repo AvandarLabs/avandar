@@ -13,7 +13,6 @@ import type {
   ZodSchemaEqualsTypes,
 } from "@utils/types/test-utilities.types.ts";
 import type {
-  Dataset,
   DatasetId,
   DatasetModel,
 } from "$/models/datasets/Dataset/Dataset.types.ts";
@@ -40,7 +39,7 @@ export const DatasetParsers = makeParserRegistry<DatasetModel>().build({
   fromDBReadToModelRead: pipe(
     camelCaseKeysDeep,
     nullsToUndefinedDeep,
-    (obj): Dataset => {
+    (obj): DatasetModel["Read"] => {
       return Model.make("Dataset", {
         ...obj,
         id: obj.id as DatasetId,

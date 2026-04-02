@@ -4,7 +4,7 @@ import { ObjectDescriptionList } from "@ui/ObjectDescriptionList/ObjectDescripti
 import { where } from "@utils/filters/where/where";
 import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { DuckDBClient } from "@/clients/DuckDBClient";
+import { DuckDBClient } from "@/clients/DuckDBClient/DuckDBClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { promiseMap } from "@/lib/utils/promises";
