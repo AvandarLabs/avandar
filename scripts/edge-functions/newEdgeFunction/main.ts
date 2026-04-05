@@ -97,7 +97,8 @@ async function updateHttpApiTypes(
 ): Promise<void> {
   const pascalCaseName = toPascalCase(functionName);
   const apiTypeName = `${pascalCaseName}API`;
-  const importPath = `../../supabase/functions/${functionName}/${functionName}.types`;
+  const importPath =
+    `../../supabase/functions/${functionName}/${functionName}.routes.types`;
 
   let content = readFileSync(httpApiTypesPath, "utf-8");
 
@@ -191,16 +192,20 @@ async function main() {
       output: "index.ts",
     },
     {
-      template: "route.tsx.template.txt",
+      template: "routes.ts.template.txt",
       output: `${functionName}.routes.ts`,
     },
     {
-      template: "types.ts.template.txt",
-      output: `${functionName}.types.ts`,
+      template: "routes.types.ts.template.txt",
+      output: `${functionName}.routes.types.ts`,
     },
     {
       template: "deno.json.template.txt",
       output: "deno.json",
+    },
+    {
+      template: "npmrc.template.txt",
+      output: ".npmrc",
     },
   ];
 
