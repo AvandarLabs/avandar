@@ -92,7 +92,7 @@ export function updateHTTPAPITypes(options: {
 }): void {
   const pascalCaseName = toPascalCase(options.functionName);
   const apiTypeName = `${pascalCaseName}API`;
-  const importPath = `../../supabase/functions/${options.functionName}/${options.functionName}.routes.types`;
+  const importPath = `@sbfn/${options.functionName}/${options.functionName}.routes.types`;
 
   let content = fs.readFileSync(options.httpAPITypesPath, "utf-8");
 

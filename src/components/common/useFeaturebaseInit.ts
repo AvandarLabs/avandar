@@ -15,7 +15,9 @@ export function useFeaturebaseInit(): void {
         // section for the details:
         // https://help.featurebase.app/en/articles/3774671-advanced#7k8iriyap66
         metadata: null,
-        // featurebaseJwt: generatedTokenValue // Authenticate user in the widget - should be skipped if using recommended SDK identification functionality
+        // featurebaseJwt: generatedTokenValue // Authenticate user in the
+        // widget - should be skipped if using recommended SDK identification
+        // functionality
       });
     }
   }, []);

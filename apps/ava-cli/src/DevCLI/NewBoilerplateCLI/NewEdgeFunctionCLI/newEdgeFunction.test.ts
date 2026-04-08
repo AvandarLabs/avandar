@@ -127,7 +127,7 @@ export type HTTPMethod = "GET";
 
     const written = fs.readFileSync(filePath, "utf-8");
     expect(written).toContain("import type { MyFnAPI } from");
-    expect(written).toContain("my-fn/my-fn.routes.types");
+    expect(written).toContain("@sbfn/my-fn/my-fn.routes.types");
     expect(written).toContain("type FullAPI = MyFnAPI &");
   });
 });
