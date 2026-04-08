@@ -134,7 +134,7 @@ describe("writeNewPackageBoilerplate", () => {
 
     writeNewPackageBoilerplate({
       packageName: "my-lib",
-      runtime: "shared",
+      packageType: "shared",
     });
 
     const mock = writeFileFromTemplate as ReturnType<typeof vi.fn>;
@@ -158,7 +158,7 @@ describe("writeNewPackageBoilerplate", () => {
 
     writeNewPackageBoilerplate({
       packageName: "my-lib",
-      runtime: "shared",
+      packageType: "shared",
     });
 
     const writeMock = fs.writeFileSync as ReturnType<typeof vi.fn>;
@@ -184,7 +184,7 @@ describe("writeNewPackageBoilerplate", () => {
 
     writeNewPackageBoilerplate({
       packageName: "my-lib",
-      runtime: "shared",
+      packageType: "shared",
     });
 
     const writeMock = fs.writeFileSync as ReturnType<typeof vi.fn>;
@@ -208,7 +208,7 @@ describe("writeNewPackageBoilerplate", () => {
 
     writeNewPackageBoilerplate({
       packageName: "my-lib",
-      runtime: "shared",
+      packageType: "shared",
     });
 
     const writeMock = fs.writeFileSync as ReturnType<typeof vi.fn>;
@@ -233,7 +233,7 @@ describe("writeNewPackageBoilerplate", () => {
 
       writeNewPackageBoilerplate({
         packageName: "my-lib",
-        runtime: "shared",
+        packageType: "shared",
       });
 
       const writeMock = fs.writeFileSync as ReturnType<typeof vi.fn>;
@@ -267,7 +267,7 @@ describe("writeNewPackageBoilerplate", () => {
 
     writeNewPackageBoilerplate({
       packageName: "my-lib",
-      runtime: "shared",
+      packageType: "shared",
     });
 
     const writeMock = fs.writeFileSync as ReturnType<typeof vi.fn>;
@@ -290,7 +290,7 @@ describe("writeNewPackageBoilerplate", () => {
 
     writeNewPackageBoilerplate({
       packageName: "my-lib",
-      runtime: "shared",
+      packageType: "shared",
     });
 
     const writeMock = fs.writeFileSync as ReturnType<typeof vi.fn>;
@@ -342,11 +342,11 @@ describe("writeNewPackageBoilerplate", () => {
 
     writeNewPackageBoilerplate({
       packageName: "my-lib",
-      runtime: "shared",
+      packageType: "shared",
     });
 
     const logs = _getCombinedLogs();
-    expect(logs).toContain("tsconfig.base.json already has alias");
+    expect(logs).toContain("⚠️ tsconfig.base.json already has alias");
   });
 
   it(
@@ -379,11 +379,11 @@ describe("writeNewPackageBoilerplate", () => {
 
       writeNewPackageBoilerplate({
         packageName: "my-lib",
-        runtime: "shared",
+        packageType: "shared",
       });
 
       const logs = _getCombinedLogs();
-      expect(logs).toContain("tsconfig.app.json already has");
+      expect(logs).toContain("⚠️ tsconfig.app.json already has");
     },
   );
 
@@ -422,11 +422,11 @@ describe("writeNewPackageBoilerplate", () => {
 
     writeNewPackageBoilerplate({
       packageName: "my-lib",
-      runtime: "shared",
+      packageType: "shared",
     });
 
     const logs = _getCombinedLogs();
-    expect(logs).toContain("deno.json workspace already has");
+    expect(logs).toContain("⚠️ deno.json workspace already has");
   });
 
   it("skips .vscode/settings.json when path " + "already exists", async () => {
@@ -457,11 +457,11 @@ describe("writeNewPackageBoilerplate", () => {
 
     writeNewPackageBoilerplate({
       packageName: "my-lib",
-      runtime: "shared",
+      packageType: "shared",
     });
 
     const logs = _getCombinedLogs();
-    expect(logs).toContain(".vscode/settings.json already has");
+    expect(logs).toContain("⚠️ .vscode/settings.json already has");
   });
 
   it("logs success messages", async () => {
@@ -470,11 +470,27 @@ describe("writeNewPackageBoilerplate", () => {
 
     writeNewPackageBoilerplate({
       packageName: "my-lib",
-      runtime: "shared",
+      packageType: "shared",
     });
 
     const logs = _getCombinedLogs();
-    expect(logs).toContain("Created package in: packages/shared/my-lib");
-    expect(logs).toContain("Registered alias: @my-lib");
+    expect(logs).toContain("📦 Created package in: packages/shared/my-lib");
+    expect(logs).toContain("✅ Registered alias: @my-lib");
+  });
+
+  it("does not write deno.json for node packages", async () => {
+    const { writeNewPackageBoilerplate } =
+      await import("./writeNewPackageBoilerplate");
+
+    writeNewPackageBoilerplate({
+      packageName: "my-tool",
+      packageType: "node",
+    });
+
+    const writeMock = fs.writeFileSync as ReturnType<typeof vi.fn>;
+    const denoWrites = writeMock.mock.calls.filter((c: unknown[]) => {
+      return typeof c[0] === "string" && c[0].endsWith("deno.json");
+    });
+    expect(denoWrites.length).toBe(0);
   });
 });

@@ -1,3 +1,5 @@
+import { template } from "@utils/strings/template/template";
+
 export type TemplateParams = Readonly<Record<string, string>>;
 
 type ParseTemplateOptions = Readonly<{
@@ -6,34 +8,25 @@ type ParseTemplateOptions = Readonly<{
 }>;
 
 export function parseTemplate(options: ParseTemplateOptions): string {
-  return fillTemplate({
-    template: options.template,
-    params: options.params,
-  });
-}
-
-/** Fill a template using `params` tokens (e.g. `$NAME$`). */
-function fillTemplate(options: {
-  template: string;
-  params: TemplateParams;
-}): string {
-  const applyReplacement = (current: string, entry: [string, string]) => {
-    const [key, value] = entry;
-    const token = getTokenFromKey(key);
-
-    return current.replaceAll(token, value);
-  };
-
-  return Object.entries(options.params).reduce(
-    applyReplacement,
-    options.template,
+  return template(options.template).parse(
+    _normalizeTemplateParams(options.params),
   );
 }
 
-function getTokenFromKey(key: string): string {
-  if (key.startsWith("$") && key.endsWith("$")) {
-    return key;
+/**
+ * Maps param keys to `template()` keys (`$KEY$` in the string uses `KEY`).
+ * Accepts either `NAME` or `$NAME$` style keys (legacy).
+ */
+function _normalizeTemplateParams(
+  params: TemplateParams,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(params)) {
+    if (key.startsWith("$") && key.endsWith("$")) {
+      out[key.slice(1, -1)] = value;
+    } else {
+      out[key] = value;
+    }
   }
-
-  return `$${key}$`;
+  return out;
 }

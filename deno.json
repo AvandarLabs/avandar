@@ -15,7 +15,8 @@
     "./supabase/functions/queries",
     "./supabase/functions/subscriptions",
     "./supabase/functions/waitlist",
-    "./supabase/functions/workspaces"
+    "./supabase/functions/workspaces",
+    "./supabase/functions/support"
   ],
   "imports": {
     "$/": "./shared/",

@@ -1,3 +1,4 @@
+import type { SupportAPI } from "../../supabase/functions/support/support.routes.types";
 import type { GoogleAuthCallbackAPI } from "@sbfn/google-auth-callback/google-auth-callback.types";
 import type { GoogleAuthAPI } from "@sbfn/google-auth/google-auth.types";
 import type { GoogleSheetsAPI } from "@sbfn/google-sheets/google-sheets.types";
@@ -15,7 +16,8 @@ export type HTTPMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
  * Any new APIs that get added to the supabase/functions directory should
  * be added here.
  */
-type FullAPI = HealthzAPI &
+type FullAPI = SupportAPI &
+  HealthzAPI &
   QueriesAPI &
   WorkspacesAPI &
   GoogleAuthAPI &

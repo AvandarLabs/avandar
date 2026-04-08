@@ -1,35 +1,19 @@
-import type { Model } from "@/models/Model";
+import type { UUID } from "@utils/types/common.types.ts";
 import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
+import type { UserId } from "$/models/User/User.types.ts";
+import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 import type { SetOptional } from "type-fest";
-import type { WorkspaceId } from "@/models/Workspace/Workspace.types";
-import type { UUID } from "$/lib/types/common.types";
 
-type ModelType = "$MODEL_NAME$";
+export type $MODEL_NAME$Id = UUID<"$MODEL_NAME$">;
 
-export type $MODEL_NAME$Id = UUID<ModelType>;
+export type $MODEL_NAME$Read = {
+  id: $MODEL_NAME$Id;
+  ownerId: UserId;
+  workspaceId: WorkspaceId;
+  createdAt: string;
+  updatedAt: string;
+};
 
-export type $MODEL_NAME$Read = Model<
-  ModelType,
-  {
-    /** Timestamp of when the $MODEL_NAME$ was created. */
-    createdAt: string;
-
-    /** The $MODEL_NAME$'s unique identifier. */
-    id: $MODEL_NAME$Id;
-
-    /** Workspace id the $MODEL_NAME$ belongs to. */
-    workspaceId: WorkspaceId;
-
-    /** Timestamp of when the $MODEL_NAME$ was last updated. */
-    updatedAt: string;
-
-    // Add additional fields here...
-  }
->;
-
-/**
- * CRUD type definitions for the $MODEL_NAME$ model.
- */
 export type $MODEL_NAME$Model = SupabaseCRUDModelSpec<
   {
     tableName: "$TABLE_NAME$";
@@ -39,9 +23,7 @@ export type $MODEL_NAME$Model = SupabaseCRUDModelSpec<
       Read: $MODEL_NAME$Read;
       Insert: SetOptional<
         $MODEL_NAME$Read,
-        | "createdAt"
-        | "id"
-        | "updatedAt"
+        "id" | "createdAt" | "updatedAt"
       >;
       Update: Partial<$MODEL_NAME$Read>;
     };
@@ -50,5 +32,3 @@ export type $MODEL_NAME$Model = SupabaseCRUDModelSpec<
     dbTablePrimaryKey: "id";
   }
 >;
-
-export type $MODEL_NAME$<K extends keyof $MODEL_NAME$Model = "Read"> = $MODEL_NAME$Model[K];

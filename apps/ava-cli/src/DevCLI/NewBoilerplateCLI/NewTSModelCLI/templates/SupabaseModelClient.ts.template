@@ -1,5 +1,5 @@
-import { createSupabaseCRUDClient } from "@/lib/clients/supabase/createSupabaseCRUDClient";
-import { $MODEL_NAME$Parsers } from "$PATH_TO_PARSERS$/$MODEL_NAME$";
+import { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupabaseCRUDClient";
+import { $MODEL_NAME$Parsers } from "$/models/$MODEL_PATH_FROM_MODELS_ROOT$/$MODEL_NAME$Parsers.ts";
 
 export const $MODEL_NAME$Client = createSupabaseCRUDClient({
   modelName: "$MODEL_NAME$",

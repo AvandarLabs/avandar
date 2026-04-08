@@ -2,12 +2,12 @@ import { MantineProvider } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
 import { ReactNode } from "react";
+import { useFeaturebaseInit } from "@/components/common/useFeaturebaseInit";
 import {
   cssVariablesResolver,
   MODAL_ROOT_Z_INDEX,
   Theme,
 } from "@/config/Theme";
-import { useFeaturebaseInit } from "./useFeaturebaseInit";
 
 type Props = {
   children: ReactNode;
