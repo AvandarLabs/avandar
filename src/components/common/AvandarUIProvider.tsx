@@ -19,7 +19,7 @@ export function AvandarUIProvider({ children }: Props): JSX.Element {
     <MantineProvider theme={Theme} cssVariablesResolver={cssVariablesResolver}>
       <ModalsProvider modalProps={{ zIndex: MODAL_ROOT_Z_INDEX }}>
         <Notifications position="bottom-right" />
-        {isFlagEnabled(FeatureFlag.EnableFeaturebase) ?
+        {isFlagEnabled(FeatureFlag.EnableUserFeedback) ?
           <FeedbackButton />
         : null}
         {children}
