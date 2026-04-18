@@ -37,11 +37,6 @@ export enum FeatureFlag {
   DisableManualData = "disable-manual-data",
 
   /**
-   * Disable inviting users to a workspace until the feature is ready.
-   */
-  DisableUserInvites = "disable-user-invites",
-
-  /**
    * Disable the Geo Explorer feature.
    */
   DisableGeoExplorer = "disable-geo-explorer",
@@ -50,6 +45,15 @@ export enum FeatureFlag {
    * Disable the Profile Manager feature.
    */
   DisableProfileManager = "disable-profile-manager",
+
+  /**
+   * Enable the Featurebase feedback widget.
+   *
+   * When this is on, the feedback button will be enabled. By default, it is
+   * disabled. Enable this only if you want to allow users to submit feedback.
+   * This requires a Featurebase account and organization setup.
+   */
+  EnableFeaturebase = "enable-featurebase",
 }
 
 export const FeatureFlagConfig = {
@@ -58,9 +62,9 @@ export const FeatureFlagConfig = {
   },
   [FeatureFlag.RequireSignUpCode]: undefined,
   [FeatureFlag.DisableManualData]: undefined,
-  [FeatureFlag.DisableUserInvites]: undefined,
   [FeatureFlag.DisableGeoExplorer]: undefined,
   [FeatureFlag.DisableProfileManager]: undefined,
+  [FeatureFlag.EnableFeaturebase]: undefined,
 } as const satisfies Registry<FeatureFlag>;
 
 export function isFlagEnabled(featureFlag: FeatureFlag): boolean {
