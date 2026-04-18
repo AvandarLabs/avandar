@@ -1,7 +1,5 @@
-import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns.ts";
-import type {
-  PartialStructuredQuery,
-} from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
 type Options = {
@@ -59,9 +57,7 @@ export function shouldHydrateVizFromQueryResult(options: Options): boolean {
     return true;
   }
 
-  const derivedNames = query.queryColumns.map(
-    QueryColumns.getDerivedColumnName,
-  );
+  const derivedNames = query.queryColumns.map(QueryColumn.getDerivedColumnName);
   const anyDerivedAppearsInResult = derivedNames.some((name) => {
     return resultColumnNames.has(name);
   });

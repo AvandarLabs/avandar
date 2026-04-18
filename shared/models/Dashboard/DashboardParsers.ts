@@ -13,7 +13,6 @@ import type {
   ZodSchemaEqualsTypes,
 } from "@utils/types/test-utilities.types.ts";
 import type {
-  Dashboard,
   DashboardId,
   DashboardModel,
 } from "$/models/Dashboard/Dashboard.types.ts";
@@ -41,7 +40,7 @@ export const DashboardParsers = makeParserRegistry<DashboardModel>().build({
   fromDBReadToModelRead: pipe(
     camelCaseKeysDeep,
     nullsToUndefinedDeep,
-    (obj): Dashboard => {
+    (obj): DashboardModel["Read"] => {
       return Model.make("Dashboard", {
         ...obj,
         id: obj.id as DashboardId,

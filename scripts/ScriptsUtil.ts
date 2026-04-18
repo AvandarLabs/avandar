@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { User } from "$/models/User/User.types";
+import type { User } from "$/models/User/User";
 import type { Database } from "$/types/database.types";
 
 export const ScriptsUtil = {
@@ -12,7 +12,7 @@ export const ScriptsUtil = {
   async createUser(
     user: { email: string; password: string },
     dbClient: SupabaseClient<Database>,
-  ): Promise<User> {
+  ): Promise<User.T> {
     const { data, error } = await dbClient.auth.signUp({
       email: user.email,
       password: user.password,
@@ -34,6 +34,6 @@ export const ScriptsUtil = {
       email: data.user.email,
     });
 
-    return data.user as User;
+    return data.user as User.T;
   },
 };

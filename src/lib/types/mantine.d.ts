@@ -24,6 +24,9 @@ type ExtendedCustomSpacing =
 
 declare module "@mantine/core" {
   export interface MantineThemeOther {
+    /** Primary color */
+    primaryColor: string;
+
     navbar: {
       /** Navbar background color */
       backgroundColor: string;

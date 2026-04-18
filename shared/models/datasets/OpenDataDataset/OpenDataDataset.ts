@@ -4,6 +4,8 @@ import type {
   OpenDataDatasetModel,
 } from "$/models/datasets/OpenDataDataset/OpenDataDataset.types.ts";
 
+export { OpenDataDatasetParsers } from "$/models/datasets/OpenDataDataset/OpenDataDatasetParsers.ts";
+
 export namespace OpenDataDataset {
   export type T<K extends keyof OpenDataDatasetModel = "Read"> =
     OpenDataDatasetModel[K];

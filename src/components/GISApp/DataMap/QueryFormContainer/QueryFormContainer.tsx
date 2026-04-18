@@ -5,22 +5,22 @@ import { Model } from "@models/Model/Model";
 import { IconFilter } from "@tabler/icons-react";
 import { notifyError } from "@ui/notifications/notify";
 import { Tooltip } from "@ui/Tooltip/Tooltip";
-import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
+import { QueryColumn as QueryColumnFns } from "$/models/queries/QueryColumn/QueryColumn";
 import { mantineColorVar, mantineVar } from "@/lib/utils/browser/css";
 import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect";
 import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 
 type Props = {
   selectedDataSource?: QueryDataSource;
   onSelectedDataSourceChange: (dataSource: QueryDataSource | undefined) => void;
-  latitudeColumn?: QueryColumn;
-  onLatitudeColumnChange: (column: QueryColumn | undefined) => void;
-  longitudeColumn?: QueryColumn;
-  onLongitudeColumnChange: (column: QueryColumn | undefined) => void;
-  symbolSizeColumn?: QueryColumn;
-  onSymbolSizeColumnChange: (column: QueryColumn | undefined) => void;
+  latitudeColumn?: QueryColumn.T;
+  onLatitudeColumnChange: (column: QueryColumn.T | undefined) => void;
+  longitudeColumn?: QueryColumn.T;
+  onLongitudeColumnChange: (column: QueryColumn.T | undefined) => void;
+  symbolSizeColumn?: QueryColumn.T;
+  onSymbolSizeColumnChange: (column: QueryColumn.T | undefined) => void;
   symbolColor?: string;
   onSymbolColorChange: (color: string | undefined) => void;
 };
@@ -126,7 +126,7 @@ export function QueryFormContainer({
               }
               value={symbolSizeColumn ?? null}
               onChange={(value) => {
-                if (value && !QueryColumns.isNumeric(value)) {
+                if (value && !QueryColumnFns.isNumeric(value)) {
                   notifyError({
                     title: "Invalid column type",
                     message: "Symbol size column must be numeric.",

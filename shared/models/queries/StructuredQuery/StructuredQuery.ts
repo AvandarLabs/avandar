@@ -4,7 +4,7 @@ import type {
   StructuredQueryRead,
 } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 
-export { StructuredQueryUtils as StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQueryUtils/StructuredQueryUtils.ts";
+export { StructuredQueryModule as StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQueryModule.ts";
 
 export namespace StructuredQuery {
   export type T = StructuredQueryRead;

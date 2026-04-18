@@ -1,9 +1,9 @@
+import type { UUID } from "@utils/types/common.types.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type {
   WorkspaceId,
   WorkspaceRole,
 } from "$/models/Workspace/Workspace.types.ts";
-import type { UUID } from "@utils/types/common.types.ts";
 
 export type UserProfileId = UUID<"UserProfile">;
 export type MembershipId = UUID<"Membership">;
@@ -18,7 +18,7 @@ export type MembershipId = UUID<"Membership">;
  *
  * If you want the Supabase user id, use the `userId` property of this object.
  */
-export type UserProfile = {
+export type UserProfileRead = {
   /**
    * **NOTE:** This is actually the user **profile** id, not the user id.
    * Meaning, this is the id of the user profile for a specific workspace.
@@ -41,6 +41,6 @@ export type UserProfile = {
   updatedAt: Date;
 };
 
-export type UserProfileWithRole = UserProfile & {
+export type UserProfileWithRole = UserProfileRead & {
   role: WorkspaceRole;
 };

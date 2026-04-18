@@ -5,14 +5,14 @@ import { Select } from "@ui/inputs/Select/Select";
 import { where } from "@utils/filters/where/where";
 import { makeIdLookupMap } from "@utils/index";
 import { prop } from "@utils/objects/hofs/prop/prop";
-import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
+import { QueryColumn as QueryColumnModule } from "$/models/queries/QueryColumn/QueryColumn";
 import { useEffect, useMemo } from "react";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import type { SelectProps } from "@ui/inputs/Select/Select";
 import type {
-  QueryColumn,
   QueryColumnId,
+  QueryColumnRead,
 } from "$/models/queries/QueryColumn/QueryColumn.types";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { ReactNode } from "react";
@@ -21,9 +21,9 @@ type Props = {
   label: ReactNode;
   placeholder: string;
   dataSourceId?: Model.TypedId<QueryDataSource>;
-  value?: QueryColumn | null;
-  defaultValue?: QueryColumn | null;
-  onChange?: (field: QueryColumn | null) => void;
+  value?: QueryColumnRead | null;
+  defaultValue?: QueryColumnRead | null;
+  onChange?: (field: QueryColumnRead | null) => void;
 } & Omit<SelectProps<QueryColumnId>, "value" | "defaultValue" | "onChange">;
 
 export function QueryColumnSingleSelect({
@@ -36,7 +36,7 @@ export function QueryColumnSingleSelect({
   ...selectProps
 }: Props): JSX.Element {
   const [currentSelectedColumn, setCurrentSelectedColumn] =
-    useUncontrolled<QueryColumn | null>({
+    useUncontrolled<QueryColumnRead | null>({
       value,
       defaultValue,
       onChange,
@@ -64,14 +64,14 @@ export function QueryColumnSingleSelect({
   const isLoading = isLoadingDatasetColumns || isLoadingEntityFieldConfigs;
 
   const { selectableOptions, queryColumnLookup } = useMemo(() => {
-    // TODO(jpsyx): this conversion to QueryColumns should happen in the clients
+    // TODO(jpsyx): this conversion to QueryColumn should happen in the clients
     // and there should be a global cache
     const queryColumns = [
       ...(datasetColumns ?? []).map((col) => {
-        return QueryColumns.makeFromDatasetColumn(col);
+        return QueryColumnModule.makeFromDatasetColumn(col);
       }),
       ...(entityFieldConfigs ?? []).map((col) => {
-        return QueryColumns.makeFromEntityFieldConfig(col);
+        return QueryColumnModule.makeFromEntityFieldConfig(col);
       }),
     ];
 

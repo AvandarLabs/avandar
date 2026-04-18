@@ -1,4 +1,4 @@
-import type { FormType } from "@/lib/hooks/ui/useForm";
+import type { FormType } from "@/lib/hooks/ui/useForm/useForm";
 import type { SelectData, SelectOption } from "@ui/inputs/Select/Select";
 import type { StringKeyOf } from "@utils/types/utilities.types";
 import type { HTMLInputAutoCompleteAttribute, ReactNode } from "react";

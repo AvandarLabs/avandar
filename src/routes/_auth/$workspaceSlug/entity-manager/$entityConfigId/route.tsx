@@ -10,13 +10,13 @@ import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient"
 import { EntityManagerApp } from "@/components/EntityManagerApp";
 import { Callout } from "@/lib/ui/Callout";
 import { Logger } from "@/utils/Logger";
-import type { EntityConfig } from "$/models/EntityConfig/EntityConfig.types";
+import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 
 export const Route = createFileRoute(
   "/_auth/$workspaceSlug/entity-manager/$entityConfigId",
 )({
   component: RouteComponent,
-  loader: async ({ params: { entityConfigId } }): Promise<EntityConfig> => {
+  loader: async ({ params: { entityConfigId } }): Promise<EntityConfig.T> => {
     const entityConfig = await EntityConfigClient.getById({
       id: uuid(entityConfigId),
     });

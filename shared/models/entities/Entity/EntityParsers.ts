@@ -9,7 +9,6 @@ import { ZodSchemaEqualsTypes } from "@utils/types/test-utilities.types.ts";
 import { z } from "zod";
 import type { Expect } from "@utils/types/test-utilities.types.ts";
 import type {
-  Entity,
   EntityId,
   EntityModel,
 } from "$/models/entities/Entity/Entity.types.ts";
@@ -34,7 +33,7 @@ export const EntityParsers = makeParserRegistry<EntityModel>().build({
   fromDBReadToModelRead: pipe(
     camelCaseKeysDeep,
     nullsToUndefinedDeep,
-    (obj): Entity => {
+    (obj): EntityModel["Read"] => {
       return {
         ...obj,
         id: obj.id as EntityId,

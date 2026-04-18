@@ -75,7 +75,3 @@ export type OpenDataCatalogEntryModel = SupabaseCRUDModelSpec<
     dbTablePrimaryKey: "id";
   }
 >;
-
-export type OpenDataCatalogEntry<
-  K extends keyof OpenDataCatalogEntryModel = "Read",
-> = OpenDataCatalogEntryModel[K];

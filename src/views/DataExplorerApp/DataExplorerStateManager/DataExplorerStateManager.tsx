@@ -1,6 +1,7 @@
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { makeObject } from "@utils/objects/makeObject/makeObject";
 import { setValue } from "@utils/objects/setValue/setValue";
+import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
 import {
   applyVizConfigFromQueryResult,
   isVizConfigEqualForQueryResultSync,
@@ -12,11 +13,8 @@ import type {
   DataExplorerAppState,
   OpenDatasetInfo,
 } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
-import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
-import type {
-  QueryColumn,
-  QueryColumnId,
-} from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
@@ -46,7 +44,7 @@ export const DataExplorerStateManager = createAppStateManager({
     /** Set the columns for the query. */
     setColumns: (
       state: DataExplorerAppState,
-      columns: readonly QueryColumn[],
+      columns: readonly QueryColumn.T[],
     ) => {
       const {
         query: { aggregations },
@@ -75,8 +73,8 @@ export const DataExplorerStateManager = createAppStateManager({
     setColumnAggregation: (
       state: DataExplorerAppState,
       payload: {
-        columnId: QueryColumnId;
-        aggregation: QueryAggregationType;
+        columnId: QueryColumn.Id;
+        aggregation: QueryAggregationType.T;
       },
     ) => {
       const { query, vizConfig } = state;

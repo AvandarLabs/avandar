@@ -5,14 +5,14 @@ import { sqlTemplate } from "@utils/index";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { makeObject } from "@utils/objects/makeObject/makeObject";
-import { EntityConfigModule } from "$/models/EntityConfig/EntityConfigUtils";
+import { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { DuckDBClient } from "@/clients/DuckDBClient";
+import { DuckDBClient } from "@/clients/DuckDBClient/DuckDBClient";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { getSQLSelectOfExtractor } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getDatasetColumnFieldValues";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import { Logger } from "@/utils/Logger";
-import type { Entity } from "$/models/entities/Entity/Entity.types";
+import type { Entity } from "$/models/entities/Entity/Entity";
 import type { BuildableEntityConfig } from "$/models/EntityConfig/EntityConfig.types";
 
 /**
@@ -21,7 +21,7 @@ import type { BuildableEntityConfig } from "$/models/EntityConfig/EntityConfig.t
 export async function generateEntities(
   entityConfig: BuildableEntityConfig,
 ): Promise<void> {
-  const entConfig = EntityConfigModule.bind(entityConfig);
+  const entConfig = EntityConfig.bind(entityConfig);
 
   // 1. Figure out what source datasets we need to query.
   const primaryKeyFields = entConfig.getIdFields();
@@ -131,7 +131,7 @@ export async function generateEntities(
   // optimization that can be done to only upsert new rows or rows that have
   // a new name. There is no need to upsert rows that already exist and have
   // not changed.
-  const jobSummary = await DuckDBClient.forEachQueryPage<Entity<"DBRead">>(
+  const jobSummary = await DuckDBClient.forEachQueryPage<Entity.T<"DBRead">>(
     { tableName: entityConfig.id, castTimestampsToISO: true },
     async (page) => {
       await EntityClient.crudFunctions.bulkInsert({

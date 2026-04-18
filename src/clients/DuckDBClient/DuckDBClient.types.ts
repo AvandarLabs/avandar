@@ -1,6 +1,6 @@
 import type { UUID } from "@utils/types/common.types";
 import type { DuckDBDataType } from "$/models/datasets/DatasetColumn/DuckDBDataTypes";
-import type { DuckDBQueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationTypes";
+import type { DuckDBQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
 
 /**
  * The CSV Reject Scans Table returns the following information:
@@ -183,7 +183,7 @@ export type DuckDBStructuredQuery = {
    *
    * **NOTE**: Key is the column name.
    */
-  aggregations?: Record<string, DuckDBQueryAggregationType>;
+  aggregations?: Record<string, DuckDBQueryAggregationTypeT>;
   offset?: number;
   limit?: number;
 

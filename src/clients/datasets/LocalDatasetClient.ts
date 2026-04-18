@@ -1,11 +1,11 @@
 import { createDexieCRUDClient } from "@/clients/dexie/createDexieCRUDClient";
-import { DuckDBClient } from "@/clients/DuckDBClient/index";
+import { DuckDBClient } from "@/clients/DuckDBClient/DuckDBClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { LocalDatasetParsers } from "@/models/LocalDataset/LocalDatasetParsers";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
+import type { DucKDBLoadCSVOptions } from "@/clients/DuckDBClient/DuckDBClient";
 import type { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/DuckDBClient.types";
-import type { DucKDBLoadCSVOptions } from "@/clients/DuckDBClient/index";
 import type { LocalDataset } from "@/models/LocalDataset/LocalDataset.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { UserId } from "$/models/User/User.types";

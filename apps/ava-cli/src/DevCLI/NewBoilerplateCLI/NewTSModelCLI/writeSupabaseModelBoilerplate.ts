@@ -1,28 +1,44 @@
 import * as path from "node:path";
-import { Acclimate } from "@avandar/acclimate";
-import { writeFileFromTemplate } from "@ava-cli/utils/writeFileFromTemplate/writeFileFromTemplate";
 import { TEMPLATES_DIR } from "@ava-cli/DevCLI/NewBoilerplateCLI/NewTSModelCLI/constants";
+import { writeFileFromTemplate } from "@ava-cli/utils/writeFileFromTemplate/writeFileFromTemplate";
+import { Acclimate } from "@avandar/acclimate";
 
+/**
+ * Writes a Supabase-backed model folder with parsers and a client stub.
+ */
 export function writeSupabaseModelBoilerplate(options: {
   modelName: string;
-  modelsDir: string;
+  modelsDirRelative: string;
   clientsDir: string;
+  modelPathFromModelsRoot: string;
+  addModule: boolean;
   templateParams: {
     MODEL_NAME: string;
     TABLE_NAME: string;
-    PATH_TO_PARSERS: string;
+    MODEL_PATH_FROM_MODELS_ROOT: string;
   };
 }): void {
-  const { modelName, modelsDir, clientsDir, templateParams } = options;
+  const {
+    modelName,
+    modelsDirRelative,
+    clientsDir,
+    addModule,
+    templateParams,
+  } = options;
 
-  const outputDir = path.posix.join(modelsDir, modelName);
+  const outputDir = path.posix.join(modelsDirRelative, modelName);
+
+  const mainTemplate =
+    addModule ?
+      "SupabaseModel.main.withModule.ts.template"
+    : "SupabaseModel.main.ts.template";
 
   writeFileFromTemplate({
     templateDir: TEMPLATES_DIR,
-    templateFileName: "SupabaseModel.index.ts.template",
+    templateFileName: mainTemplate,
     params: templateParams,
     outputDir,
-    outputFileName: "index.ts",
+    outputFileName: `${modelName}.ts`,
   });
 
   writeFileFromTemplate({
@@ -49,8 +65,20 @@ export function writeSupabaseModelBoilerplate(options: {
     outputFileName: `${modelName}Client.ts`,
   });
 
-  Acclimate.log(`|green|Created model files in: ${outputDir}`);
+  if (addModule) {
+    writeFileFromTemplate({
+      templateDir: TEMPLATES_DIR,
+      templateFileName: "ModelModule.ts.template",
+      params: templateParams,
+      outputDir,
+      outputFileName: `${modelName}Module.ts`,
+    });
+  }
+
   Acclimate.log(
-    `|green|Created client file in: ${clientsDir}/${modelName}Client.ts`,
+    `|green|📦 Created Supabase model at shared/models/${templateParams.MODEL_PATH_FROM_MODELS_ROOT}/`,
+  );
+  Acclimate.log(
+    `|green|📄 Created client: ${clientsDir}/${modelName}Client.ts`,
   );
 }

@@ -1,10 +1,11 @@
 import * as path from "node:path";
-import { Acclimate } from "@avandar/acclimate";
-import { isPascalCase } from "@ava-cli/utils/validators/isPascalCase/isPascalCase";
+import { getModelPathFromModelsRoot } from "@ava-cli/DevCLI/NewBoilerplateCLI/NewTSModelCLI/getModelPathFromModelsRoot";
 import { writeBasicModelBoilerplate } from "@ava-cli/DevCLI/NewBoilerplateCLI/NewTSModelCLI/writeBasicModelBoilerplate";
 import { writeSupabaseModelBoilerplate } from "@ava-cli/DevCLI/NewBoilerplateCLI/NewTSModelCLI/writeSupabaseModelBoilerplate";
+import { isPascalCase } from "@ava-cli/utils/validators/isPascalCase/isPascalCase";
+import { Acclimate } from "@avandar/acclimate";
 
-const OUTPUT_MODELS_DIR_BASE = "src/models";
+const OUTPUT_MODELS_DIR_BASE = "shared/models";
 const OUTPUT_CLIENTS_DIR_BASE = "src/clients";
 
 export const NewTSModelCLI = Acclimate.createCLI("model")
@@ -19,25 +20,39 @@ export const NewTSModelCLI = Acclimate.createCLI("model")
   })
   .addOption({
     name: "--models-dir",
-    aliases: ["-md"],
-    description: `Subdirectory in ${OUTPUT_MODELS_DIR_BASE} to write the '<ModelName>/' directory. Any missing intermediate directories will be created.`,
+    aliases: ["-mdir"],
+    description:
+      "Subdirectory under shared/models for the `<ModelName>/` folder " +
+      "(default: place the model directly under shared/models).",
     type: "string",
     required: false,
   })
   .addOption({
     name: "--supabase-table",
-    aliases: ["-st"],
+    aliases: ["-sb"],
     type: "string",
     description:
-      "If set, we create a model based off the given Supabase table with the appropriate CRUD types and parsers.",
+      "Snake_case Supabase table name. When set, generates CRUD types, " +
+      "parsers, and a client stub.",
     required: false,
   })
   .addOption({
     name: "--clients-dir",
-    aliases: ["-cd"],
+    aliases: ["-cdir"],
     type: "string",
-    description: `Subdirectory in ${OUTPUT_CLIENTS_DIR_BASE} to write the '<ModelName>Client.ts' file. Any missing intermediate directories will be created.`,
+    description:
+      `Subdirectory under ${OUTPUT_CLIENTS_DIR_BASE} for ` +
+      "`<ModelName>Client.ts` (Supabase mode only).",
     required: false,
+  })
+  .addOption({
+    name: "--add-module",
+    type: "boolean",
+    description:
+      "Also create `<ModelName>Module.ts` and re-export it from " +
+      "`<ModelName>.ts` (see QueryColumn).",
+    required: false,
+    defaultValue: false,
   })
   .action(
     ({
@@ -45,45 +60,62 @@ export const NewTSModelCLI = Acclimate.createCLI("model")
       modelsDir,
       clientsDir,
       supabaseTable,
+      addModule,
     }: Readonly<{
       modelName: string;
       modelsDir?: string;
       clientsDir?: string;
       supabaseTable?: string;
+      addModule?: boolean;
     }>) => {
+      Acclimate.log(`|cyan|🧱 Scaffolding model ${modelName}`);
+
       const outputModelsDir = _getOutputDir({
         baseDir: OUTPUT_MODELS_DIR_BASE,
         subDir: modelsDir,
       });
 
-      const outputClientsDir = _getOutputDir({
-        baseDir: OUTPUT_CLIENTS_DIR_BASE,
-        subDir: clientsDir,
+      const modelPathFromModelsRoot = getModelPathFromModelsRoot({
+        modelsDirRelative: outputModelsDir,
+        modelName,
       });
 
-      if (supabaseTable !== undefined) {
-        const pathToParsers = _getRelativeImportPath({
-          fromDir: outputClientsDir,
-          toDir: outputModelsDir,
+      const templateParams = {
+        MODEL_NAME: modelName,
+        MODEL_PATH_FROM_MODELS_ROOT: modelPathFromModelsRoot,
+      };
+
+      const shouldAddModule = addModule === true;
+
+      if (supabaseTable !== undefined && supabaseTable.trim() !== "") {
+        const tableName = supabaseTable.trim();
+        const outputClientsDir = _getOutputDir({
+          baseDir: OUTPUT_CLIENTS_DIR_BASE,
+          subDir: clientsDir,
         });
 
         writeSupabaseModelBoilerplate({
           modelName,
-          modelsDir: outputModelsDir,
+          modelsDirRelative: outputModelsDir,
           clientsDir: outputClientsDir,
+          modelPathFromModelsRoot,
+          addModule: shouldAddModule,
           templateParams: {
-            MODEL_NAME: modelName,
-            TABLE_NAME: supabaseTable,
-            PATH_TO_PARSERS: pathToParsers,
+            ...templateParams,
+            TABLE_NAME: tableName,
           },
         });
       } else {
         writeBasicModelBoilerplate({
           modelName,
-          modelsDir: outputModelsDir,
-          templateParams: { MODEL_NAME: modelName },
+          modelsDirRelative: outputModelsDir,
+          modelPathFromModelsRoot,
+          addModule: shouldAddModule,
+          templateParams,
         });
       }
+
+      Acclimate.log("|green|✅ Model scaffold finished.");
     },
   );
 
@@ -102,20 +134,4 @@ function _getOutputDir(options: {
   }
 
   return path.posix.join(options.baseDir, normalizedSubDir);
-}
-
-function _getRelativeImportPath(options: {
-  fromDir: string;
-  toDir: string;
-}): string {
-  const relativePath = path.posix.relative(options.fromDir, options.toDir);
-  if (relativePath === "") {
-    return ".";
-  }
-
-  if (relativePath.startsWith(".")) {
-    return relativePath;
-  }
-
-  return `./${relativePath}`;
 }

@@ -7,10 +7,10 @@ import {
   IconSettings,
   IconTable,
 } from "@tabler/icons-react";
-import { User } from "$/models/User/User.types";
 import { ReactNode } from "react";
 import { AppLink, AppLinkKey, AppLinks } from "@/config/AppLinks";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
+import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 export type NavbarLink = {
@@ -21,7 +21,7 @@ export type NavbarLink = {
    * Whether or not this link should be shown
    */
   isEnabled?: (options: {
-    user: User;
+    user: User.T;
     workspace: Workspace.WithSubscription;
   }) => boolean;
 };

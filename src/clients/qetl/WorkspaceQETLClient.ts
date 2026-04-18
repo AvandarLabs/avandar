@@ -4,7 +4,7 @@ import { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import { AuthClient } from "@/clients/AuthClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
-import { UnknownRow } from "@/clients/DuckDBClient/index";
+import { UnknownRow } from "@/clients/DuckDBClient/DuckDBClient";
 import { IQETLClient, QETLClientFactory } from "@/clients/qetl/QETLClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";

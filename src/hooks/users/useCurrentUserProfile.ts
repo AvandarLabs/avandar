@@ -1,7 +1,7 @@
 import { UserClient } from "@/clients/UserClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { UseQueryResult } from "@hooks/useQuery/useQuery";
-import type { UserProfile } from "$/models/User/UserProfile.types";
+import type { UserProfile } from "$/models/User/UserProfile";
 
 /**
  * Get the current user profile for the current workspace.
@@ -18,9 +18,9 @@ import type { UserProfile } from "$/models/User/UserProfile.types";
  * if the data is loading, and the full `useQuery` response object.
  */
 export function useCurrentUserProfile(): [
-  userProfile: UserProfile | undefined,
+  userProfile: UserProfile.T | undefined,
   isLoading: boolean,
-  response: UseQueryResult<UserProfile>,
+  response: UseQueryResult<UserProfile.T>,
 ] {
   const workspace = useCurrentWorkspace();
   const [userProfile, isLoadingUserProfile, response] =

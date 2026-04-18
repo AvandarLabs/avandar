@@ -10,7 +10,8 @@ import { where } from "@utils/filters/where/where";
 import { isNonNullish } from "@utils/guards/isNonNullish/isNonNullish";
 import { makeIdLookupMap } from "@utils/index";
 import { prop } from "@utils/objects/hofs/prop/prop";
-import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns";
+import { QueryColumn as QueryColumnFns } from "$/models/queries/QueryColumn/QueryColumn";
+import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
 import { matchSorter } from "match-sorter";
 import { useEffect, useMemo } from "react";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
@@ -22,10 +23,7 @@ import type {
   MultiSelectProps,
   OptionsFilter,
 } from "@mantine/core";
-import type {
-  QueryColumn,
-  QueryColumnId,
-} from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { ReactNode } from "react";
 
@@ -50,9 +48,9 @@ type Props = {
   label: ReactNode;
   placeholder: string;
   dataSourceId?: Model.TypedId<QueryDataSource>;
-  value?: readonly QueryColumn[];
-  defaultValue?: readonly QueryColumn[];
-  onChange?: (fields: readonly QueryColumn[]) => void;
+  value?: readonly QueryColumn.T[];
+  defaultValue?: readonly QueryColumn.T[];
+  onChange?: (fields: readonly QueryColumn.T[]) => void;
 } & Omit<MultiSelectProps, "value" | "defaultValue" | "onChange">;
 
 export function QueryColumnMultiSelect({
@@ -65,7 +63,7 @@ export function QueryColumnMultiSelect({
   ...multiSelectProps
 }: Props): JSX.Element {
   const [currentSelectedColumns, setCurrentSelectedColumns] = useUncontrolled<
-    readonly QueryColumn[]
+    readonly QueryColumn.T[]
   >({
     value,
     defaultValue,
@@ -94,10 +92,10 @@ export function QueryColumnMultiSelect({
   const { queryColumns, selectableOptions, queryColumnLookup } = useMemo(() => {
     const columns = [
       ...(datasetColumns ?? []).map((col) => {
-        return QueryColumns.makeFromDatasetColumn(col);
+        return QueryColumnFns.makeFromDatasetColumn(col);
       }),
       ...(entityFieldConfigs ?? []).map((col) => {
-        return QueryColumns.makeFromEntityFieldConfig(col);
+        return QueryColumnFns.makeFromEntityFieldConfig(col);
       }),
     ];
 

@@ -1,10 +1,10 @@
 import { ColorInput, Switch } from "@mantine/core";
-import { Select } from "@ui/inputs/Select/Select";
 import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
+import { Select } from "@ui/inputs/Select/Select";
 import { propPasses } from "@utils/objects/hofs/propPasses/propPasses";
-import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
-import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useMemo } from "react";
+import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
 
@@ -32,7 +32,7 @@ export function AreaChartForm({
 
   const numericFieldOptions = useMemo(() => {
     return makeSelectOptions(
-      fields.filter(propPasses("dataType", AvaDataTypes.isNumeric)),
+      fields.filter(propPasses("dataType", AvaDataType.isNumeric)),
       { valueKey: "name", labelKey: "name" },
     );
   }, [fields]);
@@ -48,7 +48,8 @@ export function AreaChartForm({
         value={xAxisKey}
         disabled={fieldOptions.length === 0}
         placeholder={
-          fieldOptions.length === 0 ? "No fields have been queried"
+          fieldOptions.length === 0 ?
+            "No fields have been queried"
           : "Select a field"
         }
         onChange={(field) => {

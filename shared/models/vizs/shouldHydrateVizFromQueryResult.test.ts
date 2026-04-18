@@ -1,28 +1,28 @@
-import { describe, expect, it } from "vitest";
-import { StructuredQueryUtils } from "$/models/queries/StructuredQuery/StructuredQueryUtils/StructuredQueryUtils.ts";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 import { shouldHydrateVizFromQueryResult } from "$/models/vizs/shouldHydrateVizFromQueryResult.ts";
+import { describe, expect, it } from "vitest";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
-function mockColumn(name: string): QueryColumn {
+function mockColumn(name: string): QueryColumn.T {
   return {
     aggregation: undefined,
     baseColumn: { name, dataType: "varchar" },
-  } as QueryColumn;
+  } as QueryColumn.T;
 }
 
 function _makeQueryWithColumns(
-  columns: QueryColumn[],
+  columns: QueryColumn.T[],
 ): PartialStructuredQuery {
   return {
-    ...StructuredQueryUtils.makeEmpty(),
+    ...StructuredQuery.makeEmpty(),
     queryColumns: columns,
   } as unknown as PartialStructuredQuery;
 }
 
 describe("shouldHydrateVizFromQueryResult", () => {
-  const emptyQuery = StructuredQueryUtils.makeEmpty();
+  const emptyQuery = StructuredQuery.makeEmpty();
 
   const barEmpty: VizConfig = {
     vizType: "bar",

@@ -1,7 +1,5 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { Acclimate } from "@avandar/acclimate";
-import { writeFileFromTemplate } from "@ava-cli/utils/writeFileFromTemplate/writeFileFromTemplate";
 import {
   EDGE_FUNCTION_DENO_TEMPLATE_PATH,
   PACKAGES_DIR,
@@ -9,8 +7,10 @@ import {
   TSCONFIG_APP_PATH,
   VSCODE_SETTINGS_PATH,
 } from "@ava-cli/DevCLI/NewBoilerplateCLI/NewPackageCLI/constants";
+import { writeFileFromTemplate } from "@ava-cli/utils/writeFileFromTemplate/writeFileFromTemplate";
+import { Acclimate } from "@avandar/acclimate";
 
-export type PackageRuntime = "shared" | "web";
+export type PackageType = "shared" | "web" | "node";
 
 const PROJECT_ROOT = process.cwd();
 const TSCONFIG_PATH = "tsconfig.base.json";
@@ -18,24 +18,28 @@ const DENO_JSON_PATH = "deno.json";
 const VITE_CONFIG_PATH = "vite.config.ts";
 
 /**
- * Writes all boilerplate files for a new package and
- * registers its path alias in tsconfig.base.json and
- * deno.json.
+ * Writes all boilerplate files for a new workspace package and registers
+ * path aliases. Deno integration applies only to `shared` packages.
  */
 export function writeNewPackageBoilerplate(options: {
   packageName: string;
-  runtime: PackageRuntime;
+  packageType: PackageType;
 }): void {
-  const { packageName, runtime } = options;
-  const outputDir = `${PACKAGES_DIR}/${runtime}/${packageName}`;
+  const { packageName, packageType } = options;
+  const outputDir = `${PACKAGES_DIR}/${packageType}/${packageName}`;
   const srcDir = `${outputDir}/src`;
   const templateParams = {
     PACKAGE_NAME: packageName,
+    PACKAGE_TYPE: packageType,
   };
+
+  const pkgJSONTemplate = `package.json.${packageType}.template`;
+  const tsconfigTemplate = `tsconfig.${packageType}.json.template`;
+  const vitestTemplate = `vitest.${packageType}.config.template`;
 
   writeFileFromTemplate({
     templateDir: TEMPLATES_DIR,
-    templateFileName: "package.json.template",
+    templateFileName: pkgJSONTemplate,
     params: templateParams,
     outputDir,
     outputFileName: "package.json",
@@ -43,7 +47,7 @@ export function writeNewPackageBoilerplate(options: {
 
   writeFileFromTemplate({
     templateDir: TEMPLATES_DIR,
-    templateFileName: "tsconfig.json.template",
+    templateFileName: tsconfigTemplate,
     params: templateParams,
     outputDir,
     outputFileName: "tsconfig.json",
@@ -51,8 +55,8 @@ export function writeNewPackageBoilerplate(options: {
 
   writeFileFromTemplate({
     templateDir: TEMPLATES_DIR,
-    templateFileName: "vitest.config.template.ts",
-    params: {},
+    templateFileName: vitestTemplate,
+    params: templateParams,
     outputDir,
     outputFileName: "vitest.config.ts",
   });
@@ -74,32 +78,38 @@ export function writeNewPackageBoilerplate(options: {
   });
 
   const alias = `@${packageName}`;
-  const pkgSrcDir = `packages/${runtime}/${packageName}/src`;
-  const packageDir = `./packages/${runtime}/${packageName}`;
+  const pkgSrcDir = `packages/${packageType}/${packageName}/src`;
+  const packageDir = `./packages/${packageType}/${packageName}`;
 
   _addTsconfigPathAlias({
     alias: `${alias}/*`,
     aliasTarget: `./${pkgSrcDir}/*`,
   });
   _addTsconfigAppInclude(`./${pkgSrcDir}`);
-  _addDenoImportAlias({
-    alias: `${alias}/`,
-    aliasTarget: `./${pkgSrcDir}/`,
-  });
-  _addDenoWorkspaceEntry(packageDir);
-  _addEdgeFunctionTemplateImportAlias({
-    alias: `${alias}/`,
-    aliasTarget: `../../../${pkgSrcDir}/`,
-  });
-  _addVscodeDenoEnablePath(packageDir);
-  _addViteConfigAlias({
-    alias,
-    aliasTarget: `/${pkgSrcDir}`,
-  });
 
-  Acclimate.log(`|green|Created package in: ${outputDir}`);
-  Acclimate.log(`|green|Registered alias: ${alias}`);
-  Acclimate.log("|cyan|Run `pnpm install` to link the new package.");
+  if (packageType === "shared") {
+    _addDenoImportAlias({
+      alias: `${alias}/`,
+      aliasTarget: `./${pkgSrcDir}/`,
+    });
+    _addDenoWorkspaceEntry(packageDir);
+    _addEdgeFunctionTemplateImportAlias({
+      alias: `${alias}/`,
+      aliasTarget: `../../../${pkgSrcDir}/`,
+    });
+    _addVscodeDenoEnablePath(packageDir);
+  }
+
+  if (packageType === "shared" || packageType === "web") {
+    _addViteConfigAlias({
+      alias,
+      aliasTarget: `/${pkgSrcDir}`,
+    });
+  }
+
+  Acclimate.log(`|green|📦 Created package in: ${outputDir}|`);
+  Acclimate.log(`|green|✅ Registered alias: ${alias}|`);
+  Acclimate.log("|cyan|💡 Run `pnpm install` to link the new package.|");
 }
 
 function _addTsconfigPathAlias(options: {
@@ -116,7 +126,7 @@ function _addTsconfigPathAlias(options: {
 
   if (config.compilerOptions.paths[options.alias]) {
     Acclimate.log(
-      `|yellow|tsconfig.base.json already has alias "${options.alias}", skipping.`,
+      `|yellow|⚠️ tsconfig.base.json already has alias "${options.alias}", skipping.|`,
     );
     return;
   }
@@ -143,7 +153,7 @@ function _addTsconfigAppInclude(packageSrcDir: string): void {
 
   if (config.include.includes(packageSrcDir)) {
     Acclimate.log(
-      `|yellow|tsconfig.app.json already has "${packageSrcDir}" in include, skipping.`,
+      `|yellow|⚠️ tsconfig.app.json already has "${packageSrcDir}" in include, skipping.|`,
     );
     return;
   }
@@ -174,7 +184,7 @@ function _addDenoImportAlias(options: {
 
   if (config.imports[options.alias]) {
     Acclimate.log(
-      `|yellow|deno.json already has alias "${options.alias}", skipping.`,
+      `|yellow|⚠️ deno.json already has alias "${options.alias}", skipping.|`,
     );
     return;
   }
@@ -201,7 +211,7 @@ function _addDenoWorkspaceEntry(packageDir: string): void {
 
   if (config.workspace.includes(packageDir)) {
     Acclimate.log(
-      `|yellow|deno.json workspace already has "${packageDir}", skipping.`,
+      `|yellow|⚠️ deno.json workspace already has "${packageDir}", skipping.|`,
     );
     return;
   }
@@ -239,7 +249,7 @@ function _addVscodeDenoEnablePath(packageDir: string): void {
 
   if (paths.includes(packageDir)) {
     Acclimate.log(
-      `|yellow|.vscode/settings.json already has "${packageDir}" in deno.enablePaths, skipping.`,
+      `|yellow|⚠️ .vscode/settings.json already has "${packageDir}" in deno.enablePaths, skipping.|`,
     );
     return;
   }
@@ -270,7 +280,7 @@ function _addEdgeFunctionTemplateImportAlias(options: {
 
   if (config.imports[options.alias]) {
     Acclimate.log(
-      `|yellow|deno.json.template.txt already has alias "${options.alias}", skipping.`,
+      `|yellow|⚠️ deno.json.template.txt already has alias "${options.alias}", skipping.|`,
     );
     return;
   }
@@ -297,7 +307,7 @@ function _addViteConfigAlias(options: {
 
   if (content.includes(`"${options.alias}"`)) {
     Acclimate.log(
-      `|yellow|vite.config.ts already has alias "${options.alias}", skipping.`,
+      `|yellow|⚠️ vite.config.ts already has alias "${options.alias}", skipping.|`,
     );
     return;
   }
@@ -312,7 +322,7 @@ function _addViteConfigAlias(options: {
 
   if (lastPkgAliasIndex === -1) {
     Acclimate.log(
-      "|yellow|Could not find package aliases in vite.config.ts, skipping.",
+      "|yellow|⚠️ Could not find package aliases in vite.config.ts, skipping.|",
     );
     return;
   }

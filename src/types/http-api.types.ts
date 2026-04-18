@@ -1,10 +1,11 @@
 import type { GoogleAuthCallbackAPI } from "@sbfn/google-auth-callback/google-auth-callback.types";
 import type { GoogleAuthAPI } from "@sbfn/google-auth/google-auth.types";
 import type { GoogleSheetsAPI } from "@sbfn/google-sheets/google-sheets.types";
-import type { HealthAPI } from "@sbfn/health/health.types";
+import type { HealthzAPI } from "@sbfn/healthz/healthz.types";
 import type { PolarPublicAPI } from "@sbfn/polar-public/polar-public.types";
 import type { QueriesAPI } from "@sbfn/queries/queries.types";
 import type { SubscriptionsAPI } from "@sbfn/subscriptions/subscriptions.routes.types";
+import type { SupportAPI } from "@sbfn/support/support.routes.types";
 import type { WaitlistAPI } from "@sbfn/waitlist/waitlist.types";
 import type { WorkspacesAPI } from "@sbfn/workspaces/workspaces.routes.types";
 import type { Simplify } from "type-fest";
@@ -15,7 +16,8 @@ export type HTTPMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
  * Any new APIs that get added to the supabase/functions directory should
  * be added here.
  */
-type FullAPI = HealthAPI &
+type FullAPI = SupportAPI &
+  HealthzAPI &
   QueriesAPI &
   WorkspacesAPI &
   GoogleAuthAPI &

@@ -1,6 +1,6 @@
 import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
-import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
+import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource.ts";
 import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
@@ -73,8 +73,6 @@ export type DatasetModel = SupabaseCRUDModelSpec<
   }
 >;
 
-export type Dataset<K extends keyof DatasetModel = "Read"> = DatasetModel[K];
-
-export type DatasetWithColumns = Dataset & {
-  columns: readonly DatasetColumn[];
+export type DatasetWithColumns = DatasetModel["Read"] & {
+  columns: readonly DatasetColumnRead[];
 };

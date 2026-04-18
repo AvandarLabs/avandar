@@ -1,5 +1,5 @@
 import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray.ts";
-import { QueryColumns } from "$/models/queries/QueryColumn/QueryColumns.ts";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 
 type XYAxesConfig = {
@@ -24,11 +24,11 @@ export function hydrateXYFromQuery<VConfig extends XYAxesConfig>(
   const isXAXisStillValid = query.queryColumns.some((col) => {
     // TODO(jpsyx): this will change when we compare columns by their IDs
     // instead of their derived names
-    return QueryColumns.getDerivedColumnName(col) === prevXAxisKey;
+    return QueryColumn.getDerivedColumnName(col) === prevXAxisKey;
   });
   const isYAxisStillValid = query.queryColumns.some((col) => {
     // TODO(jpsyx): see note above for the X axis check
-    return QueryColumns.getDerivedColumnName(col) === prevYAxisKey;
+    return QueryColumn.getDerivedColumnName(col) === prevYAxisKey;
   });
 
   // for each axis that is invalid, we clear it from the existing config
@@ -43,12 +43,12 @@ export function hydrateXYFromQuery<VConfig extends XYAxesConfig>(
     const { queryColumns } = query;
     // if we're missing a Y axis, choose the first numeric column available
     if (yAxisKey === undefined && isNonEmptyArray(queryColumns)) {
-      const firstNumericColumn = queryColumns.find(QueryColumns.isNumeric);
+      const firstNumericColumn = queryColumns.find(QueryColumn.isNumeric);
       newVizConfig = {
         ...newVizConfig,
         yAxisKey:
           firstNumericColumn ?
-            QueryColumns.getDerivedColumnName(firstNumericColumn)
+            QueryColumn.getDerivedColumnName(firstNumericColumn)
           : undefined,
       };
     }
@@ -59,14 +59,14 @@ export function hydrateXYFromQuery<VConfig extends XYAxesConfig>(
     // the Y axis
     if (xAxisKey === undefined && isNonEmptyArray(queryColumns)) {
       const firstColumn = queryColumns.find((col) => {
-        return QueryColumns.getDerivedColumnName(col) !== newYAxisKey;
+        return QueryColumn.getDerivedColumnName(col) !== newYAxisKey;
       });
 
       newVizConfig = {
         ...newVizConfig,
         xAxisKey:
           firstColumn ?
-            QueryColumns.getDerivedColumnName(firstColumn)
+            QueryColumn.getDerivedColumnName(firstColumn)
           : undefined,
       };
     }

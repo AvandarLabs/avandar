@@ -6,7 +6,7 @@ import { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.type
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useForm } from "@/lib/hooks/ui/useForm";
+import { useForm } from "@/lib/hooks/ui/useForm/useForm";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import css from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.module.css";
 

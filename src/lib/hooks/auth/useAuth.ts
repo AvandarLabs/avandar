@@ -5,7 +5,7 @@ import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import type { AnyRouter } from "@tanstack/react-router";
-import type { User } from "$/models/User/User.types";
+import type { User } from "$/models/User/User";
 
 /**
  * This function should be called from the root component of the app.
@@ -14,8 +14,12 @@ import type { User } from "$/models/User/User.types";
  * the routes so that the appropriate page can load.
  *
  * @returns The current user or undefined if the user is not authenticated
+ *
+ * TODO(jpsyx): rename this to `useRootAuth` and then create a separate
+ * `useUser` that uses RootRoute.useRouteContext().user instead.
+ * `useRootAuth` should be used no where else other than in main.tsx.
  */
-export function useAuth(router: AnyRouter): { user: User | undefined } {
+export function useAuth(router: AnyRouter): { user: User.T | undefined } {
   const [user, setUser] = useState<SupabaseUser | undefined>(undefined);
   const pendingRedirectRef = useRef<string | null>(null);
   const hadUserRef = useRef(false);
@@ -28,19 +32,17 @@ export function useAuth(router: AnyRouter): { user: User | undefined } {
 
     getSession();
 
-    const subscription = AuthClient.onAuthStateChange(
-      (_event, newSession) => {
-        if (newSession?.user) {
-          const currentLocation = router.state.location;
-          const searchParams = new URLSearchParams(currentLocation.search);
-          const redirectParam = searchParams.get("redirect");
-          if (redirectParam) {
-            pendingRedirectRef.current = redirectParam;
-          }
+    const subscription = AuthClient.onAuthStateChange((_event, newSession) => {
+      if (newSession?.user) {
+        const currentLocation = router.state.location;
+        const searchParams = new URLSearchParams(currentLocation.search);
+        const redirectParam = searchParams.get("redirect");
+        if (redirectParam) {
+          pendingRedirectRef.current = redirectParam;
         }
-        setUser(newSession?.user ?? undefined);
-      },
-    );
+      }
+      setUser(newSession?.user ?? undefined);
+    });
 
     return () => {
       subscription.unsubscribe();
@@ -73,7 +75,7 @@ export function useAuth(router: AnyRouter): { user: User | undefined } {
   }, [user, router]);
 
   if (user && hasDefinedProps(user, "email")) {
-    return { user: user as User };
+    return { user: user as User.T };
   }
   return { user: undefined };
 }

@@ -68,6 +68,3 @@ export type DashboardModel = SupabaseCRUDModelSpec<
     dbTablePrimaryKey: "id";
   }
 >;
-
-export type Dashboard<K extends keyof DashboardModel = "Read"> =
-  DashboardModel[K];

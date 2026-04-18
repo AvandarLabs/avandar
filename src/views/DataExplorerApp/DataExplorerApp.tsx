@@ -17,15 +17,15 @@ import {
   IconInfoCircle,
   IconRotateClockwise,
 } from "@tabler/icons-react";
-import { useEffect, useMemo } from "react";
 import { notifyError, notifyNotImplemented, notifySuccess } from "@ui/index";
 import { Tooltip } from "@ui/Tooltip/Tooltip";
 import { isEpochMs, isISODateString, prop } from "@utils/index";
-import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
-import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import { useEffect, useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
+import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { downloadRowsAsCSV } from "@/views/DataExplorerApp/downloadRowsAsCSV";
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetModal/OpenDatasetModal";
@@ -136,7 +136,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
       .filter((f) => {
         const sampleVal = queryResultData[0]?.[f.name];
         return (
-          AvaDataTypes.isTemporal(f.dataType) ||
+          AvaDataType.isTemporal(f.dataType) ||
           isISODateString(sampleVal) ||
           isEpochMs(sampleVal)
         );

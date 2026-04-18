@@ -18,8 +18,8 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset.types";
-import type { VirtualDatasetRead } from "$/models/datasets/VirtualDataset/VirtualDataset.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 
 type Props = {
   onOpen: (info: OpenDatasetInfo, rawSQL: string) => void;
@@ -62,7 +62,7 @@ export function OpenDatasetModal({ onOpen }: Props): JSX.Element {
   });
 
   const [loadVirtualDataset, isLoadingVirtualDataset] = useMutation({
-    mutationFn: async (dataset: Dataset) => {
+    mutationFn: async (dataset: Dataset.T) => {
       const virtualDataset = await VirtualDatasetClient.getOne(
         where("dataset_id", "eq", dataset.id),
       );
@@ -75,8 +75,8 @@ export function OpenDatasetModal({ onOpen }: Props): JSX.Element {
       dataset,
       virtualDataset,
     }: {
-      dataset: Dataset;
-      virtualDataset: VirtualDatasetRead;
+      dataset: Dataset.T;
+      virtualDataset: VirtualDataset.T;
     }) => {
       onOpen(
         {
@@ -93,7 +93,7 @@ export function OpenDatasetModal({ onOpen }: Props): JSX.Element {
     },
   });
 
-  const onDeleteClick = (dataset: Dataset) => {
+  const onDeleteClick = (dataset: Dataset.T) => {
     modals.openConfirmModal({
       title: "Delete dataset",
       children: (

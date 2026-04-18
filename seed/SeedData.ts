@@ -1,5 +1,5 @@
 import { Model } from "@models/Model/Model";
-import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
+import type { EntityFieldConfigModel } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import type { GenericSeedData } from "scripts/SeedRunner";
 
 export const TEST_USER_EMAIL = "user@avandarlabs.com";
@@ -84,7 +84,7 @@ export const SeedData = {
           isArray: false,
         } as const),
       ] satisfies Array<
-        Omit<EntityFieldConfig<"Insert">, "entityConfigId" | "workspaceId">
+        Omit<EntityFieldConfigModel["Insert"], "entityConfigId" | "workspaceId">
       >,
     },
   ],

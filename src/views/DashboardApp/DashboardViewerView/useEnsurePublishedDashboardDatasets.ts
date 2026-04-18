@@ -2,7 +2,7 @@ import { useQuery } from "@hooks/useQuery/useQuery";
 import { useMemo } from "react";
 import { extractDatasetIdsFromDashboardConfig } from "@/clients/dashboards/extractDatasetIdsFromDashboardConfig";
 import { LocalPublicDatasetRawDataClient } from "@/clients/datasets/LocalPublicDatasetRawDataClient";
-import type { Dashboard } from "$/models/Dashboard/Dashboard.types";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 /**
@@ -10,7 +10,7 @@ import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
  * DuckDB before rendering DataViz blocks.
  */
 export function useEnsurePublishedDashboardDatasets(
-  dashboard: Dashboard | undefined,
+  dashboard: Dashboard.T | undefined,
 ): [isLoadingDatasets: boolean, error: Error | undefined] {
   const dashboardId = dashboard?.id;
   const datasetIds = useMemo(() => {

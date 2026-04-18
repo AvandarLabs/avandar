@@ -5,7 +5,7 @@ import type {
   DatasetSourceType,
 } from "$/models/datasets/DatasetSource/DatasetSource.types.ts";
 
-export { DatasetSourceUtils as DatasetSource } from "$/models/datasets/DatasetSource/DatasetSourceUtils.ts";
+export { DatasetSourceModule as DatasetSource } from "$/models/datasets/DatasetSource/DatasetSourceModule.ts";
 
 export namespace DatasetSource {
   export type T<

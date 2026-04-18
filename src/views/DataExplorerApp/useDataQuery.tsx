@@ -5,12 +5,12 @@ import { makeObjectFromEntries } from "@utils/objects/makeObjectFromEntries/make
 import { sortObjList } from "@utils/objects/sortObjList/sortObjList";
 import { uuid } from "$/lib/uuid";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
-import { QueryResults } from "$/models/queries/QueryResult/QueryResults";
+import { QueryResult as QueryResultFns } from "$/models/queries/QueryResult/QueryResult";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { PublicQETLClient } from "@/clients/qetl/PublicQETLClient";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
-import type { UnknownRow } from "@/clients/DuckDBClient";
+import type { UnknownRow } from "@/clients/DuckDBClient/DuckDBClient";
 import type { UseQueryResultTuple } from "@hooks/useQuery/useQuery";
 import type {
   QueryResult,
@@ -161,7 +161,7 @@ export function useDataQuery(
 
         return queryResults;
       }
-      return QueryResults.makeEmpty();
+      return QueryResultFns.makeEmpty();
     },
   });
 }

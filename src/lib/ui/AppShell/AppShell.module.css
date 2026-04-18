@@ -12,7 +12,7 @@
 .main {
   pointer-events: none;
   position: relative;
-  z-index: 201;
+  z-index: var(--mantine-z-index-app-shell-main);
 }
 
 .main > * {

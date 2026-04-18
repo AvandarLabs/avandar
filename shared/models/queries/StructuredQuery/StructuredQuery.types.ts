@@ -1,11 +1,11 @@
-import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
-import type {
-  QueryColumn,
-  QueryColumnId,
-} from "$/models/queries/QueryColumn/QueryColumn.types.ts";
-import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types.ts";
 import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
+import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType.ts";
+import type {
+  QueryColumnId,
+  QueryColumnRead,
+} from "$/models/queries/QueryColumn/QueryColumn.types.ts";
+import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types.ts";
 
 type ModelType = "StructuredQuery";
 type CurrentStructuredQueryVersion = 1;
@@ -28,7 +28,7 @@ export type StructuredQueryRead = Model.Versioned<
     dataSource: QueryDataSource;
 
     /** The columns that are being queried. */
-    queryColumns: readonly QueryColumn[];
+    queryColumns: readonly QueryColumnRead[];
 
     /** The column that we are ordering by. */
     orderByColumn: QueryColumnId | undefined;
@@ -37,7 +37,7 @@ export type StructuredQueryRead = Model.Versioned<
     orderByDirection: OrderByDirection | undefined;
 
     /** The aggregations that are being applied to the query columns */
-    aggregations: Record<QueryColumnId, QueryAggregationType>;
+    aggregations: Record<QueryColumnId, QueryAggregationType.T>;
 
     /** The offset of the query. */
     offset: number | undefined;
@@ -53,10 +53,10 @@ type EmptyStructuredQuery = Model.Versioned<
   {
     id: StructuredQueryId;
     dataSource: undefined;
-    queryColumns: readonly QueryColumn[];
+    queryColumns: readonly QueryColumnRead[];
     orderByColumn: undefined;
     orderByDirection: undefined;
-    aggregations: Record<QueryColumnId, QueryAggregationType>;
+    aggregations: Record<QueryColumnId, QueryAggregationType.T>;
     offset: undefined;
     limit: undefined;
   }

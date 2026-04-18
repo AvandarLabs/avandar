@@ -18,7 +18,7 @@ import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
-import { DuckDBClient } from "@/clients/DuckDBClient";
+import { DuckDBClient } from "@/clients/DuckDBClient/DuckDBClient";
 import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { AppConfig } from "@/config/AppConfig";
@@ -37,10 +37,7 @@ import {
   DatasetImportFormValues,
 } from "@/views/DataManagerApp/DataImportView/DatasetUploadForm/index";
 import type { UnknownObject } from "@utils/types/common.types";
-import type {
-  Dataset,
-  DatasetId,
-} from "$/models/datasets/Dataset/Dataset.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DetectedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -51,14 +48,14 @@ type Props = BoxProps | undefined;
 
 async function saveGoogleSheetToBackend(params: {
   name: string;
-  datasetId: DatasetId;
+  datasetId: Dataset.Id;
   description: string;
   googleAccount: GoogleToken;
   googleDocument: GPickerDocumentObject;
   columns: DetectedDatasetColumn[];
   workspaceId: Workspace.Id;
   loadCSVResult: DuckDBLoadCSVResult;
-}): Promise<Dataset> {
+}): Promise<Dataset.T> {
   const {
     name,
     description,
@@ -93,7 +90,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
   const selectedDocumentId = selectedDocument?.id;
   const [parseOptions, setParseOptions] = useState<{
     fileText: string;
-    datasetId: DatasetId;
+    datasetId: Dataset.Id;
     spreadsheetName: string;
     numRowsToSkip?: number;
     delimiter?: string;
@@ -130,7 +127,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
     queryKey: ["load-csv-text", user!.id, workspace.id, parseOptions],
     queryFn: async (): Promise<
       | {
-          datasetId: DatasetId;
+          datasetId: Dataset.Id;
           metadata: DuckDBLoadCSVResult;
           previewRows: UnknownObject[];
         }

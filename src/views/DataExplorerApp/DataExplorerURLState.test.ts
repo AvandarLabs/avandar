@@ -13,8 +13,8 @@ import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import type { VirtualDatasetId } from "$/models/datasets/VirtualDataset/VirtualDataset.types";
 import type {
-  QueryColumn,
   QueryColumnId,
+  QueryColumnRead,
 } from "$/models/queries/QueryColumn/QueryColumn.types";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
@@ -28,12 +28,12 @@ function _mockQueryColumn(
   queryId: string,
   baseId: string,
   name: string,
-): QueryColumn {
+): QueryColumnRead {
   return {
     id: queryId as QueryColumnId,
     aggregation: undefined,
     baseColumn: { id: baseId as DatasetColumnId, name, dataType: "varchar" },
-  } as QueryColumn;
+  } as QueryColumnRead;
 }
 
 function _makeState(overrides: {
@@ -53,7 +53,7 @@ function _makeState(overrides: {
 
 function _makeQueryWithColumns(
   dataSource: QueryDataSource,
-  columns: QueryColumn[],
+  columns: QueryColumnRead[],
 ): PartialStructuredQuery {
   return {
     ...StructuredQuery.makeEmpty(),

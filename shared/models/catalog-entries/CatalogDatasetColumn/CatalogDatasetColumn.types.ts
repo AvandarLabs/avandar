@@ -54,7 +54,3 @@ export type CatalogDatasetColumnModel = SupabaseCRUDModelSpec<
     dbTablePrimaryKey: "id";
   }
 >;
-
-export type CatalogDatasetColumn<
-  K extends keyof CatalogDatasetColumnModel = "Read",
-> = CatalogDatasetColumnModel[K];

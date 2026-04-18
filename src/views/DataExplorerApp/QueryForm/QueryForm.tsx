@@ -1,4 +1,4 @@
-import { Tabs } from "@/lib/ui/Tabs";
+import { Tabs } from "@/lib/ui/Tabs/Tabs";
 import { LLMQueryForm } from "@/views/DataExplorerApp/QueryForm/LLMQueryForm";
 import { ManualQueryForm } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm";
 

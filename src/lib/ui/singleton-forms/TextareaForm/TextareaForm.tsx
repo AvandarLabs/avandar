@@ -1,7 +1,7 @@
 import { Button, Group, Text, Textarea } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
 import { useId, useMemo, useRef } from "react";
-import { useForm } from "@/lib/hooks/ui/useForm";
+import { useForm } from "@/lib/hooks/ui/useForm/useForm";
 import type { TextareaProps } from "@mantine/core";
 
 type Props = {

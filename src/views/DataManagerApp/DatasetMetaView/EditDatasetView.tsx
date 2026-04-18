@@ -1,10 +1,10 @@
 import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { InputTextForm } from "@/lib/ui/singleton-forms/InputTextForm";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type Props = {
-  dataset: Dataset;
+  dataset: Dataset.T;
 };
 
 export function EditDatasetView({ dataset }: Props): JSX.Element {

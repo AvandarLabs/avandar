@@ -1,4 +1,4 @@
-import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes.ts";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 type XYAxesConfig = {
@@ -59,7 +59,7 @@ function _pickFirstNumericColumnName(
   columns: readonly QueryResultColumn[],
 ): string | undefined {
   const col = columns.find((c) => {
-    return AvaDataTypes.isNumeric(c.dataType);
+    return AvaDataType.isNumeric(c.dataType);
   });
   return col?.name;
 }
@@ -76,13 +76,13 @@ function _pickBarLineXColumnName(
     return c.name !== yKey;
   });
   const temporal = others.find((c) => {
-    return AvaDataTypes.isTemporal(c.dataType);
+    return AvaDataType.isTemporal(c.dataType);
   });
   if (temporal !== undefined) {
     return temporal.name;
   }
   const text = others.find((c) => {
-    return AvaDataTypes.isText(c.dataType);
+    return AvaDataType.isText(c.dataType);
   });
   if (text !== undefined) {
     return text.name;
@@ -94,7 +94,7 @@ function _pickBarLineXColumnName(
     return booleanCol.name;
   }
   const numeric = others.find((c) => {
-    return AvaDataTypes.isNumeric(c.dataType);
+    return AvaDataType.isNumeric(c.dataType);
   });
   if (numeric !== undefined) {
     return numeric.name;
@@ -113,19 +113,19 @@ function _pickScatterXColumnName(
     return c.name !== yKey;
   });
   const numericX = others.find((c) => {
-    return AvaDataTypes.isNumeric(c.dataType);
+    return AvaDataType.isNumeric(c.dataType);
   });
   if (numericX !== undefined) {
     return numericX.name;
   }
   const temporal = others.find((c) => {
-    return AvaDataTypes.isTemporal(c.dataType);
+    return AvaDataType.isTemporal(c.dataType);
   });
   if (temporal !== undefined) {
     return temporal.name;
   }
   const text = others.find((c) => {
-    return AvaDataTypes.isText(c.dataType);
+    return AvaDataType.isText(c.dataType);
   });
   if (text !== undefined) {
     return text.name;

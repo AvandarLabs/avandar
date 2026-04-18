@@ -18,25 +18,23 @@ import { identity } from "@utils/misc/identity";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { makeObject } from "@utils/objects/makeObject/makeObject";
+import { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { useCallback, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnPickerList } from "@/components/common/DatasetColumnPickerList";
+import { DatasetColumnExtractorCreator } from "@/components/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator";
+import { IDConfigBlock } from "@/components/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index";
+import {
+  EntityConfigFormType,
+  makeDefaultDatasetColumnField,
+} from "@/components/EntityDesignerApp/EntityConfigCreatorView/entityConfigFormTypes";
 import { useMap } from "@/lib/hooks/state/useMap";
 import { Callout } from "@/lib/ui/Callout";
 import { SegmentedControl } from "@/lib/ui/inputs/SegmentedControl";
 import { makeSegmentedControlItems } from "@/lib/ui/inputs/SegmentedControl/makeSegmentedControlItems";
 import { removeItemWhere } from "@/lib/utils/arrays/removeItemWhere/removeItemWhere";
-import {
-  EntityConfigFormType,
-  makeDefaultDatasetColumnField,
-} from "@/components/EntityDesignerApp/EntityConfigCreatorView/entityConfigFormTypes";
-import { DatasetColumnExtractorCreator } from "@/components/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator";
-import { IDConfigBlock } from "@/components/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
-import type {
-  DatasetColumn,
-  DatasetColumnId,
-} from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
 import type { EntityFieldConfigId } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 
@@ -61,8 +59,8 @@ export function DatasetColumnFieldsBlock({
   // load all datasets and all available columns
   const [allDatasets] = DatasetClient.useGetAllDatasetsWithColumns();
   const datasetColumnLookup: Record<
-    DatasetColumnId,
-    { dataset: DatasetWithColumns; column: DatasetColumn }
+    DatasetColumn.Id,
+    { dataset: DatasetWithColumns; column: DatasetColumn.T }
   > = useMemo(() => {
     if (!allDatasets) {
       return {};
@@ -83,7 +81,7 @@ export function DatasetColumnFieldsBlock({
   // Keep track of the fields we've added and the dataset columns they map to
   const [fieldToColumnMap, updateFieldToColumnMap] = useMap<
     EntityFieldConfigId,
-    DatasetColumnId
+    DatasetColumn.Id
   >();
 
   // these are the fields that we've already added

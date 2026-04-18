@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { remapColumnsByBaseId } from "@/views/DataExplorerApp/QueryColumnMultiSelect/remapColumnsByBaseId";
-import type {
-  QueryColumn,
-  QueryColumnId,
-} from "$/models/queries/QueryColumn/QueryColumn.types";
 import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type {
+  QueryColumnId,
+  QueryColumnRead,
+} from "$/models/queries/QueryColumn/QueryColumn.types";
 
 /**
  * Builds a minimal `QueryColumn` fixture.
@@ -17,7 +17,7 @@ function _mockCol(
   queryId: string,
   baseId: string,
   name: string,
-): QueryColumn {
+): QueryColumnRead {
   return {
     id: queryId as QueryColumnId,
     aggregation: undefined,
@@ -26,7 +26,7 @@ function _mockCol(
       name,
       dataType: "varchar",
     },
-  } as QueryColumn;
+  } as QueryColumnRead;
 }
 
 describe("remapColumnsByBaseId", () => {

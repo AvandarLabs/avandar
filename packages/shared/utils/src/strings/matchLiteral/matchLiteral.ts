@@ -1,7 +1,13 @@
 import { unknownToString } from "@utils/strings/unknownToString/unknownToString.ts";
+import type { UnknownObject } from "@utils/types/common.types.ts";
 import type { SetRequired, UnionToIntersection } from "type-fest";
 
-type KeyMatcher<Key> = ((key: Key) => unknown) | string | number | boolean;
+type KeyMatcher<Key> =
+  | ((key: Key) => unknown)
+  | string
+  | number
+  | boolean
+  | UnknownObject;
 
 type ValueRecord<Key extends PropertyKey> = UnionToIntersection<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -7,16 +7,16 @@ import { ObjectDescriptionList } from "@ui/ObjectDescriptionList/ObjectDescripti
 import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
 import { useState } from "react";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
+import { generateEntities } from "@/components/EntityDesignerApp/EntityConfigMetaView/generateEntities/index";
+import { useHydratedEntityConfig } from "@/components/EntityDesignerApp/EntityConfigMetaView/useHydratedEntityConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { Paper } from "@/lib/ui/Paper/Paper";
-import { generateEntities } from "@/components/EntityDesignerApp/EntityConfigMetaView/generateEntities/index";
-import { useHydratedEntityConfig } from "@/components/EntityDesignerApp/EntityConfigMetaView/useHydratedEntityConfig";
 import type { ObjectKeyRenderOptionsMap } from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
-import type { EntityConfig } from "$/models/EntityConfig/EntityConfig.types";
+import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 
 type Props = {
-  entityConfig: EntityConfig;
+  entityConfig: EntityConfig.T;
 };
 
 const EXCLUDED_ENTITY_CONFIG_KEYS = [
@@ -26,7 +26,7 @@ const EXCLUDED_ENTITY_CONFIG_KEYS = [
   "workspaceId",
 ] as const;
 const ENTITY_CONFIG_RENDER_OPTIONS: ObjectKeyRenderOptionsMap<
-  EntityConfig<"Full">
+  EntityConfig.T<"Full">
 > = {
   fields: {
     titleKey: "name",

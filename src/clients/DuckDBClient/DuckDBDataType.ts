@@ -1,6 +1,6 @@
 import { constant } from "@utils/misc/constant/constant";
 import { match } from "ts-pattern";
-import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.types";
+import type { AvaDataTypeT } from "$/models/datasets/AvaDataType/AvaDataType.types";
 import type { DuckDBDataType } from "$/models/datasets/DatasetColumn/DuckDBDataTypes";
 
 /**
@@ -28,7 +28,7 @@ export const DuckDBDataTypeUtils = {
    */
   // TODO(jpsyx): move this to AvaDataTypeUtils and rename to
   // `fromDuckDBDataType`
-  toAvaDataType: (duckDBDataType: DuckDBDataType): AvaDataType => {
+  toAvaDataType: (duckDBDataType: DuckDBDataType): AvaDataTypeT => {
     return (
       match(duckDBDataType)
         .with(
@@ -79,7 +79,7 @@ export const DuckDBDataTypeUtils = {
   // TODO(jpsyx): move this to AvaDataTypeUtils and rename to
   // `toDuckDBDataType`
   fromDatasetColumnType: (
-    datasetColumnType: AvaDataType,
+    datasetColumnType: AvaDataTypeT,
   ): DuckDBSniffableDataType => {
     return match(datasetColumnType)
       .with("varchar", constant("VARCHAR" as const))

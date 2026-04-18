@@ -1,9 +1,9 @@
 import { Stack, Text } from "@mantine/core";
+import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { ResyncDatasetCard } from "@/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset.types";
 
 type Props = {
-  datasets: Dataset[];
+  datasets: Dataset.T[];
 };
 
 export function ResyncDatasetsBlock({ datasets }: Props): JSX.Element {

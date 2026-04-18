@@ -13,7 +13,7 @@ import {
   EntityConfigFormValues,
   makeDefaultManualEntryField,
 } from "@/components/EntityDesignerApp/EntityConfigCreatorView/entityConfigFormTypes";
-import type { FormType } from "@/lib/hooks/ui/useForm";
+import type { FormType } from "@/lib/hooks/ui/useForm/useForm";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
 
 type Props = {

@@ -19,13 +19,10 @@ import { PublishDashboardButton } from "@/views/DashboardApp/DashboardEditorView
 import { SaveDashboardButton } from "@/views/DashboardApp/DashboardEditorView/SaveDashboardButton";
 import { ViewDashboardButton } from "@/views/DashboardApp/DashboardEditorView/ViewDashboardButton";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
-import type {
-  Dashboard,
-  DashboardId,
-} from "$/models/Dashboard/Dashboard.types";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 type Props = {
-  dashboard: Dashboard;
+  dashboard: Dashboard.T;
   workspaceSlug: string;
 };
 export function DashboardEditorView({
@@ -39,7 +36,7 @@ export function DashboardEditorView({
   });
   const dashboardTitle: string = dashboard.name ?? "Untitled dashboard";
 
-  const lastDashboardIdRef = useRef<DashboardId | undefined>(undefined);
+  const lastDashboardIdRef = useRef<Dashboard.Id | undefined>(undefined);
 
   // simple counter to force Puck to re-mount when the initial data changes
   const [editorKey, setEditorKey] = useState(0);
@@ -97,8 +94,8 @@ export function DashboardEditorView({
 
       const publishedTitle: string =
         getDashboardTitleFromPuckData(savedData) ?? dashboardTitle;
-      const publishedConfig: Dashboard["config"] =
-        savedData as unknown as Dashboard["config"];
+      const publishedConfig: Dashboard.T["config"] =
+        savedData as unknown as Dashboard.T["config"];
 
       saveDashboard({
         id: dashboard.id,

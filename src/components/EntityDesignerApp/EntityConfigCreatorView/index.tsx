@@ -11,17 +11,12 @@ import {
 import { isNotEmpty } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
 import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
+import { Select } from "@ui/inputs/Select/Select";
 import { isDefined } from "@utils/guards/isDefined/isDefined";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { setValue } from "@utils/objects/setValue/setValue";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AppLinks } from "@/config/AppLinks";
-import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useForm } from "@/lib/hooks/ui/useForm";
-import { Select } from "@ui/inputs/Select/Select";
-import { Paper } from "@/lib/ui/Paper/Paper";
 import { DatasetColumnFieldsBlock } from "@/components/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index";
 import { EntityConfigCreatorStore } from "@/components/EntityDesignerApp/EntityConfigCreatorView/EntityConfigCreatorStore/index";
 import {
@@ -34,6 +29,11 @@ import {
 } from "@/components/EntityDesignerApp/EntityConfigCreatorView/entityConfigFormTypes";
 import { ManualEntryFieldsBlock } from "@/components/EntityDesignerApp/EntityConfigCreatorView/ManualEntryFieldsBlock";
 import { useSubmitEntityCreatorForm } from "@/components/EntityDesignerApp/EntityConfigCreatorView/useSubmitEntityCreatorForm";
+import { AppLinks } from "@/config/AppLinks";
+import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useForm } from "@/lib/hooks/ui/useForm/useForm";
+import { Paper } from "@/lib/ui/Paper/Paper";
 
 const IS_MANUAL_DATA_DISABLED = isFlagEnabled(FeatureFlag.DisableManualData);
 

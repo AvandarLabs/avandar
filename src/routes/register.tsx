@@ -14,7 +14,6 @@ import {
   Transition,
 } from "@mantine/core";
 import { isEmail } from "@mantine/form";
-
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { INFO_EMAIL } from "$/config/AppConfig";
@@ -27,7 +26,7 @@ import { AuthFooter } from "@/components/common/AuthLayout/AuthFooter";
 import { BackToLoginLink } from "@/components/common/AuthLayout/BackToLoginLink";
 import { WAITLIST_URL } from "@/config/AppConfig";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
-import { useForm } from "@/lib/hooks/ui/useForm";
+import { useForm } from "@/lib/hooks/ui/useForm/useForm";
 import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
 
 export const Route = createFileRoute("/register")({

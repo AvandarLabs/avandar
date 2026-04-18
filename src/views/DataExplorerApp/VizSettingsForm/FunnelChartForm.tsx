@@ -1,10 +1,10 @@
 import { ColorInput, Divider } from "@mantine/core";
-import { Select } from "@ui/inputs/Select/Select";
 import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
+import { Select } from "@ui/inputs/Select/Select";
 import { propPasses } from "@utils/objects/hofs/propPasses/propPasses";
-import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
-import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useMemo } from "react";
+import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
 import type { UnknownDataFrame } from "@utils/types/common.types";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { FunnelChartVizConfig } from "$/models/vizs/FunnelChartVizConfig/FunnelChartVizConfig.types";
@@ -28,7 +28,7 @@ export function FunnelChartForm({
 
   const numericFieldOptions = useMemo(() => {
     return makeSelectOptions(
-      fields.filter(propPasses("dataType", AvaDataTypes.isNumeric)),
+      fields.filter(propPasses("dataType", AvaDataType.isNumeric)),
       { valueKey: "name", labelKey: "name" },
     );
   }, [fields]);
@@ -58,7 +58,8 @@ export function FunnelChartForm({
         value={nameKey}
         disabled={fieldOptions.length === 0}
         placeholder={
-          fieldOptions.length === 0 ? "No columns are available"
+          fieldOptions.length === 0 ?
+            "No columns are available"
           : "Select a column"
         }
         onChange={(field) => {
@@ -82,7 +83,7 @@ export function FunnelChartForm({
         }}
       />
 
-      {sliceNames.length > 0 ? (
+      {sliceNames.length > 0 ?
         <>
           <Divider label="Slice colors" mt="sm" mb="xs" />
           {sliceNames.map((name) => {
@@ -108,7 +109,7 @@ export function FunnelChartForm({
             );
           })}
         </>
-      ) : null}
+      : null}
     </>
   );
 }

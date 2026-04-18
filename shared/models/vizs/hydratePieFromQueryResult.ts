@@ -1,7 +1,5 @@
-import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes.ts";
-import type {
-  QueryResultColumn,
-} from "$/models/queries/QueryResult/QueryResult.types.ts";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 type PieAxesConfig = {
   nameKey: string | undefined;
@@ -32,7 +30,7 @@ export function hydratePieFromQueryResult<VConfig extends PieAxesConfig>(
 
   if (next.valueKey === undefined) {
     const valueCol = columns.find((c) => {
-      return AvaDataTypes.isNumeric(c.dataType);
+      return AvaDataType.isNumeric(c.dataType);
     });
     if (valueCol !== undefined) {
       next = { ...next, valueKey: valueCol.name };
@@ -46,14 +44,14 @@ export function hydratePieFromQueryResult<VConfig extends PieAxesConfig>(
     });
 
     const temporal = others.find((c) => {
-      return AvaDataTypes.isTemporal(c.dataType);
+      return AvaDataType.isTemporal(c.dataType);
     });
     if (temporal !== undefined) {
       return { ...next, nameKey: temporal.name };
     }
 
     const text = others.find((c) => {
-      return AvaDataTypes.isText(c.dataType);
+      return AvaDataType.isText(c.dataType);
     });
     if (text !== undefined) {
       return { ...next, nameKey: text.name };

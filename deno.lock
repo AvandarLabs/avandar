@@ -9218,7 +9218,7 @@
           "npm:zod@4"
         ]
       },
-      "supabase/functions/health": {
+      "supabase/functions/healthz": {
         "dependencies": [
           "npm:@supabase/supabase-js@2",
           "npm:type-fest@5",
@@ -9240,6 +9240,14 @@
         ]
       },
       "supabase/functions/subscriptions": {
+        "dependencies": [
+          "npm:@supabase/supabase-js@2",
+          "npm:ts-pattern@5",
+          "npm:type-fest@5",
+          "npm:zod@4"
+        ]
+      },
+      "supabase/functions/support": {
         "dependencies": [
           "npm:@supabase/supabase-js@2",
           "npm:ts-pattern@5",

@@ -1,13 +1,11 @@
 import { ScrollArea, Stack, StackProps } from "@mantine/core";
 import { ObjectDescriptionList } from "@ui/ObjectDescriptionList/ObjectDescriptionList";
 import { prop } from "@utils/objects/hofs/prop/prop";
-import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { Callout } from "@/lib/ui/Callout";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
-import type {
-  DatasetColumn,
-  DetectedDatasetColumn,
-} from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { DetectedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 
 type Props = {
   /** The preview rows to display in the data grid */
@@ -57,14 +55,14 @@ export function DatasetPreviewBlock({
         <ObjectDescriptionList
           data={columns}
           renderAsTable
-          renderTableHeader={(key: keyof DatasetColumn) => {
+          renderTableHeader={(key: keyof DatasetColumn.T) => {
             return key === "name" ? "Column Name" : undefined;
           }}
           itemRenderOptions={{
             includeKeys: ["name", "dataType"],
             keyRenderOptions: {
               dataType: {
-                renderValue: AvaDataTypes.toDisplayValue,
+                renderValue: AvaDataType.toDisplayValue,
               },
             },
           }}

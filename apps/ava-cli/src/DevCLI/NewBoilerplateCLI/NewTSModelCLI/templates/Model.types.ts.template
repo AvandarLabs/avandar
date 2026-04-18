@@ -1,14 +1,11 @@
-import type { VersionedModel } from "@/models/Model";
-import type { UUID } from "$/lib/types/common.types";
+import type { UUID } from "@utils/types/common.types.ts";
 
-type ModelType = "$MODEL_NAME$";
+export type $MODEL_NAME$Id = UUID<"$MODEL_NAME$">;
 
-export type $MODEL_NAME$Id = UUID<ModelType>;
+export type $MODEL_NAME$Read = {
+  id: $MODEL_NAME$Id;
+};
 
-export type $MODEL_NAME$ = VersionedModel<
-  ModelType,
-  1,
-  {
-    id: $MODEL_NAME$Id;
-  }
->;
+export type $MODEL_NAME$Model = {
+  Read: $MODEL_NAME$Read;
+};

@@ -4,15 +4,16 @@ import { notifySuccess } from "@ui/index";
 import { ObjectDescriptionList } from "@ui/ObjectDescriptionList/ObjectDescriptionList";
 import { assertIsDefined, where } from "@utils/index";
 import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral";
-import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import type { ObjectKeyRenderOptionsMap } from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
-import type { CSVFileDataset } from "$/models/datasets/CSVFileDataset";
+import type { CSVFileDataset } from "$/models/datasets/CSVFileDataset/CSVFileDataset";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
-import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset.types";
-import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenDataDataset.types";
+import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
+import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenDataDataset";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { SetOptional } from "type-fest";
 
@@ -21,9 +22,9 @@ type DatasetWithColumnsAndSource = SetOptional<
   "columns"
 > & {
   source:
-    | CSVFileDataset
-    | GoogleSheetsDataset
-    | OpenDataDataset
+    | CSVFileDataset.T
+    | GoogleSheetsDataset.T
+    | OpenDataDataset.T
     | VirtualDataset.T
     | undefined;
 };
@@ -75,14 +76,14 @@ const DATASET_METADATA_RENDER_OPTIONS = {
         dataType: {
           renderAsType: {
             type: "text",
-            choices: AvaDataTypes.Types.map((type) => {
+            choices: AvaDataType.Types.map((type) => {
               return {
                 value: type,
-                label: AvaDataTypes.toDisplayValue(type),
+                label: AvaDataType.toDisplayValue(type),
               };
             }),
           },
-          renderValue: AvaDataTypes.toDisplayValue,
+          renderValue: AvaDataType.toDisplayValue,
         },
       },
       includeKeys: ["name", "dataType", "description"],
@@ -125,7 +126,7 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
         keyRenderOptions={DATASET_METADATA_RENDER_OPTIONS}
         onSubmitChange={async (value) => {
           if (Model.isOfModelType(value, "DatasetColumn")) {
-            const datasetColumn = value;
+            const datasetColumn = value as DatasetColumn.T;
             const prevDatasetColumn = dataset.columns?.find((column) => {
               return column.id === value.id;
             });

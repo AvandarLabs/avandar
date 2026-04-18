@@ -53,7 +53,3 @@ export type GoogleSheetsDatasetModel = SupabaseCRUDModelSpec<
     dbTablePrimaryKey: "id";
   }
 >;
-
-export type GoogleSheetsDataset<
-  K extends keyof GoogleSheetsDatasetModel = "Read",
-> = GoogleSheetsDatasetModel[K];

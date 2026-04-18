@@ -1,46 +1,22 @@
-import { match } from "ts-pattern";
+import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { hydrateXYFromQuery } from "$/models/vizs/hydrateXYFromQuery.ts";
-import type {
-  AreaChartVizConfig,
-} from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types.ts";
-import type {
-  BarChartVizConfig,
-} from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types.ts";
-import type {
-  BubbleChartVizConfig,
-} from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types.ts";
-import type {
-  FunnelChartVizConfig,
-} from "$/models/vizs/FunnelChartVizConfig/FunnelChartVizConfig.types.ts";
-import type {
-  LineChartVizConfig,
-} from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types.ts";
-import type {
-  PieChartVizConfig,
-} from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types.ts";
-import type {
-  RadarChartVizConfig,
-} from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types.ts";
-import type {
-  ScatterPlotVizConfig,
-} from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts";
-import type {
-  TableVizConfig,
-} from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
-import type {
-  IVizConfigModule,
-} from "$/models/vizs/VizConfig/IVizConfigModule.ts";
+import { match } from "ts-pattern";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types.ts";
+import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types.ts";
+import type { BubbleChartVizConfig } from "$/models/vizs/BubbleChartVizConfig/BubbleChartVizConfig.types.ts";
+import type { FunnelChartVizConfig } from "$/models/vizs/FunnelChartVizConfig/FunnelChartVizConfig.types.ts";
+import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types.ts";
+import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types.ts";
+import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types.ts";
+import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts";
+import type { TableVizConfig } from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
+import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
 import type {
   VizConfigType,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types.ts";
-import type {
-  PartialStructuredQuery,
-} from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type {
-  QueryResultColumn,
-} from "$/models/queries/QueryResult/QueryResult.types.ts";
-import { AvaDataTypes } from "$/models/datasets/AvaDataType/AvaDataTypes.ts";
 
 export const BubbleChartVizConfigs = {
   vizType: "bubble",
@@ -149,7 +125,7 @@ function _hydrateBubbleFromQueryResult(
   }
 
   const numericCols = columns.filter((c) => {
-    return AvaDataTypes.isNumeric(c.dataType);
+    return AvaDataType.isNumeric(c.dataType);
   });
 
   let next = { ...vizConfig };

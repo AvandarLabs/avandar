@@ -3,6 +3,7 @@ import { notifyError } from "@ui/notifications/notify";
 import { where } from "@utils/filters/where/where";
 import { assertIsDefined, prop } from "@utils/index";
 import { DashboardParsers } from "$/models/Dashboard/DashboardParsers";
+import { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import { extractDatasetIdsFromDashboardConfig } from "@/clients/dashboards/extractDatasetIdsFromDashboardConfig";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
@@ -15,11 +16,7 @@ import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatas
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { promiseMap } from "@/lib/utils/promises";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
-import type {
-  Dashboard,
-  DashboardId,
-} from "$/models/Dashboard/Dashboard.types";
-import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 export const DashboardClient = createUsableServiceClient(
   createSupabaseCRUDClient({
@@ -36,8 +33,8 @@ export const DashboardClient = createUsableServiceClient(
          * can be publicly loadable.
          */
         publishDashboard: async (params: {
-          dashboardId: DashboardId;
-        }): Promise<Dashboard> => {
+          dashboardId: Dashboard.Id;
+        }): Promise<Dashboard.T> => {
           const { dashboardId } = params;
           const logger = config.clientLogger.appendName("publishDashboard");
 
@@ -176,7 +173,7 @@ export const DashboardClient = createUsableServiceClient(
             });
           }
 
-          const updateModel: Partial<Dashboard> = { isPublic: true };
+          const updateModel: Partial<Dashboard.T> = { isPublic: true };
           const dbUpdate =
             config.parsers.fromModelUpdateToDBUpdate(updateModel);
 

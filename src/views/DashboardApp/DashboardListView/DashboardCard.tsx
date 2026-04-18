@@ -2,10 +2,10 @@ import { Card, Group, Stack, Text, ThemeIcon } from "@mantine/core";
 import { IconLayoutDashboard } from "@tabler/icons-react";
 import { useState } from "react";
 import { mantineColorVar } from "@/lib/utils/browser/css";
-import type { Dashboard } from "$/models/Dashboard/Dashboard.types";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 type Props = {
-  dashboard: Dashboard;
+  dashboard: Dashboard.T;
   onClick?: () => void;
 };
 
