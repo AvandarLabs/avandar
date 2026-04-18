@@ -1,0 +1,64 @@
+/**
+ * Derived from Featurebase `.fb-feedback-widget-feedback-button` computed
+ * styles.
+ *
+ * Do not animate `transform` in `@keyframes` on this node: it prevents
+ * `transition` on `transform` for :hover / :active (animation wins the same
+ * property). Entrance uses opacity only.
+ */
+@keyframes feedback-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.root {
+  align-items: center;
+  animation: feedback-fade-in 0.3s ease-in forwards;
+  background-color: #1563fe;
+  border-radius: 50%;
+  box-shadow: var(--mantine-shadow-md);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  -webkit-font-smoothing: antialiased;
+  height: 43px;
+  justify-content: center;
+  padding: 0;
+  position: fixed;
+  transition:
+    background-color 0.25s ease-in-out,
+    box-shadow 0.25s ease-in-out,
+    transform 0.25s ease-in-out;
+  user-select: none;
+  width: 43px;
+  z-index: calc(var(--mantine-z-index-app-shell-main) + 1);
+}
+
+/* Match Featurebase “highlight”: deeper shadow + lift + slight scale. */
+.root:hover,
+.root:focus-visible,
+.root:active,
+.rootMenuOpen {
+  background-color: var(--mantine-primary-color-5);
+  box-shadow: var(--mantine-shadow-xl);
+  transform: translateY(-2px) scale(1.03);
+}
+
+.root:active {
+  background-color: var(--mantine-primary-color-8);
+  transform: translateY(-2px) scale(0.98);
+}
+
+.root:focus {
+  outline: none;
+}
+
+.root:focus-visible {
+  outline: 2px solid rgb(21 99 254 / 45%);
+  outline-offset: 2px;
+}

@@ -14,6 +14,10 @@ import type { User } from "$/models/User/User";
  * the routes so that the appropriate page can load.
  *
  * @returns The current user or undefined if the user is not authenticated
+ *
+ * TODO(jpsyx): rename this to `useRootAuth` and then create a separate
+ * `useUser` that uses RootRoute.useRouteContext().user instead.
+ * `useRootAuth` should be used no where else other than in main.tsx.
  */
 export function useAuth(router: AnyRouter): { user: User.T | undefined } {
   const [user, setUser] = useState<SupabaseUser | undefined>(undefined);

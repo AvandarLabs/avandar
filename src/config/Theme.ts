@@ -14,8 +14,19 @@ import {
 } from "../../shared/config/Theme";
 
 /**
- * Modal z-index above AppShell main (`AppShell.module.css` uses 201).
- * Mantine's `getDefaultZIndex("modal")` is hardcoded to 200 and ignores
+ * AppShell main z-index.
+ * This effectively sets our "base" z-index to be 200. This ensures the app
+ * shell shows up above the sidebar on the left.
+ *
+ * This means any other content that must show up above the main app content
+ * should be at a higher z-index than 200.
+ */
+export const APP_SHELL_MAIN_Z_INDEX = 200;
+
+/**
+ * Modal z-index above AppShell main.
+ *
+ * Mantine's `getDefaultZIndex("modal")` is hardcoded to 201 and ignores
  * `theme.zIndex`, so defaults are set on `Modal` and `ModalsProvider`.
  */
 export const MODAL_ROOT_Z_INDEX = 300;
@@ -149,6 +160,11 @@ export const Theme = createTheme({
   },
 
   other: {
+    primaryColor: AVANDAR_BLUE_SHADES[PRIMARY_COLOR_LIGHT_SHADE],
+    zIndex: {
+      appShellMain: APP_SHELL_MAIN_Z_INDEX,
+      modal: MODAL_ROOT_Z_INDEX,
+    },
     navbar: {
       backgroundColor: NEUTRAL_SHADES[6],
       textColor: DEFAULT_THEME.white,
@@ -173,12 +189,18 @@ export const cssVariablesResolver: CSSVariablesResolver = (
         theme.other.navbar.activeBackgroundColor,
       "--mantine-navbar-active-hover-background":
         theme.other.navbar.activeHoverBackgroundColor,
+
+      // z-indexes
+      "--mantine-z-index-app-shell-main": theme.other.zIndex.appShellMain,
+      "--mantine-z-index-modal": theme.other.zIndex.modal,
     },
     dark: {
+      "--mantine-primary-color": theme.other.primaryColor,
       "--mantine-color-body": theme.colors.neutral[0],
       "--mantine-color-text": theme.colors.neutral[9],
     },
     light: {
+      "--mantine-primary-color": theme.other.primaryColor,
       "--mantine-color-body": theme.colors.neutral[0],
       "--mantine-color-text": theme.colors.neutral[9],
     },

@@ -26,11 +26,19 @@ button {
  * editor for an improved developer experience.
  */
 :root {
+  /* navbar colors */
   --mantine-navbar-background: ;
   --mantine-navbar-color: ;
   --mantine-navbar-hover-background: ;
   --mantine-navbar-active-background: ;
   --mantine-navbar-active-hover-background: ;
+
+  /* z-indexes */
+  --mantine-z-index-app-shell-main: ;
+  --mantine-z-index-modal: ;
+
+  /* other colors */
+  --mantine-primary-color: ;
   --mantine-color-body: ;
   --mantine-color-text: ;
 }

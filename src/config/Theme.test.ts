@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { MODAL_ROOT_Z_INDEX, Theme } from "@/config/Theme";
+import {
+  APP_SHELL_MAIN_Z_INDEX,
+  MODAL_ROOT_Z_INDEX,
+  Theme,
+} from "@/config/Theme";
 
 describe("Theme modal stacking", () => {
-  it("keeps modal layer above AppShell main (z-index 201)", () => {
-    expect(MODAL_ROOT_Z_INDEX).toBeGreaterThan(201);
+  it("keeps modal layer above AppShell main z-index", () => {
+    expect(MODAL_ROOT_Z_INDEX).toBeGreaterThan(APP_SHELL_MAIN_Z_INDEX);
   });
 
   it("registers Modal defaults on the theme", () => {
