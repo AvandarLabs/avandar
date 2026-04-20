@@ -55,11 +55,11 @@ export function replaceTemplateVariables(
  * @returns Whether a new entry was written.
  */
 export function updateRootDenoWorkspace(options: {
-  denoJsonPath: string;
+  denoJSONPath: string;
   functionName: string;
 }): boolean {
   const workspaceEntry = `./supabase/functions/${options.functionName}`;
-  const content = fs.readFileSync(options.denoJsonPath, "utf-8");
+  const content = fs.readFileSync(options.denoJSONPath, "utf-8");
   const data = JSON.parse(content) as { workspace?: string[] };
 
   if (!data.workspace) {
@@ -76,7 +76,7 @@ export function updateRootDenoWorkspace(options: {
   data.workspace.push(workspaceEntry);
 
   fs.writeFileSync(
-    options.denoJsonPath,
+    options.denoJSONPath,
     `${JSON.stringify(data, undefined, 2)}\n`,
     "utf-8",
   );
@@ -198,6 +198,89 @@ type RunNewEdgeFunctionOptions = Readonly<{
 }>;
 
 /**
+ * True when `line` opens a new TOML table (e.g. `[functions.foo]`).
+ */
+function _isTOMLSectionHeaderLine(line: string): boolean {
+  const trimmed = line.trim();
+  return trimmed.startsWith("[") && trimmed.endsWith("]");
+}
+
+/**
+ * Sets `verify_jwt = false` under `[functions.<functionName>]` in
+ * `supabase/config.toml`.
+ *
+ * The Supabase CLI defaults new functions to `verify_jwt = true`; we rely on
+ * MiniServer `authMiddleware` instead (same as other repo functions).
+ *
+ * @param options.configTomlPath Absolute path to `supabase/config.toml`.
+ * @param options.functionName Kebab-case function directory name.
+ */
+export function setEdgeFunctionVerifyJWTInConfigTOML(options: {
+  configTomlPath: string;
+  functionName: string;
+}): void {
+  const { configTomlPath, functionName } = options;
+  const content = fs.readFileSync(configTomlPath, "utf-8");
+  const eol = content.includes("\r\n") ? "\r\n" : "\n";
+  const lines = content.split(/\r?\n/);
+  const header = `[functions.${functionName}]`;
+  const sectionStart = lines.findIndex((line) => {
+    return line.trim() === header;
+  });
+
+  if (sectionStart === -1) {
+    throw new Error(
+      `Could not find ${header} in ${configTomlPath}. ` +
+        "Did supabase functions new update config.toml?",
+    );
+  }
+
+  const linesAfterHeader = lines.slice(sectionStart + 1);
+  const nextSectionRelativeIndex = linesAfterHeader.findIndex(
+    _isTOMLSectionHeaderLine,
+  );
+  const sectionEnd =
+    nextSectionRelativeIndex === -1 ?
+      lines.length
+    : sectionStart + 1 + nextSectionRelativeIndex;
+
+  const sectionBody = lines.slice(sectionStart + 1, sectionEnd);
+  const verifyJWTRelativeIndex = sectionBody.findIndex((line) => {
+    return /^\s*verify_jwt\s*=/.test(line);
+  });
+  const verifyJWTLineIndex =
+    verifyJWTRelativeIndex === -1 ? -1 : (
+      sectionStart + 1 + verifyJWTRelativeIndex
+    );
+
+  if (verifyJWTLineIndex !== -1) {
+    lines[verifyJWTLineIndex] = lines[verifyJWTLineIndex]!.replace(
+      /verify_jwt\s*=\s*\S+/,
+      "verify_jwt = false",
+    );
+  } else {
+    const enabledRelativeIndex = sectionBody.findIndex((line) => {
+      return /^\s*enabled\s*=/.test(line);
+    });
+    const insertAt =
+      enabledRelativeIndex === -1 ?
+        sectionStart + 1
+      : sectionStart + 1 + enabledRelativeIndex + 1;
+
+    lines.splice(insertAt, 0, "verify_jwt = false");
+  }
+
+  const endsWithNewline = /\r?\n$/.test(content);
+  const out = lines.join(eol);
+
+  fs.writeFileSync(
+    configTomlPath,
+    endsWithNewline ? `${out}${eol}` : out,
+    "utf-8",
+  );
+}
+
+/**
  * Runs the full new edge function workflow (Supabase CLI + templates +
  * repo config updates).
  */
@@ -216,12 +299,19 @@ export function runNewEdgeFunction(options: RunNewEdgeFunctionOptions): void {
     throw new Error("supabase CLI failed");
   }
 
+  const configTomlPath = path.join(projectRoot, "supabase", "config.toml");
+  setEdgeFunctionVerifyJWTInConfigTOML({ configTomlPath, functionName });
+  Acclimate.log(
+    "|green|✅ Set verify_jwt = false for " +
+      `[functions.${functionName}] in supabase/config.toml|`,
+  );
+
   Acclimate.log("|cyan|📝 Applying MiniServer templates…|");
   writeEdgeFunctionTemplateFiles({ projectRoot, functionName });
 
-  const rootDenoJsonPath = path.join(projectRoot, "deno.json");
+  const rootDenoJSONPath = path.join(projectRoot, "deno.json");
   const didAddWorkspace = updateRootDenoWorkspace({
-    denoJsonPath: rootDenoJsonPath,
+    denoJSONPath: rootDenoJSONPath,
     functionName,
   });
   if (didAddWorkspace) {
@@ -243,7 +333,7 @@ export function runNewEdgeFunction(options: RunNewEdgeFunctionOptions): void {
   });
   formatFileWithRepoPrettier({
     projectRoot,
-    filePath: rootDenoJsonPath,
+    filePath: rootDenoJSONPath,
   });
 
   Acclimate.log(
