@@ -3,6 +3,7 @@ import * as os from "node:os";
 import * as path from "node:path";
 import {
   replaceTemplateVariables,
+  setEdgeFunctionVerifyJWTInConfigTOML,
   toCamelCase,
   toPascalCase,
   updateHTTPAPITypes,
@@ -65,7 +66,7 @@ describe("updateRootDenoWorkspace", () => {
     );
 
     const didAdd = updateRootDenoWorkspace({
-      denoJsonPath: denoPath,
+      denoJSONPath: denoPath,
       functionName: "my-fn",
     });
 
@@ -92,11 +93,88 @@ describe("updateRootDenoWorkspace", () => {
     );
 
     const didAdd = updateRootDenoWorkspace({
-      denoJsonPath: denoPath,
+      denoJSONPath: denoPath,
       functionName: "my-fn",
     });
 
     expect(didAdd).toBe(false);
+  });
+});
+
+describe("setEdgeFunctionVerifyJwtInConfigToml", () => {
+  const tmpRoot = path.join(os.tmpdir(), "ava-config-toml-test");
+
+  afterEach(() => {
+    if (fs.existsSync(tmpRoot)) {
+      fs.rmSync(tmpRoot, { recursive: true, force: true });
+    }
+  });
+
+  it("replaces verify_jwt with false", () => {
+    fs.mkdirSync(tmpRoot, { recursive: true });
+    const configPath = path.join(tmpRoot, "config.toml");
+    fs.writeFileSync(
+      configPath,
+      `[functions.my-fn]
+enabled = true
+verify_jwt = true
+import_map = "./functions/my-fn/deno.json"
+`,
+      "utf-8",
+    );
+
+    setEdgeFunctionVerifyJWTInConfigTOML({
+      configTomlPath: configPath,
+      functionName: "my-fn",
+    });
+
+    expect(fs.readFileSync(configPath, "utf-8")).toContain(
+      "verify_jwt = false",
+    );
+    expect(fs.readFileSync(configPath, "utf-8")).not.toContain(
+      "verify_jwt = true",
+    );
+  });
+
+  it("inserts verify_jwt = false when missing", () => {
+    fs.mkdirSync(tmpRoot, { recursive: true });
+    const configPath = path.join(tmpRoot, "config.toml");
+    fs.writeFileSync(
+      configPath,
+      `[functions.my-fn]
+enabled = true
+import_map = "./functions/my-fn/deno.json"
+`,
+      "utf-8",
+    );
+
+    setEdgeFunctionVerifyJWTInConfigTOML({
+      configTomlPath: configPath,
+      functionName: "my-fn",
+    });
+
+    const written = fs.readFileSync(configPath, "utf-8");
+    expect(written).toContain("verify_jwt = false");
+    expect(written.indexOf("enabled = true")).toBeLessThan(
+      written.indexOf("verify_jwt = false"),
+    );
+  });
+
+  it("throws when the function section is missing", () => {
+    fs.mkdirSync(tmpRoot, { recursive: true });
+    const configPath = path.join(tmpRoot, "config.toml");
+    fs.writeFileSync(
+      configPath,
+      "[functions.other]\nenabled = true\n",
+      "utf-8",
+    );
+
+    expect(() => {
+      setEdgeFunctionVerifyJWTInConfigTOML({
+        configTomlPath: configPath,
+        functionName: "my-fn",
+      });
+    }).toThrow(/Could not find \[functions\.my-fn\]/);
   });
 });
 
