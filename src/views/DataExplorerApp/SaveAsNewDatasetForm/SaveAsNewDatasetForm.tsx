@@ -4,7 +4,7 @@ import { prop, UnknownDataFrame } from "@utils/index";
 import { uuid } from "$/lib/uuid";
 import { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
+import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useForm } from "@/lib/hooks/ui/useForm/useForm";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
@@ -67,7 +67,7 @@ export function SaveAsNewDatasetForm({
                 name: col.name,
                 description: "",
                 original_data_type: col.dataType,
-                detected_data_type: DuckDBDataTypeUtils.fromDatasetColumnType(
+                detected_data_type: DuckDbDataTypeUtils.fromDatasetColumnType(
                   col.dataType,
                 ),
                 column_idx: idx,

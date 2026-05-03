@@ -11,7 +11,7 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
-import { DuckDBClient } from "@/clients/DuckDBClient/DuckDBClient";
+import { DuckDBClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { DangerousActionButton } from "@/lib/ui/buttons/DangerousActionButton";

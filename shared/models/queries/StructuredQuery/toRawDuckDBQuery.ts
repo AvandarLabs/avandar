@@ -6,7 +6,7 @@ import { objectEntries } from "@utils/objects/objectEntries.ts";
 import { objectValues } from "@utils/objects/objectValues.ts";
 import { sortObjList } from "@utils/objects/sortObjList/sortObjList.ts";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
-import { DuckDBQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationTypeModule.ts";
+import { DuckDbQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationTypeModule.ts";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import knex from "knex";
 import { match } from "ts-pattern";
@@ -143,7 +143,7 @@ export function toRawDuckDBQuery(
   sqlQuery = objectEntries(duckDBAggregations).reduce(
     (newQuery, [columnName, aggType]) => {
       const aggregationColumnName =
-        DuckDBQueryAggregations.getAggregationColumnName(aggType, columnName);
+        DuckDbQueryAggregations.getAggregationColumnName(aggType, columnName);
       const quotedColumnName = _quoteSQLIdentifier(columnName);
       const quotedAggregationColumnName = _quoteSQLIdentifier(
         aggregationColumnName,

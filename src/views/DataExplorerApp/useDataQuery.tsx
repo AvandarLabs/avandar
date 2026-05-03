@@ -10,7 +10,7 @@ import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuer
 import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClient/EntityFieldValueClient";
 import { PublicQETLClient } from "@/clients/qetl/PublicQETLClient";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
-import type { UnknownRow } from "@/clients/DuckDBClient/DuckDBClient";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { UseQueryResultTuple } from "@hooks/useQuery/useQuery";
 import type {
   QueryResult,

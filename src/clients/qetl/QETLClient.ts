@@ -16,9 +16,9 @@ import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
 import { XlsFileDatasetClient } from "@/clients/datasets/XlsFileDatasetClient";
-import { DuckDBClient, UnknownRow } from "@/clients/DuckDBClient/DuckDBClient";
-import { DuckDbLoadParquetResult } from "@/clients/DuckDBClient/DuckDBClient.types";
-import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
+import { DuckDBClient, UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+import { DuckDbLoadParquetResult } from "@/clients/DuckDbClient/DuckDbClient.types";
+import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { difference } from "@/lib/utils/arrays/difference/difference";
@@ -469,14 +469,14 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
                 const changedName = col.name !== col.originalName;
                 const changedDataType =
                   col.dataType !==
-                  DuckDBDataTypeUtils.toAvaDataType(col.detectedDataType);
+                  DuckDbDataTypeUtils.toAvaDataType(col.detectedDataType);
                 if (changedName || changedDataType) {
                   return {
                     originalName: col.originalName,
                     alias: changedName ? col.name : undefined,
                     dataType:
                       changedDataType ?
-                        DuckDBDataTypeUtils.fromDatasetColumnType(col.dataType)
+                        DuckDbDataTypeUtils.fromDatasetColumnType(col.dataType)
                       : undefined,
                   };
                 }

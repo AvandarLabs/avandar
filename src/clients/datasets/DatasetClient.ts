@@ -12,7 +12,7 @@ import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
 import { XlsFileDatasetClient } from "@/clients/datasets/XlsFileDatasetClient";
-import { DuckDBClient } from "@/clients/DuckDBClient/DuckDBClient";
+import { DuckDBClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";

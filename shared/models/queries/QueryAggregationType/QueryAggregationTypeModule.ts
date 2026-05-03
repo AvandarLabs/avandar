@@ -5,7 +5,7 @@ import type {
   QueryAggregationTypeT,
 } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
 
-export const DuckDBQueryAggregations = {
+export const DuckDbQueryAggregations = {
   /**
    * The name to use for a column with an aggregation applied to it.
    * @param aggregation - The aggregation type to get the column name for.
@@ -23,7 +23,7 @@ export const DuckDBQueryAggregations = {
       .with("max", constant(`max(${columnName})`))
       .with("min", constant(`min(${columnName})`))
       .exhaustive(() => {
-        throw new Error(`Invalid DuckDBQueryAggregationType: "${aggregation}"`);
+        throw new Error(`Invalid DuckDbQueryAggregationType: "${aggregation}"`);
       });
   },
 };
@@ -35,7 +35,7 @@ export const QueryAggregationTypeModule = {
   ): string => {
     return match(aggregation)
       .with("sum", "avg", "count", "max", "min", (duckDBAggregation) => {
-        return DuckDBQueryAggregations.getAggregationColumnName(
+        return DuckDbQueryAggregations.getAggregationColumnName(
           duckDBAggregation,
           columnName,
         );

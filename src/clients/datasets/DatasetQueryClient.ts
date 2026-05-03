@@ -7,7 +7,7 @@ import { objectKeys } from "@utils/objects/objectKeys";
 import { sqlTemplate } from "@utils/strings/template/sqlTemplate";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { scalar, singleton } from "@/clients/DuckDBClient/queryResultHelpers";
+import { scalar, singleton } from "@/clients/DuckDbClient/queryResultHelpers";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import { promiseReduce } from "@/lib/utils/promises";
 import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";

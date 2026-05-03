@@ -7,30 +7,30 @@ import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataT
  * This is a subset of DuckDBDataType. These are the possible data that
  * DuckDB outputs when sniffing a CSV file.
  */
-export type DuckDBSniffableDataType = Extract<
+export type DuckDbSniffableDataType = Extract<
   DuckDbDataType,
   "BOOLEAN" | "BIGINT" | "DOUBLE" | "TIME" | "DATE" | "TIMESTAMP" | "VARCHAR"
 >;
 
-export const DuckDBDataTypeUtils = {
-  isDateOrTimestamp: (duckDBDataType: DuckDbDataType): boolean => {
+export const DuckDbDataTypeUtils = {
+  isDateOrTimestamp: (duckDbDataType: DuckDbDataType): boolean => {
     return [
       "DATE",
       "TIME",
       "TIMESTAMP",
       "TIMESTAMP_TZ",
       "TIMESTAMP WITH TIME ZONE",
-    ].includes(duckDBDataType);
+    ].includes(duckDbDataType);
   },
 
   /**
    * Converts a DuckDB data type to an Avandar data type.
    */
   // TODO(jpsyx): move this to AvaDataTypeUtils and rename to
-  // `fromDuckDBDataType`
-  toAvaDataType: (duckDBDataType: DuckDbDataType): AvaDataTypeT => {
+  // `fromDuckDbDataType`
+  toAvaDataType: (duckDbDataType: DuckDbDataType): AvaDataTypeT => {
     return (
-      match(duckDBDataType)
+      match(duckDbDataType)
         .with(
           "TINYINT",
           "SMALLINT",
@@ -77,10 +77,10 @@ export const DuckDBDataTypeUtils = {
   },
 
   // TODO(jpsyx): move this to AvaDataTypeUtils and rename to
-  // `toDuckDBDataType`
+  // `toDuckDbDataType`
   fromDatasetColumnType: (
     datasetColumnType: AvaDataTypeT,
-  ): DuckDBSniffableDataType => {
+  ): DuckDbSniffableDataType => {
     return match(datasetColumnType)
       .with("varchar", constant("VARCHAR" as const))
       .with("bigint", constant("BIGINT" as const))

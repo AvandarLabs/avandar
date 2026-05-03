@@ -7,7 +7,7 @@ import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { makeObject } from "@utils/objects/makeObject/makeObject";
 import { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { DuckDBClient } from "@/clients/DuckDBClient/DuckDBClient";
+import { DuckDBClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { getSQLSelectOfExtractor } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getDatasetColumnFieldValues";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";

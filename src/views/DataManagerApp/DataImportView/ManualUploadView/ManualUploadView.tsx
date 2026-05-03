@@ -13,9 +13,9 @@ import { uuid } from "$/lib/uuid";
 import { useMemo, useState } from "react";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
-import { UnknownRow } from "@/clients/DuckDBClient/DuckDBClient";
-import { DuckDbLoadCsvResult } from "@/clients/DuckDBClient/DuckDBClient.types";
-import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
+import { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+import { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
+import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
@@ -108,7 +108,7 @@ export function ManualUploadView(props: Props): JSX.Element {
         originalName: duckColumn.column_name,
         originalDataType: duckColumn.column_type,
         detectedDataType: duckColumn.column_type,
-        dataType: DuckDBDataTypeUtils.toAvaDataType(duckColumn.column_type),
+        dataType: DuckDbDataTypeUtils.toAvaDataType(duckColumn.column_type),
         columnIdx: idx,
       };
     });
@@ -129,10 +129,10 @@ export function ManualUploadView(props: Props): JSX.Element {
     <Box {...props}>
       <Stack align="flex-start">
         <FileUploadForm
-          label="Upload a CSV"
-          description="Select a CSV from your computer to import"
+          label="Upload an Excel file or CSV"
+          description="Select an Excel file or CSV from your computer to import"
           placeholder="Select file"
-          accept={MIMEType.TEXT_CSV}
+          accept={[MIMEType.TEXT_CSV, MIMEType.APPLICATION_MS_EXCEL]}
           fullWidth
           isSubmitting={isParsingCsv}
           onSubmit={onFileSubmit}

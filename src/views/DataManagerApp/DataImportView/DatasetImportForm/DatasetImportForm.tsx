@@ -15,7 +15,7 @@ import { snakeCaseKeysShallow } from "@utils/index";
 import { useMemo, useRef, useState } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { DuckDbLoadCsvResult } from "@/clients/DuckDBClient/DuckDBClient.types";
+import { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";

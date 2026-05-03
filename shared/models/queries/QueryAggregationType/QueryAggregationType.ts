@@ -4,7 +4,7 @@ import type {
   QueryAggregationTypeT,
 } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
 
-export { DuckDBQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationTypeModule.ts";
+export { DuckDbQueryAggregations as DuckDBQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationTypeModule.ts";
 export { QueryAggregationTypeModule as QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationTypeModule.ts";
 
 export namespace QueryAggregationType {

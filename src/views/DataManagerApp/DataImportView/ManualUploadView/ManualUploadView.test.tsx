@@ -20,7 +20,7 @@ import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUp
 import type {
   DuckDbColumnSchema,
   DuckDbLoadCsvResult,
-} from "@/clients/DuckDBClient/DuckDBClient.types";
+} from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { UnknownObject } from "@utils/types/common.types";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";

@@ -106,6 +106,28 @@ export type DuckDbLoadParquetResult = {
   columns: DuckDbColumnSchema[];
 };
 
+/**
+ * Result of loading an Excel `.xlsx` workbook via DuckDB `read_xlsx`.
+ * DuckDB does not support legacy `.xls` (BIFF) workbooks.
+ */
+export type DuckDbLoadXlsxResult = {
+  /** Unique identifier for this load operation */
+  id: UUID;
+  /** The DuckDB table holding the loaded sheet */
+  tableName: string;
+  /** Same as `tableName`; mirrors `DuckDbLoadCsvResult.csvName`. */
+  xlsxName: string;
+  /** Number of rows loaded */
+  numRows: number;
+  /** Inferred column schema */
+  columns: DuckDbColumnSchema[];
+  /**
+   * Worksheet name passed to `read_xlsx`, or `undefined` when the first
+   * sheet was loaded.
+   */
+  sheet: string | undefined;
+};
+
 export type DuckDbLoadCsvResult = {
   /** Unique identifier for this load operation */
   id: UUID;

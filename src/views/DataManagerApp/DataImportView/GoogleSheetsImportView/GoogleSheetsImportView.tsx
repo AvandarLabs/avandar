@@ -15,8 +15,8 @@ import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
-import { DuckDbLoadCsvResult } from "@/clients/DuckDBClient/DuckDBClient.types";
-import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
+import { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
+import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { AppConfig } from "@/config/AppConfig";
 import { useGooglePicker } from "@/hooks/ui/useGooglePicker";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
@@ -192,7 +192,7 @@ export function GoogleSheetsImportView(props: Props): JSX.Element {
         originalName: duckColumn.column_name,
         originalDataType: duckColumn.column_type,
         detectedDataType: duckColumn.column_type,
-        dataType: DuckDBDataTypeUtils.toAvaDataType(duckColumn.column_type),
+        dataType: DuckDbDataTypeUtils.toAvaDataType(duckColumn.column_type),
         columnIdx: idx,
       };
     });

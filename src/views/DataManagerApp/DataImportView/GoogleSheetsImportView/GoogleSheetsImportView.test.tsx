@@ -21,7 +21,7 @@ import { GoogleSheetsImportView } from "@/views/DataManagerApp/DataImportView/Go
 import type {
   DuckDbColumnSchema,
   DuckDbLoadCsvResult,
-} from "@/clients/DuckDBClient/DuckDBClient.types";
+} from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import type { GPickerDocumentObject } from "@/lib/types/google-picker";
 import type { APIReturnType } from "@/types/http-api.types";
