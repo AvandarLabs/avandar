@@ -9,12 +9,13 @@ import { objectKeys } from "@utils/objects/objectKeys";
 import { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import { match } from "ts-pattern";
 import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
-import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
+import { CsvFileDatasetClient } from "@/clients/datasets/CsvFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
+import { XlsFileDatasetClient } from "@/clients/datasets/XlsFileDatasetClient";
 import { DuckDBClient, UnknownRow } from "@/clients/DuckDBClient/DuckDBClient";
 import { DuckDbLoadParquetResult } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
@@ -24,11 +25,12 @@ import { difference } from "@/lib/utils/arrays/difference/difference";
 import { promiseFlatMap, promiseMap } from "@/lib/utils/promises";
 import type { Module } from "@modules/createModule";
 import type { UnknownObject } from "@utils/types/common.types";
-import type { CSVFileDataset } from "$/models/datasets/CSVFileDataset/CSVFileDataset";
+import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenDataDataset";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
+import type { XlsFileDataset } from "$/models/datasets/XlsFileDataset/XlsFileDataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 
 export type IQETLClient = Module<
@@ -69,12 +71,7 @@ type ColumnReplacement = {
 type DiceExtractor =
   | {
       sourceType: "csv_file";
-      sourceDataset: CSVFileDataset.T;
-      dataset: Dataset.T;
-    }
-  | {
-      sourceType: "virtual";
-      sourceDataset: VirtualDataset.T;
+      sourceDataset: CsvFileDataset.T;
       dataset: Dataset.T;
     }
   | {
@@ -86,6 +83,16 @@ type DiceExtractor =
       sourceType: "open_data";
       dataset: Dataset.T;
       sourceDataset: OpenDataDataset.T;
+    }
+  | {
+      sourceType: "virtual";
+      sourceDataset: VirtualDataset.T;
+      dataset: Dataset.T;
+    }
+  | {
+      sourceType: "xls_file";
+      dataset: Dataset.T;
+      sourceDataset: XlsFileDataset.T;
     };
 
 /**
@@ -232,7 +239,7 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
               const extractors: DiceExtractor[] = await match(sourceType)
                 .with("csv_file", async (type) => {
                   const ids = datasetsBySourceType[type].map(prop("id"));
-                  const csvDatasets = await CSVFileDatasetClient.withCache(
+                  const csvDatasets = await CsvFileDatasetClient.withCache(
                     AvaQueryClient,
                   )
                     .withEnsureQueryData()
@@ -242,6 +249,21 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
                       dataset: datasetsById[csvDataset.datasetId]!,
                       sourceType: "csv_file",
                       sourceDataset: csvDataset,
+                    } as const;
+                  });
+                })
+                .with("xls_file", async (type) => {
+                  const ids = datasetsBySourceType[type].map(prop("id"));
+                  const xlsDatasets = await XlsFileDatasetClient.withCache(
+                    AvaQueryClient,
+                  )
+                    .withEnsureQueryData()
+                    .getAll(where("dataset_id", "in", ids));
+                  return xlsDatasets.map((xlsDataset) => {
+                    return {
+                      dataset: datasetsById[xlsDataset.datasetId]!,
+                      sourceType: "xls_file" as const,
+                      sourceDataset: xlsDataset,
                     } as const;
                   });
                 })
@@ -329,6 +351,21 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
                 if (!parquetBlob) {
                   throw new Error(
                     `Failed to download data for CSV file dataset '${ex.dataset.id}' (${ex.dataset.name})`,
+                  );
+                }
+                return { datasetId: ex.dataset.id, parquetBlob };
+              })
+              .with({ sourceType: "xls_file" }, async (ex) => {
+                const parquetBlob =
+                  await DatasetParquetStorageClient.downloadDataset({
+                    datasetId: ex.dataset.id,
+                    workspaceId: ex.dataset.workspaceId,
+                  });
+
+                if (!parquetBlob) {
+                  throw new Error(
+                    `Failed to download data for Excel file dataset ` +
+                      `'${ex.dataset.id}' (${ex.dataset.name})`,
                   );
                 }
                 return { datasetId: ex.dataset.id, parquetBlob };

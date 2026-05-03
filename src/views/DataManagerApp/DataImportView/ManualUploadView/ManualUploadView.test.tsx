@@ -85,7 +85,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 vi.mock("@/clients/datasets/DatasetClient", () => {
   return {
     DatasetClient: {
-      insertCSVFileDataset: vi.fn(),
+      insertCsvFileDataset: vi.fn(),
       QueryKeys: {
         getAll: (): string[] => {
           return ["datasets"];

@@ -6,7 +6,7 @@ import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
 import { where } from "@utils/filters/where/where";
 import { MIMEType } from "@utils/types/common.types";
-import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
+import { CsvFileDatasetClient } from "@/clients/datasets/CsvFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
@@ -56,7 +56,7 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
     queryToRefetch: ["missing-datasets"],
     mutationFn: async (file: File) => {
       const [csvParseOptions, datasetColumns] = await Promise.all([
-        CSVFileDatasetClient.getOne(where("dataset_id", "eq", dataset.id)),
+        CsvFileDatasetClient.getOne(where("dataset_id", "eq", dataset.id)),
         DatasetColumnClient.getAll(where("dataset_id", "eq", dataset.id)),
       ]);
       assertIsDefined(

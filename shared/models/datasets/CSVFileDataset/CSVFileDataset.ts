@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import type {
-  CSVFileDatasetId,
-  CSVFileDatasetModel,
-} from "$/models/datasets/CSVFileDataset/CSVFileDataset.types.ts";
+  CsvFileDatasetId,
+  CsvFileDatasetModel,
+} from "$/models/datasets/CsvFileDataset/CsvFileDataset.types.ts";
 
-export { CSVFileDatasetParsers } from "$/models/datasets/CSVFileDataset/CSVFileDatasetParsers.ts";
+export { CsvFileDatasetParsers } from "$/models/datasets/CsvFileDataset/CsvFileDatasetParsers.ts";
 
-export namespace CSVFileDataset {
-  export type T<K extends keyof CSVFileDatasetModel = "Read"> =
-    CSVFileDatasetModel[K];
-  export type Id = CSVFileDatasetId;
+export namespace CsvFileDataset {
+  export type T<K extends keyof CsvFileDatasetModel = "Read"> =
+    CsvFileDatasetModel[K];
+  export type Id = CsvFileDatasetId;
 }

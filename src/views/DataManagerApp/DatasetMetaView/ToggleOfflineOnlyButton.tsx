@@ -4,18 +4,19 @@ import { modals } from "@mantine/modals";
 import { IconWorld, IconWorldOff } from "@tabler/icons-react";
 import { ActionIcon } from "@ui/ActionIcon/ActionIcon";
 import { notifyError, notifySuccess } from "@ui/notifications/notify";
-import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
+import { CsvFileDatasetClient } from "@/clients/datasets/CsvFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { useIsDatasetUploadInProgress } from "@/clients/storage/DatasetParquetStorageClient/useIsDatasetUploadInProgress";
 import { useUploadPercent } from "@/clients/storage/DatasetParquetStorageClient/useUploadPercent";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import type { CSVFileDatasetId } from "$/models/datasets/CSVFileDataset/CSVFileDataset.types";
+import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { XlsFileDataset } from "$/models/datasets/XlsFileDataset/XlsFileDataset";
 
 type Props = {
   isInCloudStorage: boolean;
-  csvFileDatasetId: CSVFileDatasetId;
+  fileDatasetId: CsvFileDataset.Id | XlsFileDataset.Id;
   datasetId: DatasetId;
 };
 
@@ -24,13 +25,13 @@ type Props = {
  */
 export function ToggleOfflineOnlyButton({
   isInCloudStorage,
-  csvFileDatasetId,
+  fileDatasetId,
   datasetId,
 }: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
 
-  const [updateCSVFileDataset, isUpdatePending] =
-    CSVFileDatasetClient.useUpdate({
+  const [updateCsvFileDataset, isUpdatePending] =
+    CsvFileDatasetClient.useUpdate({
       queryToInvalidate: DatasetClient.QueryKeys.getSourceDataset({
         datasetId,
         sourceType: "csv_file",
@@ -57,8 +58,8 @@ export function ToggleOfflineOnlyButton({
     onSuccess: () => {
       // successfully deleted the dataset from storage, so we update the CSV
       // file to reflect that it is no longer in cloud storage.
-      return updateCSVFileDataset({
-        id: csvFileDatasetId,
+      return updateCsvFileDataset({
+        id: fileDatasetId,
         data: {
           isInCloudStorage: false,
         },

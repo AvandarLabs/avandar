@@ -4,9 +4,9 @@ import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { SetOptional } from "type-fest";
 
-export type CSVFileDatasetId = UUID<"CSVFileDatasetId">;
+export type CsvFileDatasetId = UUID<"CsvFileDatasetId">;
 
-export type CSVFileDatasetRead = {
+export type CsvFileDatasetRead = {
   /** Timestamp of when the dataset was created. */
   createdAt: string;
 
@@ -14,7 +14,7 @@ export type CSVFileDatasetRead = {
   datasetId: DatasetId;
 
   /** Unique identifier of the local CSV dataset in our system. */
-  id: CSVFileDatasetId;
+  id: CsvFileDatasetId;
 
   /** Timestamp of when the dataset was last updated. */
   updatedAt: string;
@@ -59,15 +59,15 @@ export type CSVFileDatasetRead = {
 /**
  * CRUD type definitions for the LocalCSVDataset model.
  */
-export type CSVFileDatasetModel = SupabaseCRUDModelSpec<
+export type CsvFileDatasetModel = SupabaseCRUDModelSpec<
   {
     tableName: "datasets__csv_file";
-    modelName: "CSVFileDataset";
-    modelPrimaryKeyType: CSVFileDatasetId;
+    modelName: "CsvFileDataset";
+    modelPrimaryKeyType: CsvFileDatasetId;
     modelTypes: {
-      Read: CSVFileDatasetRead;
-      Insert: SetOptional<CSVFileDatasetRead, "createdAt" | "id" | "updatedAt">;
-      Update: Partial<CSVFileDatasetRead>;
+      Read: CsvFileDatasetRead;
+      Insert: SetOptional<CsvFileDatasetRead, "createdAt" | "id" | "updatedAt">;
+      Update: Partial<CsvFileDatasetRead>;
     };
   },
   {

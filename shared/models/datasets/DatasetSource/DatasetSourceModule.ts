@@ -5,7 +5,8 @@ export const DatasetSourceModule = {
   SourceTypes: registry<DatasetSource.SourceType>().keys(
     "csv_file",
     "google_sheets",
-    "virtual",
     "open_data",
+    "virtual",
+    "xls_file",
   ),
 };

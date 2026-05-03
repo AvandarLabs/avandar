@@ -160,7 +160,7 @@ export function DatasetImportForm({
         .with({ sourceType: "csv_file" }, async (payload) => {
           const { sizeInBytes } = payload;
           const { csvSniff } = loadCsvResult;
-          const dataset = await DatasetClient.insertCSVFileDataset({
+          const dataset = await DatasetClient.insertCsvFileDataset({
             datasetId: initialDatasetId,
             workspaceId: workspace.id,
             datasetName: name,

@@ -10,11 +10,12 @@ import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import type { ObjectKeyRenderOptionsMap } from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
-import type { CSVFileDataset } from "$/models/datasets/CSVFileDataset/CSVFileDataset";
+import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenDataDataset";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
+import type { XlsFileDataset } from "$/models/datasets/XlsFileDataset/XlsFileDataset";
 import type { SetOptional } from "type-fest";
 
 type DatasetWithColumnsAndSource = SetOptional<
@@ -22,10 +23,11 @@ type DatasetWithColumnsAndSource = SetOptional<
   "columns"
 > & {
   source:
-    | CSVFileDataset.T
+    | CsvFileDataset.T
     | GoogleSheetsDataset.T
     | OpenDataDataset.T
     | VirtualDataset.T
+    | XlsFileDataset.T
     | undefined;
 };
 
@@ -55,8 +57,9 @@ const DATASET_METADATA_RENDER_OPTIONS = {
       return matchLiteral(value, {
         csv_file: "CSV file",
         google_sheets: "Google Sheets",
-        virtual: "Derived Dataset",
         open_data: "Open Data",
+        virtual: "Derived Dataset",
+        xls_file: "Excel file",
         _otherwise: value,
       });
     },

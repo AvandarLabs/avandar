@@ -5,12 +5,13 @@ import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketReco
 import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral";
 import { DatasetParsers } from "$/models/datasets/Dataset/DatasetParsers";
 import { WorkspaceId } from "$/models/Workspace/Workspace.types";
-import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
+import { CsvFileDatasetClient } from "@/clients/datasets/CsvFileDatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { GoogleSheetsDatasetClient } from "@/clients/datasets/GoogleSheetsDatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
+import { XlsFileDatasetClient } from "@/clients/datasets/XlsFileDatasetClient";
 import { DuckDBClient } from "@/clients/DuckDBClient/DuckDBClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
@@ -48,7 +49,7 @@ export const DatasetClient = createUsableServiceClient(
       return {
         /**
          * For a given dataset, get its source-specific dataset, e.g.
-         * if it is a CSVFileDataset, GoogleSheetsDataset, etc.
+         * if it is a CsvFileDataset, GoogleSheetsDataset, etc.
          */
         getSourceDataset: async (params: {
           datasetId: DatasetId;
@@ -64,7 +65,7 @@ export const DatasetClient = createUsableServiceClient(
               );
             },
             csv_file: () => {
-              return CSVFileDatasetClient.getOne(
+              return CsvFileDatasetClient.getOne(
                 where("dataset_id", "eq", datasetId),
               );
             },
@@ -75,6 +76,11 @@ export const DatasetClient = createUsableServiceClient(
             },
             open_data: () => {
               return OpenDataDatasetClient.getOne(
+                where("dataset_id", "eq", datasetId),
+              );
+            },
+            xls_file: () => {
+              return XlsFileDatasetClient.getOne(
                 where("dataset_id", "eq", datasetId),
               );
             },
@@ -173,7 +179,7 @@ export const DatasetClient = createUsableServiceClient(
          * @param params - The parameters for the dataset to be inserted.
          * @returns The inserted dataset.
          */
-        insertCSVFileDataset: async (params: {
+        insertCsvFileDataset: async (params: {
           datasetId: DatasetId;
           workspaceId: Workspace.Id;
           datasetName: string;
@@ -193,7 +199,7 @@ export const DatasetClient = createUsableServiceClient(
             timestampFormat: string | null;
           };
         }): Promise<Dataset.T> => {
-          const logger = clientLogger.appendName("insertCSVFileDataset");
+          const logger = clientLogger.appendName("insertCsvFileDataset");
           logger.log("Creating dataset", params);
 
           const {
@@ -358,7 +364,7 @@ export const DatasetClient = createUsableServiceClient(
       "getAllDatasetsWithColumns",
     ],
     mutationFns: [
-      "insertCSVFileDataset",
+      "insertCsvFileDataset",
       "insertGoogleSheetsDataset",
       "insertOpenDataDataset",
       "insertVirtualDataset",

@@ -8,35 +8,31 @@ import type {
   Expect,
   ZodSchemaEqualsTypes,
 } from "@utils/types/test-utilities.types.ts";
-import type {
-  CsvFileDatasetId,
-  CsvFileDatasetModel,
-} from "$/models/datasets/CsvFileDataset/CsvFileDataset.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
+import type {
+  XlsFileDatasetId,
+  XlsFileDatasetModel,
+} from "$/models/datasets/XlsFileDataset/XlsFileDataset.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 
 const DBReadSchema = z.object({
   created_at: z.iso.datetime({ offset: true }),
   dataset_id: z.uuid(),
+  date_format: z.string().nullable(),
+  has_header: z.boolean(),
   id: z.uuid(),
+  is_in_cloud_storage: z.boolean(),
+  rows_to_skip: z.number(),
+  sheet_name: z.string().nullable(),
+  size_in_bytes: z.number(),
+  timestamp_format: z.string().nullable(),
   updated_at: z.iso.datetime({ offset: true }),
   workspace_id: z.uuid(),
-  is_in_cloud_storage: z.boolean(),
-  size_in_bytes: z.number(),
-  rows_to_skip: z.number(),
-  quote_char: z.string().nullable(),
-  escape_char: z.string().nullable(),
-  delimiter: z.string(),
-  newline_delimiter: z.string(),
-  comment_char: z.string().nullable(),
-  has_header: z.boolean(),
-  date_format: z.string().nullable(),
-  timestamp_format: z.string().nullable(),
 });
 
-export const CsvFileDatasetParsers =
-  makeParserRegistry<CsvFileDatasetModel>().build({
-    modelName: "CsvFileDataset",
+export const XlsFileDatasetParsers =
+  makeParserRegistry<XlsFileDatasetModel>().build({
+    modelName: "XlsFileDataset",
     DBReadSchema,
     fromDBReadToModelRead: pipe(
       camelCaseKeysDeep,
@@ -44,8 +40,8 @@ export const CsvFileDatasetParsers =
       (obj) => {
         return {
           ...obj,
-          id: obj.id as CsvFileDatasetId,
           datasetId: obj.datasetId as DatasetId,
+          id: obj.id as XlsFileDatasetId,
           workspaceId: obj.workspaceId as Workspace.Id,
         };
       },
@@ -57,11 +53,10 @@ export const CsvFileDatasetParsers =
 /**
  * Do not remove these tests!
  */
-type CRUDTypes = CsvFileDatasetModel;
+type CRUDTypes = XlsFileDatasetModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
-  // Check that the DBReadSchema is consistent with the DBRead type.
   Expect<
     ZodSchemaEqualsTypes<
       typeof DBReadSchema,

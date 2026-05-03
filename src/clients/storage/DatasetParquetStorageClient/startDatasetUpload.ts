@@ -4,17 +4,17 @@ import Tus from "@uppy/tus";
 import { where } from "@utils/filters/where/where";
 import { MIMEType } from "@utils/types/common.types";
 import { AuthClient } from "@/clients/AuthClient";
-import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
+import { CsvFileDatasetClient } from "@/clients/datasets/CsvFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
-import { AvaQueryClient } from "@/config/AvaQueryClient";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { DatasetUploadProgressStore } from "@/clients/storage/DatasetParquetStorageClient/DatasetUploadProgressStore";
 import {
   DIRECT_UPLOAD_MAX_BYTES,
   getDatasetParquetStoragePath,
   WORKSPACES_BUCKET_NAME,
 } from "@/clients/storage/DatasetParquetStorageClient/utils";
+import { AvaQueryClient } from "@/config/AvaQueryClient";
+import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
@@ -152,18 +152,18 @@ async function _uploadDatasetToSupabase(options: {
   DatasetUploadProgressStore.setUploadedBytes(datasetId, parquetBlob.size);
   DatasetUploadProgressStore.markCompleted(datasetId);
 
-  const csvFileDataset = await CSVFileDatasetClient.getOne(
+  const CsvFileDataset = await CsvFileDatasetClient.getOne(
     where("dataset_id", "eq", datasetId),
   );
 
-  if (!csvFileDataset) {
+  if (!CsvFileDataset) {
     throw new Error("CSV dataset metadata is missing.");
   }
 
   // upload is complete, so we update the CSV file in our db to reflect
   // that it is in cloud storage.
-  await CSVFileDatasetClient.update({
-    id: csvFileDataset.id,
+  await CsvFileDatasetClient.update({
+    id: CsvFileDataset.id,
     data: {
       isInCloudStorage: true,
     },
