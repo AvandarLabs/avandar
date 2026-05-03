@@ -25,8 +25,9 @@ create type public.datasets__csv_file__date_format as (
  * Add a dataset to a given workspace.
  * This function should never be called directly and instead we should
  * always call one of the more specific functions such as
- * `rpc_datasets__add_google_sheets_dataset` or
- * `rpc_datasets__add_csv_file_dataset`.
+ * `rpc_datasets__add_google_sheets_dataset`,
+ * `rpc_datasets__add_csv_file_dataset`, or
+ * `rpc_datasets__add_xls_file_dataset`.
  *
  * The requesting user must be an admin of the workspace.
  *
