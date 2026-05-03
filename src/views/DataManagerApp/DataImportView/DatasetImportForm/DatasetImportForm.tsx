@@ -92,7 +92,7 @@ type Props = {
    */
   showOnlineStorageAllowed?: boolean;
 
-  /** The payload for importing a CSV file. */
+  /** Source-specific metadata used when persisting the dataset. */
   importPayload:
     | {
         sourceType: "csv_file";
@@ -100,6 +100,8 @@ type Props = {
       }
     | {
         sourceType: "google_sheets";
+        googleAccountId: string;
+        googleDocumentId: string;
       };
 };
 
@@ -184,8 +186,20 @@ export function DatasetImportForm({
           });
           return dataset;
         })
-        .with({ sourceType: "google_sheets" }, async () => {
-          throw new Error("Google Sheets import is not supported yet");
+        .with({ sourceType: "google_sheets" }, async (payload) => {
+          const { csvSniff } = loadCsvResult;
+          const { googleAccountId, googleDocumentId } = payload;
+          const dataset = await DatasetClient.insertGoogleSheetsDataset({
+            columns: columns.map(snakeCaseKeysShallow),
+            datasetDescription: description,
+            datasetId: initialDatasetId,
+            datasetName: name,
+            googleAccountId,
+            googleDocumentId,
+            rowsToSkip: numRowsToSkip ?? csvSniff.SkipRows ?? 0,
+            workspaceId: workspace.id,
+          });
+          return dataset;
         })
         .exhaustive(() => {
           throw new Error(

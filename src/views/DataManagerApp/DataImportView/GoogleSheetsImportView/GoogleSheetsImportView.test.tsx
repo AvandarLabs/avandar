@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
-  fireEvent,
+  act,
   RenderOptions,
   render as renderRtl,
   screen,
@@ -12,15 +12,19 @@ import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
 import { uuid } from "$/lib/uuid";
 import Papa from "papaparse";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { APIClient } from "@/clients/APIClient";
 import { AvandarUIProvider } from "@/components/common/AvandarUIProvider";
 import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";
+import { GoogleSheetsImportView } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView";
 import type {
   DuckDbColumnSchema,
   DuckDbLoadCsvResult,
 } from "@/clients/DuckDBClient/DuckDBClient.types";
+import type { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
+import type { GPickerDocumentObject } from "@/lib/types/google-picker";
+import type { APIReturnType } from "@/types/http-api.types";
 import type { UnknownObject } from "@utils/types/common.types";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -42,12 +46,22 @@ const {
   storeLocalCSVMock,
   dropLocalDatasetMock,
   getPreviewDataMock,
+  googlePickerHarness,
 } = vi.hoisted(() => {
+  const harness: {
+    onSheetPicked: ((document: GPickerDocumentObject) => void) | null;
+    pickerSetVisible: ReturnType<typeof vi.fn>;
+  } = {
+    onSheetPicked: null,
+    pickerSetVisible: vi.fn(),
+  };
+
   return {
     notifySuccessMock: vi.fn(),
     storeLocalCSVMock: vi.fn(),
     dropLocalDatasetMock: vi.fn().mockResolvedValue(undefined),
     getPreviewDataMock: vi.fn(),
+    googlePickerHarness: harness,
   };
 });
 
@@ -82,10 +96,26 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
   };
 });
 
+vi.mock("@/clients/APIClient", () => {
+  return {
+    APIClient: {
+      get: vi.fn(),
+    },
+  };
+});
+
+vi.mock("@/clients/datasets/DatasetQueryClient", () => {
+  return {
+    DatasetQueryClient: {
+      getPreviewData: getPreviewDataMock,
+    },
+  };
+});
+
 vi.mock("@/clients/datasets/DatasetClient", () => {
   return {
     DatasetClient: {
-      insertCSVFileDataset: vi.fn(),
+      insertGoogleSheetsDataset: vi.fn(),
       QueryKeys: {
         getAll: (): string[] => {
           return ["datasets"];
@@ -115,10 +145,29 @@ vi.mock("@/clients/datasets/LocalDatasetClient", () => {
   };
 });
 
-vi.mock("@/clients/datasets/DatasetQueryClient", () => {
+vi.mock("@/hooks/ui/useGooglePicker", () => {
   return {
-    DatasetQueryClient: {
-      getPreviewData: getPreviewDataMock,
+    useGooglePicker: (options: {
+      onGoogleSheetPicked?: (document: GPickerDocumentObject) => void;
+    }) => {
+      if (options.onGoogleSheetPicked) {
+        googlePickerHarness.onSheetPicked = options.onGoogleSheetPicked;
+      }
+
+      const mockAccount = {
+        access_token: "google-sheets-test-access-token",
+        google_account_id: "00000000-0000-4000-8000-000000000099",
+        google_email: "google-sheets-test@example.com",
+      } as GoogleToken;
+
+      return {
+        googlePickerAPI: undefined,
+        isGoogleAuthenticated: true,
+        isLoadingAPI: false,
+        isLoadingGoogleAuthState: false,
+        picker: { setVisible: googlePickerHarness.pickerSetVisible },
+        selectedGoogleAccount: mockAccount,
+      };
     },
   };
 });
@@ -172,7 +221,7 @@ function _columnSchema(
 }
 
 /**
- * Metadata matching DuckDB WASM inference for `us-covid-sample.csv`
+ * Metadata matching DuckDB WASM inference for `california-covid-sample.csv`
  * (see fixture under `tests/data/`).
  */
 function _covidSampleLoadResult(options: {
@@ -243,16 +292,38 @@ function _previewRowsFromCovidSample(): UnknownObject[] {
 }
 
 /**
- * Full DuckDB WASM does not finish reliably in Vitest/jsdom (web workers), so
- * `LocalDatasetClient.storeLocalCSV` and `DatasetQueryClient.getPreviewData`
- * use mocks. Load metadata matches DuckDB inference for
- * `tests/data/california-covid-sample.csv`.
+ * Rows as returned by `google-sheets/:id`, matching `california-covid-sample`.
+ * Cells must be strings for `csvCellValueSchema` in the view.
  */
-describe("ManualUploadView", () => {
+function _spreadsheetRowsFromCovidSampleCsv(): string[][] {
+  const text = readFileSync(FIXTURE_CSV_PATH, "utf8");
+  const parsed = Papa.parse<string[]>(text, {
+    header: false,
+    skipEmptyLines: true,
+  });
+
+  return parsed.data.map((row) => {
+    return row.map((cell) => {
+      return String(cell);
+    });
+  });
+}
+
+function _simulateGoogleSheetPick(document: GPickerDocumentObject): void {
+  if (!googlePickerHarness.onSheetPicked) {
+    throw new Error(
+      "Expected useGooglePicker to register onGoogleSheetPicked.",
+    );
+  }
+
+  googlePickerHarness.onSheetPicked(document);
+}
+
+describe("GoogleSheetsImportView", () => {
   beforeEach(() => {
     vi.mocked(useCurrentUser).mockReturnValue({
       id: "00000000-0000-4000-8000-000000000001",
-      email: "manual-upload-test@example.com",
+      email: "google-sheets-import-test@example.com",
     } as User.T);
 
     vi.mocked(useCurrentWorkspace).mockReturnValue({
@@ -269,14 +340,28 @@ describe("ManualUploadView", () => {
     storeLocalCSVMock.mockClear();
     dropLocalDatasetMock.mockClear();
     getPreviewDataMock.mockClear();
+    googlePickerHarness.pickerSetVisible.mockClear();
+
+    const spreadsheetRows = _spreadsheetRowsFromCovidSampleCsv();
+
+    vi.mocked(APIClient.get).mockImplementation((async (opts) => {
+      if (opts.route === "google-sheets/:id") {
+        const payload: APIReturnType<"google-sheets/:id", "GET"> = {
+          availableSheets: [{ name: "Sheet1", sheetId: 0 }],
+          rows: spreadsheetRows,
+          sheetName: "Sheet1",
+          spreadsheetName: "california-covid-sample",
+        };
+        return payload;
+      }
+
+      throw new Error(`Unexpected APIClient.get route: ${String(opts.route)}`);
+    }) as typeof APIClient.get);
 
     storeLocalCSVMock.mockImplementation(async (params) => {
-      const file = params.csvParseOptions.file as File | undefined;
-      const csvName = file?.name ?? "fixture.csv";
-
       return _covidSampleLoadResult({
+        csvName: "california-covid-sample",
         datasetId: params.datasetId,
-        csvName,
       });
     });
 
@@ -285,31 +370,16 @@ describe("ManualUploadView", () => {
     getPreviewDataMock.mockResolvedValue(previewRows);
   });
 
-  it("parses us-covid-sample.csv, infers columns, and reports row count", async () => {
-    const csvBuffer = readFileSync(FIXTURE_CSV_PATH);
-    const file = new File([csvBuffer], "us-covid-sample.csv", {
-      type: "text/csv",
+  it("loads california-covid-sample via Sheets API, infers columns, and reports row count", async () => {
+    renderWithProviders(<GoogleSheetsImportView />);
+
+    await act(async () => {
+      _simulateGoogleSheetPick({
+        id: "00000000-0000-4000-8000-0000000000a1",
+        name: "california-covid-sample",
+      });
     });
 
-    const { container } = renderWithProviders(<ManualUploadView />);
-
-    const hiddenFileInput = container.querySelector(
-      `input[type="file"][accept="text/csv"]`,
-    );
-    expect(hiddenFileInput).not.toBeNull();
-
-    fireEvent.change(hiddenFileInput!, {
-      target: { files: [file] },
-    });
-
-    await waitFor(() => {
-      const uploadBtn = screen.getByRole("button", { name: "Upload" });
-      expect(uploadBtn).not.toBeDisabled();
-    });
-
-    fireEvent.click(screen.getByRole("button", { name: "Upload" }));
-
-    // expect success notification
     await waitFor(() => {
       expect(notifySuccessMock).toHaveBeenCalled();
     });

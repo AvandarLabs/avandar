@@ -66,8 +66,8 @@ export const LocalDatasetClient = createUsableServiceClient(
             loadResult.tableName,
           );
 
-          // now that the data is in DuckDB memory, lets add an entry to
-          // IndexedDB to track it in persisted local storage.
+          // now that the data is in DuckDb memory, lets add an entry to
+          // IndexedDb to track it in persisted local storage.
           await LocalDatasetClient.insert({
             data: {
               datasetId: datasetId,
@@ -80,8 +80,8 @@ export const LocalDatasetClient = createUsableServiceClient(
         },
 
         /**
-         * Drops the local dataset from both local storage (IndexedDB) and
-         * memory (DuckDB).
+         * Drops the local dataset from both local storage (IndexedDb) and
+         * memory (DuckDb).
          */
         dropLocalDataset: async (params: {
           datasetId: DatasetId;
