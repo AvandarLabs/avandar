@@ -536,7 +536,7 @@ export type Database = {
           },
         ]
       }
-      datasets__xls_file: {
+      datasets__xlsx_file: {
         Row: {
           created_at: string
           dataset_id: string
@@ -1360,7 +1360,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      rpc_datasets__add_xls_file_dataset: {
+      rpc_datasets__add_xlsx_file_dataset: {
         Args: {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
           p_dataset_description: string
@@ -1472,7 +1472,7 @@ export type Database = {
         | "google_sheets"
         | "virtual"
         | "open_data"
-        | "xls_file"
+        | "xlsx_file"
       entity_field_configs__value_extractor_type:
         | "dataset_column_value"
         | "manual_entry"
@@ -1688,7 +1688,7 @@ export const Constants = {
         "google_sheets",
         "virtual",
         "open_data",
-        "xls_file",
+        "xlsx_file",
       ],
       entity_field_configs__value_extractor_type: [
         "dataset_column_value",

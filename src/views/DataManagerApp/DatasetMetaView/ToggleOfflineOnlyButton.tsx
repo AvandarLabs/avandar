@@ -12,11 +12,11 @@ import { useUploadPercent } from "@/clients/storage/DatasetParquetStorageClient/
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { XlsFileDataset } from "$/models/datasets/XlsFileDataset/XlsFileDataset";
+import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
 
 type Props = {
   isInCloudStorage: boolean;
-  fileDatasetId: CsvFileDataset.Id | XlsFileDataset.Id;
+  fileDatasetId: CsvFileDataset.Id | XlsxFileDataset.Id;
   datasetId: DatasetId;
 };
 

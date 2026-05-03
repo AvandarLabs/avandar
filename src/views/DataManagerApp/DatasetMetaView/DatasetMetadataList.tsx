@@ -15,7 +15,7 @@ import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenDataDataset";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
-import type { XlsFileDataset } from "$/models/datasets/XlsFileDataset/XlsFileDataset";
+import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
 import type { SetOptional } from "type-fest";
 
 type DatasetWithColumnsAndSource = SetOptional<
@@ -27,7 +27,7 @@ type DatasetWithColumnsAndSource = SetOptional<
     | GoogleSheetsDataset.T
     | OpenDataDataset.T
     | VirtualDataset.T
-    | XlsFileDataset.T
+    | XlsxFileDataset.T
     | undefined;
 };
 
@@ -59,7 +59,7 @@ const DATASET_METADATA_RENDER_OPTIONS = {
         google_sheets: "Google Sheets",
         open_data: "Open Data",
         virtual: "Derived Dataset",
-        xls_file: "Excel file",
+        xlsx_file: "Excel file",
         _otherwise: value,
       });
     },

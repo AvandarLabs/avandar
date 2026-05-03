@@ -1,4 +1,4 @@
-create table public.datasets__xls_file (
+create table public.datasets__xlsx_file (
   -- Primary key
   id uuid primary key default gen_random_uuid(),
   -- Dataset this metadata belongs to
@@ -30,13 +30,13 @@ create table public.datasets__xls_file (
 );
 
 -- Enable row level security
-alter table public.datasets__xls_file enable row level security;
+alter table public.datasets__xlsx_file enable row level security;
 
 -- Policies
-create policy "User can select datasets__xls_file in their workspace" on public.datasets__xls_file for
+create policy "User can select datasets__xlsx_file in their workspace" on public.datasets__xlsx_file for
 select
   to authenticated using (
-    public.datasets__xls_file.workspace_id = any (
+    public.datasets__xlsx_file.workspace_id = any (
       array(
         select
           public.util__get_auth_user_workspaces ()
@@ -44,10 +44,10 @@ select
     )
   );
 
-create policy "User can insert datasets__xls_file in their workspace" on public.datasets__xls_file for insert to authenticated
+create policy "User can insert datasets__xlsx_file in their workspace" on public.datasets__xlsx_file for insert to authenticated
 with
   check (
-    public.datasets__xls_file.workspace_id = any (
+    public.datasets__xlsx_file.workspace_id = any (
       array(
         select
           public.util__get_auth_user_workspaces ()
@@ -55,10 +55,10 @@ with
     )
   );
 
-create policy "User can update datasets__xls_file in their workspace" on public.datasets__xls_file
+create policy "User can update datasets__xlsx_file in their workspace" on public.datasets__xlsx_file
 for update
   to authenticated using (
-    public.datasets__xls_file.workspace_id = any (
+    public.datasets__xlsx_file.workspace_id = any (
       array(
         select
           public.util__get_auth_user_workspaces ()
@@ -68,7 +68,7 @@ for update
 with
   check (
     -- Updated values must still be in the auth user's workspace
-    public.datasets__xls_file.workspace_id = any (
+    public.datasets__xlsx_file.workspace_id = any (
       array(
         select
           public.util__get_auth_user_workspaces ()
@@ -76,8 +76,8 @@ with
     )
   );
 
-create policy "User can delete datasets__xls_file in their workspace" on public.datasets__xls_file for delete to authenticated using (
-  public.datasets__xls_file.workspace_id = any (
+create policy "User can delete datasets__xlsx_file in their workspace" on public.datasets__xlsx_file for delete to authenticated using (
+  public.datasets__xlsx_file.workspace_id = any (
     array(
       select
         public.util__get_auth_user_workspaces ()
@@ -88,6 +88,6 @@ create policy "User can delete datasets__xls_file in their workspace" on public.
 /**
  * Trigger the `updated_at` update
  */
-create trigger tr_datasets__xls_file__set_updated_at before
-update on public.datasets__xls_file for each row
+create trigger tr_datasets__xlsx_file__set_updated_at before
+update on public.datasets__xlsx_file for each row
 execute function public.util__set_updated_at ();

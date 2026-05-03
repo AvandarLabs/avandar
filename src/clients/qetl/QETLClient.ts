@@ -15,7 +15,7 @@ import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
-import { XlsFileDatasetClient } from "@/clients/datasets/XlsFileDatasetClient";
+import { XlsxFileDatasetClient } from "@/clients/datasets/XlsxFileDatasetClient";
 import { DuckDBClient, UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import { DuckDbLoadParquetResult } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
@@ -30,7 +30,7 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenDataDataset";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
-import type { XlsFileDataset } from "$/models/datasets/XlsFileDataset/XlsFileDataset";
+import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 
 export type IQETLClient = Module<
@@ -90,9 +90,9 @@ type DiceExtractor =
       dataset: Dataset.T;
     }
   | {
-      sourceType: "xls_file";
+      sourceType: "xlsx_file";
       dataset: Dataset.T;
-      sourceDataset: XlsFileDataset.T;
+      sourceDataset: XlsxFileDataset.T;
     };
 
 /**
@@ -252,18 +252,18 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
                     } as const;
                   });
                 })
-                .with("xls_file", async (type) => {
+                .with("xlsx_file", async (type) => {
                   const ids = datasetsBySourceType[type].map(prop("id"));
-                  const xlsDatasets = await XlsFileDatasetClient.withCache(
+                  const xlsxDatasets = await XlsxFileDatasetClient.withCache(
                     AvaQueryClient,
                   )
                     .withEnsureQueryData()
                     .getAll(where("dataset_id", "in", ids));
-                  return xlsDatasets.map((xlsDataset) => {
+                  return xlsxDatasets.map((xlsxDataset) => {
                     return {
-                      dataset: datasetsById[xlsDataset.datasetId]!,
-                      sourceType: "xls_file" as const,
-                      sourceDataset: xlsDataset,
+                      dataset: datasetsById[xlsxDataset.datasetId]!,
+                      sourceType: "xlsx_file" as const,
+                      sourceDataset: xlsxDataset,
                     } as const;
                   });
                 })
@@ -355,7 +355,7 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
                 }
                 return { datasetId: ex.dataset.id, parquetBlob };
               })
-              .with({ sourceType: "xls_file" }, async (ex) => {
+              .with({ sourceType: "xlsx_file" }, async (ex) => {
                 const parquetBlob =
                   await DatasetParquetStorageClient.downloadDataset({
                     datasetId: ex.dataset.id,

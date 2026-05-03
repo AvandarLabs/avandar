@@ -21,6 +21,7 @@ import type {
   DuckDbColumnSchema,
   DuckDbLoadCsvResult,
 } from "@/clients/DuckDbClient/DuckDbClient.types";
+import type { UseQueryResult } from "@tanstack/react-query";
 import type { UnknownObject } from "@utils/types/common.types";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -42,12 +43,14 @@ const {
   storeLocalCSVMock,
   dropLocalDatasetMock,
   getPreviewDataMock,
+  useGetPreviewDataMock,
 } = vi.hoisted(() => {
   return {
     notifySuccessMock: vi.fn(),
     storeLocalCSVMock: vi.fn(),
     dropLocalDatasetMock: vi.fn().mockResolvedValue(undefined),
     getPreviewDataMock: vi.fn(),
+    useGetPreviewDataMock: vi.fn(),
   };
 });
 
@@ -119,6 +122,7 @@ vi.mock("@/clients/datasets/DatasetQueryClient", () => {
   return {
     DatasetQueryClient: {
       getPreviewData: getPreviewDataMock,
+      useGetPreviewData: useGetPreviewDataMock,
     },
   };
 });
@@ -244,7 +248,7 @@ function _previewRowsFromCovidSample(): UnknownObject[] {
 
 /**
  * Full DuckDB WASM does not finish reliably in Vitest/jsdom (web workers), so
- * `LocalDatasetClient.storeLocalCSV` and `DatasetQueryClient.getPreviewData`
+ * `LocalDatasetClient.storeLocalCSV` and `DatasetQueryClient.useGetPreviewData`
  * use mocks. Load metadata matches DuckDB inference for
  * `tests/data/california-covid-sample.csv`.
  */
@@ -269,6 +273,7 @@ describe("ManualUploadView", () => {
     storeLocalCSVMock.mockClear();
     dropLocalDatasetMock.mockClear();
     getPreviewDataMock.mockClear();
+    useGetPreviewDataMock.mockClear();
 
     storeLocalCSVMock.mockImplementation(async (params) => {
       const file = params.csvParseOptions.file as File | undefined;
@@ -283,6 +288,22 @@ describe("ManualUploadView", () => {
     const previewRows = _previewRowsFromCovidSample();
 
     getPreviewDataMock.mockResolvedValue(previewRows);
+
+    useGetPreviewDataMock.mockImplementation((options) => {
+      const enabled = Boolean(options?.useQueryOptions?.enabled);
+      const data = enabled ? previewRows : undefined;
+      const queryResult = {
+        data,
+        error: null,
+        isError: false,
+        isLoading: false,
+        isPending: !enabled,
+        isSuccess: enabled,
+        status: enabled ? "success" : "pending",
+      } as UseQueryResult<UnknownObject[]>;
+
+      return [data, false, queryResult];
+    });
   });
 
   it("parses us-covid-sample.csv, infers columns, and reports row count", async () => {
@@ -294,7 +315,7 @@ describe("ManualUploadView", () => {
     const { container } = renderWithProviders(<ManualUploadView />);
 
     const hiddenFileInput = container.querySelector(
-      `input[type="file"][accept="text/csv"]`,
+      'input[type="file"][accept*="text/csv"]',
     );
     expect(hiddenFileInput).not.toBeNull();
 

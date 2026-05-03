@@ -179,7 +179,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                 // this toggle is currently only supported for CSV and Excel
                 // datasets
                 (dataset.sourceType === "csv_file" ||
-                  dataset.sourceType === "xls_file")
+                  dataset.sourceType === "xlsx_file")
               ) ?
                 <Box style={{ flexShrink: 0 }}>
                   <ToggleOfflineOnlyButton

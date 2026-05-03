@@ -3,7 +3,7 @@ create type public.datasets__source_type as enum(
   'google_sheets',
   'virtual',
   'open_data',
-  'xls_file'
+  'xlsx_file'
 );
 
 create table public.datasets (
@@ -28,7 +28,7 @@ create table public.datasets (
   date_of_last_sync timestamptz,
   -- Name of the dataset
   name text not null,
-  -- The source of the dataset. E.g. "csv_file", "xls_file", etc
+  -- The source of the dataset. E.g. "csv_file", "xlsx_file", etc
   source_type public.datasets__source_type not null,
   -- Description of the dataset
   description text

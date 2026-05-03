@@ -55,7 +55,7 @@ type DatasetSummary = {
 
 type DatasetQueryClientQueries = {
   getPreviewData: (params: {
-    datasetId: DatasetId;
+    datasetId: DatasetId | undefined;
     numRows: number;
     workspaceId: Workspace.Id;
   }) => Promise<UnknownDataFrame>;
@@ -79,6 +79,11 @@ function createDatasetQueryClient(): WithLogger<
         const logger = clientLogger.appendName("getPreviewData");
         logger.log("Getting preview data for dataset", params);
         const { datasetId, numRows, workspaceId } = params;
+        if (datasetId === undefined) {
+          logger.error("Dataset ID is required to load preview data");
+          return [];
+        }
+
         const queryString = sqlTemplate(
           'SELECT * FROM "$tableName$" LIMIT $numRows$',
         ).parse({ numRows, tableName: datasetId });

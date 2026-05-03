@@ -7,6 +7,6 @@ export const DatasetSourceModule = {
     "google_sheets",
     "open_data",
     "virtual",
-    "xls_file",
+    "xlsx_file",
   ),
 };

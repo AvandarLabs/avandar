@@ -10,9 +10,9 @@ import type {
 } from "@utils/types/test-utilities.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type {
-  XlsFileDatasetId,
-  XlsFileDatasetModel,
-} from "$/models/datasets/XlsFileDataset/XlsFileDataset.types.ts";
+  XlsxFileDatasetId,
+  XlsxFileDatasetModel,
+} from "$/models/datasets/XlsxFileDataset/XlsxFileDataset.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 
 const DBReadSchema = z.object({
@@ -30,9 +30,9 @@ const DBReadSchema = z.object({
   workspace_id: z.uuid(),
 });
 
-export const XlsFileDatasetParsers =
-  makeParserRegistry<XlsFileDatasetModel>().build({
-    modelName: "XlsFileDataset",
+export const XlsxFileDatasetParsers =
+  makeParserRegistry<XlsxFileDatasetModel>().build({
+    modelName: "XlsxFileDataset",
     DBReadSchema,
     fromDBReadToModelRead: pipe(
       camelCaseKeysDeep,
@@ -41,7 +41,7 @@ export const XlsFileDatasetParsers =
         return {
           ...obj,
           datasetId: obj.datasetId as DatasetId,
-          id: obj.id as XlsFileDatasetId,
+          id: obj.id as XlsxFileDatasetId,
           workspaceId: obj.workspaceId as Workspace.Id,
         };
       },
@@ -53,7 +53,7 @@ export const XlsFileDatasetParsers =
 /**
  * Do not remove these tests!
  */
-type CRUDTypes = XlsFileDatasetModel;
+type CRUDTypes = XlsxFileDatasetModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [

@@ -1,7 +1,7 @@
 /**
- * Add an Excel (.xls / .xlsx) file dataset to a workspace.
+ * Add an Excel (.xlsx) file dataset to a workspace.
  * Calls rpc_datasets__add_dataset and inserts metadata into
- * datasets__xls_file.
+ * datasets__xlsx_file.
  *
  * @param p_dataset_id: The id of the dataset to add
  * @param p_workspace_id: The workspace id to add the dataset to
@@ -17,7 +17,7 @@
  *
  * @returns: The created dataset
  */
-create or replace function public.rpc_datasets__add_xls_file_dataset (
+create or replace function public.rpc_datasets__add_xlsx_file_dataset (
   p_dataset_id uuid,
   p_workspace_id uuid,
   p_dataset_name text,
@@ -38,11 +38,11 @@ begin
     p_workspace_id,
     p_dataset_name,
     p_dataset_description,
-    'xls_file',
+    'xlsx_file',
     p_columns
   );
 
-  insert into public.datasets__xls_file (
+  insert into public.datasets__xlsx_file (
     dataset_id,
     workspace_id,
     is_in_cloud_storage,

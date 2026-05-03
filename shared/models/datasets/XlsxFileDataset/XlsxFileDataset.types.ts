@@ -4,17 +4,17 @@ import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { SetOptional } from "type-fest";
 
-export type XlsFileDatasetId = UUID<"XlsFileDatasetId">;
+export type XlsxFileDatasetId = UUID<"XlsxFileDatasetId">;
 
-export type XlsFileDatasetRead = {
+export type XlsxFileDatasetRead = {
   /** Timestamp of when the dataset was created. */
   createdAt: string;
 
   /** Unique identifier of the dataset. */
   datasetId: DatasetId;
 
-  /** Unique identifier of the XLS file dataset in our system. */
-  id: XlsFileDatasetId;
+  /** Unique identifier of the XLSX file dataset in our system. */
+  id: XlsxFileDatasetId;
 
   /** Timestamp of when the dataset was last updated. */
   updatedAt: string;
@@ -45,17 +45,20 @@ export type XlsFileDatasetRead = {
 };
 
 /**
- * CRUD type definitions for the XlsFileDataset model.
+ * CRUD type definitions for the XlsxFileDataset model.
  */
-export type XlsFileDatasetModel = SupabaseCRUDModelSpec<
+export type XlsxFileDatasetModel = SupabaseCRUDModelSpec<
   {
-    tableName: "datasets__xls_file";
-    modelName: "XlsFileDataset";
-    modelPrimaryKeyType: XlsFileDatasetId;
+    tableName: "datasets__xlsx_file";
+    modelName: "XlsxFileDataset";
+    modelPrimaryKeyType: XlsxFileDatasetId;
     modelTypes: {
-      Read: XlsFileDatasetRead;
-      Insert: SetOptional<XlsFileDatasetRead, "createdAt" | "id" | "updatedAt">;
-      Update: Partial<XlsFileDatasetRead>;
+      Read: XlsxFileDatasetRead;
+      Insert: SetOptional<
+        XlsxFileDatasetRead,
+        "createdAt" | "id" | "updatedAt"
+      >;
+      Update: Partial<XlsxFileDatasetRead>;
     };
   },
   {

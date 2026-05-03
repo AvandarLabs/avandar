@@ -11,7 +11,7 @@ import { GoogleSheetsDatasetClient } from "@/clients/datasets/GoogleSheetsDatase
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
-import { XlsFileDatasetClient } from "@/clients/datasets/XlsFileDatasetClient";
+import { XlsxFileDatasetClient } from "@/clients/datasets/XlsxFileDatasetClient";
 import { DuckDBClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
@@ -79,8 +79,8 @@ export const DatasetClient = createUsableServiceClient(
                 where("dataset_id", "eq", datasetId),
               );
             },
-            xls_file: () => {
-              return XlsFileDatasetClient.getOne(
+            xlsx_file: () => {
+              return XlsxFileDatasetClient.getOne(
                 where("dataset_id", "eq", datasetId),
               );
             },
