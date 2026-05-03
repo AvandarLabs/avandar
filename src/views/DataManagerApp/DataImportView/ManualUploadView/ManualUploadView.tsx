@@ -1,123 +1,53 @@
-import { useQuery } from "@hooks/useQuery/useQuery";
+import { useMutation } from "@hooks/useMutation/useMutation";
 import { Box, BoxProps, Stack } from "@mantine/core";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   notifyError,
   notifySuccess,
   notifyWarning,
 } from "@ui/notifications/notify";
 import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
-import { snakeCaseKeysShallow } from "@utils/objects/snakeCaseKeys/snakeCaseKeys";
 import { MIMEType } from "@utils/types/common.types";
 import { uuid } from "$/lib/uuid";
-import { useEffect, useMemo, useState } from "react";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { useMemo, useState } from "react";
+import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
-import { DuckDBClient } from "@/clients/DuckDBClient/DuckDBClient";
-import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/DuckDBClient.types";
+import { UnknownRow } from "@/clients/DuckDBClient/DuckDBClient";
+import { DuckDbLoadCsvResult } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { FileUploadForm } from "@/lib/ui/singleton-forms/FileUploadForm";
-import {
-  DatasetImportForm,
-  DatasetImportFormValues,
-} from "@/views/DataManagerApp/DataImportView/DatasetUploadForm/index";
-import type { UnknownObject } from "@utils/types/common.types";
+import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DetectedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import type { UserId } from "$/models/User/User.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
 
-async function saveLocalCSVToBackend(params: {
-  name: string;
+type ParseCsvOptions = {
+  file: File;
   datasetId: Dataset.Id;
-  description: string;
-  columns: DetectedDatasetColumn[];
-  workspaceId: Workspace.Id;
-  isInCloudStorage: boolean;
-  loadCSVResult: DuckDBLoadCSVResult;
-  sizeInBytes: number;
-  rowsToSkip?: number;
+  numRowsToSkip?: number;
   delimiter?: string;
-}): Promise<Dataset.T> {
-  const {
-    name,
-    datasetId,
-    description,
-    isInCloudStorage,
-    sizeInBytes,
-    workspaceId,
-    columns,
-    delimiter,
-    rowsToSkip,
-    loadCSVResult,
-  } = params;
-  const { csvSniff } = loadCSVResult;
-  const dataset = await DatasetClient.insertCSVFileDataset({
-    datasetId,
-    workspaceId,
-    datasetName: name,
-    datasetDescription: description,
-    columns: columns.map(snakeCaseKeysShallow),
-    isInCloudStorage,
-    sizeInBytes,
-    parseOptions: {
-      // use the user-defined parse options here first. Otherwise, default to
-      // the sniffed options.
-      rowsToSkip: rowsToSkip ?? csvSniff.SkipRows,
-      delimiter: delimiter ?? csvSniff.Delimiter,
+};
 
-      // Fill in the other options from the CSV sniff object
-      quoteChar: csvSniff.Quote,
-      escapeChar: csvSniff.Escape,
-      newlineDelimiter: csvSniff.NewLineDelimiter,
-      commentChar: csvSniff.Comment,
-      hasHeader: csvSniff.HasHeader,
-      dateFormat: csvSniff.DateFormat,
-      timestampFormat: csvSniff.TimestampFormat,
-    },
-  });
-  return dataset;
-}
+type LoadResults = {
+  datasetId: Dataset.Id;
+  metadata: DuckDbLoadCsvResult;
+  previewRows: UnknownRow[];
+};
 
 type Props = BoxProps;
 
-export function ManualUploadView({ ...props }: Props): JSX.Element {
-  const queryClient = useQueryClient();
+export function ManualUploadView(props: Props): JSX.Element {
   const user = useCurrentUser();
   const workspace = useCurrentWorkspace();
-
-  const [parseOptions, setParseOptions] = useState<{
-    file: File;
-    datasetId: Dataset.Id;
-    numRowsToSkip?: number;
-    delimiter?: string;
-  }>();
-
-  // query to load the data locally to DuckDB
-  // TODO(jpsyx): try again to set this to `useMutation` instead of `useQuery`
-  // the code is hard to follow with `useQuery` and i dont think we need to
-  // have it that way anymore. We used to need to but we worked around it i
-  // think.
-  const [loadResults, isLoadingCSV, loadQueryObj] = useQuery({
-    queryKey: ["load-csv", user!.id, workspace.id, parseOptions],
-    queryFn: async (): Promise<
-      | {
-          datasetId: Dataset.Id;
-          metadata: DuckDBLoadCSVResult;
-          previewRows: UnknownObject[];
-        }
-      | undefined
-    > => {
-      if (!parseOptions) {
-        return undefined;
-      }
-      const { file, datasetId, numRowsToSkip, delimiter } = parseOptions;
+  const [uploadedFile, setUploadedFile] = useState<File | undefined>();
+  const [loadResults, setLoadResults] = useState<LoadResults>();
+  const [parseCsv, isParsingCsv] = useMutation({
+    mutationFn: async (options: ParseCsvOptions): Promise<LoadResults> => {
+      const { file, datasetId, numRowsToSkip, delimiter } = options;
       const loadResult = await LocalDatasetClient.storeLocalCSV({
         datasetId,
         workspaceId: workspace.id,
@@ -130,33 +60,18 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
       });
 
       // now query the file for the rows to preview
-      // TODO(jpsyx): this should be using DatasetRawDataClient.getPreviewData
-      const previewData = await DuckDBClient.runRawQuery(
-        `SELECT * FROM "$tableName$" LIMIT $maxPreviewRows$`,
-        {
-          params: {
-            tableName: datasetId,
-            maxPreviewRows: AppConfig.dataManagerApp.maxPreviewRows,
-          },
-        },
-      );
-      return { datasetId, metadata: loadResult, previewRows: previewData.data };
+      const previewData = await DatasetQueryClient.getPreviewData({
+        datasetId,
+        numRows: AppConfig.dataManagerApp.maxPreviewRows,
+        workspaceId: workspace.id,
+      });
+      return { datasetId, metadata: loadResult, previewRows: previewData };
     },
-    enabled: !!parseOptions,
-    // this ensures that we dont immediately set `loadResults` to undefined when
-    // the `parseOptions` change.
-    usePreviousDataAsPlaceholder: true,
-    refetchOnWindowFocus: false,
-    staleTime: Infinity,
-    retry: false,
-  });
-
-  // check if dataset has loaded and if so, show a notification
-  useEffect(() => {
-    if (loadResults) {
+    onSuccess: (results) => {
+      setLoadResults(results);
       const {
         metadata: { numRows: numSuccessRows, numRejectedRows },
-      } = loadResults;
+      } = results;
       if (numRejectedRows === 0) {
         notifySuccess({
           title: "File loaded successfully",
@@ -168,26 +83,23 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
           message: "No rows were read successfully",
         });
       } else {
+        const numRejectedStr =
+          numRejectedRows > 1000 ?
+            " over 1000 rows were rejected"
+          : ` ${numRejectedRows} rows were rejected`;
         notifyWarning({
           title: "File was partially loaded",
-          message: `Parsed ${numSuccessRows} rows successfully, but ${
-            numRejectedRows > 1000 ?
-              " over 1000 rows were rejected"
-            : ` ${numRejectedRows} rows were rejected`
-          }`,
+          message: `Parsed ${numSuccessRows} rows successfully, but ${numRejectedStr}`,
         });
       }
-    }
-  }, [loadResults]);
+    },
+  });
 
-  useEffect(() => {
-    if (loadQueryObj.isError) {
-      notifyError({
-        title: "File failed to load",
-        message: "An error occurred while loading the file",
-      });
-    }
-  }, [loadQueryObj.isError]);
+  const onRequestFileParse = (file: File) => {
+    const datasetId = uuid() as Dataset.Id;
+    setUploadedFile(file);
+    parseCsv({ file, datasetId });
+  };
 
   const detectedColumns = useMemo(() => {
     return loadResults?.metadata.columns.map((duckColumn, idx) => {
@@ -204,10 +116,7 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
 
   const onFileSubmit = (file: File | undefined) => {
     if (file) {
-      setParseOptions({
-        file,
-        datasetId: uuid(),
-      });
+      onRequestFileParse(file);
     } else {
       notifyError({
         title: "No file selected",
@@ -225,44 +134,17 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
           placeholder="Select file"
           accept={MIMEType.TEXT_CSV}
           fullWidth
-          isSubmitting={isLoadingCSV}
+          isSubmitting={isParsingCsv}
           onSubmit={onFileSubmit}
         />
 
-        {(
-          detectedColumns &&
-          parseOptions &&
-          loadResults &&
-          !loadQueryObj.isError
-        ) ?
+        {detectedColumns && uploadedFile && loadResults ?
           <DatasetImportForm
             key={loadResults.metadata.id}
-            defaultName={parseOptions.file.name}
+            initialDatasetName={uploadedFile.name}
+            initialDatasetId={loadResults.datasetId}
             rows={loadResults.previewRows}
             columns={detectedColumns}
-            doDatasetSave={async (
-              datasetFormValues: DatasetImportFormValues,
-            ) => {
-              const dataset = await saveLocalCSVToBackend({
-                datasetId: loadResults.datasetId,
-                workspaceId: workspace.id,
-                name: datasetFormValues.name,
-                description: datasetFormValues.description,
-
-                // start as offline-only by default. we will switch this to
-                // false if the user has allowed online syncing and the dataset
-                // has completed its upload.
-                isInCloudStorage: true,
-                sizeInBytes: parseOptions.file.size,
-                rowsToSkip: parseOptions.numRowsToSkip,
-                columns: detectedColumns,
-                loadCSVResult: loadResults.metadata,
-              });
-              queryClient.invalidateQueries({
-                queryKey: DatasetClient.QueryKeys.getAll(),
-              });
-              return dataset;
-            }}
             onDatasetSaved={({ savedDataset, datasetFormValues }) => {
               if (!datasetFormValues.onlineStorageAllowed) {
                 return;
@@ -274,41 +156,38 @@ export function ManualUploadView({ ...props }: Props): JSX.Element {
                 datasetId: savedDataset.id,
               });
             }}
-            loadCSVResult={loadResults.metadata}
+            loadCsvResult={loadResults.metadata}
             onRequestDataParse={async (parseConfig: {
               numRowsToSkip: number;
               delimiter: string;
             }) => {
-              // drop the dataset so we can re-parse it from scratch
               await LocalDatasetClient.dropLocalDataset({
                 datasetId: loadResults.datasetId,
               });
-              setParseOptions((prevParseOptions) => {
-                if (prevParseOptions) {
-                  return {
-                    file: prevParseOptions.file,
-                    numRowsToSkip: parseConfig.numRowsToSkip,
-                    delimiter: parseConfig.delimiter,
-
-                    // generate a new dataset id for this new parsing
-                    datasetId: uuid(),
-                  };
-                }
-                return prevParseOptions;
-              });
+              // generate a new dataset id for this new parsing
+              const nextDatasetId = uuid() as Dataset.Id;
+              const nextParseOptions: ParseCsvOptions = {
+                file: uploadedFile,
+                datasetId: nextDatasetId,
+                numRowsToSkip: parseConfig.numRowsToSkip,
+                delimiter: parseConfig.delimiter,
+              };
+              onRequestFileParse(uploadedFile);
+              parseCsv(nextParseOptions);
             }}
-            isProcessing={loadQueryObj.isFetching}
+            isProcessing={isParsingCsv}
+            importPayload={{
+              sourceType: "csv_file",
+              sizeInBytes: uploadedFile.size,
+            }}
           />
         : null}
 
         <Dropzone.FullScreen
           onDrop={(files: FileWithPath[]) => {
-            const uploadedFile = files[0];
-            if (uploadedFile) {
-              setParseOptions({
-                file: uploadedFile,
-                datasetId: uuid(),
-              });
+            const file = files[0];
+            if (file) {
+              onRequestFileParse(file);
             }
           }}
         >

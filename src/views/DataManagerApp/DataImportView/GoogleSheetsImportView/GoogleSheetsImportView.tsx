@@ -19,7 +19,7 @@ import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { DuckDBClient } from "@/clients/DuckDBClient/DuckDBClient";
-import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/DuckDBClient.types";
+import { DuckDbLoadCsvResult } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { AppConfig } from "@/config/AppConfig";
 import { useGooglePicker } from "@/hooks/ui/useGooglePicker";
@@ -35,7 +35,7 @@ import { Logger } from "@/utils/Logger";
 import {
   DatasetImportForm,
   DatasetImportFormValues,
-} from "@/views/DataManagerApp/DataImportView/DatasetUploadForm/index";
+} from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
 import type { UnknownObject } from "@utils/types/common.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DetectedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
@@ -54,7 +54,7 @@ async function saveGoogleSheetToBackend(params: {
   googleDocument: GPickerDocumentObject;
   columns: DetectedDatasetColumn[];
   workspaceId: Workspace.Id;
-  loadCSVResult: DuckDBLoadCSVResult;
+  loadCSVResult: DuckDbLoadCsvResult;
 }): Promise<Dataset.T> {
   const {
     name,
@@ -128,7 +128,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
     queryFn: async (): Promise<
       | {
           datasetId: Dataset.Id;
-          metadata: DuckDBLoadCSVResult;
+          metadata: DuckDbLoadCsvResult;
           previewRows: UnknownObject[];
         }
       | undefined
@@ -304,7 +304,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
         ) ?
           <DatasetImportForm
             key={loadResults.metadata.id}
-            defaultName={parseOptions.spreadsheetName}
+            initialDatasetName={parseOptions.spreadsheetName}
             rows={loadResults.previewRows}
             columns={detectedColumns}
             showOnlineStorageAllowed={false}
@@ -326,7 +326,7 @@ export function GoogleSheetsImportView({ ...props }: Props): JSX.Element {
               });
               return dataset;
             }}
-            loadCSVResult={loadResults.metadata}
+            loadCsvResult={loadResults.metadata}
             onRequestDataParse={async (parseConfig: {
               numRowsToSkip: number;
               delimiter: string;

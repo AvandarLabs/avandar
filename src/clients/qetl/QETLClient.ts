@@ -6,7 +6,7 @@ import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
 import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord";
 import { objectKeys } from "@utils/objects/objectKeys";
-import { DuckDBDataType } from "$/models/datasets/DatasetColumn/DuckDBDataTypes";
+import { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import { match } from "ts-pattern";
 import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
 import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
@@ -16,7 +16,7 @@ import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
 import { DuckDBClient, UnknownRow } from "@/clients/DuckDBClient/DuckDBClient";
-import { DuckDBLoadParquetResult } from "@/clients/DuckDBClient/DuckDBClient.types";
+import { DuckDbLoadParquetResult } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
@@ -63,7 +63,7 @@ type ColumnReplacement = {
   /** The new name of the column. */
   alias?: string;
   /** The new data type of the column. */
-  dataType?: DuckDBDataType;
+  dataType?: DuckDbDataType;
 };
 
 type DiceExtractor =
@@ -151,7 +151,7 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
           datasetId: Dataset.Id;
           parquetBlob: Blob;
           columnReplacements?: readonly ColumnReplacement[];
-        }): Promise<DuckDBLoadParquetResult> => {
+        }): Promise<DuckDbLoadParquetResult> => {
           return DuckDBClient.loadParquet({
             tableName: datasetId,
             blob: parquetBlob,

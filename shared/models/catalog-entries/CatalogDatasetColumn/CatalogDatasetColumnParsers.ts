@@ -3,7 +3,7 @@ import { pipe } from "@utils/misc/pipe/pipe.ts";
 import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
 import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeys/snakeCaseKeys.ts";
-import { DuckDBDataTypes } from "$/models/datasets/DatasetColumn/DuckDBDataTypes.ts";
+import { DuckDbDataTypes } from "$/models/datasets/DatasetColumn/DuckDbDataTypes.ts";
 import { z } from "zod";
 import type {
   Expect,
@@ -24,7 +24,7 @@ const DBReadSchema = z.object({
   created_at: z.iso.datetime({ offset: true }).nullable(),
   updated_at: z.iso.datetime({ offset: true }).nullable(),
   original_data_type: z.string(),
-  cast_data_type: z.enum(DuckDBDataTypes),
+  cast_data_type: z.enum(DuckDbDataTypes),
 });
 
 export const CatalogDatasetColumnParsers =

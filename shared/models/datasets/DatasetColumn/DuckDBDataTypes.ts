@@ -1,6 +1,6 @@
 import { registry } from "@utils/objects/registry/registry.ts";
 
-export type DuckDBDataType =
+export type DuckDbDataType =
   | "BOOLEAN"
   | "TINYINT"
   | "SMALLINT"
@@ -32,7 +32,7 @@ export type DuckDBDataType =
   | "JSON"
   | "GEOMETRY";
 
-export const DuckDBDataTypes = registry<DuckDBDataType>().keys(
+export const DuckDbDataTypes = registry<DuckDbDataType>().keys(
   "BOOLEAN",
   "TINYINT",
   "SMALLINT",

@@ -1,6 +1,6 @@
 import type { UUID } from "@utils/types/common.types.ts";
 import type { OpenDataCatalogEntryId } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts";
-import type { DuckDBDataType } from "$/models/datasets/DatasetColumn/DuckDBDataTypes.ts";
+import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes.ts";
 import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
 import type { SetOptional } from "type-fest";
 
@@ -30,7 +30,7 @@ export type CatalogDatasetColumnRead = {
   originalDataType: string;
 
   /** DuckDB type used when casting / interpreting this column in Avandar. */
-  castDataType: DuckDBDataType;
+  castDataType: DuckDbDataType;
 };
 
 /**

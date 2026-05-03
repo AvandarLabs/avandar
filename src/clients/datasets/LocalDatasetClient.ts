@@ -5,7 +5,7 @@ import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { LocalDatasetParsers } from "@/models/LocalDataset/LocalDatasetParsers";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { DucKDBLoadCSVOptions } from "@/clients/DuckDBClient/DuckDBClient";
-import type { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/DuckDBClient.types";
+import type { DuckDbLoadCsvResult } from "@/clients/DuckDBClient/DuckDBClient.types";
 import type { LocalDataset } from "@/models/LocalDataset/LocalDataset.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { UserId } from "$/models/User/User.types";
@@ -53,7 +53,7 @@ export const LocalDatasetClient = createUsableServiceClient(
           workspaceId: Workspace.Id;
           userId: UserId;
           csvParseOptions: DistributedOmit<DucKDBLoadCSVOptions, "tableName">;
-        }): Promise<DuckDBLoadCSVResult> => {
+        }): Promise<DuckDbLoadCsvResult> => {
           const logger = config.logger.appendName("insertCSV");
           logger.log("Storing CSV locally", params);
           const { datasetId, csvParseOptions, workspaceId, userId } = params;

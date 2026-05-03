@@ -10,7 +10,7 @@ import { DuckDBQueryAggregations } from "$/models/queries/QueryAggregationType/Q
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import knex from "knex";
 import { match } from "ts-pattern";
-import type { DuckDBQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
+import type { DuckDbQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 
 const sql = knex({
@@ -66,7 +66,7 @@ export function toRawDuckDBQuery(
 
   const duckDBAggregations = {} as Record<
     string, // duckdb uses column **names** for aggregations (not ids)
-    DuckDBQueryAggregationTypeT
+    DuckDbQueryAggregationTypeT
   >;
   objectEntries(aggregations).forEach(([columnId, aggregation]) => {
     const column = queryColumnLookup.get(columnId);

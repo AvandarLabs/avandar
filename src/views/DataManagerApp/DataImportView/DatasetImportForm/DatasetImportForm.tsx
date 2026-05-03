@@ -8,17 +8,20 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
+import { FormErrors } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
 import { notifyError, notifySuccess } from "@ui/notifications/notify";
+import { snakeCaseKeysShallow } from "@utils/index";
 import { useMemo, useRef, useState } from "react";
-import { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/DuckDBClient.types";
+import { match } from "ts-pattern";
+import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { DuckDbLoadCsvResult } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useForm } from "@/lib/hooks/ui/useForm/useForm";
 import { Callout } from "@/lib/ui/Callout";
-import type { FormErrors } from "@mantine/form";
 import type { UnknownObject } from "@utils/types/common.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DetectedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
@@ -59,13 +62,11 @@ type Props = {
    * `AppConfig.dataManagerApp.maxPreviewRows` will be displayed.
    */
   rows: UnknownObject[];
-  defaultName: string;
+  initialDatasetId: Dataset.Id;
+  initialDatasetName: string;
   columns: readonly DetectedDatasetColumn[];
-  doDatasetSave: (
-    datasetFormValues: DatasetImportFormValues,
-  ) => Promise<Dataset.T>;
   disableSubmit?: boolean;
-  loadCSVResult: DuckDBLoadCSVResult;
+  loadCsvResult: DuckDbLoadCsvResult;
 
   /** When the user requests to parse the data again. */
   onRequestDataParse: (parseConfig: {
@@ -73,12 +74,6 @@ type Props = {
     delimiter: string;
   }) => void;
   isProcessing?: boolean;
-
-  /**
-   * If true, show the "cloud storage" toggle which can mark the dataset as
-   * offline-only.
-   */
-  showOnlineStorageAllowed?: boolean;
 
   /**
    * Called after the dataset is saved, before navigating away.
@@ -90,19 +85,42 @@ type Props = {
     savedDataset: Dataset.T;
     datasetFormValues: DatasetImportFormValues;
   }) => void;
+
+  /**
+   * If true, show the "cloud storage" toggle which can mark the dataset as
+   * offline-only.
+   */
+  showOnlineStorageAllowed?: boolean;
+
+  /** The payload for importing a CSV file. */
+  importPayload:
+    | {
+        sourceType: "csv_file";
+        sizeInBytes: number;
+      }
+    | {
+        sourceType: "google_sheets";
+      };
 };
 
+/**
+ * This is the common form that shows up after a user has uploaded or connected
+ * a data source. This is where the user can adjust settings, re-connect or
+ * re-parse the data, preview the data, and (ultimately) finally save the
+ * data source to their workspace.
+ */
 export function DatasetImportForm({
   rows,
   columns,
-  defaultName,
-  doDatasetSave,
+  initialDatasetId,
+  initialDatasetName,
   disableSubmit,
-  loadCSVResult,
+  loadCsvResult,
   onRequestDataParse,
   isProcessing = false,
   showOnlineStorageAllowed = true,
   onDatasetSaved,
+  importPayload,
 }: Props): JSX.Element {
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
@@ -111,13 +129,13 @@ export function DatasetImportForm({
   const [showValidationSummary, setShowValidationSummary] = useState(false);
 
   const [numRowsToSkip, setNumRowsToSkip] = useState(
-    loadCSVResult.csvSniff.SkipRows,
+    loadCsvResult.csvSniff.SkipRows,
   );
-  const [delimiter, setDelimiter] = useState(loadCSVResult.csvSniff.Delimiter);
+  const [delimiter, setDelimiter] = useState(loadCsvResult.csvSniff.Delimiter);
 
   const form = useForm<DatasetImportFormValues>({
     initialValues: {
-      name: defaultName,
+      name: initialDatasetName,
       description: "",
       onlineStorageAllowed: true,
     },
@@ -133,7 +151,48 @@ export function DatasetImportForm({
   });
 
   const [saveDataset, isSavePending] = useMutation({
-    mutationFn: doDatasetSave,
+    queryToInvalidate: DatasetClient.QueryKeys.getAll(),
+    mutationFn: (values: DatasetImportFormValues) => {
+      const { name, description, onlineStorageAllowed } = values;
+      return match(importPayload)
+        .with({ sourceType: "csv_file" }, async (payload) => {
+          const { sizeInBytes } = payload;
+          const { csvSniff } = loadCsvResult;
+          const dataset = await DatasetClient.insertCSVFileDataset({
+            datasetId: initialDatasetId,
+            workspaceId: workspace.id,
+            datasetName: name,
+            datasetDescription: description,
+            columns: columns.map(snakeCaseKeysShallow),
+            isInCloudStorage: onlineStorageAllowed,
+            sizeInBytes,
+            parseOptions: {
+              // use the user-defined parse options here first. Otherwise,
+              // default to the sniffed options.
+              rowsToSkip: numRowsToSkip ?? csvSniff.SkipRows,
+              delimiter: delimiter ?? csvSniff.Delimiter,
+
+              // Fill in the other options from the CSV sniff object
+              quoteChar: csvSniff.Quote,
+              escapeChar: csvSniff.Escape,
+              newlineDelimiter: csvSniff.NewLineDelimiter,
+              commentChar: csvSniff.Comment,
+              hasHeader: csvSniff.HasHeader,
+              dateFormat: csvSniff.DateFormat,
+              timestampFormat: csvSniff.TimestampFormat,
+            },
+          });
+          return dataset;
+        })
+        .with({ sourceType: "google_sheets" }, async () => {
+          throw new Error("Google Sheets import is not supported yet");
+        })
+        .exhaustive(() => {
+          throw new Error(
+            `Unsupported dataset source type: ${importPayload.sourceType}`,
+          );
+        });
+    },
     onSuccess: async (savedDataset) => {
       setShowValidationSummary(false);
       notifySuccess({
@@ -214,7 +273,7 @@ export function DatasetImportForm({
   });
 
   const renderProcessState = () => {
-    const { numRows } = loadCSVResult;
+    const { numRows } = loadCsvResult;
     const formattedNumRows = numRows.toLocaleString();
 
     if (numRows === 0) {

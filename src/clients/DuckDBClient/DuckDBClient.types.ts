@@ -1,11 +1,11 @@
 import type { UUID } from "@utils/types/common.types";
-import type { DuckDBDataType } from "$/models/datasets/DatasetColumn/DuckDBDataTypes";
-import type { DuckDBQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
+import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
+import type { DuckDbQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types";
 
 /**
  * The CSV Reject Scans Table returns the following information:
  */
-export type DuckDBScan = {
+export type DuckDbScan = {
   /** The internal ID used in DuckDB to represent that scanner */
   scan_id: bigint;
   /**
@@ -40,7 +40,7 @@ export type DuckDBScan = {
 /**
  * The CSV Reject Errors Table returns the following information:
  */
-export type DuckDBRejectedRow = {
+export type DuckDbRejectedRow = {
   /**
    * The internal ID used in DuckDB to represent that scanner, used to join
    * with reject scans tables
@@ -69,19 +69,19 @@ export type DuckDBRejectedRow = {
   error_message: string;
 };
 
-export type LoadCSVErrors = {
-  rejectedScans: DuckDBScan[];
-  rejectedRows: DuckDBRejectedRow[];
+export type LoadCsvErrors = {
+  rejectedScans: DuckDbScan[];
+  rejectedRows: DuckDbRejectedRow[];
 };
 
 /**
  * Schema for a column as returned by DuckDB's DESCRIBE statement.
  */
-export type DuckDBColumnSchema = {
+export type DuckDbColumnSchema = {
   /** The name of the column */
   column_name: string;
   /** The data type of the column (e.g. VARCHAR, INTEGER, etc.) */
-  column_type: DuckDBDataType;
+  column_type: DuckDbDataType;
   /** The default value for the column, if any */
   default: unknown;
   /** Any extra information about the column (usually null) */
@@ -95,7 +95,7 @@ export type DuckDBColumnSchema = {
   null: "YES" | "NO";
 };
 
-export type DuckDBLoadParquetResult = {
+export type DuckDbLoadParquetResult = {
   /** Unique identifier for this load operation */
   id: UUID;
   /** The name of the parquet file */
@@ -103,10 +103,10 @@ export type DuckDBLoadParquetResult = {
   /** The number of rows that successfully parsed */
   numRows: number;
   /** The inferred schema of the CSV file */
-  columns: DuckDBColumnSchema[];
+  columns: DuckDbColumnSchema[];
 };
 
-export type DuckDBLoadCSVResult = {
+export type DuckDbLoadCsvResult = {
   /** Unique identifier for this load operation */
   id: UUID;
   /** The name of the CSV file */
@@ -114,22 +114,22 @@ export type DuckDBLoadCSVResult = {
   /** The number of rows that successfully parsed */
   numRows: number;
   /** The inferred schema of the CSV file */
-  columns: DuckDBColumnSchema[];
+  columns: DuckDbColumnSchema[];
   /** The number of rows that were rejected */
   numRejectedRows: number;
   /** The errors that occurred while loading the CSV file */
-  errors: LoadCSVErrors;
+  errors: LoadCsvErrors;
   /**
    * The sniffed CSV file information. This is the result of DuckDB's
    * auto-detection. It may not be completely accurate.
    */
-  csvSniff: DuckDBCSVSniffResult;
+  csvSniff: DuckDbCsvSniffResult;
 
   /** The name of the DUckDB table holding the loaded CSV data */
   tableName: string;
 };
 
-export type DuckDBCSVSniffResult = {
+export type DuckDbCsvSniffResult = {
   /** Example: `,` */
   Delimiter: string;
   /** Quote character. E.g. `"` */
@@ -145,7 +145,7 @@ export type DuckDBCSVSniffResult = {
   /** Whether the CSV has a header */
   HasHeader: boolean;
   /** The columns of the CSV file */
-  Columns: Array<{ name: string; type: DuckDBDataType }>;
+  Columns: Array<{ name: string; type: DuckDbDataType }>;
   /** The date format of the CSV file. E.g. `%d/%m/%Y` */
   DateFormat: string | null;
   /** The timestamp format of the CSV file. E.g. `%Y-%m-%dT%H:%M:%S.%f` */
@@ -171,7 +171,7 @@ export type DuckDBCSVSniffResult = {
   table_name: string;
 };
 
-export type DuckDBStructuredQuery = {
+export type DuckDbStructuredQuery = {
   tableName: string;
   selectColumnNames?: readonly string[] | "*";
   groupByColumnNames?: readonly string[];
@@ -183,7 +183,7 @@ export type DuckDBStructuredQuery = {
    *
    * **NOTE**: Key is the column name.
    */
-  aggregations?: Record<string, DuckDBQueryAggregationTypeT>;
+  aggregations?: Record<string, DuckDbQueryAggregationTypeT>;
   offset?: number;
   limit?: number;
 

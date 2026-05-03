@@ -5,6 +5,10 @@ import type { VirtualDatasetModel } from "$/models/datasets/VirtualDataset/Virtu
 import type { Enums } from "$/types/database.types.ts";
 
 export type DatasetSourceType = Enums<"datasets__source_type">;
+export type ImportableDatasetSourceType = Exclude<
+  DatasetSourceType,
+  "virtual" | "open_data"
+>;
 
 export type DatasetSourceRegistry<
   K extends "Read" | "Insert" | "Update" = "Read",
@@ -15,6 +19,10 @@ export type DatasetSourceRegistry<
   open_data: OpenDataDatasetModel[K];
 };
 
+/**
+ * The DatasetSource model is a union of each individual dataset source
+ * model (e.g. CSVFileDatasetModel, GoogleSheetsDatasetModel, etc.)
+ */
 export type DatasetSourceModel<
   SourceType extends DatasetSourceType = DatasetSourceType,
   K extends "Read" | "Insert" | "Update" = "Read",

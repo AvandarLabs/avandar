@@ -3,6 +3,7 @@ import type {
   DatasetSourceModel,
   DatasetSourceRegistry,
   DatasetSourceType,
+  ImportableDatasetSourceType,
 } from "$/models/datasets/DatasetSource/DatasetSource.types.ts";
 
 export { DatasetSourceModule as DatasetSource } from "$/models/datasets/DatasetSource/DatasetSourceModule.ts";
@@ -14,4 +15,5 @@ export namespace DatasetSource {
   > = DatasetSourceModel<TSourceType, K>;
   export type Registry = DatasetSourceRegistry;
   export type SourceType = DatasetSourceType;
+  export type ImportableSourceType = ImportableDatasetSourceType;
 }

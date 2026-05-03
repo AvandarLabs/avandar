@@ -79,11 +79,9 @@ function createDatasetQueryClient(): WithLogger<
         const logger = clientLogger.appendName("getPreviewData");
         logger.log("Getting preview data for dataset", params);
         const { datasetId, numRows, workspaceId } = params;
-
         const queryString = sqlTemplate(
           'SELECT * FROM "$tableName$" LIMIT $numRows$',
         ).parse({ numRows, tableName: datasetId });
-
         const { data } = await WorkspaceQETLClient.runQuery({
           rawSQL: queryString,
           workspaceId,

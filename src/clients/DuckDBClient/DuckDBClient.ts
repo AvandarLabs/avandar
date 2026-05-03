@@ -12,22 +12,22 @@ import { objectValuesMap } from "@utils/objects/objectValuesMap/objectValuesMap"
 import { MIMEType } from "@utils/types/common.types";
 import { uuid } from "$/lib/uuid";
 import {
-  DuckDBDataType,
-  DuckDBDataTypes,
-} from "$/models/datasets/DatasetColumn/DuckDBDataTypes";
+  DuckDbDataType,
+  DuckDbDataTypes,
+} from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import { DuckDBQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationTypeModule";
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
 import { arrowFieldToQueryResultField } from "@/clients/DuckDBClient/arrowFieldToQueryResultField";
 import {
-  DuckDBColumnSchema,
-  DuckDBCSVSniffResult,
-  DuckDBLoadCSVResult,
-  DuckDBLoadParquetResult,
-  DuckDBRejectedRow,
-  DuckDBScan,
-  DuckDBStructuredQuery,
+  DuckDbColumnSchema,
+  DuckDbCsvSniffResult,
+  DuckDbLoadCsvResult,
+  DuckDbLoadParquetResult,
+  DuckDbRejectedRow,
+  DuckDbScan,
+  DuckDbStructuredQuery,
 } from "@/clients/DuckDBClient/DuckDBClient.types";
 import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
 import { Logger } from "@/utils/Logger";
@@ -70,7 +70,7 @@ type BaseDuckDBLoadCSVOptions = {
   hasHeader?: boolean;
   dateFormat?: string;
   timestampFormat?: string;
-  columns?: Array<readonly [columnName: string, columnType: DuckDBDataType]>;
+  columns?: Array<readonly [columnName: string, columnType: DuckDbDataType]>;
 };
 
 export type DucKDBLoadCSVOptions =
@@ -100,9 +100,9 @@ export type UnknownRow = Record<string, unknown>;
  */
 const REJECTED_ROW_STORAGE_LIMIT = 1001;
 
-function _duckDBDataTypeFromString(typeString: string): DuckDBDataType {
-  const normalizedType = typeString.toUpperCase() as DuckDBDataType;
-  const isKnownType = DuckDBDataTypes.includes(normalizedType);
+function _duckDBDataTypeFromString(typeString: string): DuckDbDataType {
+  const normalizedType = typeString.toUpperCase() as DuckDbDataType;
+  const isKnownType = DuckDbDataTypes.includes(normalizedType);
   if (isKnownType) {
     return normalizedType;
   }
@@ -112,7 +112,7 @@ function _duckDBDataTypeFromString(typeString: string): DuckDBDataType {
 
 function _parseRejectScanColumns(
   columnsString: string,
-): Array<{ name: string; type: DuckDBDataType }> {
+): Array<{ name: string; type: DuckDbDataType }> {
   const matches = Array.from(
     columnsString.matchAll(/'([^']+)'\s*:\s*'([^']+)'/g),
   );
@@ -132,7 +132,7 @@ function _parseRejectScanColumns(
 
 function _buildReadCSVPrompt(options: {
   tableName: string;
-  scan: DuckDBScan;
+  scan: DuckDbScan;
   commentChar: string | null;
 }): string {
   const { tableName, scan, commentChar } = options;
@@ -168,9 +168,9 @@ function _buildReadCSVPrompt(options: {
 
 function _getDuckDBCSVSniffResultFromRejectScan(options: {
   tableName: string;
-  scan: DuckDBScan;
+  scan: DuckDbScan;
   commentChar: string | null;
-}): DuckDBCSVSniffResult {
+}): DuckDbCsvSniffResult {
   const { scan, tableName, commentChar } = options;
   const parsedColumns = _parseRejectScanColumns(scan.columns);
 
@@ -193,7 +193,7 @@ function _getDuckDBCSVSniffResultFromRejectScan(options: {
 }
 
 function _inferHasHeaderFromTableSchema(
-  tableColumns: readonly DuckDBColumnSchema[],
+  tableColumns: readonly DuckDbColumnSchema[],
 ): boolean {
   const isAutoColumnName = (columnName: string): boolean => {
     return /^column\d+$/i.test(columnName);
@@ -215,8 +215,8 @@ function _getDuckDBCSVSniffResultFallback(options: {
   hasHeader: boolean | undefined;
   dateFormat: string | undefined;
   timestampFormat: string | undefined;
-  tableColumns: readonly DuckDBColumnSchema[];
-}): DuckDBCSVSniffResult {
+  tableColumns: readonly DuckDbColumnSchema[];
+}): DuckDbCsvSniffResult {
   const {
     tableName,
     numRowsToSkip,
@@ -391,8 +391,8 @@ class DuckDBClientImpl {
    * @returns The schema of the table as an array of
    * DuckDBColumnSchema objects.
    */
-  async getTableSchema(tableName: string): Promise<DuckDBColumnSchema[]> {
-    const { data } = await this.runRawQuery<DuckDBColumnSchema>(
+  async getTableSchema(tableName: string): Promise<DuckDbColumnSchema[]> {
+    const { data } = await this.runRawQuery<DuckDbColumnSchema>(
       `DESCRIBE "$tableName$"`,
       { params: { tableName } },
     );
@@ -554,7 +554,7 @@ class DuckDBClientImpl {
    * is provided, this option will be ignored.
    * @returns A promise that resolves when the file is loaded.
    */
-  async loadCSV(options: DucKDBLoadCSVOptions): Promise<DuckDBLoadCSVResult> {
+  async loadCSV(options: DucKDBLoadCSVOptions): Promise<DuckDbLoadCsvResult> {
     const {
       tableName,
       numRowsToSkip = 0,
@@ -569,7 +569,7 @@ class DuckDBClientImpl {
       timestampFormat,
     } = options;
     const conn = await this.#connect();
-    let loadResults: DuckDBLoadCSVResult;
+    let loadResults: DuckDbLoadCsvResult;
     try {
       // If the dataset already exists, we drop it and then recreate it.
       // Loading a CSV will ALWAYS overwrite existing data.
@@ -636,9 +636,9 @@ class DuckDBClientImpl {
       );
 
       // get the parsing errors
-      let rejectedScans: DuckDBScan[] = [];
-      let rejectedRows: DuckDBRejectedRow[] = [];
-      const rejectedScansResult = await this.runRawQuery<DuckDBScan>(
+      let rejectedScans: DuckDbScan[] = [];
+      let rejectedRows: DuckDbRejectedRow[] = [];
+      const rejectedScansResult = await this.runRawQuery<DuckDbScan>(
         `SELECT * FROM reject_scans WHERE file_path='$tableName$'`,
         { conn, params: { tableName } },
       );
@@ -647,7 +647,7 @@ class DuckDBClientImpl {
       if (isNonEmptyArray(rejectedScans)) {
         // if there are scans, then let's see if there are any rejected rows
         const fileId = rejectedScans[0].file_id;
-        const rejectedRowsResult = await this.runRawQuery<DuckDBRejectedRow>(
+        const rejectedRowsResult = await this.runRawQuery<DuckDbRejectedRow>(
           `SELECT * FROM reject_errors WHERE file_id='$fileId$'`,
           { conn, params: { fileId } },
         );
@@ -720,12 +720,12 @@ class DuckDBClientImpl {
       string,
       {
         alias?: string;
-        dataType?: DuckDBDataType;
+        dataType?: DuckDbDataType;
       }
     >;
-  }): Promise<DuckDBLoadParquetResult> {
+  }): Promise<DuckDbLoadParquetResult> {
     const { tableName, blob, columnReplacements } = options;
-    let loadResults: DuckDBLoadParquetResult;
+    let loadResults: DuckDbLoadParquetResult;
 
     // Drop the dataset and recreate it. We are overwriting the data.
     await this.dropTableViewAndFile(tableName);
@@ -942,7 +942,7 @@ SET enable_external_file_cache = true;
 
   async #getPageHelper<T extends UnknownRow>(
     queryParams: Omit<
-      DuckDBStructuredQuery & {
+      DuckDbStructuredQuery & {
         pageSize: number;
         pageNum: number;
         totalRows: number | undefined;
@@ -996,7 +996,7 @@ SET enable_external_file_cache = true;
     pageNum = 0,
     ...restOfStructuredQuery
   }: Omit<
-    DuckDBStructuredQuery & { pageSize: number; pageNum: number },
+    DuckDbStructuredQuery & { pageSize: number; pageNum: number },
     "limit" | "offset"
   >): Promise<QueryResultPage<T>> {
     const page = await this.#getPageHelper<T>({
@@ -1020,7 +1020,7 @@ SET enable_external_file_cache = true;
       aggregations = {},
       pageSize = 1000,
       ...restOfStructuredQuery
-    }: Omit<DuckDBStructuredQuery, "limit" | "offset"> & {
+    }: Omit<DuckDbStructuredQuery, "limit" | "offset"> & {
       pageSize?: number;
     },
     callback: (page: QueryResultPage<T>) => void | Promise<void>,
@@ -1072,7 +1072,7 @@ SET enable_external_file_cache = true;
     castTimestampsToISO,
     limit,
     offset,
-  }: DuckDBStructuredQuery): Promise<QueryResult<RowObject>> {
+  }: DuckDbStructuredQuery): Promise<QueryResult<RowObject>> {
     const conn = await this.#connect();
     let queryResults: QueryResult<RowObject>;
     const tableColumns = await this.getTableSchema(tableName);

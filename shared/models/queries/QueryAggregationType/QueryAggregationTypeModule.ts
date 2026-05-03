@@ -1,7 +1,7 @@
 import { constant } from "@utils/misc/constant/constant.ts";
 import { match } from "ts-pattern";
 import type {
-  DuckDBQueryAggregationTypeT,
+  DuckDbQueryAggregationTypeT,
   QueryAggregationTypeT,
 } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
 
@@ -13,7 +13,7 @@ export const DuckDBQueryAggregations = {
    * @returns The name of the aggregation column.
    */
   getAggregationColumnName: (
-    aggregation: DuckDBQueryAggregationTypeT,
+    aggregation: DuckDbQueryAggregationTypeT,
     columnName: string,
   ): string => {
     return match(aggregation)

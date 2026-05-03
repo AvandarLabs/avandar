@@ -1,19 +1,19 @@
 import { constant } from "@utils/misc/constant/constant";
 import { match } from "ts-pattern";
 import type { AvaDataTypeT } from "$/models/datasets/AvaDataType/AvaDataType.types";
-import type { DuckDBDataType } from "$/models/datasets/DatasetColumn/DuckDBDataTypes";
+import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 
 /**
  * This is a subset of DuckDBDataType. These are the possible data that
  * DuckDB outputs when sniffing a CSV file.
  */
 export type DuckDBSniffableDataType = Extract<
-  DuckDBDataType,
+  DuckDbDataType,
   "BOOLEAN" | "BIGINT" | "DOUBLE" | "TIME" | "DATE" | "TIMESTAMP" | "VARCHAR"
 >;
 
 export const DuckDBDataTypeUtils = {
-  isDateOrTimestamp: (duckDBDataType: DuckDBDataType): boolean => {
+  isDateOrTimestamp: (duckDBDataType: DuckDbDataType): boolean => {
     return [
       "DATE",
       "TIME",
@@ -28,7 +28,7 @@ export const DuckDBDataTypeUtils = {
    */
   // TODO(jpsyx): move this to AvaDataTypeUtils and rename to
   // `fromDuckDBDataType`
-  toAvaDataType: (duckDBDataType: DuckDBDataType): AvaDataTypeT => {
+  toAvaDataType: (duckDBDataType: DuckDbDataType): AvaDataTypeT => {
     return (
       match(duckDBDataType)
         .with(
