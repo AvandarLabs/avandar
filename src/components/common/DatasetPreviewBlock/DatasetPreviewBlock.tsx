@@ -5,14 +5,14 @@ import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { Callout } from "@/lib/ui/Callout";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import type { DetectedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { ImportedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 
 type Props = {
   /** The preview rows to display in the data grid */
   previewRows: Array<Record<string, unknown>>;
 
   /** The column information to display in the details section */
-  columns: readonly DetectedDatasetColumn[];
+  columns: readonly ImportedDatasetColumn[];
 
   /**
    * Optional component to render in the data preview callout

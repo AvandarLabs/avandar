@@ -195,6 +195,7 @@ function _covidSampleLoadResult(options: {
 
   return {
     id: uuid(),
+    type: "csv",
     csvName,
     numRows: COVID_SAMPLE_NUM_ROWS,
     numRejectedRows: 0,

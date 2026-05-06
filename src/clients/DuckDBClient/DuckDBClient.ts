@@ -757,6 +757,7 @@ class DuckDbClientImpl {
 
       loadResults = {
         id: uuid(),
+        type: "csv",
         tableName,
         csvName: tableName,
         numRows: csvRowCount,
@@ -825,6 +826,7 @@ class DuckDbClientImpl {
 
       loadResults = {
         id: uuid(),
+        type: "xlsx",
         tableName,
         xlsxName: tableName,
         numRows: rowCount,

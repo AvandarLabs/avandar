@@ -78,9 +78,9 @@ export type DatasetColumnRead = Model.Base<
 
 /**
  * This is a subset of a DatasetColumn type with only the name, data type,
- * and column index.
+ * and column index. We use this time when a dataset is imported.
  */
-export type DetectedDatasetColumn = Pick<
+export type ImportedDatasetColumn = Pick<
   DatasetColumnRead,
   | "originalName"
   | "name"

@@ -1,60 +1,66 @@
+import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { SetOptional } from "type-fest";
 
-export type CsvFileDatasetId = UUID<"CsvFileDatasetId">;
+type ModelType = "CsvFileDataset";
 
-export type CsvFileDatasetRead = {
-  /** Timestamp of when the dataset was created. */
-  createdAt: string;
+export type CsvFileDatasetId = UUID<ModelType>;
 
-  /** Unique identifier of the dataset. */
-  datasetId: DatasetId;
+export type CsvFileDatasetRead = Model.Base<
+  ModelType,
+  {
+    /** Timestamp of when the dataset was created. */
+    createdAt: string;
 
-  /** Unique identifier of the local CSV dataset in our system. */
-  id: CsvFileDatasetId;
+    /** Unique identifier of the dataset. */
+    datasetId: DatasetId;
 
-  /** Timestamp of when the dataset was last updated. */
-  updatedAt: string;
+    /** Unique identifier of the local CSV dataset in our system. */
+    id: CsvFileDatasetId;
 
-  /** Unique identifier of the workspace the dataset belongs to. */
-  workspaceId: Workspace.Id;
+    /** Timestamp of when the dataset was last updated. */
+    updatedAt: string;
 
-  /** If true it means the CSV is persisted in cloud storage */
-  isInCloudStorage: boolean;
+    /** Unique identifier of the workspace the dataset belongs to. */
+    workspaceId: Workspace.Id;
 
-  /** Size of the dataset in bytes. */
-  sizeInBytes: number;
+    /** If true it means the CSV is persisted in cloud storage */
+    isInCloudStorage: boolean;
 
-  /** Number of rows to skip at the start of the file */
-  rowsToSkip: number;
+    /** Size of the dataset in bytes. */
+    sizeInBytes: number;
 
-  /** Quote character used in the CSV file */
-  quoteChar: string | undefined;
+    /** Number of rows to skip at the start of the file */
+    rowsToSkip: number;
 
-  /** Escape character used in the CSV file */
-  escapeChar: string | undefined;
+    /** Quote character used in the CSV file */
+    quoteChar: string | undefined;
 
-  /** Delimiter used in the CSV file. */
-  delimiter: string;
+    /** Escape character used in the CSV file */
+    escapeChar: string | undefined;
 
-  /** Newline delimiter used in the CSV file */
-  newlineDelimiter: string;
+    /** Delimiter used in the CSV file. */
+    delimiter: string;
 
-  /** Comment character used in the CSV file */
-  commentChar: string | undefined;
+    /** Newline delimiter used in the CSV file */
+    newlineDelimiter: string;
 
-  /** Whether the CSV has a header */
-  hasHeader: boolean;
+    /** Comment character used in the CSV file */
+    commentChar: string | undefined;
 
-  /** Date format of the CSV file */
-  dateFormat: string | undefined;
+    /** Whether the CSV has a header */
+    hasHeader: boolean;
 
-  /** Timestamp format of the CSV file */
-  timestampFormat: string | undefined;
-};
+    /** Date format of the CSV file */
+    dateFormat: string | undefined;
+
+    /** Timestamp format of the CSV file */
+    timestampFormat: string | undefined;
+  }
+>;
 
 /**
  * CRUD type definitions for the LocalCSVDataset model.

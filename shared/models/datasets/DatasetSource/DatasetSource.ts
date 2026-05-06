@@ -4,6 +4,7 @@ import type {
   DatasetSourceRegistry,
   DatasetSourceType,
   ImportableDatasetSourceType,
+  ManuallyUploadableDatasetSourceType,
 } from "$/models/datasets/DatasetSource/DatasetSource.types.ts";
 
 export { DatasetSourceModule as DatasetSource } from "$/models/datasets/DatasetSource/DatasetSourceModule.ts";
@@ -16,4 +17,6 @@ export namespace DatasetSource {
   export type Registry = DatasetSourceRegistry;
   export type SourceType = DatasetSourceType;
   export type ImportableSourceType = ImportableDatasetSourceType;
+  export type ManuallyUploadableSourceType =
+    ManuallyUploadableDatasetSourceType;
 }

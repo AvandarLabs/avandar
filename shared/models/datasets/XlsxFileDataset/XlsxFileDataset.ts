@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-namespace,import-x/export */
+/* eslint-disable @typescript-eslint/no-namespace */
 import type {
   XlsxFileDatasetId,
   XlsxFileDatasetModel,

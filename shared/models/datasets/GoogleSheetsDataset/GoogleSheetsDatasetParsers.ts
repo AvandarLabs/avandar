@@ -1,4 +1,5 @@
 import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
+import { Model } from "@models/Model/Model.ts";
 import { pipe } from "@utils/misc/pipe/pipe.ts";
 import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeys/snakeCaseKeys.ts";
@@ -30,12 +31,12 @@ export const GoogleSheetsDatasetParsers =
     modelName: "GoogleSheetsDataset",
     DBReadSchema,
     fromDBReadToModelRead: pipe(camelCaseKeysDeep, (obj) => {
-      return {
+      return Model.make("GoogleSheetsDataset", {
         ...obj,
         id: obj.id as GoogleSheetsDatasetId,
         datasetId: obj.datasetId as DatasetId,
         workspaceId: obj.workspaceId as Workspace.Id,
-      };
+      });
     }),
     fromModelInsertToDBInsert: snakeCaseKeysDeep,
     fromModelUpdateToDBUpdate: snakeCaseKeysDeep,

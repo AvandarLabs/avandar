@@ -186,8 +186,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                     isInCloudStorage={
                       datasetWithColumnsAndSource.source.isInCloudStorage
                     }
-                    datasetId={dataset.id}
-                    fileDatasetId={datasetWithColumnsAndSource.source.id}
+                    dataSource={datasetWithColumnsAndSource.source}
                   />
                 </Box>
               : null}

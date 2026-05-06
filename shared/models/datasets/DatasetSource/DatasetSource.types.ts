@@ -11,6 +11,11 @@ export type ImportableDatasetSourceType = Exclude<
   "virtual" | "open_data"
 >;
 
+export type ManuallyUploadableDatasetSourceType = Extract<
+  DatasetSourceType,
+  "csv_file" | "xlsx_file"
+>;
+
 export type DatasetSourceRegistry<
   K extends "Read" | "Insert" | "Update" = "Read",
 > = {

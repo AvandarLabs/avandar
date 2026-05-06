@@ -115,6 +115,7 @@
     "recharts": "2",
     "ts-pattern": "^5.7.0",
     "uuid": "^11.1.0",
+    "xlsx": "^0.18.5",
     "zod": "^4.1.13"
   },
   "devDependencies": {

@@ -125,8 +125,6 @@ async function _oneShotParquetBlobUpload(options: {
  *
  * This requires that the dataset be available locally (so we can extract
  * the Parquet blob).
- *
- * For now, we only allow one-shot uploads.
  */
 async function _uploadDatasetToSupabase(options: {
   workspaceId: Workspace.Id;

@@ -10,44 +10,48 @@ import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
 import { MIMEType } from "@utils/types/common.types";
 import { uuid } from "$/lib/uuid";
 import { csvCellValueSchema } from "$/lib/zodHelpers";
-import { useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
-import { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
-import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { AppConfig } from "@/config/AppConfig";
 import { useGooglePicker } from "@/hooks/ui/useGooglePicker";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import { GPickerDocumentObject } from "@/lib/types/google-picker";
 import { getCurrentURL } from "@/lib/utils/browser/getCurrentURL";
 import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL";
 import { unparseDataset } from "@/models/LocalDataset/LocalDatasetUtils";
 import { Logger } from "@/utils/Logger";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
-import type { UnknownObject } from "@utils/types/common.types";
+import type {
+  GoogleSheetsDataSourceMetadata,
+  GoogleSheetsLoadResult,
+} from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { UserId } from "$/models/User/User.types";
 
-type ParseGoogleSheetInput = {
-  datasetId: Dataset.Id;
-  delimiter?: string;
-  documentId?: string;
+type GoogleSheetsParseOptions = {
+  type: "google_sheets";
   numRowsToSkip?: number;
-  rawText?: string;
-  spreadsheetName?: string;
 };
 
-type LoadResults = {
+type GoogleSheetsLoadOptions = {
   datasetId: Dataset.Id;
-  metadata: DuckDbLoadCsvResult;
-  previewRows: UnknownObject[];
+  googleAccountId: string;
+  documentId: string;
+
+  /** Raw string containing the spreadsheet data */
+  rawText: string;
+
+  /** Name of the google sheet */
+  spreadsheetName: string;
 };
 
-type ParseGoogleSheetSuccess = LoadResults & {
-  fileText: string;
+type GoogleSheetsRawData = {
+  rawText: string;
   spreadsheetName: string;
 };
 
@@ -59,52 +63,74 @@ export function GoogleSheetsImportView(props: Props): JSX.Element {
   const [selectedDocument, setSelectedDocument] = useState<
     GPickerDocumentObject | undefined
   >();
-  const [loadResults, setLoadResults] = useState<LoadResults>();
-  const [cachedSheetRawText, setCachedSheetRawText] = useState<
-    string | undefined
+  const [dataSourceMetadata, setDataSourceMetadata] = useState<
+    GoogleSheetsDataSourceMetadata | undefined
   >();
-  const [cachedSpreadsheetName, setCachedSpreadsheetName] = useState<
-    string | undefined
+  const [previewRows] = DatasetQueryClient.useGetPreviewData({
+    datasetId: dataSourceMetadata?.datasetLoadResult.datasetId,
+    numRows: AppConfig.dataManagerApp.maxPreviewRows,
+    workspaceId: workspace.id,
+    useQueryOptions: {
+      enabled: !!dataSourceMetadata?.datasetLoadResult,
+    },
+  });
+  const [fetchedGoogleSheetRawData, setFetchedGoogleSheetRawData] = useState<
+    GoogleSheetsRawData | undefined
   >();
 
-  const [parseGoogleSheet, isParsingGoogleSheet] = useMutation({
-    mutationFn: async (
-      input: ParseGoogleSheetInput,
-    ): Promise<ParseGoogleSheetSuccess> => {
-      let fileText: string;
-      let spreadsheetName: string;
-
-      if (input.rawText !== undefined) {
-        fileText = input.rawText;
-        spreadsheetName = input.spreadsheetName ?? "";
-      } else if (input.documentId !== undefined) {
-        const googleSpreadsheet = await APIClient.get({
-          route: "google-sheets/:id",
-          pathParams: { id: input.documentId },
-        });
-
+  const [fetchGoogleSheet, isFetchingGoogleSheet] = useMutation({
+    mutationFn: async (params: {
+      documentId: string;
+      googleAccountId: string;
+    }) => {
+      const { documentId } = params;
+      const googleSpreadsheet = await APIClient.get({
+        route: "google-sheets/:id",
+        pathParams: { id: documentId },
+      });
+      return {
         // convert our Google Sheets data into a CSV string so it can be
         // loaded easily into DuckDb and local storage.
-        fileText = unparseDataset({
+        rawText: unparseDataset({
           datasetType: MIMEType.APPLICATION_GOOGLE_SPREADSHEET,
           data: z
             .array(z.array(csvCellValueSchema))
             .parse(googleSpreadsheet.rows),
+        }),
+        spreadsheetName: googleSpreadsheet.spreadsheetName,
+      };
+    },
+    onSuccess: (gsheetRawData, inputParams) => {
+      if (selectedGoogleAccount) {
+        onRequestParse({
+          documentId: inputParams.documentId,
+          googleAccountId: inputParams.googleAccountId,
+          newDatasetId: uuid() as Dataset.Id,
+          rawText: gsheetRawData.rawText,
+          spreadsheetName: gsheetRawData.spreadsheetName,
         });
-        spreadsheetName = googleSpreadsheet.spreadsheetName;
-      } else {
-        throw new Error(
-          "parseGoogleSheet requires either rawText or documentId.",
-        );
       }
+    },
+    onError: () => {
+      notifyError({
+        title: "Google Sheet failed to load",
+        message: "An error occurred while loading the file",
+      });
+    },
+  });
 
-      const { datasetId, delimiter, numRowsToSkip } = input;
+  // create mutation to load a Google Sheet into local storage after it has
+  // been picked from the Google Picker and we have fetched its raw data
+  const [loadGoogleSheet, isLoadingGoogleSheet] = useMutation({
+    mutationFn: async (
+      params: GoogleSheetsLoadOptions & GoogleSheetsParseOptions,
+    ): Promise<GoogleSheetsLoadResult> => {
+      const { datasetId, numRowsToSkip, rawText, spreadsheetName } = params;
 
       // store our Google Sheets-turned-CSV string into local storage.
       const loadResult = await LocalDatasetClient.storeLocalCSV({
         csvParseOptions: {
-          delimiter,
-          fileText,
+          fileText: rawText,
           numRowsToSkip,
         },
         datasetId,
@@ -112,31 +138,30 @@ export function GoogleSheetsImportView(props: Props): JSX.Element {
         workspaceId: workspace.id,
       });
 
-      const previewRows = await DatasetQueryClient.getPreviewData({
+      const googleSheetsLoadResult: GoogleSheetsLoadResult = {
         datasetId,
-        numRows: AppConfig.dataManagerApp.maxPreviewRows,
-        workspaceId: workspace.id,
+        numRows: loadResult.numRows,
+        rawText,
+        spreadsheetName,
+        sheetLoadMetadata: loadResult,
+      };
+      return googleSheetsLoadResult;
+    },
+    onSuccess: (loadResult, inputParams) => {
+      setDataSourceMetadata({
+        sourceType: "google_sheets",
+        googleAccountId: inputParams.googleAccountId,
+        googleDocumentId: inputParams.documentId,
+        datasetLoadResult: loadResult,
+        parseOptions: {
+          type: "google_sheets",
+          numRowsToSkip: inputParams.numRowsToSkip,
+        },
       });
 
-      return {
-        datasetId,
-        fileText,
-        metadata: loadResult,
-        previewRows,
-        spreadsheetName,
-      };
-    },
-    onSuccess: (results) => {
-      setLoadResults({
-        datasetId: results.datasetId,
-        metadata: results.metadata,
-        previewRows: results.previewRows,
-      });
-      setCachedSheetRawText(results.fileText);
-      setCachedSpreadsheetName(results.spreadsheetName);
       const {
-        metadata: { numRows: numSuccessRows, numRejectedRows },
-      } = results;
+        sheetLoadMetadata: { numRows: numSuccessRows, numRejectedRows },
+      } = loadResult;
       if (numRejectedRows === 0) {
         notifySuccess({
           title: "File loaded successfully",
@@ -166,37 +191,68 @@ export function GoogleSheetsImportView(props: Props): JSX.Element {
     },
   });
 
+  const onRequestParse = useCallback(
+    async (params: {
+      documentId: GPickerDocumentObject["id"];
+      googleAccountId: string;
+      rawText: string;
+      spreadsheetName: string;
+      newDatasetId: Dataset.Id;
+      datasetIdToDrop?: Dataset.Id;
+      parseOptions?: GoogleSheetsParseOptions;
+    }) => {
+      const {
+        documentId,
+        googleAccountId,
+        newDatasetId,
+        datasetIdToDrop,
+        rawText,
+        spreadsheetName,
+        parseOptions = { type: "google_sheets" },
+      } = params;
+      setFetchedGoogleSheetRawData({ rawText, spreadsheetName });
+      if (datasetIdToDrop) {
+        await LocalDatasetClient.dropLocalDataset({
+          datasetId: datasetIdToDrop,
+        });
+      }
+
+      loadGoogleSheet({
+        ...parseOptions,
+        documentId,
+        googleAccountId,
+        datasetId: newDatasetId,
+        rawText,
+        spreadsheetName,
+      });
+    },
+    [loadGoogleSheet],
+  );
+
+  const onGoogleSheetPicked = useCallback(
+    async (params: {
+      document: GPickerDocumentObject;
+      googleAccount: GoogleToken;
+    }) => {
+      const { document, googleAccount } = params;
+      setSelectedDocument(document);
+      setDataSourceMetadata(undefined);
+
+      // fetch the raw data for the Google Sheet
+      fetchGoogleSheet({
+        documentId: document.id,
+        googleAccountId: googleAccount.google_account_id,
+      });
+    },
+    [fetchGoogleSheet],
+  );
+
   const {
     picker,
     selectedGoogleAccount,
     isLoadingGoogleAuthState,
     isGoogleAuthenticated,
-  } = useGooglePicker({
-    onGoogleSheetPicked: (document) => {
-      setSelectedDocument(document);
-      setLoadResults(undefined);
-      setCachedSheetRawText(undefined);
-      setCachedSpreadsheetName(undefined);
-      const datasetId = uuid() as Dataset.Id;
-      parseGoogleSheet({
-        datasetId,
-        documentId: document.id,
-      });
-    },
-  });
-
-  const detectedColumns = useMemo(() => {
-    return loadResults?.metadata.columns.map((duckColumn, idx) => {
-      return {
-        name: duckColumn.column_name,
-        originalName: duckColumn.column_name,
-        originalDataType: duckColumn.column_type,
-        detectedDataType: duckColumn.column_type,
-        dataType: DuckDbDataTypeUtils.toAvaDataType(duckColumn.column_type),
-        columnIdx: idx,
-      };
-    });
-  }, [loadResults?.metadata.columns]);
+  } = useGooglePicker({ onGoogleSheetPicked });
 
   return (
     <Box {...props}>
@@ -225,7 +281,7 @@ export function GoogleSheetsImportView(props: Props): JSX.Element {
             {selectedDocument ?
               <>
                 <Text>Selected document: {selectedDocument.name}</Text>
-                {isParsingGoogleSheet ?
+                {isLoadingGoogleSheet ?
                   <Loader />
                 : null}
               </>
@@ -263,44 +319,33 @@ export function GoogleSheetsImportView(props: Props): JSX.Element {
           </Tooltip>
         }
 
-        {(
-          cachedSheetRawText !== undefined &&
-          cachedSpreadsheetName !== undefined &&
-          detectedColumns &&
-          loadResults &&
-          selectedGoogleAccount &&
-          selectedDocument
-        ) ?
+        {previewRows && dataSourceMetadata && fetchedGoogleSheetRawData ?
           <DatasetImportForm
-            columns={detectedColumns}
-            importPayload={{
-              googleAccountId: selectedGoogleAccount.google_account_id,
-              googleDocumentId: selectedDocument.id,
-              sourceType: "google_sheets",
+            key={dataSourceMetadata.datasetLoadResult.sheetLoadMetadata.id}
+            dataSourceMetadata={dataSourceMetadata}
+            initialDatasetName={
+              dataSourceMetadata.datasetLoadResult.spreadsheetName
+            }
+            isProcessing={isFetchingGoogleSheet || isLoadingGoogleSheet}
+            onDataSourceMetadataChange={(metadata) => {
+              setDataSourceMetadata(metadata as GoogleSheetsDataSourceMetadata);
             }}
-            initialDatasetId={loadResults.datasetId}
-            initialDatasetName={cachedSpreadsheetName}
-            isProcessing={isParsingGoogleSheet}
-            key={loadResults.metadata.id}
-            loadCsvResult={loadResults.metadata}
-            onRequestDataParse={async (parseConfig: {
-              delimiter: string;
-              numRowsToSkip: number;
-            }) => {
-              await LocalDatasetClient.dropLocalDataset({
-                datasetId: loadResults.datasetId,
-              });
-              const nextDatasetId = uuid() as Dataset.Id;
-              parseGoogleSheet({
-                datasetId: nextDatasetId,
-                delimiter: parseConfig.delimiter,
-                numRowsToSkip: parseConfig.numRowsToSkip,
-                rawText: cachedSheetRawText,
-                spreadsheetName: cachedSpreadsheetName,
+            onRequestDataReparse={async (parseOptions) => {
+              if (parseOptions.type !== "google_sheets") {
+                return;
+              }
+              const { rawText, spreadsheetName } = fetchedGoogleSheetRawData;
+              onRequestParse({
+                newDatasetId: uuid() as Dataset.Id,
+                documentId: dataSourceMetadata.googleDocumentId,
+                googleAccountId: dataSourceMetadata.googleAccountId,
+                rawText,
+                spreadsheetName,
+                parseOptions,
               });
             }}
-            rows={loadResults.previewRows}
-            showOnlineStorageAllowed={false}
+            parseOptions={dataSourceMetadata.parseOptions}
+            rows={previewRows}
           />
         : null}
       </Stack>

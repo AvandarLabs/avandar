@@ -45,11 +45,16 @@ const {
   notifySuccessMock,
   storeLocalCSVMock,
   dropLocalDatasetMock,
-  getPreviewDataMock,
+  useGetPreviewDataMock,
   googlePickerHarness,
 } = vi.hoisted(() => {
   const harness: {
-    onSheetPicked: ((document: GPickerDocumentObject) => void) | null;
+    onSheetPicked:
+      | ((params: {
+          document: GPickerDocumentObject;
+          googleAccount: GoogleToken;
+        }) => void)
+      | null;
     pickerSetVisible: ReturnType<typeof vi.fn>;
   } = {
     onSheetPicked: null,
@@ -60,7 +65,7 @@ const {
     notifySuccessMock: vi.fn(),
     storeLocalCSVMock: vi.fn(),
     dropLocalDatasetMock: vi.fn().mockResolvedValue(undefined),
-    getPreviewDataMock: vi.fn(),
+    useGetPreviewDataMock: vi.fn(),
     googlePickerHarness: harness,
   };
 });
@@ -107,7 +112,7 @@ vi.mock("@/clients/APIClient", () => {
 vi.mock("@/clients/datasets/DatasetQueryClient", () => {
   return {
     DatasetQueryClient: {
-      getPreviewData: getPreviewDataMock,
+      useGetPreviewData: useGetPreviewDataMock,
     },
   };
 });
@@ -148,7 +153,10 @@ vi.mock("@/clients/datasets/LocalDatasetClient", () => {
 vi.mock("@/hooks/ui/useGooglePicker", () => {
   return {
     useGooglePicker: (options: {
-      onGoogleSheetPicked?: (document: GPickerDocumentObject) => void;
+      onGoogleSheetPicked?: (params: {
+        document: GPickerDocumentObject;
+        googleAccount: GoogleToken;
+      }) => void;
     }) => {
       if (options.onGoogleSheetPicked) {
         googlePickerHarness.onSheetPicked = options.onGoogleSheetPicked;
@@ -239,6 +247,7 @@ function _covidSampleLoadResult(options: {
   ];
 
   return {
+    type: "csv",
     id: uuid(),
     csvName,
     numRows: COVID_SAMPLE_NUM_ROWS,
@@ -316,7 +325,14 @@ function _simulateGoogleSheetPick(document: GPickerDocumentObject): void {
     );
   }
 
-  googlePickerHarness.onSheetPicked(document);
+  googlePickerHarness.onSheetPicked({
+    document,
+    googleAccount: {
+      access_token: "google-sheets-test-access-token",
+      google_account_id: "00000000-0000-4000-8000-000000000099",
+      google_email: "google-sheets-test@example.com",
+    } as GoogleToken,
+  });
 }
 
 describe("GoogleSheetsImportView", () => {
@@ -339,7 +355,7 @@ describe("GoogleSheetsImportView", () => {
     notifySuccessMock.mockClear();
     storeLocalCSVMock.mockClear();
     dropLocalDatasetMock.mockClear();
-    getPreviewDataMock.mockClear();
+    useGetPreviewDataMock.mockClear();
     googlePickerHarness.pickerSetVisible.mockClear();
 
     const spreadsheetRows = _spreadsheetRowsFromCovidSampleCsv();
@@ -367,7 +383,7 @@ describe("GoogleSheetsImportView", () => {
 
     const previewRows = _previewRowsFromCovidSample();
 
-    getPreviewDataMock.mockResolvedValue(previewRows);
+    useGetPreviewDataMock.mockReturnValue([previewRows]);
   });
 
   it("loads california-covid-sample via Sheets API, infers columns, and reports row count", async () => {

@@ -247,6 +247,68 @@ export const DatasetClient = createUsableServiceClient(
         },
 
         /**
+         * Inserts a new Excel (.xlsx) file dataset into the database.
+         *
+         * @param params - The parameters for the dataset to be inserted.
+         * @returns The inserted dataset.
+         */
+        insertXlsxFileDataset: async (params: {
+          datasetId: DatasetId;
+          workspaceId: Workspace.Id;
+          datasetName: string;
+          datasetDescription: string;
+          columns: DatasetColumnInput[];
+          isInCloudStorage: boolean;
+          sizeInBytes: number;
+          rowsToSkip: number;
+          sheetName?: string;
+          hasHeader: boolean;
+          dateFormat: string | null;
+          timestampFormat: string | null;
+        }): Promise<Dataset.T> => {
+          const logger = clientLogger.appendName("insertXlsxFileDataset");
+          logger.log("Creating xlsx file dataset", params);
+
+          const {
+            columns,
+            isInCloudStorage,
+            sizeInBytes,
+            workspaceId,
+            datasetName,
+            datasetDescription,
+            rowsToSkip,
+            hasHeader,
+            dateFormat,
+            timestampFormat,
+          } = params;
+          const { data: dataset } = await dbClient
+            .rpc("rpc_datasets__add_xlsx_file_dataset", {
+              p_dataset_id: params.datasetId,
+              p_workspace_id: workspaceId,
+              p_dataset_name: datasetName,
+              p_dataset_description: datasetDescription,
+              p_columns: columns.map((col) => {
+                return { ...col, description: col.description ?? null };
+              }),
+              p_is_in_cloud_storage: isInCloudStorage,
+              p_size_in_bytes: sizeInBytes,
+              p_rows_to_skip: rowsToSkip,
+              p_sheet_name: {
+                value: params.sheetName ?? null,
+              },
+              p_has_header: hasHeader,
+              p_date_format: {
+                date_format: dateFormat,
+                timestamp_format: timestampFormat,
+              },
+            })
+            .throwOnError();
+
+          logger.log("Successfully added xlsx file dataset", dataset);
+          return parsers.fromDBReadToModelRead(dataset);
+        },
+
+        /**
          * Inserts a new Google Sheets dataset into the database.
          *
          * @param params - The parameters for the dataset to be inserted.
@@ -365,6 +427,7 @@ export const DatasetClient = createUsableServiceClient(
     ],
     mutationFns: [
       "insertCsvFileDataset",
+      "insertXlsxFileDataset",
       "insertGoogleSheetsDataset",
       "insertOpenDataDataset",
       "insertVirtualDataset",

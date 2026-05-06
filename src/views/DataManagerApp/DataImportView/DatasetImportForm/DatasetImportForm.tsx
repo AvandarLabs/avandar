@@ -1,36 +1,95 @@
-import { useMutation } from "@hooks/useMutation/useMutation";
-import {
-  Button,
-  Checkbox,
-  Group,
-  NumberInput,
-  Stack,
-  Text,
-  TextInput,
-} from "@mantine/core";
-import { FormErrors } from "@mantine/form";
-import { useNavigate } from "@tanstack/react-router";
-import { notifyError, notifySuccess } from "@ui/notifications/notify";
-import { snakeCaseKeysShallow } from "@utils/index";
+import { Button, Checkbox, Group, Stack, Text, TextInput } from "@mantine/core";
+import { FormErrors, useForm } from "@mantine/form";
+import { notifyError } from "@ui/notifications/notify";
+import { Dataset } from "$/models/datasets/Dataset/Dataset";
+import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo, useRef, useState } from "react";
-import { match } from "ts-pattern";
-import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
-import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock";
+import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock/DatasetPreviewBlock";
 import { AppConfig } from "@/config/AppConfig";
-import { AppLinks } from "@/config/AppLinks";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useForm } from "@/lib/hooks/ui/useForm/useForm";
 import { Callout } from "@/lib/ui/Callout";
+import {
+  CsvFileLoadResult,
+  XlsxFileLoadResult,
+} from "../ManualUploadView/useLoadManualUploadFile/useLoadManualUploadFile";
+import { DatasetParseControls } from "./DatasetParseControls";
+import { useImportedColumns } from "./useImportedColumns/useImportedColumns";
+import {
+  CsvParseOptions,
+  FileParseOptions,
+  GoogleSheetsParseOptions,
+  useSaveDataset,
+  XlsxParseOptions,
+} from "./useSaveDataset/useSaveDataset";
 import type { UnknownObject } from "@utils/types/common.types";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DetectedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 
 export type DatasetImportFormValues = {
   name: string;
   description: string;
-  onlineStorageAllowed: boolean;
 };
+
+export type XlsxDataSourceMetadata = {
+  sourceType: "xlsx_file";
+  onlineStorageAllowed: boolean;
+  sizeInBytes: number;
+
+  /** Metadata we extracted during the parsing and loading process */
+  datasetLoadResult: XlsxFileLoadResult;
+
+  /**
+   * Options used to parse the XLSX. Used in case we need to re-parse and
+   * reload the data.
+   */
+  parseOptions: XlsxParseOptions;
+};
+
+export type CsvDataSourceMetadata = {
+  sourceType: "csv_file";
+  onlineStorageAllowed: boolean;
+  sizeInBytes: number;
+
+  /** Metadata we extracted during the parsing and loading process */
+  datasetLoadResult: CsvFileLoadResult;
+
+  /**
+   * Options used to parse the CSV. Used in case we need to re-parse and
+   * reload the data.
+   */
+  parseOptions: CsvParseOptions;
+};
+
+export type ManualUploadDataSourceMetadata =
+  | XlsxDataSourceMetadata
+  | CsvDataSourceMetadata;
+
+export type BaseLoadResult = {
+  datasetId: Dataset.Id;
+  numRows: number;
+};
+
+export type GoogleSheetsLoadResult = BaseLoadResult & {
+  rawText: string;
+  sheetLoadMetadata: DuckDbLoadCsvResult;
+  spreadsheetName: string;
+};
+
+export type GoogleSheetsDataSourceMetadata = {
+  sourceType: "google_sheets";
+  googleDocumentId: string;
+  googleAccountId: string;
+  datasetLoadResult: GoogleSheetsLoadResult;
+
+  /**
+   * Options used to parse and load the Google Sheets. Used in case we ever
+   * need to re-parse and reload the data.
+   */
+  parseOptions: GoogleSheetsParseOptions;
+};
+
+export type DataSourceMetadata =
+  | XlsxDataSourceMetadata
+  | CsvDataSourceMetadata
+  | GoogleSheetsDataSourceMetadata;
 
 const { maxDatasetNameLength, maxDatasetDescriptionLength } =
   AppConfig.dataManagerApp;
@@ -62,29 +121,17 @@ type Props = {
    * `AppConfig.dataManagerApp.maxPreviewRows` will be displayed.
    */
   rows: UnknownObject[];
-  initialDatasetId: Dataset.Id;
   initialDatasetName: string;
-  columns: readonly DetectedDatasetColumn[];
   disableSubmit?: boolean;
-  loadCsvResult: DuckDbLoadCsvResult;
 
   /** When the user requests to parse the data again. */
-  onRequestDataParse: (parseConfig: {
-    numRowsToSkip: number;
-    delimiter: string;
-  }) => void;
+  onRequestDataReparse: (parseOptions: FileParseOptions) => void;
   isProcessing?: boolean;
 
   /**
-   * Called after the dataset is saved, before navigating away.
-   *
-   * This is intentionally not awaited, so callers can kick off background work
-   * (like online syncing) without blocking navigation.
+   * When the user changes the data source metadata, such as the parse options.
    */
-  onDatasetSaved?: (options: {
-    savedDataset: Dataset.T;
-    datasetFormValues: DatasetImportFormValues;
-  }) => void;
+  onDataSourceMetadataChange: (options: DataSourceMetadata) => void;
 
   /**
    * If true, show the "cloud storage" toggle which can mark the dataset as
@@ -93,16 +140,10 @@ type Props = {
   showOnlineStorageAllowed?: boolean;
 
   /** Source-specific metadata used when persisting the dataset. */
-  importPayload:
-    | {
-        sourceType: "csv_file";
-        sizeInBytes: number;
-      }
-    | {
-        sourceType: "google_sheets";
-        googleAccountId: string;
-        googleDocumentId: string;
-      };
+  dataSourceMetadata: DataSourceMetadata;
+
+  /** The parse options for the dataset. This is a controlled component. */
+  parseOptions: FileParseOptions;
 };
 
 /**
@@ -113,33 +154,23 @@ type Props = {
  */
 export function DatasetImportForm({
   rows,
-  columns,
-  initialDatasetId,
   initialDatasetName,
   disableSubmit,
-  loadCsvResult,
-  onRequestDataParse,
+  onDataSourceMetadataChange,
+  onRequestDataReparse,
   isProcessing = false,
-  showOnlineStorageAllowed = true,
-  onDatasetSaved,
-  importPayload,
+  dataSourceMetadata,
 }: Props): JSX.Element {
-  const navigate = useNavigate();
-  const workspace = useCurrentWorkspace();
   const nameInputRef = useRef<HTMLInputElement>(null);
   const descriptionInputRef = useRef<HTMLInputElement>(null);
-  const [showValidationSummary, setShowValidationSummary] = useState(false);
-
-  const [numRowsToSkip, setNumRowsToSkip] = useState(
-    loadCsvResult.csvSniff.SkipRows,
-  );
-  const [delimiter, setDelimiter] = useState(loadCsvResult.csvSniff.Delimiter);
+  const [isFormErrorSummaryVisible, setIsFormErrorSummaryVisible] =
+    useState(false);
+  const importedColumns = useImportedColumns(dataSourceMetadata);
 
   const form = useForm<DatasetImportFormValues>({
     initialValues: {
       name: initialDatasetName,
       description: "",
-      onlineStorageAllowed: true,
     },
     validateInputOnChange: true,
     validate: {
@@ -152,94 +183,7 @@ export function DatasetImportForm({
     },
   });
 
-  const [saveDataset, isSavePending] = useMutation({
-    queryToInvalidate: DatasetClient.QueryKeys.getAll(),
-    mutationFn: (values: DatasetImportFormValues) => {
-      const { name, description, onlineStorageAllowed } = values;
-      return match(importPayload)
-        .with({ sourceType: "csv_file" }, async (payload) => {
-          const { sizeInBytes } = payload;
-          const { csvSniff } = loadCsvResult;
-          const dataset = await DatasetClient.insertCsvFileDataset({
-            datasetId: initialDatasetId,
-            workspaceId: workspace.id,
-            datasetName: name,
-            datasetDescription: description,
-            columns: columns.map(snakeCaseKeysShallow),
-            isInCloudStorage: onlineStorageAllowed,
-            sizeInBytes,
-            parseOptions: {
-              // use the user-defined parse options here first. Otherwise,
-              // default to the sniffed options.
-              rowsToSkip: numRowsToSkip ?? csvSniff.SkipRows,
-              delimiter: delimiter ?? csvSniff.Delimiter,
-
-              // Fill in the other options from the CSV sniff object
-              quoteChar: csvSniff.Quote,
-              escapeChar: csvSniff.Escape,
-              newlineDelimiter: csvSniff.NewLineDelimiter,
-              commentChar: csvSniff.Comment,
-              hasHeader: csvSniff.HasHeader,
-              dateFormat: csvSniff.DateFormat,
-              timestampFormat: csvSniff.TimestampFormat,
-            },
-          });
-          return dataset;
-        })
-        .with({ sourceType: "google_sheets" }, async (payload) => {
-          const { csvSniff } = loadCsvResult;
-          const { googleAccountId, googleDocumentId } = payload;
-          const dataset = await DatasetClient.insertGoogleSheetsDataset({
-            columns: columns.map(snakeCaseKeysShallow),
-            datasetDescription: description,
-            datasetId: initialDatasetId,
-            datasetName: name,
-            googleAccountId,
-            googleDocumentId,
-            rowsToSkip: numRowsToSkip ?? csvSniff.SkipRows ?? 0,
-            workspaceId: workspace.id,
-          });
-          return dataset;
-        })
-        .exhaustive(() => {
-          throw new Error(
-            `Unsupported dataset source type: ${importPayload.sourceType}`,
-          );
-        });
-    },
-    onSuccess: async (savedDataset) => {
-      setShowValidationSummary(false);
-      notifySuccess({
-        title: "Dataset saved",
-        message: `Dataset "${savedDataset.name}" saved successfully`,
-      });
-
-      if (onDatasetSaved) {
-        try {
-          onDatasetSaved({
-            savedDataset,
-            datasetFormValues: form.getValues(),
-          });
-        } catch {
-          // Do nothing. Navigation should not be blocked by background work.
-        }
-      }
-
-      navigate(
-        AppLinks.dataManagerDatasetView({
-          workspaceSlug: workspace.slug,
-          datasetId: savedDataset.id,
-          datasetName: savedDataset.name,
-        }),
-      );
-    },
-    onError: () => {
-      notifyError({
-        title: "Error saving dataset",
-        message: "An error occurred while saving the dataset",
-      });
-    },
-  });
+  const [saveDataset, isSavePending] = useSaveDataset();
 
   const previewRows = useMemo(() => {
     return rows.slice(0, AppConfig.dataManagerApp.maxPreviewRows);
@@ -249,7 +193,7 @@ export function DatasetImportForm({
     errors: FormErrors,
     _values: DatasetImportFormValues,
   ) => {
-    setShowValidationSummary(true);
+    setIsFormErrorSummaryVisible(true);
 
     for (const field of VALIDATION_FIELD_ORDER) {
       if (!errors[field]) {
@@ -276,7 +220,7 @@ export function DatasetImportForm({
     }
   };
 
-  const validationSummaryItems = VALIDATION_FIELD_ORDER.flatMap((field) => {
+  const formErrorSummaryItems = VALIDATION_FIELD_ORDER.flatMap((field) => {
     const err = form.errors[field];
     if (!err) {
       return [];
@@ -286,34 +230,87 @@ export function DatasetImportForm({
     return [{ field, line: `${label}: ${text}` }];
   });
 
-  const renderProcessState = () => {
-    const { numRows } = loadCsvResult;
-    const formattedNumRows = numRows.toLocaleString();
+  const elements = {
+    successOrFailedStatus: () => {
+      const {
+        datasetLoadResult: { numRows },
+      } = dataSourceMetadata;
+      const formattedNumRows = numRows.toLocaleString();
+      if (numRows === 0) {
+        return (
+          <Callout
+            title="Data processing failed"
+            color="error"
+            message="No rows were read successfully"
+          />
+        );
+      }
 
-    if (numRows === 0) {
       return (
         <Callout
-          title="Data processing failed"
-          color="error"
-          message="No rows were read successfully"
+          title="Data processed successfully"
+          color="success"
+          message={`Parsed ${formattedNumRows} rows successfully`}
         />
       );
-    }
+    },
 
-    return (
-      <Callout
-        title="Data processed successfully"
-        color="success"
-        message={`Parsed ${formattedNumRows} rows successfully`}
-      />
-    );
+    reparseDataButton: () => {
+      const { parseOptions } = dataSourceMetadata;
+      return (
+        <Button
+          onClick={() => {
+            return onRequestDataReparse(parseOptions);
+          }}
+          loading={isProcessing}
+          disabled={isProcessing}
+        >
+          Process data again
+        </Button>
+      );
+    },
+
+    onlineStorageAllowedCheckbox: () => {
+      if (DatasetSource.canBeOfflineOnly(dataSourceMetadata)) {
+        return (
+          <Checkbox
+            label={
+              <>
+                <Text span>This dataset can be stored in the cloud. </Text>
+                {!dataSourceMetadata.sourceType ?
+                  <Callout
+                    mt="sm"
+                    title="This dataset will be offline-only"
+                    titleSize="xl"
+                  >
+                    <Text c="red.8">
+                      This dataset will no longer be stored online and can only
+                      be accessed as long as it is on your personal computer.
+                      Nobody on your team will be able to access this data. This
+                      is recommended only for very sensitive data.
+                    </Text>
+                  </Callout>
+                : null}
+              </>
+            }
+            {...form.getInputProps("onlineStorageAllowed", {
+              type: "checkbox",
+            })}
+          />
+        );
+      }
+      return null;
+    },
   };
 
   return (
     <form
       onSubmit={form.onSubmit(
-        (values) => {
-          saveDataset(values);
+        (formValues) => {
+          saveDataset({
+            ...formValues,
+            ...dataSourceMetadata,
+          });
         },
         (errors, values, _event) => {
           onValidationFailure(errors, values);
@@ -337,79 +334,32 @@ export function DatasetImportForm({
           {...form.getInputProps("description")}
         />
 
-        {renderProcessState()}
+        {elements.successOrFailedStatus()}
 
         <DatasetPreviewBlock
           previewRows={previewRows}
-          columns={columns}
+          columns={importedColumns}
           dataPreviewCalloutMessage={`These are the first ${previewRows.length} rows
             of your dataset. Check to see if the data is correct. If they are not,
             it's possible your dataset does not start on the first row or the CSV
             uses a different delimiter. Try adjusting those settings here.`}
-          dataColumnsCalloutMessage={`${columns.length} columns were detected.
+          dataColumnsCalloutMessage={`${importedColumns.length} columns were detected.
             Review the column info below to make sure they are correct. If they
             are not, change the import options above and click Upload again.`}
           dataPreviewCalloutContents={
             <Group align="flex-end">
-              <NumberInput
-                label="Number of rows to skip"
-                value={numRowsToSkip}
-                onChange={(value) => {
-                  return setNumRowsToSkip(Number(value));
-                }}
+              <DatasetParseControls
+                onDataSourceMetadataChange={onDataSourceMetadataChange}
+                {...dataSourceMetadata}
               />
-              <TextInput
-                label="Delimiter"
-                value={delimiter}
-                onChange={(e) => {
-                  return setDelimiter(e.currentTarget.value);
-                }}
-              />
-              <Button
-                onClick={() => {
-                  return onRequestDataParse({
-                    numRowsToSkip,
-                    delimiter,
-                  });
-                }}
-                loading={isProcessing}
-                disabled={isProcessing}
-              >
-                Process data again
-              </Button>
+              {elements.reparseDataButton()}
             </Group>
           }
         />
 
-        {showOnlineStorageAllowed ?
-          <Checkbox
-            key={form.key("onlineStorageAllowed")}
-            label={
-              <>
-                <Text span>This dataset can be stored in the cloud. </Text>
-                {!form.getValues().onlineStorageAllowed ?
-                  <Callout
-                    mt="sm"
-                    title="This dataset will be offline-only"
-                    titleSize="xl"
-                  >
-                    <Text c="red.8">
-                      This dataset will no longer be stored online and can only
-                      be accessed as long as it is on your personal computer.
-                      Nobody on your team will be able to access this data. This
-                      is recommended only for very sensitive data.
-                    </Text>
-                  </Callout>
-                : null}
-              </>
-            }
-            {...form.getInputProps("onlineStorageAllowed", {
-              type: "checkbox",
-            })}
-          />
-        : null}
+        {elements.onlineStorageAllowedCheckbox()}
 
-        {showValidationSummary && validationSummaryItems.length > 0 ?
+        {isFormErrorSummaryVisible && formErrorSummaryItems.length > 0 ?
           <Callout
             color="error"
             title="Fix these issues before saving"
@@ -421,7 +371,7 @@ export function DatasetImportForm({
               mt="xs"
               style={{ listStyle: "disc", paddingInlineStart: "1.25rem" }}
             >
-              {validationSummaryItems.map((item) => {
+              {formErrorSummaryItems.map((item) => {
                 return (
                   <Text component="li" key={item.field} size="sm" c="red.8">
                     {item.line}

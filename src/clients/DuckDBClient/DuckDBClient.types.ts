@@ -111,6 +111,7 @@ export type DuckDbLoadParquetResult = {
  * DuckDB does not support legacy `.xls` (BIFF) workbooks.
  */
 export type DuckDbLoadXlsxResult = {
+  type: "xlsx";
   /** Unique identifier for this load operation */
   id: UUID;
   /** The DuckDB table holding the loaded sheet */
@@ -129,6 +130,7 @@ export type DuckDbLoadXlsxResult = {
 };
 
 export type DuckDbLoadCsvResult = {
+  type: "csv";
   /** Unique identifier for this load operation */
   id: UUID;
   /** The name of the CSV file */

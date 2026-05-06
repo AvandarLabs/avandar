@@ -1,4 +1,5 @@
 import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
+import { Model } from "@models/Model/Model.ts";
 import { pipe } from "@utils/misc/pipe/pipe.ts";
 import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
 import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
@@ -42,12 +43,12 @@ export const CsvFileDatasetParsers =
       camelCaseKeysDeep,
       nullsToUndefinedDeep,
       (obj) => {
-        return {
+        return Model.make("CsvFileDataset", {
           ...obj,
           id: obj.id as CsvFileDatasetId,
           datasetId: obj.datasetId as DatasetId,
           workspaceId: obj.workspaceId as Workspace.Id,
-        };
+        });
       },
     ),
     fromModelInsertToDBInsert: snakeCaseKeysDeep,
