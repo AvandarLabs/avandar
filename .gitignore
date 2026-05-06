@@ -41,6 +41,10 @@ supabase/.branches
 # Cursor
 .cursor/plans
 
+# Playwright
+/playwright-report/
+/test-results/
+
 # Common scratch or temp files
 todo.md
 TODO.md

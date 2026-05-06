@@ -15,6 +15,9 @@ type Props = {
     displayName: string;
   }) => void;
   introText?: string;
+
+  /** Called after the workspace is created */
+  onWorkspaceCreated?: () => void;
 };
 
 const SLUG_MIN_LENGTH = 3;
@@ -42,6 +45,7 @@ function validateSlugString(value: string): string | undefined {
 export function CreateWorkspaceForm({
   onSubmit,
   introText,
+  onWorkspaceCreated,
 }: Props): JSX.Element {
   const navigate = useNavigate();
   const [submittedOnwerInfo, setSubmittedOnwerInfo] = useState<
@@ -56,7 +60,7 @@ export function CreateWorkspaceForm({
       queryToInvalidate: [WorkspaceClient.getClientName()],
       onSuccess: (newWorkspace) => {
         notifySuccess("Workspace created successfully!");
-        close();
+        onWorkspaceCreated?.();
 
         // navigate to the new workspace
         navigate(AppLinks.workspaceHome(newWorkspace.slug));

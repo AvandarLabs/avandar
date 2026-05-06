@@ -8,6 +8,8 @@
     "incremental": true
   },
   "include": [
+    "playwright.config.ts",
+    "tests/e2e/**/*.ts",
     "vite.config.ts",
     ".ava/**/*.ts",
     "apps/dev-fanout-server/src",

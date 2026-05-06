@@ -75,7 +75,11 @@ Libraries:
 - Use higher-order functions (map, filter, reduce) to simplify logic.
   Avoid `for` and `while` loops.
 - Always use named exports instead of default exports.
-- **Never** exceed 80 characters per line, including comments.
+- **Never** exceed 80 characters per line for code and comments.
+- **Exception: string literals:** the 80-character limit does **not** apply to
+  string literal contents (user-facing copy, test skip messages, error text,
+  URLs, etc.). Keep each message as **one** string or template literal; do **not**
+  break it across lines with `+` concatenation only to stay under 80 columns.
 - Leave an empty line before any comments or docstrings.
 - If a docstring fits in 80 characters, then single-line it. Example:
 
@@ -99,6 +103,7 @@ Libraries:
 - Use string interpolation instead of concatenation.
 
   This is bad:
+
   ```ts
   // This is bad:
   const myString = "Hello, " + name;
