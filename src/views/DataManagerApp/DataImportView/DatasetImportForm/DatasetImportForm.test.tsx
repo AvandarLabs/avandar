@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { uuid } from "$/lib/uuid";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
+import { useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AvandarUIProvider } from "@/components/common/AvandarUIProvider";
 import { DatasetImportForm } from "./DatasetImportForm";
@@ -211,6 +212,61 @@ describe("DatasetImportForm", () => {
         parseOptions: expect.objectContaining({
           hasHeader: false,
         }),
+      }),
+    );
+  });
+
+  it("shows and hides offline-only warning while updating online storage metadata", () => {
+    const onDataSourceMetadataChange = vi.fn();
+    const metadata = _csvDataSourceMetadata();
+
+    function ControlledMetadataHarness(): JSX.Element {
+      const [currentMetadata, setCurrentMetadata] =
+        useState<DataSourceMetadata>(metadata);
+
+      return (
+        <DatasetImportForm
+          rows={[{ city: "LA" }]}
+          initialDatasetName="cities.csv"
+          onRequestDataReparse={vi.fn()}
+          onDataSourceMetadataChange={(nextMetadata) => {
+            onDataSourceMetadataChange(nextMetadata);
+            setCurrentMetadata(nextMetadata);
+          }}
+          dataSourceMetadata={currentMetadata}
+          parseOptions={currentMetadata.parseOptions}
+        />
+      );
+    }
+
+    render(
+      <AvandarUIProvider>
+        <ControlledMetadataHarness />
+      </AvandarUIProvider>,
+    );
+
+    const warningRegex = /This dataset will no longer be stored online/i;
+    const onlineStorageCheckbox = screen.getByLabelText(
+      /This dataset can be stored in the cloud/i,
+    );
+
+    expect(screen.queryByText(warningRegex)).not.toBeInTheDocument();
+
+    fireEvent.click(onlineStorageCheckbox);
+
+    expect(screen.getByText(warningRegex)).toBeInTheDocument();
+    expect(onDataSourceMetadataChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        onlineStorageAllowed: false,
+      }),
+    );
+
+    fireEvent.click(onlineStorageCheckbox);
+
+    expect(screen.queryByText(warningRegex)).not.toBeInTheDocument();
+    expect(onDataSourceMetadataChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        onlineStorageAllowed: true,
       }),
     );
   });

@@ -277,7 +277,7 @@ export function DatasetImportForm({
             label={
               <>
                 <Text span>This dataset can be stored in the cloud. </Text>
-                {!dataSourceMetadata.sourceType ?
+                {!dataSourceMetadata.onlineStorageAllowed ?
                   <Callout
                     mt="sm"
                     title="This dataset will be offline-only"
@@ -293,9 +293,13 @@ export function DatasetImportForm({
                 : null}
               </>
             }
-            {...form.getInputProps("onlineStorageAllowed", {
-              type: "checkbox",
-            })}
+            checked={dataSourceMetadata.onlineStorageAllowed}
+            onChange={(event) => {
+              onDataSourceMetadataChange({
+                ...dataSourceMetadata,
+                onlineStorageAllowed: event.currentTarget.checked,
+              });
+            }}
           />
         );
       }

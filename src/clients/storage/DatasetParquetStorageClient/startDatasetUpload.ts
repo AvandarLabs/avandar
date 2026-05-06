@@ -160,6 +160,7 @@ async function _uploadDatasetToSupabase(options: {
 
   // upload is complete, so we update the CSV file in our db to reflect
   // that it is in cloud storage.
+  // TODO(jpsyx): this has to handle other source types
   await CsvFileDatasetClient.update({
     id: CsvFileDataset.id,
     data: {
@@ -210,11 +211,13 @@ export async function startDatasetUpload(options: {
 
   const parquetBlob = localDataset.parquetData;
 
-  const uploadPromise = _uploadDatasetToSupabase({
-    ...options,
-    parquetBlob,
-  })
-    .catch((error: unknown) => {
+  const makeUploadPromise = async (): Promise<void> => {
+    try {
+      await _uploadDatasetToSupabase({
+        ...options,
+        parquetBlob,
+      });
+    } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
 
@@ -224,14 +227,17 @@ export async function startDatasetUpload(options: {
         message: errorMessage,
       });
       throw error;
-    })
-    .finally(() => {
+    } finally {
       DatasetUploadProgressStore.removeUpload(datasetId);
-    });
+    }
+  };
+
+  const uploadPromise = makeUploadPromise();
 
   DatasetUploadProgressStore.startUpload(datasetId, {
-    totalBytes: parquetBlob.size,
     uploadPromise,
+    totalBytes: parquetBlob.size,
   });
+
   return await uploadPromise;
 }
