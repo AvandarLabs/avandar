@@ -159,6 +159,8 @@ export function useSaveDataset(): UseMutationResultTuple<
         message: `Dataset "${savedDataset.name}" saved successfully`,
       });
 
+      // Hanlde post-save actions, such as uploading the dataset to cloud
+      // storage if it was allowed by the user.
       match(params)
         .with({ sourceType: "csv_file" }, { sourceType: "xlsx_file" }, (p) => {
           if (p.onlineStorageAllowed) {
@@ -168,12 +170,14 @@ export function useSaveDataset(): UseMutationResultTuple<
             void DatasetParquetStorageClient.startDatasetUpload({
               workspaceId: workspace.id,
               datasetId: savedDataset.id,
+              sourceType: params.sourceType,
             });
           }
           return;
         })
         .with({ sourceType: "google_sheets" }, () => {
-          // do nothing
+          // Do nothing. There is no post-save action for Google Sheets
+          // datasets.
           return;
         })
         .exhaustive(() => {

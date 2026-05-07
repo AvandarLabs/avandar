@@ -6,8 +6,9 @@ import { ModelTypedId } from "@models/Model/Model.types";
 import { IconWorld, IconWorldOff } from "@tabler/icons-react";
 import { ActionIcon } from "@ui/ActionIcon/ActionIcon";
 import { notifyError, notifySuccess } from "@ui/notifications/notify";
-import { CsvFileDatasetClient } from "@/clients/datasets/CsvFileDatasetClient";
-import { XlsxFileDatasetClient } from "@/clients/datasets/XlsxFileDatasetClient";
+import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
+import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
+import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { useIsDatasetUploadInProgress } from "@/clients/storage/DatasetParquetStorageClient/useIsDatasetUploadInProgress";
 import { useUploadPercent } from "@/clients/storage/DatasetParquetStorageClient/useUploadPercent";
@@ -125,6 +126,7 @@ export function ToggleOfflineOnlyButton({
           return DatasetParquetStorageClient.startDatasetUpload({
             workspaceId: workspace.id,
             datasetId: dataSource.datasetId,
+            sourceType: DatasetSource.getSourceType(dataSource),
           });
         }
       },

@@ -1,6 +1,10 @@
+import { Model } from "@models/Model/Model.ts";
 import { registry } from "@utils/objects/registry/registry.ts";
 import { match } from "ts-pattern";
-import type { DatasetSourceType } from "$/models/datasets/DatasetSource/DatasetSource.types.ts";
+import type {
+  DatasetSourceModel,
+  DatasetSourceType,
+} from "$/models/datasets/DatasetSource/DatasetSource.types.ts";
 
 function _canBeOfflineOnly(
   sourceType: DatasetSourceType,
@@ -42,4 +46,19 @@ export const DatasetSourceModule = {
 
   canBeOfflineOnly: _canBeOfflineOnly,
   isManuallyUploadable: _canBeOfflineOnly,
+
+  /**
+   * Get the source type of a dataset source model.
+   * @param datasetSource The dataset source model to get the source type of.
+   * @returns The source type of the dataset source model.
+   */
+  getSourceType: (datasetSource: DatasetSourceModel): DatasetSourceType => {
+    return Model.match(datasetSource, {
+      CsvFileDataset: "csv_file",
+      OpenDataDataset: "open_data",
+      GoogleSheetsDataset: "google_sheets",
+      VirtualDataset: "virtual",
+      XlsxFileDataset: "xlsx_file",
+    } as const);
+  },
 };

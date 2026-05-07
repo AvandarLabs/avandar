@@ -1,26 +1,11 @@
 {
   "version": 1,
   "skills": {
-    "adapt": {
-      "source": "pbakaus/impeccable",
-      "sourceType": "github",
-      "computedHash": "65085998d643c3b64ff323ca74d76496b47484046b030730c00c03a0208bf410"
-    },
-    "animate": {
-      "source": "pbakaus/impeccable",
-      "sourceType": "github",
-      "computedHash": "354414a934957f9d54a71468abe81888304d35b47a4fe8e27fff08f60b457d53"
-    },
     "attach-db": {
       "source": "duckdb/duckdb-skills",
       "sourceType": "github",
       "skillPath": "skills/attach-db/SKILL.md",
       "computedHash": "db6a105a312536b75a58616dfd38b46909253c88fcb1ffd58bfc506ffa3065d6"
-    },
-    "audit": {
-      "source": "pbakaus/impeccable",
-      "sourceType": "github",
-      "computedHash": "115a00d21d91d52123115af789948cb22bd604de0084837b5533f5e4af3c4055"
     },
     "avandar-ava-model-creation": {
       "source": "AvandarLabs/avandar-agent-skills",
@@ -28,39 +13,22 @@
       "skillPath": "skills/avandar-ava-model-creation/SKILL.md",
       "computedHash": "7daf2610d2718852b320f452e6ba68e6e93631899b6855af6d4208941b4e8a86"
     },
-    "bolder": {
-      "source": "pbakaus/impeccable",
+    "brainstorming": {
+      "source": "obra/superpowers",
       "sourceType": "github",
-      "computedHash": "1787478962577c9d5bde26e89e47c1654aa9c8f3c47c316a026731db0000a92e"
+      "skillPath": "skills/brainstorming/SKILL.md",
+      "computedHash": "8df9b47092524833138b58682d03f2e153a242e550d1693657afdbee0cc9cdb0"
     },
-    "clarify": {
-      "source": "pbakaus/impeccable",
+    "dispatching-parallel-agents": {
+      "source": "obra/superpowers",
       "sourceType": "github",
-      "computedHash": "42877142fcc51dcc6be696349aa7df8887eb29510e2a5868beac913f5f84de31"
-    },
-    "colorize": {
-      "source": "pbakaus/impeccable",
-      "sourceType": "github",
-      "computedHash": "4793ac377b2bc1a5831d9634ce882373350cc5d097fd631d192155266204ceb8"
-    },
-    "critique": {
-      "source": "pbakaus/impeccable",
-      "sourceType": "github",
-      "computedHash": "977f6fc3aa1002ec095f649e1b7c4fa52ee08a447f19229062810a9323c5c342"
-    },
-    "delight": {
-      "source": "pbakaus/impeccable",
-      "sourceType": "github",
-      "computedHash": "1f6f4adee0b964e8344c0baef46b4e303ab3ba20932907bcbb1444ba7b3273b2"
-    },
-    "distill": {
-      "source": "pbakaus/impeccable",
-      "sourceType": "github",
-      "computedHash": "669a671f855be8773e4c2936e54d4243fbd1d273f87633158544efe3dbc4d825"
+      "skillPath": "skills/dispatching-parallel-agents/SKILL.md",
+      "computedHash": "e21044ae7496fc285f1df9ff3fb518a3a20bea6f5216c1f59f4987e12c769a0a"
     },
     "documentation": {
       "source": "mcollina/skills",
       "sourceType": "github",
+      "skillPath": "skills/documentation/SKILL.md",
       "computedHash": "9a43f2e8ebb01dbc162ad78d865ff9e20bf20270e0514095c3bf3f1ac43599c6"
     },
     "duckdb-docs": {
@@ -69,15 +37,35 @@
       "skillPath": "skills/duckdb-docs/SKILL.md",
       "computedHash": "6aa9b9d013487eace5398a0e035cf5ee3efd220b34349a46e7c335cf079f7e66"
     },
+    "executing-plans": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "skillPath": "skills/executing-plans/SKILL.md",
+      "computedHash": "b41c919caf1bb07fbacb0e29899ac513f9eb11cd4dd695975ad352c2c03cc4d7"
+    },
     "fastify-best-practices": {
       "source": "mcollina/skills",
       "sourceType": "github",
+      "skillPath": "skills/fastify/SKILL.md",
       "computedHash": "269924684709b8c6f50a569ef988e66031efb822ef92cba6c8dfa160e54ed4d4"
+    },
+    "finishing-a-development-branch": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "skillPath": "skills/finishing-a-development-branch/SKILL.md",
+      "computedHash": "932d23af11a3eb2b758f5b1d9aec7b6d28ddd26658328414f87f34dff7179d19"
     },
     "impeccable": {
       "source": "pbakaus/impeccable",
       "sourceType": "github",
-      "computedHash": "a26b3dd377c4572b1c34c68f82ab9a1cb806f21c7157060327fe60e9b6d2e277"
+      "skillPath": "skill/SKILL.md",
+      "computedHash": "8cdf2e788eaca3af7d02026ef9cec55b506100a00d130f938e3fb1ad669c0ad0"
+    },
+    "init": {
+      "source": "mcollina/skills",
+      "sourceType": "github",
+      "skillPath": "skills/init/SKILL.md",
+      "computedHash": "3a30628fcb5d80a3e06df0fd749bd08c27054114f545a570e49ea3d888634abe"
     },
     "install-duckdb": {
       "source": "duckdb/duckdb-skills",
@@ -85,30 +73,35 @@
       "skillPath": "skills/install-duckdb/SKILL.md",
       "computedHash": "ce264b48e369a23adbda39804fc65c7e9fdffe182f6dfbc9f4e2fdf88b027b9e"
     },
-    "layout": {
-      "source": "pbakaus/impeccable",
+    "linting-neostandard-eslint9": {
+      "source": "mcollina/skills",
       "sourceType": "github",
-      "computedHash": "6b5fd49587616ca1e594e9c6b11bc1cef5eb0b2d137c307de54a8a650770f4ce"
+      "skillPath": "skills/linting-neostandard-eslint9/SKILL.md",
+      "computedHash": "752557ba728543623393c86a4190ce2f4dd712222c72c5d22796fb961a2567a3"
     },
     "node": {
       "source": "mcollina/skills",
       "sourceType": "github",
+      "skillPath": "skills/node/SKILL.md",
       "computedHash": "aba2163ddb3fcf3e6a9d101ac370fabc94055b3e628b125dd084969f1a945993"
     },
     "nodejs-core": {
       "source": "mcollina/skills",
       "sourceType": "github",
+      "skillPath": "skills/nodejs-core/SKILL.md",
       "computedHash": "3d358d412d95e38d06bbfadab64b20da4aeafafd4dac8a95f3f3cad3bba40882"
     },
-    "optimize": {
-      "source": "pbakaus/impeccable",
+    "oauth": {
+      "source": "mcollina/skills",
       "sourceType": "github",
-      "computedHash": "979ffc76a4345c081fdf89078b7107c216d70696e027b23e8e24972dd4e457b2"
+      "skillPath": "skills/oauth/SKILL.md",
+      "computedHash": "cf0ec2396dbf94504eb74ac7191c7b7b082dba3ef080a42688e79ca5c856eddc"
     },
-    "overdrive": {
-      "source": "pbakaus/impeccable",
+    "octocat": {
+      "source": "mcollina/skills",
       "sourceType": "github",
-      "computedHash": "30e2909c14b9e860b580e63f9bbe10cc1dee8de0be9b03013218c3ef8d9ede78"
+      "skillPath": "skills/octocat/SKILL.md",
+      "computedHash": "b5e546eedcde6ff050435f9e7e3b6ffa66cc37f3ab0443d0030d96f05fcdd7b1"
     },
     "playwright-best-practices": {
       "source": "currents-dev/playwright-best-practices-skill",
@@ -116,10 +109,11 @@
       "skillPath": "SKILL.md",
       "computedHash": "320eaf861e3a0a923bfaad0726cb311a3fe30093378f8d26c89b9c5ae5c42b35"
     },
-    "polish": {
-      "source": "pbakaus/impeccable",
+    "playwright-skill": {
+      "source": "lackeyjb/playwright-skill",
       "sourceType": "github",
-      "computedHash": "c294f2570dcc5b8865d17f0dc5ef339a700c868f1b20fa9994297f64ace2d4de"
+      "skillPath": "skills/playwright-skill/SKILL.md",
+      "computedHash": "3a284d9eee004bcbcf17f58a08550146021d43efb02c9f411d65cacca889fb25"
     },
     "query": {
       "source": "duckdb/duckdb-skills",
@@ -127,31 +121,47 @@
       "skillPath": "skills/query/SKILL.md",
       "computedHash": "4ef826c2a588b8629aef536a797ea67f31f8f5a04f88acadbc5ba84f6778887d"
     },
-    "quieter": {
-      "source": "pbakaus/impeccable",
-      "sourceType": "github",
-      "computedHash": "2c20b12bb4ece445d45fc63bda020aecf78b3cdf6d593beb59c273f658293130"
-    },
     "read-file": {
       "source": "duckdb/duckdb-skills",
       "sourceType": "github",
       "skillPath": "skills/read-file/SKILL.md",
       "computedHash": "16607eb0d4dc7e2ff8d92e2bdba6bedb67aedb1189f66249a46ed672ca1782c4"
     },
-    "shape": {
-      "source": "pbakaus/impeccable",
+    "receiving-code-review": {
+      "source": "obra/superpowers",
       "sourceType": "github",
-      "computedHash": "8edad33758f2461f51afdb51741bfcc4cc57d84ea42e2751a84be2c6a2d48f69"
+      "skillPath": "skills/receiving-code-review/SKILL.md",
+      "computedHash": "2760c85d4f4117b0006e7ba755f4bbd61f8f4c185f347999763c97f507274e30"
+    },
+    "requesting-code-review": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "skillPath": "skills/requesting-code-review/SKILL.md",
+      "computedHash": "874f3786b05007a8b4a60452a4cd89b9917c645d34b6b1e40ea05037d12f0e67"
     },
     "skill-optimizer": {
       "source": "mcollina/skills",
       "sourceType": "github",
+      "skillPath": "skills/skill-optimizer/SKILL.md",
       "computedHash": "17611b4b906ceabd9ae386350450e676d0692341d90af4468b00c0b7c9ed0a95"
+    },
+    "snipgrapher": {
+      "source": "mcollina/skills",
+      "sourceType": "github",
+      "skillPath": "skills/snipgrapher/SKILL.md",
+      "computedHash": "2bc2074c37caa2a4936109e254abaf5a1f3abaa88937714176170a606dd2e681"
+    },
+    "subagent-driven-development": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "skillPath": "skills/subagent-driven-development/SKILL.md",
+      "computedHash": "b38be2f3a092d758127f6d47e77c2493885aebf38aae359e4c786df2c343b837"
     },
     "supabase": {
       "source": "supabase/agent-skills",
       "sourceType": "github",
-      "computedHash": "cb675a889c60172febe84740e7c22b600c8241c390deaff3d368c408f10dffdf"
+      "skillPath": "skills/supabase/SKILL.md",
+      "computedHash": "45a3cdccc364a4bbd6cdf700fc069e9f24ebc0428098746cbfbf8b18a5e160d2"
     },
     "supabase-declarative-schema": {
       "source": "AvandarLabs/avandar-agent-skills",
@@ -162,17 +172,56 @@
     "supabase-postgres-best-practices": {
       "source": "supabase/agent-skills",
       "sourceType": "github",
+      "skillPath": "skills/supabase-postgres-best-practices/SKILL.md",
       "computedHash": "d606a1146be6d54fb9e73f718b5320b9acac5ff2ba2d7230a555df4b5a923b4a"
+    },
+    "systematic-debugging": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "skillPath": "skills/systematic-debugging/SKILL.md",
+      "computedHash": "7246fdd3a795fc3daff0af72044ca99bf836e4e6a46844742858786fdfb86488"
+    },
+    "test-driven-development": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "skillPath": "skills/test-driven-development/SKILL.md",
+      "computedHash": "126f1ebf6ccd414f42544f6e83d8cc5adb089e1108eaffb7c400701e37eecd9f"
     },
     "typescript-magician": {
       "source": "mcollina/skills",
       "sourceType": "github",
+      "skillPath": "skills/typescript-magician/SKILL.md",
       "computedHash": "99e61d29c107b3c52adbb70c6ee8cfbfb7830ea0649dba4ec89557fdf5c46b54"
     },
-    "typeset": {
-      "source": "pbakaus/impeccable",
+    "using-git-worktrees": {
+      "source": "obra/superpowers",
       "sourceType": "github",
-      "computedHash": "1cd76e560d1ba25b0bd5f7adfa2957a9f653a3ad0b031d467221154fcd1e0423"
+      "skillPath": "skills/using-git-worktrees/SKILL.md",
+      "computedHash": "bd10bc57c23040630b17c877a9bc7b4be40c35161a2e2f110d770d78e3b0a4ff"
+    },
+    "using-superpowers": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "skillPath": "skills/using-superpowers/SKILL.md",
+      "computedHash": "de10fd3ff46d797acc92b9df6b3ea456a5cd1d095b73c90bc921e83cce4c5bb9"
+    },
+    "verification-before-completion": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "skillPath": "skills/verification-before-completion/SKILL.md",
+      "computedHash": "9b446f0c7fe1cfb560b1d34439523b1a76d5f177290007b2c053a1c749a4a8ba"
+    },
+    "writing-plans": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "skillPath": "skills/writing-plans/SKILL.md",
+      "computedHash": "2b986445454a025ca2c3839f8a2024747e8cce0517948437232cd113d2719060"
+    },
+    "writing-skills": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "skillPath": "skills/writing-skills/SKILL.md",
+      "computedHash": "c0a92e629e39ea91b1f54da67a6aa92723008a8ef5b500c6de078f55485937c7"
     }
   }
 }

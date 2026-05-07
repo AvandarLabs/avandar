@@ -1,12 +1,11 @@
 import { notifyError } from "@ui/notifications/notify";
 import Uppy from "@uppy/core";
 import Tus from "@uppy/tus";
-import { where } from "@utils/filters/where/where";
 import { MIMEType } from "@utils/types/common.types";
 import { AuthClient } from "@/clients/AuthClient";
-import { CsvFileDatasetClient } from "@/clients/datasets/CsvFileDatasetClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { SourceDatasetClient } from "@/clients/datasets/SourceDatasetClient";
 import { DatasetUploadProgressStore } from "@/clients/storage/DatasetParquetStorageClient/DatasetUploadProgressStore";
 import {
   DIRECT_UPLOAD_MAX_BYTES,
@@ -16,6 +15,7 @@ import {
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 async function _getTusHeaders(): Promise<Record<string, string>> {
@@ -130,8 +130,9 @@ async function _uploadDatasetToSupabase(options: {
   workspaceId: Workspace.Id;
   datasetId: DatasetId;
   parquetBlob: Blob;
+  sourceType: DatasetSource.SourceType;
 }): Promise<void> {
-  const { workspaceId, datasetId, parquetBlob } = options;
+  const { workspaceId, datasetId, parquetBlob, sourceType } = options;
 
   if (parquetBlob.size > DIRECT_UPLOAD_MAX_BYTES) {
     await _resumableParquetBlobUpload({
@@ -150,19 +151,20 @@ async function _uploadDatasetToSupabase(options: {
   DatasetUploadProgressStore.setUploadedBytes(datasetId, parquetBlob.size);
   DatasetUploadProgressStore.markCompleted(datasetId);
 
-  const CsvFileDataset = await CsvFileDatasetClient.getOne(
-    where("dataset_id", "eq", datasetId),
-  );
+  const sourceDataset = await SourceDatasetClient.getByDatasetId({
+    sourceType,
+    datasetId,
+  });
 
-  if (!CsvFileDataset) {
+  if (!sourceDataset) {
     throw new Error("CSV dataset metadata is missing.");
   }
 
   // upload is complete, so we update the CSV file in our db to reflect
   // that it is in cloud storage.
-  // TODO(jpsyx): this has to handle other source types
-  await CsvFileDatasetClient.update({
-    id: CsvFileDataset.id,
+  await SourceDatasetClient.update({
+    sourceType,
+    id: sourceDataset.id,
     data: {
       isInCloudStorage: true,
     },
@@ -190,13 +192,15 @@ async function _uploadDatasetToSupabase(options: {
  * @param options The options for starting the dataset upload.
  * @param options.workspaceId The ID of the workspace the dataset belongs to.
  * @param options.datasetId The ID of the dataset to upload.
+ * @param options.sourceType The type of the dataset to upload.
  * @returns A promise that resolves when the dataset upload is complete.
  */
 export async function startDatasetUpload(options: {
   workspaceId: Workspace.Id;
   datasetId: DatasetId;
+  sourceType: DatasetSource.SourceType;
 }): Promise<void> {
-  const { datasetId } = options;
+  const { datasetId, sourceType } = options;
 
   const currentUpload =
     DatasetUploadProgressStore.getInProgressUpload(datasetId);
@@ -216,6 +220,7 @@ export async function startDatasetUpload(options: {
       await _uploadDatasetToSupabase({
         ...options,
         parquetBlob,
+        sourceType,
       });
     } catch (error: unknown) {
       const errorMessage =

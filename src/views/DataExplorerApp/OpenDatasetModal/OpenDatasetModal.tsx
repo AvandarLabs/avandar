@@ -15,7 +15,7 @@ import { notifyError, notifySuccess } from "@ui/index";
 import { where } from "@utils/filters/where/where";
 import { useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
+import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";

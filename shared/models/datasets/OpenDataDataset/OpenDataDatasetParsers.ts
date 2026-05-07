@@ -1,4 +1,5 @@
 import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
+import { Model } from "@models/Model/Model.ts";
 import { pipe } from "@utils/misc/pipe/pipe.ts";
 import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeys/snakeCaseKeys.ts";
@@ -29,13 +30,13 @@ export const OpenDataDatasetParsers =
     modelName: "OpenDataDataset",
     DBReadSchema,
     fromDBReadToModelRead: pipe(camelCaseKeysDeep, (obj) => {
-      return {
+      return Model.make("OpenDataDataset", {
         ...obj,
         id: obj.id as OpenDataDatasetId,
         datasetId: obj.datasetId as DatasetId,
         workspaceId: obj.workspaceId as Workspace.Id,
         catalogEntryId: obj.catalogEntryId as OpenDataCatalogEntryId,
-      };
+      });
     }),
     fromModelInsertToDBInsert: snakeCaseKeysDeep,
     fromModelUpdateToDBUpdate: snakeCaseKeysDeep,

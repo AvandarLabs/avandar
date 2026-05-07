@@ -1,3 +1,4 @@
+import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
@@ -6,25 +7,28 @@ import type { SetOptional } from "type-fest";
 
 export type VirtualDatasetId = UUID<"VirtualDataset">;
 
-export type VirtualDatasetRead = {
-  /** Unique identifier for this VirtualDataset */
-  id: VirtualDatasetId;
+export type VirtualDatasetRead = Model.Base<
+  "VirtualDataset",
+  {
+    /** Unique identifier for this VirtualDataset */
+    id: VirtualDatasetId;
 
-  /** Unique identifier for the dataset this VirtualDataset belongs to. */
-  datasetId: DatasetId;
+    /** Unique identifier for the dataset this VirtualDataset belongs to. */
+    datasetId: DatasetId;
 
-  /** Unique identifier for the workspace this VirtualDataset belongs to. */
-  workspaceId: Workspace.Id;
+    /** Unique identifier for the workspace this VirtualDataset belongs to. */
+    workspaceId: Workspace.Id;
 
-  /** Timestamp of when the VirtualDataset was created. */
-  createdAt: string;
+    /** Timestamp of when the VirtualDataset was created. */
+    createdAt: string;
 
-  /** Timestamp of when the VirtualDataset was last updated. */
-  updatedAt: string;
+    /** Timestamp of when the VirtualDataset was last updated. */
+    updatedAt: string;
 
-  /** The raw SQL query that was used to generate the dataset. */
-  rawSQL: string;
-};
+    /** The raw SQL query that was used to generate the dataset. */
+    rawSQL: string;
+  }
+>;
 
 /**
  * CRUD type definitions for the VirtualDataset model.

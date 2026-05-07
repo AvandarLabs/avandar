@@ -23,7 +23,7 @@ import { isEpochMs, isISODateString, prop } from "@utils/index";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useEffect, useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
+import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";

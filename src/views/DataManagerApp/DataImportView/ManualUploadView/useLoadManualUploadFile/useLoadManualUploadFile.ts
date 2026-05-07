@@ -85,7 +85,9 @@ function _buildDataSourceMetadataFromLoadResult({
       { type: "xlsx" },
       (xlsxLoadResult): ManualUploadDataSourceMetadata => {
         const xlsxRequest =
-          loadAndParseOptions?.type === "xlsx_file" ? loadAndParseOptions : undefined;
+          loadAndParseOptions?.type === "xlsx_file" ?
+            loadAndParseOptions
+          : undefined;
         const defaultSheetName =
           xlsxLoadResult.availableSheetNames.length === 1 ?
             xlsxLoadResult.availableSheetNames[0]
