@@ -61,9 +61,11 @@ type UseLoadManualUploadFileResult = {
 function _buildDataSourceMetadataFromLoadResult({
   loadResult,
   file,
+  loadAndParseOptions,
 }: {
   loadResult: FileLoadResult;
   file: File;
+  loadAndParseOptions?: LoadAndParseFileOptions;
 }): ManualUploadDataSourceMetadata {
   return match(loadResult)
     .with({ type: "csv" }, (csvLoadResult): ManualUploadDataSourceMetadata => {
@@ -82,6 +84,8 @@ function _buildDataSourceMetadataFromLoadResult({
     .with(
       { type: "xlsx" },
       (xlsxLoadResult): ManualUploadDataSourceMetadata => {
+        const xlsxRequest =
+          loadAndParseOptions?.type === "xlsx_file" ? loadAndParseOptions : undefined;
         const defaultSheetName =
           xlsxLoadResult.availableSheetNames.length === 1 ?
             xlsxLoadResult.availableSheetNames[0]
@@ -93,11 +97,11 @@ function _buildDataSourceMetadataFromLoadResult({
           datasetLoadResult: xlsxLoadResult,
           parseOptions: {
             type: "xlsx_file",
-            sheetName: defaultSheetName,
-            hasHeader: true,
-            numRowsToSkip: 0,
-            dateFormat: null,
-            timestampFormat: null,
+            sheetName: xlsxRequest?.sheetName ?? defaultSheetName,
+            hasHeader: xlsxRequest?.hasHeader ?? true,
+            numRowsToSkip: xlsxRequest?.numRowsToSkip ?? 0,
+            dateFormat: xlsxRequest?.dateFormat ?? null,
+            timestampFormat: xlsxRequest?.timestampFormat ?? null,
           },
         };
       },
@@ -191,7 +195,7 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
           return { datasetId, ...loadResult };
         })
         .with({ type: "xlsx_file" }, async (xlsxParseOptions) => {
-          const { datasetId, sheetName: sheet } = xlsxParseOptions;
+          const { datasetId, sheetName: sheet, hasHeader } = xlsxParseOptions;
           const fileBytes = await file.arrayBuffer();
           const workbook = XLSX.read(fileBytes, { type: "array" });
           const availableSheetNames = workbook.SheetNames;
@@ -202,6 +206,7 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
             xlsxParseOptions: {
               file,
               sheet,
+              hasHeader,
             },
           });
           return { datasetId, availableSheetNames, ...loadResult };
@@ -213,6 +218,7 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
         _buildDataSourceMetadataFromLoadResult({
           loadResult,
           file: inputParams.file,
+          loadAndParseOptions: inputParams,
         }),
       );
       _notifyLoadResults(loadResult);

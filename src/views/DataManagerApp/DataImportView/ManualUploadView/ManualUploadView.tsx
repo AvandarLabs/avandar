@@ -128,8 +128,8 @@ export function ManualUploadView(props: Props): JSX.Element {
     <Box {...props}>
       <Stack align="flex-start">
         <FileUploadForm
-          label="Upload an Excel file or CSV"
-          description="Select an Excel file or CSV from your computer to import"
+          label="Upload a spreadsheet"
+          description="Select an Excel or CSV file from your computer to import"
           placeholder="Select file"
           accept={[
             MIMEType.TEXT_CSV,

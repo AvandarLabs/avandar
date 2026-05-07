@@ -16,10 +16,10 @@ import {
   DuckDbDataTypes,
 } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import { DuckDBQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationType";
+import { QueryResultPage } from "$/models/queries/QueryResult/QueryResult.types";
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
-import { arrowFieldToQueryResultField } from "@/clients/DuckDbClient/arrowFieldToQueryResultField";
 import {
   DuckDbColumnSchema,
   DuckDbCsvSniffResult,
@@ -32,10 +32,8 @@ import {
 } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { Logger } from "@/utils/Logger";
-import type {
-  QueryResult,
-  QueryResultPage,
-} from "$/models/queries/QueryResult/QueryResult.types";
+import { arrowFieldToQueryResultField } from "./arrowFieldToQueryResultField";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 
 const MANUAL_BUNDLES: duckdb.DuckDBBundles = {
   mvp: {
@@ -104,6 +102,11 @@ type BaseDuckDbLoadXlsxOptions = {
    * default).
    */
   sheet?: string;
+  /**
+   * When true, `read_xlsx` uses the first row as column names. Defaults to
+   * true so behavior matches the import UI and avoids flaky auto-detection.
+   */
+  hasHeader?: boolean;
 };
 
 /**
@@ -780,6 +783,7 @@ class DuckDbClientImpl {
    *
    * @param options.tableName Table and base name for the virtual `.xlsx` file.
    * @param options.sheet Optional worksheet name (first sheet if omitted).
+   * @param options.hasHeader First row is column names (`read_xlsx` `header`).
    * @param options.file Browser file to load (takes precedence over bytes).
    * @param options.fileBytes Raw `.xlsx` bytes when no `File` is available.
    */
@@ -787,6 +791,7 @@ class DuckDbClientImpl {
     options: DuckDbLoadXlsxOptions,
   ): Promise<DuckDbLoadXlsxResult> {
     const { tableName, sheet } = options;
+    const hasHeader = options.hasHeader ?? true;
     const conn = await this.#connect();
     let loadResults: DuckDbLoadXlsxResult;
 
@@ -805,14 +810,13 @@ class DuckDbClientImpl {
         });
       }
 
-      const sheetSql =
-        sheet === undefined ? "" : (
-          `, sheet = '${_escapeSqlSingleQuotedLiteral(sheet)}'`
-        );
-
       await this.runRawQuery(
         `CREATE TABLE IF NOT EXISTS "$tableName$" AS
-          SELECT * FROM read_xlsx('$tableName$'${sheetSql})`,
+          SELECT * FROM read_xlsx(
+            '$tableName$'
+            , header = ${hasHeader}
+            ${sheet ? `, sheet = '${_escapeSqlSingleQuotedLiteral(sheet)}'` : ""}
+          )`,
         {
           conn,
           params: { tableName },

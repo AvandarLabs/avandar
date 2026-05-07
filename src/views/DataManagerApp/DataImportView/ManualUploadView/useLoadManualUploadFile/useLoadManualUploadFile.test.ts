@@ -220,6 +220,7 @@ describe("useLoadManualUploadFile", () => {
           datasetId: "dataset_xlsx",
           xlsxParseOptions: expect.objectContaining({
             sheet: "Sheet2",
+            hasHeader: undefined,
           }),
         }),
       );
