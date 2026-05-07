@@ -49,6 +49,7 @@ supabase/.branches
 todo.md
 TODO.md
 /tmp/
+~$*.*
 
 # Ava CLI
 .ava/

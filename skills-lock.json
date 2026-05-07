@@ -11,6 +11,12 @@
       "sourceType": "github",
       "computedHash": "354414a934957f9d54a71468abe81888304d35b47a4fe8e27fff08f60b457d53"
     },
+    "attach-db": {
+      "source": "duckdb/duckdb-skills",
+      "sourceType": "github",
+      "skillPath": "skills/attach-db/SKILL.md",
+      "computedHash": "db6a105a312536b75a58616dfd38b46909253c88fcb1ffd58bfc506ffa3065d6"
+    },
     "audit": {
       "source": "pbakaus/impeccable",
       "sourceType": "github",
@@ -57,6 +63,12 @@
       "sourceType": "github",
       "computedHash": "9a43f2e8ebb01dbc162ad78d865ff9e20bf20270e0514095c3bf3f1ac43599c6"
     },
+    "duckdb-docs": {
+      "source": "duckdb/duckdb-skills",
+      "sourceType": "github",
+      "skillPath": "skills/duckdb-docs/SKILL.md",
+      "computedHash": "6aa9b9d013487eace5398a0e035cf5ee3efd220b34349a46e7c335cf079f7e66"
+    },
     "fastify-best-practices": {
       "source": "mcollina/skills",
       "sourceType": "github",
@@ -66,6 +78,12 @@
       "source": "pbakaus/impeccable",
       "sourceType": "github",
       "computedHash": "a26b3dd377c4572b1c34c68f82ab9a1cb806f21c7157060327fe60e9b6d2e277"
+    },
+    "install-duckdb": {
+      "source": "duckdb/duckdb-skills",
+      "sourceType": "github",
+      "skillPath": "skills/install-duckdb/SKILL.md",
+      "computedHash": "ce264b48e369a23adbda39804fc65c7e9fdffe182f6dfbc9f4e2fdf88b027b9e"
     },
     "layout": {
       "source": "pbakaus/impeccable",
@@ -103,10 +121,22 @@
       "sourceType": "github",
       "computedHash": "c294f2570dcc5b8865d17f0dc5ef339a700c868f1b20fa9994297f64ace2d4de"
     },
+    "query": {
+      "source": "duckdb/duckdb-skills",
+      "sourceType": "github",
+      "skillPath": "skills/query/SKILL.md",
+      "computedHash": "4ef826c2a588b8629aef536a797ea67f31f8f5a04f88acadbc5ba84f6778887d"
+    },
     "quieter": {
       "source": "pbakaus/impeccable",
       "sourceType": "github",
       "computedHash": "2c20b12bb4ece445d45fc63bda020aecf78b3cdf6d593beb59c273f658293130"
+    },
+    "read-file": {
+      "source": "duckdb/duckdb-skills",
+      "sourceType": "github",
+      "skillPath": "skills/read-file/SKILL.md",
+      "computedHash": "16607eb0d4dc7e2ff8d92e2bdba6bedb67aedb1189f66249a46ed672ca1782c4"
     },
     "shape": {
       "source": "pbakaus/impeccable",

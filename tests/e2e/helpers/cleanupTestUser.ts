@@ -2,11 +2,16 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../../../shared/types/database.types";
 
 /**
- * Deletes a Supabase Auth user by email. No-op when credentials are missing,
- * the user does not exist, or deletion fails (warnings only — does not throw).
- * Uses the same service-role env vars as `ensureTestUser`.
+ * Deletes a Supabase user by email. We use this function to clean up after
+ * tests that create new test users.
+ *
+ * **This function must be called explicitly at the end of the test if a test
+ * user was created.** It does not get called automatically by Playwright.
+ *
+ * This function is a no-op if Supabase credentials are missing, the user does
+ * not exist, or the deletion fails.
  */
-export async function deleteAuthUserByEmail(email: string): Promise<void> {
+export async function cleanupTestUser(email: string): Promise<void> {
   const apiUrl = process.env.VITE_SUPABASE_API_URL ?? process.env.SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 

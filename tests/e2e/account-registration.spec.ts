@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { deleteAuthUserByEmail } from "./setup/deleteAuthUserByEmail";
+import { cleanupTestUser } from "./helpers/cleanupTestUser";
 
 function _isSelfRegistrationDisabled(): boolean {
   const raw = process.env.VITE_FEATURE_FLAGS ?? "";
@@ -38,7 +38,7 @@ test.describe("account registration", () => {
         }),
       ).toBeVisible({ timeout: 60_000 });
     } finally {
-      await deleteAuthUserByEmail(email);
+      await cleanupTestUser(email);
     }
   });
 });
