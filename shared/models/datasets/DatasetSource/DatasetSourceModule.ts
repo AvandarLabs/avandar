@@ -2,6 +2,7 @@ import { Model } from "@models/Model/Model.ts";
 import { registry } from "@utils/objects/registry/registry.ts";
 import { match } from "ts-pattern";
 import type {
+  CanBeOfflineOnlyDatasetSourceModel,
   DatasetSourceModel,
   DatasetSourceType,
 } from "$/models/datasets/DatasetSource/DatasetSource.types.ts";
@@ -16,13 +17,18 @@ function _canBeOfflineOnly(sourceType: {
   type: DatasetSourceType;
 }): sourceType is { type: "csv_file" } | { type: "xlsx_file" };
 function _canBeOfflineOnly(
+  datasetSource: DatasetSourceModel,
+): datasetSource is CanBeOfflineOnlyDatasetSourceModel;
+function _canBeOfflineOnly(
   sourceType:
     | DatasetSourceType
+    | DatasetSourceModel
     | { sourceType: DatasetSourceType }
     | { type: DatasetSourceType },
 ): boolean {
   const type =
     typeof sourceType === "string" ? sourceType
+    : Model.isModel(sourceType) ? DatasetSourceModule.getSourceType(sourceType)
     : "sourceType" in sourceType ? sourceType.sourceType
     : sourceType.type;
   return match(type)

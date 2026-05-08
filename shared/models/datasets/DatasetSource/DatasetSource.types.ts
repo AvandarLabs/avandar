@@ -11,6 +11,11 @@ export type ImportableDatasetSourceType = Exclude<
   "virtual" | "open_data"
 >;
 
+export type CanBeOfflineOnlyDatasetSourceType = Extract<
+  DatasetSourceType,
+  "csv_file" | "xlsx_file"
+>;
+
 export type ManuallyUploadableDatasetSourceType = Extract<
   DatasetSourceType,
   "csv_file" | "xlsx_file"
@@ -25,6 +30,9 @@ export type DatasetSourceRegistry<
   virtual: VirtualDatasetModel[K];
   xlsx_file: XlsxFileDatasetModel[K];
 };
+
+export type CanBeOfflineOnlyDatasetSourceModel =
+  DatasetSourceRegistry[CanBeOfflineOnlyDatasetSourceType];
 
 /**
  * The DatasetSource model is a union of each individual dataset source

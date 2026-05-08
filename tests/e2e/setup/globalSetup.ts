@@ -1,7 +1,6 @@
 import path from "node:path";
 import { config } from "dotenv";
 import { ensureTestUser } from "./ensureTestUser";
-import { ensureWorkspaceSubscriptionForE2E } from "./ensureWorkspaceSubscriptionForE2E";
 
 /**
  * Loads `.env.development` from the repository root so global setup and the
@@ -12,11 +11,11 @@ function _loadDevelopmentEnv(): void {
 }
 
 /**
- * Runs once before the Playwright webserver and tests. Seeds auth and billing
- * rows needed for local E2E against Supabase.
+ * Runs once before the Playwright webserver and tests. Ensures the primary
+ * auth user exists. Each test provisions its own `e2e-test-workspace` via the
+ * E2E fixture.
  */
 export default async function globalSetup(): Promise<void> {
   _loadDevelopmentEnv();
   await ensureTestUser();
-  await ensureWorkspaceSubscriptionForE2E();
 }

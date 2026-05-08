@@ -98,3 +98,171 @@ export async function isDatasetParquetInStorage(options: {
 
   return data !== null;
 }
+
+/**
+ * Deletes all datasets for a workspace (child rows cascade) and best-effort
+ * removes their Parquet objects from the workspaces bucket.
+ *
+ * Used by E2E global setup so repeated runs do not hit the Free-plan dataset
+ * cap (the Data Import view then shows a blocking upgrade modal).
+ *
+ * @param options.admin Admin Supabase client.
+ * @param options.workspaceId Workspace UUID.
+ */
+export async function deleteAllDatasetsInWorkspaceForE2E(options: {
+  admin: SupabaseClient;
+  workspaceId: string;
+}): Promise<void> {
+  const { data: rows, error: selectError } = await options.admin
+    .from("datasets")
+    .select("id")
+    .eq("workspace_id", options.workspaceId);
+
+  if (selectError) {
+    throw new Error(`e2e dataset list failed: ${selectError.message}`);
+  }
+
+  const datasetIds = (rows ?? []).map((row) => {
+    return row.id;
+  });
+
+  if (datasetIds.length === 0) {
+    return;
+  }
+
+  const objectPaths = datasetIds.map((datasetId) => {
+    return getDatasetParquetObjectPath({
+      workspaceId: options.workspaceId,
+      datasetId,
+    });
+  });
+
+  const { error: storageError } = await options.admin.storage
+    .from(WORKSPACES_STORAGE_BUCKET)
+    .remove(objectPaths);
+
+  if (storageError) {
+    console.warn(
+      `[e2e] Parquet storage cleanup (non-fatal): ${storageError.message}`,
+    );
+  }
+
+  const { error: deleteError } = await options.admin
+    .from("datasets")
+    .delete()
+    .eq("workspace_id", options.workspaceId);
+
+  if (deleteError) {
+    throw new Error(`e2e dataset delete failed: ${deleteError.message}`);
+  }
+}
+
+/**
+ * Deletes every dataset and dashboard in a workspace (including dataset
+ * Parquet objects). Subscription and workspace rows are untouched.
+ *
+ * @param options.admin Admin Supabase client.
+ * @param options.workspaceId Workspace UUID.
+ */
+export async function clearWorkspaceResourcesForE2E(options: {
+  admin: SupabaseClient;
+  workspaceId: string;
+}): Promise<void> {
+  const { admin, workspaceId } = options;
+
+  await deleteAllDatasetsInWorkspaceForE2E({ admin, workspaceId });
+
+  const { error: dashboardsError } = await admin
+    .from("dashboards")
+    .delete()
+    .eq("workspace_id", workspaceId);
+
+  if (dashboardsError) {
+    throw new Error(`e2e dashboards delete failed: ${dashboardsError.message}`);
+  }
+}
+
+/**
+ * Best-effort recursive removal of storage objects under the workspace prefix
+ * in the `workspaces` bucket.
+ *
+ * @param options.admin Admin Supabase client.
+ * @param options.workspaceId Workspace UUID used as the bucket path prefix.
+ */
+export async function removeWorkspaceBucketTreeForE2E(options: {
+  admin: SupabaseClient;
+  workspaceId: string;
+}): Promise<void> {
+  const removeRecursive = async (relativePath: string): Promise<void> => {
+    const { data: items, error: listError } = await options.admin.storage
+      .from(WORKSPACES_STORAGE_BUCKET)
+      .list(relativePath, { limit: 1000 });
+
+    if (listError) {
+      console.warn(
+        `[e2e] storage list "${relativePath}": ${listError.message}`,
+      );
+      return;
+    }
+
+    for (const item of items ?? []) {
+      const childPath =
+        relativePath.length > 0 ? `${relativePath}/${item.name}` : item.name;
+      const isFolder = item.metadata === null;
+
+      if (isFolder) {
+        await removeRecursive(childPath);
+      } else {
+        const { error: removeError } = await options.admin.storage
+          .from(WORKSPACES_STORAGE_BUCKET)
+          .remove([childPath]);
+
+        if (removeError) {
+          console.warn(
+            `[e2e] storage remove "${childPath}": ${removeError.message}`,
+          );
+        }
+      }
+    }
+  };
+
+  await removeRecursive(`${options.workspaceId}`);
+}
+
+/**
+ * Deletes datasets, dashboards, storage objects, the subscription row, and
+ * the workspace row for the given workspace id.
+ *
+ * @param options.admin Admin Supabase client.
+ * @param options.workspaceId Workspace UUID to remove completely.
+ */
+export async function deleteWorkspaceTreeForE2EById(options: {
+  admin: SupabaseClient;
+  workspaceId: string;
+}): Promise<void> {
+  const { admin, workspaceId } = options;
+
+  await clearWorkspaceResourcesForE2E({ admin, workspaceId });
+
+  await removeWorkspaceBucketTreeForE2E({ admin, workspaceId });
+
+  const { error: subscriptionError } = await admin
+    .from("subscriptions")
+    .delete()
+    .eq("workspace_id", workspaceId);
+
+  if (subscriptionError) {
+    console.warn(`[e2e] subscriptions delete: ${subscriptionError.message}`);
+  }
+
+  const { error: workspaceDeleteError } = await admin
+    .from("workspaces")
+    .delete()
+    .eq("id", workspaceId);
+
+  if (workspaceDeleteError) {
+    throw new Error(
+      `e2e workspace delete failed: ${workspaceDeleteError.message}`,
+    );
+  }
+}

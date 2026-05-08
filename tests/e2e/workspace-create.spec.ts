@@ -1,25 +1,15 @@
-import { expect, test } from "@playwright/test";
+import { createSupabaseAdminClient } from "../helper/supabaseAdminClient";
+import { expect, test } from "./fixtures/e2eTestWorkspace.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
   E2E_SEEDED_WORKSPACE_SLUG,
   E2E_TEST_USER,
   SEEDED_WORKSPACE_MENU_BUTTON_NAME,
 } from "./helpers/constants";
+import { deletePrimaryUserE2EWorkspaceTreeBySlug } from "./setup/e2eTestWorkspaceLifecycle";
 
 test.describe("workspace creation", () => {
   test("creates a new workspace from the navbar", async ({ page }) => {
-    await signInWithEmailPassword(page, {
-      email: E2E_TEST_USER.email,
-      password: E2E_TEST_USER.password,
-    });
-
-    await page.goto(`/${E2E_SEEDED_WORKSPACE_SLUG}`);
-
-    await page
-      .getByRole("button", { name: SEEDED_WORKSPACE_MENU_BUTTON_NAME })
-      .click();
-    await page.getByRole("menuitem", { name: "Create Workspace" }).click();
-
     const uniqueSuffix = Date.now().toString(36);
     const workspaceName = `E2E Org ${uniqueSuffix}`;
     /**
@@ -28,28 +18,58 @@ test.describe("workspace creation", () => {
      */
     const workspaceSlug = `e2e-org-${uniqueSuffix}`;
 
-    const dialog = page.getByRole("dialog");
+    try {
+      await signInWithEmailPassword(page, {
+        email: E2E_TEST_USER.email,
+        password: E2E_TEST_USER.password,
+      });
 
-    await dialog.getByLabel("Workspace Name").fill(workspaceName);
-    await expect(dialog.getByLabel("Workspace ID")).toHaveValue(workspaceSlug, {
-      timeout: 20_000,
-    });
+      await page.goto(`/${E2E_SEEDED_WORKSPACE_SLUG}`);
 
-    const workspaceIdInput = dialog.getByLabel("Workspace ID");
-    await workspaceIdInput.fill("");
-    await workspaceIdInput.fill(workspaceSlug);
+      await page
+        .getByRole("button", { name: SEEDED_WORKSPACE_MENU_BUTTON_NAME })
+        .click();
+      await page.getByRole("menuitem", { name: "Create Workspace" }).click();
 
-    await dialog.getByLabel("Full Name").fill("E2E Tester");
-    await dialog.getByLabel("Display Name").fill("E2E Tester");
+      const dialog = page.getByRole("dialog");
 
-    await expect(dialog.getByRole("button", { name: "Submit" })).toBeEnabled({
-      timeout: 30_000,
-    });
+      await dialog.getByLabel("Workspace Name").fill(workspaceName);
+      await expect(dialog.getByLabel("Workspace ID")).toHaveValue(
+        workspaceSlug,
+        {
+          timeout: 20_000,
+        },
+      );
 
-    await dialog.getByRole("button", { name: "Submit" }).click();
+      const workspaceIdInput = dialog.getByLabel("Workspace ID");
+      await workspaceIdInput.fill("");
+      await workspaceIdInput.fill(workspaceSlug);
 
-    await expect(page).toHaveURL(new RegExp(`/${workspaceSlug}`), {
-      timeout: 60_000,
-    });
+      await dialog.getByLabel("Full Name").fill("E2E Tester");
+      await dialog.getByLabel("Display Name").fill("E2E Tester");
+
+      await expect(dialog.getByRole("button", { name: "Submit" })).toBeEnabled({
+        timeout: 30_000,
+      });
+
+      await dialog.getByRole("button", { name: "Submit" }).click();
+
+      await expect(page).toHaveURL(new RegExp(`/${workspaceSlug}`), {
+        timeout: 60_000,
+      });
+    } finally {
+      try {
+        const admin = createSupabaseAdminClient();
+        await deletePrimaryUserE2EWorkspaceTreeBySlug({
+          admin,
+          slug: workspaceSlug,
+        });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        console.warn(
+          `[e2e] workspace-create cleanup (${workspaceSlug}): ${message}`,
+        );
+      }
+    }
   });
 });

@@ -29,10 +29,14 @@ export const SourceDatasetClient = withQueryHooks(
           sourceType: TSourceType;
           id: DatasetSource.T<TSourceType>["id"];
           data: DatasetSource.T<TSourceType, "Update">;
-        }) => {
+        }): Promise<DatasetSource.T<TSourceType>> => {
           const SourceClient = SourceDatasetClientRegistry[sourceType];
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          return await SourceClient.update({ id, data } as any);
+          const updatedDataset = await SourceClient.update({
+            id,
+            data,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } as any);
+          return updatedDataset as DatasetSource.T<TSourceType>;
         },
         getByDatasetId: async ({
           sourceType,

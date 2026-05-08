@@ -13,7 +13,7 @@ export const E2E_TEST_USER = {
 export { E2E_SEEDED_WORKSPACE_SLUG };
 
 /** Navbar workspace menu button shows the workspace display name. */
-export const SEEDED_WORKSPACE_MENU_BUTTON_NAME = /Avandar Labs/i;
+export const SEEDED_WORKSPACE_MENU_BUTTON_NAME = /E2E Test Workspace/i;
 
 /**
  * Row count reported after DuckDB parses `california-covid-sample.csv`

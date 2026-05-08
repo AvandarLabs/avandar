@@ -40,6 +40,7 @@ export const WorkspaceClient = createUsableServiceClient(
             .from("workspace_memberships")
             .select(`workspace:workspaces (*, subscription:subscriptions (*))`)
             .eq("user_id", session.user.id)
+            .order("created_at", { ascending: false })
             .throwOnError();
 
           const workspaces = memberships.map(prop("workspace"));

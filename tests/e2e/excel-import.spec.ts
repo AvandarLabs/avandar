@@ -1,9 +1,9 @@
-import { expect, test } from "@playwright/test";
 import {
   createSupabaseAdminClient,
   getWorkspaceIdBySlug,
   isDatasetParquetInStorage,
 } from "../helper/supabaseAdminClient";
+import { expect, test } from "./fixtures/e2eTestWorkspace.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
   CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
@@ -132,15 +132,10 @@ test.describe("Excel manual upload", () => {
       sampleCellSubstring: "California",
     });
 
-    await ensureCloudStorageCheckedAndSaveDataset(page);
-
-    await page.waitForURL(
-      new RegExp(
-        `/${E2E_SEEDED_WORKSPACE_SLUG}/data-manager/[0-9a-f-]{36}`,
-        "i",
-      ),
-      { timeout: 120_000 },
-    );
+    await ensureCloudStorageCheckedAndSaveDataset({
+      page,
+      workspaceSlug: E2E_SEEDED_WORKSPACE_SLUG,
+    });
 
     const datasetId = parseDatasetIdFromDataManagerUrl({
       url: page.url(),
@@ -184,18 +179,19 @@ test.describe("Excel manual upload", () => {
     await expect
       .poll(
         async () => {
-          return !(await isDatasetParquetInStorage({
+          const parquetGone = !(await isDatasetParquetInStorage({
             admin,
             workspaceId,
             datasetId,
           }));
+          const offlineToggleVisible = await page
+            .getByRole("button", { name: "Allow online syncing" })
+            .isVisible();
+
+          return parquetGone && offlineToggleVisible;
         },
-        { timeout: 120_000 },
+        { timeout: 180_000 },
       )
       .toBe(true);
-
-    await expect(
-      page.getByRole("button", { name: "Allow online syncing" }),
-    ).toBeVisible();
   });
 });

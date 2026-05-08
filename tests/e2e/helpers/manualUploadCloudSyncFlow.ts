@@ -43,13 +43,23 @@ export async function pollUntilCloudDatasetToggleShowsOnline(
 }
 
 /**
- * Ensures the import form keeps cloud storage enabled, then saves.
+ * Ensures cloud storage stays enabled, saves, and waits for the dataset meta
+ * route (`/{workspaceSlug}/data-manager/{uuid}`). Uses `waitUntil: "commit"`
+ * so client-side navigations are not blocked on a full `load` event.
  *
- * @param page Playwright page with the manual upload import form visible.
+ * @param options.page Import form page.
+ * @param options.workspaceSlug Workspace slug segment from the URL.
+ * @param options.navigationTimeout Max ms to wait for navigation (default
+ *   120_000).
  */
-export async function ensureCloudStorageCheckedAndSaveDataset(
-  page: Page,
-): Promise<void> {
+export async function ensureCloudStorageCheckedAndSaveDataset(options: {
+  page: Page;
+  workspaceSlug: string;
+  navigationTimeout?: number;
+}): Promise<void> {
+  const { page, workspaceSlug } = options;
+  const navigationTimeout = options.navigationTimeout ?? 120_000;
+
   const cloudCheckbox = page.getByRole("checkbox", {
     name: /This dataset can be stored in the cloud/i,
   });
@@ -60,5 +70,14 @@ export async function ensureCloudStorageCheckedAndSaveDataset(
     await cloudCheckbox.check();
   }
 
-  await page.getByRole("button", { name: "Save Dataset" }).click();
+  const escaped = workspaceSlug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const metaUrl = new RegExp(`/${escaped}/data-manager/[0-9a-f-]{36}`, "i");
+
+  await Promise.all([
+    page.waitForURL(metaUrl, {
+      timeout: navigationTimeout,
+      waitUntil: "commit",
+    }),
+    page.getByRole("button", { name: "Save Dataset" }).click(),
+  ]);
 }
