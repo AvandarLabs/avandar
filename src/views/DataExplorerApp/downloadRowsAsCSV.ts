@@ -1,6 +1,6 @@
 import { objectKeys } from "@utils/objects/objectKeys";
 import { unknownToString } from "@utils/strings/unknownToString/unknownToString";
-import type { UnknownRow } from "@/clients/DuckDBClient/DuckDBClient";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 
 // Helper to escape fields for CSV
 function _escapeCSVValue(value: unknown): string {

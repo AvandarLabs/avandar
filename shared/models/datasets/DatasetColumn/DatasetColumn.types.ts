@@ -2,7 +2,7 @@ import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
-import type { DuckDBDataType } from "$/models/datasets/DatasetColumn/DuckDBDataTypes.ts";
+import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes.ts";
 import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { SetOptional } from "type-fest";
@@ -32,7 +32,7 @@ export type DatasetColumnRead = Model.Base<
      * dataset's types are consistent with the original detected data types.
      * This cannot be manually changed by the user.
      */
-    detectedDataType: DuckDBDataType;
+    detectedDataType: DuckDbDataType;
 
     /**
      * Queryable data type of the column. This may differ from the
@@ -78,9 +78,9 @@ export type DatasetColumnRead = Model.Base<
 
 /**
  * This is a subset of a DatasetColumn type with only the name, data type,
- * and column index.
+ * and column index. We use this time when a dataset is imported.
  */
-export type DetectedDatasetColumn = Pick<
+export type ImportedDatasetColumn = Pick<
   DatasetColumnRead,
   | "originalName"
   | "name"

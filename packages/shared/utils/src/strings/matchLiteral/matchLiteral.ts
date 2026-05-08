@@ -2,7 +2,7 @@ import { unknownToString } from "@utils/strings/unknownToString/unknownToString.
 import type { UnknownObject } from "@utils/types/common.types.ts";
 import type { SetRequired, UnionToIntersection } from "type-fest";
 
-type KeyMatcher<Key> =
+type ValidMatchedValues<Key> =
   | ((key: Key) => unknown)
   | string
   | number
@@ -13,10 +13,10 @@ type ValueRecord<Key extends PropertyKey> = UnionToIntersection<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Key extends any ?
     {
-      [K in Key]: KeyMatcher<K>;
+      [K in Key]: ValidMatchedValues<K>;
     }
   : never
-> & { _otherwise?: KeyMatcher<unknown> };
+> & { _otherwise?: ValidMatchedValues<unknown> };
 
 type MappedValue<Key extends PropertyKey, Values extends ValueRecord<Key>> =
   Key extends keyof Values ?

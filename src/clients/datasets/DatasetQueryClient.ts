@@ -7,7 +7,7 @@ import { objectKeys } from "@utils/objects/objectKeys";
 import { sqlTemplate } from "@utils/strings/template/sqlTemplate";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { scalar, singleton } from "@/clients/DuckDBClient/queryResultHelpers";
+import { scalar, singleton } from "@/clients/DuckDbClient/queryResultHelpers";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import { promiseReduce } from "@/lib/utils/promises";
 import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
@@ -55,7 +55,7 @@ type DatasetSummary = {
 
 type DatasetQueryClientQueries = {
   getPreviewData: (params: {
-    datasetId: DatasetId;
+    datasetId: DatasetId | undefined;
     numRows: number;
     workspaceId: Workspace.Id;
   }) => Promise<UnknownDataFrame>;
@@ -79,11 +79,14 @@ function createDatasetQueryClient(): WithLogger<
         const logger = clientLogger.appendName("getPreviewData");
         logger.log("Getting preview data for dataset", params);
         const { datasetId, numRows, workspaceId } = params;
+        if (datasetId === undefined) {
+          logger.error("Dataset ID is required to load preview data");
+          return [];
+        }
 
         const queryString = sqlTemplate(
           'SELECT * FROM "$tableName$" LIMIT $numRows$',
         ).parse({ numRows, tableName: datasetId });
-
         const { data } = await WorkspaceQETLClient.runQuery({
           rawSQL: queryString,
           workspaceId,

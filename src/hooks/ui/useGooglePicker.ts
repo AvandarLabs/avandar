@@ -3,8 +3,8 @@ import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray";
 import { noop } from "@utils/misc/noop";
 import { useEffect, useMemo, useState } from "react";
 import { APIClient } from "@/clients/APIClient";
-import { useGooglePickerAPI } from "@/lib/hooks/useGooglePickerAPI";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
+import { useGooglePickerAPI } from "@/lib/hooks/useGooglePickerAPI";
 import type { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import type {
   GooglePickerAPI,
@@ -19,7 +19,10 @@ if (!GOOGLE_PICKER_API_KEY) {
 }
 
 type UseGooglePickerOptions = {
-  onGoogleSheetPicked?: (document: GPickerDocumentObject) => void;
+  onGoogleSheetPicked?: (params: {
+    document: GPickerDocumentObject;
+    googleAccount: GoogleToken;
+  }) => void;
 };
 
 const GOOGLE_SPREADSHEET_MIME_TYPE = "application/vnd.google-apps.spreadsheet";
@@ -81,13 +84,16 @@ export function useGooglePicker({
             response.viewToken?.[0] === pickerAPI.ViewId.SPREADSHEETS &&
             isNonEmptyArray(response.docs)
           ) {
-            onGoogleSheetPicked(response.docs[0]);
+            onGoogleSheetPicked({
+              document: response.docs[0],
+              googleAccount: selectedAccount,
+            });
           }
         })
         .build();
     }
     return undefined;
-  }, [pickerAPI, accessToken, onGoogleSheetPicked]);
+  }, [pickerAPI, accessToken, onGoogleSheetPicked, selectedAccount]);
 
   const isLoadingGoogleAuthState = isLoadingUser || isLoadingTokens;
   const isLoadingAPI = isLoadingGoogleAuthState || isLoadingPickerAPI;

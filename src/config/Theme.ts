@@ -5,8 +5,6 @@ import {
   MantineTheme,
   Modal,
 } from "@mantine/core";
-// Disable no-restricted-imports lint so that tailwind can work
-// eslint-disable-next-line no-restricted-imports
 import {
   AVANDAR_BLUE_SHADES,
   NEUTRAL_SHADES,

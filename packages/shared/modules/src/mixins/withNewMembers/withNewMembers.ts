@@ -1,0 +1,9 @@
+import type { UnknownObject } from "@utils/types/common.types.ts";
+
+export function withNewMembers<T extends UnknownObject>(
+  newMembers: T,
+): () => { members: T } {
+  return () => {
+    return { members: newMembers };
+  };
+}

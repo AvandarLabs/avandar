@@ -1,4 +1,4 @@
-import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
+import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import type { ExcludeNullsIn } from "@utils/objects/excludeNullsIn/excludeNullsIn";
 import type { CatalogDatasetColumnRead } from "$/models/catalog-entries/CatalogDatasetColumn/CatalogDatasetColumn.types";
 import type { CompositeTypes, Json } from "$/types/database.types";
@@ -102,7 +102,7 @@ export function buildOpenDataDatasetColumnInputsFromCatalogRows(
       description: undefined,
       original_data_type: col.originalDataType,
       detected_data_type: col.castDataType,
-      data_type: DuckDBDataTypeUtils.toAvaDataType(col.castDataType),
+      data_type: DuckDbDataTypeUtils.toAvaDataType(col.castDataType),
       column_idx: columnIdx,
     };
   });

@@ -6,13 +6,15 @@ import { notifyError, notifySuccess } from "@ui/notifications/notify";
 import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
 import { where } from "@utils/filters/where/where";
 import { MIMEType } from "@utils/types/common.types";
-import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
+import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
-import { DuckDBClient } from "@/clients/DuckDBClient/DuckDBClient";
-import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock";
+import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
+import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
+import { DuckDBClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock/DatasetPreviewBlock";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { DangerousActionButton } from "@/lib/ui/buttons/DangerousActionButton";
 import { Paper } from "@/lib/ui/Paper/Paper";
@@ -23,6 +25,100 @@ import type { UserId } from "$/models/User/User.types";
 type Props = {
   dataset: Dataset.T;
 };
+
+async function _resyncCsvDataset(options: {
+  file: File;
+  dataset: Dataset.T;
+  userId: UserId;
+}): Promise<void> {
+  const { file, dataset, userId } = options;
+  const [csvParseOptions, datasetColumns] = await Promise.all([
+    CsvFileDatasetClient.getOne(where("dataset_id", "eq", dataset.id)),
+    DatasetColumnClient.getAll(where("dataset_id", "eq", dataset.id)),
+  ]);
+  assertIsDefined(
+    csvParseOptions,
+    `CSV parse options could not be found for dataset (ID: ${dataset.id})`,
+  );
+  const duckdbColumns = datasetColumns.map((column) => {
+    return [column.name, column.detectedDataType] as const;
+  });
+  await LocalDatasetClient.storeLocalCSV({
+    datasetId: dataset.id,
+    workspaceId: dataset.workspaceId,
+    userId,
+    csvParseOptions: {
+      file,
+      numRowsToSkip: csvParseOptions.rowsToSkip,
+      delimiter: csvParseOptions.delimiter,
+      columns: duckdbColumns,
+      quoteChar: csvParseOptions.quoteChar,
+      escapeChar: csvParseOptions.escapeChar,
+      newlineDelimiter: csvParseOptions.newlineDelimiter,
+      commentChar: csvParseOptions.commentChar,
+      hasHeader: csvParseOptions.hasHeader,
+      dateFormat: csvParseOptions.dateFormat,
+      timestampFormat: csvParseOptions.timestampFormat,
+    },
+  });
+}
+
+async function _resyncXlsxDataset(options: {
+  file: File;
+  dataset: Dataset.T;
+  userId: UserId;
+}): Promise<void> {
+  const { file, dataset, userId } = options;
+  const xlsxParseOptions = await XlsxFileDatasetClient.getOne(
+    where("dataset_id", "eq", dataset.id),
+  );
+  assertIsDefined(
+    xlsxParseOptions,
+    `Excel parse options could not be found for dataset (ID: ${dataset.id})`,
+  );
+  await LocalDatasetClient.storeLocalExcel({
+    datasetId: dataset.id,
+    workspaceId: dataset.workspaceId,
+    userId,
+    xlsxParseOptions: {
+      file,
+      sheet: xlsxParseOptions.sheetName,
+      hasHeader: xlsxParseOptions.hasHeader,
+    },
+  });
+}
+
+type UploadControlConfig = {
+  acceptMimeTypes: string;
+  uploadButtonLabel: string;
+};
+
+function _getUploadControlConfig(
+  sourceType: Dataset.T["sourceType"],
+): UploadControlConfig {
+  return match(sourceType)
+    .with("csv_file", () => {
+      return {
+        acceptMimeTypes: MIMEType.TEXT_CSV,
+        uploadButtonLabel: "Upload CSV",
+      };
+    })
+    .with("xlsx_file", () => {
+      return {
+        acceptMimeTypes: [
+          MIMEType.APPLICATION_OPENXML_EXCEL,
+          MIMEType.APPLICATION_MS_EXCEL,
+        ].join(","),
+        uploadButtonLabel: "Upload Excel",
+      };
+    })
+    .otherwise(() => {
+      return {
+        acceptMimeTypes: MIMEType.TEXT_CSV,
+        uploadButtonLabel: "Upload file",
+      };
+    });
+}
 
 /**
  * A card component for displaying a single dataset that needs to be re-synced
@@ -55,39 +151,20 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
   const [resyncDataset, isResyncing] = useMutation({
     queryToRefetch: ["missing-datasets"],
     mutationFn: async (file: File) => {
-      const [csvParseOptions, datasetColumns] = await Promise.all([
-        CSVFileDatasetClient.getOne(where("dataset_id", "eq", dataset.id)),
-        DatasetColumnClient.getAll(where("dataset_id", "eq", dataset.id)),
-      ]);
-      assertIsDefined(
-        csvParseOptions,
-        `CSV parse options could not be found for dataset (ID: ${dataset.id})`,
-      );
-      const duckdbColumns = datasetColumns.map((column) => {
-        return [column.name, column.detectedDataType] as const;
-      });
-
-      // add the data back to local storage
-      const loadResult = await LocalDatasetClient.storeLocalCSV({
-        datasetId: dataset.id,
-        workspaceId: dataset.workspaceId,
-        userId: user!.id as UserId,
-        csvParseOptions: {
-          file,
-          numRowsToSkip: csvParseOptions.rowsToSkip,
-          delimiter: csvParseOptions.delimiter,
-          columns: duckdbColumns,
-          quoteChar: csvParseOptions.quoteChar,
-          escapeChar: csvParseOptions.escapeChar,
-          newlineDelimiter: csvParseOptions.newlineDelimiter,
-          commentChar: csvParseOptions.commentChar,
-          hasHeader: csvParseOptions.hasHeader,
-          dateFormat: csvParseOptions.dateFormat,
-          timestampFormat: csvParseOptions.timestampFormat,
-        },
-      });
-
-      return { metadata: loadResult };
+      const userId = user!.id as UserId;
+      await match(dataset.sourceType)
+        .with("csv_file", async () => {
+          await _resyncCsvDataset({ file, dataset, userId });
+        })
+        .with("xlsx_file", async () => {
+          await _resyncXlsxDataset({ file, dataset, userId });
+        })
+        .otherwise(() => {
+          throw new Error(
+            `Resync is not supported for dataset source type ` +
+              `'${dataset.sourceType}'`,
+          );
+        });
     },
 
     onError: async (error) => {
@@ -144,6 +221,10 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
     },
   });
 
+  const { acceptMimeTypes, uploadButtonLabel } = _getUploadControlConfig(
+    dataset.sourceType,
+  );
+
   return (
     <Card withBorder shadow="sm" w="100%" pb="0">
       <Card.Section withBorder px="md" py="xs">
@@ -153,7 +234,7 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
       </Card.Section>
       <Group justify="space-around" py="md">
         <FileButton
-          accept={MIMEType.TEXT_CSV}
+          accept={acceptMimeTypes}
           onChange={(file) => {
             if (file) {
               resyncDataset(file);
@@ -167,7 +248,7 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
                 leftSection={<IconUpload size="1rem" />}
                 {...props}
               >
-                Upload CSV
+                {uploadButtonLabel}
               </Button>
             );
           }}

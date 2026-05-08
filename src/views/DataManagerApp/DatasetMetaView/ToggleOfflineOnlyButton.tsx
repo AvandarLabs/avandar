@@ -4,19 +4,20 @@ import { modals } from "@mantine/modals";
 import { IconWorld, IconWorldOff } from "@tabler/icons-react";
 import { ActionIcon } from "@ui/ActionIcon/ActionIcon";
 import { notifyError, notifySuccess } from "@ui/notifications/notify";
-import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
+import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { SourceDatasetClient } from "@/clients/datasets/SourceDatasetClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { useIsDatasetUploadInProgress } from "@/clients/storage/DatasetParquetStorageClient/useIsDatasetUploadInProgress";
 import { useUploadPercent } from "@/clients/storage/DatasetParquetStorageClient/useUploadPercent";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import type { CSVFileDatasetId } from "$/models/datasets/CSVFileDataset/CSVFileDataset.types";
+import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
 
 type Props = {
   isInCloudStorage: boolean;
-  csvFileDatasetId: CSVFileDatasetId;
-  datasetId: DatasetId;
+  dataSource: CsvFileDataset.T | XlsxFileDataset.T;
 };
 
 /**
@@ -24,45 +25,37 @@ type Props = {
  */
 export function ToggleOfflineOnlyButton({
   isInCloudStorage,
-  csvFileDatasetId,
-  datasetId,
+  dataSource,
 }: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
+  const sourceType = DatasetSource.getSourceType(dataSource);
 
-  const [updateCSVFileDataset, isUpdatePending] =
-    CSVFileDatasetClient.useUpdate({
-      queryToInvalidate: DatasetClient.QueryKeys.getSourceDataset({
-        datasetId,
-        sourceType: "csv_file",
-      }),
-      onSuccess: (dataset) => {
-        notifySuccess(
-          `Dataset is now ${dataset.isInCloudStorage ? "synced online" : "offline-only"}`,
-        );
-      },
-      onError: (error) => {
-        notifyError(
-          `There was an error updating the dataset: ${error.message}`,
-        );
-      },
-    });
-
-  const [deleteDatasetFromStorage, isDeletePending] = useMutation({
-    mutationFn: async (datasetIdToDelete: DatasetId): Promise<void> => {
+  const [makeOfflineOnly, isMakeOfflinePending] = useMutation({
+    mutationFn: async (datasetIdToDelete: DatasetId) => {
       await DatasetParquetStorageClient.deleteDataset({
         workspaceId: workspace.id,
         datasetId: datasetIdToDelete,
       });
-    },
-    onSuccess: () => {
-      // successfully deleted the dataset from storage, so we update the CSV
-      // file to reflect that it is no longer in cloud storage.
-      return updateCSVFileDataset({
-        id: csvFileDatasetId,
-        data: {
-          isInCloudStorage: false,
-        },
+
+      return SourceDatasetClient.update({
+        sourceType,
+        id: dataSource.id,
+        data: { isInCloudStorage: false },
       });
+    },
+    queriesToInvalidate: [
+      DatasetClient.QueryKeys.getAll(),
+      DatasetClient.QueryKeys.getSourceDataset({
+        datasetId: dataSource.datasetId,
+        sourceType,
+      }),
+    ],
+    onSuccess: (dataset) => {
+      if (DatasetSource.canBeOfflineOnly(dataset)) {
+        notifySuccess(
+          `Dataset is now ${dataset.isInCloudStorage ? "synced online" : "offline-only"}`,
+        );
+      }
     },
     onError: (error) => {
       const errorMessage =
@@ -75,11 +68,11 @@ export function ToggleOfflineOnlyButton({
     },
   });
 
-  const isUploadPending = useIsDatasetUploadInProgress(datasetId);
-  const uploadPercent = useUploadPercent(datasetId);
+  const isUploadPending = useIsDatasetUploadInProgress(dataSource.datasetId);
+  const uploadPercent = useUploadPercent(dataSource.datasetId);
 
   const onClick = () => {
-    const isPending = isUpdatePending || isUploadPending || isDeletePending;
+    const isPending = isMakeOfflinePending || isUploadPending;
 
     if (isPending) {
       return;
@@ -109,18 +102,19 @@ export function ToggleOfflineOnlyButton({
           </Text>,
       onConfirm: () => {
         if (isInCloudStorage) {
-          return deleteDatasetFromStorage(datasetId);
+          return makeOfflineOnly(dataSource.datasetId);
         } else {
           return DatasetParquetStorageClient.startDatasetUpload({
             workspaceId: workspace.id,
-            datasetId,
+            datasetId: dataSource.datasetId,
+            sourceType,
           });
         }
       },
     });
   };
 
-  const isPending = isUpdatePending || isUploadPending || isDeletePending;
+  const isPending = isMakeOfflinePending || isUploadPending;
 
   return (
     <Stack gap={4} align="center">

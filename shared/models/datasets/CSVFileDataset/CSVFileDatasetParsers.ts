@@ -1,4 +1,5 @@
 import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
+import { Model } from "@models/Model/Model.ts";
 import { pipe } from "@utils/misc/pipe/pipe.ts";
 import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
 import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
@@ -9,9 +10,9 @@ import type {
   ZodSchemaEqualsTypes,
 } from "@utils/types/test-utilities.types.ts";
 import type {
-  CSVFileDatasetId,
-  CSVFileDatasetModel,
-} from "$/models/datasets/CSVFileDataset/CSVFileDataset.types.ts";
+  CsvFileDatasetId,
+  CsvFileDatasetModel,
+} from "$/models/datasets/CsvFileDataset/CsvFileDataset.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 
@@ -34,20 +35,20 @@ const DBReadSchema = z.object({
   timestamp_format: z.string().nullable(),
 });
 
-export const CSVFileDatasetParsers =
-  makeParserRegistry<CSVFileDatasetModel>().build({
-    modelName: "CSVFileDataset",
+export const CsvFileDatasetParsers =
+  makeParserRegistry<CsvFileDatasetModel>().build({
+    modelName: "CsvFileDataset",
     DBReadSchema,
     fromDBReadToModelRead: pipe(
       camelCaseKeysDeep,
       nullsToUndefinedDeep,
       (obj) => {
-        return {
+        return Model.make("CsvFileDataset", {
           ...obj,
-          id: obj.id as CSVFileDatasetId,
+          id: obj.id as CsvFileDatasetId,
           datasetId: obj.datasetId as DatasetId,
           workspaceId: obj.workspaceId as Workspace.Id,
-        };
+        });
       },
     ),
     fromModelInsertToDBInsert: snakeCaseKeysDeep,
@@ -57,7 +58,7 @@ export const CSVFileDatasetParsers =
 /**
  * Do not remove these tests!
  */
-type CRUDTypes = CSVFileDatasetModel;
+type CRUDTypes = CsvFileDatasetModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
