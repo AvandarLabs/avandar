@@ -2,7 +2,9 @@ import { Tooltip } from "@mantine/core";
 import {
   IconBrandGoogle,
   IconFileTypeCsv,
+  IconFileTypeXls,
   IconTable,
+  IconWorld,
 } from "@tabler/icons-react";
 import { match } from "ts-pattern";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
@@ -27,6 +29,14 @@ export function SourceBadge({
         tooltip: "From CSV",
       };
     })
+    .with("xlsx_file", () => {
+      return {
+        Icon: (props: React.ComponentProps<typeof IconFileTypeXls>) => {
+          return <IconFileTypeXls {...props} color="#666" />;
+        },
+        tooltip: "From Excel",
+      };
+    })
     .with("google_sheets", () => {
       return {
         Icon: (props: React.ComponentProps<typeof IconBrandGoogle>) => {
@@ -35,7 +45,23 @@ export function SourceBadge({
         tooltip: "From Google Sheets",
       };
     })
-    .otherwise(() => {
+    .with("virtual", () => {
+      return {
+        Icon: (props: React.ComponentProps<typeof IconTable>) => {
+          return <IconTable {...props} color="#999" />;
+        },
+        tooltip: "From derived dataset",
+      };
+    })
+    .with("open_data", () => {
+      return {
+        Icon: (props: React.ComponentProps<typeof IconWorld>) => {
+          return <IconWorld {...props} color="#0072ce" />;
+        },
+        tooltip: "From Open Data",
+      };
+    })
+    .exhaustive(() => {
       return {
         Icon: (props: React.ComponentProps<typeof IconTable>) => {
           return <IconTable {...props} color="#999" />;

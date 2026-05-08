@@ -70,8 +70,9 @@ export function WorkspaceHomeView({ workspace }: Props): JSX.Element {
                         Upload a dataset
                       </Title>
                       <Text size="sm" c="dimmed">
-                        Import CSV files, connect to Google Sheets, or add data
-                        from other sources to start analyzing your information.
+                        Import spreadsheets, connect to Google Sheets, or add
+                        data from other sources to start analyzing your
+                        information.
                       </Text>
                     </Stack>
                   </Group>

@@ -189,6 +189,7 @@ export const LocalDatasetClient = createUsableServiceClient(
   }),
   {
     mutationFns: [
+      "storeLocalExcel",
       "storeLocalCSV",
       "dropLocalDataset",
       "fetchCloudDatasetToLocalStorage",

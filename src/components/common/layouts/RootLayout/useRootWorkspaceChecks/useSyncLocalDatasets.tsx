@@ -57,8 +57,9 @@ function useGarbageDatasetCollection(): void {
 }
 
 /**
- * Checks that all datasets that require locally-loaded data (e.g. datasets of
- * type `"csv_file"`) are available in local storage (IndexedDB).
+ * Checks that all datasets that require locally-loaded data (i.e. datasets of
+ * type `"csv_file"` or `"xlsx_file"`) are available in local storage
+ * (IndexedDB).
  *
  * For all missing datasets that require local data, we will display an
  * error modal notifying the user that the data could not be found.
@@ -73,11 +74,12 @@ export function useSyncLocalDatasets(): void {
   const user = useCurrentUser();
   const [modalId, setModalId] = useState<string | undefined>(undefined);
 
-  // get all datasets that are available to this user and are of type "csv_file"
+  // get all datasets that are available to this user and require locally
+  // loaded data (i.e. csv_file or xlsx_file).
   const [datasets] = DatasetClient.useGetAll({
     where: {
       workspace_id: { eq: workspace.id },
-      source_type: { eq: "csv_file" },
+      source_type: { in: ["csv_file", "xlsx_file"] },
     },
   });
 
