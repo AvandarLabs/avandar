@@ -2,7 +2,7 @@ import eslintPlugin from "@nabla/vite-plugin-eslint";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
-import { defineConfig } from "vitest/config";
+import { defaultExclude, defineConfig } from "vitest/config";
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
@@ -44,6 +44,14 @@ export default defineConfig(({ mode }) => {
       globals: true,
       environment: "jsdom",
       setupFiles: "./tests/vitest.setup.ts",
+      exclude: [
+        ...defaultExclude,
+        "tests/e2e/**",
+        ".agents/**",
+        ".claude/**",
+        "apps/**",
+        "packages/**",
+      ],
     },
   };
 });
