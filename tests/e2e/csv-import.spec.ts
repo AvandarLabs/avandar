@@ -12,6 +12,7 @@ import {
   E2E_TEST_USER,
   EXPECTED_CSV_COLUMN_NAMES,
 } from "./helpers/constants";
+import { deleteDatasetViaDataManagerUiAndVerify } from "./helpers/deleteDatasetViaDataManagerUi";
 import {
   ensureCloudStorageCheckedAndSaveDataset,
   parseDatasetIdFromDataManagerUrl,
@@ -155,5 +156,13 @@ test.describe("CSV manual upload", () => {
 
     await expect(syncedToggle).toBeVisible();
     await expect(syncedToggle).toBeEnabled();
+
+    await deleteDatasetViaDataManagerUiAndVerify({
+      admin,
+      datasetId,
+      page,
+      workspaceId,
+      workspaceSlug: E2E_SEEDED_WORKSPACE_SLUG,
+    });
   });
 });

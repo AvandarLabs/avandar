@@ -157,11 +157,10 @@ async function _uploadDatasetToSupabase(options: {
   });
 
   if (!sourceDataset) {
-    throw new Error("CSV dataset metadata is missing.");
+    throw new Error("Source dataset metadata is missing.");
   }
 
-  // upload is complete, so we update the CSV file in our db to reflect
-  // that it is in cloud storage.
+  // Upload is complete; persist cloud storage flag on the source row.
   await SourceDatasetClient.update({
     sourceType,
     id: sourceDataset.id,
@@ -177,7 +176,7 @@ async function _uploadDatasetToSupabase(options: {
   AvaQueryClient.invalidateQueries({
     queryKey: DatasetClient.QueryKeys.getSourceDataset({
       datasetId,
-      sourceType: "csv_file",
+      sourceType,
     }),
   });
 }
