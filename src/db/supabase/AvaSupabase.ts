@@ -53,7 +53,7 @@ export function createSupabaseAdminClient(
   } = {},
 ): SupabaseClient<Database> {
   const {
-    apiUrl = import.meta.env.VITE_SUPABASE_API_URL ?? "",
+    apiUrl = process.env.SUPABASE_URL ?? "",
     serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
   } = options;
   return createClient(apiUrl, serviceRoleKey);
