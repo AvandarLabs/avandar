@@ -1,6 +1,6 @@
 import { RenderOptions, render as renderReact } from "@testing-library/react";
 import { ReactElement } from "react";
-import { AvandarUIProvider } from "@/components/common/AvandarUIProvider";
+import { AvandarUiProvider } from "@/components/common/AvandarUiProvider";
 
 /**
  * Renders the given UI with the Avandar UI provider, which adds
@@ -13,7 +13,7 @@ export function render(
   options?: Omit<RenderOptions, "wrapper">,
 ): void {
   renderReact(ui, {
-    wrapper: AvandarUIProvider,
+    wrapper: AvandarUiProvider,
     ...options,
   });
 }

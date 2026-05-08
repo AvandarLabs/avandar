@@ -172,7 +172,7 @@ export class NodeDuckDB {
    * Runs a SQL string and returns result rows as plain objects.
    *
    * Optional `$paramName$` placeholders are replaced with `String(value)` from
-   * `params` (same idea as `DuckDBClient.runRawQuery`).
+   * `params` (same idea as `DuckDbClient.runRawQuery`).
    */
   async runRawQuery<RowObject extends UnknownRow = UnknownRow>(
     queryString: string,

@@ -16,7 +16,7 @@ import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFile
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
-import { DuckDBClient, UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+import { DuckDbClient, UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import { DuckDbLoadParquetResult } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
@@ -127,7 +127,7 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
       // The Memory Cube is an in-memory DuckDB instance.
       const MemoryCube = {
         getAllDice: async (): Promise<readonly string[]> => {
-          const inMemoryDice = await DuckDBClient.getTableOrViewNames();
+          const inMemoryDice = await DuckDbClient.getTableOrViewNames();
           return inMemoryDice;
         },
 
@@ -136,7 +136,7 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
         }: {
           datasetId: Dataset.Id;
         }): Promise<void> => {
-          return DuckDBClient.dropTableViewAndFile(datasetId);
+          return DuckDbClient.dropTableViewAndFile(datasetId);
         },
 
         /**
@@ -159,7 +159,7 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
           parquetBlob: Blob;
           columnReplacements?: readonly ColumnReplacement[];
         }): Promise<DuckDbLoadParquetResult> => {
-          return DuckDBClient.loadParquet({
+          return DuckDbClient.loadParquet({
             tableName: datasetId,
             blob: parquetBlob,
             columnReplacements:
@@ -584,9 +584,9 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
         // now run the actual query against the memory cube, because we can be
         // confident that all the data is in the memory cube.
         if (returnType === "js") {
-          return await DuckDBClient.runRawQuery<RowObject>(rawSQL);
+          return await DuckDbClient.runRawQuery<RowObject>(rawSQL);
         } else {
-          return await DuckDBClient.runRawQuery(rawSQL, {
+          return await DuckDbClient.runRawQuery(rawSQL, {
             returnType: "parquet",
           });
         }

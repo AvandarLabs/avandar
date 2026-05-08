@@ -1344,4 +1344,4 @@ SET enable_external_file_cache = true;
   }
 }
 
-export const DuckDBClient = new DuckDbClientImpl();
+export const DuckDbClient = new DuckDbClientImpl();

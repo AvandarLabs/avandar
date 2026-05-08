@@ -1,5 +1,5 @@
 import { createDexieCRUDClient } from "@/clients/dexie/createDexieCRUDClient";
-import { DuckDBClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { LocalDatasetParsers } from "@/models/LocalDataset/LocalDatasetParsers";
@@ -61,11 +61,11 @@ export const LocalDatasetClient = createUsableServiceClient(
           const logger = config.logger.appendName("storeLocalExcel");
           logger.log("Storing Excel locally", params);
           const { datasetId, xlsxParseOptions, workspaceId, userId } = params;
-          const loadResult = await DuckDBClient.loadXlsx({
+          const loadResult = await DuckDbClient.loadXlsx({
             tableName: datasetId,
             ...xlsxParseOptions,
           });
-          const parquetData = await DuckDBClient.exportTableAsParquet(
+          const parquetData = await DuckDbClient.exportTableAsParquet(
             loadResult.tableName,
           );
 
@@ -94,12 +94,12 @@ export const LocalDatasetClient = createUsableServiceClient(
           const logger = config.logger.appendName("insertCSV");
           logger.log("Storing CSV locally", params);
           const { datasetId, csvParseOptions, workspaceId, userId } = params;
-          const loadResult = await DuckDBClient.loadCsv({
+          const loadResult = await DuckDbClient.loadCsv({
             tableName: datasetId,
             ...csvParseOptions,
           });
 
-          const parquetData = await DuckDBClient.exportTableAsParquet(
+          const parquetData = await DuckDbClient.exportTableAsParquet(
             loadResult.tableName,
           );
 
@@ -127,7 +127,7 @@ export const LocalDatasetClient = createUsableServiceClient(
           logger.log("Dropping local dataset", params);
           const { datasetId } = params;
           await LocalDatasetClient.delete({ id: datasetId });
-          await DuckDBClient.dropTableViewAndFile(datasetId);
+          await DuckDbClient.dropTableViewAndFile(datasetId);
         },
 
         /**

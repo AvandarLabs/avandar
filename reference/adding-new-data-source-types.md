@@ -113,7 +113,7 @@ For each new source type, you typically add:
 7. **Local / IndexedDB** — `src/clients/datasets/LocalDatasetClient.ts`:
    - If the type stores raw bytes in the browser (CSV/XLSX pattern), add
      load helpers (see `storeLocalCSV`, `storeLocalExcel`) and any new DuckDB
-     loaders in `DuckDBClient` if the file format is new.
+     loaders in `DuckDbClient` if the file format is new.
 
 ---
 
