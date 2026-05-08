@@ -1,4 +1,5 @@
 import { Box, Button, FileInput, Group } from "@mantine/core";
+import { isArray } from "@utils/index";
 import { MIMEType } from "@utils/types/common.types";
 import { useRef, useState } from "react";
 import { useForm } from "@/lib/hooks/ui/useForm/useForm";
@@ -12,9 +13,10 @@ type Props = {
   clearable?: boolean;
 
   /**
-   * MIME type to accept. Example: "text/csv"
+   * MIME types to accept. Passed to the file input as a comma-separated
+   * list (HTML `accept` attribute).
    */
-  accept: MIMEType;
+  accept: MIMEType | readonly MIMEType[];
 
   /**
    * Callback fired when a file is submitted
@@ -96,7 +98,7 @@ export function FileUploadForm({
             key={form.key("file")}
             {...form.getInputProps("file")}
             clearable={clearable}
-            accept={accept}
+            accept={isArray(accept) ? accept.join(",") : accept}
             {...fileInputProps}
             styles={{
               input: {

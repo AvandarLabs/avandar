@@ -83,6 +83,24 @@ the product into something that truly serves your mission.
    pnpm dev
    ```
 
+### End-to-end tests (Playwright)
+
+Playwright runs against the app URL in `playwright.config.ts` (default
+`http://127.0.0.1:5173`). The config can start Vite automatically unless a
+server is already running.
+
+E2E tests expect a **full local Supabase stack**: `supabase start`, seeded DB
+(`pnpm db:reset` or equivalent), **Edge Functions served** (e.g. `pnpm fns:serve`
+after `pnpm fns:update-env`), and `.env.development` filled in (including
+`SUPABASE_SERVICE_ROLE_KEY` for global setup). Tests call real RPCs and function
+routes; they do not stub Supabase APIs.
+
+| Command                | What it does                                                                      |
+| ---------------------- | --------------------------------------------------------------------------------- |
+| `pnpm test:e2e`        | **Headless** run: no browser window, best for CI and quick passes.                |
+| `pnpm test:e2e:headed` | Same tests with a **visible** browser; useful to watch flows and failures.        |
+| `pnpm test:e2e:ui`     | **Playwright UI mode**: pick tests, debug with time travel, live DOM, and traces. |
+
 ## Stack
 
 - React
@@ -94,6 +112,12 @@ the product into something that truly serves your mission.
 - React Query
 - React Router
 - Supabase
+
+## Reference documentation
+
+The [`reference/`](reference/) directory holds long-lived Markdown notes:
+architectural decisions, design decisions, and change checklists. Start there
+when touching cross-cutting areas (for example, dataset source types).
 
 ## Creating new CRUD models
 

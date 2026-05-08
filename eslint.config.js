@@ -15,7 +15,7 @@ import tseslint from "typescript-eslint";
 
 export default [
   {
-    ignores: ["**/dist/**"],
+    ignores: ["**/dist/**", ".agents/**"],
   },
   eslintPluginImportX.flatConfigs.recommended,
   ...eslintPluginTailwindCSS.configs["flat/recommended"],
@@ -104,17 +104,6 @@ export default [
             controlComponents: [],
           },
         ],
-        "no-restricted-imports": [
-          "error",
-          {
-            patterns: [
-              {
-                regex: "^\\.{1,2}/",
-                message: "Use path aliases instead of relative imports.",
-              },
-            ],
-          },
-        ],
         "no-unused-vars": "off",
 
         // we use the @typescript-eslint one instead
@@ -180,6 +169,29 @@ export default [
           ts: "always",
           tsx: "always",
           checkTypeImports: true,
+        },
+      ],
+    },
+  },
+  {
+    files: [
+      "supabase/**/*.{js,jsx,ts,tsx}",
+      "shared/**/*.{js,jsx,ts,tsx}",
+      "packages/shared/**/*.{js,jsx,ts,tsx}",
+    ],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "^\\.{1,2}/",
+              message:
+                "This file is in a shared or Supabase directory (may run under " +
+                "Deno). Use absolute imports with path aliases instead of " +
+                "relative imports.",
+            },
+          ],
         },
       ],
     },

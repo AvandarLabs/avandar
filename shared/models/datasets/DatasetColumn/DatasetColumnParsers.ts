@@ -7,7 +7,7 @@ import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsT
 import { snakeCaseKeysDeep } from "@utils/objects/snakeCaseKeys/snakeCaseKeys.ts";
 import { undefinedsToNullsDeep } from "@utils/objects/undefinedsToNullsDeep/undefinedsToNullsDeep.ts";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
-import { DuckDBDataTypes } from "$/models/datasets/DatasetColumn/DuckDBDataTypes.ts";
+import { DuckDbDataTypes } from "$/models/datasets/DatasetColumn/DuckDbDataTypes.ts";
 import z from "zod";
 import type {
   Expect,
@@ -23,7 +23,7 @@ import type { Workspace } from "$/models/Workspace/Workspace.ts";
 const DBReadSchema = z.object({
   created_at: z.iso.datetime({ offset: true }),
   original_data_type: z.string(),
-  detected_data_type: z.enum(DuckDBDataTypes),
+  detected_data_type: z.enum(DuckDbDataTypes),
   data_type: z.enum(AvaDataType.Types),
   dataset_id: z.uuid(),
   description: z.string().nullable(),

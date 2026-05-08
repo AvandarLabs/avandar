@@ -14,7 +14,7 @@ export type QueryAggregationTypeT =
  * Aggregations that map to DuckDB SQL functions (subset of
  * {@link QueryAggregationType}).
  */
-export type DuckDBQueryAggregationTypeT =
+export type DuckDbQueryAggregationTypeT =
   | "sum"
   | "avg"
   | "count"

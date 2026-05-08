@@ -1,11 +1,17 @@
 import { createDexieCRUDClient } from "@/clients/dexie/createDexieCRUDClient";
-import { DuckDBClient } from "@/clients/DuckDBClient/DuckDBClient";
+import { DuckDBClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { LocalDatasetParsers } from "@/models/LocalDataset/LocalDatasetParsers";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
-import type { DucKDBLoadCSVOptions } from "@/clients/DuckDBClient/DuckDBClient";
-import type { DuckDBLoadCSVResult } from "@/clients/DuckDBClient/DuckDBClient.types";
+import type {
+  DuckDbLoadCsvOptions,
+  DuckDbLoadXlsxOptions,
+} from "@/clients/DuckDbClient/DuckDbClient";
+import type {
+  DuckDbLoadCsvResult,
+  DuckDbLoadXlsxResult,
+} from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { LocalDataset } from "@/models/LocalDataset/LocalDataset.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { UserId } from "$/models/User/User.types";
@@ -45,6 +51,37 @@ export const LocalDatasetClient = createUsableServiceClient(
       > = new Map();
 
       return {
+        /** Add an excel file to local storage. */
+        storeLocalExcel: async (params: {
+          datasetId: DatasetId;
+          workspaceId: Workspace.Id;
+          userId: UserId;
+          xlsxParseOptions: DistributedOmit<DuckDbLoadXlsxOptions, "tableName">;
+        }): Promise<DuckDbLoadXlsxResult> => {
+          const logger = config.logger.appendName("storeLocalExcel");
+          logger.log("Storing Excel locally", params);
+          const { datasetId, xlsxParseOptions, workspaceId, userId } = params;
+          const loadResult = await DuckDBClient.loadXlsx({
+            tableName: datasetId,
+            ...xlsxParseOptions,
+          });
+          const parquetData = await DuckDBClient.exportTableAsParquet(
+            loadResult.tableName,
+          );
+
+          // now that the data is in DuckDB memory, lets add an entry to
+          // IndexedDB to track it in persisted local storage.
+          await LocalDatasetClient.insert({
+            data: {
+              datasetId: datasetId,
+              parquetData: parquetData,
+              workspaceId: workspaceId,
+              userId: userId,
+            },
+          });
+          return loadResult;
+        },
+
         /**
          * Add a CSV to local storage.
          */
@@ -52,12 +89,12 @@ export const LocalDatasetClient = createUsableServiceClient(
           datasetId: DatasetId;
           workspaceId: Workspace.Id;
           userId: UserId;
-          csvParseOptions: DistributedOmit<DucKDBLoadCSVOptions, "tableName">;
-        }): Promise<DuckDBLoadCSVResult> => {
+          csvParseOptions: DistributedOmit<DuckDbLoadCsvOptions, "tableName">;
+        }): Promise<DuckDbLoadCsvResult> => {
           const logger = config.logger.appendName("insertCSV");
           logger.log("Storing CSV locally", params);
           const { datasetId, csvParseOptions, workspaceId, userId } = params;
-          const loadResult = await DuckDBClient.loadCSV({
+          const loadResult = await DuckDBClient.loadCsv({
             tableName: datasetId,
             ...csvParseOptions,
           });
@@ -80,8 +117,8 @@ export const LocalDatasetClient = createUsableServiceClient(
         },
 
         /**
-         * Drops the local dataset from both local storage (IndexedDB) and
-         * memory (DuckDB).
+         * Drops the local dataset from both local storage (IndexedDb) and
+         * memory (DuckDb).
          */
         dropLocalDataset: async (params: {
           datasetId: DatasetId;
@@ -152,6 +189,7 @@ export const LocalDatasetClient = createUsableServiceClient(
   }),
   {
     mutationFns: [
+      "storeLocalExcel",
       "storeLocalCSV",
       "dropLocalDataset",
       "fetchCloudDatasetToLocalStorage",

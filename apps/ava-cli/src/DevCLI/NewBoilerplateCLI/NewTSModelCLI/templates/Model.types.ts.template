@@ -1,10 +1,16 @@
+import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
 
-export type $MODEL_NAME$Id = UUID<"$MODEL_NAME$">;
+type ModelType = "$MODEL_NAME$";
 
-export type $MODEL_NAME$Read = {
-  id: $MODEL_NAME$Id;
-};
+export type $MODEL_NAME$Id = UUID<ModelType>;
+
+export type $MODEL_NAME$Read = Model.Base<
+  ModelType,
+  {
+    id: $MODEL_NAME$Id;
+  }
+>;
 
 export type $MODEL_NAME$Model = {
   Read: $MODEL_NAME$Read;

@@ -106,6 +106,9 @@ export function QueryDataSourceSelect({
         .with("open_data", () => {
           return "Open Data";
         })
+        .with("xlsx_file", () => {
+          return "Excel files";
+        })
         .exhaustive(() => {
           return undefined;
         });

@@ -1,4 +1,5 @@
 import { makeParserRegistry } from "@clients/makeParserRegistry.ts";
+import { Model } from "@models/Model/Model.ts";
 import { pipe } from "@utils/misc/pipe/pipe.ts";
 import { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
 import { excludeNullsDeep } from "@utils/objects/excludeNullsDeep/excludeNullsDeep.ts";
@@ -15,7 +16,6 @@ import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 import type {
   $MODEL_NAME$Id,
   $MODEL_NAME$Model,
-  $MODEL_NAME$Read,
 } from "$/models/$MODEL_PATH_FROM_MODELS_ROOT$/$MODEL_NAME$.types.ts";
 
 const DBReadSchema = z.object({
@@ -33,13 +33,13 @@ export const $MODEL_NAME$Parsers =
     fromDBReadToModelRead: pipe(
       camelCaseKeysDeep,
       nullsToUndefinedDeep,
-      (obj): $MODEL_NAME$Read => {
-        return {
+      (obj) => {
+        return Model.make("$MODEL_NAME$", {
           ...obj,
           id: obj.id as $MODEL_NAME$Id,
           ownerId: obj.ownerId as UserId,
           workspaceId: obj.workspaceId as WorkspaceId,
-        };
+        });
       },
     ),
 

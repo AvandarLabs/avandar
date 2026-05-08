@@ -1,8 +1,8 @@
 import * as duckdb from "@duckdb/duckdb-wasm";
 import ehWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url";
 import mvpWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?url";
-import duckDBWasmEh from "@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url";
-import duckDBWasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
+import duckDbWasmEh from "@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url";
+import duckDbWasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
 import { ILogger } from "@logger/Logger.types";
 import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray";
 import { prop } from "@utils/objects/hofs/prop/prop";
@@ -12,37 +12,36 @@ import { objectValuesMap } from "@utils/objects/objectValuesMap/objectValuesMap"
 import { MIMEType } from "@utils/types/common.types";
 import { uuid } from "$/lib/uuid";
 import {
-  DuckDBDataType,
-  DuckDBDataTypes,
-} from "$/models/datasets/DatasetColumn/DuckDBDataTypes";
-import { DuckDBQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationTypeModule";
+  DuckDbDataType,
+  DuckDbDataTypes,
+} from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
+import { DuckDBQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationType";
+import { QueryResultPage } from "$/models/queries/QueryResult/QueryResult.types";
 import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
-import { arrowFieldToQueryResultField } from "@/clients/DuckDBClient/arrowFieldToQueryResultField";
 import {
-  DuckDBColumnSchema,
-  DuckDBCSVSniffResult,
-  DuckDBLoadCSVResult,
-  DuckDBLoadParquetResult,
-  DuckDBRejectedRow,
-  DuckDBScan,
-  DuckDBStructuredQuery,
-} from "@/clients/DuckDBClient/DuckDBClient.types";
-import { DuckDBDataTypeUtils } from "@/clients/DuckDBClient/DuckDBDataType";
+  DuckDbColumnSchema,
+  DuckDbCsvSniffResult,
+  DuckDbLoadCsvResult,
+  DuckDbLoadParquetResult,
+  DuckDbLoadXlsxResult,
+  DuckDbRejectedRow,
+  DuckDbScan,
+  DuckDbStructuredQuery,
+} from "@/clients/DuckDbClient/DuckDbClient.types";
+import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { Logger } from "@/utils/Logger";
-import type {
-  QueryResult,
-  QueryResultPage,
-} from "$/models/queries/QueryResult/QueryResult.types";
+import { arrowFieldToQueryResultField } from "./arrowFieldToQueryResultField";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 
 const MANUAL_BUNDLES: duckdb.DuckDBBundles = {
   mvp: {
-    mainModule: duckDBWasm,
+    mainModule: duckDbWasm,
     mainWorker: mvpWorker,
   },
   eh: {
-    mainModule: duckDBWasmEh,
+    mainModule: duckDbWasmEh,
     mainWorker: ehWorker,
   },
 };
@@ -59,7 +58,26 @@ function _quoteSQLIdentifier(identifier: string): string {
   return `"${identifier.replace(/"/g, '""')}"`;
 }
 
-type BaseDuckDBLoadCSVOptions = {
+function _escapeSqlSingleQuotedLiteral(value: string): string {
+  return value.replaceAll("'", "''");
+}
+
+function _assertXlsxFileReadable(file: File): void {
+  const lower = file.name.toLowerCase();
+  if (lower.endsWith(".xlsx")) {
+    return;
+  }
+
+  if (lower.endsWith(".xls")) {
+    throw new Error(
+      "DuckDb read_xlsx supports .xlsx only; legacy .xls is not supported.",
+    );
+  }
+
+  throw new Error(`Expected an .xlsx workbook file; got "${file.name}".`);
+}
+
+type BaseDuckDbLoadCsvOptions = {
   tableName: string;
   numRowsToSkip?: number;
   delimiter?: string;
@@ -70,12 +88,34 @@ type BaseDuckDBLoadCSVOptions = {
   hasHeader?: boolean;
   dateFormat?: string;
   timestampFormat?: string;
-  columns?: Array<readonly [columnName: string, columnType: DuckDBDataType]>;
+  columns?: Array<readonly [columnName: string, columnType: DuckDbDataType]>;
 };
 
-export type DucKDBLoadCSVOptions =
-  | (BaseDuckDBLoadCSVOptions & { file: File })
-  | (BaseDuckDBLoadCSVOptions & { fileText: string });
+export type DuckDbLoadCsvOptions =
+  | (BaseDuckDbLoadCsvOptions & { file: File })
+  | (BaseDuckDbLoadCsvOptions & { fileText: string });
+
+type BaseDuckDbLoadXlsxOptions = {
+  tableName: string;
+  /**
+   * Worksheet name for `read_xlsx`. Omit to load the first sheet (DuckDb
+   * default).
+   */
+  sheet?: string;
+  /**
+   * When true, `read_xlsx` uses the first row as column names. Defaults to
+   * true so behavior matches the import UI and avoids flaky auto-detection.
+   */
+  hasHeader?: boolean;
+};
+
+/**
+ * Options for `loadXlsx`. Pass either a browser `File` or raw workbook bytes
+ * (`.xlsx` only; DuckDb does not read `.xls`).
+ */
+export type DuckDbLoadXlsxOptions =
+  | (BaseDuckDbLoadXlsxOptions & { file: File })
+  | (BaseDuckDbLoadXlsxOptions & { fileBytes: Uint8Array });
 
 /**
  * An object representing a row with unknown column types.
@@ -84,7 +124,7 @@ export type DucKDBLoadCSVOptions =
 export type UnknownRow = Record<string, unknown>;
 
 /**
- * The maximum number of rejected rows to store in DuckDB per file.
+ * The maximum number of rejected rows to store in DuckDb per file.
  * During a scan, once we have hit this limit, the CSV will still
  * continue to parse, but any more rejected rows will be ignored.
  *
@@ -100,9 +140,9 @@ export type UnknownRow = Record<string, unknown>;
  */
 const REJECTED_ROW_STORAGE_LIMIT = 1001;
 
-function _duckDBDataTypeFromString(typeString: string): DuckDBDataType {
-  const normalizedType = typeString.toUpperCase() as DuckDBDataType;
-  const isKnownType = DuckDBDataTypes.includes(normalizedType);
+function _duckDbDataTypeFromString(typeString: string): DuckDbDataType {
+  const normalizedType = typeString.toUpperCase() as DuckDbDataType;
+  const isKnownType = DuckDbDataTypes.includes(normalizedType);
   if (isKnownType) {
     return normalizedType;
   }
@@ -112,7 +152,7 @@ function _duckDBDataTypeFromString(typeString: string): DuckDBDataType {
 
 function _parseRejectScanColumns(
   columnsString: string,
-): Array<{ name: string; type: DuckDBDataType }> {
+): Array<{ name: string; type: DuckDbDataType }> {
   const matches = Array.from(
     columnsString.matchAll(/'([^']+)'\s*:\s*'([^']+)'/g),
   );
@@ -125,14 +165,14 @@ function _parseRejectScanColumns(
     }
 
     return [
-      { name: columnName, type: _duckDBDataTypeFromString(columnTypeString) },
+      { name: columnName, type: _duckDbDataTypeFromString(columnTypeString) },
     ];
   });
 }
 
 function _buildReadCSVPrompt(options: {
   tableName: string;
-  scan: DuckDBScan;
+  scan: DuckDbScan;
   commentChar: string | null;
 }): string {
   const { tableName, scan, commentChar } = options;
@@ -166,11 +206,11 @@ function _buildReadCSVPrompt(options: {
   return `FROM read_csv('${tableName}', ${args.join(", ")});`;
 }
 
-function _getDuckDBCSVSniffResultFromRejectScan(options: {
+function _getDuckDbCSVSniffResultFromRejectScan(options: {
   tableName: string;
-  scan: DuckDBScan;
+  scan: DuckDbScan;
   commentChar: string | null;
-}): DuckDBCSVSniffResult {
+}): DuckDbCsvSniffResult {
   const { scan, tableName, commentChar } = options;
   const parsedColumns = _parseRejectScanColumns(scan.columns);
 
@@ -193,7 +233,7 @@ function _getDuckDBCSVSniffResultFromRejectScan(options: {
 }
 
 function _inferHasHeaderFromTableSchema(
-  tableColumns: readonly DuckDBColumnSchema[],
+  tableColumns: readonly DuckDbColumnSchema[],
 ): boolean {
   const isAutoColumnName = (columnName: string): boolean => {
     return /^column\d+$/i.test(columnName);
@@ -204,7 +244,7 @@ function _inferHasHeaderFromTableSchema(
   });
 }
 
-function _getDuckDBCSVSniffResultFallback(options: {
+function _getDuckDbCSVSniffResultFallback(options: {
   tableName: string;
   numRowsToSkip: number;
   delimiter: string | undefined;
@@ -215,8 +255,8 @@ function _getDuckDBCSVSniffResultFallback(options: {
   hasHeader: boolean | undefined;
   dateFormat: string | undefined;
   timestampFormat: string | undefined;
-  tableColumns: readonly DuckDBColumnSchema[];
-}): DuckDBCSVSniffResult {
+  tableColumns: readonly DuckDbColumnSchema[];
+}): DuckDbCsvSniffResult {
   const {
     tableName,
     numRowsToSkip,
@@ -309,7 +349,7 @@ function arrowTableToJS<RowObject extends UnknownRow>(
  *
  * TODO(jpsyx): convert this to a composable function rather than a class.
  */
-class DuckDBClientImpl {
+class DuckDbClientImpl {
   #db?: Promise<duckdb.AsyncDuckDB>;
 
   /**
@@ -317,7 +357,7 @@ class DuckDBClientImpl {
    * know if we forgot to close any connections.
    */
   #openConnections: Set<duckdb.AsyncDuckDBConnection> = new Set();
-  #logger: ILogger = Logger.appendName("DuckDBClient");
+  #logger: ILogger = Logger.appendName("DuckDbClient");
 
   async #initialize(): Promise<duckdb.AsyncDuckDB> {
     // Select a bundle based on browser checks
@@ -334,6 +374,7 @@ class DuckDBClientImpl {
     const conn = await db.connect();
     await conn.query("LOAD spatial;");
     await conn.query("LOAD parquet;");
+    await conn.query("LOAD excel;");
     await conn.close();
     return db;
   }
@@ -389,10 +430,10 @@ class DuckDBClientImpl {
    * Gets the schema of a table
    * @param tableName The name of the table.
    * @returns The schema of the table as an array of
-   * DuckDBColumnSchema objects.
+   * DuckDbColumnSchema objects.
    */
-  async getTableSchema(tableName: string): Promise<DuckDBColumnSchema[]> {
-    const { data } = await this.runRawQuery<DuckDBColumnSchema>(
+  async getTableSchema(tableName: string): Promise<DuckDbColumnSchema[]> {
+    const { data } = await this.runRawQuery<DuckDbColumnSchema>(
       `DESCRIBE "$tableName$"`,
       { params: { tableName } },
     );
@@ -475,12 +516,41 @@ class DuckDBClientImpl {
   }
 
   /**
+   * Registers an `.xlsx` workbook in DuckDB's internal file system.
+   *
+   * @param options The options for registering the dataset.
+   * @param options.tableName The name of the table to register the dataset
+   * under. This must be a valid DuckDb table name.
+   * @param options.file The file to register. This takes precedence over
+   * passing `fileBytes`.
+   * @param options.fileBytes The raw workbook bytes to register. If a `file`
+   * is provided, this option will be ignored.
+   * `_xlsxVirtualFileKey`).
+   */
+  async #registerXlsxFile(options: {
+    tableName: string;
+    file?: File;
+    fileBytes?: Uint8Array;
+  }): Promise<void> {
+    const { tableName, file, fileBytes } = options;
+    const db = await this.#getDB();
+    if (file) {
+      const buffer = new Uint8Array(await file.arrayBuffer());
+      await db.registerFileBuffer(tableName, buffer);
+      return;
+    }
+    if (fileBytes) {
+      await db.registerFileBuffer(tableName, fileBytes);
+      return;
+    }
+    throw new Error("#registerXlsxFile: expected file or fileBytes");
+  }
+
+  /**
    * Registers a Parquet file in DuckDB's internal file system.
    * @param options The options for registering the dataset.
    * @param options.tableName The name of the table to register the dataset
-   * under. This must be a valid DuckDB table name. Calling `snakeify` on the
-   * string before passing it to this function would be sufficient to ensure
-   * the string is a valid table name.
+   * under. This must be a valid DuckDB table name.
    * @param options.blob The parquet file as a binary blob to register.
    */
   async #registerParquetFile(options: {
@@ -547,14 +617,14 @@ class DuckDBClientImpl {
    * @param options.columns The columns to use for the CSV file, if we know
    * the schema of the CSV file ahead of time and want to make sure these
    * columns get used. The record keys are the column names, the values are
-   * the DuckDBDataType of the column.
+   * the DuckDbDataType of the column.
    * @param options.file The file to load. This takes precedence over
    * passing `fileText`.
    * @param options.fileText The raw CSV text string to load. If a `file`
    * is provided, this option will be ignored.
    * @returns A promise that resolves when the file is loaded.
    */
-  async loadCSV(options: DucKDBLoadCSVOptions): Promise<DuckDBLoadCSVResult> {
+  async loadCsv(options: DuckDbLoadCsvOptions): Promise<DuckDbLoadCsvResult> {
     const {
       tableName,
       numRowsToSkip = 0,
@@ -569,7 +639,7 @@ class DuckDBClientImpl {
       timestampFormat,
     } = options;
     const conn = await this.#connect();
-    let loadResults: DuckDBLoadCSVResult;
+    let loadResults: DuckDbLoadCsvResult;
     try {
       // If the dataset already exists, we drop it and then recreate it.
       // Loading a CSV will ALWAYS overwrite existing data.
@@ -636,9 +706,9 @@ class DuckDBClientImpl {
       );
 
       // get the parsing errors
-      let rejectedScans: DuckDBScan[] = [];
-      let rejectedRows: DuckDBRejectedRow[] = [];
-      const rejectedScansResult = await this.runRawQuery<DuckDBScan>(
+      let rejectedScans: DuckDbScan[] = [];
+      let rejectedRows: DuckDbRejectedRow[] = [];
+      const rejectedScansResult = await this.runRawQuery<DuckDbScan>(
         `SELECT * FROM reject_scans WHERE file_path='$tableName$'`,
         { conn, params: { tableName } },
       );
@@ -647,7 +717,7 @@ class DuckDBClientImpl {
       if (isNonEmptyArray(rejectedScans)) {
         // if there are scans, then let's see if there are any rejected rows
         const fileId = rejectedScans[0].file_id;
-        const rejectedRowsResult = await this.runRawQuery<DuckDBRejectedRow>(
+        const rejectedRowsResult = await this.runRawQuery<DuckDbRejectedRow>(
           `SELECT * FROM reject_errors WHERE file_id='$fileId$'`,
           { conn, params: { fileId } },
         );
@@ -669,12 +739,12 @@ class DuckDBClientImpl {
 
       const csvSniffResult =
         scan ?
-          _getDuckDBCSVSniffResultFromRejectScan({
+          _getDuckDbCSVSniffResultFromRejectScan({
             tableName,
             scan,
             commentChar: cleanCommentChar,
           })
-        : _getDuckDBCSVSniffResultFallback({
+        : _getDuckDbCSVSniffResultFallback({
             tableName,
             numRowsToSkip,
             delimiter,
@@ -690,6 +760,7 @@ class DuckDBClientImpl {
 
       loadResults = {
         id: uuid(),
+        type: "csv",
         tableName,
         csvName: tableName,
         numRows: csvRowCount,
@@ -697,6 +768,74 @@ class DuckDBClientImpl {
         errors: csvErrors,
         numRejectedRows: csvErrors.rejectedRows.length,
         csvSniff: csvSniffResult,
+      };
+    } finally {
+      await this.#closeConnection(conn);
+    }
+
+    return loadResults;
+  }
+
+  /**
+   * Loads an `.xlsx` workbook into DuckDB using `read_xlsx`.
+   *
+   * Legacy `.xls` (BIFF) files are rejected; DuckDB only supports `.xlsx`.
+   *
+   * @param options.tableName Table and base name for the virtual `.xlsx` file.
+   * @param options.sheet Optional worksheet name (first sheet if omitted).
+   * @param options.hasHeader First row is column names (`read_xlsx` `header`).
+   * @param options.file Browser file to load (takes precedence over bytes).
+   * @param options.fileBytes Raw `.xlsx` bytes when no `File` is available.
+   */
+  async loadXlsx(
+    options: DuckDbLoadXlsxOptions,
+  ): Promise<DuckDbLoadXlsxResult> {
+    const { tableName, sheet } = options;
+    const hasHeader = options.hasHeader ?? true;
+    const conn = await this.#connect();
+    let loadResults: DuckDbLoadXlsxResult;
+
+    try {
+      await this.dropTableViewAndFile(tableName);
+      if ("file" in options) {
+        _assertXlsxFileReadable(options.file);
+        await this.#registerXlsxFile({
+          tableName,
+          file: options.file,
+        });
+      } else {
+        await this.#registerXlsxFile({
+          tableName,
+          fileBytes: options.fileBytes,
+        });
+      }
+
+      await this.runRawQuery(
+        `CREATE TABLE IF NOT EXISTS "$tableName$" AS
+          SELECT * FROM read_xlsx(
+            '$tableName$'
+            , header = ${hasHeader}
+            ${sheet ? `, sheet = '${_escapeSqlSingleQuotedLiteral(sheet)}'` : ""}
+          )`,
+        {
+          conn,
+          params: { tableName },
+        },
+      );
+
+      this.#logger.log("Successfully loaded XLSX into DuckDB!");
+
+      const tableColumns = await this.getTableSchema(tableName);
+      const rowCount = await this.getTableRowCount(tableName);
+
+      loadResults = {
+        id: uuid(),
+        type: "xlsx",
+        tableName,
+        xlsxName: tableName,
+        numRows: rowCount,
+        columns: tableColumns,
+        sheet,
       };
     } finally {
       await this.#closeConnection(conn);
@@ -720,12 +859,12 @@ class DuckDBClientImpl {
       string,
       {
         alias?: string;
-        dataType?: DuckDBDataType;
+        dataType?: DuckDbDataType;
       }
     >;
-  }): Promise<DuckDBLoadParquetResult> {
+  }): Promise<DuckDbLoadParquetResult> {
     const { tableName, blob, columnReplacements } = options;
-    let loadResults: DuckDBLoadParquetResult;
+    let loadResults: DuckDbLoadParquetResult;
 
     // Drop the dataset and recreate it. We are overwriting the data.
     await this.dropTableViewAndFile(tableName);
@@ -942,7 +1081,7 @@ SET enable_external_file_cache = true;
 
   async #getPageHelper<T extends UnknownRow>(
     queryParams: Omit<
-      DuckDBStructuredQuery & {
+      DuckDbStructuredQuery & {
         pageSize: number;
         pageNum: number;
         totalRows: number | undefined;
@@ -996,7 +1135,7 @@ SET enable_external_file_cache = true;
     pageNum = 0,
     ...restOfStructuredQuery
   }: Omit<
-    DuckDBStructuredQuery & { pageSize: number; pageNum: number },
+    DuckDbStructuredQuery & { pageSize: number; pageNum: number },
     "limit" | "offset"
   >): Promise<QueryResultPage<T>> {
     const page = await this.#getPageHelper<T>({
@@ -1020,7 +1159,7 @@ SET enable_external_file_cache = true;
       aggregations = {},
       pageSize = 1000,
       ...restOfStructuredQuery
-    }: Omit<DuckDBStructuredQuery, "limit" | "offset"> & {
+    }: Omit<DuckDbStructuredQuery, "limit" | "offset"> & {
       pageSize?: number;
     },
     callback: (page: QueryResultPage<T>) => void | Promise<void>,
@@ -1072,13 +1211,13 @@ SET enable_external_file_cache = true;
     castTimestampsToISO,
     limit,
     offset,
-  }: DuckDBStructuredQuery): Promise<QueryResult<RowObject>> {
+  }: DuckDbStructuredQuery): Promise<QueryResult<RowObject>> {
     const conn = await this.#connect();
     let queryResults: QueryResult<RowObject>;
     const tableColumns = await this.getTableSchema(tableName);
     const timestampColumnNames = tableColumns
       .filter((col) => {
-        return DuckDBDataTypeUtils.isDateOrTimestamp(col.column_type);
+        return DuckDbDataTypeUtils.isDateOrTimestamp(col.column_type);
       })
       .map(prop("column_name"));
 
@@ -1205,4 +1344,4 @@ SET enable_external_file_cache = true;
   }
 }
 
-export const DuckDBClient = new DuckDBClientImpl();
+export const DuckDBClient = new DuckDbClientImpl();

@@ -9040,7 +9040,7 @@
         "npm:@mantine/spotlight@^8.3.16",
         "npm:@mantine/tiptap@^8.3.16",
         "npm:@nabla/vite-plugin-eslint@^2.0.5",
-        "npm:@playwright/test@^1.58.2",
+        "npm:@playwright/test@^1.59.1",
         "npm:@polar-sh/sdk@~0.41.5",
         "npm:@postgres-language-server/cli@0.19",
         "npm:@puckeditor/core@~0.21.1",
@@ -9140,6 +9140,7 @@
         "npm:vite-tsconfig-paths@^6.1.1",
         "npm:vite@^7.0.4",
         "npm:vitest@^3.2.4",
+        "npm:xlsx@~0.18.5",
         "npm:zod@^4.1.13"
       ]
     },

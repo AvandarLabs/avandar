@@ -13,7 +13,7 @@
  * @param value The value to return.
  * @returns A function that always returns the same value.
  */
-export function constant<T>(value: T): () => T {
+export function constant<const T>(value: T): () => T {
   return () => {
     return value;
   };

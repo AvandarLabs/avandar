@@ -1,5 +1,5 @@
-import { createModule } from "@modules/createModule.ts";
 import { ServiceClient } from "@clients/ServiceClient/ServiceClient.types.ts";
+import { createModule } from "@modules/createModule.ts";
 
 /**
  * Creates a base service client module with a `getClientName` function.

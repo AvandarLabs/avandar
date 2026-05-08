@@ -176,16 +176,17 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                 // "isInCloudStorage" property
                 datasetWithColumnsAndSource.source &&
                 "isInCloudStorage" in datasetWithColumnsAndSource.source &&
-                // this toggle is currently only supported for CSV datasets
-                dataset.sourceType === "csv_file"
+                // this toggle is currently only supported for CSV and Excel
+                // datasets
+                (dataset.sourceType === "csv_file" ||
+                  dataset.sourceType === "xlsx_file")
               ) ?
                 <Box style={{ flexShrink: 0 }}>
                   <ToggleOfflineOnlyButton
                     isInCloudStorage={
                       datasetWithColumnsAndSource.source.isInCloudStorage
                     }
-                    datasetId={dataset.id}
-                    csvFileDatasetId={datasetWithColumnsAndSource.source.id}
+                    dataSource={datasetWithColumnsAndSource.source}
                   />
                 </Box>
               : null}

@@ -29,9 +29,9 @@ import { BetaBadge } from "@/components/common/BetaBadge/BetaBadge";
 import { CreateWorkspaceForm } from "@/components/common/forms/CreateWorkspaceForm";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
-import { Link } from "@/lib/ui/links/Link";
 import { Logo } from "@/lib/ui/AppShell/Logo";
 import css from "@/lib/ui/AppShell/Navbar/Navbar.module.css";
+import { Link } from "@/lib/ui/links/Link";
 import type { AppLink } from "@/config/AppLinks";
 import type { NavbarLink } from "@/config/NavbarLinks";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -308,7 +308,10 @@ export function Navbar({
         opened={isCreateWorkspaceModalOpen}
         onClose={closeCreateWorkspaceModal}
       >
-        <CreateWorkspaceForm introText="Create a new workspace. You can always edit it later." />
+        <CreateWorkspaceForm
+          introText="Create a new workspace. You can always edit it later."
+          onWorkspaceCreated={closeCreateWorkspaceModal}
+        />
       </Modal>
     </>
   );

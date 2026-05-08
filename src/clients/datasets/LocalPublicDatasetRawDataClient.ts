@@ -4,7 +4,7 @@ import { withQueryHooks } from "@hooks/withQueryHooks/withQueryHooks";
 import { withLogger } from "@logger/module-augmenters/withLogger";
 import { isDefined } from "@utils/guards/isDefined/isDefined";
 import { LocalPublicDatasetClient } from "@/clients/datasets/LocalPublicDatasetClient";
-import { DuckDBClient } from "@/clients/DuckDBClient/DuckDBClient";
+import { DuckDBClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { promiseMap } from "@/lib/utils/promises";
 import type { LocalPublicDataset } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
 import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";

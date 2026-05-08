@@ -1,11 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import type {
-  ModelBase,
-  ModelType,
-  ModelTypedId,
-  ModelTypeKey,
-} from "@models/Model/Model.types.ts";
-import type { EmptyObject, Simplify, UnionToIntersection } from "type-fest";
+import { matchModel } from "@models/Model/matchModel/matchModel.ts";
+import type { MatchModelFn } from "@models/Model/matchModel/matchModel.ts";
+import type { ModelBase, ModelTypedId } from "@models/Model/Model.types.ts";
+import type { EmptyObject, Simplify } from "type-fest";
 
 export type IModelModule = {
   /**
@@ -42,19 +38,7 @@ export type IModelModule = {
    * @param fns - A record of functions, mapping a model type to a function.
    * @returns The result of the function that matched the model instance.
    */
-  match: <
-    M extends ModelBase,
-    FunctionRecord extends UnionToIntersection<
-      M extends any ?
-        {
-          [Mod in M as ModelType<Mod>]: (model: Mod) => unknown;
-        }
-      : never
-    >,
-  >(
-    model: M,
-    fns: FunctionRecord,
-  ) => ReturnType<FunctionRecord[M[ModelTypeKey]]>;
+  match: MatchModelFn;
 
   /**
    * Get the typed id of a model (i.e. an object that couples the model id
@@ -110,25 +94,7 @@ export const ModelModule: IModelModule = {
     } as ModelBase<MType, MProps>;
   },
 
-  match: <
-    M extends ModelBase,
-    FunctionRecord extends UnionToIntersection<
-      M extends any ?
-        {
-          [Mod in M as ModelType<Mod>]: (model: Mod) => unknown;
-        }
-      : never
-    >,
-  >(
-    model: M,
-    fns: FunctionRecord,
-  ) => {
-    const mType = model.__type;
-    if (mType in fns && fns[mType] !== undefined) {
-      return fns[mType](model) as ReturnType<FunctionRecord[M[ModelTypeKey]]>;
-    }
-    throw new Error(`No match found for model type: ${mType}`);
-  },
+  match: matchModel,
 
   getTypedId: <M extends ModelBase<string> & { id: unknown }>(
     model: M,

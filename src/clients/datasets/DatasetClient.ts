@@ -5,13 +5,14 @@ import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketReco
 import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral";
 import { DatasetParsers } from "$/models/datasets/Dataset/DatasetParsers";
 import { WorkspaceId } from "$/models/Workspace/Workspace.types";
-import { CSVFileDatasetClient } from "@/clients/datasets/CSVFileDatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { GoogleSheetsDatasetClient } from "@/clients/datasets/GoogleSheetsDatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
-import { OpenDataDatasetClient } from "@/clients/datasets/OpenDataDatasetClient";
-import { VirtualDatasetClient } from "@/clients/datasets/VirtualDatasetClient";
-import { DuckDBClient } from "@/clients/DuckDBClient/DuckDBClient";
+import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
+import { GoogleSheetsDatasetClient } from "@/clients/datasets/source-datasets/GoogleSheetsDatasetClient";
+import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
+import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
+import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
+import { DuckDBClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
@@ -48,7 +49,7 @@ export const DatasetClient = createUsableServiceClient(
       return {
         /**
          * For a given dataset, get its source-specific dataset, e.g.
-         * if it is a CSVFileDataset, GoogleSheetsDataset, etc.
+         * if it is a CsvFileDataset, GoogleSheetsDataset, etc.
          */
         getSourceDataset: async (params: {
           datasetId: DatasetId;
@@ -64,7 +65,7 @@ export const DatasetClient = createUsableServiceClient(
               );
             },
             csv_file: () => {
-              return CSVFileDatasetClient.getOne(
+              return CsvFileDatasetClient.getOne(
                 where("dataset_id", "eq", datasetId),
               );
             },
@@ -75,6 +76,11 @@ export const DatasetClient = createUsableServiceClient(
             },
             open_data: () => {
               return OpenDataDatasetClient.getOne(
+                where("dataset_id", "eq", datasetId),
+              );
+            },
+            xlsx_file: () => {
+              return XlsxFileDatasetClient.getOne(
                 where("dataset_id", "eq", datasetId),
               );
             },
@@ -173,7 +179,7 @@ export const DatasetClient = createUsableServiceClient(
          * @param params - The parameters for the dataset to be inserted.
          * @returns The inserted dataset.
          */
-        insertCSVFileDataset: async (params: {
+        insertCsvFileDataset: async (params: {
           datasetId: DatasetId;
           workspaceId: Workspace.Id;
           datasetName: string;
@@ -193,7 +199,7 @@ export const DatasetClient = createUsableServiceClient(
             timestampFormat: string | null;
           };
         }): Promise<Dataset.T> => {
-          const logger = clientLogger.appendName("insertCSVFileDataset");
+          const logger = clientLogger.appendName("insertCsvFileDataset");
           logger.log("Creating dataset", params);
 
           const {
@@ -237,6 +243,68 @@ export const DatasetClient = createUsableServiceClient(
             .throwOnError();
 
           logger.log("Successfully added dataset", dataset);
+          return parsers.fromDBReadToModelRead(dataset);
+        },
+
+        /**
+         * Inserts a new Excel (.xlsx) file dataset into the database.
+         *
+         * @param params - The parameters for the dataset to be inserted.
+         * @returns The inserted dataset.
+         */
+        insertXlsxFileDataset: async (params: {
+          datasetId: DatasetId;
+          workspaceId: Workspace.Id;
+          datasetName: string;
+          datasetDescription: string;
+          columns: DatasetColumnInput[];
+          isInCloudStorage: boolean;
+          sizeInBytes: number;
+          rowsToSkip: number;
+          sheetName?: string;
+          hasHeader: boolean;
+          dateFormat: string | null;
+          timestampFormat: string | null;
+        }): Promise<Dataset.T> => {
+          const logger = clientLogger.appendName("insertXlsxFileDataset");
+          logger.log("Creating xlsx file dataset", params);
+
+          const {
+            columns,
+            isInCloudStorage,
+            sizeInBytes,
+            workspaceId,
+            datasetName,
+            datasetDescription,
+            rowsToSkip,
+            hasHeader,
+            dateFormat,
+            timestampFormat,
+          } = params;
+          const { data: dataset } = await dbClient
+            .rpc("rpc_datasets__add_xlsx_file_dataset", {
+              p_dataset_id: params.datasetId,
+              p_workspace_id: workspaceId,
+              p_dataset_name: datasetName,
+              p_dataset_description: datasetDescription,
+              p_columns: columns.map((col) => {
+                return { ...col, description: col.description ?? null };
+              }),
+              p_is_in_cloud_storage: isInCloudStorage,
+              p_size_in_bytes: sizeInBytes,
+              p_rows_to_skip: rowsToSkip,
+              p_sheet_name: {
+                value: params.sheetName ?? null,
+              },
+              p_has_header: hasHeader,
+              p_date_format: {
+                date_format: dateFormat,
+                timestamp_format: timestampFormat,
+              },
+            })
+            .throwOnError();
+
+          logger.log("Successfully added xlsx file dataset", dataset);
           return parsers.fromDBReadToModelRead(dataset);
         },
 
@@ -358,7 +426,8 @@ export const DatasetClient = createUsableServiceClient(
       "getAllDatasetsWithColumns",
     ],
     mutationFns: [
-      "insertCSVFileDataset",
+      "insertCsvFileDataset",
+      "insertXlsxFileDataset",
       "insertGoogleSheetsDataset",
       "insertOpenDataDataset",
       "insertVirtualDataset",

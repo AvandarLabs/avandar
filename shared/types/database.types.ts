@@ -536,6 +536,66 @@ export type Database = {
           },
         ]
       }
+      datasets__xlsx_file: {
+        Row: {
+          created_at: string
+          dataset_id: string
+          date_format: string | null
+          has_header: boolean
+          id: string
+          is_in_cloud_storage: boolean
+          rows_to_skip: number
+          sheet_name: string | null
+          size_in_bytes: number
+          timestamp_format: string | null
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          dataset_id: string
+          date_format?: string | null
+          has_header?: boolean
+          id?: string
+          is_in_cloud_storage?: boolean
+          rows_to_skip?: number
+          sheet_name?: string | null
+          size_in_bytes: number
+          timestamp_format?: string | null
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          dataset_id?: string
+          date_format?: string | null
+          has_header?: boolean
+          id?: string
+          is_in_cloud_storage?: boolean
+          rows_to_skip?: number
+          sheet_name?: string | null
+          size_in_bytes?: number
+          timestamp_format?: string | null
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "datasets__xls_file_dataset_id_fkey"
+            columns: ["dataset_id"]
+            isOneToOne: true
+            referencedRelation: "datasets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "datasets__xls_file_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dexie_dbs: {
         Row: {
           created_at: string
@@ -1300,6 +1360,39 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      rpc_datasets__add_xlsx_file_dataset: {
+        Args: {
+          p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
+          p_dataset_description: string
+          p_dataset_id: string
+          p_dataset_name: string
+          p_date_format: Database["public"]["CompositeTypes"]["datasets__csv_file__date_format"]
+          p_has_header: boolean
+          p_is_in_cloud_storage: boolean
+          p_rows_to_skip: number
+          p_sheet_name: Database["public"]["CompositeTypes"]["util__nullable_text"]
+          p_size_in_bytes: number
+          p_workspace_id: string
+        }
+        Returns: {
+          created_at: string
+          date_of_last_sync: string | null
+          description: string | null
+          id: string
+          name: string
+          owner_id: string
+          owner_profile_id: string
+          source_type: Database["public"]["Enums"]["datasets__source_type"]
+          updated_at: string
+          workspace_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "datasets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       rpc_workspaces__create_with_owner: {
         Args: {
           p_display_name: string
@@ -1379,6 +1472,7 @@ export type Database = {
         | "google_sheets"
         | "virtual"
         | "open_data"
+        | "xlsx_file"
       entity_field_configs__value_extractor_type:
         | "dataset_column_value"
         | "manual_entry"
@@ -1594,6 +1688,7 @@ export const Constants = {
         "google_sheets",
         "virtual",
         "open_data",
+        "xlsx_file",
       ],
       entity_field_configs__value_extractor_type: [
         "dataset_column_value",
