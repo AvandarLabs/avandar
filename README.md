@@ -113,6 +113,12 @@ routes; they do not stub Supabase APIs.
 - React Router
 - Supabase
 
+## Reference documentation
+
+The [`reference/`](reference/) directory holds long-lived Markdown notes:
+architectural decisions, design decisions, and change checklists. Start there
+when touching cross-cutting areas (for example, dataset source types).
+
 ## Creating new CRUD models
 
 ### 1. DB schema changes

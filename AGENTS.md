@@ -4,6 +4,8 @@
 
 - Refer to `package.json` for the most recent library versions
 - Refer to the root `README.md` for the repo description and other conventions.
+- Use `reference/` for architectural notes, design decisions, and checklists
+  (for example `reference/<topic>.md`).
 - Use Context7 MCP to reference the most up-to-date documentation of any
   library when you need it.
 
