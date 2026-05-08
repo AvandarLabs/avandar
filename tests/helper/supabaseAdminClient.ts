@@ -26,14 +26,11 @@ export function getDatasetParquetObjectPath(options: {
  * @returns Admin Supabase client.
  */
 export function createSupabaseAdminClient(): SupabaseClient {
-  const apiUrl = process.env.VITE_SUPABASE_API_URL ?? process.env.SUPABASE_URL;
+  const apiUrl = process.env.SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!apiUrl || !serviceRoleKey) {
-    throw new Error(
-      "Missing VITE_SUPABASE_API_URL (or SUPABASE_URL) or " +
-        "SUPABASE_SERVICE_ROLE_KEY.",
-    );
+    throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.");
   }
 
   return createClient(apiUrl, serviceRoleKey, {
