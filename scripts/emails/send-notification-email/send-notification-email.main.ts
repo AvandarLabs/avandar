@@ -1,6 +1,7 @@
 import { stdin as input, stdout as output } from "node:process";
 import { createInterface } from "node:readline/promises";
 import { SupabaseClient } from "@supabase/supabase-js";
+import { createSupabaseAdminClient } from "$/db/supabase/createSupabaseAdminClient";
 import { EmailClient } from "$/EmailClient/EmailClient";
 import { NotificationEmailType } from "$/EmailClient/EmailClient.types";
 import { NOTIFICATION_EMAIL_TYPES } from "$/EmailClient/EmailClientConfig";
@@ -10,7 +11,6 @@ import { Database } from "$/types/database.types";
 import { program } from "commander";
 import { loadProductionEnv } from "scripts/utils/loadProductionEnv";
 import { z } from "zod";
-import { createSupabaseAdminClient } from "@/db/supabase/AvaSupabase";
 
 const RED = "\x1b[31m";
 const BLUE = "\x1b[34m";
