@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "$/types/database.types";
+import type { Database } from "$/types/database.types.ts";
 
 /**
  * An admin client for interacting with Supabase. This should only be used
