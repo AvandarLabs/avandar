@@ -175,7 +175,7 @@
     "stylelint-config-css-modules": "^4.6.0",
     "stylelint-config-standard": "^40.0.0",
     "stylelint-order": "^7.0.1",
-    "supabase": "^2.72.7",
+    "supabase": "^2.98.2",
     "tailwindcss": "^3.4.14",
     "type-fest": "^5.4.4",
     "typescript": "~5.9.3",

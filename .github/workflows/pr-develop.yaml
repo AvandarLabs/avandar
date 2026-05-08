@@ -23,8 +23,8 @@ jobs:
       - run: pnpm type-check
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
-      - run: supabase start
+          version: 2.98.2
+      - run: supabase start -x studio,imgproxy,mailpit,vector,logflare,supavisor
       - run: echo "SUPABASE_URL=\"$(supabase status -o env | sed -n 's/^API_URL=\"\([^\"]*\)\"$/\1/p')\"" >> "$GITHUB_ENV"
       - run: echo "SUPABASE_SERVICE_ROLE_KEY=\"$(supabase status -o env | sed -n 's/^SECRET_KEY=\"\([^\"]*\)\"$/\1/p')\"" >> "$GITHUB_ENV"
       - run: pnpm db:reset
