@@ -15,7 +15,7 @@ import tseslint from "typescript-eslint";
 
 export default [
   {
-    ignores: ["**/dist/**"],
+    ignores: ["**/dist/**", ".agents/**"],
   },
   eslintPluginImportX.flatConfigs.recommended,
   ...eslintPluginTailwindCSS.configs["flat/recommended"],
