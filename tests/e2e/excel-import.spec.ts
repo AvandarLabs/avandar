@@ -58,10 +58,12 @@ async function expectExcelParsePreview(options: {
 }
 
 test.describe("Excel manual upload", () => {
-  test("imports cholera NYC linelist XLSX then California COVID XLSX", async ({
+  test("XLSX import, cloud sync, offline then online again", async ({
     page,
   }) => {
-    test.setTimeout(360_000);
+    test.setTimeout(480_000);
+
+    const admin = createSupabaseAdminClient();
 
     await signInWithEmailPassword(page, {
       email: E2E_TEST_USER.email,
@@ -86,39 +88,6 @@ test.describe("Excel manual upload", () => {
         CHOLERA_NYC_XLSX_EXPECTED_ROW_COUNT.toLocaleString("en-US"),
       columnNames: EXPECTED_CHOLERA_COLUMN_NAMES,
       sampleCellSubstring: "Times Square",
-    });
-
-    await fileInput.setInputFiles(CALIFORNIA_XLSX_PATH);
-    await uploadSubmitButton.click();
-
-    await expectExcelParsePreview({
-      page,
-      formattedRowCount:
-        CALIFORNIA_CSV_EXPECTED_ROW_COUNT.toLocaleString("en-US"),
-      columnNames: EXPECTED_CSV_COLUMN_NAMES,
-      sampleCellSubstring: "California",
-    });
-  });
-
-  test("after save, parquet is in storage; offline toggle removes it", async ({
-    page,
-  }) => {
-    test.setTimeout(300_000);
-
-    const admin = createSupabaseAdminClient();
-
-    await signInWithEmailPassword(page, {
-      email: E2E_TEST_USER.email,
-      password: E2E_TEST_USER.password,
-    });
-
-    await page.goto(`/${E2E_SEEDED_WORKSPACE_SLUG}/data-manager/data-import`);
-
-    const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
-    const fileInput = uploadPanel.locator('input[type="file"]');
-    const uploadSubmitButton = uploadPanel.getByRole("button", {
-      name: "Upload",
-      exact: true,
     });
 
     await fileInput.setInputFiles(CALIFORNIA_XLSX_PATH);
@@ -193,5 +162,37 @@ test.describe("Excel manual upload", () => {
         { timeout: 180_000 },
       )
       .toBe(true);
+
+    await page
+      .getByRole("button", { name: "Allow online syncing" })
+      .first()
+      .click();
+
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "Allow syncing" })
+      .click();
+
+    await pollUntilCloudDatasetToggleShowsOnline(page);
+
+    await expect
+      .poll(
+        async () => {
+          return isDatasetParquetInStorage({
+            admin,
+            workspaceId,
+            datasetId,
+          });
+        },
+        { timeout: 180_000 },
+      )
+      .toBe(true);
+
+    const syncedToggle = page.getByRole("button", {
+      name: "Make offline-only",
+    });
+
+    await expect(syncedToggle).toBeVisible();
+    await expect(syncedToggle).toBeEnabled();
   });
 });
