@@ -55,13 +55,10 @@ jobs:
       - run: supabase start -x studio,imgproxy,mailpit,vector,logflare,supavisor
       - run: |
           SUPABASE_STATUS_ENV=$(supabase status -o env)
-          API_URL=$(echo "$SUPABASE_STATUS_ENV" \
-            | sed -n 's/^API_URL=\"\([^\"]*\)\"$/\1/p')
-          SECRET_KEY=$(echo "$SUPABASE_STATUS_ENV" \
-            | sed -n 's/^SECRET_KEY=\"\([^\"]*\)\"$/\1/p')
-          echo "SUPABASE_URL=\"${API_URL}\"" >> "$GITHUB_ENV"
-          echo "SUPABASE_SERVICE_ROLE_KEY=\"${SECRET_KEY}\"" >> "$GITHUB_ENV"
-          echo "SUPABASE_URL from status: ${API_URL}"
+          API_URL=$(echo "$SUPABASE_STATUS_ENV" | sed -n 's/^API_URL=\"\([^\"]*\)\"$/\1/p')
+          SECRET_KEY=$(echo "$SUPABASE_STATUS_ENV" | sed -n 's/^SECRET_KEY=\"\([^\"]*\)\"$/\1/p')
+          echo "SUPABASE_URL=${API_URL}" >> "$GITHUB_ENV"
+          echo "SUPABASE_SERVICE_ROLE_KEY=${SECRET_KEY}" >> "$GITHUB_ENV"
       - run: pnpm db:reset
       - run: pnpm fns:update-env
       - run: nohup pnpm fns:serve > /tmp/supabase-functions.log 2>&1 &
