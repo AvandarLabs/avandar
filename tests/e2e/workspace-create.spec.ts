@@ -6,7 +6,7 @@ import {
   E2E_TEST_USER,
   SEEDED_WORKSPACE_MENU_BUTTON_NAME,
 } from "./helpers/constants";
-import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
+import { LONG_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 import { deletePrimaryUserE2EWorkspaceTreeBySlug } from "./setup/e2eTestWorkspaceLifecycle";
 
 test.describe("workspace creation", () => {
@@ -34,17 +34,25 @@ test.describe("workspace creation", () => {
 
       const dialog = page.getByRole("dialog");
 
+      const slugValidResponsePromise = page.waitForResponse(
+        (response) => {
+          return (
+            response.request().method() === "POST" &&
+            response.url().includes("validate-slug") &&
+            response.ok()
+          );
+        },
+        { timeout: LONG_WAIT },
+      );
+
       await dialog.getByLabel("Workspace Name").fill(workspaceName);
       await expect(dialog.getByLabel("Workspace ID")).toHaveValue(
         workspaceSlug,
-        {
-          timeout: MEDIUM_WAIT,
-        },
+        { timeout: SHORT_WAIT },
       );
 
-      const workspaceIdInput = dialog.getByLabel("Workspace ID");
-      await workspaceIdInput.fill("");
-      await workspaceIdInput.fill(workspaceSlug);
+      // ensure the slug is valid
+      await slugValidResponsePromise;
 
       await dialog.getByLabel("Full Name").fill("E2E Tester");
       await dialog.getByLabel("Display Name").fill("E2E Tester");
