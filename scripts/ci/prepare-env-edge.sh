@@ -19,8 +19,7 @@ declare -A _edge_env=(
   [SB_JWT_ISSUER]="http://127.0.0.1:54321/auth/v1"
 )
 
-cp .env.example.edge .env.development.edge
-
+cp .env.example.edge $ENV_FILE_NAME
 
 for _key in "${!_edge_env[@]}"; do
   replace_env_var "$_key" "${_edge_env[$_key]}" "$ENV_FILE_NAME"

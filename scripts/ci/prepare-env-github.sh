@@ -5,8 +5,9 @@
 # All GITHUB_ENV vars get added to node process.env which makes them available
 # to our node scripts, e.g. for running tests.
 # ------------------------------------------------------------------------------
-
 source scripts/utils/common.sh
+
+# Exit on error or undefined variable.
 set -euo pipefail
 
 # Verify that GITHUB_ENV is set.

@@ -11,13 +11,15 @@ set -euo pipefail
 
 ENV_FILE_NAME=".env.development"
 
-# Declare env dictionary
+# Declare env dictionar
 declare -A _development_env=(
-  [SB_SECRET_KEY]="$(get_supabase_env_var SECRET_KEY)"
-  [SB_JWT_ISSUER]="http://127.0.0.1:54321/auth/v1"
+  [VITE_APP_URL]="http://localhost:5173/"
+  [VITE_SUPABASE_API_URL]="$(get_supabase_env_var API_URL)"
+  [VITE_SUPABASE_ANON_KEY]="$(get_supabase_env_var PUBLISHABLE_KEY)"
+  [VITE_HIDE_DEV_TOOLS]="true"
 )
 
-cp .env.example .env.development
+cp .env.example $ENV_FILE_NAME
 
 for _key in "${!_development_env[@]}"; do
   replace_env_var "$_key" "${_development_env[$_key]}" "$ENV_FILE_NAME"
