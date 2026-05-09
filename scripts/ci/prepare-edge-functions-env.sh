@@ -33,5 +33,5 @@ replace_env_var() {
 
 cp .env.example.edge .env.development.edge
 
-replace_env_var SB_SECRET_KEY "$(get_supabase_env_var SB_SECRET_KEY)"
+replace_env_var SB_SECRET_KEY "$(get_supabase_env_var SECRET_KEY)"
 replace_env_var SB_JWT_ISSUER "http://127.0.0.1:54321/auth/v1"
