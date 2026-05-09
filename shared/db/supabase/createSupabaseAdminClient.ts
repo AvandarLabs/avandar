@@ -16,8 +16,9 @@ export function createSupabaseAdminClient(
   } = {},
 ): SupabaseClient<Database> {
   const {
-    apiUrl = process.env.SUPABASE_URL ?? "",
-    serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+    apiUrl = process.env.SUPABASE_URL ?? "__EMPTY_URL__",
+    serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ??
+      "__EMPTY_SECRET_KEY__",
   } = options;
   return createClient(apiUrl, serviceRoleKey);
 }
