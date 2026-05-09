@@ -53,8 +53,9 @@ jobs:
         with:
           version: 2.98.2
       - run: supabase start -x studio,imgproxy,mailpit,vector,logflare,supavisor
-      - run: bash scripts/ci/prepare-github-env.sh
-      - run: bash scripts/ci/prepare-edge-functions-env.sh
+      - run: bash scripts/ci/prepare-env-github.sh
+      - run: bash scripts/ci/prepare-env-development.sh
+      - run: bash scripts/ci/prepare-env-edge.sh
       - run: pnpm db:reset
       - run: nohup pnpm fns:serve > /tmp/supabase-functions.log 2>&1 &
       - run: bash scripts/ci/verify-supabase-api-is-running.sh

@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
+# ------------------------------------------------------------------------------
 # Appends SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY to GITHUB_ENV using one
 # `supabase status -o env` snapshot (local stack).
 # All GITHUB_ENV vars get added to node process.env which makes them available
 # to our node scripts, e.g. for running tests.
+# ------------------------------------------------------------------------------
 
 source scripts/utils/common.sh
 set -euo pipefail
@@ -20,6 +22,8 @@ API_URL="$(get_supabase_env_var API_URL)"
 SECRET_KEY="$(get_supabase_env_var SECRET_KEY)"
 
 {
+  echo "VITE_APP_URL=http://localhost:5173/"
+  echo "VITE_SUPABASE_API_URL=http://127.0.0.1:54321"
   echo "SUPABASE_URL=${API_URL}"
   echo "SUPABASE_SERVICE_ROLE_KEY=${SECRET_KEY}"
 } >> "$GITHUB_ENV"

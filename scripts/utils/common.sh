@@ -48,3 +48,17 @@ get_scripts_dir() {
 run_vite_script() {
   $SCRIPTS_DIR/utils/run-vite-script.sh "$@"
 }
+
+# ------------------------------------------------------------------------------
+# Supabase functions
+# ------------------------------------------------------------------------------
+# Get snapshot of `supabase status -o env` (if not already set)
+if [[ -z "${_SUPABASE_STATUS_ENV:-}" ]]; then
+  _SUPABASE_STATUS_ENV="$(supabase status -o env)"
+fi
+
+# Parses one `NAME="value"` line from `_SUPABASE_STATUS_ENV`.
+get_supabase_env_var() {
+  local name="$1"
+  echo "$_SUPABASE_STATUS_ENV" | sed -n "s/^${name}=\"\\([^\"]*\\)\"$/\\1/p"
+}
