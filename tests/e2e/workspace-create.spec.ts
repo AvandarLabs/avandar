@@ -6,6 +6,7 @@ import {
   E2E_TEST_USER,
   SEEDED_WORKSPACE_MENU_BUTTON_NAME,
 } from "./helpers/constants";
+import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
 import { deletePrimaryUserE2EWorkspaceTreeBySlug } from "./setup/e2eTestWorkspaceLifecycle";
 
 test.describe("workspace creation", () => {
@@ -37,7 +38,7 @@ test.describe("workspace creation", () => {
       await expect(dialog.getByLabel("Workspace ID")).toHaveValue(
         workspaceSlug,
         {
-          timeout: 20_000,
+          timeout: MEDIUM_WAIT,
         },
       );
 
@@ -49,13 +50,13 @@ test.describe("workspace creation", () => {
       await dialog.getByLabel("Display Name").fill("E2E Tester");
 
       await expect(dialog.getByRole("button", { name: "Submit" })).toBeEnabled({
-        timeout: 30_000,
+        timeout: LONG_WAIT,
       });
 
       await dialog.getByRole("button", { name: "Submit" }).click();
 
       await expect(page).toHaveURL(new RegExp(`/${workspaceSlug}`), {
-        timeout: 60_000,
+        timeout: LONG_WAIT,
       });
     } finally {
       try {

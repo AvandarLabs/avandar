@@ -21,6 +21,7 @@ import {
   parseDatasetIdFromDataManagerUrl,
   pollUntilCloudDatasetToggleShowsOnline,
 } from "./helpers/manualUploadCloudSyncFlow";
+import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 import type { Page } from "@playwright/test";
 
 /**
@@ -35,27 +36,27 @@ async function expectExcelParsePreview(options: {
 }): Promise<void> {
   await expect(
     options.page.getByText("Data processed successfully", { exact: false }),
-  ).toBeVisible({ timeout: 60_000 });
+  ).toBeVisible({ timeout: LONG_WAIT });
 
   await expect(
     options.page.getByText(
       `Parsed ${options.formattedRowCount} rows successfully`,
     ),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: LONG_WAIT });
 
   await expect(
     options.page.getByText(/These are the first \d+ rows/),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: MEDIUM_WAIT });
 
   for (const columnName of options.columnNames) {
     await expect(
       options.page.getByRole("columnheader", { name: columnName }),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: SHORT_WAIT });
   }
 
   await expect(
     options.page.getByText(options.sampleCellSubstring).first(),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: SHORT_WAIT });
 }
 
 test.describe("Excel manual upload", () => {
@@ -132,7 +133,7 @@ test.describe("Excel manual upload", () => {
             datasetId,
           });
         },
-        { timeout: 60_000 },
+        { timeout: LONG_WAIT },
       )
       .toBe(true);
 
@@ -160,7 +161,7 @@ test.describe("Excel manual upload", () => {
 
           return parquetGone && offlineToggleVisible;
         },
-        { timeout: 60_000 },
+        { timeout: LONG_WAIT },
       )
       .toBe(true);
 
@@ -185,7 +186,7 @@ test.describe("Excel manual upload", () => {
             datasetId,
           });
         },
-        { timeout: 60_000 },
+        { timeout: LONG_WAIT },
       )
       .toBe(true);
 
@@ -193,8 +194,8 @@ test.describe("Excel manual upload", () => {
       name: "Make offline-only",
     });
 
-    await expect(syncedToggle).toBeVisible();
-    await expect(syncedToggle).toBeEnabled();
+    await expect(syncedToggle).toBeVisible({ timeout: SHORT_WAIT });
+    await expect(syncedToggle).toBeEnabled({ timeout: SHORT_WAIT });
 
     await deleteDatasetViaDataManagerUiAndVerify({
       admin,

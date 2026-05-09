@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test";
 import { E2E_SEEDED_WORKSPACE_SLUG } from "../setup/e2e-credentials";
+import { LONG_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
 
 type SignInOptions = {
@@ -21,12 +22,12 @@ export async function signInWithEmailPassword(
   await page.getByLabel("Email").fill(options.email);
   await page.getByLabel("Password").fill(options.password);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page).not.toHaveURL(/\/signin/, { timeout: 90_000 });
+  await expect(page).not.toHaveURL(/\/signin/, { timeout: LONG_WAIT });
 
   const workspaceSlug = options.workspaceSlug ?? E2E_SEEDED_WORKSPACE_SLUG;
   await page.goto(`/${workspaceSlug}`);
 
   await expect(page).toHaveURL(new RegExp(`/${workspaceSlug}`), {
-    timeout: 60_000,
+    timeout: LONG_WAIT,
   });
 }

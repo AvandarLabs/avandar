@@ -18,6 +18,7 @@ import {
   parseDatasetIdFromDataManagerUrl,
   pollUntilCloudDatasetToggleShowsOnline,
 } from "./helpers/manualUploadCloudSyncFlow";
+import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
 test.describe("CSV manual upload", () => {
   test("uploads CSV, verifies preview, offline/online cycle, parquet, toggle", async ({
@@ -45,23 +46,27 @@ test.describe("CSV manual upload", () => {
 
     await expect(
       page.getByText("Data processed successfully", { exact: false }),
-    ).toBeVisible({ timeout: 60_000 });
+    ).toBeVisible({ timeout: LONG_WAIT });
 
     const formattedRowCount =
       CALIFORNIA_CSV_EXPECTED_ROW_COUNT.toLocaleString("en-US");
     await expect(
       page.getByText(`Parsed ${formattedRowCount} rows successfully`),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: LONG_WAIT });
 
-    await expect(page.getByText(/These are the first \d+ rows/)).toBeVisible();
+    await expect(page.getByText(/These are the first \d+ rows/)).toBeVisible({
+      timeout: MEDIUM_WAIT,
+    });
 
     for (const columnName of EXPECTED_CSV_COLUMN_NAMES) {
       await expect(
         page.getByRole("columnheader", { name: columnName }),
-      ).toBeVisible();
+      ).toBeVisible({ timeout: SHORT_WAIT });
     }
 
-    await expect(page.getByText("California").first()).toBeVisible();
+    await expect(page.getByText("California").first()).toBeVisible({
+      timeout: SHORT_WAIT,
+    });
 
     await ensureCloudStorageCheckedAndSaveDataset({
       page,
@@ -93,7 +98,7 @@ test.describe("CSV manual upload", () => {
             datasetId,
           });
         },
-        { timeout: 60_000 },
+        { timeout: LONG_WAIT },
       )
       .toBe(true);
 
@@ -121,7 +126,7 @@ test.describe("CSV manual upload", () => {
 
           return parquetGone && offlineToggleVisible;
         },
-        { timeout: 60_000 },
+        { timeout: LONG_WAIT },
       )
       .toBe(true);
 
@@ -146,7 +151,7 @@ test.describe("CSV manual upload", () => {
             datasetId,
           });
         },
-        { timeout: 60_000 },
+        { timeout: LONG_WAIT },
       )
       .toBe(true);
 
@@ -154,8 +159,8 @@ test.describe("CSV manual upload", () => {
       name: "Make offline-only",
     });
 
-    await expect(syncedToggle).toBeVisible();
-    await expect(syncedToggle).toBeEnabled();
+    await expect(syncedToggle).toBeVisible({ timeout: SHORT_WAIT });
+    await expect(syncedToggle).toBeEnabled({ timeout: SHORT_WAIT });
 
     await deleteDatasetViaDataManagerUiAndVerify({
       admin,

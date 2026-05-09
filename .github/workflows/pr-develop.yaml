@@ -34,3 +34,13 @@ jobs:
       - run: bash scripts/ci/verify-supabase-functions-are-serving.sh
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test
+      - name: Upload Playwright report and test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-pr-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            playwright-report
+            test-results
+          retention-days: 30
+          if-no-files-found: warn
