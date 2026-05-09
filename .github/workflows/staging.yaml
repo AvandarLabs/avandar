@@ -53,35 +53,13 @@ jobs:
         with:
           version: 2.98.2
       - run: supabase start -x studio,imgproxy,mailpit,vector,logflare,supavisor
-      - run: |
-          SUPABASE_STATUS_ENV=$(supabase status -o env)
-          API_URL=$(echo "$SUPABASE_STATUS_ENV" | sed -n 's/^API_URL=\"\([^\"]*\)\"$/\1/p')
-          SECRET_KEY=$(echo "$SUPABASE_STATUS_ENV" | sed -n 's/^SECRET_KEY=\"\([^\"]*\)\"$/\1/p')
-          echo "SUPABASE_URL=${API_URL}" >> "$GITHUB_ENV"
-          echo "SUPABASE_SERVICE_ROLE_KEY=${SECRET_KEY}" >> "$GITHUB_ENV"
-      - run: pnpm db:reset
+      - run: bash scripts/ci/prepare-github-env.sh
       - run: bash scripts/ci/prepare-edge-functions-env.sh
-      - run: pnpm fns:update-env
+      - run: pnpm db:reset
       - run: nohup pnpm fns:serve > /tmp/supabase-functions.log 2>&1 &
-      - run: |
-          for i in {1..30}; do
-            if curl -fsS http://127.0.0.1:54321/rest/v1/ >/dev/null; then
-              exit 0
-            fi
-            sleep 2
-          done
-          echo "Local Supabase API did not become ready in time." >&2
-          exit 1
-      - run: |
-          for i in {1..30}; do
-            if curl -fsS http://127.0.0.1:54321/functions/v1/healthz \
-              >/dev/null; then
-              exit 0
-            fi
-            sleep 2
-          done
-          echo "Local Supabase Functions did not become ready in time." >&2
-          exit 1
+      - run: bash scripts/ci/verify-supabase-api-is-running.sh
+      - run: bash scripts/ci/verify-supabase-functions-are-serving.sh
+      - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test
 
   # Migrate Supabase Staging database
