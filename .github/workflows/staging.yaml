@@ -60,6 +60,7 @@ jobs:
           echo "SUPABASE_URL=${API_URL}" >> "$GITHUB_ENV"
           echo "SUPABASE_SERVICE_ROLE_KEY=${SECRET_KEY}" >> "$GITHUB_ENV"
       - run: pnpm db:reset
+      - run: bash scripts/ci/prepare-edge-functions-env.sh
       - run: pnpm fns:update-env
       - run: nohup pnpm fns:serve > /tmp/supabase-functions.log 2>&1 &
       - run: |
