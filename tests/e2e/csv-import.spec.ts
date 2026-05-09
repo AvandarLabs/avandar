@@ -23,7 +23,7 @@ test.describe("CSV manual upload", () => {
   test("uploads CSV, verifies preview, offline/online cycle, parquet, toggle", async ({
     page,
   }) => {
-    test.setTimeout(300_000);
+    test.setTimeout(240_000);
 
     const admin = createSupabaseAdminClient();
 
@@ -45,7 +45,7 @@ test.describe("CSV manual upload", () => {
 
     await expect(
       page.getByText("Data processed successfully", { exact: false }),
-    ).toBeVisible({ timeout: 120_000 });
+    ).toBeVisible({ timeout: 60_000 });
 
     const formattedRowCount =
       CALIFORNIA_CSV_EXPECTED_ROW_COUNT.toLocaleString("en-US");
@@ -93,7 +93,7 @@ test.describe("CSV manual upload", () => {
             datasetId,
           });
         },
-        { timeout: 180_000 },
+        { timeout: 60_000 },
       )
       .toBe(true);
 
@@ -121,7 +121,7 @@ test.describe("CSV manual upload", () => {
 
           return parquetGone && offlineToggleVisible;
         },
-        { timeout: 180_000 },
+        { timeout: 60_000 },
       )
       .toBe(true);
 
@@ -146,7 +146,7 @@ test.describe("CSV manual upload", () => {
             datasetId,
           });
         },
-        { timeout: 180_000 },
+        { timeout: 60_000 },
       )
       .toBe(true);
 

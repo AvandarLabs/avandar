@@ -30,7 +30,7 @@ test.describe("account registration", () => {
       await page.locator('input[name="confirmPassword"]').fill(password);
       await page.getByRole("button", { name: "Register" }).click();
 
-      await expect(page).not.toHaveURL(/\/register/, { timeout: 90_000 });
+      await expect(page).not.toHaveURL(/\/register/, { timeout: 60_000 });
 
       await expect(
         page.getByRole("heading", {

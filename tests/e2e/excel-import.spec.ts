@@ -35,7 +35,7 @@ async function expectExcelParsePreview(options: {
 }): Promise<void> {
   await expect(
     options.page.getByText("Data processed successfully", { exact: false }),
-  ).toBeVisible({ timeout: 120_000 });
+  ).toBeVisible({ timeout: 60_000 });
 
   await expect(
     options.page.getByText(
@@ -62,7 +62,7 @@ test.describe("Excel manual upload", () => {
   test("XLSX import, cloud sync, offline then online again", async ({
     page,
   }) => {
-    test.setTimeout(480_000);
+    test.setTimeout(240_000);
 
     const admin = createSupabaseAdminClient();
 
@@ -132,7 +132,7 @@ test.describe("Excel manual upload", () => {
             datasetId,
           });
         },
-        { timeout: 180_000 },
+        { timeout: 60_000 },
       )
       .toBe(true);
 
@@ -160,7 +160,7 @@ test.describe("Excel manual upload", () => {
 
           return parquetGone && offlineToggleVisible;
         },
-        { timeout: 180_000 },
+        { timeout: 60_000 },
       )
       .toBe(true);
 
@@ -185,7 +185,7 @@ test.describe("Excel manual upload", () => {
             datasetId,
           });
         },
-        { timeout: 180_000 },
+        { timeout: 60_000 },
       )
       .toBe(true);
 

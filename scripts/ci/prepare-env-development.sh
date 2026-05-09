@@ -13,7 +13,7 @@ ENV_FILE_NAME=".env.development"
 
 # Declare env dictionar
 declare -A _development_env=(
-  [VITE_APP_URL]="http://localhost:5173/"
+  [VITE_APP_URL]="http://127.0.0.1:5173/"
   [VITE_SUPABASE_API_URL]="$(get_supabase_env_var API_URL)"
   [VITE_SUPABASE_ANON_KEY]="$(get_supabase_env_var PUBLISHABLE_KEY)"
   [VITE_HIDE_DEV_TOOLS]="true"

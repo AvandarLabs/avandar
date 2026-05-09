@@ -15,8 +15,12 @@ ENV_FILE_NAME=".env.development.edge"
 
 # Declare env dictionary
 declare -A _edge_env=(
+  [MODE]="development"
   [SB_SECRET_KEY]="$(get_supabase_env_var SECRET_KEY)"
   [SB_JWT_ISSUER]="http://127.0.0.1:54321/auth/v1"
+  [SUPABASE_URL]="$(get_supabase_env_var API_URL)"
+  [SUPABASE_ANON_KEY]="$(get_supabase_env_var PUBLISHABLE_KEY)"
+  [SUPABASE_SERVICE_ROLE_KEY]="$(get_supabase_env_var SECRET_KEY)"
 )
 
 cp .env.example.edge $ENV_FILE_NAME
