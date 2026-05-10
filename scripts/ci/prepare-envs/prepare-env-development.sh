@@ -49,12 +49,12 @@ declare -A _development_env=(
   # Dev Fanout Server
   # We ignore these env vars for CI/CD. We should not be testing 3rd party
   # service webhooks in CI/CD.
-  AVA_DEV_FANOUT_SERVER_URL="__ignored__"
-  AVA_DEV_FANOUT_ADMIN_SERVER_SECRET="__ignored__"
+  [AVA_DEV_FANOUT_SERVER_URL]="__ignored__"
+  [AVA_DEV_FANOUT_ADMIN_SERVER_SECRET]="__ignored__"
 
   # Pipeline Server
-  AVA_PIPELINE_SERVER_URL="http://127.0.0.1:4611"
-  AVA_PIPELINE_SERVER_SECRET="$AVA_PIPELINE_SERVER_SECRET"
+  [AVA_PIPELINE_SERVER_URL]="http://127.0.0.1:4611"
+  [AVA_PIPELINE_SERVER_SECRET]="$AVA_PIPELINE_SERVER_SECRET"
 )
 
 cp .env.example $ENV_FILE_NAME
