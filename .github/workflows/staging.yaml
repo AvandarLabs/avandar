@@ -56,7 +56,7 @@ jobs:
         with:
           version: 2.98.2
       - run: supabase start -x studio,imgproxy,mailpit,vector,logflare,supavisor
-      - run: bash scripts/ci/prepare-envs.sh
+      - run: bash scripts/ci/prepare-envs/prepare-envs.sh
         env:
           POLAR_ACCESS_TOKEN: ${{ secrets.POLAR_ACCESS_TOKEN }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
