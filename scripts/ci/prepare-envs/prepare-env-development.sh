@@ -39,7 +39,7 @@ declare -A _development_env=(
   [RESEND_SITE_IMG_URL]="https://avandarlabs.com"
 
   # Email local testing
-  [DEV_EMAIL_OVERRIDE]="$DEV_EMAIL_OVERRIDE"
+  [DEV_EMAIL_OVERRIDE]="delivered@resend.dev"
   [RESEND_LOCAL_TEST_SEGMENT_ID]="$RESEND_LOCAL_TEST_SEGMENT_ID"
 
   # Billing/Polar
