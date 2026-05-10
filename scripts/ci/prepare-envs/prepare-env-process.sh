@@ -4,6 +4,10 @@
 # `supabase status -o env` snapshot (local stack).
 # All GITHUB_ENV vars get added to node process.env which makes them available
 # to our node scripts, e.g. for running tests.
+# TODO(jpsyx): verify if it is safe to remove this script entirely now that we
+#  `prepare-env-development.sh`. If all our scripts always use dotenv to load
+#  .env.development, then we should not have to populate the GITHUB_ENV
+#  anymore with this script.
 # ------------------------------------------------------------------------------
 source scripts/utils/common.sh
 

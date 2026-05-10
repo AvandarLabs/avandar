@@ -15,12 +15,38 @@ ENV_FILE_NAME=".env.development.edge"
 
 # Declare env dictionary
 declare -A _edge_env=(
-  [MODE]="development"
+  # App environment
   [SB_SECRET_KEY]="$(get_supabase_env_var SECRET_KEY)"
   [SB_JWT_ISSUER]="http://127.0.0.1:54321/auth/v1"
-  [SUPABASE_URL]="$(get_supabase_env_var API_URL)"
-  [SUPABASE_ANON_KEY]="$(get_supabase_env_var PUBLISHABLE_KEY)"
-  [SUPABASE_SERVICE_ROLE_KEY]="$(get_supabase_env_var SECRET_KEY)"
+  [MODE]="development"
+  [VITE_APP_URL]="http://127.0.0.1:5173/"
+
+  # Google environment variables
+  [GOOGLE_CLIENT_ID]="$GOOGLE_CLIENT_ID"
+  [GOOGLE_CLIENT_SECRET]="$GOOGLE_CLIENT_SECRET"
+  [GOOGLE_REDIRECT_URI]="$GOOGLE_REDIRECT_URI"
+
+  # Billing/Polar
+  [POLAR_ACCESS_TOKEN]="$POLAR_ACCESS_TOKEN"
+  [POLAR_SERVER_TYPE]="sandbox"
+
+  # Upstash + Redis
+  UPSTASH_REDIS_API_URL="$UPSTASH_REDIS_API_URL"
+  UPSTASH_REDIS_REST_API_TOKEN="$UPSTASH_REDIS_REST_API_TOKEN"
+
+  # Email
+  [RESEND_API_KEY]="$RESEND_API_KEY"
+  [RESEND_SITE_IMG_URL]="https://avandarlabs.com"
+
+  # Email local testing
+  [DEV_EMAIL_OVERRIDE]="delivered@resend.dev"
+  [RESEND_LOCAL_TEST_SEGMENT_ID]="$RESEND_LOCAL_TEST_SEGMENT_ID"
+
+  # OpenAI
+  [OPENAI_API_KEY]="$OPENAI_API_KEY"
+
+  # Featurebase (Customer support)
+  [FEATUREBASE_JWT_SECRET]="$FEATUREBASE_JWT_SECRET"
 )
 
 cp .env.example.edge $ENV_FILE_NAME
