@@ -154,6 +154,7 @@ export type Database = {
           description: string | null
           id: string
           is_public: boolean
+          is_restricted: boolean
           name: string
           owner_id: string
           owner_profile_id: string
@@ -167,6 +168,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_public?: boolean
+          is_restricted?: boolean
           name: string
           owner_id?: string
           owner_profile_id: string
@@ -180,6 +182,7 @@ export type Database = {
           description?: string | null
           id?: string
           is_public?: boolean
+          is_restricted?: boolean
           name?: string
           owner_id?: string
           owner_profile_id?: string
@@ -270,6 +273,7 @@ export type Database = {
           date_of_last_sync: string | null
           description: string | null
           id: string
+          is_restricted: boolean
           name: string
           owner_id: string
           owner_profile_id: string
@@ -282,6 +286,7 @@ export type Database = {
           date_of_last_sync?: string | null
           description?: string | null
           id?: string
+          is_restricted?: boolean
           name: string
           owner_id?: string
           owner_profile_id: string
@@ -294,6 +299,7 @@ export type Database = {
           date_of_last_sync?: string | null
           description?: string | null
           id?: string
+          is_restricted?: boolean
           name?: string
           owner_id?: string
           owner_profile_id?: string
@@ -781,6 +787,162 @@ export type Database = {
           },
         ]
       }
+      resource_shares: {
+        Row: {
+          created_at: string
+          id: string
+          principal_id: string | null
+          principal_type: Database["public"]["Enums"]["share_principal_type"]
+          resource_id: string
+          resource_type: Database["public"]["Enums"]["resource_type"]
+          role: Database["public"]["Enums"]["role_level"]
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          principal_id?: string | null
+          principal_type: Database["public"]["Enums"]["share_principal_type"]
+          resource_id: string
+          resource_type: Database["public"]["Enums"]["resource_type"]
+          role: Database["public"]["Enums"]["role_level"]
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          principal_id?: string | null
+          principal_type?: Database["public"]["Enums"]["share_principal_type"]
+          resource_id?: string
+          resource_type?: Database["public"]["Enums"]["resource_type"]
+          role?: Database["public"]["Enums"]["role_level"]
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_shares_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resource_user_group_tags: {
+        Row: {
+          created_at: string
+          id: string
+          resource_id: string
+          resource_type: Database["public"]["Enums"]["resource_type"]
+          user_group_id: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          resource_id: string
+          resource_type: Database["public"]["Enums"]["resource_type"]
+          user_group_id: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          resource_id?: string
+          resource_type?: Database["public"]["Enums"]["resource_type"]
+          user_group_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_user_group_tags_user_group_id_fkey"
+            columns: ["user_group_id"]
+            isOneToOne: false
+            referencedRelation: "user_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resource_user_group_tags_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      role_group_app_roles: {
+        Row: {
+          app: Database["public"]["Enums"]["app_type"]
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["role_level"]
+          role_group_id: string
+          updated_at: string
+        }
+        Insert: {
+          app: Database["public"]["Enums"]["app_type"]
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["role_level"]
+          role_group_id: string
+          updated_at?: string
+        }
+        Update: {
+          app?: Database["public"]["Enums"]["app_type"]
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["role_level"]
+          role_group_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_group_app_roles_role_group_id_fkey"
+            columns: ["role_group_id"]
+            isOneToOne: false
+            referencedRelation: "role_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      role_groups: {
+        Row: {
+          created_at: string
+          id: string
+          is_builtin: boolean
+          name: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_builtin?: boolean
+          name: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_builtin?: boolean
+          name?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_groups_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           created_at: string
@@ -893,6 +1055,108 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_app_roles: {
+        Row: {
+          app: Database["public"]["Enums"]["app_type"]
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["role_level"]
+          updated_at: string
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          app: Database["public"]["Enums"]["app_type"]
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["role_level"]
+          updated_at?: string
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          app?: Database["public"]["Enums"]["app_type"]
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["role_level"]
+          updated_at?: string
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_app_roles_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_group_memberships: {
+        Row: {
+          created_at: string
+          id: string
+          user_group_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_group_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_group_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_group_memberships_user_group_id_fkey"
+            columns: ["user_group_id"]
+            isOneToOne: false
+            referencedRelation: "user_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_groups: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+          workspace_id: string
+        }
+        Insert: {
+          color: string
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+          workspace_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_groups_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_profiles: {
         Row: {
@@ -1232,6 +1496,7 @@ export type Database = {
           date_of_last_sync: string | null
           description: string | null
           id: string
+          is_restricted: boolean
           name: string
           owner_id: string
           owner_profile_id: string
@@ -1260,6 +1525,7 @@ export type Database = {
           date_of_last_sync: string | null
           description: string | null
           id: string
+          is_restricted: boolean
           name: string
           owner_id: string
           owner_profile_id: string
@@ -1290,6 +1556,7 @@ export type Database = {
           date_of_last_sync: string | null
           description: string | null
           id: string
+          is_restricted: boolean
           name: string
           owner_id: string
           owner_profile_id: string
@@ -1318,6 +1585,7 @@ export type Database = {
           date_of_last_sync: string | null
           description: string | null
           id: string
+          is_restricted: boolean
           name: string
           owner_id: string
           owner_profile_id: string
@@ -1346,6 +1614,7 @@ export type Database = {
           date_of_last_sync: string | null
           description: string | null
           id: string
+          is_restricted: boolean
           name: string
           owner_id: string
           owner_profile_id: string
@@ -1379,6 +1648,7 @@ export type Database = {
           date_of_last_sync: string | null
           description: string | null
           id: string
+          is_restricted: boolean
           name: string
           owner_id: string
           owner_profile_id: string
@@ -1415,7 +1685,26 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      util__auth_user_can_access_resource: {
+        Args: {
+          p_min_role: Database["public"]["Enums"]["role_level"]
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+        }
+        Returns: boolean
+      }
+      util__get_auth_user_app_role: {
+        Args: {
+          p_app: Database["public"]["Enums"]["app_type"]
+          p_workspace_id: string
+        }
+        Returns: Database["public"]["Enums"]["role_level"]
+      }
       util__get_auth_user_owned_workspaces: { Args: never; Returns: string[] }
+      util__get_auth_user_user_group_ids: {
+        Args: { p_workspace_id: string }
+        Returns: string[]
+      }
       util__get_auth_user_workspaces: { Args: never; Returns: string[] }
       util__get_auth_user_workspaces_by_role: {
         Args: { role: string }
@@ -1426,8 +1715,28 @@ export type Database = {
         Args: { workspace_id: string }
         Returns: string[]
       }
+      util__is_settings_admin: {
+        Args: { p_workspace_id: string }
+        Returns: boolean
+      }
+      util__rank_to_role_level: {
+        Args: { p_rank: number }
+        Returns: Database["public"]["Enums"]["role_level"]
+      }
+      util__resource_effective_role: {
+        Args: {
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+        }
+        Returns: Database["public"]["Enums"]["role_level"]
+      }
+      util__role_level_rank: {
+        Args: { p_role: Database["public"]["Enums"]["role_level"] }
+        Returns: number
+      }
     }
     Enums: {
+      app_type: "data_sources" | "data_explorer" | "dashboards" | "settings"
       datasets__ava_data_type:
         | "boolean"
         | "bigint"
@@ -1476,6 +1785,9 @@ export type Database = {
       entity_field_configs__value_extractor_type:
         | "dataset_column_value"
         | "manual_entry"
+      resource_type: "dashboard" | "dataset"
+      role_level: "viewer" | "editor" | "admin"
+      share_principal_type: "user" | "user_group" | "workspace"
       subscriptions__feature_plan_type: "free" | "basic" | "premium"
       subscriptions__status:
         | "incomplete"
@@ -1642,6 +1954,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      app_type: ["data_sources", "data_explorer", "dashboards", "settings"],
       datasets__ava_data_type: [
         "boolean",
         "bigint",
@@ -1694,6 +2007,9 @@ export const Constants = {
         "dataset_column_value",
         "manual_entry",
       ],
+      resource_type: ["dashboard", "dataset"],
+      role_level: ["viewer", "editor", "admin"],
+      share_principal_type: ["user", "user_group", "workspace"],
       subscriptions__feature_plan_type: ["free", "basic", "premium"],
       subscriptions__status: [
         "incomplete",

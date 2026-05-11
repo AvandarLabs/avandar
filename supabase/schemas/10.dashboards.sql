@@ -22,6 +22,8 @@ create table public.dashboards (
   slug text,
   -- The dashboard's full config as a JSON blob
   config jsonb not null,
+  -- When true, tag-based app roles do not apply; shares still can
+  is_restricted boolean not null default false,
   constraint dashboards__workspace_id_slug unique (
     workspace_id,
     slug

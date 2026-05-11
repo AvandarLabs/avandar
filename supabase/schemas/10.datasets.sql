@@ -31,7 +31,9 @@ create table public.datasets (
   -- The source of the dataset. E.g. "csv_file", "xlsx_file", etc
   source_type public.datasets__source_type not null,
   -- Description of the dataset
-  description text
+  description text,
+  -- When true, tag-based app roles do not apply; shares still can
+  is_restricted boolean not null default false
 );
 
 -- Enable row level security
