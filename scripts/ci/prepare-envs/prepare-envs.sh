@@ -79,27 +79,25 @@ check_empty_env_vars() {
   fi
 }
 
-declare -A EMPTY_VARS
+# One entry per failing file: "filename:var1 var2 ..." (indexed array avoids
+# `set -u` issues with empty associative arrays on some bash versions).
+EMPTY_ENV_ENTRIES=()
 
 # Loop through each env file and check for empty env vars.
-# Add any empty vars to the EMPTY_VARS associative array.
 for envfile in "${ENV_FILES[@]}"; do
   result="$(check_empty_env_vars "$envfile")"
   if [[ -n "$result" ]]; then
-    filename="${result%%:*}"
-    vars_str="${result#*:}"
-    IFS=' ' read -ra vars <<< "$vars_str"
-    EMPTY_VARS["$filename"]="${vars[*]}"
+    EMPTY_ENV_ENTRIES+=("$result")
   fi
 done
 
-# Check if there are any entries in the EMPTY_VARS associative array.
-# If yes, throw non-zero exit code.
-if (( ${#EMPTY_VARS[@]} > 0 )); then
+if [[ ${#EMPTY_ENV_ENTRIES[@]} -gt 0 ]]; then
   echo "❌ Environment variable checks failed. The following variables are empty:"
-  for file in "${!EMPTY_VARS[@]}"; do
-    echo "  In $file:"
-    for var in ${EMPTY_VARS[$file]}; do
+  for entry in "${EMPTY_ENV_ENTRIES[@]}"; do
+    filename="${entry%%:*}"
+    vars_str="${entry#*:}"
+    echo "  In $filename:"
+    for var in $vars_str; do
       echo "    - $var"
     done
   done
