@@ -30,6 +30,9 @@ export type DashboardRead = Model.Base<
     /** Whether the dashboard is public. */
     isPublic: boolean;
 
+    /** Restricted unless caller has explicit grants (RBAC). */
+    isRestricted: boolean;
+
     /** The dashboard's name. */
     name: string;
 
@@ -60,7 +63,10 @@ export type DashboardModel = SupabaseCRUDModelSpec<
     modelPrimaryKeyType: DashboardId;
     modelTypes: {
       Read: DashboardRead;
-      Insert: SetOptional<DashboardRead, "createdAt" | "id" | "updatedAt">;
+      Insert: SetOptional<
+        DashboardRead,
+        "createdAt" | "id" | "isRestricted" | "updatedAt"
+      >;
       Update: Partial<DashboardRead>;
     };
   },
