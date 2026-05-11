@@ -1,4 +1,5 @@
 import { expect } from "@playwright/test";
+import { SHORT_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
 
 /**
@@ -64,7 +65,7 @@ export async function ensureCloudStorageCheckedAndSaveDataset(options: {
     name: /This dataset can be stored in the cloud/i,
   });
 
-  await expect(cloudCheckbox).toBeVisible();
+  await expect(cloudCheckbox).toBeVisible({ timeout: SHORT_WAIT });
 
   if (!(await cloudCheckbox.isChecked())) {
     await cloudCheckbox.check();

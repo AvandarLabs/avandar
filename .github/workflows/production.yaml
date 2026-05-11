@@ -14,12 +14,13 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: corepack enable
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: pnpm
+          package-manager-cache: true
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
 
@@ -28,12 +29,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: lint
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: corepack enable
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: pnpm
+          package-manager-cache: true
       - run: pnpm install --frozen-lockfile
       - run: pnpm type-check
 
@@ -41,21 +43,66 @@ jobs:
   test:
     runs-on: ubuntu-latest
     needs: typescript
+    # Even though this is a production CI, we still use the staging env vars
+    # to run tests.
+    environment: staging
+    env:
+      POLAR_ACCESS_TOKEN: ${{ secrets.POLAR_ACCESS_TOKEN }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      GOOGLE_REDIRECT_URI: ${{ secrets.GOOGLE_REDIRECT_URI }}
+      VITE_GOOGLE_PICKER_API_KEY: ${{ secrets.VITE_GOOGLE_PICKER_API_KEY }}
+      UPSTASH_REDIS_API_URL: ${{ secrets.UPSTASH_REDIS_API_URL }}
+      UPSTASH_REDIS_REST_API_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_API_TOKEN }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      RESEND_LOCAL_TEST_SEGMENT_ID: ${{ secrets.RESEND_LOCAL_TEST_SEGMENT_ID }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      FEATUREBASE_JWT_SECRET: ${{ secrets.FEATUREBASE_JWT_SECRET }}
+      AVA_PIPELINE_SERVER_SECRET: ${{ secrets.AVA_PIPELINE_SERVER_SECRET }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: corepack enable
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: pnpm
+          package-manager-cache: true
       - run: pnpm install --frozen-lockfile
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.98.2
+      - run: supabase start -x studio,imgproxy,mailpit,vector,logflare,supavisor
+      - run: bash scripts/ci/prepare-envs/prepare-envs.sh
+      - run: pnpm db:reset
+      - run: nohup pnpm fns:serve > /tmp/supabase-functions.log 2>&1 &
+      - run: bash scripts/ci/verify-supabase-api-is-running.sh
+      - run: bash scripts/ci/verify-supabase-functions-are-serving.sh
+      - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test
+      - name: Upload Supabase functions log
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: supabase-functions-log-production-${{ github.run_id }}-${{ github.run_attempt }}
+          path: /tmp/supabase-functions.log
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Upload Playwright report and test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-production-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            playwright-report
+            test-results
+          retention-days: 30
+          if-no-files-found: warn
 
   # Migrate Supabase Production database
   migrate:
     runs-on: ubuntu-latest
     needs: test
-
+    # Database migration should be done with the production environment
     environment: production
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -63,10 +110,10 @@ jobs:
       SUPABASE_PROJECT_ID: ${{ secrets.PRODUCTION_PROJECT_ID }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.98.2
 
       - run: supabase link --project-ref $SUPABASE_PROJECT_ID
       - run: supabase db push

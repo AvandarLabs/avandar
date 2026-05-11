@@ -4,7 +4,7 @@ import { ObjectDescriptionList } from "@ui/ObjectDescriptionList/ObjectDescripti
 import { where } from "@utils/filters/where/where";
 import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { DuckDBClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { promiseMap } from "@/lib/utils/promises";
@@ -22,9 +22,9 @@ export function DevDuckDBTableSchemaView(): JSX.Element {
   const [tables = [], isLoadingSchemas] = useQuery({
     queryKey: ["dev", "duckdb", "table-schemas", datasets, entityConfigs],
     queryFn: async () => {
-      const tableNames = await DuckDBClient.getTableNames();
+      const tableNames = await DuckDbClient.getTableNames();
       return await promiseMap(tableNames, async (tableName) => {
-        const schema = await DuckDBClient.getTableSchema(tableName);
+        const schema = await DuckDbClient.getTableSchema(tableName);
         const dataset = datasets.find(propEq("id", tableName as DatasetId));
         const entityConfig = entityConfigs.find(
           propEq("id", tableName as EntityConfigId),

@@ -12,7 +12,7 @@ import { GoogleSheetsDatasetClient } from "@/clients/datasets/source-datasets/Go
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
-import { DuckDBClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
@@ -413,7 +413,7 @@ export const DatasetClient = createUsableServiceClient(
             const { datasetId } = localDataset;
             await LocalDatasetClient.delete({ id: datasetId });
             // finally, delete the raw data locally from DuckDB
-            await DuckDBClient.dropTableViewAndFile(datasetId);
+            await DuckDbClient.dropTableViewAndFile(datasetId);
           }
         },
       };

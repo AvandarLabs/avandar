@@ -3,7 +3,7 @@ import { uuid } from "$/lib/uuid";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUIProvider } from "@/components/common/AvandarUIProvider";
+import { AvandarUiProvider } from "@/components/common/AvandarUiProvider";
 import { DatasetImportForm } from "./DatasetImportForm";
 import type { DataSourceMetadata } from "./DatasetImportForm";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
@@ -143,7 +143,7 @@ describe("DatasetImportForm", () => {
     const onDataSourceMetadataChange = vi.fn();
     const metadata = _csvDataSourceMetadata();
     render(
-      <AvandarUIProvider>
+      <AvandarUiProvider>
         <DatasetImportForm
           rows={[{ city: "LA" }]}
           initialDatasetName="cities.csv"
@@ -152,7 +152,7 @@ describe("DatasetImportForm", () => {
           dataSourceMetadata={metadata}
           parseOptions={metadata.parseOptions}
         />
-      </AvandarUIProvider>,
+      </AvandarUiProvider>,
     );
 
     fireEvent.change(screen.getByLabelText("Delimiter"), {
@@ -170,7 +170,7 @@ describe("DatasetImportForm", () => {
   it("disables sheet picker when xlsx has one sheet", () => {
     const metadata = _xlsxDataSourceMetadata(["Sheet1"]);
     render(
-      <AvandarUIProvider>
+      <AvandarUiProvider>
         <DatasetImportForm
           rows={[{ city: "LA" }]}
           initialDatasetName="cities.xlsx"
@@ -179,7 +179,7 @@ describe("DatasetImportForm", () => {
           dataSourceMetadata={metadata}
           parseOptions={metadata.parseOptions}
         />
-      </AvandarUIProvider>,
+      </AvandarUiProvider>,
     );
 
     expect(
@@ -191,7 +191,7 @@ describe("DatasetImportForm", () => {
     const onDataSourceMetadataChange = vi.fn();
     const metadata = _xlsxDataSourceMetadata(["Sheet1", "Sheet2"]);
     render(
-      <AvandarUIProvider>
+      <AvandarUiProvider>
         <DatasetImportForm
           rows={[{ city: "LA" }]}
           initialDatasetName="cities.xlsx"
@@ -200,7 +200,7 @@ describe("DatasetImportForm", () => {
           dataSourceMetadata={metadata}
           parseOptions={metadata.parseOptions}
         />
-      </AvandarUIProvider>,
+      </AvandarUiProvider>,
     );
 
     expect(
@@ -240,9 +240,9 @@ describe("DatasetImportForm", () => {
     }
 
     render(
-      <AvandarUIProvider>
+      <AvandarUiProvider>
         <ControlledMetadataHarness />
-      </AvandarUIProvider>,
+      </AvandarUiProvider>,
     );
 
     const warningRegex = /This dataset will no longer be stored online/i;

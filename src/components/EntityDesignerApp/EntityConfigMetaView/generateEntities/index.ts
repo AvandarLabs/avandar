@@ -7,7 +7,7 @@ import { propEq } from "@utils/objects/hofs/propEq/propEq";
 import { makeObject } from "@utils/objects/makeObject/makeObject";
 import { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
-import { DuckDBClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { getSQLSelectOfExtractor } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getDatasetColumnFieldValues";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
@@ -131,7 +131,7 @@ export async function generateEntities(
   // optimization that can be done to only upsert new rows or rows that have
   // a new name. There is no need to upsert rows that already exist and have
   // not changed.
-  const jobSummary = await DuckDBClient.forEachQueryPage<Entity.T<"DBRead">>(
+  const jobSummary = await DuckDbClient.forEachQueryPage<Entity.T<"DBRead">>(
     { tableName: entityConfig.id, castTimestampsToISO: true },
     async (page) => {
       await EntityClient.crudFunctions.bulkInsert({

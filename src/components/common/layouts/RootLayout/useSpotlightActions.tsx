@@ -7,7 +7,7 @@ import { IconDatabase, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "@tanstack/react-router";
 import { notifySuccess } from "@ui/notifications/notify";
 import { useMemo } from "react";
-import { DuckDBClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { SpotlightLinks } from "@/config/SpotlightLinks";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { clearOPFS } from "@/lib/utils/browser/clearOPFS";
@@ -80,7 +80,7 @@ export function useSpotlightActions(
               description: "List all DuckDB tables",
               leftSection: <IconTrash size={24} stroke={1.5} />,
               onClick: async () => {
-                const relationNames = await DuckDBClient.getTableOrViewNames();
+                const relationNames = await DuckDbClient.getTableOrViewNames();
                 Logger.log("Relation names", relationNames.join("; "));
                 notifySuccess({
                   title: "Check the console",

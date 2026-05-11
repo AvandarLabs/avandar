@@ -91,6 +91,7 @@ port = 51634
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
+# Local Storage must stay enabled for E2E (workspaces bucket uploads).
 [storage]
 enabled = true
 # The maximum file size allowed (e.g. "5MB", "500KB").

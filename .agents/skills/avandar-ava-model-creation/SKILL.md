@@ -56,7 +56,7 @@ Use `shared/models/...` when the model represents a Supabase table or RPC-orient
 Examples:
 
 - `shared/models/datasets/Dataset`
-- `shared/models/datasets/CSVFileDataset`
+- `shared/models/datasets/CsvFileDataset`
 - `shared/models/datasets/OpenDataDataset`
 - `shared/models/Dashboard`
 - `shared/models/Workspace`
@@ -163,7 +163,7 @@ Use `ava new model` with:
 The scaffold is only a starting point. Compare it against the real patterns in:
 
 - `shared/models/datasets/Dataset`
-- `shared/models/datasets/CSVFileDataset`
+- `shared/models/datasets/CsvFileDataset`
 - `shared/models/datasets/OpenDataDataset`
 - `shared/models/Dashboard`
 - `shared/models/EntityConfig/EntityFieldConfig`
@@ -205,7 +205,7 @@ If the model is persisted in Supabase, add a client in the matching `src/clients
 
 Examples:
 
-- `src/clients/datasets/CSVFileDatasetClient.ts`
+- `src/clients/datasets/CsvFileDatasetClient.ts`
 - `src/clients/datasets/DatasetClient.ts`
 - `src/clients/catalog-entries/OpenDataCatalogEntryClient.ts`
 - `src/clients/entities/EntityFieldConfigClient.ts`
@@ -383,9 +383,9 @@ ava new model ExampleDataset \
   --clients-dir datasets
 ```
 
-5. Edit the scaffold to match patterns from `CSVFileDataset`, `OpenDataDataset`, and `Dataset`.
-6. Add or refine parsers.
-7. Fix the generated client to use `AvaSupabase.DB` and `createUsableServiceClient(...)`.
+1. Edit the scaffold to match patterns from `CsvFileDataset`, `OpenDataDataset`, and `Dataset`.
+2. Add or refine parsers.
+3. Fix the generated client to use `AvaSupabase.DB` and `createUsableServiceClient(...)`.
 
 ### Example: new standalone shared model
 

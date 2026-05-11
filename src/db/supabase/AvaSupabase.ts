@@ -40,21 +40,3 @@ export type GetSupabaseClientOptions<DB> =
     DB["__InternalSupabase"]
   : // otherwise default to 12
     { PostgrestVersion: "12" };
-
-/**
- * An admin client for interacting with Supabase. This should only be used
- * when seeding the database.
- * @returns An admin client for interacting with Supabase.
- */
-export function createSupabaseAdminClient(
-  options: {
-    apiUrl?: string;
-    serviceRoleKey?: string;
-  } = {},
-): SupabaseClient<Database> {
-  const {
-    apiUrl = import.meta.env.VITE_SUPABASE_API_URL ?? "",
-    serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
-  } = options;
-  return createClient(apiUrl, serviceRoleKey);
-}

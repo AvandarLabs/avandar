@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { cleanupTestUser } from "./helpers/cleanupTestUser";
+import { LONG_WAIT } from "./helpers/timeouts";
 
 function _isSelfRegistrationDisabled(): boolean {
   const raw = process.env.VITE_FEATURE_FLAGS ?? "";
@@ -30,13 +31,13 @@ test.describe("account registration", () => {
       await page.locator('input[name="confirmPassword"]').fill(password);
       await page.getByRole("button", { name: "Register" }).click();
 
-      await expect(page).not.toHaveURL(/\/register/, { timeout: 90_000 });
+      await expect(page).not.toHaveURL(/\/register/, { timeout: LONG_WAIT });
 
       await expect(
         page.getByRole("heading", {
           name: /welcome to your first workspace/i,
         }),
-      ).toBeVisible({ timeout: 60_000 });
+      ).toBeVisible({ timeout: LONG_WAIT });
     } finally {
       await cleanupTestUser(email);
     }

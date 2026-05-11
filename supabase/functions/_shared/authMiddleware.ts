@@ -2,8 +2,8 @@ import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { BAD_REQUEST, UNAUTHORIZED } from "@sbfn/_shared/httpCodes.ts";
 import { responseError } from "@sbfn/_shared/MiniServer/responseError.ts";
 import {
-    AvaSupabaseClient,
-    createSupabaseClient,
+  AvaSupabaseClient,
+  createSupabaseClient,
 } from "@sbfn/_shared/supabase.ts";
 import * as jose from "jsr:@panva/jose@6";
 import type { User } from "@supabase/supabase-js";
@@ -35,9 +35,13 @@ function _getAuthToken(req: Request) {
   return token;
 }
 
+/** Seconds of skew allowed between Auth token `iat` and edge runtime clock. */
+const JWT_VERIFY_CLOCK_TOLERANCE_SECONDS = 60;
+
 function _verifySupabaseJWT(jwt: string) {
   return jose.jwtVerify(jwt, SUPABASE_JWT_KEYS, {
     issuer: SUPABASE_JWT_ISSUER,
+    clockTolerance: JWT_VERIFY_CLOCK_TOLERANCE_SECONDS,
   });
 }
 

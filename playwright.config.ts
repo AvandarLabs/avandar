@@ -1,6 +1,7 @@
 import path from "node:path";
 import { defineConfig, devices } from "@playwright/test";
 import dotenv from "dotenv";
+import { SHORT_WAIT } from "./tests/e2e/helpers/timeouts";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env.development") });
 
@@ -14,11 +15,11 @@ export default defineConfig({
    */
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 1 : 0,
   workers: 1,
   reporter: [["list"], ["html", { open: "never" }]],
   timeout: 120_000,
-  expect: { timeout: 30_000 },
+  expect: { timeout: SHORT_WAIT },
   use: {
     baseURL,
     trace: "on-first-retry",

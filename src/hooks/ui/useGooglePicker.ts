@@ -1,5 +1,6 @@
 import { useQuery } from "@hooks/useQuery/useQuery";
 import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray";
+import { MIMEType } from "@utils/index";
 import { noop } from "@utils/misc/noop";
 import { useEffect, useMemo, useState } from "react";
 import { APIClient } from "@/clients/APIClient";
@@ -13,9 +14,12 @@ import type {
   GPickerResponseObject,
 } from "@/lib/types/google-picker";
 
-const GOOGLE_PICKER_API_KEY = import.meta.env.VITE_GOOGLE_PICKER_API_KEY!;
-if (!GOOGLE_PICKER_API_KEY) {
-  throw new Error("Google Picker API key is not defined");
+function _getGooglePickerAPIKey(): string {
+  const key = import.meta.env.VITE_GOOGLE_PICKER_API_KEY;
+  if (!key) {
+    throw new Error("Google Picker API key is not defined");
+  }
+  return key;
 }
 
 type UseGooglePickerOptions = {
@@ -24,8 +28,6 @@ type UseGooglePickerOptions = {
     googleAccount: GoogleToken;
   }) => void;
 };
-
-const GOOGLE_SPREADSHEET_MIME_TYPE = "application/vnd.google-apps.spreadsheet";
 
 export function useGooglePicker({
   onGoogleSheetPicked = noop,
@@ -69,15 +71,15 @@ export function useGooglePicker({
     if (pickerAPI && accessToken) {
       const sheetsView = new pickerAPI.DocsView(pickerAPI.ViewId.SPREADSHEETS)
         .setMode(pickerAPI.DocsViewMode.LIST)
-        .setMimeTypes(GOOGLE_SPREADSHEET_MIME_TYPE)
+        .setMimeTypes(MIMEType.APPLICATION_GOOGLE_SPREADSHEET)
         .setIncludeFolders(true);
 
       return new pickerAPI.PickerBuilder()
         .addView(sheetsView)
         .setOAuthToken(accessToken) // get the accessToken
-        .setDeveloperKey(GOOGLE_PICKER_API_KEY) // get my developer key
+        .setDeveloperKey(_getGooglePickerAPIKey()) // get my developer key
         .setMaxItems(1)
-        .setSelectableMimeTypes(GOOGLE_SPREADSHEET_MIME_TYPE)
+        .setSelectableMimeTypes(MIMEType.APPLICATION_GOOGLE_SPREADSHEET)
         .setCallback((response: GPickerResponseObject) => {
           if (
             response.action === pickerAPI.Action.PICKED &&

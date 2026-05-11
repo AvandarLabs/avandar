@@ -1,7 +1,7 @@
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { AvandarUIProvider } from "@/components/common/AvandarUIProvider";
+import { AvandarUiProvider } from "@/components/common/AvandarUiProvider";
 import { FeedbackButton } from "@/components/FeedbackButton/FeedbackButton";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import type { AvaRouterRootContext } from "@/config/AvaRouter";
@@ -15,7 +15,7 @@ export const Route = createRootRouteWithContext<AvaRouterRootContext>()({
 
 function RouterRootComponent() {
   return (
-    <AvandarUIProvider>
+    <AvandarUiProvider>
       <Outlet />
       {import.meta.env.VITE_HIDE_DEV_TOOLS === "true" ? null : (
         <>
@@ -26,6 +26,6 @@ function RouterRootComponent() {
       {isFlagEnabled(FeatureFlag.EnableUserFeedback) ?
         <FeedbackButton />
       : null}
-    </AvandarUIProvider>
+    </AvandarUiProvider>
   );
 }

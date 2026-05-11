@@ -12,7 +12,7 @@ type Props = {
   children: ReactNode;
 };
 
-export function AvandarUIProvider({ children }: Props): JSX.Element {
+export function AvandarUiProvider({ children }: Props): JSX.Element {
   return (
     <MantineProvider theme={Theme} cssVariablesResolver={cssVariablesResolver}>
       <ModalsProvider modalProps={{ zIndex: MODAL_ROOT_Z_INDEX }}>

@@ -12,7 +12,7 @@ import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
 import { uuid } from "$/lib/uuid";
 import Papa from "papaparse";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUIProvider } from "@/components/common/AvandarUIProvider";
+import { AvandarUiProvider } from "@/components/common/AvandarUiProvider";
 import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -153,7 +153,7 @@ function renderWithProviders(
     wrapper: ({ children }) => {
       return (
         <QueryClientProvider client={queryClient}>
-          <AvandarUIProvider>{children}</AvandarUIProvider>
+          <AvandarUiProvider>{children}</AvandarUiProvider>
         </QueryClientProvider>
       );
     },

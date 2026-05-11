@@ -31,7 +31,27 @@ pnpm db:gen-types
 # Run our custom seed script unless --no-seed was specified
 if [ "$SKIP_SEED" = false ]; then
   echo "Seeding database with custom data..."
-  pnpm vite-script "$SCRIPT_DIR/seedDatabaseScript.ts"
+
+  if [ -z "${SUPABASE_URL:-}" ]; then
+    echo "SUPABASE_URL is unset; cannot seed." >&2
+    exit 1
+  fi
+
+  if [[ ! "${SUPABASE_URL}" =~ ^https?:// ]]; then
+    echo \
+      "SUPABASE_URL must start with http:// or https:// (got: ${SUPABASE_URL})" \
+      >&2
+    exit 1
+  fi
+
+  if [ -z "${SUPABASE_SERVICE_ROLE_KEY:-}" ]; then
+    echo "SUPABASE_SERVICE_ROLE_KEY is unset; cannot seed." >&2
+    exit 1
+  fi
+
+  env SUPABASE_URL="$SUPABASE_URL" \
+    SUPABASE_SERVICE_ROLE_KEY="$SUPABASE_SERVICE_ROLE_KEY" \
+    pnpm vite-script "$SCRIPT_DIR/seedDatabaseScript.ts"
 else
   echo "Skipping database seed (--no-seed specified)"
 fi

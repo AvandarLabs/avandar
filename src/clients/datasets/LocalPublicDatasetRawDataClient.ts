@@ -4,7 +4,7 @@ import { withQueryHooks } from "@hooks/withQueryHooks/withQueryHooks";
 import { withLogger } from "@logger/module-augmenters/withLogger";
 import { isDefined } from "@utils/guards/isDefined/isDefined";
 import { LocalPublicDatasetClient } from "@/clients/datasets/LocalPublicDatasetClient";
-import { DuckDBClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { promiseMap } from "@/lib/utils/promises";
 import type { LocalPublicDataset } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
 import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
@@ -49,7 +49,7 @@ function createLocalPublicDatasetRawQueryClient(): WithLogger<
         const loadedDatasetIds = (
           await promiseMap(datasetIds, async (datasetId) => {
             const isAlreadyInMemory: boolean =
-              await DuckDBClient.hasTableOrView(datasetId);
+              await DuckDbClient.hasTableOrView(datasetId);
             if (isAlreadyInMemory) {
               return;
             }
@@ -81,7 +81,7 @@ function createLocalPublicDatasetRawQueryClient(): WithLogger<
               }
             }
 
-            await DuckDBClient.loadParquet({
+            await DuckDbClient.loadParquet({
               tableName: datasetId,
               blob: publicDataset.parquetData,
             });
