@@ -39,10 +39,15 @@ export function OpenDataCatalogEntryList({
             w="100%"
           >
             <Paper
-              bg={isSelected ? "primary.0" : undefined}
+              bg="white"
               p="sm"
               radius="md"
               withBorder
+              bd={isSelected ? "1px solid neutral.4" : undefined}
+              shadow={isSelected ? "xs" : "none"}
+              style={{
+                transition: "all 0.2s ease-in-out",
+              }}
             >
               <Stack gap={4}>
                 <Text fw={600} lineClamp={2} size="sm">

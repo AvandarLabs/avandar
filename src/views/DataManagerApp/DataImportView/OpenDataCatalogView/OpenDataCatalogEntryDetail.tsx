@@ -9,6 +9,7 @@ import {
   Title,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
+import { Tooltip } from "@ui/Tooltip/Tooltip";
 import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
 
 type Props = {
@@ -60,17 +61,19 @@ export function OpenDataCatalogEntryDetail({
             {entry.displayName}
           </Title>
 
-          <ActionIcon
-            aria-label="Add dataset to workspace"
-            color="primary"
-            variant="filled"
-            size="lg"
-            loading={isAdding || isLoadingColumnMetadata}
-            disabled={!isAddAllowed || isAdding || isLoadingColumnMetadata}
-            onClick={onAddToWorkspace}
-          >
-            <IconPlus size={20} />
-          </ActionIcon>
+          <Tooltip label="Add to your workspace">
+            <ActionIcon
+              aria-label="Add dataset to workspace"
+              color="primary"
+              variant="filled"
+              size="lg"
+              loading={isAdding || isLoadingColumnMetadata}
+              disabled={!isAddAllowed || isAdding || isLoadingColumnMetadata}
+              onClick={onAddToWorkspace}
+            >
+              <IconPlus size={20} />
+            </ActionIcon>
+          </Tooltip>
         </Group>
 
         {!isAddAllowed ?

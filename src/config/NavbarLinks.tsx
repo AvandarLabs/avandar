@@ -47,9 +47,12 @@ export const NavbarLinks = {
       icon: <IconHome size={DEFAULT_ICON_SIZE} stroke={1.5} />,
     };
   },
-  dataManagerHome: (workspaceSlug: string) => {
+  dataImport: (workspaceSlug: string) => {
     return {
-      link: AppLinks.dataManagerHome(workspaceSlug),
+      link: {
+        ...AppLinks.dataImport(workspaceSlug),
+        label: "Data Sources",
+      },
       icon: <IconDatabase size={DEFAULT_ICON_SIZE} stroke={1.5} />,
     };
   },

@@ -2,13 +2,13 @@ import { Outlet } from "@tanstack/react-router";
 import { where } from "@utils/filters/where/where";
 import { ReactNode, useMemo } from "react";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
+import { useRootWorkspaceChecks } from "@/components/common/layouts/RootLayout/useRootWorkspaceChecks/useRootWorkspaceChecks";
+import { useSpotlightActions } from "@/components/common/layouts/RootLayout/useSpotlightActions";
 import { AppLinks } from "@/config/AppLinks";
 import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AppShell } from "@/lib/ui/AppShell/AppShell";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import { useRootWorkspaceChecks } from "@/components/common/layouts/RootLayout/useRootWorkspaceChecks/useRootWorkspaceChecks";
-import { useSpotlightActions } from "@/components/common/layouts/RootLayout/useSpotlightActions";
 
 type Props = {
   /**
@@ -41,7 +41,7 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
   const mainNavBarLinks = useMemo(() => {
     return [
       NavbarLinks.workspaceHome(workspace.slug),
-      NavbarLinks.dataManagerHome(workspace.slug),
+      NavbarLinks.dataImport(workspace.slug),
       NavbarLinks.dataExplorer(workspace.slug),
       NavbarLinks.dashboards(workspace.slug),
       NavbarLinks.map(workspace.slug),

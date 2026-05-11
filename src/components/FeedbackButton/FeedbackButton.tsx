@@ -6,16 +6,15 @@ import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral";
 import clsx from "clsx";
 import { useState } from "react";
 import css from "@/components/FeedbackButton/FeedbackButton.module.css";
+import {
+  FEATUREBASE_BUG_BOARD,
+  FEATUREBASE_FEATURE_REQUEST_BOARD,
+  openFeaturebaseFeedbackWidget,
+} from "@/components/FeedbackButton/openFeaturebaseFeedbackWidget";
 import { useFeaturebaseInit } from "@/components/FeedbackButton/useFeaturebaseInit";
 import { APP_SHELL_MAIN_Z_INDEX } from "@/config/Theme";
 import { Route as RootRoute } from "@/routes/__root";
 import type { CSSProperties } from "react";
-
-/** Featurebase default board for feature requests. */
-const FEATUREBASE_FEATURE_REQUEST_BOARD = "Feature Request";
-
-/** Featurebase default board for bug reports. */
-const FEATUREBASE_BUG_BOARD = "Bug";
 
 /** Corner anchor for the floating feedback control. */
 export type FeedbackButtonPlacement =
@@ -49,24 +48,6 @@ function _getFeedbackButtonPlacementStyle(options: {
     "top-left": { left: horizontal, top: vertical },
     "top-right": { right: horizontal, top: vertical },
   });
-}
-
-/**
- * Opens the Featurebase feedback widget, optionally preselecting a board.
- *
- * @see https://help.featurebase.app/en/articles/1261560-install-feedback-widget
- */
-function _openFeaturebaseFeedbackWidget(options: { boardName: string }): void {
-  window.postMessage(
-    {
-      target: "FeaturebaseWidget",
-      data: {
-        action: "openFeedbackWidget",
-        setBoard: options.boardName,
-      },
-    },
-    "*",
-  );
 }
 
 /**
@@ -144,7 +125,7 @@ export function FeedbackButton({
         <Menu.Item
           leftSection={<IconSparkles size={16} stroke={1.5} aria-hidden />}
           onClick={() => {
-            _openFeaturebaseFeedbackWidget({
+            openFeaturebaseFeedbackWidget({
               boardName: FEATUREBASE_FEATURE_REQUEST_BOARD,
             });
           }}
@@ -154,7 +135,7 @@ export function FeedbackButton({
         <Menu.Item
           leftSection={<IconBug size={16} stroke={1.5} aria-hidden />}
           onClick={() => {
-            _openFeaturebaseFeedbackWidget({
+            openFeaturebaseFeedbackWidget({
               boardName: FEATUREBASE_BUG_BOARD,
             });
           }}
