@@ -38,8 +38,8 @@ export const SpotlightLinks = {
   },
   dataManagerHome: (workspaceSlug: string) => {
     return {
-      link: AppLinks.dataManagerHome(workspaceSlug),
-      icon: NavbarLinks.dataManagerHome(workspaceSlug).icon,
+      link: AppLinks.dataImport(workspaceSlug),
+      icon: NavbarLinks.dataImport(workspaceSlug).icon,
       spotlightDescription: "Go to the data import app",
     };
   },

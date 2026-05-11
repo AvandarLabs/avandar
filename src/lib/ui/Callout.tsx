@@ -3,7 +3,7 @@ import { IconAlertCircle } from "@tabler/icons-react";
 import type { AlertProps, TextProps } from "@mantine/core";
 
 type Props = {
-  title: string;
+  title?: string;
   titleSize?: TextProps["size"];
 
   /**
@@ -39,9 +39,11 @@ export function Callout({
       color={color}
       variant={variant}
       title={
-        <Title order={2} size={titleSize}>
-          {title}
-        </Title>
+        title ?
+          <Title order={2} size={titleSize}>
+            {title}
+          </Title>
+        : null
       }
       icon={icon}
       styles={{ icon: { width: "fit-content", height: "fit-content" } }}

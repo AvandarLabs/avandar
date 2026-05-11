@@ -8,6 +8,7 @@ import {
   Stack,
   Text,
   TextInput,
+  UnstyledButton,
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
@@ -19,7 +20,13 @@ import { useMemo, useState } from "react";
 import { CatalogDatasetColumnClient } from "@/clients/catalog-entries/CatalogDatasetColumnClient";
 import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { BetaBadge } from "@/components/common/BetaBadge/BetaBadge";
+import {
+  FEATUREBASE_FEATURE_REQUEST_BOARD,
+  openFeaturebaseFeedbackWidget,
+} from "@/components/FeedbackButton/openFeaturebaseFeedbackWidget";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { Callout } from "@/lib/ui/Callout";
 import { resolveOpenDataDatasetColumnInputs } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/buildOpenDataDatasetColumnInputs";
 import { OpenDataCatalogEntryDetail } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail";
 import { OpenDataCatalogEntryList } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList";
@@ -132,6 +139,45 @@ export function OpenDataCatalogView({
   return (
     <Box {...boxProps}>
       <Stack gap="md">
+        <Text>
+          Search the data catalog to add open datasets to your workspace.
+        </Text>
+
+        <Callout color="warning" messageSize="sm">
+          <Text component="div" size="sm">
+            The public open data catalog is still in{" "}
+            <BetaBadge
+              size="xs"
+              style={{ verticalAlign: "text-bottom" }}
+              withTooltip={false}
+            />
+            <br />
+            We are adding more open datasets as users tell us which datasets
+            they want in Avandar. If there is a dataset you would like to see
+            here,{" "}
+            <UnstyledButton
+              type="button"
+              aria-label="Tell us which open dataset you want via feedback"
+              display="inline"
+              p={0}
+              h="auto"
+              td="underline"
+              c="primary"
+              fz="sm"
+              fw={500}
+              style={{ verticalAlign: "baseline" }}
+              onClick={() => {
+                openFeaturebaseFeedbackWidget({
+                  boardName: FEATUREBASE_FEATURE_REQUEST_BOARD,
+                });
+              }}
+            >
+              tell us
+            </UnstyledButton>
+            !
+          </Text>
+        </Callout>
+
         <TextInput
           aria-label="Search open data catalog"
           leftSection={<IconSearch size={18} />}
@@ -141,13 +187,12 @@ export function OpenDataCatalogView({
           placeholder="Search by name, organization, pipeline…"
           value={search}
         />
-
         {isLoadingCatalog ?
           <Group justify="center" py="xl">
             <Loader />
           </Group>
         : <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-            <Paper p="md" withBorder>
+            <Paper p="md" withBorder shadow="none">
               <Stack gap={6}>
                 <Text fw={600} size="sm">
                   Catalog ({displayedEntries.length})
@@ -161,7 +206,7 @@ export function OpenDataCatalogView({
               </Stack>
             </Paper>
 
-            <Paper p="md" withBorder>
+            <Paper p="md" withBorder shadow="none">
               <OpenDataCatalogEntryDetail
                 entry={selectedEntry}
                 isAddAllowed={isAddAllowed}
