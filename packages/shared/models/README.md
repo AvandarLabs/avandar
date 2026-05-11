@@ -1,30 +1,14 @@
 # @avandar/models
 
-This is a very lightweight library to represent data model types. It provides
-core model primitives for typed, discriminated data objects.
+A lightweight library for representing typed, discriminated data models.
+The only export is `Model`, a small bundle of helpers built around the
+`__type` discriminator convention.
 
-.... keep writing....
-
-- Clients and React hooks for data queries and mutations.
-
-A common problem with any full-stack application is the duplication of model
-type definitions in the frontend and backend and the difficulty in representing
-the types once data-fetching and data-mutations are in the mix. A data model's
-"Read" type is always just a _little_ different from its "Insert" type. The
-amount of variants a single data model has begins to balloon.
-
-This library is lightweight because it has minimal overhead. A data model is
-represented as nothing more than an object with a `__type` string.
-
-The power of this library isn't in enforcing any clever representation of data,
-but rather in enforcing codebase conventions and patterns on how all a
-model's variants (e.g. reading a model, inserting a model, updating a model)
-should be represented.
-
-These conventions provide a consistent way to define data models in a codebase,
-which provides predictability for developers. This allows a data-fetching layer
-to be standardized. This library provides helper functions to auto-generate a
-model's client and React hooks for data queries and mutations.
+A model is just an object with a `__type` string and arbitrary additional
+properties. The value of this library isn't in enforcing any clever
+representation — it's the shared convention that lets the rest of the
+Avandar packages (`@avandar/clients`, `@avandar/react-query`) auto-generate
+parsers, CRUD clients, and React Query hooks against any model.
 
 ## Usage
 
@@ -34,39 +18,70 @@ import { Model } from "@avandar/models";
 // Create a model instance
 const user = Model.make("User", { id: "u1", name: "Alice" });
 
-// Pattern-match on model type
+// Pattern-match on a discriminated union of models
 const label = Model.match(model, {
   User: (m) => m.name,
   Admin: (m) => `admin:${m.level}`,
 });
 
-// Extract an id coupled with the model type:
-const typedId = Model.getTypedId(user); // { id: 'u1', __type: 'User' };
+// Extract the id coupled with the model type
+const typedId = Model.getTypedId(user); // { id: 'u1', __type: 'User' }
+
+// Runtime type guards
+Model.isModel(value);                 // true if value has a `__type` string
+Model.isOfModelType(value, "User");   // true if `__type === "User"`
+
+// Higher-order guard for use with `.filter`, `.find`, etc.
+users.filter(Model.valIsOfModelType("Admin"));
 ```
-
-## Types
-
-| Type              | Description                                         |
-| ----------------- | --------------------------------------------------- |
-| `Model.Base`      | Base model shape: `{ __type: string } & ModelProps` |
-| `Model.Versioned` | Base model extended with a `version` field          |
-| `Model.Type`      | Utility type: extracts the string type from a model |
-| `Model.TypedId`   | Utility type: `{ __type, id }` picked from a model  |
 
 ## API
 
-### `Model.make(modelType, modelProps)`
+### Constructors
 
-Creates a new model instance with the given type discriminator and properties.
+#### `Model.make(modelType, modelProps)`
 
-### `Model.match(model, fns)`
+Returns `{ __type: modelType, ...modelProps }`. The return type carries the
+literal `__type` so unions of models remain discriminated.
+
+### Pattern matching
+
+#### `Model.match(model, fns)`
 
 Pattern-matches a model union by its `__type`, calling the corresponding
 function. Throws if no branch matches.
 
-### `Model.getTypedId(model)`
+```ts
+type Shape = Model.Base<"Circle", { r: number }> | Model.Base<"Square", { s: number }>;
+const area = Model.match(shape, {
+  Circle: ({ r }) => Math.PI * r * r,
+  Square: ({ s }) => s * s,
+});
+```
 
-Returns `{ __type, id }` from a model, discarding all other properties.
+### Identity helpers
+
+#### `Model.getTypedId(model)`
+
+Returns `{ __type, id }` from a model with an `id` property, discarding
+every other property. Useful for keying lookups or passing references.
+
+### Type guards
+
+| Function                              | Returns                                     |
+| ------------------------------------- | ------------------------------------------- |
+| `Model.isModel(val)`                  | `val is Model.Base`                         |
+| `Model.isOfModelType(val, modelType)` | `val is Model.Base<modelType>`              |
+| `Model.valIsOfModelType(modelType)`   | Curried guard for `.filter` / `.find` calls |
+
+## Types
+
+| Type              | Description                                                                  |
+| ----------------- | ---------------------------------------------------------------------------- |
+| `Model.Base<T,P>` | Base model shape: `{ __type: T } & P` (defaults: `string`, `EmptyObject`)    |
+| `Model.Versioned` | Base model extended with a numeric `version` field                           |
+| `Model.Type<M>`   | Utility type: extracts the `__type` string literal from a model              |
+| `Model.TypedId<M>`| Utility type: `{ __type, id }` picked from a model with an `id` property     |
 
 ## Scripts
 
