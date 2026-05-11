@@ -23,6 +23,23 @@ ENV_FILES=(
   ".env.development.edge"
 )
 
+# Names allowed to be empty (optional flags, unset-by-design in CI).
+ALLOW_EMPTY_ENV_VAR_NAMES=(
+  VITE_FEATURE_FLAGS
+)
+
+# Returns 0 if key is listed in ALLOW_EMPTY_ENV_VAR_NAMES.
+_is_allowed_empty_env_var() {
+  local key="$1"
+  local allowed_name=""
+  for allowed_name in "${ALLOW_EMPTY_ENV_VAR_NAMES[@]}"; do
+    if [[ "$key" == "$allowed_name" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
 # Function that checks that a given file does not have any empty variables.
 check_empty_env_vars() {
   local file="$1"
@@ -48,9 +65,17 @@ check_empty_env_vars() {
     fi
   done < "$file"
 
-  if [ ${#empty_keys[@]} -ne 0 ]; then
-    # Output as var= in the output for clarity
-    echo "${file}:${empty_keys[@]}"
+  local filtered_keys=()
+  local key=""
+  for key in "${empty_keys[@]}"; do
+    if _is_allowed_empty_env_var "$key"; then
+      continue
+    fi
+    filtered_keys+=("$key")
+  done
+
+  if [ ${#filtered_keys[@]} -ne 0 ]; then
+    echo "${file}:${filtered_keys[@]}"
   fi
 }
 
