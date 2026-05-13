@@ -1,19 +1,17 @@
-import { createServiceClient } from "@clients/ServiceClient/createServiceClient";
-import { withQueryHooks } from "@hooks/withQueryHooks/withQueryHooks";
-import { withLogger } from "@logger/module-augmenters/withLogger";
-import { notifyDevAlert } from "@ui/index";
-import { where } from "@utils/index";
-import { objectKeys } from "@utils/objects/objectKeys";
-import { sqlTemplate } from "@utils/strings/template/sqlTemplate";
+import { createServiceClient } from "@clients";
+import { withQueryHooks } from "@hooks";
+import { withLogger } from "@logger";
+import { notifyDevAlert } from "@ui";
+import { where, objectKeys , sqlTemplate  } from "@utils";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { scalar, singleton } from "@/clients/DuckDbClient/queryResultHelpers";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import { promiseReduce } from "@/lib/utils/promises";
-import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
-import type { WithQueryHooks } from "@hooks/withQueryHooks/withQueryHooks.types";
-import type { WithLogger } from "@logger/Logger.types";
-import type { UnknownDataFrame } from "@utils/types/common.types";
+import type { ServiceClient } from "@clients";
+import type { WithQueryHooks } from "@hooks";
+import type { WithLogger } from "@logger";
+import type { UnknownDataFrame } from "@utils";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 

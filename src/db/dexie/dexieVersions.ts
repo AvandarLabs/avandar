@@ -20,7 +20,7 @@
  * was lost and we should clear the IndexedDB database and try to seed it as
  * much as possible with defaults or data we can get from the backend.
  */
-import { prop } from "@utils/objects/hofs/prop/prop";
+import { prop } from "@utils";
 import Dexie from "dexie";
 import { DexieDBVersionManager } from "@/clients/dexie/DexieDBVersionManager";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";

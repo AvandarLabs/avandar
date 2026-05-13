@@ -1,8 +1,8 @@
-import { useBoolean } from "@hooks/useBoolean/useBoolean";
+import { useBoolean } from "@hooks";
 import { ActionIcon, Flex, Popover, Stack, Text } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import { IconPalette } from "@tabler/icons-react";
-import { Tooltip } from "@ui/Tooltip/Tooltip";
+import { Tooltip } from "@ui";
 import {
   SegmentedControl,
   SegmentedControlItem,

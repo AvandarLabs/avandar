@@ -28,7 +28,7 @@ const MOCK_TSCONFIG = JSON.stringify(
   {
     compilerOptions: {
       paths: {
-        "@utils/*": ["./packages/shared/utils/src/*"],
+        "@utils": ["./packages/shared/utils/src/*"],
       },
     },
   },

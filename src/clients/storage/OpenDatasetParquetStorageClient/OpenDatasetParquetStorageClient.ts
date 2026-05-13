@@ -1,4 +1,4 @@
-import { where } from "@utils/filters/where/where";
+import { where } from "@utils";
 import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
 import type { OpenDataCatalogEntryId } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
 

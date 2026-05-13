@@ -1,12 +1,12 @@
-import { makeParserRegistry } from "@clients/makeParserRegistry";
-import { identity } from "@utils/misc/identity";
+import { makeParserRegistry } from "@clients";
+import { identity } from "@utils";
 import { uuidType } from "$/lib/zodHelpers";
 import { z } from "zod";
 import type { LegacyLocalDatasetEntryModel } from "@/models/Legacy_LocalDatasetEntry/Legacy_LocalDatasetEntry.types";
 import type {
   Expect,
   ZodSchemaEqualsTypes,
-} from "@utils/types/test-utilities.types";
+} from "@utils";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 const DBReadSchema = z.object({

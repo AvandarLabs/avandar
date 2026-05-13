@@ -1,5 +1,5 @@
 import { Box, LoadingOverlay, Text } from "@mantine/core";
-import { prop } from "@utils/objects/hofs/prop/prop";
+import { prop } from "@utils";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";

@@ -1,7 +1,7 @@
-import { notifyError } from "@ui/notifications/notify";
+import { notifyError } from "@ui";
 import Uppy from "@uppy/core";
 import Tus from "@uppy/tus";
-import { MIMEType } from "@utils/types/common.types";
+import { MIMEType } from "@utils";
 import { AuthClient } from "@/clients/AuthClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";

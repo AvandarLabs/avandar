@@ -1,15 +1,9 @@
-import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
-import { doesRowPassFilters } from "@utils/filters/doesRowPassFilters/doesRowPassFilters";
-import { doesValuePassFilters } from "@utils/filters/doesValuePassFilters/doesValuePassFilters";
-import { isEmptyFiltersObject } from "@utils/filters/isEmptyFiltersObject/isEmptyFiltersObject";
-import { isFiltersByOperatorObject } from "@utils/filters/isFiltersByOperatorObject/isFiltersByOperatorObject";
-import { objectKeys } from "@utils/objects/objectKeys";
+import { assertIsDefined, doesRowPassFilters , doesValuePassFilters , isEmptyFiltersObject , isFiltersByOperatorObject , objectKeys  } from "@utils";
 import { assertDexieColumnsAreIndexed } from "@/clients/dexie/dexieColumnIsIndexed";
 import type {
   FilterOperatorRecord,
-  FiltersByColumn,
-} from "@utils/filters/filters";
-import type { UnknownObject } from "@utils/types/common.types";
+  FiltersByColumn, UnknownObject 
+} from "@utils";
 import type { Collection, IndexableType, IndexSpec, Table } from "dexie";
 
 /**

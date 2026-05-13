@@ -1,9 +1,8 @@
-import { useMutation } from "@hooks/useMutation/useMutation";
+import { useMutation } from "@hooks";
 import { Loader, Progress, Stack, Text, ThemeIcon } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconWorld, IconWorldOff } from "@tabler/icons-react";
-import { ActionIcon } from "@ui/ActionIcon/ActionIcon";
-import { notifyError, notifySuccess } from "@ui/notifications/notify";
+import { ActionIcon, notifyError, notifySuccess  } from "@ui";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { SourceDatasetClient } from "@/clients/datasets/SourceDatasetClient";

@@ -1,6 +1,6 @@
-import { createServiceClient } from "@clients/index";
-import { withQueryHooks } from "@hooks/withQueryHooks/withQueryHooks";
-import { Registry, where } from "@utils/index";
+import { createServiceClient } from "@clients";
+import { withQueryHooks } from "@hooks";
+import { Registry, where } from "@utils";
 import { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { CsvFileDatasetClient } from "./source-datasets/CsvFileDatasetClient";

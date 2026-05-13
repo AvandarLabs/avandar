@@ -14,10 +14,7 @@ import {
   IconCircleNumber1Filled,
   IconCircleNumber2Filled,
 } from "@tabler/icons-react";
-import { identity } from "@utils/misc/identity";
-import { prop } from "@utils/objects/hofs/prop/prop";
-import { propEq } from "@utils/objects/hofs/propEq/propEq";
-import { makeObject } from "@utils/objects/makeObject/makeObject";
+import { identity, prop , propEq , makeObject  } from "@utils";
 import { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { useCallback, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";

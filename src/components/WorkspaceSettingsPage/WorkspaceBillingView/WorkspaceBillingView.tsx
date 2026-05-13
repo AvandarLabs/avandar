@@ -1,5 +1,5 @@
 import { Group, Loader, Stack, Text, Title } from "@mantine/core";
-import { isDefined } from "@utils/guards/isDefined/isDefined";
+import { isDefined } from "@utils";
 import { match } from "ts-pattern";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { BillingPortalButton } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/BillingPortalButton";

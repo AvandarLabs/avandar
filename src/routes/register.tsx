@@ -1,5 +1,4 @@
-import { useBoolean } from "@hooks/useBoolean/useBoolean";
-import { useMutation } from "@hooks/useMutation/useMutation";
+import { useBoolean, useMutation  } from "@hooks";
 import {
   Anchor,
   Box,
@@ -15,7 +14,7 @@ import {
 } from "@mantine/core";
 import { isEmail } from "@mantine/form";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { notifyError, notifySuccess } from "@ui/notifications/notify";
+import { notifyError, notifySuccess } from "@ui";
 import { INFO_EMAIL } from "$/config/AppConfig";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";

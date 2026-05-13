@@ -1,6 +1,4 @@
-import { prop } from "@utils/objects/hofs/prop/prop";
-import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
-import { objectKeys } from "@utils/objects/objectKeys";
+import { prop, makeBucketRecord , objectKeys  } from "@utils";
 import {
   EntityFieldValueExtractor,
   EntityFieldValueExtractorRegistry,

@@ -1,4 +1,4 @@
-import { useMutation } from "@hooks/useMutation/useMutation";
+import { useMutation } from "@hooks";
 import { Button, Loader, PasswordInput, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import {

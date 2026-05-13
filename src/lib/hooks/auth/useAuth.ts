@@ -1,4 +1,4 @@
-import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
+import { hasDefinedProps } from "@utils";
 import { useEffect, useRef, useState } from "react";
 import { AuthClient } from "@/clients/AuthClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";

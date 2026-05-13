@@ -1,6 +1,6 @@
 import { Box, Button, Stack, TextInput } from "@mantine/core";
-import { notifyError, notifySuccess } from "@ui/index";
-import { prop, UnknownDataFrame } from "@utils/index";
+import { notifyError, notifySuccess } from "@ui";
+import { prop, UnknownDataFrame } from "@utils";
 import { uuid } from "$/lib/uuid";
 import { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";

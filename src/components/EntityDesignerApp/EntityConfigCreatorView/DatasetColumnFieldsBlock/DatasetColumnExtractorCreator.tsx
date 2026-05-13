@@ -1,5 +1,5 @@
 import { Checkbox, Fieldset, Select, Stack, Tooltip } from "@mantine/core";
-import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral";
+import { matchLiteral } from "@utils";
 import { DatasetColumnValueExtractors } from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractors";
 import { EntityConfigCreatorStore } from "@/components/EntityDesignerApp/EntityConfigCreatorView/EntityConfigCreatorStore/index";
 import type { EntityConfigFormValues } from "@/components/EntityDesignerApp/EntityConfigCreatorView/entityConfigFormTypes";

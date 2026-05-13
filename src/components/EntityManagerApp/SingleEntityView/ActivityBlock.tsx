@@ -9,7 +9,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import Underline from "@tiptap/extension-underline";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { notifyNotImplemented } from "@ui/notifications/notifyNotImplemented";
+import { notifyNotImplemented } from "@ui";
 
 export function ActivityBlock(): JSX.Element {
   const editor = useEditor({

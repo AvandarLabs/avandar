@@ -3,13 +3,8 @@ import ehWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url";
 import mvpWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?url";
 import duckDbWasmEh from "@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url";
 import duckDbWasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
-import { ILogger } from "@logger/Logger.types";
-import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray";
-import { prop } from "@utils/objects/hofs/prop/prop";
-import { objectEntries } from "@utils/objects/objectEntries";
-import { objectKeys } from "@utils/objects/objectKeys";
-import { objectValuesMap } from "@utils/objects/objectValuesMap/objectValuesMap";
-import { MIMEType } from "@utils/types/common.types";
+import { ILogger } from "@logger";
+import { isNonEmptyArray, prop , objectEntries , objectKeys , objectValuesMap , MIMEType  } from "@utils";
 import { uuid } from "$/lib/uuid";
 import {
   DuckDbDataType,

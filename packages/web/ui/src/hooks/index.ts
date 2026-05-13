@@ -1,1 +1,1 @@
-export { useCheckTruncatedText } from "@ui/hooks/useCheckTruncatedText/useCheckTruncatedText";
+export { useCheckTruncatedText } from "./useCheckTruncatedText/useCheckTruncatedText";

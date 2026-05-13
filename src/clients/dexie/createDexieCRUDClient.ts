@@ -1,9 +1,5 @@
-import { ModelCRUDParserRegistry } from "@clients/makeParserRegistry";
-import { createModelCRUDClient } from "@clients/ModelCRUDClient/createModelCRUDClient";
-import { UpsertOptions } from "@clients/ModelCRUDClient/ModelCRUDClient.types";
-import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
-import { isEmptyFiltersObject } from "@utils/filters/isEmptyFiltersObject/isEmptyFiltersObject";
-import { isDefined } from "@utils/guards/isDefined/isDefined";
+import { ModelCRUDParserRegistry, createModelCRUDClient , UpsertOptions  } from "@clients";
+import { assertIsDefined, isEmptyFiltersObject , isDefined  } from "@utils";
 import { assertDexieColumnsAreIndexed } from "@/clients/dexie/dexieColumnIsIndexed";
 import { DexieCRUDModelSpec } from "@/clients/dexie/DexieCRUDClient.types";
 import {
@@ -15,10 +11,9 @@ import type { DexieDBType } from "@/clients/dexie/DexieDBVersionManager";
 import type {
   ClientReturningOnlyPromises,
   ModelCRUDClient,
-} from "@clients/ModelCRUDClient/ModelCRUDClient.types";
-import type { ILogger } from "@logger/Logger.types";
-import type { FiltersByColumn } from "@utils/filters/filters";
-import type { EmptyObject } from "@utils/types/common.types";
+} from "@clients";
+import type { ILogger } from "@logger";
+import type { FiltersByColumn, EmptyObject  } from "@utils";
 import type {
   IDType,
   IndexableType,

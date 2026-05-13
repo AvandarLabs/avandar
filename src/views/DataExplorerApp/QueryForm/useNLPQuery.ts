@@ -1,8 +1,8 @@
-import { useMutation } from "@hooks/useMutation/useMutation";
-import { where } from "@utils/filters/where/where";
+import { useMutation } from "@hooks";
+import { where } from "@utils";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import type { UseMutationResultTuple } from "@hooks/useMutation/useMutation";
+import type { UseMutationResultTuple } from "@hooks";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 type UseNLPQueryVariables = {

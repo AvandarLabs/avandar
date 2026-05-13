@@ -1,4 +1,4 @@
-import { unknownToString } from "@utils/strings/unknownToString/unknownToString";
+import { unknownToString } from "@utils";
 import {
     buildHTTPQueryString as _buildHTTPQueryString,
     ValidURLQueryParamValue,

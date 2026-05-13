@@ -1,4 +1,4 @@
-import { notifyError } from "@ui/notifications/notify";
+import { notifyError } from "@ui";
 import { UserId } from "$/models/User/User.types";
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";

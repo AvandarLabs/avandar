@@ -1,12 +1,10 @@
-import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
-import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord";
-import { objectKeys } from "@utils/objects/objectKeys";
+import { makeBucketRecord, makeIdLookupRecord , objectKeys  } from "@utils";
 import { match } from "ts-pattern";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { getDatasetColumnFieldValues } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getDatasetColumnFieldValues";
 import { promiseFlatMap } from "@/lib/utils/promises";
 import { Logger } from "@/utils/Logger";
-import type { RegistryOfArrays } from "@utils/types/utilities.types";
+import type { RegistryOfArrays } from "@utils";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";
 import type { EntityFieldConfig } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig";
 import type { EntityFieldValueExtractorRegistry } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types";

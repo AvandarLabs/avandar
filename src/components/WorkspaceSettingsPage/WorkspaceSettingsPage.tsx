@@ -1,5 +1,5 @@
 import { Container, Stack, Title } from "@mantine/core";
-import { notifyError, notifySuccess } from "@ui/notifications/notify";
+import { notifyError, notifySuccess } from "@ui";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";

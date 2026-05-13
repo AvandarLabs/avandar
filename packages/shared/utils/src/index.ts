@@ -149,6 +149,7 @@ export { prefix } from "@utils/strings/prefix/prefix.ts";
 export { template } from "@utils/strings/template/template.ts";
 export { sqlTemplate } from "@utils/strings/template/sqlTemplate.ts";
 export { toSnakeCase } from "@utils/strings/toSnakeCase/toSnakeCase.ts";
+export { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral.ts";
 
 // constants
 export { MIMEType } from "@utils/types/common.types.ts";

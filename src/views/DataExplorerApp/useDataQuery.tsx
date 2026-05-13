@@ -1,8 +1,6 @@
-import { useQuery } from "@hooks/useQuery/useQuery";
-import { Model } from "@models/Model/Model";
-import { prop } from "@utils/objects/hofs/prop/prop";
-import { makeObjectFromEntries } from "@utils/objects/makeObjectFromEntries/makeObjectFromEntries";
-import { sortObjList } from "@utils/objects/sortObjList/sortObjList";
+import { useQuery } from "@hooks";
+import { Model } from "@models";
+import { prop, makeObjectFromEntries , sortObjList  } from "@utils";
 import { uuid } from "$/lib/uuid";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { QueryResult as QueryResultFns } from "$/models/queries/QueryResult/QueryResult";
@@ -11,7 +9,7 @@ import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClien
 import { PublicQETLClient } from "@/clients/qetl/PublicQETLClient";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { UseQueryResultTuple } from "@hooks/useQuery/useQuery";
+import type { UseQueryResultTuple } from "@hooks";
 import type {
   QueryResult,
   QueryResultColumn,

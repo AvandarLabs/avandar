@@ -1,7 +1,5 @@
-import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
-import { objectKeys } from "@utils/objects/objectKeys";
-import type { UnknownObject } from "@utils/types/common.types";
-import type { StringKeyOf } from "@utils/types/utilities.types";
+import { hasDefinedProps, objectKeys  } from "@utils";
+import type { UnknownObject, StringKeyOf  } from "@utils";
 
 /**
  * Transforms an array of objects (rows) into an object where each key

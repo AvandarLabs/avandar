@@ -9,7 +9,7 @@ import {
   Title,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import { Tooltip } from "@ui/Tooltip/Tooltip";
+import { Tooltip } from "@ui";
 import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
 
 type Props = {

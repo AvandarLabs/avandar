@@ -1,4 +1,4 @@
-import { propEq } from "@utils/objects/hofs/propEq/propEq";
+import { propEq } from "@utils";
 import { beforeAll, describe, expect, it } from "vitest";
 import { AvaPageDataMigrator } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";

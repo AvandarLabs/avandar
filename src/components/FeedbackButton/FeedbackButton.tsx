@@ -1,8 +1,7 @@
 import { Menu, UnstyledButton } from "@mantine/core";
 import { IconBug, IconMessageCircle, IconSparkles } from "@tabler/icons-react";
-import { Tooltip } from "@ui/Tooltip/Tooltip";
-import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
-import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral";
+import { Tooltip } from "@ui";
+import { hasDefinedProps, matchLiteral  } from "@utils";
 import clsx from "clsx";
 import { useState } from "react";
 import css from "@/components/FeedbackButton/FeedbackButton.module.css";

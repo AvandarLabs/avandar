@@ -24,7 +24,7 @@ import {
   YAxis,
 } from "recharts";
 import { Box } from "@mantine/core";
-import { formatDate } from "@utils/dates/formatDate/formatDate";
+import { formatDate } from "@utils";
 import { useId, useMemo } from "react";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import type { CurveType } from "$/models/vizs/CurveType";

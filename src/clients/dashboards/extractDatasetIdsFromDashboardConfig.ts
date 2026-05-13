@@ -5,9 +5,7 @@
  * they agree on which datasets are required.
  */
 
-import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject";
-import { isString } from "@utils/guards/isString/isString";
-import { traverse } from "@utils/misc/traverse/traverse";
+import { isPlainObject, isString , traverse  } from "@utils";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 type DataVizLikeProps = {

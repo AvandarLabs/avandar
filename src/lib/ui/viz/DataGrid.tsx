@@ -2,12 +2,12 @@ import { Box } from "@mantine/core";
 import {
   formatDate,
   FormattableTimezone,
-} from "@utils/dates/formatDate/formatDate";
+} from "@utils";
 import { themeMaterial } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
 import { mantineColorVar, mantineVar } from "@/lib/utils/browser/css";
-import type { UnknownDataFrame } from "@utils/types/common.types";
+import type { UnknownDataFrame } from "@utils";
 import type {
   GridReadyEvent,
   GridSizeChangedEvent,

@@ -10,12 +10,8 @@ import {
 } from "@mantine/core";
 import { isNotEmpty } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
-import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
-import { Select } from "@ui/inputs/Select/Select";
-import { isDefined } from "@utils/guards/isDefined/isDefined";
-import { prop } from "@utils/objects/hofs/prop/prop";
-import { propEq } from "@utils/objects/hofs/propEq/propEq";
-import { setValue } from "@utils/objects/setValue/setValue";
+import { makeSelectOptions, Select  } from "@ui";
+import { isDefined, prop , propEq , setValue  } from "@utils";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DatasetColumnFieldsBlock } from "@/components/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index";
 import { EntityConfigCreatorStore } from "@/components/EntityDesignerApp/EntityConfigCreatorView/EntityConfigCreatorStore/index";

@@ -1,10 +1,10 @@
-import { Select } from "@ui/inputs/Select/Select";
+import { Select } from "@ui";
 import type { FormType } from "@/lib/hooks/ui/useForm/useForm";
 import type {
   GenericFormSchemaRecord,
   ValuesOfFieldRecord,
 } from "@/lib/ui/AvaForm/AvaForm.types";
-import type { SelectOption, SelectProps } from "@ui/inputs/Select/Select";
+import type { SelectOption, SelectProps } from "@ui";
 import type { Paths } from "type-fest";
 
 type Props<

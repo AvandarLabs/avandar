@@ -1,4 +1,4 @@
-import { makeSet } from "@utils/index";
+import { makeSet } from "@utils";
 import {
   createSupabaseAdminClient,
   deleteWorkspaceTreeForE2EById,

@@ -1,7 +1,7 @@
 import { Divider, Stack, Text } from "@mantine/core";
 import { match } from "ts-pattern";
 import { Paper } from "@/lib/ui/Paper/Paper";
-import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
+import { formatNumber } from "@utils";
 import { PlanFeatures } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanFeatures";
 import { SubscriptionPlan } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
 

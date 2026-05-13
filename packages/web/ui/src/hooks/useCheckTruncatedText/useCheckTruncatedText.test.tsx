@@ -1,5 +1,5 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
-import { useCheckTruncatedText } from "@ui/hooks/useCheckTruncatedText/useCheckTruncatedText";
+import { useCheckTruncatedText } from "./useCheckTruncatedText";
 import { useState } from "react";
 import { describe, expect, it } from "vitest";
 

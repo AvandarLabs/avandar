@@ -1,5 +1,4 @@
-import { useBoolean } from "@hooks/useBoolean/useBoolean";
-import { useMutation } from "@hooks/useMutation/useMutation";
+import { useBoolean, useMutation  } from "@hooks";
 import {
   Box,
   Burger,

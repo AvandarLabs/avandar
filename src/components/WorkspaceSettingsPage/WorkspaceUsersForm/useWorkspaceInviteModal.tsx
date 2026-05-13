@@ -1,8 +1,8 @@
-import { useMutation } from "@hooks/useMutation/useMutation";
+import { useMutation } from "@hooks";
 import { Stack, Text } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
-import { notifySuccess } from "@ui/notifications/notify";
+import { notifySuccess } from "@ui";
 import { Subscription } from "$/models/Subscription/Subscription";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { useRef } from "react";

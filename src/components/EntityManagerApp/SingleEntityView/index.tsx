@@ -1,14 +1,6 @@
 import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
-import { ObjectDescriptionList } from "@ui/ObjectDescriptionList/ObjectDescriptionList";
-import { where } from "@utils/filters/where/where";
-import { isNonNullish } from "@utils/guards/isNonNullish/isNonNullish";
-import { makeIdLookupMap } from "@utils/maps/makeIdLookupMap/makeIdLookupMap";
-import { makeMap } from "@utils/maps/makeMap/makeMap";
-import { prop } from "@utils/objects/hofs/prop/prop";
-import { propEq } from "@utils/objects/hofs/propEq/propEq";
-import { makeObject } from "@utils/objects/makeObject/makeObject";
-import { omit } from "@utils/objects/omit/omit";
-import { unknownToString } from "@utils/strings/unknownToString/unknownToString";
+import { ObjectDescriptionList } from "@ui";
+import { where, isNonNullish , makeIdLookupMap , makeMap , prop , propEq , makeObject , omit , unknownToString  } from "@utils";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";

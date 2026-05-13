@@ -1,5 +1,5 @@
 import { SegmentedControlItem } from "@mantine/core";
-import { prop } from "@utils/objects/hofs/prop/prop";
+import { prop } from "@utils";
 import {
     BasicPlanConfig,
     FreePlanConfig,

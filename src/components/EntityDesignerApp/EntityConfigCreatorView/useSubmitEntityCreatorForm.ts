@@ -1,9 +1,8 @@
 import {
   useMutation,
   UseMutationResultTuple,
-} from "@hooks/useMutation/useMutation";
-import { isDefined } from "@utils/guards/isDefined/isDefined";
-import { prop } from "@utils/objects/hofs/prop/prop";
+} from "@hooks";
+import { isDefined, prop  } from "@utils";
 import { match } from "ts-pattern";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";

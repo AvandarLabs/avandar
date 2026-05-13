@@ -1,8 +1,5 @@
-import { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupabaseCRUDClient";
-import { where } from "@utils/filters/where/where";
-import { prop } from "@utils/objects/hofs/prop/prop";
-import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
-import { matchLiteral } from "@utils/strings/matchLiteral/matchLiteral";
+import { createSupabaseCRUDClient } from "@clients";
+import { where, prop , makeBucketRecord , matchLiteral  } from "@utils";
 import { DatasetParsers } from "$/models/datasets/Dataset/DatasetParsers";
 import { WorkspaceId } from "$/models/Workspace/Workspace.types";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
@@ -16,8 +13,7 @@ import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
-import type { FiltersByColumn } from "@utils/filters/filters";
-import type { ExcludeNullsIn } from "@utils/objects/excludeNullsIn/excludeNullsIn";
+import type { FiltersByColumn, ExcludeNullsIn  } from "@utils";
 import type { OpenDataCatalogEntryId } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {

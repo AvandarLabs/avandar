@@ -1,5 +1,5 @@
 import { Box } from "@mantine/core";
-import { Select, SelectData } from "@ui/inputs/Select/Select";
+import { Select, SelectData } from "@ui";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
 import { match } from "ts-pattern";
 import {
@@ -29,7 +29,7 @@ import {
 import {
   ScatterChartForm,
 } from "@/views/DataExplorerApp/VizSettingsForm/ScatterChartForm";
-import type { UnknownDataFrame } from "@utils/types/common.types";
+import type { UnknownDataFrame } from "@utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { VizType } from "$/models/vizs/VizConfig/VizConfig.types";
 

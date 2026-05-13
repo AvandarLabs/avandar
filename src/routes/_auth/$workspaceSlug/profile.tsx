@@ -1,5 +1,4 @@
-import { useMutation } from "@hooks/useMutation/useMutation";
-import { useToggleBoolean } from "@hooks/useToggleBoolean/useToggleBoolean";
+import { useMutation, useToggleBoolean  } from "@hooks";
 import {
   Button,
   Container,

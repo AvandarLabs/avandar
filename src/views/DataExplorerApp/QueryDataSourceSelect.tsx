@@ -1,8 +1,6 @@
 import { useUncontrolled } from "@mantine/hooks";
-import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
-import { Select } from "@ui/inputs/Select/Select";
-import { where } from "@utils/filters/where/where";
-import { makeBucketMap } from "@utils/maps/makeBucketMap/makeBucketMap";
+import { makeSelectOptions, Select  } from "@ui";
+import { where, makeBucketMap  } from "@utils";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
@@ -13,7 +11,7 @@ import type {
   SelectData,
   SelectOptionGroup,
   SelectProps,
-} from "@ui/inputs/Select/Select";
+} from "@ui";
 import type {
   QueryDataSource,
   QueryDataSourceId,

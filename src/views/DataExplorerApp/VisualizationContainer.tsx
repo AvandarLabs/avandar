@@ -1,7 +1,5 @@
 import { Box, Flex, List, Text } from "@mantine/core";
-import { prop } from "@utils/objects/hofs/prop/prop";
-import { objectValues } from "@utils/objects/objectValues";
-import { UnknownDataFrame } from "@utils/types/common.types";
+import { prop, objectValues , UnknownDataFrame  } from "@utils";
 import { match } from "ts-pattern";
 import { flattenError, object, prettifyError, string } from "zod";
 import { Callout } from "@/lib/ui/Callout";

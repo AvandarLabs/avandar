@@ -1,9 +1,6 @@
-import { useQuery } from "@hooks/useQuery/useQuery";
+import { useQuery } from "@hooks";
 import { modals } from "@mantine/modals";
-import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
-import { isNullish } from "@utils/guards/isNullish/isNullish";
-import { prop } from "@utils/objects/hofs/prop/prop";
-import { propEq } from "@utils/objects/hofs/propEq/propEq";
+import { assertIsDefined, isNullish , prop , propEq  } from "@utils";
 import { UserId } from "$/models/User/User.types";
 import { useEffect, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";

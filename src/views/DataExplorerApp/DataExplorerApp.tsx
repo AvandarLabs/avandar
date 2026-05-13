@@ -17,9 +17,8 @@ import {
   IconInfoCircle,
   IconRotateClockwise,
 } from "@tabler/icons-react";
-import { notifyError, notifyNotImplemented, notifySuccess } from "@ui/index";
-import { Tooltip } from "@ui/Tooltip/Tooltip";
-import { isEpochMs, isISODateString, prop } from "@utils/index";
+import { notifyError, notifyNotImplemented, notifySuccess, Tooltip  } from "@ui";
+import { isEpochMs, isISODateString, prop } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useEffect, useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";

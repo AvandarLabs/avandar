@@ -8,7 +8,7 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
+import { formatNumber } from "@utils";
 import { uuid } from "$/lib/uuid";
 import Papa from "papaparse";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -25,7 +25,7 @@ import type {
 import type { GoogleToken } from "@/lib/hooks/useGooglePickerAPI";
 import type { GPickerDocumentObject } from "@/lib/types/google-picker";
 import type { APIReturnType } from "@/types/http-api.types";
-import type { UnknownObject } from "@utils/types/common.types";
+import type { UnknownObject } from "@utils";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactElement } from "react";
@@ -70,7 +70,7 @@ const {
   };
 });
 
-vi.mock("@ui/notifications/notify", () => {
+vi.mock("@ui", () => {
   return {
     notifySuccess: notifySuccessMock,
     notifyError: vi.fn(),

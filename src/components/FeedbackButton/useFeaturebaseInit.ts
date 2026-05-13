@@ -1,5 +1,5 @@
-import { useQuery } from "@hooks/useQuery/useQuery";
-import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
+import { useQuery } from "@hooks";
+import { hasDefinedProps } from "@utils";
 import { useEffect } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { Route as RootRoute } from "@/routes/__root";

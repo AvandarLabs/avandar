@@ -1,7 +1,7 @@
-import { useMutation } from "@hooks/useMutation/useMutation";
+import { useMutation } from "@hooks";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import { notifyError, notifySuccess } from "@ui/notifications/notify";
+import { notifyError, notifySuccess } from "@ui";
 import { SUPPORT_EMAIL } from "$/config/AppConfig";
 import { match } from "ts-pattern";
 import { APIClient } from "@/clients/APIClient";

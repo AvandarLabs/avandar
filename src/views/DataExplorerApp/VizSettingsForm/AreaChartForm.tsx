@@ -1,7 +1,6 @@
 import { ColorInput, Switch } from "@mantine/core";
-import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
-import { Select } from "@ui/inputs/Select/Select";
-import { propPasses } from "@utils/objects/hofs/propPasses/propPasses";
+import { makeSelectOptions, Select  } from "@ui";
+import { propPasses } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useMemo } from "react";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";

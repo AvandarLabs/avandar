@@ -1,7 +1,5 @@
-import { useQuery } from "@hooks/useQuery/useQuery";
-import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray";
-import { MIMEType } from "@utils/index";
-import { noop } from "@utils/misc/noop";
+import { useQuery } from "@hooks";
+import { isNonEmptyArray, MIMEType , noop  } from "@utils";
 import { useEffect, useMemo, useState } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
