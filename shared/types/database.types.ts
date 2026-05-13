@@ -587,14 +587,14 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "datasets__xls_file_dataset_id_fkey"
+            foreignKeyName: "datasets__xlsx_file_dataset_id_fkey"
             columns: ["dataset_id"]
             isOneToOne: true
             referencedRelation: "datasets"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "datasets__xls_file_workspace_id_fkey"
+            foreignKeyName: "datasets__xlsx_file_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -1056,44 +1056,6 @@ export type Database = {
         }
         Relationships: []
       }
-      user_app_roles: {
-        Row: {
-          app: Database["public"]["Enums"]["app_type"]
-          created_at: string
-          id: string
-          role: Database["public"]["Enums"]["role_level"]
-          updated_at: string
-          user_id: string
-          workspace_id: string
-        }
-        Insert: {
-          app: Database["public"]["Enums"]["app_type"]
-          created_at?: string
-          id?: string
-          role: Database["public"]["Enums"]["role_level"]
-          updated_at?: string
-          user_id: string
-          workspace_id: string
-        }
-        Update: {
-          app?: Database["public"]["Enums"]["app_type"]
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["role_level"]
-          updated_at?: string
-          user_id?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_app_roles_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_group_memberships: {
         Row: {
           created_at: string
@@ -1416,22 +1378,35 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          role_group_id: string | null
+          updated_at: string
           user_id: string
           workspace_id: string
         }
         Insert: {
           created_at?: string
           id?: string
+          role_group_id?: string | null
+          updated_at?: string
           user_id: string
           workspace_id: string
         }
         Update: {
           created_at?: string
           id?: string
+          role_group_id?: string | null
+          updated_at?: string
           user_id?: string
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "workspace_memberships_role_group_id_fkey"
+            columns: ["role_group_id"]
+            isOneToOne: false
+            referencedRelation: "role_groups"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "workspace_memberships_workspace_id_fkey"
             columns: ["workspace_id"]
@@ -1693,6 +1668,18 @@ export type Database = {
         }
         Returns: boolean
       }
+      util__auth_user_meets_min_app_role: {
+        Args: {
+          p_app: Database["public"]["Enums"]["app_type"]
+          p_min_role: Database["public"]["Enums"]["role_level"]
+          p_workspace_id: string
+        }
+        Returns: boolean
+      }
+      util__can_manage_workspace_settings: {
+        Args: { p_workspace_id: string }
+        Returns: boolean
+      }
       util__get_auth_user_app_role: {
         Args: {
           p_app: Database["public"]["Enums"]["app_type"]
@@ -1733,6 +1720,10 @@ export type Database = {
       util__role_level_rank: {
         Args: { p_role: Database["public"]["Enums"]["role_level"] }
         Returns: number
+      }
+      util__seed_builtin_role_groups_for_workspace: {
+        Args: { p_workspace_id: string }
+        Returns: undefined
       }
     }
     Enums: {

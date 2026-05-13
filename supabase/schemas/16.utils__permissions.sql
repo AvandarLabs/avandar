@@ -7,9 +7,9 @@ create or replace function public.util__role_level_rank (
   p_role public.role_level
 ) returns int language sql immutable as $$
   select case p_role
-    when 'viewer'::public.role_level then 1
-    when 'editor'::public.role_level then 2
-    when 'admin'::public.role_level then 3
+    when 'viewer' then 1
+    when 'editor' then 2
+    when 'admin' then 3
   end;
 $$;
 
@@ -22,10 +22,10 @@ create or replace function public.util__rank_to_role_level (
   p_rank int
 ) returns public.role_level language sql immutable as $$
   select case p_rank
-    when 1 then 'viewer'::public.role_level
-    when 2 then 'editor'::public.role_level
-    when 3 then 'admin'::public.role_level
-    else null::public.role_level
+    when 1 then 'viewer'
+    when 2 then 'editor'
+    when 3 then 'admin'
+    else null
   end;
 $$;
 
@@ -41,12 +41,14 @@ set
   search_path = public as $$
   select exists (
     select 1
-    from public.user_app_roles uar
+    from public.workspace_memberships wm
+    inner join public.role_group_app_roles rgar on
+      rgar.role_group_id = wm.role_group_id
     where
-      uar.workspace_id = p_workspace_id and
-      uar.user_id = auth.uid () and
-      uar.app = 'settings'::public.app_type and
-      uar.role = 'admin'::public.role_level
+      wm.workspace_id = p_workspace_id and
+      wm.user_id = auth.uid () and
+      rgar.app = 'settings' and
+      rgar.role = 'admin'
   );
 $$;
 
@@ -61,13 +63,77 @@ create or replace function public.util__get_auth_user_app_role (
 ) returns public.role_level language sql security definer stable
 set
   search_path = public as $$
-  select uar.role
-  from public.user_app_roles uar
+  select rgar.role
+  from public.workspace_memberships wm
+  inner join public.role_group_app_roles rgar on
+    rgar.role_group_id = wm.role_group_id
   where
-    uar.workspace_id = p_workspace_id and
-    uar.user_id = auth.uid () and
-    uar.app = p_app
+    wm.workspace_id = p_workspace_id and
+    wm.user_id = auth.uid () and
+    rgar.app = p_app
   limit 1;
+$$;
+
+/**
+ * Workspace owner or Settings (global) admin — membership and settings UI.
+ *
+ * @returns True when the auth user may manage workspace-level settings.
+ */
+create or replace function public.util__can_manage_workspace_settings (
+  p_workspace_id uuid
+) returns boolean language sql security definer stable
+set
+  search_path = public as $$
+  select exists (
+    select 1
+    from public.workspaces w
+    where
+      w.id = p_workspace_id and
+      w.owner_id = auth.uid ()
+  )
+  or public.util__is_settings_admin (p_workspace_id);
+$$;
+
+/**
+ * Whether the auth user has at least p_min_role on p_app in the workspace.
+ * Workspace owners always satisfy any minimum.
+ *
+ * @returns True when app role rank meets or exceeds the minimum.
+ */
+create or replace function public.util__auth_user_meets_min_app_role (
+  p_workspace_id uuid,
+  p_app public.app_type,
+  p_min_role public.role_level
+) returns boolean language plpgsql security definer stable
+set
+  search_path = public as $$
+declare
+  v_uid uuid := auth.uid ();
+  v_role public.role_level;
+begin
+  if v_uid is null then
+    return false;
+  end if;
+
+  if exists (
+    select 1
+    from public.workspaces w
+    where
+      w.id = p_workspace_id and
+      w.owner_id = v_uid
+  ) then
+    return true;
+  end if;
+
+  v_role := public.util__get_auth_user_app_role (p_workspace_id, p_app);
+
+  if v_role is null then
+    return false;
+  end if;
+
+  return public.util__role_level_rank (v_role) >=
+    public.util__role_level_rank (p_min_role);
+end;
 $$;
 
 /**
@@ -92,8 +158,32 @@ $$;
 /**
  * Effective role for auth.uid() on a dashboard or dataset row.
  *
- * @returns Highest role_level from owner/settings shortcuts, shares, and
- *   tag-gated app roles when applicable.
+ * Most paths merge several independent grants (direct/group/workspace shares,
+ * and optionally the user's app role on this resource's app). Each grant is
+ * converted with util__role_level_rank (viewer=1, editor=2, admin=3); the
+ * function keeps the single largest rank and maps it back with
+ * util__rank_to_role_level. So "highest role_level" means the strongest of
+ * those candidates, not "most roles" or "first match".
+ *
+ * Short-circuits (no merge with shares):
+ * - Resource owner → admin.
+ * - Settings (global) admin in the workspace → admin.
+ *
+ * Examples (non-owner, non-settings-admin):
+ * - Workspace share viewer + app role editor (tags allow app role) → editor.
+ * - Direct user share admin + app role viewer → admin (ranks 3 vs 1).
+ * - Only workspace share viewer, resource is_restricted, no other grant →
+ *   viewer.
+ * - App role editor would apply, but resource has tags and user shares no tag
+ *   with the resource → that app-role candidate is dropped; effective role is
+ *   whatever remains from shares only (often null).
+ *
+ * After owner and settings-admin short-circuits, every other grant path
+ * requires a `workspace_memberships` row for this resource's workspace so
+ * shares and app roles cannot expose workspace data to unrelated users.
+ * Public dashboard read remains handled in RLS (`is_public`), not here.
+ *
+ * @returns Merged role_level, or null when no candidate grants access.
  */
 create or replace function public.util__resource_effective_role (
   p_resource_type public.resource_type,
@@ -117,7 +207,7 @@ begin
     return null;
   end if;
 
-  if p_resource_type = 'dashboard'::public.resource_type then
+  if p_resource_type = 'dashboard' then
     select
       d.workspace_id,
       d.owner_id,
@@ -126,8 +216,8 @@ begin
     from public.dashboards d
     where
       d.id = p_resource_id;
-    v_app := 'dashboards'::public.app_type;
-  elsif p_resource_type = 'dataset'::public.resource_type then
+    v_app := 'dashboards';
+  elsif p_resource_type = 'dataset' then
     select
       ds.workspace_id,
       ds.owner_id,
@@ -136,7 +226,7 @@ begin
     from public.datasets ds
     where
       ds.id = p_resource_id;
-    v_app := 'data_sources'::public.app_type;
+    v_app := 'data_sources';
   else
     return null;
   end if;
@@ -151,6 +241,20 @@ begin
 
   if public.util__is_settings_admin (v_workspace_id) then
     return 'admin'::public.role_level;
+  end if;
+
+  -- Shares and app-role grants never apply to users who are not workspace
+  -- members (prevents workspace-wide or direct shares from opening rows to
+  -- arbitrary authenticated users). Owner and settings-admin paths above
+  -- already returned.
+  if not exists (
+    select 1
+    from public.workspace_memberships wm
+    where
+      wm.workspace_id = v_workspace_id and
+      wm.user_id = v_uid
+  ) then
+    return null;
   end if;
 
   select coalesce(max(public.util__role_level_rank (rs.role)), 0)
@@ -175,9 +279,11 @@ begin
         exists (
           select 1
           from public.user_group_memberships ugm
+          inner join public.user_groups ug on ug.id = ugm.user_group_id
           where
             ugm.user_group_id = rs.principal_id and
-            ugm.user_id = v_uid
+            ugm.user_id = v_uid and
+            ug.workspace_id = v_workspace_id
         )
       )
     );
@@ -259,5 +365,49 @@ begin
   v_eff_rank := public.util__role_level_rank (v_eff);
   v_min_rank := public.util__role_level_rank (p_min_role);
   return v_eff_rank >= v_min_rank;
+end;
+$$;
+
+/**
+ * Legacy shim: map old user_roles-style strings to workspace id sets.
+ * `admin` → owner or Settings admin; `member` → any workspace membership.
+ *
+ * @returns Distinct workspace ids for the auth user under that legacy label.
+ */
+create or replace function public.util__get_auth_user_workspaces_by_role (
+  role text
+) returns uuid[] language plpgsql security definer stable
+set
+  search_path = public as $$
+declare
+  v_uid uuid := auth.uid ();
+begin
+  if v_uid is null then
+    return '{}'::uuid[];
+  end if;
+
+  if role = 'admin' then
+    return array(
+      select distinct x.wid
+      from (
+        select w.id as wid
+        from public.workspaces w
+        where
+          w.owner_id = v_uid
+        union all
+        select wm.workspace_id as wid
+        from public.workspace_memberships wm
+        where
+          wm.user_id = v_uid and
+          public.util__is_settings_admin (wm.workspace_id)
+      ) as x
+    );
+  end if;
+
+  if role = 'member' then
+    return public.util__get_auth_user_workspaces ();
+  end if;
+
+  return '{}'::uuid[];
 end;
 $$;

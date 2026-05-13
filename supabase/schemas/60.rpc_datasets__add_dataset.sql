@@ -58,7 +58,7 @@ declare
 begin
   -- Ensure the workspace is one that the user admins
   if (
-    p_workspace_id != all(public.util__get_auth_user_workspaces_by_role('admin'))
+    not public.util__can_manage_workspace_settings (p_workspace_id)
   ) then
     raise exception 'The requesting user is not an admin of this workspace';
   end if;

@@ -24,6 +24,21 @@
 
 - Follow the repository pattern
 
+## SQL
+
+### Row level security (RLS)
+
+The browser ships the **Supabase publishable (anon) key**; with a user JWT,
+anyone can call the PostgREST API using crafted JSON, filters, and verbs.
+**RLS is the real authorization layer**: policies must tie every sensitive
+column to the **workspace id on the row** (or a join that resolves to it),
+helper functions must take that same id as an argument derived from the row
+expression (for example
+`util__can_manage_workspace_settings (public.user_roles.workspace_id)`), and
+`WITH CHECK` on `UPDATE` must constrain new values the same way. Never rely on
+the client to send the "correct" workspace id without binding it to the tuple
+PostgREST is mutating.
+
 ## Code style
 
 - Follow existing conventions and styles.
@@ -66,6 +81,17 @@ have the flexibility you need.
 - If you are asked to navigate the app in the browser to write tests or verify
   functionality, use the credentials in `tests/e2e/setup/e2e-credentials.ts` to
   log in as a test user. The localhost URL is <http://localhost:5173>.
+
+## Testing
+
+### End-to-end tests
+
+E2E runs against a real local app and Supabase instance that may already hold
+data from local development. When a test mutates the database (roles,
+memberships, workspace fields, seeded users, etc.), it must restore prior state
+in `finally`, `afterEach`, or dedicated fixtures. Prefer deleting or reverting
+only rows that test inserted or changed (track ids or booleans) instead of
+broad resets that could harm unrelated developer data.
 
 ## Modes
 

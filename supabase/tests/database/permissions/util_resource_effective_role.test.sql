@@ -23,6 +23,12 @@ values
     'util_bob@test.dev',
     'authenticated',
     'authenticated'
+  ),
+  (
+    '90000004-0000-4000-8000-000000000004'::uuid,
+    'util_outsider@test.dev',
+    'authenticated',
+    'authenticated'
   );
 
 insert into public.workspaces (id, owner_id, name, slug)
@@ -50,6 +56,47 @@ values
     '90001001-0000-4000-8000-000000000001'::uuid,
     '90000003-0000-4000-8000-000000000003'::uuid
   );
+
+insert into public.user_roles (
+  workspace_id,
+  user_id,
+  membership_id,
+  role
+)
+values
+  (
+    '90001001-0000-4000-8000-000000000001'::uuid,
+    '90000001-0000-4000-8000-000000000001'::uuid,
+    '90002001-0000-4000-8000-000000000001'::uuid,
+    'admin'
+  ),
+  (
+    '90001001-0000-4000-8000-000000000001'::uuid,
+    '90000002-0000-4000-8000-000000000002'::uuid,
+    '90002002-0000-4000-8000-000000000002'::uuid,
+    'admin'
+  ),
+  (
+    '90001001-0000-4000-8000-000000000001'::uuid,
+    '90000003-0000-4000-8000-000000000003'::uuid,
+    '90002003-0000-4000-8000-000000000003'::uuid,
+    'member'
+  );
+
+update public.workspace_memberships wm
+set
+  role_group_id = rg.id
+from
+  public.role_groups rg
+where
+  wm.workspace_id = '90001001-0000-4000-8000-000000000001'::uuid and
+  rg.workspace_id = wm.workspace_id and
+  rg.is_builtin and
+  rg.name = case wm.user_id
+    when '90000001-0000-4000-8000-000000000001'::uuid then 'Global Admin'
+    when '90000002-0000-4000-8000-000000000002'::uuid then 'Global Admin'
+    else 'Global Viewer'
+  end;
 
 insert into public.user_profiles (
   id,
@@ -260,7 +307,7 @@ values (
   '90000002-0000-4000-8000-000000000002'::uuid
 );
 
-select plan(10);
+select plan(11);
 
 -- 1 Owner
 set local role authenticated;
@@ -283,18 +330,41 @@ select is(
 -- 2 Settings admin (alice settings admin only)
 set local role postgres;
 
-delete from public.user_app_roles
+delete from public.role_group_app_roles
 where
-  workspace_id = '90001001-0000-4000-8000-000000000001'::uuid and
-  user_id = '90000002-0000-4000-8000-000000000002'::uuid;
+  role_group_id = '9000cf02-0000-4000-8000-000000000002'::uuid;
 
-insert into public.user_app_roles (workspace_id, user_id, app, role)
-values (
+delete from public.role_groups
+where
+  id = '9000cf02-0000-4000-8000-000000000002'::uuid;
+
+insert into public.role_groups (
+  id,
+  workspace_id,
+  name,
+  is_builtin
+) values (
+  '9000cf02-0000-4000-8000-000000000002'::uuid,
   '90001001-0000-4000-8000-000000000001'::uuid,
-  '90000002-0000-4000-8000-000000000002'::uuid,
+  'util_eff_t2_settings_admin',
+  false
+);
+
+insert into public.role_group_app_roles (
+  role_group_id,
+  app,
+  role
+) values (
+  '9000cf02-0000-4000-8000-000000000002'::uuid,
   'settings'::public.app_type,
   'admin'::public.role_level
 );
+
+update public.workspace_memberships
+set
+  role_group_id = '9000cf02-0000-4000-8000-000000000002'::uuid
+where
+  id = '90002002-0000-4000-8000-000000000002'::uuid;
 
 set local role authenticated;
 
@@ -316,37 +386,57 @@ select is(
 -- 3 App admin, no resource tags
 set local role postgres;
 
-delete from public.user_app_roles
-where
-  workspace_id = '90001001-0000-4000-8000-000000000001'::uuid and
-  user_id = '90000002-0000-4000-8000-000000000002'::uuid;
+insert into public.role_groups (
+  id,
+  workspace_id,
+  name,
+  is_builtin
+) values (
+  '9000cf03-0000-4000-8000-000000000003'::uuid,
+  '90001001-0000-4000-8000-000000000001'::uuid,
+  'util_eff_t3_app_admin',
+  false
+);
 
-insert into public.user_app_roles (workspace_id, user_id, app, role)
-values
+insert into public.role_group_app_roles (
+  role_group_id,
+  app,
+  role
+) values
   (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000002-0000-4000-8000-000000000002'::uuid,
+    '9000cf03-0000-4000-8000-000000000003'::uuid,
     'settings'::public.app_type,
     'viewer'::public.role_level
   ),
   (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000002-0000-4000-8000-000000000002'::uuid,
+    '9000cf03-0000-4000-8000-000000000003'::uuid,
     'dashboards'::public.app_type,
     'admin'::public.role_level
   ),
   (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000002-0000-4000-8000-000000000002'::uuid,
+    '9000cf03-0000-4000-8000-000000000003'::uuid,
     'data_sources'::public.app_type,
     'viewer'::public.role_level
   ),
   (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000002-0000-4000-8000-000000000002'::uuid,
+    '9000cf03-0000-4000-8000-000000000003'::uuid,
     'data_explorer'::public.app_type,
     'viewer'::public.role_level
   );
+
+update public.workspace_memberships
+set
+  role_group_id = '9000cf03-0000-4000-8000-000000000003'::uuid
+where
+  id = '90002002-0000-4000-8000-000000000002'::uuid;
+
+delete from public.role_group_app_roles
+where
+  role_group_id = '9000cf02-0000-4000-8000-000000000002'::uuid;
+
+delete from public.role_groups
+where
+  id = '9000cf02-0000-4000-8000-000000000002'::uuid;
 
 set local role authenticated;
 
@@ -401,42 +491,57 @@ values (
 -- 5 Editor + overlapping tag
 set local role postgres;
 
-delete from public.user_app_roles
-where
-  workspace_id = '90001001-0000-4000-8000-000000000001'::uuid and
-  user_id = '90000002-0000-4000-8000-000000000002'::uuid and
-  app = 'dashboards'::public.app_type;
-
-insert into public.user_app_roles (workspace_id, user_id, app, role)
-values (
+insert into public.role_groups (
+  id,
+  workspace_id,
+  name,
+  is_builtin
+) values (
+  '9000cf05-0000-4000-8000-000000000005'::uuid,
   '90001001-0000-4000-8000-000000000001'::uuid,
-  '90000002-0000-4000-8000-000000000002'::uuid,
-  'dashboards'::public.app_type,
-  'editor'::public.role_level
+  'util_eff_t5_editor',
+  false
 );
 
-insert into public.user_app_roles (workspace_id, user_id, app, role)
-values
+insert into public.role_group_app_roles (
+  role_group_id,
+  app,
+  role
+) values
   (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000002-0000-4000-8000-000000000002'::uuid,
+    '9000cf05-0000-4000-8000-000000000005'::uuid,
+    'dashboards'::public.app_type,
+    'editor'::public.role_level
+  ),
+  (
+    '9000cf05-0000-4000-8000-000000000005'::uuid,
     'settings'::public.app_type,
     'viewer'::public.role_level
   ),
   (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000002-0000-4000-8000-000000000002'::uuid,
+    '9000cf05-0000-4000-8000-000000000005'::uuid,
     'data_sources'::public.app_type,
     'viewer'::public.role_level
   ),
   (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000002-0000-4000-8000-000000000002'::uuid,
+    '9000cf05-0000-4000-8000-000000000005'::uuid,
     'data_explorer'::public.app_type,
     'viewer'::public.role_level
-  )
-on conflict (workspace_id, user_id, app) do update set
-  role = excluded.role;
+  );
+
+update public.workspace_memberships
+set
+  role_group_id = '9000cf05-0000-4000-8000-000000000005'::uuid
+where
+  id = '90002002-0000-4000-8000-000000000002'::uuid;
+
+delete from public.role_group_app_roles
+where
+  role_group_id = '9000cf03-0000-4000-8000-000000000003'::uuid;
+
+delete from public.role_groups
+where
+  id = '9000cf03-0000-4000-8000-000000000003'::uuid;
 
 set local role authenticated;
 
@@ -458,42 +563,57 @@ select is(
 -- 6 Viewer + restricted + overlap -> null (settings not admin)
 set local role postgres;
 
-delete from public.user_app_roles
-where
-  workspace_id = '90001001-0000-4000-8000-000000000001'::uuid and
-  user_id = '90000002-0000-4000-8000-000000000002'::uuid and
-  app = 'dashboards'::public.app_type;
-
-insert into public.user_app_roles (workspace_id, user_id, app, role)
-values (
+insert into public.role_groups (
+  id,
+  workspace_id,
+  name,
+  is_builtin
+) values (
+  '9000cf06-0000-4000-8000-000000000006'::uuid,
   '90001001-0000-4000-8000-000000000001'::uuid,
-  '90000002-0000-4000-8000-000000000002'::uuid,
-  'dashboards'::public.app_type,
-  'viewer'::public.role_level
+  'util_eff_t6_viewer',
+  false
 );
 
-insert into public.user_app_roles (workspace_id, user_id, app, role)
-values
+insert into public.role_group_app_roles (
+  role_group_id,
+  app,
+  role
+) values
   (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000002-0000-4000-8000-000000000002'::uuid,
+    '9000cf06-0000-4000-8000-000000000006'::uuid,
+    'dashboards'::public.app_type,
+    'viewer'::public.role_level
+  ),
+  (
+    '9000cf06-0000-4000-8000-000000000006'::uuid,
     'settings'::public.app_type,
     'viewer'::public.role_level
   ),
   (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000002-0000-4000-8000-000000000002'::uuid,
+    '9000cf06-0000-4000-8000-000000000006'::uuid,
     'data_sources'::public.app_type,
     'viewer'::public.role_level
   ),
   (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000002-0000-4000-8000-000000000002'::uuid,
+    '9000cf06-0000-4000-8000-000000000006'::uuid,
     'data_explorer'::public.app_type,
     'viewer'::public.role_level
-  )
-on conflict (workspace_id, user_id, app) do update set
-  role = excluded.role;
+  );
+
+update public.workspace_memberships
+set
+  role_group_id = '9000cf06-0000-4000-8000-000000000006'::uuid
+where
+  id = '90002002-0000-4000-8000-000000000002'::uuid;
+
+delete from public.role_group_app_roles
+where
+  role_group_id = '9000cf05-0000-4000-8000-000000000005'::uuid;
+
+delete from public.role_groups
+where
+  id = '9000cf05-0000-4000-8000-000000000005'::uuid;
 
 set local role authenticated;
 
@@ -533,42 +653,57 @@ select is(
 -- 8 Workspace share viewer + editor app role -> max editor
 set local role postgres;
 
-delete from public.user_app_roles
-where
-  workspace_id = '90001001-0000-4000-8000-000000000001'::uuid and
-  user_id = '90000002-0000-4000-8000-000000000002'::uuid and
-  app = 'dashboards'::public.app_type;
-
-insert into public.user_app_roles (workspace_id, user_id, app, role)
-values (
+insert into public.role_groups (
+  id,
+  workspace_id,
+  name,
+  is_builtin
+) values (
+  '9000cf08-0000-4000-8000-000000000008'::uuid,
   '90001001-0000-4000-8000-000000000001'::uuid,
-  '90000002-0000-4000-8000-000000000002'::uuid,
-  'dashboards'::public.app_type,
-  'editor'::public.role_level
+  'util_eff_t8_editor',
+  false
 );
 
-insert into public.user_app_roles (workspace_id, user_id, app, role)
-values
+insert into public.role_group_app_roles (
+  role_group_id,
+  app,
+  role
+) values
   (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000002-0000-4000-8000-000000000002'::uuid,
+    '9000cf08-0000-4000-8000-000000000008'::uuid,
+    'dashboards'::public.app_type,
+    'editor'::public.role_level
+  ),
+  (
+    '9000cf08-0000-4000-8000-000000000008'::uuid,
     'settings'::public.app_type,
     'viewer'::public.role_level
   ),
   (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000002-0000-4000-8000-000000000002'::uuid,
+    '9000cf08-0000-4000-8000-000000000008'::uuid,
     'data_sources'::public.app_type,
     'viewer'::public.role_level
   ),
   (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000002-0000-4000-8000-000000000002'::uuid,
+    '9000cf08-0000-4000-8000-000000000008'::uuid,
     'data_explorer'::public.app_type,
     'viewer'::public.role_level
-  )
-on conflict (workspace_id, user_id, app) do update set
-  role = excluded.role;
+  );
+
+update public.workspace_memberships
+set
+  role_group_id = '9000cf08-0000-4000-8000-000000000008'::uuid
+where
+  id = '90002002-0000-4000-8000-000000000002'::uuid;
+
+delete from public.role_group_app_roles
+where
+  role_group_id = '9000cf06-0000-4000-8000-000000000006'::uuid;
+
+delete from public.role_groups
+where
+  id = '9000cf06-0000-4000-8000-000000000006'::uuid;
 
 set local role authenticated;
 
@@ -590,42 +725,57 @@ select is(
 -- 9 Group share
 set local role postgres;
 
-delete from public.user_app_roles
-where
-  workspace_id = '90001001-0000-4000-8000-000000000001'::uuid and
-  user_id = '90000002-0000-4000-8000-000000000002'::uuid and
-  app = 'dashboards'::public.app_type;
-
-insert into public.user_app_roles (workspace_id, user_id, app, role)
-values (
+insert into public.role_groups (
+  id,
+  workspace_id,
+  name,
+  is_builtin
+) values (
+  '9000cf09-0000-4000-8000-000000000009'::uuid,
   '90001001-0000-4000-8000-000000000001'::uuid,
-  '90000002-0000-4000-8000-000000000002'::uuid,
-  'dashboards'::public.app_type,
-  'viewer'::public.role_level
+  'util_eff_t9_viewer',
+  false
 );
 
-insert into public.user_app_roles (workspace_id, user_id, app, role)
-values
+insert into public.role_group_app_roles (
+  role_group_id,
+  app,
+  role
+) values
   (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000002-0000-4000-8000-000000000002'::uuid,
+    '9000cf09-0000-4000-8000-000000000009'::uuid,
+    'dashboards'::public.app_type,
+    'viewer'::public.role_level
+  ),
+  (
+    '9000cf09-0000-4000-8000-000000000009'::uuid,
     'settings'::public.app_type,
     'viewer'::public.role_level
   ),
   (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000002-0000-4000-8000-000000000002'::uuid,
+    '9000cf09-0000-4000-8000-000000000009'::uuid,
     'data_sources'::public.app_type,
     'viewer'::public.role_level
   ),
   (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000002-0000-4000-8000-000000000002'::uuid,
+    '9000cf09-0000-4000-8000-000000000009'::uuid,
     'data_explorer'::public.app_type,
     'viewer'::public.role_level
-  )
-on conflict (workspace_id, user_id, app) do update set
-  role = excluded.role;
+  );
+
+update public.workspace_memberships
+set
+  role_group_id = '9000cf09-0000-4000-8000-000000000009'::uuid
+where
+  id = '90002002-0000-4000-8000-000000000002'::uuid;
+
+delete from public.role_group_app_roles
+where
+  role_group_id = '9000cf08-0000-4000-8000-000000000008'::uuid;
+
+delete from public.role_groups
+where
+  id = '9000cf08-0000-4000-8000-000000000008'::uuid;
 
 set local role authenticated;
 
@@ -647,31 +797,52 @@ select is(
 -- 10 No dashboards role
 set local role postgres;
 
-delete from public.user_app_roles
-where
-  workspace_id = '90001001-0000-4000-8000-000000000001'::uuid and
-  user_id = '90000002-0000-4000-8000-000000000002'::uuid;
+insert into public.role_groups (
+  id,
+  workspace_id,
+  name,
+  is_builtin
+) values (
+  '9000cf0a-0000-4000-8000-00000000000a'::uuid,
+  '90001001-0000-4000-8000-000000000001'::uuid,
+  'util_eff_t10_no_dashboards',
+  false
+);
 
-insert into public.user_app_roles (workspace_id, user_id, app, role)
-values
+insert into public.role_group_app_roles (
+  role_group_id,
+  app,
+  role
+) values
   (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000002-0000-4000-8000-000000000002'::uuid,
+    '9000cf0a-0000-4000-8000-00000000000a'::uuid,
     'settings'::public.app_type,
     'viewer'::public.role_level
   ),
   (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000002-0000-4000-8000-000000000002'::uuid,
+    '9000cf0a-0000-4000-8000-00000000000a'::uuid,
     'data_sources'::public.app_type,
     'viewer'::public.role_level
   ),
   (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000002-0000-4000-8000-000000000002'::uuid,
+    '9000cf0a-0000-4000-8000-00000000000a'::uuid,
     'data_explorer'::public.app_type,
     'viewer'::public.role_level
   );
+
+update public.workspace_memberships
+set
+  role_group_id = '9000cf0a-0000-4000-8000-00000000000a'::uuid
+where
+  id = '90002002-0000-4000-8000-000000000002'::uuid;
+
+delete from public.role_group_app_roles
+where
+  role_group_id = '9000cf09-0000-4000-8000-000000000009'::uuid;
+
+delete from public.role_groups
+where
+  id = '9000cf09-0000-4000-8000-000000000009'::uuid;
 
 set local role authenticated;
 
@@ -688,6 +859,26 @@ select is(
   ),
   null::public.role_level,
   'no dashboards role and no applicable share'
+);
+
+-- 11 Non-member: workspace-wide share must not grant access
+set local role postgres;
+
+set local role authenticated;
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"90000004-0000-4000-8000-000000000004"}',
+  true
+);
+
+select is(
+  public.util__resource_effective_role (
+    'dashboard'::public.resource_type,
+    '90005008-0000-4000-8000-000000000008'::uuid
+  ),
+  null::public.role_level,
+  'outsider ignored workspace-wide share without membership'
 );
 
 select * from finish();

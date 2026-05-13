@@ -67,11 +67,27 @@ async function _insertPrimaryUserE2eTestWorkspace(
 
   const workspaceId = insertedWorkspace.id;
 
+  const { data: globalAdminGroup, error: globalAdminGroupError } = await admin
+    .from("role_groups")
+    .select("id")
+    .eq("workspace_id", workspaceId)
+    .eq("name", "Global Admin")
+    .eq("is_builtin", true)
+    .single();
+
+  if (globalAdminGroupError || !globalAdminGroup) {
+    throw new Error(
+      `[e2e] Global Admin role_group lookup failed: ` +
+        `${globalAdminGroupError?.message ?? "no row"}`,
+    );
+  }
+
   const { data: membership, error: membershipError } = await admin
     .from("workspace_memberships")
     .insert({
       user_id: userId,
       workspace_id: workspaceId,
+      role_group_id: globalAdminGroup.id,
     })
     .select("id")
     .single();

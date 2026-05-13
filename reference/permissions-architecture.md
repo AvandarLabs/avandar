@@ -15,7 +15,8 @@ without changing product semantics until RLS cut-over (later phase).
 
 The system replaces a single workspace membership role with **per-application**
 capabilities (`admin`, `editor`, `viewer`) across four apps, adds **role
-groups** as named presets that expand into stored per-app rows, adds **user
+groups** as named presets whose matrix lives in `role_group_app_roles` and is
+joined through `workspace_memberships.role_group_id`, adds **user
 groups** (tags) so resources and people can be labeled for intersection-based
 access, and adds **per-resource shares** (user, user group, or whole workspace)
 at a chosen role level. Resources may be marked **restricted**, which turns off
@@ -67,9 +68,10 @@ explicit shares (and owner / Settings Admin paths) still do.
 **Workspace owner** — `workspaces.owner_id`; always effective `admin`
 everywhere in that workspace; cannot be revoked by shares or role edits.
 
-**Settings Admin (Global Admin)** — A user whose `user_app_roles` row for
-`settings` is `admin`; treated as `admin` across apps for enforcement shortcuts
-in the resolution algorithm (see §4).
+**Settings Admin (Global Admin)** — A user whose effective `settings` app role
+(from their membership’s `role_group_app_roles` row for `settings`) is
+`admin`; treated as `admin` across apps for enforcement shortcuts in the
+resolution algorithm (see §4).
 
 ---
 
@@ -122,9 +124,9 @@ p_resource_id)` (security definer, stable), called by RLS. Role ordering:
 4. If a **user group** share exists for a group the user belongs to → include
    its `role`.
 5. If a **workspace** share exists → include its `role`.
-6. If the resource is **not** `is_restricted`, include the user’s
-   `user_app_roles.role` for the resource’s **app**, **gated by tag
-   intersection**:
+6. If the resource is **not** `is_restricted`, include the user’s effective app
+   role for the resource’s **app** (from `workspace_memberships` →
+   `role_group_app_roles`), **gated by tag intersection**:
    - If the resource has **zero** `resource_user_group_tags` rows → apply the
      app role (no tag filter).
    - Else apply the app role **only if** the user shares at least one
@@ -133,11 +135,11 @@ p_resource_id)` (security definer, stable), called by RLS. Role ordering:
 
 ```mermaid
 flowchart LR
-  User --> UAR[user_app_roles]
+  User --> WM[workspace_memberships]
+  WM --> RG[role_groups]
+  RG --> RGAR[role_group_app_roles]
   User --> UGM[user_group_memberships]
   UGM --> UG[user_groups]
-  UAR -.assigned via.-> RG[role_groups]
-  RG --> RGAR[role_group_app_roles]
   Resource[dashboards / datasets] --> RT[resource_user_group_tags]
   RT --> UG
   Resource --> RS[resource_shares]
@@ -161,7 +163,7 @@ flowchart LR
 
 | Table                      | Purpose / keys                                                                                                    |
 | -------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `user_app_roles`           | `(workspace_id, user_id, app)` unique; stores `role_level`.                                                       |
+| `workspace_memberships`    | `(workspace_id, user_id)` unique; `role_group_id` FK → `role_groups` (canonical per-app matrix source).           |
 | `role_groups`              | `(workspace_id, name)` unique; `is_builtin` marks built-ins.                                                      |
 | `role_group_app_roles`     | `(role_group_id, app)` unique; role per app for the group.                                                        |
 | `user_groups`              | `(workspace_id, name)` unique; optional `color`.                                                                  |
@@ -176,21 +178,22 @@ flowchart LR
 
 **Legacy compatibility (migration period)**
 
-- `user_roles` kept temporarily; may be maintained by trigger from
-  `user_app_roles` until all readers migrate; dropped in a final phase.
+- `user_roles` kept temporarily for product semantics (`admin` / `member`); may
+  diverge from the role-group matrix until the final cleanup phase.
 
 ```mermaid
 erDiagram
-  workspaces ||--o{ user_app_roles : has
+  workspaces ||--o{ workspace_memberships : has
   workspaces ||--o{ role_groups : has
-  role_groups ||--o{ role_group_app_roles : expands
+  role_groups ||--o{ role_group_app_roles : defines
+  workspace_memberships }o--|| role_groups : uses
   workspaces ||--o{ user_groups : tags
   user_groups ||--o{ user_group_memberships : members
   dashboards ||--o{ resource_user_group_tags : tagged
   datasets ||--o{ resource_user_group_tags : tagged
   dashboards ||--o{ resource_shares : shared
   datasets ||--o{ resource_shares : shared
-  auth_users ||--o{ user_app_roles : granted
+  auth_users ||--o{ workspace_memberships : member
   auth_users ||--o{ user_group_memberships : in
 ```
 
@@ -237,11 +240,11 @@ const canEdit = useHasPermission("data_sources__can_edit_dataset");
 
 **Role mapping (one-off backfill)**
 
-- Existing `user_roles.role = 'admin'` → insert **four** `user_app_roles` rows
-  (`data_sources`, `data_explorer`, `dashboards`, `settings`), each `admin`.
-- Existing `user_roles.role = 'member'` → insert **three** rows with
-  `viewer` for `data_sources`, `data_explorer`, `dashboards` (**no** `settings`
-  row — non-settings member).
+- Existing `user_roles.role = 'admin'` → set membership `role_group_id` to
+  built-in **Global Admin** (four `role_group_app_roles` rows, each `admin`).
+- Existing `user_roles.role = 'member'` → set membership `role_group_id` to
+  built-in **Global Viewer** (three `viewer` rows for `data_sources`,
+  `data_explorer`, `dashboards`; **no** `settings` row — non-settings member).
 
 **Built-in role groups**
 
@@ -277,7 +280,7 @@ const canEdit = useHasPermission("data_sources__can_edit_dataset");
 
 **Read-only access to one dashboard**
 
-- Grant `viewer` on `dashboards` via role group or custom `user_app_roles`, **or**
+- Grant `viewer` on `dashboards` via a **custom role group** (matrix row) **or**
   add a **user share** on that dashboard at `viewer`. Shares override narrow
   cases when combined via `max` with other grants.
 
@@ -317,7 +320,7 @@ const canEdit = useHasPermission("data_sources__can_edit_dataset");
 Run from repo root when touching permissions:
 
 ```bash
-rg 'user_app_roles|role_groups|role_group_app_roles|user_groups|user_group_memberships|resource_user_group_tags|resource_shares|is_restricted' supabase/schemas shared src
+rg 'workspace_memberships|role_groups|role_group_app_roles|user_groups|user_group_memberships|resource_user_group_tags|resource_shares|is_restricted' supabase/schemas shared src
 rg 'util__(get_auth_user_app_role|get_auth_user_user_group_ids|resource_effective_role|auth_user_can_access_resource|is_settings_admin)' supabase/schemas
 rg 'useHasPermission|useUserAppRoles|useResourceRole|useIsGlobalAdmin' src
 rg 'ShareResourceModal|WorkspaceUserPermissions|workspace_invites' src

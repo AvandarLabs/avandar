@@ -30,14 +30,23 @@ begin
     p_workspace_slug
   ) returning * into v_workspace;
 
-  -- Create the workspace membership
+  -- Create the workspace membership (owner = Global Admin preset)
   insert into public.workspace_memberships (
     workspace_id,
-    user_id
-  ) values (
+    user_id,
+    role_group_id
+  )
+  select
     v_workspace.id,
-    v_owner_id
-  ) returning id into v_membership_id;
+    v_owner_id,
+    rg.id
+  from
+    public.role_groups rg
+  where
+    rg.workspace_id = v_workspace.id and
+    rg.name = 'Global Admin' and
+    rg.is_builtin
+  returning id into v_membership_id;
 
   -- Create the user profile
   insert into public.user_profiles (

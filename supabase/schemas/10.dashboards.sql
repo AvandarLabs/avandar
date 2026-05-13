@@ -31,71 +31,9 @@ create table public.dashboards (
 );
 
 -- Enable row level security
-alter table public.dashboards enable row level security;
-
--- Policies
-create policy "
-  User can SELECT dashboards in their workspace
-" on public.dashboards for
-select
-  to authenticated,
-  anon using (
-    public.dashboards.is_public = true or
-    (
-      auth.uid () is not null and
-      public.dashboards.workspace_id = any (
-        array(
-          select
-            public.util__get_auth_user_workspaces ()
-        )
-      )
-    )
-  );
-
-create policy "
-  User can INSERT dashboards in their workspace
-" on public.dashboards for insert to authenticated
-with
-  check (
-    public.dashboards.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
-    )
-  );
-
-create policy "User can UPDATE dashboards in their workspace" on public.dashboards
-for update
-  to authenticated using (
-    public.dashboards.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
-    )
-  )
-with
-  check (
-    -- Updated row must still be in the auth user's workspace
-    public.dashboards.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
-    )
-  );
-
-create policy "
-  User can DELETE dashboards in their workspace
-" on public.dashboards for delete to authenticated using (
-  public.dashboards.workspace_id = any (
-    array(
-      select
-        public.util__get_auth_user_workspaces ()
-    )
-  )
-);
+-- RLS and policies: `17.dashboards_datasets_rls.sql`
+-- (after `16.utils__permissions.sql` defines resource helper functions).
+alter table public.datasets enable row level security;
 
 -- Trigger the `updated_at` update
 create trigger tr_dashboards__set_updated_at before

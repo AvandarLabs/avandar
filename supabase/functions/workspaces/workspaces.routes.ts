@@ -274,12 +274,25 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
             .single()
             .throwOnError();
 
+          const builtinRoleGroupName =
+            invite.role === "admin" ? "Global Admin" : "Global Viewer";
+
+          const { data: builtinRoleGroup } = await supabaseAdminClient
+            .from("role_groups")
+            .select("id")
+            .eq("workspace_id", workspace.id)
+            .eq("name", builtinRoleGroupName)
+            .eq("is_builtin", true)
+            .single()
+            .throwOnError();
+
           // create the workspace membership
           const { data: membership } = await supabaseAdminClient
             .from("workspace_memberships")
             .insert({
               workspace_id: workspace.id,
               user_id: user.id,
+              role_group_id: builtinRoleGroup.id,
             })
             .select()
             .single()

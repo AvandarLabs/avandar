@@ -15,12 +15,12 @@ import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { useWorkspaceInviteModal } from "@/components/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal";
+import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { useWorkspaceRole } from "@/hooks/workspaces/useWorkspaceRole";
 import type { UserProfileWithRole } from "$/models/User/UserProfile.types";
 
 export function WorkspaceUsersForm(): JSX.Element | null {
-  const workspaceRole = useWorkspaceRole();
+  const isAdmin = useIsGlobalAdmin();
   const workspace = useCurrentWorkspace();
   const [workspaceUsers = [], workspaceUsersLoading] =
     WorkspaceClient.useGetUsersForWorkspace({
@@ -53,8 +53,6 @@ export function WorkspaceUsersForm(): JSX.Element | null {
     numberOfSeats:
       loadingSeats ? undefined : pendingInvites.length + workspaceUsers.length,
   });
-
-  const isAdmin = workspaceRole === "admin";
 
   const { usedSeats, maxSeats, remainingSeats } =
     SubscriptionModule.getSeatInfo({

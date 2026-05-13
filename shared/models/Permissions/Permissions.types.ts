@@ -26,3 +26,43 @@ export type PermissionCatalog = {
     readonly [R in RoleLevel]: readonly PermissionKey[];
   };
 };
+
+/**
+ * Per-app role for the current user in one workspace, derived from
+ * `workspace_memberships.role_group_id` and `role_group_app_roles`.
+ *
+ * Each `app_type` can differ; `undefined` means no row for that app in the
+ * member’s role group matrix.
+ *
+ * @example Global Admin (four `role_group_app_roles` rows, all `admin`):
+ * ```ts
+ * {
+ *   data_sources: "admin",
+ *   data_explorer: "admin",
+ *   dashboards: "admin",
+ *   settings: "admin",
+ * }
+ * ```
+ *
+ * @example Global Viewer (three rows, no `settings` app;
+ * `useIsGlobalAdmin()` is false):
+ * ```ts
+ * {
+ *   data_sources: "viewer",
+ *   data_explorer: "viewer",
+ *   dashboards: "viewer",
+ *   settings: undefined,
+ * }
+ * ```
+ *
+ * @example Custom role group matrix (non-built-in `role_groups` row):
+ * ```ts
+ * {
+ *   data_sources: "editor",
+ *   data_explorer: "viewer",
+ *   dashboards: "viewer",
+ *   settings: undefined,
+ * }
+ * ```
+ */
+export type UserAppRolesRecord = Record<AppType, RoleLevel | undefined>;
