@@ -81,6 +81,40 @@ with
     )
   );
 
+-- Inlined owner path: avoids relying on SECURITY DEFINER helpers inside
+-- WITH CHECK (Postgres can evaluate them in a context where nested RLS
+-- behaves unexpectedly for workspace reads during RPC inserts).
+create policy "Workspace owners can insert datasets" on public.datasets for insert to authenticated
+with
+  check (
+    exists (
+      select
+        1
+      from
+        public.workspaces w
+      where
+        w.id = public.datasets.workspace_id and
+        w.owner_id = auth.uid ()
+    ) and
+    public.datasets.owner_id = (
+      select
+        auth.uid ()
+    )
+  );
+
+-- Same gate as rpc_datasets__add_dataset (owner or Settings admin).
+create policy "Workspace settings managers can insert datasets" on public.datasets for insert to authenticated
+with
+  check (
+    public.util__can_manage_workspace_settings (
+      public.datasets.workspace_id
+    ) and
+    public.datasets.owner_id = (
+      select
+        auth.uid ()
+    )
+  );
+
 create policy "User can update datasets in their workspace" on public.datasets
 for update
   to authenticated using (

@@ -40,7 +40,7 @@ type E2eWorkerFixtures = {
  */
 export const test = base.extend<Record<never, never>, E2eWorkerFixtures>({
   e2eWorkerDb: [
-    async (_, use, workerInfo) => {
+    async ({}, use, workerInfo) => {
       const workspaceSlug = `${E2E_WORKSPACE_SLUG_BASE}-w${workerInfo.workerIndex}`;
       const primaryUser: E2eWorkerCredentials = {
         email: E2E_PRIMARY_USER_EMAIL,
