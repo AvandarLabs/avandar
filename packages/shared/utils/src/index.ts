@@ -82,6 +82,9 @@ export { sleep } from "@utils/misc/sleep/sleep.ts";
 export { traverse } from "@utils/misc/traverse/traverse.ts";
 export { pipe } from "@utils/misc/pipe/pipe.ts";
 
+// sets
+export { makeSet } from "@utils/sets/makeSet/makeSet.ts";
+
 // objects
 export { camelCaseKeys } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
 export { camelCaseKeysDeep } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";

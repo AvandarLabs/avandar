@@ -4,6 +4,7 @@ import { withLogger } from "@logger/module-augmenters/withLogger";
 import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
 import { where } from "@utils/filters/where/where";
 import { isDefined } from "@utils/guards/isDefined/isDefined";
+import { makeSet } from "@utils/index";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
 import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord";
@@ -25,7 +26,6 @@ import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigCli
 import { getEntityFieldValues } from "@/clients/entities/EntityFieldValueClient/getEntityFieldValues/getEntityFieldValues";
 import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import { promiseFlatMap, promiseMap } from "@/lib/utils/promises";
-import { makeSet } from "@/lib/utils/sets/builders";
 import { isInSet } from "@/lib/utils/sets/higherOrderFuncs";
 import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
 import type { WithQueryHooks } from "@hooks/withQueryHooks/withQueryHooks.types";

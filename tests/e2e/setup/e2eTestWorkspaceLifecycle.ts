@@ -1,58 +1,62 @@
+import { makeSet } from "@utils/index";
 import {
   createSupabaseAdminClient,
   deleteWorkspaceTreeForE2EById,
-} from "../../helper/supabaseAdminClient";
-import {
-  E2E_PRIMARY_USER_EMAIL,
-  E2E_SEEDED_WORKSPACE_SLUG,
-} from "./e2e-credentials";
+} from "../../helpers/supabaseAdminClient";
 import { ensureWorkspaceSubscriptionForE2E } from "./ensureWorkspaceSubscriptionForE2E";
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { AvaSupabaseDBClient } from "@/db/supabase/AvaSupabaseDbClient.types";
 
 const E2E_TEST_WORKSPACE_DISPLAY_NAME = "E2E Test Workspace";
 
 /**
- * Resolves the primary E2E user's auth user id via RPC.
+ * Resolves a user's auth id
  *
- * @param admin Admin Supabase client.
+ * @param options.supabaseAdminClient Admin Supabase client.
+ * @param options.email User email.
  */
-async function _getPrimaryE2EUserId(admin: SupabaseClient): Promise<string> {
-  const { data: userId, error: userRpcError } = await admin.rpc(
-    "util__get_user_id_by_email",
-    { p_email: E2E_PRIMARY_USER_EMAIL },
-  );
+export async function getUserIdByEmail(options: {
+  supabaseAdminClient: AvaSupabaseDBClient;
+  email: string;
+}): Promise<string> {
+  const { data: userId, error: userRpcError } =
+    await options.supabaseAdminClient.rpc("util__get_user_id_by_email", {
+      p_email: options.email,
+    });
 
   if (userRpcError) {
-    throw new Error(
-      `[e2e] primary user lookup failed: ${userRpcError.message}`,
-    );
+    throw new Error(`[e2e] user lookup failed: ${userRpcError.message}`);
   }
 
   if (userId === null || userId === undefined || userId === "") {
-    throw new Error(
-      "[e2e] primary test user id missing; run ensureTestUser first.",
-    );
+    throw new Error(`[e2e] user id missing for ${options.email}.`);
   }
 
   return userId;
 }
 
 /**
- * Inserts the `e2e-test-workspace` row plus membership, profile, and admin
- * role for the primary E2E user. Caller must ensure the slug is unused.
+ * Inserts a workspace plus membership, profile, and admin role for the owner.
  *
- * @param admin Admin Supabase client.
+ * @param options.supabaseAdminClient Admin Supabase client.
+ * @param options.ownerEmail Workspace owner email (must exist in auth).
+ * @param options.workspaceSlug Unique slug for the URL.
  */
-async function _insertPrimaryUserE2eTestWorkspace(
-  admin: SupabaseClient,
-): Promise<void> {
-  const userId = await _getPrimaryE2EUserId(admin);
+async function _insertE2EWorkspaceForOwner(options: {
+  supabaseAdminClient: AvaSupabaseDBClient;
+  ownerEmail: string;
+  workspaceSlug: string;
+}): Promise<void> {
+  const { supabaseAdminClient: admin, ownerEmail, workspaceSlug } = options;
+  const userId = await getUserIdByEmail({
+    supabaseAdminClient: admin,
+    email: ownerEmail,
+  });
 
   const { data: insertedWorkspace, error: insertWorkspaceError } = await admin
     .from("workspaces")
     .insert({
       name: E2E_TEST_WORKSPACE_DISPLAY_NAME,
-      slug: E2E_SEEDED_WORKSPACE_SLUG,
+      slug: workspaceSlug,
       owner_id: userId,
     })
     .select("id")
@@ -126,20 +130,25 @@ async function _insertPrimaryUserE2eTestWorkspace(
 }
 
 /**
- * Deletes a workspace by slug when it exists and is owned by the primary E2E
- * user. No-op when missing; warns when owned by someone else.
+ * Deletes a workspace tree when the row exists and is owned by the given
+ * email. No-op when missing; warns when owned by someone else.
  *
- * @param options.admin Admin Supabase client.
- * @param options.slug Workspace slug from the URL.
+ * @param options.supabaseAdminClient Admin Supabase client.
+ * @param options.slug Workspace slug.
+ * @param options.ownerEmail Expected owner email.
  */
-export async function deletePrimaryUserE2EWorkspaceTreeBySlug(options: {
-  admin: SupabaseClient;
+export async function deleteUserOwnedWorkspaceTreeBySlug(options: {
+  supabaseAdminClient: AvaSupabaseDBClient;
   slug: string;
+  ownerEmail: string;
 }): Promise<void> {
-  const { admin, slug } = options;
-  const userId = await _getPrimaryE2EUserId(admin);
+  const { supabaseAdminClient, slug, ownerEmail } = options;
+  const userId = await getUserIdByEmail({
+    supabaseAdminClient,
+    email: ownerEmail,
+  });
 
-  const { data: row, error: lookupError } = await admin
+  const { data: row, error: lookupError } = await supabaseAdminClient
     .from("workspaces")
     .select("id, owner_id")
     .eq("slug", slug)
@@ -147,7 +156,7 @@ export async function deletePrimaryUserE2EWorkspaceTreeBySlug(options: {
 
   if (lookupError) {
     console.warn(
-      `[e2e] deletePrimaryUserE2EWorkspaceTreeBySlug lookup (${slug}): ` +
+      `[e2e] deleteUserOwnedWorkspaceTreeBySlug lookup (${slug}): ` +
         `${lookupError.message}`,
     );
     return;
@@ -159,77 +168,93 @@ export async function deletePrimaryUserE2EWorkspaceTreeBySlug(options: {
 
   if (row.owner_id !== userId) {
     console.warn(
-      `[e2e] skip delete: workspace "${slug}" ` +
-        `is not owned by ${E2E_PRIMARY_USER_EMAIL}.`,
+      `[e2e] skip delete: workspace "${slug}" is not owned by ${ownerEmail}.`,
     );
     return;
   }
 
   await deleteWorkspaceTreeForE2EById({
-    admin,
+    supabaseAdminClient: supabaseAdminClient,
     workspaceId: row.id,
   });
 }
 
 /**
- * Deletes the primary user's seeded E2E workspace by slug when present.
+ * Deletes the workspace for this slug when present and owned by ownerEmail.
  *
- * @param options.admin Admin Supabase client.
+ * @param options.ownerEmail Owner email.
+ * @param options.workspaceSlug Workspace slug.
  */
-export async function deletePrimaryUserE2EWorkspaceBySlug(options: {
-  admin: SupabaseClient;
+export async function teardownE2EWorkspaceBySlug(options: {
+  ownerEmail: string;
+  workspaceSlug: string;
 }): Promise<void> {
-  await deletePrimaryUserE2EWorkspaceTreeBySlug({
-    admin: options.admin,
-    slug: E2E_SEEDED_WORKSPACE_SLUG,
-  });
-}
-
-/**
- * Deletes any leftover workspace, inserts a fresh one, and adds a fake Polar
- * subscription row for free-plan limits.
- */
-// eslint-disable-next-line max-len
-export async function provisionFreshPrimaryUserE2ETestWorkspace(): Promise<void> {
-  const admin = createSupabaseAdminClient();
-
-  await deletePrimaryUserE2EWorkspaceBySlug({ admin });
-  await _insertPrimaryUserE2eTestWorkspace(admin);
-  await ensureWorkspaceSubscriptionForE2E();
-}
-
-/**
- * Removes the primary user's dedicated E2E workspace after a test (and after
- * the full run via global teardown).
- */
-export async function teardownPrimaryUserE2ETestWorkspace(): Promise<void> {
   try {
-    const admin = createSupabaseAdminClient();
-    await deletePrimaryUserE2EWorkspaceBySlug({ admin });
+    const supabaseAdminClient = createSupabaseAdminClient();
+    await deleteUserOwnedWorkspaceTreeBySlug({
+      supabaseAdminClient,
+      slug: options.workspaceSlug,
+      ownerEmail: options.ownerEmail,
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.warn(`[e2e] teardownPrimaryUserE2ETestWorkspace: ${message}`);
+    console.warn(`[e2e] teardownE2EWorkspaceBySlug: ${message}`);
   }
 }
 
 /**
- * Deletes every workspace owned by the primary E2E user whose slug is either
- * {@link E2E_SEEDED_WORKSPACE_SLUG} or starts with `e2e-org-` (Playwright
- * workspace-create leftovers).
+ * Deletes any existing workspace with this slug, inserts a fresh one, and adds
+ * a fake Polar subscription row for free-plan limits.
  *
- * @param options.admin Admin Supabase client.
+ * @param options.ownerEmail Primary E2E user email (workspace owner).
+ * @param options.workspaceSlug Slug for the shared E2E workspace.
  */
-export async function purgePrimaryUserE2EWorkspaces(options: {
-  admin: SupabaseClient;
+export async function provisionFreshE2EWorkspaceForOwner(options: {
+  ownerEmail: string;
+  workspaceSlug: string;
 }): Promise<void> {
-  const { admin } = options;
-  const userId = await _getPrimaryE2EUserId(admin);
+  const supabaseAdminClient = createSupabaseAdminClient();
+
+  await deleteUserOwnedWorkspaceTreeBySlug({
+    supabaseAdminClient,
+    slug: options.workspaceSlug,
+    ownerEmail: options.ownerEmail,
+  });
+  await _insertE2EWorkspaceForOwner({
+    supabaseAdminClient: supabaseAdminClient,
+    ownerEmail: options.ownerEmail,
+    workspaceSlug: options.workspaceSlug,
+  });
+  await ensureWorkspaceSubscriptionForE2E({
+    workspaceSlug: options.workspaceSlug,
+    polarCustomerEmail: options.ownerEmail,
+  });
+}
+
+/**
+ * Deletes every workspace owned by ownerEmail whose slug equals workspaceSlug
+ * or starts with `e2e-org-` (workspace-create leftovers).
+ *
+ * @param options.supabaseAdminClient Admin Supabase client.
+ * @param options.ownerEmail Owner email.
+ * @param options.workspaceSlug Exact slug of the shared worker workspace.
+ */
+export async function purgeE2EWorkspacesForOwner(options: {
+  supabaseAdminClient: AvaSupabaseDBClient;
+  ownerEmail: string;
+  workspaceSlug: string;
+}): Promise<void> {
+  const { supabaseAdminClient: admin, ownerEmail, workspaceSlug } = options;
+  const userId = await getUserIdByEmail({
+    supabaseAdminClient: admin,
+    email: ownerEmail,
+  });
 
   const { data: exactRows, error: exactError } = await admin
     .from("workspaces")
     .select("id")
     .eq("owner_id", userId)
-    .eq("slug", E2E_SEEDED_WORKSPACE_SLUG);
+    .eq("slug", workspaceSlug);
 
   if (exactError) {
     throw new Error(`[e2e] purge exact slug failed: ${exactError.message}`);
@@ -245,19 +270,96 @@ export async function purgePrimaryUserE2EWorkspaces(options: {
     throw new Error(`[e2e] purge prefix slug failed: ${prefixError.message}`);
   }
 
-  const ids = new Set<string>();
-  exactRows.forEach((row) => {
-    return ids.add(row.id);
-  });
-  prefixRows.forEach((row) => {
-    return ids.add(row.id);
+  const ids = makeSet(exactRows.concat(prefixRows), {
+    key: "id",
   });
 
-  for (const workspaceId of ids) {
-    await deleteWorkspaceTreeForE2EById({ admin, workspaceId });
-  }
-
-  console.log(
-    `[e2e] Purged ${ids.size} workspace(s) for ${E2E_PRIMARY_USER_EMAIL}.`,
+  await Promise.all(
+    [...ids].map((workspaceId) => {
+      return deleteWorkspaceTreeForE2EById({
+        supabaseAdminClient: admin,
+        workspaceId,
+      });
+    }),
   );
+
+  console.log(`[e2e] Purged ${ids.size} workspace(s) for ${ownerEmail}.`);
+}
+
+/**
+ * Best-effort removal of known E2E workspaces for the given owner emails. Used
+ * by global teardown when a prior run exited without worker teardown.
+ *
+ * We are okay with ignoring thrown errors here because this is the cleanup
+ * step. We don't want spurious errors on teardown to turn a green test suite
+ * into a red one.
+ *
+ * @param options.ownerEmails Emails whose owned `e2e-test-workspace%` and
+ *   `e2e-org-%` slugs should be removed.
+ */
+export async function bestEffortPurgeE2EWorkspacesForOwners(options: {
+  ownerEmails: readonly string[];
+}): Promise<void> {
+  const supabaseAdminClient = createSupabaseAdminClient();
+
+  for (const email of options.ownerEmails) {
+    let userId: string;
+    try {
+      userId = await getUserIdByEmail({
+        supabaseAdminClient: supabaseAdminClient,
+        email,
+      });
+    } catch {
+      continue;
+    }
+
+    const { data: seededRows, error: seededError } = await supabaseAdminClient
+      .from("workspaces")
+      .select("id, slug")
+      .eq("owner_id", userId)
+      .like("slug", "e2e-test-workspace%");
+
+    if (seededError) {
+      console.warn(
+        `[e2e] best-effort purge list (seeded) for ${email}: ` +
+          `${seededError.message}`,
+      );
+      continue;
+    }
+
+    const { data: orgRows, error: orgError } = await supabaseAdminClient
+      .from("workspaces")
+      .select("id, slug")
+      .eq("owner_id", userId)
+      .like("slug", "e2e-org-%");
+
+    if (orgError) {
+      console.warn(
+        `[e2e] best-effort purge list (org) for ${email}: ${orgError.message}`,
+      );
+      continue;
+    }
+
+    const byId = new Map<string, { id: string; slug: string }>();
+    for (const row of [...(seededRows ?? []), ...(orgRows ?? [])]) {
+      byId.set(row.id, row);
+    }
+
+    await Promise.all(
+      [...byId.values()].map(async (row) => {
+        try {
+          await deleteWorkspaceTreeForE2EById({
+            supabaseAdminClient,
+            workspaceId: row.id,
+          });
+        } catch (cleanupError) {
+          const message =
+            cleanupError instanceof Error ?
+              cleanupError.message
+            : String(cleanupError);
+          console.warn(`[e2e] best-effort purge ${row.slug}: ${message}`);
+        }
+      }),
+    );
+  }
 }

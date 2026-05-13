@@ -203,6 +203,14 @@ export default [
     },
   },
   {
+    // Avoid false-positives in Playwright fixtures where the function `use()`
+    // is not a hook, it is part of Playwright's fixture system.
+    files: ["tests/e2e/**/*.{ts,tsx}"],
+    rules: {
+      "react-hooks/rules-of-hooks": "off",
+    },
+  },
+  {
     ignores: ["shared/types/database.types.ts"],
   },
 ];

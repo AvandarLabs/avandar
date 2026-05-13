@@ -2,16 +2,14 @@ import {
   createSupabaseAdminClient,
   getWorkspaceIdBySlug,
   isDatasetParquetInStorage,
-} from "../helper/supabaseAdminClient";
-import { expect, test } from "./fixtures/e2eTestWorkspace.fixture";
+} from "../helpers/supabaseAdminClient";
+import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
   CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
   CALIFORNIA_XLSX_PATH,
   CHOLERA_NYC_XLSX_EXPECTED_ROW_COUNT,
   CHOLERA_NYC_XLSX_PATH,
-  E2E_SEEDED_WORKSPACE_SLUG,
-  E2E_TEST_USER,
   EXPECTED_CHOLERA_COLUMN_NAMES,
   EXPECTED_CSV_COLUMN_NAMES,
 } from "./helpers/constants";
@@ -62,17 +60,20 @@ async function expectExcelParsePreview(options: {
 test.describe("Excel manual upload", () => {
   test("XLSX import, cloud sync, offline then online again", async ({
     page,
+    e2eWorkerDb,
   }) => {
     test.setTimeout(240_000);
 
     const admin = createSupabaseAdminClient();
+    const { workspaceSlug } = e2eWorkerDb;
 
     await signInWithEmailPassword(page, {
-      email: E2E_TEST_USER.email,
-      password: E2E_TEST_USER.password,
+      email: e2eWorkerDb.primaryUser.email,
+      password: e2eWorkerDb.primaryUser.password,
+      workspaceSlug,
     });
 
-    await page.goto(`/${E2E_SEEDED_WORKSPACE_SLUG}/data-manager/data-import`);
+    await page.goto(`/${workspaceSlug}/data-manager/data-import`);
 
     const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
     const fileInput = uploadPanel.locator('input[type="file"]');
@@ -105,12 +106,12 @@ test.describe("Excel manual upload", () => {
 
     await ensureCloudStorageCheckedAndSaveDataset({
       page,
-      workspaceSlug: E2E_SEEDED_WORKSPACE_SLUG,
+      workspaceSlug,
     });
 
     const datasetId = parseDatasetIdFromDataManagerUrl({
       url: page.url(),
-      workspaceSlug: E2E_SEEDED_WORKSPACE_SLUG,
+      workspaceSlug,
     });
 
     if (!datasetId) {
@@ -118,8 +119,8 @@ test.describe("Excel manual upload", () => {
     }
 
     const workspaceId = await getWorkspaceIdBySlug({
-      admin,
-      slug: E2E_SEEDED_WORKSPACE_SLUG,
+      supabaseAdminClient: admin,
+      slug: workspaceSlug,
     });
 
     await pollUntilCloudDatasetToggleShowsOnline(page);
@@ -128,7 +129,7 @@ test.describe("Excel manual upload", () => {
       .poll(
         async () => {
           return isDatasetParquetInStorage({
-            admin,
+            supabaseAdminClient: admin,
             workspaceId,
             datasetId,
           });
@@ -151,7 +152,7 @@ test.describe("Excel manual upload", () => {
       .poll(
         async () => {
           const parquetGone = !(await isDatasetParquetInStorage({
-            admin,
+            supabaseAdminClient: admin,
             workspaceId,
             datasetId,
           }));
@@ -181,7 +182,7 @@ test.describe("Excel manual upload", () => {
       .poll(
         async () => {
           return isDatasetParquetInStorage({
-            admin,
+            supabaseAdminClient: admin,
             workspaceId,
             datasetId,
           });
@@ -202,7 +203,7 @@ test.describe("Excel manual upload", () => {
       datasetId,
       page,
       workspaceId,
-      workspaceSlug: E2E_SEEDED_WORKSPACE_SLUG,
+      workspaceSlug,
     });
   });
 });

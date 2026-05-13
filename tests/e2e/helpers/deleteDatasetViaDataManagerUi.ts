@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { isDatasetParquetInStorage } from "../../helper/supabaseAdminClient";
+import { isDatasetParquetInStorage } from "../../helpers/supabaseAdminClient";
 import { LONG_WAIT, SHORT_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -63,7 +63,7 @@ export async function deleteDatasetViaDataManagerUiAndVerify(options: {
     .poll(
       async () => {
         return !(await isDatasetParquetInStorage({
-          admin,
+          supabaseAdminClient: admin,
           workspaceId,
           datasetId,
         }));

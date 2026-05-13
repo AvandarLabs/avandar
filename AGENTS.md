@@ -79,8 +79,9 @@ have the flexibility you need.
 ## Browser navigation
 
 - If you are asked to navigate the app in the browser to write tests or verify
-  functionality, use the credentials in `tests/e2e/setup/e2e-credentials.ts` to
-  log in as a test user. The localhost URL is <http://localhost:5173>.
+  functionality, use the credentials in `tests/e2e/setup/e2e-credentials.ts`
+  (`test-user@avandarlabs.com` / `test-user2@avandarlabs.com`). The localhost URL
+  is <http://localhost:5173>.
 
 ## Testing
 

@@ -30,7 +30,9 @@ export function createSupabaseAdminClient(): SupabaseClient {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!apiUrl || !serviceRoleKey) {
-    throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.");
+    throw new Error(
+      "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY (which should actually be the SECRET_KEY).",
+    );
   }
 
   return createClient(apiUrl, serviceRoleKey, {
@@ -48,10 +50,10 @@ export function createSupabaseAdminClient(): SupabaseClient {
  * @param options.slug Workspace slug from the URL.
  */
 export async function getWorkspaceIdBySlug(options: {
-  admin: SupabaseClient;
+  supabaseAdminClient: SupabaseClient;
   slug: string;
 }): Promise<string> {
-  const { data, error } = await options.admin
+  const { data, error } = await options.supabaseAdminClient
     .from("workspaces")
     .select("id")
     .eq("slug", options.slug)
@@ -71,12 +73,12 @@ export async function getWorkspaceIdBySlug(options: {
 /**
  * Returns whether the Parquet object exists in Supabase Storage.
  *
- * @param options.admin Admin Supabase client.
+ * @param options.supabaseAdminClient Admin Supabase client.
  * @param options.workspaceId Workspace UUID.
  * @param options.datasetId Dataset UUID.
  */
 export async function isDatasetParquetInStorage(options: {
-  admin: SupabaseClient;
+  supabaseAdminClient: SupabaseClient;
   workspaceId: string;
   datasetId: string;
 }): Promise<boolean> {
@@ -85,7 +87,7 @@ export async function isDatasetParquetInStorage(options: {
     datasetId: options.datasetId,
   });
 
-  const { data, error } = await options.admin.storage
+  const { data, error } = await options.supabaseAdminClient.storage
     .from(WORKSPACES_STORAGE_BUCKET)
     .download(path);
 
@@ -103,14 +105,14 @@ export async function isDatasetParquetInStorage(options: {
  * Used by E2E global setup so repeated runs do not hit the Free-plan dataset
  * cap (the Data Import view then shows a blocking upgrade modal).
  *
- * @param options.admin Admin Supabase client.
+ * @param options.supabaseAdminClient Admin Supabase client.
  * @param options.workspaceId Workspace UUID.
  */
 export async function deleteAllDatasetsInWorkspaceForE2E(options: {
-  admin: SupabaseClient;
+  supabaseAdminClient: SupabaseClient;
   workspaceId: string;
 }): Promise<void> {
-  const { data: rows, error: selectError } = await options.admin
+  const { data: rows, error: selectError } = await options.supabaseAdminClient
     .from("datasets")
     .select("id")
     .eq("workspace_id", options.workspaceId);
@@ -134,7 +136,7 @@ export async function deleteAllDatasetsInWorkspaceForE2E(options: {
     });
   });
 
-  const { error: storageError } = await options.admin.storage
+  const { error: storageError } = await options.supabaseAdminClient.storage
     .from(WORKSPACES_STORAGE_BUCKET)
     .remove(objectPaths);
 
@@ -144,7 +146,7 @@ export async function deleteAllDatasetsInWorkspaceForE2E(options: {
     );
   }
 
-  const { error: deleteError } = await options.admin
+  const { error: deleteError } = await options.supabaseAdminClient
     .from("datasets")
     .delete()
     .eq("workspace_id", options.workspaceId);
@@ -158,18 +160,21 @@ export async function deleteAllDatasetsInWorkspaceForE2E(options: {
  * Deletes every dataset and dashboard in a workspace (including dataset
  * Parquet objects). Subscription and workspace rows are untouched.
  *
- * @param options.admin Admin Supabase client.
+ * @param options.supabaseAdminClient Admin Supabase client.
  * @param options.workspaceId Workspace UUID.
  */
 export async function clearWorkspaceResourcesForE2E(options: {
-  admin: SupabaseClient;
+  supabaseAdminClient: SupabaseClient;
   workspaceId: string;
 }): Promise<void> {
-  const { admin, workspaceId } = options;
+  const { supabaseAdminClient, workspaceId } = options;
 
-  await deleteAllDatasetsInWorkspaceForE2E({ admin, workspaceId });
+  await deleteAllDatasetsInWorkspaceForE2E({
+    supabaseAdminClient,
+    workspaceId,
+  });
 
-  const { error: dashboardsError } = await admin
+  const { error: dashboardsError } = await supabaseAdminClient
     .from("dashboards")
     .delete()
     .eq("workspace_id", workspaceId);
@@ -187,13 +192,14 @@ export async function clearWorkspaceResourcesForE2E(options: {
  * @param options.workspaceId Workspace UUID used as the bucket path prefix.
  */
 export async function removeWorkspaceBucketTreeForE2E(options: {
-  admin: SupabaseClient;
+  supabaseAdminClient: SupabaseClient;
   workspaceId: string;
 }): Promise<void> {
   const removeRecursive = async (relativePath: string): Promise<void> => {
-    const { data: items, error: listError } = await options.admin.storage
-      .from(WORKSPACES_STORAGE_BUCKET)
-      .list(relativePath, { limit: 1000 });
+    const { data: items, error: listError } =
+      await options.supabaseAdminClient.storage
+        .from(WORKSPACES_STORAGE_BUCKET)
+        .list(relativePath, { limit: 1000 });
 
     if (listError) {
       console.warn(
@@ -210,7 +216,7 @@ export async function removeWorkspaceBucketTreeForE2E(options: {
       if (isFolder) {
         await removeRecursive(childPath);
       } else {
-        const { error: removeError } = await options.admin.storage
+        const { error: removeError } = await options.supabaseAdminClient.storage
           .from(WORKSPACES_STORAGE_BUCKET)
           .remove([childPath]);
 
@@ -230,20 +236,26 @@ export async function removeWorkspaceBucketTreeForE2E(options: {
  * Deletes datasets, dashboards, storage objects, the subscription row, and
  * the workspace row for the given workspace id.
  *
- * @param options.admin Admin Supabase client.
+ * @param options.supabaseAdminClient Admin Supabase client.
  * @param options.workspaceId Workspace UUID to remove completely.
  */
 export async function deleteWorkspaceTreeForE2EById(options: {
-  admin: SupabaseClient;
+  supabaseAdminClient: SupabaseClient;
   workspaceId: string;
 }): Promise<void> {
-  const { admin, workspaceId } = options;
+  const { supabaseAdminClient: supabaseAdminClient, workspaceId } = options;
 
-  await clearWorkspaceResourcesForE2E({ admin, workspaceId });
+  await clearWorkspaceResourcesForE2E({
+    supabaseAdminClient,
+    workspaceId,
+  });
 
-  await removeWorkspaceBucketTreeForE2E({ admin, workspaceId });
+  await removeWorkspaceBucketTreeForE2E({
+    supabaseAdminClient,
+    workspaceId,
+  });
 
-  const { error: subscriptionError } = await admin
+  const { error: subscriptionError } = await supabaseAdminClient
     .from("subscriptions")
     .delete()
     .eq("workspace_id", workspaceId);
@@ -252,7 +264,7 @@ export async function deleteWorkspaceTreeForE2EById(options: {
     console.warn(`[e2e] subscriptions delete: ${subscriptionError.message}`);
   }
 
-  const { error: workspaceDeleteError } = await admin
+  const { error: workspaceDeleteError } = await supabaseAdminClient
     .from("workspaces")
     .delete()
     .eq("id", workspaceId);
