@@ -19,7 +19,8 @@ const VITE_CONFIG_PATH = "vite.config.ts";
 
 /**
  * Writes all boilerplate files for a new workspace package and registers
- * path aliases. Deno integration applies only to `shared` packages.
+ * path aliases (barrel `@name` and `@name/*`). Deno integration applies only
+ * to `shared` packages.
  */
 export function writeNewPackageBoilerplate(options: {
   packageName: string;
@@ -81,9 +82,9 @@ export function writeNewPackageBoilerplate(options: {
   const pkgSrcDir = `packages/${packageType}/${packageName}/src`;
   const packageDir = `./packages/${packageType}/${packageName}`;
 
-  _addTsconfigPathAlias({
-    alias: `${alias}/*`,
-    aliasTarget: `./${pkgSrcDir}/*`,
+  _registerNewPackageTsconfigBasePaths({
+    barrelAlias: alias,
+    pkgSrcDir,
   });
   _addTsconfigAppInclude(`./${pkgSrcDir}`);
 
@@ -112,9 +113,9 @@ export function writeNewPackageBoilerplate(options: {
   Acclimate.log("|cyan|💡 Run `pnpm install` to link the new package.|");
 }
 
-function _addTsconfigPathAlias(options: {
-  alias: string;
-  aliasTarget: string;
+function _registerNewPackageTsconfigBasePaths(options: {
+  barrelAlias: string;
+  pkgSrcDir: string;
 }): void {
   const filePath = path.join(PROJECT_ROOT, TSCONFIG_PATH);
   const raw = fs.readFileSync(filePath, "utf8");
@@ -124,14 +125,32 @@ function _addTsconfigPathAlias(options: {
     };
   };
 
-  if (config.compilerOptions.paths[options.alias]) {
+  const { paths } = config.compilerOptions;
+  const wildcardAlias = `${options.barrelAlias}/*`;
+  let didChange = false;
+
+  if (paths[options.barrelAlias]) {
     Acclimate.log(
-      `|yellow|⚠️ tsconfig.base.json already has alias "${options.alias}", skipping.|`,
+      `|yellow|⚠️ tsconfig.base.json already has alias "${options.barrelAlias}", skipping.|`,
     );
+  } else {
+    paths[options.barrelAlias] = [`./${options.pkgSrcDir}/index.ts`];
+    didChange = true;
+  }
+
+  if (paths[wildcardAlias]) {
+    Acclimate.log(
+      `|yellow|⚠️ tsconfig.base.json already has alias "${wildcardAlias}", skipping.|`,
+    );
+  } else {
+    paths[wildcardAlias] = [`./${options.pkgSrcDir}/*`];
+    didChange = true;
+  }
+
+  if (!didChange) {
     return;
   }
 
-  config.compilerOptions.paths[options.alias] = [options.aliasTarget];
   fs.writeFileSync(
     filePath,
     JSON.stringify(config, undefined, 2) + "\n",

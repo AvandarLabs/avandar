@@ -173,6 +173,9 @@ describe("writeNewPackageBoilerplate", () => {
         paths: Record<string, string[]>;
       };
     };
+    expect(written.compilerOptions.paths["@my-lib"]).toEqual([
+      "./packages/shared/my-lib/src/index.ts",
+    ]);
     expect(written.compilerOptions.paths["@my-lib/*"]).toEqual([
       "./packages/shared/my-lib/src/*",
     ]);
