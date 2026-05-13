@@ -25,7 +25,7 @@ create or replace function public.util__rank_to_role_level (
     when 1 then 'viewer'
     when 2 then 'editor'
     when 3 then 'admin'
-    else null::public.role_level
+    else null
   end;
 $$;
 
@@ -193,7 +193,7 @@ begin
     return null;
   end if;
 
-  if p_resource_type = 'dashboard'::public.resource_type then
+  if p_resource_type = 'dashboard' then
     select
       d.workspace_id,
       d.owner_id,
@@ -202,8 +202,8 @@ begin
     from public.dashboards d
     where
       d.id = p_resource_id;
-    v_app := 'dashboards'::public.app_type;
-  elsif p_resource_type = 'dataset'::public.resource_type then
+    v_app := 'dashboards';
+  elsif p_resource_type = 'dataset' then
     select
       ds.workspace_id,
       ds.owner_id,
