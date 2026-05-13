@@ -1,17 +1,17 @@
 import { unknownToString } from "@utils";
 import {
-    buildHTTPQueryString as _buildHTTPQueryString,
-    ValidURLQueryParamValue,
+  buildHTTPQueryString as _buildHTTPQueryString,
+  ValidURLQueryParamValue,
 } from "$/utils/urls/buildHTTPQueryString";
 import { Simplify } from "type-fest";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { Logger } from "@/utils/Logger";
 import type {
-    API,
-    APIBody,
-    APIPathParams,
-    APIQueryParams,
-    APIReturnType,
+  API,
+  APIBody,
+  APIPathParams,
+  APIQueryParams,
+  APIReturnType,
 } from "@/types/http-api.types";
 import type { HTTPMethod } from "@sbfn/_shared/MiniServer/api.types";
 

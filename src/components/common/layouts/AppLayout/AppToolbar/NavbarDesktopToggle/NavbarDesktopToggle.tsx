@@ -3,8 +3,8 @@ import {
   IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarLeftExpand,
 } from "@tabler/icons-react";
-import { AppShellStateManager } from "@/lib/ui/AppShell/AppShellStateManager";
 import { Tooltip } from "@ui";
+import { AppShellStateManager } from "@/lib/ui/AppShell/AppShellStateManager";
 
 /**
  * Toggle icon to control the navbar

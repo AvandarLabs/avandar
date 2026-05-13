@@ -1,4 +1,4 @@
-import { useBoolean, useQuery  } from "@hooks";
+import { useBoolean, useQuery } from "@hooks";
 import { notifyError } from "@ui";
 import { useEffect } from "react";
 import { Logger } from "@/utils/Logger";

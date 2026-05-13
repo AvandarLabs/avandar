@@ -6,7 +6,7 @@ import {
 import { useUncontrolled } from "@mantine/hooks";
 import { Model } from "@models";
 import { makeSelectOptions } from "@ui";
-import { where, isNonNullish , makeIdLookupMap , prop  } from "@utils";
+import { isNonNullish, makeIdLookupMap, prop, where } from "@utils";
 import { QueryColumn as QueryColumnFns } from "$/models/queries/QueryColumn/QueryColumn";
 import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
 import { matchSorter } from "match-sorter";

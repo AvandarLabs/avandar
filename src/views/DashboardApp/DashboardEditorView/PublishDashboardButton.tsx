@@ -1,7 +1,7 @@
 import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconWorld } from "@tabler/icons-react";
-import { notifySuccess, notifyDevAlert  } from "@ui";
+import { notifyDevAlert, notifySuccess } from "@ui";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 

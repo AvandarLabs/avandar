@@ -1,6 +1,6 @@
 import { useQuery } from "@hooks";
 import { Model } from "@models";
-import { prop, makeObjectFromEntries , sortObjList  } from "@utils";
+import { makeObjectFromEntries, prop, sortObjList } from "@utils";
 import { uuid } from "$/lib/uuid";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { QueryResult as QueryResultFns } from "$/models/queries/QueryResult/QueryResult";

@@ -1,8 +1,9 @@
 import { Box, Flex, List, Text } from "@mantine/core";
-import { prop, objectValues , UnknownDataFrame  } from "@utils";
+import { objectValues, prop, UnknownDataFrame } from "@utils";
 import { match } from "ts-pattern";
 import { flattenError, object, prettifyError, string } from "zod";
 import { Callout } from "@/lib/ui/Callout";
+import { DangerText } from "@/lib/ui/text/DangerText";
 import { AreaChart } from "@/lib/ui/viz/AreaChart";
 import { BarChart } from "@/lib/ui/viz/BarChart";
 import { BubbleChart } from "@/lib/ui/viz/BubbleChart";
@@ -13,7 +14,6 @@ import { PieChart } from "@/lib/ui/viz/PieChart";
 import { RadarChart } from "@/lib/ui/viz/RadarChart";
 import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import { DangerText } from "@/lib/ui/text/DangerText";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 
 type Props = {

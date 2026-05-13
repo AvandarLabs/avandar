@@ -1,5 +1,5 @@
-import { describe, expect, expectTypeOf, it } from "vitest";
 import { toCamelCase } from "@utils/strings/toCamelCase/toCamelCase.ts";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
 describe("toCamelCase", () => {
   it("converts simple dashed and underscored phrases with defaults", () => {

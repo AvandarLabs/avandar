@@ -1,7 +1,7 @@
 import { useQuery } from "@hooks";
 import { Loader, Stack, Text } from "@mantine/core";
 import { ObjectDescriptionList } from "@ui";
-import { where, propEq  } from "@utils";
+import { propEq, where } from "@utils";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";

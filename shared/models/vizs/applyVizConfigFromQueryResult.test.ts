@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
 import {
   applyVizConfigFromQueryResult,
   isVizConfigEqualForQueryResultSync,
 } from "$/models/vizs/applyVizConfigFromQueryResult.ts";
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.ts";
+import { describe, expect, it } from "vitest";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 function cols(

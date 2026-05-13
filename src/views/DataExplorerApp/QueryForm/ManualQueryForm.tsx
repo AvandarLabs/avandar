@@ -1,6 +1,6 @@
 import { Fieldset, Stack, Text } from "@mantine/core";
 import { Model } from "@models";
-import { makeSelectOptions, Select  } from "@ui";
+import { makeSelectOptions, Select } from "@ui";
 import { prop } from "@utils";
 import { QueryColumn as QueryColumnModule } from "$/models/queries/QueryColumn/QueryColumn";
 import { AggregationSelect } from "@/views/DataExplorerApp/AggregationSelect";

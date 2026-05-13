@@ -1,6 +1,16 @@
 import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { ObjectDescriptionList } from "@ui";
-import { where, isNonNullish , makeIdLookupMap , makeMap , prop , propEq , makeObject , omit , unknownToString  } from "@utils";
+import {
+  isNonNullish,
+  makeIdLookupMap,
+  makeMap,
+  makeObject,
+  omit,
+  prop,
+  propEq,
+  unknownToString,
+  where,
+} from "@utils";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";

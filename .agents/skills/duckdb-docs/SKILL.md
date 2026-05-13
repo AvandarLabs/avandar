@@ -38,22 +38,22 @@ The query is: `$@`
 
 There are two search indexes available:
 
-| Index | Remote URL | Local cache filename | Versions | Use when |
-|-------|-----------|---------------------|----------|----------|
-| **DuckDB docs + blog** | `https://duckdb.org/data/docs-search.duckdb` | `duckdb-docs.duckdb` | `lts`, `current`, `blog` | Default — any DuckDB question |
-| **DuckLake docs** | `https://ducklake.select/data/docs-search.duckdb` | `ducklake-docs.duckdb` | `stable`, `preview` | Query mentions DuckLake, catalogs, or DuckLake-specific features |
+| Index                  | Remote URL                                        | Local cache filename   | Versions                 | Use when                                                         |
+| ---------------------- | ------------------------------------------------- | ---------------------- | ------------------------ | ---------------------------------------------------------------- |
+| **DuckDB docs + blog** | `https://duckdb.org/data/docs-search.duckdb`      | `duckdb-docs.duckdb`   | `lts`, `current`, `blog` | Default — any DuckDB question                                    |
+| **DuckLake docs**      | `https://ducklake.select/data/docs-search.duckdb` | `ducklake-docs.duckdb` | `stable`, `preview`      | Query mentions DuckLake, catalogs, or DuckLake-specific features |
 
 Both indexes share the same schema:
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `chunk_id` | `VARCHAR` (PK) | e.g. `stable/sql/functions/numeric#absx` |
-| `page_title` | `VARCHAR` | Page title from front matter |
-| `section` | `VARCHAR` | Section heading (null for page intros) |
-| `breadcrumb` | `VARCHAR` | e.g. `SQL > Functions > Numeric` |
-| `url` | `VARCHAR` | URL path with anchor |
-| `version` | `VARCHAR` | See table above |
-| `text` | `TEXT` | Full markdown of the chunk |
+| Column       | Type           | Description                              |
+| ------------ | -------------- | ---------------------------------------- |
+| `chunk_id`   | `VARCHAR` (PK) | e.g. `stable/sql/functions/numeric#absx` |
+| `page_title` | `VARCHAR`      | Page title from front matter             |
+| `section`    | `VARCHAR`      | Section heading (null for page intros)   |
+| `breadcrumb` | `VARCHAR`      | e.g. `SQL > Functions > Numeric`         |
+| `url`        | `VARCHAR`      | URL path with anchor                     |
+| `version`    | `VARCHAR`      | See table above                          |
+| `text`       | `TEXT`         | Full markdown of the chunk               |
 
 By default, search **DuckDB docs** and filter to `version = 'lts'`. Use different versions when:
 

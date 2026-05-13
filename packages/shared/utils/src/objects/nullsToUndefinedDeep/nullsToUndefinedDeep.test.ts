@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { nullsToUndefinedDeep } from "@utils/objects/nullsToUndefinedDeep/nullsToUndefinedDeep.ts";
+import { describe, expect, it } from "vitest";
 
 describe("nullsToUndefinedDeep", () => {
   it("swaps top-level null values to undefined", () => {

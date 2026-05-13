@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { isArray } from "@utils/guards/isArray/isArray.ts";
+import { describe, expect, it } from "vitest";
 
 describe("isArray", () => {
   it("returns true for arrays", () => {

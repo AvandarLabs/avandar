@@ -40,14 +40,14 @@ Executes callbacks scheduled by `setTimeout()` and `setInterval()`.
 
 ```javascript
 // Timer callbacks execute when their threshold is reached
-setTimeout(() => console.log('timer'), 100);
+setTimeout(() => console.log("timer"), 100);
 
 // Multiple timers with same delay execute in order of scheduling
-setTimeout(() => console.log('first'), 100);
-setTimeout(() => console.log('second'), 100);
+setTimeout(() => console.log("first"), 100);
+setTimeout(() => console.log("second"), 100);
 ```
 
-**Important**: Timers specify a *minimum* delay, not exact timing:
+**Important**: Timers specify a _minimum_ delay, not exact timing:
 
 ```javascript
 const start = Date.now();
@@ -69,12 +69,12 @@ Executes I/O callbacks deferred from the previous loop iteration (e.g., TCP erro
 
 ```javascript
 // Some system operations defer callbacks to this phase
-const net = require('node:net');
+const net = require("node:net");
 
 const server = net.createServer();
-server.on('error', (err) => {
+server.on("error", (err) => {
   // ECONNREFUSED and similar errors may fire here
-  console.error('Server error:', err);
+  console.error("Server error:", err);
 });
 ```
 
@@ -87,26 +87,28 @@ Used for internal housekeeping before polling for I/O.
 ### 4. Poll Phase
 
 The poll phase:
+
 1. Calculates how long to block waiting for I/O
 2. Processes events in the poll queue
 
 ```javascript
-const fs = require('node:fs');
+const fs = require("node:fs");
 
 // File I/O callbacks execute during poll phase
-fs.readFile('/etc/passwd', (err, data) => {
-  console.log('File read callback - poll phase');
+fs.readFile("/etc/passwd", (err, data) => {
+  console.log("File read callback - poll phase");
 });
 
 // Network I/O also executes during poll
-const net = require('node:net');
-const socket = net.connect(80, 'example.com');
-socket.on('data', (chunk) => {
-  console.log('Socket data callback - poll phase');
+const net = require("node:net");
+const socket = net.connect(80, "example.com");
+socket.on("data", (chunk) => {
+  console.log("Socket data callback - poll phase");
 });
 ```
 
 **Poll behavior**:
+
 - If poll queue is not empty: execute callbacks synchronously until queue is empty or system limit reached
 - If poll queue is empty:
   - If `setImmediate()` is scheduled: end poll phase and move to check phase
@@ -119,7 +121,7 @@ Executes `setImmediate()` callbacks immediately after poll phase.
 
 ```javascript
 setImmediate(() => {
-  console.log('setImmediate callback - check phase');
+  console.log("setImmediate callback - check phase");
 });
 ```
 
@@ -128,11 +130,11 @@ setImmediate(() => {
 Executes close event callbacks (e.g., `socket.on('close', ...)`).
 
 ```javascript
-const net = require('node:net');
+const net = require("node:net");
 
-const socket = net.connect(80, 'example.com');
-socket.on('close', () => {
-  console.log('Socket closed - close callbacks phase');
+const socket = net.connect(80, "example.com");
+socket.on("close", () => {
+  console.log("Socket closed - close callbacks phase");
 });
 socket.destroy();
 ```
@@ -164,13 +166,13 @@ socket.destroy();
 
 ```javascript
 // Execution order example
-setImmediate(() => console.log('1. setImmediate'));
-setTimeout(() => console.log('2. setTimeout'), 0);
+setImmediate(() => console.log("1. setImmediate"));
+setTimeout(() => console.log("2. setTimeout"), 0);
 
-Promise.resolve().then(() => console.log('3. Promise'));
-process.nextTick(() => console.log('4. nextTick'));
+Promise.resolve().then(() => console.log("3. Promise"));
+process.nextTick(() => console.log("4. nextTick"));
 
-console.log('5. sync');
+console.log("5. sync");
 
 // Output (may vary for setTimeout vs setImmediate):
 // 5. sync
@@ -202,8 +204,8 @@ function recursiveImmediate() {
 In the main module, order is non-deterministic:
 
 ```javascript
-setTimeout(() => console.log('timeout'), 0);
-setImmediate(() => console.log('immediate'));
+setTimeout(() => console.log("timeout"), 0);
+setImmediate(() => console.log("immediate"));
 
 // Order depends on process performance
 // Sometimes: timeout, immediate
@@ -213,11 +215,11 @@ setImmediate(() => console.log('immediate'));
 Within an I/O callback, `setImmediate` always first:
 
 ```javascript
-const fs = require('node:fs');
+const fs = require("node:fs");
 
-fs.readFile('/etc/passwd', () => {
-  setTimeout(() => console.log('timeout'), 0);
-  setImmediate(() => console.log('immediate'));
+fs.readFile("/etc/passwd", () => {
+  setTimeout(() => console.log("timeout"), 0);
+  setImmediate(() => console.log("immediate"));
 });
 
 // Always: immediate, timeout
@@ -246,7 +248,7 @@ setInterval(() => {
 ### Using Async Hooks
 
 ```javascript
-const async_hooks = require('node:async_hooks');
+const async_hooks = require("node:async_hooks");
 
 // Track async operation timing
 const asyncTiming = new Map();
@@ -256,7 +258,7 @@ const hook = async_hooks.createHook({
     asyncTiming.set(asyncId, {
       type,
       start: Date.now(),
-      trigger: triggerAsyncId
+      trigger: triggerAsyncId,
     });
   },
   destroy(asyncId) {
@@ -268,7 +270,7 @@ const hook = async_hooks.createHook({
       }
       asyncTiming.delete(asyncId);
     }
-  }
+  },
 });
 
 hook.enable();
@@ -277,18 +279,18 @@ hook.enable();
 ### libuv Metrics (Node.js 18+)
 
 ```javascript
-const { monitorEventLoopDelay } = require('node:perf_hooks');
+const { monitorEventLoopDelay } = require("node:perf_hooks");
 
 const histogram = monitorEventLoopDelay({ resolution: 20 });
 histogram.enable();
 
 setInterval(() => {
   console.log({
-    min: histogram.min / 1e6 + 'ms',
-    max: histogram.max / 1e6 + 'ms',
-    mean: histogram.mean / 1e6 + 'ms',
-    stddev: histogram.stddev / 1e6 + 'ms',
-    p99: histogram.percentile(99) / 1e6 + 'ms'
+    min: histogram.min / 1e6 + "ms",
+    max: histogram.max / 1e6 + "ms",
+    mean: histogram.mean / 1e6 + "ms",
+    stddev: histogram.stddev / 1e6 + "ms",
+    p99: histogram.percentile(99) / 1e6 + "ms",
   });
   histogram.reset();
 }, 5000);
@@ -300,11 +302,11 @@ setInterval(() => {
 
 ```javascript
 // BAD: Synchronous file operations block
-const data = fs.readFileSync('large-file.txt');
+const data = fs.readFileSync("large-file.txt");
 // Event loop blocked during entire read
 
 // GOOD: Async operations
-const data = await fs.promises.readFile('large-file.txt');
+const data = await fs.promises.readFile("large-file.txt");
 
 // BAD: CPU-intensive computation
 function fibonacci(n) {
@@ -314,8 +316,8 @@ function fibonacci(n) {
 fibonacci(45); // Blocks for seconds!
 
 // GOOD: Move to worker thread
-const { Worker } = require('node:worker_threads');
-const worker = new Worker('./fib-worker.js');
+const { Worker } = require("node:worker_threads");
+const worker = new Worker("./fib-worker.js");
 ```
 
 ### Timer Coalescing

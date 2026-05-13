@@ -24,7 +24,7 @@ await page.context().storageState({ path: ".auth/session.json" });
 // Reuse in config — every test starts authenticated
 {
   use: {
-    storageState: ".auth/session.json"
+    storageState: ".auth/session.json";
   }
 }
 
@@ -81,7 +81,7 @@ export default defineConfig({
 
 ```typescript
 // tests/home.spec.ts — test starts already logged in
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test("authenticated user sees home page", async ({ page }) => {
   await page.goto("/home");
@@ -95,8 +95,10 @@ test("authenticated user sees home page", async ({ page }) => {
 **Avoid when**: Different tests need different users, or your tokens expire faster than your suite runs.
 
 ```typescript
+import { chromium } from "@playwright/test";
+import type { FullConfig } from "@playwright/test";
+
 // global-setup.ts
-import { chromium, type FullConfig } from "@playwright/test";
 
 async function globalSetup(config: FullConfig) {
   const { baseURL } = config.projects[0].use;
@@ -140,8 +142,10 @@ Add `.auth/` to `.gitignore`. Auth state files contain session tokens and should
 > **Sharded runs**: `parallelIndex` resets per shard, so different shards can have workers with the same index. To avoid collisions, include the shard identifier in the username (e.g., `worker-${SHARD_INDEX}-${parallelIndex}@example.com`) by passing a `SHARD_INDEX` environment variable from your CI matrix.
 
 ```typescript
+import { test as base } from "@playwright/test";
+import type { BrowserContext } from "@playwright/test";
+
 // fixtures/auth.ts
-import { test as base, type BrowserContext } from "@playwright/test";
 
 type AuthFixtures = {
   authenticatedContext: BrowserContext;
@@ -174,7 +178,7 @@ export { expect } from "@playwright/test";
 
 ```typescript
 // tests/settings.spec.ts
-import { test, expect } from "../fixtures/auth";
+import { expect, test } from "../fixtures/auth";
 
 test("update display name", async ({ authenticatedContext }) => {
   const page = await authenticatedContext.newPage();
@@ -191,8 +195,10 @@ test("update display name", async ({ authenticatedContext }) => {
 **Avoid when**: Your app has a single user role.
 
 ```typescript
+import { chromium } from "@playwright/test";
+import type { FullConfig } from "@playwright/test";
+
 // global-setup.ts — authenticate all roles
-import { chromium, type FullConfig } from "@playwright/test";
 
 const accounts = [
   {
@@ -267,12 +273,12 @@ export default defineConfig({
 
 ```typescript
 // tests/admin-panel.admin.spec.ts
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test("admin can access user management", async ({ page }) => {
   await page.goto("/admin/users");
   await expect(
-    page.getByRole("heading", { name: "User Management" })
+    page.getByRole("heading", { name: "User Management" }),
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "Remove user" })).toBeEnabled();
 });
@@ -280,7 +286,7 @@ test("admin can access user management", async ({ page }) => {
 
 ```typescript
 // tests/admin-panel.guest.spec.ts
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test("guest cannot access admin panel", async ({ page }) => {
   await page.goto("/admin/users");
@@ -291,9 +297,11 @@ test("guest cannot access admin panel", async ({ page }) => {
 **Alternative**: Use a fixture that accepts a role parameter when you need role switching within a single spec file.
 
 ```typescript
-// fixtures/auth.ts — role-based fixture
-import { test as base, type Page } from "@playwright/test";
 import fs from "fs";
+import { test as base } from "@playwright/test";
+import type { Page } from "@playwright/test";
+
+// fixtures/auth.ts — role-based fixture
 
 type RoleFixtures = {
   loginAs: (role: "admin" | "member" | "guest") => Promise<Page>;
@@ -307,7 +315,7 @@ export const test = base.extend<RoleFixtures>({
       const statePath = `.auth/${role}.json`;
       if (!fs.existsSync(statePath)) {
         throw new Error(
-          `Auth state for role "${role}" not found at ${statePath}`
+          `Auth state for role "${role}" not found at ${statePath}`,
         );
       }
       const context = await browser.newContext({ storageState: statePath });
@@ -327,13 +335,13 @@ export { expect } from "@playwright/test";
 
 ```typescript
 // tests/role-comparison.spec.ts
-import { test, expect } from "../fixtures/auth";
+import { expect, test } from "../fixtures/auth";
 
 test("admin sees remove button, guest does not", async ({ loginAs }) => {
   const adminPage = await loginAs("admin");
   await adminPage.goto("/admin/users");
   await expect(
-    adminPage.getByRole("button", { name: "Remove user" })
+    adminPage.getByRole("button", { name: "Remove user" }),
   ).toBeVisible();
 
   const guestPage = await loginAs("guest");
@@ -359,7 +367,7 @@ For cases where you want to skip the browser redirect entirely, a second approac
 
 ```typescript
 // tests/oauth-login.spec.ts — mock the callback route
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test("login via mocked OAuth flow", async ({ page }) => {
   await page.route("https://accounts.provider.com/**", async (route) => {
@@ -382,11 +390,9 @@ test("login via mocked OAuth flow", async ({ page }) => {
 
 ```typescript
 // tests/oauth-login.spec.ts — API-based session injection
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
-test("bypass OAuth entirely via API session injection", async ({
-  page,
-}) => {
+test("bypass OAuth entirely via API session injection", async ({ page }) => {
   // Call a test-only endpoint that creates a session without OAuth
   const response = await page.request.post("/api/test/create-session", {
     data: {
@@ -429,7 +435,7 @@ export function generateTOTP(secret: string): string {
 
 ```typescript
 // tests/mfa-login.spec.ts
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { generateTOTP } from "../helpers/totp";
 
 test("login with TOTP two-factor auth", async ({ page }) => {
@@ -459,9 +465,11 @@ test("login with TOTP two-factor auth", async ({ page }) => {
 **Avoid when**: Your test suite runs quickly and tokens outlast the entire run.
 
 ```typescript
-// fixtures/auth-with-refresh.ts
-import { test as base, type BrowserContext } from "@playwright/test";
 import fs from "fs";
+import { test as base } from "@playwright/test";
+import type { BrowserContext } from "@playwright/test";
+
+// fixtures/auth-with-refresh.ts
 
 type AuthFixtures = {
   authenticatedPage: import("@playwright/test").Page;
@@ -509,8 +517,10 @@ export { expect } from "@playwright/test";
 **Avoid when**: You use `storageState` everywhere and never navigate through the login UI in tests.
 
 ```typescript
+import { expect } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
+
 // page-objects/LoginPage.ts
-import { type Page, type Locator, expect } from "@playwright/test";
 
 export class LoginPage {
   readonly page: Page;
@@ -565,7 +575,7 @@ export class LoginPage {
 
 ```typescript
 // tests/login.spec.ts
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { LoginPage } from "../page-objects/LoginPage";
 
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -581,7 +591,7 @@ test.describe("login page", () => {
   test("successful login redirects to home", async ({ page }) => {
     await loginPage.loginAndWaitForHome(
       "testuser@example.com",
-      "secretPass123"
+      "secretPass123",
     );
     await expect(page.getByRole("heading", { name: "Home" })).toBeVisible();
   });
@@ -600,7 +610,7 @@ test.describe("login page", () => {
     await loginPage.forgotPasswordLink.click();
     await page.waitForURL("/forgot-password");
     await expect(
-      page.getByRole("heading", { name: "Reset password" })
+      page.getByRole("heading", { name: "Reset password" }),
     ).toBeVisible();
   });
 });
@@ -614,8 +624,10 @@ test.describe("login page", () => {
 API login is typically 5-10x faster than UI login.
 
 ```typescript
+import { request } from "@playwright/test";
+import type { FullConfig } from "@playwright/test";
+
 // global-setup.ts — API-based login (fastest)
-import { request, type FullConfig } from "@playwright/test";
 
 async function globalSetup(config: FullConfig) {
   const { baseURL } = config.projects[0].use;
@@ -631,7 +643,7 @@ async function globalSetup(config: FullConfig) {
 
   if (!response.ok()) {
     throw new Error(
-      `API login failed: ${response.status()} ${await response.text()}`
+      `API login failed: ${response.status()} ${await response.text()}`,
     );
   }
 
@@ -682,7 +694,7 @@ When your config sets a default `storageState`, you must explicitly clear it for
 
 ```typescript
 // tests/public-pages.spec.ts
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
@@ -780,7 +792,7 @@ Need to test the login page itself?
 const response = await page.waitForResponse("**/api/auth/**");
 if (!response.ok()) {
   throw new Error(
-    `Login failed in global setup: ${response.status()} ${await response.text()}`
+    `Login failed in global setup: ${response.status()} ${await response.text()}`,
   );
 }
 ```

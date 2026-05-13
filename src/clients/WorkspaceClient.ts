@@ -1,5 +1,5 @@
 import { createSupabaseCRUDClient } from "@clients";
-import { isDefined, prop  } from "@utils";
+import { isDefined, prop } from "@utils";
 import { SubscriptionParsers } from "$/models/Subscription/SubscriptionParsers";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { WorkspaceParsers } from "$/models/Workspace/WorkspaceParsers";

@@ -1,6 +1,4 @@
-import type {
-  FormattableTimezone, UnknownDataFrame 
-} from "@utils";
+import type { FormattableTimezone, UnknownDataFrame } from "@utils";
 
 export type XYSettings = {
   xAxisKey: string;

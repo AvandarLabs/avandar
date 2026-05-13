@@ -1,4 +1,4 @@
-import { useBoolean, useMutation  } from "@hooks";
+import { useBoolean, useMutation } from "@hooks";
 import {
   Anchor,
   Box,

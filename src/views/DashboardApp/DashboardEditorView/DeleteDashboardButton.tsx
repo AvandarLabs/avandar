@@ -2,7 +2,7 @@ import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconTrash } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import { notifySuccess, notifyDevAlert  } from "@ui";
+import { notifyDevAlert, notifySuccess } from "@ui";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 

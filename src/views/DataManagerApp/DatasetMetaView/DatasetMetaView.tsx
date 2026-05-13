@@ -14,8 +14,8 @@ import {
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
-import { EditableDisplayText, notifyError, notifySuccess  } from "@ui";
-import { where, prop  } from "@utils";
+import { EditableDisplayText, notifyError, notifySuccess } from "@ui";
+import { prop, where } from "@utils";
 import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";

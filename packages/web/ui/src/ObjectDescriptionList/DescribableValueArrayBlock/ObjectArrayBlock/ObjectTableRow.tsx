@@ -1,8 +1,8 @@
 import { useBoolean } from "@hooks/useBoolean/useBoolean";
 import { Button, Group, Table } from "@mantine/core";
-import { EditButton } from "../../../buttons/EditButton";
 import { StringKeyOf } from "@utils/types/utilities.types";
 import { useState } from "react";
+import { EditButton } from "../../../buttons/EditButton";
 import { ValueItemContainer } from "../../ValueItemContainer";
 import type {
   AnyDescribableValueRenderOptions,

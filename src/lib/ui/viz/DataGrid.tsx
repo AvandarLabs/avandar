@@ -1,8 +1,5 @@
 import { Box } from "@mantine/core";
-import {
-  formatDate,
-  FormattableTimezone,
-} from "@utils";
+import { formatDate, FormattableTimezone } from "@utils";
 import { themeMaterial } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";

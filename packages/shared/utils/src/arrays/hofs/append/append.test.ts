@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { append } from "@utils/arrays/hofs/append/append.ts";
+import { describe, expect, it } from "vitest";
 
 describe("append", () => {
   it("appends a single element to an array", () => {

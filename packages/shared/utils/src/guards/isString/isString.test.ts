@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { isString } from "@utils/guards/isString/isString.ts";
+import { describe, expect, it } from "vitest";
 
 describe("isString", () => {
   it("returns true for strings", () => {

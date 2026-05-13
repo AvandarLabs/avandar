@@ -1,4 +1,4 @@
-import { prop, makeObject , setValue  } from "@utils";
+import { makeObject, prop, setValue } from "@utils";
 import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
 import {
   applyVizConfigFromQueryResult,

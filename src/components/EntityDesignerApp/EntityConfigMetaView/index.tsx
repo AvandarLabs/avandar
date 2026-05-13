@@ -2,7 +2,7 @@ import { Button, Container, Group, Stack, Text, Title } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
-import { notifySuccess, ObjectDescriptionList  } from "@ui";
+import { notifySuccess, ObjectDescriptionList } from "@ui";
 import { hasDefinedProps } from "@utils";
 import { useState } from "react";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";

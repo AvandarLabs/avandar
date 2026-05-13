@@ -53,7 +53,7 @@
 - Third-party iframe interactions
 
 ```typescript
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("Products API", () => {
   let token: string;
@@ -96,7 +96,7 @@ test.describe("Products API", () => {
     expect(res.status()).toBe(422);
     const err = await res.json();
     expect(err.errors).toContainEqual(
-      expect.objectContaining({ field: "sku" })
+      expect.objectContaining({ field: "sku" }),
     );
   });
 
@@ -236,7 +236,7 @@ test.describe("ContactForm component", () => {
 - Edge cases that only affect the backend
 
 ```typescript
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("subscription flow", () => {
   test.beforeEach(async ({ page }) => {
@@ -249,7 +249,7 @@ test.describe("subscription flow", () => {
   test("upgrades to premium plan", async ({ page }) => {
     await test.step("select plan", async () => {
       await expect(
-        page.getByRole("heading", { name: "Choose Your Plan" })
+        page.getByRole("heading", { name: "Choose Your Plan" }),
       ).toBeVisible();
       await page.getByRole("button", { name: "Select Premium" }).click();
     });
@@ -274,7 +274,7 @@ test.describe("subscription flow", () => {
     await test.step("verify success", async () => {
       await page.waitForURL("**/account/subscription/success**");
       await expect(
-        page.getByRole("heading", { name: "Welcome to Premium" })
+        page.getByRole("heading", { name: "Welcome to Premium" }),
       ).toBeVisible();
       await expect(page.getByText(/Subscription #\d+/)).toBeVisible();
     });

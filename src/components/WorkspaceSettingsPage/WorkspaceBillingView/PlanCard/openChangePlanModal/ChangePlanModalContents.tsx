@@ -1,9 +1,9 @@
 import { Divider, Stack, Text } from "@mantine/core";
-import { match } from "ts-pattern";
-import { Paper } from "@/lib/ui/Paper/Paper";
 import { formatNumber } from "@utils";
+import { match } from "ts-pattern";
 import { PlanFeatures } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanFeatures";
 import { SubscriptionPlan } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
+import { Paper } from "@/lib/ui/Paper/Paper";
 
 type Props = {
   newPlan: SubscriptionPlan;

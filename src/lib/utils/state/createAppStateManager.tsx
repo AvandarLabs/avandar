@@ -1,4 +1,4 @@
-import { assertIsDefined, objectKeys  } from "@utils";
+import { assertIsDefined, objectKeys } from "@utils";
 import { createContext, useContext, useMemo, useReducer } from "react";
 
 type GenericActionRegistry<State> = Record<

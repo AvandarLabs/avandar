@@ -4,8 +4,8 @@ import { handleSubscriptionCreatedEvent } from "@sbfn/polar-public/handleSubscri
 import { handleSubscriptionUpdatedEvent } from "@sbfn/polar-public/handleSubscriptionUpdatedEvent.ts";
 import { PolarEventDataSchemas } from "@sbfn/polar-public/PolarEventDataSchemas.ts";
 import {
-    parseEventDataFailureResponse,
-    webhookFailureResponse,
+  parseEventDataFailureResponse,
+  webhookFailureResponse,
 } from "@sbfn/polar-public/polarWebhookUtils.ts";
 import { match } from "ts-pattern";
 import { any, iso, object, record, string } from "zod";

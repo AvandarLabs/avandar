@@ -1,11 +1,13 @@
 import { ModelCRUDClient } from "@clients";
-import { withQueryHooks,
+import {
   DEFAULT_MUTATION_FN_NAMES,
   DEFAULT_QUERY_FN_NAMES,
   DefaultMutationFnName,
   DefaultQueryFnName,
   FnNameReturningPromise,
-  WithQueryHooks } from "@hooks";
+  withQueryHooks,
+  WithQueryHooks,
+} from "@hooks";
 
 export function createUsableServiceClient<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

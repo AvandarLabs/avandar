@@ -29,19 +29,16 @@ export async function goToBillingPortal({
       AvaQueryClient.invalidateQueries({
         queryKey: [WorkspaceClient.getClientName()],
       });
-      navigateToExternalURL(
-        customerPortalResponse.customerPortalURL,
-      );
+      navigateToExternalURL(customerPortalResponse.customerPortalURL);
     } else {
       notifyError(
-        "Billing portal cannot be loaded because you do not"
-          + " have a subscription yet.",
+        "Billing portal cannot be loaded because you do not" +
+          " have a subscription yet.",
       );
     }
   } catch {
     notifyError(
-      "Unable to open the billing portal. Please try"
-        + " again later.",
+      "Unable to open the billing portal. Please try" + " again later.",
     );
   }
 }

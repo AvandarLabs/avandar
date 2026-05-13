@@ -1,4 +1,4 @@
-import { where, isNonNullish  } from "@utils";
+import { isNonNullish, where } from "@utils";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";

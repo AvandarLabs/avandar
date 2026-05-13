@@ -1,7 +1,7 @@
 import { useUncontrolled } from "@mantine/hooks";
 import { Model } from "@models";
-import { makeSelectOptions, Select  } from "@ui";
-import { where, makeIdLookupMap , prop  } from "@utils";
+import { makeSelectOptions, Select } from "@ui";
+import { makeIdLookupMap, prop, where } from "@utils";
 import { QueryColumn as QueryColumnModule } from "$/models/queries/QueryColumn/QueryColumn";
 import { useEffect, useMemo } from "react";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";

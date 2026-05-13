@@ -1,6 +1,6 @@
 import { Box, Group, Loader, Stack, Text } from "@mantine/core";
-import { makeSelectOptions, Select  } from "@ui";
-import { where, isDefined , prop , makeObject  } from "@utils";
+import { makeSelectOptions, Select } from "@ui";
+import { isDefined, makeObject, prop, where } from "@utils";
 import { useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import type { EntityConfigFormType } from "@/components/EntityDesignerApp/EntityConfigCreatorView/entityConfigFormTypes";

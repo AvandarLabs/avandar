@@ -33,15 +33,15 @@ V8 divides the heap into several spaces:
 
 ```javascript
 // Get current heap statistics
-const v8 = require('node:v8');
+const v8 = require("node:v8");
 const stats = v8.getHeapStatistics();
 
 console.log({
-  heapTotal: stats.total_heap_size / 1024 / 1024 + ' MB',
-  heapUsed: stats.used_heap_size / 1024 / 1024 + ' MB',
-  heapLimit: stats.heap_size_limit / 1024 / 1024 + ' MB',
-  mallocedMemory: stats.malloced_memory / 1024 / 1024 + ' MB',
-  externalMemory: stats.external_memory / 1024 / 1024 + ' MB',
+  heapTotal: stats.total_heap_size / 1024 / 1024 + " MB",
+  heapUsed: stats.used_heap_size / 1024 / 1024 + " MB",
+  heapLimit: stats.heap_size_limit / 1024 / 1024 + " MB",
+  mallocedMemory: stats.malloced_memory / 1024 / 1024 + " MB",
+  externalMemory: stats.external_memory / 1024 / 1024 + " MB",
 });
 ```
 
@@ -88,16 +88,16 @@ After GC (B and D are dead):
 ```javascript
 // BAD: Creating many short-lived objects triggers frequent Scavenger runs
 function processData(items) {
-  return items.map(item => ({
+  return items.map((item) => ({
     ...item,
     processed: true,
     timestamp: new Date(), // New object each time
-    meta: { source: 'api' } // New object each time
+    meta: { source: "api" }, // New object each time
   }));
 }
 
 // BETTER: Reuse objects where possible
-const META = Object.freeze({ source: 'api' });
+const META = Object.freeze({ source: "api" });
 
 function processData(items) {
   const results = new Array(items.length);
@@ -106,7 +106,7 @@ function processData(items) {
       ...items[i],
       processed: true,
       timestamp: Date.now(), // Primitive, not object
-      meta: META // Shared reference
+      meta: META, // Shared reference
     };
   }
   return results;
@@ -129,9 +129,7 @@ class ObjectPool {
   }
 
   acquire() {
-    return this.pool.length > 0
-      ? this.pool.pop()
-      : this.factory();
+    return this.pool.length > 0 ? this.pool.pop() : this.factory();
   }
 
   release(obj) {
@@ -143,7 +141,7 @@ class ObjectPool {
 // Usage
 const bufferPool = new ObjectPool(
   () => Buffer.allocUnsafe(4096),
-  (buf) => buf.fill(0)
+  (buf) => buf.fill(0),
 );
 
 const buf = bufferPool.acquire();
@@ -239,13 +237,13 @@ V8's GC is based on the generational hypothesis: most objects die young.
 // Short-lived objects (ideal case)
 function handleRequest(req) {
   const data = JSON.parse(req.body); // Dies quickly
-  const result = processData(data);  // Dies quickly
-  return JSON.stringify(result);     // Dies quickly
+  const result = processData(data); // Dies quickly
+  return JSON.stringify(result); // Dies quickly
 }
 
 // Long-lived objects (cache, connections)
 const connectionPool = new Pool(); // Lives forever
-const cache = new LRUCache();      // Lives forever
+const cache = new LRUCache(); // Lives forever
 ```
 
 ### Allocation Site Feedback
@@ -256,8 +254,8 @@ V8 tracks allocation sites to optimize object placement:
 // V8 learns that objects from this function live long
 function createLongLivedConfig() {
   return {
-    setting1: 'value1',
-    setting2: 'value2',
+    setting1: "value1",
+    setting2: "value2",
     // After profiling, V8 may allocate directly in old space
   };
 }
@@ -287,8 +285,8 @@ node --trace-gc-nvp app.js
 ### Heap Snapshots
 
 ```javascript
-const v8 = require('node:v8');
-const fs = require('node:fs');
+const v8 = require("node:v8");
+const fs = require("node:fs");
 
 // Write heap snapshot
 function writeHeapSnapshot() {
@@ -309,7 +307,7 @@ function streamHeapSnapshot() {
 ### Detecting Memory Leaks
 
 ```javascript
-const v8 = require('node:v8');
+const v8 = require("node:v8");
 
 class MemoryMonitor {
   constructor(intervalMs = 30000) {
@@ -331,7 +329,7 @@ class MemoryMonitor {
     this.history.push({
       timestamp: Date.now(),
       used,
-      delta: used - this.baseline
+      delta: used - this.baseline,
     });
 
     // Keep last 100 measurements
@@ -342,12 +340,12 @@ class MemoryMonitor {
     // Check for consistent growth
     if (this.history.length >= 10) {
       const recent = this.history.slice(-10);
-      const allGrowing = recent.every((m, i) =>
-        i === 0 || m.used >= recent[i-1].used
+      const allGrowing = recent.every(
+        (m, i) => i === 0 || m.used >= recent[i - 1].used,
       );
 
       if (allGrowing) {
-        console.warn('Possible memory leak detected');
+        console.warn("Possible memory leak detected");
         console.warn(`Heap grew from ${this.baseline} to ${used}`);
       }
     }
@@ -364,7 +362,7 @@ class MemoryMonitor {
 function createHandler(largeData) {
   return function handler() {
     // Even if we don't use largeData, it's retained
-    return 'done';
+    return "done";
   };
 }
 
@@ -388,7 +386,7 @@ function processData(data) {
 }
 
 // GOOD: Use strict mode and proper declarations
-'use strict';
+("use strict");
 function processData(data) {
   const results = data.map(transform);
   return results;
@@ -455,8 +453,10 @@ For long-lived data structures:
 // Pre-allocate and fill immediately
 // This helps V8 understand the object shape
 const cache = Object.create(null);
-const INITIAL_KEYS = ['user:', 'session:', 'token:'];
-INITIAL_KEYS.forEach(k => { cache[k] = undefined; });
+const INITIAL_KEYS = ["user:", "session:", "token:"];
+INITIAL_KEYS.forEach((k) => {
+  cache[k] = undefined;
+});
 
 // Use Map for dynamic keys (better for old space)
 const dynamicCache = new Map();

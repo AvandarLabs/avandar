@@ -1,33 +1,33 @@
 import {
-    object,
-    record,
-    string,
-    never as zNever,
-    ZodType,
-    undefined as zUndefined,
+  object,
+  record,
+  string,
+  never as zNever,
+  ZodType,
+  undefined as zUndefined,
 } from "npm:zod@4";
 import type {
-    AnyValidPathParamsRecord,
-    HTTPMethod,
-    UnknownRecord,
-    URLPathPattern,
-    ValidBody,
-    ValidPathParams,
-    ValidReturnType,
+  AnyValidPathParamsRecord,
+  HTTPMethod,
+  UnknownRecord,
+  URLPathPattern,
+  ValidBody,
+  ValidPathParams,
+  ValidReturnType,
 } from "@sbfn/_shared/MiniServer/api.types.ts";
 import type {
-    HTTPMethodActionFn,
-    HTTPMethodActionFnOptions,
-    InferBody,
-    MakeOptionalIfUndefined,
-    QueryParamsSchemaShape,
-    ServerRouteHandler,
-    ValidBodySchema,
-    ValidQueryParams,
+  HTTPMethodActionFn,
+  HTTPMethodActionFnOptions,
+  InferBody,
+  MakeOptionalIfUndefined,
+  QueryParamsSchemaShape,
+  ServerRouteHandler,
+  ValidBodySchema,
+  ValidQueryParams,
 } from "@sbfn/_shared/MiniServer/MiniServer.types.ts";
 import type {
-    ValidPathParamsSchema,
-    ValidPathParamsSchemaShape,
+  ValidPathParamsSchema,
+  ValidPathParamsSchemaShape,
 } from "@sbfn/_shared/MiniServer/parseURLPathParams.ts";
 import type { infer as ZodInfer, ZodObject } from "npm:zod@4";
 

@@ -1,17 +1,13 @@
 import { useUncontrolled } from "@mantine/hooks";
-import { makeSelectOptions, Select  } from "@ui";
-import { where, makeBucketMap  } from "@utils";
+import { makeSelectOptions, Select } from "@ui";
+import { makeBucketMap, where } from "@utils";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
-import type {
-  SelectData,
-  SelectOptionGroup,
-  SelectProps,
-} from "@ui";
+import type { SelectData, SelectOptionGroup, SelectProps } from "@ui";
 import type {
   QueryDataSource,
   QueryDataSourceId,

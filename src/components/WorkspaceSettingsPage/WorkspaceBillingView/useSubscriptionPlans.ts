@@ -1,5 +1,5 @@
 import { useQuery } from "@hooks";
-import { isDefined, makeBucketMap , prop  } from "@utils";
+import { isDefined, makeBucketMap, prop } from "@utils";
 import { APIClient } from "@/clients/APIClient";
 import {
   isAnnualPaidSeatsPlan,

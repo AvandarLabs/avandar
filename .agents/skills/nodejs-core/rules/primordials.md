@@ -38,11 +38,11 @@ argument:
 
 ```javascript
 // Instead of:
-arr.push(item);                      // Calls user-mutable Array.prototype.push
+arr.push(item); // Calls user-mutable Array.prototype.push
 
 // Use:
 const { ArrayPrototypePush } = primordials;
-ArrayPrototypePush(arr, item);       // Calls the saved original
+ArrayPrototypePush(arr, item); // Calls the saved original
 ```
 
 The entire `primordials` object is serialized into the V8 heap snapshot that
@@ -79,7 +79,7 @@ lowercase). This is enforced by the `node-core/alphabetize-primordials` lint
 rule.
 
 ```javascript
-'use strict';
+"use strict";
 
 const {
   ArrayIsArray,
@@ -113,14 +113,14 @@ Named as `ConstructorMethod`:
 
 ```javascript
 const {
-  ArrayIsArray,          // Array.isArray
-  ArrayFrom,             // Array.from
-  ObjectKeys,            // Object.keys
-  ObjectDefineProperty,  // Object.defineProperty
-  NumberIsFinite,        // Number.isFinite
+  ArrayIsArray, // Array.isArray
+  ArrayFrom, // Array.from
+  ObjectKeys, // Object.keys
+  ObjectDefineProperty, // Object.defineProperty
+  NumberIsFinite, // Number.isFinite
   ErrorCaptureStackTrace, // Error.captureStackTrace
-  JSONStringify,         // JSON.stringify
-  MathMax,               // Math.max
+  JSONStringify, // JSON.stringify
+  MathMax, // Math.max
 } = primordials;
 ```
 
@@ -131,11 +131,11 @@ parameter:
 
 ```javascript
 const {
-  ArrayPrototypePush,       // arr.push(item)     → ArrayPrototypePush(arr, item)
-  ArrayPrototypeSlice,      // arr.slice(0, 3)    → ArrayPrototypeSlice(arr, 0, 3)
-  StringPrototypeSlice,     // str.slice(0, 5)    → StringPrototypeSlice(str, 0, 5)
+  ArrayPrototypePush, // arr.push(item)     → ArrayPrototypePush(arr, item)
+  ArrayPrototypeSlice, // arr.slice(0, 3)    → ArrayPrototypeSlice(arr, 0, 3)
+  StringPrototypeSlice, // str.slice(0, 5)    → StringPrototypeSlice(str, 0, 5)
   StringPrototypeStartsWith, // str.startsWith(p) → StringPrototypeStartsWith(str, p)
-  RegExpPrototypeExec,      // re.exec(str)       → RegExpPrototypeExec(re, str)
+  RegExpPrototypeExec, // re.exec(str)       → RegExpPrototypeExec(re, str)
 } = primordials;
 ```
 
@@ -146,8 +146,8 @@ an array of arguments:
 
 ```javascript
 const {
-  ArrayPrototypePushApply,  // arr.push(...items) → ArrayPrototypePushApply(arr, items)
-  MathMaxApply,             // Math.max(...nums)  → MathMaxApply(nums)
+  ArrayPrototypePushApply, // arr.push(...items) → ArrayPrototypePushApply(arr, items)
+  MathMaxApply, // Math.max(...nums)  → MathMaxApply(nums)
 } = primordials;
 ```
 
@@ -176,10 +176,10 @@ Promise combinators with varying levels of safety:
 
 ```javascript
 const {
-  PromisePrototypeThen,             // Safe .then() call
-  SafePromiseAll,                   // Wraps each promise, but result array is mutable
-  SafePromiseAllReturnVoid,         // Fully safe — no result array
-  SafePromiseAllReturnArrayLike,    // Fully safe — returns null-prototype array-like
+  PromisePrototypeThen, // Safe .then() call
+  SafePromiseAll, // Wraps each promise, but result array is mutable
+  SafePromiseAllReturnVoid, // Fully safe — no result array
+  SafePromiseAllReturnArrayLike, // Fully safe — returns null-prototype array-like
   SafePromiseAllSettled,
   SafePromiseAllSettledReturnVoid,
   SafePromiseAny,
@@ -275,10 +275,10 @@ user-mutable. Use `RegExpPrototypeExec` directly:
 
 ```javascript
 // UNSAFE — calls user-mutable .exec internally:
-RegExpPrototypeTest(pattern, string)
+RegExpPrototypeTest(pattern, string);
 
 // SAFE:
-RegExpPrototypeExec(pattern, string) !== null
+RegExpPrototypeExec(pattern, string) !== null;
 ```
 
 ### String methods with RegExp
@@ -286,12 +286,12 @@ RegExpPrototypeExec(pattern, string) !== null
 `String.prototype.match/replace/search/split` look up Symbol methods on the
 regex argument. These are all user-mutable:
 
-| String method              | Looks up           | Safe alternative                            |
-| -------------------------- | ------------------ | ------------------------------------------- |
-| `StringPrototypeMatch`     | `Symbol.match`     | `RegExpPrototypeExec`                       |
-| `StringPrototypeReplace`   | `Symbol.replace`   | `RegExpPrototypeSymbolReplace(re, str, rep)` |
-| `StringPrototypeSearch`    | `Symbol.search`    | `SafeStringPrototypeSearch(str, re)`        |
-| `StringPrototypeSplit`     | `Symbol.split`     | `RegExpPrototypeSymbolSplit(re, str)`       |
+| String method            | Looks up         | Safe alternative                             |
+| ------------------------ | ---------------- | -------------------------------------------- |
+| `StringPrototypeMatch`   | `Symbol.match`   | `RegExpPrototypeExec`                        |
+| `StringPrototypeReplace` | `Symbol.replace` | `RegExpPrototypeSymbolReplace(re, str, rep)` |
+| `StringPrototypeSearch`  | `Symbol.search`  | `SafeStringPrototypeSearch(str, re)`         |
+| `StringPrototypeSplit`   | `Symbol.split`   | `RegExpPrototypeSymbolSplit(re, str)`        |
 
 For full regex safety (protecting against flag getter mutation too), use
 `hardenRegExp(re)` which copies all methods and flag getters directly onto
@@ -327,10 +327,10 @@ SafePromiseAll(array, someFunction);
 
 ```javascript
 // UNSAFE — looks up Symbol.hasInstance:
-value instanceof SomeClass
+value instanceof SomeClass;
 
 // SAFE:
-FunctionPrototypeSymbolHasInstance(SomeClass, value)
+FunctionPrototypeSymbolHasInstance(SomeClass, value);
 ```
 
 ### Object property descriptors
@@ -341,10 +341,10 @@ can corrupt descriptors:
 
 ```javascript
 // UNSAFE:
-ObjectDefineProperty(obj, 'prop', { value: 0 });
+ObjectDefineProperty(obj, "prop", { value: 0 });
 
 // SAFE:
-ObjectDefineProperty(obj, 'prop', { __proto__: null, value: 0 });
+ObjectDefineProperty(obj, "prop", { __proto__: null, value: 0 });
 ```
 
 ### Array concatenation
@@ -357,7 +357,7 @@ instead:
 const result = ArrayPrototypeConcat(a, b);
 
 // SAFE:
-ArrayPrototypePushApply(a, b);  // Mutates a
+ArrayPrototypePushApply(a, b); // Mutates a
 
 // SAFE (new array):
 const result = ArrayPrototypeSlice(a);
@@ -397,12 +397,12 @@ For ASCII-safe strings, indexed `for` loops are fine and faster.
 
 ## ESLint rules
 
-| Rule                                    | Enforces                                              |
-| --------------------------------------- | ----------------------------------------------------- |
-| `node-core/prefer-primordials`          | Flags direct use of globals that should be primordials |
-| `node-core/alphabetize-primordials`     | Import ordering: ASCIIbetical, multiline, first expr  |
-| `node-core/no-array-destructuring`      | Flags `[a, b] = arr` (use object destructuring)       |
-| `node-core/avoid-prototype-pollution`   | Flags unsafe descriptor/handler patterns              |
+| Rule                                  | Enforces                                               |
+| ------------------------------------- | ------------------------------------------------------ |
+| `node-core/prefer-primordials`        | Flags direct use of globals that should be primordials |
+| `node-core/alphabetize-primordials`   | Import ordering: ASCIIbetical, multiline, first expr   |
+| `node-core/no-array-destructuring`    | Flags `[a, b] = arr` (use object destructuring)        |
+| `node-core/avoid-prototype-pollution` | Flags unsafe descriptor/handler patterns               |
 
 ## References
 

@@ -1,5 +1,13 @@
 import { createModuleFactory } from "@modules";
-import { where, isDefined , prop , propEq , makeBucketRecord , makeIdLookupRecord , objectKeys  } from "@utils";
+import {
+  isDefined,
+  makeBucketRecord,
+  makeIdLookupRecord,
+  objectKeys,
+  prop,
+  propEq,
+  where,
+} from "@utils";
 import { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import { match } from "ts-pattern";
 import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";

@@ -1,4 +1,4 @@
-import { assertIsDefined, identity , objectKeys  } from "@utils";
+import { assertIsDefined, identity, objectKeys } from "@utils";
 import Dexie, { EntityTable, Transaction } from "dexie";
 import { UnionToIntersection } from "type-fest";
 import type { DexieCRUDModelSpec } from "@/clients/dexie/DexieCRUDClient.types";

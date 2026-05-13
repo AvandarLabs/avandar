@@ -1,4 +1,4 @@
-import { makeSelectOptions, Select  } from "@ui";
+import { makeSelectOptions, Select } from "@ui";
 import { propPasses } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useMemo } from "react";

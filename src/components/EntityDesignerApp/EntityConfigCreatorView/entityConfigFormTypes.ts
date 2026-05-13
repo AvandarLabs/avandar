@@ -4,7 +4,7 @@ import { DatasetColumnValueExtractor } from "$/models/EntityConfig/ValueExtracto
 import { ManualEntryExtractor } from "$/models/EntityConfig/ValueExtractor/ManualEntryExtractor/ManualEntryExtractor.types";
 import { EntityFieldValueExtractorRegistry } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types";
 import type { FormType } from "@/lib/hooks/ui/useForm/useForm";
-import type { CamelCaseKeys, Expect  } from "@utils";
+import type { CamelCaseKeys, Expect } from "@utils";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
 import type {

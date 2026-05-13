@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { omit } from "@utils/objects/omit/omit.ts";
+import { describe, expect, it } from "vitest";
 
 describe("omit", () => {
   describe("single key as string", () => {

@@ -1,6 +1,6 @@
 import { Fieldset, Stack, Text } from "@mantine/core";
-import { ValueItemContainer } from "../ValueItemContainer";
 import { useMemo } from "react";
+import { ValueItemContainer } from "../ValueItemContainer";
 import type {
   DescribableValueArrayRenderOptions,
   GenericRootData,

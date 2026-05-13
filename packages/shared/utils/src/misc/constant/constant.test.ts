@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { constant } from "@utils/misc/constant/constant.ts";
+import { describe, expect, it } from "vitest";
 
 describe("constant", () => {
   it("returns a function that always returns the same value", () => {

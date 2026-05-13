@@ -1,5 +1,5 @@
 import { createSupabaseCRUDClient } from "@clients";
-import { where, prop , makeBucketRecord , matchLiteral  } from "@utils";
+import { makeBucketRecord, matchLiteral, prop, where } from "@utils";
 import { DatasetParsers } from "$/models/datasets/Dataset/DatasetParsers";
 import { WorkspaceId } from "$/models/Workspace/Workspace.types";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
@@ -13,7 +13,7 @@ import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
-import type { FiltersByColumn, ExcludeNullsIn  } from "@utils";
+import type { ExcludeNullsIn, FiltersByColumn } from "@utils";
 import type { OpenDataCatalogEntryId } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {

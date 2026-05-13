@@ -1,8 +1,16 @@
-import { assertIsDefined, doesRowPassFilters , doesValuePassFilters , isEmptyFiltersObject , isFiltersByOperatorObject , objectKeys  } from "@utils";
+import {
+  assertIsDefined,
+  doesRowPassFilters,
+  doesValuePassFilters,
+  isEmptyFiltersObject,
+  isFiltersByOperatorObject,
+  objectKeys,
+} from "@utils";
 import { assertDexieColumnsAreIndexed } from "@/clients/dexie/dexieColumnIsIndexed";
 import type {
   FilterOperatorRecord,
-  FiltersByColumn, UnknownObject 
+  FiltersByColumn,
+  UnknownObject,
 } from "@utils";
 import type { Collection, IndexableType, IndexSpec, Table } from "dexie";
 

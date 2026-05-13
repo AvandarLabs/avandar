@@ -1,13 +1,7 @@
-import {
-  shouldHydrateVizFromQueryResult,
-} from "$/models/vizs/shouldHydrateVizFromQueryResult.ts";
+import { shouldHydrateVizFromQueryResult } from "$/models/vizs/shouldHydrateVizFromQueryResult.ts";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs.ts";
-import type {
-  PartialStructuredQuery,
-} from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type {
-  QueryResultColumn,
-} from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
 type ApplyVizConfigFromQueryResultInput = {

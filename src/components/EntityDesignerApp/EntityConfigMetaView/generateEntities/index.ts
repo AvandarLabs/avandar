@@ -1,4 +1,12 @@
-import { assertIsDefined, where , isDefined , sqlTemplate , prop , propEq , makeObject  } from "@utils";
+import {
+  assertIsDefined,
+  isDefined,
+  makeObject,
+  prop,
+  propEq,
+  sqlTemplate,
+  where,
+} from "@utils";
 import { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";

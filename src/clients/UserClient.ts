@@ -1,13 +1,13 @@
-import { createServiceClient, withSupabaseClient  } from "@clients";
-import { withQueryHooks, WithQueryHooks  } from "@hooks";
+import { createServiceClient, withSupabaseClient } from "@clients";
+import { withQueryHooks, WithQueryHooks } from "@hooks";
 import { withLogger } from "@logger";
-import { makeObject, camelCaseKeysShallow , omit  } from "@utils";
+import { camelCaseKeysShallow, makeObject, omit } from "@utils";
 import { WorkspaceId } from "$/models/Workspace/Workspace.types";
 import { Database, Tables } from "$/types/database.types";
 import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
-import type { ServiceClient, WithSupabaseClient  } from "@clients";
+import type { ServiceClient, WithSupabaseClient } from "@clients";
 import type { ILogger, WithLogger } from "@logger";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { UserAppRolesRecord } from "$/models/Permissions/Permissions.types";

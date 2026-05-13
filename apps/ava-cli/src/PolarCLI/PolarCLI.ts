@@ -1,5 +1,5 @@
-import { Acclimate } from "@avandar/acclimate";
 import { CustomerCLI } from "@ava-cli/PolarCLI/CustomerCLI/CustomerCLI";
+import { Acclimate } from "@avandar/acclimate";
 
 /** A CLI for managing Polar billing resources in Avandar. */
 export const PolarCLI = Acclimate.createCLI("polar")

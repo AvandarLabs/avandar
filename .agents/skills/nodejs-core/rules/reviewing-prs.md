@@ -35,7 +35,7 @@ During review, check:
 
 - Correct subsystem prefix (`fs:`, `stream:`, `http:`, `test:`, `doc:`, etc.)
 - Short imperative description on the first line
-- Body explains *why* the change is needed, not just *what* it does
+- Body explains _why_ the change is needed, not just _what_ it does
 - `Fixes:` and `Refs:` footers are used correctly (Fixes closes an issue,
   Refs links related work without closing)
 - No AI attribution lines (`Co-Authored-By: Claude`, etc.)
@@ -65,7 +65,7 @@ During review, check:
 
 - Are `doc/api/` changes included for new or changed public APIs?
 - Is `doc/api/cli.md` updated for new CLI flags?
-- Does the documentation explain *how to use* the feature, not just restate
+- Does the documentation explain _how to use_ the feature, not just restate
   the implementation?
 - Are stability markers and version metadata correct?
 
@@ -236,16 +236,16 @@ Reviewed-By: Your Name <your@email.com>
 
 ### Labels to check
 
-| Label               | Meaning                                              |
-| ------------------- | ---------------------------------------------------- |
-| `semver-major`      | Breaking change (requires TSC approval)              |
-| `semver-minor`      | New feature (additive, non-breaking)                 |
-| `semver-patch`      | Bug fix                                              |
-| `notable-change`    | Should appear in release notes                       |
-| `needs-ci`          | CI has not been run yet                              |
-| `request-ci`        | CI requested                                         |
-| `author ready`      | Author considers PR ready for review                 |
-| `dont-land-on-*`    | Do not land on specific release lines                |
+| Label            | Meaning                                 |
+| ---------------- | --------------------------------------- |
+| `semver-major`   | Breaking change (requires TSC approval) |
+| `semver-minor`   | New feature (additive, non-breaking)    |
+| `semver-patch`   | Bug fix                                 |
+| `notable-change` | Should appear in release notes          |
+| `needs-ci`       | CI has not been run yet                 |
+| `request-ci`     | CI requested                            |
+| `author ready`   | Author considers PR ready for review    |
+| `dont-land-on-*` | Do not land on specific release lines   |
 
 ## References
 

@@ -1,4 +1,4 @@
-import { isNonEmptyArray, MIMEType  } from "@utils";
+import { isNonEmptyArray, MIMEType } from "@utils";
 import Papa from "papaparse";
 import { match } from "ts-pattern";
 import type { RawCellValue, RawDataRow } from "@utils";

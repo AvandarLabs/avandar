@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { template } from "@utils/strings/template/template.ts";
+import { describe, expect, it } from "vitest";
 
 describe("template", () => {
   it("replaces single token with string value", () => {

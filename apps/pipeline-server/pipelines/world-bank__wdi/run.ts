@@ -1,8 +1,11 @@
 import { mkdir, readdir } from "node:fs/promises";
 import { join } from "node:path";
-import { ETLEngine,
+import {
+  ETLEngine,
   getETLOutputDir,
-  getETLPipelineInputDir, NodeDuckDB  } from "@ava-etl";
+  getETLPipelineInputDir,
+  NodeDuckDB,
+} from "@ava-etl";
 import {
   createSupabaseAdminClient,
   getWdiYearCoverageFromParquet,

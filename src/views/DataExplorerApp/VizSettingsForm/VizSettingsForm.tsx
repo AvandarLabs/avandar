@@ -2,33 +2,15 @@ import { Box } from "@mantine/core";
 import { Select, SelectData } from "@ui";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
 import { match } from "ts-pattern";
-import {
-  DataExplorerStateManager,
-} from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import {
-  AreaChartForm,
-} from "@/views/DataExplorerApp/VizSettingsForm/AreaChartForm";
-import {
-  BarChartForm,
-} from "@/views/DataExplorerApp/VizSettingsForm/BarChartForm";
-import {
-  BubbleChartForm,
-} from "@/views/DataExplorerApp/VizSettingsForm/BubbleChartForm";
-import {
-  FunnelChartForm,
-} from "@/views/DataExplorerApp/VizSettingsForm/FunnelChartForm";
-import {
-  LineChartForm,
-} from "@/views/DataExplorerApp/VizSettingsForm/LineChartForm";
-import {
-  PieChartForm,
-} from "@/views/DataExplorerApp/VizSettingsForm/PieChartForm";
-import {
-  RadarChartForm,
-} from "@/views/DataExplorerApp/VizSettingsForm/RadarChartForm";
-import {
-  ScatterChartForm,
-} from "@/views/DataExplorerApp/VizSettingsForm/ScatterChartForm";
+import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import { AreaChartForm } from "@/views/DataExplorerApp/VizSettingsForm/AreaChartForm";
+import { BarChartForm } from "@/views/DataExplorerApp/VizSettingsForm/BarChartForm";
+import { BubbleChartForm } from "@/views/DataExplorerApp/VizSettingsForm/BubbleChartForm";
+import { FunnelChartForm } from "@/views/DataExplorerApp/VizSettingsForm/FunnelChartForm";
+import { LineChartForm } from "@/views/DataExplorerApp/VizSettingsForm/LineChartForm";
+import { PieChartForm } from "@/views/DataExplorerApp/VizSettingsForm/PieChartForm";
+import { RadarChartForm } from "@/views/DataExplorerApp/VizSettingsForm/RadarChartForm";
+import { ScatterChartForm } from "@/views/DataExplorerApp/VizSettingsForm/ScatterChartForm";
 import type { UnknownDataFrame } from "@utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { VizType } from "$/models/vizs/VizConfig/VizConfig.types";

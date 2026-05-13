@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { getDevFanoutServerClientConfig } from "@ava-cli/DevCLI/NgrokURLCLI/getDevFanoutServerClientConfig";
+import { z } from "zod";
 
 export type NgrokDevURLTarget = Readonly<{
   url: string;

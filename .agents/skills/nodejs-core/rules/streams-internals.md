@@ -279,7 +279,7 @@ function getHighWaterMark(state, options, duplexKey, isDuplex) {
 
   if (hwm != null) {
     if (!Number.isInteger(hwm) || hwm < 0) {
-      throw new ERR_INVALID_OPT_VALUE('highWaterMark', hwm);
+      throw new ERR_INVALID_OPT_VALUE("highWaterMark", hwm);
     }
     return hwm;
   }
@@ -327,8 +327,7 @@ Duplex streams combine Readable and Writable:
 // lib/internal/streams/duplex.js
 
 function Duplex(options) {
-  if (!(this instanceof Duplex))
-    return new Duplex(options);
+  if (!(this instanceof Duplex)) return new Duplex(options);
 
   Readable.call(this, options);
   Writable.call(this, options);
@@ -399,7 +398,7 @@ function pipeline(...streams) {
   const callback = streams.pop();
 
   if (!streams.length) {
-    throw new ERR_MISSING_ARGS('streams');
+    throw new ERR_MISSING_ARGS("streams");
   }
 
   let error;
@@ -409,7 +408,7 @@ function pipeline(...streams) {
     return destroyer(stream, !isLast, isLast, (err) => {
       if (!error) error = err;
       if (err) {
-        destroys.forEach(d => d());
+        destroys.forEach((d) => d());
       }
       if (isLast) {
         callback(error);
@@ -426,20 +425,20 @@ function pipeline(...streams) {
 function destroyer(stream, reading, writing, callback) {
   let closed = false;
 
-  stream.on('close', () => {
+  stream.on("close", () => {
     closed = true;
   });
 
-  stream.on('error', callback);
+  stream.on("error", callback);
 
   if (reading) {
-    stream.on('end', () => {
+    stream.on("end", () => {
       if (!closed) callback();
     });
   }
 
   if (writing) {
-    stream.on('finish', () => {
+    stream.on("finish", () => {
       if (!closed) callback();
     });
   }
@@ -494,7 +493,7 @@ console.log({
   flowing: state.flowing,
   ended: state.ended,
   reading: state.reading,
-  needReadable: state.needReadable
+  needReadable: state.needReadable,
 });
 
 const writable = getWritableStream();
@@ -505,17 +504,17 @@ console.log({
   writing: wState.writing,
   ended: wState.ended,
   finished: wState.finished,
-  bufferProcessing: wState.bufferProcessing
+  bufferProcessing: wState.bufferProcessing,
 });
 ```
 
 ### Tracing Stream Events
 
 ```javascript
-const { EventEmitter } = require('node:events');
+const { EventEmitter } = require("node:events");
 
 const originalEmit = EventEmitter.prototype.emit;
-EventEmitter.prototype.emit = function(event, ...args) {
+EventEmitter.prototype.emit = function (event, ...args) {
   if (this._readableState || this._writableState) {
     console.log(`[${this.constructor.name}] ${event}`, args.slice(0, 1));
   }
@@ -530,14 +529,14 @@ EventEmitter.prototype.emit = function(event, ...args) {
 ```javascript
 // BAD: Ignoring write() return value
 for (const chunk of chunks) {
-  stream.write(chunk);  // May buffer indefinitely!
+  stream.write(chunk); // May buffer indefinitely!
 }
 
 // GOOD: Respect backpressure
 async function writeWithBackpressure(stream, chunks) {
   for (const chunk of chunks) {
     if (!stream.write(chunk)) {
-      await once(stream, 'drain');
+      await once(stream, "drain");
     }
   }
 }
@@ -547,10 +546,10 @@ async function writeWithBackpressure(stream, chunks) {
 
 ```javascript
 // BAD: Data lost
-stream.on('data', (chunk) => {
-  processAsync(chunk);  // Not awaited
+stream.on("data", (chunk) => {
+  processAsync(chunk); // Not awaited
 });
-stream.on('end', () => {
+stream.on("end", () => {
   // Processing may not be complete!
 });
 

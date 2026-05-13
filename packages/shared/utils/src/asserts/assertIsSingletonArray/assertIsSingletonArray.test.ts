@@ -1,5 +1,5 @@
-import { describe, expect, expectTypeOf, it } from "vitest";
 import { assertIsSingletonArray } from "@utils/asserts/assertIsSingletonArray/assertIsSingletonArray.ts";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
 describe("assertIsSingletonArray", () => {
   it("does not throw for a singleton array", () => {

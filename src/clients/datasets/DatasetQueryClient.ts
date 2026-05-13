@@ -2,7 +2,7 @@ import { createServiceClient } from "@clients";
 import { withQueryHooks } from "@hooks";
 import { withLogger } from "@logger";
 import { notifyDevAlert } from "@ui";
-import { where, objectKeys , sqlTemplate  } from "@utils";
+import { objectKeys, sqlTemplate, where } from "@utils";
 import { match } from "ts-pattern";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { scalar, singleton } from "@/clients/DuckDbClient/queryResultHelpers";

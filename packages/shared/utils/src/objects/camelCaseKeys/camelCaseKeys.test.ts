@@ -1,5 +1,5 @@
-import { describe, expect, expectTypeOf, it } from "vitest";
 import { camelCaseKeys } from "@utils/objects/camelCaseKeys/camelCaseKeys.ts";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
 describe("camelCaseKeys", () => {
   it("maps top-level keys to camelCase shallowly by default", () => {

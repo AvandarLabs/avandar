@@ -1,13 +1,13 @@
 import type {
-    AnyValidPathParamsRecord,
-    GenericAPITypeDef,
-    GenericRouteAPIRecord,
-    HTTPMethod,
-    UnknownRecord,
-    URLPathPattern,
-    ValidBody,
-    ValidPathParams,
-    ValidReturnType,
+  AnyValidPathParamsRecord,
+  GenericAPITypeDef,
+  GenericRouteAPIRecord,
+  HTTPMethod,
+  UnknownRecord,
+  URLPathPattern,
+  ValidBody,
+  ValidPathParams,
+  ValidReturnType,
 } from "@sbfn/_shared/MiniServer/api.types.ts";
 import type { AnyZodType } from "@sbfn/_shared/MiniServer/createServerRouteHandler.ts";
 import type { ValidPathParamsSchema } from "@sbfn/_shared/MiniServer/parseURLPathParams.ts";

@@ -1,5 +1,5 @@
 import { createSupabaseCRUDClient } from "@clients";
-import { where, prop , makeBucketRecord , objectKeys  } from "@utils";
+import { makeBucketRecord, objectKeys, prop, where } from "@utils";
 import { EntityFieldConfigParsers } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfigParsers";
 import { match } from "ts-pattern";
 import { DatasetColumnValueExtractorClient } from "@/clients/entity-configs/DatasetColumnValueExtractorClient";

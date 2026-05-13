@@ -1,4 +1,8 @@
-import { assertIsNonEmptyArray, assertIsSingletonArray , objectKeys  } from "@utils";
+import {
+  assertIsNonEmptyArray,
+  assertIsSingletonArray,
+  objectKeys,
+} from "@utils";
 import type { UnknownObject } from "@utils";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
 

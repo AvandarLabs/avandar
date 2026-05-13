@@ -1,8 +1,8 @@
 import { Button, Loader } from "@mantine/core";
 import { assertIsDefined } from "@utils";
 import { ReactNode, useState } from "react";
-import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { goToBillingPortal } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal";
+import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 
 type Props = {
   children: ReactNode;

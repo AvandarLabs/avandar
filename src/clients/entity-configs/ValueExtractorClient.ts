@@ -1,4 +1,4 @@
-import { prop, makeBucketRecord , objectKeys  } from "@utils";
+import { makeBucketRecord, objectKeys, prop } from "@utils";
 import {
   EntityFieldValueExtractor,
   EntityFieldValueExtractorRegistry,

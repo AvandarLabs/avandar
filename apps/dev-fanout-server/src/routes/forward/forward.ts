@@ -1,5 +1,5 @@
 import { NgrokDevURLsManager } from "@fanout-server/NgrokDevURLsManager";
-import { isArray, isDefined , objectValuesMap  } from "@utils";
+import { isArray, isDefined, objectValuesMap } from "@utils";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 type FanoutResult = Readonly<{

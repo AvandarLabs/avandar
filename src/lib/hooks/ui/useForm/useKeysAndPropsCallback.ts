@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import type { UseFormReturnType as MantineUseFormReturnType } from "@mantine/form";
-import type { UnknownObject, IdentityFnType  } from "@utils";
+import type { IdentityFnType, UnknownObject } from "@utils";
 import type { Paths, Simplify } from "type-fest";
 
 type GetPathTail<Path, PathHead extends string> =

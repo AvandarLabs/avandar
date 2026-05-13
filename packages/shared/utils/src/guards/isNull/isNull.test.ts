@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { isNull } from "@utils/guards/isNull/isNull.ts";
+import { describe, expect, it } from "vitest";
 
 describe("isNull", () => {
   it("returns true for null", () => {

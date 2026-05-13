@@ -1,19 +1,14 @@
-import { describe, expect, it } from "vitest";
 import { convertDatesToISOIn } from "@utils/objects/convertDatesToISOIn/convertDatesToISOIn.ts";
+import { describe, expect, it } from "vitest";
 
 describe("convertDatesToISOIn", () => {
   it("converts a Date to an ISO string", () => {
     const date = new Date("2025-06-15T12:00:00.000Z");
     const input = { createdAt: date, name: "test" };
 
-    const result = convertDatesToISOIn(
-      input,
-      ["createdAt"],
-    );
+    const result = convertDatesToISOIn(input, ["createdAt"]);
 
-    expect(result.createdAt).toBe(
-      "2025-06-15T12:00:00.000Z",
-    );
+    expect(result.createdAt).toBe("2025-06-15T12:00:00.000Z");
     expect(result.name).toBe("test");
   });
 
@@ -26,17 +21,10 @@ describe("convertDatesToISOIn", () => {
       title: "event",
     };
 
-    const result = convertDatesToISOIn(
-      input,
-      ["start", "end"],
-    );
+    const result = convertDatesToISOIn(input, ["start", "end"]);
 
-    expect(result.start).toBe(
-      "2025-01-01T00:00:00.000Z",
-    );
-    expect(result.end).toBe(
-      "2025-12-31T00:00:00.000Z",
-    );
+    expect(result.start).toBe("2025-01-01T00:00:00.000Z");
+    expect(result.end).toBe("2025-12-31T00:00:00.000Z");
     expect(result.title).toBe("event");
   });
 
@@ -49,10 +37,7 @@ describe("convertDatesToISOIn", () => {
       name: "test",
     };
 
-    const result = convertDatesToISOIn(
-      input,
-      ["date"],
-    );
+    const result = convertDatesToISOIn(input, ["date"]);
 
     expect(result.date).toBeUndefined();
     expect(result.name).toBe("test");
@@ -74,10 +59,7 @@ describe("convertDatesToISOIn", () => {
     const input = { createdAt: date, name: "test" };
     const copy = { ...input };
 
-    const result = convertDatesToISOIn(
-      input,
-      ["createdAt"],
-    );
+    const result = convertDatesToISOIn(input, ["createdAt"]);
 
     expect(result).not.toBe(input);
     expect(input).toEqual(copy);

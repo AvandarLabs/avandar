@@ -4,7 +4,14 @@ import mvpWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.js?url
 import duckDbWasmEh from "@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url";
 import duckDbWasm from "@duckdb/duckdb-wasm/dist/duckdb-mvp.wasm?url";
 import { ILogger } from "@logger";
-import { isNonEmptyArray, prop , objectEntries , objectKeys , objectValuesMap , MIMEType  } from "@utils";
+import {
+  isNonEmptyArray,
+  MIMEType,
+  objectEntries,
+  objectKeys,
+  objectValuesMap,
+  prop,
+} from "@utils";
 import { uuid } from "$/lib/uuid";
 import {
   DuckDbDataType,

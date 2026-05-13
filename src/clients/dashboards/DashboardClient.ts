@@ -1,6 +1,6 @@
 import { createSupabaseCRUDClient } from "@clients";
 import { notifyError } from "@ui";
-import { where, assertIsDefined, prop  } from "@utils";
+import { assertIsDefined, prop, where } from "@utils";
 import { DashboardParsers } from "$/models/Dashboard/DashboardParsers";
 import { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import { extractDatasetIdsFromDashboardConfig } from "@/clients/dashboards/extractDatasetIdsFromDashboardConfig";

@@ -1,5 +1,5 @@
 import { createServiceClient } from "@clients";
-import { WithQueryHooks, withQueryHooks  } from "@hooks";
+import { WithQueryHooks, withQueryHooks } from "@hooks";
 import { withLogger } from "@logger";
 import { isDefined } from "@utils";
 import { LocalPublicDatasetClient } from "@/clients/datasets/LocalPublicDatasetClient";

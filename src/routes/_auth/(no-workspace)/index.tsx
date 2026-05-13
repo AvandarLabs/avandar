@@ -2,8 +2,8 @@ import { Container, Paper, Stack, Title } from "@mantine/core";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { isNonEmptyArray } from "@utils";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
-import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
 import { CreateWorkspaceForm } from "@/components/common/forms/CreateWorkspaceForm";
+import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
 import { AppLinks } from "@/config/AppLinks";
 
 /**
