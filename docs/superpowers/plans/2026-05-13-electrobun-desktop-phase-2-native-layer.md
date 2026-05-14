@@ -4,6 +4,8 @@
 
 **Spec:** `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md`
 
+**Testing strategy:** `docs/superpowers/specs/2026-05-14-testing-strategy.md` — defines per-PR test groupings (G2.x) referenced in each Task below.
+
 **Goal:** Wire all desktop privileged services (SQLite, native DuckDB, filesystem `DatasetBlobStore`, OS keychain) into Bun main and expose them to the webview via typed IPC. After Phase 2 the desktop runs **fully offline** against a local snapshot of the user's data; the sync engine (Phase 3) is still absent, so writes do not yet propagate to Supabase.
 
 **Architecture:**
@@ -87,6 +89,13 @@
 ---
 
 ## Task 1: IPC Contracts Framework
+
+**Test groupings:** G2.1 (IPC contracts parity — type-level guard against drift between contract __request/__response and handler signatures registered in Tasks 8/10/11/12/14).
+
+**PR boundaries:** 2 PRs.
+- PR 1: Type-level contract definitions for all six handler groups (RdbContracts, DuckDbContracts, AuthContracts, DatasetBlobContracts, ServerApiContracts plus the loopback helper) — type-only, no runtime cost, nothing imports them yet.
+- PR 2: Tests for the contracts framework — asserts currently-passing type-level behavior; safe to land independently.
+- (Or 1 combined PR if the Steps fold tests and contracts together in a TDD pair.)
 
 A small, typed RPC abstraction that lives in `@avandar/platform` and is consumed by both sides. Each contract is `{ name, request, response }` and the registration helper enforces type matching.
 
@@ -278,6 +287,27 @@ export const AuthContracts = {
     "auth.refreshIfNeeded",
   ),
 };
+
+// ServerApi (Supabase RPCs + Edge Functions, routed through Bun main)
+// Inner request/response types are checked by the typed `ServerApiClient`
+// interface in @avandar/clients; the IPC layer here is intentionally loose
+// (unknown in / unknown out) so contracts don't have to re-encode every RPC.
+export const ServerApiContracts = {
+  rpc: defineIpcContract<
+    { readonly name: string; readonly args: unknown },
+    unknown
+  >("serverApi.rpc"),
+  invokeFunction: defineIpcContract<
+    {
+      readonly route: string;
+      readonly method: string;
+      readonly pathParams?: Record<string, string | number>;
+      readonly queryParams?: Record<string, unknown>;
+      readonly body?: unknown;
+    },
+    { readonly data: unknown; readonly status: number }
+  >("serverApi.invokeFunction"),
+};
 ```
 
 **Note on bytes-as-base64:** Electrobun's stdin/stdout IPC layer transports strings. Large blobs over base64 add ~33% overhead. For files >50MB consider chunking. The contracts above keep things simple for V1; Phase 3 may add a streaming variant if profiles show pressure.
@@ -293,6 +323,7 @@ export {
   DuckDbContracts,
   DatasetBlobContracts,
   AuthContracts,
+  ServerApiContracts,
 } from "./ipc/contracts.ts";
 export type { IpcContract } from "./ipc/contracts.ts";
 ```
@@ -305,16 +336,33 @@ pnpm --filter @avandar/platform type-check
 
 Expected: green.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 8: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add packages/shared/platform/
-git commit -m "feat(platform): add typed IPC contract framework with Phase 2 contracts"
-```
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/platform test
+  pnpm --filter @avandar/platform type-check
+  ```
+  Expected: tests pass, type-check exits clean.
+
+  **Verify:**
+  - `packages/shared/platform/src/ipc/contracts.ts` exists with the `defineIpcContract` / `IpcContract` exports.
+  - `packages/shared/platform/src/ipc/contracts.test-d.ts` covers both the type-test and the runtime sanity checks.
+  - All Phase 2 contracts (rdb.*, duckdb.*, auth.*, dataset-blob.*, serverApi.*) are declared in the contracts module with the request/response shapes the spec calls for.
+  - Public surface is re-exported from `packages/shared/platform/src/index.ts`.
+  - Test groupings G2.1 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test:** none yet — there's no runtime path to exercise until the client/server land in Tasks 2/3 (and a real handler in Task 8). Defer end-to-end smoke until then.
+
+  **Greenlight criteria:** unit + type tests pass and the contract module compiles cleanly across the monorepo before moving to Task 2.
 
 ---
 
 ## Task 2: IPC Client (webview side)
+
+**Test groupings:** G2.2 (IPC client unit — happy path, error reply, concurrent calls to same channel matched by id, bridge-missing throws, 5s timeout fires; the concurrency case will likely surface a bug in the once-listener pattern).
+
+**PR boundaries:** 1 PR. TDD red-green over the IPC client — failing tests and implementation must ship together, and the module is only consumed by desktop callers added in later tasks so web is unaffected.
 
 Webview-side client that calls a contract over Electrobun's IPC bridge and returns a Promise.
 
@@ -467,16 +515,33 @@ Edit `packages/shared/platform/src/index.ts`:
 export { callIpc, __setIpcBridgeForTests } from "./ipc/client.ts";
 ```
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add packages/shared/platform/
-git commit -m "feat(platform): add webview-side IPC client with test injection"
-```
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/platform test
+  pnpm --filter @avandar/platform type-check
+  ```
+  Expected: client unit tests pass (including the bridge-injection cases), type-check clean.
+
+  **Verify:**
+  - `packages/shared/platform/src/ipc/client.ts` exports `callIpc` plus the test-injection seam `__setIpcBridgeForTests`.
+  - The client serialises a contract call into the expected Electrobun bridge shape and rejects on error responses.
+  - `packages/shared/platform/src/index.ts` re-exports the new symbols.
+  - Request/response types flow through from `defineIpcContract` so callers get inferred typings.
+  - Test groupings G2.2 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test:** none yet — `callIpc` still has nothing real to talk to (server lands in Task 3, first usable handler in Task 8). Defer end-to-end smoke until then.
+
+  **Greenlight criteria:** client tests + type-check are green and the test-injection seam works before moving to Task 3.
 
 ---
 
 ## Task 3: IPC Server (Bun-main side)
+
+**Test groupings:** G2.3 (IPC server unit — dispatch, handler-throw → error reply, unknown channel); G2.4 (IPC loopback integration — round-trip a real contract via paired fake transport; symmetry guard against channel-name typos).
+
+**PR boundaries:** 1 PR. TDD red-green; lives only in `apps/desktop/main` so web bundles are untouched.
 
 Helper for registering typed handlers in Bun main. Same shape on the other side of the wire.
 
@@ -607,16 +672,33 @@ export { createIpcServer } from "./ipc/server.ts";
 export type { IpcServer, IpcTransport } from "./ipc/server.ts";
 ```
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add packages/shared/platform/
-git commit -m "feat(platform): add main-side IPC server helper"
-```
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/platform test
+  pnpm --filter @avandar/platform type-check
+  ```
+  Expected: server unit tests pass, type-check clean.
+
+  **Verify:**
+  - `packages/shared/platform/src/ipc/server.ts` exports `createIpcServer`, the `IpcServer` type, and the `IpcTransport` shape it expects from Electrobun.
+  - Registering a handler for a contract narrows request/response types correctly (mirror of the client side).
+  - Errors thrown inside a handler are serialised, not crashed; the test covers this.
+  - Re-export wired up in `packages/shared/platform/src/index.ts`.
+  - Test groupings G2.3, G2.4 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test:** none yet — exercising the server requires a real transport, which Tasks 7/8 deliver. A trivial loopback round-trip (fake transport that pipes client → server in-process) is acceptable here if you want extra confidence; otherwise defer.
+
+  **Greenlight criteria:** server tests + type-check pass and contract types stay symmetric between client and server before moving to Task 4.
 
 ---
 
 ## Task 4: `userDataDir` resolver
+
+**Test groupings:** G2.5 (userDataDir resolver across platform fixtures — darwin, win32 happy, win32 with spaces, win32 missing APPDATA, linux throws; uses path/win32 to lock Windows behavior even on macOS CI).
+
+**PR boundaries:** 1 PR. TDD red-green; pure function in `apps/desktop/main` with no web consumers.
 
 Pure function returning the per-OS-user app data directory. Used by every native service.
 
@@ -723,16 +805,40 @@ pnpm --filter @avandar/desktop test
 
 Expected: green.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add apps/desktop/main/platform/userDataDir.ts apps/desktop/main/platform/userDataDir.test.ts
-git commit -m "feat(desktop): add resolveUserDataDir helper"
-```
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/desktop test
+  pnpm --filter @avandar/desktop type-check
+  ```
+  Expected: path-resolution tests pass on all stubbed platforms (darwin/win32/linux), type-check clean.
+
+  **Verify:**
+  - `apps/desktop/main/platform/userDataDir.ts` exports `resolveUserDataDir` and is a pure function over `(platform, env, homedir)` — no side effects at import time.
+  - macOS branch returns `<home>/Library/Application Support/Avandar`.
+  - Windows branch returns the `%APPDATA%\Avandar` equivalent (even though Phase 5 ships it, the resolver should already be correct).
+  - Linux branch honours `$XDG_DATA_HOME` with the documented fallback.
+  - Test file covers each branch with injected inputs.
+  - Test groupings G2.5 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test (desktop app — `pnpm dev:desktop`):**
+  1. Add a one-line `console.log("[userDataDir]", resolveUserDataDir(...))` near app startup (temporary, revert before moving on).
+  2. Launch the app on macOS.
+  3. Confirm the logged path is exactly `~/Library/Application Support/Avandar`.
+  4. Quit and revert the temporary log line.
+
+  Expected: the printed path matches the macOS branch verbatim; no exceptions during startup.
+
+  **Greenlight criteria:** unit tests pass and the resolved path matches the macOS spec on a real launch before moving to Task 5.
 
 ---
 
 ## Task 5: `SYNCABLE_TABLES` manifest
+
+**Test groupings:** G2.6 (SYNCABLE_TABLES manifest vs live Supabase schema — every CREATE TABLE in supabase/migrations/*.sql is in SYNCABLE_TABLES ∪ EXCLUDED_TABLES; automates the human check in this task).
+
+**PR boundaries:** 1 PR (could be split to 2). The manifest is pure data with no runtime consumers yet, and the parity test asserts a currently-true property — small enough to land together. If preferred, ship the manifest first and the parity test second.
 
 The single source of truth for which Supabase tables get mirrored to SQLite. Listed manually; tested for shape.
 
@@ -848,16 +954,36 @@ pnpm --filter @avandar/desktop test
 
 Expected: green.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add apps/desktop/sync/syncable-tables.ts apps/desktop/sync/syncable-tables.test.ts
-git commit -m "feat(desktop): add SYNCABLE_TABLES manifest"
-```
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/desktop test
+  pnpm --filter @avandar/desktop type-check
+  ```
+  Expected: manifest shape tests pass, type-check clean.
+
+  **Verify:**
+  - `apps/desktop/sync/syncable-tables.ts` exports a `readonly`-typed `SYNCABLE_TABLES` tuple/record matching the Phase 2 spec intent (user-owned artifacts only — no auth, no system tables, no Phase 3-only artifacts).
+  - The list lines up with the actual table names in `supabase/migrations/*.sql` (no typos, no missing tables, no tables that don't exist).
+  - Each entry carries whatever metadata downstream tasks expect (table name, primary key, etc.) — confirm by cross-referencing how Task 6 (generator) and Task 9 (bootstrap) consume it.
+  - Tests assert the shape (e.g. unique table names, primary keys present) rather than the literal list.
+  - Test groupings G2.6 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test:** none — manifest is a static constant with no runtime behaviour of its own. Real validation happens when Task 6 generates migrations and Task 9 reads from these tables.
+
+  **Greenlight criteria:** manifest tests pass and the table list has been reviewed against the live Supabase schema before moving to Task 6.
 
 ---
 
 ## Task 6: Postgres → SQLite migration generator
+
+**Test groupings:** G2.7 (PG→SQLite generator fixture+golden snapshots — uuid→text, timestamptz→expected, RLS stripped, unknown table errors, idempotency; replaces the manual spot-check review step).
+
+**PR boundaries:** 2-3 PRs.
+- PR 1: Scaffold the generator script with fixtures and golden tests; no generated SQLite migrations committed yet — script-only.
+- PR 2: Commit the first generated SQLite migration files plus the CI drift-check workflow (`pnpm check:sqlite-migrations`); files are unread until Task 7 wires the runner.
+- PR 3 (optional): Generator's hard-error / warning behavior on unknown PG constructs, if implemented as a separate Step.
 
 Shells out to Python's `sqlglot`. Reads `supabase/migrations/*.sql`; emits `apps/desktop/migrations/*.sql` for syncable tables only; hard-errors on unknown tables.
 
@@ -1286,16 +1412,49 @@ Spot-check a few generated files:
 
 If sqlglot mis-translates something critical, file an upstream issue and apply a one-off post-processing step. For Phase 2, a minor manual touch-up *of the generator script* (not of the output files) is acceptable.
 
-- [ ] **Step 10: Commit**
+- [ ] **Step 10: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add apps/desktop/scripts/ apps/desktop/migrations/ package.json
-git commit -m "feat(desktop): add Postgres→SQLite migration generator and CI drift check"
-```
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/desktop test
+  pnpm gen:sqlite-migrations
+  pnpm check:sqlite-migrations
+  git status apps/desktop/migrations/
+  git diff --stat apps/desktop/migrations/
+  ```
+  Expected: generator tests pass; the generator runs without errors; `check:sqlite-migrations` exits 0 (no drift between generator output and what's on disk); `git status`/`git diff` show only the expected, intentional changes under `apps/desktop/migrations/`.
+
+  **Verify:**
+  - `apps/desktop/scripts/gen-sqlite-migrations.ts` and `apps/desktop/scripts/check-sqlite-migrations.ts` exist and are wired into root `package.json` scripts.
+  - `apps/desktop/migrations/` contains one generated file per source migration that touches a syncable table — no files for non-syncable tables.
+  - `apps/desktop/migrations/README.md` documents the regeneration workflow.
+  - Spot-check **at least one** generated migration:
+    - `uuid` columns become `text`.
+    - `timestamptz` columns become whichever of `integer`/`text` sqlglot lands on — confirm the choice is workable for bun:sqlite.
+    - RLS / GRANT statements dropped or commented out.
+    - PG-function triggers either dropped or surfaced as `-- TODO:` markers (no live calls to `auth.uid()` etc.).
+  - Generator hard-errors on a manifest table it can't translate (verified by a unit test).
+  - Test groupings G2.7 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test:**
+  1. Touch a syncable-table column in `supabase/migrations/` (e.g. add a no-op `ALTER TABLE … ADD COLUMN _scratch text`).
+  2. Re-run `pnpm gen:sqlite-migrations` — confirm a new `apps/desktop/migrations/*.sql` file appears reflecting the change.
+  3. Run `pnpm check:sqlite-migrations` — confirm it now passes.
+  4. Revert the scratch change in `supabase/migrations/`, re-run the generator, and confirm the desktop migration disappears (or the diff cleanly reverts).
+
+  Expected: the generator picks up source changes and `check:sqlite-migrations` reliably catches drift in both directions.
+
+  **Greenlight criteria:** generator runs clean, drift check passes against committed output, and a manual diff of one migration reads sensibly before moving to Task 7.
 
 ---
 
 ## Task 7: `Sqlite.ts` — bun:sqlite handle + migration runner
+
+**Test groupings:** G2.8 (bun:sqlite migration runner — fresh DB applies all; idempotency on rerun; history mismatch detected; malformed migration rolls back without partial state).
+
+**PR boundaries:** 2 PRs.
+- PR 1: `openSqliteDatabase` + migration runner module (`apps/desktop/main/sqlite/...`) with its unit tests; not yet invoked at launch.
+- PR 2: Wire the runner into desktop main startup so Task 6's generated migrations apply on first launch — desktop-only code path.
 
 **Files:**
 - Create: `apps/desktop/main/services/Sqlite.ts`
@@ -1464,16 +1623,51 @@ pnpm --filter @avandar/desktop test
 
 Expected: green.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add apps/desktop/main/services/Sqlite.ts apps/desktop/main/services/Sqlite.test.ts
-git commit -m "feat(desktop): add bun:sqlite handle + migration runner"
-```
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/desktop test
+  pnpm --filter @avandar/desktop type-check
+  ```
+  Expected: Sqlite unit tests pass (migration runner, idempotency, error paths), type-check clean.
+
+  **Verify:**
+  - `apps/desktop/main/services/Sqlite.ts` exports the handle factory and a migration runner that:
+    - reads from `apps/desktop/migrations/*.sql` in lexical order,
+    - tracks applied migrations in a bookkeeping table,
+    - is idempotent across restarts,
+    - runs each file inside a transaction.
+  - Tests cover: fresh DB, partial-apply restart, malformed migration aborts the transaction.
+  - The handle uses `bun:sqlite` (not `better-sqlite3`) and sets WAL / sensible pragmas at open time.
+  - Test groupings G2.8 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test (desktop app — `pnpm dev:desktop`):**
+  1. Delete any pre-existing `~/Library/Application Support/Avandar/metadata.sqlite` so you're starting fresh.
+  2. Launch the desktop app.
+  3. Quit, then inspect on disk:
+     ```bash
+     ls -la "$HOME/Library/Application Support/Avandar/"
+     sqlite3 "$HOME/Library/Application Support/Avandar/metadata.sqlite" '.schema'
+     sqlite3 "$HOME/Library/Application Support/Avandar/metadata.sqlite" 'SELECT name FROM sqlite_master WHERE type="table";'
+     ```
+  4. Relaunch the app and confirm no migrations re-apply (check logs for a "no pending migrations" or equivalent line; the bookkeeping table should already list every migration).
+
+  Expected: `metadata.sqlite` exists, schema contains every syncable table from Task 5, the bookkeeping table is populated, and a second launch does not re-run migrations.
+
+  **Greenlight criteria:** fresh launch produces the expected SQLite file and schema, and a second launch is a no-op for the migration runner, before moving to Task 8.
 
 ---
 
 ## Task 8: RDB IPC handlers + `createSqliteCRUDClient`
+
+**Test groupings:** G2.9 (createSqliteCRUDClient round-trip on real bun:sqlite — insert→getById→list→update→delete; transaction rolls back on second-statement failure); G2.10 (Outbox-in-same-transaction invariant — data write + manual INSERT INTO _outbox commit atomically; Phase 3 prerequisite encoded in Phase 2).
+
+**PR boundaries:** 3-4 PRs.
+- PR 1: RDB IPC handlers in `apps/desktop/main/ipc/rdb.ts` with unit tests; nothing imports them on web.
+- PR 2: `createSqliteCRUDClient` in `packages/shared/clients/src/RdbCRUDClient/...` with mocked-IPC unit tests; new file, not yet selected by the factory.
+- PR 3: Integration loopback test wiring PR 1 and PR 2 through the fake-IPC harness — asserts already-passing behavior.
+- PR 4: Update `createRdbCRUDClient` factory's desktop branch to return `createSqliteCRUDClient`; desktop CRUD goes live, web is unaffected because `isDesktop()` is false.
 
 Wire SQLite to the webview through the IPC layer, then introduce the SQLite-backed CRUD client.
 
@@ -1844,16 +2038,46 @@ If the webview crashes because `createRdbCRUDClient` returns empty results from 
 
 The actual implementation lives in the next task.
 
-- [ ] **Step 12: Commit**
+- [ ] **Step 12: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add apps/desktop/ packages/shared/clients/
-git commit -m "feat(desktop): wire RDB IPC + createSqliteCRUDClient; flip createRdbCRUDClient desktop branch"
-```
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/desktop test
+  pnpm --filter @avandar/clients test
+  pnpm type-check
+  ```
+  Expected: SQLite CRUD client tests pass against a real bun:sqlite in-memory DB; the RDB-IPC server tests pass; whole-monorepo type-check clean.
+
+  **Verify:**
+  - `apps/desktop/main/ipc/rdb.ts` registers handlers for every `rdb.*` contract from Task 1.
+  - `packages/shared/clients/src/SqliteCRUDClient/createSqliteCRUDClient.ts` implements the same `RdbCRUDClient` interface as the web Dexie client (parity is what makes the swap transparent).
+  - `packages/shared/clients/src/RdbCRUDClient/createRdbCRUDClient.ts` now branches on platform and returns the SQLite-backed client on desktop, Dexie on web.
+  - SQL parameter handling is parameterised — no string interpolation of user data into queries.
+  - `apps/desktop/main/index.ts` constructs the Sqlite handle once and passes it to `registerRdbHandlers`.
+  - Test groupings G2.9, G2.10 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test (desktop app — `pnpm dev:desktop`):**
+  1. Open a page in the app that creates a row in a syncable table (e.g. a Datasets list or whichever CRUD surface is wired earliest).
+  2. Create a row via the UI.
+  3. In another terminal, confirm it landed in SQLite:
+     ```bash
+     sqlite3 "$HOME/Library/Application Support/Avandar/metadata.sqlite" 'SELECT * FROM datasets;'
+     ```
+  4. Quit the app and relaunch.
+  5. Confirm the row is still listed in the UI on relaunch.
+  6. Watch the desktop logs during the operation for the IPC roundtrip (request name + response) to confirm calls flow through `callIpc` → server handler → bun:sqlite, not a stale web code path.
+
+  Expected: the row appears in the on-disk SQLite file and survives a restart; logs show the desktop RDB IPC path firing, not the Dexie fallback.
+
+  **Greenlight criteria:** at least one full create→read→restart→read cycle works through the SQLite-backed CRUD client before moving to Task 9.
 
 ---
 
 ## Task 9: One-shot Supabase→SQLite snapshot bootstrap
+
+**Test groupings:** G2.11 (Snapshot bootstrap — empty→populated; populated→skip; partial-completion-per-table is recoverable; FK-ordered inserts; REST 401 → no partial state; mocked Supabase REST via msw).
+
+**PR boundaries:** 1 PR. Bootstrap module, tests, and desktop main wiring all land together; the code path is desktop-only and gated by `isDesktop()` so web users never reach it.
 
 Without a sync engine (Phase 3), the desktop still needs *some* way to populate its local SQLite from Supabase on first launch. This task ships a minimal one-shot pull: when the local DB is fresh, fetch all rows for each syncable table from Supabase and insert.
 
@@ -2054,16 +2278,52 @@ if (devToken) {
 
 The "real" bootstrap-on-login flow is wired up in the Keychain/auth task (Task 11).
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 7: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add apps/desktop/main/
-git commit -m "feat(desktop): one-shot Supabase→SQLite snapshot bootstrap"
-```
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/desktop test
+  pnpm --filter @avandar/desktop type-check
+  ```
+  Expected: `SnapshotBootstrap.test.ts` covers fresh-DB + already-populated cases and passes; type-check clean.
+
+  **Verify:**
+  - `apps/desktop/main/services/SupabaseRest.ts` is a minimal, typed REST wrapper (no full supabase-js dependency in main) honouring the dev token contract Task 11 will replace.
+  - `apps/desktop/main/services/SnapshotBootstrap.ts`:
+    - detects "empty SQLite" by checking the bookkeeping/data tables — not by file existence,
+    - iterates `SYNCABLE_TABLES` and inserts rows in dependency order (FK-safe),
+    - is idempotent: a second run on a non-empty DB is a no-op,
+    - batches inserts inside a single transaction per table.
+  - Wiring in `apps/desktop/main/index.ts` runs the bootstrap exactly once at startup and logs `[snapshot-bootstrap] …` progress.
+  - Test groupings G2.11 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test (desktop app — `pnpm dev:desktop`):**
+  1. Wipe local state: `rm "$HOME/Library/Application Support/Avandar/metadata.sqlite"*`.
+  2. Make sure the dev token used by `SnapshotBootstrap` is configured for a user that has real rows in Supabase.
+  3. Launch the desktop app.
+  4. Watch the logs for `[snapshot-bootstrap] starting`, per-table progress lines, and a `[snapshot-bootstrap] done` (or equivalent) terminator.
+  5. After bootstrap completes, inspect SQLite:
+     ```bash
+     for t in $(sqlite3 "$HOME/Library/Application Support/Avandar/metadata.sqlite" "SELECT name FROM sqlite_master WHERE type='table'"); do
+       echo "=== $t ==="
+       sqlite3 "$HOME/Library/Application Support/Avandar/metadata.sqlite" "SELECT COUNT(*) FROM $t;"
+     done
+     ```
+  6. Quit and relaunch; confirm the bootstrap log line says "already bootstrapped / skipping" instead of re-pulling.
+
+  Expected: every syncable table has the same row count locally as it does in Supabase for that user; second launch does not re-pull.
+
+  **Greenlight criteria:** fresh launch populates SQLite from Supabase, counts match, and the second launch is a no-op before moving to Task 10.
 
 ---
 
 ## Task 10: Native DuckDB in Bun main + DuckDb IPC
+
+**Test groupings:** G2.12 (Native DuckDB happy path + parity — real @duckdb/node-api instance, SELECT 1, parquet round-trip, column types match a golden captured from duckdb-wasm; catches BIGINT/INTEGER and TIMESTAMP_NS drift early).
+
+**PR boundaries:** 2 PRs.
+- PR 1: `DuckDb` service in Bun main + DuckDb IPC handlers + parity tests; new desktop-only files, not yet wired.
+- PR 2: `createIpcDuckDbClient` desktop adapter + wiring into the platform provider's desktop branch; web's DuckDb implementation remains the WASM one because `isDesktop()` is false.
 
 Replace duckdb-wasm on desktop. The existing `@avandar/ava-etl` package already uses the `duckdb` Node binding; we lean on the same package.
 
@@ -2421,16 +2681,47 @@ git grep -l "@duckdb/duckdb-wasm" -- 'src/' 'packages/'
 
 Each call site should either be desktop-conditional or moved behind a `usePlatform().duckDb` indirection. The full audit is broader than Phase 2 — for now, the goal is *not* "zero duckdb-wasm in the desktop bundle" but "duckdb-wasm code paths never execute on desktop". The bundle drop is an optimization; if it's blocked, defer it to Phase 4 and accept the ~30MB bundle bloat in V1 desktop. Note this decision in the spec's "decisions" section.
 
-- [ ] **Step 10: Commit**
+- [ ] **Step 10: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add apps/desktop/ packages/shared/platform/ vite.config.ts package.json
-git commit -m "feat(desktop): native DuckDB service + IPC; DesktopDuckDbClient stub"
-```
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/desktop test
+  pnpm --filter @avandar/desktop type-check
+  pnpm type-check
+  ```
+  Expected: native DuckDB service tests pass against the real `duckdb` Node binding loaded under Bun; monorepo type-check clean.
+
+  **Verify:**
+  - `apps/desktop/package.json` now depends on `duckdb` (Node binding) and the binding loads under Bun without a postinstall fight.
+  - `apps/desktop/main/services/DuckDb.ts` exposes the same query API the web `duckdb-wasm` wrapper exposes (so the IPC layer can swap in transparently).
+  - `apps/desktop/main/ipc/duckdb.ts` registers handlers for every `duckdb.*` contract from Task 1.
+  - `packages/shared/platform/src/desktop/DesktopDuckDbClient.ts` calls the contracts and returns the same shape the web client returns.
+  - The duckdb-wasm bundle decision is recorded as described in Step 9 (dropped from desktop OR explicitly deferred to Phase 4 in the spec's "decisions" section).
+  - No `@duckdb/duckdb-wasm` import executes on the desktop runtime path (audit confirmed via `git grep` per Step 9).
+  - Test groupings G2.12 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test (desktop app — `pnpm dev:desktop`):**
+  1. Add a temporary `console.log` in `DuckDb.ts` that prints the binding's reported version on first query (revert after).
+  2. Open a page that runs a DuckDB query — dataset preview, query workbench, whichever exists today.
+  3. Confirm the result renders.
+  4. In the desktop logs:
+     - Confirm the native-DuckDB version line prints.
+     - Confirm NO log lines from `duckdb-wasm` (e.g. no "Loading WASM module" messages from the wasm worker).
+  5. Run a larger query (e.g. against a multi-MB parquet) and confirm it returns at a speed consistent with native, not wasm.
+
+  Expected: queries succeed via the native binding; logs show native path only; no `duckdb-wasm` activity in the desktop process.
+
+  **Greenlight criteria:** at least one real query renders through `DesktopDuckDbClient` → IPC → native DuckDB, with no wasm fallback firing, before moving to Task 11.
 
 ---
 
 ## Task 11: Keychain via Bun FFI (macOS only in Phase 2)
+
+**Test groupings:** G2.13 (Keychain pure-layer unit — argv construction for set/get/delete; status-code parsing including 44 = not found); G2.14 (Keychain real-Security.framework round-trip, gated by KEYCHAIN_E2E=1 + process.platform === 'darwin'; non-ASCII payload; plaintext never appears in stdout/stderr).
+
+**PR boundaries:** 2 PRs.
+- PR 1: Keychain wrapper pure-layer (argv construction, status-code parsing) + unit tests; no native FFI dependency.
+- PR 2: Real Security.framework FFI bindings + gated integration test (KEYCHAIN_E2E=1); desktop-only code, not consumed on web.
 
 Phase 2 lands macOS keychain. Windows keychain is Phase 5.
 
@@ -2903,16 +3194,54 @@ pnpm dev:desktop
 
 In the window: sign in, close the app, reopen. The second launch should reach the post-login state without prompting.
 
-- [ ] **Step 9: Commit**
+- [ ] **Step 9: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add apps/desktop/ packages/shared/platform/
-git commit -m "feat(desktop): macOS keychain, auth IPC, DesktopAuthProvider"
-```
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/desktop test
+  pnpm --filter @avandar/desktop type-check
+  pnpm type-check
+  ```
+  Expected: keychain unit tests / smoke harness pass (FFI calls succeed against the real macOS Security framework); type-check clean.
+
+  **Verify:**
+  - `apps/desktop/main/services/Keychain.ts`:
+    - either uses Bun FFI bindings against `Security.framework` directly, OR shells out to `/usr/bin/security` as the documented fallback (Step 3 risk mitigation),
+    - never logs the secret value,
+    - the FFI implementation correctly frees any pointers/copies it owns.
+  - `apps/desktop/main/ipc/auth.ts` registers `auth.*` handlers (set, get, delete) wired to the Keychain service.
+  - `packages/shared/platform/src/desktop/DesktopAuthProvider.ts` implements the same auth-provider interface the web side uses and persists the session via the auth IPC.
+  - `apps/desktop/main/index.ts` calls the auth provider before constructing the snapshot bootstrap from Task 9, so the bootstrap token comes from Keychain instead of a hardcoded dev token.
+  - Service uses an account identifier scoped to "Avandar" (so deletions/inspections in Keychain Access are unambiguous).
+  - Test groupings G2.13, G2.14 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test (desktop app — `pnpm dev:desktop`):**
+  1. Wipe local state: `rm "$HOME/Library/Application Support/Avandar/metadata.sqlite"*` and ensure no prior Keychain entry for Avandar exists (delete it in Keychain Access.app if present).
+  2. Launch the desktop app — it should land on the sign-in screen.
+  3. Sign in with a real seeded user.
+  4. Open `Keychain Access.app`, search for `Avandar`, and confirm:
+     - exactly one entry exists for the signed-in account,
+     - the entry's "Where" / service name matches what `Keychain.ts` writes,
+     - the password is not stored in plaintext anywhere in `~/Library/Application Support/Avandar/`.
+  5. Quit the app fully.
+  6. Relaunch the app. Confirm it boots straight into the post-login state — no credential prompt.
+  7. Trigger sign-out in the UI.
+  8. Re-check Keychain Access — confirm the Avandar entry is gone.
+  9. Relaunch one more time — confirm the app now lands on the sign-in screen again.
+
+  Expected: session survives restarts via Keychain only; the Keychain entry is created on sign-in and removed on sign-out; no fallback file-based session store exists in userDataDir.
+
+  **Greenlight criteria:** sign-in → quit → restart → restored, and sign-out → entry deleted, both verified against Keychain Access.app, before moving to Task 12.
 
 ---
 
 ## Task 12: `FileSystemDatasetBlobStore` + IPC
+
+**Test groupings:** G2.15 (FileSystemDatasetBlobStore round-trip + listing + stat + delete); G2.16 (FileSystemDatasetBlobStore atomic-write crash simulation — monkey-patch renameSync to throw post-write; assert final key absent, partial .tmp may exist; path-traversal guard for ../ and ..\\; the test that proves the atomicity invariant the manual review can't).
+
+**PR boundaries:** 2 PRs.
+- PR 1: `FileSystemDatasetBlobStore` implementation + tests + DatasetBlob IPC handlers in `apps/desktop/main`; new desktop-only files, not yet wired.
+- PR 2: Desktop adapter (`createIpcDatasetBlobStore`) + wiring into platform provider's desktop branch; web continues to use its existing store.
 
 The desktop equivalent of `DatasetBlobStore`. Atomic writes, on-disk per-OS-user.
 
@@ -3217,16 +3546,61 @@ const datasetBlobStore = createFileSystemDatasetBlobStore(join(dataDir, "blobs")
 registerDatasetBlobHandlers(ipcServer, datasetBlobStore);
 ```
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 8: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add apps/desktop/ packages/shared/platform/
-git commit -m "feat(desktop): FileSystemDatasetBlobStore + IPC; DesktopDatasetBlobStore"
-```
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/desktop test
+  pnpm --filter @avandar/desktop type-check
+  pnpm type-check
+  ```
+  Expected: `FileSystemDatasetBlobStore.test.ts` covers happy path + crash-during-write + read-after-write, all pass; type-check clean.
+
+  **Verify:**
+  - `apps/desktop/main/services/FileSystemDatasetBlobStore.ts`:
+    - writes go through `<final>.tmp` + `rename` for atomicity,
+    - layout matches the spec: `workspaces/<wsId>/datasets/<dsId>/source.<ext>`, `data.parquet`, `meta.json`,
+    - reads verify the file exists before returning a stream/handle,
+    - delete is recursive and bounded to the dataset directory (cannot escape).
+  - `apps/desktop/main/ipc/dataset-blob.ts` registers `dataset-blob.*` handlers from Task 1.
+  - `packages/shared/platform/src/desktop/DesktopDatasetBlobStore.ts` implements the same interface the web `DatasetBlobStore` implements (so consumers don't branch).
+  - `apps/desktop/main/index.ts` constructs the store rooted at `<userDataDir>/blobs` and wires it into the IPC server.
+  - Test groupings G2.15, G2.16 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test (desktop app — `pnpm dev:desktop`):**
+  1. Sign in (Keychain path from Task 11) and navigate to a workspace.
+  2. Upload a small CSV via the Datasets UI.
+  3. Watch desktop logs for `[blob-store] wrote …` (or whatever log line the implementation emits).
+  4. Locate the file on disk:
+     ```bash
+     ls -la "$HOME/Library/Application Support/Avandar/blobs/workspaces/"
+     find "$HOME/Library/Application Support/Avandar/blobs/workspaces" -type f
+     ```
+  5. Confirm:
+     - `source.csv` exists with the uploaded CSV's contents.
+     - `data.parquet` exists (if dataset ingestion produces parquet at upload time).
+     - `meta.json` exists and parses, with sane fields (size, mime, timestamps).
+     - NO leftover `*.tmp` files in any dataset dir (atomicity proof).
+  6. Quit the app, relaunch, reopen the dataset — confirm the preview still loads (proves disk persistence + read path).
+  7. Delete the dataset from the UI and confirm the dataset directory is removed from disk.
+
+  Expected: the upload lands at the documented path, atomic-write leaves no `.tmp` debris, restart still finds the data, and delete cleans up the directory.
+
+  **Greenlight criteria:** at least one full upload → quit → restart → reload → delete cycle works through `DesktopDatasetBlobStore`, with the on-disk layout matching the spec, before moving to Task 13.
 
 ---
 
 ## Task 13: Wire the platform implementations into the React app
+
+**Test groupings:** G2.17 (PlatformProvider React component — mocked isDesktop; both branches resolve to correct adapter; usePlatform outside provider throws); G2.18 (Fake-IPC harness scaffolding itself — proves the harness's exposeFunction bridge correctly routes a trivial echo contract; lands before any e2e test depends on it); G2.19 (First fake-IPC e2e — sign in → upload CSV → list datasets → harness restart → dataset still listed; replaces multiple manual smoke steps in Tasks 8/12/13).
+
+**PR boundaries:** 4-5 PRs.
+- PR 1: PlatformProvider scaffold + `usePlatform` hook + provider tests (no implementations wired yet — defaults to web for both branches).
+- PR 2: Wire the desktop branch for DuckDbClient.
+- PR 3: Wire the desktop branch for DatasetBlobStore.
+- PR 4: Wire the desktop branch for AuthProvider.
+- PR 5: Wire any remaining desktop adapters (e.g., RdbCRUDClient if not already wired via Task 8's factory).
+- Each PR is independently safe because Phase 1 established the factory pattern and desktop has no current users; web continues to use its existing implementations selected by `isDesktop() === false`. (ServerApiClient wiring lives in Task 14.)
 
 The webview-side `Desktop*` implementations exist but aren't consumed yet. Wire them in via a `PlatformProvider` React context.
 
@@ -3364,16 +3738,132 @@ pnpm dev:desktop
 
 Expected: green; both shells work.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add src/ packages/
-git commit -m "refactor: thread platform implementations through PlatformProvider"
-```
+  **Run:**
+  ```bash
+  pnpm test
+  pnpm type-check
+  pnpm dev
+  pnpm dev:desktop
+  ```
+  Expected: all tests pass; both web (`pnpm dev`) and desktop (`pnpm dev:desktop`) shells boot without runtime errors or `usePlatform()` undefined warnings.
+
+  **Verify:**
+  - `PlatformProvider` is created in the documented location (`packages/web/hooks` or the equivalent) and exports a `usePlatform()` hook.
+  - The provider picks the desktop implementations (`DesktopAuthProvider`, `DesktopDuckDbClient`, `DesktopDatasetBlobStore`, `createSqliteCRUDClient`) when running under Electrobun, and the web implementations otherwise — gated by an `isDesktop()` check, not by NODE_ENV.
+  - `src/main.tsx` wraps the React tree with `<PlatformProvider>` ABOVE any consumer.
+  - Existing call sites that used to import the web implementations directly now read them from `usePlatform()` (audit at least the auth, dataset, and query call sites).
+  - No web-only modules (Dexie, duckdb-wasm) execute on the desktop runtime path.
+  - Test groupings G2.17, G2.18, G2.19 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test — full desktop happy path (`pnpm dev:desktop`):**
+  1. Wipe userDataDir for a true cold start: `rm -rf "$HOME/Library/Application Support/Avandar"`.
+  2. Launch the desktop app.
+  3. Sign in as a seeded user — confirm the Keychain entry is created (Task 11 territory, re-verify here).
+  4. Watch logs for snapshot bootstrap completing (Task 9).
+  5. List workspaces — confirm rows appear (proves SQLite-backed CRUD client + bootstrap).
+  6. Open a dataset and run a query — confirm DuckDB result renders (proves native DuckDB IPC).
+  7. Upload a new CSV dataset — confirm `source.csv`, `data.parquet`, `meta.json` land on disk under `~/Library/Application Support/Avandar/blobs/workspaces/<wsId>/datasets/<dsId>/`.
+  8. Quit the app fully.
+  9. Relaunch — confirm:
+     - lands in post-login state (no sign-in prompt),
+     - snapshot bootstrap logs a "skip" message,
+     - workspaces still listed,
+     - newly-uploaded dataset still present and previewable.
+  10. Open the same routes in `pnpm dev` (web shell) — confirm the web implementations still work (no accidental desktop-only imports leaking into web).
+
+  Expected: every step renders without errors and survives restart; web shell is unaffected.
+
+  **Greenlight criteria:** the full desktop happy path completes end-to-end on a cold userDataDir AND the web shell still works, before moving to Task 14.
 
 ---
 
-## Task 14: Phase 2 acceptance checklist
+## Task 14: ServerApi IPC handlers + desktop `ServerApiClient` implementation
+
+**Test groupings:** G2.20 (ServerApi IPC round-trip — RPC and Edge Function calls dispatched via IPC, executed by Bun-main against a mocked Supabase REST via msw; offline path throws OfflineError; auth header is injected by the handler, not the React client).
+
+**PR boundaries:** 2 PRs.
+- PR 1: Bun-main `api.ts` IPC handler + ServerApi IPC server registration + tests; new desktop-only file, not yet consumed.
+- PR 2: Replace the Phase 1 stub in `createIpcServerApiClient.ts` with the real IPC client implementation and wire it into the PlatformProvider's desktop branch; desktop-only code path, web continues using its existing ServerApiClient.
+
+**Files:**
+- Create: `apps/desktop/main/ipc/api.ts` — Bun-main IPC handler implementing `registerServerApiHandlers(ipcServer, { supabaseUrl, supabaseAnonKey, authProvider })`. The handler reads the current access token from the AuthProvider on every call.
+- Modify: `packages/shared/clients/src/ServerApiClient/createIpcServerApiClient.ts` — replace the Phase 1 throwing stub with a real IPC client that issues `serverApi.rpc` / `serverApi.invokeFunction` calls over the IPC bridge.
+- Test: `apps/desktop/main/ipc/api.test.ts` — integration test with msw + real IPC server.
+- Test: `packages/shared/clients/src/ServerApiClient/createIpcServerApiClient.test.ts` — unit test with mocked IPC bridge.
+
+**Steps:**
+
+- [ ] **Step 1: Write the failing test for the IPC client**
+
+Create `createIpcServerApiClient.test.ts`. Cases: rpc call dispatched on correct channel with correct envelope; invokeFunction same; error reply surfaces as a thrown Error in the caller; OfflineError surfaces when the handler reports offline.
+
+- [ ] **Step 2: Implement the IPC client**
+
+Replace the Phase 1 stub in `createIpcServerApiClient.ts` with a real implementation that uses the IPC bridge from Phase 2 Task 2. Methods proxy through the typed contracts defined in Task 1.
+
+- [ ] **Step 3: Run the test and confirm green**
+
+```bash
+pnpm --filter @avandar/clients test ServerApiClient
+```
+
+- [ ] **Step 4: Write the failing test for the handler module**
+
+Create `apps/desktop/main/ipc/api.test.ts` using `bun test`. Spin up a real `createIpcServer`, register the handler with a fake Supabase REST (msw). Cases:
+- `serverApi.rpc("some_rpc", {...})` round-trips and returns the mocked response.
+- `serverApi.invokeFunction({ route, method, body })` round-trips and returns `{ data, status }`.
+- A 401 from Supabase surfaces as a typed error.
+- An offline scenario (msw throws NetworkError) surfaces as `OfflineError`.
+- The handler injects the current access token from AuthProvider on every call — verified by inspecting the msw request headers.
+
+- [ ] **Step 5: Implement the handler module**
+
+Create `apps/desktop/main/ipc/api.ts`. Use Bun's native `fetch` to call Supabase. The handler accepts `{ supabaseUrl, supabaseAnonKey, authProvider }` at construction. On each call it reads the current session from AuthProvider, builds the appropriate request (`/rest/v1/rpc/<name>` for rpc; `/functions/v1/<path>` for invokeFunction), and returns the deserialized response.
+
+- [ ] **Step 6: Run the handler test and confirm green**
+
+```bash
+pnpm --filter @avandar/desktop test api
+```
+
+- [ ] **Step 7: Wire the new client into the platform implementations**
+
+Update wherever Task 13 wires PlatformProvider's desktop branch — `createServerApiClient()` on desktop now resolves to `createIpcServerApiClient()` instead of the Phase 1 stub.
+
+- [ ] **Step 8: Manual review checkpoint (do NOT commit)**
+
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/desktop test api
+  pnpm --filter @avandar/clients test ServerApiClient
+  pnpm type-check
+  ```
+  Expected: all green.
+
+  **Verify:**
+  - `apps/desktop/main/ipc/api.ts` registers `serverApi.rpc` and `serverApi.invokeFunction` handlers
+  - `createIpcServerApiClient.ts` no longer throws — it issues real IPC calls
+  - Auth header injection happens in the Bun-main handler, not in the React client (grep the React code: `git grep "Bearer " -- src/`)
+  - Test groupings G2.20 are authored (in this PR or as a separate PR to be merged before this checkpoint is greenlit), and the mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test (desktop app — `pnpm dev:desktop`):**
+  1. Sign in as seeded user
+  2. Navigate to a page that previously exercised an `APIClient` call (e.g. workspaces list, query execution)
+  3. Watch Bun-main logs for `[ipc:serverApi.invokeFunction]` lines — proves the call routed through Bun main, not direct webview→Supabase
+  4. Toggle Wi-Fi off; navigate to a page that calls a migrated RPC (the dataset/workspace flows); confirm the call fails with a typed `OfflineError`, not a generic `fetch` error
+  5. Toggle Wi-Fi on; confirm the call succeeds again
+
+  Expected: every Supabase call (CRUD, auth, RPC, Edge Function) is now visible from Bun-main logs — single network egress invariant holds.
+
+  **Greenlight criteria:** all checks above pass before moving to Task 15 (acceptance).
+
+---
+
+## Task 15: Phase 2 acceptance checklist
+
+**PR boundaries:** No code-change boundaries — verification-only. The spec annotation Step (if it ships a doc edit) is a single safe doc-only PR; remaining Steps are manual gates between prior PRs.
 
 - [ ] **Step 1: Confirm migrations applied at startup**
 
@@ -3421,12 +3911,36 @@ pnpm test
 
 Edit `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md`, mark Phase 2 complete with today's date.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 7: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md
-git commit -m "docs(spec): mark phase 2 complete"
-```
+  **Run:**
+  ```bash
+  git status docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md
+  git diff docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md
+  ```
+  Expected: the spec shows a Phase 2 completion marker with today's date and no other unrelated edits.
+
+  **Final reviewer checklist — confirm every prior Task checkpoint passed before declaring Phase 2 done:**
+  - [ ] Task 1 — IPC contracts: unit + type tests green, all Phase 2 contracts declared.
+  - [ ] Task 2 — IPC client: tests green, `__setIpcBridgeForTests` seam works.
+  - [ ] Task 3 — IPC server: tests green, contract types symmetric with client.
+  - [ ] Task 4 — `userDataDir`: macOS branch returns `~/Library/Application Support/Avandar` on a real launch.
+  - [ ] Task 5 — `SYNCABLE_TABLES`: manifest reviewed against live Supabase schema, shape tests pass.
+  - [ ] Task 6 — migration generator: `pnpm check:sqlite-migrations` is clean and one generated migration was manually inspected.
+  - [ ] Task 7 — Sqlite + runner: fresh launch produces `metadata.sqlite` with the expected schema; second launch is a no-op.
+  - [ ] Task 8 — RDB IPC + `createSqliteCRUDClient`: full create → restart → read cycle works on disk.
+  - [ ] Task 9 — snapshot bootstrap: fresh userDataDir hydrates from Supabase; second launch skips.
+  - [ ] Task 10 — native DuckDB: at least one query renders via the native binding with no `duckdb-wasm` activity on desktop.
+  - [ ] Task 11 — Keychain: sign-in persists across restart via Keychain Access entry; sign-out deletes it.
+  - [ ] Task 12 — `FileSystemDatasetBlobStore`: upload lands at the documented path with `source.<ext>`, `data.parquet`, `meta.json`; no `.tmp` debris; survives restart.
+  - [ ] Task 13 — wired into React: full desktop happy path completes on cold userDataDir; web shell unaffected.
+  - [ ] Task 14 — ServerApi IPC handler and desktop client are wired (G2.20 merged); single-network-egress invariant verified by inspecting Bun-main logs during a full desktop smoke.
+
+  **Manual smoke test:** none beyond confirming the spec edit reads correctly. (No new code in this task.)
+
+  Expected: the spec is the only modified file, the Phase 2 marker is accurate, and every prior task checkbox above has been ticked off based on real verification — not just inspection.
+
+  **Greenlight criteria:** every prior checkpoint above is checked AND the spec edit is reviewed and ready for the user to commit themselves. Do NOT commit on the user's behalf.
 
 ---
 

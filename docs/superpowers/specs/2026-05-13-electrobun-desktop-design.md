@@ -54,7 +54,7 @@ The desktop app runs as two processes communicating over Electrobun's IPC channe
 
 Key design moves:
 
-1. **The webview loads the same Vite build as the web app.** Same `src/main.tsx`, same React, same router, same components. Platform differences are injected at runtime through a `PlatformProvider` React context that resolves to the appropriate `DuckDbClient` / `RdbClient` / `DatasetBlobStore` / `AuthProvider` / `SyncEngine` implementation. Detection via `window.__AVA_PLATFORM__` set by Electrobun's preload script.
+1. **The webview loads the same Vite build as the web app.** Same `src/main.tsx`, same React, same router, same components. Platform differences are injected at runtime through a `PlatformProvider` React context that resolves to the appropriate `DuckDbClient` / `RdbClient` / `ServerApiClient` / `DatasetBlobStore` / `AuthProvider` / `SyncEngine` implementation. Detection via `window.__AVA_PLATFORM__` set by Electrobun's preload script.
 
 2. **All privileged work happens in Bun main.** Native DuckDB, file IO, SQLite, keychain access, Supabase realtime/storage. The webview never touches the filesystem directly.
 
@@ -62,13 +62,13 @@ Key design moves:
 
 4. **Supabase access path differs by platform:**
    - Web: webview talks to Supabase directly (today's behavior).
-   - Desktop: data reads/writes route through Bun main (so the SyncEngine sees every mutation); auth still touches Supabase from Bun main; realtime subscriptions (V2) live in Bun main.
+   - Desktop: data reads/writes, Supabase RPC invocations (`supabase.rpc(...)`), and Edge Function calls (`supabase.functions.invoke(...)`) all route through Bun main, so Bun main is the only network egress for Supabase. The SyncEngine sees every mutation; auth still touches Supabase from Bun main; realtime subscriptions (V2) live in Bun main.
 
 5. **Dexie is removed on desktop entirely.** On the web it remains as the parquet cache for `duckdb-wasm`. On desktop, parquet files live directly on disk and are loaded by native DuckDB.
 
 ## Platform Abstraction Layer
 
-Five interfaces live in `packages/shared/platform/types.ts`. Each has a web implementation (existing behavior) and a desktop implementation (IPC client to Bun main).
+Six interfaces live in `packages/shared/platform/types.ts`. Each has a web implementation (existing behavior) and a desktop implementation (IPC client to Bun main).
 
 ```ts
 export interface DuckDbClient {
@@ -92,6 +92,13 @@ export interface RdbClient {
   upsert<T>(model: ModelName, row: T): Promise<T>;
   delete(model: ModelName, id: string): Promise<void>;
   transaction<T>(fn: (tx: RdbTx) => Promise<T>): Promise<T>;
+}
+
+export interface ServerApiClient {
+  // Supabase RPCs — Postgres functions invoked via PostgREST (`supabase.rpc(...)`)
+  rpc<TName extends RpcName>(name: TName, args: RpcArgs<TName>): Promise<RpcResult<TName>>;
+  // Edge Functions — typed by the existing `keyof API` route schema in `src/clients/APIClient.ts`
+  invokeFunction<TRoute extends keyof API>(req: APIRequest<TRoute>): Promise<APIResult<TRoute>>;
 }
 
 export interface AuthProvider {
@@ -130,6 +137,34 @@ Naming convention:
 - `createRdbCRUDClient(spec)` — top-level platform-aware factory used by every client file
 - `createSqliteCRUDClient(spec)` — desktop backend
 - `createSupabaseCRUDClient({ dbClient, ...spec })` — web backend (existing)
+
+## ServerApiClient — RPCs & Edge Functions
+
+`ServerApiClient` exists for two call surfaces the relational `RdbClient` doesn't cover: Supabase RPCs (`supabase.rpc(...)`) and Edge Functions (`supabase.functions.invoke(...)`). Both are server-side procedures with no local equivalent — they cannot be approximated against the local SQLite/DuckDB stores.
+
+**Why a dedicated interface rather than letting consumers call Supabase directly:**
+
+1. **Single network egress on desktop.** Design move #4 (above) requires all Supabase traffic to route through Bun main. If RPCs or Edge Functions bypass this, the SyncEngine's view of pending state is incomplete and observability is fragmented across two processes.
+2. **WKWebView CORS.** WKWebView's CORS is stricter than Chrome. Routing every Supabase call through Bun's `fetch` avoids that class of webview-specific bugs.
+3. **Unified offline error surface.** An unwrapped `supabase.rpc(...)` failing while offline throws a generic `fetch` error somewhere deep in a React component. Through `ServerApiClient`, it throws a typed `OfflineError` that the `SyncStatus` indicator already knows how to display.
+4. **V2 forward-compatibility.** Some write RPCs and Edge Functions are queueable (e.g. "send invitation") — adding that later without an interface boundary is a much harder refactor than wiring it into an existing one.
+
+**Naming convention:**
+- `createServerApiClient()` — top-level platform-aware factory returning a `ServerApiClient`
+- `createBrowserServerApiClient()` — web backend; thin wrapper over today's `src/clients/APIClient.ts` (which already centralizes Edge Function calls behind a typed `keyof API` schema) plus a `supabase.rpc(...)` passthrough
+- `createIpcServerApiClient()` — desktop backend; an IPC client routing both `rpc(...)` and `invokeFunction(...)` calls to Bun main, where the actual Supabase fetch happens
+
+**V1 behavior:**
+- Both web and desktop: pass-through to Supabase when online.
+- Desktop offline: throw `OfflineError`. The call is **not** queued in V1. Read-only RPCs (the common case in our codebase today: 2 call sites in `DatasetClient.ts` and `WorkspaceClient.ts`) fail loudly, exactly as a manual page reload would.
+- Web offline: same as today (generic `fetch` error). Unchanged.
+
+**V2 (not built):**
+- Per-call queueing for specific write RPCs and Edge Functions via a marker on the `ServerApiClient` call site (e.g. `serverApi.invokeFunction({ ...req, queueWhenOffline: true })`). Queue lives in `sync_outbox` alongside relational mutations; replayed after reconnect.
+
+**Migration scope (Phase 1 Task 5 extends to cover this):**
+- 2 `supabase.rpc(...)` call sites: `src/clients/datasets/DatasetClient.ts`, `src/clients/WorkspaceClient.ts` → call `serverApi.rpc(...)` instead.
+- `src/clients/APIClient.ts` → reimplement its `sendHTTPRequest` to delegate to `serverApi.invokeFunction(...)`. The public `APIClient.get/post/patch/put/delete` surface is unchanged; every consumer keeps working.
 
 ## RdbClient & Local Relational Store
 
@@ -355,7 +390,7 @@ apps/desktop/
       └── check-migrations.ts       # CI drift check
 
 packages/shared/platform/           # NEW directory
-  ├── types.ts                      # all five interface definitions
+  ├── types.ts                      # all six interface definitions
   ├── isDesktop.ts
   └── ipc/
       ├── contracts.ts
@@ -407,12 +442,13 @@ Captured here so V1 design decisions stay forward-compatible.
 | Platforms | macOS + Windows | macOS + Windows (Linux still out of scope unless explicitly added) |
 | Shell | Electrobun | Keep abstractions clean enough to swap to Tauri or Electron if Electrobun stalls |
 | Distribution | Signed direct download | + App Store / Microsoft Store if their distribution surface is needed |
+| RPC / Edge Function offline behavior | `OfflineError` (no queueing) | Opt-in per-call queueing via `serverApi.invokeFunction({ ..., queueWhenOffline: true })`; queue lives in `sync_outbox` alongside relational mutations; replayed on reconnect |
 
 ## Phased Rollout
 
 **Phase 0 — Foundations (1–2 weeks).** `apps/desktop/` scaffolded; Electrobun hosts the existing web build as a shell; login works; smoke test of read-only browsing.
 
-**Phase 1 — Platform abstractions, no behavior change (1–2 weeks).** Define interfaces in `packages/shared/platform/`; implement web-side adapters wrapping today's code; migrate ~20 client files to `createRdbCRUDClient`. Both shells still behave identically to today.
+**Phase 1 — Platform abstractions, no behavior change (1–2 weeks).** Define the six interfaces in `packages/shared/platform/`; implement web-side adapters wrapping today's code; migrate ~20 client files to `createRdbCRUDClient`; migrate the 2 `supabase.rpc(...)` call sites and `src/clients/APIClient.ts` to `createServerApiClient`. Both shells still behave identically to today.
 
 **Phase 2 — Desktop native layer wired up (2–3 weeks).** IPC contracts; `bun:sqlite` + first migrations via `sqlglot`; `RdbClient` IPC live; native DuckDB in Bun main; `DatasetBlobStore` filesystem implementation; keychain via Bun FFI. Desktop runs offline against a snapshot, uploads persist to disk, no sync yet.
 
@@ -452,10 +488,11 @@ Ordered by *likelihood × impact*.
 - Electrobun shell (alpha — flagged as Risk #1).
 - Web + desktop share a single Vite build of `src/`.
 - Web app lives in `src/`, desktop in new `apps/desktop/`. Web is unchanged structurally.
-- Five platform abstractions in `packages/shared/platform/`.
+- Six platform abstractions in `packages/shared/platform/`: `DuckDbClient`, `RdbClient`, `ServerApiClient`, `DatasetBlobStore`, `AuthProvider`, `SyncEngine`.
 - `bun:sqlite` + native DuckDB + filesystem + OS keychain (Bun FFI) on desktop.
 - SQLite schema is a near-mirror of Postgres for tables in `SYNCABLE_TABLES`; generated via `sqlglot`; committed to repo.
 - Naming: `createRdbCRUDClient` (top-level), `createSqliteCRUDClient` (desktop), `createSupabaseCRUDClient` (web).
+- Naming: `createServerApiClient` (top-level), `createIpcServerApiClient` (desktop), `createBrowserServerApiClient` (web). RPCs and Edge Functions both route through this on desktop; V1 throws `OfflineError` when offline (no queueing).
 - Naming: `DatasetBlobStore`, `DatasetBlobKey`, `parquet_blob`, `source_file_blob` — no generic "blob" in user-facing identifiers.
 - Custom sync engine; no third-party sync service.
 - V1 sync: outbox + LWW for relational; parquet upload-on-reconnect (opt-in via `online_storage_allowed`).

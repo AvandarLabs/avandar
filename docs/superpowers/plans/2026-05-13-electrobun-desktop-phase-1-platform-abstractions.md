@@ -3,6 +3,7 @@
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Spec:** `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md`
+**Testing strategy:** `docs/superpowers/specs/2026-05-14-testing-strategy.md` — defines per-PR test groupings (G1.x) referenced in each Task below.
 
 **Goal:** Introduce the five platform abstraction interfaces (`DuckDbClient`, `RdbClient`, `DatasetBlobStore`, `AuthProvider`, `SyncEngine`) and the `createRdbCRUDClient` umbrella factory; migrate every existing Supabase CRUD client to the new factory **without changing any observable behavior on web or desktop**.
 
@@ -14,8 +15,9 @@
 1. `@avandar/platform` package exists with all five interfaces, fully typed.
 2. `createRdbCRUDClient` exists and routes to `createSupabaseCRUDClient` on both web and desktop in Phase 1.
 3. Every `createSupabaseCRUDClient(...)` call site in the codebase has been migrated to `createRdbCRUDClient(...)`.
-4. `pnpm test` is green.
-5. `pnpm dev` and `pnpm dev:desktop` both work and behave **identically** to before this phase.
+4. Every `supabase.rpc(...)` call site (2 known: `DatasetClient.ts`, `WorkspaceClient.ts`) has been migrated to `serverApi.rpc(...)`, and `src/clients/APIClient.ts` internally delegates to `serverApi.invokeFunction(...)` (its public surface unchanged).
+5. `pnpm test` is green.
+6. `pnpm dev` and `pnpm dev:desktop` both work and behave **identically** to before this phase.
 
 **Honest framing:** This is a mechanical refactor with strong test coverage. The interface definitions are the only "new" code; the client-file migration is find/replace with type-checking.
 
@@ -35,22 +37,33 @@
 - `packages/shared/platform/src/types/DatasetBlobStore.types.ts`
 - `packages/shared/platform/src/types/AuthProvider.types.ts`
 - `packages/shared/platform/src/types/SyncEngine.types.ts`
+- `packages/shared/platform/src/types/ServerApiClient.types.ts`
 - `packages/shared/platform/src/types/Platform.types.ts` — `Platform` enum / discriminated union
 
 **New factory (lives next to existing clients):**
 - `packages/shared/clients/src/RdbCRUDClient/createRdbCRUDClient.ts`
 - `packages/shared/clients/src/RdbCRUDClient/createRdbCRUDClient.test.ts`
 - `packages/shared/clients/src/RdbCRUDClient/RdbCRUDClient.types.ts`
+- `packages/shared/clients/src/ServerApiClient/createServerApiClient.ts`
+- `packages/shared/clients/src/ServerApiClient/createServerApiClient.test.ts`
+- `packages/shared/clients/src/ServerApiClient/createBrowserServerApiClient.ts`
+- `packages/shared/clients/src/ServerApiClient/createIpcServerApiClient.ts`  # Phase 1 = throwing stub; Phase 2 wires real IPC
+- `packages/shared/clients/src/ServerApiClient/ServerApiClient.types.ts`
 
 **Modified files:**
 - `packages/shared/clients/src/index.ts` — export `createRdbCRUDClient` and types
 - `packages/shared/clients/package.json` — add `@avandar/platform` workspace dep
 - `pnpm-workspace.yaml` — no change (already covers `packages/shared/*`)
 - Every `src/clients/**/*Client.ts` file using `createSupabaseCRUDClient` — swap to `createRdbCRUDClient`
+- `src/clients/datasets/DatasetClient.ts` — swap `supabase.rpc(...)` call to `serverApi.rpc(...)`
+- `src/clients/WorkspaceClient.ts` — swap `supabase.rpc(...)` call to `serverApi.rpc(...)`
+- `src/clients/APIClient.ts` — rewire internal `sendHTTPRequest` to delegate to `serverApi.invokeFunction(...)`; public surface unchanged
 
 ---
 
 ## Task 1: Scaffold `@avandar/platform` workspace package
+
+**PR boundaries:** 1 PR. New empty package; nothing imports it yet; web app behavior is unchanged. All scaffold files (package.json, tsconfig.json, vitest.config.ts, empty index.ts) are interdependent fragments of a single workspace registration and must ship together to type-check.
 
 **Files:**
 - Create: `packages/shared/platform/package.json`
@@ -154,16 +167,38 @@ pnpm --filter @avandar/platform type-check
 
 Expected: pnpm picks up the new workspace package; `type-check` passes on empty source.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add packages/shared/platform/ pnpm-lock.yaml
-git commit -m "chore(platform): scaffold @avandar/platform workspace package"
-```
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/platform type-check
+  ```
+  Expected: type-check passes on the empty source; `pnpm install` from Step 5 resolved the new workspace package without errors.
+
+  **Verify:**
+  - `packages/shared/platform/package.json` exists with name `@avandar/platform`, version `0.1.0`, `"type": "module"`, and `"exports": { ".": "./src/index.ts" }`
+  - `packages/shared/platform/tsconfig.json` is strict, with the `@platform/*` path alias
+  - `packages/shared/platform/vitest.config.ts` aliases `@platform` to `./src` and uses the `jsdom` environment
+  - `packages/shared/platform/src/index.ts` exists (currently just `export {};`)
+  - `pnpm-lock.yaml` was updated to register the new workspace package
+  - No changes outside `packages/shared/platform/` and the lockfile
+
+  **Manual smoke test (if applicable):**
+  1. `pnpm dev`
+  2. Open browser to localhost:5173, sign in
+  3. Confirm the app loads exactly as before — this task adds no runtime code, so behavior must be unchanged.
+
+  Expected: web app behavior identical to pre-phase-1.
+
+  **Greenlight criteria:** all checks above pass before moving to Task 2. If anything fails, stop and report.
 
 ---
 
 ## Task 2: `Platform` type and `isDesktop()` helper
+
+**Test groupings:** G1.1 (isDesktop branching + Platform type lock via expectTypeOf<Platform>().toEqualTypeOf<"web" | "desktop">() — locks against future widening).
+
+**PR boundaries:** 1 PR. TDD red-green coupling: the failing `isDesktop.test.ts` Step and the `isDesktop.ts` implementation Step must ship together so `pnpm test` stays green. The `Platform.types.ts` type-only file is a tightly-coupled prerequisite consumed by both and belongs in the same PR.
 
 **Files:**
 - Create: `packages/shared/platform/src/types/Platform.types.ts`
@@ -263,16 +298,41 @@ pnpm --filter @avandar/platform type-check
 
 Expected: passes.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 8: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add packages/shared/platform/
-git commit -m "feat(platform): add Platform type and isDesktop() helper"
-```
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/platform test
+  pnpm --filter @avandar/platform type-check
+  ```
+  Expected: all 3 `isDesktop` tests pass; type-check clean.
+
+  **Verify:**
+  - `packages/shared/platform/src/types/Platform.types.ts` exports `type Platform = "web" | "desktop";`
+  - `packages/shared/platform/src/isDesktop.ts` exports a synchronous `isDesktop(): boolean` that:
+    - returns `false` when `window` is undefined
+    - returns `true` only when `window.__AVA_PLATFORM__ === "desktop"`
+  - `packages/shared/platform/src/index.ts` re-exports `isDesktop` and `type Platform`
+  - No `any` types in the helper or its test; the cast through `Record<string, unknown>` is the only escape hatch
+  - No changes outside `packages/shared/platform/`
+  - Test groupings G1.1 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test (if applicable):**
+  1. `pnpm dev`
+  2. Open browser to localhost:5173, sign in
+  3. Confirm app loads normally — `isDesktop()` is not yet imported by any caller, so this must be a no-op for the web app.
+
+  Expected: web app behavior identical to pre-phase-1.
+
+  **Greenlight criteria:** all checks above pass before moving to Task 3. If anything fails, stop and report.
 
 ---
 
-## Task 3: Define the five abstraction interfaces
+## Task 3: Define the six abstraction interfaces
+
+**Test groupings:** G1.2 (Six interface signature locks via expectTypeOf().parameters — tighter than toHaveProperty; one type-test per interface, including ServerApiClient's rpc and invokeFunction signatures so Phase 2 handler implementations break loudly on drift).
+
+**PR boundaries:** 1 PR practically (small surface area, all six interfaces are pure type-only files with no runtime impact and nothing yet imports them); but each interface file CAN ship as its own PR — split into up to 6 PRs if reviewers want finer granularity, since each new `*.types.ts` file is independently safe (compiles, no consumer in user-facing code). The `interfaces.test-d.ts` type-test file should ship with whichever PR(s) introduce the interfaces it asserts against to keep type-check green.
 
 Each interface is a pure type. No runtime code yet. Tests for interfaces are *type-level* — we use `expectTypeOf` from vitest to assert the shape matches expectations and to lock down breaking changes.
 
@@ -282,6 +342,7 @@ Each interface is a pure type. No runtime code yet. Tests for interfaces are *ty
 - Create: `packages/shared/platform/src/types/DatasetBlobStore.types.ts`
 - Create: `packages/shared/platform/src/types/AuthProvider.types.ts`
 - Create: `packages/shared/platform/src/types/SyncEngine.types.ts`
+- Create: `packages/shared/platform/src/types/ServerApiClient.types.ts`
 - Test: `packages/shared/platform/src/types/interfaces.test-d.ts`
 
 - [ ] **Step 1: Define `DuckDbClient`**
@@ -512,6 +573,32 @@ export type SyncStatus =
 export type Unsubscribe = () => void;
 ```
 
+- [ ] **Step 5b: Define `ServerApiClient`**
+
+Create `packages/shared/platform/src/types/ServerApiClient.types.ts`:
+
+```ts
+/**
+ * Platform-agnostic server API client.
+ *
+ * Covers two server-side surfaces today bridged by `@supabase/supabase-js`:
+ *   - Postgres functions invoked via PostgREST (`supabase.rpc(...)`)
+ *   - Edge Functions (`supabase.functions.invoke(...)`)
+ *
+ * On web this is a thin wrapper over the existing `APIClient.ts` (for Edge
+ * Functions) and a `supabase.rpc(...)` passthrough. On desktop (Phase 2+)
+ * this is an IPC client; in Phase 1 the desktop factory throws.
+ */
+export interface ServerApiClient {
+  // Supabase RPCs — Postgres functions invoked via PostgREST
+  rpc<TName extends RpcName>(name: TName, args: RpcArgs<TName>): Promise<RpcResult<TName>>;
+  // Edge Functions — typed by the existing `keyof API` route schema in src/clients/APIClient.ts
+  invokeFunction<TRoute extends keyof API>(req: APIRequest<TRoute>): Promise<APIResult<TRoute>>;
+}
+```
+
+`RpcName`, `RpcArgs<T>`, `RpcResult<T>`, and the Edge Function counterparts `APIRequest<T>` / `APIResult<T>` should be **derived from the existing typed Supabase schema and the `API` route schema already declared in `src/clients/APIClient.ts`** — do not redefine these here. The intent is that the interface signature locks into the same types consumers already see today; Phase 2 backends must satisfy that exact shape.
+
 - [ ] **Step 6: Write the interface-shape test**
 
 Create `packages/shared/platform/src/types/interfaces.test-d.ts`:
@@ -639,16 +726,44 @@ pnpm --filter @avandar/platform type-check
 
 Expected: green.
 
-- [ ] **Step 9: Commit**
+- [ ] **Step 9: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add packages/shared/platform/
-git commit -m "feat(platform): define DuckDbClient/RdbClient/DatasetBlobStore/AuthProvider/SyncEngine interfaces"
-```
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/platform test
+  pnpm --filter @avandar/platform type-check
+  ```
+  Expected: all `expectTypeOf` assertions in `interfaces.test-d.ts` pass; type-check clean.
+
+  **Verify:**
+  - All five interface files exist under `packages/shared/platform/src/types/` with the shapes documented in this task:
+    - `DuckDbClient.types.ts` — exposes `runStructuredQuery`, `runRawQuery`, `loadParquetFromDatasetBlobStore`, `loadFromUpload`; includes `StructuredQuery` placeholder, `UploadSource`, `DatasetImportOptions`, `DatasetImportResult`
+    - `RdbClient.types.ts` — exposes `query`/`upsert`/`delete`/`transaction` plus `RdbTx`, branded `ModelName`, `RdbFilter`, and the `asModelName` helper
+    - `DatasetBlobStore.types.ts` — exposes `put`/`get`/`delete`/`exists`/`list`/`stat`; branded `DatasetBlobKey`, `DatasetBlobStat`, `asDatasetBlobKey`, `DatasetBlobKeys` helper object
+    - `AuthProvider.types.ts` — exposes `getSession`/`signIn`/`signOut`/`refreshIfNeeded`/`onAuthChange`; `AuthCredentials` discriminated union, `Session` with `mode: "online" | "offline-cached"`, `Unsubscribe`
+    - `SyncEngine.types.ts` — exposes `enqueue`/`status`/`forceSync`/`onStatusChange`; `SyncMutation`, `SyncStatus` discriminated union with `offline | online | error` kinds
+  - `packages/shared/platform/src/index.ts` re-exports every type and helper above (no missing exports)
+  - No runtime code yet (other than the `asModelName`, `asDatasetBlobKey`, `DatasetBlobKeys` brand helpers) — these are pure type definitions
+  - No `any` types snuck in; readonly modifiers preserved per spec
+  - No changes outside `packages/shared/platform/`
+  - Test groupings G1.2 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test (if applicable):**
+  1. `pnpm dev`
+  2. Open browser to localhost:5173, sign in
+  3. Confirm the app still loads — none of these types are yet imported by `src/`, so this must be a no-op.
+
+  Expected: web app behavior identical to pre-phase-1.
+
+  **Greenlight criteria:** all checks above pass before moving to Task 4. If anything fails, stop and report.
 
 ---
 
 ## Task 4: `createRdbCRUDClient` umbrella factory
+
+**Test groupings:** G1.3 (createRdbCRUDClient factory selection — web returns Supabase-backed; desktop throws in Phase 1 and returns Sqlite-backed in Phase 2 follow-up; spy on createSupabaseCRUDClient and assert dbClient injection).
+
+**PR boundaries:** 1 PR. The factory exists but no call site uses it yet (migration is Task 5), so creating it does not change web app behavior. The TDD test + implementation + index export + package.json dependency edit are tightly coupled — test and impl must ship together to keep `pnpm test` green, and the new export with no consumer is safe.
 
 The factory accepts a spec, inspects `isDesktop()`, and currently *always* returns the Supabase-backed client (because the SQLite-backed client doesn't exist yet — that's Phase 2). The point of doing this in Phase 1 is so that every client file already calls the umbrella; switching the desktop implementation later is one-line in this factory.
 
@@ -820,16 +935,207 @@ pnpm --filter @avandar/clients type-check
 
 Expected: passes.
 
-- [ ] **Step 9: Commit**
+- [ ] **Step 9: Manual review checkpoint (do NOT commit)**
+
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/clients test
+  pnpm --filter @avandar/clients type-check
+  pnpm type-check
+  ```
+  Expected: both `createRdbCRUDClient` tests pass (web delegates to Supabase; desktop throws the Phase-1 sentinel); whole-repo type-check clean.
+
+  **Verify:**
+  - `packages/shared/clients/src/RdbCRUDClient/RdbCRUDClient.types.ts` exports `RdbCRUDModelSpec<M>` as `Omit<SupabaseCRUDModelSpec<M>, "dbClient">`
+  - `packages/shared/clients/src/RdbCRUDClient/createRdbCRUDClient.ts` exports `createRdbCRUDClient<M>(spec)` which:
+    - throws a clear "desktop backend not implemented" error when `isDesktop()` returns true
+    - otherwise delegates to `createSupabaseCRUDClient` with `dbClient` injected via the `getWebDbClient` shim
+  - The dynamic `require()` shim in `getWebDbClient` is commented as a Phase-1-only transitional ugliness
+  - `packages/shared/clients/src/index.ts` re-exports `createRdbCRUDClient` and `type RdbCRUDModelSpec`
+  - `packages/shared/clients/package.json` declares `"@avandar/platform": "workspace:*"` under `dependencies`
+  - No `any` introduced (the `as never` casts in the test fixtures are limited to test-only spec shells)
+  - No call sites in `src/clients/**` have been touched yet — that's Task 5
+  - Test groupings G1.3 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test (if applicable):**
+  1. `pnpm dev`
+  2. Open browser to localhost:5173, sign in
+  3. Open the datasets or workspaces list — every existing client still calls `createSupabaseCRUDClient` directly, so the app must be unchanged.
+
+  Expected: web app behavior identical to pre-phase-1.
+
+  **Greenlight criteria:** all checks above pass before moving to Task 4b. If anything fails, stop and report.
+
+---
+
+## Task 4b: `createServerApiClient` factory
+
+**Test groupings:** G1.6 (createServerApiClient factory selection — web returns browser-backed; desktop throws Error("desktop ServerApiClient lands in Phase 2") in Phase 1).
+
+**PR boundaries:** 1 PR. Same shape as Task 4: factory + browser-backed impl + throwing desktop stub + test ship together as a self-contained mergeable unit. Nothing in `src/` consumes the new factory yet (Task 5 does that), so the web app stays behaviorally identical.
+
+The factory accepts no spec; it inspects `isDesktop()` and returns either a browser-backed implementation (thin wrapper over today's `APIClient.ts` for Edge Functions and a `supabase.rpc(...)` passthrough for RPCs) or — on desktop — a stub that throws. Phase 2 wires the desktop branch through real IPC.
+
+**Files:**
+- Create: `packages/shared/clients/src/ServerApiClient/ServerApiClient.types.ts`
+- Create: `packages/shared/clients/src/ServerApiClient/createServerApiClient.ts`
+- Create: `packages/shared/clients/src/ServerApiClient/createBrowserServerApiClient.ts`
+- Create: `packages/shared/clients/src/ServerApiClient/createIpcServerApiClient.ts` (Phase 1 = throwing stub)
+- Test: `packages/shared/clients/src/ServerApiClient/createServerApiClient.test.ts`
+
+- [ ] **Step 1: Write the failing test**
+
+Create `packages/shared/clients/src/ServerApiClient/createServerApiClient.test.ts`:
+
+```ts
+import { isDesktop } from "@avandar/platform";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("@avandar/platform", async () => {
+  const actual =
+    await vi.importActual<typeof import("@avandar/platform")>("@avandar/platform");
+  return { ...actual, isDesktop: vi.fn(() => false) };
+});
+
+import { createServerApiClient } from "./createServerApiClient.ts";
+
+describe("createServerApiClient", () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("returns the browser-backed ServerApiClient on web", () => {
+    (isDesktop as ReturnType<typeof vi.fn>).mockReturnValue(false);
+    const client = createServerApiClient();
+    expect(client).toBeDefined();
+    expect(typeof client.rpc).toBe("function");
+    expect(typeof client.invokeFunction).toBe("function");
+  });
+
+  it("throws a clear Phase-2 sentinel error on desktop", () => {
+    (isDesktop as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    expect(() => createServerApiClient()).toThrow(
+      /desktop ServerApiClient lands in Phase 2/i,
+    );
+  });
+});
+```
+
+- [ ] **Step 2: Create the local types re-export**
+
+Create `packages/shared/clients/src/ServerApiClient/ServerApiClient.types.ts` — re-exports the interface and supporting types from `@avandar/platform`:
+
+```ts
+export type { ServerApiClient } from "@avandar/platform";
+```
+
+- [ ] **Step 3: Implement the umbrella factory**
+
+Create `packages/shared/clients/src/ServerApiClient/createServerApiClient.ts`:
+
+```ts
+import { isDesktop } from "@avandar/platform";
+import type { ServerApiClient } from "@avandar/platform";
+import { createBrowserServerApiClient } from "./createBrowserServerApiClient.ts";
+import { createIpcServerApiClient } from "./createIpcServerApiClient.ts";
+
+/**
+ * Platform-aware ServerApiClient factory.
+ *   - web:     browser-backed (thin wrapper over APIClient.ts + supabase.rpc)
+ *   - desktop: IPC-backed (Phase 2; Phase 1 = throwing stub)
+ */
+export function createServerApiClient(): ServerApiClient {
+  if (isDesktop()) return createIpcServerApiClient();
+  return createBrowserServerApiClient();
+}
+```
+
+- [ ] **Step 4: Implement the browser-backed adapter**
+
+Create `packages/shared/clients/src/ServerApiClient/createBrowserServerApiClient.ts` — a thin wrapper over today's `APIClient.ts` (for `invokeFunction`) and a passthrough to `supabase.rpc(...)` (for `rpc`). The exact wiring imports the existing `AvaSupabase.DB` for the rpc passthrough and the existing `APIClient` route-schema typing for `invokeFunction`. The intent is **zero behavior change on web** — every call goes through the same code paths it does today.
+
+- [ ] **Step 5: Implement the desktop IPC stub**
+
+Create `packages/shared/clients/src/ServerApiClient/createIpcServerApiClient.ts`:
+
+```ts
+import type { ServerApiClient } from "@avandar/platform";
+
+/**
+ * Phase 1 stub. Phase 2 replaces this with the real IPC-backed implementation.
+ * V1 offline behavior: desktop throws OfflineError when offline (no queueing).
+ */
+export function createIpcServerApiClient(): ServerApiClient {
+  throw new Error("desktop ServerApiClient lands in Phase 2");
+}
+```
+
+- [ ] **Step 6: Run tests and confirm they pass**
 
 ```bash
-git add packages/shared/clients/
-git commit -m "feat(clients): add createRdbCRUDClient umbrella factory"
+pnpm --filter @avandar/clients test
 ```
+
+Expected: both `createServerApiClient` tests pass.
+
+- [ ] **Step 7: Export from the package index**
+
+Edit `packages/shared/clients/src/index.ts` — add:
+
+```ts
+// Server-side API client (RPCs + Edge Functions)
+export { createServerApiClient } from "@clients/ServerApiClient/createServerApiClient.ts";
+export type { ServerApiClient } from "@clients/ServerApiClient/ServerApiClient.types.ts";
+```
+
+- [ ] **Step 8: Type-check**
+
+```bash
+pnpm --filter @avandar/clients type-check
+```
+
+Expected: passes.
+
+- [ ] **Step 9: Manual review checkpoint (do NOT commit)**
+
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/clients test
+  pnpm --filter @avandar/clients type-check
+  pnpm type-check
+  ```
+  Expected: both `createServerApiClient` tests pass (web returns browser-backed; desktop throws `"desktop ServerApiClient lands in Phase 2"`); whole-repo type-check clean.
+
+  **Verify:**
+  - `packages/shared/clients/src/ServerApiClient/ServerApiClient.types.ts` re-exports the `ServerApiClient` interface from `@avandar/platform`
+  - `packages/shared/clients/src/ServerApiClient/createServerApiClient.ts` switches on `isDesktop()` and dispatches to the browser-backed or IPC stub
+  - `createBrowserServerApiClient.ts` is a thin wrapper over today's `APIClient.ts` (`invokeFunction`) and a passthrough to `supabase.rpc(...)` (`rpc`)
+  - `createIpcServerApiClient.ts` throws `Error("desktop ServerApiClient lands in Phase 2")` verbatim
+  - `packages/shared/clients/src/index.ts` re-exports `createServerApiClient` and `type ServerApiClient`
+  - No `any` introduced; signatures match the `ServerApiClient` interface from `@avandar/platform`
+  - No call sites in `src/clients/**` have been touched yet — that's Task 5
+  - Test groupings G1.6 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test (if applicable):**
+  1. `pnpm dev`
+  2. Open browser to localhost:5173, sign in
+  3. No call sites use `createServerApiClient` yet — Task 5 wires them. App must behave identically to pre-Task-4b.
+
+  Expected: web app behavior identical to pre-phase-1.
+
+  **Greenlight criteria:** all checks above pass before moving to Task 5. If anything fails, stop and report.
 
 ---
 
 ## Task 5: Migrate every Supabase CRUD client call site
+
+**Test groupings:** G1.4 (CRUD-migration regression suite — single parameterized Playwright spec over every migrated entity doing list → create → read → update → delete; the highest-leverage safety net in this phase); G1.7 (ServerApi migration regression — Playwright suite hits every page that depends on the 2 migrated RPC sites and on APIClient consumers, plus a snapshot test that no source file references AvaSupabase.DB.rpc/functions.invoke).
+
+**PR boundaries:** ~7 PRs total — each batch ships independently because every migrated call site swaps to `createRdbCRUDClient(spec)`, which on web still returns the Supabase-backed client (zero behavior change per file).
+- PR 1: Single template migration (1 file) — proves the mechanical pattern, validates Playwright regression for that one entity before fan-out.
+- PR 2..N: Each batch of ~5 migrated CRUD-client files is its own PR (≈ 5 batch PRs total for the ~20-file enumeration). Each batch leaves the web app behaviorally unchanged and `pnpm test` / lint / type-check green.
+- PR N+1: ServerApi migration (2 RPC call sites + APIClient internal rewire) is its own PR — different factory, different regression surface, keep it isolated from CRUD batches.
+- The "verify zero stragglers" Step (`git grep "createSupabaseCRUDClient"` returns empty) is part of the final batch PR, since it can only pass once every preceding batch has merged.
 
 This is a mechanical refactor across the codebase. Each client file that calls `createSupabaseCRUDClient(...)` with `{ dbClient: AvaSupabase.DB, ...spec }` becomes a call to `createRdbCRUDClient(spec)` (no `dbClient` field).
 
@@ -890,26 +1196,49 @@ pnpm test:frontend
 
 Expected: green.
 
-- [ ] **Step 4: Commit the template migration on its own**
+- [ ] **Step 4: Manual review checkpoint (do NOT commit) — template migration**
 
-```bash
-git add <the one migrated file>
-git commit -m "refactor(clients): migrate FooClient to createRdbCRUDClient"
-```
+  **Run:**
+  ```bash
+  pnpm type-check
+  pnpm test:clients
+  pnpm test:frontend
+  ```
+  Expected: green across the board for the single migrated file.
 
-This single-file commit documents the canonical change pattern for reviewers.
+  **Verify:**
+  - Exactly one client file under `src/clients/**` has been migrated (the simplest one, e.g. `FooClient.ts`)
+  - The migrated file:
+    - imports `createRdbCRUDClient` from `@avandar/clients` (not `createSupabaseCRUDClient`)
+    - no longer imports `AvaSupabase` if it's unused elsewhere in the file
+    - omits the `dbClient` field from the spec passed to `createRdbCRUDClient`
+    - preserves `modelName`, `tableName`, `dbTablePrimaryKey`, `parsers`, and any custom queries/mutations exactly as before
+  - No `any` types introduced
+  - No other files modified in this step
+  - Test groupings G1.4 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test (if applicable):**
+  1. `pnpm dev`
+  2. Open browser to localhost:5173, sign in
+  3. Navigate to the page that exercises the migrated client (the entity's list view; create/read on at least one row)
+  4. Confirm rows load and the page operates exactly as before — no console errors, no network/auth failures
+
+  Expected: behavior on that page is indistinguishable from pre-migration.
+
+  This single-file checkpoint documents the canonical change pattern for the reviewer. The user will commit it manually before proceeding.
+
+  **Greenlight criteria:** all checks above pass before moving to Step 5 (batch migration). If anything fails, stop and report.
 
 - [ ] **Step 5: Migrate the remaining clients in batches of ~5**
 
-For the remaining files from Step 1, apply the same mechanical edit in batches:
+For the remaining files from Step 1, apply the same mechanical edit in batches. Do NOT commit — pause after each batch for manual review and let the user commit themselves.
 
 ```bash
 git grep -l "createSupabaseCRUDClient" src/clients/
-# pick 5 files, edit them
+# pick ~5 files, edit them
 pnpm type-check
 pnpm test
-git add <those 5 files>
-git commit -m "refactor(clients): migrate <names> to createRdbCRUDClient"
+# STOP here. Surface the diff to the user for review and let them commit.
 ```
 
 Repeat until `git grep -l "createSupabaseCRUDClient" src/clients/` returns no matches.
@@ -927,6 +1256,21 @@ git grep "AvaSupabase.DB" -- 'src/clients/**'
 ```
 
 Expected: zero matches. Stragglers indicate an incomplete migration.
+
+- [ ] **Step 6b: Migrate `supabase.rpc(...)` call sites and rewire `APIClient.ts`**
+
+Three files to update — each is a small mechanical change:
+
+1. `src/clients/datasets/DatasetClient.ts` — replace `AvaSupabase.DB.rpc(...)` with the equivalent `serverApi.rpc(...)` call.
+2. `src/clients/WorkspaceClient.ts` — same swap.
+3. `src/clients/APIClient.ts` — inside `sendHTTPRequest`, replace the `AvaSupabase.DB.functions.invoke<...>(relativeAPIURL, { method, body })` call with `serverApi.invokeFunction<...>({ route, method, pathParams, queryParams, body })`. The public `APIClient.get/post/patch/put/delete` surface stays exactly the same.
+
+Verification:
+```bash
+git grep "AvaSupabase\.DB\.rpc\(" -- 'src/**'
+git grep "AvaSupabase\.DB\.functions\.invoke\(" -- 'src/**'
+```
+Expected: both return zero matches. Any remaining are stragglers.
 
 - [ ] **Step 7: Run the full test suite**
 
@@ -982,16 +1326,58 @@ pnpm dev:desktop
 
 Expected: tests green, desktop login + data browsing works.
 
-- [ ] **Step 11: Commit**
+- [ ] **Step 11: Manual review checkpoint (do NOT commit) — end of Task 5**
 
-```bash
-git add packages/shared/clients/src/RdbCRUDClient/
-git commit -m "refactor(clients): fall through to Supabase on desktop in Phase 1"
-```
+  **Run:**
+  ```bash
+  pnpm type-check
+  pnpm test
+  pnpm test:clients
+  pnpm test:models
+  pnpm test:frontend
+  pnpm test:e2e
+  ```
+  Expected: every suite green. If `pnpm test:e2e` requires a running dev server, run it according to the repo's e2e convention.
+
+  **Verify:**
+  - `git grep "createSupabaseCRUDClient" -- 'src/'` returns zero matches (call sites fully migrated)
+  - `git grep "AvaSupabase.DB" -- 'src/clients/**'` returns zero matches (no leftover direct Supabase DB references in client files)
+  - `git grep "AvaSupabase\.DB\.rpc\(" -- 'src/**'` returns zero matches (Step 6b: `DatasetClient.ts` and `WorkspaceClient.ts` migrated to `serverApi.rpc(...)`)
+  - `git grep "AvaSupabase\.DB\.functions\.invoke\(" -- 'src/**'` returns zero matches (Step 6b: `APIClient.ts` `sendHTTPRequest` rewired to `serverApi.invokeFunction(...)`; public `APIClient.get/post/patch/put/delete` surface unchanged)
+  - The Option A edit to `packages/shared/clients/src/RdbCRUDClient/createRdbCRUDClient.ts` is in place: desktop falls through to the Supabase factory, with a TODO comment referencing Phase 2's SQLite cutover
+  - The corresponding test in `createRdbCRUDClient.test.ts` was updated so the "desktop" case now asserts delegation (not a thrown error), with a comment about the Phase 2 cutover
+  - The umbrella factory's web behavior is unchanged from Task 4 — only the desktop branch was relaxed
+  - No `any` types introduced across the migration
+  - All ~20 migrated client files import `createRdbCRUDClient` from `@avandar/clients`, omit `dbClient` from the spec, and drop their `AvaSupabase` import if it became unused
+  - Test groupings G1.4 and G1.7 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test — web (REQUIRED):**
+  1. `pnpm dev`
+  2. Open browser to localhost:5173, sign in with pablo@avandarlabs.com
+  3. Exercise CRUD across the entities the migrated clients touch:
+     - Workspaces: list, create a new workspace, open it, rename it, delete it
+     - Datasets: list, upload a CSV (creates a dataset + parquet), open the dataset, delete it
+     - Dashboards / Queries / Models / any other migrated entity: open the list view, create one new row, edit it, delete it
+  4. Watch the browser devtools console and network panel — no unexpected errors, no failed Supabase requests, no auth regressions
+  5. Sign out and sign back in to confirm the auth flow is untouched
+
+  **Manual smoke test — desktop (REQUIRED, validates Option A change):**
+  1. `pnpm dev:desktop`
+  2. Sign in inside the Electrobun window
+  3. Open the same list views as on web (workspaces, datasets, etc.) and confirm rows render — Phase 1 desktop must transparently fall through to Supabase
+  4. No "desktop backend not implemented" error in the desktop console
+
+  Expected: web app behavior identical to pre-phase-1; desktop shell renders the same data as web with no thrown errors from the umbrella factory.
+
+  **Greenlight criteria:** every test suite green AND both smoke tests clean before moving to Task 6. If anything fails, stop and report — bisect by reverting batches if necessary.
 
 ---
 
 ## Task 6: Phase 1 acceptance checklist
+
+**Test groupings:** G1.5 (Production build smoke — pnpm build + pnpm build:desktop both succeed; built desktop bundle contains no duckdb-wasm reference; catches require() shim breakage under prod bundler that dev-mode hides).
+
+**PR boundaries:** No code-change boundaries — pure verification + spec annotation. The verification Steps (`git grep` straggler check, `pnpm test`/`build`/`build:desktop` sweeps) are gating checks run against already-merged work, not separate PRs. The spec annotation Step that records Phase 1 completion ships as a single safe doc PR.
 
 - [ ] **Step 1: Confirm no leftover Supabase factory call sites**
 
@@ -1037,12 +1423,29 @@ Same flow inside the Electrobun window.
 
 Edit `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md` Phase 1 line in the Phased Rollout section; append "— completed YYYY-MM-DD".
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 7: Final manual review checkpoint (do NOT commit) — Phase 1 acceptance**
 
-```bash
-git add docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md
-git commit -m "docs(spec): mark phase 1 complete"
-```
+  **Verify all prior task checkpoints are green:**
+  - Task 1 Step 6 checkpoint passed (workspace package scaffold)
+  - Task 2 Step 8 checkpoint passed (`isDesktop` + `Platform` type)
+  - Task 3 Step 9 checkpoint passed (six interfaces defined and exported)
+  - Task 4 Step 9 checkpoint passed (`createRdbCRUDClient` umbrella factory)
+  - Task 4b Step 9 checkpoint passed (`createServerApiClient` umbrella factory)
+  - Task 5 Step 4 checkpoint passed (template client migration)
+  - Task 5 Step 11 checkpoint passed (all ~20 clients migrated, Option A applied, full smoke test clean)
+  - ServerApiClient factory exists and is wired (G1.6 merged); 2 rpc call sites + APIClient.ts internal delegation migrated (G1.7 merged)
+  - Task 6 Steps 1–5 above all returned the expected results: zero leftover `createSupabaseCRUDClient` call sites in `src/`, `pnpm test` green, `pnpm type-check` clean, web smoke test indistinguishable from pre-Phase-1, desktop smoke test renders the same data
+
+  **Verify the spec marker:**
+  - `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md` Phase 1 line in the Phased Rollout section has been annotated with "— completed 2026-05-13" (or the actual completion date)
+  - No other edits made to the spec file
+
+  **Verify the working tree:**
+  - `git status` shows only the intended changes accumulated across Phase 1 (the new `@avandar/platform` package, the `createRdbCRUDClient` factory under `packages/shared/clients/`, the ~20 migrated client files in `src/clients/`, the workspace dep added to `packages/shared/clients/package.json`, the lockfile, and the spec annotation)
+  - No unrelated or accidental modifications
+  - Test groupings G1.5 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Greenlight criteria:** every prior checkpoint passed, both smoke tests are clean, and the spec is annotated. At that point Phase 1 is functionally complete — the user will commit Phase 1 manually in whatever shape they prefer (single squash, per-task commits, etc.). If anything fails, stop and report.
 
 ---
 

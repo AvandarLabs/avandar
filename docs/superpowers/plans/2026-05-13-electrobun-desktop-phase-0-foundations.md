@@ -3,6 +3,7 @@
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Spec:** `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md`
+**Testing strategy:** `docs/superpowers/specs/2026-05-14-testing-strategy.md` — defines per-PR test groupings (G0.x) referenced in each Task below.
 
 **Goal:** Stand up an `apps/desktop/` Electrobun shell on macOS that hosts the existing web build, logs in via Supabase, and lets a user browse their online data read-only.
 
@@ -42,6 +43,8 @@
 ---
 
 ## Task 1: Scaffold the `apps/desktop/` workspace package
+
+**PR boundaries:** 1 PR. All Steps create new files in a new workspace package that is not yet imported by any user-facing code, so each Step is technically safe as its own PR. Each Step is technically safe as its own PR but practically grouped because no Step delivers user-observable value alone — split only if review bandwidth requires it.
 
 **Files:**
 - Create: `apps/desktop/package.json`
@@ -165,16 +168,31 @@ Expected: pnpm installs `electrobun` into `apps/desktop/node_modules` (or hoiste
 
 If `pnpm install` fails because `electrobun@latest` doesn't resolve, check Electrobun's npm page and pin the actual current version, then retry.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add apps/desktop/package.json apps/desktop/tsconfig.json apps/desktop/.gitignore apps/desktop/README.md pnpm-lock.yaml
-git commit -m "chore(desktop): scaffold @avandar/desktop workspace package"
-```
+  **Run:**
+  ```bash
+  pnpm install
+  pnpm --filter @avandar/desktop type-check
+  ```
+  Expected: `pnpm install` completes without errors and reports `apps/desktop` as a workspace package; `type-check` exits 0 with no diagnostics.
+
+  **Verify:**
+  - `apps/desktop/package.json` exists with name `@avandar/desktop`, the four scripts (`dev`, `build`, `test`, `type-check`), `electrobun` in dependencies, and `vitest` + `typescript` in devDependencies.
+  - `apps/desktop/tsconfig.json` exists with the documented compiler options (or with `extends` omitted if `tsconfig.base.json` is absent at the repo root).
+  - `apps/desktop/.gitignore` lists `build/`, `bundle/`, `*.app/`, `*.dmg`, `.electrobun-cache/`.
+  - `apps/desktop/README.md` exists with the run/build/app-data-location sections shown in Step 4.
+  - `pnpm-lock.yaml` now references `electrobun`.
+
+  **Greenlight criteria:** all checks above pass before moving to Task 2. If anything fails, stop and report back with the exact output.
 
 ---
 
 ## Task 2: URL resolution pure function (with tests)
+
+**Test groupings:** G0.1 (URL resolver edge cases — extends the 3 base cases written in this task with rejects-`file://`-viteDevUrl, handles spaces/unicode in bundledIndexPath, rejects unknown mode).
+
+**PR boundaries:** 1 PR. The failing test added in Step 2 would red CI on its own; it must ship together with the `resolveWebviewUrl` implementation in Step 4 so the test passes at merge time.
 
 The Bun main needs to decide what URL the webview should load. In dev, that's the local Vite server. In a packaged build, it's `file://...` pointing at the bundled web app's `index.html`. This is a small pure function — the only thing in Phase 0 amenable to genuine TDD.
 
@@ -278,16 +296,29 @@ pnpm --filter @avandar/desktop test
 
 Expected: 3 tests pass.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add apps/desktop/vitest.config.ts apps/desktop/main/config/url.ts apps/desktop/main/config/url.test.ts
-git commit -m "feat(desktop): add resolveWebviewUrl helper with tests"
-```
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/desktop test
+  ```
+  Expected: 3 tests pass (`resolveWebviewUrl > returns the Vite dev URL in development`, `> returns a file:// URL ... in production`, `> throws when production mode is missing the bundled index path`). Vitest exits 0.
+
+  **Verify:**
+  - `apps/desktop/vitest.config.ts` exists with `environment: "node"` and the include glob covering `main/**/*.test.ts` and `preload/**/*.test.ts`.
+  - `apps/desktop/main/config/url.ts` exports `resolveWebviewUrl` and `ResolveWebviewUrlArgs`, contains only URL-resolution logic (no I/O, no Electrobun imports, no side effects), and throws when `mode === "production"` and `bundledIndexPath` is empty.
+  - `apps/desktop/main/config/url.test.ts` covers all three cases from Step 2.
+  - Test groupings G0.1 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Greenlight criteria:** all checks above pass before moving to Task 3. If anything fails, stop and report back with the exact output.
 
 ---
 
 ## Task 3: Bun-main entry point that opens an Electrobun webview
+
+**Test groupings:** G0.2 (Env reader — requires extracting `readDesktopEnv()` from `main/index.ts` and unit-testing AVA_DESKTOP_MODE default, invalid-value throws, AVA_VITE_DEV_URL default).
+
+**PR boundaries:** 1 PR. Each file (electrobun config, preload, main entry) is a fragment of one runnable unit; none is independently useful and `main/index.ts` would fail type-check without the others. Each Step is technically safe as its own PR but practically grouped because no Step delivers user-observable value alone — split only if review bandwidth requires it.
 
 **Files:**
 - Create: `apps/desktop/main/index.ts`
@@ -418,16 +449,35 @@ If this fails: capture the exact error and fix it before proceeding. Common issu
 - The webview can't reach `localhost:5173` — check macOS local network permissions for Bun.
 - WebView2 isn't installed (irrelevant on macOS but flag for the Windows port).
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add apps/desktop/main/index.ts apps/desktop/preload/index.ts apps/desktop/electrobun.config.ts
-git commit -m "feat(desktop): bun main entry opens electrobun webview pointing at vite dev"
-```
+  **Run:**
+  ```bash
+  pnpm --filter @avandar/desktop type-check
+  ```
+  Expected: exits 0 with no diagnostics. The new `main/index.ts`, `preload/index.ts`, and `electrobun.config.ts` should all type-check cleanly against Electrobun's actual exported types.
+
+  **Verify:**
+  - `apps/desktop/electrobun.config.ts` declares the four build sections (`main`, `preload`, `web`, `bundle`) and uses `../../dist` as the web source so Electrobun reads the repo-root Vite build output.
+  - `apps/desktop/preload/index.ts` sets `window.__AVA_PLATFORM__ = "desktop"` and declares the global on `Window`.
+  - `apps/desktop/main/index.ts` reads `AVA_DESKTOP_MODE` / `AVA_VITE_DEV_URL` / `AVA_BUNDLED_INDEX_PATH`, calls `resolveWebviewUrl`, opens one window, and quits the app on `closed`.
+  - Test groupings G0.2 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test:**
+  1. Terminal A, from the repo root: `pnpm dev`. Wait for `Local: http://localhost:5173/`.
+  2. Terminal B, from the repo root: `AVA_DESKTOP_MODE=development AVA_VITE_DEV_URL=http://localhost:5173 bun run apps/desktop/main/index.ts`.
+  3. Open the webview devtools (via the Electrobun-exposed shortcut or a temporary `Electrobun.app.openDevtools()` call) and run `window.__AVA_PLATFORM__` in the console.
+  4. Close the native window.
+
+  Expected: a native macOS window opens showing the Avandar login screen; terminal B prints `[avandar-desktop] webview loaded http://localhost:5173`; the devtools console returns `"desktop"`; closing the window terminates the Bun process in terminal B.
+
+  **Greenlight criteria:** all checks above pass before moving to Task 4. If anything fails, stop and report back with the exact output.
 
 ---
 
 ## Task 4: Root-level `dev:desktop` script
+
+**PR boundaries:** 1 PR. A single additive script edit to the root `package.json`; web behavior is unchanged because the existing `dev` script is untouched.
 
 Wire a convenient one-command developer experience that runs Vite and the desktop shell concurrently.
 
@@ -469,16 +519,31 @@ Expected:
 
 Press Ctrl+C to stop if the script doesn't self-terminate.
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 4: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add package.json
-git commit -m "chore(scripts): add dev:desktop concurrent runner"
-```
+  **Run:** no extra commands beyond Step 3 — `pnpm dev:desktop` is itself the test.
+
+  **Verify:**
+  - Root `package.json` has a `dev:desktop` script in `scripts` matching the documented `concurrently -k -n vite,electrobun -c blue,magenta ...` invocation, with the `AVA_DESKTOP_MODE` and `AVA_VITE_DEV_URL` env vars inlined on the desktop side.
+  - The script is placed adjacent to the existing `dev` script.
+  - No other scripts were modified.
+
+  **Manual smoke test:**
+  1. From the repo root: `pnpm dev:desktop`.
+  2. Watch the two log streams — Vite labelled in blue, Electrobun in magenta.
+  3. Wait up to ~5s after Vite reports "ready"; the native Avandar window should open.
+  4. Close the window (or Ctrl-C the script).
+  5. Run `ps aux | grep -E 'vite|bun run'` and confirm no orphan Vite or Bun processes remain.
+
+  Expected: blue and magenta interleaved logs, a window appears within 5s of Vite ready, closing the window (or Ctrl-C) terminates both processes thanks to `-k`, and no orphan processes survive.
+
+  **Greenlight criteria:** all checks above pass before moving to Task 5. If anything fails, stop and report back with the exact output.
 
 ---
 
 ## Task 5: Login smoke test
+
+**PR boundaries:** No code change PR boundaries — this Task is verification/documentation. The README annotation Step (Step 4) is a single safe doc PR.
 
 Verify the existing Supabase login flow works inside the Electrobun webview. This is *not* an automated test — it's a manual checklist whose pass-state gates Phase 0 completion.
 
@@ -529,16 +594,26 @@ Verified on macOS <version> with Electrobun <version>:
 
 Replace `<version>` placeholders with the actual versions you tested with.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add apps/desktop/README.md
-git commit -m "docs(desktop): record phase 0 smoke-test results"
-```
+  **Run:** no extra commands — Steps 1–4 above are themselves the verification.
+
+  **Verify:**
+  - `apps/desktop/README.md` now contains a `## Phase 0 smoke-test status` section with the actual macOS version and Electrobun version substituted in (no `<version>` placeholders left).
+  - During the sign-in flow in Step 2, the webview devtools console showed no errors (auth, CORS, CSP, network).
+  - The post-login dashboard rendered fully in Step 2.
+  - The data-listing page in Step 3 rendered with at least one row of seeded online data.
+  - Closing the window from Step 1's `pnpm dev:desktop` cleanly terminated both processes.
+
+  **Greenlight criteria:** all checks above pass before moving to Task 6. If anything fails, stop and report back with the exact output (including any console errors captured from the webview devtools).
 
 ---
 
 ## Task 6: Production build (unsigned)
+
+**Test groupings:** G0.3 (Bundle layout assertion — `pnpm build:desktop` produces `web/index.html` at the path `resolveWebviewUrl` computes; catches Electrobun renaming its output dir between alpha versions).
+
+**PR boundaries:** 1 PR. Adding the `build:desktop` script and the README unsigned-builds note are both additive and safe; web behavior is unchanged.
 
 Produce a runnable `.app` bundle to validate the build pipeline. Code signing is deferred to Phase 4.
 
@@ -603,16 +678,35 @@ The Phase 0 bundle is unsigned. macOS will refuse to open it on first launch wit
 Code signing & notarization land in Phase 4.
 ```
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add package.json apps/desktop/README.md
-git commit -m "feat(desktop): build:desktop produces unsigned .app bundle"
-```
+  **Run:**
+  ```bash
+  pnpm build:desktop
+  ```
+  Expected: Vite build completes, Electrobun packages the bundle, and a `.app` appears under `apps/desktop/bundle/<arch>/Avandar.app`. No build errors.
+
+  **Verify:**
+  - Root `package.json` has the `build:desktop` script set to `pnpm build && pnpm --filter @avandar/desktop build`.
+  - `apps/desktop/README.md` now has a `## Unsigned builds (Phase 0)` section that documents the Gatekeeper warning and the `xattr -d com.apple.quarantine` workaround.
+  - The packaged `.app` exists at the expected path; `dist/` is populated by the Vite build.
+  - Test groupings G0.3 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test:**
+  1. From the repo root: `xattr -d com.apple.quarantine apps/desktop/bundle/<arch>/Avandar.app` (substitute the actual arch directory).
+  2. `open apps/desktop/bundle/<arch>/Avandar.app`.
+  3. Sign in with credentials appropriate to the env the Vite build was made against (production by default, or dev if you exported `NODE_ENV=development pnpm build:desktop`).
+  4. Navigate to a data-listing page.
+
+  Expected: the packaged app opens without a Gatekeeper block after `xattr`, the login succeeds against the intended Supabase environment (production vs dev — confirm this matches what you intended to build), the dashboard renders, and the data list shows rows.
+
+  **Greenlight criteria:** all checks above pass before moving to Task 7. If anything fails, stop and report back with the exact output (build error, Gatekeeper dialog text, or any login/data errors).
 
 ---
 
 ## Task 7: Phase 0 acceptance checklist
+
+**PR boundaries:** No code change PR boundaries — this Task is verification/documentation. The spec annotation Step (Step 5) is a single safe doc PR.
 
 A final sanity-check pass before declaring Phase 0 done. No file changes — pure verification.
 
@@ -654,12 +748,19 @@ Expected: both green.
 
 Edit `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md`, find the Phase 0 line under "Phased Rollout", and append "— completed YYYY-MM-DD" with today's date.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md
-git commit -m "docs(spec): mark phase 0 complete"
-```
+  **Run:** no extra commands — Steps 1–4 above already exercise everything.
+
+  **Verify:**
+  - `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md` has the Phase 0 line under "Phased Rollout" updated with `— completed YYYY-MM-DD` using today's date.
+  - No other edits were made to the spec.
+  - Step 1 confirmed: `pnpm dev` still serves the web app on `localhost:5173` and login works in a browser (no regression).
+  - Step 2 confirmed: `pnpm dev:desktop` opens the window, login succeeds, the data view renders, the window closes cleanly.
+  - Step 3 confirmed: `pnpm build:desktop` produces a working `.app`; the packaged app logs in and shows data.
+  - Step 4 confirmed: both `pnpm --filter @avandar/desktop test` and `pnpm test:frontend` are green.
+
+  **Greenlight criteria:** every sub-step result above is confirmed before declaring Phase 0 done. If any of the four prior steps regressed or the spec edit is missing/incorrect, stop and report back with the exact failure.
 
 ---
 

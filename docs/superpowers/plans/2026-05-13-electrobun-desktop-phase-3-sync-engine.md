@@ -3,6 +3,7 @@
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Spec:** `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md` (sections "RdbClient & Local Relational Store" and "SyncEngine (V1)")
+**Testing strategy:** `docs/superpowers/specs/2026-05-14-testing-strategy.md` — defines per-PR test groupings (G3.x) referenced in each Task below. Phase 3 leans heavily on property-based testing (fast-check) because the failure mode is silent data loss.
 
 **Goal:** Wire a complete V1 sync engine: every SQLite write enqueues an outbox row in the same transaction; a push loop drains the outbox to Supabase; a pull loop fetches deltas back; LWW resolves conflicts. Parquet files marked `online_storage_allowed` upload on reconnect via resumable TUS. UI shows sync status.
 
@@ -73,6 +74,11 @@
 ---
 
 ## Task 1: Sync schema migration
+
+**Test groupings:** G3.1 (Sync schema migration — all _sync_* columns present per syncable table; bookkeeping tables exist; idempotent on rerun).
+
+**PR boundaries:** 1 PR.
+- PR 1: All Steps — new migration SQL file plus its idempotency test; the migration only runs on next desktop launch and the web app never touches SQLite, so `pnpm test`/`type-check`/`lint`/CI stay green and current users are unaffected.
 
 Add per-row sync columns to every `SYNCABLE_TABLES` table, plus the three sync engine tables.
 
@@ -237,16 +243,47 @@ pnpm --filter @avandar/desktop test
 
 Expected: green.
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 4: Manual review checkpoint (do NOT commit)**
 
+**Run:**
 ```bash
-git add apps/desktop/migrations/9999_phase3_sync_schema.sql apps/desktop/sync/sync-schema.test.ts
-git commit -m "feat(desktop): add Phase 3 sync schema migration"
+pnpm --filter @avandar/desktop test apps/desktop/sync/sync-schema.test.ts
+pnpm --filter @avandar/desktop typecheck
 ```
+Expected: schema test green; typecheck clean.
+
+**Verify:**
+- Open `apps/desktop/migrations/9999_phase3_sync_schema.sql` and confirm every table listed in `SYNCABLE_TABLES` has all four sync columns (`_local_updated_at`, `_server_updated_at`, `_sync_state`, `_deleted_at`) — eyeball the manifest against the migration, do not trust the test alone to catch missing tables.
+- Confirm `sync_outbox`, `parquet_blob_outbox`, and `sync_cursor` are all created with the expected columns and indexes per the plan.
+- The migration filename sorts last in `apps/desktop/migrations/` so it applies after generated migrations.
+- Test groupings G3.1 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
+
+**Manual smoke test (desktop app — `pnpm dev:desktop`):**
+1. Delete any existing local SQLite file so migrations re-apply from a clean slate: `rm "$HOME/Library/Application Support/Avandar/metadata.sqlite"` (adjust the bundle path if different).
+2. Launch the desktop app and sign in so the DB initializes and migrations run.
+3. Inspect the schema directly:
+   ```bash
+   sqlite3 "$HOME/Library/Application Support/Avandar/metadata.sqlite" ".schema sync_outbox"
+   sqlite3 "$HOME/Library/Application Support/Avandar/metadata.sqlite" ".schema parquet_blob_outbox"
+   sqlite3 "$HOME/Library/Application Support/Avandar/metadata.sqlite" ".schema sync_cursor"
+   sqlite3 "$HOME/Library/Application Support/Avandar/metadata.sqlite" "pragma table_info(datasets);"
+   ```
+4. Confirm the three sync tables exist, and that `datasets` (plus 2–3 other syncable tables, spot-checked) shows the four `_sync_*` / `_local_updated_at` / `_deleted_at` columns with correct types and defaults.
+
+Expected: `.schema` output matches the SQL in `9999_phase3_sync_schema.sql`; `pragma table_info` lists the new columns.
+
+**Greenlight criteria:** all checks above pass before moving to Task 2.
 
 ---
 
 ## Task 2: Transactional outbox-aware writes
+
+**Test groupings:** G3.2 (Outbox/data atomicity property test — fast-check random sequences of writes with injected failures at each tx step; invariant: count(outbox per row_id) ∈ {0, 1} always, never partial; the highest-leverage test in the entire project).
+
+**PR boundaries:** 2 PRs.
+- PR 1: `withOutbox` helper module + its atomicity property test — the helper is new, nothing imports it from a hot path yet, so `pnpm test`/`type-check`/`lint`/CI stay green and behavior is unchanged.
+- PR 2: Migrate `createSqliteCRUDClient` write paths to use `withOutbox` — integration boundary where the atomicity invariant goes live; web app continues to talk to Supabase directly and only desktop's SQLite writes are touched.
+(Manual review checkpoint Steps are gates between PRs.)
 
 The critical invariant: every CRUD mutation appends to `sync_outbox` **in the same SQLite transaction** as the data write. Implement once in a helper; call from every mutation path.
 
@@ -528,16 +565,48 @@ pnpm --filter @avandar/desktop test
 
 Expected: green.
 
-- [ ] **Step 9: Commit**
+- [ ] **Step 9: Manual review checkpoint (do NOT commit) — CRITICAL INVARIANT**
 
+This is the single most important review in Phase 3. A bug here causes silent data loss (a data write lands without an outbox row, or vice-versa). Do not skim.
+
+**Run:**
 ```bash
-git add packages/shared/ apps/desktop/
-git commit -m "feat(sync): transactional outbox-aware writes; integrate into createSqliteCRUDClient"
+pnpm --filter @avandar/desktop test packages/shared/clients/src/SqliteCRUDClient/withOutbox.test.ts
+pnpm --filter @avandar/desktop test apps/desktop/main/ipc/rdb.test.ts
+pnpm --filter @avandar/desktop typecheck
 ```
+Expected: all tests green; typecheck clean.
+
+**Verify (code review — do NOT rely on tests alone):**
+- Open `apps/desktop/main/ipc/rdb.ts` `runWithOutbox` handler. Confirm the data `INSERT/UPDATE/DELETE` AND the `insert into sync_outbox` are inside the SAME `db.transaction(() => { ... })` block, with no early returns, awaits, or exception swallowing between them.
+- Open `packages/shared/clients/src/SqliteCRUDClient/withOutbox.ts`. Confirm every mutation path (insert, update, delete) routes through `runWithOutbox` — there is no bypass that calls `rdb.run(...)` directly for a syncable table.
+- Open `packages/shared/clients/src/SqliteCRUDClient/createSqliteCRUDClient.ts`. Search the diff for any remaining direct `db.run`, `db.prepare(...).run`, or unwrapped IPC `run` call on a syncable table. There should be none.
+- Confirm the test that forces a constraint violation inside the transaction proves rollback also removes the outbox row.
+- Test groupings G3.2 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
+
+**Manual integrity test (the failure mode is crash-mid-flight; reproduce it):**
+1. Start the desktop app with the network disabled.
+2. Open the SQLite DB in a second terminal: `sqlite3 "$HOME/Library/Application Support/Avandar/metadata.sqlite"`. Note current `sync_outbox` row count.
+3. In the UI, create or rename an entity (e.g. a dataset). Watch the outbox count tick up by exactly 1.
+4. Repeat the write while watching the underlying row update — confirm `_sync_state = 'dirty'` and `_local_updated_at` advance in lockstep with a new `sync_outbox` insert.
+5. **Crash-safety check:** trigger a write in the UI, then immediately force-quit the app (Cmd+Option+Esc → Force Quit, or `kill -9 <pid>`) before the next event loop tick. Relaunch the app and inspect the DB:
+   - Either the data row reflects the new value AND a corresponding `sync_outbox` row exists, OR
+   - Neither the data row update NOR the `sync_outbox` row exists.
+   - There must NEVER be one without the other. Repeat 3–5 times to catch races.
+6. With network still off, run `sqlite3 ... "select table_name, row_id, op from sync_outbox order by id;"` — every queued mutation must correspond to a real row in the data table (no orphan outbox rows referencing non-existent ids).
+
+Expected: zero divergence between data writes and outbox entries across all force-quit attempts.
+
+**Greenlight criteria:** code review confirms single-transaction invariant AND crash-safety check shows perfect atomicity across at least 3 force-quits. Do NOT proceed to Task 3 until this is rock-solid.
 
 ---
 
 ## Task 3: LWW pure function
+
+**Test groupings:** G3.3 (LWW pure-fn truth table — {local, server} × {live, tombstone, missing} × {<, =, >}, ~27 cases); G3.4 (LWW property tests via fast-check — idempotency, tie-determinism, tombstone-monotonicity).
+
+**PR boundaries:** 1 PR.
+- PR 1: All Steps — pure function module + truth-table tests + fast-check property tests; no caller imports it yet, so the web app is unaffected and all CI gates remain green.
 
 The conflict-resolution rule is a small pure function — testable without IO.
 
@@ -647,16 +716,34 @@ export function resolveLww(args: LwwArgs): LwwResult {
 pnpm --filter @avandar/desktop test
 ```
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Manual review checkpoint (do NOT commit)**
 
+`resolveLww` is a pure function — review is unit-test-driven, no smoke test needed.
+
+**Run:**
 ```bash
-git add apps/desktop/main/services/sync/Lww.ts apps/desktop/main/services/sync/Lww.test.ts
-git commit -m "feat(sync): LWW resolver with tombstone precedence"
+pnpm --filter @avandar/desktop test apps/desktop/main/services/sync/Lww.test.ts
+pnpm --filter @avandar/desktop typecheck
 ```
+Expected: all 4 cases green (server-later, local-later, tie-server-wins, tombstone-always-wins); typecheck clean.
+
+**Verify:**
+- Read `apps/desktop/main/services/sync/Lww.ts`. Confirm the function is pure: no IO, no `Date.now()`, no module-level mutable state, no logging side effects.
+- Confirm tombstone precedence: `serverRow._deleted_at != null` causes the server to win regardless of `localUpdatedAt` (this is intentional — deletes propagate).
+- Confirm tie-breaking is `server` (server is canonical) — the test asserts this and the implementation must use `>` not `>=` for local-wins.
+- Eyeball whether additional adversarial cases are worth adding to the test (e.g. `localUpdatedAt = 0`, `serverUpdatedAt` undefined/NaN). If any edge case feels under-covered, add a test before moving on — a quiet LWW bug here corrupts conflict resolution silently.
+- Test groupings G3.3, G3.4 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
+
+**Greenlight criteria:** all tests green AND the function is verifiably pure on inspection. Proceed to Task 4.
 
 ---
 
 ## Task 4: NetworkProbe
+
+**Test groupings:** G3.5 (NetworkProbe — fake timers; start() idempotent; rapid flap collapses to single transitions; stop() mid-flight aborts cleanly).
+
+**PR boundaries:** 1 PR.
+- PR 1: All Steps — NetworkProbe state machine + unit tests with fake timers; nothing wires it into the orchestrator yet, so it's dormant code and the web app is untouched.
 
 Detect online/offline state. Simple poll-based for V1; OS-level network change events as a V2 nicety.
 
@@ -794,16 +881,43 @@ export function createNetworkProbe(args: NetworkProbeArgs): NetworkProbe {
 pnpm --filter @avandar/desktop test
 ```
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Manual review checkpoint (do NOT commit)**
 
+**Run:**
 ```bash
-git add apps/desktop/main/services/sync/NetworkProbe.ts apps/desktop/main/services/sync/NetworkProbe.test.ts
-git commit -m "feat(sync): polling-based NetworkProbe"
+pnpm --filter @avandar/desktop test apps/desktop/main/services/sync/NetworkProbe.test.ts
+pnpm --filter @avandar/desktop typecheck
 ```
+Expected: probe transitions tested with fake timers/fake fetch are green; typecheck clean.
+
+**Verify:**
+- Open `apps/desktop/main/services/sync/NetworkProbe.ts`. Confirm:
+  - Listener `onChange` callbacks only fire on actual state transitions, never on duplicate same-state polls (avoids log spam and redundant loop wake-ups).
+  - `stop()` clears the interval and is idempotent (calling twice does not crash).
+  - The probe does not log or throw on a single probe failure — failures simply mark `offline`.
+- Test groupings G3.5 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
+
+**Manual smoke test (desktop app — `pnpm dev:desktop`):**
+1. Start the app online; confirm the in-app sync indicator (or, if Task 9 not built yet, the main-process logs) shows `online`.
+2. Disable Wi-Fi from the macOS menu bar (or run `sudo ifconfig en0 down`).
+3. Within one probe interval (per `NetworkProbe.ts`, typically 5–15s), watch logs / status flip to `offline`. Confirm only ONE transition event is logged (no duplicates).
+4. Re-enable Wi-Fi (`sudo ifconfig en0 up`). Within one interval, status flips back to `online`, again with a single transition event.
+5. Toggle 2–3 more times to confirm no listener leak (transition count grows by exactly 1 per real toggle).
+
+Expected: clean `online ↔ offline` transitions logged once each, no spurious events on stable network.
+
+**Greenlight criteria:** unit tests green AND manual toggle produces exactly one transition event per toggle. Proceed to Task 5.
 
 ---
 
 ## Task 5: PushLoop (relational)
+
+**Test groupings:** G3.6 (PushLoop drain order, batch boundary, backoff math, transient-vs-permanent classification); G3.7 (PushLoop duplicate-delivery idempotency property — fast-check crash after Supabase ack but before outbox delete; assert server-side row count = 1 after replay).
+
+**PR boundaries:** 2 PRs.
+- PR 1: PushLoop module + unit tests + duplicate-delivery property tests with mocked Supabase REST; orchestrator does not import it yet, so it's dormant and CI stays green.
+- PR 2: Integration test against the real `sync_outbox` shape from Task 2 — purely additive test coverage, no runtime wiring; safe to merge independently.
+(Manual review checkpoint Steps are gates between PRs.)
 
 Drains `sync_outbox` to Supabase.
 
@@ -1121,16 +1235,51 @@ export function createSupabaseRestClient(): SupabaseRestClient {
 
 `selectChangedSince` is implemented in the PullLoop task; stub it for now if unused.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: Manual review checkpoint (do NOT commit)**
 
+**Run:**
 ```bash
-git add apps/desktop/main/
-git commit -m "feat(sync): relational push loop with transient/permanent failure handling"
+pnpm --filter @avandar/desktop test apps/desktop/main/services/sync/PushLoop.test.ts
+pnpm --filter @avandar/desktop typecheck
 ```
+Expected: success-path, transient-failure-with-retry, and permanent-failure-marks-error tests all green; typecheck clean.
+
+**Verify:**
+- Open `apps/desktop/main/services/sync/PushLoop.ts`. Confirm:
+  - On success: outbox row is deleted, `_sync_state` flips to `clean`, `_server_updated_at` is written, all inside one SQLite transaction.
+  - On transient (5xx / 429) failure: outbox row is retained, `attempts` is incremented, no `_sync_state` change.
+  - On permanent (4xx other than 429) failure: outbox row stays but `_sync_state` flips to `error` so the UI can surface it.
+  - Drain processes at most `batchSize` per call; ordering by `id` (FIFO) is preserved.
+- Test groupings G3.6, G3.7 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
+
+**Manual smoke test (desktop app — `pnpm dev:desktop`):**
+1. Sign in online; confirm baseline `select count(*) from sync_outbox;` is 0.
+2. Disable network (Wi-Fi off or `sudo ifconfig en0 down`).
+3. In the UI, perform 3 distinct edits to syncable rows (e.g. rename a dataset, edit a dashboard, create a new entity).
+4. In a terminal:
+   ```bash
+   sqlite3 "$HOME/Library/Application Support/Avandar/metadata.sqlite" "select id, table_name, row_id, op, attempts from sync_outbox order by id;"
+   sqlite3 "$HOME/Library/Application Support/Avandar/metadata.sqlite" "select id, _sync_state, _local_updated_at, _server_updated_at from datasets where _sync_state != 'clean';"
+   ```
+   Expected: 3 outbox rows, all `attempts = 0`; the 3 affected data rows have `_sync_state = 'dirty'` and null `_server_updated_at`.
+5. Re-enable network. Within one push interval (typically 5–10s), watch the main-process logs report drains.
+6. Re-run the same SQL — `sync_outbox` should be empty, and the 3 data rows should now have `_sync_state = 'clean'` with a populated `_server_updated_at`.
+7. Open Supabase Studio (or `pnpm db:sql-cmd`) and confirm all 3 edits are visible on the server with the matching values.
+
+Expected: outbox drains to empty within seconds of reconnect; data rows transition `dirty → clean`; server reflects all edits.
+
+**Greenlight criteria:** every step above observed end-to-end; no orphan outbox rows; no stuck `dirty` rows after drain. Proceed to Task 6.
 
 ---
 
 ## Task 6: PullLoop (relational)
+
+**Test groupings:** G3.8 (PullLoop cursor monotonicity, tombstone propagation, per-table cursor isolation, LWW-skipped-row still advances cursor); G3.9 (PullLoop ↔ PushLoop race — server-wins pull deletes outbox row; subsequent push response writes to a now-different row state).
+
+**PR boundaries:** 2 PRs.
+- PR 1: PullLoop module + unit tests including LWW-vs-outbox race coverage; nothing wires it in, so it's dormant and the web app is unaffected.
+- PR 2: Cross-loop race tests using PullLoop and PushLoop together — additive test-only PR; both modules already exist and are still unwired, so CI stays green.
+(Manual review checkpoint Steps are gates between PRs.)
 
 Pulls Supabase deltas into local SQLite; resolves conflicts via LWW.
 
@@ -1427,16 +1576,52 @@ function updateRow(
 pnpm --filter @avandar/desktop test
 ```
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: Manual review checkpoint (do NOT commit)**
 
+**Run:**
 ```bash
-git add apps/desktop/main/
-git commit -m "feat(sync): relational pull loop with LWW conflict resolution"
+pnpm --filter @avandar/desktop test apps/desktop/main/services/sync/PullLoop.test.ts
+pnpm --filter @avandar/desktop typecheck
 ```
+Expected: pull-fetch-and-merge, LWW conflict-resolution, and cursor-advance tests green; typecheck clean.
+
+**Verify:**
+- Open `apps/desktop/main/services/sync/PullLoop.ts`. Confirm:
+  - The pull cursor (`sync_cursor.last_pulled_server_updated_at`) is advanced only AFTER a successful local apply (so a crash mid-pull doesn't lose deltas).
+  - Conflicts route through `resolveLww` (Task 3) — no ad-hoc tie-breaking in the pull path.
+  - Tombstoned server rows (`_deleted_at` set) cascade to a local delete.
+  - The pull never touches rows where the local `_sync_state` is `dirty` AND the local `_local_updated_at` beats the server (LWW result `winner === 'local'`).
+- Test groupings G3.8, G3.9 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
+
+**Manual smoke test (desktop app — `pnpm dev:desktop`):**
+1. Sign in on the desktop app. Open Supabase Studio (or the web app on a different device/browser) for the same account.
+2. Note the current value of `sync_cursor`:
+   ```bash
+   sqlite3 "$HOME/Library/Application Support/Avandar/metadata.sqlite" "select * from sync_cursor;"
+   ```
+3. In Supabase Studio (or the web app), edit one row — e.g. rename a dashboard to a recognizable string like `pull-test-<timestamp>`.
+4. Within ~30s on the desktop app (one pull interval), the new value should appear in the UI without manual refresh. If the UI does not auto-refresh, confirm via:
+   ```bash
+   sqlite3 "$HOME/Library/Application Support/Avandar/metadata.sqlite" "select id, name, _sync_state, _server_updated_at from dashboards where name like 'pull-test-%';"
+   ```
+5. Re-check `sync_cursor` — `last_pulled_server_updated_at` for the affected table must have advanced to at least the new `_server_updated_at`.
+6. **Conflict path:** with desktop online, edit the same row in the desktop UI AND in Supabase Studio within a few seconds. Wait for both push and pull to cycle. Confirm the LWW winner (latest `updated_at`) is reflected on both sides, and that the local `_sync_state` settles back to `clean`.
+7. **Delete propagation:** delete a row in Supabase Studio. Within ~30s, confirm it is gone from the desktop UI (and physically removed or marked `_deleted_at` in SQLite per the implementation).
+
+Expected: cross-device edits propagate within ~30s; cursor monotonically advances; conflicts resolve per LWW; deletes propagate.
+
+**Greenlight criteria:** all four scenarios (forward pull, cursor advance, conflict resolution, tombstone propagation) observed end-to-end. Proceed to Task 7.
 
 ---
 
 ## Task 7: ParquetUploadLoop (TUS resumable)
+
+**Test groupings:** G3.10 (ParquetUploadLoop with real mini-TUS server in vitest — resume from bytes_uploaded; 404 on HEAD → restart at 0; 409 on PATCH → re-HEAD + adjust; toggling online_storage_allowed=false mid-upload enqueues delete).
+
+**PR boundaries:** 2 PRs.
+- PR 1: TUS resumable upload module + mini-TUS server vitest fixture + unit tests; not invoked from anywhere yet, so it's dormant and CI stays green.
+- PR 2: Integration with `parquet_blob_outbox` + resume scenarios — exercises the Task 1 outbox shape; still unwired from orchestrator, so the web app and live desktop sessions are unaffected.
+(Manual review checkpoint Steps are gates between PRs.)
 
 Drains `parquet_blob_outbox` to Supabase Storage. Port the existing TUS pattern from `src/clients/DatasetParquetStorageClient`.
 
@@ -1747,16 +1932,51 @@ alter table datasets add column parquet_uploaded_at integer;
 pnpm --filter @avandar/desktop test
 ```
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 6: Manual review checkpoint (do NOT commit)**
 
+**Run:**
 ```bash
-git add apps/desktop/main/
-git commit -m "feat(sync): TUS-resumable parquet upload loop"
+pnpm --filter @avandar/desktop test apps/desktop/main/services/sync/ParquetUploadLoop.test.ts
+pnpm --filter @avandar/desktop typecheck
 ```
+Expected: tests covering TUS create, `HEAD` resume, byte-offset upload, expired URL (404 on HEAD), and successful completion are green; typecheck clean.
+
+**Verify:**
+- Open `apps/desktop/main/services/sync/ParquetUploadLoop.ts`. Confirm:
+  - Each upload row in `parquet_blob_outbox` is uploaded via TUS — `PATCH` calls include `Upload-Offset` matching the server's `HEAD` response, NOT a stale local cache.
+  - On resume, `bytes_uploaded` in `parquet_blob_outbox` is updated only after the `PATCH` actually succeeds (so a crash mid-`PATCH` will re-probe with `HEAD` on next run rather than skipping bytes).
+  - On `HEAD 404` (resumable URL expired), the loop clears `tus_upload_url` and restarts the upload from offset 0.
+  - On final completion, `datasets.parquet_uploaded_at` is set and the outbox row is removed in a single SQLite transaction.
+- Test groupings G3.10 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
+
+**Manual smoke test (desktop app — `pnpm dev:desktop`):**
+1. Sign in online. Open Supabase Studio → Storage → the parquet bucket so you can watch for new files.
+2. Disable the network.
+3. In the desktop app, upload a CSV dataset that's at least a few MB (so resume is observable) with the `online_storage_allowed` option enabled.
+4. Confirm the parquet file exists in the local datasets directory AND there is a queued row:
+   ```bash
+   sqlite3 "$HOME/Library/Application Support/Avandar/metadata.sqlite" "select id, dataset_id, file_path, bytes_total, bytes_uploaded, tus_upload_url, attempts from parquet_blob_outbox;"
+   ```
+   Expected: one row, `bytes_uploaded = 0` (or null), `tus_upload_url` null.
+5. Re-enable the network. Watch the main-process logs report a TUS `POST` (create) then a `PATCH`. Within the upload loop interval, `bytes_uploaded` should advance toward `bytes_total` in the SQLite row.
+6. **Resume test:** while a large upload is mid-flight, force-quit the app (`kill -9 <pid>`). Re-read `parquet_blob_outbox` — `tus_upload_url` is set and `bytes_uploaded` reflects the partial progress. Relaunch the app. The loop should issue a `HEAD` to the saved `tus_upload_url`, read the server-side offset, and resume from there — confirm by watching logs that the next `PATCH` uses the offset, NOT 0.
+7. Once the upload completes, the row is removed from `parquet_blob_outbox` and `datasets.parquet_uploaded_at` is populated. Refresh Supabase Studio Storage and confirm the parquet file is present with the expected size.
+8. **Expired URL test (optional but recommended):** manually corrupt `tus_upload_url` in SQLite to a non-existent path. Restart the app and confirm the loop detects the 404 on `HEAD`, clears the URL, and starts a fresh upload from offset 0.
+
+Expected: uploads survive a force-quit and resume from the server-observed offset rather than restarting; final file appears in Supabase Storage matching local bytes.
+
+**Greenlight criteria:** resume test passes (bytes do NOT restart at 0 after force-quit); final parquet present in Storage; outbox row removed; `parquet_uploaded_at` set. Proceed to Task 8.
 
 ---
 
 ## Task 8: SyncEngine orchestrator
+
+**Test groupings:** G3.11 (SyncEngine orchestrator convergence — seed 50 outbox rows + 3 parquet uploads + 20 server-side changes; assert convergence within N ticks; local rows == server rows); G3.12 (Convergence under random network drops via fast-check state-machine model; random sequence of local writes, server writes, network toggles, ticks; assert eventual convergence); G3.13 (Orchestrator mutex — concurrent forceSync() doesn't double-drain; assert _server_updated_at never regresses).
+
+**PR boundaries:** 2 PRs.
+- PR 1: Orchestrator module + unit tests + mutex/convergence/state-machine tests + `SyncContracts` IPC additions; the orchestrator exists but Bun-main never constructs it, so all sync code stays dormant and CI gates pass.
+- PR 2: **Integration boundary** — wire the orchestrator into the Bun-main entry point. THIS is the moment sync goes live for desktop users; everything before this is dormant code. Web users still hit Supabase directly via existing clients, so the web app is unaffected.
+(Manual review checkpoint Steps are gates between PRs.)
 
 Glue the loops together; export status via IPC.
 
@@ -2116,16 +2336,58 @@ window.on("closed", async () => {
 });
 ```
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 7: Manual review checkpoint (do NOT commit)**
 
+**Run:**
 ```bash
-git add apps/desktop/ packages/shared/platform/
-git commit -m "feat(sync): SyncEngine orchestrator + IPC + DesktopSyncEngine"
+pnpm --filter @avandar/desktop test apps/desktop/main/services/sync/SyncEngine.test.ts
+pnpm --filter @avandar/desktop typecheck
+pnpm test
 ```
+Expected: orchestrator unit tests green; full repo test suite green; typecheck clean.
+
+**Verify:**
+- Open `apps/desktop/main/services/sync/SyncEngine.ts`. Confirm:
+  - `start()` is idempotent (calling twice does not double up timers / listeners).
+  - `stop()` cleanly clears all timers and removes the `NetworkProbe.onChange` listener (no leak on app close).
+  - Status state machine is well-defined: at minimum `offline`, `online-idle`, `syncing`, `error` — and transitions are surfaced via `onStatusChange`.
+  - On `NetworkProbe` transition `offline → online`, the engine immediately schedules a push + pull cycle (not just on the next timer tick).
+- Open `packages/shared/platform/src/desktop/DesktopSyncEngine.ts` — confirm it bridges main-process status to webview via the registered IPC handlers in `apps/desktop/main/ipc/sync.ts`.
+- Open `apps/desktop/main/index.ts` — confirm the engine is started after services init AND stopped in the `window.on("closed", ...)` handler.
+- Test groupings G3.11, G3.12, G3.13 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
+
+**Manual smoke test (desktop app — `pnpm dev:desktop`) — END-TO-END HAPPY PATH:**
+1. Start the app online, sign in. Confirm the (Task 9) indicator shows `online-idle` (or watch main-process logs for the equivalent state line).
+2. Disable network. Confirm status flips to `offline`.
+3. While offline, perform 2 mixed actions:
+   - Edit a regular row (e.g. rename a dataset).
+   - Upload a small CSV with `online_storage_allowed` enabled.
+4. Inspect both queues:
+   ```bash
+   sqlite3 "$HOME/Library/Application Support/Avandar/metadata.sqlite" "select count(*) from sync_outbox; select count(*) from parquet_blob_outbox;"
+   ```
+   Both should be > 0.
+5. Re-enable the network. Watch the indicator/logs transition `offline → syncing → online-idle`. Within ~60s, both queues should be empty:
+   ```bash
+   sqlite3 "$HOME/Library/Application Support/Avandar/metadata.sqlite" "select count(*) from sync_outbox; select count(*) from parquet_blob_outbox;"
+   ```
+6. Open Supabase Studio: confirm the renamed row reflects the new value, and the parquet file is in the Storage bucket.
+7. Close the app window. Confirm main-process logs show clean shutdown (timers cleared, no "leaked listener" warnings).
+
+Expected: status indicator settles on `online-idle` after both queues drain; clean shutdown leaves no orphan resources.
+
+**Greenlight criteria:** full offline-edits + offline-upload → online drain cycle completes cleanly with the indicator settling on idle; clean shutdown verified. Proceed to Task 9.
 
 ---
 
 ## Task 9: Sync status UI indicator
+
+**Test groupings:** G3.14 (Status UI component — 4 SyncStatus shapes render correctly; click → detail panel opens; unmount removes listener).
+
+**PR boundaries:** 2 PRs.
+- PR 1: `SyncStatusIndicator` component + its tests + integration with the existing PlatformProvider's SyncEngine; component is not yet mounted in app chrome, so the web build is unaffected.
+- PR 2: Mount the indicator into the app chrome — visible only to desktop users (web has no SyncEngine in PlatformProvider, so the indicator renders nothing / no-ops on web), keeping the web app behavior unchanged.
+(Manual review checkpoint Steps are gates between PRs.)
 
 Small React component in the app chrome.
 
@@ -2289,16 +2551,45 @@ pnpm dev:desktop
 
 The indicator should appear in the header and reflect status changes.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 7: Manual review checkpoint (do NOT commit)**
 
+**Run:**
 ```bash
-git add packages/web/ src/
-git commit -m "feat(sync): SyncStatusIndicator in app chrome"
+pnpm --filter @avandar/components test SyncStatusIndicator
+pnpm --filter @avandar/web typecheck
 ```
+Expected: component tests green (rendering per status, click-to-detail, conflict surfacing); typecheck clean.
+
+**Verify:**
+- Open `packages/web/components/src/SyncStatusIndicator/SyncStatusIndicator.tsx`. Confirm:
+  - The component renders distinct visual states for `idle`, `syncing`, `offline`, `error` — easy to differentiate at a glance (color + icon + tooltip).
+  - It reads from `usePlatform().syncEngine` and subscribes via `onStatusChange`, with cleanup on unmount (no listener leak).
+  - On the web build (always offline mode for V1), the indicator either hides or shows a stable "local-only" affordance — confirm the web app does not break.
+- Confirm `HeaderSyncIndicator` (or equivalent wrapper) is mounted in the root layout so it appears on every screen.
+- Test groupings G3.14 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
+
+**Manual smoke test (desktop app — `pnpm dev:desktop`):**
+1. Launch the desktop app and sign in. Visually confirm the indicator is present in the app chrome (header / status bar).
+2. Online idle → the indicator shows the `idle`/`online` state (e.g. green dot, "Synced").
+3. Make an edit while online — the indicator briefly transitions to `syncing` then back to `idle`.
+4. Disable network. Indicator should flip to `offline` within one `NetworkProbe` interval.
+5. With network off, make 2 edits. The indicator should show a pending count (if implemented) or at minimum a "queued" affordance.
+6. Click the indicator. A detail panel / popover should open and surface the pending mutation count and queued items.
+7. **Force a conflict:** with network off, edit a row locally. In Supabase Studio, edit the same row with a different value AND a later `updated_at`. Re-enable network. The conflict should resolve via LWW (server wins) and the indicator should NOT flag a "conflict" state for the LWW case. If your indicator surfaces conflicts that needed user intervention, contrive a case (e.g. permanent 4xx push failure) by editing a row with a server-side constraint violation, and confirm the indicator transitions to `error` with the offending row reachable from the detail panel.
+8. Visually confirm the web build (`pnpm dev`) still renders without breaking on the missing desktop `syncEngine` — the indicator either hides or shows the `local-only` affordance.
+
+Expected: indicator accurately reflects every state transition; detail panel surfaces pending and errored items; web build is not broken.
+
+**Greenlight criteria:** all four states visually verified; conflict / error path surfaces the bad row; web build unaffected. Proceed to Task 10.
 
 ---
 
 ## Task 10: Phase 3 acceptance checklist
+
+**Test groupings:** G3.15 (Full end-to-end via fake-IPC harness — offline edits + offline upload → online → drain → desktop SQLite and mocked Supabase converge; Phase 3 acceptance criterion as a script).
+
+**PR boundaries:** 1 PR.
+- PR 1: Spec annotation / acceptance-checklist doc Step — verification-only, no code changes touch product behavior; safe doc PR. Manual smoke-test / acceptance Steps are gates (not code PRs) and are exercised against the Task 8 PR 2 wiring that already shipped.
 
 - [ ] **Step 1: Round-trip smoke test**
 
@@ -2341,12 +2632,34 @@ pnpm test
 
 Update `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md` Phase 3 line.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 7: Final manual review checkpoint (do NOT commit)**
 
+Phase 3 is the riskiest correctness work in the project. Before declaring done, confirm every prior task's greenlight gate actually passed — not just that you reached the end.
+
+**Run:**
 ```bash
-git add docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md
-git commit -m "docs(spec): mark phase 3 complete"
+pnpm test
+pnpm --filter @avandar/desktop typecheck
+pnpm --filter @avandar/web typecheck
 ```
+Expected: full repo green; typechecks clean across desktop and web.
+
+**Verify — checkpoint roll-up (re-confirm each Task's greenlight criterion):**
+- Task 1: schema migration applied; `sync_outbox`, `parquet_blob_outbox`, `sync_cursor`, and per-row `_sync_*` columns present on every syncable table.
+- Task 2: code review confirms outbox INSERT and data write share one `db.transaction(...)`; force-quit-mid-write produced zero divergence over multiple trials.
+- Task 3: `resolveLww` is pure and tested for tombstone precedence + tie-server-wins.
+- Task 4: `NetworkProbe` transitions fire exactly once per real toggle.
+- Task 5: PushLoop drained 3+ offline edits to Supabase within seconds of reconnect; data rows transitioned `dirty → clean`.
+- Task 6: PullLoop propagated cross-device edits and deletes within ~30s; `sync_cursor` advanced monotonically; LWW resolved a forced conflict.
+- Task 7: ParquetUploadLoop survived a force-quit mid-upload and resumed from the server-observed offset (NOT 0); final file appeared in Supabase Storage.
+- Task 8: SyncEngine orchestrator drove the full offline-edits + offline-upload → online drain cycle to `online-idle`; clean shutdown verified.
+- Task 9: status indicator visually reflects every state; detail panel surfaces pending and errored items; web build is unaffected.
+- Test groupings G3.15 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
+
+**Documentation update:**
+- Update `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md` Phase 3 line to mark complete — but do NOT commit. Leave the change unstaged for human review.
+
+**Greenlight criteria:** every prior task's greenlight gate passed (not merely "step ran") AND the acceptance smoke tests in Steps 1–6 above all observed end-to-end. Phase 3 is ready for human sign-off and integration; the human will handle commits and any spec marker.
 
 ---
 

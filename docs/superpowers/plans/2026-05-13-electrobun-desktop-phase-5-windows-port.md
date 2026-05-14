@@ -4,6 +4,8 @@
 
 **Spec:** `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md` (Phase 5 section)
 
+**Testing strategy:** `docs/superpowers/specs/2026-05-14-testing-strategy.md` — defines per-PR test groupings (G5.x) referenced in each Task below.
+
 **Goal:** Reach feature parity on Windows. Most of the architecture from Phases 0–4 is already portable; this plan covers the genuinely Windows-specific bits — keychain via `wincred`, code signing, the installer format, and a regression sweep on Windows-native quirks.
 
 **Architecture:** The macOS path resolution (`resolveUserDataDir`) and process model are unchanged on Windows. What changes:
@@ -43,6 +45,12 @@
 
 ## Task 1: Windows path & process sanity
 
+**Test groupings:** G5.1 (userDataDir Windows fixtures — happy path, username with spaces, UNC path, missing APPDATA throws; uses path/win32 mode on macOS CI; also runs on actual Windows CI per G5.5).
+
+**PR boundaries:** 2 PRs.
+- PR 1: Step 1 — Extend `userDataDir` resolver coverage with Windows fixture tests using `path/win32` so they run green on macOS CI without changing runtime behavior; web app unaffected.
+- PR 2: Steps 2–4 — Add `win-x64` to `electrobun.config.ts` and any Windows-only main-bootstrap branches; bundler config change is inert on macOS builds and the manual review checkpoint is a gate, not a code change.
+
 **Files:**
 - Verify: `apps/desktop/main/platform/userDataDir.ts` (already handles win32 from Phase 2 Task 4)
 - Modify: `apps/desktop/electrobun.config.ts`
@@ -81,16 +89,41 @@ Expected: an `.exe` artifact under `apps/desktop/bundle/win-x64/`.
 
 If the build fails: triage as **Bun-on-Windows compatibility** vs **Electrobun-on-Windows compatibility**. The error message will indicate which. Both are project-specific risks per the spec.
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 4: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add apps/desktop/electrobun.config.ts
-git commit -m "feat(desktop): enable win-x64 build target"
-```
+  **Run (on a Windows host):**
+  ```powershell
+  pnpm --filter @avandar/desktop test
+  pnpm --filter @avandar/desktop build
+  ```
+  Expected: unit tests green (including the `win32` `userDataDir` test); a build artifact lands under `apps\desktop\bundle\win-x64\`.
+
+  **Verify:**
+  - `electrobun.config.ts` lists `win-x64` alongside the macOS targets and nothing else regressed.
+  - The Windows-style `userDataDir` test resolves to `%APPDATA%\Avandar\` and not a Unix-style path.
+  - No Unix-only assumptions slipped in (forward-slash literals, hardcoded `$HOME`, POSIX-only `path` usage in modified files).
+  - The Bun-on-Windows vs Electrobun-on-Windows compatibility risk from Step 3 is either green or has a written triage note describing the blocker.
+  - Test groupings G5.1 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test on a Windows machine:**
+  1. Launch the freshly built desktop app on Windows 11.
+  2. Log the resolved `userDataDir` (or read it from the diagnostics panel) and confirm it points at `%APPDATA%\Avandar\`.
+  3. Trigger the upload flow to create a file on disk; confirm the resulting path uses backslashes and lands inside `%APPDATA%\Avandar\`.
+  4. Re-run the same flow under a Windows user whose profile contains spaces (e.g. `C:\Users\First Last\AppData\Roaming\Avandar\`) and confirm everything still resolves correctly.
+
+  Expected: the app launches cleanly on Windows, writes to `%APPDATA%\Avandar\` with backslash paths, and tolerates usernames containing spaces.
+
+  **Greenlight criteria:** all checks above pass before moving to Task 2.
 
 ---
 
 ## Task 2: Windows Keychain via wincred (DPAPI)
+
+**Test groupings:** G5.2 (wincred Keychain integration — set/get/delete with non-ASCII payload; plaintext absent from stdout/stderr; gated by it.skipIf(process.platform !== 'win32')).
+
+**PR boundaries:** 2 PRs.
+- PR 1: Step 1 + pure-layer helpers — Refactor `Keychain.ts` to dispatch by `process.platform` and add a pure wincred helper (argv construction, command/output parsing) with unit tests; macOS path is unchanged and the win32 branch is reachable only on Windows.
+- PR 2: Steps 2–4 — Real wincred bindings (FFI or PowerShell fallback) plus the gated integration test using `it.skipIf(process.platform !== 'win32')`; manual review checkpoint is a gate, not a code change.
 
 **Files:**
 - Modify: `apps/desktop/main/services/Keychain.ts`
@@ -258,16 +291,42 @@ pnpm --filter @avandar/desktop test
 
 Expected: the smoke test (from Phase 2 Task 11 Step 2) passes the set/get/delete round-trip.
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 4: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add apps/desktop/main/services/Keychain*.ts
-git commit -m "feat(desktop): Windows keychain implementation (wincred via FFI or PS shellout)"
-```
+  **Run (on a Windows host):**
+  ```powershell
+  $env:KEYCHAIN_SMOKE = "1"
+  pnpm --filter @avandar/desktop test
+  ```
+  Expected: the Phase 2 keychain smoke test passes the set/get/delete round-trip on Windows.
+
+  **Verify:**
+  - `Keychain.ts` cleanly dispatches by `process.platform` with no dead `throw on non-darwin` branch left over.
+  - The Windows implementation (FFI or `cmdkey` + PowerShell fallback) returns the same value it stored, byte-for-byte (no UTF-16 truncation).
+  - After a `Keychain.set`, a `Credential Manager` entry of type "Generic Credential" exists under `com.avandarlabs.desktop/...` and the user account name matches.
+  - After a `Keychain.delete`, the entry is gone from Credential Manager.
+  - No plaintext secrets are logged by the FFI or PowerShell fallback path (scan stderr/stdout from the smoke test).
+  - Test groupings G5.2 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test on a Windows machine:**
+  1. Launch the desktop app on Windows 11 and sign in with a real Supabase account.
+  2. Quit the app fully (no background process), then relaunch — confirm the session is restored without re-entering credentials.
+  3. Open Control Panel -> User Accounts -> Credential Manager -> Windows Credentials and confirm an `Avandar` (or `com.avandarlabs.desktop/...`) entry is listed.
+  4. Sign out from inside the app, then refresh Credential Manager and confirm the entry is removed.
+
+  Expected: session persists across restarts, the credential is visible in Credential Manager while signed in, and is deleted on sign-out.
+
+  **Greenlight criteria:** all checks above pass before moving to Task 3.
 
 ---
 
 ## Task 3: Windows code signing
+
+**Test groupings:** G5.3 (signtool argv snapshot — /fd SHA256, /tr, /td SHA256 present — plus Windows CI sign-and-verify smoke against a fixture binary; covers both OV-style and EV-style cert paths).
+
+**PR boundaries:** 2 PRs.
+- PR 1: Steps 1–3 — Add `sign-win.ps1` + `build-and-sign-win.ps1` and the signtool argv snapshot test; scripts exist but no workflow invokes them yet, so existing CI is unaffected and snapshots run cross-platform.
+- PR 2: Steps 4–5 — Add a manual `workflow_dispatch` job that signs a fixture binary and runs `signtool verify /pa` to validate the script end-to-end; opt-in workflow only, no impact on default CI or macOS path.
 
 **Files:**
 - Create: `apps/desktop/scripts/sign-win.ps1`
@@ -363,16 +422,38 @@ Expected: signed `.exe` produced; running it on a different Windows machine show
 
 Note: SmartScreen reputation is separate from Authenticode signing. The first releases of an OV-signed `.exe` will still trigger SmartScreen ("Windows protected your PC — unrecognized app") for ~2 weeks, until enough installs have built reputation. This is unavoidable with OV; EV bypasses it from day one.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add apps/desktop/scripts/sign-win.ps1 apps/desktop/scripts/build-and-sign-win.ps1
-git commit -m "feat(desktop): Windows Authenticode signing pipeline"
-```
+  **Run (on a Windows host with the cert available):**
+  ```powershell
+  powershell -ExecutionPolicy Bypass -File apps\desktop\scripts\build-and-sign-win.ps1
+  signtool verify /pa /v .\apps\desktop\bundle\win-x64\Avandar.exe
+  ```
+  Expected: `signtool verify` reports `Successfully verified` and lists the expected publisher subject + a trusted timestamp.
+
+  **Verify:**
+  - `signtool sign` ran with `/fd SHA256`, a `/tr` timestamp URL, and `/td SHA256` (modern Authenticode requirements).
+  - The signed `.exe` shows a real publisher in its Properties -> Digital Signatures tab — not "Unknown publisher".
+  - `sign-win.ps1` and `build-and-sign-win.ps1` do not echo the cert password to stdout/log files; secrets only flow through environment variables.
+  - The signing script fails loudly (non-zero exit) if `signtool.exe` is missing or the cert/password is wrong, rather than silently producing an unsigned binary.
+  - Test groupings G5.3 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test on a Windows machine:**
+  1. Copy the signed `.exe` to a clean Windows 11 VM with no developer tools installed.
+  2. Double-click the installer; record the exact SmartScreen behavior (no prompt / "Windows protected your PC" with "More info" -> "Run anyway" / publisher shown). For an OV cert, expect friction until reputation accrues; for an EV cert, expect minimal-to-no friction.
+  3. Right-click the installed `Avandar.exe`, open Properties -> Digital Signatures, and confirm the signature is present, the timestamp is valid, and the publisher matches the cert subject.
+  4. Document the observed SmartScreen result (cert type, OS build, prompt text, click path) in the release notes for this build.
+
+  Expected: a verifiably signed `.exe` whose SmartScreen behavior matches the documented expectation for the chosen cert tier (OV or EV).
+
+  **Greenlight criteria:** all checks above pass before moving to Task 4.
 
 ---
 
 ## Task 4: Windows release CI workflow
+
+**PR boundaries:** 1 PR.
+- PR 1: Steps 1–3 — New workflow file + `publish-update-manifest.ts` platform generalization; workflow runs only on `workflow_dispatch` (and tag pushes if added later), so default branch CI and macOS release flow are untouched. The publish script change reads a new env var with a `mac` default, preserving existing macOS behavior.
 
 **Files:**
 - Create: `.github/workflows/desktop-release-win.yml`
@@ -458,16 +539,44 @@ const releaseKey = `${PLATFORM}/${CHANNEL}/Avandar-${PKG.version}.${ext}`;
 
 `findFirstWindowsExe()` recursively walks `apps/desktop/bundle/` for `*.exe` (the Electrobun layout may nest the exe under an arch folder).
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add .github/workflows/desktop-release-win.yml apps/desktop/scripts/publish-update-manifest.ts
-git commit -m "ci(desktop): Windows release workflow + multi-platform manifest publish"
-```
+  **Run (from a test branch, via the GitHub Actions UI or `gh`):**
+  ```bash
+  gh workflow run desktop-release-win.yml --ref <test-branch> -f publish-update=false
+  gh run watch
+  # After the run completes:
+  gh run download --name avandar-desktop-win
+  ```
+  Expected: the workflow finishes green on `windows-2022`; a signed `Avandar*.exe` artifact is downloadable.
+
+  **Verify:**
+  - The decoded `cert.pfx` step runs and the cleanup step removes it on `always()` so the cert never leaks into the uploaded artifact.
+  - `WINDOWS_CERT_PFX_BASE64`, `WINDOWS_CERT_PASSWORD`, `SUPABASE_URL`, and `SUPABASE_SERVICE_ROLE_KEY` are wired as repo secrets and never echoed in logs.
+  - `publish-update-manifest.ts` honors `AVA_PUBLISH_PLATFORM=win`, locates the `.exe` via the Windows discovery helper, and uploads to a `win/<channel>/...` key — not the macOS path.
+  - `signtool verify /pa` against the downloaded artifact still says `Successfully verified` (i.e. CI signing produced the same shape as local signing).
+
+  **Manual smoke test on a Windows machine:**
+  1. Trigger the workflow on a test branch with `publish-update=true` against a non-production update channel.
+  2. Download the produced `.exe`, run `signtool verify /pa Avandar*.exe`, and install it on a clean Windows VM.
+  3. In Supabase Storage, open `win/<channel>/manifest.json` and confirm it points at the just-uploaded `.exe` with the correct version, size, and checksum.
+  4. Launch an older Windows build pointed at that channel and confirm it picks up the new manifest entry and offers the update.
+
+  Expected: end-to-end Windows CI produces a signed artifact, publishes a correct `win/<channel>/manifest.json`, and an older client honors it.
+
+  **Greenlight criteria:** all checks above pass before moving to Task 5.
 
 ---
 
 ## Task 5: Windows regression sweep
+
+**Test groupings:** G5.4 (@windows-regression Playwright suite via WebView2 CDP — re-runs every prior phase's e2e specs against the built .exe; requires one-day spike first to verify Electrobun forwards WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS); G5.5 (Cross-platform vitest matrix green on windows-latest runners; Phase 5 exit gate).
+
+**PR boundaries:** Multi-PR depending on how the audit Steps split.
+- PR 1: Set up the `@windows-regression` Playwright tag + WebView2 CDP launch fixture + a single smoke test (the Phase 0 login flow on Windows); suite is opt-in via tag, so existing macOS Playwright runs are unaffected.
+- PR 2..N: Each prior phase's regression spec is its own PR (Phase 2 upload, Phase 3 sync, Phase 4 logger, etc.), tagged `@windows-regression` so it only runs on Windows CI; each PR keeps macOS/web behavior unchanged.
+- PR N+1: Add `windows-latest` to the existing vitest matrix and fix any tests that fail (e.g. add `it.skipIf` guards to macOS-only specs); this is the gate that fails Windows CI if uncovered drift exists, so it lands last.
+- Final PR: README updates (Step 4) — documentation only.
 
 **Files:** none new; manual testing matrix.
 
@@ -516,16 +625,45 @@ Append to `apps/desktop/README.md`:
 5. WebView2 runtime is required (preinstalled on Windows 11, bundled with the installer on Windows 10).
 ```
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Manual review checkpoint (do NOT commit)**
 
-```bash
-git add apps/desktop/README.md
-git commit -m "docs(desktop): Windows install notes + post-port checklist"
-```
+  **Run (on a Windows host, against the signed CI artifact from Task 4):**
+  ```powershell
+  signtool verify /pa Avandar.exe
+  cmdkey /list:com.avandarlabs.desktop/supabase-refresh-token
+  ```
+  Expected: signature verifies; the Credential Manager entry appears once the user has signed in.
+
+  **Verify — per-phase regression sweep on Windows (record pass/fail per row):**
+
+  | Phase | Smoke | Pass/Fail | Notes |
+  |---|---|---|---|
+  | 0 | Sign in with Supabase credentials; confirm session lands | | |
+  | 2 | Upload a CSV, run a DuckDB query against it, quit and relaunch, confirm data + workspace persist under `%APPDATA%\Avandar\` | | |
+  | 3 | Disconnect network, edit a workspace offline, generate a parquet upload, reconnect, watch the push loop drain to Supabase | | |
+  | 4 | Trigger an info+error log line and confirm it lands in the logger sink; submit a bug report and confirm it uploads; publish a newer build and confirm auto-update offers/installs it | | |
+  | 5 (Win-only) | Verify `%APPDATA%\Avandar\blobs\workspaces\...` layout, Credential Manager entry, WebView2 load, SmartScreen prompt behavior | | |
+
+  - Repeat the full sweep on **Windows 10** to confirm WebView2 bundling/bootstrap behaves correctly.
+  - Repeat the install step on a **clean Windows VM with no developer tools** to catch missing runtime DLLs.
+  - The README update lists the `%APPDATA%\Avandar\` data location, the WebView2 requirement, and the temporary SmartScreen prompt expectation.
+  - Test groupings G5.4, G5.5 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+
+  **Manual smoke test on a Windows machine:**
+  1. Install Avandar from the signed `.exe` on Windows 11, complete the full Phase 0/2/3/4 smoke matrix above, and record the per-phase table.
+  2. Repeat the install + matrix on Windows 10 (with and without preinstalled WebView2) and on a clean Windows VM.
+  3. Capture any Windows-specific quirks (path edge cases, antivirus interactions, WebView2 prompts) and add them to `apps/desktop/README.md`.
+
+  Expected: a fully populated per-phase pass/fail table where every row is Pass on both Windows 10 and Windows 11, plus a clean-VM install that succeeds without manual runtime fixes.
+
+  **Greenlight criteria:** the regression table is all-Pass on Windows before moving to Task 6.
 
 ---
 
 ## Task 6: Phase 5 acceptance checklist
+
+**PR boundaries:** No code-change boundaries — verification + spec annotation only.
+- All Steps are manual verification (CI status check, cross-platform sync round-trip, spec annotation, internal announcement); any incidental edits (e.g. spec/README updates in Steps 3–4) are documentation-only PRs that cannot regress web or desktop behavior.
 
 - [ ] **Step 1: Both CI workflows green**
 
@@ -537,14 +675,32 @@ Confirm:
 
 Install on macOS and Windows. Log in as the same user on both. Make edits on each; verify they converge.
 
-- [ ] **Step 3: Mark Phase 5 complete in the spec**
+- [ ] **Step 3: Manual review checkpoint (do NOT commit)**
 
-Update `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md` Phase 5 line.
+  Update `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md` Phase 5 line in place — annotate it with the completion date (today) and a pointer to this plan.
 
-```bash
-git add docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md
-git commit -m "docs(spec): mark phase 5 complete; V1 desktop ship"
-```
+  **Run (on a Windows host, as the final pre-ship gate):**
+  ```powershell
+  signtool verify /pa Avandar.exe
+  pnpm --filter @avandar/desktop test
+  ```
+  Expected: signature still verifies; tests stay green.
+
+  **Verify:**
+  - The Phase 5 line in the spec is annotated `complete YYYY-MM-DD` (matching the date the Task 5 regression sweep passed).
+  - The Task 5 per-phase pass/fail table is all-Pass on both Windows 10 and Windows 11 — no rows left blank or marked Fail.
+  - Both CI workflows (`Desktop Release (macOS)` and `Desktop Release (Windows)`) are green on the same commit that will be tagged for V1.
+  - The cross-platform sync round-trip from Step 2 converged with no manual reconciliation.
+  - Outstanding Windows-specific quirks are captured in `apps/desktop/README.md` (and/or a tracked issue), not left as undocumented tribal knowledge.
+
+  **Manual confirmation on a Windows machine:**
+  1. Re-run a 5-minute end-to-end smoke (install -> sign in -> upload -> offline edit -> reconnect -> auto-update offered) on the exact signed build that will ship.
+  2. Confirm the build artifact, its checksum, and the published `win/<channel>/manifest.json` entry all match.
+  3. State explicitly in this checkpoint's notes that the Windows launch is shippable.
+
+  Expected: the Windows port is at feature parity with the macOS V1 build, the spec reflects that, and shipping is a one-tag operation.
+
+  **Greenlight criteria:** all checks above pass before moving to Step 4 (internal announcement).
 
 - [ ] **Step 4: Announce internally**
 
