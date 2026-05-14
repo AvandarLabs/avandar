@@ -175,9 +175,10 @@ If `pnpm install` fails because `electrobun@latest` doesn't resolve, check Elect
   **Run:**
   ```bash
   pnpm install
-  pnpm --filter @avandar/desktop type-check
   ```
-  Expected: `pnpm install` completes without errors and reports `apps/desktop` as a workspace package; `type-check` exits 0 with no diagnostics.
+  Expected: `pnpm install` completes without errors and reports `apps/desktop` as a workspace package.
+
+  > **Note — type-check is deferred:** Do NOT run `pnpm --filter @avandar/desktop type-check` here. The tsconfig `include` glob references `main/**/*`, `preload/**/*`, and `electrobun.config.ts`, none of which exist yet (they're created in Tasks 2 and 3). Running `tsc --noEmit` at this point fails with `TS18003: No inputs were found in config file`. Type-check is verified at Task 3 Step 5, once those source files exist.
 
   **Verify:**
   - `apps/desktop/package.json` exists with name `@avandar/desktop`, the four scripts (`dev`, `build`, `test`, `type-check`), `electrobun` in dependencies, and `vitest` + `typescript` in devDependencies.

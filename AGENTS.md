@@ -31,7 +31,8 @@ Implement functionality using red/green TDD.
 
 ## General Code Style & Formatting
 
-- Use block comments or docstrings to document public classes and methods.
+- Use block comments or docstrings to document exported or public interfaces,
+  constants, objects, functions, and classes.
 
 ## Naming conventions
 
