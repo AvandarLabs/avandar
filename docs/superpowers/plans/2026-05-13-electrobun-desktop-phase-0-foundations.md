@@ -3,6 +3,8 @@
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 >
 > **Per-step test handoff:** After completing every Step in this plan, output an enumerated list (`1.`, `2.`, `3.`, …) of the exact actions the human partner should take to verify the just-completed Step — commands to run (copy-pasteable), files or UI to inspect, and the expected result for each. Do this for every Step, including "trivial" config/file-creation steps; never skip or summarize. The list is in addition to (not a replacement for) the Manual review checkpoint at the end of each Task.
+>
+> **PR rule:** Every Task ships as exactly **one PR**. Steps are progress markers *within* a Task, not independent PR boundaries — never split a Task across multiple PRs, and never bundle two Tasks into one PR. When a per-Task `**PR boundaries:**` note below mentions multiple PRs (carried over from an earlier revision), treat that as a signal the Task should be **decomposed into multiple smaller Tasks**, not shipped as multi-PR work.
 
 **Spec:** `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md`
 **Testing strategy:** `docs/superpowers/specs/2026-05-14-testing-strategy.md` — defines per-PR test groupings (G0.x) referenced in each Task below.
@@ -46,7 +48,7 @@
 
 ## Task 1: Scaffold the `apps/desktop/` workspace package
 
-**PR boundaries:** 1 PR. All Steps create new files in a new workspace package that is not yet imported by any user-facing code, so each Step is technically safe as its own PR. Each Step is technically safe as its own PR but practically grouped because no Step delivers user-observable value alone — split only if review bandwidth requires it.
+**PR boundaries:** 1 PR. All Steps create new files in a new workspace package that is not yet imported by any user-facing code; the whole Task ships together as a single mergeable unit.
 
 **Files:**
 - Create: `apps/desktop/package.json`
@@ -321,7 +323,9 @@ Expected: 3 tests pass.
 
 **Test groupings:** G0.2 (Env reader — requires extracting `readDesktopEnv()` from `main/index.ts` and unit-testing AVA_DESKTOP_MODE default, invalid-value throws, AVA_VITE_DEV_URL default).
 
-**PR boundaries:** 1 PR. Each file (electrobun config, preload, main entry) is a fragment of one runnable unit; none is independently useful and `main/index.ts` would fail type-check without the others. Each Step is technically safe as its own PR but practically grouped because no Step delivers user-observable value alone — split only if review bandwidth requires it.
+**PR boundaries:** 1 PR. Each file (electrobun config, preload, main entry) is a fragment of one runnable unit; none is independently useful and `main/index.ts` would fail type-check without the others. The whole Task ships together as a single mergeable unit.
+
+> **API note — Electrobun 1.18.1:** This Task was originally authored against guessed Electrobun API names. It was patched on 2026-05-14 against the actual `apps/desktop/node_modules/electrobun@1.18.1` API surface (`BrowserWindow` class, `app` / `PATHS` named exports, `build.bun` / `build.views` / `build.copy` / `build.targets` config shape, automatic `runtime.exitOnLastWindowClosed` quit). When upgrading Electrobun, re-verify this Task's snippets against the new package before re-running.
 
 **Files:**
 - Create: `apps/desktop/main/index.ts`
@@ -342,30 +346,40 @@ const config: ElectrobunConfig = {
     version: "0.0.0",
   },
   build: {
-    main: {
-      entry: "main/index.ts",
-      out: "build/main",
+    // Bun main process — bundled with target=bun, output to <build>/bun/index.js
+    bun: {
+      entrypoint: "main/index.ts",
     },
-    preload: {
-      entry: "preload/index.ts",
-      out: "build/preload",
+    // Browser-side bundles. Preload is just a browser bundle that BrowserWindow
+    // loads before any page script. Output: <build>/views/preload/index.js
+    views: {
+      preload: {
+        entrypoint: "preload/index.ts",
+      },
     },
-    web: {
-      // points at the repo-root Vite build output
-      source: "../../dist",
-      out: "build/web",
+    // Copy the Vite build output (repo-root `dist/`) into the app bundle's
+    // Resources folder so the webview can load index.html via file:// in
+    // production. Source paths are resolved relative to apps/desktop/.
+    copy: {
+      "../../dist": "Resources/web",
     },
-    bundle: {
-      out: "bundle",
-      platforms: ["mac-arm64", "mac-x64"],
-    },
+    buildFolder: "build",
+    artifactFolder: "bundle",
+    // Comma-separated build targets. Use "macos-arm64" alone if cross-compiling
+    // for Intel is unnecessary on the dev machine.
+    targets: "macos-arm64,macos-x64",
+  },
+  runtime: {
+    // Library default is true; declare explicitly so the intent is reviewable.
+    // When the last BrowserWindow closes, Electrobun terminates the Bun process.
+    exitOnLastWindowClosed: true,
   },
 };
 
 export default config;
 ```
 
-Note: if the Electrobun config schema differs from what's shown (alpha software — APIs evolve), consult `node_modules/electrobun` for the actual exported type and adjust field names accordingly. Keep the *intent* the same: declare the main entry, preload entry, web-source directory, and target platforms.
+Note: `build.views[viewName].entrypoint` is bundled with Bun targeting `browser`; the output filename inherits from the entrypoint (`preload/index.ts` → `views/preload/index.js`). The preload field on a `BrowserWindow` accepts a filesystem path resolved at runtime — Step 3 documents how `main/index.ts` derives it.
 
 - [ ] **Step 2: Create the preload script**
 
@@ -388,7 +402,8 @@ declare global {
 Create `apps/desktop/main/index.ts`:
 
 ```ts
-import { Electrobun } from "electrobun";
+import { app, BrowserWindow, PATHS } from "electrobun";
+import { join } from "node:path";
 import { resolveWebviewUrl } from "./config/url.ts";
 
 const mode = (process.env.AVA_DESKTOP_MODE ?? "development") as
@@ -397,35 +412,51 @@ const mode = (process.env.AVA_DESKTOP_MODE ?? "development") as
 
 const viteDevUrl = process.env.AVA_VITE_DEV_URL ?? "http://localhost:5173";
 
+// In production the packaged web app lives at <appBundle>/Resources/web/index.html.
+// PATHS.RESOURCES_FOLDER is computed relative to the running Bun process's cwd,
+// which Electrobun sets to <appBundle>/Contents/MacOS at launch.
 const bundledIndexPath =
   process.env.AVA_BUNDLED_INDEX_PATH ??
-  // resolved at runtime in production by Electrobun's resource path helper
-  Electrobun.resources.path("web/index.html");
+  join(PATHS.RESOURCES_FOLDER, "web", "index.html");
 
 const url = resolveWebviewUrl({ mode, viteDevUrl, bundledIndexPath });
 
-const window = Electrobun.windows.create({
+// AVA_PRELOAD_PATH is set automatically by Electrobun in packaged builds.
+// During `bun run` dev smoke-tests it can be left unset (preload disabled) or
+// pointed at the built preload JS once Step 4 of the smoke test confirms the
+// expected location. See Step 4 for the empirical preload-path discovery flow.
+const preload = process.env.AVA_PRELOAD_PATH ?? null;
+
+new BrowserWindow({
   title: "Avandar",
   url,
-  width: 1280,
-  height: 800,
-  preload: "preload/index.js",
-});
-
-window.on("closed", () => {
-  Electrobun.app.quit();
+  frame: { x: 0, y: 0, width: 1280, height: 800 },
+  preload,
 });
 
 console.log(`[avandar-desktop] webview loaded ${url}`);
+
+// Note: we intentionally do not register a `closed` handler here.
+// `runtime.exitOnLastWindowClosed` (set in electrobun.config.ts and defaulted to
+// true by the library) causes Electrobun to call Utils.quit() automatically when
+// the last BrowserWindow closes. The `app.quit()` named export is available if
+// you ever need to terminate from a different event (menu item, IPC, etc.).
+//
+// `app` is imported above for that future use and to keep the import surface
+// stable; TypeScript will flag it as unused for now — accept that or wrap in a
+// `void app;` line if your lint config rejects unused imports.
+void app;
 ```
 
-If Electrobun's actual API for window creation differs, port the same logic to the real method names (`Electrobun.BrowserWindow`, `Electrobun.app.createWindow`, etc.). The four invariants:
+The four invariants this code must preserve through any future API rework:
 1. Read `mode` from `AVA_DESKTOP_MODE`.
 2. Resolve URL via `resolveWebviewUrl`.
-3. Open one window pointing at that URL with the preload attached.
-4. Quit the app when the window closes.
+3. Open one window pointing at that URL with the preload attached when a path is available.
+4. Quit the app when the last window closes (here delegated to the library).
 
-- [ ] **Step 4: Smoke-run main against a running Vite server**
+- [ ] **Step 4: Smoke-run the desktop shell against a running Vite server**
+
+> **Empirical correction (2026-05-14):** Running `bun run apps/desktop/main/index.ts` directly **does not work** with Electrobun 1.18.1. The bare Bun process never initializes the native FFI bridge that `BrowserWindow` requires, and the constructor crashes with `TypeError: null is not an object (evaluating 'bridge.requestHost')` at `BrowserWindow.ts:180`. The supported entry point is the `electrobun dev` CLI, which (a) bundles the Bun main / preload / web copy, (b) builds the `<channel>-<arch>/<App>-<channel>.app` artifact, (c) launches the `.app` whose macOS-side native launcher dlopens `libNativeWrapper.dylib`, sets up FFI, and *then* spawns the Bun main. The desktop package's `dev` script must therefore invoke `electrobun dev`, not `bun run`.
 
 In one terminal, from repo root:
 
@@ -438,19 +469,23 @@ Wait for `Local: http://localhost:5173/` to appear.
 In a second terminal:
 
 ```bash
-AVA_DESKTOP_MODE=development AVA_VITE_DEV_URL=http://localhost:5173 bun run apps/desktop/main/index.ts
+pnpm dev:desktop
 ```
+
+`pnpm dev:desktop` runs `scripts/devDesktop.sh`, which detects that Vite is already serving on `:5173` and skips re-spawning `pnpm dev` (reuses the existing dev environment). With no `pnpm dev` running, the same script starts both the dev environment and the desktop shell concurrently — closing the window tears both down via `concurrently -k`.
 
 Expected:
 - A native macOS window opens displaying the Avandar web app.
 - Console prints `[avandar-desktop] webview loaded http://localhost:5173`.
 - The login screen renders.
-- Closing the window terminates the Bun process.
+- Closing the window terminates the spawned processes.
 
 If this fails: capture the exact error and fix it before proceeding. Common issues:
-- Electrobun's API names differ from the example — port to the real names.
-- The webview can't reach `localhost:5173` — check macOS local network permissions for Bun.
+- The webview can't reach `localhost:5173` — check macOS local network permissions for the Electrobun launcher binary.
 - WebView2 isn't installed (irrelevant on macOS but flag for the Windows port).
+- `electrobun dev` errors with "Core dependencies not found for macos-arm64" — Electrobun is fetching CEF/launcher binaries on first run; allow network and retry.
+
+**Preload behavior (current state):** `main/index.ts` defaults `preload` to `join(PATHS.RESOURCES_FOLDER, "app", "views", "preload", "index.js")` — the path Electrobun's build emits inside the `.app`. With the window open, evaluate `window.__AVA_PLATFORM__` in the webview devtools. If it returns `"desktop"`, preload is wired. If it returns `undefined`, override with `AVA_PRELOAD_PATH=<absolute-path-to-built-preload-index.js> pnpm dev:desktop` and record the working value in `apps/desktop/README.md`.
 
 - [ ] **Step 5: Manual review checkpoint (do NOT commit)**
 
@@ -458,21 +493,21 @@ If this fails: capture the exact error and fix it before proceeding. Common issu
   ```bash
   pnpm --filter @avandar/desktop type-check
   ```
-  Expected: exits 0 with no diagnostics. The new `main/index.ts`, `preload/index.ts`, and `electrobun.config.ts` should all type-check cleanly against Electrobun's actual exported types.
+  Expected: exits 0 with no diagnostics. The new `main/index.ts`, `preload/index.ts`, and `electrobun.config.ts` should all type-check cleanly against `electrobun@1.18.1`'s actual exported types (`ElectrobunConfig`, `BrowserWindow`, `app`, `PATHS`).
 
   **Verify:**
-  - `apps/desktop/electrobun.config.ts` declares the four build sections (`main`, `preload`, `web`, `bundle`) and uses `../../dist` as the web source so Electrobun reads the repo-root Vite build output.
+  - `apps/desktop/electrobun.config.ts` declares `build.bun.entrypoint`, `build.views.preload.entrypoint`, `build.copy["../../dist"] === "Resources/web"`, `build.targets` listing the macOS arches, and `runtime.exitOnLastWindowClosed === true`.
   - `apps/desktop/preload/index.ts` sets `window.__AVA_PLATFORM__ = "desktop"` and declares the global on `Window`.
-  - `apps/desktop/main/index.ts` reads `AVA_DESKTOP_MODE` / `AVA_VITE_DEV_URL` / `AVA_BUNDLED_INDEX_PATH`, calls `resolveWebviewUrl`, opens one window, and quits the app on `closed`.
+  - `apps/desktop/main/index.ts` imports `app`, `BrowserWindow`, `PATHS` as named exports from `"electrobun"`; reads `AVA_DESKTOP_MODE` / `AVA_VITE_DEV_URL` / `AVA_BUNDLED_INDEX_PATH` / `AVA_PRELOAD_PATH`; calls `resolveWebviewUrl`; constructs one `BrowserWindow` with a `frame` object; and does *not* register an explicit `closed` handler (relies on `runtime.exitOnLastWindowClosed`).
   - Test groupings G0.2 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
 
   **Manual smoke test:**
   1. Terminal A, from the repo root: `pnpm dev`. Wait for `Local: http://localhost:5173/`.
   2. Terminal B, from the repo root: `AVA_DESKTOP_MODE=development AVA_VITE_DEV_URL=http://localhost:5173 bun run apps/desktop/main/index.ts`.
-  3. Open the webview devtools (via the Electrobun-exposed shortcut or a temporary `Electrobun.app.openDevtools()` call) and run `window.__AVA_PLATFORM__` in the console.
+  3. Open the webview devtools (via the Electrobun-exposed shortcut) and run `window.__AVA_PLATFORM__` in the console. If `undefined`, follow the preload-path discovery flow in Step 4 and re-run with `AVA_PRELOAD_PATH=…` set.
   4. Close the native window.
 
-  Expected: a native macOS window opens showing the Avandar login screen; terminal B prints `[avandar-desktop] webview loaded http://localhost:5173`; the devtools console returns `"desktop"`; closing the window terminates the Bun process in terminal B.
+  Expected: a native macOS window opens showing the Avandar login screen; terminal B prints `[avandar-desktop] webview loaded http://localhost:5173`; the devtools console returns `"desktop"` once `AVA_PRELOAD_PATH` is set; closing the window terminates the Bun process in terminal B because `runtime.exitOnLastWindowClosed` is true.
 
   **Greenlight criteria:** all checks above pass before moving to Task 4. If anything fails, stop and report back with the exact output.
 
