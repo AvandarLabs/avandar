@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveWebviewUrl } from "./url.ts";
+import { resolveWebviewUrl } from "./url";
 
 describe("resolveWebviewUrl", () => {
   it("returns the Vite dev URL in development", () => {
@@ -15,18 +15,21 @@ describe("resolveWebviewUrl", () => {
     const url = resolveWebviewUrl({
       mode: "production",
       viteDevUrl: "http://localhost:5173",
-      bundledIndexPath: "/Applications/Avandar.app/Contents/Resources/web/index.html",
+      bundledIndexPath:
+        "/Applications/Avandar.app/Contents/Resources/web/index.html",
     });
-    expect(url).toBe("file:///Applications/Avandar.app/Contents/Resources/web/index.html");
+    expect(url).toBe(
+      "file:///Applications/Avandar.app/Contents/Resources/web/index.html",
+    );
   });
 
   it("throws when production mode is missing the bundled index path", () => {
-    expect(() =>
-      resolveWebviewUrl({
+    expect(() => {
+      return resolveWebviewUrl({
         mode: "production",
         viteDevUrl: "http://localhost:5173",
         bundledIndexPath: "",
-      }),
-    ).toThrow(/bundledIndexPath required in production/);
+      });
+    }).toThrow(/bundledIndexPath required in production/);
   });
 });

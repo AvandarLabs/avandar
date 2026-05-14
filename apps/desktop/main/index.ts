@@ -1,6 +1,6 @@
-import { app, BrowserWindow, PATHS } from "electrobun";
 import { join } from "node:path";
-import { resolveWebviewUrl } from "./config/url.ts";
+import { app, BrowserWindow, PATHS } from "electrobun";
+import { resolveWebviewUrl } from "./config/url";
 
 const mode = (process.env.AVA_DESKTOP_MODE ?? "development") as
   | "development"
