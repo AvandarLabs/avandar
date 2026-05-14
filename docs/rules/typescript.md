@@ -356,7 +356,13 @@
 - Use Zod for validation
 - In React, use our internal `useQuery` and `useMutation` wrappers of Tanstack Query.
 
-## React-query
+## Icons
+
+- Use `@tabler/icons-react`
+
+## Library-specific usage
+
+### React-query
 
 - Use our `useQuery` and `useMutation` wrappers from `@hooks` instead
   of importing from `@tanstack/react-query`
@@ -364,7 +370,7 @@
   function and set necessary `onSuccess` and `onError` handlers at the hook level.
   Do not call `mutateFunc.async()` unless strictly necessary, which is rare.
 
-## Mantine
+### Mantine
 
 - Before using any Mantine component, check if we we have a wrapper in
   `src/lib/ui` or `packages/web/ui` that you can use instead.
@@ -373,6 +379,9 @@
 - When using `useForm`, always set a `key={form.key('fieldId')}` prop
   to each input component even if they are not in an array.
 
-## Icons
+### Supabase-js
 
-- Use `@tabler/icons-react`
+- Use `.throwOnError()` whenever possible instead of relying on destructuring
+  the `{ error }` and then checking it in an `if`.
+- Parameters that accept a Supabase admin client should always be named
+  `supabaseAdminClient` instead of just `admin` or `adminClient`.
