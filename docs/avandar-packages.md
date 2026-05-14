@@ -1,4 +1,4 @@
-# Packages
+# Avandar Packages
 
 Reference for every workspace package under `packages/`. Each entry lists
 the package name, location, intended runtime, what it provides, and a
