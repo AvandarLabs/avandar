@@ -53,7 +53,11 @@ function _membershipSelectChain(result: {
     return builder;
   });
   builder.maybeSingle = vi.fn(() => {
-    return Promise.resolve(result);
+    return {
+      throwOnError: vi.fn(() => {
+        return Promise.resolve(result);
+      }),
+    };
   });
   return builder;
 }

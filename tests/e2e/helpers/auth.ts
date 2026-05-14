@@ -19,7 +19,7 @@ export async function signInWithEmailPassword(
 ): Promise<void> {
   await page.goto("/signin");
   await page.getByLabel("Email").fill(options.email);
-  await page.getByLabel("Password").fill(options.password);
+  await page.getByRole("textbox", { name: "Password" }).fill(options.password);
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page).not.toHaveURL(/\/signin/, { timeout: LONG_WAIT });
 

@@ -251,6 +251,14 @@ export default [
     },
   },
   {
+    // Playwright requires object destructuring on the first fixture argument;
+    // `{}` is valid but triggers `no-empty-pattern` without this override.
+    files: ["tests/e2e/**/*.fixture.ts"],
+    rules: {
+      "no-empty-pattern": "off",
+    },
+  },
+  {
     ignores: ["shared/types/database.types.ts"],
   },
 ];

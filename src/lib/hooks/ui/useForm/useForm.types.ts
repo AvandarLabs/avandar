@@ -32,10 +32,7 @@ export type FormType<
   FormPath extends Paths<FormValues> = Paths<FormValues>,
 > = Simplify<
   Omit<
-    MantineUseFormReturnType<
-      FormValues,
-      (values: FormValues) => TransformedValues
-    >,
+    MantineUseFormReturnType<FormValues, TransformedValues>,
     | "values"
     | "key"
     | "setFieldValue"

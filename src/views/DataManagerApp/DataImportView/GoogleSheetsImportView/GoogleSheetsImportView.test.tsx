@@ -70,8 +70,10 @@ const {
   };
 });
 
-vi.mock("@ui", () => {
+vi.mock("@ui", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@ui")>();
   return {
+    ...actual,
     notifySuccess: notifySuccessMock,
     notifyError: vi.fn(),
     notifyWarning: vi.fn(),

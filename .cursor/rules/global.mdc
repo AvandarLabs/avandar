@@ -22,7 +22,7 @@ Libraries:
 
 - Bundler: Vite v7
 - Frontend framework: React v19
-- UI library: Mantine v8
+- UI library: Mantine v9
 - Router: Tanstack Router v1
 - Querying: Tanstack Query v5
 - Schema validation: Zod v4
