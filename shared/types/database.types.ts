@@ -1668,6 +1668,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      util__auth_user_may_select_dashboard: {
+        Args: { p_dashboard_id: string }
+        Returns: boolean
+      }
+      util__auth_user_may_select_dataset: {
+        Args: { p_dataset_id: string }
+        Returns: boolean
+      }
       util__auth_user_meets_min_app_role: {
         Args: {
           p_app: Database["public"]["Enums"]["app_type"]
