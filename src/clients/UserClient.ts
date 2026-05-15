@@ -3,14 +3,15 @@ import { withQueryHooks, WithQueryHooks } from "@hooks";
 import { withLogger } from "@logger";
 import { camelCaseKeysShallow, makeObject, omit } from "@utils";
 import { WorkspaceId } from "$/models/Workspace/Workspace.types";
-import { Database, Tables } from "$/types/database.types";
+import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
+import { Tables } from "$/types/database.types";
 import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
-import type { ServiceClient, WithSupabaseClient } from "@clients";
+import type { ServiceClient } from "@clients";
+import type { WithSupabaseClient } from "@clients/mixins/withSupabaseClient";
 import type { ILogger, WithLogger } from "@logger";
-import type { SupabaseClient } from "@supabase/supabase-js";
-import type { UserAppRolesRecord } from "$/models/Permissions/Permissions.types";
+import type { UserAppRolesMatrix } from "$/models/Permissions/Permissions.types";
 import type { UserId } from "$/models/User/User.types";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type {
@@ -30,7 +31,7 @@ type TUserClient = WithSupabaseClient<
         getUserAppRoles: (params: {
           workspaceId: WorkspaceId;
           userId: UserId | undefined;
-        }) => Promise<UserAppRolesRecord>;
+        }) => Promise<UserAppRolesMatrix>;
       },
       "getProfile" | "getUserAppRoles",
       never
@@ -39,7 +40,7 @@ type TUserClient = WithSupabaseClient<
 >;
 
 type TUserClientOptions = {
-  dbClient?: SupabaseClient<Database>;
+  dbClient?: AvaSupabaseDBClient;
 };
 
 export const UserProfileDBReadToModelReadSchema: z.ZodType<
@@ -135,7 +136,7 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
         }: {
           workspaceId: WorkspaceId;
           userId: UserId | undefined;
-        }): Promise<UserAppRolesRecord> => {
+        }): Promise<UserAppRolesMatrix> => {
           const logger = baseLogger.appendName("getUserAppRoles");
           logger.log("Calling `getUserAppRoles`", { workspaceId, userId });
           if (userId === undefined) {
@@ -182,9 +183,9 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
     );
   });
 
-  return withSupabaseClient(client, (newDBClient: SupabaseClient<Database>) => {
-    return createUserClient({ ...options, dbClient: newDBClient });
-  });
+  return client.mixin(withSupabaseClient(dbClient)) as unknown as TUserClient;
 }
 
-export const UserClient = createUserClient();
+export const UserClient = createUserClient({
+  dbClient: AvaSupabase.DB,
+});

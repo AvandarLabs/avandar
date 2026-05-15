@@ -14,10 +14,14 @@ export type { UpsertOptions } from "@clients/ModelCRUDClient/ModelCRUDClient.typ
 
 // Supabase client
 export { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupabaseCRUDClient.ts";
-export { withSupabaseClient } from "@clients/SupabaseCRUDClient/withSupabaseClient.ts";
 export type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
-export type { WithSupabaseClient } from "@clients/SupabaseCRUDClient/withSupabaseClient.ts";
 
 // Parser registry
 export { makeParserRegistry } from "@clients/makeParserRegistry.ts";
 export type { ModelCRUDParserRegistry } from "@clients/makeParserRegistry.ts";
+
+// Mixins
+export { withSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
+
+// Mixin types
+export type { WithSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";

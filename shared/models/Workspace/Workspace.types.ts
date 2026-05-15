@@ -2,7 +2,6 @@ import type { UUID } from "@utils/types/common.types.ts";
 import type { Subscription } from "$/models/Subscription/Subscription.ts";
 import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
-import type { Tables } from "$/types/database.types.ts";
 import type { SetOptional } from "type-fest";
 
 export type WorkspaceId = UUID<"Workspace">;
@@ -52,5 +51,3 @@ export type WorkspaceModel = SupabaseCRUDModelSpec<
 export type WorkspaceWithSubscription = WorkspaceRead & {
   subscription: Subscription.T | undefined;
 };
-
-export type WorkspaceInvite = Tables<"workspace_invites">;

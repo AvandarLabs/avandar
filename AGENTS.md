@@ -2,13 +2,11 @@
 
 ## Documentation
 
-- Refer to `package.json` for the most recent library versions
-- Refer to the root `README.md` for the repo description and other conventions.
-- Use `reference/` for architectural notes, design decisions, and checklists
-  (for example `reference/<topic>.md`).
-- Granular workspace permissions: `reference/permissions-architecture.md`.
-- Use Context7 MCP to reference the most up-to-date documentation of any
-  library when you need it.
+- Use `docs/` for architectural notes, design decisions, and checklists
+  (for example `docs/<topic>.md`).
+- Granular workspace permissions: `docs/permissions-architecture.md`.
+- If Context7 MCP is configured, use it to reference the most up-to-date
+  documentation of any library when you need it.
 
 ## Scope
 
@@ -20,98 +18,73 @@
   that were outside of the requested scope of files. Include a 1-sentence
   explanation for each file about what changed.
 
-## Architecture
+## Implementation approaches
 
-- Follow the repository pattern
+Before writing code:
+
+- Determine which files in `docs/` are relevant to read.
+- Determine which available skills are relevant.
+- Determine which tests, if any, need to be written to test the requested
+  functionality.
+
+Implement functionality using red/green TDD.
+
+## General Code Style & Formatting
+
+- Use block comments or docstrings to document exported or public interfaces,
+  constants, objects, functions, and classes.
+
+## Naming conventions
+
+- Follow naming conventions for the language you are using.
+- Use descriptive variable names with auxiliary verbs (e.g., isLoading,
+  hasError).
+- Avoid abbreviated names, such as `val`, use the full word `value`, unless
+  this were to cause a naming collision with another variable in scope.
+- Avoid vague names like `next`, `prev`, or `n`, that don't say what the
+  variable actually actually holds. Always include a noun, such as `nextPage`,
+  `prevRow` or `numPeople`.
+
+## Functions & Logic
+
+- Keep functions short (<= 40 lines).
+- Extract logic into utility functions if:
+  - The function will be too long otherwise
+  - The logic will be reused
+
+## TypeScript
+
+[See our TypeScript rules](docs/rules/typescript.md)
 
 ## SQL
 
-### Row level security (RLS)
+[See our SQL rules](docs/rules/sql.md)
 
-The browser ships the **Supabase publishable (anon) key**; with a user JWT,
-anyone can call the PostgREST API using crafted JSON, filters, and verbs.
-**RLS is the real authorization layer**: policies must tie every sensitive
-column to the **workspace id on the row** (or a join that resolves to it),
-helper functions must take that same id as an argument derived from the row
-expression (for example
-`util__can_manage_workspace_settings (public.user_roles.workspace_id)`), and
-`WITH CHECK` on `UPDATE` must constrain new values the same way. Never rely on
-the client to send the "correct" workspace id without binding it to the tuple
-PostgREST is mutating.
+## Supabase
 
-## Code style
+- To update the schema or data models, use the `supabase-declarative-schema` skill.
 
-- Follow existing conventions and styles.
+## Styling & UI
 
-## React
-
-- Only one React component per file.
-- Split up components into logical sub-components. Avoid monolithic components.
-- Use either our internal UI library in `src/lib/ui` or Mantine components.
-  Do not build new core UI elements from scratch unless specifically asked to.
-
-## CSS styling
-
-When styling components, use the following approaches, in the priority given.
-Only use a lower priority approach when the higher priority methods does not
-have the flexibility you need.
-
-1. Use Mantine's style prop shorthands (e.g. `c`, `mt`, `pd`, `bg`, `bd`, `bdrs`,
-   . etc.) as much as possible.
-   - This also applies to responsive designs. We use Mantine's breakpoints and
-     `hiddenFrom` and `visibleFrom` props when necessary.
-     Only use Tailwind when something cannot be styled using Mantine directly.
-2. Use Mantine's `classNames` prop with Tailwind classes. Use Context7 to look
-   up the component's selectors for the `classNames` object. Use the `clsx`
-   for conditional classes.
-3. Use Tailwind classes directly in a `className` prop. Use the `clsx` library
-   for conditional classes.
-4. Use `.css` modules and import the CSS into the component.
-5. Use the `style` or `styles` prop with an object or a function (whose argument
-   is the Mantine theme object) that returns an object. Only use this when we
-   need to dynamically compute styles.
+- Ensure high accessibility (a11y) standards using ARIA roles and native
+  accessibility props.
+- Use Mantine themes tokens and style prop shorthands (e.g. `c`, `mt`, `pd`,
+  `bg`, etc.)
+  - Use CSS Modules instead of inline `style={}` or `styles={}` props.
+  - Only use inline styles if we need to dynamically compute styles.
+- Use `clsx` for conditional classes
+- Never use TailwindCSS. We are trying to deprecate it.
 
 ## Files to ignore
 
 - Any files of the form `*.gen.*` are autogenerated and should never be manually
   edited.
 
-## Browser navigation
+## End-to-end tests
 
-- If you are asked to navigate the app in the browser to write tests or verify
-  functionality, use the credentials in `tests/e2e/setup/e2e-credentials.ts`
-  (`test-user@avandarlabs.com` / `test-user2@avandarlabs.com`). The localhost URL
-  is <http://localhost:5173>.
-
-## Testing
-
-### End-to-end tests
-
-E2E runs against a real local app and Supabase instance that may already hold
-data from local development. When a test mutates the database (roles,
-memberships, workspace fields, seeded users, etc.), it must restore prior state
-in `finally`, `afterEach`, or dedicated fixtures. Prefer deleting or reverting
-only rows that test inserted or changed (track ids or booleans) instead of
-broad resets that could harm unrelated developer data.
-
-## Modes
-
-If the instruction specifies a mode type then also follow these specific
-instructions.
-
-### UI-only mode
-
-- Do not implement any business logic.
-- **ONLY** implement the UI
-- Create placeholder functions for where business logic should go, but do not
-  implement them.
-- If `notifyDevAlert` exists in this codebase, use that as your placeholder
-  implementation for business logic. Otherwise, just use `console.log`.
-
-### TDD mode
-
-- Only implement tests.
-- It is okay if none of the tests pass.
-- Make sure that any failures aren't due to bugs in the tests themselves.
-- Output a list of tests you created with a succinct description of each,
-  max 1 sentence.
+- When a test mutates the database (roles, memberships, workspace fields,
+  seeded users, etc.), it must restore prior state in `finally`, `afterEach`,
+  or dedicated fixtures.
+- Prefer deleting or reverting only rows that test inserted or changed
+  (track ids or booleans) instead of broad resets that could harm unrelated
+  developer data.

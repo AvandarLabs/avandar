@@ -1,11 +1,21 @@
+import { buildInitialCustomRoleGroupName } from "$/models/Permissions/PermissionsModule/buildInitialCustomRoleGroupName/buildInitialCustomRoleGroupName.ts";
+import {
+  BUILTIN_ROLE_GROUP_NAMES,
+  RESTRICTABLE_APPS,
+} from "$/models/Permissions/PermissionsModule/RolesMatrixModule/preset-role-matrices.ts";
+import { RolesMatrixModule } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/RolesMatrixModule.ts";
 import type { PermissionCatalog } from "$/models/Permissions/Permissions.types.ts";
 
 /**
- * Workspace permission catalog for UI gating (derived from roles in SQL).
+ * Workspace permissions: UI catalog plus workspace role-matrix helpers.
  *
  * @property PermissionCatalog Frozen keys per `(app_type, role_level)`.
  */
 export const PermissionsModule = {
+  RestrictableApps: RESTRICTABLE_APPS,
+  BuiltinRoleGroupNames: BUILTIN_ROLE_GROUP_NAMES,
+  RolesMatrix: RolesMatrixModule,
+  buildInitialCustomRoleGroupName,
   PermissionCatalog: {
     data_sources: {
       viewer: [

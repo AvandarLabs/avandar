@@ -4,12 +4,12 @@ import { WorkspaceId } from "$/models/Workspace/Workspace.types";
 import { UserClient } from "@/clients/UserClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import type { UserAppRolesRecord } from "$/models/Permissions/Permissions.types";
+import type { UserAppRolesMatrix } from "$/models/Permissions/Permissions.types";
 
 /**
  * Empty record used while roles are loading or workspace/user is missing.
  */
-const EMPTY_ROLES_RECORD: UserAppRolesRecord = {
+const EMPTY_ROLES_RECORD: UserAppRolesMatrix = {
   data_sources: undefined,
   data_explorer: undefined,
   dashboards: undefined,
@@ -36,7 +36,7 @@ export function userAppRolesQueryKey(params: {
  * @returns Tuple of roles (undefined while loading) and loading flag.
  */
 export function useUserAppRoles(): readonly [
-  userAppRoles: UserAppRolesRecord | undefined,
+  userAppRoles: UserAppRolesMatrix | undefined,
   isLoading: boolean,
 ] {
   const user = useCurrentUser();

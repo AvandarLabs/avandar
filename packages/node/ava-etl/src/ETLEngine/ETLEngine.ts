@@ -287,13 +287,16 @@ async function uploadParquetToStorage(options: {
 }
 
 const ETLEngineFactory = createModuleFactory<IETLEngine>("ETLEngine", {
-  childBuilder(
+  // TODO(jpsyx): fix the types of `childBuilder` to better support factory
+  // patterns in modules
+  // @ts-expect-error - this needs to be fixed
+  childBuilder: (
     accessors: Accessors<
       "ETLEngine",
       StateOfModule<IETLEngine>,
       { run: () => Promise<ETLContext> }
     >,
-  ) {
+  ) => {
     const pipelineRunId = randomUUID() as PipelineRunId;
 
     return {

@@ -1,4 +1,5 @@
 import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
+import type { AppType } from "$/models/Permissions/Permissions.types.ts";
 import type { Tables } from "$/types/database.types.ts";
 
 export type WorkspacesAPI = APITypeDef<
@@ -36,7 +37,13 @@ export type WorkspacesAPI = APITypeDef<
         };
         body: {
           emailToInvite: string;
-          role: "admin" | "member";
+          role?: "admin" | "member"; // legacy role
+          roleGroupId?: string;
+          roleOverrides?: Array<{
+            app: AppType;
+            role: "viewer" | "editor" | "admin";
+          }>;
+          userGroupIds?: string[];
         };
         returnType: Tables<"workspace_invites">;
       };

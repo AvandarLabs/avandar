@@ -1336,8 +1336,11 @@ export type Database = {
           email: string
           id: string
           invite_status: Database["public"]["Enums"]["workspace_invites__status"]
+          invite_user_group_ids: string[]
           invited_by: string
           role: string
+          role_group_id: string | null
+          role_overrides: Json
           updated_at: string
           user_id: string | null
           workspace_id: string
@@ -1347,8 +1350,11 @@ export type Database = {
           email: string
           id?: string
           invite_status: Database["public"]["Enums"]["workspace_invites__status"]
+          invite_user_group_ids?: string[]
           invited_by: string
           role: string
+          role_group_id?: string | null
+          role_overrides?: Json
           updated_at?: string
           user_id?: string | null
           workspace_id: string
@@ -1358,13 +1364,23 @@ export type Database = {
           email?: string
           id?: string
           invite_status?: Database["public"]["Enums"]["workspace_invites__status"]
+          invite_user_group_ids?: string[]
           invited_by?: string
           role?: string
+          role_group_id?: string | null
+          role_overrides?: Json
           updated_at?: string
           user_id?: string | null
           workspace_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "workspace_invites_role_group_id_fkey"
+            columns: ["role_group_id"]
+            isOneToOne: false
+            referencedRelation: "role_groups"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "workspace_invites_workspace_id_fkey"
             columns: ["workspace_id"]

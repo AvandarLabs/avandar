@@ -65,4 +65,31 @@ export type PermissionCatalog = {
  * }
  * ```
  */
-export type UserAppRolesRecord = Record<AppType, RoleLevel | undefined>;
+export type UserAppRolesMatrix = Record<AppType, RoleLevel | undefined>;
+
+/**
+ * List of app roles for a user.
+ *
+ * Unlike in the `UserAppRolesMatrix`, no role can be left undefined.
+ * Only defined roles are included in the list.
+ *
+ * @example
+ * ```ts
+ * [
+ *   { app: "data_sources", role: "editor" },
+ *   { app: "data_explorer", role: "viewer" },
+ *   { app: "dashboards", role: "viewer" },
+ *   { app: "settings", role: "admin" },
+ * ]
+ * ```
+ */
+export type UserAppRolesList = Array<{ app: AppType; role: RoleLevel }>;
+
+/**
+ * Built-in role matrix preset segment in workspace permissions UI.
+ */
+export type BuiltinPresetType =
+  | "global_admin"
+  | "global_editor"
+  | "global_viewer"
+  | "custom";

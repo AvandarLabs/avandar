@@ -1,51 +1,45 @@
 import { Permissions } from "$/models/Permissions/Permissions.ts";
+import { RESTRICTABLE_APPS } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/preset-role-matrices.ts";
 import { describe, expect, it } from "vitest";
-
-const APP_TYPES = [
-  "data_sources",
-  "data_explorer",
-  "dashboards",
-  "settings",
-] as const;
 
 const ROLE_LEVELS = ["viewer", "editor", "admin"] as const;
 
 describe("Permissions.PermissionCatalog", () => {
   it("defines each app_type with viewer, editor, and admin keys", () => {
-    for (const app of APP_TYPES) {
-      for (const role of ROLE_LEVELS) {
+    RESTRICTABLE_APPS.forEach((app) => {
+      ROLE_LEVELS.forEach((role) => {
         expect(Permissions.PermissionCatalog[app][role]).toBeDefined();
         expect(Array.isArray(Permissions.PermissionCatalog[app][role])).toBe(
           true,
         );
-      }
-    }
+      });
+    });
   });
 
   it("uses unique permission strings within each (app, role) slice", () => {
-    for (const app of APP_TYPES) {
-      for (const role of ROLE_LEVELS) {
+    RESTRICTABLE_APPS.forEach((app) => {
+      ROLE_LEVELS.forEach((role) => {
         const keys = [...Permissions.PermissionCatalog[app][role]];
         expect(new Set(keys).size).toBe(keys.length);
-      }
-    }
+      });
+    });
   });
 
   it("includes viewer keys in editor and admin tiers", () => {
-    for (const app of APP_TYPES) {
+    RESTRICTABLE_APPS.forEach((app) => {
       const viewerKeys = [...Permissions.PermissionCatalog[app].viewer];
       const editorKeys = [...Permissions.PermissionCatalog[app].editor];
       const adminKeys = [...Permissions.PermissionCatalog[app].admin];
 
-      for (const key of viewerKeys) {
+      viewerKeys.forEach((key) => {
         expect(editorKeys.includes(key)).toBe(true);
         expect(adminKeys.includes(key)).toBe(true);
-      }
+      });
 
-      for (const key of editorKeys) {
+      editorKeys.forEach((key) => {
         expect(adminKeys.includes(key)).toBe(true);
-      }
-    }
+      });
+    });
   });
 
   it("lists settings permissions only at admin tier", () => {

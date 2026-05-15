@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import type { AvaSupabaseDBClient } from "./AvaSupabaseDbClient.types";
+import type { AvaSupabaseDBClient } from "../../../shared/types/AvaSupabaseDbClient.types";
 
 /**
  * Supabase DB client using the public API key. This is usable from the browser.

@@ -14,8 +14,20 @@ create table public.workspace_invites (
   user_id uuid references auth.users (id) on update cascade on delete cascade,
   -- The email address that was invited
   email text not null,
-  -- The role of the user invited
+  -- Legacy workspace role mirror (`admin` | `member`) for older clients and
+  -- invite rows created before `role_group_id` existed.
   role text not null,
+  -- Role group chosen when the invite was sent (built-in or custom).
+  -- When the user accepts the invite, the server merges `role_overrides`
+  -- with the role group's matrix to compute a new role matrix.
+  -- If the result equals the `role_group_id`'s matrix, then the member
+  -- keeps that role group. Otherwise, a new custom role group is inserted.
+  role_group_id uuid references public.role_groups (id) on update cascade on delete set null,
+  -- JSON array of `{"app":"data_sources","role":"editor"}` overrides applied
+  -- on top of `role_group_id` when the invite is accepted.
+  role_overrides jsonb not null default '[]'::jsonb,
+  -- Tag groups the member should join after accepting the invite.
+  invite_user_group_ids uuid[] not null default '{}'::uuid[],
   -- the status of the invite
   invite_status public.workspace_invites__status not null,
   -- Timestamp of when the invite was created
@@ -28,9 +40,7 @@ create table public.workspace_invites (
 alter table public.workspace_invites enable row level security;
 
 -- Policies
-create policy "
-  User can SELECT invites they sent from their workspace
-" on public.workspace_invites for
+create policy "User can select invites they sent from their workspace" on public.workspace_invites for
 select
   to authenticated using (
     public.workspace_invites.invited_by = (
@@ -42,6 +52,23 @@ select
         select
           public.util__get_auth_user_workspaces ()
       )
+    )
+  );
+
+create policy "Settings admins can select workspace invites" on public.workspace_invites for
+select
+  to authenticated using (
+    exists (
+      select
+        1
+      from
+        public.workspace_memberships wm
+        inner join public.role_group_app_roles rgar on rgar.role_group_id = wm.role_group_id
+      where
+        wm.workspace_id = public.workspace_invites.workspace_id and
+        wm.user_id = auth.uid () and
+        rgar.app = 'settings'::public.app_type and
+        rgar.role = 'admin'::public.role_level
     )
   );
 
@@ -81,6 +108,38 @@ with
     )
   );
 
+create policy "Settings admins can update any workspace invite" on public.workspace_invites
+for update
+  to authenticated using (
+    exists (
+      select
+        1
+      from
+        public.workspace_memberships wm
+        inner join public.role_group_app_roles rgar on rgar.role_group_id = wm.role_group_id
+      where
+        wm.workspace_id = public.workspace_invites.workspace_id and
+        wm.user_id = auth.uid () and
+        rgar.app = 'settings'::public.app_type and
+        rgar.role = 'admin'::public.role_level
+    )
+  )
+with
+  check (
+    exists (
+      select
+        1
+      from
+        public.workspace_memberships wm
+        inner join public.role_group_app_roles rgar on rgar.role_group_id = wm.role_group_id
+      where
+        wm.workspace_id = public.workspace_invites.workspace_id and
+        wm.user_id = auth.uid () and
+        rgar.app = 'settings'::public.app_type and
+        rgar.role = 'admin'::public.role_level
+    )
+  );
+
 create policy "
   User can DELETE invites they sent in their workspace
 " on public.workspace_invites for delete to authenticated using (
@@ -93,6 +152,21 @@ create policy "
   public.workspace_invites.invited_by = (
     select
       auth.uid ()
+  )
+);
+
+create policy "Settings admins can delete any workspace invite" on public.workspace_invites for delete to authenticated using (
+  exists (
+    select
+      1
+    from
+      public.workspace_memberships wm
+      inner join public.role_group_app_roles rgar on rgar.role_group_id = wm.role_group_id
+    where
+      wm.workspace_id = public.workspace_invites.workspace_id and
+      wm.user_id = auth.uid () and
+      rgar.app = 'settings'::public.app_type and
+      rgar.role = 'admin'::public.role_level
   )
 );
 

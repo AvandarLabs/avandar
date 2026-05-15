@@ -13,6 +13,18 @@ create table public.role_groups (
   constraint role_groups__workspace_id_name unique (
     workspace_id,
     name
+  ),
+  -- role group must either be a bultin group or, if custom, it cannot
+  -- have a name matching one of the reserved builtin names
+  constraint role_groups__custom_name_not_reserved_builtin check (
+    is_builtin or
+    lower(
+      btrim(name)
+    ) not in (
+      'global admin',
+      'global editor',
+      'global viewer'
+    )
   )
 );
 

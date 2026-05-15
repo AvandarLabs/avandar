@@ -9132,6 +9132,7 @@
         "dependencies": [
           "npm:@supabase/supabase-js@2",
           "npm:ts-pattern@5",
+          "npm:type-fest@5",
           "npm:zod@4"
         ]
       },

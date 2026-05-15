@@ -1,0 +1,387 @@
+# TypeScript rules
+
+## Runtime coexistence: Browser, Node, and Deno
+
+- This repo has shared code among browser, Node, and Deno runtimes.
+- Because of Deno, any code reachable by Deno must import files with their extensions.
+
+  Example:
+
+  ```ts
+  // Good - includes .ts extension
+  import { foo } from "some/path/to/foo.ts";
+  ```
+
+  Deno-reachable paths include:
+  `supabase/functions/`, `shared/` and `packages/shared/`
+
+## General Code Style & Formatting
+
+- Use JSDoc to document public classes and methods.
+- **Use functional and declarative programming patterns.**
+  - Avoid classes or imperative programming patterns.
+  - Use higher-order functions (map, filter, reduce).
+  - Avoid `for` and `while` loops.
+- Use named exports instead of default exports.
+- Limit comments to 80 characters per line.
+- If a docstring fits in 80 characters, then single-line it. Example:
+
+  ```ts
+  /** My single-line comment less than 80 characters*/.
+  ```
+
+- Never use single-line `if`s. Always use opening `{` and closing `}` even if
+  there is only one statement to wrap. Examples:
+
+  ```ts
+  // Bad - inline if
+  if (someCondition) doSomething();
+
+  // Good - wrapped in braces
+  if (someCondition) {
+    doSomething();
+  }
+  ```
+
+- Use string interpolation instead of concatenation. Examples:
+
+  ```ts
+  // Bad - concatenating with +
+  const myString = "Hello, " + name;
+
+  // Good - interpolation
+  const myString = `Hello ${name}`;
+  ```
+
+## Naming Conventions
+
+- Use PascalCase for React components, classes, singleton class instances, or
+  objects representing modules, namespaces, or static singletons.
+- Use camelCase for variables, functions, and methods.
+- Use UPPERCASE for environment variables or hard-coded constants.
+- Event handlers should be prefixed with `on` (E.g. Good: `onSubmit`) instead of
+  `handle` (e.g. Bad: `handleSubmit`).
+- Prefix non-exported top-level helper functions with an underscore.
+  Example:
+
+  ```ts
+  function _doSomething(): void {} // <-- prefixed with _
+
+  export function exportedFunction(): void {
+    _doSomething();
+  }
+  ```
+
+- Always name a React component's props just `Props`. Do not name props after
+  the component, such as `MyComponentProps`.
+- Naming exceptions:
+  - "E2E" should always stay fully uppercased or fully lowercased
+    Examples: `e2eCreds` or `MyE2ETest`
+
+## Types
+
+- **Never** use `any`.
+- Use `as const` for literals that never change.
+- Use `type` instead of `interface`. **Only** use `interface` for OOP-style
+  interfaces implemented by a class.
+- Use `undefined` instead of `null`. Only use `null` when required by the API
+  or library. Example: JSON in HTTP requests requires `null`; React requires `null`
+  to be returned to skip renders.
+- Use string literal unions instead of enums.
+- Encapsulate data in composite types when a type, or parts of a type, need to
+  be re-used.
+- Do not create a new type if the type is never re-used. Reduce indirection.
+  Example:
+
+  ```ts
+  // Bad - too much indirection and none of these types are exported or reused
+  type FooParams = {
+    name: string;
+    age: number;
+  };
+
+  type FooReturn = {
+    foo: string;
+  };
+
+  export function foo(params: FooParams): FooReturn {
+    return something();
+  }
+  ```
+
+  **THIS RULE DOES NOT APPLY TO PROPS**
+  A React component's props should always be its own `type Props` even if it
+  has only one property.
+
+- If an object has >= 4 properties, extract to its own type for readability.
+  Example:
+
+  ```ts
+  // Bad - too many inline properties, difficult to read
+  export function foo(params: {
+    name: string;
+    age: number;
+    foo: string;
+    bar: boolean;
+  }): { foo: string } {
+    return something();
+  }
+
+  // Good - large object extracted to its own type
+  type FooParams = {
+    name: string;
+    age: number;
+    foo: string;
+    bar: boolean;
+  };
+
+  export function foo(params: FooParams): { foo: string } {
+    return something();
+  }
+  ```
+
+### When to explicitly annotate types
+
+- Declare types for variables, functions, parameters, and return values at
+  module boundaries and top-level declarations.
+  - Avoid annotations for local variables inside a function.
+  - Avoid annotations for nested arrow functions (e.g. inline callbacks).
+
+  For example:
+
+  ```ts
+  // Good - explicit types for module boundaries, top-level declarations, and params
+  export const myVar: MyType = foo();
+  export function myFunc(myParam: string): MyReturnType {
+    return foo();
+  }
+
+  // Bad - excessive typing
+  export function MyComponent({ values }) {
+    // <-- missing type in param
+    const x: number = 3; // <-- local variable type declaration unnecessary
+
+    // types in nested arrow function unnecessary
+    const result = myArray.map((x: MyItem): string => {
+      return foo();
+    });
+  }
+  ```
+
+## Functions
+
+- Use default parameter values instead of null/undefined checks.
+- Use RO-RO (Receive Object, Return Object) for passing and returning multiple
+  parameters.
+  - If there is only one parameter, do not wrap it in an object
+  - If wrapping parameters in an object, name the arg `options` unless `params`
+    or `config` are more appropriate in the context of the function.
+  - If you use an object, use an inline type annotation. Only extract the object
+    into a named type if it will be reused.
+
+    Examples:
+
+    ```ts
+    // Good - only a single argument, do not wrap in an object
+    function foo(singleArg: string): void {}
+
+    // Good - `options` object, but it is small so type annotation is inline
+    function bar(options: { name: string; age: number }): void {}
+
+    // Good - parameters are reused so we extract to a type alias
+    type Person = {
+      name: string;
+      title: string;
+    };
+
+    function doSomething(options: Person): void {}
+    function doSomethingElse(options: Person): void {}
+    ```
+
+- Top-level functions should always use the `function` keyword. Nested functions
+  (inside a function or as an object property) should always be arrow functions.
+
+  Examples:
+
+  ```ts
+  // Good - `function` for top-level and arrow functions inside
+  function MyComponent() {
+    const onClick = () => {
+      doSomething();
+    }
+    return <button onClick={onCLick}>Hello</button>
+  }
+
+  // Good - arrow function for object property
+  const Utils = {
+    sayHello: (person) => {
+      return `Hello ${person.name}`;
+    }
+  };
+  ```
+
+### Import/export declarations
+
+- Type imports/exports always use the `type` keyword.
+
+  ```ts
+  import type { MyType } from "./foo";
+
+  export type { MyType } from "./foo";
+  ```
+
+## File, Directory, and Module Conventions
+
+- When a module can not be encapsulated in a single file, create a directory
+  to represent the module. Some examples of when a module should be a directory
+  are: when a module has a `.test` file, has tightly-coupled helper functions,
+  or has sub-components in separate files.
+
+  The directory structure should be as follows:
+
+  ```plaintext
+  MyComponent
+    | MyComponent.tsx
+    | MyComponent.test.tsx
+    | SubComponent.tsx
+  ```
+
+- Never create barrel files. The only barrel files allowed are the `index.ts`
+  files exporting the contents of our libraries in `packages/`.
+- Never use namespace exports. Always use named exports.
+  Bad: `export * from ...`.
+  Good: `export { MyComponent } from ...`.
+- All exported classes, objects, and functions must always have a docstring.
+
+  ```ts
+  /**
+   * Docstring describing `foo`.
+   *
+   * @param options The options to pass.
+   * @param options.name The name of the person
+   * @param options.age The age of the person
+   * @returns void
+   */
+  export function foo(options: { name: string; age: number }): void {}
+  ```
+
+- If an object is exported, its top-level methods should also have docstrings.
+
+  ```ts
+  /**
+   * Docstring describing `MyObject`.
+   */
+  export const MyObject = {
+    foo, // docstring already attached to its declaration, no need to duplciate
+
+    /**
+     * Docstring describing the `hello` method.
+     */
+    hello: () => {
+      return "hello, world";
+    },
+  };
+  ```
+
+## Immutability
+
+- Use mutable types by default.
+- We use immutable types in only these two situations:
+  1. Parameters in exported functions. Example:
+
+  ```ts
+  export function foo(myArr: readonly string[]) {}
+  ```
+
+  2. Data that crosses module boundaries (e.g. React props).
+
+- To make a type immutable:
+  - Arrays: use `readonly`
+  - Sets: use `ReadonlySet<>`
+  - Maps: use `ReadonlyMap<>`
+- Exception: even if an object should be explicitly immutable, we still do not
+  use `readonly` or `Readonly<>` on objects. This is to reduce verbosity.
+  But still remember to behave as if the object is immutable.
+  Instead, use immutable types for the object's inner properties:
+
+  ```ts
+  // Bad - Props object is marked Readonly
+  type Props = Readonly<{
+    names: readonly string[];
+    foo: number;
+  }>;
+
+  // Bad - each key marked readonly
+  type Props = {
+    readonly names: readonly string[];
+    readonly foo: number;
+  };
+
+  // Good - only inner properties use immutable types
+  type Props = {
+    names: readonly string[];
+  };
+  ```
+
+## React Code Style
+
+- **One component per file.**
+- Split up components into logical sub-components. Avoid monolithic components.
+- Use our internal UI library in `src/lib/ui` or Mantine components.
+- Do not build new core UI elements from scratch unless specifically asked to.
+- Define functional components with the function keyword instead of arrow
+  functions. Example:
+
+  ```ts
+  // Bad:
+  const MyComponent = () => {};
+
+  // Good:
+  function MyComponent() {}
+  ```
+
+- Use ternaries for conditional rendering instead of short-circuited
+  evaluations. For example:
+
+  ```ts
+  // Bad:
+  <div>{someCondition && <MyComponent />}</div>
+
+  // Good:
+  <div>{someCondition ? <MyComponent /> : null}</div>
+  ```
+
+## Data Fetching
+
+- Use Zod for validation
+- In React, use our internal `useQuery` and `useMutation` wrappers of Tanstack Query.
+
+## Icons
+
+- Use `@tabler/icons-react`
+
+## Library-specific usage
+
+### React-query
+
+- Use our `useQuery` and `useMutation` wrappers from `@hooks` instead
+  of importing from `@tanstack/react-query`
+- When using `useMutation` (or any hooks that wrap it), call the non-async mutate
+  function and set necessary `onSuccess` and `onError` handlers at the hook level.
+  Do not call `mutateFunc.async()` unless strictly necessary, which is rare.
+
+### Mantine
+
+- Before using any Mantine component, check if we we have a wrapper in
+  `src/lib/ui` or `packages/web/ui` that you can use instead.
+- Use our `useForm` wrapper in `@/lib/hooks/ui/useForm` instead of using Mantine's
+  `useForm` directly.
+- When using `useForm`, always set a `key={form.key('fieldId')}` prop
+  to each input component even if they are not in an array.
+
+### Supabase-js
+
+- Use `.throwOnError()` whenever possible instead of relying on destructuring
+  the `{ error }` and then checking it in an `if`.
+- Parameters that accept a Supabase admin client should always be named
+  `supabaseAdminClient` instead of just `admin` or `adminClient`.

@@ -1,39 +1,52 @@
 import { useMutation } from "@hooks";
 import { Stack, Text } from "@mantine/core";
-import { getHotkeyHandler } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifySuccess } from "@ui";
+import { buildWorkspaceInviteRolePayload } from "$/models/Permissions/inviteRolePayload";
 import { Subscription } from "$/models/Subscription/Subscription";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { useRef } from "react";
 import { APIClient } from "@/clients/APIClient";
-import { WorkspaceClient } from "@/clients/WorkspaceClient";
+import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
+import { WorkspaceInviteClient } from "@/clients/WorkspaceInviteClient";
 import { WorkspaceBillingView } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 import { PurchaseSeatsModalContents } from "@/components/WorkspaceSettingsPage/WorkspaceUsersForm/PurchaseSeatsModalContents";
+import { WorkspaceInviteModalFields } from "@/components/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useFeaturePlanType } from "@/hooks/workspaces/useCurrentSubscriptionType";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { AvaField } from "@/lib/ui/AvaForm/AvaField";
-import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
-import { AvaFormRef } from "@/lib/ui/AvaForm/AvaForm.types";
+import type { RoleGroupWithMatrix } from "@/clients/permissions/PermissionsClient";
+import type { WorkspaceInviteModalFieldsRef } from "@/components/WorkspaceSettingsPage/WorkspaceUsersForm/WorkspaceInviteModalFields";
+import type { UserAppRolesMatrix } from "$/models/Permissions/Permissions.types";
 
 export function useWorkspaceInviteModal({
   numberOfSeats,
+  roleGroups,
 }: {
   numberOfSeats: number | undefined;
+  roleGroups: readonly RoleGroupWithMatrix[];
 }): () => void {
   const featurePlanType = useFeaturePlanType();
   const workspace = useCurrentWorkspace();
-
   const user = useCurrentUser();
-  const formRef =
-    useRef<AvaFormRef<{ email: string; role: Workspace.Role }>>(null);
+  const fieldsRef = useRef<WorkspaceInviteModalFieldsRef>(null);
+
+  const [userGroups = [], userGroupsLoading] =
+    PermissionsClient.useGetUserGroups({
+      workspaceId: workspace.id,
+    });
+
   const [sendInvite] = useMutation({
     mutationFn: (variables: {
       workspaceId: Workspace.Id;
       email: string;
-      role: Workspace.Role;
+      rolesMatrix: UserAppRolesMatrix;
+      userGroupIds: readonly string[];
     }) => {
+      const payload = buildWorkspaceInviteRolePayload(
+        variables.rolesMatrix,
+        roleGroups,
+      );
       return APIClient.post({
         route: "workspaces/:workspaceId/invite",
         pathParams: {
@@ -41,119 +54,84 @@ export function useWorkspaceInviteModal({
         },
         body: {
           emailToInvite: variables.email,
-          role: variables.role,
+          role: payload.legacyRole,
+          roleGroupId: payload.roleGroupId,
+          roleOverrides: payload.roleOverrides,
+          userGroupIds: [...variables.userGroupIds],
         },
       });
     },
     queriesToInvalidate: [
-      WorkspaceClient.QueryKeys.getPendingInvites({
+      WorkspaceInviteClient.QueryKeys.getPendingInvites({
         workspaceId: workspace.id,
       }),
     ],
   });
 
-  const onSendInviteClick = async (modalId: string) => {
-    if (formRef.current) {
-      const validation = formRef.current.getForm().validate();
-      if (!validation.hasErrors) {
-        const { email, role } = formRef.current.getFormValues();
+  const openInviteModal = (): void => {
+    let modalId = "";
+    const submit = async (): Promise<void> => {
+      if (!fieldsRef.current?.validate()) {
+        return;
+      }
+      const {
+        email,
+        rolesMatrix: matrix,
+        tagIds,
+      } = fieldsRef.current.getState();
+      if (!email) {
+        return;
+      }
+      modals.updateModal({
+        modalId,
+        confirmProps: { loading: true },
+      });
+      try {
+        await sendInvite.async({
+          workspaceId: workspace.id,
+          email,
+          rolesMatrix: matrix,
+          userGroupIds: tagIds,
+        });
+        notifySuccess({ title: "Invite sent" });
+        modals.close(modalId);
+      } catch {
         modals.updateModal({
           modalId,
-          confirmProps: { loading: true },
+          confirmProps: { loading: false },
         });
-        try {
-          await sendInvite.async({
-            workspaceId: workspace.id,
-            email,
-            role,
-          });
-          notifySuccess({ title: "Invite sent" });
-          modals.close(modalId);
-        } catch {
-          modals.updateModal({
-            modalId,
-            confirmProps: { loading: false },
-          });
-        }
       }
-    }
-  };
+    };
 
-  const openInviteModal = (): void => {
-    const modalId = modals.openConfirmModal({
-      title: "Add a member to your Workspace",
+    modalId = modals.openConfirmModal({
+      title: "Invite a member",
       labels: {
         confirm: "Send invite",
         cancel: "Cancel",
       },
-      confirmProps: {
-        disabled: true,
-      },
       closeOnConfirm: false,
       onConfirm: () => {
-        onSendInviteClick(modalId);
+        void submit();
       },
       children: (
-        <Stack>
-          <Text size="sm" c="dimmed">
-            Type or paste in an email below.
-            {featurePlanType !== "free" ?
-              "Your workspace will be billed per member."
-            : null}
-          </Text>
-          <AvaForm
-            ref={formRef}
-            hideSubmitButton
-            fields={{
-              email: AvaField.email({
-                key: "email",
-                initialValue: "",
-                label: "Email address",
-                onChange: (newEmail) => {
-                  modals.updateModal({
-                    modalId,
-                    confirmProps: { disabled: !newEmail },
-                  });
-                },
-              }),
-              role: AvaField.select({
-                key: "role",
-                data: [
-                  { value: "member", label: "Member" },
-                  { value: "admin", label: "Admin" },
-                ] as const,
-                initialValue: "member",
-              }),
-            }}
-            formElements={["email", "role"]}
-            onKeyDown={getHotkeyHandler([
-              [
-                "Enter",
-                (event) => {
-                  event.preventDefault();
-                  onSendInviteClick(modalId);
-                },
-              ],
-            ])}
-          />
-        </Stack>
+        <WorkspaceInviteModalFields
+          ref={fieldsRef}
+          featurePlanType={featurePlanType}
+          userGroups={userGroups}
+          userGroupsLoading={userGroupsLoading}
+          onPressEnter={() => {
+            void submit();
+          }}
+        />
       ),
     });
   };
 
   return (): void => {
-    // do nothing if we don't know how many seats are in the workspace
-    // ideally, this function should have never gotten called yet.
     if (numberOfSeats === undefined || workspace.subscription === undefined) {
       return;
     }
 
-    // since we have the number of members already, we can eagerly check on
-    // the frontend if the workspace has reached its seat limit.
-    // But even if we don't show this modal, we should still do a backend check
-    // when users invite a new member to make sure they are still allowed to
-    // invite more members (in case of any race conditions. E.g. if there
-    // are multiple admins inviting users at the same time).
     if (
       !Subscription.canInviteMembers({
         subscription: workspace.subscription,
