@@ -2,7 +2,7 @@ import { Argument, Command } from "commander";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "seed/SeedData";
 import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 
 const httpMethodChoices = [
   "get",

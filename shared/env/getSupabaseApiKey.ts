@@ -17,9 +17,12 @@ import { isViteBrowserRuntime } from "$/env/isViteBrowserRuntime.ts";
  * @throws Error When `VITE_SUPABASE_ANON_KEY` is not set in the current
  * environment.
  */
-export function getSupabasePublicAPIKey(): string {
+export function getSupabaseApiKey(): string {
   if (isDenoRuntime()) {
-    return Deno.env.get("VITE_SUPABASE_ANON_KEY") ?? _missing();
+    const g = globalThis as {
+      Deno?: { env: { get: (key: string) => string | undefined } };
+    };
+    return g.Deno?.env.get("VITE_SUPABASE_ANON_KEY") ?? _missing();
   }
 
   if (isBunDesktopRuntime()) {

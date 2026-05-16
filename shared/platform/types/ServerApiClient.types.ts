@@ -39,8 +39,10 @@ export interface ServerApiClient {
    * at the call site. The interface keeps the request/response as `unknown`
    * to avoid a `packages/shared/` → `src/` dependency.
    *
-   * @param request - Structured request describing route, method, params, body.
-   * @returns The function payload, typed by the caller via the generic parameter.
+   * @param request - Structured request describing route, method, params,
+   * body.
+   * @returns The function payload, typed by the caller via the generic
+   * parameter.
    */
   invokeFunction<TResult = unknown>(
     request: ServerApiFunctionRequest,
@@ -48,8 +50,9 @@ export interface ServerApiClient {
 }
 
 /**
- * Structured Edge Function request. Mirrors the shape `APIClient.sendHTTPRequest`
- * already accepts so the browser-backed adapter is a direct passthrough.
+ * Structured Edge Function request. Mirrors the shape
+ * `APIClient.sendHTTPRequest` already accepts so the browser-backed adapter
+ * is a direct passthrough.
  */
 export type ServerApiFunctionRequest = {
   route: string;

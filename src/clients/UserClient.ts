@@ -7,7 +7,7 @@ import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 import { Tables } from "$/types/database.types";
 import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import type { ServiceClient } from "@clients";
 import type { WithSupabaseClient } from "@clients/mixins/withSupabaseClient";
 import type { ILogger, WithLogger } from "@logger";

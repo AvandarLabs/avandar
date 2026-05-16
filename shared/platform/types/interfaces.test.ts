@@ -9,19 +9,19 @@ import { expectTypeOf, test } from "vitest";
 import type {
   AuthProvider,
   Session,
-} from "./AuthProvider.types.ts";
+} from "$/platform/types/AuthProvider.types.ts";
 import type {
   DatasetBlobKey,
   DatasetBlobStore,
-} from "./DatasetBlobStore.types.ts";
-import type { DuckDbClient } from "./DuckDbClient.types.ts";
-import type { RdbClient, RdbFilter } from "./RdbClient.types.ts";
+} from "$/platform/types/DatasetBlobStore.types.ts";
+import type { DuckDbClient } from "$/platform/types/DuckDbClient.types.ts";
+import type { RdbClient, RdbFilter } from "$/platform/types/RdbClient.types.ts";
 import type {
   ServerApiClient,
   ServerApiFunctionRequest,
-} from "./ServerApiClient.types.ts";
-import type { SyncEngine, SyncStatus } from "./SyncEngine.types.ts";
-import type { Platform } from "./Platform.types.ts";
+} from "$/platform/types/ServerApiClient.types.ts";
+import type { SyncEngine, SyncStatus } from "$/platform/types/SyncEngine.types.ts";
+import type { Platform } from "$/platform/types/Platform.types.ts";
 
 test("Platform is the closed 'web' | 'desktop' union", () => {
   expectTypeOf<Platform>().toEqualTypeOf<"web" | "desktop">();

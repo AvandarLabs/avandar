@@ -13,7 +13,7 @@ import {
   WORKSPACES_BUCKET_NAME,
 } from "@/clients/storage/DatasetParquetStorageClient/utils";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { Workspace } from "$/models/Workspace/Workspace";

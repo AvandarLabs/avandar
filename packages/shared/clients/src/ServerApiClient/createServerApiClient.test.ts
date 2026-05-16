@@ -14,7 +14,12 @@ vi.mock("$/platform/isDesktop.ts", async () => {
   const actual = await vi.importActual<typeof import("$/platform/isDesktop.ts")>(
     "$/platform/isDesktop.ts",
   );
-  return { ...actual, isDesktop: vi.fn(() => false) };
+  return {
+    ...actual,
+    isDesktop: vi.fn(() => {
+      return false;
+    }),
+  };
 });
 
 vi.mock("$/db/supabase/AvaSupabase.ts", () => {
@@ -27,7 +32,7 @@ vi.mock("$/db/supabase/AvaSupabase.ts", () => {
   };
 });
 
-import { createServerApiClient } from "./createServerApiClient.ts";
+import { createServerApiClient } from "@clients/ServerApiClient/createServerApiClient.ts";
 
 describe("createServerApiClient", () => {
   beforeEach(() => {

@@ -5,7 +5,7 @@
  */
 import { ScriptsUtil } from "scripts/ScriptsUtil";
 import { z } from "zod";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 
 function printUsage() {
   console.log("Usage: pnpm db:create-user <email> <password>");

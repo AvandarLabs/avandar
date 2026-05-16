@@ -7,9 +7,10 @@
  * bundled by Vite, false otherwise.
  */
 export function isViteBrowserRuntime(): boolean {
+  const g = globalThis as { window?: unknown };
   return (
     typeof import.meta !== "undefined" &&
     import.meta.env !== undefined &&
-    typeof window !== "undefined"
+    typeof g.window !== "undefined"
   );
 }

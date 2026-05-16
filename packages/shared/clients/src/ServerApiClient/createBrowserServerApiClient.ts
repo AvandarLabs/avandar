@@ -40,7 +40,9 @@ function buildRelativeFunctionUrl(
   }
 
   const search = Object.entries(queryParams)
-    .filter(([, v]) => v !== undefined && v !== null)
+    .filter(([, v]) => {
+      return v !== undefined && v !== null;
+    })
     .flatMap(([k, v]) => {
       if (Array.isArray(v)) {
         return [`${encodeURIComponent(k)}=${encodeURIComponent(v.join(";"))}`];

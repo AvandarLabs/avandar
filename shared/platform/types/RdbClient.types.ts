@@ -1,4 +1,4 @@
-import type { Brand } from "@utils/types/common.types";
+import type { Brand } from "@utils/types/common.types.ts";
 
 /**
  * Platform-agnostic relational database client.

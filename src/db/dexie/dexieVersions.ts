@@ -23,7 +23,7 @@
 import { prop } from "@utils";
 import Dexie from "dexie";
 import { DexieDBVersionManager } from "@/clients/dexie/DexieDBVersionManager";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { clearOPFS } from "@/lib/utils/browser/clearOPFS";
 import type { LegacyLocalDatasetEntryModel } from "@/models/Legacy_LocalDatasetEntry/Legacy_LocalDatasetEntry.types";
 import type { LocalDatasetModel } from "@/models/LocalDataset/LocalDataset.types";

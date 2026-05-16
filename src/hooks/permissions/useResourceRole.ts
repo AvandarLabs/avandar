@@ -1,5 +1,5 @@
 import { useQuery } from "@hooks";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { permissionsQueryKeys } from "@/hooks/permissions/permissionsQueryKeys";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import type { Database } from "$/types/database.types";

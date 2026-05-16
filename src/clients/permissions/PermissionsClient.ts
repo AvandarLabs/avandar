@@ -4,7 +4,7 @@ import { withLogger } from "@logger";
 import { withNewMembers } from "@modules";
 import { Permissions } from "$/models/Permissions/Permissions";
 import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import type { ILogger } from "@logger";
 import type {
   AppType,

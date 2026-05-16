@@ -16,7 +16,7 @@ import type { HTTPMethod } from "@sbfn/_shared/MiniServer/api.types";
 // share one instance. Path-param and query-string substitution that used to
 // live in this file (the `_buildRelativeAPIURL` helper) now happens inside
 // the ServerApiClient browser adapter — see
-// `packages/shared/clients/src/ServerApiClient/createBrowserServerApiClient.ts`.
+// `packages/shared/clients/src/ServerApiClient/createBrowserServerApiClient`.
 const serverApi = createServerApiClient();
 
 type HTTPRequestOptions<

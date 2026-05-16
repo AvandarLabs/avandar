@@ -22,7 +22,9 @@ vi.mock("@/hooks/users/useCurrentUser", () => {
 vi.mock("$/db/supabase/AvaSupabase.ts", () => {
   return {
     AvaSupabase: {
-      db: () => ({ rpc: rpcMock }),
+      db: () => {
+        return { rpc: rpcMock };
+      },
     },
   };
 });

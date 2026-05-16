@@ -1,7 +1,7 @@
-import { createModule } from "@modules/createModule";
+import { createModule } from "@modules/createModule.ts";
 import { createClient } from "@supabase/supabase-js";
-import { getSupabaseAPIURL } from "$/env/getSupabaseAPIURL.ts";
-import { getSupabasePublicAPIKey } from "$/env/getSupabasePublicAPIKey.ts";
+import { getSupabaseApiKey } from "$/env/getSupabaseApiKey.ts";
+import { getSupabaseApiUrl } from "$/env/getSupabaseApiUrl.ts";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types.ts";
 
 let cachedClient: AvaSupabaseDBClient | undefined;
@@ -26,10 +26,7 @@ export const AvaSupabase = createModule("AvaSupabase", {
        */
       db: (): AvaSupabaseDBClient => {
         if (!cachedClient) {
-          cachedClient = createClient(
-            getSupabaseAPIURL(),
-            getSupabasePublicAPIKey(),
-          );
+          cachedClient = createClient(getSupabaseApiUrl(), getSupabaseApiKey());
         }
         return cachedClient;
       },
@@ -40,7 +37,7 @@ export const AvaSupabase = createModule("AvaSupabase", {
        * @returns The Supabase API URL.
        */
       getAPIURL: (): string => {
-        return getSupabaseAPIURL();
+        return getSupabaseApiUrl();
       },
 
       /**
@@ -49,7 +46,7 @@ export const AvaSupabase = createModule("AvaSupabase", {
        * @returns The Supabase Edge Functions URL (`${apiURL}/functions/v1`).
        */
       getEdgeFunctionsURL: (): string => {
-        return `${getSupabaseAPIURL()}/functions/v1`;
+        return `${getSupabaseApiUrl()}/functions/v1`;
       },
     };
   },

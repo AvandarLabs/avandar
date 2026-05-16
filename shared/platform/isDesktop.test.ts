@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { isDesktop } from "./isDesktop.ts";
+import { isDesktop } from "$/platform/isDesktop.ts";
 
 type WindowWithMarker = {
   __AVA_PLATFORM__?: string;

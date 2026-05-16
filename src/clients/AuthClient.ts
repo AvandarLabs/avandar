@@ -5,7 +5,7 @@ import {
   User,
   WeakPassword,
 } from "@supabase/supabase-js";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 
 type AuthClient = {
   /**
@@ -103,9 +103,10 @@ function createAuthClient(): AuthClient {
 
   return {
     requestPasswordResetEmail: async (email: string): Promise<void> => {
-      const { error } = await AvaSupabase.db().auth.resetPasswordForEmail(email, {
-        redirectTo: `${import.meta.env.VITE_APP_URL}/update-password`,
-      });
+      const { error } = await AvaSupabase.db().auth.resetPasswordForEmail(
+        email,
+        { redirectTo: `${import.meta.env.VITE_APP_URL}/update-password` },
+      );
       if (error) {
         throw error;
       }

@@ -36,7 +36,9 @@ vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
 vi.mock("$/db/supabase/AvaSupabase.ts", () => {
   return {
     AvaSupabase: {
-      db: () => ({ from: fromMock }),
+      db: () => {
+        return { from: fromMock };
+      },
     },
   };
 });

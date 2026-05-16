@@ -3,7 +3,7 @@ import {
   getPublicDatasetParquetStoragePath,
   PUBLIC_BUCKET_NAME,
 } from "@/clients/storage/PublicDatasetParquetStorageClient/utils";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
@@ -70,8 +70,9 @@ async function downloadDataset({
     datasetId,
   });
 
-  const { data: parquetBlob, error: downloadError } =
-    await AvaSupabase.db().storage.from(PUBLIC_BUCKET_NAME).download(objectPath);
+  const { data: parquetBlob, error: downloadError } = await AvaSupabase.db()
+    .storage.from(PUBLIC_BUCKET_NAME)
+    .download(objectPath);
 
   if (!downloadError && parquetBlob) {
     return parquetBlob;
