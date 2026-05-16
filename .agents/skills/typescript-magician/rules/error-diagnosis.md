@@ -62,6 +62,7 @@ type Step3 = Step2[number];
 ### "Type 'X' is not assignable to type 'Y'"
 
 The most common error. Check:
+
 1. Are you missing properties?
 2. Are property types incompatible?
 3. Is there a literal vs widened type mismatch?
@@ -201,7 +202,7 @@ For library types, check the actual definitions:
 // In lib.dom.d.ts
 interface Document {
   querySelector<K extends keyof HTMLElementTagNameMap>(
-    selectors: K
+    selectors: K,
   ): HTMLElementTagNameMap[K] | null;
   querySelector(selectors: string): Element | null;
 }

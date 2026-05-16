@@ -19,7 +19,7 @@
 
 ```typescript
 // fixtures/api-fixtures.ts
-import { test as base, expect, APIRequestContext } from "@playwright/test";
+import { APIRequestContext, test as base, expect } from "@playwright/test";
 
 type ApiFixtures = {
   authApi: APIRequestContext;
@@ -70,7 +70,7 @@ export { expect };
 
 ```typescript
 // tests/api/admin.spec.ts
-import { test, expect } from "../../fixtures/api-fixtures";
+import { expect, test } from "../../fixtures/api-fixtures";
 
 test("admin retrieves all accounts", async ({ adminApi }) => {
   const resp = await adminApi.get("/admin/accounts");
@@ -86,7 +86,7 @@ test("admin retrieves all accounts", async ({ adminApi }) => {
 **Avoid when**: You need to test browser-rendered responses (redirects, cookies with `HttpOnly`).
 
 ```typescript
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test("full CRUD cycle", async ({ request }) => {
   // GET with query params
@@ -183,7 +183,7 @@ export default defineConfig({
 **Avoid when**: Never skip these — every API test should assert on status and body.
 
 ```typescript
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test("comprehensive response validation", async ({ request }) => {
   const resp = await request.get("/api/items/101");
@@ -302,7 +302,7 @@ export { expect };
 
 ```typescript
 // tests/e2e/workspace-dashboard.spec.ts
-import { test, expect } from "../../fixtures/seed-fixtures";
+import { expect, test } from "../../fixtures/seed-fixtures";
 
 test("user sees workspace on dashboard", async ({
   page,
@@ -316,7 +316,7 @@ test("user sees workspace on dashboard", async ({
 
   await page.waitForURL("/dashboard");
   await expect(
-    page.getByRole("heading", { name: seedWorkspace.name })
+    page.getByRole("heading", { name: seedWorkspace.name }),
   ).toBeVisible();
 });
 ```
@@ -326,7 +326,7 @@ test("user sees workspace on dashboard", async ({
 **Use when**: Every API has error paths — test them. A missing 401 test today is a security hole tomorrow.
 
 ```typescript
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("Error responses", () => {
   test("400 — validation error with details", async ({ request }) => {
@@ -350,7 +350,7 @@ test.describe("Error responses", () => {
           field: "price",
           message: expect.any(String),
         }),
-      ])
+      ]),
     );
   });
 
@@ -399,8 +399,8 @@ test.describe("Error responses", () => {
   test("429 — rate limiting", async ({ request }) => {
     const responses = await Promise.all(
       Array.from({ length: 50 }, () =>
-        request.get("/api/search", { params: { q: "test" } })
-      )
+        request.get("/api/search", { params: { q: "test" } }),
+      ),
     );
     const rateLimited = responses.filter((r) => r.status() === 429);
     expect(rateLimited.length).toBeGreaterThan(0);
@@ -415,9 +415,9 @@ test.describe("Error responses", () => {
 **Avoid when**: You need to test the browser file picker dialog — use `page.setInputFiles()` instead.
 
 ```typescript
-import { test, expect } from "@playwright/test";
-import path from "path";
 import fs from "fs";
+import path from "path";
+import { expect, test } from "@playwright/test";
 
 test("upload file via multipart", async ({ request }) => {
   const filePath = path.resolve("tests/fixtures/report.pdf");
@@ -468,7 +468,7 @@ test("rejects oversized files", async ({ request }) => {
 **Avoid when**: You can test each endpoint in isolation and the interactions are trivial.
 
 ```typescript
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test("complete order workflow", async ({ request }) => {
   // Step 1: Create a product
@@ -537,7 +537,7 @@ test("state machine transitions — publish workflow", async ({ request }) => {
     `/api/articles/${article.id}/status`,
     {
       data: { status: "published" },
-    }
+    },
   );
   expect(approveResp.ok()).toBeTruthy();
   expect((await approveResp.json()).status).toBe("published");
@@ -578,7 +578,7 @@ test("API + E2E hybrid — seed via API, verify in browser", async ({
 **Avoid when**: You only need to check one or two specific fields — use `toMatchObject` instead.
 
 ```typescript
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { z } from "zod";
 
 const ItemSchema = z.object({
@@ -613,7 +613,7 @@ test("GET /api/items matches schema", async ({ request }) => {
     throw new Error(
       `Schema validation failed:\n${result.error.issues
         .map((i) => `  ${i.path.join(".")}: ${i.message}`)
-        .join("\n")}`
+        .join("\n")}`,
     );
   }
 });

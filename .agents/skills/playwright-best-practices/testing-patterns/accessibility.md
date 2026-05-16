@@ -19,8 +19,8 @@ npm install -D @axe-core/playwright
 ### Basic A11y Test
 
 ```typescript
-import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { expect, test } from "@playwright/test";
 
 test("homepage should have no a11y violations", async ({ page }) => {
   await page.goto("/");
@@ -61,8 +61,8 @@ test("ignore known issues", async ({ page }) => {
 
 ```typescript
 // fixtures/a11y.fixture.ts
-import { test as base } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { test as base } from "@playwright/test";
 
 type A11yFixtures = {
   makeAxeBuilder: () => AxeBuilder;

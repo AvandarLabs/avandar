@@ -1,5 +1,5 @@
+import { withSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
 import { createModelCrudClient } from "@clients/ModelCrudClient/createModelCrudClient.ts";
-import { withSupabaseClient } from "@clients/SupabaseCrudClient/withSupabaseClient.ts";
 import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined.ts";
 import { objectEntries } from "@utils/objects/objectEntries.ts";
 import { objectKeys } from "@utils/objects/objectKeys.ts";
@@ -319,14 +319,10 @@ export function createSupabaseCrudClient<
     },
   });
 
-  return withSupabaseClient(
-    modelClient as SupabaseCrudClient<
-      M,
-      ExtendedQueriesClient,
-      ExtendedMutationsClient
-    >,
-    (newDBClient: SupabaseClient<RegisteredSupabaseDatabase>) => {
-      return createSupabaseCrudClient({ ...options, dbClient: newDBClient });
-    },
-  );
+  const withDb = modelClient.mixin(withSupabaseClient(dbClient));
+  return withDb as unknown as SupabaseCrudClient<
+    M,
+    ExtendedQueriesClient,
+    ExtendedMutationsClient
+  >;
 }

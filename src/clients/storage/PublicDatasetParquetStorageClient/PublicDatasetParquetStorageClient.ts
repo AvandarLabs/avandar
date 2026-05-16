@@ -1,9 +1,9 @@
-import { MIMEType } from "@utils/types/common.types";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
+import { MIMEType } from "@utils";
 import {
   getPublicDatasetParquetStoragePath,
   PUBLIC_BUCKET_NAME,
 } from "@/clients/storage/PublicDatasetParquetStorageClient/utils";
+import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 

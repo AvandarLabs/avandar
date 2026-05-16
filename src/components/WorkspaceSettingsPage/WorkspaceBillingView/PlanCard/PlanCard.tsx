@@ -8,7 +8,7 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { useRouter } from "@tanstack/react-router";
-import { notifyExpiredSession } from "@ui/notifications/notifyExpiredSession";
+import { notifyExpiredSession } from "@ui";
 import { useState } from "react";
 import { match } from "ts-pattern";
 import { goToPolarCheckout } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/goToPolarCheckout";

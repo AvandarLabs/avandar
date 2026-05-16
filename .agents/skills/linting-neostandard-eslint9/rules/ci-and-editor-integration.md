@@ -23,9 +23,7 @@ Use `lint-staged` (or equivalent) to lint only changed files before commit.
 ```json
 {
   "lint-staged": {
-    "*.{js,mjs,cjs,ts,mts,cts}": [
-      "eslint --fix"
-    ]
+    "*.{js,mjs,cjs,ts,mts,cts}": ["eslint --fix"]
   }
 }
 ```

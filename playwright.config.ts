@@ -10,8 +10,8 @@ const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:5173";
 export default defineConfig({
   testDir: "tests/e2e",
   /**
-   * One worker: every test recreates the same `e2e-test-workspace` slug via the
-   * E2E fixture; parallel tests would collide on that slug.
+   * Default `workers: 1`; raising it is safe: each worker gets its own
+   * `e2e-test-workspace-w{n}` slug via the worker-scoped `e2eWorkerDb` fixture.
    */
   fullyParallel: false,
   forbidOnly: !!process.env.CI,

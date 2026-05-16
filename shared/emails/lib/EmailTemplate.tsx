@@ -9,9 +9,9 @@ import {
   Section,
 } from "@react-email/components";
 import { APP_NAME } from "$/config/AppConfig.ts";
-import { ReactNode } from "react";
 import { buildRelativeImageURL } from "$/emails/lib/buildRelativeImageURL.ts";
 import { LOGO, THEME } from "$/emails/lib/EmailTheme.ts";
+import { ReactNode } from "react";
 
 type Props = {
   children: ReactNode;

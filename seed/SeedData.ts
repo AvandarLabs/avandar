@@ -1,4 +1,4 @@
-import { Model } from "@models/Model/Model";
+import { Model } from "@models";
 import type { EntityFieldConfigModel } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types";
 import type { GenericSeedData } from "scripts/SeedRunner";
 

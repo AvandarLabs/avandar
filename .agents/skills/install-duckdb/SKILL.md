@@ -11,6 +11,7 @@ allowed-tools: Bash
 Arguments: `$@`
 
 Each extension argument has the form `name` or `name@repo`.
+
 - `name` → `INSTALL name;`
 - `name@repo` → `INSTALL name FROM repo;`
 
@@ -23,8 +24,9 @@ DUCKDB=$(command -v duckdb)
 If not found, tell the user:
 
 > **DuckDB is not installed.** Install it first with one of:
-> - macOS:   `brew install duckdb`
-> - Linux:   `curl -fsSL https://install.duckdb.org | sh`
+>
+> - macOS: `brew install duckdb`
+> - Linux: `curl -fsSL https://install.duckdb.org | sh`
 > - Windows: `winget install DuckDB.cli`
 >
 > Then re-run `/duckdb-skills:install-duckdb`.
@@ -41,6 +43,7 @@ Otherwise mode is **install**.
 **Install mode:**
 
 Parse each remaining argument:
+
 - If it contains `@`, split on `@` → `INSTALL <name> FROM <repo>;`
 - Otherwise → `INSTALL <name>;`
 
@@ -61,6 +64,7 @@ LATEST=$(curl -fsSL https://duckdb.org/data/latest_stable_version.txt)
 
 - If `CURRENT` == `LATEST` → report DuckDB CLI is up to date.
 - If `CURRENT` != `LATEST` → ask the user:
+
   > **DuckDB CLI is outdated** (installed: `CURRENT`, latest: `LATEST`). Upgrade now?
 
   If the user agrees, detect the platform and run the appropriate upgrade command:

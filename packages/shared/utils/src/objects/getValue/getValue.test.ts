@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { getValue } from "@utils/objects/getValue/getValue.ts";
+import { describe, expect, it } from "vitest";
 
 describe("getValue", () => {
   describe("top-level keys", () => {

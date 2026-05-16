@@ -1,0 +1,7 @@
+---
+description: TypeScript style
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+@docs/rules/typescript.md

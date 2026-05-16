@@ -42,5 +42,19 @@ export type UserProfileRead = {
 };
 
 export type UserProfileWithRole = UserProfileRead & {
+  /**
+   * @deprecated legacy role
+   */
   role: WorkspaceRole;
+};
+
+/**
+ * Workspace members list row including role group and tag metadata for
+ * settings UI.
+ */
+export type WorkspaceMemberProfile = UserProfileWithRole & {
+  roleGroupId: string | null;
+  roleGroupName: string | null;
+  roleGroupIsBuiltin: boolean | null;
+  tags: ReadonlyArray<{ id: string; name: string; color: string }>;
 };

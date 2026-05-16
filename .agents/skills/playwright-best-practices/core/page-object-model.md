@@ -23,7 +23,7 @@ Page Object Model encapsulates page structure and interactions, providing:
 
 ```typescript
 // pages/login.page.ts
-import { Page, Locator, expect } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
 
 export class LoginPage {
   readonly page: Page;
@@ -60,7 +60,7 @@ export class LoginPage {
 
 ```typescript
 // tests/login.spec.ts
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { LoginPage } from "../pages/login.page";
 
 test.describe("Login", () => {
@@ -86,7 +86,7 @@ For reusable UI components:
 
 ```typescript
 // components/navbar.component.ts
-import { Page, Locator } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
 
 export class NavbarComponent {
   readonly container: Locator;
@@ -114,7 +114,7 @@ export class NavbarComponent {
 
 ```typescript
 // components/modal.component.ts
-import { Locator, expect } from "@playwright/test";
+import { expect, Locator } from "@playwright/test";
 
 export class ModalComponent {
   readonly container: Locator;
@@ -149,9 +149,9 @@ export class ModalComponent {
 
 ```typescript
 // pages/dashboard.page.ts
-import { Page, Locator } from "@playwright/test";
-import { NavbarComponent } from "../components/navbar.component";
+import { Locator, Page } from "@playwright/test";
 import { ModalComponent } from "../components/modal.component";
+import { NavbarComponent } from "../components/navbar.component";
 
 export class DashboardPage {
   readonly page: Page;
@@ -284,8 +284,8 @@ tests/
 ```typescript
 // fixtures/pages.fixture.ts
 import { test as base } from "@playwright/test";
-import { LoginPage } from "../pages/login.page";
 import { DashboardPage } from "../pages/dashboard.page";
+import { LoginPage } from "../pages/login.page";
 
 type Pages = {
   loginPage: LoginPage;

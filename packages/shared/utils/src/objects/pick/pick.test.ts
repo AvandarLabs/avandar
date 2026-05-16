@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { pick } from "@utils/objects/pick/pick.ts";
+import { describe, expect, it } from "vitest";
 
 describe("pick", () => {
   describe("single key as string", () => {

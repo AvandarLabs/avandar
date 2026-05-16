@@ -1,5 +1,5 @@
 import { Outlet } from "@tanstack/react-router";
-import { where } from "@utils/filters/where/where";
+import { where } from "@utils";
 import { ReactNode, useMemo } from "react";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { useRootWorkspaceChecks } from "@/components/common/layouts/RootLayout/useRootWorkspaceChecks/useRootWorkspaceChecks";

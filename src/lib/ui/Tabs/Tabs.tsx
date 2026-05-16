@@ -5,7 +5,7 @@ import {
   Text,
   useMantineTheme,
 } from "@mantine/core";
-import { makeObject } from "@utils/objects/makeObject/makeObject";
+import { makeObject } from "@utils";
 import { ReactNode, useState } from "react";
 import classes from "@/lib/ui/Tabs/Tabs.module.css";
 

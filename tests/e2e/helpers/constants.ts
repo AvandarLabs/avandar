@@ -1,16 +1,4 @@
 import path from "node:path";
-import {
-  E2E_PRIMARY_USER_EMAIL,
-  E2E_PRIMARY_USER_PASSWORD,
-  E2E_SEEDED_WORKSPACE_SLUG,
-} from "../setup/e2e-credentials";
-
-export const E2E_TEST_USER = {
-  email: E2E_PRIMARY_USER_EMAIL,
-  password: E2E_PRIMARY_USER_PASSWORD,
-} as const;
-
-export { E2E_SEEDED_WORKSPACE_SLUG };
 
 /** Navbar workspace menu button shows the workspace display name. */
 export const SEEDED_WORKSPACE_MENU_BUTTON_NAME = /E2E Test Workspace/i;

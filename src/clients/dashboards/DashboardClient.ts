@@ -1,7 +1,6 @@
-import { createRdbCrudClient } from "@clients/RdbCrudClient/createRdbCrudClient";
-import { notifyError } from "@ui/notifications/notify";
-import { where } from "@utils/filters/where/where";
-import { assertIsDefined, prop } from "@utils/index";
+import { createRdbCrudClient } from "@clients";
+import { notifyError } from "@ui";
+import { assertIsDefined, prop, where } from "@utils";
 import { DashboardParsers } from "$/models/Dashboard/DashboardParsers";
 import { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import { extractDatasetIdsFromDashboardConfig } from "@/clients/dashboards/extractDatasetIdsFromDashboardConfig";

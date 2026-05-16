@@ -31,78 +31,14 @@ create table public.datasets (
   -- The source of the dataset. E.g. "csv_file", "xlsx_file", etc
   source_type public.datasets__source_type not null,
   -- Description of the dataset
-  description text
+  description text,
+  -- When true, tag-based app roles do not apply; shares still can
+  is_restricted boolean not null default false
 );
 
 -- Enable row level security
+-- RLS and policies: `17.dashboards_datasets_rls.sql`.
 alter table public.datasets enable row level security;
-
--- Policies
-create policy "User can select datasets in their workspace" on public.datasets for
-select
-  to authenticated using (
-    public.datasets.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
-    )
-  );
-
-create policy "User can insert datasets in their workspace" on public.datasets for insert to authenticated
-with
-  check (
-    public.datasets.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
-    ) and
-    -- inserted datasets must have auth user as owner
-    public.datasets.owner_id = (
-      select
-        auth.uid ()
-    )
-  );
-
-create policy "User can update datasets in their workspace" on public.datasets
-for update
-  to authenticated using (
-    public.datasets.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
-    )
-  )
-with
-  check (
-    -- Updated dataset must still be in the auth user's workspace
-    public.datasets.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
-    ) and
-    -- New owner must still be a member of this workspace
-    public.datasets.owner_id = any (
-      array(
-        select
-          public.util__get_workspace_members (
-            public.datasets.workspace_id
-          )
-      )
-    )
-  );
-
-create policy "User can delete datasets in their workspace" on public.datasets for delete to authenticated using (
-  public.datasets.workspace_id = any (
-    array(
-      select
-        public.util__get_auth_user_workspaces ()
-    )
-  )
-);
 
 -- Trigger the `updated_at` update
 create trigger tr_datasets__set_updated_at before

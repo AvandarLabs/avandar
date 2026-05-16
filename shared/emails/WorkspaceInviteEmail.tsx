@@ -1,9 +1,9 @@
 import { Text } from "@react-email/components";
-import { buildAppPageURL } from "$/utils/urls/buildAppPageURL.ts";
 import { EmailFullButton } from "$/emails/lib/EmailFullButton.tsx";
 import { EmailHeading } from "$/emails/lib/EmailHeading.tsx";
 import { EmailParagraph } from "$/emails/lib/EmailParagraph.tsx";
 import { EmailTemplate } from "$/emails/lib/EmailTemplate.tsx";
+import { buildAppPageURL } from "$/utils/urls/buildAppPageURL.ts";
 
 type Props = {
   inviteId: string;

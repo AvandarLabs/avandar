@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { excludeNullsIn } from "@utils/objects/excludeNullsIn/excludeNullsIn.ts";
+import { describe, expect, it } from "vitest";
 
 describe("excludeNullsIn", () => {
   describe("single key as string", () => {

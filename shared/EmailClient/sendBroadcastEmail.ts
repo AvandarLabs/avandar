@@ -1,6 +1,6 @@
 import { render } from "@react-email/render";
-import { SendBroadcastResponseSuccess } from "resend";
 import { ResendClient } from "$/EmailClient/ResendClient.ts";
+import { SendBroadcastResponseSuccess } from "resend";
 import type { ReactNode } from "react";
 
 export type SendBroadcastEmailOptions = {

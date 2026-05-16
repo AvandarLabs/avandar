@@ -34,12 +34,24 @@ export const SeedJobs = [
           displayName: string;
           role: Workspace.Role;
         }) => {
+          const builtinRoleGroupName =
+            user.role === "admin" ? "Global Admin" : "Global Viewer";
+
+          const { data: roleGroup } = await dbClient
+            .from("role_groups")
+            .select("id")
+            .eq("workspace_id", insertedWorkspace.id)
+            .eq("name", builtinRoleGroupName)
+            .single()
+            .throwOnError();
+
           // create the workspace membership row
           const { data: membership } = await dbClient
             .from("workspace_memberships")
             .insert({
               user_id: user.id,
               workspace_id: insertedWorkspace.id,
+              role_group_id: roleGroup.id,
             })
             .select()
             .single()

@@ -1,4 +1,4 @@
-import { useQuery } from "@hooks/useQuery/useQuery";
+import { useQuery } from "@hooks";
 import {
   Button,
   Center,

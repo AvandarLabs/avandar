@@ -29,6 +29,7 @@ snipgrapher init
 ```
 
 Supported config filenames (first match wins):
+
 - `snipgrapher.config.json`
 - `snipgrapher.config.yaml`
 - `snipgrapher.config.yml`
@@ -79,6 +80,7 @@ Rendering values resolve as:
 **CLI flags > environment variables > config file > defaults**
 
 Useful env vars include:
+
 - `SNIPGRAPHER_PROFILE`
 - `SNIPGRAPHER_THEME`
 - `SNIPGRAPHER_FORMAT`

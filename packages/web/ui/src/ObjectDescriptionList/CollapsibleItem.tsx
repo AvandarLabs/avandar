@@ -49,7 +49,7 @@ export function CollapsibleItem({
         </Group>
       </UnstyledButton>
 
-      <Collapse in={isOpened} px="sm">
+      <Collapse expanded={isOpened} px="sm">
         {children}
       </Collapse>
     </Box>

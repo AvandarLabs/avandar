@@ -108,7 +108,7 @@ const rolePermissions: Permissions = {
 // Dynamic keys with constraint
 function createLookup<K extends string, V>(
   keys: K[],
-  getValue: (key: K) => V
+  getValue: (key: K) => V,
 ): Record<K, V> {
   const result = {} as Record<K, V>;
   for (const key of keys) {
@@ -219,16 +219,13 @@ type DefiniteString = NonNullable<MaybeString>;
 Combine utilities to create reusable type helpers:
 
 ```typescript
+// Usage
+import { fetchPost, fetchUser } from "external-lib";
+
 // A type that wraps any async function, extending its return type
-type WrapFunction<
-  TFunc extends (...args: any) => any,
-  TAdditional = {}
-> = (
+type WrapFunction<TFunc extends (...args: any) => any, TAdditional = {}> = (
   ...args: Parameters<TFunc>
 ) => Promise<Awaited<ReturnType<TFunc>> & TAdditional>;
-
-// Usage
-import { fetchUser, fetchPost } from "external-lib";
 
 const fetchUserWithMeta: WrapFunction<
   typeof fetchUser,
@@ -244,19 +241,19 @@ const fetchUserWithMeta: WrapFunction<
 
 ## When to Use Each Utility
 
-| Utility | Use Case |
-|---------|----------|
-| `Parameters<T>` | Wrapping functions, creating function variants |
-| `ReturnType<T>` | Extracting return types when not explicitly exported |
-| `Awaited<T>` | Unwrapping Promise types |
-| `Record<K, V>` | Creating object types with dynamic keys |
-| `Partial<T>` | Update/patch operations |
-| `Required<T>` | Ensuring all config options are provided |
-| `Omit<T, K>` | Removing sensitive or internal fields |
-| `Pick<T, K>` | Creating focused subsets of types |
-| `Exclude<T, U>` | Filtering union types |
-| `Extract<T, U>` | Selecting from union types |
-| `NonNullable<T>` | Removing null/undefined after validation |
+| Utility          | Use Case                                             |
+| ---------------- | ---------------------------------------------------- |
+| `Parameters<T>`  | Wrapping functions, creating function variants       |
+| `ReturnType<T>`  | Extracting return types when not explicitly exported |
+| `Awaited<T>`     | Unwrapping Promise types                             |
+| `Record<K, V>`   | Creating object types with dynamic keys              |
+| `Partial<T>`     | Update/patch operations                              |
+| `Required<T>`    | Ensuring all config options are provided             |
+| `Omit<T, K>`     | Removing sensitive or internal fields                |
+| `Pick<T, K>`     | Creating focused subsets of types                    |
+| `Exclude<T, U>`  | Filtering union types                                |
+| `Extract<T, U>`  | Selecting from union types                           |
+| `NonNullable<T>` | Removing null/undefined after validation             |
 
 ## Common Pitfalls
 

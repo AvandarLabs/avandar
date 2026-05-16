@@ -1,6 +1,4 @@
-import { prop } from "@utils/objects/hofs/prop/prop";
-import { makeObject } from "@utils/objects/makeObject/makeObject";
-import { setValue } from "@utils/objects/setValue/setValue";
+import { makeObject, prop, setValue } from "@utils";
 import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
 import {
   applyVizConfigFromQueryResult,

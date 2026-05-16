@@ -1,0 +1,68 @@
+import { renderHook } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useHasPermission } from "@/hooks/permissions/useHasPermission";
+import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles";
+
+vi.mock("@/hooks/permissions/useUserAppRoles", () => {
+  return { useUserAppRoles: vi.fn() };
+});
+
+describe("useHasPermission", () => {
+  beforeEach(() => {
+    vi.mocked(useUserAppRoles).mockReset();
+  });
+
+  it("grants viewer keys for a dashboards viewer", () => {
+    vi.mocked(useUserAppRoles).mockReturnValue([
+      {
+        data_sources: undefined,
+        data_explorer: undefined,
+        dashboards: "viewer",
+        settings: undefined,
+      },
+      false,
+    ]);
+
+    const { result } = renderHook(() => {
+      return useHasPermission("dashboards__can_view_dashboard");
+    });
+
+    expect(result.current).toBe(true);
+  });
+
+  it("denies editor keys for a dashboards viewer", () => {
+    vi.mocked(useUserAppRoles).mockReturnValue([
+      {
+        data_sources: undefined,
+        data_explorer: undefined,
+        dashboards: "viewer",
+        settings: undefined,
+      },
+      false,
+    ]);
+
+    const { result } = renderHook(() => {
+      return useHasPermission("dashboards__can_edit_dashboard");
+    });
+
+    expect(result.current).toBe(false);
+  });
+
+  it("denies settings keys when the user has no settings role", () => {
+    vi.mocked(useUserAppRoles).mockReturnValue([
+      {
+        data_sources: "admin",
+        data_explorer: "admin",
+        dashboards: "admin",
+        settings: undefined,
+      },
+      false,
+    ]);
+
+    const { result } = renderHook(() => {
+      return useHasPermission("settings__can_manage_workspace_users");
+    });
+
+    expect(result.current).toBe(false);
+  });
+});

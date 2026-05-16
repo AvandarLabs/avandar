@@ -190,9 +190,7 @@ await expect(page.locator(".data-row")).toHaveCount(10, { timeout: 10000 });
 // ✅ BETTER: Wait for network response, then assert
 const responsePromise = page.waitForResponse(
   (r) =>
-    r.url().includes("/api/data") &&
-    r.request().method() === "GET" &&
-    r.ok(),
+    r.url().includes("/api/data") && r.request().method() === "GET" && r.ok(),
 );
 await page.click("#load-data");
 await responsePromise;
@@ -223,11 +221,11 @@ await Promise.all([
 **Problem: Tests share backend data**
 
 ```typescript
-// ❌ BAD: All workers use same user
-const testUser = { email: "test@example.com", password: "pass123" };
-
 // ✅ GOOD: Unique data per worker
 import { test as base } from "@playwright/test";
+
+// ❌ BAD: All workers use same user
+const testUser = { email: "test@example.com", password: "pass123" };
 
 export const test = base.extend<
   {},

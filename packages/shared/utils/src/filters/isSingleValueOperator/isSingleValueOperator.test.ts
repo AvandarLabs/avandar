@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { isSingleValueOperator } from "@utils/filters/isSingleValueOperator/isSingleValueOperator.ts";
+import { describe, expect, it } from "vitest";
 
 describe("isSingleValueOperator", () => {
   it("identifies single value operators", () => {

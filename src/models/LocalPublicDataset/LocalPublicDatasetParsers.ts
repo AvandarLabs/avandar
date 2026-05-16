@@ -1,12 +1,9 @@
-import { makeParserRegistry } from "@clients/makeParserRegistry";
-import { identity } from "@utils/misc/identity";
+import { makeParserRegistry } from "@clients";
+import { identity } from "@utils";
 import { uuidType } from "$/lib/zodHelpers";
 import { z } from "zod";
 import type { LocalPublicDatasetModel } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
-import type {
-  Expect,
-  ZodSchemaEqualsTypes,
-} from "@utils/types/test-utilities.types";
+import type { Expect, ZodSchemaEqualsTypes } from "@utils";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 

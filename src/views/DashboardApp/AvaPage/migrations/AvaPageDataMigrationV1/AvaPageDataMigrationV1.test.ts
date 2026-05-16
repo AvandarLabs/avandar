@@ -1,8 +1,8 @@
-import { propEq } from "@utils/objects/hofs/propEq/propEq";
+import { propEq } from "@utils";
 import { beforeAll, describe, expect, it } from "vitest";
+import { AvaPageDataMigrationV1 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV1/AvaPageDataMigrationV1";
 import { AvaPageDataMigrator } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
-import { AvaPageDataMigrationV1 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV1/AvaPageDataMigrationV1";
 import type {
   V0_AvaPageData,
   V1_AvaPageData,

@@ -1,12 +1,12 @@
 import { ValidURLQueryParamValue } from "$/utils/urls/buildHTTPQueryString";
 import { Simplify } from "type-fest";
-import { createServerApiClient } from "@clients/ServerApiClient/createServerApiClient";
+import { createServerApiClient } from "@clients";
 import type {
-    API,
-    APIBody,
-    APIPathParams,
-    APIQueryParams,
-    APIReturnType,
+  API,
+  APIBody,
+  APIPathParams,
+  APIQueryParams,
+  APIReturnType,
 } from "@/types/http-api.types";
 import type { HTTPMethod } from "@sbfn/_shared/MiniServer/api.types";
 

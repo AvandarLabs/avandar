@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getOrderedKeys } from "@ui/ObjectDescriptionList/gerOrderedKeys/getOrderedKeys";
+import { getOrderedKeys } from "./getOrderedKeys";
 
 const ALL_KEYS = ["id", "name", "email", "created_at", "updated_at"] as const;
 const REST_KEY = "..." as const;

@@ -8,12 +8,14 @@ import {
   Title,
 } from "@mantine/core";
 import { usePrevious, useUncontrolled } from "@mantine/hooks";
-import { where } from "@utils/filters/where/where";
-import { isNonEmptyArray } from "@utils/guards/isNonEmptyArray/isNonEmptyArray";
-import { prop } from "@utils/objects/hofs/prop/prop";
-import { propEq } from "@utils/objects/hofs/propEq/propEq";
-import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
-import { objectEntries } from "@utils/objects/objectEntries";
+import {
+  isNonEmptyArray,
+  makeBucketRecord,
+  objectEntries,
+  prop,
+  propEq,
+  where,
+} from "@utils";
 import { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";

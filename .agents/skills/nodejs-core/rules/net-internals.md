@@ -51,7 +51,7 @@ class Server extends EventEmitter {
     this._connections = 0;
 
     if (connectionListener) {
-      this.on('connection', connectionListener);
+      this.on("connection", connectionListener);
     }
   }
 
@@ -63,14 +63,14 @@ class Server extends EventEmitter {
     const err = this._handle.bind(host, port);
     if (err) {
       this._handle.close();
-      throw errnoException(err, 'bind');
+      throw errnoException(err, "bind");
     }
 
     // Listen
     const listenErr = this._handle.listen(backlog);
     if (listenErr) {
       this._handle.close();
-      throw errnoException(listenErr, 'listen');
+      throw errnoException(listenErr, "listen");
     }
 
     // Set up connection callback
@@ -82,7 +82,7 @@ function onconnection(err, clientHandle) {
   const self = this.owner;
 
   if (err) {
-    self.emit('error', errnoException(err, 'accept'));
+    self.emit("error", errnoException(err, "accept"));
     return;
   }
 
@@ -90,11 +90,11 @@ function onconnection(err, clientHandle) {
   const socket = new Socket({
     handle: clientHandle,
     allowHalfOpen: self.allowHalfOpen,
-    pauseOnCreate: self.pauseOnConnect
+    pauseOnCreate: self.pauseOnConnect,
   });
 
   self._connections++;
-  self.emit('connection', socket);
+  self.emit("connection", socket);
 }
 ```
 
@@ -157,7 +157,7 @@ void TCPWrap::OnConnection(uv_stream_t* handle, int status) {
 ```javascript
 // lib/net.js
 
-Socket.prototype.connect = function(options, callback) {
+Socket.prototype.connect = function (options, callback) {
   const self = this;
 
   // Create handle if not exists
@@ -183,7 +183,7 @@ function connect(socket, address, port) {
   const err = socket._handle.connect(req, address, port);
 
   if (err) {
-    socket.destroy(errnoException(err, 'connect'));
+    socket.destroy(errnoException(err, "connect"));
   }
 }
 
@@ -191,7 +191,7 @@ function afterConnect(status, handle, req, readable, writable) {
   const socket = handle.owner;
 
   if (status !== 0) {
-    socket.destroy(errnoException(status, 'connect'));
+    socket.destroy(errnoException(status, "connect"));
     return;
   }
 
@@ -199,7 +199,7 @@ function afterConnect(status, handle, req, readable, writable) {
   socket.writable = writable;
 
   socket._handle.readStart();
-  socket.emit('connect');
+  socket.emit("connect");
 }
 ```
 
@@ -320,27 +320,27 @@ class Socket extends EventEmitter {
 
     if (err) {
       // Immediate error
-      process.nextTick(callback, errnoException(err, 'send'));
+      process.nextTick(callback, errnoException(err, "send"));
     }
   }
 
   bind(port, address, callback) {
     const err = this._handle.bind(address, port, flags);
     if (err) {
-      throw errnoException(err, 'bind');
+      throw errnoException(err, "bind");
     }
 
     // Start receiving
     const recvErr = this._handle.recvStart();
     if (recvErr) {
-      throw errnoException(recvErr, 'recvStart');
+      throw errnoException(recvErr, "recvStart");
     }
   }
 }
 
 function onMessage(nread, handle, buf, rinfo) {
   const self = handle.owner;
-  self.emit('message', buf.slice(0, nread), rinfo);
+  self.emit("message", buf.slice(0, nread), rinfo);
 }
 ```
 
@@ -437,9 +437,8 @@ void UDPWrap::OnRecv(uv_udp_t* handle,
 ```javascript
 // Get active socket handles
 const handles = process._getActiveHandles();
-const sockets = handles.filter(h =>
-  h.constructor.name === 'TCP' ||
-  h.constructor.name === 'Socket'
+const sockets = handles.filter(
+  (h) => h.constructor.name === "TCP" || h.constructor.name === "Socket",
 );
 
 console.log(`Active sockets: ${sockets.length}`);
@@ -448,15 +447,15 @@ console.log(`Active sockets: ${sockets.length}`);
 ### Server Connection Counting
 
 ```javascript
-const net = require('node:net');
+const net = require("node:net");
 
 const server = net.createServer();
 const connections = new Set();
 
-server.on('connection', (socket) => {
+server.on("connection", (socket) => {
   connections.add(socket);
 
-  socket.on('close', () => {
+  socket.on("close", () => {
     connections.delete(socket);
   });
 
@@ -464,12 +463,12 @@ server.on('connection', (socket) => {
   socket._bytesReceived = 0;
   socket._bytesSent = 0;
 
-  socket.on('data', (chunk) => {
+  socket.on("data", (chunk) => {
     socket._bytesReceived += chunk.length;
   });
 
   const originalWrite = socket.write.bind(socket);
-  socket.write = function(data, encoding, callback) {
+  socket.write = function (data, encoding, callback) {
     socket._bytesSent += Buffer.byteLength(data);
     return originalWrite(data, encoding, callback);
   };
@@ -479,8 +478,10 @@ server.on('connection', (socket) => {
 setInterval(() => {
   console.log(`Active connections: ${connections.size}`);
   for (const socket of connections) {
-    console.log(`  ${socket.remoteAddress}:${socket.remotePort} - ` +
-                `rx: ${socket._bytesReceived}, tx: ${socket._bytesSent}`);
+    console.log(
+      `  ${socket.remoteAddress}:${socket.remotePort} - ` +
+        `rx: ${socket._bytesReceived}, tx: ${socket._bytesSent}`,
+    );
   }
 }, 5000);
 ```
@@ -494,24 +495,24 @@ const socket = net.connect(port, host);
 
 // Increase kernel buffer sizes
 // Must be done before connection
-socket.setRecvBufferSize?.(1024 * 1024);  // Node 12+
-socket.setSendBufferSize?.(1024 * 1024);  // Node 12+
+socket.setRecvBufferSize?.(1024 * 1024); // Node 12+
+socket.setSendBufferSize?.(1024 * 1024); // Node 12+
 ```
 
 ### Connection Reuse (HTTP Keep-Alive)
 
 ```javascript
-const http = require('node:http');
+const http = require("node:http");
 
 const agent = new http.Agent({
   keepAlive: true,
   keepAliveMsecs: 60000,
   maxSockets: 100,
-  maxFreeSockets: 10
+  maxFreeSockets: 10,
 });
 
 // All requests share connections
-http.get({ host: 'example.com', agent }, callback);
+http.get({ host: "example.com", agent }, callback);
 ```
 
 ## Debugging
@@ -533,7 +534,7 @@ console.log({
   localAddress: socket.localAddress,
   localPort: socket.localPort,
   remoteAddress: socket.remoteAddress,
-  remotePort: socket.remotePort
+  remotePort: socket.remotePort,
 });
 ```
 
@@ -565,8 +566,8 @@ setImmediate(() => {
 ### ECONNREFUSED
 
 ```javascript
-socket.on('error', (err) => {
-  if (err.code === 'ECONNREFUSED') {
+socket.on("error", (err) => {
+  if (err.code === "ECONNREFUSED") {
     // Server not running or wrong port
     console.log(`Connection refused to ${err.address}:${err.port}`);
   }
@@ -576,8 +577,8 @@ socket.on('error', (err) => {
 ### EADDRINUSE
 
 ```javascript
-server.on('error', (err) => {
-  if (err.code === 'EADDRINUSE') {
+server.on("error", (err) => {
+  if (err.code === "EADDRINUSE") {
     console.log(`Port ${err.port} already in use`);
     // Try different port or use SO_REUSEADDR
   }
@@ -593,8 +594,8 @@ server.listen({ port: 3000, reuseAddr: true });
 const socket = net.connect(port, host);
 
 socket.setTimeout(5000);
-socket.on('timeout', () => {
-  console.log('Connection timed out');
+socket.on("timeout", () => {
+  console.log("Connection timed out");
   socket.destroy();
 });
 ```

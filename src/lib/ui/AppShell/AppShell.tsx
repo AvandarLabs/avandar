@@ -1,4 +1,4 @@
-import { useToggleBoolean } from "@hooks/useToggleBoolean/useToggleBoolean";
+import { useToggleBoolean } from "@hooks";
 import { AppShell as MantineAppShell } from "@mantine/core";
 import {
   Spotlight,

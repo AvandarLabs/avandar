@@ -26,6 +26,7 @@ const DBReadSchema = z.object({
   description: z.string().nullable(),
   id: z.uuid(),
   is_public: z.boolean(),
+  is_restricted: z.boolean(),
   name: z.string(),
   owner_id: z.uuid(),
   owner_profile_id: z.uuid(),

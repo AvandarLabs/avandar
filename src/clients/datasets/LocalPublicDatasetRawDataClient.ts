@@ -1,14 +1,13 @@
-import { createServiceClient } from "@clients/ServiceClient/createServiceClient";
-import { WithQueryHooks } from "@hooks/index";
-import { withQueryHooks } from "@hooks/withQueryHooks/withQueryHooks";
-import { withLogger } from "@logger/module-augmenters/withLogger";
-import { isDefined } from "@utils/guards/isDefined/isDefined";
+import { createServiceClient } from "@clients";
+import { WithQueryHooks, withQueryHooks } from "@hooks";
+import { withLogger } from "@logger";
+import { isDefined } from "@utils";
 import { LocalPublicDatasetClient } from "@/clients/datasets/LocalPublicDatasetClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { promiseMap } from "@/lib/utils/promises";
 import type { LocalPublicDataset } from "@/models/LocalPublicDataset/LocalPublicDataset.types";
-import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
-import type { WithLogger } from "@logger/Logger.types";
+import type { ServiceClient } from "@clients";
+import type { WithLogger } from "@logger";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 

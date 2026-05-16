@@ -1,3 +1,12 @@
+import { NOTIFICATION_EMAIL_FROM } from "$/EmailClient/EmailClientConfig.ts";
+import {
+  sendBroadcastEmail,
+  SendBroadcastEmailOptions,
+} from "$/EmailClient/sendBroadcastEmail.ts";
+import {
+  sendTransactionalEmail,
+  SendTransactionalEmailOptions,
+} from "$/EmailClient/sendTransactionalEmail.ts";
 import { WaitlistSignupCodeEmail } from "$/emails/WaitlistSignupCodeEmail.tsx";
 import WorkspaceInviteEmail from "$/emails/WorkspaceInviteEmail.tsx";
 import { getResendAPIKey } from "$/env/getResendAPIKey.ts";
@@ -8,15 +17,6 @@ import {
   SendBroadcastResponseSuccess,
 } from "resend";
 import { match } from "ts-pattern";
-import { NOTIFICATION_EMAIL_FROM } from "$/EmailClient/EmailClientConfig.ts";
-import {
-  sendBroadcastEmail,
-  SendBroadcastEmailOptions,
-} from "$/EmailClient/sendBroadcastEmail.ts";
-import {
-  sendTransactionalEmail,
-  SendTransactionalEmailOptions,
-} from "$/EmailClient/sendTransactionalEmail.ts";
 import type { IEmailClient } from "$/EmailClient/EmailClient.types.ts";
 
 function createEmailClient(): IEmailClient {

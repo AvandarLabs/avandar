@@ -5,7 +5,7 @@ import {
 } from "@mantine/spotlight";
 import { IconDatabase, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "@tanstack/react-router";
-import { notifySuccess } from "@ui/notifications/notify";
+import { notifySuccess } from "@ui";
 import { useMemo } from "react";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { SpotlightLinks } from "@/config/SpotlightLinks";

@@ -12,15 +12,15 @@ metadata:
 Fastify has a built-in error handler. Thrown errors automatically become HTTP responses:
 
 ```typescript
-import Fastify from 'fastify';
+import Fastify from "fastify";
 
 const app = Fastify({ logger: true });
 
-app.get('/users/:id', async (request) => {
+app.get("/users/:id", async (request) => {
   const user = await findUser(request.params.id);
   if (!user) {
     // Throwing an error with statusCode sets the response status
-    const error = new Error('User not found');
+    const error = new Error("User not found");
     error.statusCode = 404;
     throw error;
   }
@@ -33,27 +33,31 @@ app.get('/users/:id', async (request) => {
 Use `@fastify/error` for creating typed errors:
 
 ```typescript
-import createError from '@fastify/error';
+import createError from "@fastify/error";
 
-const NotFoundError = createError('NOT_FOUND', '%s not found', 404);
-const UnauthorizedError = createError('UNAUTHORIZED', 'Authentication required', 401);
-const ForbiddenError = createError('FORBIDDEN', 'Access denied: %s', 403);
-const ValidationError = createError('VALIDATION_ERROR', '%s', 400);
-const ConflictError = createError('CONFLICT', '%s already exists', 409);
+const NotFoundError = createError("NOT_FOUND", "%s not found", 404);
+const UnauthorizedError = createError(
+  "UNAUTHORIZED",
+  "Authentication required",
+  401,
+);
+const ForbiddenError = createError("FORBIDDEN", "Access denied: %s", 403);
+const ValidationError = createError("VALIDATION_ERROR", "%s", 400);
+const ConflictError = createError("CONFLICT", "%s already exists", 409);
 
 // Usage
-app.get('/users/:id', async (request) => {
+app.get("/users/:id", async (request) => {
   const user = await findUser(request.params.id);
   if (!user) {
-    throw new NotFoundError('User');
+    throw new NotFoundError("User");
   }
   return user;
 });
 
-app.post('/users', async (request) => {
+app.post("/users", async (request) => {
   const exists = await userExists(request.body.email);
   if (exists) {
-    throw new ConflictError('Email');
+    throw new ConflictError("Email");
   }
   return createUser(request.body);
 });
@@ -64,40 +68,43 @@ app.post('/users', async (request) => {
 Implement a centralized error handler:
 
 ```typescript
-import Fastify from 'fastify';
-import type { FastifyError, FastifyRequest, FastifyReply } from 'fastify';
+import Fastify from "fastify";
+import type { FastifyError, FastifyReply, FastifyRequest } from "fastify";
 
 const app = Fastify({ logger: true });
 
-app.setErrorHandler((error: FastifyError, request: FastifyRequest, reply: FastifyReply) => {
-  // Log the error
-  request.log.error({ err: error }, 'Request error');
+app.setErrorHandler(
+  (error: FastifyError, request: FastifyRequest, reply: FastifyReply) => {
+    // Log the error
+    request.log.error({ err: error }, "Request error");
 
-  // Handle validation errors
-  if (error.validation) {
-    return reply.code(400).send({
-      statusCode: 400,
-      error: 'Bad Request',
-      message: 'Validation failed',
-      details: error.validation,
+    // Handle validation errors
+    if (error.validation) {
+      return reply.code(400).send({
+        statusCode: 400,
+        error: "Bad Request",
+        message: "Validation failed",
+        details: error.validation,
+      });
+    }
+
+    // Handle known errors with status codes
+    const statusCode = error.statusCode ?? 500;
+    const code = error.code ?? "INTERNAL_ERROR";
+
+    // Don't expose internal error details in production
+    const message =
+      statusCode >= 500 && process.env.NODE_ENV === "production" ?
+        "Internal Server Error"
+      : error.message;
+
+    return reply.code(statusCode).send({
+      statusCode,
+      error: code,
+      message,
     });
-  }
-
-  // Handle known errors with status codes
-  const statusCode = error.statusCode ?? 500;
-  const code = error.code ?? 'INTERNAL_ERROR';
-
-  // Don't expose internal error details in production
-  const message = statusCode >= 500 && process.env.NODE_ENV === 'production'
-    ? 'Internal Server Error'
-    : error.message;
-
-  return reply.code(statusCode).send({
-    statusCode,
-    error: code,
-    message,
-  });
-});
+  },
+);
 ```
 
 ## Error Response Schema
@@ -106,41 +113,45 @@ Define consistent error response schemas:
 
 ```typescript
 app.addSchema({
-  $id: 'httpError',
-  type: 'object',
+  $id: "httpError",
+  type: "object",
   properties: {
-    statusCode: { type: 'integer' },
-    error: { type: 'string' },
-    message: { type: 'string' },
+    statusCode: { type: "integer" },
+    error: { type: "string" },
+    message: { type: "string" },
     details: {
-      type: 'array',
+      type: "array",
       items: {
-        type: 'object',
+        type: "object",
         properties: {
-          field: { type: 'string' },
-          message: { type: 'string' },
+          field: { type: "string" },
+          message: { type: "string" },
         },
       },
     },
   },
-  required: ['statusCode', 'error', 'message'],
+  required: ["statusCode", "error", "message"],
 });
 
 // Use in route schemas
-app.get('/users/:id', {
-  schema: {
-    params: {
-      type: 'object',
-      properties: { id: { type: 'string' } },
-      required: ['id'],
-    },
-    response: {
-      200: { $ref: 'user#' },
-      404: { $ref: 'httpError#' },
-      500: { $ref: 'httpError#' },
+app.get(
+  "/users/:id",
+  {
+    schema: {
+      params: {
+        type: "object",
+        properties: { id: { type: "string" } },
+        required: ["id"],
+      },
+      response: {
+        200: { $ref: "user#" },
+        404: { $ref: "httpError#" },
+        500: { $ref: "httpError#" },
+      },
     },
   },
-}, handler);
+  handler,
+);
 ```
 
 ## Reply Helpers with @fastify/sensible
@@ -148,17 +159,17 @@ app.get('/users/:id', {
 Use `@fastify/sensible` for standard HTTP errors:
 
 ```typescript
-import fastifySensible from '@fastify/sensible';
+import fastifySensible from "@fastify/sensible";
 
 app.register(fastifySensible);
 
-app.get('/users/:id', async (request, reply) => {
+app.get("/users/:id", async (request, reply) => {
   const user = await findUser(request.params.id);
   if (!user) {
-    return reply.notFound('User not found');
+    return reply.notFound("User not found");
   }
   if (!hasAccess(request.user, user)) {
-    return reply.forbidden('You cannot access this user');
+    return reply.forbidden("You cannot access this user");
   }
   return user;
 });
@@ -186,24 +197,24 @@ Errors in async handlers are automatically caught:
 
 ```typescript
 // Errors are automatically caught and passed to error handler
-app.get('/users', async (request) => {
+app.get("/users", async (request) => {
   const users = await db.users.findAll(); // If this throws, error handler catches it
   return users;
 });
 
 // Explicit error handling for custom logic
-app.get('/users/:id', async (request, reply) => {
+app.get("/users/:id", async (request, reply) => {
   try {
     const user = await db.users.findById(request.params.id);
     if (!user) {
-      return reply.code(404).send({ error: 'User not found' });
+      return reply.code(404).send({ error: "User not found" });
     }
     return user;
   } catch (error) {
     // Transform database errors
-    if (error.code === 'CONNECTION_ERROR') {
-      request.log.error({ err: error }, 'Database connection failed');
-      return reply.code(503).send({ error: 'Service temporarily unavailable' });
+    if (error.code === "CONNECTION_ERROR") {
+      request.log.error({ err: error }, "Database connection failed");
+      return reply.code(503).send({ error: "Service temporarily unavailable" });
     }
     throw error; // Re-throw for error handler
   }
@@ -215,7 +226,7 @@ app.get('/users/:id', async (request, reply) => {
 Errors in hooks are handled the same way:
 
 ```typescript
-app.addHook('onRequest', async (request, reply) => {
+app.addHook("onRequest", async (request, reply) => {
   const token = request.headers.authorization;
   if (!token) {
     // This error goes to the error handler
@@ -230,9 +241,9 @@ app.addHook('onRequest', async (request, reply) => {
 });
 
 // Or use reply to send response directly
-app.addHook('onRequest', async (request, reply) => {
+app.addHook("onRequest", async (request, reply) => {
   if (!request.headers.authorization) {
-    reply.code(401).send({ error: 'Unauthorized' });
+    reply.code(401).send({ error: "Unauthorized" });
     return; // Must return to stop processing
   }
 });
@@ -246,19 +257,22 @@ Customize the 404 response:
 app.setNotFoundHandler(async (request, reply) => {
   return reply.code(404).send({
     statusCode: 404,
-    error: 'Not Found',
+    error: "Not Found",
     message: `Route ${request.method} ${request.url} not found`,
   });
 });
 
 // With schema validation
-app.setNotFoundHandler({
-  preValidation: async (request, reply) => {
-    // Pre-validation hook for 404 handler
+app.setNotFoundHandler(
+  {
+    preValidation: async (request, reply) => {
+      // Pre-validation hook for 404 handler
+    },
   },
-}, async (request, reply) => {
-  return reply.code(404).send({ error: 'Not Found' });
-});
+  async (request, reply) => {
+    return reply.code(404).send({ error: "Not Found" });
+  },
+);
 ```
 
 ## Error Wrapping
@@ -266,12 +280,20 @@ app.setNotFoundHandler({
 Wrap external errors with context:
 
 ```typescript
-import createError from '@fastify/error';
+import createError from "@fastify/error";
 
-const DatabaseError = createError('DATABASE_ERROR', 'Database operation failed: %s', 500);
-const ExternalServiceError = createError('EXTERNAL_SERVICE_ERROR', 'External service failed: %s', 502);
+const DatabaseError = createError(
+  "DATABASE_ERROR",
+  "Database operation failed: %s",
+  500,
+);
+const ExternalServiceError = createError(
+  "EXTERNAL_SERVICE_ERROR",
+  "External service failed: %s",
+  502,
+);
 
-app.get('/users/:id', async (request) => {
+app.get("/users/:id", async (request) => {
   try {
     return await db.users.findById(request.params.id);
   } catch (error) {
@@ -279,7 +301,7 @@ app.get('/users/:id', async (request) => {
   }
 });
 
-app.get('/weather', async (request) => {
+app.get("/weather", async (request) => {
   try {
     return await weatherApi.fetch(request.query.city);
   } catch (error) {
@@ -296,9 +318,10 @@ Customize validation error format:
 app.setErrorHandler((error, request, reply) => {
   if (error.validation) {
     const details = error.validation.map((err) => {
-      const field = err.instancePath
-        ? err.instancePath.slice(1).replace(/\//g, '.')
-        : err.params?.missingProperty || 'unknown';
+      const field =
+        err.instancePath ?
+          err.instancePath.slice(1).replace(/\//g, ".")
+        : err.params?.missingProperty || "unknown";
 
       return {
         field,
@@ -309,8 +332,8 @@ app.setErrorHandler((error, request, reply) => {
 
     return reply.code(400).send({
       statusCode: 400,
-      error: 'Validation Error',
-      message: `Invalid ${error.validationContext}: ${details.map(d => d.field).join(', ')}`,
+      error: "Validation Error",
+      message: `Invalid ${error.validationContext}: ${details.map((d) => d.field).join(", ")}`,
       details,
     });
   }
@@ -325,11 +348,11 @@ app.setErrorHandler((error, request, reply) => {
 Preserve error chains for debugging:
 
 ```typescript
-app.get('/complex-operation', async (request) => {
+app.get("/complex-operation", async (request) => {
   try {
     await step1();
   } catch (error) {
-    const wrapped = new Error('Step 1 failed', { cause: error });
+    const wrapped = new Error("Step 1 failed", { cause: error });
     wrapped.statusCode = 500;
     throw wrapped;
   }
@@ -349,7 +372,7 @@ app.setErrorHandler((error, request, reply) => {
     current = current.cause;
   }
 
-  request.log.error({ errorChain: chain }, 'Request failed');
+  request.log.error({ errorChain: chain }, "Request failed");
 
   reply.code(error.statusCode || 500).send({
     error: error.message,
@@ -362,23 +385,26 @@ app.setErrorHandler((error, request, reply) => {
 Set error handlers at the plugin level:
 
 ```typescript
-app.register(async function apiRoutes(fastify) {
-  // This error handler only applies to routes in this plugin
-  fastify.setErrorHandler((error, request, reply) => {
-    request.log.error({ err: error }, 'API error');
+app.register(
+  async function apiRoutes(fastify) {
+    // This error handler only applies to routes in this plugin
+    fastify.setErrorHandler((error, request, reply) => {
+      request.log.error({ err: error }, "API error");
 
-    reply.code(error.statusCode || 500).send({
-      error: {
-        code: error.code || 'API_ERROR',
-        message: error.message,
-      },
+      reply.code(error.statusCode || 500).send({
+        error: {
+          code: error.code || "API_ERROR",
+          message: error.message,
+        },
+      });
     });
-  });
 
-  fastify.get('/data', async () => {
-    throw new Error('API-specific error');
-  });
-}, { prefix: '/api' });
+    fastify.get("/data", async () => {
+      throw new Error("API-specific error");
+    });
+  },
+  { prefix: "/api" },
+);
 ```
 
 ## Graceful Error Recovery
@@ -386,7 +412,7 @@ app.register(async function apiRoutes(fastify) {
 Handle errors gracefully without crashing:
 
 ```typescript
-app.get('/resilient', async (request, reply) => {
+app.get("/resilient", async (request, reply) => {
   const results = await Promise.allSettled([
     fetchPrimaryData(),
     fetchSecondaryData(),
@@ -395,17 +421,17 @@ app.get('/resilient', async (request, reply) => {
 
   const [primary, secondary, optional] = results;
 
-  if (primary.status === 'rejected') {
+  if (primary.status === "rejected") {
     // Primary data is required
-    throw new Error('Primary data unavailable');
+    throw new Error("Primary data unavailable");
   }
 
   return {
     data: primary.value,
-    secondary: secondary.status === 'fulfilled' ? secondary.value : null,
-    optional: optional.status === 'fulfilled' ? optional.value : null,
+    secondary: secondary.status === "fulfilled" ? secondary.value : null,
+    optional: optional.status === "fulfilled" ? optional.value : null,
     warnings: results
-      .filter((r) => r.status === 'rejected')
+      .filter((r) => r.status === "rejected")
       .map((r) => r.reason.message),
   };
 });

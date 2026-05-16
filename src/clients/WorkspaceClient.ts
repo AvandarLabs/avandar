@@ -1,7 +1,5 @@
-import { createRdbCrudClient } from "@clients/RdbCrudClient/createRdbCrudClient";
-import { createServerApiClient } from "@clients/ServerApiClient/createServerApiClient";
-import { isDefined } from "@utils/guards/isDefined/isDefined";
-import { prop } from "@utils/objects/hofs/prop/prop";
+import { createRdbCrudClient, createServerApiClient } from "@clients";
+import { isDefined, prop } from "@utils";
 import { SubscriptionParsers } from "$/models/Subscription/SubscriptionParsers";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { WorkspaceParsers } from "$/models/Workspace/WorkspaceParsers";
@@ -11,7 +9,7 @@ import { UserProfileDBReadToModelReadSchema } from "@/clients/UserClient";
 import { isOneOf } from "@/lib/utils/guards/guards";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { UserId } from "$/models/User/User.types";
-import type { UserProfileWithRole } from "$/models/User/UserProfile.types";
+import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
 
 // Platform-aware server API client; lazy-readable from any mutation/query.
 const serverApi = createServerApiClient();
@@ -70,7 +68,7 @@ export const WorkspaceClient = createUsableServiceClient(
           workspaceId,
         }: {
           workspaceId: Workspace.Id;
-        }): Promise<UserProfileWithRole[]> => {
+        }): Promise<WorkspaceMemberProfile[]> => {
           const logger = clientLogger.appendName("getUsersForWorkspace");
           logger.log("Fetching all users for workspace", { workspaceId });
 
@@ -79,29 +77,72 @@ export const WorkspaceClient = createUsableServiceClient(
             throw new Error("User not found.");
           }
 
-          const { data: memberships } = await dbClient
-            .from("workspace_memberships")
-            .select(
-              "*, user_profile:user_profiles (*), user_role:user_roles (*)",
-            )
-            .eq("workspace_id", workspaceId)
-            .throwOnError();
+          const [{ data: memberships }, { data: tagMemberships }] =
+            await Promise.all([
+              dbClient
+                .from("workspace_memberships")
+                .select(
+                  `
+              *,
+              user_profile:user_profiles (*),
+              user_role:user_roles (*),
+              role_groups ( id, name, is_builtin )
+            `,
+                )
+                .eq("workspace_id", workspaceId)
+                .throwOnError(),
+              dbClient
+                .from("user_group_memberships")
+                .select(
+                  `
+              user_id,
+              user_groups!inner ( id, name, color, workspace_id )
+            `,
+                )
+                .eq("user_groups.workspace_id", workspaceId)
+                .throwOnError(),
+            ]);
 
-          const profiles: UserProfileWithRole[] = memberships
+          const tagsByUserId = new Map<
+            string,
+            Array<{ id: string; name: string; color: string }>
+          >();
+          for (const row of tagMemberships ?? []) {
+            const ug = row.user_groups as {
+              id: string;
+              name: string;
+              color: string;
+            };
+            const uid = row.user_id;
+            const list = tagsByUserId.get(uid) ?? [];
+            list.push({ id: ug.id, name: ug.name, color: ug.color });
+            tagsByUserId.set(uid, list);
+          }
+
+          const profiles: WorkspaceMemberProfile[] = (memberships ?? [])
             .map((membership) => {
               if (
                 membership.user_profile &&
                 membership.user_role &&
                 isOneOf(membership.user_role.role, ["admin", "member"])
               ) {
+                const rowEmail =
+                  membership.user_profile.user_id === session.user.id ?
+                    (session.user.email ?? "")
+                  : "";
                 const profile = UserProfileDBReadToModelReadSchema.parse({
                   ...membership.user_profile,
-                  email: session?.user?.email,
+                  email: rowEmail,
                 });
                 const role = membership.user_role.role;
+                const roleGroup = membership.role_groups;
                 return {
                   ...profile,
                   role,
+                  roleGroupId: roleGroup?.id ?? null,
+                  roleGroupName: roleGroup?.name ?? null,
+                  roleGroupIsBuiltin: roleGroup?.is_builtin ?? null,
+                  tags: tagsByUserId.get(membership.user_id) ?? [],
                 };
               }
               return undefined;
@@ -109,25 +150,6 @@ export const WorkspaceClient = createUsableServiceClient(
             .filter(isDefined);
 
           return profiles;
-        },
-
-        getPendingInvites: async ({
-          workspaceId,
-        }: {
-          workspaceId: Workspace.Id;
-        }): Promise<Workspace.Invite[]> => {
-          const logger = clientLogger.appendName("getPendingInvites");
-          logger.log("Fetching pending invites for workspace", {
-            workspaceId,
-          });
-
-          const { data: invites } = await dbClient
-            .from("workspace_invites")
-            .select("*")
-            .eq("workspace_id", workspaceId)
-            .eq("invite_status", "pending")
-            .throwOnError();
-          return invites;
         },
       };
     },
@@ -207,11 +229,7 @@ export const WorkspaceClient = createUsableServiceClient(
     },
   }),
   {
-    queryFns: [
-      "getWorkspacesOfCurrentUser",
-      "getUsersForWorkspace",
-      "getPendingInvites",
-    ],
+    queryFns: ["getWorkspacesOfCurrentUser", "getUsersForWorkspace"],
     mutationFns: [
       "validateWorkspaceSlug",
       "createWorkspaceWithOwner",

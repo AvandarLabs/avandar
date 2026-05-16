@@ -1,10 +1,12 @@
-import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
-import { where } from "@utils/filters/where/where";
-import { isDefined } from "@utils/guards/isDefined/isDefined";
-import { sqlTemplate } from "@utils/index";
-import { prop } from "@utils/objects/hofs/prop/prop";
-import { propEq } from "@utils/objects/hofs/propEq/propEq";
-import { makeObject } from "@utils/objects/makeObject/makeObject";
+import {
+  assertIsDefined,
+  isDefined,
+  makeObject,
+  prop,
+  propEq,
+  sqlTemplate,
+  where,
+} from "@utils";
 import { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";

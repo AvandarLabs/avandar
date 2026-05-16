@@ -1,6 +1,6 @@
 import { Box, MantineColor, Text } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
-import { objectEntries } from "@utils/objects/objectEntries";
+import { objectEntries } from "@utils";
 import clsx from "clsx";
 import { Key, ReactNode } from "react";
 import { NavLink } from "@/lib/ui/links/NavLink";

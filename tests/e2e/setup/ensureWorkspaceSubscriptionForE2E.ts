@@ -1,9 +1,5 @@
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
-import { createSupabaseAdminClient } from "../../helper/supabaseAdminClient";
-import {
-  E2E_PRIMARY_USER_EMAIL,
-  E2E_SEEDED_WORKSPACE_SLUG,
-} from "./e2e-credentials";
+import { createSupabaseAdminClient } from "../../helpers/supabaseAdminClient";
 import type { TablesInsert } from "../../../shared/types/database.types";
 
 /**
@@ -14,16 +10,22 @@ const E2E_FAKE_POLAR_PRODUCT_ID = "00000000-0000-4000-8000-000000000002";
 const E2E_FAKE_POLAR_CUSTOMER_ID = "00000000-0000-4000-8000-000000000003";
 
 /**
- * Ensures the seeded workspace has a `subscriptions` row with fake Polar ids
- * and free-plan limits. Skips when a row already exists.
+ * Ensures the workspace has a `subscriptions` row with fake Polar ids and
+ * free-plan limits. Skips when a row already exists.
+ *
+ * @param options.workspaceSlug Workspace slug from the URL.
+ * @param options.polarCustomerEmail Stored on the subscription row.
  */
-export async function ensureWorkspaceSubscriptionForE2E(): Promise<void> {
+export async function ensureWorkspaceSubscriptionForE2E(options: {
+  workspaceSlug: string;
+  polarCustomerEmail: string;
+}): Promise<void> {
   const adminClient = createSupabaseAdminClient();
 
   const { data: workspaceRow, error: workspaceError } = await adminClient
     .from("workspaces")
     .select("id, owner_id")
-    .eq("slug", E2E_SEEDED_WORKSPACE_SLUG)
+    .eq("slug", options.workspaceSlug)
     .maybeSingle();
 
   if (workspaceError) {
@@ -32,8 +34,8 @@ export async function ensureWorkspaceSubscriptionForE2E(): Promise<void> {
 
   if (!workspaceRow) {
     console.warn(
-      `[e2e] No workspace "${E2E_SEEDED_WORKSPACE_SLUG}" found; ensure the ` +
-        `E2E workspace fixture ran before this helper.`,
+      `[e2e] No workspace "${options.workspaceSlug}" found; ensure the ` +
+        `E2E workspace was provisioned before this helper.`,
     );
     return;
   }
@@ -54,7 +56,7 @@ export async function ensureWorkspaceSubscriptionForE2E(): Promise<void> {
     polar_subscription_id: E2E_FAKE_POLAR_SUBSCRIPTION_ID,
     polar_product_id: E2E_FAKE_POLAR_PRODUCT_ID,
     polar_customer_id: E2E_FAKE_POLAR_CUSTOMER_ID,
-    polar_customer_email: E2E_PRIMARY_USER_EMAIL,
+    polar_customer_email: options.polarCustomerEmail,
     workspace_id: workspaceRow.id,
     subscription_owner_id: workspaceRow.owner_id,
     subscription_status: "active",
@@ -80,6 +82,6 @@ export async function ensureWorkspaceSubscriptionForE2E(): Promise<void> {
 
   console.log(
     `[e2e] Inserted fake-Polar free subscription for workspace ` +
-      `"${E2E_SEEDED_WORKSPACE_SLUG}".`,
+      `"${options.workspaceSlug}".`,
   );
 }

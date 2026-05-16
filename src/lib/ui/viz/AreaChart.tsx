@@ -13,22 +13,22 @@
  * external component API is identical to every other chart wrapper in this
  * directory, so nothing outside this file is affected.
  */
+import { Box } from "@mantine/core";
+import { formatDate } from "@utils";
+import { useId, useMemo } from "react";
 import {
   Area,
-  AreaChart as RechartsAreaChart,
   CartesianGrid,
   Legend,
+  AreaChart as RechartsAreaChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
-import { Box } from "@mantine/core";
-import { formatDate } from "@utils/dates/formatDate/formatDate";
-import { useId, useMemo } from "react";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
-import type { CurveType } from "$/models/vizs/CurveType";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
+import type { CurveType } from "$/models/vizs/CurveType";
 
 type Props = XYChartProps & {
   withLegend?: boolean;
@@ -102,7 +102,9 @@ export function AreaChart({
             stroke=""
             tickLine={false}
           />
-          {withLegend ? <Legend verticalAlign="top" /> : null}
+          {withLegend ?
+            <Legend verticalAlign="top" />
+          : null}
           <Tooltip labelFormatter={labelFormatter} />
           <Area
             type={curveType}

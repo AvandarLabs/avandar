@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps.ts";
+import { describe, expect, it } from "vitest";
 
 describe("hasDefinedProps", () => {
   describe("single key as string", () => {

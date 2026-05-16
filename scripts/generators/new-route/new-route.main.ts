@@ -2,7 +2,7 @@ import { execSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
-import { toPascalCase } from "@utils/strings/toPascalCase/toPascalCase";
+import { toPascalCase } from "@utils";
 import { program } from "commander";
 import prettier from "prettier";
 import { z } from "zod";

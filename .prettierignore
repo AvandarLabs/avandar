@@ -4,3 +4,6 @@ build
 src/routeTree.gen.ts
 LICENSE
 shared/types/database.types.ts
+
+# pgTap / psql scripts; prettier-plugin-sql cannot parse meta-commands (\set, …)
+supabase/tests/**/*.sql

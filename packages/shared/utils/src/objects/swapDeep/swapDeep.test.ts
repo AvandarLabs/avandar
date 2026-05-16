@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { isNull } from "@utils/guards/isNull/isNull.ts";
 import { swapDeep } from "@utils/objects/swapDeep/swapDeep.ts";
+import { describe, expect, it } from "vitest";
 
 describe("swapDeep", () => {
   describe("primitives and non-object values", () => {

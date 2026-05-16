@@ -1,18 +1,18 @@
 import { mkdir, readdir } from "node:fs/promises";
 import { join } from "node:path";
-import { ETLEngine } from "@ava-etl/ETLEngine/ETLEngine";
 import {
+  ETLEngine,
   getETLOutputDir,
   getETLPipelineInputDir,
-} from "@ava-etl/ETLEngine/etlPaths";
-import { NodeDuckDB } from "@ava-etl/NodeDuckDB/NodeDuckDB";
+  NodeDuckDB,
+} from "@ava-etl";
 import {
   createSupabaseAdminClient,
   getWdiYearCoverageFromParquet,
   upsertWorldBankWdiCatalogEntry,
 } from "@pipelines/world-bank__wdi/catalogOpenDataInsert";
-import { MIMEType } from "@utils/types/common.types";
-import type { TransformedDataDescriptionForParquet } from "@ava-etl/ETLEngine/transformedCSVsToParquetBlobs";
+import { MIMEType } from "@utils";
+import type { TransformedDataDescriptionForParquet } from "@ava-etl";
 import type { WdiTableParquetSummary } from "@pipelines/world-bank__wdi/catalogOpenDataInsert";
 
 const PIPELINE_NAME = "world-bank__wdi" as const;

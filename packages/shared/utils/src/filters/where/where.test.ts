@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { where } from "@utils/filters/where/where.ts";
+import { describe, expect, it } from "vitest";
 
 type Row = { id: string };
 

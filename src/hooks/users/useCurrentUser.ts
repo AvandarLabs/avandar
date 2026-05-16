@@ -1,4 +1,4 @@
-import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
+import { hasDefinedProps } from "@utils";
 import { Route as AuthRoute } from "@/routes/_auth/route";
 import type { User } from "$/models/User/User";
 

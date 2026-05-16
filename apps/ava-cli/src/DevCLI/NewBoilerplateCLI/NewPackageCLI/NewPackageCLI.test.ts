@@ -28,7 +28,7 @@ const MOCK_TSCONFIG = JSON.stringify(
   {
     compilerOptions: {
       paths: {
-        "@utils/*": ["./packages/shared/utils/src/*"],
+        "@utils": ["./packages/shared/utils/src/*"],
       },
     },
   },
@@ -173,6 +173,9 @@ describe("writeNewPackageBoilerplate", () => {
         paths: Record<string, string[]>;
       };
     };
+    expect(written.compilerOptions.paths["@my-lib"]).toEqual([
+      "./packages/shared/my-lib/src/index.ts",
+    ]);
     expect(written.compilerOptions.paths["@my-lib/*"]).toEqual([
       "./packages/shared/my-lib/src/*",
     ]);

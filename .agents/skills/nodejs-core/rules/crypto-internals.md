@@ -37,10 +37,10 @@ OpenSSL
 
 ```javascript
 // These use the thread pool (libuv):
-crypto.pbkdf2(password, salt, iterations, keylen, 'sha512', callback);
+crypto.pbkdf2(password, salt, iterations, keylen, "sha512", callback);
 crypto.scrypt(password, salt, keylen, callback);
 crypto.randomBytes(256, callback);
-crypto.generateKeyPair('rsa', options, callback);
+crypto.generateKeyPair("rsa", options, callback);
 
 // Thread pool can become a bottleneck!
 ```
@@ -49,9 +49,9 @@ crypto.generateKeyPair('rsa', options, callback);
 
 ```javascript
 // These run synchronously on the main thread:
-const hash = crypto.createHash('sha256').update(data).digest();
+const hash = crypto.createHash("sha256").update(data).digest();
 const cipher = crypto.createCipheriv(algorithm, key, iv);
-const hmac = crypto.createHmac('sha256', key).update(data).digest();
+const hmac = crypto.createHmac("sha256", key).update(data).digest();
 ```
 
 ## Hash Operations
@@ -59,16 +59,16 @@ const hmac = crypto.createHmac('sha256', key).update(data).digest();
 ### JavaScript API
 
 ```javascript
-const crypto = require('node:crypto');
+const crypto = require("node:crypto");
 
 // Stream-based hashing
-const hash = crypto.createHash('sha256');
-hash.update('data1');
-hash.update('data2');
-const digest = hash.digest('hex');
+const hash = crypto.createHash("sha256");
+hash.update("data1");
+hash.update("data2");
+const digest = hash.digest("hex");
 
 // One-shot (Node.js 15+)
-const digest = crypto.hash('sha256', data, 'hex');
+const digest = crypto.hash("sha256", data, "hex");
 ```
 
 ### C++ Implementation
@@ -123,18 +123,18 @@ void Hash::HashDigest(const FunctionCallbackInfo<Value>& args) {
 ### Encryption
 
 ```javascript
-const crypto = require('node:crypto');
+const crypto = require("node:crypto");
 
 function encrypt(text, key, iv) {
   // Create cipher with specific algorithm
-  const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+  const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
 
   // Set additional authenticated data (for AEAD modes)
-  cipher.setAAD(Buffer.from('additional data'));
+  cipher.setAAD(Buffer.from("additional data"));
 
   // Encrypt
-  let encrypted = cipher.update(text, 'utf8', 'hex');
-  encrypted += cipher.final('hex');
+  let encrypted = cipher.update(text, "utf8", "hex");
+  encrypted += cipher.final("hex");
 
   // Get auth tag (for AEAD modes)
   const authTag = cipher.getAuthTag();
@@ -181,7 +181,7 @@ void CipherBase::Update(const FunctionCallbackInfo<Value>& args) {
 ### Secure Random
 
 ```javascript
-const crypto = require('node:crypto');
+const crypto = require("node:crypto");
 
 // Async (uses thread pool)
 crypto.randomBytes(256, (err, buf) => {
@@ -244,57 +244,61 @@ void RandomBytes(const FunctionCallbackInfo<Value>& args) {
 ### PBKDF2
 
 ```javascript
-const crypto = require('node:crypto');
+const crypto = require("node:crypto");
 
 // Async (thread pool) - recommended
-crypto.pbkdf2('password', 'salt', 100000, 64, 'sha512', (err, key) => {
-  console.log(key.toString('hex'));
+crypto.pbkdf2("password", "salt", 100000, 64, "sha512", (err, key) => {
+  console.log(key.toString("hex"));
 });
 
 // Sync - blocks event loop!
-const key = crypto.pbkdf2Sync('password', 'salt', 100000, 64, 'sha512');
+const key = crypto.pbkdf2Sync("password", "salt", 100000, 64, "sha512");
 ```
 
 ### Scrypt (Memory-Hard)
 
 ```javascript
 // More resistant to hardware attacks
-crypto.scrypt('password', 'salt', 64, {
-  N: 16384,  // CPU/memory cost
-  r: 8,      // Block size
-  p: 1       // Parallelization
-}, (err, key) => {
-  console.log(key.toString('hex'));
-});
+crypto.scrypt(
+  "password",
+  "salt",
+  64,
+  {
+    N: 16384, // CPU/memory cost
+    r: 8, // Block size
+    p: 1, // Parallelization
+  },
+  (err, key) => {
+    console.log(key.toString("hex"));
+  },
+);
 ```
 
 ### Performance Comparison
 
 ```javascript
-const crypto = require('node:crypto');
+const crypto = require("node:crypto");
 
 // Benchmark different KDFs
 async function benchmark() {
-  const password = 'test-password';
+  const password = "test-password";
   const salt = crypto.randomBytes(16);
 
   // PBKDF2
-  console.time('pbkdf2');
+  console.time("pbkdf2");
   for (let i = 0; i < 100; i++) {
-    await new Promise(resolve =>
-      crypto.pbkdf2(password, salt, 100000, 64, 'sha512', resolve)
+    await new Promise((resolve) =>
+      crypto.pbkdf2(password, salt, 100000, 64, "sha512", resolve),
     );
   }
-  console.timeEnd('pbkdf2');
+  console.timeEnd("pbkdf2");
 
   // Scrypt
-  console.time('scrypt');
+  console.time("scrypt");
   for (let i = 0; i < 100; i++) {
-    await new Promise(resolve =>
-      crypto.scrypt(password, salt, 64, resolve)
-    );
+    await new Promise((resolve) => crypto.scrypt(password, salt, 64, resolve));
   }
-  console.timeEnd('scrypt');
+  console.timeEnd("scrypt");
 }
 ```
 
@@ -305,19 +309,19 @@ async function benchmark() {
 ```javascript
 // BAD: Create new hash for each piece of data
 function hashMany(items) {
-  return items.map(item =>
-    crypto.createHash('sha256').update(item).digest('hex')
+  return items.map((item) =>
+    crypto.createHash("sha256").update(item).digest("hex"),
   );
 }
 
 // GOOD: Stream data through single hash
 function hashCombined(items) {
-  const hash = crypto.createHash('sha256');
+  const hash = crypto.createHash("sha256");
   for (const item of items) {
     hash.update(item);
-    hash.update('\n');  // Separator
+    hash.update("\n"); // Separator
   }
-  return hash.digest('hex');
+  return hash.digest("hex");
 }
 ```
 
@@ -327,7 +331,7 @@ function hashCombined(items) {
 // For high-throughput encryption
 class CipherStream {
   constructor(key, iv) {
-    this.cipher = crypto.createCipheriv('aes-256-ctr', key, iv);
+    this.cipher = crypto.createCipheriv("aes-256-ctr", key, iv);
     this.outputBuffer = Buffer.allocUnsafe(65536);
   }
 
@@ -347,14 +351,20 @@ class CipherStream {
 
 ```javascript
 // BAD: Sync operations block event loop
-app.post('/login', (req, res) => {
-  const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512');
+app.post("/login", (req, res) => {
+  const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, "sha512");
   // Server blocked for ~100ms!
 });
 
 // GOOD: Use async
-app.post('/login', async (req, res) => {
-  const hash = await promisify(crypto.pbkdf2)(password, salt, 100000, 64, 'sha512');
+app.post("/login", async (req, res) => {
+  const hash = await promisify(crypto.pbkdf2)(
+    password,
+    salt,
+    100000,
+    64,
+    "sha512",
+  );
 });
 ```
 
@@ -363,37 +373,37 @@ app.post('/login', async (req, res) => {
 Node.js 15+ includes the Web Crypto API:
 
 ```javascript
-const { subtle } = require('node:crypto').webcrypto;
+const { subtle } = require("node:crypto").webcrypto;
 
 async function encryptWithWebCrypto(data, password) {
   // Derive key from password
   const keyMaterial = await subtle.importKey(
-    'raw',
+    "raw",
     Buffer.from(password),
-    'PBKDF2',
+    "PBKDF2",
     false,
-    ['deriveBits', 'deriveKey']
+    ["deriveBits", "deriveKey"],
   );
 
   const key = await subtle.deriveKey(
     {
-      name: 'PBKDF2',
-      salt: Buffer.from('salt'),
+      name: "PBKDF2",
+      salt: Buffer.from("salt"),
       iterations: 100000,
-      hash: 'SHA-256'
+      hash: "SHA-256",
     },
     keyMaterial,
-    { name: 'AES-GCM', length: 256 },
+    { name: "AES-GCM", length: 256 },
     false,
-    ['encrypt', 'decrypt']
+    ["encrypt", "decrypt"],
   );
 
   const iv = crypto.randomBytes(12);
 
   const encrypted = await subtle.encrypt(
-    { name: 'AES-GCM', iv },
+    { name: "AES-GCM", iv },
     key,
-    Buffer.from(data)
+    Buffer.from(data),
   );
 
   return { encrypted: Buffer.from(encrypted), iv };
@@ -405,14 +415,14 @@ async function encryptWithWebCrypto(data, password) {
 Node.js 17+ supports OpenSSL 3.0 providers:
 
 ```javascript
-const crypto = require('node:crypto');
+const crypto = require("node:crypto");
 
 // Check available algorithms
 console.log(crypto.getHashes());
 console.log(crypto.getCiphers());
 
 // Check if FIPS mode is available
-console.log('FIPS available:', crypto.getFips());
+console.log("FIPS available:", crypto.getFips());
 
 // Enable FIPS mode (if compiled with FIPS support)
 crypto.setFips(1);
@@ -423,13 +433,13 @@ crypto.setFips(1);
 ### OpenSSL Errors
 
 ```javascript
-const crypto = require('node:crypto');
+const crypto = require("node:crypto");
 
 try {
-  const cipher = crypto.createCipheriv('aes-256-gcm', 'short-key', 'short-iv');
+  const cipher = crypto.createCipheriv("aes-256-gcm", "short-key", "short-iv");
 } catch (err) {
-  console.error('Crypto error:', err.message);
-  console.error('OpenSSL error:', err.opensslErrorStack);
+  console.error("Crypto error:", err.message);
+  console.error("OpenSSL error:", err.opensslErrorStack);
 }
 ```
 
@@ -437,13 +447,14 @@ try {
 
 ```javascript
 function isAlgorithmSupported(name) {
-  return crypto.getHashes().includes(name) ||
-         crypto.getCiphers().includes(name);
+  return (
+    crypto.getHashes().includes(name) || crypto.getCiphers().includes(name)
+  );
 }
 
 // Check before use
-if (!isAlgorithmSupported('sha3-256')) {
-  console.warn('SHA3-256 not available, using SHA-256');
+if (!isAlgorithmSupported("sha3-256")) {
+  console.warn("SHA3-256 not available, using SHA-256");
 }
 ```
 
@@ -454,15 +465,12 @@ if (!isAlgorithmSupported('sha3-256')) {
 ```javascript
 // BAD: Vulnerable to timing attack
 function checkSignature(expected, actual) {
-  return expected === actual;  // Short-circuits on first difference
+  return expected === actual; // Short-circuits on first difference
 }
 
 // GOOD: Constant-time comparison
 function checkSignature(expected, actual) {
-  return crypto.timingSafeEqual(
-    Buffer.from(expected),
-    Buffer.from(actual)
-  );
+  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(actual));
 }
 ```
 
@@ -471,10 +479,10 @@ function checkSignature(expected, actual) {
 ```javascript
 // BAD: Reusing IV
 const iv = crypto.randomBytes(12);
-messages.forEach(msg => encrypt(msg, key, iv));  // Security vulnerability!
+messages.forEach((msg) => encrypt(msg, key, iv)); // Security vulnerability!
 
 // GOOD: Unique IV per message
-messages.forEach(msg => {
+messages.forEach((msg) => {
   const iv = crypto.randomBytes(12);
   encrypt(msg, key, iv);
 });
@@ -489,7 +497,7 @@ function secureEncrypt(data, password) {
   try {
     return encrypt(data, key);
   } finally {
-    key.fill(0);  // Overwrite key in memory
+    key.fill(0); // Overwrite key in memory
   }
 }
 ```

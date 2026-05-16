@@ -36,12 +36,12 @@ There are four option classes, each scoped to a different lifetime. The classes
 nest: `PerProcess` contains a `PerIsolate`, which contains an `Environment`,
 which contains `Debug`.
 
-| Class                  | Scope                          | Parser constructor in `node_options.cc` | Typical use                               |
-| ---------------------- | ------------------------------ | --------------------------------------- | ----------------------------------------- |
-| `DebugOptions`         | Inspector/debugging            | `DebugOptionsParser::DebugOptionsParser()` | `--inspect`, `--inspect-brk`, `--inspect-port` |
-| `EnvironmentOptions`   | Per Environment (most common)  | `EnvironmentOptionsParser::EnvironmentOptionsParser()` | `--experimental-*`, module flags, `--eval` |
-| `PerIsolateOptions`    | Per V8 isolate                 | `PerIsolateOptionsParser::PerIsolateOptionsParser(...)` | `--track-heap-objects`, `--stack-trace-limit`, V8 flags |
-| `PerProcessOptions`    | Once per process, set at start | `PerProcessOptionsParser::PerProcessOptionsParser(...)` | `--title`, `--v8-pool-size`, `--security-revert` |
+| Class                | Scope                          | Parser constructor in `node_options.cc`                 | Typical use                                             |
+| -------------------- | ------------------------------ | ------------------------------------------------------- | ------------------------------------------------------- |
+| `DebugOptions`       | Inspector/debugging            | `DebugOptionsParser::DebugOptionsParser()`              | `--inspect`, `--inspect-brk`, `--inspect-port`          |
+| `EnvironmentOptions` | Per Environment (most common)  | `EnvironmentOptionsParser::EnvironmentOptionsParser()`  | `--experimental-*`, module flags, `--eval`              |
+| `PerIsolateOptions`  | Per V8 isolate                 | `PerIsolateOptionsParser::PerIsolateOptionsParser(...)` | `--track-heap-objects`, `--stack-trace-limit`, V8 flags |
+| `PerProcessOptions`  | Once per process, set at start | `PerProcessOptionsParser::PerProcessOptionsParser(...)` | `--title`, `--v8-pool-size`, `--security-revert`        |
 
 **Choosing the right class:**
 
@@ -139,13 +139,13 @@ AddOption("--inspect",
 
 **`AddOption` parameters:**
 
-| Parameter          | Purpose                                                            |
-| ------------------ | ------------------------------------------------------------------ |
-| `name`             | CLI flag string, e.g. `"--experimental-foo"`                       |
-| `help_text`        | Shown in `node --help`                                             |
-| `field`            | Pointer-to-member on the matching class                            |
-| `env_setting`      | `kAllowedInEnvvar` (can set via `NODE_OPTIONS`) or `kDisallowedInEnvvar` |
-| `default_is_true`  | When `true`, help text advertises the `--no-*` variant             |
+| Parameter         | Purpose                                                                  |
+| ----------------- | ------------------------------------------------------------------------ |
+| `name`            | CLI flag string, e.g. `"--experimental-foo"`                             |
+| `help_text`       | Shown in `node --help`                                                   |
+| `field`           | Pointer-to-member on the matching class                                  |
+| `env_setting`     | `kAllowedInEnvvar` (can set via `NODE_OPTIONS`) or `kDisallowedInEnvvar` |
+| `default_is_true` | When `true`, help text advertises the `--no-*` variant                   |
 
 Node.js automatically generates `--no-*` negation variants for all boolean flags.
 
@@ -174,14 +174,14 @@ env->options()->get_debug_options()->inspector_enabled
 
 ```javascript
 // lib/internal/options.js exposes:
-const { getOptionValue } = require('internal/options');
+const { getOptionValue } = require("internal/options");
 
 // Returns the value of the flag regardless of which C++ class it's on.
 // getOptionValue() calls getCLIOptionsValues() from internalBinding('options'),
 // which serializes all option values from all four classes into a single dict.
-getOptionValue('--experimental-foo');  // true or false
-getOptionValue('--inspect');           // works for DebugOptions too
-getOptionValue('--title');             // works for PerProcessOptions too
+getOptionValue("--experimental-foo"); // true or false
+getOptionValue("--inspect"); // works for DebugOptions too
+getOptionValue("--title"); // works for PerProcessOptions too
 ```
 
 ### Setup function pattern (`lib/internal/process/pre_execution.js`)
@@ -192,11 +192,11 @@ Add a `setupXxx()` function called from `prepareExecution()`:
 
 ```javascript
 function setupFoo() {
-  if (!getOptionValue('--experimental-foo')) {
-    return;  // Not enabled, don't allow
+  if (!getOptionValue("--experimental-foo")) {
+    return; // Not enabled, don't allow
   }
-  const { BuiltinModule } = require('internal/bootstrap/realm');
-  BuiltinModule.allowRequireByUsers('foo');
+  const { BuiltinModule } = require("internal/bootstrap/realm");
+  BuiltinModule.allowRequireByUsers("foo");
 }
 ```
 
@@ -204,11 +204,11 @@ function setupFoo() {
 
 ```javascript
 function setupSQLite() {
-  if (getOptionValue('--no-experimental-sqlite')) {
-    return;  // User explicitly disabled it
+  if (getOptionValue("--no-experimental-sqlite")) {
+    return; // User explicitly disabled it
   }
-  const { BuiltinModule } = require('internal/bootstrap/realm');
-  BuiltinModule.allowRequireByUsers('sqlite');
+  const { BuiltinModule } = require("internal/bootstrap/realm");
+  BuiltinModule.allowRequireByUsers("sqlite");
 }
 ```
 
@@ -217,7 +217,7 @@ Call the setup function from `prepareExecution()`:
 ```javascript
 function prepareExecution(options) {
   // ... existing setup calls ...
-  setupFoo();   // Add alongside setupSQLite(), setupQuic(), etc.
+  setupFoo(); // Add alongside setupSQLite(), setupQuic(), etc.
 }
 ```
 
@@ -233,12 +233,16 @@ experimental modules require the prefix.
 
 ```javascript
 // Modules excluded from public list by default (require flag to enable):
-const experimentalModuleList = new SafeSet(['sqlite', 'quic', 'foo']);
+const experimentalModuleList = new SafeSet(["sqlite", "quic", "foo"]);
 
 // Modules that require the node: prefix (cannot use bare specifier).
 // Only add the module here if bare-specifier access should be blocked.
 const schemelessBlockList = new SafeSet([
-  'sea', 'sqlite', 'quic', 'test', 'test/reporters',
+  "sea",
+  "sqlite",
+  "quic",
+  "test",
+  "test/reporters",
   // 'foo',   // Add here ONLY if node:foo prefix is required
 ]);
 ```
@@ -326,9 +330,9 @@ The entry point file (e.g., `lib/foo.js`) can optionally emit an
 experimental warning:
 
 ```javascript
-'use strict';
-const { emitExperimentalWarning } = require('internal/util');
-emitExperimentalWarning('foo');
+"use strict";
+const { emitExperimentalWarning } = require("internal/util");
+emitExperimentalWarning("foo");
 // ... module implementation ...
 ```
 
@@ -367,7 +371,8 @@ Also add to the `NODE_OPTIONS` allowlist section in alphabetical position
 
 ```markdown
 <!-- node-options-node start -->
-* `--experimental-foo`
+
+- `--experimental-foo`
 ```
 
 ### `doc/node.1` (man page, nroff format)
@@ -385,24 +390,25 @@ module.
 
 ```javascript
 // Flags: --experimental-foo
-'use strict';
-require('../common');
-const foo = require('node:foo');
+"use strict";
+require("../common");
+const foo = require("node:foo");
 // ... test the module ...
 ```
 
 ### Test that import fails without the flag
 
 ```javascript
-'use strict';
-const { spawnPromisified } = require('../common');
-const assert = require('assert');
-const { describe, it } = require('node:test');
+"use strict";
+const { spawnPromisified } = require("../common");
+const assert = require("assert");
+const { describe, it } = require("node:test");
 
-describe('foo gating', () => {
-  it('fails without --experimental-foo', async () => {
+describe("foo gating", () => {
+  it("fails without --experimental-foo", async () => {
     const { stderr, code } = await spawnPromisified(process.execPath, [
-      '-e', 'require("node:foo")',
+      "-e",
+      'require("node:foo")',
     ]);
     assert.match(stderr, /No such built-in module: node:foo/);
     assert.notStrictEqual(code, 0);
@@ -412,17 +418,17 @@ describe('foo gating', () => {
 
 ## Complete Checklist
 
-| Step | File | Change |
-| ---- | ---- | ------ |
-| 1 | `src/node_options.h` | Add member to the appropriate class (`EnvironmentOptions` for module flags) |
-| 2 | `src/node_options.cc` | Register with `AddOption()` in the **matching parser constructor** |
-| 3 | `src/node_builtins.cc` | Add to `cannot_be_required` in `GetBuiltinCategories()` (module gating only) |
-| 4 | `lib/internal/bootstrap/realm.js` | Add to `experimentalModuleList` and `schemelessBlockList` (module gating only) |
-| 5 | `lib/internal/process/pre_execution.js` | Add `setupXxx()` checking the flag (module gating only) |
-| 6 | `lib/yourmod.js` | Optionally call `emitExperimentalWarning()` |
-| 7 | `doc/api/cli.md` | Document flag + add to `NODE_OPTIONS` allowlist |
-| 8 | `doc/node.1` | Man page entry |
-| 9 | `test/parallel/` | Flag-enabled tests + flag-disabled gating test |
+| Step | File                                    | Change                                                                         |
+| ---- | --------------------------------------- | ------------------------------------------------------------------------------ |
+| 1    | `src/node_options.h`                    | Add member to the appropriate class (`EnvironmentOptions` for module flags)    |
+| 2    | `src/node_options.cc`                   | Register with `AddOption()` in the **matching parser constructor**             |
+| 3    | `src/node_builtins.cc`                  | Add to `cannot_be_required` in `GetBuiltinCategories()` (module gating only)   |
+| 4    | `lib/internal/bootstrap/realm.js`       | Add to `experimentalModuleList` and `schemelessBlockList` (module gating only) |
+| 5    | `lib/internal/process/pre_execution.js` | Add `setupXxx()` checking the flag (module gating only)                        |
+| 6    | `lib/yourmod.js`                        | Optionally call `emitExperimentalWarning()`                                    |
+| 7    | `doc/api/cli.md`                        | Document flag + add to `NODE_OPTIONS` allowlist                                |
+| 8    | `doc/node.1`                            | Man page entry                                                                 |
+| 9    | `test/parallel/`                        | Flag-enabled tests + flag-disabled gating test                                 |
 
 Steps 3–5 apply specifically to module-gating flags. General-purpose flags
 (e.g., a new `PerProcessOptions` flag) only need steps 1, 2, 7, 8, 9.

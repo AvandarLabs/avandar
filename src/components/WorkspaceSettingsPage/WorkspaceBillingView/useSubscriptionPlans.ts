@@ -1,7 +1,5 @@
-import { useQuery } from "@hooks/useQuery/useQuery";
-import { isDefined } from "@utils/guards/isDefined/isDefined";
-import { makeBucketMap } from "@utils/maps/makeBucketMap/makeBucketMap";
-import { prop } from "@utils/objects/hofs/prop/prop";
+import { useQuery } from "@hooks";
+import { isDefined, makeBucketMap, prop } from "@utils";
 import { APIClient } from "@/clients/APIClient";
 import {
   isAnnualPaidSeatsPlan,
@@ -12,7 +10,7 @@ import {
   makeSubscriptionPlanFromPolarProduct,
 } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/planUtils";
 import type { SubscriptionPlanGroup } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
-import type { UseQueryResultTuple } from "@hooks/useQuery/useQuery";
+import type { UseQueryResultTuple } from "@hooks";
 
 export function useSubscriptionPlans(): UseQueryResultTuple<
   SubscriptionPlanGroup[]

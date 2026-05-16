@@ -1,4 +1,4 @@
-import { createWebLogger } from "@logger/createWebLogger/createWebLogger";
+import { createWebLogger } from "@logger";
 
 export const Logger = createWebLogger({
   // do not show console.logs in production

@@ -1,7 +1,7 @@
-import { useMutation } from "@hooks/index";
+import { useMutation } from "@hooks";
 import { useNavigate } from "@tanstack/react-router";
-import { notifyError, notifySuccess } from "@ui/index";
-import { snakeCaseKeysShallow } from "@utils/index";
+import { notifyError, notifySuccess } from "@ui";
+import { snakeCaseKeysShallow } from "@utils";
 import { ImportedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
@@ -14,7 +14,7 @@ import {
   DatasetImportFormValues,
   DataSourceMetadata,
 } from "../DatasetImportForm";
-import type { UseMutationResultTuple } from "@hooks/index";
+import type { UseMutationResultTuple } from "@hooks";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 export type CsvParseOptions = {

@@ -1,5 +1,5 @@
-import { Model } from "@models/Model/Model";
-import { sqlTemplate } from "@utils/index";
+import { Model } from "@models";
+import { sqlTemplate } from "@utils";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { MapLayerMouseEvent, Map as MapLibreMap } from "maplibre-gl";
 import { RefObject, useEffect, useRef } from "react";

@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { applyFiltersToRows } from "@utils/filters/applyFiltersToRows/applyFiltersToRows.ts";
+import { describe, expect, it } from "vitest";
 
 const data = [
   { id: "1", status: "active" },

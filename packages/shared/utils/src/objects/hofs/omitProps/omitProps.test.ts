@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { omitProps } from "@utils/objects/hofs/omitProps/omitProps.ts";
+import { describe, expect, it } from "vitest";
 
 describe("omitProps", () => {
   it("returns a function that omits a single key", () => {
@@ -28,9 +28,7 @@ describe("omitProps", () => {
       { id: 2, secret: "y" },
     ];
 
-    const result = items.map(
-      omitProps<Item, "secret">("secret"),
-    );
+    const result = items.map(omitProps<Item, "secret">("secret"));
 
     expect(result).toEqual([{ id: 1 }, { id: 2 }]);
   });

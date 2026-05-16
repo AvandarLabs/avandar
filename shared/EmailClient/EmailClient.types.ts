@@ -1,10 +1,10 @@
+import { SendBroadcastEmailOptions } from "$/EmailClient/sendBroadcastEmail.ts";
+import { SendTransactionalEmailOptions } from "$/EmailClient/sendTransactionalEmail.ts";
 import {
   CreateEmailResponseSuccess,
   SendBroadcastResponseSuccess,
 } from "resend";
 import { Simplify } from "type-fest";
-import { SendBroadcastEmailOptions } from "$/EmailClient/sendBroadcastEmail.ts";
-import { SendTransactionalEmailOptions } from "$/EmailClient/sendTransactionalEmail.ts";
 
 export type NotificationEmailType = "waitlist_signup_code" | "workspace_invite";
 

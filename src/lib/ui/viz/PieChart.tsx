@@ -1,10 +1,7 @@
-import {
-  DonutChart,
-  PieChart as MantinePieChart,
-} from "@mantine/charts";
+import { DonutChart, PieChart as MantinePieChart } from "@mantine/charts";
 import { useMemo } from "react";
 import { CHART_COLORS } from "@/lib/ui/viz/ChartConstants";
-import type { UnknownDataFrame } from "@utils/types/common.types";
+import type { UnknownDataFrame } from "@utils";
 
 type Props = {
   data: UnknownDataFrame;

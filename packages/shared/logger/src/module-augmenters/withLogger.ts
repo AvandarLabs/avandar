@@ -1,7 +1,8 @@
 import { createWebLogger } from "@logger/createWebLogger/createWebLogger.ts";
 import type { ILogger, WithLogger } from "@logger/Logger.types.ts";
-import type { Module } from "@modules/createModule.ts";
+import type { UnknownModule } from "@modules/createModule.ts";
 
+// TODO(jpsyx): this should become a mixin in the @modules package
 /**
  * Adds a logger that is accessible to all module functions. The logger is
  * disabled by default and becomes enabled when the user calls `.withLogger()`
@@ -14,8 +15,8 @@ import type { Module } from "@modules/createModule.ts";
  * @param moduleBuilder A function that builds the new module.
  * @returns The module with a `withLogger` method.
  */
-export function withLogger<ReturnModule extends Module>(
-  baseModule: Module,
+export function withLogger<ReturnModule extends UnknownModule>(
+  baseModule: UnknownModule,
   moduleBuilder: (baseLogger: ILogger) => ReturnModule,
 ): WithLogger<ReturnModule> {
   // initialize a logger that is disabled by default

@@ -59,7 +59,7 @@ The DOM's `querySelector` uses overloads for element type inference:
 interface Document {
   // Specific overload for known HTML elements
   querySelector<K extends keyof HTMLElementTagNameMap>(
-    selectors: K
+    selectors: K,
   ): HTMLElementTagNameMap[K] | null;
 
   // Fallback for custom selectors
@@ -88,7 +88,7 @@ const body = nonNullQuerySelector("body"); // Type: Element (lost HTMLBodyElemen
 
 // Solution: Add overload that mirrors querySelector
 export function nonNullQuerySelector<K extends keyof HTMLElementTagNameMap>(
-  tag: K
+  tag: K,
 ): HTMLElementTagNameMap[K];
 export function nonNullQuerySelector(tag: string): Element;
 export function nonNullQuerySelector(tag: string): Element {
@@ -153,7 +153,7 @@ interface EventEmitter {
   // Specific overload for known events
   on<K extends keyof EventMap>(
     event: K,
-    handler: (e: EventMap[K]) => void
+    handler: (e: EventMap[K]) => void,
   ): void;
 
   // Fallback for custom events

@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { makeIdLookupMap } from "@utils/maps/makeIdLookupMap/makeIdLookupMap.ts";
+import { describe, expect, it } from "vitest";
 
 describe("makeIdLookupMap", () => {
   it("indexes records by the default id key", () => {

@@ -4,8 +4,7 @@ import type {
   GetKeyAndPropsFn,
 } from "@/lib/hooks/ui/useForm/useKeysAndPropsCallback";
 import type { UseFormReturnType as MantineUseFormReturnType } from "@mantine/form";
-import type { PathValue } from "@utils/objects/getValue/getValue";
-import type { UnknownObject } from "@utils/types/common.types";
+import type { PathValue, UnknownObject } from "@utils";
 import type { Paths, Simplify } from "type-fest";
 
 type InsertListItemFn<FormValues extends UnknownObject> = <
@@ -33,10 +32,7 @@ export type FormType<
   FormPath extends Paths<FormValues> = Paths<FormValues>,
 > = Simplify<
   Omit<
-    MantineUseFormReturnType<
-      FormValues,
-      (values: FormValues) => TransformedValues
-    >,
+    MantineUseFormReturnType<FormValues, TransformedValues>,
     | "values"
     | "key"
     | "setFieldValue"

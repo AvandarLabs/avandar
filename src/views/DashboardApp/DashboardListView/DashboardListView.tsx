@@ -6,10 +6,10 @@ import {
   ThemeIcon,
   Title,
 } from "@mantine/core";
-import { Model } from "@models/Model/Model";
+import { Model } from "@models";
 import { IconLayoutDashboard, IconPlus } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import { notifyDevAlert } from "@ui/notifications/notifyDevAlert";
+import { notifyDevAlert } from "@ui";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";

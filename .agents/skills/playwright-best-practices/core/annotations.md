@@ -369,7 +369,7 @@ export function onlyInEnv(env: string) {
 
 ```typescript
 // tests/feature.spec.ts
-import { skipInCI, onlyInEnv } from "../helpers/test-annotations";
+import { onlyInEnv, skipInCI } from "../helpers/test-annotations";
 
 test("local only feature", async ({ page }) => {
   skipInCI("Uses local resources");

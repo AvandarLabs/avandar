@@ -1,5 +1,5 @@
-import { ILogger } from "@logger/Logger.types";
-import { constant } from "@utils/misc/constant/constant";
+import { ILogger } from "@logger";
+import { constant } from "@utils";
 import { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import * as arrow from "apache-arrow";
 import { match } from "ts-pattern";

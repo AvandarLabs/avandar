@@ -14,13 +14,15 @@ export type { UpsertOptions } from "@clients/ModelCrudClient/ModelCrudClient.typ
 
 // Supabase client
 export { createSupabaseCrudClient } from "@clients/SupabaseCrudClient/createSupabaseCrudClient.ts";
-export { withSupabaseClient } from "@clients/SupabaseCrudClient/withSupabaseClient.ts";
 export type { SupabaseCrudModelSpec } from "@clients/SupabaseCrudClient/SupabaseCrudClient.types.ts";
-export type { WithSupabaseClient } from "@clients/SupabaseCrudClient/withSupabaseClient.ts";
 
 // Parser registry
 export { makeParserRegistry } from "@clients/makeParserRegistry.ts";
 export type { ModelCrudParserRegistry } from "@clients/makeParserRegistry.ts";
+
+// Mixins
+export { withSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
+export type { WithSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
 
 // Rdb (platform-aware) CRUD client
 export {
@@ -31,6 +33,9 @@ export type {
   RdbCrudModelSpec,
   RdbCrudClient,
 } from "@clients/RdbCrudClient/RdbCrudClient.types.ts";
+
+// Web db client registry (shared between Rdb and ServerApi web adapters)
+export { getRegisteredWebDbClient } from "@clients/webDbClientRegistry.ts";
 
 // Server-side API client (Postgres RPCs + Edge Functions)
 export { createServerApiClient } from "@clients/ServerApiClient/createServerApiClient.ts";

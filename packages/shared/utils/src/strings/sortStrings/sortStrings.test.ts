@@ -1,5 +1,8 @@
+import {
+  sortStrings,
+  stringComparator,
+} from "@utils/strings/sortStrings/sortStrings.ts";
 import { describe, expect, it } from "vitest";
-import { sortStrings, stringComparator } from "@utils/strings/sortStrings/sortStrings.ts";
 
 describe("stringComparator", () => {
   it("returns a negative number when the first string sorts before the second", () => {

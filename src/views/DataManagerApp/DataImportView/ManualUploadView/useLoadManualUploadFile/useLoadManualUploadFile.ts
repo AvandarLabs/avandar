@@ -1,9 +1,6 @@
-import {
-  useMutation,
-  UseMutationResultTuple,
-} from "@hooks/useMutation/useMutation";
-import { notifyError, notifySuccess, notifyWarning } from "@ui/index";
-import { formatNumber } from "@utils/index";
+import { useMutation, UseMutationResultTuple } from "@hooks";
+import { notifyError, notifySuccess, notifyWarning } from "@ui";
+import { formatNumber } from "@utils";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { UserId } from "$/models/User/User.types";
 import { useState } from "react";

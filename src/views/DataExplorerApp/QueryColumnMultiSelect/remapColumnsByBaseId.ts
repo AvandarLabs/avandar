@@ -1,4 +1,4 @@
-import { isNonNullish } from "@utils/guards/isNonNullish/isNonNullish";
+import { isNonNullish } from "@utils";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 /**

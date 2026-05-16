@@ -26,6 +26,9 @@ type DatasetRead = Model.Base<
     /** Unique identifier of the dataset. */
     id: DatasetId;
 
+    /** Restricted unless caller has explicit grants (RBAC). */
+    isRestricted: boolean;
+
     /** Name of the dataset. */
     name: string;
 
@@ -62,6 +65,7 @@ export type DatasetModel = SupabaseCrudModelSpec<
         | "dateOfLastSync"
         | "description"
         | "id"
+        | "isRestricted"
         | "ownerId"
         | "updatedAt"
       >;

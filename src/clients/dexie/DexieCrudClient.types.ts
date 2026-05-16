@@ -1,5 +1,5 @@
-import type { CrudModelSpec } from "@clients/ModelCrudClient/ModelCrudClient.types";
-import type { UnknownObject } from "@utils/types/common.types";
+import type { CrudModelSpec } from "@clients";
+import type { UnknownObject } from "@utils";
 import type { Merge } from "type-fest";
 
 type DefaultModelTypes = {

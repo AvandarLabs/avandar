@@ -28,6 +28,15 @@ Use this skill when the task is to add or update an Avandar model, especially wh
 5. If the model is backed by Dexie, add a Dexie schema version entry and migration in `src/db/dexie/dexieVersions.ts`.
 6. Do not trust the generator output blindly. The current CLI scaffold is older than the hand-maintained patterns in the repo.
 
+## `@avandar/models` vs `shared/models`
+
+- **`packages/shared/models`** publishes **`@avandar/models`**. Keep it for **core cross-cutting primitives** (for example `Model`, shared typing helpers) that every consumer imports as infrastructure.
+- Put **business or domain logic**—permission catalogs, workspace policy mirrors, product-specific registries, RBAC-related constants—in **`shared/models/<Domain>/`**, **not** in `packages/shared/models`.
+- For domain models that expose both types and runtime tables/registries, follow the **`{ModelName}Module.ts`** contract:
+  - **`PermissionsModule.ts`** (or **`DatasetSourceModule.ts`**, etc.) holds **`export const PermissionsModule = { ... }`** with frozen catalogs, factories, or lookup maps.
+  - **`Permissions.ts`** merges **`export { PermissionsModule as Permissions }`** with **`export namespace Permissions { ... }`** for types aliased from **`Permissions.types.ts`**, mirroring **`shared/models/datasets/AvaDataType/AvaDataType.ts`**.
+  - Consumers import **`Permissions`** from **`$/models/Permissions/Permissions.ts`** and refer to **`Permissions.PermissionCatalog`** (value) and **`Permissions.PermissionKey`** (type) on the merged symbol.
+
 ## Decide The Model Kind First
 
 Choose the storage/runtime shape before generating files.
@@ -44,9 +53,9 @@ Examples:
 
 Typical files:
 
-- `<ModelName>.ts`
+- `<ModelName>.ts` (merged **`export { …Module as … }`** + **`export namespace`**)
 - `<ModelName>.types.ts`
-- optional `<ModelName>Module.ts`
+- optional `<ModelName>Module.ts` (exact name; constants, registries, catalogs)
 - no parsers unless the model has a serialized form
 
 ### 2. Shared Supabase-backed model
@@ -383,9 +392,9 @@ ava new model ExampleDataset \
   --clients-dir datasets
 ```
 
-1. Edit the scaffold to match patterns from `CsvFileDataset`, `OpenDataDataset`, and `Dataset`.
-2. Add or refine parsers.
-3. Fix the generated client to use `AvaSupabase.DB` and `createUsableServiceClient(...)`.
+5. Edit the scaffold to match patterns from `CsvFileDataset`, `OpenDataDataset`, and `Dataset`.
+6. Add or refine parsers.
+7. Fix the generated client to use `AvaSupabase.DB` and `createUsableServiceClient(...)`.
 
 ### Example: new standalone shared model
 

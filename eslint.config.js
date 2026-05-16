@@ -189,13 +189,53 @@ export default [
       "no-restricted-imports": [
         "error",
         {
+          paths: [
+            {
+              name: "@ava-etl",
+              message:
+                "Deno-allowable code: you must import an exact file under @ava-etl/ for this to work in Deno envs.",
+            },
+            {
+              name: "@clients",
+              message:
+                "Deno-allowable code: you must import an exact file under @clients/ for this to work in Deno envs.",
+            },
+            {
+              name: "@logger",
+              message:
+                "Deno-allowable code: you must import an exact file under @logger/ for this to work in Deno envs.",
+            },
+            {
+              name: "@models",
+              message:
+                "Deno-allowable code: you must import an exact file under @models/ for this to work in Deno envs.",
+            },
+            {
+              name: "@modules",
+              message:
+                "Deno-allowable code: you must import an exact file under @modules/ for this to work in Deno envs.",
+            },
+            {
+              name: "@utils",
+              message:
+                "Deno-allowable code: you must import an exact file under @utils/ for this to work in Deno envs.",
+            },
+            {
+              name: "@ui",
+              message:
+                "Deno-allowable code: you must import an exact file under @ui/ for this to work in Deno envs.",
+            },
+            {
+              name: "@hooks",
+              message:
+                "Deno-allowable code: you must import an exact file under @hooks/ for this to work in Deno envs.",
+            },
+          ],
           patterns: [
             {
               regex: "^\\.{1,2}/",
               message:
-                "This file is in a shared or Supabase directory (may run under " +
-                "Deno). Use absolute imports with path aliases instead of " +
-                "relative imports.",
+                "Deno-allowable code: this file may run under Deno; use absolute path-alias imports instead of relative imports (no ./ or ../).",
             },
           ],
         },
@@ -206,6 +246,22 @@ export default [
     files: ["**/vitest.config.ts"],
     rules: {
       "no-restricted-imports": "off",
+    },
+  },
+  {
+    // Avoid false-positives in Playwright fixtures where the function `use()`
+    // is not a hook, it is part of Playwright's fixture system.
+    files: ["tests/e2e/**/*.{ts,tsx}"],
+    rules: {
+      "react-hooks/rules-of-hooks": "off",
+    },
+  },
+  {
+    // Playwright requires object destructuring on the first fixture argument;
+    // `{}` is valid but triggers `no-empty-pattern` without this override.
+    files: ["tests/e2e/**/*.fixture.ts"],
+    rules: {
+      "no-empty-pattern": "off",
     },
   },
   {

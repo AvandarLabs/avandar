@@ -13,12 +13,12 @@ libuv provides cross-platform asynchronous I/O using the best available mechanis
 
 libuv uses different mechanisms per platform:
 
-| Platform | Mechanism | Description |
-|----------|-----------|-------------|
-| Linux | epoll | Scalable I/O event notification |
-| macOS/BSD | kqueue | Kernel event notification |
-| Windows | IOCP | I/O Completion Ports |
-| SunOS | event ports | Solaris event ports |
+| Platform  | Mechanism   | Description                     |
+| --------- | ----------- | ------------------------------- |
+| Linux     | epoll       | Scalable I/O event notification |
+| macOS/BSD | kqueue      | Kernel event notification       |
+| Windows   | IOCP        | I/O Completion Ports            |
+| SunOS     | event ports | Solaris event ports             |
 
 ```c
 // libuv abstracts these differences
@@ -79,17 +79,17 @@ typedef enum {
 ### TCP Server (JavaScript)
 
 ```javascript
-const net = require('node:net');
+const net = require("node:net");
 
 const server = net.createServer((socket) => {
   // Each connection is a uv_tcp_t handle
 
-  socket.on('data', (chunk) => {
+  socket.on("data", (chunk) => {
     // Data arrives via uv_read_cb
     // Internally: uv_read_start() on the handle
   });
 
-  socket.on('close', () => {
+  socket.on("close", () => {
     // Handle is closed via uv_close()
   });
 });
@@ -137,19 +137,19 @@ int main() {
 ### UDP (JavaScript)
 
 ```javascript
-const dgram = require('node:dgram');
+const dgram = require("node:dgram");
 
-const socket = dgram.createSocket('udp4');
+const socket = dgram.createSocket("udp4");
 // Creates uv_udp_t handle
 
-socket.on('message', (msg, rinfo) => {
+socket.on("message", (msg, rinfo) => {
   // uv_udp_recv_cb callback
 });
 
 socket.bind(41234);
 // uv_udp_bind() + uv_udp_recv_start()
 
-socket.send(Buffer.from('hello'), 41234, 'localhost');
+socket.send(Buffer.from("hello"), 41234, "localhost");
 // uv_udp_send() request
 ```
 
@@ -158,10 +158,10 @@ socket.send(Buffer.from('hello'), 41234, 'localhost');
 File system operations use the thread pool, but the interface follows the same pattern:
 
 ```javascript
-const fs = require('node:fs');
+const fs = require("node:fs");
 
 // Async operation using thread pool
-fs.readFile('file.txt', (err, data) => {
+fs.readFile("file.txt", (err, data) => {
   // Callback runs on main thread after worker completes
 });
 
@@ -174,10 +174,10 @@ fs.readFile('file.txt', (err, data) => {
 ### File Descriptor Operations
 
 ```javascript
-const fs = require('node:fs');
+const fs = require("node:fs");
 
 // Open returns a file descriptor
-fs.open('file.txt', 'r', (err, fd) => {
+fs.open("file.txt", "r", (err, fd) => {
   // fd is an integer file descriptor
 
   // Read at specific position
@@ -193,16 +193,16 @@ fs.open('file.txt', 'r', (err, fd) => {
 ### File Watching
 
 ```javascript
-const fs = require('node:fs');
+const fs = require("node:fs");
 
 // Uses OS-specific file watching (inotify, FSEvents, ReadDirectoryChangesW)
 // NOT the thread pool
-const watcher = fs.watch('file.txt', (eventType, filename) => {
+const watcher = fs.watch("file.txt", (eventType, filename) => {
   console.log(eventType, filename);
 });
 
 // Different from fs.watchFile which DOES poll (thread pool)
-fs.watchFile('file.txt', { interval: 1000 }, (curr, prev) => {
+fs.watchFile("file.txt", { interval: 1000 }, (curr, prev) => {
   // Uses stat polling - thread pool
 });
 ```
@@ -212,11 +212,11 @@ fs.watchFile('file.txt', { interval: 1000 }, (curr, prev) => {
 libuv handles backpressure at the stream level:
 
 ```javascript
-const net = require('node:net');
+const net = require("node:net");
 
-const socket = net.connect(80, 'example.com');
+const socket = net.connect(80, "example.com");
 
-socket.on('data', (chunk) => {
+socket.on("data", (chunk) => {
   // If processing is slow, pause reading
   socket.pause();
 
@@ -239,9 +239,9 @@ Internally:
 ### Write Backpressure
 
 ```javascript
-const net = require('node:net');
+const net = require("node:net");
 
-const socket = net.connect(80, 'example.com');
+const socket = net.connect(80, "example.com");
 
 function writeData(data) {
   const canContinue = socket.write(data);
@@ -249,7 +249,7 @@ function writeData(data) {
   if (!canContinue) {
     // Kernel buffer is full
     // Wait for 'drain' event
-    socket.once('drain', () => {
+    socket.once("drain", () => {
       // Can write more now
     });
   }
@@ -261,7 +261,7 @@ function writeData(data) {
 For custom file descriptor polling:
 
 ```javascript
-const { Poll } = process.binding('fs_event');
+const { Poll } = process.binding("fs_event");
 // Note: This is internal API, not recommended
 
 // Better: Use native addon with uv_poll
@@ -319,6 +319,7 @@ int main() {
 ```
 
 In JavaScript, this is used internally for:
+
 - Worker thread communication
 - N-API async callbacks
 - Signal handlers
@@ -328,11 +329,11 @@ In JavaScript, this is used internally for:
 ### Connection Limits
 
 ```javascript
-const os = require('node:os');
+const os = require("node:os");
 
 // Check max open files
-const { rlimit } = process.binding('os');
-console.log('Max open files:', rlimit('nofile'));
+const { rlimit } = process.binding("os");
+console.log("Max open files:", rlimit("nofile"));
 
 // Increase on Linux:
 // ulimit -n 65536
@@ -341,11 +342,11 @@ console.log('Max open files:', rlimit('nofile'));
 ### Socket Options
 
 ```javascript
-const net = require('node:net');
+const net = require("node:net");
 
 const server = net.createServer();
 
-server.on('connection', (socket) => {
+server.on("connection", (socket) => {
   // Disable Nagle's algorithm for low latency
   socket.setNoDelay(true);
 
@@ -357,13 +358,13 @@ server.on('connection', (socket) => {
 });
 
 // Set TCP backlog (connection queue size)
-server.listen(3000, '0.0.0.0', 511);  // 511 is default
+server.listen(3000, "0.0.0.0", 511); // 511 is default
 ```
 
 ### Buffer Allocation
 
 ```javascript
-const net = require('node:net');
+const net = require("node:net");
 
 // Default allocator creates new buffers
 // For high throughput, consider buffer pooling
@@ -372,8 +373,8 @@ const bufferPool = [];
 const BUFFER_SIZE = 16384;
 
 function allocBuffer() {
-  return bufferPool.length > 0
-    ? bufferPool.pop()
+  return bufferPool.length > 0 ?
+      bufferPool.pop()
     : Buffer.allocUnsafe(BUFFER_SIZE);
 }
 
@@ -413,11 +414,11 @@ node --trace-exit app.js
 const handles = process._getActiveHandles();
 const requests = process._getActiveRequests();
 
-console.log('Active handles:', handles.length);
-handles.forEach(h => console.log(' ', h.constructor.name));
+console.log("Active handles:", handles.length);
+handles.forEach((h) => console.log(" ", h.constructor.name));
 
-console.log('Active requests:', requests.length);
-requests.forEach(r => console.log(' ', r.constructor.name));
+console.log("Active requests:", requests.length);
+requests.forEach((r) => console.log(" ", r.constructor.name));
 ```
 
 ## Common Patterns
@@ -425,7 +426,7 @@ requests.forEach(r => console.log(' ', r.constructor.name));
 ### Graceful Socket Shutdown
 
 ```javascript
-const net = require('node:net');
+const net = require("node:net");
 
 function gracefulClose(socket) {
   // Disable reading (half-close)
@@ -436,7 +437,7 @@ function gracefulClose(socket) {
     socket.destroy();
   }, 5000);
 
-  socket.once('close', () => {
+  socket.once("close", () => {
     clearTimeout(timeout);
   });
 }
@@ -445,22 +446,22 @@ function gracefulClose(socket) {
 ### Connection Draining
 
 ```javascript
-const http = require('node:http');
+const http = require("node:http");
 
 const server = http.createServer((req, res) => {
-  res.end('Hello');
+  res.end("Hello");
 });
 
 const connections = new Set();
 
-server.on('connection', (socket) => {
+server.on("connection", (socket) => {
   connections.add(socket);
-  socket.on('close', () => connections.delete(socket));
+  socket.on("close", () => connections.delete(socket));
 });
 
 function shutdown() {
   server.close(() => {
-    console.log('Server closed');
+    console.log("Server closed");
     process.exit(0);
   });
 
@@ -478,7 +479,7 @@ function shutdown() {
   }, 10000);
 }
 
-process.on('SIGTERM', shutdown);
+process.on("SIGTERM", shutdown);
 ```
 
 ## Native Addon I/O

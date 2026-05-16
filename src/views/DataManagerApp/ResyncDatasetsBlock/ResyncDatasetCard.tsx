@@ -1,11 +1,9 @@
-import { useMutation } from "@hooks/useMutation/useMutation";
+import { useMutation } from "@hooks";
 import { Button, Card, FileButton, Group, Stack, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconUpload } from "@tabler/icons-react";
-import { notifyError, notifySuccess } from "@ui/notifications/notify";
-import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined";
-import { where } from "@utils/filters/where/where";
-import { MIMEType } from "@utils/types/common.types";
+import { notifyError, notifySuccess } from "@ui";
+import { assertIsDefined, MIMEType, where } from "@utils";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
