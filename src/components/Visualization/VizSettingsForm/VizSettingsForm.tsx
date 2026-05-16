@@ -2,26 +2,49 @@ import { Box } from "@mantine/core";
 import { Select, SelectData } from "@ui";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
 import { match } from "ts-pattern";
-import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
-import { AreaChartForm } from "@/views/DataExplorerApp/VizSettingsForm/AreaChartForm";
-import { BarChartForm } from "@/views/DataExplorerApp/VizSettingsForm/BarChartForm";
-import { BubbleChartForm } from "@/views/DataExplorerApp/VizSettingsForm/BubbleChartForm";
-import { FunnelChartForm } from "@/views/DataExplorerApp/VizSettingsForm/FunnelChartForm";
-import { LineChartForm } from "@/views/DataExplorerApp/VizSettingsForm/LineChartForm";
-import { PieChartForm } from "@/views/DataExplorerApp/VizSettingsForm/PieChartForm";
-import { RadarChartForm } from "@/views/DataExplorerApp/VizSettingsForm/RadarChartForm";
-import { ScatterChartForm } from "@/views/DataExplorerApp/VizSettingsForm/ScatterChartForm";
+import { AreaChartForm } from "@/components/Visualization/VizSettingsForm/AreaChartForm";
+import { BarChartForm } from "@/components/Visualization/VizSettingsForm/BarChartForm";
+import { BubbleChartForm } from "@/components/Visualization/VizSettingsForm/BubbleChartForm";
+import { FunnelChartForm } from "@/components/Visualization/VizSettingsForm/FunnelChartForm";
+import { LineChartForm } from "@/components/Visualization/VizSettingsForm/LineChartForm";
+import { PieChartForm } from "@/components/Visualization/VizSettingsForm/PieChartForm";
+import { RadarChartForm } from "@/components/Visualization/VizSettingsForm/RadarChartForm";
+import { ScatterChartForm } from "@/components/Visualization/VizSettingsForm/ScatterChartForm";
 import type { UnknownDataFrame } from "@utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type { VizType } from "$/models/vizs/VizConfig/VizConfig.types";
+import type {
+  VizConfig,
+  VizType,
+} from "$/models/vizs/VizConfig/VizConfig.types";
 
 type Props = {
   columns: readonly QueryResultColumn[];
   data: UnknownDataFrame;
+
+  /** Current visualization config. */
+  vizConfig: VizConfig;
+
+  /** Called when the user edits any control inside a per-type subform. */
+  onVizConfigChange: (vizConfig: VizConfig) => void;
+
+  /** Called when the user picks a different viz type from the type picker. */
+  onVizTypeChange: (vizType: VizType) => void;
 };
 
-export function VizSettingsForm({ columns, data }: Props): JSX.Element {
-  const [{ vizConfig }, dispatch] = DataExplorerStateManager.useContext();
+/**
+ * Renders the controls used to edit a `VizConfig`: a type picker plus the
+ * per-type subform for the currently selected viz type. Pure and prop-driven
+ * so it can be reused in any context (DataExplorer sidebar, dashboard editor
+ * side panel, etc.) by wiring `vizConfig` + `onVizConfigChange` to whichever
+ * store owns the config.
+ */
+export function VizSettingsForm({
+  columns,
+  data,
+  vizConfig,
+  onVizConfigChange,
+  onVizTypeChange,
+}: Props): JSX.Element {
   const vizTypeOptions: SelectData<VizType> = VizTypes.map((vizType) => {
     return {
       label: VizConfigs.getDisplayName(vizType),
@@ -38,7 +61,7 @@ export function VizSettingsForm({ columns, data }: Props): JSX.Element {
         value={vizConfig.vizType}
         onChange={(selectedVizType) => {
           if (selectedVizType) {
-            dispatch.setActiveVizType(selectedVizType);
+            onVizTypeChange(selectedVizType);
           }
         }}
       />
@@ -53,7 +76,7 @@ export function VizSettingsForm({ columns, data }: Props): JSX.Element {
               fields={columns}
               config={config}
               onConfigChange={(newConfig) => {
-                dispatch.setVizConfig({ ...config, ...newConfig });
+                onVizConfigChange({ ...config, ...newConfig });
               }}
             />
           );
@@ -64,7 +87,7 @@ export function VizSettingsForm({ columns, data }: Props): JSX.Element {
               fields={columns}
               config={config}
               onConfigChange={(newConfig) => {
-                dispatch.setVizConfig({ ...config, ...newConfig });
+                onVizConfigChange({ ...config, ...newConfig });
               }}
             />
           );
@@ -75,7 +98,7 @@ export function VizSettingsForm({ columns, data }: Props): JSX.Element {
               fields={columns}
               config={config}
               onConfigChange={(newConfig) => {
-                dispatch.setVizConfig({ ...config, ...newConfig });
+                onVizConfigChange({ ...config, ...newConfig });
               }}
             />
           );
@@ -86,7 +109,7 @@ export function VizSettingsForm({ columns, data }: Props): JSX.Element {
               fields={columns}
               config={config}
               onConfigChange={(newConfig) => {
-                dispatch.setVizConfig({ ...config, ...newConfig });
+                onVizConfigChange({ ...config, ...newConfig });
               }}
             />
           );
@@ -98,7 +121,7 @@ export function VizSettingsForm({ columns, data }: Props): JSX.Element {
               config={config}
               data={data}
               onConfigChange={(newConfig) => {
-                dispatch.setVizConfig({ ...config, ...newConfig });
+                onVizConfigChange({ ...config, ...newConfig });
               }}
             />
           );
@@ -110,7 +133,7 @@ export function VizSettingsForm({ columns, data }: Props): JSX.Element {
               config={config}
               data={data}
               onConfigChange={(newConfig) => {
-                dispatch.setVizConfig({ ...config, ...newConfig });
+                onVizConfigChange({ ...config, ...newConfig });
               }}
             />
           );
@@ -121,7 +144,7 @@ export function VizSettingsForm({ columns, data }: Props): JSX.Element {
               fields={columns}
               config={config}
               onConfigChange={(newConfig) => {
-                dispatch.setVizConfig({ ...config, ...newConfig });
+                onVizConfigChange({ ...config, ...newConfig });
               }}
             />
           );
@@ -132,7 +155,7 @@ export function VizSettingsForm({ columns, data }: Props): JSX.Element {
               fields={columns}
               config={config}
               onConfigChange={(newConfig) => {
-                dispatch.setVizConfig({ ...config, ...newConfig });
+                onVizConfigChange({ ...config, ...newConfig });
               }}
             />
           );
