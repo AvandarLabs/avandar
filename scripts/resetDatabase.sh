@@ -33,7 +33,9 @@ if [ "$SKIP_SEED" = false ]; then
   echo "Seeding database with custom data..."
 
   if [ -z "${SUPABASE_URL:-}" ]; then
-    echo "SUPABASE_URL is unset; cannot seed." >&2
+    echo \
+      "SUPABASE_URL is unset; cannot seed. Use pnpm db:reset or dotenv -e .env.development -- …" \
+      >&2
     exit 1
   fi
 
@@ -45,7 +47,9 @@ if [ "$SKIP_SEED" = false ]; then
   fi
 
   if [ -z "${SUPABASE_SERVICE_ROLE_KEY:-}" ]; then
-    echo "SUPABASE_SERVICE_ROLE_KEY is unset; cannot seed." >&2
+    echo \
+      "SUPABASE_SERVICE_ROLE_KEY is unset; cannot seed. Use pnpm db:reset or dotenv -e .env.development -- …" \
+      >&2
     exit 1
   fi
 

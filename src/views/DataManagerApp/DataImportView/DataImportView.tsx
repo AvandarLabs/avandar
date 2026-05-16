@@ -1,6 +1,6 @@
-import { useQuery } from "@hooks/useQuery/useQuery";
+import { useQuery } from "@hooks";
 import { Container, Stack, Title } from "@mantine/core";
-import { where } from "@utils/index";
+import { where } from "@utils";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";

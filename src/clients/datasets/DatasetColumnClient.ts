@@ -1,4 +1,4 @@
-import { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupabaseCRUDClient";
+import { createSupabaseCRUDClient } from "@clients";
 import { DatasetColumnParsers } from "$/models/datasets/DatasetColumn/DatasetColumnParsers";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";

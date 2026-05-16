@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { bucketFiltersByOperator } from "@utils/filters/bucketFiltersByOperator/bucketFiltersByOperator.ts";
+import { describe, expect, it } from "vitest";
 
 describe("bucketFiltersByOperator", () => {
   it("converts column filters into operator filters", () => {

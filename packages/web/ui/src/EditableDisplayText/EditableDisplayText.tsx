@@ -1,11 +1,11 @@
 import { Box, Button, Group, Text, Textarea, TextInput } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
-import { EditButton } from "@ui/buttons/EditButton";
-import { useCheckTruncatedText } from "@ui/hooks/useCheckTruncatedText/useCheckTruncatedText";
-import { Tooltip } from "@ui/Tooltip/Tooltip";
 import { hasDefinedProps } from "@utils/guards/hasDefinedProps/hasDefinedProps";
 import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { EditButton } from "../buttons/EditButton";
+import { useCheckTruncatedText } from "../hooks/useCheckTruncatedText/useCheckTruncatedText";
+import { Tooltip } from "../Tooltip/Tooltip";
 import type { TextareaProps, TextInputProps, TextProps } from "@mantine/core";
 
 type BaseProps = {

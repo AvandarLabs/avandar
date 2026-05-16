@@ -64,6 +64,7 @@ npx neostandard --semi --migrate > eslint.config.js
 - on neostandard v1+, import rules from `eslint-plugin-import-x` are not bundled by default
 
 If you relied heavily on import linting in your old setup, either:
+
 - add `eslint-plugin-import-x` explicitly, or
 - rely on `tsc --noEmit` (recommended for TypeScript-heavy projects)
 

@@ -1,5 +1,5 @@
 import { CustomField } from "@puckeditor/core";
-import { constant } from "@utils/misc/constant/constant";
+import { constant } from "@utils";
 import { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import {
   ContainerMaxWidthPField,

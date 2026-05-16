@@ -1,10 +1,6 @@
+import { hydratePieFromQueryResult } from "$/models/vizs/hydratePieFromQueryResult.ts";
 import { describe, expect, it } from "vitest";
-import {
-  hydratePieFromQueryResult,
-} from "$/models/vizs/hydratePieFromQueryResult.ts";
-import type {
-  QueryResultColumn,
-} from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 
 function cols(
   pairs: ReadonlyArray<{

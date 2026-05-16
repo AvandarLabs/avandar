@@ -77,7 +77,5 @@ export type SupabaseCRUDClient<
   ExtendedQueriesClient extends ClientReturningOnlyPromises,
   ExtendedMutationsClient extends ClientReturningOnlyPromises,
 > = ModelCRUDClient<M, ExtendedQueriesClient, ExtendedMutationsClient> & {
-  setDBClient: (
-    dbClient: SupabaseClient<RegisteredSupabaseDatabase>,
-  ) => SupabaseCRUDClient<M, ExtendedQueriesClient, ExtendedMutationsClient>;
+  getDb: () => SupabaseClient<RegisteredSupabaseDatabase>;
 };

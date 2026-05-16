@@ -1,4 +1,4 @@
-import { registry } from "@utils/objects/registry/registry";
+import { registry } from "@utils";
 
 export const mapStyles = {
   positron: {

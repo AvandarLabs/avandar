@@ -1,14 +1,13 @@
 import { Fieldset, Stack, Text } from "@mantine/core";
-import { Model } from "@models/Model/Model";
-import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
-import { Select } from "@ui/inputs/Select/Select";
-import { prop } from "@utils/objects/hofs/prop/prop";
+import { Model } from "@models";
+import { makeSelectOptions, Select } from "@ui";
+import { prop } from "@utils";
 import { QueryColumn as QueryColumnModule } from "$/models/queries/QueryColumn/QueryColumn";
 import { AggregationSelect } from "@/views/DataExplorerApp/AggregationSelect";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { QueryColumnMultiSelect } from "@/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect";
 import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
-import type { SelectData } from "@ui/inputs/Select/Select";
+import type { SelectData } from "@ui";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumnRead } from "$/models/queries/QueryColumn/QueryColumn.types";
 

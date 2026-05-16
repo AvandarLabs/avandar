@@ -1,5 +1,5 @@
 import { usePrevious } from "@mantine/hooks";
-import { isDefined } from "@utils/guards/isDefined/isDefined";
+import { isDefined } from "@utils";
 import { useEffect } from "react";
 
 /**

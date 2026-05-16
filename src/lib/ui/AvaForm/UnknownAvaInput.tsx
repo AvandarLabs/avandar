@@ -8,7 +8,7 @@ import type {
   ValidBaseValueType,
   ValuesOfFieldRecord,
 } from "@/lib/ui/AvaForm/AvaForm.types";
-import type { SelectData } from "@ui/inputs/Select/Select";
+import type { SelectData } from "@ui";
 
 type Props<
   FieldKey extends string,

@@ -36,11 +36,11 @@ npx neostandard > eslint.config.js
 Or author manually (ESM):
 
 ```js
-import neostandard from 'neostandard'
+import neostandard from "neostandard";
 
 export default neostandard({
-  ts: true
-})
+  ts: true,
+});
 ```
 
 ## Run lint
@@ -74,11 +74,11 @@ As of neostandard v1+, `eslint-plugin-import-x` is no longer bundled.
 Use `.gitignore` patterns as ESLint ignores:
 
 ```js
-import neostandard, { resolveIgnoresFromGitignore } from 'neostandard'
+import neostandard, { resolveIgnoresFromGitignore } from "neostandard";
 
 export default neostandard({
-  ignores: resolveIgnoresFromGitignore()
-})
+  ignores: resolveIgnoresFromGitignore(),
+});
 ```
 
 ## Important migration note

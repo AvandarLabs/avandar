@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { pipe } from "@utils/misc/pipe/pipe.ts";
+import { describe, expect, it } from "vitest";
 import type { Expect, IsEqual } from "@utils/types/test-utilities.types.ts";
 
 describe("pipe", () => {

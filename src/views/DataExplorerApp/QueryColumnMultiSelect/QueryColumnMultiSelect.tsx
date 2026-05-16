@@ -4,12 +4,9 @@ import {
   MultiSelect,
 } from "@mantine/core";
 import { useUncontrolled } from "@mantine/hooks";
-import { Model } from "@models/Model/Model";
-import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
-import { where } from "@utils/filters/where/where";
-import { isNonNullish } from "@utils/guards/isNonNullish/isNonNullish";
-import { makeIdLookupMap } from "@utils/index";
-import { prop } from "@utils/objects/hofs/prop/prop";
+import { Model } from "@models";
+import { makeSelectOptions } from "@ui";
+import { isNonNullish, makeIdLookupMap, prop, where } from "@utils";
 import { QueryColumn as QueryColumnFns } from "$/models/queries/QueryColumn/QueryColumn";
 import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
 import { matchSorter } from "match-sorter";
@@ -110,10 +107,14 @@ export function QueryColumnMultiSelect({
   }, [datasetColumns, entityFieldConfigs]);
 
   const matchColumnFilter = useMemo((): OptionsFilter => {
-    return ({ options, search, limit }) => {
+    const filter: OptionsFilter = ({ options, search, limit }) => {
       const trimmedSearch = search.trim();
       if (trimmedSearch === "") {
-        return defaultOptionsFilter({ options, search, limit });
+        return defaultOptionsFilter({
+          options,
+          search,
+          limit,
+        }) as Array<ComboboxParsedItem<string>>;
       }
       const optionByValue = _optionByValueFromParsed(options);
       const matchedColumns = matchSorter(queryColumns, trimmedSearch, {
@@ -128,8 +129,9 @@ export function QueryColumnMultiSelect({
           return optionByValue.get(column.id);
         })
         .filter(isNonNullish)
-        .slice(0, limit);
+        .slice(0, limit) as Array<ComboboxParsedItem<string>>;
     };
+    return filter;
   }, [queryColumns]);
 
   // When available columns change (e.g. data source changed, or columns

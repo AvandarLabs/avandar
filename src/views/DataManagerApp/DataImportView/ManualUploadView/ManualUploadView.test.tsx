@@ -8,7 +8,7 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
+import { formatNumber } from "@utils";
 import { uuid } from "$/lib/uuid";
 import Papa from "papaparse";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -22,7 +22,7 @@ import type {
   DuckDbLoadCsvResult,
 } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { UseQueryResult } from "@tanstack/react-query";
-import type { UnknownObject } from "@utils/types/common.types";
+import type { UnknownObject } from "@utils";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactElement } from "react";
@@ -54,8 +54,10 @@ const {
   };
 });
 
-vi.mock("@ui/notifications/notify", () => {
+vi.mock("@ui", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@ui")>();
   return {
+    ...actual,
     notifySuccess: notifySuccessMock,
     notifyError: vi.fn(),
     notifyWarning: vi.fn(),

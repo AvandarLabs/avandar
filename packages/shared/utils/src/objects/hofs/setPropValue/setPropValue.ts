@@ -1,6 +1,6 @@
 import { setValue } from "@utils/objects/setValue/setValue.ts";
-import type { UnknownObject } from "@utils/types/common.types.ts";
 import type { PathValue } from "@utils/objects/getValue/getValue.ts";
+import type { UnknownObject } from "@utils/types/common.types.ts";
 import type { Paths, UnknownArray } from "type-fest";
 
 /**

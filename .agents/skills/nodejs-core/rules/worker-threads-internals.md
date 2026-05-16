@@ -36,7 +36,7 @@ Worker Thread 1          Worker Thread 2
 ```javascript
 // lib/internal/worker.js (simplified)
 
-const { Worker: WorkerImpl } = internalBinding('worker');
+const { Worker: WorkerImpl } = internalBinding("worker");
 
 class Worker extends EventEmitter {
   constructor(filename, options = {}) {
@@ -48,7 +48,7 @@ class Worker extends EventEmitter {
       options.env,
       options.execArgv,
       options.resourceLimits,
-      options.trackUnmanagedFds
+      options.trackUnmanagedFds,
     );
 
     // Set up message channel
@@ -57,7 +57,7 @@ class Worker extends EventEmitter {
     this[kHandle].startThread(port2);
 
     // Forward messages
-    port1.on('message', (msg) => this.emit('message', msg));
+    port1.on("message", (msg) => this.emit("message", msg));
   }
 
   postMessage(value, transferList) {
@@ -130,23 +130,23 @@ void Worker::Run() {
 
 ```javascript
 // Messages are serialized using structured clone
-const { MessageChannel } = require('worker_threads');
+const { MessageChannel } = require("worker_threads");
 
 const { port1, port2 } = new MessageChannel();
 
 // Supported types:
 port1.postMessage({
   number: 42,
-  string: 'hello',
+  string: "hello",
   date: new Date(),
   regexp: /pattern/g,
   array: [1, 2, 3],
-  map: new Map([['key', 'value']]),
+  map: new Map([["key", "value"]]),
   set: new Set([1, 2, 3]),
-  buffer: Buffer.from('data'),
+  buffer: Buffer.from("data"),
   typedArray: new Float64Array([1.1, 2.2]),
   arrayBuffer: new ArrayBuffer(8),
-  error: new Error('message'),
+  error: new Error("message"),
   // NOT supported: functions, symbols, WeakMap, WeakSet
 });
 ```
@@ -155,7 +155,7 @@ port1.postMessage({
 
 ```javascript
 // Transfer ownership instead of copying
-const buffer = new ArrayBuffer(1024 * 1024);  // 1MB
+const buffer = new ArrayBuffer(1024 * 1024); // 1MB
 
 // Without transfer: copies entire buffer
 port.postMessage({ buffer });
@@ -204,14 +204,14 @@ void MessagePort::PostMessage(const FunctionCallbackInfo<Value>& args) {
 
 ```javascript
 // Main thread
-const { Worker } = require('worker_threads');
+const { Worker } = require("worker_threads");
 
 // Create shared memory
 const sharedBuffer = new SharedArrayBuffer(1024);
 const sharedArray = new Int32Array(sharedBuffer);
 
-const worker = new Worker('./worker.js', {
-  workerData: { sharedBuffer }
+const worker = new Worker("./worker.js", {
+  workerData: { sharedBuffer },
 });
 
 // Both threads can now access sharedArray
@@ -220,11 +220,11 @@ sharedArray[0] = 42;
 
 ```javascript
 // worker.js
-const { workerData } = require('worker_threads');
+const { workerData } = require("worker_threads");
 
 const sharedArray = new Int32Array(workerData.sharedBuffer);
-console.log(sharedArray[0]);  // 42
-sharedArray[1] = 100;  // Visible to main thread
+console.log(sharedArray[0]); // 42
+sharedArray[1] = 100; // Visible to main thread
 ```
 
 ### Memory Layout
@@ -249,14 +249,14 @@ SharedArrayBuffer
 const shared = new Int32Array(new SharedArrayBuffer(4));
 
 // Atomic operations are thread-safe
-Atomics.add(shared, 0, 1);      // Atomic increment
-Atomics.sub(shared, 0, 1);      // Atomic decrement
+Atomics.add(shared, 0, 1); // Atomic increment
+Atomics.sub(shared, 0, 1); // Atomic decrement
 Atomics.exchange(shared, 0, 5); // Atomic swap, returns old value
-Atomics.compareExchange(shared, 0, 5, 10);  // CAS
+Atomics.compareExchange(shared, 0, 5, 10); // CAS
 
 // Load and store
-Atomics.load(shared, 0);        // Atomic read
-Atomics.store(shared, 0, 42);   // Atomic write
+Atomics.load(shared, 0); // Atomic read
+Atomics.store(shared, 0, 42); // Atomic write
 ```
 
 ### Wait and Notify (Futex)
@@ -268,7 +268,7 @@ const result = Atomics.wait(shared, 0, 0);
 
 // Main: Wake waiting workers
 Atomics.store(shared, 0, 1);
-Atomics.notify(shared, 0, 1);  // Wake 1 worker
+Atomics.notify(shared, 0, 1); // Wake 1 worker
 ```
 
 ### Spinlock Implementation
@@ -303,7 +303,7 @@ class Mutex {
     while (true) {
       // Try to acquire (0 -> 1)
       if (Atomics.compareExchange(this.state, 0, 0, 1) === 0) {
-        return;  // Acquired
+        return; // Acquired
       }
 
       // Wait until state might be 0
@@ -324,28 +324,28 @@ class Mutex {
 
 ```javascript
 // Main thread
-const worker = new Worker('./worker.js', {
+const worker = new Worker("./worker.js", {
   workerData: {
     config: { port: 8080 },
-    sharedBuffer: new SharedArrayBuffer(1024)
-  }
+    sharedBuffer: new SharedArrayBuffer(1024),
+  },
 });
 
 // Worker
-const { workerData } = require('worker_threads');
-console.log(workerData.config);  // { port: 8080 }
+const { workerData } = require("worker_threads");
+console.log(workerData.config); // { port: 8080 }
 ```
 
 ### Resource Limits
 
 ```javascript
-const worker = new Worker('./worker.js', {
+const worker = new Worker("./worker.js", {
   resourceLimits: {
-    maxOldGenerationSizeMb: 128,    // V8 old space limit
-    maxYoungGenerationSizeMb: 32,   // V8 young space limit
-    codeRangeSizeMb: 32,            // V8 code space limit
-    stackSizeMb: 4                  // Stack size
-  }
+    maxOldGenerationSizeMb: 128, // V8 old space limit
+    maxYoungGenerationSizeMb: 32, // V8 young space limit
+    codeRangeSizeMb: 32, // V8 code space limit
+    stackSizeMb: 4, // Stack size
+  },
 });
 ```
 
@@ -358,7 +358,7 @@ const worker = new Worker('./worker.js', {
 const pending = new Map();
 let messageId = 0;
 
-worker.on('message', ({ id, result, error }) => {
+worker.on("message", ({ id, result, error }) => {
   const { resolve, reject } = pending.get(id);
   pending.delete(id);
   if (error) reject(new Error(error));
@@ -392,12 +392,12 @@ class SharedQueue {
     const head = Atomics.load(this.meta, 0);
 
     if (newTail === head) {
-      return false;  // Queue full
+      return false; // Queue full
     }
 
     this.items[tail] = value;
     Atomics.store(this.meta, 1, newTail);
-    Atomics.notify(this.meta, 1, 1);  // Wake consumers
+    Atomics.notify(this.meta, 1, 1); // Wake consumers
     return true;
   }
 
@@ -436,7 +436,7 @@ worker.postMessage(items);
 
 // BEST: Shared memory for frequent updates
 const shared = new Float64Array(new SharedArrayBuffer(items.length * 8));
-items.forEach((v, i) => shared[i] = v);
+items.forEach((v, i) => (shared[i] = v));
 worker.postMessage({ ready: true });
 ```
 
@@ -459,7 +459,7 @@ worker.postMessage({ buffer: shared });
 ### Worker Pool
 
 ```javascript
-const { Worker } = require('worker_threads');
+const { Worker } = require("worker_threads");
 
 class WorkerPool {
   constructor(script, size = 4) {
@@ -469,14 +469,14 @@ class WorkerPool {
 
     for (let i = 0; i < size; i++) {
       const worker = new Worker(script);
-      worker.on('message', (result) => {
+      worker.on("message", (result) => {
         const task = worker.currentTask;
         worker.currentTask = null;
         task.resolve(result);
         this.free.push(worker);
         this.dispatch();
       });
-      worker.on('error', (err) => {
+      worker.on("error", (err) => {
         const task = worker.currentTask;
         if (task) {
           task.reject(err);
@@ -504,7 +504,7 @@ class WorkerPool {
   }
 
   terminate() {
-    return Promise.all(this.workers.map(w => w.terminate()));
+    return Promise.all(this.workers.map((w) => w.terminate()));
   }
 }
 ```
@@ -514,15 +514,15 @@ class WorkerPool {
 ### Worker State
 
 ```javascript
-const { Worker, threadId, isMainThread } = require('worker_threads');
+const { Worker, threadId, isMainThread } = require("worker_threads");
 
-console.log('Thread ID:', threadId);
-console.log('Is main thread:', isMainThread);
+console.log("Thread ID:", threadId);
+console.log("Is main thread:", isMainThread);
 
 // In worker
-const { parentPort } = require('worker_threads');
+const { parentPort } = require("worker_threads");
 if (parentPort) {
-  console.log('Running as worker');
+  console.log("Running as worker");
 }
 ```
 
@@ -531,16 +531,16 @@ if (parentPort) {
 ```javascript
 const worker = new Worker(script);
 
-worker.on('exit', (code) => {
+worker.on("exit", (code) => {
   console.log(`Worker exited with code ${code}`);
 });
 
-worker.on('error', (err) => {
-  console.error('Worker error:', err);
+worker.on("error", (err) => {
+  console.error("Worker error:", err);
 });
 
 // Graceful shutdown
-process.on('SIGTERM', async () => {
+process.on("SIGTERM", async () => {
   await worker.terminate();
   process.exit(0);
 });
@@ -553,14 +553,14 @@ process.on('SIGTERM', async () => {
 ```javascript
 // BAD: Growing message queue
 setInterval(() => {
-  worker.postMessage(data);  // If worker is slow, messages queue up
+  worker.postMessage(data); // If worker is slow, messages queue up
 }, 1);
 
 // GOOD: Flow control
 let pending = 0;
 const MAX_PENDING = 100;
 
-worker.on('message', () => pending--);
+worker.on("message", () => pending--);
 
 function sendIfRoom(data) {
   if (pending < MAX_PENDING) {
@@ -574,7 +574,7 @@ function sendIfRoom(data) {
 
 ```javascript
 // BAD: Main thread waiting
-Atomics.wait(shared, 0, 0);  // Never use on main thread!
+Atomics.wait(shared, 0, 0); // Never use on main thread!
 
 // GOOD: Only workers should wait
 // Main thread uses Atomics.waitAsync (or don't wait at all)

@@ -1,5 +1,5 @@
 import { BarChart as MantineBarChart } from "@mantine/charts";
-import { formatDate } from "@utils/dates/formatDate/formatDate";
+import { formatDate } from "@utils";
 import { useMemo } from "react";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";

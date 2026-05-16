@@ -8,6 +8,7 @@ metadata:
 ## When to use
 
 Use this skill when you need to:
+
 - Develop backend applications using Fastify
 - Implement Fastify plugins and route handlers
 - Get guidance on Fastify architecture and patterns
@@ -20,18 +21,18 @@ Use this skill when you need to:
 A minimal, runnable Fastify server to get started immediately:
 
 ```ts
-import Fastify from 'fastify'
+import Fastify from "fastify";
 
-const app = Fastify({ logger: true })
+const app = Fastify({ logger: true });
 
-app.get('/health', async (request, reply) => {
-  return { status: 'ok' }
-})
+app.get("/health", async (request, reply) => {
+  return { status: "ok" };
+});
 
 const start = async () => {
-  await app.listen({ port: 3000, host: '0.0.0.0' })
-}
-start()
+  await app.listen({ port: 3000, host: "0.0.0.0" });
+};
+start();
 ```
 
 ## Recommended Reading Order for Common Scenarios

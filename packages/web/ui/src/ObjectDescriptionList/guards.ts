@@ -3,7 +3,7 @@ import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject";
 import type {
   DescribableObject,
   PrimitiveValue,
-} from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
+} from "./ObjectDescriptionList.types";
 
 export function isPrimitiveDescribableValue(
   value: unknown,

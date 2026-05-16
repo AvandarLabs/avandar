@@ -1,7 +1,7 @@
 import { BubbleChart as MantineBubbleChart } from "@mantine/charts";
 import { useMemo } from "react";
 import { BUBBLE_SIZE_RANGE } from "@/lib/ui/viz/ChartConstants";
-import type { UnknownDataFrame } from "@utils/types/common.types";
+import type { UnknownDataFrame } from "@utils";
 
 type Props = {
   data: UnknownDataFrame;

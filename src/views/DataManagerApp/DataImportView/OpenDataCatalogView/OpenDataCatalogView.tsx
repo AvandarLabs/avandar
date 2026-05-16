@@ -12,8 +12,8 @@ import {
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
-import { notifyError, notifySuccess } from "@ui/notifications/notify";
-import { where } from "@utils/filters/where/where";
+import { notifyError, notifySuccess } from "@ui";
+import { where } from "@utils";
 import { uuid } from "$/lib/uuid";
 import Fuse from "fuse.js";
 import { useMemo, useState } from "react";

@@ -1,5 +1,5 @@
 import { Box, Stack, Text } from "@mantine/core";
-import { formatNumber } from "@utils/numbers/formatNumber/formatNumber";
+import { formatNumber } from "@utils";
 import type {
   AnnualPaidSeatsPlan,
   MonthlyPaidSeatsPlan,

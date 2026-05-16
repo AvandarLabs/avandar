@@ -1,20 +1,17 @@
-import { createServiceClient } from "@clients/ServiceClient/createServiceClient";
-import { withSupabaseClient } from "@clients/SupabaseCRUDClient/withSupabaseClient";
-import { withQueryHooks } from "@hooks/withQueryHooks/withQueryHooks";
-import { WithQueryHooks } from "@hooks/withQueryHooks/withQueryHooks.types";
-import { withLogger } from "@logger/module-augmenters/withLogger";
-import { camelCaseKeysShallow } from "@utils/objects/camelCaseKeys/camelCaseKeys";
-import { omit } from "@utils/objects/omit/omit";
-import { Workspace } from "$/models/Workspace/Workspace";
+import { createServiceClient, withSupabaseClient } from "@clients";
+import { withQueryHooks, WithQueryHooks } from "@hooks";
+import { withLogger } from "@logger";
+import { camelCaseKeysShallow, makeObject, omit } from "@utils";
 import { WorkspaceId } from "$/models/Workspace/Workspace.types";
-import { Database, Tables } from "$/types/database.types";
+import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
+import { Tables } from "$/types/database.types";
 import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
-import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
-import type { WithSupabaseClient } from "@clients/SupabaseCRUDClient/withSupabaseClient";
-import type { ILogger, WithLogger } from "@logger/Logger.types.ts";
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { ServiceClient } from "@clients";
+import type { WithSupabaseClient } from "@clients/mixins/withSupabaseClient";
+import type { ILogger, WithLogger } from "@logger";
+import type { UserAppRolesMatrix } from "$/models/Permissions/Permissions.types";
 import type { UserId } from "$/models/User/User.types";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type {
@@ -29,17 +26,21 @@ type TUserClient = WithSupabaseClient<
         getProfile: ({
           workspaceId,
         }: {
-          workspaceId: Workspace.Id;
+          workspaceId: WorkspaceId;
         }) => Promise<UserProfile.T>;
+        getUserAppRoles: (params: {
+          workspaceId: WorkspaceId;
+          userId: UserId | undefined;
+        }) => Promise<UserAppRolesMatrix>;
       },
-      "getProfile",
+      "getProfile" | "getUserAppRoles",
       never
     >
   >
 >;
 
 type TUserClientOptions = {
-  dbClient?: SupabaseClient<Database>;
+  dbClient?: AvaSupabaseDBClient;
 };
 
 export const UserProfileDBReadToModelReadSchema: z.ZodType<
@@ -121,17 +122,76 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
           logger.log("User profile retrieved", { userProfile });
           return userProfile;
         },
+
+        /**
+         * Loads per-app roles for a user in a workspace from
+         * `workspace_memberships` and nested `role_group_app_roles`.
+         *
+         * @param params.workspaceId Target workspace.
+         * @param params.userId Auth user id; required at runtime for the query.
+         */
+        getUserAppRoles: async ({
+          workspaceId,
+          userId,
+        }: {
+          workspaceId: WorkspaceId;
+          userId: UserId | undefined;
+        }): Promise<UserAppRolesMatrix> => {
+          const logger = baseLogger.appendName("getUserAppRoles");
+          logger.log("Calling `getUserAppRoles`", { workspaceId, userId });
+          if (userId === undefined) {
+            throw new Error("getUserAppRoles requires a user id.");
+          }
+
+          const { data: membership } = await dbClient
+            .from("workspace_memberships")
+            .select(
+              `
+              role_group_id,
+              role_groups (
+                role_group_app_roles (
+                  app,
+                  role
+                )
+              )
+            `,
+            )
+            .eq("workspace_id", workspaceId)
+            .eq("user_id", userId)
+            .maybeSingle()
+            .throwOnError();
+
+          if (!membership) {
+            throw new Error("Workspace membership not found.");
+          }
+
+          const appRolesList =
+            membership?.role_groups?.role_group_app_roles ?? [];
+          const appRoles = makeObject(appRolesList, {
+            key: "app",
+            valueKey: "role",
+          });
+
+          logger.log("User app roles retrieved", { appRoles });
+          return appRoles;
+        },
       },
       {
-        queryFns: ["getProfile"],
+        queryFns: ["getProfile", "getUserAppRoles"],
         mutationFns: [],
       },
     );
   });
 
-  return withSupabaseClient(client, (newDBClient: SupabaseClient<Database>) => {
-    return createUserClient({ ...options, dbClient: newDBClient });
-  });
+  // Do not use `client.mixin(withSupabaseClient(...))`: `createModule` mixin
+  // rebuilds members from the base service client slice only, which drops
+  // `withQueryHooks` methods such as `useGetProfile` / `useGetUserAppRoles`.
+  return {
+    ...client,
+    ...withSupabaseClient(dbClient)().members,
+  } as unknown as TUserClient;
 }
 
-export const UserClient = createUserClient();
+export const UserClient = createUserClient({
+  dbClient: AvaSupabase.DB,
+});

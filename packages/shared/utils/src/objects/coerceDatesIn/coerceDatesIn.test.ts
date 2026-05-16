@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { coerceDatesIn } from "@utils/objects/coerceDatesIn/coerceDatesIn.ts";
+import { describe, expect, it } from "vitest";
 
 describe("coerceDatesIn", () => {
   it("coerces an ISO string into a Date", () => {
@@ -8,9 +8,7 @@ describe("coerceDatesIn", () => {
     const result = coerceDatesIn(input, ["createdAt"]);
 
     expect(result.createdAt).toBeInstanceOf(Date);
-    expect(result.createdAt.toISOString()).toBe(
-      "2025-01-15T00:00:00.000Z",
-    );
+    expect(result.createdAt.toISOString()).toBe("2025-01-15T00:00:00.000Z");
     expect(result.name).toBe("test");
   });
 
@@ -32,10 +30,7 @@ describe("coerceDatesIn", () => {
       title: "event",
     };
 
-    const result = coerceDatesIn(
-      input,
-      ["start", "end"],
-    );
+    const result = coerceDatesIn(input, ["start", "end"]);
 
     expect(result.start).toBeInstanceOf(Date);
     expect(result.end).toBeInstanceOf(Date);

@@ -36,33 +36,36 @@ Incoming Request
 First hook to execute, before body parsing. Use for authentication, request ID setup:
 
 ```typescript
-import Fastify from 'fastify';
+import Fastify from "fastify";
 
 const app = Fastify();
 
 // Global onRequest hook
-app.addHook('onRequest', async (request, reply) => {
+app.addHook("onRequest", async (request, reply) => {
   request.startTime = Date.now();
-  request.log.info({ url: request.url, method: request.method }, 'Request started');
+  request.log.info(
+    { url: request.url, method: request.method },
+    "Request started",
+  );
 });
 
 // Authentication check
-app.addHook('onRequest', async (request, reply) => {
+app.addHook("onRequest", async (request, reply) => {
   // Skip auth for public routes
-  if (request.url.startsWith('/public')) {
+  if (request.url.startsWith("/public")) {
     return;
   }
 
-  const token = request.headers.authorization?.replace('Bearer ', '');
+  const token = request.headers.authorization?.replace("Bearer ", "");
   if (!token) {
-    reply.code(401).send({ error: 'Unauthorized' });
+    reply.code(401).send({ error: "Unauthorized" });
     return; // Stop processing
   }
 
   try {
     request.user = await verifyToken(token);
   } catch {
-    reply.code(401).send({ error: 'Invalid token' });
+    reply.code(401).send({ error: "Invalid token" });
   }
 });
 ```
@@ -72,17 +75,20 @@ app.addHook('onRequest', async (request, reply) => {
 Execute before body parsing. Can modify the payload stream:
 
 ```typescript
-app.addHook('preParsing', async (request, reply, payload) => {
+app.addHook("preParsing", async (request, reply, payload) => {
   // Log raw payload size
-  request.log.debug({ contentLength: request.headers['content-length'] }, 'Parsing body');
+  request.log.debug(
+    { contentLength: request.headers["content-length"] },
+    "Parsing body",
+  );
 
   // Return modified payload stream if needed
   return payload;
 });
 
 // Decompress incoming data
-app.addHook('preParsing', async (request, reply, payload) => {
-  if (request.headers['content-encoding'] === 'gzip') {
+app.addHook("preParsing", async (request, reply, payload) => {
+  if (request.headers["content-encoding"] === "gzip") {
     return payload.pipe(zlib.createGunzip());
   }
   return payload;
@@ -94,16 +100,16 @@ app.addHook('preParsing', async (request, reply, payload) => {
 Execute after parsing, before schema validation:
 
 ```typescript
-app.addHook('preValidation', async (request, reply) => {
+app.addHook("preValidation", async (request, reply) => {
   // Modify body before validation
-  if (request.body && typeof request.body === 'object') {
+  if (request.body && typeof request.body === "object") {
     // Normalize data
     request.body.email = request.body.email?.toLowerCase().trim();
   }
 });
 
 // Rate limiting check
-app.addHook('preValidation', async (request, reply) => {
+app.addHook("preValidation", async (request, reply) => {
   const key = request.ip;
   const count = await redis.incr(`ratelimit:${key}`);
 
@@ -112,7 +118,7 @@ app.addHook('preValidation', async (request, reply) => {
   }
 
   if (count > 100) {
-    reply.code(429).send({ error: 'Too many requests' });
+    reply.code(429).send({ error: "Too many requests" });
   }
 });
 ```
@@ -123,36 +129,36 @@ Most common hook, execute after validation, before handler:
 
 ```typescript
 // Authorization check
-app.addHook('preHandler', async (request, reply) => {
+app.addHook("preHandler", async (request, reply) => {
   const { userId } = request.params as { userId: string };
 
   if (request.user.id !== userId && !request.user.isAdmin) {
-    reply.code(403).send({ error: 'Forbidden' });
+    reply.code(403).send({ error: "Forbidden" });
   }
 });
 
 // Load related data
-app.addHook('preHandler', async (request, reply) => {
+app.addHook("preHandler", async (request, reply) => {
   if (request.params?.projectId) {
     request.project = await db.projects.findById(request.params.projectId);
     if (!request.project) {
-      reply.code(404).send({ error: 'Project not found' });
+      reply.code(404).send({ error: "Project not found" });
     }
   }
 });
 
 // Transaction wrapper
-app.addHook('preHandler', async (request) => {
+app.addHook("preHandler", async (request) => {
   request.transaction = await db.beginTransaction();
 });
 
-app.addHook('onResponse', async (request) => {
+app.addHook("onResponse", async (request) => {
   if (request.transaction) {
     await request.transaction.commit();
   }
 });
 
-app.addHook('onError', async (request, reply, error) => {
+app.addHook("onError", async (request, reply, error) => {
   if (request.transaction) {
     await request.transaction.rollback();
   }
@@ -164,9 +170,9 @@ app.addHook('onError', async (request, reply, error) => {
 Modify payload before serialization:
 
 ```typescript
-app.addHook('preSerialization', async (request, reply, payload) => {
+app.addHook("preSerialization", async (request, reply, payload) => {
   // Add metadata to all responses
-  if (payload && typeof payload === 'object') {
+  if (payload && typeof payload === "object") {
     return {
       ...payload,
       _meta: {
@@ -179,7 +185,7 @@ app.addHook('preSerialization', async (request, reply, payload) => {
 });
 
 // Remove sensitive fields
-app.addHook('preSerialization', async (request, reply, payload) => {
+app.addHook("preSerialization", async (request, reply, payload) => {
   if (payload?.user?.password) {
     const { password, ...user } = payload.user;
     return { ...payload, user };
@@ -193,14 +199,14 @@ app.addHook('preSerialization', async (request, reply, payload) => {
 Modify response after serialization:
 
 ```typescript
-app.addHook('onSend', async (request, reply, payload) => {
+app.addHook("onSend", async (request, reply, payload) => {
   // Add response headers
-  reply.header('X-Response-Time', Date.now() - request.startTime);
+  reply.header("X-Response-Time", Date.now() - request.startTime);
 
   // Compress response
   if (payload && payload.length > 1024) {
     const compressed = await gzip(payload);
-    reply.header('Content-Encoding', 'gzip');
+    reply.header("Content-Encoding", "gzip");
     return compressed;
   }
 
@@ -208,8 +214,8 @@ app.addHook('onSend', async (request, reply, payload) => {
 });
 
 // Transform JSON string response
-app.addHook('onSend', async (request, reply, payload) => {
-  if (reply.getHeader('content-type')?.includes('application/json')) {
+app.addHook("onSend", async (request, reply, payload) => {
+  if (reply.getHeader("content-type")?.includes("application/json")) {
     // payload is already a string at this point
     return payload;
   }
@@ -222,18 +228,21 @@ app.addHook('onSend', async (request, reply, payload) => {
 Execute after response is sent. Cannot modify response:
 
 ```typescript
-app.addHook('onResponse', async (request, reply) => {
+app.addHook("onResponse", async (request, reply) => {
   // Log response time
   const responseTime = Date.now() - request.startTime;
-  request.log.info({
-    method: request.method,
-    url: request.url,
-    statusCode: reply.statusCode,
-    responseTime,
-  }, 'Request completed');
+  request.log.info(
+    {
+      method: request.method,
+      url: request.url,
+      statusCode: reply.statusCode,
+      responseTime,
+    },
+    "Request completed",
+  );
 
   // Track metrics
-  metrics.histogram('http_request_duration', responseTime, {
+  metrics.histogram("http_request_duration", responseTime, {
     method: request.method,
     route: request.routeOptions.url,
     status: reply.statusCode,
@@ -246,18 +255,21 @@ app.addHook('onResponse', async (request, reply) => {
 Execute when an error is thrown:
 
 ```typescript
-app.addHook('onError', async (request, reply, error) => {
+app.addHook("onError", async (request, reply, error) => {
   // Log error details
-  request.log.error({
-    err: error,
-    url: request.url,
-    method: request.method,
-    body: request.body,
-  }, 'Request error');
+  request.log.error(
+    {
+      err: error,
+      url: request.url,
+      method: request.method,
+      body: request.body,
+    },
+    "Request error",
+  );
 
   // Track error metrics
-  metrics.increment('http_errors', {
-    error: error.code || 'UNKNOWN',
+  metrics.increment("http_errors", {
+    error: error.code || "UNKNOWN",
     route: request.routeOptions.url,
   });
 
@@ -277,11 +289,14 @@ const app = Fastify({
   connectionTimeout: 30000, // 30 seconds
 });
 
-app.addHook('onTimeout', async (request, reply) => {
-  request.log.warn({
-    url: request.url,
-    method: request.method,
-  }, 'Request timeout');
+app.addHook("onTimeout", async (request, reply) => {
+  request.log.warn(
+    {
+      url: request.url,
+      method: request.method,
+    },
+    "Request timeout",
+  );
 
   // Cleanup
   if (request.abortController) {
@@ -295,8 +310,8 @@ app.addHook('onTimeout', async (request, reply) => {
 Execute when client closes connection:
 
 ```typescript
-app.addHook('onRequestAbort', async (request) => {
-  request.log.info('Client aborted request');
+app.addHook("onRequestAbort", async (request) => {
+  request.log.info("Client aborted request");
 
   // Cancel ongoing operations
   if (request.abortController) {
@@ -318,8 +333,8 @@ Hooks that run at application startup/shutdown:
 
 ```typescript
 // After all plugins are loaded
-app.addHook('onReady', async function () {
-  this.log.info('Server is ready');
+app.addHook("onReady", async function () {
+  this.log.info("Server is ready");
 
   // Initialize connections
   await this.db.connect();
@@ -330,8 +345,8 @@ app.addHook('onReady', async function () {
 });
 
 // When server is closing
-app.addHook('onClose', async function () {
-  this.log.info('Server is closing');
+app.addHook("onClose", async function () {
+  this.log.info("Server is closing");
 
   // Cleanup connections
   await this.db.close();
@@ -339,7 +354,7 @@ app.addHook('onClose', async function () {
 });
 
 // After routes are registered
-app.addHook('onRoute', (routeOptions) => {
+app.addHook("onRoute", (routeOptions) => {
   console.log(`Route registered: ${routeOptions.method} ${routeOptions.url}`);
 
   // Track all routes
@@ -351,7 +366,7 @@ app.addHook('onRoute', (routeOptions) => {
 });
 
 // After plugin is registered
-app.addHook('onRegister', (instance, options) => {
+app.addHook("onRegister", (instance, options) => {
   console.log(`Plugin registered with prefix: ${options.prefix}`);
 });
 ```
@@ -361,23 +376,26 @@ app.addHook('onRegister', (instance, options) => {
 Hooks are scoped to their encapsulation context:
 
 ```typescript
-app.addHook('onRequest', async (request) => {
+app.addHook("onRequest", async (request) => {
   // Runs for ALL routes
-  request.log.info('Global hook');
+  request.log.info("Global hook");
 });
 
-app.register(async function adminRoutes(fastify) {
-  // Only runs for routes in this plugin
-  fastify.addHook('onRequest', async (request, reply) => {
-    if (!request.user?.isAdmin) {
-      reply.code(403).send({ error: 'Admin only' });
-    }
-  });
+app.register(
+  async function adminRoutes(fastify) {
+    // Only runs for routes in this plugin
+    fastify.addHook("onRequest", async (request, reply) => {
+      if (!request.user?.isAdmin) {
+        reply.code(403).send({ error: "Admin only" });
+      }
+    });
 
-  fastify.get('/admin/users', async () => {
-    return { users: [] };
-  });
-}, { prefix: '/admin' });
+    fastify.get("/admin/users", async () => {
+      return { users: [] };
+    });
+  },
+  { prefix: "/admin" },
+);
 ```
 
 ## Hook Execution Order
@@ -385,16 +403,16 @@ app.register(async function adminRoutes(fastify) {
 Multiple hooks of the same type execute in registration order:
 
 ```typescript
-app.addHook('onRequest', async () => {
-  console.log('First');
+app.addHook("onRequest", async () => {
+  console.log("First");
 });
 
-app.addHook('onRequest', async () => {
-  console.log('Second');
+app.addHook("onRequest", async () => {
+  console.log("Second");
 });
 
-app.addHook('onRequest', async () => {
-  console.log('Third');
+app.addHook("onRequest", async () => {
+  console.log("Third");
 });
 
 // Output: First, Second, Third
@@ -405,10 +423,10 @@ app.addHook('onRequest', async () => {
 Return early from hooks to stop processing:
 
 ```typescript
-app.addHook('preHandler', async (request, reply) => {
+app.addHook("preHandler", async (request, reply) => {
   if (!request.user) {
     // Send response and return to stop further processing
-    reply.code(401).send({ error: 'Unauthorized' });
+    reply.code(401).send({ error: "Unauthorized" });
     return;
   }
   // Continue to next hook and handler
@@ -422,11 +440,11 @@ Add hooks to specific routes:
 ```typescript
 const adminOnlyHook = async (request, reply) => {
   if (!request.user?.isAdmin) {
-    reply.code(403).send({ error: 'Forbidden' });
+    reply.code(403).send({ error: "Forbidden" });
   }
 };
 
-app.get('/admin/settings', {
+app.get("/admin/settings", {
   preHandler: [adminOnlyHook],
   handler: async (request) => {
     return { settings: {} };
@@ -434,7 +452,7 @@ app.get('/admin/settings', {
 });
 
 // Multiple hooks
-app.post('/orders', {
+app.post("/orders", {
   preValidation: [validateApiKey],
   preHandler: [loadUser, checkQuota, logOrder],
   handler: createOrderHandler,
@@ -447,13 +465,13 @@ Always use async/await in hooks:
 
 ```typescript
 // GOOD - async hook
-app.addHook('preHandler', async (request, reply) => {
+app.addHook("preHandler", async (request, reply) => {
   const user = await loadUser(request.headers.authorization);
   request.user = user;
 });
 
 // AVOID - callback style (deprecated)
-app.addHook('preHandler', (request, reply, done) => {
+app.addHook("preHandler", (request, reply, done) => {
   loadUser(request.headers.authorization)
     .then((user) => {
       request.user = user;

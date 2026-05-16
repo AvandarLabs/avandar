@@ -1,8 +1,7 @@
 import { Data, Puck } from "@puckeditor/core";
 import "@puckeditor/core/puck.css";
 import { Flex } from "@mantine/core";
-import { notifySuccess } from "@ui/notifications/notify";
-import { notifyDevAlert } from "@ui/notifications/notifyDevAlert";
+import { notifyDevAlert, notifySuccess } from "@ui";
 import { createInitialDashboardPuckData } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";

@@ -73,9 +73,9 @@ the product into something that truly serves your mission.
    pnpm db:reset
    ```
 
-   This will reset your Supabase database, apply all local migrations from
-   the `supabase/migrations` directory, and then add the seed data from
-   `seed/SeedConfig.ts`
+   This loads `.env.development` for the seed step, resets your Supabase
+   database, applies all local migrations from the `supabase/migrations`
+   directory, and then adds the seed data from `seed/SeedConfig.ts`.
 
 5. Start the development server
 

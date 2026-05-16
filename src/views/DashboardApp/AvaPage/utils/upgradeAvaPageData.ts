@@ -1,6 +1,9 @@
 import { AvaPageDataMigrationV1 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV1/AvaPageDataMigrationV1";
 import { AvaPageDataMigrator } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
-import type { AvaPageData, AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type {
+  AvaPageData,
+  AvaPageGenericData,
+} from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 const versionTransforms = [AvaPageDataMigrationV1];
 

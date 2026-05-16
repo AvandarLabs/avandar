@@ -25,6 +25,7 @@ const DBReadSchema = z.object({
   date_of_last_sync: z.iso.datetime({ offset: true }).nullable(),
   description: z.string().nullable(),
   id: z.uuid(),
+  is_restricted: z.boolean(),
   name: z.string(),
   owner_id: z.uuid(),
   owner_profile_id: z.uuid(),

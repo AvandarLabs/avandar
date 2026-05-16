@@ -1,6 +1,6 @@
 import { RadarChart as MantineRadarChart } from "@mantine/charts";
 import { useMemo } from "react";
-import type { UnknownDataFrame } from "@utils/types/common.types";
+import type { UnknownDataFrame } from "@utils";
 
 type Props = {
   data: UnknownDataFrame;

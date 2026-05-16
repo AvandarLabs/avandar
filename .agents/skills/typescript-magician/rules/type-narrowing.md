@@ -192,7 +192,7 @@ const filtered = values.filter(isNotNull);
 ```typescript
 function hasProperty<T extends object, K extends string>(
   obj: T,
-  key: K
+  key: K,
 ): obj is T & Record<K, unknown> {
   return key in obj;
 }
@@ -302,7 +302,7 @@ const items: Item[] = [
 
 // Filter to specific type
 const typeAItems = items.filter(
-  (item): item is { type: "a"; value: string } => item.type === "a"
+  (item): item is { type: "a"; value: string } => item.type === "a",
 );
 // typeAItems is { type: "a"; value: string }[]
 ```
@@ -349,7 +349,9 @@ interface ErrorResponse {
 
 type ApiResponse<T> = SuccessResponse<T> | ErrorResponse;
 
-function isSuccess<T>(response: ApiResponse<T>): response is SuccessResponse<T> {
+function isSuccess<T>(
+  response: ApiResponse<T>,
+): response is SuccessResponse<T> {
   return response.status === "success";
 }
 
@@ -372,14 +374,14 @@ async function handleUser() {
 
 ## When to Use Each Technique
 
-| Technique | Use Case |
-|-----------|----------|
-| `typeof` | Primitive type checks |
-| `instanceof` | Class instance checks |
-| `in` operator | Property existence checks |
+| Technique            | Use Case                                        |
+| -------------------- | ----------------------------------------------- |
+| `typeof`             | Primitive type checks                           |
+| `instanceof`         | Class instance checks                           |
+| `in` operator        | Property existence checks                       |
 | Discriminated unions | Multiple related types with common discriminant |
-| Type predicates | Custom narrowing logic |
-| Assertion functions | Validation with early error throwing |
+| Type predicates      | Custom narrowing logic                          |
+| Assertion functions  | Validation with early error throwing            |
 
 ## Common Pitfalls
 

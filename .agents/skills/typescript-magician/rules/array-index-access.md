@@ -19,11 +19,11 @@ Just like you can access object properties with string keys, you can access arra
 const roles = ["user", "admin", "anonymous"] as const;
 
 // Access specific index
-type FirstRole = typeof roles[0]; // "user"
-type SecondRole = typeof roles[1]; // "admin"
+type FirstRole = (typeof roles)[0]; // "user"
+type SecondRole = (typeof roles)[1]; // "admin"
 
 // Access all elements with [number]
-type AnyRole = typeof roles[number]; // "user" | "admin" | "anonymous"
+type AnyRole = (typeof roles)[number]; // "user" | "admin" | "anonymous"
 ```
 
 ## Why `[number]` Works
@@ -32,7 +32,7 @@ The `number` type, when used as an index, represents a union of ALL possible num
 
 ```typescript
 // This is conceptually equivalent to:
-type AnyRole = typeof roles[0 | 1 | 2];
+type AnyRole = (typeof roles)[0 | 1 | 2];
 // But [number] handles any array length automatically
 ```
 
@@ -49,11 +49,11 @@ type Role = keyof typeof userAccessModel;
 // Type: "user" | "admin" | "anonymous"
 
 // Get all values (arrays) as a union
-type UserAccessModelValues = typeof userAccessModel[Role];
+type UserAccessModelValues = (typeof userAccessModel)[Role];
 // Type: readonly ["update-self", "view"] | readonly ["create", ...] | readonly ["view"]
 
 // Get all actions from all roles
-type Action = typeof userAccessModel[Role][number];
+type Action = (typeof userAccessModel)[Role][number];
 // Type: "update-self" | "view" | "create" | "update-any" | "delete"
 ```
 
@@ -62,11 +62,11 @@ type Action = typeof userAccessModel[Role][number];
 ```typescript
 // Tuple - fixed length, specific types at each position
 const tuple = ["hello", 42, true] as const;
-type TupleElements = typeof tuple[number]; // "hello" | 42 | true
+type TupleElements = (typeof tuple)[number]; // "hello" | 42 | true
 
 // Array - variable length, single element type
 const array: string[] = ["a", "b", "c"];
-type ArrayElement = typeof array[number]; // string
+type ArrayElement = (typeof array)[number]; // string
 ```
 
 ## Pattern: Extract Function Parameter Types
@@ -109,7 +109,7 @@ const userAccessModel = {
 } as const;
 
 type Role = keyof typeof userAccessModel;
-type Action = typeof userAccessModel[Role][number];
+type Action = (typeof userAccessModel)[Role][number];
 
 const canUserAccess = (role: Role, action: Action): boolean => {
   // Need to cast because TypeScript can't narrow the array type
@@ -129,11 +129,11 @@ canUserAccess("admin", "invalid"); // Error: "invalid" is not assignable to Acti
 ```typescript
 // BAD - elements widened to string
 const actions = ["view", "edit", "delete"];
-type Action = typeof actions[number]; // string
+type Action = (typeof actions)[number]; // string
 
 // GOOD - literal types preserved
 const actions = ["view", "edit", "delete"] as const;
-type Action = typeof actions[number]; // "view" | "edit" | "delete"
+type Action = (typeof actions)[number]; // "view" | "edit" | "delete"
 ```
 
 ### ReadonlyArray Type Mismatch
@@ -142,7 +142,7 @@ When using `.includes()` on readonly arrays, you may need to cast:
 
 ```typescript
 const items = ["a", "b", "c"] as const;
-type Item = typeof items[number];
+type Item = (typeof items)[number];
 
 // Error: Argument of type 'string' is not assignable to parameter of type '"a" | "b" | "c"'
 const hasItem = items.includes(someString);

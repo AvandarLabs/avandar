@@ -1,15 +1,12 @@
 import { useUncontrolled } from "@mantine/hooks";
-import { Model } from "@models/Model/Model";
-import { makeSelectOptions } from "@ui/inputs/Select/makeSelectOptions";
-import { Select } from "@ui/inputs/Select/Select";
-import { where } from "@utils/filters/where/where";
-import { makeIdLookupMap } from "@utils/index";
-import { prop } from "@utils/objects/hofs/prop/prop";
+import { Model } from "@models";
+import { makeSelectOptions, Select } from "@ui";
+import { makeIdLookupMap, prop, where } from "@utils";
 import { QueryColumn as QueryColumnModule } from "$/models/queries/QueryColumn/QueryColumn";
 import { useEffect, useMemo } from "react";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { EntityFieldConfigClient } from "@/clients/entities/EntityFieldConfigClient";
-import type { SelectProps } from "@ui/inputs/Select/Select";
+import type { SelectProps } from "@ui";
 import type {
   QueryColumnId,
   QueryColumnRead,

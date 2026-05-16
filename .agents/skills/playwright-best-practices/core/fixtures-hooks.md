@@ -243,7 +243,7 @@ test.describe("User Management", () => {
 
 ```typescript
 // auth.setup.ts
-import { test as setup, expect } from "@playwright/test";
+import { expect, test as setup } from "@playwright/test";
 
 const authFile = ".auth/user.json";
 

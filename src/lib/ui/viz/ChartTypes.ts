@@ -1,7 +1,4 @@
-import type {
-  FormattableTimezone,
-} from "@utils/dates/formatDate/formatDate";
-import type { UnknownDataFrame } from "@utils/types/common.types";
+import type { FormattableTimezone, UnknownDataFrame } from "@utils";
 
 export type XYSettings = {
   xAxisKey: string;

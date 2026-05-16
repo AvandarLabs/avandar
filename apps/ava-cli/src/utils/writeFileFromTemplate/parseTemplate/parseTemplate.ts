@@ -1,4 +1,4 @@
-import { template } from "@utils/strings/template/template";
+import { template } from "@utils";
 
 export type TemplateParams = Readonly<Record<string, string>>;
 

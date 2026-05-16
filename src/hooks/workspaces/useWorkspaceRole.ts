@@ -1,7 +1,7 @@
-import { useQuery } from "@hooks/useQuery/useQuery";
+import { useQuery } from "@hooks";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
 export function useWorkspaceRole(): Workspace.Role {

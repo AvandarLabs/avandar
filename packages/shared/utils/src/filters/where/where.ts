@@ -1,10 +1,10 @@
-import type { UnknownObject } from "@utils/types/common.types.ts";
 import type {
   ArrayValueOperator,
   FilterOperator,
   FiltersByColumn,
   SingleValueOperator,
 } from "@utils/filters/filters.ts";
+import type { UnknownObject } from "@utils/types/common.types.ts";
 
 export function where<T extends UnknownObject, K extends keyof T>(
   column: K,

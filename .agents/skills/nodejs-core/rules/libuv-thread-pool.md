@@ -12,6 +12,7 @@ libuv uses a thread pool for operations that can't be performed asynchronously a
 ## Thread Pool Overview
 
 The thread pool handles:
+
 - **File system operations** (`fs.*` except FSWatcher)
 - **DNS** (`dns.lookup()`, not `dns.resolve*()`)
 - **Crypto** (some operations like `crypto.pbkdf2()`, `crypto.randomBytes()`)
@@ -69,8 +70,8 @@ process.env.UV_THREADPOOL_SIZE = 16; // Too late!
 ### The Problem
 
 ```javascript
-const fs = require('node:fs/promises');
-const dns = require('node:dns/promises');
+const fs = require("node:fs/promises");
+const dns = require("node:dns/promises");
 
 // With default pool size of 4:
 async function handleRequest(hostname) {
@@ -80,13 +81,13 @@ async function handleRequest(hostname) {
     file2,
     file3,
     file4,
-    resolved  // This waits for a free thread!
+    resolved, // This waits for a free thread!
   ] = await Promise.all([
-    fs.readFile('config1.json'),
-    fs.readFile('config2.json'),
-    fs.readFile('config3.json'),
-    fs.readFile('config4.json'),
-    dns.lookup(hostname)  // Blocked until a thread is free
+    fs.readFile("config1.json"),
+    fs.readFile("config2.json"),
+    fs.readFile("config3.json"),
+    fs.readFile("config4.json"),
+    dns.lookup(hostname), // Blocked until a thread is free
   ]);
 }
 ```
@@ -94,13 +95,13 @@ async function handleRequest(hostname) {
 ### Detecting Starvation
 
 ```javascript
-const dns = require('node:dns');
+const dns = require("node:dns");
 
 // DNS lookup is a good canary for thread pool saturation
 function measureThreadPoolLatency() {
   const start = process.hrtime.bigint();
 
-  dns.lookup('localhost', (err) => {
+  dns.lookup("localhost", (err) => {
     const end = process.hrtime.bigint();
     const ms = Number(end - start) / 1e6;
 
@@ -116,21 +117,21 @@ setInterval(measureThreadPoolLatency, 1000);
 ### Monitoring with Async Hooks
 
 ```javascript
-const async_hooks = require('node:async_hooks');
-const fs = require('node:fs');
+const async_hooks = require("node:async_hooks");
+const fs = require("node:fs");
 
 // Track thread pool operations
 const threadPoolTypes = new Set([
-  'FSREQCALLBACK',
-  'FSREQPROMISE',
-  'GETADDRINFOREQWRAP',
-  'GETNAMEINFOREQWRAP',
-  'PBKDF2REQUEST',
-  'RANDOMBYTESREQUEST',
-  'SCRYPTREQUEST',
-  'SIGNREQUEST',
-  'VERIFYREQUEST',
-  'ZLIB'
+  "FSREQCALLBACK",
+  "FSREQPROMISE",
+  "GETADDRINFOREQWRAP",
+  "GETNAMEINFOREQWRAP",
+  "PBKDF2REQUEST",
+  "RANDOMBYTESREQUEST",
+  "SCRYPTREQUEST",
+  "SIGNREQUEST",
+  "VERIFYREQUEST",
+  "ZLIB",
 ]);
 
 let activeThreadPoolOps = 0;
@@ -145,13 +146,15 @@ const hook = async_hooks.createHook({
   },
   destroy(asyncId, type) {
     // Note: type not available in destroy, need to track separately
-  }
+  },
 });
 
 hook.enable();
 
 setInterval(() => {
-  console.log(`Active thread pool ops: ${activeThreadPoolOps}, max: ${maxConcurrent}`);
+  console.log(
+    `Active thread pool ops: ${activeThreadPoolOps}, max: ${maxConcurrent}`,
+  );
   maxConcurrent = activeThreadPoolOps;
 }, 5000);
 ```
@@ -161,18 +164,18 @@ setInterval(() => {
 ### File System (All Operations)
 
 ```javascript
-const fs = require('node:fs');
+const fs = require("node:fs");
 
 // ALL of these use the thread pool:
-fs.readFile('file.txt', callback);
-fs.writeFile('file.txt', data, callback);
-fs.stat('file.txt', callback);
-fs.readdir('.', callback);
-fs.open('file.txt', 'r', callback);
+fs.readFile("file.txt", callback);
+fs.writeFile("file.txt", data, callback);
+fs.stat("file.txt", callback);
+fs.readdir(".", callback);
+fs.open("file.txt", "r", callback);
 // Even metadata operations!
 
 // Exception: fs.watch() / fs.watchFile() use OS facilities
-fs.watch('.', (event, filename) => {
+fs.watch(".", (event, filename) => {
   // This does NOT use thread pool
 });
 ```
@@ -180,56 +183,52 @@ fs.watch('.', (event, filename) => {
 ### DNS Lookup (Not Resolve)
 
 ```javascript
-const dns = require('node:dns');
+const dns = require("node:dns");
 
 // Uses thread pool (calls getaddrinfo)
-dns.lookup('example.com', callback);
+dns.lookup("example.com", callback);
 
 // Does NOT use thread pool (uses c-ares)
-dns.resolve('example.com', callback);
-dns.resolve4('example.com', callback);
-dns.resolveMx('example.com', callback);
+dns.resolve("example.com", callback);
+dns.resolve4("example.com", callback);
+dns.resolveMx("example.com", callback);
 ```
 
 **Recommendation**: Prefer `dns.resolve*()` for high-throughput:
 
 ```javascript
-const dns = require('node:dns');
+const dns = require("node:dns");
 
 // BAD: Thread pool bottleneck
 async function resolveMany(hostnames) {
-  return Promise.all(
-    hostnames.map(h => dns.promises.lookup(h))
-  );
+  return Promise.all(hostnames.map((h) => dns.promises.lookup(h)));
 }
 
 // GOOD: Uses c-ares, no thread pool
 async function resolveMany(hostnames) {
-  return Promise.all(
-    hostnames.map(h => dns.promises.resolve4(h))
-  );
+  return Promise.all(hostnames.map((h) => dns.promises.resolve4(h)));
 }
 ```
 
 ### Crypto Operations
 
 ```javascript
-const crypto = require('node:crypto');
+const crypto = require("node:crypto");
 
 // Uses thread pool:
-crypto.pbkdf2(password, salt, iterations, keylen, 'sha512', callback);
+crypto.pbkdf2(password, salt, iterations, keylen, "sha512", callback);
 crypto.randomBytes(256, callback);
 crypto.scrypt(password, salt, keylen, callback);
 
 // Does NOT use thread pool (runs on main thread):
-crypto.createHash('sha256').update(data).digest();
+crypto.createHash("sha256").update(data).digest();
 crypto.createCipheriv(algorithm, key, iv);
 ```
 
 ### Zlib
 
 ```javascript
-const zlib = require('node:zlib');
+const zlib = require("node:zlib");
 
 // Uses thread pool:
 zlib.gzip(buffer, callback);
@@ -251,7 +250,7 @@ zlib.gzipSync(buffer); // BAD
 // 2. Nature of blocking operations
 // 3. Concurrent request load
 
-const os = require('node:os');
+const os = require("node:os");
 
 // For I/O-heavy workloads:
 // More threads than CPUs is fine (threads are often waiting)
@@ -269,7 +268,7 @@ const mixedSize = Math.max(os.cpus().length * 1.5, 4);
 ### Monitoring to Determine Size
 
 ```javascript
-const { monitorEventLoopDelay } = require('node:perf_hooks');
+const { monitorEventLoopDelay } = require("node:perf_hooks");
 
 // Monitor event loop delay
 const histogram = monitorEventLoopDelay({ resolution: 20 });
@@ -279,7 +278,9 @@ histogram.enable();
 setInterval(() => {
   const p99 = histogram.percentile(99) / 1e6;
   if (p99 > 100) {
-    console.warn(`Event loop p99: ${p99.toFixed(2)}ms - consider increasing UV_THREADPOOL_SIZE`);
+    console.warn(
+      `Event loop p99: ${p99.toFixed(2)}ms - consider increasing UV_THREADPOOL_SIZE`,
+    );
   }
   histogram.reset();
 }, 10000);
@@ -293,7 +294,7 @@ setInterval(() => {
 // Instead of file system for caching:
 // Use Redis, Memcached, or in-memory cache
 
-const { LRUCache } = require('lru-cache');
+const { LRUCache } = require("lru-cache");
 const cache = new LRUCache({ max: 500 });
 
 // Instead of dns.lookup():
@@ -319,24 +320,24 @@ async function cachedResolve(hostname) {
 ### Use Worker Threads for CPU-Heavy Work
 
 ```javascript
-const { Worker, isMainThread, parentPort } = require('node:worker_threads');
+const { Worker, isMainThread, parentPort } = require("node:worker_threads");
 
 if (isMainThread) {
   // Main thread: dispatch work to workers
   const worker = new Worker(__filename);
 
-  worker.postMessage({ password: 'secret', salt: 'random' });
-  worker.on('message', (hash) => {
-    console.log('Hash:', hash);
+  worker.postMessage({ password: "secret", salt: "random" });
+  worker.on("message", (hash) => {
+    console.log("Hash:", hash);
   });
 } else {
   // Worker thread: do CPU-heavy work
-  const crypto = require('node:crypto');
+  const crypto = require("node:crypto");
 
-  parentPort.on('message', ({ password, salt }) => {
+  parentPort.on("message", ({ password, salt }) => {
     // This runs in worker, not thread pool
-    const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512');
-    parentPort.postMessage(hash.toString('hex'));
+    const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, "sha512");
+    parentPort.postMessage(hash.toString("hex"));
   });
 }
 ```
@@ -344,17 +345,17 @@ if (isMainThread) {
 ### Stream Large Files
 
 ```javascript
-const fs = require('node:fs');
-const { pipeline } = require('node:stream/promises');
+const fs = require("node:fs");
+const { pipeline } = require("node:stream/promises");
 
 // BAD: Holds thread pool slot for entire read
-const data = await fs.promises.readFile('huge-file.txt');
+const data = await fs.promises.readFile("huge-file.txt");
 
 // BETTER: Streaming uses thread pool in small chunks
 await pipeline(
-  fs.createReadStream('huge-file.txt'),
+  fs.createReadStream("huge-file.txt"),
   processStream,
-  fs.createWriteStream('output.txt')
+  fs.createWriteStream("output.txt"),
 );
 ```
 

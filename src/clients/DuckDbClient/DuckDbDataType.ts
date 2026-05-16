@@ -1,4 +1,4 @@
-import { constant } from "@utils/misc/constant/constant";
+import { constant } from "@utils";
 import { match } from "ts-pattern";
 import type { AvaDataTypeT } from "$/models/datasets/AvaDataType/AvaDataType.types";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";

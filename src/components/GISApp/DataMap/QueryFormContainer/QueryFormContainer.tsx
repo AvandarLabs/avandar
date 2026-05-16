@@ -1,10 +1,9 @@
-import { useBoolean } from "@hooks/useBoolean/useBoolean";
+import { useBoolean } from "@hooks";
 import { ActionIcon, ColorInput, Flex, Popover, Stack } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
-import { Model } from "@models/Model/Model";
+import { Model } from "@models";
 import { IconFilter } from "@tabler/icons-react";
-import { notifyError } from "@ui/notifications/notify";
-import { Tooltip } from "@ui/Tooltip/Tooltip";
+import { notifyError, Tooltip } from "@ui";
 import { QueryColumn as QueryColumnFns } from "$/models/queries/QueryColumn/QueryColumn";
 import { mantineColorVar, mantineVar } from "@/lib/utils/browser/css";
 import { QueryColumnSingleSelect } from "@/views/DataExplorerApp/QueryColumnSingleSelect";

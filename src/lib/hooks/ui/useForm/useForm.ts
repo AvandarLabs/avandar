@@ -5,7 +5,7 @@ import type {
   FormErrors,
   UseFormInput as MantineUseFormInput,
 } from "@mantine/form";
-import type { UnknownObject } from "@utils/types/common.types";
+import type { UnknownObject } from "@utils";
 import type { Merge, Paths } from "type-fest";
 
 // Improved type safety for `path` argument in a Rule function
@@ -71,7 +71,7 @@ export type UseFormInput<
   TransformValues = FormValues,
   FormPath extends Paths<FormValues> = Paths<FormValues>,
 > = Merge<
-  MantineUseFormInput<FormValues, (values: FormValues) => TransformValues>,
+  MantineUseFormInput<FormValues, TransformValues>,
   {
     validate?:
       | FormRulesRecord<FormValues, FormValues, FormPath>
@@ -98,14 +98,8 @@ export function useForm<
 >(
   formOptions: UseFormInput<FormValues, TransformValues, FormPath>,
 ): FormType<FormValues, TransformValues, FormPath> {
-  const form = mantineUseForm<
-    FormValues,
-    (values: FormValues) => TransformValues
-  >(
-    formOptions as MantineUseFormInput<
-      FormValues,
-      (values: FormValues) => TransformValues
-    >,
+  const form = mantineUseForm<FormValues, TransformValues>(
+    formOptions as MantineUseFormInput<FormValues, TransformValues>,
   );
 
   const keysAndProps = useKeysAndPropsCallback(form);

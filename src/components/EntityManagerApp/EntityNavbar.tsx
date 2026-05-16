@@ -8,9 +8,7 @@ import {
 } from "@mantine/core";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { where } from "@utils/filters/where/where";
-import { constant } from "@utils/misc/constant/constant";
-import { prop } from "@utils/objects/hofs/prop/prop";
+import { constant, prop, where } from "@utils";
 import { useEffect, useMemo, useRef } from "react";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { AppLinks } from "@/config/AppLinks";

@@ -27,7 +27,7 @@ to recognize anti-patterns.
 
 Include specific metrics. Helps agents prioritize fixes.
 
-**Good:** "10x faster queries", "50% smaller index", "Eliminates N+1" 
+**Good:** "10x faster queries", "50% smaller index", "Eliminates N+1"
 **Bad:** "Faster", "Better", "More efficient"
 
 ### 4. Self-Contained Examples
@@ -44,7 +44,9 @@ CREATE TABLE users (
 );
 
 -- Now show the index
-CREATE INDEX users_active_email_idx ON users(email) WHERE deleted_at IS NULL;
+CREATE INDEX users_active_email_idx ON users (email)
+WHERE
+  deleted_at IS NULL;
 ```
 
 ### 5. Semantic Naming
@@ -62,12 +64,14 @@ Use meaningful table/column names. Names carry intent for LLMs.
 
 ```sql
 -- Use lowercase keywords, clear formatting
-CREATE INDEX CONCURRENTLY users_email_idx
-  ON users(email)
-  WHERE deleted_at IS NULL;
+CREATE INDEX CONCURRENTLY users_email_idx ON users (email)
+WHERE
+  deleted_at IS NULL;
 
 -- Not cramped or ALL CAPS
-CREATE INDEX CONCURRENTLY USERS_EMAIL_IDX ON USERS(EMAIL) WHERE DELETED_AT IS NULL;
+CREATE INDEX CONCURRENTLY USERS_EMAIL_IDX ON USERS (EMAIL)
+WHERE
+  DELETED_AT IS NULL;
 ```
 
 ### Comments
@@ -124,14 +128,14 @@ const posts = await db.query("SELECT * FROM posts WHERE user_id = ANY($1)", [
 
 ## Impact Level Guidelines
 
-| Level | Improvement | Use When |
-|-------|-------------|----------|
-| **CRITICAL** | 10-100x | Missing indexes, connection exhaustion, sequential scans on large tables |
-| **HIGH** | 5-20x | Wrong index types, poor partitioning, missing covering indexes |
-| **MEDIUM-HIGH** | 2-5x | N+1 queries, inefficient pagination, RLS optimization |
-| **MEDIUM** | 1.5-3x | Redundant indexes, query plan instability |
-| **LOW-MEDIUM** | 1.2-2x | VACUUM tuning, configuration tweaks |
-| **LOW** | Incremental | Advanced patterns, edge cases |
+| Level           | Improvement | Use When                                                                 |
+| --------------- | ----------- | ------------------------------------------------------------------------ |
+| **CRITICAL**    | 10-100x     | Missing indexes, connection exhaustion, sequential scans on large tables |
+| **HIGH**        | 5-20x       | Wrong index types, poor partitioning, missing covering indexes           |
+| **MEDIUM-HIGH** | 2-5x        | N+1 queries, inefficient pagination, RLS optimization                    |
+| **MEDIUM**      | 1.5-3x      | Redundant indexes, query plan instability                                |
+| **LOW-MEDIUM**  | 1.2-2x      | VACUUM tuning, configuration tweaks                                      |
+| **LOW**         | Incremental | Advanced patterns, edge cases                                            |
 
 ---
 

@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
-import { Expect, IsEqual } from "@utils/types/test-utilities.types";
+import { Expect, IsEqual } from "@utils";
 import { uuid } from "$/lib/uuid";
 import { createElement } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -9,7 +9,7 @@ import {
   useLoadManualUploadFile,
 } from "./useLoadManualUploadFile";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
-import type { UnknownObject } from "@utils/types/common.types";
+import type { UnknownObject } from "@utils";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { ReactNode } from "react";
@@ -61,7 +61,7 @@ vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   };
 });
 
-vi.mock("@ui/index", () => {
+vi.mock("@ui", () => {
   return {
     notifySuccess: notifySuccessMock,
     notifyError: vi.fn(),
@@ -69,7 +69,7 @@ vi.mock("@ui/index", () => {
   };
 });
 
-vi.mock("@utils/index", () => {
+vi.mock("@utils", () => {
   return {
     formatNumber: (value: number) => {
       return String(value);

@@ -1,4 +1,4 @@
-import { useMutation } from "@hooks/useMutation/useMutation";
+import { useMutation } from "@hooks";
 import {
   Button,
   Divider,
@@ -8,7 +8,7 @@ import {
   Text,
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import { notifySuccess } from "@ui/notifications/notify";
+import { notifySuccess } from "@ui";
 import { useState } from "react";
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";

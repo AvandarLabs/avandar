@@ -12,28 +12,28 @@ metadata:
 Add WebSocket support to Fastify:
 
 ```typescript
-import Fastify from 'fastify';
-import websocket from '@fastify/websocket';
+import websocket from "@fastify/websocket";
+import Fastify from "fastify";
 
 const app = Fastify();
 
 app.register(websocket);
 
-app.get('/ws', { websocket: true }, (socket, request) => {
-  socket.on('message', (message) => {
+app.get("/ws", { websocket: true }, (socket, request) => {
+  socket.on("message", (message) => {
     const data = message.toString();
-    console.log('Received:', data);
+    console.log("Received:", data);
 
     // Echo back
     socket.send(`Echo: ${data}`);
   });
 
-  socket.on('close', () => {
-    console.log('Client disconnected');
+  socket.on("close", () => {
+    console.log("Client disconnected");
   });
 
-  socket.on('error', (error) => {
-    console.error('WebSocket error:', error);
+  socket.on("error", (error) => {
+    console.error("WebSocket error:", error);
   });
 });
 
@@ -47,19 +47,19 @@ Use Fastify hooks with WebSocket routes:
 ```typescript
 app.register(async function wsRoutes(fastify) {
   // This hook runs before WebSocket upgrade
-  fastify.addHook('preValidation', async (request, reply) => {
+  fastify.addHook("preValidation", async (request, reply) => {
     const token = request.headers.authorization;
     if (!token) {
-      reply.code(401).send({ error: 'Unauthorized' });
+      reply.code(401).send({ error: "Unauthorized" });
       return;
     }
     request.user = await verifyToken(token);
   });
 
-  fastify.get('/ws', { websocket: true }, (socket, request) => {
-    console.log('Connected user:', request.user.id);
+  fastify.get("/ws", { websocket: true }, (socket, request) => {
+    console.log("Connected user:", request.user.id);
 
-    socket.on('message', (message) => {
+    socket.on("message", (message) => {
       // Handle authenticated messages
     });
   });
@@ -96,14 +96,14 @@ Broadcast messages to connected clients:
 ```typescript
 const clients = new Set<WebSocket>();
 
-app.get('/ws', { websocket: true }, (socket, request) => {
+app.get("/ws", { websocket: true }, (socket, request) => {
   clients.add(socket);
 
-  socket.on('close', () => {
+  socket.on("close", () => {
     clients.delete(socket);
   });
 
-  socket.on('message', (message) => {
+  socket.on("message", (message) => {
     // Broadcast to all other clients
     for (const client of clients) {
       if (client !== socket && client.readyState === WebSocket.OPEN) {
@@ -114,12 +114,12 @@ app.get('/ws', { websocket: true }, (socket, request) => {
 });
 
 // Broadcast from HTTP route
-app.post('/broadcast', async (request) => {
+app.post("/broadcast", async (request) => {
   const { message } = request.body;
 
   for (const client of clients) {
     if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify({ type: 'broadcast', message }));
+      client.send(JSON.stringify({ type: "broadcast", message }));
     }
   }
 
@@ -159,16 +159,16 @@ function broadcastToRoom(roomId: string, message: string, exclude?: WebSocket) {
   }
 }
 
-app.get('/ws/:roomId', { websocket: true }, (socket, request) => {
+app.get("/ws/:roomId", { websocket: true }, (socket, request) => {
   const { roomId } = request.params as { roomId: string };
 
   joinRoom(socket, roomId);
 
-  socket.on('message', (message) => {
+  socket.on("message", (message) => {
     broadcastToRoom(roomId, message.toString(), socket);
   });
 
-  socket.on('close', () => {
+  socket.on("close", () => {
     leaveRoom(socket, roomId);
   });
 });
@@ -185,37 +185,37 @@ interface WSMessage {
   id?: string;
 }
 
-app.get('/ws', { websocket: true }, (socket, request) => {
+app.get("/ws", { websocket: true }, (socket, request) => {
   function send(message: WSMessage) {
     socket.send(JSON.stringify(message));
   }
 
-  socket.on('message', (raw) => {
+  socket.on("message", (raw) => {
     let message: WSMessage;
 
     try {
       message = JSON.parse(raw.toString());
     } catch {
-      send({ type: 'error', payload: 'Invalid JSON' });
+      send({ type: "error", payload: "Invalid JSON" });
       return;
     }
 
     switch (message.type) {
-      case 'ping':
-        send({ type: 'pong', id: message.id });
+      case "ping":
+        send({ type: "pong", id: message.id });
         break;
 
-      case 'subscribe':
+      case "subscribe":
         handleSubscribe(socket, message.payload);
-        send({ type: 'subscribed', payload: message.payload, id: message.id });
+        send({ type: "subscribed", payload: message.payload, id: message.id });
         break;
 
-      case 'message':
+      case "message":
         handleMessage(socket, message.payload);
         break;
 
       default:
-        send({ type: 'error', payload: 'Unknown message type' });
+        send({ type: "error", payload: "Unknown message type" });
     }
   });
 });
@@ -229,15 +229,15 @@ Keep connections alive:
 const HEARTBEAT_INTERVAL = 30000;
 const clients = new Map<WebSocket, { isAlive: boolean }>();
 
-app.get('/ws', { websocket: true }, (socket, request) => {
+app.get("/ws", { websocket: true }, (socket, request) => {
   clients.set(socket, { isAlive: true });
 
-  socket.on('pong', () => {
+  socket.on("pong", () => {
     const client = clients.get(socket);
     if (client) client.isAlive = true;
   });
 
-  socket.on('close', () => {
+  socket.on("close", () => {
     clients.delete(socket);
   });
 });
@@ -262,30 +262,36 @@ setInterval(() => {
 Authenticate WebSocket connections:
 
 ```typescript
-app.get('/ws', {
-  websocket: true,
-  preValidation: async (request, reply) => {
-    // Authenticate via query parameter or header
-    const token = request.query.token || request.headers.authorization?.replace('Bearer ', '');
+app.get(
+  "/ws",
+  {
+    websocket: true,
+    preValidation: async (request, reply) => {
+      // Authenticate via query parameter or header
+      const token =
+        request.query.token ||
+        request.headers.authorization?.replace("Bearer ", "");
 
-    if (!token) {
-      reply.code(401).send({ error: 'Token required' });
-      return;
-    }
+      if (!token) {
+        reply.code(401).send({ error: "Token required" });
+        return;
+      }
 
-    try {
-      request.user = await verifyToken(token);
-    } catch {
-      reply.code(401).send({ error: 'Invalid token' });
-    }
+      try {
+        request.user = await verifyToken(token);
+      } catch {
+        reply.code(401).send({ error: "Invalid token" });
+      }
+    },
   },
-}, (socket, request) => {
-  console.log('Authenticated user:', request.user);
+  (socket, request) => {
+    console.log("Authenticated user:", request.user);
 
-  socket.on('message', (message) => {
-    // Handle authenticated messages
-  });
-});
+    socket.on("message", (message) => {
+      // Handle authenticated messages
+    });
+  },
+);
 ```
 
 ## Error Handling
@@ -293,22 +299,24 @@ app.get('/ws', {
 Handle WebSocket errors properly:
 
 ```typescript
-app.get('/ws', { websocket: true }, (socket, request) => {
-  socket.on('error', (error) => {
-    request.log.error({ err: error }, 'WebSocket error');
+app.get("/ws", { websocket: true }, (socket, request) => {
+  socket.on("error", (error) => {
+    request.log.error({ err: error }, "WebSocket error");
   });
 
-  socket.on('message', async (raw) => {
+  socket.on("message", async (raw) => {
     try {
       const message = JSON.parse(raw.toString());
       const result = await processMessage(message);
       socket.send(JSON.stringify({ success: true, result }));
     } catch (error) {
-      request.log.error({ err: error }, 'Message processing error');
-      socket.send(JSON.stringify({
-        success: false,
-        error: error.message,
-      }));
+      request.log.error({ err: error }, "Message processing error");
+      socket.send(
+        JSON.stringify({
+          success: false,
+          error: error.message,
+        }),
+      );
     }
   });
 });
@@ -321,7 +329,11 @@ Limit message frequency:
 ```typescript
 const rateLimits = new Map<WebSocket, { count: number; resetAt: number }>();
 
-function checkRateLimit(socket: WebSocket, limit: number, window: number): boolean {
+function checkRateLimit(
+  socket: WebSocket,
+  limit: number,
+  window: number,
+): boolean {
   const now = Date.now();
   let state = rateLimits.get(socket);
 
@@ -339,17 +351,17 @@ function checkRateLimit(socket: WebSocket, limit: number, window: number): boole
   return true;
 }
 
-app.get('/ws', { websocket: true }, (socket, request) => {
-  socket.on('message', (message) => {
+app.get("/ws", { websocket: true }, (socket, request) => {
+  socket.on("message", (message) => {
     if (!checkRateLimit(socket, 100, 60000)) {
-      socket.send(JSON.stringify({ error: 'Rate limit exceeded' }));
+      socket.send(JSON.stringify({ error: "Rate limit exceeded" }));
       return;
     }
 
     // Process message
   });
 
-  socket.on('close', () => {
+  socket.on("close", () => {
     rateLimits.delete(socket);
   });
 });
@@ -360,14 +372,14 @@ app.get('/ws', { websocket: true }, (socket, request) => {
 Close WebSocket connections on shutdown:
 
 ```typescript
-import closeWithGrace from 'close-with-grace';
+import closeWithGrace from "close-with-grace";
 
 const connections = new Set<WebSocket>();
 
-app.get('/ws', { websocket: true }, (socket, request) => {
+app.get("/ws", { websocket: true }, (socket, request) => {
   connections.add(socket);
 
-  socket.on('close', () => {
+  socket.on("close", () => {
     connections.delete(socket);
   });
 });
@@ -376,8 +388,13 @@ closeWithGrace({ delay: 5000 }, async ({ signal }) => {
   // Notify clients
   for (const socket of connections) {
     if (socket.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify({ type: 'shutdown', message: 'Server is shutting down' }));
-      socket.close(1001, 'Server shutdown');
+      socket.send(
+        JSON.stringify({
+          type: "shutdown",
+          message: "Server is shutting down",
+        }),
+      );
+      socket.close(1001, "Server shutdown");
     }
   }
 
@@ -390,31 +407,31 @@ closeWithGrace({ delay: 5000 }, async ({ signal }) => {
 Use WebSocket for streaming data:
 
 ```typescript
-app.get('/ws/stream', { websocket: true }, async (socket, request) => {
+app.get("/ws/stream", { websocket: true }, async (socket, request) => {
   const stream = createDataStream();
 
-  stream.on('data', (data) => {
+  stream.on("data", (data) => {
     if (socket.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify({ type: 'data', payload: data }));
+      socket.send(JSON.stringify({ type: "data", payload: data }));
     }
   });
 
-  stream.on('end', () => {
-    socket.send(JSON.stringify({ type: 'end' }));
+  stream.on("end", () => {
+    socket.send(JSON.stringify({ type: "end" }));
     socket.close();
   });
 
-  socket.on('message', (message) => {
+  socket.on("message", (message) => {
     const { type, payload } = JSON.parse(message.toString());
 
-    if (type === 'pause') {
+    if (type === "pause") {
       stream.pause();
-    } else if (type === 'resume') {
+    } else if (type === "resume") {
       stream.resume();
     }
   });
 
-  socket.on('close', () => {
+  socket.on("close", () => {
     stream.destroy();
   });
 });

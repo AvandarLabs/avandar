@@ -41,10 +41,10 @@ export default defineConfig({
 
 ```typescript
 // fixtures/coverage.ts
-import { test as base, expect } from "@playwright/test";
+import { randomUUID } from "crypto";
 import fs from "fs";
 import path from "path";
-import { randomUUID } from "crypto";
+import { test as base, expect } from "@playwright/test";
 
 export const test = base.extend<{}, { collectCoverage: void }>({
   collectCoverage: [
@@ -72,7 +72,7 @@ export const test = base.extend<{}, { collectCoverage: void }>({
 
       fs.writeFileSync(
         path.join(coverageDir, `coverage-${randomUUID()}.json`),
-        JSON.stringify([...jsCoverage, ...cssCoverage])
+        JSON.stringify([...jsCoverage, ...cssCoverage]),
       );
 
       await context.close();
@@ -126,7 +126,7 @@ test("track specific module coverage", async ({ page }) => {
     const totalBytes = checkoutCoverage.text?.length || 0;
     const coveredBytes = checkoutCoverage.ranges.reduce(
       (sum, range) => sum + (range.end - range.start),
-      0
+      0,
     );
     const percentage = (coveredBytes / totalBytes) * 100;
 
@@ -155,7 +155,7 @@ test("collect CSS coverage", async ({ page }) => {
     const totalBytes = entry.text?.length || 0;
     const usedBytes = entry.ranges.reduce(
       (sum, range) => sum + (range.end - range.start),
-      0
+      0,
     );
     const unusedPercentage = ((totalBytes - usedBytes) / totalBytes) * 100;
 
@@ -185,7 +185,7 @@ async function convertCoverage() {
 
   for (const file of files) {
     const coverageData = JSON.parse(
-      fs.readFileSync(path.join(coverageDir, file), "utf-8")
+      fs.readFileSync(path.join(coverageDir, file), "utf-8"),
     );
 
     for (const entry of coverageData) {
@@ -204,7 +204,7 @@ async function convertCoverage() {
 
   fs.writeFileSync(
     path.join(coverageDir, "coverage-final.json"),
-    JSON.stringify(istanbulCoverage)
+    JSON.stringify(istanbulCoverage),
   );
 }
 
@@ -233,9 +233,9 @@ npx nyc report --reporter=html --reporter=text --temp-dir=./coverage
 
 ```typescript
 // reporters/coverage-reporter.ts
-import type { Reporter, FullResult } from "@playwright/test/reporter";
 import fs from "fs";
 import path from "path";
+import type { FullResult, Reporter } from "@playwright/test/reporter";
 
 class CoverageReporter implements Reporter {
   private coverageData: any[] = [];
@@ -249,7 +249,7 @@ class CoverageReporter implements Reporter {
 
     for (const file of files) {
       const data = JSON.parse(
-        fs.readFileSync(path.join(coverageDir, file), "utf-8")
+        fs.readFileSync(path.join(coverageDir, file), "utf-8"),
       );
       this.coverageData.push(...data);
     }
@@ -277,7 +277,7 @@ class CoverageReporter implements Reporter {
         totalBytes += entry.text?.length || 0;
         coveredBytes += entry.ranges.reduce(
           (sum: number, r: any) => sum + (r.end - r.start),
-          0
+          0,
         );
       }
     }
@@ -299,9 +299,9 @@ export default CoverageReporter;
 
 ```typescript
 // tests/coverage.spec.ts
-import { test, expect } from "@playwright/test";
 import fs from "fs";
 import path from "path";
+import { expect, test } from "@playwright/test";
 
 test.afterAll(async () => {
   const coverageDir = "./coverage";
@@ -312,7 +312,7 @@ test.afterAll(async () => {
 
   for (const file of files) {
     const coverage = JSON.parse(
-      fs.readFileSync(path.join(coverageDir, file), "utf-8")
+      fs.readFileSync(path.join(coverageDir, file), "utf-8"),
     );
 
     for (const entry of coverage) {
@@ -320,7 +320,7 @@ test.afterAll(async () => {
       totalBytes += entry.text?.length || 0;
       coveredBytes += entry.ranges.reduce(
         (sum: number, r: any) => sum + (r.end - r.start),
-        0
+        0,
       );
     }
   }
@@ -361,7 +361,7 @@ function checkThresholds(coverage: any[]): string[] {
       total += file.text?.length || 0;
       covered += file.ranges.reduce(
         (sum: number, r: any) => sum + (r.end - r.start),
-        0
+        0,
       );
     }
 
@@ -371,7 +371,7 @@ function checkThresholds(coverage: any[]): string[] {
       violations.push(
         `${threshold.pattern}: ${percent.toFixed(1)}% < ${
           threshold.minCoverage
-        }%`
+        }%`,
       );
     }
   }
@@ -407,7 +407,7 @@ async function mergeCoverage() {
 
   fs.writeFileSync(
     "./coverage/merged.json",
-    JSON.stringify([...merged.values()])
+    JSON.stringify([...merged.values()]),
   );
 }
 

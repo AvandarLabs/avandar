@@ -6,10 +6,6 @@ import {
   screen,
 } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
-const { publishDashboardMock } = vi.hoisted(() => {
-  return { publishDashboardMock: vi.fn() };
-});
 import { AvandarUiProvider } from "@/components/common/AvandarUiProvider";
 import { DashboardEditorView } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
@@ -18,6 +14,10 @@ import type { UserId } from "$/models/User/User.types";
 import type { UserProfileId } from "$/models/User/UserProfile.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactElement } from "react";
+
+const { publishDashboardMock } = vi.hoisted(() => {
+  return { publishDashboardMock: vi.fn() };
+});
 
 vi.mock("@puckeditor/core/puck.css", () => {
   return {};
@@ -222,6 +222,7 @@ function _makeDashboard(): Dashboard.T {
     slug: "test-dashboard",
     description: undefined,
     isPublic: false,
+    isRestricted: false,
     ownerId: "00000000-0000-4000-8000-000000000002" as UserId,
     ownerProfileId: "00000000-0000-4000-8000-000000000003" as UserProfileId,
     workspaceId: "00000000-0000-4000-8000-000000000004" as Workspace.Id,
@@ -265,10 +266,9 @@ describe("DashboardEditorView", () => {
     // Sanity check: the dashboard starts with no components and Publish is
     // enabled (nothing to save yet).
     expect(screen.getByTestId("puck-content-count")).toHaveTextContent("0");
-    expect(screen.getByRole("button", { name: /publish/i })).not.toHaveAttribute(
-      "aria-disabled",
-      "true",
-    );
+    expect(
+      screen.getByRole("button", { name: /publish/i }),
+    ).not.toHaveAttribute("aria-disabled", "true");
 
     // Add a random component (a HeadingBlock) via the Puck editor.
     fireEvent.click(screen.getByTestId("puck-add-component"));
@@ -340,7 +340,9 @@ describe("DashboardEditorView", () => {
     fireEvent.mouseEnter(screen.getByRole("button", { name: /publish/i }));
 
     expect(
-      await screen.findByText(/cannot publish while there are unsaved changes/i),
+      await screen.findByText(
+        /cannot publish while there are unsaved changes/i,
+      ),
     ).toBeInTheDocument();
   });
 });

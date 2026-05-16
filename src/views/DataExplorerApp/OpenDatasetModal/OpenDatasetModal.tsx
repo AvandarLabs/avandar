@@ -1,4 +1,4 @@
-import { useMutation } from "@hooks/useMutation/useMutation";
+import { useMutation } from "@hooks";
 import {
   ActionIcon,
   Button,
@@ -11,8 +11,8 @@ import {
 import { useDebouncedValue } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { IconSearch, IconTrash } from "@tabler/icons-react";
-import { notifyError, notifySuccess } from "@ui/index";
-import { where } from "@utils/filters/where/where";
+import { notifyError, notifySuccess } from "@ui";
+import { where } from "@utils";
 import { useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";

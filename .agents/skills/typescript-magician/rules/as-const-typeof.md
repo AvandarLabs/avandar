@@ -63,7 +63,8 @@ type BackendProgram = keyof typeof programModeEnumMap;
 // Type: "GROUP" | "ANNOUNCEMENT" | "ONE_ON_ONE" | "SELF_DIRECTED"
 
 // Extract values as a union type using indexed access
-type FrontendProgram = typeof programModeEnumMap[keyof typeof programModeEnumMap];
+type FrontendProgram =
+  (typeof programModeEnumMap)[keyof typeof programModeEnumMap];
 // Type: "group" | "announcement" | "1on1" | "selfDirected"
 ```
 
@@ -79,7 +80,7 @@ const statusCodes = {
   NOT_FOUND: 404,
 } as const;
 
-type StatusCode = typeof statusCodes[keyof typeof statusCodes];
+type StatusCode = (typeof statusCodes)[keyof typeof statusCodes];
 // Type: 200 | 201 | 400 | 404
 ```
 
@@ -122,14 +123,14 @@ const colors = {
   RED: "#ff0000",
   GREEN: "#00ff00",
 };
-type Color = typeof colors[keyof typeof colors]; // string
+type Color = (typeof colors)[keyof typeof colors]; // string
 
 // GOOD - literal types preserved
 const colors = {
   RED: "#ff0000",
   GREEN: "#00ff00",
 } as const;
-type Color = typeof colors[keyof typeof colors]; // "#ff0000" | "#00ff00"
+type Color = (typeof colors)[keyof typeof colors]; // "#ff0000" | "#00ff00"
 ```
 
 ### Attempting to Mutate
@@ -156,13 +157,17 @@ const HTTP_METHODS = {
   PATCH: "PATCH",
 } as const;
 
-type HttpMethod = typeof HTTP_METHODS[keyof typeof HTTP_METHODS];
+type HttpMethod = (typeof HTTP_METHODS)[keyof typeof HTTP_METHODS];
 // Type: "GET" | "POST" | "PUT" | "DELETE" | "PATCH"
 
-type SafeMethod = typeof HTTP_METHODS["GET"];
+type SafeMethod = (typeof HTTP_METHODS)["GET"];
 // Type: "GET"
 
-type MutatingMethod = typeof HTTP_METHODS["POST" | "PUT" | "DELETE" | "PATCH"];
+type MutatingMethod = (typeof HTTP_METHODS)[
+  | "POST"
+  | "PUT"
+  | "DELETE"
+  | "PATCH"];
 // Type: "POST" | "PUT" | "DELETE" | "PATCH"
 
 function makeRequest(method: HttpMethod, url: string): void {

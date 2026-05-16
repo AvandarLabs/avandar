@@ -94,7 +94,7 @@ Provide defaults for optional type parameters:
 ```typescript
 type WrapFunction<
   TFunc extends (...args: any) => any,
-  TAdditional = {} // Default to empty object
+  TAdditional = {}, // Default to empty object
 > = (
   ...args: Parameters<TFunc>
 ) => Promise<Awaited<ReturnType<TFunc>> & TAdditional>;
@@ -148,7 +148,7 @@ Use multiple parameters for related but distinct types:
 ```typescript
 function map<TInput, TOutput>(
   items: TInput[],
-  transform: (item: TInput) => TOutput
+  transform: (item: TInput) => TOutput,
 ): TOutput[] {
   return items.map(transform);
 }
@@ -165,7 +165,7 @@ Combine `keyof` with generics for type-safe property access:
 ```typescript
 function getProperty<TObj, TKey extends keyof TObj>(
   obj: TObj,
-  key: TKey
+  key: TKey,
 ): TObj[TKey] {
   return obj[key];
 }
@@ -257,7 +257,7 @@ function greet(name: string): string {
 ```typescript
 // BAD - overly specific constraint
 function process<T extends { id: string; name: string; email: string }>(
-  obj: T
+  obj: T,
 ): void {}
 
 // GOOD - only require what you actually use

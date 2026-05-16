@@ -8,6 +8,7 @@ metadata:
 ## When to use
 
 Use this skill when you need to:
+
 - Set up linting in a JavaScript or TypeScript project
 - Use `neostandard` as a Standard-like ESLint v9 flat-config baseline
 - Configure `eslint@9` with the flat config system (`eslint.config.js`/`eslint.config.mjs`)
@@ -25,9 +26,9 @@ npm install --save-dev eslint@9 neostandard
 
 ```js
 // eslint.config.js
-import neostandard from 'neostandard'
+import neostandard from "neostandard";
 
-export default neostandard()
+export default neostandard();
 ```
 
 Verify the config works:

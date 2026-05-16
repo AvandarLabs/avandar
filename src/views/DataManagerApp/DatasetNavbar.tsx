@@ -7,8 +7,7 @@ import {
   Text,
   useMantineTheme,
 } from "@mantine/core";
-import { makeBucketMap } from "@utils/maps/makeBucketMap/makeBucketMap";
-import { prop } from "@utils/objects/hofs/prop/prop";
+import { makeBucketMap, prop } from "@utils";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";

@@ -8,7 +8,7 @@ import { isISODateString } from "@utils/guards/isISODateString/isISODateString";
 import { isNullish } from "@utils/guards/isNullish/isNullish";
 import { isValidDateValue } from "@utils/guards/isValidDateValue/isValidDateValue";
 import { ReactNode } from "react";
-import { NullOrUndefinedValueItem } from "@ui/ObjectDescriptionList/PrimitiveValueItem/NullOrUndefinedValueItem";
+import { NullOrUndefinedValueItem } from "./NullOrUndefinedValueItem";
 
 type Props = {
   /** The value to render. */

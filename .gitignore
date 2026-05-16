@@ -48,6 +48,8 @@ supabase/.branches
 # Common scratch or temp files
 todo.md
 TODO.md
+testplan*.md
+test-plan*.md
 /tmp/
 ~$*.*
 

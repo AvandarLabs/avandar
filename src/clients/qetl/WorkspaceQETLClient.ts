@@ -1,5 +1,5 @@
-import { createModule, Module } from "@modules/createModule";
-import { EmptyObject, prop, where } from "@utils/index";
+import { createModule, Module } from "@modules";
+import { EmptyObject, prop, where } from "@utils";
 import { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import { AuthClient } from "@/clients/AuthClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";

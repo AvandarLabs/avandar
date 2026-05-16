@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { isPrimitive } from "@utils/guards/isPrimitive/isPrimitive.ts";
+import { describe, expect, it } from "vitest";
 
 describe("isPrimitive", () => {
   describe("returns true for primitive types", () => {

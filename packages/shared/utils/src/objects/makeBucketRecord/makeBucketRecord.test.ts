@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from "vitest";
 import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord.ts";
+import { describe, expect, it, vi } from "vitest";
 import type { Expect, IsEqual } from "@utils/types/test-utilities.types.ts";
 
 describe("makeBucketRecord", () => {

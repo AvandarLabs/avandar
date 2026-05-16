@@ -41,10 +41,10 @@ Every new API entry needs a YAML metadata block:
 added: REPLACEME
 -->
 
-* `arg1` {string} Description.
-* `arg2` {Object} Optional description.
-  * `option1` {number} **Default:** `42`.
-* Returns: {Promise}
+- `arg1` {string} Description.
+- `arg2` {Object} Optional description.
+  - `option1` {number} **Default:** `42`.
+- Returns: {Promise}
 
 Description of what the method does.
 ```
@@ -75,11 +75,11 @@ Stability levels: `0 - Deprecated`, `1 - Experimental`, `2 - Stable`.
 
 ### Parameter list format
 
-* Use `{type}` for parameter types: `{string}`, `{number}`, `{Object}`,
+- Use `{type}` for parameter types: `{string}`, `{number}`, `{Object}`,
   `{Buffer}`, `{AbortSignal}`, `{stream.Readable}`, etc.
-* Optional parameters use `[, param]` in the heading
-* Default values use `**Default:** \`value\``
-* Nested options are indented with two spaces
+- Optional parameters use `[, param]` in the heading
+- Default values use `**Default:** \`value\``
+- Nested options are indented with two spaces
 
 ### Method ordering
 
@@ -97,20 +97,20 @@ The markdown linter (`make lint-md`) enforces strict ordering.
 The sort is **ASCII lexical order**, which means:
 
 1. **Uppercase letters sort before lowercase:** `[A-Z]` before `[a-z]`
-2. **Backtick-quoted references** like `` [`foo()`] `` sort by the text
+2. **Backtick-quoted references** like ``[`foo()`]`` sort by the text
    inside the backticks (including the backticks in the sort key)
 3. **Within the same case**, normal alphabetical order applies
 
 ### Practical consequences
 
-| Reference A              | Reference B                 | Correct order     | Why                       |
-| ------------------------ | --------------------------- | ----------------- | ------------------------- |
-| `` [`ERR_MISSING_OPTION`] `` | `` [`EventEmitter`] ``          | ERR first         | `E`, `R` < `E`, `v`               |
-| `` [`Stream.toAsync...`] ``  | `` [`readable.push('')`] ``     | Stream first      | uppercase `S` < lowercase `r` |
-| `` [`fromSync()`] ``         | `` [`fs.createReadStream()`] `` | fromSync first    | `f`, `r` < `f`, `s`               |
-| `` [`stream/iter`] ``        | `` [`stream.wrap()`] ``         | stream.wrap first | `.` < `/` in ASCII            |
+| Reference A                | Reference B                   | Correct order     | Why                           |
+| -------------------------- | ----------------------------- | ----------------- | ----------------------------- |
+| ``[`ERR_MISSING_OPTION`]`` | ``[`EventEmitter`]``          | ERR first         | `E`, `R` < `E`, `v`           |
+| ``[`Stream.toAsync...`]``  | ``[`readable.push('')`]``     | Stream first      | uppercase `S` < lowercase `r` |
+| ``[`fromSync()`]``         | ``[`fs.createReadStream()`]`` | fromSync first    | `f`, `r` < `f`, `s`           |
+| ``[`stream/iter`]``        | ``[`stream.wrap()`]``         | stream.wrap first | `.` < `/` in ASCII            |
 | `[stream-end]`             | `[stream-iter-from]`          | stream-end first  | `e` < `i`                     |
-| `[child process stdin]`    | `[crypto]`                    | child first       | `c`, `h` < `c`, `r`               |
+| `[child process stdin]`    | `[crypto]`                    | child first       | `c`, `h` < `c`, `r`           |
 
 ### Example: correct reference block ordering
 
@@ -131,7 +131,7 @@ The sort is **ASCII lexical order**, which means:
 [stream-iter-from]: stream_iter.md#frominput
 ```
 
-**Key insight:** All backtick-quoted refs (`` [`...`] ``) sort among
+**Key insight:** All backtick-quoted refs (``[`...`]``) sort among
 themselves, then all unquoted refs (`[...]`) sort among themselves.
 Within each group, it is strict ASCII order.
 
@@ -161,10 +161,13 @@ The `node-core/alphabetize-errors` ESLint rule enforces this.
 ```javascript
 // Correct — ERR_STREAM_ITER_MISSING_FLAG between ERR_STREAM_DESTROYED
 // and ERR_STREAM_NULL_VALUES
-E('ERR_STREAM_DESTROYED', 'Cannot call %s after a stream was destroyed', Error);
-E('ERR_STREAM_ITER_MISSING_FLAG',
-  'The stream/iter API requires the --experimental-stream-iter flag', TypeError);
-E('ERR_STREAM_NULL_VALUES', 'May not write null values to stream', TypeError);
+E("ERR_STREAM_DESTROYED", "Cannot call %s after a stream was destroyed", Error);
+E(
+  "ERR_STREAM_ITER_MISSING_FLAG",
+  "The stream/iter API requires the --experimental-stream-iter flag",
+  TypeError,
+);
+E("ERR_STREAM_NULL_VALUES", "May not write null values to stream", TypeError);
 ```
 
 ### `doc/api/errors.md`
@@ -201,19 +204,19 @@ fenced code blocks with `mjs` and `cjs` language tags:
 
 ````markdown
 ```mjs
-import { Readable } from 'node:stream';
-import { from, text } from 'node:stream/iter';
+import { Readable } from "node:stream";
+import { from, text } from "node:stream/iter";
 
-const readable = Readable.fromStreamIter(from('hello'));
+const readable = Readable.fromStreamIter(from("hello"));
 console.log(await text(from(readable)));
 ```
 
 ```cjs
-const { Readable } = require('node:stream');
-const { from, text } = require('node:stream/iter');
+const { Readable } = require("node:stream");
+const { from, text } = require("node:stream/iter");
 
 async function run() {
-  const readable = Readable.fromStreamIter(from('hello'));
+  const readable = Readable.fromStreamIter(from("hello"));
   console.log(await text(from(readable)));
 }
 
@@ -230,13 +233,13 @@ JavaScript code blocks inside markdown files are linted by ESLint via
 `make lint-md` (which runs `make lint-js-doc` internally). Key rules
 that frequently cause failures:
 
-| Rule                  | What it enforces                                   | Common fix                                      |
-| --------------------- | -------------------------------------------------- | ----------------------------------------------- |
-| `no-restricted-globals` | Cannot use bare `process` global                     | Import `process` or use a different example       |
-| `capitalized-comments`  | Comments must start with an uppercase letter       | `// Foo` not `// foo`                               |
+| Rule                    | What it enforces                                     | Common fix                                          |
+| ----------------------- | ---------------------------------------------------- | --------------------------------------------------- |
+| `no-restricted-globals` | Cannot use bare `process` global                     | Import `process` or use a different example         |
+| `capitalized-comments`  | Comments must start with an uppercase letter         | `// Foo` not `// foo`                               |
 | `func-style`            | Use function declarations, not `const fn = function` | `function gen() {}` not `const gen = function() {}` |
-| `no-void`               | Don't use the `void` operator                        | Use `// eslint-disable-next-line no-unused-vars`  |
-| `no-unused-vars`        | Variables must be used                             | Remove or use the variable                      |
+| `no-void`               | Don't use the `void` operator                        | Use `// eslint-disable-next-line no-unused-vars`    |
+| `no-unused-vars`        | Variables must be used                               | Remove or use the variable                          |
 
 ### Using eslint-disable comments in examples
 
@@ -254,24 +257,24 @@ for await (const chunk of readable) {
 The `node-core/non-ascii-character` ESLint rule rejects non-ASCII characters
 in JavaScript files under `lib/`. This applies to both code and comments.
 
-| Wrong | Correct | Character name |
-| ----- | ------- | -------------- |
-| `—`     | `-`       | Em dash        |
-| `–`     | `-`       | En dash        |
-| `'` `'`   | `'`       | Smart quotes   |
-| `"` `"`   | `"`       | Smart quotes   |
-| `…`     | `...`     | Ellipsis       |
+| Wrong   | Correct | Character name |
+| ------- | ------- | -------------- |
+| `—`     | `-`     | Em dash        |
+| `–`     | `-`     | En dash        |
+| `'` `'` | `'`     | Smart quotes   |
+| `"` `"` | `"`     | Smart quotes   |
+| `…`     | `...`   | Ellipsis       |
 
 This rule does NOT apply to markdown files — only to `.js` and `.mjs` files.
 However, code comments in `lib/internal/` should always use ASCII.
 
 ## Lint and Format Commands
 
-| Command        | What it does                                               |
-| -------------- | ---------------------------------------------------------- |
+| Command          | What it does                                               |
+| ---------------- | ---------------------------------------------------------- |
 | `make lint-md`   | Checks markdown structure + JS code blocks + link ordering |
 | `make format-md` | Auto-formats markdown (line wrapping, spacing)             |
-| `make lint-js`   | Checks JS files including `errors.js` ordering               |
+| `make lint-js`   | Checks JS files including `errors.js` ordering             |
 | `make lint`      | Runs all linters (JS, C++, markdown, YAML)                 |
 
 **Recommended workflow for doc changes:**
@@ -291,14 +294,14 @@ make lint-js
 
 ## Checklist for Documentation Changes
 
-| Step | Action                                                                  |
-| ---- | ----------------------------------------------------------------------- |
-| 1    | New doc file? Add to `doc/api/index.md` (alphabetical order)              |
-| 2    | YAML metadata block with `added: REPLACEME`                               |
-| 3    | Stability indicator for experimental APIs                               |
+| Step | Action                                                                      |
+| ---- | --------------------------------------------------------------------------- |
+| 1    | New doc file? Add to `doc/api/index.md` (alphabetical order)                |
+| 2    | YAML metadata block with `added: REPLACEME`                                 |
+| 3    | Stability indicator for experimental APIs                                   |
 | 4    | Both `mjs` and `cjs` code examples                                          |
-| 5    | Link reference definitions in correct ASCII sort order                  |
+| 5    | Link reference definitions in correct ASCII sort order                      |
 | 6    | New error code? Add to both `errors.js` and `errors.md` (both alphabetized) |
-| 7    | Methods listed alphabetically within the doc file                       |
-| 8    | Run `make lint-md` to verify                                              |
+| 7    | Methods listed alphabetically within the doc file                           |
+| 8    | Run `make lint-md` to verify                                                |
 | 9    | Run `make lint-js` if `errors.js` was changed                               |

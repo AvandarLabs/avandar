@@ -7,7 +7,7 @@ import {
   Text,
   Textarea,
 } from "@mantine/core";
-import { where } from "@utils/filters/where/where";
+import { where } from "@utils";
 import { useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";

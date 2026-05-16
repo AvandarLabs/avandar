@@ -1,6 +1,9 @@
-import type { VizConfigType, VizType } from "$/models/vizs/VizConfig/VizConfig.types.ts";
-import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+import type {
+  VizConfigType,
+  VizType,
+} from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
 export interface IVizConfigModule<
   VType extends VizType,

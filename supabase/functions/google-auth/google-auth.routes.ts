@@ -1,7 +1,7 @@
 import {
-    defineRoutes,
-    GET,
-    MiniServer,
+  defineRoutes,
+  GET,
+  MiniServer,
 } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { getAuthURL } from "@sbfn/google-auth/getAuthURL.ts";
 import { getGoogleTokens } from "@sbfn/google-auth/getGoogleTokens.ts";

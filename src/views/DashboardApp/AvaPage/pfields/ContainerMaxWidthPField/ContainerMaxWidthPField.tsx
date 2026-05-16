@@ -1,6 +1,6 @@
 import { Group, NumberInput, Stack } from "@mantine/core";
 import { FieldLabel } from "@puckeditor/core";
-import { isPlainObject } from "@utils/guards/isPlainObject/isPlainObject";
+import { isPlainObject } from "@utils";
 import { SegmentedControl } from "@/lib/ui/inputs/SegmentedControl";
 import { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 

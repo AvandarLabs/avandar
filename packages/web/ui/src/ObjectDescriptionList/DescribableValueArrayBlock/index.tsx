@@ -1,16 +1,16 @@
 import { ScrollArea, Stack, Text } from "@mantine/core";
-import { pick } from "@utils/objects/pick/pick";
+import { pick } from "@utils";
 import { useMemo } from "react";
 import {
   isDescribableObject,
   isDescribableValueArray,
   isPrimitiveDescribableValue,
   isStringOrNumber,
-} from "@ui/ObjectDescriptionList/guards";
-import { PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS } from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
-import { NestedArraysBlock } from "@ui/ObjectDescriptionList/DescribableValueArrayBlock/NestedArraysBlock";
-import { ObjectArrayBlock } from "@ui/ObjectDescriptionList/DescribableValueArrayBlock/ObjectArrayBlock/ObjectArrayBlock";
-import { PrimitiveFieldValueArrayBlock } from "@ui/ObjectDescriptionList/DescribableValueArrayBlock/PrimitiveFieldValueArrayBlock";
+} from "../guards";
+import { PRIMITIVE_VALUE_RENDER_OPTIONS_KEYS } from "../ObjectDescriptionList.types";
+import { NestedArraysBlock } from "./NestedArraysBlock";
+import { ObjectArrayBlock } from "./ObjectArrayBlock/ObjectArrayBlock";
+import { PrimitiveFieldValueArrayBlock } from "./PrimitiveFieldValueArrayBlock";
 import type {
   DescribableObject,
   DescribableValueArrayRenderOptions,
@@ -20,7 +20,7 @@ import type {
   ObjectArrayRenderOptions,
   PrimitiveValue,
   PrimitiveValueRenderOptions,
-} from "@ui/ObjectDescriptionList/ObjectDescriptionList.types";
+} from "../ObjectDescriptionList.types";
 
 type Props<T, RootData extends GenericRootData> = {
   data: readonly T[];

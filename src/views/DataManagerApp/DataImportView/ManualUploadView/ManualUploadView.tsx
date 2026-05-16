@@ -1,6 +1,6 @@
 import { Box, BoxProps, Stack } from "@mantine/core";
-import { notifyError } from "@ui/notifications/notify";
-import { MIMEType } from "@utils/types/common.types";
+import { notifyError } from "@ui";
+import { MIMEType } from "@utils";
 import { uuid } from "$/lib/uuid";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useState } from "react";

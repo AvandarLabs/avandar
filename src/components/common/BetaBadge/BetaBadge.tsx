@@ -1,5 +1,5 @@
 import { Badge, BadgeProps } from "@mantine/core";
-import { Tooltip } from "@ui/Tooltip/Tooltip";
+import { Tooltip } from "@ui";
 import { mantineVar } from "@/lib/utils/browser/css";
 
 type Props = BadgeProps & {

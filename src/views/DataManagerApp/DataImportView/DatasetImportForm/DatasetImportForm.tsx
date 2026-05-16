@@ -1,6 +1,6 @@
 import { Button, Checkbox, Group, Stack, Text, TextInput } from "@mantine/core";
 import { FormErrors, useForm } from "@mantine/form";
-import { notifyError } from "@ui/notifications/notify";
+import { notifyError } from "@ui";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo, useRef, useState } from "react";
@@ -21,7 +21,7 @@ import {
   useSaveDataset,
   XlsxParseOptions,
 } from "./useSaveDataset/useSaveDataset";
-import type { UnknownObject } from "@utils/types/common.types";
+import type { UnknownObject } from "@utils";
 
 export type DatasetImportFormValues = {
   name: string;

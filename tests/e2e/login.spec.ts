@@ -1,12 +1,15 @@
-import { test } from "./fixtures/e2eTestWorkspace.fixture";
+import { test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
-import { E2E_TEST_USER } from "./helpers/constants";
 
 test.describe("login", () => {
-  test("logs in as the primary seeded test user", async ({ page }) => {
+  test("logs in as the primary E2E test user", async ({
+    page,
+    e2eWorkerDb,
+  }) => {
     await signInWithEmailPassword(page, {
-      email: E2E_TEST_USER.email,
-      password: E2E_TEST_USER.password,
+      email: e2eWorkerDb.primaryUser.email,
+      password: e2eWorkerDb.primaryUser.password,
+      workspaceSlug: e2eWorkerDb.workspaceSlug,
     });
   });
 });

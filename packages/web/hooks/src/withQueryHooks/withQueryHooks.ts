@@ -33,6 +33,8 @@ type ClientFnReturnType<
   FnName extends keyof Client,
 > = Client[FnName] extends AnyFunction ? ReturnType<Client[FnName]> : never;
 
+// TODO(jpsyx): this should become a mixin in the @modules, @clients, or
+// some other package
 /**
  * Augments an object with `use` hooks that wrap any specified functions
  * with `useQuery` or `useMutation`. This hook is intended to augment clients

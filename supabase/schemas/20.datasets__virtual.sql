@@ -27,52 +27,46 @@ alter table public.datasets__virtual enable row level security;
 create policy "User can select datasets__virtual in their workspace" on public.datasets__virtual for
 select
   to authenticated using (
-    public.datasets__virtual.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_can_access_resource (
+      'dataset',
+      public.datasets__virtual.dataset_id,
+      'viewer'
     )
   );
 
 create policy "User can insert datasets__virtual in their workspace" on public.datasets__virtual for insert to authenticated
 with
   check (
-    public.datasets__virtual.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_can_access_resource (
+      'dataset',
+      public.datasets__virtual.dataset_id,
+      'editor'
     )
   );
 
 create policy "User can update datasets__virtual in their workspace" on public.datasets__virtual
 for update
   to authenticated using (
-    public.datasets__virtual.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_can_access_resource (
+      'dataset',
+      public.datasets__virtual.dataset_id,
+      'editor'
     )
   )
 with
   check (
-    -- Updated values must still be in the auth user's workspace
-    public.datasets__virtual.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_can_access_resource (
+      'dataset',
+      public.datasets__virtual.dataset_id,
+      'editor'
     )
   );
 
 create policy "User can delete datasets__virtual in their workspace" on public.datasets__virtual for delete to authenticated using (
-  public.datasets__virtual.workspace_id = any (
-    array(
-      select
-        public.util__get_auth_user_workspaces ()
-    )
+  public.util__auth_user_can_access_resource (
+    'dataset',
+    public.datasets__virtual.dataset_id,
+    'editor'
   )
 );
 

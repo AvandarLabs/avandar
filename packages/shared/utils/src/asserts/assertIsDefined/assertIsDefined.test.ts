@@ -1,5 +1,5 @@
-import { describe, expect, expectTypeOf, it } from "vitest";
 import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined.ts";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
 describe("assertIsDefined", () => {
   it("does not throw for defined values", () => {

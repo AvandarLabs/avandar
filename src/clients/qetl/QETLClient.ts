@@ -1,11 +1,13 @@
-import { createModuleFactory } from "@modules/createModuleFactory";
-import { where } from "@utils/filters/where/where";
-import { isDefined } from "@utils/guards/isDefined/isDefined";
-import { prop } from "@utils/objects/hofs/prop/prop";
-import { propEq } from "@utils/objects/hofs/propEq/propEq";
-import { makeBucketRecord } from "@utils/objects/makeBucketRecord/makeBucketRecord";
-import { makeIdLookupRecord } from "@utils/objects/makeIdLookupRecord/makeIdLookupRecord";
-import { objectKeys } from "@utils/objects/objectKeys";
+import { createModuleFactory } from "@modules";
+import {
+  isDefined,
+  makeBucketRecord,
+  makeIdLookupRecord,
+  objectKeys,
+  prop,
+  propEq,
+  where,
+} from "@utils";
 import { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import { match } from "ts-pattern";
 import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
@@ -23,8 +25,8 @@ import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetSto
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { difference } from "@/lib/utils/arrays/difference/difference";
 import { promiseFlatMap, promiseMap } from "@/lib/utils/promises";
-import type { Module } from "@modules/createModule";
-import type { UnknownObject } from "@utils/types/common.types";
+import type { Module } from "@modules";
+import type { UnknownObject } from "@utils";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";

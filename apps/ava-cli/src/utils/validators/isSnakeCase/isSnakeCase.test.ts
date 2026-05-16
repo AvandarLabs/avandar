@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { isSnakeCase } from "@ava-cli/utils/validators/isSnakeCase/isSnakeCase";
+import { describe, expect, it } from "vitest";
 
 describe("isSnakeCase", () => {
   it("returns a validator function", () => {
