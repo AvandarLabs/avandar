@@ -7,10 +7,7 @@
  */
 export interface DuckDbClient {
   runStructuredQuery<TRow>(query: StructuredQuery): Promise<TRow[]>;
-  runRawQuery<TRow>(
-    sql: string,
-    params?: ReadonlyArray<unknown>,
-  ): Promise<TRow[]>;
+  runRawQuery<TRow>(sql: string, params?: readonly unknown[]): Promise<TRow[]>;
   loadParquetFromDatasetBlobStore(datasetId: string): Promise<void>;
   loadFromUpload(
     source: UploadSource,
@@ -42,17 +39,17 @@ export type UploadSource =
  * Configuration for ingesting an upload into DuckDB.
  */
 export type DatasetImportOptions = {
-  readonly datasetId: string;
-  readonly format: "csv" | "xlsx" | "parquet";
-  readonly delimiter?: string;
-  readonly hasHeader?: boolean;
+  datasetId: string;
+  format: "csv" | "xlsx" | "parquet";
+  delimiter?: string;
+  hasHeader?: boolean;
 };
 
 /**
  * Result of a successful dataset import.
  */
 export type DatasetImportResult = {
-  readonly datasetId: string;
-  readonly rowCount: number;
-  readonly schema: ReadonlyArray<{ name: string; type: string }>;
+  datasetId: string;
+  rowCount: number;
+  schema: ReadonlyArray<{ name: string; type: string }>;
 };

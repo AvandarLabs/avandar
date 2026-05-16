@@ -16,10 +16,10 @@ export interface SyncEngine {
  * One pending row-level mutation queued in the desktop outbox.
  */
 export type SyncMutation = {
-  readonly tableName: string;
-  readonly rowId: string;
-  readonly op: "insert" | "update" | "delete";
-  readonly payload: Readonly<Record<string, unknown>>;
+  tableName: string;
+  rowId: string;
+  op: "insert" | "update" | "delete";
+  payload: Readonly<Record<string, unknown>>;
 };
 
 /**
@@ -29,20 +29,20 @@ export type SyncMutation = {
  *   - `error`: last sync attempt threw; pending counts are still tracked
  */
 export type SyncStatus =
-  | { readonly kind: "offline" }
+  | { kind: "offline" }
   | {
-      readonly kind: "online";
-      readonly state: "idle" | "syncing";
-      readonly lastSyncedAt: number;
-      readonly pendingRows: number;
-      readonly pendingParquets: number;
-      readonly bytesUploading?: number;
+      kind: "online";
+      state: "idle" | "syncing";
+      lastSyncedAt: number;
+      pendingRows: number;
+      pendingParquets: number;
+      bytesUploading?: number;
     }
   | {
-      readonly kind: "error";
-      readonly lastError: string;
-      readonly pendingRows: number;
-      readonly pendingParquets: number;
+      kind: "error";
+      lastError: string;
+      pendingRows: number;
+      pendingParquets: number;
     };
 
 /**

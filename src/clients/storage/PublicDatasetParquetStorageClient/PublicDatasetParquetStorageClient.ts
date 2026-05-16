@@ -3,7 +3,7 @@ import {
   getPublicDatasetParquetStoragePath,
   PUBLIC_BUCKET_NAME,
 } from "@/clients/storage/PublicDatasetParquetStorageClient/utils";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
@@ -23,7 +23,7 @@ async function uploadDataset(options: {
     datasetId,
   });
 
-  const { error } = await AvaSupabase.DB.storage
+  const { error } = await AvaSupabase.db().storage
     .from(PUBLIC_BUCKET_NAME)
     .upload(objectPath, parquetBlob, {
       contentType: MIMEType.APPLICATION_PARQUET,
@@ -71,7 +71,7 @@ async function downloadDataset({
   });
 
   const { data: parquetBlob, error: downloadError } =
-    await AvaSupabase.DB.storage.from(PUBLIC_BUCKET_NAME).download(objectPath);
+    await AvaSupabase.db().storage.from(PUBLIC_BUCKET_NAME).download(objectPath);
 
   if (!downloadError && parquetBlob) {
     return parquetBlob;
@@ -111,7 +111,7 @@ async function listDatasetIdsForDashboard(options: {
     offset: number,
     acc: readonly DatasetId[],
   ): Promise<readonly DatasetId[]> => {
-    const { data, error } = await AvaSupabase.DB.storage
+    const { data, error } = await AvaSupabase.db().storage
       .from(PUBLIC_BUCKET_NAME)
       .list(folderPath, {
         limit: pageSize,

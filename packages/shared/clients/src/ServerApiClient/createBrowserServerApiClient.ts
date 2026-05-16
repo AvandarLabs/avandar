@@ -1,8 +1,8 @@
 import type {
   ServerApiClient,
   ServerApiFunctionRequest,
-} from "$/platform";
-import { getRegisteredWebDbClient } from "@clients/webDbClientRegistry.ts";
+} from "$/platform/types/ServerApiClient.types.ts";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
 
 /**
  * Build the relative URL `supabase.functions.invoke` is called with.
@@ -53,16 +53,15 @@ function buildRelativeFunctionUrl(
 }
 
 /**
- * Web-side {@link ServerApiClient}. Thin wrapper over the registered Supabase
- * client — `rpc` is a direct passthrough; `invokeFunction` builds the
+ * Web-side {@link ServerApiClient}. Thin wrapper over the shared `AvaSupabase`
+ * singleton — `rpc` is a direct passthrough; `invokeFunction` builds the
  * relative URL the same way `APIClient.sendHTTPRequest` does today and
  * delegates to `supabase.functions.invoke(...)`.
  *
  * Phase 2 may replace this with a more typed shim; the current goal is zero
  * behavior change on web while desktop migrates to its own IPC backend.
  *
- * @returns A browser-backed {@link ServerApiClient} ready for use after the
- *   Supabase client has been registered via `registerWebDbClient`.
+ * @returns A browser-backed {@link ServerApiClient}.
  */
 export function createBrowserServerApiClient(): ServerApiClient {
   return {
@@ -70,7 +69,7 @@ export function createBrowserServerApiClient(): ServerApiClient {
       name: string,
       args?: Readonly<Record<string, unknown>>,
     ): Promise<TResult> {
-      const client = getRegisteredWebDbClient();
+      const client = AvaSupabase.db();
       // Supabase's `.rpc()` signature is typed against the registered Database;
       // at this generic boundary we cast through `unknown` because the
       // platform-level interface deliberately keeps RPCs string-keyed.
@@ -89,7 +88,7 @@ export function createBrowserServerApiClient(): ServerApiClient {
     async invokeFunction<TResult = unknown>(
       request: ServerApiFunctionRequest,
     ): Promise<TResult> {
-      const client = getRegisteredWebDbClient();
+      const client = AvaSupabase.db();
       const relativeUrl = buildRelativeFunctionUrl(request);
       const { data, error } = await client.functions.invoke(relativeUrl, {
         method: request.method,

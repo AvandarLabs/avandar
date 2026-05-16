@@ -33,10 +33,10 @@ vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   };
 });
 
-vi.mock("@/db/supabase/AvaSupabase", () => {
+vi.mock("$/db/supabase/AvaSupabase.ts", () => {
   return {
     AvaSupabase: {
-      DB: { from: fromMock },
+      db: () => ({ from: fromMock }),
     },
   };
 });

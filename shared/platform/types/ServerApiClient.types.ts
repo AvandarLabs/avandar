@@ -52,9 +52,9 @@ export interface ServerApiClient {
  * already accepts so the browser-backed adapter is a direct passthrough.
  */
 export type ServerApiFunctionRequest = {
-  readonly route: string;
-  readonly method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
-  readonly pathParams?: Readonly<Record<string, string | number>>;
-  readonly queryParams?: Readonly<Record<string, unknown>>;
-  readonly body?: unknown;
+  route: string;
+  method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
+  pathParams?: Readonly<Record<string, string | number>>;
+  queryParams?: Readonly<Record<string, unknown>>;
+  body?: unknown;
 };

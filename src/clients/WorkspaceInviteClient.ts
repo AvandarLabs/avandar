@@ -1,4 +1,4 @@
-import { createRdbCrudClient } from "@clients";
+import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { WorkspaceInviteParsers } from "$/models/WorkspaceInvite/WorkspaceInviteParsers";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";

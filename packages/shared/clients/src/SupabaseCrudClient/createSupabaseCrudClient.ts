@@ -319,8 +319,9 @@ export function createSupabaseCrudClient<
     },
   });
 
-  const withDb = modelClient.mixin(withSupabaseClient(dbClient));
-  return withDb as unknown as SupabaseCrudClient<
+  return modelClient.mixin(
+    withSupabaseClient(dbClient),
+  ) as unknown as SupabaseCrudClient<
     M,
     ExtendedQueriesClient,
     ExtendedMutationsClient

@@ -1,4 +1,4 @@
-import { createRdbCrudClient } from "@clients/RdbCrudClient/createRdbCrudClient";
+import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { OpenDataDatasetParsers } from "$/models/datasets/OpenDataDataset/OpenDataDatasetParsers";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 

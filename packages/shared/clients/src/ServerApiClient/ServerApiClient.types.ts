@@ -1,4 +1,4 @@
 export type {
   ServerApiClient,
   ServerApiFunctionRequest,
-} from "$/platform";
+} from "$/platform/types/ServerApiClient.types.ts";

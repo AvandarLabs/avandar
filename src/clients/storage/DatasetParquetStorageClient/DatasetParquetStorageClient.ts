@@ -3,7 +3,7 @@ import {
   getDatasetParquetStoragePath,
   WORKSPACES_BUCKET_NAME,
 } from "@/clients/storage/DatasetParquetStorageClient/utils";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
@@ -26,7 +26,7 @@ async function deleteDataset(options: {
     datasetId,
   });
 
-  const { error } = await AvaSupabase.DB.storage
+  const { error } = await AvaSupabase.db().storage
     .from(WORKSPACES_BUCKET_NAME)
     .remove([objectPath]);
 
@@ -66,7 +66,7 @@ async function downloadDataset({
   throwIfNotFound?: boolean;
 }): Promise<Blob | undefined> {
   const objectPath = `${workspaceId}/datasets/${datasetId}.parquet`;
-  const { data: parquetBlob, error } = await AvaSupabase.DB.storage
+  const { data: parquetBlob, error } = await AvaSupabase.db().storage
     .from("workspaces")
     .download(objectPath);
 

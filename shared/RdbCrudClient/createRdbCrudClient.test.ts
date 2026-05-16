@@ -1,37 +1,47 @@
-import { isDesktop } from "$/platform";
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
+import { createSupabaseCrudClient } from "@clients/SupabaseCrudClient/createSupabaseCrudClient.ts";
+import { isDesktop } from "$/platform/isDesktop.ts";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createRdbCrudClient } from "./createRdbCrudClient.ts";
 
-vi.mock("$/platform", async () => {
-  const actual = await vi.importActual<typeof import("$/platform")>(
-    "$/platform",
-  );
-  return { ...actual, isDesktop: vi.fn(() => false) };
+const { fakeDbClient } = vi.hoisted(() => {
+  return {
+    fakeDbClient: { __fake: "supabase-db-client" } as unknown,
+  };
+});
+
+vi.mock("$/platform/isDesktop.ts", async () => {
+  const actual = await vi.importActual<
+    typeof import("$/platform/isDesktop.ts")
+  >("$/platform/isDesktop.ts");
+  return {
+    ...actual,
+    isDesktop: vi.fn(() => {
+      return false;
+    }),
+  };
+});
+
+vi.mock("$/db/supabase/AvaSupabase.ts", () => {
+  return {
+    AvaSupabase: {
+      db: () => {
+        return fakeDbClient;
+      },
+    },
+  };
 });
 
 vi.mock("@clients/SupabaseCrudClient/createSupabaseCrudClient.ts", () => {
   return {
-    createSupabaseCrudClient: vi.fn(() => ({
-      get: () => undefined,
-    })),
+    createSupabaseCrudClient: vi.fn(() => {
+      return {
+        get: () => {
+          return undefined;
+        },
+      };
+    }),
   };
 });
-
-import { createSupabaseCrudClient } from "@clients/SupabaseCrudClient/createSupabaseCrudClient.ts";
-import {
-  createRdbCrudClient,
-  registerWebDbClient,
-} from "./createRdbCrudClient.ts";
-
-const fakeDbClient = {
-  __fake: "supabase-db-client",
-} as unknown as Parameters<typeof registerWebDbClient>[0];
 
 const baseSpec = {
   modelName: "TestModel",
@@ -42,14 +52,13 @@ const baseSpec = {
 
 describe("createRdbCrudClient", () => {
   beforeEach(() => {
-    registerWebDbClient(fakeDbClient);
     (isDesktop as ReturnType<typeof vi.fn>).mockReturnValue(false);
   });
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  it("delegates to createSupabaseCrudClient with the registered web db client on web", () => {
+  it("delegates to createSupabaseCrudClient with the shared Supabase client on web", () => {
     createRdbCrudClient(baseSpec as never);
 
     expect(createSupabaseCrudClient).toHaveBeenCalledTimes(1);
@@ -76,11 +85,4 @@ describe("createRdbCrudClient", () => {
       );
     },
   );
-
-  it("throws a clear error when no web db client has been registered", () => {
-    registerWebDbClient(null);
-    expect(() => createRdbCrudClient(baseSpec as never)).toThrow(
-      /no web db client registered/i,
-    );
-  });
 });

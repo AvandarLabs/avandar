@@ -23,13 +23,13 @@ export type AuthCredentials =
  * Active auth session. `mode` distinguishes a live session from a
  * locally-cached one used while the desktop client is offline.
  */
-export type Session = {
-  readonly userId: string;
-  readonly email: string;
-  readonly accessToken: string;
-  readonly accessTokenExpiresAt: number; // ms epoch
-  readonly mode: "online" | "offline-cached";
-};
+export type Session = Readonly<{
+  userId: string;
+  email: string;
+  accessToken: string;
+  accessTokenExpiresAt: number; // ms epoch
+  mode: "online" | "offline-cached";
+}>;
 
 /**
  * Cancels an event subscription registered via `onAuthChange` or similar.

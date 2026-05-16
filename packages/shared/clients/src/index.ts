@@ -24,19 +24,6 @@ export type { ModelCrudParserRegistry } from "@clients/makeParserRegistry.ts";
 export { withSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
 export type { WithSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
 
-// Rdb (platform-aware) CRUD client
-export {
-  createRdbCrudClient,
-  registerWebDbClient,
-} from "@clients/RdbCrudClient/createRdbCrudClient.ts";
-export type {
-  RdbCrudModelSpec,
-  RdbCrudClient,
-} from "@clients/RdbCrudClient/RdbCrudClient.types.ts";
-
-// Web db client registry (shared between Rdb and ServerApi web adapters)
-export { getRegisteredWebDbClient } from "@clients/webDbClientRegistry.ts";
-
 // Server-side API client (Postgres RPCs + Edge Functions)
 export { createServerApiClient } from "@clients/ServerApiClient/createServerApiClient.ts";
 export type {

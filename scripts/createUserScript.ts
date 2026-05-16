@@ -5,7 +5,7 @@
  */
 import { ScriptsUtil } from "scripts/ScriptsUtil";
 import { z } from "zod";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
 
 function printUsage() {
   console.log("Usage: pnpm db:create-user <email> <password>");
@@ -21,7 +21,7 @@ async function main(): Promise<void> {
         email,
         password,
       },
-      AvaSupabase.DB,
+      AvaSupabase.db(),
     );
     console.log(`Successfully created user with email ${email}`);
   } catch (error) {

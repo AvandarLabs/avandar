@@ -1,4 +1,4 @@
-import { createRdbCrudClient } from "@clients/RdbCrudClient/createRdbCrudClient";
+import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { EntityParsers } from "$/models/entities/Entity/EntityParsers";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 

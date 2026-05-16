@@ -1,24 +1,36 @@
-import { isDesktop } from "$/platform";
+import { isDesktop } from "$/platform/isDesktop.ts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("$/platform", async () => {
-  const actual = await vi.importActual<typeof import("$/platform")>(
-    "$/platform",
+const { fakeDbClient } = vi.hoisted(() => {
+  return {
+    fakeDbClient: {
+      rpc: vi.fn(),
+      functions: { invoke: vi.fn() },
+    } as unknown,
+  };
+});
+
+vi.mock("$/platform/isDesktop.ts", async () => {
+  const actual = await vi.importActual<typeof import("$/platform/isDesktop.ts")>(
+    "$/platform/isDesktop.ts",
   );
   return { ...actual, isDesktop: vi.fn(() => false) };
 });
 
-import { registerWebDbClient } from "@clients/webDbClientRegistry.ts";
-import { createServerApiClient } from "./createServerApiClient.ts";
+vi.mock("$/db/supabase/AvaSupabase.ts", () => {
+  return {
+    AvaSupabase: {
+      db: () => {
+        return fakeDbClient;
+      },
+    },
+  };
+});
 
-const fakeDbClient = {
-  rpc: vi.fn(),
-  functions: { invoke: vi.fn() },
-} as unknown as Parameters<typeof registerWebDbClient>[0];
+import { createServerApiClient } from "./createServerApiClient.ts";
 
 describe("createServerApiClient", () => {
   beforeEach(() => {
-    registerWebDbClient(fakeDbClient);
     (isDesktop as ReturnType<typeof vi.fn>).mockReturnValue(false);
   });
   afterEach(() => {

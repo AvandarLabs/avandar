@@ -12,7 +12,7 @@ export interface DatasetBlobStore {
   get(key: DatasetBlobKey): Promise<ReadableStream<Uint8Array>>;
   delete(key: DatasetBlobKey): Promise<void>;
   exists(key: DatasetBlobKey): Promise<boolean>;
-  list(prefix: DatasetBlobKey): Promise<ReadonlyArray<DatasetBlobKey>>;
+  list(prefix: DatasetBlobKey): Promise<readonly DatasetBlobKey[]>;
   stat(key: DatasetBlobKey): Promise<DatasetBlobStat | null>;
 }
 
@@ -48,21 +48,21 @@ export function asDatasetBlobKey(key: string): DatasetBlobKey {
  * the web and desktop backends so they stay schema-compatible.
  */
 export const DatasetBlobKeys = {
-  source(
+  source: (
     workspaceId: string,
     datasetId: string,
     ext: string,
-  ): DatasetBlobKey {
+  ): DatasetBlobKey => {
     return asDatasetBlobKey(
       `workspaces/${workspaceId}/datasets/${datasetId}/source.${ext}`,
     );
   },
-  parquet(workspaceId: string, datasetId: string): DatasetBlobKey {
+  parquet: (workspaceId: string, datasetId: string): DatasetBlobKey => {
     return asDatasetBlobKey(
       `workspaces/${workspaceId}/datasets/${datasetId}/data.parquet`,
     );
   },
-  meta(workspaceId: string, datasetId: string): DatasetBlobKey {
+  meta: (workspaceId: string, datasetId: string): DatasetBlobKey => {
     return asDatasetBlobKey(
       `workspaces/${workspaceId}/datasets/${datasetId}/meta.json`,
     );

@@ -1,5 +1,5 @@
 import { useQuery } from "@hooks";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -13,7 +13,7 @@ export function useWorkspaceRole(): Workspace.Role {
     enabled: !!workspace?.id && !!user?.id,
     staleTime: Infinity,
     queryFn: async () => {
-      const { data, error } = await AvaSupabase.DB.from("user_roles")
+      const { data, error } = await AvaSupabase.db().from("user_roles")
         .select("role")
         .eq("user_id", user!.id)
         .eq("workspace_id", workspace!.id)

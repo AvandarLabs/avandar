@@ -3,7 +3,7 @@ import {
   AvaDexieVersionManager,
   CURRENT_AVA_DEXIE_VERSION,
 } from "@/db/dexie/dexieVersions";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
 import { Logger } from "@/utils/Logger";
 import type { User } from "$/models/User/User";
 
@@ -79,7 +79,7 @@ export const AvaDexie = {
     const dbId = (await currentDexieDBVersion.meta.get("db_id"))?.value;
     if (user && dbId) {
       // Sync the dexie db metadata to the backend
-      await AvaSupabase.DB.from("dexie_dbs")
+      await AvaSupabase.db().from("dexie_dbs")
         .upsert(
           {
             user_id: user.id,

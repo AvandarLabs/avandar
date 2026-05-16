@@ -1,5 +1,5 @@
-import { isDesktop } from "$/platform";
-import type { ServerApiClient } from "$/platform";
+import { isDesktop } from "$/platform/isDesktop.ts";
+import type { ServerApiClient } from "$/platform/types/ServerApiClient.types.ts";
 import { createBrowserServerApiClient } from "./createBrowserServerApiClient.ts";
 import { createIpcServerApiClient } from "./createIpcServerApiClient.ts";
 

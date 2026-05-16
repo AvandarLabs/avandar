@@ -1,4 +1,4 @@
-import { createRdbCrudClient } from "@clients";
+import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { notifyError } from "@ui";
 import { assertIsDefined, prop, where } from "@utils";
 import { DashboardParsers } from "$/models/Dashboard/DashboardParsers";

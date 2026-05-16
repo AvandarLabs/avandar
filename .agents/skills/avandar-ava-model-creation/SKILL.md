@@ -225,7 +225,7 @@ Base convention:
 ```ts
 export const ExampleClient = createUsableServiceClient(
   createSupabaseCrudClient({
-    dbClient: AvaSupabase.DB,
+    dbClient: AvaSupabase.db(),
     modelName: "Example",
     tableName: "examples",
     dbTablePrimaryKey: "id",
@@ -236,7 +236,7 @@ export const ExampleClient = createUsableServiceClient(
 
 Notes:
 
-- Add `dbClient: AvaSupabase.DB`. The scaffold does not currently include it.
+- Add `dbClient: AvaSupabase.db()`. The scaffold does not currently include it.
 - Wrap with `createUsableServiceClient(...)` to match current repo usage.
 - Add custom `queries` and `mutations` only when the model needs them.
 - Put the client in the domain folder that matches nearby conventions, such as `datasets`, `entities`, `entity-configs`, `catalog-entries`, or `dashboards`.
@@ -369,7 +369,7 @@ After running the generator, review and fix the output.
 4. Confirm parsers exist when serialization is involved.
 5. Confirm nullable DB columns are handled correctly in parser transforms.
 6. Confirm the client exists for persisted models.
-7. Confirm Supabase clients use `AvaSupabase.DB` and current `createUsableServiceClient(...)` conventions.
+7. Confirm Supabase clients use `AvaSupabase.db()` and current `createUsableServiceClient(...)` conventions.
 8. Confirm Dexie models are registered in `src/db/dexie/dexieVersions.ts`.
 9. Confirm generated database types are up to date after Supabase schema changes.
 10. Confirm the generated scaffold has been edited to match the surrounding hand-written examples.
@@ -394,7 +394,7 @@ ava new model ExampleDataset \
 
 5. Edit the scaffold to match patterns from `CsvFileDataset`, `OpenDataDataset`, and `Dataset`.
 6. Add or refine parsers.
-7. Fix the generated client to use `AvaSupabase.DB` and `createUsableServiceClient(...)`.
+7. Fix the generated client to use `AvaSupabase.db()` and `createUsableServiceClient(...)`.
 
 ### Example: new standalone shared model
 

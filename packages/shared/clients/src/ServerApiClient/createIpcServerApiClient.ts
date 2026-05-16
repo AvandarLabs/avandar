@@ -1,4 +1,4 @@
-import type { ServerApiClient } from "$/platform";
+import type { ServerApiClient } from "$/platform/types/ServerApiClient.types.ts";
 
 /**
  * Phase 1 stub for the desktop-side {@link ServerApiClient}.

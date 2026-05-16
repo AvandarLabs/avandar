@@ -10,7 +10,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { EmptyObject } from "type-fest";
 
 /**
- * Spec accepted by `createRdbCrudClient`.
+ * Model spec for `createRdbCrudClient`.
  *
  * Mirrors `createSupabaseCrudClient`'s options object structurally minus the
  * `dbClient` field — the umbrella factory injects the registered Supabase
@@ -40,9 +40,9 @@ export type RdbCrudModelSpec<
 };
 
 /**
- * Concrete client returned by `createRdbCrudClient`. In Phase 1 this is the
- * existing Supabase-backed CRUD client. Phase 2 will widen this to a union /
- * adapter type once the SQLite-backed branch lands.
+ * Concrete client returned by `createRdbCrudClient`.
+ * For now, this is just the Supabase CRUD client. Soon it will widen into
+ * a union adapter type once the SQLite-backed branch lands.
  */
 export type RdbCrudClient<
   M extends AnySupabaseCrudModelSpec,

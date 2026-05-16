@@ -1,3 +1,5 @@
+import type { Brand } from "@utils/types/common.types";
+
 /**
  * Platform-agnostic relational database client.
  *
@@ -5,10 +7,7 @@
  * IPC client that talks to bun:sqlite in the Bun main process.
  */
 export interface RdbClient {
-  query<TRow>(
-    model: ModelName,
-    filter: RdbFilter,
-  ): Promise<ReadonlyArray<TRow>>;
+  query<TRow>(model: ModelName, filter: RdbFilter): Promise<readonly TRow[]>;
   upsert<TRow>(model: ModelName, row: TRow): Promise<TRow>;
   delete(model: ModelName, id: string): Promise<void>;
   transaction<TResult>(fn: (tx: RdbTx) => Promise<TResult>): Promise<TResult>;
@@ -16,13 +15,10 @@ export interface RdbClient {
 
 /**
  * Transaction handle. Same surface as {@link RdbClient} minus the nested
- * `transaction` call — transactions don't nest.
+ * `transaction` call (transactions don't nest).
  */
 export interface RdbTx {
-  query<TRow>(
-    model: ModelName,
-    filter: RdbFilter,
-  ): Promise<ReadonlyArray<TRow>>;
+  query<TRow>(model: ModelName, filter: Readonly<RdbFilter>): Promise<TRow[]>;
   upsert<TRow>(model: ModelName, row: TRow): Promise<TRow>;
   delete(model: ModelName, id: string): Promise<void>;
 }
@@ -30,7 +26,7 @@ export interface RdbTx {
 /**
  * Branded model identifier. Use {@link asModelName} to construct.
  */
-export type ModelName = string & { readonly __brand: "ModelName" };
+export type ModelName = Brand<string, "ModelName">;
 
 /**
  * Common filter shape supported by every backend (Supabase, SQLite).
@@ -39,14 +35,14 @@ export type ModelName = string & { readonly __brand: "ModelName" };
  * keys declared here for portability.
  */
 export type RdbFilter = {
-  readonly eq?: Readonly<Record<string, unknown>>;
-  readonly in?: Readonly<Record<string, ReadonlyArray<unknown>>>;
-  readonly orderBy?: ReadonlyArray<{
-    readonly column: string;
-    readonly direction: "asc" | "desc";
+  eq?: Record<string, unknown>;
+  in?: Record<string, readonly unknown[]>;
+  orderBy?: Array<{
+    column: string;
+    direction: "asc" | "desc";
   }>;
-  readonly limit?: number;
-  readonly offset?: number;
+  limit?: number;
+  offset?: number;
 };
 
 /**

@@ -7,7 +7,7 @@ import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 import { Tables } from "$/types/database.types";
 import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
 import type { ServiceClient } from "@clients";
 import type { WithSupabaseClient } from "@clients/mixins/withSupabaseClient";
 import type { ILogger, WithLogger } from "@logger";
@@ -74,7 +74,7 @@ export const UserProfileDBReadToModelReadSchema: z.ZodType<
   });
 
 function createUserClient(options?: TUserClientOptions): TUserClient {
-  const { dbClient = AvaSupabase.DB } = options ?? {};
+  const { dbClient = AvaSupabase.db() } = options ?? {};
   const baseClient = createServiceClient("UserClient");
 
   const client = withLogger(baseClient, (baseLogger: ILogger) => {
@@ -193,5 +193,5 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
 }
 
 export const UserClient = createUserClient({
-  dbClient: AvaSupabase.DB,
+  dbClient: AvaSupabase.db(),
 });
