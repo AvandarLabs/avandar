@@ -26,7 +26,7 @@ export const Legacy_LocalDatasetEntryParsers =
 /**
  * Do not remove these tests!
  */
-type CRUDTypes = LegacyLocalDatasetEntryModel;
+type CrudTypes = LegacyLocalDatasetEntryModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
@@ -34,7 +34,7 @@ type ZodConsistencyTests = [
   Expect<
     ZodSchemaEqualsTypes<
       typeof DBReadSchema,
-      { input: CRUDTypes["DBRead"]; output: CRUDTypes["DBRead"] }
+      { input: CrudTypes["DBRead"]; output: CrudTypes["DBRead"] }
     >
   >,
 ];

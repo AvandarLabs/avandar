@@ -1,7 +1,7 @@
 import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
 import type { SwapDeep } from "@utils/types/utilities.types.ts";
-import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { UserProfileId } from "$/models/User/UserProfile.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
@@ -53,7 +53,7 @@ export type DashboardRead = Model.Base<
 /**
  * CRUD type definitions for the Dashboard model.
  */
-export type DashboardModel = SupabaseCRUDModelSpec<
+export type DashboardModel = SupabaseCrudModelSpec<
   {
     tableName: "dashboards";
     modelName: "Dashboard";

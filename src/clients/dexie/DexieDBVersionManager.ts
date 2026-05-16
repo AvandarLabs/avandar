@@ -3,13 +3,13 @@ import { identity } from "@utils/misc/identity";
 import { objectKeys } from "@utils/objects/objectKeys";
 import Dexie, { EntityTable, Transaction } from "dexie";
 import { UnionToIntersection } from "type-fest";
-import type { DexieCRUDModelSpec } from "@/clients/dexie/DexieCRUDClient.types";
+import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";
 
 /**
  * A record of Dexie tables representing CRUD models.
  * Each key is a model name and the values are Dexie tables type definitions.
  */
-type DexieModelTableRecord<M extends DexieCRUDModelSpec> = UnionToIntersection<
+type DexieModelTableRecord<M extends DexieCrudModelSpec> = UnionToIntersection<
   // we use a distributive conditional here to create a union of records, so
   // we can then intersect them all together. This way we can ensure each
   // model name is associated to its correct model type, rather than being a
@@ -30,14 +30,14 @@ type DexieMetaTable = EntityTable<{ key: string; value: string }, "key">;
 /**
  * A type representing a Dexie database with a specific union of models.
  */
-export type DexieDBType<M extends DexieCRUDModelSpec> = Dexie &
+export type DexieDBType<M extends DexieCrudModelSpec> = Dexie &
   DexieModelTableRecord<M> & {
     meta: DexieMetaTable;
   };
 
 type DBSchemaType = {
   version: number;
-  models: readonly [DexieCRUDModelSpec, ...DexieCRUDModelSpec[]];
+  models: readonly [DexieCrudModelSpec, ...DexieCrudModelSpec[]];
 };
 
 type DBSchemaConfig<DBSchema extends DBSchemaType = DBSchemaType> =
@@ -79,7 +79,7 @@ type GenericDexieDBSchema = {
   version: number;
 
   /** Models must be specified as a fixed tuple. */
-  models: readonly [DexieCRUDModelSpec, ...DexieCRUDModelSpec[]];
+  models: readonly [DexieCrudModelSpec, ...DexieCrudModelSpec[]];
 };
 
 type GenericDexieDBSchemaRegistry = Record<`v${number}`, GenericDexieDBSchema>;

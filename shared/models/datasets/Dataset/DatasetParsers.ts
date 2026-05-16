@@ -64,7 +64,7 @@ export const DatasetParsers = makeParserRegistry<DatasetModel>().build({
 /**
  * Do not remove these tests!
  */
-type CRUDTypes = DatasetModel;
+type CrudTypes = DatasetModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
@@ -72,7 +72,7 @@ type ZodConsistencyTests = [
   Expect<
     ZodSchemaEqualsTypes<
       typeof DBReadSchema,
-      { input: CRUDTypes["DBRead"]; output: CRUDTypes["DBRead"] }
+      { input: CrudTypes["DBRead"]; output: CrudTypes["DBRead"] }
     >
   >,
 ];

@@ -171,7 +171,7 @@ The scaffold is only a starting point. Compare it against the real patterns in:
 Bring the generated files up to current conventions:
 
 - flesh out the `Read`, `Insert`, and `Update` variants in `<ModelName>.types.ts`
-- use `SupabaseCRUDModelSpec`
+- use `SupabaseCrudModelSpec`
 - define a branded ID type when appropriate
 - use `Model.Base<...>` when the repo pattern for that family uses it
 - keep comments concise and domain-specific
@@ -215,7 +215,7 @@ Base convention:
 
 ```ts
 export const ExampleClient = createUsableServiceClient(
-  createSupabaseCRUDClient({
+  createSupabaseCrudClient({
     dbClient: AvaSupabase.DB,
     modelName: "Example",
     tableName: "examples",
@@ -265,7 +265,7 @@ Start with `ava new model` for the closest shape, then move/adapt the scaffold i
 
 ### 2. Convert the types to Dexie conventions
 
-Use `DexieCRUDModelSpec`, not `SupabaseCRUDModelSpec`.
+Use `DexieCrudModelSpec`, not `SupabaseCrudModelSpec`.
 
 References:
 
@@ -305,7 +305,7 @@ You must:
 Also remember:
 
 - any columns used in Dexie filters or conflict matching should be indexed
-- `createDexieCRUDClient` expects the model table to exist in the registered Dexie schema
+- `createDexieCrudClient` expects the model table to exist in the registered Dexie schema
 
 ### 5. Add the Dexie client
 
@@ -319,7 +319,7 @@ References:
 Base pattern:
 
 ```ts
-export const ExampleClient = createDexieCRUDClient({
+export const ExampleClient = createDexieCrudClient({
   db: AvaDexie.DB,
   modelName: "Example",
   parsers: ExampleParsers,
@@ -356,7 +356,7 @@ After running the generator, review and fix the output.
 
 1. Confirm the model lives in the correct root: `shared/models` vs `src/models`.
 2. Confirm the domain subdirectory matches nearby patterns.
-3. Confirm the types use the correct spec: `SupabaseCRUDModelSpec` vs `DexieCRUDModelSpec` vs standalone types only.
+3. Confirm the types use the correct spec: `SupabaseCrudModelSpec` vs `DexieCrudModelSpec` vs standalone types only.
 4. Confirm parsers exist when serialization is involved.
 5. Confirm nullable DB columns are handled correctly in parser transforms.
 6. Confirm the client exists for persisted models.
@@ -407,7 +407,7 @@ If you add a new browser-local cached model:
 
 1. Start with the scaffold.
 2. Move/adapt it into `src/models/<ModelName>/`.
-3. Convert the types to `DexieCRUDModelSpec`.
+3. Convert the types to `DexieCrudModelSpec`.
 4. Add parsers.
 5. Register the table and migration in `src/db/dexie/dexieVersions.ts`.
 6. Add the Dexie client in `src/clients/...`.

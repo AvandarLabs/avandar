@@ -1,3 +1,4 @@
+import { registerWebDbClient } from "@clients/webDbClientRegistry.ts";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "$/types/database.types";
 
@@ -10,6 +11,12 @@ const supabaseDBClient: SupabaseClient<Database> = createClient(
   import.meta.env.VITE_SUPABASE_API_URL ?? "",
   import.meta.env.VITE_SUPABASE_ANON_KEY ?? "",
 );
+
+// Phase 1 platform-aware factories (`createRdbCrudClient`,
+// `createServerApiClient`) read the registered Supabase client out of
+// @avandar/clients to avoid a packages/shared/ → src/ direct import. Register
+// once at module load; the client lifetime matches the singleton in `AvaSupabase`.
+registerWebDbClient(supabaseDBClient);
 
 export const AvaSupabase = {
   /**

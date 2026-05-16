@@ -1,4 +1,5 @@
-import { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupabaseCRUDClient";
+import { createRdbCrudClient } from "@clients/RdbCrudClient/createRdbCrudClient";
+import { createServerApiClient } from "@clients/ServerApiClient/createServerApiClient";
 import { isDefined } from "@utils/guards/isDefined/isDefined";
 import { prop } from "@utils/objects/hofs/prop/prop";
 import { SubscriptionParsers } from "$/models/Subscription/SubscriptionParsers";
@@ -7,15 +8,16 @@ import { WorkspaceParsers } from "$/models/Workspace/WorkspaceParsers";
 import { APIClient } from "@/clients/APIClient";
 import { AuthClient } from "@/clients/AuthClient";
 import { UserProfileDBReadToModelReadSchema } from "@/clients/UserClient";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { isOneOf } from "@/lib/utils/guards/guards";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { UserId } from "$/models/User/User.types";
 import type { UserProfileWithRole } from "$/models/User/UserProfile.types";
 
+// Platform-aware server API client; lazy-readable from any mutation/query.
+const serverApi = createServerApiClient();
+
 export const WorkspaceClient = createUsableServiceClient(
-  createSupabaseCRUDClient({
-    dbClient: AvaSupabase.DB,
+  createRdbCrudClient({
     modelName: "Workspace",
     tableName: "workspaces",
     dbTablePrimaryKey: "id",
@@ -162,14 +164,14 @@ export const WorkspaceClient = createUsableServiceClient(
 
           // creating a workspace involves many database operations, so we
           // use a stored procedure to handle it
-          const { data: workspace } = await dbClient
-            .rpc("rpc_workspaces__create_with_owner", {
-              p_workspace_name: workspaceName,
-              p_workspace_slug: workspaceSlug,
-              p_full_name: ownerName,
-              p_display_name: ownerDisplayName,
-            })
-            .throwOnError();
+          const workspace = await serverApi.rpc<
+            Parameters<typeof parsers.fromDBReadToModelRead>[0]
+          >("rpc_workspaces__create_with_owner", {
+            p_workspace_name: workspaceName,
+            p_workspace_slug: workspaceSlug,
+            p_full_name: ownerName,
+            p_display_name: ownerDisplayName,
+          });
 
           logger.log("Successfully created workspace", workspace);
           return parsers.fromDBReadToModelRead(workspace);

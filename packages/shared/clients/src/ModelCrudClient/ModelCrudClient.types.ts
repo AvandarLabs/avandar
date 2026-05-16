@@ -1,4 +1,4 @@
-import type { ModelCRUDParserRegistry } from "@clients/makeParserRegistry.ts";
+import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry.ts";
 import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types.ts";
 import type { ILogger } from "@logger/Logger.types.ts";
 import type { FiltersByColumn } from "@utils/filters/filters.ts";
@@ -15,7 +15,7 @@ export type ClientReturningOnlyPromises = Record<
   AnyFunctionWithSignature<[any], Promise<any>>
 >;
 
-export type ModelCRUDPage<ModelRead> = {
+export type ModelCrudPage<ModelRead> = {
   /** The rows in the page */
   rows: ModelRead[];
 
@@ -63,7 +63,7 @@ export type UpsertOptions = {
   };
 };
 
-export type CRUDModelSpec = {
+export type CrudModelSpec = {
   /** The name of the model */
   modelName: string;
 
@@ -102,7 +102,7 @@ export type CRUDModelSpec = {
   Update: UnknownObject;
 };
 
-export type ModelCRUDFunctions<M extends CRUDModelSpec> = {
+export type ModelCrudFunctions<M extends CrudModelSpec> = {
   // `Get` queries
   getById: (params: {
     id: M["modelPrimaryKeyType"] | null | undefined;
@@ -158,15 +158,15 @@ export type ModelCRUDFunctions<M extends CRUDModelSpec> = {
  * All of these functions will have auto-generated `useQuery` and `useMutation`
  * hooks.
  */
-export type BaseModelCRUDClient<M extends CRUDModelSpec> = {
+export type BaseModelCrudClient<M extends CrudModelSpec> = {
   /** The parsers for the model */
-  parsers: ModelCRUDParserRegistry<M>;
+  parsers: ModelCrudParserRegistry<M>;
 
   /**
    * The CRUD functions for the model, in case we need to work directly
    * with the CRUD-level functions and types.
    */
-  crudFunctions: ModelCRUDFunctions<M>;
+  crudFunctions: ModelCrudFunctions<M>;
 
   /**
    * Retrieves a single model instance by its ID.
@@ -211,7 +211,7 @@ export type BaseModelCRUDClient<M extends CRUDModelSpec> = {
     where?: FiltersByColumn<M["DBRead"]>;
     pageSize: number;
     pageNum: number;
-  }): Promise<ModelCRUDPage<M["Read"]>>;
+  }): Promise<ModelCrudPage<M["Read"]>>;
 
   /**
    * Retrieves all instances of a model.
@@ -319,8 +319,8 @@ export type BaseModelCRUDClient<M extends CRUDModelSpec> = {
   }): Promise<void>;
 } & ServiceClient<`${M["modelName"]}Client`>;
 
-export type ModelCRUDClient<
-  M extends CRUDModelSpec,
+export type ModelCrudClient<
+  M extends CrudModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises = EmptyObject,
   ExtendedMutationsClient extends ClientReturningOnlyPromises = EmptyObject,
-> = BaseModelCRUDClient<M> & ExtendedQueriesClient & ExtendedMutationsClient;
+> = BaseModelCrudClient<M> & ExtendedQueriesClient & ExtendedMutationsClient;

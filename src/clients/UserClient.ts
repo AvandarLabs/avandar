@@ -1,5 +1,5 @@
 import { createServiceClient } from "@clients/ServiceClient/createServiceClient";
-import { withSupabaseClient } from "@clients/SupabaseCRUDClient/withSupabaseClient";
+import { withSupabaseClient } from "@clients/SupabaseCrudClient/withSupabaseClient";
 import { withQueryHooks } from "@hooks/withQueryHooks/withQueryHooks";
 import { WithQueryHooks } from "@hooks/withQueryHooks/withQueryHooks.types";
 import { withLogger } from "@logger/module-augmenters/withLogger";
@@ -12,7 +12,7 @@ import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types";
-import type { WithSupabaseClient } from "@clients/SupabaseCRUDClient/withSupabaseClient";
+import type { WithSupabaseClient } from "@clients/SupabaseCrudClient/withSupabaseClient";
 import type { ILogger, WithLogger } from "@logger/Logger.types.ts";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { UserId } from "$/models/User/User.types";

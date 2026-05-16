@@ -1,4 +1,4 @@
-import type { DexieCRUDModelSpec } from "@/clients/dexie/DexieCRUDClient.types";
+import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
 /**
@@ -16,7 +16,7 @@ type LegacyLocalDatasetEntryDBRead = {
   localTableName: string;
 };
 
-export type LegacyLocalDatasetEntryModel = DexieCRUDModelSpec<{
+export type LegacyLocalDatasetEntryModel = DexieCrudModelSpec<{
   modelName: "LocalDatasetEntry";
   primaryKey: "datasetId";
   primaryKeyType: DatasetId;

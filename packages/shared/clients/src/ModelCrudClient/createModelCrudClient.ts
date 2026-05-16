@@ -1,21 +1,21 @@
 import {
   ClientReturningOnlyPromises,
-  CRUDModelSpec,
-  ModelCRUDClient,
-  ModelCRUDFunctions,
-  ModelCRUDPage,
+  CrudModelSpec,
+  ModelCrudClient,
+  ModelCrudFunctions,
+  ModelCrudPage,
   UpsertOptions,
-} from "@clients/ModelCRUDClient/ModelCRUDClient.types.ts";
+} from "@clients/ModelCrudClient/ModelCrudClient.types.ts";
 import { createServiceClient } from "@clients/ServiceClient/createServiceClient.ts";
 import { withLogger } from "@logger/module-augmenters/withLogger.ts";
 import { FiltersByColumn } from "@utils/filters/filters.ts";
 import { omit } from "@utils/objects/omit/omit.ts";
-import type { ModelCRUDParserRegistry } from "@clients/makeParserRegistry.ts";
+import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry.ts";
 import type { ILogger } from "@logger/Logger.types.ts";
 import type { EmptyObject } from "type-fest";
 
-type CreateModelCRUDClientOptions<
-  M extends CRUDModelSpec,
+type CreateModelCrudClientOptions<
+  M extends CrudModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises,
   ExtendedMutationsClient extends ClientReturningOnlyPromises,
 > = {
@@ -23,7 +23,7 @@ type CreateModelCRUDClientOptions<
 
   /** The default batch size to use in `getAll`. Defaults to 500. */
   defaultGetAllBatchSize?: number;
-  parsers: ModelCRUDParserRegistry<M>;
+  parsers: ModelCrudParserRegistry<M>;
 
   /**
    * Additional queries to merge into the main client. These will also have
@@ -41,11 +41,11 @@ type CreateModelCRUDClientOptions<
     clientLogger: ILogger;
   }) => ExtendedMutationsClient;
 
-  crudFunctions: ModelCRUDFunctions<M>;
+  crudFunctions: ModelCrudFunctions<M>;
 };
 
-export function createModelCRUDClient<
-  M extends CRUDModelSpec,
+export function createModelCrudClient<
+  M extends CrudModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises = EmptyObject,
   ExtendedMutationsClient extends ClientReturningOnlyPromises = EmptyObject,
 >({
@@ -55,18 +55,18 @@ export function createModelCRUDClient<
   additionalQueries,
   additionalMutations,
   crudFunctions,
-}: CreateModelCRUDClientOptions<
+}: CreateModelCrudClientOptions<
   M,
   ExtendedQueriesClient,
   ExtendedMutationsClient
->): ModelCRUDClient<M, ExtendedQueriesClient, ExtendedMutationsClient> {
+>): ModelCrudClient<M, ExtendedQueriesClient, ExtendedMutationsClient> {
   const _getPage = async (params: {
     where: FiltersByColumn<M["DBRead"]> | undefined;
     pageSize: number;
     pageNum: number;
     logger: ILogger;
     totalRows: number | undefined;
-  }): Promise<ModelCRUDPage<M["Read"]>> => {
+  }): Promise<ModelCrudPage<M["Read"]>> => {
     const { pageNum, pageSize, logger } = params;
 
     logger.log("Calling `getPage` with params", omit(params, "logger"));
@@ -169,7 +169,7 @@ export function createModelCRUDClient<
         where?: FiltersByColumn<M["DBRead"]>;
         pageSize: number;
         pageNum: number;
-      }): Promise<ModelCRUDPage<M["Read"]>> => {
+      }): Promise<ModelCrudPage<M["Read"]>> => {
         const logger = baseLogger.appendName("getPage");
         const { where, pageNum = 0, pageSize } = params;
         const page = await _getPage({

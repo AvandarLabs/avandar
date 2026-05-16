@@ -2,7 +2,7 @@ import type { UUID } from "@utils/types/common.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 import type { EntityFieldConfigId } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";
-import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { Enums } from "$/types/database.types.ts";
 import type { SetOptional, Simplify } from "type-fest";
@@ -52,7 +52,7 @@ type DatasetColumnValueExtractorUpdate =
 /**
  * CRUD type definitions for the DatasetColumnValueExtractor model.
  */
-export type DatasetColumnValueExtractorModel = SupabaseCRUDModelSpec<
+export type DatasetColumnValueExtractorModel = SupabaseCrudModelSpec<
   {
     tableName: "value_extractors__dataset_column_value";
     modelName: "DatasetColumnValueExtractor";

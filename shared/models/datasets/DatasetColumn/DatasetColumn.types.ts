@@ -3,7 +3,7 @@ import type { UUID } from "@utils/types/common.types.ts";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes.ts";
-import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { SetOptional } from "type-fest";
 
@@ -93,7 +93,7 @@ export type ImportedDatasetColumn = Pick<
 /**
  * CRUD type definitions for the DatasetColumn model.
  */
-export type DatasetColumnModel = SupabaseCRUDModelSpec<
+export type DatasetColumnModel = SupabaseCrudModelSpec<
   {
     tableName: "dataset_columns";
     modelName: "DatasetColumn";

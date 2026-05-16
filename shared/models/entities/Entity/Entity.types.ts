@@ -1,6 +1,6 @@
 import type { UUID } from "@utils/types/common.types.ts";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types.ts";
-import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { SetOptional } from "type-fest";
 
@@ -21,7 +21,7 @@ type EntityRead = {
 /**
  * CRUD type definitions for the Workspace model.
  */
-export type EntityModel = SupabaseCRUDModelSpec<
+export type EntityModel = SupabaseCrudModelSpec<
   {
     tableName: "entities";
     modelName: "Entity";

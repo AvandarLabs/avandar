@@ -1,4 +1,4 @@
-import { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupabaseCRUDClient";
+import { createRdbCrudClient } from "@clients/RdbCrudClient/createRdbCrudClient";
 import { notifyError } from "@ui/notifications/notify";
 import { where } from "@utils/filters/where/where";
 import { assertIsDefined, prop } from "@utils/index";
@@ -13,18 +13,17 @@ import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { OpenDatasetParquetStorageClient } from "@/clients/storage/OpenDatasetParquetStorageClient/OpenDatasetParquetStorageClient";
 import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatasetParquetStorageClient/PublicDatasetParquetStorageClient";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { promiseMap } from "@/lib/utils/promises";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 export const DashboardClient = createUsableServiceClient(
-  createSupabaseCRUDClient({
-    dbClient: AvaSupabase.DB,
+  createRdbCrudClient({
     modelName: "Dashboard",
     tableName: "dashboards",
     dbTablePrimaryKey: "id",
     parsers: DashboardParsers,
+    // dbClient is now injected by createRdbCrudClient; nothing to pass here
     mutations: (config) => {
       return {
         /**

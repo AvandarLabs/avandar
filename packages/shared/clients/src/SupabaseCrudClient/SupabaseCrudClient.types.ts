@@ -1,7 +1,7 @@
 import type {
   ClientReturningOnlyPromises,
-  ModelCRUDClient,
-} from "@clients/ModelCRUDClient/ModelCRUDClient.types.ts";
+  ModelCrudClient,
+} from "@clients/ModelCrudClient/ModelCrudClient.types.ts";
 import type {
   RegisteredSupabaseDatabase,
   RegisteredSupabaseDatabaseTableNames,
@@ -32,7 +32,7 @@ type DefaultDBPrimaryKey<
 /**
  * A wrapper type to create the Supabase CRUD types for a model.
  */
-export type SupabaseCRUDModelSpec<
+export type SupabaseCrudModelSpec<
   ModelTypes extends DefaultModelTypes,
   DBPrimaryKey extends DefaultDBPrimaryKey<ModelTypes["tableName"]>,
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -68,16 +68,16 @@ export type SupabaseCRUDModelSpec<
   Update: ModelTypes["modelTypes"]["Update"];
 } & ExtraTypes;
 
-export type AnySupabaseCRUDModelSpec =
+export type AnySupabaseCrudModelSpec =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  SupabaseCRUDModelSpec<any, any>;
+  SupabaseCrudModelSpec<any, any>;
 
-export type SupabaseCRUDClient<
-  M extends AnySupabaseCRUDModelSpec,
+export type SupabaseCrudClient<
+  M extends AnySupabaseCrudModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises,
   ExtendedMutationsClient extends ClientReturningOnlyPromises,
-> = ModelCRUDClient<M, ExtendedQueriesClient, ExtendedMutationsClient> & {
+> = ModelCrudClient<M, ExtendedQueriesClient, ExtendedMutationsClient> & {
   setDBClient: (
     dbClient: SupabaseClient<RegisteredSupabaseDatabase>,
-  ) => SupabaseCRUDClient<M, ExtendedQueriesClient, ExtendedMutationsClient>;
+  ) => SupabaseCrudClient<M, ExtendedQueriesClient, ExtendedMutationsClient>;
 };

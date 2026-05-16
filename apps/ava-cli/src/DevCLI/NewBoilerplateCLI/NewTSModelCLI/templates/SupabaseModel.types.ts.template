@@ -1,6 +1,6 @@
 import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
-import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 import type { SetOptional } from "type-fest";
@@ -20,7 +20,7 @@ export type $MODEL_NAME$Read = Model.Base<
   }
 >;
 
-export type $MODEL_NAME$Model = SupabaseCRUDModelSpec<
+export type $MODEL_NAME$Model = SupabaseCrudModelSpec<
   {
     tableName: "$TABLE_NAME$";
     modelName: "$MODEL_NAME$";

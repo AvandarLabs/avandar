@@ -77,7 +77,7 @@ export const DatasetColumnValueExtractorParsers =
  * Do not remove these tests! These check that your Zod parsers are
  * consistent with your defined model and DB types.
  */
-type CRUDTypes = DatasetColumnValueExtractorModel;
+type CrudTypes = DatasetColumnValueExtractorModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
@@ -85,7 +85,7 @@ type ZodConsistencyTests = [
   Expect<
     ZodSchemaEqualsTypes<
       typeof DBReadSchema,
-      { input: CRUDTypes["DBRead"]; output: CRUDTypes["DBRead"] }
+      { input: CrudTypes["DBRead"]; output: CrudTypes["DBRead"] }
     >
   >,
 ];
