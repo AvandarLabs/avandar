@@ -40,6 +40,11 @@ export function DashboardEditorView({
   // simple counter to force Puck to re-mount when the initial data changes
   const [editorKey, setEditorKey] = useState(0);
 
+  // Tracks whether the in-memory Puck data has diverged from what is
+  // persisted in the dashboard's `config`. Publishing copies the persisted
+  // config to the public bucket, so we disable publish while dirty.
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
   useEffect(() => {
     if (lastDashboardIdRef.current === dashboard.id) {
       return;
@@ -59,6 +64,7 @@ export function DashboardEditorView({
       },
     };
     setData(upgradeAvaPageData(puckData));
+    setHasUnsavedChanges(false);
     setEditorKey((prevEditorKey) => {
       return prevEditorKey + 1;
     });
@@ -81,6 +87,7 @@ export function DashboardEditorView({
       : undefined,
     onSuccess: () => {
       notifySuccess("Dashboard saved successfully!");
+      setHasUnsavedChanges(false);
     },
   });
 
@@ -122,6 +129,7 @@ export function DashboardEditorView({
           data={data}
           onChange={(d: Data) => {
             setData(d as AvaPageData);
+            setHasUnsavedChanges(true);
           }}
           overrides={{
             headerActions: () => {
@@ -132,7 +140,10 @@ export function DashboardEditorView({
                     workspaceSlug={workspaceSlug}
                     dashboardId={dashboard.id}
                   />
-                  <PublishDashboardButton dashboardId={dashboard.id} />
+                  <PublishDashboardButton
+                    dashboardId={dashboard.id}
+                    hasUnsavedChanges={hasUnsavedChanges}
+                  />
                   <DeleteDashboardButton
                     workspaceSlug={workspaceSlug}
                     dashboardId={dashboard.id}

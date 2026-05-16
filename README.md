@@ -115,7 +115,7 @@ routes; they do not stub Supabase APIs.
 
 ## Reference documentation
 
-The [`reference/`](reference/) directory holds long-lived Markdown notes:
+The [`docs/`](docs/) directory holds long-lived Markdown notes:
 architectural decisions, design decisions, and change checklists. Start there
 when touching cross-cutting areas (for example, dataset source types).
 
