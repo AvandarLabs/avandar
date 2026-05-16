@@ -183,7 +183,13 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
     );
   });
 
-  return client.mixin(withSupabaseClient(dbClient)) as unknown as TUserClient;
+  // Do not use `client.mixin(withSupabaseClient(...))`: `createModule` mixin
+  // rebuilds members from the base service client slice only, which drops
+  // `withQueryHooks` methods such as `useGetProfile` / `useGetUserAppRoles`.
+  return {
+    ...client,
+    ...withSupabaseClient(dbClient)().members,
+  } as unknown as TUserClient;
 }
 
 export const UserClient = createUserClient({

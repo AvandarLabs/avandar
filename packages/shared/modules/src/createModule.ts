@@ -1,5 +1,6 @@
 import { isFunction } from "@utils/guards/isFunction.ts";
 import { getValue } from "@utils/objects/getValue/getValue.ts";
+import { objectFilter } from "@utils/objects/objectFilter/objectFilter.ts";
 import { objectValuesMap } from "@utils/objects/objectValuesMap/objectValuesMap.ts";
 import { setValue } from "@utils/objects/setValue/setValue.ts";
 import { MergeObjects } from "@utils/types/utilities.types.ts";
@@ -20,7 +21,6 @@ export type StateOfModule<M extends AnyModule> =
 
 export type MembersOfModule<M extends AnyModule> =
   M extends Module<any, any, infer Members> ? Members : never;
-
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 type Getters<State extends UnknownObject | EmptyObject> =
@@ -119,14 +119,14 @@ export type Module<
          * so any time the module is built it will be called with the full
          * sequence of mixins applied to it.
          *
-         * @param mixin - The mixin function to apply to the module.
+         * @param mixinFn - The mixin function to apply to the module.
          * @returns The mixed module.
          */
         mixin<
           NewMembers extends UnknownObject = EmptyObject,
           NewState extends UnknownObject = EmptyObject,
         >(
-          mixin: Mixin<ModuleName, State, Members, NewState, NewMembers>,
+          mixinFn: Mixin<ModuleName, State, Members, NewState, NewMembers>,
         ): Module<
           ModuleName,
           MergeObjects<State, NewState>,
@@ -198,6 +198,7 @@ export function createModule<
     };
   });
 
+  // getters and setters for the module
   const moduleAccessors = {
     getModuleName: () => {
       return moduleName;
@@ -246,37 +247,48 @@ export function createModule<
     ...members,
   } as unknown as FullModule;
 
-  return {
-    ...moduleWithMembers,
-    mixin: <
-      NewState extends UnknownObject = EmptyObject,
-      NewMembers extends UnknownObject = EmptyObject,
-    >(
-      mixin: Mixin<ModuleName, State, Members, NewState, NewMembers>,
-    ): Module<
+  // cannot use arrow function here because we needto make sure `this` gets
+  // bound to the caller
+  const cumulativeMixin = function <
+    NewState extends UnknownObject = EmptyObject,
+    NewMembers extends UnknownObject = EmptyObject,
+  >(
+    this: FullModule,
+    mixinFn: Mixin<ModuleName, State, Members, NewState, NewMembers>,
+  ): Module<
+    ModuleName,
+    MergeObjects<State, NewState>,
+    MergeObjects<Members, NewMembers>
+  > {
+    const {
+      state: newState = {} as NewState,
+      members: newMembers = {} as NewMembers,
+      // mixinFn gets called on the `this` arg, which should be the current full
+      // module so we can continue expanding the module
+    } = mixinFn(this);
+
+    const priorMembers = objectFilter(this, (key) => {
+      return key !== "mixin" && !(key in moduleAccessors);
+    });
+
+    return createModule(moduleName, {
+      state: {
+        ...state,
+        ...newState,
+      } as MergeObjects<State, NewState>,
+      builder: {
+        ...priorMembers,
+        ...newMembers,
+      },
+    }) as Module<
       ModuleName,
       MergeObjects<State, NewState>,
       MergeObjects<Members, NewMembers>
-    > => {
-      const {
-        state: newState = {} as NewState,
-        members: newMembers = {} as NewMembers,
-      } = mixin(moduleWithMembers);
+    >;
+  };
 
-      return createModule(moduleName, {
-        state: {
-          ...state,
-          ...newState,
-        } as MergeObjects<State, NewState>,
-        builder: {
-          ...members,
-          ...newMembers,
-        },
-      }) as Module<
-        ModuleName,
-        MergeObjects<State, NewState>,
-        MergeObjects<Members, NewMembers>
-      >;
-    },
+  return {
+    ...moduleWithMembers,
+    mixin: cumulativeMixin,
   };
 }

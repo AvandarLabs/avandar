@@ -24,6 +24,7 @@
     "test:hooks": "pnpm --filter @avandar/hooks test",
     "test:logger": "pnpm --filter @avandar/logger test",
     "test:models": "pnpm --filter @avandar/models test",
+    "test:modules": "pnpm --filter @avandar/modules test",
     "test:ui": "pnpm --filter @avandar/ui test",
     "test:db": "supabase test db",
     "test:e2e": "playwright test",
