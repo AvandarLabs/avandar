@@ -3,7 +3,8 @@ import { LONG_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
 
 /**
- * Hard navigation so TanStack Query refetches roles after admin-side role changes.
+ * Hard navigation so TanStack Query refetches roles after admin-side role
+ * changes.
  */
 export async function reloadWorkspaceAppSession(
   page: Page,
