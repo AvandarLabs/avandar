@@ -20,19 +20,10 @@ CREATE TABLE "Users" (
 );
 
 -- Must always quote or queries fail
-SELECT
-  "firstName"
-FROM
-  "Users"
-WHERE
-  "userId" = 1;
+SELECT "firstName" FROM "Users" WHERE "userId" = 1;
 
 -- This fails - Users becomes users without quotes
-SELECT
-  firstName
-FROM
-  Users;
-
+SELECT firstName FROM Users;
 -- ERROR: relation "users" does not exist
 ```
 
@@ -47,12 +38,7 @@ CREATE TABLE users (
 );
 
 -- Works without quotes, recognized by all tools
-SELECT
-  first_name
-FROM
-  users
-WHERE
-  user_id = 1;
+SELECT first_name FROM users WHERE user_id = 1;
 ```
 
 Common sources of mixed-case identifiers:
@@ -61,13 +47,9 @@ Common sources of mixed-case identifiers:
 -- ORMs often generate quoted camelCase - configure them to use snake_case
 -- Migrations from other databases may preserve original casing
 -- Some GUI tools quote identifiers by default - disable this
+
 -- If stuck with mixed-case, create views as a compatibility layer
-CREATE VIEW users AS
-SELECT
-  "userId" AS user_id,
-  "firstName" AS first_name
-FROM
-  "Users";
+CREATE VIEW users AS SELECT "userId" AS user_id, "firstName" AS first_name FROM "Users";
 ```
 
 Reference: [Identifiers and Key Words](https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS)

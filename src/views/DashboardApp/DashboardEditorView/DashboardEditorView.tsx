@@ -5,7 +5,7 @@ import { notifyDevAlert, notifySuccess } from "@ui";
 import { createInitialDashboardPuckData } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
-import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
+import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard";

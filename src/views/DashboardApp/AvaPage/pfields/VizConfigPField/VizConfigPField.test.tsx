@@ -1,15 +1,16 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/common/AvandarUiProvider";
+import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { pickMantineSelectOption } from "@/test-utils/pickMantineSelectOption";
 import { VizConfigPField } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
-const TEST_WORKSPACE_ID = "00000000-0000-4000-8000-000000000001" as Workspace.Id;
-const TEST_DASHBOARD_ID =
-  "00000000-0000-4000-8000-000000000002" as DashboardId;
+const TEST_WORKSPACE_ID =
+  "00000000-0000-4000-8000-000000000001" as Workspace.Id;
+const TEST_DASHBOARD_ID = "00000000-0000-4000-8000-000000000002" as DashboardId;
 
 vi.mock("@puckeditor/core", () => {
   return {
@@ -52,9 +53,9 @@ vi.mock("@/views/DataExplorerApp/useDataQuery", () => {
   };
 });
 
-function renderField(props: {
-  value: VizConfig;
-}): { onChange: ReturnType<typeof vi.fn> } {
+function renderField(props: { value: VizConfig }): {
+  onChange: ReturnType<typeof vi.fn>;
+} {
   const onChange = vi.fn();
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -77,9 +78,7 @@ function renderField(props: {
 describe("VizConfigPField", () => {
   it("shows a hint and no axis controls for the table viz type", () => {
     renderField({ value: { vizType: "table" } });
-    expect(
-      screen.getByText(/no extra settings/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/no extra settings/i)).toBeInTheDocument();
     expect(screen.queryByRole("combobox", { name: /X Axis/i })).toBeNull();
   });
 
@@ -92,8 +91,12 @@ describe("VizConfigPField", () => {
         withLegend: true,
       },
     });
-    expect(screen.getByRole("combobox", { name: /X Axis/i })).toBeInTheDocument();
-    expect(screen.getByRole("combobox", { name: /Y Axis/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("combobox", { name: /X Axis/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("combobox", { name: /Y Axis/i }),
+    ).toBeInTheDocument();
   });
 
   it("calls onChange when an axis option is picked", () => {
@@ -105,16 +108,7 @@ describe("VizConfigPField", () => {
         withLegend: true,
       },
     });
-    const xInput = screen.getByRole("combobox", { name: /X Axis/i });
-    fireEvent.click(xInput);
-    fireEvent.focus(xInput);
-    const dropdown = Array.from(
-      document.querySelectorAll<HTMLElement>(".mantine-Select-dropdown"),
-    ).find((d) => {return d.style.display !== "none"});
-    expect(dropdown).toBeTruthy();
-    const option = dropdown!.querySelector('[role="option"][value="category"]');
-    expect(option).toBeTruthy();
-    fireEvent.click(option as Element);
+    pickMantineSelectOption(/X Axis/i, "category");
     expect(onChange).toHaveBeenCalledWith({
       vizType: "bar",
       xAxisKey: "category",

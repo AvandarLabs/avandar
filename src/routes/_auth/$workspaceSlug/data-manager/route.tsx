@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { RouteMiddleware } from "@/util/RouteMiddleware";
+import { RouteMiddleware } from "@/utils/RouteMiddleware";
 import { DataManagerApp } from "@/views/DataManagerApp/DataManagerApp";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug/data-manager")({

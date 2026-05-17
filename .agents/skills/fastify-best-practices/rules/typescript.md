@@ -50,13 +50,12 @@ node app.ts
 Type your Fastify application:
 
 ```typescript
-import Fastify from "fastify";
-import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import Fastify, { type FastifyInstance, type FastifyRequest, type FastifyReply } from 'fastify';
 
 const app: FastifyInstance = Fastify({ logger: true });
 
-app.get("/health", async (request: FastifyRequest, reply: FastifyReply) => {
-  return { status: "ok" };
+app.get('/health', async (request: FastifyRequest, reply: FastifyReply) => {
+  return { status: 'ok' };
 });
 
 await app.listen({ port: 3000 });
@@ -67,7 +66,7 @@ await app.listen({ port: 3000 });
 Use generics to type request parts:
 
 ```typescript
-import type { FastifyReply, FastifyRequest } from "fastify";
+import type { FastifyRequest, FastifyReply } from 'fastify';
 
 interface CreateUserBody {
   name: string;
@@ -85,7 +84,7 @@ interface UserQuery {
 // Type the request with generics
 app.post<{
   Body: CreateUserBody;
-}>("/users", async (request, reply) => {
+}>('/users', async (request, reply) => {
   const { name, email } = request.body; // Fully typed
   return { name, email };
 });
@@ -93,9 +92,9 @@ app.post<{
 app.get<{
   Params: UserParams;
   Querystring: UserQuery;
-}>("/users/:id", async (request) => {
-  const { id } = request.params; // string
-  const { include } = request.query; // string | undefined
+}>('/users/:id', async (request) => {
+  const { id } = request.params;         // string
+  const { include } = request.query;      // string | undefined
   return { id, include };
 });
 
@@ -106,8 +105,8 @@ app.route<{
   Body: CreateUserBody;
   Reply: { user: { id: string; name: string } };
 }>({
-  method: "PUT",
-  url: "/users/:id",
+  method: 'PUT',
+  url: '/users/:id',
   handler: async (request, reply) => {
     return { user: { id: request.params.id, name: request.body.name } };
   },
@@ -119,41 +118,37 @@ app.route<{
 Use @fastify/type-provider-typebox for runtime + compile-time safety:
 
 ```typescript
-import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
-import { Type } from "@sinclair/typebox";
-import Fastify from "fastify";
+import Fastify from 'fastify';
+import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
+import { Type } from '@sinclair/typebox';
 
 const app = Fastify().withTypeProvider<TypeBoxTypeProvider>();
 
 const UserSchema = Type.Object({
   id: Type.String(),
   name: Type.String(),
-  email: Type.String({ format: "email" }),
+  email: Type.String({ format: 'email' }),
 });
 
 const CreateUserSchema = Type.Object({
   name: Type.String({ minLength: 1 }),
-  email: Type.String({ format: "email" }),
+  email: Type.String({ format: 'email' }),
 });
 
-app.post(
-  "/users",
-  {
-    schema: {
-      body: CreateUserSchema,
-      response: {
-        201: UserSchema,
-      },
+app.post('/users', {
+  schema: {
+    body: CreateUserSchema,
+    response: {
+      201: UserSchema,
     },
   },
-  async (request, reply) => {
-    // request.body is typed as { name: string; email: string }
-    const { name, email } = request.body;
+}, async (request, reply) => {
+  // request.body is typed as { name: string; email: string }
+  const { name, email } = request.body;
 
-    reply.code(201);
-    return { id: "generated", name, email };
-  },
-);
+  reply.code(201);
+  return { id: 'generated', name, email };
+});
 ```
 
 ## Typing Decorators
@@ -161,10 +156,10 @@ app.post(
 Extend Fastify types with declaration merging:
 
 ```typescript
-import Fastify from "fastify";
+import Fastify from 'fastify';
 
 // Declare types for decorators
-declare module "fastify" {
+declare module 'fastify' {
   interface FastifyInstance {
     config: {
       port: number;
@@ -190,20 +185,20 @@ declare module "fastify" {
 const app = Fastify();
 
 // Add decorators
-app.decorate("config", { port: 3000, host: "localhost" });
-app.decorate("db", new Database());
+app.decorate('config', { port: 3000, host: 'localhost' });
+app.decorate('db', new Database());
 
-app.decorateRequest("user", null);
-app.decorateRequest("startTime", 0);
+app.decorateRequest('user', null);
+app.decorateRequest('startTime', 0);
 
-app.decorateReply("sendSuccess", function (data: unknown) {
+app.decorateReply('sendSuccess', function (data: unknown) {
   this.send({ success: true, data });
 });
 
 // Now fully typed
-app.get("/profile", async (request, reply) => {
+app.get('/profile', async (request, reply) => {
   const user = request.user; // { id: string; email: string; role: string } | undefined
-  const config = app.config; // { port: number; host: string }
+  const config = app.config;  // { port: number; host: string }
 
   reply.sendSuccess({ user });
 });
@@ -214,15 +209,15 @@ app.get("/profile", async (request, reply) => {
 Type plugin options and exports:
 
 ```typescript
-import fp from "fastify-plugin";
-import type { FastifyPluginAsync } from "fastify";
+import fp from 'fastify-plugin';
+import type { FastifyPluginAsync } from 'fastify';
 
 interface DatabasePluginOptions {
   connectionString: string;
   poolSize?: number;
 }
 
-declare module "fastify" {
+declare module 'fastify' {
   interface FastifyInstance {
     db: {
       query: (sql: string, params?: unknown[]) => Promise<unknown[]>;
@@ -239,18 +234,18 @@ const databasePlugin: FastifyPluginAsync<DatabasePluginOptions> = async (
 
   const db = await createConnection(connectionString, poolSize);
 
-  fastify.decorate("db", {
+  fastify.decorate('db', {
     query: (sql: string, params?: unknown[]) => db.query(sql, params),
     close: () => db.end(),
   });
 
-  fastify.addHook("onClose", async () => {
+  fastify.addHook('onClose', async () => {
     await db.end();
   });
 };
 
 export default fp(databasePlugin, {
-  name: "database",
+  name: 'database',
 });
 ```
 
@@ -260,11 +255,11 @@ Type hook functions:
 
 ```typescript
 import type {
-  FastifyReply,
   FastifyRequest,
+  FastifyReply,
   onRequestHookHandler,
   preHandlerHookHandler,
-} from "fastify";
+} from 'fastify';
 
 const authHook: preHandlerHookHandler = async (
   request: FastifyRequest,
@@ -272,7 +267,7 @@ const authHook: preHandlerHookHandler = async (
 ) => {
   const token = request.headers.authorization;
   if (!token) {
-    reply.code(401).send({ error: "Unauthorized" });
+    reply.code(401).send({ error: 'Unauthorized' });
     return;
   }
   request.user = await verifyToken(token);
@@ -282,8 +277,8 @@ const timingHook: onRequestHookHandler = async (request) => {
   request.startTime = Date.now();
 };
 
-app.addHook("onRequest", timingHook);
-app.addHook("preHandler", authHook);
+app.addHook('onRequest', timingHook);
+app.addHook('preHandler', authHook);
 ```
 
 ## Typing Schema Objects
@@ -291,17 +286,17 @@ app.addHook("preHandler", authHook);
 Create reusable typed schemas:
 
 ```typescript
-import type { JSONSchema7 } from "json-schema";
+import type { JSONSchema7 } from 'json-schema';
 
 // Define schema with const assertion for type inference
 const userSchema = {
-  type: "object",
+  type: 'object',
   properties: {
-    id: { type: "string" },
-    name: { type: "string" },
-    email: { type: "string", format: "email" },
+    id: { type: 'string' },
+    name: { type: 'string' },
+    email: { type: 'string', format: 'email' },
   },
-  required: ["id", "name", "email"],
+  required: ['id', 'name', 'email'],
 } as const satisfies JSONSchema7;
 
 // Infer TypeScript type from schema
@@ -311,19 +306,15 @@ type User = {
   email: string;
 };
 
-app.get<{ Reply: User }>(
-  "/users/:id",
-  {
-    schema: {
-      response: {
-        200: userSchema,
-      },
+app.get<{ Reply: User }>('/users/:id', {
+  schema: {
+    response: {
+      200: userSchema,
     },
   },
-  async (request) => {
-    return { id: "1", name: "John", email: "john@example.com" };
-  },
-);
+}, async (request) => {
+  return { id: '1', name: 'John', email: 'john@example.com' };
+});
 ```
 
 ## Shared Types
@@ -331,16 +322,12 @@ app.get<{ Reply: User }>(
 Organize types in dedicated files:
 
 ```typescript
-// routes/users.ts
-import type { CreateUserInput, PaginationQuery, User } from "../types/index.js";
-import type { FastifyInstance } from "fastify";
-
 // types/index.ts
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: "admin" | "user";
+  role: 'admin' | 'user';
 }
 
 export interface CreateUserInput {
@@ -354,11 +341,15 @@ export interface PaginationQuery {
   sort?: string;
 }
 
+// routes/users.ts
+import type { FastifyInstance } from 'fastify';
+import type { User, CreateUserInput, PaginationQuery } from '../types/index.js';
+
 export default async function userRoutes(fastify: FastifyInstance) {
   fastify.get<{
     Querystring: PaginationQuery;
     Reply: { users: User[]; total: number };
-  }>("/", async (request) => {
+  }>('/', async (request) => {
     const { page = 1, limit = 10 } = request.query;
     // ...
   });
@@ -366,7 +357,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
   fastify.post<{
     Body: CreateUserInput;
     Reply: User;
-  }>("/", async (request, reply) => {
+  }>('/', async (request, reply) => {
     reply.code(201);
     // ...
   });
@@ -378,7 +369,7 @@ export default async function userRoutes(fastify: FastifyInstance) {
 Create typed route factories:
 
 ```typescript
-import type { FastifyInstance, RouteOptions } from "fastify";
+import type { FastifyInstance, RouteOptions } from 'fastify';
 
 function createCrudRoutes<T extends { id: string }>(
   fastify: FastifyInstance,
@@ -400,25 +391,17 @@ function createCrudRoutes<T extends { id: string }>(
 ) {
   const { prefix, schema, handlers } = options;
 
-  fastify.get(
-    `${prefix}`,
-    {
-      schema: { response: { 200: { type: "array", items: schema.item } } },
-    },
-    async () => handlers.list(),
-  );
+  fastify.get(`${prefix}`, {
+    schema: { response: { 200: { type: 'array', items: schema.item } } },
+  }, async () => handlers.list());
 
-  fastify.get(
-    `${prefix}/:id`,
-    {
-      schema: { response: { 200: schema.item } },
-    },
-    async (request) => {
-      const item = await handlers.get((request.params as { id: string }).id);
-      if (!item) throw { statusCode: 404, message: "Not found" };
-      return item;
-    },
-  );
+  fastify.get(`${prefix}/:id`, {
+    schema: { response: { 200: schema.item } },
+  }, async (request) => {
+    const item = await handlers.get((request.params as { id: string }).id);
+    if (!item) throw { statusCode: 404, message: 'Not found' };
+    return item;
+  });
 
   // ... more routes
 }
@@ -435,20 +418,16 @@ interface UserRequest {
   Body: { name: string };
 }
 
-app.put<UserRequest>("/users/:id", handler);
+app.put<UserRequest>('/users/:id', handler);
 
 // AVOID - overly complex generic types
-type DeepPartial<T> =
-  T extends object ?
-    {
-      [P in keyof T]?: DeepPartial<T[P]>;
-    }
-  : T;
+type DeepPartial<T> = T extends object ? {
+  [P in keyof T]?: DeepPartial<T[P]>;
+} : T;
 
 // AVOID - excessive type inference
-type InferSchemaType<T> =
-  T extends { properties: infer P } ?
-    { [K in keyof P]: InferPropertyType<P[K]> }
+type InferSchemaType<T> = T extends { properties: infer P }
+  ? { [K in keyof P]: InferPropertyType<P[K]> }
   : never;
 ```
 

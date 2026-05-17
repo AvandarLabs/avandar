@@ -1,3 +1,9 @@
 .root {
+  border: 1px solid var(--ava-border-default);
+  box-shadow: var(--mantine-shadow-xs);
+  transition: var(--ava-transition-interactive);
+}
+
+.root:hover {
   box-shadow: var(--mantine-shadow-sm);
 }

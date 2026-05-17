@@ -104,8 +104,8 @@ const soldOut = createProduct({}, "outOfStock");
 
 ```typescript
 // factories/order.factory.ts
-import { createProduct, Product } from "./product.factory";
 import { createUser, User } from "./user.factory";
+import { createProduct, Product } from "./product.factory";
 
 interface OrderItem {
   product: Product;
@@ -223,8 +223,8 @@ test("user profile", async ({ page }) => {
 
 ```typescript
 // fixtures/faker.fixture.ts
-import { faker } from "@faker-js/faker";
 import { test as base } from "@playwright/test";
+import { faker } from "@faker-js/faker";
 
 type FakerFixtures = {
   fake: typeof faker;
@@ -355,8 +355,8 @@ test.describe("search functionality", () => {
 ```typescript
 // fixtures/data.fixture.ts
 import { test as base } from "@playwright/test";
-import { createProduct, Product } from "../factories/product.factory";
 import { createUser, User } from "../factories/user.factory";
+import { createProduct, Product } from "../factories/product.factory";
 
 type DataFixtures = {
   testUser: User;
@@ -398,7 +398,7 @@ test("add product to cart", async ({ page, testUser, testProducts }) => {
 
 ```typescript
 // fixtures/seed.fixture.ts
-import { APIRequestContext, test as base } from "@playwright/test";
+import { test as base, APIRequestContext } from "@playwright/test";
 import { createUser } from "../factories/user.factory";
 
 type SeedFixtures = {

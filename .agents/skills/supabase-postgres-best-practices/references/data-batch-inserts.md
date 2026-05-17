@@ -13,22 +13,11 @@ Individual INSERT statements have high overhead. Batch multiple rows in single s
 
 ```sql
 -- Each insert is a separate transaction and round trip
-insert into
-  events (user_id, action)
-values
-  (1, 'click');
-
-insert into
-  events (user_id, action)
-values
-  (1, 'view');
-
-insert into
-  events (user_id, action)
-values
-  (2, 'click');
-
+insert into events (user_id, action) values (1, 'click');
+insert into events (user_id, action) values (1, 'view');
+insert into events (user_id, action) values (2, 'click');
 -- ... 1000 more individual inserts
+
 -- 1000 inserts = 1000 round trips = slow
 ```
 
@@ -36,9 +25,7 @@ values
 
 ```sql
 -- Multiple rows in single statement
-insert into
-  events (user_id, action)
-values
+insert into events (user_id, action) values
   (1, 'click'),
   (1, 'view'),
   (2, 'click'),

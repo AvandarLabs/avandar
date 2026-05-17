@@ -11,7 +11,13 @@
       "source": "AvandarLabs/avandar-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/avandar-ava-model-creation/SKILL.md",
-      "computedHash": "f0d7808bb61406d92f81d69e2e41a9fda877a4a6ea6e5c7d92ceea84141e6c64"
+      "computedHash": "25e4d25a9fc70487345bcef67f3ba84da11acc9fa79b7add981f609e6c078c24"
+    },
+    "avandar-code-review": {
+      "source": "AvandarLabs/avandar-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/avandar-code-review/SKILL.md",
+      "computedHash": "0a32aae750d227415087d26399f04870990231c43fd908bc0b4e73084b9c2ac0"
     },
     "brainstorming": {
       "source": "obra/superpowers",
@@ -71,7 +77,7 @@
       "source": "pbakaus/impeccable",
       "sourceType": "github",
       "skillPath": "skill/SKILL.md",
-      "computedHash": "8cdf2e788eaca3af7d02026ef9cec55b506100a00d130f938e3fb1ad669c0ad0"
+      "computedHash": "ada9c434d56c794352ccd5c7a6901e5ebb4b7f3b7fe42e8c17c2c4b96c3735c8"
     },
     "init": {
       "source": "mcollina/skills",
@@ -90,6 +96,18 @@
       "sourceType": "github",
       "skillPath": "skills/linting-neostandard-eslint9/SKILL.md",
       "computedHash": "752557ba728543623393c86a4190ce2f4dd712222c72c5d22796fb961a2567a3"
+    },
+    "mantine-combobox": {
+      "source": "mantinedev/skills",
+      "sourceType": "github",
+      "skillPath": "skills/mantine-combobox/SKILL.md",
+      "computedHash": "fb3002c7bb704a111b1f4c596573aa9905e1b8dd728ad15dbba8cdf7a53ed98a"
+    },
+    "mantine-custom-components": {
+      "source": "mantinedev/skills",
+      "sourceType": "github",
+      "skillPath": "skills/mantine-custom-components/SKILL.md",
+      "computedHash": "16f771d471da17b76a803ace40211177283ad3adcf319e8e3b4bd1a1ddeb74c1"
     },
     "node": {
       "source": "mcollina/skills",

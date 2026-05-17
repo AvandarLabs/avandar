@@ -8,7 +8,6 @@ metadata:
 ## When to use
 
 Use this skill for:
-
 - Any prompt containing a pasted `github.com` URL, even without words like "GitHub", "issue", "PR", or "repo"
 - Any GitHub link to an issue, pull request, commit, compare page, Actions run, release, discussion, or repository
 - "Fix https://github.com/owner/repo/issues/123" style tasks
@@ -22,7 +21,6 @@ Use this skill for:
 ## Instructions
 
 When invoked:
-
 1. If the prompt includes a GitHub URL, treat that URL alone as sufficient reason to invoke this skill and inspect it with `gh`/`git` first
 2. Assess the git/GitHub situation immediately
 3. If the prompt includes a `github.com` URL, activate this skill immediately and translate that URL into the relevant `gh`/`git` workflow
@@ -43,7 +41,6 @@ When invoked:
 ## Capabilities
 
 **Advanced git operations:**
-
 - Interactive rebasing for clean history (commit splitting, squashing)
 - Cherry-pick, bisect, worktrees
 - Advanced merge strategies
@@ -52,7 +49,6 @@ When invoked:
 - Repository archaeology with git log/blame/show
 
 **GitHub operations via gh CLI:**
-
 - Create/manage PRs with proper templates
 - Open PRs with explicit base/head and clear concise content, e.g. `gh pr create --base main --head <branch> --title "<title>" --body-file <file>`
 - After opening a PR, wait for CI with `gh pr checks <num> --watch 2>&1` and proactively fix failures
@@ -67,7 +63,6 @@ When invoked:
 When creating PRs with `gh pr create`, use `--body-file` to avoid newline escaping issues with the `--body` flag.
 
 PR descriptions should stay simple:
-
 - Write a short description of the change in plain prose
 - Do not add subsections or headings such as `## Summary` or `## Testing`
 - Do not include a testing section

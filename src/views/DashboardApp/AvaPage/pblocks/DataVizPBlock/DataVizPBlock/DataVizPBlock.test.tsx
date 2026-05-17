@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/common/AvandarUiProvider";
+import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { PuckContext } from "@puckeditor/core";
 import type { ReactElement } from "react";
@@ -30,7 +30,7 @@ vi.mock("@/views/DataExplorerApp/useDataQuery", () => {
   };
 });
 
-vi.mock("@/components/Visualization/VisualizationContainer", () => {
+vi.mock("@/components/VisualizationContainer/VisualizationContainer", () => {
   return {
     VisualizationContainer: (props: {
       columns: ReadonlyArray<{ name: string }>;
@@ -40,7 +40,11 @@ vi.mock("@/components/Visualization/VisualizationContainer", () => {
         <div
           data-testid="visualization-container"
           data-viz-type={props.vizConfig.vizType}
-          data-columns={props.columns.map((c) => {return c.name}).join(",")}
+          data-columns={props.columns
+            .map((c) => {
+              return c.name;
+            })
+            .join(",")}
         />
       );
     },
@@ -52,7 +56,9 @@ const TEST_WORKSPACE_ID = "00000000-0000-4000-8000-000000000002";
 
 function fakePuckContext(): PuckContext {
   return {
-    renderDropZone: () => {return null},
+    renderDropZone: () => {
+      return null;
+    },
     metadata: {
       auth: "workspace",
       workspaceId: TEST_WORKSPACE_ID,

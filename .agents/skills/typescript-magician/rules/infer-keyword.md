@@ -69,10 +69,10 @@ type Test3 = RemoveMaps<"other">; // "other" (no match, returns T)
 
 ```typescript
 // Parse route parameters
-type ParseRoute<T> =
-  T extends `${infer Start}:${infer Param}/${infer Rest}` ?
-    { start: Start; param: Param; rest: ParseRoute<Rest> }
-  : T extends `${infer Start}:${infer Param}` ? { start: Start; param: Param }
+type ParseRoute<T> = T extends `${infer Start}:${infer Param}/${infer Rest}`
+  ? { start: Start; param: Param; rest: ParseRoute<Rest> }
+  : T extends `${infer Start}:${infer Param}`
+  ? { start: Start; param: Param }
   : T;
 
 type Route = ParseRoute<"/users/:id/posts/:postId">;
@@ -114,8 +114,9 @@ type Test = MyParameters<(a: string, b: number) => void>;
 ### Extract First Parameter
 
 ```typescript
-type FirstArg<T> =
-  T extends (first: infer F, ...rest: any[]) => any ? F : never;
+type FirstArg<T> = T extends (first: infer F, ...rest: any[]) => any
+  ? F
+  : never;
 
 type Test = FirstArg<(name: string, age: number) => void>; // string
 ```
@@ -123,13 +124,12 @@ type Test = FirstArg<(name: string, age: number) => void>; // string
 ### Extract Constructor Parameters
 
 ```typescript
-type ConstructorParams<T> = T extends new (...args: infer P) => any ? P : never;
+type ConstructorParams<T> = T extends new (...args: infer P) => any
+  ? P
+  : never;
 
 class User {
-  constructor(
-    public name: string,
-    public age: number,
-  ) {}
+  constructor(public name: string, public age: number) {}
 }
 
 type UserParams = ConstructorParams<typeof User>; // [string, number]
@@ -141,8 +141,9 @@ You can use multiple `infer` captures:
 
 ```typescript
 // Extract key-value from "key=value" string
-type ParseKeyValue<T> =
-  T extends `${infer Key}=${infer Value}` ? { key: Key; value: Value } : never;
+type ParseKeyValue<T> = T extends `${infer Key}=${infer Value}`
+  ? { key: Key; value: Value }
+  : never;
 
 type Test = ParseKeyValue<"name=John">;
 // { key: "name"; value: "John" }
@@ -154,7 +155,9 @@ You can add constraints to inferred types:
 
 ```typescript
 // Only infer if it's a string
-type ExtractString<T> = T extends { value: infer V extends string } ? V : never;
+type ExtractString<T> = T extends { value: infer V extends string }
+  ? V
+  : never;
 
 type Test1 = ExtractString<{ value: "hello" }>; // "hello"
 type Test2 = ExtractString<{ value: 123 }>; // never
@@ -164,7 +167,9 @@ type Test2 = ExtractString<{ value: 123 }>; // never
 
 ```typescript
 // Deeply unwrap nested promises
-type DeepAwaited<T> = T extends Promise<infer U> ? DeepAwaited<U> : T;
+type DeepAwaited<T> = T extends Promise<infer U>
+  ? DeepAwaited<U>
+  : T;
 
 type Test = DeepAwaited<Promise<Promise<Promise<string>>>>; // string
 ```
@@ -188,10 +193,11 @@ type ClickEvent = EventHandler<Events["click"]>; // MouseEvent
 
 ```typescript
 type ExtractParams<T extends string> =
-  T extends `${string}:${infer Param}/${infer Rest}` ?
-    Param | ExtractParams<`/${Rest}`>
-  : T extends `${string}:${infer Param}` ? Param
-  : never;
+  T extends `${string}:${infer Param}/${infer Rest}`
+    ? Param | ExtractParams<`/${Rest}`>
+    : T extends `${string}:${infer Param}`
+    ? Param
+    : never;
 
 type Params = ExtractParams<"/users/:userId/posts/:postId">;
 // "userId" | "postId"
@@ -220,10 +226,12 @@ type Cleaned = RemoveMapsPrefixFromObj<ApiData>;
 ### Extract Generic Parameters
 
 ```typescript
-type ExtractGeneric<T> =
-  T extends Array<infer U> ? U
-  : T extends Map<infer K, infer V> ? { key: K; value: V }
-  : T extends Set<infer U> ? U
+type ExtractGeneric<T> = T extends Array<infer U>
+  ? U
+  : T extends Map<infer K, infer V>
+  ? { key: K; value: V }
+  : T extends Set<infer U>
+  ? U
   : never;
 
 type Test1 = ExtractGeneric<Array<string>>; // string

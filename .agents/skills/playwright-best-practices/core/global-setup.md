@@ -82,8 +82,8 @@ export default globalSetup;
 
 ```typescript
 // global-teardown.ts
-import fs from "fs";
 import { FullConfig } from "@playwright/test";
+import fs from "fs";
 
 async function globalTeardown(config: FullConfig) {
   console.log("Running global teardown...");
@@ -284,8 +284,8 @@ export default globalTeardown;
 
 ```typescript
 // global-setup.ts
-import path from "path";
 import dotenv from "dotenv";
+import path from "path";
 
 async function globalSetup() {
   // Load test-specific environment

@@ -15,7 +15,7 @@ function expandTabsForHTML(str: string): string {
  * button clicks, are working.
  */
 export function notifyDevAlert(...messages: unknown[]): void {
-  if (import.meta.env.DEV) {
+  if (import.meta.env?.DEV === true) {
     notifications.show({
       title: "Alert",
       message: (

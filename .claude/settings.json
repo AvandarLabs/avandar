@@ -1,0 +1,19 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && if [ ! -d node_modules ]; then corepack enable >/dev/null 2>&1 || true; pnpm install --frozen-lockfile; fi"
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/scripts/cloudBootstrapEnv.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}

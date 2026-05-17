@@ -1,11 +1,10 @@
 import { Box, BoxProps, Stack } from "@mantine/core";
-import { notifyError } from "@ui";
+import { notifyError, FileUploadForm  } from "@ui";
 import { MIMEType } from "@utils";
 import { uuid } from "$/lib/uuid";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useState } from "react";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
-import { FileUploadForm } from "@/lib/ui/singleton-forms/FileUploadForm";
 import {
   DatasetImportForm,
   ManualUploadDataSourceMetadata,

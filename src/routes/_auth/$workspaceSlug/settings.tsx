@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { WorkspaceSettingsPage } from "@/components/WorkspaceSettingsPage/WorkspaceSettingsPage";
-import { RouteMiddleware } from "@/util/RouteMiddleware";
+import { RouteMiddleware } from "@/utils/RouteMiddleware";
+import { WorkspaceSettingsPage } from "@/views/WorkspaceSettingsPage/WorkspaceSettingsPage";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug/settings")({
   beforeLoad: RouteMiddleware.BeforeLoad.checkUserPermissions({

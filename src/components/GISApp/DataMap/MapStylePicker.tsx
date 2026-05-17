@@ -2,15 +2,13 @@ import { useBoolean } from "@hooks";
 import { ActionIcon, Flex, Popover, Stack, Text } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import { IconPalette } from "@tabler/icons-react";
-import { Tooltip } from "@ui";
+import { Tooltip,
+  SegmentedControl,
+  SegmentedControlItem } from "@ui";
 import {
   MapStyleKey,
   MapStyleKeys,
 } from "@/components/GISApp/DataMap/mapStyles";
-import {
-  SegmentedControl,
-  SegmentedControlItem,
-} from "@/lib/ui/inputs/SegmentedControl";
 import { mantineColorVar, mantineVar } from "@/lib/utils/browser/css";
 
 type MapStyle = {

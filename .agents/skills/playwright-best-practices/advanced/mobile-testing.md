@@ -13,7 +13,7 @@
 ### Use Built-in Devices
 
 ```typescript
-import { devices, test } from "@playwright/test";
+import { test, devices } from "@playwright/test";
 
 // Configure in playwright.config.ts
 export default defineConfig({

@@ -69,13 +69,11 @@ For configure flags (debug builds, ASan, Ninja, etc.), see
 ### Rebuild After Errors
 
 If a build fails partway through:
-
 - Fix the error
 - Run `make -j$(nproc)` again — it picks up where it left off
 - Only recompiles changed files and their dependents
 
 If the build is completely broken:
-
 ```bash
 make clean          # Remove object files, keep config
 make -j$(nproc)     # Full rebuild
@@ -102,15 +100,15 @@ This runs all linters: JavaScript (ESLint), C++ (cpplint), Markdown
 
 ### Targeted Lint Commands
 
-| Target             | What it checks                                 |
-| ------------------ | ---------------------------------------------- |
-| `make lint`        | All linters                                    |
-| `make lint-js`     | JavaScript with ESLint                         |
-| `make lint-js-fix` | JavaScript with ESLint `--fix` (auto-corrects) |
-| `make lint-cpp`    | C++ with cpplint and checkimports              |
-| `make lint-md`     | Markdown with remark                           |
-| `make lint-py`     | Python with ruff                               |
-| `make lint-yaml`   | YAML with yamllint                             |
+| Target              | What it checks                                    |
+| ------------------- | ------------------------------------------------- |
+| `make lint`         | All linters                                        |
+| `make lint-js`      | JavaScript with ESLint                             |
+| `make lint-js-fix`  | JavaScript with ESLint `--fix` (auto-corrects)     |
+| `make lint-cpp`     | C++ with cpplint and checkimports                  |
+| `make lint-md`      | Markdown with remark                               |
+| `make lint-py`      | Python with ruff                                   |
+| `make lint-yaml`    | YAML with yamllint                                 |
 
 ### Formatting C++ Code
 
@@ -159,7 +157,6 @@ make test
 ```
 
 `make test` does the following in order:
-
 1. Builds node (`make all`)
 2. Runs Python tool tests (`make tooltest`)
 3. Builds addon test fixtures (addons, N-API, Node-API, SQLite)
@@ -211,31 +208,31 @@ python3 tools/test.py parallel sequential message
 
 ### Test Runner Options (`tools/test.py`)
 
-| Option                 | Default     | Purpose                                    |
-| ---------------------- | ----------- | ------------------------------------------ |
-| `-j N`                 | (all CPUs)  | Number of parallel test processes          |
-| `-m, --mode MODE`      | `release`   | `release`, `debug`, or `debug,release`     |
-| `-t, --timeout SECS`   | `120`       | Timeout per test                           |
-| `--shell PATH`         | auto-detect | Path to node binary                        |
-| `--node-args ARGS`     | (none)      | Extra args passed to node                  |
-| `--flaky-tests ACTION` | `run`       | `run`, `skip`, `dontcare`, `keep_retrying` |
-| `-v, --verbose`        | off         | Verbose output                             |
-| `--repeat N`           | `1`         | Repeat tests N times                       |
+| Option                 | Default     | Purpose                                           |
+| ---------------------- | ----------- | ------------------------------------------------- |
+| `-j N`                 | (all CPUs)  | Number of parallel test processes                  |
+| `-m, --mode MODE`      | `release`   | `release`, `debug`, or `debug,release`             |
+| `-t, --timeout SECS`   | `120`       | Timeout per test                                   |
+| `--shell PATH`         | auto-detect | Path to node binary                                |
+| `--node-args ARGS`     | (none)      | Extra args passed to node                          |
+| `--flaky-tests ACTION` | `run`       | `run`, `skip`, `dontcare`, `keep_retrying`         |
+| `-v, --verbose`        | off         | Verbose output                                     |
+| `--repeat N`           | `1`         | Repeat tests N times                               |
 
 ### Specialized Test Targets
 
-| Target               | Purpose                                   |
-| -------------------- | ----------------------------------------- |
-| `make jstest`        | JS test suites + native addon suites only |
-| `make cctest`        | C++ gtest suite only                      |
-| `make test-ci`       | CI mode (JUnit XML + TAP output)          |
-| `make test-internet` | Tests requiring network access            |
-| `make test-valgrind` | Run tests under Valgrind                  |
-| `make test-addons`   | Native addon tests                        |
-| `make test-node-api` | Node-API tests                            |
-| `make test-wpt`      | Web Platform Tests                        |
-| `make test-v8`       | V8 test suite                             |
-| `make test-doc`      | Documentation tests + Markdown lint       |
+| Target                  | Purpose                                          |
+| ----------------------- | ------------------------------------------------ |
+| `make jstest`           | JS test suites + native addon suites only        |
+| `make cctest`           | C++ gtest suite only                             |
+| `make test-ci`          | CI mode (JUnit XML + TAP output)                 |
+| `make test-internet`    | Tests requiring network access                   |
+| `make test-valgrind`    | Run tests under Valgrind                         |
+| `make test-addons`      | Native addon tests                               |
+| `make test-node-api`    | Node-API tests                                   |
+| `make test-wpt`         | Web Platform Tests                               |
+| `make test-v8`          | V8 test suite                                    |
+| `make test-doc`         | Documentation tests + Markdown lint              |
 
 ### Filtering C++ Tests
 
