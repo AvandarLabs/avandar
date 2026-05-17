@@ -109,3 +109,9 @@ Implement functionality using red/green TDD.
 - Prefer deleting or reverting only rows that test inserted or changed
   (track ids or booleans) instead of broad resets that could harm unrelated
   developer data.
+
+## Browser usage with Playwright
+
+- If you need to control the browser, use the Playwright MCP.
+- Take screenshots to refer to. Store them in the `.playwright-mcp` directory
+  which is gitignored so we don't commit by accident.
