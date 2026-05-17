@@ -91,6 +91,14 @@ Implement functionality using red/green TDD.
 
 ## End-to-end tests
 
+- E2E tests must exercise the user-facing flow through the UI. Never bypass
+  the feature under test by calling the database, RPCs, or service-role
+  helpers directly. The whole point of an e2e test is to mimic the user
+  experience as closely as possible: clicks, form fills, navigations.
+- The only allowed direct-DB calls are for pre-test setup that exists purely
+  to save time (provisioning the initial workspace, seeding the auth user,
+  Polar subscription rows, etc.). If the thing the test is asserting against
+  could fail in a real browser session, it must be driven through the UI.
 - When a test mutates the database (roles, memberships, workspace fields,
   seeded users, etc.), it must restore prior state in `finally`, `afterEach`,
   or dedicated fixtures.
