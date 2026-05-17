@@ -1,10 +1,10 @@
-drop policy "Members can select resource_user_group_tags" on "public"."resource_user_group_tags";
+drop policy if exists "Members can select resource_user_group_tags" on "public"."resource_user_group_tags";
 
-drop policy "Resource admins can delete resource_user_group_tags" on "public"."resource_user_group_tags";
+drop policy if exists "Resource admins can delete resource_user_group_tags" on "public"."resource_user_group_tags";
 
-drop policy "Resource admins can insert resource_user_group_tags" on "public"."resource_user_group_tags";
+drop policy if exists "Resource admins can insert resource_user_group_tags" on "public"."resource_user_group_tags";
 
-drop policy "Resource admins can update resource_user_group_tags" on "public"."resource_user_group_tags";
+drop policy if exists "Resource admins can update resource_user_group_tags" on "public"."resource_user_group_tags";
 
 revoke delete on table "public"."resource_user_group_tags" from "anon";
 
@@ -48,13 +48,13 @@ revoke truncate on table "public"."resource_user_group_tags" from "service_role"
 
 revoke update on table "public"."resource_user_group_tags" from "service_role";
 
-alter table "public"."resource_user_group_tags" drop constraint "resource_user_group_tags__resource_tag";
+alter table "public"."resource_user_group_tags" drop constraint if exists "resource_user_group_tags__resource_tag";
 
-alter table "public"."resource_user_group_tags" drop constraint "resource_user_group_tags_user_group_id_fkey";
+alter table "public"."resource_user_group_tags" drop constraint if exists "resource_user_group_tags_user_group_id_fkey";
 
-alter table "public"."resource_user_group_tags" drop constraint "resource_user_group_tags_workspace_id_fkey";
+alter table "public"."resource_user_group_tags" drop constraint if exists "resource_user_group_tags_workspace_id_fkey";
 
-alter table "public"."resource_user_group_tags" drop constraint "resource_user_group_tags_pkey";
+alter table "public"."resource_user_group_tags" drop constraint if exists "resource_user_group_tags_pkey";
 
 drop index if exists "public"."idx_resource_user_group_tags__resource";
 
@@ -62,7 +62,7 @@ drop index if exists "public"."resource_user_group_tags__resource_tag";
 
 drop index if exists "public"."resource_user_group_tags_pkey";
 
-drop table "public"."resource_user_group_tags";
+drop table if exists "public"."resource_user_group_tags";
 
 set check_function_bodies = off;
 
