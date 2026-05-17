@@ -146,6 +146,10 @@ begin
             ugm.user_group_id = rs.principal_id and
             ugm.user_id = v_uid and
             ug.workspace_id = v_workspace_id
+        ) and
+        (
+          rs.requires_app_access = false or
+          public.util__get_auth_user_app_role (v_workspace_id, v_app) is not null
         )
       )
     );
@@ -412,6 +416,13 @@ begin
             where
               ugm.user_group_id = rs.principal_id and
               ugm.user_id = v_uid
+          ) and
+          (
+            rs.requires_app_access = false or
+            public.util__get_auth_user_app_role (
+              v_ws,
+              'data_sources'::public.app_type
+            ) is not null
           )
         )
       )
@@ -542,6 +553,13 @@ begin
             where
               ugm.user_group_id = rs.principal_id and
               ugm.user_id = v_uid
+          ) and
+          (
+            rs.requires_app_access = false or
+            public.util__get_auth_user_app_role (
+              v_ws,
+              'dashboards'::public.app_type
+            ) is not null
           )
         )
       )

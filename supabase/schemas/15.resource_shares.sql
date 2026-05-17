@@ -13,6 +13,7 @@ create table public.resource_shares (
   role public.role_level not null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
+  requires_app_access boolean not null default false,
   constraint resource_shares__principal_shape check (
     (
       principal_type = 'user'::public.share_principal_type and
@@ -26,6 +27,10 @@ create table public.resource_shares (
       principal_type = 'workspace'::public.share_principal_type and
       principal_id is null
     )
+  ),
+  constraint resource_shares__requires_app_access_only_for_groups check (
+    requires_app_access = false or
+    principal_type = 'user_group'::public.share_principal_type
   )
 );
 

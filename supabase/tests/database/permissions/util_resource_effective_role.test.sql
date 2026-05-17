@@ -281,7 +281,168 @@ values (
   '90000002-0000-4000-8000-000000000002'::uuid
 );
 
-select plan(11);
+-- Fixture for requires_app_access truth table (cases 12-17). bob is the
+-- subject; we vary bob's dashboards app role and his membership in the
+-- Analytics user_group between cases.
+insert into public.user_groups (id, workspace_id, name, color)
+values (
+  '90004002-0000-4000-8000-000000000002'::uuid,
+  '90001001-0000-4000-8000-000000000001'::uuid,
+  'Analytics',
+  '#00ff00'
+);
+
+insert into public.user_group_memberships (user_group_id, user_id)
+values (
+  '90004002-0000-4000-8000-000000000002'::uuid,
+  '90000003-0000-4000-8000-000000000003'::uuid
+);
+
+-- Six dashboards mirroring cases 12-17. The "no resource tags" requirement
+-- for case 16 means we leave resource_user_group_tags empty for these rows
+-- (so the existing tag-intersection branch defers to "no tag filter").
+insert into public.dashboards (
+  id,
+  workspace_id,
+  owner_id,
+  owner_profile_id,
+  name,
+  config,
+  is_restricted
+)
+values
+  -- 12: group share editor + requires_app_access=false, unrestricted.
+  (
+    '90005012-0000-4000-8000-000000000012'::uuid,
+    '90001001-0000-4000-8000-000000000001'::uuid,
+    '90000001-0000-4000-8000-000000000001'::uuid,
+    '90003001-0000-4000-8000-000000000001'::uuid,
+    't12 raa=false no app role',
+    '{}'::jsonb,
+    true
+  ),
+  -- 13: group share editor + requires_app_access=true, member no app role.
+  (
+    '90005013-0000-4000-8000-000000000013'::uuid,
+    '90001001-0000-4000-8000-000000000001'::uuid,
+    '90000001-0000-4000-8000-000000000001'::uuid,
+    '90003001-0000-4000-8000-000000000001'::uuid,
+    't13 raa=true no app role',
+    '{}'::jsonb,
+    true
+  ),
+  -- 14: group share editor + requires_app_access=true, member dashboards
+  -- viewer. Restricted so the only candidate is the share itself.
+  (
+    '90005014-0000-4000-8000-000000000014'::uuid,
+    '90001001-0000-4000-8000-000000000001'::uuid,
+    '90000001-0000-4000-8000-000000000001'::uuid,
+    '90003001-0000-4000-8000-000000000001'::uuid,
+    't14 raa=true viewer app role restricted',
+    '{}'::jsonb,
+    true
+  ),
+  -- 15: group share editor + requires_app_access=true, member dashboards
+  -- admin, restricted (so the admin app-role candidate is suppressed and the
+  -- share is the only contributor).
+  (
+    '90005015-0000-4000-8000-000000000015'::uuid,
+    '90001001-0000-4000-8000-000000000001'::uuid,
+    '90000001-0000-4000-8000-000000000001'::uuid,
+    '90003001-0000-4000-8000-000000000001'::uuid,
+    't15 raa=true admin app role restricted',
+    '{}'::jsonb,
+    true
+  ),
+  -- 16: same as 15 but UNRESTRICTED with no resource tags. The unrestricted
+  -- app-role candidate (admin) participates in max alongside the editor
+  -- share, so the answer is admin.
+  (
+    '90005016-0000-4000-8000-000000000016'::uuid,
+    '90001001-0000-4000-8000-000000000001'::uuid,
+    '90000001-0000-4000-8000-000000000001'::uuid,
+    '90003001-0000-4000-8000-000000000001'::uuid,
+    't16 raa=true admin app role unrestricted',
+    '{}'::jsonb,
+    false
+  ),
+  -- 17: group share editor + requires_app_access=true, member NOT in group.
+  (
+    '90005017-0000-4000-8000-000000000017'::uuid,
+    '90001001-0000-4000-8000-000000000001'::uuid,
+    '90000001-0000-4000-8000-000000000001'::uuid,
+    '90003001-0000-4000-8000-000000000001'::uuid,
+    't17 raa=true not in group',
+    '{}'::jsonb,
+    true
+  );
+
+insert into public.resource_shares (
+  workspace_id,
+  resource_type,
+  resource_id,
+  principal_type,
+  principal_id,
+  role,
+  requires_app_access
+)
+values
+  (
+    '90001001-0000-4000-8000-000000000001'::uuid,
+    'dashboard'::public.resource_type,
+    '90005012-0000-4000-8000-000000000012'::uuid,
+    'user_group'::public.share_principal_type,
+    '90004002-0000-4000-8000-000000000002'::uuid,
+    'editor'::public.role_level,
+    false
+  ),
+  (
+    '90001001-0000-4000-8000-000000000001'::uuid,
+    'dashboard'::public.resource_type,
+    '90005013-0000-4000-8000-000000000013'::uuid,
+    'user_group'::public.share_principal_type,
+    '90004002-0000-4000-8000-000000000002'::uuid,
+    'editor'::public.role_level,
+    true
+  ),
+  (
+    '90001001-0000-4000-8000-000000000001'::uuid,
+    'dashboard'::public.resource_type,
+    '90005014-0000-4000-8000-000000000014'::uuid,
+    'user_group'::public.share_principal_type,
+    '90004002-0000-4000-8000-000000000002'::uuid,
+    'editor'::public.role_level,
+    true
+  ),
+  (
+    '90001001-0000-4000-8000-000000000001'::uuid,
+    'dashboard'::public.resource_type,
+    '90005015-0000-4000-8000-000000000015'::uuid,
+    'user_group'::public.share_principal_type,
+    '90004002-0000-4000-8000-000000000002'::uuid,
+    'editor'::public.role_level,
+    true
+  ),
+  (
+    '90001001-0000-4000-8000-000000000001'::uuid,
+    'dashboard'::public.resource_type,
+    '90005016-0000-4000-8000-000000000016'::uuid,
+    'user_group'::public.share_principal_type,
+    '90004002-0000-4000-8000-000000000002'::uuid,
+    'editor'::public.role_level,
+    true
+  ),
+  (
+    '90001001-0000-4000-8000-000000000001'::uuid,
+    'dashboard'::public.resource_type,
+    '90005017-0000-4000-8000-000000000017'::uuid,
+    'user_group'::public.share_principal_type,
+    '90004002-0000-4000-8000-000000000002'::uuid,
+    'editor'::public.role_level,
+    true
+  );
+
+select plan(17);
 
 -- 1 Owner
 set local role authenticated;
@@ -853,6 +1014,248 @@ select is(
   ),
   null::public.role_level,
   'outsider ignored workspace-wide share without membership'
+);
+
+-- requires_app_access truth table cases (subject: bob, in Analytics group).
+-- bob was untouched by tests 1-11 so he is still Global Viewer (dashboards:
+-- viewer). Cases below move bob between custom role groups to drive the
+-- truth table.
+
+-- 12 user_group editor share, requires_app_access=false, bob has no
+-- dashboards app role. Swap bob to a role group with no dashboards entry.
+set local role postgres;
+
+insert into public.role_groups (
+  id,
+  workspace_id,
+  name,
+  is_builtin
+) values (
+  '9000cf0c-0000-4000-8000-00000000000c'::uuid,
+  '90001001-0000-4000-8000-000000000001'::uuid,
+  'util_eff_t12_no_dashboards',
+  false
+);
+
+insert into public.role_group_app_roles (
+  role_group_id,
+  app,
+  role
+) values
+  (
+    '9000cf0c-0000-4000-8000-00000000000c'::uuid,
+    'settings'::public.app_type,
+    'viewer'::public.role_level
+  ),
+  (
+    '9000cf0c-0000-4000-8000-00000000000c'::uuid,
+    'data_sources'::public.app_type,
+    'viewer'::public.role_level
+  ),
+  (
+    '9000cf0c-0000-4000-8000-00000000000c'::uuid,
+    'data_explorer'::public.app_type,
+    'viewer'::public.role_level
+  );
+
+update public.workspace_memberships
+set
+  role_group_id = '9000cf0c-0000-4000-8000-00000000000c'::uuid
+where
+  id = '90002003-0000-4000-8000-000000000003'::uuid;
+
+set local role authenticated;
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"90000003-0000-4000-8000-000000000003"}',
+  true
+);
+
+select is(
+  public.util__resource_effective_role (
+    'dashboard'::public.resource_type,
+    '90005012-0000-4000-8000-000000000012'::uuid
+  )::text,
+  'editor'::text,
+  'requires_app_access=false grants share role without app role'
+);
+
+-- 13 user_group editor share, requires_app_access=true, bob has no app role.
+select is(
+  public.util__resource_effective_role (
+    'dashboard'::public.resource_type,
+    '90005013-0000-4000-8000-000000000013'::uuid
+  ),
+  null::public.role_level,
+  'requires_app_access=true blocks share when member has no app role'
+);
+
+-- 14 user_group editor share, requires_app_access=true, bob is dashboards
+-- viewer. Resource is restricted so the only candidate is the share itself.
+set local role postgres;
+
+insert into public.role_groups (
+  id,
+  workspace_id,
+  name,
+  is_builtin
+) values (
+  '9000cf0e-0000-4000-8000-00000000000e'::uuid,
+  '90001001-0000-4000-8000-000000000001'::uuid,
+  'util_eff_t14_dashboards_viewer',
+  false
+);
+
+insert into public.role_group_app_roles (
+  role_group_id,
+  app,
+  role
+) values
+  (
+    '9000cf0e-0000-4000-8000-00000000000e'::uuid,
+    'dashboards'::public.app_type,
+    'viewer'::public.role_level
+  ),
+  (
+    '9000cf0e-0000-4000-8000-00000000000e'::uuid,
+    'settings'::public.app_type,
+    'viewer'::public.role_level
+  ),
+  (
+    '9000cf0e-0000-4000-8000-00000000000e'::uuid,
+    'data_sources'::public.app_type,
+    'viewer'::public.role_level
+  ),
+  (
+    '9000cf0e-0000-4000-8000-00000000000e'::uuid,
+    'data_explorer'::public.app_type,
+    'viewer'::public.role_level
+  );
+
+update public.workspace_memberships
+set
+  role_group_id = '9000cf0e-0000-4000-8000-00000000000e'::uuid
+where
+  id = '90002003-0000-4000-8000-000000000003'::uuid;
+
+set local role authenticated;
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"90000003-0000-4000-8000-000000000003"}',
+  true
+);
+
+select is(
+  public.util__resource_effective_role (
+    'dashboard'::public.resource_type,
+    '90005014-0000-4000-8000-000000000014'::uuid
+  )::text,
+  'editor'::text,
+  'requires_app_access=true with viewer app role yields share role (restricted)'
+);
+
+-- 15 user_group editor share, requires_app_access=true, bob is dashboards
+-- admin, resource restricted: app-role candidate is suppressed, share wins.
+set local role postgres;
+
+insert into public.role_groups (
+  id,
+  workspace_id,
+  name,
+  is_builtin
+) values (
+  '9000cf0f-0000-4000-8000-00000000000f'::uuid,
+  '90001001-0000-4000-8000-000000000001'::uuid,
+  'util_eff_t15_dashboards_admin',
+  false
+);
+
+insert into public.role_group_app_roles (
+  role_group_id,
+  app,
+  role
+) values
+  (
+    '9000cf0f-0000-4000-8000-00000000000f'::uuid,
+    'dashboards'::public.app_type,
+    'admin'::public.role_level
+  ),
+  (
+    '9000cf0f-0000-4000-8000-00000000000f'::uuid,
+    'settings'::public.app_type,
+    'viewer'::public.role_level
+  ),
+  (
+    '9000cf0f-0000-4000-8000-00000000000f'::uuid,
+    'data_sources'::public.app_type,
+    'viewer'::public.role_level
+  ),
+  (
+    '9000cf0f-0000-4000-8000-00000000000f'::uuid,
+    'data_explorer'::public.app_type,
+    'viewer'::public.role_level
+  );
+
+update public.workspace_memberships
+set
+  role_group_id = '9000cf0f-0000-4000-8000-00000000000f'::uuid
+where
+  id = '90002003-0000-4000-8000-000000000003'::uuid;
+
+set local role authenticated;
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"90000003-0000-4000-8000-000000000003"}',
+  true
+);
+
+select is(
+  public.util__resource_effective_role (
+    'dashboard'::public.resource_type,
+    '90005015-0000-4000-8000-000000000015'::uuid
+  )::text,
+  'editor'::text,
+  'requires_app_access=true with admin app role on restricted yields share role'
+);
+
+-- 16 Same as 15 but resource is unrestricted with no tags. Now the admin
+-- app-role candidate participates in max alongside the editor share.
+select is(
+  public.util__resource_effective_role (
+    'dashboard'::public.resource_type,
+    '90005016-0000-4000-8000-000000000016'::uuid
+  )::text,
+  'admin'::text,
+  'unrestricted resource lets admin app role beat editor share'
+);
+
+-- 17 user_group editor share, requires_app_access=true, but bob is not in
+-- the Analytics group anymore -> share branch does not fire.
+set local role postgres;
+
+delete from public.user_group_memberships
+where
+  user_group_id = '90004002-0000-4000-8000-000000000002'::uuid and
+  user_id = '90000003-0000-4000-8000-000000000003'::uuid;
+
+set local role authenticated;
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"90000003-0000-4000-8000-000000000003"}',
+  true
+);
+
+select is(
+  public.util__resource_effective_role (
+    'dashboard'::public.resource_type,
+    '90005017-0000-4000-8000-000000000017'::uuid
+  ),
+  null::public.role_level,
+  'requires_app_access=true share with non-member yields null'
 );
 
 select * from finish();
