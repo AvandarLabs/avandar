@@ -3,7 +3,10 @@ import type { EmptyObject } from "type-fest";
 export type UUID<B extends string = never> =
   [B] extends [never] ? Brand<string, "UUID"> : Brand<string, `${B}UUID`>;
 
+export type ReadonlyRecord<K extends PropertyKey, V> = Readonly<Record<K, V>>;
+
 export type UnknownObject = Record<PropertyKey, unknown>;
+
 export type UnknownArray = readonly unknown[];
 
 // re-export type-fest's EmptyObject as it is
