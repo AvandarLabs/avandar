@@ -10,6 +10,10 @@
           },
           {
             "type": "command",
+            "command": "if ! command -v ngrok >/dev/null 2>&1; then if command -v brew >/dev/null 2>&1; then brew install ngrok >/dev/null 2>&1 || brew install --cask ngrok >/dev/null 2>&1; else echo 'ngrok not installed and brew not available' >&2; fi; fi"
+          },
+          {
+            "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR/scripts/cloudBootstrapEnv.sh\""
           }
         ]
