@@ -1,7 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { pickMantineSelectOption } from "@/test-utils/pickMantineSelectOption";
 import { VizConfigPField } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
@@ -107,18 +108,7 @@ describe("VizConfigPField", () => {
         withLegend: true,
       },
     });
-    const xInput = screen.getByRole("combobox", { name: /X Axis/i });
-    fireEvent.click(xInput);
-    fireEvent.focus(xInput);
-    const dropdown = Array.from(
-      document.querySelectorAll<HTMLElement>(".mantine-Select-dropdown"),
-    ).find((d) => {
-      return d.style.display !== "none";
-    });
-    expect(dropdown).toBeTruthy();
-    const option = dropdown!.querySelector('[role="option"][value="category"]');
-    expect(option).toBeTruthy();
-    fireEvent.click(option as Element);
+    pickMantineSelectOption(/X Axis/i, "category");
     expect(onChange).toHaveBeenCalledWith({
       vizType: "bar",
       xAxisKey: "category",
