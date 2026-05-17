@@ -22,6 +22,7 @@ export type ResourceShareRow = {
   principalType: SharePrincipalType;
   principalId: string | null;
   role: RoleLevel;
+  requiresAppAccess: boolean;
 };
 
 export type ResourceSharingState = {
@@ -38,6 +39,7 @@ function _mapResourceShareRow(row: {
   principal_type: SharePrincipalType;
   principal_id: string | null;
   role: RoleLevel;
+  requires_app_access: boolean;
 }): ResourceShareRow {
   return {
     id: row.id,
@@ -47,6 +49,7 @@ function _mapResourceShareRow(row: {
     principalType: row.principal_type,
     principalId: row.principal_id,
     role: row.role,
+    requiresAppAccess: row.requires_app_access,
   };
 }
 
@@ -98,7 +101,8 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
                   resource_id,
                   principal_type,
                   principal_id,
-                  role
+                  role,
+                  requires_app_access
                 `,
               )
               .eq("workspace_id", options.workspaceId)
@@ -133,9 +137,19 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
           principalType: SharePrincipalType;
           principalId: string | null;
           role: RoleLevel;
+          requiresAppAccess?: boolean;
         }): Promise<ResourceShareRow> => {
           const logger = baseLogger.appendName("upsertResourceShare");
           logger.log("upsert share", options);
+
+          if (
+            options.requiresAppAccess === true &&
+            options.principalType !== "user_group"
+          ) {
+            throw new Error(
+              "requiresAppAccess applies only to user_group shares.",
+            );
+          }
 
           let existingQuery = dbClient
             .from("resource_shares")
@@ -160,9 +174,16 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
 
           if (options.principalType === "workspace") {
             if (existing?.id) {
+              const updatePayload: {
+                role?: RoleLevel;
+                requires_app_access?: boolean;
+              } = { role: options.role };
+              if (options.requiresAppAccess !== undefined) {
+                updatePayload.requires_app_access = options.requiresAppAccess;
+              }
               const { data } = await dbClient
                 .from("resource_shares")
-                .update({ role: options.role })
+                .update(updatePayload)
                 .eq("id", existing.id)
                 .select(
                   `
@@ -172,7 +193,8 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
                   resource_id,
                   principal_type,
                   principal_id,
-                  role
+                  role,
+                  requires_app_access
                 `,
                 )
                 .single()
@@ -189,6 +211,7 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
                 principal_type: "workspace",
                 principal_id: null,
                 role: options.role,
+                requires_app_access: options.requiresAppAccess ?? false,
               })
               .select(
                 `
@@ -198,7 +221,8 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
                 resource_id,
                 principal_type,
                 principal_id,
-                role
+                role,
+                requires_app_access
               `,
               )
               .single()
@@ -211,12 +235,20 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
           }
 
           if (existing?.id) {
+            const updatePayload: {
+              role?: RoleLevel;
+              principal_id?: string;
+              requires_app_access?: boolean;
+            } = {
+              role: options.role,
+              principal_id: options.principalId,
+            };
+            if (options.requiresAppAccess !== undefined) {
+              updatePayload.requires_app_access = options.requiresAppAccess;
+            }
             const { data } = await dbClient
               .from("resource_shares")
-              .update({
-                role: options.role,
-                principal_id: options.principalId,
-              })
+              .update(updatePayload)
               .eq("id", existing.id)
               .select(
                 `
@@ -226,7 +258,8 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
                 resource_id,
                 principal_type,
                 principal_id,
-                role
+                role,
+                requires_app_access
               `,
               )
               .single()
@@ -243,6 +276,7 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
               principal_type: options.principalType,
               principal_id: options.principalId,
               role: options.role,
+              requires_app_access: options.requiresAppAccess ?? false,
             })
             .select(
               `
@@ -252,7 +286,8 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
               resource_id,
               principal_type,
               principal_id,
-              role
+              role,
+              requires_app_access
             `,
             )
             .single()
