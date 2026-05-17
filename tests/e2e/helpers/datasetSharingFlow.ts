@@ -2,8 +2,17 @@ import { expect } from "@playwright/test";
 import { CALIFORNIA_CSV_PATH } from "./constants";
 import { ensureCloudStorageCheckedAndSaveDataset } from "./manualUploadCloudSyncFlow";
 import { LONG_WAIT, MEDIUM_WAIT } from "./timeouts";
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
+
+/**
+ * Mantine renders the v2 share modal inside a `role="dialog"` element
+ * labelled by its title ("Share"). Scoping interactions to the dialog
+ * avoids ambiguity with the page-level Share button outside the modal.
+ */
+function shareDialog(page: Page): Locator {
+  return page.getByRole("dialog", { name: "Share" });
+}
 
 /**
  * Uploads the California CSV sample, sets the dataset name, saves, and returns
@@ -50,55 +59,57 @@ export async function uploadCaliforniaCsvDataset(options: {
 }
 
 /**
- * Opens the Share modal from the dataset metadata page.
+ * Opens the v2 Share modal from the dataset metadata page. Waits for the
+ * Drive-style "Add people, groups, or tags" combobox to appear, which is
+ * the most stable v2-only anchor.
  */
 export async function openDatasetShareModal(page: Page): Promise<void> {
   const shareButton = page.getByRole("button", { name: "Share" });
   await expect(shareButton).toBeEnabled({ timeout: LONG_WAIT });
   await shareButton.click();
-  await expect(page.getByText("Workspace access")).toBeVisible({
-    timeout: LONG_WAIT,
-  });
+  await expect(
+    shareDialog(page).getByRole("combobox", {
+      name: "Add people, groups, or tags",
+    }),
+  ).toBeVisible({ timeout: LONG_WAIT });
 }
 
 /**
- * Sets the restricted-access switch on the share modal.
+ * Picks "Restricted" or "Anyone in Data Sources" on the v2 General access
+ * dropdown. The boolean argument matches the v1 helper signature so the
+ * legacy `dataset-sharing.spec.ts` specs can keep calling it unchanged.
  */
 export async function setShareModalRestricted(
   page: Page,
   isRestricted: boolean,
 ): Promise<void> {
-  const restrictSwitch = page.getByRole("switch", {
-    name: /Restrict access/i,
+  const select = shareDialog(page).getByRole("combobox", {
+    name: "General access",
   });
-  const isChecked = await restrictSwitch.isChecked();
-  if (isChecked !== isRestricted) {
-    await restrictSwitch.click();
+  await select.click();
+  if (isRestricted) {
+    await page.getByRole("option", { name: "Restricted" }).click();
+  } else {
+    await page.getByRole("option", { name: /^Anyone in/ }).click();
   }
 }
 
 /**
- * Clears workspace-wide access on the share modal when a workspace role is set.
+ * No-op shim: the v2 General-access dropdown collapses "no workspace share"
+ * and "restricted" into the same option, so once `setShareModalRestricted`
+ * has flipped to Restricted there is no separate workspace-role clear to
+ * perform. Kept so legacy specs can keep their existing call sequence.
  */
-export async function clearWorkspaceWideShareAccess(page: Page): Promise<void> {
-  const workspaceRoleSelect = page.getByRole("combobox", {
-    name: "Role for everyone in the workspace",
-  });
-  const clearButton = workspaceRoleSelect
-    .locator("xpath=ancestor::div[contains(@class, 'mantine-Input-wrapper')]")
-    .getByRole("button")
-    .first();
-  if (
-    await clearButton.isVisible().catch(() => {
-      return false;
-    })
-  ) {
-    await clearButton.click();
-  }
+export async function clearWorkspaceWideShareAccess(
+  _page: Page,
+): Promise<void> {
+  return;
 }
 
 /**
- * Adds a direct share row for a workspace member or tag label.
+ * Adds a direct share row for a workspace member or user-group label using
+ * the v2 unified Add combobox. Picks the matching option, sets the role on
+ * the inline `Role for new share` select, then clicks `Share`.
  */
 export async function addDirectShareInModal(options: {
   page: Page;
@@ -106,45 +117,51 @@ export async function addDirectShareInModal(options: {
   role?: RoleLevel;
 }): Promise<void> {
   const { page, principalLabel, role = "viewer" } = options;
+  const dialog = shareDialog(page);
 
-  const addTargetSelect = page.getByRole("combobox", {
-    name: "Add member or tag",
+  const addCombobox = dialog.getByRole("combobox", {
+    name: "Add people, groups, or tags",
   });
-  await addTargetSelect.click();
+  await addCombobox.click();
+  await addCombobox.fill(principalLabel);
   await page.getByRole("option", { name: principalLabel }).click();
 
-  const roleSelect = page.getByRole("combobox", { name: "Role", exact: true });
-  await roleSelect.click();
-  await page
-    .getByRole("option", { name: new RegExp(`^${role}$`, "i") })
-    .click();
+  if (role !== "viewer") {
+    const roleSelect = dialog.getByRole("combobox", {
+      name: "Role for new share",
+    });
+    await roleSelect.click();
+    await page
+      .getByRole("option", { name: new RegExp(`^${role}$`, "i") })
+      .click();
+  }
 
-  await page.getByRole("button", { name: "Add", exact: true }).click();
+  await dialog.getByRole("button", { name: "Share", exact: true }).click();
 
-  await expect(page.getByText(principalLabel).first()).toBeVisible({
-    timeout: MEDIUM_WAIT,
-  });
+  await expect(
+    dialog.getByRole("combobox", { name: `Role for ${principalLabel}` }),
+  ).toBeVisible({ timeout: MEDIUM_WAIT });
 }
 
 /**
- * Closes the share modal via Done.
+ * Closes the v2 share modal via the Done button and waits for the unified
+ * Add combobox to be gone before returning.
  */
 export async function closeShareModal(page: Page): Promise<void> {
-  await page.getByRole("button", { name: "Done" }).click();
-  await expect(page.getByText("Workspace access")).not.toBeVisible({
-    timeout: MEDIUM_WAIT,
-  });
+  await shareDialog(page).getByRole("button", { name: "Done" }).click();
+  await expect(shareDialog(page)).toBeHidden({ timeout: MEDIUM_WAIT });
 }
 
 /**
  * Configures a dataset as restricted with no workspace-wide access.
+ * Implementation now drives the v2 modal: open → set General access to
+ * Restricted → close.
  */
 export async function restrictDatasetWithNoWorkspaceAccess(
   page: Page,
 ): Promise<void> {
   await openDatasetShareModal(page);
   await setShareModalRestricted(page, true);
-  await clearWorkspaceWideShareAccess(page);
   await closeShareModal(page);
 }
 
@@ -186,11 +203,15 @@ export async function expectDatasetMetaPageDenied(
   await page.goto(
     `/${options.workspaceSlug}/data-manager/${options.datasetId}`,
   );
-  await expect(page.getByText(/Dataset failed to load|Not Found/i)).toBeVisible(
-    {
-      timeout: LONG_WAIT,
-    },
-  );
+  // Two denial paths exist:
+  // 1. The user has data_sources app access but the dataset RLS denies →
+  //    `Dataset failed to load` / `Not Found` on the dataset meta view.
+  // 2. The user does NOT have data_sources app access at all → the
+  //    route guard short-circuits before the dataset query and renders
+  //    the "Access denied" page.
+  await expect(
+    page.getByText(/Dataset failed to load|Not Found|Access denied/i).first(),
+  ).toBeVisible({ timeout: LONG_WAIT });
 }
 
 /**
