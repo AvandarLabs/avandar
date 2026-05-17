@@ -1,15 +1,7 @@
 import { Box } from "@mantine/core";
 import { Select, SelectData } from "@ui";
 import { VizConfigs, VizTypes } from "$/models/vizs/VizConfig/VizConfigs";
-import { match } from "ts-pattern";
-import { AreaChartForm } from "@/components/Visualization/VizSettingsForm/AreaChartForm";
-import { BarChartForm } from "@/components/Visualization/VizSettingsForm/BarChartForm";
-import { BubbleChartForm } from "@/components/Visualization/VizSettingsForm/BubbleChartForm";
-import { FunnelChartForm } from "@/components/Visualization/VizSettingsForm/FunnelChartForm";
-import { LineChartForm } from "@/components/Visualization/VizSettingsForm/LineChartForm";
-import { PieChartForm } from "@/components/Visualization/VizSettingsForm/PieChartForm";
-import { RadarChartForm } from "@/components/Visualization/VizSettingsForm/RadarChartForm";
-import { ScatterChartForm } from "@/components/Visualization/VizSettingsForm/ScatterChartForm";
+import { VizSettingsFormBody } from "@/components/Visualization/VizSettingsForm/VizSettingsFormBody";
 import type { UnknownDataFrame } from "@utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type {
@@ -66,101 +58,12 @@ export function VizSettingsForm({
         }}
       />
 
-      {match(vizConfig)
-        .with({ vizType: "table" }, () => {
-          return null;
-        })
-        .with({ vizType: "bar" }, (config) => {
-          return (
-            <BarChartForm
-              fields={columns}
-              config={config}
-              onConfigChange={(newConfig) => {
-                onVizConfigChange({ ...config, ...newConfig });
-              }}
-            />
-          );
-        })
-        .with({ vizType: "line" }, (config) => {
-          return (
-            <LineChartForm
-              fields={columns}
-              config={config}
-              onConfigChange={(newConfig) => {
-                onVizConfigChange({ ...config, ...newConfig });
-              }}
-            />
-          );
-        })
-        .with({ vizType: "area" }, (config) => {
-          return (
-            <AreaChartForm
-              fields={columns}
-              config={config}
-              onConfigChange={(newConfig) => {
-                onVizConfigChange({ ...config, ...newConfig });
-              }}
-            />
-          );
-        })
-        .with({ vizType: "scatter" }, (config) => {
-          return (
-            <ScatterChartForm
-              fields={columns}
-              config={config}
-              onConfigChange={(newConfig) => {
-                onVizConfigChange({ ...config, ...newConfig });
-              }}
-            />
-          );
-        })
-        .with({ vizType: "pie" }, (config) => {
-          return (
-            <PieChartForm
-              fields={columns}
-              config={config}
-              data={data}
-              onConfigChange={(newConfig) => {
-                onVizConfigChange({ ...config, ...newConfig });
-              }}
-            />
-          );
-        })
-        .with({ vizType: "funnel" }, (config) => {
-          return (
-            <FunnelChartForm
-              fields={columns}
-              config={config}
-              data={data}
-              onConfigChange={(newConfig) => {
-                onVizConfigChange({ ...config, ...newConfig });
-              }}
-            />
-          );
-        })
-        .with({ vizType: "radar" }, (config) => {
-          return (
-            <RadarChartForm
-              fields={columns}
-              config={config}
-              onConfigChange={(newConfig) => {
-                onVizConfigChange({ ...config, ...newConfig });
-              }}
-            />
-          );
-        })
-        .with({ vizType: "bubble" }, (config) => {
-          return (
-            <BubbleChartForm
-              fields={columns}
-              config={config}
-              onConfigChange={(newConfig) => {
-                onVizConfigChange({ ...config, ...newConfig });
-              }}
-            />
-          );
-        })
-        .exhaustive()}
+      <VizSettingsFormBody
+        columns={columns}
+        data={data}
+        vizConfig={vizConfig}
+        onVizConfigChange={onVizConfigChange}
+      />
     </Box>
   );
 }

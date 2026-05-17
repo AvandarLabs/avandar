@@ -1,36 +1,106 @@
-import { Stack, Text } from "@mantine/core";
+import { Box, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { WithPuckProps } from "@puckeditor/core";
+import { useMemo } from "react";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import { getDateColumns } from "@/components/Visualization/getDateColumns";
+import { VisualizationContainer } from "@/components/Visualization/VisualizationContainer";
 import { Paper } from "@/lib/ui/Paper/Paper";
-import { TableViz } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/TableViz";
 import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
+import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
+import type { VizConfig, VizType } from "$/models/vizs/VizConfig/VizConfig.types";
 
 type Props = {
+  /** Natural-language prompt + generated SQL configured by the editor. */
   nlQuery: NLQuery;
+
+  /**
+   * The active visualization type. Kept in sync with `vizConfig.vizType` by
+   * the Puck `resolveData` hook so it can drive the type-picker control
+   * separately from the per-type sub-config.
+   */
+  vizType: VizType;
+
+  /**
+   * The full per-type viz config (axis selections, legend toggle, colors,
+   * etc.) that gets passed straight to `VisualizationContainer`.
+   */
+  vizConfig: VizConfig;
 };
 
 export { type Props as DataVizPBlockProps };
 
+/**
+ * Dashboard Puck block that renders any visualization supported by the shared
+ * `VisualizationContainer` (table, bar, line, area, scatter, pie, funnel,
+ * radar, bubble) for a natural-language SQL query.
+ *
+ * Acts as a small adapter that turns the block's persisted props
+ * (`nlQuery` + `vizConfig`) into the props `VisualizationContainer` expects,
+ * by running the generated SQL via `useDataQuery` and deriving date columns.
+ */
 export function DataVizPBlock({
   nlQuery,
+  vizConfig,
   puck,
 }: WithPuckProps<Props>): JSX.Element {
   const { prompt, rawSql } = nlQuery;
-  const { dashboardId, workspaceId } = useAvaPageMetadata(puck);
+  const metadata = useAvaPageMetadata(puck);
+
+  const emptyStructuredQuery = useMemo(() => {
+    return StructuredQuery.makeEmpty();
+  }, []);
+
+  const [queryResults, isLoadingResults] = useDataQuery({
+    query: emptyStructuredQuery,
+    rawSQL: rawSql,
+    ...(metadata.auth === "workspace" ?
+      {
+        auth: "workspace" as const,
+        workspaceId: metadata.workspaceId,
+      }
+    : {
+        auth: "public" as const,
+        publicAvaPageId: metadata.dashboardId,
+      }),
+  });
+
+  const columns = queryResults?.columns ?? [];
+  const data = queryResults?.data ?? [];
+  const dateColumns = getDateColumns(columns, data);
+
+  if (prompt.length === 0) {
+    return (
+      <Paper withBorder p="md">
+        <Text c="dimmed" fz="sm">
+          Add a prompt and generate SQL to configure this visualization.
+        </Text>
+      </Paper>
+    );
+  }
+
+  if (rawSql.trim().length === 0) {
+    return (
+      <Paper withBorder p="md">
+        <Text c="dimmed" fz="sm">
+          Run a query to see results.
+        </Text>
+      </Paper>
+    );
+  }
 
   return (
     <Paper withBorder p="md">
       <Stack gap={6}>
-        {prompt.length === 0 ?
-          <Text c="dimmed" fz="sm">
-            Add a prompt and generate SQL to configure this visualization.
-          </Text>
-        : null}
-        <TableViz
-          rawSQL={rawSql}
-          dashboardId={dashboardId}
-          workspaceId={workspaceId}
-        />
+        <Box pos="relative" w="100%" h={420}>
+          <LoadingOverlay visible={isLoadingResults} zIndex={10} />
+          <VisualizationContainer
+            columns={columns}
+            data={data}
+            dateColumns={dateColumns}
+            vizConfig={vizConfig}
+          />
+        </Box>
       </Stack>
     </Paper>
   );

@@ -1,11 +1,12 @@
 import { AvaPageDataMigrationV1 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV1/AvaPageDataMigrationV1";
+import { AvaPageDataMigrationV2 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV2/AvaPageDataMigrationV2";
 import { AvaPageDataMigrator } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
 import type {
   AvaPageData,
   AvaPageGenericData,
 } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
-const versionTransforms = [AvaPageDataMigrationV1];
+const versionTransforms = [AvaPageDataMigrationV1, AvaPageDataMigrationV2];
 
 AvaPageDataMigrator.registerMigrations(versionTransforms);
 

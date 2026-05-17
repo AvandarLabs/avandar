@@ -1,50 +1,16 @@
 import { propEq } from "@utils";
 import { beforeAll, describe, expect, it } from "vitest";
-import { AvaPageDataMigrationV1 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV1/AvaPageDataMigrationV1";
+import { AvaPageDataMigrationV2 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV2/AvaPageDataMigrationV2";
 import { AvaPageDataMigrator } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import type {
-  V0_AvaPageData,
   V1_AvaPageData,
-} from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV1/AvaPageDataMigrationV1.types";
+  V2_AvaPageData,
+} from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV2/AvaPageDataMigrationV2.types";
 
 const TEST_PROMPT = "Find all covid data";
 const TEST_SQL = "SELECT * FROM some_covid_table;";
 const TEST_DATA_VIZ_ID = "some-uuid";
-
-const v0Data: V0_AvaPageData = {
-  root: {
-    props: {
-      title: "v0 Dashboard",
-      author: "John Doe",
-      publishedAt: "2021-01-01",
-      subtitle: "A subtitle",
-      horizontalPadding: "none",
-      verticalPadding: "none",
-      containerMaxWidth: {
-        unit: "%",
-        value: 100,
-      },
-      isAuthorHidden: false,
-      isPublishedAtHidden: false,
-      isSubtitleHidden: false,
-      isTitleHidden: false,
-    },
-  },
-  content: [
-    {
-      type: "DataViz",
-      props: {
-        id: TEST_DATA_VIZ_ID,
-        prompt: TEST_PROMPT,
-        sql: TEST_SQL,
-        generateSqlRequestId: "123",
-        sqlError: "",
-        sqlGeneratedFromPrompt: TEST_SQL,
-      },
-    },
-  ],
-};
 
 const v1Data: V1_AvaPageData = {
   root: {
@@ -86,23 +52,65 @@ const v1Data: V1_AvaPageData = {
   ],
 };
 
-describe("AvaPageConfigMigration - v1", () => {
+const v2Data: V2_AvaPageData = {
+  root: {
+    props: {
+      title: "v2 Dashboard",
+      author: "John Doe",
+      publishedAt: "2021-01-01",
+      subtitle: "A subtitle",
+      horizontalPadding: "none",
+      verticalPadding: "none",
+      containerMaxWidth: {
+        unit: "%",
+        value: 100,
+      },
+      isAuthorHidden: false,
+      isPublishedAtHidden: false,
+      isSubtitleHidden: false,
+      isTitleHidden: false,
+      schemaVersion: 2,
+    },
+  },
+  content: [
+    {
+      type: "DataViz",
+      props: {
+        id: TEST_DATA_VIZ_ID,
+        nlQuery: {
+          prompt: TEST_PROMPT,
+          rawSql: TEST_SQL,
+          generations: [
+            {
+              prompt: TEST_PROMPT,
+              rawSql: TEST_SQL,
+            },
+          ],
+        },
+        vizType: "table",
+        vizConfig: { vizType: "table" },
+      },
+    },
+  ],
+};
+
+describe("AvaPageConfigMigration - v2", () => {
   beforeAll(() => {
-    AvaPageDataMigrator.registerMigrations([AvaPageDataMigrationV1]);
+    AvaPageDataMigrator.registerMigrations([AvaPageDataMigrationV2]);
   });
 
-  it("should upgrade the AvaPageConfig data to version 1", () => {
-    const upgradedData = AvaPageDataMigrator.upgradeOnce(v0Data);
-    expect(getVersionFromAvaPageData(upgradedData)).toEqual(1);
+  it("should upgrade the AvaPageConfig data to version 2", () => {
+    const upgradedData = AvaPageDataMigrator.upgradeOnce(v1Data);
+    expect(getVersionFromAvaPageData(upgradedData)).toEqual(2);
   });
 
-  it("should downgrade the AvaPageConfig data to version undefined", () => {
-    const downgradedData = AvaPageDataMigrator.downgradeOnce(v1Data);
-    expect(getVersionFromAvaPageData(downgradedData)).toEqual(undefined);
+  it("should downgrade the AvaPageConfig data to version 1", () => {
+    const downgradedData = AvaPageDataMigrator.downgradeOnce(v2Data);
+    expect(getVersionFromAvaPageData(downgradedData)).toEqual(1);
   });
 
-  it("should upgrade the DataViz block to hold an `nlQuery`object", () => {
-    const upgradedData = AvaPageDataMigrator.upgradeOnce(v0Data);
+  it("should upgrade DataViz to include `vizType` and `vizConfig` defaults", () => {
+    const upgradedData = AvaPageDataMigrator.upgradeOnce(v1Data);
     const upgradedDataViz = upgradedData.content.find(
       propEq("type", "DataViz"),
     );
@@ -121,12 +129,14 @@ describe("AvaPageConfigMigration - v1", () => {
             },
           ],
         },
+        vizType: "table",
+        vizConfig: { vizType: "table" },
       },
     });
   });
 
-  it("should downgrade the DataViz block to hold `prompt, `sql`, and `sqlGeneratedFromPrompt` and empty string for the rest", () => {
-    const downgradedData = AvaPageDataMigrator.downgradeOnce(v1Data);
+  it("should downgrade DataViz by stripping `vizType` and `vizConfig`", () => {
+    const downgradedData = AvaPageDataMigrator.downgradeOnce(v2Data);
     const downgradedDataViz = downgradedData.content.find(
       propEq("type", "DataViz"),
     );
@@ -135,11 +145,16 @@ describe("AvaPageConfigMigration - v1", () => {
       type: "DataViz",
       props: {
         id: TEST_DATA_VIZ_ID,
-        prompt: TEST_PROMPT,
-        sql: TEST_SQL,
-        generateSqlRequestId: "",
-        sqlError: "",
-        sqlGeneratedFromPrompt: TEST_SQL,
+        nlQuery: {
+          prompt: TEST_PROMPT,
+          rawSql: TEST_SQL,
+          generations: [
+            {
+              prompt: TEST_PROMPT,
+              rawSql: TEST_SQL,
+            },
+          ],
+        },
       },
     });
   });

@@ -9,6 +9,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
+import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { Paper } from "@/lib/ui/Paper/Paper";
 import { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
@@ -323,6 +324,7 @@ function _parseTableRows(options: {
 export function getDashboardPuckConfig(options: {
   dashboardTitle: string;
   workspaceId: Workspace.Id | undefined;
+  dashboardId: DashboardId;
 }): AvaPageConfig {
   return {
     root: {
