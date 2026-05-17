@@ -1,0 +1,7 @@
+-- Generated from supabase/migrations/20251013023524_Added dataset_id as an argument to RPC functions.sql by
+-- apps/desktop/scripts/gen-sqlite-migrations.ts. Do not edit by hand
+-- unless the matching `needs hand-edit` warning calls for it.
+-- Schema-shape statements emitted: 0
+-- Statements dropped (RLS/funcs/triggers/data/etc.): 7
+-- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 0
+-- No schema-shape changes: every statement was RLS / GRANT / function / trigger / type / data backfill, none of which has a SQLite equivalent.

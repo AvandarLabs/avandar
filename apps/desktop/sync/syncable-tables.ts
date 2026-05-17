@@ -39,6 +39,10 @@ export const SYNCABLE_TABLES = [
   "datasets__open_data",
   "datasets__virtual",
   "datasets__xls_file",
+  // Renamed from `datasets__xls_file` mid-history; keep both names so
+  // every per-migration generation step recognises whichever name the
+  // statement is using.
+  "datasets__xlsx_file",
   "catalog_entries__open_data",
   "catalog_entries__dataset_column",
   "dashboards",

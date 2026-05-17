@@ -1163,7 +1163,18 @@ Expected: green.
 - PR 2: Commit the first generated SQLite migration files plus the CI drift-check workflow (`pnpm check:sqlite-migrations`); files are unread until Task 7 wires the runner.
 - PR 3 (optional): Generator's hard-error / warning behavior on unknown PG constructs, if implemented as a separate Step.
 
-Shells out to Python's `sqlglot`. Reads `supabase/migrations/*.sql`; emits `apps/desktop/migrations/*.sql` for syncable tables only; hard-errors on unknown tables.
+**Approach (post-Phase 2 implementation): classify-and-filter, schema-shape only.**
+
+Per-file generation of one `.gen.sql` per Postgres migration, but every statement runs through a classifier first. Only schema-shape statements (CREATE/ALTER/DROP TABLE, CREATE/DROP INDEX) end up in the SQLite output. RLS policies, GRANT/REVOKE, functions, triggers, types, COMMENTs, SETs, and data-mutation statements (UPDATE/INSERT/DELETE/DO blocks) are silently dropped because SQLite has no equivalent for any of them.
+
+**Foreign-key handling.** FKs are preserved when their target table is in `SYNCABLE_TABLES`; SQLite enforces them natively when the Bun-main runner sets `PRAGMA foreign_keys = ON`. Two flavours are handled differently:
+- *Inline* FK references (`REFERENCES <table>(<col>)` inside a `CREATE TABLE` column or table-level clause) are emitted verbatim and SQLite accepts them as-is.
+- *Standalone* `ALTER TABLE ... ADD CONSTRAINT ... FOREIGN KEY` statements are surfaced via a yellow `⚠ needs hand-edit` warning at the end of the run because SQLite's `ALTER TABLE` only supports `RENAME`/`ADD COLUMN`/`DROP COLUMN`. Same hand-edit treatment applies to `ALTER COLUMN` (type change, set/drop default, set/drop NOT NULL) and any other `ADD CONSTRAINT` (CHECK, PK, UNIQUE). The developer inlines the constraint into the matching `CREATE TABLE` in the earlier `.gen.sql`.
+- FKs pointing at a non-public schema (e.g. `references auth.users`) or at an `EXCLUDED_TABLES` entry are dropped (the target table does not exist locally).
+
+**Tool chain.** Shells out to Python's `sqlglot` (Postgres → SQLite transpile) via `uv run --with 'sqlglot>=26.0.0,<27.0.0' python -c "..."`. `uv` (https://astral.sh/uv) is the only developer-machine prerequisite; it manages Python + sqlglot on demand with no `pip install` step. The exact sqlglot version range lives in the `SQLGLOT_SPEC` constant at the top of the generator. `sqlglot` is never an npm dependency and never reaches the runtime bundle. Post-transpile, a small `_stripPostgresIsms` step strips residue sqlglot leaves behind that SQLite still cannot parse: `"public".` schema prefixes, `NOT VALID`, `USING btree`, `NULLS FIRST`/`LAST` inside index defs, `ARRAY<T>` (collapsed to `TEXT`), `ADD COLUMN IF NOT EXISTS` (→ `ADD COLUMN`), and `DEFAULT <fn>(...)` clauses whose function does not exist on SQLite (`UUID()`, `auth.uid()`, etc.).
+
+Hard-errors on uncategorised tables and on unrecognised leading keywords; first lists each unhandled statement with a reason hint so the engineer knows whether to extend `classifyStatement()` or the manifest.
 
 **Files:**
 - Create: `apps/desktop/scripts/gen-sqlite-migrations.ts`

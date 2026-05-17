@@ -195,17 +195,31 @@ Outbox entries are appended **inside the same SQLite transaction** as the data w
 
 ## Migration Generation (Postgres → SQLite)
 
-A `pnpm run gen:sqlite-migrations` script translates `supabase/migrations/*.sql` into `apps/desktop/migrations/*.sql` via **`sqlglot`** (Python, shelled out from a Bun script). Generated SQLite migrations are **committed** to the repo, mirroring how Postgres migrations are committed today.
+A `pnpm run gen:sqlite-migrations` script translates `supabase/migrations/*.sql` into `apps/desktop/migrations/*.gen.sql` via **`sqlglot`** (Python), invoked through **`uv`** (`uv run --with 'sqlglot>=26.0.0,<27.0.0' python -c "..."`). The only developer-machine prerequisite is `uv`; `sqlglot` is never an npm dependency and never reaches the runtime bundle. Generated SQLite migrations are **committed** to the repo, mirroring how Postgres migrations are committed today.
+
+**Approach: classify-and-filter, schema-shape only, hand-edits for the rest.**
+
+The generator runs every Postgres statement through a classifier that buckets it by intent rather than transpiling everything wholesale. Three buckets matter at runtime:
+
+- *Schema-shape* (CREATE/ALTER/DROP TABLE, CREATE/DROP INDEX) — kept, transpiled to SQLite, written to the per-migration `.gen.sql`.
+- *Drop* (RLS, GRANT/REVOKE, functions, triggers, types, COMMENT, SET, data-mutation statements, `ENABLE ROW LEVEL SECURITY`, `VALIDATE CONSTRAINT`, `DROP/RENAME CONSTRAINT`, `ADD CONSTRAINT … USING INDEX`) — silently discarded. SQLite either has no equivalent or treats the construct as a no-op for our use case.
+- *Needs hand-edit* — schema-relevant statements SQLite's `ALTER TABLE` cannot accept post-creation. Today this is `ADD CONSTRAINT` (FK, CHECK, PK, UNIQUE) and `ALTER COLUMN` (type change, set/drop default, set/drop NOT NULL). The generator drops them from the `.gen.sql` output and prints a yellow `⚠ needs hand-edit` warning at the end of the run listing each statement plus its source file. The developer inlines the change into the matching `CREATE TABLE` in the earlier `.gen.sql`. Same pattern Alembic uses when auto-generation falls short.
 
 **Guarded generator behavior:**
 
 - A `SYNCABLE_TABLES` manifest (`apps/desktop/sync/syncable-tables.ts`) is the source of truth for which Postgres tables become local SQLite tables.
-- For each Postgres migration statement: if it touches a table in `SYNCABLE_TABLES`, transpile via `sqlglot` and emit. Otherwise skip.
-- **Hard error** if a migration references a table that's neither in `SYNCABLE_TABLES` nor in an explicit exclusion list — forces a human decision per new table (sync this? exclude?).
-- **Warning** if a migration uses Postgres-only constructs on a syncable table (custom types, triggers calling PG functions, RLS, extensions). Emit as commented-out SQL with a TODO.
-- A CI check (`pnpm check:sqlite-migrations`) regenerates and diffs against committed output; fails on drift.
+- For each schema-shape statement: if its primary table is in `SYNCABLE_TABLES`, transpile via sqlglot and emit (with FK targets checked against the manifest — see below). If the primary table is in `EXCLUDED_TABLES`, silently skip.
+- **Hard error** if a statement references a table that's neither in `SYNCABLE_TABLES` nor `EXCLUDED_TABLES`, or has a leading keyword the classifier does not recognise — forces a human decision (categorise the table, extend the classifier, or both).
+- Post-transpile, a `_stripPostgresIsms` step removes residue sqlglot can't drop on its own (`"public".` schema prefixes, `NOT VALID`, `USING btree`, `NULLS FIRST/LAST` in index defs, `ARRAY<T>` → `TEXT`, `ADD COLUMN IF NOT EXISTS` → `ADD COLUMN`, `DEFAULT <fn>(...)` clauses whose function does not exist on SQLite like `UUID()` / `auth.uid()`).
+- A CI check (`pnpm check:sqlite-migrations`) regenerates and diffs against committed output; fails on drift. Because hand-edited `.gen.sql` files would always diff against a fresh regen, the check is most useful as a "fresh-gen vs committed" ledger reviewer, not as a strict equality gate, until a preserve-hand-edits mechanism exists.
 
-RLS policies are intentionally dropped during translation — the local SQLite store is single-user (the local user), so RLS is unnecessary.
+**Foreign-key handling.** SQLite enforces foreign keys natively when `PRAGMA foreign_keys = ON;` is set (Phase 2 Task 7's runner sets this at connection open). The generator preserves every FK whose target table is in `SYNCABLE_TABLES`:
+
+- FKs declared *inline* in `CREATE TABLE` (column-level `REFERENCES` or table-level `FOREIGN KEY (...) REFERENCES …`) are emitted verbatim — SQLite accepts them as-is.
+- FKs declared as a separate `ALTER TABLE … ADD CONSTRAINT … FOREIGN KEY` are routed to the `needs hand-edit` warning because SQLite has no way to add a FK after table creation. The developer inlines them into the matching `CREATE TABLE`.
+- FKs targeting a non-public schema (e.g. `references auth.users`) or an `EXCLUDED_TABLES` entry are dropped — the target table does not exist in the SQLite mirror, so the constraint can't be honoured.
+
+RLS policies, functions, triggers, and GRANTs are intentionally dropped during translation — the local SQLite store is single-user (the local user), so RLS is unnecessary and the rest are Postgres-only constructs without SQLite equivalents.
 
 ## DatasetBlobStore & File Management
 

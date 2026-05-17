@@ -1,0 +1,7 @@
+-- Generated from supabase/migrations/20260517050340_restricted_select_requires_explicit_share.sql by
+-- apps/desktop/scripts/gen-sqlite-migrations.ts. Do not edit by hand
+-- unless the matching `needs hand-edit` warning calls for it.
+-- Schema-shape statements emitted: 0
+-- Statements dropped (RLS/funcs/triggers/data/etc.): 3
+-- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 0
+-- No schema-shape changes: every statement was RLS / GRANT / function / trigger / type / data backfill, none of which has a SQLite equivalent.

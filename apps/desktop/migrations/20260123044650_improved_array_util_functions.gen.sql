@@ -1,0 +1,7 @@
+-- Generated from supabase/migrations/20260123044650_improved_array_util_functions.sql by
+-- apps/desktop/scripts/gen-sqlite-migrations.ts. Do not edit by hand
+-- unless the matching `needs hand-edit` warning calls for it.
+-- Schema-shape statements emitted: 0
+-- Statements dropped (RLS/funcs/triggers/data/etc.): 35
+-- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 0
+-- No schema-shape changes: every statement was RLS / GRANT / function / trigger / type / data backfill, none of which has a SQLite equivalent.

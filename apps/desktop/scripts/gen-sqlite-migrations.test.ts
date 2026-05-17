@@ -1,152 +1,323 @@
 import { describe, expect, it } from "vitest";
 import {
+  classifyStatement,
   extractStatements,
   partitionStatements,
-  type Statement,
 } from "./gen-sqlite-migrations";
 
-describe("partitionStatements", () => {
-  const syncable = ["datasets", "dashboards"];
-  const excluded = ["audit_log", "workspace_invites"];
-
-  it("includes statements that touch only syncable tables", () => {
-    const stmts: Statement[] = [
-      {
-        tables: ["datasets"],
-        sql: "create table datasets (id text primary key);",
-      },
-      {
-        tables: ["dashboards"],
-        sql: "create index idx_d on dashboards(workspace_id);",
-      },
-    ];
-    const result = partitionStatements({
-      statements: stmts,
-      syncable,
-      excluded,
-    });
-    expect(result.included).toHaveLength(2);
-    expect(result.skipped).toHaveLength(0);
-    expect(result.unknown).toHaveLength(0);
+describe("classifyStatement", () => {
+  it("classifies CREATE TABLE / ALTER TABLE / DROP TABLE as schema-shape", () => {
+    expect(classifyStatement('create table "public"."x" (id text);')).toBe(
+      "schema-shape",
+    );
+    expect(
+      classifyStatement('alter table "public"."x" add column y text;'),
+    ).toBe("schema-shape");
+    expect(classifyStatement('drop table "public"."x";')).toBe("schema-shape");
   });
 
-  it("skips statements that touch only excluded tables", () => {
-    const stmts: Statement[] = [
-      {
-        tables: ["audit_log"],
-        sql: "create table audit_log (id text primary key);",
-      },
-    ];
-    const result = partitionStatements({
-      statements: stmts,
-      syncable,
-      excluded,
-    });
-    expect(result.included).toHaveLength(0);
-    expect(result.skipped).toHaveLength(1);
-    expect(result.unknown).toHaveLength(0);
+  it("classifies CREATE [UNIQUE] INDEX and DROP INDEX as schema-shape", () => {
+    expect(
+      classifyStatement("create index idx on public.x using btree (id);"),
+    ).toBe("schema-shape");
+    expect(
+      classifyStatement(
+        "create unique index idx on public.x using btree (id);",
+      ),
+    ).toBe("schema-shape");
+    expect(classifyStatement("drop index public.idx;")).toBe("schema-shape");
   });
 
-  it("flags statements that touch a table not categorised in either list", () => {
-    const stmts: Statement[] = [
-      {
-        tables: ["mystery_new_table"],
-        sql: "create table mystery_new_table (id text);",
-      },
-    ];
-    const result = partitionStatements({
-      statements: stmts,
-      syncable,
-      excluded,
-    });
-    expect(result.unknown).toHaveLength(1);
-    expect(result.unknown[0]!.tables).toEqual(["mystery_new_table"]);
+  it("classifies ALTER TABLE ... ENABLE/DISABLE ROW LEVEL SECURITY as drop", () => {
+    expect(
+      classifyStatement(
+        'alter table "public"."x" enable row level security;',
+      ),
+    ).toBe("drop");
+    expect(
+      classifyStatement(
+        'alter table "public"."x" disable row level security;',
+      ),
+    ).toBe("drop");
   });
 
-  it("flags statements that mix syncable and excluded tables as unknown so the engineer makes an explicit call", () => {
-    const stmts: Statement[] = [
-      {
-        tables: ["datasets", "audit_log"],
-        sql: "alter table datasets add column audit_log_id text references audit_log(id);",
-      },
-    ];
-    const result = partitionStatements({
-      statements: stmts,
-      syncable,
-      excluded,
-    });
-    expect(result.unknown).toHaveLength(1);
+  it("classifies ALTER TABLE ... VALIDATE CONSTRAINT as drop", () => {
+    expect(
+      classifyStatement(
+        'alter table "public"."x" validate constraint "x_fkey";',
+      ),
+    ).toBe("drop");
   });
 
-  it("statements that reference no tables (e.g. CREATE EXTENSION) are skipped", () => {
-    const stmts: Statement[] = [
-      { tables: [], sql: "create extension if not exists pgcrypto;" },
-    ];
-    const result = partitionStatements({
-      statements: stmts,
-      syncable,
-      excluded,
-    });
-    expect(result.included).toHaveLength(0);
-    expect(result.skipped).toHaveLength(1);
-    expect(result.unknown).toHaveLength(0);
+  it("classifies GRANT / REVOKE as drop", () => {
+    expect(
+      classifyStatement('grant select on table "public"."x" to "anon";'),
+    ).toBe("drop");
+    expect(classifyStatement("revoke select on table public.x from anon;")).toBe(
+      "drop",
+    );
+  });
+
+  it("classifies CREATE / DROP POLICY as drop", () => {
+    expect(
+      classifyStatement(
+        'create policy "p" on "public"."x" as permissive for select to authenticated using (true);',
+      ),
+    ).toBe("drop");
+    expect(classifyStatement('drop policy "p" on "public"."x";')).toBe("drop");
+  });
+
+  it("classifies CREATE OR REPLACE FUNCTION / DROP FUNCTION as drop", () => {
+    expect(
+      classifyStatement(
+        "create or replace function public.f() returns void language plpgsql as $$ begin end; $$;",
+      ),
+    ).toBe("drop");
+    expect(classifyStatement("drop function if exists public.f;")).toBe("drop");
+  });
+
+  it("classifies CREATE / DROP TRIGGER as drop", () => {
+    expect(
+      classifyStatement(
+        "create trigger tr before update on public.x for each row execute function f();",
+      ),
+    ).toBe("drop");
+    expect(classifyStatement("drop trigger if exists tr on public.x;")).toBe(
+      "drop",
+    );
+  });
+
+  it("classifies CREATE TYPE (Postgres enums) as drop", () => {
+    expect(
+      classifyStatement("create type public.mood as enum ('happy', 'sad');"),
+    ).toBe("drop");
+  });
+
+  it("classifies CREATE EXTENSION / COMMENT / SET as drop", () => {
+    expect(classifyStatement("create extension if not exists pgcrypto;")).toBe(
+      "drop",
+    );
+    expect(classifyStatement("comment on table public.x is 'hi';")).toBe(
+      "drop",
+    );
+    expect(classifyStatement("set check_function_bodies = off;")).toBe("drop");
+  });
+
+  it("classifies a leading keyword it does not know as unknown", () => {
+    expect(classifyStatement("reindex table public.x;")).toBe("unknown");
+    expect(classifyStatement("vacuum analyze public.x;")).toBe("unknown");
   });
 });
 
 describe("extractStatements", () => {
   it("splits a multi-statement file on the unquoted semicolon", () => {
-    const sql = `
+    const stmts = extractStatements(`
       create table foo (id text primary key);
       create table bar (id text primary key);
-    `;
-    const stmts = extractStatements(sql);
+    `);
     expect(stmts.length).toBe(2);
     expect(stmts[0]!.sql.toLowerCase()).toContain("create table foo");
     expect(stmts[1]!.sql.toLowerCase()).toContain("create table bar");
   });
 
-  it("identifies the primary table from CREATE TABLE", () => {
+  it("populates kind via classifyStatement on every statement", () => {
     const stmts = extractStatements(
-      'create table "public"."datasets" (id text primary key);',
+      'create table "public"."x" (id text); grant select on table "public"."x" to "anon";',
     );
-    expect(stmts[0]!.tables).toContain("datasets");
+    expect(stmts[0]!.kind).toBe("schema-shape");
+    expect(stmts[1]!.kind).toBe("drop");
   });
 
-  it("identifies the primary table from ALTER TABLE", () => {
+  it("identifies the primary table on CREATE TABLE", () => {
     const stmts = extractStatements(
-      "alter table public.dashboards add column color text;",
+      'create table "public"."datasets" (id text);',
     );
-    expect(stmts[0]!.tables).toContain("dashboards");
+    expect(stmts[0]!.primaryTable).toBe("datasets");
   });
 
-  it("identifies the table from CREATE INDEX ... ON", () => {
+  it("identifies the primary table on ALTER TABLE without a schema qualifier", () => {
     const stmts = extractStatements(
-      "create index idx_workspace on public.datasets (workspace_id);",
+      "alter table dashboards add column color text;",
     );
-    expect(stmts[0]!.tables).toContain("datasets");
+    expect(stmts[0]!.primaryTable).toBe("dashboards");
   });
 
-  it("captures every distinct table mentioned in a statement", () => {
+  it("identifies the primary table on CREATE INDEX ... ON public.X", () => {
     const stmts = extractStatements(
-      "alter table datasets add column audit_log_id text references audit_log(id);",
+      "create index idx on public.datasets using btree (workspace_id);",
     );
-    expect(stmts[0]!.tables).toContain("datasets");
-    expect(stmts[0]!.tables).toContain("audit_log");
+    expect(stmts[0]!.primaryTable).toBe("datasets");
+  });
+
+  it("does not pick up FK targets as the primary table", () => {
+    const stmts = extractStatements(
+      "alter table entity_configs add constraint fk foreign key (workspace_id) references workspaces(id);",
+    );
+    expect(stmts[0]!.primaryTable).toBe("entity_configs");
+  });
+
+  it("captures FK references with a public schema as unqualified", () => {
+    const stmts = extractStatements(
+      "alter table entity_configs add constraint fk foreign key (workspace_id) references public.workspaces(id);",
+    );
+    expect(stmts[0]!.fkReferences).toEqual([
+      { schema: undefined, table: "workspaces" },
+    ]);
+  });
+
+  it("captures FK references to a non-public schema as cross-schema", () => {
+    const stmts = extractStatements(
+      "alter table entity_configs add constraint fk foreign key (owner_id) references auth.users(id) on update cascade;",
+    );
+    expect(stmts[0]!.fkReferences).toEqual([
+      { schema: "auth", table: "users" },
+    ]);
+  });
+
+  it("does not treat GRANT REFERENCES ON TABLE as a FK reference", () => {
+    const stmts = extractStatements(
+      'grant references on table "public"."entity_configs" to "anon";',
+    );
+    expect(stmts[0]!.fkReferences).toEqual([]);
   });
 
   it("ignores semicolons inside single-quoted strings", () => {
-    const sql = "insert into datasets (id, note) values ('a', 'hi; there');";
-    const stmts = extractStatements(sql);
+    const stmts = extractStatements(
+      "insert into datasets (id, note) values ('a', 'hi; there');",
+    );
     expect(stmts.length).toBe(1);
   });
 
-  it("strips line comments and block comments before parsing", () => {
-    const sql = `
-      -- this is a line comment
-      create table foo (id text primary key); /* block ;comment */
-      create table bar (id text primary key);
-    `;
-    const stmts = extractStatements(sql);
+  it("strips line and block comments before parsing", () => {
+    const stmts = extractStatements(`
+      -- a line comment
+      create table foo (id text); /* block ;comment */
+      create table bar (id text);
+    `);
     expect(stmts.length).toBe(2);
+  });
+});
+
+describe("partitionStatements", () => {
+  const syncable = ["datasets", "dashboards", "workspaces"];
+  const excluded = ["audit_log", "workspace_invites"];
+
+  it("skips statements classified as drop (RLS, GRANT, etc.)", () => {
+    const stmts = extractStatements(`
+      grant select on table "public"."datasets" to "anon";
+      alter table "public"."datasets" enable row level security;
+      create policy "p" on "public"."datasets" as permissive for select to authenticated using (true);
+    `);
+    const result = partitionStatements({
+      statements: stmts,
+      syncable,
+      excluded,
+    });
+    expect(result.skipped.length).toBe(3);
+    expect(result.included.length).toBe(0);
+    expect(result.unknown.length).toBe(0);
+  });
+
+  it("includes schema-shape statements on a syncable table with no foreign keys", () => {
+    const stmts = extractStatements(
+      'create table "public"."datasets" (id text primary key);',
+    );
+    const result = partitionStatements({
+      statements: stmts,
+      syncable,
+      excluded,
+    });
+    expect(result.included.length).toBe(1);
+  });
+
+  it("routes ALTER TABLE ADD CONSTRAINT FOREIGN KEY to needsHandEdit even when FK targets are local", () => {
+    // SQLite cannot ADD FKs via ALTER TABLE; they must be inlined into
+    // CREATE TABLE. Surface for a human edit rather than silently
+    // including a statement SQLite would reject.
+    const stmts = extractStatements(
+      "alter table dashboards add constraint fk foreign key (workspace_id) references workspaces(id);",
+    );
+    const result = partitionStatements({
+      statements: stmts,
+      syncable,
+      excluded,
+    });
+    expect(result.needsHandEdit.length).toBe(1);
+    expect(result.included.length).toBe(0);
+  });
+
+  it("includes inline FK references inside CREATE TABLE (SQLite accepts these as-is)", () => {
+    const stmts = extractStatements(
+      "create table dashboards (id text primary key, workspace_id text references workspaces(id));",
+    );
+    const result = partitionStatements({
+      statements: stmts,
+      syncable,
+      excluded,
+    });
+    expect(result.included.length).toBe(1);
+    expect(result.needsHandEdit.length).toBe(0);
+  });
+
+  it("skips schema-shape statements whose FK targets a non-public schema (auth.users)", () => {
+    const stmts = extractStatements(
+      "alter table dashboards add constraint fk foreign key (owner_id) references auth.users(id);",
+    );
+    const result = partitionStatements({
+      statements: stmts,
+      syncable,
+      excluded,
+    });
+    expect(result.skipped.length).toBe(1);
+    expect(result.included.length).toBe(0);
+  });
+
+  it("skips schema-shape statements whose FK targets an excluded table", () => {
+    const stmts = extractStatements(
+      "alter table dashboards add constraint fk foreign key (audit_id) references audit_log(id);",
+    );
+    const result = partitionStatements({
+      statements: stmts,
+      syncable,
+      excluded,
+    });
+    expect(result.skipped.length).toBe(1);
+    expect(result.included.length).toBe(0);
+  });
+
+  it("skips schema-shape statements whose primary table is excluded", () => {
+    const stmts = extractStatements(
+      'create table "public"."audit_log" (id text primary key);',
+    );
+    const result = partitionStatements({
+      statements: stmts,
+      syncable,
+      excluded,
+    });
+    expect(result.skipped.length).toBe(1);
+  });
+
+  it("flags schema-shape statements on an uncategorised table as unknown", () => {
+    const stmts = extractStatements(
+      'create table "public"."mystery" (id text primary key);',
+    );
+    const result = partitionStatements({
+      statements: stmts,
+      syncable,
+      excluded,
+    });
+    expect(result.unknown.length).toBe(1);
+    expect(result.unknown[0]!.primaryTable).toBe("mystery");
+  });
+
+  it("flags statements with an unrecognised leading keyword as unknown", () => {
+    const stmts = extractStatements("reindex table public.datasets;");
+    const result = partitionStatements({
+      statements: stmts,
+      syncable,
+      excluded,
+    });
+    expect(result.unknown.length).toBe(1);
+    expect(result.unknown[0]!.kind).toBe("unknown");
   });
 });
