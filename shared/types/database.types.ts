@@ -1422,6 +1422,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      rpc__list_shared_with_me: {
+        Args: { p_workspace_id: string }
+        Returns: {
+          effective_role: Database["public"]["Enums"]["role_level"]
+          name: string
+          resource_id: string
+          resource_type: Database["public"]["Enums"]["resource_type"]
+        }[]
+      }
       rpc_datasets__add_csv_file_dataset: {
         Args: {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
