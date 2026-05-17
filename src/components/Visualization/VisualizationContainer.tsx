@@ -13,8 +13,8 @@ import { LineChart } from "@/lib/ui/viz/LineChart";
 import { PieChart } from "@/lib/ui/viz/PieChart";
 import { RadarChart } from "@/lib/ui/viz/RadarChart";
 import { ScatterChart } from "@/lib/ui/viz/ScatterChart";
-import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 
 type Props = {
   columns: readonly QueryResultColumn[];
@@ -27,6 +27,9 @@ type Props = {
    */
   dateColumns: ReadonlySet<string>;
   data: UnknownDataFrame;
+
+  /** The visualization config that drives what is rendered. */
+  vizConfig: VizConfig;
 };
 
 // Reusable XY schema "blocks"
@@ -107,12 +110,18 @@ const BubbleChartConfigSchema = object({
   sizeKey: SizeKeySchema,
 });
 
+/**
+ * Renders a visualization (chart or table) for a given query result and
+ * `VizConfig`. Pure and prop-driven: holds no state of its own and has no
+ * coupling to any app-specific store, so it can be reused anywhere a query
+ * result needs to be visualized.
+ */
 export function VisualizationContainer({
   columns,
   data,
   dateColumns,
+  vizConfig,
 }: Props): JSX.Element {
-  const { vizConfig } = DataExplorerStateManager.useState();
   const columnNames = columns.map(prop("name"));
 
   const viz = match(vizConfig)

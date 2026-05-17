@@ -18,12 +18,13 @@ import {
   IconRotateClockwise,
 } from "@tabler/icons-react";
 import { notifyError, notifyNotImplemented, notifySuccess, Tooltip } from "@ui";
-import { isEpochMs, isISODateString, prop } from "@utils";
-import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { useEffect, useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
+import { getDateColumns } from "@/components/Visualization/getDateColumns";
+import { VisualizationContainer } from "@/components/Visualization/VisualizationContainer";
+import { VizSettingsForm } from "@/components/Visualization/VizSettingsForm/VizSettingsForm";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { downloadRowsAsCSV } from "@/views/DataExplorerApp/downloadRowsAsCSV";
@@ -32,8 +33,6 @@ import { QueryForm } from "@/views/DataExplorerApp/QueryForm/QueryForm";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { useDataExplorerURLSync } from "@/views/DataExplorerApp/useDataExplorerURLSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
-import { VisualizationContainer } from "@/views/DataExplorerApp/VisualizationContainer";
-import { VizSettingsForm } from "@/views/DataExplorerApp/VizSettingsForm/VizSettingsForm";
 import type { DataExplorerURLSearch } from "@/views/DataExplorerApp/DataExplorerURLState";
 
 const QUERY_FORM_WIDTH = 300;
@@ -130,18 +129,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     dispatch,
   ]);
   const queryResultData = queryResults?.data ?? [];
-  const dateColumns = new Set(
-    queryResultColumns
-      .filter((f) => {
-        const sampleVal = queryResultData[0]?.[f.name];
-        return (
-          AvaDataType.isTemporal(f.dataType) ||
-          isISODateString(sampleVal) ||
-          isEpochMs(sampleVal)
-        );
-      })
-      .map(prop("name")),
-  );
+  const dateColumns = getDateColumns(queryResultColumns, queryResultData);
 
   return (
     <AppLayout title="Data Explorer">
@@ -158,6 +146,9 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
           <VizSettingsForm
             columns={queryResultColumns}
             data={queryResultData}
+            vizConfig={state.vizConfig}
+            onVizConfigChange={dispatch.setVizConfig}
+            onVizTypeChange={dispatch.setActiveVizType}
           />
         </Box>
 
@@ -330,6 +321,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
               columns={queryResultColumns}
               data={queryResultData}
               dateColumns={dateColumns}
+              vizConfig={state.vizConfig}
             />
           </Box>
         </Stack>

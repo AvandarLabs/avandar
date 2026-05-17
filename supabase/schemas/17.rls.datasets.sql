@@ -9,9 +9,14 @@
  *  SELECT also uses `util__auth_user_may_select_dataset` so workspace editors
  *  cannot read other members' unrestricted rows without an explicit share.
  */
+-- The inline owner short-circuit lets the row owner pass SELECT RLS without the
+-- helper re-fetching the row. Required so `INSERT ... RETURNING *` works for
+-- the inserting user: during INSERT, the helper's internal SELECT cannot see
+-- the just-inserted row and would otherwise return false.
 create policy "User can select datasets they have permissions for" on public.datasets for
 select
   to authenticated using (
+    public.datasets.owner_id = (select auth.uid()) or
     public.util__auth_user_may_select_dataset (
       public.datasets.id
     )

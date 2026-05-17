@@ -16,7 +16,6 @@
  * - We want to allow the most current AvaPage types to change freely without
  *   raising type errors in tests or migration code for older versions.
  */
-import type { AvaPageTypes } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 export type V0_AvaPageRootProps = {
   author: string;
@@ -143,6 +142,35 @@ export type V0_AvaPageData = {
   >;
 };
 
-export type V1_AvaPageRootProps = AvaPageTypes["RootProps"];
-export type V1_PBlockPropsRegistry = AvaPageTypes["PBlockPropsRegistry"];
-export type V1_AvaPageData = AvaPageTypes["Data"];
+type V1_NLQuery = {
+  prompt: string;
+  rawSql: string;
+  generations: ReadonlyArray<
+    | { prompt: string; rawSql: string; error?: undefined }
+    | { prompt: string; rawSql: undefined; error: string }
+  >;
+};
+
+export type V1_AvaPageRootProps = V0_AvaPageRootProps & {
+  schemaVersion: 1;
+};
+
+export type V1_PBlockPropsRegistry = Omit<V0_PBlockPropsRegistry, "DataViz"> & {
+  DataViz: {
+    nlQuery: V1_NLQuery;
+  };
+};
+
+export type V1_AvaPageData = {
+  root: {
+    props?: V1_AvaPageRootProps;
+  };
+  content: Array<
+    {
+      [K in keyof V1_PBlockPropsRegistry]: {
+        type: K;
+        props: { id: string } & V1_PBlockPropsRegistry[K];
+      };
+    }[keyof V1_PBlockPropsRegistry]
+  >;
+};

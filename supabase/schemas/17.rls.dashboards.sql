@@ -15,9 +15,14 @@ select
     public.dashboards.is_public = true
   );
 
+-- The inline owner short-circuit lets the row owner pass SELECT RLS without the
+-- helper re-fetching the row. Required so `INSERT ... RETURNING *` works for
+-- the inserting user: during INSERT, the helper's internal SELECT cannot see
+-- the just-inserted row and would otherwise return false.
 create policy "Users can read dashboards they have permissions for" on public.dashboards for
 select
   to authenticated using (
+    public.dashboards.owner_id = (select auth.uid()) or
     public.util__auth_user_may_select_dashboard (
       public.dashboards.id
     )

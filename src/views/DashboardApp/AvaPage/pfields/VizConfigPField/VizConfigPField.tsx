@@ -1,0 +1,101 @@
+import { Box, Text } from "@mantine/core";
+import { usePuck } from "@puckeditor/core";
+import { useMemo } from "react";
+import { DashboardId } from "$/models/Dashboard/Dashboard.types";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import { Workspace } from "$/models/Workspace/Workspace";
+import { VizSettingsFormBody } from "@/components/Visualization/VizSettingsForm/VizSettingsFormBody";
+import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
+import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+
+type Props = {
+  /** Current viz config. */
+  value: VizConfig;
+
+  /** Called when the user edits any control inside the per-type subform. */
+  onChange: (value: VizConfig) => void;
+
+  /**
+   * Workspace id used to authorize the SQL data query. When undefined the
+   * field treats the dashboard as a public page and uses `dashboardId`.
+   */
+  workspaceId: Workspace.Id | undefined;
+
+  /** Dashboard id used for public-page queries when `workspaceId` is unset. */
+  dashboardId: DashboardId;
+};
+
+/**
+ * Puck custom field that renders the per-viz-type controls for a `VizConfig`.
+ *
+ * Reads the owning block's generated SQL from the Puck-selected item, runs
+ * the SQL through `useDataQuery` to discover available columns, and renders
+ * the shared `VizSettingsBody` so the same controls used in `DataExplorerApp`
+ * drive dashboard visualizations. The viz-type picker itself lives as a
+ * separate top-level Puck `select` field; this field only renders the
+ * per-type subform.
+ */
+export function VizConfigPField({
+  value,
+  onChange,
+  workspaceId,
+  dashboardId,
+}: Props): JSX.Element {
+  const { selectedItem } = usePuck();
+  const rawSql =
+    (selectedItem?.props as { nlQuery?: NLQuery } | undefined)?.nlQuery
+      ?.rawSql ?? "";
+
+  const emptyStructuredQuery = useMemo(() => {
+    return StructuredQuery.makeEmpty();
+  }, []);
+
+  const [queryResults] = useDataQuery({
+    query: emptyStructuredQuery,
+    rawSQL: rawSql,
+    ...(workspaceId !== undefined ?
+      {
+        auth: "workspace" as const,
+        workspaceId,
+      }
+    : {
+        auth: "public" as const,
+        publicAvaPageId: dashboardId,
+      }),
+  });
+
+  const columns = queryResults?.columns ?? [];
+  const data = queryResults?.data ?? [];
+
+  if (value.vizType === "table") {
+    return (
+      <Box>
+        <Text c="dimmed" fz="sm">
+          The table visualization has no extra settings.
+        </Text>
+      </Box>
+    );
+  }
+
+  if (rawSql.trim().length === 0) {
+    return (
+      <Box>
+        <Text c="dimmed" fz="sm">
+          Generate a query to configure this visualization.
+        </Text>
+      </Box>
+    );
+  }
+
+  return (
+    <Box>
+      <VizSettingsFormBody
+        columns={columns}
+        data={data}
+        vizConfig={value}
+        onVizConfigChange={onChange}
+      />
+    </Box>
+  );
+}

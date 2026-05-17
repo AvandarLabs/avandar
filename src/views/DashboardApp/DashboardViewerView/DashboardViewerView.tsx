@@ -23,6 +23,7 @@ export function DashboardViewerView({ dashboard }: Props): JSX.Element {
   const config = getDashboardPuckConfig({
     dashboardTitle: dashboard?.name ?? "Untitled dashboard",
     workspaceId: dashboard?.workspaceId,
+    dashboardId: dashboard.id,
   });
 
   const data = useMemo(() => {

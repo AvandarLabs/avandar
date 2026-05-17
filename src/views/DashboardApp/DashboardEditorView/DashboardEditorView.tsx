@@ -75,8 +75,9 @@ export function DashboardEditorView({
     return getDashboardPuckConfig({
       dashboardTitle,
       workspaceId: dashboard.workspaceId,
+      dashboardId: dashboard.id,
     });
-  }, [dashboard.workspaceId, dashboardTitle]);
+  }, [dashboard.id, dashboard.workspaceId, dashboardTitle]);
 
   const [saveDashboard] = DashboardClient.useUpdate({
     queriesToInvalidate:
