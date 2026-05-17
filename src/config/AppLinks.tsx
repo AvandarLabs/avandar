@@ -205,6 +205,17 @@ export const AppLinks = {
       label: entityName,
     };
   },
+  // Shared with me — surfaces resources the user can reach only through
+  // explicit shares (no parent app role).
+  sharedWithMe: (workspaceSlug: string) => {
+    return {
+      key: "shared-with-me",
+      to: "/$workspaceSlug/shared-with-me",
+      params: { workspaceSlug },
+      label: "Shared with me",
+    };
+  },
+
   // Settings link
   workspaceSettings: (workspaceSlug: string) => {
     return {

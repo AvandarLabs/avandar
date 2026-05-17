@@ -68,6 +68,9 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
     links.push(NavbarLinks.map(workspace.slug));
     links.push(NavbarLinks.entityDesignerHome(workspace.slug));
     links.push(...entityManagerLinks);
+    // Always show "Shared with me" to workspace members; the page handles
+    // its own empty state when no resources are share-only.
+    links.push(NavbarLinks.sharedWithMe(workspace.slug));
 
     return links;
   }, [
