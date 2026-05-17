@@ -1,6 +1,6 @@
 import { test as base } from "@playwright/test";
-import { createSupabaseAdminClient } from "../../helpers/supabaseAdminClient";
 import { cleanupTestUser } from "../helpers/cleanupTestUser";
+import { createSupabaseAdminClient } from "../helpers/supabaseAdminClient";
 import {
   E2E_PRIMARY_USER_EMAIL,
   E2E_SECONDARY_USER_EMAIL,

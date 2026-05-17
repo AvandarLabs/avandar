@@ -43,27 +43,6 @@ values
   )
 on conflict (id) do nothing;
 
-insert into public.user_roles (
-  workspace_id,
-  user_id,
-  membership_id,
-  role
-)
-values
-  (
-    'e2000001-0000-4000-8000-000000000001'::uuid,
-    'e1000001-0000-4000-8000-000000000001'::uuid,
-    'e3000001-0000-4000-8000-000000000001'::uuid,
-    'admin'
-  ),
-  (
-    'e2000001-0000-4000-8000-000000000001'::uuid,
-    'e1000002-0000-4000-8000-000000000002'::uuid,
-    'e3000002-0000-4000-8000-000000000002'::uuid,
-    'member'
-  )
-on conflict (membership_id) do nothing;
-
 insert into public.user_profiles (
   id,
   user_id,

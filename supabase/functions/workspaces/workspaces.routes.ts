@@ -6,7 +6,7 @@ import {
 import { hasSubscriptionPermission } from "@sbfn/subscriptions/services/hasSubscriptionPermission.ts";
 import { resolveRoleGroupIdForAcceptedInvite } from "@sbfn/workspaces/inviteRoleResolution.ts";
 import { EmailClient } from "$/EmailClient/EmailClient.tsx";
-import { PermissionsModule } from "$/models/Permissions/PermissionsModule/PermissionsModule.ts";
+import { Permissions } from "$/models/Permissions/Permissions.ts";
 import { z } from "zod";
 import type { WorkspacesAPI } from "@sbfn/workspaces/workspaces.routes.types.ts";
 import type {
@@ -88,38 +88,24 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
       },
     })
       .bodySchema(
-        z
-          .object({
-            emailToInvite: z.string(),
-            role: z.enum(["admin", "member"]).optional(),
-            roleGroupId: z.uuid().optional(),
-            roleOverrides: z
-              .array(
-                z.object({
-                  app: z.enum([
-                    "data_sources",
-                    "data_explorer",
-                    "dashboards",
-                    "settings",
-                  ]),
-                  role: z.enum(["viewer", "editor", "admin"]),
-                }),
-              )
-              .optional(),
-            userGroupIds: z.array(z.uuid()).optional(),
-          })
-          .superRefine((data, ctx) => {
-            // either roleGroupId or role are allowed to be empty, but not both.
-            // so we do additional validation here to ensure at least one of
-            // them exists.
-            if (!data.roleGroupId && !data.role) {
-              ctx.addIssue({
-                code: "custom",
-                message: "roleGroupId or role is required",
-                path: ["roleGroupId"],
-              });
-            }
-          }),
+        z.object({
+          emailToInvite: z.string(),
+          roleGroupId: z.uuid(),
+          roleOverrides: z
+            .array(
+              z.object({
+                app: z.enum([
+                  "data_sources",
+                  "data_explorer",
+                  "dashboards",
+                  "settings",
+                ]),
+                role: z.enum(["viewer", "editor", "admin"]),
+              }),
+            )
+            .optional(),
+          userGroupIds: z.array(z.uuid()).optional(),
+        }),
       )
       .action(
         async ({
@@ -129,13 +115,8 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
           supabaseAdminClient,
           user,
         }) => {
-          const {
-            emailToInvite,
-            role,
-            roleGroupId,
-            roleOverrides,
-            userGroupIds,
-          } = body;
+          const { emailToInvite, roleGroupId, roleOverrides, userGroupIds } =
+            body;
           // look up the workspace
           const { data: workspace } = await supabaseClient
             .from("workspaces")
@@ -195,21 +176,6 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
             throw new Error("This email has already been invited.");
           }
 
-          let resolvedRoleGroupId = roleGroupId;
-          if (!resolvedRoleGroupId) {
-            const builtinName =
-              role === "admin" ? "Global Admin" : "Global Viewer";
-            const { data: builtin } = await supabaseClient
-              .from("role_groups")
-              .select("id")
-              .eq("workspace_id", workspace.id)
-              .eq("name", builtinName)
-              .eq("is_builtin", true)
-              .single()
-              .throwOnError();
-            resolvedRoleGroupId = builtin.id;
-          }
-
           const tagIds = userGroupIds ?? [];
           if (tagIds.length > 0) {
             const { data: tagRows } = await supabaseClient
@@ -225,7 +191,29 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
             }
           }
 
-          const legacyRole = role ?? "member";
+          const { data: roleGroupRows } = await supabaseClient
+            .from("role_group_app_roles")
+            .select("app, role")
+            .eq("role_group_id", roleGroupId)
+            .throwOnError();
+
+          const baseMatrix = Permissions.RolesMatrix.rowsToUserAppRolesMatrix(
+            (roleGroupRows ?? []).map((row) => {
+              return {
+                app: row.app as AppType,
+                role: row.role as RoleLevel,
+              };
+            }),
+          );
+          const mergedMatrix =
+            (roleOverrides ?? []).length === 0 ?
+              baseMatrix
+            : Permissions.RolesMatrix.applyRoleOverridesToMatrix(
+                baseMatrix,
+                roleOverrides ?? [],
+              );
+          const inviteRoleMirror =
+            mergedMatrix.settings === "admin" ? "admin" : "member";
 
           // it's finally safe to create the invite row
           const { data: invite } = await supabaseClient
@@ -236,8 +224,8 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
               workspace_id: workspace.id,
               invited_by: user.id,
               invite_status: "pending",
-              role: legacyRole,
-              role_group_id: resolvedRoleGroupId,
+              role: inviteRoleMirror,
+              role_group_id: roleGroupId,
               role_overrides: roleOverrides ?? [],
               invite_user_group_ids: tagIds,
             })
@@ -379,26 +367,6 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
             .single()
             .throwOnError();
 
-          const { data: roleRows } = await supabaseAdminClient
-            .from("role_group_app_roles")
-            .select("app, role")
-            .eq("role_group_id", membershipRoleGroupId)
-            .throwOnError();
-
-          const mergedMatrix =
-            PermissionsModule.RolesMatrix.rowsToUserAppRolesMatrix(
-              (roleRows ?? []).map((row) => {
-                return {
-                  app: row.app as AppType,
-                  role: row.role as RoleLevel,
-                };
-              }),
-            );
-          const legacyRole =
-            PermissionsModule.RolesMatrix.legacyWorkspaceRoleFromMatrix(
-              mergedMatrix,
-            );
-
           // create the user profile
           const { data: profile } = await supabaseAdminClient
             .from("user_profiles")
@@ -408,19 +376,6 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
               membership_id: membership.id,
               full_name: user.email,
               display_name: user.email,
-            })
-            .select()
-            .single()
-            .throwOnError();
-
-          // create the user role
-          const { data: role } = await supabaseAdminClient
-            .from("user_roles")
-            .insert({
-              workspace_id: workspace.id,
-              user_id: user.id,
-              membership_id: membership.id,
-              role: legacyRole,
             })
             .select()
             .single()
@@ -438,7 +393,7 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
               .throwOnError();
           }
 
-          return { invite: updatedInvite, membership, profile, role };
+          return { invite: updatedInvite, membership, profile };
         },
       ),
   },

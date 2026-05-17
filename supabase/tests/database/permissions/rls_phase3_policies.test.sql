@@ -54,33 +54,6 @@ values
   )
 on conflict (id) do nothing;
 
-insert into public.user_roles (
-  workspace_id,
-  user_id,
-  membership_id,
-  role
-)
-values
-  (
-    'a7001001-0000-4000-8000-000000000001'::uuid,
-    'a7000001-0000-4000-8000-000000000001'::uuid,
-    'a7002001-0000-4000-8000-000000000001'::uuid,
-    'admin'
-  ),
-  (
-    'a7001001-0000-4000-8000-000000000001'::uuid,
-    'a7000002-0000-4000-8000-000000000002'::uuid,
-    'a7002002-0000-4000-8000-000000000002'::uuid,
-    'member'
-  ),
-  (
-    'a7001001-0000-4000-8000-000000000001'::uuid,
-    'a7000003-0000-4000-8000-000000000003'::uuid,
-    'a7002003-0000-4000-8000-000000000003'::uuid,
-    'member'
-  )
-on conflict (membership_id) do nothing;
-
 insert into public.user_profiles (
   id,
   user_id,
@@ -166,7 +139,7 @@ on conflict (id) do nothing;
 
 select plan(6);
 
--- 1 legacy shim admin includes workspace for owner
+-- 1 owner is settings admin
 set local role authenticated;
 
 select set_config(
@@ -176,13 +149,13 @@ select set_config(
 );
 
 select ok(
-  'a7001001-0000-4000-8000-000000000001'::uuid = any (
-    public.util__get_auth_user_workspaces_by_role ('admin')
+  public.util__is_settings_admin (
+    'a7001001-0000-4000-8000-000000000001'::uuid
   ),
-  'owner in legacy admin workspace list'
+  'owner is settings admin'
 );
 
--- 2 Global viewer not in legacy admin list
+-- 2 Global viewer is not settings admin
 set local role postgres;
 
 set local role authenticated;
@@ -194,12 +167,10 @@ select set_config(
 );
 
 select ok(
-  not (
-    'a7001001-0000-4000-8000-000000000001'::uuid = any (
-      public.util__get_auth_user_workspaces_by_role ('admin')
-    )
+  not public.util__is_settings_admin (
+    'a7001001-0000-4000-8000-000000000001'::uuid
   ),
-  'global viewer excluded from legacy admin list'
+  'global viewer is not settings admin'
 );
 
 -- 3 viewer can select unrestricted dashboard

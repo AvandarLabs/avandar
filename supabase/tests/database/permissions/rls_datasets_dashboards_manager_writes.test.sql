@@ -1,11 +1,11 @@
 \set ON_ERROR_STOP on
 
 /**
- * Hardened RLS for top-level datasets and dashboards: INSERT/UPDATE/DELETE
- * require workspace owner, Settings admin, or resource owner (with viewer
- * access); SELECT uses `util__auth_user_may_select_*` so Global Editors cannot
- * read others' unrestricted resources without a share. Cross-workspace INSERT
- * must fail.
+ * Hardened RLS for top-level datasets and dashboards: INSERT requires editor+
+ * app role and self-ownership; UPDATE requires effective editor+; DELETE
+ * requires effective admin+. SELECT uses `util__auth_user_may_select_*` so
+ * Global Editors cannot read others' unrestricted resources without a share.
+ * Cross-workspace INSERT must fail.
  */
 begin;
 
@@ -143,33 +143,6 @@ values
   )
 on conflict (id) do nothing;
 
-insert into public.user_roles (
-  workspace_id,
-  user_id,
-  membership_id,
-  role
-)
-values
-  (
-    'f1001001-0000-4000-8000-000000000001'::uuid,
-    'f1000001-0000-4000-8000-000000000001'::uuid,
-    'f1002001-0000-4000-8000-000000000001'::uuid,
-    'admin'
-  ),
-  (
-    'f1001001-0000-4000-8000-000000000001'::uuid,
-    'f1000002-0000-4000-8000-000000000002'::uuid,
-    'f1002002-0000-4000-8000-000000000002'::uuid,
-    'member'
-  ),
-  (
-    'f1001002-0000-4000-8000-000000000002'::uuid,
-    'f1000003-0000-4000-8000-000000000003'::uuid,
-    'f1002003-0000-4000-8000-000000000003'::uuid,
-    'admin'
-  )
-on conflict (membership_id) do nothing;
-
 insert into public.datasets (
   id,
   owner_id,
@@ -262,7 +235,7 @@ select
   plan (18);
 
 select
-  throws_ok (
+  lives_ok (
     $ins_ds_home$
     set local role authenticated;
 
@@ -290,12 +263,11 @@ select
       '',
       'csv_file'::public.datasets__source_type
     );
-    $ins_ds_home$,
-    '42501'
+    $ins_ds_home$
   );
 
 select
-  throws_ok (
+  lives_ok (
     $ins_dash_home$
     set local role authenticated;
 
@@ -325,8 +297,7 @@ select
       false,
       '{}'::jsonb
     );
-    $ins_dash_home$,
-    '42501'
+    $ins_dash_home$
   );
 
 select

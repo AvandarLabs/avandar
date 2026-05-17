@@ -1,10 +1,16 @@
 import { buildInitialCustomRoleGroupName } from "$/models/Permissions/PermissionsModule/buildInitialCustomRoleGroupName/buildInitialCustomRoleGroupName.ts";
+import { PermissionRegistry } from "$/models/Permissions/PermissionsModule/PermissionRegistry.ts";
 import {
   BUILTIN_ROLE_GROUP_NAMES,
   RESTRICTABLE_APPS,
 } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/preset-role-matrices.ts";
 import { RolesMatrixModule } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/RolesMatrixModule.ts";
-import type { PermissionCatalog } from "$/models/Permissions/Permissions.types.ts";
+import type {
+  AppType,
+  PermissionKey,
+  RoleLevel,
+  UserAppRolesMatrix,
+} from "$/models/Permissions/Permissions.types.ts";
 
 /**
  * Workspace permissions: UI catalog plus workspace role-matrix helpers.
@@ -15,64 +21,77 @@ export const PermissionsModule = {
   RestrictableApps: RESTRICTABLE_APPS,
   BuiltinRoleGroupNames: BUILTIN_ROLE_GROUP_NAMES,
   RolesMatrix: RolesMatrixModule,
+
+  /**
+   * Picks a unique `Custom Role Group N` for a workspace. Starts at
+   * `(count of non-built-in role_groups in workspace) + 1`, then increments `N`
+   * while that name is already taken (any group in the workspace).
+   */
   buildInitialCustomRoleGroupName,
-  PermissionCatalog: {
-    data_sources: {
-      viewer: [
-        "data_sources__can_view_dataset",
-        "data_sources__can_list_sources",
-      ] as const,
-      editor: [
-        "data_sources__can_view_dataset",
-        "data_sources__can_list_sources",
-        "data_sources__can_edit_dataset",
-        "data_sources__can_create_dataset",
-      ] as const,
-      admin: [
-        "data_sources__can_view_dataset",
-        "data_sources__can_list_sources",
-        "data_sources__can_edit_dataset",
-        "data_sources__can_create_dataset",
-        "data_sources__can_manage_sources",
-      ] as const,
-    },
-    data_explorer: {
-      viewer: [
-        "data_explorer__can_run_query",
-        "data_explorer__can_view_results",
-      ] as const,
-      editor: [
-        "data_explorer__can_run_query",
-        "data_explorer__can_view_results",
-        "data_explorer__can_save_query",
-      ] as const,
-      admin: [
-        "data_explorer__can_run_query",
-        "data_explorer__can_view_results",
-        "data_explorer__can_save_query",
-        "data_explorer__can_manage_explorer",
-      ] as const,
-    },
-    dashboards: {
-      viewer: ["dashboards__can_view_dashboard"] as const,
-      editor: [
-        "dashboards__can_view_dashboard",
-        "dashboards__can_edit_dashboard",
-      ] as const,
-      admin: [
-        "dashboards__can_view_dashboard",
-        "dashboards__can_edit_dashboard",
-        "dashboards__can_manage_dashboards",
-      ] as const,
-    },
-    settings: {
-      viewer: [] as const,
-      editor: [] as const,
-      admin: [
-        "settings__can_manage_workspace_users",
-        "settings__can_manage_roles_and_tags",
-        "settings__can_manage_billing",
-      ] as const,
-    },
-  } as const satisfies PermissionCatalog,
+
+  PermissionCatalog: PermissionRegistry,
+
+  /**
+   * Returns every permission key granted to `role` in `app`.
+   *
+   * @param options.app Workspace app surface.
+   * @param options.role Effective role tier for that app.
+   */
+  getPermissionsForAppRole(options: {
+    app: AppType;
+    role: RoleLevel;
+  }): ReadonlySet<PermissionKey> {
+    const catalog = PermissionRegistry[options.app];
+    const ordered: readonly RoleLevel[] = ["viewer", "editor", "admin"];
+    const maxIdx = ordered.indexOf(options.role);
+
+    return new Set(
+      ordered.slice(0, maxIdx + 1).flatMap((tier) => {
+        return [...catalog[tier]];
+      }),
+    );
+  },
+
+  /**
+   * Resolves which app a permission key belongs to.
+   *
+   * @returns Matching app, or undefined when the prefix is unknown.
+   */
+  parseAppTypeFromPermissionKey(
+    permissionKey: PermissionKey,
+  ): AppType | undefined {
+    return RESTRICTABLE_APPS.find((app) => {
+      return permissionKey.startsWith(`${app}__`);
+    });
+  },
+
+  /**
+   * Whether a member's app-role matrix includes a catalog permission key.
+   *
+   * @param options.roles Per-app role levels for the member.
+   * @param options.permissionKey Catalog permission key to check.
+   */
+  rolesMatrixHasPermission(options: {
+    roles: UserAppRolesMatrix;
+    permissionKey: PermissionKey;
+  }): boolean {
+    const app = PermissionsModule.parseAppTypeFromPermissionKey(
+      options.permissionKey,
+    );
+    if (!app) {
+      return false;
+    }
+
+    const roleForApp = options.roles[app];
+    if (!roleForApp) {
+      return false;
+    }
+
+    const granted = PermissionsModule.getPermissionsForAppRole({
+      app,
+      role: roleForApp,
+    });
+
+    return granted.has(options.permissionKey);
+  },
 };

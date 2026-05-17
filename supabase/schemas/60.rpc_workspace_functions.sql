@@ -63,19 +63,6 @@ begin
     p_display_name
   );
 
-  -- Create the user role
-  insert into public.user_roles (
-    workspace_id,
-    user_id,
-    membership_id,
-    role
-  ) values (
-    v_workspace.id,
-    v_owner_id,
-    v_membership_id,
-    'admin'
-  );
-
   return v_workspace;
 end;
 $$ language plpgsql security invoker;

@@ -20,7 +20,7 @@ import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { WorkspaceInviteClient } from "@/clients/WorkspaceInviteClient";
 import { WorkspaceUserPermissionsDrawer } from "@/components/WorkspaceSettingsPage/WorkspaceUserPermissionsDrawer/WorkspaceUserPermissionsDrawer";
 import { useWorkspaceInviteModal } from "@/components/WorkspaceSettingsPage/WorkspaceUsersForm/useWorkspaceInviteModal";
-import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin";
+import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
 
@@ -81,8 +81,7 @@ export function WorkspaceUsersTab(): JSX.Element | null {
   };
 
   const memberRows = workspaceUsers.map((user) => {
-    const roleLabel =
-      user.roleGroupName ?? (user.role === "admin" ? "Admin" : "Member");
+    const roleLabel = user.roleGroupName ?? "Custom role";
     return (
       <Table.Tr key={user.userId}>
         <Table.Td>{user.displayName}</Table.Td>

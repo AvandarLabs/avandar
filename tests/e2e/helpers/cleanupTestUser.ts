@@ -1,4 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
+import {
+  tryGetSupabaseServiceRoleKeyFromEnv,
+  tryGetSupabaseUrlFromEnv,
+} from "./supabaseEnv";
 import type { Database } from "../../../shared/types/database.types";
 
 /**
@@ -12,13 +16,12 @@ import type { Database } from "../../../shared/types/database.types";
  * not exist, or the deletion fails.
  */
 export async function cleanupTestUser(email: string): Promise<void> {
-  const apiUrl = process.env.VITE_SUPABASE_API_URL ?? process.env.SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const apiUrl = tryGetSupabaseUrlFromEnv();
+  const serviceRoleKey = tryGetSupabaseServiceRoleKeyFromEnv();
 
   if (!apiUrl || !serviceRoleKey) {
     console.warn(
-      "[e2e] Skipping deleteAuthUserByEmail: set VITE_SUPABASE_API_URL " +
-        "(or SUPABASE_URL) and SUPABASE_SERVICE_ROLE_KEY.",
+      "[e2e] Skipping deleteAuthUserByEmail: set VITE_SUPABASE_API_URL (or SUPABASE_URL) and SUPABASE_SERVICE_ROLE_KEY.",
     );
     return;
   }
