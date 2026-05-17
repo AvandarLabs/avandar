@@ -2,7 +2,6 @@ import { LineChart as MantineLineChart } from "@mantine/charts";
 import { formatDate } from "@utils";
 import { useMemo } from "react";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
-import { useVizDataLimit } from "@/lib/ui/viz/useVizDataLimit";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { CurveType } from "$/models/vizs/CurveType";
 
@@ -24,8 +23,6 @@ export function LineChart({
   curveType = "monotone",
   color,
 }: Props): JSX.Element {
-  const limitedData = useVizDataLimit("line", data);
-
   const series = useMemo(() => {
     return [{ name: yAxisKey, ...(color ? { color } : {}) }];
   }, [yAxisKey, color]);
@@ -58,7 +55,7 @@ export function LineChart({
   return (
     <MantineLineChart
       h={height}
-      data={limitedData}
+      data={data}
       dataKey={xAxisKey}
       series={series}
       xAxisProps={xAxisProps}

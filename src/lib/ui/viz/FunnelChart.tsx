@@ -1,7 +1,6 @@
 import { FunnelChart as MantineFunnelChart } from "@mantine/charts";
 import { useMemo } from "react";
 import { CHART_COLORS } from "@/lib/ui/viz/ChartConstants";
-import { useVizDataLimit } from "@/lib/ui/viz/useVizDataLimit";
 import type { UnknownDataFrame } from "@utils";
 
 type Props = {
@@ -19,9 +18,8 @@ export function FunnelChart({
   seriesColors,
   size = 300,
 }: Props): JSX.Element {
-  const limitedData = useVizDataLimit("funnel", data);
   const chartData = useMemo(() => {
-    return limitedData.map((row, index) => {
+    return data.map((row, index) => {
       const r = row as Record<string, unknown>;
       const name = String(r[nameKey] ?? "");
       return {
@@ -33,7 +31,7 @@ export function FunnelChart({
           "blue.6",
       };
     });
-  }, [limitedData, nameKey, valueKey, seriesColors]);
+  }, [data, nameKey, valueKey, seriesColors]);
 
   return <MantineFunnelChart data={chartData} size={size} withLabels />;
 }

@@ -4,8 +4,8 @@ import { isEmail, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { AuthClient } from "@/clients/AuthClient";
-import { AuthLayout } from "@/components/common/AuthLayout";
-import { BackToLoginLink } from "@/components/common/AuthLayout/BackToLoginLink";
+import { AuthLayout } from "@/components/layouts/AuthLayout";
+import { BackToLoginLink } from "@/components/layouts/AuthLayout/BackToLoginLink";
 
 export const Route = createFileRoute("/forgot-password")({
   component: ForgotPasswordPage,

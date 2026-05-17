@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { match } from "ts-pattern";
 import { z } from "zod";
-import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
+import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { Logger } from "@/utils/Logger";
 
 const searchSchema = z.object({

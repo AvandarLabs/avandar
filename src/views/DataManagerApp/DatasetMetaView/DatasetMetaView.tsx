@@ -14,7 +14,7 @@ import {
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
-import { EditableDisplayText, notifyError, notifySuccess } from "@ui";
+import { EditableDisplayText, notifyError, notifySuccess, Paper  } from "@ui";
 import { prop, where } from "@utils";
 import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
@@ -24,7 +24,6 @@ import { ShareResourceButton } from "@/components/permissions/ShareResourceModal
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { Paper } from "@/lib/ui/Paper/Paper";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { DatasetMetadataList } from "@/views/DataManagerApp/DatasetMetaView/DatasetMetadataList";
 import { DataSummaryView } from "@/views/DataManagerApp/DatasetMetaView/DataSummaryView";
