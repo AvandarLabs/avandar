@@ -9,7 +9,12 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    include: ["main/**/*.test.ts", "preload/**/*.test.ts"],
+    include: [
+      "main/**/*.test.ts",
+      "preload/**/*.test.ts",
+      "sync/**/*.test.ts",
+      "scripts/**/*.test.ts",
+    ],
     globals: false,
   },
 });

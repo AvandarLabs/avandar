@@ -44,6 +44,8 @@
     "preview": "vite preview",
     "tsc-watch": "scripts/tsc-watch.sh",
     "db:apply-migrations": "./scripts/applyMigrations.sh",
+    "gen:sqlite-migrations": "bun apps/desktop/scripts/gen-sqlite-migrations.ts",
+    "check:sqlite-migrations": "bun apps/desktop/scripts/check-sqlite-migrations.ts",
     "db:create-user": "pnpm vite-script scripts/createUserScript.ts",
     "db:delete-user": "./scripts/db/delete-user/delete-user.sh",
     "db:gen-types": "supabase gen types typescript --local > shared/types/database.types.ts",
