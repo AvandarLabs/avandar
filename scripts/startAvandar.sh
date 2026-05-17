@@ -61,6 +61,23 @@ echo -e "${CYAN}Starting Avandar Development Environment${NC}"
 echo -e "${CYAN}==========================================${NC}"
 echo ""
 
+# Stop any prior `pnpm dev` for this repo so the new one can take over.
+# Narrowly targets:
+#  - our concurrently orchestrator (matches the exact flags we pass below)
+#  - whatever is listening on the vite port (5173)
+#  - stray supabase functions serve / ngrok processes from the same script
+echo -e "${BLUE}Stopping any prior Avandar dev processes...${NC}"
+pkill -f "concurrently --names vite,functions,ngrok" 2>/dev/null || true
+vite_pids=$(lsof -ti:5173 -sTCP:LISTEN 2>/dev/null || true)
+if [ -n "$vite_pids" ]; then
+  kill $vite_pids 2>/dev/null || true
+fi
+pkill -f "supabase functions serve" 2>/dev/null || true
+pkill -f "^ngrok http " 2>/dev/null || true
+sleep 1
+echo -e "${GREEN}✓ Cleared prior dev processes${NC}"
+echo ""
+
 # Step 1: Update edge function environment variables
 echo -e "${BLUE}Step 1: Updating edge function environment variables...${NC}"
 if ! pnpm fns:update-env; then

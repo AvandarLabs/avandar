@@ -17,7 +17,7 @@ import {
   IconInfoCircle,
   IconRotateClockwise,
 } from "@tabler/icons-react";
-import { notifyError, notifyNotImplemented, notifySuccess, Tooltip } from "@ui";
+import { notifyError, notifySuccess, Tooltip } from "@ui";
 import { useEffect, useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
@@ -31,6 +31,7 @@ import { downloadRowsAsCSV } from "@/views/DataExplorerApp/downloadRowsAsCSV";
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetModal/OpenDatasetModal";
 import { QueryForm } from "@/views/DataExplorerApp/QueryForm/QueryForm";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
+import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
 import { useDataExplorerURLSync } from "@/views/DataExplorerApp/useDataExplorerURLSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 import type { DataExplorerURLSearch } from "@/views/DataExplorerApp/DataExplorerURLState";
@@ -195,7 +196,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
             >
               Open
             </Button>
-            <Menu shadow="md" width={220}>
+            <Menu shadow="md" width={240}>
               <Menu.Target>
                 <Button
                   variant="outline"
@@ -203,7 +204,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                   size="compact-sm"
                   rightSection={<IconChevronDown size={16} />}
                 >
-                  Save As
+                  Save
                 </Button>
               </Menu.Target>
               <Menu.Dropdown>
@@ -260,16 +261,22 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                   </>
                 : null}
                 <Menu.Item
-                  disabled={queryResultData.length === 0}
+                  disabled={
+                    queryResultData.length === 0 || state.rawSQL === undefined
+                  }
+                  rightSection={
+                    state.rawSQL === undefined ?
+                      <Tooltip label="Run an AI query first.">
+                        <IconInfoCircle size={16} />
+                      </Tooltip>
+                    : null
+                  }
                   onClick={() => {
                     if (!state.rawSQL) {
-                      notifyError(
-                        "Saving a new dataset is only supported for AI queries",
-                      );
                       return;
                     }
                     const modalId = modals.open({
-                      title: "Save As New Dataset",
+                      title: "Save as new dataset",
                       size: "xl",
                       children: (
                         <SaveAsNewDatasetForm
@@ -285,20 +292,42 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                     });
                   }}
                 >
-                  New Dataset
+                  Save as new dataset
                 </Menu.Item>
                 <Menu.Item
-                  disabled
-                  onClick={() => {
-                    notifyNotImplemented();
-                  }}
-                  rightSection={
-                    <Tooltip label="This feature is not implemented yet.">
-                      <IconInfoCircle size={16} />
-                    </Tooltip>
+                  disabled={
+                    queryResultData.length === 0 || state.rawSQL === undefined
                   }
+                  rightSection={
+                    state.rawSQL === undefined ?
+                      <Tooltip label="Run an AI query first.">
+                        <IconInfoCircle size={16} />
+                      </Tooltip>
+                    : null
+                  }
+                  onClick={() => {
+                    if (!state.rawSQL) {
+                      return;
+                    }
+                    const modalId = modals.open({
+                      withCloseButton: true,
+                      size: "lg",
+                      children: (
+                        <SaveToDashboardModal
+                          rawSQL={state.rawSQL}
+                          prompt={state.nlPrompt}
+                          vizType={state.vizConfig.vizType}
+                          vizConfig={state.vizConfig}
+                          workspaceSlug={workspace.slug}
+                          onClose={() => {
+                            modals.close(modalId);
+                          }}
+                        />
+                      ),
+                    });
+                  }}
                 >
-                  Dashboard Block
+                  Save to dashboard
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
