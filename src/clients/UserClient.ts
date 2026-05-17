@@ -11,13 +11,19 @@ import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import type { ServiceClient } from "@clients";
 import type { WithSupabaseClient } from "@clients/mixins/withSupabaseClient";
 import type { ILogger, WithLogger } from "@logger";
-import type { UserAppRolesMatrix } from "$/models/Permissions/Permissions.types";
+import type {
+  RoleLevel,
+  UserAppRolesMatrix,
+} from "$/models/Permissions/Permissions.types";
 import type { UserId } from "$/models/User/User.types";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type {
   MembershipId,
   UserProfileId,
 } from "$/models/User/UserProfile.types";
+import type { Database } from "$/types/database.types";
+
+export type ResourceType = Database["public"]["Enums"]["resource_type"];
 
 type TUserClient = WithSupabaseClient<
   WithLogger<
@@ -32,8 +38,13 @@ type TUserClient = WithSupabaseClient<
           workspaceId: WorkspaceId;
           userId: UserId | undefined;
         }) => Promise<UserAppRolesMatrix>;
+        canAccessResource: (params: {
+          resourceType: ResourceType;
+          resourceId: string;
+          minRole: RoleLevel;
+        }) => Promise<boolean>;
       },
-      "getProfile" | "getUserAppRoles",
+      "getProfile" | "getUserAppRoles" | "canAccessResource",
       never
     >
   >
@@ -175,9 +186,49 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
           logger.log("User app roles retrieved", { appRoles });
           return appRoles;
         },
+
+        /**
+         * Returns whether the auth user can access a resource at a minimum
+         * role. Wraps the SQL helper `util__auth_user_can_access_resource`.
+         *
+         * Used by the route middleware `resourceFallback` so a user who only
+         * has share-derived access on a dataset or dashboard can still load
+         * the deep route without the parent app's permission key.
+         */
+        canAccessResource: async ({
+          resourceType,
+          resourceId,
+          minRole,
+        }: {
+          resourceType: ResourceType;
+          resourceId: string;
+          minRole: RoleLevel;
+        }): Promise<boolean> => {
+          const logger = baseLogger.appendName("canAccessResource");
+          logger.log("Calling `canAccessResource`", {
+            resourceType,
+            resourceId,
+            minRole,
+          });
+
+          const { data, error } = await dbClient.rpc(
+            "util__auth_user_can_access_resource",
+            {
+              p_resource_type: resourceType,
+              p_resource_id: resourceId,
+              p_min_role: minRole,
+            },
+          );
+
+          if (error) {
+            throw new Error(error.message);
+          }
+
+          return data ?? false;
+        },
       },
       {
-        queryFns: ["getProfile", "getUserAppRoles"],
+        queryFns: ["getProfile", "getUserAppRoles", "canAccessResource"],
         mutationFns: [],
       },
     );
