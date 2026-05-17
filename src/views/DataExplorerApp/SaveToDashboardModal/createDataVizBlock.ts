@@ -2,6 +2,16 @@ import { uuid } from "$/lib/uuid";
 import type { VizConfig, VizType } from "$/models/vizs/VizConfig/VizConfig.types";
 
 /**
+ * Fallback prompt used when the Data Explorer's `state.nlPrompt` is empty
+ * (e.g. the SQL was hand-edited or loaded from the URL `?sql=` parameter).
+ *
+ * `DataVizPBlock` short-circuits to an "add a prompt" placeholder whenever
+ * `nlQuery.prompt` is empty, so writing this default keeps the saved block
+ * renderable inside the dashboard editor.
+ */
+export const DATA_EXPLORER_FALLBACK_PROMPT = "Saved from Data Explorer";
+
+/**
  * The shape of a DataViz entry inside a dashboard's Puck `content` array.
  *
  * Mirrors the structure produced by the dashboard editor when a `DataViz`
@@ -39,7 +49,9 @@ export function createDataVizBlock(args: {
   vizType: VizType;
   vizConfig: VizConfig;
 }): DataVizDashboardBlock {
-  const normalizedPrompt = args.prompt ?? "";
+  const trimmedPrompt = args.prompt?.trim() ?? "";
+  const normalizedPrompt =
+    trimmedPrompt.length > 0 ? trimmedPrompt : DATA_EXPLORER_FALLBACK_PROMPT;
   return {
     type: "DataViz",
     props: {

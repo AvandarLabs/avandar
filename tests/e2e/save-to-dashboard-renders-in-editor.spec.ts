@@ -10,17 +10,19 @@ import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
 import { MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
 /**
- * Regression-bait spec that demonstrates the stale react-query cache bug:
- * after saving a DataViz block to an existing dashboard, navigating to that
- * dashboard's editor shows the dashboard *without* the new block because
- * `DashboardClient.useUpdate` invalidates `QueryKeys.getAll()` but not
- * `QueryKeys.getById()`.
+ * End-to-end check that a bar chart saved from the Data Explorer actually
+ * renders inside the target dashboard's editor.
  *
- * The bar-chart assertion at the end is expected to FAIL until the cache
- * invalidation in `SaveToDashboardModal` is widened to include the per-id key.
+ * Exercises the full path:
+ *   1. Upload a real xlsx dataset.
+ *   2. Create + save an empty dashboard.
+ *   3. Run a SQL query in the Data Explorer and switch the viz to bar.
+ *   4. Save to the existing dashboard.
+ *   5. Navigate (client-side) back to the dashboard editor.
+ *   6. Assert the bar chart is visible inside the Puck canvas iframe.
  */
-test.describe("Save to dashboard - stale dashboard cache", () => {
-  test("bar chart saved to existing dashboard is missing in editor (expected to fail)", async ({
+test.describe("Save to dashboard - viz renders in editor", () => {
+  test("bar chart saved to an existing dashboard renders inside that dashboard's editor", async ({
     page,
     e2eWorkerDb,
   }) => {
@@ -150,12 +152,9 @@ test.describe("Save to dashboard - stale dashboard cache", () => {
         .getByRole("button", { name: /^save to dashboard$/i })
         .click();
 
-      // Toast confirms the save hit the database. We avoid clicking the
-      // toast's "Open dashboard" link because Mantine notifications auto-
-      // dismiss before a slow CI click can land. Instead we use the sidebar
-      // Dashboards link + the dashboard card; both are client-side
-      // navigations that keep the react-query cache live (a hard reload
-      // via `page.goto` would mask the stale-cache bug).
+      // Toast confirms the save hit the database. We navigate via the
+      // sidebar (instead of the toast link) because Mantine notifications
+      // auto-dismiss quickly and a slow CI click can miss them.
       await expect(
         page.getByText(/added to "untitled dashboard"/i),
       ).toBeVisible({ timeout: SHORT_WAIT });
@@ -177,11 +176,10 @@ test.describe("Save to dashboard - stale dashboard cache", () => {
         { timeout: SHORT_WAIT },
       );
 
-      // Step 6: The dashboard editor uses `useGetById`, which still holds
-      // the pre-save config in cache because `useUpdate` only invalidates
-      // `getAll`. The bar block we just saved is therefore absent from the
-      // Puck canvas iframe. The next assertion is expected to FAIL until
-      // SaveToDashboardModal also invalidates `getById({ id })`.
+      // Step 6: The DataViz block we appended should render inside the
+      // Puck canvas iframe. If the block was saved without a usable
+      // `nlQuery.prompt`, DataVizPBlock short-circuits to its "add a
+      // prompt" placeholder and the bar chart never appears.
       const editorFrame = page.locator("iframe").first().contentFrame();
       await expect(
         editorFrame.locator(".recharts-bar").first(),

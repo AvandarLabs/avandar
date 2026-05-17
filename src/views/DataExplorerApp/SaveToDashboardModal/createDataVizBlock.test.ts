@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
-import { createDataVizBlock } from "@/views/DataExplorerApp/SaveToDashboardModal/createDataVizBlock";
+import {
+  createDataVizBlock,
+  DATA_EXPLORER_FALLBACK_PROMPT,
+} from "@/views/DataExplorerApp/SaveToDashboardModal/createDataVizBlock";
 
 describe("createDataVizBlock", () => {
   it("returns a DataViz block whose props mirror the input rawSQL, prompt, and viz config", () => {
@@ -42,7 +45,7 @@ describe("createDataVizBlock", () => {
     expect(blockA.props.id).not.toBe(blockB.props.id);
   });
 
-  it("falls back to an empty prompt when prompt is undefined so the block stays valid", () => {
+  it("falls back to a non-empty default prompt when prompt is undefined so the block renders", () => {
     const vizConfig = VizConfigs.makeEmptyConfig("bar");
     const block = createDataVizBlock({
       rawSQL: "SELECT a, b FROM t",
@@ -51,9 +54,24 @@ describe("createDataVizBlock", () => {
       vizConfig,
     });
 
-    expect(block.props.nlQuery.prompt).toBe("");
+    expect(block.props.nlQuery.prompt).toBe(DATA_EXPLORER_FALLBACK_PROMPT);
     expect(block.props.nlQuery.generations).toEqual([
-      { prompt: "", rawSql: "SELECT a, b FROM t" },
+      {
+        prompt: DATA_EXPLORER_FALLBACK_PROMPT,
+        rawSql: "SELECT a, b FROM t",
+      },
     ]);
+  });
+
+  it("falls back to the default prompt when the supplied prompt is just whitespace", () => {
+    const vizConfig = VizConfigs.makeEmptyConfig("table");
+    const block = createDataVizBlock({
+      rawSQL: "SELECT 1",
+      prompt: "   ",
+      vizType: "table",
+      vizConfig,
+    });
+
+    expect(block.props.nlQuery.prompt).toBe(DATA_EXPLORER_FALLBACK_PROMPT);
   });
 });
