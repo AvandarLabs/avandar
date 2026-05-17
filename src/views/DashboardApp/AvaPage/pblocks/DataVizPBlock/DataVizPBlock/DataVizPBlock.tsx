@@ -1,14 +1,17 @@
 import { Box, LoadingOverlay, Stack, Text } from "@mantine/core";
 import { WithPuckProps } from "@puckeditor/core";
-import { useMemo } from "react";
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { getDateColumns } from "@/components/Visualization/getDateColumns";
-import { VisualizationContainer } from "@/components/Visualization/VisualizationContainer";
 import { Paper } from "@ui";
+import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import { useMemo } from "react";
+import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
+import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
-import type { VizConfig, VizType } from "$/models/vizs/VizConfig/VizConfig.types";
+import type {
+  VizConfig,
+  VizType,
+} from "$/models/vizs/VizConfig/VizConfig.types";
 
 type Props = {
   /** Natural-language prompt + generated SQL configured by the editor. */

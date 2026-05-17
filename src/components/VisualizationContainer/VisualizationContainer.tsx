@@ -1,8 +1,9 @@
 import { Box, Flex, List, Text } from "@mantine/core";
+import { Callout, DangerText } from "@ui";
 import { objectValues, prop, UnknownDataFrame } from "@utils";
 import { match } from "ts-pattern";
 import { flattenError, object, prettifyError, string } from "zod";
-import { Callout, DangerText  } from "@ui";
+import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit";
 import { AreaChart } from "@/lib/ui/viz/AreaChart";
 import { BarChart } from "@/lib/ui/viz/BarChart";
 import { BubbleChart } from "@/lib/ui/viz/BubbleChart";
@@ -122,13 +123,14 @@ export function VisualizationContainer({
   vizConfig,
 }: Props): JSX.Element {
   const columnNames = columns.map(prop("name"));
+  const limitedData = useVizDataLimit(vizConfig.vizType, data);
 
   const viz = match(vizConfig)
     .with({ vizType: "table" }, () => {
       return (
         <DataGrid
           columnNames={columnNames}
-          data={data}
+          data={limitedData}
           dateColumns={dateColumns}
           dateFormat="YYYY-MM-DD HH:mm:ss Z"
           height="100%"
@@ -145,7 +147,7 @@ export function VisualizationContainer({
         return (
           <Box w="100%">
             <BarChart
-              data={data}
+              data={limitedData}
               height={700}
               dateColumns={dateColumns}
               withLegend={config.withLegend}
@@ -198,7 +200,7 @@ export function VisualizationContainer({
         return (
           <Box w="100%">
             <LineChart
-              data={data}
+              data={limitedData}
               height={700}
               dateColumns={dateColumns}
               withLegend={config.withLegend}
@@ -222,7 +224,7 @@ export function VisualizationContainer({
         return (
           <Box w="100%">
             <AreaChart
-              data={data}
+              data={limitedData}
               height={700}
               dateColumns={dateColumns}
               withLegend={config.withLegend}
@@ -243,7 +245,9 @@ export function VisualizationContainer({
       } = ScatterPlotConfigSchema.safeParse(config);
 
       if (success) {
-        return <ScatterChart data={data} height={700} {...validConfig} />;
+        return (
+          <ScatterChart data={limitedData} height={700} {...validConfig} />
+        );
       }
       return <DangerText>{prettifyError(error)}</DangerText>;
     })
@@ -257,7 +261,7 @@ export function VisualizationContainer({
       if (success) {
         return (
           <PieChart
-            data={data}
+            data={limitedData}
             nameKey={validConfig.nameKey}
             valueKey={validConfig.valueKey}
             isDonut={config.isDonut}
@@ -279,7 +283,7 @@ export function VisualizationContainer({
       if (success) {
         return (
           <FunnelChart
-            data={data}
+            data={limitedData}
             nameKey={validConfig.nameKey}
             valueKey={validConfig.valueKey}
             seriesColors={config.seriesColors}
@@ -298,7 +302,7 @@ export function VisualizationContainer({
       if (success) {
         return (
           <RadarChart
-            data={data}
+            data={limitedData}
             nameKey={validConfig.nameKey}
             valueKey={validConfig.valueKey}
             color={config.color}
@@ -317,7 +321,7 @@ export function VisualizationContainer({
       if (success) {
         return (
           <BubbleChart
-            data={data}
+            data={limitedData}
             height={700}
             xAxisKey={validConfig.xAxisKey}
             yAxisKey={validConfig.yAxisKey}

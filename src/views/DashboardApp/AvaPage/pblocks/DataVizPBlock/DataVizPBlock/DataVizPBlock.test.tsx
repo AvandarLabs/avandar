@@ -30,7 +30,7 @@ vi.mock("@/views/DataExplorerApp/useDataQuery", () => {
   };
 });
 
-vi.mock("@/components/Visualization/VisualizationContainer", () => {
+vi.mock("@/components/VisualizationContainer/VisualizationContainer", () => {
   return {
     VisualizationContainer: (props: {
       columns: ReadonlyArray<{ name: string }>;

@@ -1,10 +1,10 @@
 import { Box, Text } from "@mantine/core";
 import { usePuck } from "@puckeditor/core";
-import { useMemo } from "react";
 import { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { Workspace } from "$/models/Workspace/Workspace";
-import { VizSettingsFormBody } from "@/components/Visualization/VizSettingsForm/VizSettingsFormBody";
+import { useMemo } from "react";
+import { VizSettingsFormBody } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsFormBody";
 import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";

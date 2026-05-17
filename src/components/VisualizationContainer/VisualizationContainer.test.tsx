@@ -1,14 +1,31 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { VIZ_RENDER_LIMITS } from "$/config/GlobalVizConfig";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
-import { VisualizationContainer } from "@/components/Visualization/VisualizationContainer";
+import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
+import type { UnknownDataFrame } from "@utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+
+const { notifyWarningMock } = vi.hoisted(() => {
+  return { notifyWarningMock: vi.fn() };
+});
+
+vi.mock("@ui", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@ui")>();
+  return {
+    ...actual,
+    notifyWarning: notifyWarningMock,
+  };
+});
 
 vi.mock("@/lib/ui/viz/DataGrid", () => {
   return {
-    DataGrid: (props: { columnNames: readonly string[] }) => {
+    DataGrid: (props: {
+      columnNames: readonly string[];
+      data: UnknownDataFrame;
+    }) => {
       return (
-        <div data-testid="data-grid">
+        <div data-testid="data-grid" data-row-count={props.data.length}>
           {props.columnNames.map((name) => {
             return <span key={name}>{name}</span>;
           })}
@@ -20,12 +37,17 @@ vi.mock("@/lib/ui/viz/DataGrid", () => {
 
 vi.mock("@/lib/ui/viz/BarChart", () => {
   return {
-    BarChart: (props: { xAxisKey?: string; yAxisKey?: string }) => {
+    BarChart: (props: {
+      xAxisKey?: string;
+      yAxisKey?: string;
+      data: UnknownDataFrame;
+    }) => {
       return (
         <div
           data-testid="bar-chart"
           data-x={props.xAxisKey}
           data-y={props.yAxisKey}
+          data-row-count={props.data.length}
         />
       );
     },
@@ -151,12 +173,13 @@ const EMPTY_DATE_COLUMNS: ReadonlySet<string> = new Set();
 
 function renderViz(
   vizConfig: Parameters<typeof VisualizationContainer>[0]["vizConfig"],
+  data: UnknownDataFrame = DATA,
 ): ReturnType<typeof render> {
   return render(
     <AvandarUiProvider>
       <VisualizationContainer
         columns={COLUMNS}
-        data={DATA}
+        data={data}
         dateColumns={EMPTY_DATE_COLUMNS}
         vizConfig={vizConfig}
       />
@@ -165,6 +188,10 @@ function renderViz(
 }
 
 describe("VisualizationContainer", () => {
+  beforeEach(() => {
+    notifyWarningMock.mockClear();
+  });
+
   it("renders the data grid for the 'table' viz type", () => {
     renderViz({ vizType: "table" });
     const grid = screen.getByTestId("data-grid");
@@ -281,5 +308,47 @@ describe("VisualizationContainer", () => {
     expect(bubble).toHaveAttribute("data-x", "value");
     expect(bubble).toHaveAttribute("data-y", "score");
     expect(bubble).toHaveAttribute("data-size", "value");
+  });
+
+  it("passes truncated data to bar charts over the render limit", () => {
+    const barMax = VIZ_RENDER_LIMITS.bar!.max;
+    const overLimitData: UnknownDataFrame = Array.from(
+      { length: barMax + 50 },
+      (_, index) => {
+        return { category: `row-${index}`, value: index, score: index };
+      },
+    );
+
+    renderViz(
+      {
+        vizType: "bar",
+        xAxisKey: "category",
+        yAxisKey: "value",
+        withLegend: true,
+      },
+      overLimitData,
+    );
+
+    const bar = screen.getByTestId("bar-chart");
+    expect(bar).toHaveAttribute("data-row-count", String(barMax));
+    expect(notifyWarningMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not truncate table data", () => {
+    const rowCount = 500;
+    const tableData: UnknownDataFrame = Array.from(
+      { length: rowCount },
+      (_, index) => {
+        return { category: `row-${index}`, value: index, score: index };
+      },
+    );
+
+    renderViz({ vizType: "table" }, tableData);
+
+    expect(screen.getByTestId("data-grid")).toHaveAttribute(
+      "data-row-count",
+      String(rowCount),
+    );
+    expect(notifyWarningMock).not.toHaveBeenCalled();
   });
 });
