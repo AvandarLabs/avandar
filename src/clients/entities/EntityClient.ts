@@ -1,11 +1,9 @@
-import { createSupabaseCRUDClient } from "@clients";
+import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { EntityParsers } from "$/models/entities/Entity/EntityParsers";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 
 export const EntityClient = createUsableServiceClient(
-  createSupabaseCRUDClient({
-    dbClient: AvaSupabase.DB,
+  createRdbCrudClient({
     modelName: "Entity",
     tableName: "entities",
     dbTablePrimaryKey: "id",

@@ -23,7 +23,7 @@
 import { prop } from "@utils";
 import Dexie from "dexie";
 import { DexieDBVersionManager } from "@/clients/dexie/DexieDBVersionManager";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { clearOPFS } from "@/lib/utils/browser/clearOPFS";
 import type { LegacyLocalDatasetEntryModel } from "@/models/Legacy_LocalDatasetEntry/Legacy_LocalDatasetEntry.types";
 import type { LocalDatasetModel } from "@/models/LocalDataset/LocalDataset.types";
@@ -71,11 +71,11 @@ const DBDefinitions = [
       // When a user upgardes the database in a different browser, this will run
       // again). But this is safe right now because we have not launched the
       // platform yet.
-      const { data: datasets } = await AvaSupabase.DB.from("datasets")
+      const { data: datasets } = await AvaSupabase.db().from("datasets")
         .select("*")
         .throwOnError();
       const datasetIds = datasets.map(prop("id"));
-      await AvaSupabase.DB.from("datasets").delete().in("id", datasetIds);
+      await AvaSupabase.db().from("datasets").delete().in("id", datasetIds);
     },
   }),
 

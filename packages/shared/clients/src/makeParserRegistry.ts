@@ -1,14 +1,14 @@
 import { excludeUndefinedDeep } from "@utils/objects/excludeUndefinedDeep/excludeUndefinedDeep.ts";
 import { objectKeys } from "@utils/objects/objectKeys.ts";
 import { pick } from "@utils/objects/pick/pick.ts";
-import type { CRUDModelSpec } from "@clients/ModelCRUDClient/ModelCRUDClient.types.ts";
+import type { CrudModelSpec } from "@clients/ModelCrudClient/ModelCrudClient.types.ts";
 import type { z } from "zod";
 
-type GenericDBReadSchema<M extends CRUDModelSpec> = z.ZodObject<{
+type GenericDBReadSchema<M extends CrudModelSpec> = z.ZodObject<{
   [K in keyof M["DBRead"]]: z.ZodType<M["DBRead"][K], M["DBRead"][K]>;
 }>;
 
-type CRUDTransformerFunctions<M extends CRUDModelSpec> = {
+type CrudTransformerFunctions<M extends CrudModelSpec> = {
   /**
    * Transforms a DBRead object into a ModelRead object.
    *
@@ -34,16 +34,16 @@ type CRUDTransformerFunctions<M extends CRUDModelSpec> = {
   fromModelUpdateToDBUpdate: (data: M["Update"]) => M["DBUpdate"];
 };
 
-export type ModelCRUDParserRegistry<M extends CRUDModelSpec> = {
+export type ModelCrudParserRegistry<M extends CrudModelSpec> = {
   DBReadSchema: GenericDBReadSchema<M>;
-} & CRUDTransformerFunctions<M>;
+} & CrudTransformerFunctions<M>;
 
-type ParserRegistryBuilderFn<M extends CRUDModelSpec> = (
+type ParserRegistryBuilderFn<M extends CrudModelSpec> = (
   config: {
     modelName: M["modelName"];
     DBReadSchema: GenericDBReadSchema<M>;
-  } & CRUDTransformerFunctions<M>,
-) => ModelCRUDParserRegistry<M>;
+  } & CrudTransformerFunctions<M>,
+) => ModelCrudParserRegistry<M>;
 
 /**
  * Appends the model name and schema name to the Zod error message.
@@ -75,7 +75,7 @@ export function getErrorMap({
  *
  * @returns A builder function for creating a parser registry.
  */
-export function makeParserRegistry<M extends CRUDModelSpec = never>(): {
+export function makeParserRegistry<M extends CrudModelSpec = never>(): {
   build: ParserRegistryBuilderFn<M>;
 } {
   return {
@@ -83,8 +83,8 @@ export function makeParserRegistry<M extends CRUDModelSpec = never>(): {
       config: {
         modelName: M["modelName"];
         DBReadSchema: GenericDBReadSchema<M>;
-      } & CRUDTransformerFunctions<M>,
-    ): ModelCRUDParserRegistry<M> => {
+      } & CrudTransformerFunctions<M>,
+    ): ModelCrudParserRegistry<M> => {
       const dbKeys = objectKeys(config.DBReadSchema.shape);
 
       return {

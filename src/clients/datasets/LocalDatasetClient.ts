@@ -1,4 +1,4 @@
-import { createDexieCRUDClient } from "@/clients/dexie/createDexieCRUDClient";
+import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
@@ -40,7 +40,7 @@ import type { DistributedOmit } from "type-fest";
  *
  */
 export const LocalDatasetClient = createUsableServiceClient(
-  createDexieCRUDClient({
+  createDexieCrudClient({
     db: AvaDexie.DB,
     modelName: "LocalDataset",
     parsers: LocalDatasetParsers,

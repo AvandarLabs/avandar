@@ -1,7 +1,7 @@
 import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
-import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { SetOptional } from "type-fest";
 
@@ -52,7 +52,7 @@ export type XlsxFileDatasetRead = Model.Base<
 /**
  * CRUD type definitions for the XlsxFileDataset model.
  */
-export type XlsxFileDatasetModel = SupabaseCRUDModelSpec<
+export type XlsxFileDatasetModel = SupabaseCrudModelSpec<
   {
     tableName: "datasets__xlsx_file";
     modelName: "XlsxFileDataset";

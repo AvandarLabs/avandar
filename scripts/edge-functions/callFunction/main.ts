@@ -2,7 +2,7 @@ import { Argument, Command } from "commander";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "seed/SeedData";
 import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 
 const httpMethodChoices = [
   "get",
@@ -155,7 +155,7 @@ async function main() {
 
   const parsedMethod = HTTPMethod.parse(methodName);
 
-  const { data, error } = await AvaSupabase.DB.functions.invoke(
+  const { data, error } = await AvaSupabase.db().functions.invoke(
     fullFunctionName,
     {
       body:

@@ -88,7 +88,11 @@ export async function clearWorkspaceWideShareAccess(page: Page): Promise<void> {
     .locator("xpath=ancestor::div[contains(@class, 'mantine-Input-wrapper')]")
     .getByRole("button")
     .first();
-  if (await clearButton.isVisible().catch(() => false)) {
+  if (
+    await clearButton.isVisible().catch(() => {
+      return false;
+    })
+  ) {
     await clearButton.click();
   }
 }

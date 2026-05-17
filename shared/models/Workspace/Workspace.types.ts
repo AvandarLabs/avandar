@@ -1,6 +1,6 @@
 import type { UUID } from "@utils/types/common.types.ts";
 import type { Subscription } from "$/models/Subscription/Subscription.ts";
-import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { SetOptional } from "type-fest";
 
@@ -32,7 +32,7 @@ export type WorkspaceRead = {
 /**
  * CRUD type definitions for the Workspace model.
  */
-export type WorkspaceModel = SupabaseCRUDModelSpec<
+export type WorkspaceModel = SupabaseCrudModelSpec<
   {
     tableName: "workspaces";
     modelName: "Workspace";

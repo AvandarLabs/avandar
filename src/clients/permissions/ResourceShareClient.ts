@@ -2,10 +2,11 @@ import { createServiceClient, withSupabaseClient } from "@clients";
 import { withQueryHooks } from "@hooks";
 import { withLogger } from "@logger";
 import { withNewMembers } from "@modules";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import type { ILogger } from "@logger";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
+import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 import type { Database } from "$/types/database.types";
 
 export type ResourceType = Database["public"]["Enums"]["resource_type"];
@@ -52,7 +53,7 @@ function _mapResourceShareRow(row: {
 /**
  * CRUD for `resource_shares`, resource tags, and `is_restricted` on resources.
  */
-function createResourceShareClient(supabaseClient: typeof AvaSupabase.DB) {
+function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
   const baseClient = createServiceClient("ResourceShareClient").mixin(
     withSupabaseClient(supabaseClient),
   );
@@ -350,4 +351,4 @@ function createResourceShareClient(supabaseClient: typeof AvaSupabase.DB) {
   return finalClient;
 }
 
-export const ResourceShareClient = createResourceShareClient(AvaSupabase.DB);
+export const ResourceShareClient = createResourceShareClient(AvaSupabase.db());

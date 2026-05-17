@@ -122,21 +122,21 @@ export interface SyncEngine {
 The existing pattern (per `AGENTS.md` repository convention) already injects DB clients at factory time. We add **one umbrella factory** that selects per-platform:
 
 ```ts
-// packages/shared/clients/createRdbCRUDClient.ts
-export function createRdbCRUDClient<M>(spec: RdbCRUDClientSpec<M>) {
+// packages/shared/clients/createRdbCrudClient.ts
+export function createRdbCrudClient<M>(spec: RdbCrudClientSpec<M>) {
   if (isDesktop()) {
-    return createSqliteCRUDClient(spec);   // new: IPC → bun:sqlite
+    return createSqliteCrudClient(spec);   // new: IPC → bun:sqlite
   }
-  return createSupabaseCRUDClient({ dbClient: AvaSupabase.DB, ...spec });
+  return createSupabaseCrudClient({ dbClient: AvaSupabase.DB, ...spec });
 }
 ```
 
-Migration of existing ~20 client files is mechanical (find/replace), no React-component changes. Existing `createDexieCRUDClient` callers stay as-is (Dexie remains web-only for parquet caching).
+Migration of existing ~20 client files is mechanical (find/replace), no React-component changes. Existing `createDexieCrudClient` callers stay as-is (Dexie remains web-only for parquet caching).
 
 Naming convention:
-- `createRdbCRUDClient(spec)` — top-level platform-aware factory used by every client file
-- `createSqliteCRUDClient(spec)` — desktop backend
-- `createSupabaseCRUDClient({ dbClient, ...spec })` — web backend (existing)
+- `createRdbCrudClient(spec)` — top-level platform-aware factory used by every client file
+- `createSqliteCrudClient(spec)` — desktop backend
+- `createSupabaseCrudClient({ dbClient, ...spec })` — web backend (existing)
 
 ## ServerApiClient — RPCs & Edge Functions
 
@@ -448,7 +448,7 @@ Captured here so V1 design decisions stay forward-compatible.
 
 **Phase 0 — Foundations (1–2 weeks).** `apps/desktop/` scaffolded; Electrobun hosts the existing web build as a shell; login works; smoke test of read-only browsing.
 
-**Phase 1 — Platform abstractions, no behavior change (1–2 weeks).** Define the six interfaces in `packages/shared/platform/`; implement web-side adapters wrapping today's code; migrate ~20 client files to `createRdbCRUDClient`; migrate the 2 `supabase.rpc(...)` call sites and `src/clients/APIClient.ts` to `createServerApiClient`. Both shells still behave identically to today.
+**Phase 1 — Platform abstractions, no behavior change (1–2 weeks).** Define the six interfaces in `packages/shared/platform/`; implement web-side adapters wrapping today's code; migrate ~20 client files to `createRdbCrudClient`; migrate the 2 `supabase.rpc(...)` call sites and `src/clients/APIClient.ts` to `createServerApiClient`. Both shells still behave identically to today.
 
 **Phase 2 — Desktop native layer wired up (2–3 weeks).** IPC contracts; `bun:sqlite` + first migrations via `sqlglot`; `RdbClient` IPC live; native DuckDB in Bun main; `DatasetBlobStore` filesystem implementation; keychain via Bun FFI. Desktop runs offline against a snapshot, uploads persist to disk, no sync yet.
 
@@ -491,7 +491,7 @@ Ordered by *likelihood × impact*.
 - Six platform abstractions in `packages/shared/platform/`: `DuckDbClient`, `RdbClient`, `ServerApiClient`, `DatasetBlobStore`, `AuthProvider`, `SyncEngine`.
 - `bun:sqlite` + native DuckDB + filesystem + OS keychain (Bun FFI) on desktop.
 - SQLite schema is a near-mirror of Postgres for tables in `SYNCABLE_TABLES`; generated via `sqlglot`; committed to repo.
-- Naming: `createRdbCRUDClient` (top-level), `createSqliteCRUDClient` (desktop), `createSupabaseCRUDClient` (web).
+- Naming: `createRdbCrudClient` (top-level), `createSqliteCrudClient` (desktop), `createSupabaseCrudClient` (web).
 - Naming: `createServerApiClient` (top-level), `createIpcServerApiClient` (desktop), `createBrowserServerApiClient` (web). RPCs and Edge Functions both route through this on desktop; V1 throws `OfflineError` when offline (no queueing).
 - Naming: `DatasetBlobStore`, `DatasetBlobKey`, `parquet_blob`, `source_file_blob` — no generic "blob" in user-facing identifiers.
 - Custom sync engine; no third-party sync service.

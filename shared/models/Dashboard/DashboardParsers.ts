@@ -66,7 +66,7 @@ export const DashboardParsers = makeParserRegistry<DashboardModel>().build({
 /**
  * Do not remove these tests!
  */
-type CRUDTypes = DashboardModel;
+type CrudTypes = DashboardModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
@@ -74,7 +74,7 @@ type ZodConsistencyTests = [
   Expect<
     ZodSchemaEqualsTypes<
       typeof DBReadSchema,
-      { input: CRUDTypes["DBRead"]; output: CRUDTypes["DBRead"] }
+      { input: CrudTypes["DBRead"]; output: CrudTypes["DBRead"] }
     >
   >,
 ];

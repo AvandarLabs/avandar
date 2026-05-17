@@ -4,11 +4,11 @@ Typed CRUD client primitives. Provides:
 
 - A base `ServiceClient` module — the lowest-level client primitive (just a
   named module). All other client builders extend it.
-- A generic `ModelCRUDClient` — a database-agnostic CRUD client for any
+- A generic `ModelCrudClient` — a database-agnostic CRUD client for any
   data model. Defines the standard interface (`getById`, `getAll`,
   `getPage`, `insert`, `update`, `delete`, etc.) that `@avandar/hooks`'
   `withQueryHooks` knows how to wrap.
-- A `SupabaseCRUDClient` — a concrete Supabase implementation of the
+- A `SupabaseCrudClient` — a concrete Supabase implementation of the
   generic CRUD client, with table-name-aware types pulled from a registered
   database type.
 - A `makeParserRegistry` builder for translating between database row
@@ -24,7 +24,7 @@ This package separates *what a model client does* (CRUD operations) from
 ```ts
 import {
   createServiceClient,
-  createSupabaseCRUDClient,
+  createSupabaseCrudClient,
   makeParserRegistry,
 } from "@avandar/clients";
 
@@ -35,7 +35,7 @@ declare module "@avandar/clients" {
   }
 }
 
-const userParsers = makeParserRegistry<UserCRUDSpec>().build({
+const userParsers = makeParserRegistry<UserCrudSpec>().build({
   modelName: "User",
   DBReadSchema: UserDBReadSchema,
   fromDBReadToModelRead: (db) => ({ id: db.id, name: db.full_name }),
@@ -43,7 +43,7 @@ const userParsers = makeParserRegistry<UserCRUDSpec>().build({
   fromModelUpdateToDBUpdate: (m) => ({ full_name: m.name }),
 });
 
-const UserClient = createSupabaseCRUDClient({
+const UserClient = createSupabaseCrudClient({
   modelName: "User",
   tableName: "users",
   dbTablePrimaryKey: "id",
@@ -80,9 +80,9 @@ low-level `crudFunctions` (one function per CRUD operation, working in
 "DB" types) and parsers (converting between DB and frontend model types).
 The client exposes a high-level surface in frontend model types.
 
-### `createModelCRUDClient(options)`
+### `createModelCrudClient(options)`
 
-Builds a `ModelCRUDClient<M>`.
+Builds a `ModelCrudClient<M>`.
 
 | Option                  | Description                                                                       |
 | ----------------------- | --------------------------------------------------------------------------------- |
@@ -114,8 +114,8 @@ The returned client exposes the following methods (all return promises):
 
 | Type                          | Description                                                                |
 | ----------------------------- | -------------------------------------------------------------------------- |
-| `CRUDModelSpec`               | Generic spec: `modelName`, `modelPrimaryKeyType`, plus `DBRead`/`DBInsert`/`DBUpdate` and `Read`/`Insert`/`Update` shapes |
-| `ModelCRUDClient<M>`          | The full client surface for a given `CRUDModelSpec`                        |
+| `CrudModelSpec`               | Generic spec: `modelName`, `modelPrimaryKeyType`, plus `DBRead`/`DBInsert`/`DBUpdate` and `Read`/`Insert`/`Update` shapes |
+| `ModelCrudClient<M>`          | The full client surface for a given `CrudModelSpec`                        |
 | `ClientReturningOnlyPromises` | Record shape required for `additionalQueries` and `additionalMutations`    |
 | `UpsertOptions`               | `{ upsert?, onConflict? }` shared by `insert` / `bulkInsert`               |
 
@@ -127,7 +127,7 @@ A concrete CRUD client backed by Supabase. Reads `DBRead`/`DBInsert`/
 `DBUpdate` from the database type registered through the `Register`
 interface, so callers only need to declare frontend model types.
 
-### `createSupabaseCRUDClient(options)`
+### `createSupabaseCrudClient(options)`
 
 | Option              | Description                                                                                |
 | ------------------- | ------------------------------------------------------------------------------------------ |
@@ -139,7 +139,7 @@ interface, so callers only need to declare frontend model types.
 | `queries?`          | Builder that returns extra promise-returning query functions; receives `dbClient`, parsers, logger |
 | `mutations?`        | Builder that returns extra promise-returning mutation functions; same arguments            |
 
-The returned client extends `ModelCRUDClient` with `setDBClient(newClient)`
+The returned client extends `ModelCrudClient` with `setDBClient(newClient)`
 for swapping out the underlying Supabase client (used to seed data with an
 admin client during tests).
 
@@ -153,7 +153,7 @@ without using the full CRUD machinery.
 
 | Type                  | Description                                                              |
 | --------------------- | ------------------------------------------------------------------------ |
-| `SupabaseCRUDModelSpec` | Wrapper that derives DB types from the registered Supabase `Database`  |
+| `SupabaseCrudModelSpec` | Wrapper that derives DB types from the registered Supabase `Database`  |
 | `WithSupabaseClient`  | A `ServiceClient` augmented with `setDBClient`                           |
 
 ---
@@ -162,7 +162,7 @@ without using the full CRUD machinery.
 
 ### `makeParserRegistry<M>().build(config)`
 
-Builds a `ModelCRUDParserRegistry<M>` from:
+Builds a `ModelCrudParserRegistry<M>` from:
 
 - a Zod schema for `DBRead` rows (validated on every read),
 - a `fromDBReadToModelRead` parser,
@@ -179,7 +179,7 @@ The builder hardens each parser:
 
 | Type                     | Description                                              |
 | ------------------------ | -------------------------------------------------------- |
-| `ModelCRUDParserRegistry`| The shape returned from `.build(...)`                    |
+| `ModelCrudParserRegistry`| The shape returned from `.build(...)`                    |
 
 ---
 
@@ -199,7 +199,7 @@ declare module "@avandar/clients" {
 ```
 
 Once registered, `tableName`, `DBRead`, `DBInsert`, and `DBUpdate` types
-flow through `createSupabaseCRUDClient` automatically.
+flow through `createSupabaseCrudClient` automatically.
 
 | Type       | Description                                                  |
 | ---------- | ------------------------------------------------------------ |

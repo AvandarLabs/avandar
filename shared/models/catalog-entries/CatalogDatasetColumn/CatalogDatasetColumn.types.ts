@@ -1,7 +1,7 @@
 import type { UUID } from "@utils/types/common.types.ts";
 import type { OpenDataCatalogEntryId } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types.ts";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes.ts";
-import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { SetOptional } from "type-fest";
 
 export type CatalogDatasetColumnId = UUID<"CatalogDatasetColumn">;
@@ -36,7 +36,7 @@ export type CatalogDatasetColumnRead = {
 /**
  * CRUD type definitions for the CatalogDatasetColumn model.
  */
-export type CatalogDatasetColumnModel = SupabaseCRUDModelSpec<
+export type CatalogDatasetColumnModel = SupabaseCrudModelSpec<
   {
     tableName: "catalog_entries__dataset_column";
     modelName: "CatalogDatasetColumn";

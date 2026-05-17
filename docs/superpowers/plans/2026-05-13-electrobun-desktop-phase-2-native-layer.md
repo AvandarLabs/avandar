@@ -16,7 +16,7 @@
 - A typed IPC layer in `packages/shared/platform/ipc/` defines contracts; webview side has an IPC client, Bun main side has handler registration.
 - `apps/desktop/main/services/` hosts the concrete native implementations: `Sqlite.ts`, `DuckDb.ts`, `FileSystemDatasetBlobStore.ts`, `Keychain.ts`.
 - A Postgres→SQLite migration generator (`apps/desktop/scripts/gen-sqlite-migrations.ts`) shells out to Python's `sqlglot`, guarded by a `SYNCABLE_TABLES` manifest.
-- `createSqliteCRUDClient` joins `createSupabaseCRUDClient` as a backend implementation; `createRdbCRUDClient` now branches per platform.
+- `createSqliteCrudClient` joins `createSupabaseCrudClient` as a backend implementation; `createRdbCrudClient` now branches per platform.
 
 **Tech Stack:** Electrobun IPC, Bun runtime, `bun:sqlite`, native DuckDB (via the existing `duckdb` Node binding used by `@avandar/ava-etl`), Bun FFI, Python 3 + `sqlglot` (developer-machine dependency).
 
@@ -73,8 +73,8 @@
 - `apps/desktop/main/platform/network.ts`
 
 **New: Webview-side desktop implementations:**
-- `packages/shared/clients/src/SqliteCRUDClient/createSqliteCRUDClient.ts`
-- `packages/shared/clients/src/SqliteCRUDClient/createSqliteCRUDClient.test.ts`
+- `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.ts`
+- `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.test.ts`
 - `packages/shared/platform/src/desktop/DesktopRdbClient.ts`
 - `packages/shared/platform/src/desktop/DesktopDuckDbClient.ts`
 - `packages/shared/platform/src/desktop/DesktopDatasetBlobStore.ts`
@@ -85,8 +85,8 @@
 - `apps/desktop/package.json` — add `duckdb`, `bun:sqlite` (built-in, no dep needed)
 - `apps/desktop/main/index.ts` — register IPC handlers on startup
 - `apps/desktop/preload/index.ts` — expose IPC bridge to webview
-- `packages/shared/clients/src/index.ts` — export `createSqliteCRUDClient`
-- `packages/shared/clients/src/RdbCRUDClient/createRdbCRUDClient.ts` — flip the desktop branch
+- `packages/shared/clients/src/index.ts` — export `createSqliteCrudClient`
+- `packages/shared/clients/src/RdbCrudClient/createRdbCrudClient.ts` — flip the desktop branch
 - `package.json` (root) — add `gen:sqlite-migrations` and `check:sqlite-migrations` scripts
 - Vite config — exclude `@duckdb/duckdb-wasm` from the bundle when `AVA_TARGET=desktop`
 
@@ -1663,24 +1663,24 @@ Expected: green.
 
 ---
 
-## Task 8: RDB IPC handlers + `createSqliteCRUDClient`
+## Task 8: RDB IPC handlers + `createSqliteCrudClient`
 
-**Test groupings:** G2.9 (createSqliteCRUDClient round-trip on real bun:sqlite — insert→getById→list→update→delete; transaction rolls back on second-statement failure); G2.10 (Outbox-in-same-transaction invariant — data write + manual INSERT INTO _outbox commit atomically; Phase 3 prerequisite encoded in Phase 2).
+**Test groupings:** G2.9 (createSqliteCrudClient round-trip on real bun:sqlite — insert→getById→list→update→delete; transaction rolls back on second-statement failure); G2.10 (Outbox-in-same-transaction invariant — data write + manual INSERT INTO _outbox commit atomically; Phase 3 prerequisite encoded in Phase 2).
 
 **PR boundaries:** 3-4 PRs.
 - PR 1: RDB IPC handlers in `apps/desktop/main/ipc/rdb.ts` with unit tests; nothing imports them on web.
-- PR 2: `createSqliteCRUDClient` in `packages/shared/clients/src/RdbCRUDClient/...` with mocked-IPC unit tests; new file, not yet selected by the factory.
+- PR 2: `createSqliteCrudClient` in `packages/shared/clients/src/RdbCrudClient/...` with mocked-IPC unit tests; new file, not yet selected by the factory.
 - PR 3: Integration loopback test wiring PR 1 and PR 2 through the fake-IPC harness — asserts already-passing behavior.
-- PR 4: Update `createRdbCRUDClient` factory's desktop branch to return `createSqliteCRUDClient`; desktop CRUD goes live, web is unaffected because `isDesktop()` is false.
+- PR 4: Update `createRdbCrudClient` factory's desktop branch to return `createSqliteCrudClient`; desktop CRUD goes live, web is unaffected because `isDesktop()` is false.
 
 Wire SQLite to the webview through the IPC layer, then introduce the SQLite-backed CRUD client.
 
 **Files:**
 - Create: `apps/desktop/main/ipc/rdb.ts`
-- Create: `packages/shared/clients/src/SqliteCRUDClient/createSqliteCRUDClient.ts`
-- Test: `packages/shared/clients/src/SqliteCRUDClient/createSqliteCRUDClient.test.ts`
+- Create: `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.ts`
+- Test: `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.test.ts`
 - Modify: `packages/shared/clients/src/index.ts`
-- Modify: `packages/shared/clients/src/RdbCRUDClient/createRdbCRUDClient.ts`
+- Modify: `packages/shared/clients/src/RdbCrudClient/createRdbCrudClient.ts`
 - Modify: `apps/desktop/main/index.ts`
 
 - [ ] **Step 1: Register RDB handlers in Bun main**
@@ -1799,16 +1799,16 @@ export async function loadMigrations(): Promise<ReadonlyArray<Migration>> {
 
 In production builds, the migrations directory will be bundled into the app resources; adjust this path if Electrobun's bundler relocates `apps/desktop/migrations/`.
 
-- [ ] **Step 4: Write the failing test for `createSqliteCRUDClient`**
+- [ ] **Step 4: Write the failing test for `createSqliteCrudClient`**
 
-Create `packages/shared/clients/src/SqliteCRUDClient/createSqliteCRUDClient.test.ts`:
+Create `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.test.ts`:
 
 ```ts
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { __setIpcBridgeForTests, RdbContracts } from "@avandar/platform";
-import { createSqliteCRUDClient } from "./createSqliteCRUDClient.ts";
+import { createSqliteCrudClient } from "./createSqliteCrudClient.ts";
 
-describe("createSqliteCRUDClient", () => {
+describe("createSqliteCrudClient", () => {
   const sendMock = vi.fn();
   const onceMock = vi.fn();
 
@@ -1833,7 +1833,7 @@ describe("createSqliteCRUDClient", () => {
       );
     });
 
-    const client = createSqliteCRUDClient<{
+    const client = createSqliteCrudClient<{
       Read: { id: string; name: string; created_at: number };
     }>({
       modelName: "Widget",
@@ -1860,26 +1860,26 @@ pnpm --filter @avandar/clients test
 
 Expected: FAIL.
 
-- [ ] **Step 6: Implement `createSqliteCRUDClient`**
+- [ ] **Step 6: Implement `createSqliteCrudClient`**
 
-Create `packages/shared/clients/src/SqliteCRUDClient/createSqliteCRUDClient.ts`:
+Create `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.ts`:
 
 ```ts
 import { callIpc, RdbContracts } from "@avandar/platform";
-import { createModelCRUDClient } from "@clients/ModelCRUDClient/createModelCRUDClient.ts";
-import type { RdbCRUDModelSpec } from "@clients/RdbCRUDClient/RdbCRUDClient.types.ts";
+import { createModelCrudClient } from "@clients/ModelCrudClient/createModelCrudClient.ts";
+import type { RdbCrudModelSpec } from "@clients/RdbCrudClient/RdbCrudClient.types.ts";
 
 /**
  * SQLite-backed CRUD client. Issues IPC calls to the Bun-main process,
  * which holds the bun:sqlite database. Mirrors the surface of
- * `createSupabaseCRUDClient` so it can plug into the existing
- * `ModelCRUDClient` factory.
+ * `createSupabaseCrudClient` so it can plug into the existing
+ * `ModelCrudClient` factory.
  */
-export function createSqliteCRUDClient<M>(spec: RdbCRUDModelSpec<M>) {
+export function createSqliteCrudClient<M>(spec: RdbCrudModelSpec<M>) {
   const tableName = spec.tableName;
   const pk = spec.dbTablePrimaryKey;
 
-  return createModelCRUDClient<M>({
+  return createModelCrudClient<M>({
     modelName: spec.modelName,
     parsers: spec.parsers,
     primaryKey: pk,
@@ -1962,7 +1962,7 @@ function buildWhere(filter: { eq?: Record<string, unknown>; in?: Record<string, 
 }
 ```
 
-If the existing `createModelCRUDClient` doesn't accept an `operations` block in this exact shape, adapt to its real signature. The invariant: `createSqliteCRUDClient` must produce a value that satisfies the same `ModelCRUDClient<M, ExtendedQueries, ExtendedMutations>` interface as `createSupabaseCRUDClient`.
+If the existing `createModelCrudClient` doesn't accept an `operations` block in this exact shape, adapt to its real signature. The invariant: `createSqliteCrudClient` must produce a value that satisfies the same `ModelCrudClient<M, ExtendedQueries, ExtendedMutations>` interface as `createSupabaseCrudClient`.
 
 - [ ] **Step 7: Run the test and confirm it passes**
 
@@ -1972,21 +1972,21 @@ pnpm --filter @avandar/clients test
 
 Expected: green.
 
-- [ ] **Step 8: Flip the desktop branch in `createRdbCRUDClient`**
+- [ ] **Step 8: Flip the desktop branch in `createRdbCrudClient`**
 
-Edit `packages/shared/clients/src/RdbCRUDClient/createRdbCRUDClient.ts`:
+Edit `packages/shared/clients/src/RdbCrudClient/createRdbCrudClient.ts`:
 
 ```ts
 import { isDesktop } from "@avandar/platform";
-import { createSqliteCRUDClient } from "@clients/SqliteCRUDClient/createSqliteCRUDClient.ts";
-import { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupabaseCRUDClient.ts";
-import type { RdbCRUDModelSpec } from "./RdbCRUDClient.types.ts";
+import { createSqliteCrudClient } from "@clients/SqliteCrudClient/createSqliteCrudClient.ts";
+import { createSupabaseCrudClient } from "@clients/SupabaseCrudClient/createSupabaseCrudClient.ts";
+import type { RdbCrudModelSpec } from "./RdbCrudClient.types.ts";
 
-export function createRdbCRUDClient<M>(spec: RdbCRUDModelSpec<M>) {
+export function createRdbCrudClient<M>(spec: RdbCrudModelSpec<M>) {
   if (isDesktop()) {
-    return createSqliteCRUDClient<M>(spec);
+    return createSqliteCrudClient<M>(spec);
   }
-  return createSupabaseCRUDClient<M>({
+  return createSupabaseCrudClient<M>({
     ...spec,
     dbClient: getWebDbClient(),
   } as never);
@@ -2003,14 +2003,14 @@ function getWebDbClient() {
 }
 ```
 
-Update the existing test in `createRdbCRUDClient.test.ts` to assert that the desktop branch returns a SQLite client (not throws).
+Update the existing test in `createRdbCrudClient.test.ts` to assert that the desktop branch returns a SQLite client (not throws).
 
-- [ ] **Step 9: Export `createSqliteCRUDClient` from the clients index**
+- [ ] **Step 9: Export `createSqliteCrudClient` from the clients index**
 
 Edit `packages/shared/clients/src/index.ts`:
 
 ```ts
-export { createSqliteCRUDClient } from "@clients/SqliteCRUDClient/createSqliteCRUDClient.ts";
+export { createSqliteCrudClient } from "@clients/SqliteCrudClient/createSqliteCrudClient.ts";
 ```
 
 - [ ] **Step 10: Run all tests**
@@ -2033,7 +2033,7 @@ The webview should:
 - The webview now routes CRUD reads through the IPC bridge to bun:sqlite
 - Reads return empty initially (no data yet) — this is *expected*; subsequent tasks handle the one-shot Supabase→SQLite snapshot bootstrap
 
-If the webview crashes because `createRdbCRUDClient` returns empty results from an empty DB, that's exposing a missing snapshot-bootstrap. Add it as a small startup-time service in `apps/desktop/main/index.ts`:
+If the webview crashes because `createRdbCrudClient` returns empty results from an empty DB, that's exposing a missing snapshot-bootstrap. Add it as a small startup-time service in `apps/desktop/main/index.ts`:
 
 ```ts
 // Pseudocode: on first launch, if SQLite is empty, fetch the user's syncable
@@ -2054,8 +2054,8 @@ The actual implementation lives in the next task.
 
   **Verify:**
   - `apps/desktop/main/ipc/rdb.ts` registers handlers for every `rdb.*` contract from Task 1.
-  - `packages/shared/clients/src/SqliteCRUDClient/createSqliteCRUDClient.ts` implements the same `RdbCRUDClient` interface as the web Dexie client (parity is what makes the swap transparent).
-  - `packages/shared/clients/src/RdbCRUDClient/createRdbCRUDClient.ts` now branches on platform and returns the SQLite-backed client on desktop, Dexie on web.
+  - `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.ts` implements the same `RdbCrudClient` interface as the web Dexie client (parity is what makes the swap transparent).
+  - `packages/shared/clients/src/RdbCrudClient/createRdbCrudClient.ts` now branches on platform and returns the SQLite-backed client on desktop, Dexie on web.
   - SQL parameter handling is parameterised — no string interpolation of user data into queries.
   - `apps/desktop/main/index.ts` constructs the Sqlite handle once and passes it to `registerRdbHandlers`.
   - Test groupings G2.9, G2.10 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
@@ -3603,7 +3603,7 @@ registerDatasetBlobHandlers(ipcServer, datasetBlobStore);
 - PR 2: Wire the desktop branch for DuckDbClient.
 - PR 3: Wire the desktop branch for DatasetBlobStore.
 - PR 4: Wire the desktop branch for AuthProvider.
-- PR 5: Wire any remaining desktop adapters (e.g., RdbCRUDClient if not already wired via Task 8's factory).
+- PR 5: Wire any remaining desktop adapters (e.g., RdbCrudClient if not already wired via Task 8's factory).
 - Each PR is independently safe because Phase 1 established the factory pattern and desktop has no current users; web continues to use its existing implementations selected by `isDesktop() === false`. (ServerApiClient wiring lives in Task 14.)
 
 The webview-side `Desktop*` implementations exist but aren't consumed yet. Wire them in via a `PlatformProvider` React context.
@@ -3755,7 +3755,7 @@ Expected: green; both shells work.
 
   **Verify:**
   - `PlatformProvider` is created in the documented location (`packages/web/hooks` or the equivalent) and exports a `usePlatform()` hook.
-  - The provider picks the desktop implementations (`DesktopAuthProvider`, `DesktopDuckDbClient`, `DesktopDatasetBlobStore`, `createSqliteCRUDClient`) when running under Electrobun, and the web implementations otherwise — gated by an `isDesktop()` check, not by NODE_ENV.
+  - The provider picks the desktop implementations (`DesktopAuthProvider`, `DesktopDuckDbClient`, `DesktopDatasetBlobStore`, `createSqliteCrudClient`) when running under Electrobun, and the web implementations otherwise — gated by an `isDesktop()` check, not by NODE_ENV.
   - `src/main.tsx` wraps the React tree with `<PlatformProvider>` ABOVE any consumer.
   - Existing call sites that used to import the web implementations directly now read them from `usePlatform()` (audit at least the auth, dataset, and query call sites).
   - No web-only modules (Dexie, duckdb-wasm) execute on the desktop runtime path.
@@ -3932,7 +3932,7 @@ Edit `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md`, mark Phas
   - [ ] Task 5 — `SYNCABLE_TABLES`: manifest reviewed against live Supabase schema, shape tests pass.
   - [ ] Task 6 — migration generator: `pnpm check:sqlite-migrations` is clean and one generated migration was manually inspected.
   - [ ] Task 7 — Sqlite + runner: fresh launch produces `metadata.sqlite` with the expected schema; second launch is a no-op.
-  - [ ] Task 8 — RDB IPC + `createSqliteCRUDClient`: full create → restart → read cycle works on disk.
+  - [ ] Task 8 — RDB IPC + `createSqliteCrudClient`: full create → restart → read cycle works on disk.
   - [ ] Task 9 — snapshot bootstrap: fresh userDataDir hydrates from Supabase; second launch skips.
   - [ ] Task 10 — native DuckDB: at least one query renders via the native binding with no `duckdb-wasm` activity on desktop.
   - [ ] Task 11 — Keychain: sign-in persists across restart via Keychain Access entry; sign-out deletes it.

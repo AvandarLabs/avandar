@@ -1,12 +1,10 @@
-import { createSupabaseCRUDClient } from "@clients";
+import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { DatasetColumnValueExtractorParsers } from "$/models/EntityConfig/ValueExtractor/DatasetColumnValueExtractor/DatasetColumnValueExtractorParsers";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 
 /**
  * Client for managing dataset column value extractor configurations
  */
-export const DatasetColumnValueExtractorClient = createSupabaseCRUDClient({
-  dbClient: AvaSupabase.DB,
+export const DatasetColumnValueExtractorClient = createRdbCrudClient({
   modelName: "DatasetColumnValueExtractor",
   tableName: "value_extractors__dataset_column_value",
   dbTablePrimaryKey: "id",
