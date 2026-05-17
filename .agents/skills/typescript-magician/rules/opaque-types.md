@@ -19,12 +19,8 @@ TypeScript uses structural typing, so these are interchangeable:
 type UserId = string;
 type PostId = string;
 
-function getUser(id: UserId): User {
-  /* ... */
-}
-function getPost(id: PostId): Post {
-  /* ... */
-}
+function getUser(id: UserId): User { /* ... */ }
+function getPost(id: PostId): Post { /* ... */ }
 
 const userId: UserId = "user-123";
 const postId: PostId = "post-456";
@@ -49,12 +45,8 @@ type ValidAge = Opaque<number, "ValidAge">;
 Now these types are incompatible:
 
 ```typescript
-function getUser(id: UserId): User {
-  /* ... */
-}
-function getPost(id: PostId): Post {
-  /* ... */
-}
+function getUser(id: UserId): User { /* ... */ }
+function getPost(id: PostId): Post { /* ... */ }
 
 const userId = "user-123" as UserId;
 const postId = "post-456" as PostId;
@@ -136,12 +128,12 @@ function assertValidEmail(email: string): asserts email is ValidEmail {
 
 ## Comparison: Type Predicates vs Assertion Functions
 
-| Aspect         | Type Predicate     | Assertion Function         |
-| -------------- | ------------------ | -------------------------- |
-| Return         | `boolean`          | `void` (throws on failure) |
-| Usage          | In `if` statements | Standalone call            |
-| Error handling | Caller handles     | Function throws            |
-| Syntax         | Arrow or function  | Must be `function`         |
+| Aspect | Type Predicate | Assertion Function |
+|--------|----------------|-------------------|
+| Return | `boolean` | `void` (throws on failure) |
+| Usage | In `if` statements | Standalone call |
+| Error handling | Caller handles | Function throws |
+| Syntax | Arrow or function | Must be `function` |
 
 ```typescript
 // Type predicate - returns boolean, caller handles failure
@@ -171,9 +163,7 @@ function assertValidEmail(email: string): asserts email is ValidEmail {
   }
 }
 
-function assertValidPassword(
-  password: string,
-): asserts password is ValidPassword {
+function assertValidPassword(password: string): asserts password is ValidPassword {
   if (password.length < 8) {
     throw new Error("Password must be at least 8 characters");
   }

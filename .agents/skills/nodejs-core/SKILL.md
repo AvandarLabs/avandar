@@ -8,7 +8,6 @@ metadata:
 ## When to use
 
 Use this skill when you need deep Node.js internals expertise, including:
-
 - C++ addon development
 - V8 engine debugging
 - libuv event loop issues
@@ -64,7 +63,7 @@ Read individual rule files for detailed explanations and code examples:
 
 ### Documentation
 
-- [rules/documentation.md](rules/documentation.md) - **Updating doc/api/\*.md files: structure, link ordering, error docs, code example constraints**
+- [rules/documentation.md](rules/documentation.md) - **Updating doc/api/*.md files: structure, link ordering, error docs, code example constraints**
 
 ### Debugging & Profiling
 
@@ -109,7 +108,6 @@ Apply deep knowledge of Node.js internals across these domains:
 ### Quick-reference debugging commands
 
 **V8 optimization tracing:**
-
 ```bash
 node --trace-opt --trace-deopt script.js
 # Checkpoint: confirm no unexpected deoptimization warnings before proceeding to profiling
@@ -117,13 +115,11 @@ node --prof script.js && node --prof-process isolate-*.log > processed.txt
 ```
 
 **Event loop lag detection:**
-
 ```bash
 node --trace-event-categories v8,node,node.async_hooks script.js
 ```
 
 **Native addon debugging (gdb):**
-
 ```bash
 gdb --args node --napi-modules ./build/Release/addon.node
 # Inside gdb:
@@ -133,7 +129,6 @@ bt        # backtrace on crash
 ```
 
 **Heap snapshot for memory leaks:**
-
 ```bash
 node --inspect script.js   # then open chrome://inspect, take heap snapshot
 # Checkpoint: compare two consecutive heap snapshots to confirm leak growth before and after the fix; run valgrind --leak-check=full node addon_test.js to confirm no native leaks remain
@@ -142,21 +137,18 @@ node --inspect script.js   # then open chrome://inspect, take heap snapshot
 ### Node.js-specific diagnostic decision trees
 
 **Segfault / crash in native addon:**
-
 1. Is the crash reproducible with `node --napi-modules`? → Run `gdb`, capture `bt`
 2. Does `bt` point to a V8 handle scope issue? → Check `HandleScope` / `EscapableHandleScope` usage in the addon
 3. Does it point to a libuv callback? → Inspect async handle lifetime and `uv_close()` sequencing
 4. No clear C++ frame? → Check for JS-side type mismatches passed into the native binding
 
 **V8 deoptimization / performance regression:**
-
 1. Run `--trace-opt --trace-deopt` → identify the deoptimized function and reason (e.g., "not a Smi", "wrong map")
 2. Checkpoint: confirm the same function deoptimizes consistently across runs
 3. Inspect hidden class transitions (`--trace-ic`) and fix property addition order or type inconsistencies
 4. Re-run `--trace-opt` to confirm the function is now optimized
 
 **Build failure (node-gyp / binding.gyp):**
-
 1. Is it a missing header? → Verify `include_dirs` in `binding.gyp` and Node.js header installation
 2. Is it a linker error? → Check `libraries` and `link_settings` entries; confirm ABI compatibility
 3. Is it platform-specific? → Consult `rules/build-system.md` for Windows/macOS/Linux differences

@@ -62,7 +62,7 @@ export default defineConfig({
 
 ```ts
 // tests/checkout-flow.spec.ts
-import { expect, test } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 
 test.describe.configure({ mode: "serial" });
 
@@ -94,9 +94,8 @@ export default defineConfig({
   fullyParallel: true,
   workers: process.env.CI ? "50%" : undefined,
 
-  reporter:
-    process.env.CI ?
-      [["blob"], ["github"]]
+  reporter: process.env.CI
+    ? [["blob"], ["github"]]
     : [["html", { open: "on-failure" }]],
 });
 ```
@@ -218,7 +217,7 @@ test("edit settings", async ({ page, request }) => {
 **Using `testInfo` for unique identifiers:**
 
 ```ts
-import { expect, test } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 
 test("submit order", async ({ page }, testInfo) => {
   const orderId = `order-${testInfo.workerIndex}-${Date.now()}`;

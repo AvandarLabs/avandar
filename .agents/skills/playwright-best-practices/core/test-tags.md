@@ -17,7 +17,7 @@
 ### Tag via Details Object
 
 ```typescript
-import { expect, test } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 
 test(
   "test login page",
@@ -27,7 +27,7 @@ test(
   async ({ page }) => {
     await page.goto("/login");
     await expect(page.getByRole("heading")).toBeVisible();
-  },
+  }
 );
 
 test(
@@ -38,7 +38,7 @@ test(
   async ({ page }) => {
     await page.goto("/dashboard");
     await expect(page.getByTestId("charts")).toBeVisible();
-  },
+  }
 );
 ```
 
@@ -74,7 +74,7 @@ test.describe(
     test("test report footer", async ({ page }) => {
       // Inherits @report tag
     });
-  },
+  }
 );
 ```
 
@@ -98,9 +98,9 @@ test.describe(
       },
       async ({ page }) => {
         // Has @admin, @slow, @critical tags
-      },
+      }
     );
-  },
+  }
 );
 ```
 
@@ -220,7 +220,7 @@ test(
   {
     tag: ["@critical", "@p0"],
   },
-  async ({ page }) => {},
+  async ({ page }) => {}
 );
 
 test(
@@ -228,7 +228,7 @@ test(
   {
     tag: ["@p1"],
   },
-  async ({ page }) => {},
+  async ({ page }) => {}
 );
 
 test(
@@ -236,7 +236,7 @@ test(
   {
     tag: ["@p2"],
   },
-  async ({ page }) => {},
+  async ({ page }) => {}
 );
 ```
 
@@ -252,7 +252,7 @@ test.describe(
     test("login @smoke", async ({ page }) => {});
     test("logout", async ({ page }) => {});
     test("password reset @slow", async ({ page }) => {});
-  },
+  }
 );
 
 test.describe(
@@ -263,7 +263,7 @@ test.describe(
   () => {
     test("credit card @critical", async ({ page }) => {});
     test("paypal @critical", async ({ page }) => {});
-  },
+  }
 );
 ```
 

@@ -44,48 +44,48 @@ rebuild after code changes. See
 
 ### Debug and Diagnostics
 
-| Flag                       | Purpose                                                  |
-| -------------------------- | -------------------------------------------------------- |
-| `--debug`                  | Build debug binary (`./node_g`) with DCHECKs enabled     |
-| `--debug-symbols`          | Add `-g` to release build (profiling without DCHECKs)    |
-| `--debug-node`             | Debug symbols for just the Node.js part (not V8/deps)    |
-| `--v8-with-dchecks`        | Enable V8 debug checks without full debug build          |
+| Flag                   | Purpose                                                     |
+| ---------------------- | ----------------------------------------------------------- |
+| `--debug`              | Build debug binary (`./node_g`) with DCHECKs enabled       |
+| `--debug-symbols`      | Add `-g` to release build (profiling without DCHECKs)       |
+| `--debug-node`         | Debug symbols for just the Node.js part (not V8/deps)       |
+| `--v8-with-dchecks`    | Enable V8 debug checks without full debug build             |
 | `--v8-non-optimized-debug` | Compile V8 with minimal optimizations and runtime checks |
 | `--v8-enable-object-print` | V8 auxiliary functions for native debuggers              |
-| `--gdb`                    | Add gdb support                                          |
-| `--enable-asan`            | Build with AddressSanitizer                              |
-| `--enable-ubsan`           | Build with UndefinedBehaviorSanitizer                    |
-| `--coverage`               | Build with code coverage enabled                         |
-| `--error-on-warn`          | Turn compiler warnings into errors                       |
+| `--gdb`                | Add gdb support                                             |
+| `--enable-asan`        | Build with AddressSanitizer                                 |
+| `--enable-ubsan`       | Build with UndefinedBehaviorSanitizer                       |
+| `--coverage`           | Build with code coverage enabled                            |
+| `--error-on-warn`      | Turn compiler warnings into errors                          |
 
 ### Build Configuration
 
-| Flag              | Purpose                                               |
-| ----------------- | ----------------------------------------------------- |
-| `--ninja`         | Use Ninja instead of Make (faster incremental builds) |
-| `--enable-lto`    | Enable link-time optimization                         |
-| `--prefix PREFIX` | Install prefix (default: `/usr/local`)                |
+| Flag                              | Purpose                                                    |
+| --------------------------------- | ---------------------------------------------------------- |
+| `--ninja`                         | Use Ninja instead of Make (faster incremental builds)      |
+| `--enable-lto`                    | Enable link-time optimization                              |
+| `--prefix PREFIX`                 | Install prefix (default: `/usr/local`)                     |
 
 ### Feature Flags
 
-| Flag                              | Purpose                                                   |
-| --------------------------------- | --------------------------------------------------------- |
-| `--node-builtin-modules-path DIR` | Load `lib/` builtins from disk instead of embedded copies |
-| `--without-npm`                   | Skip npm (faster build if you don't need it)              |
-| `--without-ssl`                   | Build without SSL                                         |
-| `--without-inspector`             | Disable the V8 inspector protocol                         |
-| `--without-node-snapshot`         | Disable V8 snapshot (useful for debugging startup)        |
-| `--without-node-code-cache`       | Disable V8 code cache                                     |
-| `--without-intl`                  | Build without ICU (smaller binary)                        |
-| `--experimental-quic`             | Build with experimental QUIC support                      |
+| Flag                              | Purpose                                                    |
+| --------------------------------- | ---------------------------------------------------------- |
+| `--node-builtin-modules-path DIR` | Load `lib/` builtins from disk instead of embedded copies  |
+| `--without-npm`                   | Skip npm (faster build if you don't need it)               |
+| `--without-ssl`                   | Build without SSL                                          |
+| `--without-inspector`             | Disable the V8 inspector protocol                          |
+| `--without-node-snapshot`         | Disable V8 snapshot (useful for debugging startup)         |
+| `--without-node-code-cache`       | Disable V8 code cache                                      |
+| `--without-intl`                  | Build without ICU (smaller binary)                         |
+| `--experimental-quic`             | Build with experimental QUIC support                       |
 
 ### Cross-Compilation
 
-| Flag                | Purpose                           |
-| ------------------- | --------------------------------- |
-| `--dest-cpu=ARCH`   | Target CPU (e.g., `arm64`, `x64`) |
-| `--dest-os=OS`      | Target OS (e.g., `linux`, `mac`)  |
-| `--cross-compiling` | Enable cross-compilation mode     |
+| Flag                | Purpose                             |
+| ------------------- | ----------------------------------- |
+| `--dest-cpu=ARCH`   | Target CPU (e.g., `arm64`, `x64`)   |
+| `--dest-os=OS`      | Target OS (e.g., `linux`, `mac`)    |
+| `--cross-compiling` | Enable cross-compilation mode       |
 
 ## Debug Build
 

@@ -59,7 +59,6 @@ Statistical profiling result from isolate-0x1234.log
 ```
 
 Key indicators:
-
 - `*` before function name = optimized
 - `~` before function name = interpreted (not optimized)
 - High ticks in C++ = possible native bottleneck
@@ -164,23 +163,23 @@ Look for:
 ### Programmatic Profiling
 
 ```javascript
-const v8 = require("node:v8");
-const inspector = require("node:inspector");
+const v8 = require('node:v8');
+const inspector = require('node:inspector');
 
 const session = new inspector.Session();
 session.connect();
 
 // Start profiling
-session.post("Profiler.enable");
-session.post("Profiler.start");
+session.post('Profiler.enable');
+session.post('Profiler.start');
 
 // Run your code...
 runHeavyOperation();
 
 // Stop and get profile
-session.post("Profiler.stop", (err, { profile }) => {
-  const fs = require("fs");
-  fs.writeFileSync("profile.cpuprofile", JSON.stringify(profile));
+session.post('Profiler.stop', (err, { profile }) => {
+  const fs = require('fs');
+  fs.writeFileSync('profile.cpuprofile', JSON.stringify(profile));
   // Open in Chrome DevTools
 });
 ```
@@ -221,29 +220,29 @@ node --prof-process --ll-prof     # Linux perf format
 ### Heap Snapshots
 
 ```javascript
-const v8 = require("node:v8");
-const fs = require("node:fs");
+const v8 = require('node:v8');
+const fs = require('node:fs');
 
 // Take snapshot
 const filename = v8.writeHeapSnapshot();
 console.log(`Heap snapshot written to ${filename}`);
 
 // Or stream it
-const stream = fs.createWriteStream("heap.heapsnapshot");
-v8.writeHeapSnapshot("heap.heapsnapshot");
+const stream = fs.createWriteStream('heap.heapsnapshot');
+v8.writeHeapSnapshot('heap.heapsnapshot');
 ```
 
 ### Heap Statistics
 
 ```javascript
-const v8 = require("node:v8");
+const v8 = require('node:v8');
 
 setInterval(() => {
   const stats = v8.getHeapStatistics();
   console.log({
-    total: (stats.total_heap_size / 1024 / 1024).toFixed(2) + " MB",
-    used: (stats.used_heap_size / 1024 / 1024).toFixed(2) + " MB",
-    external: (stats.external_memory / 1024 / 1024).toFixed(2) + " MB",
+    total: (stats.total_heap_size / 1024 / 1024).toFixed(2) + ' MB',
+    used: (stats.used_heap_size / 1024 / 1024).toFixed(2) + ' MB',
+    external: (stats.external_memory / 1024 / 1024).toFixed(2) + ' MB',
   });
 }, 5000);
 ```
@@ -251,7 +250,7 @@ setInterval(() => {
 ### Heap Space Details
 
 ```javascript
-const v8 = require("node:v8");
+const v8 = require('node:v8');
 
 const spaces = v8.getHeapSpaceStatistics();
 for (const space of spaces) {
@@ -322,23 +321,21 @@ node compare.js --runs 30 --new ./node-new --old ./node-old fs
 ### Micro-Benchmarking
 
 ```javascript
-const { performance, PerformanceObserver } = require("node:perf_hooks");
+const { performance, PerformanceObserver } = require('node:perf_hooks');
 
 // Measure function
 function benchmark(name, fn, iterations = 100000) {
-  performance.mark("start");
+  performance.mark('start');
 
   for (let i = 0; i < iterations; i++) {
     fn();
   }
 
-  performance.mark("end");
-  performance.measure(name, "start", "end");
+  performance.mark('end');
+  performance.measure(name, 'start', 'end');
 
   const [measure] = performance.getEntriesByName(name);
-  console.log(
-    `${name}: ${((measure.duration / iterations) * 1000).toFixed(3)}µs per call`,
-  );
+  console.log(`${name}: ${(measure.duration / iterations * 1000).toFixed(3)}µs per call`);
   performance.clearMarks();
   performance.clearMeasures();
 }
@@ -347,23 +344,23 @@ function benchmark(name, fn, iterations = 100000) {
 for (let i = 0; i < 1000; i++) myFunction();
 
 // Benchmark
-benchmark("myFunction", myFunction);
+benchmark('myFunction', myFunction);
 ```
 
 ### Using Benchmark.js
 
 ```javascript
-const Benchmark = require("benchmark");
+const Benchmark = require('benchmark');
 
-const suite = new Benchmark.Suite();
+const suite = new Benchmark.Suite;
 
 suite
-  .add("RegExp#test", () => /o/.test("Hello World!"))
-  .add("String#indexOf", () => "Hello World!".indexOf("o") > -1)
-  .add("String#includes", () => "Hello World!".includes("o"))
-  .on("cycle", (event) => console.log(String(event.target)))
-  .on("complete", function () {
-    console.log("Fastest is " + this.filter("fastest").map("name"));
+  .add('RegExp#test', () => /o/.test('Hello World!'))
+  .add('String#indexOf', () => 'Hello World!'.indexOf('o') > -1)
+  .add('String#includes', () => 'Hello World!'.includes('o'))
+  .on('cycle', (event) => console.log(String(event.target)))
+  .on('complete', function() {
+    console.log('Fastest is ' + this.filter('fastest').map('name'));
   })
   .run({ async: true });
 ```
@@ -390,7 +387,7 @@ clinic bubbleprof -- node app.js
 
 ```javascript
 // Sample-based profiling for production
-const v8 = require("node:v8");
+const v8 = require('node:v8');
 
 class ContinuousProfiler {
   constructor(intervalMs = 60000) {
@@ -408,18 +405,18 @@ class ContinuousProfiler {
     const session = new inspector.Session();
     session.connect();
 
-    session.post("Profiler.enable");
-    session.post("Profiler.start");
+    session.post('Profiler.enable');
+    session.post('Profiler.start');
 
     setTimeout(() => {
-      session.post("Profiler.stop", (err, { profile }) => {
+      session.post('Profiler.stop', (err, { profile }) => {
         this.profiles.push({
           timestamp: Date.now(),
-          profile,
+          profile
         });
         session.disconnect();
       });
-    }, 10000); // Profile for 10 seconds
+    }, 10000);  // Profile for 10 seconds
   }
 
   stop() {
@@ -435,13 +432,13 @@ class ContinuousProfiler {
 ```javascript
 // BAD: Function keeps getting deoptimized and reoptimized
 function process(value) {
-  return value.x + value.y; // Different object shapes
+  return value.x + value.y;  // Different object shapes
 }
 
 // Called with different shapes
 process({ x: 1, y: 2 });
-process({ y: 2, x: 1 }); // Different property order!
-process({ x: 1, y: 2, z: 3 }); // Extra property!
+process({ y: 2, x: 1 });  // Different property order!
+process({ x: 1, y: 2, z: 3 });  // Extra property!
 ```
 
 ### Megamorphic Call Site

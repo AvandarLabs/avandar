@@ -14,17 +14,10 @@ When queries filter on multiple columns, a composite index is more efficient tha
 ```sql
 -- Two separate indexes
 create index orders_status_idx on orders (status);
-
 create index orders_created_idx on orders (created_at);
 
 -- Query must combine both indexes (slower)
-select
-  *
-from
-  orders
-where
-  status = 'pending'
-  and created_at > '2024-01-01';
+select * from orders where status = 'pending' and created_at > '2024-01-01';
 ```
 
 **Correct (composite index):**
@@ -34,13 +27,7 @@ where
 create index orders_status_created_idx on orders (status, created_at);
 
 -- Query uses one efficient index scan
-select
-  *
-from
-  orders
-where
-  status = 'pending'
-  and created_at > '2024-01-01';
+select * from orders where status = 'pending' and created_at > '2024-01-01';
 ```
 
 **Column order matters** - place equality columns first, range columns last:

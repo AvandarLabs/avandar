@@ -123,9 +123,9 @@ function fork(modulePath, args, options) {
   options = Object.assign({}, options);
 
   // Force IPC channel
-  options.stdio = options.stdio ? options.stdio.slice() : "pipe";
-  if (!options.stdio.includes("ipc")) {
-    options.stdio.push("ipc");
+  options.stdio = options.stdio ? options.stdio.slice() : 'pipe';
+  if (!options.stdio.includes('ipc')) {
+    options.stdio.push('ipc');
   }
 
   // Use node executable
@@ -142,21 +142,21 @@ function fork(modulePath, args, options) {
 
 function setupChannel(target, channel, serializationMode) {
   // Set up message handling
-  channel.onread = function (arrayBuffer) {
+  channel.onread = function(arrayBuffer) {
     const message = deserialize(arrayBuffer);
-    target.emit("message", message.message, message.handle);
+    target.emit('message', message.message, message.handle);
   };
 
   // Set up send function
-  target.send = function (message, handle, options, callback) {
+  target.send = function(message, handle, options, callback) {
     const serialized = serialize({ message, handle });
     return channel.writeUtf8String(serialized);
   };
 
   // Handle disconnect
-  channel.onDisconnect = function () {
+  channel.onDisconnect = function() {
     target.connected = false;
-    target.emit("disconnect");
+    target.emit('disconnect');
   };
 }
 ```
@@ -198,13 +198,13 @@ Node.js can pass handles (sockets, servers) between processes:
 const server = net.createServer();
 server.listen(8000);
 
-const child = fork("worker.js");
-child.send({ type: "server" }, server);
+const child = fork('worker.js');
+child.send({ type: 'server' }, server);
 
 // Worker
-process.on("message", (msg, handle) => {
-  if (msg.type === "server") {
-    handle.on("connection", (socket) => {
+process.on('message', (msg, handle) => {
+  if (msg.type === 'server') {
+    handle.on('connection', (socket) => {
       // Handle connection in worker
     });
   }
@@ -242,24 +242,24 @@ int StreamBase::SendFD(uv_stream_t* handle, int fd) {
 
 ```javascript
 // Different stdio configurations
-spawn("cmd", args, {
-  stdio: "inherit", // Share parent's stdio
+spawn('cmd', args, {
+  stdio: 'inherit'           // Share parent's stdio
 });
 
-spawn("cmd", args, {
-  stdio: "pipe", // Create pipes (default)
+spawn('cmd', args, {
+  stdio: 'pipe'              // Create pipes (default)
 });
 
-spawn("cmd", args, {
-  stdio: ["pipe", "pipe", "pipe", "ipc"], // With IPC
+spawn('cmd', args, {
+  stdio: ['pipe', 'pipe', 'pipe', 'ipc']  // With IPC
 });
 
-spawn("cmd", args, {
-  stdio: [0, 1, 2], // Inherit specific fds
+spawn('cmd', args, {
+  stdio: [0, 1, 2]           // Inherit specific fds
 });
 
-spawn("cmd", args, {
-  stdio: ["pipe", fs.openSync("out.log", "w"), "pipe"],
+spawn('cmd', args, {
+  stdio: ['pipe', fs.openSync('out.log', 'w'), 'pipe']
 });
 ```
 
@@ -307,44 +307,40 @@ void ProcessWrap::ParseStdioOptions(Environment* env,
 
 function exec(command, options, callback) {
   // Use shell
-  return execFile(
-    options.shell || "/bin/sh",
-    ["-c", command],
-    options,
-    callback,
-  );
+  return execFile(options.shell || '/bin/sh',
+                  ['-c', command],
+                  options,
+                  callback);
 }
 
 function execFile(file, args, options, callback) {
   options = {
     ...options,
     shell: false,
-    maxBuffer: options.maxBuffer || 1024 * 1024, // 1MB
+    maxBuffer: options.maxBuffer || 1024 * 1024  // 1MB
   };
 
   const child = spawn(file, args, options);
 
-  let stdout = "";
-  let stderr = "";
+  let stdout = '';
+  let stderr = '';
 
-  child.stdout.on("data", (chunk) => {
+  child.stdout.on('data', (chunk) => {
     stdout += chunk;
     if (stdout.length > options.maxBuffer) {
       child.kill();
-      callback(new Error("maxBuffer exceeded"));
+      callback(new Error('maxBuffer exceeded'));
     }
   });
 
-  child.stderr.on("data", (chunk) => {
+  child.stderr.on('data', (chunk) => {
     stderr += chunk;
   });
 
-  child.on("close", (code, signal) => {
-    callback(
-      code === 0 ? null : new Error(`Exit code ${code}`),
-      stdout,
-      stderr,
-    );
+  child.on('close', (code, signal) => {
+    callback(code === 0 ? null : new Error(`Exit code ${code}`),
+             stdout,
+             stderr);
   });
 
   return child;
@@ -357,14 +353,14 @@ function execFile(file, args, options, callback) {
 
 ```javascript
 // Uses libuv's synchronous spawn
-const { spawnSync } = require("child_process");
+const { spawnSync } = require('child_process');
 
-const result = spawnSync("ls", ["-la"], {
-  encoding: "utf8",
+const result = spawnSync('ls', ['-la'], {
+  encoding: 'utf8'
 });
 
 console.log(result.stdout);
-console.log(result.status); // Exit code
+console.log(result.status);  // Exit code
 ```
 
 ```cpp
@@ -384,13 +380,13 @@ void SyncProcessRunner::Spawn(Local<Object> options) {
 ### Sending Signals
 
 ```javascript
-const child = spawn("long-running-process");
+const child = spawn('long-running-process');
 
 // Send signal
-child.kill("SIGTERM");
+child.kill('SIGTERM');
 
 // Or with process.kill
-process.kill(child.pid, "SIGKILL");
+process.kill(child.pid, 'SIGKILL');
 ```
 
 ### C++ Signal Implementation
@@ -414,12 +410,12 @@ void ProcessWrap::Kill(const FunctionCallbackInfo<Value>& args) {
 
 ```javascript
 // Create daemon process
-const child = spawn("daemon-process", [], {
+const child = spawn('daemon-process', [], {
   detached: true,
-  stdio: "ignore",
+  stdio: 'ignore'
 });
 
-child.unref(); // Allow parent to exit
+child.unref();  // Allow parent to exit
 ```
 
 ```cpp
@@ -436,7 +432,7 @@ if (js_options->Get(env->context(), env->detached_string())
 ### Process Pool Pattern
 
 ```javascript
-const { fork } = require("child_process");
+const { fork } = require('child_process');
 
 class ProcessPool {
   constructor(modulePath, size = 4) {
@@ -446,7 +442,7 @@ class ProcessPool {
 
     for (let i = 0; i < size; i++) {
       const worker = fork(modulePath);
-      worker.on("message", (result) => {
+      worker.on('message', (result) => {
         const { resolve } = worker.currentTask;
         worker.currentTask = null;
         resolve(result);
@@ -475,11 +471,11 @@ class ProcessPool {
   }
 
   getAvailableWorker() {
-    return this.workers.find((w) => !w.currentTask);
+    return this.workers.find(w => !w.currentTask);
   }
 
   destroy() {
-    this.workers.forEach((w) => w.kill());
+    this.workers.forEach(w => w.kill());
   }
 }
 ```
@@ -488,13 +484,13 @@ class ProcessPool {
 
 ```javascript
 // BAD: Shell spawning overhead
-exec("ls -la", (err, stdout) => {});
+exec('ls -la', (err, stdout) => { });
 
 // GOOD: Direct execution
-execFile("ls", ["-la"], (err, stdout) => {});
+execFile('ls', ['-la'], (err, stdout) => { });
 
 // BETTER: spawn with streaming
-const child = spawn("ls", ["-la"]);
+const child = spawn('ls', ['-la']);
 child.stdout.pipe(process.stdout);
 ```
 
@@ -503,16 +499,16 @@ child.stdout.pipe(process.stdout);
 ### Trace Child Processes
 
 ```javascript
-const child = spawn("command", args);
+const child = spawn('command', args);
 
-console.log("Spawned child pid:", child.pid);
+console.log('Spawned child pid:', child.pid);
 
-child.on("error", (err) => {
-  console.error("Failed to start:", err);
+child.on('error', (err) => {
+  console.error('Failed to start:', err);
 });
 
-child.on("exit", (code, signal) => {
-  console.log("Exited:", { code, signal });
+child.on('exit', (code, signal) => {
+  console.log('Exited:', { code, signal });
 });
 ```
 
@@ -520,13 +516,13 @@ child.on("exit", (code, signal) => {
 
 ```javascript
 // Parent
-child.on("message", (msg) => {
-  console.log("[IPC] Received:", JSON.stringify(msg));
+child.on('message', (msg) => {
+  console.log('[IPC] Received:', JSON.stringify(msg));
 });
 
 const originalSend = child.send.bind(child);
 child.send = (msg, ...args) => {
-  console.log("[IPC] Sending:", JSON.stringify(msg));
+  console.log('[IPC] Sending:', JSON.stringify(msg));
   return originalSend(msg, ...args);
 };
 ```
@@ -536,14 +532,14 @@ child.send = (msg, ...args) => {
 ### EPERM on Kill
 
 ```javascript
-child.kill("SIGTERM"); // May fail with EPERM
+child.kill('SIGTERM');  // May fail with EPERM
 
 // Check if process is still alive
 if (child.exitCode === null && child.signalCode === null) {
   try {
-    process.kill(child.pid, 0); // Check existence
+    process.kill(child.pid, 0);  // Check existence
   } catch (e) {
-    if (e.code !== "ESRCH") throw e;
+    if (e.code !== 'ESRCH') throw e;
   }
 }
 ```
@@ -552,7 +548,7 @@ if (child.exitCode === null && child.signalCode === null) {
 
 ```javascript
 // BAD: Large messages
-child.send({ data: largeBuffer }); // May fail or be slow
+child.send({ data: largeBuffer });  // May fail or be slow
 
 // GOOD: Use shared memory or files for large data
 const shm = createSharedArrayBuffer(size);
@@ -563,15 +559,15 @@ child.send({ shmName: shm.name });
 
 ```javascript
 // Always handle child exit
-child.on("exit", () => {
+child.on('exit', () => {
   // Cleanup
 });
 
 // Or with spawn options
-spawn("cmd", args, {
+spawn('cmd', args, {
   detached: true,
-  stdio: "ignore",
-}).unref(); // Won't keep parent alive
+  stdio: 'ignore'
+}).unref();  // Won't keep parent alive
 ```
 
 ## References

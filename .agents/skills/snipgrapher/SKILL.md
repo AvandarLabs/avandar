@@ -8,7 +8,6 @@ metadata:
 ## When to use
 
 Use this skill when you need to:
-
 - Generate image snippets from source code
 - Configure reusable snippet rendering defaults
 - Batch-render snippet assets for docs, social posts, or changelogs
