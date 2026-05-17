@@ -33,6 +33,7 @@ export const Routes = defineRoutes<WorkspacesAPI>("workspaces", {
       .bodySchema({
         slug: z.string(),
       })
+      .disableJWTVerification()
       .action(async ({ body: { slug }, supabaseAdminClient }) => {
         const { data: workspaces } = await supabaseAdminClient
           .from("workspaces")
