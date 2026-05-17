@@ -14,7 +14,7 @@
 **Architecture:**
 - Per-row sync columns (`_local_updated_at`, `_server_updated_at`, `_sync_state`, `_deleted_at`) are added to every syncable SQLite table via a migration.
 - Three new sync tables: `sync_outbox` (relational mutations queued for push), `parquet_blob_outbox` (queued blob uploads), `sync_cursor` (per-table pull cursor).
-- `createSqliteCRUDClient` wraps every write so the data write + outbox row are in **one** SQLite transaction. Non-negotiable invariant for crash safety.
+- `createSqliteCrudClient` wraps every write so the data write + outbox row are in **one** SQLite transaction. Non-negotiable invariant for crash safety.
 - `SyncEngine` runs as a worker in Bun main, draining queues and pulling deltas on a timer when online.
 - `DesktopSyncEngine` (webview side) exposes status to React via the existing `usePlatform()` and a small status indicator component.
 
@@ -42,9 +42,9 @@
 - `apps/desktop/main/services/sync/types.ts` — `OutboxRow`, `ParquetOutboxRow`, `SyncCursorRow`
 
 **New: Outbox-aware write helper**
-- `packages/shared/clients/src/SqliteCRUDClient/withOutbox.ts` — wraps a write in a transaction that also inserts to `sync_outbox`
-- `packages/shared/clients/src/SqliteCRUDClient/withOutbox.test.ts`
-- Modify: `packages/shared/clients/src/SqliteCRUDClient/createSqliteCRUDClient.ts` — use `withOutbox`
+- `packages/shared/clients/src/SqliteCrudClient/withOutbox.ts` — wraps a write in a transaction that also inserts to `sync_outbox`
+- `packages/shared/clients/src/SqliteCrudClient/withOutbox.test.ts`
+- Modify: `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.ts` — use `withOutbox`
 
 **New: Sync engine in Bun main**
 - `apps/desktop/main/services/sync/SyncEngine.ts` — orchestrator
@@ -286,15 +286,15 @@ Expected: `.schema` output matches the SQL in `9999_phase3_sync_schema.sql`; `pr
 
 **PR boundaries:** 2 PRs.
 - PR 1: `withOutbox` helper module + its atomicity property test — the helper is new, nothing imports it from a hot path yet, so `pnpm test`/`type-check`/`lint`/CI stay green and behavior is unchanged.
-- PR 2: Migrate `createSqliteCRUDClient` write paths to use `withOutbox` — integration boundary where the atomicity invariant goes live; web app continues to talk to Supabase directly and only desktop's SQLite writes are touched.
+- PR 2: Migrate `createSqliteCrudClient` write paths to use `withOutbox` — integration boundary where the atomicity invariant goes live; web app continues to talk to Supabase directly and only desktop's SQLite writes are touched.
 (Manual review checkpoint Steps are gates between PRs.)
 
 The critical invariant: every CRUD mutation appends to `sync_outbox` **in the same SQLite transaction** as the data write. Implement once in a helper; call from every mutation path.
 
 **Files:**
-- Create: `packages/shared/clients/src/SqliteCRUDClient/withOutbox.ts`
-- Test: `packages/shared/clients/src/SqliteCRUDClient/withOutbox.test.ts`
-- Modify: `packages/shared/clients/src/SqliteCRUDClient/createSqliteCRUDClient.ts`
+- Create: `packages/shared/clients/src/SqliteCrudClient/withOutbox.ts`
+- Test: `packages/shared/clients/src/SqliteCrudClient/withOutbox.test.ts`
+- Modify: `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.ts`
 - Add: `packages/shared/platform/src/ipc/contracts.ts` — `RdbContracts.runWithOutbox`
 
 - [ ] **Step 1: Extend the IPC contracts**
@@ -335,7 +335,7 @@ server.handle(RdbContracts.runWithOutbox, (req) => {
 
 - [ ] **Step 3: Write the failing test for `withOutbox`**
 
-Create `packages/shared/clients/src/SqliteCRUDClient/withOutbox.test.ts`:
+Create `packages/shared/clients/src/SqliteCrudClient/withOutbox.test.ts`:
 
 ```ts
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -392,7 +392,7 @@ pnpm --filter @avandar/clients test
 
 - [ ] **Step 5: Implement `writeWithOutbox`**
 
-Create `packages/shared/clients/src/SqliteCRUDClient/withOutbox.ts`:
+Create `packages/shared/clients/src/SqliteCrudClient/withOutbox.ts`:
 
 ```ts
 import { callIpc, RdbContracts } from "@avandar/platform";
@@ -418,9 +418,9 @@ export async function writeWithOutbox(args: WriteWithOutboxArgs): Promise<void> 
 }
 ```
 
-- [ ] **Step 6: Wire `writeWithOutbox` into `createSqliteCRUDClient`**
+- [ ] **Step 6: Wire `writeWithOutbox` into `createSqliteCrudClient`**
 
-Replace the existing `upsert` and `delete` implementations in `packages/shared/clients/src/SqliteCRUDClient/createSqliteCRUDClient.ts` with versions that include the `_local_updated_at` column and route through `writeWithOutbox`:
+Replace the existing `upsert` and `delete` implementations in `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.ts` with versions that include the `_local_updated_at` column and route through `writeWithOutbox`:
 
 ```ts
 import { writeWithOutbox } from "./withOutbox.ts";
@@ -575,7 +575,7 @@ This is the single most important review in Phase 3. A bug here causes silent da
 
 **Run:**
 ```bash
-pnpm --filter @avandar/desktop test packages/shared/clients/src/SqliteCRUDClient/withOutbox.test.ts
+pnpm --filter @avandar/desktop test packages/shared/clients/src/SqliteCrudClient/withOutbox.test.ts
 pnpm --filter @avandar/desktop test apps/desktop/main/ipc/rdb.test.ts
 pnpm --filter @avandar/desktop typecheck
 ```
@@ -583,8 +583,8 @@ Expected: all tests green; typecheck clean.
 
 **Verify (code review — do NOT rely on tests alone):**
 - Open `apps/desktop/main/ipc/rdb.ts` `runWithOutbox` handler. Confirm the data `INSERT/UPDATE/DELETE` AND the `insert into sync_outbox` are inside the SAME `db.transaction(() => { ... })` block, with no early returns, awaits, or exception swallowing between them.
-- Open `packages/shared/clients/src/SqliteCRUDClient/withOutbox.ts`. Confirm every mutation path (insert, update, delete) routes through `runWithOutbox` — there is no bypass that calls `rdb.run(...)` directly for a syncable table.
-- Open `packages/shared/clients/src/SqliteCRUDClient/createSqliteCRUDClient.ts`. Search the diff for any remaining direct `db.run`, `db.prepare(...).run`, or unwrapped IPC `run` call on a syncable table. There should be none.
+- Open `packages/shared/clients/src/SqliteCrudClient/withOutbox.ts`. Confirm every mutation path (insert, update, delete) routes through `runWithOutbox` — there is no bypass that calls `rdb.run(...)` directly for a syncable table.
+- Open `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.ts`. Search the diff for any remaining direct `db.run`, `db.prepare(...).run`, or unwrapped IPC `run` call on a syncable table. There should be none.
 - Confirm the test that forces a constraint violation inside the transaction proves rollback also removes the outbox row.
 - Test groupings G3.2 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy. For property-based groupings, also record the seed printed on failure during local runs so failures are reproducible.
 
@@ -2277,7 +2277,7 @@ bindStatusEvents();
 
 export const DesktopSyncEngine: SyncEngine = {
   async enqueue(_m: SyncMutation) {
-    // In V1, mutations are enqueued automatically inside createSqliteCRUDClient
+    // In V1, mutations are enqueued automatically inside createSqliteCrudClient
     // via writeWithOutbox. This method is a no-op on desktop V1; web V2 uses it.
   },
   status: () => cachedStatus,

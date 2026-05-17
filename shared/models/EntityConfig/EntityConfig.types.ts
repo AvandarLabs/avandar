@@ -3,7 +3,7 @@ import type { UUID } from "@utils/types/common.types.ts";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { EntityFieldConfigModel } from "$/models/EntityConfig/EntityFieldConfig/EntityFieldConfig.types.ts";
 import type { EntityFieldValueExtractor } from "$/models/EntityConfig/ValueExtractor/ValueExtractor.types.ts";
-import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { Paths, SetOptional, SetRequiredDeep, Simplify } from "type-fest";
@@ -62,7 +62,7 @@ type EntityConfigFull = EntityConfigRead & {
 /**
  * CRUD type definitions for the EntityConfig model.
  */
-export type EntityConfigModel = SupabaseCRUDModelSpec<
+export type EntityConfigModel = SupabaseCrudModelSpec<
   {
     tableName: "entity_configs";
     modelName: "EntityConfig";

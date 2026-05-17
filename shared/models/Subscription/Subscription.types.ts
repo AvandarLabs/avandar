@@ -1,5 +1,5 @@
 import type { UUID } from "@utils/types/common.types.ts";
-import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { Enums } from "$/types/database.types.ts";
@@ -35,7 +35,7 @@ export type SubscriptionRead = {
   currentPeriodEnd: Date | undefined;
 };
 
-export type SubscriptionModel = SupabaseCRUDModelSpec<
+export type SubscriptionModel = SupabaseCrudModelSpec<
   {
     tableName: "subscriptions";
     modelName: "Subscription";

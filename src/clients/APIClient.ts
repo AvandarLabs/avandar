@@ -1,11 +1,6 @@
-import { unknownToString } from "@utils";
-import {
-  buildHTTPQueryString as _buildHTTPQueryString,
-  ValidURLQueryParamValue,
-} from "$/utils/urls/buildHTTPQueryString";
+import { ValidURLQueryParamValue } from "$/utils/urls/buildHTTPQueryString";
 import { Simplify } from "type-fest";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
-import { Logger } from "@/utils/Logger";
+import { createServerApiClient } from "@clients";
 import type {
   API,
   APIBody,
@@ -14,6 +9,15 @@ import type {
   APIReturnType,
 } from "@/types/http-api.types";
 import type { HTTPMethod } from "@sbfn/_shared/MiniServer/api.types";
+
+// Platform-aware server API client. On web this delegates to the registered
+// Supabase client's `functions.invoke`; on desktop (Phase 2+) it bridges
+// through Bun-main IPC. Module-scope singleton so all APIClient call sites
+// share one instance. Path-param and query-string substitution that used to
+// live in this file (the `_buildRelativeAPIURL` helper) now happens inside
+// the ServerApiClient browser adapter — see
+// `packages/shared/clients/src/ServerApiClient/createBrowserServerApiClient`.
+const serverApi = createServerApiClient();
 
 type HTTPRequestOptions<
   Route extends keyof API,
@@ -33,81 +37,31 @@ type HTTPRequestOptions<
     : { queryParams?: undefined })
 >;
 
-function _buildURLWithPathParams(
-  route: string,
-  pathParams?: Record<string, string | number>,
-): string {
-  if (pathParams === undefined) {
-    return route;
-  }
-
-  return route.replace(/:([a-zA-Z0-9_]+)/g, (_, paramName) => {
-    if (pathParams[paramName]) {
-      return String(pathParams[paramName]);
-    }
-    const errMsg = `Could not build a URL for ${route}. No parameter was passed in for '${paramName}'`;
-    Logger.error(errMsg, { route, pathParams: pathParams });
-    throw new Error(errMsg);
-  });
-}
-
-function _buildRelativeAPIURL<
-  Route extends keyof API,
-  Method extends HTTPMethod,
->(
-  options: Pick<
-    HTTPRequestOptions<Route, Method>,
-    "route" | "pathParams" | "queryParams"
-  >,
-): string {
-  const { route, pathParams, queryParams } = options;
-  const newRoutePath = _buildURLWithPathParams(route, pathParams);
-  if (newRoutePath.includes(":")) {
-    // if there is still a colon in the URL, it means we didn't find a path
-    // param
-    const errMsg = `Could not build a URL for ${route}. Not all path parameters were replaced.`;
-    Logger.error(errMsg, { route, pathParams });
-    throw new Error(errMsg);
-  }
-  const queryString =
-    queryParams ? _buildHTTPQueryString(queryParams) : undefined;
-  return queryString === undefined ? newRoutePath : (
-      `${newRoutePath}?${queryString}`
-    );
-}
-
 async function sendHTTPRequest<
   Route extends keyof API,
   Method extends HTTPMethod,
 >(
   options: HTTPRequestOptions<Route, Method>,
 ): Promise<APIReturnType<Route, Method>> {
-  const { method, body } = options;
-  const relativeAPIURL = _buildRelativeAPIURL(options);
-  const { data, error } = await AvaSupabase.DB.functions.invoke<
-    APIReturnType<Route, Method>
-  >(relativeAPIURL, {
-    method,
-    body: body ? JSON.stringify(body) : undefined,
+  const { method, body, route } = options;
+  // Delegate to the platform-aware ServerApiClient. The browser adapter does
+  // the same `supabase.functions.invoke(...)` underneath; the desktop adapter
+  // bridges through IPC in Phase 2. Path/query param substitution and the
+  // error-shape unwrapping that previously lived here move into the adapter.
+  return await serverApi.invokeFunction<APIReturnType<Route, Method>>({
+    route: route as string,
+    method: method as
+      | "GET"
+      | "POST"
+      | "PATCH"
+      | "PUT"
+      | "DELETE",
+    pathParams: (options as { pathParams?: Record<string, string | number> })
+      .pathParams,
+    queryParams: (options as { queryParams?: Record<string, unknown> })
+      .queryParams,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
   });
-
-  if (data) {
-    return data;
-  }
-
-  const errorContext = error?.context;
-  if (errorContext instanceof Response) {
-    const errorResponse = await errorContext.json();
-    if (
-      errorResponse &&
-      typeof errorResponse === "object" &&
-      "error" in errorResponse
-    ) {
-      throw new Error(unknownToString(errorResponse.error));
-    }
-  }
-
-  throw error ? error : new Error("No data returned");
 }
 
 /**

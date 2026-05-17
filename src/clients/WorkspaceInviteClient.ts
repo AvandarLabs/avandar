@@ -1,13 +1,11 @@
-import { createSupabaseCRUDClient } from "@clients";
+import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { Workspace } from "$/models/Workspace/Workspace";
 import { WorkspaceInviteParsers } from "$/models/WorkspaceInvite/WorkspaceInviteParsers";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { WorkspaceInviteReadWithRoleGroupName } from "$/models/WorkspaceInvite/WorkspaceInvite.types";
 
 export const WorkspaceInviteClient = createUsableServiceClient(
-  createSupabaseCRUDClient({
-    dbClient: AvaSupabase.DB,
+  createRdbCrudClient({
     modelName: "WorkspaceInvite",
     tableName: "workspace_invites",
     dbTablePrimaryKey: "id",

@@ -1,4 +1,4 @@
-import { ModelCRUDClient } from "@clients";
+import { ModelCrudClient } from "@clients";
 import {
   DEFAULT_MUTATION_FN_NAMES,
   DEFAULT_QUERY_FN_NAMES,
@@ -11,7 +11,7 @@ import {
 
 export function createUsableServiceClient<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Client extends ModelCRUDClient<any>,
+  Client extends ModelCrudClient<any>,
   UseQueryFnName extends FnNameReturningPromise<Client>,
   UseMutationFnName extends FnNameReturningPromise<Client>,
 >(

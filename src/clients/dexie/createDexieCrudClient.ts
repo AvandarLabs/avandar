@@ -1,18 +1,18 @@
 import {
-  createModelCRUDClient,
-  ModelCRUDParserRegistry,
+  createModelCrudClient,
+  ModelCrudParserRegistry,
   UpsertOptions,
 } from "@clients";
 import { assertIsDefined, isDefined, isEmptyFiltersObject } from "@utils";
 import { assertDexieColumnsAreIndexed } from "@/clients/dexie/dexieColumnIsIndexed";
-import { DexieCRUDModelSpec } from "@/clients/dexie/DexieCRUDClient.types";
+import { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient.types";
 import {
   buildFilteredDexieCollection,
   findFirstConflictingRowByIndexedColumns,
 } from "@/clients/dexie/dexieFilteredCollection";
 import { promiseMapSequential, promiseReduce } from "@/lib/utils/promises";
 import type { DexieDBType } from "@/clients/dexie/DexieDBVersionManager";
-import type { ClientReturningOnlyPromises, ModelCRUDClient } from "@clients";
+import type { ClientReturningOnlyPromises, ModelCrudClient } from "@clients";
 import type { ILogger } from "@logger";
 import type { EmptyObject, FiltersByColumn } from "@utils";
 import type {
@@ -90,14 +90,14 @@ function _isPrimaryKeyConflictColumns(
   });
 }
 
-export type DexieCRUDClient<
-  M extends DexieCRUDModelSpec,
+export type DexieCrudClient<
+  M extends DexieCrudModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises,
   ExtendedMutationsClient extends ClientReturningOnlyPromises,
-> = ModelCRUDClient<M, ExtendedQueriesClient, ExtendedMutationsClient>;
+> = ModelCrudClient<M, ExtendedQueriesClient, ExtendedMutationsClient>;
 
-type CreateDexieCRUDClientOptions<
-  M extends DexieCRUDModelSpec,
+type CreateDexieCrudClientOptions<
+  M extends DexieCrudModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises,
   ExtendedMutationsClient extends ClientReturningOnlyPromises,
   DB extends DexieDBType<M> = DexieDBType<M>,
@@ -115,7 +115,7 @@ type CreateDexieCRUDClientOptions<
    * A registry of parsers for converting between model variants and
    * database variants.
    */
-  parsers: ModelCRUDParserRegistry<M>;
+  parsers: ModelCrudParserRegistry<M>;
 
   /**
    * Additional query functions to add to the client. These functions
@@ -149,8 +149,8 @@ type CreateDexieCRUDClientOptions<
 /**
  * Creates a client for a model that maps to a Dexie table.
  */
-export function createDexieCRUDClient<
-  M extends DexieCRUDModelSpec,
+export function createDexieCrudClient<
+  M extends DexieCrudModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises = EmptyObject,
   ExtendedMutationsClient extends ClientReturningOnlyPromises = EmptyObject,
   DB extends DexieDBType<M> = DexieDBType<M>,
@@ -160,16 +160,16 @@ export function createDexieCRUDClient<
   parsers,
   queries,
   mutations,
-}: CreateDexieCRUDClientOptions<
+}: CreateDexieCrudClientOptions<
   M,
   ExtendedQueriesClient,
   ExtendedMutationsClient,
   DB
->): DexieCRUDClient<M, ExtendedQueriesClient, ExtendedMutationsClient> {
+>): DexieCrudClient<M, ExtendedQueriesClient, ExtendedMutationsClient> {
   const dbTable = db[modelName];
   assertIsDefined(dbTable, `Could not find Dexie table for model ${modelName}`);
 
-  const modelClient = createModelCRUDClient({
+  const modelClient = createModelCrudClient({
     modelName,
     parsers,
     additionalQueries:

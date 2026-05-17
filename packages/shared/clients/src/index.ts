@@ -6,22 +6,27 @@ export { createServiceClient } from "@clients/ServiceClient/createServiceClient.
 export type { ServiceClient } from "@clients/ServiceClient/ServiceClient.types.ts";
 
 // Base CRUD client
-export { createModelCRUDClient } from "@clients/ModelCRUDClient/createModelCRUDClient.ts";
-export type { CRUDModelSpec } from "@clients/ModelCRUDClient/ModelCRUDClient.types.ts";
-export type { ClientReturningOnlyPromises } from "@clients/ModelCRUDClient/ModelCRUDClient.types.ts";
-export type { ModelCRUDClient } from "@clients/ModelCRUDClient/ModelCRUDClient.types.ts";
-export type { UpsertOptions } from "@clients/ModelCRUDClient/ModelCRUDClient.types.ts";
+export { createModelCrudClient } from "@clients/ModelCrudClient/createModelCrudClient.ts";
+export type { CrudModelSpec } from "@clients/ModelCrudClient/ModelCrudClient.types.ts";
+export type { ClientReturningOnlyPromises } from "@clients/ModelCrudClient/ModelCrudClient.types.ts";
+export type { ModelCrudClient } from "@clients/ModelCrudClient/ModelCrudClient.types.ts";
+export type { UpsertOptions } from "@clients/ModelCrudClient/ModelCrudClient.types.ts";
 
 // Supabase client
-export { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupabaseCRUDClient.ts";
-export type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
+export { createSupabaseCrudClient } from "@clients/SupabaseCrudClient/createSupabaseCrudClient.ts";
+export type { SupabaseCrudModelSpec } from "@clients/SupabaseCrudClient/SupabaseCrudClient.types.ts";
 
 // Parser registry
 export { makeParserRegistry } from "@clients/makeParserRegistry.ts";
-export type { ModelCRUDParserRegistry } from "@clients/makeParserRegistry.ts";
+export type { ModelCrudParserRegistry } from "@clients/makeParserRegistry.ts";
 
 // Mixins
 export { withSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
-
-// Mixin types
 export type { WithSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
+
+// Server-side API client (Postgres RPCs + Edge Functions)
+export { createServerApiClient } from "@clients/ServerApiClient/createServerApiClient.ts";
+export type {
+  ServerApiClient,
+  ServerApiFunctionRequest,
+} from "@clients/ServerApiClient/ServerApiClient.types.ts";

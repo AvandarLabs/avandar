@@ -1,20 +1,20 @@
 import { withSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
-import { createModelCRUDClient } from "@clients/ModelCRUDClient/createModelCRUDClient.ts";
+import { createModelCrudClient } from "@clients/ModelCrudClient/createModelCrudClient.ts";
 import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined.ts";
 import { objectEntries } from "@utils/objects/objectEntries.ts";
 import { objectKeys } from "@utils/objects/objectKeys.ts";
 import { match } from "ts-pattern";
 import { EmptyObject } from "type-fest";
-import type { ModelCRUDParserRegistry } from "@clients/makeParserRegistry.ts";
+import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry.ts";
 import type {
   ClientReturningOnlyPromises,
   UpsertOptions,
-} from "@clients/ModelCRUDClient/ModelCRUDClient.types.ts";
+} from "@clients/ModelCrudClient/ModelCrudClient.types.ts";
 import type { RegisteredSupabaseDatabase } from "@clients/Register.types.ts";
 import type {
-  AnySupabaseCRUDModelSpec,
-  SupabaseCRUDClient,
-} from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
+  AnySupabaseCrudModelSpec,
+  SupabaseCrudClient,
+} from "@clients/SupabaseCrudClient/SupabaseCrudClient.types.ts";
 import type { ILogger } from "@logger/Logger.types.ts";
 import type { PostgrestFilterBuilder } from "@supabase/postgrest-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -41,8 +41,8 @@ type AnySupabaseFilterableQuery = PostgrestFilterBuilder<
 /**
  * Creates a client for a model that maps to a Supabase table.
  */
-export function createSupabaseCRUDClient<
-  M extends AnySupabaseCRUDModelSpec,
+export function createSupabaseCrudClient<
+  M extends AnySupabaseCrudModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises = EmptyObject,
   ExtendedMutationsClient extends ClientReturningOnlyPromises = EmptyObject,
 >(options: {
@@ -53,7 +53,7 @@ export function createSupabaseCRUDClient<
    * A registry of parsers for converting between model variants and
    * database variants.
    */
-  parsers: ModelCRUDParserRegistry<M>;
+  parsers: ModelCrudParserRegistry<M>;
   dbTablePrimaryKey: M["dbTablePrimaryKey"];
 
   /**
@@ -69,7 +69,7 @@ export function createSupabaseCRUDClient<
   queries?: (config: {
     clientLogger: ILogger;
     dbClient: SupabaseClient<RegisteredSupabaseDatabase>;
-    parsers: ModelCRUDParserRegistry<M>;
+    parsers: ModelCrudParserRegistry<M>;
   }) => ExtendedQueriesClient;
 
   /**
@@ -85,7 +85,7 @@ export function createSupabaseCRUDClient<
   mutations?: (config: {
     clientLogger: ILogger;
     dbClient: SupabaseClient<RegisteredSupabaseDatabase>;
-    parsers: ModelCRUDParserRegistry<M>;
+    parsers: ModelCrudParserRegistry<M>;
   }) => ExtendedMutationsClient;
 
   /**
@@ -94,7 +94,7 @@ export function createSupabaseCRUDClient<
    * We override this when we want to test or seed data with an admin client.
    */
   dbClient: SupabaseClient<RegisteredSupabaseDatabase>;
-}): SupabaseCRUDClient<M, ExtendedQueriesClient, ExtendedMutationsClient> {
+}): SupabaseCrudClient<M, ExtendedQueriesClient, ExtendedMutationsClient> {
   const {
     modelName,
     tableName,
@@ -130,7 +130,7 @@ export function createSupabaseCRUDClient<
     return newQuery;
   }
 
-  const modelClient = createModelCRUDClient({
+  const modelClient = createModelCrudClient({
     modelName,
     parsers,
     additionalQueries: (config) => {
@@ -319,8 +319,9 @@ export function createSupabaseCRUDClient<
     },
   });
 
-  const x = modelClient.mixin(withSupabaseClient(dbClient));
-  return x as unknown as SupabaseCRUDClient<
+  return modelClient.mixin(
+    withSupabaseClient(dbClient),
+  ) as unknown as SupabaseCrudClient<
     M,
     ExtendedQueriesClient,
     ExtendedMutationsClient

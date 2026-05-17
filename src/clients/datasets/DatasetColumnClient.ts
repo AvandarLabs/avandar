@@ -1,11 +1,9 @@
-import { createSupabaseCRUDClient } from "@clients";
+import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { DatasetColumnParsers } from "$/models/datasets/DatasetColumn/DatasetColumnParsers";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 
 export const DatasetColumnClient = createUsableServiceClient(
-  createSupabaseCRUDClient({
-    dbClient: AvaSupabase.DB,
+  createRdbCrudClient({
     modelName: "DatasetColumn",
     tableName: "dataset_columns",
     dbTablePrimaryKey: "id",

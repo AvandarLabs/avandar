@@ -9,16 +9,16 @@
 **Spec:** `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md`
 **Testing strategy:** `docs/superpowers/specs/2026-05-14-testing-strategy.md` — defines per-PR test groupings (G1.x) referenced in each Task below.
 
-**Goal:** Introduce the five platform abstraction interfaces (`DuckDbClient`, `RdbClient`, `DatasetBlobStore`, `AuthProvider`, `SyncEngine`) and the `createRdbCRUDClient` umbrella factory; migrate every existing Supabase CRUD client to the new factory **without changing any observable behavior on web or desktop**.
+**Goal:** Introduce the five platform abstraction interfaces (`DuckDbClient`, `RdbClient`, `DatasetBlobStore`, `AuthProvider`, `SyncEngine`) and the `createRdbCrudClient` umbrella factory; migrate every existing Supabase CRUD client to the new factory **without changing any observable behavior on web or desktop**.
 
-**Architecture:** A new `@avandar/platform` package under `packages/shared/platform/` declares the interfaces, the `isDesktop()` runtime check, and web-side adapter implementations (thin wrappers over today's code). Each existing client file in `src/clients/**` swaps `createSupabaseCRUDClient(...)` for `createRdbCRUDClient(...)`; on web this resolves to the existing Supabase implementation, so behavior is unchanged. Desktop continues to behave as in Phase 0 (it's still pointing at the same Vite build, and `createRdbCRUDClient` resolves to the same Supabase implementation until Phase 2 replaces it).
+**Architecture:** A new `@avandar/platform` package under `packages/shared/platform/` declares the interfaces, the `isDesktop()` runtime check, and web-side adapter implementations (thin wrappers over today's code). Each existing client file in `src/clients/**` swaps `createSupabaseCrudClient(...)` for `createRdbCrudClient(...)`; on web this resolves to the existing Supabase implementation, so behavior is unchanged. Desktop continues to behave as in Phase 0 (it's still pointing at the same Vite build, and `createRdbCrudClient` resolves to the same Supabase implementation until Phase 2 replaces it).
 
 **Tech Stack:** TypeScript, vitest, existing `@avandar/clients` package conventions.
 
 **Phase exit criteria:**
 1. `@avandar/platform` package exists with all five interfaces, fully typed.
-2. `createRdbCRUDClient` exists and routes to `createSupabaseCRUDClient` on both web and desktop in Phase 1.
-3. Every `createSupabaseCRUDClient(...)` call site in the codebase has been migrated to `createRdbCRUDClient(...)`.
+2. `createRdbCrudClient` exists and routes to `createSupabaseCrudClient` on both web and desktop in Phase 1.
+3. Every `createSupabaseCrudClient(...)` call site in the codebase has been migrated to `createRdbCrudClient(...)`.
 4. Every `supabase.rpc(...)` call site (2 known: `DatasetClient.ts`, `WorkspaceClient.ts`) has been migrated to `serverApi.rpc(...)`, and `src/clients/APIClient.ts` internally delegates to `serverApi.invokeFunction(...)` (its public surface unchanged).
 5. `pnpm test` is green.
 6. `pnpm dev` and `pnpm dev:desktop` both work and behave **identically** to before this phase.
@@ -45,9 +45,9 @@
 - `packages/shared/platform/src/types/Platform.types.ts` — `Platform` enum / discriminated union
 
 **New factory (lives next to existing clients):**
-- `packages/shared/clients/src/RdbCRUDClient/createRdbCRUDClient.ts`
-- `packages/shared/clients/src/RdbCRUDClient/createRdbCRUDClient.test.ts`
-- `packages/shared/clients/src/RdbCRUDClient/RdbCRUDClient.types.ts`
+- `packages/shared/clients/src/RdbCrudClient/createRdbCrudClient.ts`
+- `packages/shared/clients/src/RdbCrudClient/createRdbCrudClient.test.ts`
+- `packages/shared/clients/src/RdbCrudClient/RdbCrudClient.types.ts`
 - `packages/shared/clients/src/ServerApiClient/createServerApiClient.ts`
 - `packages/shared/clients/src/ServerApiClient/createServerApiClient.test.ts`
 - `packages/shared/clients/src/ServerApiClient/createBrowserServerApiClient.ts`
@@ -55,10 +55,10 @@
 - `packages/shared/clients/src/ServerApiClient/ServerApiClient.types.ts`
 
 **Modified files:**
-- `packages/shared/clients/src/index.ts` — export `createRdbCRUDClient` and types
+- `packages/shared/clients/src/index.ts` — export `createRdbCrudClient` and types
 - `packages/shared/clients/package.json` — add `@avandar/platform` workspace dep
 - `pnpm-workspace.yaml` — no change (already covers `packages/shared/*`)
-- Every `src/clients/**/*Client.ts` file using `createSupabaseCRUDClient` — swap to `createRdbCRUDClient`
+- Every `src/clients/**/*Client.ts` file using `createSupabaseCrudClient` — swap to `createRdbCrudClient`
 - `src/clients/datasets/DatasetClient.ts` — swap `supabase.rpc(...)` call to `serverApi.rpc(...)`
 - `src/clients/WorkspaceClient.ts` — swap `supabase.rpc(...)` call to `serverApi.rpc(...)`
 - `src/clients/APIClient.ts` — rewire internal `sendHTTPRequest` to delegate to `serverApi.invokeFunction(...)`; public surface unchanged
@@ -763,18 +763,18 @@ Expected: green.
 
 ---
 
-## Task 4: `createRdbCRUDClient` umbrella factory
+## Task 4: `createRdbCrudClient` umbrella factory
 
-**Test groupings:** G1.3 (createRdbCRUDClient factory selection — web returns Supabase-backed; desktop throws in Phase 1 and returns Sqlite-backed in Phase 2 follow-up; spy on createSupabaseCRUDClient and assert dbClient injection).
+**Test groupings:** G1.3 (createRdbCrudClient factory selection — web returns Supabase-backed; desktop throws in Phase 1 and returns Sqlite-backed in Phase 2 follow-up; spy on createSupabaseCrudClient and assert dbClient injection).
 
 **PR boundaries:** 1 PR. The factory exists but no call site uses it yet (migration is Task 5), so creating it does not change web app behavior. The TDD test + implementation + index export + package.json dependency edit are tightly coupled — test and impl must ship together to keep `pnpm test` green, and the new export with no consumer is safe.
 
 The factory accepts a spec, inspects `isDesktop()`, and currently *always* returns the Supabase-backed client (because the SQLite-backed client doesn't exist yet — that's Phase 2). The point of doing this in Phase 1 is so that every client file already calls the umbrella; switching the desktop implementation later is one-line in this factory.
 
 **Files:**
-- Create: `packages/shared/clients/src/RdbCRUDClient/RdbCRUDClient.types.ts`
-- Create: `packages/shared/clients/src/RdbCRUDClient/createRdbCRUDClient.ts`
-- Test: `packages/shared/clients/src/RdbCRUDClient/createRdbCRUDClient.test.ts`
+- Create: `packages/shared/clients/src/RdbCrudClient/RdbCrudClient.types.ts`
+- Create: `packages/shared/clients/src/RdbCrudClient/createRdbCrudClient.ts`
+- Test: `packages/shared/clients/src/RdbCrudClient/createRdbCrudClient.test.ts`
 - Modify: `packages/shared/clients/src/index.ts`
 - Modify: `packages/shared/clients/package.json`
 
@@ -792,25 +792,25 @@ Run from repo root:
 pnpm install
 ```
 
-- [ ] **Step 2: Define `RdbCRUDClient` spec type**
+- [ ] **Step 2: Define `RdbCrudClient` spec type**
 
-Create `packages/shared/clients/src/RdbCRUDClient/RdbCRUDClient.types.ts`:
+Create `packages/shared/clients/src/RdbCrudClient/RdbCrudClient.types.ts`:
 
 ```ts
-import type { SupabaseCRUDModelSpec } from "@clients/SupabaseCRUDClient/SupabaseCRUDClient.types.ts";
+import type { SupabaseCrudModelSpec } from "@clients/SupabaseCrudClient/SupabaseCrudClient.types.ts";
 
 /**
- * Spec accepted by `createRdbCRUDClient`. In Phase 1, this is a structural
- * superset of `SupabaseCRUDModelSpec` — minus the `dbClient` field, which
+ * Spec accepted by `createRdbCrudClient`. In Phase 1, this is a structural
+ * superset of `SupabaseCrudModelSpec` — minus the `dbClient` field, which
  * the umbrella factory injects when delegating to Supabase. Phase 2 adds
  * SQLite-specific fields here.
  */
-export type RdbCRUDModelSpec<M> = Omit<SupabaseCRUDModelSpec<M>, "dbClient">;
+export type RdbCrudModelSpec<M> = Omit<SupabaseCrudModelSpec<M>, "dbClient">;
 ```
 
 - [ ] **Step 3: Write the failing test**
 
-Create `packages/shared/clients/src/RdbCRUDClient/createRdbCRUDClient.test.ts`:
+Create `packages/shared/clients/src/RdbCrudClient/createRdbCrudClient.test.ts`:
 
 ```ts
 import { isDesktop } from "@avandar/platform";
@@ -822,9 +822,9 @@ vi.mock("@avandar/platform", async () => {
   return { ...actual, isDesktop: vi.fn(() => false) };
 });
 
-import { createRdbCRUDClient } from "./createRdbCRUDClient.ts";
+import { createRdbCrudClient } from "./createRdbCrudClient.ts";
 
-describe("createRdbCRUDClient", () => {
+describe("createRdbCrudClient", () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -832,7 +832,7 @@ describe("createRdbCRUDClient", () => {
   it("delegates to Supabase factory on web", () => {
     (isDesktop as ReturnType<typeof vi.fn>).mockReturnValue(false);
 
-    const client = createRdbCRUDClient({
+    const client = createRdbCrudClient({
       modelName: "TestModel",
       tableName: "test_models",
       dbTablePrimaryKey: "id",
@@ -848,7 +848,7 @@ describe("createRdbCRUDClient", () => {
     (isDesktop as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
     expect(() =>
-      createRdbCRUDClient({
+      createRdbCrudClient({
         modelName: "TestModel",
         tableName: "test_models",
         dbTablePrimaryKey: "id",
@@ -867,14 +867,14 @@ pnpm --filter @avandar/clients test
 
 Expected: FAIL — file does not exist.
 
-- [ ] **Step 5: Implement `createRdbCRUDClient`**
+- [ ] **Step 5: Implement `createRdbCrudClient`**
 
-Create `packages/shared/clients/src/RdbCRUDClient/createRdbCRUDClient.ts`:
+Create `packages/shared/clients/src/RdbCrudClient/createRdbCrudClient.ts`:
 
 ```ts
 import { isDesktop } from "@avandar/platform";
-import { createSupabaseCRUDClient } from "@clients/SupabaseCRUDClient/createSupabaseCRUDClient.ts";
-import type { RdbCRUDModelSpec } from "./RdbCRUDClient.types.ts";
+import { createSupabaseCrudClient } from "@clients/SupabaseCrudClient/createSupabaseCrudClient.ts";
+import type { RdbCrudModelSpec } from "./RdbCrudClient.types.ts";
 
 /**
  * Platform-aware CRUD client factory. Resolves to:
@@ -884,14 +884,14 @@ import type { RdbCRUDModelSpec } from "./RdbCRUDClient.types.ts";
  * Consumers pass the spec WITHOUT a `dbClient` field; the factory injects
  * the appropriate underlying client per platform.
  */
-export function createRdbCRUDClient<M>(spec: RdbCRUDModelSpec<M>) {
+export function createRdbCrudClient<M>(spec: RdbCrudModelSpec<M>) {
   if (isDesktop()) {
     throw new Error(
-      "createRdbCRUDClient: desktop backend not implemented in Phase 1 — see Phase 2 plan",
+      "createRdbCrudClient: desktop backend not implemented in Phase 1 — see Phase 2 plan",
     );
   }
 
-  return createSupabaseCRUDClient<M>({
+  return createSupabaseCrudClient<M>({
     ...spec,
     // The caller doesn't pass `dbClient`; we inject the canonical web one.
     dbClient: getWebDbClient(),
@@ -927,8 +927,8 @@ Edit `packages/shared/clients/src/index.ts` — add:
 
 ```ts
 // Rdb (platform-aware) CRUD client
-export { createRdbCRUDClient } from "@clients/RdbCRUDClient/createRdbCRUDClient.ts";
-export type { RdbCRUDModelSpec } from "@clients/RdbCRUDClient/RdbCRUDClient.types.ts";
+export { createRdbCrudClient } from "@clients/RdbCrudClient/createRdbCrudClient.ts";
+export type { RdbCrudModelSpec } from "@clients/RdbCrudClient/RdbCrudClient.types.ts";
 ```
 
 - [ ] **Step 8: Type-check**
@@ -947,15 +947,15 @@ Expected: passes.
   pnpm --filter @avandar/clients type-check
   pnpm type-check
   ```
-  Expected: both `createRdbCRUDClient` tests pass (web delegates to Supabase; desktop throws the Phase-1 sentinel); whole-repo type-check clean.
+  Expected: both `createRdbCrudClient` tests pass (web delegates to Supabase; desktop throws the Phase-1 sentinel); whole-repo type-check clean.
 
   **Verify:**
-  - `packages/shared/clients/src/RdbCRUDClient/RdbCRUDClient.types.ts` exports `RdbCRUDModelSpec<M>` as `Omit<SupabaseCRUDModelSpec<M>, "dbClient">`
-  - `packages/shared/clients/src/RdbCRUDClient/createRdbCRUDClient.ts` exports `createRdbCRUDClient<M>(spec)` which:
+  - `packages/shared/clients/src/RdbCrudClient/RdbCrudClient.types.ts` exports `RdbCrudModelSpec<M>` as `Omit<SupabaseCrudModelSpec<M>, "dbClient">`
+  - `packages/shared/clients/src/RdbCrudClient/createRdbCrudClient.ts` exports `createRdbCrudClient<M>(spec)` which:
     - throws a clear "desktop backend not implemented" error when `isDesktop()` returns true
-    - otherwise delegates to `createSupabaseCRUDClient` with `dbClient` injected via the `getWebDbClient` shim
+    - otherwise delegates to `createSupabaseCrudClient` with `dbClient` injected via the `getWebDbClient` shim
   - The dynamic `require()` shim in `getWebDbClient` is commented as a Phase-1-only transitional ugliness
-  - `packages/shared/clients/src/index.ts` re-exports `createRdbCRUDClient` and `type RdbCRUDModelSpec`
+  - `packages/shared/clients/src/index.ts` re-exports `createRdbCrudClient` and `type RdbCrudModelSpec`
   - `packages/shared/clients/package.json` declares `"@avandar/platform": "workspace:*"` under `dependencies`
   - No `any` introduced (the `as never` casts in the test fixtures are limited to test-only spec shells)
   - No call sites in `src/clients/**` have been touched yet — that's Task 5
@@ -964,7 +964,7 @@ Expected: passes.
   **Manual smoke test (if applicable):**
   1. `pnpm dev`
   2. Open browser to localhost:5173, sign in
-  3. Open the datasets or workspaces list — every existing client still calls `createSupabaseCRUDClient` directly, so the app must be unchanged.
+  3. Open the datasets or workspaces list — every existing client still calls `createSupabaseCrudClient` directly, so the app must be unchanged.
 
   Expected: web app behavior identical to pre-phase-1.
 
@@ -1135,20 +1135,20 @@ Expected: passes.
 
 **Test groupings:** G1.4 (CRUD-migration regression suite — single parameterized Playwright spec over every migrated entity doing list → create → read → update → delete; the highest-leverage safety net in this phase); G1.7 (ServerApi migration regression — Playwright suite hits every page that depends on the 2 migrated RPC sites and on APIClient consumers, plus a snapshot test that no source file references AvaSupabase.DB.rpc/functions.invoke).
 
-**PR boundaries:** ~7 PRs total — each batch ships independently because every migrated call site swaps to `createRdbCRUDClient(spec)`, which on web still returns the Supabase-backed client (zero behavior change per file).
+**PR boundaries:** ~7 PRs total — each batch ships independently because every migrated call site swaps to `createRdbCrudClient(spec)`, which on web still returns the Supabase-backed client (zero behavior change per file).
 - PR 1: Single template migration (1 file) — proves the mechanical pattern, validates Playwright regression for that one entity before fan-out.
 - PR 2..N: Each batch of ~5 migrated CRUD-client files is its own PR (≈ 5 batch PRs total for the ~20-file enumeration). Each batch leaves the web app behaviorally unchanged and `pnpm test` / lint / type-check green.
 - PR N+1: ServerApi migration (2 RPC call sites + APIClient internal rewire) is its own PR — different factory, different regression surface, keep it isolated from CRUD batches.
-- The "verify zero stragglers" Step (`git grep "createSupabaseCRUDClient"` returns empty) is part of the final batch PR, since it can only pass once every preceding batch has merged.
+- The "verify zero stragglers" Step (`git grep "createSupabaseCrudClient"` returns empty) is part of the final batch PR, since it can only pass once every preceding batch has merged.
 
-This is a mechanical refactor across the codebase. Each client file that calls `createSupabaseCRUDClient(...)` with `{ dbClient: AvaSupabase.DB, ...spec }` becomes a call to `createRdbCRUDClient(spec)` (no `dbClient` field).
+This is a mechanical refactor across the codebase. Each client file that calls `createSupabaseCrudClient(...)` with `{ dbClient: AvaSupabase.DB, ...spec }` becomes a call to `createRdbCrudClient(spec)` (no `dbClient` field).
 
-**Files:** every file matching `src/clients/**/*Client.ts` that calls `createSupabaseCRUDClient`.
+**Files:** every file matching `src/clients/**/*Client.ts` that calls `createSupabaseCrudClient`.
 
 - [ ] **Step 1: Enumerate the call sites**
 
 ```bash
-git grep -l "createSupabaseCRUDClient" src/clients/
+git grep -l "createSupabaseCrudClient" src/clients/
 ```
 
 Record the list (typically ~20 files per the spec). Each gets the same mechanical edit.
@@ -1158,12 +1158,12 @@ Record the list (typically ~20 files per the spec). Each gets the same mechanica
 Pick the simplest client in the list (e.g. one that doesn't add custom queries/mutations). Open it. The current shape will look like:
 
 ```ts
-import { createSupabaseCRUDClient, createServiceClient } from "@avandar/clients";
+import { createSupabaseCrudClient, createServiceClient } from "@avandar/clients";
 import { AvaSupabase } from "@/db/supabase/AvaSupabase.ts";
 // ...
 
 export const FooClient = createUsableServiceClient(
-  createSupabaseCRUDClient({
+  createSupabaseCrudClient({
     dbClient: AvaSupabase.DB,
     modelName: "Foo",
     tableName: "foos",
@@ -1176,12 +1176,12 @@ export const FooClient = createUsableServiceClient(
 Change it to:
 
 ```ts
-import { createRdbCRUDClient } from "@avandar/clients";
+import { createRdbCrudClient } from "@avandar/clients";
 // AvaSupabase import removed if unused elsewhere in the file
 // ...
 
 export const FooClient = createUsableServiceClient(
-  createRdbCRUDClient({
+  createRdbCrudClient({
     modelName: "Foo",
     tableName: "foos",
     dbTablePrimaryKey: "id",
@@ -1213,9 +1213,9 @@ Expected: green.
   **Verify:**
   - Exactly one client file under `src/clients/**` has been migrated (the simplest one, e.g. `FooClient.ts`)
   - The migrated file:
-    - imports `createRdbCRUDClient` from `@avandar/clients` (not `createSupabaseCRUDClient`)
+    - imports `createRdbCrudClient` from `@avandar/clients` (not `createSupabaseCrudClient`)
     - no longer imports `AvaSupabase` if it's unused elsewhere in the file
-    - omits the `dbClient` field from the spec passed to `createRdbCRUDClient`
+    - omits the `dbClient` field from the spec passed to `createRdbCrudClient`
     - preserves `modelName`, `tableName`, `dbTablePrimaryKey`, `parsers`, and any custom queries/mutations exactly as before
   - No `any` types introduced
   - No other files modified in this step
@@ -1238,19 +1238,19 @@ Expected: green.
 For the remaining files from Step 1, apply the same mechanical edit in batches. Do NOT commit — pause after each batch for manual review and let the user commit themselves.
 
 ```bash
-git grep -l "createSupabaseCRUDClient" src/clients/
+git grep -l "createSupabaseCrudClient" src/clients/
 # pick ~5 files, edit them
 pnpm type-check
 pnpm test
 # STOP here. Surface the diff to the user for review and let them commit.
 ```
 
-Repeat until `git grep -l "createSupabaseCRUDClient" src/clients/` returns no matches.
+Repeat until `git grep -l "createSupabaseCrudClient" src/clients/` returns no matches.
 
 - [ ] **Step 6: Verify no stragglers remain**
 
 ```bash
-git grep "createSupabaseCRUDClient" -- 'src/**'
+git grep "createSupabaseCrudClient" -- 'src/**'
 ```
 
 Expected: zero matches. If any remain, migrate them.
@@ -1298,21 +1298,21 @@ Log in, navigate to a few data views (datasets list, dashboards list, anything t
 pnpm dev:desktop
 ```
 
-Confirm login works and the same data views render. Phase 1 desktop still routes through Supabase (since `createRdbCRUDClient` on desktop falls through to Supabase in Phase 1 — the desktop branch only throws when explicitly entered via `isDesktop()`).
+Confirm login works and the same data views render. Phase 1 desktop still routes through Supabase (since `createRdbCrudClient` on desktop falls through to Supabase in Phase 1 — the desktop branch only throws when explicitly entered via `isDesktop()`).
 
-**Wait** — re-read Task 4 Step 5: in Phase 1, `createRdbCRUDClient` on desktop *throws*. Before doing the desktop smoke test, you must decide:
+**Wait** — re-read Task 4 Step 5: in Phase 1, `createRdbCrudClient` on desktop *throws*. Before doing the desktop smoke test, you must decide:
 
-  - **Option A (recommended):** Make the Phase 1 desktop path fall through to Supabase (not throw). This keeps the desktop shell usable through Phase 1. To do this, edit `createRdbCRUDClient` to remove the `throw` and fall through to the Supabase factory regardless of platform during Phase 1. Update the test accordingly. Add a TODO comment referencing Phase 2.
+  - **Option A (recommended):** Make the Phase 1 desktop path fall through to Supabase (not throw). This keeps the desktop shell usable through Phase 1. To do this, edit `createRdbCrudClient` to remove the `throw` and fall through to the Supabase factory regardless of platform during Phase 1. Update the test accordingly. Add a TODO comment referencing Phase 2.
   - **Option B:** Skip the desktop smoke test in Phase 1; resume desktop testing in Phase 2 when the SQLite client lands.
 
 Pick Option A. Apply the change:
 
 ```ts
-export function createRdbCRUDClient<M>(spec: RdbCRUDModelSpec<M>) {
+export function createRdbCrudClient<M>(spec: RdbCrudModelSpec<M>) {
   // Phase 1: desktop falls through to Supabase. Phase 2 introduces the
   // SQLite-backed branch here:
-  //   if (isDesktop()) return createSqliteCRUDClient(spec);
-  return createSupabaseCRUDClient<M>({
+  //   if (isDesktop()) return createSqliteCrudClient(spec);
+  return createSupabaseCrudClient<M>({
     ...spec,
     dbClient: getWebDbClient(),
   } as never);
@@ -1344,15 +1344,15 @@ Expected: tests green, desktop login + data browsing works.
   Expected: every suite green. If `pnpm test:e2e` requires a running dev server, run it according to the repo's e2e convention.
 
   **Verify:**
-  - `git grep "createSupabaseCRUDClient" -- 'src/'` returns zero matches (call sites fully migrated)
+  - `git grep "createSupabaseCrudClient" -- 'src/'` returns zero matches (call sites fully migrated)
   - `git grep "AvaSupabase.DB" -- 'src/clients/**'` returns zero matches (no leftover direct Supabase DB references in client files)
   - `git grep "AvaSupabase\.DB\.rpc\(" -- 'src/**'` returns zero matches (Step 6b: `DatasetClient.ts` and `WorkspaceClient.ts` migrated to `serverApi.rpc(...)`)
   - `git grep "AvaSupabase\.DB\.functions\.invoke\(" -- 'src/**'` returns zero matches (Step 6b: `APIClient.ts` `sendHTTPRequest` rewired to `serverApi.invokeFunction(...)`; public `APIClient.get/post/patch/put/delete` surface unchanged)
-  - The Option A edit to `packages/shared/clients/src/RdbCRUDClient/createRdbCRUDClient.ts` is in place: desktop falls through to the Supabase factory, with a TODO comment referencing Phase 2's SQLite cutover
-  - The corresponding test in `createRdbCRUDClient.test.ts` was updated so the "desktop" case now asserts delegation (not a thrown error), with a comment about the Phase 2 cutover
+  - The Option A edit to `packages/shared/clients/src/RdbCrudClient/createRdbCrudClient.ts` is in place: desktop falls through to the Supabase factory, with a TODO comment referencing Phase 2's SQLite cutover
+  - The corresponding test in `createRdbCrudClient.test.ts` was updated so the "desktop" case now asserts delegation (not a thrown error), with a comment about the Phase 2 cutover
   - The umbrella factory's web behavior is unchanged from Task 4 — only the desktop branch was relaxed
   - No `any` types introduced across the migration
-  - All ~20 migrated client files import `createRdbCRUDClient` from `@avandar/clients`, omit `dbClient` from the spec, and drop their `AvaSupabase` import if it became unused
+  - All ~20 migrated client files import `createRdbCrudClient` from `@avandar/clients`, omit `dbClient` from the spec, and drop their `AvaSupabase` import if it became unused
   - Test groupings G1.4 and G1.7 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
 
   **Manual smoke test — web (REQUIRED):**
@@ -1386,7 +1386,7 @@ Expected: tests green, desktop login + data browsing works.
 - [ ] **Step 1: Confirm no leftover Supabase factory call sites**
 
 ```bash
-git grep "createSupabaseCRUDClient" -- 'src/'
+git grep "createSupabaseCrudClient" -- 'src/'
 ```
 
 Expected: zero results.
@@ -1433,19 +1433,19 @@ Edit `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md` Phase 1 li
   - Task 1 Step 6 checkpoint passed (workspace package scaffold)
   - Task 2 Step 8 checkpoint passed (`isDesktop` + `Platform` type)
   - Task 3 Step 9 checkpoint passed (six interfaces defined and exported)
-  - Task 4 Step 9 checkpoint passed (`createRdbCRUDClient` umbrella factory)
+  - Task 4 Step 9 checkpoint passed (`createRdbCrudClient` umbrella factory)
   - Task 4b Step 9 checkpoint passed (`createServerApiClient` umbrella factory)
   - Task 5 Step 4 checkpoint passed (template client migration)
   - Task 5 Step 11 checkpoint passed (all ~20 clients migrated, Option A applied, full smoke test clean)
   - ServerApiClient factory exists and is wired (G1.6 merged); 2 rpc call sites + APIClient.ts internal delegation migrated (G1.7 merged)
-  - Task 6 Steps 1–5 above all returned the expected results: zero leftover `createSupabaseCRUDClient` call sites in `src/`, `pnpm test` green, `pnpm type-check` clean, web smoke test indistinguishable from pre-Phase-1, desktop smoke test renders the same data
+  - Task 6 Steps 1–5 above all returned the expected results: zero leftover `createSupabaseCrudClient` call sites in `src/`, `pnpm test` green, `pnpm type-check` clean, web smoke test indistinguishable from pre-Phase-1, desktop smoke test renders the same data
 
   **Verify the spec marker:**
   - `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md` Phase 1 line in the Phased Rollout section has been annotated with "— completed 2026-05-13" (or the actual completion date)
   - No other edits made to the spec file
 
   **Verify the working tree:**
-  - `git status` shows only the intended changes accumulated across Phase 1 (the new `@avandar/platform` package, the `createRdbCRUDClient` factory under `packages/shared/clients/`, the ~20 migrated client files in `src/clients/`, the workspace dep added to `packages/shared/clients/package.json`, the lockfile, and the spec annotation)
+  - `git status` shows only the intended changes accumulated across Phase 1 (the new `@avandar/platform` package, the `createRdbCrudClient` factory under `packages/shared/clients/`, the ~20 migrated client files in `src/clients/`, the workspace dep added to `packages/shared/clients/package.json`, the lockfile, and the spec annotation)
   - No unrelated or accidental modifications
   - Test groupings G1.5 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
 
@@ -1458,7 +1458,7 @@ Edit `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md` Phase 1 li
 - Any SQLite implementation (Phase 2)
 - Any IPC contracts or Bun-main service implementations (Phase 2)
 - Any migration generator or `SYNCABLE_TABLES` manifest (Phase 2)
-- The `createSqliteCRUDClient` factory (Phase 2)
+- The `createSqliteCrudClient` factory (Phase 2)
 - Replacing the dynamic `require("../../../../../src/db/supabase/AvaSupabase.ts")` shim with a clean import (Phase 2 cleans this up; flagged as a known transitional ugliness)
 
 ---

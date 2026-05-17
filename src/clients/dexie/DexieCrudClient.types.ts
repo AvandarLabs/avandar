@@ -1,4 +1,4 @@
-import type { CRUDModelSpec } from "@clients";
+import type { CrudModelSpec } from "@clients";
 import type { UnknownObject } from "@utils";
 import type { Merge } from "type-fest";
 
@@ -44,12 +44,12 @@ type DefaultModelTypes = {
  * need to rely on database behavior to fill in any default
  * values.
  */
-export type DexieCRUDModelSpec<
+export type DexieCrudModelSpec<
   ModelTypes extends DefaultModelTypes = DefaultModelTypes,
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   ExtraTypes extends object = {},
 > = Merge<
-  CRUDModelSpec,
+  CrudModelSpec,
   {
     /** The model name. Also used as the Dexie table name. */
     modelName: ModelTypes["modelName"];

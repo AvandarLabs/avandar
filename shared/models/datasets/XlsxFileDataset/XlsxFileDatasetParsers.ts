@@ -54,14 +54,14 @@ export const XlsxFileDatasetParsers =
 /**
  * Do not remove these tests!
  */
-type CRUDTypes = XlsxFileDatasetModel;
+type CrudTypes = XlsxFileDatasetModel;
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
   Expect<
     ZodSchemaEqualsTypes<
       typeof DBReadSchema,
-      { input: CRUDTypes["DBRead"]; output: CRUDTypes["DBRead"] }
+      { input: CrudTypes["DBRead"]; output: CrudTypes["DBRead"] }
     >
   >,
 ];

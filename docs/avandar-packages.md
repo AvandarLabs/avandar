@@ -119,10 +119,10 @@ See [`packages/shared/logger/README.md`](../packages/shared/logger/README.md).
 Typed CRUD client primitives. Provides:
 
 - `createServiceClient` — the base named-module primitive.
-- `createModelCRUDClient` — generic CRUD client (`getById`, `getAll`,
+- `createModelCrudClient` — generic CRUD client (`getById`, `getAll`,
   `getPage`, `insert`, `update`, `delete`, etc.) decoupled from any
   particular data store.
-- `createSupabaseCRUDClient` / `withSupabaseClient` — concrete Supabase
+- `createSupabaseCrudClient` / `withSupabaseClient` — concrete Supabase
   implementation that reads table-name-aware DB types from a registered
   `Database` type.
 - `makeParserRegistry` — builder for translating between DB and frontend

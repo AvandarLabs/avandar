@@ -1,7 +1,7 @@
 import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
 import type { SwapDeep } from "@utils/types/utilities.types.ts";
-import type { SupabaseCRUDModelSpec } from "$/models/SupabaseCRUDModelSpec.ts";
+import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type {
   WorkspaceId,
@@ -39,7 +39,7 @@ export type WorkspaceInviteRead = Model.Base<
   }
 >;
 
-export type WorkspaceInviteModel = SupabaseCRUDModelSpec<
+export type WorkspaceInviteModel = SupabaseCrudModelSpec<
   {
     tableName: "workspace_invites";
     modelName: "WorkspaceInvite";

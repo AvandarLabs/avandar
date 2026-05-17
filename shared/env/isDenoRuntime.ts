@@ -5,5 +5,6 @@
  * @returns True if the current environment is Deno, false otherwise.
  */
 export function isDenoRuntime(): boolean {
-  return typeof Deno !== "undefined";
+  const g = globalThis as { Deno?: unknown };
+  return typeof g.Deno !== "undefined";
 }
