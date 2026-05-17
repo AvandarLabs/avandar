@@ -13,12 +13,25 @@
 **Goal:** Wire all desktop privileged services (SQLite, native DuckDB, filesystem `DatasetBlobStore`, OS keychain) into Bun main and expose them to the webview via typed IPC. After Phase 2 the desktop runs **fully offline** against a local snapshot of the user's data; the sync engine (Phase 3) is still absent, so writes do not yet propagate to Supabase.
 
 **Architecture:**
-- A typed IPC layer in `packages/shared/platform/ipc/` defines contracts; webview side has an IPC client, Bun main side has handler registration.
+- A typed IPC layer in `shared/platform/ipc/` defines contracts; webview side has an IPC client, Bun main side has handler registration.
 - `apps/desktop/main/services/` hosts the concrete native implementations: `Sqlite.ts`, `DuckDb.ts`, `FileSystemDatasetBlobStore.ts`, `Keychain.ts`.
 - A Postgres→SQLite migration generator (`apps/desktop/scripts/gen-sqlite-migrations.ts`) shells out to Python's `sqlglot`, guarded by a `SYNCABLE_TABLES` manifest.
-- `createSqliteCrudClient` joins `createSupabaseCrudClient` as a backend implementation; `createRdbCrudClient` now branches per platform.
+- `createSqliteCrudClient` joins `createSupabaseCrudClient` as a backend implementation; `createRdbCrudClient` (at `shared/RdbCrudClient/createRdbCrudClient.ts`) now branches per platform.
 
 **Tech Stack:** Electrobun IPC, Bun runtime, `bun:sqlite`, native DuckDB (via the existing `duckdb` Node binding used by `@avandar/ava-etl`), Bun FFI, Python 3 + `sqlglot` (developer-machine dependency).
+
+**Phase 1 outcome — what already exists (as of 2026-05-17):**
+- Electrobun desktop shell: `apps/desktop/{electrobun.config.ts,main/index.ts,preload/index.ts,package.json,vitest.config.ts,types/electrobun-deps.d.ts}` and `pnpm dev:desktop` boots a window pointed at the Vite dev server.
+- Platform discriminator: `shared/platform/isDesktop.ts` (reads `document.documentElement.dataset.avaPlatform`, set in the page main world by a Bun-side `dom-ready` handler in `apps/desktop/main/index.ts`).
+- Platform interface contracts (type-only): `shared/platform/types/{Platform,AuthProvider,DatasetBlobStore,DuckDbClient,RdbClient,ServerApiClient,SyncEngine}.types.ts` plus a structural existence test at `shared/platform/types/interfaces.test.ts`.
+- Umbrella CRUD factory: `shared/RdbCrudClient/createRdbCrudClient.ts` (currently always returns `createSupabaseCrudClient`; Phase 2 Task 8 flips the desktop branch). Every `src/clients/**` call site has already been migrated from `createSupabaseCrudClient` to `createRdbCrudClient`.
+- ServerApiClient Phase 1 stub: `packages/shared/clients/src/ServerApiClient/createIpcServerApiClient.ts` throws `"desktop ServerApiClient lands in Phase 2"`. `createServerApiClient` currently falls through to the browser adapter on both platforms. Phase 2 Task 14 replaces the stub.
+- Platform-aware hooks: `src/hooks/useIsDesktopPlatform/`, `src/hooks/usePlatformInfo/` consume `isDesktop()`. There is no `PlatformProvider` yet — Task 13 introduces it.
+
+**Path aliases & package layout (deltas from the plan as originally drafted):**
+- There is **no `@avandar/platform` workspace package**. Platform code lives under `shared/platform/` and is reached via the `$/` alias (`$/* → ./shared/*`). When code samples below import from `"@avandar/platform"`, substitute the matching `$/platform/...` path: contracts at `$/platform/ipc/contracts.ts`, client at `$/platform/ipc/client.ts`, server at `$/platform/ipc/server.ts`, `isDesktop` at `$/platform/isDesktop.ts`, and the `Desktop*` adapters at `$/platform/desktop/...`.
+- The umbrella factory is at `shared/RdbCrudClient/createRdbCrudClient.ts` (under `$/RdbCrudClient/...`), **not** `packages/shared/clients/src/RdbCrudClient/`. Concrete backends like `createSupabaseCrudClient` and the new `createSqliteCrudClient` do live under `packages/shared/clients/src/` (the `@clients` package, alias `@clients/*`).
+- Tests under `shared/**` (excluding `shared/lib/**`) are picked up by the root vitest config and run via `pnpm test:frontend`. Tests under `apps/desktop/` run via `pnpm --filter @avandar/desktop test`, but the current desktop `vitest.config.ts` only includes `main/**` and `preload/**` — Tasks that drop tests in `apps/desktop/{sync,scripts}/` must also widen that include glob or relocate the tests under `main/`.
 
 **Phase exit criteria:**
 1. On desktop, `pnpm dev:desktop` opens the app; first launch performs a one-shot Supabase→SQLite snapshot pull; subsequent launches read from local SQLite even with the network disabled.
@@ -33,13 +46,15 @@
 
 ## File Structure
 
-**New: IPC framework in `@avandar/platform`:**
-- `packages/shared/platform/src/ipc/contracts.ts` — typed contract definitions
-- `packages/shared/platform/src/ipc/contracts.test-d.ts`
-- `packages/shared/platform/src/ipc/client.ts` — webview-side IPC client
-- `packages/shared/platform/src/ipc/client.test.ts`
-- `packages/shared/platform/src/ipc/server.ts` — main-side handler registration helper
-- `packages/shared/platform/src/ipc/server.test.ts`
+> The paths below reflect the **current** repo layout after Phase 1 landed. Where the original plan referenced `packages/shared/platform/src/...` or `@avandar/platform`, the real location is `shared/platform/...` (alias `$/platform/...`). The remaining `@avandar/platform` imports inside code samples in later Tasks have been intentionally left in place — when implementing, substitute the matching `$/platform/...` path per the note in the previous section.
+
+**New: IPC framework (lives in the shared `$/platform` tree, not a separate workspace):**
+- `shared/platform/ipc/contracts.ts` — typed contract definitions
+- `shared/platform/ipc/contracts.test-d.ts`
+- `shared/platform/ipc/client.ts` — webview-side IPC client
+- `shared/platform/ipc/client.test.ts`
+- `shared/platform/ipc/server.ts` — main-side handler registration helper
+- `shared/platform/ipc/server.test.ts`
 
 **New: Migration generator:**
 - `apps/desktop/scripts/gen-sqlite-migrations.ts` — Bun-runnable generator
@@ -49,6 +64,8 @@
 - `apps/desktop/sync/syncable-tables.test.ts`
 - `apps/desktop/migrations/` — committed generated SQLite migrations
 - `apps/desktop/migrations/README.md`
+
+  ⚠ The current `apps/desktop/vitest.config.ts` `include` glob is `["main/**/*.test.ts", "preload/**/*.test.ts"]`. Either widen it to cover `sync/**` and `scripts/**`, or relocate these tests under `main/` (and adjust the script paths accordingly) before authoring tests here — otherwise the suite will silently skip them.
 
 **New: Bun-main services:**
 - `apps/desktop/main/services/Sqlite.ts` — bun:sqlite handle + migration runner
@@ -66,6 +83,7 @@
 - `apps/desktop/main/ipc/duckdb.ts`
 - `apps/desktop/main/ipc/dataset-blob.ts`
 - `apps/desktop/main/ipc/auth.ts`
+- `apps/desktop/main/ipc/api.ts` — ServerApi (Task 14)
 
 **New: Platform helpers:**
 - `apps/desktop/main/platform/userDataDir.ts`
@@ -75,20 +93,176 @@
 **New: Webview-side desktop implementations:**
 - `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.ts`
 - `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.test.ts`
-- `packages/shared/platform/src/desktop/DesktopRdbClient.ts`
-- `packages/shared/platform/src/desktop/DesktopDuckDbClient.ts`
-- `packages/shared/platform/src/desktop/DesktopDatasetBlobStore.ts`
-- `packages/shared/platform/src/desktop/DesktopAuthProvider.ts`
-- `packages/shared/platform/src/desktop/*.test.ts` for each
+- `shared/platform/desktop/DesktopRdbClient.ts`
+- `shared/platform/desktop/DesktopDuckDbClient.ts`
+- `shared/platform/desktop/DesktopDatasetBlobStore.ts`
+- `shared/platform/desktop/DesktopAuthProvider.ts`
+- `shared/platform/desktop/*.test.ts` for each
+
+**Pre-existing from Phase 1 (referenced by Phase 2, do not recreate):**
+- `shared/platform/isDesktop.ts` + `shared/platform/isDesktop.test.ts`
+- `shared/platform/types/{Platform,AuthProvider,DatasetBlobStore,DuckDbClient,RdbClient,ServerApiClient,SyncEngine}.types.ts` + `shared/platform/types/interfaces.test.ts`
+- `shared/RdbCrudClient/createRdbCrudClient.ts` + `.test.ts` + `RdbCrudClient.types.ts`
+- `packages/shared/clients/src/ServerApiClient/createIpcServerApiClient.ts` (Phase 1 throwing stub; Task 14 replaces the body)
+- `packages/shared/clients/src/ServerApiClient/createServerApiClient.ts` (Phase 1 always-browser dispatch; Task 14 flips the desktop branch)
+- `apps/desktop/main/index.ts`, `apps/desktop/preload/index.ts`, `apps/desktop/main/config/url.ts`, `apps/desktop/main/menu/setupApplicationMenu.ts`, `apps/desktop/electrobun.config.ts`, `apps/desktop/vitest.config.ts`
 
 **Modified:**
-- `apps/desktop/package.json` — add `duckdb`, `bun:sqlite` (built-in, no dep needed)
+- `apps/desktop/package.json` — add `duckdb` (bun:sqlite is built-in)
+- `apps/desktop/vitest.config.ts` — widen `include` if Task 5/6 put tests outside `main/`
 - `apps/desktop/main/index.ts` — register IPC handlers on startup
-- `apps/desktop/preload/index.ts` — expose IPC bridge to webview
+- `apps/desktop/preload/index.ts` — expose IPC bridge to webview (if needed beyond Electrobun's defaults)
 - `packages/shared/clients/src/index.ts` — export `createSqliteCrudClient`
-- `packages/shared/clients/src/RdbCrudClient/createRdbCrudClient.ts` — flip the desktop branch
+- `shared/RdbCrudClient/createRdbCrudClient.ts` — flip the desktop branch to `createSqliteCrudClient`
+- `shared/RdbCrudClient/createRdbCrudClient.test.ts` — update the desktop-branch assertion (currently asserts Supabase fallback per Phase 1 Option A)
+- `packages/shared/clients/src/ServerApiClient/createServerApiClient.ts` — flip the desktop branch to `createIpcServerApiClient` (Task 14)
+- `packages/shared/clients/src/ServerApiClient/createIpcServerApiClient.ts` — replace the Phase 1 throwing stub with the real IPC implementation (Task 14)
 - `package.json` (root) — add `gen:sqlite-migrations` and `check:sqlite-migrations` scripts
 - Vite config — exclude `@duckdb/duckdb-wasm` from the bundle when `AVA_TARGET=desktop`
+
+---
+
+## Milestones
+
+Phase 2 is too big to ship in one go. The 15 Tasks group into **6 milestones**. Every milestone is sized to:
+1. **Leave the codebase consistent** — `pnpm test` green, `pnpm type-check` clean, `pnpm dev` (web) and `pnpm dev:desktop` both boot, no half-wired adapters left behind.
+2. **Be reviewable** — a milestone is a coherent unit of work, not a grab-bag. Each constituent Task still ships per its own `**PR boundaries:**` block; the milestone is just the chunk you'd open a meta-issue for.
+
+The hard ordering invariants (don't reorder these):
+- Tasks 2 & 3 depend on Task 1's contract types.
+- Task 6 (migration generator) depends on Task 5's `SYNCABLE_TABLES` manifest.
+- Task 7's startup wiring depends on Task 6's generated `apps/desktop/migrations/*.sql`.
+- Task 8's `createSqliteCrudClient` depends on Tasks 1-3 + 7.
+- Task 8's **factory flip** (the moment desktop CRUD stops reading from Supabase) must ship *together with* Task 9's snapshot bootstrap — otherwise the desktop reads from an empty SQLite and the UI goes blank.
+- Tasks 10, 11, 12 each depend on Tasks 1-3 but are independent of each other.
+- Task 13 (PlatformProvider) is the moment the Desktop* adapters from 10/11/12 actually get consumed by React. Until Task 13, those adapters exist but idle.
+- Task 14 depends on Task 11 (it reads the access token from AuthProvider).
+
+### Milestone A — IPC framework (Tasks 1, 2, 3)
+
+Lay the typed IPC primitives. Zero runtime consumers yet.
+
+**Includes:**
+- Task 1 — IPC contract definitions in `shared/platform/ipc/contracts.ts`
+- Task 2 — `callIpc` webview client in `shared/platform/ipc/client.ts`
+- Task 3 — `createIpcServer` Bun-main helper in `shared/platform/ipc/server.ts`
+
+**Consistency at milestone end:**
+- New files exist, type-level + unit tests pass.
+- Nothing imports the new symbols yet — web is bit-for-bit identical, `pnpm dev:desktop` opens the same window it does today.
+
+**Review surface:** small, mostly type-level; ~3 PRs.
+
+---
+
+### Milestone B — Desktop infrastructure scaffolding (Tasks 4, 5, 6)
+
+Stand up the building blocks the SQLite path needs, *without* wiring anything into startup.
+
+**Includes:**
+- Task 4 — `resolveUserDataDir` pure function in `apps/desktop/main/platform/userDataDir.ts`
+- Task 5 — `SYNCABLE_TABLES` manifest in `apps/desktop/sync/syncable-tables.ts`
+- Task 6 — Postgres→SQLite generator (`apps/desktop/scripts/gen-sqlite-migrations.ts`), first batch of generated `apps/desktop/migrations/*.sql`, and the `pnpm check:sqlite-migrations` CI drift check.
+
+**Consistency at milestone end:**
+- Generated migrations are committed but not yet applied at runtime (no runner exists yet).
+- `pnpm check:sqlite-migrations` passes against the current Supabase schema.
+- Desktop boots identically.
+
+**Watch out for:**
+- The current `apps/desktop/vitest.config.ts` only includes `main/**` and `preload/**`. Task 5/6 tests live under `apps/desktop/{sync,scripts}/` — widen the `include` glob (or relocate the tests under `main/`) before authoring, or the suite will silently skip them.
+- Python `sqlglot>=22` becomes a developer-machine dependency; document it in `apps/desktop/migrations/README.md` (Task 6 Step 1 already covers this).
+
+**Review surface:** 3-4 PRs; Task 6 is the heaviest because it ships a script + generated SQL + CI check.
+
+---
+
+### Milestone C — Local SQLite + CRUD live on desktop (Tasks 7, 8, 9)
+
+The biggest milestone. After this lands, desktop CRUD reads from local SQLite, populated on first launch via a one-shot Supabase pull. Web is untouched.
+
+**Includes:**
+- Task 7 — `openSqliteDatabase` + migration runner; wired into `apps/desktop/main/index.ts` startup so launch creates `~/Library/Application Support/Avandar/metadata.sqlite` with every syncable table.
+- Task 8 — RDB IPC handlers (`apps/desktop/main/ipc/rdb.ts`), `createSqliteCrudClient` in `packages/shared/clients/src/SqliteCrudClient/`, and the **flip** of `shared/RdbCrudClient/createRdbCrudClient.ts` so `isDesktop()` selects the SQLite backend.
+- Task 9 — `SnapshotBootstrap` at `apps/desktop/main/services/SnapshotBootstrap.ts` that fills an empty local SQLite from Supabase REST before the webview opens.
+
+**Hard internal ordering (within the milestone, across its PRs):**
+1. Task 7 lands + wires startup → migrations apply, empty SQLite on disk.
+2. Task 8 PRs 1-3 land (`rdb.ts`, `createSqliteCrudClient`, integration loopback test) — factory still routes desktop to Supabase, nothing breaks.
+3. Task 9 lands → first-launch bootstrap populates SQLite from Supabase.
+4. Task 8 PR 4 lands → factory flips; desktop CRUD now hits local SQLite, which is no longer empty.
+
+If you ship the flip before the bootstrap, the desktop UI loads against an empty DB. Don't do that.
+
+**Consistency at milestone end:**
+- Cold-launch desktop hydrates SQLite from Supabase, then renders the UI from local data.
+- Restart with network off still renders cached data (the headline Phase 2 deliverable).
+- Web is unaffected because `isDesktop() === false`.
+- `shared/RdbCrudClient/createRdbCrudClient.test.ts` is updated: the Phase 1 "Option A — falls through to Supabase on desktop" assertion becomes "desktop returns SQLite client".
+
+**Review surface:** 6-8 PRs total. Largest of the six milestones; split aggressively.
+
+---
+
+### Milestone D — Native services in Bun main (Tasks 10, 11, 12)
+
+Land the three remaining native subsystems. Each ships its Bun-main service + IPC handlers + desktop adapter, but the adapters are not yet *consumed* by React (that's Milestone E).
+
+**Includes:**
+- Task 10 — Native DuckDB (`apps/desktop/main/services/DuckDb.ts`) + DuckDb IPC + `DesktopDuckDbClient` + (optional) drop `@duckdb/duckdb-wasm` from desktop bundle.
+- Task 11 — Keychain (`apps/desktop/main/services/Keychain.ts`) + auth IPC + `DesktopAuthProvider`. Recommendation per the plan: ship the `security` CLI shellout first, file a follow-up for the FFI port.
+- Task 12 — `FileSystemDatasetBlobStore` + dataset-blob IPC + `DesktopDatasetBlobStore`.
+
+**Consistency at milestone end:**
+- Bun main starts SQLite (from C), DuckDB, Keychain, and the blob store on launch. Each must boot without throwing — a single failed `dlopen` or missing path takes the app down.
+- The Desktop* adapters exist on disk but no React code imports them yet, so the webview behavior is unchanged.
+- Tests pass for each service. Manual smoke tests at each Task's checkpoint confirm startup boots cleanly.
+
+**Watch out for:**
+- Tasks 10, 11, 12 are independent of each other — order them by risk: do whichever blocks first. Keychain (Task 11) is the riskiest because of FFI/CLI ergonomics; DuckDB (Task 10) is second-riskiest because of the `duckdb` Node binding under Bun.
+- Each task's PR 1 lands the service in isolation, PR 2 wires it into `apps/desktop/main/index.ts`. After each PR 2 lands, do `pnpm dev:desktop` and confirm the app still boots — startup is now doing strictly more work and any of these services can break it.
+
+**Review surface:** 6-9 PRs across the three Tasks. They can land in parallel.
+
+---
+
+### Milestone E — Wire desktop into React (Tasks 13, 14)
+
+The "make it real" milestone. Introduce `PlatformProvider`, migrate consumers to `usePlatform()`, and route ServerApi (Supabase RPCs + Edge Functions) through Bun main.
+
+**Includes:**
+- Task 13 — `PlatformProvider` + `usePlatform()` hook in `src/config/platform/` (NOT `packages/web/hooks/` — the web adapters need to import from `src/` where the existing concrete classes live; this is called out in Task 13 Step 1's note). Migrate `DuckDbClient.getInstance()`, direct `AvaSupabase` auth calls, and Dexie `LocalDataset` accesses to `usePlatform().*` in batches.
+- Task 14 — `apps/desktop/main/ipc/api.ts` Bun-main handler, real implementation in `packages/shared/clients/src/ServerApiClient/createIpcServerApiClient.ts` (replaces the Phase 1 throwing stub), and the flip of `createServerApiClient.ts`'s desktop branch.
+
+**Consistency at milestone end:**
+- Desktop runs the full happy path on a cold `userDataDir`: sign in → snapshot bootstrap → list workspaces → run a query → upload a CSV → quit → relaunch → state survives.
+- Single network-egress invariant holds: every Supabase call from the desktop webview is visible in Bun-main logs.
+- Web shell (`pnpm dev`) still works — gate everything behind `isDesktop()`.
+
+**Review surface:** 5-7 PRs (Task 13's PR-by-adapter split + Task 14's 2 PRs).
+
+---
+
+### Milestone F — Phase 2 acceptance (Task 15)
+
+Verification + spec annotation. Doc-only edits to mark Phase 2 complete in the design spec. No code changes.
+
+**Consistency at milestone end:** trivially consistent — nothing in code changed.
+
+**Review surface:** 1 PR.
+
+---
+
+### Milestone summary table
+
+| Milestone | Tasks | Approx. PRs | Risk | After this, desktop behavior… |
+|---|---|---|---|---|
+| A — IPC framework | 1, 2, 3 | ~3 | Low | unchanged |
+| B — Infra scaffolding | 4, 5, 6 | ~3-4 | Low | unchanged |
+| C — SQLite live | 7, 8, 9 | ~6-8 | **High** (factory flip + bootstrap must land coherently) | reads from local SQLite, hydrated from Supabase on first launch |
+| D — Native services | 10, 11, 12 | ~6-9 | Medium (each service can break startup) | unchanged (adapters idle) |
+| E — Wire React + ServerApi | 13, 14 | ~5-7 | Medium-High (broad consumer migration) | uses all native services end-to-end |
+| F — Acceptance | 15 | 1 | None | unchanged |
 
 ---
 
@@ -101,15 +275,15 @@
 - PR 2: Tests for the contracts framework — asserts currently-passing type-level behavior; safe to land independently.
 - (Or 1 combined PR if the Steps fold tests and contracts together in a TDD pair.)
 
-A small, typed RPC abstraction that lives in `@avandar/platform` and is consumed by both sides. Each contract is `{ name, request, response }` and the registration helper enforces type matching.
+A small, typed RPC abstraction that lives under `shared/platform/ipc/` (alias `$/platform/ipc/...`) and is consumed by both sides. Each contract is `{ name, request, response }` and the registration helper enforces type matching.
 
 **Files:**
-- Create: `packages/shared/platform/src/ipc/contracts.ts`
-- Test: `packages/shared/platform/src/ipc/contracts.test-d.ts`
+- Create: `shared/platform/ipc/contracts.ts`
+- Test: `shared/platform/ipc/contracts.test-d.ts`
 
 - [ ] **Step 1: Write the failing type test**
 
-Create `packages/shared/platform/src/ipc/contracts.test-d.ts`:
+Create `shared/platform/ipc/contracts.test-d.ts`:
 
 ```ts
 import { expectTypeOf, test } from "vitest";
@@ -139,14 +313,14 @@ test("IpcContract preserves request/response types", () => {
 - [ ] **Step 2: Run the test and confirm it fails**
 
 ```bash
-pnpm --filter @avandar/platform test
+pnpm test:frontend
 ```
 
 Expected: FAIL — file does not exist.
 
 - [ ] **Step 3: Implement `defineIpcContract`**
 
-Create `packages/shared/platform/src/ipc/contracts.ts`:
+Create `shared/platform/ipc/contracts.ts`:
 
 ```ts
 /**
@@ -179,14 +353,14 @@ Note: `parseRequest`/`parseResponse` are intentionally identity casts in Phase 2
 - [ ] **Step 4: Run the test and confirm it passes**
 
 ```bash
-pnpm --filter @avandar/platform test
+pnpm test:frontend
 ```
 
 Expected: green.
 
 - [ ] **Step 5: Define every contract used in Phase 2**
 
-Append to `packages/shared/platform/src/ipc/contracts.ts`:
+Append to `shared/platform/ipc/contracts.ts`:
 
 ```ts
 // ─────────────────────────────────────────────────────────────────────────
@@ -318,7 +492,7 @@ export const ServerApiContracts = {
 
 - [ ] **Step 6: Export from the platform index**
 
-Edit `packages/shared/platform/src/index.ts`, add:
+Edit `shared/platform/index.ts`, add:
 
 ```ts
 export {
@@ -335,7 +509,7 @@ export type { IpcContract } from "./ipc/contracts.ts";
 - [ ] **Step 7: Type-check**
 
 ```bash
-pnpm --filter @avandar/platform type-check
+pnpm type-check
 ```
 
 Expected: green.
@@ -344,16 +518,16 @@ Expected: green.
 
   **Run:**
   ```bash
-  pnpm --filter @avandar/platform test
-  pnpm --filter @avandar/platform type-check
+  pnpm test:frontend
+  pnpm type-check
   ```
   Expected: tests pass, type-check exits clean.
 
   **Verify:**
-  - `packages/shared/platform/src/ipc/contracts.ts` exists with the `defineIpcContract` / `IpcContract` exports.
-  - `packages/shared/platform/src/ipc/contracts.test-d.ts` covers both the type-test and the runtime sanity checks.
+  - `shared/platform/ipc/contracts.ts` exists with the `defineIpcContract` / `IpcContract` exports.
+  - `shared/platform/ipc/contracts.test-d.ts` covers both the type-test and the runtime sanity checks.
   - All Phase 2 contracts (rdb.*, duckdb.*, auth.*, dataset-blob.*, serverApi.*) are declared in the contracts module with the request/response shapes the spec calls for.
-  - Public surface is re-exported from `packages/shared/platform/src/index.ts`.
+  - Public surface is re-exported from `shared/platform/index.ts`.
   - Test groupings G2.1 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
 
   **Manual smoke test:** none yet — there's no runtime path to exercise until the client/server land in Tasks 2/3 (and a real handler in Task 8). Defer end-to-end smoke until then.
@@ -371,12 +545,12 @@ Expected: green.
 Webview-side client that calls a contract over Electrobun's IPC bridge and returns a Promise.
 
 **Files:**
-- Create: `packages/shared/platform/src/ipc/client.ts`
-- Test: `packages/shared/platform/src/ipc/client.test.ts`
+- Create: `shared/platform/ipc/client.ts`
+- Test: `shared/platform/ipc/client.test.ts`
 
 - [ ] **Step 1: Write the failing test**
 
-Create `packages/shared/platform/src/ipc/client.test.ts`:
+Create `shared/platform/ipc/client.test.ts`:
 
 ```ts
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -430,14 +604,14 @@ describe("callIpc", () => {
 - [ ] **Step 2: Run the test and confirm it fails**
 
 ```bash
-pnpm --filter @avandar/platform test
+pnpm test:frontend
 ```
 
 Expected: FAIL — file does not exist.
 
 - [ ] **Step 3: Implement the client**
 
-Create `packages/shared/platform/src/ipc/client.ts`:
+Create `shared/platform/ipc/client.ts`:
 
 ```ts
 import type { IpcContract } from "./contracts.ts";
@@ -506,14 +680,14 @@ export async function callIpc<TRequest, TResponse>(
 - [ ] **Step 4: Run the test and confirm it passes**
 
 ```bash
-pnpm --filter @avandar/platform test
+pnpm test:frontend
 ```
 
 Expected: green.
 
 - [ ] **Step 5: Export from the platform index**
 
-Edit `packages/shared/platform/src/index.ts`:
+Edit `shared/platform/index.ts`:
 
 ```ts
 export { callIpc, __setIpcBridgeForTests } from "./ipc/client.ts";
@@ -523,15 +697,15 @@ export { callIpc, __setIpcBridgeForTests } from "./ipc/client.ts";
 
   **Run:**
   ```bash
-  pnpm --filter @avandar/platform test
-  pnpm --filter @avandar/platform type-check
+  pnpm test:frontend
+  pnpm type-check
   ```
   Expected: client unit tests pass (including the bridge-injection cases), type-check clean.
 
   **Verify:**
-  - `packages/shared/platform/src/ipc/client.ts` exports `callIpc` plus the test-injection seam `__setIpcBridgeForTests`.
+  - `shared/platform/ipc/client.ts` exports `callIpc` plus the test-injection seam `__setIpcBridgeForTests`.
   - The client serialises a contract call into the expected Electrobun bridge shape and rejects on error responses.
-  - `packages/shared/platform/src/index.ts` re-exports the new symbols.
+  - `shared/platform/index.ts` re-exports the new symbols.
   - Request/response types flow through from `defineIpcContract` so callers get inferred typings.
   - Test groupings G2.2 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
 
@@ -550,12 +724,12 @@ export { callIpc, __setIpcBridgeForTests } from "./ipc/client.ts";
 Helper for registering typed handlers in Bun main. Same shape on the other side of the wire.
 
 **Files:**
-- Create: `packages/shared/platform/src/ipc/server.ts`
-- Test: `packages/shared/platform/src/ipc/server.test.ts`
+- Create: `shared/platform/ipc/server.ts`
+- Test: `shared/platform/ipc/server.test.ts`
 
 - [ ] **Step 1: Write the failing test**
 
-Create `packages/shared/platform/src/ipc/server.test.ts`:
+Create `shared/platform/ipc/server.test.ts`:
 
 ```ts
 import { describe, expect, it, vi } from "vitest";
@@ -618,14 +792,14 @@ describe("createIpcServer", () => {
 - [ ] **Step 2: Run the test and confirm it fails**
 
 ```bash
-pnpm --filter @avandar/platform test
+pnpm test:frontend
 ```
 
 Expected: FAIL.
 
 - [ ] **Step 3: Implement the server**
 
-Create `packages/shared/platform/src/ipc/server.ts`:
+Create `shared/platform/ipc/server.ts`:
 
 ```ts
 import type { IpcContract } from "./contracts.ts";
@@ -664,7 +838,7 @@ export function createIpcServer(transport: IpcTransport): IpcServer {
 - [ ] **Step 4: Run tests and confirm pass**
 
 ```bash
-pnpm --filter @avandar/platform test
+pnpm test:frontend
 ```
 
 Expected: green.
@@ -680,16 +854,16 @@ export type { IpcServer, IpcTransport } from "./ipc/server.ts";
 
   **Run:**
   ```bash
-  pnpm --filter @avandar/platform test
-  pnpm --filter @avandar/platform type-check
+  pnpm test:frontend
+  pnpm type-check
   ```
   Expected: server unit tests pass, type-check clean.
 
   **Verify:**
-  - `packages/shared/platform/src/ipc/server.ts` exports `createIpcServer`, the `IpcServer` type, and the `IpcTransport` shape it expects from Electrobun.
+  - `shared/platform/ipc/server.ts` exports `createIpcServer`, the `IpcServer` type, and the `IpcTransport` shape it expects from Electrobun.
   - Registering a handler for a contract narrows request/response types correctly (mirror of the client side).
   - Errors thrown inside a handler are serialised, not crashed; the test covers this.
-  - Re-export wired up in `packages/shared/platform/src/index.ts`.
+  - Re-export wired up in `shared/platform/index.ts`.
   - Test groupings G2.3, G2.4 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
 
   **Manual smoke test:** none yet — exercising the server requires a real transport, which Tasks 7/8 deliver. A trivial loopback round-trip (fake transport that pipes client → server in-process) is acceptable here if you want extra confidence; otherwise defer.
@@ -1669,7 +1843,7 @@ Expected: green.
 
 **PR boundaries:** 3-4 PRs.
 - PR 1: RDB IPC handlers in `apps/desktop/main/ipc/rdb.ts` with unit tests; nothing imports them on web.
-- PR 2: `createSqliteCrudClient` in `packages/shared/clients/src/RdbCrudClient/...` with mocked-IPC unit tests; new file, not yet selected by the factory.
+- PR 2: `createSqliteCrudClient` in `packages/shared/clients/src/SqliteCrudClient/...` with mocked-IPC unit tests; new file, not yet selected by the factory.
 - PR 3: Integration loopback test wiring PR 1 and PR 2 through the fake-IPC harness — asserts already-passing behavior.
 - PR 4: Update `createRdbCrudClient` factory's desktop branch to return `createSqliteCrudClient`; desktop CRUD goes live, web is unaffected because `isDesktop()` is false.
 
@@ -1680,7 +1854,7 @@ Wire SQLite to the webview through the IPC layer, then introduce the SQLite-back
 - Create: `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.ts`
 - Test: `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.test.ts`
 - Modify: `packages/shared/clients/src/index.ts`
-- Modify: `packages/shared/clients/src/RdbCrudClient/createRdbCrudClient.ts`
+- Modify: `shared/RdbCrudClient/createRdbCrudClient.ts`
 - Modify: `apps/desktop/main/index.ts`
 
 - [ ] **Step 1: Register RDB handlers in Bun main**
@@ -1867,7 +2041,7 @@ Create `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.ts`:
 ```ts
 import { callIpc, RdbContracts } from "@avandar/platform";
 import { createModelCrudClient } from "@clients/ModelCrudClient/createModelCrudClient.ts";
-import type { RdbCrudModelSpec } from "@clients/RdbCrudClient/RdbCrudClient.types.ts";
+import type { RdbCrudModelSpec } from "$/RdbCrudClient/RdbCrudClient.types.ts";
 
 /**
  * SQLite-backed CRUD client. Issues IPC calls to the Bun-main process,
@@ -1974,13 +2148,16 @@ Expected: green.
 
 - [ ] **Step 8: Flip the desktop branch in `createRdbCrudClient`**
 
-Edit `packages/shared/clients/src/RdbCrudClient/createRdbCrudClient.ts`:
+Edit `shared/RdbCrudClient/createRdbCrudClient.ts`:
+
+Adapt the existing Phase 1 file (which currently always delegates to Supabase) to branch on `isDesktop()`:
 
 ```ts
-import { isDesktop } from "@avandar/platform";
 import { createSqliteCrudClient } from "@clients/SqliteCrudClient/createSqliteCrudClient.ts";
 import { createSupabaseCrudClient } from "@clients/SupabaseCrudClient/createSupabaseCrudClient.ts";
-import type { RdbCrudModelSpec } from "./RdbCrudClient.types.ts";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
+import { isDesktop } from "$/platform/isDesktop.ts";
+import type { RdbCrudModelSpec } from "$/RdbCrudClient/RdbCrudClient.types.ts";
 
 export function createRdbCrudClient<M>(spec: RdbCrudModelSpec<M>) {
   if (isDesktop()) {
@@ -1988,22 +2165,12 @@ export function createRdbCrudClient<M>(spec: RdbCrudModelSpec<M>) {
   }
   return createSupabaseCrudClient<M>({
     ...spec,
-    dbClient: getWebDbClient(),
+    dbClient: AvaSupabase.db(),
   } as never);
-}
-
-function getWebDbClient() {
-  // Phase 2 cleanup opportunity: replace this dynamic require with an
-  // injected dependency. Currently retained for Phase 1 compatibility.
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mod = require("../../../../../src/db/supabase/AvaSupabase.ts") as {
-    AvaSupabase: { DB: unknown };
-  };
-  return mod.AvaSupabase.DB;
 }
 ```
 
-Update the existing test in `createRdbCrudClient.test.ts` to assert that the desktop branch returns a SQLite client (not throws).
+Keep the actual generics (`ExtendedQueriesClient`, `ExtendedMutationsClient`) from the existing Phase 1 signature — the snippet above omits them for clarity. Update `shared/RdbCrudClient/createRdbCrudClient.test.ts` accordingly: the Phase 1 test currently asserts "Phase 1 Option A — also delegates to createSupabaseCrudClient on desktop". Replace that case with one that mocks `isDesktop` → `true` and asserts the call lands on `createSqliteCrudClient` instead.
 
 - [ ] **Step 9: Export `createSqliteCrudClient` from the clients index**
 
@@ -2055,7 +2222,7 @@ The actual implementation lives in the next task.
   **Verify:**
   - `apps/desktop/main/ipc/rdb.ts` registers handlers for every `rdb.*` contract from Task 1.
   - `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.ts` implements the same `RdbCrudClient` interface as the web Dexie client (parity is what makes the swap transparent).
-  - `packages/shared/clients/src/RdbCrudClient/createRdbCrudClient.ts` now branches on platform and returns the SQLite-backed client on desktop, Dexie on web.
+  - `shared/RdbCrudClient/createRdbCrudClient.ts` now branches on platform and returns the SQLite-backed client on desktop, Dexie on web.
   - SQL parameter handling is parameterised — no string interpolation of user data into queries.
   - `apps/desktop/main/index.ts` constructs the Sqlite handle once and passes it to `registerRdbHandlers`.
   - Test groupings G2.9, G2.10 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
@@ -2335,7 +2502,7 @@ Replace duckdb-wasm on desktop. The existing `@avandar/ava-etl` package already 
 - Create: `apps/desktop/main/services/DuckDb.ts`
 - Test: `apps/desktop/main/services/DuckDb.test.ts`
 - Create: `apps/desktop/main/ipc/duckdb.ts`
-- Create: `packages/shared/platform/src/desktop/DesktopDuckDbClient.ts`
+- Create: `shared/platform/desktop/DesktopDuckDbClient.ts`
 - Modify: `apps/desktop/package.json` — add `duckdb` dep
 - Modify: `apps/desktop/main/index.ts`
 - Modify: `vite.config.ts` (root) — drop duckdb-wasm from the bundle when `AVA_TARGET=desktop`
@@ -2594,7 +2761,7 @@ window.on("closed", async () => {
 
 - [ ] **Step 8: Implement webview-side `DesktopDuckDbClient`**
 
-Create `packages/shared/platform/src/desktop/DesktopDuckDbClient.ts`:
+Create `shared/platform/desktop/DesktopDuckDbClient.ts`:
 
 ```ts
 import { callIpc, DuckDbContracts } from "../ipc/contracts.ts";
@@ -2699,7 +2866,7 @@ Each call site should either be desktop-conditional or moved behind a `usePlatfo
   - `apps/desktop/package.json` now depends on `duckdb` (Node binding) and the binding loads under Bun without a postinstall fight.
   - `apps/desktop/main/services/DuckDb.ts` exposes the same query API the web `duckdb-wasm` wrapper exposes (so the IPC layer can swap in transparently).
   - `apps/desktop/main/ipc/duckdb.ts` registers handlers for every `duckdb.*` contract from Task 1.
-  - `packages/shared/platform/src/desktop/DesktopDuckDbClient.ts` calls the contracts and returns the same shape the web client returns.
+  - `shared/platform/desktop/DesktopDuckDbClient.ts` calls the contracts and returns the same shape the web client returns.
   - The duckdb-wasm bundle decision is recorded as described in Step 9 (dropped from desktop OR explicitly deferred to Phase 4 in the spec's "decisions" section).
   - No `@duckdb/duckdb-wasm` import executes on the desktop runtime path (audit confirmed via `git grep` per Step 9).
   - Test groupings G2.12 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
@@ -2733,7 +2900,7 @@ Phase 2 lands macOS keychain. Windows keychain is Phase 5.
 - Create: `apps/desktop/main/services/Keychain.ts`
 - Test: `apps/desktop/main/services/Keychain.test.ts` (manual smoke test harness)
 - Create: `apps/desktop/main/ipc/auth.ts`
-- Create: `packages/shared/platform/src/desktop/DesktopAuthProvider.ts`
+- Create: `shared/platform/desktop/DesktopAuthProvider.ts`
 - Modify: `apps/desktop/main/index.ts`
 
 - [ ] **Step 1: Investigate Bun FFI bindings for macOS Security.framework**
@@ -3129,7 +3296,7 @@ export function getCurrentAccessToken(): string | null {
 
 - [ ] **Step 6: Implement webview-side `DesktopAuthProvider`**
 
-Create `packages/shared/platform/src/desktop/DesktopAuthProvider.ts`:
+Create `shared/platform/desktop/DesktopAuthProvider.ts`:
 
 ```ts
 import { AuthContracts } from "../ipc/contracts.ts";
@@ -3214,7 +3381,7 @@ In the window: sign in, close the app, reopen. The second launch should reach th
     - never logs the secret value,
     - the FFI implementation correctly frees any pointers/copies it owns.
   - `apps/desktop/main/ipc/auth.ts` registers `auth.*` handlers (set, get, delete) wired to the Keychain service.
-  - `packages/shared/platform/src/desktop/DesktopAuthProvider.ts` implements the same auth-provider interface the web side uses and persists the session via the auth IPC.
+  - `shared/platform/desktop/DesktopAuthProvider.ts` implements the same auth-provider interface the web side uses and persists the session via the auth IPC.
   - `apps/desktop/main/index.ts` calls the auth provider before constructing the snapshot bootstrap from Task 9, so the bootstrap token comes from Keychain instead of a hardcoded dev token.
   - Service uses an account identifier scoped to "Avandar" (so deletions/inspections in Keychain Access are unambiguous).
   - Test groupings G2.13, G2.14 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
@@ -3253,7 +3420,7 @@ The desktop equivalent of `DatasetBlobStore`. Atomic writes, on-disk per-OS-user
 - Create: `apps/desktop/main/services/FileSystemDatasetBlobStore.ts`
 - Test: `apps/desktop/main/services/FileSystemDatasetBlobStore.test.ts`
 - Create: `apps/desktop/main/ipc/dataset-blob.ts`
-- Create: `packages/shared/platform/src/desktop/DesktopDatasetBlobStore.ts`
+- Create: `shared/platform/desktop/DesktopDatasetBlobStore.ts`
 - Modify: `apps/desktop/main/index.ts`
 
 - [ ] **Step 1: Write the failing test**
@@ -3463,7 +3630,7 @@ export function registerDatasetBlobHandlers(
 
 - [ ] **Step 6: Implement webview-side `DesktopDatasetBlobStore`**
 
-Create `packages/shared/platform/src/desktop/DesktopDatasetBlobStore.ts`:
+Create `shared/platform/desktop/DesktopDatasetBlobStore.ts`:
 
 ```ts
 import { callIpc, DatasetBlobContracts } from "../ipc/contracts.ts";
@@ -3567,7 +3734,7 @@ registerDatasetBlobHandlers(ipcServer, datasetBlobStore);
     - reads verify the file exists before returning a stream/handle,
     - delete is recursive and bounded to the dataset directory (cannot escape).
   - `apps/desktop/main/ipc/dataset-blob.ts` registers `dataset-blob.*` handlers from Task 1.
-  - `packages/shared/platform/src/desktop/DesktopDatasetBlobStore.ts` implements the same interface the web `DatasetBlobStore` implements (so consumers don't branch).
+  - `shared/platform/desktop/DesktopDatasetBlobStore.ts` implements the same interface the web `DatasetBlobStore` implements (so consumers don't branch).
   - `apps/desktop/main/index.ts` constructs the store rooted at `<userDataDir>/blobs` and wires it into the IPC server.
   - Test groupings G2.15, G2.16 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
 
