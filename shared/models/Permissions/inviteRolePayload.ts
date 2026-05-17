@@ -22,7 +22,6 @@ export function buildWorkspaceInviteRolePayload(
 ): {
   roleGroupId: string;
   roleOverrides: Array<{ app: AppType; role: RoleLevel }>;
-  legacyRole: "admin" | "member";
 } {
   const match = roleGroups.find((group) => {
     return Permissions.RolesMatrix.areRoleMatricesEqual(
@@ -40,7 +39,6 @@ export function buildWorkspaceInviteRolePayload(
     return {
       roleGroupId: match.id,
       roleOverrides: [],
-      legacyRole: matrix.settings === "admin" ? "admin" : "member",
     };
   }
   const base = Permissions.RolesMatrix.Builtins.GlobalViewer;
@@ -50,6 +48,5 @@ export function buildWorkspaceInviteRolePayload(
       base,
       matrix,
     ),
-    legacyRole: matrix.settings === "admin" ? "admin" : "member",
   };
 }

@@ -31,7 +31,7 @@ create table public.dashboards (
 );
 
 -- Enable row level security
--- RLS and policies: `17.dashboards_datasets_rls.sql`
+-- RLS and policies: `17.rls.dashboards.sql`
 -- (after `16.utils__permissions.sql` defines resource helper functions).
 alter table public.dashboards enable row level security;
 

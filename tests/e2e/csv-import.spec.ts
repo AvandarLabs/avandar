@@ -1,8 +1,3 @@
-import {
-  createSupabaseAdminClient,
-  getWorkspaceIdBySlug,
-  isDatasetParquetInStorage,
-} from "../helpers/supabaseAdminClient";
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
@@ -16,6 +11,11 @@ import {
   parseDatasetIdFromDataManagerUrl,
   pollUntilCloudDatasetToggleShowsOnline,
 } from "./helpers/manualUploadCloudSyncFlow";
+import {
+  createSupabaseAdminClient,
+  getWorkspaceIdBySlug,
+  isDatasetParquetInStorage,
+} from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
 test.describe("CSV manual upload", () => {
@@ -59,11 +59,13 @@ test.describe("CSV manual upload", () => {
       timeout: MEDIUM_WAIT,
     });
 
-    for (const columnName of EXPECTED_CSV_COLUMN_NAMES) {
-      await expect(
-        page.getByRole("columnheader", { name: columnName }),
-      ).toBeVisible({ timeout: SHORT_WAIT });
-    }
+    await Promise.all(
+      EXPECTED_CSV_COLUMN_NAMES.map(async (columnName) => {
+        await expect(
+          page.getByRole("columnheader", { name: columnName }),
+        ).toBeVisible({ timeout: SHORT_WAIT });
+      }),
+    );
 
     await expect(page.getByText("California").first()).toBeVisible({
       timeout: SHORT_WAIT,

@@ -1,8 +1,9 @@
+import { BUILTIN_ROLE_GROUP_NAMES } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/preset-role-matrices.ts";
 import { RolesMatrixModule } from "$/models/Permissions/PermissionsModule/RolesMatrixModule/RolesMatrixModule.ts";
 import { describe, expect, it } from "vitest";
 import type { UserAppRolesMatrix } from "$/models/Permissions/Permissions.types.ts";
 
-describe("RoleMatrixModule", () => {
+describe("RolesMatrixModule", () => {
   it("areRoleMatricesEqual is true for identical matrices", () => {
     const viewer = { ...RolesMatrixModule.Builtins.GlobalViewer };
     expect(
@@ -38,6 +39,41 @@ describe("RoleMatrixModule", () => {
     ).toEqual([{ app: "data_sources", role: "admin" }]);
   });
 
+  it("applyRoleOverridesToMatrix merges overrides onto a base matrix", () => {
+    const result = RolesMatrixModule.applyRoleOverridesToMatrix(
+      RolesMatrixModule.Builtins.GlobalViewer,
+      [{ app: "data_sources", role: "admin" }],
+    );
+    expect(result.data_sources).toBe("admin");
+    expect(result.data_explorer).toBe(
+      RolesMatrixModule.Builtins.GlobalViewer.data_explorer,
+    );
+  });
+
+  it("roleMatrixFromBuiltinRoleGroupName returns built-in matrices", () => {
+    expect(
+      RolesMatrixModule.roleMatrixFromBuiltinRoleGroupName(
+        BUILTIN_ROLE_GROUP_NAMES.globalAdmin,
+      ),
+    ).toEqual(RolesMatrixModule.Builtins.GlobalAdmin);
+    expect(
+      RolesMatrixModule.roleMatrixFromBuiltinRoleGroupName(
+        BUILTIN_ROLE_GROUP_NAMES.globalEditor,
+      ),
+    ).toEqual(RolesMatrixModule.Builtins.GlobalEditor);
+    expect(
+      RolesMatrixModule.roleMatrixFromBuiltinRoleGroupName(
+        BUILTIN_ROLE_GROUP_NAMES.globalViewer,
+      ),
+    ).toEqual(RolesMatrixModule.Builtins.GlobalViewer);
+  });
+
+  it("roleMatrixFromBuiltinRoleGroupName returns undefined for unknown names", () => {
+    expect(
+      RolesMatrixModule.roleMatrixFromBuiltinRoleGroupName("Unknown Group"),
+    ).toBe(undefined);
+  });
+
   it("roleGroupPresetTypeFromRoleMatrix classifies built-in matrices", () => {
     expect(
       RolesMatrixModule.roleGroupPresetTypeFromRoleMatrix(
@@ -56,16 +92,37 @@ describe("RoleMatrixModule", () => {
     ).toBe("global_viewer");
   });
 
-  it("roleMatrixFromPresetType matches built-in admin matrix", () => {
+  it("roleGroupPresetTypeFromRoleMatrix returns custom for non-built-in matrices", () => {
+    expect(
+      RolesMatrixModule.roleGroupPresetTypeFromRoleMatrix({
+        ...RolesMatrixModule.Builtins.GlobalViewer,
+        data_sources: "admin",
+      }),
+    ).toBe("custom");
+  });
+
+  it("roleMatrixFromPresetType matches each built-in matrix", () => {
     expect(
       RolesMatrixModule.areRoleMatricesEqual(
         RolesMatrixModule.roleMatrixFromPresetType("global_admin"),
         RolesMatrixModule.Builtins.GlobalAdmin,
       ),
     ).toBe(true);
+    expect(
+      RolesMatrixModule.areRoleMatricesEqual(
+        RolesMatrixModule.roleMatrixFromPresetType("global_editor"),
+        RolesMatrixModule.Builtins.GlobalEditor,
+      ),
+    ).toBe(true);
+    expect(
+      RolesMatrixModule.areRoleMatricesEqual(
+        RolesMatrixModule.roleMatrixFromPresetType("global_viewer"),
+        RolesMatrixModule.Builtins.GlobalViewer,
+      ),
+    ).toBe(true);
   });
 
-  it("rows round-trip through rowsToUserAppRolesMatrix and UserAppRolesMatrixToRows", () => {
+  it("rows round-trip through rowsToUserAppRolesMatrix and userAppRolesMatrixToRows", () => {
     const rows = [
       { app: "data_sources" as const, role: "viewer" as const },
       { app: "dashboards" as const, role: "admin" as const },

@@ -60,7 +60,7 @@ create policy "User can delete datasets__open_data in their workspace" on public
   public.util__auth_user_can_access_resource (
     'dataset',
     public.datasets__open_data.dataset_id,
-    'editor'
+    'admin'
   )
 );
 

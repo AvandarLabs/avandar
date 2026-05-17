@@ -1,6 +1,4 @@
-import { useQuery } from "@hooks";
-import { AvaSupabase } from "@/db/supabase/AvaSupabase";
-import { permissionsQueryKeys } from "@/hooks/permissions/permissionsQueryKeys";
+import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import type { Database } from "$/types/database.types";
 
@@ -22,30 +20,13 @@ export function useResourceRole(options: {
 ] {
   const user = useCurrentUser();
   const { resourceType, resourceId } = options;
-
-  const [data, isLoading] = useQuery({
-    queryKey: permissionsQueryKeys.resourceEffectiveRole(
-      resourceType,
-      resourceId ?? "",
-    ),
-    enabled: !!resourceId && !!user?.id,
-    staleTime: 30_000,
-    queryFn: async () => {
-      const { data: role, error } = await AvaSupabase.DB.rpc(
-        "util__resource_effective_role",
-        {
-          p_resource_type: resourceType,
-          p_resource_id: resourceId!,
-        },
-      );
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      return role;
+  const [data, isLoading] = PermissionsClient.useGetResourceEffectiveRole({
+    resourceType,
+    resourceId: resourceId ?? "",
+    useQueryOptions: {
+      enabled: !!resourceId && !!user?.id,
+      staleTime: 30_000,
     },
   });
-
   return [data, isLoading] as const;
 }

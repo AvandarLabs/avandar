@@ -1,4 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
+import {
+  tryGetSupabaseServiceRoleKeyFromEnv,
+  tryGetSupabaseUrlFromEnv,
+} from "../helpers/supabaseEnv";
 
 /**
  * Ensures a Supabase Auth user exists (idempotent). Requires service role and
@@ -11,13 +15,12 @@ export async function ensureAuthUserExists(options: {
   email: string;
   password: string;
 }): Promise<void> {
-  const apiUrl = process.env.VITE_SUPABASE_API_URL ?? process.env.SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const apiUrl = tryGetSupabaseUrlFromEnv();
+  const serviceRoleKey = tryGetSupabaseServiceRoleKeyFromEnv();
 
   if (!apiUrl || !serviceRoleKey) {
     console.warn(
-      "[e2e] Skipping ensureAuthUserExists: set VITE_SUPABASE_API_URL (or " +
-        "SUPABASE_URL) and SUPABASE_SERVICE_ROLE_KEY in .env.development.",
+      "[e2e] Skipping ensureAuthUserExists: set VITE_SUPABASE_API_URL (or SUPABASE_URL) and SUPABASE_SERVICE_ROLE_KEY in .env.development.",
     );
     return;
   }

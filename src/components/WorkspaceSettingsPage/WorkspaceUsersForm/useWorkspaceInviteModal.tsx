@@ -54,7 +54,6 @@ export function useWorkspaceInviteModal({
         },
         body: {
           emailToInvite: variables.email,
-          role: payload.legacyRole,
           roleGroupId: payload.roleGroupId,
           roleOverrides: payload.roleOverrides,
           userGroupIds: [...variables.userGroupIds],

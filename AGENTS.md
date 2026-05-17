@@ -31,6 +31,10 @@ Implement functionality using red/green TDD.
 
 ## General Code Style & Formatting
 
+## Comments
+
+- Do not use em dashes (—). Prefer a colon for explanations, or a hyphen (-)
+  as a short dash for aside explanations where you would have used an em dash.
 - Use block comments or docstrings to document exported or public interfaces,
   constants, objects, functions, and classes.
 
@@ -44,6 +48,11 @@ Implement functionality using red/green TDD.
 - Avoid vague names like `next`, `prev`, or `n`, that don't say what the
   variable actually actually holds. Always include a noun, such as `nextPage`,
   `prevRow` or `numPeople`.
+- Builder functions for objects or classes should be named `create{Type}`
+  - A function that creates a type from some seed data then use "From". E.g.
+    `createUserFromId`
+- Conversion or cast functions should use "to". E.g. `roleToDisplayLabel`
+  or `app_type_to_key`.
 
 ## Functions & Logic
 

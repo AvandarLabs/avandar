@@ -1,5 +1,5 @@
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
-import { createSupabaseAdminClient } from "../../helpers/supabaseAdminClient";
+import { createSupabaseAdminClient } from "../helpers/supabaseAdminClient";
 import type { TablesInsert } from "../../../shared/types/database.types";
 
 /**

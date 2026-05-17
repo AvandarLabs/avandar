@@ -34,28 +34,16 @@ export async function resolveRoleGroupIdForAcceptedInvite(options: {
   workspaceId: string;
   invite: {
     role_group_id: string | null;
-    role: string;
     role_overrides: unknown;
   };
 }): Promise<string> {
   const { supabaseAdminClient, workspaceId, invite } = options;
-  let baseGroupId = invite.role_group_id;
+  const baseGroupId = invite.role_group_id;
 
-  // legacy fallback: if there's no base group id, we need to infer which
-  // role-group matrix to start from, so we infer it based on the legacy
-  // invite "role" field.
   if (!baseGroupId) {
-    const builtinName =
-      invite.role === "admin" ? "Global Admin" : "Global Viewer";
-    const { data: builtin } = await supabaseAdminClient
-      .from("role_groups")
-      .select("id")
-      .eq("workspace_id", workspaceId)
-      .eq("name", builtinName)
-      .eq("is_builtin", true)
-      .single()
-      .throwOnError();
-    baseGroupId = builtin.id;
+    throw new Error(
+      "Invite is missing role_group_id; re-send the invite with a role group.",
+    );
   }
 
   const { data: baseRows } = await supabaseAdminClient

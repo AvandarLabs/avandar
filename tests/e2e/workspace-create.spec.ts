@@ -1,7 +1,7 @@
-import { createSupabaseAdminClient } from "../helpers/supabaseAdminClient";
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import { SEEDED_WORKSPACE_MENU_BUTTON_NAME } from "./helpers/constants";
+import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 import { deleteUserOwnedWorkspaceTreeBySlug } from "./setup/e2eTestWorkspaceLifecycle";
 import type { Response } from "@playwright/test";

@@ -2,7 +2,6 @@
 import type {
   AppType as AppTypeAlias,
   BuiltinPresetType as BuiltinPresetTypeAlias,
-  PermissionCatalog as PermissionCatalogAlias,
   PermissionKey as PermissionKeyAlias,
   RoleLevel as RoleLevelAlias,
   UserAppRolesList as UserAppRolesListAlias,
@@ -14,7 +13,13 @@ export { PermissionsModule as Permissions } from "$/models/Permissions/Permissio
 export namespace Permissions {
   export type AppType = AppTypeAlias;
   export type BuiltinPresetType = BuiltinPresetTypeAlias;
-  export type PermissionCatalog = PermissionCatalogAlias;
+
+  /**
+   * A PermissionKey is a string concatenation of an AppType and a capability.
+   *
+   * @example "data_sources__can_view_dataset"
+   * @example "dashboards__can_view_dashboard"
+   * */
   export type PermissionKey = PermissionKeyAlias;
   export type RoleLevel = RoleLevelAlias;
   export type UserAppRolesMatrix = UserAppRolesMatrixAlias;
