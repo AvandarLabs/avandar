@@ -1,6 +1,6 @@
 /**
  * Policies for workspaces, workspace_memberships, user_profiles, and
- * user_roles. Declared after permission helpers (e.g.
+ * Declared after permission helpers (e.g.
  * util__can_manage_workspace_settings) so RLS can reference them.
  */
 --------------------------------------------------------------------------------
@@ -165,68 +165,5 @@ create policy "Users can DELETE profiles" on public.user_profiles for delete to 
   ) or
   public.util__can_manage_workspace_settings (
     public.user_profiles.workspace_id
-  )
-);
-
---------------------------------------------------------------------------------
--- Policies: user_roles
---------------------------------------------------------------------------------
-create policy "Users can select user roles in their workspaces" on public.user_roles for
-select
-  to authenticated using (
-    -- User can select their own user_roles
-    public.user_roles.user_id = (
-      select
-        auth.uid ()
-    ) or
-    -- User can select roles belonging to a workspace they are also in
-    -- This allows authenticated users to see the roles of others in
-    -- their workspace.
-    public.user_roles.workspace_id = any (
-      public.util__get_auth_user_workspaces ()
-    )
-  );
-
-create policy "Users can insert user roles in their workspaces" on public.user_roles for insert to authenticated
-with
-  check (
-    -- User can insert their own user_roles
-    (
-      public.user_roles.user_id = (
-        select
-          auth.uid ()
-      ) and
-      public.user_roles.workspace_id = any (
-        public.util__get_auth_user_owned_workspaces ()
-      )
-    ) or
-    public.util__can_manage_workspace_settings (
-      public.user_roles.workspace_id
-    )
-  );
-
--- This policy is why `user_roles` has to be a separate table from
--- `user_profiles`. While users are allowed to update their own
--- `user_profiles`, they are **not** allowed to update their own roles.
--- Only admins can update roles.
-create policy "Admins can update user roles in their workspaces" on public.user_roles
-for update
-  to authenticated using (
-    public.util__can_manage_workspace_settings (
-      public.user_roles.workspace_id
-    )
-  );
-
--- This policy must allow users to delete their own roles because
--- if a user leaves a workspace (i.e. deletes their user profile, which
--- they are allowed to do), we need to allow the role to be deleted as well.
-create policy "Users can DELETE user roles" on public.user_roles for delete to authenticated using (
-  -- User can delete their own user_roles
-  public.user_roles.user_id = (
-    select
-      auth.uid ()
-  ) or
-  public.util__can_manage_workspace_settings (
-    public.user_roles.workspace_id
   )
 );

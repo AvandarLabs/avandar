@@ -6,6 +6,7 @@ import { createInitialDashboardPuckData } from "$/models/Dashboard/DashboardConf
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
+import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
@@ -137,6 +138,11 @@ export function DashboardEditorView({
               return (
                 <>
                   <SaveDashboardButton onSave={onSave} />
+                  <ShareResourceButton
+                    resourceName={dashboardTitle}
+                    resourceType="dashboard"
+                    resourceId={dashboard.id}
+                  />
                   <ViewDashboardButton
                     workspaceSlug={workspaceSlug}
                     dashboardId={dashboard.id}

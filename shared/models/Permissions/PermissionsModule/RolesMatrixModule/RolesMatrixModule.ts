@@ -62,15 +62,6 @@ export const RolesMatrixModule = {
   },
 
   /**
-   * Maps a per-app matrix to the legacy `user_roles.role` text (`admin` when
-   * the user is a Settings admin, otherwise `member`).
-   */
-  legacyWorkspaceRoleFromMatrix(
-    matrix: UserAppRolesMatrix,
-  ): "admin" | "member" {
-    return matrix.settings === "admin" ? "admin" : "member";
-  },
-  /**
    * @returns True when both records assign the same role per app (including
    *   undefined).
    */

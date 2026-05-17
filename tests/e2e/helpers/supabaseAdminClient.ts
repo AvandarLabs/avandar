@@ -1,5 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
-import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  getSupabaseServiceRoleKeyFromEnv,
+  getSupabaseUrlFromEnv,
+} from "./supabaseEnv";
+import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 
 /** Supabase Storage bucket for workspace-scoped dataset files. */
 export const WORKSPACES_STORAGE_BUCKET = "workspaces" as const;
@@ -25,22 +29,17 @@ export function getDatasetParquetObjectPath(options: {
  *
  * @returns Admin Supabase client.
  */
-export function createSupabaseAdminClient(): SupabaseClient {
-  const apiUrl = process.env.SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!apiUrl || !serviceRoleKey) {
-    throw new Error(
-      "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY (which should actually be the SECRET_KEY).",
-    );
-  }
-
-  return createClient(apiUrl, serviceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
+export function createSupabaseAdminClient(): AvaSupabaseDBClient {
+  return createClient(
+    getSupabaseUrlFromEnv(),
+    getSupabaseServiceRoleKeyFromEnv(),
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
     },
-  });
+  );
 }
 
 /**
@@ -50,7 +49,7 @@ export function createSupabaseAdminClient(): SupabaseClient {
  * @param options.slug Workspace slug from the URL.
  */
 export async function getWorkspaceIdBySlug(options: {
-  supabaseAdminClient: SupabaseClient;
+  supabaseAdminClient: AvaSupabaseDBClient;
   slug: string;
 }): Promise<string> {
   const { data, error } = await options.supabaseAdminClient
@@ -78,7 +77,7 @@ export async function getWorkspaceIdBySlug(options: {
  * @param options.datasetId Dataset UUID.
  */
 export async function isDatasetParquetInStorage(options: {
-  supabaseAdminClient: SupabaseClient;
+  supabaseAdminClient: AvaSupabaseDBClient;
   workspaceId: string;
   datasetId: string;
 }): Promise<boolean> {
@@ -109,7 +108,7 @@ export async function isDatasetParquetInStorage(options: {
  * @param options.workspaceId Workspace UUID.
  */
 export async function deleteAllDatasetsInWorkspaceForE2E(options: {
-  supabaseAdminClient: SupabaseClient;
+  supabaseAdminClient: AvaSupabaseDBClient;
   workspaceId: string;
 }): Promise<void> {
   const { data: rows, error: selectError } = await options.supabaseAdminClient
@@ -164,7 +163,7 @@ export async function deleteAllDatasetsInWorkspaceForE2E(options: {
  * @param options.workspaceId Workspace UUID.
  */
 export async function clearWorkspaceResourcesForE2E(options: {
-  supabaseAdminClient: SupabaseClient;
+  supabaseAdminClient: AvaSupabaseDBClient;
   workspaceId: string;
 }): Promise<void> {
   const { supabaseAdminClient, workspaceId } = options;
@@ -192,7 +191,7 @@ export async function clearWorkspaceResourcesForE2E(options: {
  * @param options.workspaceId Workspace UUID used as the bucket path prefix.
  */
 export async function removeWorkspaceBucketTreeForE2E(options: {
-  supabaseAdminClient: SupabaseClient;
+  supabaseAdminClient: AvaSupabaseDBClient;
   workspaceId: string;
 }): Promise<void> {
   const removeRecursive = async (relativePath: string): Promise<void> => {
@@ -240,7 +239,7 @@ export async function removeWorkspaceBucketTreeForE2E(options: {
  * @param options.workspaceId Workspace UUID to remove completely.
  */
 export async function deleteWorkspaceTreeForE2EById(options: {
-  supabaseAdminClient: SupabaseClient;
+  supabaseAdminClient: AvaSupabaseDBClient;
   workspaceId: string;
 }): Promise<void> {
   const { supabaseAdminClient: supabaseAdminClient, workspaceId } = options;

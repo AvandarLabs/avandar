@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { isDatasetParquetInStorage } from "../../helpers/supabaseAdminClient";
+import { isDatasetParquetInStorage } from "./supabaseAdminClient";
 import { LONG_WAIT, SHORT_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
 import type { SupabaseClient } from "@supabase/supabase-js";

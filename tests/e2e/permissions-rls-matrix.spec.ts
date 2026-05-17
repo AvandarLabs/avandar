@@ -1,22 +1,9 @@
-import { createClient } from "@supabase/supabase-js";
 import { expect, test } from "./fixtures/e2eWithGlobalViewerMembership.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
+import { createE2ESupabaseViewerClient } from "./helpers/supabase";
 import { LONG_WAIT } from "./helpers/timeouts";
 
 export { expect };
-
-/**
- * Resolves Supabase HTTP URL for browser-style clients.
- */
-function _getSupabaseUrl(): string {
-  const url = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_API_URL;
-
-  if (!url) {
-    throw new Error("SUPABASE_URL or VITE_SUPABASE_API_URL is required.");
-  }
-
-  return url;
-}
 
 /**
  * "Matrix" here means a grid of permission checks: each row is an actor
@@ -46,26 +33,10 @@ test.describe("permissions RLS matrix (owner vs viewer)", () => {
       { timeout: LONG_WAIT },
     );
 
-    const anonKey = process.env.VITE_SUPABASE_ANON_KEY;
-
-    if (!anonKey) {
-      throw new Error(
-        "VITE_SUPABASE_ANON_KEY is required for viewer API test.",
-      );
-    }
-
-    const viewerClient = createClient(_getSupabaseUrl(), anonKey, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    });
-
-    const { error: signInError } = await viewerClient.auth.signInWithPassword({
+    const viewerClient = await createE2ESupabaseViewerClient({
       email: e2eWorkerDb.secondaryUser.email,
       password: e2eWorkerDb.secondaryUser.password,
     });
-
-    if (signInError) {
-      throw new Error(`viewer sign-in failed: ${signInError.message}`);
-    }
 
     const { data: workspaceBefore, error: readBeforeError } = await admin
       .from("workspaces")

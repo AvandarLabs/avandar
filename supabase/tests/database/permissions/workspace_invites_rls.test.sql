@@ -60,33 +60,6 @@ values
   )
 on conflict (id) do nothing;
 
-insert into public.user_roles (
-  workspace_id,
-  user_id,
-  membership_id,
-  role
-)
-values
-  (
-    'f9001001-0000-4000-8000-000000000001'::uuid,
-    'f9000001-0000-4000-8000-000000000001'::uuid,
-    'f9002001-0000-4000-8000-000000000001'::uuid,
-    'admin'
-  ),
-  (
-    'f9001001-0000-4000-8000-000000000001'::uuid,
-    'f9000002-0000-4000-8000-000000000002'::uuid,
-    'f9002002-0000-4000-8000-000000000002'::uuid,
-    'member'
-  ),
-  (
-    'f9001001-0000-4000-8000-000000000001'::uuid,
-    'f9000003-0000-4000-8000-000000000003'::uuid,
-    'f9002003-0000-4000-8000-000000000003'::uuid,
-    'admin'
-  )
-on conflict (membership_id) do nothing;
-
 update public.workspace_memberships wm
 set
   role_group_id = rg.id

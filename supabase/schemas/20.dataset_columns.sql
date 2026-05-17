@@ -87,7 +87,7 @@ create policy "User can delete dataset_columns in their workspace" on public.dat
   public.util__auth_user_can_access_resource (
     'dataset',
     public.dataset_columns.dataset_id,
-    'editor'
+    'admin'
   )
 );
 

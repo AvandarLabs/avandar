@@ -69,7 +69,7 @@ create policy "User can delete datasets__google_sheets in their workspace" on pu
   public.util__auth_user_can_access_resource (
     'dataset',
     public.datasets__google_sheets.dataset_id,
-    'editor'
+    'admin'
   )
 );
 

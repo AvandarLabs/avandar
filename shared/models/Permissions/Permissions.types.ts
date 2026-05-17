@@ -19,15 +19,6 @@ export type RoleLevel = "viewer" | "editor" | "admin";
 export type PermissionKey = `${AppType}__${string}`;
 
 /**
- * Full catalog: each app defines permission keys granted at each role tier.
- */
-export type PermissionCatalog = {
-  readonly [A in AppType]: {
-    readonly [R in RoleLevel]: readonly PermissionKey[];
-  };
-};
-
-/**
  * Per-app role for the current user in one workspace, derived from
  * `workspace_memberships.role_group_id` and `role_group_app_roles`.
  *

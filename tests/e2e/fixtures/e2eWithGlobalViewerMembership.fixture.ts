@@ -2,7 +2,7 @@ import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 import {
   createSupabaseAdminClient,
   getWorkspaceIdBySlug,
-} from "../../helpers/supabaseAdminClient";
+} from "../helpers/supabaseAdminClient";
 import { getUserIdByEmail } from "../setup/e2eTestWorkspaceLifecycle";
 import { test as base, expect } from "./e2e.fixture";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -11,7 +11,7 @@ export { expect };
 
 type ViewerMembershipSetup = {
   viewerUserId: string;
-  /** True when this fixture inserted membership (and profile / user_roles). */
+  /** True when this fixture inserted membership (and profile). */
   didInsertMembership: boolean;
 };
 
@@ -29,8 +29,8 @@ type E2eGlobalViewerFixtures = {
 };
 
 /**
- * Deletes the viewer's membership row for the workspace (cascades profiles
- * and user_roles). Used for teardown and for rollback after a failed seed.
+ * Deletes the viewer's membership row for the workspace (cascades profiles).
+ * Used for teardown and for rollback after a failed seed.
  */
 async function _deleteViewerMembershipRow(options: {
   supabaseAdminClient: AvaSupabaseDBClient;
@@ -144,26 +144,6 @@ async function _ensureUserIsMemberAndViewer(options: {
     });
     throw new Error(
       `[e2e] viewer profile insert failed: ${profileError.message}`,
-    );
-  }
-
-  const { error: roleError } = await options.supabaseAdminClient
-    .from("user_roles")
-    .insert({
-      user_id: viewerUserId,
-      workspace_id: options.workspaceId,
-      membership_id: membership.id,
-      role: "member",
-    });
-
-  if (roleError) {
-    await _deleteViewerMembershipRow({
-      supabaseAdminClient: options.supabaseAdminClient,
-      workspaceId: options.workspaceId,
-      viewerUserId,
-    });
-    throw new Error(
-      `[e2e] viewer user_roles insert failed: ${roleError.message}`,
     );
   }
 
