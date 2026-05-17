@@ -3,6 +3,7 @@ import { RESTRICTABLE_APPS } from "$/models/Permissions/PermissionsModule/RolesM
 import { describe, expect, it } from "vitest";
 import type {
   AppType,
+  PermissionKey,
   UserAppRolesMatrix,
 } from "$/models/Permissions/Permissions.types.ts";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
@@ -13,7 +14,7 @@ const PERMISSIONS_THAT_DEFINE_ROUTE_ACCESS = {
   data_explorer: "data_explorer__can_run_query",
   dashboards: "dashboards__can_view_dashboard",
   settings: "settings__can_manage_workspace_users",
-} as const satisfies Record<AppType, Permissions.PermissionKey>;
+} as const satisfies Record<AppType, PermissionKey>;
 
 const ROLE_LEVELS = ["viewer", "editor", "admin"] as const;
 
@@ -180,7 +181,7 @@ describe("Permissions.parseAppTypeFromPermissionKey", () => {
   it("returns undefined for unknown prefixes", () => {
     expect(
       Permissions.parseAppTypeFromPermissionKey(
-        "unknown__x" as Permissions.PermissionKey,
+        "unknown__x" as PermissionKey,
       ),
     ).toBe(undefined);
   });
@@ -191,7 +192,7 @@ describe("Permissions.rolesMatrixHasPermission", () => {
     expect(
       Permissions.rolesMatrixHasPermission({
         roles: Permissions.RolesMatrix.Builtins.GlobalAdmin,
-        permissionKey: "unknown__x" as Permissions.PermissionKey,
+        permissionKey: "unknown__x" as PermissionKey,
       }),
     ).toBe(false);
   });

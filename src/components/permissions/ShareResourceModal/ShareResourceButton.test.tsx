@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton";
 import { render } from "@/utils/testingUtils";
 
-vi.mock("@/hooks/permissions/useResourceRole", () => {
+vi.mock("@/hooks/permissions/useResourceRole/useResourceRole", () => {
   return {
     useResourceRole: () => {
       return ["admin", false] as const;

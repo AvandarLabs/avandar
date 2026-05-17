@@ -44,7 +44,7 @@ export async function expectWorkspaceAppAccessDenied(
     { timeout: LONG_WAIT },
   );
   await expect(
-    page.getByRole("heading", { name: "Access denied" }),
+    page.getByText(/You do not have permission to open/),
   ).toBeVisible();
 }
 

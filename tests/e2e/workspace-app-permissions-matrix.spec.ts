@@ -10,6 +10,7 @@ import {
   restoreE2ESecondaryMemberRoleGroup,
 } from "./helpers/assignE2ESecondaryMemberRole";
 import { signInWithEmailPassword } from "./helpers/auth";
+import { insertE2ERestrictedDataset } from "./helpers/insertE2ERestrictedDataset";
 import { createE2ESupabaseViewerClient } from "./helpers/supabase";
 import { LONG_WAIT } from "./helpers/timeouts";
 import {
@@ -214,8 +215,9 @@ test.describe("workspace app route permission matrix", () => {
         allowedUrlPattern: WORKSPACE_APP_ROUTES.settings.allowedUrlPattern,
       });
 
+      await page.getByRole("tab", { name: "Members" }).click();
       await expect(
-        page.getByRole("heading", { name: "Workspace Users" }),
+        page.getByRole("button", { name: "Invite member" }),
       ).toBeVisible({ timeout: LONG_WAIT });
     } finally {
       await restoreE2ESecondaryMemberRoleGroup({
@@ -242,57 +244,24 @@ test.describe("resource share bypasses missing app role (API)", () => {
       matrix: createRolesMatrixWithoutApp("data_sources"),
     });
 
-    const { data: ownerMembership } = await admin
-      .from("workspace_memberships")
-      .select("user_id")
-      .eq("workspace_id", workspaceId)
-      .limit(1)
-      .single();
+    const dataset = await insertE2ERestrictedDataset({
+      supabaseAdminClient: admin,
+      workspaceId,
+      name: "E2E resource share dataset",
+    });
 
-    if (!ownerMembership) {
-      throw new Error("[e2e] owner membership missing");
-    }
-
-    const { data: dataset, error: datasetError } = await admin
-      .from("datasets")
-      .insert({
-        workspace_id: workspaceId,
-        owner_id: ownerMembership.user_id,
-        name: "E2E resource share dataset",
-        is_restricted: true,
-      })
-      .select("id")
-      .single();
-
-    if (datasetError || !dataset) {
-      throw new Error(
-        `[e2e] dataset insert failed: ${datasetError?.message ?? ""}`,
-      );
-    }
-
-    const { data: otherDataset, error: otherDatasetError } = await admin
-      .from("datasets")
-      .insert({
-        workspace_id: workspaceId,
-        owner_id: ownerMembership.user_id,
-        name: "E2E resource share other dataset",
-        is_restricted: true,
-      })
-      .select("id")
-      .single();
-
-    if (otherDatasetError || !otherDataset) {
-      throw new Error(
-        `[e2e] other dataset insert failed: ${otherDatasetError?.message ?? ""}`,
-      );
-    }
+    const otherDataset = await insertE2ERestrictedDataset({
+      supabaseAdminClient: admin,
+      workspaceId,
+      name: "E2E resource share other dataset",
+    });
 
     const { error: shareError } = await admin.from("resource_shares").insert({
       resource_type: "dataset",
       resource_id: dataset.id,
       workspace_id: workspaceId,
       principal_type: "user",
-      principal_user_id: viewerUserId,
+      principal_id: viewerUserId,
       role: "viewer",
     });
 
@@ -360,40 +329,18 @@ test.describe("resource share bypasses missing app role (API)", () => {
         matrix: createRolesMatrixWithoutApp("data_sources"),
       });
 
-      const { data: ownerMembership } = await admin
-        .from("workspace_memberships")
-        .select("user_id")
-        .eq("workspace_id", workspaceId)
-        .limit(1)
-        .single();
-
-      if (!ownerMembership) {
-        throw new Error("[e2e] owner membership missing");
-      }
-
-      const { data: dataset, error: datasetError } = await admin
-        .from("datasets")
-        .insert({
-          workspace_id: workspaceId,
-          owner_id: ownerMembership.user_id,
-          name: `E2E ${role} share dataset`,
-          is_restricted: true,
-        })
-        .select("id, name")
-        .single();
-
-      if (datasetError || !dataset) {
-        throw new Error(
-          `[e2e] dataset insert failed: ${datasetError?.message ?? ""}`,
-        );
-      }
+      const dataset = await insertE2ERestrictedDataset({
+        supabaseAdminClient: admin,
+        workspaceId,
+        name: `E2E ${role} share dataset`,
+      });
 
       const { error: shareError } = await admin.from("resource_shares").insert({
         resource_type: "dataset",
         resource_id: dataset.id,
         workspace_id: workspaceId,
         principal_type: "user",
-        principal_user_id: viewerUserId,
+        principal_id: viewerUserId,
         role,
       });
 

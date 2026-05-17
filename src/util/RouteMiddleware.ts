@@ -7,6 +7,7 @@ import { UserClient } from "@/clients/UserClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppLinks } from "@/config/AppLinks";
 import type { QueryClient } from "@tanstack/react-query";
+import type { PermissionKey } from "$/models/Permissions/Permissions.types";
 
 export const RouteMiddleware = {
   BeforeLoad: {
@@ -21,7 +22,7 @@ export const RouteMiddleware = {
       permissionKey,
       appLabel,
     }: {
-      permissionKey: Permissions.PermissionKey;
+      permissionKey: PermissionKey;
       appLabel: string;
     }) => {
       return async (loadContext: {

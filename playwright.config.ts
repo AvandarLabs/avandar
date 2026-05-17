@@ -6,6 +6,10 @@ import { SHORT_WAIT } from "./tests/e2e/helpers/timeouts";
 dotenv.config({ path: path.resolve(process.cwd(), ".env.development") });
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:5173";
+const isCI = !!process.env.CI;
+
+/** Per-test ceiling: 1 min locally so failures surface quickly; longer in CI. */
+const defaultTestTimeoutMs = isCI ? 120_000 : 60_000;
 
 export default defineConfig({
   testDir: "tests/e2e",
@@ -18,7 +22,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   workers: 1,
   reporter: [["list"], ["html", { open: "never" }]],
-  timeout: 120_000,
+  timeout: defaultTestTimeoutMs,
   expect: { timeout: SHORT_WAIT },
   use: {
     baseURL,

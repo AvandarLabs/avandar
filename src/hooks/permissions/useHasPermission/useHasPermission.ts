@@ -1,4 +1,5 @@
 import { Permissions } from "$/models/Permissions/Permissions";
+import type { PermissionKey } from "$/models/Permissions/Permissions.types";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 
 /**
@@ -7,7 +8,7 @@ import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppR
  * @param permissionKey Permission key for one capability in an app.
  */
 export function useHasPermission(
-  permissionKey: Permissions.PermissionKey,
+  permissionKey: PermissionKey,
 ): boolean {
   const [roles, isLoading] = useUserAppRoles();
   if (isLoading || roles === undefined) {
