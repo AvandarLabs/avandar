@@ -110,17 +110,28 @@ export function ShareResourceModal({
       return {
         value: `user:${member.userId}` as AddTargetValue,
         label: member.displayName || member.fullName,
-        group: "Members",
       };
     });
     const groupOpts = (userGroups ?? []).map((group) => {
       return {
         value: `user_group:${group.id}` as AddTargetValue,
         label: group.name,
-        group: "Tags",
       };
     });
-    return [...userOpts, ...groupOpts];
+
+    const groups: Array<{
+      group: string;
+      items: Array<{ value: AddTargetValue; label: string }>;
+    }> = [];
+
+    if (userOpts.length > 0) {
+      groups.push({ group: "Members", items: userOpts });
+    }
+    if (groupOpts.length > 0) {
+      groups.push({ group: "Tags", items: groupOpts });
+    }
+
+    return groups;
   }, [members, userGroups]);
 
   const tagSelectData = useMemo(() => {

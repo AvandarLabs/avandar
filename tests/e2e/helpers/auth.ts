@@ -1,4 +1,5 @@
 import { expect } from "@playwright/test";
+import { SEEDED_WORKSPACE_MENU_BUTTON_NAME } from "./constants";
 import { LONG_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
 
@@ -28,4 +29,24 @@ export async function signInWithEmailPassword(
   await expect(page).toHaveURL(new RegExp(`/${options.workspaceSlug}`), {
     timeout: LONG_WAIT,
   });
+}
+
+/**
+ * Opens the workspace user menu and signs out.
+ */
+export async function signOutViaUserMenu(page: Page): Promise<void> {
+  await page.getByRole("button", { name: SEEDED_WORKSPACE_MENU_BUTTON_NAME }).click();
+  await page.getByRole("menuitem", { name: "Sign Out" }).click();
+  await expect(page).toHaveURL(/\/signin/, { timeout: LONG_WAIT });
+}
+
+/**
+ * Signs out the current user, then signs in as another account.
+ */
+export async function switchToWorkspaceUser(
+  page: Page,
+  options: SignInOptions,
+): Promise<void> {
+  await signOutViaUserMenu(page);
+  await signInWithEmailPassword(page, options);
 }
