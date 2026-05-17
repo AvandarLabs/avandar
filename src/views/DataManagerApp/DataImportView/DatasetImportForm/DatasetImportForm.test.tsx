@@ -3,7 +3,7 @@ import { uuid } from "$/lib/uuid";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/common/AvandarUiProvider";
+import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { DatasetImportForm } from "./DatasetImportForm";
 import type { DataSourceMetadata } from "./DatasetImportForm";
 import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";

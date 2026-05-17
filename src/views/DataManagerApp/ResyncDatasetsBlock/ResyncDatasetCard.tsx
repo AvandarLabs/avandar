@@ -12,7 +12,7 @@ import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
 import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
-import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock/DatasetPreviewBlock";
+import { DatasetPreviewBlock } from "@/components/DatasetPreviewBlock/DatasetPreviewBlock";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { DangerousActionButton } from "@/lib/ui/buttons/DangerousActionButton";
 import { Paper } from "@/lib/ui/Paper/Paper";

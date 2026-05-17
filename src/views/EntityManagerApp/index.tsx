@@ -1,0 +1,31 @@
+import { Box, Flex, MantineTheme } from "@mantine/core";
+import { Outlet } from "@tanstack/react-router";
+import { EntityNavbar } from "@/views/EntityManagerApp/EntityNavbar";
+import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
+
+type Props = {
+  entityConfig: EntityConfig.T;
+};
+
+export function EntityManagerApp({ entityConfig }: Props): JSX.Element {
+  return (
+    <Flex>
+      <EntityNavbar
+        entityConfig={entityConfig}
+        miw={240}
+        mih="100dvh"
+        h="100dvh"
+        style={$entityNavbarBorder}
+      />
+      <Box flex={1}>
+        <Outlet />
+      </Box>
+    </Flex>
+  );
+}
+
+const $entityNavbarBorder = (theme: MantineTheme) => {
+  return {
+    borderRight: `1px solid ${theme.colors.neutral[2]}`,
+  };
+};

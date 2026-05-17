@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/common/AvandarUiProvider";
+import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { VizSettingsForm } from "@/components/Visualization/VizSettingsForm/VizSettingsForm";
 import type { UnknownDataFrame } from "@utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";

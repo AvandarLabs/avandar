@@ -1,6 +1,6 @@
 import { RenderOptions, render as renderReact } from "@testing-library/react";
 import { ReactElement } from "react";
-import { AvandarUiProvider } from "@/components/common/AvandarUiProvider";
+import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 
 /**
  * Renders the given UI with the Avandar UI provider, which adds

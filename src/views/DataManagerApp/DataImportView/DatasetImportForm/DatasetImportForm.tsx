@@ -5,7 +5,7 @@ import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo, useRef, useState } from "react";
 import { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
-import { DatasetPreviewBlock } from "@/components/common/DatasetPreviewBlock/DatasetPreviewBlock";
+import { DatasetPreviewBlock } from "@/components/DatasetPreviewBlock/DatasetPreviewBlock";
 import { AppConfig } from "@/config/AppConfig";
 import { Callout } from "@/lib/ui/Callout";
 import {

@@ -12,7 +12,7 @@ import { formatNumber } from "@utils";
 import { uuid } from "$/lib/uuid";
 import Papa from "papaparse";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/common/AvandarUiProvider";
+import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { AppConfig } from "@/config/AppConfig";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";

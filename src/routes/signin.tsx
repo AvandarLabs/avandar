@@ -9,8 +9,8 @@ import {
 } from "@tanstack/react-router";
 import { z } from "zod";
 import { AuthClient } from "@/clients/AuthClient";
-import { AuthLayout } from "@/components/common/AuthLayout";
-import { AuthFooter } from "@/components/common/AuthLayout/AuthFooter";
+import { AuthLayout } from "@/components/layouts/AuthLayout";
+import { AuthFooter } from "@/components/layouts/AuthLayout/AuthFooter";
 import { Link } from "@/lib/ui/links/Link";
 import { isValidRedirectPath } from "@/utils/isValidRedirectPath/isValidRedirectPath";
 

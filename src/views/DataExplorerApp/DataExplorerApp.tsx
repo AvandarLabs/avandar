@@ -21,7 +21,7 @@ import { notifyError, notifyNotImplemented, notifySuccess, Tooltip } from "@ui";
 import { useEffect, useMemo } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
-import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
+import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { getDateColumns } from "@/components/Visualization/getDateColumns";
 import { VisualizationContainer } from "@/components/Visualization/VisualizationContainer";
 import { VizSettingsForm } from "@/components/Visualization/VizSettingsForm/VizSettingsForm";

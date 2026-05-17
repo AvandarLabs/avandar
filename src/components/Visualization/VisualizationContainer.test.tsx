@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/common/AvandarUiProvider";
+import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { VisualizationContainer } from "@/components/Visualization/VisualizationContainer";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 

@@ -6,7 +6,7 @@ import {
   screen,
 } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AvandarUiProvider } from "@/components/common/AvandarUiProvider";
+import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { DashboardEditorView } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
@@ -84,7 +84,7 @@ vi.mock("@puckeditor/core", async () => {
   return { Puck: PuckMock, createUsePuck };
 });
 
-vi.mock("@/components/common/layouts/AppLayout/AppLayout", async () => {
+vi.mock("@/components/layouts/AppLayout/AppLayout", async () => {
   const { Fragment, createElement } = await import("react");
   return {
     AppLayout: function AppLayoutMock({

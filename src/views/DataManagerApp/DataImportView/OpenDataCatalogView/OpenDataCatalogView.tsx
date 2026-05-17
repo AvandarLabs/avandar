@@ -20,7 +20,7 @@ import { useMemo, useState } from "react";
 import { CatalogDatasetColumnClient } from "@/clients/catalog-entries/CatalogDatasetColumnClient";
 import { OpenDataCatalogEntryClient } from "@/clients/catalog-entries/OpenDataCatalogEntryClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { BetaBadge } from "@/components/common/BetaBadge/BetaBadge";
+import { BetaBadge } from "@/components/badges/BetaBadge/BetaBadge";
 import {
   FEATUREBASE_FEATURE_REQUEST_BOARD,
   openFeaturebaseFeedbackWidget,

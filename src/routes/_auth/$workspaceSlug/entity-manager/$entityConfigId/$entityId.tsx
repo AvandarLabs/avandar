@@ -8,7 +8,7 @@ import { uuid } from "$/lib/uuid";
 import { useEffect } from "react";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
-import { SingleEntityView } from "@/components/EntityManagerApp/SingleEntityView";
+import { SingleEntityView } from "@/views/EntityManagerApp/SingleEntityView";
 import { Callout } from "@/lib/ui/Callout";
 import { Logger } from "@/utils/Logger";
 import type { Entity } from "$/models/entities/Entity/Entity";

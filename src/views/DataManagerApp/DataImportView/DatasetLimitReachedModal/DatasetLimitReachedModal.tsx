@@ -2,7 +2,7 @@ import { Modal, Stack, Text } from "@mantine/core";
 import { useNavigate } from "@tanstack/react-router";
 import { matchLiteral } from "@utils";
 import { Subscription } from "$/models/Subscription/Subscription";
-import { WorkspaceBillingView } from "@/components/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
+import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 
 type Props = {
   subscription: Subscription.T | undefined;

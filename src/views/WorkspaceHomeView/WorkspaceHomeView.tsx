@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { IconDatabase, IconTable } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
+import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { Paper } from "@/lib/ui/Paper/Paper";

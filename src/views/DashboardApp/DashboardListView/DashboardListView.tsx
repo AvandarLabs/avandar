@@ -12,7 +12,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { notifyDevAlert } from "@ui";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
-import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
+import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { Paper } from "@/lib/ui/Paper/Paper";
