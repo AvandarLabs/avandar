@@ -27,6 +27,7 @@ import {
   YAxis,
 } from "recharts";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
+import { useVizDataLimit } from "@/lib/ui/viz/useVizDataLimit";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { CurveType } from "$/models/vizs/CurveType";
 
@@ -50,6 +51,7 @@ export function AreaChart({
 }: Props): JSX.Element {
   const gradientId = useId();
   const isDateAxis = dateColumns?.has(xAxisKey) ?? false;
+  const limitedData = useVizDataLimit("area", data);
 
   const tickFormatter = useMemo(() => {
     if (!isDateAxis) {
@@ -73,7 +75,7 @@ export function AreaChart({
     <Box h={height} w="100%">
       <ResponsiveContainer width="100%" height="100%">
         <RechartsAreaChart
-          data={data as Array<Record<string, unknown>>}
+          data={limitedData as Array<Record<string, unknown>>}
           margin={{ top: 10, right: 10, bottom: 0, left: 0 }}
         >
           <defs>

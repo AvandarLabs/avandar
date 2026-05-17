@@ -2,6 +2,7 @@ import { BarChart as MantineBarChart } from "@mantine/charts";
 import { formatDate } from "@utils";
 import { useMemo } from "react";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
+import { useVizDataLimit } from "@/lib/ui/viz/useVizDataLimit";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 
 type Props = XYChartProps & {
@@ -20,6 +21,8 @@ export function BarChart({
   withLegend = false,
   color,
 }: Props): JSX.Element {
+  const limitedData = useVizDataLimit("bar", data);
+
   const series = useMemo(() => {
     return [{ name: yAxisKey, ...(color ? { color } : {}) }];
   }, [yAxisKey, color]);
@@ -52,7 +55,7 @@ export function BarChart({
   return (
     <MantineBarChart
       h={height}
-      data={data}
+      data={limitedData}
       dataKey={xAxisKey}
       series={series}
       xAxisProps={xAxisProps}
