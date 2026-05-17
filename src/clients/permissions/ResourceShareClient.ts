@@ -29,7 +29,6 @@ export type ResourceSharingState = {
   isRestricted: boolean;
   ownerId: string;
   shares: readonly ResourceShareRow[];
-  resourceTagIds: readonly string[];
 };
 
 function _mapResourceShareRow(row: {
@@ -55,7 +54,7 @@ function _mapResourceShareRow(row: {
 }
 
 /**
- * CRUD for `resource_shares`, resource tags, and `is_restricted` on resources.
+ * CRUD for `resource_shares` and `is_restricted` on resources.
  */
 function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
   const baseClient = createServiceClient("ResourceShareClient").mixin(
@@ -67,7 +66,7 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
     const newClient = baseClient.mixin(
       withNewMembers({
         /**
-         * Loads shares, tag ids, and restriction flag for one resource.
+         * Loads shares and restriction flag for one resource.
          */
         getResourceSharingState: async (options: {
           workspaceId: WorkspaceId;
@@ -80,22 +79,19 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
           const resourceTable =
             options.resourceType === "dashboard" ? "dashboards" : "datasets";
 
-          const [
-            { data: resourceRow },
-            { data: shareRows },
-            { data: tagRows },
-          ] = await Promise.all([
-            dbClient
-              .from(resourceTable)
-              .select("is_restricted, owner_id")
-              .eq("id", options.resourceId)
-              .eq("workspace_id", options.workspaceId)
-              .single()
-              .throwOnError(),
-            dbClient
-              .from("resource_shares")
-              .select(
-                `
+          const [{ data: resourceRow }, { data: shareRows }] =
+            await Promise.all([
+              dbClient
+                .from(resourceTable)
+                .select("is_restricted, owner_id")
+                .eq("id", options.resourceId)
+                .eq("workspace_id", options.workspaceId)
+                .single()
+                .throwOnError(),
+              dbClient
+                .from("resource_shares")
+                .select(
+                  `
                   id,
                   workspace_id,
                   resource_type,
@@ -105,27 +101,17 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
                   role,
                   requires_app_access
                 `,
-              )
-              .eq("workspace_id", options.workspaceId)
-              .eq("resource_type", options.resourceType)
-              .eq("resource_id", options.resourceId)
-              .throwOnError(),
-            dbClient
-              .from("resource_user_group_tags")
-              .select("user_group_id")
-              .eq("workspace_id", options.workspaceId)
-              .eq("resource_type", options.resourceType)
-              .eq("resource_id", options.resourceId)
-              .throwOnError(),
-          ]);
+                )
+                .eq("workspace_id", options.workspaceId)
+                .eq("resource_type", options.resourceType)
+                .eq("resource_id", options.resourceId)
+                .throwOnError(),
+            ]);
 
           return {
             isRestricted: resourceRow.is_restricted,
             ownerId: resourceRow.owner_id,
             shares: (shareRows ?? []).map(_mapResourceShareRow),
-            resourceTagIds: (tagRows ?? []).map((row) => {
-              return row.user_group_id;
-            }),
           };
         },
 
@@ -335,44 +321,6 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
             .throwOnError();
         },
 
-        /**
-         * Replaces tag links for a resource (user_group tags).
-         */
-        setResourceUserGroupTags: async (options: {
-          workspaceId: WorkspaceId;
-          resourceType: ResourceType;
-          resourceId: string;
-          userGroupIds: readonly string[];
-        }): Promise<void> => {
-          const logger = baseLogger.appendName("setResourceUserGroupTags");
-          logger.log("set resource tags", options);
-
-          await dbClient
-            .from("resource_user_group_tags")
-            .delete()
-            .eq("workspace_id", options.workspaceId)
-            .eq("resource_type", options.resourceType)
-            .eq("resource_id", options.resourceId)
-            .throwOnError();
-
-          if (options.userGroupIds.length === 0) {
-            return;
-          }
-
-          await dbClient
-            .from("resource_user_group_tags")
-            .insert(
-              options.userGroupIds.map((userGroupId) => {
-                return {
-                  workspace_id: options.workspaceId,
-                  resource_type: options.resourceType,
-                  resource_id: options.resourceId,
-                  user_group_id: userGroupId,
-                };
-              }),
-            )
-            .throwOnError();
-        },
       }),
     );
 
@@ -382,7 +330,6 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
         "upsertResourceShare",
         "deleteResourceShare",
         "setResourceRestricted",
-        "setResourceUserGroupTags",
       ],
     });
   });

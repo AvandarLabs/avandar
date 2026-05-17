@@ -1,12 +1,4 @@
-import {
-  Button,
-  Group,
-  MultiSelect,
-  Select,
-  Stack,
-  Switch,
-  Text,
-} from "@mantine/core";
+import { Button, Group, Select, Stack, Switch, Text } from "@mantine/core";
 import { notifyError, notifySuccess } from "@ui";
 import { useMemo, useState } from "react";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
@@ -63,7 +55,7 @@ export function ShareResourceModalV1({
     });
 
   const [members] = WorkspaceClient.useGetUsersForWorkspace({ workspaceId });
-  const [userGroups, isLoadingGroups] = PermissionsClient.useGetUserGroups({
+  const [userGroups] = PermissionsClient.useGetUserGroups({
     workspaceId,
   });
 
@@ -99,14 +91,6 @@ export function ShareResourceModalV1({
       },
     });
 
-  const [setResourceTags, isSavingTags] =
-    ResourceShareClient.useSetResourceUserGroupTags({
-      queriesToInvalidate: invalidateKeys,
-      onError: (error: Error) => {
-        notifyError({ title: "Tags update failed", message: error.message });
-      },
-    });
-
   const addOptions = useMemo(() => {
     const userOpts = (members ?? []).map((member) => {
       return {
@@ -135,12 +119,6 @@ export function ShareResourceModalV1({
 
     return groups;
   }, [members, userGroups]);
-
-  const tagSelectData = useMemo(() => {
-    return (userGroups ?? []).map((group) => {
-      return { value: group.id, label: group.name };
-    });
-  }, [userGroups]);
 
   const workspaceShare = sharingState?.shares.find((share) => {
     return share.principalType === "workspace";
@@ -308,22 +286,6 @@ export function ShareResourceModalV1({
           </Button>
         </Group>
       </Stack>
-
-      <MultiSelect
-        label="Resource tags"
-        description="Members with matching tags get default access (unless restricted)."
-        data={tagSelectData}
-        value={[...sharingState.resourceTagIds]}
-        disabled={isLoadingGroups || isSavingTags}
-        onChange={(tagIds) => {
-          setResourceTags({
-            workspaceId,
-            resourceType,
-            resourceId,
-            userGroupIds: tagIds,
-          });
-        }}
-      />
 
       <Switch
         label="Restrict access — only people listed above can access"

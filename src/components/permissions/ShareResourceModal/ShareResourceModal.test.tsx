@@ -31,7 +31,6 @@ vi.mock("@/clients/permissions/ResourceShareClient", () => {
             isRestricted: false,
             ownerId: "user-owner",
             shares: [],
-            resourceTagIds: [],
           },
           false,
         ] as const;
@@ -43,9 +42,6 @@ vi.mock("@/clients/permissions/ResourceShareClient", () => {
         return [vi.fn()] as const;
       },
       useSetResourceRestricted: () => {
-        return [vi.fn(), false] as const;
-      },
-      useSetResourceUserGroupTags: () => {
         return [vi.fn(), false] as const;
       },
     },
