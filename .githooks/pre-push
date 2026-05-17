@@ -27,11 +27,18 @@ if [ -z "$BASE" ]; then
   exit 0
 fi
 
-mapfile -t CHANGED < <(
+CHANGED=()
+while IFS= read -r line; do
+  [ -n "$line" ] && CHANGED+=("$line")
+done < <(
   git diff --name-only --diff-filter=ACMR "$BASE" HEAD \
     | grep -Ev '^(node_modules/|.*routeTree\.gen\.ts$|shared/types/database\.types\.ts$)' \
     || true
 )
+
+if [ ${#CHANGED[@]} -eq 0 ]; then
+  exit 0
+fi
 
 EXISTING=()
 for f in "${CHANGED[@]}"; do
