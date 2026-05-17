@@ -1174,51 +1174,6 @@ export type Database = {
           },
         ]
       }
-      user_roles: {
-        Row: {
-          created_at: string
-          id: string
-          membership_id: string
-          role: string
-          updated_at: string | null
-          user_id: string
-          workspace_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          membership_id: string
-          role: string
-          updated_at?: string | null
-          user_id: string
-          workspace_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          membership_id?: string
-          role?: string
-          updated_at?: string | null
-          user_id?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_roles_membership_id_fkey"
-            columns: ["membership_id"]
-            isOneToOne: true
-            referencedRelation: "workspace_memberships"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_roles_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       value_extractors__dataset_column_value: {
         Row: {
           created_at: string
@@ -1676,9 +1631,35 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      util__app_type_for_resource_type: {
+        Args: { p_resource_type: Database["public"]["Enums"]["resource_type"] }
+        Returns: Database["public"]["Enums"]["app_type"]
+      }
       util__auth_user_can_access_resource: {
         Args: {
           p_min_role: Database["public"]["Enums"]["role_level"]
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+        }
+        Returns: boolean
+      }
+      util__auth_user_can_delete_resource: {
+        Args: {
+          p_resource_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+        }
+        Returns: boolean
+      }
+      util__auth_user_can_insert_workspace_resource: {
+        Args: {
+          p_owner_id: string
+          p_resource_type: Database["public"]["Enums"]["resource_type"]
+          p_workspace_id: string
+        }
+        Returns: boolean
+      }
+      util__auth_user_can_update_resource: {
+        Args: {
           p_resource_id: string
           p_resource_type: Database["public"]["Enums"]["resource_type"]
         }
@@ -1717,10 +1698,6 @@ export type Database = {
         Returns: string[]
       }
       util__get_auth_user_workspaces: { Args: never; Returns: string[] }
-      util__get_auth_user_workspaces_by_role: {
-        Args: { role: string }
-        Returns: string[]
-      }
       util__get_user_id_by_email: { Args: { p_email: string }; Returns: string }
       util__get_workspace_members: {
         Args: { workspace_id: string }

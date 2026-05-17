@@ -7,7 +7,6 @@ import { WorkspaceParsers } from "$/models/Workspace/WorkspaceParsers";
 import { APIClient } from "@/clients/APIClient";
 import { AuthClient } from "@/clients/AuthClient";
 import { UserProfileDBReadToModelReadSchema } from "@/clients/UserClient";
-import { isOneOf } from "@/lib/utils/guards/guards";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { UserId } from "$/models/User/User.types";
 import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
@@ -86,8 +85,12 @@ export const WorkspaceClient = createUsableServiceClient(
                   `
               *,
               user_profile:user_profiles (*),
-              user_role:user_roles (*),
-              role_groups ( id, name, is_builtin )
+              role_groups (
+                id,
+                name,
+                is_builtin,
+                role_group_app_roles ( app, role )
+              )
             `,
                 )
                 .eq("workspace_id", workspaceId)
@@ -122,31 +125,26 @@ export const WorkspaceClient = createUsableServiceClient(
 
           const profiles: WorkspaceMemberProfile[] = (memberships ?? [])
             .map((membership) => {
-              if (
-                membership.user_profile &&
-                membership.user_role &&
-                isOneOf(membership.user_role.role, ["admin", "member"])
-              ) {
-                const rowEmail =
-                  membership.user_profile.user_id === session.user.id ?
-                    (session.user.email ?? "")
-                  : "";
-                const profile = UserProfileDBReadToModelReadSchema.parse({
-                  ...membership.user_profile,
-                  email: rowEmail,
-                });
-                const role = membership.user_role.role;
-                const roleGroup = membership.role_groups;
-                return {
-                  ...profile,
-                  role,
-                  roleGroupId: roleGroup?.id ?? null,
-                  roleGroupName: roleGroup?.name ?? null,
-                  roleGroupIsBuiltin: roleGroup?.is_builtin ?? null,
-                  tags: tagsByUserId.get(membership.user_id) ?? [],
-                };
+              if (!membership.user_profile) {
+                return undefined;
               }
-              return undefined;
+
+              const rowEmail =
+                membership.user_profile.user_id === session.user.id ?
+                  (session.user.email ?? "")
+                : "";
+              const profile = UserProfileDBReadToModelReadSchema.parse({
+                ...membership.user_profile,
+                email: rowEmail,
+              });
+              const roleGroup = membership.role_groups;
+              return {
+                ...profile,
+                roleGroupId: roleGroup?.id ?? null,
+                roleGroupName: roleGroup?.name ?? null,
+                roleGroupIsBuiltin: roleGroup?.is_builtin ?? null,
+                tags: tagsByUserId.get(membership.user_id) ?? [],
+              };
             })
             .filter(isDefined);
 

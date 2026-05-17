@@ -2,12 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
 import { createElement } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  getGrantedPermissionKeysForAppRole,
-  parseAppTypeFromPermissionKey,
-} from "@/hooks/permissions/permissionCatalogUtils";
-import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles";
-import type { Permissions } from "$/models/Permissions/Permissions";
+import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 import type { ReactNode } from "react";
 
 const WS = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
@@ -106,31 +101,5 @@ describe("useUserAppRoles", () => {
     expect(result.current[0]?.settings).toBe("admin");
     expect(result.current[0]?.dashboards).toBe("viewer");
     expect(result.current[0]?.data_sources).toBeUndefined();
-  });
-});
-
-describe("parseAppTypeFromPermissionKey", () => {
-  it("resolves data_sources keys", () => {
-    expect(
-      parseAppTypeFromPermissionKey("data_sources__can_edit_dataset"),
-    ).toBe("data_sources");
-  });
-
-  it("returns undefined for unknown prefixes", () => {
-    expect(
-      parseAppTypeFromPermissionKey("unknown__x" as Permissions.PermissionKey),
-    ).toBe(undefined);
-  });
-});
-
-describe("getGrantedPermissionKeysForAppRole", () => {
-  it("includes viewer and editor keys for an editor", () => {
-    const keys = getGrantedPermissionKeysForAppRole({
-      app: "dashboards",
-      role: "editor",
-    });
-    expect(keys.has("dashboards__can_view_dashboard")).toBe(true);
-    expect(keys.has("dashboards__can_edit_dashboard")).toBe(true);
-    expect(keys.has("dashboards__can_manage_dashboards")).toBe(false);
   });
 });

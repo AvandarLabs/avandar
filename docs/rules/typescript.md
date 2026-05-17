@@ -285,43 +285,106 @@
 
 ## Immutability
 
-- Use mutable types by default.
-- We use immutable types in only these two situations:
-  1. Parameters in exported functions. Example:
+- Follow **input contravariance, output covariance**: widen inputs, narrow
+  outputs.
+- Wrap inputs at module boundaries as readonly so callers retain control of
+  their data; return mutable types so callers retain control of what you give
+  them.
+- Locally, prefer mutable types. They are faster in V8 and immutability is
+  not a dogmatic goal. Immutability is about establishing a clear contract
+  at the boundary.
 
-  ```ts
-  export function foo(myArr: readonly string[]) {}
-  ```
+### When to use readonly wrappers
 
-  2. Data that crosses module boundaries (e.g. React props).
+- Apply readonly wrappers to function parameters.
+- Everywhere else, use mutable types (local variables, internal helpers,
+  return types, intermediate values).
+- Functions that intentionally mutate their input (e.g. `sortInPlace`,
+  `assignDefaults`) are the exception: drop the readonly wrapper on the
+  parameter they mutate. Name these functions so the mutation is obvious,
+  and prefer returning `void` to signal the side effect.
 
-- To make a type immutable:
-  - Arrays: use `readonly`
-  - Sets: use `ReadonlySet<>`
-  - Maps: use `ReadonlyMap<>`
-- Exception: even if an object should be explicitly immutable, we still do not
-  use `readonly` or `Readonly<>` on objects. This is to reduce verbosity.
-  But still remember to behave as if the object is immutable.
-  Instead, use immutable types for the object's inner properties:
+```ts
+// Good: readonly input, mutable locally, mutable output
+export function getActiveUserNames(users: readonly User[]): string[] {
+  const names: string[] = []; // local mutation is fine and faster
+  users.forEach((user) => {
+    if (user.active) {
+      names.push(user.name);
+    }
+  });
+  return names; // mutable return, caller owns it
+}
 
-  ```ts
-  // Bad - Props object is marked Readonly
-  type Props = Readonly<{
-    names: readonly string[];
-    foo: number;
-  }>;
+// Good: mutable input because this is clearly a mutation function
+export function sortInPlace(users: User[]): void {}
 
-  // Bad - each key marked readonly
-  type Props = {
-    readonly names: readonly string[];
-    readonly foo: number;
-  };
+// Bad: readonly return restricts the caller for no reason
+export function getRoles(user: Readonly<User>): readonly Role[] {}
 
-  // Good - only inner properties use immutable types
-  type Props = {
-    names: readonly string[];
-  };
-  ```
+// Bad: mutable input lets the function mutate the caller's data
+export function getRoles(users: User[]): Role[] {}
+```
+
+### How to make a type readonly
+
+| Kind   | Use                    |
+| ------ | ---------------------- |
+| Array  | `readonly T[]`         |
+| Set    | `ReadonlySet<T>`       |
+| Map    | `ReadonlyMap<K, V>`    |
+| Object | `Readonly<T>`          |
+| Record | `ReadonlyRecord<K, V>` |
+
+For objects, prefer the `Readonly<T>` wrapper over annotating each property
+with `readonly`. Use per-property `readonly` only when **some** properties
+are readonly and others are not.
+
+```ts
+// Good: wrapper at the call site
+export function render(props: Readonly<Props>) {}
+
+// Good: per-property readonly when mixing
+type Config = {
+  readonly id: string; // immutable identity
+  label: string; // mutable display field
+};
+
+// Bad: per-property readonly when all are readonly. Use Readonly<> instead.
+type Props = {
+  readonly name: string;
+  readonly age: number;
+};
+```
+
+### Type aliases stay mutable
+
+Define type aliases as mutable. Apply `Readonly<T>` or `readonly` at the
+function signature, not on the alias itself. A reusable type should not
+impose immutability on every consumer.
+
+```ts
+// Good: mutable alias, readonly applied at the boundary
+type User = { name: string; age: number };
+
+export function greet(user: Readonly<User>) {}
+export function increaseAge(user: User): void {
+  user.age++;
+} // intentional mutation
+```
+
+Only bake `readonly` into the alias itself when the type **must never**
+be mutated anywhere. E.g. a frozen constant, a discriminated union of
+immutable events, or a shared reference where mutation would be a bug.
+
+```ts
+// Good: type must always be immutable
+type AuditLogEntry = Readonly<{
+  timestamp: number;
+  userId: string;
+  action: string;
+}>;
+```
 
 ## React Code Style
 

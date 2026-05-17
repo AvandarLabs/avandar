@@ -21,7 +21,10 @@ import { WorkspaceAppRoleMatrixForm } from "@/components/WorkspaceSettingsPage/W
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { partition } from "@/lib/utils/arrays/partition/partition";
 import type { RoleGroupWithMatrix } from "@/clients/permissions/PermissionsClient";
-import type { UserAppRolesMatrix } from "$/models/Permissions/Permissions.types";
+import type {
+  BuiltinPresetType,
+  UserAppRolesMatrix,
+} from "$/models/Permissions/Permissions.types";
 
 /**
  * Built-in presets (read-only) and CRUD for custom role groups.
@@ -40,7 +43,7 @@ export function WorkspaceRolesTab(): JSX.Element {
     settings: undefined,
   });
   const [builtinPresetType, setBuiltinPresetType] =
-    useState<Permissions.BuiltinPresetType>("custom");
+    useState<BuiltinPresetType>("custom");
 
   const [roleGroups = [], roleGroupsLoading] =
     PermissionsClient.useGetRoleGroupsWithMatrices({

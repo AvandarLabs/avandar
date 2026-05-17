@@ -1,9 +1,9 @@
 import { renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useHasPermission } from "@/hooks/permissions/useHasPermission";
-import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles";
+import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
+import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 
-vi.mock("@/hooks/permissions/useUserAppRoles", () => {
+vi.mock("@/hooks/permissions/useUserAppRoles/useUserAppRoles", () => {
   return { useUserAppRoles: vi.fn() };
 });
 

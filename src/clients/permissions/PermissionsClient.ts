@@ -13,6 +13,9 @@ import type {
 } from "$/models/Permissions/Permissions.types";
 import type { UserId } from "$/models/User/User.types";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
+import type { Database } from "$/types/database.types";
+
+export type ResourceType = Database["public"]["Enums"]["resource_type"];
 
 export type RoleGroupWithMatrix = {
   id: string;
@@ -136,6 +139,38 @@ function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
         },
 
         /**
+         * Resolves the signed-in user's effective role on a dashboard or
+         * dataset.
+         */
+        getResourceEffectiveRole: async ({
+          resourceType,
+          resourceId,
+        }: {
+          resourceType: ResourceType;
+          resourceId: string;
+        }): Promise<RoleLevel | null> => {
+          const logger = baseLogger.appendName("getResourceEffectiveRole");
+          logger.log("fetch resource effective role", {
+            resourceType,
+            resourceId,
+          });
+
+          const { data: role, error } = await dbClient.rpc(
+            "util__resource_effective_role",
+            {
+              p_resource_type: resourceType,
+              p_resource_id: resourceId,
+            },
+          );
+
+          if (error) {
+            throw new Error(error.message);
+          }
+
+          return role;
+        },
+
+        /**
          * Loads workspace user-group tags.
          */
         getUserGroups: async ({
@@ -232,14 +267,6 @@ function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
             .update({ role_group_id: resolvedGroupId })
             .eq("id", membershipId)
             .eq("workspace_id", workspaceId)
-            .throwOnError();
-
-          const legacyRole =
-            Permissions.RolesMatrix.legacyWorkspaceRoleFromMatrix(targetMatrix);
-          await dbClient
-            .from("user_roles")
-            .update({ role: legacyRole })
-            .eq("membership_id", membershipId)
             .throwOnError();
 
           const { data: workspaceGroups } = await dbClient
@@ -472,6 +499,7 @@ function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
       queryFns: [
         "getRoleGroupsWithMatrices",
         "getMemberAppRoles",
+        "getResourceEffectiveRole",
         "getUserGroups",
       ],
       mutationFns: [

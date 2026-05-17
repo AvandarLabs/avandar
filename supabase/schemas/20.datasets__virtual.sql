@@ -66,7 +66,7 @@ create policy "User can delete datasets__virtual in their workspace" on public.d
   public.util__auth_user_can_access_resource (
     'dataset',
     public.datasets__virtual.dataset_id,
-    'editor'
+    'admin'
   )
 );
 

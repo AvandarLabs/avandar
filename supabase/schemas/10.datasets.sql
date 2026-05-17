@@ -37,7 +37,7 @@ create table public.datasets (
 );
 
 -- Enable row level security
--- RLS and policies: `17.dashboards_datasets_rls.sql`.
+-- RLS and policies: `17.rls.datasets.sql`.
 alter table public.datasets enable row level security;
 
 -- Trigger the `updated_at` update
