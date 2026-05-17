@@ -65,14 +65,6 @@ export const SeedJobs = [
             display_name: user.displayName,
             membership_id: membership.id,
           });
-
-          // create the user role
-          await dbClient.from("user_roles").insert({
-            user_id: user.id,
-            workspace_id: insertedWorkspace.id,
-            role: user.role,
-            membership_id: membership.id,
-          });
         };
 
         // link the owner to the workspace

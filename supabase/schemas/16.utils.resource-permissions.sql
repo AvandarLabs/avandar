@@ -231,47 +231,89 @@ end;
 $$;
 
 /**
- * Legacy shim: map old user_roles-style strings to workspace id sets.
- * `admin` → owner or Settings admin; `member` → any workspace membership.
- *
- * @returns Distinct workspace ids for the auth user under that legacy label.
+ * App catalog entry for a dashboard or dataset resource type.
  */
-create or replace function public.util__get_auth_user_workspaces_by_role (
-  role text
-) returns uuid[] language plpgsql security definer stable
+create or replace function public.util__resource_type_to_app_type (
+  p_resource_type public.resource_type
+) returns public.app_type language sql immutable
+set
+  search_path = public as $$
+  select case p_resource_type
+    when 'dashboard'::public.resource_type then 'dashboards'::public.app_type
+    when 'dataset'::public.resource_type then 'data_sources'::public.app_type
+  end;
+$$;
+
+/**
+ * INSERT on `dashboards` / `datasets`: editor+ app role in workspace, caller
+ * owns the row, workspace is a member workspace.
+ */
+create or replace function public.util__auth_user_can_insert_workspace_resource (
+  p_workspace_id uuid,
+  p_resource_type public.resource_type,
+  p_owner_id uuid
+) returns boolean language plpgsql security definer stable
 set
   search_path = public as $$
 declare
   v_uid uuid := auth.uid ();
+  v_app public.app_type;
 begin
-  if v_uid is null then
-    return '{}'::uuid[];
+  if v_uid is null or p_owner_id is distinct from v_uid then
+    return false;
   end if;
 
-  if role = 'admin' then
-    return array(
-      select distinct x.wid
-      from (
-        select w.id as wid
-        from public.workspaces w
-        where
-          w.owner_id = v_uid
-        union all
-        select wm.workspace_id as wid
-        from public.workspace_memberships wm
-        where
-          wm.user_id = v_uid and
-          public.util__is_settings_admin (wm.workspace_id)
-      ) as x
-    );
+  if not (
+    p_workspace_id = any (
+      array(
+        select
+          public.util__get_auth_user_workspaces ()
+      )
+    )
+  ) then
+    return false;
   end if;
 
-  if role = 'member' then
-    return public.util__get_auth_user_workspaces ();
-  end if;
+  v_app := public.util__resource_type_to_app_type (p_resource_type);
 
-  return '{}'::uuid[];
+  return public.util__auth_user_meets_min_app_role (
+    p_workspace_id,
+    v_app,
+    'editor'::public.role_level
+  );
 end;
+$$;
+
+/**
+ * UPDATE on a dashboard or dataset: effective role is at least editor.
+ */
+create or replace function public.util__auth_user_can_update_resource (
+  p_resource_type public.resource_type,
+  p_resource_id uuid
+) returns boolean language sql security definer stable
+set
+  search_path = public as $$
+  select public.util__auth_user_can_access_resource (
+    p_resource_type,
+    p_resource_id,
+    'editor'::public.role_level
+  );
+$$;
+
+/**
+ * DELETE on a dashboard or dataset: effective role is at least admin.
+ */
+create or replace function public.util__auth_user_can_delete_resource (
+  p_resource_type public.resource_type,
+  p_resource_id uuid
+) returns boolean language sql security definer stable
+set
+  search_path = public as $$
+  select public.util__auth_user_can_access_resource (
+    p_resource_type,
+    p_resource_id,
+    'admin'::public.role_level
+  );
 $$;
 
 /**
@@ -345,20 +387,6 @@ begin
     return true;
   end if;
 
-  if v_restricted then
-    return true;
-  end if;
-
-  v_app_role := public.util__get_auth_user_app_role (
-    v_ws,
-    'data_sources'::public.app_type
-  );
-  v_user_rank := coalesce(public.util__role_level_rank (v_app_role), 0);
-
-  if v_user_rank < v_editor_rank then
-    return true;
-  end if;
-
   select exists (
     select
       1
@@ -389,6 +417,21 @@ begin
       )
   )
   into v_has_share;
+
+  -- Restricted rows never inherit workspace app roles; require a share grant.
+  if v_restricted then
+    return coalesce(v_has_share, false);
+  end if;
+
+  v_app_role := public.util__get_auth_user_app_role (
+    v_ws,
+    'data_sources'::public.app_type
+  );
+  v_user_rank := coalesce(public.util__role_level_rank (v_app_role), 0);
+
+  if v_user_rank < v_editor_rank then
+    return true;
+  end if;
 
   if v_has_share then
     return true;
@@ -474,20 +517,6 @@ begin
     return true;
   end if;
 
-  if v_restricted then
-    return true;
-  end if;
-
-  v_app_role := public.util__get_auth_user_app_role (
-    v_ws,
-    'dashboards'::public.app_type
-  );
-  v_user_rank := coalesce(public.util__role_level_rank (v_app_role), 0);
-
-  if v_user_rank < v_editor_rank then
-    return true;
-  end if;
-
   select exists (
     select
       1
@@ -518,6 +547,20 @@ begin
       )
   )
   into v_has_share;
+
+  if v_restricted then
+    return coalesce(v_has_share, false);
+  end if;
+
+  v_app_role := public.util__get_auth_user_app_role (
+    v_ws,
+    'dashboards'::public.app_type
+  );
+  v_user_rank := coalesce(public.util__role_level_rank (v_app_role), 0);
+
+  if v_user_rank < v_editor_rank then
+    return true;
+  end if;
 
   if v_has_share then
     return true;

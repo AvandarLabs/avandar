@@ -98,6 +98,17 @@ vi.mock("@/components/common/layouts/AppLayout/AppLayout", async () => {
 });
 
 vi.mock(
+  "@/components/permissions/ShareResourceModal/ShareResourceButton",
+  () => {
+    return {
+      ShareResourceButton: () => {
+        return null;
+      },
+    };
+  },
+);
+
+vi.mock(
   "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig",
   () => {
     return {

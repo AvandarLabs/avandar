@@ -75,7 +75,7 @@ create policy "User can delete datasets__xlsx_file in their workspace" on public
   public.util__auth_user_can_access_resource (
     'dataset',
     public.datasets__xlsx_file.dataset_id,
-    'editor'
+    'admin'
   )
 );
 

@@ -20,6 +20,7 @@ import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
+import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -190,6 +191,11 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
               : null}
             </Group>
           </Group>
+          <ShareResourceButton
+            resourceName={dataset.name}
+            resourceType="dataset"
+            resourceId={dataset.id}
+          />
         </Group>
 
         <Paper>

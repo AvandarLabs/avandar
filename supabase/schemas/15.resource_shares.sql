@@ -60,46 +60,8 @@ create index idx_resource_shares__resource on public.resource_shares (
   resource_id
 );
 
+-- Enable row level security
 alter table public.resource_shares enable row level security;
-
-create policy "Members can select resource_shares in their workspaces" on public.resource_shares for
-select
-  to authenticated using (
-    public.resource_shares.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
-    )
-  );
-
-create policy "Settings admins can insert resource_shares" on public.resource_shares for insert to authenticated
-with
-  check (
-    public.util__is_settings_admin (
-      public.resource_shares.workspace_id
-    )
-  );
-
-create policy "Settings admins can update resource_shares" on public.resource_shares
-for update
-  to authenticated using (
-    public.util__is_settings_admin (
-      public.resource_shares.workspace_id
-    )
-  )
-with
-  check (
-    public.util__is_settings_admin (
-      public.resource_shares.workspace_id
-    )
-  );
-
-create policy "Settings admins can delete resource_shares" on public.resource_shares for delete to authenticated using (
-  public.util__is_settings_admin (
-    public.resource_shares.workspace_id
-  )
-);
 
 create trigger tr_resource_shares__set_updated_at before
 update on public.resource_shares for each row

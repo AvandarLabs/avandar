@@ -28,7 +28,7 @@ export type WorkspacesAPI = APITypeDef<
      * @param pathParams.workspaceSlug - The slug of the workspace to invite
      * the user to.
      * @param body.emailToInvite - The email address to invite.
-     * @param body.role - The role of the user invited.
+     * @param body.roleGroupId - Built-in or custom role group for the invite.
      */
     "/:workspaceId/invite": {
       POST: {
@@ -37,8 +37,7 @@ export type WorkspacesAPI = APITypeDef<
         };
         body: {
           emailToInvite: string;
-          role?: "admin" | "member"; // legacy role
-          roleGroupId?: string;
+          roleGroupId: string;
           roleOverrides?: Array<{
             app: AppType;
             role: "viewer" | "editor" | "admin";
@@ -99,7 +98,6 @@ export type WorkspacesAPI = APITypeDef<
           invite: Tables<"workspace_invites">;
           membership: Tables<"workspace_memberships">;
           profile: Tables<"user_profiles">;
-          role: Tables<"user_roles">;
         };
       };
     };

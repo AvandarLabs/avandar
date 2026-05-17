@@ -2,7 +2,7 @@ import { makeSet } from "@utils";
 import {
   createSupabaseAdminClient,
   deleteWorkspaceTreeForE2EById,
-} from "../../helpers/supabaseAdminClient";
+} from "../helpers/supabaseAdminClient";
 import { ensureWorkspaceSubscriptionForE2E } from "./ensureWorkspaceSubscriptionForE2E";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 
@@ -115,17 +115,6 @@ async function _insertE2EWorkspaceForOwner(options: {
     throw new Error(
       `[e2e] user_profiles insert failed: ${profileError.message}`,
     );
-  }
-
-  const { error: roleError } = await admin.from("user_roles").insert({
-    user_id: userId,
-    workspace_id: workspaceId,
-    membership_id: membership.id,
-    role: "admin",
-  });
-
-  if (roleError) {
-    throw new Error(`[e2e] user_roles insert failed: ${roleError.message}`);
   }
 }
 
@@ -341,9 +330,9 @@ export async function bestEffortPurgeE2EWorkspacesForOwners(options: {
     }
 
     const byId = new Map<string, { id: string; slug: string }>();
-    for (const row of [...(seededRows ?? []), ...(orgRows ?? [])]) {
+    [...(seededRows ?? []), ...(orgRows ?? [])].forEach((row) => {
       byId.set(row.id, row);
-    }
+    });
 
     await Promise.all(
       [...byId.values()].map(async (row) => {

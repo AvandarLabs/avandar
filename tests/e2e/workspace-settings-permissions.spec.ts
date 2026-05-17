@@ -14,15 +14,14 @@ test.describe("workspace settings permissions smoke", () => {
     });
 
     await page.goto(`/${e2eWorkerDb.workspaceSlug}/settings`);
+    await page.getByRole("tab", { name: "Members" }).click();
 
     await expect(
-      page.getByRole("heading", { name: "Workspace Users" }),
+      page.getByRole("button", { name: "Invite member" }),
     ).toBeVisible({ timeout: LONG_WAIT });
 
     await expect(
-      page.getByRole("button", { name: "Invite User" }),
+      page.getByRole("columnheader", { name: "Name" }),
     ).toBeVisible();
-
-    await expect(page.locator(".tabler-icon-trash")).toHaveCount(1);
   });
 });
