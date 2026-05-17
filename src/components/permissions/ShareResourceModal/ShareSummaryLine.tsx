@@ -22,12 +22,17 @@ type Props = {
  * `buildShareSummary` so this component is trivial to test.
  *
  * The pills are decorative: each pill's `label` is part of the surrounding
- * sentence text so screen readers read one continuous sentence.
+ * sentence text so screen readers read one continuous sentence. The
+ * surrounding element is a polite live region (`role="status"`) labelled
+ * "Share summary" so screen readers announce updates and so tests can
+ * scope assertions to this exact line rather than the whole dialog.
  */
 export function ShareSummaryLine({ spans }: Props): JSX.Element {
   return (
     <Text
       component="div"
+      role="status"
+      aria-label="Share summary"
       size="sm"
       c="dimmed"
       style={{ lineHeight: 1.8 }}

@@ -1,4 +1,4 @@
-import { expect, test } from "./fixtures/e2eWithGlobalViewerMembership.fixture";
+import { test } from "./fixtures/e2eWithGlobalViewerMembership.fixture";
 import {
   assignE2ESecondaryMemberCustomMatrix,
   createRolesMatrixWithoutApp,
@@ -32,33 +32,12 @@ import {
   assignWorkspaceTagToMember,
   createWorkspaceTagViaSettings,
 } from "./helpers/workspaceTagsFlow";
-import type { Page } from "@playwright/test";
 
 /** Display name seeded for the workspace owner profile. */
 const OWNER_DISPLAY_NAME = "E2E Test Workspace";
 
 /** Workspace name shown in the v2 summary line for workspace shares. */
 const WORKSPACE_NAME = "E2E Test Workspace";
-
-/**
- * Editor-vs-viewer distinction at the UI is best observed via the Delete
- * Dataset button: admin/editor can delete; viewer cannot. The button is
- * rendered conditionally in `DatasetMetaView`, so its presence is a
- * reliable signal of write capability on this dataset.
- */
-async function expectDatasetEditable(options: {
-  page: Page;
-  workspaceSlug: string;
-  datasetId: string;
-  datasetName: string;
-}): Promise<void> {
-  const { page, workspaceSlug, datasetId, datasetName } = options;
-  await page.goto(`/${workspaceSlug}/data-manager/${datasetId}`);
-  // Meta page must render first.
-  await expect(
-    page.getByRole("paragraph").filter({ hasText: datasetName }),
-  ).toBeVisible({ timeout: 30_000 });
-}
 
 test.describe("Share modal v2 — Drive-style flows", () => {
   test("1. Drive-style direct user share grants editor access", async ({
@@ -105,13 +84,12 @@ test.describe("Share modal v2 — Drive-style flows", () => {
         workspaceSlug,
         datasetName,
       });
+      // TODO(rbac): this only verifies read access — editor vs. viewer
+      // distinction is not observable at the UI level today because
+      // DatasetMetaView renders edit affordances (description editor,
+      // Delete button) unconditionally and writes are gated only at RLS.
+      // Tighten this when an editor-only control is exposed.
       await expectDatasetMetaPageAccessible(page, {
-        workspaceSlug,
-        datasetId,
-        datasetName,
-      });
-      await expectDatasetEditable({
-        page,
         workspaceSlug,
         datasetId,
         datasetName,
@@ -246,13 +224,10 @@ test.describe("Share modal v2 — Drive-style flows", () => {
         workspaceSlug,
       });
 
+      // TODO(rbac): editor capability not verifiable at the UI level
+      // today (see DatasetMetaView — all edit affordances render
+      // unconditionally). We assert dataset access only.
       await expectDatasetMetaPageAccessible(page, {
-        workspaceSlug,
-        datasetId,
-        datasetName,
-      });
-      await expectDatasetEditable({
-        page,
         workspaceSlug,
         datasetId,
         datasetName,
@@ -382,8 +357,11 @@ test.describe("Share modal v2 — Drive-style flows", () => {
         workspaceSlug,
         resourceName: datasetName,
       });
-      await expectDatasetEditable({
-        page,
+      // TODO(rbac): editor capability not verifiable at the UI level
+      // today (see DatasetMetaView). The card-open path is the assertion;
+      // editor-vs-viewer at the share row is covered by the modal unit
+      // tests, and write enforcement is exercised by RLS-level tests.
+      await expectDatasetMetaPageAccessible(page, {
         workspaceSlug,
         datasetId,
         datasetName,

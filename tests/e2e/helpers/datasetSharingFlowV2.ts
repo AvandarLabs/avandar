@@ -130,30 +130,6 @@ export async function addShareV2(options: {
 }
 
 /**
- * Flips the per-row role select for a principal already in the
- * People-with-access list. Targets the row by its `Role for <Name>`
- * accessible label inside the share dialog.
- */
-export async function setShareRoleV2(options: {
-  page: Page;
-  principalLabel: string;
-  role: RoleLevel;
-}): Promise<void> {
-  const { page, principalLabel, role } = options;
-  const roleSelect = shareDialog(page).getByRole("combobox", {
-    name: `Role for ${principalLabel}`,
-  });
-  await roleSelect.click();
-  await page
-    .getByRole("option", { name: new RegExp(`^${role}$`, "i") })
-    .click();
-  // Wait for the select to reflect the new value before returning.
-  await expect(roleSelect).toHaveValue(new RegExp(role, "i"), {
-    timeout: MEDIUM_WAIT,
-  });
-}
-
-/**
  * Toggles the "Limit to app access" checkbox for a user-group share row.
  * Idempotent: only clicks when the current state differs from `on`.
  */
@@ -175,38 +151,22 @@ export async function toggleRequiresAppAccessV2(options: {
 }
 
 /**
- * Removes a share by clicking the `Remove access for <Name>` button on its
- * row. Waits until the row is no longer in the People-with-access list.
- */
-export async function removeShareV2(options: {
-  page: Page;
-  principalLabel: string;
-}): Promise<void> {
-  const { page, principalLabel } = options;
-  const dialog = shareDialog(page);
-  await dialog
-    .getByRole("button", { name: `Remove access for ${principalLabel}` })
-    .click();
-  await expect(
-    dialog.getByRole("combobox", { name: `Role for ${principalLabel}` }),
-  ).toBeHidden({ timeout: MEDIUM_WAIT });
-}
-
-/**
  * Asserts the v2 share summary line contains every expected substring.
- * The pills (user, group, app, role names) are rendered inline with the
- * sentence text, so a substring match against the dialog itself is the
- * simplest stable assertion — the summary line is the only content in
- * the dialog that starts with "This dataset is shared with:".
+ * Scopes the assertion to the `role="status"` `Share summary` element so
+ * matches against shared substrings (e.g. a user name that also appears
+ * in the People-with-access list) cannot accidentally pass against the
+ * wrong region of the dialog.
  */
 export async function expectSummaryTextV2(
   page: Page,
   substrings: readonly string[],
 ): Promise<void> {
-  const dialog = shareDialog(page);
-  await expect(dialog).toBeVisible({ timeout: MEDIUM_WAIT });
+  const summary = shareDialog(page).getByRole("status", {
+    name: "Share summary",
+  });
+  await expect(summary).toBeVisible({ timeout: MEDIUM_WAIT });
   for (const substring of substrings) {
-    await expect(dialog).toContainText(substring, { timeout: MEDIUM_WAIT });
+    await expect(summary).toContainText(substring, { timeout: MEDIUM_WAIT });
   }
 }
 

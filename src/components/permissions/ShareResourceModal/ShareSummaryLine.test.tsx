@@ -35,4 +35,19 @@ describe("ShareSummaryLine", () => {
       ),
     ).toBeInTheDocument();
   });
+
+  it("exposes role=status with the 'Share summary' accessible name", () => {
+    render(
+      <ShareSummaryLine
+        spans={[
+          { kind: "text", text: "Shared with " },
+          { kind: "pill", label: "William Farr", variant: "user" },
+          { kind: "text", text: "." },
+        ]}
+      />,
+    );
+    const summary = screen.getByRole("status", { name: "Share summary" });
+    expect(summary).toBeInTheDocument();
+    expect(summary).toHaveTextContent("William Farr");
+  });
 });
