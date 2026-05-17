@@ -3,9 +3,9 @@ import { IconChevronRight } from "@tabler/icons-react";
 import { objectEntries } from "@utils";
 import clsx from "clsx";
 import { Key, ReactNode } from "react";
-import { NavLink } from "@/lib/ui/links/NavLink";
-import { TruncatedText } from "@/lib/ui/text/TruncatedText";
-import type { NavLinkProps } from "@/lib/ui/links/NavLink";
+import { TruncatedText } from "../text/TruncatedText";
+import { NavLink } from "./NavLink";
+import type { NavLinkProps } from "./NavLink";
 import type { BoxProps } from "@mantine/core";
 
 type Props = {

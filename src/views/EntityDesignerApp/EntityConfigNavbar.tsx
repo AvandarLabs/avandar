@@ -2,7 +2,7 @@ import { Box, BoxProps, Loader, useMantineTheme } from "@mantine/core";
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { NavLinkList } from "@/lib/ui/links/NavLinkList";
+import { NavLinkList } from "@ui";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 
 type Props = {

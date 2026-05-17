@@ -16,7 +16,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { Theme } from "@/config/Theme";
 import type { LinkComponent, LinkComponentProps } from "@tanstack/react-router";
 
 const DEFAULT_PRIMARY_SHADE =
@@ -89,11 +88,9 @@ export const NavLink: LinkComponent<typeof MantineRouterNavLink> = (props) => {
       }
 
       const primaryShade =
-        typeof Theme.primaryShade === "object" ?
-          // TODO(jpsyx): this should handle using the `dark` primary shade if
-          // we're in dark mode
-          Theme.primaryShade.light
-        : undefined;
+        typeof theme.primaryShade === "object" ?
+          theme.primaryShade.light
+        : theme.primaryShade;
       return themeColors[primaryShade ?? DEFAULT_PRIMARY_SHADE];
     }
     return inactiveHoverColor;

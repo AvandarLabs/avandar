@@ -1,4 +1,4 @@
-import { TruncatedText } from "@/lib/ui/text/TruncatedText";
+import { TruncatedText } from "../text/TruncatedText";
 
 type Props = {
   value: null | File | File[];

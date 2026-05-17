@@ -1,5 +1,6 @@
 import { Text } from "@mantine/core";
-import { Tooltip, useCheckTruncatedText } from "@ui";
+import { Tooltip } from "../Tooltip/Tooltip";
+import { useCheckTruncatedText } from "../hooks/useCheckTruncatedText/useCheckTruncatedText";
 import type { TextProps, TooltipProps } from "@mantine/core";
 
 type TooltipPassthroughProps = Omit<

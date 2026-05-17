@@ -2,7 +2,7 @@ import { Box, Button, FileInput, Group } from "@mantine/core";
 import { isArray, MIMEType } from "@utils";
 import { useRef, useState } from "react";
 import { useForm } from "@/lib/hooks/ui/useForm/useForm";
-import { TruncatedFileInputValue } from "@/lib/ui/singleton-forms/TruncatedFileInputValue";
+import { TruncatedFileInputValue } from "./TruncatedFileInputValue";
 import type { FileInputProps } from "@mantine/core";
 
 type Props = {

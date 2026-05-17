@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef } from "react";
 import { notifyWarning } from "@ui";
 import { VIZ_RENDER_LIMITS } from "$/config/GlobalVizConfig";
+import { useEffect, useMemo, useRef } from "react";
 import type { VizRenderLimitKey } from "$/config/GlobalVizConfig";
 
 /**

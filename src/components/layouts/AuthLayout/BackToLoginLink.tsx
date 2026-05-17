@@ -1,6 +1,6 @@
 import { Box, Center } from "@mantine/core";
 import { IconArrowLeft } from "@tabler/icons-react";
-import { Link } from "@/lib/ui/links/Link";
+import { Link } from "@ui";
 
 export function BackToLoginLink(): JSX.Element {
   return (
