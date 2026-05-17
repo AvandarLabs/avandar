@@ -3,7 +3,6 @@ import {
   Tabs as MantineTabs,
   TabsProps as MantineTabsProps,
   Text,
-  useMantineTheme,
 } from "@mantine/core";
 import { makeObject } from "@utils";
 import { ReactNode, useState } from "react";
@@ -45,7 +44,6 @@ export function Tabs<TabId extends string>({
   indicatorVariant = "underline",
   ...props
 }: Props<TabId>): JSX.Element {
-  const theme = useMantineTheme();
   const [currentTab, setCurrentTab] = useState<TabId>(tabIds[0]!);
 
   // track the tab list refs so we can animate the tab indicator
@@ -81,7 +79,7 @@ export function Tabs<TabId extends string>({
         style={
           isFloating ? undefined : (
             {
-              borderBottom: `2px solid ${theme.colors.neutral[1]}`,
+              borderBottom: "2px solid var(--mantine-color-neutral-1)",
             }
           )
         }
@@ -119,7 +117,7 @@ export function Tabs<TabId extends string>({
               {
                 position: "absolute",
                 top: "2px",
-                borderBottom: `2px solid ${theme.colors.primary[6]}`,
+                borderBottom: "2px solid var(--mantine-color-primary-6)",
               }
             )
           }

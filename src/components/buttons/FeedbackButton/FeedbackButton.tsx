@@ -4,6 +4,8 @@ import { Tooltip } from "@ui";
 import { hasDefinedProps, matchLiteral } from "@utils";
 import clsx from "clsx";
 import { useState } from "react";
+import { APP_SHELL_MAIN_Z_INDEX } from "@/config/Theme";
+import { Route as RootRoute } from "@/routes/__root";
 import css from "./FeedbackButton.module.css";
 import {
   FEATUREBASE_BUG_BOARD,
@@ -11,8 +13,6 @@ import {
   openFeaturebaseFeedbackWidget,
 } from "./openFeaturebaseFeedbackWidget";
 import { useFeaturebaseInit } from "./useFeaturebaseInit";
-import { APP_SHELL_MAIN_Z_INDEX } from "@/config/Theme";
-import { Route as RootRoute } from "@/routes/__root";
 import type { CSSProperties } from "react";
 
 /** Corner anchor for the floating feedback control. */

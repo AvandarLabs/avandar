@@ -13,10 +13,10 @@ type Props = {
  */
 export function Paper({
   p = "lg",
-  radius = "md",
-  shadow = "md",
+  radius = "sm",
+  shadow = "sm",
   noShadow = false,
-  bg = "white",
+  bg = "var(--ava-surface-raised)",
   withBorder = true,
   ...rest
 }: Props): JSX.Element {

@@ -1,4 +1,9 @@
 import type {
+  ELEVATION_BORDERS,
+  ELEVATION_SHADOWS,
+  ELEVATION_SURFACES,
+} from "@/config/Theme/themeElevation";
+import type {
   DefaultMantineColor,
   DefaultMantineSize,
   MantineColorsTuple,
@@ -22,10 +27,33 @@ type ExtendedCustomSpacing =
   | "xxl"
   | "xxxl";
 
+type ElevationSurfaces = typeof ELEVATION_SURFACES;
+type ElevationBorders = typeof ELEVATION_BORDERS;
+type ElevationShadows = typeof ELEVATION_SHADOWS;
+
 declare module "@mantine/core" {
   export interface MantineThemeOther {
     /** Primary color */
     primaryColor: string;
+
+    zIndex: {
+      appShellMain: number;
+      modal: number;
+    };
+
+    elevation: {
+      surfaces: ElevationSurfaces;
+      borders: ElevationBorders;
+      shadows: ElevationShadows;
+    };
+
+    animation: {
+      durationMs: Record<string, number>;
+      duration: Record<string, string>;
+      easing: Record<string, string>;
+      transition: Record<string, string>;
+      mantine: Record<string, Record<string, string | number>>;
+    };
 
     navbar: {
       /** Navbar background color */
@@ -53,3 +81,5 @@ declare module "@mantine/core" {
     colors: Record<ExtendedAppColors, MantineColorsTuple>;
   }
 }
+
+export {};

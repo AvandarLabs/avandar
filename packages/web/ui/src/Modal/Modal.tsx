@@ -4,8 +4,8 @@ import type { ModalProps } from "@mantine/core";
 export function Modal(props: ModalProps): JSX.Element {
   return (
     <MantineModal
-      overlayProps={{ blur: 4, opacity: 0.5 }}
-      radius="md"
+      overlayProps={{ blur: 0, backgroundOpacity: 0.35 }}
+      radius="sm"
       centered
       {...props}
     />

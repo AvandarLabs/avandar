@@ -91,6 +91,18 @@
       "skillPath": "skills/linting-neostandard-eslint9/SKILL.md",
       "computedHash": "752557ba728543623393c86a4190ce2f4dd712222c72c5d22796fb961a2567a3"
     },
+    "mantine-combobox": {
+      "source": "mantinedev/skills",
+      "sourceType": "github",
+      "skillPath": "skills/mantine-combobox/SKILL.md",
+      "computedHash": "fb3002c7bb704a111b1f4c596573aa9905e1b8dd728ad15dbba8cdf7a53ed98a"
+    },
+    "mantine-custom-components": {
+      "source": "mantinedev/skills",
+      "sourceType": "github",
+      "skillPath": "skills/mantine-custom-components/SKILL.md",
+      "computedHash": "16f771d471da17b76a803ace40211177283ad3adcf319e8e3b4bd1a1ddeb74c1"
+    },
     "node": {
       "source": "mcollina/skills",
       "sourceType": "github",

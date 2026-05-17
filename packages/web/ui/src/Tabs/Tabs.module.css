@@ -9,32 +9,28 @@
 }
 
 .indicator {
-  background-color: var(--mantine-color-white);
-  border: 1px solid var(--mantine-color-gray-2);
-  border-radius: var(--mantine-radius-md);
-  box-shadow: var(--mantine-shadow-sm);
-}
-
-:global([data-mantine-color-scheme="dark"]) .indicator {
-  background-color: var(--mantine-color-dark-6);
-  border-color: var(--mantine-color-dark-4);
+  background-color: var(--ava-surface-raised);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  box-shadow: var(--mantine-shadow-xs);
+  /* Do not set `transition` here: it overrides Mantine's transform/width/height slide. */
 }
 
 .tab {
-  color: var(--mantine-color-gray-7);
+  color: var(--mantine-color-neutral-6);
   font-weight: 500;
-  transition: color 100ms ease;
+  transition: var(--ava-transition-colors);
   z-index: 1;
 }
 
 .tab[data-active] {
-  color: var(--mantine-color-black);
+  color: var(--mantine-color-neutral-9);
 }
 
 :global([data-mantine-color-scheme="dark"]) .tab {
-  color: var(--mantine-color-dark-1);
+  color: var(--mantine-color-neutral-3);
 }
 
 :global([data-mantine-color-scheme="dark"]) .tab[data-active] {
-  color: var(--mantine-color-white);
+  color: var(--mantine-color-neutral-0);
 }
