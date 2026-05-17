@@ -7,7 +7,7 @@ import {
 } from "@mantine/core";
 import { makeObject } from "@utils";
 import { ReactNode, useState } from "react";
-import classes from "@/lib/ui/Tabs/Tabs.module.css";
+import classes from "./Tabs.module.css";
 
 export type TabsIndicatorVariant = "underline" | "floating";
 

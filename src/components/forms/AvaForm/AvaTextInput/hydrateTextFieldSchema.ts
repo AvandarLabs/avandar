@@ -1,11 +1,11 @@
 import { isEmail } from "@mantine/form";
 import { match } from "ts-pattern";
-import { getFieldLabel } from "@/lib/ui/AvaForm/getFieldLabel";
+import { getFieldLabel } from "@/components/forms/AvaForm/getFieldLabel";
 import type {
   GenericFormSchemaRecord,
   TextFieldSchema,
   ValuesOfFieldRecord,
-} from "@/lib/ui/AvaForm/AvaForm.types";
+} from "@/components/forms/AvaForm/AvaForm.types";
 
 /**
  * Fill in the text field schema with default values based on its semantic type

@@ -2,7 +2,7 @@ import { useMutation } from "@hooks";
 import { Button, Card, FileButton, Group, Stack, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconUpload } from "@tabler/icons-react";
-import { notifyError, notifySuccess } from "@ui";
+import { notifyError, notifySuccess, DangerousActionButton , Paper  } from "@ui";
 import { assertIsDefined, MIMEType, where } from "@utils";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
@@ -14,8 +14,6 @@ import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFi
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetPreviewBlock } from "@/components/DatasetPreviewBlock/DatasetPreviewBlock";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
-import { DangerousActionButton } from "@/lib/ui/buttons/DangerousActionButton";
-import { Paper } from "@/lib/ui/Paper/Paper";
 import { Logger } from "@/utils/Logger";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { UserId } from "$/models/User/User.types";

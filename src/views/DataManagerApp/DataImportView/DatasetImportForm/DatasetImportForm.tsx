@@ -1,13 +1,12 @@
 import { Button, Checkbox, Group, Stack, Text, TextInput } from "@mantine/core";
 import { FormErrors, useForm } from "@mantine/form";
-import { notifyError } from "@ui";
+import { notifyError, Callout  } from "@ui";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo, useRef, useState } from "react";
 import { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DatasetPreviewBlock } from "@/components/DatasetPreviewBlock/DatasetPreviewBlock";
 import { AppConfig } from "@/config/AppConfig";
-import { Callout } from "@/lib/ui/Callout";
 import {
   CsvFileLoadResult,
   XlsxFileLoadResult,

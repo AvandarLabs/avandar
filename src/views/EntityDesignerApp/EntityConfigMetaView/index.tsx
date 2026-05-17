@@ -2,15 +2,14 @@ import { Button, Container, Group, Stack, Text, Title } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
-import { notifySuccess, ObjectDescriptionList } from "@ui";
+import { notifySuccess, ObjectDescriptionList, Paper } from "@ui";
 import { hasDefinedProps } from "@utils";
 import { useState } from "react";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
-import { generateEntities } from "@/views/EntityDesignerApp/EntityConfigMetaView/generateEntities/index";
-import { useHydratedEntityConfig } from "@/views/EntityDesignerApp/EntityConfigMetaView/useHydratedEntityConfig";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { Paper } from "@/lib/ui/Paper/Paper";
+import { generateEntities } from "@/views/EntityDesignerApp/EntityConfigMetaView/generateEntities/index";
+import { useHydratedEntityConfig } from "@/views/EntityDesignerApp/EntityConfigMetaView/useHydratedEntityConfig";
 import type { ObjectKeyRenderOptionsMap } from "@ui";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";
 

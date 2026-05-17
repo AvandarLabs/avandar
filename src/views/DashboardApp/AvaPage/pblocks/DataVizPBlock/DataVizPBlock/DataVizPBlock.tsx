@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { getDateColumns } from "@/components/Visualization/getDateColumns";
 import { VisualizationContainer } from "@/components/Visualization/VisualizationContainer";
-import { Paper } from "@/lib/ui/Paper/Paper";
+import { Paper } from "@ui";
 import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";

@@ -9,13 +9,12 @@ import {
 import { Model } from "@models";
 import { IconLayoutDashboard, IconPlus } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import { notifyDevAlert } from "@ui";
+import { notifyDevAlert, Paper  } from "@ui";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { Paper } from "@/lib/ui/Paper/Paper";
 import { DashboardCard } from "@/views/DashboardApp/DashboardListView/DashboardCard";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 

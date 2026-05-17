@@ -5,7 +5,7 @@ import { slugify } from "$/lib/strings/transformations";
 import { useState } from "react";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppLinks } from "@/config/AppLinks";
-import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
+import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
 
 type Props = {
   onSubmit?: (values: {

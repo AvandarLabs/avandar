@@ -14,22 +14,20 @@ import {
   IconCircleNumber1Filled,
   IconCircleNumber2Filled,
 } from "@tabler/icons-react";
+import { Callout, makeSegmentedControlItems, SegmentedControl } from "@ui";
 import { identity, makeObject, prop, propEq } from "@utils";
 import { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { useCallback, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnPickerList } from "@/components/DatasetColumnPickerList";
+import { useMap } from "@/lib/hooks/state/useMap";
+import { removeItemWhere } from "@/lib/utils/arrays/removeItemWhere/removeItemWhere";
 import { DatasetColumnExtractorCreator } from "@/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/DatasetColumnExtractorCreator";
 import { IDConfigBlock } from "@/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/IDConfigBlock/index";
 import {
   EntityConfigFormType,
   makeDefaultDatasetColumnField,
 } from "@/views/EntityDesignerApp/EntityConfigCreatorView/entityConfigFormTypes";
-import { useMap } from "@/lib/hooks/state/useMap";
-import { Callout } from "@/lib/ui/Callout";
-import { SegmentedControl } from "@/lib/ui/inputs/SegmentedControl";
-import { makeSegmentedControlItems } from "@/lib/ui/inputs/SegmentedControl/makeSegmentedControlItems";
-import { removeItemWhere } from "@/lib/utils/arrays/removeItemWhere/removeItemWhere";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { EntityConfigId } from "$/models/EntityConfig/EntityConfig.types";

@@ -26,7 +26,7 @@ import { BackToLoginLink } from "@/components/layouts/AuthLayout/BackToLoginLink
 import { WAITLIST_URL } from "@/config/AppConfig";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useForm } from "@/lib/hooks/ui/useForm/useForm";
-import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
+import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,

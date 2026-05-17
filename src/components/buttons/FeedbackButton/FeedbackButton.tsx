@@ -4,13 +4,13 @@ import { Tooltip } from "@ui";
 import { hasDefinedProps, matchLiteral } from "@utils";
 import clsx from "clsx";
 import { useState } from "react";
-import css from "@/components/FeedbackButton/FeedbackButton.module.css";
+import css from "./FeedbackButton.module.css";
 import {
   FEATUREBASE_BUG_BOARD,
   FEATUREBASE_FEATURE_REQUEST_BOARD,
   openFeaturebaseFeedbackWidget,
-} from "@/components/FeedbackButton/openFeaturebaseFeedbackWidget";
-import { useFeaturebaseInit } from "@/components/FeedbackButton/useFeaturebaseInit";
+} from "./openFeaturebaseFeedbackWidget";
+import { useFeaturebaseInit } from "./useFeaturebaseInit";
 import { APP_SHELL_MAIN_Z_INDEX } from "@/config/Theme";
 import { Route as RootRoute } from "@/routes/__root";
 import type { CSSProperties } from "react";

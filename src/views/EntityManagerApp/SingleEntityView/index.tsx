@@ -1,5 +1,5 @@
 import { Container, Group, Loader, Stack, Text, Title } from "@mantine/core";
-import { ObjectDescriptionList } from "@ui";
+import { ObjectDescriptionList, Paper  } from "@ui";
 import {
   isNonNullish,
   makeIdLookupMap,
@@ -18,7 +18,6 @@ import { EntityFieldValueClient } from "@/clients/entities/EntityFieldValueClien
 import { SourceBadge } from "@/components/badges/SourceBadge";
 import { ActivityBlock } from "@/views/EntityManagerApp/SingleEntityView/ActivityBlock";
 import { StatusPill } from "@/views/EntityManagerApp/SingleEntityView/StatusPill";
-import { Paper } from "@/lib/ui/Paper/Paper";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { Entity } from "$/models/entities/Entity/Entity";
 import type { EntityFieldValue } from "$/models/entities/EntityFieldValue/EntityFieldValue";

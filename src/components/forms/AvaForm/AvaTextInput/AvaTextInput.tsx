@@ -5,7 +5,7 @@ import type { FormType } from "@/lib/hooks/ui/useForm/useForm";
 import type {
   GenericFormSchemaRecord,
   ValuesOfFieldRecord,
-} from "@/lib/ui/AvaForm/AvaForm.types";
+} from "@/components/forms/AvaForm/AvaForm.types";
 import type { PathValue, StringKeyOf } from "@utils";
 import type { ChangeEvent } from "react";
 import type { Paths } from "type-fest";

@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { isNotEmpty } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
-import { makeSelectOptions, Select } from "@ui";
+import { makeSelectOptions, Select, Paper  } from "@ui";
 import { isDefined, prop, propEq, setValue } from "@utils";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DatasetColumnFieldsBlock } from "@/views/EntityDesignerApp/EntityConfigCreatorView/DatasetColumnFieldsBlock/index";
@@ -29,7 +29,6 @@ import { AppLinks } from "@/config/AppLinks";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useForm } from "@/lib/hooks/ui/useForm/useForm";
-import { Paper } from "@/lib/ui/Paper/Paper";
 
 const IS_MANUAL_DATA_DISABLED = isFlagEnabled(FeatureFlag.DisableManualData);
 

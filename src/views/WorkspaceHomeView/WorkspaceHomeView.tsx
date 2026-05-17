@@ -13,7 +13,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
-import { Paper } from "@/lib/ui/Paper/Paper";
+import { Paper } from "@ui";
 import { mantineColorVar } from "@/lib/utils/browser/css";
 import type { Workspace } from "$/models/Workspace/Workspace";
 

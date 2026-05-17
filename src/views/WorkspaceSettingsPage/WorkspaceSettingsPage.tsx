@@ -6,7 +6,7 @@ import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBil
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
+import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
 import { WorkspaceRolesTab } from "./WorkspaceRolesTab/WorkspaceRolesTab";
 import { WorkspaceTagsTab } from "./WorkspaceTagsTab/WorkspaceTagsTab";
 import { WorkspaceUsersTab } from "./WorkspaceUsersTab/WorkspaceUsersTab";

@@ -1,8 +1,7 @@
 import { ScrollArea, Stack, StackProps } from "@mantine/core";
-import { ObjectDescriptionList } from "@ui";
+import { ObjectDescriptionList, Callout  } from "@ui";
 import { prop } from "@utils";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import { Callout } from "@/lib/ui/Callout";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ImportedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";

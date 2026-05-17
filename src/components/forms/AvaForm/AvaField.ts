@@ -2,7 +2,7 @@ import {
   AnyFormValues,
   SelectFieldSchema,
   TextFieldSchema,
-} from "@/lib/ui/AvaForm/AvaForm.types";
+} from "@/components/forms/AvaForm/AvaForm.types";
 import type { SelectData } from "@ui";
 
 export const AvaField = {

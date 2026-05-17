@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import { EntityClient } from "@/clients/entities/EntityClient";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { SingleEntityView } from "@/views/EntityManagerApp/SingleEntityView";
-import { Callout } from "@/lib/ui/Callout";
+import { Callout } from "@ui";
 import { Logger } from "@/utils/Logger";
 import type { Entity } from "$/models/entities/Entity/Entity";
 import type { EntityConfig } from "$/models/EntityConfig/EntityConfig";

@@ -9,9 +9,9 @@ import {
   useState,
 } from "react";
 import { WorkspaceAppRoleMatrixForm } from "@/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm";
-import { AvaField } from "@/lib/ui/AvaForm/AvaField";
-import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
-import { AvaFormRef } from "@/lib/ui/AvaForm/AvaForm.types";
+import { AvaField } from "@/components/forms/AvaForm/AvaField";
+import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
+import { AvaFormRef } from "@/components/forms/AvaForm/AvaForm.types";
 import type {
   BuiltinPresetType,
   UserAppRolesMatrix,

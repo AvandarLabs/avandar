@@ -3,7 +3,7 @@ import { formatNumber } from "@utils";
 import { match } from "ts-pattern";
 import { PlanFeatures } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanFeatures";
 import { SubscriptionPlan } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
-import { Paper } from "@/lib/ui/Paper/Paper";
+import { Paper } from "@ui";
 
 type Props = {
   newPlan: SubscriptionPlan;

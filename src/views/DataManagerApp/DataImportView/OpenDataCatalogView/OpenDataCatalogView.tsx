@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
-import { notifyError, notifySuccess } from "@ui";
+import { notifyError, notifySuccess, Callout  } from "@ui";
 import { where } from "@utils";
 import { uuid } from "$/lib/uuid";
 import Fuse from "fuse.js";
@@ -24,9 +24,8 @@ import { BetaBadge } from "@/components/badges/BetaBadge/BetaBadge";
 import {
   FEATUREBASE_FEATURE_REQUEST_BOARD,
   openFeaturebaseFeedbackWidget,
-} from "@/components/FeedbackButton/openFeaturebaseFeedbackWidget";
+} from "@/components/buttons/FeedbackButton/openFeaturebaseFeedbackWidget";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { Callout } from "@/lib/ui/Callout";
 import { resolveOpenDataDatasetColumnInputs } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/buildOpenDataDatasetColumnInputs";
 import { OpenDataCatalogEntryDetail } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail";
 import { OpenDataCatalogEntryList } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList";

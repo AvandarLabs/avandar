@@ -3,8 +3,8 @@ import { objectKeys, objectValues } from "@utils";
 import { useImperativeHandle, useMemo, useRef } from "react";
 import { match } from "ts-pattern";
 import { useForm } from "@/lib/hooks/ui/useForm/useForm";
-import { hydrateTextFieldSchema } from "@/lib/ui/AvaForm/AvaTextInput/hydrateTextFieldSchema";
-import { UnknownAvaInput } from "@/lib/ui/AvaForm/UnknownAvaInput";
+import { hydrateTextFieldSchema } from "@/components/forms/AvaForm/AvaTextInput/hydrateTextFieldSchema";
+import { UnknownAvaInput } from "@/components/forms/AvaForm/UnknownAvaInput";
 import type {
   FormRulesRecord,
   UseFormInput,
@@ -15,7 +15,7 @@ import type {
   GenericFormSchemaRecord,
   ValidBaseValueType,
   ValuesOfFieldRecord,
-} from "@/lib/ui/AvaForm/AvaForm.types";
+} from "@/components/forms/AvaForm/AvaForm.types";
 import type { StringKeyOf } from "@utils";
 import type { ReactElement, ReactNode, Ref } from "react";
 

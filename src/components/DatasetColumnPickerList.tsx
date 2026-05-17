@@ -22,12 +22,10 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { useOnBecomesDefined } from "@/lib/hooks/useOnBecomesDefined";
-import {
+import { makeSegmentedControlItems,
   SegmentedControl,
   SegmentedControlItem,
-  SegmentedControlProps,
-} from "@/lib/ui/inputs/SegmentedControl";
-import { makeSegmentedControlItems } from "@/lib/ui/inputs/SegmentedControl/makeSegmentedControlItems";
+  SegmentedControlProps } from "@ui";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type {
   DatasetId,
