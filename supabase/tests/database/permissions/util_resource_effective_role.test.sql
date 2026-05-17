@@ -319,7 +319,7 @@ values
     '90003001-0000-4000-8000-000000000001'::uuid,
     't12 raa=false no app role',
     '{}'::jsonb,
-    true
+    false
   ),
   -- 13: group share editor + requires_app_access=true, member no app role.
   (
@@ -332,15 +332,17 @@ values
     true
   ),
   -- 14: group share editor + requires_app_access=true, member dashboards
-  -- viewer. Restricted so the only candidate is the share itself.
+  -- viewer. Unrestricted with no resource tags, so the gate is exercised:
+  -- the share survives because bob has *some* dashboards app role, and the
+  -- viewer app-role candidate participates in max alongside the editor share.
   (
     '90005014-0000-4000-8000-000000000014'::uuid,
     '90001001-0000-4000-8000-000000000001'::uuid,
     '90000001-0000-4000-8000-000000000001'::uuid,
     '90003001-0000-4000-8000-000000000001'::uuid,
-    't14 raa=true viewer app role restricted',
+    't14 raa=true viewer app role unrestricted',
     '{}'::jsonb,
-    true
+    false
   ),
   -- 15: group share editor + requires_app_access=true, member dashboards
   -- admin, restricted (so the admin app-role candidate is suppressed and the
@@ -365,17 +367,32 @@ values
     't16 raa=true admin app role unrestricted',
     '{}'::jsonb,
     false
-  ),
-  -- 17: group share editor + requires_app_access=true, member NOT in group.
-  (
-    '90005017-0000-4000-8000-000000000017'::uuid,
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    '90000001-0000-4000-8000-000000000001'::uuid,
-    '90003001-0000-4000-8000-000000000001'::uuid,
-    't17 raa=true not in group',
-    '{}'::jsonb,
-    true
   );
+  -- (Case 17 covers a dataset and is inserted separately below.)
+
+-- Case 17 dataset: unrestricted, no resource tags. Bob is in Analytics and
+-- has no data_sources app role; the requires_app_access=true gate must drop
+-- the share, and the app-role candidate also doesn't exist → null.
+insert into public.datasets (
+  id,
+  owner_id,
+  owner_profile_id,
+  workspace_id,
+  name,
+  description,
+  source_type,
+  is_restricted
+)
+values (
+  '90006017-0000-4000-8000-000000000017'::uuid,
+  '90000001-0000-4000-8000-000000000001'::uuid,
+  '90003001-0000-4000-8000-000000000001'::uuid,
+  '90001001-0000-4000-8000-000000000001'::uuid,
+  't17 dataset raa=true no data_sources role',
+  '',
+  'csv_file'::public.datasets__source_type,
+  false
+);
 
 insert into public.resource_shares (
   workspace_id,
@@ -434,8 +451,8 @@ values
   ),
   (
     '90001001-0000-4000-8000-000000000001'::uuid,
-    'dashboard'::public.resource_type,
-    '90005017-0000-4000-8000-000000000017'::uuid,
+    'dataset'::public.resource_type,
+    '90006017-0000-4000-8000-000000000017'::uuid,
     'user_group'::public.share_principal_type,
     '90004002-0000-4000-8000-000000000002'::uuid,
     'editor'::public.role_level,
@@ -1092,7 +1109,9 @@ select is(
 );
 
 -- 14 user_group editor share, requires_app_access=true, bob is dashboards
--- viewer. Resource is restricted so the only candidate is the share itself.
+-- viewer. Resource is unrestricted with no resource tags: the share survives
+-- the gate because bob has *some* dashboards app role, and the viewer
+-- app-role candidate participates in max (share editor=2 vs viewer=1).
 set local role postgres;
 
 insert into public.role_groups (
@@ -1153,7 +1172,7 @@ select is(
     '90005014-0000-4000-8000-000000000014'::uuid
   )::text,
   'editor'::text,
-  'requires_app_access=true with viewer app role yields share role (restricted)'
+  'requires_app_access=true with member viewer app role yields share role (editor)'
 );
 
 -- 15 user_group editor share, requires_app_access=true, bob is dashboards
@@ -1232,14 +1251,50 @@ select is(
   'unrestricted resource lets admin app role beat editor share'
 );
 
--- 17 user_group editor share, requires_app_access=true, but bob is not in
--- the Analytics group anymore -> share branch does not fire.
+-- 17 (dataset variant) user_group editor share on a dataset,
+-- requires_app_access=true, bob is in Analytics but has NO data_sources app
+-- role. Dataset is unrestricted with no resource tags, so the requires-gate
+-- drops the share and the app-role candidate is also absent → null.
 set local role postgres;
 
-delete from public.user_group_memberships
+insert into public.role_groups (
+  id,
+  workspace_id,
+  name,
+  is_builtin
+) values (
+  '9000cf11-0000-4000-8000-000000000011'::uuid,
+  '90001001-0000-4000-8000-000000000001'::uuid,
+  'util_eff_t17_no_data_sources',
+  false
+);
+
+insert into public.role_group_app_roles (
+  role_group_id,
+  app,
+  role
+) values
+  (
+    '9000cf11-0000-4000-8000-000000000011'::uuid,
+    'settings'::public.app_type,
+    'viewer'::public.role_level
+  ),
+  (
+    '9000cf11-0000-4000-8000-000000000011'::uuid,
+    'dashboards'::public.app_type,
+    'viewer'::public.role_level
+  ),
+  (
+    '9000cf11-0000-4000-8000-000000000011'::uuid,
+    'data_explorer'::public.app_type,
+    'viewer'::public.role_level
+  );
+
+update public.workspace_memberships
+set
+  role_group_id = '9000cf11-0000-4000-8000-000000000011'::uuid
 where
-  user_group_id = '90004002-0000-4000-8000-000000000002'::uuid and
-  user_id = '90000003-0000-4000-8000-000000000003'::uuid;
+  id = '90002003-0000-4000-8000-000000000003'::uuid;
 
 set local role authenticated;
 
@@ -1251,11 +1306,11 @@ select set_config(
 
 select is(
   public.util__resource_effective_role (
-    'dashboard'::public.resource_type,
-    '90005017-0000-4000-8000-000000000017'::uuid
+    'dataset'::public.resource_type,
+    '90006017-0000-4000-8000-000000000017'::uuid
   ),
   null::public.role_level,
-  'requires_app_access=true share with non-member yields null'
+  'dataset share requires_app_access=true dropped when member lacks data_sources app role'
 );
 
 select * from finish();

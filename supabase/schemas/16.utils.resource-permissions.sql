@@ -39,6 +39,8 @@ $$;
  * - App role editor would apply, but resource has tags and user shares no tag
  *   with the resource → that app-role candidate is dropped; effective role is
  *   whatever remains from shares only (often null).
+ * - Group share editor + requires_app_access=true, user has no app role on
+ *   resource's app → that share candidate is dropped; merge proceeds without it.
  *
  * After owner and settings-admin short-circuits, every other grant path
  * requires a `workspace_memberships` row for this resource's workspace so
@@ -327,6 +329,8 @@ $$;
  * workspace-wide app role at editor+ (e.g. Global Editor) from reading
  * another user’s dataset, while keeping viewers, owners, settings/workspace
  * managers, restricted-resource paths, and explicit `resource_shares` grants.
+ * Group shares with requires_app_access=true additionally require the auth
+ * user to have a data_sources app role.
  *
  * @param p_dataset_id Primary key of `public.datasets`.
  * @returns True when the row should be visible to `auth.uid()`.
@@ -458,6 +462,8 @@ $$;
  * Public dashboards (`is_public`) are readable by any authenticated user.
  * Otherwise applies the same editor-only block as
  * `util__auth_user_may_select_dataset` with app `dashboards`.
+ * Group shares with requires_app_access=true additionally require the auth
+ * user to have a dashboards app role.
  *
  * @param p_dashboard_id Primary key of `public.dashboards`.
  * @returns True when the row should be visible to `auth.uid()`.
@@ -566,6 +572,7 @@ begin
   )
   into v_has_share;
 
+  -- Restricted rows never inherit workspace app roles; require a share grant.
   if v_restricted then
     return coalesce(v_has_share, false);
   end if;
