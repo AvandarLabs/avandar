@@ -169,12 +169,6 @@
       "skillPath": "skills/requesting-code-review/SKILL.md",
       "computedHash": "874f3786b05007a8b4a60452a4cd89b9917c645d34b6b1e40ea05037d12f0e67"
     },
-    "skill-optimizer": {
-      "source": "mcollina/skills",
-      "sourceType": "github",
-      "skillPath": "skills/skill-optimizer/SKILL.md",
-      "computedHash": "17611b4b906ceabd9ae386350450e676d0692341d90af4468b00c0b7c9ed0a95"
-    },
     "snipgrapher": {
       "source": "mcollina/skills",
       "sourceType": "github",
