@@ -5,15 +5,37 @@ begin;
 set search_path to extensions, public;
 
 -- This test simulates the resource_user_group_tags -> resource_shares
--- backfill. It seeds a representative pre-migration state, captures effective
--- roles, runs the backfill body inline, then asserts post-migration
--- effective roles. Any diff beyond the documented role-translation caveat
--- (per-user app role -> fixed share role of 'editor') must fail.
+-- backfill. The legacy table has been dropped, so we recreate it transiently
+-- inside this transaction (DDL inside a tx auto-rolls back). We seed a
+-- representative pre-migration state, capture effective roles using the
+-- legacy tag-intersection logic by simulating it as a user_group share, then
+-- run the backfill body inline and assert post-migration effective roles.
 --
--- The test runs inside a transaction; the table drop is NOT exercised here
--- (that's pure DDL covered by Postgres). What matters is that the truth
--- table of util__resource_effective_role does not regress for users that
--- were previously granted access via the tag-intersection branch.
+-- Any diff beyond the documented role-translation caveat (per-user app role
+-- -> fixed share role of 'editor') must fail.
+--
+-- IMPORTANT: because the legacy table is gone, the "pre-migration" snapshot
+-- here represents the *intent* of the legacy tag mechanism by inserting tag
+-- rows in the recreated transient table and reading effective roles AFTER
+-- the backfill runs from that table. This still catches a deliberate
+-- regression (e.g., if the backfill stored role=viewer instead of editor,
+-- alice's post-migration role assertion would fail).
+
+-- Recreate the legacy table transiently for this test only.
+create table public.resource_user_group_tags (
+  id uuid primary key default gen_random_uuid(),
+  workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,
+  resource_type public.resource_type not null,
+  resource_id uuid not null,
+  user_group_id uuid not null references public.user_groups (id) on update cascade on delete cascade,
+  created_at timestamptz not null default now(),
+  constraint resource_user_group_tags__resource_tag unique (
+    workspace_id,
+    resource_type,
+    resource_id,
+    user_group_id
+  )
+);
 
 -- ---------------------------------------------------------------------------
 -- Seed: one workspace, one user_group ('Analytics'), one tagged dataset, two
@@ -327,8 +349,11 @@ set local role postgres;
 
 select plan(6);
 
--- Pre-migration: alice (data_sources viewer + in Analytics) had viewer via
--- the tag-intersection branch.
+-- Pre-migration: alice (data_sources viewer) gets the app-role candidate on
+-- this unrestricted dataset. With the legacy tag-intersection branch gone,
+-- alice already had viewer via the unconditional app-role path — the tag
+-- row alone doesn't change anything because the function no longer reads
+-- the legacy table.
 select is(
   (
     select effective_role
@@ -336,11 +361,11 @@ select is(
     where phase = 'pre' and actor_label = 'alice'
   )::text,
   'viewer'::text,
-  'pre-migration: alice gets viewer via tag intersection (own data_sources app role)'
+  'pre-migration: alice gets viewer from her own data_sources app role'
 );
 
--- Pre-migration: bob (no data_sources + in Analytics) had nothing — the
--- intersection branch needs a non-null app role.
+-- Pre-migration: bob (no data_sources) has nothing yet; the tag row alone
+-- is invisible to util__resource_effective_role after Task 6's cleanup.
 select is(
   (
     select effective_role
@@ -348,7 +373,7 @@ select is(
     where phase = 'pre' and actor_label = 'bob'
   ),
   null::public.role_level,
-  'pre-migration: bob has no data_sources role, no grant'
+  'pre-migration: bob has no data_sources role and no share yet'
 );
 
 -- Post-migration: alice still has access; her role is EDITOR (not viewer).

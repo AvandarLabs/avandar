@@ -834,48 +834,6 @@ export type Database = {
           },
         ]
       }
-      resource_user_group_tags: {
-        Row: {
-          created_at: string
-          id: string
-          resource_id: string
-          resource_type: Database["public"]["Enums"]["resource_type"]
-          user_group_id: string
-          workspace_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          resource_id: string
-          resource_type: Database["public"]["Enums"]["resource_type"]
-          user_group_id: string
-          workspace_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          resource_id?: string
-          resource_type?: Database["public"]["Enums"]["resource_type"]
-          user_group_id?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "resource_user_group_tags_user_group_id_fkey"
-            columns: ["user_group_id"]
-            isOneToOne: false
-            referencedRelation: "user_groups"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "resource_user_group_tags_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       role_group_app_roles: {
         Row: {
           app: Database["public"]["Enums"]["app_type"]

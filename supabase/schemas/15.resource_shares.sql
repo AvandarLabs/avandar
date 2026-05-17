@@ -1,8 +1,11 @@
 -- Grants a role on one resource (dashboard or dataset) to a principal (see
 -- share_principal_type): one user, one user_group tag, or the whole workspace.
 -- principal_id is null only for workspace-wide shares.
--- Merged with owner/settings shortcuts and tag-based app roles in
--- util__resource_effective_role using max rank.
+-- requires_app_access only applies when principal_type = 'user_group';
+-- when true, members of that group also need any role on the resource's app
+-- for the share to contribute (see util__resource_effective_role).
+-- Merged with owner/settings shortcuts and the workspace app-role candidate
+-- in util__resource_effective_role using max rank.
 create table public.resource_shares (
   id uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces (id) on update cascade on delete cascade,

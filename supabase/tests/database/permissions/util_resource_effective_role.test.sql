@@ -215,31 +215,9 @@ values
     false
   );
 
-insert into public.resource_user_group_tags (
-  workspace_id,
-  resource_type,
-  resource_id,
-  user_group_id
-)
-values
-  (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    'dashboard'::public.resource_type,
-    '90005004-0000-4000-8000-000000000004'::uuid,
-    '90004001-0000-4000-8000-000000000001'::uuid
-  ),
-  (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    'dashboard'::public.resource_type,
-    '90005005-0000-4000-8000-000000000005'::uuid,
-    '90004001-0000-4000-8000-000000000001'::uuid
-  ),
-  (
-    '90001001-0000-4000-8000-000000000001'::uuid,
-    'dashboard'::public.resource_type,
-    '90005006-0000-4000-8000-000000000006'::uuid,
-    '90004001-0000-4000-8000-000000000001'::uuid
-  );
+-- (Pre-cleanup: the legacy resource_user_group_tags table is gone. Cases that
+-- used to depend on tag intersection now use user_group shares with
+-- requires_app_access=true to encode the same gate. See cases 4 and 5 below.)
 
 insert into public.resource_shares (
   workspace_id,
@@ -298,9 +276,11 @@ values (
   '90000003-0000-4000-8000-000000000003'::uuid
 );
 
--- Six dashboards mirroring cases 12-17. The "no resource tags" requirement
--- for case 16 means we leave resource_user_group_tags empty for these rows
--- (so the existing tag-intersection branch defers to "no tag filter").
+-- Six dashboards mirroring cases 12-17. The legacy tag intersection branch
+-- has been removed; the workspace app-role candidate now applies
+-- unconditionally on unrestricted resources, gated only by workspace
+-- membership. The user_group share's requires_app_access flag is the
+-- per-share gate that survives.
 insert into public.dashboards (
   id,
   workspace_id,
@@ -332,9 +312,9 @@ values
     true
   ),
   -- 14: group share editor + requires_app_access=true, member dashboards
-  -- viewer. Unrestricted with no resource tags, so the gate is exercised:
-  -- the share survives because bob has *some* dashboards app role, and the
-  -- viewer app-role candidate participates in max alongside the editor share.
+  -- viewer. Unrestricted, so the gate is exercised: the share survives
+  -- because bob has *some* dashboards app role, and the viewer app-role
+  -- candidate participates in max alongside the editor share.
   (
     '90005014-0000-4000-8000-000000000014'::uuid,
     '90001001-0000-4000-8000-000000000001'::uuid,
@@ -356,9 +336,9 @@ values
     '{}'::jsonb,
     true
   ),
-  -- 16: same as 15 but UNRESTRICTED with no resource tags. The unrestricted
-  -- app-role candidate (admin) participates in max alongside the editor
-  -- share, so the answer is admin.
+  -- 16: same as 15 but UNRESTRICTED. The unrestricted app-role candidate
+  -- (admin) participates in max alongside the editor share, so the answer
+  -- is admin.
   (
     '90005016-0000-4000-8000-000000000016'::uuid,
     '90001001-0000-4000-8000-000000000001'::uuid,
@@ -607,7 +587,9 @@ select is(
   'app admin without tags'
 );
 
--- 4 Admin but tags without overlap
+-- 4 App-admin role applies unconditionally on a resource that used to be
+-- tagged (the tag mechanism is gone; only requires_app_access on user_group
+-- shares preserves the "gate on app role" capability).
 set local role postgres;
 
 delete from public.user_group_memberships
@@ -627,9 +609,9 @@ select is(
   public.util__resource_effective_role (
     'dashboard'::public.resource_type,
     '90005004-0000-4000-8000-000000000004'::uuid
-  ),
-  null::public.role_level,
-  'admin with tags but no overlap'
+  )::text,
+  'admin'::text,
+  'app-admin applies unconditionally without tag intersection'
 );
 
 set local role postgres;
@@ -709,7 +691,7 @@ select is(
     '90005005-0000-4000-8000-000000000005'::uuid
   )::text,
   'editor'::text,
-  'editor with tag overlap'
+  'editor app role applies without tag intersection'
 );
 
 -- 6 Viewer + restricted + overlap -> null (settings not admin)
@@ -781,7 +763,7 @@ select is(
     '90005006-0000-4000-8000-000000000006'::uuid
   ),
   null::public.role_level,
-  'restricted removes tag-based viewer grant'
+  'restricted resource suppresses workspace app-role candidate'
 );
 
 -- 7 Direct share on restricted
@@ -1240,8 +1222,8 @@ select is(
   'requires_app_access=true with admin app role on restricted yields share role'
 );
 
--- 16 Same as 15 but resource is unrestricted with no tags. Now the admin
--- app-role candidate participates in max alongside the editor share.
+-- 16 Same as 15 but resource is unrestricted. Now the admin app-role
+-- candidate participates in max alongside the editor share.
 select is(
   public.util__resource_effective_role (
     'dashboard'::public.resource_type,
@@ -1253,8 +1235,8 @@ select is(
 
 -- 17 (dataset variant) user_group editor share on a dataset,
 -- requires_app_access=true, bob is in Analytics but has NO data_sources app
--- role. Dataset is unrestricted with no resource tags, so the requires-gate
--- drops the share and the app-role candidate is also absent → null.
+-- role. Dataset is unrestricted; the requires-gate drops the share and the
+-- app-role candidate is also absent → null.
 set local role postgres;
 
 insert into public.role_groups (
