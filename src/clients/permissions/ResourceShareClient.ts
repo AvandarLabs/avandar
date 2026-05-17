@@ -27,6 +27,7 @@ export type ResourceShareRow = {
 
 export type ResourceSharingState = {
   isRestricted: boolean;
+  ownerId: string;
   shares: readonly ResourceShareRow[];
   resourceTagIds: readonly string[];
 };
@@ -86,7 +87,7 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
           ] = await Promise.all([
             dbClient
               .from(resourceTable)
-              .select("is_restricted")
+              .select("is_restricted, owner_id")
               .eq("id", options.resourceId)
               .eq("workspace_id", options.workspaceId)
               .single()
@@ -120,6 +121,7 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
 
           return {
             isRestricted: resourceRow.is_restricted,
+            ownerId: resourceRow.owner_id,
             shares: (shareRows ?? []).map(_mapResourceShareRow),
             resourceTagIds: (tagRows ?? []).map((row) => {
               return row.user_group_id;
