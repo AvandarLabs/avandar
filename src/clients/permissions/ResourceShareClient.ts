@@ -129,6 +129,8 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
 
         /**
          * Upserts one share row (user, user_group, or workspace principal).
+         * Throws if `requiresAppAccess` is true for any principal other than
+         * `user_group` (mirrors the SQL check constraint).
          */
         upsertResourceShare: async (options: {
           workspaceId: WorkspaceId;
