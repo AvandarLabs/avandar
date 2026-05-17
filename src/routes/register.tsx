@@ -20,13 +20,13 @@ import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
 import { AuthClient } from "@/clients/AuthClient";
-import { AuthLayout } from "@/components/common/AuthLayout";
-import { AuthFooter } from "@/components/common/AuthLayout/AuthFooter";
-import { BackToLoginLink } from "@/components/common/AuthLayout/BackToLoginLink";
+import { AuthLayout } from "@/components/layouts/AuthLayout";
+import { AuthFooter } from "@/components/layouts/AuthLayout/AuthFooter";
+import { BackToLoginLink } from "@/components/layouts/AuthLayout/BackToLoginLink";
 import { WAITLIST_URL } from "@/config/AppConfig";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useForm } from "@/lib/hooks/ui/useForm/useForm";
-import { AvaForm } from "@/lib/ui/AvaForm/AvaForm";
+import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,

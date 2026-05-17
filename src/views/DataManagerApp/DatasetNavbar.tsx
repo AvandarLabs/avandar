@@ -12,7 +12,7 @@ import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { NavLinkList } from "@/lib/ui/links/NavLinkList";
+import { NavLinkList } from "@ui";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type Props = {

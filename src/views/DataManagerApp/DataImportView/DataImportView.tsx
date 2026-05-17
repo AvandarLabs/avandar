@@ -1,12 +1,11 @@
 import { useQuery } from "@hooks";
 import { Container, Stack, Title } from "@mantine/core";
+import { Tabs, Paper  } from "@ui";
 import { where } from "@utils";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { Paper } from "@/lib/ui/Paper/Paper";
-import { Tabs } from "@/lib/ui/Tabs/Tabs";
 import { DatasetLimitReachedModal } from "@/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal";
 import { GoogleSheetsImportView } from "@/views/DataManagerApp/DataImportView/GoogleSheetsImportView/GoogleSheetsImportView";
 import { ManualUploadView } from "@/views/DataManagerApp/DataImportView/ManualUploadView/ManualUploadView";

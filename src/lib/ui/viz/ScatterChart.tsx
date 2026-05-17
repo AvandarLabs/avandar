@@ -1,19 +1,17 @@
 import { ScatterChart as MantineScatterChart } from "@mantine/charts";
 import { useMemo } from "react";
-import { useVizDataLimit } from "@/lib/ui/viz/useVizDataLimit";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { ScatterChartSeries } from "@mantine/charts";
 
 export function ScatterChart({
-  data: rawData,
+  data,
   xAxisKey,
   yAxisKey,
   height = 500,
 }: XYChartProps): JSX.Element {
-  const limitedData = useVizDataLimit("scatter", rawData);
   // data needs special formatting and typing coercion for scatter chart
   const scatterSeries: ScatterChartSeries[] = useMemo(() => {
-    const points = limitedData
+    const points = data
       .map((row) => {
         const rowObject = row as Record<string, unknown>;
         const xValue = Number(rowObject[xAxisKey]);
@@ -31,7 +29,7 @@ export function ScatterChart({
         data: points,
       },
     ];
-  }, [limitedData, xAxisKey, yAxisKey]);
+  }, [data, xAxisKey, yAxisKey]);
 
   return (
     <MantineScatterChart

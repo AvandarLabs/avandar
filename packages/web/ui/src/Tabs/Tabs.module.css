@@ -1,0 +1,36 @@
+/**
+ * Floating pill indicator for `indicatorVariant="floating"`.
+ * Mirrors Mantine FloatingIndicator + Tabs demo styling.
+ */
+
+.list {
+  margin-bottom: var(--mantine-spacing-md);
+  position: relative;
+}
+
+.indicator {
+  background-color: var(--ava-surface-raised);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  box-shadow: var(--mantine-shadow-xs);
+  /* Do not set `transition` here: it overrides Mantine's transform/width/height slide. */
+}
+
+.tab {
+  color: var(--mantine-color-neutral-6);
+  font-weight: 500;
+  transition: var(--ava-transition-colors);
+  z-index: 1;
+}
+
+.tab[data-active] {
+  color: var(--mantine-color-neutral-9);
+}
+
+:global([data-mantine-color-scheme="dark"]) .tab {
+  color: var(--mantine-color-neutral-3);
+}
+
+:global([data-mantine-color-scheme="dark"]) .tab[data-active] {
+  color: var(--mantine-color-neutral-0);
+}

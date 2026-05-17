@@ -3,7 +3,7 @@ import { IconPlus } from "@tabler/icons-react";
 import { Outlet, useNavigate } from "@tanstack/react-router";
 import { where } from "@utils";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { AppLayout } from "@/components/common/layouts/AppLayout/AppLayout";
+import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DatasetNavbar } from "@/views/DataManagerApp/DatasetNavbar";

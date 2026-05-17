@@ -14,7 +14,7 @@ import { notifications } from "@mantine/notifications";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AuthClient } from "@/clients/AuthClient";
 import { AppLinks } from "@/config/AppLinks";
-import { InputTextForm } from "@/lib/ui/singleton-forms/InputTextForm";
+import { InputTextForm } from "@ui";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug/profile")({
   component: ProfilePage,

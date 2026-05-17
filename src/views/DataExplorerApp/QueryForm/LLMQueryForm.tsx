@@ -11,7 +11,7 @@ import { where } from "@utils";
 import { useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { TextareaForm } from "@/lib/ui/singleton-forms/TextareaForm/TextareaForm";
+import { TextareaForm } from "@ui";
 import { mantineColorVar } from "@/lib/utils/browser/css";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useNLPQuery } from "@/views/DataExplorerApp/QueryForm/useNLPQuery";
