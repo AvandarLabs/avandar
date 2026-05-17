@@ -2,6 +2,17 @@ import { expect } from "@playwright/test";
 import { LONG_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
 
+/**
+ * Hard navigation so TanStack Query refetches roles after admin-side role
+ * changes.
+ */
+export async function reloadWorkspaceAppSession(
+  page: Page,
+  workspaceSlug: string,
+): Promise<void> {
+  await page.goto(`/${workspaceSlug}/`, { waitUntil: "load" });
+}
+
 export type WorkspaceAppRouteCase = {
   label: string;
   path: string;

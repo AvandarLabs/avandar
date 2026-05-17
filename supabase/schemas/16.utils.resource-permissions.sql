@@ -387,20 +387,6 @@ begin
     return true;
   end if;
 
-  if v_restricted then
-    return true;
-  end if;
-
-  v_app_role := public.util__get_auth_user_app_role (
-    v_ws,
-    'data_sources'::public.app_type
-  );
-  v_user_rank := coalesce(public.util__role_level_rank (v_app_role), 0);
-
-  if v_user_rank < v_editor_rank then
-    return true;
-  end if;
-
   select exists (
     select
       1
@@ -431,6 +417,21 @@ begin
       )
   )
   into v_has_share;
+
+  -- Restricted rows never inherit workspace app roles; require a share grant.
+  if v_restricted then
+    return coalesce(v_has_share, false);
+  end if;
+
+  v_app_role := public.util__get_auth_user_app_role (
+    v_ws,
+    'data_sources'::public.app_type
+  );
+  v_user_rank := coalesce(public.util__role_level_rank (v_app_role), 0);
+
+  if v_user_rank < v_editor_rank then
+    return true;
+  end if;
 
   if v_has_share then
     return true;
@@ -516,20 +517,6 @@ begin
     return true;
   end if;
 
-  if v_restricted then
-    return true;
-  end if;
-
-  v_app_role := public.util__get_auth_user_app_role (
-    v_ws,
-    'dashboards'::public.app_type
-  );
-  v_user_rank := coalesce(public.util__role_level_rank (v_app_role), 0);
-
-  if v_user_rank < v_editor_rank then
-    return true;
-  end if;
-
   select exists (
     select
       1
@@ -560,6 +547,20 @@ begin
       )
   )
   into v_has_share;
+
+  if v_restricted then
+    return coalesce(v_has_share, false);
+  end if;
+
+  v_app_role := public.util__get_auth_user_app_role (
+    v_ws,
+    'dashboards'::public.app_type
+  );
+  v_user_rank := coalesce(public.util__role_level_rank (v_app_role), 0);
+
+  if v_user_rank < v_editor_rank then
+    return true;
+  end if;
 
   if v_has_share then
     return true;

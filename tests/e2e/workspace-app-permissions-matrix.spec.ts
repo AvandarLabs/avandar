@@ -16,6 +16,7 @@ import { LONG_WAIT } from "./helpers/timeouts";
 import {
   expectWorkspaceAppAccessAllowed,
   expectWorkspaceAppAccessDenied,
+  reloadWorkspaceAppSession,
   WORKSPACE_APP_ROUTES,
 } from "./helpers/workspaceAppRouteExpectations";
 import type { WorkspaceAppRouteCase } from "./helpers/workspaceAppRouteExpectations";
@@ -60,6 +61,7 @@ test.describe("workspace app route permission matrix", () => {
       });
 
       try {
+        await reloadWorkspaceAppSession(page, e2eWorkerDb.workspaceSlug);
         await expectWorkspaceAppAccessDenied(page, {
           workspaceSlug: e2eWorkerDb.workspaceSlug,
           appPath: route.path,
@@ -87,6 +89,7 @@ test.describe("workspace app route permission matrix", () => {
       });
 
       try {
+        await reloadWorkspaceAppSession(page, e2eWorkerDb.workspaceSlug);
         await expectWorkspaceAppAccessAllowed(page, {
           workspaceSlug: e2eWorkerDb.workspaceSlug,
           appPath: route.path,
@@ -115,6 +118,7 @@ test.describe("workspace app route permission matrix", () => {
       });
 
       try {
+        await reloadWorkspaceAppSession(page, e2eWorkerDb.workspaceSlug);
         await expectWorkspaceAppAccessAllowed(page, {
           workspaceSlug: e2eWorkerDb.workspaceSlug,
           appPath: route.path,
@@ -143,6 +147,7 @@ test.describe("workspace app route permission matrix", () => {
       });
 
       try {
+        await reloadWorkspaceAppSession(page, e2eWorkerDb.workspaceSlug);
         await expectWorkspaceAppAccessAllowed(page, {
           workspaceSlug: e2eWorkerDb.workspaceSlug,
           appPath: route.path,
@@ -182,6 +187,7 @@ test.describe("workspace app route permission matrix", () => {
     });
 
     try {
+      await reloadWorkspaceAppSession(page, e2eWorkerDb.workspaceSlug);
       await expectWorkspaceAppAccessDenied(page, {
         workspaceSlug: e2eWorkerDb.workspaceSlug,
         appPath: WORKSPACE_APP_ROUTES.settings.path,
@@ -209,6 +215,7 @@ test.describe("workspace app route permission matrix", () => {
     });
 
     try {
+      await reloadWorkspaceAppSession(page, e2eWorkerDb.workspaceSlug);
       await expectWorkspaceAppAccessAllowed(page, {
         workspaceSlug: e2eWorkerDb.workspaceSlug,
         appPath: WORKSPACE_APP_ROUTES.settings.path,
@@ -300,11 +307,16 @@ test.describe("resource share bypasses missing app role (API)", () => {
       expect(blockedReadError ?? null).toBeNull();
       expect(blockedRows ?? []).toEqual([]);
 
+      await reloadWorkspaceAppSession(page, e2eWorkerDb.workspaceSlug);
       await expectWorkspaceAppAccessDenied(page, {
         workspaceSlug: e2eWorkerDb.workspaceSlug,
         appPath: WORKSPACE_APP_ROUTES.dataSources.path,
       });
     } finally {
+      await admin
+        .from("resource_shares")
+        .delete()
+        .eq("resource_id", dataset.id);
       await admin.from("datasets").delete().eq("id", dataset.id);
       await admin.from("datasets").delete().eq("id", otherDataset.id);
       await restoreE2ESecondaryMemberRoleGroup({
