@@ -28,6 +28,17 @@ type BuildShareSummaryOptions = {
 };
 
 /**
+ * Type guard that narrows a `ResourceShareRow` to one whose `principalId`
+ * is a non-null string. Use this in `.filter(hasPrincipalId)` so callers
+ * can read `share.principalId` as `string` without a cast.
+ */
+export function hasPrincipalId(
+  share: ResourceShareRow,
+): share is ResourceShareRow & { principalId: string } {
+  return share.principalId !== null;
+}
+
+/**
  * Pure builder: turns the modal's current state into a list of summary
  * spans that the `ShareSummaryLine` component renders as a human-readable
  * sentence with inline pills. No React, no side effects.
@@ -38,12 +49,16 @@ export function buildShareSummary(
   const resource = resourceTypeLabel(opts.resourceType);
   const app = appLabel(appForResource(opts.resourceType));
 
-  const userShares = opts.shares.filter((s) => {
-    return s.principalType === "user" && s.principalId;
-  });
-  const groupShares = opts.shares.filter((s) => {
-    return s.principalType === "user_group" && s.principalId;
-  });
+  const userShares = opts.shares
+    .filter(hasPrincipalId)
+    .filter((s) => {
+      return s.principalType === "user";
+    });
+  const groupShares = opts.shares
+    .filter(hasPrincipalId)
+    .filter((s) => {
+      return s.principalType === "user_group";
+    });
 
   const hasAnyShares = userShares.length + groupShares.length > 0;
   const hasWorkspaceShare = opts.workspaceShareRole !== null;
@@ -68,7 +83,7 @@ export function buildShareSummary(
   if (userShares.length > 0) {
     const userFrag: SummarySpan[] = [];
     userShares.forEach((s, i) => {
-      const name = opts.userById[s.principalId as string] ?? "Unknown user";
+      const name = opts.userById[s.principalId] ?? "Unknown user";
       if (i > 0) {
         userFrag.push({ kind: "text", text: ", " });
       }
@@ -78,8 +93,7 @@ export function buildShareSummary(
   }
 
   groupShares.forEach((s) => {
-    const groupName =
-      opts.groupById[s.principalId as string] ?? "Unknown group";
+    const groupName = opts.groupById[s.principalId] ?? "Unknown group";
     const frag: SummarySpan[] = [
       { kind: "text", text: "all members of " },
       { kind: "pill", label: groupName, variant: "group" },
