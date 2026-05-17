@@ -130,12 +130,15 @@ export const Theme = createTheme({
       defaultProps: {
         radius: "sm",
       },
-      styles: {
+      styles: (theme, props) => ({
         root: {
           transition: interactiveTransition,
           fontWeight: 500,
+          ...(props.variant === "default" && {
+            boxShadow: theme.shadows.xs,
+          }),
         },
-      },
+      }),
     }),
 
     ActionIcon: ActionIcon.extend({

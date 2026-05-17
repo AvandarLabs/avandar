@@ -37,7 +37,7 @@ export function ShareResourceButton({
       }
     >
       <Button
-        variant="outline"
+        variant="default"
         leftSection={<IconShare size={16} />}
         data-disabled={isDisabled || undefined}
         aria-disabled={isDisabled || undefined}
