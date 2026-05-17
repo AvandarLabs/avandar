@@ -1,23 +1,21 @@
-import {
-  createSupabaseAdminClient,
-  getWorkspaceIdBySlug,
-} from "../helpers/supabaseAdminClient";
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
   CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
   CALIFORNIA_CSV_PATH,
 } from "./helpers/constants";
-import {
-  createDashboardWithDataVizBlock,
-  type SeededVizConfig,
-} from "./helpers/createDashboardWithDataVizBlock";
+import { createDashboardWithDataVizBlock } from "./helpers/createDashboardWithDataVizBlock";
 import {
   ensureCloudStorageCheckedAndSaveDataset,
   parseDatasetIdFromDataManagerUrl,
   pollUntilCloudDatasetToggleShowsOnline,
 } from "./helpers/manualUploadCloudSyncFlow";
+import {
+  createSupabaseAdminClient,
+  getWorkspaceIdBySlug,
+} from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
+import type { SeededVizConfig } from "./helpers/createDashboardWithDataVizBlock";
 
 /**
  * Per-viz-type seeds used to verify every visualization renders inside the
@@ -233,9 +231,7 @@ test.describe("DataViz PBlock — every visualization", () => {
           vizConfig: vizCase.vizConfig,
         });
 
-        await page.goto(
-          `/${workspaceSlug}/dashboards/edit/${dashboardId}`,
-        );
+        await page.goto(`/${workspaceSlug}/dashboards/edit/${dashboardId}`);
 
         // Puck v0.21 renders the editor canvas inside an iframe by default.
         // The DataViz block is rendered inside the canvas iframe, so query
