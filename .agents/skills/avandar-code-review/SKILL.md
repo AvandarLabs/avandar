@@ -3,15 +3,15 @@ name: avandar-code-review
 description: Use when reviewing Avandar code changes, pull requests, or local diffs for repo-specific TypeScript, SQL, naming, documentation, and immutability conventions.
 metadata:
   author: jpsyx
-  version: "1.4.0"
+  version: "1.7.0"
   tags: avandar, code-review, typescript, sql, conventions, style
 ---
 
 # Avandar Code Review
 
 Use this skill when reviewing Avandar code for convention violations. Apply the
-general section to every review, then only apply the TypeScript and SQL
-sections when those languages are present in the diff.
+general section to every review, then only apply the language-specific
+checklists when those languages are present in the diff.
 
 ## Additional Checklist File
 
@@ -34,63 +34,100 @@ The actual repo-local checklist used during reviews lives at
 - When creating the repo-local file for the first time, use the packaged
   template from this skill as the starting structure.
 
+## Asking The User
+
+When this skill says "prompt with options", use the host agent's interactive
+menu tool if one is available, otherwise fall back to a plain-text question.
+Never error out because a menu tool is missing — just ask in chat.
+
+- Claude Code: call `AskUserQuestion` with the listed options.
+- Codex CLI or any other host without an interactive menu tool: write the
+  options as a numbered list in chat and wait for the user's reply.
+- If you are unsure whether a menu tool exists in the current host, default to
+  the plain-text fallback rather than guessing.
+
 ## Review Modes
 
-Before doing any review work, explicitly ask which review mode the user wants
-to use unless they already specified one in the prompt. Do not default
-silently.
+If the mode is not specified in the prompt, prompt with options before any
+review work:
+
+- Question: "Which review mode?"
+- Header (Claude Code only): "Review mode"
+- Options:
+  - `Report` — write a paste-ready review, no edits
+  - `Auto` — fix violations as you find them
+  - `Pair Review` — discuss each finding before editing
+
+Do not default silently.
 
 ### Report Mode
 
-Use this when the goal is a copy-pasteable review for GitHub, Slack, or another
-discussion surface.
+Goal: a copy-pasteable review for GitHub, Slack, or another discussion surface.
 
 - Do not modify code.
-- Review the diff, collect findings, and report them in a clean written review.
-- Keep the output ready to paste externally: concise, concrete, and organized
-  by severity with file and line references.
+- Collect findings; report them ordered by severity with file and line refs.
+- Keep output concise, concrete, and ready to paste externally.
 
 ### Auto Mode
 
-Use this when the agent should act as reviewer and fixer.
+Goal: agent acts as reviewer and fixer.
 
-- As soon as you find a rule violation, fix it yourself when the correct change
-  is clear and local.
-- Only fix issues inside the requested review scope. Do not do opportunistic
-  cleanup, unrelated refactors, or out-of-scope improvements.
-- Continue reviewing after each fix until you exhaust the checklist.
-- Run the relevant validation for the changes you made, especially typecheck,
-  lint, and targeted tests, and report anything you could not verify.
-- At the end, summarize what you changed and call out any remaining findings
-  that were ambiguous, risky, or outside the requested scope.
+- Fix rule violations as you find them when the change is clear and local.
+- Stay inside the requested review scope. No opportunistic cleanup or
+  unrelated refactors.
+- Continue reviewing after each fix until the checklist is exhausted.
+- Run relevant validation (typecheck, lint, targeted tests). Report anything
+  you could not verify.
+- End with a summary of fixes plus any ambiguous, risky, or out-of-scope
+  findings.
 
 ### Pair Review Mode
 
-Use this when the user wants to review interactively and approve each change
-direction before edits happen.
+Goal: interactive review, user approves direction before edits.
 
+- Announce the current review phase before presenting its findings.
 - Review iteratively, one finding at a time.
-- For each finding, explain the issue, recommend a fix, and ask the user
-  whether to apply that fix or do something else.
-- Do not edit code for a finding until the user approves the direction.
-- Keep the discussion inside the requested review scope rather than expanding
-  into unrelated cleanup.
+- For each finding: explain the issue, recommend a fix, then prompt with
+  options (see "Asking The User"):
+  - Question: "Apply the recommended fix?"
+  - Header (Claude Code only): "Apply fix?"
+  - Options:
+    - `Yes` — apply the recommended fix
+    - `No` — skip this finding and move on
+    - `Let's chat about this` — wait for the user's next message before
+      proceeding. Omit this option when the host provides an interactive
+      menu tool with a built-in free-text input (for example, Claude Code's
+      `AskUserQuestion`, which already exposes a "Type something" field).
+- Do not edit code for a finding until the user picks `Yes`.
+- If the user types a free-text reply instead of picking an option (either
+  via the host's built-in text input or via `Let's chat about this` when
+  that option is offered), stop and wait for input. Do not move on to the
+  next finding until the discussion resolves.
+- Stay inside the requested review scope.
 - After resolving one finding, continue to the next until the review is done.
 
 ## Review Order
 
-1. If the mode was not specified, ask the user at the very start whether they
-   want report mode, auto mode, or pair review mode.
-2. Start with the common mistakes checklist below.
-3. Apply the general checklist.
-4. Apply the TypeScript checklist when the diff includes TS or TSX.
-5. Apply the SQL checklist when the diff includes SQL.
-6. If `docs/code-reviews/extra-checklist.md` exists, review the diff against
-   those additional mistakes too.
-7. Follow the active review mode for how to handle each finding.
-8. At the end of the review, run only the exact tests that are relevant to the
+1. If the mode was not specified, prompt for it at the very start (see
+   "Review Modes" for the interactive menu spec).
+2. Review the common mistakes checklist below first.
+3. Review the general checks in this file second.
+4. Review the language-specific checklists next by referencing the supporting
+   files in `skills/avandar-code-review/docs/code-reviews/`:
+   `typescript-checklist.md` for TS or TSX diffs and `sql-checklist.md` for
+   SQL diffs.
+5. If `docs/code-reviews/extra-checklist.md` exists, review the diff against
+   those additional repo-local mistakes after finishing the built-in
+   checklists.
+6. Follow the active review mode for how to handle each finding.
+7. At the end of the review, run only the exact tests that are relevant to the
    code changes.
-9. Report only concrete findings that are visible in the code under review.
+8. Report only concrete findings that are visible in the code under review.
+
+In pair review mode, announce the phase explicitly as you move through the
+review, for example: "Phase: common mistakes", "Phase: general checks",
+"Phase: TypeScript checklist", "Phase: SQL checklist", or
+"Phase: repo-local extra checklist".
 
 ## Testing At The End Of Review
 
@@ -120,6 +157,21 @@ After completing the review, run the narrowest relevant tests you can identify.
 - Prefer command shapes like `pnpm test:e2e spec-a.spec.ts` followed by
   `pnpm test:e2e spec-b.spec.ts` rather than batching many E2E specs together.
 
+### Reviewing E2E Test Code
+
+- When reviewing an E2E test itself, make sure the test does not bypass the
+  end-to-end path by calling the database directly for behavior that should be
+  exercised through the real product boundary.
+- Direct database insertions are allowed only for test setup and seed data that
+  must exist before the user flow starts, such as workspaces, users,
+  memberships, and similar prerequisites.
+- Do not use direct database writes for steps that are part of the user flow
+  under test when that flow could fail at the application boundary, including
+  auth, permissions, validation, and other request-handling behavior.
+- Treat direct database writes in the middle of an E2E flow as a review
+  finding, even when the test is not explicitly about permissions, because they
+  can hide incorrect allow or deny behavior that the real flow should surface.
+
 ## Most Common Mistakes
 
 Check these first because they are the most frequent review findings:
@@ -127,6 +179,8 @@ Check these first because they are the most frequent review findings:
 - Functional style: avoid `for` and `while` loops. Prefer functional and
   declarative collection utilities such as `map`, `filter`, `reduce`, and
   `forEach`.
+  - Exceptions: 1) char-by-char for loops on strings; 2) loops that implement
+    exit-early break logic to improve performance
 - Readonly wrappers: do not use per-property `readonly` keys when the real
   contract is "this input object is readonly". Prefer wrapping the function
   parameter in `Readonly<...>` or `readonly T[]`.
@@ -184,72 +238,12 @@ Check these first because they are the most frequent review findings:
 - For UI code: use `clsx` for conditional classes.
 - For UI code: never introduce TailwindCSS.
 
-## TypeScript Checks
+## Language-Specific Checklists
 
-- In Deno-reachable code, imports must include file extensions. This especially
-  applies to `supabase/functions/`, `shared/`, and `packages/shared/`.
-- Use JSDoc for public classes and methods.
-- Prefer functional and declarative programming.
-- Avoid classes and imperative patterns unless a real constraint requires them.
-- Prefer higher-order functions over manual loops.
-- Use named exports instead of default exports.
-- Keep comment and docstring lines at 80 characters or fewer.
-- If a docstring fits on one line within 80 characters, keep it single-line.
-- Never use single-line `if` statements: always keep braces.
-- Prefer string interpolation over string concatenation.
-- Use PascalCase for React components, classes, singleton instances, and module
-  objects.
-- Use camelCase for variables, functions, and methods.
-- Use UPPERCASE for environment variables and hard-coded constants.
-- Event handlers should be named `on...`, not `handle...`.
-- Non-exported top-level helper functions should be prefixed with `_`.
-- React component prop types should always be named `Props`.
-- Preserve `e2e` or `E2E` casing exactly; do not invent mixed variants.
-- Never use `any`.
-- Use `as const` for literals that never change.
-- Prefer `type` over `interface`, except for class-style OOP interfaces.
-- Prefer `undefined` over `null` unless an API or framework requires `null`.
-- Prefer string literal unions over enums.
-- Reuse composite types when they are genuinely shared.
-- Avoid extracting one-off type aliases unless the type is reused. `Props` is
-  the explicit exception.
-- If an object shape has 4 or more properties, extract it to a named type for
-  readability.
-- Add explicit types at module boundaries, top-level declarations, and function
-  parameters. Avoid unnecessary annotations for local variables and inline
-  callbacks.
-- Prefer default parameter values over nullish guard logic.
-- Use RO-RO for multiple parameters and multiple return values.
-- If a function takes only one parameter, do not wrap it in an object.
-- When using an object parameter, prefer the name `options` unless `params` or
-  `config` is more accurate.
-- Keep small object parameter types inline. Only extract them when reused.
-- Top-level functions should use the `function` keyword.
-- Nested functions and object methods should use arrow functions.
-- Type imports and type exports should always use the `type` keyword.
-- If a module grows beyond one file, prefer a directory module layout instead
-  of cramming everything into a single file.
-- Do not add barrel files, except approved `index.ts` files in `packages/`.
-- Do not use namespace exports such as `export * from`.
-- All exported classes, objects, and functions need docstrings.
-- If an exported object defines top-level methods inline, those methods need
-  docstrings too.
-- Follow input contravariance and output covariance: readonly at module
-  boundaries for inputs, mutable outputs for callers.
-- Apply readonly wrappers to function parameters, not to local variables,
-  internal helpers, or return types.
-- Prefer mutable local variables and intermediate values.
-- If a function intentionally mutates its input, the name should make the
-  mutation obvious, and returning `void` is usually the clearest contract.
+Use these supporting files when the corresponding language appears in the diff:
 
-## SQL Checks
-
-- Use `snake_case` consistently.
-- Table names should be plural.
-- SQL function names should be namespace-prefixed.
-- Use `util__*` for shared utility functions.
-- Use `table_name__*` for table-specific functions.
-- Trigger names should follow `tr__table_name__*`.
+- TypeScript or TSX: `skills/avandar-code-review/docs/code-reviews/typescript-checklist.md`
+- SQL: `skills/avandar-code-review/docs/code-reviews/sql-checklist.md`
 
 ## Review Output
 

@@ -56,8 +56,10 @@ export function LLMQueryForm(): JSX.Element {
           isSubmitting={isRunningQuery}
           submitButtonLabel="Run Query"
           onSubmit={(value) => {
+            const trimmedPrompt = value.trim();
+            dispatch.setNLPrompt(trimmedPrompt);
             generateAndRunQuery({
-              prompt: value.trim(),
+              prompt: trimmedPrompt,
             });
           }}
         />
