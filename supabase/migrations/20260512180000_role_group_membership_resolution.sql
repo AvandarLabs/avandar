@@ -1,5 +1,15 @@
 -- Resolve per-app roles from workspace_memberships.role_group_id +
 -- role_group_app_roles; drop materialized user_app_roles.
+
+-- The pre-existing `tr_workspace_memberships__set_updated_at` trigger (from
+-- init_db) calls `util__set_updated_at`, which assigns NEW.updated_at. The
+-- column was never added on workspace_memberships, so any UPDATE on the
+-- table fails. Add the column up front (mirrors
+-- 20260512190000_workspace_memberships_updated_at.sql, which remains
+-- idempotent via `if not exists` and re-backfills updated_at = created_at).
+alter table public.workspace_memberships
+add column if not exists updated_at timestamptz not null default now();
+
 create or replace function public.util__seed_builtin_role_groups_for_workspace (
   p_workspace_id uuid
 ) returns void language plpgsql security definer
