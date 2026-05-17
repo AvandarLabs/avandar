@@ -8,12 +8,25 @@ export async function insertE2ERestrictedDataset(options: {
   workspaceId: string;
   name: string;
 }): Promise<{ id: string; name: string }> {
+  const { data: workspaceRow, error: workspaceError } =
+    await options.supabaseAdminClient
+      .from("workspaces")
+      .select("owner_id")
+      .eq("id", options.workspaceId)
+      .single();
+
+  if (workspaceError || !workspaceRow?.owner_id) {
+    throw new Error(
+      `[e2e] workspace owner missing: ${workspaceError?.message ?? ""}`,
+    );
+  }
+
   const { data: ownerProfile, error: profileError } =
     await options.supabaseAdminClient
       .from("user_profiles")
       .select("id, user_id")
       .eq("workspace_id", options.workspaceId)
-      .limit(1)
+      .eq("user_id", workspaceRow.owner_id)
       .single();
 
   if (profileError || !ownerProfile) {

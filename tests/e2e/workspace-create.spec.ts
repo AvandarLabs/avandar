@@ -24,10 +24,7 @@ async function _assertSlugResponseOk(response: Response): Promise<void> {
   }
 
   throw new Error(
-    `workspaces/validate-slug request failed: 
-  HTTP ${response.status} ${response.statusText}.
-  Response body:
-  ${bodySnippet}`,
+    `workspaces/validate-slug request failed: HTTP ${response.status()} ${response.statusText()}. Response body: ${bodySnippet}`,
   );
 }
 
