@@ -61,8 +61,7 @@ test.describe("Share resource modal", () => {
       page.getByText(/Cannot read properties of undefined/i),
     ).not.toBeVisible();
 
-    // v2 (SHARE_MODAL_V2): no "Workspace access" heading anymore — the new
-    // anchor is the unified Add combobox and the "General access" select.
+    // Anchor on the unified Add combobox and the "General access" select.
     await expect(
       page.getByRole("combobox", { name: "Add people, groups, or tags" }),
     ).toBeVisible({ timeout: LONG_WAIT });

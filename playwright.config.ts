@@ -35,12 +35,8 @@ export default defineConfig({
     ...devices["Desktop Chrome"],
   },
   webServer: {
-    // `VITE_FEATURE_SHARE_MODAL_V2=true` propagates through `dotenv` into
-    // Vite's `import.meta.env` so the new Drive-style share modal renders
-    // for every e2e run. Strip this once Task 7 retires the v1 modal.
     command:
-      "VITE_FEATURE_SHARE_MODAL_V2=true pnpm exec dotenv -e " +
-      ".env.development -- vite --host 127.0.0.1 --port 5173",
+      "pnpm exec dotenv -e .env.development -- vite --host 127.0.0.1 --port 5173",
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
