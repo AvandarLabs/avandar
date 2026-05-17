@@ -2,6 +2,7 @@ import { Card, Group, Stack, Text, ThemeIcon } from "@mantine/core";
 import { IconLayoutDashboard } from "@tabler/icons-react";
 import { useState } from "react";
 import { mantineColorVar } from "@/lib/utils/browser/css";
+import { formatDashboardDate } from "@/views/DashboardApp/DashboardListView/formatDashboardDate";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 type Props = {
@@ -61,22 +62,9 @@ export function DashboardCard({ dashboard, onClick }: Props): JSX.Element {
         </Group>
 
         <Text c="dimmed" size="xs">
-          Updated {_formatDashboardDate(dashboard.updatedAt)}
+          Updated {formatDashboardDate(dashboard.updatedAt)}
         </Text>
       </Stack>
     </Card>
   );
-}
-
-function _formatDashboardDate(dateString: string): string {
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) {
-    return "recently";
-  }
-
-  return new Intl.DateTimeFormat(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date);
 }

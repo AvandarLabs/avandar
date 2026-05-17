@@ -22,6 +22,14 @@ export type DataExplorerAppState = {
    * the structured query.
    */
   rawSQL: string | undefined;
+
+  /**
+   * The natural-language prompt that produced the current `rawSQL`, if any.
+   * Persisted in state so downstream actions (e.g. saving to a dashboard as
+   * a DataViz block) can carry the prompt alongside the generated SQL.
+   */
+  nlPrompt: string | undefined;
+
   vizConfig: VizConfig;
 
   /** The currently open saved dataset, or `undefined` if none is open. */
@@ -34,5 +42,6 @@ export const INITIAL_DATA_EXPLORER_STATE: DataExplorerAppState = {
     vizType: "table",
   },
   rawSQL: undefined,
+  nlPrompt: undefined,
   openDataset: undefined,
 };

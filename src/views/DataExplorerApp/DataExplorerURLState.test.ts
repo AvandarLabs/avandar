@@ -46,6 +46,7 @@ function _makeState(overrides: {
     query: StructuredQuery.makeEmpty(),
     vizConfig: { vizType: "table" },
     rawSQL: undefined,
+    nlPrompt: undefined,
     openDataset: undefined,
     ...overrides,
   };

@@ -130,11 +130,16 @@ export const Theme = createTheme({
       defaultProps: {
         radius: "sm",
       },
-      styles: {
-        root: {
-          transition: interactiveTransition,
-          fontWeight: 500,
-        },
+      styles: (theme, props) => {
+        return {
+          root: {
+            transition: interactiveTransition,
+            fontWeight: 500,
+            ...(props.variant === "default" && {
+              boxShadow: theme.shadows.xs,
+            }),
+          },
+        };
       },
     }),
 
