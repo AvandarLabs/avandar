@@ -7,6 +7,8 @@ import {
 } from "@mantine/spotlight";
 import { IconSearch } from "@tabler/icons-react";
 import { Outlet } from "@tanstack/react-router";
+import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/common/layouts/AppLayout/AppLayout";
+import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
 import css from "@/lib/ui/AppShell/AppShell.module.css";
 import { AppShellStateManager } from "@/lib/ui/AppShell/AppShellStateManager";
@@ -15,9 +17,23 @@ import { Navbar } from "@/lib/ui/AppShell/Navbar/Navbar";
 import type { AppLink } from "@/config/AppLinks";
 import type { NavbarLink } from "@/config/NavbarLinks";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
+
+// `-webkit-app-region: drag` is what Electrobun's preload detects on
+// mousedown to send `startWindowMove` to native. We render a real <div>
+// filling the (otherwise empty) Mantine header rather than passing the
+// style to <AppShell.Header style={…}> directly, because Mantine doesn't
+// reliably forward `style` as an inline `style="…"` attribute — and
+// Electrobun's detector specifically looks for the substring in the inline
+// attribute (`[style*="app-region"][style*="drag"]`).
+const DRAG_REGION_FILL_STYLE: CSSProperties = {
+  position: "absolute",
+  inset: 0,
+  WebkitAppRegion: "drag",
+} as CSSProperties;
 
 const HEADER_MOBILE_DEFAULT_HEIGHT = 42;
+
 const NAVBAR_DEFAULT_WIDTH = 220;
 
 type Props = {
@@ -56,14 +72,19 @@ function AppShellComponent({
   const { isDesktopNavbarCollapsed } = AppShellStateManager.useState();
   const [isMobileNavbarOpened, toggleMobileNavbar] = useToggleBoolean(false);
   const isMobileViewSize = useIsMobileSize() ?? false;
+  const platformType = usePlatformInfo();
+  const isDesktopPlatform = platformType === "desktop";
+
+  const headerHeight =
+    isMobileViewSize ? HEADER_MOBILE_DEFAULT_HEIGHT
+    : isDesktopPlatform ? HEADER_DESKTOP_TITLEBAR_HEIGHT
+    : 0;
 
   return (
     <>
       <MantineAppShell
         layout="default"
-        header={{
-          height: isMobileViewSize ? HEADER_MOBILE_DEFAULT_HEIGHT : 0,
-        }}
+        header={{ height: headerHeight }}
         classNames={{ navbar: css.navbar, root: css.root, main: css.main }}
         navbar={{
           width: NAVBAR_DEFAULT_WIDTH,
@@ -76,6 +97,13 @@ function AppShellComponent({
         padding="md"
       >
         <MantineAppShell.Header bg="neutral" withBorder={false}>
+          {isDesktopPlatform && !isMobileViewSize ?
+            <div
+              aria-hidden
+              className="electrobun-webkit-app-region-drag"
+              style={DRAG_REGION_FILL_STYLE}
+            />
+          : null}
           {isMobileViewSize ?
             <MobileHeader
               isMobileNavbarOpened={isMobileNavbarOpened}

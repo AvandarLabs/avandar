@@ -16,6 +16,10 @@ describe("isDesktop", () => {
     if (w !== undefined) {
       delete w.__AVA_PLATFORM__;
     }
+    const doc = (globalThis as { document?: Document }).document;
+    if (doc !== undefined) {
+      delete doc.documentElement.dataset.avaPlatform;
+    }
   });
 
   it("returns false when window has no platform marker", () => {
@@ -28,6 +32,15 @@ describe("isDesktop", () => {
       throw new Error("jsdom did not provide a window global for this test");
     }
     w.__AVA_PLATFORM__ = "desktop";
+    expect(isDesktop()).toBe(true);
+  });
+
+  it("returns true when only <html data-ava-platform='desktop'> is set", () => {
+    const doc = (globalThis as { document?: Document }).document;
+    if (doc === undefined) {
+      throw new Error("jsdom did not provide a document for this test");
+    }
+    doc.documentElement.dataset.avaPlatform = "desktop";
     expect(isDesktop()).toBe(true);
   });
 

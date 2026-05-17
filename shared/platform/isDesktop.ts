@@ -3,21 +3,39 @@
  * `false` for any browser-only context (including SSR/Node where `window`
  * is undefined).
  *
- * The desktop preload script sets `window.__AVA_PLATFORM__ = "desktop"` before
- * any page script runs (see `apps/desktop/preload/index.ts`). This helper is
- * the single source of truth platform-aware code branches on; never read the
- * `__AVA_PLATFORM__` global directly.
+ * Two independent signals are checked, either of which is sufficient:
  *
- * Reads the marker via `globalThis.window` rather than the bare `window`
- * global so the function type-checks cleanly without the `DOM` lib in the
- * ambient compilation. The runtime semantics are identical.
+ * 1. `window.__AVA_PLATFORM__ === "desktop"`: set by the app's preload
+ *    (`apps/desktop/preload/index.ts`) before any page script runs. In
+ *    practice Electrobun injects user preloads into a webkit isolated
+ *    content world, so this signal isn't visible to React-running-in-page
+ *    code; it's kept for any worker/preload-scoped callers that *do* see it.
+ * 2. `document.documentElement.dataset.avaPlatform === "desktop"`: set in
+ *    the page main world by the bun-side `dom-ready` handler in
+ *    `apps/desktop/main/index.ts` via `webview.executeJavascript(...)`.
+ *    This is the signal page-side React actually reads. Note that it's set
+ *    *after* the page's `dom-ready` fires, so callers invoked very early in
+ *    the page lifecycle may not see it yet — UI that depends on this should
+ *    observe the attribute (e.g. `MutationObserver`) to re-render.
  *
- * @returns `true` only when `window.__AVA_PLATFORM__ === "desktop"`.
+ * Reads via `globalThis` so the function type-checks cleanly without the
+ * `DOM` lib in the ambient compilation.
+ *
+ * @returns `true` when running inside the Electrobun desktop shell.
  */
 export function isDesktop(): boolean {
   const g = globalThis as {
     window?: { __AVA_PLATFORM__?: string };
+    document?: {
+      documentElement?: { dataset?: { avaPlatform?: string } };
+    };
   };
-  if (g.window === undefined) return false;
-  return g.window.__AVA_PLATFORM__ === "desktop";
+
+  if (g.window === undefined) {
+    return false;
+  }
+  if (g.window.__AVA_PLATFORM__ === "desktop") {
+    return true;
+  }
+  return g.document?.documentElement?.dataset?.avaPlatform === "desktop";
 }
