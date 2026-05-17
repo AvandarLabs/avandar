@@ -60,7 +60,7 @@ Full user journey tests through the browser.
 
 ```typescript
 // tests/e2e/checkout.spec.ts
-import { expect, test } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 
 test.describe("Checkout Flow", () => {
   test.beforeEach(async ({ page }) => {
@@ -133,7 +133,7 @@ test("displays mocked users", async ({ page }) => {
     route.fulfill({
       status: 200,
       json: [{ id: 1, name: "Test User" }],
-    }),
+    })
   );
 
   await page.goto("/users");
@@ -146,7 +146,7 @@ test("handles API errors", async ({ page }) => {
     route.fulfill({
       status: 500,
       json: { error: "Server error" },
-    }),
+    })
   );
 
   await page.goto("/users");
@@ -170,7 +170,7 @@ test("handles slow API", async ({ page }) => {
     route.fulfill({
       json: { data: "test" },
       delay: 2000, // 2 second delay
-    }),
+    })
   );
 
   await page.goto("/dashboard");
@@ -189,7 +189,7 @@ Compare screenshots to detect visual changes.
 
 ```typescript
 // tests/visual/homepage.spec.ts
-import { expect, test } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 
 test("homepage visual", async ({ page }) => {
   await page.goto("/");

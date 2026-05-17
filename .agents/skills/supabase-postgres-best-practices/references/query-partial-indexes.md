@@ -16,13 +16,7 @@ Partial indexes only include rows matching a WHERE condition, making them smalle
 create index users_email_idx on users (email);
 
 -- Query always filters active users
-select
-  *
-from
-  users
-where
-  email = 'user@example.com'
-  and deleted_at is null;
+select * from users where email = 'user@example.com' and deleted_at is null;
 ```
 
 **Correct (partial index matches query filter):**
@@ -30,17 +24,10 @@ where
 ```sql
 -- Index only includes active users
 create index users_active_email_idx on users (email)
-where
-  deleted_at is null;
+where deleted_at is null;
 
 -- Query uses the smaller, faster index
-select
-  *
-from
-  users
-where
-  email = 'user@example.com'
-  and deleted_at is null;
+select * from users where email = 'user@example.com' and deleted_at is null;
 ```
 
 Common use cases for partial indexes:
@@ -48,13 +35,11 @@ Common use cases for partial indexes:
 ```sql
 -- Only pending orders (status rarely changes once completed)
 create index orders_pending_idx on orders (created_at)
-where
-  status = 'pending';
+where status = 'pending';
 
 -- Only non-null values
 create index products_sku_idx on products (sku)
-where
-  sku is not null;
+where sku is not null;
 ```
 
 Reference: [Partial Indexes](https://www.postgresql.org/docs/current/indexes-partial.html)

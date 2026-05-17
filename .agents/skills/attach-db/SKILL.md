@@ -99,20 +99,16 @@ If **neither exists**, ask the user:
 Based on their choice:
 
 **Option 1:**
-
 ```bash
 STATE_DIR=".duckdb-skills"
 mkdir -p "$STATE_DIR"
 ```
-
-Then ask: _"Would you like to gitignore `.duckdb-skills/`?"_ If yes:
-
+Then ask: *"Would you like to gitignore `.duckdb-skills/`?"* If yes:
 ```bash
 echo '.duckdb-skills/' >> .gitignore
 ```
 
 **Option 2:**
-
 ```bash
 PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo "$PWD")"
 PROJECT_ID="$(echo "$PROJECT_ROOT" | tr '/' '-')"

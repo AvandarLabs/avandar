@@ -49,12 +49,16 @@ type Test3 = IsNullable<undefined>; // false (null !== undefined)
 
 ```typescript
 // Return different types based on input
-type TypeName<T> =
-  T extends string ? "string"
-  : T extends number ? "number"
-  : T extends boolean ? "boolean"
-  : T extends undefined ? "undefined"
-  : T extends Function ? "function"
+type TypeName<T> = T extends string
+  ? "string"
+  : T extends number
+  ? "number"
+  : T extends boolean
+  ? "boolean"
+  : T extends undefined
+  ? "undefined"
+  : T extends Function
+  ? "function"
   : "object";
 
 type T1 = TypeName<string>; // "string"
@@ -100,28 +104,25 @@ type TupleToSearchParams<T extends string[]> = {
 };
 
 // Only convert if search is defined and is a string array
-type SearchParams<
-  TConfig extends BaseRouterConfig,
-  TRoute extends keyof TConfig,
-> =
-  TConfig[TRoute]["search"] extends string[] ?
-    TupleToSearchParams<TConfig[TRoute]["search"]>
-  : undefined;
+type SearchParams<TConfig extends BaseRouterConfig, TRoute extends keyof TConfig> =
+  TConfig[TRoute]["search"] extends string[]
+    ? TupleToSearchParams<TConfig[TRoute]["search"]>
+    : undefined;
 ```
 
 ## Using Conditionals in Function Arguments
 
 ```typescript
 const makeRouter = <TConfig extends Record<string, { search?: string[] }>>(
-  config: TConfig,
+  config: TConfig
 ) => {
   return {
     goTo: <TRoute extends keyof TConfig>(
       route: TRoute,
       // Only allow search params if route has search defined
-      search?: TConfig[TRoute]["search"] extends string[] ?
-        { [K in TConfig[TRoute]["search"][number]]?: string }
-      : never,
+      search?: TConfig[TRoute]["search"] extends string[]
+        ? { [K in TConfig[TRoute]["search"][number]]?: string }
+        : never
     ) => {
       // Implementation
     },
@@ -159,9 +160,10 @@ type Exclude<T, U> = T extends U ? never : T;
 ## Nested Conditionals
 
 ```typescript
-type DeepReadonly<T> =
-  T extends Function ? T
-  : T extends object ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
+type DeepReadonly<T> = T extends Function
+  ? T
+  : T extends object
+  ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
   : T;
 
 interface User {
@@ -182,9 +184,10 @@ type ReadonlyUser = DeepReadonly<User>;
 
 ```typescript
 // Check if array type is empty
-type IsEmptyArray<T extends any[]> =
-  T extends [] ? true
-  : T extends [any, ...any[]] ? false
+type IsEmptyArray<T extends any[]> = T extends []
+  ? true
+  : T extends [any, ...any[]]
+  ? false
   : boolean; // Unknown length arrays
 
 type Test1 = IsEmptyArray<[]>; // true
@@ -196,8 +199,9 @@ type Test3 = IsEmptyArray<string[]>; // boolean (unknown at compile time)
 
 ```typescript
 // Ensure array has at least one element
-type NonEmptyArray<T extends any[]> =
-  T extends [infer First, ...infer Rest] ? [First, ...Rest] : never;
+type NonEmptyArray<T extends any[]> = T extends [infer First, ...infer Rest]
+  ? [First, ...Rest]
+  : never;
 
 type Config = {
   fields: ["name", "email"]; // Non-empty
@@ -205,7 +209,9 @@ type Config = {
 
 // Use in conditional
 type HasFields<T extends { fields?: string[] }> =
-  T["fields"] extends [string, ...string[]] ? true : false;
+  T["fields"] extends [string, ...string[]]
+    ? true
+    : false;
 ```
 
 ## Common Patterns
@@ -231,8 +237,9 @@ type Test2 = UnwrapArray<number>; // number (passthrough)
 ### Make All Properties Nullable
 
 ```typescript
-type Nullable<T> =
-  T extends object ? { [K in keyof T]: T[K] | null } : T | null;
+type Nullable<T> = T extends object
+  ? { [K in keyof T]: T[K] | null }
+  : T | null;
 ```
 
 ## When to Use Conditional Types
@@ -262,9 +269,10 @@ Sometimes union types or overloads are simpler:
 
 ```typescript
 // Over-complicated
-type ProcessResult<T> =
-  T extends string ? { type: "string"; value: string }
-  : T extends number ? { type: "number"; value: number }
+type ProcessResult<T> = T extends string
+  ? { type: "string"; value: string }
+  : T extends number
+  ? { type: "number"; value: number }
   : never;
 
 // Simpler with discriminated union

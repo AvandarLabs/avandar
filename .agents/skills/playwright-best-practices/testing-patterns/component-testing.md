@@ -79,7 +79,7 @@ playwright/
 
 ```tsx
 // Button.spec.tsx
-import { expect, test } from "@playwright/experimental-ct-react";
+import { test, expect } from "@playwright/experimental-ct-react";
 import { Button } from "@/components/Button";
 
 test("renders button with text", async ({ mount }) => {
@@ -110,8 +110,8 @@ test("renders with all props", async ({ mount }) => {
 
 ```tsx
 // playwright/index.tsx - Global providers
-import { QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@/providers/theme";
+import { QueryClientProvider } from "@tanstack/react-query";
 import "@/styles/globals.css";
 
 export default function PlaywrightWrapper({ children }) {
@@ -452,7 +452,7 @@ test("uses context", async ({ mount }) => {
 ### Vue Testing
 
 ```tsx
-import { expect, test } from "@playwright/experimental-ct-vue";
+import { test, expect } from "@playwright/experimental-ct-vue";
 import MyInput from "@/components/MyInput.vue";
 
 // With v-model
@@ -473,7 +473,7 @@ test("v-model binding", async ({ mount }) => {
 ### Svelte Testing
 
 ```tsx
-import { expect, test } from "@playwright/experimental-ct-svelte";
+import { test, expect } from "@playwright/experimental-ct-svelte";
 import Counter from "./Counter.svelte";
 
 test("Svelte component", async ({ mount }) => {

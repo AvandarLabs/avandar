@@ -415,11 +415,11 @@ ASAN_OPTIONS=detect_leaks=1 node test.js
 ### Heap Snapshots
 
 ```javascript
-const v8 = require("node:v8");
-const addon = require("./build/Release/addon");
+const v8 = require('node:v8');
+const addon = require('./build/Release/addon');
 
 // Take baseline snapshot
-v8.writeHeapSnapshot("before.heapsnapshot");
+v8.writeHeapSnapshot('before.heapsnapshot');
 
 // Use addon
 for (let i = 0; i < 10000; i++) {
@@ -430,7 +430,7 @@ for (let i = 0; i < 10000; i++) {
 if (global.gc) global.gc();
 
 // Take comparison snapshot
-v8.writeHeapSnapshot("after.heapsnapshot");
+v8.writeHeapSnapshot('after.heapsnapshot');
 
 // Compare in Chrome DevTools
 ```

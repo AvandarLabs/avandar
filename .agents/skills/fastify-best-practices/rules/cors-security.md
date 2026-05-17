@@ -12,8 +12,8 @@ metadata:
 Enable Cross-Origin Resource Sharing:
 
 ```typescript
-import cors from "@fastify/cors";
-import Fastify from "fastify";
+import Fastify from 'fastify';
+import cors from '@fastify/cors';
 
 const app = Fastify();
 
@@ -22,10 +22,10 @@ app.register(cors);
 
 // Configured CORS
 app.register(cors, {
-  origin: ["https://example.com", "https://app.example.com"],
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  exposedHeaders: ["X-Total-Count"],
+  origin: ['https://example.com', 'https://app.example.com'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['X-Total-Count'],
   credentials: true,
   maxAge: 86400, // 24 hours
 });
@@ -45,8 +45,8 @@ app.register(cors, {
 
     // Check against allowed origins
     const allowedOrigins = [
-      "https://example.com",
-      "https://app.example.com",
+      'https://example.com',
+      'https://app.example.com',
       /\.example\.com$/,
     ];
 
@@ -60,7 +60,7 @@ app.register(cors, {
     if (isAllowed) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"), false);
+      callback(new Error('Not allowed by CORS'), false);
     }
   },
   credentials: true,
@@ -79,8 +79,8 @@ app.register(cors, {
 
 // Or disable CORS for specific routes
 app.route({
-  method: "GET",
-  url: "/internal",
+  method: 'GET',
+  url: '/internal',
   config: {
     cors: false,
   },
@@ -95,7 +95,7 @@ app.route({
 Add security headers:
 
 ```typescript
-import helmet from "@fastify/helmet";
+import helmet from '@fastify/helmet';
 
 app.register(helmet, {
   contentSecurityPolicy: {
@@ -103,8 +103,8 @@ app.register(helmet, {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "https://api.example.com"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+      connectSrc: ["'self'", 'https://api.example.com'],
     },
   },
   crossOriginEmbedderPolicy: false, // Disable if embedding external resources
@@ -128,13 +128,13 @@ app.register(helmet, {
   contentSecurityPolicy: {
     useDefaults: true,
     directives: {
-      "script-src": ["'self'", "https://trusted-cdn.com"],
+      'script-src': ["'self'", 'https://trusted-cdn.com'],
     },
   },
 
   // X-Frame-Options
   frameguard: {
-    action: "deny", // or 'sameorigin'
+    action: 'deny', // or 'sameorigin'
   },
 
   // X-Content-Type-Options
@@ -145,7 +145,7 @@ app.register(helmet, {
 
   // Referrer-Policy
   referrerPolicy: {
-    policy: "strict-origin-when-cross-origin",
+    policy: 'strict-origin-when-cross-origin',
   },
 
   // X-Permitted-Cross-Domain-Policies
@@ -163,43 +163,35 @@ app.register(helmet, {
 Protect against abuse:
 
 ```typescript
-import rateLimit from "@fastify/rate-limit";
+import rateLimit from '@fastify/rate-limit';
 
 app.register(rateLimit, {
   max: 100,
-  timeWindow: "1 minute",
+  timeWindow: '1 minute',
   errorResponseBuilder: (request, context) => ({
     statusCode: 429,
-    error: "Too Many Requests",
+    error: 'Too Many Requests',
     message: `Rate limit exceeded. Retry in ${context.after}`,
     retryAfter: context.after,
   }),
 });
 
 // Per-route rate limit
-app.get(
-  "/expensive",
-  {
-    config: {
-      rateLimit: {
-        max: 10,
-        timeWindow: "1 minute",
-      },
+app.get('/expensive', {
+  config: {
+    rateLimit: {
+      max: 10,
+      timeWindow: '1 minute',
     },
   },
-  handler,
-);
+}, handler);
 
 // Skip rate limit for certain routes
-app.get(
-  "/health",
-  {
-    config: {
-      rateLimit: false,
-    },
+app.get('/health', {
+  config: {
+    rateLimit: false,
   },
-  () => ({ status: "ok" }),
-);
+}, () => ({ status: 'ok' }));
 ```
 
 ## Redis-Based Rate Limiting
@@ -207,16 +199,16 @@ app.get(
 Use Redis for distributed rate limiting:
 
 ```typescript
-import rateLimit from "@fastify/rate-limit";
-import Redis from "ioredis";
+import rateLimit from '@fastify/rate-limit';
+import Redis from 'ioredis';
 
 const redis = new Redis(process.env.REDIS_URL);
 
 app.register(rateLimit, {
   max: 100,
-  timeWindow: "1 minute",
+  timeWindow: '1 minute',
   redis,
-  nameSpace: "rate-limit:",
+  nameSpace: 'rate-limit:',
   keyGenerator: (request) => {
     // Rate limit by user ID if authenticated, otherwise by IP
     return request.user?.id || request.ip;
@@ -229,35 +221,31 @@ app.register(rateLimit, {
 Protect against Cross-Site Request Forgery:
 
 ```typescript
-import fastifyCookie from "@fastify/cookie";
-import fastifyCsrf from "@fastify/csrf-protection";
+import fastifyCsrf from '@fastify/csrf-protection';
+import fastifyCookie from '@fastify/cookie';
 
 app.register(fastifyCookie);
 app.register(fastifyCsrf, {
   cookieOpts: {
     signed: true,
     httpOnly: true,
-    sameSite: "strict",
+    sameSite: 'strict',
   },
 });
 
 // Generate token
-app.get("/csrf-token", async (request, reply) => {
+app.get('/csrf-token', async (request, reply) => {
   const token = reply.generateCsrf();
   return { token };
 });
 
 // Protected route
-app.post(
-  "/transfer",
-  {
-    preHandler: app.csrfProtection,
-  },
-  async (request) => {
-    // CSRF token validated
-    return { success: true };
-  },
-);
+app.post('/transfer', {
+  preHandler: app.csrfProtection,
+}, async (request) => {
+  // CSRF token validated
+  return { success: true };
+});
 ```
 
 ## Custom Security Headers
@@ -265,18 +253,18 @@ app.post(
 Add custom headers:
 
 ```typescript
-app.addHook("onSend", async (request, reply) => {
+app.addHook('onSend', async (request, reply) => {
   // Custom security headers
-  reply.header("X-Request-ID", request.id);
-  reply.header("X-Content-Type-Options", "nosniff");
-  reply.header("X-Frame-Options", "DENY");
-  reply.header("Permissions-Policy", "geolocation=(), camera=()");
+  reply.header('X-Request-ID', request.id);
+  reply.header('X-Content-Type-Options', 'nosniff');
+  reply.header('X-Frame-Options', 'DENY');
+  reply.header('Permissions-Policy', 'geolocation=(), camera=()');
 });
 
 // Per-route headers
-app.get("/download", async (request, reply) => {
-  reply.header("Content-Disposition", 'attachment; filename="file.pdf"');
-  reply.header("X-Download-Options", "noopen");
+app.get('/download', async (request, reply) => {
+  reply.header('Content-Disposition', 'attachment; filename="file.pdf"');
+  reply.header('X-Download-Options', 'noopen');
   return reply.send(fileStream);
 });
 ```
@@ -286,28 +274,28 @@ app.get("/download", async (request, reply) => {
 Configure secure cookies:
 
 ```typescript
-import cookie from "@fastify/cookie";
+import cookie from '@fastify/cookie';
 
 app.register(cookie, {
   secret: process.env.COOKIE_SECRET,
   parseOptions: {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    path: "/",
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/',
     maxAge: 3600, // 1 hour
   },
 });
 
 // Set secure cookie
-app.post("/login", async (request, reply) => {
+app.post('/login', async (request, reply) => {
   const token = await createSession(request.body);
 
-  reply.setCookie("session", token, {
+  reply.setCookie('session', token, {
     httpOnly: true,
     secure: true,
-    sameSite: "strict",
-    path: "/",
+    sameSite: 'strict',
+    path: '/',
     maxAge: 86400,
     signed: true,
   });
@@ -316,12 +304,12 @@ app.post("/login", async (request, reply) => {
 });
 
 // Read signed cookie
-app.get("/profile", async (request) => {
+app.get('/profile', async (request) => {
   const session = request.cookies.session;
   const unsigned = request.unsignCookie(session);
 
   if (!unsigned.valid) {
-    throw { statusCode: 401, message: "Invalid session" };
+    throw { statusCode: 401, message: 'Invalid session' };
   }
 
   return { sessionId: unsigned.value };
@@ -334,32 +322,28 @@ Validate and sanitize input:
 
 ```typescript
 // Schema-based validation protects against injection
-app.post(
-  "/users",
-  {
-    schema: {
-      body: {
-        type: "object",
-        properties: {
-          email: {
-            type: "string",
-            format: "email",
-            maxLength: 254,
-          },
-          name: {
-            type: "string",
-            minLength: 1,
-            maxLength: 100,
-            pattern: "^[a-zA-Z\\s]+$", // Only letters and spaces
-          },
+app.post('/users', {
+  schema: {
+    body: {
+      type: 'object',
+      properties: {
+        email: {
+          type: 'string',
+          format: 'email',
+          maxLength: 254,
         },
-        required: ["email", "name"],
-        additionalProperties: false,
+        name: {
+          type: 'string',
+          minLength: 1,
+          maxLength: 100,
+          pattern: '^[a-zA-Z\\s]+$', // Only letters and spaces
+        },
       },
+      required: ['email', 'name'],
+      additionalProperties: false,
     },
   },
-  handler,
-);
+}, handler);
 ```
 
 ## IP Filtering
@@ -367,14 +351,17 @@ app.post(
 Restrict access by IP:
 
 ```typescript
-const allowedIps = new Set(["192.168.1.0/24", "10.0.0.0/8"]);
+const allowedIps = new Set([
+  '192.168.1.0/24',
+  '10.0.0.0/8',
+]);
 
-app.addHook("onRequest", async (request, reply) => {
-  if (request.url.startsWith("/admin")) {
+app.addHook('onRequest', async (request, reply) => {
+  if (request.url.startsWith('/admin')) {
     const clientIp = request.ip;
 
     if (!isIpAllowed(clientIp, allowedIps)) {
-      reply.code(403).send({ error: "Forbidden" });
+      reply.code(403).send({ error: 'Forbidden' });
     }
   }
 });
@@ -399,11 +386,11 @@ const app = Fastify({
 
 // Or specific proxy configuration
 const app = Fastify({
-  trustProxy: ["127.0.0.1", "10.0.0.0/8"],
+  trustProxy: ['127.0.0.1', '10.0.0.0/8'],
 });
 
 // Now request.ip returns the real client IP
-app.get("/ip", async (request) => {
+app.get('/ip', async (request) => {
   return {
     ip: request.ip,
     ips: request.ips, // Array of all IPs in chain
@@ -416,10 +403,10 @@ app.get("/ip", async (request) => {
 Force HTTPS in production:
 
 ```typescript
-app.addHook("onRequest", async (request, reply) => {
+app.addHook('onRequest', async (request, reply) => {
   if (
-    process.env.NODE_ENV === "production" &&
-    request.headers["x-forwarded-proto"] !== "https"
+    process.env.NODE_ENV === 'production' &&
+    request.headers['x-forwarded-proto'] !== 'https'
   ) {
     const httpsUrl = `https://${request.hostname}${request.url}`;
     reply.redirect(301, httpsUrl);
@@ -430,10 +417,10 @@ app.addHook("onRequest", async (request, reply) => {
 ## Security Best Practices Summary
 
 ```typescript
-import cors from "@fastify/cors";
-import helmet from "@fastify/helmet";
-import rateLimit from "@fastify/rate-limit";
-import Fastify from "fastify";
+import Fastify from 'fastify';
+import cors from '@fastify/cors';
+import helmet from '@fastify/helmet';
+import rateLimit from '@fastify/rate-limit';
 
 const app = Fastify({
   trustProxy: true,
@@ -443,12 +430,12 @@ const app = Fastify({
 // Security plugins
 app.register(helmet);
 app.register(cors, {
-  origin: process.env.ALLOWED_ORIGINS?.split(","),
+  origin: process.env.ALLOWED_ORIGINS?.split(','),
   credentials: true,
 });
 app.register(rateLimit, {
   max: 100,
-  timeWindow: "1 minute",
+  timeWindow: '1 minute',
 });
 
 // Validate all input with schemas

@@ -120,10 +120,11 @@ test("launch in dev mode", async () => {
 ```typescript
 test("launch packaged app", async () => {
   const appPath =
-    process.platform === "darwin" ?
-      "/Applications/MyApp.app/Contents/MacOS/MyApp"
-    : process.platform === "win32" ? "C:\\Program Files\\MyApp\\MyApp.exe"
-    : "/usr/bin/myapp";
+    process.platform === "darwin"
+      ? "/Applications/MyApp.app/Contents/MacOS/MyApp"
+      : process.platform === "win32"
+        ? "C:\\Program Files\\MyApp\\MyApp.exe"
+        : "/usr/bin/myapp";
 
   const electronApp = await electron.launch({
     executablePath: appPath,
@@ -459,9 +460,9 @@ test("clipboard operations", async ({ electronApp, window }) => {
 
 ```typescript
 // fixtures/packaged-electron.ts
-import { execSync } from "child_process";
-import path from "path";
 import { test as base, _electron as electron } from "@playwright/test";
+import path from "path";
+import { execSync } from "child_process";
 
 export const test = base.extend({
   electronApp: async ({}, use) => {

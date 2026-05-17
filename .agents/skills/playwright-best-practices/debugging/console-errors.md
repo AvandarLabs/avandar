@@ -68,8 +68,9 @@ test("capture errors with location", async ({ page }) => {
       const location = msg.location();
       errors.push({
         message: msg.text(),
-        location:
-          location ? `${location.url}:${location.lineNumber}` : undefined,
+        location: location
+          ? `${location.url}:${location.lineNumber}`
+          : undefined,
       });
     }
   });
@@ -336,9 +337,8 @@ export const test = base.extend<ConsoleFixtures>({
       messages.push({
         type: msg.type(),
         text: msg.text(),
-        location:
-          location ?
-            { url: location.url, line: location.lineNumber }
+        location: location
+          ? { url: location.url, line: location.lineNumber }
           : undefined,
         timestamp: Date.now(),
       });
