@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"$CLAUDE_PROJECT_DIR\" && if [ ! -d node_modules ]; then corepack enable >/dev/null 2>&1 || true; pnpm install --frozen-lockfile; fi"
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && if [ ! -d node_modules ]; then corepack enable >/dev/null 2>&1 || true; pnpm install --frozen-lockfile; fi && if [ ! -f apps/ava-cli/dist/main.cjs ]; then pnpm build:ava-cli; fi"
           },
           {
             "type": "command",

@@ -115,3 +115,9 @@ Implement functionality using red/green TDD.
   the underlying slowness (mock the slow path, shrink the seed data, narrow
   the assertion) instead of raising the ceiling. CI may go up to 90 seconds
   for noisier infra, but local must stay tight.
+
+## Browser usage with Playwright
+
+- If you need to control the browser, use the Playwright MCP.
+- Take screenshots to refer to. Store them in the `.playwright-mcp` directory
+  which is gitignored so we don't commit by accident.
