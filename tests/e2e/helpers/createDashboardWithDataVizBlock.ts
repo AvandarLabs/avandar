@@ -63,7 +63,7 @@ export async function createDashboardWithDataVizBlock(options: {
 
   const { data: ownerUserIdRaw, error: ownerLookupError } = await admin.rpc(
     "util__get_user_id_by_email",
-    { user_email: ownerEmail },
+    { p_email: ownerEmail },
   );
   if (ownerLookupError) {
     throw new Error(

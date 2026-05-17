@@ -118,7 +118,7 @@ const VIZ_TYPE_CASES: readonly VizTypeCase[] = [
       nameKey: "Admin2",
       valueKey: "total_cases",
     },
-    visibleSelector: ".recharts-funnel",
+    visibleSelector: ".recharts-trapezoids",
   },
   {
     vizType: "radar",
