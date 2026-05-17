@@ -17,14 +17,15 @@ export function useVizDataLimit<TRow>(
   data: TRow[],
 ): TRow[] {
   const limit = VIZ_RENDER_LIMITS[vizType];
+  const max = limit?.max ?? Infinity;
 
   const limitedData = useMemo(() => {
-    return data.length > limit.max ? data.slice(0, limit.max) : data;
-  }, [data, limit.max]);
+    return data.length > max ? data.slice(0, max) : data;
+  }, [data, max]);
 
   const prevExceededRef = useRef(false);
   useEffect(() => {
-    const exceeded = data.length > limit.max;
+    const exceeded = limit !== undefined && data.length > limit.max;
     if (exceeded && !prevExceededRef.current) {
       notifyWarning({
         title: `${limit.name} data truncated`,
