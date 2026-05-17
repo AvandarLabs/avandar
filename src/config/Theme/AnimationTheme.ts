@@ -53,7 +53,7 @@ export const MANTINE_TRANSITION_PROPS = {
     timingFunction: ANIMATION_EASING.out,
   },
   popover: {
-    transition: "pop-top" as const,
+    transition: "pop" as const,
     duration: ANIMATION_DURATION_MS.fast,
     timingFunction: ANIMATION_EASING.out,
   },

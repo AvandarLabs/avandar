@@ -1,3 +1,4 @@
+import type { AnimationTheme } from "@/config/Theme/AnimationTheme";
 import type {
   ELEVATION_BORDERS,
   ELEVATION_SHADOWS,
@@ -47,13 +48,7 @@ declare module "@mantine/core" {
       shadows: ElevationShadows;
     };
 
-    animation: {
-      durationMs: Record<string, number>;
-      duration: Record<string, string>;
-      easing: Record<string, string>;
-      transition: Record<string, string>;
-      mantine: Record<string, Record<string, string | number>>;
-    };
+    animation: typeof AnimationTheme;
 
     navbar: {
       /** Navbar background color */

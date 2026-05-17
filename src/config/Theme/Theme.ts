@@ -27,6 +27,9 @@ import {
   PRIMARY_COLOR_LIGHT_SHADE,
 } from "../../../shared/config/Theme";
 import {
+  ANIMATION_DURATION,
+  ANIMATION_EASING,
+  ANIMATION_TRANSITION,
   AnimationTheme,
   DEFAULT_COMBOBOX_PROPS,
   MANTINE_TRANSITION_PROPS,
@@ -297,7 +300,6 @@ export const Theme = createTheme({
     Notification: Notification.extend({
       defaultProps: {
         radius: "sm",
-        transitionProps: MANTINE_TRANSITION_PROPS.notification,
       },
       styles: {
         root: {
@@ -413,14 +415,14 @@ export const Theme = createTheme({
       activeHoverBackgroundColor: NEUTRAL_SHADES[7],
     },
   },
-});
+}) as MantineTheme;
 
 export { AnimationTheme } from "./AnimationTheme";
 
 export const cssVariablesResolver: CSSVariablesResolver = (
   theme: MantineTheme,
 ) => {
-  const { animation, elevation } = theme.other;
+  const { elevation } = theme.other;
 
   const sharedVariables = {
     "--mantine-navbar-background": theme.other.navbar.backgroundColor,
@@ -431,24 +433,24 @@ export const cssVariablesResolver: CSSVariablesResolver = (
       theme.other.navbar.activeBackgroundColor,
     "--mantine-navbar-active-hover-background":
       theme.other.navbar.activeHoverBackgroundColor,
-    "--navbar-transition-duration": animation.duration.fast,
+    "--navbar-transition-duration": ANIMATION_DURATION.fast,
 
-    "--mantine-z-index-app-shell-main": theme.other.zIndex.appShellMain,
-    "--mantine-z-index-modal": theme.other.zIndex.modal,
+    "--mantine-z-index-app-shell-main": String(theme.other.zIndex.appShellMain),
+    "--mantine-z-index-modal": String(theme.other.zIndex.modal),
 
-    "--ava-animation-duration-instant": animation.duration.instant,
-    "--ava-animation-duration-fast": animation.duration.fast,
-    "--ava-animation-duration-normal": animation.duration.normal,
-    "--ava-animation-duration-moderate": animation.duration.moderate,
-    "--ava-animation-duration-slow": animation.duration.slow,
-    "--ava-animation-easing-out": animation.easing.out,
-    "--ava-animation-easing-out-soft": animation.easing.outSoft,
-    "--ava-animation-easing-in-out": animation.easing.inOut,
-    "--ava-transition-colors": animation.transition.colors,
-    "--ava-transition-interactive": animation.transition.interactive,
-    "--ava-transition-transform": animation.transition.transform,
-    "--ava-transition-opacity": animation.transition.opacity,
-    "--ava-transition-shadow": animation.transition.shadow,
+    "--ava-animation-duration-instant": ANIMATION_DURATION.instant,
+    "--ava-animation-duration-fast": ANIMATION_DURATION.fast,
+    "--ava-animation-duration-normal": ANIMATION_DURATION.normal,
+    "--ava-animation-duration-moderate": ANIMATION_DURATION.moderate,
+    "--ava-animation-duration-slow": ANIMATION_DURATION.slow,
+    "--ava-animation-easing-out": ANIMATION_EASING.out,
+    "--ava-animation-easing-out-soft": ANIMATION_EASING.outSoft,
+    "--ava-animation-easing-in-out": ANIMATION_EASING.inOut,
+    "--ava-transition-colors": ANIMATION_TRANSITION.colors,
+    "--ava-transition-interactive": ANIMATION_TRANSITION.interactive,
+    "--ava-transition-transform": ANIMATION_TRANSITION.transform,
+    "--ava-transition-opacity": ANIMATION_TRANSITION.opacity,
+    "--ava-transition-shadow": ANIMATION_TRANSITION.shadow,
   };
 
   return {
