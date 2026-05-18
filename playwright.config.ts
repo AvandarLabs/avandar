@@ -10,10 +10,10 @@ const isCI = !!process.env.CI;
 
 /**
  * Per-test ceiling:
- * - 1 min locally so failures surface quickly
- * - 2 mins in CI
+ * - 45s locally so failures surface quickly
+ * - 90s in CI for noisier infra
  */
-const defaultTestTimeoutMs = isCI ? 120_000 : 60_000;
+const defaultTestTimeoutMs = isCI ? 90_000 : 45_000;
 
 export default defineConfig({
   testDir: "tests/e2e",
@@ -36,8 +36,7 @@ export default defineConfig({
   },
   webServer: {
     command:
-      "pnpm exec dotenv -e .env.development -- vite --host 127.0.0.1 " +
-      "--port 5173",
+      "pnpm exec dotenv -e .env.development -- vite --host 127.0.0.1 --port 5173",
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,

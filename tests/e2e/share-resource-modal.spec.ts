@@ -61,11 +61,12 @@ test.describe("Share resource modal", () => {
       page.getByText(/Cannot read properties of undefined/i),
     ).not.toBeVisible();
 
-    await expect(page.getByText("Workspace access")).toBeVisible({
-      timeout: LONG_WAIT,
-    });
+    // Anchor on the unified Add combobox and the "General access" select.
     await expect(
-      page.getByRole("combobox", { name: "Add member or tag" }),
+      page.getByRole("combobox", { name: "Add people, groups, or tags" }),
+    ).toBeVisible({ timeout: LONG_WAIT });
+    await expect(
+      page.getByRole("combobox", { name: "General access" }),
     ).toBeVisible();
 
     expect(pageErrors).toEqual([]);

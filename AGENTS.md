@@ -48,15 +48,18 @@ Implement functionality using red/green TDD.
 - Avoid vague names like `next`, `prev`, or `n`, that don't say what the
   variable actually actually holds. Always include a noun, such as `nextPage`,
   `prevRow` or `numPeople`.
-- Builder functions for objects or classes should be named `create{Type}`
-  - A function that creates a type from some seed data then use "From". E.g.
-    `createUserFromId`
+- Builder functions for objects or classes should be named `create{Type}`.
+  E.g. `createUser`
+- Builder functions for strings or primitives should be named `build{Thing}`.
+  E.g. `buildRoleKey`
+- Builder functions that take some seed data to build an output should use the
+  `*From{Seed}` format. E.g. `createUserFromId` or `buildKeyFromRole`
 - Conversion or cast functions should use "to". E.g. `roleToDisplayLabel`
   or `app_type_to_key`.
 
 ## Functions & Logic
 
-- Keep functions short (<= 40 lines).
+- Keep functions short (<= 45 lines).
 - Extract logic into utility functions if:
   - The function will be too long otherwise
   - The logic will be reused
@@ -109,3 +112,15 @@ Implement functionality using red/green TDD.
 - Prefer deleting or reverting only rows that test inserted or changed
   (track ids or booleans) instead of broad resets that could harm unrelated
   developer data.
+- Locally, never set a per-test timeout longer than **45 seconds**
+  (`test.setTimeout` or the default in `playwright.config.ts`). Long timeouts
+  make failure cycles unbearable. If a test legitimately needs more time, fix
+  the underlying slowness (mock the slow path, shrink the seed data, narrow
+  the assertion) instead of raising the ceiling. CI may go up to 90 seconds
+  for noisier infra, but local must stay tight.
+
+## Browser usage with Playwright
+
+- If you need to control the browser, use the Playwright MCP.
+- Take screenshots to refer to. Store them in the `.playwright-mcp` directory
+  which is gitignored so we don't commit by accident.

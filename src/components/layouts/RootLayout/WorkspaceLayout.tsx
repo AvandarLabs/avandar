@@ -69,6 +69,7 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
     links.push(NavbarLinks.map(workspace.slug));
     links.push(NavbarLinks.entityDesignerHome(workspace.slug));
     links.push(...entityManagerLinks);
+    links.push(NavbarLinks.sharedWithMe(workspace.slug));
 
     return links;
   }, [

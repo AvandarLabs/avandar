@@ -75,7 +75,10 @@ export interface DuckDbClient {
   runStructuredQuery<T>(query: StructuredQuery): Promise<T[]>;
   runRawQuery<T>(sql: string, params?: unknown[]): Promise<T[]>;
   loadParquetFromDatasetBlobStore(datasetId: string): Promise<void>;
-  loadFromUpload(file: File | { path: string }, opts: ImportOptions): Promise<DatasetMeta>;
+  loadFromUpload(
+    file: File | { path: string },
+    opts: ImportOptions,
+  ): Promise<DatasetMeta>;
 }
 
 export interface DatasetBlobStore {
@@ -96,9 +99,14 @@ export interface RdbClient {
 
 export interface ServerApiClient {
   // Supabase RPCs — Postgres functions invoked via PostgREST (`supabase.rpc(...)`)
-  rpc<TName extends RpcName>(name: TName, args: RpcArgs<TName>): Promise<RpcResult<TName>>;
+  rpc<TName extends RpcName>(
+    name: TName,
+    args: RpcArgs<TName>,
+  ): Promise<RpcResult<TName>>;
   // Edge Functions — typed by the existing `keyof API` route schema in `src/clients/APIClient.ts`
-  invokeFunction<TRoute extends keyof API>(req: APIRequest<TRoute>): Promise<APIResult<TRoute>>;
+  invokeFunction<TRoute extends keyof API>(
+    req: APIRequest<TRoute>,
+  ): Promise<APIResult<TRoute>>;
 }
 
 export interface AuthProvider {
@@ -125,7 +133,7 @@ The existing pattern (per `AGENTS.md` repository convention) already injects DB 
 // packages/shared/clients/createRdbCrudClient.ts
 export function createRdbCrudClient<M>(spec: RdbCrudClientSpec<M>) {
   if (isDesktop()) {
-    return createSqliteCrudClient(spec);   // new: IPC → bun:sqlite
+    return createSqliteCrudClient(spec); // new: IPC → bun:sqlite
   }
   return createSupabaseCrudClient({ dbClient: AvaSupabase.DB, ...spec });
 }
@@ -134,6 +142,7 @@ export function createRdbCrudClient<M>(spec: RdbCrudClientSpec<M>) {
 Migration of existing ~20 client files is mechanical (find/replace), no React-component changes. Existing `createDexieCrudClient` callers stay as-is (Dexie remains web-only for parquet caching).
 
 Naming convention:
+
 - `createRdbCrudClient(spec)` — top-level platform-aware factory used by every client file
 - `createSqliteCrudClient(spec)` — desktop backend
 - `createSupabaseCrudClient({ dbClient, ...spec })` — web backend (existing)
@@ -150,19 +159,23 @@ Naming convention:
 4. **V2 forward-compatibility.** Some write RPCs and Edge Functions are queueable (e.g. "send invitation") — adding that later without an interface boundary is a much harder refactor than wiring it into an existing one.
 
 **Naming convention:**
+
 - `createServerApiClient()` — top-level platform-aware factory returning a `ServerApiClient`
 - `createBrowserServerApiClient()` — web backend; thin wrapper over today's `src/clients/APIClient.ts` (which already centralizes Edge Function calls behind a typed `keyof API` schema) plus a `supabase.rpc(...)` passthrough
 - `createIpcServerApiClient()` — desktop backend; an IPC client routing both `rpc(...)` and `invokeFunction(...)` calls to Bun main, where the actual Supabase fetch happens
 
 **V1 behavior:**
+
 - Both web and desktop: pass-through to Supabase when online.
 - Desktop offline: throw `OfflineError`. The call is **not** queued in V1. Read-only RPCs (the common case in our codebase today: 2 call sites in `DatasetClient.ts` and `WorkspaceClient.ts`) fail loudly, exactly as a manual page reload would.
 - Web offline: same as today (generic `fetch` error). Unchanged.
 
 **V2 (not built):**
+
 - Per-call queueing for specific write RPCs and Edge Functions via a marker on the `ServerApiClient` call site (e.g. `serverApi.invokeFunction({ ...req, queueWhenOffline: true })`). Queue lives in `sync_outbox` alongside relational mutations; replayed after reconnect.
 
 **Migration scope (Phase 1 Task 5 extends to cover this):**
+
 - 2 `supabase.rpc(...)` call sites: `src/clients/datasets/DatasetClient.ts`, `src/clients/WorkspaceClient.ts` → call `serverApi.rpc(...)` instead.
 - `src/clients/APIClient.ts` → reimplement its `sendHTTPRequest` to delegate to `serverApi.invokeFunction(...)`. The public `APIClient.get/post/patch/put/delete` surface is unchanged; every consumer keeps working.
 
@@ -185,27 +198,43 @@ Naming convention:
 **Why a near-mirror, not a different shape:** the frontend already understands Supabase row shapes; RdbClient returns the same shapes (minus the `_sync_*` prefix). Sync becomes a per-row diff, which is far simpler than mapping between two schemas.
 
 **Transaction model.** Reads and writes are async via IPC. Transactions are scoped:
+
 ```ts
 await rdb.transaction(async tx => {
   const ds = await tx.upsert('datasets', {...});
   await tx.upsert('dataset_versions', { datasetId: ds.id, ... });
 });
 ```
+
 Outbox entries are appended **inside the same SQLite transaction** as the data write. Crash safety depends on this invariant.
 
 ## Migration Generation (Postgres → SQLite)
 
-A `pnpm run gen:sqlite-migrations` script translates `supabase/migrations/*.sql` into `apps/desktop/migrations/*.sql` via **`sqlglot`** (Python, shelled out from a Bun script). Generated SQLite migrations are **committed** to the repo, mirroring how Postgres migrations are committed today.
+A `pnpm run gen:sqlite-migrations` script translates `supabase/migrations/*.sql` into `apps/desktop/migrations/*.gen.sql` via **`sqlglot`** (Python), invoked through **`uv`** (`uv run --with 'sqlglot>=26.0.0,<27.0.0' python -c "..."`). The only developer-machine prerequisite is `uv`; `sqlglot` is never an npm dependency and never reaches the runtime bundle. Generated SQLite migrations are **committed** to the repo, mirroring how Postgres migrations are committed today.
+
+**Approach: classify-and-filter, schema-shape only, hand-edits for the rest.**
+
+The generator runs every Postgres statement through a classifier that buckets it by intent rather than transpiling everything wholesale. Three buckets matter at runtime:
+
+- _Schema-shape_ (CREATE/ALTER/DROP TABLE, CREATE/DROP INDEX) — kept, transpiled to SQLite, written to the per-migration `.gen.sql`.
+- _Drop_ (RLS, GRANT/REVOKE, functions, triggers, types, COMMENT, SET, data-mutation statements, `ENABLE ROW LEVEL SECURITY`, `VALIDATE CONSTRAINT`, `DROP/RENAME CONSTRAINT`, `ADD CONSTRAINT … USING INDEX`) — silently discarded. SQLite either has no equivalent or treats the construct as a no-op for our use case.
+- _Needs hand-edit_ — schema-relevant statements SQLite's `ALTER TABLE` cannot accept post-creation. Today this is `ADD CONSTRAINT` (FK, CHECK, PK, UNIQUE) and `ALTER COLUMN` (type change, set/drop default, set/drop NOT NULL). The generator drops them from the `.gen.sql` output and prints a yellow `⚠ needs hand-edit` warning at the end of the run listing each statement plus its source file. The developer inlines the change into the matching `CREATE TABLE` in the earlier `.gen.sql`. Same pattern Alembic uses when auto-generation falls short.
 
 **Guarded generator behavior:**
 
 - A `SYNCABLE_TABLES` manifest (`apps/desktop/sync/syncable-tables.ts`) is the source of truth for which Postgres tables become local SQLite tables.
-- For each Postgres migration statement: if it touches a table in `SYNCABLE_TABLES`, transpile via `sqlglot` and emit. Otherwise skip.
-- **Hard error** if a migration references a table that's neither in `SYNCABLE_TABLES` nor in an explicit exclusion list — forces a human decision per new table (sync this? exclude?).
-- **Warning** if a migration uses Postgres-only constructs on a syncable table (custom types, triggers calling PG functions, RLS, extensions). Emit as commented-out SQL with a TODO.
-- A CI check (`pnpm check:sqlite-migrations`) regenerates and diffs against committed output; fails on drift.
+- For each schema-shape statement: if its primary table is in `SYNCABLE_TABLES`, transpile via sqlglot and emit (with FK targets checked against the manifest — see below). If the primary table is in `EXCLUDED_TABLES`, silently skip.
+- **Hard error** if a statement references a table that's neither in `SYNCABLE_TABLES` nor `EXCLUDED_TABLES`, or has a leading keyword the classifier does not recognise — forces a human decision (categorise the table, extend the classifier, or both).
+- Post-transpile, a `_stripPostgresIsms` step removes residue sqlglot can't drop on its own (`"public".` schema prefixes, `NOT VALID`, `USING btree`, `NULLS FIRST/LAST` in index defs, `ARRAY<T>` → `TEXT`, `ADD COLUMN IF NOT EXISTS` → `ADD COLUMN`, `DEFAULT <fn>(...)` clauses whose function does not exist on SQLite like `UUID()` / `auth.uid()`).
+- A CI check (`pnpm check:sqlite-migrations`) regenerates and diffs against committed output; fails on drift. Because hand-edited `.gen.sql` files would always diff against a fresh regen, the check is most useful as a "fresh-gen vs committed" ledger reviewer, not as a strict equality gate, until a preserve-hand-edits mechanism exists.
 
-RLS policies are intentionally dropped during translation — the local SQLite store is single-user (the local user), so RLS is unnecessary.
+**Foreign-key handling.** SQLite enforces foreign keys natively when `PRAGMA foreign_keys = ON;` is set (Phase 2 Task 7's runner sets this at connection open). The generator preserves every FK whose target table is in `SYNCABLE_TABLES`:
+
+- FKs declared _inline_ in `CREATE TABLE` (column-level `REFERENCES` or table-level `FOREIGN KEY (...) REFERENCES …`) are emitted verbatim — SQLite accepts them as-is.
+- FKs declared as a separate `ALTER TABLE … ADD CONSTRAINT … FOREIGN KEY` are routed to the `needs hand-edit` warning because SQLite has no way to add a FK after table creation. The developer inlines them into the matching `CREATE TABLE`.
+- FKs targeting a non-public schema (e.g. `references auth.users`) or an `EXCLUDED_TABLES` entry are dropped — the target table does not exist in the SQLite mirror, so the constraint can't be honoured.
+
+RLS policies, functions, triggers, and GRANTs are intentionally dropped during translation — the local SQLite store is single-user (the local user), so RLS is unnecessary and the rest are Postgres-only constructs without SQLite equivalents.
 
 ## DatasetBlobStore & File Management
 
@@ -225,6 +254,7 @@ workspaces/<workspaceId>/datasets/<datasetId>/meta.json
 ```
 
 **On disk (desktop)** — per-OS-user, OS-conventional paths:
+
 ```
 macOS:   ~/Library/Application Support/Avandar/
 Windows: %APPDATA%\Avandar\
@@ -247,6 +277,7 @@ Windows: %APPDATA%\Avandar\
 **Storage accounting.** A `dataset_blob_index` table in SQLite tracks per-key size, mtime, last-read-at, and a `derivable_from` reference so parquet files can be safely evicted (regeneratable from source).
 
 **GC (V1):**
+
 - On user-requested "free up space" or disk-pressure heuristic at startup: parquet blobs whose `last_read_at` exceeds N days and whose source still exists are deleted. Regenerated lazily on next read.
 - Source files never auto-deleted; only removed when the user deletes the dataset.
 
@@ -293,12 +324,13 @@ The SyncEngine has one job: **keep user-owned SQLite rows in sync with Supabase,
 Datasets marked "online-storage-allowed" must have their parquet uploaded to Supabase Storage. When offline, the upload is queued; on reconnect, it drains.
 
 **Outbox:**
+
 ```sql
-parquet_blob_outbox(
+parquet_blob_outbox (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   dataset_id TEXT NOT NULL,
   parquet_blob_key TEXT NOT NULL,
-  op TEXT NOT NULL,                       -- 'upload' | 'delete'
+  op TEXT NOT NULL, -- 'upload' | 'delete'
   online_storage_allowed BOOLEAN NOT NULL,
   created_at INTEGER NOT NULL,
   attempts INTEGER NOT NULL DEFAULT 0,
@@ -326,12 +358,20 @@ Toggling `online_storage_allowed` later enqueues `upload` or `delete` ops accord
 ```ts
 type SyncStatus =
   | { kind: "offline" }
-  | { kind: "online", state: "idle" | "syncing",
-      lastSyncedAt: number,
-      pendingRows: number,
-      pendingParquets: number,
-      bytesUploading?: number }
-  | { kind: "error", lastError: string, pendingRows: number, pendingParquets: number };
+  | {
+      kind: "online";
+      state: "idle" | "syncing";
+      lastSyncedAt: number;
+      pendingRows: number;
+      pendingParquets: number;
+      bytesUploading?: number;
+    }
+  | {
+      kind: "error";
+      lastError: string;
+      pendingRows: number;
+      pendingParquets: number;
+    };
 ```
 
 Surfaced as a small persistent indicator in app chrome with a click-through detail panel showing the outboxes and conflict rows.
@@ -342,7 +382,7 @@ Every CRUD client write enqueues its outbox entry **in the same SQLite transacti
 
 ```ts
 async function upsert(row) {
-  return await rdbTx(async tx => {
+  return await rdbTx(async (tx) => {
     await tx.run("UPDATE/INSERT ...", row);
     await tx.run("INSERT INTO sync_outbox ...", { table, op, payload });
   });
@@ -356,16 +396,19 @@ No third-party error reporting in V1. `console.error` plus structured JSONL log 
 **Logger:** the existing `packages/shared/logger` gets a platform-aware sink layer. Web sink = `console.error` (today). Desktop sink = `console.error` + JSONL file writes.
 
 **Rotation & cleanup:**
-- Rotate `current.log` → `YYYY-MM-DD.log` at midnight local time *or* when the file exceeds 10 MB, whichever first.
+
+- Rotate `current.log` → `YYYY-MM-DD.log` at midnight local time _or_ when the file exceeds 10 MB, whichever first.
 - Delete files older than **14 days** on app startup.
 - Hard cap total log dir size at **100 MB**; delete oldest until under cap.
 
 **Privacy boundary — never log raw user data:**
+
 - Logger API accepts only typed structured fields. No free-form `data` / `payload` / `row` / `rows` keys.
 - A custom ESLint rule blocks `logger.*(...)` calls that include identifiers named `row`, `rows`, `payload`, `data`, `body`, `content`, `value`, `record`, `records`. Forces explicit review.
 - A defensive redaction pass on write (strip anything matching email/URL/long-base64/JSON-blob heuristics) as belt-and-suspenders.
 
 **In-app bug report:**
+
 - Settings → "Report a problem" → dialog with description input and "Preview what gets sent" toggle.
 - Auto-collects app version, OS + version, anonymized user ID, last N days of log files.
 - Submits to a Supabase Edge Function (`bug-reports`) that writes to a bucket or forwards to the team support inbox. Not `mailto:` (unreliable).
@@ -399,12 +442,12 @@ packages/shared/platform/           # NEW directory
 
 ### Build pipelines
 
-| Target | Tooling | Entry | Output |
-|---|---|---|---|
-| Web | Existing Vite | `src/main.tsx` | `dist/` |
-| Desktop webview | Same Vite | `src/main.tsx` (same!) | Same `dist/`, consumed by Electrobun bundle |
-| Desktop main | `bun build` | `apps/desktop/main/index.ts` | Single Bun executable |
-| Desktop preload | `bun build` | `apps/desktop/preload/index.ts` | Tiny script injected into webview |
+| Target          | Tooling       | Entry                           | Output                                      |
+| --------------- | ------------- | ------------------------------- | ------------------------------------------- |
+| Web             | Existing Vite | `src/main.tsx`                  | `dist/`                                     |
+| Desktop webview | Same Vite     | `src/main.tsx` (same!)          | Same `dist/`, consumed by Electrobun bundle |
+| Desktop main    | `bun build`   | `apps/desktop/main/index.ts`    | Single Bun executable                       |
+| Desktop preload | `bun build`   | `apps/desktop/preload/index.ts` | Tiny script injected into webview           |
 
 The webview build is the **same** web build. Runtime platform detection is the primary mechanism; `AVA_TARGET` env var is an escape hatch for build-time tree-shaking (e.g. dropping `duckdb-wasm` from the desktop webview bundle to save ~30MB).
 
@@ -429,20 +472,20 @@ pnpm check:sqlite-migrations
 
 Captured here so V1 design decisions stay forward-compatible.
 
-| Area | V1 | V2 (planned) |
-|---|---|---|
-| Sync scope | User-owned artifacts | Full-app bidirectional sync of additional tables (collaborative state); each table classified as "LWW", "HLC field-level", or "CRDT" |
-| Sync engine | Outbox + LWW | Hybrid logical clocks per row; per-field timestamps for fine-grained merges; CRDTs (Yjs/Automerge/Loro) for concurrent-edit-prone fields |
-| Sync transport | Periodic poll | Supabase Realtime subscriptions per syncable table |
-| Auth | Cached refresh token in OS keychain | + Device registration with `user_devices` table; remote revocation UI on web settings; optional biometric unlock (Touch ID / Windows Hello) |
-| Parquet sync | Push-only (upload-on-reconnect) | Pull-on-fresh-install; content-hash deduplication |
-| Source files | Local only, never uploaded | Optional source-file sync (separate opt-in) if user demand warrants |
-| Storage GC | Manual + simple heuristic | LRU eviction with configurable disk budget; cloud-tier evicted parquet for cheap re-fetch |
-| Error reporting | console.error + JSONL log files + in-app email report | Scoped investigation: self-hosted (Glitchtip, Highlight.io self-hosted) or carefully-configured SaaS; session replay with strict masking. Do not lock into Sentry — evaluate alternatives. |
-| Platforms | macOS + Windows | macOS + Windows (Linux still out of scope unless explicitly added) |
-| Shell | Electrobun | Keep abstractions clean enough to swap to Tauri or Electron if Electrobun stalls |
-| Distribution | Signed direct download | + App Store / Microsoft Store if their distribution surface is needed |
-| RPC / Edge Function offline behavior | `OfflineError` (no queueing) | Opt-in per-call queueing via `serverApi.invokeFunction({ ..., queueWhenOffline: true })`; queue lives in `sync_outbox` alongside relational mutations; replayed on reconnect |
+| Area                                 | V1                                                    | V2 (planned)                                                                                                                                                                               |
+| ------------------------------------ | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Sync scope                           | User-owned artifacts                                  | Full-app bidirectional sync of additional tables (collaborative state); each table classified as "LWW", "HLC field-level", or "CRDT"                                                       |
+| Sync engine                          | Outbox + LWW                                          | Hybrid logical clocks per row; per-field timestamps for fine-grained merges; CRDTs (Yjs/Automerge/Loro) for concurrent-edit-prone fields                                                   |
+| Sync transport                       | Periodic poll                                         | Supabase Realtime subscriptions per syncable table                                                                                                                                         |
+| Auth                                 | Cached refresh token in OS keychain                   | + Device registration with `user_devices` table; remote revocation UI on web settings; optional biometric unlock (Touch ID / Windows Hello)                                                |
+| Parquet sync                         | Push-only (upload-on-reconnect)                       | Pull-on-fresh-install; content-hash deduplication                                                                                                                                          |
+| Source files                         | Local only, never uploaded                            | Optional source-file sync (separate opt-in) if user demand warrants                                                                                                                        |
+| Storage GC                           | Manual + simple heuristic                             | LRU eviction with configurable disk budget; cloud-tier evicted parquet for cheap re-fetch                                                                                                  |
+| Error reporting                      | console.error + JSONL log files + in-app email report | Scoped investigation: self-hosted (Glitchtip, Highlight.io self-hosted) or carefully-configured SaaS; session replay with strict masking. Do not lock into Sentry — evaluate alternatives. |
+| Platforms                            | macOS + Windows                                       | macOS + Windows (Linux still out of scope unless explicitly added)                                                                                                                         |
+| Shell                                | Electrobun                                            | Keep abstractions clean enough to swap to Tauri or Electron if Electrobun stalls                                                                                                           |
+| Distribution                         | Signed direct download                                | + App Store / Microsoft Store if their distribution surface is needed                                                                                                                      |
+| RPC / Edge Function offline behavior | `OfflineError` (no queueing)                          | Opt-in per-call queueing via `serverApi.invokeFunction({ ..., queueWhenOffline: true })`; queue lives in `sync_outbox` alongside relational mutations; replayed on reconnect               |
 
 ## Phased Rollout
 
@@ -462,20 +505,20 @@ Captured here so V1 design decisions stay forward-compatible.
 
 ## Risk Register
 
-Ordered by *likelihood × impact*.
+Ordered by _likelihood × impact_.
 
-| # | Risk | Likelihood | Impact | Mitigation |
-|---|---|---|---|---|
-| 1 | **Electrobun alpha — distribution tooling breaks** (signing, notarization, auto-update edge cases) | High | High | Validate full sign→notarize→install→auto-update loop in Phase 0/4. Budget time. Keep abstractions clean enough to swap shells. |
-| 2 | **Sync engine correctness bugs** (silent data loss from outbox/data write atomicity holes) | Medium | Very High | Hard invariant: outbox writes are in the same SQLite transaction as data writes. Comprehensive integration tests. Diagnostic tool that compares local vs server and reports drift. |
-| 3 | **SQLite migration translator misses Postgres-specific features** silently | Medium | High | Generator emits hard errors on unknown constructs. CI drift check on every PR. Human review of generated diffs in PR. |
-| 4 | **Native DuckDB in Bun has compatibility gaps** vs duckdb-wasm (extensions, spatial, etc.) | Medium | Medium | Verify in Phase 2 against actual query workload before deeper investment. Document extension parity. Worst case: hybrid execution model for extension-dependent queries. |
-| 5 | **OS Keychain UX edge cases** (locked keychain, biometric prompts, signing identity changes invalidating saved entries) | Medium | Medium | Always have a re-authenticate fallback path. Surface keychain errors clearly. |
-| 6 | **Windows code signing reputation warmup** (SmartScreen warning on first releases) | High | Low-Medium | Procure EV cert *or* accept ~1–2 weeks of SmartScreen friction while OV cert builds reputation. |
-| 7 | **Disk pressure from uncapped growth** (kept source files + parquet) | Low (initially) | Medium | V1: surface storage usage in settings + manual "free up space" action. V2: configurable disk budget + auto-GC. |
-| 8 | **Supabase rate limits during sync storms** (e.g. first sync of a heavy user) | Low | Medium | Push loop respects 429 responses with longer backoff. Bulk pull paginated. |
-| 9 | **Log files inadvertently contain user data** | Medium | High | Logger API discipline (typed structured fields only); ESLint rule blocking `row/rows/payload/data/body/content/value/record/records` identifiers in log calls; defensive redaction pass on write; user preview before bug-report submission. |
-| 10 | **Bun FFI keychain bindings are greenfield** (no widely-adopted reference implementation) | Medium | Medium | Budget time in Phase 2 to develop and test the FFI wrappers per platform. Encrypted-file fallback as last resort if FFI proves blocked (with full risk disclosure). |
+| #   | Risk                                                                                                                    | Likelihood      | Impact     | Mitigation                                                                                                                                                                                                                                   |
+| --- | ----------------------------------------------------------------------------------------------------------------------- | --------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Electrobun alpha — distribution tooling breaks** (signing, notarization, auto-update edge cases)                      | High            | High       | Validate full sign→notarize→install→auto-update loop in Phase 0/4. Budget time. Keep abstractions clean enough to swap shells.                                                                                                               |
+| 2   | **Sync engine correctness bugs** (silent data loss from outbox/data write atomicity holes)                              | Medium          | Very High  | Hard invariant: outbox writes are in the same SQLite transaction as data writes. Comprehensive integration tests. Diagnostic tool that compares local vs server and reports drift.                                                           |
+| 3   | **SQLite migration translator misses Postgres-specific features** silently                                              | Medium          | High       | Generator emits hard errors on unknown constructs. CI drift check on every PR. Human review of generated diffs in PR.                                                                                                                        |
+| 4   | **Native DuckDB in Bun has compatibility gaps** vs duckdb-wasm (extensions, spatial, etc.)                              | Medium          | Medium     | Verify in Phase 2 against actual query workload before deeper investment. Document extension parity. Worst case: hybrid execution model for extension-dependent queries.                                                                     |
+| 5   | **OS Keychain UX edge cases** (locked keychain, biometric prompts, signing identity changes invalidating saved entries) | Medium          | Medium     | Always have a re-authenticate fallback path. Surface keychain errors clearly.                                                                                                                                                                |
+| 6   | **Windows code signing reputation warmup** (SmartScreen warning on first releases)                                      | High            | Low-Medium | Procure EV cert _or_ accept ~1–2 weeks of SmartScreen friction while OV cert builds reputation.                                                                                                                                              |
+| 7   | **Disk pressure from uncapped growth** (kept source files + parquet)                                                    | Low (initially) | Medium     | V1: surface storage usage in settings + manual "free up space" action. V2: configurable disk budget + auto-GC.                                                                                                                               |
+| 8   | **Supabase rate limits during sync storms** (e.g. first sync of a heavy user)                                           | Low             | Medium     | Push loop respects 429 responses with longer backoff. Bulk pull paginated.                                                                                                                                                                   |
+| 9   | **Log files inadvertently contain user data**                                                                           | Medium          | High       | Logger API discipline (typed structured fields only); ESLint rule blocking `row/rows/payload/data/body/content/value/record/records` identifiers in log calls; defensive redaction pass on write; user preview before bug-report submission. |
+| 10  | **Bun FFI keychain bindings are greenfield** (no widely-adopted reference implementation)                               | Medium          | Medium     | Budget time in Phase 2 to develop and test the FFI wrappers per platform. Encrypted-file fallback as last resort if FFI proves blocked (with full risk disclosure).                                                                          |
 
 ## Open Questions
 

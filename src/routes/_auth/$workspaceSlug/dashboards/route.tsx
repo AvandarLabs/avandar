@@ -5,6 +5,11 @@ export const Route = createFileRoute("/_auth/$workspaceSlug/dashboards")({
   beforeLoad: RouteMiddleware.BeforeLoad.checkUserPermissions({
     permissionKey: "dashboards__can_view_dashboard",
     appLabel: "Dashboards",
+    resourceFallback: {
+      type: "dashboard",
+      idParam: "dashboardId",
+      minRole: "viewer",
+    },
   }),
   component: DashboardsLayout,
 });

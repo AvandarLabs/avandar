@@ -169,6 +169,19 @@ export const DataExplorerStateManager = createAppStateManager({
     },
 
     /**
+     * Record the natural-language prompt that produced the current `rawSQL`.
+     * Used by the "Save to dashboard" flow to seed the DataViz block's
+     * `nlQuery.prompt` so the saved block renders identically to one created
+     * inside the dashboard editor.
+     */
+    setNLPrompt: (
+      state: DataExplorerAppState,
+      nlPrompt: string | undefined,
+    ) => {
+      return setValue(state, "nlPrompt", nlPrompt);
+    },
+
+    /**
      * Set (or clear) the currently open saved dataset. Pass `undefined` to
      * indicate no dataset is open.
      */

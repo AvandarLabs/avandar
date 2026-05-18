@@ -15,7 +15,7 @@
     "dev:pipeline-server-prod": "dotenv --no-expand -o -e .env.development -e .env.production -- pnpm --filter @avandar/pipeline-server dev",
     "deploy:dev-fanout-server": "fly deploy --config apps/dev-fanout-server/fly.production.toml",
     "deploy:pipeline-server": "fly deploy --config apps/pipeline-server/fly.production.toml",
-    "test": "pnpm test:frontend && pnpm test:utils && pnpm test:ava-cli && pnpm test:ava-etl && pnpm test:dev-fanout-server && pnpm test:pipeline-server && pnpm test:logger && pnpm test:clients && pnpm test:models && pnpm test:hooks && pnpm test:ui && pnpm test:db && pnpm test:e2e",
+    "test": "./scripts/runAllTests.sh",
     "test:ava-cli": "pnpm --filter @avandar/ava-cli test",
     "test:ava-etl": "pnpm --filter @avandar/ava-etl test",
     "test:clients": "pnpm --filter @avandar/clients test",
@@ -44,6 +44,8 @@
     "preview": "vite preview",
     "tsc-watch": "scripts/tsc-watch.sh",
     "db:apply-migrations": "./scripts/applyMigrations.sh",
+    "desktop:sqlite:gen-migrations": "bun apps/desktop/scripts/gen-sqlite-migrations/main.ts",
+    "desktop:sqlite:check-migrations": "bun apps/desktop/scripts/check-sqlite-migrations/main.ts",
     "db:create-user": "pnpm vite-script scripts/createUserScript.ts",
     "db:delete-user": "./scripts/db/delete-user/delete-user.sh",
     "db:gen-types": "supabase gen types typescript --local > shared/types/database.types.ts",
@@ -65,7 +67,8 @@
     "fns:serve": "supabase functions serve",
     "vite-script": "./scripts/utils/run-vite-script.sh",
     "util:get-current-version": "./scripts/utils/get-current-version.sh",
-    "util:get-project-root": "./scripts/utils/get-project-root.sh"
+    "util:get-project-root": "./scripts/utils/get-project-root.sh",
+    "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true"
   },
   "preinstall": "npx only-allow pnpm",
   "//comments:dependencies": {

@@ -210,7 +210,7 @@ Check these first because they are the most frequent review findings:
 - Comments should not use em dashes. Prefer a colon or a hyphen.
 - Exported or public interfaces, constants, objects, functions, and classes
   should have block comments or docstrings.
-- Functions should stay short, ideally 40 lines or fewer.
+- Functions should stay short, ideally 45 lines or fewer.
 - If a function is getting too long or contains reusable logic, extract a
   utility function.
 - Follow normal language naming conventions for the file's language.

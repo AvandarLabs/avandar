@@ -6,6 +6,11 @@ export const Route = createFileRoute("/_auth/$workspaceSlug/data-manager")({
   beforeLoad: RouteMiddleware.BeforeLoad.checkUserPermissions({
     permissionKey: "data_sources__can_list_sources",
     appLabel: "Data Sources",
+    resourceFallback: {
+      type: "dataset",
+      idParam: "datasetId",
+      minRole: "viewer",
+    },
   }),
   component: DataManagerApp,
 });
