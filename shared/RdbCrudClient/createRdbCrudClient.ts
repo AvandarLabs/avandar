@@ -1,3 +1,4 @@
+import { createSqliteCrudClient } from "@clients/SqliteCrudClient/createSqliteCrudClient.ts";
 import { createSupabaseCrudClient } from "@clients/SupabaseCrudClient/createSupabaseCrudClient.ts";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase.ts";
 import { isDesktop } from "$/platform/isDesktop.ts";
@@ -12,17 +13,20 @@ import type { EmptyObject } from "type-fest";
 /**
  * Platform-aware CRUD client factory.
  *
- * For now, we always return the Supabase-backed client. Soon, this will
- * branch on {@link isDesktop} and return a SQLite-backed client when
- * running on the Electrobun desktop shell.
+ * On web, delegates to {@link createSupabaseCrudClient}. On the
+ * Electrobun desktop shell (where `isDesktop()` is true), delegates to
+ * {@link createSqliteCrudClient} so reads and writes hit the local
+ * SQLite mirror through the typed IPC bridge instead of Supabase REST.
  *
- * Consumers pass the spec WITHOUT a `dbClient` field; the factory injects the
- * shared `AvaSupabase` singleton. This makes the migration from
- * `createSupabaseCrudClient` to `createRdbCrudClient` purely mechanical —
- * every call site drops the explicit `dbClient: AvaSupabase.db()` field.
+ * Both branches return the same `SupabaseCrudClient<…>` shape so the
+ * call sites under `src/clients/**` stay unchanged.
  *
- * @param modelSpec - CRUD spec (CRUD models, names, and primary keys)
- * @returns The Supabase-backed CRUD client (for now. Soon to be a union)
+ * Consumers pass the spec WITHOUT a `dbClient` field; the factory
+ * injects the shared `AvaSupabase` singleton. The SQLite client still
+ * accepts the Supabase handle because its escape-hatch `queries` and
+ * `mutations` factories receive it (Phase 2 leaves those targeting
+ * Supabase REST; Phase 3's sync engine will route them through the
+ * local mirror).
  */
 export function createRdbCrudClient<
   M extends AnySupabaseCrudModelSpec,
@@ -35,15 +39,23 @@ export function createRdbCrudClient<
     ExtendedMutationsClient
   >,
 ): SupabaseCrudClient<M, ExtendedQueriesClient, ExtendedMutationsClient> {
-  // For now, both web and desktop fall through to the Supabase factory.
-  // Soon, this we will introduce a SQLite-backed branch here for desktop:
-  //   if (isDesktop()) return createSqliteCrudClient(spec);
+  const dbClient = AvaSupabase.db();
+  if (isDesktop()) {
+    return createSqliteCrudClient<
+      M,
+      ExtendedQueriesClient,
+      ExtendedMutationsClient
+    >({
+      ...modelSpec,
+      dbClient,
+    });
+  }
   return createSupabaseCrudClient<
     M,
     ExtendedQueriesClient,
     ExtendedMutationsClient
   >({
     ...modelSpec,
-    dbClient: AvaSupabase.db(),
+    dbClient,
   });
 }
