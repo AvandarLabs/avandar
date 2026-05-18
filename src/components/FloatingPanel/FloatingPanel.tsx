@@ -15,6 +15,7 @@ import {
 } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
 import css from "./FloatingPanel.module.css";
+import type { ReactNode } from "react";
 
 type FloatingPanelInitialPosition = {
   top?: number;
@@ -46,7 +47,7 @@ type Props = {
   width?: number | string;
 
   /** Body content rendered below the header. */
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 /**

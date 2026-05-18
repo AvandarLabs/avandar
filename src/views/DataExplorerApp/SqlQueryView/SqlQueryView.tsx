@@ -32,7 +32,7 @@ export function SqlQueryView(): JSX.Element {
         legend={
           <Group justify="space-between" style={{ width: "100%" }}>
             <span>Generated SQL</span>
-            {!isEditMode && (
+            {isEditMode ? null : (
               <Button
                 size="xs"
                 variant="subtle"
