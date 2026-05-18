@@ -10,7 +10,8 @@ import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 const _minimalBarViz: VizConfig = {
   vizType: "bar",
   xAxisKey: "a",
-  yAxisKey: "b",
+  series: [{ renderAs: "bar", key: "b" }],
+  layout: "group",
   withLegend: false,
 };
 

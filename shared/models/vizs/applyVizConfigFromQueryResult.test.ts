@@ -34,24 +34,27 @@ describe("isVizConfigEqualForQueryResultSync", () => {
         {
           vizType: "bar",
           xAxisKey: undefined,
-          yAxisKey: undefined,
+          series: [],
+          layout: "group",
           withLegend: true,
         },
       ),
     ).toBe(false);
   });
 
-  it("compares XY keys for bar configs", () => {
+  it("compares xAxisKey and series for bar configs", () => {
     const a = {
       vizType: "bar" as const,
       xAxisKey: "a",
-      yAxisKey: "b",
+      series: [{ renderAs: "bar" as const, key: "b" }],
+      layout: "group" as const,
       withLegend: true,
     };
     const b = {
       vizType: "bar" as const,
       xAxisKey: "a",
-      yAxisKey: "b",
+      series: [{ renderAs: "bar" as const, key: "b" }],
+      layout: "group" as const,
       withLegend: true,
     };
     expect(isVizConfigEqualForQueryResultSync(a, b)).toBe(true);
@@ -76,7 +79,8 @@ describe("applyVizConfigFromQueryResult", () => {
       vizConfig: {
         vizType: "bar",
         xAxisKey: "gone",
-        yAxisKey: "n",
+        series: [{ renderAs: "bar", key: "n" }],
+        layout: "group",
         withLegend: true,
       },
       rawSQL: undefined,
@@ -87,7 +91,9 @@ describe("applyVizConfigFromQueryResult", () => {
       columns: cols([{ name: "n", dataType: "double" }]),
     });
     expect((out as { xAxisKey?: string }).xAxisKey).toBeUndefined();
-    expect((out as { yAxisKey?: string }).yAxisKey).toBe("n");
+    expect((out as { series?: Array<{ key: string }> }).series?.[0]?.key).toBe(
+      "n",
+    );
   });
 
   it("hydrates from result when raw SQL is set", () => {
@@ -95,7 +101,8 @@ describe("applyVizConfigFromQueryResult", () => {
       vizConfig: {
         vizType: "bar",
         xAxisKey: undefined,
-        yAxisKey: undefined,
+        series: [],
+        layout: "group",
         withLegend: true,
       },
       rawSQL: "SELECT * FROM t",
@@ -106,7 +113,9 @@ describe("applyVizConfigFromQueryResult", () => {
       ]),
     });
     expect((out as { xAxisKey?: string }).xAxisKey).toBe("month");
-    expect((out as { yAxisKey?: string }).yAxisKey).toBe("total");
+    expect((out as { series?: Array<{ key: string }> }).series?.[0]?.key).toBe(
+      "total",
+    );
   });
 
   it("does not change axes when both are valid in result (2B)", () => {
@@ -114,7 +123,8 @@ describe("applyVizConfigFromQueryResult", () => {
       vizConfig: {
         vizType: "bar",
         xAxisKey: "month",
-        yAxisKey: "total",
+        series: [{ renderAs: "bar", key: "total" }],
+        layout: "group",
         withLegend: true,
       },
       rawSQL: "SELECT * FROM t",
@@ -125,6 +135,8 @@ describe("applyVizConfigFromQueryResult", () => {
       ]),
     });
     expect((out as { xAxisKey?: string }).xAxisKey).toBe("month");
-    expect((out as { yAxisKey?: string }).yAxisKey).toBe("total");
+    expect((out as { series?: Array<{ key: string }> }).series?.[0]?.key).toBe(
+      "total",
+    );
   });
 });

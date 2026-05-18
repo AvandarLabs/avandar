@@ -1,25 +1,53 @@
 import { RadarChart as MantineRadarChart } from "@mantine/charts";
 import { useMemo } from "react";
 import type { UnknownDataFrame } from "@utils";
+import type { ChartStyle } from "$/models/vizs/ChartStyle";
+import type { RadarSeries } from "$/models/vizs/SeriesConfig";
 
 type Props = {
   data: UnknownDataFrame;
   nameKey: string;
-  valueKey: string;
-  color?: string;
+  series: ReadonlyArray<RadarSeries>;
   height?: number;
+  withLegend?: boolean;
+  chartStyle?: ChartStyle;
 };
+
+const DEFAULT_FILL_OPACITY = 0.2;
 
 export function RadarChart({
   data,
   nameKey,
-  valueKey,
-  color = "blue.6",
+  series,
   height = 300,
+  withLegend = true,
+  chartStyle,
 }: Props): JSX.Element {
-  const series = useMemo(() => {
-    return [{ name: valueKey, color, opacity: 0.2 }];
-  }, [valueKey, color]);
+  const mantineSeries = useMemo(() => {
+    return series.map((s) => {
+      return {
+        name: s.key,
+        label: s.label,
+        color: s.color ?? "blue.6",
+        opacity: s.fillOpacity ?? DEFAULT_FILL_OPACITY,
+        strokeWidth: s.strokeWidth,
+      };
+    });
+  }, [series]);
+
+  const legendProps = useMemo(() => {
+    const position = chartStyle?.legend?.position ?? "top";
+    return {
+      verticalAlign:
+        position === "bottom" ? "bottom"
+        : position === "top" ? "top"
+        : "middle",
+      align:
+        position === "left" ? "left"
+        : position === "right" ? "right"
+        : "center",
+    } as const;
+  }, [chartStyle?.legend?.position]);
 
   return (
     <MantineRadarChart
@@ -27,9 +55,10 @@ export function RadarChart({
       w="100%"
       data={data as Array<Record<string, unknown>>}
       dataKey={nameKey}
-      series={series}
+      series={mantineSeries}
       withTooltip
-      withLegend
+      withLegend={withLegend}
+      legendProps={legendProps}
     />
   );
 }

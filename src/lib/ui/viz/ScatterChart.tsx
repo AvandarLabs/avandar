@@ -1,14 +1,21 @@
 import { ScatterChart as MantineScatterChart } from "@mantine/charts";
 import { useMemo } from "react";
-import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
+import type { UnknownDataFrame } from "@utils";
 import type { ScatterChartSeries } from "@mantine/charts";
+
+type Props = {
+  data: UnknownDataFrame;
+  xAxisKey: string;
+  yAxisKey: string;
+  height: number;
+};
 
 export function ScatterChart({
   data,
   xAxisKey,
   yAxisKey,
   height = 500,
-}: XYChartProps): JSX.Element {
+}: Props): JSX.Element {
   // data needs special formatting and typing coercion for scatter chart
   const scatterSeries: ScatterChartSeries[] = useMemo(() => {
     const points = data

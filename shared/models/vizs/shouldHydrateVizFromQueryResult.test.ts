@@ -27,7 +27,8 @@ describe("shouldHydrateVizFromQueryResult", () => {
   const barEmpty: VizConfig = {
     vizType: "bar",
     xAxisKey: undefined,
-    yAxisKey: undefined,
+    series: [],
+    layout: "group",
     withLegend: true,
   };
 
@@ -61,7 +62,8 @@ describe("shouldHydrateVizFromQueryResult", () => {
         vizConfig: {
           vizType: "bar",
           xAxisKey: "month",
-          yAxisKey: "total",
+          series: [{ renderAs: "bar", key: "total" }],
+          layout: "group",
           withLegend: true,
         },
         resultColumnNames: new Set(["month", "total"]),
@@ -80,7 +82,8 @@ describe("shouldHydrateVizFromQueryResult", () => {
         vizConfig: {
           vizType: "bar",
           xAxisKey: "month",
-          yAxisKey: "total_cases",
+          series: [{ renderAs: "bar", key: "total_cases" }],
+          layout: "group",
           withLegend: true,
         },
         resultColumnNames: new Set(["month", "total_cases"]),
@@ -107,7 +110,8 @@ describe("shouldHydrateVizFromQueryResult", () => {
         vizConfig: {
           vizType: "bar",
           xAxisKey: "old_x",
-          yAxisKey: "y",
+          series: [{ renderAs: "bar", key: "y" }],
+          layout: "group",
           withLegend: true,
         },
         resultColumnNames: new Set(["month", "y"]),
@@ -137,9 +141,10 @@ describe("shouldHydrateVizFromQueryResult", () => {
         vizConfig: {
           vizType: "line",
           xAxisKey: "month",
-          yAxisKey: "total_cases",
+          series: [
+            { renderAs: "line", key: "total_cases", curveType: "monotone" },
+          ],
           withLegend: true,
-          curveType: "monotone",
         },
         resultColumnNames: new Set(["month", "total_cases"]),
       }),

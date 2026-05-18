@@ -231,9 +231,8 @@ describe("serializeStateToURL", () => {
     const vizConfig: VizConfig = {
       vizType: "line",
       xAxisKey: "month",
-      yAxisKey: "total_cases",
+      series: [{ renderAs: "line", key: "total_cases", curveType: "monotone" }],
       withLegend: false,
-      curveType: "monotone",
     };
     const result = serializeStateToURL(_makeState({ vizConfig }));
     expect(result.vc).toBeDefined();
@@ -359,7 +358,8 @@ describe("round-trip: serialize then parse", () => {
     const vizConfig: VizConfig = {
       vizType: "bar",
       xAxisKey: "month",
-      yAxisKey: "total_cases",
+      series: [{ renderAs: "bar", key: "total_cases" }],
+      layout: "group",
       withLegend: true,
     };
     const parsed = parseURLSearch(

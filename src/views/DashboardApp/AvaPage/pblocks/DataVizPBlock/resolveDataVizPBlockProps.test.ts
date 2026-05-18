@@ -24,7 +24,8 @@ describe("resolveDataVizPBlockProps", () => {
         vizConfig: {
           vizType: "bar",
           xAxisKey: "category",
-          yAxisKey: "value",
+          series: [{ renderAs: "bar", key: "value" }],
+          layout: "group",
           withLegend: true,
         },
       },
@@ -86,7 +87,8 @@ describe("resolveDataVizPBlockProps", () => {
       vizConfig: {
         vizType: "bar",
         xAxisKey: "category",
-        yAxisKey: "value",
+        series: [{ renderAs: "bar", key: "value" }],
+        layout: "group",
         withLegend: true,
       },
     };
@@ -102,7 +104,8 @@ describe("resolveDataVizPBlockProps", () => {
         vizConfig: {
           vizType: "bar",
           xAxisKey: "category",
-          yAxisKey: "value",
+          series: [{ renderAs: "bar", key: "value" }],
+          layout: "group",
           withLegend: true,
         },
       },
@@ -111,7 +114,8 @@ describe("resolveDataVizPBlockProps", () => {
     expect(next.vizConfig.vizType).toBe("line");
     if (next.vizConfig.vizType === "line") {
       expect(next.vizConfig.xAxisKey).toBe("category");
-      expect(next.vizConfig.yAxisKey).toBe("value");
+      expect(next.vizConfig.series[0]?.key).toBe("value");
+      expect(next.vizConfig.series[0]?.renderAs).toBe("line");
     }
   });
 });

@@ -57,6 +57,16 @@ export const VizConfigs = {
     return _getVizTypeModule(type).displayName;
   },
 
+  /**
+   * Get the descriptor registry for a viz type. Used by the
+   * settings form to render chart-level controls and to look up
+   * series-level controls (including from foreign viz types when a
+   * series's `renderAs` differs from the host).
+   */
+  getDescriptors: <VType extends VizType>(type: VType) => {
+    return _getVizTypeModule(type).descriptors;
+  },
+
   makeEmptyConfig: <VType extends VizType>(
     type: VType,
   ): VizConfigType<VType> => {

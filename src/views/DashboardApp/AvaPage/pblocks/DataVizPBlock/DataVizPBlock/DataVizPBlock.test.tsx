@@ -143,7 +143,8 @@ describe("DataVizPBlock", () => {
       vizConfig: {
         vizType: "bar",
         xAxisKey: "category",
-        yAxisKey: "value",
+        series: [{ renderAs: "bar", key: "value" }],
+        layout: "group",
         withLegend: true,
       },
     });
@@ -161,9 +162,8 @@ describe("DataVizPBlock", () => {
       vizConfig: {
         vizType: "line",
         xAxisKey: "category",
-        yAxisKey: "value",
+        series: [{ renderAs: "line", key: "value", curveType: "monotone" }],
         withLegend: false,
-        curveType: "monotone",
       },
     });
     expect(screen.getByTestId("visualization-container")).toHaveAttribute(
@@ -180,9 +180,9 @@ describe("DataVizPBlock", () => {
       vizConfig: {
         vizType: "area",
         xAxisKey: "category",
-        yAxisKey: "value",
+        series: [{ renderAs: "area", key: "value", curveType: "linear" }],
+        layout: "default",
         withLegend: true,
-        curveType: "linear",
       },
     });
     expect(screen.getByTestId("visualization-container")).toHaveAttribute(
@@ -253,7 +253,8 @@ describe("DataVizPBlock", () => {
       vizConfig: {
         vizType: "radar",
         nameKey: "category",
-        valueKey: "value",
+        series: [{ key: "value" }],
+        withLegend: true,
       },
     });
     expect(screen.getByTestId("visualization-container")).toHaveAttribute(

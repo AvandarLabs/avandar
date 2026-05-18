@@ -1,4 +1,4 @@
 /**
  * The current schema version of the AvaPageData schema.
  */
-export const CURRENT_SCHEMA_VERSION = 2;
+export const CURRENT_SCHEMA_VERSION = 3;

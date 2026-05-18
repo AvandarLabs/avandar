@@ -1,12 +1,9 @@
 import { match } from "ts-pattern";
-import { AreaChartForm } from "@/components/VisualizationContainer/VizSettingsForm/AreaChartForm";
-import { BarChartForm } from "@/components/VisualizationContainer/VizSettingsForm/BarChartForm";
 import { BubbleChartForm } from "@/components/VisualizationContainer/VizSettingsForm/BubbleChartForm";
 import { FunnelChartForm } from "@/components/VisualizationContainer/VizSettingsForm/FunnelChartForm";
-import { LineChartForm } from "@/components/VisualizationContainer/VizSettingsForm/LineChartForm";
 import { PieChartForm } from "@/components/VisualizationContainer/VizSettingsForm/PieChartForm";
-import { RadarChartForm } from "@/components/VisualizationContainer/VizSettingsForm/RadarChartForm";
 import { ScatterChartForm } from "@/components/VisualizationContainer/VizSettingsForm/ScatterChartForm";
+import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm";
 import type { UnknownDataFrame } from "@utils";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
@@ -28,6 +25,11 @@ type Props = {
  * anywhere a viz config needs to be edited (DataExplorer sidebar, Puck custom
  * field in the dashboard editor, etc.) by composing it with whatever viz-type
  * picker is appropriate for that context.
+ *
+ * Bar / line / area / radar share a descriptor-driven form
+ * (`SeriesAwareVizForm`). The remaining single-series vizs (pie,
+ * funnel, scatter, bubble) keep their hand-coded forms until phase 2
+ * migrates them.
  */
 export function VizSettingsFormBody({
   columns,
@@ -41,34 +43,37 @@ export function VizSettingsFormBody({
     })
     .with({ vizType: "bar" }, (config) => {
       return (
-        <BarChartForm
+        <SeriesAwareVizForm
           fields={columns}
           config={config}
-          onConfigChange={(newConfig) => {
-            onVizConfigChange({ ...config, ...newConfig });
-          }}
+          onConfigChange={onVizConfigChange}
         />
       );
     })
     .with({ vizType: "line" }, (config) => {
       return (
-        <LineChartForm
+        <SeriesAwareVizForm
           fields={columns}
           config={config}
-          onConfigChange={(newConfig) => {
-            onVizConfigChange({ ...config, ...newConfig });
-          }}
+          onConfigChange={onVizConfigChange}
         />
       );
     })
     .with({ vizType: "area" }, (config) => {
       return (
-        <AreaChartForm
+        <SeriesAwareVizForm
           fields={columns}
           config={config}
-          onConfigChange={(newConfig) => {
-            onVizConfigChange({ ...config, ...newConfig });
-          }}
+          onConfigChange={onVizConfigChange}
+        />
+      );
+    })
+    .with({ vizType: "radar" }, (config) => {
+      return (
+        <SeriesAwareVizForm
+          fields={columns}
+          config={config}
+          onConfigChange={onVizConfigChange}
         />
       );
     })
@@ -101,17 +106,6 @@ export function VizSettingsFormBody({
           fields={columns}
           config={config}
           data={data}
-          onConfigChange={(newConfig) => {
-            onVizConfigChange({ ...config, ...newConfig });
-          }}
-        />
-      );
-    })
-    .with({ vizType: "radar" }, (config) => {
-      return (
-        <RadarChartForm
-          fields={columns}
-          config={config}
           onConfigChange={(newConfig) => {
             onVizConfigChange({ ...config, ...newConfig });
           }}
