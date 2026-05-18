@@ -2,6 +2,7 @@ import { Outlet } from "@tanstack/react-router";
 import { where } from "@utils";
 import { ReactNode, useMemo } from "react";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
+import { AppDropzone } from "@/components/AppDropzone/AppDropzone";
 import { AppShell } from "@/components/AppShell/AppShell";
 import { useRootWorkspaceChecks } from "@/components/layouts/RootLayout/useRootWorkspaceChecks/useRootWorkspaceChecks";
 import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions";
@@ -93,16 +94,18 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
 
   return (
     <DataExplorerStateManager.Provider>
-      <AppShell
-        title={workspace.name}
-        currentWorkspace={workspace}
-        profileLink={profileLink}
-        navbarLinks={mainNavBarLinks}
-        utilityLinks={utilityNavBarLinks}
-        spotlightActions={spotlightActions}
-      >
-        {children}
-      </AppShell>
+      <AppDropzone>
+        <AppShell
+          title={workspace.name}
+          currentWorkspace={workspace}
+          profileLink={profileLink}
+          navbarLinks={mainNavBarLinks}
+          utilityLinks={utilityNavBarLinks}
+          spotlightActions={spotlightActions}
+        >
+          {children}
+        </AppShell>
+      </AppDropzone>
     </DataExplorerStateManager.Provider>
   );
 }

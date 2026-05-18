@@ -57,7 +57,18 @@ function _duckDbColumnsToImportedColumns(
   });
 }
 
-export function useSaveDataset(): UseMutationResultTuple<
+type UseSaveDatasetOptions = {
+  /**
+   * Called once the dataset has been saved and the success notification
+   * has fired, just before the default navigation to the dataset view.
+   * Used by the app-wide import modal to close itself.
+   */
+  onAfterSave?: (savedDataset: Dataset.T) => void;
+};
+
+export function useSaveDataset(
+  options: UseSaveDatasetOptions = {},
+): UseMutationResultTuple<
   Dataset.T,
   DatasetImportFormValues & DataSourceMetadata
 > {
@@ -185,6 +196,8 @@ export function useSaveDataset(): UseMutationResultTuple<
             `Unsupported dataset source type: ${params.sourceType}`,
           );
         });
+
+      options.onAfterSave?.(savedDataset);
 
       navigate(
         AppLinks.dataManagerDatasetView({

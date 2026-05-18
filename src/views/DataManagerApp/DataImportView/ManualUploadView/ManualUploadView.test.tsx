@@ -365,4 +365,25 @@ describe("ManualUploadView", () => {
     expect(screen.getAllByText("Number").length).toBe(2);
     expect(screen.getAllByText("Integer").length).toBe(2);
   });
+
+  it("automatically parses the file when initialFile is provided", async () => {
+    const csvBuffer = readFileSync(FIXTURE_CSV_PATH);
+    const file = new File([csvBuffer], "preloaded.csv", {
+      type: "text/csv",
+    });
+
+    renderWithProviders(<ManualUploadView initialFile={file} />);
+
+    await waitFor(() => {
+      expect(storeLocalCSVMock).toHaveBeenCalled();
+    });
+
+    await waitFor(() => {
+      expect(notifySuccessMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: "File loaded successfully",
+        }),
+      );
+    });
+  });
 });
