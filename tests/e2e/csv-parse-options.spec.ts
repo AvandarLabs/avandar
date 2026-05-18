@@ -111,11 +111,13 @@ test.describe("CSV parsing options", () => {
 
     // Baseline: default sniffed options (delimiter=",", skip=0).
     await expectParsedRowCount(page, SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT);
-    for (const columnName of EXPECTED_CSV_COLUMN_NAMES) {
-      await expect(
-        page.getByRole("columnheader", { name: columnName, exact: true }),
-      ).toBeVisible({ timeout: SHORT_WAIT });
-    }
+    await Promise.all(
+      EXPECTED_CSV_COLUMN_NAMES.map(async (columnName) => {
+        await expect(
+          page.getByRole("columnheader", { name: columnName, exact: true }),
+        ).toBeVisible({ timeout: SHORT_WAIT });
+      }),
+    );
 
     // Variation 1: skip=1 promotes the first data row to the header line.
     // 99 data rows, 6 columns with the new (data-derived) names. This is
@@ -124,11 +126,13 @@ test.describe("CSV parsing options", () => {
     await setSkipRows(page, 1);
     await clickReparse(page);
     await expectParsedRowCount(page, 99);
-    for (const columnName of COLUMN_NAMES_AFTER_SKIP_1) {
-      await expect(
-        page.getByRole("columnheader", { name: columnName, exact: true }),
-      ).toBeVisible({ timeout: MEDIUM_WAIT });
-    }
+    await Promise.all(
+      COLUMN_NAMES_AFTER_SKIP_1.map(async (columnName) => {
+        await expect(
+          page.getByRole("columnheader", { name: columnName, exact: true }),
+        ).toBeVisible({ timeout: MEDIUM_WAIT });
+      }),
+    );
     // The original headers must NOT appear as columns anymore.
     await expect(
       page.getByRole("columnheader", {
@@ -171,7 +175,7 @@ test.describe("CSV parsing options", () => {
       page.getByRole("columnheader", { name: "Admin2", exact: true }),
     ).toHaveCount(0, { timeout: MEDIUM_WAIT });
 
-    // Variation 5: colon delimiter — same wrong-delimiter effect as `;`.
+    // Variation 5: colon delimiter, same wrong-delimiter effect as `;`.
     await setDelimiter(page, ":");
     await clickReparse(page);
     await expectParsedRowCount(page, SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT);
@@ -182,7 +186,7 @@ test.describe("CSV parsing options", () => {
       }),
     ).toHaveCount(0, { timeout: MEDIUM_WAIT });
 
-    // Variation 6: pipe delimiter — same wrong-delimiter effect.
+    // Variation 6: pipe delimiter, same wrong-delimiter effect.
     await setDelimiter(page, "|");
     await clickReparse(page);
     await expectParsedRowCount(page, SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT);
@@ -200,11 +204,13 @@ test.describe("CSV parsing options", () => {
     await setSkipRows(page, FINAL_SKIP_ROWS);
     await clickReparse(page);
     await expectParsedRowCount(page, 99);
-    for (const columnName of COLUMN_NAMES_AFTER_SKIP_1) {
-      await expect(
-        page.getByRole("columnheader", { name: columnName, exact: true }),
-      ).toBeVisible({ timeout: MEDIUM_WAIT });
-    }
+    await Promise.all(
+      COLUMN_NAMES_AFTER_SKIP_1.map(async (columnName) => {
+        await expect(
+          page.getByRole("columnheader", { name: columnName, exact: true }),
+        ).toBeVisible({ timeout: MEDIUM_WAIT });
+      }),
+    );
 
     await ensureCloudStorageCheckedAndSaveDataset({
       page,
@@ -225,15 +231,17 @@ test.describe("CSV parsing options", () => {
     });
 
     // The saved dataset's data preview must use the headers from the
-    // FINAL_SKIP_ROWS / FINAL_DELIMITER configuration — not the headers
+    // FINAL_SKIP_ROWS / FINAL_DELIMITER configuration, not the headers
     // DuckDB sniffed on the initial upload. If `save` ignored the user's
     // options and saved the original sniffed parse, "Province_State"
     // would still be visible here.
-    for (const columnName of COLUMN_NAMES_AFTER_SKIP_1) {
-      await expect(
-        page.getByRole("columnheader", { name: columnName, exact: true }),
-      ).toBeVisible({ timeout: MEDIUM_WAIT });
-    }
+    await Promise.all(
+      COLUMN_NAMES_AFTER_SKIP_1.map(async (columnName) => {
+        await expect(
+          page.getByRole("columnheader", { name: columnName, exact: true }),
+        ).toBeVisible({ timeout: MEDIUM_WAIT });
+      }),
+    );
     await expect(
       page.getByRole("columnheader", {
         name: "Province_State",
