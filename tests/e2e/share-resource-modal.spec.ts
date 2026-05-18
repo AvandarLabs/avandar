@@ -1,6 +1,6 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
-import { CALIFORNIA_CSV_PATH } from "./helpers/constants";
+import { SMALL_CALIFORNIA_CSV_PATH } from "./helpers/constants";
 import { ensureCloudStorageCheckedAndSaveDataset } from "./helpers/manualUploadCloudSyncFlow";
 import { LONG_WAIT } from "./helpers/timeouts";
 
@@ -29,7 +29,7 @@ test.describe("Share resource modal", () => {
     const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
     await uploadPanel
       .locator('input[type="file"]')
-      .setInputFiles(CALIFORNIA_CSV_PATH);
+      .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
     await uploadPanel
       .getByRole("button", { name: "Upload", exact: true })
       .click();

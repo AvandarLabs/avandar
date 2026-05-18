@@ -1,8 +1,8 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
-  CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
-  CALIFORNIA_CSV_PATH,
+  SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
+  SMALL_CALIFORNIA_CSV_PATH,
 } from "./helpers/constants";
 import { createDashboardWithDataVizBlock } from "./helpers/createDashboardWithDataVizBlock";
 import {
@@ -20,7 +20,7 @@ import type { SeededVizConfig } from "./helpers/createDashboardWithDataVizBlock"
 /**
  * Per-viz-type seeds used to verify every visualization renders inside the
  * dashboard editor. SQL aggregations match the column types of the
- * `california-covid-sample.csv` dataset (varchar Admin2 / Province_State,
+ * `small-california-covid-sample.csv` dataset (varchar Admin2 / Province_State,
  * numeric Lat / Long_ / daily_new_cases, date `date`).
  */
 type VizTypeCase = {
@@ -185,7 +185,7 @@ test.describe("DataViz PBlock — every visualization", () => {
     const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
     await uploadPanel
       .locator('input[type="file"]')
-      .setInputFiles(CALIFORNIA_CSV_PATH);
+      .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
     await uploadPanel
       .getByRole("button", { name: "Upload", exact: true })
       .click();
@@ -195,7 +195,7 @@ test.describe("DataViz PBlock — every visualization", () => {
     ).toBeVisible({ timeout: LONG_WAIT });
 
     const formattedRowCount =
-      CALIFORNIA_CSV_EXPECTED_ROW_COUNT.toLocaleString("en-US");
+      SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT.toLocaleString("en-US");
     await expect(
       page.getByText(`Parsed ${formattedRowCount} rows successfully`),
     ).toBeVisible({ timeout: LONG_WAIT });

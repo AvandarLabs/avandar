@@ -19,7 +19,7 @@ import {
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
 test.describe("CSV manual upload", () => {
-  test("uploads CSV, verifies preview, offline/online cycle, parquet, toggle", async ({
+  test("uploads a medium-sized CSV dataset, verifies preview, offline/online cycle, parquet, toggle", async ({
     page,
     e2eWorkerDb,
   }) => {
