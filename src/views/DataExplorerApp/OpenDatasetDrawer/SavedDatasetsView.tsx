@@ -15,9 +15,11 @@ import { IconSearch, IconTrash } from "@tabler/icons-react";
 import { notifyError, notifySuccess } from "@ui";
 import { where } from "@utils";
 import { useState } from "react";
+import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { buildSelectAllPreviewSQL } from "@/views/DataExplorerApp/OpenDatasetDrawer/datasetPreviewSQL";
 import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
@@ -35,14 +37,6 @@ const SOURCE_TYPE_LABEL: Record<DatasetSource.SourceType, string> = {
   virtual: "Derived",
 };
 
-function _quoteIdentifier(value: string): string {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
-function _selectAllSQL(datasetId: string): string {
-  return `SELECT * FROM ${_quoteIdentifier(datasetId)} LIMIT 100`;
-}
-
 /**
  * Lists every saved dataset in the workspace. Opening a derived (virtual)
  * dataset runs its stored SQL; opening any other dataset runs
@@ -59,11 +53,11 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
     useQueryOptions: { enabled: true },
   });
 
-  const filtered = (datasets ?? []).filter((d) => {
+  const filtered = (datasets ?? []).filter((dataset) => {
     if (!debouncedSearch) {
       return true;
     }
-    return d.name.toLowerCase().includes(debouncedSearch.toLowerCase());
+    return dataset.name.toLowerCase().includes(debouncedSearch.toLowerCase());
   });
 
   const [deleteDataset, isDeletingDataset] = DatasetClient.useFullDelete({
@@ -108,19 +102,26 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
     },
   });
 
-  const onOpenClick = (dataset: Dataset.T) => {
-    if (dataset.sourceType === "virtual") {
-      loadVirtualDataset(dataset);
-      return;
-    }
+  const openAsRawPreview = (dataset: Dataset.T) => {
     onOpen(
       {
         datasetId: dataset.id,
         name: dataset.name,
         sourceType: dataset.sourceType,
       },
-      _selectAllSQL(dataset.id),
+      buildSelectAllPreviewSQL(dataset.id),
     );
+  };
+
+  const onOpenClick = (dataset: Dataset.T) => {
+    match(dataset.sourceType)
+      .with("virtual", () => {
+        loadVirtualDataset(dataset);
+      })
+      .with("csv_file", "xlsx_file", "google_sheets", "open_data", () => {
+        openAsRawPreview(dataset);
+      })
+      .exhaustive();
   };
 
   const onDeleteClick = (dataset: Dataset.T) => {

@@ -1,6 +1,7 @@
 import { Title } from "@mantine/core";
 import { Drawer, Tabs } from "@ui";
 import { APP_SHELL_MAIN_ID } from "@/components/AppShell/AppShell";
+import { buildSelectAllPreviewSQL } from "@/views/DataExplorerApp/OpenDatasetDrawer/datasetPreviewSQL";
 import { ImportDatasetView } from "@/views/DataExplorerApp/OpenDatasetDrawer/ImportDatasetView";
 import { SavedDatasetsView } from "@/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView";
 import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
@@ -17,14 +18,6 @@ type Props = {
   onOpen: (info: OpenDatasetInfo, rawSQL: string) => void;
 };
 
-function _quoteIdentifier(value: string): string {
-  return `"${value.replace(/"/g, '""')}"`;
-}
-
-function _selectAllSQL(datasetId: string): string {
-  return `SELECT * FROM ${_quoteIdentifier(datasetId)} LIMIT 100`;
-}
-
 /**
  * The Data Explorer's "Open" drawer. Toggles between a list of saved
  * datasets and the dataset-import flow, and is scoped to the app's main
@@ -35,19 +28,15 @@ export function OpenDatasetDrawer({
   onClose,
   onOpen,
 }: Props): JSX.Element {
-  const handleImportSaved = (dataset: Dataset.T) => {
+  const onImportSaved = (dataset: Dataset.T) => {
     onOpen(
       {
         datasetId: dataset.id,
         name: dataset.name,
         sourceType: dataset.sourceType,
       },
-      _selectAllSQL(dataset.id),
+      buildSelectAllPreviewSQL(dataset.id),
     );
-  };
-
-  const handleSavedOpen = (info: OpenDatasetInfo, rawSQL: string) => {
-    onOpen(info, rawSQL);
   };
 
   return (
@@ -67,10 +56,10 @@ export function OpenDatasetDrawer({
         }}
         renderTabPanel={{
           saved: () => {
-            return <SavedDatasetsView onOpen={handleSavedOpen} />;
+            return <SavedDatasetsView onOpen={onOpen} />;
           },
           import: () => {
-            return <ImportDatasetView onSaveSuccess={handleImportSaved} />;
+            return <ImportDatasetView onSaveSuccess={onImportSaved} />;
           },
         }}
       />

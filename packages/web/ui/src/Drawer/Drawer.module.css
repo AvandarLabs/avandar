@@ -20,8 +20,8 @@
  * would otherwise escape the parent and span the whole window.
  */
 .scopedRoot {
-  position: absolute;
   inset: 0;
+  position: absolute;
 }
 
 .scopedInner {

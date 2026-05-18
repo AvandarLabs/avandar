@@ -43,8 +43,8 @@ const ASIDE_DEFAULT_WIDTH = 380;
 
 /**
  * DOM id on the AppShell's main content area. Components that need to scope
- * an overlay (drawer, popover, etc.) to the main canvas — without covering
- * the side navbar or the chat panel Aside — can target this element.
+ * an overlay (drawer, popover, etc.) to the main canvas, without covering
+ * the side navbar or the chat panel Aside, can target this element.
  */
 export const APP_SHELL_MAIN_ID = "ava-app-shell-main";
 
