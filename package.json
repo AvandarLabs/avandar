@@ -67,7 +67,8 @@
     "fns:serve": "supabase functions serve",
     "vite-script": "./scripts/utils/run-vite-script.sh",
     "util:get-current-version": "./scripts/utils/get-current-version.sh",
-    "util:get-project-root": "./scripts/utils/get-project-root.sh"
+    "util:get-project-root": "./scripts/utils/get-project-root.sh",
+    "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true"
   },
   "preinstall": "npx only-allow pnpm",
   "//comments:dependencies": {

@@ -56,7 +56,7 @@ Implement functionality using red/green TDD.
 
 ## Functions & Logic
 
-- Keep functions short (<= 40 lines).
+- Keep functions short (<= 45 lines).
 - Extract logic into utility functions if:
   - The function will be too long otherwise
   - The logic will be reused
@@ -109,3 +109,15 @@ Implement functionality using red/green TDD.
 - Prefer deleting or reverting only rows that test inserted or changed
   (track ids or booleans) instead of broad resets that could harm unrelated
   developer data.
+- Locally, never set a per-test timeout longer than **45 seconds**
+  (`test.setTimeout` or the default in `playwright.config.ts`). Long timeouts
+  make failure cycles unbearable. If a test legitimately needs more time, fix
+  the underlying slowness (mock the slow path, shrink the seed data, narrow
+  the assertion) instead of raising the ceiling. CI may go up to 90 seconds
+  for noisier infra, but local must stay tight.
+
+## Browser usage with Playwright
+
+- If you need to control the browser, use the Playwright MCP.
+- Take screenshots to refer to. Store them in the `.playwright-mcp` directory
+  which is gitignored so we don't commit by accident.
