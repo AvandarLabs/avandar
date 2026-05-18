@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Autocomplete,
   Button,
+  ButtonProps,
   Card,
   Combobox,
   createTheme,
@@ -26,6 +27,7 @@ import {
   NEUTRAL_SHADES,
   PRIMARY_COLOR_LIGHT_SHADE,
 } from "../../../shared/config/Theme";
+import { cssAvaVar } from "../../lib/utils/browser/css";
 import {
   ANIMATION_DURATION,
   ANIMATION_EASING,
@@ -130,14 +132,17 @@ export const Theme = createTheme({
       defaultProps: {
         radius: "sm",
       },
-      styles: (theme, props) => {
+      styles: (theme: MantineTheme, props: ButtonProps) => {
         return {
           root: {
             transition: interactiveTransition,
             fontWeight: 500,
-            ...(props.variant === "default" && {
-              boxShadow: theme.shadows.xs,
-            }),
+            ...(props.variant === "default" ?
+              {
+                borderColor: cssAvaVar("border-default"),
+                boxShadow: theme.shadows.xs,
+              }
+            : {}),
           },
         };
       },

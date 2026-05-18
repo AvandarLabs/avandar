@@ -41,7 +41,7 @@ export function Tabs<TabId extends string>({
   tabIds,
   renderTabHeader,
   renderTabPanel,
-  indicatorVariant = "underline",
+  indicatorVariant = "floating",
   ...props
 }: Props<TabId>): JSX.Element {
   const [currentTab, setCurrentTab] = useState<TabId>(tabIds[0]!);
@@ -93,11 +93,7 @@ export function Tabs<TabId extends string>({
               ref={tabItemRefCallback(tabId)}
               className={isFloating ? classes.tab : undefined}
             >
-              <Text
-                span
-                fw={isActive ? 500 : 400}
-                c={!isActive ? "dimmed" : undefined}
-              >
+              <Text span fw={isActive ? 500 : 400}>
                 {typeof renderTabHeader === "function" ?
                   renderTabHeader(tabId)
                 : typeof renderTabHeader[tabId] === "function" ?
