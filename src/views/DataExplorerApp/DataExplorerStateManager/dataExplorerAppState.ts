@@ -1,17 +1,21 @@
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { VirtualDatasetId } from "$/models/datasets/VirtualDataset/VirtualDataset.types";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 
 /**
  * Identifies the currently open saved dataset in the Data Explorer, if any.
- * Stored in state so the toolbar can offer "Save Over" and "Delete" actions.
+ * Stored in state so the toolbar can offer "Save Over" (virtual datasets
+ * only) and "Delete" actions. `virtualDatasetId` is only set when
+ * `sourceType === "virtual"`.
  */
 export type OpenDatasetInfo = {
   datasetId: DatasetId;
   name: string;
-  virtualDatasetId: VirtualDatasetId;
+  sourceType: DatasetSource.SourceType;
+  virtualDatasetId?: VirtualDatasetId;
 };
 
 export type DataExplorerAppState = {

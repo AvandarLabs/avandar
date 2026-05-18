@@ -49,9 +49,18 @@ type GoogleSheetsRawData = {
   spreadsheetName: string;
 };
 
-type Props = BoxProps;
+type Props = BoxProps & {
+  /**
+   * When set, this callback is invoked with the newly saved dataset instead
+   * of the default navigation to the dataset detail page.
+   */
+  onSaveSuccess?: (dataset: Dataset.T) => void;
+};
 
-export function GoogleSheetsImportView(props: Props): JSX.Element {
+export function GoogleSheetsImportView({
+  onSaveSuccess,
+  ...props
+}: Props): JSX.Element {
   const user = useCurrentUser();
   const workspace = useCurrentWorkspace();
   const [selectedDocument, setSelectedDocument] = useState<
@@ -321,6 +330,7 @@ export function GoogleSheetsImportView(props: Props): JSX.Element {
               dataSourceMetadata.datasetLoadResult.spreadsheetName
             }
             isProcessing={isFetchingGoogleSheet || isLoadingGoogleSheet}
+            onSaveSuccess={onSaveSuccess}
             onDataSourceMetadataChange={(metadata) => {
               setDataSourceMetadata(metadata as GoogleSheetsDataSourceMetadata);
             }}

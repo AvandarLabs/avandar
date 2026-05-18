@@ -147,12 +147,44 @@ describe("parseURLSearch", () => {
     const od = JSON.stringify({
       did: "did-1",
       name: "My Dataset",
+      st: "virtual",
       vid: "vid-1",
     });
     const result = parseURLSearch({ od });
     expect(result.openDataset).toEqual({
       datasetId: "did-1",
       name: "My Dataset",
+      sourceType: "virtual",
+      virtualDatasetId: "vid-1",
+    });
+  });
+
+  it("parses a non-virtual openDataset without vid", () => {
+    const od = JSON.stringify({
+      did: "did-1",
+      name: "My Dataset",
+      st: "csv_file",
+    });
+    const result = parseURLSearch({ od });
+    expect(result.openDataset).toEqual({
+      datasetId: "did-1",
+      name: "My Dataset",
+      sourceType: "csv_file",
+      virtualDatasetId: undefined,
+    });
+  });
+
+  it("defaults legacy od (missing st) to sourceType=virtual", () => {
+    const od = JSON.stringify({
+      did: "did-1",
+      name: "My Dataset",
+      vid: "vid-1",
+    });
+    const result = parseURLSearch({ od });
+    expect(result.openDataset).toEqual({
+      datasetId: "did-1",
+      name: "My Dataset",
+      sourceType: "virtual",
       virtualDatasetId: "vid-1",
     });
   });
@@ -269,16 +301,38 @@ describe("serializeStateToURL", () => {
     expect(result.orderDir).toBeUndefined();
   });
 
-  it("serializes openDataset into the od param", () => {
+  it("serializes a virtual openDataset into the od param", () => {
     const openDataset: OpenDatasetInfo = {
       datasetId: "did-1" as DatasetId,
       name: "My Dataset",
+      sourceType: "virtual",
       virtualDatasetId: "vid-1" as VirtualDatasetId,
     };
     const result = serializeStateToURL(_makeState({ openDataset }));
     expect(result.od).toBeDefined();
     const parsed = JSON.parse(result.od!);
-    expect(parsed).toEqual({ did: "did-1", name: "My Dataset", vid: "vid-1" });
+    expect(parsed).toEqual({
+      did: "did-1",
+      name: "My Dataset",
+      st: "virtual",
+      vid: "vid-1",
+    });
+  });
+
+  it("serializes a non-virtual openDataset (no vid) into the od param", () => {
+    const openDataset: OpenDatasetInfo = {
+      datasetId: "did-1" as DatasetId,
+      name: "My Dataset",
+      sourceType: "csv_file",
+    };
+    const result = serializeStateToURL(_makeState({ openDataset }));
+    expect(result.od).toBeDefined();
+    const parsed = JSON.parse(result.od!);
+    expect(parsed).toEqual({
+      did: "did-1",
+      name: "My Dataset",
+      st: "csv_file",
+    });
   });
 });
 

@@ -57,12 +57,25 @@ function _duckDbColumnsToImportedColumns(
   });
 }
 
-export function useSaveDataset(): UseMutationResultTuple<
+type UseSaveDatasetOptions = {
+  /**
+   * If set, the default redirect to the dataset view is skipped and this
+   * callback is invoked with the saved dataset instead. Use this when the
+   * caller wants to handle the post-save action itself (e.g. opening the
+   * dataset in the Data Explorer instead of navigating to its detail page).
+   */
+  onSaveSuccess?: (dataset: Dataset.T) => void;
+};
+
+export function useSaveDataset(
+  options: UseSaveDatasetOptions = {},
+): UseMutationResultTuple<
   Dataset.T,
   DatasetImportFormValues & DataSourceMetadata
 > {
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
+  const { onSaveSuccess } = options;
 
   return useMutation({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
@@ -185,6 +198,11 @@ export function useSaveDataset(): UseMutationResultTuple<
             `Unsupported dataset source type: ${params.sourceType}`,
           );
         });
+
+      if (onSaveSuccess) {
+        onSaveSuccess(savedDataset);
+        return;
+      }
 
       navigate(
         AppLinks.dataManagerDatasetView({

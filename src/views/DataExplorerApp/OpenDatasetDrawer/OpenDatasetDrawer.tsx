@@ -1,0 +1,79 @@
+import { Title } from "@mantine/core";
+import { Drawer, Tabs } from "@ui";
+import { APP_SHELL_MAIN_ID } from "@/components/AppShell/AppShell";
+import { ImportDatasetView } from "@/views/DataExplorerApp/OpenDatasetDrawer/ImportDatasetView";
+import { SavedDatasetsView } from "@/views/DataExplorerApp/OpenDatasetDrawer/SavedDatasetsView";
+import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+
+type Props = {
+  opened: boolean;
+  onClose: () => void;
+
+  /**
+   * Called when the user picks (or imports) a dataset. The drawer is
+   * responsible for the canvas-side state updates via this callback.
+   */
+  onOpen: (info: OpenDatasetInfo, rawSQL: string) => void;
+};
+
+function _quoteIdentifier(value: string): string {
+  return `"${value.replace(/"/g, '""')}"`;
+}
+
+function _selectAllSQL(datasetId: string): string {
+  return `SELECT * FROM ${_quoteIdentifier(datasetId)} LIMIT 100`;
+}
+
+/**
+ * The Data Explorer's "Open" drawer. Toggles between a list of saved
+ * datasets and the dataset-import flow, and is scoped to the app's main
+ * layout so it does not cover the side navbar or chat panel Aside.
+ */
+export function OpenDatasetDrawer({
+  opened,
+  onClose,
+  onOpen,
+}: Props): JSX.Element {
+  const handleImportSaved = (dataset: Dataset.T) => {
+    onOpen(
+      {
+        datasetId: dataset.id,
+        name: dataset.name,
+        sourceType: dataset.sourceType,
+      },
+      _selectAllSQL(dataset.id),
+    );
+  };
+
+  const handleSavedOpen = (info: OpenDatasetInfo, rawSQL: string) => {
+    onOpen(info, rawSQL);
+  };
+
+  return (
+    <Drawer
+      opened={opened}
+      onClose={onClose}
+      boundary={`#${APP_SHELL_MAIN_ID}`}
+      position="right"
+      size="100%"
+      title={<Title order={4}>Open dataset</Title>}
+    >
+      <Tabs
+        tabIds={["saved", "import"] as const}
+        renderTabHeader={{
+          saved: "Saved datasets",
+          import: "Import dataset",
+        }}
+        renderTabPanel={{
+          saved: () => {
+            return <SavedDatasetsView onOpen={handleSavedOpen} />;
+          },
+          import: () => {
+            return <ImportDatasetView onSaveSuccess={handleImportSaved} />;
+          },
+        }}
+      />
+    </Drawer>
+  );
+}

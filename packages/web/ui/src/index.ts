@@ -10,6 +10,9 @@ export { Callout } from "./Callout/Callout";
 // Modal
 export { Modal } from "./Modal/Modal";
 
+// Drawer
+export { Drawer } from "./Drawer/Drawer";
+
 // buttons
 export { DangerousActionButton } from "./buttons/DangerousActionButton/DangerousActionButton";
 export { EditButton as EditIconButton } from "./buttons/EditButton";

@@ -47,6 +47,7 @@ describe("urlSearchHasHydrateableExplorerKeys", () => {
     const openDataset = {
       datasetId: "d",
       name: "n",
+      sourceType: "virtual",
       virtualDatasetId: "v",
     } as OpenDatasetInfo;
     expect(urlSearchHasHydrateableExplorerKeys(_parsed({ openDataset }))).toBe(

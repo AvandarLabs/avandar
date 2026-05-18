@@ -143,6 +143,13 @@ type Props = {
 
   /** The parse options for the dataset. This is a controlled component. */
   parseOptions: FileParseOptions;
+
+  /**
+   * If set, this callback is invoked with the saved dataset instead of
+   * navigating to the dataset detail page on success. Forwarded to
+   * `useSaveDataset`.
+   */
+  onSaveSuccess?: (dataset: Dataset.T) => void;
 };
 
 /**
@@ -159,6 +166,7 @@ export function DatasetImportForm({
   onRequestDataReparse,
   isProcessing = false,
   dataSourceMetadata,
+  onSaveSuccess,
 }: Props): JSX.Element {
   const nameInputRef = useRef<HTMLInputElement>(null);
   const descriptionInputRef = useRef<HTMLInputElement>(null);
@@ -182,7 +190,7 @@ export function DatasetImportForm({
     },
   });
 
-  const [saveDataset, isSavePending] = useSaveDataset();
+  const [saveDataset, isSavePending] = useSaveDataset({ onSaveSuccess });
 
   const previewRows = useMemo(() => {
     return rows.slice(0, AppConfig.dataManagerApp.maxPreviewRows);

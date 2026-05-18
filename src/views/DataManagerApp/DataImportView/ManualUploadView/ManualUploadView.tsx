@@ -14,7 +14,13 @@ import { ManualUploadDropzone } from "./ManualUploadDropzone";
 import type { ParseManualFileOptions } from "./useLoadManualUploadFile/useLoadManualUploadFile";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
-type Props = BoxProps;
+type Props = BoxProps & {
+  /**
+   * When set, this callback is invoked with the newly saved dataset instead
+   * of the default navigation to the dataset detail page.
+   */
+  onSaveSuccess?: (dataset: Dataset.T) => void;
+};
 
 function _fileMimeTypeToSourceType(file: File): "csv_file" | "xlsx_file" {
   const lowerFileName = file.name.toLowerCase();
@@ -42,7 +48,10 @@ function _fileMimeTypeToSourceType(file: File): "csv_file" | "xlsx_file" {
   throw new Error(`Unsupported file type: ${file.type}`);
 }
 
-export function ManualUploadView(props: Props): JSX.Element {
+export function ManualUploadView({
+  onSaveSuccess,
+  ...props
+}: Props): JSX.Element {
   const [uploadedFile, setUploadedFile] = useState<File | undefined>();
   const {
     dataSourceMetadata,
@@ -101,6 +110,7 @@ export function ManualUploadView(props: Props): JSX.Element {
           rows={previewRows}
           dataSourceMetadata={dataSourceMetadata}
           parseOptions={parseOptions}
+          onSaveSuccess={onSaveSuccess}
           onDataSourceMetadataChange={(metadata) => {
             setDataSourceMetadata(metadata as ManualUploadDataSourceMetadata);
           }}
