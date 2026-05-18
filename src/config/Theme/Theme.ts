@@ -22,12 +22,12 @@ import {
   TagsInput,
   Tooltip,
 } from "@mantine/core";
-import { cssAvaVar } from "../../lib/utils/browser/css";
 import {
   AVANDAR_BLUE_SHADES,
   NEUTRAL_SHADES,
   PRIMARY_COLOR_LIGHT_SHADE,
 } from "../../../shared/config/Theme";
+import { cssAvaVar } from "../../lib/utils/browser/css";
 import {
   ANIMATION_DURATION,
   ANIMATION_EASING,

@@ -243,7 +243,9 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
                       }}
                     />
 
-                    <DatasetMetadataList dataset={datasetWithColumnsAndSource} />
+                    <DatasetMetadataList
+                      dataset={datasetWithColumnsAndSource}
+                    />
                     <Title order={5}>Data preview</Title>
                     {isLoadingPreviewData ?
                       <Loader />

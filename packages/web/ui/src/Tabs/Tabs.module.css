@@ -13,6 +13,7 @@
   border: 1px solid var(--ava-border-default);
   border-radius: var(--mantine-radius-sm);
   box-shadow: var(--mantine-shadow-sm);
+
   /* Do not set `transition` here: it overrides Mantine's transform/width/height slide. */
 }
 
@@ -23,6 +24,10 @@
   position: relative;
   transition: var(--ava-transition-colors);
   z-index: 1;
+}
+
+:global([data-mantine-color-scheme="dark"]) .tab {
+  color: var(--mantine-color-neutral-3);
 }
 
 /**
@@ -56,10 +61,6 @@
 
 .tab[data-active] {
   color: var(--mantine-color-neutral-9);
-}
-
-:global([data-mantine-color-scheme="dark"]) .tab {
-  color: var(--mantine-color-neutral-3);
 }
 
 :global([data-mantine-color-scheme="dark"])

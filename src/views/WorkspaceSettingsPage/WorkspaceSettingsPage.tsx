@@ -1,12 +1,12 @@
 import { Container, Text, Title } from "@mantine/core";
 import { notifyError, notifySuccess, Tabs } from "@ui";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
+import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
-import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
+import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
 import { WorkspaceRolesTab } from "./WorkspaceRolesTab/WorkspaceRolesTab";
 import { WorkspaceTagsTab } from "./WorkspaceTagsTab/WorkspaceTagsTab";
 import { WorkspaceUsersTab } from "./WorkspaceUsersTab/WorkspaceUsersTab";
