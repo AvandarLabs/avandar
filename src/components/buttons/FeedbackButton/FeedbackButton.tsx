@@ -31,7 +31,7 @@ export function FeedbackButton(): JSX.Element | null {
       width={240}
     >
       <Menu.Target>
-        <Button variant="default" size="xs">
+        <Button variant="default" size="compact-sm">
           Send feedback
         </Button>
       </Menu.Target>
