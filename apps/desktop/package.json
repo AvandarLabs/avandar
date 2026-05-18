@@ -9,6 +9,7 @@
     "dev": "electrobun dev",
     "build": "electrobun build",
     "test": "vitest run -c vitest.config.ts",
+    "test:integration": "find main -name '*.integration.test.ts' -print0 | xargs -0 bun test",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {

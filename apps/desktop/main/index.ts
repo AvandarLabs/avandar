@@ -1,7 +1,11 @@
 import { join } from "node:path";
 import { app, BrowserWindow, PATHS } from "electrobun";
+import { resolveMigrationsDir } from "./config/migrationsDir";
 import { resolveWebviewUrl } from "./config/url";
 import { setupApplicationMenu } from "./menu/setupApplicationMenu";
+import { getUserDataDir } from "./platform/getUserDataDir";
+import { loadMigrationsFromDir } from "./services/loadMigrations";
+import { openSqliteDatabase, runMigrations } from "./services/Sqlite";
 
 const APP_NAME = "Avandar";
 
@@ -16,6 +20,29 @@ const bundledIndexPath =
   join(PATHS.RESOURCES_FOLDER, "app", "web", "index.html");
 
 const url = resolveWebviewUrl({ mode, viteDevUrl, bundledIndexPath });
+
+// Open the local metadata database and apply any pending migrations
+// before the webview gets a chance to read from it. Failure to open or
+// migrate is fatal: the webview's CRUD layer assumes a ready schema.
+const userDataDir = getUserDataDir();
+const sqlitePath =
+  process.env.AVA_SQLITE_PATH ?? join(userDataDir, "metadata.sqlite");
+
+const migrationsDir = resolveMigrationsDir({
+  mode,
+  mainDir: import.meta.dirname,
+  resourcesFolder: PATHS.RESOURCES_FOLDER,
+  override: process.env.AVA_MIGRATIONS_DIR,
+});
+
+const sqliteDb = openSqliteDatabase(sqlitePath);
+const migrations = loadMigrationsFromDir(migrationsDir);
+runMigrations(sqliteDb, migrations);
+
+console.log(
+  `[avandar-desktop] sqlite ready at ${sqlitePath} ` +
+    `(${migrations.length} migration(s) on disk)`,
+);
 
 const preload =
   process.env.AVA_PRELOAD_PATH ??
