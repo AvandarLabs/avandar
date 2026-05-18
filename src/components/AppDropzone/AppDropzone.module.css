@@ -1,0 +1,98 @@
+/*
+ * The full-screen overlay that appears when the user drags a file onto
+ * the app. Dims and blurs the page behind it just enough to read it as
+ * an overlay, without making the underlying content unreadable.
+ *
+ * Mantine's `Dropzone.FullScreen` toggles inline `opacity` on this
+ * element when a drag enters / leaves the window. We use that inline
+ * style as the trigger for the inner card's pop-in transition, so the
+ * card animates every time a new drag begins.
+ */
+.fullScreen {
+  align-items: center;
+  backdrop-filter: blur(6px) saturate(140%);
+  background-color: rgb(15 23 42 / 38%);
+  display: flex;
+  justify-content: center;
+  padding: 0;
+}
+
+/*
+ * Strip Mantine's default dashed border, opaque background, and inner
+ * padding from the inner dropzone so the overlay backdrop shows
+ * through and only the floating card draws attention.
+ */
+.root {
+  align-items: center;
+  background-color: transparent !important;
+  border: none !important;
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  padding: 0;
+}
+
+/*
+ * The floating card with the icon and label. Starts shrunk, blurred,
+ * and translated down when the overlay is hidden, then springs into
+ * place when the overlay becomes visible. Uses a slight-overshoot ease
+ * for a soft pop without feeling cartoonish.
+ */
+.card {
+  align-items: center;
+  background-color: var(--mantine-color-body);
+  border-radius: var(--mantine-radius-xl);
+  box-shadow:
+    0 25px 50px -12px rgb(15 23 42 / 35%),
+    0 0 0 1px rgb(255 255 255 / 50%) inset;
+  display: flex;
+  filter: blur(10px);
+  flex-direction: column;
+  gap: var(--mantine-spacing-lg);
+  justify-content: center;
+  opacity: 0;
+  padding:
+    calc(var(--mantine-spacing-xl) * 1.25)
+    calc(var(--mantine-spacing-xl) * 1.75);
+  transform: scale(0.72) translateY(20px);
+  transition:
+    transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity var(--ava-animation-duration-fast) var(--ava-animation-easing-out),
+    filter var(--ava-animation-duration-moderate) var(--ava-animation-easing-out);
+}
+
+.fullScreen[style*="opacity: 1"] .card {
+  filter: blur(0);
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.iconWrapper {
+  align-items: center;
+  background-color: var(--mantine-color-blue-0);
+  border-radius: 50%;
+  display: flex;
+  height: 7rem;
+  justify-content: center;
+  transition:
+    background-color var(--ava-animation-duration-fast)
+    var(--ava-animation-easing-out);
+  width: 7rem;
+}
+
+.root[data-reject] .iconWrapper {
+  background-color: var(--mantine-color-red-0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    filter: none;
+    transform: none;
+    transition: opacity var(--ava-animation-duration-fast) linear;
+  }
+
+  .fullScreen[style*="opacity: 1"] .card {
+    filter: none;
+    transform: none;
+  }
+}

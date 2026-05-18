@@ -1,6 +1,8 @@
+import { Stack, Text } from "@mantine/core";
 import { Dropzone } from "@mantine/dropzone";
 import { IconFileSpreadsheet, IconUpload, IconX } from "@tabler/icons-react";
 import { MIMEType } from "@utils";
+import classes from "./AppDropzone.module.css";
 import { onAppDropzoneDrop } from "./onAppDropzoneDrop";
 import type { ReactNode } from "react";
 
@@ -10,13 +12,19 @@ const ACCEPTED_MIME_TYPES = [
   MIMEType.APPLICATION_OPENXML_EXCEL,
 ];
 
+const ICON_SIZE = 96;
+
 type Props = { children: ReactNode };
 
 /**
- * Wraps the workspace app shell so that the user can drop a CSV or
- * Excel file from anywhere in the app. On drop, the app prompts the
- * user to confirm the import and then opens a large modal containing
- * the dataset import flow.
+ * Wraps the workspace app shell with a full-screen drop target so the
+ * user can drop a CSV or Excel file from anywhere in the app. On drop,
+ * a confirm dialog appears and then a large modal containing the
+ * dataset import flow.
+ *
+ * The overlay dims and blurs the page behind it just enough to read it
+ * as an overlay, and the centered card pops in with a smooth scale +
+ * un-blur transition every time a drag enters the window.
  */
 export function AppDropzone({ children }: Props): JSX.Element {
   return (
@@ -25,24 +33,44 @@ export function AppDropzone({ children }: Props): JSX.Element {
       <Dropzone.FullScreen
         accept={ACCEPTED_MIME_TYPES}
         onDrop={onAppDropzoneDrop}
+        classNames={{
+          fullScreen: classes.fullScreen,
+          root: classes.root,
+        }}
       >
-        <Dropzone.Accept>
-          <IconUpload
-            size={52}
-            color="var(--mantine-color-blue-6)"
-            stroke={1.5}
-          />
-        </Dropzone.Accept>
-        <Dropzone.Reject>
-          <IconX size={52} color="var(--mantine-color-red-6)" stroke={1.5} />
-        </Dropzone.Reject>
-        <Dropzone.Idle>
-          <IconFileSpreadsheet
-            size={52}
-            color="var(--mantine-color-dimmed)"
-            stroke={1.5}
-          />
-        </Dropzone.Idle>
+        <div className={classes.card}>
+          <div className={classes.iconWrapper}>
+            <Dropzone.Accept>
+              <IconUpload
+                size={ICON_SIZE}
+                color="var(--mantine-color-blue-6)"
+                stroke={1.5}
+              />
+            </Dropzone.Accept>
+            <Dropzone.Reject>
+              <IconX
+                size={ICON_SIZE}
+                color="var(--mantine-color-red-6)"
+                stroke={1.5}
+              />
+            </Dropzone.Reject>
+            <Dropzone.Idle>
+              <IconFileSpreadsheet
+                size={ICON_SIZE}
+                color="var(--mantine-color-blue-6)"
+                stroke={1.5}
+              />
+            </Dropzone.Idle>
+          </div>
+          <Stack align="center" gap="xs">
+            <Text size="xl" fw={600}>
+              Drop to import
+            </Text>
+            <Text size="sm" c="dimmed">
+              CSV or Excel file
+            </Text>
+          </Stack>
+        </div>
       </Dropzone.FullScreen>
     </>
   );
