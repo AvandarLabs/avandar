@@ -1,7 +1,7 @@
 import { useThreadRuntime } from "@assistant-ui/react";
 import { Badge, Button, Group, Stack, Text } from "@mantine/core";
 import { IconSparkles } from "@tabler/icons-react";
-import { Link } from "@ui";
+import { Link, TruncatedText } from "@ui";
 import { where } from "@utils";
 import { useMemo } from "react";
 import { match } from "ts-pattern";
@@ -80,7 +80,7 @@ export function ChatEmptyState(): JSX.Element {
     });
   }, [context.app, datasets, openDataset]);
 
-  const send = (text: string) => {
+  const sendPrompt = (text: string) => {
     threadRuntime.append({
       role: "user",
       content: [{ type: "text", text }],
@@ -139,7 +139,7 @@ export function ChatEmptyState(): JSX.Element {
                 justify="flex-start"
                 fullWidth
                 onClick={() => {
-                  send(prompt);
+                  sendPrompt(prompt);
                 }}
                 classNames={{
                   root: css.suggestionButton,
@@ -147,7 +147,9 @@ export function ChatEmptyState(): JSX.Element {
                   label: css.suggestionButtonLabel,
                 }}
               >
-                {prompt}
+                <TruncatedText withFullTextTooltip maw="100%" size="xs">
+                  {prompt}
+                </TruncatedText>
               </Button>
             );
           })}
