@@ -5,11 +5,11 @@
  * exposed as CSS variables via Theme's cssVariablesResolver.
  */
 export const ANIMATION_DURATION_MS = {
-  instant: 50,
-  fast: 120,
-  normal: 180,
-  moderate: 240,
-  slow: 320,
+  instant: 80,
+  fast: 140,
+  normal: 200,
+  moderate: 270,
+  slow: 350,
 } as const;
 
 export const ANIMATION_DURATION = {
@@ -27,12 +27,47 @@ export const ANIMATION_EASING = {
   inOut: "cubic-bezier(0.45, 0, 0.55, 1)",
 } as const;
 
+type TransitionPart = {
+  /** One or more CSS properties sharing the same duration and easing. */
+  properties: string | readonly string[];
+  duration: keyof typeof ANIMATION_DURATION;
+  easing?: keyof typeof ANIMATION_EASING;
+};
+
+/**
+ * Compose a CSS `transition` shorthand value from one or more property groups.
+ * Each group shares a duration and easing; properties within a group are
+ * expanded into separate comma-separated entries.
+ */
+function transition(parts: readonly TransitionPart[]): string {
+  return parts
+    .flatMap(({ properties, duration, easing = "out" }) => {
+      const props = typeof properties === "string" ? [properties] : properties;
+      return props.map((p) => {
+        return `${p} ${ANIMATION_DURATION[duration]} ${ANIMATION_EASING[easing]}`;
+      });
+    })
+    .join(", ");
+}
+
 export const ANIMATION_TRANSITION = {
-  colors: `color ${ANIMATION_DURATION.fast} ${ANIMATION_EASING.out}, background-color ${ANIMATION_DURATION.fast} ${ANIMATION_EASING.out}, border-color ${ANIMATION_DURATION.fast} ${ANIMATION_EASING.out}`,
-  transform: `transform ${ANIMATION_DURATION.normal} ${ANIMATION_EASING.out}`,
-  opacity: `opacity ${ANIMATION_DURATION.normal} ${ANIMATION_EASING.out}`,
-  shadow: `box-shadow ${ANIMATION_DURATION.normal} ${ANIMATION_EASING.out}`,
-  interactive: `color ${ANIMATION_DURATION.fast} ${ANIMATION_EASING.out}, background-color ${ANIMATION_DURATION.fast} ${ANIMATION_EASING.out}, border-color ${ANIMATION_DURATION.fast} ${ANIMATION_EASING.out}, box-shadow ${ANIMATION_DURATION.normal} ${ANIMATION_EASING.out}, opacity ${ANIMATION_DURATION.fast} ${ANIMATION_EASING.out}`,
+  colors: transition([
+    {
+      properties: ["color", "background-color", "border-color"],
+      duration: "fast",
+    },
+  ]),
+  transform: transition([{ properties: "transform", duration: "normal" }]),
+  opacity: transition([{ properties: "opacity", duration: "normal" }]),
+  shadow: transition([{ properties: "box-shadow", duration: "normal" }]),
+  interactive: transition([
+    {
+      properties: ["color", "background-color", "border-color"],
+      duration: "fast",
+    },
+    { properties: "box-shadow", duration: "normal" },
+    { properties: "opacity", duration: "fast" },
+  ]),
 } as const;
 
 /** Default Mantine overlay transition presets. */

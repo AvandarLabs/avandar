@@ -1,4 +1,4 @@
-import { Container, Stack, Text, Title } from "@mantine/core";
+import { Container, Text, Title } from "@mantine/core";
 import { notifyError, notifySuccess, Tabs } from "@ui";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";

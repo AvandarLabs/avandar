@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Autocomplete,
   Button,
+  ButtonProps,
   Card,
   Combobox,
   createTheme,
@@ -21,6 +22,7 @@ import {
   TagsInput,
   Tooltip,
 } from "@mantine/core";
+import { cssAvaVar } from "../../lib/utils/browser/css";
 import {
   AVANDAR_BLUE_SHADES,
   NEUTRAL_SHADES,
@@ -130,14 +132,17 @@ export const Theme = createTheme({
       defaultProps: {
         radius: "sm",
       },
-      styles: (theme, props) => {
+      styles: (theme: MantineTheme, props: ButtonProps) => {
         return {
           root: {
             transition: interactiveTransition,
             fontWeight: 500,
-            ...(props.variant === "default" && {
-              boxShadow: theme.shadows.xs,
-            }),
+            ...(props.variant === "default" ?
+              {
+                borderColor: cssAvaVar("border-default"),
+                boxShadow: theme.shadows.xs,
+              }
+            : {}),
           },
         };
       },
