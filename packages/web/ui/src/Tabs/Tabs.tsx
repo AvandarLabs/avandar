@@ -41,7 +41,7 @@ export function Tabs<TabId extends string>({
   tabIds,
   renderTabHeader,
   renderTabPanel,
-  indicatorVariant = "underline",
+  indicatorVariant = "floating",
   ...props
 }: Props<TabId>): JSX.Element {
   const [currentTab, setCurrentTab] = useState<TabId>(tabIds[0]!);

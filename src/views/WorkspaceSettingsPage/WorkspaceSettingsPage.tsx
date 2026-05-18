@@ -1,5 +1,5 @@
-import { Container, Stack, Tabs, Text, Title } from "@mantine/core";
-import { notifyError, notifySuccess } from "@ui";
+import { Container, Stack, Text, Title } from "@mantine/core";
+import { notifyError, notifySuccess, Tabs } from "@ui";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { WorkspaceBillingView } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/WorkspaceBillingView";
@@ -47,61 +47,67 @@ export function WorkspaceSettingsPage(): JSX.Element {
     );
   }
 
+  const tabIds = [
+    "general",
+    "users",
+    "roles",
+    "tags",
+    ...(isCurrentUserTheWorkspaceOwner ? (["billing"] as const) : []),
+  ] as const;
+
   return (
     <AppLayout title="Settings">
       <Container py="xxxl" size="xl">
-        <Stack>
-          <Title order={2}>Workspace Settings</Title>
-          <Tabs defaultValue="general">
-            <Tabs.List>
-              <Tabs.Tab value="general">General</Tabs.Tab>
-              <Tabs.Tab value="users">Members</Tabs.Tab>
-              <Tabs.Tab value="roles">Roles</Tabs.Tab>
-              <Tabs.Tab value="tags">Tags</Tabs.Tab>
-              {isCurrentUserTheWorkspaceOwner ?
-                <Tabs.Tab value="billing">Billing</Tabs.Tab>
-              : null}
-            </Tabs.List>
-            <Tabs.Panel value="general" pt="lg">
-              <AvaForm
-                fields={{
-                  workspaceName: {
-                    key: "workspaceName",
-                    type: "text",
-                    initialValue: workspace.name,
-                    label: "Workspace Name",
-                  },
-                }}
-                formElements={["workspaceName"]}
-                disableSubmitWhileUnchanged
-                buttonAlignment="right"
-                submitIsLoading={isWorkspaceSaving}
-                onSubmit={(values) => {
-                  saveWorkspace({
-                    id: workspace.id,
-                    data: {
-                      name: values.workspaceName,
+        <Tabs
+          tabIds={tabIds}
+          renderTabHeader={{
+            general: "General",
+            users: "Members",
+            roles: "Roles",
+            tags: "Tags",
+            billing: "Billing",
+          }}
+          renderTabPanel={{
+            general: () => {
+              return (
+                <AvaForm
+                  fields={{
+                    workspaceName: {
+                      key: "workspaceName",
+                      type: "text",
+                      initialValue: workspace.name,
+                      label: "Workspace Name",
                     },
-                  });
-                }}
-              />
-            </Tabs.Panel>
-            <Tabs.Panel value="users" pt="lg">
-              <WorkspaceUsersTab />
-            </Tabs.Panel>
-            <Tabs.Panel value="roles" pt="lg">
-              <WorkspaceRolesTab />
-            </Tabs.Panel>
-            <Tabs.Panel value="tags" pt="lg">
-              <WorkspaceTagsTab />
-            </Tabs.Panel>
-            {isCurrentUserTheWorkspaceOwner ?
-              <Tabs.Panel value="billing" pt="lg">
-                <WorkspaceBillingView />
-              </Tabs.Panel>
-            : null}
-          </Tabs>
-        </Stack>
+                  }}
+                  formElements={["workspaceName"]}
+                  disableSubmitWhileUnchanged
+                  buttonAlignment="right"
+                  submitIsLoading={isWorkspaceSaving}
+                  onSubmit={(values) => {
+                    saveWorkspace({
+                      id: workspace.id,
+                      data: {
+                        name: values.workspaceName,
+                      },
+                    });
+                  }}
+                />
+              );
+            },
+            users: () => {
+              return <WorkspaceUsersTab />;
+            },
+            roles: () => {
+              return <WorkspaceRolesTab />;
+            },
+            tags: () => {
+              return <WorkspaceTagsTab />;
+            },
+            billing: () => {
+              return <WorkspaceBillingView />;
+            },
+          }}
+        />
       </Container>
     </AppLayout>
   );

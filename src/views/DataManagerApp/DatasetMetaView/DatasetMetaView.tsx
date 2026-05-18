@@ -3,12 +3,9 @@ import {
   Box,
   Button,
   Container,
-  FloatingIndicator,
   Group,
   Loader,
-  MantineTheme,
   Stack,
-  Tabs,
   Text,
   Title,
 } from "@mantine/core";
@@ -21,6 +18,7 @@ import {
   notifyError,
   notifySuccess,
   Paper,
+  Tabs,
 } from "@ui";
 import { prop, where } from "@utils";
 import { useEffect, useMemo, useState } from "react";
@@ -42,8 +40,6 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 type Props = {
   dataset: Dataset.T;
 };
-
-type DatasetTabId = "dataset-metadata" | "dataset-summary";
 
 /**
  * A view of the metadata for a dataset.
@@ -90,24 +86,6 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
       columns: datasetColumns,
     };
   }, [dataset, datasetColumns, isLoadingSourceDataset, sourceDataset]);
-
-  const [currentTab, setCurrentTab] =
-    useState<DatasetTabId>("dataset-metadata");
-
-  // track the tab list refs so we can animate the tab indicator
-  const [tabListRef, setTabListRef] = useState<HTMLDivElement | null>(null);
-  const [tabItemRefs, setTabItemRefs] = useState<
-    Record<DatasetTabId, HTMLButtonElement | null>
-  >({
-    "dataset-metadata": null,
-    "dataset-summary": null,
-  });
-  const tabItemRefCallback = (tabItemId: DatasetTabId) => {
-    return (node: HTMLButtonElement | null) => {
-      tabItemRefs[tabItemId] = node; // intentional mutation
-      setTabItemRefs(tabItemRefs);
-    };
-  };
 
   const isLoadingFullDataset = isLoadingPreviewData || isLoadingDatasetColumns;
   const datasetColumnNames = datasetColumns?.map(prop("name")) ?? [];
@@ -231,142 +209,97 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
 
         <Paper>
           <Tabs
-            variant="none"
-            value={currentTab}
-            onChange={(val) => {
-              return setCurrentTab(val as DatasetTabId);
+            tabIds={["dataset-metadata", "dataset-summary"] as const}
+            renderTabHeader={{
+              "dataset-metadata": "Metadata",
+              "dataset-summary": "Data Summary",
+            }}
+            renderTabPanel={{
+              "dataset-metadata": () => {
+                return (
+                  <Stack>
+                    <EditableDisplayText
+                      name="description"
+                      value={datasetDescription}
+                      textarea
+                      onChange={setDatasetDescription}
+                      isSaving={isUpdatePending}
+                      emptyDisplayText="This dataset has no description."
+                      onSave={(newDescription) => {
+                        const descriptionToSave =
+                          newDescription.trim().length === 0 ?
+                            undefined
+                          : newDescription;
+
+                        updateDataset({
+                          id: dataset.id,
+                          data: {
+                            description: descriptionToSave,
+                          },
+                        });
+                      }}
+                      onCancel={() => {
+                        setDatasetDescription(dataset.description ?? "");
+                      }}
+                    />
+
+                    <DatasetMetadataList dataset={datasetWithColumnsAndSource} />
+                    <Title order={5}>Data preview</Title>
+                    {isLoadingPreviewData ?
+                      <Loader />
+                    : previewData && previewData ?
+                      <DataGrid
+                        columnNames={datasetColumnNames}
+                        data={previewData}
+                      />
+                    : null}
+                  </Stack>
+                );
+              },
+              "dataset-summary": () => {
+                return isLoadingFullDataset || !previewData || !datasetColumns ?
+                    <Loader />
+                  : <DataSummaryView datasetId={dataset.id} />;
+              },
+            }}
+          />
+
+          <Button
+            color="danger"
+            mt="lg"
+            onClick={() => {
+              modals.openConfirmModal({
+                title: "Delete dataset",
+                children: (
+                  <Text>Are you sure you want to delete {dataset.name}?</Text>
+                ),
+                labels: { confirm: "Delete", cancel: "Cancel" },
+                confirmProps: {
+                  color: "danger",
+                  loading: isDeletePending,
+                },
+                onConfirm: () => {
+                  deleteDataset(
+                    { id: dataset.id },
+                    {
+                      onSuccess: () => {
+                        navigate(AppLinks.dataManagerHome(workspace.slug));
+                        notifications.show({
+                          title: "Dataset deleted",
+                          message: `${dataset.name} deleted successfully`,
+                          color: "green",
+                        });
+                      },
+                    },
+                  );
+                },
+              });
             }}
           >
-            <Tabs.List
-              mb="xs"
-              ref={setTabListRef}
-              pos="relative"
-              style={styles.tabList}
-            >
-              <Tabs.Tab
-                value="dataset-metadata"
-                ref={tabItemRefCallback("dataset-metadata")}
-              >
-                <Text span>Metadata</Text>
-              </Tabs.Tab>
-              <Tabs.Tab
-                value="dataset-summary"
-                ref={tabItemRefCallback("dataset-summary")}
-              >
-                <Text span>Data Summary</Text>
-              </Tabs.Tab>
-
-              <FloatingIndicator
-                target={tabItemRefs[currentTab]}
-                parent={tabListRef}
-                style={styles.tabIndicator}
-              />
-            </Tabs.List>
-
-            <Tabs.Panel value="dataset-metadata">
-              <Stack>
-                <EditableDisplayText
-                  name="description"
-                  value={datasetDescription}
-                  textarea
-                  onChange={setDatasetDescription}
-                  isSaving={isUpdatePending}
-                  emptyDisplayText="This dataset has no description."
-                  onSave={(newDescription) => {
-                    const descriptionToSave =
-                      newDescription.trim().length === 0 ?
-                        undefined
-                      : newDescription;
-
-                    updateDataset({
-                      id: dataset.id,
-                      data: {
-                        description: descriptionToSave,
-                      },
-                    });
-                  }}
-                  onCancel={() => {
-                    setDatasetDescription(dataset.description ?? "");
-                  }}
-                />
-
-                <DatasetMetadataList dataset={datasetWithColumnsAndSource} />
-                <Title order={5}>Data preview</Title>
-                {isLoadingPreviewData ?
-                  <Loader />
-                : previewData && previewData ?
-                  <DataGrid
-                    columnNames={datasetColumnNames}
-                    data={previewData}
-                  />
-                : null}
-              </Stack>
-            </Tabs.Panel>
-
-            <Tabs.Panel value="dataset-summary">
-              {
-                currentTab !== "dataset-summary" ?
-                  null
-                  // lazy load the data summary view because it has an expensive
-                  // query
-                : isLoadingFullDataset || !previewData || !datasetColumns ?
-                  <Loader />
-                : <DataSummaryView datasetId={dataset.id} />
-              }
-            </Tabs.Panel>
-
-            <Button
-              color="danger"
-              mt="lg"
-              onClick={() => {
-                modals.openConfirmModal({
-                  title: "Delete dataset",
-                  children: (
-                    <Text>Are you sure you want to delete {dataset.name}?</Text>
-                  ),
-                  labels: { confirm: "Delete", cancel: "Cancel" },
-                  confirmProps: {
-                    color: "danger",
-                    loading: isDeletePending,
-                  },
-                  onConfirm: () => {
-                    deleteDataset(
-                      { id: dataset.id },
-                      {
-                        onSuccess: () => {
-                          navigate(AppLinks.dataManagerHome(workspace.slug));
-                          notifications.show({
-                            title: "Dataset deleted",
-                            message: `${dataset.name} deleted successfully`,
-                            color: "green",
-                          });
-                        },
-                      },
-                    );
-                  },
-                });
-              }}
-            >
-              Delete Dataset
-            </Button>
-          </Tabs>
+            Delete Dataset
+          </Button>
         </Paper>
       </Stack>
     </Container>
   );
 }
-
-const styles = {
-  tabList: (theme: MantineTheme) => {
-    return {
-      borderBottom: `2px solid ${theme.colors.neutral[1]}`,
-    };
-  },
-  tabIndicator: (theme: MantineTheme) => {
-    return {
-      position: "absolute",
-      top: "2px",
-      borderBottom: `2px solid ${theme.colors.primary[6]}`,
-    };
-  },
-};
