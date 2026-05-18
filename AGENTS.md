@@ -59,7 +59,7 @@ Implement functionality using red/green TDD.
 
 ## Functions & Logic
 
-- Keep functions short (<= 40 lines).
+- Keep functions short (<= 45 lines).
 - Extract logic into utility functions if:
   - The function will be too long otherwise
   - The logic will be reused
