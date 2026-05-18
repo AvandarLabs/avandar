@@ -147,7 +147,7 @@ const VIZ_TYPE_CASES: readonly VizTypeCase[] = [
   },
 ];
 
-test.describe("DataViz PBlock — every visualization", () => {
+test.describe("DataViz PBlock - every visualization", () => {
   test("renders every supported visualization in the dashboard editor", async ({
     page,
     e2eWorkerDb,
