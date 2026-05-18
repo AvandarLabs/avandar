@@ -47,67 +47,70 @@ export function WorkspaceSettingsPage(): JSX.Element {
     );
   }
 
-  const tabIds = [
-    "general",
-    "users",
-    "roles",
-    "tags",
-    ...(isCurrentUserTheWorkspaceOwner ? (["billing"] as const) : []),
-  ] as const;
+  const generalTabPanel = () => {
+    return (
+      <AvaForm
+        fields={{
+          workspaceName: {
+            key: "workspaceName",
+            type: "text",
+            initialValue: workspace.name,
+            label: "Workspace Name",
+          },
+        }}
+        formElements={["workspaceName"]}
+        disableSubmitWhileUnchanged
+        buttonAlignment="right"
+        submitIsLoading={isWorkspaceSaving}
+        onSubmit={(values) => {
+          saveWorkspace({
+            id: workspace.id,
+            data: {
+              name: values.workspaceName,
+            },
+          });
+        }}
+      />
+    );
+  };
 
   return (
     <AppLayout title="Settings">
       <Container py="xxxl" size="xl">
-        <Tabs
-          tabIds={tabIds}
-          renderTabHeader={{
-            general: "General",
-            users: "Members",
-            roles: "Roles",
-            tags: "Tags",
-            billing: "Billing",
-          }}
-          renderTabPanel={{
-            general: () => {
-              return (
-                <AvaForm
-                  fields={{
-                    workspaceName: {
-                      key: "workspaceName",
-                      type: "text",
-                      initialValue: workspace.name,
-                      label: "Workspace Name",
-                    },
-                  }}
-                  formElements={["workspaceName"]}
-                  disableSubmitWhileUnchanged
-                  buttonAlignment="right"
-                  submitIsLoading={isWorkspaceSaving}
-                  onSubmit={(values) => {
-                    saveWorkspace({
-                      id: workspace.id,
-                      data: {
-                        name: values.workspaceName,
-                      },
-                    });
-                  }}
-                />
-              );
-            },
-            users: () => {
-              return <WorkspaceUsersTab />;
-            },
-            roles: () => {
-              return <WorkspaceRolesTab />;
-            },
-            tags: () => {
-              return <WorkspaceTagsTab />;
-            },
-            billing: () => {
-              return <WorkspaceBillingView />;
-            },
-          }}
-        />
+        {isCurrentUserTheWorkspaceOwner ?
+          <Tabs
+            tabIds={["general", "users", "roles", "tags", "billing"] as const}
+            renderTabHeader={{
+              general: "General",
+              users: "Members",
+              roles: "Roles",
+              tags: "Tags",
+              billing: "Billing",
+            }}
+            renderTabPanel={{
+              general: generalTabPanel,
+              users: () => <WorkspaceUsersTab />,
+              roles: () => <WorkspaceRolesTab />,
+              tags: () => <WorkspaceTagsTab />,
+              billing: () => <WorkspaceBillingView />,
+            }}
+          />
+        : <Tabs
+            tabIds={["general", "users", "roles", "tags"] as const}
+            renderTabHeader={{
+              general: "General",
+              users: "Members",
+              roles: "Roles",
+              tags: "Tags",
+            }}
+            renderTabPanel={{
+              general: generalTabPanel,
+              users: () => <WorkspaceUsersTab />,
+              roles: () => <WorkspaceRolesTab />,
+              tags: () => <WorkspaceTagsTab />,
+            }}
+          />
+        }
       </Container>
     </AppLayout>
   );
