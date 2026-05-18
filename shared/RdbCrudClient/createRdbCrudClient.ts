@@ -24,9 +24,9 @@ import type { EmptyObject } from "type-fest";
  * Consumers pass the spec WITHOUT a `dbClient` field; the factory
  * injects the shared `AvaSupabase` singleton. The SQLite client still
  * accepts the Supabase handle because its escape-hatch `queries` and
- * `mutations` factories receive it (Phase 2 leaves those targeting
- * Supabase REST; Phase 3's sync engine will route them through the
- * local mirror).
+ * `mutations` factories receive it: for now those escape hatches
+ * target Supabase REST in both branches, and the sync engine will
+ * eventually route them through the local mirror.
  */
 export function createRdbCrudClient<
   M extends AnySupabaseCrudModelSpec,

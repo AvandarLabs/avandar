@@ -1,21 +1,22 @@
+import { createClient } from "@supabase/supabase-js";
+
 /**
- * Minimal Supabase REST wrapper used by the snapshot bootstrap.
- *
- * Lives in Bun main so the webview never sees the anon key. Phase 3's
- * sync engine will reuse the same surface; until then, this is the
- * only Supabase-talking code path outside the webview.
+ * Minimal "read every row of a table" surface used by the snapshot
+ * bootstrap. Lives in Bun main so the webview never sees the anon key.
+ * For now, this is the only Supabase-talking code path outside the
+ * webview; the sync engine will eventually reuse the same surface.
  */
 export type SupabaseRestClient = {
   /**
-   * Page through every row of `table` from Supabase. Uses the REST
-   * range header for paging so we never hit Supabase's max-row cap.
+   * Page through every row of `table` from Supabase under the user's
+   * JWT (so RLS scopes the result to that user's data).
    *
    * @param table - Public-schema table name.
-   * @param accessToken - User access token (Bearer); the anon key is
-   *   sent alongside as `apikey`.
-   * @returns Every row in the table as Supabase REST returned it
-   *   (JS-typed: booleans are real booleans, `jsonb` columns are
-   *   already parsed JS objects).
+   * @param accessToken - User access token (passed as `Authorization:
+   *   Bearer …` on every request).
+   * @returns Every row in the table as Supabase JS returned it
+   *   (booleans are real booleans, `jsonb` columns are already parsed
+   *   JS objects).
    */
   selectAll: (
     table: string,
@@ -23,51 +24,74 @@ export type SupabaseRestClient = {
   ) => Promise<ReadonlyArray<Record<string, unknown>>>;
 };
 
+type CreateSupabaseRestClientOverrides = {
+  url?: string;
+  anonKey?: string;
+  pageSize?: number;
+};
+
 /**
- * Build a {@link SupabaseRestClient} bound to a project URL + anon
- * key. Reads `AVA_SUPABASE_URL` / `AVA_SUPABASE_ANON_KEY` by default;
- * tests can override either via the `overrides` argument.
+ * Build a {@link SupabaseRestClient} backed by `@supabase/supabase-js`
+ * (the same library the web bundle uses). Reads
+ * `VITE_SUPABASE_API_URL` / `VITE_SUPABASE_ANON_KEY` by default; tests
+ * inject a fake {@link SupabaseRestClient} directly rather than going
+ * through this factory.
  */
 export function createSupabaseRestClient(
-  overrides: { url?: string; anonKey?: string; pageSize?: number } = {},
+  overrides: Readonly<CreateSupabaseRestClientOverrides> = {},
 ): SupabaseRestClient {
-  const url = overrides.url ?? process.env.AVA_SUPABASE_URL ?? "";
+  const url = overrides.url ?? process.env.VITE_SUPABASE_API_URL ?? "";
   const anonKey =
-    overrides.anonKey ?? process.env.AVA_SUPABASE_ANON_KEY ?? "";
+    overrides.anonKey ?? process.env.VITE_SUPABASE_ANON_KEY ?? "";
   const pageSize = overrides.pageSize ?? 1000;
 
   if (!url || !anonKey) {
     throw new Error(
-      "AVA_SUPABASE_URL and AVA_SUPABASE_ANON_KEY must be set for the desktop snapshot bootstrap",
+      "VITE_SUPABASE_API_URL and VITE_SUPABASE_ANON_KEY must be set for the desktop snapshot bootstrap",
     );
   }
 
   return {
     async selectAll(table, accessToken) {
+      // Per-call client so the user's JWT lives in this request's
+      // headers without polluting the Bun-main process's broader auth
+      // state. `persistSession: false` because there is no browser
+      // storage to write to in Bun main.
+      const client = createClient(url, anonKey, {
+        global: {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        },
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+        },
+      });
+
       const all: Array<Record<string, unknown>> = [];
       let from = 0;
-      // Loop until a page comes back shorter than pageSize.
+      // Paging loop: termination depends on the server's response
+      // size, so this is the exit-early-break exception, not a missed
+      // `forEach`.
       for (;;) {
         const to = from + pageSize - 1;
-        const res = await fetch(`${url}/rest/v1/${table}?select=*`, {
-          headers: {
-            apikey: anonKey,
-            Authorization: `Bearer ${accessToken}`,
-            Accept: "application/json",
-            Range: `${from}-${to}`,
-            "Range-Unit": "items",
-          },
-        });
-        if (!res.ok) {
-          const body = await res.text();
+        const { data, error } = await client
+          // The synced tables are listed in `SYNCABLE_TABLES` as plain
+          // strings, not literal types in the registered Supabase
+          // database schema, so the `.from` argument is widened.
+          .from(table)
+          .select("*")
+          .range(from, to);
+        if (error) {
           throw new Error(
             `Supabase selectAll ${table} failed (range ${from}-${to}): ` +
-              `${res.status} ${body}`,
+              `${error.message}`,
           );
         }
-        const page = (await res.json()) as Array<Record<string, unknown>>;
+        const page = (data ?? []) as Array<Record<string, unknown>>;
         all.push(...page);
-        if (page.length < pageSize) break;
+        if (page.length < pageSize) {
+          break;
+        }
         from += pageSize;
       }
       return all;

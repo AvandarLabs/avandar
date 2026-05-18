@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import { app, BrowserWindow, PATHS } from "electrobun";
 import { SYNCABLE_TABLES } from "../sync/syncable-tables";
-import { resolveMigrationsDir } from "./config/migrationsDir";
+import { resolveMigrationsDir } from "./config/resolveMigrationsDir/resolveMigrationsDir";
 import { resolveWebviewUrl } from "./config/url";
 import { setupApplicationMenu } from "./menu/setupApplicationMenu";
 import { getUserDataDir } from "./platform/getUserDataDir";
@@ -49,11 +49,11 @@ console.log(
 
 // Stopgap snapshot bootstrap: when a dev token + Supabase URL/key are
 // configured, pull every syncable table from Supabase REST into the
-// local mirror on first launch. The "real" bootstrap that fires once
-// the user signs in lands with Task 11 (Keychain auth).
+// local mirror on first launch. Soon, the real bootstrap will fire
+// once the user signs in (driven by the keychain auth work).
 const devToken = process.env.AVA_DEV_ACCESS_TOKEN;
-const supabaseUrl = process.env.AVA_SUPABASE_URL;
-const supabaseAnonKey = process.env.AVA_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.VITE_SUPABASE_API_URL;
+const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
 
 if (devToken && supabaseUrl && supabaseAnonKey) {
   try {
@@ -62,20 +62,17 @@ if (devToken && supabaseUrl && supabaseAnonKey) {
       rest: createSupabaseRestClient(),
       accessToken: devToken,
       tables: SYNCABLE_TABLES,
-      logger: {
-        log: (msg) => console.log(msg),
-        error: (msg) => console.error(msg),
-      },
+      logger: { log: console.log, error: console.error },
     });
   } catch (err) {
-    // Bootstrap failures are non-fatal — the webview still loads
+    // Bootstrap failures are non-fatal: the webview still loads
     // against whatever is in SQLite. Logged so dev can investigate.
     console.error("[snapshot-bootstrap] failed:", err);
   }
 } else {
   console.log(
     "[snapshot-bootstrap] skipped (set AVA_DEV_ACCESS_TOKEN + " +
-      "AVA_SUPABASE_URL + AVA_SUPABASE_ANON_KEY to enable)",
+      "VITE_SUPABASE_API_URL + VITE_SUPABASE_ANON_KEY to enable)",
   );
 }
 

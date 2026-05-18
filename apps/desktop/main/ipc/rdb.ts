@@ -1,5 +1,5 @@
 import type { SQLQueryBindings } from "bun:sqlite";
-import { RdbContracts } from "../../../../shared/platform/ipc/contracts/RdbContracts.ts";
+import { RdbContracts } from "$/platform/ipc/contracts/RdbContracts.ts";
 import type { AvaSqliteDatabase } from "../services/Sqlite.ts";
 import type { IpcServer } from "./server.ts";
 
@@ -11,7 +11,7 @@ import type { IpcServer } from "./server.ts";
  * payloads surface as a bun:sqlite "wrong type" error and propagate
  * back to the caller via the reply envelope.
  */
-function toBindings(params: unknown[]): SQLQueryBindings[] {
+function _toBindings(params: unknown[]): SQLQueryBindings[] {
   return params as SQLQueryBindings[];
 }
 
@@ -22,7 +22,7 @@ function toBindings(params: unknown[]): SQLQueryBindings[] {
  * `callIpc` to read and write the local metadata DB.
  *
  * Every handler treats `req.params` as positional bind arguments and
- * never interpolates them into the SQL string — the caller is
+ * never interpolates them into the SQL string; the caller is
  * responsible for emitting parameterised SQL.
  *
  * @param server - Server returned by `createIpcServer`.
@@ -34,7 +34,7 @@ export function registerRdbHandlers(
 ): void {
   server.handle(RdbContracts.run, (req) => {
     const stmt = db.prepare(req.sql);
-    const result = stmt.run(...toBindings(req.params as unknown[]));
+    const result = stmt.run(..._toBindings(req.params as unknown[]));
     return {
       changes: result.changes,
       lastInsertRowid: Number(result.lastInsertRowid ?? 0),
@@ -43,7 +43,7 @@ export function registerRdbHandlers(
 
   server.handle(RdbContracts.query, (req) => {
     const stmt = db.prepare(req.sql);
-    const rows = stmt.all(...toBindings(req.params as unknown[])) as Array<
+    const rows = stmt.all(..._toBindings(req.params as unknown[])) as Array<
       Record<string, unknown>
     >;
     return { rows };
@@ -52,12 +52,12 @@ export function registerRdbHandlers(
   server.handle(RdbContracts.transaction, (req) => {
     const tx = db.transaction(
       (statements: ReadonlyArray<{ sql: string; params: unknown[] }>) => {
-        const results: Array<{ changes: number }> = [];
-        for (const s of statements) {
-          const r = db.prepare(s.sql).run(...toBindings(s.params));
-          results.push({ changes: r.changes });
-        }
-        return results;
+        return statements.map((statement) => {
+          const result = db
+            .prepare(statement.sql)
+            .run(..._toBindings(statement.params));
+          return { changes: result.changes };
+        });
       },
     );
     return { results: tx(req.statements) };

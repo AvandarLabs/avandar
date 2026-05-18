@@ -5,6 +5,7 @@ import { createModelCrudClient } from "@clients/ModelCrudClient/createModelCrudC
 import { assertIsDefined } from "@utils/asserts/assertIsDefined/assertIsDefined.ts";
 import { objectEntries } from "@utils/objects/objectEntries.ts";
 import { objectKeys } from "@utils/objects/objectKeys.ts";
+import { objectValuesMap } from "@utils/objects/objectValuesMap/objectValuesMap.ts";
 import { match } from "ts-pattern";
 import { EmptyObject } from "type-fest";
 import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry.ts";
@@ -30,12 +31,11 @@ import type {
  * Reads and writes go through the typed IPC bridge to the Bun-main
  * process (`apps/desktop/main/ipc/rdb.ts`), which holds the only
  * `bun:sqlite` handle. The escape-hatch `queries` and `mutations`
- * factories still receive the live `SupabaseClient` — those custom
- * functions currently target Supabase REST in both web and desktop
- * builds; Phase 3 sync engine will route them through the local
- * mirror.
+ * factories still receive the live `SupabaseClient`: for now, those
+ * custom functions target Supabase REST on both web and desktop, and
+ * the sync engine will eventually route them through the local mirror.
  *
- * Limitations carried over from Phase 2:
+ * Known limitations:
  * - JSON-typed columns (`config`, `metadata`, `filter`) are
  *   stringified on write but returned as raw strings on read; model
  *   parsers must coerce when they consume them.
@@ -78,7 +78,7 @@ export function createSqliteCrudClient<
   } = options;
 
   const pk = String(dbTablePrimaryKey);
-  const table = ident(String(tableName));
+  const table = _ident(String(tableName));
 
   const modelClient = createModelCrudClient({
     modelName,
@@ -98,14 +98,14 @@ export function createSqliteCrudClient<
           return undefined;
         }
         const { rows } = await callIpc(RdbContracts.query, {
-          sql: `select * from ${table} where ${ident(pk)} = ? limit 1`,
+          sql: `select * from ${table} where ${_ident(pk)} = ? limit 1`,
           params: [params.id as unknown],
         });
         return (rows[0] as M["DBRead"] | undefined) ?? undefined;
       },
 
       getCount: async (params) => {
-        const { where, params: bindings } = buildWhereClause(params.where);
+        const { where, params: bindings } = _buildWhereClause(params.where);
         const { rows } = await callIpc(RdbContracts.query, {
           sql: `select count(*) as _count from ${table}${where}`,
           params: bindings,
@@ -115,7 +115,7 @@ export function createSqliteCrudClient<
       },
 
       getPage: async (params) => {
-        const { where, params: bindings } = buildWhereClause(params.where);
+        const { where, params: bindings } = _buildWhereClause(params.where);
         const offset = params.pageNum * params.pageSize;
         const sql =
           `select * from ${table}${where} limit ? offset ?`;
@@ -127,9 +127,9 @@ export function createSqliteCrudClient<
       },
 
       insert: async (params) => {
-        const row = serializeRowValues(params.data as Record<string, unknown>);
+        const row = _serializeRowValues(params.data as Record<string, unknown>);
         const cols = objectKeys(row);
-        const sql = buildInsertSql({
+        const sql = _buildInsertSql({
           table,
           cols,
           pk,
@@ -138,7 +138,7 @@ export function createSqliteCrudClient<
         });
         const { rows } = await callIpc(RdbContracts.query, {
           sql,
-          params: cols.map((c) => row[c]),
+          params: cols.map((col) => row[col]),
         });
         const returned = rows[0];
         assertIsDefined(returned, "insert returned no row");
@@ -146,9 +146,11 @@ export function createSqliteCrudClient<
       },
 
       bulkInsert: async (params) => {
-        if (params.data.length === 0) return [];
-        const allRows = params.data.map((d) =>
-          serializeRowValues(d as Record<string, unknown>),
+        if (params.data.length === 0) {
+          return [];
+        }
+        const allRows = params.data.map((rowData) =>
+          _serializeRowValues(rowData as Record<string, unknown>),
         );
         // Take column set from the first row; assume every row in a
         // bulkInsert has the same shape (matches Postgres + Supabase
@@ -157,7 +159,7 @@ export function createSqliteCrudClient<
         const placeholders =
           "(" + cols.map(() => "?").join(", ") + ")";
         const valuesClause = allRows.map(() => placeholders).join(", ");
-        const sql = buildInsertSql({
+        const sql = _buildInsertSql({
           table,
           cols,
           pk,
@@ -165,7 +167,9 @@ export function createSqliteCrudClient<
           upsert: params.upsert ?? false,
           onConflict: params.onConflict,
         });
-        const bindings = allRows.flatMap((r) => cols.map((c) => r[c]));
+        const bindings = allRows.flatMap((row) =>
+          cols.map((col) => row[col]),
+        );
         const { rows } = await callIpc(RdbContracts.query, {
           sql,
           params: bindings,
@@ -174,23 +178,23 @@ export function createSqliteCrudClient<
       },
 
       update: async (params) => {
-        const row = serializeRowValues(params.data as Record<string, unknown>);
+        const row = _serializeRowValues(params.data as Record<string, unknown>);
         const cols = objectKeys(row);
         if (cols.length === 0) {
           // No-op update; just read the current row back.
           const { rows } = await callIpc(RdbContracts.query, {
-            sql: `select * from ${table} where ${ident(pk)} = ? limit 1`,
+            sql: `select * from ${table} where ${_ident(pk)} = ? limit 1`,
             params: [params.id as unknown],
           });
           const back = rows[0];
           assertIsDefined(back, `update found no row with ${pk}=${params.id}`);
           return back as M["DBRead"];
         }
-        const setClause = cols.map((c) => `${ident(c)} = ?`).join(", ");
-        const sql = `update ${table} set ${setClause} where ${ident(pk)} = ? returning *`;
+        const setClause = cols.map((col) => `${_ident(col)} = ?`).join(", ");
+        const sql = `update ${table} set ${setClause} where ${_ident(pk)} = ? returning *`;
         const { rows } = await callIpc(RdbContracts.query, {
           sql,
-          params: [...cols.map((c) => row[c]), params.id as unknown],
+          params: [...cols.map((col) => row[col]), params.id as unknown],
         });
         const updated = rows[0];
         assertIsDefined(updated, `update found no row with ${pk}=${params.id}`);
@@ -199,16 +203,18 @@ export function createSqliteCrudClient<
 
       delete: async (params) => {
         await callIpc(RdbContracts.run, {
-          sql: `delete from ${table} where ${ident(pk)} = ?`,
+          sql: `delete from ${table} where ${_ident(pk)} = ?`,
           params: [params.id as unknown],
         });
       },
 
       bulkDelete: async (params) => {
-        if (params.ids.length === 0) return;
+        if (params.ids.length === 0) {
+          return;
+        }
         const placeholders = params.ids.map(() => "?").join(", ");
         await callIpc(RdbContracts.run, {
-          sql: `delete from ${table} where ${ident(pk)} in (${placeholders})`,
+          sql: `delete from ${table} where ${_ident(pk)} in (${placeholders})`,
           params: params.ids as unknown as unknown[],
         });
       },
@@ -231,7 +237,7 @@ export function createSqliteCrudClient<
  * uses identifiers containing them today, but quoting keeps the path
  * safe if a future migration introduces one.
  */
-function ident(name: string): string {
+function _ident(name: string): string {
   return `"${name.replaceAll('"', '""')}"`;
 }
 
@@ -239,24 +245,28 @@ function ident(name: string): string {
  * Build a parameterised WHERE clause from the model's
  * `FiltersByColumn` shape. Supports the same operators as the
  * Supabase client (`eq`, `in`) and emits placeholders rather than
- * interpolating values — the only thing that gets concatenated is the
+ * interpolating values; the only thing that gets concatenated is the
  * caller-controlled column name.
  */
-function buildWhereClause<DBRead extends Record<string, unknown>>(
+function _buildWhereClause<DBRead extends Record<string, unknown>>(
   filters: FiltersByColumn<DBRead> | undefined,
 ): { where: string; params: unknown[] } {
-  if (!filters) return { where: "", params: [] };
+  if (!filters) {
+    return { where: "", params: [] };
+  }
   const clauses: string[] = [];
   const params: unknown[] = [];
 
   objectKeys(filters).forEach((column) => {
     const filter = filters[column];
-    if (!filter) return;
+    if (!filter) {
+      return;
+    }
     objectEntries(filter).forEach(([operator, value]) => {
-      const col = ident(String(column));
+      const quotedColumn = _ident(String(column));
       match(operator as FilterOperator)
         .with("eq", () => {
-          clauses.push(`${col} = ?`);
+          clauses.push(`${quotedColumn} = ?`);
           params.push(value as unknown);
         })
         .with("in", () => {
@@ -268,7 +278,7 @@ function buildWhereClause<DBRead extends Record<string, unknown>>(
             return;
           }
           const placeholders = values.map(() => "?").join(", ");
-          clauses.push(`${col} in (${placeholders})`);
+          clauses.push(`${quotedColumn} in (${placeholders})`);
           params.push(...values);
         })
         .exhaustive();
@@ -283,31 +293,22 @@ function buildWhereClause<DBRead extends Record<string, unknown>>(
 /**
  * Stringify object/array values so bun:sqlite can store them in
  * TEXT-affinity (`jsonb`) columns. Returns primitives unchanged.
- * Symmetric parse-on-read is intentionally not done here — model
+ * Symmetric parse-on-read is intentionally not done here; model
  * parsers handle DBRead → ModelRead transforms and can pick up the
  * raw JSON strings.
  */
-function serializeRowValues(
+function _serializeRowValues(
   row: Record<string, unknown>,
 ): Record<string, unknown> {
-  const out: Record<string, unknown> = {};
-  for (const k of objectKeys(row)) {
-    const v = row[k];
-    if (v !== null && typeof v === "object" && !(v instanceof Date)) {
-      out[k] = JSON.stringify(v);
-    } else {
-      out[k] = v;
+  return objectValuesMap(row, (value) => {
+    if (value !== null && typeof value === "object" && !(value instanceof Date)) {
+      return JSON.stringify(value);
     }
-  }
-  return out;
+    return value;
+  });
 }
 
-/**
- * Compose an `insert ... values ... [on conflict ...] returning *`
- * statement. `valuesClause` is provided for the bulk path; the single
- * insert path leaves it undefined and uses one `(?, ?, …)` row.
- */
-function buildInsertSql(args: {
+type BuildInsertSqlArgs = {
   table: string;
   cols: ReadonlyArray<string>;
   pk: string;
@@ -316,22 +317,29 @@ function buildInsertSql(args: {
   onConflict:
     | { columnNames: string[]; ignoreDuplicates: boolean }
     | undefined;
-}): string {
+};
+
+/**
+ * Compose an `insert ... values ... [on conflict ...] returning *`
+ * statement. `valuesClause` is provided for the bulk path; the single
+ * insert path leaves it undefined and uses one `(?, ?, …)` row.
+ */
+function _buildInsertSql(args: Readonly<BuildInsertSqlArgs>): string {
   const { table, cols, pk, valuesClause, upsert, onConflict } = args;
-  const colsClause = cols.map(ident).join(", ");
+  const colsClause = cols.map(_ident).join(", ");
   const values =
     valuesClause ??
     "(" + cols.map(() => "?").join(", ") + ")";
   let conflict = "";
   if (upsert) {
     assertIsDefined(onConflict, "`onConflict` must be defined when upserting");
-    const onCols = onConflict.columnNames.map(ident).join(", ");
+    const onCols = onConflict.columnNames.map(_ident).join(", ");
     if (onConflict.ignoreDuplicates) {
       conflict = ` on conflict (${onCols}) do nothing`;
     } else {
       const updates = cols
-        .filter((c) => c !== pk && !onConflict.columnNames.includes(c))
-        .map((c) => `${ident(c)} = excluded.${ident(c)}`)
+        .filter((col) => col !== pk && !onConflict.columnNames.includes(col))
+        .map((col) => `${_ident(col)} = excluded.${_ident(col)}`)
         .join(", ");
       conflict =
         updates.length === 0 ?

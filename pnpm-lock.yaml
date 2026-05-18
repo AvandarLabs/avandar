@@ -385,6 +385,9 @@ importers:
 
   apps/desktop:
     dependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.98.0
+        version: 2.98.0
       electrobun:
         specifier: latest
         version: 1.18.1

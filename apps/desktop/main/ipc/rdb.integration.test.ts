@@ -2,11 +2,14 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
-import { RdbContracts } from "../../../../shared/platform/ipc/contracts/RdbContracts.ts";
-import type { ReplyEnvelope, RequestEnvelope } from "../../../../shared/platform/ipc/envelopes.ts";
-import { createIpcServer } from "./server.ts";
+import { RdbContracts } from "$/platform/ipc/contracts/RdbContracts.ts";
 import { openSqliteDatabase } from "../services/Sqlite.ts";
 import { registerRdbHandlers } from "./rdb.ts";
+import { createIpcServer } from "./server.ts";
+import type {
+  ReplyEnvelope,
+  RequestEnvelope,
+} from "$/platform/ipc/envelopes.ts";
 
 type FakeTransport = {
   on: (channel: string, callback: (message: unknown) => void) => void;

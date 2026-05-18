@@ -16,7 +16,7 @@ const MIGRATION_FILE_SUFFIX = ".gen.sql";
  * each filename (e.g. `20250706214712_init_db.gen.sql`), which is the
  * same ordering the bookkeeping table in {@link runMigrations} expects.
  * Subdirectories and any file that does not end in `.gen.sql` are
- * ignored — README files and editor backups must not be applied.
+ * ignored: README files and editor backups must not be applied.
  *
  * @param dir - Absolute path to a directory of generated migrations.
  * @returns The migration list, ready to pass to `runMigrations`.
@@ -25,7 +25,9 @@ export function loadMigrationsFromDir(dir: string): ReadonlyArray<Migration> {
   const entries = readdirSync(dir);
   const files = entries
     .filter((name) => {
-      if (!name.endsWith(MIGRATION_FILE_SUFFIX)) return false;
+      if (!name.endsWith(MIGRATION_FILE_SUFFIX)) {
+        return false;
+      }
       const stats = statSync(join(dir, name));
       return stats.isFile();
     })

@@ -42,7 +42,7 @@ export function openSqliteDatabase(filePath: string): AvaSqliteDatabase {
  *
  * Invariants:
  * - Every migration already recorded in the DB must appear, in the same
- *   order, at the head of `migrations` — otherwise the runner throws
+ *   order, at the head of `migrations`; otherwise the runner throws
  *   `migration history mismatch` (caller built the input from a stale or
  *   re-ordered manifest).
  * - The batch of new migrations is wrapped in a single transaction so a
@@ -74,6 +74,9 @@ export function runMigrations(
     .all()
     .map((r) => r.name);
 
+  // Plain `for` so we can throw the moment we find a mismatch and
+  // skip the remaining comparisons; the loop is the exit-early-break
+  // exception, not an oversight.
   for (let i = 0; i < applied.length; i++) {
     if (migrations[i]?.name !== applied[i]) {
       throw new Error(
@@ -84,18 +87,20 @@ export function runMigrations(
   }
 
   const toApply = migrations.slice(applied.length);
-  if (toApply.length === 0) return;
+  if (toApply.length === 0) {
+    return;
+  }
 
   const tx = db.transaction((batch: ReadonlyArray<Migration>) => {
-    for (const m of batch) {
-      if (hasExecutableSql(m.sql)) {
-        db.run(m.sql);
+    batch.forEach((migration) => {
+      if (_hasExecutableSql(migration.sql)) {
+        db.run(migration.sql);
       }
       db.run(
         "insert into _schema_migrations (name, applied_at) values (?, ?);",
-        [m.name, Date.now()],
+        [migration.name, Date.now()],
       );
-    }
+    });
   });
 
   tx(toApply);
@@ -104,7 +109,7 @@ export function runMigrations(
 /**
  * True iff `sql` contains at least one non-comment, non-whitespace
  * token. Generated `.gen.sql` files are comment-only when the upstream
- * Postgres migration was pure RLS / function / data backfill — they
+ * Postgres migration was pure RLS / function / data backfill: they
  * carry no schema-shape statements, so the runner must record them in
  * `_schema_migrations` (to keep history in step with the manifest) but
  * must not hand the all-comment body to bun:sqlite, which errors with
@@ -113,7 +118,7 @@ export function runMigrations(
  * Strips `--` line comments and `slash-star ... star-slash` block
  * comments and checks whether anything remains.
  */
-function hasExecutableSql(sql: string): boolean {
+function _hasExecutableSql(sql: string): boolean {
   const stripped = sql
     .replace(/\/\*[\s\S]*?\*\//g, "")
     .replace(/--[^\n]*/g, "")
