@@ -14,13 +14,15 @@ export function useChatPageContext(): ChatPageContext {
       return s.location.pathname;
     },
   });
-  const { openDataset, rawSQL } = DataExplorerStateManager.useState();
+  const { openDataset, rawSQL, lastQueryError } =
+    DataExplorerStateManager.useState();
 
   if (pathname.includes("/data-explorer")) {
     return {
       app: "data-explorer",
       ...(openDataset ? { openDatasetId: openDataset.datasetId } : {}),
       ...(rawSQL ? { lastSql: rawSQL } : {}),
+      ...(lastQueryError ? { lastError: lastQueryError } : {}),
     };
   }
   if (pathname.includes("/data-import") || pathname.includes("/data-sources")) {

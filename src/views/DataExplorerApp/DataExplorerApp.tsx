@@ -32,6 +32,7 @@ import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetModal/OpenD
 import { QueryForm } from "@/views/DataExplorerApp/QueryForm/QueryForm";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
+import { GeneratedPromptBadge } from "@/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge";
 import { useDataExplorerURLSync } from "@/views/DataExplorerApp/useDataExplorerURLSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 import type { DataExplorerURLSearch } from "@/views/DataExplorerApp/DataExplorerURLState";
@@ -75,12 +76,32 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
   });
 
   const workspace = useCurrentWorkspace();
-  const [queryResults, isLoadingResults] = useDataQuery({
+  const [queryResults, isLoadingResults, dataQuery] = useDataQuery({
     query: state.query,
     rawSQL: state.rawSQL,
     auth: "workspace",
     workspaceId: workspace.id,
   });
+
+  // Mirror useDataQuery's runtime error onto state so the chat panel can
+  // show a "Regenerate with the error" affordance when the auto-applied SQL
+  // turned out to be invalid.
+  useEffect(() => {
+    const message =
+      dataQuery.isError ?
+        dataQuery.error instanceof Error ?
+          dataQuery.error.message
+        : String(dataQuery.error)
+      : undefined;
+    if (message !== state.lastQueryError) {
+      dispatch.setLastQueryError(message);
+    }
+  }, [
+    dataQuery.isError,
+    dataQuery.error,
+    state.lastQueryError,
+    dispatch,
+  ]);
   const queryResultColumns = queryResults?.columns ?? [];
 
   const columnSignature = useMemo(() => {
@@ -344,6 +365,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
               Export
             </Button>
           </Group>
+          <GeneratedPromptBadge />
           <Box flex={1} pos="relative" w="100%" h="100%" bg="white">
             <LoadingOverlay visible={isLoadingResults} zIndex={99} />
             <VisualizationContainer

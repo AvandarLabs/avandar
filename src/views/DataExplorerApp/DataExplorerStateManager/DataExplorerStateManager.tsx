@@ -192,6 +192,19 @@ export const DataExplorerStateManager = createAppStateManager({
       return { ...state, openDataset };
     },
 
+    /**
+     * Record the runtime error message from the most recent query attempt, or
+     * clear it by passing `undefined`. The chat panel reads this so it can
+     * surface a one-click "Regenerate with the error" action when the
+     * auto-applied SQL fails at runtime.
+     */
+    setLastQueryError: (
+      state: DataExplorerAppState,
+      lastQueryError: string | undefined,
+    ): DataExplorerAppState => {
+      return { ...state, lastQueryError };
+    },
+
     /** Reset the Data Explorer to its initial (blank) state. */
     resetState: (_state: DataExplorerAppState): DataExplorerAppState => {
       return INITIAL_DATA_EXPLORER_STATE;

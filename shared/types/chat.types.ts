@@ -17,6 +17,12 @@ export type ChatPageContext = {
   app: ChatApp;
   openDatasetId?: string;
   lastSql?: string;
+  /**
+   * Runtime error message from the most recent SQL execution, if any. Sent
+   * so the model can offer to fix the prior SQL when the user asks to
+   * regenerate.
+   */
+  lastError?: string;
 };
 
 export type ChatGeneratedSql = {

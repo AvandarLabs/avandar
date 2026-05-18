@@ -21,6 +21,14 @@ const openRouterReferer = getAppURL();
 // Low-latency, low-cost model for v1. Easy to swap by changing this constant.
 const DEFAULT_MODEL = "openai/gpt-4o-mini";
 
+// Cheap heuristic for "this prompt is a refinement of the previous turn."
+// When it matches AND the client gave us a `lastSql`, we attach the prior
+// SQL to the system prompt so the model can edit it instead of rebuilding
+// from scratch. The brief calls for "prior prompt + SQL only when relevant"
+// to keep token spend honest; this regex is the relevance gate.
+const REFINEMENT_HINTS =
+  /^\s*(now|instead|also|actually|and|but|wait)\b|\b(it|that|this query|this one|the result|the previous|same|earlier|again|now also)\b/i;
+
 // OpenRouter speaks the OpenAI Chat Completions wire format, so we POST
 // directly the same way `queries.routes.ts` calls OpenAI. The brief names
 // Vercel AI SDK as the target stack; using it here means npm: imports inside
@@ -106,6 +114,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           app: z.enum(["data-explorer", "data-sources", "dashboards", "other"]),
           openDatasetId: z.string().optional(),
           lastSql: z.string().optional(),
+          lastError: z.string().optional(),
         }),
       })
       .action(async ({ pathParams, body, supabaseClient }) => {
@@ -134,9 +143,29 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
             })
           : "";
 
+        const hasLastSql =
+          typeof context.lastSql === "string" && context.lastSql.length > 0;
+
+        const isLikelyRefinement =
+          isDataExplorer &&
+          hasLastSql &&
+          REFINEMENT_HINTS.test(lastUserPrompt);
+
+        const refinementContext =
+          isLikelyRefinement && hasLastSql ?
+            `\n\nThe user's previous turn produced this SQL, and the current message looks like a refinement of it. When generating SQL, edit this prior query rather than starting over.\n\nPrevious SQL:\n\`\`\`sql\n${context.lastSql}\n\`\`\``
+          : "";
+
+        // When the prior SQL produced a runtime error and the client passed
+        // it back, surface it so the model can fix the query in this turn.
+        const errorContext =
+          isDataExplorer && hasLastSql && context.lastError ?
+            `\n\nThe previous SQL failed at runtime with this error. Use the error to fix the query.\n\nPrevious SQL:\n\`\`\`sql\n${context.lastSql}\n\`\`\`\n\nError:\n${context.lastError}`
+          : "";
+
         const systemContent =
           isDataExplorer ?
-            `${dataExplorerSystemPrefix}\n\n${sqlSystemPrompt}`
+            `${dataExplorerSystemPrefix}\n\n${sqlSystemPrompt}${refinementContext}${errorContext}`
           : genericSystemPrompt;
 
         const requestBody: Record<string, unknown> = {
