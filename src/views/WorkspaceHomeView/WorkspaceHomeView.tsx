@@ -10,11 +10,11 @@ import {
 } from "@mantine/core";
 import { IconDatabase, IconTable } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
+import { Paper } from "@ui";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useIsTabletSize } from "@/lib/hooks/ui/useIsTabletSize";
-import { Paper } from "@ui";
 import { mantineColorVar } from "@/lib/utils/browser/css";
 import type { Workspace } from "$/models/Workspace/Workspace";
 

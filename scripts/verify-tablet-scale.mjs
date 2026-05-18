@@ -1,6 +1,6 @@
-import { chromium } from "@playwright/test";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { chromium } from "@playwright/test";
 
 const SCREENSHOT_DIR = ".playwright-mcp";
 const CHROME_PATH = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
@@ -11,9 +11,24 @@ const BASE_URL = "http://localhost:5173";
 const VIEWPORTS = [
   { name: "ipad-portrait-768", width: 768, height: 1024, expectedScale: "0.8" },
   { name: "ipad-portrait-810", width: 810, height: 1080, expectedScale: "0.8" },
-  { name: "ipad-landscape-1024", width: 1024, height: 768, expectedScale: "0.8" },
-  { name: "ipad-landscape-1180", width: 1180, height: 820, expectedScale: "0.8" },
-  { name: "ipad-pro-13-landscape-1366", width: 1366, height: 1024, expectedScale: "0.9" },
+  {
+    name: "ipad-landscape-1024",
+    width: 1024,
+    height: 768,
+    expectedScale: "0.8",
+  },
+  {
+    name: "ipad-landscape-1180",
+    width: 1180,
+    height: 820,
+    expectedScale: "0.8",
+  },
+  {
+    name: "ipad-pro-13-landscape-1366",
+    width: 1366,
+    height: 1024,
+    expectedScale: "0.9",
+  },
   { name: "desktop-1440", width: 1440, height: 900, expectedScale: "1" },
   { name: "desktop-1920", width: 1920, height: 1080, expectedScale: "1" },
 ];

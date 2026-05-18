@@ -9,7 +9,7 @@ import {
 import { Model } from "@models";
 import { IconLayoutDashboard, IconPlus } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import { notifyDevAlert, Paper  } from "@ui";
+import { notifyDevAlert, Paper } from "@ui";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
@@ -84,10 +84,7 @@ export function DashboardListView({
               radius="xl"
               variant="light"
             >
-              <IconLayoutDashboard
-                size={isTabletSize ? 24 : 32}
-                stroke={1.5}
-              />
+              <IconLayoutDashboard size={isTabletSize ? 24 : 32} stroke={1.5} />
             </ThemeIcon>
 
             <Stack gap="xs">
