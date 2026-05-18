@@ -2,8 +2,6 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
-import { FeedbackButton } from "@/components/buttons/FeedbackButton/FeedbackButton";
-import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import type { AvaRouterRootContext } from "@/config/AvaRouter";
 
 /**
@@ -23,9 +21,6 @@ function RouterRootComponent() {
           <ReactQueryDevtools initialIsOpen={false} />
         </>
       )}
-      {isFlagEnabled(FeatureFlag.EnableUserFeedback) ?
-        <FeedbackButton />
-      : null}
     </AvandarUiProvider>
   );
 }
