@@ -52,13 +52,13 @@ function TriggerButton({ file }: { file: File }): ReactElement {
   );
 }
 
-function createCsvFile(name = "data.csv"): File {
+function _createCsvFile(name = "data.csv"): File {
   return new File(["a,b\n1,2"], name, { type: "text/csv" });
 }
 
 describe("openFileImportFlow", () => {
   it("shows a confirm dialog asking whether to import the dropped file", async () => {
-    const file = createCsvFile("california.csv");
+    const file = _createCsvFile("california.csv");
 
     render(
       <AvandarUiProvider>
@@ -78,7 +78,7 @@ describe("openFileImportFlow", () => {
   });
 
   it("opens the import modal containing ManualUploadView when the user confirms", async () => {
-    const file = createCsvFile("california.csv");
+    const file = _createCsvFile("california.csv");
     manualUploadViewMock.mockClear();
 
     render(
@@ -107,7 +107,7 @@ describe("openFileImportFlow", () => {
   });
 
   it("does not open the import modal when the user cancels the confirm dialog", async () => {
-    const file = createCsvFile();
+    const file = _createCsvFile();
 
     render(
       <AvandarUiProvider>
@@ -128,7 +128,7 @@ describe("openFileImportFlow", () => {
   });
 
   it("closes the import modal when the ManualUploadView fires onAfterSave", async () => {
-    const file = createCsvFile();
+    const file = _createCsvFile();
 
     render(
       <AvandarUiProvider>
