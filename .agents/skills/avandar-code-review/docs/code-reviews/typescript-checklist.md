@@ -43,8 +43,6 @@ Use this checklist only when the diff includes TypeScript or TSX files.
 - Top-level functions should use the `function` keyword.
 - Nested functions and object methods should use arrow functions.
 - Type imports and type exports should always use the `type` keyword.
-- If a module grows beyond one file, prefer a directory module layout instead
-  of cramming everything into a single file.
 - Do not add barrel files, except approved `index.ts` files in `packages/`.
 - Do not use namespace exports such as `export * from`.
 - All exported classes, objects, and functions need docstrings.

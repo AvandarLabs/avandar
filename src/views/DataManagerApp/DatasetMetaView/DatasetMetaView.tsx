@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Button,
   Container,
@@ -14,15 +15,23 @@ import {
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "@tanstack/react-router";
-import { EditableDisplayText, notifyError, notifySuccess, Paper } from "@ui";
+import {
+  EditableDisplayText,
+  Link,
+  notifyError,
+  notifySuccess,
+  Paper,
+} from "@ui";
 import { prop, where } from "@utils";
 import { useEffect, useMemo, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
-import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton";
+import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
 import { AppConfig } from "@/config/AppConfig";
 import { AppLinks } from "@/config/AppLinks";
+import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
+import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { DatasetMetadataList } from "@/views/DataManagerApp/DatasetMetaView/DatasetMetadataList";
@@ -42,6 +51,11 @@ type DatasetTabId = "dataset-metadata" | "dataset-summary";
 export function DatasetMetaView({ dataset }: Props): JSX.Element {
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
+  const [appRoles] = useUserAppRoles();
+  // True when the user has no data_sources app role; in that case the dataset
+  // is visible only through a resource share. We surface this with a soft
+  // informational banner; it never blocks rendering.
+  const isShareOnlyAccess = !!appRoles && !appRoles.data_sources;
   const [deleteDataset, isDeletePending] = DatasetClient.useFullDelete({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
   });
@@ -113,6 +127,24 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
   return (
     <Container py="md">
       <Stack>
+        {isShareOnlyAccess ?
+          <Alert color="blue" variant="light" title="Shared with you">
+            <Text size="sm">
+              You can view this dataset because it was shared with you.
+              {isFlagEnabled(FeatureFlag.EnableSharedWithMe) ?
+                <>
+                  {" "}
+                  <Link
+                    to="/$workspaceSlug/shared-with-me"
+                    params={{ workspaceSlug: workspace.slug }}
+                  >
+                    See all shared items
+                  </Link>
+                </>
+              : null}
+            </Text>
+          </Alert>
+        : null}
         <Group justify="space-between" align="center" wrap="nowrap" w="100%">
           <Group
             gap="xs"

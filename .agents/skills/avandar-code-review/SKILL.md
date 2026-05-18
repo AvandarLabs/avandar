@@ -1,10 +1,10 @@
 ---
 name: avandar-code-review
-description: Use when reviewing Avandar code changes, pull requests, or local diffs for repo-specific TypeScript, SQL, naming, documentation, and immutability conventions.
+description: Use when reviewing Avandar code changes, pull requests, or local diffs for repo-specific TypeScript, React, SQL, naming, documentation, and immutability conventions.
 metadata:
   author: jpsyx
-  version: "1.7.0"
-  tags: avandar, code-review, typescript, sql, conventions, style
+  version: "1.9.0"
+  tags: avandar, code-review, typescript, react, sql, conventions, style
 ---
 
 # Avandar Code Review
@@ -112,10 +112,12 @@ Goal: interactive review, user approves direction before edits.
    "Review Modes" for the interactive menu spec).
 2. Review the common mistakes checklist below first.
 3. Review the general checks in this file second.
-4. Review the language-specific checklists next by referencing the supporting
+4. Review the language-specific phases next by referencing the supporting
    files in `skills/avandar-code-review/docs/code-reviews/`:
-   `typescript-checklist.md` for TS or TSX diffs and `sql-checklist.md` for
-   SQL diffs.
+   `typescript-checklist.md` for TS or TSX diffs,
+   `module-checklist.md` for TS or TSX module hierarchy and file structure,
+   `react-checklist.md` for TSX React component diffs, and
+   `sql-checklist.md` for SQL diffs. Each checklist should be a separate phase.
 5. If `docs/code-reviews/extra-checklist.md` exists, review the diff against
    those additional repo-local mistakes after finishing the built-in
    checklists.
@@ -126,7 +128,9 @@ Goal: interactive review, user approves direction before edits.
 
 In pair review mode, announce the phase explicitly as you move through the
 review, for example: "Phase: common mistakes", "Phase: general checks",
-"Phase: TypeScript checklist", "Phase: SQL checklist", or
+"Phase: TypeScript checklist", "Phase: Module checklist",
+"Phase: React checklist",
+"Phase: SQL checklist", or
 "Phase: repo-local extra checklist".
 
 ## Testing At The End Of Review
@@ -242,7 +246,12 @@ Check these first because they are the most frequent review findings:
 
 Use these supporting files when the corresponding language appears in the diff:
 
-- TypeScript or TSX: `skills/avandar-code-review/docs/code-reviews/typescript-checklist.md`
+- TypeScript or TSX:
+  `skills/avandar-code-review/docs/code-reviews/typescript-checklist.md`
+- TypeScript or TSX module hierarchy and file structure:
+  `skills/avandar-code-review/docs/code-reviews/module-checklist.md`
+- React component rules for TSX:
+  `skills/avandar-code-review/docs/code-reviews/react-checklist.md`
 - SQL: `skills/avandar-code-review/docs/code-reviews/sql-checklist.md`
 
 ## Review Output

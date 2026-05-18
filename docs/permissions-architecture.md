@@ -1,7 +1,7 @@
 # Permissions architecture
 
 This document is the canonical description of Avandar’s granular workspace
-permissions model (per-app roles, role groups, user-group tags, resource shares,
+permissions model (per-app roles, role groups, user groups, resource shares,
 and restriction). Humans and agents should treat it as the source of truth;
 when implementation diverges, update the code **or** this file in the same PR.
 
@@ -17,11 +17,13 @@ The system replaces a single workspace membership role with **per-application**
 capabilities (`admin`, `editor`, `viewer`) across four apps, adds **role
 groups** as named presets whose matrix lives in `role_group_app_roles` and is
 joined through `workspace_memberships.role_group_id`, adds **user
-groups** (tags) so resources and people can be labeled for intersection-based
-access, and adds **per-resource shares** (user, user group, or whole workspace)
-at a chosen role level. Resources may be marked **restricted**, which turns off
-tag-based “default” access so only explicit shares (plus super-user paths) grant
-access. **Workspace owners** and **Settings Admins** remain unconditional
+groups** so people can be labeled and used as share principals, and adds
+**per-resource shares** (user, user group, or whole workspace) at a chosen
+role level. User-group shares may set a `requires_app_access` flag so the
+share only applies to members who also hold any role on the resource’s parent
+app. Resources may be marked **restricted**, which turns off the workspace-wide
+default (the user’s app role) so only explicit shares (plus super-user paths)
+grant access. **Workspace owners** and **Settings Admins** remain unconditional
 admins for enforcement shortcuts. The experience is intentionally similar to
 Google Drive-style sharing layered on top of workspace membership.
 
@@ -29,46 +31,48 @@ Google Drive-style sharing layered on top of workspace membership.
 
 ## 2. Vocabulary
 
-**App (`app_type`)** — A product surface within a workspace whose access is
+**App (`app_type`)** - A product surface within a workspace whose access is
 granted independently. v1 values: `data_sources`, `data_explorer`,
 `dashboards`, `settings`. Example: a user can be `editor` in `dashboards` and
 `viewer` in `data_sources`.
 
-**Role level (`role_level`)** — One of `viewer` < `editor` < `admin`. Ordered
+**Role level (`role_level`)** - One of `viewer` < `editor` < `admin`. Ordered
 low→high in Postgres so enum comparison matches intent. Example: `editor` can
 edit content that `viewer` can only read, per permission catalog rules.
 
-**Permission key** — A derived string such as `data_sources__can_edit_dataset`;
+**Permission key** - A derived string such as `data_sources__can_edit_dataset`;
 the catalog maps `(app, role_level)` → keys. Admins do not toggle individual
 keys; SQL enforces role levels, TypeScript gates UI via the catalog.
 
-**Role group** — A named bundle of per-app role levels (`role_groups` +
+**Role group** - A named bundle of per-app role levels (`role_groups` +
 `role_group_app_roles`). Built-ins include Global Admin / Editor / Viewer;
 workspace admins may create custom groups. Example: “Analyst” =
 `data_explorer: editor`, `dashboards: viewer`, others unset or defaulted per
 product rules.
 
-**User group (tag)** — A workspace-scoped label (`user_groups`) with
-memberships (`user_group_memberships`). Resources link to tags via
-`resource_user_group_tags`. Example: tag “Health” on people and datasets so
-intersection gates access (see §4).
+**User group** - A workspace-scoped label (`user_groups`) with memberships
+(`user_group_memberships`). User groups are used as **principals** on
+`resource_shares` (see Share below). Example: a “Health” group with the Health
+team’s users, granted `editor` on a Health dataset via a share row.
 
-**Resource** — A row protected by RLS, typed as `resource_type` (`dashboard` |
-`dataset` in v1). Carries optional tag rows and share rows; may set
-`is_restricted`.
+**Resource** - A row protected by RLS, typed as `resource_type` (`dashboard` |
+`dataset` in v1). Carries optional share rows; may set `is_restricted`.
 
-**Share** — A row in `resource_shares` granting a **principal** (single user,
+**Share** - A row in `resource_shares` granting a **principal** (single user,
 user group, or entire workspace) a **role level** on one resource. Example:
-share dashboard D to user U at `viewer`.
+share dashboard D to user U at `viewer`. User-group shares may set
+`requires_app_access = true` to apply the share only to members who already
+have **any** role on the resource’s parent app.
 
-**Restriction (`is_restricted`)** — When `true` on a dashboard or dataset,
-tag-based application of the user’s normal app role does **not** grant access;
-explicit shares (and owner / Settings Admin paths) still do.
+**Restriction (`is_restricted`)** - When `true` on a dashboard or dataset,
+the workspace-wide default (applying the user’s normal app role to every
+resource of that app) does **not** grant access; explicit shares (and owner /
+Settings Admin paths) still do.
 
-**Workspace owner** — `workspaces.owner_id`; always effective `admin`
+**Workspace owner** - `workspaces.owner_id`; always effective `admin`
 everywhere in that workspace; cannot be revoked by shares or role edits.
 
-**Settings Admin (Global Admin)** — A user whose effective `settings` app role
+**Settings Admin (Global Admin)** - A user whose effective `settings` app role
 (from their membership’s `role_group_app_roles` row for `settings`) is
 `admin`; treated as `admin` across apps for enforcement shortcuts in the
 resolution algorithm (see §4).
@@ -77,7 +81,7 @@ resolution algorithm (see §4).
 
 ## 3. The “CSS specificity” mental model
 
-Think of candidates contributing an effective role like CSS cascade layers—**all
+Think of candidates contributing an effective role like CSS cascade layers: **all
 qualified candidates are combined by `max(rank)`**, not “first match wins,”
 except where a path **short-circuits** (owner, Settings Admin).
 
@@ -87,10 +91,11 @@ except where a path **short-circuits** (owner, Settings Admin).
 2. Settings Admin → always `admin` (short-circuit).
 3. Direct **user** share on the resource → strong grant; still merged with
    others via `max` (the “inline style” that almost always dominates).
-4. **User group** share where the user is in that group.
+4. **User group** share where the user is in that group (filtered by
+   `requires_app_access` when set; see §4 step 4).
 5. **Workspace** share (everyone in the workspace gets at least that role).
-6. If the resource is **not** restricted: **app role** for the resource’s app,
-   gated by **tag intersection** (see §4 step 6).
+6. If the resource is **not** restricted: **app role** for the resource’s app
+   applies as the workspace-wide default.
 7. Otherwise no grant from this path → contributes nothing (`null`).
 
 ```mermaid
@@ -101,10 +106,10 @@ flowchart TD
   settings -->|yes| admin2[return admin]
   settings -->|no| shares[collect share candidates]
   shares --> restricted{is_restricted?}
-  restricted -->|no| tags[app role + tag intersection]
-  restricted -->|yes| skipTags[skip tag-based app role]
-  tags --> max[max of all role ranks]
-  skipTags --> max
+  restricted -->|no| appRole[include app role]
+  restricted -->|yes| skipAppRole[skip app role]
+  appRole --> max[max of all role ranks]
+  skipAppRole --> max
   max --> out[effective_role or null]
 ```
 
@@ -122,16 +127,21 @@ p_resource_id)` (security definer, stable), called by RLS. Role ordering:
    This row is the strongest share signal but is still combined with other
    candidates by `max`.
 4. If a **user group** share exists for a group the user belongs to → include
-   its `role`.
+   its `role`. If the share has `requires_app_access = true`, include the
+   `role` **only if** the user also has any role on the resource’s parent app
+   (i.e. `util__get_auth_user_app_role(workspace, app)` is not null).
 5. If a **workspace** share exists → include its `role`.
 6. If the resource is **not** `is_restricted`, include the user’s effective app
    role for the resource’s **app** (from `workspace_memberships` →
-   `role_group_app_roles`), **gated by tag intersection**:
-   - If the resource has **zero** `resource_user_group_tags` rows → apply the
-     app role (no tag filter).
-   - Else apply the app role **only if** the user shares at least one
-     `user_group` with the resource (non-empty intersection of tag ids).
+   `role_group_app_roles`) as the workspace-wide default.
 7. If no candidate produced a role → `null` (no access).
+
+**Note on `requires_app_access`.** This per-share flag (column on
+`resource_shares`, defaulted to `false`) is meaningful only when
+`principal_type = 'user_group'`. When set, it gates the share by app
+membership so a “Health” group share on a dataset reaches only users who can
+already see `data_sources` at all. The flag has no effect on `user` or
+`workspace` principals.
 
 ```mermaid
 flowchart LR
@@ -140,9 +150,7 @@ flowchart LR
   RG --> RGAR[role_group_app_roles]
   User --> UGM[user_group_memberships]
   UGM --> UG[user_groups]
-  Resource[dashboards / datasets] --> RT[resource_user_group_tags]
-  RT --> UG
-  Resource --> RS[resource_shares]
+  Resource[dashboards / datasets] --> RS[resource_shares]
   RS -->|"principal=user"| User
   RS -->|"principal=user_group"| UG
   RS -->|"principal=workspace"| Workspace
@@ -161,15 +169,14 @@ flowchart LR
 
 **Tables (planned)**
 
-| Table                      | Purpose / keys                                                                                                    |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `workspace_memberships`    | `(workspace_id, user_id)` unique; `role_group_id` FK → `role_groups` (canonical per-app matrix source).           |
-| `role_groups`              | `(workspace_id, name)` unique; `is_builtin` marks built-ins.                                                      |
-| `role_group_app_roles`     | `(role_group_id, app)` unique; role per app for the group.                                                        |
-| `user_groups`              | `(workspace_id, name)` unique; optional `color`.                                                                  |
-| `user_group_memberships`   | `(user_group_id, user_id)` unique; tag membership.                                                                |
-| `resource_user_group_tags` | `(workspace_id, resource_type, resource_id, user_group_id)`.                                                      |
-| `resource_shares`          | `(resource_type, resource_id, principal_type, principal_id)` unique; `principal_id` NULL for workspace principal. |
+| Table                    | Purpose / keys                                                                                                                                           |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `workspace_memberships`  | `(workspace_id, user_id)` unique; `role_group_id` FK → `role_groups` (canonical per-app matrix source).                                                  |
+| `role_groups`            | `(workspace_id, name)` unique; `is_builtin` marks built-ins.                                                                                             |
+| `role_group_app_roles`   | `(role_group_id, app)` unique; role per app for the group.                                                                                               |
+| `user_groups`            | `(workspace_id, name)` unique; optional `color`.                                                                                                         |
+| `user_group_memberships` | `(user_group_id, user_id)` unique; group membership.                                                                                                     |
+| `resource_shares`        | `(resource_type, resource_id, principal_type, principal_id)` unique; `principal_id` NULL for workspace principal; `requires_app_access boolean` per row. |
 
 **Column additions**
 
@@ -187,10 +194,8 @@ erDiagram
   workspaces ||--o{ role_groups : has
   role_groups ||--o{ role_group_app_roles : defines
   workspace_memberships }o--|| role_groups : uses
-  workspaces ||--o{ user_groups : tags
+  workspaces ||--o{ user_groups : groups
   user_groups ||--o{ user_group_memberships : members
-  dashboards ||--o{ resource_user_group_tags : tagged
-  datasets ||--o{ resource_user_group_tags : tagged
   dashboards ||--o{ resource_shares : shared
   datasets ||--o{ resource_shares : shared
   auth_users ||--o{ workspace_memberships : member
@@ -205,7 +210,7 @@ erDiagram
 | --------------- | ---------------------------- | ---------------------------------------------------------------------------------- |
 | Catalog + types | `shared/models/Permissions/` | Frozen `Record<AppType, Record<RoleLevel, readonly PermissionKey[]>>`.             |
 | Hooks           | `src/hooks/permissions/`     | e.g. `useUserAppRoles`, `useHasPermission`, `useResourceRole`, `useIsGlobalAdmin`. |
-| Clients         | `src/clients/permissions/`   | e.g. `ResourceShareClient` for shares + tag edges.                                 |
+| Clients         | `src/clients/permissions/`   | e.g. `ResourceShareClient` for share CRUD (incl. `requires_app_access`).           |
 
 **Example (UI gate)**
 
@@ -218,21 +223,22 @@ const canEdit = useHasPermission("data_sources__can_edit_dataset");
 
 ## 7. UI surfaces (planned)
 
-- **Workspace Settings → Tabs:** General, **Users**, **Roles**, **Tags**,
+- **Workspace Settings → Tabs:** General, **Users**, **Roles**, **User groups**,
   Billing. Non-settings-admins see a 403-style state on this area.
 - **Users tab:** Member table with avatar, name, role-group chip (or “Custom”),
-  tag chips; row actions (edit drawer, remove).
-- **User permissions drawer / invite:** **M × 3** `Radio.Card` grid — rows =
+  user-group chips; row actions (edit drawer, remove).
+- **User permissions drawer / invite:** **M × 3** `Radio.Card` grid - rows =
   apps, columns = Admin / Editor / Viewer (+ **None**). Top segmented control:
   Global Admin / Editor / Viewer / Custom syncs with rows; divergent rows force
-  **Custom**. Tags via `MultiSelect`.
+  **Custom**. User groups via `MultiSelect`.
 - **Roles tab:** Built-in role groups (read-only) + CRUD for custom groups using
   the same grid.
-- **Tags tab:** CRUD for user groups; bulk-assign users to tags.
+- **User groups tab:** CRUD for user groups; bulk-assign users to groups.
 - **Share modal (`ShareResourceModal`):** Used from dashboard editor and dataset
-  meta views; lists principals, role per share, workspace row, and **Restrict
-  access** switch (`is_restricted`). Non-admins disabled via effective role
-  hook.
+  meta views; lists principals (users / user groups / workspace), role per
+  share, a **Requires app access** toggle on user-group rows, and a
+  **Restrict access** switch (`is_restricted`). Non-admins disabled via
+  effective role hook.
 
 ---
 
@@ -244,7 +250,7 @@ const canEdit = useHasPermission("data_sources__can_edit_dataset");
   built-in **Global Admin** (four `role_group_app_roles` rows, each `admin`).
 - Existing `user_roles.role = 'member'` → set membership `role_group_id` to
   built-in **Global Viewer** (three `viewer` rows for `data_sources`,
-  `data_explorer`, `dashboards`; **no** `settings` row — non-settings member).
+  `data_explorer`, `dashboards`; **no** `settings` row - non-settings member).
 
 **Built-in role groups**
 
@@ -266,7 +272,7 @@ const canEdit = useHasPermission("data_sources__can_edit_dataset");
 **Reversibility**
 
 - Schema migrations are forward-applied; rolling back production may require
-  paired down migrations — prefer feature flags / phased deploy rather than
+  paired down migrations - prefer feature flags / phased deploy rather than
   silent data loss. Backfill uses idempotent upserts (`on conflict do nothing`
   where applicable) so re-runs are safe.
 
@@ -286,15 +292,18 @@ const canEdit = useHasPermission("data_sources__can_edit_dataset");
 
 **“Health” team edits Health datasets only**
 
-- Create user group **Health**; tag Health members and Health datasets. Give the
-  team at least `editor` on `data_sources` (or share specific datasets). Without
-  overlapping tags on a dataset, app roles gated by tags do not apply.
+- Create user group **Health** and add the Health team’s users. For each Health
+  dataset, mark it `is_restricted` and add a `user_group` share at `editor`
+  with `requires_app_access = true` so the share only applies to Health members
+  who can already see `data_sources`. Non-Health members and non-Health
+  datasets are unaffected.
 
 **Dashboard visible only to me**
 
-- Mark the dashboard **`is_restricted`**, remove workspace-wide overlap, and
-  rely on **direct user share** (or owner access). Tags alone will not reopen
-  access when restricted unless paired with explicit shares per §4.
+- Mark the dashboard **`is_restricted`**, remove any workspace share, and rely
+  on **direct user share** (or owner access). Without a matching share row,
+  `is_restricted` suppresses the workspace-wide app-role default and the user
+  receives no role.
 
 **Whole workspace viewer on one resource**
 
@@ -309,7 +318,7 @@ const canEdit = useHasPermission("data_sources__can_edit_dataset");
 - No cross-workspace resource sharing.
 - **Public** dashboards (`is_public`) stay a separate flag in v1; not merged
   into `resource_shares` until a follow-up.
-- No arbitrary SQL predicates inside shares — only typed principals and
+- No arbitrary SQL predicates inside shares - only typed principals and
   `role_level`.
 - Role groups are presets, not runtime-evaluated formulas.
 
@@ -320,7 +329,7 @@ const canEdit = useHasPermission("data_sources__can_edit_dataset");
 Run from repo root when touching permissions:
 
 ```bash
-rg 'workspace_memberships|role_groups|role_group_app_roles|user_groups|user_group_memberships|resource_user_group_tags|resource_shares|is_restricted' supabase/schemas shared src
+rg 'workspace_memberships|role_groups|role_group_app_roles|user_groups|user_group_memberships|resource_shares|requires_app_access|is_restricted' supabase/schemas shared src
 rg 'util__(get_auth_user_app_role|get_auth_user_user_group_ids|resource_effective_role|auth_user_can_access_resource|is_settings_admin)' supabase/schemas
 rg 'useHasPermission|useUserAppRoles|useResourceRole|useIsGlobalAdmin' src
 rg 'ShareResourceModal|WorkspaceUserPermissions|workspace_invites' src

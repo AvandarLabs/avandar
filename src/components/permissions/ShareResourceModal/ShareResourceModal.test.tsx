@@ -6,7 +6,12 @@ import { render } from "@/utils/testing-utils";
 vi.mock("@/hooks/workspaces/useCurrentWorkspace", () => {
   return {
     useCurrentWorkspace: () => {
-      return { id: "workspace-id-1", slug: "test-workspace" };
+      return {
+        id: "workspace-id-1",
+        slug: "test-workspace",
+        name: "Test Workspace",
+        ownerId: "user-owner",
+      };
     },
   };
 });
@@ -23,8 +28,8 @@ vi.mock("@/clients/permissions/ResourceShareClient", () => {
         return [
           {
             isRestricted: false,
+            ownerId: "user-owner",
             shares: [],
-            resourceTagIds: [],
           },
           false,
         ] as const;
@@ -38,9 +43,6 @@ vi.mock("@/clients/permissions/ResourceShareClient", () => {
       useSetResourceRestricted: () => {
         return [vi.fn(), false] as const;
       },
-      useSetResourceUserGroupTags: () => {
-        return [vi.fn(), false] as const;
-      },
     },
   };
 });
@@ -52,9 +54,16 @@ vi.mock("@/clients/WorkspaceClient", () => {
         return [
           [
             {
+              userId: "user-owner",
+              displayName: "John Snow",
+              fullName: "John Snow",
+              email: "john@example.com",
+            },
+            {
               userId: "user-1",
               displayName: "Alice",
               fullName: "Alice Example",
+              email: "alice@example.com",
             },
           ],
         ] as const;
@@ -74,7 +83,7 @@ vi.mock("@/clients/permissions/PermissionsClient", () => {
 });
 
 describe("ShareResourceModal", () => {
-  it("renders grouped add-member select without crashing", async () => {
+  it("renders the Drive-style layout with general access and owner row", async () => {
     render(
       <ShareResourceModal
         resourceName="California COVID"
@@ -85,12 +94,29 @@ describe("ShareResourceModal", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Workspace access")).toBeInTheDocument();
+      expect(screen.getByText("People with access")).toBeInTheDocument();
     });
 
-    expect(screen.getByText("People and tags")).toBeInTheDocument();
+    // Section headings.
+    expect(screen.getByText("General access")).toBeInTheDocument();
+    // The summary sentence is rendered. With no shares and the resource
+    // not restricted, the builder returns the general-access sentence.
     expect(
-      screen.queryByText(/Cannot read properties of undefined/i),
+      screen.getByText(
+        /This dataset is accessible to anyone with .* permission\./,
+      ),
+    ).toBeInTheDocument();
+    // The Add combobox is present and reachable by aria-label.
+    const comboboxes = screen.getAllByRole("combobox");
+    expect(
+      comboboxes.some((el) => {
+        return el.getAttribute("aria-label") === "Add people, groups, or tags";
+      }),
+    ).toBe(true);
+    // Owner row shows as a non-removable badge.
+    expect(screen.getByText("Owner")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Remove access for John Snow/ }),
     ).toBeNull();
   });
 });

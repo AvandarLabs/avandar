@@ -16,6 +16,9 @@ export type { UpsertOptions } from "@clients/ModelCrudClient/ModelCrudClient.typ
 export { createSupabaseCrudClient } from "@clients/SupabaseCrudClient/createSupabaseCrudClient.ts";
 export type { SupabaseCrudModelSpec } from "@clients/SupabaseCrudClient/SupabaseCrudClient.types.ts";
 
+// SQLite client (desktop)
+export { createSqliteCrudClient } from "@clients/SqliteCrudClient/createSqliteCrudClient.ts";
+
 // Parser registry
 export { makeParserRegistry } from "@clients/makeParserRegistry.ts";
 export type { ModelCrudParserRegistry } from "@clients/makeParserRegistry.ts";
