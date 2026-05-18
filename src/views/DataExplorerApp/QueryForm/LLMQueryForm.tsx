@@ -7,11 +7,11 @@ import {
   Text,
   Textarea,
 } from "@mantine/core";
+import { TextareaForm } from "@ui";
 import { where } from "@utils";
 import { useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { TextareaForm } from "@ui";
 import { mantineColorVar } from "@/lib/utils/browser/css";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { useNLPQuery } from "@/views/DataExplorerApp/QueryForm/useNLPQuery";
@@ -31,7 +31,7 @@ export function LLMQueryForm(): JSX.Element {
   const [generateAndRunQuery, isRunningQuery] = useNLPQuery({
     workspaceId: workspace.id,
     onSuccess: (sql) => {
-      dispatch.setRawSQL(sql);
+      dispatch.setRawSql(sql);
     },
   });
 
@@ -57,7 +57,7 @@ export function LLMQueryForm(): JSX.Element {
           submitButtonLabel="Run Query"
           onSubmit={(value) => {
             const trimmedPrompt = value.trim();
-            dispatch.setNLPrompt(trimmedPrompt);
+            dispatch.setNlPrompt(trimmedPrompt);
             generateAndRunQuery({
               prompt: trimmedPrompt,
             });
@@ -110,7 +110,7 @@ export function LLMQueryForm(): JSX.Element {
                 disabledUntilDirty={true}
                 onSubmit={(value) => {
                   const trimmedValue = value.trim();
-                  dispatch.setRawSQL(trimmedValue);
+                  dispatch.setRawSql(trimmedValue);
                   setIsEditMode(false);
                 }}
                 onCancel={() => {

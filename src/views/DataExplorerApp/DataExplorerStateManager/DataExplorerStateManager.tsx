@@ -164,8 +164,8 @@ export const DataExplorerStateManager = createAppStateManager({
       return setValue(state, "vizConfig", vizConfig);
     },
 
-    setRawSQL: (state: DataExplorerAppState, rawSQL: string | undefined) => {
-      return setValue(state, "rawSQL", rawSQL);
+    setRawSql: (state: DataExplorerAppState, rawSql: string | undefined) => {
+      return setValue(state, "rawSQL", rawSql);
     },
 
     /**
@@ -174,7 +174,7 @@ export const DataExplorerStateManager = createAppStateManager({
      * `nlQuery.prompt` so the saved block renders identically to one created
      * inside the dashboard editor.
      */
-    setNLPrompt: (
+    setNlPrompt: (
       state: DataExplorerAppState,
       nlPrompt: string | undefined,
     ) => {

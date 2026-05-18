@@ -1,6 +1,6 @@
 import { Group, Title } from "@mantine/core";
 import { ReactNode } from "react";
-import { ChatAsideToggle } from "@/components/ChatPanel/ChatAsideToggle";
+import { ChatAsideToggle } from "@/components/ChatPanel/ChatAsideToggle/ChatAsideToggle";
 import { useIsChatPanelAvailable } from "@/components/ChatPanel/useIsChatPanelAvailable";
 import { NavbarDesktopToggle } from "@/components/layouts/AppLayout/AppToolbar/NavbarDesktopToggle/NavbarDesktopToggle";
 import { mantineColorVar } from "@/lib/utils/browser/css";
@@ -47,7 +47,9 @@ export function AppToolbar({
       : null}
       <Group ml="auto" mr="xxs" gap="xs">
         {children}
-        {isChatPanelAvailable ? <ChatAsideToggle /> : null}
+        {isChatPanelAvailable ?
+          <ChatAsideToggle />
+        : null}
       </Group>
     </Group>
   );

@@ -28,20 +28,9 @@ import {
   PRIMARY_COLOR_LIGHT_SHADE,
 } from "../../../shared/config/Theme";
 import { cssAvaVar } from "../../lib/utils/browser/css";
-import {
-  ANIMATION_DURATION,
-  ANIMATION_EASING,
-  ANIMATION_TRANSITION,
-  AnimationTheme,
-  DEFAULT_COMBOBOX_PROPS,
-  MANTINE_TRANSITION_PROPS,
-} from "./AnimationTheme";
-import {
-  ELEVATION_BORDERS,
-  ELEVATION_RADIUS,
-  ELEVATION_SHADOWS,
-  ELEVATION_SURFACES,
-} from "./themeElevation";
+import { AnimationTheme } from "./AnimationTheme";
+import { BorderTheme } from "./BorderTheme";
+import { ElevationTheme } from "./ElevationTheme";
 import type {
   VariantColorResolverResult,
   VariantColorsResolverInput,
@@ -67,6 +56,8 @@ export const MODAL_ROOT_Z_INDEX = 300;
 
 const interactiveTransition = AnimationTheme.transition.interactive;
 
+const COMBOBOX_DEFAULT_PROPS = AnimationTheme.combobox;
+
 function avandarVariantColorResolver(
   input: VariantColorsResolverInput,
 ): VariantColorResolverResult {
@@ -87,7 +78,7 @@ function avandarVariantColorResolver(
   if (variant === "subtle") {
     return {
       background: "transparent",
-      hover: ELEVATION_SURFACES.light.sunken,
+      hover: ElevationTheme.surfaces.light.sunken,
       color: shades[7],
       border: "1px solid transparent",
     };
@@ -98,16 +89,16 @@ function avandarVariantColorResolver(
       background: shades[0],
       hover: shades[1],
       color: shades[7],
-      border: `1px solid ${ELEVATION_BORDERS.light.default}`,
+      border: `1px solid ${BorderTheme.colors.light.default}`,
     };
   }
 
   if (variant === "default") {
     return {
-      background: ELEVATION_SURFACES.light.raised,
-      hover: ELEVATION_SURFACES.light.sunken,
+      background: ElevationTheme.surfaces.light.raised,
+      hover: ElevationTheme.surfaces.light.sunken,
       color: theme.colors.neutral[8],
-      border: `1px solid ${ELEVATION_BORDERS.light.default}`,
+      border: `1px solid ${BorderTheme.colors.light.default}`,
     };
   }
 
@@ -121,9 +112,8 @@ export const Theme = createTheme({
   primaryColor: "primary",
   defaultRadius: "sm",
   respectReducedMotion: true,
-
-  shadows: ELEVATION_SHADOWS,
-  radius: ELEVATION_RADIUS,
+  shadows: ElevationTheme.shadows,
+  radius: BorderTheme.radius,
 
   variantColorResolver: avandarVariantColorResolver,
 
@@ -196,7 +186,7 @@ export const Theme = createTheme({
           backgroundOpacity: 0.35,
           blur: 0,
         },
-        transitionProps: MANTINE_TRANSITION_PROPS.modal,
+        transitionProps: AnimationTheme.mantine.modal,
       },
       styles: {
         content: {
@@ -208,7 +198,7 @@ export const Theme = createTheme({
 
     Drawer: Drawer.extend({
       defaultProps: {
-        transitionProps: MANTINE_TRANSITION_PROPS.drawer,
+        transitionProps: AnimationTheme.mantine.drawer,
       },
     }),
 
@@ -216,7 +206,7 @@ export const Theme = createTheme({
       defaultProps: {
         radius: "sm",
         shadow: "md",
-        transitionProps: MANTINE_TRANSITION_PROPS.menu,
+        transitionProps: AnimationTheme.mantine.menu,
       },
       styles: {
         dropdown: {
@@ -232,7 +222,7 @@ export const Theme = createTheme({
       defaultProps: {
         radius: "sm",
         shadow: "md",
-        transitionProps: MANTINE_TRANSITION_PROPS.popover,
+        transitionProps: AnimationTheme.mantine.popover,
       },
       styles: {
         dropdown: {
@@ -246,7 +236,7 @@ export const Theme = createTheme({
      * Mantine defaults to `fade` with `duration: 0` (no animation).
      */
     Combobox: Combobox.extend({
-      defaultProps: DEFAULT_COMBOBOX_PROPS,
+      defaultProps: COMBOBOX_DEFAULT_PROPS,
       styles: {
         dropdown: {
           border: "1px solid var(--ava-border-default)",
@@ -260,28 +250,28 @@ export const Theme = createTheme({
     Select: Select.extend({
       defaultProps: {
         radius: "sm",
-        comboboxProps: DEFAULT_COMBOBOX_PROPS,
+        comboboxProps: COMBOBOX_DEFAULT_PROPS,
       },
     }),
 
     MultiSelect: MultiSelect.extend({
       defaultProps: {
         radius: "sm",
-        comboboxProps: DEFAULT_COMBOBOX_PROPS,
+        comboboxProps: COMBOBOX_DEFAULT_PROPS,
       },
     }),
 
     Autocomplete: Autocomplete.extend({
       defaultProps: {
         radius: "sm",
-        comboboxProps: DEFAULT_COMBOBOX_PROPS,
+        comboboxProps: COMBOBOX_DEFAULT_PROPS,
       },
     }),
 
     TagsInput: TagsInput.extend({
       defaultProps: {
         radius: "sm",
-        comboboxProps: DEFAULT_COMBOBOX_PROPS,
+        comboboxProps: COMBOBOX_DEFAULT_PROPS,
       },
     }),
 
@@ -303,7 +293,7 @@ export const Theme = createTheme({
     Tooltip: Tooltip.extend({
       defaultProps: {
         radius: "sm",
-        transitionProps: MANTINE_TRANSITION_PROPS.tooltip,
+        transitionProps: AnimationTheme.mantine.tooltip,
       },
     }),
 
@@ -411,11 +401,8 @@ export const Theme = createTheme({
       appShellMain: APP_SHELL_MAIN_Z_INDEX,
       modal: MODAL_ROOT_Z_INDEX,
     },
-    elevation: {
-      surfaces: ELEVATION_SURFACES,
-      borders: ELEVATION_BORDERS,
-      shadows: ELEVATION_SHADOWS,
-    },
+    elevation: ElevationTheme,
+    borders: BorderTheme,
     animation: AnimationTheme,
     navbar: {
       backgroundColor: NEUTRAL_SHADES[6],
@@ -428,11 +415,13 @@ export const Theme = createTheme({
 }) as MantineTheme;
 
 export { AnimationTheme } from "./AnimationTheme";
+export { BorderTheme } from "./BorderTheme";
+export { ElevationTheme } from "./ElevationTheme";
 
 export const cssVariablesResolver: CSSVariablesResolver = (
   theme: MantineTheme,
 ) => {
-  const { elevation } = theme.other;
+  const { elevation, borders: borderTheme } = theme.other;
 
   const sharedVariables = {
     "--mantine-navbar-background": theme.other.navbar.backgroundColor,
@@ -443,24 +432,24 @@ export const cssVariablesResolver: CSSVariablesResolver = (
       theme.other.navbar.activeBackgroundColor,
     "--mantine-navbar-active-hover-background":
       theme.other.navbar.activeHoverBackgroundColor,
-    "--navbar-transition-duration": ANIMATION_DURATION.fast,
+    "--navbar-transition-duration": AnimationTheme.duration.fast,
 
     "--mantine-z-index-app-shell-main": String(theme.other.zIndex.appShellMain),
     "--mantine-z-index-modal": String(theme.other.zIndex.modal),
 
-    "--ava-animation-duration-instant": ANIMATION_DURATION.instant,
-    "--ava-animation-duration-fast": ANIMATION_DURATION.fast,
-    "--ava-animation-duration-normal": ANIMATION_DURATION.normal,
-    "--ava-animation-duration-moderate": ANIMATION_DURATION.moderate,
-    "--ava-animation-duration-slow": ANIMATION_DURATION.slow,
-    "--ava-animation-easing-out": ANIMATION_EASING.out,
-    "--ava-animation-easing-out-soft": ANIMATION_EASING.outSoft,
-    "--ava-animation-easing-in-out": ANIMATION_EASING.inOut,
-    "--ava-transition-colors": ANIMATION_TRANSITION.colors,
-    "--ava-transition-interactive": ANIMATION_TRANSITION.interactive,
-    "--ava-transition-transform": ANIMATION_TRANSITION.transform,
-    "--ava-transition-opacity": ANIMATION_TRANSITION.opacity,
-    "--ava-transition-shadow": ANIMATION_TRANSITION.shadow,
+    "--ava-animation-duration-instant": AnimationTheme.duration.instant,
+    "--ava-animation-duration-fast": AnimationTheme.duration.fast,
+    "--ava-animation-duration-normal": AnimationTheme.duration.normal,
+    "--ava-animation-duration-moderate": AnimationTheme.duration.moderate,
+    "--ava-animation-duration-slow": AnimationTheme.duration.slow,
+    "--ava-animation-easing-out": AnimationTheme.easing.out,
+    "--ava-animation-easing-out-soft": AnimationTheme.easing.outSoft,
+    "--ava-animation-easing-in-out": AnimationTheme.easing.inOut,
+    "--ava-transition-colors": AnimationTheme.transition.colors,
+    "--ava-transition-interactive": AnimationTheme.transition.interactive,
+    "--ava-transition-transform": AnimationTheme.transition.transform,
+    "--ava-transition-opacity": AnimationTheme.transition.opacity,
+    "--ava-transition-shadow": AnimationTheme.transition.shadow,
   };
 
   return {
@@ -470,9 +459,9 @@ export const cssVariablesResolver: CSSVariablesResolver = (
       "--mantine-color-body": elevation.surfaces.light.body,
       "--mantine-color-text": theme.colors.neutral[9],
 
-      "--ava-border-default": elevation.borders.light.default,
-      "--ava-border-strong": elevation.borders.light.strong,
-      "--ava-border-focus": elevation.borders.light.focus,
+      "--ava-border-default": borderTheme.colors.light.default,
+      "--ava-border-strong": borderTheme.colors.light.strong,
+      "--ava-border-focus": borderTheme.colors.light.focus,
       "--ava-surface-body": elevation.surfaces.light.body,
       "--ava-surface-raised": elevation.surfaces.light.raised,
       "--ava-surface-overlay": elevation.surfaces.light.overlay,
@@ -483,9 +472,9 @@ export const cssVariablesResolver: CSSVariablesResolver = (
       "--mantine-color-body": elevation.surfaces.dark.body,
       "--mantine-color-text": theme.colors.neutral[0],
 
-      "--ava-border-default": elevation.borders.dark.default,
-      "--ava-border-strong": elevation.borders.dark.strong,
-      "--ava-border-focus": elevation.borders.dark.focus,
+      "--ava-border-default": borderTheme.colors.dark.default,
+      "--ava-border-strong": borderTheme.colors.dark.strong,
+      "--ava-border-focus": borderTheme.colors.dark.focus,
       "--ava-surface-body": elevation.surfaces.dark.body,
       "--ava-surface-raised": elevation.surfaces.dark.raised,
       "--ava-surface-overlay": elevation.surfaces.dark.overlay,

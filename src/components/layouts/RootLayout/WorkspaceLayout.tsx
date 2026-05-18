@@ -3,7 +3,7 @@ import { where } from "@utils";
 import { ReactNode, useMemo } from "react";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { AppShell } from "@/components/AppShell/AppShell";
-import { ChatPanelProvider } from "@/components/ChatPanel/ChatPanelProvider";
+import { ChatPanelProvider } from "@/components/ChatPanel/ChatPanelProvider/ChatPanelProvider";
 import { useRootWorkspaceChecks } from "@/components/layouts/RootLayout/useRootWorkspaceChecks/useRootWorkspaceChecks";
 import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions";
 import { AppLinks } from "@/config/AppLinks";

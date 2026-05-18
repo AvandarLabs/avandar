@@ -1,30 +1,18 @@
-import { ReactNode, useEffect } from "react";
-import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager";
+import {
+  CHAT_PANEL_LOCAL_STORAGE_KEY,
+  ChatPanelContents,
+} from "@/components/ChatPanel/ChatPanelProvider/ChatPanelContents";
+import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatPanelAvailableContext } from "@/components/ChatPanel/useIsChatPanelAvailable";
+import type { ReactNode } from "react";
 
-const LS_KEY = "ava.chat.aside.open";
-
-function readInitialOpen(): boolean {
+function _readInitialOpen(): boolean {
   try {
-    const raw = window.localStorage.getItem(LS_KEY);
+    const raw = window.localStorage.getItem(CHAT_PANEL_LOCAL_STORAGE_KEY);
     return raw === "true";
   } catch {
     return false;
   }
-}
-
-function PersistOpenState(): null {
-  const { isOpen } = ChatPanelStateManager.useState();
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(LS_KEY, String(isOpen));
-    } catch {
-      // Private browsing or storage disabled — fall back to in-memory only.
-    }
-  }, [isOpen]);
-
-  return null;
 }
 
 type Props = {
@@ -39,11 +27,10 @@ type Props = {
 export function ChatPanelProvider({ children }: Props): JSX.Element {
   return (
     <ChatPanelStateManager.Provider
-      initialStateOverrides={{ isOpen: readInitialOpen() }}
+      initialStateOverrides={{ isOpen: _readInitialOpen() }}
     >
       <ChatPanelAvailableContext.Provider value={true}>
-        <PersistOpenState />
-        {children}
+        <ChatPanelContents>{children}</ChatPanelContents>
       </ChatPanelAvailableContext.Provider>
     </ChatPanelStateManager.Provider>
   );

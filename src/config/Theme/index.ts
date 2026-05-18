@@ -5,22 +5,6 @@ export {
   ThemeColors,
   cssVariablesResolver,
 } from "./Theme";
-
-export {
-  AnimationTheme,
-  ANIMATION_DURATION,
-  ANIMATION_DURATION_MS,
-  ANIMATION_EASING,
-  ANIMATION_TRANSITION,
-  DEFAULT_COMBOBOX_PROPS,
-  MANTINE_TRANSITION_PROPS,
-} from "./AnimationTheme";
-
-export {
-  ELEVATION_BORDERS,
-  ELEVATION_RADIUS,
-  ELEVATION_SHADOWS,
-  ELEVATION_SURFACES,
-  ELEVATION_SURFACES_DARK,
-  ELEVATION_SURFACES_LIGHT,
-} from "./themeElevation";
+export { AnimationTheme } from "./AnimationTheme";
+export { BorderTheme } from "./BorderTheme";
+export { ElevationTheme } from "./ElevationTheme";

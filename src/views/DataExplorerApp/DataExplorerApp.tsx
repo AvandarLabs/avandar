@@ -66,7 +66,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
     onSuccess: () => {
       dispatch.setOpenDataset(undefined);
-      dispatch.setRawSQL(undefined);
+      dispatch.setRawSql(undefined);
       notifySuccess("Dataset deleted.");
     },
     onError: (error) => {
@@ -186,7 +186,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                   children: (
                     <OpenDatasetModal
                       onOpen={(info, rawSQL) => {
-                        dispatch.setRawSQL(rawSQL);
+                        dispatch.setRawSql(rawSQL);
                         dispatch.setOpenDataset(info);
                       }}
                     />

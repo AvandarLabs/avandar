@@ -79,7 +79,7 @@ function _getMenuPosition(
 export function FeedbackButton({
   offsetX = 0,
   offsetY = 0,
-  placement = "bottom-right",
+  placement = "bottom-left",
 }: Props = {}): JSX.Element | null {
   const { user } = RootRoute.useRouteContext();
   const [menuOpened, setMenuOpened] = useState(false);

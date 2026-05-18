@@ -1,3 +1,4 @@
+import type { ChatAPI } from "@sbfn/chat/chat.types";
 import type { GoogleAuthCallbackAPI } from "@sbfn/google-auth-callback/google-auth-callback.types";
 import type { GoogleAuthAPI } from "@sbfn/google-auth/google-auth.types";
 import type { GoogleSheetsAPI } from "@sbfn/google-sheets/google-sheets.types";
@@ -19,6 +20,7 @@ export type HTTPMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 type FullAPI = SupportAPI &
   HealthzAPI &
   QueriesAPI &
+  ChatAPI &
   WorkspacesAPI &
   GoogleAuthAPI &
   GoogleAuthCallbackAPI &

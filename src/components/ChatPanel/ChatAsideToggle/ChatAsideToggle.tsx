@@ -4,7 +4,7 @@ import {
   IconLayoutSidebarRightExpand,
 } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
-import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager";
+import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 
 /**
  * Toggle button for the AppShell's right-side chat panel. Rendered in the
@@ -15,7 +15,7 @@ export function ChatAsideToggle(): JSX.Element {
   const [{ isOpen }, dispatch] = ChatPanelStateManager.useContext();
 
   return (
-    <Tooltip label={isOpen ? "Close chat (⌘J)" : "Open chat (⌘J)"}>
+    <Tooltip label={isOpen ? "Close chat (⌘/)" : "Open chat (⌘/)"}>
       <ActionIcon
         variant="subtle"
         size="md"

@@ -12,8 +12,8 @@ import css from "@/components/AppShell/AppShell.module.css";
 import { AppShellStateManager } from "@/components/AppShell/AppShellStateManager";
 import { MobileHeader } from "@/components/AppShell/MobileHeader";
 import { Navbar } from "@/components/AppShell/Navbar/Navbar";
-import { ChatPanel } from "@/components/ChatPanel/ChatPanel";
-import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager";
+import { ChatPanel } from "@/components/ChatPanel/ChatPanel/ChatPanel";
+import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppLayout/AppLayout";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
@@ -75,6 +75,7 @@ function AppShellComponent({
   utilityLinks = [],
 }: Props): JSX.Element {
   const { isDesktopNavbarCollapsed } = AppShellStateManager.useState();
+  const appShellDispatch = AppShellStateManager.useDispatch();
   const { isOpen: isChatPanelOpen } = ChatPanelStateManager.useState();
   const chatPanelDispatch = ChatPanelStateManager.useDispatch();
   const [isMobileNavbarOpened, toggleMobileNavbar] = useToggleBoolean(false);
@@ -82,11 +83,20 @@ function AppShellComponent({
   const platformType = usePlatformInfo();
   const isDesktopPlatform = platformType === "desktop";
 
+  // We use mod+/ instead of mod+J because Chrome and Firefox both bind
+  // mod+J to the Downloads window at the browser/OS layer and the keydown
+  // never reaches the page.
   useHotkeys([
     [
-      "mod+J",
+      "mod+/",
       () => {
         chatPanelDispatch.toggle();
+      },
+    ],
+    [
+      "mod+.",
+      () => {
+        appShellDispatch.toggleDesktopNavbar();
       },
     ],
   ]);
@@ -157,13 +167,13 @@ function AppShellComponent({
         </MantineAppShell.Navbar>
         <MantineAppShell.Main
           py="0"
-          pr="0"
           ml={-16}
+          mr={-16}
           mt={isMobileViewSize ? 30 : 0}
         >
           {children}
         </MantineAppShell.Main>
-        <MantineAppShell.Aside withBorder={false} p={0}>
+        <MantineAppShell.Aside withBorder={false} p={0} bg="transparent">
           <ChatPanel />
         </MantineAppShell.Aside>
       </MantineAppShell>
