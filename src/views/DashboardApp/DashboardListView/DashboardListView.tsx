@@ -15,6 +15,7 @@ import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { useIsTabletSize } from "@/lib/hooks/ui/useIsTabletSize";
 import { DashboardCard } from "@/views/DashboardApp/DashboardListView/DashboardCard";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
@@ -30,6 +31,7 @@ export function DashboardListView({
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();
   const [userProfile, isLoadingUserProfile] = useCurrentUserProfile();
+  const isTabletSize = useIsTabletSize() ?? false;
   const [insertDashboard, isInsertDashboardPending] = DashboardClient.useInsert(
     {
       queryToInvalidate: DashboardClient.QueryKeys.getAll(),
@@ -77,8 +79,15 @@ export function DashboardListView({
       return (
         <Paper p="xxl" maw={720} mx="auto">
           <Stack gap="lg" align="center" ta="center">
-            <ThemeIcon size={64} radius="xl" variant="light">
-              <IconLayoutDashboard size={32} stroke={1.5} />
+            <ThemeIcon
+              size={isTabletSize ? 48 : 64}
+              radius="xl"
+              variant="light"
+            >
+              <IconLayoutDashboard
+                size={isTabletSize ? 24 : 32}
+                stroke={1.5}
+              />
             </ThemeIcon>
 
             <Stack gap="xs">

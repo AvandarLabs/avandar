@@ -19,6 +19,36 @@ button {
 }
 
 /*
+ * Tablet responsiveness.
+ *
+ * Avandar's UI is designed for desktop. On tablet-sized viewports (iPad
+ * portrait/landscape, small laptops) everything appeared roughly 25%
+ * oversized. Overriding --mantine-scale shrinks all sizes built through
+ * Mantine's rem() helper - spacing, font sizes, heading sizes, radius,
+ * shadows, AppShell navbar/aside widths, etc. - in one place.
+ *
+ * !important is required because Mantine's MantineCssVariables renders a
+ * <style> tag at runtime that sets --mantine-scale on :root, and that
+ * style tag is appended to the DOM after this stylesheet.
+ *
+ * The breakpoints below are em-based to match Mantine's breakpoint
+ * convention (48em = sm = 768px, 88em = xl = 1408px). The two-tier scale
+ * lets iPad Pro 13" landscape (1366px) sit a bit closer to desktop than
+ * smaller iPads.
+ */
+@media (min-width: 48em) and (max-width: 74.99em) {
+  :root {
+    --mantine-scale: 0.8 !important;
+  }
+}
+
+@media (min-width: 75em) and (max-width: 87.99em) {
+  :root {
+    --mantine-scale: 0.9 !important;
+  }
+}
+
+/*
  * These are the same variables specified in `src/config/Theme.ts` in the
  * `cssVariablesResolver` function.
  * These variables are compiled at runtime and injected in the DOM. We are
