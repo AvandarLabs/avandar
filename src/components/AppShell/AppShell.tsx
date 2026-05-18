@@ -1,5 +1,6 @@
 import { useToggleBoolean } from "@hooks";
 import { AppShell as MantineAppShell } from "@mantine/core";
+import { useHotkeys } from "@mantine/hooks";
 import {
   Spotlight,
   SpotlightActionData,
@@ -11,6 +12,8 @@ import css from "@/components/AppShell/AppShell.module.css";
 import { AppShellStateManager } from "@/components/AppShell/AppShellStateManager";
 import { MobileHeader } from "@/components/AppShell/MobileHeader";
 import { Navbar } from "@/components/AppShell/Navbar/Navbar";
+import { ChatPanel } from "@/components/ChatPanel/ChatPanel/ChatPanel";
+import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppLayout/AppLayout";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
@@ -35,6 +38,8 @@ const DRAG_REGION_FILL_STYLE: CSSProperties = {
 const HEADER_MOBILE_DEFAULT_HEIGHT = 42;
 
 const NAVBAR_DEFAULT_WIDTH = 220;
+
+const ASIDE_DEFAULT_WIDTH = 380;
 
 type Props = {
   /**
@@ -70,10 +75,31 @@ function AppShellComponent({
   utilityLinks = [],
 }: Props): JSX.Element {
   const { isDesktopNavbarCollapsed } = AppShellStateManager.useState();
+  const appShellDispatch = AppShellStateManager.useDispatch();
+  const { isOpen: isChatPanelOpen } = ChatPanelStateManager.useState();
+  const chatPanelDispatch = ChatPanelStateManager.useDispatch();
   const [isMobileNavbarOpened, toggleMobileNavbar] = useToggleBoolean(false);
   const isMobileViewSize = useIsMobileSize() ?? false;
   const platformType = usePlatformInfo();
   const isDesktopPlatform = platformType === "desktop";
+
+  // We use mod+/ instead of mod+J because Chrome and Firefox both bind
+  // mod+J to the Downloads window at the browser/OS layer and the keydown
+  // never reaches the page.
+  useHotkeys([
+    [
+      "mod+/",
+      () => {
+        chatPanelDispatch.toggle();
+      },
+    ],
+    [
+      "mod+.",
+      () => {
+        appShellDispatch.toggleDesktopNavbar();
+      },
+    ],
+  ]);
 
   const headerHeight =
     isMobileViewSize ? HEADER_MOBILE_DEFAULT_HEIGHT
@@ -92,6 +118,14 @@ function AppShellComponent({
           collapsed: {
             mobile: !isMobileNavbarOpened,
             desktop: isDesktopNavbarCollapsed,
+          },
+        }}
+        aside={{
+          width: ASIDE_DEFAULT_WIDTH,
+          breakpoint: "md",
+          collapsed: {
+            mobile: true,
+            desktop: !isChatPanelOpen,
           },
         }}
         padding="md"
@@ -133,12 +167,15 @@ function AppShellComponent({
         </MantineAppShell.Navbar>
         <MantineAppShell.Main
           py="0"
-          pr="0"
           ml={-16}
+          mr={-16}
           mt={isMobileViewSize ? 30 : 0}
         >
           {children}
         </MantineAppShell.Main>
+        <MantineAppShell.Aside withBorder={false} p={0} bg="transparent">
+          <ChatPanel />
+        </MantineAppShell.Aside>
       </MantineAppShell>
 
       <Spotlight

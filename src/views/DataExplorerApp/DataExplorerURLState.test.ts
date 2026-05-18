@@ -48,6 +48,7 @@ function _makeState(overrides: {
     rawSQL: undefined,
     nlPrompt: undefined,
     openDataset: undefined,
+    lastQueryError: undefined,
     ...overrides,
   };
 }

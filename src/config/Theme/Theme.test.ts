@@ -23,10 +23,10 @@ describe("Theme modal stacking", () => {
 });
 
 describe("Theme design tokens", () => {
-  it("exposes animation and elevation tokens on theme.other", () => {
-    expect(Theme.other.animation.duration.fast).toBe("120ms");
+  it("exposes animation, elevation, and border tokens on theme.other", () => {
+    expect(Theme.other.animation.duration.fast).toBe("140ms");
     expect(Theme.other.elevation.surfaces.light.raised).toBe("#ffffff");
-    expect(Theme.other.elevation.borders.light.default).toContain("rgba");
+    expect(Theme.other.borders.colors.light.default).toContain("rgba");
   });
 
   it("registers interactive transitions on primary components", () => {
@@ -60,7 +60,7 @@ describe("Theme design tokens", () => {
   it("animates Combobox dropdowns with the same pop transition as Menu", () => {
     const combobox = Theme.components?.Combobox;
     expect(combobox?.defaultProps?.transitionProps?.transition).toBe("pop");
-    expect(combobox?.defaultProps?.transitionProps?.duration).toBe(120);
+    expect(combobox?.defaultProps?.transitionProps?.duration).toBe(140);
     expect(
       Theme.components?.Menu?.defaultProps?.transitionProps?.transition,
     ).toBe("pop");

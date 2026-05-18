@@ -1,0 +1,17 @@
+.root {
+  border-top: 1px solid var(--mantine-color-danger-2);
+}
+
+.icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.messageColumn {
+  flex: 1;
+  min-width: 0;
+}
+
+.errorText {
+  overflow-wrap: anywhere;
+}

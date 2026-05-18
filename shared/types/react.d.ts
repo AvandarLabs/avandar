@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import "react";
+/// <reference types="react" />
 
 declare global {
   /**
@@ -11,17 +10,6 @@ declare global {
     // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     interface Element extends React.JSX.Element {}
   }
-
-  interface ImportMetaEnv {
-    BASE_URL: string;
-    MODE: string;
-    DEV: boolean;
-    PROD: boolean;
-    SSR: boolean;
-    [key: string]: any;
-  }
-
-  interface ImportMeta {
-    readonly env?: ImportMetaEnv;
-  }
 }
+
+export {};

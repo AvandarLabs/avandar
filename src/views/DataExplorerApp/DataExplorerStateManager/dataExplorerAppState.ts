@@ -34,6 +34,14 @@ export type DataExplorerAppState = {
 
   /** The currently open saved dataset, or `undefined` if none is open. */
   openDataset: OpenDatasetInfo | undefined;
+
+  /**
+   * Runtime error message from the most recent query attempt, if any. Set by
+   * `DataExplorerApp` after `useDataQuery` finishes; consumed by the chat
+   * panel to offer a one-click "Regenerate with the error" affordance when
+   * the auto-applied SQL turned out to be invalid.
+   */
+  lastQueryError: string | undefined;
 };
 
 export const INITIAL_DATA_EXPLORER_STATE: DataExplorerAppState = {
@@ -44,4 +52,5 @@ export const INITIAL_DATA_EXPLORER_STATE: DataExplorerAppState = {
   rawSQL: undefined,
   nlPrompt: undefined,
   openDataset: undefined,
+  lastQueryError: undefined,
 };

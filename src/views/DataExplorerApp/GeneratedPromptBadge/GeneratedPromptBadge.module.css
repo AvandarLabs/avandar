@@ -1,0 +1,23 @@
+.root {
+  border-bottom: 1px solid var(--mantine-color-primary-2);
+  min-height: 0;
+}
+
+.icon {
+  flex-shrink: 0;
+}
+
+.staticText {
+  flex-shrink: 0;
+}
+
+.promptText {
+  flex: 1;
+  min-width: 0;
+}
+
+.showSqlButton {
+  flex-shrink: 0;
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 600;
+}

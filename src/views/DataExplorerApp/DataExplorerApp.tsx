@@ -28,6 +28,7 @@ import { VizSettingsForm } from "@/components/VisualizationContainer/VizSettings
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { downloadRowsAsCSV } from "@/views/DataExplorerApp/downloadRowsAsCSV";
+import { GeneratedPromptBadge } from "@/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge";
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetModal/OpenDatasetModal";
 import { QueryForm } from "@/views/DataExplorerApp/QueryForm/QueryForm";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
@@ -66,7 +67,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
     onSuccess: () => {
       dispatch.setOpenDataset(undefined);
-      dispatch.setRawSQL(undefined);
+      dispatch.setRawSql(undefined);
       notifySuccess("Dataset deleted.");
     },
     onError: (error) => {
@@ -75,12 +76,27 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
   });
 
   const workspace = useCurrentWorkspace();
-  const [queryResults, isLoadingResults] = useDataQuery({
+  const [queryResults, isLoadingResults, dataQuery] = useDataQuery({
     query: state.query,
     rawSQL: state.rawSQL,
     auth: "workspace",
     workspaceId: workspace.id,
   });
+
+  // Mirror useDataQuery's runtime error onto state so the chat panel can
+  // show a "Regenerate with the error" affordance when the auto-applied SQL
+  // turned out to be invalid.
+  useEffect(() => {
+    const message =
+      dataQuery.isError ?
+        dataQuery.error instanceof Error ?
+          dataQuery.error.message
+        : String(dataQuery.error)
+      : undefined;
+    if (message !== state.lastQueryError) {
+      dispatch.setLastQueryError(message);
+    }
+  }, [dataQuery.isError, dataQuery.error, state.lastQueryError, dispatch]);
   const queryResultColumns = queryResults?.columns ?? [];
 
   const columnSignature = useMemo(() => {
@@ -186,7 +202,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                   children: (
                     <OpenDatasetModal
                       onOpen={(info, rawSQL) => {
-                        dispatch.setRawSQL(rawSQL);
+                        dispatch.setRawSql(rawSQL);
                         dispatch.setOpenDataset(info);
                       }}
                     />
@@ -344,6 +360,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
               Export
             </Button>
           </Group>
+          <GeneratedPromptBadge />
           <Box flex={1} pos="relative" w="100%" h="100%" bg="white">
             <LoadingOverlay visible={isLoadingResults} zIndex={99} />
             <VisualizationContainer
