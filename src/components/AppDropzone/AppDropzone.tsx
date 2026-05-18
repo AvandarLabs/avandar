@@ -1,7 +1,7 @@
 import { Dropzone } from "@mantine/dropzone";
 import { IconFileSpreadsheet, IconUpload, IconX } from "@tabler/icons-react";
 import { MIMEType } from "@utils";
-import { handleAppDropzoneDrop } from "./handleAppDropzoneDrop";
+import { onAppDropzoneDrop } from "./onAppDropzoneDrop";
 import type { ReactNode } from "react";
 
 const ACCEPTED_MIME_TYPES = [
@@ -24,7 +24,7 @@ export function AppDropzone({ children }: Props): JSX.Element {
       {children}
       <Dropzone.FullScreen
         accept={ACCEPTED_MIME_TYPES}
-        onDrop={handleAppDropzoneDrop}
+        onDrop={onAppDropzoneDrop}
       >
         <Dropzone.Accept>
           <IconUpload

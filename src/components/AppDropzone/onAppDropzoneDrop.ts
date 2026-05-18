@@ -6,7 +6,7 @@ import { openFileImportFlow } from "./openFileImportFlow";
  * and forwards it to the import flow. Extracted so it can be tested
  * directly without simulating drag/drop events in jsdom.
  */
-export function handleAppDropzoneDrop(files: FileWithPath[]): void {
+export function onAppDropzoneDrop(files: FileWithPath[]): void {
   const file = files[0];
   if (file) {
     openFileImportFlow(file);

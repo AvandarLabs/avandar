@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { AppDropzone } from "./AppDropzone";
-import { handleAppDropzoneDrop } from "./handleAppDropzoneDrop";
+import { onAppDropzoneDrop } from "./onAppDropzoneDrop";
 
 const { openFileImportFlowMock } = vi.hoisted(() => {
   return { openFileImportFlowMock: vi.fn() };
@@ -33,7 +33,7 @@ describe("AppDropzone", () => {
     openFileImportFlowMock.mockClear();
     const file = new File(["a"], "test.csv", { type: "text/csv" });
 
-    handleAppDropzoneDrop([file]);
+    onAppDropzoneDrop([file]);
 
     expect(openFileImportFlowMock).toHaveBeenCalledWith(file);
   });
@@ -41,7 +41,7 @@ describe("AppDropzone", () => {
   it("does not call openFileImportFlow when the drop has no files", () => {
     openFileImportFlowMock.mockClear();
 
-    handleAppDropzoneDrop([]);
+    onAppDropzoneDrop([]);
 
     expect(openFileImportFlowMock).not.toHaveBeenCalled();
   });
