@@ -36,13 +36,13 @@ button {
  * lets iPad Pro 13" landscape (1366px) sit a bit closer to desktop than
  * smaller iPads.
  */
-@media (min-width: 48em) and (max-width: 74.99em) {
+@media (width >= 48em) and (width <= 74.99em) {
   :root {
     --mantine-scale: 0.8 !important;
   }
 }
 
-@media (min-width: 75em) and (max-width: 87.99em) {
+@media (width >= 75em) and (width <= 87.99em) {
   :root {
     --mantine-scale: 0.9 !important;
   }
