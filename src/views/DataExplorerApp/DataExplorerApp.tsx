@@ -28,11 +28,11 @@ import { VizSettingsForm } from "@/components/VisualizationContainer/VizSettings
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { downloadRowsAsCSV } from "@/views/DataExplorerApp/downloadRowsAsCSV";
+import { GeneratedPromptBadge } from "@/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge";
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetModal/OpenDatasetModal";
 import { QueryForm } from "@/views/DataExplorerApp/QueryForm/QueryForm";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
-import { GeneratedPromptBadge } from "@/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge";
 import { useDataExplorerURLSync } from "@/views/DataExplorerApp/useDataExplorerURLSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 import type { DataExplorerURLSearch } from "@/views/DataExplorerApp/DataExplorerURLState";
@@ -96,12 +96,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     if (message !== state.lastQueryError) {
       dispatch.setLastQueryError(message);
     }
-  }, [
-    dataQuery.isError,
-    dataQuery.error,
-    state.lastQueryError,
-    dispatch,
-  ]);
+  }, [dataQuery.isError, dataQuery.error, state.lastQueryError, dispatch]);
   const queryResultColumns = queryResults?.columns ?? [];
 
   const columnSignature = useMemo(() => {

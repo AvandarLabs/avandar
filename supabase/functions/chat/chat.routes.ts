@@ -147,9 +147,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           typeof context.lastSql === "string" && context.lastSql.length > 0;
 
         const isLikelyRefinement =
-          isDataExplorer &&
-          hasLastSql &&
-          REFINEMENT_HINTS.test(lastUserPrompt);
+          isDataExplorer && hasLastSql && REFINEMENT_HINTS.test(lastUserPrompt);
 
         const refinementContext =
           isLikelyRefinement && hasLastSql ?
