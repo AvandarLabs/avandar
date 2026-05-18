@@ -17,7 +17,7 @@
       "source": "AvandarLabs/avandar-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/avandar-code-review/SKILL.md",
-      "computedHash": "a510c880d31f3874d3031a24c67ffad319d7e269ce0f9118c0fffd7ea344dbb1"
+      "computedHash": "dbb4bd937407505123e1263343d7e5eed2fc674e985fa22fcc32bfeff0ebd282"
     },
     "brainstorming": {
       "source": "obra/superpowers",

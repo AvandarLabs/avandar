@@ -5,6 +5,7 @@ import {
   IconLayoutDashboard,
   IconMap,
   IconSettings,
+  IconShare3,
   IconTable,
 } from "@tabler/icons-react";
 import { ReactNode } from "react";
@@ -104,6 +105,15 @@ export const NavbarLinks = {
       icon: <IconBlocks size={DEFAULT_ICON_SIZE} stroke={1.5} />,
       isEnabled: () => {
         return !isFlagEnabled(FeatureFlag.DisableProfileManager);
+      },
+    };
+  },
+  sharedWithMe: (workspaceSlug: string) => {
+    return {
+      link: AppLinks.sharedWithMe(workspaceSlug),
+      icon: <IconShare3 size={DEFAULT_ICON_SIZE} stroke={1.5} />,
+      isEnabled: () => {
+        return isFlagEnabled(FeatureFlag.EnableSharedWithMe);
       },
     };
   },

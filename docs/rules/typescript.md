@@ -248,6 +248,9 @@
 
 - Never create barrel files. The only barrel files allowed are the `index.ts`
   files exporting the contents of our libraries in `packages/`.
+- As soon as a file has another co-named file (e.g. `MyFile.tsx` and
+  `MyFile.test.tsx`) then you must create an equally-named directory to
+  couple them. E.g. `MyFile/MyFile.tsx` and `MyFile/MyFile.test.tsx`
 - Never use namespace exports. Always use named exports.
   Bad: `export * from ...`.
   Good: `export { MyComponent } from ...`.

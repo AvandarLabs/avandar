@@ -32,7 +32,7 @@ while IFS= read -r line; do
   [ -n "$line" ] && CHANGED+=("$line")
 done < <(
   git diff --name-only --diff-filter=ACMR "$BASE" HEAD \
-    | grep -Ev '^(node_modules/|.*routeTree\.gen\.ts$|shared/types/database\.types\.ts$)' \
+    | grep -Ev '^node_modules/|^shared/types/database\.types\.ts$|^supabase/migrations/.*\.sql$|\.gen\.[^/]+$|\.md$' \
     || true
 )
 

@@ -14,11 +14,6 @@ export async function deleteDatasetAndShares(options: {
     .delete()
     .eq("resource_id", datasetId);
 
-  await supabaseAdminClient
-    .from("resource_user_group_tags")
-    .delete()
-    .eq("resource_id", datasetId);
-
   await supabaseAdminClient.from("datasets").delete().eq("id", datasetId);
 }
 

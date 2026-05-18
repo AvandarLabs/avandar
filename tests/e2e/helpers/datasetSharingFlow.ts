@@ -1,7 +1,13 @@
 import { expect } from "@playwright/test";
 import { CALIFORNIA_CSV_PATH } from "./constants";
+import {
+  addShareV2,
+  closeShareModalV2,
+  openShareModalV2,
+  setGeneralAccessV2,
+} from "./datasetSharingFlowV2";
 import { ensureCloudStorageCheckedAndSaveDataset } from "./manualUploadCloudSyncFlow";
-import { LONG_WAIT, MEDIUM_WAIT } from "./timeouts";
+import { LONG_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
@@ -50,102 +56,15 @@ export async function uploadCaliforniaCsvDataset(options: {
 }
 
 /**
- * Opens the Share modal from the dataset metadata page.
- */
-export async function openDatasetShareModal(page: Page): Promise<void> {
-  const shareButton = page.getByRole("button", { name: "Share" });
-  await expect(shareButton).toBeEnabled({ timeout: LONG_WAIT });
-  await shareButton.click();
-  await expect(page.getByText("Workspace access")).toBeVisible({
-    timeout: LONG_WAIT,
-  });
-}
-
-/**
- * Sets the restricted-access switch on the share modal.
- */
-export async function setShareModalRestricted(
-  page: Page,
-  isRestricted: boolean,
-): Promise<void> {
-  const restrictSwitch = page.getByRole("switch", {
-    name: /Restrict access/i,
-  });
-  const isChecked = await restrictSwitch.isChecked();
-  if (isChecked !== isRestricted) {
-    await restrictSwitch.click();
-  }
-}
-
-/**
- * Clears workspace-wide access on the share modal when a workspace role is set.
- */
-export async function clearWorkspaceWideShareAccess(page: Page): Promise<void> {
-  const workspaceRoleSelect = page.getByRole("combobox", {
-    name: "Role for everyone in the workspace",
-  });
-  const clearButton = workspaceRoleSelect
-    .locator("xpath=ancestor::div[contains(@class, 'mantine-Input-wrapper')]")
-    .getByRole("button")
-    .first();
-  if (
-    await clearButton.isVisible().catch(() => {
-      return false;
-    })
-  ) {
-    await clearButton.click();
-  }
-}
-
-/**
- * Adds a direct share row for a workspace member or tag label.
- */
-export async function addDirectShareInModal(options: {
-  page: Page;
-  principalLabel: string;
-  role?: RoleLevel;
-}): Promise<void> {
-  const { page, principalLabel, role = "viewer" } = options;
-
-  const addTargetSelect = page.getByRole("combobox", {
-    name: "Add member or tag",
-  });
-  await addTargetSelect.click();
-  await page.getByRole("option", { name: principalLabel }).click();
-
-  const roleSelect = page.getByRole("combobox", { name: "Role", exact: true });
-  await roleSelect.click();
-  await page
-    .getByRole("option", { name: new RegExp(`^${role}$`, "i") })
-    .click();
-
-  await page.getByRole("button", { name: "Add", exact: true }).click();
-
-  await expect(page.getByText(principalLabel).first()).toBeVisible({
-    timeout: MEDIUM_WAIT,
-  });
-}
-
-/**
- * Closes the share modal via Done.
- */
-export async function closeShareModal(page: Page): Promise<void> {
-  await page.getByRole("button", { name: "Done" }).click();
-  await expect(page.getByText("Workspace access")).not.toBeVisible({
-    timeout: MEDIUM_WAIT,
-  });
-}
-
-/**
  * Configures a dataset as restricted with no workspace-wide access.
+ * Composite helper: open modal -> set General access to Restricted -> close.
  */
 export async function restrictDatasetWithNoWorkspaceAccess(
   page: Page,
 ): Promise<void> {
-  await openDatasetShareModal(page);
-  await setShareModalRestricted(page, true);
-  await clearWorkspaceWideShareAccess(page);
-  await closeShareModal(page);
+  await openShareModalV2(page);
+  await setGeneralAccessV2(page, "Restricted");
+  await closeShareModalV2(page);
 }
 
 /**
@@ -186,11 +105,15 @@ export async function expectDatasetMetaPageDenied(
   await page.goto(
     `/${options.workspaceSlug}/data-manager/${options.datasetId}`,
   );
-  await expect(page.getByText(/Dataset failed to load|Not Found/i)).toBeVisible(
-    {
-      timeout: LONG_WAIT,
-    },
-  );
+  // Two denial paths exist:
+  // 1. The user has data_sources app access but the dataset RLS denies →
+  //    `Dataset failed to load` / `Not Found` on the dataset meta view.
+  // 2. The user does NOT have data_sources app access at all → the
+  //    route guard short-circuits before the dataset query and renders
+  //    the "Access denied" page.
+  await expect(
+    page.getByText(/Dataset failed to load|Not Found|Access denied/i).first(),
+  ).toBeVisible({ timeout: LONG_WAIT });
 }
 
 /**
@@ -216,15 +139,16 @@ export async function expectDatasetMetaPageAccessible(
 
 /**
  * Opens share modal, adds a direct principal share, and closes the modal.
+ * Composite helper: delegates to the v2 helpers for the actual modal driving.
  */
 export async function shareDatasetWithPrincipal(options: {
   page: Page;
   principalLabel: string;
   role?: RoleLevel;
 }): Promise<void> {
-  await openDatasetShareModal(options.page);
-  await addDirectShareInModal(options);
-  await closeShareModal(options.page);
+  await openShareModalV2(options.page);
+  await addShareV2(options);
+  await closeShareModalV2(options.page);
 }
 
 /** Display name seeded for the secondary E2E viewer membership. */
