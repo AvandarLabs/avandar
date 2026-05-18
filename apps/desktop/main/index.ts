@@ -1,11 +1,14 @@
 import { join } from "node:path";
 import { app, BrowserWindow, PATHS } from "electrobun";
+import { SYNCABLE_TABLES } from "../sync/syncable-tables";
 import { resolveMigrationsDir } from "./config/migrationsDir";
 import { resolveWebviewUrl } from "./config/url";
 import { setupApplicationMenu } from "./menu/setupApplicationMenu";
 import { getUserDataDir } from "./platform/getUserDataDir";
 import { loadMigrationsFromDir } from "./services/loadMigrations";
+import { bootstrapSnapshotIfNeeded } from "./services/SnapshotBootstrap";
 import { openSqliteDatabase, runMigrations } from "./services/Sqlite";
+import { createSupabaseRestClient } from "./services/SupabaseRest";
 
 const APP_NAME = "Avandar";
 
@@ -43,6 +46,38 @@ console.log(
   `[avandar-desktop] sqlite ready at ${sqlitePath} ` +
     `(${migrations.length} migration(s) on disk)`,
 );
+
+// Stopgap snapshot bootstrap: when a dev token + Supabase URL/key are
+// configured, pull every syncable table from Supabase REST into the
+// local mirror on first launch. The "real" bootstrap that fires once
+// the user signs in lands with Task 11 (Keychain auth).
+const devToken = process.env.AVA_DEV_ACCESS_TOKEN;
+const supabaseUrl = process.env.AVA_SUPABASE_URL;
+const supabaseAnonKey = process.env.AVA_SUPABASE_ANON_KEY;
+
+if (devToken && supabaseUrl && supabaseAnonKey) {
+  try {
+    await bootstrapSnapshotIfNeeded({
+      db: sqliteDb,
+      rest: createSupabaseRestClient(),
+      accessToken: devToken,
+      tables: SYNCABLE_TABLES,
+      logger: {
+        log: (msg) => console.log(msg),
+        error: (msg) => console.error(msg),
+      },
+    });
+  } catch (err) {
+    // Bootstrap failures are non-fatal — the webview still loads
+    // against whatever is in SQLite. Logged so dev can investigate.
+    console.error("[snapshot-bootstrap] failed:", err);
+  }
+} else {
+  console.log(
+    "[snapshot-bootstrap] skipped (set AVA_DEV_ACCESS_TOKEN + " +
+      "AVA_SUPABASE_URL + AVA_SUPABASE_ANON_KEY to enable)",
+  );
+}
 
 const preload =
   process.env.AVA_PRELOAD_PATH ??
