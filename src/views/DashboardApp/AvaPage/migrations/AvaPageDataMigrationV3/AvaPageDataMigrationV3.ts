@@ -1,6 +1,5 @@
 import { transformProps } from "@puckeditor/core";
 import { AvaPageDataMigration } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 import type {
   V2_AvaPageData,
   V2_AvaPageRootProps,
@@ -10,6 +9,7 @@ import type {
   V3_AvaPageRootProps,
   V3_PBlockPropsRegistry,
 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV3/AvaPageDataMigrationV3.types";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 
 const SCHEMA_VERSION = 3;
 
@@ -186,9 +186,9 @@ function _downgradeVizConfig(curr: VizConfig): V2_VizConfig {
         yAxisKey: first?.key,
         withLegend: curr.withLegend,
         curveType:
-          first?.renderAs === "line" ? (first.curveType ?? "monotone") : (
-            "monotone"
-          ),
+          first?.renderAs === "line" ?
+            (first.curveType ?? "monotone")
+          : "monotone",
         color: first?.color,
       };
     }
@@ -200,9 +200,9 @@ function _downgradeVizConfig(curr: VizConfig): V2_VizConfig {
         yAxisKey: first?.key,
         withLegend: curr.withLegend,
         curveType:
-          first?.renderAs === "area" ? (first.curveType ?? "monotone") : (
-            "monotone"
-          ),
+          first?.renderAs === "area" ?
+            (first.curveType ?? "monotone")
+          : "monotone",
         color: first?.color,
       };
     }

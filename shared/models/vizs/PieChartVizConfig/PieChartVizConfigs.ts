@@ -12,10 +12,7 @@ import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineCh
 import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types.ts";
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types.ts";
 import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts";
-import type {
-  RadarSeries,
-  XYSeries,
-} from "$/models/vizs/SeriesConfig.ts";
+import type { RadarSeries, XYSeries } from "$/models/vizs/SeriesConfig.ts";
 import type { TableVizConfig } from "$/models/vizs/TableVizConfig/TableVizConfig.types.ts";
 import type { IVizConfigModule } from "$/models/vizs/VizConfig/IVizConfigModule.ts";
 import type {
@@ -65,7 +62,9 @@ export const PieChartVizConfigs = {
         return [];
       }
       if (renderAs === "area") {
-        return [{ renderAs, key: valueKey, color: seriesColor, fillOpacity: 0.6 }];
+        return [
+          { renderAs, key: valueKey, color: seriesColor, fillOpacity: 0.6 },
+        ];
       }
       return [{ renderAs, key: valueKey, color: seriesColor }];
     };
@@ -110,9 +109,7 @@ export const PieChartVizConfigs = {
       })
       .with("radar", (vizType): RadarChartVizConfig => {
         const radarSeries: RadarSeries[] =
-          valueKey === undefined ?
-            []
-          : [{ key: valueKey, color: seriesColor }];
+          valueKey === undefined ? [] : [{ key: valueKey, color: seriesColor }];
         return { vizType, nameKey, series: radarSeries, withLegend: true };
       })
       .with("bubble", (vizType): BubbleChartVizConfig => {

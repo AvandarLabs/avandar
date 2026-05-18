@@ -9,22 +9,22 @@
  * changes the viz" guarantee.
  */
 import { fireEvent, render, screen, within } from "@testing-library/react";
+import { pathGet } from "$/models/vizs/SettingDescriptor";
+import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm";
-import { pathGet } from "$/models/vizs/SettingDescriptor";
-import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { getMantineSelectDropdown } from "@/test-utils/pickMantineSelectOption";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
+import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
+import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
+import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";
 import type {
   ControlSpec,
   ErasedChartSettingDescriptor,
   ErasedSeriesSettingDescriptor,
 } from "$/models/vizs/SettingDescriptor";
-import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
-import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
-import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineChartVizConfig.types";
-import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types";
 
 const COLUMNS: readonly QueryResultColumn[] = [
   { name: "category", dataType: "varchar" },
@@ -93,7 +93,9 @@ function valueForControl(spec: ControlSpec, currentValue: unknown): unknown {
   }
 }
 
-function renderForm<TConfig extends Parameters<typeof SeriesAwareVizForm>[0]["config"]>(
+function renderForm<
+  TConfig extends Parameters<typeof SeriesAwareVizForm>[0]["config"],
+>(
   config: TConfig,
 ): {
   onConfigChange: ReturnType<typeof vi.fn>;
@@ -143,7 +145,11 @@ function exactLabel(label: string): RegExp {
   return new RegExp(`^${label}$`, "i");
 }
 
-function driveControl(label: string, spec: ControlSpec, nextValue: unknown): void {
+function driveControl(
+  label: string,
+  spec: ControlSpec,
+  nextValue: unknown,
+): void {
   switch (spec.kind) {
     case "switch": {
       const toggle = screen.getByRole("switch", { name: exactLabel(label) });
@@ -172,7 +178,9 @@ function driveControl(label: string, spec: ControlSpec, nextValue: unknown): voi
       if (target === undefined) {
         throw new Error(`No option for segmented control "${label}"`);
       }
-      const radio = screen.getByRole("radio", { name: exactLabel(target.label) });
+      const radio = screen.getByRole("radio", {
+        name: exactLabel(target.label),
+      });
       fireEvent.click(radio);
       return;
     }
@@ -235,7 +243,8 @@ function driveControl(label: string, spec: ControlSpec, nextValue: unknown): voi
     seriesDescriptors.forEach((desc: ErasedSeriesSettingDescriptor) => {
       it(`changes the "${desc.label}" series setting via its ${desc.control.kind} control`, () => {
         const { onConfigChange } = renderForm(config);
-        const firstSeries: unknown = (config as { series: unknown[] }).series[0];
+        const firstSeries: unknown = (config as { series: unknown[] })
+          .series[0];
         const currentValue = pathGet(firstSeries as never, desc.key as never);
         const nextValue = valueForControl(desc.control, currentValue);
         if (nextValue === undefined && desc.control.kind !== "switch") {

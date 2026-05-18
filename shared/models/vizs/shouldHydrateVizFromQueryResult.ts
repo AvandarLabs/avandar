@@ -1,9 +1,6 @@
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type {
-  RadarSeries,
-  XYSeries,
-} from "$/models/vizs/SeriesConfig.ts";
+import type { RadarSeries, XYSeries } from "$/models/vizs/SeriesConfig.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
 type Options = {
@@ -100,7 +97,7 @@ function _getKeysToValidate(vizConfig: VizConfig): string[] {
   if (vt === "radar") {
     const rv = vizConfig as {
       nameKey: string | undefined;
-      series: ReadonlyArray<RadarSeries>;
+      series: readonly RadarSeries[];
     };
     const keys: string[] = [];
     if (rv.nameKey !== undefined) {
@@ -115,7 +112,7 @@ function _getKeysToValidate(vizConfig: VizConfig): string[] {
   if (vt === "bar" || vt === "line" || vt === "area") {
     const xy = vizConfig as {
       xAxisKey: string | undefined;
-      series: ReadonlyArray<XYSeries>;
+      series: readonly XYSeries[];
     };
     const keys: string[] = [];
     if (xy.xAxisKey !== undefined) {

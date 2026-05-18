@@ -1,7 +1,7 @@
 import { ScatterChart as MantineScatterChart } from "@mantine/charts";
 import { useMemo } from "react";
-import type { UnknownDataFrame } from "@utils";
 import type { ScatterChartSeries } from "@mantine/charts";
+import type { UnknownDataFrame } from "@utils";
 
 type Props = {
   data: UnknownDataFrame;

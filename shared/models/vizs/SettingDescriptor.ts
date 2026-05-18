@@ -151,13 +151,13 @@ export type SwitchControlSpec = { kind: "switch" };
 /** Pill-segmented choice (Mantine `SegmentedControl`). Best for ≤4 options. */
 export type SegmentedControlSpec = {
   kind: "segmented";
-  options: ReadonlyArray<SelectOption>;
+  options: readonly SelectOption[];
 };
 
 /** Dropdown select (Mantine `Select`). Best for >4 options. */
 export type SelectControlSpec = {
   kind: "select";
-  options: ReadonlyArray<SelectOption>;
+  options: readonly SelectOption[];
 };
 
 /** Numeric input (Mantine `NumberInput`). */
@@ -280,8 +280,8 @@ export type ErasedSeriesSettingDescriptor = {
 };
 
 export type ErasedVizSettingDescriptors = {
-  chart: ReadonlyArray<ErasedChartSettingDescriptor>;
-  series: ReadonlyArray<ErasedSeriesSettingDescriptor>;
+  chart: readonly ErasedChartSettingDescriptor[];
+  series: readonly ErasedSeriesSettingDescriptor[];
 };
 
 /**

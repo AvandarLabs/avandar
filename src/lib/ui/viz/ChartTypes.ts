@@ -11,7 +11,7 @@ import type { XYSeries } from "$/models/vizs/SeriesConfig";
 export type XYChartProps = {
   data: UnknownDataFrame;
   xAxisKey: string;
-  series: ReadonlyArray<XYSeries>;
+  series: readonly XYSeries[];
   height: number;
   withLegend?: boolean;
   chartStyle?: ChartStyle;

@@ -11,10 +11,7 @@ import type { LineChartVizConfig } from "$/models/vizs/LineChartVizConfig/LineCh
 import type { PieChartVizConfig } from "$/models/vizs/PieChartVizConfig/PieChartVizConfig.types.ts";
 import type { RadarChartVizConfig } from "$/models/vizs/RadarChartVizConfig/RadarChartVizConfig.types.ts";
 import type { ScatterPlotVizConfig } from "$/models/vizs/ScatterPlotVizConfig/ScatterPlotVizConfig.types.ts";
-import type {
-  RadarSeries,
-  XYSeries,
-} from "$/models/vizs/SeriesConfig.ts";
+import type { RadarSeries, XYSeries } from "$/models/vizs/SeriesConfig.ts";
 import type {
   ErasedVizSettingDescriptors,
   VizSettingDescriptors,

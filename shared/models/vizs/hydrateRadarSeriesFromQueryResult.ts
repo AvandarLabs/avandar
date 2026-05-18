@@ -4,7 +4,7 @@ import type { RadarSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type RadarSeriesConfig = {
   nameKey: string | undefined;
-  series: ReadonlyArray<RadarSeries>;
+  series: readonly RadarSeries[];
 };
 
 /**
@@ -14,10 +14,7 @@ type RadarSeriesConfig = {
  */
 export function hydrateRadarSeriesFromQueryResult<
   VConfig extends RadarSeriesConfig,
->(
-  currVizConfig: VConfig,
-  columns: readonly QueryResultColumn[],
-): VConfig {
+>(currVizConfig: VConfig, columns: readonly QueryResultColumn[]): VConfig {
   if (columns.length === 0) {
     return currVizConfig;
   }

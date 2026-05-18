@@ -5,7 +5,7 @@ import type { RenderAs, XYSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type XYSeriesConfig = {
   xAxisKey: string | undefined;
-  series: ReadonlyArray<XYSeries>;
+  series: readonly XYSeries[];
 };
 
 /**

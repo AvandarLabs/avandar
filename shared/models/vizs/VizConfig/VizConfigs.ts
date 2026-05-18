@@ -63,7 +63,9 @@ export const VizConfigs = {
    * series-level controls (including from foreign viz types when a
    * series's `renderAs` differs from the host).
    */
-  getDescriptors: <VType extends VizType>(type: VType) => {
+  getDescriptors: <VType extends VizType>(
+    type: VType,
+  ): IVizConfigModule<VType, VizConfigType<VType>>["descriptors"] => {
     return _getVizTypeModule(type).descriptors;
   },
 

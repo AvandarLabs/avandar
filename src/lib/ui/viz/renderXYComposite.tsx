@@ -1,13 +1,13 @@
 import { CompositeChart as MantineCompositeChart } from "@mantine/charts";
-import type { CompositeChartSeries } from "@mantine/charts";
 import type { applyChartStyle } from "@/lib/ui/viz/applyChartStyle";
+import type { CompositeChartSeries } from "@mantine/charts";
 import type { UnknownDataFrame } from "@utils";
 import type { XYSeries } from "$/models/vizs/SeriesConfig";
 
 type Props = {
   data: UnknownDataFrame;
   xAxisKey: string;
-  series: ReadonlyArray<XYSeries>;
+  series: readonly XYSeries[];
   height: number;
   withLegend: boolean;
   tooltipProps?: unknown;

@@ -2,10 +2,7 @@ import { shouldHydrateVizFromQueryResult } from "$/models/vizs/shouldHydrateVizF
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs.ts";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
-import type {
-  RadarSeries,
-  XYSeries,
-} from "$/models/vizs/SeriesConfig.ts";
+import type { RadarSeries, XYSeries } from "$/models/vizs/SeriesConfig.ts";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types.ts";
 
 type ApplyVizConfigFromQueryResultInput = {
@@ -48,30 +45,25 @@ export function isVizConfigEqualForQueryResultSync(
   if (vt === "radar") {
     const ar = a as {
       nameKey: string | undefined;
-      series: ReadonlyArray<RadarSeries>;
+      series: readonly RadarSeries[];
     };
     const br = b as {
       nameKey: string | undefined;
-      series: ReadonlyArray<RadarSeries>;
+      series: readonly RadarSeries[];
     };
-    return (
-      ar.nameKey === br.nameKey &&
-      _sameSeriesKeys(ar.series, br.series)
-    );
+    return ar.nameKey === br.nameKey && _sameSeriesKeys(ar.series, br.series);
   }
 
   if (vt === "bar" || vt === "line" || vt === "area") {
     const ax = a as {
       xAxisKey: string | undefined;
-      series: ReadonlyArray<XYSeries>;
+      series: readonly XYSeries[];
     };
     const bx = b as {
       xAxisKey: string | undefined;
-      series: ReadonlyArray<XYSeries>;
+      series: readonly XYSeries[];
     };
-    return (
-      ax.xAxisKey === bx.xAxisKey && _sameSeriesKeys(ax.series, bx.series)
-    );
+    return ax.xAxisKey === bx.xAxisKey && _sameSeriesKeys(ax.series, bx.series);
   }
 
   const ax = a as {
@@ -182,7 +174,7 @@ function _clearStaleAxisKeys(
   if (vt === "radar") {
     const rv = vizConfig as {
       nameKey: string | undefined;
-      series: ReadonlyArray<RadarSeries>;
+      series: readonly RadarSeries[];
     };
     let cleared: VizConfig = vizConfig;
     let didChange = false;
@@ -206,7 +198,7 @@ function _clearStaleAxisKeys(
   if (vt === "bar" || vt === "line" || vt === "area") {
     const xy = vizConfig as {
       xAxisKey: string | undefined;
-      series: ReadonlyArray<XYSeries>;
+      series: readonly XYSeries[];
     };
     let cleared: VizConfig = vizConfig;
     let didChange = false;

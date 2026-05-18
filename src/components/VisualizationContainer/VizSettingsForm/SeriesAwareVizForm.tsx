@@ -16,7 +16,6 @@ import { pathGet, pathSet } from "$/models/vizs/SettingDescriptor";
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
 import { useCallback, useMemo } from "react";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control";
-import type { ErasedSeriesSettingDescriptor } from "$/models/vizs/SettingDescriptor";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import type { AreaChartVizConfig } from "$/models/vizs/AreaChartVizConfig/AreaChartVizConfig.types";
 import type { BarChartVizConfig } from "$/models/vizs/BarChartVizConfig/BarChartVizConfig.types";
@@ -27,11 +26,9 @@ import type {
   RenderAs,
   XYSeries,
 } from "$/models/vizs/SeriesConfig";
+import type { ErasedSeriesSettingDescriptor } from "$/models/vizs/SettingDescriptor";
 
-type XYHostConfig =
-  | BarChartVizConfig
-  | LineChartVizConfig
-  | AreaChartVizConfig;
+type XYHostConfig = BarChartVizConfig | LineChartVizConfig | AreaChartVizConfig;
 type RadarHostConfig = RadarChartVizConfig;
 type HostConfig = XYHostConfig | RadarHostConfig;
 
@@ -220,7 +217,7 @@ export function SeriesAwareVizForm<TConfig extends HostConfig>({
       <Stack gap="sm">
         {config.series.map((s, idx) => {
           return (
-            <_SeriesCard
+            <SeriesCard
               key={`${s.key}-${idx}`}
               fields={fields}
               numericFields={numericFields}
@@ -251,7 +248,7 @@ type SeriesCardProps = {
   onRemove: () => void;
 };
 
-function _SeriesCard({
+function SeriesCard({
   numericFields,
   series,
   hostVizType,
@@ -271,7 +268,7 @@ function _SeriesCard({
   }, [seriesRenderAs]);
 
   const isComposed = !isRadarHost && seriesRenderAs !== hostVizType;
-  const filtered: ReadonlyArray<ErasedSeriesSettingDescriptor> =
+  const filtered: readonly ErasedSeriesSettingDescriptor[] =
     isComposed ?
       descriptors.filter((d) => {
         return d.composable;
@@ -292,11 +289,9 @@ function _SeriesCard({
 
   const setSeriesPath = useCallback(
     (path: string, value: unknown) => {
-      const next = pathSet(
-        series as never,
-        path as never,
-        value as never,
-      ) as XYSeries | RadarSeries;
+      const next = pathSet(series as never, path as never, value as never) as
+        | XYSeries
+        | RadarSeries;
       onSeriesChange(next);
     },
     [series, onSeriesChange],
@@ -412,7 +407,7 @@ function _SeriesCard({
 }
 
 function _groupBy<T>(
-  items: ReadonlyArray<T>,
+  items: readonly T[],
   key: (item: T) => string,
 ): Map<string, T[]> {
   const map = new Map<string, T[]>();
@@ -427,4 +422,3 @@ function _groupBy<T>(
   }
   return map;
 }
-

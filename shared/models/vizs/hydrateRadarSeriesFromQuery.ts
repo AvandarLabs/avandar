@@ -5,7 +5,7 @@ import type { RadarSeries } from "$/models/vizs/SeriesConfig.ts";
 
 type RadarSeriesConfig = {
   nameKey: string | undefined;
-  series: ReadonlyArray<RadarSeries>;
+  series: readonly RadarSeries[];
 };
 
 /**

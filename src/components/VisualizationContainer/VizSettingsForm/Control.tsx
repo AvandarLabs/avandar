@@ -125,7 +125,7 @@ export function Control({
 
     case "columnPicker":
       return (
-        <_ColumnPicker
+        <ColumnPickerControl
           label={label}
           fields={fields}
           dataType={spec.dataType}
@@ -136,7 +136,7 @@ export function Control({
   }
 }
 
-function _ColumnPicker({
+function ColumnPickerControl({
   label,
   fields,
   dataType,

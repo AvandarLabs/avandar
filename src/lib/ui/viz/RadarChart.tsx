@@ -7,7 +7,7 @@ import type { RadarSeries } from "$/models/vizs/SeriesConfig";
 type Props = {
   data: UnknownDataFrame;
   nameKey: string;
-  series: ReadonlyArray<RadarSeries>;
+  series: readonly RadarSeries[];
   height?: number;
   withLegend?: boolean;
   chartStyle?: ChartStyle;

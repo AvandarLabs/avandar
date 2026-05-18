@@ -1,5 +1,10 @@
-import type { CartesianGridProps, LegendProps, XAxisProps, YAxisProps } from "recharts";
 import type { ChartStyle } from "$/models/vizs/ChartStyle";
+import type {
+  CartesianGridProps,
+  LegendProps,
+  XAxisProps,
+  YAxisProps,
+} from "recharts";
 
 const DEFAULT_TICK_FONT_SIZE = 12;
 const DEFAULT_AXIS_LABEL_OFFSET = -10;

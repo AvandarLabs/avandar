@@ -4,9 +4,9 @@ import { useMemo } from "react";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
-import type { BarProps } from "recharts";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
 import type { BarSeries } from "$/models/vizs/SeriesConfig";
+import type { BarProps } from "recharts";
 
 type Props = XYChartProps & {
   /**
@@ -84,7 +84,7 @@ export function BarChart({
     });
   }
 
-  const barSeries = series as ReadonlyArray<BarSeries>;
+  const barSeries = series as readonly BarSeries[];
   return (
     <MantineBarChart
       h={height}

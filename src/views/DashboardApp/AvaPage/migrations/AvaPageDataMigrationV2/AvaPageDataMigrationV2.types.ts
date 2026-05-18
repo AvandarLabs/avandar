@@ -22,11 +22,7 @@ import type {
   V1_PBlockPropsRegistry,
 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV1/AvaPageDataMigrationV1.types";
 
-export type {
-  V1_AvaPageData,
-  V1_AvaPageRootProps,
-  V1_PBlockPropsRegistry,
-};
+export type { V1_AvaPageData, V1_AvaPageRootProps, V1_PBlockPropsRegistry };
 
 /** V2-era curve type for line / area charts. */
 type V2_CurveType = "linear" | "natural" | "monotone" | "step";

@@ -4,10 +4,10 @@ import { useMemo } from "react";
 import { applyChartStyle } from "@/lib/ui/viz/applyChartStyle";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
-import type { LineProps } from "recharts";
-import type { LineChartSeries } from "@mantine/charts";
 import type { XYChartProps } from "@/lib/ui/viz/ChartTypes";
+import type { LineChartSeries } from "@mantine/charts";
 import type { LineSeries } from "$/models/vizs/SeriesConfig";
+import type { LineProps } from "recharts";
 
 type Props = XYChartProps;
 
@@ -69,7 +69,7 @@ export function LineChart({
     });
   }
 
-  const lineSeries = series as ReadonlyArray<LineSeries>;
+  const lineSeries = series as readonly LineSeries[];
   return (
     <MantineLineChart
       h={height}

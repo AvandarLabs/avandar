@@ -119,7 +119,7 @@ export function AreaChart({
     });
   }
 
-  const areaSeries = series as ReadonlyArray<AreaSeries>;
+  const areaSeries = series as readonly AreaSeries[];
   const isStacked = layout !== "default";
   const stackOffset = STACK_OFFSET_FOR_LAYOUT[layout];
 
@@ -137,14 +137,7 @@ export function AreaChart({
               const id = `${gradientPrefix}-${idx}`;
               const fillOpacity = s.fillOpacity ?? DEFAULT_AREA_FILL_OPACITY;
               return (
-                <linearGradient
-                  key={id}
-                  id={id}
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
+                <linearGradient key={id} id={id} x1="0" y1="0" x2="0" y2="1">
                   <stop
                     offset="0%"
                     stopColor={color}
@@ -205,7 +198,11 @@ export function AreaChart({
                   stackId={isStacked ? "1" : undefined}
                   dot={
                     showDots ?
-                      { r: DEFAULT_AREA_DOT_RADIUS, fill: color, strokeWidth: 0 }
+                      {
+                        r: DEFAULT_AREA_DOT_RADIUS,
+                        fill: color,
+                        strokeWidth: 0,
+                      }
                     : false
                   }
                   activeDot={{
