@@ -1,7 +1,14 @@
-import { ActionIcon, Badge, Checkbox, Group, Select, Text } from "@mantine/core";
+import {
+  ActionIcon,
+  Badge,
+  Checkbox,
+  Group,
+  Select,
+  Text,
+} from "@mantine/core";
 import { IconTag, IconUser, IconX } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
-import { SHARE_COPY, appForResource, appLabel } from "../shareCopy";
+import { appForResource, appLabel, SHARE_COPY } from "../shareCopy";
 import type {
   ResourceShareRow,
   ResourceType,

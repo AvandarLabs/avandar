@@ -1,11 +1,11 @@
-set check_function_bodies = off;
+set
+  check_function_bodies = off;
 
-CREATE OR REPLACE FUNCTION public.util__auth_user_may_select_dashboard(p_dashboard_id uuid)
- RETURNS boolean
- LANGUAGE plpgsql
- STABLE SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
+create or replace function public.util__auth_user_may_select_dashboard (
+  p_dashboard_id uuid
+) returns boolean language plpgsql stable security definer
+set
+  search_path to 'public' as $function$
 declare
   v_uid uuid := auth.uid ();
   v_ws uuid;
@@ -125,15 +125,13 @@ begin
 
   return false;
 end;
-$function$
-;
+$function$;
 
-CREATE OR REPLACE FUNCTION public.util__auth_user_may_select_dataset(p_dataset_id uuid)
- RETURNS boolean
- LANGUAGE plpgsql
- STABLE SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
+create or replace function public.util__auth_user_may_select_dataset (
+  p_dataset_id uuid
+) returns boolean language plpgsql stable security definer
+set
+  search_path to 'public' as $function$
 declare
   v_uid uuid := auth.uid ();
   v_ws uuid;
@@ -248,15 +246,14 @@ begin
 
   return false;
 end;
-$function$
-;
+$function$;
 
-CREATE OR REPLACE FUNCTION public.util__resource_effective_role(p_resource_type public.resource_type, p_resource_id uuid)
- RETURNS public.role_level
- LANGUAGE plpgsql
- STABLE SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
+create or replace function public.util__resource_effective_role (
+  p_resource_type public.resource_type,
+  p_resource_id uuid
+) returns public.role_level language plpgsql stable security definer
+set
+  search_path to 'public' as $function$
 declare
   v_workspace_id uuid;
   v_owner_id uuid;
@@ -407,7 +404,4 @@ begin
 
   return public.util__rank_to_role_level (v_max_rank);
 end;
-$function$
-;
-
-
+$function$;

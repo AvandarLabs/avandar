@@ -205,9 +205,9 @@ export async function expectSharedWithMeListsResource(options: {
 }): Promise<void> {
   const { page, workspaceSlug, resourceName } = options;
   await page.goto(`/${workspaceSlug}/shared-with-me`);
-  await expect(
-    page.getByRole("link", { name: resourceName }),
-  ).toBeVisible({ timeout: LONG_WAIT });
+  await expect(page.getByRole("link", { name: resourceName })).toBeVisible({
+    timeout: LONG_WAIT,
+  });
 }
 
 /**

@@ -1,11 +1,16 @@
-set check_function_bodies = off;
+set
+  check_function_bodies = off;
 
-CREATE OR REPLACE FUNCTION public.rpc__list_shared_with_me(p_workspace_id uuid)
- RETURNS TABLE(resource_type public.resource_type, resource_id uuid, name text, effective_role public.role_level)
- LANGUAGE plpgsql
- STABLE SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
+create or replace function public.rpc__list_shared_with_me (
+  p_workspace_id uuid
+) returns table (
+  resource_type public.resource_type,
+  resource_id uuid,
+  name text,
+  effective_role public.role_level
+) language plpgsql stable security definer
+set
+  search_path to 'public' as $function$
 declare
   v_uid uuid := auth.uid ();
   v_ds_app_role public.role_level;
@@ -59,7 +64,4 @@ begin
         d.id
       ) is not null;
 end;
-$function$
-;
-
-
+$function$;

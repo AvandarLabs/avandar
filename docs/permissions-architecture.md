@@ -169,13 +169,13 @@ flowchart LR
 
 **Tables (planned)**
 
-| Table                    | Purpose / keys                                                                                                                                            |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `workspace_memberships`  | `(workspace_id, user_id)` unique; `role_group_id` FK → `role_groups` (canonical per-app matrix source).                                                   |
-| `role_groups`            | `(workspace_id, name)` unique; `is_builtin` marks built-ins.                                                                                              |
-| `role_group_app_roles`   | `(role_group_id, app)` unique; role per app for the group.                                                                                                |
-| `user_groups`            | `(workspace_id, name)` unique; optional `color`.                                                                                                          |
-| `user_group_memberships` | `(user_group_id, user_id)` unique; group membership.                                                                                                      |
+| Table                    | Purpose / keys                                                                                                                                           |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `workspace_memberships`  | `(workspace_id, user_id)` unique; `role_group_id` FK → `role_groups` (canonical per-app matrix source).                                                  |
+| `role_groups`            | `(workspace_id, name)` unique; `is_builtin` marks built-ins.                                                                                             |
+| `role_group_app_roles`   | `(role_group_id, app)` unique; role per app for the group.                                                                                               |
+| `user_groups`            | `(workspace_id, name)` unique; optional `color`.                                                                                                         |
+| `user_group_memberships` | `(user_group_id, user_id)` unique; group membership.                                                                                                     |
 | `resource_shares`        | `(resource_type, resource_id, principal_type, principal_id)` unique; `principal_id` NULL for workspace principal; `requires_app_access boolean` per row. |
 
 **Column additions**

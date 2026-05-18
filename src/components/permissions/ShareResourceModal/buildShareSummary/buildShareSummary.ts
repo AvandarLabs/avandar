@@ -1,9 +1,9 @@
 import { capitalize, propEq } from "@utils";
 import {
-  SHARE_COPY,
   appForResource,
   appLabel,
   resourceTypeLabel,
+  SHARE_COPY,
 } from "../shareCopy";
 import type {
   ResourceShareRow,

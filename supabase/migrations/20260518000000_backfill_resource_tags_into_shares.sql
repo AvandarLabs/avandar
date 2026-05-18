@@ -24,21 +24,21 @@
 --   safe (idempotent).
 -- - The update path only flips requires_app_access from false to true; it
 --   never downgrades an existing share's role.
-
 -- Insert a user_group share for each tag row that has no existing
 -- (workspace_id, resource_type, resource_id, principal_type='user_group',
 -- principal_id=<user_group_id>) share. The unique partial index
 -- resource_shares__uniq_user_group_principal lets us use the index-inference
 -- on-conflict form: list the same columns + the partial WHERE predicate.
-insert into public.resource_shares (
-  workspace_id,
-  resource_type,
-  resource_id,
-  principal_type,
-  principal_id,
-  role,
-  requires_app_access
-)
+insert into
+  public.resource_shares (
+    workspace_id,
+    resource_type,
+    resource_id,
+    principal_type,
+    principal_id,
+    role,
+    requires_app_access
+  )
 select
   rugt.workspace_id,
   rugt.resource_type,
@@ -47,10 +47,16 @@ select
   rugt.user_group_id,
   'editor'::public.role_level,
   true
-from public.resource_user_group_tags rugt
-on conflict (resource_type, resource_id, principal_type, principal_id)
-where principal_type = 'user_group'::public.share_principal_type
-do nothing;
+from
+  public.resource_user_group_tags rugt
+on conflict (
+  resource_type,
+  resource_id,
+  principal_type,
+  principal_id
+)
+where
+  principal_type = 'user_group'::public.share_principal_type do nothing;
 
 -- For existing user_group shares whose (resource, group) pair matches a tag
 -- row but where requires_app_access is still false, flip the flag on. We do
@@ -61,7 +67,8 @@ update public.resource_shares rs
 set
   requires_app_access = true,
   updated_at = now()
-from public.resource_user_group_tags rugt
+from
+  public.resource_user_group_tags rugt
 where
   rs.workspace_id = rugt.workspace_id and
   rs.resource_type = rugt.resource_type and

@@ -81,9 +81,7 @@ export function ShareAddPrincipalRow({
         onChange={setTarget}
         searchable
         nothingFoundMessage={
-          isEmptySource ?
-            SHARE_COPY.emptyState.noMembersOrTags
-          : "No matches"
+          isEmptySource ? SHARE_COPY.emptyState.noMembersOrTags : "No matches"
         }
         aria-label="Add people, groups, or tags"
       />

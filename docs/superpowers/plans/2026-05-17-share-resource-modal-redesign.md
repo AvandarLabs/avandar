@@ -5,6 +5,7 @@
 **Goal:** Replace the four-mechanism share modal (`ShareResourceModal`) with a Google Drive–style two-section design, preserve the user-group ∩ app-role intersection via a per-share `requires_app_access` toggle, add a `Shared with me` surface so share-only users can navigate, and ship the change behind a feature flag with pgTAP, Vitest, and Playwright coverage.
 
 **Architecture:**
+
 - **DB layer:** add `requires_app_access boolean` to `public.resource_shares`; rewrite `util__resource_effective_role` to honor it; drop `public.resource_user_group_tags` after a backfill migration.
 - **Service layer:** extend `ResourceShareClient` with the new field on read/write; keep the old `setResourceUserGroupTags` mutation deprecated through rollout for safety.
 - **UI layer:** decompose `ShareResourceModal.tsx` into focused sub-components (`ShareAddPrincipalRow`, `SharePrincipalList`, `SharePrincipalRow`, `ShareGeneralAccess`, `ShareSummaryLine`); introduce `shareSummary.ts` (pure builder) and `shareCopy.ts` (canonical strings).
@@ -14,10 +15,12 @@
 **Tech Stack:** TypeScript + React + Mantine v8 + TanStack Router/Query, Supabase Postgres with pgTAP tests, Vitest + React Testing Library, Playwright e2e.
 
 **Reference docs:**
+
 - Spec: `docs/superpowers/specs/2026-05-17-share-resource-modal-redesign-design.md`
 - Permissions arch: `docs/permissions-architecture.md`
 
 **Conventions to mirror (do not invent):**
+
 - Exported functions get a one-line JSDoc (user preference; overrides default "no comments" rule).
 - One Task = one PR; commits inside a Task are progress markers.
 - All schema files live under `supabase/schemas/`; declarative schemas are diffed into `supabase/migrations/` via `pnpm db:diff` (do NOT hand-write the migration file; let the tooling generate it).
@@ -29,59 +32,61 @@
 
 **New files**
 
-| Path | Responsibility |
-| --- | --- |
-| `supabase/schemas/15.resource_shares.sql` (modified) | Add `requires_app_access` column + check constraint. |
-| `supabase/schemas/16.utils.resource-permissions.sql` (modified) | Rewrite `util__resource_effective_role`, `util__auth_user_may_select_dataset`, `util__auth_user_may_select_dashboard` to honor `requires_app_access` and drop tag lookups. |
-| `supabase/tests/database/permissions/requires_app_access_share.test.sql` | pgTAP truth table for the new flag. |
-| `supabase/tests/database/permissions/migration_diff_resource_tags_to_shares.test.sql` | Migration backfill diff test (Task 6). |
-| `src/components/permissions/ShareResourceModal/shareCopy.ts` | Centralized user-visible strings. |
-| `src/components/permissions/ShareResourceModal/shareSummary.ts` | Pure builder: `(state, lookups) → SummarySpan[]`. |
-| `src/components/permissions/ShareResourceModal/shareSummary.test.ts` | Exhaustive cases for the summary builder. |
-| `src/components/permissions/ShareResourceModal/ShareAddPrincipalRow.tsx` | Single Add combobox + inline role picker + Share button. |
-| `src/components/permissions/ShareResourceModal/ShareAddPrincipalRow.test.tsx` | Component tests. |
-| `src/components/permissions/ShareResourceModal/SharePrincipalList.tsx` | List section header + map of rows. |
-| `src/components/permissions/ShareResourceModal/SharePrincipalRow.tsx` | One row (user or group), with intersection checkbox for groups. |
-| `src/components/permissions/ShareResourceModal/SharePrincipalRow.test.tsx` | Component tests. |
-| `src/components/permissions/ShareResourceModal/ShareGeneralAccess.tsx` | `Restricted` / `Anyone in {AppLabel}` dropdown + role picker. |
-| `src/components/permissions/ShareResourceModal/ShareGeneralAccess.test.tsx` | Component tests. |
-| `src/components/permissions/ShareResourceModal/ShareSummaryLine.tsx` | Renders the pure summary spans with Mantine badges. |
-| `src/components/permissions/ShareResourceModal/ShareSummaryLine.test.tsx` | Component tests. |
-| `src/routes/_auth/$workspaceSlug/shared-with-me/route.tsx` | New page route (workspace-only guard). |
-| `src/routes/_auth/$workspaceSlug/shared-with-me/index.tsx` | Page content (grouped list of share-only resources). |
-| `src/views/SharedWithMeView/SharedWithMeView.tsx` | View component. |
-| `src/views/SharedWithMeView/SharedWithMeView.test.tsx` | View tests. |
-| `src/clients/permissions/SharedWithMeClient.ts` | Read-only client returning the user's share-derived resources. |
-| `src/clients/permissions/SharedWithMeClient.test.ts` | Client unit test. |
-| `src/utils/featureFlags.ts` (modified or created) | `SHARE_MODAL_V2` env flag accessor. |
-| `tests/e2e/share-modal-v2.spec.ts` | New e2e suite (7 scenarios from spec §7.3). |
-| `tests/e2e/helpers/datasetSharingFlowV2.ts` | New helpers for the v2 modal selectors (the old `datasetSharingFlow.ts` keeps the v1 helpers for parity tests during rollout). |
+| Path                                                                                  | Responsibility                                                                                                                                                             |
+| ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `supabase/schemas/15.resource_shares.sql` (modified)                                  | Add `requires_app_access` column + check constraint.                                                                                                                       |
+| `supabase/schemas/16.utils.resource-permissions.sql` (modified)                       | Rewrite `util__resource_effective_role`, `util__auth_user_may_select_dataset`, `util__auth_user_may_select_dashboard` to honor `requires_app_access` and drop tag lookups. |
+| `supabase/tests/database/permissions/requires_app_access_share.test.sql`              | pgTAP truth table for the new flag.                                                                                                                                        |
+| `supabase/tests/database/permissions/migration_diff_resource_tags_to_shares.test.sql` | Migration backfill diff test (Task 6).                                                                                                                                     |
+| `src/components/permissions/ShareResourceModal/shareCopy.ts`                          | Centralized user-visible strings.                                                                                                                                          |
+| `src/components/permissions/ShareResourceModal/shareSummary.ts`                       | Pure builder: `(state, lookups) → SummarySpan[]`.                                                                                                                          |
+| `src/components/permissions/ShareResourceModal/shareSummary.test.ts`                  | Exhaustive cases for the summary builder.                                                                                                                                  |
+| `src/components/permissions/ShareResourceModal/ShareAddPrincipalRow.tsx`              | Single Add combobox + inline role picker + Share button.                                                                                                                   |
+| `src/components/permissions/ShareResourceModal/ShareAddPrincipalRow.test.tsx`         | Component tests.                                                                                                                                                           |
+| `src/components/permissions/ShareResourceModal/SharePrincipalList.tsx`                | List section header + map of rows.                                                                                                                                         |
+| `src/components/permissions/ShareResourceModal/SharePrincipalRow.tsx`                 | One row (user or group), with intersection checkbox for groups.                                                                                                            |
+| `src/components/permissions/ShareResourceModal/SharePrincipalRow.test.tsx`            | Component tests.                                                                                                                                                           |
+| `src/components/permissions/ShareResourceModal/ShareGeneralAccess.tsx`                | `Restricted` / `Anyone in {AppLabel}` dropdown + role picker.                                                                                                              |
+| `src/components/permissions/ShareResourceModal/ShareGeneralAccess.test.tsx`           | Component tests.                                                                                                                                                           |
+| `src/components/permissions/ShareResourceModal/ShareSummaryLine.tsx`                  | Renders the pure summary spans with Mantine badges.                                                                                                                        |
+| `src/components/permissions/ShareResourceModal/ShareSummaryLine.test.tsx`             | Component tests.                                                                                                                                                           |
+| `src/routes/_auth/$workspaceSlug/shared-with-me/route.tsx`                            | New page route (workspace-only guard).                                                                                                                                     |
+| `src/routes/_auth/$workspaceSlug/shared-with-me/index.tsx`                            | Page content (grouped list of share-only resources).                                                                                                                       |
+| `src/views/SharedWithMeView/SharedWithMeView.tsx`                                     | View component.                                                                                                                                                            |
+| `src/views/SharedWithMeView/SharedWithMeView.test.tsx`                                | View tests.                                                                                                                                                                |
+| `src/clients/permissions/SharedWithMeClient.ts`                                       | Read-only client returning the user's share-derived resources.                                                                                                             |
+| `src/clients/permissions/SharedWithMeClient.test.ts`                                  | Client unit test.                                                                                                                                                          |
+| `src/utils/featureFlags.ts` (modified or created)                                     | `SHARE_MODAL_V2` env flag accessor.                                                                                                                                        |
+| `tests/e2e/share-modal-v2.spec.ts`                                                    | New e2e suite (7 scenarios from spec §7.3).                                                                                                                                |
+| `tests/e2e/helpers/datasetSharingFlowV2.ts`                                           | New helpers for the v2 modal selectors (the old `datasetSharingFlow.ts` keeps the v1 helpers for parity tests during rollout).                                             |
 
 **Modified files**
 
-| Path | Change |
-| --- | --- |
-| `src/components/permissions/ShareResourceModal/ShareResourceModal.tsx` | Slim orchestrator: data fetch + render of sub-components; new branch when `SHARE_MODAL_V2` is on. |
-| `src/components/permissions/ShareResourceModal/ShareResourceModal.test.tsx` | Update mocks to include `requires_app_access` field. |
-| `src/clients/permissions/ResourceShareClient.ts` | Add `requiresAppAccess` to row type, read/write paths; new mutation overload. |
-| `src/utils/RouteMiddleware.ts` | Add `resourceFallback` option to `checkUserPermissions`. |
-| `src/routes/_auth/$workspaceSlug/data-manager/route.tsx` | Pass `resourceFallback` for `$datasetId` child. |
-| `src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx` | Verify share-only access path renders the "Shared with you" banner. |
-| `src/routes/_auth/$workspaceSlug/dashboards/route.tsx` | Same as data-manager for `$dashboardId`. |
-| `shared/models/Permissions/Permissions.types.ts` | Optional: export `ShareSummarySpan` types. |
-| `src/components/Sidebar/Sidebar.tsx` (or equivalent nav) | Show a `Shared with me` link when there are share-only resources. (Investigate the actual file under `src/components/` or layout.) |
+| Path                                                                        | Change                                                                                                                             |
+| --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `src/components/permissions/ShareResourceModal/ShareResourceModal.tsx`      | Slim orchestrator: data fetch + render of sub-components; new branch when `SHARE_MODAL_V2` is on.                                  |
+| `src/components/permissions/ShareResourceModal/ShareResourceModal.test.tsx` | Update mocks to include `requires_app_access` field.                                                                               |
+| `src/clients/permissions/ResourceShareClient.ts`                            | Add `requiresAppAccess` to row type, read/write paths; new mutation overload.                                                      |
+| `src/utils/RouteMiddleware.ts`                                              | Add `resourceFallback` option to `checkUserPermissions`.                                                                           |
+| `src/routes/_auth/$workspaceSlug/data-manager/route.tsx`                    | Pass `resourceFallback` for `$datasetId` child.                                                                                    |
+| `src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx`               | Verify share-only access path renders the "Shared with you" banner.                                                                |
+| `src/routes/_auth/$workspaceSlug/dashboards/route.tsx`                      | Same as data-manager for `$dashboardId`.                                                                                           |
+| `shared/models/Permissions/Permissions.types.ts`                            | Optional: export `ShareSummarySpan` types.                                                                                         |
+| `src/components/Sidebar/Sidebar.tsx` (or equivalent nav)                    | Show a `Shared with me` link when there are share-only resources. (Investigate the actual file under `src/components/` or layout.) |
 
 ---
 
 ## Task 1 - DB foundation: `requires_app_access` column + RLS rewrite
 
 **Files:**
+
 - Modify: `supabase/schemas/15.resource_shares.sql`
 - Modify: `supabase/schemas/16.utils.resource-permissions.sql`
 - Create: `supabase/tests/database/permissions/requires_app_access_share.test.sql`
 - Modify: `supabase/tests/database/permissions/util_resource_effective_role.test.sql` (add cases)
 
 **Constraints:**
+
 - The column ships with `default false`, so existing rows preserve current behavior at the SQL level.
 - `resource_user_group_tags` and its current intersection path stay in place for now (removed in Task 6 after backfill). Keep the new path additive.
 - Settings-admin and owner short-circuits do not change.
@@ -263,23 +268,25 @@ Expected: the 6 new assertions FAIL because the function ignores `requires_app_a
 In `supabase/schemas/16.utils.resource-permissions.sql`, replace the existing user-group block inside the share-rank `select` with this:
 
 ```sql
-      (
-        rs.principal_type = 'user_group' and
-        rs.principal_id is not null and
-        exists (
-          select 1
-          from public.user_group_memberships ugm
-          inner join public.user_groups ug on ug.id = ugm.user_group_id
-          where
-            ugm.user_group_id = rs.principal_id and
-            ugm.user_id = v_uid and
-            ug.workspace_id = v_workspace_id
-        ) and
-        (
-          rs.requires_app_access = false
-          or public.util__get_auth_user_app_role(v_workspace_id, v_app) is not null
-        )
-      )
+(
+  rs.principal_type = 'user_group'
+  and rs.principal_id is not null
+  and exists (
+    select
+      1
+    from
+      public.user_group_memberships ugm
+      inner join public.user_groups ug on ug.id = ugm.user_group_id
+    where
+      ugm.user_group_id = rs.principal_id
+      and ugm.user_id = v_uid
+      and ug.workspace_id = v_workspace_id
+  )
+  and (
+    rs.requires_app_access = false
+    or public.util__get_auth_user_app_role (v_workspace_id, v_app) is not null
+  )
+)
 ```
 
 - [ ] **Step 1.9: Mirror the change in the SELECT hardening helpers**
@@ -338,6 +345,7 @@ EOF
 ```
 
 **Test plan for Task 1:**
+
 1. `pnpm db:reset && pnpm db:test` - full pgTAP suite green.
 2. Manual sanity in `psql`: insert a user-group share with `requires_app_access=true`, change `auth.uid()` to a tagged user with no `data_sources` role, confirm `util__resource_effective_role` returns `null`.
 3. Open PR. CI must run pgTAP.
@@ -347,6 +355,7 @@ EOF
 ## Task 2 - Service layer: extend `ResourceShareClient`
 
 **Files:**
+
 - Modify: `src/clients/permissions/ResourceShareClient.ts`
 - Modify: `src/components/permissions/ShareResourceModal/ShareResourceModal.test.tsx` (mock update only)
 - Create: `src/clients/permissions/ResourceShareClient.test.ts` if it doesn't exist; otherwise modify.
@@ -431,7 +440,7 @@ upsertResourceShare: async (options: {
   //   - On insert: include requires_app_access ?? false.
   //   - On update (existing row): include requires_app_access when defined,
   //     so callers can flip the flag without changing role.
-}
+};
 ```
 
 Update the three `insert(...)` and two `update(...)` calls to pass `requires_app_access`.
@@ -500,6 +509,7 @@ EOF
 ```
 
 **Test plan for Task 2:**
+
 1. `pnpm test -- ResourceShareClient` green.
 2. `pnpm test -- ShareResourceModal` green (still uses v1 modal).
 3. `pnpm typecheck` green - verify the new field is accepted across all call sites.
@@ -509,6 +519,7 @@ EOF
 ## Task 3 - UI: New share modal under `SHARE_MODAL_V2` flag
 
 **Files:**
+
 - Create: `src/utils/featureFlags.ts` (or extend if it exists)
 - Create: `src/components/permissions/ShareResourceModal/shareCopy.ts`
 - Create: `src/components/permissions/ShareResourceModal/shareSummary.ts`
@@ -619,7 +630,9 @@ const baseLookups = {
   groupById: { "g-1": "Analytics", "g-2": "Public datasets" },
 };
 
-function userShare(role: "viewer" | "editor" | "admin" = "viewer"): ResourceShareRow {
+function userShare(
+  role: "viewer" | "editor" | "admin" = "viewer",
+): ResourceShareRow {
   return {
     id: "s-user",
     workspaceId: "ws-1" as any,
@@ -657,8 +670,9 @@ describe("buildShareSummary", () => {
       workspaceShareRole: null,
       ...baseLookups,
     });
-    expect(spans.map((s) => s.kind === "text" ? s.text : `<${s.label}>`).join(""))
-      .toBe("This dataset is currently only accessible to its owner.");
+    expect(
+      spans.map((s) => (s.kind === "text" ? s.text : `<${s.label}>`)).join(""),
+    ).toBe("This dataset is currently only accessible to its owner.");
   });
 
   it("formats a user share only, restricted", () => {
@@ -669,8 +683,9 @@ describe("buildShareSummary", () => {
       ...baseLookups,
     });
     // Expect pills for "William Farr"
-    expect(spans.some((s) => s.kind === "pill" && s.label === "William Farr"))
-      .toBe(true);
+    expect(
+      spans.some((s) => s.kind === "pill" && s.label === "William Farr"),
+    ).toBe(true);
   });
 
   it("includes 'who also have Data Sources access' when group share has requiresAppAccess", () => {
@@ -697,7 +712,9 @@ describe("buildShareSummary", () => {
       workspaceShareRole: null,
       ...baseLookups,
     });
-    const flat = spans.map((s) => (s.kind === "text" ? s.text : s.label)).join(" ");
+    const flat = spans
+      .map((s) => (s.kind === "text" ? s.text : s.label))
+      .join(" ");
     expect(flat).not.toContain("who also have");
   });
 
@@ -708,7 +725,9 @@ describe("buildShareSummary", () => {
       workspaceShareRole: "viewer",
       ...baseLookups,
     });
-    const flat = spans.map((s) => (s.kind === "text" ? s.text : s.label)).join(" ");
+    const flat = spans
+      .map((s) => (s.kind === "text" ? s.text : s.label))
+      .join(" ");
     expect(flat).toContain("anyone in");
     expect(flat).toContain("Avandar Labs");
     expect(flat).toContain("Data Sources");
@@ -728,18 +747,21 @@ Expected: FAIL (`buildShareSummary` does not exist).
 - [ ] **Step 3.5: Implement `shareSummary.ts`**
 
 ```ts
-import {
-  appForResource,
-  appLabel,
-  resourceTypeLabel,
-} from "./shareCopy";
-import type { ResourceShareRow, ResourceType } from "@/clients/permissions/ResourceShareClient";
+import { appForResource, appLabel, resourceTypeLabel } from "./shareCopy";
+import type {
+  ResourceShareRow,
+  ResourceType,
+} from "@/clients/permissions/ResourceShareClient";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
 /** One run in the rendered summary line: literal text or a labeled pill. */
 export type SummarySpan =
   | { kind: "text"; text: string }
-  | { kind: "pill"; label: string; variant: "user" | "group" | "workspace" | "app" | "role" };
+  | {
+      kind: "pill";
+      label: string;
+      variant: "user" | "group" | "workspace" | "app" | "role";
+    };
 
 type BuildShareSummaryOptions = {
   shares: readonly ResourceShareRow[];
@@ -755,7 +777,9 @@ type BuildShareSummaryOptions = {
  * Pure builder: turns the modal's current state into a list of summary spans
  * to be rendered as a human-readable sentence with pills.
  */
-export function buildShareSummary(opts: BuildShareSummaryOptions): SummarySpan[] {
+export function buildShareSummary(
+  opts: BuildShareSummaryOptions,
+): SummarySpan[] {
   const resource = resourceTypeLabel(opts.resourceType);
   const app = appLabel(appForResource(opts.resourceType));
 
@@ -770,7 +794,10 @@ export function buildShareSummary(opts: BuildShareSummaryOptions): SummarySpan[]
 
   if (!hasAnyShares && opts.workspaceShareRole === null) {
     return [
-      { kind: "text", text: `This ${resource} is currently only accessible to its owner.` },
+      {
+        kind: "text",
+        text: `This ${resource} is currently only accessible to its owner.`,
+      },
     ];
   }
 
@@ -811,7 +838,11 @@ export function buildShareSummary(opts: BuildShareSummaryOptions): SummarySpan[]
       { kind: "text", text: " with " },
       { kind: "pill", label: app, variant: "app" },
       { kind: "text", text: " access as " },
-      { kind: "pill", label: capitalize(opts.workspaceShareRole), variant: "role" },
+      {
+        kind: "pill",
+        label: capitalize(opts.workspaceShareRole),
+        variant: "role",
+      },
     ];
     fragments.push(frag);
   }
@@ -848,7 +879,10 @@ If any cases fail, iterate on the joining logic until all five pass. Add more ca
 import { Badge, Text } from "@mantine/core";
 import type { SummarySpan } from "./shareSummary";
 
-const variantColor: Record<SummarySpan extends { kind: "pill" } ? SummarySpan["variant"] : never, string> = {
+const variantColor: Record<
+  SummarySpan extends { kind: "pill" } ? SummarySpan["variant"] : never,
+  string
+> = {
   user: "blue",
   group: "violet",
   workspace: "gray",
@@ -859,7 +893,11 @@ const variantColor: Record<SummarySpan extends { kind: "pill" } ? SummarySpan["v
 /**
  * Renders summary spans inline with Mantine badges. Pure presentation.
  */
-export function ShareSummaryLine({ spans }: { spans: readonly SummarySpan[] }): JSX.Element {
+export function ShareSummaryLine({
+  spans,
+}: {
+  spans: readonly SummarySpan[];
+}): JSX.Element {
   return (
     <Text size="sm" c="dimmed" style={{ lineHeight: 1.8 }}>
       {spans.map((span, i) => {
@@ -910,9 +948,17 @@ Run: `pnpm test -- ShareSummaryLine` → PASS expected after Step 3.7.
 - [ ] **Step 3.9: Implement `SharePrincipalRow.tsx`**
 
 ```tsx
-import { Badge, Checkbox, Group, Select, Stack, Text, Tooltip } from "@mantine/core";
-import { IconUser, IconTag, IconX } from "@tabler/icons-react";
-import { SHARE_COPY, appForResource, appLabel } from "./shareCopy";
+import {
+  Badge,
+  Checkbox,
+  Group,
+  Select,
+  Stack,
+  Text,
+  Tooltip,
+} from "@mantine/core";
+import { IconTag, IconUser, IconX } from "@tabler/icons-react";
+import { appForResource, appLabel, SHARE_COPY } from "./shareCopy";
 import type {
   ResourceShareRow,
   ResourceType,
@@ -950,17 +996,20 @@ export function SharePrincipalRow({
 
   return (
     <Group wrap="nowrap" align="center" gap="sm">
-      {isGroup ? <IconTag size={16} /> : <IconUser size={16} />}
+      {isGroup ?
+        <IconTag size={16} />
+      : <IconUser size={16} />}
       <Stack gap={0} flex={1}>
         <Text size="sm">{displayName}</Text>
       </Stack>
 
-      {isOwnerRow ? (
+      {isOwnerRow ?
         <Tooltip label={SHARE_COPY.ownerBadgeTooltip(resourceType)}>
-          <Badge variant="light" color="gray">Owner</Badge>
+          <Badge variant="light" color="gray">
+            Owner
+          </Badge>
         </Tooltip>
-      ) : (
-        <Tooltip label={SHARE_COPY.roleSelectTooltip}>
+      : <Tooltip label={SHARE_COPY.roleSelectTooltip}>
           <Select
             w={120}
             data={ROLE_OPTIONS}
@@ -971,10 +1020,14 @@ export function SharePrincipalRow({
             aria-label={`Role for ${displayName}`}
           />
         </Tooltip>
-      )}
+      }
 
-      {isGroup && onToggleRequiresAppAccess ? (
-        <Tooltip label={SHARE_COPY.limitToAppAccessTooltip(app)} multiline w={300}>
+      {isGroup && onToggleRequiresAppAccess ?
+        <Tooltip
+          label={SHARE_COPY.limitToAppAccessTooltip(app)}
+          multiline
+          w={300}
+        >
           <Checkbox
             checked={share.requiresAppAccess}
             onChange={(e) => onToggleRequiresAppAccess(e.currentTarget.checked)}
@@ -982,7 +1035,7 @@ export function SharePrincipalRow({
             size="sm"
           />
         </Tooltip>
-      ) : null}
+      : null}
 
       {!isOwnerRow && (
         <Tooltip label={SHARE_COPY.removeTooltip(displayName)}>
@@ -1058,7 +1111,9 @@ describe("SharePrincipalRow", () => {
         onRemove={() => {}}
       />,
     );
-    expect(screen.queryByRole("button", { name: /Remove access for John Snow/ })).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: /Remove access for John Snow/ }),
+    ).toBeNull();
     expect(screen.getByText("Owner")).toBeInTheDocument();
   });
 });
@@ -1090,7 +1145,12 @@ type Props = {
  * Top of the modal: one searchable combobox (users + groups) plus role
  * picker and Share button. Emits onAdd when the user commits.
  */
-export function ShareAddPrincipalRow({ members, groups, isAdding, onAdd }: Props): JSX.Element {
+export function ShareAddPrincipalRow({
+  members,
+  groups,
+  isAdding,
+  onAdd,
+}: Props): JSX.Element {
   const [target, setTarget] = useState<string | null>(null);
   const [role, setRole] = useState<RoleLevel>("viewer");
 
@@ -1099,12 +1159,18 @@ export function ShareAddPrincipalRow({ members, groups, isAdding, onAdd }: Props
     if (members.length > 0)
       data.push({
         group: "Members",
-        items: members.map((m) => ({ value: `user:${m.value}`, label: m.label })),
+        items: members.map((m) => ({
+          value: `user:${m.value}`,
+          label: m.label,
+        })),
       });
     if (groups.length > 0)
       data.push({
         group: "Tags",
-        items: groups.map((g) => ({ value: `user_group:${g.value}`, label: g.label })),
+        items: groups.map((g) => ({
+          value: `user_group:${g.value}`,
+          label: g.label,
+        })),
       });
     return data;
   }, [members, groups]);
@@ -1183,7 +1249,10 @@ import type {
 } from "@/clients/permissions/ResourceShareClient";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
-type DisplayShare = ResourceShareRow & { displayName: string; isOwnerRow?: boolean };
+type DisplayShare = ResourceShareRow & {
+  displayName: string;
+  isOwnerRow?: boolean;
+};
 
 type Props = {
   shares: readonly DisplayShare[];
@@ -1197,7 +1266,9 @@ type Props = {
 export function SharePrincipalList(props: Props): JSX.Element {
   return (
     <Stack gap="xs">
-      <Text fw={600} size="sm">People with access</Text>
+      <Text fw={600} size="sm">
+        People with access
+      </Text>
       {props.shares.map((share) => (
         <SharePrincipalRow
           key={share.id}
@@ -1206,7 +1277,9 @@ export function SharePrincipalList(props: Props): JSX.Element {
           resourceType={props.resourceType}
           isOwnerRow={share.isOwnerRow}
           onRoleChange={(role) => props.onRoleChange(share, role)}
-          onToggleRequiresAppAccess={(next) => props.onToggleRequiresAppAccess(share, next)}
+          onToggleRequiresAppAccess={(next) =>
+            props.onToggleRequiresAppAccess(share, next)
+          }
           onRemove={() => props.onRemove(share)}
         />
       ))}
@@ -1221,10 +1294,10 @@ export function SharePrincipalList(props: Props): JSX.Element {
 import { Group, Select, Stack, Text, Tooltip } from "@mantine/core";
 import { IconBuilding } from "@tabler/icons-react";
 import {
-  SHARE_COPY,
   appForResource,
   appLabel,
   resourceTypeLabel,
+  SHARE_COPY,
 } from "./shareCopy";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
@@ -1249,12 +1322,16 @@ export function ShareGeneralAccess(props: Props): JSX.Element {
 
   return (
     <Stack gap="xs">
-      <Text fw={600} size="sm">General access</Text>
+      <Text fw={600} size="sm">
+        General access
+      </Text>
       <Group wrap="nowrap" align="flex-end">
         <Tooltip
-          label={generalValue === "restricted"
-            ? SHARE_COPY.restrictedOptionTooltip(resource)
-            : SHARE_COPY.workspaceOptionTooltip(resource, app)}
+          label={
+            generalValue === "restricted" ?
+              SHARE_COPY.restrictedOptionTooltip(resource)
+            : SHARE_COPY.workspaceOptionTooltip(resource, app)
+          }
         >
           <Select
             flex={1}
@@ -1268,12 +1345,15 @@ export function ShareGeneralAccess(props: Props): JSX.Element {
               if (value === "restricted") {
                 props.onChange({ isRestricted: true, role: null });
               } else {
-                props.onChange({ isRestricted: false, role: props.workspaceShareRole ?? "viewer" });
+                props.onChange({
+                  isRestricted: false,
+                  role: props.workspaceShareRole ?? "viewer",
+                });
               }
             }}
           />
         </Tooltip>
-        {generalValue === "workspace" ? (
+        {generalValue === "workspace" ?
           <Select
             w={120}
             data={[
@@ -1282,11 +1362,15 @@ export function ShareGeneralAccess(props: Props): JSX.Element {
               { value: "admin", label: "Admin" },
             ]}
             value={props.workspaceShareRole ?? "viewer"}
-            onChange={(v) => v && props.onChange({ isRestricted: false, role: v as RoleLevel })}
+            onChange={(v) =>
+              v && props.onChange({ isRestricted: false, role: v as RoleLevel })
+            }
           />
-        ) : null}
+        : null}
       </Group>
-      <Text size="xs" c="dimmed">{SHARE_COPY.generalAccessHelper}</Text>
+      <Text size="xs" c="dimmed">
+        {SHARE_COPY.generalAccessHelper}
+      </Text>
     </Stack>
   );
 }
@@ -1330,7 +1414,10 @@ describe("ShareGeneralAccess", () => {
     // exposes the input as combobox role; use that to simulate.
     fireEvent.click(screen.getByRole("textbox"));
     fireEvent.click(screen.getByText(/Anyone in Data Sources/));
-    expect(onChange).toHaveBeenCalledWith({ isRestricted: false, role: "viewer" });
+    expect(onChange).toHaveBeenCalledWith({
+      isRestricted: false,
+      role: "viewer",
+    });
   });
 });
 ```
@@ -1345,17 +1432,18 @@ Replace the file. Keep the v1 implementation in a small inner function so the fl
 import { Button, Group, Stack, Text } from "@mantine/core";
 import { notifyError } from "@ui";
 import { useMemo } from "react";
-import { isShareModalV2Enabled } from "@/utils/featureFlags";
-import { ShareResourceModalV1 } from "./ShareResourceModalV1"; // extract the old body here
-import { ShareAddPrincipalRow } from "./ShareAddPrincipalRow";
-import { SharePrincipalList } from "./SharePrincipalList";
-import { ShareGeneralAccess } from "./ShareGeneralAccess";
-import { ShareSummaryLine } from "./ShareSummaryLine";
-import { buildShareSummary } from "./shareSummary";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { ResourceShareClient } from "@/clients/permissions/ResourceShareClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { isShareModalV2Enabled } from "@/utils/featureFlags";
+import { ShareAddPrincipalRow } from "./ShareAddPrincipalRow";
+import { ShareGeneralAccess } from "./ShareGeneralAccess";
+import { SharePrincipalList } from "./SharePrincipalList";
+import { ShareResourceModalV1 } from "./ShareResourceModalV1"; // extract the old body here
+
+import { buildShareSummary } from "./shareSummary";
+import { ShareSummaryLine } from "./ShareSummaryLine";
 import type {
   ResourceShareRow,
   ResourceType,
@@ -1399,13 +1487,17 @@ function ShareResourceModalV2(props: Props): JSX.Element {
   const [members] = WorkspaceClient.useGetUsersForWorkspace({ workspaceId });
   const [groups] = PermissionsClient.useGetUserGroups({ workspaceId });
 
-  const [upsertShare, isUpserting] = ResourceShareClient.useUpsertResourceShare({
-    queriesToInvalidate: invalidateKeys,
-    onError: (e: Error) => notifyError({ title: "Share failed", message: e.message }),
-  });
+  const [upsertShare, isUpserting] = ResourceShareClient.useUpsertResourceShare(
+    {
+      queriesToInvalidate: invalidateKeys,
+      onError: (e: Error) =>
+        notifyError({ title: "Share failed", message: e.message }),
+    },
+  );
   const [deleteShare] = ResourceShareClient.useDeleteResourceShare({
     queriesToInvalidate: invalidateKeys,
-    onError: (e: Error) => notifyError({ title: "Remove failed", message: e.message }),
+    onError: (e: Error) =>
+      notifyError({ title: "Remove failed", message: e.message }),
   });
   const [setRestricted] = ResourceShareClient.useSetResourceRestricted({
     queriesToInvalidate: invalidateKeys,
@@ -1433,15 +1525,19 @@ function ShareResourceModalV2(props: Props): JSX.Element {
     return <Text>Loading sharing settings…</Text>;
   }
 
-  const workspaceShare = state.shares.find((s) => s.principalType === "workspace");
-  const directShares = state.shares.filter((s) => s.principalType !== "workspace");
+  const workspaceShare = state.shares.find(
+    (s) => s.principalType === "workspace",
+  );
+  const directShares = state.shares.filter(
+    (s) => s.principalType !== "workspace",
+  );
 
   const displayShares = directShares.map((s) => ({
     ...s,
     displayName:
-      s.principalType === "user"
-        ? userById[s.principalId!] ?? "Unknown user"
-        : groupById[s.principalId!] ?? "Unknown group",
+      s.principalType === "user" ?
+        (userById[s.principalId!] ?? "Unknown user")
+      : (groupById[s.principalId!] ?? "Unknown group"),
   }));
 
   const spans = buildShareSummary({
@@ -1456,7 +1552,9 @@ function ShareResourceModalV2(props: Props): JSX.Element {
 
   return (
     <Stack gap="md">
-      <Text size="sm" c="dimmed">Share &ldquo;{props.resourceName}&rdquo;</Text>
+      <Text size="sm" c="dimmed">
+        Share &ldquo;{props.resourceName}&rdquo;
+      </Text>
 
       <ShareAddPrincipalRow
         members={(members ?? []).map((m) => ({
@@ -1538,7 +1636,9 @@ function ShareResourceModalV2(props: Props): JSX.Element {
       <ShareSummaryLine spans={spans} />
 
       <Group justify="flex-end" mt="md">
-        <Button variant="default" onClick={props.onClose}>Done</Button>
+        <Button variant="default" onClick={props.onClose}>
+          Done
+        </Button>
       </Group>
     </Stack>
   );
@@ -1584,6 +1684,7 @@ EOF
 ```
 
 **Test plan for Task 3:**
+
 1. Vitest suites for each new sub-component and the summary builder.
 2. Flag-off: existing `ShareResourceModal.test.tsx` still green.
 3. Manual smoke with `VITE_FEATURE_SHARE_MODAL_V2=true pnpm dev`: open the modal, exercise all controls, verify summary line updates live.
@@ -1593,6 +1694,7 @@ EOF
 ## Task 4 - Route middleware + `Shared with me` page
 
 **Files:**
+
 - Modify: `src/utils/RouteMiddleware.ts`
 - Create: `src/routes/_auth/$workspaceSlug/shared-with-me/route.tsx`
 - Create: `src/routes/_auth/$workspaceSlug/shared-with-me/index.tsx`
@@ -1731,11 +1833,16 @@ function createSharedWithMeClient(supabaseClient: AvaSupabaseDBClient) {
            * Lists every dataset and dashboard the auth user can access *only*
            * via shares (no app role on the parent app), in the given workspace.
            */
-          listSharedWithMe: async (options: { workspaceId: string }): Promise<SharedResource[]> => {
+          listSharedWithMe: async (options: {
+            workspaceId: string;
+          }): Promise<SharedResource[]> => {
             logger.appendName("listSharedWithMe").log("fetch", options);
-            const { data, error } = await dbClient.rpc("rpc__list_shared_with_me", {
-              p_workspace_id: options.workspaceId,
-            });
+            const { data, error } = await dbClient.rpc(
+              "rpc__list_shared_with_me",
+              {
+                p_workspace_id: options.workspaceId,
+              },
+            );
             if (error) throw error;
             return (data ?? []) as SharedResource[];
           },
@@ -1796,6 +1903,7 @@ $$;
 - [ ] **Step 4.4: pgTAP for the new RPC**
 
 Create `supabase/tests/database/permissions/rpc_list_shared_with_me.test.sql` covering:
+
 - User with no `data_sources` app role + a user share → row returned with `effective_role = 'viewer'`.
 - User with `data_sources: viewer` + a user share → row NOT returned (already visible via app).
 - User with no app roles at all → empty set.
@@ -1805,7 +1913,7 @@ Run `pnpm db:test -- rpc_list_shared_with_me` to verify failures, then add the s
 - [ ] **Step 4.5: Build `SharedWithMeView`**
 
 ```tsx
-import { Card, Group, Stack, Text, Title, Badge } from "@mantine/core";
+import { Badge, Card, Group, Stack, Text, Title } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
 import { SharedWithMeClient } from "@/clients/permissions/SharedWithMeClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -1843,13 +1951,27 @@ export function SharedWithMeView(): JSX.Element {
   );
 }
 
-function Section({ title, items, toLink }: { title: string; items: any[]; toLink: (r: any) => string }) {
+function Section({
+  title,
+  items,
+  toLink,
+}: {
+  title: string;
+  items: any[];
+  toLink: (r: any) => string;
+}) {
   if (items.length === 0) return null;
   return (
     <Stack gap="xs">
       <Title order={4}>{title}</Title>
       {items.map((r) => (
-        <Card key={r.resourceId} component={Link} to={toLink(r)} withBorder p="sm">
+        <Card
+          key={r.resourceId}
+          component={Link}
+          to={toLink(r)}
+          withBorder
+          p="sm"
+        >
           <Group justify="space-between">
             <Text>{r.name}</Text>
             <Badge variant="light">{r.effectiveRole}</Badge>
@@ -1872,12 +1994,15 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { propEq } from "@utils";
 import { AuthClient } from "@/clients/AuthClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
-import { SharedWithMeView } from "@/views/SharedWithMeView/SharedWithMeView";
 import { AppLinks } from "@/config/AppLinks";
+import { SharedWithMeView } from "@/views/SharedWithMeView/SharedWithMeView";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug/shared-with-me")({
   component: SharedWithMeView,
-  beforeLoad: async ({ context: { queryClient }, params: { workspaceSlug } }) => {
+  beforeLoad: async ({
+    context: { queryClient },
+    params: { workspaceSlug },
+  }) => {
     const workspaces = await WorkspaceClient.withCache(queryClient)
       .withFetchQuery()
       .getWorkspacesOfCurrentUser();
@@ -1895,7 +2020,11 @@ export const Route = createFileRoute("/_auth/$workspaceSlug/shared-with-me")({
 Find the sidebar component (likely `src/components/Sidebar` or under the layout for `_auth`). Add a link entry:
 
 ```tsx
-<NavLink to={`/${workspaceSlug}/shared-with-me`} label="Shared with me" leftSection={<IconShare3 size={16} />} />
+<NavLink
+  to={`/${workspaceSlug}/shared-with-me`}
+  label="Shared with me"
+  leftSection={<IconShare3 size={16} />}
+/>
 ```
 
 (Only render the link if the workspace membership exists; it's safe to show for all members since the page handles empty state.)
@@ -1913,7 +2042,10 @@ if (!hasAppAccess) {
   return (
     <Stack gap="md">
       <Alert color="blue" variant="light">
-        Shared with you. <Link to={`/${workspace.slug}/shared-with-me`}>See all shared items</Link>
+        Shared with you.{" "}
+        <Link to={`/${workspace.slug}/shared-with-me`}>
+          See all shared items
+        </Link>
       </Alert>
       {/* …existing content… */}
     </Stack>
@@ -1929,8 +2061,12 @@ Two tests:
 
 ```ts
 // SharedWithMeView.test.tsx
-it("renders the empty state when there are no shared resources", () => { /* ... */ });
-it("groups datasets and dashboards into sections", () => { /* ... */ });
+it("renders the empty state when there are no shared resources", () => {
+  /* ... */
+});
+it("groups datasets and dashboards into sections", () => {
+  /* ... */
+});
 ```
 
 ```ts
@@ -1939,7 +2075,9 @@ it("falls back to canAccessResource when the parent app permission is missing", 
   // Mock canAccessResource = true, parent permission false → middleware returns
   // (no redirect thrown).
 });
-it("redirects to access-denied when both parent and fallback miss", async () => { /* ... */ });
+it("redirects to access-denied when both parent and fallback miss", async () => {
+  /* ... */
+});
 ```
 
 Run: `pnpm test -- SharedWithMeView RouteMiddleware` → PASS.
@@ -1973,6 +2111,7 @@ EOF
 ```
 
 **Test plan for Task 4:**
+
 1. `pnpm test -- SharedWithMeView RouteMiddleware SharedWithMeClient` green.
 2. `pnpm db:test -- rpc_list_shared_with_me` green.
 3. Manual smoke: as a workspace member with no `data_sources` role but a direct share on one dataset, navigate to `/{slug}/shared-with-me`, click the dataset card, verify the dataset opens and the "Shared with you" banner renders.
@@ -1982,6 +2121,7 @@ EOF
 ## Task 5 - E2E sharing test suite
 
 **Files:**
+
 - Create: `tests/e2e/share-modal-v2.spec.ts`
 - Create: `tests/e2e/helpers/datasetSharingFlowV2.ts`
 - Modify: `tests/e2e/fixtures/e2eWithGlobalViewerMembership.fixture.ts` to add a `Analytics` user-group plus two viewers (one in the group, one not). Inspect the existing fixture first; add fields to the worker DB shape.
@@ -2024,19 +2164,25 @@ export async function setGeneralAccessV2(
   page: Page,
   mode: "Restricted" | "Workspace",
   role?: RoleLevel,
-): Promise<void> { /* select Restricted or "Anyone in Data Sources", set role if workspace */ }
+): Promise<void> {
+  /* select Restricted or "Anyone in Data Sources", set role if workspace */
+}
 
 export async function addShareV2(options: {
   page: Page;
   principalLabel: string;
   role?: RoleLevel;
-}): Promise<void> { /* type into Add, pick option, set role, click Share */ }
+}): Promise<void> {
+  /* type into Add, pick option, set role, click Share */
+}
 
 export async function toggleRequiresAppAccessV2(options: {
   page: Page;
   groupLabel: string;
   on: boolean;
-}): Promise<void> { /* find the group row, click the "Limit to app access" checkbox */ }
+}): Promise<void> {
+  /* find the group row, click the "Limit to app access" checkbox */
+}
 ```
 
 Implement the bodies referencing the accessible names defined in the v2 components (we set them deliberately for this).
@@ -2054,6 +2200,7 @@ Implement the bodies referencing the accessible names defined in the v2 componen
 7. Assert the on-screen summary line text via `page.getByText(/This dataset is shared with: /)`.
 
 Cover all 7 spec scenarios:
+
 - Drive-style direct user share.
 - Restricted.
 - Intersection on.
@@ -2089,6 +2236,7 @@ EOF
 ```
 
 **Test plan for Task 5:**
+
 1. `pnpm test:e2e -- share-modal-v2` - green locally with `VITE_FEATURE_SHARE_MODAL_V2=true` in the dev server env.
 2. CI updated to run with the env flag (one CI matrix slot or hard-code the env until Task 7 strips the flag).
 
@@ -2097,6 +2245,7 @@ EOF
 ## Task 6 - Backfill migration + drop `resource_user_group_tags`
 
 **Files:**
+
 - New migration: generated via `pnpm db:diff -- drop_resource_user_group_tags_table` after schema edit.
 - Modify: `supabase/schemas/15.resource_user_group_tags.sql` (delete the file).
 - Modify: `supabase/schemas/17.rls.resource_user_group_tags.sql` (delete the file).
@@ -2158,6 +2307,7 @@ Seed a representative pre-migration state (one tagged dataset, two members - one
 - [ ] **Step 6.3: Drop the table and policies in the declarative schema**
 
 Delete:
+
 - `supabase/schemas/15.resource_user_group_tags.sql`
 - `supabase/schemas/17.rls.resource_user_group_tags.sql`
 
@@ -2176,6 +2326,7 @@ In the same file, remove any references to `resource_user_group_tags` in `util__
 - [ ] **Step 6.6: Strip client code**
 
 In `src/clients/permissions/ResourceShareClient.ts`:
+
 - Remove `resourceTagIds` from `ResourceSharingState` and the parallel `Promise.all` branch in `getResourceSharingState`.
 - Delete `setResourceUserGroupTags`.
 - Remove the mutation from the `mutationFns` array.
@@ -2214,6 +2365,7 @@ EOF
 ```
 
 **Test plan for Task 6:**
+
 1. `pnpm db:reset && pnpm db:test` - all suites green; migration-diff test asserts only documented diffs.
 2. Staging: run the migration against a copy of prod data; eyeball the resulting share table for sanity.
 3. Production: run during a quiet window; keep a paired down-migration handy (or a feature flag rollback) for 24 hours.
@@ -2223,6 +2375,7 @@ EOF
 ## Task 7 - Cleanup: remove `SHARE_MODAL_V2` flag + V1 modal
 
 **Files:**
+
 - Delete: `src/components/permissions/ShareResourceModal/ShareResourceModalV1.tsx`
 - Modify: `src/components/permissions/ShareResourceModal/ShareResourceModal.tsx` (remove flag branch)
 - Modify: `src/utils/featureFlags.ts` (remove `isShareModalV2Enabled`)
@@ -2265,6 +2418,7 @@ EOF
 ```
 
 **Test plan for Task 7:**
+
 1. Full local suite green.
 2. Manual smoke as a smoke pass before merging.
 
@@ -2274,26 +2428,27 @@ EOF
 
 **Spec coverage map**
 
-| Spec section | Implemented in |
-| --- | --- |
-| §3.1 Dialog layout | Task 3 (ShareAddPrincipalRow, SharePrincipalList, ShareGeneralAccess, ShareSummaryLine) |
-| §3.3 Summary line | Task 3 (shareSummary.ts) |
-| §3.4 Copy, tooltips | Task 3 (shareCopy.ts) |
-| §3.5 Empty/edge states | Task 3 step 3.11 (owner badge), step 3.11 (Add helper) |
-| §3.6 Accessibility | Task 3 - aria-labels on Add combobox, role select, remove button |
-| §4 Data model | Task 1 (column + check) |
-| §4.2 RLS changes | Task 1 (effective_role, may_select helpers) |
-| §4.3 Migration | Task 6 |
-| §5 Shared with me | Task 4 |
-| §6 Component structure | Task 3 file layout |
-| §7.1 pgTAP coverage | Task 1 (truth table) + Task 6 (migration diff) + Task 4 (RPC) |
-| §7.2 Unit tests | Task 3 (component + summary) |
-| §7.3 Playwright e2e | Task 5 |
-| §8 Rollout | Tasks 3 (flag on), 6 (backfill), 7 (flag off) |
+| Spec section           | Implemented in                                                                          |
+| ---------------------- | --------------------------------------------------------------------------------------- |
+| §3.1 Dialog layout     | Task 3 (ShareAddPrincipalRow, SharePrincipalList, ShareGeneralAccess, ShareSummaryLine) |
+| §3.3 Summary line      | Task 3 (shareSummary.ts)                                                                |
+| §3.4 Copy, tooltips    | Task 3 (shareCopy.ts)                                                                   |
+| §3.5 Empty/edge states | Task 3 step 3.11 (owner badge), step 3.11 (Add helper)                                  |
+| §3.6 Accessibility     | Task 3 - aria-labels on Add combobox, role select, remove button                        |
+| §4 Data model          | Task 1 (column + check)                                                                 |
+| §4.2 RLS changes       | Task 1 (effective_role, may_select helpers)                                             |
+| §4.3 Migration         | Task 6                                                                                  |
+| §5 Shared with me      | Task 4                                                                                  |
+| §6 Component structure | Task 3 file layout                                                                      |
+| §7.1 pgTAP coverage    | Task 1 (truth table) + Task 6 (migration diff) + Task 4 (RPC)                           |
+| §7.2 Unit tests        | Task 3 (component + summary)                                                            |
+| §7.3 Playwright e2e    | Task 5                                                                                  |
+| §8 Rollout             | Tasks 3 (flag on), 6 (backfill), 7 (flag off)                                           |
 
 **Placeholder scan:** no TBDs, no "implement appropriate error handling," no "similar to Task N." Each code block contains the actual implementation skeleton.
 
 **Type consistency:**
+
 - `requiresAppAccess: boolean` (TS) maps to `requires_app_access boolean` (SQL) across Tasks 1, 2, 3, 6.
 - `ResourceShareRow` extended in Task 2 is the same type used in Task 3's `shareSummary.ts` and `SharePrincipalRow.tsx`.
 - `resourceFallback` typing in Task 4 uses `ResourceType` + `RoleLevel` already exported from existing modules.

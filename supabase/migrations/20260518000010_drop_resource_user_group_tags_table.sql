@@ -6,55 +6,113 @@ drop policy if exists "Resource admins can insert resource_user_group_tags" on "
 
 drop policy if exists "Resource admins can update resource_user_group_tags" on "public"."resource_user_group_tags";
 
-revoke delete on table "public"."resource_user_group_tags" from "anon";
+revoke delete on table "public"."resource_user_group_tags"
+from
+  "anon";
 
-revoke insert on table "public"."resource_user_group_tags" from "anon";
+revoke insert on table "public"."resource_user_group_tags"
+from
+  "anon";
 
-revoke references on table "public"."resource_user_group_tags" from "anon";
+revoke references on table "public"."resource_user_group_tags"
+from
+  "anon";
 
-revoke select on table "public"."resource_user_group_tags" from "anon";
+revoke
+select
+  on table "public"."resource_user_group_tags"
+from
+  "anon";
 
-revoke trigger on table "public"."resource_user_group_tags" from "anon";
+revoke trigger on table "public"."resource_user_group_tags"
+from
+  "anon";
 
-revoke truncate on table "public"."resource_user_group_tags" from "anon";
+revoke
+truncate on table "public"."resource_user_group_tags"
+from
+  "anon";
 
-revoke update on table "public"."resource_user_group_tags" from "anon";
+revoke
+update on table "public"."resource_user_group_tags"
+from
+  "anon";
 
-revoke delete on table "public"."resource_user_group_tags" from "authenticated";
+revoke delete on table "public"."resource_user_group_tags"
+from
+  "authenticated";
 
-revoke insert on table "public"."resource_user_group_tags" from "authenticated";
+revoke insert on table "public"."resource_user_group_tags"
+from
+  "authenticated";
 
-revoke references on table "public"."resource_user_group_tags" from "authenticated";
+revoke references on table "public"."resource_user_group_tags"
+from
+  "authenticated";
 
-revoke select on table "public"."resource_user_group_tags" from "authenticated";
+revoke
+select
+  on table "public"."resource_user_group_tags"
+from
+  "authenticated";
 
-revoke trigger on table "public"."resource_user_group_tags" from "authenticated";
+revoke trigger on table "public"."resource_user_group_tags"
+from
+  "authenticated";
 
-revoke truncate on table "public"."resource_user_group_tags" from "authenticated";
+revoke
+truncate on table "public"."resource_user_group_tags"
+from
+  "authenticated";
 
-revoke update on table "public"."resource_user_group_tags" from "authenticated";
+revoke
+update on table "public"."resource_user_group_tags"
+from
+  "authenticated";
 
-revoke delete on table "public"."resource_user_group_tags" from "service_role";
+revoke delete on table "public"."resource_user_group_tags"
+from
+  "service_role";
 
-revoke insert on table "public"."resource_user_group_tags" from "service_role";
+revoke insert on table "public"."resource_user_group_tags"
+from
+  "service_role";
 
-revoke references on table "public"."resource_user_group_tags" from "service_role";
+revoke references on table "public"."resource_user_group_tags"
+from
+  "service_role";
 
-revoke select on table "public"."resource_user_group_tags" from "service_role";
+revoke
+select
+  on table "public"."resource_user_group_tags"
+from
+  "service_role";
 
-revoke trigger on table "public"."resource_user_group_tags" from "service_role";
+revoke trigger on table "public"."resource_user_group_tags"
+from
+  "service_role";
 
-revoke truncate on table "public"."resource_user_group_tags" from "service_role";
+revoke
+truncate on table "public"."resource_user_group_tags"
+from
+  "service_role";
 
-revoke update on table "public"."resource_user_group_tags" from "service_role";
+revoke
+update on table "public"."resource_user_group_tags"
+from
+  "service_role";
 
-alter table "public"."resource_user_group_tags" drop constraint if exists "resource_user_group_tags__resource_tag";
+alter table "public"."resource_user_group_tags"
+drop constraint if exists "resource_user_group_tags__resource_tag";
 
-alter table "public"."resource_user_group_tags" drop constraint if exists "resource_user_group_tags_user_group_id_fkey";
+alter table "public"."resource_user_group_tags"
+drop constraint if exists "resource_user_group_tags_user_group_id_fkey";
 
-alter table "public"."resource_user_group_tags" drop constraint if exists "resource_user_group_tags_workspace_id_fkey";
+alter table "public"."resource_user_group_tags"
+drop constraint if exists "resource_user_group_tags_workspace_id_fkey";
 
-alter table "public"."resource_user_group_tags" drop constraint if exists "resource_user_group_tags_pkey";
+alter table "public"."resource_user_group_tags"
+drop constraint if exists "resource_user_group_tags_pkey";
 
 drop index if exists "public"."idx_resource_user_group_tags__resource";
 
@@ -64,14 +122,15 @@ drop index if exists "public"."resource_user_group_tags_pkey";
 
 drop table if exists "public"."resource_user_group_tags";
 
-set check_function_bodies = off;
+set
+  check_function_bodies = off;
 
-CREATE OR REPLACE FUNCTION public.util__resource_effective_role(p_resource_type public.resource_type, p_resource_id uuid)
- RETURNS public.role_level
- LANGUAGE plpgsql
- STABLE SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
+create or replace function public.util__resource_effective_role (
+  p_resource_type public.resource_type,
+  p_resource_id uuid
+) returns public.role_level language plpgsql stable security definer
+set
+  search_path to 'public' as $function$
 declare
   v_workspace_id uuid;
   v_owner_id uuid;
@@ -191,7 +250,4 @@ begin
 
   return public.util__rank_to_role_level (v_max_rank);
 end;
-$function$
-;
-
-
+$function$;

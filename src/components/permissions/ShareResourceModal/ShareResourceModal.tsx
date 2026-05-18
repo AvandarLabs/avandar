@@ -6,13 +6,13 @@ import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { ResourceShareClient } from "@/clients/permissions/ResourceShareClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { ShareAddPrincipalRow } from "./ShareAddPrincipalRow/ShareAddPrincipalRow";
-import { ShareGeneralAccess } from "./ShareGeneralAccess/ShareGeneralAccess";
-import { SharePrincipalList } from "./SharePrincipalList";
 import {
   buildShareSummary,
   hasPrincipalId,
 } from "./buildShareSummary/buildShareSummary";
+import { ShareAddPrincipalRow } from "./ShareAddPrincipalRow/ShareAddPrincipalRow";
+import { ShareGeneralAccess } from "./ShareGeneralAccess/ShareGeneralAccess";
+import { SharePrincipalList } from "./SharePrincipalList";
 import { ShareSummaryLine } from "./ShareSummaryLine/ShareSummaryLine";
 import type { DisplayShare } from "./SharePrincipalList";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
@@ -105,7 +105,7 @@ export function ShareResourceModal({
 
   const userById = useMemo((): Record<string, string> => {
     return makeObject(members ?? [], {
-      key: 'userId',
+      key: "userId",
       valueFn: (member): string => {
         return member.displayName || member.fullName;
       },

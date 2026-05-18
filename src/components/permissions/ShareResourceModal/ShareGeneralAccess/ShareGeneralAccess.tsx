@@ -2,10 +2,10 @@ import { Group, Select, Stack, Text } from "@mantine/core";
 import { IconBuilding } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
 import {
-  SHARE_COPY,
   appForResource,
   appLabel,
   resourceTypeLabel,
+  SHARE_COPY,
 } from "../shareCopy";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
@@ -14,10 +14,7 @@ type Props = {
   resourceType: ResourceType;
   isRestricted: boolean;
   workspaceShareRole: RoleLevel | null;
-  onChange: (next: {
-    isRestricted: boolean;
-    role: RoleLevel | null;
-  }) => void;
+  onChange: (next: { isRestricted: boolean; role: RoleLevel | null }) => void;
 };
 
 /**

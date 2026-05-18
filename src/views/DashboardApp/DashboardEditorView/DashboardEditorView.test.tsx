@@ -7,6 +7,12 @@ import {
 } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
+import type { UserId } from "$/models/User/User.types";
+import type { UserProfileId } from "$/models/User/UserProfile.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ReactElement } from "react";
 
 vi.mock("@/hooks/permissions/useUserAppRoles/useUserAppRoles", () => {
   return {
@@ -24,15 +30,8 @@ vi.mock("@/hooks/permissions/useUserAppRoles/useUserAppRoles", () => {
   };
 });
 
-const { DashboardEditorView } = await import(
-  "@/views/DashboardApp/DashboardEditorView/DashboardEditorView"
-);
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
-import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
-import type { UserId } from "$/models/User/User.types";
-import type { UserProfileId } from "$/models/User/UserProfile.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ReactElement } from "react";
+const { DashboardEditorView } =
+  await import("@/views/DashboardApp/DashboardEditorView/DashboardEditorView");
 
 const { publishDashboardMock } = vi.hoisted(() => {
   return { publishDashboardMock: vi.fn() };

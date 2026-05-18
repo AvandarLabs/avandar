@@ -13,12 +13,12 @@ The current `ShareResourceModal` (datasets and dashboards) layers four independe
 
 1. **Workspace access** - a default role for everyone in the workspace.
 2. **People and tags** - explicit per-principal shares.
-3. **Resource tags** - a *second* default-access mechanism that gates the workspace app-role grant by user-group intersection.
+3. **Resource tags** - a _second_ default-access mechanism that gates the workspace app-role grant by user-group intersection.
 4. **Restrict access** switch - a negation that disables the tag-based default grants.
 
 User feedback: this is hard to reason about. Two competing default mechanisms (workspace role + resource tags) and an inverted negation switch sit next to a list of explicit shares, and the relationship between them is not obvious.
 
-Google Drive solves the same problem with two sections - a list of principals plus a *General access* dropdown whose "Restricted" option is the negation. We want that mental model, adapted to Avandar's permission system.
+Google Drive solves the same problem with two sections - a list of principals plus a _General access_ dropdown whose "Restricted" option is the negation. We want that mental model, adapted to Avandar's permission system.
 
 ## 2. Goals & non-goals
 
@@ -27,7 +27,7 @@ Google Drive solves the same problem with two sections - a list of principals pl
 - One coherent share dialog that maps cleanly to Drive's "principals + General access" model.
 - Preserve the intersection capability currently provided by `resource_user_group_tags` (Analytics ∩ data_sources access) as an explicit, per-share toggle.
 - Make the effective semantics legible: copy, tooltips, and a plain-language summary sentence with pills.
-- Be honest about the workspace-app-role gate. "Anyone in workspace" is misleading; the correct phrasing is "Anyone in *Data Sources*" (or the resource's app).
+- Be honest about the workspace-app-role gate. "Anyone in workspace" is misleading; the correct phrasing is "Anyone in _Data Sources_" (or the resource's app).
 - Add a `Shared with me` surface so users with only share-derived access can actually navigate to those resources without needing the parent app's permission key.
 - Lock the truth table with pgTAP / RLS tests **and** Playwright e2e tests before cut-over. Mis-grants here are a security incident.
 
@@ -88,8 +88,8 @@ Google Drive solves the same problem with two sections - a list of principals pl
 
 **C. General access.** A single dropdown with two options:
 
-- *Restricted* - only the rows above grant access. The accompanying role picker is hidden.
-- *Anyone in {AppLabel}* - translates to a `workspace` principal share at the chosen role. The role picker is shown next to the dropdown.
+- _Restricted_ - only the rows above grant access. The accompanying role picker is hidden.
+- _Anyone in {AppLabel}_ - translates to a `workspace` principal share at the chosen role. The role picker is shown next to the dropdown.
 
 Where `{AppLabel}` is the resource's app: "Data Sources" for datasets, "Dashboards" for dashboards. This phrasing is the honest one - it tells users that workspace-wide access still requires the app role.
 
@@ -113,16 +113,19 @@ The summary is generated from the modal's current state. Each variable element i
 
 **Examples**
 
-- *Just an explicit user share, restricted:*
+- _Just an explicit user share, restricted:_
+
   > This dataset is shared with: **William Farr**.
 
-- *Group share + workspace general access:*
+- _Group share + workspace general access:_
+
   > This dataset is shared with: all members of **Analytics**, and anyone in **Avandar Labs** with **Data Sources** access as **Viewer**.
 
-- *Mixed, with intersection toggle on:*
+- _Mixed, with intersection toggle on:_
+
   > This dataset is shared with: **William Farr**, all members of **Analytics** who also have **Data Sources** access, and anyone in **Avandar Labs** with **Data Sources** access as **Viewer**.
 
-- *Restricted, no shares:*
+- _Restricted, no shares:_
   > This dataset is currently only accessible to its owner.
 
 ### 3.4 Copy, tooltips, microcopy
@@ -131,24 +134,24 @@ We are deliberately verbose. Every non-trivial control gets a tooltip; every sec
 
 **Tooltips and helper text (canonical strings)**
 
-| Element | Helper / tooltip |
-| --- | --- |
-| Add combobox placeholder | `"Search by name or tag"` |
-| Add combobox helper | `"Add a member or a tag to grant access. Use General access below to share more broadly."` |
-| Role select (per row) | Tooltip: `"What this person or group can do. Viewer = read only, Editor = edit content, Admin = full control including sharing."` |
-| `Limit to app access` checkbox | Tooltip: `"When on, members of this group only get access if they already have {AppLabel} access in the workspace. When off, every member of the group gets access here, even if they normally can't open {AppLabel}."` |
-| General access dropdown | Helper text (below): `"Controls the default for the rest of the workspace. People without app access still need a direct share above."` |
-| `Restricted` option tooltip | `"Only the people and groups listed above can access this {resourceType}."` |
-| `Anyone in {AppLabel}` option tooltip | `"Every workspace member who can open the {AppLabel} app gets this role on this {resourceType}, in addition to whatever's listed above."` |
-| Summary line | No tooltip; the sentence is the explanation. |
-| Remove (×) button | Tooltip: `"Remove access for {Name}."` |
-| Owner row "Owner" badge | Tooltip: `"The owner always has admin access. To change owner, use the {resourceType} settings."` |
+| Element                               | Helper / tooltip                                                                                                                                                                                                        |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Add combobox placeholder              | `"Search by name or tag"`                                                                                                                                                                                               |
+| Add combobox helper                   | `"Add a member or a tag to grant access. Use General access below to share more broadly."`                                                                                                                              |
+| Role select (per row)                 | Tooltip: `"What this person or group can do. Viewer = read only, Editor = edit content, Admin = full control including sharing."`                                                                                       |
+| `Limit to app access` checkbox        | Tooltip: `"When on, members of this group only get access if they already have {AppLabel} access in the workspace. When off, every member of the group gets access here, even if they normally can't open {AppLabel}."` |
+| General access dropdown               | Helper text (below): `"Controls the default for the rest of the workspace. People without app access still need a direct share above."`                                                                                 |
+| `Restricted` option tooltip           | `"Only the people and groups listed above can access this {resourceType}."`                                                                                                                                             |
+| `Anyone in {AppLabel}` option tooltip | `"Every workspace member who can open the {AppLabel} app gets this role on this {resourceType}, in addition to whatever's listed above."`                                                                               |
+| Summary line                          | No tooltip; the sentence is the explanation.                                                                                                                                                                            |
+| Remove (×) button                     | Tooltip: `"Remove access for {Name}."`                                                                                                                                                                                  |
+| Owner row "Owner" badge               | Tooltip: `"The owner always has admin access. To change owner, use the {resourceType} settings."`                                                                                                                       |
 
 **`Limit to app access` deserves a stronger callout.** A small "(?)" icon next to the checkbox label opens a `HoverCard` with a two-line explanation and an example, e.g.:
 
 > **Limit to app access**
-> Off (default): every member of *Analytics* gets this role, even if they can't normally open *Data Sources*.
-> On: only members of *Analytics* who already have *Data Sources* access get this role here. People in *Analytics* without app access stay locked out.
+> Off (default): every member of _Analytics_ gets this role, even if they can't normally open _Data Sources_.
+> On: only members of _Analytics_ who already have _Data Sources_ access get this role here. People in _Analytics_ without app access stay locked out.
 
 ### 3.5 Empty and edge states
 
@@ -174,7 +177,7 @@ We are deliberately verbose. Every non-trivial control gets a tooltip; every sec
 
 ```sql
 alter table public.resource_shares
-  add column requires_app_access boolean not null default false;
+add column requires_app_access boolean not null default false;
 ```
 
 Semantics:
@@ -185,12 +188,10 @@ Semantics:
 **Validity constraint:** `requires_app_access = true` is only meaningful for `principal_type = 'user_group'`. A check constraint enforces this:
 
 ```sql
-alter table public.resource_shares
-  add constraint resource_shares__requires_app_access_only_for_groups
-  check (
-    requires_app_access = false
-    or principal_type = 'user_group'
-  );
+alter table public.resource_shares add constraint resource_shares__requires_app_access_only_for_groups check (
+  requires_app_access = false
+  or principal_type = 'user_group'
+);
 ```
 
 ### 4.2 RLS / function changes
@@ -209,7 +210,7 @@ A backfill migration converts existing tagged resources into the new shape. For 
 
 - Insert a `resource_shares` row with `(principal_type='user_group', principal_id=<user_group_id>, role=<choose>, requires_app_access=true)`.
 
-**Role-translation caveat.** The current tag mechanism grants each user their *personal* app role (one user might effectively be `editor`, another `viewer`). The new mechanism grants a single share-level role per group. There is no lossless translation. The migration picks `editor` as the converted role because that's the cap most workspaces actually use today and it preserves edit capability for tagged Analyst-style groups; `requires_app_access=true` means viewers without `data_sources` access are still locked out as before. Document this explicitly in the migration script and surface it in release notes - workspaces relying on the per-user app-role variance will need to add finer-grained shares post-migration.
+**Role-translation caveat.** The current tag mechanism grants each user their _personal_ app role (one user might effectively be `editor`, another `viewer`). The new mechanism grants a single share-level role per group. There is no lossless translation. The migration picks `editor` as the converted role because that's the cap most workspaces actually use today and it preserves edit capability for tagged Analyst-style groups; `requires_app_access=true` means viewers without `data_sources` access are still locked out as before. Document this explicitly in the migration script and surface it in release notes - workspaces relying on the per-user app-role variance will need to add finer-grained shares post-migration.
 
 Then drop `resource_user_group_tags` and its RLS policies.
 
@@ -223,11 +224,11 @@ A new workspace-scoped page makes share-only access usable for members without t
 
 **Guard:** workspace membership only. No `permissionKey` requirement.
 
-**Content:** a list of resources where the auth user has an effective role > none via any path *other than* their app role on the parent app. Group by resource type (Datasets, Dashboards). Each item links to the resource's deep view (`/data-manager/{datasetId}` or `/dashboards/{dashboardId}`).
+**Content:** a list of resources where the auth user has an effective role > none via any path _other than_ their app role on the parent app. Group by resource type (Datasets, Dashboards). Each item links to the resource's deep view (`/data-manager/{datasetId}` or `/dashboards/{dashboardId}`).
 
 **Deep route guard relaxation:** `/_auth/$workspaceSlug/data-manager/$datasetId` and the dashboard equivalent need to permit users who have a share-derived role but lack `data_sources__can_list_sources` / `dashboards__can_view_dashboard`. The middleware grows a `resourceFallback: { type: ResourceType; idParam: string; minRole: RoleLevel }` option. When set, `RouteMiddleware.BeforeLoad.checkUserPermissions` first checks the configured `permissionKey`; on miss, it calls `util__auth_user_can_access_resource(type, params[idParam], minRole)` and lets the user through if it returns true. This keeps the parent app's permission key as the fast happy path while still admitting share-only users on a per-resource basis.
 
-**UI signal on the deep page:** when the user reaches a resource via the share path (no app role), show a small "Shared with you" banner with a link back to *Shared with me* - they shouldn't be left wondering why the rest of the app is empty.
+**UI signal on the deep page:** when the user reaches a resource via the share path (no app role), show a small "Shared with you" banner with a link back to _Shared with me_ - they shouldn't be left wondering why the rest of the app is empty.
 
 ## 6. Component / file structure
 
@@ -261,7 +262,7 @@ Cover the full truth table for `util__resource_effective_role` and the SELECT ha
 **Actor dimensions** (cartesian product where meaningful):
 
 - Workspace role: owner, Settings Admin, Global Admin matrix, Global Editor, Global Viewer, Custom (data_sources only), Custom (no data_sources), non-member.
-- User-group memberships: in *Analytics*, in *Public datasets*, in both, in neither.
+- User-group memberships: in _Analytics_, in _Public datasets_, in both, in neither.
 
 **Resource-state dimensions**:
 
@@ -295,11 +296,11 @@ Run `pgTAP` in CI on every PR that touches schema files under `supabase/schemas/
 Extend `tests/e2e/dataset-sharing.spec.ts` and `tests/e2e/share-resource-modal.spec.ts` with new flows:
 
 1. **Drive-style flow** - owner shares with a specific user via the unified Add combobox at editor; secondary user can open the dataset and edit.
-2. **Restricted flow** - owner sets *General access* to Restricted; secondary user with `data_sources` viewer can no longer see the dataset in the sidebar nor open it directly.
+2. **Restricted flow** - owner sets _General access_ to Restricted; secondary user with `data_sources` viewer can no longer see the dataset in the sidebar nor open it directly.
 3. **Intersection-on flow** - owner shares with a user-group at editor with `Limit to app access` on; a member of that group **with** `data_sources` access can open and edit; a member of the same group **without** `data_sources` access cannot.
-4. **Intersection-off flow** - same setup but `Limit to app access` off; the no-app-access member can open the resource (via the *Shared with me* surface) and edit.
+4. **Intersection-off flow** - same setup but `Limit to app access` off; the no-app-access member can open the resource (via the _Shared with me_ surface) and edit.
 5. **Summary sentence flow** - for each configuration above, assert the on-screen summary sentence contains the expected substrings and pills.
-6. **Shared with me flow** - a user with only a share-derived grant can navigate to *Shared with me*, click into the resource, and open it. The deep route grant works even though the app sidebar item is hidden.
+6. **Shared with me flow** - a user with only a share-derived grant can navigate to _Shared with me_, click into the resource, and open it. The deep route grant works even though the app sidebar item is hidden.
 7. **Owner row is read-only** - attempting to change the owner's role or remove them is blocked at the UI.
 
 Test data: extend the seeded workspace with at least one user-group (`Analytics`), a Global Viewer who is in the group, and a Global Viewer who is not. The existing `e2eWorkerDb` fixture is the right place to add this.
@@ -330,7 +331,7 @@ Before merging:
 
 ## 10. Out of scope (deferred)
 
-- A new permission tier that *replaces* `data_sources` app role at the resource level. The `Shared with me` page plus existing share semantics covers the same outcome without expanding the data model.
+- A new permission tier that _replaces_ `data_sources` app role at the resource level. The `Shared with me` page plus existing share semantics covers the same outcome without expanding the data model.
 - Cross-workspace shares.
 - Per-column or per-row ACLs.
 - Public link shares (`is_public`) - separate flag, separate UI.

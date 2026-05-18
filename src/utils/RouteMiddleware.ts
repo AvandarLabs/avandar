@@ -6,8 +6,8 @@ import { AuthClient } from "@/clients/AuthClient";
 import { UserClient } from "@/clients/UserClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppLinks } from "@/config/AppLinks";
-import type { QueryClient } from "@tanstack/react-query";
 import type { ResourceType } from "@/clients/UserClient";
+import type { QueryClient } from "@tanstack/react-query";
 import type {
   PermissionKey,
   RoleLevel,
