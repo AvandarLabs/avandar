@@ -10,7 +10,9 @@ export function Composer(): JSX.Element {
 
   return (
     <div className={css.composerContainer}>
-      <ComposerPrimitive.Root className={css.composer}>
+      <ComposerPrimitive.Root
+        className={`${css.composer}${disabled ? ` ${css.composerDisabled}` : ""}`}
+      >
         <ComposerPrimitive.Input
           className={css.composerInput}
           placeholder={

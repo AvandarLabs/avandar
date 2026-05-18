@@ -90,6 +90,10 @@
   border-color: var(--ava-border-focus);
 }
 
+.composerDisabled {
+  background: transparent;
+}
+
 .composerInput {
   background: transparent;
   border: 0;
@@ -104,6 +108,15 @@
 }
 
 .composerInput::placeholder {
+  color: var(--mantine-color-neutral-5);
+}
+
+.composerInput:disabled {
+  color: var(--mantine-color-neutral-5);
+  cursor: not-allowed;
+}
+
+.composerInput:disabled::placeholder {
   color: var(--mantine-color-neutral-5);
 }
 

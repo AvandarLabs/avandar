@@ -5,6 +5,7 @@ import { Tooltip } from "@ui";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatThread } from "@/components/ChatPanel/ChatThread/ChatThread";
 import { useAvandarChatRuntime } from "@/components/ChatPanel/useAvandarChatRuntime";
+import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import css from "./ChatPanel.module.css";
 
 /**
@@ -17,10 +18,18 @@ import css from "./ChatPanel.module.css";
 export function ChatPanel(): JSX.Element {
   const dispatch = ChatPanelStateManager.useDispatch();
   const runtime = useAvandarChatRuntime();
+  const context = useChatPageContext();
+  const disabled = context.app !== "data-explorer";
 
   return (
     <Box h="100%" py="xs" pr="xs">
-      <Stack h="100%" bg="white" bdrs="md" className={css.shell} gap={0}>
+      <Stack
+        h="100%"
+        bg={disabled ? undefined : "white"}
+        bdrs="md"
+        className={`${css.shell}${disabled ? ` ${css.shellDisabled}` : ""}`}
+        gap={0}
+      >
         <Group px="md" py="sm" justify="space-between" className={css.header}>
           <Group gap="xs">
             <IconSparkles size={16} color="var(--mantine-color-primary-6)" />
