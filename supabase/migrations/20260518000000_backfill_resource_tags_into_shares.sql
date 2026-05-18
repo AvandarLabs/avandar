@@ -54,7 +54,7 @@ do nothing;
 
 -- For existing user_group shares whose (resource, group) pair matches a tag
 -- row but where requires_app_access is still false, flip the flag on. We do
--- NOT downgrade the existing role — the share retains whatever role was set
+-- NOT downgrade the existing role: the share retains whatever role was set
 -- explicitly. This preserves Drive-style union semantics while restoring the
 -- "tag intersection" capability via the new flag.
 update public.resource_shares rs

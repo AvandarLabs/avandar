@@ -3,13 +3,17 @@ import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 
 vi.mock("$/env/getSupabaseApiUrl.ts", () => {
   return {
-    getSupabaseApiUrl: () => "http://test.local",
+    getSupabaseApiUrl: () => {
+      return "http://test.local";
+    },
   };
 });
 
 vi.mock("$/env/getSupabaseApiKey.ts", () => {
   return {
-    getSupabaseApiKey: () => "test-anon-key",
+    getSupabaseApiKey: () => {
+      return "test-anon-key";
+    },
   };
 });
 

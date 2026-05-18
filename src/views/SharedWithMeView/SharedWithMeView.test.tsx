@@ -1,10 +1,11 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { AppShellStateManager } from "@/components/AppShell/AppShellStateManager";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
-import type { ReactElement } from "react";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
+import type { ReactElement } from "react";
 
 const { useListSharedWithMeMock, useCurrentWorkspaceMock } = vi.hoisted(() => {
   return {
@@ -56,7 +57,9 @@ function renderWithProviders(ui: ReactElement): void {
   });
   render(
     <QueryClientProvider client={queryClient}>
-      <AvandarUiProvider>{ui}</AvandarUiProvider>
+      <AvandarUiProvider>
+        <AppShellStateManager.Provider>{ui}</AppShellStateManager.Provider>
+      </AvandarUiProvider>
     </QueryClientProvider>,
   );
 }

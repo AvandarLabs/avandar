@@ -351,7 +351,7 @@ select plan(6);
 
 -- Pre-migration: alice (data_sources viewer) gets the app-role candidate on
 -- this unrestricted dataset. With the legacy tag-intersection branch gone,
--- alice already had viewer via the unconditional app-role path — the tag
+-- alice already had viewer via the unconditional app-role path; the tag
 -- row alone doesn't change anything because the function no longer reads
 -- the legacy table.
 select is(

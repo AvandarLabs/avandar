@@ -99,11 +99,11 @@ describe("ShareResourceModal", () => {
 
     // Section headings.
     expect(screen.getByText("General access")).toBeInTheDocument();
-    // The summary sentence is rendered. With no shares + no workspace
-    // share, the builder returns the owner-only fallback sentence.
+    // The summary sentence is rendered. With no shares and the resource
+    // not restricted, the builder returns the general-access sentence.
     expect(
       screen.getByText(
-        /This dataset is currently only accessible to its owner./,
+        /This dataset is accessible to anyone with .* permission\./,
       ),
     ).toBeInTheDocument();
     // The Add combobox is present and reachable by aria-label.

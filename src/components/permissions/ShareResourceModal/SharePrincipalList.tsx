@@ -1,6 +1,6 @@
 import { Stack, Text } from "@mantine/core";
 import { SHARE_COPY } from "./shareCopy";
-import { SharePrincipalRow } from "./SharePrincipalRow";
+import { SharePrincipalRow } from "./SharePrincipalRow/SharePrincipalRow";
 import type {
   ResourceShareRow,
   ResourceType,

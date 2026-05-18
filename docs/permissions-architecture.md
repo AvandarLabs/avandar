@@ -31,48 +31,48 @@ Google Drive-style sharing layered on top of workspace membership.
 
 ## 2. Vocabulary
 
-**App (`app_type`)** — A product surface within a workspace whose access is
+**App (`app_type`)** - A product surface within a workspace whose access is
 granted independently. v1 values: `data_sources`, `data_explorer`,
 `dashboards`, `settings`. Example: a user can be `editor` in `dashboards` and
 `viewer` in `data_sources`.
 
-**Role level (`role_level`)** — One of `viewer` < `editor` < `admin`. Ordered
+**Role level (`role_level`)** - One of `viewer` < `editor` < `admin`. Ordered
 low→high in Postgres so enum comparison matches intent. Example: `editor` can
 edit content that `viewer` can only read, per permission catalog rules.
 
-**Permission key** — A derived string such as `data_sources__can_edit_dataset`;
+**Permission key** - A derived string such as `data_sources__can_edit_dataset`;
 the catalog maps `(app, role_level)` → keys. Admins do not toggle individual
 keys; SQL enforces role levels, TypeScript gates UI via the catalog.
 
-**Role group** — A named bundle of per-app role levels (`role_groups` +
+**Role group** - A named bundle of per-app role levels (`role_groups` +
 `role_group_app_roles`). Built-ins include Global Admin / Editor / Viewer;
 workspace admins may create custom groups. Example: “Analyst” =
 `data_explorer: editor`, `dashboards: viewer`, others unset or defaulted per
 product rules.
 
-**User group** — A workspace-scoped label (`user_groups`) with memberships
+**User group** - A workspace-scoped label (`user_groups`) with memberships
 (`user_group_memberships`). User groups are used as **principals** on
 `resource_shares` (see Share below). Example: a “Health” group with the Health
 team’s users, granted `editor` on a Health dataset via a share row.
 
-**Resource** — A row protected by RLS, typed as `resource_type` (`dashboard` |
+**Resource** - A row protected by RLS, typed as `resource_type` (`dashboard` |
 `dataset` in v1). Carries optional share rows; may set `is_restricted`.
 
-**Share** — A row in `resource_shares` granting a **principal** (single user,
+**Share** - A row in `resource_shares` granting a **principal** (single user,
 user group, or entire workspace) a **role level** on one resource. Example:
 share dashboard D to user U at `viewer`. User-group shares may set
 `requires_app_access = true` to apply the share only to members who already
 have **any** role on the resource’s parent app.
 
-**Restriction (`is_restricted`)** — When `true` on a dashboard or dataset,
+**Restriction (`is_restricted`)** - When `true` on a dashboard or dataset,
 the workspace-wide default (applying the user’s normal app role to every
 resource of that app) does **not** grant access; explicit shares (and owner /
 Settings Admin paths) still do.
 
-**Workspace owner** — `workspaces.owner_id`; always effective `admin`
+**Workspace owner** - `workspaces.owner_id`; always effective `admin`
 everywhere in that workspace; cannot be revoked by shares or role edits.
 
-**Settings Admin (Global Admin)** — A user whose effective `settings` app role
+**Settings Admin (Global Admin)** - A user whose effective `settings` app role
 (from their membership’s `role_group_app_roles` row for `settings`) is
 `admin`; treated as `admin` across apps for enforcement shortcuts in the
 resolution algorithm (see §4).
@@ -81,7 +81,7 @@ resolution algorithm (see §4).
 
 ## 3. The “CSS specificity” mental model
 
-Think of candidates contributing an effective role like CSS cascade layers—**all
+Think of candidates contributing an effective role like CSS cascade layers: **all
 qualified candidates are combined by `max(rank)`**, not “first match wins,”
 except where a path **short-circuits** (owner, Settings Admin).
 
@@ -227,7 +227,7 @@ const canEdit = useHasPermission("data_sources__can_edit_dataset");
   Billing. Non-settings-admins see a 403-style state on this area.
 - **Users tab:** Member table with avatar, name, role-group chip (or “Custom”),
   user-group chips; row actions (edit drawer, remove).
-- **User permissions drawer / invite:** **M × 3** `Radio.Card` grid — rows =
+- **User permissions drawer / invite:** **M × 3** `Radio.Card` grid - rows =
   apps, columns = Admin / Editor / Viewer (+ **None**). Top segmented control:
   Global Admin / Editor / Viewer / Custom syncs with rows; divergent rows force
   **Custom**. User groups via `MultiSelect`.
@@ -250,7 +250,7 @@ const canEdit = useHasPermission("data_sources__can_edit_dataset");
   built-in **Global Admin** (four `role_group_app_roles` rows, each `admin`).
 - Existing `user_roles.role = 'member'` → set membership `role_group_id` to
   built-in **Global Viewer** (three `viewer` rows for `data_sources`,
-  `data_explorer`, `dashboards`; **no** `settings` row — non-settings member).
+  `data_explorer`, `dashboards`; **no** `settings` row - non-settings member).
 
 **Built-in role groups**
 
@@ -272,7 +272,7 @@ const canEdit = useHasPermission("data_sources__can_edit_dataset");
 **Reversibility**
 
 - Schema migrations are forward-applied; rolling back production may require
-  paired down migrations — prefer feature flags / phased deploy rather than
+  paired down migrations - prefer feature flags / phased deploy rather than
   silent data loss. Backfill uses idempotent upserts (`on conflict do nothing`
   where applicable) so re-runs are safe.
 
@@ -318,7 +318,7 @@ const canEdit = useHasPermission("data_sources__can_edit_dataset");
 - No cross-workspace resource sharing.
 - **Public** dashboards (`is_public`) stay a separate flag in v1; not merged
   into `resource_shares` until a follow-up.
-- No arbitrary SQL predicates inside shares — only typed principals and
+- No arbitrary SQL predicates inside shares - only typed principals and
   `role_level`.
 - Role groups are presets, not runtime-evaluated formulas.
 

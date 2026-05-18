@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { buildShareSummary } from "./shareSummary";
-import type { SummarySpan } from "./shareSummary";
+import { buildShareSummary } from "./buildShareSummary";
+import type { SummarySpan } from "./buildShareSummary";
 import type { ResourceShareRow } from "@/clients/permissions/ResourceShareClient";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 
@@ -18,10 +18,10 @@ const baseLookups = {
 };
 
 /** Flattens spans into a single plain string for easy substring asserts. */
-function flat(spans: readonly SummarySpan[]): string {
+function flat(spans: SummarySpan[]): string {
   return spans
-    .map((s) => {
-      return s.kind === "text" ? s.text : s.label;
+    .map((span) => {
+      return span.kind === "text" ? span.text : span.label;
     })
     .join("")
     .replace(/\s+/g, " ")
@@ -76,6 +76,18 @@ describe("buildShareSummary", () => {
     );
   });
 
+  it("describes general app access when unrestricted with no direct shares", () => {
+    const spans = buildShareSummary({
+      shares: [],
+      isRestricted: false,
+      workspaceShareRole: null,
+      ...baseLookups,
+    });
+    expect(flat(spans)).toBe(
+      "This dataset is accessible to anyone with Data Sources Viewer permission.",
+    );
+  });
+
   it("formats a single user share (restricted)", () => {
     const spans = buildShareSummary({
       shares: [userShare("s-1", "u-1", "editor")],
@@ -84,8 +96,8 @@ describe("buildShareSummary", () => {
       ...baseLookups,
     });
     expect(
-      spans.some((s) => {
-        return s.kind === "pill" && s.label === "William Farr";
+      spans.some((span) => {
+        return span.kind === "pill" && span.label === "William Farr";
       }),
     ).toBe(true);
     expect(flat(spans)).toBe("This dataset is shared with: William Farr.");
@@ -118,7 +130,7 @@ describe("buildShareSummary", () => {
     expect(text).toBe("This dataset is shared with: all members of Analytics.");
   });
 
-  it("appends the workspace clause when general access is not restricted", () => {
+  it("appends the general access clause when not restricted", () => {
     const spans = buildShareSummary({
       shares: [userShare("s-1", "u-1", "editor")],
       isRestricted: false,
@@ -126,11 +138,11 @@ describe("buildShareSummary", () => {
       ...baseLookups,
     });
     const text = flat(spans);
-    expect(text).toContain("anyone in");
-    expect(text).toContain("Avandar Labs");
+    expect(text).toContain("anyone with");
     expect(text).toContain("Data Sources");
     expect(text).toContain("Viewer");
     expect(text).toContain(", and");
+    expect(text).not.toContain("Avandar Labs");
   });
 
   it("joins multiple user + group shares with comma-and (restricted)", () => {
@@ -184,7 +196,7 @@ describe("buildShareSummary", () => {
     });
     const text = flat(spans);
     expect(text).toContain(
-      "all members of Analytics, all members of Public datasets, and anyone in Avandar Labs",
+      "all members of Analytics, all members of Public datasets, and anyone with Data Sources Editor permission",
     );
   });
 });

@@ -1,6 +1,6 @@
 import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { ShareAddPrincipalRow } from "@/components/permissions/ShareResourceModal/ShareAddPrincipalRow";
+import { ShareAddPrincipalRow } from "@/components/permissions/ShareResourceModal/ShareAddPrincipalRow/ShareAddPrincipalRow";
 import { render } from "@/utils/testing-utils";
 
 describe("ShareAddPrincipalRow", () => {

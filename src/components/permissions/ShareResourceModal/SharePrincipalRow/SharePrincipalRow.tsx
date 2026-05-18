@@ -1,7 +1,7 @@
 import { ActionIcon, Badge, Checkbox, Group, Select, Text } from "@mantine/core";
 import { IconTag, IconUser, IconX } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
-import { SHARE_COPY, appForResource, appLabel } from "./shareCopy";
+import { SHARE_COPY, appForResource, appLabel } from "../shareCopy";
 import type {
   ResourceShareRow,
   ResourceType,
@@ -47,7 +47,7 @@ export function SharePrincipalRow({
       {isGroup ?
         <IconTag size={16} aria-hidden />
       : <IconUser size={16} aria-hidden />}
-      <Text size="sm" style={{ flex: 1 }}>
+      <Text size="sm" flex={1}>
         {displayName}
       </Text>
 

@@ -112,6 +112,9 @@ export const NavbarLinks = {
     return {
       link: AppLinks.sharedWithMe(workspaceSlug),
       icon: <IconShare3 size={DEFAULT_ICON_SIZE} stroke={1.5} />,
+      isEnabled: () => {
+        return isFlagEnabled(FeatureFlag.EnableSharedWithMe);
+      },
     };
   },
   workspaceSettings: (workspaceSlug: string) => {

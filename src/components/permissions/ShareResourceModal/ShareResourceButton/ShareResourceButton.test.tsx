@@ -1,6 +1,6 @@
 import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton";
+import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
 import { render } from "@/utils/testing-utils";
 
 vi.mock("@/hooks/permissions/useResourceRole/useResourceRole", () => {

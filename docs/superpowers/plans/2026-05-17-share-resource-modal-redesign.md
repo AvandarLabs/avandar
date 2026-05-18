@@ -1,4 +1,4 @@
-# Share Resource Modal Redesign — Implementation Plan
+# Share Resource Modal Redesign - Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -73,7 +73,7 @@
 
 ---
 
-## Task 1 — DB foundation: `requires_app_access` column + RLS rewrite
+## Task 1 - DB foundation: `requires_app_access` column + RLS rewrite
 
 **Files:**
 - Modify: `supabase/schemas/15.resource_shares.sql`
@@ -141,7 +141,7 @@ select * from finish();
 rollback;
 ```
 
-The test calls `public.util__test_seed_intersection_fixture()` — a helper added next step.
+The test calls `public.util__test_seed_intersection_fixture()` - a helper added next step.
 
 - [ ] **Step 1.2: Run the test, confirm it fails**
 
@@ -216,7 +216,7 @@ Append a new section to `supabase/tests/database/permissions/util_resource_effec
 1. user-group share `editor` with `requires_app_access=false` + member with no app role → returns `editor`.
 2. user-group share `editor` with `requires_app_access=true` + member with no app role → returns `null` (no grant from this share).
 3. user-group share `editor` with `requires_app_access=true` + member with `data_sources: viewer` → returns `editor` (share role, not bumped by app role).
-4. user-group share `editor` with `requires_app_access=true` + member with `data_sources: admin` → returns `editor` (capped at share role; app role does NOT override the cap on this share path, but the unrestricted app-role path may still bump it via `max` — see case 5).
+4. user-group share `editor` with `requires_app_access=true` + member with `data_sources: admin` → returns `editor` (capped at share role; app role does NOT override the cap on this share path, but the unrestricted app-role path may still bump it via `max` - see case 5).
 5. Same as case 4 BUT resource is unrestricted with no resource tags → returns `admin` (the unrestricted app-role candidate participates in `max`).
 6. user-group share `editor` with `requires_app_access=true` + member not in the group → returns `null` from this share path.
 
@@ -309,7 +309,7 @@ In the same file, update `util__auth_user_may_select_dataset` and `util__auth_us
         )
 ```
 
-(Use the appropriate `app_type` per function; the dataset helper uses `data_sources`, the dashboard helper uses `dashboards`. Don't templatize across the two — leave them as separate explicit literals to keep RLS audit grep-friendly.)
+(Use the appropriate `app_type` per function; the dataset helper uses `data_sources`, the dashboard helper uses `dashboards`. Don't templatize across the two - leave them as separate explicit literals to keep RLS audit grep-friendly.)
 
 - [ ] **Step 1.10: Regenerate migration and run all tests**
 
@@ -338,13 +338,13 @@ EOF
 ```
 
 **Test plan for Task 1:**
-1. `pnpm db:reset && pnpm db:test` — full pgTAP suite green.
+1. `pnpm db:reset && pnpm db:test` - full pgTAP suite green.
 2. Manual sanity in `psql`: insert a user-group share with `requires_app_access=true`, change `auth.uid()` to a tagged user with no `data_sources` role, confirm `util__resource_effective_role` returns `null`.
 3. Open PR. CI must run pgTAP.
 
 ---
 
-## Task 2 — Service layer: extend `ResourceShareClient`
+## Task 2 - Service layer: extend `ResourceShareClient`
 
 **Files:**
 - Modify: `src/clients/permissions/ResourceShareClient.ts`
@@ -470,7 +470,7 @@ describe("ResourceShareClient.upsertResourceShare", () => {
 
 - [ ] **Step 2.4: Update `ShareResourceModal.test.tsx` mock**
 
-In `src/components/permissions/ShareResourceModal/ShareResourceModal.test.tsx`, no behavior changes are required — but if the test asserts the shape of `shares`, ensure the mock row shape includes `requiresAppAccess: false`.
+In `src/components/permissions/ShareResourceModal/ShareResourceModal.test.tsx`, no behavior changes are required - but if the test asserts the shape of `shares`, ensure the mock row shape includes `requiresAppAccess: false`.
 
 - [ ] **Step 2.5: Run tests**
 
@@ -502,11 +502,11 @@ EOF
 **Test plan for Task 2:**
 1. `pnpm test -- ResourceShareClient` green.
 2. `pnpm test -- ShareResourceModal` green (still uses v1 modal).
-3. `pnpm typecheck` green — verify the new field is accepted across all call sites.
+3. `pnpm typecheck` green - verify the new field is accepted across all call sites.
 
 ---
 
-## Task 3 — UI: New share modal under `SHARE_MODAL_V2` flag
+## Task 3 - UI: New share modal under `SHARE_MODAL_V2` flag
 
 **Files:**
 - Create: `src/utils/featureFlags.ts` (or extend if it exists)
@@ -1547,7 +1547,7 @@ function ShareResourceModalV2(props: Props): JSX.Element {
 
 - [ ] **Step 3.17: Extract v1 implementation into `ShareResourceModalV1.tsx`**
 
-Copy the existing body of `ShareResourceModal.tsx` (before this Task's changes) into a new file `ShareResourceModalV1.tsx` exporting `ShareResourceModalV1` with the same `Props` shape. Touch nothing in its body — it must remain identical so flag-off behavior is unchanged.
+Copy the existing body of `ShareResourceModal.tsx` (before this Task's changes) into a new file `ShareResourceModalV1.tsx` exporting `ShareResourceModalV1` with the same `Props` shape. Touch nothing in its body - it must remain identical so flag-off behavior is unchanged.
 
 - [ ] **Step 3.18: Update `ShareResourceModal.test.tsx` to cover both branches**
 
@@ -1590,7 +1590,7 @@ EOF
 
 ---
 
-## Task 4 — Route middleware + `Shared with me` page
+## Task 4 - Route middleware + `Shared with me` page
 
 **Files:**
 - Modify: `src/utils/RouteMiddleware.ts`
@@ -1604,7 +1604,7 @@ EOF
 - Modify: `src/routes/_auth/$workspaceSlug/dashboards/route.tsx`
 - Modify: `src/routes/_auth/$workspaceSlug/data-manager/$datasetId.tsx` (banner)
 - Modify: `src/routes/_auth/$workspaceSlug/dashboards/edit/$dashboardId.tsx` (banner)
-- Sidebar component (e.g. `src/components/Sidebar/Sidebar.tsx`) — add `Shared with me` link gated by membership.
+- Sidebar component (e.g. `src/components/Sidebar/Sidebar.tsx`) - add `Shared with me` link gated by membership.
 
 - [ ] **Step 4.1: Extend the middleware with `resourceFallback`**
 
@@ -1677,7 +1677,7 @@ export const RouteMiddleware = {
 };
 ```
 
-(Add `canAccessResource` to `UserClient` — it wraps the existing `util__auth_user_can_access_resource` RPC. Mirror the read-only client pattern already used.)
+(Add `canAccessResource` to `UserClient` - it wraps the existing `util__auth_user_can_access_resource` RPC. Mirror the read-only client pattern already used.)
 
 - [ ] **Step 4.2: Apply fallback to data-manager and dashboards parent routes**
 
@@ -1791,7 +1791,7 @@ end;
 $$;
 ```
 
-(Engineer note: the filter is "no app role on the parent app." This is intentional — if you already have app role you'll find the resource in the main app's listing.)
+(Engineer note: the filter is "no app role on the parent app." This is intentional - if you already have app role you'll find the resource in the main app's listing.)
 
 - [ ] **Step 4.4: pgTAP for the new RPC**
 
@@ -1979,7 +1979,7 @@ EOF
 
 ---
 
-## Task 5 — E2E sharing test suite
+## Task 5 - E2E sharing test suite
 
 **Files:**
 - Create: `tests/e2e/share-modal-v2.spec.ts`
@@ -2043,7 +2043,7 @@ Implement the bodies referencing the accessible names defined in the v2 componen
 
 - [ ] **Step 5.3: Write the spec**
 
-`tests/e2e/share-modal-v2.spec.ts` — translate the seven scenarios from spec §7.3 into Playwright tests. Each test should:
+`tests/e2e/share-modal-v2.spec.ts` - translate the seven scenarios from spec §7.3 into Playwright tests. Each test should:
 
 1. Sign in as owner.
 2. Upload California CSV via `uploadCaliforniaCsvDataset`.
@@ -2077,7 +2077,7 @@ git add tests/e2e/share-modal-v2.spec.ts \
         tests/e2e/helpers/datasetSharingFlowV2.ts \
         tests/e2e/fixtures/e2eWithGlobalViewerMembership.fixture.ts
 git commit -m "$(cat <<'EOF'
-e2e: share modal v2 — seven scenarios incl. intersection toggle
+e2e: share modal v2 - seven scenarios incl. intersection toggle
 
 Adds end-to-end coverage of the new Drive-style modal: Drive-style
 share, restricted, intersection on/off (with and without app role),
@@ -2089,12 +2089,12 @@ EOF
 ```
 
 **Test plan for Task 5:**
-1. `pnpm test:e2e -- share-modal-v2` — green locally with `VITE_FEATURE_SHARE_MODAL_V2=true` in the dev server env.
+1. `pnpm test:e2e -- share-modal-v2` - green locally with `VITE_FEATURE_SHARE_MODAL_V2=true` in the dev server env.
 2. CI updated to run with the env flag (one CI matrix slot or hard-code the env until Task 7 strips the flag).
 
 ---
 
-## Task 6 — Backfill migration + drop `resource_user_group_tags`
+## Task 6 - Backfill migration + drop `resource_user_group_tags`
 
 **Files:**
 - New migration: generated via `pnpm db:diff -- drop_resource_user_group_tags_table` after schema edit.
@@ -2103,13 +2103,13 @@ EOF
 - Modify: `supabase/schemas/16.utils.resource-permissions.sql` (remove the tag-intersection block now dead in `util__resource_effective_role`).
 - Create: `supabase/tests/database/permissions/migration_diff_resource_tags_to_shares.test.sql`
 - Delete: `supabase/tests/database/permissions/resource_user_group_tags.test.sql`
-- Modify: `src/clients/permissions/ResourceShareClient.ts` — drop `setResourceUserGroupTags`, drop `resourceTagIds` from `ResourceSharingState`.
+- Modify: `src/clients/permissions/ResourceShareClient.ts` - drop `setResourceUserGroupTags`, drop `resourceTagIds` from `ResourceSharingState`.
 
 **Constraint:** This Task is destructive. It must ship AFTER Task 4 has merged AND the staging backfill diff has run clean for one full release cycle. Treat it as a follow-up PR, not a same-day deploy.
 
 - [ ] **Step 6.1: Write the migration backfill SQL**
 
-Create a dedicated migration file (not via `pnpm db:diff` — backfill data migrations are hand-written):
+Create a dedicated migration file (not via `pnpm db:diff` - backfill data migrations are hand-written):
 
 ```sql
 -- supabase/migrations/<timestamp>_backfill_resource_tags_into_shares.sql
@@ -2153,7 +2153,7 @@ where rs.workspace_id = rugt.workspace_id
 
 `supabase/tests/database/permissions/migration_diff_resource_tags_to_shares.test.sql`:
 
-Seed a representative pre-migration state (one tagged dataset, two members — one with app role, one without). Snapshot `(actor, resource, util__resource_effective_role(...))` for each pair. Run the backfill SQL inline (or skip if dropping the table happens in the same file). Compute the same snapshot post-migration. Assert that the only diffs match the documented "role-translation caveat" (e.g. a user who was an `admin` via app role becomes `editor` because the share role is fixed at editor).
+Seed a representative pre-migration state (one tagged dataset, two members - one with app role, one without). Snapshot `(actor, resource, util__resource_effective_role(...))` for each pair. Run the backfill SQL inline (or skip if dropping the table happens in the same file). Compute the same snapshot post-migration. Assert that the only diffs match the documented "role-translation caveat" (e.g. a user who was an `admin` via app role becomes `editor` because the share role is fixed at editor).
 
 - [ ] **Step 6.3: Drop the table and policies in the declarative schema**
 
@@ -2214,20 +2214,20 @@ EOF
 ```
 
 **Test plan for Task 6:**
-1. `pnpm db:reset && pnpm db:test` — all suites green; migration-diff test asserts only documented diffs.
+1. `pnpm db:reset && pnpm db:test` - all suites green; migration-diff test asserts only documented diffs.
 2. Staging: run the migration against a copy of prod data; eyeball the resulting share table for sanity.
 3. Production: run during a quiet window; keep a paired down-migration handy (or a feature flag rollback) for 24 hours.
 
 ---
 
-## Task 7 — Cleanup: remove `SHARE_MODAL_V2` flag + V1 modal
+## Task 7 - Cleanup: remove `SHARE_MODAL_V2` flag + V1 modal
 
 **Files:**
 - Delete: `src/components/permissions/ShareResourceModal/ShareResourceModalV1.tsx`
 - Modify: `src/components/permissions/ShareResourceModal/ShareResourceModal.tsx` (remove flag branch)
 - Modify: `src/utils/featureFlags.ts` (remove `isShareModalV2Enabled`)
 - Modify: `src/components/permissions/ShareResourceModal/ShareResourceModal.test.tsx` (drop flag-off branch)
-- Modify: `tests/e2e/dataset-sharing.spec.ts` and `tests/e2e/share-resource-modal.spec.ts` — migrate any remaining V1 selectors to V2 helpers; delete `tests/e2e/helpers/datasetSharingFlow.ts` if no longer referenced, or strip its V1-specific functions.
+- Modify: `tests/e2e/dataset-sharing.spec.ts` and `tests/e2e/share-resource-modal.spec.ts` - migrate any remaining V1 selectors to V2 helpers; delete `tests/e2e/helpers/datasetSharingFlow.ts` if no longer referenced, or strip its V1-specific functions.
 - Delete: `tests/e2e/helpers/datasetSharingFlow.ts` V1-only functions; keep the upload helpers in a shared file.
 
 - [ ] **Step 7.1: Inline the V2 implementation into `ShareResourceModal.tsx`**
@@ -2280,7 +2280,7 @@ EOF
 | §3.3 Summary line | Task 3 (shareSummary.ts) |
 | §3.4 Copy, tooltips | Task 3 (shareCopy.ts) |
 | §3.5 Empty/edge states | Task 3 step 3.11 (owner badge), step 3.11 (Add helper) |
-| §3.6 Accessibility | Task 3 — aria-labels on Add combobox, role select, remove button |
+| §3.6 Accessibility | Task 3 - aria-labels on Add combobox, role select, remove button |
 | §4 Data model | Task 1 (column + check) |
 | §4.2 RLS changes | Task 1 (effective_role, may_select helpers) |
 | §4.3 Migration | Task 6 |
@@ -2305,8 +2305,8 @@ EOF
 
 Plan complete and saved to `docs/superpowers/plans/2026-05-17-share-resource-modal-redesign.md`. Two execution options:
 
-**1. Subagent-Driven (recommended)** — I dispatch a fresh subagent per Task, review between Tasks, fast iteration with checkpoint approvals from you between each PR-sized chunk.
+**1. Subagent-Driven (recommended)** - I dispatch a fresh subagent per Task, review between Tasks, fast iteration with checkpoint approvals from you between each PR-sized chunk.
 
-**2. Inline Execution** — I execute the Tasks in this session using superpowers:executing-plans, batching steps with checkpoints for your review.
+**2. Inline Execution** - I execute the Tasks in this session using superpowers:executing-plans, batching steps with checkpoints for your review.
 
 Which approach?

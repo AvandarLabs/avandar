@@ -1,4 +1,4 @@
-# Share resource modal redesign — design
+# Share resource modal redesign - design
 
 **Status:** Draft for implementation
 **Author:** pablo@avandarlabs.com (brainstormed with Claude)
@@ -11,14 +11,14 @@
 
 The current `ShareResourceModal` (datasets and dashboards) layers four independent sharing mechanisms in one dialog:
 
-1. **Workspace access** — a default role for everyone in the workspace.
-2. **People and tags** — explicit per-principal shares.
-3. **Resource tags** — a *second* default-access mechanism that gates the workspace app-role grant by user-group intersection.
-4. **Restrict access** switch — a negation that disables the tag-based default grants.
+1. **Workspace access** - a default role for everyone in the workspace.
+2. **People and tags** - explicit per-principal shares.
+3. **Resource tags** - a *second* default-access mechanism that gates the workspace app-role grant by user-group intersection.
+4. **Restrict access** switch - a negation that disables the tag-based default grants.
 
 User feedback: this is hard to reason about. Two competing default mechanisms (workspace role + resource tags) and an inverted negation switch sit next to a list of explicit shares, and the relationship between them is not obvious.
 
-Google Drive solves the same problem with two sections — a list of principals plus a *General access* dropdown whose "Restricted" option is the negation. We want that mental model, adapted to Avandar's permission system.
+Google Drive solves the same problem with two sections - a list of principals plus a *General access* dropdown whose "Restricted" option is the negation. We want that mental model, adapted to Avandar's permission system.
 
 ## 2. Goals & non-goals
 
@@ -34,7 +34,7 @@ Google Drive solves the same problem with two sections — a list of principals 
 **Non-goals**
 
 - Cross-workspace sharing (out of scope; matches v1 permissions architecture).
-- Public-link sharing (`is_public`) — stays a separate flag.
+- Public-link sharing (`is_public`) - stays a separate flag.
 - Per-column ACLs (out of scope).
 - Changing the underlying `app_type` or `role_level` enums.
 - Adding a new permission tier that bypasses app-role gating (we evaluated this; the `Shared with me` surface + existing shares give the same outcome without expanding the data model).
@@ -61,7 +61,7 @@ Google Drive solves the same problem with two sections — a list of principals 
 │   🏢  [ Anyone in Data Sources ▾ ]    [ Viewer ▾ ]                  │
 │                                                                      │
 │       Options:                                                       │
-│       • Restricted — only people listed above                        │
+│       • Restricted - only people listed above                        │
 │       • Anyone in Data Sources (members with app access)            │
 │                                                                      │
 │  ────────────────────────────────────────────────────────           │
@@ -88,14 +88,14 @@ Google Drive solves the same problem with two sections — a list of principals 
 
 **C. General access.** A single dropdown with two options:
 
-- *Restricted* — only the rows above grant access. The accompanying role picker is hidden.
-- *Anyone in {AppLabel}* — translates to a `workspace` principal share at the chosen role. The role picker is shown next to the dropdown.
+- *Restricted* - only the rows above grant access. The accompanying role picker is hidden.
+- *Anyone in {AppLabel}* - translates to a `workspace` principal share at the chosen role. The role picker is shown next to the dropdown.
 
-Where `{AppLabel}` is the resource's app: "Data Sources" for datasets, "Dashboards" for dashboards. This phrasing is the honest one — it tells users that workspace-wide access still requires the app role.
+Where `{AppLabel}` is the resource's app: "Data Sources" for datasets, "Dashboards" for dashboards. This phrasing is the honest one - it tells users that workspace-wide access still requires the app role.
 
 **D. Summary line (plain language).** A single sentence with pills/badges that compiles from current state. Pills wrap; the sentence reads naturally with no jargon. See §3.3 for the construction rules and examples.
 
-**E. Footer.** A single "Done" button (closes the dialog; saves happen inline as the user changes controls, matching today's behavior). No "Cancel" — non-destructive changes auto-save like Drive.
+**E. Footer.** A single "Done" button (closes the dialog; saves happen inline as the user changes controls, matching today's behavior). No "Cancel" - non-destructive changes auto-save like Drive.
 
 ### 3.3 The summary line
 
@@ -152,10 +152,10 @@ We are deliberately verbose. Every non-trivial control gets a tooltip; every sec
 
 ### 3.5 Empty and edge states
 
-- **No members or tags in workspace** — the Add combobox shows the helper: `"No members or tags yet. Invite members or create tags in Workspace settings."` with a link.
-- **Non-admin viewing share modal** — should not be reachable (the Share button is hidden); if reached, render a read-only summary line with no controls and a banner: `"Only resource admins can change sharing."`
-- **Loading** — keep the existing skeleton text. The new layout doesn't change the loading path.
-- **Save failures** — keep current `notifyError` behavior. Each control reverts optimistically on error and shows the toast.
+- **No members or tags in workspace** - the Add combobox shows the helper: `"No members or tags yet. Invite members or create tags in Workspace settings."` with a link.
+- **Non-admin viewing share modal** - should not be reachable (the Share button is hidden); if reached, render a read-only summary line with no controls and a banner: `"Only resource admins can change sharing."`
+- **Loading** - keep the existing skeleton text. The new layout doesn't change the loading path.
+- **Save failures** - keep current `notifyError` behavior. Each control reverts optimistically on error and shows the toast.
 
 ### 3.6 Accessibility
 
@@ -179,8 +179,8 @@ alter table public.resource_shares
 
 Semantics:
 
-- `requires_app_access = false` (default) — the share contributes its role unconditionally for matching principals. This matches Drive's union semantics.
-- `requires_app_access = true` — the share contributes its role **only if** the principal has a non-null app role on the resource's app (i.e. `util__get_auth_user_app_role(workspace_id, resource_app) is not null`). No specific role threshold; presence of any app role suffices. The share's role is then capped to its declared value (the app role doesn't bump it).
+- `requires_app_access = false` (default) - the share contributes its role unconditionally for matching principals. This matches Drive's union semantics.
+- `requires_app_access = true` - the share contributes its role **only if** the principal has a non-null app role on the resource's app (i.e. `util__get_auth_user_app_role(workspace_id, resource_app) is not null`). No specific role threshold; presence of any app role suffices. The share's role is then capped to its declared value (the app role doesn't bump it).
 
 **Validity constraint:** `requires_app_access = true` is only meaningful for `principal_type = 'user_group'`. A check constraint enforces this:
 
@@ -209,11 +209,11 @@ A backfill migration converts existing tagged resources into the new shape. For 
 
 - Insert a `resource_shares` row with `(principal_type='user_group', principal_id=<user_group_id>, role=<choose>, requires_app_access=true)`.
 
-**Role-translation caveat.** The current tag mechanism grants each user their *personal* app role (one user might effectively be `editor`, another `viewer`). The new mechanism grants a single share-level role per group. There is no lossless translation. The migration picks `editor` as the converted role because that's the cap most workspaces actually use today and it preserves edit capability for tagged Analyst-style groups; `requires_app_access=true` means viewers without `data_sources` access are still locked out as before. Document this explicitly in the migration script and surface it in release notes — workspaces relying on the per-user app-role variance will need to add finer-grained shares post-migration.
+**Role-translation caveat.** The current tag mechanism grants each user their *personal* app role (one user might effectively be `editor`, another `viewer`). The new mechanism grants a single share-level role per group. There is no lossless translation. The migration picks `editor` as the converted role because that's the cap most workspaces actually use today and it preserves edit capability for tagged Analyst-style groups; `requires_app_access=true` means viewers without `data_sources` access are still locked out as before. Document this explicitly in the migration script and surface it in release notes - workspaces relying on the per-user app-role variance will need to add finer-grained shares post-migration.
 
 Then drop `resource_user_group_tags` and its RLS policies.
 
-**This migration is observable.** It changes effective roles in subtle cases. We must run it side-by-side with the new RLS, with a pgTAP harness that asserts the truth table is preserved for a representative seeded workspace. Plan to keep `resource_user_group_tags` available read-only for one release for incident recovery. The pgTAP suite includes an explicit `migration_diff` test set that loads a snapshot of the pre-migration state, runs the migration, and asserts the per-user effective role for every (actor, resource) pair — any divergence beyond the documented role-translation caveat fails CI.
+**This migration is observable.** It changes effective roles in subtle cases. We must run it side-by-side with the new RLS, with a pgTAP harness that asserts the truth table is preserved for a representative seeded workspace. Plan to keep `resource_user_group_tags` available read-only for one release for incident recovery. The pgTAP suite includes an explicit `migration_diff` test set that loads a snapshot of the pre-migration state, runs the migration, and asserts the per-user effective role for every (actor, resource) pair - any divergence beyond the documented role-translation caveat fails CI.
 
 ## 5. `Shared with me` surface
 
@@ -227,7 +227,7 @@ A new workspace-scoped page makes share-only access usable for members without t
 
 **Deep route guard relaxation:** `/_auth/$workspaceSlug/data-manager/$datasetId` and the dashboard equivalent need to permit users who have a share-derived role but lack `data_sources__can_list_sources` / `dashboards__can_view_dashboard`. The middleware grows a `resourceFallback: { type: ResourceType; idParam: string; minRole: RoleLevel }` option. When set, `RouteMiddleware.BeforeLoad.checkUserPermissions` first checks the configured `permissionKey`; on miss, it calls `util__auth_user_can_access_resource(type, params[idParam], minRole)` and lets the user through if it returns true. This keeps the parent app's permission key as the fast happy path while still admitting share-only users on a per-resource basis.
 
-**UI signal on the deep page:** when the user reaches a resource via the share path (no app role), show a small "Shared with you" banner with a link back to *Shared with me* — they shouldn't be left wondering why the rest of the app is empty.
+**UI signal on the deep page:** when the user reaches a resource via the share path (no app role), show a small "Shared with you" banner with a link back to *Shared with me* - they shouldn't be left wondering why the rest of the app is empty.
 
 ## 6. Component / file structure
 
@@ -285,22 +285,22 @@ Run `pgTAP` in CI on every PR that touches schema files under `supabase/schemas/
 
 ### 7.2 Client / unit tests
 
-- `shareSummary.test.ts` — exhaustive cases for the summary sentence builder. Snapshot the sentence text and the pill markup for each example in §3.3 and many more.
-- `ShareGeneralAccess.test.tsx` — switching `Restricted ↔ Anyone in {AppLabel}` issues the right mutation; role picker visibility follows.
-- `SharePrincipalRow.test.tsx` — `Limit to app access` checkbox visible only for `user_group` principals; toggling fires `useUpsertResourceShare` with the new flag.
-- `ShareResourceModal.test.tsx` — full modal smoke: open with mock state, add a user share, add a group share with `requires_app_access`, flip general access. Verifies wiring; deep semantics are covered by sub-tests.
+- `shareSummary.test.ts` - exhaustive cases for the summary sentence builder. Snapshot the sentence text and the pill markup for each example in §3.3 and many more.
+- `ShareGeneralAccess.test.tsx` - switching `Restricted ↔ Anyone in {AppLabel}` issues the right mutation; role picker visibility follows.
+- `SharePrincipalRow.test.tsx` - `Limit to app access` checkbox visible only for `user_group` principals; toggling fires `useUpsertResourceShare` with the new flag.
+- `ShareResourceModal.test.tsx` - full modal smoke: open with mock state, add a user share, add a group share with `requires_app_access`, flip general access. Verifies wiring; deep semantics are covered by sub-tests.
 
 ### 7.3 Playwright e2e tests
 
 Extend `tests/e2e/dataset-sharing.spec.ts` and `tests/e2e/share-resource-modal.spec.ts` with new flows:
 
-1. **Drive-style flow** — owner shares with a specific user via the unified Add combobox at editor; secondary user can open the dataset and edit.
-2. **Restricted flow** — owner sets *General access* to Restricted; secondary user with `data_sources` viewer can no longer see the dataset in the sidebar nor open it directly.
-3. **Intersection-on flow** — owner shares with a user-group at editor with `Limit to app access` on; a member of that group **with** `data_sources` access can open and edit; a member of the same group **without** `data_sources` access cannot.
-4. **Intersection-off flow** — same setup but `Limit to app access` off; the no-app-access member can open the resource (via the *Shared with me* surface) and edit.
-5. **Summary sentence flow** — for each configuration above, assert the on-screen summary sentence contains the expected substrings and pills.
-6. **Shared with me flow** — a user with only a share-derived grant can navigate to *Shared with me*, click into the resource, and open it. The deep route grant works even though the app sidebar item is hidden.
-7. **Owner row is read-only** — attempting to change the owner's role or remove them is blocked at the UI.
+1. **Drive-style flow** - owner shares with a specific user via the unified Add combobox at editor; secondary user can open the dataset and edit.
+2. **Restricted flow** - owner sets *General access* to Restricted; secondary user with `data_sources` viewer can no longer see the dataset in the sidebar nor open it directly.
+3. **Intersection-on flow** - owner shares with a user-group at editor with `Limit to app access` on; a member of that group **with** `data_sources` access can open and edit; a member of the same group **without** `data_sources` access cannot.
+4. **Intersection-off flow** - same setup but `Limit to app access` off; the no-app-access member can open the resource (via the *Shared with me* surface) and edit.
+5. **Summary sentence flow** - for each configuration above, assert the on-screen summary sentence contains the expected substrings and pills.
+6. **Shared with me flow** - a user with only a share-derived grant can navigate to *Shared with me*, click into the resource, and open it. The deep route grant works even though the app sidebar item is hidden.
+7. **Owner row is read-only** - attempting to change the owner's role or remove them is blocked at the UI.
 
 Test data: extend the seeded workspace with at least one user-group (`Analytics`), a Global Viewer who is in the group, and a Global Viewer who is not. The existing `e2eWorkerDb` fixture is the right place to add this.
 
@@ -315,7 +315,7 @@ Before merging:
 
 ## 8. Rollout
 
-1. Schema migration + RLS function update behind a feature flag (`SHARE_MODAL_V2`) — the flag controls UI only; RLS changes ship immediately because the new column defaults preserve current behavior for un-migrated rows.
+1. Schema migration + RLS function update behind a feature flag (`SHARE_MODAL_V2`) - the flag controls UI only; RLS changes ship immediately because the new column defaults preserve current behavior for un-migrated rows.
 2. Ship the new modal under the flag. Internal dogfood on the `avandar-labs` workspace.
 3. Run the `resource_user_group_tags` → `resource_shares` backfill in staging; pgTAP truth-table dual-run against pre- and post-migration. Investigate any diff.
 4. Run backfill in production during a quiet window. Keep `resource_user_group_tags` available read-only for one release.
@@ -333,4 +333,4 @@ Before merging:
 - A new permission tier that *replaces* `data_sources` app role at the resource level. The `Shared with me` page plus existing share semantics covers the same outcome without expanding the data model.
 - Cross-workspace shares.
 - Per-column or per-row ACLs.
-- Public link shares (`is_public`) — separate flag, separate UI.
+- Public link shares (`is_public`) - separate flag, separate UI.

@@ -39,7 +39,7 @@ const OWNER_DISPLAY_NAME = "E2E Test Workspace";
 /** Workspace name shown in the v2 summary line for workspace shares. */
 const WORKSPACE_NAME = "E2E Test Workspace";
 
-test.describe("Share modal v2 — Drive-style flows", () => {
+test.describe("Share modal v2: Drive-style flows", () => {
   test("1. Drive-style direct user share grants editor access", async ({
     page,
     e2eWorkerDb,
@@ -84,7 +84,7 @@ test.describe("Share modal v2 — Drive-style flows", () => {
         workspaceSlug,
         datasetName,
       });
-      // TODO(rbac): this only verifies read access — editor vs. viewer
+      // TODO(rbac): this only verifies read access - editor vs. viewer
       // distinction is not observable at the UI level today because
       // DatasetMetaView renders edit affordances (description editor,
       // Delete button) unconditionally and writes are gated only at RLS.
@@ -225,7 +225,7 @@ test.describe("Share modal v2 — Drive-style flows", () => {
       });
 
       // TODO(rbac): editor capability not verifiable at the UI level
-      // today (see DatasetMetaView — all edit affordances render
+      // today (see DatasetMetaView: all edit affordances render
       // unconditionally). We assert dataset access only.
       await expectDatasetMetaPageAccessible(page, {
         workspaceSlug,
@@ -346,7 +346,7 @@ test.describe("Share modal v2 — Drive-style flows", () => {
       });
 
       // The user has no data_sources role, so the sidebar does not list
-      // the dataset directly — but Shared with me does.
+      // the dataset directly; but Shared with me does.
       await expectSharedWithMeListsResource({
         page,
         workspaceSlug,
@@ -489,7 +489,7 @@ test.describe("Share modal v2 — Drive-style flows", () => {
 
     let datasetId = "";
     // Strip data_sources from the secondary user so the only path to the
-    // dataset is the explicit share — exactly the Shared with me case.
+    // dataset is the explicit share: exactly the Shared with me case.
     const assignResult = await assignE2ESecondaryMemberCustomMatrix({
       supabaseAdminClient: admin,
       workspaceId,
@@ -551,7 +551,7 @@ test.describe("Share modal v2 — Drive-style flows", () => {
     }
   });
 
-  test("7. Owner row is read-only — Owner badge, no remove button, no role select", async ({
+  test("7. Owner row is read-only: Owner badge, no remove button, no role select", async ({
     page,
     e2eWorkerDb,
     e2eViewerMembership,

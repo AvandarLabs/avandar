@@ -3,6 +3,7 @@ import { propEq } from "@utils";
 import { AuthClient } from "@/clients/AuthClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AppLinks } from "@/config/AppLinks";
+import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { SharedWithMeView } from "@/views/SharedWithMeView/SharedWithMeView";
 
 /**
@@ -16,6 +17,13 @@ export const Route = createFileRoute("/_auth/$workspaceSlug/shared-with-me")({
     context: { queryClient },
     params: { workspaceSlug },
   }) => {
+    if (!isFlagEnabled(FeatureFlag.EnableSharedWithMe)) {
+      throw redirect({
+        to: AppLinks.workspaceHome(workspaceSlug).to,
+        params: { workspaceSlug },
+      });
+    }
+
     const session = await AuthClient.getCurrentSession();
     if (!session?.user?.id) {
       throw redirect({ to: "/signin" });

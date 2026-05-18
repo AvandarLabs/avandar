@@ -117,7 +117,7 @@ vi.mock("@/components/layouts/AppLayout/AppLayout", async () => {
 });
 
 vi.mock(
-  "@/components/permissions/ShareResourceModal/ShareResourceButton",
+  "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton",
   () => {
     return {
       ShareResourceButton: () => {

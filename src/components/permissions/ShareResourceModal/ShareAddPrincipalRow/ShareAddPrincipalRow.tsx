@@ -1,6 +1,6 @@
 import { Button, Group, Select } from "@mantine/core";
 import { useMemo, useState } from "react";
-import { SHARE_COPY } from "./shareCopy";
+import { SHARE_COPY } from "../shareCopy";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
 const ROLE_OPTIONS: Array<{ value: RoleLevel; label: string }> = [
@@ -43,16 +43,16 @@ export function ShareAddPrincipalRow({
     if (members.length > 0) {
       data.push({
         group: "Members",
-        items: members.map((m) => {
-          return { value: `user:${m.value}`, label: m.label };
+        items: members.map((member) => {
+          return { value: `user:${member.value}`, label: member.label };
         }),
       });
     }
     if (groups.length > 0) {
       data.push({
         group: "Tags",
-        items: groups.map((g) => {
-          return { value: `user_group:${g.value}`, label: g.label };
+        items: groups.map((group) => {
+          return { value: `user_group:${group.value}`, label: group.label };
         }),
       });
     }

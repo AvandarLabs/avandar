@@ -64,7 +64,7 @@ export async function setGeneralAccessV2(
   // mode === "Workspace": the dropdown defaults to "Anyone in {App}" so
   // re-clicking it is a no-op (`allowDeselect={false}`). The only path
   // that reliably writes a workspace-share row is to change the
-  // accompanying role select — which always fires `onChange` and routes
+  // accompanying role select, which always fires `onChange` and routes
   // through the upsertShare mutation. We bounce through Restricted first
   // so the workspace-role select shows up and any prior role value is
   // cleared.

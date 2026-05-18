@@ -205,7 +205,7 @@ export const AppLinks = {
       label: entityName,
     };
   },
-  // Shared with me — surfaces resources the user can reach only through
+  // Shared with me: surfaces resources the user can reach only through
   // explicit shares (no parent app role).
   sharedWithMe: (workspaceSlug: string) => {
     return {

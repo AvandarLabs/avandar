@@ -1,20 +1,21 @@
 import { Button, Group, Stack, Text } from "@mantine/core";
 import { notifyError } from "@ui";
+import { makeObject, propEq, propNotEq } from "@utils";
 import { useMemo } from "react";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { ResourceShareClient } from "@/clients/permissions/ResourceShareClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { ShareAddPrincipalRow } from "./ShareAddPrincipalRow";
-import { ShareGeneralAccess } from "./ShareGeneralAccess";
+import { ShareAddPrincipalRow } from "./ShareAddPrincipalRow/ShareAddPrincipalRow";
+import { ShareGeneralAccess } from "./ShareGeneralAccess/ShareGeneralAccess";
 import { SharePrincipalList } from "./SharePrincipalList";
-import { buildShareSummary, hasPrincipalId } from "./shareSummary";
-import { ShareSummaryLine } from "./ShareSummaryLine";
+import {
+  buildShareSummary,
+  hasPrincipalId,
+} from "./buildShareSummary/buildShareSummary";
+import { ShareSummaryLine } from "./ShareSummaryLine/ShareSummaryLine";
 import type { DisplayShare } from "./SharePrincipalList";
-import type {
-  ResourceShareRow,
-  ResourceType,
-} from "@/clients/permissions/ResourceShareClient";
+import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
@@ -34,13 +35,13 @@ type Props = {
  */
 function resolveOwnerDisplayName(
   ownerId: string,
-  members: readonly WorkspaceMemberProfile[] | undefined,
+  members: WorkspaceMemberProfile[] | undefined,
   userById: Readonly<Record<string, string>>,
 ): string {
   return (
     userById[ownerId] ??
-    members?.find((m) => {
-      return m.userId === ownerId;
+    members?.find((member) => {
+      return member.userId === ownerId;
     })?.email ??
     "Owner"
   );
@@ -102,20 +103,17 @@ export function ShareResourceModal({
     },
   });
 
-  const userById = useMemo(() => {
-    const out: Record<string, string> = {};
-    (members ?? []).forEach((m) => {
-      out[m.userId] = m.displayName || m.fullName;
+  const userById = useMemo((): Record<string, string> => {
+    return makeObject(members ?? [], {
+      key: 'userId',
+      valueFn: (member): string => {
+        return member.displayName || member.fullName;
+      },
     });
-    return out;
   }, [members]);
 
-  const groupById = useMemo(() => {
-    const out: Record<string, string> = {};
-    (userGroups ?? []).forEach((g) => {
-      out[g.id] = g.name;
-    });
-    return out;
+  const groupById = useMemo((): Record<string, string> => {
+    return makeObject(userGroups ?? [], { key: "id", valueKey: "name" });
   }, [userGroups]);
 
   if (isLoadingState || !sharingState) {
@@ -126,13 +124,11 @@ export function ShareResourceModal({
     );
   }
 
-  const workspaceShare = sharingState.shares.find((s) => {
-    return s.principalType === "workspace";
-  });
-  const directShares: readonly ResourceShareRow[] = sharingState.shares.filter(
-    (s) => {
-      return s.principalType !== "workspace";
-    },
+  const workspaceShare = sharingState.shares.find(
+    propEq("principalType", "workspace"),
+  );
+  const directShares = sharingState.shares.filter(
+    propNotEq("principalType", "workspace"),
   );
 
   // Build an in-memory Owner row for display only. The owner is the
@@ -160,21 +156,20 @@ export function ShareResourceModal({
   // Sort: owner first; then users (alphabetical); then user_groups
   // (alphabetical). Excludes any explicit share for the owner if present
   // because it would shadow the read-only Owner row.
-  const filteredDirectShares = directShares.filter((s) => {
-    return !(
-      s.principalType === "user" && s.principalId === sharingState.ownerId
-    );
+  const filteredDirectShares = directShares.filter((share) => {
+    const isOwnerUserShare =
+      share.principalType === "user" &&
+      share.principalId === sharingState.ownerId;
+    return !isOwnerUserShare;
   });
 
   const userShares = filteredDirectShares
     .filter(hasPrincipalId)
-    .filter((s) => {
-      return s.principalType === "user";
-    })
-    .map((s): DisplayShare => {
+    .filter(propEq("principalType", "user"))
+    .map((share): DisplayShare => {
       return {
-        ...s,
-        displayName: userById[s.principalId] ?? "Unknown user",
+        ...share,
+        displayName: userById[share.principalId] ?? "Unknown user",
       };
     })
     .sort((a, b) => {
@@ -183,13 +178,11 @@ export function ShareResourceModal({
 
   const groupShares = filteredDirectShares
     .filter(hasPrincipalId)
-    .filter((s) => {
-      return s.principalType === "user_group";
-    })
-    .map((s): DisplayShare => {
+    .filter(propEq("principalType", "user_group"))
+    .map((share): DisplayShare => {
       return {
-        ...s,
-        displayName: groupById[s.principalId] ?? "Unknown group",
+        ...share,
+        displayName: groupById[share.principalId] ?? "Unknown group",
       };
     })
     .sort((a, b) => {
@@ -252,14 +245,14 @@ export function ShareResourceModal({
       </Text>
 
       <ShareAddPrincipalRow
-        members={(members ?? []).map((m) => {
+        members={(members ?? []).map((member) => {
           return {
-            value: m.userId,
-            label: m.displayName || m.fullName,
+            value: member.userId,
+            label: member.displayName || member.fullName,
           };
         })}
-        groups={(userGroups ?? []).map((g) => {
-          return { value: g.id, label: g.name };
+        groups={(userGroups ?? []).map((group) => {
+          return { value: group.id, label: group.name };
         })}
         isAdding={isUpserting}
         onAdd={({ principalType, principalId, role }) => {

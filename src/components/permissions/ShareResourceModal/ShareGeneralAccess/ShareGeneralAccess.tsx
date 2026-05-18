@@ -6,7 +6,7 @@ import {
   appForResource,
   appLabel,
   resourceTypeLabel,
-} from "./shareCopy";
+} from "../shareCopy";
 import type { ResourceType } from "@/clients/permissions/ResourceShareClient";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 

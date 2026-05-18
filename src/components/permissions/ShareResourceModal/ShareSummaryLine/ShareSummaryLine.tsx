@@ -1,5 +1,5 @@
 import { Badge, Text } from "@mantine/core";
-import type { SummarySpan } from "./shareSummary";
+import type { SummarySpan } from "../buildShareSummary/buildShareSummary";
 
 const VARIANT_COLOR: Record<
   Extract<SummarySpan, { kind: "pill" }>["variant"],
@@ -18,7 +18,7 @@ type Props = {
 
 /**
  * Renders the precomputed summary spans inline as text + Mantine badges.
- * Pure presentation — all formatting decisions live upstream in
+ * Pure presentation: all formatting decisions live upstream in
  * `buildShareSummary` so this component is trivial to test.
  *
  * The pills are decorative: each pill's `label` is part of the surrounding
@@ -35,15 +35,15 @@ export function ShareSummaryLine({ spans }: Props): JSX.Element {
       aria-label="Share summary"
       size="sm"
       c="dimmed"
-      style={{ lineHeight: 1.8 }}
+      lh={1.8}
     >
-      {spans.map((span, i) => {
+      {spans.map((span, idx) => {
         if (span.kind === "text") {
-          return <span key={i}>{span.text}</span>;
+          return <span key={idx}>{span.text}</span>;
         }
         return (
           <Badge
-            key={i}
+            key={idx}
             component="span"
             variant="light"
             color={VARIANT_COLOR[span.variant]}

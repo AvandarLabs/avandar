@@ -1,6 +1,6 @@
 import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { ShareSummaryLine } from "@/components/permissions/ShareResourceModal/ShareSummaryLine";
+import { ShareSummaryLine } from "@/components/permissions/ShareResourceModal/ShareSummaryLine/ShareSummaryLine";
 import { render } from "@/utils/testing-utils";
 
 describe("ShareSummaryLine", () => {
