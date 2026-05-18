@@ -10,6 +10,7 @@
  */
 
 import type { IpcContract } from "$/platform/ipc/contracts/defineIpcContract";
+import type { RequestEnvelope } from "$/platform/ipc/envelopes";
 
 /**
  * Minimal transport surface that {@link createIpcServer} needs from
@@ -32,11 +33,6 @@ export type IpcServer = {
     contract: Readonly<IpcContract<TRequest, TResponse>>,
     handler: (request: TRequest) => Promise<TResponse> | TResponse,
   ): void;
-};
-
-type RequestEnvelope = {
-  id: string;
-  payload: unknown;
 };
 
 /**

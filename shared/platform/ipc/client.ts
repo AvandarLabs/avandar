@@ -16,6 +16,10 @@
  */
 
 import type { IpcContract } from "$/platform/ipc/contracts/defineIpcContract.ts";
+import type {
+  ReplyEnvelope,
+  RequestEnvelope,
+} from "$/platform/ipc/envelopes.ts";
 
 /**
  * Minimal IPC bridge surface that the webview-side {@link callIpc} consumes.
@@ -25,18 +29,6 @@ import type { IpcContract } from "$/platform/ipc/contracts/defineIpcContract.ts"
 export type IpcBridge = {
   send: (channel: string, message: unknown) => void;
   once: (channel: string, callback: (message: unknown) => void) => void;
-};
-
-type RequestEnvelope = {
-  id: string;
-  payload: unknown;
-};
-
-type ReplyEnvelope = {
-  id: string;
-  ok: boolean;
-  result?: unknown;
-  error?: string;
 };
 
 let bridge: IpcBridge | undefined;

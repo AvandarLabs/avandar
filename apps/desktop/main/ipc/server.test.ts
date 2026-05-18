@@ -1,8 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { defineIpcContract } from "$/platform/ipc/contracts/defineIpcContract";
+import type { RequestEnvelope } from "$/platform/ipc/envelopes";
 import { createIpcServer, type IpcTransport } from "./server";
-
-type IncomingMessage = { id: string; payload: unknown };
 
 function makeFakeTransport(): {
   transport: IpcTransport;
@@ -35,7 +34,7 @@ describe("createIpcServer", () => {
     inbox["test.double"]?.({
       id: "req-1",
       payload: { a: 5 },
-    } satisfies IncomingMessage);
+    } satisfies RequestEnvelope);
     await flushMicrotasks();
 
     expect(send).toHaveBeenCalledWith("test.double.reply", {
@@ -60,7 +59,7 @@ describe("createIpcServer", () => {
     inbox["test.asyncDouble"]?.({
       id: "req-2",
       payload: { a: 7 },
-    } satisfies IncomingMessage);
+    } satisfies RequestEnvelope);
     await flushMicrotasks();
 
     expect(send).toHaveBeenCalledWith("test.asyncDouble.reply", {
@@ -84,7 +83,7 @@ describe("createIpcServer", () => {
     inbox["test.boom"]?.({
       id: "req-3",
       payload: {},
-    } satisfies IncomingMessage);
+    } satisfies RequestEnvelope);
     await flushMicrotasks();
 
     expect(send).toHaveBeenCalledWith("test.boom.reply", {
@@ -108,7 +107,7 @@ describe("createIpcServer", () => {
     inbox["test.stringThrow"]?.({
       id: "req-4",
       payload: {},
-    } satisfies IncomingMessage);
+    } satisfies RequestEnvelope);
     await flushMicrotasks();
 
     expect(send).toHaveBeenCalledWith("test.stringThrow.reply", {

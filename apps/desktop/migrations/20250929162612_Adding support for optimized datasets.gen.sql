@@ -1,8 +1,9 @@
 -- Generated from supabase/migrations/20250929162612_Adding support for optimized datasets.sql by
--- apps/desktop/scripts/gen-sqlite-migrations.ts. Do not edit by hand
+-- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 9
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 105
+-- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 4
 DROP INDEX IF EXISTS "datasets__local_csv_dataset_id_key";
 

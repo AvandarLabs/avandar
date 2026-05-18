@@ -1,19 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { __setIpcBridgeForTests, callIpc } from "$/platform/ipc/client.ts";
+import {
+  __setIpcBridgeForTests,
+  callIpc,
+  type IpcBridge,
+} from "$/platform/ipc/client.ts";
 import { defineIpcContract } from "$/platform/ipc/contracts/defineIpcContract.ts";
-
-type IpcBridge = {
-  send: (channel: string, message: unknown) => void;
-  once: (channel: string, callback: (message: unknown) => void) => void;
-};
-
-type RequestEnvelope = { id: string; payload: unknown };
-type ReplyEnvelope = {
-  id: string;
-  ok: boolean;
-  result?: unknown;
-  error?: string;
-};
+import type {
+  ReplyEnvelope,
+  RequestEnvelope,
+} from "$/platform/ipc/envelopes.ts";
 
 describe("callIpc", () => {
   const sendMock = vi.fn();

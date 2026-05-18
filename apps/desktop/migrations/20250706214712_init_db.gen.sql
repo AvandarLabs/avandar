@@ -1,8 +1,9 @@
 -- Generated from supabase/migrations/20250706214712_init_db.sql by
--- apps/desktop/scripts/gen-sqlite-migrations.ts. Do not edit by hand
+-- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 26
--- Statements dropped (RLS/funcs/triggers/data/etc.): 304
+-- Statements dropped (RLS/funcs/triggers/data/etc.): 300
+-- FK constraints dropped (target not synced to SQLite): 4
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 15
 CREATE TABLE "entity_configs" ("id" UUID NOT NULL, "owner_id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "name" TEXT NOT NULL, "description" TEXT, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "allow_manual_creation" INTEGER NOT NULL);
 

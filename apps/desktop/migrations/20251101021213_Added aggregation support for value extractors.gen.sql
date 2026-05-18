@@ -1,8 +1,9 @@
 -- Generated from supabase/migrations/20251101021213_Added aggregation support for value extractors.sql by
--- apps/desktop/scripts/gen-sqlite-migrations.ts. Do not edit by hand
+-- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 9
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 42
+-- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 6
 DROP INDEX IF EXISTS "idx_value_extractors__aggregation__entity_field_config_id_works";
 

@@ -7,16 +7,16 @@
  *
  * Edit when adding a new table to `supabase/migrations/`:
  *   - User-owned artifact the desktop must render offline -> add to
- *     SYNCABLE_TABLES.
+ *     ACTIVE_TABLES.
  *   - Collaborative state, server-of-truth data, billing, audit, or
  *     permissions glue -> add to EXCLUDED_TABLES.
  *
  * Defaulting to "conservative" (excluded) is safer; the desktop just won't
  * be able to render that table's data offline until it is promoted to
- * SYNCABLE_TABLES with a per-row sync strategy.
+ * ACTIVE_TABLES with a per-row sync strategy.
  *
  * Today's split (every entry is a judgment call, review in the PR):
- *   - SYNCABLE: dataset definitions and their per-format detail rows,
+ *   - ACTIVE: dataset definitions and their per-format detail rows,
  *     catalog entries, dashboards, entities + configs + field values,
  *     value extractors, user profile, plus `workspaces` and
  *     `workspace_memberships` so the workspace picker renders offline.
@@ -26,22 +26,16 @@
  */
 
 /**
- * Tables that the desktop mirrors to local SQLite. For now, syncing is a
- * one-shot Supabase REST pull on first launch; incremental sync layers on
- * top later.
+ * Tables that exist in the current Postgres schema and that the desktop
+ * mirrors to local SQLite. New syncable tables should land here.
  */
-export const SYNCABLE_TABLES = [
+const ACTIVE_TABLES = [
   "datasets",
   "dataset_columns",
   "datasets__csv_file",
   "datasets__google_sheets",
-  "datasets__local_csv",
   "datasets__open_data",
   "datasets__virtual",
-  "datasets__xls_file",
-  // Renamed from `datasets__xls_file` mid-history; keep both names so
-  // every per-migration generation step recognises whichever name the
-  // statement is using.
   "datasets__xlsx_file",
   "catalog_entries__open_data",
   "catalog_entries__dataset_column",
@@ -49,13 +43,68 @@ export const SYNCABLE_TABLES = [
   "entities",
   "entity_configs",
   "entity_field_configs",
-  "entity_field_values",
-  "value_extractors__aggregation",
   "value_extractors__dataset_column_value",
   "value_extractors__manual_entry",
   "user_profiles",
   "workspaces",
   "workspace_memberships",
+] as const;
+
+/*
+ * Tables that USED TO exist in the Postgres schema and were syncable
+ * while they were live, but have since been dropped or renamed.
+ *
+ * Why keep them?
+ *
+ * The migration generator processes the full Postgres history one file
+ * at a time. Early migrations contain CREATE TABLE / ALTER TABLE /
+ * CREATE INDEX statements for these tables, and intermediate migrations
+ * may reference them in FK clauses before the final DROP TABLE lands.
+ * If a deprecated name disappears from the manifest, the generator
+ * hard-errors with "uncategorised table" the moment it walks past one
+ * of those historical statements - even though the runtime SQLite
+ * schema will never see the table.
+ *
+ * Listing the historical names here lets the generator recognise the
+ * statements as syncable-at-the-time, transpile them, and emit them
+ * to the matching `.gen.sql`. The SQLite migration runner then
+ * applies the CREATE-then-eventually-DROP pair the same way Postgres
+ * did, so the local schema stays in step with what Postgres ended up
+ * with.
+ *
+ * Add an entry here when a Postgres migration drops a table that was
+ * previously in ACTIVE_TABLES. Never remove an entry - that breaks
+ * historical-migration parsing.
+ */
+const DEPRECATED_TABLES = [
+  // Dropped by 20250929162612 ("Adding support for optimized datasets"),
+  // replaced by the unified datasets / datasets__csv_file model.
+  "datasets__local_csv",
+  // Renamed to `datasets__xlsx_file` by 20260504000020. Both names
+  // need to be recognised so the rename ALTER TABLEs partition
+  // cleanly.
+  "datasets__xls_file",
+  // Dropped by 20250929162612, folded into the unified datasets model.
+  "entity_field_values",
+  // Dropped by 20251101021213 ("Added aggregation support for value
+  // extractors"); aggregation was re-implemented without a dedicated
+  // table.
+  "value_extractors__aggregation",
+] as const;
+
+/**
+ * Tables that the desktop mirrors to local SQLite. Union of
+ * {@link ACTIVE_TABLES} (still in the live schema) and
+ * {@link DEPRECATED_TABLES} (referenced by Postgres migration history,
+ * preserved here so the generator's per-file partition step does not
+ * hard-error on legacy DDL).
+ *
+ * For now, syncing is a one-shot Supabase REST pull on first launch;
+ * incremental sync layers on top later.
+ */
+export const SYNCABLE_TABLES = [
+  ...ACTIVE_TABLES,
+  ...DEPRECATED_TABLES,
 ] as const;
 
 /**

@@ -1,8 +1,9 @@
 -- Generated from supabase/migrations/20260329222138_added_catalog_entries_dataset_columns.sql by
--- apps/desktop/scripts/gen-sqlite-migrations.ts. Do not edit by hand
+-- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 7
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 30
+-- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 1
 DROP INDEX IF EXISTS "unique_dataset_pipeline";
 
