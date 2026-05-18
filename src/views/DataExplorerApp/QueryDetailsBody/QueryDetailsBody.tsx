@@ -8,7 +8,7 @@ import { SqlQueryView } from "@/views/DataExplorerApp/SqlQueryView/SqlQueryView"
  * (SQL). Both tabs read and write through `DataExplorerStateManager` so they
  * stay in sync with the canvas and with whichever AI prompt produced the SQL.
  */
-export function QueryDetailsPanel(): JSX.Element {
+export function QueryDetailsBody(): JSX.Element {
   return (
     <Tabs
       indicatorVariant="floating"

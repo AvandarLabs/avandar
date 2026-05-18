@@ -1,0 +1,23 @@
+.fieldset {
+  background-color: rgb(255 255 255 / 40%);
+}
+
+.legendGroup {
+  width: 100%;
+}
+
+.sqlPaper {
+  background: var(--mantine-color-gray-0);
+  border: 1px solid var(--mantine-color-gray-3);
+}
+
+.sqlReadOnlyInput {
+  background-color: transparent;
+  border: none;
+  font-family: monospace;
+  padding: 0;
+}
+
+.sqlEditInput {
+  font-family: monospace;
+}

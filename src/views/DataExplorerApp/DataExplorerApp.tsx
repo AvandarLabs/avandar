@@ -32,7 +32,7 @@ import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerSt
 import { downloadRowsAsCSV } from "@/views/DataExplorerApp/downloadRowsAsCSV";
 import { GeneratedPromptBadge } from "@/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge";
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetModal/OpenDatasetModal";
-import { QueryDetailsPanel } from "@/views/DataExplorerApp/QueryDetailsPanel/QueryDetailsPanel";
+import { QueryDetailsBody } from "@/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
 import { useDataExplorerURLSync } from "@/views/DataExplorerApp/useDataExplorerURLSync";
@@ -424,7 +424,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
         initialPosition={QUERY_DETAILS_INITIAL_POSITION}
         width={QUERY_DETAILS_WIDTH}
       >
-        <QueryDetailsPanel />
+        <QueryDetailsBody />
       </FloatingPanel>
       <FloatingPanel
         title="Visualization Settings"

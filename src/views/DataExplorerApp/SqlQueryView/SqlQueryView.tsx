@@ -1,8 +1,16 @@
-import { Button, Fieldset, Group, Paper, Stack, Text, Textarea } from "@mantine/core";
+import {
+  Button,
+  Fieldset,
+  Group,
+  Paper,
+  Stack,
+  Text,
+  Textarea,
+} from "@mantine/core";
 import { TextareaForm } from "@ui";
 import { useState } from "react";
-import { mantineColorVar } from "@/lib/utils/browser/css";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import css from "./SqlQueryView.module.css";
 
 /**
  * Read-only view of the current SQL with an "Edit query" affordance that
@@ -29,8 +37,9 @@ export function SqlQueryView(): JSX.Element {
   return (
     <Stack gap="md" px="sm">
       <Fieldset
+        className={css.fieldset}
         legend={
-          <Group justify="space-between" style={{ width: "100%" }}>
+          <Group justify="space-between" className={css.legendGroup}>
             <span>Generated SQL</span>
             {isEditMode ? null : (
               <Button
@@ -45,7 +54,6 @@ export function SqlQueryView(): JSX.Element {
             )}
           </Group>
         }
-        style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
       >
         <Stack gap="sm">
           {isEditMode ?
@@ -59,11 +67,7 @@ export function SqlQueryView(): JSX.Element {
               submitButtonLabel="Re-run query"
               cancelButtonLabel="Cancel"
               isSubmitting={false}
-              styles={{
-                input: {
-                  fontFamily: "monospace",
-                },
-              }}
+              classNames={{ input: css.sqlEditInput }}
               validateOnChange={true}
               required={true}
               disabledUntilDirty={true}
@@ -76,26 +80,13 @@ export function SqlQueryView(): JSX.Element {
                 setIsEditMode(false);
               }}
             />
-          : <Paper
-              p="sm"
-              style={{
-                backgroundColor: mantineColorVar("gray.0"),
-                border: `1px solid ${mantineColorVar("gray.3")}`,
-              }}
-            >
+          : <Paper p="sm" className={css.sqlPaper}>
               <Textarea
                 value={rawSQL}
                 readOnly
                 minRows={6}
                 autosize
-                styles={{
-                  input: {
-                    fontFamily: "monospace",
-                    backgroundColor: "transparent",
-                    border: "none",
-                    padding: 0,
-                  },
-                }}
+                classNames={{ input: css.sqlReadOnlyInput }}
               />
             </Paper>
           }
