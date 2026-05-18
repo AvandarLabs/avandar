@@ -139,25 +139,29 @@ const BASELINE_CONFIGS: ConfigsByVizType = {
   radar: radarConfig,
 };
 
+function exactLabel(label: string): RegExp {
+  return new RegExp(`^${label}$`, "i");
+}
+
 function driveControl(label: string, spec: ControlSpec, nextValue: unknown): void {
   switch (spec.kind) {
     case "switch": {
-      const toggle = screen.getByRole("switch", { name: new RegExp(label, "i") });
+      const toggle = screen.getByRole("switch", { name: exactLabel(label) });
       fireEvent.click(toggle);
       return;
     }
     case "color": {
-      const input = screen.getByLabelText(new RegExp(label, "i"));
+      const input = screen.getByLabelText(exactLabel(label));
       fireEvent.change(input, { target: { value: nextValue } });
       return;
     }
     case "number": {
-      const input = screen.getByLabelText(new RegExp(label, "i"));
+      const input = screen.getByLabelText(exactLabel(label));
       fireEvent.change(input, { target: { value: String(nextValue) } });
       return;
     }
     case "text": {
-      const input = screen.getByLabelText(new RegExp(label, "i"));
+      const input = screen.getByLabelText(exactLabel(label));
       fireEvent.change(input, { target: { value: nextValue } });
       return;
     }
@@ -168,9 +172,7 @@ function driveControl(label: string, spec: ControlSpec, nextValue: unknown): voi
       if (target === undefined) {
         throw new Error(`No option for segmented control "${label}"`);
       }
-      const radio = screen.getByRole("radio", {
-        name: new RegExp(target.label, "i"),
-      });
+      const radio = screen.getByRole("radio", { name: exactLabel(target.label) });
       fireEvent.click(radio);
       return;
     }
@@ -181,7 +183,7 @@ function driveControl(label: string, spec: ControlSpec, nextValue: unknown): voi
       if (target === undefined) {
         throw new Error(`No option for select control "${label}"`);
       }
-      const dropdown = getMantineSelectDropdown(new RegExp(label, "i"));
+      const dropdown = getMantineSelectDropdown(exactLabel(label));
       const option = within(dropdown).getByRole("option", {
         name: target.label,
         hidden: true,
@@ -190,9 +192,9 @@ function driveControl(label: string, spec: ControlSpec, nextValue: unknown): voi
       return;
     }
     case "columnPicker": {
-      const dropdown = getMantineSelectDropdown(new RegExp(label, "i"));
+      const dropdown = getMantineSelectDropdown(exactLabel(label));
       const option = within(dropdown).getByRole("option", {
-        name: new RegExp(String(nextValue), "i"),
+        name: new RegExp(`^${String(nextValue)}$`, "i"),
         hidden: true,
       });
       fireEvent.click(option);
