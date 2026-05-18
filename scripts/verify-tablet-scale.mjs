@@ -1,5 +1,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+// `chromium` is a runtime named export from @playwright/test (re-exported
+// from `playwright`) but the import-x rule can't see it through the chain.
+// eslint-disable-next-line import-x/named
 import { chromium } from "@playwright/test";
 
 const SCREENSHOT_DIR = ".playwright-mcp";
