@@ -32,13 +32,12 @@ $$;
  * - Settings (global) admin in the workspace → admin.
  *
  * Examples (non-owner, non-settings-admin):
- * - Workspace share viewer + app role editor (tags allow app role) → editor.
+ * - Workspace share viewer + app role editor → editor.
  * - Direct user share admin + app role viewer → admin (ranks 3 vs 1).
  * - Only workspace share viewer, resource is_restricted, no other grant →
  *   viewer.
- * - App role editor would apply, but resource has tags and user shares no tag
- *   with the resource → that app-role candidate is dropped; effective role is
- *   whatever remains from shares only (often null).
+ * - Group share editor + requires_app_access=true, user has no app role on
+ *   resource's app → that share candidate is dropped; merge proceeds without it.
  *
  * After owner and settings-admin short-circuits, every other grant path
  * requires a `workspace_memberships` row for this resource's workspace so
@@ -62,8 +61,6 @@ declare
   v_max_rank int := 0;
   v_share_rank int;
   v_user_app_role public.role_level;
-  v_tag_count int;
-  v_has_overlap boolean;
 begin
   if v_uid is null then
     return null;
@@ -146,6 +143,10 @@ begin
             ugm.user_group_id = rs.principal_id and
             ugm.user_id = v_uid and
             ug.workspace_id = v_workspace_id
+        ) and
+        (
+          rs.requires_app_access = false or
+          public.util__get_auth_user_app_role (v_workspace_id, v_app) is not null
         )
       )
     );
@@ -157,39 +158,10 @@ begin
     into v_user_app_role;
 
     if v_user_app_role is not null then
-      select count(*) into v_tag_count
-      from public.resource_user_group_tags rut
-      where
-        rut.workspace_id = v_workspace_id and
-        rut.resource_type = p_resource_type and
-        rut.resource_id = p_resource_id;
-
-      if v_tag_count = 0 then
-        v_max_rank := greatest(
-          v_max_rank,
-          public.util__role_level_rank (v_user_app_role)
-        );
-      else
-        select exists (
-          select 1
-          from public.resource_user_group_tags rut
-          inner join public.user_group_memberships ugm on
-            ugm.user_group_id = rut.user_group_id
-          where
-            rut.workspace_id = v_workspace_id and
-            rut.resource_type = p_resource_type and
-            rut.resource_id = p_resource_id and
-            ugm.user_id = v_uid
-        )
-        into v_has_overlap;
-
-        if v_has_overlap then
-          v_max_rank := greatest(
-            v_max_rank,
-            public.util__role_level_rank (v_user_app_role)
-          );
-        end if;
-      end if;
+      v_max_rank := greatest(
+        v_max_rank,
+        public.util__role_level_rank (v_user_app_role)
+      );
     end if;
   end if;
 
@@ -323,6 +295,8 @@ $$;
  * workspace-wide app role at editor+ (e.g. Global Editor) from reading
  * another user’s dataset, while keeping viewers, owners, settings/workspace
  * managers, restricted-resource paths, and explicit `resource_shares` grants.
+ * Group shares with requires_app_access=true additionally require the auth
+ * user to have a data_sources app role.
  *
  * @param p_dataset_id Primary key of `public.datasets`.
  * @returns True when the row should be visible to `auth.uid()`.
@@ -412,6 +386,13 @@ begin
             where
               ugm.user_group_id = rs.principal_id and
               ugm.user_id = v_uid
+          ) and
+          (
+            rs.requires_app_access = false or
+            public.util__get_auth_user_app_role (
+              v_ws,
+              'data_sources'::public.app_type
+            ) is not null
           )
         )
       )
@@ -447,6 +428,8 @@ $$;
  * Public dashboards (`is_public`) are readable by any authenticated user.
  * Otherwise applies the same editor-only block as
  * `util__auth_user_may_select_dataset` with app `dashboards`.
+ * Group shares with requires_app_access=true additionally require the auth
+ * user to have a dashboards app role.
  *
  * @param p_dashboard_id Primary key of `public.dashboards`.
  * @returns True when the row should be visible to `auth.uid()`.
@@ -542,12 +525,20 @@ begin
             where
               ugm.user_group_id = rs.principal_id and
               ugm.user_id = v_uid
+          ) and
+          (
+            rs.requires_app_access = false or
+            public.util__get_auth_user_app_role (
+              v_ws,
+              'dashboards'::public.app_type
+            ) is not null
           )
         )
       )
   )
   into v_has_share;
 
+  -- Restricted rows never inherit workspace app roles; require a share grant.
   if v_restricted then
     return coalesce(v_has_share, false);
   end if;

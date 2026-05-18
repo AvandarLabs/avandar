@@ -48,9 +48,12 @@ Implement functionality using red/green TDD.
 - Avoid vague names like `next`, `prev`, or `n`, that don't say what the
   variable actually actually holds. Always include a noun, such as `nextPage`,
   `prevRow` or `numPeople`.
-- Builder functions for objects or classes should be named `create{Type}`
-  - A function that creates a type from some seed data then use "From". E.g.
-    `createUserFromId`
+- Builder functions for objects or classes should be named `create{Type}`.
+  E.g. `createUser`
+- Builder functions for strings or primitives should be named `build{Thing}`.
+  E.g. `buildRoleKey`
+- Builder functions that take some seed data to build an output should use the
+  `*From{Seed}` format. E.g. `createUserFromId` or `buildKeyFromRole`
 - Conversion or cast functions should use "to". E.g. `roleToDisplayLabel`
   or `app_type_to_key`.
 

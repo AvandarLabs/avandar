@@ -36,8 +36,7 @@ export default defineConfig({
   },
   webServer: {
     command:
-      "pnpm exec dotenv -e .env.development -- vite --host 127.0.0.1 " +
-      "--port 5173",
+      "pnpm exec dotenv -e .env.development -- vite --host 127.0.0.1 --port 5173",
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,

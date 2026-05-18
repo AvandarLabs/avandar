@@ -7,13 +7,31 @@ import {
 } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
-import { DashboardEditorView } from "@/views/DashboardApp/DashboardEditorView/DashboardEditorView";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { UserId } from "$/models/User/User.types";
 import type { UserProfileId } from "$/models/User/UserProfile.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ReactElement } from "react";
+
+vi.mock("@/hooks/permissions/useUserAppRoles/useUserAppRoles", () => {
+  return {
+    useUserAppRoles: () => {
+      return [
+        {
+          dashboards: "viewer",
+          data_sources: "viewer",
+          data_explorer: "viewer",
+          settings: "viewer",
+        },
+        false,
+      ] as const;
+    },
+  };
+});
+
+const { DashboardEditorView } =
+  await import("@/views/DashboardApp/DashboardEditorView/DashboardEditorView");
 
 const { publishDashboardMock } = vi.hoisted(() => {
   return { publishDashboardMock: vi.fn() };
@@ -98,7 +116,7 @@ vi.mock("@/components/layouts/AppLayout/AppLayout", async () => {
 });
 
 vi.mock(
-  "@/components/permissions/ShareResourceModal/ShareResourceButton",
+  "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton",
   () => {
     return {
       ShareResourceButton: () => {

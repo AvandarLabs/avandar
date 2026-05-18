@@ -9,6 +9,17 @@ const _TOOLTIP_TEXT_WRAP = {
 };
 
 /**
+ * Default events for the @ui Tooltip. Mantine 9 sets `focus: false` by
+ * default; we override it to `true` so keyboard-only users can see
+ * tooltips when they Tab to the trigger (a11y spec §3.6).
+ */
+const _DEFAULT_TOOLTIP_EVENTS: NonNullable<TooltipProps["events"]> = {
+  hover: true,
+  focus: true,
+  touch: false,
+};
+
+/**
  * Ensures long unbroken strings (e.g. filenames) wrap inside `maw`.
  */
 function _mergeTooltipStyles(
@@ -55,6 +66,7 @@ export function Tooltip({
   withArrow = true,
   multiline = true,
   transitionProps = { transition: "pop" },
+  events = _DEFAULT_TOOLTIP_EVENTS,
   styles,
   ...props
 }: Props): JSX.Element {
@@ -66,6 +78,7 @@ export function Tooltip({
       withArrow={withArrow}
       multiline={multiline}
       transitionProps={{ transition: "pop", ...transitionProps }}
+      events={events}
       styles={_mergeTooltipStyles(styles)}
       {...props}
     >

@@ -22,12 +22,13 @@ export type ResourceShareRow = {
   principalType: SharePrincipalType;
   principalId: string | null;
   role: RoleLevel;
+  requiresAppAccess: boolean;
 };
 
 export type ResourceSharingState = {
   isRestricted: boolean;
-  shares: readonly ResourceShareRow[];
-  resourceTagIds: readonly string[];
+  ownerId: string;
+  shares: ResourceShareRow[];
 };
 
 function _mapResourceShareRow(row: {
@@ -38,6 +39,7 @@ function _mapResourceShareRow(row: {
   principal_type: SharePrincipalType;
   principal_id: string | null;
   role: RoleLevel;
+  requires_app_access: boolean;
 }): ResourceShareRow {
   return {
     id: row.id,
@@ -47,11 +49,103 @@ function _mapResourceShareRow(row: {
     principalType: row.principal_type,
     principalId: row.principal_id,
     role: row.role,
+    requiresAppAccess: row.requires_app_access,
   };
 }
 
+const _SHARE_ROW_PROJECTION = `
+  id,
+  workspace_id,
+  resource_type,
+  resource_id,
+  principal_type,
+  principal_id,
+  role,
+  requires_app_access
+`;
+
+type UpsertShareOptions = {
+  workspaceId: WorkspaceId;
+  resourceType: ResourceType;
+  resourceId: string;
+  principalType: SharePrincipalType;
+  principalId: string | null;
+  role: RoleLevel;
+  requiresAppAccess?: boolean;
+};
+
+async function _findExistingShareId(
+  dbClient: AvaSupabaseDBClient,
+  options: UpsertShareOptions,
+): Promise<string | null> {
+  let query = dbClient
+    .from("resource_shares")
+    .select("id")
+    .eq("workspace_id", options.workspaceId)
+    .eq("resource_type", options.resourceType)
+    .eq("resource_id", options.resourceId)
+    .eq("principal_type", options.principalType);
+
+  if (options.principalType === "workspace") {
+    query = query.is("principal_id", null);
+  } else {
+    query = query.eq("principal_id", options.principalId!);
+  }
+
+  const { data } = await query.maybeSingle().throwOnError();
+  return data?.id ?? null;
+}
+
+async function _updateShareById(
+  dbClient: AvaSupabaseDBClient,
+  shareId: string,
+  patch: { role: RoleLevel; principalId?: string; requiresAppAccess?: boolean },
+): Promise<ResourceShareRow> {
+  const updatePayload: {
+    role: RoleLevel;
+    principal_id?: string;
+    requires_app_access?: boolean;
+  } = { role: patch.role };
+  if (patch.principalId !== undefined) {
+    updatePayload.principal_id = patch.principalId;
+  }
+  if (patch.requiresAppAccess !== undefined) {
+    updatePayload.requires_app_access = patch.requiresAppAccess;
+  }
+  const { data } = await dbClient
+    .from("resource_shares")
+    .update(updatePayload)
+    .eq("id", shareId)
+    .select(_SHARE_ROW_PROJECTION)
+    .single()
+    .throwOnError();
+  return _mapResourceShareRow(data);
+}
+
+async function _insertShare(
+  dbClient: AvaSupabaseDBClient,
+  options: UpsertShareOptions,
+): Promise<ResourceShareRow> {
+  const { data } = await dbClient
+    .from("resource_shares")
+    .insert({
+      workspace_id: options.workspaceId,
+      resource_type: options.resourceType,
+      resource_id: options.resourceId,
+      principal_type: options.principalType,
+      principal_id:
+        options.principalType === "workspace" ? null : options.principalId,
+      role: options.role,
+      requires_app_access: options.requiresAppAccess ?? false,
+    })
+    .select(_SHARE_ROW_PROJECTION)
+    .single()
+    .throwOnError();
+  return _mapResourceShareRow(data);
+}
+
 /**
- * CRUD for `resource_shares`, resource tags, and `is_restricted` on resources.
+ * CRUD for `resource_shares` and `is_restricted` on resources.
  */
 function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
   const baseClient = createServiceClient("ResourceShareClient").mixin(
@@ -63,7 +157,7 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
     const newClient = baseClient.mixin(
       withNewMembers({
         /**
-         * Loads shares, tag ids, and restriction flag for one resource.
+         * Loads shares and restriction flag for one resource.
          */
         getResourceSharingState: async (options: {
           workspaceId: WorkspaceId;
@@ -76,188 +170,66 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
           const resourceTable =
             options.resourceType === "dashboard" ? "dashboards" : "datasets";
 
-          const [
-            { data: resourceRow },
-            { data: shareRows },
-            { data: tagRows },
-          ] = await Promise.all([
-            dbClient
-              .from(resourceTable)
-              .select("is_restricted")
-              .eq("id", options.resourceId)
-              .eq("workspace_id", options.workspaceId)
-              .single()
-              .throwOnError(),
-            dbClient
-              .from("resource_shares")
-              .select(
-                `
-                  id,
-                  workspace_id,
-                  resource_type,
-                  resource_id,
-                  principal_type,
-                  principal_id,
-                  role
-                `,
-              )
-              .eq("workspace_id", options.workspaceId)
-              .eq("resource_type", options.resourceType)
-              .eq("resource_id", options.resourceId)
-              .throwOnError(),
-            dbClient
-              .from("resource_user_group_tags")
-              .select("user_group_id")
-              .eq("workspace_id", options.workspaceId)
-              .eq("resource_type", options.resourceType)
-              .eq("resource_id", options.resourceId)
-              .throwOnError(),
-          ]);
+          const [{ data: resourceRow }, { data: shareRows }] =
+            await Promise.all([
+              dbClient
+                .from(resourceTable)
+                .select("is_restricted, owner_id")
+                .eq("id", options.resourceId)
+                .eq("workspace_id", options.workspaceId)
+                .single()
+                .throwOnError(),
+              dbClient
+                .from("resource_shares")
+                .select(_SHARE_ROW_PROJECTION)
+                .eq("workspace_id", options.workspaceId)
+                .eq("resource_type", options.resourceType)
+                .eq("resource_id", options.resourceId)
+                .throwOnError(),
+            ]);
 
           return {
             isRestricted: resourceRow.is_restricted,
+            ownerId: resourceRow.owner_id,
             shares: (shareRows ?? []).map(_mapResourceShareRow),
-            resourceTagIds: (tagRows ?? []).map((row) => {
-              return row.user_group_id;
-            }),
           };
         },
 
         /**
          * Upserts one share row (user, user_group, or workspace principal).
+         * Throws if `requiresAppAccess` is true for any principal other than
+         * `user_group` (mirrors the SQL check constraint).
          */
-        upsertResourceShare: async (options: {
-          workspaceId: WorkspaceId;
-          resourceType: ResourceType;
-          resourceId: string;
-          principalType: SharePrincipalType;
-          principalId: string | null;
-          role: RoleLevel;
-        }): Promise<ResourceShareRow> => {
+        upsertResourceShare: async (
+          options: UpsertShareOptions,
+        ): Promise<ResourceShareRow> => {
           const logger = baseLogger.appendName("upsertResourceShare");
           logger.log("upsert share", options);
 
-          let existingQuery = dbClient
-            .from("resource_shares")
-            .select("id")
-            .eq("workspace_id", options.workspaceId)
-            .eq("resource_type", options.resourceType)
-            .eq("resource_id", options.resourceId)
-            .eq("principal_type", options.principalType);
-
-          if (options.principalType === "workspace") {
-            existingQuery = existingQuery.is("principal_id", null);
-          } else {
-            existingQuery = existingQuery.eq(
-              "principal_id",
-              options.principalId!,
+          if (
+            options.requiresAppAccess === true &&
+            options.principalType !== "user_group"
+          ) {
+            throw new Error(
+              "requiresAppAccess applies only to user_group shares.",
             );
           }
-
-          const { data: existing } = await existingQuery
-            .maybeSingle()
-            .throwOnError();
-
-          if (options.principalType === "workspace") {
-            if (existing?.id) {
-              const { data } = await dbClient
-                .from("resource_shares")
-                .update({ role: options.role })
-                .eq("id", existing.id)
-                .select(
-                  `
-                  id,
-                  workspace_id,
-                  resource_type,
-                  resource_id,
-                  principal_type,
-                  principal_id,
-                  role
-                `,
-                )
-                .single()
-                .throwOnError();
-              return _mapResourceShareRow(data);
-            }
-
-            const { data } = await dbClient
-              .from("resource_shares")
-              .insert({
-                workspace_id: options.workspaceId,
-                resource_type: options.resourceType,
-                resource_id: options.resourceId,
-                principal_type: "workspace",
-                principal_id: null,
-                role: options.role,
-              })
-              .select(
-                `
-                id,
-                workspace_id,
-                resource_type,
-                resource_id,
-                principal_type,
-                principal_id,
-                role
-              `,
-              )
-              .single()
-              .throwOnError();
-            return _mapResourceShareRow(data);
-          }
-
-          if (!options.principalId) {
+          if (options.principalType !== "workspace" && !options.principalId) {
             throw new Error("principalId is required for user and user_group.");
           }
 
-          if (existing?.id) {
-            const { data } = await dbClient
-              .from("resource_shares")
-              .update({
-                role: options.role,
-                principal_id: options.principalId,
-              })
-              .eq("id", existing.id)
-              .select(
-                `
-                id,
-                workspace_id,
-                resource_type,
-                resource_id,
-                principal_type,
-                principal_id,
-                role
-              `,
-              )
-              .single()
-              .throwOnError();
-            return _mapResourceShareRow(data);
-          }
-
-          const { data } = await dbClient
-            .from("resource_shares")
-            .insert({
-              workspace_id: options.workspaceId,
-              resource_type: options.resourceType,
-              resource_id: options.resourceId,
-              principal_type: options.principalType,
-              principal_id: options.principalId,
+          const existingId = await _findExistingShareId(dbClient, options);
+          if (existingId) {
+            return _updateShareById(dbClient, existingId, {
               role: options.role,
-            })
-            .select(
-              `
-              id,
-              workspace_id,
-              resource_type,
-              resource_id,
-              principal_type,
-              principal_id,
-              role
-            `,
-            )
-            .single()
-            .throwOnError();
-          return _mapResourceShareRow(data);
+              principalId:
+                options.principalType === "workspace" ?
+                  undefined
+                : (options.principalId ?? undefined),
+              requiresAppAccess: options.requiresAppAccess,
+            });
+          }
+          return _insertShare(dbClient, options);
         },
 
         /**
@@ -295,45 +267,6 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
             .eq("workspace_id", options.workspaceId)
             .throwOnError();
         },
-
-        /**
-         * Replaces tag links for a resource (user_group tags).
-         */
-        setResourceUserGroupTags: async (options: {
-          workspaceId: WorkspaceId;
-          resourceType: ResourceType;
-          resourceId: string;
-          userGroupIds: readonly string[];
-        }): Promise<void> => {
-          const logger = baseLogger.appendName("setResourceUserGroupTags");
-          logger.log("set resource tags", options);
-
-          await dbClient
-            .from("resource_user_group_tags")
-            .delete()
-            .eq("workspace_id", options.workspaceId)
-            .eq("resource_type", options.resourceType)
-            .eq("resource_id", options.resourceId)
-            .throwOnError();
-
-          if (options.userGroupIds.length === 0) {
-            return;
-          }
-
-          await dbClient
-            .from("resource_user_group_tags")
-            .insert(
-              options.userGroupIds.map((userGroupId) => {
-                return {
-                  workspace_id: options.workspaceId,
-                  resource_type: options.resourceType,
-                  resource_id: options.resourceId,
-                  user_group_id: userGroupId,
-                };
-              }),
-            )
-            .throwOnError();
-        },
       }),
     );
 
@@ -343,7 +276,6 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
         "upsertResourceShare",
         "deleteResourceShare",
         "setResourceRestricted",
-        "setResourceUserGroupTags",
       ],
     });
   });

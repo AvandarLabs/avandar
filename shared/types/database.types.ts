@@ -793,6 +793,7 @@ export type Database = {
           id: string
           principal_id: string | null
           principal_type: Database["public"]["Enums"]["share_principal_type"]
+          requires_app_access: boolean
           resource_id: string
           resource_type: Database["public"]["Enums"]["resource_type"]
           role: Database["public"]["Enums"]["role_level"]
@@ -804,6 +805,7 @@ export type Database = {
           id?: string
           principal_id?: string | null
           principal_type: Database["public"]["Enums"]["share_principal_type"]
+          requires_app_access?: boolean
           resource_id: string
           resource_type: Database["public"]["Enums"]["resource_type"]
           role: Database["public"]["Enums"]["role_level"]
@@ -815,6 +817,7 @@ export type Database = {
           id?: string
           principal_id?: string | null
           principal_type?: Database["public"]["Enums"]["share_principal_type"]
+          requires_app_access?: boolean
           resource_id?: string
           resource_type?: Database["public"]["Enums"]["resource_type"]
           role?: Database["public"]["Enums"]["role_level"]
@@ -824,48 +827,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "resource_shares_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      resource_user_group_tags: {
-        Row: {
-          created_at: string
-          id: string
-          resource_id: string
-          resource_type: Database["public"]["Enums"]["resource_type"]
-          user_group_id: string
-          workspace_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          resource_id: string
-          resource_type: Database["public"]["Enums"]["resource_type"]
-          user_group_id: string
-          workspace_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          resource_id?: string
-          resource_type?: Database["public"]["Enums"]["resource_type"]
-          user_group_id?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "resource_user_group_tags_user_group_id_fkey"
-            columns: ["user_group_id"]
-            isOneToOne: false
-            referencedRelation: "user_groups"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "resource_user_group_tags_workspace_id_fkey"
             columns: ["workspace_id"]
             isOneToOne: false
             referencedRelation: "workspaces"
@@ -1419,6 +1380,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      rpc__list_shared_with_me: {
+        Args: { p_workspace_id: string }
+        Returns: {
+          effective_role: Database["public"]["Enums"]["role_level"]
+          name: string
+          resource_id: string
+          resource_type: Database["public"]["Enums"]["resource_type"]
+        }[]
+      }
       rpc_datasets__add_csv_file_dataset: {
         Args: {
           p_columns: Database["public"]["CompositeTypes"]["dataset_column_input"][]
