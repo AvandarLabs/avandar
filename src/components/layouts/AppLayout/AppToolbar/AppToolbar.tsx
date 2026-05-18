@@ -1,5 +1,7 @@
 import { Box, Group, Title } from "@mantine/core";
 import { ReactNode } from "react";
+import { FeedbackButton } from "@/components/buttons/FeedbackButton/FeedbackButton";
+import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { NavbarDesktopToggle } from "@/components/layouts/AppLayout/AppToolbar/NavbarDesktopToggle/NavbarDesktopToggle";
 import { mantineColorVar } from "@/lib/utils/browser/css";
 
@@ -42,7 +44,12 @@ export function AppToolbar({
         </Title>
       : null}
       <Box ml="auto" mr="xxs">
-        {children}
+        <Group gap="xs">
+          {children}
+          {isFlagEnabled(FeatureFlag.EnableUserFeedback) ?
+            <FeedbackButton />
+          : null}
+        </Group>
       </Box>
     </Group>
   );
