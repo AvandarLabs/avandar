@@ -2,6 +2,7 @@ import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { ActionIcon, Box, Group, Stack, Text } from "@mantine/core";
 import { IconSparkles, IconX } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
+import clsx from "clsx";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatThread } from "@/components/ChatPanel/ChatThread/ChatThread";
 import { useAvandarChatRuntime } from "@/components/ChatPanel/useAvandarChatRuntime";
@@ -27,7 +28,7 @@ export function ChatPanel(): JSX.Element {
         h="100%"
         bg={disabled ? undefined : "white"}
         bdrs="md"
-        className={`${css.shell}${disabled ? ` ${css.shellDisabled}` : ""}`}
+        className={clsx(css.shell, disabled && css.shellDisabled)}
         gap={0}
       >
         <Group px="md" py="sm" justify="space-between" className={css.header}>
