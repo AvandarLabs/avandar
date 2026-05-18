@@ -5,4 +5,5 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 9
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 1
-ALTER TABLE "dataset_columns" ADD COLUMN "original_name" TEXT;
+alter table "dataset_columns"
+add column "original_name" text;

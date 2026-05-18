@@ -29,12 +29,7 @@ import { runGenerator } from "./runGenerator";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(HERE, "..", "..", "..", "..");
 const PG_MIGRATIONS_DIR = join(REPO_ROOT, "supabase", "migrations");
-const SQLITE_MIGRATIONS_DIR = join(
-  REPO_ROOT,
-  "apps",
-  "desktop",
-  "migrations",
-);
+const SQLITE_MIGRATIONS_DIR = join(REPO_ROOT, "apps", "desktop", "migrations");
 
 const summary = runGenerator({
   sourceDir: PG_MIGRATIONS_DIR,

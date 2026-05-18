@@ -171,9 +171,8 @@ function _resetOutputDir(outDir: string): void {
   // we do not nuke the operator-facing documentation that lives
   // alongside.
   const readmePath = join(outDir, "README.md");
-  const readme = existsSync(readmePath)
-    ? readFileSync(readmePath, "utf8")
-    : undefined;
+  const readme =
+    existsSync(readmePath) ? readFileSync(readmePath, "utf8") : undefined;
   if (existsSync(outDir)) {
     rmSync(outDir, { recursive: true, force: true });
   }
@@ -189,11 +188,10 @@ function _throwOnUnknown(
   const { sourceFile, partition } = args;
   const samples = partition.unknown.slice(0, 5).map((s) => {
     const reason =
-      s.kind === "unknown"
-        ? "unrecognised leading keyword"
-        : s.primaryTable === undefined
-          ? "schema-shape with no detectable primary table"
-          : `uncategorised table: ${s.primaryTable}`;
+      s.kind === "unknown" ? "unrecognised leading keyword"
+      : s.primaryTable === undefined ?
+        "schema-shape with no detectable primary table"
+      : `uncategorised table: ${s.primaryTable}`;
     const preview = s.sql.replace(/\s+/g, " ").slice(0, 120);
     const ellipsis = s.sql.length > 120 ? "..." : "";
     return `  - [${reason}] ${preview}${ellipsis}`;

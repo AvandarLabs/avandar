@@ -50,9 +50,7 @@ describe("compare", () => {
   });
 
   it("returns an empty result for two empty maps", () => {
-    expect(
-      compare({ committed: new Map(), fresh: new Map() }),
-    ).toEqual([]);
+    expect(compare({ committed: new Map(), fresh: new Map() })).toEqual([]);
   });
 });
 

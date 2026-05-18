@@ -5,4 +5,4 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 10
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 0
-DROP INDEX IF EXISTS "idx_workspace_invites__role_group_id";
+drop index if exists "idx_workspace_invites__role_group_id";

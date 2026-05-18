@@ -51,8 +51,8 @@ export function printHandEditWarning(
   const bullets = items.map((item) => {
     const fkTargets = item.statement.fkReferences
       .map((ref) => {
-        return ref.schema === undefined
-          ? ref.table
+        return ref.schema === undefined ?
+            ref.table
           : `${ref.schema}.${ref.table}`;
       })
       .join(", ");
@@ -104,11 +104,9 @@ export function printDroppedFkInfo(
         const target =
           ref.schema === undefined ? ref.table : `${ref.schema}.${ref.table}`;
         const reason =
-          ref.schema !== undefined
-            ? "cross-schema"
-            : excludedSet.has(ref.table)
-              ? "excluded from sync"
-              : "target table not in SYNCABLE_TABLES";
+          ref.schema !== undefined ? "cross-schema"
+          : excludedSet.has(ref.table) ? "excluded from sync"
+          : "target table not in SYNCABLE_TABLES";
         return `${target} (${reason})`;
       })
       .join(", ");

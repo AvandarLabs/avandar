@@ -5,54 +5,149 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 300
 -- FK constraints dropped (target not synced to SQLite): 4
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 15
-CREATE TABLE "entity_configs" ("id" UUID NOT NULL, "owner_id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "name" TEXT NOT NULL, "description" TEXT, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "allow_manual_creation" INTEGER NOT NULL);
+create table "entity_configs" (
+  "id" uuid not null,
+  "owner_id" uuid not null,
+  "workspace_id" uuid not null,
+  "name" text not null,
+  "description" text,
+  "created_at" timestamptz not null default current_timestamp,
+  "updated_at" timestamptz not null default current_timestamp,
+  "allow_manual_creation" integer not null
+);
 
-CREATE TABLE "entity_field_configs" ("id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "entity_config_id" UUID NOT NULL, "name" TEXT NOT NULL, "description" TEXT, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "class" entity_field_configs__class NOT NULL, "base_data_type" entity_field_configs__base_data_type NOT NULL, "value_extractor_type" entity_field_configs__value_extractor_type NOT NULL, "is_title_field" INTEGER NOT NULL DEFAULT FALSE, "is_id_field" INTEGER NOT NULL DEFAULT FALSE, "is_array" INTEGER, "allow_manual_edit" INTEGER NOT NULL DEFAULT FALSE);
+create table "entity_field_configs" (
+  "id" uuid not null,
+  "workspace_id" uuid not null,
+  "entity_config_id" uuid not null,
+  "name" text not null,
+  "description" text,
+  "created_at" timestamptz not null default current_timestamp,
+  "updated_at" timestamptz not null default current_timestamp,
+  "class" entity_field_configs__class not null,
+  "base_data_type" entity_field_configs__base_data_type not null,
+  "value_extractor_type" entity_field_configs__value_extractor_type not null,
+  "is_title_field" integer not null default false,
+  "is_id_field" integer not null default false,
+  "is_array" integer,
+  "allow_manual_edit" integer not null default false
+);
 
-CREATE TABLE "user_profiles" ("id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "user_id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "membership_id" UUID NOT NULL, "full_name" TEXT NOT NULL, "display_name" TEXT NOT NULL);
+create table "user_profiles" (
+  "id" uuid not null,
+  "created_at" timestamptz not null default current_timestamp,
+  "updated_at" timestamptz not null default current_timestamp,
+  "user_id" uuid not null,
+  "workspace_id" uuid not null,
+  "membership_id" uuid not null,
+  "full_name" text not null,
+  "display_name" text not null
+);
 
-CREATE TABLE "value_extractors__aggregation" ("id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "entity_field_config_id" UUID NOT NULL, "aggregation_type" value_extractors__aggregation_type NOT NULL, "dataset_id" UUID NOT NULL, "dataset_field_id" UUID NOT NULL, "filter" JSONB);
+create table "value_extractors__aggregation" (
+  "id" uuid not null,
+  "workspace_id" uuid not null,
+  "created_at" timestamptz not null default current_timestamp,
+  "updated_at" timestamptz not null default current_timestamp,
+  "entity_field_config_id" uuid not null,
+  "aggregation_type" value_extractors__aggregation_type not null,
+  "dataset_id" uuid not null,
+  "dataset_field_id" uuid not null,
+  "filter" jsonb
+);
 
-CREATE TABLE "value_extractors__dataset_column_value" ("id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "entity_field_config_id" UUID NOT NULL, "value_picker_rule_type" value_extractors__value_picker_rule_type NOT NULL, "dataset_id" UUID NOT NULL, "dataset_field_id" UUID NOT NULL);
+create table "value_extractors__dataset_column_value" (
+  "id" uuid not null,
+  "workspace_id" uuid not null,
+  "created_at" timestamptz not null default current_timestamp,
+  "updated_at" timestamptz not null default current_timestamp,
+  "entity_field_config_id" uuid not null,
+  "value_picker_rule_type" value_extractors__value_picker_rule_type not null,
+  "dataset_id" uuid not null,
+  "dataset_field_id" uuid not null
+);
 
-CREATE TABLE "value_extractors__manual_entry" ("id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "entity_field_config_id" UUID NOT NULL);
+create table "value_extractors__manual_entry" (
+  "id" uuid not null,
+  "workspace_id" uuid not null,
+  "created_at" timestamptz not null default current_timestamp,
+  "updated_at" timestamptz not null default current_timestamp,
+  "entity_field_config_id" uuid not null
+);
 
-CREATE TABLE "workspace_memberships" ("id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "workspace_id" UUID NOT NULL, "user_id" UUID NOT NULL);
+create table "workspace_memberships" (
+  "id" uuid not null,
+  "created_at" timestamptz not null default current_timestamp,
+  "workspace_id" uuid not null,
+  "user_id" uuid not null
+);
 
-CREATE TABLE "workspaces" ("id" UUID NOT NULL, "owner_id" UUID NOT NULL, "name" TEXT NOT NULL, "slug" TEXT NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP);
+create table "workspaces" (
+  "id" uuid not null,
+  "owner_id" uuid not null,
+  "name" text not null,
+  "slug" text not null,
+  "created_at" timestamptz not null default current_timestamp,
+  "updated_at" timestamptz not null default current_timestamp
+);
 
-CREATE UNIQUE INDEX entity_configs_pkey ON entity_configs(id);
+create unique index entity_configs_pkey on entity_configs (id);
 
-CREATE UNIQUE INDEX entity_field_configs_pkey ON entity_field_configs(id);
+create unique index entity_field_configs_pkey on entity_field_configs (id);
 
-CREATE INDEX idx_entity_configs__workspace_id ON entity_configs(workspace_id);
+create index idx_entity_configs__workspace_id on entity_configs (
+  workspace_id
+);
 
-CREATE INDEX idx_entity_field_configs__entity_config_id_workspace_id ON entity_field_configs(entity_config_id, workspace_id);
+create index idx_entity_field_configs__entity_config_id_workspace_id on entity_field_configs (
+  entity_config_id,
+  workspace_id
+);
 
-CREATE INDEX idx_user_profiles__user_id_workspace_id ON user_profiles(user_id, workspace_id);
+create index idx_user_profiles__user_id_workspace_id on user_profiles (
+  user_id,
+  workspace_id
+);
 
-CREATE INDEX idx_value_extractors__aggregation__entity_field_config_id_works ON value_extractors__aggregation(entity_field_config_id, workspace_id);
+create index idx_value_extractors__aggregation__entity_field_config_id_works on value_extractors__aggregation (
+  entity_field_config_id,
+  workspace_id
+);
 
-CREATE INDEX idx_value_extractors__dataset_column_value__entity_field_config ON value_extractors__dataset_column_value(entity_field_config_id, workspace_id);
+create index idx_value_extractors__dataset_column_value__entity_field_config on value_extractors__dataset_column_value (
+  entity_field_config_id,
+  workspace_id
+);
 
-CREATE INDEX idx_value_extractors__manual_entry__entity_field_config_id_work ON value_extractors__manual_entry(entity_field_config_id, workspace_id);
+create index idx_value_extractors__manual_entry__entity_field_config_id_work on value_extractors__manual_entry (
+  entity_field_config_id,
+  workspace_id
+);
 
-CREATE INDEX idx_workspace_memberships__user_id_workspace_id ON workspace_memberships(user_id, workspace_id);
+create index idx_workspace_memberships__user_id_workspace_id on workspace_memberships (
+  user_id,
+  workspace_id
+);
 
-CREATE INDEX idx_workspace_memberships__workspace_id ON workspace_memberships(workspace_id);
+create index idx_workspace_memberships__workspace_id on workspace_memberships (
+  workspace_id
+);
 
-CREATE UNIQUE INDEX user_profiles_pkey ON user_profiles(id);
+create unique index user_profiles_pkey on user_profiles (id);
 
-CREATE UNIQUE INDEX value_extractors__aggregation_pkey ON value_extractors__aggregation(id);
+create unique index value_extractors__aggregation_pkey on value_extractors__aggregation (id);
 
-CREATE UNIQUE INDEX value_extractors__dataset_column_value_pkey ON value_extractors__dataset_column_value(id);
+create unique index value_extractors__dataset_column_value_pkey on value_extractors__dataset_column_value (id);
 
-CREATE UNIQUE INDEX value_extractors__manual_entry_pkey ON value_extractors__manual_entry(id);
+create unique index value_extractors__manual_entry_pkey on value_extractors__manual_entry (id);
 
-CREATE UNIQUE INDEX workspace_memberships_pkey ON workspace_memberships(id);
+create unique index workspace_memberships_pkey on workspace_memberships (id);
 
-CREATE UNIQUE INDEX workspace_memberships_workspace_user_unique ON workspace_memberships(workspace_id, user_id);
+create unique index workspace_memberships_workspace_user_unique on workspace_memberships (
+  workspace_id,
+  user_id
+);
 
-CREATE UNIQUE INDEX workspaces_pkey ON workspaces(id);
+create unique index workspaces_pkey on workspaces (id);
 
-CREATE UNIQUE INDEX workspaces_slug_key ON workspaces(slug);
+create unique index workspaces_slug_key on workspaces (slug);

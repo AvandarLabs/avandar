@@ -5,4 +5,5 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 1
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 0
-ALTER TABLE workspace_memberships ADD COLUMN updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP;
+alter table workspace_memberships
+add column updated_at timestamptz not null default current_timestamp;

@@ -5,6 +5,8 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 14
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 2
-ALTER TABLE "dataset_columns" ADD COLUMN "original_data_type" TEXT NOT NULL;
+alter table "dataset_columns"
+add column "original_data_type" text not null;
 
-ALTER TABLE "dataset_columns" ADD COLUMN "detected_data_type" "datasets__duckdb_data_type" NOT NULL;
+alter table "dataset_columns"
+add column "detected_data_type" "datasets__duckdb_data_type" not null;

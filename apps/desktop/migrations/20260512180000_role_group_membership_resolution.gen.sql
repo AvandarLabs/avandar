@@ -5,6 +5,9 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 17
 -- FK constraints dropped (target not synced to SQLite): 1
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 0
-ALTER TABLE workspace_memberships ADD COLUMN updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP;
+alter table workspace_memberships
+add column updated_at timestamptz not null default current_timestamp;
 
-CREATE INDEX IF NOT EXISTS idx_workspace_memberships__role_group_id ON workspace_memberships(role_group_id);
+create index if not exists idx_workspace_memberships__role_group_id on workspace_memberships (
+  role_group_id
+);

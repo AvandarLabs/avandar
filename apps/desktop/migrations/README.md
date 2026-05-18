@@ -56,7 +56,7 @@ generator preserves every FK whose target table is in
   or table-level `FOREIGN KEY (...) REFERENCES ...`) -> emitted
   verbatim, SQLite handles it.
 - **FK declared as a separate `ALTER TABLE ... ADD CONSTRAINT ...
-  FOREIGN KEY`** -> SQLite cannot accept this syntax; routed to the
+FOREIGN KEY`** -> SQLite cannot accept this syntax; routed to the
   `⚠ needs hand-edit` warning. Inline it into the CREATE TABLE
   yourself.
 - **FK targeting a non-public schema** (e.g. `references auth.users`)
@@ -103,27 +103,33 @@ Three checks, fastest first. The unit tests are hermetic (no Python
 needed); the last two actually shell out to uv + sqlglot.
 
 1. **The TypeScript-only logic passes its unit tests (no uv needed):**
+
    ```bash
    pnpm --filter @avandar/desktop test scripts/gen-sqlite-migrations.test.ts sync/syncable-tables.test.ts
    ```
+
    Expected: green; covers the classifier, the partition logic, and the
    syncable-tables manifest shape.
 
 2. **uv can resolve sqlglot and run a smoke transpile (does not touch
    the repo):**
+
    ```bash
    echo "create table foo (id uuid primary key, created_at timestamptz);" \
      | uv run --quiet --with 'sqlglot>=26.0.0,<27.0.0' python -c "import sys, sqlglot; print(sqlglot.transpile(sys.stdin.read(), read='postgres', write='sqlite')[0])"
    ```
+
    Expected: prints a SQLite-flavoured `CREATE TABLE`. First run takes
    a few seconds while uv downloads sqlglot into its cache; later runs
    are instant.
 
 3. **End-to-end run of the generator against the real migrations
    (writes files into this directory):**
+
    ```bash
    pnpm gen:sqlite-migrations
    ```
+
    Expected: a log line like
    `[gen-sqlite-migrations] wrote N files; included X statements, skipped Y`,
    followed (if applicable) by a yellow `⚠ needs hand-edit` warning

@@ -1,10 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  __setIpcBridgeForTests,
-  callIpc,
-  type IpcBridge,
-} from "$/platform/ipc/client.ts";
+import { __setIpcBridgeForTests, callIpc } from "$/platform/ipc/client.ts";
 import { defineIpcContract } from "$/platform/ipc/contracts/defineIpcContract.ts";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { IpcBridge } from "$/platform/ipc/client.ts";
 import type {
   ReplyEnvelope,
   RequestEnvelope,
@@ -53,7 +50,10 @@ describe("callIpc", () => {
       id: expect.any(String) as unknown,
       payload: { a: 1 },
     });
-    expect(onceMock).toHaveBeenCalledWith("test.echo.reply", expect.any(Function));
+    expect(onceMock).toHaveBeenCalledWith(
+      "test.echo.reply",
+      expect.any(Function),
+    );
   });
 
   it("rejects when the server replies with ok: false", async () => {
@@ -94,9 +94,7 @@ describe("callIpc", () => {
       },
     );
 
-    await expect(callIpc(contract, { a: 1 })).rejects.toThrow(
-      /id mismatch/i,
-    );
+    await expect(callIpc(contract, { a: 1 })).rejects.toThrow(/id mismatch/i);
   });
 
   it("throws synchronously when no IPC bridge is available", async () => {

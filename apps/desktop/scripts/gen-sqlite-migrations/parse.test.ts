@@ -29,9 +29,7 @@ describe("classifyStatement", () => {
       classifyStatement('alter table "public"."x" enable row level security;'),
     ).toBe("drop");
     expect(
-      classifyStatement(
-        'alter table "public"."x" disable row level security;',
-      ),
+      classifyStatement('alter table "public"."x" disable row level security;'),
     ).toBe("drop");
   });
 
@@ -67,9 +65,7 @@ describe("classifyStatement", () => {
         "create or replace function public.f() returns void language plpgsql as $$ begin end; $$;",
       ),
     ).toBe("drop");
-    expect(classifyStatement("drop function if exists public.f;")).toBe(
-      "drop",
-    );
+    expect(classifyStatement("drop function if exists public.f;")).toBe("drop");
   });
 
   it("classifies CREATE / DROP TRIGGER as drop", () => {
@@ -90,9 +86,9 @@ describe("classifyStatement", () => {
   });
 
   it("classifies CREATE EXTENSION / COMMENT / SET as drop", () => {
-    expect(
-      classifyStatement("create extension if not exists pgcrypto;"),
-    ).toBe("drop");
+    expect(classifyStatement("create extension if not exists pgcrypto;")).toBe(
+      "drop",
+    );
     expect(classifyStatement("comment on table public.x is 'hi';")).toBe(
       "drop",
     );

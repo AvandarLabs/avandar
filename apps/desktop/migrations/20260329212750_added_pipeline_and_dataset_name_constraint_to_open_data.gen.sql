@@ -5,4 +5,7 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 1
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 0
-CREATE UNIQUE INDEX unique_dataset_pipeline ON catalog_entries__open_data(dataset_name, pipeline_name);
+create unique index unique_dataset_pipeline on catalog_entries__open_data (
+  dataset_name,
+  pipeline_name
+);

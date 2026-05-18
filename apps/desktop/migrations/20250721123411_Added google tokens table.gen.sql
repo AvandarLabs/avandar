@@ -5,6 +5,9 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 32
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 0
-DROP INDEX IF EXISTS "workspace_memberships_workspace_user_unique";
+drop index if exists "workspace_memberships_workspace_user_unique";
 
-CREATE UNIQUE INDEX workspace_memberships__workspace_user_unique ON workspace_memberships(workspace_id, user_id);
+create unique index workspace_memberships__workspace_user_unique on workspace_memberships (
+  workspace_id,
+  user_id
+);

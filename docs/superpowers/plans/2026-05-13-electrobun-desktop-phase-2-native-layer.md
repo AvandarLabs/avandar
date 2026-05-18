@@ -4,7 +4,7 @@
 >
 > **Per-step test handoff:** After completing every Step in this plan, output an enumerated list (`1.`, `2.`, `3.`, …) of the exact actions the human partner should take to verify the just-completed Step — commands to run (copy-pasteable), files or UI to inspect, and the expected result for each. Do this for every Step, including "trivial" config/file-creation steps; never skip or summarize. The list is in addition to (not a replacement for) the Manual review checkpoint at the end of each Task.
 >
-> **PR rule:** Every Task ships as exactly **one PR**. Steps are progress markers *within* a Task, not independent PR boundaries — never split a Task across multiple PRs, and never bundle two Tasks into one PR. When a per-Task `**PR boundaries:**` note below mentions multiple PRs (carried over from an earlier revision), treat that as a signal the Task should be **decomposed into multiple smaller Tasks**, not shipped as multi-PR work.
+> **PR rule:** Every Task ships as exactly **one PR**. Steps are progress markers _within_ a Task, not independent PR boundaries — never split a Task across multiple PRs, and never bundle two Tasks into one PR. When a per-Task `**PR boundaries:**` note below mentions multiple PRs (carried over from an earlier revision), treat that as a signal the Task should be **decomposed into multiple smaller Tasks**, not shipped as multi-PR work.
 
 **Spec:** `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md`
 
@@ -13,6 +13,7 @@
 **Goal:** Wire all desktop privileged services (SQLite, native DuckDB, filesystem `DatasetBlobStore`, OS keychain) into Bun main and expose them to the webview via typed IPC. After Phase 2 the desktop runs **fully offline** against a local snapshot of the user's data; the sync engine (Phase 3) is still absent, so writes do not yet propagate to Supabase.
 
 **Architecture:**
+
 - A typed IPC layer in `shared/platform/ipc/` defines contracts; webview side has an IPC client, Bun main side has handler registration.
 - `apps/desktop/main/services/` hosts the concrete native implementations: `Sqlite.ts`, `DuckDb.ts`, `FileSystemDatasetBlobStore.ts`, `Keychain.ts`.
 - A Postgres→SQLite migration generator (`apps/desktop/scripts/gen-sqlite-migrations.ts`) shells out to Python's `sqlglot`, guarded by a `SYNCABLE_TABLES` manifest.
@@ -21,6 +22,7 @@
 **Tech Stack:** Electrobun IPC, Bun runtime, `bun:sqlite`, native DuckDB (via the existing `duckdb` Node binding used by `@avandar/ava-etl`), Bun FFI, Python 3 + `sqlglot` (developer-machine dependency).
 
 **Phase 1 outcome — what already exists (as of 2026-05-17):**
+
 - Electrobun desktop shell: `apps/desktop/{electrobun.config.ts,main/index.ts,preload/index.ts,package.json,vitest.config.ts,types/electrobun-deps.d.ts}` and `pnpm dev:desktop` boots a window pointed at the Vite dev server.
 - Platform discriminator: `shared/platform/isDesktop.ts` (reads `document.documentElement.dataset.avaPlatform`, set in the page main world by a Bun-side `dom-ready` handler in `apps/desktop/main/index.ts`).
 - Platform interface contracts (type-only): `shared/platform/types/{Platform,AuthProvider,DatasetBlobStore,DuckDbClient,RdbClient,ServerApiClient,SyncEngine}.types.ts` plus a structural existence test at `shared/platform/types/interfaces.test.ts`.
@@ -29,11 +31,13 @@
 - Platform-aware hooks: `src/hooks/useIsDesktopPlatform/`, `src/hooks/usePlatformInfo/` consume `isDesktop()`. There is no `PlatformProvider` yet — Task 13 introduces it.
 
 **Path aliases & package layout (deltas from the plan as originally drafted):**
+
 - There is **no `@avandar/platform` workspace package**. Platform code lives under `shared/platform/` and is reached via the `$/` alias (`$/* → ./shared/*`). When code samples below import from `"@avandar/platform"`, substitute the matching `$/platform/...` path: contracts at `$/platform/ipc/contracts.ts`, client at `$/platform/ipc/client.ts`, server at `$/platform/ipc/server.ts`, `isDesktop` at `$/platform/isDesktop.ts`, and the `Desktop*` adapters at `$/platform/desktop/...`.
 - The umbrella factory is at `shared/RdbCrudClient/createRdbCrudClient.ts` (under `$/RdbCrudClient/...`), **not** `packages/shared/clients/src/RdbCrudClient/`. Concrete backends like `createSupabaseCrudClient` and the new `createSqliteCrudClient` do live under `packages/shared/clients/src/` (the `@clients` package, alias `@clients/*`).
 - Tests under `shared/**` (excluding `shared/lib/**`) are picked up by the root vitest config and run via `pnpm test:frontend`. Tests under `apps/desktop/` run via `pnpm --filter @avandar/desktop test`, but the current desktop `vitest.config.ts` only includes `main/**` and `preload/**` — Tasks that drop tests in `apps/desktop/{sync,scripts}/` must also widen that include glob or relocate the tests under `main/`.
 
 **Phase exit criteria:**
+
 1. On desktop, `pnpm dev:desktop` opens the app; first launch performs a one-shot Supabase→SQLite snapshot pull; subsequent launches read from local SQLite even with the network disabled.
 2. Native DuckDB in Bun main answers queries from the webview via IPC; duckdb-wasm is no longer loaded by the desktop webview bundle.
 3. File uploads on desktop write the source + parquet to disk under the per-OS-user app data directory.
@@ -49,6 +53,7 @@
 > The paths below reflect the **current** repo layout after Phase 1 landed. Where the original plan referenced `packages/shared/platform/src/...` or `@avandar/platform`, the real location is `shared/platform/...` (alias `$/platform/...`). The remaining `@avandar/platform` imports inside code samples in later Tasks have been intentionally left in place — when implementing, substitute the matching `$/platform/...` path per the note in the previous section.
 
 **New: IPC framework (lives in the shared `$/platform` tree, not a separate workspace):**
+
 - `shared/platform/ipc/contracts.ts` — typed contract definitions
 - `shared/platform/ipc/contracts.test-d.ts`
 - `shared/platform/ipc/client.ts` — webview-side IPC client
@@ -57,6 +62,7 @@
 - `shared/platform/ipc/server.test.ts`
 
 **New: Migration generator:**
+
 - `apps/desktop/scripts/gen-sqlite-migrations.ts` — Bun-runnable generator
 - `apps/desktop/scripts/gen-sqlite-migrations.test.ts`
 - `apps/desktop/scripts/check-sqlite-migrations.ts` — CI drift check
@@ -68,6 +74,7 @@
   ⚠ The current `apps/desktop/vitest.config.ts` `include` glob is `["main/**/*.test.ts", "preload/**/*.test.ts"]`. Either widen it to cover `sync/**` and `scripts/**`, or relocate these tests under `main/` (and adjust the script paths accordingly) before authoring tests here — otherwise the suite will silently skip them.
 
 **New: Bun-main services:**
+
 - `apps/desktop/main/services/Sqlite.ts` — bun:sqlite handle + migration runner
 - `apps/desktop/main/services/Sqlite.test.ts`
 - `apps/desktop/main/services/DuckDb.ts` — native DuckDB connection management
@@ -79,6 +86,7 @@
 - `apps/desktop/main/services/SupabaseRest.ts` — server-side fetch wrapper for sync (used in Phase 3)
 
 **New: Main-side IPC handlers:**
+
 - `apps/desktop/main/ipc/rdb.ts`
 - `apps/desktop/main/ipc/duckdb.ts`
 - `apps/desktop/main/ipc/dataset-blob.ts`
@@ -86,11 +94,13 @@
 - `apps/desktop/main/ipc/api.ts` — ServerApi (Task 14)
 
 **New: Platform helpers:**
+
 - `apps/desktop/main/platform/userDataDir.ts`
 - `apps/desktop/main/platform/userDataDir.test.ts`
 - `apps/desktop/main/platform/network.ts`
 
 **New: Webview-side desktop implementations:**
+
 - `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.ts`
 - `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.test.ts`
 - `shared/platform/desktop/DesktopRdbClient.ts`
@@ -100,6 +110,7 @@
 - `shared/platform/desktop/*.test.ts` for each
 
 **Pre-existing from Phase 1 (referenced by Phase 2, do not recreate):**
+
 - `shared/platform/isDesktop.ts` + `shared/platform/isDesktop.test.ts`
 - `shared/platform/types/{Platform,AuthProvider,DatasetBlobStore,DuckDbClient,RdbClient,ServerApiClient,SyncEngine}.types.ts` + `shared/platform/types/interfaces.test.ts`
 - `shared/RdbCrudClient/createRdbCrudClient.ts` + `.test.ts` + `RdbCrudClient.types.ts`
@@ -108,6 +119,7 @@
 - `apps/desktop/main/index.ts`, `apps/desktop/preload/index.ts`, `apps/desktop/main/config/url.ts`, `apps/desktop/main/menu/setupApplicationMenu.ts`, `apps/desktop/electrobun.config.ts`, `apps/desktop/vitest.config.ts`
 
 **Modified:**
+
 - `apps/desktop/package.json` — add `duckdb` (bun:sqlite is built-in)
 - `apps/desktop/vitest.config.ts` — widen `include` if Task 5/6 put tests outside `main/`
 - `apps/desktop/main/index.ts` — register IPC handlers on startup
@@ -125,17 +137,19 @@
 ## Milestones
 
 Phase 2 is too big to ship in one go. The 15 Tasks group into **6 milestones**. Every milestone is sized to:
+
 1. **Leave the codebase consistent** — `pnpm test` green, `pnpm type-check` clean, `pnpm dev` (web) and `pnpm dev:desktop` both boot, no half-wired adapters left behind.
 2. **Be reviewable** — a milestone is a coherent unit of work, not a grab-bag. Each constituent Task still ships per its own `**PR boundaries:**` block; the milestone is just the chunk you'd open a meta-issue for.
 
 The hard ordering invariants (don't reorder these):
+
 - Tasks 2 & 3 depend on Task 1's contract types.
 - Task 6 (migration generator) depends on Task 5's `SYNCABLE_TABLES` manifest.
 - Task 7's startup wiring depends on Task 6's generated `apps/desktop/migrations/*.sql`.
 - Task 8's `createSqliteCrudClient` depends on Tasks 1-3 + 7.
-- Task 8's **factory flip** (the moment desktop CRUD stops reading from Supabase) must ship *together with* Task 9's snapshot bootstrap — otherwise the desktop reads from an empty SQLite and the UI goes blank.
+- Task 8's **factory flip** (the moment desktop CRUD stops reading from Supabase) must ship _together with_ Task 9's snapshot bootstrap — otherwise the desktop reads from an empty SQLite and the UI goes blank.
 - Tasks 10, 11, 12 each depend on Tasks 1-3 but are independent of each other.
-- Task 13 (PlatformProvider) is the moment the Desktop* adapters from 10/11/12 actually get consumed by React. Until Task 13, those adapters exist but idle.
+- Task 13 (PlatformProvider) is the moment the Desktop\* adapters from 10/11/12 actually get consumed by React. Until Task 13, those adapters exist but idle.
 - Task 14 depends on Task 11 (it reads the access token from AuthProvider).
 
 ### Milestone A — IPC framework (Tasks 1, 2, 3)
@@ -143,11 +157,13 @@ The hard ordering invariants (don't reorder these):
 Lay the typed IPC primitives. Zero runtime consumers yet.
 
 **Includes:**
+
 - Task 1 — IPC contract definitions in `shared/platform/ipc/contracts.ts`
 - Task 2 — `callIpc` webview client in `shared/platform/ipc/client.ts`
 - Task 3 — `createIpcServer` Bun-main helper in `shared/platform/ipc/server.ts`
 
 **Consistency at milestone end:**
+
 - New files exist, type-level + unit tests pass.
 - Nothing imports the new symbols yet — web is bit-for-bit identical, `pnpm dev:desktop` opens the same window it does today.
 
@@ -157,19 +173,22 @@ Lay the typed IPC primitives. Zero runtime consumers yet.
 
 ### Milestone B — Desktop infrastructure scaffolding (Tasks 4, 5, 6)
 
-Stand up the building blocks the SQLite path needs, *without* wiring anything into startup.
+Stand up the building blocks the SQLite path needs, _without_ wiring anything into startup.
 
 **Includes:**
+
 - Task 4 — `resolveUserDataDir` pure function in `apps/desktop/main/platform/userDataDir.ts`
 - Task 5 — `SYNCABLE_TABLES` manifest in `apps/desktop/sync/syncable-tables.ts`
 - Task 6 — Postgres→SQLite generator (`apps/desktop/scripts/gen-sqlite-migrations.ts`), first batch of generated `apps/desktop/migrations/*.sql`, and the `pnpm check:sqlite-migrations` CI drift check.
 
 **Consistency at milestone end:**
+
 - Generated migrations are committed but not yet applied at runtime (no runner exists yet).
 - `pnpm check:sqlite-migrations` passes against the current Supabase schema.
 - Desktop boots identically.
 
 **Watch out for:**
+
 - The current `apps/desktop/vitest.config.ts` only includes `main/**` and `preload/**`. Task 5/6 tests live under `apps/desktop/{sync,scripts}/` — widen the `include` glob (or relocate the tests under `main/`) before authoring, or the suite will silently skip them.
 - Python `sqlglot>=22` becomes a developer-machine dependency; document it in `apps/desktop/migrations/README.md` (Task 6 Step 1 already covers this).
 
@@ -182,11 +201,13 @@ Stand up the building blocks the SQLite path needs, *without* wiring anything in
 The biggest milestone. After this lands, desktop CRUD reads from local SQLite, populated on first launch via a one-shot Supabase pull. Web is untouched.
 
 **Includes:**
+
 - Task 7 — `openSqliteDatabase` + migration runner; wired into `apps/desktop/main/index.ts` startup so launch creates `~/Library/Application Support/Avandar/metadata.sqlite` with every syncable table.
 - Task 8 — RDB IPC handlers (`apps/desktop/main/ipc/rdb.ts`), `createSqliteCrudClient` in `packages/shared/clients/src/SqliteCrudClient/`, and the **flip** of `shared/RdbCrudClient/createRdbCrudClient.ts` so `isDesktop()` selects the SQLite backend.
 - Task 9 — `SnapshotBootstrap` at `apps/desktop/main/services/SnapshotBootstrap.ts` that fills an empty local SQLite from Supabase REST before the webview opens.
 
 **Hard internal ordering (within the milestone, across its PRs):**
+
 1. Task 7 lands + wires startup → migrations apply, empty SQLite on disk.
 2. Task 8 PRs 1-3 land (`rdb.ts`, `createSqliteCrudClient`, integration loopback test) — factory still routes desktop to Supabase, nothing breaks.
 3. Task 9 lands → first-launch bootstrap populates SQLite from Supabase.
@@ -195,6 +216,7 @@ The biggest milestone. After this lands, desktop CRUD reads from local SQLite, p
 If you ship the flip before the bootstrap, the desktop UI loads against an empty DB. Don't do that.
 
 **Consistency at milestone end:**
+
 - Cold-launch desktop hydrates SQLite from Supabase, then renders the UI from local data.
 - Restart with network off still renders cached data (the headline Phase 2 deliverable).
 - Web is unaffected because `isDesktop() === false`.
@@ -206,19 +228,22 @@ If you ship the flip before the bootstrap, the desktop UI loads against an empty
 
 ### Milestone D — Native services in Bun main (Tasks 10, 11, 12)
 
-Land the three remaining native subsystems. Each ships its Bun-main service + IPC handlers + desktop adapter, but the adapters are not yet *consumed* by React (that's Milestone E).
+Land the three remaining native subsystems. Each ships its Bun-main service + IPC handlers + desktop adapter, but the adapters are not yet _consumed_ by React (that's Milestone E).
 
 **Includes:**
+
 - Task 10 — Native DuckDB (`apps/desktop/main/services/DuckDb.ts`) + DuckDb IPC + `DesktopDuckDbClient` + (optional) drop `@duckdb/duckdb-wasm` from desktop bundle.
 - Task 11 — Keychain (`apps/desktop/main/services/Keychain.ts`) + auth IPC + `DesktopAuthProvider`. Recommendation per the plan: ship the `security` CLI shellout first, file a follow-up for the FFI port.
 - Task 12 — `FileSystemDatasetBlobStore` + dataset-blob IPC + `DesktopDatasetBlobStore`.
 
 **Consistency at milestone end:**
+
 - Bun main starts SQLite (from C), DuckDB, Keychain, and the blob store on launch. Each must boot without throwing — a single failed `dlopen` or missing path takes the app down.
-- The Desktop* adapters exist on disk but no React code imports them yet, so the webview behavior is unchanged.
+- The Desktop\* adapters exist on disk but no React code imports them yet, so the webview behavior is unchanged.
 - Tests pass for each service. Manual smoke tests at each Task's checkpoint confirm startup boots cleanly.
 
 **Watch out for:**
+
 - Tasks 10, 11, 12 are independent of each other — order them by risk: do whichever blocks first. Keychain (Task 11) is the riskiest because of FFI/CLI ergonomics; DuckDB (Task 10) is second-riskiest because of the `duckdb` Node binding under Bun.
 - Each task's PR 1 lands the service in isolation, PR 2 wires it into `apps/desktop/main/index.ts`. After each PR 2 lands, do `pnpm dev:desktop` and confirm the app still boots — startup is now doing strictly more work and any of these services can break it.
 
@@ -231,10 +256,12 @@ Land the three remaining native subsystems. Each ships its Bun-main service + IP
 The "make it real" milestone. Introduce `PlatformProvider`, migrate consumers to `usePlatform()`, and route ServerApi (Supabase RPCs + Edge Functions) through Bun main.
 
 **Includes:**
+
 - Task 13 — `PlatformProvider` + `usePlatform()` hook in `src/config/platform/` (NOT `packages/web/hooks/` — the web adapters need to import from `src/` where the existing concrete classes live; this is called out in Task 13 Step 1's note). Migrate `DuckDbClient.getInstance()`, direct `AvaSupabase` auth calls, and Dexie `LocalDataset` accesses to `usePlatform().*` in batches.
 - Task 14 — `apps/desktop/main/ipc/api.ts` Bun-main handler, real implementation in `packages/shared/clients/src/ServerApiClient/createIpcServerApiClient.ts` (replaces the Phase 1 throwing stub), and the flip of `createServerApiClient.ts`'s desktop branch.
 
 **Consistency at milestone end:**
+
 - Desktop runs the full happy path on a cold `userDataDir`: sign in → snapshot bootstrap → list workspaces → run a query → upload a CSV → quit → relaunch → state survives.
 - Single network-egress invariant holds: every Supabase call from the desktop webview is visible in Bun-main logs.
 - Web shell (`pnpm dev`) still works — gate everything behind `isDesktop()`.
@@ -255,22 +282,23 @@ Verification + spec annotation. Doc-only edits to mark Phase 2 complete in the d
 
 ### Milestone summary table
 
-| Milestone | Tasks | Approx. PRs | Risk | After this, desktop behavior… |
-|---|---|---|---|---|
-| A — IPC framework | 1, 2, 3 | ~3 | Low | unchanged |
-| B — Infra scaffolding | 4, 5, 6 | ~3-4 | Low | unchanged |
-| C — SQLite live | 7, 8, 9 | ~6-8 | **High** (factory flip + bootstrap must land coherently) | reads from local SQLite, hydrated from Supabase on first launch |
-| D — Native services | 10, 11, 12 | ~6-9 | Medium (each service can break startup) | unchanged (adapters idle) |
-| E — Wire React + ServerApi | 13, 14 | ~5-7 | Medium-High (broad consumer migration) | uses all native services end-to-end |
-| F — Acceptance | 15 | 1 | None | unchanged |
+| Milestone                  | Tasks      | Approx. PRs | Risk                                                     | After this, desktop behavior…                                   |
+| -------------------------- | ---------- | ----------- | -------------------------------------------------------- | --------------------------------------------------------------- |
+| A — IPC framework          | 1, 2, 3    | ~3          | Low                                                      | unchanged                                                       |
+| B — Infra scaffolding      | 4, 5, 6    | ~3-4        | Low                                                      | unchanged                                                       |
+| C — SQLite live            | 7, 8, 9    | ~6-8        | **High** (factory flip + bootstrap must land coherently) | reads from local SQLite, hydrated from Supabase on first launch |
+| D — Native services        | 10, 11, 12 | ~6-9        | Medium (each service can break startup)                  | unchanged (adapters idle)                                       |
+| E — Wire React + ServerApi | 13, 14     | ~5-7        | Medium-High (broad consumer migration)                   | uses all native services end-to-end                             |
+| F — Acceptance             | 15         | 1           | None                                                     | unchanged                                                       |
 
 ---
 
 ## Task 1: IPC Contracts Framework
 
-**Test groupings:** G2.1 (IPC contracts parity — type-level guard against drift between contract __request/__response and handler signatures registered in Tasks 8/10/11/12/14).
+**Test groupings:** G2.1 (IPC contracts parity — type-level guard against drift between contract **request/**response and handler signatures registered in Tasks 8/10/11/12/14).
 
 **PR boundaries:** 2 PRs.
+
 - PR 1: Type-level contract definitions for all six handler groups (RdbContracts, DuckDbContracts, AuthContracts, DatasetBlobContracts, ServerApiContracts plus the loopback helper) — type-only, no runtime cost, nothing imports them yet.
 - PR 2: Tests for the contracts framework — asserts currently-passing type-level behavior; safe to land independently.
 - (Or 1 combined PR if the Steps fold tests and contracts together in a TDD pair.)
@@ -278,6 +306,7 @@ Verification + spec annotation. Doc-only edits to mark Phase 2 complete in the d
 A small, typed RPC abstraction that lives under `shared/platform/ipc/` (alias `$/platform/ipc/...`) and is consumed by both sides. Each contract is `{ name, request, response }` and the registration helper enforces type matching.
 
 **Files:**
+
 - Create: `shared/platform/ipc/contracts.ts`
 - Test: `shared/platform/ipc/contracts.test-d.ts`
 
@@ -287,7 +316,8 @@ Create `shared/platform/ipc/contracts.test-d.ts`:
 
 ```ts
 import { expectTypeOf, test } from "vitest";
-import { defineIpcContract, type IpcContract } from "./contracts.ts";
+import { defineIpcContract } from "./contracts.ts";
+import type { IpcContract } from "./contracts.ts";
 
 test("defineIpcContract returns a typed contract handle", () => {
   const contract = defineIpcContract<
@@ -297,13 +327,17 @@ test("defineIpcContract returns a typed contract handle", () => {
 
   expectTypeOf(contract).toMatchTypeOf<IpcContract<unknown, unknown>>();
   expectTypeOf(contract.name).toEqualTypeOf<string>();
-  expectTypeOf<Parameters<typeof contract.parseRequest>[0]>().toEqualTypeOf<unknown>();
+  expectTypeOf<
+    Parameters<typeof contract.parseRequest>[0]
+  >().toEqualTypeOf<unknown>();
 });
 
 test("IpcContract preserves request/response types", () => {
   type Req = { sql: string; params: ReadonlyArray<unknown> };
   type Res = { rows: ReadonlyArray<Record<string, unknown>> };
-  const contract: IpcContract<Req, Res> = defineIpcContract<Req, Res>("rdb.run");
+  const contract: IpcContract<Req, Res> = defineIpcContract<Req, Res>(
+    "rdb.run",
+  );
 
   expectTypeOf<typeof contract.__request>().toEqualTypeOf<Req>();
   expectTypeOf<typeof contract.__response>().toEqualTypeOf<Res>();
@@ -422,19 +456,26 @@ export const DatasetBlobContracts = {
     { readonly key: string },
     { readonly bytesBase64: string }
   >("datasetBlob.get"),
-  delete: defineIpcContract<{ readonly key: string }, { readonly deleted: boolean }>(
-    "datasetBlob.delete",
-  ),
-  exists: defineIpcContract<{ readonly key: string }, { readonly exists: boolean }>(
-    "datasetBlob.exists",
-  ),
+  delete: defineIpcContract<
+    { readonly key: string },
+    { readonly deleted: boolean }
+  >("datasetBlob.delete"),
+  exists: defineIpcContract<
+    { readonly key: string },
+    { readonly exists: boolean }
+  >("datasetBlob.exists"),
   list: defineIpcContract<
     { readonly prefix: string },
     { readonly keys: ReadonlyArray<string> }
   >("datasetBlob.list"),
   stat: defineIpcContract<
     { readonly key: string },
-    { readonly stat: { readonly sizeBytes: number; readonly mtimeMs: number } | null }
+    {
+      readonly stat: {
+        readonly sizeBytes: number;
+        readonly mtimeMs: number;
+      } | null;
+    }
   >("datasetBlob.stat"),
 };
 
@@ -442,7 +483,12 @@ export const DatasetBlobContracts = {
 export const AuthContracts = {
   signIn: defineIpcContract<
     { readonly email: string; readonly password: string },
-    { readonly userId: string; readonly email: string; readonly accessToken: string; readonly accessTokenExpiresAt: number }
+    {
+      readonly userId: string;
+      readonly email: string;
+      readonly accessToken: string;
+      readonly accessTokenExpiresAt: number;
+    }
   >("auth.signIn"),
   signOut: defineIpcContract<Record<string, never>, { readonly ok: true }>(
     "auth.signOut",
@@ -450,20 +496,19 @@ export const AuthContracts = {
   getSession: defineIpcContract<
     Record<string, never>,
     {
-      readonly session:
-        | {
-            readonly userId: string;
-            readonly email: string;
-            readonly accessToken: string;
-            readonly accessTokenExpiresAt: number;
-            readonly mode: "online" | "offline-cached";
-          }
-        | null;
+      readonly session: {
+        readonly userId: string;
+        readonly email: string;
+        readonly accessToken: string;
+        readonly accessTokenExpiresAt: number;
+        readonly mode: "online" | "offline-cached";
+      } | null;
     }
   >("auth.getSession"),
-  refreshIfNeeded: defineIpcContract<Record<string, never>, { readonly refreshed: boolean }>(
-    "auth.refreshIfNeeded",
-  ),
+  refreshIfNeeded: defineIpcContract<
+    Record<string, never>,
+    { readonly refreshed: boolean }
+  >("auth.refreshIfNeeded"),
 };
 
 // ServerApi (Supabase RPCs + Edge Functions, routed through Bun main)
@@ -517,16 +562,18 @@ Expected: green.
 - [ ] **Step 8: Manual review checkpoint (do NOT commit)**
 
   **Run:**
+
   ```bash
   pnpm test:frontend
   pnpm type-check
   ```
+
   Expected: tests pass, type-check exits clean.
 
   **Verify:**
   - `shared/platform/ipc/contracts.ts` exists with the `defineIpcContract` / `IpcContract` exports.
   - `shared/platform/ipc/contracts.test-d.ts` covers both the type-test and the runtime sanity checks.
-  - All Phase 2 contracts (rdb.*, duckdb.*, auth.*, dataset-blob.*, serverApi.*) are declared in the contracts module with the request/response shapes the spec calls for.
+  - All Phase 2 contracts (rdb._, duckdb._, auth._, dataset-blob._, serverApi.\*) are declared in the contracts module with the request/response shapes the spec calls for.
   - Public surface is re-exported from `shared/platform/index.ts`.
   - Test groupings G2.1 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
 
@@ -545,6 +592,7 @@ Expected: green.
 Webview-side client that calls a contract over Electrobun's IPC bridge and returns a Promise.
 
 **Files:**
+
 - Create: `shared/platform/ipc/client.ts`
 - Test: `shared/platform/ipc/client.test.ts`
 
@@ -554,8 +602,8 @@ Create `shared/platform/ipc/client.test.ts`:
 
 ```ts
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { __setIpcBridgeForTests, callIpc } from "./client.ts";
 import { defineIpcContract } from "./contracts.ts";
-import { callIpc, __setIpcBridgeForTests } from "./client.ts";
 
 describe("callIpc", () => {
   const sendMock = vi.fn();
@@ -571,14 +619,22 @@ describe("callIpc", () => {
   });
 
   it("sends a request with a unique id and resolves with the response", async () => {
-    const contract = defineIpcContract<{ a: number }, { b: number }>("test.echo");
+    const contract = defineIpcContract<{ a: number }, { b: number }>(
+      "test.echo",
+    );
 
-    onceMock.mockImplementation((channel: string, cb: (msg: unknown) => void) => {
-      // Simulate the server replying on the response channel
-      Promise.resolve().then(() =>
-        cb({ id: (sendMock.mock.calls[0]?.[1] as { id: string }).id, ok: true, result: { b: 42 } }),
-      );
-    });
+    onceMock.mockImplementation(
+      (channel: string, cb: (msg: unknown) => void) => {
+        // Simulate the server replying on the response channel
+        Promise.resolve().then(() =>
+          cb({
+            id: (sendMock.mock.calls[0]?.[1] as { id: string }).id,
+            ok: true,
+            result: { b: 42 },
+          }),
+        );
+      },
+    );
 
     const result = await callIpc(contract, { a: 1 });
     expect(sendMock).toHaveBeenCalledOnce();
@@ -590,11 +646,17 @@ describe("callIpc", () => {
       "test.fails",
     );
 
-    onceMock.mockImplementation((channel: string, cb: (msg: unknown) => void) => {
-      Promise.resolve().then(() =>
-        cb({ id: (sendMock.mock.calls[0]?.[1] as { id: string }).id, ok: false, error: "boom" }),
-      );
-    });
+    onceMock.mockImplementation(
+      (channel: string, cb: (msg: unknown) => void) => {
+        Promise.resolve().then(() =>
+          cb({
+            id: (sendMock.mock.calls[0]?.[1] as { id: string }).id,
+            ok: false,
+            error: "boom",
+          }),
+        );
+      },
+    );
 
     await expect(callIpc(contract, {})).rejects.toThrow(/boom/);
   });
@@ -618,14 +680,18 @@ import type { IpcContract } from "./contracts.ts";
 
 type IpcBridge = {
   readonly send: (channel: string, message: unknown) => void;
-  readonly once: (channel: string, callback: (message: unknown) => void) => void;
+  readonly once: (
+    channel: string,
+    callback: (message: unknown) => void,
+  ) => void;
 };
 
 let bridge: IpcBridge | null = null;
 
 function getBridge(): IpcBridge {
   if (bridge) return bridge;
-  const electrobun = (globalThis as unknown as { electrobun?: IpcBridge }).electrobun;
+  const electrobun = (globalThis as unknown as { electrobun?: IpcBridge })
+    .electrobun;
   if (!electrobun) {
     throw new Error(
       "Electrobun IPC bridge not available — callIpc may only be used inside the desktop webview",
@@ -696,10 +762,12 @@ export { callIpc, __setIpcBridgeForTests } from "./ipc/client.ts";
 - [ ] **Step 6: Manual review checkpoint (do NOT commit)**
 
   **Run:**
+
   ```bash
   pnpm test:frontend
   pnpm type-check
   ```
+
   Expected: client unit tests pass (including the bridge-injection cases), type-check clean.
 
   **Verify:**
@@ -724,6 +792,7 @@ export { callIpc, __setIpcBridgeForTests } from "./ipc/client.ts";
 Helper for registering typed handlers in Bun main. Same shape on the other side of the wire.
 
 **Files:**
+
 - Create: `shared/platform/ipc/server.ts`
 - Test: `shared/platform/ipc/server.test.ts`
 
@@ -748,7 +817,9 @@ describe("createIpcServer", () => {
     };
     const server = createIpcServer(transport);
 
-    const contract = defineIpcContract<{ a: number }, { b: number }>("test.double");
+    const contract = defineIpcContract<{ a: number }, { b: number }>(
+      "test.double",
+    );
     server.handle(contract, async (req) => ({ b: req.a * 2 }));
 
     onMessageHandlers["test.double"]({ id: "x1", payload: { a: 5 } });
@@ -772,7 +843,9 @@ describe("createIpcServer", () => {
     };
     const server = createIpcServer(transport);
 
-    const contract = defineIpcContract<Record<string, never>, { ok: true }>("test.boom");
+    const contract = defineIpcContract<Record<string, never>, { ok: true }>(
+      "test.boom",
+    );
     server.handle(contract, async () => {
       throw new Error("nope");
     });
@@ -853,10 +926,12 @@ export type { IpcServer, IpcTransport } from "./ipc/server.ts";
 - [ ] **Step 6: Manual review checkpoint (do NOT commit)**
 
   **Run:**
+
   ```bash
   pnpm test:frontend
   pnpm type-check
   ```
+
   Expected: server unit tests pass, type-check clean.
 
   **Verify:**
@@ -881,6 +956,7 @@ export type { IpcServer, IpcTransport } from "./ipc/server.ts";
 Pure function returning the per-OS-user app data directory. Used by every native service.
 
 **Files:**
+
 - Create: `apps/desktop/main/platform/userDataDir.ts`
 - Test: `apps/desktop/main/platform/userDataDir.test.ts`
 
@@ -986,10 +1062,12 @@ Expected: green.
 - [ ] **Step 5: Manual review checkpoint (do NOT commit)**
 
   **Run:**
+
   ```bash
   pnpm --filter @avandar/desktop test
   pnpm --filter @avandar/desktop type-check
   ```
+
   Expected: path-resolution tests pass on all stubbed platforms (darwin/win32/linux), type-check clean.
 
   **Verify:**
@@ -1014,13 +1092,14 @@ Expected: green.
 
 ## Task 5: `SYNCABLE_TABLES` manifest
 
-**Test groupings:** G2.6 (SYNCABLE_TABLES manifest vs live Supabase schema — every CREATE TABLE in supabase/migrations/*.sql is in SYNCABLE_TABLES ∪ EXCLUDED_TABLES; automates the human check in this task).
+**Test groupings:** G2.6 (SYNCABLE_TABLES manifest vs live Supabase schema — every CREATE TABLE in supabase/migrations/\*.sql is in SYNCABLE_TABLES ∪ EXCLUDED_TABLES; automates the human check in this task).
 
 **PR boundaries:** 1 PR (could be split to 2). The manifest is pure data with no runtime consumers yet, and the parity test asserts a currently-true property — small enough to land together. If preferred, ship the manifest first and the parity test second.
 
 The single source of truth for which Supabase tables get mirrored to SQLite. Listed manually; tested for shape.
 
 **Files:**
+
 - Create: `apps/desktop/sync/syncable-tables.ts`
 - Test: `apps/desktop/sync/syncable-tables.test.ts`
 
@@ -1035,7 +1114,7 @@ git grep "create table" -- supabase/migrations/ | head -50
 
 Enumerate the tables that hold user-owned artifacts: at minimum `datasets`, `dataset_versions`, `dashboards`, `saved_queries`, `entity_configs`, `user_profiles`, `workspace_memberships`, plus any other tables whose rows are exclusively a single user's personal data (consult `AGENTS.md` and the `src/clients/` directory for the canonical list).
 
-If unclear which tables are user-owned vs shared, default to the conservative *small* set (only what's clearly personal) — the spec's manifest-driven generator will fail loudly on the next new table, forcing a per-table decision rather than silent drift.
+If unclear which tables are user-owned vs shared, default to the conservative _small_ set (only what's clearly personal) — the spec's manifest-driven generator will fail loudly on the next new table, forcing a per-table decision rather than silent drift.
 
 - [ ] **Step 2: Write the manifest**
 
@@ -1096,9 +1175,9 @@ Create `apps/desktop/sync/syncable-tables.test.ts`:
 import { describe, expect, it } from "vitest";
 import {
   EXCLUDED_TABLES,
-  SYNCABLE_TABLES,
   isExcluded,
   isSyncable,
+  SYNCABLE_TABLES,
 } from "./syncable-tables.ts";
 
 describe("syncable-tables manifest", () => {
@@ -1135,10 +1214,12 @@ Expected: green.
 - [ ] **Step 5: Manual review checkpoint (do NOT commit)**
 
   **Run:**
+
   ```bash
   pnpm --filter @avandar/desktop test
   pnpm --filter @avandar/desktop type-check
   ```
+
   Expected: manifest shape tests pass, type-check clean.
 
   **Verify:**
@@ -1159,6 +1240,7 @@ Expected: green.
 **Test groupings:** G2.7 (PG→SQLite generator fixture+golden snapshots — uuid→text, timestamptz→expected, RLS stripped, unknown table errors, idempotency; replaces the manual spot-check review step).
 
 **PR boundaries:** 2-3 PRs.
+
 - PR 1: Scaffold the generator script with fixtures and golden tests; no generated SQLite migrations committed yet — script-only.
 - PR 2: Commit the first generated SQLite migration files plus the CI drift-check workflow (`pnpm check:sqlite-migrations`); files are unread until Task 7 wires the runner.
 - PR 3 (optional): Generator's hard-error / warning behavior on unknown PG constructs, if implemented as a separate Step.
@@ -1168,8 +1250,9 @@ Expected: green.
 Per-file generation of one `.gen.sql` per Postgres migration, but every statement runs through a classifier first. Only schema-shape statements (CREATE/ALTER/DROP TABLE, CREATE/DROP INDEX) end up in the SQLite output. RLS policies, GRANT/REVOKE, functions, triggers, types, COMMENTs, SETs, and data-mutation statements (UPDATE/INSERT/DELETE/DO blocks) are silently dropped because SQLite has no equivalent for any of them.
 
 **Foreign-key handling.** FKs are preserved when their target table is in `SYNCABLE_TABLES`; SQLite enforces them natively when the Bun-main runner sets `PRAGMA foreign_keys = ON`. Two flavours are handled differently:
-- *Inline* FK references (`REFERENCES <table>(<col>)` inside a `CREATE TABLE` column or table-level clause) are emitted verbatim and SQLite accepts them as-is.
-- *Standalone* `ALTER TABLE ... ADD CONSTRAINT ... FOREIGN KEY` statements are surfaced via a yellow `⚠ needs hand-edit` warning at the end of the run because SQLite's `ALTER TABLE` only supports `RENAME`/`ADD COLUMN`/`DROP COLUMN`. Same hand-edit treatment applies to `ALTER COLUMN` (type change, set/drop default, set/drop NOT NULL) and any other `ADD CONSTRAINT` (CHECK, PK, UNIQUE). The developer inlines the constraint into the matching `CREATE TABLE` in the earlier `.gen.sql`.
+
+- _Inline_ FK references (`REFERENCES <table>(<col>)` inside a `CREATE TABLE` column or table-level clause) are emitted verbatim and SQLite accepts them as-is.
+- _Standalone_ `ALTER TABLE ... ADD CONSTRAINT ... FOREIGN KEY` statements are surfaced via a yellow `⚠ needs hand-edit` warning at the end of the run because SQLite's `ALTER TABLE` only supports `RENAME`/`ADD COLUMN`/`DROP COLUMN`. Same hand-edit treatment applies to `ALTER COLUMN` (type change, set/drop default, set/drop NOT NULL) and any other `ADD CONSTRAINT` (CHECK, PK, UNIQUE). The developer inlines the constraint into the matching `CREATE TABLE` in the earlier `.gen.sql`.
 - FKs pointing at a non-public schema (e.g. `references auth.users`) or at an `EXCLUDED_TABLES` entry are dropped (the target table does not exist locally).
 
 **Tool chain.** Shells out to Python's `sqlglot` (Postgres → SQLite transpile) via `uv run --with 'sqlglot>=26.0.0,<27.0.0' python -c "..."`. `uv` (https://astral.sh/uv) is the only developer-machine prerequisite; it manages Python + sqlglot on demand with no `pip install` step. The exact sqlglot version range lives in the `SQLGLOT_SPEC` constant at the top of the generator. `sqlglot` is never an npm dependency and never reaches the runtime bundle. Post-transpile, a small `_stripPostgresIsms` step strips residue sqlglot leaves behind that SQLite still cannot parse: `"public".` schema prefixes, `NOT VALID`, `USING btree`, `NULLS FIRST`/`LAST` inside index defs, `ARRAY<T>` (collapsed to `TEXT`), `ADD COLUMN IF NOT EXISTS` (→ `ADD COLUMN`), and `DEFAULT <fn>(...)` clauses whose function does not exist on SQLite (`UUID()`, `auth.uid()`, etc.).
@@ -1177,6 +1260,7 @@ Per-file generation of one `.gen.sql` per Postgres migration, but every statemen
 Hard-errors on uncategorised tables and on unrecognised leading keywords; first lists each unhandled statement with a reason hint so the engineer knows whether to extend `classifyStatement()` or the manifest.
 
 **Files:**
+
 - Create: `apps/desktop/scripts/gen-sqlite-migrations.ts`
 - Test: `apps/desktop/scripts/gen-sqlite-migrations.test.ts`
 - Create: `apps/desktop/scripts/check-sqlite-migrations.ts`
@@ -1216,7 +1300,7 @@ Install:
 1. Author the Postgres migration as usual (`pnpm db:new-migration name`).
 2. Decide: should this table be synced to desktop?
    - Yes → add the table name to `apps/desktop/sync/syncable-tables.ts` `SYNCABLE_TABLES`.
-   - No  → add the table name to `EXCLUDED_TABLES`.
+   - No → add the table name to `EXCLUDED_TABLES`.
 3. Run `pnpm gen:sqlite-migrations`.
 4. Commit the regenerated `apps/desktop/migrations/*.sql` alongside the Postgres migration.
 ```
@@ -1227,7 +1311,8 @@ Create `apps/desktop/scripts/gen-sqlite-migrations.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { partitionStatements, type Statement } from "./gen-sqlite-migrations.ts";
+import { partitionStatements } from "./gen-sqlite-migrations.ts";
+import type { Statement } from "./gen-sqlite-migrations.ts";
 
 describe("partitionStatements", () => {
   const syncable = ["datasets", "dashboards"];
@@ -1235,7 +1320,10 @@ describe("partitionStatements", () => {
 
   it("includes statements referencing only syncable tables", () => {
     const stmts: Statement[] = [
-      { tables: ["datasets"], sql: "create table datasets (id text primary key);" },
+      {
+        tables: ["datasets"],
+        sql: "create table datasets (id text primary key);",
+      },
     ];
     const result = partitionStatements(stmts, syncable, excluded);
     expect(result.included).toHaveLength(1);
@@ -1245,7 +1333,10 @@ describe("partitionStatements", () => {
 
   it("skips statements that touch only excluded tables", () => {
     const stmts: Statement[] = [
-      { tables: ["audit_log"], sql: "create table audit_log (id text primary key);" },
+      {
+        tables: ["audit_log"],
+        sql: "create table audit_log (id text primary key);",
+      },
     ];
     const result = partitionStatements(stmts, syncable, excluded);
     expect(result.included).toHaveLength(0);
@@ -1294,14 +1385,10 @@ Create `apps/desktop/scripts/gen-sqlite-migrations.ts`:
 
 ```ts
 #!/usr/bin/env bun
-
-import { readdirSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
-import { join, dirname, basename } from "node:path";
 import { spawnSync } from "node:child_process";
-import {
-  EXCLUDED_TABLES,
-  SYNCABLE_TABLES,
-} from "../sync/syncable-tables.ts";
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
+import { EXCLUDED_TABLES, SYNCABLE_TABLES } from "../sync/syncable-tables.ts";
 
 export type Statement = {
   readonly tables: ReadonlyArray<string>;
@@ -1311,7 +1398,10 @@ export type Statement = {
 export type PartitionResult = {
   readonly included: ReadonlyArray<Statement>;
   readonly skipped: ReadonlyArray<Statement>;
-  readonly unknown: ReadonlyArray<{ readonly table: string; readonly sql: string }>;
+  readonly unknown: ReadonlyArray<{
+    readonly table: string;
+    readonly sql: string;
+  }>;
 };
 
 export function partitionStatements(
@@ -1414,7 +1504,9 @@ async function main(): Promise<void> {
     for (const u of allUnknown) {
       console.error(`  ${u.file}: table=${u.table}`);
     }
-    console.error("Decide per table: add to SYNCABLE_TABLES or EXCLUDED_TABLES.");
+    console.error(
+      "Decide per table: add to SYNCABLE_TABLES or EXCLUDED_TABLES.",
+    );
     process.exit(1);
   }
 
@@ -1499,10 +1591,9 @@ Create `apps/desktop/scripts/check-sqlite-migrations.ts`:
 
 ```ts
 #!/usr/bin/env bun
-
-import { readFileSync, readdirSync, statSync } from "node:fs";
-import { join } from "node:path";
 import { spawnSync } from "node:child_process";
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { join } from "node:path";
 
 const REPO_ROOT = join(import.meta.dir, "..", "..", "..");
 const SQLITE_DIR = join(REPO_ROOT, "apps", "desktop", "migrations");
@@ -1510,13 +1601,20 @@ const SQLITE_DIR = join(REPO_ROOT, "apps", "desktop", "migrations");
 // Snapshot the current committed migrations.
 const before = readdirSync(SQLITE_DIR)
   .filter((f) => f.endsWith(".sql"))
-  .map((f) => ({ name: f, content: readFileSync(join(SQLITE_DIR, f), "utf8") }));
+  .map((f) => ({
+    name: f,
+    content: readFileSync(join(SQLITE_DIR, f), "utf8"),
+  }));
 
 // Regenerate.
-const gen = spawnSync("bun", ["run", "apps/desktop/scripts/gen-sqlite-migrations.ts"], {
-  cwd: REPO_ROOT,
-  encoding: "utf8",
-});
+const gen = spawnSync(
+  "bun",
+  ["run", "apps/desktop/scripts/gen-sqlite-migrations.ts"],
+  {
+    cwd: REPO_ROOT,
+    encoding: "utf8",
+  },
+);
 if (gen.status !== 0) {
   console.error(gen.stderr);
   process.exit(1);
@@ -1525,7 +1623,10 @@ if (gen.status !== 0) {
 // Compare.
 const after = readdirSync(SQLITE_DIR)
   .filter((f) => f.endsWith(".sql"))
-  .map((f) => ({ name: f, content: readFileSync(join(SQLITE_DIR, f), "utf8") }));
+  .map((f) => ({
+    name: f,
+    content: readFileSync(join(SQLITE_DIR, f), "utf8"),
+  }));
 
 let drift = false;
 const beforeMap = new Map(before.map((f) => [f.name, f.content]));
@@ -1589,21 +1690,24 @@ pnpm gen:sqlite-migrations
 ```
 
 Expected:
+
 - If every Postgres migration touches only known (syncable or excluded) tables: generates `apps/desktop/migrations/*.sql` files mirroring `supabase/migrations/*.sql`.
 - If any Postgres migration references unknown tables: hard error listing them. **Stop. Decide per table. Update `SYNCABLE_TABLES` or `EXCLUDED_TABLES`. Re-run.**
 
 - [ ] **Step 9: Review the generated migrations**
 
 Spot-check a few generated files:
+
 - Types translated correctly (`uuid` → `text`, `timestamptz` → `integer` or `text` per sqlglot's defaults — verify the choice is workable).
 - RLS / GRANT statements dropped or commented out.
 - Triggers calling PG functions either dropped or surfaced as TODOs.
 
-If sqlglot mis-translates something critical, file an upstream issue and apply a one-off post-processing step. For Phase 2, a minor manual touch-up *of the generator script* (not of the output files) is acceptable.
+If sqlglot mis-translates something critical, file an upstream issue and apply a one-off post-processing step. For Phase 2, a minor manual touch-up _of the generator script_ (not of the output files) is acceptable.
 
 - [ ] **Step 10: Manual review checkpoint (do NOT commit)**
 
   **Run:**
+
   ```bash
   pnpm --filter @avandar/desktop test
   pnpm gen:sqlite-migrations
@@ -1611,6 +1715,7 @@ If sqlglot mis-translates something critical, file an upstream issue and apply a
   git status apps/desktop/migrations/
   git diff --stat apps/desktop/migrations/
   ```
+
   Expected: generator tests pass; the generator runs without errors; `check:sqlite-migrations` exits 0 (no drift between generator output and what's on disk); `git status`/`git diff` show only the expected, intentional changes under `apps/desktop/migrations/`.
 
   **Verify:**
@@ -1642,10 +1747,12 @@ If sqlglot mis-translates something critical, file an upstream issue and apply a
 **Test groupings:** G2.8 (bun:sqlite migration runner — fresh DB applies all; idempotency on rerun; history mismatch detected; malformed migration rolls back without partial state).
 
 **PR boundaries:** 2 PRs.
+
 - PR 1: `openSqliteDatabase` + migration runner module (`apps/desktop/main/sqlite/...`) with its unit tests; not yet invoked at launch.
 - PR 2: Wire the runner into desktop main startup so Task 6's generated migrations apply on first launch — desktop-only code path.
 
 **Files:**
+
 - Create: `apps/desktop/main/services/Sqlite.ts`
 - Test: `apps/desktop/main/services/Sqlite.test.ts`
 
@@ -1654,10 +1761,10 @@ If sqlglot mis-translates something critical, file an upstream issue and apply a
 Create `apps/desktop/main/services/Sqlite.test.ts`:
 
 ```ts
-import { afterEach, describe, expect, it } from "vitest";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { afterEach, describe, expect, it } from "vitest";
 import { openSqliteDatabase, runMigrations } from "./Sqlite.ts";
 
 describe("Sqlite", () => {
@@ -1687,7 +1794,10 @@ describe("Sqlite", () => {
         name: "001_init.sql",
         sql: "create table widgets (id integer primary key, name text);",
       },
-      { name: "002_add_color.sql", sql: "alter table widgets add column color text;" },
+      {
+        name: "002_add_color.sql",
+        sql: "alter table widgets add column color text;",
+      },
     ];
 
     runMigrations(db, migrations);
@@ -1697,9 +1807,10 @@ describe("Sqlite", () => {
 
     db.run("insert into widgets (name, color) values ('a', 'red');");
     const rows = db
-      .query<{ name: string; color: string }, []>(
-        "select name, color from widgets",
-      )
+      .query<
+        { name: string; color: string },
+        []
+      >("select name, color from widgets")
       .all();
     expect(rows).toEqual([{ name: "a", color: "red" }]);
     db.close();
@@ -1710,13 +1821,19 @@ describe("Sqlite", () => {
     const db = openSqliteDatabase(join(dir, "test.sqlite"));
 
     runMigrations(db, [
-      { name: "001_init.sql", sql: "create table widgets (id integer primary key);" },
+      {
+        name: "001_init.sql",
+        sql: "create table widgets (id integer primary key);",
+      },
     ]);
 
     // Now caller passes a different set that omits 001
     expect(() =>
       runMigrations(db, [
-        { name: "002_add_color.sql", sql: "alter table widgets add column color text;" },
+        {
+          name: "002_add_color.sql",
+          sql: "alter table widgets add column color text;",
+        },
       ]),
     ).toThrow(/migration history mismatch/i);
 
@@ -1738,9 +1855,9 @@ Expected: FAIL.
 Create `apps/desktop/main/services/Sqlite.ts`:
 
 ```ts
-import { Database } from "bun:sqlite";
-import { dirname } from "node:path";
 import { mkdirSync } from "node:fs";
+import { dirname } from "node:path";
+import { Database } from "bun:sqlite";
 
 export type AvaSqliteDatabase = Database;
 
@@ -1793,10 +1910,10 @@ export function runMigrations(
   const tx = db.transaction((toApply: ReadonlyArray<Migration>) => {
     for (const m of toApply) {
       db.run(m.sql);
-      db.run("insert into _schema_migrations (name, applied_at) values (?, ?);", [
-        m.name,
-        Date.now(),
-      ]);
+      db.run(
+        "insert into _schema_migrations (name, applied_at) values (?, ?);",
+        [m.name, Date.now()],
+      );
     }
   });
 
@@ -1815,10 +1932,12 @@ Expected: green.
 - [ ] **Step 5: Manual review checkpoint (do NOT commit)**
 
   **Run:**
+
   ```bash
   pnpm --filter @avandar/desktop test
   pnpm --filter @avandar/desktop type-check
   ```
+
   Expected: Sqlite unit tests pass (migration runner, idempotency, error paths), type-check clean.
 
   **Verify:**
@@ -1850,9 +1969,10 @@ Expected: green.
 
 ## Task 8: RDB IPC handlers + `createSqliteCrudClient`
 
-**Test groupings:** G2.9 (createSqliteCrudClient round-trip on real bun:sqlite — insert→getById→list→update→delete; transaction rolls back on second-statement failure); G2.10 (Outbox-in-same-transaction invariant — data write + manual INSERT INTO _outbox commit atomically; Phase 3 prerequisite encoded in Phase 2).
+**Test groupings:** G2.9 (createSqliteCrudClient round-trip on real bun:sqlite — insert→getById→list→update→delete; transaction rolls back on second-statement failure); G2.10 (Outbox-in-same-transaction invariant — data write + manual INSERT INTO \_outbox commit atomically; Phase 3 prerequisite encoded in Phase 2).
 
 **PR boundaries:** 3-4 PRs.
+
 - PR 1: RDB IPC handlers in `apps/desktop/main/ipc/rdb.ts` with unit tests; nothing imports them on web.
 - PR 2: `createSqliteCrudClient` in `packages/shared/clients/src/SqliteCrudClient/...` with mocked-IPC unit tests; new file, not yet selected by the factory.
 - PR 3: Integration loopback test wiring PR 1 and PR 2 through the fake-IPC harness — asserts already-passing behavior.
@@ -1861,6 +1981,7 @@ Expected: green.
 Wire SQLite to the webview through the IPC layer, then introduce the SQLite-backed CRUD client.
 
 **Files:**
+
 - Create: `apps/desktop/main/ipc/rdb.ts`
 - Create: `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.ts`
 - Test: `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.test.ts`
@@ -1874,10 +1995,13 @@ Create `apps/desktop/main/ipc/rdb.ts`:
 
 ```ts
 import { RdbContracts } from "@avandar/platform";
-import type { IpcServer } from "@avandar/platform";
 import type { AvaSqliteDatabase } from "../services/Sqlite.ts";
+import type { IpcServer } from "@avandar/platform";
 
-export function registerRdbHandlers(server: IpcServer, db: AvaSqliteDatabase): void {
+export function registerRdbHandlers(
+  server: IpcServer,
+  db: AvaSqliteDatabase,
+): void {
   server.handle(RdbContracts.run, (req) => {
     const stmt = db.prepare(req.sql);
     const res = stmt.run(...req.params);
@@ -1889,7 +2013,9 @@ export function registerRdbHandlers(server: IpcServer, db: AvaSqliteDatabase): v
 
   server.handle(RdbContracts.query, (req) => {
     const stmt = db.prepare(req.sql);
-    const rows = stmt.all(...req.params) as ReadonlyArray<Record<string, unknown>>;
+    const rows = stmt.all(...req.params) as ReadonlyArray<
+      Record<string, unknown>
+    >;
     return { rows };
   });
 
@@ -1912,14 +2038,14 @@ export function registerRdbHandlers(server: IpcServer, db: AvaSqliteDatabase): v
 Modify `apps/desktop/main/index.ts`:
 
 ```ts
-import { Electrobun } from "electrobun";
 import { join } from "node:path";
 import { createIpcServer } from "@avandar/platform";
+import { Electrobun } from "electrobun";
 import { resolveWebviewUrl } from "./config/url.ts";
-import { getUserDataDir } from "./platform/userDataDir.ts";
-import { openSqliteDatabase, runMigrations } from "./services/Sqlite.ts";
 import { registerRdbHandlers } from "./ipc/rdb.ts";
+import { getUserDataDir } from "./platform/userDataDir.ts";
 import { loadMigrations } from "./services/loadMigrations.ts";
+import { openSqliteDatabase, runMigrations } from "./services/Sqlite.ts";
 
 const mode = (process.env.AVA_DESKTOP_MODE ?? "development") as
   | "development"
@@ -1989,8 +2115,8 @@ In production builds, the migrations directory will be bundled into the app reso
 Create `packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.test.ts`:
 
 ```ts
-import { afterEach, describe, expect, it, vi } from "vitest";
 import { __setIpcBridgeForTests, RdbContracts } from "@avandar/platform";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createSqliteCrudClient } from "./createSqliteCrudClient.ts";
 
 describe("createSqliteCrudClient", () => {
@@ -2024,13 +2150,21 @@ describe("createSqliteCrudClient", () => {
       modelName: "Widget",
       tableName: "widgets",
       dbTablePrimaryKey: "id",
-      parsers: { Read: (r) => r as any, Insert: (r) => r as any, Update: (r) => r as any },
+      parsers: {
+        Read: (r) => r as any,
+        Insert: (r) => r as any,
+        Update: (r) => r as any,
+      },
     });
 
     const result = await client.getById("x1");
     expect(sendMock).toHaveBeenCalledWith(
       RdbContracts.query.name,
-      expect.objectContaining({ payload: expect.objectContaining({ sql: expect.stringContaining("widgets") }) }),
+      expect.objectContaining({
+        payload: expect.objectContaining({
+          sql: expect.stringContaining("widgets"),
+        }),
+      }),
     );
     expect(result?.name).toBe("test");
   });
@@ -2078,21 +2212,18 @@ export function createSqliteCrudClient<M>(spec: RdbCrudModelSpec<M>) {
       },
       async list(filter) {
         const { where, params } = buildWhere(filter);
-        const order = filter?.orderBy
-          ? "order by " +
+        const order =
+          filter?.orderBy ?
+            "order by " +
             filter.orderBy
-              .map((o) => `${o.column} ${o.direction === "desc" ? "desc" : "asc"}`)
+              .map(
+                (o) => `${o.column} ${o.direction === "desc" ? "desc" : "asc"}`,
+              )
               .join(", ")
           : "";
         const lim = filter?.limit ? `limit ${filter.limit}` : "";
         const off = filter?.offset ? `offset ${filter.offset}` : "";
-        const sql = [
-          `select * from ${tableName}`,
-          where,
-          order,
-          lim,
-          off,
-        ]
+        const sql = [`select * from ${tableName}`, where, order, lim, off]
           .filter(Boolean)
           .join(" ");
         const { rows } = await callIpc(RdbContracts.query, { sql, params });
@@ -2120,7 +2251,14 @@ export function createSqliteCrudClient<M>(spec: RdbCrudModelSpec<M>) {
   });
 }
 
-function buildWhere(filter: { eq?: Record<string, unknown>; in?: Record<string, ReadonlyArray<unknown>> } | undefined): {
+function buildWhere(
+  filter:
+    | {
+        eq?: Record<string, unknown>;
+        in?: Record<string, ReadonlyArray<unknown>>;
+      }
+    | undefined,
+): {
   where: string;
   params: unknown[];
 } {
@@ -2141,8 +2279,8 @@ function buildWhere(filter: { eq?: Record<string, unknown>; in?: Record<string, 
     params.push(...vals);
   }
 
-  return clauses.length === 0
-    ? { where: "", params: [] }
+  return clauses.length === 0 ?
+      { where: "", params: [] }
     : { where: `where ${clauses.join(" and ")}`, params };
 }
 ```
@@ -2206,10 +2344,11 @@ pnpm dev:desktop
 ```
 
 The webview should:
+
 - Open the Electrobun window
 - Bun main creates the SQLite database in `~/Library/Application Support/Avandar/metadata.sqlite`
 - The webview now routes CRUD reads through the IPC bridge to bun:sqlite
-- Reads return empty initially (no data yet) — this is *expected*; subsequent tasks handle the one-shot Supabase→SQLite snapshot bootstrap
+- Reads return empty initially (no data yet) — this is _expected_; subsequent tasks handle the one-shot Supabase→SQLite snapshot bootstrap
 
 If the webview crashes because `createRdbCrudClient` returns empty results from an empty DB, that's exposing a missing snapshot-bootstrap. Add it as a small startup-time service in `apps/desktop/main/index.ts`:
 
@@ -2223,11 +2362,13 @@ The actual implementation lives in the next task.
 - [ ] **Step 12: Manual review checkpoint (do NOT commit)**
 
   **Run:**
+
   ```bash
   pnpm --filter @avandar/desktop test
   pnpm --filter @avandar/clients test
   pnpm type-check
   ```
+
   Expected: SQLite CRUD client tests pass against a real bun:sqlite in-memory DB; the RDB-IPC server tests pass; whole-monorepo type-check clean.
 
   **Verify:**
@@ -2261,9 +2402,10 @@ The actual implementation lives in the next task.
 
 **PR boundaries:** 1 PR. Bootstrap module, tests, and desktop main wiring all land together; the code path is desktop-only and gated by `isDesktop()` so web users never reach it.
 
-Without a sync engine (Phase 3), the desktop still needs *some* way to populate its local SQLite from Supabase on first launch. This task ships a minimal one-shot pull: when the local DB is fresh, fetch all rows for each syncable table from Supabase and insert.
+Without a sync engine (Phase 3), the desktop still needs _some_ way to populate its local SQLite from Supabase on first launch. This task ships a minimal one-shot pull: when the local DB is fresh, fetch all rows for each syncable table from Supabase and insert.
 
 **Files:**
+
 - Create: `apps/desktop/main/services/SupabaseRest.ts`
 - Create: `apps/desktop/main/services/SnapshotBootstrap.ts`
 - Test: `apps/desktop/main/services/SnapshotBootstrap.test.ts`
@@ -2326,8 +2468,8 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { openSqliteDatabase, runMigrations } from "./Sqlite.ts";
 import { bootstrapSnapshotIfNeeded } from "./SnapshotBootstrap.ts";
+import { openSqliteDatabase, runMigrations } from "./Sqlite.ts";
 
 describe("bootstrapSnapshotIfNeeded", () => {
   let dir: string;
@@ -2347,17 +2489,24 @@ describe("bootstrapSnapshotIfNeeded", () => {
     ]);
 
     const rest = {
-      selectAll: vi
-        .fn()
-        .mockResolvedValueOnce([{ id: "a", name: "Alpha" }, { id: "b", name: "Bravo" }]),
+      selectAll: vi.fn().mockResolvedValueOnce([
+        { id: "a", name: "Alpha" },
+        { id: "b", name: "Bravo" },
+      ]),
     };
 
     await bootstrapSnapshotIfNeeded(db, rest as never, "token", ["datasets"]);
 
     const rows = db
-      .query<{ id: string; name: string }, []>("select id, name from datasets order by id")
+      .query<
+        { id: string; name: string },
+        []
+      >("select id, name from datasets order by id")
       .all();
-    expect(rows).toEqual([{ id: "a", name: "Alpha" }, { id: "b", name: "Bravo" }]);
+    expect(rows).toEqual([
+      { id: "a", name: "Alpha" },
+      { id: "b", name: "Bravo" },
+    ]);
     expect(rest.selectAll).toHaveBeenCalledOnce();
     db.close();
   });
@@ -2404,9 +2553,11 @@ export async function bootstrapSnapshotIfNeeded(
   tables: ReadonlyArray<string>,
 ): Promise<void> {
   for (const table of tables) {
-    const count = (db
-      .query<{ c: number }, []>(`select count(*) as c from ${table}`)
-      .get() ?? { c: 0 }).c;
+    const count = (
+      db
+        .query<{ c: number }, []>(`select count(*) as c from ${table}`)
+        .get() ?? { c: 0 }
+    ).c;
     if (count > 0) continue;
 
     const rows = await rest.selectAll(table, accessToken);
@@ -2417,11 +2568,13 @@ export async function bootstrapSnapshotIfNeeded(
     const sql = `insert into ${table} (${cols.join(", ")}) values (${placeholders});`;
     const stmt = db.prepare(sql);
 
-    const tx = db.transaction((rowsBatch: ReadonlyArray<Record<string, unknown>>) => {
-      for (const row of rowsBatch) {
-        stmt.run(...cols.map((c) => row[c] ?? null));
-      }
-    });
+    const tx = db.transaction(
+      (rowsBatch: ReadonlyArray<Record<string, unknown>>) => {
+        for (const row of rowsBatch) {
+          stmt.run(...cols.map((c) => row[c] ?? null));
+        }
+      },
+    );
     tx(rows);
   }
 }
@@ -2442,9 +2595,9 @@ Edit `apps/desktop/main/index.ts` to call `bootstrapSnapshotIfNeeded` after the 
 Add near the top of `apps/desktop/main/index.ts`:
 
 ```ts
-import { createSupabaseRestClient } from "./services/SupabaseRest.ts";
-import { bootstrapSnapshotIfNeeded } from "./services/SnapshotBootstrap.ts";
 import { SYNCABLE_TABLES } from "../sync/syncable-tables.ts";
+import { bootstrapSnapshotIfNeeded } from "./services/SnapshotBootstrap.ts";
+import { createSupabaseRestClient } from "./services/SupabaseRest.ts";
 
 // ... after db + migrations:
 const devToken = process.env.AVA_DEV_ACCESS_TOKEN;
@@ -2463,10 +2616,12 @@ The "real" bootstrap-on-login flow is wired up in the Keychain/auth task (Task 1
 - [ ] **Step 7: Manual review checkpoint (do NOT commit)**
 
   **Run:**
+
   ```bash
   pnpm --filter @avandar/desktop test
   pnpm --filter @avandar/desktop type-check
   ```
+
   Expected: `SnapshotBootstrap.test.ts` covers fresh-DB + already-populated cases and passes; type-check clean.
 
   **Verify:**
@@ -2504,12 +2659,14 @@ The "real" bootstrap-on-login flow is wired up in the Keychain/auth task (Task 1
 **Test groupings:** G2.12 (Native DuckDB happy path + parity — real @duckdb/node-api instance, SELECT 1, parquet round-trip, column types match a golden captured from duckdb-wasm; catches BIGINT/INTEGER and TIMESTAMP_NS drift early).
 
 **PR boundaries:** 2 PRs.
+
 - PR 1: `DuckDb` service in Bun main + DuckDb IPC handlers + parity tests; new desktop-only files, not yet wired.
 - PR 2: `createIpcDuckDbClient` desktop adapter + wiring into the platform provider's desktop branch; web's DuckDb implementation remains the WASM one because `isDesktop()` is false.
 
 Replace duckdb-wasm on desktop. The existing `@avandar/ava-etl` package already uses the `duckdb` Node binding; we lean on the same package.
 
 **Files:**
+
 - Create: `apps/desktop/main/services/DuckDb.ts`
 - Test: `apps/desktop/main/services/DuckDb.test.ts`
 - Create: `apps/desktop/main/ipc/duckdb.ts`
@@ -2610,7 +2767,10 @@ export function createDuckDbService(filePath: string): DuckDbService {
   const db = new duckdb.Database(filePath);
   const conn = db.connect();
 
-  function exec<TRow>(sql: string, params: ReadonlyArray<unknown>): Promise<TRow[]> {
+  function exec<TRow>(
+    sql: string,
+    params: ReadonlyArray<unknown>,
+  ): Promise<TRow[]> {
     return new Promise((resolve, reject) => {
       conn.all(sql, ...params, (err: Error | null, rows: TRow[]) => {
         if (err) reject(err);
@@ -2648,11 +2808,11 @@ Expected: green.
 Create `apps/desktop/main/ipc/duckdb.ts`:
 
 ```ts
-import { DuckDbContracts } from "@avandar/platform";
-import type { IpcServer } from "@avandar/platform";
-import type { DuckDbService } from "../services/DuckDb.ts";
 import { join } from "node:path";
+import { DuckDbContracts } from "@avandar/platform";
 import { getUserDataDir } from "../platform/userDataDir.ts";
+import type { DuckDbService } from "../services/DuckDb.ts";
+import type { IpcServer } from "@avandar/platform";
 
 export function registerDuckDbHandlers(
   server: IpcServer,
@@ -2675,11 +2835,7 @@ export function registerDuckDbHandlers(
       // datasetId. Phase 3 narrows this via the dataset_blob_index.
       // Stopgap for Phase 2: caller passes a key in `datasetId` formatted as
       // `workspaces/<wsId>/datasets/<dsId>`.
-      const parquetPath = join(
-        dataDir,
-        req.datasetId,
-        "data.parquet",
-      );
+      const parquetPath = join(dataDir, req.datasetId, "data.parquet");
       // Register a table view bound to the parquet file
       const tableName = `ds_${req.datasetId.replace(/[^a-z0-9_]/gi, "_")}`;
       await svc.runRawQuery(
@@ -2753,8 +2909,8 @@ The path layout in this handler is a stopgap; Task 12 introduces the canonical w
 Modify `apps/desktop/main/index.ts`:
 
 ```ts
-import { createDuckDbService } from "./services/DuckDb.ts";
 import { registerDuckDbHandlers } from "./ipc/duckdb.ts";
+import { createDuckDbService } from "./services/DuckDb.ts";
 
 // ... after openSqliteDatabase:
 const duckdbSvc = createDuckDbService(join(dataDir, "duckdb", "ava.duckdb"));
@@ -2796,7 +2952,9 @@ export const DesktopDuckDbClient: DuckDbClient = {
     // web (src/clients/DuckDbClient). Reuse that translator here. Phase 2
     // leaves this as a thin pass-through to a TODO; Phase 3 wires the real
     // translator after the web<->desktop boundary is firmed up.
-    throw new Error("DesktopDuckDbClient.runStructuredQuery: not yet implemented in Phase 2");
+    throw new Error(
+      "DesktopDuckDbClient.runStructuredQuery: not yet implemented in Phase 2",
+    );
   },
   async loadParquetFromDatasetBlobStore(datasetId) {
     await callIpc(DuckDbContracts.loadParquetFromDatasetBlobStore, {
@@ -2855,22 +3013,24 @@ Then update root `package.json` `scripts`:
 "build:desktop": "AVA_TARGET=desktop pnpm build && pnpm --filter @avandar/desktop build",
 ```
 
-This requires that any web code that *imports* `@duckdb/duckdb-wasm` is wrapped in an `isDesktop()` guard, otherwise the bundle will fail. Audit imports:
+This requires that any web code that _imports_ `@duckdb/duckdb-wasm` is wrapped in an `isDesktop()` guard, otherwise the bundle will fail. Audit imports:
 
 ```bash
 git grep -l "@duckdb/duckdb-wasm" -- 'src/' 'packages/'
 ```
 
-Each call site should either be desktop-conditional or moved behind a `usePlatform().duckDb` indirection. The full audit is broader than Phase 2 — for now, the goal is *not* "zero duckdb-wasm in the desktop bundle" but "duckdb-wasm code paths never execute on desktop". The bundle drop is an optimization; if it's blocked, defer it to Phase 4 and accept the ~30MB bundle bloat in V1 desktop. Note this decision in the spec's "decisions" section.
+Each call site should either be desktop-conditional or moved behind a `usePlatform().duckDb` indirection. The full audit is broader than Phase 2 — for now, the goal is _not_ "zero duckdb-wasm in the desktop bundle" but "duckdb-wasm code paths never execute on desktop". The bundle drop is an optimization; if it's blocked, defer it to Phase 4 and accept the ~30MB bundle bloat in V1 desktop. Note this decision in the spec's "decisions" section.
 
 - [ ] **Step 10: Manual review checkpoint (do NOT commit)**
 
   **Run:**
+
   ```bash
   pnpm --filter @avandar/desktop test
   pnpm --filter @avandar/desktop type-check
   pnpm type-check
   ```
+
   Expected: native DuckDB service tests pass against the real `duckdb` Node binding loaded under Bun; monorepo type-check clean.
 
   **Verify:**
@@ -2902,12 +3062,14 @@ Each call site should either be desktop-conditional or moved behind a `usePlatfo
 **Test groupings:** G2.13 (Keychain pure-layer unit — argv construction for set/get/delete; status-code parsing including 44 = not found); G2.14 (Keychain real-Security.framework round-trip, gated by KEYCHAIN_E2E=1 + process.platform === 'darwin'; non-ASCII payload; plaintext never appears in stdout/stderr).
 
 **PR boundaries:** 2 PRs.
+
 - PR 1: Keychain wrapper pure-layer (argv construction, status-code parsing) + unit tests; no native FFI dependency.
 - PR 2: Real Security.framework FFI bindings + gated integration test (KEYCHAIN_E2E=1); desktop-only code, not consumed on web.
 
 Phase 2 lands macOS keychain. Windows keychain is Phase 5.
 
 **Files:**
+
 - Create: `apps/desktop/main/services/Keychain.ts`
 - Test: `apps/desktop/main/services/Keychain.test.ts` (manual smoke test harness)
 - Create: `apps/desktop/main/ipc/auth.ts`
@@ -2919,6 +3081,7 @@ Phase 2 lands macOS keychain. Windows keychain is Phase 5.
 Read the Bun FFI docs at `https://bun.sh/docs/api/ffi` (consult them, do not assume APIs).
 
 The minimum needed:
+
 - `SecKeychainAddGenericPassword` — add an entry
 - `SecKeychainFindGenericPassword` — read an entry
 - `SecKeychainItemDelete` — remove an entry
@@ -2935,7 +3098,8 @@ import { Keychain } from "./Keychain.ts";
 
 // Skipped by default; this hits the real macOS keychain.
 // Run with: KEYCHAIN_SMOKE=1 pnpm --filter @avandar/desktop test
-const enabled = process.env.KEYCHAIN_SMOKE === "1" && process.platform === "darwin";
+const enabled =
+  process.env.KEYCHAIN_SMOKE === "1" && process.platform === "darwin";
 
 describe.skipIf(!enabled)("Keychain (smoke)", () => {
   const service = "com.avandarlabs.desktop.test";
@@ -2961,7 +3125,9 @@ import { dlopen, FFIType, suffix } from "bun:ffi";
 
 if (process.platform !== "darwin") {
   // Phase 5 adds Windows. Throw early on unsupported platforms in main.
-  throw new Error(`Keychain not supported on ${process.platform} until Phase 5`);
+  throw new Error(
+    `Keychain not supported on ${process.platform} until Phase 5`,
+  );
 }
 
 const SECURITY_FRAMEWORK =
@@ -3082,7 +3248,7 @@ function readCString(ptr: bigint, length: number): string {
 }
 ```
 
-**Honest framing:** this code is *correct in intent* but the Bun FFI pointer-read API moves around. The engineer implementing this task MUST consult the current Bun FFI docs and adapt the pointer/cstring read calls. The invariants are: `set / get / delete` round-trip a UTF-8 string; service/account select an entry uniquely; default keychain is used; deletion is best-effort idempotent.
+**Honest framing:** this code is _correct in intent_ but the Bun FFI pointer-read API moves around. The engineer implementing this task MUST consult the current Bun FFI docs and adapt the pointer/cstring read calls. The invariants are: `set / get / delete` round-trip a UTF-8 string; service/account select an entry uniquely; default keychain is used; deletion is best-effort idempotent.
 
 If Bun FFI proves too rough to bind directly, fall back to **shelling out to the `security` CLI** as a stopgap (Section 3 of the spec described this as Option (a)):
 
@@ -3094,24 +3260,28 @@ export const Keychain = {
     // Remove first
     spawnSync("security", [
       "delete-generic-password",
-      "-s", serviceName,
-      "-a", accountName,
+      "-s",
+      serviceName,
+      "-a",
+      accountName,
     ]);
     const r = spawnSync("security", [
       "add-generic-password",
-      "-s", serviceName,
-      "-a", accountName,
-      "-w", password,
+      "-s",
+      serviceName,
+      "-a",
+      accountName,
+      "-w",
+      password,
     ]);
     if (r.status !== 0) throw new Error(`security add failed: ${r.stderr}`);
   },
   get(serviceName, accountName) {
-    const r = spawnSync("security", [
-      "find-generic-password",
-      "-w",
-      "-s", serviceName,
-      "-a", accountName,
-    ], { encoding: "utf8" });
+    const r = spawnSync(
+      "security",
+      ["find-generic-password", "-w", "-s", serviceName, "-a", accountName],
+      { encoding: "utf8" },
+    );
     if (r.status === 44) return null; // not found
     if (r.status !== 0) throw new Error(`security find failed: ${r.stderr}`);
     return r.stdout.trim();
@@ -3119,8 +3289,10 @@ export const Keychain = {
   delete(serviceName, accountName) {
     spawnSync("security", [
       "delete-generic-password",
-      "-s", serviceName,
-      "-a", accountName,
+      "-s",
+      serviceName,
+      "-a",
+      accountName,
     ]);
   },
 };
@@ -3142,8 +3314,8 @@ Create `apps/desktop/main/ipc/auth.ts`:
 
 ```ts
 import { AuthContracts } from "@avandar/platform";
-import type { IpcServer } from "@avandar/platform";
 import { Keychain } from "../services/Keychain.ts";
+import type { IpcServer } from "@avandar/platform";
 
 const KEYCHAIN_SERVICE = "com.avandarlabs.desktop";
 const REFRESH_TOKEN_ACCOUNT = "supabase-refresh-token";
@@ -3157,14 +3329,17 @@ let currentUser: { id: string; email: string } | null = null;
 
 export function registerAuthHandlers(server: IpcServer): void {
   server.handle(AuthContracts.signIn, async (req) => {
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: SUPABASE_ANON_KEY,
+    const res = await fetch(
+      `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({ email: req.email, password: req.password }),
       },
-      body: JSON.stringify({ email: req.email, password: req.password }),
-    });
+    );
     if (!res.ok) throw new Error(`Sign-in failed: ${res.status}`);
     const data = (await res.json()) as {
       access_token: string;
@@ -3234,11 +3409,7 @@ export function registerAuthHandlers(server: IpcServer): void {
         expires_in: number;
         user: { id: string; email: string };
       };
-      Keychain.set(
-        KEYCHAIN_SERVICE,
-        REFRESH_TOKEN_ACCOUNT,
-        data.refresh_token,
-      );
+      Keychain.set(KEYCHAIN_SERVICE, REFRESH_TOKEN_ACCOUNT, data.refresh_token);
       currentAccessToken = {
         token: data.access_token,
         expiresAt: Date.now() + data.expires_in * 1000,
@@ -3310,8 +3481,8 @@ export function getCurrentAccessToken(): string | null {
 Create `shared/platform/desktop/DesktopAuthProvider.ts`:
 
 ```ts
-import { AuthContracts } from "../ipc/contracts.ts";
 import { callIpc } from "../ipc/client.ts";
+import { AuthContracts } from "../ipc/contracts.ts";
 import type {
   AuthCredentials,
   AuthProvider,
@@ -3364,6 +3535,7 @@ Modify `apps/desktop/main/index.ts`:
 
 ```ts
 import { registerAuthHandlers } from "./ipc/auth.ts";
+
 // ... after registerDuckDbHandlers:
 registerAuthHandlers(ipcServer);
 ```
@@ -3379,11 +3551,13 @@ In the window: sign in, close the app, reopen. The second launch should reach th
 - [ ] **Step 9: Manual review checkpoint (do NOT commit)**
 
   **Run:**
+
   ```bash
   pnpm --filter @avandar/desktop test
   pnpm --filter @avandar/desktop type-check
   pnpm type-check
   ```
+
   Expected: keychain unit tests / smoke harness pass (FFI calls succeed against the real macOS Security framework); type-check clean.
 
   **Verify:**
@@ -3422,12 +3596,14 @@ In the window: sign in, close the app, reopen. The second launch should reach th
 **Test groupings:** G2.15 (FileSystemDatasetBlobStore round-trip + listing + stat + delete); G2.16 (FileSystemDatasetBlobStore atomic-write crash simulation — monkey-patch renameSync to throw post-write; assert final key absent, partial .tmp may exist; path-traversal guard for ../ and ..\\; the test that proves the atomicity invariant the manual review can't).
 
 **PR boundaries:** 2 PRs.
+
 - PR 1: `FileSystemDatasetBlobStore` implementation + tests + DatasetBlob IPC handlers in `apps/desktop/main`; new desktop-only files, not yet wired.
 - PR 2: Desktop adapter (`createIpcDatasetBlobStore`) + wiring into platform provider's desktop branch; web continues to use its existing store.
 
 The desktop equivalent of `DatasetBlobStore`. Atomic writes, on-disk per-OS-user.
 
 **Files:**
+
 - Create: `apps/desktop/main/services/FileSystemDatasetBlobStore.ts`
 - Test: `apps/desktop/main/services/FileSystemDatasetBlobStore.test.ts`
 - Create: `apps/desktop/main/ipc/dataset-blob.ts`
@@ -3514,14 +3690,14 @@ Create `apps/desktop/main/services/FileSystemDatasetBlobStore.ts`:
 
 ```ts
 import {
+  existsSync,
   mkdirSync,
+  readdirSync,
   readFileSync,
+  renameSync,
   statSync,
   unlinkSync,
   writeFileSync,
-  renameSync,
-  readdirSync,
-  existsSync,
 } from "node:fs";
 import { dirname, join, relative } from "node:path";
 
@@ -3602,8 +3778,8 @@ Create `apps/desktop/main/ipc/dataset-blob.ts`:
 
 ```ts
 import { DatasetBlobContracts } from "@avandar/platform";
-import type { IpcServer } from "@avandar/platform";
 import type { FileSystemDatasetBlobStore } from "../services/FileSystemDatasetBlobStore.ts";
+import type { IpcServer } from "@avandar/platform";
 
 export function registerDatasetBlobHandlers(
   server: IpcServer,
@@ -3647,8 +3823,8 @@ Create `shared/platform/desktop/DesktopDatasetBlobStore.ts`:
 import { callIpc, DatasetBlobContracts } from "../ipc/contracts.ts";
 import type {
   DatasetBlobKey,
-  DatasetBlobStore,
   DatasetBlobStat,
+  DatasetBlobStore,
 } from "../types/DatasetBlobStore.types.ts";
 
 export const DesktopDatasetBlobStore: DatasetBlobStore = {
@@ -3656,7 +3832,10 @@ export const DesktopDatasetBlobStore: DatasetBlobStore = {
     const arr =
       bytes instanceof Uint8Array ? bytes : await streamToUint8Array(bytes);
     const b64 = uint8ArrayToBase64(arr);
-    await callIpc(DatasetBlobContracts.put, { key: key as string, bytesBase64: b64 });
+    await callIpc(DatasetBlobContracts.put, {
+      key: key as string,
+      bytesBase64: b64,
+    });
   },
   async get(key) {
     const r = await callIpc(DatasetBlobContracts.get, { key: key as string });
@@ -3667,14 +3846,18 @@ export const DesktopDatasetBlobStore: DatasetBlobStore = {
     await callIpc(DatasetBlobContracts.delete, { key: key as string });
   },
   async exists(key) {
-    return (await callIpc(DatasetBlobContracts.exists, { key: key as string })).exists;
+    return (await callIpc(DatasetBlobContracts.exists, { key: key as string }))
+      .exists;
   },
   async list(prefix) {
-    const r = await callIpc(DatasetBlobContracts.list, { prefix: prefix as string });
+    const r = await callIpc(DatasetBlobContracts.list, {
+      prefix: prefix as string,
+    });
     return r.keys as ReadonlyArray<DatasetBlobKey>;
   },
   async stat(key): Promise<DatasetBlobStat | null> {
-    return (await callIpc(DatasetBlobContracts.stat, { key: key as string })).stat;
+    return (await callIpc(DatasetBlobContracts.stat, { key: key as string }))
+      .stat;
   },
 };
 
@@ -3718,11 +3901,13 @@ function base64ToUint8Array(b64: string): Uint8Array {
 Modify `apps/desktop/main/index.ts`:
 
 ```ts
-import { createFileSystemDatasetBlobStore } from "./services/FileSystemDatasetBlobStore.ts";
 import { registerDatasetBlobHandlers } from "./ipc/dataset-blob.ts";
+import { createFileSystemDatasetBlobStore } from "./services/FileSystemDatasetBlobStore.ts";
 
 // ... after dataDir resolution:
-const datasetBlobStore = createFileSystemDatasetBlobStore(join(dataDir, "blobs"));
+const datasetBlobStore = createFileSystemDatasetBlobStore(
+  join(dataDir, "blobs"),
+);
 
 // ... after registerAuthHandlers:
 registerDatasetBlobHandlers(ipcServer, datasetBlobStore);
@@ -3731,11 +3916,13 @@ registerDatasetBlobHandlers(ipcServer, datasetBlobStore);
 - [ ] **Step 8: Manual review checkpoint (do NOT commit)**
 
   **Run:**
+
   ```bash
   pnpm --filter @avandar/desktop test
   pnpm --filter @avandar/desktop type-check
   pnpm type-check
   ```
+
   Expected: `FileSystemDatasetBlobStore.test.ts` covers happy path + crash-during-write + read-after-write, all pass; type-check clean.
 
   **Verify:**
@@ -3777,6 +3964,7 @@ registerDatasetBlobHandlers(ipcServer, datasetBlobStore);
 **Test groupings:** G2.17 (PlatformProvider React component — mocked isDesktop; both branches resolve to correct adapter; usePlatform outside provider throws); G2.18 (Fake-IPC harness scaffolding itself — proves the harness's exposeFunction bridge correctly routes a trivial echo contract; lands before any e2e test depends on it); G2.19 (First fake-IPC e2e — sign in → upload CSV → list datasets → harness restart → dataset still listed; replaces multiple manual smoke steps in Tasks 8/12/13).
 
 **PR boundaries:** 4-5 PRs.
+
 - PR 1: PlatformProvider scaffold + `usePlatform` hook + provider tests (no implementations wired yet — defaults to web for both branches).
 - PR 2: Wire the desktop branch for DuckDbClient.
 - PR 3: Wire the desktop branch for DatasetBlobStore.
@@ -3787,6 +3975,7 @@ registerDatasetBlobHandlers(ipcServer, datasetBlobStore);
 The webview-side `Desktop*` implementations exist but aren't consumed yet. Wire them in via a `PlatformProvider` React context.
 
 **Files:**
+
 - Create: `packages/web/hooks/src/platform/PlatformProvider.tsx` (or wherever shared hooks live)
 - Modify: `src/main.tsx` to wrap with PlatformProvider
 
@@ -3872,7 +4061,7 @@ function createWebDatasetBlobStoreAdapter(): DatasetBlobStore {
 }
 ```
 
-**Note:** the web adapter wiring is intrinsically *in* `src/` because that's where the existing concrete classes live. Move `PlatformProvider.tsx` to `src/config/platform/PlatformProvider.tsx` instead, where it can import existing modules without crossing the package boundary. Update imports accordingly.
+**Note:** the web adapter wiring is intrinsically _in_ `src/` because that's where the existing concrete classes live. Move `PlatformProvider.tsx` to `src/config/platform/PlatformProvider.tsx` instead, where it can import existing modules without crossing the package boundary. Update imports accordingly.
 
 - [ ] **Step 2: Wrap the React tree**
 
@@ -3882,9 +4071,7 @@ Edit `src/main.tsx` (or the equivalent root render file) to wrap the existing tr
 import { PlatformProvider } from "@/config/platform/PlatformProvider.tsx";
 
 createRoot(rootElement).render(
-  <PlatformProvider>
-    {/* existing root component */}
-  </PlatformProvider>,
+  <PlatformProvider>{/* existing root component */}</PlatformProvider>,
 );
 ```
 
@@ -3903,6 +4090,7 @@ pnpm dev:desktop
 ```
 
 If the desktop fails because `runStructuredQuery` isn't implemented (Task 10 left it as a TODO), that's the signal that this consumer needs structured-query support before the migration completes. Either:
+
 - Add structured-query support to `DesktopDuckDbClient` (porting the translator from `src/clients/DuckDbClient/`).
 - Defer this particular consumer's desktop migration to Phase 3.
 
@@ -3923,12 +4111,14 @@ Expected: green; both shells work.
 - [ ] **Step 6: Manual review checkpoint (do NOT commit)**
 
   **Run:**
+
   ```bash
   pnpm test
   pnpm type-check
   pnpm dev
   pnpm dev:desktop
   ```
+
   Expected: all tests pass; both web (`pnpm dev`) and desktop (`pnpm dev:desktop`) shells boot without runtime errors or `usePlatform()` undefined warnings.
 
   **Verify:**
@@ -3966,10 +4156,12 @@ Expected: green; both shells work.
 **Test groupings:** G2.20 (ServerApi IPC round-trip — RPC and Edge Function calls dispatched via IPC, executed by Bun-main against a mocked Supabase REST via msw; offline path throws OfflineError; auth header is injected by the handler, not the React client).
 
 **PR boundaries:** 2 PRs.
+
 - PR 1: Bun-main `api.ts` IPC handler + ServerApi IPC server registration + tests; new desktop-only file, not yet consumed.
 - PR 2: Replace the Phase 1 stub in `createIpcServerApiClient.ts` with the real IPC client implementation and wire it into the PlatformProvider's desktop branch; desktop-only code path, web continues using its existing ServerApiClient.
 
 **Files:**
+
 - Create: `apps/desktop/main/ipc/api.ts` — Bun-main IPC handler implementing `registerServerApiHandlers(ipcServer, { supabaseUrl, supabaseAnonKey, authProvider })`. The handler reads the current access token from the AuthProvider on every call.
 - Modify: `packages/shared/clients/src/ServerApiClient/createIpcServerApiClient.ts` — replace the Phase 1 throwing stub with a real IPC client that issues `serverApi.rpc` / `serverApi.invokeFunction` calls over the IPC bridge.
 - Test: `apps/desktop/main/ipc/api.test.ts` — integration test with msw + real IPC server.
@@ -3994,6 +4186,7 @@ pnpm --filter @avandar/clients test ServerApiClient
 - [ ] **Step 4: Write the failing test for the handler module**
 
 Create `apps/desktop/main/ipc/api.test.ts` using `bun test`. Spin up a real `createIpcServer`, register the handler with a fake Supabase REST (msw). Cases:
+
 - `serverApi.rpc("some_rpc", {...})` round-trips and returns the mocked response.
 - `serverApi.invokeFunction({ route, method, body })` round-trips and returns `{ data, status }`.
 - A 401 from Supabase surfaces as a typed error.
@@ -4017,11 +4210,13 @@ Update wherever Task 13 wires PlatformProvider's desktop branch — `createServe
 - [ ] **Step 8: Manual review checkpoint (do NOT commit)**
 
   **Run:**
+
   ```bash
   pnpm --filter @avandar/desktop test api
   pnpm --filter @avandar/clients test ServerApiClient
   pnpm type-check
   ```
+
   Expected: all green.
 
   **Verify:**
@@ -4065,7 +4260,7 @@ Expected: lists every table in `SYNCABLE_TABLES`.
 
 Log in via the desktop app. After login, navigate to a dataset list view. Confirm rows render. Quit the app. Disconnect from network. Relaunch.
 
-Expected: app starts, session restored from keychain, data view *still renders* (reading from local SQLite). This is the headline Phase 2 deliverable.
+Expected: app starts, session restored from keychain, data view _still renders_ (reading from local SQLite). This is the headline Phase 2 deliverable.
 
 - [ ] **Step 3: Confirm upload writes to disk**
 
@@ -4096,10 +4291,12 @@ Edit `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md`, mark Phas
 - [ ] **Step 7: Manual review checkpoint (do NOT commit)**
 
   **Run:**
+
   ```bash
   git status docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md
   git diff docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md
   ```
+
   Expected: the spec shows a Phase 2 completion marker with today's date and no other unrelated edits.
 
   **Final reviewer checklist — confirm every prior Task checkpoint passed before declaring Phase 2 done:**
@@ -4139,10 +4336,10 @@ Edit `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md`, mark Phas
 
 ## Risks Specific to Phase 2
 
-| Risk | Mitigation in this phase |
-|---|---|
-| sqlglot output requires per-table touch-ups for Postgres-only features | Hard-error generator + human review in Task 6 Step 9; fix the *generator* not the output |
-| Bun FFI memory-pointer wrangling fails on first attempt | Pragmatic fallback in Task 11 Step 3: ship the `security`-CLI shellout; file a follow-up to migrate to FFI |
-| Native `duckdb` Node binding fails to load under Bun | Phase 2 Task 10 tests catch this; if blocked, evaluate `@duckdb/node-api` or compile against duckdb-bindings-node-bun. Worst case: stay on duckdb-wasm for desktop in Phase 2 and accept the memory limits temporarily |
-| Webview ↔ Bun IPC pipeline mismatches Electrobun's actual API | Task 8 Step 2 explicitly calls out the `window.ipc` shim — engineer adapts to real names |
-| Dropping duckdb-wasm from desktop bundle breaks if some code path imports it eagerly | Decision in Task 10 Step 9 — if blocked, accept the bundle bloat; do not delay Phase 2 on this optimization |
+| Risk                                                                                 | Mitigation in this phase                                                                                                                                                                                               |
+| ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| sqlglot output requires per-table touch-ups for Postgres-only features               | Hard-error generator + human review in Task 6 Step 9; fix the _generator_ not the output                                                                                                                               |
+| Bun FFI memory-pointer wrangling fails on first attempt                              | Pragmatic fallback in Task 11 Step 3: ship the `security`-CLI shellout; file a follow-up to migrate to FFI                                                                                                             |
+| Native `duckdb` Node binding fails to load under Bun                                 | Phase 2 Task 10 tests catch this; if blocked, evaluate `@duckdb/node-api` or compile against duckdb-bindings-node-bun. Worst case: stay on duckdb-wasm for desktop in Phase 2 and accept the memory limits temporarily |
+| Webview ↔ Bun IPC pipeline mismatches Electrobun's actual API                        | Task 8 Step 2 explicitly calls out the `window.ipc` shim — engineer adapts to real names                                                                                                                               |
+| Dropping duckdb-wasm from desktop bundle breaks if some code path imports it eagerly | Decision in Task 10 Step 9 — if blocked, accept the bundle bloat; do not delay Phase 2 on this optimization                                                                                                            |

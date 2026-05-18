@@ -25,15 +25,13 @@ export const AuthContracts = {
     {
       // null (not undefined) so the JSON wire envelope preserves the
       // "no active session" signal.
-      session:
-        | {
-            userId: string;
-            email: string;
-            accessToken: string;
-            accessTokenExpiresAt: number;
-            mode: "online" | "offline-cached";
-          }
-        | null;
+      session: {
+        userId: string;
+        email: string;
+        accessToken: string;
+        accessTokenExpiresAt: number;
+        mode: "online" | "offline-cached";
+      } | null;
     }
   >("auth.getSession"),
   refreshIfNeeded: defineIpcContract<

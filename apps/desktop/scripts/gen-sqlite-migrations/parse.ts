@@ -234,11 +234,13 @@ const _PRIMARY_TABLE_PATTERNS: RegExp[] = [
 ];
 
 function _findPrimaryTable(sql: string): string | undefined {
-  return _PRIMARY_TABLE_PATTERNS.map((re) => {
-    return re.exec(sql);
-  }).find((match) => {
-    return match !== null && match[1] !== undefined;
-  })?.[1];
+  return _PRIMARY_TABLE_PATTERNS
+    .map((re) => {
+      return re.exec(sql);
+    })
+    .find((match) => {
+      return match !== null && match[1] !== undefined;
+    })?.[1];
 }
 
 /*
@@ -260,9 +262,9 @@ function _findFkReferences(sql: string): FkReference[] {
       return;
     }
     const schema =
-      rawSchema === undefined || rawSchema.toLowerCase() === "public"
-        ? undefined
-        : rawSchema;
+      rawSchema === undefined || rawSchema.toLowerCase() === "public" ?
+        undefined
+      : rawSchema;
     refs.push({ schema, table });
   });
   return refs;

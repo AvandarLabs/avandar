@@ -13,6 +13,11 @@
     "resolveJsonModule": true,
     "noImplicitReturns": false
   },
-  "include": ["main/**/*", "preload/**/*", "types/**/*", "electrobun.config.ts"],
+  "include": [
+    "main/**/*",
+    "preload/**/*",
+    "types/**/*",
+    "electrobun.config.ts"
+  ],
   "exclude": ["build", "bundle", "node_modules", "**/*.test.ts"]
 }

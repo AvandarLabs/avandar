@@ -5,8 +5,17 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 52
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 3
-CREATE TABLE "datasets__virtual" ("id" UUID NOT NULL, "dataset_id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "raw_sql" TEXT NOT NULL);
+create table "datasets__virtual" (
+  "id" uuid not null,
+  "dataset_id" uuid not null,
+  "workspace_id" uuid not null,
+  "created_at" timestamptz not null default current_timestamp,
+  "updated_at" timestamptz not null default current_timestamp,
+  "raw_sql" text not null
+);
 
-CREATE UNIQUE INDEX datasets__virtual_dataset_id_key ON datasets__virtual(dataset_id);
+create unique index datasets__virtual_dataset_id_key on datasets__virtual (
+  dataset_id
+);
 
-CREATE UNIQUE INDEX datasets__virtual_pkey ON datasets__virtual(id);
+create unique index datasets__virtual_pkey on datasets__virtual (id);

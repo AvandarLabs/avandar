@@ -5,50 +5,129 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 332
 -- FK constraints dropped (target not synced to SQLite): 3
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 15
-DROP INDEX IF EXISTS "idx_value_extractors__dataset_column_value__entity_field_config";
+drop index if exists "idx_value_extractors__dataset_column_value__entity_field_config";
 
-DROP INDEX IF EXISTS "idx_value_extractors__manual_entry__entity_field_config_id_work";
+drop index if exists "idx_value_extractors__manual_entry__entity_field_config_id_work";
 
-DROP INDEX IF EXISTS "tokens__google__user_google_account_unique";
+drop index if exists "tokens__google__user_google_account_unique";
 
-CREATE TABLE "dataset_columns" ("id" UUID NOT NULL, "dataset_id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "name" TEXT NOT NULL, "data_type" datasets__column_data_type NOT NULL, "description" TEXT, "column_idx" INTEGER NOT NULL);
+create table "dataset_columns" (
+  "id" uuid not null,
+  "dataset_id" uuid not null,
+  "workspace_id" uuid not null,
+  "created_at" timestamptz not null default current_timestamp,
+  "updated_at" timestamptz not null default current_timestamp,
+  "name" text not null,
+  "data_type" datasets__column_data_type not null,
+  "description" text,
+  "column_idx" integer not null
+);
 
-CREATE TABLE "datasets" ("id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "owner_id" UUID NOT NULL, "owner_profile_id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "date_of_last_sync" TIMESTAMPTZ, "name" TEXT NOT NULL, "source_type" datasets__source_type NOT NULL, "description" TEXT);
+create table "datasets" (
+  "id" uuid not null,
+  "created_at" timestamptz not null default current_timestamp,
+  "updated_at" timestamptz not null default current_timestamp,
+  "owner_id" uuid not null,
+  "owner_profile_id" uuid not null,
+  "workspace_id" uuid not null,
+  "date_of_last_sync" timestamptz,
+  "name" text not null,
+  "source_type" datasets__source_type not null,
+  "description" text
+);
 
-CREATE TABLE "datasets__google_sheets" ("id" UUID NOT NULL, "dataset_id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "google_account_id" TEXT NOT NULL, "google_document_id" TEXT NOT NULL, "rows_to_skip" INTEGER NOT NULL DEFAULT 0);
+create table "datasets__google_sheets" (
+  "id" uuid not null,
+  "dataset_id" uuid not null,
+  "workspace_id" uuid not null,
+  "created_at" timestamptz not null default current_timestamp,
+  "updated_at" timestamptz not null default current_timestamp,
+  "google_account_id" text not null,
+  "google_document_id" text not null,
+  "rows_to_skip" integer not null default 0
+);
 
-CREATE TABLE "datasets__local_csv" ("id" UUID NOT NULL, "dataset_id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "delimiter" TEXT NOT NULL, "size_in_bytes" INTEGER NOT NULL);
+create table "datasets__local_csv" (
+  "id" uuid not null,
+  "dataset_id" uuid not null,
+  "workspace_id" uuid not null,
+  "created_at" timestamptz not null default current_timestamp,
+  "updated_at" timestamptz not null default current_timestamp,
+  "delimiter" text not null,
+  "size_in_bytes" integer not null
+);
 
-CREATE TABLE "entities" ("id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "workspace_id" UUID NOT NULL, "name" TEXT NOT NULL, "entity_config_id" UUID NOT NULL, "external_id" TEXT NOT NULL, "assigned_to" UUID, "status" TEXT NOT NULL);
+create table "entities" (
+  "id" uuid not null,
+  "created_at" timestamptz not null default current_timestamp,
+  "updated_at" timestamptz not null default current_timestamp,
+  "workspace_id" uuid not null,
+  "name" text not null,
+  "entity_config_id" uuid not null,
+  "external_id" text not null,
+  "assigned_to" uuid,
+  "status" text not null
+);
 
-CREATE TABLE "entity_field_values" ("id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "workspace_id" UUID NOT NULL, "entity_id" UUID NOT NULL, "entity_config_id" UUID NOT NULL, "entity_field_config_id" UUID NOT NULL, "value" TEXT, "value_set" TEXT NOT NULL, "dataset_id" UUID);
+create table "entity_field_values" (
+  "id" uuid not null,
+  "created_at" timestamptz not null default current_timestamp,
+  "updated_at" timestamptz not null default current_timestamp,
+  "workspace_id" uuid not null,
+  "entity_id" uuid not null,
+  "entity_config_id" uuid not null,
+  "entity_field_config_id" uuid not null,
+  "value" text,
+  "value_set" text not null,
+  "dataset_id" uuid
+);
 
-CREATE UNIQUE INDEX dataset_columns_pkey ON dataset_columns(id);
+create unique index dataset_columns_pkey on dataset_columns (id);
 
-CREATE UNIQUE INDEX datasets__google_sheets_dataset_id_key ON datasets__google_sheets(dataset_id);
+create unique index datasets__google_sheets_dataset_id_key on datasets__google_sheets (
+  dataset_id
+);
 
-CREATE UNIQUE INDEX datasets__google_sheets_pkey ON datasets__google_sheets(id);
+create unique index datasets__google_sheets_pkey on datasets__google_sheets (id);
 
-CREATE UNIQUE INDEX datasets__local_csv_dataset_id_key ON datasets__local_csv(dataset_id);
+create unique index datasets__local_csv_dataset_id_key on datasets__local_csv (
+  dataset_id
+);
 
-CREATE UNIQUE INDEX datasets__local_csv_pkey ON datasets__local_csv(id);
+create unique index datasets__local_csv_pkey on datasets__local_csv (id);
 
-CREATE UNIQUE INDEX datasets_pkey ON datasets(id);
+create unique index datasets_pkey on datasets (id);
 
-CREATE UNIQUE INDEX entities_pkey ON entities(id);
+create unique index entities_pkey on entities (id);
 
-CREATE UNIQUE INDEX entity_field_values_pkey ON entity_field_values(id);
+create unique index entity_field_values_pkey on entity_field_values (id);
 
-CREATE INDEX idx_dataset_column_value_extractors__efc_id_workspace_id ON value_extractors__dataset_column_value(entity_field_config_id, workspace_id);
+create index idx_dataset_column_value_extractors__efc_id_workspace_id on value_extractors__dataset_column_value (
+  entity_field_config_id,
+  workspace_id
+);
 
-CREATE INDEX idx_manual_entry_value_extractors__efc_id_workspace_id ON value_extractors__manual_entry(entity_field_config_id, workspace_id);
+create index idx_manual_entry_value_extractors__efc_id_workspace_id on value_extractors__manual_entry (
+  entity_field_config_id,
+  workspace_id
+);
 
-CREATE INDEX idx_workspaces__owner_id ON workspaces(owner_id);
+create index idx_workspaces__owner_id on workspaces (
+  owner_id
+);
 
-CREATE UNIQUE INDEX user_profiles_membership_id_key ON user_profiles(membership_id);
+create unique index user_profiles_membership_id_key on user_profiles (
+  membership_id
+);
 
-CREATE UNIQUE INDEX value_extractors__aggregation_entity_field_config_id_key ON value_extractors__aggregation(entity_field_config_id);
+create unique index value_extractors__aggregation_entity_field_config_id_key on value_extractors__aggregation (
+  entity_field_config_id
+);
 
-CREATE UNIQUE INDEX value_extractors__dataset_column_val_entity_field_config_id_key ON value_extractors__dataset_column_value(entity_field_config_id);
+create unique index value_extractors__dataset_column_val_entity_field_config_id_key on value_extractors__dataset_column_value (
+  entity_field_config_id
+);
 
-CREATE UNIQUE INDEX value_extractors__manual_entry_entity_field_config_id_key ON value_extractors__manual_entry(entity_field_config_id);
+create unique index value_extractors__manual_entry_entity_field_config_id_key on value_extractors__manual_entry (
+  entity_field_config_id
+);

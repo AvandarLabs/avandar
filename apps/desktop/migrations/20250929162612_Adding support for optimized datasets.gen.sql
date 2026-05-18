@@ -5,20 +5,41 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 105
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 4
-DROP INDEX IF EXISTS "datasets__local_csv_dataset_id_key";
+drop index if exists "datasets__local_csv_dataset_id_key";
 
-DROP INDEX IF EXISTS "datasets__local_csv_pkey";
+drop index if exists "datasets__local_csv_pkey";
 
-DROP INDEX IF EXISTS "entity_field_values_pkey";
+drop index if exists "entity_field_values_pkey";
 
-DROP TABLE "datasets__local_csv";
+drop table "datasets__local_csv";
 
-DROP TABLE "entity_field_values";
+drop table "entity_field_values";
 
-CREATE TABLE "datasets__csv_file" ("id" UUID NOT NULL, "dataset_id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "size_in_bytes" INTEGER NOT NULL, "rows_to_skip" INTEGER NOT NULL DEFAULT 0, "quote_char" TEXT NOT NULL, "escape_char" TEXT NOT NULL, "delimiter" TEXT NOT NULL, "newline_delimiter" TEXT NOT NULL, "comment_char" TEXT, "has_header" INTEGER NOT NULL DEFAULT TRUE, "date_format" TEXT, "timestamp_format" TEXT);
+create table "datasets__csv_file" (
+  "id" uuid not null,
+  "dataset_id" uuid not null,
+  "workspace_id" uuid not null,
+  "created_at" timestamptz not null default current_timestamp,
+  "updated_at" timestamptz not null default current_timestamp,
+  "size_in_bytes" integer not null,
+  "rows_to_skip" integer not null default 0,
+  "quote_char" text not null,
+  "escape_char" text not null,
+  "delimiter" text not null,
+  "newline_delimiter" text not null,
+  "comment_char" text,
+  "has_header" integer not null default true,
+  "date_format" text,
+  "timestamp_format" text
+);
 
-CREATE UNIQUE INDEX datasets__csv_file_dataset_id_key ON datasets__csv_file(dataset_id);
+create unique index datasets__csv_file_dataset_id_key on datasets__csv_file (
+  dataset_id
+);
 
-CREATE UNIQUE INDEX datasets__csv_file_pkey ON datasets__csv_file(id);
+create unique index datasets__csv_file_pkey on datasets__csv_file (id);
 
-CREATE UNIQUE INDEX entities__entity_config_external_id_unique ON entities(entity_config_id, external_id);
+create unique index entities__entity_config_external_id_unique on entities (
+  entity_config_id,
+  external_id
+);

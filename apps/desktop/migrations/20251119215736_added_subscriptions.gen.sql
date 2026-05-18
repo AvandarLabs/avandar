@@ -5,6 +5,8 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 37
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 0
-ALTER TABLE "user_profiles" ADD COLUMN "polar_product_id" UUID;
+alter table "user_profiles"
+add column "polar_product_id" uuid;
 
-ALTER TABLE "user_profiles" ADD COLUMN "subscription_id" UUID;
+alter table "user_profiles"
+add column "subscription_id" uuid;

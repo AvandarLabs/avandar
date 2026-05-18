@@ -66,9 +66,7 @@ export function assertSqlglotAvailable(): void {
  * @param statements - SQL strings (no trailing semicolons required).
  * @returns The transpiled SQLite-flavoured strings, in input order.
  */
-export function transpileToSqlite(
-  statements: readonly string[],
-): string[] {
+export function transpileToSqlite(statements: readonly string[]): string[] {
   const joined = statements.join(";\n") + ";";
   const py = [
     "import sys, sqlglot",

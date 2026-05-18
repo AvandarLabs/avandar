@@ -5,6 +5,8 @@
 -- Statements dropped (RLS/funcs/triggers/data/etc.): 71
 -- FK constraints dropped (target not synced to SQLite): 0
 -- Statements needing hand-edit (ADD CONSTRAINT, ALTER COLUMN): 0
-ALTER TABLE dashboards ADD COLUMN is_restricted INTEGER NOT NULL DEFAULT FALSE;
+alter table dashboards
+add column is_restricted integer not null default false;
 
-ALTER TABLE datasets ADD COLUMN is_restricted INTEGER NOT NULL DEFAULT FALSE;
+alter table datasets
+add column is_restricted integer not null default false;

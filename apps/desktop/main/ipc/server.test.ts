@@ -1,7 +1,8 @@
-import { describe, expect, it, vi } from "vitest";
 import { defineIpcContract } from "$/platform/ipc/contracts/defineIpcContract";
+import { describe, expect, it, vi } from "vitest";
+import { createIpcServer } from "./server";
+import type { IpcTransport } from "./server";
 import type { RequestEnvelope } from "$/platform/ipc/envelopes";
-import { createIpcServer, type IpcTransport } from "./server";
 
 function makeFakeTransport(): {
   transport: IpcTransport;
@@ -141,9 +142,8 @@ describe("createIpcServer", () => {
       return { doubled: req.n * 2 };
     });
 
-    const { callIpc, __setIpcBridgeForTests } = await import(
-      "$/platform/ipc/client"
-    );
+    const { callIpc, __setIpcBridgeForTests } =
+      await import("$/platform/ipc/client");
     __setIpcBridgeForTests({
       send: (channel, message) => {
         serverInbox[channel]?.(message);
