@@ -143,7 +143,7 @@ export function FloatingPanel({
                 </Tooltip>
               </Group>
             </Group>
-            <Collapse in={!collapsed} transitionDuration={180}>
+            <Collapse expanded={!collapsed} transitionDuration={180}>
               <Box className={css.body}>{children}</Box>
             </Collapse>
           </FloatingWindow>
