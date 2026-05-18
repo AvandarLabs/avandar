@@ -26,24 +26,24 @@ function stackedShadow({ sharp, soft }: StackedShadowOptions): string {
 
 export const ELEVATION_SHADOWS = {
   xs: stackedShadow({
-    sharp: { offsetY: 1, blur: 1, alpha: 0.06 },
-    soft: { offsetY: 1, blur: 2, alpha: 0.04 },
+    sharp: { offsetY: 1, blur: 1, alpha: 0.08 },
+    soft: { offsetY: 1, blur: 2, alpha: 0.05 },
   }),
   sm: stackedShadow({
-    sharp: { offsetY: 1, blur: 2, alpha: 0.06 },
-    soft: { offsetY: 2, blur: 4, alpha: 0.05 },
+    sharp: { offsetY: 1, blur: 2, alpha: 0.1 },
+    soft: { offsetY: 2, blur: 5, alpha: 0.06 },
   }),
   md: stackedShadow({
-    sharp: { offsetY: 1, blur: 3, alpha: 0.07 },
-    soft: { offsetY: 2, blur: 6, alpha: 0.05 },
+    sharp: { offsetY: 2, blur: 3, alpha: 0.1 },
+    soft: { offsetY: 4, blur: 10, alpha: 0.07 },
   }),
   lg: stackedShadow({
-    sharp: { offsetY: 1, blur: 4, alpha: 0.08 },
-    soft: { offsetY: 3, blur: 10, alpha: 0.06 },
+    sharp: { offsetY: 3, blur: 4, alpha: 0.11 },
+    soft: { offsetY: 8, blur: 20, alpha: 0.08 },
   }),
   xl: stackedShadow({
-    sharp: { offsetY: 2, blur: 6, alpha: 0.08 },
-    soft: { offsetY: 4, blur: 14, alpha: 0.06 },
+    sharp: { offsetY: 4, blur: 6, alpha: 0.12 },
+    soft: { offsetY: 14, blur: 32, alpha: 0.1 },
   }),
 } as const;
 
@@ -58,16 +58,39 @@ export const ELEVATION_RADIUS = {
 
 const NEUTRAL_LIGHT_RGB = "217, 226, 236";
 
+/**
+ * Hairline borders that define a surface's edge against the layer behind it.
+ *
+ * In this system, borders carry most of the elevation — shadows only
+ * reinforce the lift. A crisp hairline is what tells the eye "this is a
+ * distinct surface"; the shadow tells it "and it's sitting above the
+ * background." Always pair an `--ava-border-*` with the matching
+ * `--ava-surface-raised`/`--ava-surface-overlay` and an `ELEVATION_SHADOWS`
+ * step rather than picking neutral shades by hand — that's how elevations
+ * stay consistent across light/dark and across components.
+ *
+ * Tiers:
+ * - `default`: cards, panels, inputs, dropdowns, dividers. The everyday
+ *   edge. If a surface is "raised," it should have this border.
+ * - `strong`: use only when `default` is too faint for the context — e.g.
+ *   a card sitting on a tinted surface that washes the default border out,
+ *   or a section divider that needs to read as a structural break.
+ * - `focus`: focus rings and active field borders. Signals "this control
+ *   is currently active or accepting input." Don't use decoratively.
+ *
+ * Dark-mode tiers use a light-tinted neutral at higher alpha because
+ * light-on-dark reads more faintly per unit alpha than dark-on-light.
+ */
 export const ELEVATION_BORDERS = {
   light: {
-    default: `rgba(${NEUTRAL_RGB}, 0.1)`,
-    strong: `rgba(${NEUTRAL_RGB}, 0.14)`,
-    focus: `rgba(${NEUTRAL_RGB}, 0.22)`,
+    default: `rgba(${NEUTRAL_RGB}, 0.20)`,
+    strong: `rgba(${NEUTRAL_RGB}, 0.32)`,
+    focus: `rgba(${NEUTRAL_RGB}, 0.44)`,
   },
   dark: {
-    default: `rgba(${NEUTRAL_LIGHT_RGB}, 0.12)`,
-    strong: `rgba(${NEUTRAL_LIGHT_RGB}, 0.18)`,
-    focus: `rgba(${NEUTRAL_LIGHT_RGB}, 0.28)`,
+    default: `rgba(${NEUTRAL_LIGHT_RGB}, 0.28)`,
+    strong: `rgba(${NEUTRAL_LIGHT_RGB}, 0.4)`,
+    focus: `rgba(${NEUTRAL_LIGHT_RGB}, 0.55)`,
   },
 } as const;
 
