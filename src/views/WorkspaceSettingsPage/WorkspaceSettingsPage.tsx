@@ -89,10 +89,18 @@ export function WorkspaceSettingsPage(): JSX.Element {
             }}
             renderTabPanel={{
               general: generalTabPanel,
-              users: () => <WorkspaceUsersTab />,
-              roles: () => <WorkspaceRolesTab />,
-              tags: () => <WorkspaceTagsTab />,
-              billing: () => <WorkspaceBillingView />,
+              users: () => {
+                return <WorkspaceUsersTab />;
+              },
+              roles: () => {
+                return <WorkspaceRolesTab />;
+              },
+              tags: () => {
+                return <WorkspaceTagsTab />;
+              },
+              billing: () => {
+                return <WorkspaceBillingView />;
+              },
             }}
           />
         : <Tabs
@@ -105,9 +113,15 @@ export function WorkspaceSettingsPage(): JSX.Element {
             }}
             renderTabPanel={{
               general: generalTabPanel,
-              users: () => <WorkspaceUsersTab />,
-              roles: () => <WorkspaceRolesTab />,
-              tags: () => <WorkspaceTagsTab />,
+              users: () => {
+                return <WorkspaceUsersTab />;
+              },
+              roles: () => {
+                return <WorkspaceRolesTab />;
+              },
+              tags: () => {
+                return <WorkspaceTagsTab />;
+              },
             }}
           />
         }
