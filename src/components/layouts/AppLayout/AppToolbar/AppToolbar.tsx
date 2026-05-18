@@ -1,5 +1,7 @@
-import { Box, Group, Title } from "@mantine/core";
+import { Group, Title } from "@mantine/core";
 import { ReactNode } from "react";
+import { ChatAsideToggle } from "@/components/ChatPanel/ChatAsideToggle";
+import { useIsChatPanelAvailable } from "@/components/ChatPanel/useIsChatPanelAvailable";
 import { NavbarDesktopToggle } from "@/components/layouts/AppLayout/AppToolbar/NavbarDesktopToggle/NavbarDesktopToggle";
 import { mantineColorVar } from "@/lib/utils/browser/css";
 
@@ -14,6 +16,8 @@ export function AppToolbar({
   floatingToolbar = false,
   title,
 }: Props): JSX.Element {
+  const isChatPanelAvailable = useIsChatPanelAvailable();
+
   return (
     <Group
       px="xxs"
@@ -41,9 +45,10 @@ export function AppToolbar({
           {title}
         </Title>
       : null}
-      <Box ml="auto" mr="xxs">
+      <Group ml="auto" mr="xxs" gap="xs">
         {children}
-      </Box>
+        {isChatPanelAvailable ? <ChatAsideToggle /> : null}
+      </Group>
     </Group>
   );
 }

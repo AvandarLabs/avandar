@@ -1,5 +1,6 @@
 import { useToggleBoolean } from "@hooks";
 import { AppShell as MantineAppShell } from "@mantine/core";
+import { useHotkeys } from "@mantine/hooks";
 import {
   Spotlight,
   SpotlightActionData,
@@ -11,6 +12,8 @@ import css from "@/components/AppShell/AppShell.module.css";
 import { AppShellStateManager } from "@/components/AppShell/AppShellStateManager";
 import { MobileHeader } from "@/components/AppShell/MobileHeader";
 import { Navbar } from "@/components/AppShell/Navbar/Navbar";
+import { ChatPanel } from "@/components/ChatPanel/ChatPanel";
+import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager";
 import { HEADER_DESKTOP_TITLEBAR_HEIGHT } from "@/components/layouts/AppLayout/AppLayout";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
@@ -35,6 +38,8 @@ const DRAG_REGION_FILL_STYLE: CSSProperties = {
 const HEADER_MOBILE_DEFAULT_HEIGHT = 42;
 
 const NAVBAR_DEFAULT_WIDTH = 220;
+
+const ASIDE_DEFAULT_WIDTH = 380;
 
 type Props = {
   /**
@@ -70,10 +75,21 @@ function AppShellComponent({
   utilityLinks = [],
 }: Props): JSX.Element {
   const { isDesktopNavbarCollapsed } = AppShellStateManager.useState();
+  const { isOpen: isChatPanelOpen } = ChatPanelStateManager.useState();
+  const chatPanelDispatch = ChatPanelStateManager.useDispatch();
   const [isMobileNavbarOpened, toggleMobileNavbar] = useToggleBoolean(false);
   const isMobileViewSize = useIsMobileSize() ?? false;
   const platformType = usePlatformInfo();
   const isDesktopPlatform = platformType === "desktop";
+
+  useHotkeys([
+    [
+      "mod+J",
+      () => {
+        chatPanelDispatch.toggle();
+      },
+    ],
+  ]);
 
   const headerHeight =
     isMobileViewSize ? HEADER_MOBILE_DEFAULT_HEIGHT
@@ -92,6 +108,14 @@ function AppShellComponent({
           collapsed: {
             mobile: !isMobileNavbarOpened,
             desktop: isDesktopNavbarCollapsed,
+          },
+        }}
+        aside={{
+          width: ASIDE_DEFAULT_WIDTH,
+          breakpoint: "md",
+          collapsed: {
+            mobile: true,
+            desktop: !isChatPanelOpen,
           },
         }}
         padding="md"
@@ -139,6 +163,9 @@ function AppShellComponent({
         >
           {children}
         </MantineAppShell.Main>
+        <MantineAppShell.Aside withBorder={false} p={0}>
+          <ChatPanel />
+        </MantineAppShell.Aside>
       </MantineAppShell>
 
       <Spotlight

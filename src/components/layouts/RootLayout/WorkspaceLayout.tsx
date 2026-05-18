@@ -3,6 +3,7 @@ import { where } from "@utils";
 import { ReactNode, useMemo } from "react";
 import { EntityConfigClient } from "@/clients/entity-configs/EntityConfigClient";
 import { AppShell } from "@/components/AppShell/AppShell";
+import { ChatPanelProvider } from "@/components/ChatPanel/ChatPanelProvider";
 import { useRootWorkspaceChecks } from "@/components/layouts/RootLayout/useRootWorkspaceChecks/useRootWorkspaceChecks";
 import { useSpotlightActions } from "@/components/layouts/RootLayout/useSpotlightActions";
 import { AppLinks } from "@/config/AppLinks";
@@ -92,16 +93,18 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
 
   return (
     <DataExplorerStateManager.Provider>
-      <AppShell
-        title={workspace.name}
-        currentWorkspace={workspace}
-        profileLink={profileLink}
-        navbarLinks={mainNavBarLinks}
-        utilityLinks={utilityNavBarLinks}
-        spotlightActions={spotlightActions}
-      >
-        {children}
-      </AppShell>
+      <ChatPanelProvider>
+        <AppShell
+          title={workspace.name}
+          currentWorkspace={workspace}
+          profileLink={profileLink}
+          navbarLinks={mainNavBarLinks}
+          utilityLinks={utilityNavBarLinks}
+          spotlightActions={spotlightActions}
+        >
+          {children}
+        </AppShell>
+      </ChatPanelProvider>
     </DataExplorerStateManager.Provider>
   );
 }

@@ -1631,10 +1631,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      util__app_type_for_resource_type: {
-        Args: { p_resource_type: Database["public"]["Enums"]["resource_type"] }
-        Returns: Database["public"]["Enums"]["app_type"]
-      }
       util__auth_user_can_access_resource: {
         Args: {
           p_min_role: Database["public"]["Enums"]["role_level"]
@@ -1717,6 +1713,10 @@ export type Database = {
           p_resource_type: Database["public"]["Enums"]["resource_type"]
         }
         Returns: Database["public"]["Enums"]["role_level"]
+      }
+      util__resource_type_to_app_type: {
+        Args: { p_resource_type: Database["public"]["Enums"]["resource_type"] }
+        Returns: Database["public"]["Enums"]["app_type"]
       }
       util__role_level_rank: {
         Args: { p_role: Database["public"]["Enums"]["role_level"] }
