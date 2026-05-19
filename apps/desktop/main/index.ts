@@ -151,7 +151,33 @@ const ipcServer = createIpcServer(ipcTransport);
 
 registerRdbHandlers(ipcServer, sqliteDb);
 registerDuckDbHandlers(ipcServer, duckdbSvc);
-registerAuthHandlers(ipcServer, keychain, authState);
+registerAuthHandlers(ipcServer, keychain, authState, {
+  // After the user signs in successfully (Bun-main has just exchanged
+  // credentials for an access token), seed the local SQLite mirror from
+  // Supabase for any table that's still empty. Subsequent launches —
+  // online or offline — read from the same local rows without a
+  // network round-trip. Failures are non-fatal; the webview will still
+  // load and show whatever's in SQLite.
+  onAuthenticated: async (accessToken) => {
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.log(
+        "[snapshot-bootstrap] post-signin skipped: Supabase env missing",
+      );
+      return;
+    }
+    try {
+      await bootstrapSnapshotIfNeeded({
+        db: sqliteDb,
+        rest: createSupabaseRestClient(),
+        accessToken,
+        tables: SYNCABLE_TABLES,
+        logger: { log: console.log, error: console.error },
+      });
+    } catch (err) {
+      console.error("[snapshot-bootstrap] post-signin failed:", err);
+    }
+  },
+});
 registerDatasetBlobHandlers(ipcServer, datasetBlobStore);
 registerServerApiHandlers(ipcServer, {
   supabaseUrl: process.env.VITE_SUPABASE_API_URL ?? "",
