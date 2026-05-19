@@ -1,7 +1,7 @@
 import { Loader, Progress, Text } from "@mantine/core";
 import { Tooltip } from "@ui";
-import { findVoiceModel } from "@/lib/voice/voiceModels";
 import { useVoiceModelStatus } from "@/lib/voice/useVoiceModelManager";
+import { findVoiceModel } from "@/lib/voice/voiceModels";
 import css from "./VoiceModelDownloadIndicator.module.css";
 
 /**

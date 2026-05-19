@@ -57,7 +57,7 @@ class FakeAudioContext {
 
 class FakeOfflineAudioContext {
   readonly destination = {};
-   
+
   constructor(_channels: number, length: number, _sampleRate: number) {
     this.length = length;
   }

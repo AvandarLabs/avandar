@@ -1,8 +1,8 @@
 import { useSyncExternalStore } from "react";
-import {
-  getVoiceModelManager,
-  type VoiceManagerStatus,
-  type VoiceModelManager,
+import { getVoiceModelManager } from "./VoiceModelManager";
+import type {
+  VoiceManagerStatus,
+  VoiceModelManager,
 } from "./VoiceModelManager";
 
 /**

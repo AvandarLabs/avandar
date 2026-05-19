@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { VoiceInputButton } from "./VoiceInputButton";
 
 (
   globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }
@@ -51,8 +52,6 @@ vi.mock("@/lib/voice/audioCapture", () => {
     startMicrophoneRecording: vi.fn(),
   };
 });
-
-import { VoiceInputButton } from "./VoiceInputButton";
 
 describe("VoiceInputButton", () => {
   beforeEach(() => {

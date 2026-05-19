@@ -1,3 +1,6 @@
+import Dexie from "dexie";
+import type { EntityTable } from "dexie";
+
 /**
  * IndexedDB-backed cache for `@huggingface/transformers` model files.
  *
@@ -11,8 +14,6 @@
  *     { url: string, body: ArrayBuffer, headers: Record<string, string>,
  *       status: number, storedAt: number }
  */
-
-import Dexie, { type EntityTable } from "dexie";
 
 type CachedFileRow = {
   url: string;

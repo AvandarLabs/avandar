@@ -76,7 +76,11 @@ describe("VoiceModelManager", () => {
 
     // Simulate progress events arriving while we wait
     await Promise.resolve();
-    capturedProgressCb?.({ status: "progress", progress: 42, file: "model.onnx" });
+    capturedProgressCb?.({
+      status: "progress",
+      progress: 42,
+      file: "model.onnx",
+    });
 
     await ensure;
 
@@ -175,7 +179,9 @@ describe("VoiceModelManager", () => {
       kind: "error",
       message: "network down",
     });
-    expect(window.localStorage.getItem("avandar.voice.downloadedModels")).toBeNull();
+    expect(
+      window.localStorage.getItem("avandar.voice.downloadedModels"),
+    ).toBeNull();
   });
 
   it("isModelDownloaded returns false when the cache lacks files even if marker says yes", async () => {
@@ -202,8 +208,8 @@ describe("VoiceModelManager", () => {
     // cache, so it returns false → the manager should clear the stale marker.
     const result = await manager.isModelDownloaded("whisper-tiny");
     expect(result).toBe(false);
-    expect(
-      window.localStorage.getItem("avandar.voice.downloadedModels"),
-    ).toBe("{}");
+    expect(window.localStorage.getItem("avandar.voice.downloadedModels")).toBe(
+      "{}",
+    );
   });
 });

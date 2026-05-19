@@ -1,3 +1,21 @@
+import {
+  clearCachedFilesForPrefix,
+  createVoiceModelCache,
+  hasCachedFilesForPrefix,
+} from "./voiceModelCache";
+import { findVoiceModel } from "./voiceModels";
+import {
+  clearVoiceModelDownloaded,
+  isVoiceModelMarkedDownloaded,
+  markVoiceModelDownloaded,
+} from "./voiceModelStore";
+import type { VoiceModelCache } from "./voiceModelCache";
+import type {
+  VoiceLanguageCode,
+  VoiceModel,
+  VoiceModelId,
+} from "./voiceModels";
+
 /**
  * Singleton orchestrator for the local voice-prompt feature.
  *
@@ -12,24 +30,6 @@
  * The class is exported as a singleton via `voiceModelManager`. Tests can
  * swap the `dependencies` to avoid actually loading transformers.js.
  */
-
-import {
-  createVoiceModelCache,
-  hasCachedFilesForPrefix,
-  clearCachedFilesForPrefix,
-  type VoiceModelCache,
-} from "./voiceModelCache";
-import {
-  findVoiceModel,
-  type VoiceLanguageCode,
-  type VoiceModel,
-  type VoiceModelId,
-} from "./voiceModels";
-import {
-  isVoiceModelMarkedDownloaded,
-  markVoiceModelDownloaded,
-  clearVoiceModelDownloaded,
-} from "./voiceModelStore";
 
 /** Progress event emitted by `@huggingface/transformers` while loading. */
 type TransformersProgressEvent = {
@@ -181,11 +181,15 @@ export class VoiceModelManager {
     });
 
     const pipelineFn = await this.deps.loadPipeline();
-    this.pipelinePromise = pipelineFn("automatic-speech-recognition", model.hubRepo, {
-      progress_callback: (event) => {
-        this.handleProgress(id, event);
+    this.pipelinePromise = pipelineFn(
+      "automatic-speech-recognition",
+      model.hubRepo,
+      {
+        progress_callback: (event) => {
+          this.handleProgress(id, event);
+        },
       },
-    });
+    );
 
     try {
       await this.pipelinePromise;
@@ -231,7 +235,8 @@ export class VoiceModelManager {
         task: "transcribe",
         chunk_length_s: 30,
       });
-      const text = Array.isArray(result) ? result[0]?.text ?? "" : result.text;
+      const text =
+        Array.isArray(result) ? (result[0]?.text ?? "") : result.text;
       this.setStatus({ kind: "ready", modelId: options.modelId });
       return text.trim();
     } catch (error) {

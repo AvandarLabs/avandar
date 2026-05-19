@@ -13,20 +13,17 @@ import { IconMicrophone, IconMicrophoneOff } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
 import clsx from "clsx";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  startMicrophoneRecording,
-  type AudioRecorder,
-} from "@/lib/voice/audioCapture";
+import { startMicrophoneRecording } from "@/lib/voice/audioCapture";
 import { useVoiceModelManager } from "@/lib/voice/useVoiceModelManager";
 import {
   DEFAULT_VOICE_MODEL_ID,
   findVoiceModel,
   VOICE_LANGUAGES,
   VOICE_MODELS,
-  type VoiceLanguageCode,
-  type VoiceModelId,
 } from "@/lib/voice/voiceModels";
 import css from "./VoiceInputButton.module.css";
+import type { AudioRecorder } from "@/lib/voice/audioCapture";
+import type { VoiceLanguageCode, VoiceModelId } from "@/lib/voice/voiceModels";
 
 const LANGUAGE_STORAGE_KEY = "avandar.voice.language";
 const MODEL_STORAGE_KEY = "avandar.voice.modelId";
@@ -176,7 +173,8 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
       } else {
         notifications.show({
           title: "No speech detected",
-          message: "We didn't catch anything — try again a bit closer to the mic.",
+          message:
+            "We didn't catch anything — try again a bit closer to the mic.",
           color: "warning",
         });
       }

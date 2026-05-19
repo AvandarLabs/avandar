@@ -3,8 +3,8 @@ import { ActionIcon, Group } from "@mantine/core";
 import { IconArrowUp } from "@tabler/icons-react";
 import clsx from "clsx";
 import { ChatModelPicker } from "@/components/ChatPanel/ChatModelPicker/ChatModelPicker";
-import { VoiceInputButton } from "@/components/ChatPanel/VoiceInputButton/VoiceInputButton";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
+import { VoiceInputButton } from "@/components/ChatPanel/VoiceInputButton/VoiceInputButton";
 import css from "./Composer.module.css";
 
 export function Composer(): JSX.Element {

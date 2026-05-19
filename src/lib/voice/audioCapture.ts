@@ -69,9 +69,7 @@ export async function decodeAndResample(
     return decoded.getChannelData(0).slice();
   }
 
-  const targetLength = Math.ceil(
-    (decoded.duration * WHISPER_SAMPLE_RATE) | 0,
-  );
+  const targetLength = Math.ceil((decoded.duration * WHISPER_SAMPLE_RATE) | 0);
   const offline = new AudioContextCtor(1, targetLength, WHISPER_SAMPLE_RATE);
   const src = offline.createBufferSource();
   src.buffer = decoded;
@@ -87,9 +85,7 @@ export async function decodeAndResample(
  */
 export async function startMicrophoneRecording(): Promise<AudioRecorder> {
   if (typeof navigator === "undefined" || !navigator.mediaDevices) {
-    throw new Error(
-      "Microphone access is not available in this environment.",
-    );
+    throw new Error("Microphone access is not available in this environment.");
   }
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: {
@@ -114,9 +110,7 @@ export async function startMicrophoneRecording(): Promise<AudioRecorder> {
 
   const finished = new Promise<Blob>((resolve, reject) => {
     recorder.addEventListener("stop", () => {
-      resolve(
-        new Blob(chunks, { type: recorder.mimeType || "audio/webm" }),
-      );
+      resolve(new Blob(chunks, { type: recorder.mimeType || "audio/webm" }));
     });
     recorder.addEventListener("error", (event) => {
       const errorEvent = event as Event & { error?: unknown };
