@@ -7,7 +7,6 @@ import { getDateColumns } from "@/components/VisualizationContainer/getDateColum
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { DataVizLocalFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizLocalFilters";
 import {
-  type DataVizFilterProps,
   DEFAULT_DATA_VIZ_FILTER_PROPS,
   DEFAULT_GLOBAL_FILTER_SUBSCRIPTION,
   useLocalFilterState,
@@ -16,6 +15,7 @@ import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQu
 import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
 import { useApplyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/useApplyDashboardFiltersToSql";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
+import type { DataVizFilterProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
 import type {
   VizConfig,
   VizType,
@@ -64,8 +64,7 @@ export function DataVizPBlock({
     return {
       globalFilterSubscription:
         globalFilterSubscription ?? DEFAULT_GLOBAL_FILTER_SUBSCRIPTION,
-      localFilters:
-        localFilters ?? DEFAULT_DATA_VIZ_FILTER_PROPS.localFilters,
+      localFilters: localFilters ?? DEFAULT_DATA_VIZ_FILTER_PROPS.localFilters,
     };
   }, [globalFilterSubscription, localFilters]);
 

@@ -9,10 +9,8 @@
  * helpers directly.
  */
 import { useCallback, useMemo, useState } from "react";
-import {
-  type LocalFilter,
-  parseLocalFilterDefaultValue,
-} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
+import { parseLocalFilterDefaultValue } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
+import type { LocalFilter } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
 
 export type {
   DataVizFilterProps,

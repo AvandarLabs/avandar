@@ -9,13 +9,13 @@
  * 3. Once this module no longer represents the most recent version, remove
  *    the `AvaPageTypes` import and manually write out the types.
  */
+import type { AvaPageTypes } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type {
   V3_AvaPageData,
   V3_AvaPageRootProps,
   V3_PBlockPropsRegistry,
   V3_VizConfig,
 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV3/AvaPageDataMigrationV3.types";
-import type { AvaPageTypes } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 export type {
   V3_AvaPageData,

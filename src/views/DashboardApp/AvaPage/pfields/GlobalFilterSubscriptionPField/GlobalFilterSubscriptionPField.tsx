@@ -7,12 +7,12 @@ import {
   Text,
 } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
+import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type {
   GlobalFilterSubscription,
   GlobalFilterSubscriptionMode,
 } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
-import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
-import type { AvaPageFieldProps } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 type Props = AvaPageFieldProps<GlobalFilterSubscription>;
 
@@ -42,8 +42,7 @@ export function GlobalFilterSubscriptionPField({
       mode,
       // Reset the explicit subscription list when leaving "selected" so
       // future toggles start clean.
-      subscribedFilterIds:
-        mode === "selected" ? value.subscribedFilterIds : [],
+      subscribedFilterIds: mode === "selected" ? value.subscribedFilterIds : [],
     });
   };
 
@@ -84,8 +83,8 @@ export function GlobalFilterSubscriptionPField({
             icon={<IconInfoCircle size={14} />}
           >
             <Text size="xs">
-              Add a Filter block to the dashboard to enable global filtering
-              for this visualization.
+              Add a Filter block to the dashboard to enable global filtering for
+              this visualization.
             </Text>
           </Alert>
         : <ScrollArea.Autosize mah={200}>

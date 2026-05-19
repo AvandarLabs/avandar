@@ -17,11 +17,11 @@ import {
   TextInput,
 } from "@mantine/core";
 import { IconAdjustmentsHorizontal, IconRefresh } from "@tabler/icons-react";
-import {
-  type LocalFilter,
-  type LocalFilterStateApi,
-  type LocalFilterValue,
-  parseLocalFilterOptions,
+import { parseLocalFilterOptions } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
+import type {
+  LocalFilter,
+  LocalFilterStateApi,
+  LocalFilterValue,
 } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
 
 type Props = {

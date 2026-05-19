@@ -9,19 +9,16 @@
  * 3. Once this module no longer represents the most recent version, remove
  *    the `AvaPageTypes` import and manually write out the types.
  */
-import type { ReactNode } from "react";
-import type { Simplify } from "type-fest";
-import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
 import type {
   V2_AvaPageData,
   V2_AvaPageRootProps,
   V2_PBlockPropsRegistry,
   V2_VizConfig,
 } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrationV2/AvaPageDataMigrationV2.types";
-import type {
-  Config as PuckConfig,
-  Data as PuckData,
-} from "@puckeditor/core";
+import type { Config as PuckConfig, Data as PuckData } from "@puckeditor/core";
+import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
+import type { ReactNode } from "react";
+import type { Simplify } from "type-fest";
 
 export type {
   V2_AvaPageData,

@@ -1,10 +1,8 @@
 import { CustomField } from "@puckeditor/core";
-import type { GlobalFilterSubscription } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
 import { GlobalFilterSubscriptionPField } from "@/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField";
+import type { GlobalFilterSubscription } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
 
-export function buildGlobalFilterSubscriptionPFieldConfig(): CustomField<
-  GlobalFilterSubscription
-> {
+export function buildGlobalFilterSubscriptionPFieldConfig(): CustomField<GlobalFilterSubscription> {
   return {
     label: "Global filters",
     type: "custom",

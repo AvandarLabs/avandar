@@ -25,10 +25,10 @@ const NAME: DashboardFilterRecord = {
 describe("resolveSubscribedFilterIds", () => {
   it("returns undefined for mode=all (means: subscribe to every filter)", () => {
     expect(
-      resolveSubscribedFilterIds(
-        { mode: "all", subscribedFilterIds: [] },
-        [REGION, NAME],
-      ),
+      resolveSubscribedFilterIds({ mode: "all", subscribedFilterIds: [] }, [
+        REGION,
+        NAME,
+      ]),
     ).toBeUndefined();
   });
 
@@ -79,14 +79,13 @@ describe("parseLocalFilterDefaultValue", () => {
     );
   });
   it("returns undefined for empty single-select default", () => {
-    expect(
-      parseLocalFilterDefaultValue("", "select_single"),
-    ).toBeUndefined();
+    expect(parseLocalFilterDefaultValue("", "select_single")).toBeUndefined();
   });
   it("parses multi-select defaults from a JSON array", () => {
-    expect(
-      parseLocalFilterDefaultValue('["a","b"]', "select_multi"),
-    ).toEqual(["a", "b"]);
+    expect(parseLocalFilterDefaultValue('["a","b"]', "select_multi")).toEqual([
+      "a",
+      "b",
+    ]);
   });
   it("parses multi-select defaults from a comma list", () => {
     expect(parseLocalFilterDefaultValue("a, b", "select_multi")).toEqual([

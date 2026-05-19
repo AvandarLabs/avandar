@@ -1,13 +1,15 @@
 import { useMemo } from "react";
 import {
-  type DataVizFilterProps,
-  type LocalFilter,
-  type LocalFilterStateApi,
   localFilterToRecord,
   resolveSubscribedFilterIds,
 } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
 import { applyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/applyDashboardFiltersToSql";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
+import type {
+  DataVizFilterProps,
+  LocalFilter,
+  LocalFilterStateApi,
+} from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/useLocalFilterState";
 
 /**
  * Returns `rawSql` amended with the viewer-selected dashboard filters that
