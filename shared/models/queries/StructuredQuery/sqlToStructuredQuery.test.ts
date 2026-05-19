@@ -131,7 +131,7 @@ describe("sqlToStructuredQuery", () => {
     expect(result.query.offset).toBe(5);
   });
 
-  it("flags multi-table FROM as partial", () => {
+  it("flags comma-joined FROM as partial", () => {
     const result = sqlToStructuredQuery({
       sql: `SELECT a.name FROM "${datasetId}" a, other_table b`,
       datasets,
@@ -139,7 +139,7 @@ describe("sqlToStructuredQuery", () => {
     expect(result.isFullyMapped).toBe(false);
     expect(
       result.unmappedReasons.some((r) => {
-        return r.includes("multiple tables");
+        return r.toLowerCase().includes("comma");
       }),
     ).toBe(true);
   });
@@ -153,17 +153,15 @@ describe("sqlToStructuredQuery", () => {
     expect(result.unmappedReasons.length).toBeGreaterThan(0);
   });
 
-  it("flags HAVING / CTE / DISTINCT", () => {
-    const havingResult = sqlToStructuredQuery({
-      sql:
-        `SELECT "name", count("age") FROM "${datasetId}" ` +
-        `GROUP BY "name" HAVING count("age") > 1`,
+  it("flags CTE / DISTINCT as partial mappings", () => {
+    const distinctResult = sqlToStructuredQuery({
+      sql: `SELECT DISTINCT "name" FROM "${datasetId}"`,
       datasets,
     });
-    expect(havingResult.isFullyMapped).toBe(false);
+    expect(distinctResult.isFullyMapped).toBe(false);
     expect(
-      havingResult.unmappedReasons.some((r) => {
-        return r.includes("HAVING");
+      distinctResult.unmappedReasons.some((r) => {
+        return r.toUpperCase().includes("DISTINCT");
       }),
     ).toBe(true);
   });
@@ -188,5 +186,88 @@ describe("sqlToStructuredQuery", () => {
       expect(rule.operator).toBe("in");
       expect(rule.value).toEqual(["active", "pending"]);
     }
+  });
+
+  it("maps HAVING clause into the having filter group", () => {
+    const result = sqlToStructuredQuery({
+      sql:
+        `SELECT "name", count("age") FROM "${datasetId}" ` +
+        `GROUP BY "name" HAVING count("age") > 1`,
+      datasets,
+    });
+    expect(result.query.having.rules.length).toBe(1);
+    const rule = result.query.having.rules[0];
+    expect(rule?.type).toBe("rule");
+    if (rule && rule.type === "rule") {
+      expect(rule.columnName).toBe("count(age)");
+      expect(rule.operator).toBe(">");
+      expect(rule.value).toBe(1);
+    }
+  });
+
+  it("maps an INNER JOIN into the joins array", () => {
+    const result = sqlToStructuredQuery({
+      sql:
+        `SELECT a.name, b.email FROM "${datasetId}" a ` +
+        `INNER JOIN profiles b ON a.id = b.user_id`,
+      datasets,
+    });
+    expect(result.query.joins.length).toBe(1);
+    const join = result.query.joins[0];
+    expect(join?.kind).toBe("inner");
+    expect(join?.target.type).toBe("table");
+    if (join && join.target.type === "table") {
+      expect(join.target.tableName).toBe("profiles");
+      expect(join.target.alias).toBe("b");
+    }
+    expect(join?.on.length).toBe(1);
+    expect(join?.on[0]?.leftColumn).toBe("id");
+    expect(join?.on[0]?.rightColumn).toBe("user_id");
+  });
+
+  it("maps LEFT JOIN with subquery target", () => {
+    const result = sqlToStructuredQuery({
+      sql:
+        `SELECT a.name FROM "${datasetId}" a ` +
+        `LEFT JOIN (SELECT user_id, MAX(score) AS s FROM scores ` +
+        `GROUP BY user_id) sub ON a.id = sub.user_id`,
+      datasets,
+    });
+    expect(result.query.joins.length).toBe(1);
+    const join = result.query.joins[0];
+    expect(join?.kind).toBe("left");
+    expect(join?.target.type).toBe("subquery");
+    if (join && join.target.type === "subquery") {
+      expect(join.target.alias).toBe("sub");
+    }
+  });
+
+  it("captures a nested subquery in FROM into nestedSubquery", () => {
+    const result = sqlToStructuredQuery({
+      sql:
+        `SELECT * FROM (SELECT "name", "age" FROM "${datasetId}" ` +
+        `WHERE "age" > 18) AS adult`,
+      datasets,
+    });
+    expect(result.query.nestedSubquery).toBeDefined();
+    if (result.query.nestedSubquery) {
+      expect(result.query.nestedSubquery.alias).toBe("adult");
+      expect(result.query.nestedSubquery.sql.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("flags non-equality JOIN ON as partial", () => {
+    const result = sqlToStructuredQuery({
+      sql:
+        `SELECT a.name FROM "${datasetId}" a ` +
+        `INNER JOIN profiles b ON a.id > b.user_id`,
+      datasets,
+    });
+    expect(result.isFullyMapped).toBe(false);
+    expect(
+      result.unmappedReasons.some((r) => {
+        return r.toLowerCase().includes("equality");
+      }),
+    ).toBe(true);
   });
 });

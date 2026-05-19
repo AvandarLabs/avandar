@@ -82,8 +82,8 @@ checklist.
 
 | Path | Coverage |
 |---|---|
-| `shared/models/queries/StructuredQuery/sqlToStructuredQuery.test.ts` | 12 cases — basic SELECT, SELECT *, aggregations + GROUP BY, simple WHERE, nested AND/OR groups, ORDER BY, LIMIT/OFFSET, multi-table flag, unparseable SQL, HAVING flag, missing WHERE, `IN` lists. |
-| `shared/models/queries/StructuredQuery/structuredQueryToSQL.test.ts` | 5 cases — empty filters, equality predicate, nested AND/OR with parentheses, `IN` list, `IS NULL`. |
+| `shared/models/queries/StructuredQuery/sqlToStructuredQuery.test.ts` | 17 cases — basic SELECT, SELECT *, aggregations + GROUP BY, simple WHERE, nested AND/OR groups, ORDER BY, LIMIT/OFFSET, comma-joined FROM, unparseable SQL, CTE/DISTINCT flagging, missing WHERE, `IN` lists, HAVING, INNER JOIN, LEFT JOIN with subquery target, nested subquery in FROM, non-equality JOIN flagged. |
+| `shared/models/queries/StructuredQuery/structuredQueryToSQL.test.ts` | 9 cases — empty filters, equality predicate, nested AND/OR with parentheses, `IN` list, `IS NULL`, HAVING, INNER JOIN, LEFT JOIN with subquery, nested-subquery FROM. |
 
 Both files pass `pnpm vitest run shared/models/queries/StructuredQuery`.
 
@@ -98,6 +98,36 @@ staging Supabase). Stored in `docs/demo-features/screenshots/`:
 > in captures from a follow-up session once the test environment allows
 > it. The behaviour itself is exercised by the unit tests above, which
 > cover the parser and the knex regenerator end-to-end.
+
+## Extension: HAVING, JOIN, and nested subqueries
+
+Phase 1 (the unidirectional parser) and Phase 2 (form → SQL via knex) now
+also handle:
+
+- **HAVING.** A new `having: QueryFilterGroup` field on `StructuredQueryRead`
+  mirrors the WHERE filter tree but renders after `GROUP BY`. The parser
+  re-uses the WHERE walker but accepts aggregate-function predicates
+  (`count(age) > 5`) by treating the aggregate as a labelled column name,
+  so the form can show "count(age) > 5" in the filter UI without losing the
+  aggregate context.
+- **JOINs.** A new `joins: readonly QueryJoin[]` field carries `INNER`,
+  `LEFT`, `RIGHT`, `FULL`, and `CROSS` joins. Each join has a kind, a target
+  (table name + optional alias, OR a nested subquery + alias), an array of
+  equality `on` predicates, and a combinator. The knex renderer emits the
+  joins via `joinRaw` (so subquery targets work) and the parser walks
+  `node-sql-parser`'s FROM list looking for `join` keywords. Non-equality
+  ON clauses are flagged as partial mappings.
+- **Nested subqueries in FROM.** When the SQL is shaped
+  `SELECT … FROM (SELECT …) AS alias`, the parser stashes the inner
+  SELECT under `nestedSubquery: NestedSubquerySource` on the structured
+  query. The form treats the subquery as opaque text (so the SQL stays
+  source-of-truth) and the knex renderer emits `from (<inner sql>) as
+  <alias>`. Joining onto a subquery is similarly handled.
+
+The form widgets for these (a HAVING accordion, a JOIN list, a subquery
+preview) are an explicit follow-up — the parser/renderer round-trip is in
+place and verified by unit tests; the manual-form UI controls for editing
+them in-canvas come next.
 
 ## Outstanding follow-ups
 

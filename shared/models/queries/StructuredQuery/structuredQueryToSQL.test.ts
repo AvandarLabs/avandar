@@ -51,6 +51,8 @@ function _makeQuery(
       [ageColumn.id]: "none",
     },
     filters,
+    having: EMPTY_QUERY_FILTER,
+    joins: [],
     offset: undefined,
     limit: undefined,
   }) as PartialStructuredQuery;
@@ -156,5 +158,148 @@ describe("structuredQueryToSQL", () => {
       }),
     );
     expect(sql.toLowerCase()).toContain('"age" is null');
+  });
+
+  it("emits a HAVING clause when set", () => {
+    const nameColumn = _makeColumn("name");
+    const ageColumn = _makeColumn("age", "integer");
+    const query = Model.make("StructuredQuery", {
+      id: "q1" as StructuredQueryId,
+      version: 1 as const,
+      dataSource: _makeDataset(),
+      queryColumns: [nameColumn, ageColumn],
+      orderByColumn: undefined,
+      orderByDirection: undefined,
+      aggregations: {
+        [nameColumn.id]: "group_by",
+        [ageColumn.id]: "count",
+      },
+      filters: EMPTY_QUERY_FILTER,
+      having: {
+        type: "group",
+        combinator: "AND",
+        rules: [
+          {
+            type: "rule",
+            columnName: "count_age",
+            operator: ">",
+            value: 5,
+          },
+        ],
+      } as QueryFilterGroup,
+      joins: [],
+      offset: undefined,
+      limit: undefined,
+    }) as PartialStructuredQuery;
+    const sql = structuredQueryToSQL(query);
+    expect(sql.toLowerCase()).toContain("having");
+    expect(sql).toContain('"count_age"');
+  });
+
+  it("emits an INNER JOIN clause", () => {
+    const nameColumn = _makeColumn("name");
+    const query = Model.make("StructuredQuery", {
+      id: "q1" as StructuredQueryId,
+      version: 1 as const,
+      dataSource: _makeDataset(),
+      queryColumns: [nameColumn],
+      orderByColumn: undefined,
+      orderByDirection: undefined,
+      aggregations: { [nameColumn.id]: "none" },
+      filters: EMPTY_QUERY_FILTER,
+      having: EMPTY_QUERY_FILTER,
+      joins: [
+        {
+          id: "j1",
+          kind: "inner",
+          target: { type: "table", tableName: "profiles", alias: "b" },
+          on: [
+            {
+              type: "equality",
+              leftColumn: "id",
+              rightColumn: "user_id",
+              leftTable: "a",
+              rightTable: "b",
+            },
+          ],
+          combinator: "AND",
+        },
+      ],
+      offset: undefined,
+      limit: undefined,
+    }) as PartialStructuredQuery;
+    const sql = structuredQueryToSQL(query);
+    expect(sql.toLowerCase()).toContain("inner join");
+    expect(sql).toContain('"profiles"');
+    expect(sql).toMatch(/"a"\."id" = "b"\."user_id"/);
+  });
+
+  it("emits a LEFT JOIN with subquery target", () => {
+    const nameColumn = _makeColumn("name");
+    const query = Model.make("StructuredQuery", {
+      id: "q1" as StructuredQueryId,
+      version: 1 as const,
+      dataSource: _makeDataset(),
+      queryColumns: [nameColumn],
+      orderByColumn: undefined,
+      orderByDirection: undefined,
+      aggregations: { [nameColumn.id]: "none" },
+      filters: EMPTY_QUERY_FILTER,
+      having: EMPTY_QUERY_FILTER,
+      joins: [
+        {
+          id: "j1",
+          kind: "left",
+          target: {
+            type: "subquery",
+            subqueryId:
+              "select user_id, max(score) as s from scores group by user_id",
+            alias: "sub",
+          },
+          on: [
+            {
+              type: "equality",
+              leftColumn: "id",
+              rightColumn: "user_id",
+              leftTable: "a",
+              rightTable: "sub",
+            },
+          ],
+          combinator: "AND",
+        },
+      ],
+      offset: undefined,
+      limit: undefined,
+    }) as PartialStructuredQuery;
+    const sql = structuredQueryToSQL(query);
+    expect(sql.toLowerCase()).toContain("left join");
+    expect(sql).toContain("(select user_id, max(score) as s from scores");
+    expect(sql).toContain('as "sub"');
+  });
+
+  it("emits FROM (subquery) AS alias when nestedSubquery is set", () => {
+    const query = Model.make("StructuredQuery", {
+      id: "q1" as StructuredQueryId,
+      version: 1 as const,
+      dataSource: _makeDataset(),
+      nestedSubquery: {
+        type: "subquery",
+        id: "sub1",
+        sql: 'select "name" from "users_table" where "age" > 18',
+        alias: "adult",
+      },
+      queryColumns: [],
+      orderByColumn: undefined,
+      orderByDirection: undefined,
+      aggregations: {},
+      filters: EMPTY_QUERY_FILTER,
+      having: EMPTY_QUERY_FILTER,
+      joins: [],
+      offset: undefined,
+      limit: undefined,
+    }) as PartialStructuredQuery;
+    const sql = structuredQueryToSQL(query);
+    expect(sql).toContain('from (select "name" from "users_table"');
+    expect(sql).toContain('as "adult"');
   });
 });

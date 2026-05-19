@@ -7,6 +7,10 @@ import type {
 } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types.ts";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import type {
+  NestedSubquerySource,
+  QueryJoin,
+} from "$/models/queries/StructuredQuery/QueryJoin.types.ts";
 
 type ModelType = "StructuredQuery";
 type CurrentStructuredQueryVersion = 1;
@@ -28,6 +32,16 @@ export type StructuredQueryRead = Model.Versioned<
     /** The data source we are querying from. */
     dataSource: QueryDataSource;
 
+    /**
+     * Set when the SQL came in as `FROM (SELECT ...) AS alias` rather than
+     * `FROM <dataset>`. The string still tracks `dataSource` but the
+     * `nestedSubquery` snapshot keeps the original SQL so the SQL view can
+     * round-trip the query unchanged. When this is set the form treats the
+     * subquery as opaque (the user can edit the outer query and the inner
+     * SQL stays put).
+     */
+    nestedSubquery?: NestedSubquerySource;
+
     /** The columns that are being queried. */
     queryColumns: readonly QueryColumnRead[];
 
@@ -46,6 +60,17 @@ export type StructuredQueryRead = Model.Versioned<
      */
     filters: QueryFilterGroup;
 
+    /**
+     * Recursive HAVING tree. Same shape as `filters`; applied after
+     * GROUP BY. Empty group means "no having clause".
+     */
+    having: QueryFilterGroup;
+
+    /**
+     * JOIN clauses, applied in array order. Empty array means "no joins".
+     */
+    joins: readonly QueryJoin[];
+
     /** The offset of the query. */
     offset: number | undefined;
 
@@ -60,11 +85,14 @@ type EmptyStructuredQuery = Model.Versioned<
   {
     id: StructuredQueryId;
     dataSource: undefined;
+    nestedSubquery?: NestedSubquerySource;
     queryColumns: readonly QueryColumnRead[];
     orderByColumn: undefined;
     orderByDirection: undefined;
     aggregations: Record<QueryColumnId, QueryAggregationType.T>;
     filters: QueryFilterGroup;
+    having: QueryFilterGroup;
+    joins: readonly QueryJoin[];
     offset: undefined;
     limit: undefined;
   }
