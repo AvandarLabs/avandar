@@ -122,7 +122,7 @@ function AppShellComponent({
         }}
         aside={{
           width: ASIDE_DEFAULT_WIDTH,
-          breakpoint: "md",
+          breakpoint: "sm",
           collapsed: {
             mobile: true,
             desktop: !isChatPanelOpen,

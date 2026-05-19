@@ -1,8 +1,8 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
-import { CALIFORNIA_CSV_PATH } from "./helpers/constants";
+import { SMALL_CALIFORNIA_CSV_PATH } from "./helpers/constants";
 import { ensureCloudStorageCheckedAndSaveDataset } from "./helpers/manualUploadCloudSyncFlow";
-import { LONG_WAIT } from "./helpers/timeouts";
+import { MEDIUM_WAIT } from "./helpers/timeouts";
 
 test.describe("Share resource modal", () => {
   test("opens share modal after CSV upload without map error", async ({
@@ -29,14 +29,14 @@ test.describe("Share resource modal", () => {
     const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
     await uploadPanel
       .locator('input[type="file"]')
-      .setInputFiles(CALIFORNIA_CSV_PATH);
+      .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
     await uploadPanel
       .getByRole("button", { name: "Upload", exact: true })
       .click();
 
     await expect(
       page.getByText("Data processed successfully", { exact: false }),
-    ).toBeVisible({ timeout: LONG_WAIT });
+    ).toBeVisible({ timeout: MEDIUM_WAIT });
 
     await ensureCloudStorageCheckedAndSaveDataset({
       page,
@@ -49,7 +49,7 @@ test.describe("Share resource modal", () => {
     });
 
     const shareButton = page.getByRole("button", { name: "Share" });
-    await expect(shareButton).toBeEnabled({ timeout: LONG_WAIT });
+    await expect(shareButton).toBeEnabled({ timeout: MEDIUM_WAIT });
     await shareButton.click();
 
     await page.screenshot({
@@ -64,7 +64,7 @@ test.describe("Share resource modal", () => {
     // Anchor on the unified Add combobox and the "General access" select.
     await expect(
       page.getByRole("combobox", { name: "Add people, groups, or tags" }),
-    ).toBeVisible({ timeout: LONG_WAIT });
+    ).toBeVisible({ timeout: MEDIUM_WAIT });
     await expect(
       page.getByRole("combobox", { name: "General access" }),
     ).toBeVisible();
