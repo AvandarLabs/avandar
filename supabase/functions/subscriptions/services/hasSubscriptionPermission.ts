@@ -24,12 +24,10 @@ export async function hasSubscriptionPermission(
   const { permissionType, supabaseAdminClient } = options;
   const { data: dbSubscription } =
     options.subscriptionId !== undefined ?
-      await supabaseAdminClient
-        .from("subscriptions")
-        .select("*")
-        .eq("polar_subscription_id", options.subscriptionId)
-        .single()
-        .throwOnError()
+      await _loadSubscriptionByIdOrPolarId({
+        supabaseAdminClient,
+        subscriptionId: options.subscriptionId,
+      })
     : await supabaseAdminClient
         .from("subscriptions")
         .select("*")
@@ -83,4 +81,29 @@ export async function hasSubscriptionPermission(
       });
     },
   });
+}
+
+async function _loadSubscriptionByIdOrPolarId(options: {
+  supabaseAdminClient: AvaSupabaseClient;
+  subscriptionId: Subscription.Id;
+}) {
+  const { supabaseAdminClient, subscriptionId } = options;
+
+  const byPolarId = await supabaseAdminClient
+    .from("subscriptions")
+    .select("*")
+    .eq("polar_subscription_id", subscriptionId)
+    .maybeSingle()
+    .throwOnError();
+
+  if (byPolarId.data !== null) {
+    return { data: byPolarId.data };
+  }
+
+  return await supabaseAdminClient
+    .from("subscriptions")
+    .select("*")
+    .eq("id", subscriptionId)
+    .single()
+    .throwOnError();
 }
