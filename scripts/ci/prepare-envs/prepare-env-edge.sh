@@ -44,6 +44,7 @@ declare -A _edge_env=(
 
   # OpenAI
   [OPENAI_API_KEY]="$OPENAI_API_KEY"
+  [OPEN_ROUTER_API_KEY]="$OPEN_ROUTER_API_KEY"
 
   # Featurebase (Customer support)
   [FEATUREBASE_JWT_SECRET]="$FEATUREBASE_JWT_SECRET"

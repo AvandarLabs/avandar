@@ -1,0 +1,7 @@
+.shell {
+  border-left: 1px solid var(--ava-border-default);
+}
+
+.header {
+  border-bottom: 1px solid var(--ava-border-default);
+}

@@ -12,23 +12,68 @@
   background-color: var(--ava-surface-raised);
   border: 1px solid var(--ava-border-default);
   border-radius: var(--mantine-radius-sm);
-  box-shadow: var(--mantine-shadow-xs);
+  box-shadow: var(--mantine-shadow-sm);
+
   /* Do not set `transition` here: it overrides Mantine's transform/width/height slide. */
 }
 
 .tab {
+  border-radius: var(--mantine-radius-sm);
   color: var(--mantine-color-neutral-6);
   font-weight: 500;
+  position: relative;
   transition: var(--ava-transition-colors);
   z-index: 1;
+}
+
+:global([data-mantine-color-scheme="dark"]) .tab {
+  color: var(--mantine-color-neutral-3);
+}
+
+/**
+ * Hover pill is rendered as an inset pseudo-element so it sits inside the
+ * tab's hit area without touching the floating indicator on the adjacent
+ * tab. Click target stays full-width; only the visible pill shrinks.
+ */
+.tab::before {
+  background-color: transparent;
+  border-radius: var(--mantine-radius-sm);
+  content: "";
+  inset: 0 4px;
+  pointer-events: none;
+  position: absolute;
+  transition: background-color var(--ava-animation-duration-normal)
+    var(--ava-animation-easing-out);
+  z-index: -1;
+}
+
+.tab:hover:not([data-active])::before {
+  background-color: color-mix(
+    in srgb,
+    var(--mantine-color-neutral-9) 6%,
+    transparent
+  );
+}
+
+.tab:hover:not([data-active]) {
+  color: var(--mantine-color-neutral-8);
 }
 
 .tab[data-active] {
   color: var(--mantine-color-neutral-9);
 }
 
-:global([data-mantine-color-scheme="dark"]) .tab {
-  color: var(--mantine-color-neutral-3);
+:global([data-mantine-color-scheme="dark"])
+  .tab:hover:not([data-active])::before {
+  background-color: color-mix(
+    in srgb,
+    var(--mantine-color-neutral-0) 8%,
+    transparent
+  );
+}
+
+:global([data-mantine-color-scheme="dark"]) .tab:hover:not([data-active]) {
+  color: var(--mantine-color-neutral-1);
 }
 
 :global([data-mantine-color-scheme="dark"]) .tab[data-active] {

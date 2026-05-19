@@ -1,9 +1,6 @@
 import type { AnimationTheme } from "@/config/Theme/AnimationTheme";
-import type {
-  ELEVATION_BORDERS,
-  ELEVATION_SHADOWS,
-  ELEVATION_SURFACES,
-} from "@/config/Theme/themeElevation";
+import type { BorderTheme } from "@/config/Theme/BorderTheme";
+import type { ElevationTheme } from "@/config/Theme/ElevationTheme";
 import type {
   DefaultMantineColor,
   DefaultMantineSize,
@@ -28,10 +25,6 @@ type ExtendedCustomSpacing =
   | "xxl"
   | "xxxl";
 
-type ElevationSurfaces = typeof ELEVATION_SURFACES;
-type ElevationBorders = typeof ELEVATION_BORDERS;
-type ElevationShadows = typeof ELEVATION_SHADOWS;
-
 declare module "@mantine/core" {
   export interface MantineThemeOther {
     /** Primary color */
@@ -42,11 +35,9 @@ declare module "@mantine/core" {
       modal: number;
     };
 
-    elevation: {
-      surfaces: ElevationSurfaces;
-      borders: ElevationBorders;
-      shadows: ElevationShadows;
-    };
+    elevation: typeof ElevationTheme;
+
+    borders: typeof BorderTheme;
 
     animation: typeof AnimationTheme;
 

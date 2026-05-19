@@ -43,3 +43,16 @@ export function mantineColorVar(color: `${string}.${number}` | string): string {
 export function mantineVar(name: string): string {
   return `var(--mantine-${name})`;
 }
+
+/**
+ * Returns a string that references an Avandar theme variable.
+ *
+ * @example
+ * cssAvaVar('border-default'); // "var(--ava-border-default)"
+ *
+ * @param {string} name - The base variable name to use
+ * @returns {string} The full Avandar theme var string
+ */
+export function cssAvaVar(name: string): string {
+  return `var(--ava-${name})`;
+}

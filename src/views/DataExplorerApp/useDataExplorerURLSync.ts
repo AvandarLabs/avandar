@@ -199,7 +199,7 @@ export function useDataExplorerURLSync({ urlSearch, navigate }: Options): void {
     }
 
     if (urlState.rawSQL) {
-      dispatch.setRawSQL(urlState.rawSQL);
+      dispatch.setRawSql(urlState.rawSQL);
     }
 
     if (urlState.openDataset) {

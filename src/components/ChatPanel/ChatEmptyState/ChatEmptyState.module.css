@@ -1,0 +1,12 @@
+.suggestionButton {
+  font-weight: 400;
+}
+
+.suggestionButtonInner {
+  justify-content: flex-start;
+}
+
+.suggestionButtonLabel {
+  line-height: 1.4;
+  text-align: left;
+}

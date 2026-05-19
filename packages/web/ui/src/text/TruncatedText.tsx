@@ -1,6 +1,6 @@
 import { Text } from "@mantine/core";
-import { Tooltip } from "../Tooltip/Tooltip";
 import { useCheckTruncatedText } from "../hooks/useCheckTruncatedText/useCheckTruncatedText";
+import { Tooltip } from "../Tooltip/Tooltip";
 import type { TextProps, TooltipProps } from "@mantine/core";
 
 type TooltipPassthroughProps = Omit<
@@ -17,7 +17,7 @@ type Props = {
 export function TruncatedText({
   children,
   maw = 250,
-  withFullTextTooltip: withTooltip = false,
+  withFullTextTooltip = false,
   tooltipProps,
   ...textProps
 }: Props): JSX.Element {
@@ -30,7 +30,7 @@ export function TruncatedText({
     </Text>
   );
 
-  return withTooltip ?
+  return withFullTextTooltip ?
       <Tooltip
         position="left"
         withArrow

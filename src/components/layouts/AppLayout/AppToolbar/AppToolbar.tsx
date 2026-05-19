@@ -1,6 +1,10 @@
-import { Box, Group, Title } from "@mantine/core";
+import { Group, Title } from "@mantine/core";
 import { ReactNode } from "react";
+import { FeedbackButton } from "@/components/buttons/FeedbackButton/FeedbackButton";
+import { ChatAsideToggle } from "@/components/ChatPanel/ChatAsideToggle/ChatAsideToggle";
+import { useIsChatPanelAvailable } from "@/components/ChatPanel/useIsChatPanelAvailable";
 import { NavbarDesktopToggle } from "@/components/layouts/AppLayout/AppToolbar/NavbarDesktopToggle/NavbarDesktopToggle";
+import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { mantineColorVar } from "@/lib/utils/browser/css";
 
 type Props = {
@@ -14,6 +18,8 @@ export function AppToolbar({
   floatingToolbar = false,
   title,
 }: Props): JSX.Element {
+  const isChatPanelAvailable = useIsChatPanelAvailable();
+
   return (
     <Group
       px="xxs"
@@ -41,9 +47,15 @@ export function AppToolbar({
           {title}
         </Title>
       : null}
-      <Box ml="auto" mr="xxs">
+      <Group ml="auto" mr="xxs" gap="xxs">
         {children}
-      </Box>
+        {isFlagEnabled(FeatureFlag.EnableUserFeedback) ?
+          <FeedbackButton />
+        : null}
+        {isChatPanelAvailable ?
+          <ChatAsideToggle />
+        : null}
+      </Group>
     </Group>
   );
 }

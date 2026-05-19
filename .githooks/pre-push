@@ -12,6 +12,19 @@ set -uo pipefail
 
 cd "$(git rev-parse --show-toplevel)" || exit 0
 
+# Paths matching any of these extended regex patterns are skipped by the
+# formatters/linters below. Add new patterns here to keep this list readable.
+IGNORE_PATTERNS=(
+  '^node_modules/'
+  '^shared/types/database\.types\.ts$'
+  '^supabase/migrations/.*\.sql$'
+  '\.gen\.[^/]+$'
+  '\.md$'
+  '\.lock$'
+  '(^|/)pnpm-lock\.yaml$'
+)
+IGNORE_REGEX=$(IFS='|'; echo "${IGNORE_PATTERNS[*]}")
+
 BASE=""
 for ref in origin/develop origin/main; do
   if git rev-parse --verify "$ref" >/dev/null 2>&1; then
@@ -32,7 +45,7 @@ while IFS= read -r line; do
   [ -n "$line" ] && CHANGED+=("$line")
 done < <(
   git diff --name-only --diff-filter=ACMR "$BASE" HEAD \
-    | grep -Ev '^node_modules/|^shared/types/database\.types\.ts$|^supabase/migrations/.*\.sql$|\.gen\.[^/]+$|\.md$' \
+    | grep -Ev "$IGNORE_REGEX" \
     || true
 )
 
