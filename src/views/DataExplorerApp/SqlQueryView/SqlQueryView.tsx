@@ -1,15 +1,19 @@
 import {
+  Alert,
   Button,
   Fieldset,
   Group,
+  List,
   Paper,
   Stack,
   Text,
   Textarea,
 } from "@mantine/core";
+import { IconAlertTriangle } from "@tabler/icons-react";
 import { TextareaForm } from "@ui";
 import { useState } from "react";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import css from "./SqlQueryView.module.css";
 
 /**
@@ -20,8 +24,22 @@ import css from "./SqlQueryView.module.css";
  * saved dataset.
  */
 export function SqlQueryView(): JSX.Element {
-  const [{ rawSQL }, dispatch] = DataExplorerStateManager.useContext();
+  const [{ rawSQL, isStructuredQueryInSync, sqlSyncWarnings }, dispatch] =
+    DataExplorerStateManager.useContext();
   const [isEditMode, setIsEditMode] = useState(false);
+  const { parseSql } = useSqlToStructuredQuery();
+
+  const onSubmitSql = (rawValue: string): void => {
+    const trimmedValue = rawValue.trim();
+    dispatch.setRawSql(trimmedValue);
+    const mapping = parseSql(trimmedValue);
+    dispatch.applySqlMapping({
+      query: mapping.query,
+      isFullyMapped: mapping.isFullyMapped,
+      unmappedReasons: mapping.unmappedReasons,
+    });
+    setIsEditMode(false);
+  };
 
   if (rawSQL === undefined) {
     return (
@@ -36,6 +54,26 @@ export function SqlQueryView(): JSX.Element {
 
   return (
     <Stack gap="md" px="sm">
+      {!isStructuredQueryInSync && sqlSyncWarnings.length > 0 ?
+        <Alert
+          icon={<IconAlertTriangle size={16} />}
+          color="yellow"
+          variant="light"
+          title="Manual form shows an approximation"
+          data-testid="sql-sync-warning"
+        >
+          <Text size="xs" mb="xs">
+            Parts of this SQL could not be represented in the Manual form. The
+            form shows a best-effort approximation; the SQL above is what
+            actually runs.
+          </Text>
+          <List size="xs" spacing={2}>
+            {sqlSyncWarnings.map((reason) => {
+              return <List.Item key={reason}>{reason}</List.Item>;
+            })}
+          </List>
+        </Alert>
+      : null}
       <Fieldset
         className={css.fieldset}
         legend={
@@ -71,11 +109,7 @@ export function SqlQueryView(): JSX.Element {
               validateOnChange={true}
               required={true}
               disabledUntilDirty={true}
-              onSubmit={(value) => {
-                const trimmedValue = value.trim();
-                dispatch.setRawSql(trimmedValue);
-                setIsEditMode(false);
-              }}
+              onSubmit={onSubmitSql}
               onCancel={() => {
                 setIsEditMode(false);
               }}

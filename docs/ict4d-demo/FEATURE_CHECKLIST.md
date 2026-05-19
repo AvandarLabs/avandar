@@ -48,8 +48,8 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started
     - [ ] Phase 5 — Branching
     - [ ] Phase 6 — Python + R sandboxed executor
     - [ ] Phase 7 — Context compression
-- [ ] **5. Install `node-sql-parser`; best-effort SQL → manual query form parsing**
-- [ ] **6. Bidirectional SQL ↔ manual-query-form sync (Data Explorer + dashboards)**
+- [x] **5. Install `node-sql-parser`; best-effort SQL → manual query form parsing** (Data Explorer only; see `docs/demo-features/sql-parser-filter-ui.md`. Dashboards still pending.)
+- [~] **6. Bidirectional SQL ↔ manual-query-form sync** (Data Explorer: knex-based form → SQL regeneration + lossy-mapping warning + overwrite-confirmation flow. Dashboards still pending.)
 - [ ] **7. Tokenize generated SQL / Python / R — column names + dataset IDs as clickable pills**
 - [ ] **8. Multilingual voice dictation in chat panel (Whisper / transformers.js, 6 languages)**
 - [ ] **9. Redesigned dataset Summary view (visualizations, lazy-load, scroll-on-demand)**

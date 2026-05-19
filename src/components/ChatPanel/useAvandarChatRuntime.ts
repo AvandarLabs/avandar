@@ -12,6 +12,7 @@ import { recordShown } from "@/lib/privacy/clarificationAuditLog";
 import { crossBoundary } from "@/lib/privacy/crossBoundary";
 import { consumeAckForText } from "@/lib/privacy/pendingAcks";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import type { ChatModelAdapter, ChatModelRunResult } from "@assistant-ui/react";
 import type {
   ChatClarifyRequest,
@@ -51,6 +52,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
   const pageContext = useChatPageContext();
   const dataExplorerDispatch = DataExplorerStateManager.useDispatch();
   const chatPanelDispatch = ChatPanelStateManager.useDispatch();
+  const { parseSql } = useSqlToStructuredQuery();
 
   const adapter = useMemo<ChatModelAdapter>(() => {
     return {
@@ -147,6 +149,19 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         if (response.generatedSql) {
           dataExplorerDispatch.setRawSql(response.generatedSql.sql);
           dataExplorerDispatch.setNlPrompt(response.generatedSql.prompt);
+          // Best-effort: also map the SQL into the manual form so the
+          // user can tweak it from there. Anything we cannot represent is
+          // recorded in `sqlSyncWarnings` and surfaced to the user.
+          try {
+            const mapping = parseSql(response.generatedSql.sql);
+            dataExplorerDispatch.applySqlMapping({
+              query: mapping.query,
+              isFullyMapped: mapping.isFullyMapped,
+              unmappedReasons: mapping.unmappedReasons,
+            });
+          } catch {
+            // ignore; the structured form will simply be out of sync.
+          }
         }
 
         // The backend may attach a `clarify` tool call. We surface it in the
@@ -201,6 +216,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
     pageContext,
     dataExplorerDispatch,
     chatPanelDispatch,
+    parseSql,
   ]);
 
   return useLocalRuntime(adapter);

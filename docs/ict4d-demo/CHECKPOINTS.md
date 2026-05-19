@@ -459,6 +459,56 @@ canvas-update bug is gone in the four-turn scenario.
 
 ---
 
+## Checkpoint 5 — SQL ↔ manual query bidirectional sync + recursive filter UI ✅
+
+Implements items **#5** and **#6** of the demo feature checklist. Full
+detail lives in `docs/demo-features/sql-parser-filter-ui.md`.
+
+**Phase 1 (SQL → form).** `node-sql-parser` is installed and used by
+`shared/models/queries/StructuredQuery/sqlToStructuredQuery.ts` to
+project arbitrary SELECT statements onto our existing
+`PartialStructuredQuery` shape (data source, columns, aggregations,
+GROUP BY, ORDER BY, LIMIT/OFFSET, WHERE → recursive filter tree).
+The parser returns `{ query, isFullyMapped, unmappedReasons }` so the
+UI can surface a "best-effort approximation" alert in the SQL view
+when anything was dropped (CTEs, HAVING, joins, window functions,
+subqueries, multi-column ORDER BY, etc.).
+
+**Filter UI.** A new recursive filter editor backed by
+`react-querybuilder` + `@react-querybuilder/mantine`, hosted in
+`src/views/DataExplorerApp/QueryForm/QueryFiltersField.tsx`. Supports
+nested AND/OR groups and the operators the parser handles. Translates
+to/from a library-agnostic `QueryFilterGroup` type that's part of the
+canonical `StructuredQueryRead`.
+
+**Phase 2 (form → SQL).** The DuckDB-specific knex codepath in
+`toRawDuckDBQuery.ts` was extracted into a reusable
+`structuredQueryToSQL.ts` utility that also renders the new WHERE
+clause. The Data Explorer state manager calls it from every manual-form
+action (data source, columns, aggregations, sort, filters) so the SQL
+view and chat panel stay in sync without extra plumbing.
+
+**Sync tracking.** `DataExplorerAppState` now carries
+`isStructuredQueryInSync: boolean` and `sqlSyncWarnings: string[]`. The
+chat panel writes both via `applySqlMapping` whenever new SQL arrives;
+the SQL view writes them when the user edits SQL by hand. The manual
+form refuses to silently overwrite an out-of-sync SQL string - instead
+it pops a confirmation Alert. On confirmation it regenerates SQL from
+the form, which flips the flag back to `true`.
+
+**Tests.** 17 unit tests across `sqlToStructuredQuery.test.ts` (12) and
+`structuredQueryToSQL.test.ts` (5). All green via
+`pnpm vitest run shared/models/queries/StructuredQuery`.
+
+**Verification gap.** Playwright MCP browser captures could not be
+produced in this session because the navigate action was denied. The
+deterministic parser/regenerator behaviour is fully covered by unit
+tests; a follow-up session with browser permissions should add the
+screenshots under `docs/demo-features/screenshots/` and a mocked-AI
+E2E test under `tests/e2e/` to lock the chat → canvas integration.
+
+---
+
 ## What to do next (recommended order)
 
 1. **Smoke-test the merge.** Spin up the app locally and exercise:

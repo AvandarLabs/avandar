@@ -1,5 +1,7 @@
 import { makeObject, prop, setValue } from "@utils";
 import { QueryColumnId } from "$/models/queries/QueryColumn/QueryColumn.types";
+import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types";
+import { structuredQueryToSQL } from "$/models/queries/StructuredQuery/structuredQueryToSQL";
 import {
   applyVizConfigFromQueryResult,
   isVizConfigEqualForQueryResultSync,
@@ -15,11 +17,53 @@ import type { QueryAggregationType } from "$/models/queries/QueryAggregationType
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
-import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
+import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
+import type {
+  OrderByDirection,
+  PartialStructuredQuery,
+} from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import type {
   VizConfig,
   VizType,
 } from "$/models/vizs/VizConfig/VizConfig.types";
+
+/**
+ * Try to compute a fresh SQL string from the structured query. Used by
+ * manual-form actions to keep `rawSQL` in sync. Returns undefined when the
+ * query has no data source.
+ */
+function _regenerateRawSqlFromQuery(
+  query: PartialStructuredQuery,
+): string | undefined {
+  if (query.dataSource === undefined) {
+    return undefined;
+  }
+  try {
+    const sql = structuredQueryToSQL(query);
+    return sql || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Apply a structured-query change and also refresh `rawSQL` to match,
+ * marking SQL ↔ form sync as `true`. Used by manual-form actions that
+ * the user makes after opening the panel.
+ */
+function _applyQueryChange(
+  state: DataExplorerAppState,
+  newQuery: PartialStructuredQuery,
+): DataExplorerAppState {
+  const newSql = _regenerateRawSqlFromQuery(newQuery);
+  return {
+    ...state,
+    query: newQuery,
+    rawSQL: newSql,
+    isStructuredQueryInSync: true,
+    sqlSyncWarnings: [],
+  };
+}
 
 /**
  * This store is used to manage the state of the Data Explorer app.
@@ -36,7 +80,8 @@ export const DataExplorerStateManager = createAppStateManager({
       state: DataExplorerAppState,
       dataSource: QueryDataSource | undefined,
     ) => {
-      return setValue(state, "query.dataSource", dataSource);
+      const newQuery = { ...state.query, dataSource } as PartialStructuredQuery;
+      return _applyQueryChange(state, newQuery);
     },
 
     /** Set the columns for the query. */
@@ -58,13 +103,13 @@ export const DataExplorerStateManager = createAppStateManager({
         ...state.query,
         queryColumns: columns,
         aggregations: newAggregations,
-      };
+      } as PartialStructuredQuery;
       const newVizConfig = VizConfigs.hydrateFromQuery(
         state.vizConfig,
         newQuery,
       );
-
-      return { ...state, query: newQuery, vizConfig: newVizConfig };
+      const next = _applyQueryChange(state, newQuery);
+      return { ...next, vizConfig: newVizConfig };
     },
 
     /** Set the aggregation for a specific column */
@@ -92,13 +137,10 @@ export const DataExplorerStateManager = createAppStateManager({
         ...query,
         queryColumns: newQueryColumns,
         aggregations: newAggregations,
-      };
+      } as PartialStructuredQuery;
       const newVizConfig = VizConfigs.hydrateFromQuery(vizConfig, newQuery);
-      return {
-        ...state,
-        query: newQuery,
-        vizConfig: newVizConfig,
-      };
+      const next = _applyQueryChange(state, newQuery);
+      return { ...next, vizConfig: newVizConfig };
     },
 
     /** Set the column that we are ordering by. */
@@ -106,7 +148,11 @@ export const DataExplorerStateManager = createAppStateManager({
       state: DataExplorerAppState,
       columnId: QueryColumnId | undefined,
     ) => {
-      return setValue(state, "query.orderByColumn", columnId);
+      const newQuery = {
+        ...state.query,
+        orderByColumn: columnId,
+      } as PartialStructuredQuery;
+      return _applyQueryChange(state, newQuery);
     },
 
     /** Set the direction that we are ordering by. */
@@ -114,7 +160,53 @@ export const DataExplorerStateManager = createAppStateManager({
       state: DataExplorerAppState,
       direction: OrderByDirection | undefined,
     ) => {
-      return setValue(state, "query.orderByDirection", direction);
+      const newQuery = {
+        ...state.query,
+        orderByDirection: direction,
+      } as PartialStructuredQuery;
+      return _applyQueryChange(state, newQuery);
+    },
+
+    /**
+     * Set the recursive filter tree on the structured query, which also
+     * regenerates the raw SQL via knex.
+     */
+    setFilters: (state: DataExplorerAppState, filters: QueryFilterGroup) => {
+      const newQuery = {
+        ...state.query,
+        filters,
+      } as PartialStructuredQuery;
+      return _applyQueryChange(state, newQuery);
+    },
+
+    /**
+     * Apply the output of `sqlToStructuredQuery` to state: replace the
+     * structured form with the parsed query, leave the raw SQL untouched,
+     * and record whether the mapping was lossy.
+     */
+    applySqlMapping: (
+      state: DataExplorerAppState,
+      payload: {
+        query: PartialStructuredQuery;
+        isFullyMapped: boolean;
+        unmappedReasons: readonly string[];
+      },
+    ): DataExplorerAppState => {
+      return {
+        ...state,
+        query: payload.query,
+        isStructuredQueryInSync: payload.isFullyMapped,
+        sqlSyncWarnings: payload.unmappedReasons,
+      };
+    },
+
+    /** Reset the filter tree to the empty group. */
+    clearFilters: (state: DataExplorerAppState): DataExplorerAppState => {
+      const newQuery = {
+        ...state.query,
+        filters: EMPTY_QUERY_FILTER,
+      } as PartialStructuredQuery;
+      return _applyQueryChange(state, newQuery);
     },
 
     /**
@@ -165,7 +257,42 @@ export const DataExplorerStateManager = createAppStateManager({
     },
 
     setRawSql: (state: DataExplorerAppState, rawSql: string | undefined) => {
-      return setValue(state, "rawSQL", rawSql);
+      // When SQL is cleared we are trivially back in sync (both empty).
+      if (rawSql === undefined || rawSql === "") {
+        return {
+          ...state,
+          rawSQL: undefined,
+          isStructuredQueryInSync: true,
+          sqlSyncWarnings: [],
+        };
+      }
+      // Setting raw SQL via this action does not run the parser; the parser
+      // is wired up in the SQL view because it needs dataset metadata. Mark
+      // the form as potentially out of sync so the UI can surface that.
+      return {
+        ...state,
+        rawSQL: rawSql,
+        isStructuredQueryInSync: false,
+        sqlSyncWarnings: state.sqlSyncWarnings,
+      };
+    },
+
+    /**
+     * Mark the sync flag without changing any other state. Used by
+     * components that have just refreshed the structured form from SQL.
+     */
+    setSqlSyncState: (
+      state: DataExplorerAppState,
+      payload: {
+        isStructuredQueryInSync: boolean;
+        sqlSyncWarnings: readonly string[];
+      },
+    ): DataExplorerAppState => {
+      return {
+        ...state,
+        isStructuredQueryInSync: payload.isStructuredQueryInSync,
+        sqlSyncWarnings: payload.sqlSyncWarnings,
+      };
     },
 
     /**

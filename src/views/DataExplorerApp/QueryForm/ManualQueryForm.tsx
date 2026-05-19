@@ -1,17 +1,20 @@
-import { Fieldset, Stack, Text } from "@mantine/core";
+import { Alert, Fieldset, Stack, Text } from "@mantine/core";
 import { Model } from "@models";
+import { IconAlertTriangle } from "@tabler/icons-react";
 import { makeSelectOptions, Select } from "@ui";
 import { prop } from "@utils";
 import { QueryColumn as QueryColumnModule } from "$/models/queries/QueryColumn/QueryColumn";
+import { useState } from "react";
 import { AggregationSelect } from "@/views/DataExplorerApp/AggregationSelect";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { QueryColumnMultiSelect } from "@/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect";
 import { QueryDataSourceSelect } from "@/views/DataExplorerApp/QueryDataSourceSelect";
+import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField";
 import type { SelectData } from "@ui";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryColumnRead } from "$/models/queries/QueryColumn/QueryColumn.types";
+import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
 
-const HIDE_WHERE = true;
 const HIDE_LIMIT = true;
 
 const orderDirectionOptions = [
@@ -23,15 +26,21 @@ type Props = {
   withinPortal?: boolean;
 };
 
+type PendingChange = { kind: "filter"; nextFilter: QueryFilterGroup } | null;
+
 export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
-  const [{ query }, dispatch] = DataExplorerStateManager.useContext();
+  const [{ query, isStructuredQueryInSync }, dispatch] =
+    DataExplorerStateManager.useContext();
   const {
     dataSource,
     queryColumns,
     aggregations,
     orderByColumn,
     orderByDirection,
+    filters,
   } = query;
+
+  const [pendingChange, setPendingChange] = useState<PendingChange>(null);
 
   const selectedColumnOptions = makeSelectOptions(queryColumns, {
     valueFn: prop("id"),
@@ -40,9 +49,82 @@ export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
     },
   });
 
+  const onFiltersChange = (next: QueryFilterGroup): void => {
+    if (!isStructuredQueryInSync) {
+      setPendingChange({ kind: "filter", nextFilter: next });
+      return;
+    }
+    dispatch.setFilters(next);
+  };
+
   return (
     <form>
       <Stack px="sm">
+        {pendingChange ?
+          <Alert
+            icon={<IconAlertTriangle size={16} />}
+            color="yellow"
+            variant="light"
+            title="Overwrite SQL?"
+            withCloseButton
+            onClose={() => {
+              setPendingChange(null);
+            }}
+            data-testid="overwrite-sql-warning"
+          >
+            <Text size="xs" mb="xs">
+              The current SQL contains parts that the form could not represent.
+              Continuing will overwrite that SQL with one generated from the
+              form. This cannot be undone (unless you re-run your previous chat
+              prompt).
+            </Text>
+            <Stack gap="xs">
+              <Text
+                component="button"
+                type="button"
+                size="xs"
+                fw={600}
+                c="red"
+                onClick={() => {
+                  if (pendingChange.kind === "filter") {
+                    dispatch.setFilters(pendingChange.nextFilter);
+                  }
+                  setPendingChange(null);
+                }}
+                data-testid="overwrite-sql-confirm"
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  padding: 0,
+                }}
+              >
+                Overwrite SQL with form changes
+              </Text>
+              <Text
+                component="button"
+                type="button"
+                size="xs"
+                c="dimmed"
+                onClick={() => {
+                  setPendingChange(null);
+                }}
+                data-testid="overwrite-sql-cancel"
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  padding: 0,
+                }}
+              >
+                Keep SQL as-is
+              </Text>
+            </Stack>
+          </Alert>
+        : null}
+
         <QueryDataSourceSelect
           value={dataSource ?? null}
           onChange={(newDataSource) => {
@@ -87,7 +169,16 @@ export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
           </Fieldset>
         : null}
 
-        {HIDE_WHERE ? null : <Text>Where (react-awesome-query-builder)</Text>}
+        <Fieldset
+          legend="Filters (Where)"
+          style={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }}
+        >
+          <QueryFiltersField
+            columns={queryColumns}
+            value={filters}
+            onChange={onFiltersChange}
+          />
+        </Fieldset>
 
         <Fieldset
           legend="Sort by"
