@@ -86,7 +86,7 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started · `[—]` 
       - [x] Phase 6 - `executePlanStep` dispatches `python`/`r` steps to the sandbox; inputs read as parquet from DuckDB, results round-tripped back as parquet via `loadParquet`
       - [x] Phase 6 - 30-second default timeout per run with caller override
       - [x] Phase 6 - System prompt updated: prefer SQL; >7 SQL steps should reconsider; calling conventions documented (`read_input(name)` / `result` variable / `write_output`)
-      - [ ] Phase 6 - WebR (R runtime) — only Python is wired in `sandboxExecutor.ts` (`availableRuntimes: ["python"]`). R steps return an error from the sandbox. WebR boot script needs the same lazy-load + stdlib preload treatment.
+      - [~] Phase 6 - WebR (R runtime) — **partial, out of scope for the demo but still planned post-demo.** Python is enough for the analytic use cases the demo covers. Today only Python is wired in `sandboxExecutor.ts` (`availableRuntimes: ["python"]`) and R steps return an error from the sandbox. The iframe + CSP + parquet bridge are runtime-agnostic, so when WebR is added it slots into the same harness with its own lazy-load + an R-side parquet roundtrip via R's `arrow` package.
       - [ ] Phase 6 - External security review — REQUIRED before exposing python/r to users. The iframe + CSP stack is the spec-correct foundation, but the threat model needs an independent pass (WASM escape paths, CSP bypasses, postMessage replay).
       - [ ] Phase 6 - stdout/stderr UI — currently piped to the parent console only.
     - [ ] Phase 7 - Context compression (summariser pass, routing-decision cache, OpenRouter prompt caching, `chat_token_usage` table + dashboard)
