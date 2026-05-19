@@ -1,6 +1,6 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
-import { CALIFORNIA_XLSX_PATH } from "./helpers/constants";
+import { SMALL_CALIFORNIA_XLSX_PATH } from "./helpers/constants";
 import {
   ensureCloudStorageCheckedAndSaveDataset,
   parseDatasetIdFromDataManagerUrl,
@@ -44,7 +44,7 @@ test.describe("Save to dashboard - viz renders in editor", () => {
       const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
       await uploadPanel
         .locator('input[type="file"]')
-        .setInputFiles(CALIFORNIA_XLSX_PATH);
+        .setInputFiles(SMALL_CALIFORNIA_XLSX_PATH);
       await uploadPanel
         .getByRole("button", { name: "Upload", exact: true })
         .click();

@@ -31,6 +31,30 @@ export const CHOLERA_NYC_XLSX_PATH = path.join(
  */
 export const CHOLERA_NYC_XLSX_EXPECTED_ROW_COUNT = 17367;
 
+/**
+ * 100-row slice of {@link CALIFORNIA_CSV_PATH} for tests where dataset size
+ * doesn't matter and the parse + sync cycle should be as fast as possible.
+ */
+export const SMALL_CALIFORNIA_CSV_PATH = path.join(
+  process.cwd(),
+  "tests/data/small-california-covid-sample.csv",
+);
+
+/** Row count reported after DuckDB parses {@link SMALL_CALIFORNIA_CSV_PATH}. */
+export const SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT = 100;
+
+/** Same data as {@link SMALL_CALIFORNIA_CSV_PATH}, exported as `.xlsx`. */
+export const SMALL_CALIFORNIA_XLSX_PATH = path.join(
+  process.cwd(),
+  "tests/data/small-california-covid-sample.xlsx",
+);
+
+/** 100-row slice of {@link CHOLERA_NYC_XLSX_PATH}. */
+export const SMALL_CHOLERA_NYC_XLSX_PATH = path.join(
+  process.cwd(),
+  "tests/data/small-fake_cholera_nyc_linelist_geocoded.xlsx",
+);
+
 export const EXPECTED_CHOLERA_COLUMN_NAMES = [
   "id",
   "latitude",

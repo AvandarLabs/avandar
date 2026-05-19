@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { CALIFORNIA_CSV_PATH } from "./constants";
+import { SMALL_CALIFORNIA_CSV_PATH } from "./constants";
 import {
   addShareV2,
   closeShareModalV2,
@@ -7,7 +7,7 @@ import {
   setGeneralAccessV2,
 } from "./datasetSharingFlowV2";
 import { ensureCloudStorageCheckedAndSaveDataset } from "./manualUploadCloudSyncFlow";
-import { LONG_WAIT } from "./timeouts";
+import { LONG_WAIT, MEDIUM_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
@@ -27,14 +27,14 @@ export async function uploadCaliforniaCsvDataset(options: {
   const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
   await uploadPanel
     .locator('input[type="file"]')
-    .setInputFiles(CALIFORNIA_CSV_PATH);
+    .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
   await uploadPanel
     .getByRole("button", { name: "Upload", exact: true })
     .click();
 
   await expect(
     page.getByText("Data processed successfully", { exact: false }),
-  ).toBeVisible({ timeout: LONG_WAIT });
+  ).toBeVisible({ timeout: MEDIUM_WAIT });
 
   await page.getByLabel("Dataset name").fill(datasetName);
 

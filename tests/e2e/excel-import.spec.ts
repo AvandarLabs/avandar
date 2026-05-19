@@ -60,7 +60,7 @@ async function expectExcelParsePreview(options: {
 }
 
 test.describe("Excel manual upload", () => {
-  test("XLSX import, cloud sync, offline then online again", async ({
+  test("medium-sized XLSX dataset import, cloud sync, offline then online again", async ({
     page,
     e2eWorkerDb,
   }) => {
