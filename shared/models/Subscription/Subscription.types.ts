@@ -8,13 +8,21 @@ import type { SetOptional } from "type-fest";
 export type FeaturePlanType = Enums<"subscriptions__feature_plan_type">;
 export type PolarCustomerId = UUID<"PolarCustomer">;
 export type PolarProductId = UUID<"PolarProduct">;
+/** Polar subscription id when billed through Polar. */
 export type SubscriptionId = UUID<"PolarSubscription">;
+/** Primary key of the `subscriptions` table in Supabase. */
+export type SubscriptionRowId = UUID<"Subscription">;
 export type SubscriptionStatus = Enums<"subscriptions__status">;
 export type SubscriptionPermission = "can_add_datasets" | "can_invite_users";
 
 export type SubscriptionRead = {
-  /** The Avandar subscription ID */
-  polarSubscriptionId: SubscriptionId;
+  /** Primary key for this subscription row in Avandar. */
+  id: SubscriptionRowId;
+  /**
+   * Polar subscription id when the row is linked to Polar; undefined for
+   * native free subscriptions.
+   */
+  polarSubscriptionId: SubscriptionId | undefined;
   workspaceId: Workspace.Id;
   subscriptionOwnerId: UserId;
   createdAt: Date;
@@ -22,9 +30,9 @@ export type SubscriptionRead = {
   endsAt: Date | undefined;
   endedAt: Date | undefined;
   startedAt: Date | undefined;
-  polarProductId: PolarProductId;
-  polarCustomerEmail: string;
-  polarCustomerId: string;
+  polarProductId: PolarProductId | undefined;
+  polarCustomerEmail: string | undefined;
+  polarCustomerId: PolarCustomerId | undefined;
   featurePlanType: FeaturePlanType;
   subscriptionStatus: SubscriptionStatus;
   maxSeatsAllowed: number;
@@ -39,7 +47,7 @@ export type SubscriptionModel = SupabaseCrudModelSpec<
   {
     tableName: "subscriptions";
     modelName: "Subscription";
-    modelPrimaryKeyType: SubscriptionId;
+    modelPrimaryKeyType: SubscriptionRowId;
     modelTypes: {
       Read: SubscriptionRead;
       Insert: SetOptional<
@@ -49,6 +57,11 @@ export type SubscriptionModel = SupabaseCrudModelSpec<
         | "currentPeriodStart"
         | "endedAt"
         | "endsAt"
+        | "id"
+        | "polarCustomerEmail"
+        | "polarCustomerId"
+        | "polarProductId"
+        | "polarSubscriptionId"
         | "startedAt"
         | "updatedAt"
       >;
@@ -56,6 +69,6 @@ export type SubscriptionModel = SupabaseCrudModelSpec<
     };
   },
   {
-    dbTablePrimaryKey: "polar_subscription_id";
+    dbTablePrimaryKey: "id";
   }
 >;

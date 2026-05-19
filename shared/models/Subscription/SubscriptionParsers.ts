@@ -19,17 +19,19 @@ import type {
   SubscriptionId,
   SubscriptionModel,
   SubscriptionRead,
+  SubscriptionRowId,
 } from "$/models/Subscription/Subscription.types.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 
 const DBReadSchema = z.object({
-  polar_subscription_id: z.uuid(),
+  id: z.uuid(),
+  polar_subscription_id: z.uuid().nullable(),
   workspace_id: z.uuid(),
   subscription_owner_id: z.uuid(),
-  polar_customer_id: z.uuid(),
-  polar_customer_email: z.string(),
-  polar_product_id: z.uuid(),
+  polar_customer_id: z.uuid().nullable(),
+  polar_customer_email: z.string().nullable(),
+  polar_product_id: z.uuid().nullable(),
   feature_plan_type: z.enum(SubscriptionModule.FeaturePlanTypes),
   subscription_status: z.enum(SubscriptionModule.Statuses),
   started_at: z.iso.datetime({ offset: true }).nullable(),
@@ -64,11 +66,23 @@ export const SubscriptionParsers =
       (obj): SubscriptionRead => {
         return {
           ...obj,
+          id: obj.id as SubscriptionRowId,
           workspaceId: obj.workspaceId as WorkspaceId,
           subscriptionOwnerId: obj.subscriptionOwnerId as UserId,
-          polarCustomerId: obj.polarCustomerId as PolarCustomerId,
-          polarSubscriptionId: obj.polarSubscriptionId as SubscriptionId,
-          polarProductId: obj.polarProductId as PolarProductId,
+          polarCustomerId:
+            obj.polarCustomerId != null ?
+              (obj.polarCustomerId as PolarCustomerId)
+            : undefined,
+          polarCustomerEmail:
+            obj.polarCustomerEmail != null ? obj.polarCustomerEmail : undefined,
+          polarProductId:
+            obj.polarProductId != null ?
+              (obj.polarProductId as PolarProductId)
+            : undefined,
+          polarSubscriptionId:
+            obj.polarSubscriptionId != null ?
+              (obj.polarSubscriptionId as SubscriptionId)
+            : undefined,
         };
       },
     ),
