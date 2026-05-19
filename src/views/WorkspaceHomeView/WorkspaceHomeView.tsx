@@ -10,10 +10,11 @@ import {
 } from "@mantine/core";
 import { IconDatabase, IconTable } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
+import { Paper } from "@ui";
 import { AppLayout } from "@/components/layouts/AppLayout/AppLayout";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentUserProfile } from "@/hooks/users/useCurrentUserProfile";
-import { Paper } from "@ui";
+import { useIsTabletSize } from "@/lib/hooks/ui/useIsTabletSize";
 import { mantineColorVar } from "@/lib/utils/browser/css";
 import type { Workspace } from "$/models/Workspace/Workspace";
 
@@ -24,6 +25,8 @@ type Props = {
 export function WorkspaceHomeView({ workspace }: Props): JSX.Element {
   const navigate = useNavigate();
   const [userProfile, isLoadingUserProfile] = useCurrentUserProfile();
+  const isTabletSize = useIsTabletSize() ?? false;
+  const featureIconSize = isTabletSize ? 24 : 32;
 
   const onGoToUploadDataset = () => {
     navigate(AppLinks.dataImport(workspace.slug));
@@ -35,7 +38,7 @@ export function WorkspaceHomeView({ workspace }: Props): JSX.Element {
 
   return (
     <AppLayout title={workspace.name}>
-      <Container ta="left" py="xxxl" size="lg">
+      <Container ta="left" py={{ base: "xl", md: "xxl", xl: "xxxl" }} size="lg">
         <Stack gap="xl">
           <Stack gap="xs">
             <Title order={1}>
@@ -61,7 +64,7 @@ export function WorkspaceHomeView({ workspace }: Props): JSX.Element {
                 <Stack gap="md" h="100%">
                   <Group gap="md">
                     <IconDatabase
-                      size={32}
+                      size={featureIconSize}
                       stroke={1.5}
                       color={mantineColorVar("primary.6")}
                     />
@@ -92,7 +95,7 @@ export function WorkspaceHomeView({ workspace }: Props): JSX.Element {
                 <Stack gap="md" h="100%">
                   <Group gap="md">
                     <IconTable
-                      size={32}
+                      size={featureIconSize}
                       stroke={1.5}
                       color={mantineColorVar("primary.6")}
                     />
