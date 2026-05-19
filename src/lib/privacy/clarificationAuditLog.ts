@@ -106,7 +106,6 @@ export async function recordShown(args: {
       patternLocale: PATTERN_LOCALE,
     });
   } catch (e) {
-     
     console.warn("[privacy] clarification audit write failed:", e);
   }
   return id;
@@ -126,7 +125,6 @@ export async function recordOutcome(args: {
       timeToAnswerMs: elapsed,
     });
   } catch (e) {
-     
     console.warn("[privacy] clarification audit outcome write failed:", e);
   }
 }

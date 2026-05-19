@@ -138,7 +138,7 @@ export async function recordConsentDecision(
   } catch (e) {
     // Never block a consent decision on audit-log failure. The user's
     // approval still takes effect; we just lose the entry.
-     
+
     console.warn("[privacy] consent audit write failed:", e);
   }
 }
