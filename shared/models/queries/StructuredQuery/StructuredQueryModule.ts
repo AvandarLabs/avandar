@@ -19,6 +19,8 @@ export const StructuredQueryModule = {
       orderByDirection: undefined,
       aggregations: {},
       filters: EMPTY_QUERY_FILTER,
+      having: EMPTY_QUERY_FILTER,
+      joins: [],
       offset: undefined,
       limit: undefined,
     } as const);

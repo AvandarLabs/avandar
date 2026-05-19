@@ -28,6 +28,12 @@ import type {
   QueryFilterRule,
 } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import type {
+  NestedSubquerySource,
+  QueryJoin,
+  QueryJoinKind,
+  QueryJoinOnEquality,
+} from "$/models/queries/StructuredQuery/QueryJoin.types.ts";
+import type {
   PartialStructuredQuery,
   StructuredQueryId,
 } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
@@ -347,6 +353,8 @@ function _makeUnmappedResult(reasons: readonly string[]): SqlMappingResult {
     orderByDirection: undefined,
     aggregations: {},
     filters: EMPTY_QUERY_FILTER,
+    having: EMPTY_QUERY_FILTER,
+    joins: [],
     offset: undefined,
     limit: undefined,
   } as const);
@@ -357,45 +365,229 @@ function _makeUnmappedResult(reasons: readonly string[]): SqlMappingResult {
   };
 }
 
+type FromResolution = {
+  base?: DatasetWithColumns;
+  baseAlias?: string;
+  nestedSubquery?: NestedSubquerySource;
+  joins: QueryJoin[];
+};
+
 /**
- * Resolve the FROM clause to a known dataset. We currently support only a
- * single base table reference: joins, subqueries, dual, and CTEs are flagged
- * as unmapped.
+ * Resolve a single FROM-list entry to a dataset reference (if we know it),
+ * a nested subquery, or `undefined` when we can't classify it.
  */
 function _resolveDataset(
-  fromList: unknown,
+  tableName: string,
   datasets: readonly DatasetWithColumns[],
-  unmappedReasons: string[],
 ): DatasetWithColumns | undefined {
-  if (!Array.isArray(fromList) || fromList.length === 0) {
-    unmappedReasons.push("Could not determine a base table from FROM clause.");
-    return undefined;
-  }
-  if (fromList.length > 1) {
-    unmappedReasons.push(
-      "Query references multiple tables (joins). The form supports a single table.",
-    );
-  }
-  const first = fromList[0] as Record<string, unknown>;
-  const tableName = first.table;
-  if (typeof tableName !== "string") {
-    unmappedReasons.push("FROM clause is not a plain table reference.");
-    return undefined;
-  }
-  const match = datasets.find((d) => {
+  return datasets.find((d) => {
     return (
       d.dataset.id === tableName ||
       d.dataset.name === tableName ||
       d.dataset.name.toLowerCase() === tableName.toLowerCase()
     );
   });
-  if (!match) {
+}
+
+function _joinKindFromKeyword(keyword: string): QueryJoinKind {
+  const lower = keyword.toLowerCase();
+  if (lower.includes("left")) {
+    return "left";
+  }
+  if (lower.includes("right")) {
+    return "right";
+  }
+  if (lower.includes("full")) {
+    return "full";
+  }
+  if (lower.includes("cross")) {
+    return "cross";
+  }
+  return "inner";
+}
+
+function _parseJoinOn(
+  onNode: unknown,
+  unmappedReasons: string[],
+):
+  | { predicates: QueryJoinOnEquality[]; combinator: QueryFilterCombinator }
+  | undefined {
+  if (onNode === null || typeof onNode !== "object") {
+    return undefined;
+  }
+  const obj = onNode as Record<string, unknown>;
+  if (obj.type !== "binary_expr") {
+    return undefined;
+  }
+  const operator = String(obj.operator ?? "").toUpperCase();
+  if (operator === "AND" || operator === "OR") {
+    const left = _parseJoinOn(obj.left, unmappedReasons);
+    const right = _parseJoinOn(obj.right, unmappedReasons);
+    if (!left || !right) {
+      return undefined;
+    }
+    return {
+      predicates: [...left.predicates, ...right.predicates],
+      combinator: operator,
+    };
+  }
+  if (operator !== "=") {
     unmappedReasons.push(
-      `Could not find a known dataset matching "${tableName}".`,
+      `JOIN ON clause uses "${operator}" — only equality joins are mapped.`,
     );
     return undefined;
   }
-  return match;
+  const leftCol = _columnRefName(obj.left);
+  const rightCol = _columnRefName(obj.right);
+  const leftTable = (obj.left as { table?: string | null } | null)?.table;
+  const rightTable = (obj.right as { table?: string | null } | null)?.table;
+  if (!leftCol || !rightCol) {
+    unmappedReasons.push(
+      "JOIN ON clause uses a non-column reference; the form will keep it via raw SQL.",
+    );
+    return undefined;
+  }
+  return {
+    predicates: [
+      {
+        type: "equality",
+        leftColumn: leftCol,
+        rightColumn: rightCol,
+        ...(leftTable ? { leftTable } : {}),
+        ...(rightTable ? { rightTable } : {}),
+      },
+    ],
+    combinator: "AND",
+  };
+}
+
+function _stringifyNodeSqlParserSelect(node: unknown): string {
+  // We embed the original SQL as-is when available. If not, fall back to
+  // node-sql-parser's `sqlify`. This is best-effort; if it fails we return
+  // an empty string and the caller surfaces a warning.
+  try {
+    const parser = new Parser();
+    return parser.sqlify(node as Parameters<Parser["sqlify"]>[0]);
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Walk the FROM list and produce a FromResolution: pick a base dataset
+ * (either a known table or a nested subquery), collect any JOINs, and
+ * record unmapped reasons.
+ */
+function _resolveFrom(
+  fromList: unknown,
+  datasets: readonly DatasetWithColumns[],
+  unmappedReasons: string[],
+): FromResolution | undefined {
+  if (!Array.isArray(fromList) || fromList.length === 0) {
+    unmappedReasons.push("Could not determine a base table from FROM clause.");
+    return undefined;
+  }
+
+  let base: DatasetWithColumns | undefined;
+  let baseAlias: string | undefined;
+  let nestedSubquery: NestedSubquerySource | undefined;
+  const joins: QueryJoin[] = [];
+
+  fromList.forEach((rawItem, idx) => {
+    const item = rawItem as Record<string, unknown>;
+    const joinKeyword =
+      typeof item.join === "string" && item.join.length > 0 ?
+        (item.join as string)
+      : undefined;
+    const tableName = typeof item.table === "string" ? item.table : undefined;
+    const alias = typeof item.as === "string" ? item.as : undefined;
+    const subqueryExpr =
+      item.expr &&
+      typeof item.expr === "object" &&
+      "ast" in (item.expr as Record<string, unknown>) ?
+        (item.expr as { ast: unknown }).ast
+      : undefined;
+
+    if (idx === 0) {
+      // Base table
+      if (subqueryExpr) {
+        const sql = _stringifyNodeSqlParserSelect(subqueryExpr);
+        nestedSubquery = {
+          type: "subquery",
+          id: uuid(),
+          sql,
+          alias: alias ?? "subq",
+        };
+        if (!sql) {
+          nestedSubquery.parseFailed = true;
+          unmappedReasons.push(
+            "Nested subquery in FROM could not be re-serialised; mapping kept as a placeholder.",
+          );
+        }
+      } else if (tableName) {
+        base = _resolveDataset(tableName, datasets);
+        baseAlias = alias;
+        if (!base) {
+          unmappedReasons.push(
+            `Could not find a known dataset matching "${tableName}".`,
+          );
+        }
+      } else {
+        unmappedReasons.push("FROM clause is not a plain table reference.");
+      }
+      return;
+    }
+
+    // Subsequent entries: either a JOIN or a comma-separated cross product
+    if (!joinKeyword) {
+      unmappedReasons.push(
+        "Comma-joined tables are not mapped; treat them as INNER JOIN with ON true.",
+      );
+      return;
+    }
+
+    const onParsed = _parseJoinOn(item.on, unmappedReasons);
+    const kind = _joinKindFromKeyword(joinKeyword);
+    if (subqueryExpr) {
+      const sql = _stringifyNodeSqlParserSelect(subqueryExpr);
+      const subAlias = alias ?? `j${idx}`;
+      joins.push({
+        id: uuid(),
+        kind,
+        target: {
+          type: "subquery",
+          subqueryId: sql || `/* unmapped subquery ${idx} */`,
+          alias: subAlias,
+        },
+        on: onParsed ? onParsed.predicates : [],
+        combinator: onParsed?.combinator ?? "AND",
+      });
+      if (!sql) {
+        unmappedReasons.push(
+          `JOIN subquery at position ${idx} could not be re-serialised.`,
+        );
+      }
+      return;
+    }
+    if (!tableName) {
+      unmappedReasons.push(
+        `JOIN entry at position ${idx} is not a plain table reference.`,
+      );
+      return;
+    }
+    joins.push({
+      id: uuid(),
+      kind,
+      target: { type: "table", tableName, ...(alias ? { alias } : {}) },
+      on: onParsed ? onParsed.predicates : [],
+      combinator: onParsed?.combinator ?? "AND",
+    });
+  });
+
+  if (!base && !nestedSubquery) {
+    return undefined;
+  }
+  return { base, baseAlias, nestedSubquery, joins };
 }
 
 function _matchColumn(
@@ -458,9 +650,6 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
   if (ast.with) {
     unmappedReasons.push("CTEs (WITH clauses) are not supported in the form.");
   }
-  if (ast.having) {
-    unmappedReasons.push("HAVING clause is not supported in the form.");
-  }
   const distinctType =
     (
       ast.distinct &&
@@ -478,17 +667,28 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     );
   }
 
-  // Resolve dataset
-  const dataset = _resolveDataset(ast.from, input.datasets, unmappedReasons);
-  if (!dataset) {
+  // Resolve FROM clause (base + joins + optional nested subquery)
+  const fromResolution = _resolveFrom(
+    ast.from,
+    input.datasets,
+    unmappedReasons,
+  );
+  if (!fromResolution) {
     return _makeUnmappedResult(unmappedReasons);
   }
+  const dataset = fromResolution.base;
+  const nestedSubquery = fromResolution.nestedSubquery;
+  const joins = fromResolution.joins;
 
-  // Walk select columns
+  // Walk select columns. When the FROM is a nested subquery or has joins
+  // we can't always tie columns back to a known dataset; in those cases we
+  // skip column hydration and rely on the raw SQL still being the source
+  // of truth.
   const queryColumns: QueryColumnRead[] = [];
   const aggregations: Record<QueryColumnId, QueryAggregationTypeT> = {};
   const columnsList = ast.columns;
-  if (Array.isArray(columnsList)) {
+  const skipColumnHydration = !dataset || joins.length > 0 || !!nestedSubquery;
+  if (Array.isArray(columnsList) && !skipColumnHydration && dataset) {
     for (const item of columnsList) {
       const expr = (item as { expr?: unknown }).expr;
       if (!expr || typeof expr !== "object") {
@@ -683,15 +883,36 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     }
   }
 
+  // HAVING → filter group (we re-use the WHERE parser; predicates over
+  // aggregate functions get serialised back to the column they aggregate).
+  let having: QueryFilterGroup = EMPTY_QUERY_FILTER;
+  if (ast.having) {
+    const parsedHaving = _parseHavingNode(ast.having, unmappedReasons);
+    if (parsedHaving) {
+      having =
+        parsedHaving.type === "group" ?
+          parsedHaving
+        : ({
+            type: "group",
+            combinator: "AND",
+            rules: [parsedHaving],
+          } as QueryFilterGroup);
+    }
+  }
+
   const query: PartialStructuredQuery = Model.make("StructuredQuery", {
     id: uuid<StructuredQueryId>(),
     version: 1,
-    dataSource: dataset.dataset,
+    dataSource:
+      dataset?.dataset ?? (undefined as unknown as DatasetModel["Read"]),
+    ...(nestedSubquery ? { nestedSubquery } : {}),
     queryColumns,
     orderByColumn,
     orderByDirection,
     aggregations,
     filters,
+    having,
+    joins,
     offset,
     limit,
   } as const);
@@ -701,4 +922,93 @@ export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
     isFullyMapped: unmappedReasons.length === 0,
     unmappedReasons,
   };
+}
+
+/**
+ * Parse a HAVING clause AST node into a filter tree. HAVING typically
+ * references aggregate functions; we treat the aggregate as the column
+ * (e.g. `count(age)` becomes a rule on the column "age" with an explicit
+ * `COUNT(...)` prefix preserved in the renderer).
+ */
+function _parseHavingNode(
+  node: unknown,
+  unmappedReasons: string[],
+): QueryFilter | undefined {
+  if (node === null || typeof node !== "object") {
+    return undefined;
+  }
+  const obj = node as Record<string, unknown>;
+  if (obj.type !== "binary_expr") {
+    unmappedReasons.push(
+      `HAVING clause contains a "${String(obj.type)}" node that the form cannot represent.`,
+    );
+    return undefined;
+  }
+  const operator = String(obj.operator ?? "").toUpperCase();
+  if (operator === "AND" || operator === "OR") {
+    const left = _parseHavingNode(obj.left, unmappedReasons);
+    const right = _parseHavingNode(obj.right, unmappedReasons);
+    const rules: QueryFilter[] = [];
+    if (left) {
+      rules.push(left);
+    }
+    if (right) {
+      rules.push(right);
+    }
+    if (rules.length === 0) {
+      return undefined;
+    }
+    return {
+      type: "group",
+      combinator: operator as QueryFilterCombinator,
+      rules,
+    };
+  }
+
+  // Aggregate function on the left: count(col) > 5
+  const left = obj.left as Record<string, unknown> | null;
+  let columnName: string | undefined;
+  if (left?.type === "aggr_func") {
+    const funcName = String(left.name ?? "");
+    const args = left.args as { expr?: unknown } | undefined;
+    const innerCol = _columnRefName(args?.expr);
+    if (innerCol) {
+      columnName = `${funcName.toLowerCase()}(${innerCol})`;
+    } else {
+      unmappedReasons.push(
+        `HAVING uses aggregate ${funcName} on a complex argument; mapping kept the predicate as a label.`,
+      );
+      columnName = funcName.toLowerCase();
+    }
+  } else if (left?.type === "column_ref") {
+    columnName = _columnRefName(left);
+  }
+  if (!columnName) {
+    unmappedReasons.push(
+      "HAVING clause uses a left-hand side the form cannot represent.",
+    );
+    return undefined;
+  }
+
+  const filterOp = _toFilterOperator(operator);
+  if (!filterOp) {
+    unmappedReasons.push(
+      `HAVING uses operator "${operator}" which the form does not support.`,
+    );
+    return undefined;
+  }
+  const literal = _literalValue(obj.right);
+  if (literal === undefined) {
+    unmappedReasons.push(
+      `HAVING compares "${columnName}" against a non-literal expression.`,
+    );
+    return undefined;
+  }
+  const rule: QueryFilterRule = {
+    type: "rule",
+    columnName,
+    operator: filterOp,
+    value: literal,
+  };
+  return rule;
 }

@@ -28,6 +28,10 @@ import type {
   QueryFilterGroup,
   QueryFilterRule,
 } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import type {
+  QueryJoin,
+  QueryJoinOnEquality,
+} from "$/models/queries/StructuredQuery/QueryJoin.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { Knex } from "knex";
 
@@ -187,15 +191,201 @@ function _applyFilters(
   return current;
 }
 
+/**
+ * Apply a HAVING clause to a knex query, mirroring the WHERE-clause logic
+ * but using `havingRaw` so the predicate is rendered after GROUP BY.
+ */
+function _applyHaving(
+  builder: Knex.QueryBuilder,
+  group: QueryFilterGroup,
+): Knex.QueryBuilder {
+  if (isEmptyQueryFilter(group)) {
+    return builder;
+  }
+  return builder.havingRaw(_renderFilterGroupSQL(group));
+}
+
+function _renderFilterValue(
+  value: QueryFilterRule["value"],
+): string {
+  if (value === null || value === undefined) {
+    return "NULL";
+  }
+  if (Array.isArray(value)) {
+    return value.map((v) => {
+      return _renderFilterValue(v);
+    }).join(", ");
+  }
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  return `'${String(value).replace(/'/g, "''")}'`;
+}
+
+function _renderFilterRuleSQL(rule: QueryFilterRule): string {
+  const col = _quoteSQLIdentifier(rule.columnName);
+  return match(rule.operator)
+    .with("=", () => {
+      return `${col} = ${_renderFilterValue(rule.value)}`;
+    })
+    .with("!=", () => {
+      return `${col} != ${_renderFilterValue(rule.value)}`;
+    })
+    .with(">", () => {
+      return `${col} > ${_renderFilterValue(rule.value)}`;
+    })
+    .with(">=", () => {
+      return `${col} >= ${_renderFilterValue(rule.value)}`;
+    })
+    .with("<", () => {
+      return `${col} < ${_renderFilterValue(rule.value)}`;
+    })
+    .with("<=", () => {
+      return `${col} <= ${_renderFilterValue(rule.value)}`;
+    })
+    .with("like", () => {
+      return `${col} like ${_renderFilterValue(rule.value)}`;
+    })
+    .with("not_like", () => {
+      return `${col} not like ${_renderFilterValue(rule.value)}`;
+    })
+    .with("in", () => {
+      return `${col} in (${_renderFilterValue(rule.value)})`;
+    })
+    .with("not_in", () => {
+      return `${col} not in (${_renderFilterValue(rule.value)})`;
+    })
+    .with("is_null", () => {
+      return `${col} is null`;
+    })
+    .with("is_not_null", () => {
+      return `${col} is not null`;
+    })
+    .with("between", () => {
+      const arr =
+        Array.isArray(rule.value) ?
+          (rule.value as ReadonlyArray<string | number>)
+        : [];
+      const start = arr[0];
+      const end = arr[1];
+      if (start === undefined || end === undefined) {
+        return `${col} is not null`;
+      }
+      return (
+        `${col} between ${_renderFilterValue(start)} ` +
+        `and ${_renderFilterValue(end)}`
+      );
+    })
+    .exhaustive(() => {
+      throw new Error(
+        `Unknown filter operator on HAVING rule for "${rule.columnName}".`,
+      );
+    });
+}
+
+function _renderFilterGroupSQL(group: QueryFilterGroup): string {
+  if (group.rules.length === 0) {
+    return "";
+  }
+  const parts = group.rules.map((node) => {
+    if (node.type === "group") {
+      const inner = _renderFilterGroupSQL(node);
+      return inner ? `(${inner})` : "";
+    }
+    return _renderFilterRuleSQL(node);
+  });
+  return parts.filter(Boolean).join(` ${group.combinator} `);
+}
+
+/**
+ * Apply each join in order to the knex query builder. Subquery joins use
+ * `knex.raw` so we don't need to recursively build a knex sub-builder.
+ */
+function _applyJoins(
+  builder: Knex.QueryBuilder,
+  joins: readonly QueryJoin[],
+): Knex.QueryBuilder {
+  return joins.reduce<Knex.QueryBuilder>((current, join) => {
+    const onClause = _buildJoinOnClause(join.on, join.combinator ?? "AND");
+    const joinTarget = _buildJoinTargetSQL(join);
+    const joinFn = match(join.kind)
+      .with("inner", () => {
+        return "joinRaw" as const;
+      })
+      .with("left", () => {
+        return "leftJoinRaw" as const;
+      })
+      .with("right", () => {
+        return "rightJoinRaw" as const;
+      })
+      .with("full", () => {
+        return "joinRaw" as const;
+      })
+      .with("cross", () => {
+        return "crossJoin" as const;
+      })
+      .exhaustive(() => {
+        throw new Error(`Unknown join kind: ${String(join.kind)}`);
+      });
+
+    if (joinFn === "crossJoin") {
+      // knex.crossJoin only takes a table name; we render the raw form.
+      return current.joinRaw(`cross join ${joinTarget}`);
+    }
+    const keyword =
+      join.kind === "left" ? "left join"
+      : join.kind === "right" ? "right join"
+      : join.kind === "full" ? "full outer join"
+      : "inner join";
+    return current.joinRaw(`${keyword} ${joinTarget} on ${onClause}`);
+  }, builder);
+}
+
+function _buildJoinTargetSQL(join: QueryJoin): string {
+  if (join.target.type === "subquery") {
+    const alias = _quoteSQLIdentifier(join.target.alias);
+    return `(${join.target.subqueryId}) as ${alias}`;
+  }
+  const table = _quoteSQLIdentifier(join.target.tableName);
+  if (join.target.alias) {
+    return `${table} as ${_quoteSQLIdentifier(join.target.alias)}`;
+  }
+  return table;
+}
+
+function _buildJoinOnClause(
+  predicates: readonly QueryJoinOnEquality[],
+  combinator: "AND" | "OR",
+): string {
+  return predicates
+    .map((p) => {
+      const left =
+        p.leftTable ?
+          `${_quoteSQLIdentifier(p.leftTable)}.` +
+          `${_quoteSQLIdentifier(p.leftColumn)}`
+        : _quoteSQLIdentifier(p.leftColumn);
+      const right =
+        p.rightTable ?
+          `${_quoteSQLIdentifier(p.rightTable)}.` +
+          `${_quoteSQLIdentifier(p.rightColumn)}`
+        : _quoteSQLIdentifier(p.rightColumn);
+      return `${left} = ${right}`;
+    })
+    .join(` ${combinator} `);
+}
+
 export function structuredQueryToSQL(
   query: PartialStructuredQuery,
   { castTimestampsToISO = false }: StructuredQueryToSQLOptions = {},
 ): string {
-  if (query.dataSource === undefined) {
+  if (query.dataSource === undefined && query.nestedSubquery === undefined) {
     return "";
   }
 
-  if (Model.isOfModelType(query.dataSource, "EntityConfig")) {
+  if (
+    query.dataSource !== undefined &&
+    Model.isOfModelType(query.dataSource, "EntityConfig")
+  ) {
     throw new Error("Querying EntityConfigs through DuckDB is not supported.");
   }
 
@@ -206,9 +396,15 @@ export function structuredQueryToSQL(
     orderByColumn,
     orderByDirection,
     filters,
+    having,
+    joins,
+    nestedSubquery,
     limit,
     offset,
-  } = query;
+  } = query as PartialStructuredQuery & {
+    having?: QueryFilterGroup;
+    joins?: readonly QueryJoin[];
+  };
 
   const sortedQueryColumns = sortObjList(queryColumns, {
     sortBy: prop("id"),
@@ -216,7 +412,7 @@ export function structuredQueryToSQL(
   const queryColumnLookup = makeIdLookupMap(sortedQueryColumns, {
     key: "id",
   });
-  const tableName = dataSource.id;
+  const tableName = nestedSubquery ? undefined : dataSource?.id;
 
   const groupByColumnNames = [] as string[];
   const atLeastOneColumnHasAggregation = objectValues(aggregations).some(
@@ -266,7 +462,23 @@ export function structuredQueryToSQL(
     return _sql.raw(quotedColName);
   });
 
-  let sqlQuery = _sql.select(...adjustedColumnNames).from(tableName);
+  let sqlQuery: Knex.QueryBuilder;
+  if (nestedSubquery) {
+    const alias = nestedSubquery.alias ?? "subq";
+    const quotedAlias = _quoteSQLIdentifier(alias);
+    sqlQuery = _sql
+      .select(...adjustedColumnNames)
+      .fromRaw(`(${nestedSubquery.sql}) as ${quotedAlias}`);
+  } else if (tableName) {
+    sqlQuery = _sql.select(...adjustedColumnNames).from(tableName);
+  } else {
+    return "";
+  }
+
+  // apply joins (must be before WHERE for correctness)
+  if (joins && joins.length > 0) {
+    sqlQuery = _applyJoins(sqlQuery, joins);
+  }
 
   // apply filters (WHERE clause)
   if (filters && !isEmptyQueryFilter(filters)) {
@@ -278,6 +490,11 @@ export function structuredQueryToSQL(
       .map(_quoteSQLIdentifier)
       .join(", ");
     sqlQuery = sqlQuery.groupByRaw(groupByClause);
+  }
+
+  // apply HAVING clause (after GROUP BY, before ORDER BY)
+  if (having && !isEmptyQueryFilter(having)) {
+    sqlQuery = _applyHaving(sqlQuery, having);
   }
 
   if (orderByColumnName && orderByDirection) {
