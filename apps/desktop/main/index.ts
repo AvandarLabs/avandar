@@ -73,8 +73,7 @@ console.log(`[avandar-desktop] duckdb ready at ${duckdbPath}`);
 // boot — voice is an optional feature and the rest of the shell should
 // stay functional without it.
 const whisperModelsDir =
-  process.env.AVA_WHISPER_MODELS_DIR ??
-  join(userDataDir, "whisper-models");
+  process.env.AVA_WHISPER_MODELS_DIR ?? join(userDataDir, "whisper-models");
 const whisperSvc = createWhisperService({ modelsDir: whisperModelsDir });
 
 console.log(`[avandar-desktop] whisper models dir: ${whisperModelsDir}`);

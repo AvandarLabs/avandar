@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { VoiceModelDownloadIndicator } from "./VoiceModelDownloadIndicator";
 import type { VoiceManagerStatus } from "@/lib/voice/voiceManagerInterface";
 
 let mockStatus: VoiceManagerStatus = { kind: "idle" };
@@ -12,8 +13,6 @@ vi.mock("@/lib/voice/useVoiceModelManager", () => {
     },
   };
 });
-
-import { VoiceModelDownloadIndicator } from "./VoiceModelDownloadIndicator";
 
 describe("VoiceModelDownloadIndicator", () => {
   afterEach(() => {
@@ -59,9 +58,9 @@ describe("VoiceModelDownloadIndicator", () => {
     expect(screen.getByText("42%")).toBeInTheDocument();
     expect(screen.getByText(/ggml-base.bin/)).toBeInTheDocument();
     // The aria-live region exposes the tooltip label for screen readers.
-    expect(
-      screen.getByRole("status").getAttribute("aria-label"),
-    ).toMatch(/Downloading .* for voice prompting/i);
+    expect(screen.getByRole("status").getAttribute("aria-label")).toMatch(
+      /Downloading .* for voice prompting/i,
+    );
   });
 
   it("shows a 'Starting…' label when percent is indeterminate", () => {

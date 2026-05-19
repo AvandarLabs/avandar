@@ -18,15 +18,15 @@
  * web `VoiceModelManager`, so React components are platform-agnostic.
  */
 
-import type { IpcContract } from "$/platform/ipc/contracts/defineIpcContract";
 import { VoiceContracts } from "$/platform/ipc/contracts/VoiceContracts";
-import type { VoiceServiceStatus } from "$/platform/ipc/contracts/VoiceContracts";
 import type {
   IVoiceModelManager,
   VoiceManagerListener,
   VoiceManagerStatus,
 } from "./voiceManagerInterface";
 import type { VoiceLanguageCode, VoiceModelId } from "./voiceModels";
+import type { IpcContract } from "$/platform/ipc/contracts/defineIpcContract";
+import type { VoiceServiceStatus } from "$/platform/ipc/contracts/VoiceContracts";
 
 type CallIpcFn = <TRequest, TResponse>(
   contract: Readonly<IpcContract<TRequest, TResponse>>,

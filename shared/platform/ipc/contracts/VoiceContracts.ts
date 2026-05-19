@@ -43,10 +43,9 @@ export const VoiceContracts = {
    * Kicks off a model download. Returns immediately; the webview should
    * poll {@link VoiceContracts.getStatus} for progress.
    */
-  downloadModel: defineIpcContract<
-    { modelId: string },
-    { started: boolean }
-  >("voice.downloadModel"),
+  downloadModel: defineIpcContract<{ modelId: string }, { started: boolean }>(
+    "voice.downloadModel",
+  ),
 
   getStatus: defineIpcContract<
     Record<string, never>,

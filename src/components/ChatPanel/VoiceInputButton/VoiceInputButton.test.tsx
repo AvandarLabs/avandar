@@ -1,4 +1,10 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { VoiceInputButton } from "./VoiceInputButton";
@@ -18,10 +24,9 @@ const { notificationShowMock } = vi.hoisted(() => {
 });
 
 vi.mock("@mantine/notifications", async () => {
-  const actual =
-    await vi.importActual<typeof import("@mantine/notifications")>(
-      "@mantine/notifications",
-    );
+  const actual = await vi.importActual<typeof import("@mantine/notifications")>(
+    "@mantine/notifications",
+  );
   return {
     ...actual,
     notifications: {

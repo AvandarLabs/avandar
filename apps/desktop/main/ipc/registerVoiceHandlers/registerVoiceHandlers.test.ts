@@ -1,8 +1,9 @@
 import { VoiceContracts } from "$/platform/ipc/contracts/VoiceContracts";
 import { describe, expect, it, vi } from "vitest";
-import { createIpcServer, type IpcTransport } from "../createIpcServer/createIpcServer";
+import { createIpcServer } from "../createIpcServer/createIpcServer";
 import { registerVoiceHandlers } from "./registerVoiceHandlers";
 import type { WhisperService } from "../../services/createWhisperService/createWhisperService";
+import type { IpcTransport } from "../createIpcServer/createIpcServer";
 
 function makeFakeTransport(): {
   transport: IpcTransport;

@@ -9,12 +9,12 @@ import {
   isVoiceModelMarkedDownloaded,
   markVoiceModelDownloaded,
 } from "./voiceModelStore";
-import type { VoiceModelCache } from "./voiceModelCache";
 import type {
   IVoiceModelManager,
-  VoiceManagerListener,
   VoiceManagerStatus as SharedVoiceManagerStatus,
+  VoiceManagerListener,
 } from "./voiceManagerInterface";
+import type { VoiceModelCache } from "./voiceModelCache";
 import type {
   VoiceLanguageCode,
   VoiceModel,

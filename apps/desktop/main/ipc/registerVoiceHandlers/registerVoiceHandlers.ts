@@ -12,8 +12,8 @@
  */
 
 import { VoiceContracts } from "$/platform/ipc/contracts/VoiceContracts";
-import type { IpcServer } from "../createIpcServer/createIpcServer";
 import type { WhisperService } from "../../services/createWhisperService/createWhisperService";
+import type { IpcServer } from "../createIpcServer/createIpcServer";
 
 export function registerVoiceHandlers(
   ipcServer: IpcServer,

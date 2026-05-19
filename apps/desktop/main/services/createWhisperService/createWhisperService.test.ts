@@ -5,13 +5,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createWhisperService,
   WHISPER_MODEL_ID_TO_GGML_NAME,
-  type DownloadDependency,
-  type SmartWhisperModule,
+} from "./createWhisperService";
+import type {
+  DownloadDependency,
+  SmartWhisperModule,
 } from "./createWhisperService";
 
-function makeStubModule(overrides: {
-  transcribeText?: string;
-} = {}): SmartWhisperModule {
+function makeStubModule(
+  overrides: {
+    transcribeText?: string;
+  } = {},
+): SmartWhisperModule {
   const transcribeSpy = vi.fn(async () => {
     return {
       result: Promise.resolve([
@@ -23,7 +27,6 @@ function makeStubModule(overrides: {
     return undefined;
   });
 
-   
   class FakeWhisper {
     transcribe = transcribeSpy;
     free = freeSpy;
@@ -96,7 +99,10 @@ describe("createWhisperService", () => {
 
   it("transcribes audio with the loaded Whisper instance", async () => {
     writeFileSync(
-      join(workDir, `ggml-${WHISPER_MODEL_ID_TO_GGML_NAME["whisper-tiny"]}.bin`),
+      join(
+        workDir,
+        `ggml-${WHISPER_MODEL_ID_TO_GGML_NAME["whisper-tiny"]}.bin`,
+      ),
       Buffer.from([0, 0]),
     );
 

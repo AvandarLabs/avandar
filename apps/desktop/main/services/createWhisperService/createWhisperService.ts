@@ -78,9 +78,7 @@ export type WhisperServiceStatus =
  * service is the only place that needs the mapping — the IPC layer just
  * forwards opaque ids.
  */
-export const WHISPER_MODEL_ID_TO_GGML_NAME: Readonly<
-  Record<string, string>
-> = {
+export const WHISPER_MODEL_ID_TO_GGML_NAME: Readonly<Record<string, string>> = {
   "whisper-tiny": "tiny",
   "whisper-base": "base",
   "whisper-small": "small",
@@ -169,7 +167,6 @@ const DEFAULT_DOWNLOAD_FILE: DownloadDependency = async (
     async start(controller) {
       const reader = response.body!.getReader();
       while (true) {
-         
         const { done, value } = await reader.read();
         if (done) {
           break;

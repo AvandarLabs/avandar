@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { getVoiceModelManager, __TEST_ONLY } from "./voiceModelManagerFactory";
+import { __TEST_ONLY, getVoiceModelManager } from "./voiceModelManagerFactory";
 
 describe("voiceModelManagerFactory", () => {
   afterEach(() => {

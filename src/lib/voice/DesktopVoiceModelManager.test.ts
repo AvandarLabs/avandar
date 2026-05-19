@@ -1,6 +1,6 @@
+import { VoiceContracts } from "$/platform/ipc/contracts/VoiceContracts";
 import { describe, expect, it, vi } from "vitest";
 import { DesktopVoiceModelManager } from "./DesktopVoiceModelManager";
-import { VoiceContracts } from "$/platform/ipc/contracts/VoiceContracts";
 
 type CallIpcImpl = ReturnType<typeof vi.fn>;
 
@@ -18,9 +18,9 @@ function makeCallIpc(impls: {
     switch (contract.name) {
       case VoiceContracts.isModelDownloaded.name:
         return Promise.resolve(
-          impls.isModelDownloaded?.(
-            request as { modelId: string },
-          ) ?? { downloaded: false },
+          impls.isModelDownloaded?.(request as { modelId: string }) ?? {
+            downloaded: false,
+          },
         );
       case VoiceContracts.downloadModel.name:
         return Promise.resolve(
@@ -157,9 +157,9 @@ describe("DesktopVoiceModelManager", () => {
       clearTimer,
     });
 
-    await expect(
-      manager.ensureModelLoaded("whisper-large-v3"),
-    ).rejects.toThrow(/disk full/);
+    await expect(manager.ensureModelLoaded("whisper-large-v3")).rejects.toThrow(
+      /disk full/,
+    );
     expect(manager.getStatus().kind).toBe("error");
   });
 

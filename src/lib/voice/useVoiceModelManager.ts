@@ -1,9 +1,9 @@
 import { useSyncExternalStore } from "react";
+import { getVoiceModelManager } from "./voiceModelManagerFactory";
 import type {
   IVoiceModelManager,
   VoiceManagerStatus,
 } from "./voiceManagerInterface";
-import { getVoiceModelManager } from "./voiceModelManagerFactory";
 
 /**
  * Subscribes to the active voice-model manager's status updates. Works on
