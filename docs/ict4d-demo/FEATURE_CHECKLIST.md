@@ -43,12 +43,13 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started
     - [x] Phase 1 — Clarification audit table + telemetry (separate Dexie DB)
     - [ ] Phase 1 — Eval set (20 ambiguous questions, ≥80% resolution target)
     - [x] Phase 2 — Discovery clarifications (`discovery` response shape; user picks from a local-DB-driven dropdown that routes through `crossBoundary`)
-    - [x] Phase 3 — `proposePlan` tool + xyflow DAG view (multi-step plans with per-step canvas; temp-view lifecycle managed via `PlanStateManager`)
-    - [ ] Phase 4 — Schema-drift regen
+    - [x] Phase 3 — `proposePlan` tool + xyflow DAG view (multi-step plans with per-step canvas, RoughJS sketched edges, MiniMap/pan/zoom, IndexedDB materialisation per step, save-as-virtual-dataset with rehydration)
+    - [x] Phase 4 — Schema-drift regen (`POST /regenerate-plan`, strict drift detection, BFS over input graph for affected downstream, 11 unit tests)
     - [ ] Phase 5 — Branching (branch a thread from any plan node)
     - [ ] Phase 6 — Python + R sandboxed executor
     - [ ] Phase 7 — Context compression
-- [x] **5. Install `node-sql-parser`; best-effort SQL → manual query form parsing** (Data Explorer only; see `docs/demo-features/sql-parser-filter-ui.md`. Dashboards still pending.)
+    - [ ] Phase 9 — Chat-in-dashboards (Puck-block generation) — **spec only**, no implementation yet (overlaps with item #22)
+- [x] **5. Install `node-sql-parser`; best-effort SQL → manual query form parsing** (Data Explorer only; supports SELECT / GROUP BY / ORDER BY / WHERE / HAVING / JOIN / nested subqueries. See `docs/demo-features/sql-parser-filter-ui.md`. Dashboards still pending.)
 - [~] **6. Bidirectional SQL ↔ manual-query-form sync** (Data Explorer: knex-based form → SQL regeneration + lossy-mapping warning + overwrite-confirmation flow. Dashboards still pending.)
 - [ ] **7. Tokenize generated SQL / Python / R — column names + dataset IDs as clickable pills**
 - [ ] **8. Multilingual voice dictation in chat panel (Whisper / transformers.js, 6 languages)**
