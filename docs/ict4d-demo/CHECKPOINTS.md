@@ -617,6 +617,127 @@ E2E test under `tests/e2e/` to lock the chat → canvas integration.
 
 ---
 
+## Checkpoint 9 — Dashboard polish + chat-in-dashboards + viewer filters + analytics events ✅
+
+This checkpoint ships four investor-facing demo items: design tokens for
+dashboards (#10), the "type a question, get a chart on the page" chat flow
+inside dashboards (#22), viewer-editable global filters (#15/#16), and the
+client-side analytics-event wiring follow-up to #26.
+
+### Item #10 — Dashboard polish + design tokens
+
+`AvaPageRootProps` grew two new fields, `theme` and `typography`, both
+configurable from the Puck root field panel:
+
+- `theme` (default / ocean / forest / rose / amber / graphite) — drives
+  page background, accent color (rendered as a 4px coloured strip beside
+  the dashboard title), title colour, subtitle colour, and byline tint.
+- `typography` (system / serif / mono) — switches the heading font family
+  while keeping body type neutral.
+
+`getDashboardDesignTokens` (`src/views/DashboardApp/AvaPage/utils/dashboardDesignTokens.ts`)
+returns the resolved CSS tokens; the root render of
+`getDashboardPuckConfig` consumes them. The header is now a left-accented
+block with tighter line-height, uppercase byline, and a 60ch subtitle for
+better legibility. The `DataVizPBlock` got a subtle elevated card style
+(soft shadow + rounded corners) and now leads with the block's NL prompt
+so the dashboard reads like a doc.
+
+### Item #22 — Chat in dashboards generating P-blocks
+
+The "wow" demo moment: type a request in the chat panel on the dashboard
+editor and a new visualization block lands on the page.
+
+Backend (`supabase/functions/chat/chat.routes.ts`):
+- New `dashboards` system prompt (one-block-per-turn, viz-type guidance,
+  schema in context).
+- New `addDashboardBlock` OpenAI-function tool with strict schema:
+  `{ prompt, sql, vizType }`. SQL is run through the same
+  `cleanGeneratedSQL` pass as `generateSql`.
+- New response shape field `dashboardBlock: ChatGeneratedDashboardBlock`
+  on `ChatResponse`.
+
+Frontend:
+- New `DashboardEditorStateManager` queues pending blocks emitted by the
+  chat panel. Mounted at the workspace layout so the editor view can
+  consume them on the next render.
+- `useChatPageContext` now ships `dashboardId` so the backend knows which
+  dashboard the request belongs to (used by the dashboards system prompt
+  + analytics events).
+- `useAvandarChatRuntime` handles the new `response.dashboardBlock` path,
+  builds a Puck content item via `buildPendingDataVizBlock`, and queues
+  it on the editor state manager.
+- `DashboardEditorView` drains the queue into its in-memory Puck `data`
+  and marks the editor dirty so Save can be activated.
+- Composer + empty state are unlocked on the dashboards surface with
+  dashboard-specific placeholder text + starter suggestions.
+
+### Items #15 + #16 — Viewer-editable filters
+
+New `Filter` P-block + new `DashboardFilterStateManager` context provider
+that wraps both the editor and the viewer. Three filter modes:
+
+- `select_single` — Mantine `<Select>` with comma-separated options.
+- `select_multi` — Mantine `<MultiSelect>` (op = SQL `IN`).
+- `contains` — text input (op = SQL `ILIKE '%val%'`).
+
+`applyDashboardFiltersToSql` wraps the block's SQL in a subselect
+(`SELECT * FROM (<raw>) AS _ava_filtered WHERE …`) so filters compose
+cleanly with arbitrary inner queries, including ones with their own
+WHERE / GROUP BY / ORDER BY. The helper supports an optional
+`subscribedFilterIds` whitelist for per-viz overrides (item #16).
+
+DataViz blocks subscribe via `useApplyDashboardFiltersToSql`. The
+filter's viewer-selected value survives Puck re-renders because
+`registerFilter` merges with any existing entry by `filterId`.
+
+### Item #26 follow-up — Client-side analytics events
+
+New `src/lib/analytics/analyticsClient.ts` writes to the
+`usage_analytics_events` table via Supabase. Failures swallow silently;
+analytics never blocks a user action. The user id is read from the
+session, so callers don't have to thread it.
+
+Wired call sites:
+- `dataset.imported` — `useSaveDataset` success branch.
+- `dashboard.published` — `PublishDashboardModal` success branch.
+- `chat.message_sent` — `useAvandarChatRuntime` before each backend POST.
+- `chat.sql_generated` — when the chat backend returns SQL.
+- `dashboard.block_added_via_chat` — when the chat backend returns a
+  `dashboardBlock`.
+- `dashboard.filter_changed` — `FilterPBlock` onChange.
+
+The event-name allowlist is in `analyticsEventTypes.ts`; callers pass
+typed event names so typos can't accumulate.
+
+### Tests
+
+15 new unit tests across:
+- `applyDashboardFiltersToSql.test.ts` — 9 tests covering equals, IN,
+  ILIKE, AND-combining, semicolon-trimming, single-quote escaping, and
+  the subscribed-filter whitelist.
+- `buildPendingDataVizBlock.test.ts` — 2 tests.
+- `dashboardDesignTokens.test.ts` — 4 tests.
+
+1 new mocked Playwright spec (`tests/e2e/dashboard-chat-block.spec.ts`)
+that intercepts the OpenRouter call and asserts the dashboard editor
+appends a DataViz block when a chart request comes back from the
+mocked backend.
+
+All previously-passing tests still pass (65 tests in
+`src/views/DashboardApp/`, 109 in `src/components/ChatPanel/` + `src/lib/`).
+
+### Verification gap
+
+- **No real-OpenRouter end-to-end** was possible in the remote container
+  this session: the local Supabase stack can't pull the postgres image
+  (CloudFront rate limit, same as previous checkpoints), and the
+  hosted edge function does not have `OPEN_ROUTER_API_KEY` set yet.
+  The Vercel preview built off `feat/ict4d-demo` should be used to
+  validate the live chat → P-block flow.
+
+---
+
 ## Checkpoint 8 — Publish modal polish, kebab-case slugs, chat panel transparency fix ✅
 
 Three follow-up fixes from a hands-on browser review of Checkpoint 6:

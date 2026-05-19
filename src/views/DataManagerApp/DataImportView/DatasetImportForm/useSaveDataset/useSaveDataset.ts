@@ -10,6 +10,7 @@ import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { logAnalyticsEvent } from "@/lib/analytics/analyticsClient";
 import {
   DatasetImportFormValues,
   DataSourceMetadata,
@@ -205,6 +206,16 @@ export function useSaveDataset(
             `Unsupported dataset source type: ${params.sourceType}`,
           );
         });
+
+      void logAnalyticsEvent({
+        event: "dataset.imported",
+        workspaceId: workspace.id,
+        app: "data_sources",
+        payload: {
+          datasetId: savedDataset.id,
+          sourceType: params.sourceType,
+        },
+      });
 
       options.onAfterSave?.(savedDataset);
 

@@ -12,6 +12,7 @@ import { NavbarLink, NavbarLinks } from "@/config/NavbarLinks";
 import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 
 type Props = {
@@ -95,8 +96,9 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
 
   return (
     <DataExplorerStateManager.Provider>
-      <ChatPanelProvider>
-        <AppDropzone>
+      <DashboardEditorStateManager.Provider>
+        <ChatPanelProvider>
+          <AppDropzone>
           <AppShell
             title={workspace.name}
             currentWorkspace={workspace}
@@ -108,7 +110,8 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
             {children}
           </AppShell>
         </AppDropzone>
-      </ChatPanelProvider>
+        </ChatPanelProvider>
+      </DashboardEditorStateManager.Provider>
     </DataExplorerStateManager.Provider>
   );
 }

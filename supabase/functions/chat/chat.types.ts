@@ -2,6 +2,8 @@ import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 import type {
   ChatClarifyRequest,
   ChatClientMessage,
+  ChatDashboardVizType,
+  ChatGeneratedDashboardBlock,
   ChatGeneratedSql,
   ChatModelsResponse,
   ChatPageContext,
@@ -17,6 +19,8 @@ import type {
 export type {
   ChatClarifyRequest,
   ChatClientMessage,
+  ChatDashboardVizType,
+  ChatGeneratedDashboardBlock,
   ChatGeneratedSql as ChatGeneratedSQL,
   ChatModelsResponse,
   ChatPageContext,

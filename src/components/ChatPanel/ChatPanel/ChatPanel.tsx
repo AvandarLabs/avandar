@@ -20,7 +20,7 @@ export function ChatPanel(): JSX.Element {
   const dispatch = ChatPanelStateManager.useDispatch();
   const runtime = useAvandarChatRuntime();
   const context = useChatPageContext();
-  const disabled = context.app !== "data-explorer";
+  const disabled = context.app !== "data-explorer" && context.app !== "dashboards";
 
   return (
     <Box h="100%" py="xs" pr="xs">

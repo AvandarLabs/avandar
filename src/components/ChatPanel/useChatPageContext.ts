@@ -1,5 +1,6 @@
 import { useRouterState } from "@tanstack/react-router";
 import { useMemo } from "react";
+import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { ChatPageContext } from "$/types/chat.types";
 
@@ -25,6 +26,7 @@ export function useChatPageContext(): ChatPageContext {
   });
   const { openDataset, rawSQL, lastQueryError } =
     DataExplorerStateManager.useState();
+  const { activeDashboardId } = DashboardEditorStateManager.useState();
   const openDatasetId = openDataset?.datasetId;
 
   return useMemo<ChatPageContext>(() => {
@@ -43,8 +45,11 @@ export function useChatPageContext(): ChatPageContext {
       return { app: "data-sources" };
     }
     if (pathname.includes("/dashboards")) {
-      return { app: "dashboards" };
+      return {
+        app: "dashboards",
+        ...(activeDashboardId ? { dashboardId: activeDashboardId } : {}),
+      };
     }
     return { app: "other" };
-  }, [pathname, openDatasetId, rawSQL, lastQueryError]);
+  }, [pathname, openDatasetId, rawSQL, lastQueryError, activeDashboardId]);
 }
