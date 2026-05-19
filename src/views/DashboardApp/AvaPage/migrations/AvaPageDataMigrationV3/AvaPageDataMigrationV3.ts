@@ -53,7 +53,11 @@ export const AvaPageDataMigrationV3 = {
       // Cast: the input registry is V3 (puck's invariance), but real v2
       // data carries V2_VizConfig. The cast keeps the helper's input
       // tightly typed at V2.
-      DataViz: ((props: { nlQuery: unknown; vizType: unknown; vizConfig: unknown }) => {
+      DataViz: ((props: {
+        nlQuery: unknown;
+        vizType: unknown;
+        vizConfig: unknown;
+      }) => {
         return {
           nlQuery: props.nlQuery,
           vizType: props.vizType,
