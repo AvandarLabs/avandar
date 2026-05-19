@@ -42,7 +42,7 @@ The desktop app runs as two processes communicating over Electrobun's IPC channe
 │  │     WebView2             │    │   - native DuckDB        │    │
 │  │   - Loads existing       │    │   - bun:sqlite           │    │
 │  │     React app build      │    │   - node:fs, fetch       │    │
-│  │   - duckdb-wasm DISABLED │◄──►│   - OS keychain (FFI)    │    │
+│  │   - duckdb-wasm DISABLED │◄──►│   - OS keychain (CLI)    │    │
 │  │     (replaced by IPC     │IPC │   - Supabase REST/Realtime│   │
 │  │     client to native)    │    │   - SyncEngine worker    │    │
 │  │   - Dexie REMOVED on     │    │                          │    │
@@ -285,15 +285,15 @@ Windows: %APPDATA%\Avandar\
 
 Webview owns UI; Bun main owns secrets and the network calls.
 
-- **First launch (online):** sign-in form → IPC → Bun main calls Supabase Auth REST → refresh token written to OS keychain via Bun FFI (`Security.framework` on macOS, `wincred.dll` on Windows); access token held in memory only.
+- **First launch (online):** sign-in form → IPC → Bun main calls Supabase Auth REST → refresh token written to OS keychain via the platform's credential CLI (`/usr/bin/security` on macOS, `cmdkey` on Windows); access token held in memory only.
 - **Subsequent launches (online):** Bun main refreshes via stored refresh token; emits `auth.onChange(session)` to webview.
 - **Subsequent launches (offline):** Bun main reads refresh token; cannot refresh; emits offline-cached session built from the local `user_profiles` row. App is fully usable in offline mode; affordances requiring online (invites, etc.) are disabled.
 - **Online resume:** OS network listener triggers `refreshIfNeeded`. If refresh succeeds, SyncEngine drains its outboxes. If "invalid refresh token", route to login.
 - **Sign out:** revoke (if online) + clear keychain + emit null session.
 
-**Keychain access** uses Bun FFI to the native APIs directly (no subprocess overhead, identical security to OS-keychain). The wrapper exposes `set / get / delete / list` semantics for app-scoped secrets.
+**Keychain access** shells out to the platform's built-in credential CLI: `/usr/bin/security` on macOS, `cmdkey` on Windows. The wrapper exposes `set / get / delete` semantics for app-scoped secrets, with the secret fed to the child process via stdin (never as an argv flag) so it never appears in `ps`, audit logs, or shell history.
 
-**Risk:** there is no widely-adopted, battle-tested Bun-native keychain library today. The FFI bindings are small but greenfield — budget time during Phase 2 to develop and test them.
+**Why CLI over FFI:** the keychain is read ~once per session (boot) and written ~once per access-token refresh (default Supabase: every hour). The per-call cost of fork+exec (~50–100ms) is invisible at that frequency, and the trade is worth it: no FFI marshaling bugs, no segfault surface, no dependency on Apple's deprecated `SecKeychain*` C symbols, and the same shape generalizes naturally to Windows (`cmdkey`) and any future Linux backend (`secret-tool`).
 
 ## SyncEngine (V1)
 
@@ -493,13 +493,13 @@ Captured here so V1 design decisions stay forward-compatible.
 
 **Phase 1 — Platform abstractions, no behavior change (1–2 weeks).** Define the six interfaces in `packages/shared/platform/`; implement web-side adapters wrapping today's code; migrate ~20 client files to `createRdbCrudClient`; migrate the 2 `supabase.rpc(...)` call sites and `src/clients/APIClient.ts` to `createServerApiClient`. Both shells still behave identically to today.
 
-**Phase 2 — Desktop native layer wired up (2–3 weeks).** IPC contracts; `bun:sqlite` + first migrations via `sqlglot`; `RdbClient` IPC live; native DuckDB in Bun main; `DatasetBlobStore` filesystem implementation; keychain via Bun FFI. Desktop runs offline against a snapshot, uploads persist to disk, no sync yet.
+**Phase 2 — Desktop native layer wired up (2–3 weeks).** IPC contracts; `bun:sqlite` + first migrations via `sqlglot`; `RdbClient` IPC live; native DuckDB in Bun main; `DatasetBlobStore` filesystem implementation; keychain via the macOS `security` CLI shellout. Desktop runs offline against a snapshot, uploads persist to disk, no sync yet.
 
 **Phase 3 — V1 SyncEngine (2–3 weeks).** `sync_outbox`, `parquet_blob_outbox`, `sync_cursor` plus per-row sync columns; push and pull loops; LWW resolution; TUS-resumable parquet upload from Bun; sync status indicator; minimal error/conflict review panel.
 
 **Phase 4 — Hardening & macOS launch (2 weeks).** Code signing + notarization in CI; auto-update wired; local logger + in-app bug report flow; acceptance tests; internal dogfood.
 
-**Phase 5 — Windows port (2–3 weeks).** Windows-specific keychain FFI; path resolution; code signing certificate + signing pipeline; regression sweep.
+**Phase 5 — Windows port (2–3 weeks).** Windows-specific keychain via `cmdkey` shellout (mirroring the macOS approach); path resolution; code signing certificate + signing pipeline; regression sweep.
 
 **Rough V1 timeline: 12–15 weeks of focused work for one engineer.** Add ~30% buffer for Electrobun rough edges and signing/notarization tooling debt.
 
@@ -518,7 +518,7 @@ Ordered by _likelihood × impact_.
 | 7   | **Disk pressure from uncapped growth** (kept source files + parquet)                                                    | Low (initially) | Medium     | V1: surface storage usage in settings + manual "free up space" action. V2: configurable disk budget + auto-GC.                                                                                                                               |
 | 8   | **Supabase rate limits during sync storms** (e.g. first sync of a heavy user)                                           | Low             | Medium     | Push loop respects 429 responses with longer backoff. Bulk pull paginated.                                                                                                                                                                   |
 | 9   | **Log files inadvertently contain user data**                                                                           | Medium          | High       | Logger API discipline (typed structured fields only); ESLint rule blocking `row/rows/payload/data/body/content/value/record/records` identifiers in log calls; defensive redaction pass on write; user preview before bug-report submission. |
-| 10  | **Bun FFI keychain bindings are greenfield** (no widely-adopted reference implementation)                               | Medium          | Medium     | Budget time in Phase 2 to develop and test the FFI wrappers per platform. Encrypted-file fallback as last resort if FFI proves blocked (with full risk disclosure).                                                                          |
+| 10  | **Keychain CLI shellout parses brittle stdout/exit-code formats** (`security` / `cmdkey` output drifts across OS releases) | Low-Medium      | Low-Medium | Pure-layer parser unit tests pin the expected formats; gated integration test (G2.14 / G5.2) runs against a real keychain on each supported OS; fall back to a documented re-auth flow if a parse failure is detected. |
 
 ## Open Questions
 
@@ -532,7 +532,7 @@ Ordered by _likelihood × impact_.
 - Web + desktop share a single Vite build of `src/`.
 - Web app lives in `src/`, desktop in new `apps/desktop/`. Web is unchanged structurally.
 - Six platform abstractions in `packages/shared/platform/`: `DuckDbClient`, `RdbClient`, `ServerApiClient`, `DatasetBlobStore`, `AuthProvider`, `SyncEngine`.
-- `bun:sqlite` + native DuckDB + filesystem + OS keychain (Bun FFI) on desktop.
+- `bun:sqlite` + native DuckDB + filesystem + OS keychain (CLI shellout) on desktop.
 - SQLite schema is a near-mirror of Postgres for tables in `SYNCABLE_TABLES`; generated via `sqlglot`; committed to repo.
 - Naming: `createRdbCrudClient` (top-level), `createSqliteCrudClient` (desktop), `createSupabaseCrudClient` (web).
 - Naming: `createServerApiClient` (top-level), `createIpcServerApiClient` (desktop), `createBrowserServerApiClient` (web). RPCs and Edge Functions both route through this on desktop; V1 throws `OfflineError` when offline (no queueing).
@@ -542,6 +542,6 @@ Ordered by _likelihood × impact_.
 - Dataset metadata always syncs to Supabase; only parquet bytes are gated by opt-in; source files never go to Supabase Storage.
 - Per-OS-user app data directory; OS-conventional paths.
 - macOS first, Windows next; Linux out of scope V1 and V2.
-- Auth: cached refresh token in OS keychain via Bun FFI; 30-day default offline grace.
+- Auth: cached refresh token in OS keychain via the platform's credential CLI (`/usr/bin/security` on macOS, `cmdkey` on Windows); 30-day default offline grace. FFI bindings to `Security.framework` / `wincred.dll` are explicitly **not** in scope for V1 or V2 — the call frequency (~1 read per boot, ~1 write per access-token refresh) doesn't justify the marshaling complexity or the deprecation curve on the relevant C symbols.
 - V1 observability: `console.error` + JSONL local logs + in-app bug report; no third-party reporter.
 - Phase 2 Task 10 keeps `@duckdb/duckdb-wasm` in the desktop bundle. The audit found a single importer (`src/clients/DuckDbClient/DuckDbClient.ts`) whose module-load side effects make a Vite-level drop unsafe before Task 13 wraps duckdb-wasm behind `usePlatform().duckDb`. Phase 4 owns the bundle drop; V1 ships the desktop binary with the wasm bytes inert in the bundle.

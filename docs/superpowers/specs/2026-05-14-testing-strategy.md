@@ -27,7 +27,7 @@ It also defines a **per-PR review discipline** so the test suite doesn't grow as
 | Layer | Tool | Process | Where the code lives | Primary use |
 |---|---|---|---|---|
 | **Unit** | vitest | Node or Bun | `packages/*/src/**/*.test.ts`, `apps/desktop/main/**/*.test.ts` | Pure functions, type-level locks, state machines |
-| **Bun-main integration** | `bun test` | Bun (real `bun:sqlite`, FS, FFI) | `apps/desktop/main/**/*.integration.test.ts` | IPC handlers against real Sqlite/FS, sync loops against mocked Supabase, native DuckDB against fixture parquet |
+| **Bun-main integration** | `bun test` | Bun (real `bun:sqlite`, FS, subprocess) | `apps/desktop/main/**/*.integration.test.ts` | IPC handlers against real Sqlite/FS, sync loops against mocked Supabase, native DuckDB against fixture parquet, keychain CLI shellout |
 | **Fake-IPC e2e** | Playwright running under Bun | Bun + Chromium | `apps/desktop/tests/e2e/**/*.spec.ts` | Full React-through-IPC-through-real-services flows; offline scenarios; restart-persistence; sync convergence |
 | **Real-desktop e2e** | Playwright CDP (Windows) / XCUITest smoke (macOS) | OS host | `apps/desktop/tests/desktop/**` | WebView2-specific paths on Windows; "does it launch + menus exist" on macOS; signing/notarize via CI |
 | **Property-based** | `fast-check` | wherever it's hosted | colocated with unit/integration | LWW commutativity, sync convergence, log redaction, atomicity invariants |
@@ -165,7 +165,7 @@ These gaps are filled by:
 
 ### Prerequisite
 
-The test runner must be Bun, not Node, for the harness to use `bun:sqlite` and Bun FFI without divergence from production. CI runners must have Bun installed; existing GitHub Actions runners support this.
+The test runner must be Bun, not Node, for the harness to use `bun:sqlite` and the same subprocess + filesystem primitives the production main process uses (no divergence). CI runners must have Bun installed; existing GitHub Actions runners support this.
 
 ## Review discipline
 
@@ -280,8 +280,8 @@ The roadmap. Each row is one reviewable PR. Phase 0–1 are light because most o
 | G2.10 | Outbox-in-same-transaction invariant (the data write + a manual `INSERT INTO _outbox` in the same tx commit atomically) | integration | 2 | Phase 3 prerequisite. Encoded in Phase 2 so Phase 3 doesn't redesign. |
 | G2.11 | Snapshot bootstrap (empty→populated; populated→skip; partial-completion-per-table is recoverable; FK-ordered inserts; REST 401 → no partial state) | integration | 5 | Mocked Supabase REST via msw. |
 | G2.12 | Native DuckDB happy path + parity (real `@duckdb/node-api` instance, SELECT 1, parquet round-trip, column types match a golden captured from duckdb-wasm) | integration | 3 + 1 golden | Catches BIGINT/INTEGER and TIMESTAMP_NS drift early. |
-| G2.13 | Keychain pure-layer unit (argv construction for set/get/delete; status-code parsing including 44 = not found) | unit | 6 | |
-| G2.14 | Keychain real-Security.framework round-trip (set → get → delete with non-ASCII payload; plaintext never appears in stdout/stderr) | gated integration | 3 | `it.skipIf(process.platform !== 'darwin' \|\| !process.env.KEYCHAIN_E2E)` |
+| G2.13 | Keychain pure-layer unit (argv construction for `security` set/get/delete; exit-code parsing including 44 = not found; stderr classification) | unit | 6 | Mocks `Bun.spawn`; no real keychain. |
+| G2.14 | Keychain real-`security`-CLI round-trip (set → get → delete with non-ASCII payload; plaintext never appears in argv, stdout, or stderr) | gated integration | 3 | `it.skipIf(process.platform !== 'darwin' \|\| !process.env.KEYCHAIN_E2E)`. Secret fed via child stdin, never as `-w VALUE` on argv. |
 | G2.15 | `FileSystemDatasetBlobStore` round-trip + listing + `stat` + delete | integration | 5 | |
 | G2.16 | `FileSystemDatasetBlobStore` **atomic-write crash simulation** (monkey-patch `renameSync` to throw post-write; assert final key absent, partial `.tmp` may exist; path-traversal guard for `../` and `..\\`) | integration | 4 | The single test that proves the atomicity invariant the manual review can't. |
 | G2.17 | `PlatformProvider` React component (mocked `isDesktop`; both branches resolve to correct adapter; `usePlatform` outside provider throws) | unit (RTL) | 3 | |
@@ -360,7 +360,7 @@ Tests this strategy does **not** cover. Documented so the team isn't surprised.
 
 - Four testing layers: unit, Bun-main integration, fake-IPC e2e, real-desktop e2e (platform-specific).
 - `fast-check` adopted for property-based testing in sync engine and log redaction.
-- Test runner is Bun for any suite touching `bun:sqlite`, Bun FFI, or the fake-IPC harness.
+- Test runner is Bun for any suite touching `bun:sqlite`, native subprocess spawns, or the fake-IPC harness.
 - Per-PR test groupings — one invariant, ~5–15 cases, single-layer.
 - Mutation-test step is required on every test PR review (not optional).
 - No coverage-percentage gates.

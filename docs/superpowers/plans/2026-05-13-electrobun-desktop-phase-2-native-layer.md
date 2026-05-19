@@ -19,7 +19,7 @@
 - A Postgres→SQLite migration generator (`apps/desktop/scripts/gen-sqlite-migrations.ts`) shells out to Python's `sqlglot`, guarded by a `SYNCABLE_TABLES` manifest.
 - `createSqliteCrudClient` joins `createSupabaseCrudClient` as a backend implementation; `createRdbCrudClient` (at `shared/RdbCrudClient/createRdbCrudClient.ts`) now branches per platform.
 
-**Tech Stack:** Electrobun IPC, Bun runtime, `bun:sqlite`, native DuckDB (via the existing `duckdb` Node binding used by `@avandar/ava-etl`), Bun FFI, Python 3 + `sqlglot` (developer-machine dependency).
+**Tech Stack:** Electrobun IPC, Bun runtime, `bun:sqlite`, native DuckDB (via the existing `duckdb` Node binding used by `@avandar/ava-etl`), `Bun.spawn` shelling out to `/usr/bin/security` for keychain access, Python 3 + `sqlglot` (developer-machine dependency).
 
 **Phase 1 outcome — what already exists (as of 2026-05-17):**
 
@@ -41,10 +41,10 @@
 1. On desktop, `pnpm dev:desktop` opens the app; first launch performs a one-shot Supabase→SQLite snapshot pull; subsequent launches read from local SQLite even with the network disabled.
 2. Native DuckDB in Bun main answers queries from the webview via IPC; duckdb-wasm is no longer loaded by the desktop webview bundle.
 3. File uploads on desktop write the source + parquet to disk under the per-OS-user app data directory.
-4. Refresh tokens persist in the macOS Keychain (via Bun FFI to `Security.framework`); auth survives app relaunches.
+4. Refresh tokens persist in the macOS Keychain via `/usr/bin/security` shellout; auth survives app relaunches.
 5. `pnpm test` is green. `pnpm dev` (web) is unchanged.
 
-**Honest framing:** This is the largest phase. Treat each native service as its own subsystem with TDD discipline. The migration generator and IPC layer get tests; the FFI keychain bindings get a manual smoke test (FFI is hard to unit-test cleanly).
+**Honest framing:** This is the largest phase. Treat each native service as its own subsystem with TDD discipline. The migration generator, IPC layer, and keychain shellout all get tests — the keychain has a pure-layer unit suite (argv builder + exit-code parser via mocked `Bun.spawn`) plus a `KEYCHAIN_E2E=1`-gated integration test against the real `security` CLI.
 
 ---
 
@@ -81,8 +81,9 @@
 - `apps/desktop/main/services/DuckDb.test.ts`
 - `apps/desktop/main/services/FileSystemDatasetBlobStore.ts`
 - `apps/desktop/main/services/FileSystemDatasetBlobStore.test.ts`
-- `apps/desktop/main/services/Keychain.ts` — Bun FFI to macOS Security.framework
-- `apps/desktop/main/services/Keychain.test.ts` — manual smoke test harness
+- `apps/desktop/main/services/Keychain.ts` — shellout wrapper around `/usr/bin/security`
+- `apps/desktop/main/services/Keychain.test.ts` — pure-layer unit tests with mocked `Bun.spawn`
+- `apps/desktop/main/services/Keychain.integration.test.ts` — gated `KEYCHAIN_E2E=1` round-trip against the real macOS keychain
 - `apps/desktop/main/services/SupabaseRest.ts` — server-side fetch wrapper for sync (used in Phase 3)
 
 **New: Main-side IPC handlers:**
@@ -233,18 +234,18 @@ Land the three remaining native subsystems. Each ships its Bun-main service + IP
 **Includes:**
 
 - Task 10 — Native DuckDB (`apps/desktop/main/services/DuckDb.ts`) + DuckDb IPC + `DesktopDuckDbClient` + (optional) drop `@duckdb/duckdb-wasm` from desktop bundle.
-- Task 11 — Keychain (`apps/desktop/main/services/Keychain.ts`) + auth IPC + `DesktopAuthProvider`. Recommendation per the plan: ship the `security` CLI shellout first, file a follow-up for the FFI port.
+- Task 11 — Keychain (`apps/desktop/main/services/Keychain.ts`) + auth IPC + `DesktopAuthProvider`. Implementation is a thin shellout to `/usr/bin/security` with the secret fed via child stdin (never argv). FFI to `Security.framework` is explicitly out of scope: the call frequency (~1 read at boot, ~1 write per access-token refresh) doesn't justify the marshaling complexity or the deprecation curve on the relevant C symbols.
 - Task 12 — `FileSystemDatasetBlobStore` + dataset-blob IPC + `DesktopDatasetBlobStore`.
 
 **Consistency at milestone end:**
 
-- Bun main starts SQLite (from C), DuckDB, Keychain, and the blob store on launch. Each must boot without throwing — a single failed `dlopen` or missing path takes the app down.
+- Bun main starts SQLite (from C), DuckDB, Keychain, and the blob store on launch. Each must boot without throwing — a single failed `dlopen`, missing path, or missing `/usr/bin/security` takes the app down.
 - The Desktop\* adapters exist on disk but no React code imports them yet, so the webview behavior is unchanged.
 - Tests pass for each service. Manual smoke tests at each Task's checkpoint confirm startup boots cleanly.
 
 **Watch out for:**
 
-- Tasks 10, 11, 12 are independent of each other — order them by risk: do whichever blocks first. Keychain (Task 11) is the riskiest because of FFI/CLI ergonomics; DuckDB (Task 10) is second-riskiest because of the `duckdb` Node binding under Bun.
+- Tasks 10, 11, 12 are independent of each other — order them by risk: do whichever blocks first. With FFI off the table, Task 11 is roughly as risky as Task 12 — both are subprocess/filesystem plumbing. DuckDB (Task 10) carries slightly more risk because of the `duckdb` Node binding under Bun (now resolved on macOS — see commit history) and any future arch surprises.
 - Each task's PR 1 lands the service in isolation, PR 2 wires it into `apps/desktop/main/index.ts`. After each PR 2 lands, do `pnpm dev:desktop` and confirm the app still boots — startup is now doing strictly more work and any of these services can break it.
 
 **Review surface:** 6-9 PRs across the three Tasks. They can land in parallel.
@@ -3057,265 +3058,208 @@ Each call site should either be desktop-conditional or moved behind a `usePlatfo
 
 ---
 
-## Task 11: Keychain via Bun FFI (macOS only in Phase 2)
+## Task 11: Keychain via `/usr/bin/security` shellout (macOS only in Phase 2)
 
-**Test groupings:** G2.13 (Keychain pure-layer unit — argv construction for set/get/delete; status-code parsing including 44 = not found); G2.14 (Keychain real-Security.framework round-trip, gated by KEYCHAIN_E2E=1 + process.platform === 'darwin'; non-ASCII payload; plaintext never appears in stdout/stderr).
+**Test groupings:** G2.13 (Keychain pure-layer unit — argv construction for set/get/delete via `security`; exit-code parsing including 44 = not found; stderr classification; secret never appears in argv); G2.14 (Keychain real-`security`-CLI round-trip, gated by `KEYCHAIN_E2E=1` + `process.platform === 'darwin'`; non-ASCII payload; plaintext never appears in argv, stdout, or stderr).
 
-**PR boundaries:** 2 PRs.
+**PR boundaries:** 1 PR (per project convention — Task = 1 PR; steps below are progress markers, not PR boundaries).
 
-- PR 1: Keychain wrapper pure-layer (argv construction, status-code parsing) + unit tests; no native FFI dependency.
-- PR 2: Real Security.framework FFI bindings + gated integration test (KEYCHAIN_E2E=1); desktop-only code, not consumed on web.
+Phase 2 lands macOS keychain. Windows keychain is Phase 5 (`cmdkey` shellout, same shape).
 
-Phase 2 lands macOS keychain. Windows keychain is Phase 5.
+**Design decision (recorded at plan rewrite, 2026-05-19):** the keychain is read ~once at boot and written ~once per Supabase access-token refresh (default: hourly). At that frequency the ~50–100ms cost of `fork+exec` is invisible, so we take the boring/safe path: shell out to `/usr/bin/security`, feed the secret via the child's stdin, parse exit codes for not-found. We explicitly do **not** ship FFI bindings to `Security.framework` — Apple has deprecated the `SecKeychain*` C symbols in favor of `SecItem*`, and the marshaling surface (pointer wrangling, manual free of returned buffers, UTF-8 length math) is a much wider failure surface than a stdin pipe with no upside at this call frequency.
 
 **Files:**
 
 - Create: `apps/desktop/main/services/Keychain.ts`
-- Test: `apps/desktop/main/services/Keychain.test.ts` (manual smoke test harness)
+- Test: `apps/desktop/main/services/Keychain.test.ts` (pure-layer unit tests; mocks `Bun.spawn`)
+- Test: `apps/desktop/main/services/Keychain.integration.test.ts` (gated by `KEYCHAIN_E2E=1`, hits the real macOS keychain)
 - Create: `apps/desktop/main/ipc/auth.ts`
 - Create: `shared/platform/desktop/DesktopAuthProvider.ts`
 - Modify: `apps/desktop/main/index.ts`
 
-- [ ] **Step 1: Investigate Bun FFI bindings for macOS Security.framework**
+- [ ] **Step 1: Map the `security` CLI surface**
 
-Read the Bun FFI docs at `https://bun.sh/docs/api/ffi` (consult them, do not assume APIs).
+The three subcommands in scope:
 
-The minimum needed:
+- `security add-generic-password -s <service> -a <account> -w` (password fed on stdin via `-w` with no value) — write/replace an entry.
+- `security find-generic-password -w -s <service> -a <account>` — print the password to stdout. Exit 0 with stdout = password (trailing newline); exit 44 when the entry is missing.
+- `security delete-generic-password -s <service> -a <account>` — delete. Exit 0 on success; exit 44 when nothing matched (treated as success — idempotent delete).
 
-- `SecKeychainAddGenericPassword` — add an entry
-- `SecKeychainFindGenericPassword` — read an entry
-- `SecKeychainItemDelete` — remove an entry
+Two non-obvious specifics worth pinning in the implementation:
 
-The relevant library: `/System/Library/Frameworks/Security.framework/Security`.
+- **Always use the absolute path `/usr/bin/security`.** A `$PATH` override could substitute a malicious binary; absolute path closes that.
+- **Never put the secret on argv.** `-w` accepts the value on argv OR (when omitted) reads from stdin. We use the stdin form: argv stays scrubbed of the secret so `ps`, audit logs, and shell history can never capture it.
 
-- [ ] **Step 2: Write a smoke test harness**
+- [ ] **Step 2: Write the failing pure-layer unit tests**
 
-Create `apps/desktop/main/services/Keychain.test.ts`:
+Create `apps/desktop/main/services/Keychain.test.ts`. Use vitest with mocked `Bun.spawn` so the suite stays hermetic and cross-platform (the pure layer has no platform check; the integration test does). Pin:
+
+- Argv composition for `add` / `find` / `delete`. Assert: absolute path is `/usr/bin/security`; no `-w VALUE` form anywhere; service and account passed verbatim.
+- Secret writing: `add` writes the password bytes to the child's stdin, then closes stdin. Assert via the mocked spawn's `stdin.write` calls.
+- Exit-code parsing: `get` returns `null` on exit 44, the password on exit 0, throws on any other exit. `delete` returns silently on exit 0 or 44, throws on other exits.
+- Stderr classification: a non-zero exit message must surface stderr's text in the thrown error, but the thrown error must NOT include the password argument (it isn't on argv anyway, but pin it as a property).
+
+Run the suite (`pnpm --filter @avandar/desktop test`). Expected: every case FAILS.
+
+- [ ] **Step 3: Write the failing integration test**
+
+Create `apps/desktop/main/services/Keychain.integration.test.ts` (runs under `bun test`). Gate with:
 
 ```ts
-import { describe, expect, it } from "vitest";
-import { Keychain } from "./Keychain.ts";
-
-// Skipped by default; this hits the real macOS keychain.
-// Run with: KEYCHAIN_SMOKE=1 pnpm --filter @avandar/desktop test
 const enabled =
-  process.env.KEYCHAIN_SMOKE === "1" && process.platform === "darwin";
-
-describe.skipIf(!enabled)("Keychain (smoke)", () => {
-  const service = "com.avandarlabs.desktop.test";
-  const account = "smoke-test-user";
-
-  it("set / get / delete roundtrip", () => {
-    Keychain.set(service, account, "secret-1");
-    expect(Keychain.get(service, account)).toBe("secret-1");
-    Keychain.set(service, account, "secret-2");
-    expect(Keychain.get(service, account)).toBe("secret-2");
-    Keychain.delete(service, account);
-    expect(Keychain.get(service, account)).toBeNull();
-  });
-});
+  process.env.KEYCHAIN_E2E === "1" && process.platform === "darwin";
+describe.skipIf(!enabled)("Keychain (real CLI)", () => { ... });
 ```
 
-- [ ] **Step 3: Implement `Keychain.ts`**
+Cases (G2.14):
+
+- set → get round-trips an ASCII password.
+- set with non-ASCII payload (emoji + accented chars + a null-adjacent character `\u0001` that isn't a literal null) round-trips byte-for-byte.
+- set → set (different value, same service/account) overwrites cleanly (the second `get` returns the new value).
+- delete after set causes the next `get` to return `null`.
+- delete on a missing entry is a no-op (doesn't throw).
+- Negative assertion: across the full set→get→delete cycle, the password string never appears in any captured stdout or stderr the spawn surface produces (capture all child output and grep for the secret; assertion fails if found).
+
+Run (`KEYCHAIN_E2E=1 pnpm --filter @avandar/desktop test:integration`). Expected: every case FAILS or skips until the implementation lands.
+
+- [ ] **Step 4: Implement `Keychain.ts`**
 
 Create `apps/desktop/main/services/Keychain.ts`:
 
 ```ts
-import { dlopen, FFIType, suffix } from "bun:ffi";
+/*
+ * macOS Keychain wrapper. Shells out to `/usr/bin/security` instead of
+ * binding `Security.framework` directly: the call frequency is ~1 read at
+ * boot and ~1 write per Supabase access-token refresh, so `fork+exec`
+ * overhead (~50-100ms) is invisible, and the trade buys us no FFI marshaling,
+ * no segfault surface, and independence from Apple's deprecated `SecKeychain*`
+ * C symbols. See the design spec's "Decisions Captured" section for the full
+ * argument.
+ *
+ * The secret is fed via the child's stdin (never as a `-w VALUE` argv flag)
+ * so it cannot leak to `ps`, audit logs, or shell history.
+ */
+
+const SECURITY_BIN = "/usr/bin/security";
 
 if (process.platform !== "darwin") {
-  // Phase 5 adds Windows. Throw early on unsupported platforms in main.
-  throw new Error(
-    `Keychain not supported on ${process.platform} until Phase 5`,
-  );
+  // Windows lands in Phase 5 with the same shape against `cmdkey`. Throw
+  // early on unsupported platforms so the failure is at boot, not on the
+  // first sign-in.
+  throw new Error(`Keychain not supported on ${process.platform}`);
 }
 
-const SECURITY_FRAMEWORK =
-  "/System/Library/Frameworks/Security.framework/Security";
-
-const lib = dlopen(SECURITY_FRAMEWORK, {
-  SecKeychainAddGenericPassword: {
-    args: [
-      FFIType.ptr, // keychain (null = default)
-      FFIType.u32, // serviceNameLength
-      FFIType.cstring, // serviceName
-      FFIType.u32, // accountNameLength
-      FFIType.cstring, // accountName
-      FFIType.u32, // passwordLength
-      FFIType.cstring, // passwordData
-      FFIType.ptr, // itemRef (null = ignore)
-    ],
-    returns: FFIType.i32,
-  },
-  SecKeychainFindGenericPassword: {
-    args: [
-      FFIType.ptr, // keychainOrArray (null = default)
-      FFIType.u32, // serviceNameLength
-      FFIType.cstring, // serviceName
-      FFIType.u32, // accountNameLength
-      FFIType.cstring, // accountName
-      FFIType.ptr, // passwordLength
-      FFIType.ptr, // passwordData
-      FFIType.ptr, // itemRef
-    ],
-    returns: FFIType.i32,
-  },
-  SecKeychainItemDelete: {
-    args: [FFIType.ptr],
-    returns: FFIType.i32,
-  },
-  SecKeychainItemFreeContent: {
-    args: [FFIType.ptr, FFIType.ptr],
-    returns: FFIType.i32,
-  },
-});
-
-export const Keychain = {
-  set(serviceName: string, accountName: string, password: string): void {
-    // If an entry exists, delete it first (simplest semantics).
-    Keychain.delete(serviceName, accountName);
-    const status = lib.symbols.SecKeychainAddGenericPassword(
-      null,
-      Buffer.byteLength(serviceName),
-      Buffer.from(serviceName + "\0"),
-      Buffer.byteLength(accountName),
-      Buffer.from(accountName + "\0"),
-      Buffer.byteLength(password),
-      Buffer.from(password + "\0"),
-      null,
-    );
-    if (status !== 0) throw new Error(`Keychain.set failed: status ${status}`);
-  },
-
-  get(serviceName: string, accountName: string): string | null {
-    const lenPtr = new Uint32Array(1);
-    const dataPtr = new BigUint64Array(1);
-    const itemRef = new BigUint64Array(1);
-    const status = lib.symbols.SecKeychainFindGenericPassword(
-      null,
-      Buffer.byteLength(serviceName),
-      Buffer.from(serviceName + "\0"),
-      Buffer.byteLength(accountName),
-      Buffer.from(accountName + "\0"),
-      lenPtr as never,
-      dataPtr as never,
-      itemRef as never,
-    );
-    if (status === -25300 /* errSecItemNotFound */) return null;
-    if (status !== 0) throw new Error(`Keychain.get failed: status ${status}`);
-
-    // Pointer wrangling: Bun FFI helpers can read a string of known length
-    // from a pointer; consult bun docs and replace this with the real call.
-    // Placeholder shape — the engineer should adapt this to the actual Bun
-    // FFI memory-read API used at implementation time.
-    const length = lenPtr[0]!;
-    const value = readCString(dataPtr[0], length);
-    lib.symbols.SecKeychainItemFreeContent(null, dataPtr as never);
-    return value;
-  },
-
-  delete(serviceName: string, accountName: string): void {
-    // Find first; delete the returned itemRef.
-    const lenPtr = new Uint32Array(1);
-    const dataPtr = new BigUint64Array(1);
-    const itemRef = new BigUint64Array(1);
-    const status = lib.symbols.SecKeychainFindGenericPassword(
-      null,
-      Buffer.byteLength(serviceName),
-      Buffer.from(serviceName + "\0"),
-      Buffer.byteLength(accountName),
-      Buffer.from(accountName + "\0"),
-      lenPtr as never,
-      dataPtr as never,
-      itemRef as never,
-    );
-    if (status === -25300) return; // not found
-    if (status !== 0)
-      throw new Error(`Keychain.delete (find) failed: status ${status}`);
-    const delStatus = lib.symbols.SecKeychainItemDelete(itemRef[0] as never);
-    if (delStatus !== 0)
-      throw new Error(`Keychain.delete failed: status ${delStatus}`);
-  },
+export type Keychain = {
+  set(serviceName: string, accountName: string, password: string): Promise<void>;
+  get(serviceName: string, accountName: string): Promise<string | null>;
+  delete(serviceName: string, accountName: string): Promise<void>;
 };
 
-function readCString(ptr: bigint, length: number): string {
-  // Placeholder — replace with Bun FFI's actual string-read primitive
-  // (e.g., `read.cstring(ptr, length)` or equivalent).
-  // The engineer should not ship this placeholder; consult bun docs.
-  throw new Error(
-    "readCString: replace with Bun FFI string-read primitive per bun docs",
-  );
+// `Bun.spawn` injection seam — the unit tests replace it with a fake.
+type Spawner = typeof Bun.spawn;
+
+export function createKeychain(spawn: Spawner = Bun.spawn): Keychain {
+  async function run(
+    argv: ReadonlyArray<string>,
+    stdinPayload?: string,
+  ): Promise<{ exitCode: number; stdout: string; stderr: string }> {
+    const child = spawn([SECURITY_BIN, ...argv], {
+      stdin: stdinPayload === undefined ? "ignore" : "pipe",
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    if (stdinPayload !== undefined && child.stdin) {
+      child.stdin.write(stdinPayload);
+      await child.stdin.end();
+    }
+    const [stdout, stderr] = await Promise.all([
+      new Response(child.stdout).text(),
+      new Response(child.stderr).text(),
+    ]);
+    const exitCode = await child.exited;
+    return { exitCode, stdout, stderr };
+  }
+
+  return {
+    async set(serviceName, accountName, password) {
+      // `-w` without a value forces `security` to read the password from
+      // stdin. Keeps the secret off argv.
+      const { exitCode, stderr } = await run(
+        [
+          "add-generic-password",
+          "-U", // update if it exists
+          "-s",
+          serviceName,
+          "-a",
+          accountName,
+          "-w",
+        ],
+        password,
+      );
+      if (exitCode !== 0) {
+        throw new Error(`security add-generic-password exit ${exitCode}: ${stderr.trim()}`);
+      }
+    },
+
+    async get(serviceName, accountName) {
+      const { exitCode, stdout, stderr } = await run([
+        "find-generic-password",
+        "-w",
+        "-s",
+        serviceName,
+        "-a",
+        accountName,
+      ]);
+      if (exitCode === 44) {
+        return null;
+      }
+      if (exitCode !== 0) {
+        throw new Error(`security find-generic-password exit ${exitCode}: ${stderr.trim()}`);
+      }
+      // `security` always appends a newline.
+      return stdout.replace(/\n$/, "");
+    },
+
+    async delete(serviceName, accountName) {
+      const { exitCode, stderr } = await run([
+        "delete-generic-password",
+        "-s",
+        serviceName,
+        "-a",
+        accountName,
+      ]);
+      // 44 = nothing matched; treat delete as idempotent.
+      if (exitCode !== 0 && exitCode !== 44) {
+        throw new Error(`security delete-generic-password exit ${exitCode}: ${stderr.trim()}`);
+      }
+    },
+  };
 }
 ```
 
-**Honest framing:** this code is _correct in intent_ but the Bun FFI pointer-read API moves around. The engineer implementing this task MUST consult the current Bun FFI docs and adapt the pointer/cstring read calls. The invariants are: `set / get / delete` round-trip a UTF-8 string; service/account select an entry uniquely; default keychain is used; deletion is best-effort idempotent.
+Notes:
 
-If Bun FFI proves too rough to bind directly, fall back to **shelling out to the `security` CLI** as a stopgap (Section 3 of the spec described this as Option (a)):
+- `-U` on `add-generic-password` updates an existing entry in-place. The previous design's "delete-then-add" two-step is unnecessary and would leak a brief window where the entry is missing.
+- The `Bun.spawn` injection seam lets the unit tests be hermetic. The integration test uses the default (real `Bun.spawn`).
+- The wrapper is `async`; the previous FFI sketch was synchronous. The IPC handlers that consume Keychain are already `async`, so this is a non-issue. Keychain ops at boot are awaited just like the SQLite open already is.
 
-```ts
-import { spawnSync } from "node:child_process";
-
-export const Keychain = {
-  set(serviceName, accountName, password) {
-    // Remove first
-    spawnSync("security", [
-      "delete-generic-password",
-      "-s",
-      serviceName,
-      "-a",
-      accountName,
-    ]);
-    const r = spawnSync("security", [
-      "add-generic-password",
-      "-s",
-      serviceName,
-      "-a",
-      accountName,
-      "-w",
-      password,
-    ]);
-    if (r.status !== 0) throw new Error(`security add failed: ${r.stderr}`);
-  },
-  get(serviceName, accountName) {
-    const r = spawnSync(
-      "security",
-      ["find-generic-password", "-w", "-s", serviceName, "-a", accountName],
-      { encoding: "utf8" },
-    );
-    if (r.status === 44) return null; // not found
-    if (r.status !== 0) throw new Error(`security find failed: ${r.stderr}`);
-    return r.stdout.trim();
-  },
-  delete(serviceName, accountName) {
-    spawnSync("security", [
-      "delete-generic-password",
-      "-s",
-      serviceName,
-      "-a",
-      accountName,
-    ]);
-  },
-};
-```
-
-This works on macOS today, requires no FFI, and is fine for V1. Promote to FFI in Phase 4/V2 if the per-call cost ever matters. **Pragmatically recommended: ship the spawnSync version in Phase 2, file a follow-up task for FFI.**
-
-- [ ] **Step 4: Run the smoke test on a macOS dev machine**
+- [ ] **Step 5: Run both test files and confirm green**
 
 ```bash
-KEYCHAIN_SMOKE=1 pnpm --filter @avandar/desktop test
+pnpm --filter @avandar/desktop test
+KEYCHAIN_E2E=1 pnpm --filter @avandar/desktop test:integration
 ```
 
-Expected: roundtrip passes. On first run the macOS Keychain Access dialog may prompt; click "Always Allow".
+Expected: unit tests green; integration tests green on macOS, skipped otherwise. On the first integration-test run, macOS prompts "`bun` wants to access the Keychain" — click "Always Allow" for that binary.
 
-- [ ] **Step 5: Implement auth IPC handlers**
+- [ ] **Step 6: Implement auth IPC handlers**
 
-Create `apps/desktop/main/ipc/auth.ts`:
+Create `apps/desktop/main/ipc/auth.ts`. Note: per `defineIpcContract` / `IpcServer` paths in this repo, the real imports are `$/platform/ipc/contracts/AuthContracts` and the local `../ipc/createIpcServer/createIpcServer` — the `@avandar/platform` strings in earlier task snippets are a historical alias the rewrite never collapses.
 
 ```ts
-import { AuthContracts } from "@avandar/platform";
-import { Keychain } from "../services/Keychain.ts";
-import type { IpcServer } from "@avandar/platform";
+import { AuthContracts } from "$/platform/ipc/contracts/AuthContracts";
+import type { IpcServer } from "../createIpcServer/createIpcServer";
+import type { Keychain } from "../../services/Keychain";
 
 const KEYCHAIN_SERVICE = "com.avandarlabs.desktop";
 const REFRESH_TOKEN_ACCOUNT = "supabase-refresh-token";
@@ -3327,7 +3271,10 @@ const SUPABASE_ANON_KEY = process.env.AVA_SUPABASE_ANON_KEY ?? "";
 let currentAccessToken: { token: string; expiresAt: number } | null = null;
 let currentUser: { id: string; email: string } | null = null;
 
-export function registerAuthHandlers(server: IpcServer): void {
+export function registerAuthHandlers(
+  server: IpcServer,
+  keychain: Keychain,
+): void {
   server.handle(AuthContracts.signIn, async (req) => {
     const res = await fetch(
       `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
@@ -3348,7 +3295,7 @@ export function registerAuthHandlers(server: IpcServer): void {
       user: { id: string; email: string };
     };
 
-    Keychain.set(KEYCHAIN_SERVICE, REFRESH_TOKEN_ACCOUNT, data.refresh_token);
+    await keychain.set(KEYCHAIN_SERVICE, REFRESH_TOKEN_ACCOUNT, data.refresh_token);
     currentAccessToken = {
       token: data.access_token,
       expiresAt: Date.now() + data.expires_in * 1000,
@@ -3364,7 +3311,7 @@ export function registerAuthHandlers(server: IpcServer): void {
   });
 
   server.handle(AuthContracts.signOut, async () => {
-    Keychain.delete(KEYCHAIN_SERVICE, REFRESH_TOKEN_ACCOUNT);
+    await keychain.delete(KEYCHAIN_SERVICE, REFRESH_TOKEN_ACCOUNT);
     currentAccessToken = null;
     currentUser = null;
     return { ok: true as const };
@@ -3383,7 +3330,7 @@ export function registerAuthHandlers(server: IpcServer): void {
       };
     }
     // Try to refresh from keychain.
-    const refreshToken = Keychain.get(KEYCHAIN_SERVICE, REFRESH_TOKEN_ACCOUNT);
+    const refreshToken = await keychain.get(KEYCHAIN_SERVICE, REFRESH_TOKEN_ACCOUNT);
     if (!refreshToken) return { session: null };
     try {
       const res = await fetch(
@@ -3409,7 +3356,7 @@ export function registerAuthHandlers(server: IpcServer): void {
         expires_in: number;
         user: { id: string; email: string };
       };
-      Keychain.set(KEYCHAIN_SERVICE, REFRESH_TOKEN_ACCOUNT, data.refresh_token);
+      await keychain.set(KEYCHAIN_SERVICE, REFRESH_TOKEN_ACCOUNT, data.refresh_token);
       currentAccessToken = {
         token: data.access_token,
         expiresAt: Date.now() + data.expires_in * 1000,
@@ -3436,13 +3383,13 @@ export function registerAuthHandlers(server: IpcServer): void {
     ) {
       return { refreshed: false };
     }
-    const session = await getSessionViaRefresh();
+    const session = await getSessionViaRefresh(keychain);
     return { refreshed: session !== null };
   });
 }
 
-async function getSessionViaRefresh() {
-  const refreshToken = Keychain.get(KEYCHAIN_SERVICE, REFRESH_TOKEN_ACCOUNT);
+async function getSessionViaRefresh(keychain: Keychain) {
+  const refreshToken = await keychain.get(KEYCHAIN_SERVICE, REFRESH_TOKEN_ACCOUNT);
   if (!refreshToken) return null;
   const res = await fetch(
     `${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`,
@@ -3534,10 +3481,13 @@ export const DesktopAuthProvider: AuthProvider = {
 Modify `apps/desktop/main/index.ts`:
 
 ```ts
-import { registerAuthHandlers } from "./ipc/auth.ts";
+import { createKeychain } from "./services/Keychain";
+import { registerAuthHandlers } from "./ipc/registerAuthHandlers/registerAuthHandlers";
+
+const keychain = createKeychain();
 
 // ... after registerDuckDbHandlers:
-registerAuthHandlers(ipcServer);
+registerAuthHandlers(ipcServer, keychain);
 ```
 
 - [ ] **Step 8: Smoke test the desktop auth flow end-to-end**
@@ -3554,22 +3504,25 @@ In the window: sign in, close the app, reopen. The second launch should reach th
 
   ```bash
   pnpm --filter @avandar/desktop test
+  KEYCHAIN_E2E=1 pnpm --filter @avandar/desktop test:integration
   pnpm --filter @avandar/desktop type-check
   pnpm type-check
   ```
 
-  Expected: keychain unit tests / smoke harness pass (FFI calls succeed against the real macOS Security framework); type-check clean.
+  Expected: unit tests green (mocked-spawn pure-layer); integration tests green on macOS against the real `security` CLI; type-check clean.
 
   **Verify:**
   - `apps/desktop/main/services/Keychain.ts`:
-    - either uses Bun FFI bindings against `Security.framework` directly, OR shells out to `/usr/bin/security` as the documented fallback (Step 3 risk mitigation),
-    - never logs the secret value,
-    - the FFI implementation correctly frees any pointers/copies it owns.
-  - `apps/desktop/main/ipc/auth.ts` registers `auth.*` handlers (set, get, delete) wired to the Keychain service.
+    - shells out to the absolute path `/usr/bin/security` (no `$PATH` lookup),
+    - feeds the secret through the child's stdin, never as an argv value (`-w` without a value, then `child.stdin.write(password)`),
+    - never logs the secret in any code path (including thrown errors that quote stderr),
+    - treats exit 44 from `find-generic-password` as `null`, exit 44 from `delete-generic-password` as a no-op (idempotent),
+    - exposes a `Bun.spawn` injection seam so the unit tests can run hermetically.
+  - `apps/desktop/main/ipc/auth.ts` registers `auth.*` handlers wired to an injected `Keychain` instance (not a module-level singleton).
   - `shared/platform/desktop/DesktopAuthProvider.ts` implements the same auth-provider interface the web side uses and persists the session via the auth IPC.
-  - `apps/desktop/main/index.ts` calls the auth provider before constructing the snapshot bootstrap from Task 9, so the bootstrap token comes from Keychain instead of a hardcoded dev token.
-  - Service uses an account identifier scoped to "Avandar" (so deletions/inspections in Keychain Access are unambiguous).
-  - Test groupings G2.13, G2.14 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+  - `apps/desktop/main/index.ts` constructs `keychain = createKeychain()` at boot and passes it into `registerAuthHandlers`. The snapshot bootstrap from Task 9 should now source its access token from the keychain-backed session rather than `AVA_DEV_ACCESS_TOKEN`.
+  - Keychain service identifier is `com.avandarlabs.desktop` (unambiguous in Keychain Access.app).
+  - Test groupings G2.13, G2.14 are authored, and each grouping's mutation-test step is recorded per the testing strategy.
 
   **Manual smoke test (desktop app — `pnpm dev:desktop`):**
   1. Wipe local state: `rm "$HOME/Library/Application Support/Avandar/metadata.sqlite"*` and ensure no prior Keychain entry for Avandar exists (delete it in Keychain Access.app if present).
@@ -4339,7 +4292,7 @@ Edit `docs/superpowers/specs/2026-05-13-electrobun-desktop-design.md`, mark Phas
 | Risk                                                                                 | Mitigation in this phase                                                                                                                                                                                               |
 | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | sqlglot output requires per-table touch-ups for Postgres-only features               | Hard-error generator + human review in Task 6 Step 9; fix the _generator_ not the output                                                                                                                               |
-| Bun FFI memory-pointer wrangling fails on first attempt                              | Pragmatic fallback in Task 11 Step 3: ship the `security`-CLI shellout; file a follow-up to migrate to FFI                                                                                                             |
+| `security` CLI output / exit-code format drifts on a new macOS release                | Pure-layer unit tests pin the expected argv shape, exit codes (0, 44), and stdout newline handling; gated integration test (G2.14) catches drift against the real binary on each supported macOS version; thrown errors quote stderr so a regression surfaces with the exact OS message instead of a silent wrong-result |
 | Native `duckdb` Node binding fails to load under Bun                                 | Phase 2 Task 10 tests catch this; if blocked, evaluate `@duckdb/node-api` or compile against duckdb-bindings-node-bun. Worst case: stay on duckdb-wasm for desktop in Phase 2 and accept the memory limits temporarily |
 | Webview ↔ Bun IPC pipeline mismatches Electrobun's actual API                        | Task 8 Step 2 explicitly calls out the `window.ipc` shim — engineer adapts to real names                                                                                                                               |
 | Dropping duckdb-wasm from desktop bundle breaks if some code path imports it eagerly | Decision in Task 10 Step 9 — if blocked, accept the bundle bloat; do not delay Phase 2 on this optimization                                                                                                            |
