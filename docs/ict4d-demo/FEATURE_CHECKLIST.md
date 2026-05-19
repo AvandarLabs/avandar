@@ -132,7 +132,14 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started · `[—]` 
   - New `DashboardEditorStateManager` queues blocks emitted by the chat panel; the editor view drains them on render.
   - Composer + empty state unlocked on dashboards with surface-specific copy and starter suggestions.
 - [—] **23. Optional local model fallback for offline use (only if 8 GB RAM-feasible)** _(deferred — not needed for the demo)_
-- [ ] **24. Lingui i18n: EN / FR / ES / AR (with RTL) / ZH / SW; workspace-level language setting**
+- [~] **24. Lingui i18n: EN / FR / ES / AR (with RTL) / ZH / SW; workspace-level language setting**
+  - Lingui v6 wired up: `lingui.config.ts`, Babel macro via `@vitejs/plugin-react`, dynamic catalog loader, Mantine `DirectionProvider` keyed on locale for RTL.
+  - 8 locales scaffolded: `en, es, pt, fr, sw, ar, zh-Hans, zh-Hant` (PT and split zh-Hans/zh-Hant added beyond the original brief).
+  - Per-workspace language picker in `WorkspaceSettingsPage` (new **Language** tab). Selection persisted in `localStorage` per `workspaceId`, applied immediately via `WorkspaceI18nProvider` mounted in `WorkspaceLayout`.
+  - Translations implemented **only on the workspace settings page** so far (per "start small" brief). All other surfaces still render English regardless of locale.
+  - Scripts: `pnpm i18n:extract`, `i18n:extract-clean`, `i18n:compile`, `i18n:check`, `i18n:translate-llm`, `i18n:update`.
+  - LLM translator (`scripts/i18n/translateWithLLM.ts`) batches empty `msgstr` entries and fills them via OpenRouter (`anthropic/claude-sonnet-4.5` by default). Supports `--dry-run` and per-locale args. Catalogs are still empty on disk — run `pnpm i18n:update` with `OPEN_ROUTER_API_KEY` set to populate them.
+  - Remaining: actually populate translations for the 8 locales, smoke-test RTL flip on Arabic, and decide whether to extend coverage past the settings page.
 - [—] **25. React Joyride onboarding tour** _(deferred — not needed for the demo)_
 - [x] **26. Usage analytics — Supabase table + RLS** (`usage_analytics_events`)
   - Client-side event logging shipped: dataset imported, dashboard published, chat message sent, chat SQL generated, dashboard block added via chat, dashboard filter changed.

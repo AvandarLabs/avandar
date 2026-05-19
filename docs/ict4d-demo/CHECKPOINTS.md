@@ -104,6 +104,10 @@ translations yourself" instruction would produce machine-translated UI text
 that beta users in those locales would immediately reject. Defer until a
 human translation review pass is budgeted.
 
+**Update (Checkpoint 12):** Lingui v6 is now wired up end-to-end, but
+translation **coverage is intentionally limited to the workspace settings
+page**. Other surfaces still render English. See Checkpoint 12 below.
+
 ### Tokenized code rendering (item #7)
 "Render every column name as a pill, every dataset id as a clickable pill
 showing the dataset name." This is a SQL-aware editor with semantic
@@ -1021,6 +1025,92 @@ Type-check and ESLint clean.
 - **Streaming transcription** — current flow captures the full clip,
   then runs Whisper. Whisper.js supports chunked streaming via
   `chunk_length_s`; could be wired up if real-time feedback is needed.
+---
+
+## Checkpoint 12 — Lingui i18n scaffold + workspace language picker ✅
+
+Partial progress on item #24. The brief was deliberately scoped:
+"start small — translate only the workspace settings page" — so the
+infrastructure is end-to-end but the translated surface is one page.
+
+### What shipped
+
+- **Lingui v6 wired up**
+  - `lingui.config.ts` with `@lingui/format-po`, source locale `en`,
+    target locales `es, pt, fr, sw, ar, zh-Hans, zh-Hant`.
+  - `@lingui/babel-plugin-lingui-macro` mounted via
+    `@vitejs/plugin-react`'s `babel.plugins` option in `vite.config.ts`
+    (no extra Rolldown plugin needed).
+  - Compiled catalogs land at `src/i18n/locales/<locale>/messages.ts`
+    and are git-tracked. They are excluded from ESLint to avoid
+    machine-generated-file noise.
+
+- **Runtime**
+  - `src/i18n/i18n.ts` — `activateLocale(locale)` dynamically imports
+    the compiled catalog and calls `i18n.loadAndActivate(...)` on the
+    shared instance.
+  - `src/i18n/WorkspaceI18nProvider.tsx` — loads the catalog on locale
+    change, sets `<html dir>` + `<html lang>`, wraps children in
+    Mantine's `DirectionProvider` (keyed on locale so LTR↔RTL flips
+    cleanly remount) and Lingui's `I18nProvider`.
+  - `src/i18n/useLanguagePreference.ts` — per-workspace language stored
+    in `localStorage` (`avandar:workspace-language:<workspaceId>`),
+    exposed via `useSyncExternalStore` + a synthetic event so
+    in-tab subscribers re-render immediately on change.
+
+- **Workspace-level setting**
+  - New **Language** tab between **Tags** and **Privacy log** in
+    `WorkspaceSettingsPage`. Lists all 8 locales with their native
+    label + English name + an `RTL` marker for Arabic.
+  - `WorkspaceI18nProvider` is mounted in `WorkspaceLayout`, so the
+    locale switches with the workspace.
+
+- **Translated surface (intentionally minimal)**
+  - **Only** `WorkspaceSettingsPage` and the new `WorkspaceLanguageTab`
+    use `Trans`/`t` from `@lingui/react/macro`. 15 message ids extracted.
+  - All other pages still render English regardless of locale.
+
+- **Scripts (all prefixed `i18n:`)**
+  - `pnpm i18n:extract` — refresh `.po` catalogs.
+  - `pnpm i18n:extract-clean` — drop obsolete entries.
+  - `pnpm i18n:compile` — emit runtime TS catalogs.
+  - `pnpm i18n:check` — extract + `git diff --exit-code` (CI-friendly).
+  - `pnpm i18n:translate-llm` — LLM filler (see below).
+  - `pnpm i18n:update` — extract → translate-llm → compile.
+
+- **LLM translator** (`scripts/i18n/translateWithLLM.ts`)
+  - Parses each non-source `.po`, batches empty `msgstr` entries
+    (40 per request), sends them through OpenRouter with the existing
+    `OPEN_ROUTER_API_KEY` (default model `anthropic/claude-sonnet-4.5`,
+    overridable via `I18N_LLM_MODEL`), enforces JSON output, writes
+    each translation back into the same `.po` without re-ordering or
+    losing comments.
+  - Supports `--dry-run` and per-locale args
+    (`pnpm i18n:translate-llm -- fr es`).
+
+### Verification
+
+- `pnpm type-check` clean.
+- `pnpm lint` clean on all new files.
+- `pnpm vite build` clean end-to-end.
+- `pnpm test:frontend` — 6 pre-existing failures (verified via
+  `git stash` baseline), no regressions from i18n changes.
+
+### What is NOT done
+
+- Catalogs are still empty on disk for every non-source locale.
+  Running `pnpm i18n:update` with `OPEN_ROUTER_API_KEY` set populates
+  them; we did not run it in this session.
+- No human translation review pass.
+- No `Trans`/`t` coverage on any surface beyond the workspace settings
+  page (by design — see brief).
+- No live RTL smoke test against the rendered app in a browser. Mantine
+  components have first-class RTL support via `DirectionProvider`, so
+  this is expected to "just work" once Arabic catalogs are populated,
+  but it has not been verified visually.
+- Language preference is per-workspace per-browser (localStorage). If
+  product wants it server-synced across devices or shared workspace-wide,
+  promote it to a `workspaces.preferred_locale` column.
 
 ---
 
