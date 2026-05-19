@@ -14,8 +14,8 @@ import type {
   VirtualDatasetId,
   VirtualDatasetModel,
 } from "$/models/datasets/VirtualDataset/VirtualDataset.types.ts";
-import type { ChatPlan } from "$/types/chat.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
+import type { ChatPlan } from "$/types/chat.types.ts";
 
 /**
  * The persisted plan lives in a `jsonb` column. Zod's strictest match
@@ -60,16 +60,16 @@ export const VirtualDatasetParsers =
     fromModelInsertToDBInsert: (model) => {
       const { planSteps, ...rest } = model;
       const snake = snakeCaseKeysDeep(rest);
-      return planSteps === undefined ?
-          snake
-        : { ...snake, plan_steps: planSteps };
+      return planSteps === undefined ? snake : (
+          { ...snake, plan_steps: planSteps }
+        );
     },
     fromModelUpdateToDBUpdate: (model) => {
       const { planSteps, ...rest } = model;
       const snake = snakeCaseKeysDeep(rest);
-      return planSteps === undefined ?
-          snake
-        : { ...snake, plan_steps: planSteps };
+      return planSteps === undefined ? snake : (
+          { ...snake, plan_steps: planSteps }
+        );
     },
   });
 

@@ -2,8 +2,8 @@ import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
-import type { ChatPlan } from "$/types/chat.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
+import type { ChatPlan } from "$/types/chat.types.ts";
 import type { SetOptional } from "type-fest";
 
 export type VirtualDatasetId = UUID<"VirtualDataset">;

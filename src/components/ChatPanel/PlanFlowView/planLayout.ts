@@ -1,6 +1,6 @@
-import type { Edge, Node } from "@xyflow/react";
-import type { PlanNode } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import type { PlanStepNodeData } from "@/components/ChatPanel/PlanFlowView/PlanStepNode";
+import type { PlanNode } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
+import type { Edge, Node } from "@xyflow/react";
 
 /**
  * Compute a left-to-right layered layout for the plan DAG.
@@ -98,8 +98,7 @@ export function layoutPlan(args: {
         source: inputId,
         target: node.id,
         type: "rough",
-        selected:
-          focusedStepId === inputId || focusedStepId === node.id,
+        selected: focusedStepId === inputId || focusedStepId === node.id,
       });
     }
   }

@@ -2,10 +2,7 @@ import { describe, expect, test } from "vitest";
 import { layoutPlan } from "@/components/ChatPanel/PlanFlowView/planLayout";
 import type { PlanNode } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 
-function makeNode(args: {
-  id: string;
-  inputs?: string[];
-}): PlanNode {
+function makeNode(args: { id: string; inputs?: string[] }): PlanNode {
   return {
     id: args.id,
     description: `step ${args.id}`,

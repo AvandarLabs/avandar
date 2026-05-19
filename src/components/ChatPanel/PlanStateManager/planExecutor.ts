@@ -1,21 +1,21 @@
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import {
+  clearPlanStepBlobs,
+  putPlanStepBlob,
+} from "@/components/ChatPanel/PlanStateManager/planStepStorage";
+import {
   findAffectedDownstream,
   isSchemaDrift,
   MAX_REGEN_ATTEMPTS,
   regenerateOnDrift,
 } from "@/components/ChatPanel/PlanStateManager/schemaDrift";
-import {
-  clearPlanStepBlobs,
-  putPlanStepBlob,
-} from "@/components/ChatPanel/PlanStateManager/planStepStorage";
 import type {
   PlanNode,
   PlanStateManager,
 } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import type { PlanStepBlob } from "@/components/ChatPanel/PlanStateManager/planStepStorage";
-import type { ChatPlan } from "$/types/chat.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ChatPlan } from "$/types/chat.types";
 
 /**
  * Run a plan end-to-end in DuckDB, writing each step's output to a temp
@@ -265,9 +265,7 @@ export async function dropPlanTempViews(args: {
  *   - The user re-opens a virtual dataset that was saved with a plan
  *   - A page reload brings the plan back from local storage
  */
-export async function rehydratePlanStep(args: {
-  blob: PlanStepBlob;
-}): Promise<{
+export async function rehydratePlanStep(args: { blob: PlanStepBlob }): Promise<{
   viewName: string;
   schema: PlanStepBlob["schema"];
   rowCount: number;

@@ -127,20 +127,18 @@ describe("findAffectedDownstream", () => {
   });
 
   test("returns only direct + transitive descendants from a middle node", () => {
-    expect(
-      findAffectedDownstream({ plan, driftedStepId: "agg" }),
-    ).toEqual(["rank"]);
+    expect(findAffectedDownstream({ plan, driftedStepId: "agg" })).toEqual([
+      "rank",
+    ]);
   });
 
   test("returns an empty list when the drifted step is a leaf", () => {
-    expect(
-      findAffectedDownstream({ plan, driftedStepId: "rank" }),
-    ).toEqual([]);
+    expect(findAffectedDownstream({ plan, driftedStepId: "rank" })).toEqual([]);
   });
 
   test("returns an empty list when the drifted step id doesn't exist", () => {
-    expect(
-      findAffectedDownstream({ plan, driftedStepId: "missing" }),
-    ).toEqual([]);
+    expect(findAffectedDownstream({ plan, driftedStepId: "missing" })).toEqual(
+      [],
+    );
   });
 });

@@ -23,11 +23,11 @@ import { rehydratePlan } from "@/components/ChatPanel/PlanStateManager/planRehyd
 import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { buildSelectAllPreviewSQL } from "@/views/DataExplorerApp/OpenDatasetDrawer/datasetPreviewSQL";
-import type { ChatPlan } from "$/types/chat.types";
 import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
+import type { ChatPlan } from "$/types/chat.types";
 
 type Props = {
   onOpen: (info: OpenDatasetInfo, rawSQL: string) => void;

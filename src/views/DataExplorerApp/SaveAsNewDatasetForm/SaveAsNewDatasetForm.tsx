@@ -114,9 +114,9 @@ export function SaveAsNewDatasetForm({
               p="xs"
             >
               <Text size="xs">
-                The {planSnapshot.steps.length}-step analysis that produced
-                this result will be saved with the dataset, so it can be
-                reopened on the canvas.
+                The {planSnapshot.steps.length}-step analysis that produced this
+                result will be saved with the dataset, so it can be reopened on
+                the canvas.
               </Text>
             </Alert>
           : null}

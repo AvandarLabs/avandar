@@ -148,8 +148,7 @@ export function RoughEdge(props: EdgeProps): JSX.Element {
               padding: "2px 6px",
               borderRadius: 4,
               fontSize: 11,
-              fontFamily:
-                'Caveat, "Patrick Hand", "Comic Sans MS", system-ui',
+              fontFamily: 'Caveat, "Patrick Hand", "Comic Sans MS", system-ui',
               color: "#495057",
               pointerEvents: "all",
             }}
