@@ -502,9 +502,11 @@ function _resolveFrom(
     const tableName = typeof item.table === "string" ? item.table : undefined;
     const alias = typeof item.as === "string" ? item.as : undefined;
     const subqueryExpr =
-      item.expr &&
-      typeof item.expr === "object" &&
-      "ast" in (item.expr as Record<string, unknown>) ?
+      (
+        item.expr &&
+        typeof item.expr === "object" &&
+        "ast" in (item.expr as Record<string, unknown>)
+      ) ?
         (item.expr as { ast: unknown }).ast
       : undefined;
 

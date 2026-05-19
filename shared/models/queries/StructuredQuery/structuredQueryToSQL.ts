@@ -205,16 +205,16 @@ function _applyHaving(
   return builder.havingRaw(_renderFilterGroupSQL(group));
 }
 
-function _renderFilterValue(
-  value: QueryFilterRule["value"],
-): string {
+function _renderFilterValue(value: QueryFilterRule["value"]): string {
   if (value === null || value === undefined) {
     return "NULL";
   }
   if (Array.isArray(value)) {
-    return value.map((v) => {
-      return _renderFilterValue(v);
-    }).join(", ");
+    return value
+      .map((v) => {
+        return _renderFilterValue(v);
+      })
+      .join(", ");
   }
   if (typeof value === "number" || typeof value === "boolean") {
     return String(value);
