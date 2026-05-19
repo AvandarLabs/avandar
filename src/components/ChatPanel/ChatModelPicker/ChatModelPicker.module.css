@@ -1,0 +1,7 @@
+.root {
+  padding: 0 var(--mantine-spacing-sm) var(--mantine-spacing-xs);
+}
+
+.select {
+  width: 100%;
+}

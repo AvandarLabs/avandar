@@ -35,7 +35,8 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
 
   const adapter = useMemo<ChatModelAdapter>(() => {
     return {
-      async run({ messages }): Promise<ChatModelRunResult> {
+      async run({ messages, context }): Promise<ChatModelRunResult> {
+        const model = context.config?.modelName;
         const apiMessages: ChatClientMessage[] = messages
           .map((chatMsg) => {
             const content = extractText(chatMsg.content);
@@ -61,7 +62,11 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         const response = await APIClient.post({
           route: "chat/:workspaceId/messages",
           pathParams: { workspaceId: workspace.id },
-          body: { messages: apiMessages, context: pageContext },
+          body: {
+            messages: apiMessages,
+            context: pageContext,
+            ...(model ? { model } : {}),
+          },
         });
 
         if (response.generatedSql) {

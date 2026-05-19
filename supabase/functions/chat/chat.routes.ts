@@ -1,15 +1,23 @@
-import { defineRoutes, POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import {
+  defineRoutes,
+  GET,
+  POST,
+} from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import {
   buildSQLSystemPrompt,
   cleanGeneratedSQL,
 } from "@sbfn/_shared/sql/buildSQLSystemPrompt.ts";
+import { AppConfig } from "$/config/AppConfig.ts";
 import { getAppURL } from "$/env/getAppURL.ts";
+import { curateOpenRouterModels } from "$/lib/chat/curateOpenRouterModels.ts";
 import { z } from "zod";
 import type {
   ChatAPI,
   ChatGeneratedSQL,
+  ChatModelsResponse,
   ChatResponse,
 } from "@sbfn/chat/chat.types.ts";
+import type { OpenRouterModelInput } from "$/lib/chat/curateOpenRouterModels.ts";
 
 const openRouterApiKey = Deno.env.get("OPEN_ROUTER_API_KEY");
 if (!openRouterApiKey) {
@@ -18,8 +26,22 @@ if (!openRouterApiKey) {
 
 const openRouterReferer = getAppURL();
 
-// Low-latency, low-cost model for v1. Easy to swap by changing this constant.
-const DEFAULT_MODEL = "openai/gpt-4o-mini";
+const OPENROUTER_MODELS_URL =
+  "https://openrouter.ai/api/v1/models?output_modalities=text&supported_parameters=tools";
+
+/** Matches OpenRouter model ids such as `openai/gpt-4o-mini`. */
+const OPENROUTER_MODEL_ID_PATTERN = /^[a-z0-9-]+\/[a-z0-9._-]+$/i;
+
+type OpenRouterModelsResponse = {
+  data?: OpenRouterModelInput[];
+};
+
+function _resolveChatModel(model: string | undefined): string {
+  if (model && OPENROUTER_MODEL_ID_PATTERN.test(model)) {
+    return model;
+  }
+  return AppConfig.chat.defaultModelId;
+}
 
 // Cheap heuristic for "this prompt is a refinement of the previous turn."
 // When it matches AND the client gave us a `lastSql`, we attach the prior
@@ -96,6 +118,39 @@ async function fetchSchemaForWorkspace(args: {
  * client which auto-applies it to the Data Explorer canvas.
  */
 export const Routes = defineRoutes<ChatAPI>("chat", {
+  /**
+   * Returns the OpenRouter model catalog for the chat panel model picker.
+   * The edge function proxies OpenRouter so the API key stays server-side.
+   * Returns a curated, grouped catalog (allowlist, deduped slugs, open vs
+   * proprietary) for the chat panel model picker.
+   */
+  "/models": {
+    GET: GET("/models").action(async (): Promise<ChatModelsResponse> => {
+      const response = await fetch(OPENROUTER_MODELS_URL, {
+        headers: {
+          Authorization: `Bearer ${openRouterApiKey}`,
+          "HTTP-Referer": openRouterReferer,
+          "X-Title": "Avandar",
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`OpenRouter models API error: ${errorText}`);
+      }
+
+      const payload = (await response.json()) as OpenRouterModelsResponse;
+      const groups = curateOpenRouterModels(payload.data ?? []);
+
+      return { groups };
+    }),
+  },
+  /**
+   * Handles a chat turn for the Ask Avandar panel in a workspace.
+   * The client sends the thread, page context, and optional model id; we call
+   * OpenRouter and may invoke `generateSql` on the Data Explorer.
+   * The response is assistant text plus optional SQL for the canvas to run.
+   */
   "/:workspaceId/messages": {
     POST: POST({
       path: "/:workspaceId/messages",
@@ -116,10 +171,12 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           lastSql: z.string().optional(),
           lastError: z.string().optional(),
         }),
+        model: z.string().optional(),
       })
       .action(async ({ pathParams, body, supabaseClient }) => {
         const { workspaceId } = pathParams;
-        const { messages, context } = body;
+        const { messages, context, model: requestedModel } = body;
+        const model = _resolveChatModel(requestedModel);
 
         const isDataExplorer = context.app === "data-explorer";
 
@@ -167,7 +224,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           : genericSystemPrompt;
 
         const requestBody: Record<string, unknown> = {
-          model: DEFAULT_MODEL,
+          model,
           messages: [{ role: "system", content: systemContent }, ...messages],
           temperature: 0.3,
         };

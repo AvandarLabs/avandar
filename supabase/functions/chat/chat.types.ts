@@ -2,6 +2,7 @@ import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 import type {
   ChatClientMessage,
   ChatGeneratedSql,
+  ChatModelsResponse,
   ChatPageContext,
   ChatResponse,
 } from "$/types/chat.types.ts";
@@ -9,14 +10,20 @@ import type {
 export type {
   ChatClientMessage,
   ChatGeneratedSql as ChatGeneratedSQL,
+  ChatModelsResponse,
   ChatPageContext,
   ChatResponse,
 };
 
 export type ChatAPI = APITypeDef<
   "chat",
-  ["/:workspaceId/messages"],
+  ["/models", "/:workspaceId/messages"],
   {
+    "/models": {
+      GET: {
+        returnType: ChatModelsResponse;
+      };
+    };
     "/:workspaceId/messages": {
       POST: {
         pathParams: {
@@ -25,6 +32,7 @@ export type ChatAPI = APITypeDef<
         body: {
           messages: ChatClientMessage[];
           context: ChatPageContext;
+          model?: string;
         };
         returnType: ChatResponse;
       };

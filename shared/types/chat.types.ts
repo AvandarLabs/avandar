@@ -34,3 +34,24 @@ export type ChatResponse = {
   assistantText: string;
   generatedSql?: ChatGeneratedSql;
 };
+
+export type ChatModelLicenseTier = "open" | "proprietary";
+
+/** A chat-capable model returned from OpenRouter via our edge function. */
+export type ChatModelOption = {
+  id: string;
+  name: string;
+  description?: string;
+  supportsTools: boolean;
+  licenseTier: ChatModelLicenseTier;
+  provider: string;
+};
+
+export type ChatModelOptionGroup = {
+  group: string;
+  models: ChatModelOption[];
+};
+
+export type ChatModelsResponse = {
+  groups: ChatModelOptionGroup[];
+};
