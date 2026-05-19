@@ -3,18 +3,12 @@ import { createSupabaseAdminClient } from "../helpers/supabaseAdminClient";
 import type { TablesInsert } from "../../../shared/types/database.types";
 
 /**
- * Stable UUID-shaped fake Polar ids for E2E (columns are `uuid`; no Polar API).
- */
-const E2E_FAKE_POLAR_SUBSCRIPTION_ID = "00000000-0000-4000-8000-000000000001";
-const E2E_FAKE_POLAR_PRODUCT_ID = "00000000-0000-4000-8000-000000000002";
-const E2E_FAKE_POLAR_CUSTOMER_ID = "00000000-0000-4000-8000-000000000003";
-
-/**
- * Ensures the workspace has a `subscriptions` row with fake Polar ids and
- * free-plan limits. Skips when a row already exists.
+ * Ensures the workspace has a native free `subscriptions` row (no Polar).
+ * Skips when a row already exists.
  *
  * @param options.workspaceSlug Workspace slug from the URL.
- * @param options.polarCustomerEmail Stored on the subscription row.
+ * @param options.polarCustomerEmail Unused for native free rows; kept for
+ *   call-site compatibility with existing E2E setup helpers.
  */
 export async function ensureWorkspaceSubscriptionForE2E(options: {
   workspaceSlug: string;
@@ -42,7 +36,7 @@ export async function ensureWorkspaceSubscriptionForE2E(options: {
 
   const { data: existingSubscription } = await adminClient
     .from("subscriptions")
-    .select("polar_subscription_id")
+    .select("id")
     .eq("workspace_id", workspaceRow.id)
     .maybeSingle();
 
@@ -53,10 +47,6 @@ export async function ensureWorkspaceSubscriptionForE2E(options: {
   const startedAt = new Date().toISOString();
 
   const insertRow: TablesInsert<"subscriptions"> = {
-    polar_subscription_id: E2E_FAKE_POLAR_SUBSCRIPTION_ID,
-    polar_product_id: E2E_FAKE_POLAR_PRODUCT_ID,
-    polar_customer_id: E2E_FAKE_POLAR_CUSTOMER_ID,
-    polar_customer_email: options.polarCustomerEmail,
     workspace_id: workspaceRow.id,
     subscription_owner_id: workspaceRow.owner_id,
     subscription_status: "active",
@@ -66,6 +56,10 @@ export async function ensureWorkspaceSubscriptionForE2E(options: {
     current_period_end: null,
     ends_at: null,
     ended_at: null,
+    polar_subscription_id: null,
+    polar_product_id: null,
+    polar_customer_id: null,
+    polar_customer_email: null,
     ...SubscriptionModule.computeSubscriptionLimitsForDB({
       featurePlan: "free",
       numSeats: 1,
@@ -81,7 +75,7 @@ export async function ensureWorkspaceSubscriptionForE2E(options: {
   }
 
   console.log(
-    `[e2e] Inserted fake-Polar free subscription for workspace ` +
+    `[e2e] Inserted native free subscription for workspace ` +
       `"${options.workspaceSlug}".`,
   );
 }
