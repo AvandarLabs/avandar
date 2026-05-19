@@ -82,14 +82,6 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started
 - [ ] **28. New dataset types `datasets__pdf` and `datasets__image` with annotation → CSV extraction**
 - [x] **29. BUGFIX: chat canvas stops updating after multi-turn**
   - Memoization fix applied to `useChatPageContext`. Needs browser verification with the four-turn repro.
-- [ ] **30. Adaptive import path: prefer the fast materialize-to-parquet path when we can afford the memory, fall back to the streaming COPY when we can't**
-  - Today every import goes through the streaming `COPY (read_csv(...)) TO parquet` path that was added in PRs #234/#235/#236. Memory is bounded but it's noticeably slower than the old "load into a TABLE, then export" path on small files.
-  - After Phase A (sniff) we already know the column types and a 200-row preview; combine that with the file size, `navigator.deviceMemory`, `navigator.userAgent` (Safari/iPad has a lower per-tab heap cap than desktop Chrome), and the WASM heap limit (`performance.memory.jsHeapSizeLimit` where available) to estimate the in-memory footprint of the materialized TABLE.
-  - Estimate: `bytes_per_row ≈ Σ(estimated_size_per_column_type)` from the Phase A schema; `materialized_bytes ≈ rows × bytes_per_row × overhead_factor`. Pad the overhead_factor heavily (think 2-3×) because we're guessing and the cost of a wrong "fast" decision is an OOM that kills the tab.
-  - Pick a per-device "safe materialization ceiling" — e.g. 200 MB on iPad Safari, 600 MB on desktop Chrome with 8 GB RAM, scaled by `deviceMemory` and `jsHeapSizeLimit`. If `materialized_bytes` is under the ceiling, go through the fast path; otherwise stay on the streaming COPY.
-  - Surface the decision in the dataset status indicator ("Processing — using fast path" vs "Processing — large dataset, may take longer") so users understand why a 10 MB CSV is instant but a 1 GB CSV takes minutes.
-  - Add telemetry on which path was chosen + actual peak heap (when `performance.memory` is exposed) so we can tune the ceilings over time.
-  - **Goal:** users feel the platform is *fast* on small / medium datasets while we keep the OOM-safe path for the genuinely huge ones. Either way, no parsing errors.
 
 ## Quality / process gates
 
