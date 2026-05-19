@@ -28,33 +28,21 @@ async function _resyncCsvDataset(options: {
   userId: UserId;
 }): Promise<void> {
   const { file, dataset, userId } = options;
-  const [csvParseOptions, datasetColumns] = await Promise.all([
-    CsvFileDatasetClient.getOne(where("dataset_id", "eq", dataset.id)),
-    DatasetColumnClient.getAll(where("dataset_id", "eq", dataset.id)),
-  ]);
+  const csvParseOptions = await CsvFileDatasetClient.getOne(
+    where("dataset_id", "eq", dataset.id),
+  );
   assertIsDefined(
     csvParseOptions,
     `CSV parse options could not be found for dataset (ID: ${dataset.id})`,
   );
-  const duckdbColumns = datasetColumns.map((column) => {
-    return [column.name, column.detectedDataType] as const;
-  });
-  await LocalDatasetClient.storeLocalCSV({
+  await LocalDatasetClient.startCsvImport({
     datasetId: dataset.id,
     workspaceId: dataset.workspaceId,
     userId,
-    csvParseOptions: {
-      file,
+    file,
+    parseOptions: {
       numRowsToSkip: csvParseOptions.rowsToSkip,
       delimiter: csvParseOptions.delimiter,
-      columns: duckdbColumns,
-      quoteChar: csvParseOptions.quoteChar,
-      escapeChar: csvParseOptions.escapeChar,
-      newlineDelimiter: csvParseOptions.newlineDelimiter,
-      commentChar: csvParseOptions.commentChar,
-      hasHeader: csvParseOptions.hasHeader,
-      dateFormat: csvParseOptions.dateFormat,
-      timestampFormat: csvParseOptions.timestampFormat,
     },
   });
 }
@@ -72,12 +60,12 @@ async function _resyncXlsxDataset(options: {
     xlsxParseOptions,
     `Excel parse options could not be found for dataset (ID: ${dataset.id})`,
   );
-  await LocalDatasetClient.storeLocalExcel({
+  await LocalDatasetClient.startXlsxImport({
     datasetId: dataset.id,
     workspaceId: dataset.workspaceId,
     userId,
-    xlsxParseOptions: {
-      file,
+    file,
+    parseOptions: {
       sheet: xlsxParseOptions.sheetName,
       hasHeader: xlsxParseOptions.hasHeader,
     },

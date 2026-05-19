@@ -24,18 +24,20 @@ const DBReadSchema = z.object({
   datasetId: uuidType<DatasetId>(),
   workspaceId: uuidType<WorkspaceId>(),
   userId: uuidType<UserId>(),
-  parquetData: z.instanceof(Blob).optional(),
+  parquetData: z.union([z.instanceof(Blob), z.undefined()]),
   parseStatus: z.enum(["ready", "parsing", "failed"]),
-  parseStartedAt: z.number().optional(),
-  parseFailedReason: z.string().optional(),
-  sourceBytes: z.instanceof(Blob).optional(),
-  sourceFileName: z.string().optional(),
-  sourceFileType: z.enum(["csv", "xlsx"]).optional(),
-  sourceFileSize: z.number().optional(),
-  lastSourceAccessedAt: z.number().optional(),
-  parseOptions: z
-    .union([CsvParseOptionsSchema, XlsxParseOptionsSchema])
-    .optional(),
+  parseStartedAt: z.union([z.number(), z.undefined()]),
+  parseFailedReason: z.union([z.string(), z.undefined()]),
+  sourceBytes: z.union([z.instanceof(Blob), z.undefined()]),
+  sourceFileName: z.union([z.string(), z.undefined()]),
+  sourceFileType: z.union([z.enum(["csv", "xlsx"]), z.undefined()]),
+  sourceFileSize: z.union([z.number(), z.undefined()]),
+  lastSourceAccessedAt: z.union([z.number(), z.undefined()]),
+  parseOptions: z.union([
+    CsvParseOptionsSchema,
+    XlsxParseOptionsSchema,
+    z.undefined(),
+  ]),
 });
 
 export const LocalDatasetParsers =

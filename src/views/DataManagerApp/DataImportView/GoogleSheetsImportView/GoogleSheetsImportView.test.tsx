@@ -274,6 +274,7 @@ function _covidSampleLoadResult(options: {
       Prompt: `FROM read_csv('${datasetId}', …)`,
       table_name: datasetId,
     },
+    parquetData: new Blob(),
   };
 }
 

@@ -4,7 +4,6 @@ import { assertIsDefined, isNullish, prop, propEq } from "@utils";
 import { UserId } from "$/models/User/User.types";
 import { useEffect, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
-import { ImportJobsManager } from "@/clients/datasets/ImportJobsManager";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";

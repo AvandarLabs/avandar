@@ -80,6 +80,15 @@ export const WorkspaceQETLClient = createModule("WorkspaceQETLClient", {
                 parquetData: parquetBlob,
                 workspaceId,
                 userId,
+                parseStatus: "ready" as const,
+                parseStartedAt: undefined,
+                parseFailedReason: undefined,
+                sourceBytes: undefined,
+                sourceFileName: undefined,
+                sourceFileType: undefined,
+                sourceFileSize: undefined,
+                lastSourceAccessedAt: undefined,
+                parseOptions: undefined,
               };
             }),
           });

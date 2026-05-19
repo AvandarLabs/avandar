@@ -97,6 +97,7 @@ function _csvDataSourceMetadata(): DataSourceMetadata {
         table_name: "dataset_1",
       },
       datasetId: CSV_DATASET_ID,
+      parquetData: new Blob(),
     },
     parseOptions: {
       type: "csv_file",
@@ -122,6 +123,7 @@ function _xlsxDataSourceMetadata(sheetNames: string[]): DataSourceMetadata {
       sheet: sheetNames[0],
       datasetId: XLSX_DATASET_ID,
       availableSheetNames: sheetNames,
+      parquetData: new Blob(),
     },
     parseOptions: {
       type: "xlsx_file",

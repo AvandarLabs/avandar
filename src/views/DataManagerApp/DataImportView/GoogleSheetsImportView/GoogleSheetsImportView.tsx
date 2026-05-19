@@ -9,6 +9,7 @@ import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import type { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { AppConfig } from "@/config/AppConfig";
 import { useGooglePicker } from "@/hooks/ui/useGooglePicker";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
@@ -130,23 +131,43 @@ export function GoogleSheetsImportView({
     ): Promise<GoogleSheetsLoadResult> => {
       const { datasetId, numRowsToSkip, rawText, spreadsheetName } = params;
 
-      // store our Google Sheets-turned-CSV string into local storage.
-      const loadResult = await LocalDatasetClient.storeLocalCSV({
-        csvParseOptions: {
-          fileText: rawText,
-          numRowsToSkip,
-        },
+      // Wrap the Google-Sheets-as-CSV text in a File so we can drive it
+      // through the streaming Phase A/B import pipeline.
+      const csvBlob = new Blob([rawText], { type: MIMEType.TEXT_CSV });
+      const csvFile = new File(
+        [csvBlob],
+        `${spreadsheetName || "google-sheet"}.csv`,
+        { type: MIMEType.TEXT_CSV },
+      );
+      const sniff = await LocalDatasetClient.startCsvImport({
         datasetId,
         userId: user!.id as UserId,
         workspaceId: workspace.id,
+        file: csvFile,
+        parseOptions: { numRowsToSkip },
       });
 
       const googleSheetsLoadResult: GoogleSheetsLoadResult = {
         datasetId,
-        numRows: loadResult.numRows,
+        numRows: sniff.previewRows.length,
         rawText,
         spreadsheetName,
-        sheetLoadMetadata: loadResult,
+        sheetLoadMetadata: {
+          id: uuid() as DuckDbLoadCsvResult["id"],
+          type: "csv",
+          tableName: datasetId,
+          csvName: csvFile.name,
+          columns: sniff.columns,
+          csvSniff: sniff.csvSniff,
+          numRows: sniff.previewRows.length,
+          numRejectedRows: 0,
+          errors: { rejectedRows: [], rejectedScans: [] },
+          // Phase A doesn't produce parquetData; Phase B runs in the
+          // background and writes the real Blob into Dexie. Downstream
+          // consumers read parquetData from the Dexie row, not from this
+          // result object, so a placeholder is safe.
+          parquetData: new Blob(),
+        },
       };
       return googleSheetsLoadResult;
     },
