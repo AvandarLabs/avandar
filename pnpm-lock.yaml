@@ -388,6 +388,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.98.0
         version: 2.98.0
+      duckdb:
+        specifier: ^1.4.4
+        version: 1.4.4(encoding@0.1.13)
       electrobun:
         specifier: latest
         version: 1.18.1

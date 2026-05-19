@@ -8,7 +8,7 @@ import { defineIpcContract } from "$/platform/ipc/contracts/defineIpcContract.ts
  */
 export const DuckDbContracts = {
   runRawQuery: defineIpcContract<
-    { sql: string; params: unknown[] },
+    { sql: string; params: readonly unknown[] },
     { rows: Array<Record<string, unknown>> }
   >("duckdb.runRawQuery"),
   loadParquetFromDatasetBlobStore: defineIpcContract<

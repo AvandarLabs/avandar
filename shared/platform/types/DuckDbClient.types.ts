@@ -6,8 +6,13 @@
  * process (Phase 2). Consumers depend only on this interface.
  */
 export interface DuckDbClient {
-  runStructuredQuery<TRow>(query: StructuredQuery): Promise<TRow[]>;
-  runRawQuery<TRow>(sql: string, params?: readonly unknown[]): Promise<TRow[]>;
+  runStructuredQuery<TRow extends Record<string, unknown>>(
+    query: StructuredQuery,
+  ): Promise<TRow[]>;
+  runRawQuery<TRow extends Record<string, unknown>>(
+    sql: string,
+    params?: readonly unknown[],
+  ): Promise<TRow[]>;
   loadParquetFromDatasetBlobStore(datasetId: string): Promise<void>;
   loadFromUpload(
     source: UploadSource,

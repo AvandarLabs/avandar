@@ -5,6 +5,7 @@ import { resolveMigrationsDir } from "./config/resolveMigrationsDir/resolveMigra
 import { resolveWebviewUrl } from "./config/url";
 import { setupApplicationMenu } from "./menu/setupApplicationMenu";
 import { getUserDataDir } from "./platform/getUserDataDir";
+import { createDuckDbService } from "./services/DuckDb";
 import { loadMigrationsFromDir } from "./services/loadMigrations";
 import { bootstrapSnapshotIfNeeded } from "./services/SnapshotBootstrap";
 import { openSqliteDatabase, runMigrations } from "./services/Sqlite";
@@ -46,6 +47,19 @@ console.log(
   `[avandar-desktop] sqlite ready at ${sqlitePath} ` +
     `(${migrations.length} migration(s) on disk)`,
 );
+
+// Open the native DuckDB instance eagerly. A failed dlopen of the
+// `duckdb` Node binding here takes the app down at boot rather than on
+// the first analytical query, which is what we want: the desktop shell
+// has no wasm fallback. Soon, the IPC handler registration that exposes
+// this service to the webview will land alongside the same wiring that
+// registers the RDB handlers - register here once `createIpcServer(...)`
+// is wired against Electrobun's webview transport.
+const duckdbPath =
+  process.env.AVA_DUCKDB_PATH ?? join(userDataDir, "duckdb", "ava.duckdb");
+const duckdbSvc = createDuckDbService(duckdbPath);
+
+console.log(`[avandar-desktop] duckdb ready at ${duckdbPath}`);
 
 // Stopgap snapshot bootstrap: when a dev token + Supabase URL/key are
 // configured, pull every syncable table from Supabase REST into the
@@ -104,4 +118,13 @@ setupApplicationMenu(APP_NAME, mainWindow);
 
 console.log(`[avandar-desktop] webview loaded ${url}`);
 
-void app;
+// Close the native DuckDB connection cleanly on app quit. The OS would
+// close the file handle on process exit either way, but releasing the
+// connection lets DuckDB flush its WAL and avoid an "unclean shutdown"
+// note on the next open. SQLite gets the same treatment for symmetry
+// once a teardown hook lands.
+app.on("beforeQuit", () => {
+  duckdbSvc.close().catch((err: unknown) => {
+    console.error("[avandar-desktop] duckdb close failed:", err);
+  });
+});
