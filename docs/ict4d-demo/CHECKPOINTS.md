@@ -418,6 +418,102 @@ Checkpoint 4 and adds the Phase 1 clarification telemetry table.
 
 ---
 
+## Checkpoint 6 — Quick wins: View-before-publish, publish modal, summary redesign ✅
+
+Three demo-quality wins requested as a tight batch:
+
+### Item #18 — "View" works before "Publish"
+
+The "View" button previously navigated to the public route, which then
+rendered an "access denied" panel for any dashboard with `isPublic =
+false`. There was no way to preview your own dashboard until you
+published it.
+
+- New auth-gated preview route:
+  `/<workspaceSlug>/dashboards/preview/<dashboardId>`
+- `DashboardViewerView` now takes a `mode: "public" | "preview"` prop.
+  In `preview` mode it skips the `isPublic` gate and renders a banner
+  ("Previewing this dashboard … Back to editor"). The public route
+  still hard-enforces `isPublic` so the public guarantee is preserved.
+- View button tooltip now warns if there are unsaved Puck edits.
+
+### Items #2 + #3 — Publish modal with vanity URL, copy link, QR code
+
+`PublishDashboardButton` opens a real modal instead of a confirm
+dialog:
+
+- Optional vanity URL field with live snake-case preview
+  (`toVanitySlug` — 8 unit tests covering casing, diacritic
+  stripping, length cap, collapse-to-empty).
+- `publishDashboard` mutation extended with optional `slug`.
+- New vanity route: `/d/<workspaceSlug>/<slug>`. Looks up by
+  `(workspace_id, slug)` which is unique-per-workspace in the schema.
+- `ShareUrlRow` component shows both the canonical id-based URL
+  (always available) and the vanity URL (when set). Each row has a
+  one-click copy button and a "Show QR code" action that opens a
+  modal with a downloadable 256×256 PNG, generated client-side via
+  the `qrcode` library (no network call).
+- Button label flips: "Publish" before, "Published" (filled teal)
+  after — clicking it again opens "Manage sharing" mode.
+
+### Item #9 — Summary view redesign
+
+Replaces the long `ObjectDescriptionList` with a doc-style outline:
+
+- Two-pane layout: sticky outline TOC on the left (highlights active
+  section as you scroll); scrollable content area on the right.
+- One section per column. Each leads with a one-sentence plain-
+  language summary (e.g. "Heavily repeated: Lagos appears in 87% of
+  rows."), then a type-appropriate viz beneath, then sub-stats.
+- Lazy per-column SQL via a new `getColumnSummary(datasetId,
+  workspaceId, columnName, dataType)` query. Sections only fire their
+  query when within 200px of the viewport
+  (`@mantine/hooks` `useIntersection`). Wide datasets (50+ columns)
+  no longer pay for 50 queries upfront.
+- Type-specific blocks live in three sibling files
+  (`TextColumnSummary`, `NumberColumnSummary`, `DateColumnSummary`):
+  - **Text** — top values rendered as horizontal share-of-rows bars
+    (not a donut; bar reads faster for "how dominant is the top").
+  - **Number** — min→max range with the mean plotted as a marker tick
+    and ±1σ shown as a tinted band; min / avg / max / stddev / kind
+    as inline stats below.
+  - **Date** — horizontal timeline: oldest endpoint on the left, most
+    recent on the right, coverage span labelled centre.
+- Missing-rate ring (`RingProgress`) appears only when missing > 0;
+  yellow accent at >20%, neutral otherwise.
+
+`DatasetQueryClient` got two new methods: `getDatasetMeta` (cheap row
+count + columns list for the outline) and `getColumnSummary` (the
+per-column unit). The existing `getSummary` was refactored to call the
+new shared helper rather than inlining the per-column logic.
+
+### Files touched
+
+- New: `src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/`
+  (4 files: container, body, three type-specific visuals, plus CSS)
+- New: `src/routes/_auth/$workspaceSlug/dashboards/preview/$dashboardId.tsx`
+- New: `src/routes/d/$workspaceSlug.$slug.tsx`
+- New: `src/views/DashboardApp/DashboardEditorView/PublishDashboardModal/`
+  (modal, share-row, slug helper + tests, URL builder)
+- Modified: `DashboardViewerView`, `ViewDashboardButton`,
+  `PublishDashboardButton`, `DashboardEditorView`, `DashboardClient`
+  (publish mutation accepts `slug`), `DatasetQueryClient` (refactor +
+  two new methods), `DatasetMetaView` (switches the summary tab to
+  the new view).
+
+### Verification
+
+- `tsc -b --noEmit` clean.
+- All 96 unit tests pass (including the 8 new `slug` tests, the 4
+  existing dashboard tests, and the 27 privacy tests).
+- Vite production build succeeds (used to regenerate the TanStack
+  Router gen file for the new routes).
+- Not verified end-to-end in a browser — same network-policy
+  limitation as before. You'll see the full UX after pulling this
+  branch and logging into staging with the test user.
+
+---
+
 ## Outstanding investigation — bug #29 (chat canvas stops updating)
 
 **Symptom**: after several chat turns, the assistant returns correct SQL,

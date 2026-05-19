@@ -33,7 +33,7 @@ import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppR
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { DatasetMetadataList } from "@/views/DataManagerApp/DatasetMetaView/DatasetMetadataList";
-import { DataSummaryView } from "@/views/DataManagerApp/DatasetMetaView/DataSummaryView";
+import { DatasetSummaryView } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView";
 import { ToggleOfflineOnlyButton } from "@/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
@@ -261,7 +261,7 @@ export function DatasetMetaView({ dataset }: Props): JSX.Element {
               "dataset-summary": () => {
                 return isLoadingFullDataset || !previewData || !datasetColumns ?
                     <Loader />
-                  : <DataSummaryView datasetId={dataset.id} />;
+                  : <DatasetSummaryView datasetId={dataset.id} />;
               },
             }}
           />

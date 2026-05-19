@@ -172,9 +172,10 @@ export function DashboardEditorView({
                   <ViewDashboardButton
                     workspaceSlug={workspaceSlug}
                     dashboardId={dashboard.id}
+                    hasUnsavedChanges={hasUnsavedChanges}
                   />
                   <PublishDashboardButton
-                    dashboardId={dashboard.id}
+                    dashboard={dashboard}
                     hasUnsavedChanges={hasUnsavedChanges}
                   />
                   <DeleteDashboardButton

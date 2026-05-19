@@ -1,33 +1,32 @@
 import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconWorld } from "@tabler/icons-react";
-import { notifyDevAlert, notifySuccess, Tooltip } from "@ui";
-import { DashboardClient } from "@/clients/dashboards/DashboardClient";
-import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
+import { notifyDevAlert, Tooltip } from "@ui";
+import { PublishDashboardModal } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/PublishDashboardModal";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 type Props = {
-  dashboardId: DashboardId | undefined;
+  dashboard: Dashboard.T | undefined;
   hasUnsavedChanges: boolean;
 };
 
 /**
- * Publish button for the dashboard editor. Disabled until the dashboard is
- * loaded and any pending edits have been saved, since publishing copies the
- * persisted config (not the in-memory edits) to the public bucket. Uses
- * `data-disabled` + `aria-disabled` rather than HTML `disabled` so the
- * tooltip explaining the disabled state can still fire on hover.
+ * Publish button for the dashboard editor. Opens the publish modal where
+ * the user can:
+ *   - Pick an optional vanity URL slug.
+ *   - Copy the share URL to clipboard.
+ *   - Generate a QR code for flyers / reports.
+ *
+ * Disabled until the dashboard is loaded and any pending edits have been
+ * saved, since publishing copies the persisted config (not the in-memory
+ * edits) to the public bucket. Uses `data-disabled` + `aria-disabled` so
+ * the tooltip explaining the disabled state can still fire on hover.
  */
 export function PublishDashboardButton({
-  dashboardId,
+  dashboard,
   hasUnsavedChanges,
 }: Props): JSX.Element {
-  const [publishDashboard, isPublishing] = DashboardClient.usePublishDashboard({
-    onSuccess: () => {
-      notifySuccess("Dashboard published!");
-    },
-  });
-
-  const isDisabled: boolean = !dashboardId || hasUnsavedChanges;
+  const isDisabled: boolean = !dashboard || hasUnsavedChanges;
 
   return (
     <Tooltip
@@ -35,13 +34,13 @@ export function PublishDashboardButton({
       disabled={!hasUnsavedChanges}
     >
       <Button
-        variant="outline"
+        variant={dashboard?.isPublic ? "filled" : "outline"}
+        color={dashboard?.isPublic ? "teal" : undefined}
         leftSection={<IconWorld size={16} />}
-        loading={isPublishing}
         data-disabled={isDisabled || undefined}
         aria-disabled={isDisabled || undefined}
         onClick={(event) => {
-          if (!dashboardId) {
+          if (!dashboard) {
             event.preventDefault();
             notifyDevAlert("Dashboard is not loaded yet.");
             return;
@@ -51,20 +50,21 @@ export function PublishDashboardButton({
             return;
           }
 
-          modals.openConfirmModal({
-            title: "Publish dashboard?",
-            children:
-              "This will make the dashboard public. You can change this later.",
-            labels: { confirm: "Publish", cancel: "Cancel" },
-            onConfirm: () => {
-              publishDashboard({
-                dashboardId,
-              });
-            },
+          const modalId = modals.open({
+            title: dashboard.isPublic ? "Manage sharing" : "Publish dashboard",
+            size: "lg",
+            children: (
+              <PublishDashboardModal
+                dashboard={dashboard}
+                onClose={() => {
+                  modals.close(modalId);
+                }}
+              />
+            ),
           });
         }}
       >
-        Publish
+        {dashboard?.isPublic ? "Published" : "Publish"}
       </Button>
     </Tooltip>
   );

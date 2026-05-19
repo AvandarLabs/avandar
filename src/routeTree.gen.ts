@@ -18,6 +18,7 @@ import { Route as AuthnoWorkspaceRouteRouteImport } from "./routes/_auth/(no-wor
 import { Route as AuthWorkspaceSlugRouteRouteImport } from "./routes/_auth/$workspaceSlug/route";
 import { Route as AuthnoWorkspaceIndexRouteImport } from "./routes/_auth/(no-workspace)/index";
 import { Route as AuthWorkspaceSlugIndexRouteImport } from "./routes/_auth/$workspaceSlug/index";
+import { Route as DWorkspaceSlugSlugRouteImport } from "./routes/d/$workspaceSlug.$slug";
 import { Route as AuthnoWorkspaceInvalidWorkspaceRouteImport } from "./routes/_auth/(no-workspace)/invalid-workspace";
 import { Route as AuthWorkspaceSlugSettingsRouteImport } from "./routes/_auth/$workspaceSlug/settings";
 import { Route as AuthWorkspaceSlugProfileRouteImport } from "./routes/_auth/$workspaceSlug/profile";
@@ -42,6 +43,7 @@ import { Route as AuthWorkspaceSlugDataManagerDatasetIdRouteImport } from "./rou
 import { Route as AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRouteImport } from "./routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/route";
 import { Route as AuthWorkspaceSlugEntityManagerEntityConfigIdIndexRouteImport } from "./routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/index";
 import { Route as AuthWorkspaceSlugEntityManagerEntityConfigIdEntityIdRouteImport } from "./routes/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId";
+import { Route as AuthWorkspaceSlugDashboardsPreviewDashboardIdRouteImport } from "./routes/_auth/$workspaceSlug/dashboards/preview/$dashboardId";
 import { Route as AuthWorkspaceSlugDashboardsEditDashboardIdRouteImport } from "./routes/_auth/$workspaceSlug/dashboards/edit/$dashboardId";
 
 const UpdatePasswordRoute = UpdatePasswordRouteImport.update({
@@ -86,6 +88,11 @@ const AuthWorkspaceSlugIndexRoute = AuthWorkspaceSlugIndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => AuthWorkspaceSlugRouteRoute,
+} as any);
+const DWorkspaceSlugSlugRoute = DWorkspaceSlugSlugRouteImport.update({
+  id: "/d/$workspaceSlug/$slug",
+  path: "/d/$workspaceSlug/$slug",
+  getParentRoute: () => rootRouteImport,
 } as any);
 const AuthnoWorkspaceInvalidWorkspaceRoute =
   AuthnoWorkspaceInvalidWorkspaceRouteImport.update({
@@ -232,6 +239,12 @@ const AuthWorkspaceSlugEntityManagerEntityConfigIdEntityIdRoute =
     getParentRoute: () =>
       AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRoute,
   } as any);
+const AuthWorkspaceSlugDashboardsPreviewDashboardIdRoute =
+  AuthWorkspaceSlugDashboardsPreviewDashboardIdRouteImport.update({
+    id: "/preview/$dashboardId",
+    path: "/preview/$dashboardId",
+    getParentRoute: () => AuthWorkspaceSlugDashboardsRouteRoute,
+  } as any);
 const AuthWorkspaceSlugDashboardsEditDashboardIdRoute =
   AuthWorkspaceSlugDashboardsEditDashboardIdRouteImport.update({
     id: "/edit/$dashboardId",
@@ -257,6 +270,7 @@ export interface FileRoutesByFullPath {
   "/$workspaceSlug/profile": typeof AuthWorkspaceSlugProfileRoute;
   "/$workspaceSlug/settings": typeof AuthWorkspaceSlugSettingsRoute;
   "/invalid-workspace": typeof AuthnoWorkspaceInvalidWorkspaceRoute;
+  "/d/$workspaceSlug/$slug": typeof DWorkspaceSlugSlugRoute;
   "/$workspaceSlug/": typeof AuthWorkspaceSlugIndexRoute;
   "/$workspaceSlug/entity-manager/$entityConfigId": typeof AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRouteWithChildren;
   "/$workspaceSlug/data-manager/$datasetId": typeof AuthWorkspaceSlugDataManagerDatasetIdRoute;
@@ -270,6 +284,7 @@ export interface FileRoutesByFullPath {
   "/$workspaceSlug/entity-designer/": typeof AuthWorkspaceSlugEntityDesignerIndexRoute;
   "/$workspaceSlug/entity-manager/": typeof AuthWorkspaceSlugEntityManagerIndexRoute;
   "/$workspaceSlug/dashboards/edit/$dashboardId": typeof AuthWorkspaceSlugDashboardsEditDashboardIdRoute;
+  "/$workspaceSlug/dashboards/preview/$dashboardId": typeof AuthWorkspaceSlugDashboardsPreviewDashboardIdRoute;
   "/$workspaceSlug/entity-manager/$entityConfigId/$entityId": typeof AuthWorkspaceSlugEntityManagerEntityConfigIdEntityIdRoute;
   "/$workspaceSlug/entity-manager/$entityConfigId/": typeof AuthWorkspaceSlugEntityManagerEntityConfigIdIndexRoute;
 }
@@ -287,6 +302,7 @@ export interface FileRoutesByTo {
   "/$workspaceSlug/profile": typeof AuthWorkspaceSlugProfileRoute;
   "/$workspaceSlug/settings": typeof AuthWorkspaceSlugSettingsRoute;
   "/invalid-workspace": typeof AuthnoWorkspaceInvalidWorkspaceRoute;
+  "/d/$workspaceSlug/$slug": typeof DWorkspaceSlugSlugRoute;
   "/$workspaceSlug": typeof AuthWorkspaceSlugIndexRoute;
   "/$workspaceSlug/data-manager/$datasetId": typeof AuthWorkspaceSlugDataManagerDatasetIdRoute;
   "/$workspaceSlug/data-manager/data-import": typeof AuthWorkspaceSlugDataManagerDataImportRoute;
@@ -299,6 +315,7 @@ export interface FileRoutesByTo {
   "/$workspaceSlug/entity-designer": typeof AuthWorkspaceSlugEntityDesignerIndexRoute;
   "/$workspaceSlug/entity-manager": typeof AuthWorkspaceSlugEntityManagerIndexRoute;
   "/$workspaceSlug/dashboards/edit/$dashboardId": typeof AuthWorkspaceSlugDashboardsEditDashboardIdRoute;
+  "/$workspaceSlug/dashboards/preview/$dashboardId": typeof AuthWorkspaceSlugDashboardsPreviewDashboardIdRoute;
   "/$workspaceSlug/entity-manager/$entityConfigId/$entityId": typeof AuthWorkspaceSlugEntityManagerEntityConfigIdEntityIdRoute;
   "/$workspaceSlug/entity-manager/$entityConfigId": typeof AuthWorkspaceSlugEntityManagerEntityConfigIdIndexRoute;
 }
@@ -322,6 +339,7 @@ export interface FileRoutesById {
   "/_auth/$workspaceSlug/profile": typeof AuthWorkspaceSlugProfileRoute;
   "/_auth/$workspaceSlug/settings": typeof AuthWorkspaceSlugSettingsRoute;
   "/_auth/(no-workspace)/invalid-workspace": typeof AuthnoWorkspaceInvalidWorkspaceRoute;
+  "/d/$workspaceSlug/$slug": typeof DWorkspaceSlugSlugRoute;
   "/_auth/$workspaceSlug/": typeof AuthWorkspaceSlugIndexRoute;
   "/_auth/(no-workspace)/": typeof AuthnoWorkspaceIndexRoute;
   "/_auth/$workspaceSlug/entity-manager/$entityConfigId": typeof AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRouteWithChildren;
@@ -336,6 +354,7 @@ export interface FileRoutesById {
   "/_auth/$workspaceSlug/entity-designer/": typeof AuthWorkspaceSlugEntityDesignerIndexRoute;
   "/_auth/$workspaceSlug/entity-manager/": typeof AuthWorkspaceSlugEntityManagerIndexRoute;
   "/_auth/$workspaceSlug/dashboards/edit/$dashboardId": typeof AuthWorkspaceSlugDashboardsEditDashboardIdRoute;
+  "/_auth/$workspaceSlug/dashboards/preview/$dashboardId": typeof AuthWorkspaceSlugDashboardsPreviewDashboardIdRoute;
   "/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId": typeof AuthWorkspaceSlugEntityManagerEntityConfigIdEntityIdRoute;
   "/_auth/$workspaceSlug/entity-manager/$entityConfigId/": typeof AuthWorkspaceSlugEntityManagerEntityConfigIdIndexRoute;
 }
@@ -359,6 +378,7 @@ export interface FileRouteTypes {
     | "/$workspaceSlug/profile"
     | "/$workspaceSlug/settings"
     | "/invalid-workspace"
+    | "/d/$workspaceSlug/$slug"
     | "/$workspaceSlug/"
     | "/$workspaceSlug/entity-manager/$entityConfigId"
     | "/$workspaceSlug/data-manager/$datasetId"
@@ -372,6 +392,7 @@ export interface FileRouteTypes {
     | "/$workspaceSlug/entity-designer/"
     | "/$workspaceSlug/entity-manager/"
     | "/$workspaceSlug/dashboards/edit/$dashboardId"
+    | "/$workspaceSlug/dashboards/preview/$dashboardId"
     | "/$workspaceSlug/entity-manager/$entityConfigId/$entityId"
     | "/$workspaceSlug/entity-manager/$entityConfigId/";
   fileRoutesByTo: FileRoutesByTo;
@@ -389,6 +410,7 @@ export interface FileRouteTypes {
     | "/$workspaceSlug/profile"
     | "/$workspaceSlug/settings"
     | "/invalid-workspace"
+    | "/d/$workspaceSlug/$slug"
     | "/$workspaceSlug"
     | "/$workspaceSlug/data-manager/$datasetId"
     | "/$workspaceSlug/data-manager/data-import"
@@ -401,6 +423,7 @@ export interface FileRouteTypes {
     | "/$workspaceSlug/entity-designer"
     | "/$workspaceSlug/entity-manager"
     | "/$workspaceSlug/dashboards/edit/$dashboardId"
+    | "/$workspaceSlug/dashboards/preview/$dashboardId"
     | "/$workspaceSlug/entity-manager/$entityConfigId/$entityId"
     | "/$workspaceSlug/entity-manager/$entityConfigId";
   id:
@@ -423,6 +446,7 @@ export interface FileRouteTypes {
     | "/_auth/$workspaceSlug/profile"
     | "/_auth/$workspaceSlug/settings"
     | "/_auth/(no-workspace)/invalid-workspace"
+    | "/d/$workspaceSlug/$slug"
     | "/_auth/$workspaceSlug/"
     | "/_auth/(no-workspace)/"
     | "/_auth/$workspaceSlug/entity-manager/$entityConfigId"
@@ -437,6 +461,7 @@ export interface FileRouteTypes {
     | "/_auth/$workspaceSlug/entity-designer/"
     | "/_auth/$workspaceSlug/entity-manager/"
     | "/_auth/$workspaceSlug/dashboards/edit/$dashboardId"
+    | "/_auth/$workspaceSlug/dashboards/preview/$dashboardId"
     | "/_auth/$workspaceSlug/entity-manager/$entityConfigId/$entityId"
     | "/_auth/$workspaceSlug/entity-manager/$entityConfigId/";
   fileRoutesById: FileRoutesById;
@@ -447,6 +472,7 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute;
   SigninRoute: typeof SigninRoute;
   UpdatePasswordRoute: typeof UpdatePasswordRoute;
+  DWorkspaceSlugSlugRoute: typeof DWorkspaceSlugSlugRoute;
   PublicDashboardsWorkspaceSlugDashboardIdRoute: typeof PublicDashboardsWorkspaceSlugDashboardIdRoute;
 }
 
@@ -514,6 +540,13 @@ declare module "@tanstack/react-router" {
       fullPath: "/$workspaceSlug/";
       preLoaderRoute: typeof AuthWorkspaceSlugIndexRouteImport;
       parentRoute: typeof AuthWorkspaceSlugRouteRoute;
+    };
+    "/d/$workspaceSlug/$slug": {
+      id: "/d/$workspaceSlug/$slug";
+      path: "/d/$workspaceSlug/$slug";
+      fullPath: "/d/$workspaceSlug/$slug";
+      preLoaderRoute: typeof DWorkspaceSlugSlugRouteImport;
+      parentRoute: typeof rootRouteImport;
     };
     "/_auth/(no-workspace)/invalid-workspace": {
       id: "/_auth/(no-workspace)/invalid-workspace";
@@ -683,6 +716,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AuthWorkspaceSlugEntityManagerEntityConfigIdEntityIdRouteImport;
       parentRoute: typeof AuthWorkspaceSlugEntityManagerEntityConfigIdRouteRoute;
     };
+    "/_auth/$workspaceSlug/dashboards/preview/$dashboardId": {
+      id: "/_auth/$workspaceSlug/dashboards/preview/$dashboardId";
+      path: "/preview/$dashboardId";
+      fullPath: "/$workspaceSlug/dashboards/preview/$dashboardId";
+      preLoaderRoute: typeof AuthWorkspaceSlugDashboardsPreviewDashboardIdRouteImport;
+      parentRoute: typeof AuthWorkspaceSlugDashboardsRouteRoute;
+    };
     "/_auth/$workspaceSlug/dashboards/edit/$dashboardId": {
       id: "/_auth/$workspaceSlug/dashboards/edit/$dashboardId";
       path: "/edit/$dashboardId";
@@ -696,6 +736,7 @@ declare module "@tanstack/react-router" {
 interface AuthWorkspaceSlugDashboardsRouteRouteChildren {
   AuthWorkspaceSlugDashboardsIndexRoute: typeof AuthWorkspaceSlugDashboardsIndexRoute;
   AuthWorkspaceSlugDashboardsEditDashboardIdRoute: typeof AuthWorkspaceSlugDashboardsEditDashboardIdRoute;
+  AuthWorkspaceSlugDashboardsPreviewDashboardIdRoute: typeof AuthWorkspaceSlugDashboardsPreviewDashboardIdRoute;
 }
 
 const AuthWorkspaceSlugDashboardsRouteRouteChildren: AuthWorkspaceSlugDashboardsRouteRouteChildren =
@@ -704,6 +745,8 @@ const AuthWorkspaceSlugDashboardsRouteRouteChildren: AuthWorkspaceSlugDashboards
       AuthWorkspaceSlugDashboardsIndexRoute,
     AuthWorkspaceSlugDashboardsEditDashboardIdRoute:
       AuthWorkspaceSlugDashboardsEditDashboardIdRoute,
+    AuthWorkspaceSlugDashboardsPreviewDashboardIdRoute:
+      AuthWorkspaceSlugDashboardsPreviewDashboardIdRoute,
   };
 
 const AuthWorkspaceSlugDashboardsRouteRouteWithChildren =
@@ -850,6 +893,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   SigninRoute: SigninRoute,
   UpdatePasswordRoute: UpdatePasswordRoute,
+  DWorkspaceSlugSlugRoute: DWorkspaceSlugSlugRoute,
   PublicDashboardsWorkspaceSlugDashboardIdRoute:
     PublicDashboardsWorkspaceSlugDashboardIdRoute,
 };

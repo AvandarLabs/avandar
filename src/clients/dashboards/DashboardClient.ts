@@ -32,8 +32,15 @@ export const DashboardClient = createUsableServiceClient(
          */
         publishDashboard: async (params: {
           dashboardId: Dashboard.Id;
+          /**
+           * Optional vanity slug. The caller is responsible for snake-casing /
+           * sanitising; the server-side uniqueness constraint catches
+           * collisions. When omitted, the dashboard remains accessible by id
+           * but no vanity URL is registered.
+           */
+          slug?: string;
         }): Promise<Dashboard.T> => {
-          const { dashboardId } = params;
+          const { dashboardId, slug } = params;
           const logger = config.clientLogger.appendName("publishDashboard");
 
           const dashboard = await DashboardClient.getById({
@@ -175,7 +182,10 @@ export const DashboardClient = createUsableServiceClient(
             });
           }
 
-          const updateModel: Partial<Dashboard.T> = { isPublic: true };
+          const updateModel: Partial<Dashboard.T> = {
+            isPublic: true,
+            ...(slug ? { slug } : {}),
+          };
           const dbUpdate =
             config.parsers.fromModelUpdateToDBUpdate(updateModel);
 

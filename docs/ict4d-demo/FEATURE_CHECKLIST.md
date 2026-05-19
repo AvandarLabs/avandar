@@ -52,16 +52,23 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started
 - [~] **6. Bidirectional SQL ↔ manual-query-form sync** (Data Explorer: knex-based form → SQL regeneration + lossy-mapping warning + overwrite-confirmation flow. Dashboards still pending.)
 - [ ] **7. Tokenize generated SQL / Python / R — column names + dataset IDs as clickable pills**
 - [ ] **8. Multilingual voice dictation in chat panel (Whisper / transformers.js, 6 languages)**
-- [ ] **9. Redesigned dataset Summary view (visualizations, lazy-load, scroll-on-demand)**
+- [x] **9. Redesigned dataset Summary view (visualizations, lazy-load, scroll-on-demand)**
+  - Doc-style outline with sticky TOC on the left, plain-language headline per column, type-appropriate viz beneath (bar for text top values, range+stddev for numbers, timeline for dates), missing-rate ring when nonzero.
+  - Lazy-loaded per column: `getColumnSummary` only fires when a section is within 200px of the viewport.
 - [ ] **10. Dashboard polish: spacing, typography, color, editable design + semantic tokens, logo upload**
 - [ ] **11. Dashboard media: video / image / media embed via Supabase Storage**
-- [ ] **12. Dashboard publish options: PDF export, QR code, vanity URL**
+- [~] **12. Dashboard publish options: PDF export, QR code, vanity URL**
+  - [x] Vanity URL (optional; auto snake-cased; lands at `/d/<workspaceSlug>/<slug>`).
+  - [x] Copy share link to clipboard.
+  - [x] QR code (rendered client-side via `qrcode`, downloadable as PNG).
+  - [ ] PDF export.
 - [ ] **13. Workspace-private dashboard sharing via Share modal (dashboards as shareable resources)**
 - [ ] **14. Slice-aware public publishing (package only the data slices the dashboard reads)**
 - [ ] **15. Viewer-editable global dashboard filters**
 - [ ] **16. Viewer-editable per-viz dashboard filters**
 - [ ] **17. Publish-time slice picker (default = dashboard creator's slices; opt in to more)**
-- [ ] **18. Make dashboard "View" button work before "Publish"**
+- [x] **18. Make dashboard "View" button work before "Publish"**
+  - New auth-gated preview route at `/<workspaceSlug>/dashboards/preview/<dashboardId>` shows the read-only render with a "Back to editor" banner. Public route at `/public/dashboards/...` still enforces `isPublic`.
 - [~] **19. Everything still works in Desktop + offline mode** — requires items #2 and #8 first
 - [~] **20. Manual querying works offline (LLM queries don't, but manual must)** — manual query form already works locally; needs verification once dashboard work lands
 - [ ] **21. Manual query form available inside dashboards**
