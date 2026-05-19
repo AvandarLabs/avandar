@@ -3,6 +3,7 @@ import type {
   DataExplorerAppState,
   OpenDatasetInfo,
 } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { OrderByDirection } from "$/models/queries/StructuredQuery/StructuredQuery.types";
 import type { VizConfig } from "$/models/vizs/VizConfig/VizConfig.types";
@@ -122,13 +123,22 @@ export function parseURLSearch(search: DataExplorerURLSearch): ParsedURLState {
       const raw = JSON.parse(search.od) as {
         did: string;
         name: string;
-        vid: string;
+        st?: string;
+        vid?: string;
       };
-      if (raw.did && raw.name && raw.vid) {
+      if (raw.did && raw.name) {
+        // Older URLs were emitted before non-virtual datasets could be
+        // opened; fall back to "virtual" so legacy links keep loading.
+        const sourceType = (raw.st ??
+          "virtual") as DatasetSource.SourceType;
         result.openDataset = {
           datasetId: raw.did as OpenDatasetInfo["datasetId"],
           name: raw.name,
-          virtualDatasetId: raw.vid as OpenDatasetInfo["virtualDatasetId"],
+          sourceType,
+          virtualDatasetId:
+            raw.vid ?
+              (raw.vid as NonNullable<OpenDatasetInfo["virtualDatasetId"]>)
+            : undefined,
         };
       }
     } catch {
@@ -208,11 +218,13 @@ export function serializeStateToURL(
   }
 
   if (state.openDataset) {
-    const { datasetId, name, virtualDatasetId } = state.openDataset;
+    const { datasetId, name, sourceType, virtualDatasetId } =
+      state.openDataset;
     params.od = JSON.stringify({
       did: datasetId,
       name,
-      vid: virtualDatasetId,
+      st: sourceType,
+      ...(virtualDatasetId ? { vid: virtualDatasetId } : {}),
     });
   }
 

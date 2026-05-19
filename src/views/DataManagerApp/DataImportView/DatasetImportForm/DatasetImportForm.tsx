@@ -150,6 +150,13 @@ type Props = {
    * default post-save navigation runs.
    */
   onAfterSave?: () => void;
+
+  /**
+   * If set, this callback is invoked with the saved dataset instead of
+   * navigating to the dataset detail page on success. Forwarded to
+   * `useSaveDataset`.
+   */
+  onSaveSuccess?: (dataset: Dataset.T) => void;
 };
 
 /**
@@ -167,6 +174,7 @@ export function DatasetImportForm({
   isProcessing = false,
   dataSourceMetadata,
   onAfterSave,
+  onSaveSuccess,
 }: Props): JSX.Element {
   const nameInputRef = useRef<HTMLInputElement>(null);
   const descriptionInputRef = useRef<HTMLInputElement>(null);
@@ -190,7 +198,10 @@ export function DatasetImportForm({
     },
   });
 
-  const [saveDataset, isSavePending] = useSaveDataset({ onAfterSave });
+  const [saveDataset, isSavePending] = useSaveDataset({
+    onAfterSave,
+    onSaveSuccess,
+  });
 
   const previewRows = useMemo(() => {
     return rows.slice(0, AppConfig.dataManagerApp.maxPreviewRows);

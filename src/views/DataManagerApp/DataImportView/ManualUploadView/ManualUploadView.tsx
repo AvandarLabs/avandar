@@ -25,6 +25,12 @@ type Props = BoxProps & {
    * Used by the app-wide import modal to close itself.
    */
   onAfterSave?: () => void;
+
+  /**
+   * When set, this callback is invoked with the newly saved dataset instead
+   * of the default navigation to the dataset detail page.
+   */
+  onSaveSuccess?: (dataset: Dataset.T) => void;
 };
 
 function _fileMimeTypeToSourceType(file: File): "csv_file" | "xlsx_file" {
@@ -56,6 +62,7 @@ function _fileMimeTypeToSourceType(file: File): "csv_file" | "xlsx_file" {
 export function ManualUploadView({
   initialFile,
   onAfterSave,
+  onSaveSuccess,
   ...boxProps
 }: Props): JSX.Element {
   const [uploadedFile, setUploadedFile] = useState<File | undefined>();
@@ -134,6 +141,7 @@ export function ManualUploadView({
           rows={previewRows}
           dataSourceMetadata={dataSourceMetadata}
           parseOptions={parseOptions}
+          onSaveSuccess={onSaveSuccess}
           onDataSourceMetadataChange={(metadata) => {
             setDataSourceMetadata(metadata as ManualUploadDataSourceMetadata);
           }}

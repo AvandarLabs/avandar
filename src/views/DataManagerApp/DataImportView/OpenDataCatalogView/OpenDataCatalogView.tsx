@@ -30,10 +30,17 @@ import { resolveOpenDataDatasetColumnInputs } from "@/views/DataManagerApp/DataI
 import { OpenDataCatalogEntryDetail } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryDetail";
 import { OpenDataCatalogEntryList } from "@/views/DataManagerApp/DataImportView/OpenDataCatalogView/OpenDataCatalogEntryList";
 import type { OpenDataCatalogEntryRead } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type Props = BoxProps & {
   /** When false, the add action is disabled (subscription limits). */
   isAddAllowed: boolean;
+
+  /**
+   * When set, this callback is invoked with the newly saved dataset after
+   * a successful catalog-entry import.
+   */
+  onSaveSuccess?: (dataset: Dataset.T) => void;
 };
 
 /**
@@ -42,6 +49,7 @@ type Props = BoxProps & {
  */
 export function OpenDataCatalogView({
   isAddAllowed,
+  onSaveSuccess,
   ...boxProps
 }: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
@@ -101,6 +109,7 @@ export function OpenDataCatalogView({
           title: "Dataset added",
           message: `"${dataset.name}" is now in your workspace.`,
         });
+        onSaveSuccess?.(dataset);
       },
       queriesToInvalidate: [DatasetClient.QueryKeys.getAll()],
     });

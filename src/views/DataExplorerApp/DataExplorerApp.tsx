@@ -8,6 +8,7 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import {
   IconAdjustmentsHorizontal,
@@ -31,7 +32,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { downloadRowsAsCSV } from "@/views/DataExplorerApp/downloadRowsAsCSV";
 import { GeneratedPromptBadge } from "@/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge";
-import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetModal/OpenDatasetModal";
+import { OpenDatasetDrawer } from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetDrawer";
 import { QueryDetailsBody } from "@/views/DataExplorerApp/QueryDetailsBody/QueryDetailsBody";
 import { SaveAsNewDatasetForm } from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm";
 import { SaveToDashboardModal } from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal";
@@ -55,6 +56,10 @@ type Props = {
 export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
   const state = DataExplorerStateManager.useState();
   const dispatch = DataExplorerStateManager.useDispatch();
+  const [
+    isOpenDatasetDrawerOpen,
+    { open: openOpenDatasetDrawer, close: closeOpenDatasetDrawer },
+  ] = useDisclosure(false);
 
   const [isQueryDetailsOpened, setQueryDetailsOpened] = useState(false);
   const [isQueryDetailsCollapsed, setQueryDetailsCollapsed] = useState(false);
@@ -93,9 +98,6 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     workspaceId: workspace.id,
   });
 
-  // Mirror useDataQuery's runtime error onto state so the chat panel can
-  // show a "Regenerate with the error" affordance when the auto-applied SQL
-  // turned out to be invalid.
   useEffect(() => {
     const message =
       dataQuery.isError ?
@@ -156,9 +158,6 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
     dispatch,
   ]);
 
-  // Auto-open the Settings floating window each time a query succeeds, so
-  // the user can immediately tweak how the viz looks. Leaves the user's
-  // collapsed/expanded state alone if the window is already open.
   const wasFetchingRef = useRef(false);
   const isSettingsOpenedRef = useRef(isSettingsOpened);
   isSettingsOpenedRef.current = isSettingsOpened;
@@ -233,20 +232,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
             color="neutral"
             leftSection={<IconFolderOpen size={16} />}
             size="compact-sm"
-            onClick={() => {
-              modals.open({
-                title: "Open Dataset",
-                size: "lg",
-                children: (
-                  <OpenDatasetModal
-                    onOpen={(info, rawSQL) => {
-                      dispatch.setRawSql(rawSQL);
-                      dispatch.setOpenDataset(info);
-                    }}
-                  />
-                ),
-              });
-            }}
+            onClick={openOpenDatasetDrawer}
           >
             Open
           </Button>
@@ -264,20 +250,24 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
             <Menu.Dropdown>
               {state.openDataset ?
                 <>
-                  <Menu.Item
-                    disabled={!state.rawSQL || isSavingOver}
-                    onClick={() => {
-                      if (!state.rawSQL || !state.openDataset) {
-                        return;
-                      }
-                      saveOverDataset({
-                        id: state.openDataset.virtualDatasetId,
-                        data: { rawSQL: state.rawSQL },
-                      });
-                    }}
-                  >
-                    Save - {state.openDataset.name}
-                  </Menu.Item>
+                  {state.openDataset.virtualDatasetId ?
+                    <Menu.Item
+                      disabled={!state.rawSQL || isSavingOver}
+                      onClick={() => {
+                        const virtualDatasetId =
+                          state.openDataset?.virtualDatasetId;
+                        if (!state.rawSQL || !virtualDatasetId) {
+                          return;
+                        }
+                        saveOverDataset({
+                          id: virtualDatasetId,
+                          data: { rawSQL: state.rawSQL },
+                        });
+                      }}
+                    >
+                      Save — {state.openDataset.name}
+                    </Menu.Item>
+                  : null}
                   <Menu.Item
                     color="red"
                     disabled={isDeletingDataset}
@@ -309,7 +299,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
                       });
                     }}
                   >
-                    Delete - {state.openDataset.name}
+                    Delete — {state.openDataset.name}
                   </Menu.Item>
                   <Menu.Divider />
                 </>
@@ -449,6 +439,15 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
           onVizTypeChange={dispatch.setActiveVizType}
         />
       </FloatingPanel>
+      <OpenDatasetDrawer
+        opened={isOpenDatasetDrawerOpen}
+        onClose={closeOpenDatasetDrawer}
+        onOpen={(info, rawSQL) => {
+          dispatch.setRawSql(rawSQL);
+          dispatch.setOpenDataset(info);
+          closeOpenDatasetDrawer();
+        }}
+      />
     </AppLayout>
   );
 }

@@ -1,0 +1,33 @@
+.content {
+  background: var(--ava-surface-overlay);
+  border-left: 1px solid var(--ava-border-default);
+  box-shadow: var(--mantine-shadow-lg);
+}
+
+.header {
+  background: var(--ava-surface-overlay);
+  border-bottom: 1px solid var(--ava-border-default);
+}
+
+.body {
+  background: var(--ava-surface-overlay);
+}
+
+/**
+ * When `boundary` is set, the drawer is portaled into a parent element and
+ * must position itself relative to that parent rather than the viewport.
+ * Mantine's default `position: fixed` on `root`, `inner`, and `overlay`
+ * would otherwise escape the parent and span the whole window.
+ */
+.scopedRoot {
+  inset: 0;
+  position: absolute;
+}
+
+.scopedInner {
+  position: absolute;
+}
+
+.scopedOverlay {
+  position: absolute;
+}

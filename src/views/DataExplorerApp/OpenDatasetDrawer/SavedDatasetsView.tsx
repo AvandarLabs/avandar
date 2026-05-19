@@ -1,6 +1,7 @@
 import { useMutation } from "@hooks";
 import {
   ActionIcon,
+  Badge,
   Button,
   Group,
   Stack,
@@ -14,23 +15,35 @@ import { IconSearch, IconTrash } from "@tabler/icons-react";
 import { notifyError, notifySuccess } from "@ui";
 import { where } from "@utils";
 import { useState } from "react";
+import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { buildSelectAllPreviewSQL } from "@/views/DataExplorerApp/OpenDatasetDrawer/datasetPreviewSQL";
 import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 
 type Props = {
   onOpen: (info: OpenDatasetInfo, rawSQL: string) => void;
 };
 
+const SOURCE_TYPE_LABEL: Record<DatasetSource.SourceType, string> = {
+  csv_file: "CSV",
+  xlsx_file: "Excel",
+  google_sheets: "Google Sheets",
+  open_data: "Open data",
+  virtual: "Derived",
+};
+
 /**
- * Modal body for browsing and opening saved (virtual) datasets in the
- * Data Explorer. Only datasets created via AI query ("virtual" source type)
- * have a raw SQL query that can be loaded back into the explorer.
+ * Lists every saved dataset in the workspace. Opening a derived (virtual)
+ * dataset runs its stored SQL; opening any other dataset runs
+ * `SELECT * FROM "<datasetId>" LIMIT 100` so the user lands on the dataset's
+ * raw rows in the Data Explorer canvas.
  */
-export function OpenDatasetModal({ onOpen }: Props): JSX.Element {
+export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 200);
@@ -40,15 +53,11 @@ export function OpenDatasetModal({ onOpen }: Props): JSX.Element {
     useQueryOptions: { enabled: true },
   });
 
-  const virtualDatasets = (datasets ?? []).filter((d) => {
-    return d.sourceType === "virtual";
-  });
-
-  const filtered = virtualDatasets.filter((d) => {
+  const filtered = (datasets ?? []).filter((dataset) => {
     if (!debouncedSearch) {
       return true;
     }
-    return d.name.toLowerCase().includes(debouncedSearch.toLowerCase());
+    return dataset.name.toLowerCase().includes(debouncedSearch.toLowerCase());
   });
 
   const [deleteDataset, isDeletingDataset] = DatasetClient.useFullDelete({
@@ -82,16 +91,38 @@ export function OpenDatasetModal({ onOpen }: Props): JSX.Element {
         {
           datasetId: dataset.id,
           name: dataset.name,
+          sourceType: "virtual",
           virtualDatasetId: virtualDataset.id,
         },
         virtualDataset.rawSQL,
       );
-      modals.closeAll();
     },
     onError: (error: Error) => {
       notifyError(error.message);
     },
   });
+
+  const openAsRawPreview = (dataset: Dataset.T) => {
+    onOpen(
+      {
+        datasetId: dataset.id,
+        name: dataset.name,
+        sourceType: dataset.sourceType,
+      },
+      buildSelectAllPreviewSQL(dataset.id),
+    );
+  };
+
+  const onOpenClick = (dataset: Dataset.T) => {
+    match(dataset.sourceType)
+      .with("virtual", () => {
+        loadVirtualDataset(dataset);
+      })
+      .with("csv_file", "xlsx_file", "google_sheets", "open_data", () => {
+        openAsRawPreview(dataset);
+      })
+      .exhaustive();
+  };
 
   const onDeleteClick = (dataset: Dataset.T) => {
     modals.openConfirmModal({
@@ -135,7 +166,8 @@ export function OpenDatasetModal({ onOpen }: Props): JSX.Element {
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Name</Table.Th>
-              <Table.Th w={100} />
+              <Table.Th w={120}>Type</Table.Th>
+              <Table.Th w={140} />
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -144,13 +176,19 @@ export function OpenDatasetModal({ onOpen }: Props): JSX.Element {
                 <Table.Tr key={dataset.id}>
                   <Table.Td>{dataset.name}</Table.Td>
                   <Table.Td>
+                    <Badge color="neutral" variant="light" size="sm">
+                      {SOURCE_TYPE_LABEL[dataset.sourceType] ??
+                        dataset.sourceType}
+                    </Badge>
+                  </Table.Td>
+                  <Table.Td>
                     <Group gap="xs" justify="flex-end">
                       <Button
                         size="compact-xs"
                         variant="light"
                         disabled={isBusy}
                         onClick={() => {
-                          loadVirtualDataset(dataset);
+                          onOpenClick(dataset);
                         }}
                       >
                         Open
