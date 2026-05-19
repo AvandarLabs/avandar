@@ -14,7 +14,7 @@ import {
   createSupabaseAdminClient,
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
-import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
+import { MEDIUM_WAIT } from "./helpers/timeouts";
 import type { SeededVizConfig } from "./helpers/createDashboardWithDataVizBlock";
 
 /**
@@ -192,13 +192,13 @@ test.describe("DataViz PBlock - every visualization", () => {
 
     await expect(
       page.getByText("Data processed successfully", { exact: false }),
-    ).toBeVisible({ timeout: LONG_WAIT });
+    ).toBeVisible({ timeout: MEDIUM_WAIT });
 
     const formattedRowCount =
       SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT.toLocaleString("en-US");
     await expect(
       page.getByText(`Parsed ${formattedRowCount} rows successfully`),
-    ).toBeVisible({ timeout: LONG_WAIT });
+    ).toBeVisible({ timeout: MEDIUM_WAIT });
 
     await ensureCloudStorageCheckedAndSaveDataset({
       page,

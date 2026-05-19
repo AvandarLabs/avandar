@@ -7,7 +7,7 @@ import {
   setGeneralAccessV2,
 } from "./datasetSharingFlowV2";
 import { ensureCloudStorageCheckedAndSaveDataset } from "./manualUploadCloudSyncFlow";
-import { LONG_WAIT } from "./timeouts";
+import { LONG_WAIT, MEDIUM_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
 import type { RoleLevel } from "$/models/Permissions/Permissions.types";
 
@@ -34,7 +34,7 @@ export async function uploadCaliforniaCsvDataset(options: {
 
   await expect(
     page.getByText("Data processed successfully", { exact: false }),
-  ).toBeVisible({ timeout: LONG_WAIT });
+  ).toBeVisible({ timeout: MEDIUM_WAIT });
 
   await page.getByLabel("Dataset name").fill(datasetName);
 
