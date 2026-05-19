@@ -1,7 +1,6 @@
 import {
   Alert,
   Anchor,
-  Badge,
   Button,
   Code,
   Divider,
@@ -27,17 +26,18 @@ type Props = {
 };
 
 /**
- * Drives the publish-or-update-share flow. Three logical states:
+ * Drives the publish-or-update-share flow.
  *
- *   1) Not yet published — show the form (vanity URL field, publish button).
- *      After successful publish, transition to state 3.
- *   2) Already published, no vanity slug — show the canonical share URL +
- *      lets the user optionally add a vanity URL via the form.
- *   3) Already published with a vanity slug — show both URLs.
+ * Pre-publish: lead with the URL the dashboard will be published to
+ * (the canonical UUID URL by default; updates live as the user types a
+ * custom slug). On publish, show the same URL with copy + QR
+ * affordances. The user can come back later and add or change a
+ * vanity slug via the same modal.
  *
  * Vanity URLs go to `/d/<workspaceSlug>/<slug>`; the canonical
  * dashboardId URL at `/public/dashboards/<workspaceSlug>/<dashboardId>`
- * is always available and is what the QR code falls back to.
+ * is always available, so even if someone changes the vanity slug the
+ * canonical URL keeps working.
  */
 export function PublishDashboardModal({
   dashboard,
@@ -65,21 +65,16 @@ export function PublishDashboardModal({
     return toVanitySlug(slugInput);
   }, [slugInput]);
 
-  const shareUrls = buildShareUrls({
+  // The URL the dashboard will be (or has been) published to. Prefers
+  // the live vanity preview when the user has typed something; falls
+  // back to the canonical UUID URL otherwise.
+  const livePreviewUrls = buildShareUrls({
     workspaceSlug: workspace.slug,
     dashboardId: dashboard.id,
-    slug: dashboard.slug,
+    slug: normalisedSlug || dashboard.slug,
   });
-  // Live preview of what the vanity URL would be _after_ submitting the
-  // form. Used as the share row when the dashboard already has a slug.
-  const previewVanityUrl =
-    normalisedSlug ?
-      buildShareUrls({
-        workspaceSlug: workspace.slug,
-        dashboardId: dashboard.id,
-        slug: normalisedSlug,
-      }).vanity
-    : undefined;
+  const targetUrl = livePreviewUrls.vanity ?? livePreviewUrls.canonical;
+  const isUsingVanity = Boolean(livePreviewUrls.vanity);
 
   const isAlreadyPublished = dashboard.isPublic;
 
@@ -108,61 +103,93 @@ export function PublishDashboardModal({
         </Alert>
       }
 
-      <Stack gap={4}>
-        <Title order={5}>Vanity URL</Title>
+      <Stack gap={6}>
+        <Text size="sm" fw={500}>
+          {isAlreadyPublished ?
+            "Your dashboard is published at:"
+          : "Your dashboard will be published to:"}
+        </Text>
+        <Code
+          block
+          style={{
+            wordBreak: "break-all",
+            fontSize: "0.9em",
+            padding: "8px 12px",
+          }}
+        >
+          {targetUrl}
+        </Code>
         <Text size="xs" c="dimmed">
-          Optional. A short, memorable URL for flyers, reports, and QR codes.
-          Leave blank to publish without one — you'll still get a shareable
-          link.
+          {isUsingVanity ?
+            "Using your custom URL. The permanent UUID link below also still works."
+          : "By default we use a permanent UUID-based link. Add a custom path below for a nicer URL."}
+        </Text>
+      </Stack>
+
+      <Divider />
+
+      <Stack gap={4}>
+        <Title order={5} fw={600}>
+          Custom URL (optional)
+        </Title>
+        <Text size="xs" c="dimmed">
+          A short, memorable URL for flyers, reports, and QR codes. Whatever
+          you type is kebab-cased automatically.
         </Text>
         <TextInput
-          label="Custom path"
-          description="Lowercase letters, numbers, and underscores. We'll auto-format what you type."
-          placeholder="my_cholera_report"
+          aria-label="Custom URL path"
+          placeholder="e.g. cholera-outbreak-2024"
           value={slugInput}
           onChange={(e) => {
             return setSlugInput(e.currentTarget.value);
           }}
           rightSection={
             normalisedSlug ?
-              <Badge size="sm" variant="light" color="blue" mr="sm">
+              <Code
+                style={{
+                  fontSize: "0.78em",
+                  padding: "1px 6px",
+                  marginRight: 8,
+                  whiteSpace: "nowrap",
+                }}
+              >
                 {normalisedSlug}
-              </Badge>
+              </Code>
             : null
           }
-          rightSectionWidth={150}
+          rightSectionWidth={160}
         />
-        {normalisedSlug && previewVanityUrl ?
-          <Text size="xs" c="dimmed">
-            URL preview: <Code>{previewVanityUrl}</Code>
-          </Text>
-        : null}
       </Stack>
 
-      <Divider />
-
       {isAlreadyPublished ?
-        <Stack gap="md">
-          <Title order={5}>Share</Title>
-          {shareUrls.vanity ?
+        <>
+          <Divider />
+          <Stack gap="md">
+            <Title order={5} fw={600}>
+              Share
+            </Title>
+            {livePreviewUrls.vanity ?
+              <ShareUrlRow
+                label="Custom URL"
+                url={livePreviewUrls.vanity}
+                hint="Best for flyers, QR codes, and word-of-mouth sharing."
+              />
+            : null}
             <ShareUrlRow
-              label="Vanity URL"
-              url={shareUrls.vanity}
-              hint="Best for flyers, QR codes, and word-of-mouth sharing."
+              label={
+                livePreviewUrls.vanity ?
+                  "Permanent link (always works)"
+                : "Share link"
+              }
+              url={livePreviewUrls.canonical}
+              hint={
+                livePreviewUrls.vanity ?
+                  "Falls back to this if the custom URL ever changes."
+                : "Anyone with this link can view the dashboard."
+              }
             />
-          : null}
-          <ShareUrlRow
-            label={
-              shareUrls.vanity ? "Permanent link (always works)" : "Share link"
-            }
-            url={shareUrls.canonical}
-            hint={
-              shareUrls.vanity ?
-                "Falls back to this if the vanity URL ever changes."
-              : "Anyone with this link can view the dashboard."
-            }
-          />
-        </Stack>
+          </Stack>
+        </>
       : null}
 
       <Group justify="space-between" mt="md">
@@ -180,7 +207,7 @@ export function PublishDashboardModal({
           >
             {isAlreadyPublished ?
               normalisedSlug && normalisedSlug !== dashboard.slug ?
-                "Update vanity URL"
+                "Update custom URL"
               : "Already published"
             : "Publish"}
           </Button>

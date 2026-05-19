@@ -26,7 +26,6 @@ export function ChatPanel(): JSX.Element {
     <Box h="100%" py="xs" pr="xs">
       <Stack
         h="100%"
-        bg={disabled ? undefined : "white"}
         bdrs="md"
         className={clsx(css.shell, disabled && css.shellDisabled)}
         gap={0}

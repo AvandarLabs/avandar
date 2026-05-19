@@ -6,30 +6,31 @@ describe("toVanitySlug", () => {
     expect(toVanitySlug("MyReport")).toBe("myreport");
   });
 
-  it("snake-cases spaces", () => {
-    expect(toVanitySlug("my cholera report")).toBe("my_cholera_report");
+  it("kebab-cases spaces", () => {
+    expect(toVanitySlug("my cholera report")).toBe("my-cholera-report");
   });
 
-  it("collapses runs of non-alphanumeric to a single underscore", () => {
-    expect(toVanitySlug("my  --  report")).toBe("my_report");
-    expect(toVanitySlug("foo/bar/baz")).toBe("foo_bar_baz");
+  it("collapses runs of non-alphanumeric to a single dash", () => {
+    expect(toVanitySlug("my  --  report")).toBe("my-report");
+    expect(toVanitySlug("foo/bar/baz")).toBe("foo-bar-baz");
+    expect(toVanitySlug("foo___bar")).toBe("foo-bar");
   });
 
-  it("trims leading and trailing underscores", () => {
-    expect(toVanitySlug("__report__")).toBe("report");
+  it("trims leading and trailing dashes", () => {
+    expect(toVanitySlug("--report--")).toBe("report");
     expect(toVanitySlug(" report ")).toBe("report");
   });
 
   it("returns empty string for input that collapses to nothing", () => {
     expect(toVanitySlug("")).toBe("");
     expect(toVanitySlug("   ")).toBe("");
-    expect(toVanitySlug("___")).toBe("");
+    expect(toVanitySlug("---")).toBe("");
     expect(toVanitySlug("!@#$%")).toBe("");
   });
 
   it("strips diacritics so accented characters don't break the slug", () => {
-    expect(toVanitySlug("café review")).toBe("cafe_review");
-    expect(toVanitySlug("número uno")).toBe("numero_uno");
+    expect(toVanitySlug("café review")).toBe("cafe-review");
+    expect(toVanitySlug("número uno")).toBe("numero-uno");
   });
 
   it("caps at 64 characters", () => {
@@ -38,6 +39,6 @@ describe("toVanitySlug", () => {
   });
 
   it("preserves numbers", () => {
-    expect(toVanitySlug("2024 q1 report")).toBe("2024_q1_report");
+    expect(toVanitySlug("2024 q1 report")).toBe("2024-q1-report");
   });
 });
