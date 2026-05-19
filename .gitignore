@@ -66,3 +66,6 @@ etl-output/
 
 # Claude Code per-session runtime state
 .claude/scheduled_tasks*
+
+# Large generated test files for memory/perf benchmarking (do not commit)
+tests/data/large/

@@ -33,6 +33,7 @@ import {
   DuckDbStructuredQuery,
 } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
+import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { Logger } from "@/utils/Logger";
 import { arrowFieldToQueryResultField } from "./arrowFieldToQueryResultField";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.types";
@@ -371,12 +372,27 @@ class DuckDbClientImpl {
     const db = new duckdb.AsyncDuckDB(logger, worker);
     await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
 
-    // enable the spatial extension
-    // TODO(jpsyx): we should only enable spatial extension when it's needed
     const conn = await db.connect();
-    await conn.query("LOAD spatial;");
+    // The spatial / excel extensions are fetched at runtime from
+    // `extensions.duckdb.org`. In environments where that host is blocked
+    // (or simply offline), the fetch stalls DuckDB initialization and
+    // every CSV / XLSX import hangs. `DisableDuckDbSpatial` lets the
+    // operator opt out of the spatial fetch — geo queries lose their
+    // spatial functions but the rest of the database boots.
+    // TODO(jpsyx): we should only enable spatial extension when it's needed
+    if (!isFlagEnabled(FeatureFlag.DisableDuckDbSpatial)) {
+      await conn.query("LOAD spatial;");
+    }
     await conn.query("LOAD parquet;");
-    await conn.query("LOAD excel;");
+    // XLSX support depends on the excel extension which is also a
+    // network-fetched extension. Mirror the spatial-flag behaviour: if
+    // the operator has explicitly disabled the spatial fetch (a strong
+    // signal that the extensions origin is unreachable), skip the excel
+    // load too so CSV imports still work in the offline / restricted
+    // environment.
+    if (!isFlagEnabled(FeatureFlag.DisableDuckDbSpatial)) {
+      await conn.query("LOAD excel;");
+    }
     await conn.close();
     return db;
   }
