@@ -9,6 +9,7 @@ import type { DuckDbClient } from "$/platform/types/DuckDbClient.types";
 import { createWebAuthProvider } from "./createWebAuthProvider";
 import { createWebDatasetBlobStore } from "./createWebDatasetBlobStore";
 import { createWebDuckDbClient } from "./createWebDuckDbClient";
+import { setPlatformImpls } from "./platformRegistry";
 
 /**
  * The three platform-agnostic services consumers reach through
@@ -42,18 +43,24 @@ export function PlatformProvider({
   children: ReactNode;
 }): JSX.Element {
   const impls = useMemo<PlatformImpls>(() => {
-    if (isDesktop()) {
-      return {
+    const resolved: PlatformImpls = isDesktop() ?
+      {
         duckDb: DesktopDuckDbClient,
         authProvider: DesktopAuthProvider,
         datasetBlobStore: DesktopDatasetBlobStore,
+      }
+    : {
+        duckDb: createWebDuckDbClient(),
+        authProvider: createWebAuthProvider(),
+        datasetBlobStore: createWebDatasetBlobStore(),
       };
-    }
-    return {
-      duckDb: createWebDuckDbClient(),
-      authProvider: createWebAuthProvider(),
-      datasetBlobStore: createWebDatasetBlobStore(),
-    };
+    // Publish to the module-level registry so non-React modules
+    // (`src/clients/`, plain TS utilities) can reach the same impls
+    // through `getPlatformImpls()`. Synchronous during render so any
+    // descendant component / module that fires on mount sees a
+    // populated registry.
+    setPlatformImpls(resolved);
+    return resolved;
   }, []);
 
   return (
