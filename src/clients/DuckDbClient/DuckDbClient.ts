@@ -536,13 +536,30 @@ class DuckDbClientImpl {
   }): Promise<void> {
     const { tableName, file, fileBytes } = options;
     const db = await this.#getDB();
+    // BROWSER_FILEREADER lets DuckDB do random-access reads against a Blob /
+    // File via `slice(...).arrayBuffer()`, avoiding a redundant full-buffer
+    // copy into DuckDB's WASM heap during ingest. XLSX still gets fully
+    // materialized below via `CREATE TABLE AS read_xlsx(...)`, but peak
+    // memory during the ingest step itself is meaningfully lower.
     if (file) {
-      const buffer = new Uint8Array(await file.arrayBuffer());
-      await db.registerFileBuffer(tableName, buffer);
+      await db.registerFileHandle(
+        tableName,
+        file,
+        duckdb.DuckDBDataProtocol.BROWSER_FILEREADER,
+        true,
+      );
       return;
     }
     if (fileBytes) {
-      await db.registerFileBuffer(tableName, fileBytes);
+      const blob = new Blob([fileBytes], {
+        type: MIMEType.APPLICATION_OPENXML_EXCEL,
+      });
+      await db.registerFileHandle(
+        tableName,
+        blob,
+        duckdb.DuckDBDataProtocol.BROWSER_FILEREADER,
+        true,
+      );
       return;
     }
     throw new Error("#registerXlsxFile: expected file or fileBytes");
@@ -564,9 +581,23 @@ class DuckDbClientImpl {
       throw new Error("Blob is not a parquet file");
     }
     const db = await this.#getDB();
-    const fileContents = await blob.arrayBuffer();
-    const parquetBuffer = new Uint8Array(fileContents);
-    await db.registerFileBuffer(tableName, parquetBuffer);
+    // Register the Blob directly as a file handle rather than copying its
+    // bytes into DuckDB's WASM heap. Combined with the `CREATE VIEW ... AS
+    // SELECT * FROM read_parquet(...)` in `loadParquet`, this lets DuckDB
+    // read only the column chunks and row groups it needs per query
+    // (projection + LIMIT pushdown) by slicing byte ranges out of the Blob.
+    // IDB- and fetch-backed Blobs in every modern browser are file-backed,
+    // so `blob.slice(...).arrayBuffer()` reads from disk on demand and
+    // does not materialize the whole parquet in JS memory. directIO is
+    // false so DuckDB caches hot pages in its buffer pool (important for
+    // repeated queries against the same dataset, e.g. column-by-column
+    // summary generation).
+    await db.registerFileHandle(
+      tableName,
+      blob,
+      duckdb.DuckDBDataProtocol.BROWSER_FILEREADER,
+      false,
+    );
   }
 
   /**
