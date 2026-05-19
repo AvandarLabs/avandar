@@ -6,6 +6,7 @@ import type {
   QueryColumnRead,
 } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types.ts";
+import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 
 type ModelType = "StructuredQuery";
 type CurrentStructuredQueryVersion = 1;
@@ -39,6 +40,12 @@ export type StructuredQueryRead = Model.Versioned<
     /** The aggregations that are being applied to the query columns */
     aggregations: Record<QueryColumnId, QueryAggregationType.T>;
 
+    /**
+     * Recursive WHERE-clause tree authored via the filter UI. Always a group
+     * at the root; an empty group means "no filters".
+     */
+    filters: QueryFilterGroup;
+
     /** The offset of the query. */
     offset: number | undefined;
 
@@ -57,6 +64,7 @@ type EmptyStructuredQuery = Model.Versioned<
     orderByColumn: undefined;
     orderByDirection: undefined;
     aggregations: Record<QueryColumnId, QueryAggregationType.T>;
+    filters: QueryFilterGroup;
     offset: undefined;
     limit: undefined;
   }

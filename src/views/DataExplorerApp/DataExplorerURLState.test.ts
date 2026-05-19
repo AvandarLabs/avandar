@@ -49,6 +49,8 @@ function _makeState(overrides: {
     nlPrompt: undefined,
     openDataset: undefined,
     lastQueryError: undefined,
+    isStructuredQueryInSync: true,
+    sqlSyncWarnings: [],
     ...overrides,
   };
 }

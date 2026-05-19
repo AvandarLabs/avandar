@@ -46,6 +46,22 @@ export type DataExplorerAppState = {
    * the auto-applied SQL turned out to be invalid.
    */
   lastQueryError: string | undefined;
+
+  /**
+   * Whether `rawSQL` and `query` (the structured form) currently represent
+   * the same query. `true` when both are empty, when SQL was successfully
+   * parsed into the form, or when the form generated the current SQL. `false`
+   * when SQL was too complex to map fully onto the form (best-effort
+   * parsing): the form shows an approximation but executing the SQL still
+   * runs the original text.
+   */
+  isStructuredQueryInSync: boolean;
+
+  /**
+   * Human-readable reasons describing what part of `rawSQL` could not be
+   * represented in the manual form. Empty when the two are in sync.
+   */
+  sqlSyncWarnings: readonly string[];
 };
 
 export const INITIAL_DATA_EXPLORER_STATE: DataExplorerAppState = {
@@ -57,4 +73,6 @@ export const INITIAL_DATA_EXPLORER_STATE: DataExplorerAppState = {
   nlPrompt: undefined,
   openDataset: undefined,
   lastQueryError: undefined,
+  isStructuredQueryInSync: true,
+  sqlSyncWarnings: [],
 };
