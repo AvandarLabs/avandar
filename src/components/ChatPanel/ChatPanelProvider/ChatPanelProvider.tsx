@@ -27,7 +27,10 @@ type Props = {
 export function ChatPanelProvider({ children }: Props): JSX.Element {
   return (
     <ChatPanelStateManager.Provider
-      initialStateOverrides={{ isOpen: _readInitialOpen() }}
+      initialStateOverrides={{
+        isOpen: _readInitialOpen(),
+        pendingClarification: undefined,
+      }}
     >
       <ChatPanelAvailableContext.Provider value={true}>
         <ChatPanelContents>{children}</ChatPanelContents>

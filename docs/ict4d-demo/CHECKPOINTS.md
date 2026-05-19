@@ -183,6 +183,115 @@ any drift between the declarative schema and the migration.
 
 ---
 
+## Checkpoint 4 — Chat interactive workflows: Phase 0 (slim) + Phase 1 ✅
+
+The spec lives in
+`docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md`.
+It's 7 phases totalling ~16.5 engineer-weeks. This checkpoint ships
+the demo-impactful slice: a **clarification flow** that asks the user
+one structured question before generating SQL when the request is
+ambiguous, plus the minimal **PII + bias guardrails** the clarification
+flow depends on.
+
+### What shipped
+
+**Privacy detectors** (`src/lib/privacy/`):
+
+- `piiDetector.ts` — column-name keyword layer + content regex layer
+  (email, US SSN, Luhn-validated credit cards, IBAN, IP, date-of-birth,
+  street address). Aggregation rules per spec: both-layers-fire ⇒
+  critical, demographic / free-text ⇒ warning. Medical category is
+  surfaced so a follow-up can plug in the typed-confirmation tier.
+  **16 unit tests** in `piiDetector.test.ts`.
+- `biasDetector.ts` — gender / ethnic / cultural / loaded-framing /
+  statistical-assumption rules with curated hand-written suggestions
+  per the spec. **11 unit tests** in `biasDetector.test.ts`.
+- All 27 tests green; pure functions, no network or DOM.
+
+**Consent modal** (`src/components/Privacy/ConsentModal/`):
+
+- Three modes implemented: `clean` (Mode A), `pii_warning` (Mode B,
+  default-cancel + ack checkbox), `bias_nudge` (Mode C, non-blocking +
+  "use suggestion" option).
+- Modes **D** (composite — bias + PII fire together) and **E**
+  (medical-strict typed-phrase confirmation) are explicitly deferred.
+
+**`crossBoundary` API** (`src/lib/privacy/crossBoundary.tsx`):
+
+- Single chokepoint with the shape the spec mandates. Opens the
+  appropriate modal mode and returns either an approved payload (with
+  detected pattern labels + ack token) or `{ approved: false, reason }`.
+- **v0 caveat**: the ack token is a UUID string with `v0.` prefix;
+  there is **no HMAC + session-secret signing yet** and the backend
+  does **not** reject unsigned data transfers. This is intentionally
+  flagged in the file and in the checklist — wiring HMAC + the
+  `UNAPPROVED_DATA_TRANSFER` rejection is the next Phase 0 task.
+- Currently called from two paths: outgoing user message bias check,
+  and clarification answer submission.
+
+**Backend `clarify` tool** (`supabase/functions/chat/chat.routes.ts`):
+
+- Registered alongside `generateSql` in the Data Explorer tool list.
+- System prompt extended with the When-to-clarify / When-NOT-to-clarify
+  / How-to-clarify block from the spec, including the bias-neutral
+  rule.
+- Hard cap of 3 clarifications per analytic question, counted by
+  matching `[Clarification answer: ...]` markers in the user-visible
+  history. When the cap is reached, the `clarify` tool is omitted from
+  the request entirely so the model has to commit to SQL.
+- Response type extended with optional `clarification` field
+  (`shared/types/chat.types.ts` + `ChatClarifyRequest` + 
+  `ChatClarifyResponseShape`).
+
+**Inline clarification UI** (`src/components/ChatPanel/`):
+
+- `ClarificationCard` renders three variants: free-text, fixed-options
+  single, fixed-options multi.
+- Keyboard behaviour per spec: auto-focus on mount, Enter submits,
+  Escape triggers "Let AI decide".
+- `PendingClarificationBlock` mounts in the `ChatThread` above the
+  composer when a clarification is pending. On answer it programmatically
+  appends a new user message tagged with `[Clarification answer: ...]`
+  via `useThreadRuntime().append(...)`.
+- Free-text clarification answers route through `crossBoundary` for
+  bias + PII; fixed-option answers don't (the LLM produced the options,
+  no new user content crosses the boundary).
+- `ChatPanelStateManager` extended with `pendingClarification` plus a
+  `setPendingClarification` action.
+
+**User-message bias check**:
+
+- `useAvandarChatRuntime` now runs the bias detector on the latest
+  user-typed message before each turn. If hits fire, the consent modal
+  (Mode C, bias nudge) opens; on cancel, the turn ends with a
+  "(Message not sent.)" assistant reply.
+
+### What was explicitly deferred (logged for next session)
+
+- HMAC + session-secret signing on ack tokens
+- Backend `UNAPPROVED_DATA_TRANSFER` rejection
+- Dexie-backed audit log + `/settings/privacy/log` page
+- Medical-strict typed-phrase tier (Mode E)
+- Composite consent modal (Mode D)
+- Spanish + French pattern files (English-only for v1)
+- Clarification telemetry table
+- Phases 2–7 (discovery clarifications, plan DAG, schema drift, branching,
+  Python/R sandbox, context compression)
+
+### Verification
+
+- `pnpm exec tsc -b --noEmit` — clean.
+- `pnpm exec vitest run src/lib/privacy/ src/components/ChatPanel` —
+  30/30 tests passing.
+- **No real-browser end-to-end verification was possible** in the
+  remote container: the chat backend requires a running Supabase
+  edge function with an OpenRouter API key. The next session
+  should spin up the dev server and run a four-turn ambiguous-question
+  repro to confirm the clarify flow actually clears the cap and falls
+  through to `generateSql`.
+
+---
+
 ## Outstanding investigation — bug #29 (chat canvas stops updating)
 
 **Symptom**: after several chat turns, the assistant returns correct SQL,

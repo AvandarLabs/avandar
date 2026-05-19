@@ -13,6 +13,7 @@ import { curateOpenRouterModels } from "$/utils/chat/curateOpenRouterModels.ts";
 import { z } from "zod";
 import type {
   ChatAPI,
+  ChatClarifyRequest,
   ChatGeneratedSQL,
   ChatModelsResponse,
   ChatResponse,
@@ -64,15 +65,157 @@ type OpenRouterToolCall = {
   function?: { name?: string; arguments?: string };
 };
 
+const MAX_CLARIFICATIONS_PER_QUESTION = 3;
+
+const CLARIFICATION_MARKER_RE = /^\[Clarification answer:/m;
+
+/**
+ * Counts how many clarification answers the user has already provided in
+ * the visible thread. The frontend tags each answered clarification by
+ * appending a `[Clarification answer: ...]` block to the user message.
+ * Once we reach the cap, we omit the `clarify` tool from the next turn so
+ * the model has to commit to SQL.
+ */
+function _countClarificationsInHistory(
+  messages: ReadonlyArray<{ role: string; content: string }>,
+): number {
+  let count = 0;
+  for (const msg of messages) {
+    if (msg.role !== "user") {
+      continue;
+    }
+    if (CLARIFICATION_MARKER_RE.test(msg.content)) {
+      count += 1;
+    }
+  }
+  return count;
+}
+
+type RawClarifyArgs = {
+  question?: unknown;
+  rationale?: unknown;
+  responseShape?: {
+    kind?: unknown;
+    placeholder?: unknown;
+    options?: unknown;
+    multi?: unknown;
+  };
+};
+
+function _parseClarify(
+  argsJson: string | undefined,
+  priorClarifications: number,
+): ChatClarifyRequest | undefined {
+  if (priorClarifications >= MAX_CLARIFICATIONS_PER_QUESTION) {
+    return undefined;
+  }
+  if (!argsJson) {
+    return undefined;
+  }
+  let parsed: RawClarifyArgs;
+  try {
+    parsed = JSON.parse(argsJson) as RawClarifyArgs;
+  } catch {
+    return undefined;
+  }
+
+  if (
+    typeof parsed.question !== "string" ||
+    parsed.question.trim().length === 0
+  ) {
+    return undefined;
+  }
+  const rationale =
+    typeof parsed.rationale === "string" ?
+      parsed.rationale.trim() || undefined
+    : undefined;
+
+  const shape = parsed.responseShape;
+  if (!shape || typeof shape !== "object") {
+    return undefined;
+  }
+  const turnNumber = (priorClarifications + 1) as 1 | 2 | 3;
+
+  if (shape.kind === "free_text") {
+    return {
+      question: parsed.question.trim(),
+      rationale,
+      responseShape: {
+        kind: "free_text",
+        ...(typeof shape.placeholder === "string" ?
+          { placeholder: shape.placeholder.slice(0, 80) }
+        : {}),
+      },
+      turnNumber,
+    };
+  }
+  if (shape.kind === "fixed_options") {
+    if (!Array.isArray(shape.options)) {
+      return undefined;
+    }
+    const options = shape.options
+      .filter((o): o is string => {
+        return typeof o === "string";
+      })
+      .slice(0, 8);
+    if (options.length < 2) {
+      return undefined;
+    }
+    return {
+      question: parsed.question.trim(),
+      rationale,
+      responseShape: {
+        kind: "fixed_options",
+        options,
+        multi: shape.multi === true,
+      },
+      turnNumber,
+    };
+  }
+  return undefined;
+}
+
 const dataExplorerSystemPrefix = `
 You are Avandar, an embedded assistant that helps users analyze their data
 inside the Avandar workspace.
 
-The user is currently in the Data Explorer. When they ask a question about
-their data, call the \`generateSql\` tool with a DuckDB SELECT statement that
-answers it. Do not include the SQL in your text reply. Keep your reply short
-(one or two sentences). If the user asks something that is not a data question,
-answer it concisely without calling the tool.`;
+The user is currently in the Data Explorer. When they ask a data question,
+either call the \`generateSql\` tool with a DuckDB SELECT, or call the
+\`clarify\` tool first if the question is materially ambiguous.
+
+CLARIFYING QUESTIONS
+
+When to call \`clarify\`:
+- Subjective terms without a clear metric ("good", "best", "poor",
+  "important", "successful").
+- Multi-meaning columns (e.g. "client" could mean customer or beneficiary).
+- Subjective categorizations the model has to guess at ("poverty
+  indicators", "at-risk groups").
+- Ambiguous scopes ("this year" when the data spans multiple years).
+
+When NOT to call \`clarify\`:
+- The metadata already disambiguates the question.
+- The ambiguity is minor and a reasonable default exists — make the
+  choice, explain it briefly in your reply, and proceed with SQL.
+- The question is straightforward ("monthly revenue by region").
+
+How to clarify:
+- Ask ONE question at a time. Keep it under 25 words.
+- Prefer \`fixed_options\` (≤8 choices) when you can enumerate from the
+  metadata. Use \`free_text\` for open-ended or numeric answers.
+- State neutrally. Do not assume the answer.
+- NEVER use gendered, ethnic, religious, or culturally loaded framing.
+- Include a brief \`rationale\` so the user understands why you're asking.
+
+When the user has answered prior clarification(s), the answers will be
+attached at the end of the conversation as \`[Clarification answer: ...]\`
+lines. Use them; do not ask the same thing again.
+
+After at most 3 clarification turns within one analytic question, make
+a reasonable assumption and call \`generateSql\`.
+
+If the user asks something that is not a data question, answer it
+concisely without calling any tool.`;
 
 const genericSystemPrompt = `
 You are Avandar, an embedded assistant inside the Avandar workspace. The user
@@ -228,6 +371,10 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           temperature: 0.3,
         };
 
+        const priorClarifications = _countClarificationsInHistory(messages);
+        const clarificationCapReached =
+          priorClarifications >= MAX_CLARIFICATIONS_PER_QUESTION;
+
         if (isDataExplorer) {
           requestBody.tools = [
             {
@@ -250,6 +397,61 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
                 },
               },
             },
+            ...(clarificationCapReached ? [] : [{
+              type: "function",
+              function: {
+                name: "clarify",
+                description:
+                  "Ask the user one clarifying question when their request is materially ambiguous and the answer would change the SQL. Prefer fixed_options when the choices can be enumerated from metadata. Use this BEFORE generateSql when ambiguous.",
+                parameters: {
+                  type: "object",
+                  properties: {
+                    question: {
+                      type: "string",
+                      maxLength: 200,
+                      description:
+                        "≤25 words, neutrally phrased, single question.",
+                    },
+                    rationale: {
+                      type: "string",
+                      maxLength: 200,
+                      description:
+                        "Optional one-sentence explanation of why you are asking.",
+                    },
+                    responseShape: {
+                      oneOf: [
+                        {
+                          type: "object",
+                          properties: {
+                            kind: { const: "free_text" },
+                            placeholder: { type: "string", maxLength: 80 },
+                          },
+                          required: ["kind"],
+                          additionalProperties: false,
+                        },
+                        {
+                          type: "object",
+                          properties: {
+                            kind: { const: "fixed_options" },
+                            options: {
+                              type: "array",
+                              minItems: 2,
+                              maxItems: 8,
+                              items: { type: "string", maxLength: 80 },
+                            },
+                            multi: { type: "boolean" },
+                          },
+                          required: ["kind", "options", "multi"],
+                          additionalProperties: false,
+                        },
+                      ],
+                    },
+                  },
+                  required: ["question", "responseShape"],
+                  additionalProperties: false,
+                },
+              },
+            }]),
           ];
           requestBody.tool_choice = "auto";
         }
@@ -279,7 +481,9 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
         const text = (message?.content ?? "").trim();
 
         let generatedSql: ChatGeneratedSQL | undefined;
+        let clarification: ChatClarifyRequest | undefined;
         const toolCalls: OpenRouterToolCall[] = message?.tool_calls ?? [];
+
         const generateSqlToolCall = toolCalls.find((tc) => {
           return tc?.function?.name === "generateSql";
         });
@@ -300,15 +504,36 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           }
         }
 
+        // Only honor `clarify` if no SQL was also produced this turn — the
+        // SQL path is the terminal one. If the model emitted both, it
+        // already knows what to do, so we skip the clarification.
+        if (!generatedSql) {
+          const clarifyToolCall = toolCalls.find((tc) => {
+            return tc?.function?.name === "clarify";
+          });
+          if (clarifyToolCall?.function) {
+            const parsed = _parseClarify(
+              clarifyToolCall.function.arguments,
+              priorClarifications,
+            );
+            if (parsed) {
+              clarification = parsed;
+            }
+          }
+        }
+
         const assistantText =
           text ||
           (generatedSql ?
             "Here is the SQL I ran. Results are on the canvas to the left."
+          : clarification ?
+            clarification.question
           : "I could not generate a query for that. Try rephrasing.");
 
         const result: ChatResponse = {
           assistantText,
           ...(generatedSql ? { generatedSql: generatedSql } : {}),
+          ...(clarification ? { clarification } : {}),
         };
         return result;
       }),
