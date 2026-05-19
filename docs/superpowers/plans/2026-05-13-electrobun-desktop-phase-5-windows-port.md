@@ -10,10 +10,10 @@
 
 **Testing strategy:** `docs/superpowers/specs/2026-05-14-testing-strategy.md` — defines per-PR test groupings (G5.x) referenced in each Task below.
 
-**Goal:** Reach feature parity on Windows. Most of the architecture from Phases 0–4 is already portable; this plan covers the genuinely Windows-specific bits — keychain via `wincred`, code signing, the installer format, and a regression sweep on Windows-native quirks.
+**Goal:** Reach feature parity on Windows. Most of the architecture from Phases 0–4 is already portable; this plan covers the genuinely Windows-specific bits — keychain via the `cmdkey` + PowerShell shellout, code signing, the installer format, and a regression sweep on Windows-native quirks.
 
 **Architecture:** The macOS path resolution (`resolveUserDataDir`) and process model are unchanged on Windows. What changes:
-- **Keychain**: Bun FFI to `wincred.dll` (Windows Credential Manager / DPAPI) instead of `Security.framework`. Same `Keychain.set/get/delete` API; platform switch inside the module.
+- **Keychain**: Shell out to `cmdkey` (for set/delete) and PowerShell's `Get-StoredCredential` (for read), mirroring the macOS `/usr/bin/security` shellout. Same `Keychain.set/get/delete` API; platform switch inside the module. FFI to `wincred.dll` / `advapi32.dll` is explicitly out of scope — the call frequency doesn't justify it (see the design spec's "Decisions Captured" section).
 - **Code signing**: Authenticode with an EV (Extended Validation) certificate strongly recommended to avoid SmartScreen warmup; OV certs work with longer reputation buildup.
 - **Installer**: A signed `.exe` produced by Electrobun's bundler, optionally wrapped in an `.msi` via WiX. Phase 5 ships the `.exe` only; `.msi` is a stretch goal.
 - **Auto-update**: Same Supabase-Storage-hosted manifest model as macOS, with a parallel `win/stable/manifest.json` path.
@@ -26,7 +26,7 @@
 3. Auto-update flows to/from `win/stable/manifest.json` on Supabase Storage.
 4. Regression suite passes on Windows in CI (windows-2022 runner).
 
-**Honest framing:** Bun's Windows support is the newest part of the Bun ecosystem. Expect some friction; consult Bun's Windows compatibility notes at implementation time. If a Bun feature you depend on (e.g. `bun:sqlite`, `bun:ffi`) isn't fully working on Windows, treat that as a Phase 5 blocker and consider falling back to Node + better-sqlite3 + node-ffi-napi for the Windows main, keeping macOS on Bun.
+**Honest framing:** Bun's Windows support is the newest part of the Bun ecosystem. Expect some friction; consult Bun's Windows compatibility notes at implementation time. If `bun:sqlite` or `Bun.spawn` isn't fully working on Windows, treat that as a Phase 5 blocker and consider falling back to Node + better-sqlite3 for the Windows main, keeping macOS on Bun.
 
 ---
 
@@ -121,196 +121,100 @@ If the build fails: triage as **Bun-on-Windows compatibility** vs **Electrobun-o
 
 ---
 
-## Task 2: Windows Keychain via wincred (DPAPI)
+## Task 2: Windows Keychain via `cmdkey` + PowerShell shellout
 
-**Test groupings:** G5.2 (wincred Keychain integration — set/get/delete with non-ASCII payload; plaintext absent from stdout/stderr; gated by it.skipIf(process.platform !== 'win32')).
+**Test groupings:** G5.2 (Windows Keychain integration — set/get/delete with non-ASCII payload; plaintext absent from argv, stdout, and stderr; gated by `it.skipIf(process.platform !== 'win32')`).
 
-**PR boundaries:** 2 PRs.
-- PR 1: Step 1 + pure-layer helpers — Refactor `Keychain.ts` to dispatch by `process.platform` and add a pure wincred helper (argv construction, command/output parsing) with unit tests; macOS path is unchanged and the win32 branch is reachable only on Windows.
-- PR 2: Steps 2–4 — Real wincred bindings (FFI or PowerShell fallback) plus the gated integration test using `it.skipIf(process.platform !== 'win32')`; manual review checkpoint is a gate, not a code change.
+**PR boundaries:** 1 PR (per project convention).
+
+**Design decision (inherited from Phase 2 Task 11):** the keychain is read ~once at boot and written ~once per access-token refresh. At that frequency the cost of `cmdkey` / PowerShell `fork+exec` is invisible, and the shellout shape lets us avoid FFI marshaling and `CREDENTIALW` struct layout entirely. FFI to `wincred.dll` / `advapi32.dll` is explicitly out of scope for V1 and V2.
 
 **Files:**
-- Modify: `apps/desktop/main/services/Keychain.ts`
-- Test: `apps/desktop/main/services/Keychain.test.ts`
+- Modify: `apps/desktop/main/services/Keychain.ts` — branch on `process.platform`, delegate to the platform module
+- Create: `apps/desktop/main/services/Keychain.mac.ts` — extract today's `security`-CLI implementation (no behavior change)
+- Create: `apps/desktop/main/services/Keychain.win.ts`
+- Test: `apps/desktop/main/services/Keychain.win.test.ts` — pure-layer unit suite, mocked `Bun.spawn`
+- Test: `apps/desktop/main/services/Keychain.win.integration.test.ts` — gated by `KEYCHAIN_E2E=1`, hits the real Credential Manager
 
-- [ ] **Step 1: Update the keychain module to branch on platform**
+- [ ] **Step 1: Refactor the keychain module to branch on platform**
 
-Replace the existing `if (process.platform !== "darwin")` early-throw with a real branch.
+Split today's single-file macOS implementation into `Keychain.mac.ts` and create a new `Keychain.win.ts`. The top-level `Keychain.ts` becomes a dispatcher:
 
 ```ts
-import { dlopen, FFIType } from "bun:ffi";
+import { createMacKeychain } from "./Keychain.mac";
+import { createWinKeychain } from "./Keychain.win";
+import type { Keychain } from "./Keychain.types";
 
-if (process.platform === "darwin") {
-  // existing macOS implementation (or `security` CLI per Phase 2 fallback)
-} else if (process.platform === "win32") {
-  // ... new branch implemented below
-} else {
+export function createKeychain(): Keychain {
+  if (process.platform === "darwin") return createMacKeychain();
+  if (process.platform === "win32") return createWinKeychain();
   throw new Error(`Keychain not supported on ${process.platform}`);
 }
 ```
 
-Refactor to a single exported `Keychain` constant whose methods dispatch to the platform-specific module.
+Move the `Keychain` type alias to `Keychain.types.ts` so both platform modules can import it without circularity.
 
-A cleaner shape:
+- [ ] **Step 2: Map the Windows CLI surface**
 
-```ts
-import * as MacKeychain from "./Keychain.mac.ts";
-import * as WinKeychain from "./Keychain.win.ts";
+Three commands:
 
-export const Keychain =
-  process.platform === "darwin"
-    ? MacKeychain.Keychain
-    : process.platform === "win32"
-    ? WinKeychain.Keychain
-    : (() => {
-        throw new Error(`Keychain not supported on ${process.platform}`);
-      })();
-```
+- **Write/replace**: `cmdkey /generic:<target> /user:<account> /pass:<password>`. `cmdkey` is happy to overwrite an existing entry — no separate update flag needed.
+- **Read**: `cmdkey` does NOT print stored passwords (by design — that's the security model). Use PowerShell + the Windows `CredentialManager` namespace via Win32 P/Invoke through a one-liner:
+  ```powershell
+  Add-Type -AssemblyName System.Web
+  $vault = New-Object Windows.Security.Credentials.PasswordVault
+  $cred = $vault.Retrieve('<target>', '<account>')
+  $cred.RetrievePassword()
+  [Console]::Out.Write($cred.Password)
+  ```
+  Note: `PasswordVault` is a UWP API present on Windows 10+; if the target Windows version doesn't have it, fall back to invoking `advapi32!CredReadW` via a tiny PowerShell `Add-Type` C# shim (one-time JIT cost, no separate binary to ship).
+- **Delete**: `cmdkey /delete:<target>`. Exit code 0 on success; exit code 1 + `ERROR: The specified entry could not be found` on stderr when the entry is missing — treat as idempotent.
 
-- [ ] **Step 2: Implement the Windows branch**
+**Argv-leak mitigation**: `cmdkey /pass:<password>` puts the password on argv, which Windows audit logs can capture. Mitigate by writing the password to a temp file in `%TEMP%` with restrictive ACL, then `cmdkey /pass:@<filepath>` (cmdkey's `@file` syntax reads from a file) — OR use the PowerShell shim for write too (PowerShell can read a password from stdin and call `CredWriteW` via `Add-Type`). The PowerShell-shim path is cleaner; pick that.
 
-The simplest reliable approach on Windows: shell out to PowerShell's `Get-StoredCredential` / `New-StoredCredential` (via the CredentialManager module), or directly invoke `cmdkey` + DPAPI APIs.
+- [ ] **Step 3: Write the failing pure-layer unit tests**
 
-For V1, the pragmatic recommendation mirrors macOS: **shell out to `cmdkey`** for set/delete, and use a small native helper for read (since `cmdkey` doesn't print passwords).
+Create `apps/desktop/main/services/Keychain.win.test.ts`. Mock `Bun.spawn` and pin:
 
-Better: use Bun FFI to `advapi32.dll` directly. Functions of interest: `CredWriteW`, `CredReadW`, `CredDeleteW`.
+- Argv composition for `set` / `get` / `delete`.
+- `set` does not pass the password on argv (it's piped to PowerShell's stdin or read from a temp file).
+- `get` parses stdout exactly (no trailing newline mangling).
+- `delete` treats exit 1 with the "not found" stderr signature as a no-op (idempotent).
+- All thrown errors include enough stderr context for forensics, but never the password itself.
 
-Create `apps/desktop/main/services/Keychain.win.ts`:
+Run; expect every case to fail.
 
-```ts
-import { dlopen, FFIType, ptr, toBuffer } from "bun:ffi";
+- [ ] **Step 4: Write the failing integration test**
 
-const advapi32 = dlopen("advapi32.dll", {
-  CredWriteW: {
-    args: [FFIType.ptr /* PCREDENTIAL */, FFIType.u32 /* flags */],
-    returns: FFIType.bool,
-  },
-  CredReadW: {
-    args: [
-      FFIType.cstring /* TargetName, UTF-16 */,
-      FFIType.u32 /* Type = CRED_TYPE_GENERIC = 1 */,
-      FFIType.u32 /* Flags = 0 */,
-      FFIType.ptr /* PCREDENTIAL* */,
-    ],
-    returns: FFIType.bool,
-  },
-  CredDeleteW: {
-    args: [FFIType.cstring, FFIType.u32, FFIType.u32],
-    returns: FFIType.bool,
-  },
-  CredFree: { args: [FFIType.ptr], returns: FFIType.void },
-});
+Create `apps/desktop/main/services/Keychain.win.integration.test.ts`. Gate with `process.env.KEYCHAIN_E2E === "1" && process.platform === "win32"`. Same shape as the macOS gated test: set → get → delete with ASCII, non-ASCII, and overwrite cases; assert the password never appears in any captured child output.
 
-const CRED_TYPE_GENERIC = 1;
-const CRED_PERSIST_LOCAL_MACHINE = 2; // bound to this user on this machine
+- [ ] **Step 5: Implement `Keychain.win.ts`**
 
-function utf16(s: string): Buffer {
-  return Buffer.from(s + "\0", "utf16le");
-}
+Implement against the surface mapped in Step 2. Reuse the `createKeychain(spawn)` injection pattern from the macOS module so the unit tests stay hermetic. Use the absolute paths `C:\\Windows\\System32\\cmdkey.exe` and `C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe` (mirrors the macOS use of `/usr/bin/security`).
 
-export const Keychain = {
-  set(serviceName: string, accountName: string, password: string): void {
-    const target = `${serviceName}/${accountName}`;
-    const targetBuf = utf16(target);
-    const userBuf = utf16(accountName);
-    const blobBuf = Buffer.from(password, "utf16le");
+Expose the same `Keychain` type the macOS module exports. The caller doesn't need to know which OS it's on.
 
-    // CREDENTIALW struct layout (Win64):
-    //   DWORD  Flags;
-    //   DWORD  Type;
-    //   LPWSTR TargetName;
-    //   LPWSTR Comment;
-    //   FILETIME LastWritten;
-    //   DWORD  CredentialBlobSize;
-    //   LPBYTE CredentialBlob;
-    //   DWORD  Persist;
-    //   DWORD  AttributeCount;
-    //   PCREDENTIAL_ATTRIBUTE Attributes;
-    //   LPWSTR TargetAlias;
-    //   LPWSTR UserName;
-    // total ~88 bytes with padding on x64
+- [ ] **Step 6: Run both test files and confirm green**
 
-    // For brevity here we delegate to a small helper struct builder; the
-    // engineer implementing this should consult `wincred.h` and Bun FFI's
-    // current struct-handling primitives at the time of writing. The
-    // important invariants are:
-    //   - Type = CRED_TYPE_GENERIC (1)
-    //   - Persist = CRED_PERSIST_LOCAL_MACHINE (2)
-    //   - TargetName = utf-16le bytes of `service/account`
-    //   - CredentialBlob = utf-16le bytes of the password
-    throw new Error(
-      "Keychain.set (win32): finish CREDENTIALW struct marshalling per current Bun FFI docs",
-    );
-  },
-  get(serviceName: string, accountName: string): string | null {
-    throw new Error(
-      "Keychain.get (win32): finish CredReadW + struct unmarshalling per current Bun FFI docs",
-    );
-  },
-  delete(serviceName: string, accountName: string): void {
-    const target = `${serviceName}/${accountName}`;
-    advapi32.symbols.CredDeleteW(utf16(target) as never, CRED_TYPE_GENERIC, 0);
-  },
-};
-```
-
-**Pragmatic recommendation:** the same Phase 2 fallback applies on Windows — **shell out** to `cmdkey` for set/delete and use PowerShell's DPAPI for read, while the engineer iterates on FFI:
-
-```ts
-import { spawnSync } from "node:child_process";
-
-export const Keychain = {
-  set(serviceName, accountName, password) {
-    const target = `${serviceName}/${accountName}`;
-    spawnSync("cmdkey", [`/generic:${target}`, `/user:${accountName}`, `/pass:${password}`]);
-  },
-  get(serviceName, accountName) {
-    const target = `${serviceName}/${accountName}`;
-    // cmdkey itself does not print the password. Use PowerShell:
-    const ps = `
-      $cred = (New-Object -ComObject Microsoft.CredentialManager).Retrieve('${target}')
-      if ($cred) { $cred.Password }
-    `;
-    const r = spawnSync("powershell", ["-NoProfile", "-Command", ps], { encoding: "utf8" });
-    if (r.status !== 0 || !r.stdout.trim()) return null;
-    return r.stdout.trim();
-  },
-  delete(serviceName, accountName) {
-    const target = `${serviceName}/${accountName}`;
-    spawnSync("cmdkey", [`/delete:${target}`]);
-  },
-};
-```
-
-PowerShell COM access to Credential Manager isn't perfectly clean either. Another option: vend a tiny native helper (a single .exe written in C# or Rust) that reads/writes via DPAPI and ship it inside the bundle. For V1, **start with the FFI attempt; fall back to PowerShell shellout** if FFI proves too rough.
-
-- [ ] **Step 3: Smoke test on Windows**
-
-On a Windows machine:
+On a Windows host:
 
 ```powershell
-$env:KEYCHAIN_SMOKE = "1"
 pnpm --filter @avandar/desktop test
+$env:KEYCHAIN_E2E = "1"
+pnpm --filter @avandar/desktop test:integration
 ```
 
-Expected: the smoke test (from Phase 2 Task 11 Step 2) passes the set/get/delete round-trip.
+Expected: unit tests green on any host (mocked spawn); integration tests green on Windows, skipped elsewhere.
 
-- [ ] **Step 4: Manual review checkpoint (do NOT commit)**
-
-  **Run (on a Windows host):**
-  ```powershell
-  $env:KEYCHAIN_SMOKE = "1"
-  pnpm --filter @avandar/desktop test
-  ```
-  Expected: the Phase 2 keychain smoke test passes the set/get/delete round-trip on Windows.
+- [ ] **Step 7: Manual review checkpoint (do NOT commit)**
 
   **Verify:**
-  - `Keychain.ts` cleanly dispatches by `process.platform` with no dead `throw on non-darwin` branch left over.
-  - The Windows implementation (FFI or `cmdkey` + PowerShell fallback) returns the same value it stored, byte-for-byte (no UTF-16 truncation).
-  - After a `Keychain.set`, a `Credential Manager` entry of type "Generic Credential" exists under `com.avandarlabs.desktop/...` and the user account name matches.
+  - `Keychain.ts` dispatches by `process.platform` with no dead branches; the macOS implementation is untouched (only relocated to `Keychain.mac.ts`).
+  - The Windows implementation never passes the password on argv (audit `cmdkey` and `powershell` invocations; if PowerShell's stdin or a temp file is used, the temp file has user-only ACL and is deleted in a `finally` block).
+  - After a `Keychain.set`, a "Generic Credential" entry exists under `com.avandarlabs.desktop/...` in Control Panel → User Accounts → Credential Manager → Windows Credentials.
   - After a `Keychain.delete`, the entry is gone from Credential Manager.
-  - No plaintext secrets are logged by the FFI or PowerShell fallback path (scan stderr/stdout from the smoke test).
-  - Test groupings G5.2 are authored (either in this PR or as separate PRs to be merged before this checkpoint is greenlit), and each grouping's mutation-test step is recorded per the testing strategy
+  - No plaintext secrets are logged by any code path (scan captured stdout / stderr from the integration tests for the test password literal; assertion failure if found).
+  - Test grouping G5.2 is authored, and its mutation-test step is recorded per the testing strategy.
 
   **Manual smoke test on a Windows machine:**
   1. Launch the desktop app on Windows 11 and sign in with a real Supabase account.
@@ -727,9 +631,9 @@ Update `apps/desktop/README.md` "Phase status" header to "V1 complete — macOS 
 
 | Risk | Mitigation in this phase |
 |---|---|
-| Bun on Windows lacks parity with macOS for `bun:sqlite` / `bun:ffi` | Verify each in Task 1 Step 3; if blocked, evaluate Node + `better-sqlite3` + `node-ffi-napi` as a Windows-only main-process runtime — single platform divergence, all other code unchanged |
+| Bun on Windows lacks parity with macOS for `bun:sqlite` or `Bun.spawn` | Verify each in Task 1 Step 3; if blocked, evaluate Node + `better-sqlite3` + `child_process.spawn` as a Windows-only main-process runtime — single platform divergence, all other code unchanged |
 | WebView2 missing on Windows 10 | Bundle the evergreen runtime in the installer, or prompt to install on first launch |
 | OV cert SmartScreen warmup blocks internal testers | Document in README (done in Task 5 Step 4); communicate the temporary nature; consider EV in V2 if it materially hurts adoption |
-| Credential Manager FFI integration is rougher than macOS | Fallback to PowerShell shellout (Task 2 Step 2); accept the per-call latency cost (~50–100ms) |
+| `cmdkey` or PowerShell `PasswordVault` output / exit-code format differs from documentation | Pin formats in pure-layer unit tests; gated integration test (G5.2) runs against the real binary on each supported Windows version; thrown errors quote stderr so a regression surfaces with the OS message instead of a silent wrong-result |
 | Cross-platform sync surfaces subtle bugs (e.g. line endings in stored content, path separators in `parquet_blob_key`) | Already guarded by always-forward-slash key shape; verify in Task 6 Step 2; if drift, fix with a one-shot normalization pass and a SQLite migration |
 | Electrobun's Windows installer behavior differs from documentation | The plan's smoke tests in Task 5 are the primary safety net; engineer adapts per actual Electrobun output |

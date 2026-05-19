@@ -1,8 +1,10 @@
 /**
  * Platform-agnostic auth provider.
  *
- * On web this wraps Supabase JS auth (sessions in localStorage). On desktop
- * (Phase 2+) refresh tokens live in the OS keychain via Bun FFI.
+ * On web this wraps Supabase JS auth (sessions in localStorage). On
+ * desktop, refresh tokens live in the OS keychain, accessed by shelling
+ * out to the platform's native credential CLI (`/usr/bin/security` on
+ * macOS, `cmdkey` on Windows).
  */
 export interface AuthProvider {
   getSession(): Promise<Session | null>;
