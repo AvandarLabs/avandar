@@ -1,4 +1,5 @@
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
+import { DEFAULT_GLOBAL_FILTER_SUBSCRIPTION } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/dataVizFilters";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
 
@@ -26,6 +27,8 @@ export function buildPendingDataVizBlock(
       },
       vizType: block.vizType,
       vizConfig: VizConfigs.makeEmptyConfig(block.vizType),
+      globalFilterSubscription: DEFAULT_GLOBAL_FILTER_SUBSCRIPTION,
+      localFilters: [],
     },
   };
 }

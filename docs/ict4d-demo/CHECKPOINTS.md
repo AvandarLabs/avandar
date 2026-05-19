@@ -132,10 +132,9 @@ tokens — feasible but a multi-day project. Defer.
 - ✅ #15 — Viewer-editable global filters. New `Filter` P-block with
   single-select, multi-select, and contains modes; SQL composes via
   subselect wrap. (Checkpoint 9.)
-- ✅ #16 — Per-viz filter foundation via the `subscribedFilterIds`
-  whitelist on `applyDashboardFiltersToSql`. The per-viz UI to opt out of
-  specific global filters from inside the DataViz block panel is the
-  remaining piece. (Checkpoint 9.)
+- ✅ #16 — Per-viz filter UI fully shipped in Checkpoint 14:
+  global-filter `All/Some/None` opt-out plus inline viz-local filters
+  with `select_single`, `select_multi`, and `contains` modes.
 - ✅ #18 — View-before-publish preview route + "Back to editor" banner.
 - ✅ #22 — Chat panel inside the dashboard editor emits new DataViz
   P-blocks via the `addDashboardBlock` tool. (Checkpoint 9.)
@@ -144,7 +143,6 @@ tokens — feasible but a multi-day project. Defer.
 - #10 — Logo upload (the typography + theme tokens shipped)
 - #11 — Media embedding via Supabase Storage (deferred)
 - #13 — Workspace-private dashboard sharing via the Share modal (deferred)
-- #16 — Per-viz override UI inside the DataViz block panel
 - #21 — Manual query form in dashboards
 
 Each of these is its own focused session.
@@ -1326,6 +1324,115 @@ routes to whichever manager backs the current platform.
   removing the `.bin` file in `whisper-models/`, but there's no
   in-app button. Worth adding once we have a real "Voice settings"
   panel.
+
+---
+
+## Checkpoint 14 — Per-viz filter controls (#16 finished) ✅
+
+Closes the remaining gap from item #16. The viewer-editable filter
+story now has two clean layers:
+
+  - **Global** (Checkpoint 9): a `Filter` PBlock on the dashboard
+    surface applies its WHERE clause to every viz that subscribes.
+  - **Per-viz**: each DataViz block can opt out of global filters
+    and/or add its own viewer-editable local filters that scope
+    just to that chart.
+
+### What shipped
+
+**Global-filter opt-out** — new `Global filters` field in the DataViz
+side panel with a three-way `SegmentedControl`:
+
+  - `All` (default) — subscribe to every dashboard filter.
+  - `Some` — checkbox list of every registered FilterPBlock on the
+    dashboard (read live from the filter state manager so the list
+    updates as filters are added or removed). The viz applies only
+    the ticked filters; stale subscription ids that no longer exist
+    are dropped at SQL-compose time.
+  - `None` — ignore all global filters; useful for "context" charts
+    that should stay anchored regardless of viewer selection.
+
+**Local filters** — new `Local filters` field on the DataViz block
+that lets the editor define filter controls scoped to *that one
+chart*. Each local filter has label / column / mode
+(`select_single`, `select_multi`, `contains`) / options-CSV /
+default-value. Local filter state lives inside the block (not the
+global filter manager), so two vizzes can each define a filter on
+`province` and end up with completely independent viewer values.
+
+**Inline viewer controls** — local filters render as a compact
+strip above the chart with appropriate Mantine inputs and a "Reset"
+button that appears whenever any value diverges from its default.
+
+### Filter composition
+
+`useApplyDashboardFiltersToSql` now wraps the rawSQL twice when
+relevant:
+
+  1. First with the subscribed subset of global filters
+     (resolved via `resolveSubscribedFilterIds`).
+  2. Then with each active local filter, converted to the same
+     `DashboardFilterRecord` shape via `localFilterToRecord` so all
+     the WHERE-clause logic stays in one place
+     (`applyDashboardFiltersToSql`).
+
+Composing as two nested subselects keeps each layer independent —
+the inner SQL's `WHERE` / `GROUP BY` is preserved at every level.
+
+### Schema migration
+
+Bumped `CURRENT_SCHEMA_VERSION` from `3` to `4` and added
+`AvaPageDataMigrationV4` (with downgrade). Upgrade seeds every
+DataViz block with the safe defaults `{mode: "all",
+subscribedFilterIds: []}` plus `localFilters: []` — so v3 dashboards
+behave exactly as they did before. Downgrade strips both fields so
+a v3 reader doesn't choke.
+
+V3's frozen types (`AvaPageDataMigrationV3.types.ts`) were
+backfilled from the previous `AvaPageTypes` alias into real
+standalone declarations, matching the pattern V2 already used.
+
+### Files touched
+
+- New: `src/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/`
+  `DataVizPBlock/dataVizFilters.ts` (+ test, 13 cases),
+  `DataVizPBlock/useLocalFilterState.ts`,
+  `DataVizPBlock/DataVizLocalFilters.tsx`
+- New: `src/views/DashboardApp/AvaPage/pfields/`
+  `GlobalFilterSubscriptionPField/*` and `LocalFiltersPField/*`
+- New: `src/views/DashboardApp/AvaPage/migrations/`
+  `AvaPageDataMigrationV4/*` (+ test, 3 cases)
+- Modified: `DataVizPBlock.tsx` (consumes new filter props +
+  renders inline controls), `buildDataVizPBlockConfig.tsx` (registers
+  the two new Puck fields), `resolveDataVizPBlockProps.ts` (defaults
+  the new fields on every render so older saved data still works
+  while in-flight), `buildPendingDataVizBlock.ts` (chat-emitted
+  blocks default to all/none), `useApplyDashboardFiltersToSql.ts`
+  (two-layer SQL composition), `AvaPageDataMigrationV3.types.ts`
+  (no longer aliases the current types), `constants.ts`
+  (CURRENT_SCHEMA_VERSION → 4), `upgradeAvaPageData.ts` (registers
+  V4).
+
+### Verification
+
+- `tsc -b --noEmit -p tsconfig.app.json` clean. (Pre-existing
+  `@huggingface/transformers` missing-module errors in
+  `VoiceModelManager.ts` are unrelated and predate Checkpoint 14.)
+- 13 new `dataVizFilters` unit tests pass; 3 new V4 migration tests
+  pass; existing 9 V3 + 7 resolveDataVizProps + 11 DataVizPBlock +
+  9 applyDashboardFiltersToSql tests still green (59 dashboard
+  tests total across the touched modules).
+- ESLint clean on every touched file.
+
+### Live verification still pending
+
+- Browser smoke test of the side-panel UX: add a Filter PBlock,
+  add two DataViz blocks, set one to `Some` with a subscription,
+  one to `None`, configure a local filter on the second, confirm
+  each viz responds to the expected set.
+- End-to-end check that local-filter state survives Puck re-renders
+  (mounting the block re-seeds defaults, which `useLocalFilterState`
+  preserves via the `overrides` ref).
 
 ---
 

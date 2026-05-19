@@ -114,7 +114,10 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started · `[—]` 
   - New `Filter` P-block with single-select, multi-select, and contains modes.
   - SQL composes cleanly via subselect wrap so block-level WHERE / GROUP BY etc. are preserved.
 - [x] **16. Viewer-editable per-viz dashboard filters**
-  - Foundation in place via `subscribedFilterIds` whitelist on `applyDashboardFiltersToSql`; per-viz UI to opt out of specific global filters is a follow-up.
+  - **Per-viz global-filter opt-out**: each DataViz block has a `Global filters` side-panel field with three modes — `All` (subscribe to every dashboard filter, default), `Some` (checkbox list of registered FilterPBlocks), `None` (ignore all).
+  - **Local filters**: each DataViz block has a `Local filters` side-panel field that lets the editor define filters that only apply to that chart. Each local filter has label / column / mode (single, multi, contains) / options / default. Viewers see inline controls above the chart with a "Reset" button when active.
+  - Local filter state lives in the block (not the global filter manager), so two vizzes can each define a filter on `province` and end up with independent viewer-selected values.
+  - Bumped dashboard schema to `v4`; new `AvaPageDataMigrationV4` seeds `globalFilterSubscription` + `localFilters` on every existing DataViz block.
 - [x] **17. Publish-time slice picker (default = dashboard creator's slices; opt in to more)**
   - Same `Data scope` UI as #14: per-dataset accordion lets the publisher
     pick `queried` (default), `all_columns`, or `custom`. Custom mode

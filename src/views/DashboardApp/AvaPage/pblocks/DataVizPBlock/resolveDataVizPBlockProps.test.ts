@@ -91,6 +91,8 @@ describe("resolveDataVizPBlockProps", () => {
         layout: "group",
         withLegend: true,
       },
+      globalFilterSubscription: { mode: "all", subscribedFilterIds: [] },
+      localFilters: [],
     };
     const next = resolveDataVizPBlockProps({ props, changed: {} });
     expect(next).toEqual(props);

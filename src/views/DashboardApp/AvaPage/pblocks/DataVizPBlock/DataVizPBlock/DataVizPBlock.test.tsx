@@ -94,6 +94,8 @@ function renderBlock(props: {
               props.vizType as Parameters<typeof DataVizPBlock>[0]["vizType"]
             }
             vizConfig={props.vizConfig}
+            globalFilterSubscription={{ mode: "all", subscribedFilterIds: [] }}
+            localFilters={[]}
           />
         </DashboardFilterStateManager.Provider>
       </AvandarUiProvider>
