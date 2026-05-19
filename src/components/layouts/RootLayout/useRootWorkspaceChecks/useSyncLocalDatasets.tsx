@@ -2,9 +2,11 @@ import { useQuery } from "@hooks";
 import { modals } from "@mantine/modals";
 import { assertIsDefined, isNullish, prop, propEq } from "@utils";
 import { UserId } from "$/models/User/User.types";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
+import { ImportJobsManager } from "@/clients/datasets/ImportJobsManager";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
+import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { difference } from "@/lib/utils/arrays/difference/difference";
@@ -54,6 +56,45 @@ function useGarbageDatasetCollection(): void {
 }
 
 /**
+ * Resumes any LocalDataset rows whose Phase B transcode was interrupted
+ * by the previous tab session. Rows with `parseStatus === "parsing"` and
+ * `sourceBytes` cached can be re-driven automatically; rows without
+ * cached bytes fall through to the existing missing-dataset modal which
+ * already prompts the user to re-upload.
+ *
+ * Runs once per workspace mount. Each in-flight job is started in the
+ * background — we don't await them so the workspace bootstrap stays
+ * snappy.
+ */
+function useResumeInFlightImports(): void {
+  const didRunRef = useRef(false);
+  useEffect(() => {
+    if (didRunRef.current) {
+      return;
+    }
+    didRunRef.current = true;
+
+    (async () => {
+      const parsingRows = await AvaDexie.DB.LocalDataset.where("parseStatus")
+        .equals("parsing")
+        .toArray();
+      for (const row of parsingRows) {
+        // The ImportJobsManager is process-local so a fresh load always
+        // starts with an empty map. If the row had cached source bytes,
+        // fire and forget — `resumeImport` registers the job, runs Phase
+        // B, and updates the row.
+        if (row.sourceBytes) {
+          void LocalDatasetClient.resumeImport({ datasetId: row.datasetId });
+        }
+        // Rows without cached bytes are surfaced as "missing data"
+        // entries by `useSyncLocalDatasets` below, which already shows a
+        // re-upload affordance via `ResyncDatasetsBlock`.
+      }
+    })();
+  }, []);
+}
+
+/**
  * Checks that all datasets that require locally-loaded data (i.e. datasets of
  * type `"csv_file"` or `"xlsx_file"`) are available in local storage
  * (IndexedDB).
@@ -67,6 +108,7 @@ function useGarbageDatasetCollection(): void {
  */
 export function useSyncLocalDatasets(): void {
   useGarbageDatasetCollection();
+  useResumeInFlightImports();
   const workspace = useCurrentWorkspace();
   const user = useCurrentUser();
   const [modalId, setModalId] = useState<string | undefined>(undefined);
@@ -95,8 +137,23 @@ export function useSyncLocalDatasets(): void {
           id: dataset.id,
         });
 
+        // A row in `parseStatus="parsing"` with cached source bytes will
+        // resume in the background (see `useResumeInFlightImports`), so
+        // we don't surface it as missing. A row that's parsing but has
+        // no cached source bytes — or has `failed` outright — is treated
+        // as missing so the existing re-upload affordance kicks in.
         if (isInLocalStorage) {
-          return { dataset, isLoaded: true };
+          if (isInLocalStorage.parseStatus === "ready") {
+            return { dataset, isLoaded: true };
+          }
+          if (
+            isInLocalStorage.parseStatus === "parsing" &&
+            isInLocalStorage.sourceBytes
+          ) {
+            return { dataset, isLoaded: true };
+          }
+          // parsing-without-bytes, or failed — fall through to the
+          // re-upload flow.
         }
 
         // if not in our local storage, then fetch it from cloud object storage
