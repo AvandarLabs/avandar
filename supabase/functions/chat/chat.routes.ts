@@ -11,6 +11,10 @@ import {
   verifyAckToken,
 } from "@sbfn/_shared/privacy/ackToken.ts";
 import {
+  isReadOnlyDiscoveryQuery,
+  MAX_DISCOVERY_QUERY_CHARS,
+} from "@sbfn/_shared/privacy/discoveryQuery.ts";
+import {
   buildSQLSystemPrompt,
   cleanGeneratedSQL,
 } from "@sbfn/_shared/sql/buildSQLSystemPrompt.ts";
@@ -23,6 +27,8 @@ import type {
   ChatClarifyRequest,
   ChatGeneratedSQL,
   ChatModelsResponse,
+  ChatPlan,
+  ChatPlanStep,
   ChatResponse,
   ChatSessionSecretResponse,
 } from "@sbfn/chat/chat.types.ts";
@@ -127,8 +133,11 @@ type RawClarifyArgs = {
     placeholder?: unknown;
     options?: unknown;
     multi?: unknown;
+    query?: unknown;
+    column?: unknown;
   };
 };
+
 
 function _parseClarify(
   argsJson: string | undefined,
@@ -200,7 +209,135 @@ function _parseClarify(
       turnNumber,
     };
   }
+  if (shape.kind === "discovery") {
+    if (typeof shape.query !== "string" || typeof shape.column !== "string") {
+      return undefined;
+    }
+    const query = shape.query.trim();
+    const column = shape.column.trim();
+    if (!isReadOnlyDiscoveryQuery(query) || column.length === 0) {
+      return undefined;
+    }
+    return {
+      question: parsed.question.trim(),
+      rationale,
+      responseShape: {
+        kind: "discovery",
+        query,
+        column,
+        multi: shape.multi === true,
+      },
+      turnNumber,
+    };
+  }
   return undefined;
+}
+
+type RawPlanStep = {
+  id?: unknown;
+  description?: unknown;
+  type?: unknown;
+  code?: unknown;
+  inputs?: unknown;
+  predictedSchema?: unknown;
+  defaultViz?: unknown;
+};
+
+type RawProposePlanArgs = {
+  steps?: unknown;
+  rootMessage?: unknown;
+};
+
+const ALLOWED_PLAN_STEP_TYPES = new Set<ChatPlanStep["type"]>([
+  "sql",
+  "python",
+  "r",
+  "clarification",
+]);
+const ALLOWED_DEFAULT_VIZ = new Set([
+  "table",
+  "bar",
+  "line",
+  "scatter",
+  "pie",
+]);
+const MAX_PLAN_STEPS = 8;
+
+function _parseProposePlan(
+  argsJson: string | undefined,
+): ChatPlan | undefined {
+  if (!argsJson) {
+    return undefined;
+  }
+  let parsed: RawProposePlanArgs;
+  try {
+    parsed = JSON.parse(argsJson) as RawProposePlanArgs;
+  } catch {
+    return undefined;
+  }
+  if (!Array.isArray(parsed.steps) || parsed.steps.length === 0) {
+    return undefined;
+  }
+  const rootMessage =
+    typeof parsed.rootMessage === "string" ? parsed.rootMessage.trim() : "";
+
+  const cleaned: ChatPlanStep[] = [];
+  for (const raw of (parsed.steps as RawPlanStep[]).slice(0, MAX_PLAN_STEPS)) {
+    if (!raw || typeof raw !== "object") {
+      continue;
+    }
+    if (
+      typeof raw.id !== "string" ||
+      typeof raw.description !== "string" ||
+      typeof raw.code !== "string"
+    ) {
+      continue;
+    }
+    const id = raw.id.trim();
+    const description = raw.description.trim();
+    const code = raw.code.trim();
+    if (id.length === 0 || description.length === 0 || code.length === 0) {
+      continue;
+    }
+    const stepType =
+      typeof raw.type === "string" &&
+        ALLOWED_PLAN_STEP_TYPES.has(raw.type as ChatPlanStep["type"]) ?
+        (raw.type as ChatPlanStep["type"])
+      : "sql";
+    const inputs: string[] = Array.isArray(raw.inputs) ?
+      raw.inputs.filter((i): i is string => {
+        return typeof i === "string";
+      })
+    : [];
+    const predictedSchema: Array<{ name: string; type: string }> =
+      Array.isArray(raw.predictedSchema) ?
+        (raw.predictedSchema as Array<{ name?: unknown; type?: unknown }>)
+          .filter((c) => {
+            return typeof c?.name === "string" && typeof c?.type === "string";
+          })
+          .map((c) => {
+            return { name: c.name as string, type: c.type as string };
+          })
+      : [];
+    const defaultViz =
+      typeof raw.defaultViz === "string" &&
+        ALLOWED_DEFAULT_VIZ.has(raw.defaultViz) ?
+        (raw.defaultViz as ChatPlanStep["defaultViz"])
+      : undefined;
+    cleaned.push({
+      id,
+      description,
+      type: stepType,
+      code,
+      inputs,
+      predictedSchema,
+      ...(defaultViz ? { defaultViz } : {}),
+    });
+  }
+  if (cleaned.length === 0) {
+    return undefined;
+  }
+  return { steps: cleaned, rootMessage };
 }
 
 const dataExplorerSystemPrefix = `
@@ -231,6 +368,12 @@ How to clarify:
 - Ask ONE question at a time. Keep it under 25 words.
 - Prefer \`fixed_options\` (≤8 choices) when you can enumerate from the
   metadata. Use \`free_text\` for open-ended or numeric answers.
+- For "which of the values in column X..." questions where you do NOT
+  know the values from metadata alone, use the \`discovery\` shape:
+  emit a short \`SELECT DISTINCT "col" FROM "dataset" ORDER BY "col"
+  LIMIT 100\` query. The user will be shown a dropdown of the actual
+  values, pick from them, and their selection is returned to you.
+  Only emit read-only SELECT or WITH statements; no semicolons.
 - State neutrally. Do not assume the answer.
 - NEVER use gendered, ethnic, religious, or culturally loaded framing.
 - Include a brief \`rationale\` so the user understands why you're asking.
@@ -241,6 +384,19 @@ lines. Use them; do not ask the same thing again.
 
 After at most 3 clarification turns within one analytic question, make
 a reasonable assumption and call \`generateSql\`.
+
+MULTI-STEP PLANS
+
+When the analysis is clearer broken into 2–8 steps — especially when an
+intermediate result feeds the next, or the user wants a "build up to it"
+breakdown — call the \`proposePlan\` tool. Each step is a SQL query with
+a stable id; later steps can reference earlier ones by name as
+\`step_<id>\`. The frontend renders the plan as a DAG and executes each
+step locally in DuckDB.
+
+When NOT to use \`proposePlan\`:
+- Single-query answers — use \`generateSql\` directly.
+- When the user explicitly asks for "just the SQL" or "one query".
 
 If the user asks something that is not a data question, answer it
 concisely without calling any tool.`;
@@ -525,6 +681,27 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
                               required: ["kind", "options", "multi"],
                               additionalProperties: false,
                             },
+                            {
+                              type: "object",
+                              properties: {
+                                kind: { const: "discovery" },
+                                query: {
+                                  type: "string",
+                                  description:
+                                    "A short DuckDB SELECT statement whose results populate the dropdown. Read-only; no semicolons.",
+                                  maxLength: MAX_DISCOVERY_QUERY_CHARS,
+                                },
+                                column: {
+                                  type: "string",
+                                  description:
+                                    "The column the user is choosing values from. Informs PII detection.",
+                                  maxLength: 80,
+                                },
+                                multi: { type: "boolean" },
+                              },
+                              required: ["kind", "query", "column", "multi"],
+                              additionalProperties: false,
+                            },
                           ],
                         },
                       },
@@ -534,6 +711,72 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
                   },
                 },
               ]),
+            {
+              type: "function",
+              function: {
+                name: "proposePlan",
+                description:
+                  "Propose a multi-step analytic plan (≤8 SQL steps) when the analysis is clearer broken down than as a single query.",
+                parameters: {
+                  type: "object",
+                  properties: {
+                    rootMessage: {
+                      type: "string",
+                      description:
+                        "One short paragraph explaining the plan to the user, shown above the DAG.",
+                      maxLength: 400,
+                    },
+                    steps: {
+                      type: "array",
+                      minItems: 2,
+                      maxItems: MAX_PLAN_STEPS,
+                      items: {
+                        type: "object",
+                        properties: {
+                          id: {
+                            type: "string",
+                            description:
+                              "Stable id used by `step_<id>` references in later steps.",
+                            maxLength: 40,
+                          },
+                          description: { type: "string", maxLength: 200 },
+                          type: {
+                            type: "string",
+                            enum: ["sql", "python", "r", "clarification"],
+                          },
+                          code: { type: "string" },
+                          inputs: {
+                            type: "array",
+                            items: { type: "string" },
+                            default: [],
+                          },
+                          predictedSchema: {
+                            type: "array",
+                            items: {
+                              type: "object",
+                              properties: {
+                                name: { type: "string" },
+                                type: { type: "string" },
+                              },
+                              required: ["name", "type"],
+                              additionalProperties: false,
+                            },
+                          },
+                          defaultViz: {
+                            type: "string",
+                            enum: ["table", "bar", "line", "scatter", "pie"],
+                          },
+                        },
+                        required: ["id", "description", "type", "code"],
+                        additionalProperties: false,
+                      },
+                    },
+                  },
+                  required: ["steps", "rootMessage"],
+                  additionalProperties: false,
+                },
+              },
+            },
           ];
           requestBody.tool_choice = "auto";
         }
@@ -564,6 +807,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
 
         let generatedSql: ChatGeneratedSQL | undefined;
         let clarification: ChatClarifyRequest | undefined;
+        let plan: ChatPlan | undefined;
         const toolCalls: OpenRouterToolCall[] = message?.tool_calls ?? [];
 
         const generateSqlToolCall = toolCalls.find((tc) => {
@@ -604,10 +848,25 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           }
         }
 
+        // proposePlan is terminal like generateSql — only honor if neither
+        // of the other two terminal paths fired this turn.
+        if (!generatedSql && !clarification) {
+          const planToolCall = toolCalls.find((tc) => {
+            return tc?.function?.name === "proposePlan";
+          });
+          if (planToolCall?.function) {
+            const parsed = _parseProposePlan(planToolCall.function.arguments);
+            if (parsed) {
+              plan = parsed;
+            }
+          }
+        }
+
         const assistantText =
           text ||
           (generatedSql ?
             "Here is the SQL I ran. Results are on the canvas to the left."
+          : plan ? plan.rootMessage || "Here is a plan to answer your question."
           : clarification ? clarification.question
           : "I could not generate a query for that. Try rephrasing.");
 
@@ -615,6 +874,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           assistantText,
           ...(generatedSql ? { generatedSql: generatedSql } : {}),
           ...(clarification ? { clarification } : {}),
+          ...(plan ? { plan } : {}),
         };
         return result;
       }),

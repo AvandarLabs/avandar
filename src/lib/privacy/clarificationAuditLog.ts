@@ -17,13 +17,20 @@ export type ClarificationOutcome =
   | "cap_reached"
   | "neutral_failure";
 
+export type ClarificationResponseShapeLabel =
+  | "free_text"
+  | "fixed_options_single"
+  | "fixed_options_multi"
+  | "discovery_single"
+  | "discovery_multi";
+
 export type ClarificationAuditEntry = {
   id: string;
   workspaceId: string;
   threadId: string | null;
   timestamp: number;
   turnNumber: 1 | 2 | 3;
-  responseShape: "free_text" | "fixed_options_single" | "fixed_options_multi";
+  responseShape: ClarificationResponseShapeLabel;
   questionLengthChars: number;
   rationaleProvided: boolean;
   optionsCount: number | null;
@@ -64,6 +71,9 @@ function _responseShape(
   if (request.responseShape.kind === "free_text") {
     return "free_text";
   }
+  if (request.responseShape.kind === "discovery") {
+    return request.responseShape.multi ? "discovery_multi" : "discovery_single";
+  }
   if (request.responseShape.multi) {
     return "fixed_options_multi";
   }
@@ -81,6 +91,9 @@ export async function recordShown(args: {
 }): Promise<string> {
   const id = uuid();
   const responseShape = _responseShape(args.request);
+  // For discovery the option count is unknown at "shown" time — it
+  // only becomes known after the discovery query resolves. Persist
+  // null for now; future work can update it once the dropdown loads.
   const optionsCount =
     args.request.responseShape.kind === "fixed_options" ?
       args.request.responseShape.options.length

@@ -1,9 +1,11 @@
 import { useLocalRuntime } from "@assistant-ui/react";
 import { isNotNull, prop } from "@utils";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { match } from "ts-pattern";
 import { APIClient } from "@/clients/APIClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { dropPlanTempViews } from "@/components/ChatPanel/PlanStateManager/planExecutor";
+import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -53,6 +55,13 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
   const dataExplorerDispatch = DataExplorerStateManager.useDispatch();
   const chatPanelDispatch = ChatPanelStateManager.useDispatch();
   const { parseSql } = useSqlToStructuredQuery();
+  const planDispatch = PlanStateManager.useDispatch();
+  const currentPlanNodes = PlanStateManager.useState().nodes;
+  // Keep a ref so the adapter can read the latest plan nodes without
+  // forcing the adapter to be re-created (which would also blow away
+  // assistant-ui's runtime in-flight state — see CHECKPOINTS bug #29).
+  const planNodesRef = useRef(currentPlanNodes);
+  planNodesRef.current = currentPlanNodes;
 
   const adapter = useMemo<ChatModelAdapter>(() => {
     return {
@@ -164,6 +173,17 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           }
         }
 
+        if (response.plan && response.plan.steps.length > 0) {
+          // A new plan replaces any prior one. Drop the old temp views
+          // before loading the new plan so DuckDB doesn't accumulate
+          // stale `step_*` views across multiple plans.
+          const priorNodes = planNodesRef.current;
+          if (priorNodes.length > 0) {
+            void dropPlanTempViews({ nodes: priorNodes });
+          }
+          planDispatch.loadPlan(response.plan);
+        }
+
         // The backend may attach a `clarify` tool call. We surface it in the
         // panel state so the `ClarificationCard` can render above the
         // composer. The model's `assistantText` is the question itself in
@@ -217,6 +237,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
     dataExplorerDispatch,
     chatPanelDispatch,
     parseSql,
+    planDispatch,
   ]);
 
   return useLocalRuntime(adapter);

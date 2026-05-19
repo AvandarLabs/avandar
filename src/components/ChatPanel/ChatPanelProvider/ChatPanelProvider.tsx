@@ -3,6 +3,7 @@ import {
   ChatPanelContents,
 } from "@/components/ChatPanel/ChatPanelProvider/ChatPanelContents";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import { ChatPanelAvailableContext } from "@/components/ChatPanel/useIsChatPanelAvailable";
 import type { ReactNode } from "react";
 
@@ -23,6 +24,10 @@ type Props = {
  * Provider for the chat panel state. Wraps `ChatPanelStateManager.Provider`,
  * seeds the initial `isOpen` value from `localStorage`, and writes it back
  * whenever it changes so the panel state survives page reloads.
+ *
+ * The `PlanStateManager` is nested here so that Phase 3 multi-step plans
+ * share the same lifetime as the chat panel itself — closing or
+ * remounting the panel clears plan state.
  */
 export function ChatPanelProvider({ children }: Props): JSX.Element {
   return (
@@ -32,9 +37,11 @@ export function ChatPanelProvider({ children }: Props): JSX.Element {
         pendingClarification: undefined,
       }}
     >
-      <ChatPanelAvailableContext.Provider value={true}>
-        <ChatPanelContents>{children}</ChatPanelContents>
-      </ChatPanelAvailableContext.Provider>
+      <PlanStateManager.Provider>
+        <ChatPanelAvailableContext.Provider value={true}>
+          <ChatPanelContents>{children}</ChatPanelContents>
+        </ChatPanelAvailableContext.Provider>
+      </PlanStateManager.Provider>
     </ChatPanelStateManager.Provider>
   );
 }

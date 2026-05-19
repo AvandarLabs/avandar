@@ -38,7 +38,21 @@ export type ChatGeneratedSql = {
  */
 export type ChatClarifyResponseShape =
   | { kind: "free_text"; placeholder?: string }
-  | { kind: "fixed_options"; options: string[]; multi: boolean };
+  | { kind: "fixed_options"; options: string[]; multi: boolean }
+  /**
+   * Phase 2 — Discovery clarifications. The LLM emits a DuckDB SELECT
+   * (typically a `SELECT DISTINCT col FROM ...`) whose result populates a
+   * dropdown in the follow-up question. The query is run client-side in
+   * DuckDB-WASM; its result is NOT rendered on the canvas. The user's
+   * selection routes through `crossBoundary` with context
+   * `discovery_clarification` before crossing the LLM boundary again.
+   */
+  | {
+      kind: "discovery";
+      query: string;
+      column: string;
+      multi: boolean;
+    };
 
 export type ChatClarifyRequest = {
   /** ≤ 25 words, neutrally phrased. */
@@ -50,6 +64,40 @@ export type ChatClarifyRequest = {
   turnNumber: 1 | 2 | 3;
 };
 
+/**
+ * Phase 3 — Plans + DAG. A single step in a multi-step analytic plan
+ * proposed by the LLM. The frontend stores these in the plan state
+ * manager and renders them as nodes in an xyflow DAG.
+ */
+export type ChatPlanStep = {
+  /** Stable id the LLM uses to reference this step from `inputs`. */
+  id: string;
+  /** One-sentence description for the DAG node label. */
+  description: string;
+  /**
+   * Execution engine for this step. v1 of Phase 3 ships `sql` and
+   * `clarification` only; `python` and `r` are reserved for Phase 6.
+   */
+  type: "sql" | "python" | "r" | "clarification";
+  /** SQL or code for the step. */
+  code: string;
+  /** ids of steps this step depends on. */
+  inputs: string[];
+  /**
+   * The LLM's prediction of the output schema. Used to detect schema
+   * drift (Phase 4) and to pre-pick a default viz.
+   */
+  predictedSchema: Array<{ name: string; type: string }>;
+  /** Default visualization for the step's output. */
+  defaultViz?: "table" | "bar" | "line" | "scatter" | "pie";
+};
+
+export type ChatPlan = {
+  steps: ChatPlanStep[];
+  /** The LLM's one-paragraph summary of the plan, shown above the DAG. */
+  rootMessage: string;
+};
+
 export type ChatResponse = {
   assistantText: string;
   generatedSql?: ChatGeneratedSql;
@@ -59,6 +107,12 @@ export type ChatResponse = {
    * turn with the answer attached.
    */
   clarification?: ChatClarifyRequest;
+  /**
+   * Present when the model called the `proposePlan` tool. The frontend
+   * switches the canvas to the plan view (xyflow DAG) and runs each
+   * step in DuckDB.
+   */
+  plan?: ChatPlan;
 };
 
 /**

@@ -7,6 +7,7 @@ import {
   Select,
   Stack,
   Table,
+  Tabs,
   Text,
   Title,
 } from "@mantine/core";
@@ -15,11 +16,16 @@ import { IconDownload, IconTrash } from "@tabler/icons-react";
 import { notifySuccess } from "@ui";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { listClarificationLog } from "@/lib/privacy/clarificationAuditLog";
 import {
   clearConsentLog,
   consentLogToCsv,
   listConsentLog,
 } from "@/lib/privacy/consentAuditLog";
+import type {
+  ClarificationAuditEntry,
+  ClarificationOutcome,
+} from "@/lib/privacy/clarificationAuditLog";
 import type { ConsentAuditEntry } from "@/lib/privacy/consentAuditLog";
 
 type FilterValue = "all" | ConsentAuditEntry["decision"];
@@ -46,11 +52,32 @@ const CONTEXT_LABEL: Record<ConsentAuditEntry["context"], string> = {
 };
 
 /**
- * "Privacy log" tab in workspace settings. Renders the last 90 days of
- * consent decisions for the current workspace from the local Dexie
- * audit log. Per the spec: own-workspace only, no admin / org views.
+ * "Privacy log" tab in workspace settings. Renders two sub-tabs:
+ *
+ *   - Consent: last 90 days of consent decisions from `consentAuditLog`.
+ *   - Clarifications: clarification turn metadata from
+ *     `clarificationAuditLog`.
+ *
+ * Both sources are local-only and stored on this device.
  */
 export function PrivacyLogTab(): JSX.Element {
+  return (
+    <Tabs defaultValue="consent">
+      <Tabs.List>
+        <Tabs.Tab value="consent">Consent</Tabs.Tab>
+        <Tabs.Tab value="clarifications">Clarifications</Tabs.Tab>
+      </Tabs.List>
+      <Tabs.Panel value="consent" pt="md">
+        <ConsentLogPanel />
+      </Tabs.Panel>
+      <Tabs.Panel value="clarifications" pt="md">
+        <ClarificationLogPanel />
+      </Tabs.Panel>
+    </Tabs>
+  );
+}
+
+function ConsentLogPanel(): JSX.Element {
   const workspace = useCurrentWorkspace();
   const [entries, setEntries] = useState<ConsentAuditEntry[] | null>(null);
   const [filter, setFilter] = useState<FilterValue>("all");
@@ -246,6 +273,124 @@ export function PrivacyLogTab(): JSX.Element {
                     {entry.sourceColumn ?
                       <Text size="xs" ff="monospace">
                         {entry.sourceColumn}
+                      </Text>
+                    : <Text size="xs" c="dimmed">
+                        —
+                      </Text>
+                    }
+                  </Table.Td>
+                </Table.Tr>
+              );
+            })}
+          </Table.Tbody>
+        </Table>
+      }
+    </Stack>
+  );
+}
+
+const OUTCOME_LABEL: Record<ClarificationOutcome, string> = {
+  answered: "Answered",
+  let_ai_decide: "Let AI decide",
+  cancelled: "Cancelled",
+  cap_reached: "Cap reached",
+  neutral_failure: "Neutral failure",
+};
+
+const OUTCOME_COLOR: Record<ClarificationOutcome, string> = {
+  answered: "green",
+  let_ai_decide: "blue",
+  cancelled: "gray",
+  cap_reached: "yellow",
+  neutral_failure: "red",
+};
+
+function ClarificationLogPanel(): JSX.Element {
+  const workspace = useCurrentWorkspace();
+  const [entries, setEntries] = useState<ClarificationAuditEntry[] | null>(
+    null,
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load(): Promise<void> {
+      const rows = await listClarificationLog(workspace.id);
+      if (!cancelled) {
+        setEntries(rows);
+      }
+    }
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [workspace.id]);
+
+  if (entries === null) {
+    return (
+      <Group justify="center" py="xl">
+        <Loader />
+      </Group>
+    );
+  }
+
+  return (
+    <Stack gap="md">
+      <Stack gap={4}>
+        <Title order={4}>Clarifications</Title>
+        <Text size="sm" c="dimmed">
+          A local record of every clarifying question the AI has asked in
+          this workspace. Only metadata is stored — never the question text
+          or your answer.
+        </Text>
+      </Stack>
+
+      {entries.length === 0 ?
+        <Card withBorder>
+          <Text size="sm" c="dimmed" ta="center">
+            No clarifications yet. The log fills in as the chat asks
+            clarifying questions.
+          </Text>
+        </Card>
+      : <Table striped withTableBorder>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>When</Table.Th>
+              <Table.Th>Turn</Table.Th>
+              <Table.Th>Shape</Table.Th>
+              <Table.Th>Outcome</Table.Th>
+              <Table.Th>Time to answer</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {entries.map((entry) => {
+              return (
+                <Table.Tr key={entry.id}>
+                  <Table.Td>
+                    <Text size="xs">
+                      {new Date(entry.timestamp).toLocaleString()}
+                    </Text>
+                  </Table.Td>
+                  <Table.Td>
+                    <Text size="sm">{entry.turnNumber} / 3</Text>
+                  </Table.Td>
+                  <Table.Td>
+                    <Text size="xs" ff="monospace">
+                      {entry.responseShape}
+                    </Text>
+                  </Table.Td>
+                  <Table.Td>
+                    <Badge
+                      color={OUTCOME_COLOR[entry.outcome]}
+                      size="sm"
+                      variant="light"
+                    >
+                      {OUTCOME_LABEL[entry.outcome]}
+                    </Badge>
+                  </Table.Td>
+                  <Table.Td>
+                    {entry.timeToAnswerMs !== null ?
+                      <Text size="xs">
+                        {Math.round(entry.timeToAnswerMs / 100) / 10}s
                       </Text>
                     : <Text size="xs" c="dimmed">
                         —
