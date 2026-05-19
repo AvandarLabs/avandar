@@ -495,13 +495,15 @@ Captured here so V1 design decisions stay forward-compatible.
 
 **Phase 2 — Desktop native layer wired up (2–3 weeks).** IPC contracts; `bun:sqlite` + first migrations via `sqlglot`; `RdbClient` IPC live; native DuckDB in Bun main; `DatasetBlobStore` filesystem implementation; keychain via the macOS `security` CLI shellout. Desktop runs offline against a snapshot, uploads persist to disk, no sync yet.
 
+**Phase 2.5 — Consumer migration + Phase 2 acceptance (1–2 weeks).** The Phase 2 scaffold lands all the native services and the IPC bridge, but the React webview still imports the legacy modules (`DuckDbClient`, `AvaSupabase`, `AvaDexie`) directly — the native services are wired but unused. Phase 2.5 verifies the IPC bridge end-to-end, fleshes out the web adapters that Phase 2 stubbed, adds a non-React platform accessor + ESLint guardrail, then migrates the ~30 consumer files in batches. Closes with the Phase 2 acceptance checklist that couldn't run earlier. Plan: `docs/superpowers/plans/2026-05-19-electrobun-desktop-phase-2.5-consumer-migration.md`.
+
 **Phase 3 — V1 SyncEngine (2–3 weeks).** `sync_outbox`, `parquet_blob_outbox`, `sync_cursor` plus per-row sync columns; push and pull loops; LWW resolution; TUS-resumable parquet upload from Bun; sync status indicator; minimal error/conflict review panel.
 
 **Phase 4 — Hardening & macOS launch (2 weeks).** Code signing + notarization in CI; auto-update wired; local logger + in-app bug report flow; acceptance tests; internal dogfood.
 
 **Phase 5 — Windows port (2–3 weeks).** Windows-specific keychain via `cmdkey` shellout (mirroring the macOS approach); path resolution; code signing certificate + signing pipeline; regression sweep.
 
-**Rough V1 timeline: 12–15 weeks of focused work for one engineer.** Add ~30% buffer for Electrobun rough edges and signing/notarization tooling debt.
+**Rough V1 timeline: 13–17 weeks of focused work for one engineer** (Phase 2.5 added to the original 12–15-week estimate). Add ~30% buffer for Electrobun rough edges and signing/notarization tooling debt.
 
 ## Risk Register
 

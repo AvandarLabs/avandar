@@ -4,23 +4,15 @@ import { createBrowserServerApiClient } from "@clients/ServerApiClient/createBro
 import { createIpcServerApiClient } from "@clients/ServerApiClient/createIpcServerApiClient.ts";
 
 /**
- * Platform-aware {@link ServerApiClient} factory.
- *
- * Phase 1 (Option A): both web and desktop return the browser-backed adapter
- * so the desktop shell, which currently runs the entire web stack inside a
- * webview pointed at the Vite dev server, keeps working without surfacing the
- * "desktop ServerApiClient lands in Phase 2" sentinel from
- * {@link createIpcServerApiClient}.
- *
- * Phase 2 introduces the IPC-backed branch — at that point this factory
- * dispatches on {@link isDesktop} and the IPC adapter replaces the stub.
+ * Platform-aware {@link ServerApiClient} factory. On desktop the IPC
+ * adapter routes calls through the Bun-main `serverApi.*` handlers;
+ * on web it delegates to the existing `@supabase/supabase-js` instance.
  *
  * @returns A {@link ServerApiClient} appropriate to the current platform.
  */
 export function createServerApiClient(): ServerApiClient {
-  // Phase 2 cutover: when the IPC adapter lands, this becomes:
-  //   if (isDesktop()) return createIpcServerApiClient();
-  void isDesktop;
-  void createIpcServerApiClient;
+  if (isDesktop()) {
+    return createIpcServerApiClient();
+  }
   return createBrowserServerApiClient();
 }

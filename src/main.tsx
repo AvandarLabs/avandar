@@ -15,6 +15,7 @@ import { StrictMode, useEffect, useMemo } from "react";
 import { createRoot } from "react-dom/client";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { AvaRouter } from "@/config/AvaRouter";
+import { PlatformProvider } from "@/config/platform/PlatformProvider";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { useAuth } from "@/lib/hooks/auth/useAuth";
 import type { AvaRouterRootContext } from "@/config/AvaRouter";
@@ -41,6 +42,8 @@ function MainWrapper() {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <MainWrapper />
+    <PlatformProvider>
+      <MainWrapper />
+    </PlatformProvider>
   </StrictMode>,
 );
