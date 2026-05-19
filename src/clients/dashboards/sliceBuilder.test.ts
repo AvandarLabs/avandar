@@ -11,7 +11,7 @@ const DS_A = "00000000-0000-4000-8000-000000000001" as DatasetId;
 const DS_B = "00000000-0000-4000-8000-000000000002" as DatasetId;
 
 describe("buildSliceSql", () => {
-  it('projects queried columns by default and ignores unknown ones', () => {
+  it("projects queried columns by default and ignores unknown ones", () => {
     const sql = buildSliceSql({
       baseSelectExpr: 'SELECT * FROM "ds"',
       sliceConfig: { mode: "queried" },
@@ -55,7 +55,11 @@ describe("buildSliceSql", () => {
         mode: "custom",
         columns: ["province", "cases", "date"],
         rowFilters: [
-          { kind: "enum", columnName: "province", values: ["Lusaka", "Copperbelt"] },
+          {
+            kind: "enum",
+            columnName: "province",
+            values: ["Lusaka", "Copperbelt"],
+          },
           { kind: "range_number", columnName: "cases", min: 5, max: 1000 },
           {
             kind: "range_date",
@@ -69,7 +73,7 @@ describe("buildSliceSql", () => {
       queriedColumns: ["province"],
       treatAsAllColumns: false,
     });
-    expect(sql).toContain('"province" IN (\'Lusaka\', \'Copperbelt\')');
+    expect(sql).toContain("\"province\" IN ('Lusaka', 'Copperbelt')");
     expect(sql).toContain('"cases" >= 5 AND "cases" <= 1000');
     expect(sql).toContain(`"date" >= '2024-01-01' AND "date" <= '2024-12-31'`);
   });

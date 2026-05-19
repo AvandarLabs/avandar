@@ -127,7 +127,11 @@ export function extractReferencedColumns(
         return parts[parts.length - 1] ?? "";
       });
       // A star reference signals "all columns required".
-      if (cols.some((c) => {return c === "(.*)" || c === "*"})) {
+      if (
+        cols.some((c) => {
+          return c === "(.*)" || c === "*";
+        })
+      ) {
         for (const id of datasetIds) unparseable.add(id);
         continue;
       }
@@ -193,14 +197,12 @@ export function buildSliceSql(options: {
     const cols = queriedColumns.filter((c) => {
       return availableColumns.includes(c);
     });
-    projection =
-      cols.length > 0 ? cols.map(_quoteIdent).join(", ") : "*";
+    projection = cols.length > 0 ? cols.map(_quoteIdent).join(", ") : "*";
   } else {
     const cols = sliceConfig.columns.filter((c) => {
       return availableColumns.includes(c);
     });
-    projection =
-      cols.length > 0 ? cols.map(_quoteIdent).join(", ") : "*";
+    projection = cols.length > 0 ? cols.map(_quoteIdent).join(", ") : "*";
   }
 
   // Resolve row filters.
@@ -213,8 +215,7 @@ export function buildSliceSql(options: {
   }
 
   const innerSql = baseSelectExpr.trim().replace(/;\s*$/u, "");
-  const wherePart =
-    wheres.length > 0 ? ` WHERE ${wheres.join(" AND ")}` : "";
+  const wherePart = wheres.length > 0 ? ` WHERE ${wheres.join(" AND ")}` : "";
 
   return `SELECT ${projection} FROM (${innerSql}) AS _ava_slice${wherePart}`;
 }
@@ -227,9 +228,15 @@ function _rowFilterToSql(
   const col = _quoteIdent(filter.columnName);
 
   if (filter.kind === "enum") {
-    const vals = filter.values.filter((v) => {return v.length > 0});
+    const vals = filter.values.filter((v) => {
+      return v.length > 0;
+    });
     if (vals.length === 0) return undefined;
-    return `${col} IN (${vals.map((v) => {return _formatLiteral(v)}).join(", ")})`;
+    return `${col} IN (${vals
+      .map((v) => {
+        return _formatLiteral(v);
+      })
+      .join(", ")})`;
   }
   if (filter.kind === "range_number") {
     const parts: string[] = [];

@@ -2,8 +2,8 @@ import { Button } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconFileExport } from "@tabler/icons-react";
 import { notifyDevAlert, Tooltip } from "@ui";
-import { ExportPdfModal } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal";
 import { logAnalyticsEvent } from "@/lib/analytics/analyticsClient";
+import { ExportPdfModal } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/ExportPdfModal";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
 type Props = {

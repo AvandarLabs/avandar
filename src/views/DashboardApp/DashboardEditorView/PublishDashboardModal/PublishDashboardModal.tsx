@@ -79,7 +79,9 @@ export function PublishDashboardModal({
   }, [slugInput]);
 
   const [publishConfig, setPublishConfig] = useState<DashboardPublishConfig>(
-    () => {return readDashboardPublishConfig(dashboard.config)},
+    () => {
+      return readDashboardPublishConfig(dashboard.config);
+    },
   );
 
   // The URL the dashboard will be (or has been) published to. Prefers

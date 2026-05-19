@@ -1,19 +1,19 @@
 import { Alert, Box, Button, Group, Stack, Text } from "@mantine/core";
+import { Render as PuckPageRender } from "@puckeditor/core";
 import {
   IconArrowRight,
   IconFileExport,
   IconPencil,
 } from "@tabler/icons-react";
 import { notifyError, notifySuccess } from "@ui";
-import { Render as PuckPageRender } from "@puckeditor/core";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
-import { getDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig";
 import { PdfAnnotator } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotator";
 import { captureAndDownloadPdf } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/pdfExport";
+import { getDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
@@ -135,9 +135,9 @@ export function ExportPdfModal({ dashboard, onClose }: Props): JSX.Element {
         {hiddenRender}
         <Alert color="blue" variant="light">
           <Text size="sm">
-            Export this dashboard as a PDF, or sketch on it first.
-            Annotations support text, arrows, and freehand drawing with
-            adjustable roughness (RoughJS).
+            Export this dashboard as a PDF, or sketch on it first. Annotations
+            support text, arrows, and freehand drawing with adjustable roughness
+            (RoughJS).
           </Text>
         </Alert>
 
@@ -157,7 +157,9 @@ export function ExportPdfModal({ dashboard, onClose }: Props): JSX.Element {
             size="md"
             leftSection={<IconPencil size={18} />}
             rightSection={<IconArrowRight size={16} />}
-            onClick={() => {return setStep("annotate")}}
+            onClick={() => {
+              return setStep("annotate");
+            }}
             justify="space-between"
           >
             Annotate, then export
@@ -182,7 +184,9 @@ export function ExportPdfModal({ dashboard, onClose }: Props): JSX.Element {
         filename={filename}
         title={dashboard.name || "Untitled dashboard"}
         onClose={onClose}
-        onBack={() => {return setStep("choose")}}
+        onBack={() => {
+          return setStep("choose");
+        }}
       />
     </Stack>
   );

@@ -1,10 +1,7 @@
 import { notifyError } from "@ui";
 import { assertIsDefined, prop, where } from "@utils";
 import { DashboardParsers } from "$/models/Dashboard/DashboardParsers";
-import {
-  DEFAULT_PUBLISH_SLICE,
-  type DashboardPublishConfig,
-} from "$/models/Dashboard/PublishSliceConfig";
+import { DEFAULT_PUBLISH_SLICE } from "$/models/Dashboard/PublishSliceConfig";
 import { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { extractDatasetIdsFromDashboardConfig } from "@/clients/dashboards/extractDatasetIdsFromDashboardConfig";
@@ -26,6 +23,7 @@ import { PublicDatasetParquetStorageClient } from "@/clients/storage/PublicDatas
 import { promiseMap } from "@/lib/utils/promises";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { DashboardPublishConfig } from "$/models/Dashboard/PublishSliceConfig";
 
 export const DashboardClient = createUsableServiceClient(
   createRdbCrudClient({
@@ -59,8 +57,11 @@ export const DashboardClient = createUsableServiceClient(
            */
           publishConfig?: DashboardPublishConfig;
         }): Promise<Dashboard.T> => {
-          const { dashboardId, slug, publishConfig: incomingPublishConfig } =
-            params;
+          const {
+            dashboardId,
+            slug,
+            publishConfig: incomingPublishConfig,
+          } = params;
           const logger = config.clientLogger.appendName("publishDashboard");
 
           const dashboard = await DashboardClient.getById({

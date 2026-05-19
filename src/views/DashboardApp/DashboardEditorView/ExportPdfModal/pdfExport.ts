@@ -34,7 +34,8 @@ export async function captureAndDownloadPdf(
   options: CaptureOptions,
 ): Promise<void> {
   const baseCanvas = await snapshotElement(options.element);
-  const finalCanvas = options.annotationCanvas ?
+  const finalCanvas =
+    options.annotationCanvas ?
       composite(baseCanvas, options.annotationCanvas)
     : baseCanvas;
 

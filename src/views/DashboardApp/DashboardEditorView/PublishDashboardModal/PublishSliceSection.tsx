@@ -32,8 +32,8 @@ import type {
   PublishSliceRowFilter,
 } from "$/models/Dashboard/PublishSliceConfig";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
-import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 
 type Props = {
   dashboard: Dashboard.T;
@@ -175,7 +175,8 @@ export function PublishSliceSection({
                     variant="light"
                     color={
                       slice.mode === "queried" ? "teal"
-                      : slice.mode === "all_columns" ? "yellow"
+                      : slice.mode === "all_columns" ?
+                        "yellow"
                       : "blue"
                     }
                   >
@@ -191,7 +192,9 @@ export function PublishSliceSection({
                 <SliceModeEditor
                   dataset={d}
                   slice={slice}
-                  onChange={(next) => {return _update(d.id, next)}}
+                  onChange={(next) => {
+                    return _update(d.id, next);
+                  }}
                 />
               </Accordion.Panel>
             </Accordion.Item>
@@ -253,21 +256,13 @@ function SliceModeEditor({
       : null}
 
       {slice.mode === "custom" ?
-        <CustomEditor
-          dataset={dataset}
-          slice={slice}
-          onChange={onChange}
-        />
+        <CustomEditor dataset={dataset} slice={slice} onChange={onChange} />
       : null}
     </Stack>
   );
 }
 
-function QueriedPreview({
-  dataset,
-}: {
-  dataset: DatasetSummary;
-}): JSX.Element {
+function QueriedPreview({ dataset }: { dataset: DatasetSummary }): JSX.Element {
   if (dataset.treatAsAllColumns) {
     return (
       <Text size="xs" c="dimmed">
@@ -291,11 +286,13 @@ function QueriedPreview({
       </Text>
       <ScrollArea.Autosize mah={120}>
         <Group gap={4}>
-          {cols.map((c) => {return (
-            <Badge key={c} size="sm" variant="light" color="teal">
-              {c}
-            </Badge>
-          )})}
+          {cols.map((c) => {
+            return (
+              <Badge key={c} size="sm" variant="light" color="teal">
+                {c}
+              </Badge>
+            );
+          })}
         </Group>
       </ScrollArea.Autosize>
     </Stack>
@@ -311,14 +308,16 @@ function CustomEditor({
   slice: Extract<PublishSliceConfig, { mode: "custom" }>;
   onChange: (next: PublishSliceConfig) => void;
 }): JSX.Element {
-  const allColumnNames = useMemo(() => {return dataset.columns.map(prop("name"))}, [
-    dataset.columns,
-  ]);
+  const allColumnNames = useMemo(() => {
+    return dataset.columns.map(prop("name"));
+  }, [dataset.columns]);
   const filterableColumns = useMemo(() => {
-    return dataset.columns.map((c) => {return {
-      name: c.name,
-      type: c.dataType,
-    }});
+    return dataset.columns.map((c) => {
+      return {
+        name: c.name,
+        type: c.dataType,
+      };
+    });
   }, [dataset.columns]);
 
   const _setColumns = (cols: readonly string[]): void => {
@@ -339,14 +338,18 @@ function CustomEditor({
             <Button
               size="compact-xs"
               variant="subtle"
-              onClick={() => {return _setColumns(allColumnNames)}}
+              onClick={() => {
+                return _setColumns(allColumnNames);
+              }}
             >
               Select all
             </Button>
             <Button
               size="compact-xs"
               variant="subtle"
-              onClick={() => {return _setColumns(dataset.queriedColumns)}}
+              onClick={() => {
+                return _setColumns(dataset.queriedColumns);
+              }}
               disabled={dataset.queriedColumns.length === 0}
             >
               Just what's queried
@@ -367,11 +370,11 @@ function CustomEditor({
                       <Badge size="xs" variant="outline" color="neutral">
                         {c.dataType}
                       </Badge>
-                      {isQueried ? (
+                      {isQueried ?
                         <Badge size="xs" variant="light" color="teal">
                           queried
                         </Badge>
-                      ) : null}
+                      : null}
                     </Group>
                   }
                   checked={checked}
@@ -395,39 +398,42 @@ function CustomEditor({
           </Text>
           <AddRowFilterMenu
             columns={filterableColumns}
-            onAdd={(rf) => {return _setRowFilters([...slice.rowFilters, rf])}}
+            onAdd={(rf) => {
+              return _setRowFilters([...slice.rowFilters, rf]);
+            }}
           />
         </Group>
-        {slice.rowFilters.length === 0 ? (
+        {slice.rowFilters.length === 0 ?
           <Text size="xs" c="dimmed">
-            No row filters. The slice will include every row in the dataset
-            (for the selected columns).
+            No row filters. The slice will include every row in the dataset (for
+            the selected columns).
           </Text>
-        ) : (
-          <Stack gap="xs">
-            {slice.rowFilters.map((rf, idx) => {return (
-              <RowFilterRow
-                key={`${rf.columnName}-${idx}`}
-                rowFilter={rf}
-                columnType={
-                  filterableColumns.find((c) => {
-                    return c.name === rf.columnName;
-                  })?.type ?? "varchar"
-                }
-                onChange={(next) => {
-                  const arr = slice.rowFilters.slice();
-                  arr[idx] = next;
-                  _setRowFilters(arr);
-                }}
-                onRemove={() => {
-                  const arr = slice.rowFilters.slice();
-                  arr.splice(idx, 1);
-                  _setRowFilters(arr);
-                }}
-              />
-            )})}
+        : <Stack gap="xs">
+            {slice.rowFilters.map((rf, idx) => {
+              return (
+                <RowFilterRow
+                  key={`${rf.columnName}-${idx}`}
+                  rowFilter={rf}
+                  columnType={
+                    filterableColumns.find((c) => {
+                      return c.name === rf.columnName;
+                    })?.type ?? "varchar"
+                  }
+                  onChange={(next) => {
+                    const arr = slice.rowFilters.slice();
+                    arr[idx] = next;
+                    _setRowFilters(arr);
+                  }}
+                  onRemove={() => {
+                    const arr = slice.rowFilters.slice();
+                    arr.splice(idx, 1);
+                    _setRowFilters(arr);
+                  }}
+                />
+              );
+            })}
           </Stack>
-        )}
+        }
       </Stack>
     </Stack>
   );
@@ -446,10 +452,14 @@ function AddRowFilterMenu({
       size="xs"
       searchable
       clearable={false}
-      data={columns.map((c) => {return { value: c.name, label: c.name }})}
+      data={columns.map((c) => {
+        return { value: c.name, label: c.name };
+      })}
       onChange={(name) => {
         if (!name) return;
-        const col = columns.find((c) => {return c.name === name});
+        const col = columns.find((c) => {
+          return c.name === name;
+        });
         if (!col) return;
         if (_isNumericType(col.type))
           onAdd({ kind: "range_number", columnName: name });
@@ -534,19 +544,21 @@ function RowFilterRow({
         <TagsInput
           placeholder="Enter values; press Enter after each"
           value={[...rowFilter.values]}
-          onChange={(v) => {return onChange({ ...rowFilter, values: v })}}
+          onChange={(v) => {
+            return onChange({ ...rowFilter, values: v });
+          }}
         />
       : rowFilter.kind === "range_number" ?
         <Group gap="xs">
           <NumberInput
             placeholder="Min"
             value={rowFilter.min ?? ""}
-            onChange={(v) =>
-              {return onChange({
+            onChange={(v) => {
+              return onChange({
                 ...rowFilter,
                 min: typeof v === "number" ? v : undefined,
-              })}
-            }
+              });
+            }}
           />
           <Text size="xs" c="dimmed">
             to
@@ -554,21 +566,21 @@ function RowFilterRow({
           <NumberInput
             placeholder="Max"
             value={rowFilter.max ?? ""}
-            onChange={(v) =>
-              {return onChange({
+            onChange={(v) => {
+              return onChange({
                 ...rowFilter,
                 max: typeof v === "number" ? v : undefined,
-              })}
-            }
+              });
+            }}
           />
         </Group>
       : <Group gap="xs">
           <TextInput
             placeholder="Start (e.g. 2024-01-01)"
             value={rowFilter.start ?? ""}
-            onChange={(e) =>
-              {return onChange({ ...rowFilter, start: e.currentTarget.value })}
-            }
+            onChange={(e) => {
+              return onChange({ ...rowFilter, start: e.currentTarget.value });
+            }}
           />
           <Text size="xs" c="dimmed">
             to
@@ -576,13 +588,12 @@ function RowFilterRow({
           <TextInput
             placeholder="End (e.g. 2024-12-31)"
             value={rowFilter.end ?? ""}
-            onChange={(e) =>
-              {return onChange({ ...rowFilter, end: e.currentTarget.value })}
-            }
+            onChange={(e) => {
+              return onChange({ ...rowFilter, end: e.currentTarget.value });
+            }}
           />
         </Group>
       }
     </Box>
   );
 }
-

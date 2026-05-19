@@ -23,7 +23,10 @@ import {
 import { notifyError } from "@ui";
 import { useCallback, useEffect, useRef, useState } from "react";
 import rough from "roughjs";
-import { snapshotElement, captureAndDownloadPdf } from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/pdfExport";
+import {
+  captureAndDownloadPdf,
+  snapshotElement,
+} from "@/views/DashboardApp/DashboardEditorView/ExportPdfModal/pdfExport";
 
 type Tool = "freehand" | "arrow" | "text";
 
@@ -91,18 +94,20 @@ export function PdfAnnotator({
       setIsCapturing(false);
       return;
     }
-    void snapshotElement(sourceElement).then((canvas) => {
-      if (!isMounted) return;
-      setBaseCanvas(canvas);
-      setIsCapturing(false);
-    }).catch((e: unknown) => {
-      if (!isMounted) return;
-      notifyError({
-        title: "Couldn't capture dashboard",
-        message: e instanceof Error ? e.message : String(e),
+    void snapshotElement(sourceElement)
+      .then((canvas) => {
+        if (!isMounted) return;
+        setBaseCanvas(canvas);
+        setIsCapturing(false);
+      })
+      .catch((e: unknown) => {
+        if (!isMounted) return;
+        notifyError({
+          title: "Couldn't capture dashboard",
+          message: e instanceof Error ? e.message : String(e),
+        });
+        setIsCapturing(false);
       });
-      setIsCapturing(false);
-    });
     return () => {
       isMounted = false;
     };
@@ -185,17 +190,19 @@ export function PdfAnnotator({
       } else if (tool === "text") {
         const text = window.prompt("Annotation text:");
         if (!text) return;
-        setStrokes((s) => {return [
-          ...s,
-          {
-            kind: "text",
-            at: pt,
-            text,
-            color,
-            // Scale font with the captured canvas so it reads at PDF size.
-            fontSize: Math.round((baseCanvas.width / displayWidth) * 18),
-          },
-        ]});
+        setStrokes((s) => {
+          return [
+            ...s,
+            {
+              kind: "text",
+              at: pt,
+              text,
+              color,
+              // Scale font with the captured canvas so it reads at PDF size.
+              fontSize: Math.round((baseCanvas.width / displayWidth) * 18),
+            },
+          ];
+        });
       }
     },
     [
@@ -234,13 +241,17 @@ export function PdfAnnotator({
       } catch {
         // ignore
       }
-      setStrokes((s) => {return [...s, finished]});
+      setStrokes((s) => {
+        return [...s, finished];
+      });
     },
     [],
   );
 
   const _undo = useCallback((): void => {
-    setStrokes((s) => {return s.slice(0, -1)});
+    setStrokes((s) => {
+      return s.slice(0, -1);
+    });
   }, []);
 
   const _clear = useCallback((): void => {
@@ -302,7 +313,9 @@ export function PdfAnnotator({
           <SegmentedControl
             size="xs"
             value={tool}
-            onChange={(t) => {return setTool(t as Tool)}}
+            onChange={(t) => {
+              return setTool(t as Tool);
+            }}
             data={[
               {
                 value: "freehand",
