@@ -119,7 +119,8 @@ export function ConsentModal({
                   size="sm"
                   color={
                     pii.severity === "critical" ? "red"
-                    : pii.severity === "warning" ? "yellow"
+                    : pii.severity === "warning" ?
+                      "yellow"
                     : "gray"
                   }
                   variant="light"
@@ -231,7 +232,11 @@ export function ConsentModal({
   );
 }
 
-function Preview({ values }: { values: readonly unknown[] }): JSX.Element | null {
+function Preview({
+  values,
+}: {
+  values: readonly unknown[];
+}): JSX.Element | null {
   if (values.length === 0) {
     return null;
   }

@@ -719,8 +719,7 @@ class DuckDbClientImpl {
       commentChar === "(empty)" ? null : (commentChar ?? null);
     const cleanEscapeChar =
       escapeChar === "(empty)" ? null : (escapeChar ?? null);
-    const cleanQuoteChar =
-      quoteChar === "(empty)" ? null : (quoteChar ?? null);
+    const cleanQuoteChar = quoteChar === "(empty)" ? null : (quoteChar ?? null);
 
     const conn = await this.#connect();
     try {

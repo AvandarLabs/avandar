@@ -45,7 +45,7 @@ const RULES: BiasRule[] = [
     suggest: () => {
       return (
         "Rephrase as a question about correlations or observed patterns " +
-        "(e.g. \"what factors correlate with this outcome among women in our data\") " +
+        '(e.g. "what factors correlate with this outcome among women in our data") ' +
         "rather than a generalization."
       );
     },
@@ -77,11 +77,12 @@ const RULES: BiasRule[] = [
   {
     category: "ethnic_cultural_generalization",
     label: "Loaded cultural descriptor",
-    regex: /\b(primitive|backward|underdeveloped|third[-\s]?world|uncivilized)\b/i,
+    regex:
+      /\b(primitive|backward|underdeveloped|third[-\s]?world|uncivilized)\b/i,
     suggest: () => {
       return (
-        "Replace loaded descriptors with neutral ones — \"low-income\", " +
-        "\"emerging\", or the country/region name your data references."
+        'Replace loaded descriptors with neutral ones — "low-income", ' +
+        '"emerging", or the country/region name your data references.'
       );
     },
   },
@@ -94,33 +95,33 @@ const RULES: BiasRule[] = [
       /\bwhy\s+(are|do)\s+\w+(?:\s+\w+){0,6}\s+(poor|lazy|violent|illiterate|uneducated)/i,
     suggest: () => {
       return (
-        "\"Why are X poor / lazy / ...\" assumes the premise. Try asking what " +
+        '"Why are X poor / lazy / ..." assumes the premise. Try asking what ' +
         "factors correlate with the outcome you actually care about."
       );
     },
   },
   {
     category: "loaded_framing",
-    label: "Loaded framing — \"what's wrong with\"",
+    label: 'Loaded framing — "what\'s wrong with"',
     regex: /\bwhat['']?s\s+wrong\s+with\b/i,
     suggest: () => {
-      return "\"What's wrong with\" framing presumes a deficit. Try asking what factors influence the outcome you care about.";
+      return '"What\'s wrong with" framing presumes a deficit. Try asking what factors influence the outcome you care about.';
     },
   },
   {
     category: "loaded_framing",
-    label: "\"Normal\" framing",
+    label: '"Normal" framing',
     regex: /\bnormal\s+(persons?|family|families|households?)\b/i,
     suggest: () => {
       return (
-        "\"Normal\" implies others are abnormal. Describe the comparison group " +
-        "concretely (e.g. \"households without children\")."
+        '"Normal" implies others are abnormal. Describe the comparison group ' +
+        'concretely (e.g. "households without children").'
       );
     },
   },
   {
     category: "statistical_assumption",
-    label: "Statistical assumption — \"average\"",
+    label: 'Statistical assumption — "average"',
     regex:
       /\baverage\s+(woman|man|african|asian|latino|indigenous|poor person|disabled person)\b/i,
     suggest: () => {
@@ -132,11 +133,11 @@ const RULES: BiasRule[] = [
   },
   {
     category: "statistical_assumption",
-    label: "Statistical assumption — \"typical\"",
+    label: 'Statistical assumption — "typical"',
     regex: /\btypical\s+(woman|man|family from)\b/i,
     suggest: () => {
       return (
-        "\"Typical X\" assumes homogeneity. Try a specific question about " +
+        '"Typical X" assumes homogeneity. Try a specific question about ' +
         "the distribution in your data."
       );
     },

@@ -27,8 +27,8 @@ export function SqlQueryView(): JSX.Element {
     return (
       <Stack gap="xs" px="sm">
         <Text size="sm" c="neutral.6">
-          No SQL yet. Ask Avandar a question or build a query in the Manual
-          tab to generate SQL.
+          No SQL yet. Ask Avandar a question or build a query in the Manual tab
+          to generate SQL.
         </Text>
       </Stack>
     );

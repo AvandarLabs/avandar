@@ -1,5 +1,7 @@
 import { useMutation, UseMutationResultTuple } from "@hooks";
 import { notifyError } from "@ui";
+import { MIMEType } from "@utils";
+import { uuid } from "$/lib/uuid";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { UserId } from "$/models/User/User.types";
 import { useState } from "react";
@@ -13,8 +15,6 @@ import {
 } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { uuid } from "$/lib/uuid";
-import { MIMEType } from "@utils";
 import {
   BaseLoadResult,
   ManualUploadDataSourceMetadata,
@@ -168,7 +168,9 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
   // without churning every consumer that already calls `loadFile`, so a
   // ref carries the side channel.
   const pendingPreviewRowsRef = useState<{ value: UnknownRow[] | undefined }>(
-    () => ({ value: undefined }),
+    () => {
+      return { value: undefined };
+    },
   )[0];
 
   const [loadManualUploadFile, isLoadingManualUploadFile] = useMutation({

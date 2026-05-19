@@ -11,7 +11,8 @@
     var(--mantine-color-neutral-0),
     var(--mantine-color-neutral-1)
   );
-  border-bottom: 1px solid var(--ava-border-default, var(--mantine-color-neutral-2));
+  border-bottom: 1px solid
+    var(--ava-border-default, var(--mantine-color-neutral-2));
   cursor: grab;
   flex: 0 0 auto;
   user-select: none;

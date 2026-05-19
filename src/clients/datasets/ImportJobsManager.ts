@@ -128,7 +128,7 @@ export const ImportJobsManager = {
     _resolveCompletionWaiters(updated);
   },
 
-  /** Mark a job as failed with the message that will be surfaced to the user. */
+  /** Mark a job as failed with the message we surface to the user. */
   markFailed: (datasetId: DatasetId, reason: string): void => {
     const current = _state.current.byDatasetId[datasetId];
     if (!current) {
@@ -205,7 +205,9 @@ export function useImportJobsState(): ImportJobsState {
 }
 
 /** Convenience hook that returns just the job for a single dataset. */
-export function useImportJob(datasetId: DatasetId | undefined): ImportJob | undefined {
+export function useImportJob(
+  datasetId: DatasetId | undefined,
+): ImportJob | undefined {
   const state = useImportJobsState();
   if (!datasetId) {
     return undefined;
@@ -238,7 +240,10 @@ export function estimateRemainingFromJob(
     1_000_000, // 1 MB/s floor so tiny CSVs don't predict hours
     (job.sourceFileSize * 0.3) / (elapsedMs / 1000),
   );
-  const remainingBytes = Math.max(0, job.sourceFileSize - assumedBytesPerSecond * (elapsedMs / 1000));
+  const remainingBytes = Math.max(
+    0,
+    job.sourceFileSize - assumedBytesPerSecond * (elapsedMs / 1000),
+  );
   const remainingSec = remainingBytes / assumedBytesPerSecond;
   if (remainingSec < 5) {
     return "less than a minute";

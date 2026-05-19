@@ -1,5 +1,5 @@
 import { Box, BoxProps, Stack } from "@mantine/core";
-import { notifyError, FileUploadForm  } from "@ui";
+import { FileUploadForm, notifyError } from "@ui";
 import { MIMEType } from "@utils";
 import { uuid } from "$/lib/uuid";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";

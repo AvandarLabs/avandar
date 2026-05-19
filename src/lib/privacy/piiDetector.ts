@@ -206,8 +206,7 @@ const CONTENT_PATTERNS: Array<{
   {
     category: "demographic_sensitive",
     label: "Date of birth",
-    regex:
-      /\b(0?[1-9]|1[0-2])[\/\-](0?[1-9]|[12]\d|3[01])[\/\-](19|20)\d{2}\b/,
+    regex: /\b(0?[1-9]|1[0-2])[/-](0?[1-9]|[12]\d|3[01])[/-](19|20)\d{2}\b/,
   },
   {
     category: "direct_identifier",
@@ -340,9 +339,8 @@ export function detectPii(input: {
   columnName?: string;
   values?: readonly unknown[];
 }): PiiDetectionResult {
-  const columnHits = input.columnName ?
-    _detectFromColumnName(input.columnName)
-  : [];
+  const columnHits =
+    input.columnName ? _detectFromColumnName(input.columnName) : [];
   const contentHits = input.values ? _detectFromContent(input.values) : [];
 
   const hits = [...columnHits, ...contentHits];

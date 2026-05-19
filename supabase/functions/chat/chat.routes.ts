@@ -397,61 +397,65 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
                 },
               },
             },
-            ...(clarificationCapReached ? [] : [{
-              type: "function",
-              function: {
-                name: "clarify",
-                description:
-                  "Ask the user one clarifying question when their request is materially ambiguous and the answer would change the SQL. Prefer fixed_options when the choices can be enumerated from metadata. Use this BEFORE generateSql when ambiguous.",
-                parameters: {
-                  type: "object",
-                  properties: {
-                    question: {
-                      type: "string",
-                      maxLength: 200,
-                      description:
-                        "≤25 words, neutrally phrased, single question.",
-                    },
-                    rationale: {
-                      type: "string",
-                      maxLength: 200,
-                      description:
-                        "Optional one-sentence explanation of why you are asking.",
-                    },
-                    responseShape: {
-                      oneOf: [
-                        {
-                          type: "object",
-                          properties: {
-                            kind: { const: "free_text" },
-                            placeholder: { type: "string", maxLength: 80 },
-                          },
-                          required: ["kind"],
-                          additionalProperties: false,
+            ...(clarificationCapReached ?
+              []
+            : [
+                {
+                  type: "function",
+                  function: {
+                    name: "clarify",
+                    description:
+                      "Ask the user one clarifying question when their request is materially ambiguous and the answer would change the SQL. Prefer fixed_options when the choices can be enumerated from metadata. Use this BEFORE generateSql when ambiguous.",
+                    parameters: {
+                      type: "object",
+                      properties: {
+                        question: {
+                          type: "string",
+                          maxLength: 200,
+                          description:
+                            "≤25 words, neutrally phrased, single question.",
                         },
-                        {
-                          type: "object",
-                          properties: {
-                            kind: { const: "fixed_options" },
-                            options: {
-                              type: "array",
-                              minItems: 2,
-                              maxItems: 8,
-                              items: { type: "string", maxLength: 80 },
+                        rationale: {
+                          type: "string",
+                          maxLength: 200,
+                          description:
+                            "Optional one-sentence explanation of why you are asking.",
+                        },
+                        responseShape: {
+                          oneOf: [
+                            {
+                              type: "object",
+                              properties: {
+                                kind: { const: "free_text" },
+                                placeholder: { type: "string", maxLength: 80 },
+                              },
+                              required: ["kind"],
+                              additionalProperties: false,
                             },
-                            multi: { type: "boolean" },
-                          },
-                          required: ["kind", "options", "multi"],
-                          additionalProperties: false,
+                            {
+                              type: "object",
+                              properties: {
+                                kind: { const: "fixed_options" },
+                                options: {
+                                  type: "array",
+                                  minItems: 2,
+                                  maxItems: 8,
+                                  items: { type: "string", maxLength: 80 },
+                                },
+                                multi: { type: "boolean" },
+                              },
+                              required: ["kind", "options", "multi"],
+                              additionalProperties: false,
+                            },
+                          ],
                         },
-                      ],
+                      },
+                      required: ["question", "responseShape"],
+                      additionalProperties: false,
                     },
                   },
-                  required: ["question", "responseShape"],
-                  additionalProperties: false,
                 },
-              },
-            }]),
+              ]),
           ];
           requestBody.tool_choice = "auto";
         }
@@ -526,8 +530,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           text ||
           (generatedSql ?
             "Here is the SQL I ran. Results are on the canvas to the left."
-          : clarification ?
-            clarification.question
+          : clarification ? clarification.question
           : "I could not generate a query for that. Try rephrasing.");
 
         const result: ChatResponse = {

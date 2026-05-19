@@ -14,9 +14,6 @@ type Props = {
 export function ImportDatasetView({ onSaveSuccess }: Props): JSX.Element {
   const isAddAllowed = useCanAddDataset();
   return (
-    <DataImportTabs
-      isAddAllowed={isAddAllowed}
-      onSaveSuccess={onSaveSuccess}
-    />
+    <DataImportTabs isAddAllowed={isAddAllowed} onSaveSuccess={onSaveSuccess} />
   );
 }

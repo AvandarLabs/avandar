@@ -2,6 +2,7 @@ import { notifyError } from "@ui";
 import Uppy from "@uppy/core";
 import Tus from "@uppy/tus";
 import { MIMEType } from "@utils";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { AuthClient } from "@/clients/AuthClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { ImportJobsManager } from "@/clients/datasets/ImportJobsManager";
@@ -14,7 +15,6 @@ import {
   WORKSPACES_BUCKET_NAME,
 } from "@/clients/storage/DatasetParquetStorageClient/utils";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -110,8 +110,8 @@ async function _oneShotParquetBlobUpload(options: {
 }): Promise<void> {
   const { workspaceId, datasetId, parquetBlob } = options;
   const objectPath = getDatasetParquetStoragePath({ workspaceId, datasetId });
-  const { error } = await AvaSupabase.db().storage
-    .from(WORKSPACES_BUCKET_NAME)
+  const { error } = await AvaSupabase.db()
+    .storage.from(WORKSPACES_BUCKET_NAME)
     .upload(objectPath, parquetBlob, {
       contentType: MIMEType.APPLICATION_PARQUET,
       upsert: true,

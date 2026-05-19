@@ -129,8 +129,7 @@ export function parseURLSearch(search: DataExplorerURLSearch): ParsedURLState {
       if (raw.did && raw.name) {
         // Older URLs were emitted before non-virtual datasets could be
         // opened; fall back to "virtual" so legacy links keep loading.
-        const sourceType = (raw.st ??
-          "virtual") as DatasetSource.SourceType;
+        const sourceType = (raw.st ?? "virtual") as DatasetSource.SourceType;
         result.openDataset = {
           datasetId: raw.did as OpenDatasetInfo["datasetId"],
           name: raw.name,
@@ -218,8 +217,7 @@ export function serializeStateToURL(
   }
 
   if (state.openDataset) {
-    const { datasetId, name, sourceType, virtualDatasetId } =
-      state.openDataset;
+    const { datasetId, name, sourceType, virtualDatasetId } = state.openDataset;
     params.od = JSON.stringify({
       did: datasetId,
       name,

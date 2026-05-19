@@ -72,10 +72,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         const lastUserMsg = [...apiMessages].reverse().find((m) => {
           return m.role === "user";
         });
-        if (
-          lastUserMsg &&
-          !CLARIFICATION_ANSWER_RE.test(lastUserMsg.content)
-        ) {
+        if (lastUserMsg && !CLARIFICATION_ANSWER_RE.test(lastUserMsg.content)) {
           const biasResult = detectBias(lastUserMsg.content);
           if (biasResult.hits.length > 0) {
             const consent = await crossBoundary({
@@ -125,7 +122,6 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           // tracked in CHECKPOINTS — for v0 we surface, not gate).
           const questionBias = detectBias(response.clarification.question);
           if (questionBias.hits.length > 0) {
-            // eslint-disable-next-line no-console
             console.warn(
               "[chat] LLM clarification trips bias detector — passing through for v0:",
               questionBias.hits.map((h) => {
@@ -151,12 +147,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         return { content: assistantParts };
       },
     };
-  }, [
-    workspace.id,
-    pageContext,
-    dataExplorerDispatch,
-    chatPanelDispatch,
-  ]);
+  }, [workspace.id, pageContext, dataExplorerDispatch, chatPanelDispatch]);
 
   return useLocalRuntime(adapter);
 }

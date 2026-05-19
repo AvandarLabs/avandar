@@ -24,7 +24,9 @@ type Props = {
  *     redrive Phase B from the cached source bytes).
  *   - LocalDataset row says `failed` → warning icon + reason tooltip.
  */
-export function DatasetParseStatusIndicator({ datasetId }: Props): JSX.Element | null {
+export function DatasetParseStatusIndicator({
+  datasetId,
+}: Props): JSX.Element | null {
   const activeJob = useImportJob(datasetId);
   const [localDataset] = LocalDatasetClient.useGetById({ id: datasetId });
 

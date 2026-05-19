@@ -88,9 +88,7 @@ describe("openFileImportFlow", () => {
     );
 
     fireEvent.click(screen.getByText("open"));
-    fireEvent.click(
-      await screen.findByRole("button", { name: /^import$/i }),
-    );
+    fireEvent.click(await screen.findByRole("button", { name: /^import$/i }));
 
     const manualUploadMock = await screen.findByTestId(
       "manual-upload-view-mock",
@@ -116,9 +114,7 @@ describe("openFileImportFlow", () => {
     );
 
     fireEvent.click(screen.getByText("open"));
-    fireEvent.click(
-      await screen.findByRole("button", { name: /^cancel$/i }),
-    );
+    fireEvent.click(await screen.findByRole("button", { name: /^cancel$/i }));
 
     await waitFor(() => {
       expect(
@@ -137,9 +133,7 @@ describe("openFileImportFlow", () => {
     );
 
     fireEvent.click(screen.getByText("open"));
-    fireEvent.click(
-      await screen.findByRole("button", { name: /^import$/i }),
-    );
+    fireEvent.click(await screen.findByRole("button", { name: /^import$/i }));
 
     const manualUploadMock = await screen.findByTestId(
       "manual-upload-view-mock",

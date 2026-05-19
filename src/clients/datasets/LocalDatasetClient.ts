@@ -1,12 +1,13 @@
-import { notifySuccess, notifyError, notifyWarning } from "@ui";
+import { notifyError, notifySuccess, notifyWarning } from "@ui";
 import { ImportJobsManager } from "@/clients/datasets/ImportJobsManager";
+import { sniffXlsxFile } from "@/clients/datasets/xlsxSniff";
 import { createDexieCrudClient } from "@/clients/dexie/createDexieCrudClient";
-import { DuckDbClient, type UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { LocalDatasetParsers } from "@/models/LocalDataset/LocalDatasetParsers";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
-import { sniffXlsxFile } from "@/clients/datasets/xlsxSniff";
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type {
   DuckDbColumnSchema,
   DuckDbCsvSniffResult,
@@ -120,9 +121,8 @@ async function _reconcileColumns(params: {
   // Lazy import to avoid a circular module load — these clients pull in
   // LocalDatasetClient transitively for cloud-fetch fallbacks.
   const { DatasetClient } = await import("@/clients/datasets/DatasetClient");
-  const { DatasetColumnClient } = await import(
-    "@/clients/datasets/DatasetColumnClient"
-  );
+  const { DatasetColumnClient } =
+    await import("@/clients/datasets/DatasetColumnClient");
 
   let existingDataset;
   try {

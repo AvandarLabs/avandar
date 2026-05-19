@@ -22,14 +22,26 @@ describe("detectPii", () => {
       const result = detectPii({ columnName: "patient_email" });
       expect(result.severity).toBe("critical");
       expect(result.isMedical).toBe(true);
-      expect(result.hits.map((h) => h.label)).toContain("Contact");
-      expect(result.hits.map((h) => h.label)).toContain("Medical");
+      expect(
+        result.hits.map((h) => {
+          return h.label;
+        }),
+      ).toContain("Contact");
+      expect(
+        result.hits.map((h) => {
+          return h.label;
+        }),
+      ).toContain("Medical");
     });
 
     it("flags a standalone `name` column", () => {
       const result = detectPii({ columnName: "name" });
       expect(result.severity).toBe("critical");
-      expect(result.hits.map((h) => h.label)).toContain("Name");
+      expect(
+        result.hits.map((h) => {
+          return h.label;
+        }),
+      ).toContain("Name");
     });
 
     it("flags lat/lng as precise location", () => {
@@ -61,12 +73,18 @@ describe("detectPii", () => {
     it("flags a US SSN", () => {
       const result = detectPii({ values: ["123-45-6789"] });
       expect(result.severity).toBe("critical");
-      expect(result.hits.map((h) => h.label)).toContain("US SSN");
+      expect(
+        result.hits.map((h) => {
+          return h.label;
+        }),
+      ).toContain("US SSN");
     });
 
     it("does not flag a card number that fails Luhn", () => {
       const result = detectPii({ values: ["1234567890123456"] });
-      const hasCreditCard = result.hits.some((h) => h.label === "Credit card");
+      const hasCreditCard = result.hits.some((h) => {
+        return h.label === "Credit card";
+      });
       expect(hasCreditCard).toBe(false);
     });
 
@@ -74,7 +92,11 @@ describe("detectPii", () => {
       // 4111 1111 1111 1111 is the standard test Visa.
       const result = detectPii({ values: ["4111111111111111"] });
       expect(result.severity).toBe("critical");
-      expect(result.hits.map((h) => h.label)).toContain("Credit card");
+      expect(
+        result.hits.map((h) => {
+          return h.label;
+        }),
+      ).toContain("Credit card");
     });
 
     it("flags an IP address", () => {
@@ -84,7 +106,11 @@ describe("detectPii", () => {
     it("flags a date-of-birth-like value", () => {
       const result = detectPii({ values: ["01/15/1992"] });
       expect(result.severity).toBe("warning");
-      expect(result.hits.map((h) => h.label)).toContain("Date of birth");
+      expect(
+        result.hits.map((h) => {
+          return h.label;
+        }),
+      ).toContain("Date of birth");
     });
   });
 

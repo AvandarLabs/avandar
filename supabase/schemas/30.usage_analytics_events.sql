@@ -31,8 +31,15 @@ create table public.usage_analytics_events (
   created_at timestamptz not null default now()
 );
 
-create index usage_analytics_events__workspace_id__created_at_idx on public.usage_analytics_events (workspace_id, created_at desc);
-create index usage_analytics_events__event_name__created_at_idx on public.usage_analytics_events (event_name, created_at desc);
+create index usage_analytics_events__workspace_id__created_at_idx on public.usage_analytics_events (
+  workspace_id,
+  created_at desc
+);
+
+create index usage_analytics_events__event_name__created_at_idx on public.usage_analytics_events (
+  event_name,
+  created_at desc
+);
 
 alter table public.usage_analytics_events enable row level security;
 
@@ -43,30 +50,42 @@ alter table public.usage_analytics_events enable row level security;
 create policy "
   Authenticated users can INSERT analytics events for workspaces they belong to
 " on public.usage_analytics_events for insert to authenticated
-with check (
-  (user_id is null or user_id = auth.uid())
-  and (
-    workspace_id is null
-    or exists (
-      select 1
-      from public.workspace_memberships m
-      where m.workspace_id = usage_analytics_events.workspace_id
-        and m.user_id = auth.uid()
+with
+  check (
+    (
+      user_id is null or
+      user_id = auth.uid ()
+    ) and
+    (
+      workspace_id is null or
+      exists (
+        select
+          1
+        from
+          public.workspace_memberships m
+        where
+          m.workspace_id = usage_analytics_events.workspace_id and
+          m.user_id = auth.uid ()
+      )
     )
-  )
-);
+  );
 
 -- SELECT: workspace owners can read events for their workspaces. This
 -- powers the future "workspace usage" admin panel without needing a
 -- service-role round trip.
 create policy "
   Workspace owners can SELECT analytics events for their workspaces
-" on public.usage_analytics_events for select to authenticated
-using (
-  workspace_id is not null
-  and exists (
-    select 1 from public.workspaces w
-    where w.id = usage_analytics_events.workspace_id
-      and w.owner_id = auth.uid()
-  )
-);
+" on public.usage_analytics_events for
+select
+  to authenticated using (
+    workspace_id is not null and
+    exists (
+      select
+        1
+      from
+        public.workspaces w
+      where
+        w.id = usage_analytics_events.workspace_id and
+        w.owner_id = auth.uid ()
+    )
+  );

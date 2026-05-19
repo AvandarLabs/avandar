@@ -2,8 +2,8 @@ import { useThreadRuntime } from "@assistant-ui/react";
 import { Box } from "@mantine/core";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ClarificationCard } from "@/components/ChatPanel/ClarificationCard/ClarificationCard";
-import { crossBoundary } from "@/lib/privacy/crossBoundary";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { crossBoundary } from "@/lib/privacy/crossBoundary";
 
 /**
  * Renders the inline clarification card above the composer when the

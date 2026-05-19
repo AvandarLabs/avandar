@@ -51,14 +51,14 @@
   gap: var(--mantine-spacing-lg);
   justify-content: center;
   opacity: 0;
-  padding:
-    calc(var(--mantine-spacing-xl) * 1.25)
+  padding: calc(var(--mantine-spacing-xl) * 1.25)
     calc(var(--mantine-spacing-xl) * 1.75);
   transform: scale(0.72) translateY(20px);
   transition:
     transform 380ms cubic-bezier(0.34, 1.56, 0.64, 1),
     opacity var(--ava-animation-duration-fast) var(--ava-animation-easing-out),
-    filter var(--ava-animation-duration-moderate) var(--ava-animation-easing-out);
+    filter var(--ava-animation-duration-moderate)
+      var(--ava-animation-easing-out);
 }
 
 .fullScreen[style*="opacity: 1"] .card {
@@ -74,8 +74,7 @@
   display: flex;
   height: 7rem;
   justify-content: center;
-  transition:
-    background-color var(--ava-animation-duration-fast)
+  transition: background-color var(--ava-animation-duration-fast)
     var(--ava-animation-easing-out);
   width: 7rem;
 }

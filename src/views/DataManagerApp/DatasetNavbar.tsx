@@ -7,13 +7,13 @@ import {
   Text,
   useMantineTheme,
 } from "@mantine/core";
+import { NavLinkList } from "@ui";
 import { makeBucketMap, prop } from "@utils";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DatasetParseStatusIndicator } from "@/views/DataManagerApp/DatasetParseStatusIndicator";
-import { NavLinkList } from "@ui";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type Props = {

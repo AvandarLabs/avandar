@@ -337,7 +337,10 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
             // that are still in Phase B (parseStatus !== "ready") have an
             // undefined `parquetData`; fall through to the cloud download
             // (or fail) in that case.
-            if (localDataset?.parseStatus === "ready" && localDataset.parquetData) {
+            if (
+              localDataset?.parseStatus === "ready" &&
+              localDataset.parquetData
+            ) {
               return {
                 datasetId: extractor.dataset.id,
                 parquetBlob: localDataset.parquetData,

@@ -1,3 +1,4 @@
+// eslint-disable-next-line import-x/extensions
 import XlsxSniffWorker from "@/workers/xlsxSniff.worker.ts?worker";
 import type { XlsxSniffResult } from "@/workers/xlsxSniff.worker";
 

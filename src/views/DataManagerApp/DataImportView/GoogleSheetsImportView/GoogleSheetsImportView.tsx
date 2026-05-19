@@ -9,7 +9,6 @@ import { z } from "zod";
 import { APIClient } from "@/clients/APIClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient";
-import type { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { AppConfig } from "@/config/AppConfig";
 import { useGooglePicker } from "@/hooks/ui/useGooglePicker";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
@@ -21,6 +20,7 @@ import { navigateToExternalURL } from "@/lib/utils/browser/navigateToExternalURL
 import { unparseDataset } from "@/models/LocalDataset/LocalDatasetUtils";
 import { Logger } from "@/utils/Logger";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
+import type { DuckDbLoadCsvResult } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type {
   GoogleSheetsDataSourceMetadata,
   GoogleSheetsLoadResult,

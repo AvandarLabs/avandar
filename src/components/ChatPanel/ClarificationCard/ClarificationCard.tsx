@@ -214,11 +214,7 @@ function FixedOptionsBody({
             </Button>
           : null}
         </>
-      : <Radio.Group
-          value={single}
-          onChange={setSingle}
-          aria-label="Pick one"
-        >
+      : <Radio.Group value={single} onChange={setSingle} aria-label="Pick one">
           <Stack gap={4}>
             {options.map((opt) => {
               return <Radio key={opt} value={opt} label={opt} />;

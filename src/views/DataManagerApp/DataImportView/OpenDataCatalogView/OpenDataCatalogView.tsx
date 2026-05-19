@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
-import { notifyError, notifySuccess, Callout  } from "@ui";
+import { Callout, notifyError, notifySuccess } from "@ui";
 import { where } from "@utils";
 import { uuid } from "$/lib/uuid";
 import Fuse from "fuse.js";

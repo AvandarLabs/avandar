@@ -21,9 +21,9 @@
  * much as possible with defaults or data we can get from the backend.
  */
 import { prop } from "@utils";
+import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import Dexie from "dexie";
 import { DexieDBVersionManager } from "@/clients/dexie/DexieDBVersionManager";
-import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { clearOPFS } from "@/lib/utils/browser/clearOPFS";
 import type { LegacyLocalDatasetEntryModel } from "@/models/Legacy_LocalDatasetEntry/Legacy_LocalDatasetEntry.types";
 import type { LocalDatasetModel } from "@/models/LocalDataset/LocalDataset.types";
@@ -72,7 +72,8 @@ const DBDefinitions = [
       // When a user upgardes the database in a different browser, this will run
       // again). But this is safe right now because we have not launched the
       // platform yet.
-      const { data: datasets } = await AvaSupabase.db().from("datasets")
+      const { data: datasets } = await AvaSupabase.db()
+        .from("datasets")
         .select("*")
         .throwOnError();
       const datasetIds = datasets.map(prop("id"));
