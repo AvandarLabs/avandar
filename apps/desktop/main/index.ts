@@ -3,9 +3,19 @@ import { app, BrowserWindow, PATHS } from "electrobun";
 import { SYNCABLE_TABLES } from "../sync/syncable-tables";
 import { resolveMigrationsDir } from "./config/resolveMigrationsDir/resolveMigrationsDir";
 import { resolveWebviewUrl } from "./config/url";
+import { createElectrobunIpcTransport } from "./ipc/createElectrobunIpcTransport/createElectrobunIpcTransport";
+import { createIpcServer } from "./ipc/createIpcServer/createIpcServer";
+import { DESKTOP_IPC_BRIDGE_SCRIPT } from "./ipc/desktopIpcBridgeScript/desktopIpcBridgeScript";
+import { registerAuthHandlers, createAuthState } from "./ipc/registerAuthHandlers/registerAuthHandlers";
+import { registerDatasetBlobHandlers } from "./ipc/registerDatasetBlobHandlers/registerDatasetBlobHandlers";
+import { registerDuckDbHandlers } from "./ipc/registerDuckDbHandlers/registerDuckDbHandlers";
+import { registerRdbHandlers } from "./ipc/registerRdbHandlers/registerRdbHandlers";
+import { registerServerApiHandlers } from "./ipc/registerServerApiHandlers/registerServerApiHandlers";
 import { setupApplicationMenu } from "./menu/setupApplicationMenu";
 import { getUserDataDir } from "./platform/getUserDataDir";
 import { createDuckDbService } from "./services/createDuckDbService/createDuckDbService";
+import { createFileSystemDatasetBlobStore } from "./services/createFileSystemDatasetBlobStore/createFileSystemDatasetBlobStore";
+import { createKeychain } from "./services/createKeychain/createKeychain";
 import { loadMigrationsFromDir } from "./services/loadMigrations/loadMigrations";
 import { bootstrapSnapshotIfNeeded } from "./services/SnapshotBootstrap/SnapshotBootstrap";
 import { openSqliteDatabase, runMigrations } from "./services/SqliteService/Sqlite";
@@ -51,15 +61,23 @@ console.log(
 // Open the native DuckDB instance eagerly. A failed dlopen of the
 // `duckdb` Node binding here takes the app down at boot rather than on
 // the first analytical query, which is what we want: the desktop shell
-// has no wasm fallback. Soon, the IPC handler registration that exposes
-// this service to the webview will land alongside the same wiring that
-// registers the RDB handlers - register here once `createIpcServer(...)`
-// is wired against Electrobun's webview transport.
+// has no wasm fallback.
 const duckdbPath =
   process.env.AVA_DUCKDB_PATH ?? join(userDataDir, "duckdb", "ava.duckdb");
 const duckdbSvc = createDuckDbService(duckdbPath);
 
 console.log(`[avandar-desktop] duckdb ready at ${duckdbPath}`);
+
+// Construct the rest of the native services. Boot fails fast if any of
+// them can't initialise (keychain unsupported platform, blob root not
+// writable, etc.) so the webview never sees a half-wired IPC surface.
+const keychain = createKeychain();
+const datasetBlobStore = createFileSystemDatasetBlobStore(
+  join(userDataDir, "blobs"),
+);
+const authState = createAuthState();
+
+console.log(`[avandar-desktop] keychain + blob store ready`);
 
 // Stopgap snapshot bootstrap: when a dev token + Supabase URL/key are
 // configured, pull every syncable table from Supabase REST into the
@@ -108,11 +126,37 @@ const mainWindow = new BrowserWindow({
 // signal into the page main world here via `evaluateJavaScript`, which
 // WKWebView defaults to the main world. Platform-aware UI then reads it
 // from `<html data-ava-platform>` (see `shared/platform/isDesktop.ts`).
+//
+// On the same `dom-ready` tick we also inject the IPC bridge shim so
+// `window.electrobun = { send, once }` exists by the time React's
+// `callIpc(...)` fires. The shim relays messages through DOM
+// `CustomEvent`s to the preload world, which forwards them via the
+// Electrobun RPC stream the bun-main `ipcTransport` listens to.
 mainWindow.webview.on("dom-ready", () => {
   mainWindow.webview.executeJavascript(
     `document.documentElement.dataset.avaPlatform = "desktop";`,
   );
+  mainWindow.webview.executeJavascript(DESKTOP_IPC_BRIDGE_SCRIPT);
 });
+
+// Wire the IPC server against the webview's RPC stream. All
+// channel-keyed handlers register against the same server; the
+// transport multiplexes per-channel messages over Electrobun's single
+// underlying RPC pipe.
+const ipcTransport = createElectrobunIpcTransport(mainWindow.webview);
+const ipcServer = createIpcServer(ipcTransport);
+
+registerRdbHandlers(ipcServer, sqliteDb);
+registerDuckDbHandlers(ipcServer, duckdbSvc);
+registerAuthHandlers(ipcServer, keychain, authState);
+registerDatasetBlobHandlers(ipcServer, datasetBlobStore);
+registerServerApiHandlers(ipcServer, {
+  supabaseUrl: process.env.VITE_SUPABASE_API_URL ?? "",
+  supabaseAnonKey: process.env.VITE_SUPABASE_ANON_KEY ?? "",
+  authState,
+});
+
+console.log(`[avandar-desktop] ipc handlers registered`);
 
 setupApplicationMenu(APP_NAME, mainWindow);
 

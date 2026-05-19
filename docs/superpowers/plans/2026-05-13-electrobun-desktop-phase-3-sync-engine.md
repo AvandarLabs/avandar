@@ -1,5 +1,7 @@
 # Electrobun Desktop — Phase 3: V1 SyncEngine Implementation Plan
 
+> **BLOCKED — DO NOT START (2026-05-19):** Phase 3 depends on Phase 2's local-data invariants (writes hit local SQLite, parquet uploads land on disk) actually being exercised by the React webview. Today they aren't — the consumer migration that flips the webview onto the native services is deferred to **Phase 2.5**: `docs/superpowers/plans/2026-05-19-electrobun-desktop-phase-2.5-consumer-migration.md`. Without Phase 2.5, the sync engine has an empty outbox and no on-disk parquets to push. Complete Phase 2.5 first.
+>
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 >
 > **Per-step test handoff:** After completing every Step in this plan, output an enumerated list (`1.`, `2.`, `3.`, …) of the exact actions the human partner should take to verify the just-completed Step — commands to run (copy-pasteable), files or UI to inspect, and the expected result for each. Do this for every Step, including "trivial" config/file-creation steps; never skip or summarize. The list is in addition to (not a replacement for) the Manual review checkpoint at the end of each Task.

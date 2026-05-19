@@ -1,5 +1,7 @@
 # Electrobun Desktop — Phase 2: Native Layer Implementation Plan
 
+> **STATUS (2026-05-19):** Tasks 1–14 have all merged. The Phase 2 acceptance checklist (Task 15) has **not** been run because the React webview still imports the legacy modules (`DuckDbClient`, `AvaSupabase`, `AvaDexie`) directly — the native services from Tasks 7–12 are wired but unused at runtime, and the IPC bridge from the index.ts wiring has not been runtime-verified. The remaining work (IPC bridge verification, real web adapters, consumer migration, then the acceptance checklist) lives in **Phase 2.5**: `docs/superpowers/plans/2026-05-19-electrobun-desktop-phase-2.5-consumer-migration.md`. **Start a new session on Phase 2.5 before any Phase 3 work begins.**
+>
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 >
 > **Per-step test handoff:** After completing every Step in this plan, output an enumerated list (`1.`, `2.`, `3.`, …) of the exact actions the human partner should take to verify the just-completed Step — commands to run (copy-pasteable), files or UI to inspect, and the expected result for each. Do this for every Step, including "trivial" config/file-creation steps; never skip or summarize. The list is in addition to (not a replacement for) the Manual review checkpoint at the end of each Task.
