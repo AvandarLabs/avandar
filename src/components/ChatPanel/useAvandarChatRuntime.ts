@@ -54,12 +54,12 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
   const dataExplorerDispatch = DataExplorerStateManager.useDispatch();
   const chatPanelDispatch = ChatPanelStateManager.useDispatch();
   const planDispatch = PlanStateManager.useDispatch();
-  const currentPlanNodes = PlanStateManager.useState().nodes;
-  // Keep a ref so the adapter can read the latest plan nodes without
+  const planState = PlanStateManager.useState();
+  // Keep a ref so the adapter can read the latest plan nodes + id without
   // forcing the adapter to be re-created (which would also blow away
   // assistant-ui's runtime in-flight state — see CHECKPOINTS bug #29).
-  const planNodesRef = useRef(currentPlanNodes);
-  planNodesRef.current = currentPlanNodes;
+  const planStateRef = useRef(planState);
+  planStateRef.current = planState;
 
   const adapter = useMemo<ChatModelAdapter>(() => {
     return {
@@ -160,11 +160,14 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
 
         if (response.plan && response.plan.steps.length > 0) {
           // A new plan replaces any prior one. Drop the old temp views
-          // before loading the new plan so DuckDB doesn't accumulate
-          // stale `step_*` views across multiple plans.
-          const priorNodes = planNodesRef.current;
-          if (priorNodes.length > 0) {
-            void dropPlanTempViews({ nodes: priorNodes });
+          // AND the IndexedDB materialisation so DuckDB / storage don't
+          // accumulate stale `step_*` data across plans.
+          const prior = planStateRef.current;
+          if (prior.nodes.length > 0) {
+            void dropPlanTempViews({
+              planId: prior.planId ?? undefined,
+              nodes: prior.nodes,
+            });
           }
           planDispatch.loadPlan(response.plan);
         }

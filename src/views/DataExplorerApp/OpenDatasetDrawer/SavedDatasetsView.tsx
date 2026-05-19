@@ -18,8 +18,12 @@ import { useState } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
+import { dropPlanTempViews } from "@/components/ChatPanel/PlanStateManager/planExecutor";
+import { rehydratePlan } from "@/components/ChatPanel/PlanStateManager/planRehydrate";
+import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { buildSelectAllPreviewSQL } from "@/views/DataExplorerApp/OpenDatasetDrawer/datasetPreviewSQL";
+import type { ChatPlan } from "$/types/chat.types";
 import type { OpenDatasetInfo } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerAppState";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
@@ -47,6 +51,8 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 200);
+  const planDispatch = PlanStateManager.useDispatch();
+  const planState = PlanStateManager.useState();
 
   const [datasets, isLoadingDatasets] = DatasetClient.useGetAll({
     ...where("workspace_id", "eq", workspace.id),
@@ -80,7 +86,7 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
       }
       return { dataset, virtualDataset };
     },
-    onSuccess: ({
+    onSuccess: async ({
       dataset,
       virtualDataset,
     }: {
@@ -96,6 +102,26 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
         },
         virtualDataset.rawSQL,
       );
+
+      // If the dataset was produced by a multi-step plan, restore the
+      // canvas. We derive the planId from the virtual dataset id so
+      // IndexedDB caches survive across reloads of the same dataset.
+      if (virtualDataset.planSteps) {
+        // Drop any currently-open plan first (different dataset, or
+        // re-open of the same one) so we don't leak views.
+        if (planState.nodes.length > 0) {
+          void dropPlanTempViews({
+            planId: planState.planId ?? undefined,
+            nodes: planState.nodes,
+          });
+        }
+        const planId = `vdataset_${virtualDataset.id}`;
+        await rehydratePlan({
+          planId,
+          plan: virtualDataset.planSteps as ChatPlan,
+          dispatch: planDispatch,
+        });
+      }
     },
     onError: (error: Error) => {
       notifyError(error.message);

@@ -2,6 +2,7 @@ import type { Model } from "@models/Model/Model.ts";
 import type { UUID } from "@utils/types/common.types.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
+import type { ChatPlan } from "$/types/chat.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { SetOptional } from "type-fest";
 
@@ -27,6 +28,13 @@ export type VirtualDatasetRead = Model.Base<
 
     /** The raw SQL query that was used to generate the dataset. */
     rawSQL: string;
+
+    /**
+     * When the dataset was produced by a multi-step LLM analytic plan
+     * (Phase 3), the plan that produced it. Reopening the dataset
+     * rehydrates this plan into the canvas. `null` for one-shot SQL.
+     */
+    planSteps: ChatPlan | null;
   }
 >;
 
