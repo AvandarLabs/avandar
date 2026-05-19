@@ -1,6 +1,6 @@
 import Dexie from "dexie";
-import type { Table } from "dexie";
 import type { Annotation } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager";
+import type { Table } from "dexie";
 
 /**
  * IndexedDB-backed persistence for plan annotations (Phase 9).

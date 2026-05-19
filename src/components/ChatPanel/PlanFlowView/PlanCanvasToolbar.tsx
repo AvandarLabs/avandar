@@ -1,24 +1,24 @@
 import {
   ActionIcon,
-  Group,
-  Tooltip,
-  Menu,
   ColorSwatch,
+  Group,
+  Menu,
   Stack,
   Text,
+  Tooltip,
 } from "@mantine/core";
 import {
-  IconArrowsMove,
-  IconArrowUpRight,
   IconArrowBack,
   IconArrowForward,
+  IconArrowsMove,
+  IconArrowUpRight,
   IconDownload,
+  IconFileTypePdf,
   IconNote,
   IconPencil,
+  IconPhoto,
   IconTrash,
   IconTypography,
-  IconFileTypePdf,
-  IconPhoto,
 } from "@tabler/icons-react";
 import { setAnnotationColor } from "@/components/ChatPanel/PlanFlowView/annotationColor";
 import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager";
@@ -86,9 +86,7 @@ const TOOLS: Array<{
   },
 ];
 
-export function PlanCanvasToolbar(
-  props: PlanCanvasToolbarProps,
-): JSX.Element {
+export function PlanCanvasToolbar(props: PlanCanvasToolbarProps): JSX.Element {
   const state: PlanAnnotationState = PlanAnnotationStateManager.useState();
   const dispatch = PlanAnnotationStateManager.useDispatch();
 
@@ -227,5 +225,3 @@ function ColorPalette(): JSX.Element {
     </Stack>
   );
 }
-
-

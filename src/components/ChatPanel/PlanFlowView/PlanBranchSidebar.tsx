@@ -8,11 +8,7 @@ import {
   Text,
   Tooltip,
 } from "@mantine/core";
-import {
-  IconGitBranch,
-  IconHome,
-  IconX,
-} from "@tabler/icons-react";
+import { IconGitBranch, IconHome, IconX } from "@tabler/icons-react";
 import { useMemo } from "react";
 import { PlanBranchStateManager } from "@/components/ChatPanel/PlanStateManager/PlanBranchStateManager";
 import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
@@ -125,7 +121,9 @@ function BranchRow({
         background: isActive ? "var(--mantine-color-blue-1)" : "transparent",
         cursor: "pointer",
         border:
-          isActive ? "1px solid var(--mantine-color-blue-4)" : "1px solid transparent",
+          isActive ?
+            "1px solid var(--mantine-color-blue-4)"
+          : "1px solid transparent",
       }}
       role="button"
       aria-pressed={isActive}

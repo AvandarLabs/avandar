@@ -190,7 +190,11 @@ export async function exportPlanCanvasAsPdf(args: {
             ),
           ],
         ),
-        React.createElement(Text, { key: "code", style: styles.code }, node.code),
+        React.createElement(
+          Text,
+          { key: "code", style: styles.code },
+          node.code,
+        ),
         node.actualSchema && node.actualSchema.length > 0 ?
           React.createElement(
             Text,

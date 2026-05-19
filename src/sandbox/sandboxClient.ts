@@ -1,11 +1,11 @@
 import { uuid } from "$/lib/uuid";
-import {
-  SANDBOX_KEY,
-  type SandboxBootRequest,
-  type SandboxResponse,
-  type SandboxRunRequest,
-  type SandboxRunResponse,
-  type SandboxRuntime,
+import { SANDBOX_KEY } from "@/sandbox/sandboxProtocol";
+import type {
+  SandboxBootRequest,
+  SandboxResponse,
+  SandboxRunRequest,
+  SandboxRunResponse,
+  SandboxRuntime,
 } from "@/sandbox/sandboxProtocol";
 
 /**
@@ -122,9 +122,7 @@ function ensureIframe(): IframeHandle {
   return handle;
 }
 
-async function bootIfNeeded(
-  preload: SandboxRuntime[],
-): Promise<void> {
+async function bootIfNeeded(preload: SandboxRuntime[]): Promise<void> {
   const h = ensureIframe();
   await h.ready;
   // Send boot, await boot_response.

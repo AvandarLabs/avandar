@@ -50,9 +50,9 @@ export function PlanAnnotationOverlay({
     });
   }, [state.annotations, planId]);
 
-  const [strokeInProgress, setStrokeInProgress] = useState<
-    Array<[number, number]> | null
-  >(null);
+  const [strokeInProgress, setStrokeInProgress] = useState<Array<
+    [number, number]
+  > | null>(null);
   const [arrowStart, setArrowStart] = useState<[number, number] | null>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
@@ -107,7 +107,10 @@ export function PlanAnnotationOverlay({
       if (tool === "text") {
         const text = window.prompt("Annotation text");
         if (text && text.trim().length > 0) {
-          const annotation: Omit<TextAnnotation, "id" | "createdAt" | "updatedAt"> = {
+          const annotation: Omit<
+            TextAnnotation,
+            "id" | "createdAt" | "updatedAt"
+          > = {
             kind: "text",
             planId,
             x,
@@ -307,8 +310,7 @@ function AnnotationRenderer({
     position: "absolute",
     pointerEvents: isPanMode ? "none" : "auto",
     cursor: isEraseMode ? "crosshair" : "pointer",
-    outline:
-      isSelected ? "2px dashed var(--mantine-color-blue-5)" : undefined,
+    outline: isSelected ? "2px dashed var(--mantine-color-blue-5)" : undefined,
   };
 
   if (annotation.kind === "text") {
@@ -322,9 +324,10 @@ function AnnotationRenderer({
           fontSize: annotation.fontSize,
           color: annotation.color ?? "#1c7ed6",
           transform:
-            annotation.rotation ? `rotate(${annotation.rotation}deg)` : undefined,
-          fontFamily:
-            'Caveat, "Patrick Hand", "Comic Sans MS", system-ui',
+            annotation.rotation ?
+              `rotate(${annotation.rotation}deg)`
+            : undefined,
+          fontFamily: 'Caveat, "Patrick Hand", "Comic Sans MS", system-ui',
         }}
       >
         {annotation.text}
@@ -350,8 +353,7 @@ function AnnotationRenderer({
           boxShadow: "2px 2px 6px rgba(0,0,0,0.15)",
           fontSize: 13,
           color: "#1a1a1a",
-          fontFamily:
-            'Caveat, "Patrick Hand", "Comic Sans MS", system-ui',
+          fontFamily: 'Caveat, "Patrick Hand", "Comic Sans MS", system-ui',
           whiteSpace: "pre-wrap",
         }}
       >
@@ -492,12 +494,7 @@ function ArrowRender({
       }}
       viewBox={`${minX} ${minY} ${w} ${h}`}
     >
-      <path
-        d={pathD}
-        stroke={color ?? "#495057"}
-        strokeWidth={2}
-        fill="none"
-      />
+      <path d={pathD} stroke={color ?? "#495057"} strokeWidth={2} fill="none" />
       {isSelected && !isPanMode ?
         <foreignObject x={toX} y={toY - 10} width={20} height={20}>
           <DeleteHandle onDelete={onDelete} />

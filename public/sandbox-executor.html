@@ -59,8 +59,7 @@
         const realFetch = window.fetch;
         window.fetch = function (resource, init) {
           const url =
-            typeof resource === "string" ?
-              resource
+            typeof resource === "string" ? resource
             : resource && resource.url ? resource.url
             : "";
           if (
@@ -68,9 +67,7 @@
               return url.startsWith(p);
             })
           ) {
-            return Promise.reject(
-              new Error("[sandbox] fetch denied: " + url),
-            );
+            return Promise.reject(new Error("[sandbox] fetch denied: " + url));
           }
           return realFetch.call(this, resource, init);
         };
@@ -95,8 +92,9 @@
           };
         }
         // Strict postMessage origin check.
-        const PARENT_ORIGIN = window.location.ancestorOrigins
-          ? window.location.ancestorOrigins[0] || null
+        const PARENT_ORIGIN =
+          window.location.ancestorOrigins ?
+            window.location.ancestorOrigins[0] || null
           : null;
         window.__sandboxParentOrigin = PARENT_ORIGIN;
       })();

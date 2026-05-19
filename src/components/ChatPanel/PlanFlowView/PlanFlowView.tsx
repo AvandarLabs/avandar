@@ -25,28 +25,28 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { layoutPlan } from "@/components/ChatPanel/PlanFlowView/planLayout";
 import { PlanAnnotationOverlay } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationOverlay";
 import { PlanAnnotationStateManager } from "@/components/ChatPanel/PlanFlowView/PlanAnnotationStateManager";
-import { PlanCanvasToolbar } from "@/components/ChatPanel/PlanFlowView/PlanCanvasToolbar";
 import {
   clearAnnotationsForPlan,
   listAnnotationsForPlan,
   putAnnotations,
 } from "@/components/ChatPanel/PlanFlowView/planAnnotationStorage";
+import { PlanBranchSidebar } from "@/components/ChatPanel/PlanFlowView/PlanBranchSidebar";
 import {
   exportPlanCanvasAsPdf,
   exportPlanCanvasAsPng,
 } from "@/components/ChatPanel/PlanFlowView/planCanvasExport";
+import { PlanCanvasToolbar } from "@/components/ChatPanel/PlanFlowView/PlanCanvasToolbar";
+import { layoutPlan } from "@/components/ChatPanel/PlanFlowView/planLayout";
 import { PlanStepNode } from "@/components/ChatPanel/PlanFlowView/PlanStepNode";
 import { RoughEdge } from "@/components/ChatPanel/PlanFlowView/RoughEdge";
-import { PlanBranchSidebar } from "@/components/ChatPanel/PlanFlowView/PlanBranchSidebar";
+import { PlanBranchStateManager } from "@/components/ChatPanel/PlanStateManager/PlanBranchStateManager";
 import {
   dropPlanTempViews,
   executePlan,
   executePlanStep,
 } from "@/components/ChatPanel/PlanStateManager/planExecutor";
-import { PlanBranchStateManager } from "@/components/ChatPanel/PlanStateManager/PlanBranchStateManager";
 import { PlanStateManager } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
@@ -470,8 +470,8 @@ function PlanFlowCanvas(): JSX.Element {
         {wasRejected ?
           <Alert color="gray" variant="light" radius="sm" p="xs">
             <Text size="xs">
-              Plan rejected. Ask the chat to propose a different plan, or
-              close this canvas.
+              Plan rejected. Ask the chat to propose a different plan, or close
+              this canvas.
             </Text>
           </Alert>
         : null}
