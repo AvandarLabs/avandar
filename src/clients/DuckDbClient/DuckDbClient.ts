@@ -117,7 +117,7 @@ type BaseDuckDbLoadXlsxOptions = {
  */
 export type DuckDbLoadXlsxOptions =
   | (BaseDuckDbLoadXlsxOptions & { file: File })
-  | (BaseDuckDbLoadXlsxOptions & { fileBytes: Uint8Array });
+  | (BaseDuckDbLoadXlsxOptions & { fileBytes: Uint8Array<ArrayBuffer> });
 
 /**
  * An object representing a row with unknown column types.
@@ -532,7 +532,7 @@ class DuckDbClientImpl {
   async #registerXlsxFile(options: {
     tableName: string;
     file?: File;
-    fileBytes?: Uint8Array;
+    fileBytes?: Uint8Array<ArrayBuffer>;
   }): Promise<void> {
     const { tableName, file, fileBytes } = options;
     const db = await this.#getDB();
