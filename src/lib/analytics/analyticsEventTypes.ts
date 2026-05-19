@@ -15,6 +15,7 @@ export type AnalyticsEventName =
   | "dashboard.unpublished"
   | "dashboard.block_added_via_chat"
   | "dashboard.filter_changed"
+  | "dashboard.pdf_export_opened"
   | "chat.message_sent"
   | "chat.sql_generated";
 

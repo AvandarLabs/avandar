@@ -14,6 +14,7 @@ import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/ut
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DeleteDashboardButton } from "@/views/DashboardApp/DashboardEditorView/DeleteDashboardButton";
+import { ExportPdfButton } from "@/views/DashboardApp/DashboardEditorView/ExportPdfButton";
 import {
   getDashboardPuckConfig,
   getDashboardTitleFromPuckData,
@@ -209,6 +210,10 @@ export function DashboardEditorView({
                       hasUnsavedChanges={hasUnsavedChanges}
                     />
                     <PublishDashboardButton
+                      dashboard={dashboard}
+                      hasUnsavedChanges={hasUnsavedChanges}
+                    />
+                    <ExportPdfButton
                       dashboard={dashboard}
                       hasUnsavedChanges={hasUnsavedChanges}
                     />

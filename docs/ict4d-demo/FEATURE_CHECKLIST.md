@@ -91,20 +91,37 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started · `[—]` 
   - Polished dashboard header (left-accented strip, tighter title leading, uppercase byline).
   - Polished DataViz block (elevated card + leading NL prompt).
 - [—] **11. Dashboard media: video / image / media embed via Supabase Storage** _(deferred — not needed for the demo)_
-- [~] **12. Dashboard publish options: PDF export, QR code, vanity URL**
+- [x] **12. Dashboard publish options: PDF export, QR code, vanity URL**
   - [x] Vanity URL (optional; auto kebab-cased; lands at `/d/<workspaceSlug>/<slug>`).
   - [x] Copy share link to clipboard.
   - [x] QR code (rendered client-side via `qrcode`, downloadable as PNG).
   - [x] Publish modal leads with the URL the dashboard will be published to.
-  - [ ] PDF export.
+  - [x] PDF export — toolbar `Export PDF` button (`html2canvas` + `jspdf`).
+    Two-step modal: (a) export immediately, or (b) annotate-then-export.
+    Annotator supports text, arrows, and freehand strokes drawn via RoughJS
+    with adjustable roughness, stroke width, and color.
 - [—] **13. Workspace-private dashboard sharing via Share modal (dashboards as shareable resources)** _(deferred — not needed for the demo)_
-- [ ] **14. Slice-aware public publishing (package only the data slices the dashboard reads)**
+- [x] **14. Slice-aware public publishing (package only the data slices the dashboard reads)**
+  - New `Data scope` section in the Publish modal. Default mode `queried`
+    publishes only the columns referenced by DataViz SQL + FilterPBlock
+    columns (column-narrowed via `node-sql-parser`'s `columnList`). Other
+    modes: `all_columns` (full dataset) and `custom` (explicit column
+    allow-list + row filters).
+  - Slice config persists in `dashboard.config.__publishConfig` so future
+    re-publishes default to the same selection.
 - [x] **15. Viewer-editable global dashboard filters**
   - New `Filter` P-block with single-select, multi-select, and contains modes.
   - SQL composes cleanly via subselect wrap so block-level WHERE / GROUP BY etc. are preserved.
 - [x] **16. Viewer-editable per-viz dashboard filters**
   - Foundation in place via `subscribedFilterIds` whitelist on `applyDashboardFiltersToSql`; per-viz UI to opt out of specific global filters is a follow-up.
-- [ ] **17. Publish-time slice picker (default = dashboard creator's slices; opt in to more)**
+- [x] **17. Publish-time slice picker (default = dashboard creator's slices; opt in to more)**
+  - Same `Data scope` UI as #14: per-dataset accordion lets the publisher
+    pick `queried` (default), `all_columns`, or `custom`. Custom mode
+    supports column checkboxes plus row filters: enum (TagsInput),
+    number range (NumberInput pair), and date range (text inputs).
+  - Row-filter type is auto-suggested from the column's `AvaDataType`
+    (numeric → range_number; date/time/timestamp → range_date;
+    everything else → enum).
 - [x] **18. Make dashboard "View" button work before "Publish"**
   - New auth-gated preview route at `/<workspaceSlug>/dashboards/preview/<dashboardId>` shows the read-only render with a "Back to editor" banner. Public route at `/public/dashboards/...` still enforces `isPublic`.
 - [~] **19. Everything still works in Desktop + offline mode** — requires items #2 and #8 first
