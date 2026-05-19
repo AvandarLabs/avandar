@@ -1,10 +1,18 @@
-import { Box, Button, Group, LoadingOverlay, Stack, Text, Title } from "@mantine/core";
+import {
+  Box,
+  Button,
+  Group,
+  LoadingOverlay,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { Render as PuckPageRender } from "@puckeditor/core";
-import { useNavigate } from "@tanstack/react-router";
 import { IconArrowLeft, IconEye } from "@tabler/icons-react";
+import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
 import "@puckeditor/core/puck.css";
-import { notifyError, Paper  } from "@ui";
+import { notifyError, Paper } from "@ui";
 import { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard";

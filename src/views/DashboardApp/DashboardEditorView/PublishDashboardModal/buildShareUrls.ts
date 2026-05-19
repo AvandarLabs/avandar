@@ -27,8 +27,6 @@ export function buildShareUrls(args: {
   return {
     canonical: `${base}/public/dashboards/${args.workspaceSlug}/${args.dashboardId}`,
     vanity:
-      args.slug ?
-        `${base}/d/${args.workspaceSlug}/${args.slug}`
-      : undefined,
+      args.slug ? `${base}/d/${args.workspaceSlug}/${args.slug}` : undefined,
   };
 }

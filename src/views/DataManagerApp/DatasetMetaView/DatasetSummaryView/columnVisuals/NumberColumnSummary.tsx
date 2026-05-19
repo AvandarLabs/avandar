@@ -17,7 +17,9 @@ export function NumberColumnSummary({ summary, dataType }: Props): JSX.Element {
   const { minValue, maxValue, averageValue, stdDev } = summary;
   const range = maxValue - minValue;
   const avgPct =
-    range > 0 ? Math.max(0, Math.min(1, (averageValue - minValue) / range)) : 0.5;
+    range > 0 ?
+      Math.max(0, Math.min(1, (averageValue - minValue) / range))
+    : 0.5;
   const stdLeftPct =
     range > 0 ?
       Math.max(0, ((averageValue - stdDev - minValue) / range) * 100)

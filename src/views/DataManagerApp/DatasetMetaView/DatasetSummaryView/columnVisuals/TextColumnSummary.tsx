@@ -44,8 +44,8 @@ export function TextColumnSummary({ summary, totalRows }: Props): JSX.Element {
         })}
         {top.value.length > 5 ?
           <Text size="xs" c="dimmed" mt={4}>
-            +{top.value.length - 5} more values tied at {top.count.toLocaleString()}{" "}
-            rows
+            +{top.value.length - 5} more values tied at{" "}
+            {top.count.toLocaleString()} rows
           </Text>
         : null}
       </Stack>

@@ -247,11 +247,7 @@ function _typeShortLabel(dataType: string): string {
   if (dataType === "bigint" || dataType === "double") {
     return "num";
   }
-  if (
-    dataType === "date" ||
-    dataType === "time" ||
-    dataType === "timestamp"
-  ) {
+  if (dataType === "date" || dataType === "time" || dataType === "timestamp") {
     return "date";
   }
   return dataType;

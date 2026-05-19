@@ -22,11 +22,7 @@ export function DateColumnSummary({ summary }: Props): JSX.Element {
       </Text>
 
       <Box pos="relative" px={6}>
-        <Box
-          h={4}
-          bg="neutral.1"
-          style={{ borderRadius: 2 }}
-        />
+        <Box h={4} bg="neutral.1" style={{ borderRadius: 2 }} />
         <Box pos="absolute" top={-3} left={0}>
           <Endpoint position="start" />
         </Box>

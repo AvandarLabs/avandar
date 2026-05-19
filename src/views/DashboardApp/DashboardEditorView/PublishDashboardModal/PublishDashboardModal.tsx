@@ -101,9 +101,9 @@ export function PublishDashboardModal({
         </Alert>
       : <Alert color="blue" icon={<IconInfoCircle size={18} />} variant="light">
           <Text size="sm">
-            Publishing makes this dashboard viewable by anyone with the link
-            — no Avandar account required. Datasets referenced by the
-            dashboard are copied to public storage at publish time.
+            Publishing makes this dashboard viewable by anyone with the link —
+            no Avandar account required. Datasets referenced by the dashboard
+            are copied to public storage at publish time.
           </Text>
         </Alert>
       }
@@ -111,9 +111,9 @@ export function PublishDashboardModal({
       <Stack gap={4}>
         <Title order={5}>Vanity URL</Title>
         <Text size="xs" c="dimmed">
-          Optional. A short, memorable URL for flyers, reports, and QR
-          codes. Leave blank to publish without one — you'll still get a
-          shareable link.
+          Optional. A short, memorable URL for flyers, reports, and QR codes.
+          Leave blank to publish without one — you'll still get a shareable
+          link.
         </Text>
         <TextInput
           label="Custom path"
@@ -153,9 +153,7 @@ export function PublishDashboardModal({
           : null}
           <ShareUrlRow
             label={
-              shareUrls.vanity ? "Permanent link (always works)" : (
-                "Share link"
-              )
+              shareUrls.vanity ? "Permanent link (always works)" : "Share link"
             }
             url={shareUrls.canonical}
             hint={

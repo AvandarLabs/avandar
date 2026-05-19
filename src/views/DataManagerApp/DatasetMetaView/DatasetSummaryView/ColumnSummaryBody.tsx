@@ -10,9 +10,9 @@ import {
 } from "@mantine/core";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { TextColumnSummary } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary";
-import { NumberColumnSummary } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary";
 import { DateColumnSummary } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/DateColumnSummary";
+import { NumberColumnSummary } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/NumberColumnSummary";
+import { TextColumnSummary } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary";
 import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 
@@ -40,19 +40,18 @@ export function ColumnSummaryBody({
   totalRows,
 }: Props): JSX.Element {
   const workspace = useCurrentWorkspace();
-  const [summary, isLoading, query] =
-    DatasetQueryClient.useGetColumnSummary({
-      datasetId,
-      workspaceId: workspace.id,
-      columnName,
-      dataType,
-      useQueryOptions: {
-        staleTime: Infinity,
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        retry: false,
-      },
-    });
+  const [summary, isLoading, query] = DatasetQueryClient.useGetColumnSummary({
+    datasetId,
+    workspaceId: workspace.id,
+    columnName,
+    dataType,
+    useQueryOptions: {
+      staleTime: Infinity,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      retry: false,
+    },
+  });
 
   if (isLoading) {
     return (
@@ -131,9 +130,7 @@ function _TypeSwitch({
   dataType: string;
 }): JSX.Element | null {
   if (summary.type === "text") {
-    return (
-      <TextColumnSummary summary={summary} totalRows={totalRows} />
-    );
+    return <TextColumnSummary summary={summary} totalRows={totalRows} />;
   }
   if (summary.type === "number") {
     return (
@@ -194,7 +191,8 @@ function _buildHeadlineSentence(args: {
         averaging <Tag>{avg}</Tag>
         {Number.isFinite(summary.stdDev) ?
           <>
-            {" "}with a standard deviation of <Tag>{_fmtNum(summary.stdDev)}</Tag>.
+            {" "}
+            with a standard deviation of <Tag>{_fmtNum(summary.stdDev)}</Tag>.
           </>
         : "."}
       </>
@@ -226,17 +224,16 @@ function _buildHeadlineSentence(args: {
     if (summary.distinctValuesCount >= Math.max(1, totalRows * 0.9)) {
       return (
         <>
-          Mostly unique: <Tag>{summary.distinctValuesCount.toLocaleString()}</Tag>{" "}
-          distinct values across{" "}
-          <Tag>{totalRows.toLocaleString()}</Tag> rows.
+          Mostly unique:{" "}
+          <Tag>{summary.distinctValuesCount.toLocaleString()}</Tag> distinct
+          values across <Tag>{totalRows.toLocaleString()}</Tag> rows.
         </>
       );
     }
     return (
       <>
-        Most common value:{" "}
-        <Tag>{top.value.slice(0, 2).join(", ")}</Tag>{" "}
-        ({top.count.toLocaleString()} rows, {(share * 100).toFixed(0)}%).
+        Most common value: <Tag>{top.value.slice(0, 2).join(", ")}</Tag> (
+        {top.count.toLocaleString()} rows, {(share * 100).toFixed(0)}%).
       </>
     );
   }
