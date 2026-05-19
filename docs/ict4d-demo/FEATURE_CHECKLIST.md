@@ -4,7 +4,7 @@ Use this checklist to track progress on the 29 items from the demo brief.
 For depth on what's done, what was deferred, and why, see
 `docs/ict4d-demo/CHECKPOINTS.md`.
 
-Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started
+Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started · `[—]` **deferred** (intentionally not in scope for the demo)
 
 ---
 
@@ -88,14 +88,14 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started
   - Theme + typography presets selectable from the Puck root field panel.
   - Polished dashboard header (left-accented strip, tighter title leading, uppercase byline).
   - Polished DataViz block (elevated card + leading NL prompt).
-- [ ] **11. Dashboard media: video / image / media embed via Supabase Storage**
+- [—] **11. Dashboard media: video / image / media embed via Supabase Storage** _(deferred — not needed for the demo)_
 - [~] **12. Dashboard publish options: PDF export, QR code, vanity URL**
   - [x] Vanity URL (optional; auto kebab-cased; lands at `/d/<workspaceSlug>/<slug>`).
   - [x] Copy share link to clipboard.
   - [x] QR code (rendered client-side via `qrcode`, downloadable as PNG).
   - [x] Publish modal leads with the URL the dashboard will be published to.
   - [ ] PDF export.
-- [ ] **13. Workspace-private dashboard sharing via Share modal (dashboards as shareable resources)**
+- [—] **13. Workspace-private dashboard sharing via Share modal (dashboards as shareable resources)** _(deferred — not needed for the demo)_
 - [ ] **14. Slice-aware public publishing (package only the data slices the dashboard reads)**
 - [x] **15. Viewer-editable global dashboard filters**
   - New `Filter` P-block with single-select, multi-select, and contains modes.
@@ -112,9 +112,9 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started
   - New `addDashboardBlock` chat tool registered when on the dashboards surface.
   - New `DashboardEditorStateManager` queues blocks emitted by the chat panel; the editor view drains them on render.
   - Composer + empty state unlocked on dashboards with surface-specific copy and starter suggestions.
-- [ ] **23. Optional local model fallback for offline use (only if 8 GB RAM-feasible)**
+- [—] **23. Optional local model fallback for offline use (only if 8 GB RAM-feasible)** _(deferred — not needed for the demo)_
 - [ ] **24. Lingui i18n: EN / FR / ES / AR (with RTL) / ZH / SW; workspace-level language setting**
-- [ ] **25. React Joyride onboarding tour**
+- [—] **25. React Joyride onboarding tour** _(deferred — not needed for the demo)_
 - [x] **26. Usage analytics — Supabase table + RLS** (`usage_analytics_events`)
   - Client-side event logging shipped: dataset imported, dashboard published, chat message sent, chat SQL generated, dashboard block added via chat, dashboard filter changed.
 - [x] **27. Hugging Face API token plumbing (`.env.development` only, never committed)** — token will be added when Whisper / HF features land in item #8. Reminder: do **not** commit it; do **not** add to docs.
@@ -128,6 +128,32 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started
 - [ ] Full test suite passing on the merged branch (not yet run — duckdb native build was blocked in the previous session; needs to be run locally)
 - [ ] Smoke test in the browser (import a CSV, run a chat query, drop a CSV, save to dashboard) before showing to beta users
 - [ ] Run `supabase db diff` locally against the hand-written analytics migration to catch any drift
+
+---
+
+## DEFERRED — explicitly out of scope for the demo
+
+These items are real features in the original 30-line brief but were
+**intentionally deferred** by product. They will not block the demo and
+should not be picked up unless explicitly re-prioritised.
+
+- **#11 — Dashboard media (video / image / media embed via Supabase Storage)**
+  Needs Storage bucket setup + a media-picker P-block. Real work but
+  not differentiating for the demo audience.
+- **#13 — Workspace-private dashboard sharing via Share modal**
+  Internal-share-only path for dashboards. The public-publish path
+  (with vanity URL + QR) covers every demo flow we plan to show.
+- **#23 — Optional local-model fallback for offline LLM**
+  Conditional on #8 (Whisper local) landing, and #8 is itself out of
+  scope. The "everything works offline" demo guarantee is satisfied by
+  the manual query path; the LLM path is documented as online-only.
+- **#25 — React Joyride onboarding tour**
+  Walk-the-user-through guided tour. Demo is presenter-driven; a
+  guided tour competes with the presenter and adds little.
+
+The remaining `[ ]` items are still in scope for the demo but not
+started yet. The remaining `[~]` items are partial — see the inline
+notes for each one to know what's done and what's missing.
 
 ---
 
