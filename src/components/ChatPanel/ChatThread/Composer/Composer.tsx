@@ -1,6 +1,7 @@
 import { ComposerPrimitive } from "@assistant-ui/react";
 import { ActionIcon, Group } from "@mantine/core";
 import { IconArrowUp } from "@tabler/icons-react";
+import clsx from "clsx";
 import { ChatModelPicker } from "@/components/ChatPanel/ChatModelPicker/ChatModelPicker";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import css from "./Composer.module.css";
@@ -11,7 +12,9 @@ export function Composer(): JSX.Element {
 
   return (
     <div className={css.composerContainer}>
-      <ComposerPrimitive.Root className={css.composer}>
+      <ComposerPrimitive.Root
+        className={clsx(css.composer, disabled && css.composerDisabled)}
+      >
         <ComposerPrimitive.Input
           className={css.composerInput}
           placeholder={
