@@ -2,6 +2,7 @@ import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { PolarClient } from "@sbfn/_shared/PolarClient/PolarClient.ts";
 import { UpdateSubscriptionProduct } from "@sbfn/subscriptions/[subscriptionId].product.ts";
 import { UpdateSubscriptionSeats } from "@sbfn/subscriptions/[subscriptionId].seats.ts";
+import { CreateFreeSubscription } from "@sbfn/subscriptions/create-free.ts";
 import { FetchAndSyncUserSubscriptions } from "@sbfn/subscriptions/fetch-and-sync.ts";
 import { hasSubscriptionPermission } from "@sbfn/subscriptions/services/hasSubscriptionPermission.ts";
 import { getDevOverrideEmail } from "$/env/getDevOverrideEmail.ts";
@@ -19,6 +20,10 @@ import type {
 export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
   "/fetch-and-sync": {
     GET: FetchAndSyncUserSubscriptions,
+  },
+
+  "/create-free": {
+    POST: CreateFreeSubscription,
   },
 
   "/:subscriptionId/product": {
@@ -173,9 +178,16 @@ export const Routes = defineRoutes<SubscriptionsAPI>("subscriptions", {
           return { success: false };
         }
 
-        // They have one, so we can create a customer session for them
+        const subscriptionWithPolarCustomer = subscriptions.find(
+          (subscriptionRow) => subscriptionRow.polar_customer_id != null,
+        );
+
+        if (subscriptionWithPolarCustomer === undefined) {
+          return { success: false };
+        }
+
         const customerSession = await PolarClient.createCustomerSessions({
-          customerId: subscriptions[0]!.polar_customer_id,
+          customerId: subscriptionWithPolarCustomer.polar_customer_id,
           returnURL: queryParams.returnURL,
         });
         return {

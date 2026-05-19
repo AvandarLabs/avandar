@@ -7,10 +7,13 @@ import {
   Text,
   Tooltip,
 } from "@mantine/core";
+import { useMutation } from "@hooks/useMutation/useMutation";
 import { useRouter } from "@tanstack/react-router";
-import { notifyExpiredSession } from "@ui";
+import { notifyExpiredSession, notifySuccess } from "@ui";
 import { useState } from "react";
 import { match } from "ts-pattern";
+import { WorkspaceClient } from "@/clients/WorkspaceClient";
+import { createFreeSubscription } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/createFreeSubscription";
 import { goToPolarCheckout } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/goToPolarCheckout";
 import { useChangePlanModal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/openChangePlanModal/useChangePlanModal";
 import { PaidPlanPriceRow } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/PlanCard/PaidPlanPriceRow";
@@ -54,19 +57,34 @@ function getInitialSelectedVariant(
   options: Props,
 ): FreePlanVariants | PaidPlanVariants {
   const { type, planGroup, defaultVariant } = options;
-  const currentSubscribedPlanId = options.currentSubscription?.polarProductId;
-  if (currentSubscribedPlanId === undefined) {
+  const currentSubscription = options.currentSubscription;
+  if (currentSubscription === undefined) {
     return defaultVariant;
   }
+
   if (type === "free") {
+    if (
+      currentSubscription.polarProductId === undefined &&
+      currentSubscription.featurePlanType === "free"
+    ) {
+      return "free";
+    }
+
+    const currentSubscribedPolarProductId = currentSubscription.polarProductId;
     return (
-      planGroup.freePlan.polarProductId === currentSubscribedPlanId ? "free"
+      planGroup.freePlan.polarProductId === currentSubscribedPolarProductId ?
+        "free"
       : planGroup.payWhatYouWantPlan ? "custom"
       : "free"
     );
   }
 
-  return planGroup.monthlyPlan.polarProductId === currentSubscribedPlanId ?
+  const currentSubscribedPolarProductId = currentSubscription.polarProductId;
+  if (currentSubscribedPolarProductId === undefined) {
+    return defaultVariant;
+  }
+
+  return planGroup.monthlyPlan.polarProductId === currentSubscribedPolarProductId ?
       "month"
     : "year";
 }
@@ -80,6 +98,15 @@ export function PlanCard(props: Props): JSX.Element {
     FreePlanVariants | PaidPlanVariants
   >(getInitialSelectedVariant(props));
   const openChangePlanModal = useChangePlanModal();
+  const [createFreeSub, isCreatingFreeSub] = useMutation({
+    mutationFn: async () => {
+      await createFreeSubscription({ workspaceId: workspace.id });
+    },
+    onSuccess: () => {
+      notifySuccess("You're on the Free plan");
+    },
+    queryToInvalidate: WorkspaceClient.QueryKeys.getWorkspacesOfCurrentUser(),
+  });
   const selectedPlan =
     type === "free" ?
       selectedVariant === "custom" ?
@@ -89,8 +116,11 @@ export function PlanCard(props: Props): JSX.Element {
     : planGroup.annualPlan;
   const { featurePlan } = selectedPlan;
   const [isLoadingCheckoutPage, setIsLoadingCheckoutPage] = useState(false);
-  const isCurrentSubscribedPlan =
-    currentSubscribedPlan?.polarProductId === selectedPlan.polarProductId;
+  const isCurrentSubscribedPlan = _isCurrentSubscribedPlan({
+    currentSubscription,
+    currentSubscribedPlan,
+    selectedPlan,
+  });
 
   const paidPlanDiscount =
     type === "paid" ?
@@ -109,6 +139,11 @@ export function PlanCard(props: Props): JSX.Element {
       return;
     }
     const { userId, workspaceId, email } = userProfile;
+
+    if (selectedPlan.priceType === "free") {
+      createFreeSub();
+      return;
+    }
 
     // if we have no current subscription, or the current plan is a free plan
     // (meaning any plan we select is going to be an upgrade), then we have to
@@ -143,6 +178,10 @@ export function PlanCard(props: Props): JSX.Element {
     // otherwise, we are just updating the current from a paid plan to another
     // paid plan. Or paid plan to free plan. So we don't need to go through the
     // official Polar checkout page for that.
+    if (currentSubscription.polarSubscriptionId === undefined) {
+      return;
+    }
+
     openChangePlanModal({
       newPlan: selectedPlan,
       currentPlan: currentSubscribedPlan,
@@ -263,11 +302,40 @@ export function PlanCard(props: Props): JSX.Element {
           mt="auto"
           disabled={isCurrentSubscribedPlan}
           onClick={onSelectPlan}
-          loading={isLoadingCheckoutPage}
+          loading={isLoadingCheckoutPage || isCreatingFreeSub}
         >
           {isCurrentSubscribedPlan ? "Current Plan" : "Select Plan"}
         </Button>
       </Stack>
     </Card>
   );
+}
+
+function _isCurrentSubscribedPlan(options: {
+  currentSubscription: Props["currentSubscription"];
+  currentSubscribedPlan: SubscriptionPlan | undefined;
+  selectedPlan: SubscriptionPlan;
+}): boolean {
+  const { currentSubscription, currentSubscribedPlan, selectedPlan } = options;
+
+  if (currentSubscribedPlan === undefined || currentSubscription === undefined) {
+    return false;
+  }
+
+  if (
+    currentSubscription.polarProductId !== undefined &&
+    selectedPlan.polarProductId === currentSubscription.polarProductId
+  ) {
+    return true;
+  }
+
+  if (
+    currentSubscription.polarProductId === undefined &&
+    selectedPlan.priceType === "free" &&
+    currentSubscription.featurePlanType === "free"
+  ) {
+    return true;
+  }
+
+  return false;
 }

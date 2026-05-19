@@ -113,9 +113,27 @@ export function WorkspaceBillingView({
   );
 
   const currentSubscribedPlan = allPlans.find((plan) => {
-    return (
-      plan.polarProductId === currentWorkspace.subscription?.polarProductId
-    );
+    const subscription = currentWorkspace.subscription;
+    if (subscription === undefined) {
+      return false;
+    }
+
+    if (
+      subscription.polarProductId !== undefined &&
+      plan.polarProductId === subscription.polarProductId
+    ) {
+      return true;
+    }
+
+    if (
+      subscription.polarProductId === undefined &&
+      plan.priceType === "free" &&
+      subscription.featurePlanType === "free"
+    ) {
+      return true;
+    }
+
+    return false;
   });
 
   const hasSubscription = !!currentWorkspace.subscription;
