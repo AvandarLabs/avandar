@@ -89,12 +89,11 @@ type plumbing across the platform. Research-grade problem on the
 handwriting side. Defer.
 
 ### Bidirectional SQL ↔ form sync (items #5, #6)
-`node-sql-parser` parses SQL into an AST, but **does not round-trip** —
-especially for the kind of LLM-generated SQL Avandar produces
-(named CTEs, window functions, DuckDB-specific syntax). A best-effort
-"parse simple SELECTs into form" is feasible but treating manual and AI
-paths as one unified state requires a redesign of `DataExplorerStateManager`
-that I'm not going to attempt under demo time pressure. Defer.
+**Data Explorer surface shipped** in Checkpoint 7 — `node-sql-parser`
+projects arbitrary SELECTs onto the manual form, surfaces a
+"best-effort approximation" alert when anything is dropped, and the
+form-to-SQL knex pipeline regenerates SQL on every manual edit.
+**Dashboards still pending** (item #21 surface).
 
 ### Full i18n with RTL (item #24)
 Lingui setup is small. Translating an entire app surface for 6 languages
@@ -109,13 +108,25 @@ showing the dataset name." This is a SQL-aware editor with semantic
 tokens — feasible but a multi-day project. Defer.
 
 ### Dashboard rebuild (items #10–#17, #21, #22)
-Padding/spacing/typography/colors + editable design tokens + logo upload +
-media embedding via storage + PDF export + QR code share + vanity URL +
-sliced public publishing + workspace-private sharing + viewer-editable
-global filters + per-viz viewer-editable filters + chat-in-dashboards
-generating Puck blocks + manual query form in dashboards + view-before-publish.
-Each of these is its own focused session. I've kept the merged
-share-resource-modal-redesign spec in the tree as the starting point.
+**Partially shipped:**
+
+- ✅ #12 — Vanity URL (kebab-case), copy-to-clipboard, QR code with
+  download. PDF export still pending.
+- ✅ #18 — View-before-publish preview route + "Back to editor" banner.
+
+**Still pending:**
+- #10 — Editable design tokens / typography / spacing / logo upload
+- #11 — Media embedding via Supabase Storage
+- #12 (PDF export only)
+- #13 — Workspace-private dashboard sharing via the Share modal
+- #14 — Slice-aware public publishing (data subsetting on publish)
+- #15 — Viewer-editable global filters
+- #16 — Viewer-editable per-viz filters
+- #17 — Publish-time slice picker
+- #21 — Manual query form in dashboards
+- #22 — Chat panel inside dashboards (Puck-block-generating)
+
+Each of these is its own focused session.
 
 ### Onboarding tour (item #25)
 React Joyride walkthrough. Small but needs design pass + content. Defer.
@@ -125,8 +136,9 @@ React Joyride walkthrough. Small but needs design pass + content. Defer.
 cheap follow-up.
 
 ### Improved Summary view (item #9)
-"Lazy-load visualizations, redesign the long ObjectDescriptionList." Design
-work + perf work. Defer.
+**Shipped** in Checkpoint 6. Doc-style outline with sticky TOC,
+plain-language headline per column, type-appropriate visualisations,
+lazy per-column SQL via IntersectionObserver.
 
 ### Local-model fallback (item #23)
 Conditional on item #8 landing first.
@@ -555,7 +567,7 @@ canvas-update bug is gone in the four-turn scenario.
 
 ---
 
-## Checkpoint 5 — SQL ↔ manual query bidirectional sync + recursive filter UI ✅
+## Checkpoint 7 — SQL ↔ manual query bidirectional sync + recursive filter UI ✅
 
 Implements items **#5** and **#6** of the demo feature checklist. Full
 detail lives in `docs/demo-features/sql-parser-filter-ui.md`.
@@ -602,6 +614,50 @@ deterministic parser/regenerator behaviour is fully covered by unit
 tests; a follow-up session with browser permissions should add the
 screenshots under `docs/demo-features/screenshots/` and a mocked-AI
 E2E test under `tests/e2e/` to lock the chat → canvas integration.
+
+---
+
+## Checkpoint 8 — Publish modal polish, kebab-case slugs, chat panel transparency fix ✅
+
+Three follow-up fixes from a hands-on browser review of Checkpoint 6:
+
+**Publish modal copy — leads with the URL.** Modal now opens with
+"Your dashboard will be published to: `<url>`". Default `<url>` is
+the canonical UUID-based public URL; it updates live as the user
+types in the Custom URL field below. Helper line beneath says
+"By default we use a permanent UUID-based link. Add a custom path
+below for a nicer URL." and flips to "Using your custom URL. The
+permanent UUID link below also still works." once they type
+something. The pre-publish state no longer hides this URL behind a
+section header.
+
+**Slugs switched to kebab-case.** Earlier copy said "snake-case"
+but the user wanted kebab-case. `toVanitySlug` now produces
+`my-cholera-report` (was `my_cholera_report`); all eight unit tests
+updated accordingly. Placeholder is now `e.g. cholera-outbreak-2024`
+and the helper copy is explicit: "Whatever you type is kebab-cased
+automatically." Modal-wide rename of "Vanity URL" → "Custom URL"
+for the same reason.
+
+**Chat panel transparency bug — fixed (not an iPad artifact).** The
+chat panel's disabled state (any page that is NOT the Data Explorer)
+was applying only `rgb(0 0 0 / 6%)` as a background. Against the
+dark navbar gradient that sits behind it, 6 % black reads as fully
+transparent — which is what showed up on the Vercel preview. iPad
+was simply where the user noticed it. The Stack also had a competing
+inline `bg={disabled ? undefined : "white"}` prop that interacted
+badly with the CSS rule.
+
+Fix:
+- Removed the inline `bg` prop from the Stack in `ChatPanel.tsx`.
+- `.shell` in the CSS module is now opaque-white by default
+  (`var(--mantine-color-white)`).
+- `.shellDisabled` uses the subtle off-white
+  (`var(--mantine-color-neutral-0)`) instead of a low-opacity black
+  overlay. The disabled-state visual signal now lives in the existing
+  composer placeholder text-tint, not in the panel background.
+
+All 57 affected tests still pass; `tsc -b --noEmit` clean.
 
 ---
 

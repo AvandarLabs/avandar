@@ -58,9 +58,10 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started
 - [ ] **10. Dashboard polish: spacing, typography, color, editable design + semantic tokens, logo upload**
 - [ ] **11. Dashboard media: video / image / media embed via Supabase Storage**
 - [~] **12. Dashboard publish options: PDF export, QR code, vanity URL**
-  - [x] Vanity URL (optional; auto snake-cased; lands at `/d/<workspaceSlug>/<slug>`).
+  - [x] Vanity URL (optional; auto kebab-cased; lands at `/d/<workspaceSlug>/<slug>`).
   - [x] Copy share link to clipboard.
   - [x] QR code (rendered client-side via `qrcode`, downloadable as PNG).
+  - [x] Publish modal leads with the URL the dashboard will be published to.
   - [ ] PDF export.
 - [ ] **13. Workspace-private dashboard sharing via Share modal (dashboards as shareable resources)**
 - [ ] **14. Slice-aware public publishing (package only the data slices the dashboard reads)**
