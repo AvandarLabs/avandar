@@ -74,12 +74,14 @@ Plan at `docs/superpowers/plans/2026-05-13-electrobun-desktop-phase-2-native-lay
 is **4,298 lines**. The session container cannot build, sign, or test native
 desktop binaries, so any work here would be type-only and unverifiable.
 
-### Local Whisper voice dictation (item #8, #19)
+### Local Whisper voice dictation (item #8, #19) — **web shipped in Checkpoint 11**
 6 languages including Swahili and Chinese, working offline on 8 GB-RAM
-machines, in both web (transformers.js) and desktop (lazy download). This is
-a multi-day integration: model selection per language, microphone capture
-plumbing, in-progress transcription UI, web/desktop parity, plus the
-"works after we shut off internet" demo guarantee. Needs its own session.
+machines, in both web (transformers.js) and desktop (lazy download). The
+**web side now ships** (see Checkpoint 11 below) with model selection,
+microphone capture, in-progress transcription UI, IndexedDB-backed weight
+cache, and offline-by-default operation after first download. **Desktop
+parity is still deferred** — it depends on Desktop Phase 2 landing first,
+so the lazy-download path can be wired into the native shell.
 
 ### PDF / image dataset types with handwriting OCR (item #28)
 "Turn a hand-drawn table or hand-filled form into a CSV." Annotation UI
@@ -945,6 +947,80 @@ Three smoke checks gate Phase 5 work:
   is the only source of architecture truth; granular status lives in
   `docs/ict4d-demo/FEATURE_CHECKLIST.md`; what-shipped-when lives in
   this file.
+
+---
+
+## Checkpoint 11 — Multilingual voice dictation (web) ✅
+
+Item #8 of the brief — local Whisper voice prompts inside the chat
+composer — is now wired end-to-end in the web build. Desktop parity is
+still deferred (see "Deferred" section above; it blocks on Desktop
+Phase 2).
+
+### What shipped
+
+- **Microphone button** in the chat composer, immediately left of the
+  model picker (`src/components/ChatPanel/VoiceInputButton`). First click
+  opens a consent modal that lets the user pick a model and language; on
+  confirm the download begins in the background.
+- **Whisper model catalogue** (`src/lib/voice/voiceModels.ts`):
+  `Xenova/whisper-tiny` (~75 MB, default), `whisper-base` (~145 MB),
+  `whisper-small` (~485 MB). All multilingual, all on the public
+  Hugging Face Hub — no API key needed.
+- **Language picker** in the consent modal: auto-detect plus English,
+  Spanish, French, Portuguese, Swahili, Chinese (the six languages the
+  brief explicitly called out).
+- **`VoiceModelManager` singleton** (`src/lib/voice/VoiceModelManager.ts`)
+  orchestrates download / progress / transcribe / status pub-sub. Uses
+  `useSyncExternalStore` to drive React subscribers.
+- **IndexedDB-backed cache** (`src/lib/voice/voiceModelCache.ts`) plugged
+  into `@huggingface/transformers` via `env.useCustomCache`. Per the demo
+  brief, no OPFS — weights live in a dedicated Dexie database called
+  `AvandarVoiceModelCache`. Survives page reloads; cleared if the
+  download fails so retries aren't poisoned.
+- **Floating bottom-left progress indicator**
+  (`src/components/VoiceModelDownloadIndicator`) mounted globally from
+  `AppShell`. Renders only while a download is in flight; hover reveals
+  `Downloading <model> for voice prompting` as a tooltip; body shows %
+  + current file. Success / failure surfaced via Mantine notifications.
+- **Microphone capture pipeline** (`src/lib/voice/audioCapture.ts`):
+  `MediaRecorder` (opus/webm with mp4/ogg fallback) → `decodeAudioData`
+  → `OfflineAudioContext` resample to 16 kHz mono Float32 (Whisper's
+  required input format). Mic tracks are explicitly stopped after each
+  recording so the OS indicator clears.
+- **Composer integration** uses `@assistant-ui/react`'s
+  `useComposerRuntime().setText` to append the transcript to whatever
+  the user already typed.
+
+### Testing
+
+17 vitest cases covering: localStorage marker round-trip + malformed
+payload tolerance, manager download / progress / transcribe flow,
+language `auto` handling, error path + stale-marker cleanup,
+mime-type negotiation, resample math, and the consent-modal interaction.
+Type-check and ESLint clean.
+
+### Verification still pending
+
+- **Live download** — the session container has no outbound network,
+  so the actual fetch from huggingface.co was not exercised. Manual
+  verification steps are listed in the commit message and the PR
+  description.
+- **Microphone permission UX** — jsdom can't grant `getUserMedia`,
+  so the permission-denied toast path is covered by hand testing only.
+
+### Still deferred for this item
+
+- **Desktop parity** (item #19). Blocks on Desktop Phase 2 — once the
+  native shell exists, the same `VoiceModelManager` can be reused with a
+  filesystem-backed cache. The UI components and language list will not
+  need to change.
+- **Per-language pre-bundled models** — today the user picks one model
+  and one language at a time. A future polish pass could let the
+  composer remember per-conversation language without re-prompting.
+- **Streaming transcription** — current flow captures the full clip,
+  then runs Whisper. Whisper.js supports chunked streaming via
+  `chunk_length_s`; could be wired up if real-time feedback is needed.
 
 ---
 
