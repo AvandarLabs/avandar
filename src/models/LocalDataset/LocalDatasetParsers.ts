@@ -8,11 +8,34 @@ import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { UserId } from "$/models/User/User.types";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 
+const CsvParseOptionsSchema = z.object({
+  type: z.literal("csv"),
+  numRowsToSkip: z.number().optional(),
+  delimiter: z.string().optional(),
+});
+
+const XlsxParseOptionsSchema = z.object({
+  type: z.literal("xlsx"),
+  sheet: z.string().optional(),
+  hasHeader: z.boolean().optional(),
+});
+
 const DBReadSchema = z.object({
   datasetId: uuidType<DatasetId>(),
   workspaceId: uuidType<WorkspaceId>(),
   userId: uuidType<UserId>(),
-  parquetData: z.instanceof(Blob),
+  parquetData: z.instanceof(Blob).optional(),
+  parseStatus: z.enum(["ready", "parsing", "failed"]),
+  parseStartedAt: z.number().optional(),
+  parseFailedReason: z.string().optional(),
+  sourceBytes: z.instanceof(Blob).optional(),
+  sourceFileName: z.string().optional(),
+  sourceFileType: z.enum(["csv", "xlsx"]).optional(),
+  sourceFileSize: z.number().optional(),
+  lastSourceAccessedAt: z.number().optional(),
+  parseOptions: z
+    .union([CsvParseOptionsSchema, XlsxParseOptionsSchema])
+    .optional(),
 });
 
 export const LocalDatasetParsers =

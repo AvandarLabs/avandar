@@ -12,6 +12,7 @@ import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { DatasetParseStatusIndicator } from "@/views/DataManagerApp/DatasetParseStatusIndicator";
 import { NavLinkList } from "@ui";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
@@ -35,6 +36,9 @@ function makeDatasetLink(options: {
       datasetName,
     }),
     style,
+    // Surface the async-import lifecycle on each dataset entry. The
+    // indicator self-hides when the row is `parseStatus === "ready"`.
+    rightSection: <DatasetParseStatusIndicator datasetId={datasetId} />,
   };
   return label ? { ...link, label } : link;
 }

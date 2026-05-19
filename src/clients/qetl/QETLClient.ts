@@ -333,9 +333,11 @@ export const QETLClientFactory = createModuleFactory<IQETLClient>(
               id: extractor.dataset.id,
             });
 
-            // if we have a cache hit, then return the parquet blob, no need
-            // to download from cloud storage
-            if (localDataset) {
+            // Cache hit, with a ready parquet — return it directly. Rows
+            // that are still in Phase B (parseStatus !== "ready") have an
+            // undefined `parquetData`; fall through to the cloud download
+            // (or fail) in that case.
+            if (localDataset?.parseStatus === "ready" && localDataset.parquetData) {
               return {
                 datasetId: extractor.dataset.id,
                 parquetBlob: localDataset.parquetData,

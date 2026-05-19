@@ -657,6 +657,155 @@ class DuckDbClientImpl {
    * is provided, this option will be ignored.
    * @returns A promise that resolves when the file is loaded.
    */
+
+  /**
+   * Fast-path CSV inspection that returns the auto-detected dialect, the
+   * inferred column schema, and the first N rows — without transcoding
+   * the file to parquet. Used by Phase A of the async import flow so the
+   * import form can render its preview within hundreds of milliseconds
+   * regardless of the source CSV's size; Phase B (the full parquet
+   * transcode via `loadCsv`) runs separately in the background.
+   *
+   * Bytes read on disk are bounded by DuckDB's CSV sniff sample (a few
+   * scan-buffer chunks) plus the LIMIT N read for the preview, so this
+   * stays cheap for multi-GB files when the source is registered via
+   * `BROWSER_FILEREADER`.
+   */
+  async sniffCsv(options: {
+    file: File;
+    /** Hint passed to `read_csv`; mirrors `loadCsv`'s signature. */
+    numRowsToSkip?: number;
+    /** Hint passed to `read_csv`; mirrors `loadCsv`'s signature. */
+    delimiter?: string;
+    /** Hint passed to `read_csv`; mirrors `loadCsv`'s signature. */
+    quoteChar?: string;
+    /** Hint passed to `read_csv`; mirrors `loadCsv`'s signature. */
+    escapeChar?: string;
+    /** Hint passed to `read_csv`; mirrors `loadCsv`'s signature. */
+    newlineDelimiter?: string;
+    /** Hint passed to `read_csv`; mirrors `loadCsv`'s signature. */
+    commentChar?: string;
+    /** Hint passed to `read_csv`; mirrors `loadCsv`'s signature. */
+    hasHeader?: boolean;
+    /** Hint passed to `read_csv`; mirrors `loadCsv`'s signature. */
+    dateFormat?: string;
+    /** Hint passed to `read_csv`; mirrors `loadCsv`'s signature. */
+    timestampFormat?: string;
+    /** Number of preview rows to return (typically 200). */
+    maxPreviewRows: number;
+  }): Promise<{
+    csvSniff: DuckDbCsvSniffResult;
+    columns: DuckDbColumnSchema[];
+    previewRows: UnknownRow[];
+  }> {
+    const {
+      file,
+      numRowsToSkip = 0,
+      delimiter,
+      quoteChar,
+      escapeChar,
+      newlineDelimiter,
+      commentChar,
+      hasHeader = true,
+      dateFormat,
+      timestampFormat,
+      maxPreviewRows,
+    } = options;
+
+    // Staging name keeps the sniff file out of the way of any final view /
+    // table the caller may register under the dataset's id later.
+    const stagingFile = `sniff__${uuid()}.csv`;
+    const cleanCommentChar =
+      commentChar === "(empty)" ? null : (commentChar ?? null);
+    const cleanEscapeChar =
+      escapeChar === "(empty)" ? null : (escapeChar ?? null);
+    const cleanQuoteChar =
+      quoteChar === "(empty)" ? null : (quoteChar ?? null);
+
+    const conn = await this.#connect();
+    try {
+      await this.runRawQuery("DROP TABLE IF EXISTS reject_scans", { conn });
+      await this.runRawQuery("DROP TABLE IF EXISTS reject_errors", { conn });
+
+      await this.#registerCSVFile({ tableName: stagingFile, file });
+
+      const readCsvArgs = [
+        "auto_detect=true",
+        "encoding='utf-8'",
+        "store_rejects=true",
+        "rejects_scan='reject_scans'",
+        "rejects_table='reject_errors'",
+        `rejects_limit=${REJECTED_ROW_STORAGE_LIMIT}`,
+        "strict_mode=false",
+        numRowsToSkip ? `skip=${numRowsToSkip}` : "",
+        delimiter ? `delim='${delimiter}'` : "",
+        cleanQuoteChar ? `quote='${cleanQuoteChar}'` : "",
+        cleanEscapeChar ? `escape='${cleanEscapeChar}'` : "",
+        newlineDelimiter ? `new_line='${newlineDelimiter}'` : "",
+        cleanCommentChar ? `comment='${cleanCommentChar}'` : "",
+        hasHeader ? `header=${hasHeader}` : "",
+        dateFormat ? `dateformat='${dateFormat}'` : "",
+        timestampFormat ? `timestampformat='${timestampFormat}'` : "",
+      ]
+        .filter((arg) => {
+          return arg.length;
+        })
+        .join(", ");
+
+      // Schema via DESCRIBE — DuckDB only reads the sniff sample to answer
+      // this, not the full file.
+      const describeResult = await this.runRawQuery<DuckDbColumnSchema>(
+        `DESCRIBE SELECT * FROM read_csv('$file$', ${readCsvArgs})`,
+        { conn, params: { file: stagingFile } },
+      );
+
+      // Preview via LIMIT pushdown. The CSV reader stops scanning after it
+      // has produced `maxPreviewRows` rows.
+      const previewResult = await this.runRawQuery<UnknownRow>(
+        `SELECT * FROM read_csv('$file$', ${readCsvArgs}) LIMIT ${maxPreviewRows}`,
+        { conn, params: { file: stagingFile } },
+      );
+
+      const rejectedScansResult = await this.runRawQuery<DuckDbScan>(
+        `SELECT * FROM reject_scans WHERE file_path='$file$'`,
+        { conn, params: { file: stagingFile } },
+      );
+      const scan = rejectedScansResult.data[0];
+
+      const csvSniff =
+        scan ?
+          _getDuckDbCSVSniffResultFromRejectScan({
+            tableName: stagingFile,
+            scan,
+            commentChar: cleanCommentChar,
+          })
+        : _getDuckDbCSVSniffResultFallback({
+            tableName: stagingFile,
+            numRowsToSkip,
+            delimiter,
+            quoteChar: cleanQuoteChar,
+            escapeChar: cleanEscapeChar,
+            newlineDelimiter,
+            commentChar: cleanCommentChar,
+            hasHeader,
+            dateFormat,
+            timestampFormat,
+            tableColumns: describeResult.data,
+          });
+
+      const db = await this.#getDB();
+      await db.dropFile(stagingFile);
+
+      return {
+        csvSniff,
+        columns: describeResult.data,
+        previewRows: previewResult.data,
+      };
+    } finally {
+      await this.#closeConnection(conn);
+    }
+  }
+
   async loadCsv(options: DuckDbLoadCsvOptions): Promise<DuckDbLoadCsvResult> {
     const {
       tableName,

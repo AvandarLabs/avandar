@@ -107,7 +107,11 @@ export const DashboardClient = createUsableServiceClient(
 
                   let parquetBlob: Blob;
 
-                  if (localDataset !== undefined) {
+                  if (
+                    localDataset !== undefined &&
+                    localDataset.parseStatus === "ready" &&
+                    localDataset.parquetData
+                  ) {
                     parquetBlob = localDataset.parquetData;
                   } else {
                     const openDataDataset = await OpenDataDatasetClient.getOne(
