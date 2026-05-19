@@ -4,6 +4,16 @@ import {
   CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
   CALIFORNIA_CSV_PATH,
 } from "./helpers/constants";
+import {
+  getChatComposerInput,
+  openChatPanelIfClosed,
+} from "./helpers/chatPanelFlow";
+import { dismissBlockingOverlays } from "./helpers/dataExplorerFlow";
+import {
+  ensureCloudStorageCheckedAndSaveDataset,
+  parseDatasetIdFromDataManagerUrl,
+  pollUntilCloudDatasetToggleShowsOnline,
+} from "./helpers/manualUploadCloudSyncFlow";
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
 /**
@@ -99,8 +109,6 @@ test.describe("chat interactive workflows", () => {
     page,
     e2eWorkerDb,
   }) => {
-    test.setTimeout(120_000);
-
     await mountMockChat({
       page,
       responder: (turnIndex) => {
@@ -134,31 +142,33 @@ test.describe("chat interactive workflows", () => {
       workspaceSlug: e2eWorkerDb.workspaceSlug,
     });
     await page.goto(`/${e2eWorkerDb.workspaceSlug}/data-explorer`);
+    await dismissBlockingOverlays(page);
 
-    // Open chat panel
-    const chatToggle = page.getByRole("button", { name: /Ask Avandar/i });
-    if (await chatToggle.isVisible()) {
-      await chatToggle.click();
-    }
+    await openChatPanelIfClosed(page);
 
-    // Submit a question
-    const composer = page
-      .getByRole("textbox", { name: /chat/i })
-      .or(page.locator('[data-testid="composer-input"]'))
-      .first();
+    const composer = getChatComposerInput(page);
     await composer.fill("show me cases by region");
     await composer.press("Enter");
 
-    // The clarification card appears
-    await expect(page.getByText("Which region do you mean?")).toBeVisible({
+    // The clarification card appears (question is also echoed in the thread).
+    await expect(
+      page.getByText("Which region do you mean?").first(),
+    ).toBeVisible({
       timeout: MEDIUM_WAIT,
     });
     await expect(page.getByRole("radio", { name: "North" })).toBeVisible();
     await expect(page.getByRole("radio", { name: "South" })).toBeVisible();
 
-    // Choose "North" and confirm
-    await page.getByRole("radio", { name: "North" }).click();
-    await page.getByRole("button", { name: /confirm/i }).click();
+    // Choose "North" and confirm. The chat Aside clips overflow, so Playwright
+    // cannot scroll the radio into the viewport; dispatch the click in-page.
+    await page.getByRole("radio", { name: "North" }).evaluate((node) => {
+      (node as HTMLInputElement).click();
+    });
+    const confirmButton = page.getByRole("button", { name: /^confirm$/i });
+    await expect(confirmButton).toBeEnabled({ timeout: SHORT_WAIT });
+    await confirmButton.evaluate((node) => {
+      (node as HTMLButtonElement).click();
+    });
 
     // The next assistant turn fires; "Here is the SQL." appears
     await expect(page.getByText("Here is the SQL.")).toBeVisible({
@@ -170,7 +180,27 @@ test.describe("chat interactive workflows", () => {
     page,
     e2eWorkerDb,
   }) => {
-    test.setTimeout(180_000);
+    await signInWithEmailPassword(page, {
+      email: e2eWorkerDb.primaryUser.email,
+      password: e2eWorkerDb.primaryUser.password,
+      workspaceSlug: e2eWorkerDb.workspaceSlug,
+    });
+
+    await uploadCsvAndOpenChat({
+      page,
+      workspaceSlug: e2eWorkerDb.workspaceSlug,
+    });
+    await ensureCloudStorageCheckedAndSaveDataset({
+      page,
+      workspaceSlug: e2eWorkerDb.workspaceSlug,
+    });
+    const datasetId = parseDatasetIdFromDataManagerUrl({
+      url: page.url(),
+      workspaceSlug: e2eWorkerDb.workspaceSlug,
+    });
+    if (!datasetId) {
+      throw new Error(`Could not parse dataset id from URL: ${page.url()}`);
+    }
 
     await mountMockChat({
       page,
@@ -183,19 +213,21 @@ test.describe("chat interactive workflows", () => {
               "Filter to confirmed cases, then aggregate by date, then plot.",
             steps: [
               {
-                id: "filter",
+                id: "filter_rows",
                 description: "Keep only confirmed cases",
                 type: "sql",
-                code: "SELECT 1 AS x",
+                code: `SELECT * FROM "${datasetId}" LIMIT 50`,
                 inputs: [],
-                predictedSchema: [{ name: "x", type: "integer" }],
+                predictedSchema: [
+                  { name: "Province_State", type: "varchar" },
+                ],
               },
               {
-                id: "agg",
+                id: "aggregate",
                 description: "Aggregate by day",
                 type: "sql",
-                code: 'SELECT 1 AS "y"',
-                inputs: ["filter"],
+                code: `SELECT COUNT(*)::INTEGER AS "y" FROM "step_filter_rows"`,
+                inputs: ["filter_rows"],
                 predictedSchema: [{ name: "y", type: "integer" }],
               },
             ],
@@ -203,23 +235,31 @@ test.describe("chat interactive workflows", () => {
         };
       },
     });
-
-    await signInWithEmailPassword(page, {
-      email: e2eWorkerDb.primaryUser.email,
-      password: e2eWorkerDb.primaryUser.password,
-      workspaceSlug: e2eWorkerDb.workspaceSlug,
-    });
+    await pollUntilCloudDatasetToggleShowsOnline(page);
     await page.goto(`/${e2eWorkerDb.workspaceSlug}/data-explorer`);
+    await dismissBlockingOverlays(page);
+    await page.getByRole("button", { name: /^open$/i }).click();
+    const openDrawer = page.getByRole("dialog", { name: /open dataset/i });
+    await openDrawer
+      .getByRole("row")
+      .filter({ hasText: "california-covid-sample.csv" })
+      .getByRole("button", { name: /^open$/i })
+      .click();
+    await dismissBlockingOverlays(page);
+    await expect
+      .poll(
+        async () => {
+          return page
+            .getByRole("columnheader", { name: "Province_State", exact: true })
+            .isVisible();
+        },
+        { timeout: LONG_WAIT },
+      )
+      .toBe(true);
 
-    const chatToggle = page.getByRole("button", { name: /Ask Avandar/i });
-    if (await chatToggle.isVisible()) {
-      await chatToggle.click();
-    }
+    await openChatPanelIfClosed(page);
 
-    const composer = page
-      .getByRole("textbox", { name: /chat/i })
-      .or(page.locator('[data-testid="composer-input"]'))
-      .first();
+    const composer = getChatComposerInput(page);
     await composer.fill("Break this analysis into steps");
     await composer.press("Enter");
 
@@ -233,7 +273,7 @@ test.describe("chat interactive workflows", () => {
     // Both steps should eventually succeed (auto-run is the default)
     await expect(
       page.getByText("All steps succeeded.", { exact: false }),
-    ).toBeVisible({ timeout: MEDIUM_WAIT });
+    ).toBeVisible({ timeout: LONG_WAIT });
   });
 });
 // Keep the import to silence "unused" complaints if a future fixture
@@ -241,4 +281,3 @@ test.describe("chat interactive workflows", () => {
 // valuable.
 void CALIFORNIA_CSV_EXPECTED_ROW_COUNT;
 void SHORT_WAIT;
-void uploadCsvAndOpenChat;

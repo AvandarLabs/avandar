@@ -90,6 +90,10 @@ function _buildDataSourceMetadataFromLoadResult({
 }): ManualUploadDataSourceMetadata {
   return match(loadResult)
     .with({ type: "csv" }, (csvLoadResult): ManualUploadDataSourceMetadata => {
+      const csvRequest =
+        loadAndParseOptions?.type === "csv_file" ?
+          loadAndParseOptions
+        : undefined;
       return {
         sourceType: "csv_file",
         onlineStorageAllowed: true,
@@ -97,8 +101,9 @@ function _buildDataSourceMetadataFromLoadResult({
         datasetLoadResult: csvLoadResult,
         parseOptions: {
           type: "csv_file",
-          numRowsToSkip: csvLoadResult.csvSniff.SkipRows,
-          delimiter: csvLoadResult.csvSniff.Delimiter,
+          numRowsToSkip:
+            csvRequest?.numRowsToSkip ?? csvLoadResult.csvSniff.SkipRows,
+          delimiter: csvRequest?.delimiter ?? csvLoadResult.csvSniff.Delimiter,
         },
       };
     })

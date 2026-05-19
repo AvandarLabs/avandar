@@ -65,6 +65,8 @@ type Props = {
   /** Utility links go on the bottom of the navbar */
   utilityLinks?: readonly NavbarLink[];
   currentWorkspace?: Workspace.WithSubscription;
+  /** When false, the Aside slot stays empty (e.g. no-workspace routes). */
+  showChatPanel?: boolean;
 };
 
 /**
@@ -80,6 +82,7 @@ function AppShellComponent({
   navbarLinks,
   currentWorkspace,
   utilityLinks = [],
+  showChatPanel = true,
 }: Props): JSX.Element {
   const { isDesktopNavbarCollapsed } = AppShellStateManager.useState();
   const appShellDispatch = AppShellStateManager.useDispatch();
@@ -182,7 +185,9 @@ function AppShellComponent({
           {children}
         </MantineAppShell.Main>
         <MantineAppShell.Aside withBorder={false} p={0} bg="transparent">
-          <ChatPanel />
+          {showChatPanel ?
+            <ChatPanel />
+          : null}
         </MantineAppShell.Aside>
       </MantineAppShell>
 

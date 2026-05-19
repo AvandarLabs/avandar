@@ -1,21 +1,23 @@
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
+import { WorkspaceQETLClient } from "@/clients/qetl/WorkspaceQETLClient";
+import {
+  clearPlanStepBlobs,
+  putPlanStepBlob,
+} from "@/components/ChatPanel/PlanStateManager/planStepStorage";
 import {
   findAffectedDownstream,
   isSchemaDrift,
   MAX_REGEN_ATTEMPTS,
   regenerateOnDrift,
 } from "@/components/ChatPanel/PlanStateManager/schemaDrift";
-import {
-  clearPlanStepBlobs,
-  putPlanStepBlob,
-} from "@/components/ChatPanel/PlanStateManager/planStepStorage";
 import type {
   PlanNode,
   PlanStateManager,
 } from "@/components/ChatPanel/PlanStateManager/PlanStateManager";
 import type { PlanStepBlob } from "@/components/ChatPanel/PlanStateManager/planStepStorage";
-import type { ChatPlan } from "$/types/chat.types";
+import type * as duckdb from "@duckdb/duckdb-wasm";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ChatPlan } from "$/types/chat.types";
 
 /**
  * Run a plan end-to-end in DuckDB, writing each step's output to a temp
@@ -39,16 +41,48 @@ export type PlanExecutorDispatch = ReturnType<
 const STEP_VIEW_PREFIX = "step_";
 const PREVIEW_ROW_CAP = 50;
 
+/** Matches dataset UUIDs referenced in plan step SQL. */
+const DATASET_ID_IN_SQL_RE =
+  /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
+
 export function stepViewName(stepId: string): string {
   return `${STEP_VIEW_PREFIX}${stepId.replace(/[^a-zA-Z0-9_]/g, "_")}`;
+}
+
+/**
+ * Plan steps call `DuckDbClient` directly, bypassing the canvas QETL path
+ * that registers workspace dataset tables. Probe each referenced dataset
+ * through `WorkspaceQETLClient` so parquet is loaded before we create
+ * `step_*` temp views.
+ */
+async function ensureWorkspaceDatasetsLoadedForPlanSql(options: {
+  workspaceId: Workspace.Id;
+  rawSQL: string;
+}): Promise<void> {
+  const matches = options.rawSQL.match(DATASET_ID_IN_SQL_RE);
+  if (!matches) {
+    return;
+  }
+  const uniqueDatasetIds = [...new Set(matches)];
+  await Promise.all(
+    uniqueDatasetIds.map(async (datasetId) => {
+      await WorkspaceQETLClient.runQuery({
+        workspaceId: options.workspaceId,
+        rawSQL: `SELECT 1 AS "_ava_probe" FROM "${datasetId}" LIMIT 1`,
+      });
+    }),
+  );
 }
 
 export async function executePlanStep(args: {
   planId: string;
   step: PlanNode;
   dispatch: PlanExecutorDispatch;
+  workspaceId: Workspace.Id;
+  /** When running a full plan, pass one connection for all steps. */
+  duckDbConnection?: duckdb.AsyncDuckDBConnection;
 }): Promise<{ ok: true } | { ok: false; error: string }> {
-  const { planId, step, dispatch } = args;
+  const { planId, step, dispatch, workspaceId, duckDbConnection } = args;
   if (step.type !== "sql") {
     // Non-SQL steps (Python / R / clarification) aren't executable in
     // Phase 3; mark them skipped so the UI can show why.
@@ -63,32 +97,68 @@ export async function executePlanStep(args: {
   const wrappedSql = `CREATE OR REPLACE TEMP VIEW "${viewName}" AS\n${step.code}`;
 
   try {
-    await DuckDbClient.runRawQuery(wrappedSql);
-    // Pull schema + preview rows for the DAG node.
-    const previewQuery = `SELECT * FROM "${viewName}" LIMIT ${PREVIEW_ROW_CAP}`;
-    const result =
-      await DuckDbClient.runRawQuery<Record<string, unknown>>(previewQuery);
-    const actualSchema = result.columns.map((c) => {
-      return { name: c.name, type: String(c.dataType ?? "unknown") };
+    await ensureWorkspaceDatasetsLoadedForPlanSql({
+      workspaceId,
+      rawSQL: step.code,
     });
-    const countResult = await DuckDbClient.runRawQuery<{
-      rc: bigint | number;
-    }>(`SELECT COUNT(*) AS rc FROM "${viewName}"`);
-    const firstRow = countResult.data[0];
-    const rowCount =
-      firstRow && firstRow.rc !== undefined && firstRow.rc !== null ?
-        Number(firstRow.rc)
-      : result.data.length;
+
+    const runOnConnection = async (
+      conn: duckdb.AsyncDuckDBConnection,
+    ): Promise<{
+      actualSchema: Array<{ name: string; type: string }>;
+      rowCount: number;
+      previewRows: Record<string, unknown>[];
+    }> => {
+      await DuckDbClient.runRawQuery(wrappedSql, { conn });
+      const previewQuery = `SELECT * FROM "${viewName}" LIMIT ${PREVIEW_ROW_CAP}`;
+      const result = await DuckDbClient.runRawQuery<Record<string, unknown>>(
+        previewQuery,
+        {
+          conn,
+        },
+      );
+      const schema = result.columns.map((column) => {
+        return {
+          name: column.name,
+          type: String(column.dataType ?? "unknown"),
+        };
+      });
+      const countResult = await DuckDbClient.runRawQuery<{
+        rc: bigint | number;
+      }>(`SELECT COUNT(*) AS rc FROM "${viewName}"`, { conn });
+      const firstRow = countResult.data[0];
+      const resolvedRowCount =
+        firstRow && firstRow.rc !== undefined && firstRow.rc !== null ?
+          Number(firstRow.rc)
+        : result.data.length;
+
+      return {
+        actualSchema: schema,
+        rowCount: resolvedRowCount,
+        previewRows: result.data,
+      };
+    };
+
+    const { actualSchema, rowCount, previewRows } =
+      duckDbConnection ?
+        await runOnConnection(duckDbConnection)
+      : await DuckDbClient.withConnection(runOnConnection);
 
     // Materialise the FULL result to IndexedDB as parquet. The DuckDB
     // temp view above is enough for SQL referencing within this
     // session, but the parquet blob is what lets us reopen the
     // analysis after a reload, or save it onto a virtual dataset.
     try {
-      const parquetBlob = await DuckDbClient.runRawQuery(
-        `SELECT * FROM "${viewName}"`,
-        { returnType: "parquet" },
-      );
+      const materializeParquet = async (conn: duckdb.AsyncDuckDBConnection) => {
+        return await DuckDbClient.runRawQuery(`SELECT * FROM "${viewName}"`, {
+          returnType: "parquet",
+          conn,
+        });
+      };
+      const parquetBlob =
+        duckDbConnection ?
+          await materializeParquet(duckDbConnection)
+        : await DuckDbClient.withConnection(materializeParquet);
       await putPlanStepBlob({
         planId,
         stepId: step.id,
@@ -111,7 +181,7 @@ export async function executePlanStep(args: {
       viewName,
       actualSchema,
       rowCount,
-      previewRows: result.data,
+      previewRows,
     });
     return { ok: true };
   } catch (e) {
@@ -142,10 +212,11 @@ export async function executePlan(args: {
   planId: string;
   nodes: readonly PlanNode[];
   dispatch: PlanExecutorDispatch;
+  workspaceId: Workspace.Id;
   /** Optional Phase 4 drift-regen behaviour. */
   driftRegen?: DriftRegenContext;
 }): Promise<void> {
-  const { planId, nodes, dispatch, driftRegen } = args;
+  const { planId, nodes, dispatch, workspaceId, driftRegen } = args;
 
   // Track how many regen attempts we've spent on each (step) — capped
   // by MAX_REGEN_ATTEMPTS so a misbehaving LLM can't burn through
@@ -153,72 +224,86 @@ export async function executePlan(args: {
   // the next pass through reads it from the live plan.
   const regenCountByStep = new Map<string, number>();
 
-  for (let i = 0; i < nodes.length; i++) {
-    const node = nodes[i]!;
-    const outcome = await executePlanStep({ planId, step: node, dispatch });
-    if (!outcome.ok) {
-      // Mark all subsequent nodes as skipped. We bail on first failure
-      // rather than dependency-resolving forward.
-      for (let j = i + 1; j < nodes.length; j++) {
-        dispatch.markStepSkipped(nodes[j]!.id);
-      }
-      return;
-    }
-    if (!driftRegen) {
-      continue;
-    }
-    // Phase 4 drift check: pull the freshly-executed step out of the
-    // latest plan so we can read its `actualSchema`.
-    const latestPlan = driftRegen.getLatestPlan();
-    const latestNode = (latestPlan.steps as PlanNode[]).find((n) => {
-      return n.id === node.id;
-    });
-    if (!latestNode || !latestNode.actualSchema) {
-      continue;
-    }
-    if (!isSchemaDrift(node.predictedSchema, latestNode.actualSchema)) {
-      continue;
-    }
-    const previousAttempts = regenCountByStep.get(node.id) ?? 0;
-    if (previousAttempts >= MAX_REGEN_ATTEMPTS) {
-      // Cap reached: leave the rest of the plan alone and let the
-      // user manually intervene via the failed-step banner.
-      console.warn(
-        `[plan] step ${node.id} drifted again after ${previousAttempts} regen attempt(s); skipping further regens`,
-      );
-      continue;
-    }
-    const affected = findAffectedDownstream({
-      plan: latestPlan,
-      driftedStepId: node.id,
-    });
-    if (affected.length === 0) {
-      continue;
-    }
-    try {
-      regenCountByStep.set(node.id, previousAttempts + 1);
-      await regenerateOnDrift({
-        workspaceId: driftRegen.workspaceId,
-        plan: latestPlan,
-        driftedStep: latestNode,
-        affectedStepIds: affected,
-        model: driftRegen.model,
+  await DuckDbClient.withConnection(async (duckDbConnection) => {
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i]!;
+      const outcome = await executePlanStep({
+        planId,
+        step: node,
         dispatch,
-        runStep: async (stepId) => {
-          const latest = driftRegen.getLatestPlan();
-          const target = (latest.steps as PlanNode[]).find((n) => {
-            return n.id === stepId;
-          });
-          if (!target) {
-            return;
-          }
-          await executePlanStep({ planId, step: target, dispatch });
-        },
+        workspaceId,
+        duckDbConnection,
       });
-    } catch (e) {
-      console.warn("[plan] drift regen failed:", e);
+      if (!outcome.ok) {
+        // Mark all subsequent nodes as skipped. We bail on first failure
+        // rather than dependency-resolving forward.
+        for (let j = i + 1; j < nodes.length; j++) {
+          dispatch.markStepSkipped(nodes[j]!.id);
+        }
+        return;
+      }
+      if (!driftRegen) {
+        continue;
+      }
+      // Phase 4 drift check: pull the freshly-executed step out of the
+      // latest plan so we can read its `actualSchema`.
+      const latestPlan = driftRegen.getLatestPlan();
+      const latestNode = (latestPlan.steps as PlanNode[]).find((planNode) => {
+        return planNode.id === node.id;
+      });
+      if (!latestNode || !latestNode.actualSchema) {
+        continue;
+      }
+      if (!isSchemaDrift(node.predictedSchema, latestNode.actualSchema)) {
+        continue;
+      }
+      const previousAttempts = regenCountByStep.get(node.id) ?? 0;
+      if (previousAttempts >= MAX_REGEN_ATTEMPTS) {
+        // Cap reached: leave the rest of the plan alone and let the
+        // user manually intervene via the failed-step banner.
+        console.warn(
+          `[plan] step ${node.id} drifted again after ${previousAttempts} regen attempt(s); skipping further regens`,
+        );
+        continue;
+      }
+      const affected = findAffectedDownstream({
+        plan: latestPlan,
+        driftedStepId: node.id,
+      });
+      if (affected.length === 0) {
+        continue;
+      }
+      try {
+        regenCountByStep.set(node.id, previousAttempts + 1);
+        await regenerateOnDrift({
+          workspaceId: driftRegen.workspaceId,
+          plan: latestPlan,
+          driftedStep: latestNode,
+          affectedStepIds: affected,
+          model: driftRegen.model,
+          dispatch,
+          runStep: async (stepId) => {
+            const latest = driftRegen.getLatestPlan();
+            const target = (latest.steps as PlanNode[]).find((planNode) => {
+              return planNode.id === stepId;
+            });
+            if (!target) {
+              return;
+            }
+            await executePlanStep({
+              planId,
+              step: target,
+              dispatch,
+              workspaceId: driftRegen.workspaceId,
+              duckDbConnection,
+            });
+          },
+        });
+      } catch (e) {
+        console.warn("[plan] drift regen failed:", e);
+      }
     }
-  }
+  });
 }
 
 /**
@@ -265,9 +350,7 @@ export async function dropPlanTempViews(args: {
  *   - The user re-opens a virtual dataset that was saved with a plan
  *   - A page reload brings the plan back from local storage
  */
-export async function rehydratePlanStep(args: {
-  blob: PlanStepBlob;
-}): Promise<{
+export async function rehydratePlanStep(args: { blob: PlanStepBlob }): Promise<{
   viewName: string;
   schema: PlanStepBlob["schema"];
   rowCount: number;

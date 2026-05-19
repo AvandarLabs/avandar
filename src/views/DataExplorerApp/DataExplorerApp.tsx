@@ -31,6 +31,7 @@ import { VisualizationContainer } from "@/components/VisualizationContainer/Visu
 import { VizSettingsForm } from "@/components/VisualizationContainer/VizSettingsForm/VizSettingsForm";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import { EMPTY_EXPLORER_URL_SEARCH } from "@/views/DataExplorerApp/DataExplorerURLState";
 import { downloadRowsAsCSV } from "@/views/DataExplorerApp/downloadRowsAsCSV";
 import { GeneratedPromptBadge } from "@/views/DataExplorerApp/GeneratedPromptBadge/GeneratedPromptBadge";
 import { OpenDatasetDrawer } from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetDrawer";
@@ -179,13 +180,14 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
 
   return (
     <AppLayout title="Data Explorer">
-      <Stack flex={1} gap={0} mih="100dvh">
+      <Stack flex={1} gap={0} mih={0}>
         <Group
           bg="white"
           py="xs"
           w="100%"
           justify="flex-end"
           px="md"
+          pos="relative"
           style={styles.toolbar}
         >
           <Button
@@ -195,7 +197,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
             size="compact-sm"
             onClick={() => {
               dispatch.resetState();
-              navigate({ search: {}, replace: true });
+              navigate({ search: EMPTY_EXPLORER_URL_SEARCH, replace: true });
             }}
           >
             Reset
@@ -391,7 +393,7 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): JSX.Element {
         </Group>
         <GeneratedPromptBadge />
         <PlanFlowView />
-        <Box flex={1} pos="relative" w="100%" h="100%" bg="white">
+        <Box flex={1} pos="relative" w="100%" mih={0} bg="white">
           <LoadingOverlay visible={isLoadingResults} zIndex={99} />
           <VisualizationContainer
             columns={queryResultColumns}
@@ -458,6 +460,8 @@ const styles = {
   toolbar: (theme: MantineTheme) => {
     return {
       borderBottom: `1px solid ${theme.colors.neutral[2]}`,
+      flexShrink: 0,
+      zIndex: 2,
     };
   },
 };

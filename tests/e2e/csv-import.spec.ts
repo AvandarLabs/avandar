@@ -1,9 +1,10 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
 import {
-  CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
   CALIFORNIA_CSV_PATH,
   EXPECTED_CSV_COLUMN_NAMES,
+  formatImportPreviewRowCount,
+  CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
 } from "./helpers/constants";
 import { deleteDatasetViaDataManagerUiAndVerify } from "./helpers/deleteDatasetViaDataManagerUi";
 import {
@@ -23,8 +24,6 @@ test.describe("CSV manual upload", () => {
     page,
     e2eWorkerDb,
   }) => {
-    test.setTimeout(240_000);
-
     const admin = createSupabaseAdminClient();
     const { workspaceSlug } = e2eWorkerDb;
 
@@ -49,10 +48,11 @@ test.describe("CSV manual upload", () => {
       page.getByText("Data processed successfully", { exact: false }),
     ).toBeVisible({ timeout: LONG_WAIT });
 
-    const formattedRowCount =
-      CALIFORNIA_CSV_EXPECTED_ROW_COUNT.toLocaleString("en-US");
+    const formattedPreviewRowCount = formatImportPreviewRowCount(
+      CALIFORNIA_CSV_EXPECTED_ROW_COUNT,
+    );
     await expect(
-      page.getByText(`Parsed ${formattedRowCount} rows successfully`),
+      page.getByText(`Parsed ${formattedPreviewRowCount} rows successfully`),
     ).toBeVisible({ timeout: LONG_WAIT });
 
     await expect(page.getByText(/These are the first \d+ rows/)).toBeVisible({

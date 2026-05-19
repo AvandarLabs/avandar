@@ -11,12 +11,11 @@
   overscroll-behavior: none;
 }
 
+/*
+ * Keep main in normal document order below the fixed navbar/aside. Raising
+ * z-index here forced a pointer-events: none / .main > * workaround that
+ * broke nested canvas clicks (e.g. Data Explorer grid).
+ */
 .main {
-  pointer-events: none;
   position: relative;
-  z-index: var(--mantine-z-index-app-shell-main);
-}
-
-.main > * {
-  pointer-events: auto;
 }

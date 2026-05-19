@@ -12,6 +12,8 @@ import {
   urlSearchHasHydrateableExplorerKeys,
 } from "@/views/DataExplorerApp/dataExplorerURLHydration";
 import {
+  areExplorerURLSearchParamsEqual,
+  EMPTY_EXPLORER_URL_SEARCH,
   isDefaultExplorerState,
   parseURLSearch,
   serializeStateToURL,
@@ -241,7 +243,15 @@ export function useDataExplorerURLSync({ urlSearch, navigate }: Options): void {
     if (serialized === lastSyncedRef.current) {
       return;
     }
+    if (areExplorerURLSearchParamsEqual(urlSearch, urlParams)) {
+      lastSyncedRef.current = serialized;
+      return;
+    }
     lastSyncedRef.current = serialized;
-    navigate({ search: urlParams, replace: true });
-  }, [isHydrated, urlParams, navigate]);
+    const searchToWrite =
+      Object.keys(urlParams).length === 0 ?
+        EMPTY_EXPLORER_URL_SEARCH
+      : urlParams;
+    navigate({ search: searchToWrite, replace: true });
+  }, [isHydrated, urlParams, urlSearch, navigate]);
 }

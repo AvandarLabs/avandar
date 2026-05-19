@@ -9,6 +9,7 @@ import {
   createSupabaseAdminClient,
   getWorkspaceIdBySlug,
 } from "./helpers/supabaseAdminClient";
+import { dismissBlockingOverlays } from "./helpers/dataExplorerFlow";
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
 const MOCK_SQL = "SELECT 1 AS mocked_column";
@@ -28,6 +29,7 @@ async function goToDataExplorerWithSeededSQL(options: {
     MOCK_SQL,
   )}`;
   await options.page.goto(url);
+  await dismissBlockingOverlays(options.page);
 
   // Wait for the result grid to render at least one cell. This confirms the
   // SQL ran and `queryResultData.length > 0`, which is the gate that enables
@@ -42,8 +44,6 @@ test.describe("Save to dashboard", () => {
     page,
     e2eWorkerDb,
   }) => {
-    test.setTimeout(120_000);
-
     const admin = createSupabaseAdminClient();
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
     const workspaceId = await getWorkspaceIdBySlug({
@@ -70,15 +70,11 @@ test.describe("Save to dashboard", () => {
       await goToDataExplorerWithSeededSQL({ page, workspaceSlug });
 
       await page.getByRole("button", { name: /^save$/i }).click();
-      await page
-        .getByRole("menuitem", { name: /save to dashboard/i })
-        .click();
+      await page.getByRole("menuitem", { name: /save to dashboard/i }).click();
 
       // Modal opens directly in create mode because no dashboards exist.
       await expect(
-        page.getByText(
-          /we'll add this visualization to your new dashboard/i,
-        ),
+        page.getByText(/we'll add this visualization to your new dashboard/i),
       ).toBeVisible({ timeout: SHORT_WAIT });
       await expect(
         page.getByPlaceholder(/search dashboards/i),
@@ -92,9 +88,9 @@ test.describe("Save to dashboard", () => {
         .click();
 
       // Success toast appears with the verb "Created".
-      await expect(
-        page.getByText(`Created "${dashboardName}"`),
-      ).toBeVisible({ timeout: LONG_WAIT });
+      await expect(page.getByText(`Created "${dashboardName}"`)).toBeVisible({
+        timeout: LONG_WAIT,
+      });
 
       // Database side-effect: the dashboard was inserted with one DataViz
       // block as the only content entry.
@@ -136,8 +132,6 @@ test.describe("Save to dashboard", () => {
     page,
     e2eWorkerDb,
   }) => {
-    test.setTimeout(120_000);
-
     const admin = createSupabaseAdminClient();
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
     const workspaceId = await getWorkspaceIdBySlug({
@@ -175,9 +169,7 @@ test.describe("Save to dashboard", () => {
       await goToDataExplorerWithSeededSQL({ page, workspaceSlug });
 
       await page.getByRole("button", { name: /^save$/i }).click();
-      await page
-        .getByRole("menuitem", { name: /save to dashboard/i })
-        .click();
+      await page.getByRole("menuitem", { name: /save to dashboard/i }).click();
 
       // Modal opens in list mode.
       const listbox = page.getByRole("listbox", { name: /dashboards/i });
@@ -185,14 +177,12 @@ test.describe("Save to dashboard", () => {
 
       // Pick the target row.
       await listbox.getByRole("option", { name: targetName }).click();
-      await page
-        .getByRole("button", { name: /^save to dashboard$/i })
-        .click();
+      await page.getByRole("button", { name: /^save to dashboard$/i }).click();
 
       // Success toast appears with the verb "Added to".
-      await expect(
-        page.getByText(`Added to "${targetName}"`),
-      ).toBeVisible({ timeout: LONG_WAIT });
+      await expect(page.getByText(`Added to "${targetName}"`)).toBeVisible({
+        timeout: LONG_WAIT,
+      });
 
       // Database side-effect: the chosen dashboard now has exactly one
       // DataViz block at the end of its content array.
@@ -231,8 +221,6 @@ test.describe("Save to dashboard", () => {
     page,
     e2eWorkerDb,
   }) => {
-    test.setTimeout(120_000);
-
     const admin = createSupabaseAdminClient();
     const { workspaceSlug, primaryUser } = e2eWorkerDb;
     const workspaceId = await getWorkspaceIdBySlug({
@@ -262,31 +250,23 @@ test.describe("Save to dashboard", () => {
       await goToDataExplorerWithSeededSQL({ page, workspaceSlug });
 
       await page.getByRole("button", { name: /^save$/i }).click();
-      await page
-        .getByRole("menuitem", { name: /save to dashboard/i })
-        .click();
+      await page.getByRole("menuitem", { name: /save to dashboard/i }).click();
 
       // Modal opens in list mode. Switch to create mode and confirm Back link.
       await expect(
         page.getByRole("listbox", { name: /dashboards/i }),
       ).toBeVisible({ timeout: SHORT_WAIT });
-      await page
-        .getByRole("button", { name: /create new dashboard/i })
-        .click();
+      await page.getByRole("button", { name: /create new dashboard/i }).click();
       await expect(
         page.getByRole("button", { name: /back to dashboards/i }),
       ).toBeVisible();
 
       // Toggle back to verify the navigation works, then re-enter create mode.
-      await page
-        .getByRole("button", { name: /back to dashboards/i })
-        .click();
+      await page.getByRole("button", { name: /back to dashboards/i }).click();
       await expect(
         page.getByRole("listbox", { name: /dashboards/i }),
       ).toBeVisible();
-      await page
-        .getByRole("button", { name: /create new dashboard/i })
-        .click();
+      await page.getByRole("button", { name: /create new dashboard/i }).click();
 
       const dashboardName = "E2E create-from-list new";
       createdNames.push(dashboardName);
@@ -295,9 +275,9 @@ test.describe("Save to dashboard", () => {
         .getByRole("button", { name: /create dashboard & save/i })
         .click();
 
-      await expect(
-        page.getByText(`Created "${dashboardName}"`),
-      ).toBeVisible({ timeout: LONG_WAIT });
+      await expect(page.getByText(`Created "${dashboardName}"`)).toBeVisible({
+        timeout: LONG_WAIT,
+      });
 
       // Database side-effect: a fresh dashboard was created with the block.
       await expect

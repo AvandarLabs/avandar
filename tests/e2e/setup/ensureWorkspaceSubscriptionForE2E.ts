@@ -1,13 +1,25 @@
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule";
+import { deterministicUuid } from "../helpers/deterministicUuid";
 import { createSupabaseAdminClient } from "../helpers/supabaseAdminClient";
 import type { TablesInsert } from "../../../shared/types/database.types";
 
-/**
- * Stable UUID-shaped fake Polar ids for E2E (columns are `uuid`; no Polar API).
- */
-const E2E_FAKE_POLAR_SUBSCRIPTION_ID = "00000000-0000-4000-8000-000000000001";
-const E2E_FAKE_POLAR_PRODUCT_ID = "00000000-0000-4000-8000-000000000002";
-const E2E_FAKE_POLAR_CUSTOMER_ID = "00000000-0000-4000-8000-000000000003";
+/** Legacy shared ids that collided across worker workspaces (PK is polar_subscription_id). */
+const LEGACY_E2E_FAKE_POLAR_SUBSCRIPTION_ID =
+  "00000000-0000-4000-8000-000000000001";
+
+function buildE2eFakePolarIds(workspaceSlug: string): {
+  polar_subscription_id: string;
+  polar_product_id: string;
+  polar_customer_id: string;
+} {
+  return {
+    polar_subscription_id: deterministicUuid(
+      `e2e:polar-subscription:${workspaceSlug}`,
+    ),
+    polar_product_id: deterministicUuid(`e2e:polar-product:${workspaceSlug}`),
+    polar_customer_id: deterministicUuid(`e2e:polar-customer:${workspaceSlug}`),
+  };
+}
 
 /**
  * Ensures the workspace has a `subscriptions` row with fake Polar ids and
@@ -50,12 +62,20 @@ export async function ensureWorkspaceSubscriptionForE2E(options: {
     return;
   }
 
+  const polarIds = buildE2eFakePolarIds(options.workspaceSlug);
+
+  // Remove orphaned legacy rows that shared one polar_subscription_id globally.
+  await adminClient
+    .from("subscriptions")
+    .delete()
+    .eq("polar_subscription_id", LEGACY_E2E_FAKE_POLAR_SUBSCRIPTION_ID);
+
   const startedAt = new Date().toISOString();
 
   const insertRow: TablesInsert<"subscriptions"> = {
-    polar_subscription_id: E2E_FAKE_POLAR_SUBSCRIPTION_ID,
-    polar_product_id: E2E_FAKE_POLAR_PRODUCT_ID,
-    polar_customer_id: E2E_FAKE_POLAR_CUSTOMER_ID,
+    polar_subscription_id: polarIds.polar_subscription_id,
+    polar_product_id: polarIds.polar_product_id,
+    polar_customer_id: polarIds.polar_customer_id,
     polar_customer_email: options.polarCustomerEmail,
     workspace_id: workspaceRow.id,
     subscription_owner_id: workspaceRow.owner_id,

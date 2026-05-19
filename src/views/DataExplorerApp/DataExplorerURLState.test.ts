@@ -1,7 +1,9 @@
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { describe, expect, it } from "vitest";
 import {
+  areExplorerURLSearchParamsEqual,
   isDefaultExplorerState,
+  normalizeExplorerURLSearch,
   parseURLSearch,
   serializeStateToURL,
 } from "@/views/DataExplorerApp/DataExplorerURLState";
@@ -422,5 +424,15 @@ describe("round-trip: serialize then parse", () => {
       serializeStateToURL(_makeState({ vizConfig })),
     );
     expect(parsed.vizConfig?.vizType).toBe("bar");
+  });
+});
+
+describe("normalizeExplorerURLSearch", () => {
+  it("treats stale default table vc in the URL as empty", () => {
+    const staleUrl = {
+      vc: JSON.stringify({ vizType: "table" }),
+    };
+    expect(normalizeExplorerURLSearch(staleUrl)).toEqual({});
+    expect(areExplorerURLSearchParamsEqual(staleUrl, {})).toBe(true);
   });
 });

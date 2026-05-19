@@ -229,6 +229,90 @@ export function serializeStateToURL(
   return params;
 }
 
+/** Clears every known explorer search key so TanStack Router drops stale params. */
+export const EMPTY_EXPLORER_URL_SEARCH: DataExplorerURLSearch = {
+  ds: undefined,
+  cols: undefined,
+  agg: undefined,
+  orderBy: undefined,
+  orderDir: undefined,
+  sql: undefined,
+  vc: undefined,
+  od: undefined,
+};
+
+/**
+ * Normalises raw router search into the same compact shape as
+ * `serializeStateToURL`, so we can compare URL vs in-memory state without
+ * fighting merge semantics (`navigate({ search: {} })` leaves stale keys).
+ */
+export function normalizeExplorerURLSearch(
+  search: DataExplorerURLSearch,
+): DataExplorerURLSearch {
+  const parsed = parseURLSearch(search);
+  const params: DataExplorerURLSearch = {};
+
+  if (!parsed.rawSQL) {
+    if (parsed.dsId) {
+      params.ds = parsed.dsId;
+    }
+
+    if (parsed.colNames && parsed.colNames.length > 0) {
+      params.cols = parsed.colNames.join(",");
+    }
+
+    if (parsed.aggregations) {
+      params.agg = Object.entries(parsed.aggregations)
+        .map(([name, agg]) => {
+          return `${name}:${agg}`;
+        })
+        .join(",");
+    }
+
+    if (parsed.orderByColName) {
+      params.orderBy = parsed.orderByColName;
+      if (parsed.orderDir) {
+        params.orderDir = parsed.orderDir;
+      }
+    }
+  }
+
+  if (parsed.rawSQL) {
+    params.sql = parsed.rawSQL;
+  }
+
+  if (parsed.vizConfig && parsed.vizConfig.vizType !== "table") {
+    try {
+      params.vc = JSON.stringify(parsed.vizConfig);
+    } catch {
+      // Ignore malformed viz JSON in the URL.
+    }
+  }
+
+  if (parsed.openDataset) {
+    const { datasetId, name, sourceType, virtualDatasetId } =
+      parsed.openDataset;
+    params.od = JSON.stringify({
+      did: datasetId,
+      name,
+      st: sourceType,
+      ...(virtualDatasetId ? { vid: virtualDatasetId } : {}),
+    });
+  }
+
+  return params;
+}
+
+export function areExplorerURLSearchParamsEqual(
+  left: DataExplorerURLSearch,
+  right: DataExplorerURLSearch,
+): boolean {
+  return (
+    JSON.stringify(normalizeExplorerURLSearch(left)) ===
+    JSON.stringify(normalizeExplorerURLSearch(right))
+  );
+}
+
 /**
  * Returns `true` when the Data Explorer state has not yet been modified from
  * its initial blank state (no data source, no columns, no raw SQL).

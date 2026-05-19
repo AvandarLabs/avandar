@@ -416,6 +416,21 @@ class DuckDbClientImpl {
     await conn.close();
   }
 
+  /**
+   * Runs `callback` on a single DuckDB connection so temp views and tables
+   * created in one statement remain visible to the next.
+   */
+  async withConnection<T>(
+    callback: (conn: duckdb.AsyncDuckDBConnection) => Promise<T>,
+  ): Promise<T> {
+    const conn = await this.#connect();
+    try {
+      return await callback(conn);
+    } finally {
+      await this.#closeConnection(conn);
+    }
+  }
+
   async getTableNames(): Promise<string[]> {
     const conn = await this.#connect();
     // get all table names

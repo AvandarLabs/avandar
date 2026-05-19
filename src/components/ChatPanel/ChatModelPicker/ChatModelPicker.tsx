@@ -132,50 +132,52 @@ export function ChatModelPicker({
         </Combobox.Target>
       </Tooltip>
 
-      <Combobox.Dropdown className={css.dropdown}>
-        <Combobox.Search
-          value={search}
-          onChange={(event) => {
-            setSearch(event.currentTarget.value);
-            combobox.updateSelectedOptionIndex();
-          }}
-          placeholder="Search models"
-          aria-label="Search models"
-        />
-        <Combobox.Options className={css.options}>
-          {filteredGroups.length > 0 ?
-            filteredGroups.map((entry) => {
-              return (
-                <Combobox.Group label={entry.group} key={entry.group}>
-                  {entry.models.map((model) => {
-                    const isSelected = model.id === resolvedModelId;
-                    return (
-                      <Combobox.Option
-                        value={model.id}
-                        key={model.id}
-                        active={isSelected}
-                      >
-                        <Group gap="xs" wrap="nowrap" justify="space-between">
-                          <Text size="sm" className={css.optionLabel}>
-                            {model.name}
-                          </Text>
-                          {isSelected ?
-                            <IconCheck
-                              size={14}
-                              className={css.selectedIcon}
-                              aria-hidden
-                            />
-                          : null}
-                        </Group>
-                      </Combobox.Option>
-                    );
-                  })}
-                </Combobox.Group>
-              );
-            })
-          : <Combobox.Empty>No models match your search</Combobox.Empty>}
-        </Combobox.Options>
-      </Combobox.Dropdown>
+      {combobox.dropdownOpened ?
+        <Combobox.Dropdown className={css.dropdown}>
+          <Combobox.Search
+            value={search}
+            onChange={(event) => {
+              setSearch(event.currentTarget.value);
+              combobox.updateSelectedOptionIndex();
+            }}
+            placeholder="Search models"
+            aria-label="Search models"
+          />
+          <Combobox.Options className={css.options}>
+            {filteredGroups.length > 0 ?
+              filteredGroups.map((entry) => {
+                return (
+                  <Combobox.Group label={entry.group} key={entry.group}>
+                    {entry.models.map((model) => {
+                      const isSelected = model.id === resolvedModelId;
+                      return (
+                        <Combobox.Option
+                          value={model.id}
+                          key={model.id}
+                          active={isSelected}
+                        >
+                          <Group gap="xs" wrap="nowrap" justify="space-between">
+                            <Text size="sm" className={css.optionLabel}>
+                              {model.name}
+                            </Text>
+                            {isSelected ?
+                              <IconCheck
+                                size={14}
+                                className={css.selectedIcon}
+                                aria-hidden
+                              />
+                            : null}
+                          </Group>
+                        </Combobox.Option>
+                      );
+                    })}
+                  </Combobox.Group>
+                );
+              })
+            : <Combobox.Empty>No models match your search</Combobox.Empty>}
+          </Combobox.Options>
+        </Combobox.Dropdown>
+      : null}
     </Combobox>
   );
 }

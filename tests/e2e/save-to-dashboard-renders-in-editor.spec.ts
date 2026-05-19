@@ -1,12 +1,14 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
-import { SMALL_CALIFORNIA_XLSX_PATH } from "./helpers/constants";
+import { SMALL_CALIFORNIA_CSV_PATH } from "./helpers/constants";
 import {
   ensureCloudStorageCheckedAndSaveDataset,
   parseDatasetIdFromDataManagerUrl,
+  pollUntilCloudDatasetToggleShowsOnline,
 } from "./helpers/manualUploadCloudSyncFlow";
 import { deleteDashboardsByIds } from "./helpers/seedDashboard";
 import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
+import { dismissBlockingOverlays } from "./helpers/dataExplorerFlow";
 import { MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 
 /**
@@ -44,7 +46,7 @@ test.describe("Save to dashboard - viz renders in editor", () => {
       const uploadPanel = page.getByRole("tabpanel", { name: "Upload" });
       await uploadPanel
         .locator('input[type="file"]')
-        .setInputFiles(SMALL_CALIFORNIA_XLSX_PATH);
+        .setInputFiles(SMALL_CALIFORNIA_CSV_PATH);
       await uploadPanel
         .getByRole("button", { name: "Upload", exact: true })
         .click();
@@ -69,6 +71,7 @@ test.describe("Save to dashboard - viz renders in editor", () => {
       if (!datasetId) {
         throw new Error(`Could not parse dataset id from URL: ${page.url()}`);
       }
+      await pollUntilCloudDatasetToggleShowsOnline(page);
 
       // Step 2: Create an empty dashboard via the UI, then save it so the
       // editor's "unsaved changes" flag clears.
@@ -118,6 +121,7 @@ test.describe("Save to dashboard - viz renders in editor", () => {
       await page.goto(
         `/${workspaceSlug}/data-explorer?sql=${encodeURIComponent(sql)}`,
       );
+      await dismissBlockingOverlays(page);
 
       // Wait for the result grid to render so the Save menu items unlock.
       await expect(
@@ -159,6 +163,7 @@ test.describe("Save to dashboard - viz renders in editor", () => {
         page.getByText(/added to "untitled dashboard"/i),
       ).toBeVisible({ timeout: SHORT_WAIT });
 
+      await dismissBlockingOverlays(page);
       await page.getByRole("link", { name: /^dashboards$/i }).click();
       await expect(page).toHaveURL(
         new RegExp(`/${workspaceSlug}/dashboards/?$`),

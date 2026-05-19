@@ -5,9 +5,16 @@ export const SEEDED_WORKSPACE_MENU_BUTTON_NAME = /E2E Test Workspace/i;
 
 /**
  * Row count reported after DuckDB parses `california-covid-sample.csv`
- * (matches UI; differs from `wc -l` minus header due to loader semantics).
+ * (full file; differs from `wc -l` minus header due to loader semantics).
  */
 export const CALIFORNIA_CSV_EXPECTED_ROW_COUNT = 14700;
+
+/**
+ * Rows shown in the import preview success callout
+ * (`AppConfig.dataManagerApp.maxPreviewRows`). Large files cap here even
+ * when the saved dataset contains more rows.
+ */
+export const DATA_IMPORT_MAX_PREVIEW_ROWS = 200;
 
 export const CALIFORNIA_CSV_PATH = path.join(
   process.cwd(),
@@ -62,6 +69,15 @@ export const EXPECTED_CHOLERA_COLUMN_NAMES = [
   "address",
   "number_of_cases",
 ] as const;
+
+/**
+ * Preview callout row count for imports where the file exceeds
+ * {@link DATA_IMPORT_MAX_PREVIEW_ROWS}.
+ */
+export function formatImportPreviewRowCount(fileRowCount: number): string {
+  const previewRows = Math.min(fileRowCount, DATA_IMPORT_MAX_PREVIEW_ROWS);
+  return previewRows.toLocaleString("en-US");
+}
 
 export const EXPECTED_CSV_COLUMN_NAMES = [
   "Province_State",

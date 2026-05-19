@@ -147,8 +147,8 @@ export function ManualUploadView({
           }}
           isProcessing={isLoadingFile}
           onAfterSave={onAfterSave}
-          onRequestDataReparse={async () => {
-            if (!DatasetSource.isManuallyUploadable(parseOptions)) {
+          onRequestDataReparse={async (parseOptionsFromForm) => {
+            if (!DatasetSource.isManuallyUploadable(parseOptionsFromForm)) {
               // this should never happen in this code path
               return;
             }
@@ -157,7 +157,7 @@ export function ManualUploadView({
               file: uploadedFile,
               datasetIdToDrop: datasetId,
               newDatasetId: uuid() as Dataset.Id,
-              parseOptions,
+              parseOptions: parseOptionsFromForm,
             });
           }}
         />

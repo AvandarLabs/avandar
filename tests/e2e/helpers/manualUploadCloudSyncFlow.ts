@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { SHORT_WAIT } from "./timeouts";
+import { LONG_WAIT, SHORT_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
 
 /**
@@ -38,7 +38,7 @@ export async function pollUntilCloudDatasetToggleShowsOnline(
 
         return (await toggle.isVisible()) && (await toggle.isEnabled());
       },
-      { timeout: 180_000 },
+      { timeout: LONG_WAIT },
     )
     .toBe(true);
 }
@@ -59,7 +59,7 @@ export async function ensureCloudStorageCheckedAndSaveDataset(options: {
   navigationTimeout?: number;
 }): Promise<void> {
   const { page, workspaceSlug } = options;
-  const navigationTimeout = options.navigationTimeout ?? 120_000;
+  const navigationTimeout = options.navigationTimeout ?? LONG_WAIT;
 
   const cloudCheckbox = page.getByRole("checkbox", {
     name: /This dataset can be stored in the cloud/i,

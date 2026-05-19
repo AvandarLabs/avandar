@@ -103,6 +103,7 @@ function PlanFlowCanvas(): JSX.Element {
       planId,
       nodes: state.nodes,
       dispatch,
+      workspaceId: workspace.id,
       driftRegen: {
         workspaceId: workspace.id,
         getLatestPlan: (): ChatPlan => {
@@ -121,7 +122,12 @@ function PlanFlowCanvas(): JSX.Element {
       if (!planId) {
         return;
       }
-      await executePlanStep({ planId, step: node, dispatch });
+      await executePlanStep({
+        planId,
+        step: node,
+        dispatch,
+        workspaceId: workspace.id,
+      });
     },
     [planId, dispatch],
   );

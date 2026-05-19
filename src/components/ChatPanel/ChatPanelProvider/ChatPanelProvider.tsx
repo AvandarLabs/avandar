@@ -18,6 +18,11 @@ function _readInitialOpen(): boolean {
 
 type Props = {
   children: ReactNode;
+  /**
+   * When false, only supplies AppShell aside open/close state (no chat UI,
+   * plan state, or toolbar toggle). Use on routes outside `/$workspaceSlug`.
+   */
+  isChatAvailable?: boolean;
 };
 
 /**
@@ -29,7 +34,10 @@ type Props = {
  * share the same lifetime as the chat panel itself — closing or
  * remounting the panel clears plan state.
  */
-export function ChatPanelProvider({ children }: Props): JSX.Element {
+export function ChatPanelProvider({
+  children,
+  isChatAvailable = true,
+}: Props): JSX.Element {
   return (
     <ChatPanelStateManager.Provider
       initialStateOverrides={{
@@ -37,11 +45,16 @@ export function ChatPanelProvider({ children }: Props): JSX.Element {
         pendingClarification: undefined,
       }}
     >
-      <PlanStateManager.Provider>
-        <ChatPanelAvailableContext.Provider value={true}>
+      {isChatAvailable ?
+        <PlanStateManager.Provider>
+          <ChatPanelAvailableContext.Provider value={true}>
+            <ChatPanelContents>{children}</ChatPanelContents>
+          </ChatPanelAvailableContext.Provider>
+        </PlanStateManager.Provider>
+      : <ChatPanelAvailableContext.Provider value={false}>
           <ChatPanelContents>{children}</ChatPanelContents>
         </ChatPanelAvailableContext.Provider>
-      </PlanStateManager.Provider>
+      }
     </ChatPanelStateManager.Provider>
   );
 }

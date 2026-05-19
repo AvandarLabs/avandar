@@ -1,4 +1,5 @@
 import { expect } from "@playwright/test";
+import { dismissBillingModalIfVisible } from "./dismissBillingModal";
 import { SEEDED_WORKSPACE_MENU_BUTTON_NAME } from "./constants";
 import { LONG_WAIT } from "./timeouts";
 import type { Page } from "@playwright/test";
@@ -29,6 +30,8 @@ export async function signInWithEmailPassword(
   await expect(page).toHaveURL(new RegExp(`/${options.workspaceSlug}`), {
     timeout: LONG_WAIT,
   });
+
+  await dismissBillingModalIfVisible(page);
 }
 
 /**

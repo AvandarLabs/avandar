@@ -73,7 +73,6 @@ export function FloatingPanel({
       duration={200}
       exitDuration={150}
       timingFunction="ease"
-      keepMounted
     >
       {(transitionStyles) => {
         return (
