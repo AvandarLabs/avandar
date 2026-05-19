@@ -121,7 +121,14 @@ tokens — feasible but a multi-day project. Defer.
   strip, tighter title leading, uppercase byline). Polished DataViz card.
   (Checkpoint 9.) Logo upload is still pending.
 - ✅ #12 — Vanity URL (kebab-case), copy-to-clipboard, QR code with
-  download. PDF export still pending.
+  download, PDF export with optional annotation (RoughJS).
+  (Checkpoint 13.)
+- ✅ #14 — Slice-aware publishing: per-dataset slice picker in the
+  Publish modal (queried / all_columns / custom with column allow-list
+  and row filters). (Checkpoint 13.)
+- ✅ #17 — Publish-time slice picker UI ships as the same `Data scope`
+  section as #14. Defaults to the narrowest slice; publisher opts in to
+  more. (Checkpoint 13.)
 - ✅ #15 — Viewer-editable global filters. New `Filter` P-block with
   single-select, multi-select, and contains modes; SQL composes via
   subselect wrap. (Checkpoint 9.)
@@ -135,12 +142,9 @@ tokens — feasible but a multi-day project. Defer.
 
 **Still pending:**
 - #10 — Logo upload (the typography + theme tokens shipped)
-- #11 — Media embedding via Supabase Storage
-- #12 — PDF export only
-- #13 — Workspace-private dashboard sharing via the Share modal
-- #14 — Slice-aware public publishing (data subsetting on publish)
+- #11 — Media embedding via Supabase Storage (deferred)
+- #13 — Workspace-private dashboard sharing via the Share modal (deferred)
 - #16 — Per-viz override UI inside the DataViz block panel
-- #17 — Publish-time slice picker
 - #21 — Manual query form in dashboards
 
 Each of these is its own focused session.
@@ -1111,6 +1115,127 @@ infrastructure is end-to-end but the translated surface is one page.
 - Language preference is per-workspace per-browser (localStorage). If
   product wants it server-synced across devices or shared workspace-wide,
   promote it to a `workspaces.preferred_locale` column.
+
+---
+
+## Checkpoint 13 — Slice-aware publish + PDF export with annotation ✅
+
+Three demo items closed in one session: #12 (PDF export — the last
+gap in the publish-options trio), #14 (slice-aware publishing), and
+#17 (publish-time slice picker — same UI surface as #14).
+
+### Item #14 + #17 — Per-dataset slice picker
+
+New `Data scope` section inside `PublishDashboardModal`, one
+accordion item per dataset the dashboard reads. Each item lets the
+publisher pick a slice mode:
+
+- **Queried** (default, narrowest) — publish only the columns
+  referenced by DataViz SQL queries + any FilterPBlock column
+  targets. `node-sql-parser`'s `columnList` extracts the referenced
+  columns. `SELECT *` or unparseable SQL safely falls back to "all
+  columns required" via a per-dataset `unparseable` sentinel so the
+  upload doesn't truncate columns the dashboard actually depends on.
+- **All columns** — every column, every row. Equivalent to the
+  pre-Checkpoint-12 behaviour. Kept as a one-click escape hatch for
+  publishers who want viewers to explore freely.
+- **Custom** — explicit column allow-list (checkboxes, with
+  "Select all" and "Just what's queried" shortcuts) plus row
+  filters. Row-filter type is auto-suggested from the column's
+  `AvaDataType`: numeric → number range (`NumberInput` pair),
+  date / time / timestamp → date range (text inputs), everything
+  else → enum (`TagsInput`).
+
+Slice config persists into `dashboard.config.__publishConfig` — a
+sibling key alongside Puck's `{root, content}` — so the JSON-blob
+storage we already have is sufficient (no migration). Re-publishes
+default to the same selection.
+
+The `publishDashboard` mutation in `DashboardClient` was reworked to:
+1. Resolve `extractReferencedColumns(config, dependentDatasetIds)`
+   once per publish.
+2. Fetch `dataset_columns` for every dependent dataset so it can
+   honour custom-mode allow-lists and drop row filters whose column
+   doesn't exist on the dataset.
+3. For each dataset, materialise the slice via
+   `buildSliceSql({baseSelectExpr, sliceConfig, availableColumns,
+   queriedColumns, treatAsAllColumns})` then run it through
+   `WorkspaceQETLClient.runQuery({returnType: "parquet"})` and
+   upload the resulting blob to the public bucket.
+4. Fast path: `all_columns` + no row filters skips the SQL detour
+   and copies the existing parquet blob directly (preserves the
+   open-data passthrough behaviour).
+
+### Item #12 — PDF export with annotation
+
+New toolbar button `ExportPdfButton` next to Publish. Opens
+`ExportPdfModal`, a two-step flow:
+
+1. **Choose** — "Export as PDF" or "Annotate, then export".
+2. **Snapshot / Annotate** — the dashboard is rendered off-screen
+   into a fixed-width (1100px) container via `<PuckPageRender>` and
+   captured with `html2canvas` at 2× scale. Direct export wraps the
+   capture into a paginated portrait letter-size PDF via `jspdf`
+   (`pdfExport.ts` slices the tall canvas into page-sized chunks).
+3. **Annotate path** — `PdfAnnotator` mounts the captured image
+   inside the modal with a transparent overlay canvas. Tools:
+   freehand (RoughJS `curve`), arrow (line + two-line arrowhead),
+   text (prompt-based). Roughness slider (`0 → 4`, labelled
+   `Formal · Sketch · Loose`), stroke width slider (`1–8 px`),
+   color picker with 6 swatches, plus undo + clear all. On export
+   the annotation canvas is composited onto the base snapshot
+   before pagination.
+
+Choice of libraries: `html2canvas` + `jspdf` is the most reliable
+combination for snapshotting React + Recharts SVG content; both are
+established and synchronous to integrate. RoughJS was already in the
+tree (used by `RoughEdge` in the chat plan canvas) and gives us the
+"sketch-like" stroke style for free without a heavier canvas library.
+
+Analytics: new `dashboard.pdf_export_opened` event registered in
+`analyticsEventTypes.ts` and fired when the modal opens.
+
+### Files touched
+
+- New (shared types): `shared/models/Dashboard/PublishSliceConfig.ts`
+- New (logic): `src/clients/dashboards/sliceBuilder.ts` +
+  `sliceBuilder.test.ts` (9 tests covering buildSliceSql,
+  extractReferencedColumns, persistence round-trip)
+- New (UI): `src/views/DashboardApp/DashboardEditorView/`
+  `PublishDashboardModal/PublishSliceSection.tsx` (slice picker)
+- New (UI): `src/views/DashboardApp/DashboardEditorView/`
+  `ExportPdfButton.tsx`,
+  `ExportPdfModal/ExportPdfModal.tsx`,
+  `ExportPdfModal/PdfAnnotator.tsx`,
+  `ExportPdfModal/pdfExport.ts`
+- Modified: `src/clients/dashboards/DashboardClient.ts` (publish
+  mutation accepts `publishConfig`, materialises slices),
+  `PublishDashboardModal.tsx` (mounts slice section, passes
+  publishConfig), `DashboardEditorView.tsx` (wires the PDF button),
+  `analyticsEventTypes.ts` (new event name).
+- Deps added: `jspdf`, `html2canvas`.
+
+### Verification
+
+- `tsc -b --noEmit -p tsconfig.app.json` clean for the new and
+  modified files. (Pre-existing missing-module errors in
+  `src/lib/voice/VoiceModelManager.ts` are unrelated — Checkpoint 11
+  added `@huggingface/transformers` imports that aren't installed in
+  this environment.)
+- All 74 dashboard tests pass (`vitest run src/clients/dashboards/
+  src/views/DashboardApp/`), including the 9 new `sliceBuilder` tests.
+- ESLint clean on every touched file.
+
+### Live verification still pending
+
+- Browser smoke test of the snapshot path on a real published
+  dashboard (Recharts SVGs, theme tokens, RTL).
+- End-to-end check that `WorkspaceQETLClient.runQuery` correctly
+  materialises a custom slice with row filters into a parquet blob,
+  uploads it, and the viewer route loads it without falling over.
+- Multi-page PDF export with a tall dashboard — paginator splits at
+  pixel rows, so charts that cross a page boundary may look cut.
+  Acceptable for the demo; a chart-aware page break is a follow-up.
 
 ---
 
