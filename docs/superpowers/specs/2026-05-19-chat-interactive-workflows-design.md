@@ -119,16 +119,17 @@ Pinning: use specific provider IDs (`anthropic/claude-haiku-4-5-20251001`) rathe
 
 | Phase | Title | Effort | Status |
 |---|---|---|---|
-| 0 | PII + Bias Consent Foundation | ~4 weeks | Design locked |
-| 1 | Basic Clarifications | ~1 week | Design locked (open questions pending) |
-| 2 | Discovery Clarifications | ~1 week | Architecture only |
-| 3 | Plans + DAG View | ~3 weeks | Architecture only |
-| 4 | Schema-Drift Regen | ~1 week | Architecture only |
+| 0 | PII + Bias Consent Foundation | ~4 weeks | Shipped (hardening done) |
+| 1 | Basic Clarifications | ~1 week | Shipped |
+| 2 | Discovery Clarifications | ~1 week | Shipped |
+| 3 | Plans + DAG View | ~3 weeks | Shipped (xyflow canvas, IndexedDB materialisation, plan persistence on virtual datasets) |
+| 4 | Schema-Drift Regen | ~1 week | Shipped |
 | 5 | Branching | ~1.5 weeks | Architecture only |
 | 6 | Python + R Sandboxed Executor | ~5 weeks | Architecture only |
 | 7 | Context Compression | ~1 week | Architecture only |
+| 9 | Canvas Annotation + Export | ~1.5 weeks | Architecture only — see end of doc |
 
-**Total: ~16.5 engineer-weeks for one mid/senior engineer.**
+**Total: ~16.5 engineer-weeks (Phases 0–7) + ~1.5 weeks (Phase 9).**
 
 Phases must ship in order; each unlocks the next. Phase 0 is the foundation everything depends on.
 
@@ -740,11 +741,11 @@ The frontend recognises this shape and routes differently:
 
 # Phase 3 — Plans + DAG View
 
-**Status:** Architecture level.
+**Status:** Shipped.
 
 ## Goal
 
-Replace the implicit "one query → one canvas viz" assumption with an explicit DAG of analytic steps, rendered as an xyflow flow view. Each node is a step; each edge is a data dependency.
+Replace the implicit "one query → one canvas viz" assumption with an explicit DAG of analytic steps, rendered as an xyflow flow view with Excalidraw-style hand-drawn arrows (RoughJS). Each node is a step; each edge is a data dependency. The Data Explorer canvas becomes a true zoomable canvas with overview + per-step focus modes.
 
 ## Tool surface
 
@@ -772,30 +773,41 @@ System prompt: *"Use `proposePlan` when the analysis is clearer broken into step
 
 ## Architecture
 
-- **DAG state**: new `PlanStateManager` holds `PlanNode[]` with `{ id, type, code, predictedSchema, actualSchema, resultRef, vizConfig, status, error }`.
-- **Intermediate persistence**: each executed step writes to a DuckDB temp view `step_<id>`. Downstream steps reference views by name. Free, in-memory, dropped on workspace close. Large intermediates (>10M rows) materialise to OPFS parquet.
-- **Canvas mode**: new "flow view" using `@xyflow/react`. Each node shows step description + viz thumbnail. Click → canvas focuses that step.
-- **Execution model**: auto-run sequentially by default; toggle for step-through (pause between steps).
-- **Cap**: ≤8 steps per plan.
+- **DAG state**: `PlanStateManager` holds `PlanNode[]` with `{ id, type, code, predictedSchema, actualSchema, viewName, status, error, rowCount, regenAttempts }` plus `planId` (uuid) so every plan has a stable identity for materialisation.
+- **Intermediate persistence — IndexedDB, NOT OPFS**: each executed step writes to a DuckDB temp view `step_<id>` so downstream SQL can reference it. We ALSO export the result to parquet and store it in a dedicated Dexie database (`AvandarPlanStepDB`) keyed by `(planId, stepId)`. This:
+   1. Survives a page reload — DuckDB-WASM views are in-memory only.
+   2. Enables save-to-virtual-dataset.
+   - **Storage hygiene**: blobs are cleared explicitly via `clearPlanStepBlobs(planId)` when a plan is closed, replaced by another plan, or wiped via the IndexedDB nuke option. Never accumulated by TTL — explicit cleanup avoids storage bloat.
+- **Canvas mode** using `@xyflow/react`:
+   - **Overview**: zoomed-out DAG, pannable + zoomable, MiniMap, layered left-to-right layout.
+   - **Focused**: animated `fitView` / `setCenter` zooms into a single step; the Data Explorer's existing visualization container renders that step's result.
+   - **RoughJS edges**: custom `RoughEdge` component re-traces xyflow's Bézier path through `rough.svg().path(...)` so the arrows look hand-drawn instead of CAD-precise. Per-edge seed derived from the edge id keeps the wobble stable across renders.
+   - **Custom node**: `PlanStepNode` renders index, status icon, status badge, description, schema hint, and inline error. Handles for source/target on left/right.
+- **Execution model**: auto-run sequentially by default (`runMode: 'auto'`); `runMode: 'step'` exposes a SegmentedControl in the toolbar that pauses between steps. The executor lives in `planExecutor.ts` and writes both the temp view and the parquet blob on every success.
+- **Save-to-virtual-dataset**: when the user saves the final query as a virtual dataset, the plan structure (`{ steps, rootMessage }`) is serialised into a new `plan_steps` JSONB column on `datasets__virtual`. Opening a virtual dataset that has `planSteps` rehydrates the canvas via `rehydratePlan()`: each step's parquet blob (if cached locally) is re-registered as a DuckDB view; missing blobs are recomputed by re-running the step's SQL.
+- **Cap**: ≤8 steps per plan, enforced server-side in the `proposePlan` tool schema.
 
 ## Effort
 
-~3 weeks. xyflow layout/labels for non-technical users is the time sink; expect a couple of usability iterations.
+~3 weeks — the visual canvas + hand-drawn edges + IndexedDB materialisation + plan persistence on virtual datasets landed in this checkpoint.
 
 ## Definition of Done
 
-- [ ] `proposePlan` tool registered, schema validated
-- [ ] xyflow DAG view ships as a canvas mode
-- [ ] DuckDB temp view lifecycle (create per step, cleanup on close) tested
-- [ ] Auto-run vs step-through toggle works
-- [ ] Step-level error banner reuses Phase 1's regenerate-with-error pattern
-- [ ] 3-step demo plan ("filter → aggregate → rank") renders all viz thumbnails
+- [x] `proposePlan` tool registered, schema validated
+- [x] xyflow DAG view ships as a canvas mode with RoughJS hand-drawn edges
+- [x] Animated zoom-out (overview) ↔ zoom-in (focused) transitions
+- [x] DuckDB temp view lifecycle (create per step, cleanup on close) tested
+- [x] IndexedDB parquet materialisation per step + explicit cleanup
+- [x] Auto-run vs step-through toggle works
+- [x] Step-level retry banner (click a failed node to re-run)
+- [x] Virtual dataset save persists the full plan as JSONB
+- [x] Reopening a virtual dataset rehydrates the plan + every cached intermediate
 
 ---
 
 # Phase 4 — Schema-Drift Regen
 
-**Status:** Architecture level.
+**Status:** Shipped.
 
 ## Goal
 
@@ -803,14 +815,29 @@ When a plan step's actual output schema differs from the LLM's prediction (a GRO
 
 ## Architecture
 
-- After each step executes, diff `actualSchema` vs `predictedSchema`.
-- On mismatch, send a targeted "step X produced [cols]; replan steps Y, Z" message to the LLM. Only downstream steps regenerate.
-- Cap: ≤2 regen attempts per plan. On the 3rd failure, surface the existing `RegenerateErrorBanner` for manual intervention.
-- Cache actual schema in plan state so a re-run skips regen.
+- After each step executes, `isSchemaDrift(predicted, actual)` does a strict comparison (same column count, names in the same order, types case-insensitive). Order matters: downstream SQL that does positional projection breaks if column order shifts.
+- On mismatch, `findAffectedDownstream({ plan, driftedStepId })` walks the DAG and collects every transitive dependent. The full plan plus the drifted step's actual schema are sent to a new endpoint:
+   ```
+   POST /chat/:workspaceId/regenerate-plan
+   ```
+   The endpoint hits the LLM with a regen-only system prompt that has access to one tool, `regenerateSteps`, with a forced `tool_choice`. The model returns `{ steps: Array<{ stepId, code, predictedSchema }>, explanation }`.
+- Frontend dispatches `replaceStepCode({ stepId, code })` on the `PlanStateManager` for each rewrite, which:
+   1. Resets the step's status to `pending`.
+   2. Increments `regenAttempts` so the cap is honoured.
+- Affected steps are re-run in plan order via the same `executePlanStep` path so each step's view is registered before the next references it.
+- **Cap: ≤2 regen attempts per step.** A counter inside `executePlan` (`regenCountByStep`) holds the count per run. On the 3rd drift the runtime logs a warning and leaves the step alone for manual intervention (the failed-step banner is the existing escape hatch).
 
 ## Effort
 
-~1 week. New tool result envelope for "drift report"; orchestration changes in chat route.
+~1 week — shipped as part of the same checkpoint as the Phase 3 canvas.
+
+## Definition of Done
+
+- [x] Drift detection (`isSchemaDrift`) — 7 unit tests
+- [x] Downstream-dependent walker (`findAffectedDownstream`) — 4 unit tests
+- [x] `/chat/:workspaceId/regenerate-plan` endpoint with `regenerateSteps` tool
+- [x] `replaceStepCode` state action + `regenAttempts` cap
+- [x] End-to-end loop: `executePlan` drift-check → backend regen → step re-run
 
 ---
 
@@ -971,6 +998,66 @@ At 100 chat turns/user/month, including plans and code:
 | With 30% prompt-cache hit rate | **~$0.06** |
 
 2% of $4 ARPU. Plenty of headroom.
+
+# Phase 9 — Canvas Annotation + Export
+
+**Status:** Architecture only.
+
+## Why now
+
+Phase 3 makes the Data Explorer feel like a real canvas — a pannable, zoomable space with hand-drawn arrows between nodes. Beta users have asked for two things on top of that: a way to scribble notes on the canvas (arrows, callouts, free-text labels) so they can communicate findings, and a way to share the final canvas as a PDF or image so non-Avandar collaborators can read it without an account. Phase 9 lands both.
+
+We're skipping the phase numbers between Phase 7 and Phase 9 deliberately to reserve Phase 8 for an as-yet-undecided workstream.
+
+## Goal
+
+1. Let the user add free-form annotations on top of the plan canvas — text labels, sticky notes, drawn arrows pointing between steps, freehand strokes — without touching the underlying plan data.
+2. Export the full canvas (plan DAG + annotations + viz thumbnails) as either a multi-page PDF (one page per focused step + one overview page) or a single PNG/SVG image.
+
+## Architecture
+
+### Annotations
+
+- **State**: a new Dexie-backed table `plan_annotations` keyed by `(planId, annotationId)`. Annotations persist alongside the materialised step blobs and are cleared with the same `clearPlanStepBlobs(planId)` call. For virtual datasets, annotations serialise into a second JSONB column on `datasets__virtual` (`annotations`) so they round-trip across saves like the plan itself.
+- **Annotation kinds**:
+  - `text`: position, content, font size, colour, rotation.
+  - `arrow`: start/end coords, RoughJS seed, label.
+  - `sticky`: position, content, background colour.
+  - `stroke`: SVG path produced by a freehand-drawing tool — uses [`perfect-freehand`](https://github.com/steveruizok/perfect-freehand) for natural-looking pen pressure.
+- **Rendering**: an overlay xyflow layer that holds annotations as their own nodes (`{ type: 'annotation' }`), with `selectable: true` and `draggable: true`. Toolbar exposes Pan / Text / Arrow / Sticky / Pen modes; the current mode drives the click handler on the canvas.
+- **Undo / redo**: a small in-memory `AnnotationHistoryManager` with capped depth (50). Ctrl-Z / Ctrl-Y key bindings on the canvas surface.
+- **Hand-drawn aesthetic stays**: arrow annotations re-use the existing `RoughEdge` style so user-drawn arrows match the auto-laid-out plan arrows.
+
+### Export
+
+- **PDF**: use [`@react-pdf/renderer`](https://github.com/diegomura/react-pdf) so we can render a layout that mirrors the canvas server-style — one page per step (zoomed-in viz thumbnail + step description + actual schema + annotations near that step) plus a first-page overview that screenshots the full DAG. Generated entirely client-side.
+- **Image**: use [`html-to-image`](https://github.com/bubkoo/html-to-image) against the xyflow root element. Annotations are part of the DOM so they capture for free.
+- **Filename**: `{datasetName}-{YYYY-MM-DD}.pdf` / `.png`.
+- **Output options**:
+  - Resolution: 1x, 2x, 4x (image only).
+  - Background: white, transparent, grid.
+  - Inclusions: plan DAG only / DAG + annotations / DAG + annotations + step thumbnails (default).
+
+## Tool surface
+
+No LLM tool is added in Phase 9 — annotations and exports are client-side only. The LLM does not learn about annotation content; it stays inside the data-locality promise.
+
+## Effort
+
+~1.5 weeks.
+
+- Annotation state + toolbar + persistence: ~3 days
+- Freehand stroke renderer + undo/redo: ~2 days
+- PDF / image export wiring + design polish: ~3 days
+
+## Definition of Done
+
+- [ ] Annotation toolbar exposed on the plan canvas (Pan / Text / Arrow / Sticky / Pen)
+- [ ] Annotations persist across reloads (IndexedDB) and across virtual dataset saves (JSONB column)
+- [ ] Undo/redo per (planId, annotation) edit, capped at 50 entries
+- [ ] PDF export: multi-page layout with overview + per-step pages
+- [ ] Image export: PNG + SVG at 1×/2×/4× resolution, configurable background
+- [ ] Annotations excluded from the LLM payload — confirm via the lint rule that no annotation content ever crosses through `crossBoundary`
 
 # Decision Log
 

@@ -116,6 +116,53 @@ export type ChatResponse = {
 };
 
 /**
+ * Phase 4 — Schema-Drift Regen. After a plan step executes, the
+ * frontend diffs `actualSchema` against the LLM's `predictedSchema`.
+ * If they differ, the frontend asks the model to regenerate the
+ * affected downstream steps via this request shape.
+ */
+export type SchemaDriftReport = {
+  /** The plan step that produced unexpected columns. */
+  driftedStepId: string;
+  driftedStepDescription: string;
+  predictedSchema: Array<{ name: string; type: string }>;
+  actualSchema: Array<{ name: string; type: string }>;
+  /** Downstream step ids that need to be regenerated. */
+  affectedStepIds: string[];
+  /**
+   * The current plan in full so the LLM can see the surrounding
+   * context — what each step does and how steps reference each other.
+   */
+  plan: ChatPlan;
+};
+
+/**
+ * One regenerated step. The frontend swaps the matching step's `code`
+ * and re-runs.
+ */
+export type RegeneratedStep = {
+  stepId: string;
+  /** Replacement SQL for the step. */
+  code: string;
+  /**
+   * Updated `predictedSchema` so a second drift-detection pass can
+   * notice if THIS regeneration also drifts (cap-bounded by the
+   * caller).
+   */
+  predictedSchema: Array<{ name: string; type: string }>;
+};
+
+export type RegeneratePlanResponse = {
+  /**
+   * Steps the model rewrote. Caller dispatches `replaceStepCode` for
+   * each and re-runs the plan from `driftedStepId` forward.
+   */
+  steps: RegeneratedStep[];
+  /** Plain-text explanation for the chat thread. */
+  explanation: string;
+};
+
+/**
  * Response shape for `GET /chat/:workspaceId/session-secret`. The
  * returned secret is base64-encoded; the client stores it in memory
  * (never localStorage) and uses it to HMAC-sign `ackToken`s via

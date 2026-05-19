@@ -31,6 +31,7 @@ import type {
   ChatPlanStep,
   ChatResponse,
   ChatSessionSecretResponse,
+  RegeneratePlanResponse,
 } from "@sbfn/chat/chat.types.ts";
 import type { OpenRouterModelInput } from "$/utils/chat/curateOpenRouterModels.ts";
 
@@ -873,6 +874,265 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           ...(plan ? { plan } : {}),
         };
         return result;
+      }),
+  },
+
+  /**
+   * Phase 4 — Schema-Drift Regen. When a plan step's actual schema
+   * doesn't match its predicted schema, the frontend posts the drift
+   * report here and we ask the LLM to regenerate just the affected
+   * downstream steps. The response is a list of `{ stepId, code,
+   * predictedSchema }` items the frontend dispatches to
+   * `replaceStepCode`.
+   */
+  "/:workspaceId/regenerate-plan": {
+    POST: POST({
+      path: "/:workspaceId/regenerate-plan",
+      schema: { workspaceId: z.uuid() },
+    })
+      .bodySchema({
+        driftReport: z.object({
+          driftedStepId: z.string(),
+          driftedStepDescription: z.string(),
+          predictedSchema: z.array(
+            z.object({ name: z.string(), type: z.string() }),
+          ),
+          actualSchema: z.array(
+            z.object({ name: z.string(), type: z.string() }),
+          ),
+          affectedStepIds: z.array(z.string()),
+          plan: z.object({
+            steps: z.array(
+              z.object({
+                id: z.string(),
+                description: z.string(),
+                type: z.enum(["sql", "python", "r", "clarification"]),
+                code: z.string(),
+                inputs: z.array(z.string()),
+                predictedSchema: z.array(
+                  z.object({ name: z.string(), type: z.string() }),
+                ),
+                defaultViz: z
+                  .enum(["table", "bar", "line", "scatter", "pie"])
+                  .optional(),
+              }),
+            ),
+            rootMessage: z.string(),
+          }),
+        }),
+        model: z.string().optional(),
+      })
+      .action(async ({ body }): Promise<RegeneratePlanResponse> => {
+        const { driftReport, model: requestedModel } = body;
+        const model = _resolveChatModel(requestedModel);
+
+        const driftedStep = driftReport.plan.steps.find((s) => {
+          return s.id === driftReport.driftedStepId;
+        });
+        if (!driftedStep) {
+          return {
+            steps: [],
+            explanation:
+              "Could not find the drifted step in the plan; nothing to regenerate.",
+          };
+        }
+
+        const affectedSet = new Set(driftReport.affectedStepIds);
+        const affectedSteps = driftReport.plan.steps.filter((s) => {
+          return affectedSet.has(s.id);
+        });
+        if (affectedSteps.length === 0) {
+          return {
+            steps: [],
+            explanation:
+              "No downstream steps depend on the drifted step; nothing to regenerate.",
+          };
+        }
+
+        const fmtSchema = (
+          cols: Array<{ name: string; type: string }>,
+        ): string => {
+          return cols
+            .map((c) => {
+              return `${c.name}:${c.type}`;
+            })
+            .join(", ");
+        };
+
+        const regenSystemPrompt = `
+You are Avandar, an embedded data assistant. The user is working with a
+multi-step SQL plan in DuckDB.
+
+A previously-executed step produced columns that don't match what the
+plan predicted. You must regenerate ONLY the downstream steps that
+depend on the drifted step, updating their SQL so they work against
+the actual schema.
+
+Drifted step: ${driftReport.driftedStepDescription}
+Drifted step id: ${driftReport.driftedStepId}
+Predicted schema for drifted step: ${fmtSchema(driftReport.predictedSchema)}
+Actual schema for drifted step:    ${fmtSchema(driftReport.actualSchema)}
+
+Each downstream step references the drifted step via the DuckDB view
+\`"step_${driftReport.driftedStepId.replace(/[^a-zA-Z0-9_]/g, "_")}"\`.
+
+The full plan context is below; only rewrite SQL for the listed
+affected step ids:
+${driftReport.plan.steps
+  .map((s) => {
+    return `- ${s.id} (${s.description})\n    inputs: [${s.inputs.join(", ")}]\n    sql: ${s.code}`;
+  })
+  .join("\n")}
+
+Affected step ids: ${driftReport.affectedStepIds.join(", ")}
+
+Call the \`regenerateSteps\` tool with the corrected SQL and updated
+\`predictedSchema\` for each affected step.`;
+
+        const requestBody: Record<string, unknown> = {
+          model,
+          messages: [
+            { role: "system", content: regenSystemPrompt },
+            {
+              role: "user",
+              content: `Please regenerate the affected steps to match the drifted step's actual schema.`,
+            },
+          ],
+          temperature: 0.2,
+          tools: [
+            {
+              type: "function",
+              function: {
+                name: "regenerateSteps",
+                description:
+                  "Emit the regenerated SQL for each step in the affected step ids.",
+                parameters: {
+                  type: "object",
+                  properties: {
+                    explanation: { type: "string", maxLength: 400 },
+                    steps: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          stepId: { type: "string" },
+                          code: { type: "string" },
+                          predictedSchema: {
+                            type: "array",
+                            items: {
+                              type: "object",
+                              properties: {
+                                name: { type: "string" },
+                                type: { type: "string" },
+                              },
+                              required: ["name", "type"],
+                              additionalProperties: false,
+                            },
+                          },
+                        },
+                        required: ["stepId", "code", "predictedSchema"],
+                        additionalProperties: false,
+                      },
+                    },
+                  },
+                  required: ["steps", "explanation"],
+                  additionalProperties: false,
+                },
+              },
+            },
+          ],
+          tool_choice: {
+            type: "function",
+            function: { name: "regenerateSteps" },
+          },
+        };
+
+        const response = await fetch(
+          "https://openrouter.ai/api/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${openRouterApiKey}`,
+              "HTTP-Referer": openRouterReferer,
+              "X-Title": "Avandar",
+            },
+            body: JSON.stringify(requestBody),
+          },
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`OpenRouter API error: ${errorText}`);
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const data: any = await response.json();
+        const message = data.choices?.[0]?.message;
+        const toolCalls: OpenRouterToolCall[] = message?.tool_calls ?? [];
+        const tool = toolCalls.find((tc) => {
+          return tc?.function?.name === "regenerateSteps";
+        });
+        if (!tool?.function?.arguments) {
+          return {
+            steps: [],
+            explanation:
+              message?.content ??
+              "The model declined to regenerate the affected steps.",
+          };
+        }
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const parsed: any = JSON.parse(tool.function.arguments);
+          const stepsRaw = Array.isArray(parsed.steps) ? parsed.steps : [];
+          const cleaned: RegeneratePlanResponse["steps"] = [];
+          for (const s of stepsRaw) {
+            if (
+              typeof s?.stepId !== "string" ||
+              typeof s?.code !== "string" ||
+              !Array.isArray(s?.predictedSchema)
+            ) {
+              continue;
+            }
+            if (!affectedSet.has(s.stepId)) {
+              continue;
+            }
+            const schema = (
+              s.predictedSchema as Array<{
+                name?: unknown;
+                type?: unknown;
+              }>
+            )
+              .filter((c) => {
+                return (
+                  typeof c?.name === "string" && typeof c?.type === "string"
+                );
+              })
+              .map((c) => {
+                return {
+                  name: c.name as string,
+                  type: c.type as string,
+                };
+              });
+            cleaned.push({
+              stepId: s.stepId,
+              code: s.code.trim(),
+              predictedSchema: schema,
+            });
+          }
+          return {
+            steps: cleaned,
+            explanation:
+              typeof parsed.explanation === "string" ?
+                parsed.explanation
+              : "Regenerated downstream steps to match the drifted schema.",
+          };
+        } catch {
+          return {
+            steps: [],
+            explanation: "The model's regen response was malformed.",
+          };
+        }
       }),
   },
 

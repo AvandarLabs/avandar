@@ -10,6 +10,8 @@ import type {
   ChatResponse,
   ChatSessionSecretResponse,
   ConsentAck,
+  RegeneratePlanResponse,
+  SchemaDriftReport,
 } from "$/types/chat.types.ts";
 
 export type {
@@ -23,11 +25,18 @@ export type {
   ChatResponse,
   ChatSessionSecretResponse,
   ConsentAck,
+  RegeneratePlanResponse,
+  SchemaDriftReport,
 };
 
 export type ChatAPI = APITypeDef<
   "chat",
-  ["/models", "/:workspaceId/messages", "/:workspaceId/session-secret"],
+  [
+    "/models",
+    "/:workspaceId/messages",
+    "/:workspaceId/regenerate-plan",
+    "/:workspaceId/session-secret",
+  ],
   {
     "/models": {
       GET: {
@@ -46,6 +55,18 @@ export type ChatAPI = APITypeDef<
           consentAcks?: ConsentAck[];
         };
         returnType: ChatResponse;
+      };
+    };
+    "/:workspaceId/regenerate-plan": {
+      POST: {
+        pathParams: {
+          workspaceId: string;
+        };
+        body: {
+          driftReport: SchemaDriftReport;
+          model: string | undefined;
+        };
+        returnType: RegeneratePlanResponse;
       };
     };
     "/:workspaceId/session-secret": {
