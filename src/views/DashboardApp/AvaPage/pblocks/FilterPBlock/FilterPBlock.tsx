@@ -114,7 +114,7 @@ export function FilterPBlock(props: FilterPBlockProps): JSX.Element {
             data={options}
             clearable
             searchable
-            value={(filterState?.value as readonly string[]) ?? []}
+            value={[...((filterState?.value as readonly string[]) ?? [])]}
             onChange={(v) => {
               dispatch.setFilterValue({ filterId, value: v });
               void logAnalyticsEvent({

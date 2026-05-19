@@ -3,7 +3,6 @@ import { AvaPageDataMigration } from "@/views/DashboardApp/AvaPage/migrations/Av
 import type {
   V2_AvaPageData,
   V2_AvaPageRootProps,
-  V2_PBlockPropsRegistry,
   V2_VizConfig,
   V3_AvaPageData,
   V3_AvaPageRootProps,
@@ -30,43 +29,73 @@ export const AvaPageDataMigrationV3 = {
   upgradedVersion: SCHEMA_VERSION,
 
   upgrade: (prevData: V2_AvaPageData): V3_AvaPageData => {
+    // The current PBlock registry has gained keys since v2 was frozen
+    // (`Filter`, etc.). Puck's `transformProps` constraint requires the
+    // input registry to be a superset of those keys, so we cast the
+    // input registry to V3's wider shape. Real v2 data can never carry
+    // those new block types.
     return transformProps<
-      V2_PBlockPropsRegistry,
+      V3_PBlockPropsRegistry,
       V2_AvaPageRootProps,
       V3_PBlockPropsRegistry,
       V3_AvaPageRootProps
-    >(prevData, {
+    >(prevData as unknown as V3_AvaPageData, {
       root: (props) => {
-        return { ...props, schemaVersion: SCHEMA_VERSION };
+        return {
+          ...props,
+          // Checkpoint 9 added theme + typography to v3 root props.
+          // v2 dashboards default to the unbranded presets.
+          theme: "default" as const,
+          typography: "system" as const,
+          schemaVersion: SCHEMA_VERSION,
+        };
       },
-      DataViz: (props) => {
+      // Cast: the input registry is V3 (puck's invariance), but real v2
+      // data carries V2_VizConfig. The cast keeps the helper's input
+      // tightly typed at V2.
+      DataViz: ((props: { nlQuery: unknown; vizType: unknown; vizConfig: unknown }) => {
         return {
           nlQuery: props.nlQuery,
           vizType: props.vizType,
-          vizConfig: _upgradeVizConfig(props.vizConfig),
+          vizConfig: _upgradeVizConfig(props.vizConfig as V2_VizConfig),
         };
-      },
+      }) as unknown as (
+        props: V3_PBlockPropsRegistry["DataViz"],
+      ) => V3_PBlockPropsRegistry["DataViz"],
     });
   },
 
   downgrade: (currData: V3_AvaPageData): V2_AvaPageData => {
+    // V2 didn't know about the newer block types (e.g. `Filter`). For
+    // the downgrade we still hand puck the V3 registry shape so the
+    // generics line up, then cast the result back to `V2_AvaPageData`
+    // at the boundary. Callers that rely on v1 data structure should
+    // strip / drop unknown blocks before re-serialising.
     return transformProps<
       V3_PBlockPropsRegistry,
       V3_AvaPageRootProps,
-      V2_PBlockPropsRegistry,
+      V3_PBlockPropsRegistry,
       V2_AvaPageRootProps
     >(currData, {
       root: (props) => {
-        return { ...props, schemaVersion: 2 };
+        // Strip v3-only fields when downgrading.
+        const { theme: _theme, typography: _typography, ...v2Props } = props;
+        return { ...v2Props, schemaVersion: 2 };
       },
-      DataViz: (props) => {
+      // Cast through `unknown` because the V2 viz config shape (the
+      // return value) is narrower than the V3 viz config the function
+      // signature expects — puck's transform-prop typing is invariant
+      // on the registry argument.
+      DataViz: ((props: V3_PBlockPropsRegistry["DataViz"]) => {
         return {
           nlQuery: props.nlQuery,
           vizType: props.vizType,
           vizConfig: _downgradeVizConfig(props.vizConfig),
         };
-      },
-    });
+      }) as unknown as (
+        props: V3_PBlockPropsRegistry["DataViz"],
+      ) => V3_PBlockPropsRegistry["DataViz"],
+    }) as unknown as V2_AvaPageData;
   },
 } satisfies AvaPageDataMigration<V2_AvaPageData, V3_AvaPageData>;
 
