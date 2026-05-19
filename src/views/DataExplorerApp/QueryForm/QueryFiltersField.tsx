@@ -1,16 +1,25 @@
-import { MantineActionElement, MantineValueEditor, QueryBuilderMantine } from "@react-querybuilder/mantine";
 import { Box, Stack, Text } from "@mantine/core";
+import {
+  MantineActionElement,
+  MantineValueEditor,
+  QueryBuilderMantine,
+} from "@react-querybuilder/mantine";
 import { useMemo } from "react";
 import { QueryBuilder } from "react-querybuilder";
 import "react-querybuilder/dist/query-builder.css";
+import type { QueryColumnRead } from "$/models/queries/QueryColumn/QueryColumn.types";
 import type {
   QueryFilterCombinator,
   QueryFilterGroup,
   QueryFilterOperator,
   QueryFilterRule,
 } from "$/models/queries/StructuredQuery/QueryFilter.types";
-import type { QueryColumnRead } from "$/models/queries/QueryColumn/QueryColumn.types";
-import type { Field, RuleGroupType, RuleType, ValueEditorType } from "react-querybuilder";
+import type {
+  Field,
+  RuleGroupType,
+  RuleType,
+  ValueEditorType,
+} from "react-querybuilder";
 
 type Props = {
   /**
@@ -128,7 +137,11 @@ function _convertRuleToInternal(
     return undefined;
   }
   let value: QueryFilterRule["value"] = rule.value as QueryFilterRule["value"];
-  if (internalOp === "in" || internalOp === "not_in" || internalOp === "between") {
+  if (
+    internalOp === "in" ||
+    internalOp === "not_in" ||
+    internalOp === "between"
+  ) {
     if (Array.isArray(rule.value)) {
       value = rule.value as ReadonlyArray<string | number>;
     } else if (typeof rule.value === "string") {

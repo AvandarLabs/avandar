@@ -17,11 +17,11 @@ import type { QueryAggregationType } from "$/models/queries/QueryAggregationType
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource.types";
 import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
+import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
 import type {
   OrderByDirection,
   PartialStructuredQuery,
 } from "$/models/queries/StructuredQuery/StructuredQuery.types";
-import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types";
 import type {
   VizConfig,
   VizType,
@@ -171,10 +171,7 @@ export const DataExplorerStateManager = createAppStateManager({
      * Set the recursive filter tree on the structured query, which also
      * regenerates the raw SQL via knex.
      */
-    setFilters: (
-      state: DataExplorerAppState,
-      filters: QueryFilterGroup,
-    ) => {
+    setFilters: (state: DataExplorerAppState, filters: QueryFilterGroup) => {
       const newQuery = {
         ...state.query,
         filters,

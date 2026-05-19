@@ -178,8 +178,7 @@ describe("sqlToStructuredQuery", () => {
 
   it("maps IN list to in operator", () => {
     const result = sqlToStructuredQuery({
-      sql:
-        `SELECT "name" FROM "${datasetId}" WHERE "status" IN ('active', 'pending')`,
+      sql: `SELECT "name" FROM "${datasetId}" WHERE "status" IN ('active', 'pending')`,
       datasets,
     });
     expect(result.isFullyMapped).toBe(true);

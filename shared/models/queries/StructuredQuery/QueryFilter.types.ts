@@ -56,9 +56,7 @@ export const EMPTY_QUERY_FILTER: QueryFilterGroup = {
 };
 
 /** True if `filter` is a group node that contains no rules. */
-export function isEmptyQueryFilter(
-  filter: QueryFilter | undefined,
-): boolean {
+export function isEmptyQueryFilter(filter: QueryFilter | undefined): boolean {
   return (
     filter !== undefined && filter.type === "group" && filter.rules.length === 0
   );

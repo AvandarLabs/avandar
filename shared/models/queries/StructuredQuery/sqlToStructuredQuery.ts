@@ -11,12 +11,15 @@
  */
 import { Model } from "@models/Model/Model.ts";
 import { uuid } from "$/lib/uuid.ts";
-import { Parser } from "node-sql-parser";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
+import { Parser } from "node-sql-parser";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types.ts";
 import type { QueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
-import type { QueryColumnId, QueryColumnRead } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
+import type {
+  QueryColumnId,
+  QueryColumnRead,
+} from "$/models/queries/QueryColumn/QueryColumn.types.ts";
 import type {
   QueryFilter,
   QueryFilterCombinator,
@@ -119,9 +122,7 @@ function _columnRefName(node: unknown): string | undefined {
 /**
  * Translate a parser binary operator to a {@link QueryFilterOperator}.
  */
-function _toFilterOperator(
-  operator: string,
-): QueryFilterOperator | undefined {
+function _toFilterOperator(operator: string): QueryFilterOperator | undefined {
   const op = operator.toUpperCase();
   if (op === "=") return "=";
   if (op === "!=" || op === "<>") return "!=";
@@ -422,9 +423,7 @@ function _makeQueryColumn(
  * Always returns a result; check `isFullyMapped` to know whether anything
  * was dropped.
  */
-export function sqlToStructuredQuery(
-  input: SqlMappingInput,
-): SqlMappingResult {
+export function sqlToStructuredQuery(input: SqlMappingInput): SqlMappingResult {
   const unmappedReasons: string[] = [];
   const trimmed = input.sql.trim();
   if (trimmed.length === 0) {
@@ -437,9 +436,7 @@ export function sqlToStructuredQuery(
     parsedAst = parser.astify(trimmed, { database: "postgresql" });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    return _makeUnmappedResult([
-      `Could not parse SQL: ${message}`,
-    ]);
+    return _makeUnmappedResult([`Could not parse SQL: ${message}`]);
   }
 
   // node-sql-parser returns either a single AST or an array. We only handle
@@ -455,9 +452,7 @@ export function sqlToStructuredQuery(
 
   const ast = parsedAst as Record<string, unknown> | null;
   if (!ast || ast.type !== "select") {
-    return _makeUnmappedResult([
-      "The form only supports SELECT queries.",
-    ]);
+    return _makeUnmappedResult(["The form only supports SELECT queries."]);
   }
 
   if (ast.with) {
@@ -467,16 +462,20 @@ export function sqlToStructuredQuery(
     unmappedReasons.push("HAVING clause is not supported in the form.");
   }
   const distinctType =
-    ast.distinct &&
-    typeof ast.distinct === "object" &&
-    "type" in (ast.distinct as Record<string, unknown>) ?
+    (
+      ast.distinct &&
+      typeof ast.distinct === "object" &&
+      "type" in (ast.distinct as Record<string, unknown>)
+    ) ?
       (ast.distinct as { type: unknown }).type
     : ast.distinct;
   if (distinctType) {
     unmappedReasons.push("DISTINCT is not supported in the form.");
   }
   if (ast._next || ast.set_op) {
-    unmappedReasons.push("UNION/INTERSECT/EXCEPT is not supported in the form.");
+    unmappedReasons.push(
+      "UNION/INTERSECT/EXCEPT is not supported in the form.",
+    );
   }
 
   // Resolve dataset

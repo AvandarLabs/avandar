@@ -22,7 +22,6 @@ import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { isEmptyQueryFilter } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import knex from "knex";
 import { match } from "ts-pattern";
-import type { Knex } from "knex";
 import type { DuckDbQueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
 import type {
   QueryFilter,
@@ -30,6 +29,7 @@ import type {
   QueryFilterRule,
 } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
+import type { Knex } from "knex";
 
 export type StructuredQueryToSQLOptions = {
   /**

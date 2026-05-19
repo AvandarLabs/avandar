@@ -1,6 +1,6 @@
 import { Alert, Fieldset, Stack, Text } from "@mantine/core";
-import { IconAlertTriangle } from "@tabler/icons-react";
 import { Model } from "@models";
+import { IconAlertTriangle } from "@tabler/icons-react";
 import { makeSelectOptions, Select } from "@ui";
 import { prop } from "@utils";
 import { QueryColumn as QueryColumnModule } from "$/models/queries/QueryColumn/QueryColumn";
@@ -26,9 +26,7 @@ type Props = {
   withinPortal?: boolean;
 };
 
-type PendingChange =
-  | { kind: "filter"; nextFilter: QueryFilterGroup }
-  | null;
+type PendingChange = { kind: "filter"; nextFilter: QueryFilterGroup } | null;
 
 export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
   const [{ query, isStructuredQueryInSync }, dispatch] =
@@ -75,10 +73,10 @@ export function ManualQueryForm({ withinPortal = true }: Props): JSX.Element {
             data-testid="overwrite-sql-warning"
           >
             <Text size="xs" mb="xs">
-              The current SQL contains parts that the form could not
-              represent. Continuing will overwrite that SQL with one
-              generated from the form. This cannot be undone (unless you
-              re-run your previous chat prompt).
+              The current SQL contains parts that the form could not represent.
+              Continuing will overwrite that SQL with one generated from the
+              form. This cannot be undone (unless you re-run your previous chat
+              prompt).
             </Text>
             <Stack gap="xs">
               <Text

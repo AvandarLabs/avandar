@@ -3,7 +3,10 @@ import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter
 import { structuredQueryToSQL } from "$/models/queries/StructuredQuery/structuredQueryToSQL.ts";
 import { describe, expect, it } from "vitest";
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
-import type { QueryColumnId, QueryColumnRead } from "$/models/queries/QueryColumn/QueryColumn.types.ts";
+import type {
+  QueryColumnId,
+  QueryColumnRead,
+} from "$/models/queries/QueryColumn/QueryColumn.types.ts";
 import type { QueryFilterGroup } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 import type {
   PartialStructuredQuery,
@@ -17,10 +20,7 @@ function _makeDataset(): DatasetModel["Read"] {
   }) as unknown as DatasetModel["Read"];
 }
 
-function _makeColumn(
-  name: string,
-  dataType = "varchar",
-): QueryColumnRead {
+function _makeColumn(name: string, dataType = "varchar"): QueryColumnRead {
   return Model.make("QueryColumn", {
     id: `qc_${name}` as QueryColumnId,
     baseColumn: Model.make("DatasetColumn", {
