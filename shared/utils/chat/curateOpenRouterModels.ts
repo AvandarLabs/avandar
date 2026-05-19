@@ -152,6 +152,7 @@ function _toChatModelOption(
   return {
     id: model.id,
     name: model.name,
+    nameWithoutProvider: model.name.split(":").slice(1).join(" "),
     ...(model.description ? { description: model.description } : {}),
     supportsTools: _supportsTools(model),
     licenseTier,

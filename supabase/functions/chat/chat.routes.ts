@@ -141,7 +141,6 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
 
       const payload = (await response.json()) as OpenRouterModelsResponse;
       const groups = curateOpenRouterModels(payload.data ?? []);
-
       return { groups };
     }),
   },

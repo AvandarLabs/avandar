@@ -1,6 +1,7 @@
 import { Button, Combobox, Group, Text, useCombobox } from "@mantine/core";
-import { IconCheck, IconSparkles } from "@tabler/icons-react";
+import { IconCheck } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
+import { propEq } from "@utils";
 import { useEffect, useMemo, useState } from "react";
 import {
   readStoredChatModelId,
@@ -35,6 +36,7 @@ export function ChatModelPicker({
     },
     onDropdownOpen: () => {
       combobox.selectFirstOption();
+      combobox.focusSearchInput();
     },
   });
 
@@ -52,9 +54,7 @@ export function ChatModelPicker({
     if (!resolvedModelId) {
       return undefined;
     }
-    return models.find((model) => {
-      return model.id === resolvedModelId;
-    });
+    return models.find(propEq("id", resolvedModelId));
   }, [models, resolvedModelId]);
 
   useEffect(() => {
@@ -107,6 +107,7 @@ export function ChatModelPicker({
       width={300}
       position="top-start"
       withinPortal
+      preventPositionChangeWhenVisible
       onOptionSubmit={(modelId) => {
         setSelectedModelId(modelId);
         combobox.closeDropdown();
@@ -116,18 +117,17 @@ export function ChatModelPicker({
         <Combobox.Target>
           <Button
             type="button"
-            variant="subtle"
+            variant="light"
             color="neutral"
             size="compact-sm"
             className={css.trigger}
             disabled={isTriggerDisabled}
             aria-label="Choose chat model"
-            leftSection={<IconSparkles size={14} />}
             onClick={() => {
               combobox.toggleDropdown();
             }}
           >
-            Model
+            {selectedModel?.nameWithoutProvider ?? "Model"}
           </Button>
         </Combobox.Target>
       </Tooltip>

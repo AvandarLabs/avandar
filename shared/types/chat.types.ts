@@ -40,7 +40,8 @@ export type ChatModelLicenseTier = "open" | "proprietary";
 /** A chat-capable model returned from OpenRouter via our edge function. */
 export type ChatModelOption = {
   id: string;
-  name: string;
+  name: string; // e.g. MoonshotAI: Kimi K2.6
+  nameWithoutProvider: string; // e.g. Kimi K2.6
   description?: string;
   supportsTools: boolean;
   licenseTier: ChatModelLicenseTier;
