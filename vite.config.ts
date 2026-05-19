@@ -4,12 +4,13 @@ import react from "@vitejs/plugin-react";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import { defaultExclude, defineConfig } from "vitest/config";
 
-const reactWithLinguiMacro = () =>
-  react({
+const reactWithLinguiMacro = () => {
+  return react({
     babel: {
       plugins: ["@lingui/babel-plugin-lingui-macro"],
     },
   });
+};
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {

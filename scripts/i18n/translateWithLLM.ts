@@ -76,7 +76,10 @@ function escapePoString(s: string): string {
 }
 
 /** Collects the value out of `msgid "..."` / `msgstr "..."` (multiline). */
-function readMessageValue(lines: string[], startIdx: number): {
+function readMessageValue(
+  lines: string[],
+  startIdx: number,
+): {
   value: string;
   consumed: number;
 } {
@@ -108,10 +111,7 @@ function parsePo(text: string): ParsedPo {
   let cursor = i;
   // Walk past the header msgid + its multiline msgstr.
   cursor += readMessageValue(lines, cursor).consumed;
-  while (
-    cursor < lines.length &&
-    !lines[cursor]!.startsWith("msgstr ")
-  )
+  while (cursor < lines.length && !lines[cursor]!.startsWith("msgstr "))
     cursor++;
   cursor += readMessageValue(lines, cursor).consumed;
   // Skip trailing blank lines.
@@ -127,7 +127,10 @@ function parsePo(text: string): ParsedPo {
         lines,
         cursor,
       );
-      const headerWithMsgid = [...headerLines, ...lines.slice(cursor, cursor + midConsumed)].join("\n");
+      const headerWithMsgid = [
+        ...headerLines,
+        ...lines.slice(cursor, cursor + midConsumed),
+      ].join("\n");
       cursor += midConsumed;
       const { value: msgstr, consumed: mstrConsumed } = readMessageValue(
         lines,
@@ -222,7 +225,9 @@ async function translateBatch(args: {
   try {
     parsed = JSON.parse(content);
   } catch {
-    throw new Error(`Could not parse JSON from model:\n${content.slice(0, 400)}`);
+    throw new Error(
+      `Could not parse JSON from model:\n${content.slice(0, 400)}`,
+    );
   }
   if (typeof parsed !== "object" || parsed === null) {
     throw new Error("Model JSON was not an object");
@@ -255,7 +260,9 @@ async function processLocale(args: {
     return { translated: 0, remaining: 0 };
   }
   const parsed = parsePo(raw);
-  const missing = parsed.entries.filter((e) => {return e.msgstr.trim() === ""});
+  const missing = parsed.entries.filter((e) => {
+    return e.msgstr.trim() === "";
+  });
   console.log(
     `\n[${locale}] ${missing.length} missing of ${parsed.entries.length} entries`,
   );
@@ -265,10 +272,12 @@ async function processLocale(args: {
   const batches: Array<Array<{ id: string; source: string }>> = [];
   for (let i = 0; i < missing.length; i += BATCH_SIZE) {
     batches.push(
-      missing.slice(i, i + BATCH_SIZE).map((e, idx) => {return {
-        id: `m${i + idx}`,
-        source: e.msgid,
-      }}),
+      missing.slice(i, i + BATCH_SIZE).map((e, idx) => {
+        return {
+          id: `m${i + idx}`,
+          source: e.msgid,
+        };
+      }),
     );
   }
 
@@ -287,9 +296,8 @@ async function processLocale(args: {
     });
     for (const [idx, item] of batch.entries()) {
       const absoluteIdx = batchIdx * BATCH_SIZE + idx;
-      const target = parsed.entries[
-        parsed.entries.indexOf(missing[absoluteIdx]!)
-      ];
+      const target =
+        parsed.entries[parsed.entries.indexOf(missing[absoluteIdx]!)];
       const translated = translations[item.id];
       if (target && typeof translated === "string" && translated.trim()) {
         target.msgstr = translated;
@@ -311,7 +319,9 @@ async function processLocale(args: {
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const dryRun = args.includes("--dry-run");
-  const explicitLocales = args.filter((a) => {return !a.startsWith("--")});
+  const explicitLocales = args.filter((a) => {
+    return !a.startsWith("--");
+  });
 
   const apiKey = process.env.OPEN_ROUTER_API_KEY;
   if (!apiKey) {
@@ -325,13 +335,21 @@ async function main(): Promise<void> {
 
   const dirEntries = await fs.readdir(LOCALES_DIR, { withFileTypes: true });
   const allLocales = dirEntries
-    .filter((d) => {return d.isDirectory()})
-    .map((d) => {return d.name})
-    .filter((l) => {return l !== SOURCE_LOCALE});
+    .filter((d) => {
+      return d.isDirectory();
+    })
+    .map((d) => {
+      return d.name;
+    })
+    .filter((l) => {
+      return l !== SOURCE_LOCALE;
+    });
 
   const targetLocales =
     explicitLocales.length > 0 ?
-      explicitLocales.filter((l) => {return allLocales.includes(l)})
+      explicitLocales.filter((l) => {
+        return allLocales.includes(l);
+      })
     : allLocales;
 
   console.log(
@@ -346,7 +364,9 @@ async function main(): Promise<void> {
       console.error(`  · ${locale} failed:`, err);
     }
   }
-  console.log("\nDone. Run `pnpm i18n:compile` to regenerate runtime catalogs.");
+  console.log(
+    "\nDone. Run `pnpm i18n:compile` to regenerate runtime catalogs.",
+  );
 }
 
 void main();

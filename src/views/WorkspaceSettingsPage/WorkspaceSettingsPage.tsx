@@ -1,5 +1,5 @@
-import { Container, Text, Title } from "@mantine/core";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { Container, Text, Title } from "@mantine/core";
 import { notifyError, notifySuccess, Tabs } from "@ui";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";

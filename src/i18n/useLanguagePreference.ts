@@ -1,9 +1,6 @@
 import { useCallback, useSyncExternalStore } from "react";
-import {
-  DEFAULT_LOCALE,
-  isSupportedLocale,
-  type SupportedLocale,
-} from "./locales";
+import { DEFAULT_LOCALE, isSupportedLocale } from "./locales";
+import type { SupportedLocale } from "./locales";
 
 /**
  * Language preferences are scoped per workspace and persisted in
@@ -60,11 +57,9 @@ export function useWorkspaceLanguage(workspaceId: string): {
     return readWorkspaceLanguage(workspaceId);
   }, [workspaceId]);
 
-  const locale = useSyncExternalStore(
-    subscribe,
-    getSnapshot,
-    () => {return DEFAULT_LOCALE},
-  );
+  const locale = useSyncExternalStore(subscribe, getSnapshot, () => {
+    return DEFAULT_LOCALE;
+  });
 
   const setLocale = useCallback(
     (next: SupportedLocale) => {
