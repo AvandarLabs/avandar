@@ -1,35 +1,39 @@
 import { modals } from "@mantine/modals";
-import { uuid } from "$/lib/uuid";
 import { ConsentModal } from "@/components/Privacy/ConsentModal/ConsentModal";
 import { detectBias } from "@/lib/privacy/biasDetector";
+import { recordConsentDecision } from "@/lib/privacy/consentAuditLog";
 import { detectPii } from "@/lib/privacy/piiDetector";
+import { registerAck } from "@/lib/privacy/pendingAcks";
+import {
+  hashTextPayload,
+  issueAckToken,
+} from "@/lib/privacy/sessionSecret";
 import type {
   ConsentDecision,
   ConsentModalMode,
 } from "@/components/Privacy/ConsentModal/ConsentModal";
 import type { BiasHit } from "@/lib/privacy/biasDetector";
 import type { PiiDetectionResult } from "@/lib/privacy/piiDetector";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 /**
  * `crossBoundary` is the single chokepoint for sending values or text to
  * the LLM. Every code path that crosses the data → LLM boundary should
  * route through it.
  *
- * v0 scope (what ships in this branch):
- *   - PII detection (column-name + content layers)
+ * v1 scope (what ships in this branch):
+ *   - PII detection (column-name + content layers, English-only)
  *   - Bias detection (English-only patterns)
- *   - Consent modal Modes A / B / C
- *   - In-memory ack-token (no HMAC) — backend trust is **not** enforced
- *     in v0; this is a demo placeholder so we have the right shape on
- *     the client. The HMAC sign-and-verify pipeline is Phase 0 follow-up.
+ *   - Consent modal Modes A / B / C / D / E
+ *   - HMAC-signed ack tokens via `sessionSecret.ts`; backend rejects
+ *     unverified consent acks with `UNAPPROVED_DATA_TRANSFER` (400)
+ *   - Dexie-persisted audit log; viewable at `/settings/privacy/log`
  *
  * Deferred (logged in CHECKPOINTS.md):
- *   - HMAC + session secret on the ack token
- *   - Backend `UNAPPROVED_DATA_TRANSFER` rejection
- *   - Dexie-persisted audit log + `/settings/privacy/log` page
- *   - Medical-strict typed-confirmation tier
- *   - Composite modal (PII + bias together)
- *   - Spanish / French pattern files
+ *   - Spanish / French pattern files (UX copy stubbed; patterns to follow
+ *     after a social-sector-advisor review per spec)
+ *   - Server-issued nonce registry (v2 of the ack-token design — for now
+ *     replay protection is best-effort in-memory on the edge worker)
  */
 
 export type CrossBoundaryContext =
@@ -59,7 +63,8 @@ export type CrossBoundaryRequest = {
   sourceQuery?: string;
 
   context: CrossBoundaryContext;
-  workspaceId: string;
+  workspaceId: Workspace.Id;
+  userId: string;
   threadId?: string;
 };
 
@@ -102,12 +107,25 @@ export async function crossBoundary(
 
   const mode = _chooseMode({ pii, biasHits });
 
-  // Clean send when there is nothing to flag for value-only requests.
+  // Clean send when there is nothing to flag.
   if (mode === null) {
+    const ackToken = await _mintAckFor(req, req.text ?? "");
+    await recordConsentDecision({
+      workspaceId: req.workspaceId,
+      userId: req.userId,
+      context: req.context,
+      decision: "approved",
+      mode: "clean",
+      detectedPii: [],
+      detectedBias: [],
+      sourceColumn: req.sourceColumn,
+      isMedical: false,
+      typedConfirmationCorrect: null,
+    });
     return {
       approved: true,
       payload: {
-        ackToken: _issueAckToken(req.workspaceId),
+        ackToken,
         values: req.values ?? [],
         text: req.text,
         context: req.context,
@@ -128,21 +146,58 @@ export async function crossBoundary(
   });
 
   if (decision.action === "cancel") {
+    await recordConsentDecision({
+      workspaceId: req.workspaceId,
+      userId: req.userId,
+      context: req.context,
+      decision: "cancelled",
+      mode,
+      detectedPii: pii.hits.map((h) => {
+        return h.label;
+      }),
+      detectedBias: biasHits.map((h) => {
+        return h.label;
+      }),
+      sourceColumn: req.sourceColumn,
+      isMedical: pii.isMedical,
+      typedConfirmationCorrect:
+        mode === "medical_strict" ? false : null,
+    });
     return { approved: false, reason: "cancelled" };
   }
 
-  // When the user picked "Use suggestion" on a bias nudge, the caller is
-  // responsible for swapping the user-visible text. We attach the
-  // suggestion to the payload so the caller can swap in the right place.
+  // When the user picked "Use suggestion" on a bias nudge, swap the
+  // suggestion into the outgoing text. The ack token must cover the
+  // FINAL text the model will see, so we hash post-swap.
   const finalText =
     decision.useSuggestion && biasHits[0]?.suggestion ?
       biasHits[0].suggestion
     : req.text;
 
+  const ackToken = await _mintAckFor(req, finalText ?? "");
+
+  await recordConsentDecision({
+    workspaceId: req.workspaceId,
+    userId: req.userId,
+    context: req.context,
+    decision: decision.useSuggestion ? "used_suggestion" : "approved",
+    mode,
+    detectedPii: pii.hits.map((h) => {
+      return h.label;
+    }),
+    detectedBias: biasHits.map((h) => {
+      return h.label;
+    }),
+    sourceColumn: req.sourceColumn,
+    isMedical: pii.isMedical,
+    typedConfirmationCorrect:
+      mode === "medical_strict" ? true : null,
+  });
+
   return {
     approved: true,
     payload: {
-      ackToken: _issueAckToken(req.workspaceId),
+      ackToken,
       values: req.values ?? [],
       text: finalText,
       context: req.context,
@@ -159,6 +214,28 @@ export async function crossBoundary(
   };
 }
 
+/**
+ * Mint an HMAC-signed ack token covering `text`, and register it in the
+ * pending-acks queue so the next outgoing chat request picks it up.
+ * Value-shaped (row data) consent will follow the same pattern once
+ * Phase 2 lands; for v1 only text payloads ride this rail.
+ */
+async function _mintAckFor(
+  req: CrossBoundaryRequest,
+  text: string,
+): Promise<string> {
+  const payloadHash = await hashTextPayload(text);
+  const ackToken = await issueAckToken({
+    workspaceId: req.workspaceId,
+    userId: req.userId,
+    payloadHash,
+  });
+  if (text) {
+    await registerAck({ text, ackToken });
+  }
+  return ackToken;
+}
+
 function _chooseMode(args: {
   pii: PiiDetectionResult;
   biasHits: BiasHit[];
@@ -166,9 +243,17 @@ function _chooseMode(args: {
   const hasPii = args.pii.severity !== "clean";
   const hasBias = args.biasHits.length > 0;
 
-  // v0: when both fire, surface the PII warning since it is the higher-
-  // stakes signal. The composite modal (Mode D) lives in CHECKPOINTS as
-  // a deferred item.
+  // Medical-strict tier wins regardless of other detections — the
+  // typed-confirmation gate is the highest-friction modal we ship.
+  if (args.pii.isMedical) {
+    return "medical_strict";
+  }
+  // Composite: both PII and bias fired. The composite modal lets the
+  // user satisfy both gates in one step (ack PII + decide on bias
+  // suggestion or send-as-is).
+  if (hasPii && hasBias) {
+    return "composite";
+  }
   if (hasPii) {
     return "pii_warning";
   }
@@ -191,6 +276,8 @@ function _openModal(args: {
     const title =
       args.mode === "clean" ? "Send to AI?"
       : args.mode === "pii_warning" ? "Personal data detected"
+      : args.mode === "medical_strict" ? "Health information detected"
+      : args.mode === "composite" ? "Review before sending"
       : "Consider rephrasing";
 
     let settled = false;
@@ -226,8 +313,3 @@ function _openModal(args: {
   });
 }
 
-function _issueAckToken(workspaceId: string): string {
-  // v0 token: just a UUID. The HMAC + session-secret pipeline lands in
-  // Phase 0 follow-up; backend currently does not verify these tokens.
-  return `v0.${workspaceId}.${uuid()}.${Date.now()}`;
-}

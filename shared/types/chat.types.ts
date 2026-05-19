@@ -61,6 +61,32 @@ export type ChatResponse = {
   clarification?: ChatClarifyRequest;
 };
 
+/**
+ * Response shape for `GET /chat/:workspaceId/session-secret`. The
+ * returned secret is base64-encoded; the client stores it in memory
+ * (never localStorage) and uses it to HMAC-sign `ackToken`s via
+ * `crossBoundary`.
+ */
+export type ChatSessionSecretResponse = {
+  /** Base64-encoded HMAC key. Treat as sensitive material in memory. */
+  sessionSecret: string;
+  issuedAt: number;
+};
+
+/**
+ * Client-side proof that the user consented to send a specific
+ * payload to the LLM. The backend verifies the HMAC + payload hash
+ * before forwarding any flagged content. See
+ * `supabase/functions/_shared/privacy/ackToken.ts`.
+ */
+export type ConsentAck = {
+  ackToken: string;
+  /** What the token covers — used by the backend to look up the payload. */
+  scope:
+    | { kind: "message_index"; index: number }
+    | { kind: "values"; sourceColumn?: string };
+};
+
 export type ChatModelLicenseTier = "open" | "proprietary";
 
 /** A chat-capable model returned from OpenRouter via our edge function. */

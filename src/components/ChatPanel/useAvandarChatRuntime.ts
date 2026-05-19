@@ -5,12 +5,24 @@ import { match } from "ts-pattern";
 import { APIClient } from "@/clients/APIClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
+import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { detectBias } from "@/lib/privacy/biasDetector";
+import { recordShown } from "@/lib/privacy/clarificationAuditLog";
 import { crossBoundary } from "@/lib/privacy/crossBoundary";
+import { consumeAckForText } from "@/lib/privacy/pendingAcks";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { ChatModelAdapter, ChatModelRunResult } from "@assistant-ui/react";
-import type { ChatClientMessage } from "$/types/chat.types";
+import type {
+  ChatClarifyRequest,
+  ChatClientMessage,
+  ConsentAck,
+} from "$/types/chat.types";
+
+/** Audit-tagged clarification used by `ChatPanelStateManager`. */
+export type ChatClarifyRequestWithAudit = ChatClarifyRequest & {
+  auditId?: string;
+};
 
 const CLARIFICATION_ANSWER_RE = /^\[Clarification answer:/;
 
@@ -35,6 +47,7 @@ function extractText(parts: ReadonlyArray<{ type: string }>): string {
  */
 export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
   const workspace = useCurrentWorkspace();
+  const user = useCurrentUser();
   const pageContext = useChatPageContext();
   const dataExplorerDispatch = DataExplorerStateManager.useDispatch();
   const chatPanelDispatch = ChatPanelStateManager.useDispatch();
@@ -72,13 +85,18 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         const lastUserMsg = [...apiMessages].reverse().find((m) => {
           return m.role === "user";
         });
-        if (lastUserMsg && !CLARIFICATION_ANSWER_RE.test(lastUserMsg.content)) {
+        if (
+          lastUserMsg &&
+          !CLARIFICATION_ANSWER_RE.test(lastUserMsg.content) &&
+          user
+        ) {
           const biasResult = detectBias(lastUserMsg.content);
           if (biasResult.hits.length > 0) {
             const consent = await crossBoundary({
               text: lastUserMsg.content,
               context: "user_message_text",
               workspaceId: workspace.id,
+              userId: user.id,
             });
             if (!consent.approved) {
               // User cancelled: end the turn with an empty assistant
@@ -96,6 +114,25 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
           }
         }
 
+        // Collect any pre-approved consent acks that cover messages we
+        // are about to send. `crossBoundary` registers acks in a
+        // module-scope queue keyed by content hash; we drain matching
+        // entries here and attach them to the backend request.
+        const consentAcks: ConsentAck[] = [];
+        for (let i = 0; i < apiMessages.length; i++) {
+          const msg = apiMessages[i]!;
+          if (msg.role !== "user") {
+            continue;
+          }
+          const ackToken = await consumeAckForText(msg.content);
+          if (ackToken) {
+            consentAcks.push({
+              ackToken,
+              scope: { kind: "message_index", index: i },
+            });
+          }
+        }
+
         const response = await APIClient.post({
           route: "chat/:workspaceId/messages",
           pathParams: { workspaceId: workspace.id },
@@ -103,6 +140,7 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
             messages: apiMessages,
             context: pageContext,
             model,
+            ...(consentAcks.length > 0 ? { consentAcks } : {}),
           },
         });
 
@@ -117,19 +155,29 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         // that case — we don't double up.
         if (response.clarification) {
           // Run the bias detector on the LLM-generated question; if it
-          // trips, we display a banner above the card rather than re-
-          // prompting (the silent-reprompt loop is a Phase 1 polish item
-          // tracked in CHECKPOINTS — for v0 we surface, not gate).
+          // trips, we log but pass through. The silent-reprompt loop is
+          // a Phase 1 polish item tracked in CHECKPOINTS.
           const questionBias = detectBias(response.clarification.question);
           if (questionBias.hits.length > 0) {
             console.warn(
-              "[chat] LLM clarification trips bias detector — passing through for v0:",
+              "[chat] LLM clarification trips bias detector — passing through for v1:",
               questionBias.hits.map((h) => {
                 return h.label;
               }),
             );
           }
-          chatPanelDispatch.setPendingClarification(response.clarification);
+          // Telemetry: record the "shown" event. The PendingClarificationBlock
+          // settles it with the outcome when the user answers.
+          const auditId = await recordShown({
+            workspaceId: workspace.id,
+            request: response.clarification,
+          });
+          chatPanelDispatch.setPendingClarification({
+            ...response.clarification,
+            // We attach the audit id on the request object so the
+            // outcome handler can update the same row.
+            auditId,
+          } as ChatClarifyRequestWithAudit);
         } else {
           chatPanelDispatch.setPendingClarification(undefined);
         }
@@ -147,7 +195,13 @@ export function useAvandarChatRuntime(): ReturnType<typeof useLocalRuntime> {
         return { content: assistantParts };
       },
     };
-  }, [workspace.id, pageContext, dataExplorerDispatch, chatPanelDispatch]);
+  }, [
+    workspace.id,
+    user,
+    pageContext,
+    dataExplorerDispatch,
+    chatPanelDispatch,
+  ]);
 
   return useLocalRuntime(adapter);
 }

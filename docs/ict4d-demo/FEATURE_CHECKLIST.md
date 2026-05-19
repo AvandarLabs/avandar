@@ -29,17 +29,18 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started
   - [~] Implementation of the chat-interactive-workflows plan
     - [x] Phase 0 — PII detector (16 tests green)
     - [x] Phase 0 — Bias detector (11 tests green)
-    - [x] Phase 0 — Consent modal Modes A/B/C
-    - [x] Phase 0 — `crossBoundary` API (v0, no HMAC backend signing)
-    - [ ] Phase 0 — Mode D (composite) + Mode E (medical-strict)
-    - [ ] Phase 0 — HMAC ack tokens + backend `UNAPPROVED_DATA_TRANSFER`
-    - [ ] Phase 0 — Dexie audit log + `/settings/privacy/log` page
+    - [x] Phase 0 — Consent modal Modes A/B/C/D/E (composite + medical-strict shipped)
+    - [x] Phase 0 — `crossBoundary` API with HMAC ack tokens
+    - [x] Phase 0 — HMAC ack tokens + backend `UNAPPROVED_DATA_TRANSFER`
+    - [x] Phase 0 — Dexie audit log + `/settings/privacy/log` page (Privacy log tab)
+    - [x] Phase 0 — `isRowDataMessage` server helper for the Phase 2+ row-data path
+    - [x] Phase 0 — Spanish + French pattern file stubs
     - [x] Phase 1 — `clarify` tool registered in chat backend with 3-turn cap
     - [x] Phase 1 — Inline ClarificationCard in the thread (free_text + fixed_options)
     - [x] Phase 1 — System-prompt clarification block
     - [x] Phase 1 — Bias check on outgoing user messages via `crossBoundary`
-    - [x] Phase 1 — Bias check on LLM clarification questions (logs, doesn't block in v0)
-    - [ ] Phase 1 — Clarification audit table + telemetry
+    - [x] Phase 1 — Bias check on LLM clarification questions (logs, doesn't block in v1)
+    - [x] Phase 1 — Clarification audit table + telemetry (separate Dexie DB)
     - [ ] Phase 1 — Eval set (20 ambiguous questions, ≥80% resolution target)
     - [ ] Phase 2 — Discovery clarifications (`discovery` response shape)
     - [ ] Phase 3 — `proposePlan` + xyflow DAG view

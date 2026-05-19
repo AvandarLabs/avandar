@@ -2,8 +2,11 @@ import { useThreadRuntime } from "@assistant-ui/react";
 import { Box } from "@mantine/core";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ClarificationCard } from "@/components/ChatPanel/ClarificationCard/ClarificationCard";
+import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { recordOutcome } from "@/lib/privacy/clarificationAuditLog";
 import { crossBoundary } from "@/lib/privacy/crossBoundary";
+import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/useAvandarChatRuntime";
 
 /**
  * Renders the inline clarification card above the composer when the
@@ -25,6 +28,7 @@ export function PendingClarificationBlock(): JSX.Element | null {
   const dispatch = ChatPanelStateManager.useDispatch();
   const runtime = useThreadRuntime();
   const workspace = useCurrentWorkspace();
+  const user = useCurrentUser();
 
   if (!pending) {
     return null;
@@ -33,13 +37,19 @@ export function PendingClarificationBlock(): JSX.Element | null {
   const submit = async (answer: string | string[] | null) => {
     let finalAnswer = answer;
 
-    if (typeof answer === "string") {
+    if (typeof answer === "string" && user) {
       const result = await crossBoundary({
         text: answer,
         context: "clarification_answer",
         workspaceId: workspace.id,
+        userId: user.id,
       });
       if (!result.approved) {
+        // Cancel: log the outcome but don't append the message.
+        const auditId = (pending as ChatClarifyRequestWithAudit).auditId;
+        if (auditId) {
+          await recordOutcome({ id: auditId, outcome: "cancelled" });
+        }
         return;
       }
       if (typeof result.payload.text === "string") {
@@ -48,6 +58,14 @@ export function PendingClarificationBlock(): JSX.Element | null {
     }
 
     dispatch.setPendingClarification(undefined);
+
+    const auditId = (pending as ChatClarifyRequestWithAudit).auditId;
+    if (auditId) {
+      await recordOutcome({
+        id: auditId,
+        outcome: answer === null ? "let_ai_decide" : "answered",
+      });
+    }
 
     const renderedAnswer = _renderAnswer(finalAnswer);
     const userMessage = `[Clarification answer: ${renderedAnswer}]`;

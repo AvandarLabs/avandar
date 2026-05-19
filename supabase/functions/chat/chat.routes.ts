@@ -1,8 +1,15 @@
+import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
+import { BAD_REQUEST } from "@sbfn/_shared/httpCodes.ts";
 import {
   defineRoutes,
   GET,
   POST,
 } from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import {
+  deriveSessionSecret,
+  hashTextPayload,
+  verifyAckToken,
+} from "@sbfn/_shared/privacy/ackToken.ts";
 import {
   buildSQLSystemPrompt,
   cleanGeneratedSQL,
@@ -17,6 +24,7 @@ import type {
   ChatGeneratedSQL,
   ChatModelsResponse,
   ChatResponse,
+  ChatSessionSecretResponse,
 } from "@sbfn/chat/chat.types.ts";
 import type { OpenRouterModelInput } from "$/utils/chat/curateOpenRouterModels.ts";
 
@@ -64,6 +72,29 @@ type DatasetColumn = { dataset_id: string; name: string; data_type: string };
 type OpenRouterToolCall = {
   function?: { name?: string; arguments?: string };
 };
+
+/**
+ * Thrown when an ack token fails verification. The MiniServer wraps
+ * `AvaHTTPError` into a 4xx automatically, so this is the only thing
+ * we need to do to surface a real `UNAPPROVED_DATA_TRANSFER` to
+ * callers. Prefixed message lets the client / our logs distinguish
+ * this from generic bad-request errors.
+ */
+function _rejectUnapprovedTransfer(detail: string): never {
+  throw new AvaHTTPError(
+    `UNAPPROVED_DATA_TRANSFER: ${detail}`,
+    BAD_REQUEST,
+  );
+}
+
+function _arrayBufferToBase64(buf: ArrayBuffer): string {
+  const bytes = new Uint8Array(buf);
+  let binary = "";
+  for (const b of bytes) {
+    binary += String.fromCharCode(b);
+  }
+  return btoa(binary);
+}
 
 const MAX_CLARIFICATIONS_PER_QUESTION = 3;
 
@@ -314,11 +345,66 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           lastError: z.string().optional(),
         }),
         model: z.string().optional(),
+        consentAcks: z
+          .array(
+            z.object({
+              ackToken: z.string(),
+              scope: z.union([
+                z.object({
+                  kind: z.literal("message_index"),
+                  index: z.number().int().nonnegative(),
+                }),
+                z.object({
+                  kind: z.literal("values"),
+                  sourceColumn: z.string().optional(),
+                }),
+              ]),
+            }),
+          )
+          .optional(),
       })
-      .action(async ({ pathParams, body, supabaseClient }) => {
+      .action(async ({ pathParams, body, supabaseClient, user }) => {
         const { workspaceId } = pathParams;
-        const { messages, context, model: requestedModel } = body;
+        const {
+          messages,
+          context,
+          model: requestedModel,
+          consentAcks,
+        } = body;
         const model = _resolveChatModel(requestedModel);
+
+        // Verify any consent acks BEFORE we burn an LLM call. Each ack
+        // proves the user actually approved a flagged payload through
+        // the client-side consent modal. If any ack is invalid the whole
+        // request is rejected with UNAPPROVED_DATA_TRANSFER (400).
+        if (consentAcks && consentAcks.length > 0) {
+          for (const ack of consentAcks) {
+            if (ack.scope.kind === "message_index") {
+              const msg = messages[ack.scope.index];
+              if (!msg) {
+                return _rejectUnapprovedTransfer(
+                  `consentAck scope.index=${ack.scope.index} out of range`,
+                );
+              }
+              const expectedHash = await hashTextPayload(msg.content);
+              const result = await verifyAckToken({
+                token: ack.ackToken,
+                expectedWorkspaceId: workspaceId,
+                expectedUserId: user.id,
+                expectedPayloadHash: expectedHash,
+              });
+              if (!result.valid) {
+                return _rejectUnapprovedTransfer(
+                  `consentAck failed verification: ${result.reason}`,
+                );
+              }
+            }
+            // `values` scope is wired for Phase 2+ row-data flows;
+            // until those land we don't have a value payload to hash
+            // against on this turn, so we accept-on-presence and let
+            // the future row-data path tighten the contract.
+          }
+        }
 
         const isDataExplorer = context.app === "data-explorer";
 
@@ -540,5 +626,34 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
         };
         return result;
       }),
+  },
+
+  /**
+   * Returns the HMAC session secret used by the client to sign ack
+   * tokens for the consent flow. The secret is derived per
+   * (workspaceId, userId) from `SB_SECRET_KEY` so it never has to be
+   * stored on the server; both client and server derive it
+   * independently.
+   *
+   * The client should treat the returned base64 string as sensitive
+   * material: keep it in memory only, never in localStorage / IDB.
+   */
+  "/:workspaceId/session-secret": {
+    GET: GET({
+      path: "/:workspaceId/session-secret",
+      schema: { workspaceId: z.uuid() },
+    }).action(
+      async ({ pathParams, user }): Promise<ChatSessionSecretResponse> => {
+        const { workspaceId } = pathParams;
+        const secret = await deriveSessionSecret({
+          workspaceId,
+          userId: user.id,
+        });
+        return {
+          sessionSecret: _arrayBufferToBase64(secret),
+          issuedAt: Date.now(),
+        };
+      },
+    ),
   },
 });

@@ -1,6 +1,11 @@
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager";
 import type { ChatClarifyRequest } from "$/types/chat.types";
 
+/** Clarification carrying an optional audit log row id so telemetry can
+ *  link the "shown" event with the eventual "answered/cancelled/let-ai-
+ *  decide" outcome. */
+type PendingClarification = ChatClarifyRequest & { auditId?: string };
+
 type ChatPanelState = {
   isOpen: boolean;
   /**
@@ -8,7 +13,7 @@ type ChatPanelState = {
    * answer. Set when the chat runtime sees `response.clarification`; cleared
    * once the user submits an answer or chooses "Let AI decide".
    */
-  pendingClarification: ChatClarifyRequest | undefined;
+  pendingClarification: PendingClarification | undefined;
 };
 
 const initialState: ChatPanelState = {
@@ -38,7 +43,7 @@ export const ChatPanelStateManager = createAppStateManager({
     },
     setPendingClarification: (
       state: ChatPanelState,
-      pendingClarification: ChatClarifyRequest | undefined,
+      pendingClarification: PendingClarification | undefined,
     ) => {
       return { ...state, pendingClarification };
     },

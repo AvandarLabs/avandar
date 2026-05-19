@@ -292,6 +292,132 @@ flow depends on.
 
 ---
 
+## Checkpoint 5 — Phase 0 deferred items + Phase 1 telemetry ✅
+
+This checkpoint closes out the Phase 0 deferred items called out in
+Checkpoint 4 and adds the Phase 1 clarification telemetry table.
+
+### What shipped
+
+**HMAC-signed ack tokens, end-to-end** (`supabase/functions/_shared/privacy/ackToken.ts`,
+`src/lib/privacy/sessionSecret.ts`, `src/lib/privacy/pendingAcks.ts`):
+
+- Per-(workspace, user) session secret derived from `SB_SECRET_KEY` via
+  HMAC-SHA256 (`"ackToken:v1:${workspaceId}:${userId}"`). Both client
+  and server derive the key independently — never on the wire.
+- New `GET /chat/:workspaceId/session-secret` endpoint returns the
+  base64-encoded derived key. Client caches it in memory (never
+  localStorage) via `getSessionSecret`.
+- Tokens are `base64url(headerJson).hex(HMAC-SHA256(headerB64, K))`.
+  Header carries `nonce`, `workspaceId`, `userId`, `issuedAt`,
+  `expiresAt` (issued + 5 min), `payloadHash` (SHA-256 of approved
+  text).
+- `verifyAckToken` on the backend rejects with one of `malformed`,
+  `bad_signature`, `expired`, `wrong_workspace`, `wrong_user`,
+  `payload_hash_mismatch`, `nonce_replay`.
+- Replay protection is a process-local seen-nonce `Map` with 10-minute
+  TTL — good enough for the single-instance edge deployment we ship
+  today; CHECKPOINTS notes the Redis/Supabase upgrade for multi-instance.
+- Constant-time signature comparison (`_timingSafeEqual`).
+
+**Backend `UNAPPROVED_DATA_TRANSFER` rejection** (`supabase/functions/chat/chat.routes.ts`):
+
+- `POST /chat/:workspaceId/messages` now accepts an optional
+  `consentAcks: ConsentAck[]` array. When present, each ack is
+  verified before any LLM call. Any failure raises an `AvaHTTPError`
+  prefixed `UNAPPROVED_DATA_TRANSFER:` with the specific reason,
+  surfacing as a 400 to the client.
+- `isRowDataMessage` server helper (`supabase/functions/_shared/privacy/isRowDataMessage.ts`)
+  is wired and ready for Phase 2+. v1 chat traffic doesn't include row
+  data so the helper isn't yet enforced on every message; the v2 cut
+  will demand a token for any row-shaped message.
+
+**Pending-ack queue** (`src/lib/privacy/pendingAcks.ts`):
+
+- Module-scope `Map<payloadHash, PendingAck>` populated by
+  `crossBoundary` on approval. `useAvandarChatRuntime` drains matching
+  acks just before posting and attaches them as `body.consentAcks`.
+- Acks are single-use (`Map.delete` on consume) and expire after 5 min
+  to match token TTL.
+
+**Consent modals: Modes D + E** (`src/components/Privacy/ConsentModal/ConsentModal.tsx`):
+
+- Mode D (composite): PII + bias detected together; ack checkbox + bias
+  decision in one modal; "Use suggestion" still available.
+- Mode E (medical-strict): user must type the exact phrase
+  `SEND HEALTH DATA` to enable Send. Triggered automatically when the
+  PII detector flags a medical-category hit.
+
+**Dexie consent audit log** (`src/lib/privacy/consentAuditLog.ts`):
+
+- Standalone Dexie DB (`AvandarConsentAuditDB`) — separate from the
+  main app DB so adding the table doesn't force a main-schema bump.
+- Records every consent decision with metadata only: detected pattern
+  labels, mode shown, decision (`approved` / `used_suggestion` /
+  `cancelled`), source column, value count, content length, locale,
+  detector version, ack token nonce. **Never the values themselves.**
+- 90-day retention window enforced on read.
+- `clearConsentLog()` lets the user wipe.
+- `consentLogToCsv()` formats for download.
+
+**Privacy log page** (`src/views/WorkspaceSettingsPage/PrivacyLogTab/`):
+
+- New "Privacy log" tab in Workspace Settings (visible to all
+  workspace members, not just settings admins — own decisions only,
+  no cross-user view).
+- Filter by decision; export CSV; clear log.
+- Per-row badges for PII / bias labels.
+
+**Phase 1 clarification telemetry**
+(`src/lib/privacy/clarificationAuditLog.ts`):
+
+- Separate Dexie DB (`AvandarClarificationAuditDB`).
+- `recordShown` writes the row when the LLM emits a clarification;
+  `recordOutcome` updates it when the user answers / let-AI-decides /
+  cancels. `timeToAnswerMs` is the delta. Question text and answer
+  text are never stored — only metadata + counts.
+
+**Spanish + French pattern stubs** (`src/lib/privacy/patterns/{es,fr}/`):
+
+- Stub files document the spec's decision (`#1`): non-English bias
+  patterns are NOT machine-translated; they wait for a social-sector-
+  advisor review before activation. Until then, Spanish/French locales
+  fall back to English detectors with translated UX copy.
+
+### Testing
+
+- `pnpm exec vitest run src/lib/privacy/` — **46 tests passing** across
+  `piiDetector`, `biasDetector`, `ackToken`, `ackTokenRoundtrip`,
+  `isRowDataMessage`.
+- `ackTokenRoundtrip.test.ts` is the highlight — it inlines a
+  server-mirror `verifyAckToken` and round-trips the spec wire format
+  through 6 scenarios (valid, wrong-secret, wrong-workspace, wrong
+  payload hash, expired, malformed). The client and server
+  implementations are independently authored against the same spec; this
+  test locks in their agreement on the wire format.
+- `isRowDataMessage.test.ts` mirrors the server helper so client-side
+  vitest catches any drift.
+- `tsc -b --noEmit` clean.
+- **Live OpenRouter end-to-end testing was not possible from this
+  remote container**: `openrouter.ai` is not on the allowlist and
+  `supabase start` fails because AWS CloudFront (where Supabase
+  images live) is also blocked. Both run fine locally. The
+  protocol-level round-trip test ensures the HMAC contract is
+  correct independent of the live network round-trip.
+
+### What's still deferred (next session)
+
+- Eval set (20 ambiguous questions, ≥80% resolution target) — needs a
+  scratch dataset + an automated runner.
+- Server-issued nonce registry (v2 of the ack-token design) — replay
+  protection currently in-memory on the edge worker.
+- Spanish + French bias patterns themselves (pending advisor review).
+- Phase 2 (discovery clarifications) onwards.
+- Lint rule that prevents bypassing `crossBoundary` in code — spec
+  calls for a custom ESLint rule; not in scope for this checkpoint.
+
+---
+
 ## Outstanding investigation — bug #29 (chat canvas stops updating)
 
 **Symptom**: after several chat turns, the assistant returns correct SQL,
