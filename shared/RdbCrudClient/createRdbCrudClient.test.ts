@@ -1,3 +1,4 @@
+import { createSqliteCrudClient } from "@clients/SqliteCrudClient/createSqliteCrudClient.ts";
 import { createSupabaseCrudClient } from "@clients/SupabaseCrudClient/createSupabaseCrudClient.ts";
 import { isDesktop } from "$/platform/isDesktop.ts";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -34,11 +35,15 @@ vi.mock("$/db/supabase/AvaSupabase.ts", () => {
 vi.mock("@clients/SupabaseCrudClient/createSupabaseCrudClient.ts", () => {
   return {
     createSupabaseCrudClient: vi.fn(() => {
-      return {
-        get: () => {
-          return undefined;
-        },
-      };
+      return { __backend: "supabase" };
+    }),
+  };
+});
+
+vi.mock("@clients/SqliteCrudClient/createSqliteCrudClient.ts", () => {
+  return {
+    createSqliteCrudClient: vi.fn(() => {
+      return { __backend: "sqlite" };
     }),
   };
 });
@@ -72,17 +77,19 @@ describe("createRdbCrudClient", () => {
     );
   });
 
-  it(
-    "also delegates to createSupabaseCrudClient on desktop in Phase 1 " +
-      "(Option A — Phase 2 cuts over to SQLite for the desktop branch)",
-    () => {
-      (isDesktop as ReturnType<typeof vi.fn>).mockReturnValue(true);
-      createRdbCrudClient(baseSpec as never);
+  it("delegates to createSqliteCrudClient on desktop and threads the shared Supabase client through for the escape hatches", () => {
+    (isDesktop as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    createRdbCrudClient(baseSpec as never);
 
-      expect(createSupabaseCrudClient).toHaveBeenCalledTimes(1);
-      expect(createSupabaseCrudClient).toHaveBeenCalledWith(
-        expect.objectContaining({ dbClient: fakeDbClient }),
-      );
-    },
-  );
+    expect(createSqliteCrudClient).toHaveBeenCalledTimes(1);
+    expect(createSqliteCrudClient).toHaveBeenCalledWith(
+      expect.objectContaining({
+        modelName: "TestModel",
+        tableName: "test_models",
+        dbTablePrimaryKey: "id",
+        dbClient: fakeDbClient,
+      }),
+    );
+    expect(createSupabaseCrudClient).not.toHaveBeenCalled();
+  });
 });

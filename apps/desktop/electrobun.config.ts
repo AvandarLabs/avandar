@@ -17,6 +17,10 @@ const config: ElectrobunConfig = {
     },
     copy: {
       "../../dist": "web",
+      // Bundle the generated SQLite migrations alongside the app so the
+      // production main process can apply them on first launch. See
+      // `apps/desktop/main/config/migrationsDir.ts`.
+      "./migrations": "migrations",
     },
     buildFolder: "build",
     artifactFolder: "bundle",

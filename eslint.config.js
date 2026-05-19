@@ -165,6 +165,18 @@ export default [
     },
   },
   {
+    /*
+     * The desktop shell runs on Bun in the main process. Bun built-ins
+     * like `bun:sqlite` and `bun:test` aren't resolvable by the standard
+     * TS/Node import resolver, so ignore them here. Source files use
+     * `bun:sqlite`; integration tests use `bun:test`.
+     */
+    files: ["apps/desktop/**/*.{ts,tsx}"],
+    rules: {
+      "import-x/no-unresolved": ["error", { ignore: ["^bun:"] }],
+    },
+  },
+  {
     // we require import extensions for directories that will be used in
     // Deno runtimes (such as Supabase edge functions).
     files: ["shared/**/*.{ts,tsx}", "packages/shared/**/*.{ts,tsx}"],

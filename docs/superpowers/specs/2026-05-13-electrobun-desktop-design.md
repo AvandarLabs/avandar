@@ -544,3 +544,4 @@ Ordered by _likelihood × impact_.
 - macOS first, Windows next; Linux out of scope V1 and V2.
 - Auth: cached refresh token in OS keychain via Bun FFI; 30-day default offline grace.
 - V1 observability: `console.error` + JSONL local logs + in-app bug report; no third-party reporter.
+- Phase 2 Task 10 keeps `@duckdb/duckdb-wasm` in the desktop bundle. The audit found a single importer (`src/clients/DuckDbClient/DuckDbClient.ts`) whose module-load side effects make a Vite-level drop unsafe before Task 13 wraps duckdb-wasm behind `usePlatform().duckDb`. Phase 4 owns the bundle drop; V1 ships the desktop binary with the wasm bytes inert in the bundle.

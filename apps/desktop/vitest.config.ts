@@ -15,6 +15,11 @@ export default defineConfig({
       "sync/**/*.test.ts",
       "scripts/**/*.test.ts",
     ],
+    // Integration tests use `bun:sqlite` / Bun-FFI / etc. and run under
+    // `bun test` (see `test:integration` script). They live next to the
+    // unit tests with an `.integration.test.ts` suffix; vitest must
+    // skip them or it errors trying to resolve `bun:*` imports.
+    exclude: ["**/*.integration.test.ts", "**/node_modules/**"],
     globals: false,
   },
 });
