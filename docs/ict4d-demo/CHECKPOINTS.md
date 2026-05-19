@@ -948,6 +948,132 @@ Three smoke checks gate Phase 5 work:
 
 ---
 
+## Checkpoint 11 — Chat workflows Phase 5 + Phase 6 (Python) + Phase 9 + plan approval gate ✅
+
+Continuing the chat-interactive-workflows spec. This checkpoint
+lands Phase 5 (branching foundation), Phase 6 (Python sandboxed
+executor — R deferred to a follow-up), Phase 9 (canvas annotations
++ PDF/image export), and the plan-approval gate the spec called
+out but Phase 3 had silently skipped.
+
+### What shipped
+
+**Plan approval gate**
+- `PlanState.approvalStatus`: `awaiting_approval | approved | rejected`.
+  Fresh `loadPlan` lands in `awaiting_approval`; `hydratePlan` (used
+  for virtual-dataset reopen) lands in `approved`.
+- `PlanFlowView` shows an Approve / Reject banner before any step
+  runs. The auto-run effect AND the Re-run button both gate on
+  `approvalStatus === "approved"`.
+- >7-SQL-step heuristic: when a plan would need >7 SQL steps, the
+  approval banner suggests reconsidering Python / R — but the user
+  can approve as-is.
+
+**System prompt — multi-language hints**
+- `dataExplorerSystemPrefix` updated: prefer SQL even for multi-step
+  plans; reach for Python / R only for statistical work
+  (regressions, scikit-learn, statsmodels, tidyverse) or heavy
+  dataframe-style transformations.
+- Documented the sandbox calling convention: each `inputs` upstream
+  becomes a local pandas DataFrame named after its `step_<id>`;
+  step code must assign the final result to `result`.
+
+**Phase 5 — Branching**
+- New `PlanBranchStateManager` (sibling of `PlanStateManager`)
+  holding `Record<branchPlanId, BranchRecord>` + `activeBranchId`.
+  Each `BranchRecord` carries the parent plan + step ids, anchor
+  schema, anchor view name, branch title, and a (lazy-filled)
+  `plan` + `statuses` snapshot.
+- `PlanStateManager.addBranch` attaches a `PlanBranchRef` onto the
+  parent node so the node renderer can show its child branches.
+- `PlanBranchSidebar` lists Root + every branch with the active
+  one highlighted. X button closes a branch.
+- "Branch from here" CTA in the focused-step detail (only on
+  succeeded steps).
+- **Deferred** (logged in FEATURE_CHECKLIST): separate assistant-ui
+  chat thread per branch, virtual-dataset persistence of the branch
+  tree.
+
+**Phase 6 — Python + R Sandboxed Executor (Python only — R deferred)**
+- New `public/sandbox-executor.html`: same-origin iframe loaded with
+  `sandbox="allow-scripts"` (null opaque origin) and strict CSP
+  (`default-src 'none'`, `connect-src https://cdn.jsdelivr.net`,
+  every other network surface forbidden). Pre-boot stubs additionally
+  throw on `XMLHttpRequest`, `WebSocket`, `EventSource`,
+  `RTCPeerConnection`; `sendBeacon` is neutered.
+- `src/sandbox/sandboxProtocol.ts` is the single source of truth
+  for the wire format. Every request carries a `sandboxKey`
+  discriminator so rogue messages from extensions get dropped.
+- `src/sandbox/sandboxExecutor.ts` runs inside the iframe: lazy
+  loads Pyodide from jsdelivr (~10 MB), preloads `pyarrow`,
+  `pyarrow.parquet`, `pandas`, exposes `read_input(name)` /
+  `write_output(df)` helpers, and reads each input view as parquet.
+- `src/sandbox/sandboxClient.ts` is the parent-side client.
+  Mounts the iframe lazily on first call, waits for ready+boot,
+  posts `run` requests, and serialises concurrent runs (Pyodide is
+  single-threaded).
+- `executePlanStep` updated: SQL steps stay on the DuckDB-WASM
+  path; `python`/`r` steps pull each upstream view out of DuckDB as
+  parquet, dispatch to the sandbox, and bring the result back via
+  the existing `loadParquet`.
+- Default timeout: 30s per run, caller-overridable.
+- WebR is deferred to a follow-up — only Python is registered in
+  `availableRuntimes` today. R steps return an error from the
+  sandbox.
+- **NOT YET externally security-reviewed.** The iframe + CSP stack
+  is spec-correct, but per the design doc, "external security
+  review signed off" is in the Definition of Done. Gate user
+  exposure on that review.
+
+**Phase 9 — Canvas Annotation + Export (entire phase)**
+- `PlanAnnotationStateManager` with four annotation types — text,
+  sticky, arrow, stroke (perfect-freehand pen strokes).
+- `PlanCanvasToolbar` floating on the canvas top-left: Pan / Text /
+  Sticky / Arrow / Pen / Erase tools, colour swatches, undo / redo
+  (Ctrl+Z / Ctrl+Shift+Z), Export menu.
+- `PlanAnnotationOverlay` renders annotations in canvas space,
+  shares the xyflow viewport's pan/zoom transform, and gates
+  pointer events on the active tool. Pan tool → xyflow handles the
+  drag; any drawing tool → overlay captures.
+- Arrows use the same RoughJS sketch style as the auto-laid-out
+  plan edges, so user-drawn arrows visually match the AI ones.
+- 50-deep undo/redo stack with snapshot-based history.
+- `AvandarPlanAnnotationDB` Dexie database (separate from the step
+  parquet keyspace) persists annotations across reloads.
+- PNG export via `html-to-image` — toolbar / minimap / controls are
+  filtered out of the capture.
+- PDF export via dynamic-imported `@react-pdf/renderer` — page 1
+  is the overview image, then one page per step with description,
+  code, status badge, schema, row count.
+- 4 unit tests for the state manager (add / undo / redo / clear-
+  plan-only).
+
+### Testing
+
+- 27 chat-panel vitest tests passing (8 new): branch manager (4) +
+  annotation manager (4) + existing tests unchanged.
+- `tsc -b --noEmit` clean for all new code (the pre-existing
+  DashboardApp/AvaPageDataMigrationV3 errors from Checkpoint 10
+  remain; not introduced by this checkpoint).
+- `eslint .` clean.
+- `vite build` succeeds (the new chunk surfaces in the build output
+  as `PlanBranchStateManager-*.js` and `@react-pdf` lazy-imports).
+- Live verification (real LLM, real sandbox, real Pyodide load,
+  real DuckDB-WASM round-trip) still gated on the Vercel preview
+  per the constraints described in Checkpoint 10.
+
+### Deferred from Checkpoint 11 (tracked in FEATURE_CHECKLIST.md)
+
+- Phase 5: per-branch chat thread orchestration; virtual-dataset
+  persistence of branches.
+- Phase 6: WebR / R runtime; external security review; stdout/stderr
+  UI panel (currently parent-console only).
+- Phase 9: virtual-dataset persistence of annotations; per-annotation
+  drag-to-move + sticky resize handles.
+- Phase 7 (Context Compression) — not started.
+
+---
+
 ## What to do next (recommended order)
 
 1. **Live-verify Checkpoint 10 on the Vercel preview** (see "Live

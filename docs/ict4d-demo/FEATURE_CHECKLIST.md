@@ -69,10 +69,43 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started
     - [x] Phase 4 - `POST /chat/:workspaceId/regenerate-plan` endpoint with forced `regenerateSteps` tool call
     - [x] Phase 4 - Frontend regen loop: detect drift -> hit endpoint -> dispatch `replaceStepCode` -> re-run affected steps in plan order
     - [x] Phase 4 - `regenAttempts` cap (≤2 attempts per step, tracked locally per run)
-    - [ ] Phase 5 - Branching (branch a thread from any plan node; new assistant-ui thread anchored at parent node's `actualSchema`; sidebar listing of branches)
-    - [ ] Phase 6 - Python + R sandboxed executor (same-origin null-iframe + strict CSP, Pyodide + WebR lazy load, Arrow IPC bridge, `generatePython` / `generateR` tools, external security review)
+    - [~] Phase 5 - Branching
+      - [x] Phase 5 - `PlanBranchStateManager` + `BranchRecord` (parent plan id, parent step id, anchor schema/view, title, plan + status snapshot)
+      - [x] Phase 5 - `PlanBranchSidebar` shows Root + every branch; click to switch, X to close
+      - [x] Phase 5 - `addBranch` action on `PlanStateManager` attaches a branch ref to a parent node
+      - [x] Phase 5 - "Branch from here" CTA in the focused-step detail (only on succeeded steps)
+      - [x] Phase 5 - 4 unit tests for the state manager (open / switch / close / clear-all)
+      - [ ] Phase 5 - Separate assistant-ui chat thread per branch (currently the chat thread is shared; switching branches changes which plan the canvas renders but messages still feed the root). Requires assistant-ui multi-thread orchestration — follow-up.
+      - [ ] Phase 5 - Persist branches into the virtual-dataset JSONB column so reopening a saved analysis restores the branch tree.
+    - [~] Phase 6 - Python + R sandboxed executor
+      - [x] Phase 6 - Sandboxed iframe at `/sandbox-executor.html`, mounted with `sandbox="allow-scripts"` (null opaque origin) + strict CSP (`default-src 'none'`, `connect-src https://cdn.jsdelivr.net`, no XHR/WebSocket/EventSource/sendBeacon/RTCPeerConnection)
+      - [x] Phase 6 - Pre-boot network stubs (`fetch` allowlist, `XMLHttpRequest`/`WebSocket`/`EventSource`/`RTCPeerConnection` thrown) before runtime init
+      - [x] Phase 6 - Pyodide lazy load (~10 MB) from jsdelivr; `pyarrow` + `pyarrow.parquet` + `pandas` pre-imported on boot
+      - [x] Phase 6 - postMessage protocol (`sandboxProtocol.ts`) with `sandboxKey` discriminator on every request to reject rogue messages
+      - [x] Phase 6 - Parent-side `runInSandbox` client (`sandboxClient.ts`) — mounts iframe, awaits ready, queues runs sequentially
+      - [x] Phase 6 - `executePlanStep` dispatches `python`/`r` steps to the sandbox; inputs read as parquet from DuckDB, results round-tripped back as parquet via `loadParquet`
+      - [x] Phase 6 - 30-second default timeout per run with caller override
+      - [x] Phase 6 - System prompt updated: prefer SQL; >7 SQL steps should reconsider; calling conventions documented (`read_input(name)` / `result` variable / `write_output`)
+      - [ ] Phase 6 - WebR (R runtime) — only Python is wired in `sandboxExecutor.ts` (`availableRuntimes: ["python"]`). R steps return an error from the sandbox. WebR boot script needs the same lazy-load + stdlib preload treatment.
+      - [ ] Phase 6 - External security review — REQUIRED before exposing python/r to users. The iframe + CSP stack is the spec-correct foundation, but the threat model needs an independent pass (WASM escape paths, CSP bypasses, postMessage replay).
+      - [ ] Phase 6 - stdout/stderr UI — currently piped to the parent console only.
     - [ ] Phase 7 - Context compression (summariser pass, routing-decision cache, OpenRouter prompt caching, `chat_token_usage` table + dashboard)
-    - [ ] Phase 9 - Canvas annotation + export (text / arrow / sticky / pen annotations persisted in IndexedDB + onto virtual datasets; PDF + image exports). Architecture in spec; no implementation yet. Note: the previously-tracked "Phase 9 - Chat-in-dashboards (Puck-block generation)" lives under item #22 below, not as a phase of this plan.
+    - [~] Phase 9 - Canvas annotation + export
+      - [x] Phase 9 - `PlanAnnotationStateManager` with text / sticky / arrow / pen annotation types
+      - [x] Phase 9 - `PlanCanvasToolbar` with Pan / Text / Sticky / Arrow / Pen / Erase tools + colour palette + Undo / Redo (Ctrl+Z / Ctrl+Shift+Z)
+      - [x] Phase 9 - `PlanAnnotationOverlay` renders annotations in canvas-space, pans/zooms with xyflow viewport, pointer events gated by active tool
+      - [x] Phase 9 - RoughJS-styled arrows match the existing plan-edge sketch aesthetic
+      - [x] Phase 9 - `perfect-freehand` pen strokes
+      - [x] Phase 9 - 50-deep undo / redo stack
+      - [x] Phase 9 - IndexedDB persistence (`AvandarPlanAnnotationDB` Dexie database, keyed by `(planId, annotationId)`)
+      - [x] Phase 9 - PNG export via `html-to-image` (configurable pixel ratio + background; toolbar + minimap excluded from capture)
+      - [x] Phase 9 - PDF export via `@react-pdf/renderer` — page 1 is the canvas overview image, then one page per step (description + code + status + schema + row count)
+      - [x] Phase 9 - 4 unit tests for the state manager (add / undo / redo / clear-plan-only)
+      - [ ] Phase 9 - Save annotations into the virtual-dataset JSONB column so reopening a dataset restores the annotations alongside the plan. Currently annotations stay in IndexedDB (per device).
+      - [ ] Phase 9 - Per-annotation drag-to-move handles (current overlay supports create + delete; moving requires the user to delete + redraw).
+      - [ ] Phase 9 - Sticky-note resize handles.
+    - [x] Plan approval gate - Plans land in `awaiting_approval` and the user must approve before any step runs. Includes a >7-SQL-step hint that suggests reconsidering Python / R.
+    - [x] Multi-language plans - The `proposePlan` tool's `type` enum accepts `sql | python | r | clarification`; executor dispatches by type so a plan can mix languages freely.
     - [ ] Cross-cutting - 50-question eval harness with correctness + clarification-count + token-spend scoring
     - [ ] Cross-cutting - System prompt versioning with prompt-version label round-tripped to client
     - [ ] Cross-cutting - avandarlabs.com privacy page copy (sandboxing + PII + bias detection)

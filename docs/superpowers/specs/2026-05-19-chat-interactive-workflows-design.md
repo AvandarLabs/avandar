@@ -13,12 +13,12 @@ The checklist file is the granular source of truth. Quick snapshot:
 | 0 — PII + Bias Foundation | ~95% | `containsHealthData` workspace UI; opt-in `shareAnonymousPrivacyMetrics` setting; server-issued ack-token nonce registry (in-memory today) |
 | 1 — Basic Clarifications | ~95% | Silent bias re-prompt loop (currently warns only); 20-question ambiguous-question eval set |
 | 2 — Discovery Clarifications | ~90% | Ack-token signing for `values` scope (text scope is signed end-to-end; `values` is accept-on-presence); "Edit selection" hook on the consent modal |
-| 3 — Plans + DAG | done | Viz **thumbnails** on each plan node (currently shows schema text, not mini-charts) |
+| 3 — Plans + DAG | done | Plan approval gate added (user must approve before any step runs). Viz **thumbnails** on each plan node (currently shows schema text, not mini-charts) |
 | 4 — Schema-Drift Regen | done | — |
-| 5 — Branching | not started | All. Spec architecture below. |
-| 6 — Python + R Executor | not started | All. Spec architecture below. Security-critical, needs external review. |
+| 5 — Branching | partial | Branch state manager + sidebar + "Branch from here" CTA shipped. Missing: separate chat thread per branch (assistant-ui multi-thread orchestration), virtual-dataset persistence of the branch tree. |
+| 6 — Python + R Executor | partial | Sandboxed iframe + CSP + Pyodide + Arrow IPC bridge shipped. Missing: WebR (R) runtime, external security review (REQUIRED before user exposure), stdout/stderr UI. |
 | 7 — Context Compression | not started | All. Spec architecture below. |
-| 9 — Annotation + Export | doc only | All. Spec architecture at the bottom of this doc. |
+| 9 — Annotation + Export | partial | Text/sticky/arrow/pen annotations + IndexedDB persistence + PNG (html-to-image) + multi-page PDF (@react-pdf) shipped. Missing: virtual-dataset persistence of annotations, drag-to-move handles, sticky resize. |
 
 Cross-cutting gaps that aren't tied to a single phase:
 - 50-question eval harness with correctness + clarification-count + token-spend scoring
