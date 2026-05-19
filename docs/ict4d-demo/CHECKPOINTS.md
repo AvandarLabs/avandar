@@ -74,14 +74,14 @@ Plan at `docs/superpowers/plans/2026-05-13-electrobun-desktop-phase-2-native-lay
 is **4,298 lines**. The session container cannot build, sign, or test native
 desktop binaries, so any work here would be type-only and unverifiable.
 
-### Local Whisper voice dictation (item #8, #19) — **web shipped in Checkpoint 11**
+### Local Whisper voice dictation (item #8, #19) — **shipped (web + desktop) in Checkpoints 11–12**
 6 languages including Swahili and Chinese, working offline on 8 GB-RAM
-machines, in both web (transformers.js) and desktop (lazy download). The
-**web side now ships** (see Checkpoint 11 below) with model selection,
-microphone capture, in-progress transcription UI, IndexedDB-backed weight
-cache, and offline-by-default operation after first download. **Desktop
-parity is still deferred** — it depends on Desktop Phase 2 landing first,
-so the lazy-download path can be wired into the native shell.
+machines. Both surfaces now ship: web via `@huggingface/transformers`
+with IndexedDB-backed weights (Checkpoint 11), and desktop via
+`smart-whisper` (whisper.cpp/N-API) running in the Bun-main process with
+disk-backed weights (Checkpoint 12). The desktop path also unlocks the
+larger Medium / Large v3 / Large v3 Turbo models, which the web build
+intentionally lists as disabled-with-tooltip.
 
 ### PDF / image dataset types with handwriting OCR (item #28)
 "Turn a hand-drawn table or hand-filled form into a CSV." Annotation UI
@@ -1236,6 +1236,96 @@ Analytics: new `dashboard.pdf_export_opened` event registered in
 - Multi-page PDF export with a tall dashboard — paginator splits at
   pixel rows, so charts that cross a page boundary may look cut.
   Acceptable for the demo; a chart-aware page break is a follow-up.
+
+---
+
+## Checkpoint 12 — Voice dictation on desktop (whisper.cpp via smart-whisper) ✅
+
+Now that Phase 2's IPC + service plumbing exists in the desktop shell,
+voice dictation gets a native path that doesn't pay the
+transformers.js / onnxruntime-web tax. The webview keeps the exact same
+mic button and download-prompt UX — under the hood it transparently
+routes to whichever manager backs the current platform.
+
+### What shipped
+
+- **`WhisperService` in `apps/desktop/main/services/createWhisperService/`** —
+  thin wrapper around `smart-whisper` (whisper.cpp via N-API). Model
+  weights cached on disk under `<userData>/whisper-models/`; the
+  downloader is a streaming `fetch` against the public
+  `ggerganov/whisper.cpp` Hugging Face repo (we deliberately bypass
+  `smart-whisper`'s built-in download so we get progress callbacks +
+  control over the cache directory). Writes to `*.partial` first and
+  renames on success so a half-written file can never be mistaken for a
+  complete model.
+- **IPC contracts in `shared/platform/ipc/contracts/VoiceContracts.ts`** —
+  `voice.listDownloadedModels`, `voice.isModelDownloaded`,
+  `voice.downloadModel`, `voice.getStatus`, `voice.transcribe`. Audio
+  travels webview → main as `Array<number>` (Float32 PCM); for a typical
+  30-second prompt that's well within the JSON envelope budget.
+- **Handler registration** in
+  `apps/desktop/main/ipc/registerVoiceHandlers/`. Mirrors the
+  `registerDuckDbHandlers` and `registerRdbHandlers` files; downloads
+  are kicked off as fire-and-forget so the webview can poll for
+  progress.
+- **`DesktopVoiceModelManager` in `src/lib/voice/`** — implements the
+  shared `IVoiceModelManager` interface, calls IPC, and polls
+  `voice.getStatus` every 500 ms while downloads are in flight. Same
+  status pub/sub surface as the web manager so the existing floating
+  progress indicator + mic button work unchanged.
+- **Platform-aware factory** (`voiceModelManagerFactory.ts`). React code
+  imports `getVoiceModelManager()` and gets the right backend for the
+  current runtime — no per-component branching.
+- **Bigger model catalogue.** `voiceModels.ts` now lists Whisper Medium
+  (~1.5 GB), Large v3 (~3.1 GB), and Large v3 Turbo (~1.6 GB) with a
+  `desktopOnly: true` flag. The web UI still renders the options in the
+  model select but shows them disabled with the tooltip "These are too
+  big for web and are only available on Avandar Desktop". On web, a
+  previously-stored desktop-only selection falls back to the default
+  model automatically.
+- **`smart-whisper` added as a desktop dependency** (`apps/desktop/package.json`).
+  Pulled in lazily (`await import("smart-whisper")`) on first use so a
+  missing prebuild can't take the app down at boot.
+- **Wiring in `apps/desktop/main/index.ts`** — service constructed at
+  startup, models dir resolved from `<userData>/whisper-models` (overridable
+  via `AVA_WHISPER_MODELS_DIR`), and `whisperSvc.close()` called on
+  `beforeQuit`.
+- **Tests**: 6 cases against `createWhisperService` (file presence
+  detection, download progress, transcribe, missing model rejection,
+  partial-file cleanup on error, unknown model id), 3 cases against
+  `registerVoiceHandlers` (list / download-fire-and-return /
+  transcribe-with-Float32-roundtrip), 6 cases against
+  `DesktopVoiceModelManager` (short-circuit, polling-to-ready,
+  polling-to-error, transcribe, language auto, IPC error tolerance),
+  and 2 cases against the platform-aware factory. All green.
+
+### Verification still pending
+
+- **Native build** of `smart-whisper` from a fresh `pnpm install` —
+  the package uses `node-addon-api` and builds whisper.cpp on
+  install. The session container couldn't exercise this; manual
+  verification on macOS / Linux desktop builds is required.
+- **Live desktop download** of a multi-GB Large v3 weight from
+  Hugging Face. The HTTP path is just `fetch` so it should Just
+  Work, but we haven't ground-truthed end-to-end.
+- **Electrobun ↔ `createIpcServer` bridge.** The handler-registration
+  files exist (DuckDB, RDB, Voice) but none of them are actually
+  registered against an active webview transport in
+  `apps/desktop/main/index.ts` yet. The wiring needs to land before
+  any of these IPC paths come alive at runtime — once it does, all
+  three handler groups light up together.
+
+### Still deferred
+
+- **GPU acceleration** for whisper.cpp. `smart-whisper` accepts
+  `{ gpu: true }`; we pass `false` for now because builds with
+  CUDA / Metal turned on require platform-specific toolchains. The
+  ggml CPU path is fast enough for prompt-length clips even on
+  Medium / Large v3.
+- **Model deletion UI.** Users can delete a downloaded model by
+  removing the `.bin` file in `whisper-models/`, but there's no
+  in-app button. Worth adding once we have a real "Voice settings"
+  panel.
 
 ---
 

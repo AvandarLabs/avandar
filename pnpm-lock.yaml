@@ -460,6 +460,9 @@ importers:
       electrobun:
         specifier: latest
         version: 1.18.1
+      smart-whisper:
+        specifier: ^0.8.1
+        version: 0.8.1
     devDependencies:
       typescript:
         specifier: ~5.9.3
@@ -8209,6 +8212,9 @@ packages:
   smart-buffer@4.2.0:
     resolution: {integrity: sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==}
     engines: {node: '>= 6.0.0', npm: '>= 3.0.0'}
+
+  smart-whisper@0.8.1:
+    resolution: {integrity: sha512-0DnhD6Hq7kTpWAJxv057o8rkcZ2Sv2/ZpJZJjj/DT+8Ll/zH5EHQM1lSwk+W15AvfDPD3K2ku+MD2KCXD51z5A==}
 
   socket.io-adapter@2.5.6:
     resolution: {integrity: sha512-DkkO/dz7MGln0dHn5bmN3pPy+JmywNICWrJqVWiVOyvXjWQFIv9c2h24JrQLLFJ2aQVQf/Cvl1vblnd4r2apLQ==}
@@ -17189,6 +17195,10 @@ snapshots:
       is-fullwidth-code-point: 3.0.0
 
   smart-buffer@4.2.0: {}
+
+  smart-whisper@0.8.1:
+    dependencies:
+      node-addon-api: 7.1.1
 
   socket.io-adapter@2.5.6:
     dependencies:

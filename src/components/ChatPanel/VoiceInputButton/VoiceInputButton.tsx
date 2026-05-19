@@ -13,6 +13,7 @@ import { IconMicrophone, IconMicrophoneOff } from "@tabler/icons-react";
 import { Tooltip } from "@ui";
 import clsx from "clsx";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";
 import { startMicrophoneRecording } from "@/lib/voice/audioCapture";
 import { useVoiceModelManager } from "@/lib/voice/useVoiceModelManager";
 import {
@@ -69,6 +70,8 @@ type Props = {
 export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
   const composerRuntime = useComposerRuntime();
   const manager = useVoiceModelManager();
+  const platform = usePlatformInfo();
+  const isDesktopPlatform = platform === "desktop";
   const [language, setLanguage] = useState<VoiceLanguageCode>(() => {
     return readStoredLanguage();
   });
@@ -80,6 +83,18 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const recorderRef = useRef<AudioRecorder | null>(null);
+
+  // If a previous desktop session picked a desktop-only model, drop back
+  // to the default once the web build loads — the user can't run it here.
+  useEffect(() => {
+    if (isDesktopPlatform) {
+      return;
+    }
+    const current = findVoiceModel(selectedModelId);
+    if (current.desktopOnly) {
+      setSelectedModelId(DEFAULT_VOICE_MODEL_ID);
+    }
+  }, [isDesktopPlatform, selectedModelId]);
 
   // Whenever the selected model changes, re-check whether we already have it
   // cached locally so we can skip the download prompt next time.
@@ -262,8 +277,44 @@ export function VoiceInputButton({ disabled = false }: Props): JSX.Element {
               return {
                 value: model.id,
                 label: `${model.displayName} (~${model.approxSizeMb} MB)`,
+                disabled: model.desktopOnly && !isDesktopPlatform,
               };
             })}
+            renderOption={({ option, checked }) => {
+              const model = VOICE_MODELS.find((m) => {
+                return m.id === option.value;
+              });
+              const disabledForWeb =
+                model?.desktopOnly === true && !isDesktopPlatform;
+              if (!disabledForWeb) {
+                return (
+                  <Group justify="space-between" w="100%" wrap="nowrap">
+                    <Text size="sm">{option.label}</Text>
+                    {checked ?
+                      <Text size="xs" c="primary">
+                        Selected
+                      </Text>
+                    : null}
+                  </Group>
+                );
+              }
+              return (
+                <Tooltip
+                  label="These are too big for web and are only available on Avandar Desktop"
+                  position="right"
+                  withinPortal
+                >
+                  <Group justify="space-between" w="100%" wrap="nowrap">
+                    <Text size="sm" c="neutral.5">
+                      {option.label}
+                    </Text>
+                    <Text size="xs" c="neutral.6">
+                      Desktop only
+                    </Text>
+                  </Group>
+                </Tooltip>
+              );
+            }}
           />
 
           <Select

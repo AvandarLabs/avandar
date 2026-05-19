@@ -1,13 +1,14 @@
 import { useSyncExternalStore } from "react";
-import { getVoiceModelManager } from "./VoiceModelManager";
 import type {
+  IVoiceModelManager,
   VoiceManagerStatus,
-  VoiceModelManager,
-} from "./VoiceModelManager";
+} from "./voiceManagerInterface";
+import { getVoiceModelManager } from "./voiceModelManagerFactory";
 
 /**
- * Subscribes to the singleton `VoiceModelManager`'s status updates.
- * Components re-render whenever the status changes.
+ * Subscribes to the active voice-model manager's status updates. Works on
+ * both web and desktop because both implementations satisfy
+ * `IVoiceModelManager`. Components re-render whenever the status changes.
  */
 export function useVoiceModelStatus(): VoiceManagerStatus {
   const manager = getVoiceModelManager();
@@ -26,6 +27,6 @@ export function useVoiceModelStatus(): VoiceManagerStatus {
   );
 }
 
-export function useVoiceModelManager(): VoiceModelManager {
+export function useVoiceModelManager(): IVoiceModelManager {
   return getVoiceModelManager();
 }

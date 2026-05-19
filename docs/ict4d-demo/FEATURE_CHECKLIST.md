@@ -80,9 +80,10 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started · `[—]` 
 - [x] **5. Install `node-sql-parser`; best-effort SQL → manual query form parsing** (Data Explorer only; supports SELECT / GROUP BY / ORDER BY / WHERE / HAVING / JOIN / nested subqueries. See `docs/demo-features/sql-parser-filter-ui.md`. Dashboards still pending.)
 - [~] **6. Bidirectional SQL ↔ manual-query-form sync** (Data Explorer: knex-based form → SQL regeneration + lossy-mapping warning + overwrite-confirmation flow. Dashboards still pending.)
 - [ ] **7. Tokenize generated SQL / Python / R — column names + dataset IDs as clickable pills**
-- [~] **8. Multilingual voice dictation in chat panel (Whisper / transformers.js, 6 languages)**
-  - Web only for now. Mic icon next to the model picker; first click prompts to download a Whisper model from Hugging Face (tiny / base / small). Model weights stream into an IndexedDB-backed cache (no OPFS). A floating bottom-left progress indicator shows `Downloading <model> for voice prompting` with %; toast appears on success. Subsequent clicks record from the mic, run Whisper locally, and inject the transcript into the composer. 6 languages surfaced in the UI (English, Spanish, French, Portuguese, Swahili, Chinese) plus auto-detect.
-  - Desktop integration intentionally deferred. Models are local; no API tokens needed.
+- [x] **8. Multilingual voice dictation in chat panel (Whisper, 6 languages, web + desktop)**
+  - **Web** uses `@huggingface/transformers` (ONNX). Mic icon next to the model picker; first click prompts to download a Whisper model from Hugging Face. Model weights stream into an IndexedDB-backed cache (no OPFS). A floating bottom-left progress indicator shows `Downloading <model> for voice prompting` with %; toast appears on success. Subsequent clicks record from the mic, run Whisper locally, and inject the transcript into the composer. Web build offers tiny / base / small.
+  - **Desktop** uses `smart-whisper` (whisper.cpp via N-API) running in the Bun-main process; weights cached on disk under `<userData>/whisper-models/` so the user can download once and stay offline forever. Adds Medium, Large v3, and Large v3 Turbo to the model picker — those three are gated to Desktop and rendered disabled-with-tooltip in the web build ("These are too big for web and are only available on Avandar Desktop"). React side talks to main via typed IPC contracts (`VoiceContracts.*`); download progress is polled (~500 ms) from `voice.getStatus`.
+  - 6 languages surfaced in the UI (English, Spanish, French, Portuguese, Swahili, Chinese) plus auto-detect. No API tokens needed.
 - [x] **9. Redesigned dataset Summary view (visualizations, lazy-load, scroll-on-demand)**
   - Doc-style outline with sticky TOC on the left, plain-language headline per column, type-appropriate viz beneath (bar for text top values, range+stddev for numbers, timeline for dates), missing-rate ring when nonzero.
   - Lazy-loaded per column: `getColumnSummary` only fires when a section is within 200px of the viewport.
@@ -124,7 +125,7 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started · `[—]` 
     everything else → enum).
 - [x] **18. Make dashboard "View" button work before "Publish"**
   - New auth-gated preview route at `/<workspaceSlug>/dashboards/preview/<dashboardId>` shows the read-only render with a "Back to editor" banner. Public route at `/public/dashboards/...` still enforces `isPublic`.
-- [~] **19. Everything still works in Desktop + offline mode** — requires items #2 and #8 first
+- [~] **19. Everything still works in Desktop + offline mode** — voice (item #8) now has a desktop path via `smart-whisper`; remaining gaps tracked under item #2 (Desktop Phase 2 finishing).
 - [~] **20. Manual querying works offline (LLM queries don't, but manual must)** — manual query form already works locally; needs verification once dashboard work lands
 - [ ] **21. Manual query form available inside dashboards**
 - [x] **22. Chat panel works inside dashboards — produces Puck blocks (P-blocks)**

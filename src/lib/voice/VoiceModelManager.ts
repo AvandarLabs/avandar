@@ -11,6 +11,11 @@ import {
 } from "./voiceModelStore";
 import type { VoiceModelCache } from "./voiceModelCache";
 import type {
+  IVoiceModelManager,
+  VoiceManagerListener,
+  VoiceManagerStatus as SharedVoiceManagerStatus,
+} from "./voiceManagerInterface";
+import type {
   VoiceLanguageCode,
   VoiceModel,
   VoiceModelId,
@@ -54,20 +59,9 @@ type PipelineBuilderFn = (
   },
 ) => Promise<ASRPipelineFn>;
 
-export type VoiceManagerStatus =
-  | { kind: "idle" }
-  | {
-      kind: "downloading";
-      modelId: VoiceModelId;
-      /** 0–100. -1 means "indeterminate / starting". */
-      progressPercent: number;
-      currentFile?: string;
-    }
-  | { kind: "ready"; modelId: VoiceModelId }
-  | { kind: "transcribing"; modelId: VoiceModelId }
-  | { kind: "error"; modelId?: VoiceModelId; message: string };
+export type VoiceManagerStatus = SharedVoiceManagerStatus;
 
-type Listener = (status: VoiceManagerStatus) => void;
+type Listener = VoiceManagerListener;
 
 type ManagerDependencies = {
   /**
@@ -101,7 +95,7 @@ const PRODUCTION_DEPENDENCIES: ManagerDependencies = {
   },
 };
 
-export class VoiceModelManager {
+export class VoiceModelManager implements IVoiceModelManager {
   private status: VoiceManagerStatus = { kind: "idle" };
 
   private readonly listeners = new Set<Listener>();
@@ -301,8 +295,12 @@ function modelCachePrefix(model: VoiceModel): string {
 
 let singleton: VoiceModelManager | null = null;
 
-/** Returns the process-wide manager singleton. */
-export function getVoiceModelManager(): VoiceModelManager {
+/**
+ * Returns the process-wide manager singleton for the **web** runtime. The
+ * platform-aware factory is `getVoiceModelManager` in
+ * `voiceModelManagerFactory.ts`; use that from React code.
+ */
+export function getWebVoiceModelManager(): VoiceModelManager {
   if (!singleton) {
     singleton = new VoiceModelManager();
   }

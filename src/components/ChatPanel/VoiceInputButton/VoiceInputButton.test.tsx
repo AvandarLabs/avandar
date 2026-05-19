@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
 import { VoiceInputButton } from "./VoiceInputButton";
@@ -12,6 +12,24 @@ const composerGetState = vi.fn().mockReturnValue({ text: "" });
 const ensureModelLoadedMock = vi.fn().mockResolvedValue(undefined);
 const isModelDownloadedMock = vi.fn().mockResolvedValue(false);
 const transcribeMock = vi.fn().mockResolvedValue("hello world");
+
+const { notificationShowMock } = vi.hoisted(() => {
+  return { notificationShowMock: vi.fn() };
+});
+
+vi.mock("@mantine/notifications", async () => {
+  const actual =
+    await vi.importActual<typeof import("@mantine/notifications")>(
+      "@mantine/notifications",
+    );
+  return {
+    ...actual,
+    notifications: {
+      ...actual.notifications,
+      show: notificationShowMock,
+    },
+  };
+});
 
 vi.mock("@assistant-ui/react", () => {
   return {
@@ -59,6 +77,7 @@ describe("VoiceInputButton", () => {
     ensureModelLoadedMock.mockClear();
     isModelDownloadedMock.mockClear();
     transcribeMock.mockClear();
+    notificationShowMock.mockClear();
     window.localStorage.clear();
   });
 
@@ -122,6 +141,71 @@ describe("VoiceInputButton", () => {
     });
 
     expect(ensureModelLoadedMock).toHaveBeenCalledWith("whisper-tiny");
+  });
+
+  it("fires a success toast when the download completes", async () => {
+    isModelDownloadedMock.mockResolvedValueOnce(false);
+    ensureModelLoadedMock.mockResolvedValueOnce(undefined);
+    render(
+      <AvandarUiProvider>
+        <VoiceInputButton />
+      </AvandarUiProvider>,
+    );
+
+    await act(async () => {
+      fireEvent.click(
+        await screen.findByRole("button", {
+          name: /set up voice prompting/i,
+        }),
+      );
+    });
+    await act(async () => {
+      fireEvent.click(
+        await screen.findByRole("button", { name: /download & enable/i }),
+      );
+    });
+
+    await waitFor(() => {
+      expect(notificationShowMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: "Voice model ready",
+          color: "success",
+        }),
+      );
+    });
+  });
+
+  it("fires a danger toast when the download fails", async () => {
+    isModelDownloadedMock.mockResolvedValueOnce(false);
+    ensureModelLoadedMock.mockRejectedValueOnce(new Error("disk full"));
+    render(
+      <AvandarUiProvider>
+        <VoiceInputButton />
+      </AvandarUiProvider>,
+    );
+
+    await act(async () => {
+      fireEvent.click(
+        await screen.findByRole("button", {
+          name: /set up voice prompting/i,
+        }),
+      );
+    });
+    await act(async () => {
+      fireEvent.click(
+        await screen.findByRole("button", { name: /download & enable/i }),
+      );
+    });
+
+    await waitFor(() => {
+      expect(notificationShowMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: "Voice model download failed",
+          color: "danger",
+          message: "disk full",
+        }),
+      );
+    });
   });
 
   it("disables the button when the disabled prop is set", () => {

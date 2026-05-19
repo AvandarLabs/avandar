@@ -6,6 +6,7 @@ import { resolveWebviewUrl } from "./config/url";
 import { setupApplicationMenu } from "./menu/setupApplicationMenu";
 import { getUserDataDir } from "./platform/getUserDataDir";
 import { createDuckDbService } from "./services/createDuckDbService/createDuckDbService";
+import { createWhisperService } from "./services/createWhisperService/createWhisperService";
 import { loadMigrationsFromDir } from "./services/loadMigrations/loadMigrations";
 import { bootstrapSnapshotIfNeeded } from "./services/SnapshotBootstrap/SnapshotBootstrap";
 import {
@@ -63,6 +64,20 @@ const duckdbPath =
 const duckdbSvc = createDuckDbService(duckdbPath);
 
 console.log(`[avandar-desktop] duckdb ready at ${duckdbPath}`);
+
+// Native Whisper service. Model weights live on disk under
+// `<userData>/whisper-models/` so the user can download the larger
+// (multi-GB) ggml models once and run fully offline thereafter. The
+// `smart-whisper` native binding is loaded lazily on first download or
+// transcribe call so a missing prebuild doesn't take the app down at
+// boot — voice is an optional feature and the rest of the shell should
+// stay functional without it.
+const whisperModelsDir =
+  process.env.AVA_WHISPER_MODELS_DIR ??
+  join(userDataDir, "whisper-models");
+const whisperSvc = createWhisperService({ modelsDir: whisperModelsDir });
+
+console.log(`[avandar-desktop] whisper models dir: ${whisperModelsDir}`);
 
 // Stopgap snapshot bootstrap: when a dev token + Supabase URL/key are
 // configured, pull every syncable table from Supabase REST into the
@@ -129,5 +144,8 @@ console.log(`[avandar-desktop] webview loaded ${url}`);
 app.on("beforeQuit", () => {
   duckdbSvc.close().catch((err: unknown) => {
     console.error("[avandar-desktop] duckdb close failed:", err);
+  });
+  whisperSvc.close().catch((err: unknown) => {
+    console.error("[avandar-desktop] whisper close failed:", err);
   });
 });
