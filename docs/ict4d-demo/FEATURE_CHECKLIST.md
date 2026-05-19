@@ -42,10 +42,10 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started
     - [x] Phase 1 — Bias check on LLM clarification questions (logs, doesn't block in v1)
     - [x] Phase 1 — Clarification audit table + telemetry (separate Dexie DB)
     - [ ] Phase 1 — Eval set (20 ambiguous questions, ≥80% resolution target)
-    - [ ] Phase 2 — Discovery clarifications (`discovery` response shape)
-    - [ ] Phase 3 — `proposePlan` + xyflow DAG view
+    - [x] Phase 2 — Discovery clarifications (`discovery` response shape; user picks from a local-DB-driven dropdown that routes through `crossBoundary`)
+    - [x] Phase 3 — `proposePlan` tool + xyflow DAG view (multi-step plans with per-step canvas; temp-view lifecycle managed via `PlanStateManager`)
     - [ ] Phase 4 — Schema-drift regen
-    - [ ] Phase 5 — Branching
+    - [ ] Phase 5 — Branching (branch a thread from any plan node)
     - [ ] Phase 6 — Python + R sandboxed executor
     - [ ] Phase 7 — Context compression
 - [x] **5. Install `node-sql-parser`; best-effort SQL → manual query form parsing** (Data Explorer only; see `docs/demo-features/sql-parser-filter-ui.md`. Dashboards still pending.)
