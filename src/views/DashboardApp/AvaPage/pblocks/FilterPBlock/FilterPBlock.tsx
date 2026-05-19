@@ -1,6 +1,6 @@
 import { MultiSelect, Select, Stack, Text, TextInput } from "@mantine/core";
-import { useEffect, useMemo } from "react";
 import { Paper } from "@ui";
+import { useEffect, useMemo } from "react";
 import { logAnalyticsEvent } from "@/lib/analytics/analyticsClient";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 
@@ -95,8 +95,8 @@ export function FilterPBlock(props: FilterPBlockProps): JSX.Element {
     return (
       <Paper withBorder p="md">
         <Text c="dimmed" fz="sm">
-          Configure this filter: set its id, label, and column name in the
-          side panel.
+          Configure this filter: set its id, label, and column name in the side
+          panel.
         </Text>
       </Paper>
     );

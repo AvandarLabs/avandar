@@ -17,8 +17,8 @@ import { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
-import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import { getDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/getDashboardPuckConfig";
+import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import { useEnsurePublishedDashboardDatasets } from "@/views/DashboardApp/DashboardViewerView/useEnsurePublishedDashboardDatasets";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
@@ -130,47 +130,51 @@ export function DashboardViewerView({
 
   return (
     <DashboardFilterStateManager.Provider>
-    <Box>
-      {mode === "preview" && workspaceSlug ?
-        <Group
-          gap="xs"
-          justify="space-between"
-          px="md"
-          py="xs"
-          style={{
-            borderBottom: "1px solid var(--ava-border-default)",
-            backgroundColor: "var(--mantine-color-blue-0)",
-          }}
-        >
-          <Group gap="xs">
-            <IconEye size={16} color="var(--mantine-color-blue-7)" />
-            <Text size="sm" c="blue.9" fw={500}>
-              Previewing this dashboard
-            </Text>
-            <Text size="xs" c="dimmed">
-              {dashboard.isPublic ?
-                "This dashboard is published publicly."
-              : "Not yet published. Public viewers will not see this."}
-            </Text>
-          </Group>
-          <Button
-            size="compact-sm"
-            variant="outline"
-            color="neutral"
-            leftSection={<IconArrowLeft size={14} />}
-            onClick={() => {
-              navigate({
-                to: "/$workspaceSlug/dashboards/edit/$dashboardId",
-                params: { workspaceSlug, dashboardId: dashboard.id },
-              });
+      <Box>
+        {mode === "preview" && workspaceSlug ?
+          <Group
+            gap="xs"
+            justify="space-between"
+            px="md"
+            py="xs"
+            style={{
+              borderBottom: "1px solid var(--ava-border-default)",
+              backgroundColor: "var(--mantine-color-blue-0)",
             }}
           >
-            Back to editor
-          </Button>
-        </Group>
-      : null}
-      <PuckPageRender config={config} data={data} metadata={avaPageMetadata} />
-    </Box>
+            <Group gap="xs">
+              <IconEye size={16} color="var(--mantine-color-blue-7)" />
+              <Text size="sm" c="blue.9" fw={500}>
+                Previewing this dashboard
+              </Text>
+              <Text size="xs" c="dimmed">
+                {dashboard.isPublic ?
+                  "This dashboard is published publicly."
+                : "Not yet published. Public viewers will not see this."}
+              </Text>
+            </Group>
+            <Button
+              size="compact-sm"
+              variant="outline"
+              color="neutral"
+              leftSection={<IconArrowLeft size={14} />}
+              onClick={() => {
+                navigate({
+                  to: "/$workspaceSlug/dashboards/edit/$dashboardId",
+                  params: { workspaceSlug, dashboardId: dashboard.id },
+                });
+              }}
+            >
+              Back to editor
+            </Button>
+          </Group>
+        : null}
+        <PuckPageRender
+          config={config}
+          data={data}
+          metadata={avaPageMetadata}
+        />
+      </Box>
     </DashboardFilterStateManager.Provider>
   );
 }

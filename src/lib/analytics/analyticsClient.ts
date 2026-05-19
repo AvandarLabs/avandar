@@ -1,10 +1,10 @@
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
-import type { Workspace } from "$/models/Workspace/Workspace";
 import type {
   AnalyticsApp,
   AnalyticsEventName,
   AnalyticsEventPayload,
 } from "@/lib/analytics/analyticsEventTypes";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 type LogEventOptions = {
   event: AnalyticsEventName;

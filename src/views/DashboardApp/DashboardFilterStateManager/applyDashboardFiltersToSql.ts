@@ -42,8 +42,9 @@ function _filterToWhereClause(
   const col = _quoteSqlIdentifier(filter.columnName);
 
   if (filter.operator === "in") {
-    const values: ReadonlyArray<string | number> = Array.isArray(filter.value)
-      ? filter.value
+    const values: ReadonlyArray<string | number> =
+      Array.isArray(filter.value) ?
+        filter.value
       : [filter.value as string | number];
     const formatted = values
       .map((v) => {

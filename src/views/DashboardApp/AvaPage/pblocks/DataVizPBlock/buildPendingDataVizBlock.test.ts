@@ -16,7 +16,7 @@ describe("buildPendingDataVizBlock", () => {
     const nlQuery = props.nlQuery as {
       prompt: string;
       rawSql: string;
-      generations: ReadonlyArray<unknown>;
+      generations: readonly unknown[];
     };
     expect(nlQuery.prompt).toBe("Monthly revenue");
     expect(nlQuery.rawSql).toBe(

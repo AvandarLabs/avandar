@@ -13,8 +13,7 @@ export function Composer(): JSX.Element {
   const disabled = !isChatEnabled;
 
   const placeholder =
-    context.app === "dashboards" ?
-      "Ask me to add a chart to this dashboard..."
+    context.app === "dashboards" ? "Ask me to add a chart to this dashboard..."
     : context.app === "data-explorer" ? "Ask about your data..."
     : "Chat is enabled in Data Explorer and Dashboards";
 

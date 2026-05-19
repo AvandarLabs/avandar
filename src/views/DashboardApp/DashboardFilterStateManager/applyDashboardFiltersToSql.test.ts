@@ -99,9 +99,7 @@ describe("applyDashboardFiltersToSql", () => {
   it("escapes single quotes in literal values", () => {
     const result = applyDashboardFiltersToSql({
       sql: "SELECT * FROM t",
-      filters: [
-        { ...FILTER_REGION_EQUALS, value: "O'Reilly" },
-      ],
+      filters: [{ ...FILTER_REGION_EQUALS, value: "O'Reilly" }],
     });
     expect(result).toBe(
       `SELECT * FROM (SELECT * FROM t) AS _ava_filtered WHERE "region" = 'O''Reilly'`,

@@ -13,7 +13,6 @@ import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migratio
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
-import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import { DeleteDashboardButton } from "@/views/DashboardApp/DashboardEditorView/DeleteDashboardButton";
 import {
   getDashboardPuckConfig,
@@ -22,6 +21,7 @@ import {
 import { PublishDashboardButton } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardButton";
 import { SaveDashboardButton } from "@/views/DashboardApp/DashboardEditorView/SaveDashboardButton";
 import { ViewDashboardButton } from "@/views/DashboardApp/DashboardEditorView/ViewDashboardButton";
+import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 
@@ -163,66 +163,66 @@ export function DashboardEditorView({
 
   return (
     <DashboardFilterStateManager.Provider>
-    <AppLayout floatingToolbar>
-      <Flex direction="column" h="100%">
-        {isShareOnlyAccess ?
-          <Alert color="blue" variant="light" title="Shared with you" m="sm">
-            <Text size="sm">
-              You can view this dashboard because it was shared with you.
-              {isFlagEnabled(FeatureFlag.EnableSharedWithMe) ?
-                <>
-                  {" "}
-                  <Link
-                    to="/$workspaceSlug/shared-with-me"
-                    params={{ workspaceSlug }}
-                  >
-                    See all shared items
-                  </Link>
-                </>
-              : null}
-            </Text>
-          </Alert>
-        : null}
-        <Puck
-          key={editorKey}
-          metadata={avaPageMetadata}
-          config={puckConfig}
-          height="100%"
-          data={data}
-          onChange={(d: Data) => {
-            setData(d as AvaPageData);
-            setHasUnsavedChanges(true);
-          }}
-          overrides={{
-            headerActions: () => {
-              return (
-                <>
-                  <SaveDashboardButton onSave={onSave} />
-                  <ShareResourceButton
-                    resourceName={dashboardTitle}
-                    resourceType="dashboard"
-                    resourceId={dashboard.id}
-                  />
-                  <ViewDashboardButton
-                    workspaceSlug={workspaceSlug}
-                    dashboardId={dashboard.id}
-                    hasUnsavedChanges={hasUnsavedChanges}
-                  />
-                  <PublishDashboardButton
-                    dashboard={dashboard}
-                    hasUnsavedChanges={hasUnsavedChanges}
-                  />
-                  <DeleteDashboardButton
-                    workspaceSlug={workspaceSlug}
-                    dashboardId={dashboard.id}
-                  />
-                </>
-              );
-            },
-          }}
-        />
-      </Flex>
-    </AppLayout>
+      <AppLayout floatingToolbar>
+        <Flex direction="column" h="100%">
+          {isShareOnlyAccess ?
+            <Alert color="blue" variant="light" title="Shared with you" m="sm">
+              <Text size="sm">
+                You can view this dashboard because it was shared with you.
+                {isFlagEnabled(FeatureFlag.EnableSharedWithMe) ?
+                  <>
+                    {" "}
+                    <Link
+                      to="/$workspaceSlug/shared-with-me"
+                      params={{ workspaceSlug }}
+                    >
+                      See all shared items
+                    </Link>
+                  </>
+                : null}
+              </Text>
+            </Alert>
+          : null}
+          <Puck
+            key={editorKey}
+            metadata={avaPageMetadata}
+            config={puckConfig}
+            height="100%"
+            data={data}
+            onChange={(d: Data) => {
+              setData(d as AvaPageData);
+              setHasUnsavedChanges(true);
+            }}
+            overrides={{
+              headerActions: () => {
+                return (
+                  <>
+                    <SaveDashboardButton onSave={onSave} />
+                    <ShareResourceButton
+                      resourceName={dashboardTitle}
+                      resourceType="dashboard"
+                      resourceId={dashboard.id}
+                    />
+                    <ViewDashboardButton
+                      workspaceSlug={workspaceSlug}
+                      dashboardId={dashboard.id}
+                      hasUnsavedChanges={hasUnsavedChanges}
+                    />
+                    <PublishDashboardButton
+                      dashboard={dashboard}
+                      hasUnsavedChanges={hasUnsavedChanges}
+                    />
+                    <DeleteDashboardButton
+                      workspaceSlug={workspaceSlug}
+                      dashboardId={dashboard.id}
+                    />
+                  </>
+                );
+              },
+            }}
+          />
+        </Flex>
+      </AppLayout>
     </DashboardFilterStateManager.Provider>
   );
 }

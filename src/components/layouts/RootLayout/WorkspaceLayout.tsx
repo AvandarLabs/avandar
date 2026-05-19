@@ -99,17 +99,17 @@ export function WorkspaceLayout({ children = <Outlet /> }: Props): JSX.Element {
       <DashboardEditorStateManager.Provider>
         <ChatPanelProvider>
           <AppDropzone>
-          <AppShell
-            title={workspace.name}
-            currentWorkspace={workspace}
-            profileLink={profileLink}
-            navbarLinks={mainNavBarLinks}
-            utilityLinks={utilityNavBarLinks}
-            spotlightActions={spotlightActions}
-          >
-            {children}
-          </AppShell>
-        </AppDropzone>
+            <AppShell
+              title={workspace.name}
+              currentWorkspace={workspace}
+              profileLink={profileLink}
+              navbarLinks={mainNavBarLinks}
+              utilityLinks={utilityNavBarLinks}
+              spotlightActions={spotlightActions}
+            >
+              {children}
+            </AppShell>
+          </AppDropzone>
         </ChatPanelProvider>
       </DashboardEditorStateManager.Provider>
     </DataExplorerStateManager.Provider>

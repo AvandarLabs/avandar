@@ -1,6 +1,6 @@
 import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
-import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
 
 /**
  * Convert a chat-generated dashboard block into a Puck content item ready to
