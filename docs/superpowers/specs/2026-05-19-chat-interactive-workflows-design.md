@@ -1,8 +1,36 @@
 # Chat Panel — Interactive Analytic Workflows Design
 
 **Date:** 2026-05-19
-**Status:** Draft for review — Phase 0 and Phase 1 design locked with the product owner; Phases 2–7 at architecture level only. Looking for coworker review on the overall plan before drilling into the remaining phases.
+**Status:** Phases 0–4 shipped on `feat/ict4d-demo` (Phase 0–2 with small gaps noted below; Phases 3–4 complete). Phases 5–7 + Phase 9 at architecture level only.
 **Author:** Pablo (with Claude)
+
+## Implementation status (canonical: `docs/ict4d-demo/FEATURE_CHECKLIST.md`)
+
+The checklist file is the granular source of truth. Quick snapshot:
+
+| Phase | Status | Outstanding gaps |
+|---|---|---|
+| 0 — PII + Bias Foundation | ~95% | `containsHealthData` workspace UI; opt-in `shareAnonymousPrivacyMetrics` setting; server-issued ack-token nonce registry (in-memory today) |
+| 1 — Basic Clarifications | ~95% | Silent bias re-prompt loop (currently warns only); 20-question ambiguous-question eval set |
+| 2 — Discovery Clarifications | ~90% | Ack-token signing for `values` scope (text scope is signed end-to-end; `values` is accept-on-presence); "Edit selection" hook on the consent modal |
+| 3 — Plans + DAG | done | Viz **thumbnails** on each plan node (currently shows schema text, not mini-charts) |
+| 4 — Schema-Drift Regen | done | — |
+| 5 — Branching | not started | All. Spec architecture below. |
+| 6 — Python + R Executor | not started | All. Spec architecture below. Security-critical, needs external review. |
+| 7 — Context Compression | not started | All. Spec architecture below. |
+| 9 — Annotation + Export | doc only | All. Spec architecture at the bottom of this doc. |
+
+Cross-cutting gaps that aren't tied to a single phase:
+- 50-question eval harness with correctness + clarification-count + token-spend scoring
+- System prompt versioning with prompt-version label round-tripped to client
+- Public privacy page copy on avandarlabs.com (sandboxing + PII + bias detection)
+- Spanish + French bias patterns themselves (currently empty stubs; UX copy translated; pending social-sector advisor review)
+
+**Live verification gap.** Phases 3 and 4 have NOT been exercised against a real LLM or DuckDB-WASM end-to-end — the remote dev container hosting the implementation work has `openrouter.ai` and Supabase image hosts off its network allowlist. Verification is gated on the Vercel preview build of `feat/ict4d-demo`. Three smoke checks before stacking new phase work on top:
+
+1. A real `proposePlan` turn — canvas renders, steps run, auto-zoom feels right.
+2. A real schema-drift case — force a wrong predicted schema and watch the regen endpoint fire.
+3. Save → close → reopen a multi-step plan as a virtual dataset.
 
 ## Summary
 

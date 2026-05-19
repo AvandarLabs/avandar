@@ -26,29 +26,57 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started
 - [~] **3. Merge other `claude/` session branches** — all visible ones merged in step 0
 - [~] **4. Pull and finish work from `claude/` branches that only have plans**
   - [x] Plan pulled from `claude/add-python-r-execution-hKxZd`
-  - [~] Implementation of the chat-interactive-workflows plan
-    - [x] Phase 0 — PII detector (16 tests green)
-    - [x] Phase 0 — Bias detector (11 tests green)
-    - [x] Phase 0 — Consent modal Modes A/B/C/D/E (composite + medical-strict shipped)
-    - [x] Phase 0 — `crossBoundary` API with HMAC ack tokens
-    - [x] Phase 0 — HMAC ack tokens + backend `UNAPPROVED_DATA_TRANSFER`
-    - [x] Phase 0 — Dexie audit log + `/settings/privacy/log` page (Privacy log tab)
-    - [x] Phase 0 — `isRowDataMessage` server helper for the Phase 2+ row-data path
-    - [x] Phase 0 — Spanish + French pattern file stubs
-    - [x] Phase 1 — `clarify` tool registered in chat backend with 3-turn cap
-    - [x] Phase 1 — Inline ClarificationCard in the thread (free_text + fixed_options)
-    - [x] Phase 1 — System-prompt clarification block
-    - [x] Phase 1 — Bias check on outgoing user messages via `crossBoundary`
-    - [x] Phase 1 — Bias check on LLM clarification questions (logs, doesn't block in v1)
-    - [x] Phase 1 — Clarification audit table + telemetry (separate Dexie DB)
-    - [ ] Phase 1 — Eval set (20 ambiguous questions, ≥80% resolution target)
-    - [x] Phase 2 — Discovery clarifications (`discovery` response shape; user picks from a local-DB-driven dropdown that routes through `crossBoundary`)
-    - [x] Phase 3 — `proposePlan` tool + xyflow DAG view (multi-step plans with per-step canvas, RoughJS sketched edges, MiniMap/pan/zoom, IndexedDB materialisation per step, save-as-virtual-dataset with rehydration)
-    - [x] Phase 4 — Schema-drift regen (`POST /regenerate-plan`, strict drift detection, BFS over input graph for affected downstream, 11 unit tests)
-    - [ ] Phase 5 — Branching (branch a thread from any plan node)
-    - [ ] Phase 6 — Python + R sandboxed executor
-    - [ ] Phase 7 — Context compression
-    - [ ] Phase 9 — Chat-in-dashboards (Puck-block generation) — **spec only**, no implementation yet (overlaps with item #22)
+  - [~] Implementation of the chat-interactive-workflows plan (see
+    `docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md`
+    for the full plan and per-phase architecture)
+    - [x] Phase 0 - PII detector (16 tests green)
+    - [x] Phase 0 - Bias detector (11 tests green)
+    - [x] Phase 0 - Consent modal Modes A/B/C/D/E (composite + medical-strict shipped)
+    - [x] Phase 0 - `crossBoundary` API with HMAC ack tokens
+    - [x] Phase 0 - HMAC ack tokens + backend `UNAPPROVED_DATA_TRANSFER`
+    - [x] Phase 0 - Dexie audit log + `/settings/privacy/log` page (Privacy log tab)
+    - [x] Phase 0 - `isRowDataMessage` server helper for the Phase 2+ row-data path
+    - [x] Phase 0 - Spanish + French pattern file stubs (UX copy translated; patterns still pending advisor review)
+    - [x] Phase 0 - ESLint chokepoint guard preventing `crossBoundary` bypass
+    - [ ] Phase 0 - `containsHealthData` workspace setting UI (admin toggle that elevates all PII detections to medical-strict; detector reads the flag but no UI to set it)
+    - [ ] Phase 0 - Opt-in `shareAnonymousPrivacyMetrics` workspace setting + payload-review process
+    - [ ] Phase 0 - Server-issued ack-token nonce registry (v2 design; replay protection currently in-memory on the edge worker)
+    - [x] Phase 1 - `clarify` tool registered in chat backend with 3-turn cap
+    - [x] Phase 1 - Inline ClarificationCard in the thread (free_text + fixed_options + discovery)
+    - [x] Phase 1 - System-prompt clarification block
+    - [x] Phase 1 - Bias check on outgoing user messages via `crossBoundary`
+    - [x] Phase 1 - Bias check on LLM clarification questions (logs to console in v1)
+    - [x] Phase 1 - Clarification audit table + telemetry (separate Dexie DB)
+    - [x] Phase 1 - Privacy log gains a "Clarifications" sub-tab
+    - [ ] Phase 1 - Silent bias re-prompt loop (currently only warns; spec calls for ≤2 retries with "rephrase neutrally" system note)
+    - [ ] Phase 1 - 20-question ambiguous-question eval set + runner with ≥80% resolve-in-≤2 target
+    - [x] Phase 2 - Discovery clarifications (`discovery` response shape; LLM emits read-only SELECT, dropdown populates from local DuckDB, selection routes through `crossBoundary`)
+    - [x] Phase 2 - Shared `isReadOnlyDiscoveryQuery` validator on client + server (11 unit tests)
+    - [x] Phase 2 - PII detection on column name + content for discovery selections
+    - [ ] Phase 2 - Ack-token signing for `values` scope payloads (text scope is signed end-to-end; `values` is "accept-on-presence" in `chat.routes.ts`)
+    - [ ] Phase 2 - "Edit selection" hook on the consent modal (spec sketches dropping values before approval; UI not built)
+    - [x] Phase 3 - `proposePlan` tool with ≤8-step plans, schema-validated server-side
+    - [x] Phase 3 - `PlanStateManager` + `planExecutor` + DuckDB temp-view lifecycle
+    - [x] Phase 3 - xyflow visual DAG canvas with RoughJS hand-drawn edges (`PlanFlowView`, `PlanStepNode`, `RoughEdge`)
+    - [x] Phase 3 - Animated zoom-in / zoom-out modes with `fitView` + `setCenter`
+    - [x] Phase 3 - Auto vs Step run-mode toggle in the toolbar
+    - [x] Phase 3 - IndexedDB step materialisation (`AvandarPlanStepDB` Dexie database, keyed by `(planId, stepId)`, explicit cleanup on Close / replace)
+    - [x] Phase 3 - Save as virtual dataset persists the full plan in a new `plan_steps` JSONB column on `datasets__virtual`
+    - [x] Phase 3 - Reopening a virtual dataset rehydrates the plan + every cached intermediate (`rehydratePlan` + parquet roundtrip through `loadParquet`)
+    - [x] Phase 3 - Click failed node to retry; failed-step banner with explanation
+    - [ ] Phase 3 - Viz **thumbnails** on each plan node (currently shows schema text, not mini-charts)
+    - [x] Phase 4 - Schema-drift detection (`isSchemaDrift`, strict: names + order + type case-insensitive) + downstream-walker (`findAffectedDownstream`)
+    - [x] Phase 4 - `POST /chat/:workspaceId/regenerate-plan` endpoint with forced `regenerateSteps` tool call
+    - [x] Phase 4 - Frontend regen loop: detect drift -> hit endpoint -> dispatch `replaceStepCode` -> re-run affected steps in plan order
+    - [x] Phase 4 - `regenAttempts` cap (≤2 attempts per step, tracked locally per run)
+    - [ ] Phase 5 - Branching (branch a thread from any plan node; new assistant-ui thread anchored at parent node's `actualSchema`; sidebar listing of branches)
+    - [ ] Phase 6 - Python + R sandboxed executor (same-origin null-iframe + strict CSP, Pyodide + WebR lazy load, Arrow IPC bridge, `generatePython` / `generateR` tools, external security review)
+    - [ ] Phase 7 - Context compression (summariser pass, routing-decision cache, OpenRouter prompt caching, `chat_token_usage` table + dashboard)
+    - [ ] Phase 9 - Canvas annotation + export (text / arrow / sticky / pen annotations persisted in IndexedDB + onto virtual datasets; PDF + image exports). Architecture in spec; no implementation yet. Note: the previously-tracked "Phase 9 - Chat-in-dashboards (Puck-block generation)" lives under item #22 below, not as a phase of this plan.
+    - [ ] Cross-cutting - 50-question eval harness with correctness + clarification-count + token-spend scoring
+    - [ ] Cross-cutting - System prompt versioning with prompt-version label round-tripped to client
+    - [ ] Cross-cutting - avandarlabs.com privacy page copy (sandboxing + PII + bias detection)
+    - [ ] Cross-cutting - Spanish + French bias patterns themselves (currently stubs pending social-sector advisor review)
 - [x] **5. Install `node-sql-parser`; best-effort SQL → manual query form parsing** (Data Explorer only; supports SELECT / GROUP BY / ORDER BY / WHERE / HAVING / JOIN / nested subqueries. See `docs/demo-features/sql-parser-filter-ui.md`. Dashboards still pending.)
 - [~] **6. Bidirectional SQL ↔ manual-query-form sync** (Data Explorer: knex-based form → SQL regeneration + lossy-mapping warning + overwrite-confirmation flow. Dashboards still pending.)
 - [ ] **7. Tokenize generated SQL / Python / R — column names + dataset IDs as clickable pills**

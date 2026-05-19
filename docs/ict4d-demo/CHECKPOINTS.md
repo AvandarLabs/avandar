@@ -797,19 +797,182 @@ All 57 affected tests still pass; `tsc -b --noEmit` clean.
 
 ---
 
+## Checkpoint 9 — Chat workflows Phase 0/1 hardening + Phase 2 + Phase 3 (list view) ✅
+
+The spec at
+`docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md`
+is 7 phases totalling ~16.5 engineer-weeks. This checkpoint closes
+the remaining Phase 0/1 gaps from Checkpoints 4/5, lands all of
+Phase 2, and ships Phase 3 as a list-based DAG view.
+
+### What shipped
+
+**Phase 0/1 hardening**:
+- ESLint chokepoint guard on `crossBoundary` (`eslint.config.js`):
+  `issueAckToken` and `registerAck` can only be imported from
+  `crossBoundary.tsx`. Adding a new caller anywhere else fails CI.
+- Privacy log page gains a Clarifications sub-tab listing
+  `clarificationAuditLog` entries (turn number, shape, outcome,
+  time-to-answer). Metadata only — never the question text or answer.
+
+**Phase 2 — Discovery Clarifications**:
+- New `discovery` response shape on the `clarify` tool. The LLM emits
+  a short DuckDB `SELECT DISTINCT` query whose result populates a
+  dropdown.
+- Shared `isReadOnlyDiscoveryQuery` validator on client + server
+  (11 unit tests). SELECT/WITH only, no semicolons, ≤2000 chars.
+- `ClarificationCard.DiscoveryBody` runs the query in DuckDB-WASM
+  with loading / error / empty handling.
+- `PendingClarificationBlock` routes the user's selection through
+  `crossBoundary` with context `discovery_clarification` so PII
+  detection fires on column name + content.
+
+**Phase 3 — Plans + DAG (v1 list view in this checkpoint; replaced
+with xyflow canvas in Checkpoint 10)**:
+- New `proposePlan` tool (≤8 steps, schema-validated server-side).
+- `PlanStateManager` + `planExecutor.ts` run each step in DuckDB-WASM
+  as a `step_<id>` temp view; failures short-circuit the rest.
+- `dropPlanTempViews` cleans up.
+
+### Caveats noted
+
+- Live-AI testing was impossible inside the container (`openrouter.ai`
+  not on the allowlist). Verification gated on the Vercel preview.
+
+---
+
+## Checkpoint 10 — Chat workflows Phase 3 finish + Phase 4 + Phase 9 spec ✅
+
+Same spec as Checkpoint 9. This checkpoint replaces the list view
+with the visual xyflow canvas, adds IndexedDB step materialisation
++ virtual-dataset plan persistence, ships Phase 4 (schema-drift
+regen) entirely, and adds a new Phase 9 architecture section to the
+spec.
+
+### What shipped
+
+**Phase 3 — visual canvas**:
+- `@xyflow/react` DAG with MiniMap, pan + zoom, layered left-to-right
+  layout (`planLayout.ts`).
+- `RoughEdge.tsx` re-traces xyflow's bezier path through
+  `roughjs/svg` for Excalidraw-style hand-drawn arrows. Per-edge seed
+  derived from the edge id keeps the wobble stable across renders.
+- `PlanStepNode.tsx`: custom node with status icon, badge,
+  description, schema hint, inline error.
+- Animated `overview` ↔ `focused` zoom via `fitView({ duration })`
+  and `setCenter`. Click a node → 350ms zoom into it; toolbar exposes
+  a Zoom in / Zoom out toggle.
+- Auto / Step run-mode toggle in the toolbar.
+
+**Phase 3 — IndexedDB materialisation** (per the user's explicit
+"do NOT use OPFS" instruction):
+- New `planStepStorage.ts` owns `AvandarPlanStepDB`, a dedicated
+  Dexie database keyed by `(planId, stepId)`.
+- Every successful step writes its full parquet bytes there.
+- **Storage hygiene**: blobs are cleared explicitly via
+  `clearPlanStepBlobs(planId)` when a plan is closed, replaced, or
+  the chat runtime sees a new `proposePlan` response. Never
+  accumulated by TTL — explicit cleanup avoids storage bloat.
+
+**Phase 3 — virtual dataset plan persistence**:
+- New `plan_steps` JSONB column on `datasets__virtual` (migration +
+  declarative schema + RPC update at
+  `supabase/migrations/20260519154902_*` and
+  `..._plan_steps_rpc.sql`).
+- `SaveAsNewDatasetForm` captures the current plan when saving from
+  a multi-step analysis.
+- `SavedDatasetsView` calls `rehydratePlan()` when opening a virtual
+  dataset that has one. Each cached parquet blob is re-registered as
+  a DuckDB view via `loadParquet`; missing blobs are recomputed by
+  re-running the step's SQL.
+
+**Phase 4 — Schema-Drift Regen** (entire phase):
+- New `POST /chat/:workspaceId/regenerate-plan` endpoint with a
+  forced `regenerateSteps` tool call. Body: drift report + full
+  plan. Returns rewritten SQL + updated `predictedSchema` per
+  affected step.
+- Client: `isSchemaDrift` (strict — names + order + type
+  case-insensitive) + `findAffectedDownstream` (BFS over the input
+  graph). 11 unit tests + 4 graph tests.
+- `executePlan` accepts an optional `driftRegen` context. After each
+  step succeeds, the executor diffs predicted vs actual; on drift it
+  hits the regen endpoint, dispatches `replaceStepCode`, and re-runs
+  the affected steps in plan order.
+- Cap: ≤2 regen attempts per step, tracked locally per run.
+
+**Phase 9 — Canvas Annotation + Export** (architecture only, no
+implementation):
+- Added "Phase 9 — Canvas Annotation + Export" section to the spec
+  doc. Covers text / arrow / sticky / pen annotations persisted in
+  IndexedDB + onto virtual datasets, and PDF + image exports via
+  `@react-pdf/renderer` + `html-to-image`.
+
+### Testing
+
+- 145 vitest tests passing (was 60 at the start of Checkpoint 9).
+- `tsc -b --noEmit` clean.
+- `eslint .` clean.
+- `vite build` succeeds.
+
+### Live verification still pending
+
+None of Phase 3 / Phase 4 has been exercised against the real LLM or
+a real Vercel preview yet — same network restriction as Checkpoint 5.
+Three smoke checks gate Phase 5 work:
+1. Real `proposePlan` turn — canvas renders, steps run, zoom feels right.
+2. Real schema-drift case — force a wrong predicted schema, watch
+   the regen endpoint fire.
+3. Save → close → reopen a multi-step plan as a virtual dataset.
+
+### Deferred from Checkpoint 10 (tracked in FEATURE_CHECKLIST.md)
+
+- Phase 0: `containsHealthData` workspace UI; opt-in
+  `shareAnonymousPrivacyMetrics`; server-issued ack-token nonce
+  registry (replay protection is in-memory today).
+- Phase 1: silent bias re-prompt loop; 20-question eval set.
+- Phase 2: ack-token signing for `values` scope (text scope is fine);
+  "Edit selection" hook on the consent modal.
+- Phase 3: viz **thumbnails** on each plan node (currently shows
+  schema text, not mini-charts).
+- Cross-cutting: 50-question eval harness; prompt versioning;
+  Spanish + French bias patterns themselves.
+
+### Doc cleanup
+
+- `docs/demo-features/chat-interactive-workflows.md` was removed in
+  Checkpoint 10. The spec at
+  `docs/superpowers/specs/2026-05-19-chat-interactive-workflows-design.md`
+  is the only source of architecture truth; granular status lives in
+  `docs/ict4d-demo/FEATURE_CHECKLIST.md`; what-shipped-when lives in
+  this file.
+
+---
+
 ## What to do next (recommended order)
 
-1. **Smoke-test the merge.** Spin up the app locally and exercise:
-   import a CSV, open the dataset drawer, run a chat query, run a
-   floating-windows query, drop a CSV onto the page, save to dashboard.
-   This validates the conflict resolutions before any new work lands.
-2. **Apply the chat-context memoization fix** in
-   `src/components/ChatPanel/useChatPageContext.ts` and verify against
-   the four-turn repro the user pasted in.
-3. **Add the analytics table** (item #26) — it's small and unblocks
-   measuring all the other features.
-4. Pick **one** of the deferred items per session — Whisper, dashboard
-   rebuild, PDF/image, i18n, onboarding — and do it properly.
+1. **Live-verify Checkpoint 10 on the Vercel preview** (see "Live
+   verification still pending" above). No new chat-workflows phase
+   work should start before this.
+2. **Close the Phase 1 bias re-prompt gap** — small, ~2 hours,
+   closes the last gap in Phase 1's Definition of Done.
+3. **Phase 5 — Branching** — ~1.5 weeks per spec. State model is
+   small; bulk of work is assistant-ui thread management.
+4. **Phase 7 — Context Compression** — ~1 week. Pairs naturally
+   with Phase 5 (branching adds tokens fast).
+5. **Phase 6 — Python + R Sandboxed Executor** — ~5 weeks + external
+   security review. Defer until 5 + 7 land.
+6. **Phase 9 — Annotation + Export** — ~1.5 weeks. Independent of
+   Phases 5–7; can be picked up whenever.
+
+Smaller gaps to close opportunistically (see FEATURE_CHECKLIST.md for
+the canonical granular list):
+- Phase 0: `containsHealthData` workspace UI; opt-in analytics
+  setting; server-issued ack-token nonce registry.
+- Phase 2: ack-token signing for `values` scope; consent modal "Edit
+  selection" hook.
+- Phase 3: viz thumbnails on plan nodes.
+- Cross-cutting: 50-question eval harness; prompt versioning;
+  Spanish + French bias patterns themselves.
 
 If anything in this document does not match what you expected, the
 intent is honesty about scope, not aspirations. Better to ship five
