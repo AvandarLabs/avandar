@@ -122,7 +122,8 @@ export function PublishDashboardModal({
         <Text size="xs" c="dimmed">
           {isUsingVanity ?
             "Using your custom URL. The permanent UUID link below also still works."
-          : "By default we use a permanent UUID-based link. Add a custom path below for a nicer URL."}
+          : "By default we use a permanent UUID-based link. Add a custom path below for a nicer URL."
+          }
         </Text>
       </Stack>
 
@@ -133,8 +134,8 @@ export function PublishDashboardModal({
           Custom URL (optional)
         </Title>
         <Text size="xs" c="dimmed">
-          A short, memorable URL for flyers, reports, and QR codes. Whatever
-          you type is kebab-cased automatically.
+          A short, memorable URL for flyers, reports, and QR codes. Whatever you
+          type is kebab-cased automatically.
         </Text>
         <TextInput
           aria-label="Custom URL path"
