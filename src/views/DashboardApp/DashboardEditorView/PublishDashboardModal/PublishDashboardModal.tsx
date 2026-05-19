@@ -15,6 +15,7 @@ import { notifyError, notifySuccess } from "@ui";
 import { useMemo, useState } from "react";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { logAnalyticsEvent } from "@/lib/analytics/analyticsClient";
 import { buildShareUrls } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/buildShareUrls";
 import { ShareUrlRow } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/ShareUrlRow";
 import { toVanitySlug } from "@/views/DashboardApp/DashboardEditorView/PublishDashboardModal/slug";
@@ -51,6 +52,15 @@ export function PublishDashboardModal({
           "Dashboard share settings updated."
         : "Dashboard published!",
       );
+      void logAnalyticsEvent({
+        event: "dashboard.published",
+        workspaceId: dashboard.workspaceId,
+        app: "dashboards",
+        payload: {
+          dashboardId: dashboard.id,
+          wasPreviouslyPublic: dashboard.isPublic,
+        },
+      });
     },
     onError: (e: Error) => {
       notifyError({

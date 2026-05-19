@@ -1,0 +1,31 @@
+import { VizConfigs } from "$/models/vizs/VizConfig/VizConfigs";
+import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
+import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+
+/**
+ * Convert a chat-generated dashboard block into a Puck content item ready to
+ * be appended to an `AvaPageData.content` array. The block is given a fresh
+ * id so multiple chat-driven blocks don't collide.
+ */
+export function buildPendingDataVizBlock(
+  block: ChatGeneratedDashboardBlock,
+): AvaPageData["content"][number] {
+  return {
+    type: "DataViz",
+    props: {
+      id: `DataViz-${crypto.randomUUID()}`,
+      nlQuery: {
+        prompt: block.prompt,
+        rawSql: block.sql,
+        generations: [
+          {
+            prompt: block.prompt,
+            rawSql: block.sql,
+          },
+        ],
+      },
+      vizType: block.vizType,
+      vizConfig: VizConfigs.makeEmptyConfig(block.vizType),
+    },
+  };
+}

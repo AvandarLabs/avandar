@@ -56,10 +56,19 @@ export function ChatEmptyState(): JSX.Element {
   );
 
   const suggestions = useMemo(() => {
+    const availableDatasets = datasets ?? [];
+    if (context.app === "dashboards") {
+      const target =
+        _pickRandomDatasetName(availableDatasets) ?? "your dataset";
+      return [
+        `Add a bar chart of ${target} grouped by category`,
+        `Add a line chart showing trends in ${target} over time`,
+        `Add a table of the top 10 rows of ${target}`,
+      ];
+    }
     if (context.app !== "data-explorer") {
       return [];
     }
-    const availableDatasets = datasets ?? [];
     const promptTemplates = [
       (name: string) => {
         return `Show the first 20 rows of ${name}`;
@@ -103,13 +112,17 @@ export function ChatEmptyState(): JSX.Element {
       </Group>
       <Stack gap={4}>
         <Text size="md" fw={600} c="neutral.9">
-          Ask about your data
+          {context.app === "dashboards" ?
+            "Build a chart in chat"
+          : "Ask about your data"}
         </Text>
         <Text size="sm" c="neutral.6" lh={1.5}>
           {context.app === "data-explorer" ?
             "Type a question and I will generate the SQL and run it on the canvas."
+          : context.app === "dashboards" ?
+            "Ask me to add a chart to this dashboard. I will pick a viz type, write the SQL, and drop a block onto the page."
           : <>
-              Chat is only enabled for the Data Explorer app for now.{" "}
+              Chat is enabled in the Data Explorer and Dashboards.{" "}
               <Link
                 to={dataExplorerLink.to}
                 params={dataExplorerLink.params}
@@ -118,7 +131,7 @@ export function ChatEmptyState(): JSX.Element {
                 fz="inherit"
                 lh="inherit"
               >
-                Switch over to ask a data question
+                Open Data Explorer
               </Link>
               .
             </>

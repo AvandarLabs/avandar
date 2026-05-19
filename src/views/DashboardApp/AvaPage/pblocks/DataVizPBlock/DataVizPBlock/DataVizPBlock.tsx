@@ -7,6 +7,7 @@ import { getDateColumns } from "@/components/VisualizationContainer/getDateColum
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { NLQuery } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
+import { useApplyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/useApplyDashboardFiltersToSql";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery";
 import type {
   VizConfig,
@@ -49,6 +50,7 @@ export function DataVizPBlock({
 }: WithPuckProps<Props>): JSX.Element {
   const { prompt, rawSql } = nlQuery;
   const metadata = useAvaPageMetadata(puck);
+  const filteredSql = useApplyDashboardFiltersToSql(rawSql);
 
   const emptyStructuredQuery = useMemo(() => {
     return StructuredQuery.makeEmpty();
@@ -56,7 +58,7 @@ export function DataVizPBlock({
 
   const [queryResults, isLoadingResults] = useDataQuery({
     query: emptyStructuredQuery,
-    rawSQL: rawSql,
+    rawSQL: filteredSql,
     ...(metadata.auth === "workspace" ?
       {
         auth: "workspace" as const,
@@ -93,8 +95,26 @@ export function DataVizPBlock({
   }
 
   return (
-    <Paper withBorder p="md">
-      <Stack gap={6}>
+    <Paper
+      withBorder
+      p="lg"
+      radius="md"
+      style={{
+        boxShadow: "0 1px 2px rgba(15, 23, 42, 0.04)",
+        backgroundColor: "var(--mantine-color-white)",
+      }}
+    >
+      <Stack gap="sm">
+        {prompt.trim().length > 0 ?
+          <Text
+            size="sm"
+            fw={500}
+            c="neutral.7"
+            style={{ letterSpacing: "0.01em" }}
+          >
+            {prompt}
+          </Text>
+        : null}
         <Box pos="relative" w="100%" h={420}>
           <LoadingOverlay visible={isLoadingResults} zIndex={10} />
           <VisualizationContainer

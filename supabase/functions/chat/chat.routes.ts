@@ -25,6 +25,8 @@ import { z } from "zod";
 import type {
   ChatAPI,
   ChatClarifyRequest,
+  ChatDashboardVizType,
+  ChatGeneratedDashboardBlock,
   ChatGeneratedSQL,
   ChatModelsResponse,
   ChatPlan,
@@ -256,6 +258,52 @@ const ALLOWED_PLAN_STEP_TYPES = new Set<ChatPlanStep["type"]>([
 const ALLOWED_DEFAULT_VIZ = new Set(["table", "bar", "line", "scatter", "pie"]);
 const MAX_PLAN_STEPS = 8;
 
+const ALLOWED_DASHBOARD_VIZ_TYPES = new Set<ChatDashboardVizType>([
+  "table",
+  "bar",
+  "line",
+  "area",
+  "scatter",
+  "pie",
+]);
+
+type RawDashboardBlockArgs = {
+  prompt?: unknown;
+  sql?: unknown;
+  vizType?: unknown;
+};
+
+function _parseAddDashboardBlock(
+  argsJson: string | undefined,
+): ChatGeneratedDashboardBlock | undefined {
+  if (!argsJson) {
+    return undefined;
+  }
+  let parsed: RawDashboardBlockArgs;
+  try {
+    parsed = JSON.parse(argsJson) as RawDashboardBlockArgs;
+  } catch {
+    return undefined;
+  }
+  if (
+    typeof parsed.prompt !== "string" ||
+    typeof parsed.sql !== "string" ||
+    typeof parsed.vizType !== "string"
+  ) {
+    return undefined;
+  }
+  const prompt = parsed.prompt.trim();
+  const sql = cleanGeneratedSQL(parsed.sql).trim();
+  const vizType = parsed.vizType.trim() as ChatDashboardVizType;
+  if (prompt.length === 0 || sql.length === 0) {
+    return undefined;
+  }
+  if (!ALLOWED_DASHBOARD_VIZ_TYPES.has(vizType)) {
+    return undefined;
+  }
+  return { kind: "DataViz", prompt, sql, vizType };
+}
+
 function _parseProposePlan(argsJson: string | undefined): ChatPlan | undefined {
   if (!argsJson) {
     return undefined;
@@ -397,6 +445,31 @@ When NOT to use \`proposePlan\`:
 If the user asks something that is not a data question, answer it
 concisely without calling any tool.`;
 
+const dashboardsSystemPrefix = `
+You are Avandar, an embedded assistant that helps users build interactive
+data dashboards inside the Avandar workspace.
+
+The user is currently editing a dashboard. When they ask for a visualization
+("show me revenue by month", "add a bar chart of users per country", "create
+a pie chart of categories") call the \`addDashboardBlock\` tool with a
+DuckDB SELECT and a sensible \`vizType\`. The dashboard editor will append
+the block to the page immediately.
+
+Rules for \`addDashboardBlock\`:
+- ONE block per turn. If the user asks for multiple charts, pick the most
+  central one and mention the next ones in your reply.
+- Choose \`vizType\` from the catalog: table, bar, line, area, scatter, pie.
+- Use a "table" when the user asks for raw data, a "bar" for categorical
+  breakdowns, a "line" or "area" for time series, "pie" only when the user
+  explicitly wants a share-of-whole and there are <= 8 categories.
+- Wrap dataset ids and column names in double quotes in the SQL.
+- The \`prompt\` field should be a short, human-readable description of what
+  the block shows ("Monthly revenue", "Customers by country"). It becomes
+  the block's persisted natural-language prompt.
+
+If the user is NOT asking for a chart (e.g. layout, copy, design questions),
+answer concisely in text. Don't call any tool.`;
+
 const genericSystemPrompt = `
 You are Avandar, an embedded assistant inside the Avandar workspace. The user
 is not currently on a page where data tools are available. Be concise and
@@ -492,6 +565,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           openDatasetId: z.string().optional(),
           lastSql: z.string().optional(),
           lastError: z.string().optional(),
+          dashboardId: z.string().optional(),
         }),
         model: z.string().optional(),
         consentAcks: z
@@ -551,10 +625,12 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
         }
 
         const isDataExplorer = context.app === "data-explorer";
+        const isDashboards = context.app === "dashboards";
+        const needsSchema = isDataExplorer || isDashboards;
 
         // Only fetch the schema when we'll actually use it.
         const schema =
-          isDataExplorer ?
+          needsSchema ?
             await fetchSchemaForWorkspace({ supabaseClient, workspaceId })
           : { datasets: [], columns: [] };
 
@@ -564,7 +640,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           })?.content ?? "";
 
         const sqlSystemPrompt =
-          isDataExplorer ?
+          needsSchema ?
             buildSQLSystemPrompt({
               prompt: lastUserPrompt,
               datasets: schema.datasets,
@@ -593,6 +669,8 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
         const systemContent =
           isDataExplorer ?
             `${dataExplorerSystemPrefix}\n\n${sqlSystemPrompt}${refinementContext}${errorContext}`
+          : isDashboards ?
+            `${dashboardsSystemPrefix}\n\n${sqlSystemPrompt}`
           : genericSystemPrompt;
 
         const requestBody: Record<string, unknown> = {
@@ -777,6 +855,44 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           requestBody.tool_choice = "auto";
         }
 
+        if (isDashboards) {
+          requestBody.tools = [
+            {
+              type: "function",
+              function: {
+                name: "addDashboardBlock",
+                description:
+                  "Append a new data-visualization block (P-block) to the dashboard the user is currently editing. Call this when the user asks for a chart, table, or visual in their dashboard.",
+                parameters: {
+                  type: "object",
+                  properties: {
+                    prompt: {
+                      type: "string",
+                      description:
+                        "Short human-readable description of what the block shows. Becomes the persisted NL prompt on the block.",
+                      maxLength: 200,
+                    },
+                    sql: {
+                      type: "string",
+                      description:
+                        "DuckDB SELECT that powers the block. Wrap dataset ids and column names in double quotes.",
+                    },
+                    vizType: {
+                      type: "string",
+                      enum: ["table", "bar", "line", "area", "scatter", "pie"],
+                      description:
+                        "Visualization type. Use 'table' for raw data, 'bar' for categorical breakdowns, 'line'/'area' for time series, 'pie' only when explicit and <= 8 categories.",
+                    },
+                  },
+                  required: ["prompt", "sql", "vizType"],
+                  additionalProperties: false,
+                },
+              },
+            },
+          ];
+          requestBody.tool_choice = "auto";
+        }
+
         const response = await fetch(
           "https://openrouter.ai/api/v1/chat/completions",
           {
@@ -804,6 +920,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
         let generatedSql: ChatGeneratedSQL | undefined;
         let clarification: ChatClarifyRequest | undefined;
         let plan: ChatPlan | undefined;
+        let dashboardBlock: ChatGeneratedDashboardBlock | undefined;
         const toolCalls: OpenRouterToolCall[] = message?.tool_calls ?? [];
 
         const generateSqlToolCall = toolCalls.find((tc) => {
@@ -858,12 +975,29 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           }
         }
 
+        // Dashboard block creation. Only honored on the dashboards surface.
+        if (isDashboards && !generatedSql && !clarification && !plan) {
+          const blockToolCall = toolCalls.find((tc) => {
+            return tc?.function?.name === "addDashboardBlock";
+          });
+          if (blockToolCall?.function) {
+            const parsed = _parseAddDashboardBlock(
+              blockToolCall.function.arguments,
+            );
+            if (parsed) {
+              dashboardBlock = parsed;
+            }
+          }
+        }
+
         const assistantText =
           text ||
           (generatedSql ?
             "Here is the SQL I ran. Results are on the canvas to the left."
           : plan ? plan.rootMessage || "Here is a plan to answer your question."
           : clarification ? clarification.question
+          : dashboardBlock ?
+            `Added "${dashboardBlock.prompt}" to your dashboard as a ${dashboardBlock.vizType}.`
           : "I could not generate a query for that. Try rephrasing.");
 
         const result: ChatResponse = {
@@ -871,6 +1005,7 @@ export const Routes = defineRoutes<ChatAPI>("chat", {
           ...(generatedSql ? { generatedSql: generatedSql } : {}),
           ...(clarification ? { clarification } : {}),
           ...(plan ? { plan } : {}),
+          ...(dashboardBlock ? { dashboardBlock } : {}),
         };
         return result;
       }),

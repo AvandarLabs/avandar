@@ -23,6 +23,32 @@ export type ChatPageContext = {
    * regenerate.
    */
   lastError?: string;
+  /**
+   * Set when the user is currently editing a dashboard. The chat panel uses
+   * this to offer the `addDashboardBlock` tool and to attach the dashboard
+   * id to analytics events. Only present when `app === "dashboards"`.
+   */
+  dashboardId?: string;
+};
+
+export type ChatDashboardVizType =
+  | "table"
+  | "bar"
+  | "line"
+  | "area"
+  | "scatter"
+  | "pie";
+
+/**
+ * A P-block the LLM produced for the dashboard editor. v1 only emits
+ * `DataViz` blocks (the most common case for the demo). The client converts
+ * this to a Puck content item before appending it to the dashboard.
+ */
+export type ChatGeneratedDashboardBlock = {
+  kind: "DataViz";
+  prompt: string;
+  sql: string;
+  vizType: ChatDashboardVizType;
 };
 
 export type ChatGeneratedSql = {
@@ -113,6 +139,12 @@ export type ChatResponse = {
    * step in DuckDB.
    */
   plan?: ChatPlan;
+  /**
+   * Present when the model called the `addDashboardBlock` tool while the
+   * user was editing a dashboard. The frontend appends the block to the
+   * Puck data via `DashboardEditorStateManager.queuePendingBlock`.
+   */
+  dashboardBlock?: ChatGeneratedDashboardBlock;
 };
 
 /**

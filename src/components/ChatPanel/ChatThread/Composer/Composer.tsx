@@ -8,7 +8,15 @@ import css from "./Composer.module.css";
 
 export function Composer(): JSX.Element {
   const context = useChatPageContext();
-  const disabled = context.app !== "data-explorer";
+  const isChatEnabled =
+    context.app === "data-explorer" || context.app === "dashboards";
+  const disabled = !isChatEnabled;
+
+  const placeholder =
+    context.app === "dashboards" ?
+      "Ask me to add a chart to this dashboard..."
+    : context.app === "data-explorer" ? "Ask about your data..."
+    : "Chat is enabled in Data Explorer and Dashboards";
 
   return (
     <div className={css.composerContainer}>
@@ -17,11 +25,7 @@ export function Composer(): JSX.Element {
       >
         <ComposerPrimitive.Input
           className={css.composerInput}
-          placeholder={
-            disabled ?
-              "Chat actions available in Data Explorer for now"
-            : "Ask about your data..."
-          }
+          placeholder={placeholder}
           rows={1}
           autoFocus={false}
           disabled={disabled}

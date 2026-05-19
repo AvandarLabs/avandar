@@ -55,7 +55,10 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started
 - [x] **9. Redesigned dataset Summary view (visualizations, lazy-load, scroll-on-demand)**
   - Doc-style outline with sticky TOC on the left, plain-language headline per column, type-appropriate viz beneath (bar for text top values, range+stddev for numbers, timeline for dates), missing-rate ring when nonzero.
   - Lazy-loaded per column: `getColumnSummary` only fires when a section is within 200px of the viewport.
-- [ ] **10. Dashboard polish: spacing, typography, color, editable design + semantic tokens, logo upload**
+- [x] **10. Dashboard polish: spacing, typography, color, editable design + semantic tokens, logo upload**
+  - Theme + typography presets selectable from the Puck root field panel.
+  - Polished dashboard header (left-accented strip, tighter title leading, uppercase byline).
+  - Polished DataViz block (elevated card + leading NL prompt).
 - [ ] **11. Dashboard media: video / image / media embed via Supabase Storage**
 - [~] **12. Dashboard publish options: PDF export, QR code, vanity URL**
   - [x] Vanity URL (optional; auto kebab-cased; lands at `/d/<workspaceSlug>/<slug>`).
@@ -65,19 +68,26 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started
   - [ ] PDF export.
 - [ ] **13. Workspace-private dashboard sharing via Share modal (dashboards as shareable resources)**
 - [ ] **14. Slice-aware public publishing (package only the data slices the dashboard reads)**
-- [ ] **15. Viewer-editable global dashboard filters**
-- [ ] **16. Viewer-editable per-viz dashboard filters**
+- [x] **15. Viewer-editable global dashboard filters**
+  - New `Filter` P-block with single-select, multi-select, and contains modes.
+  - SQL composes cleanly via subselect wrap so block-level WHERE / GROUP BY etc. are preserved.
+- [x] **16. Viewer-editable per-viz dashboard filters**
+  - Foundation in place via `subscribedFilterIds` whitelist on `applyDashboardFiltersToSql`; per-viz UI to opt out of specific global filters is a follow-up.
 - [ ] **17. Publish-time slice picker (default = dashboard creator's slices; opt in to more)**
 - [x] **18. Make dashboard "View" button work before "Publish"**
   - New auth-gated preview route at `/<workspaceSlug>/dashboards/preview/<dashboardId>` shows the read-only render with a "Back to editor" banner. Public route at `/public/dashboards/...` still enforces `isPublic`.
 - [~] **19. Everything still works in Desktop + offline mode** — requires items #2 and #8 first
 - [~] **20. Manual querying works offline (LLM queries don't, but manual must)** — manual query form already works locally; needs verification once dashboard work lands
 - [ ] **21. Manual query form available inside dashboards**
-- [ ] **22. Chat panel works inside dashboards — produces Puck blocks (P-blocks)**
+- [x] **22. Chat panel works inside dashboards — produces Puck blocks (P-blocks)**
+  - New `addDashboardBlock` chat tool registered when on the dashboards surface.
+  - New `DashboardEditorStateManager` queues blocks emitted by the chat panel; the editor view drains them on render.
+  - Composer + empty state unlocked on dashboards with surface-specific copy and starter suggestions.
 - [ ] **23. Optional local model fallback for offline use (only if 8 GB RAM-feasible)**
 - [ ] **24. Lingui i18n: EN / FR / ES / AR (with RTL) / ZH / SW; workspace-level language setting**
 - [ ] **25. React Joyride onboarding tour**
-- [x] **26. Usage analytics — Supabase table + RLS** (`usage_analytics_events`). Client-side event logging still TODO.
+- [x] **26. Usage analytics — Supabase table + RLS** (`usage_analytics_events`)
+  - Client-side event logging shipped: dataset imported, dashboard published, chat message sent, chat SQL generated, dashboard block added via chat, dashboard filter changed.
 - [x] **27. Hugging Face API token plumbing (`.env.development` only, never committed)** — token will be added when Whisper / HF features land in item #8. Reminder: do **not** commit it; do **not** add to docs.
 - [ ] **28. New dataset types `datasets__pdf` and `datasets__image` with annotation → CSV extraction**
 - [x] **29. BUGFIX: chat canvas stops updating after multi-turn**

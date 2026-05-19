@@ -14,11 +14,19 @@ import { Workspace } from "$/models/Workspace/Workspace";
 import { Paper } from "@ui";
 import { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
 import { buildDataVizPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/buildDataVizPBlockConfig";
+import { buildFilterPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/buildFilterPBlockConfig";
 import { buildContainerMaxWidthPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/buildContainerMaxWidthPFieldConfig";
+import {
+  DASHBOARD_THEME_OPTIONS,
+  DASHBOARD_TYPOGRAPHY_OPTIONS,
+  getDashboardDesignTokens,
+} from "@/views/DashboardApp/AvaPage/utils/dashboardDesignTokens";
 import type {
   AvaPageConfig,
   AvaPageData,
   AvaPageRootProps,
+  AvaPageThemeName,
+  AvaPageTypographyName,
   CalloutBlockProps,
   CodeBlockProps,
   EmbedBlockProps,
@@ -121,6 +129,41 @@ function _getRootPaddingValue(
   padding: RootPadding,
 ): 0 | Exclude<RootPadding, "none"> {
   return padding === "none" ? 0 : padding;
+}
+
+const _THEME_VALUES = new Set<AvaPageThemeName>([
+  "default",
+  "ocean",
+  "forest",
+  "rose",
+  "amber",
+  "graphite",
+]);
+
+const _TYPOGRAPHY_VALUES = new Set<AvaPageTypographyName>([
+  "system",
+  "serif",
+  "mono",
+]);
+
+function _getThemeProp(props: unknown): AvaPageThemeName {
+  if (!_isRecord(props)) {
+    return "default";
+  }
+  const value: unknown = props.theme;
+  return _THEME_VALUES.has(value as AvaPageThemeName) ?
+      (value as AvaPageThemeName)
+    : "default";
+}
+
+function _getTypographyProp(props: unknown): AvaPageTypographyName {
+  if (!_isRecord(props)) {
+    return "system";
+  }
+  const value: unknown = props.typography;
+  return _TYPOGRAPHY_VALUES.has(value as AvaPageTypographyName) ?
+      (value as AvaPageTypographyName)
+    : "system";
 }
 
 function _getEmbedURL(url: string): string | undefined {
@@ -342,6 +385,20 @@ export function getDashboardPuckConfig(options: {
           label: "Page title",
           type: "text",
         },
+        theme: {
+          label: "Theme",
+          type: "select",
+          options: DASHBOARD_THEME_OPTIONS.map((o) => {
+            return { label: o.label, value: o.value };
+          }),
+        },
+        typography: {
+          label: "Typography",
+          type: "select",
+          options: DASHBOARD_TYPOGRAPHY_OPTIONS.map((o) => {
+            return { label: o.label, value: o.value };
+          }),
+        },
         containerMaxWidth: buildContainerMaxWidthPFieldConfig(),
         isTitleHidden: {
           label: "Hide title",
@@ -423,6 +480,8 @@ export function getDashboardPuckConfig(options: {
         isTitleHidden: false,
         publishedAt: "",
         subtitle: "",
+        theme: "default",
+        typography: "system",
         title: options.dashboardTitle,
         verticalPadding: "lg",
       } satisfies AvaPageRootProps,
@@ -490,6 +549,11 @@ export function getDashboardPuckConfig(options: {
         const visiblePublishedAt: string | undefined =
           isPublishedAtHidden ? undefined : publishedAt;
 
+        const tokens = getDashboardDesignTokens({
+          theme: _getThemeProp(props),
+          typography: _getTypographyProp(props),
+        });
+
         const children: ReactNode | undefined = (
           props as {
             children?: ReactNode;
@@ -506,38 +570,88 @@ export function getDashboardPuckConfig(options: {
         const byline: string | undefined =
           bylineParts.length > 0 ? bylineParts.join(" • ") : undefined;
 
+        const hasHeader =
+          !isTitleHidden ||
+          visibleSubtitle !== undefined ||
+          byline !== undefined;
+
         return (
-          <Stack
-            mx="auto"
-            w={
-              effectiveContainerMaxWidth.unit === "%" ?
-                `${effectiveContainerMaxWidth.value}%`
-              : "100%"
-            }
-            maw={
-              effectiveContainerMaxWidth.unit === "px" ?
-                effectiveContainerMaxWidth.value
-              : undefined
-            }
-            py={_getRootPaddingValue(verticalPadding)}
-            px={_getRootPaddingValue(horizontalPadding)}
-            gap="lg"
+          <Box
+            style={{
+              backgroundColor: tokens.pageBackground,
+              fontFamily: tokens.bodyFontFamily,
+              minHeight: "100%",
+            }}
           >
-            <Stack gap={6}>
-              {isTitleHidden ? null : <Title order={1}>{title}</Title>}
-              {visibleSubtitle ?
-                <Text c="dimmed" fz="lg">
-                  {visibleSubtitle}
-                </Text>
+            <Stack
+              mx="auto"
+              w={
+                effectiveContainerMaxWidth.unit === "%" ?
+                  `${effectiveContainerMaxWidth.value}%`
+                : "100%"
+              }
+              maw={
+                effectiveContainerMaxWidth.unit === "px" ?
+                  effectiveContainerMaxWidth.value
+                : undefined
+              }
+              py={_getRootPaddingValue(verticalPadding)}
+              px={_getRootPaddingValue(horizontalPadding)}
+              gap="xl"
+            >
+              {hasHeader ?
+                <Box
+                  style={{
+                    borderLeft: `4px solid ${tokens.accentColor}`,
+                    paddingLeft: "1rem",
+                  }}
+                >
+                  <Stack gap={6}>
+                    {isTitleHidden ? null : (
+                      <Title
+                        order={1}
+                        style={{
+                          color: tokens.titleColor,
+                          fontFamily: tokens.headingFontFamily,
+                          lineHeight: 1.15,
+                          letterSpacing: "-0.01em",
+                        }}
+                      >
+                        {title}
+                      </Title>
+                    )}
+                    {visibleSubtitle ?
+                      <Text
+                        fz="lg"
+                        style={{
+                          color: tokens.subtitleColor,
+                          fontFamily: tokens.bodyFontFamily,
+                          lineHeight: 1.5,
+                          maxWidth: "60ch",
+                        }}
+                      >
+                        {visibleSubtitle}
+                      </Text>
+                    : null}
+                    {byline ?
+                      <Text
+                        fz="sm"
+                        style={{
+                          color: tokens.bylineColor,
+                          letterSpacing: "0.02em",
+                          textTransform: "uppercase",
+                          fontWeight: 500,
+                        }}
+                      >
+                        {byline}
+                      </Text>
+                    : null}
+                  </Stack>
+                </Box>
               : null}
-              {byline ?
-                <Text c="dimmed" fz="sm">
-                  {byline}
-                </Text>
-              : null}
+              {children}
             </Stack>
-            {children}
-          </Stack>
+          </Box>
         );
       },
     },
@@ -556,6 +670,7 @@ export function getDashboardPuckConfig(options: {
         defaultExpanded: true,
         components: [
           "DataViz",
+          "Filter",
           "Card",
           "CalloutBlock",
           "CodeBlock",
@@ -1018,6 +1133,7 @@ export function getDashboardPuckConfig(options: {
         },
       },
       DataViz: buildDataVizPBlockConfig(options),
+      Filter: buildFilterPBlockConfig(),
       HeadingBlock: {
         label: "Heading",
         fields: {

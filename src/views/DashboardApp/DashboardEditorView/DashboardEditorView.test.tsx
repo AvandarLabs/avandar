@@ -7,6 +7,7 @@ import {
 } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AvandarUiProvider } from "@/components/AvandarUiProvider";
+import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { DashboardId } from "$/models/Dashboard/Dashboard.types";
 import type { UserId } from "$/models/User/User.types";
@@ -235,7 +236,11 @@ function renderWithProviders(
     wrapper: ({ children }) => {
       return (
         <QueryClientProvider client={queryClient}>
-          <AvandarUiProvider>{children}</AvandarUiProvider>
+          <AvandarUiProvider>
+            <DashboardEditorStateManager.Provider>
+              {children}
+            </DashboardEditorStateManager.Provider>
+          </AvandarUiProvider>
         </QueryClientProvider>
       );
     },
