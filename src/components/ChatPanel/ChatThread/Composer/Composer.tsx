@@ -3,6 +3,7 @@ import { ActionIcon, Group } from "@mantine/core";
 import { IconArrowUp } from "@tabler/icons-react";
 import clsx from "clsx";
 import { ChatModelPicker } from "@/components/ChatPanel/ChatModelPicker/ChatModelPicker";
+import { VoiceInputButton } from "@/components/ChatPanel/VoiceInputButton/VoiceInputButton";
 import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import css from "./Composer.module.css";
 
@@ -30,6 +31,7 @@ export function Composer(): JSX.Element {
           disabled={disabled}
         />
         <Group gap="xs">
+          <VoiceInputButton disabled={disabled} />
           <ChatModelPicker disabled={disabled} />
           <ComposerPrimitive.Send asChild>
             <ActionIcon

@@ -80,7 +80,9 @@ Legend: `[x]` done · `[~]` partial / in flight · `[ ]` not started · `[—]` 
 - [x] **5. Install `node-sql-parser`; best-effort SQL → manual query form parsing** (Data Explorer only; supports SELECT / GROUP BY / ORDER BY / WHERE / HAVING / JOIN / nested subqueries. See `docs/demo-features/sql-parser-filter-ui.md`. Dashboards still pending.)
 - [~] **6. Bidirectional SQL ↔ manual-query-form sync** (Data Explorer: knex-based form → SQL regeneration + lossy-mapping warning + overwrite-confirmation flow. Dashboards still pending.)
 - [ ] **7. Tokenize generated SQL / Python / R — column names + dataset IDs as clickable pills**
-- [ ] **8. Multilingual voice dictation in chat panel (Whisper / transformers.js, 6 languages)**
+- [~] **8. Multilingual voice dictation in chat panel (Whisper / transformers.js, 6 languages)**
+  - Web only for now. Mic icon next to the model picker; first click prompts to download a Whisper model from Hugging Face (tiny / base / small). Model weights stream into an IndexedDB-backed cache (no OPFS). A floating bottom-left progress indicator shows `Downloading <model> for voice prompting` with %; toast appears on success. Subsequent clicks record from the mic, run Whisper locally, and inject the transcript into the composer. 6 languages surfaced in the UI (English, Spanish, French, Portuguese, Swahili, Chinese) plus auto-detect.
+  - Desktop integration intentionally deferred. Models are local; no API tokens needed.
 - [x] **9. Redesigned dataset Summary view (visualizations, lazy-load, scroll-on-demand)**
   - Doc-style outline with sticky TOC on the left, plain-language headline per column, type-appropriate viz beneath (bar for text top values, range+stddev for numbers, timeline for dates), missing-rate ring when nonzero.
   - Lazy-loaded per column: `getColumnSummary` only fires when a section is within 200px of the viewport.
