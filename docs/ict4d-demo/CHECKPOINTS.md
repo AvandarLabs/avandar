@@ -108,23 +108,34 @@ showing the dataset name." This is a SQL-aware editor with semantic
 tokens — feasible but a multi-day project. Defer.
 
 ### Dashboard rebuild (items #10–#17, #21, #22)
-**Partially shipped:**
+**Shipped:**
 
+- ✅ #10 — Theme + typography presets (default / ocean / forest / rose /
+  amber / graphite × system / serif / mono). Polished header (left-accent
+  strip, tighter title leading, uppercase byline). Polished DataViz card.
+  (Checkpoint 9.) Logo upload is still pending.
 - ✅ #12 — Vanity URL (kebab-case), copy-to-clipboard, QR code with
   download. PDF export still pending.
+- ✅ #15 — Viewer-editable global filters. New `Filter` P-block with
+  single-select, multi-select, and contains modes; SQL composes via
+  subselect wrap. (Checkpoint 9.)
+- ✅ #16 — Per-viz filter foundation via the `subscribedFilterIds`
+  whitelist on `applyDashboardFiltersToSql`. The per-viz UI to opt out of
+  specific global filters from inside the DataViz block panel is the
+  remaining piece. (Checkpoint 9.)
 - ✅ #18 — View-before-publish preview route + "Back to editor" banner.
+- ✅ #22 — Chat panel inside the dashboard editor emits new DataViz
+  P-blocks via the `addDashboardBlock` tool. (Checkpoint 9.)
 
 **Still pending:**
-- #10 — Editable design tokens / typography / spacing / logo upload
+- #10 — Logo upload (the typography + theme tokens shipped)
 - #11 — Media embedding via Supabase Storage
-- #12 (PDF export only)
+- #12 — PDF export only
 - #13 — Workspace-private dashboard sharing via the Share modal
 - #14 — Slice-aware public publishing (data subsetting on publish)
-- #15 — Viewer-editable global filters
-- #16 — Viewer-editable per-viz filters
+- #16 — Per-viz override UI inside the DataViz block panel
 - #17 — Publish-time slice picker
 - #21 — Manual query form in dashboards
-- #22 — Chat panel inside dashboards (Puck-block-generating)
 
 Each of these is its own focused session.
 
@@ -132,8 +143,12 @@ Each of these is its own focused session.
 React Joyride walkthrough. Small but needs design pass + content. Defer.
 
 ### Usage analytics (item #26)
-**Table shipped** in Checkpoint 3. Client-side event-logging spots are a
-cheap follow-up.
+**Table shipped** in Checkpoint 3. **Client-side event logging shipped**
+in Checkpoint 9: `dataset.imported`, `dashboard.published`,
+`chat.message_sent`, `chat.sql_generated`,
+`dashboard.block_added_via_chat`, `dashboard.filter_changed`. Adding
+more event names is a matter of importing `logAnalyticsEvent` at the
+relevant call site; the allowlist lives in `analyticsEventTypes.ts`.
 
 ### Improved Summary view (item #9)
 **Shipped** in Checkpoint 6. Doc-style outline with sticky TOC,
