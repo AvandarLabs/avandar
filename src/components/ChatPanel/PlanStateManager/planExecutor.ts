@@ -51,9 +51,8 @@ export async function executePlanStep(args: {
     await DuckDbClient.runRawQuery(wrappedSql);
     // Pull schema + preview rows for the DAG node.
     const previewQuery = `SELECT * FROM "${viewName}" LIMIT ${PREVIEW_ROW_CAP}`;
-    const result = await DuckDbClient.runRawQuery<Record<string, unknown>>(
-      previewQuery,
-    );
+    const result =
+      await DuckDbClient.runRawQuery<Record<string, unknown>>(previewQuery);
     const actualSchema = result.columns.map((c) => {
       return { name: c.name, type: String(c.dataType ?? "unknown") };
     });

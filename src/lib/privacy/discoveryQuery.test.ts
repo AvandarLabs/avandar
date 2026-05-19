@@ -16,15 +16,13 @@ describe("isReadOnlyDiscoveryQuery", () => {
   test("accepts CTE prefixed with WITH", () => {
     expect(
       isReadOnlyDiscoveryQuery(
-        'WITH t AS (SELECT 1 AS x) SELECT * FROM t LIMIT 10',
+        "WITH t AS (SELECT 1 AS x) SELECT * FROM t LIMIT 10",
       ),
     ).toBe(true);
   });
 
   test("tolerates leading whitespace", () => {
-    expect(
-      isReadOnlyDiscoveryQuery("   \n  SELECT 1 LIMIT 1"),
-    ).toBe(true);
+    expect(isReadOnlyDiscoveryQuery("   \n  SELECT 1 LIMIT 1")).toBe(true);
   });
 
   test("rejects empty string", () => {
@@ -36,9 +34,7 @@ describe("isReadOnlyDiscoveryQuery", () => {
   });
 
   test("rejects UPDATE", () => {
-    expect(
-      isReadOnlyDiscoveryQuery('UPDATE "abc" SET x = 1'),
-    ).toBe(false);
+    expect(isReadOnlyDiscoveryQuery('UPDATE "abc" SET x = 1')).toBe(false);
   });
 
   test("rejects DELETE", () => {
@@ -50,9 +46,7 @@ describe("isReadOnlyDiscoveryQuery", () => {
   });
 
   test("rejects statement with semicolon", () => {
-    expect(
-      isReadOnlyDiscoveryQuery("SELECT 1; DROP TABLE x"),
-    ).toBe(false);
+    expect(isReadOnlyDiscoveryQuery("SELECT 1; DROP TABLE x")).toBe(false);
   });
 
   test("rejects a query longer than the cap", () => {

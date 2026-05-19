@@ -138,7 +138,6 @@ type RawClarifyArgs = {
   };
 };
 
-
 function _parseClarify(
   argsJson: string | undefined,
   priorClarifications: number,
@@ -254,18 +253,10 @@ const ALLOWED_PLAN_STEP_TYPES = new Set<ChatPlanStep["type"]>([
   "r",
   "clarification",
 ]);
-const ALLOWED_DEFAULT_VIZ = new Set([
-  "table",
-  "bar",
-  "line",
-  "scatter",
-  "pie",
-]);
+const ALLOWED_DEFAULT_VIZ = new Set(["table", "bar", "line", "scatter", "pie"]);
 const MAX_PLAN_STEPS = 8;
 
-function _parseProposePlan(
-  argsJson: string | undefined,
-): ChatPlan | undefined {
+function _parseProposePlan(argsJson: string | undefined): ChatPlan | undefined {
   if (!argsJson) {
     return undefined;
   }
@@ -300,15 +291,18 @@ function _parseProposePlan(
       continue;
     }
     const stepType =
-      typeof raw.type === "string" &&
-        ALLOWED_PLAN_STEP_TYPES.has(raw.type as ChatPlanStep["type"]) ?
+      (
+        typeof raw.type === "string" &&
+        ALLOWED_PLAN_STEP_TYPES.has(raw.type as ChatPlanStep["type"])
+      ) ?
         (raw.type as ChatPlanStep["type"])
       : "sql";
-    const inputs: string[] = Array.isArray(raw.inputs) ?
-      raw.inputs.filter((i): i is string => {
-        return typeof i === "string";
-      })
-    : [];
+    const inputs: string[] =
+      Array.isArray(raw.inputs) ?
+        raw.inputs.filter((i): i is string => {
+          return typeof i === "string";
+        })
+      : [];
     const predictedSchema: Array<{ name: string; type: string }> =
       Array.isArray(raw.predictedSchema) ?
         (raw.predictedSchema as Array<{ name?: unknown; type?: unknown }>)
@@ -320,8 +314,10 @@ function _parseProposePlan(
           })
       : [];
     const defaultViz =
-      typeof raw.defaultViz === "string" &&
-        ALLOWED_DEFAULT_VIZ.has(raw.defaultViz) ?
+      (
+        typeof raw.defaultViz === "string" &&
+        ALLOWED_DEFAULT_VIZ.has(raw.defaultViz)
+      ) ?
         (raw.defaultViz as ChatPlanStep["defaultViz"])
       : undefined;
     cleaned.push({

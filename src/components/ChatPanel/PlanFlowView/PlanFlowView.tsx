@@ -56,9 +56,7 @@ function StatusIcon({ status }: { status: PlanStepStatus }): JSX.Element {
     case "succeeded":
       return <IconCircleCheck size={16} color="var(--mantine-color-green-6)" />;
     case "failed":
-      return (
-        <IconAlertTriangle size={16} color="var(--mantine-color-red-6)" />
-      );
+      return <IconAlertTriangle size={16} color="var(--mantine-color-red-6)" />;
     case "running":
       return (
         <IconLoader2
@@ -187,8 +185,8 @@ export function PlanFlowView(): JSX.Element | null {
         {anyFailed ?
           <Alert color="red" variant="light" radius="sm" p="xs">
             <Text size="xs">
-              A step failed. Re-run after the model regenerates, or fix the
-              SQL manually below.
+              A step failed. Re-run after the model regenerates, or fix the SQL
+              manually below.
             </Text>
           </Alert>
         : null}
@@ -247,8 +245,7 @@ function PlanStepCard({
       radius="sm"
       p="xs"
       style={{
-        borderColor:
-          isFocused ? "var(--mantine-color-blue-4)" : undefined,
+        borderColor: isFocused ? "var(--mantine-color-blue-4)" : undefined,
       }}
     >
       <Stack gap="xs">
@@ -263,11 +260,7 @@ function PlanStepCard({
             </Text>
           </Group>
           <Group gap={4}>
-            <Badge
-              size="xs"
-              variant="light"
-              color={STATUS_COLOR[node.status]}
-            >
+            <Badge size="xs" variant="light" color={STATUS_COLOR[node.status]}>
               {STATUS_LABEL[node.status]}
             </Badge>
             <Button
@@ -311,7 +304,8 @@ function PlanStepCard({
                 </Text>
                 {node.actualSchema && node.actualSchema.length > 0 ?
                   <Text size="xs" c="dimmed">
-                    Columns: {node.actualSchema
+                    Columns:{" "}
+                    {node.actualSchema
                       .map((c) => {
                         return c.name;
                       })

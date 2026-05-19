@@ -1,15 +1,15 @@
 import { useThreadRuntime } from "@assistant-ui/react";
 import { Box } from "@mantine/core";
 import { useCallback } from "react";
+import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ClarificationCard } from "@/components/ChatPanel/ClarificationCard/ClarificationCard";
-import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { recordOutcome } from "@/lib/privacy/clarificationAuditLog";
 import { crossBoundary } from "@/lib/privacy/crossBoundary";
-import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/useAvandarChatRuntime";
 import type { DiscoveryResolver } from "@/components/ChatPanel/ClarificationCard/ClarificationCard";
+import type { ChatClarifyRequestWithAudit } from "@/components/ChatPanel/useAvandarChatRuntime";
 
 /**
  * Renders the inline clarification card above the composer when the

@@ -227,9 +227,7 @@ test.describe("chat interactive workflows", () => {
     await expect(page.getByText("Analytic plan")).toBeVisible({
       timeout: MEDIUM_WAIT,
     });
-    await expect(
-      page.getByText("Keep only confirmed cases"),
-    ).toBeVisible();
+    await expect(page.getByText("Keep only confirmed cases")).toBeVisible();
     await expect(page.getByText("Aggregate by day")).toBeVisible();
 
     // Both steps should eventually succeed (auto-run is the default)

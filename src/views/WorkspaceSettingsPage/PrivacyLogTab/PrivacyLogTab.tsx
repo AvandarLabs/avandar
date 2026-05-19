@@ -338,17 +338,17 @@ function ClarificationLogPanel(): JSX.Element {
       <Stack gap={4}>
         <Title order={4}>Clarifications</Title>
         <Text size="sm" c="dimmed">
-          A local record of every clarifying question the AI has asked in
-          this workspace. Only metadata is stored — never the question text
-          or your answer.
+          A local record of every clarifying question the AI has asked in this
+          workspace. Only metadata is stored — never the question text or your
+          answer.
         </Text>
       </Stack>
 
       {entries.length === 0 ?
         <Card withBorder>
           <Text size="sm" c="dimmed" ta="center">
-            No clarifications yet. The log fills in as the chat asks
-            clarifying questions.
+            No clarifications yet. The log fills in as the chat asks clarifying
+            questions.
           </Text>
         </Card>
       : <Table striped withTableBorder>
